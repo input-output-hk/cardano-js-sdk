@@ -8,7 +8,6 @@ export function buildTransaction (
   outputs: TransactionOutput[],
   feeAlgorithm = LinearFeeAlgorithm.default()
 ): Transaction {
-
   if (!inputs.length || !outputs.length) {
     throw new Error('Transaction requires both inputs and outputs')
   }
@@ -22,7 +21,7 @@ export function buildTransaction (
   return transactionBuilder.make_transaction()
 }
 
-export function addInsAndOutsToTransaction(inputs: TransactionInput[], outputs: TransactionOutput[]) {
+export function addInsAndOutsToTransaction (inputs: TransactionInput[], outputs: TransactionOutput[]) {
   const transactionBuilder = new TransactionBuilder()
 
   inputs.forEach(input => {
