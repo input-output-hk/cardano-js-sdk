@@ -1,7 +1,22 @@
-# cardano-js-sdk
-JavaScript SDK for interacting with the Cardano blockchain
+# Cardano JS SDK
+JavaScript SDK for interacting with Cardano
 
-## Useful References
+## Features
+*This SDK is a work in progress. Feature state as follows:*
+
+- Build transaction: *Complete*
+- Sign transaction: *TODO*
+  -- memory
+  -- Ledger Nano S
+  -- Trezor
+- Submit transaction: *TODO*
+- Balance transaction: *TODO*
+- Message signing and verification: *TODO*
+  -- memory
+  -- Ledger Nano S
+  -- Trezor
+
+## Development References
 
 Hardware wallet transaction preparation - https://github.com/Emurgo/yoroi-frontend/tree/develop/app/api/ada/hardwareWallet
 

@@ -3,7 +3,7 @@ import { buildTransaction } from './build'
 import { estimateTransactionFee } from './estimate_fee'
 
 describe('buildTransaction', () => {
-  it('throws if a transaction is underfunded', () => {
+  it('throws if a transaction has more input than output', () => {
     const inputs = [
       { pointer: { id: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef', index: 1 }, value: '1000000' },
       { pointer: { id: 'fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210', index: 0 }, value: '5000000' }
@@ -16,7 +16,7 @@ describe('buildTransaction', () => {
     expect(() => buildTransaction(inputs, outputs)).to.throw(/Inputs outweigh outputs/)
   })
 
-  it('throws if a transaction is unbalanced', () => {
+  it('throws if a transaction has more output than input', () => {
     const inputs = [
       { pointer: { id: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef', index: 1 }, value: '1' },
       { pointer: { id: 'fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210', index: 0 }, value: '1' }
