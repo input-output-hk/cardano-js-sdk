@@ -3,7 +3,7 @@ export interface TransactionInput {
     index: number
     id: string
   }
-  value: number
+  value: string
   addressing?: {
     account: number
     change: number

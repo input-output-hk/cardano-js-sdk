@@ -8,15 +8,26 @@ export function buildTransaction (
   outputs: TransactionOutput[],
   feeAlgorithm = LinearFeeAlgorithm.default()
 ): Transaction {
-  const transactionBuilder = new TransactionBuilder()
 
   if (!inputs.length || !outputs.length) {
     throw new Error('Transaction requires both inputs and outputs')
   }
 
+  const transactionBuilder = addInsAndOutsToTransaction(inputs, outputs)
+
+  const balance = transactionBuilder.get_balance(feeAlgorithm)
+  if (balance.is_negative()) throw new Error('Outputs outweigh inputs')
+  if (balance.is_positive()) throw new Error('Inputs outweigh outputs')
+
+  return transactionBuilder.make_transaction()
+}
+
+export function addInsAndOutsToTransaction(inputs: TransactionInput[], outputs: TransactionOutput[]) {
+  const transactionBuilder = new TransactionBuilder()
+
   inputs.forEach(input => {
     const pointer = TxoPointer.from_json(input.pointer)
-    const value = Coin.from(input.value, 0)
+    const value = Coin.from(0, Number(input.value))
     transactionBuilder.add_input(pointer, value)
   })
 
@@ -25,11 +36,5 @@ export function buildTransaction (
     transactionBuilder.add_output(txOut)
   })
 
-  const balance = transactionBuilder.get_balance(feeAlgorithm)
-  console.log(balance.value().to_str())
-
-  if (balance.is_negative()) throw new Error('Too many inputs')
-  if (balance.is_positive()) throw new Error('Too few inputs')
-
-  return transactionBuilder.make_transaction()
+  return transactionBuilder
 }
