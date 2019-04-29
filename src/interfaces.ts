@@ -4,7 +4,7 @@ export interface TransactionInput {
     id: string
   }
   value: number
-  addressing: {
+  addressing?: {
     account: number
     change: number
     index: number
@@ -13,7 +13,7 @@ export interface TransactionInput {
 
 export interface TransactionOutput {
   address: string
-  value: number
+  value: string
   isChange?: boolean
   fullAddress?: {
     cadAmount: {
