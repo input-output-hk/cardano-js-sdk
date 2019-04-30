@@ -1,20 +1,20 @@
 # Cardano JS SDK
-JavaScript SDK for interacting with Cardano
+JavaScript SDK for interacting with Cardano, providing various key management options including support for popular hardware wallets
 
 ## Features
 *This SDK is a work in progress. Feature state as follows:*
 
-- Build transaction: *Complete*
-- Sign transaction: *TODO*
-  -- memory
-  -- Ledger Nano S
-  -- Trezor
-- Submit transaction: *TODO*
-- Balance transaction: *TODO*
-- Message signing and verification: *TODO*
-  -- memory
-  -- Ledger Nano S
-  -- Trezor
+- [x] Build a transaction and estimate fees
+- [ ] Balance a transaction (delegate input selection)
+- [ ] Transaction signing
+  - [ ] memory
+  - [ ] Ledger Nano S
+  - [ ] Trezor
+- [ ] Submit transaction to network
+- [ ] Message signing and verification
+  - [ ] memory
+  - [ ] Ledger Nano S
+  - [ ] Trezor
 
 ## Development References
 
