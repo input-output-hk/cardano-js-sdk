@@ -1,7 +1,31 @@
 import { expect } from 'chai'
 import { Transaction } from './Transaction'
+import { InvalidTransactionConstruction, TransactionOverweight, TransactionUnderweight } from './errors'
+import { TransactionInput } from './TransactionInput'
+import { TransactionOutput } from './TransactionOutput'
 
 describe('Transaction', () => {
+  it('throws if inputs are not provided', () => {
+    const inputs = [] as TransactionInput[]
+
+    let outputs = [
+      { address: 'Ae2tdPwUPEZCEhYAUVU7evPfQCJjyuwM6n81x6hSjU9TBMSy2YwZEVydssL', value: '10000' }
+    ]
+
+    expect(() => Transaction(inputs, outputs)).to.throw(InvalidTransactionConstruction)
+  })
+
+  it('throws if outputs are not provided', () => {
+    const inputs = [
+      { pointer: { id: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef', index: 1 }, value: '1000000' },
+      { pointer: { id: 'fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210', index: 0 }, value: '5000000' }
+    ]
+
+    let outputs = [] as TransactionOutput[]
+
+    expect(() => Transaction(inputs, outputs)).to.throw(InvalidTransactionConstruction)
+  })
+
   describe('Finalize', () => {
     it('throws if a transaction has more input than output', () => {
       const inputs = [
@@ -13,7 +37,7 @@ describe('Transaction', () => {
         { address: 'Ae2tdPwUPEZCEhYAUVU7evPfQCJjyuwM6n81x6hSjU9TBMSy2YwZEVydssL', value: '10000' }
       ]
 
-      expect(() => Transaction(inputs, outputs).finalize()).to.throw(/Inputs outweigh outputs/)
+      expect(() => Transaction(inputs, outputs).finalize()).to.throw(TransactionUnderweight)
     })
 
     it('throws if a transaction has more output than input', () => {
@@ -26,7 +50,7 @@ describe('Transaction', () => {
         { address: 'Ae2tdPwUPEZCEhYAUVU7evPfQCJjyuwM6n81x6hSjU9TBMSy2YwZEVydssL', value: '2000000' }
       ]
 
-      expect(() => Transaction(inputs, outputs).finalize()).to.throw(/Outputs outweigh inputs/)
+      expect(() => Transaction(inputs, outputs).finalize()).to.throw(TransactionOverweight)
     })
 
     it('returns a transaction as hex when the transaction is balanced', () => {

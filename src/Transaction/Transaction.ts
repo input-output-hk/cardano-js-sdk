@@ -1,5 +1,6 @@
 import { Transaction as CardanoTransaction, TransactionBuilder as CardanoTransactionBuilder, LinearFeeAlgorithm as CardanoLinearFeeAlgorithm } from 'cardano-wallet'
 import { getBindingsForEnvironment } from '../lib/bindings'
+import { InvalidTransactionConstruction, TransactionOverweight, TransactionUnderweight } from './errors'
 import { TransactionInput } from './TransactionInput'
 import { TransactionOutput } from './TransactionOutput'
 const { TransactionBuilder, TxoPointer, TxOut, Coin, LinearFeeAlgorithm } = getBindingsForEnvironment()
@@ -14,7 +15,7 @@ export function Transaction (inputs: TransactionInput[], outputs: TransactionOut
   const transactionBuilder = new TransactionBuilder()
 
   if (!inputs.length || !outputs.length) {
-    throw new Error('Transaction requires both inputs and outputs')
+    throw new InvalidTransactionConstruction()
   }
 
   inputs.forEach(input => {
@@ -40,8 +41,8 @@ export function finalize (
   feeAlgorithm = LinearFeeAlgorithm.default()
 ): CardanoTransaction {
   const balance = transactionBuilder.get_balance(feeAlgorithm)
-  if (balance.is_negative()) throw new Error('Outputs outweigh inputs')
-  if (balance.is_positive()) throw new Error('Inputs outweigh outputs')
+  if (balance.is_negative()) throw new TransactionOverweight()
+  if (balance.is_positive()) throw new TransactionUnderweight()
 
   return transactionBuilder.make_transaction()
 }
