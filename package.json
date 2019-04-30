@@ -1,0 +1,73 @@
+{
+  "name": "cardano-js-sdk",
+  "version": "0.1.0",
+  "description": "A JavaScript SDK for interacting with the Cardano blockchain",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "rm -rf dist && tsc",
+    "lint": "eslint \"src/**/*.ts\"",
+    "lint:fix": "eslint --fix \"src/**/*.ts\"",
+    "test": "npm run lint && npm run build && NODE_ENV=test nyc mocha",
+    "test:watch": "mocha -w",
+    "test:coverage": "npm test && http-server coverage",
+    "documentation": "typedoc --out documentation/ --exclude \"src/**/*.spec.ts\" --mode modules src/",
+    "documentation:serve": "npm run documentation && http-server documentation"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/input-output-hk/cardano-js-sdk.git"
+  },
+  "keywords": [
+    "Cardano"
+  ],
+  "contributors": [
+    "Rhys Bartels-Waller <rhys.bartelswaller@iohk.io> (https://iohk.io)",
+    "Sam Jeston <sam.jeston@iohk.io> (https://iohk.io)"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/input-output-hk/cardano-js-sdk/issues"
+  },
+  "homepage": "https://github.com/input-output-hk/cardano-js-sdk#readme",
+  "devDependencies": {
+    "@types/chai": "^4.1.7",
+    "@types/mocha": "^5.2.6",
+    "@typescript-eslint/eslint-plugin": "^1.7.0",
+    "chai": "^4.2.0",
+    "eslint": "^5.15.1",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-plugin-import": "^2.16.0",
+    "eslint-plugin-node": "^8.0.1",
+    "eslint-plugin-promise": "^4.0.1",
+    "eslint-plugin-standard": "^4.0.0",
+    "http-server": "^0.11.1",
+    "mocha": "^6.0.2",
+    "nyc": "^13.3.0",
+    "source-map-support": "^0.5.11",
+    "ts-node": "^8.1.0",
+    "typedoc": "^0.14.2",
+    "typescript": "^3.3.3333"
+  },
+  "dependencies": {
+    "@types/node": "^11.13.8",
+    "cardano-wallet": "^0.3.0",
+    "cardano-wallet-browser": "^0.3.0",
+    "io-ts": "^1.8.5",
+    "ts-custom-error": "^3.0.0"
+  },
+  "nyc": {
+    "extension": [
+      ".ts"
+    ],
+    "include": [
+      "src/**/*.ts"
+    ],
+    "exclude": [
+      "src/**/*.spec.ts"
+    ],
+    "reporter": [
+      "html"
+    ],
+    "all": true
+  }
+}
