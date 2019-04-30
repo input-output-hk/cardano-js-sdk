@@ -5,13 +5,11 @@ import { TransactionInput } from './TransactionInput'
 import { TransactionOutput } from './TransactionOutput'
 const { TransactionBuilder, TxoPointer, TxOut, Coin, LinearFeeAlgorithm } = getBindingsForEnvironment()
 
-export interface ClientTransaction {
+export function Transaction (inputs: TransactionInput[], outputs: TransactionOutput[]): {
   estimateFee: (feeAlgorithm?: CardanoLinearFeeAlgorithm) => string
   finalize: () => CardanoTransaction,
   builder: CardanoTransactionBuilder
-}
-
-export function Transaction (inputs: TransactionInput[], outputs: TransactionOutput[]): ClientTransaction {
+} {
   const transactionBuilder = new TransactionBuilder()
 
   if (!inputs.length || !outputs.length) {
@@ -36,7 +34,7 @@ export function Transaction (inputs: TransactionInput[], outputs: TransactionOut
   }
 }
 
-export function finalize (
+function finalize (
   transactionBuilder: CardanoTransactionBuilder,
   feeAlgorithm = LinearFeeAlgorithm.default()
 ): CardanoTransaction {
@@ -47,7 +45,7 @@ export function finalize (
   return transactionBuilder.make_transaction()
 }
 
-export function estimateTransactionFee (
+function estimateTransactionFee (
   transactionBuilder: CardanoTransactionBuilder,
   feeAlgorithm = LinearFeeAlgorithm.default()
 ): string {
