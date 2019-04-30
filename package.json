@@ -52,6 +52,7 @@
     "@types/node": "^11.13.8",
     "cardano-wallet": "^0.3.0",
     "cardano-wallet-browser": "^0.3.0",
+    "io-ts": "^1.8.5",
     "ts-custom-error": "^3.0.0"
   },
   "nyc": {

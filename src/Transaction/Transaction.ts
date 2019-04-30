@@ -1,8 +1,9 @@
 import { Transaction as CardanoTransaction, TransactionBuilder as CardanoTransactionBuilder, LinearFeeAlgorithm as CardanoLinearFeeAlgorithm } from 'cardano-wallet'
 import { getBindingsForEnvironment } from '../lib/bindings'
-import { InvalidTransactionConstruction, TransactionOverweight, TransactionUnderweight } from './errors'
-import { TransactionInput } from './TransactionInput'
-import { TransactionOutput } from './TransactionOutput'
+import { TransactionOverweight, TransactionUnderweight } from './errors'
+import { TransactionInput, TransactionInputCodec } from './TransactionInput'
+import { TransactionOutput, TransactionOutputCodec } from './TransactionOutput'
+import { validateCodec } from '../lib/validator'
 const { TransactionBuilder, TxoPointer, TxOut, Coin, LinearFeeAlgorithm } = getBindingsForEnvironment()
 
 export function Transaction (inputs: TransactionInput[], outputs: TransactionOutput[]): {
@@ -10,11 +11,10 @@ export function Transaction (inputs: TransactionInput[], outputs: TransactionOut
   finalize: () => CardanoTransaction,
   builder: CardanoTransactionBuilder
 } {
-  const transactionBuilder = new TransactionBuilder()
+  validateCodec<typeof TransactionInputCodec>(TransactionInputCodec, inputs)
+  validateCodec<typeof TransactionOutputCodec>(TransactionOutputCodec, outputs)
 
-  if (!inputs.length || !outputs.length) {
-    throw new InvalidTransactionConstruction()
-  }
+  const transactionBuilder = new TransactionBuilder()
 
   inputs.forEach(input => {
     const pointer = TxoPointer.from_json(input.pointer)
