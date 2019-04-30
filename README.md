@@ -1,5 +1,5 @@
 # Cardano JS SDK
-JavaScript SDK for interacting with Cardano
+JavaScript SDK for interacting with Cardano, providing various key management options including support for popular hardware wallets
 
 ## Features
 *This SDK is a work in progress. Feature state as follows:*
