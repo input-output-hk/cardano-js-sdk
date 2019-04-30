@@ -1,8 +1,6 @@
 import { expect } from 'chai'
-import { Transaction } from './Transaction'
+import Transaction, { TransactionInput, TransactionOutput } from './'
 import { TransactionOverweight, TransactionUnderweight } from './errors'
-import { TransactionInput } from './TransactionInput'
-import { TransactionOutput } from './TransactionOutput'
 import { EmptyArray } from '../lib/validator/errors'
 
 describe('Transaction', () => {

@@ -1,11 +1,11 @@
 import * as t from 'io-ts'
 
-const transactionInputPointer = t.type({
+const pointer = t.type({
   index: t.number,
   id: t.string
 })
 
-const transactionInputAddressing = t.type({
+const addressing = t.type({
   account: t.number,
   change: t.number,
   index: t.number
@@ -13,10 +13,10 @@ const transactionInputAddressing = t.type({
 
 export const TransactionInputCodec = t.intersection([
   t.interface({
-    pointer: transactionInputPointer,
+    pointer,
     value: t.string
   }),
-  t.partial({ addressing: transactionInputAddressing })
+  t.partial({ addressing })
 ])
 
 export type TransactionInput = t.TypeOf<typeof TransactionInputCodec>

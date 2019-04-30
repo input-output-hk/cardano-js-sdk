@@ -1,11 +1,11 @@
 import * as t from 'io-ts'
 
-const transactionOutputRequiredFields = t.type({
+const requiredFields = t.type({
   address: t.string,
   value: t.string
 })
 
-const transactionOutputFullAddress = t.type({
+const fullAddress = t.type({
   cadAmount: t.interface({
     getCCoin: t.number
   }),
@@ -16,14 +16,14 @@ const transactionOutputFullAddress = t.type({
   index: t.number
 })
 
-const transactionOutputOptionalFields = t.partial({
+const optionalFields = t.partial({
   isChange: t.boolean,
-  fullAddress: transactionOutputFullAddress
+  fullAddress
 })
 
 export const TransactionOutputCodec = t.intersection([
-  transactionOutputRequiredFields,
-  transactionOutputOptionalFields
+  requiredFields,
+  optionalFields
 ])
 
 export type TransactionOutput = t.TypeOf<typeof TransactionOutputCodec>
