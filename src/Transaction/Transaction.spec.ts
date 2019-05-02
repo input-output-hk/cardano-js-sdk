@@ -40,7 +40,7 @@ describe('Transaction', () => {
         { address: 'Ae2tdPwUPEZCEhYAUVU7evPfQCJjyuwM6n81x6hSjU9TBMSy2YwZEVydssL', value: '10000' }
       ]
 
-      expect(() => Transaction(inputs, outputs).finalize()).to.throw(TransactionUnderweight)
+      expect(() => Transaction(inputs, outputs).validateAndMake()).to.throw(TransactionUnderweight)
     })
 
     it('throws if a transaction has more output than input', () => {
@@ -53,7 +53,7 @@ describe('Transaction', () => {
         { address: 'Ae2tdPwUPEZCEhYAUVU7evPfQCJjyuwM6n81x6hSjU9TBMSy2YwZEVydssL', value: '2000000' }
       ]
 
-      expect(() => Transaction(inputs, outputs).finalize()).to.throw(TransactionOverweight)
+      expect(() => Transaction(inputs, outputs).validateAndMake()).to.throw(TransactionOverweight)
     })
 
     it('returns a transaction as hex when the transaction is balanced', () => {
@@ -69,7 +69,7 @@ describe('Transaction', () => {
       const fee = Transaction(inputs, outputs).estimateFee()
 
       outputs[0].value = (6000000 - Number(fee)).toString()
-      const transaction = Transaction(inputs, outputs).finalize()
+      const transaction = Transaction(inputs, outputs).validateAndMake()
       const expectedHex = '839f8200d81858248258200123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef018200d8185824825820fedcba9876543210fedcba9876543210fedcba9876543210fedcba987654321000ff9f8282d818582183581c9aa3c11f83717c117b5da7f49b9387dc90d1694a75849bd5cbde8e20a0001ae196744f1a0058e69dffa0'
       expect(transaction.to_hex()).to.equal(expectedHex)
     })

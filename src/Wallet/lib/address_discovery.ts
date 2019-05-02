@@ -10,7 +10,7 @@ export enum AddressType {
 }
 
 // BIP44 specifies that discovery should occur for an address type in batches of 20, until no balances exist
-export function addressDiscoveryWithinBounds({type, account, lowerBound, upperBound}: {
+export function addressDiscoveryWithinBounds ({ type, account, lowerBound, upperBound }: {
   type: AddressType,
   account: Bip44AccountPublic,
   lowerBound: number,

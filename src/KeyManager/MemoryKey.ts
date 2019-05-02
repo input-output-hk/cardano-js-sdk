@@ -3,7 +3,9 @@ import { Transaction as CardanoTransaction, BlockchainSettings, Bip44AccountPriv
 import { InvalidMnemonic } from './errors'
 import { getBindingsForEnvironment } from '../lib/bindings'
 import { TransactionInput } from '../Transaction'
-const { AccountIndex, AddressKeyIndex, Bip44RootPrivateKey, Entropy, TransactionFinalized } = getBindingsForEnvironment()
+import { AddressType } from '../Wallet'
+const { AccountIndex, AddressKeyIndex, Bip44RootPrivateKey, Entropy, TransactionFinalized, Witness } = getBindingsForEnvironment()
+
 const HARD_DERIVATION_START = 0x80000000
 
 const MemoryKey = {
@@ -13,7 +15,7 @@ const MemoryKey = {
   signMessage
 }
 
-function createMemoryKey(mnemonic: string, password: string, accountNumber = 0) {
+function createMemoryKey (mnemonic: string, password: string, accountNumber = 0) {
   const validMnemonic = validateMnemonic(mnemonic)
   if (!validMnemonic) throw new InvalidMnemonic()
 
@@ -22,18 +24,24 @@ function createMemoryKey(mnemonic: string, password: string, accountNumber = 0) 
   return privateKey.bip44_account(AccountIndex.new(accountNumber | HARD_DERIVATION_START))
 }
 
-function signTransaction(key: Bip44AccountPrivate, transaction: CardanoTransaction, chainSettings: BlockchainSettings) {
+function signTransaction (key: Bip44AccountPrivate, transaction: CardanoTransaction, chainSettings: BlockchainSettings) {
   const transactionInputs: TransactionInput[] = JSON.parse(transaction.to_json().inputs)
   const transactionFinalizer = new TransactionFinalized(transaction)
+  const transactionId = transaction.id()
 
-  transactionInputs.forEach(({addressing}) => {
-    transactionFinalizer.sign(chainSettings, key.address_key(addressing.change === 1, new AddressKeyIndex(addressing.index)))
+  transactionInputs.forEach(({ addressing }) => {
+    // Not sure if we want new_extended_key or new_redeem_key. The types suggest "new_extended_key"
+    const privateKey = key.address_key(addressing.change === 1, AddressKeyIndex.new(addressing.index))
+    const witness = Witness.new_extended_key(chainSettings, privateKey, transactionId)
+    transactionFinalizer.add_witness(witness)
   })
+
+  return transactionFinalizer.finalize().to_hex()
 }
 
-function signMessage(key: Bip44AccountPrivate, message: string) {
-
+function signMessage (key: Bip44AccountPrivate, addressType: AddressType, signingIndex: number, message: string): string {
+  const privateKey = key.address_key(addressType === AddressType.internal, AddressKeyIndex.new(signingIndex))
+  return privateKey.sign(Buffer.from(message)).to_hex()
 }
 
 export default MemoryKey
-

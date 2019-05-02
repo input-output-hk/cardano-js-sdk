@@ -8,7 +8,7 @@ const { TransactionBuilder, TxoPointer, TxOut, Coin, LinearFeeAlgorithm } = getB
 
 export function Transaction (inputs: TransactionInput[], outputs: TransactionOutput[]): {
   estimateFee: (feeAlgorithm?: CardanoLinearFeeAlgorithm) => string
-  finalize: () => CardanoTransaction,
+  validateAndMake: () => CardanoTransaction,
   builder: CardanoTransactionBuilder
 } {
   validateCodec<typeof TransactionInputCodec>(TransactionInputCodec, inputs)
@@ -28,13 +28,13 @@ export function Transaction (inputs: TransactionInput[], outputs: TransactionOut
   })
 
   return {
-    estimateFee: estimateTransactionFee.bind(null, transactionBuilder),
-    finalize: finalize.bind(null, transactionBuilder),
+    estimateFee: () => estimateTransactionFee(transactionBuilder),
+    validateAndMake: () => validateAndMake(transactionBuilder),
     builder: transactionBuilder
   }
 }
 
-function finalize (
+function validateAndMake (
   transactionBuilder: CardanoTransactionBuilder,
   feeAlgorithm = LinearFeeAlgorithm.default()
 ): CardanoTransaction {
