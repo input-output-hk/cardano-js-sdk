@@ -11,10 +11,15 @@ const addressing = t.type({
   index: t.number
 })
 
+const value = t.type({
+  address: t.string,
+  value: t.string
+})
+
 export const TransactionInputCodec = t.intersection([
   t.interface({
     pointer,
-    value: t.string
+    value
   }),
   t.partial({ addressing })
 ])

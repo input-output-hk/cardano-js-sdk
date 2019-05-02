@@ -18,7 +18,7 @@ export function Transaction (inputs: TransactionInput[], outputs: TransactionOut
 
   inputs.forEach(input => {
     const pointer = TxoPointer.from_json(input.pointer)
-    const value = Coin.from(0, Number(input.value))
+    const value = Coin.from(0, Number(input.value.value))
     transactionBuilder.add_input(pointer, value)
   })
 

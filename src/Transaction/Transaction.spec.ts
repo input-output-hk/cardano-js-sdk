@@ -18,8 +18,8 @@ describe('Transaction', () => {
 
   it('throws if outputs are invalid', () => {
     const inputs = [
-      { pointer: { id: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef', index: 1 }, value: '1000000' },
-      { pointer: { id: 'fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210', index: 0 }, value: '5000000' }
+      { pointer: { id: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef', index: 1 }, value: { address: 'addressWithFunds1', value: '1000000' } },
+      { pointer: { id: 'fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210', index: 0 }, value: { address: 'addressWithFunds2', value: '6000000' } }
     ]
 
     const emptyOutputArray = [] as TransactionOutput[]
@@ -32,8 +32,8 @@ describe('Transaction', () => {
   describe('Finalize', () => {
     it('throws if a transaction has more input than output', () => {
       const inputs = [
-        { pointer: { id: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef', index: 1 }, value: '1000000' },
-        { pointer: { id: 'fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210', index: 0 }, value: '5000000' }
+        { pointer: { id: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef', index: 1 }, value: { address: 'addressWithFunds1', value: '1000000' } },
+        { pointer: { id: 'fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210', index: 0 }, value: { address: 'addressWithFunds2', value: '5000000' } }
       ]
 
       let outputs = [
@@ -45,8 +45,8 @@ describe('Transaction', () => {
 
     it('throws if a transaction has more output than input', () => {
       const inputs = [
-        { pointer: { id: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef', index: 1 }, value: '1' },
-        { pointer: { id: 'fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210', index: 0 }, value: '1' }
+        { pointer: { id: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef', index: 1 }, value: { address: 'addressWithFunds1', value: '1' } },
+        { pointer: { id: 'fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210', index: 0 }, value: { address: 'addressWithFunds2', value: '1' } }
       ]
 
       const outputs = [
@@ -58,8 +58,8 @@ describe('Transaction', () => {
 
     it('returns a transaction as hex when the transaction is balanced', () => {
       const inputs = [
-        { pointer: { id: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef', index: 1 }, value: '1000000' },
-        { pointer: { id: 'fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210', index: 0 }, value: '5000000' }
+        { pointer: { id: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef', index: 1 }, value: { address: 'addressWithFunds1', value: '1000000' } },
+        { pointer: { id: 'fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210', index: 0 }, value: { address: 'addressWithFunds2', value: '5000000' } }
       ]
 
       let outputs = [
