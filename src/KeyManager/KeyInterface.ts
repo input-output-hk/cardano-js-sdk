@@ -1,6 +1,6 @@
 import { Bip44AccountPrivate } from 'cardano-wallet'
 
-export type Key = Bip44AccountPrivate
+export type KeyInterface = Bip44AccountPrivate
   | LedgerNetworkInterface
   | TrezorNetworkInterface
 

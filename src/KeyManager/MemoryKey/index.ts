@@ -1,9 +1,9 @@
 import { generateMnemonic, validateMnemonic } from 'bip39'
 import { Transaction as CardanoTransaction, BlockchainSettings, Bip44AccountPrivate } from 'cardano-wallet'
-import { InvalidMnemonic } from './errors'
-import { getBindingsForEnvironment } from '../lib/bindings'
-import { TransactionInput } from '../Transaction'
-import { AddressType } from '../Wallet'
+import { InvalidMnemonic } from '../errors'
+import { getBindingsForEnvironment } from '../../lib/bindings'
+import { TransactionInput } from '../../Transaction'
+import { AddressType } from '../../Wallet'
 const { AccountIndex, AddressKeyIndex, Bip44RootPrivateKey, Entropy, TransactionFinalized, Witness } = getBindingsForEnvironment()
 
 const HARD_DERIVATION_START = 0x80000000
@@ -24,12 +24,13 @@ function createMemoryKey (mnemonic: string, password: string, accountNumber = 0)
   return privateKey.bip44_account(AccountIndex.new(accountNumber | HARD_DERIVATION_START))
 }
 
-function signTransaction (key: Bip44AccountPrivate, transaction: CardanoTransaction, chainSettings: BlockchainSettings) {
-  const transactionInputs: TransactionInput[] = JSON.parse(transaction.to_json().inputs)
-  const transactionFinalizer = new TransactionFinalized(transaction)
+// Once a Cardano Transaction is "made", the TransactionInputs end up without the addressing info. It is needed here to determine
+// which key index to sign with for each witness. Consider if we can make this nicer.
+function signTransaction (key: Bip44AccountPrivate, transaction: CardanoTransaction, rawInputs: TransactionInput[], chainSettings: BlockchainSettings) {
   const transactionId = transaction.id()
+  const transactionFinalizer = new TransactionFinalized(transaction)
 
-  transactionInputs.forEach(({ addressing }) => {
+  rawInputs.forEach(({ addressing }) => {
     // Not sure if we want new_extended_key or new_redeem_key. The types suggest "new_extended_key"
     const privateKey = key.address_key(addressing.change === 1, AddressKeyIndex.new(addressing.index))
     const witness = Witness.new_extended_key(chainSettings, privateKey, transactionId)
