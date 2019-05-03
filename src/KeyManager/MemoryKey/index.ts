@@ -31,7 +31,6 @@ function signTransaction (key: Bip44AccountPrivate, transaction: CardanoTransact
   const transactionFinalizer = new TransactionFinalized(transaction)
 
   rawInputs.forEach(({ addressing }) => {
-    // Not sure if we want new_extended_key or new_redeem_key. The types suggest "new_extended_key"
     const privateKey = key.address_key(addressing.change === 1, AddressKeyIndex.new(addressing.index))
     const witness = Witness.new_extended_key(chainSettings, privateKey, transactionId)
     transactionFinalizer.add_witness(witness)
