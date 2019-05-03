@@ -1,10 +1,10 @@
 import { expect } from 'chai'
 import { addressDiscoveryWithinBounds, AddressType } from './address_discovery'
-import { CreateMemoryKey, GenerateMnemonic } from '../../KeyManager'
+import { MemoryKey } from '../../KeyManager'
 
 describe('addressDiscovery', () => {
-  const mnemonic = GenerateMnemonic()
-  const account = CreateMemoryKey(mnemonic, 'cake').public()
+  const mnemonic = MemoryKey.generateMnemonic()
+  const account = MemoryKey.create(mnemonic, 'cake').public()
 
   describe('internal', () => {
     it('discovers addresses between bounds', () => {

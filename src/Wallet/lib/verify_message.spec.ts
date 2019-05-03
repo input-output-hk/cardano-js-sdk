@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import KeyManager, { CreateMemoryKey, KeyAccess } from '../../KeyManager'
+import { MemoryKey } from '../../KeyManager'
 
 import { AddressType } from '..'
 import { verifyMessage } from './verify_message'
@@ -8,8 +8,8 @@ describe('verifyMessage', () => {
   it('returns true when verifying a correct signature for a message', () => {
     const message = 'foobar'
     const mnemonic = 'height bubble drama century ask online stage camp point loyal hip awesome'
-    const keypair = CreateMemoryKey(mnemonic, 'securepassword')
-    const signatureAsHex = KeyManager(KeyAccess.memory, keypair).signMessage(AddressType.external, 0, message)
+    const keypair = MemoryKey.create(mnemonic, 'securepassword')
+    const signatureAsHex = MemoryKey.signMessage(keypair, AddressType.external, 0, message)
 
     const verification = verifyMessage(keypair.public(), {
       addressType: AddressType.external,
@@ -24,8 +24,8 @@ describe('verifyMessage', () => {
   it('returns false when verifying an incorrect message for a valid signature', () => {
     const message = 'foobar'
     const mnemonic = 'height bubble drama century ask online stage camp point loyal hip awesome'
-    const keypair = CreateMemoryKey(mnemonic, 'securepassword')
-    const signatureAsHex = KeyManager(KeyAccess.memory, keypair).signMessage(AddressType.external, 0, message)
+    const keypair = MemoryKey.create(mnemonic, 'securepassword')
+    const signatureAsHex = MemoryKey.signMessage(keypair, AddressType.external, 0, message)
 
     const verification = verifyMessage(keypair.public(), {
       addressType: AddressType.external,
