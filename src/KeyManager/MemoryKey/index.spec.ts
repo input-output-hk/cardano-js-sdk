@@ -7,7 +7,7 @@ import { generateTestTransaction } from '../../utils/test/test_transaction'
 import { generateMnemonic } from '../../utils'
 const { BlockchainSettings } = getBindingsForEnvironment()
 
-describe('MemoryKey', () => {
+describe('MemoryKeyManager', () => {
   it('throws if the mnemonic passed is invalid', () => {
     const invalidMnemonic = 'xxxx'
     expect(() => MemoryKeyManager({ mnemonic: invalidMnemonic, password: 'xx' })).to.throw(InvalidMnemonic)
