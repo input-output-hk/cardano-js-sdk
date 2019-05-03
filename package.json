@@ -50,6 +50,7 @@
   },
   "dependencies": {
     "@types/node": "^11.13.8",
+    "bip39": "^3.0.1",
     "cardano-wallet": "^0.3.0",
     "cardano-wallet-browser": "^0.3.0",
     "io-ts": "^1.8.5",
