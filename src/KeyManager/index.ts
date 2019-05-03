@@ -1,2 +1,2 @@
-import MemoryKey from './MemoryKey'
-export { MemoryKey }
+import MemoryKeyManager from './MemoryKey'
+export { MemoryKeyManager }
