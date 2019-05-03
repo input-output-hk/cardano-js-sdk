@@ -1,8 +1,8 @@
 import { expect } from 'chai'
-import { CreateMemoryKey } from '../../KeyManager'
-import KeyManager, { KeyAccess } from '../../KeyManager'
+import KeyManager, { CreateMemoryKey, KeyAccess } from '../../KeyManager'
+
 import { AddressType } from '..'
-import { verifyMessage } from './verify_message';
+import { verifyMessage } from './verify_message'
 
 describe('verifyMessage', () => {
   it('returns true when verifying a correct signature for a message', () => {
@@ -35,21 +35,5 @@ describe('verifyMessage', () => {
     })
 
     expect(verification).to.eql(false)
-  })
-
-  it('throws when verifying a message for an invalid signature', () => {
-    const message = 'foobar'
-    const mnemonic = 'height bubble drama century ask online stage camp point loyal hip awesome'
-    const keypair = CreateMemoryKey(mnemonic, 'securepassword')
-    const signatureAsHex = 'xxxx'
-
-    const call = () => verifyMessage(keypair.public(), {
-      addressType: AddressType.external,
-      message,
-      signingIndex: 0,
-      signatureAsHex
-    })
-
-    expect(call).to.throw
   })
 })

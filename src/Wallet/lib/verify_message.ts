@@ -3,7 +3,7 @@ import { getBindingsForEnvironment } from '../../lib/bindings'
 import { AddressType } from '..'
 const { AddressKeyIndex, Signature } = getBindingsForEnvironment()
 
-export function verifyMessage(
+export function verifyMessage (
   account: Bip44AccountPublic,
   { addressType, signingIndex, message, signatureAsHex }: { addressType: AddressType, signingIndex: number, message: string, signatureAsHex: string }
 ): boolean {
