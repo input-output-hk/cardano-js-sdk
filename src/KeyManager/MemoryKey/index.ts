@@ -1,4 +1,4 @@
-import { validateMnemonic, generateMnemonic } from 'bip39'
+import { validateMnemonic } from 'bip39'
 import { InvalidMnemonic } from '../errors'
 import { getBindingsForEnvironment } from '../../lib/bindings'
 import { AddressType } from '../../Wallet'
@@ -7,11 +7,7 @@ const { AccountIndex, AddressKeyIndex, BlockchainSettings, Bip44RootPrivateKey, 
 
 const HARD_DERIVATION_START = 0x80000000
 
-export function MemoryKeyManager ({ password, accountNumber, mnemonic }: { password: string, accountNumber?: number, mnemonic?: string }): KeyManager {
-  if (!mnemonic) {
-    mnemonic = generateMnemonic()
-  }
-
+export function MemoryKeyManager ({ password, accountNumber, mnemonic }: { password: string, accountNumber?: number, mnemonic: string }): KeyManager {
   if (!accountNumber) {
     accountNumber = 0
   }

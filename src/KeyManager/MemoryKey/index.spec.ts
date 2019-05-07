@@ -3,7 +3,7 @@ import { MemoryKeyManager } from '.'
 import { InvalidMnemonic } from '../errors'
 import { AddressType } from '../../Wallet'
 import { getBindingsForEnvironment } from '../../lib/bindings'
-import { generateTestTransaction } from '../../utils/test/test_transaction'
+import { generateTestTransaction } from '../../test/utils/test_transaction'
 import { generateMnemonic } from '../../utils'
 const { BlockchainSettings } = getBindingsForEnvironment()
 
