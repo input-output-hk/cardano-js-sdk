@@ -34,7 +34,10 @@ export function MemoryKeyManager ({ password, accountNumber, mnemonic }: { passw
     },
     signMessage: (addressType, signingIndex, message) => {
       const privateKey = key.address_key(addressType === AddressType.internal, AddressKeyIndex.new(signingIndex))
-      return privateKey.sign(Buffer.from(message)).to_hex()
+      return {
+        signature: privateKey.sign(Buffer.from(message)).to_hex(),
+        publicKey: key.public().address_key(addressType === AddressType.internal, AddressKeyIndex.new(signingIndex)).to_hex()
+      }
     },
     publicAccount: () => key.public()
   }

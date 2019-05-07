@@ -2,8 +2,6 @@ import { expect } from 'chai'
 import { MemoryKeyManager } from '../KeyManager'
 import { AddressType } from '../Wallet'
 import { verifyMessage } from './verify_message'
-import { getBindingsForEnvironment } from '../lib/bindings'
-const { AddressKeyIndex } = getBindingsForEnvironment()
 
 describe('utils', () => {
   describe('verifyMessage', () => {
@@ -11,13 +9,12 @@ describe('utils', () => {
       const message = 'foobar'
       const mnemonic = 'height bubble drama century ask online stage camp point loyal hip awesome'
       const keyManager = MemoryKeyManager({ mnemonic, password: 'securepassword' })
-      const signatureAsHex = keyManager.signMessage(AddressType.external, 0, message)
-      const publicKey = keyManager.publicAccount().address_key(false, AddressKeyIndex.new(0))
+      const { signature, publicKey } = keyManager.signMessage(AddressType.external, 0, message)
 
       const verification = verifyMessage({
         publicKey,
         message,
-        signatureAsHex
+        signature
       })
 
       expect(verification).to.eql(true)
@@ -27,13 +24,12 @@ describe('utils', () => {
       const message = 'foobar'
       const mnemonic = 'height bubble drama century ask online stage camp point loyal hip awesome'
       const keyManager = MemoryKeyManager({ mnemonic, password: 'securepassword' })
-      const signatureAsHex = keyManager.signMessage(AddressType.external, 0, message)
-      const publicKey = keyManager.publicAccount().address_key(false, AddressKeyIndex.new(0))
+      const { signature, publicKey } = keyManager.signMessage(AddressType.external, 0, message)
 
       const verification = verifyMessage({
         publicKey,
         message: 'a differnt message',
-        signatureAsHex
+        signature
       })
 
       expect(verification).to.eql(false)

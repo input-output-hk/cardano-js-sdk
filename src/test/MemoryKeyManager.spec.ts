@@ -3,7 +3,7 @@ import CardanoSdk from '..'
 import { generateTestTransaction } from './utils/test_transaction'
 import { mockProvider } from './utils/mock_provider'
 
-describe('MemoryKeyManager example', () => {
+describe('Example: Memory Key Manager', () => {
   const password = 'secure'
 
   it('allows a user to create a new memory key from a valid mnemonic, sign a transaction and submit it to the network', () => {

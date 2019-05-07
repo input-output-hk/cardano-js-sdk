@@ -36,7 +36,7 @@ describe('MemoryKeyManager', () => {
       const message = 'foobar'
       const mnemonic = 'height bubble drama century ask online stage camp point loyal hip awesome'
       const keyManager = MemoryKeyManager({ mnemonic, password: 'securepassword' })
-      const signature = keyManager.signMessage(AddressType.external, 0, message)
+      const { signature } = keyManager.signMessage(AddressType.external, 0, message)
       const expectedSignature = '175121c7d4c18007e0f693181584c74a3b0d667cfbe2b81f5e2afba74dc1070b818f500d26a74e9b23a9a8b0246356a156b33bb17de979f3b429c4b1cfff2303'
       expect(signature).to.eql(expectedSignature)
     })
