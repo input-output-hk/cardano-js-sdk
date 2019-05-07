@@ -7,7 +7,7 @@ describe('Example: Memory Key Manager', () => {
   const password = 'secure'
 
   it('allows a user to create a new memory key from a valid mnemonic, sign a transaction and submit it to the network', () => {
-    const mnemonic = CardanoSdk.utils.generateMnemonic()
+    const mnemonic = CardanoSdk.Utils.generateMnemonic()
     const keyManager = CardanoSdk.MemoryKeyManager({ mnemonic, password })
     const { transaction, inputs } = generateTestTransaction(keyManager.publicAccount())
     const signedTransaction = keyManager.signTransaction(transaction, inputs)
