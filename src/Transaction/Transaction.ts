@@ -7,8 +7,9 @@ import { validateCodec } from '../lib/validator'
 const { TransactionBuilder, TxoPointer, TxOut, Coin, LinearFeeAlgorithm } = getBindingsForEnvironment()
 
 export function Transaction (inputs: TransactionInput[], outputs: TransactionOutput[]): {
-  estimateFee: (feeAlgorithm?: CardanoLinearFeeAlgorithm) => string
-  validateAndMake: () => CardanoTransaction,
+  estimateNetworkFee: (feeAlgorithm?: CardanoLinearFeeAlgorithm) => string
+  fee: () => string
+  validateAndMake: () => CardanoTransaction
   builder: CardanoTransactionBuilder
 } {
   validateCodec<typeof TransactionInputCodec>(TransactionInputCodec, inputs)
@@ -28,27 +29,23 @@ export function Transaction (inputs: TransactionInput[], outputs: TransactionOut
   })
 
   return {
-    estimateFee: () => estimateTransactionFee(transactionBuilder),
-    validateAndMake: () => validateAndMake(transactionBuilder),
+    estimateNetworkFee: (feeAlgorithm = LinearFeeAlgorithm.default()): string => {
+      const fee = transactionBuilder.estimate_fee(feeAlgorithm)
+      return fee.lovelace().toString()
+    },
+    fee: () => {
+      const realisedFee = transactionBuilder.get_balance_without_fees().value()
+      const ada = realisedFee.ada()
+      const lovelace = realisedFee.lovelace()
+      return String((ada * 1000000) + lovelace)
+    },
+    validateAndMake: (feeAlgorithm = LinearFeeAlgorithm.default()) => {
+      const balance = transactionBuilder.get_balance(feeAlgorithm)
+      if (balance.is_negative()) throw new TransactionOverweight()
+      if (balance.is_positive()) throw new TransactionUnderweight()
+
+      return transactionBuilder.make_transaction()
+    },
     builder: transactionBuilder
   }
-}
-
-function validateAndMake (
-  transactionBuilder: CardanoTransactionBuilder,
-  feeAlgorithm = LinearFeeAlgorithm.default()
-): CardanoTransaction {
-  const balance = transactionBuilder.get_balance(feeAlgorithm)
-  if (balance.is_negative()) throw new TransactionOverweight()
-  if (balance.is_positive()) throw new TransactionUnderweight()
-
-  return transactionBuilder.make_transaction()
-}
-
-function estimateTransactionFee (
-  transactionBuilder: CardanoTransactionBuilder,
-  feeAlgorithm = LinearFeeAlgorithm.default()
-): string {
-  const fee = transactionBuilder.estimate_fee(feeAlgorithm)
-  return fee.lovelace().toString()
 }

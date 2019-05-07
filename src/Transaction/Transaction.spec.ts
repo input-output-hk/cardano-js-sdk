@@ -29,7 +29,7 @@ describe('Transaction', () => {
     expect(() => Transaction(inputs, invalidOutputType)).to.throw(/Invalid value/)
   })
 
-  describe('Finalize', () => {
+  describe('validateAndMake', () => {
     it('throws if a transaction has more input than output', () => {
       const inputs = [
         { pointer: { id: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef', index: 1 }, value: { address: 'addressWithFunds1', value: '1000000' } },
@@ -66,12 +66,31 @@ describe('Transaction', () => {
         { address: 'Ae2tdPwUPEZCEhYAUVU7evPfQCJjyuwM6n81x6hSjU9TBMSy2YwZEVydssL', value: '6000000' }
       ]
 
-      const fee = Transaction(inputs, outputs).estimateFee()
+      const fee = Transaction(inputs, outputs).estimateNetworkFee()
 
       outputs[0].value = (6000000 - Number(fee)).toString()
       const transaction = Transaction(inputs, outputs).validateAndMake()
       const expectedHex = '839f8200d81858248258200123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef018200d8185824825820fedcba9876543210fedcba9876543210fedcba9876543210fedcba987654321000ff9f8282d818582183581c9aa3c11f83717c117b5da7f49b9387dc90d1694a75849bd5cbde8e20a0001ae196744f1a0058e69dffa0'
       expect(transaction.to_hex()).to.equal(expectedHex)
+    })
+  })
+
+  describe('fee', () => {
+    it('returns the realised fee of a transaction', () => {
+      const inputs = [
+        { pointer: { id: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef', index: 1 }, value: { address: 'addressWithFunds1', value: '1000000' } },
+        { pointer: { id: 'fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210', index: 0 }, value: { address: 'addressWithFunds2', value: '6010000' } }
+      ]
+
+      let outputs = [
+        { address: 'Ae2tdPwUPEZCEhYAUVU7evPfQCJjyuwM6n81x6hSjU9TBMSy2YwZEVydssL', value: '5000000' }
+      ]
+
+      const estimatedFee = Transaction(inputs, outputs).estimateNetworkFee()
+      const realisedFee = Transaction(inputs, outputs).fee()
+
+      expect(realisedFee).to.equal('2010000')
+      expect(realisedFee).to.not.eql(estimatedFee)
     })
   })
 })

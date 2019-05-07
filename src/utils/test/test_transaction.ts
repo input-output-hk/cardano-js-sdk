@@ -27,7 +27,7 @@ export function generateTestTransaction (publicAccount: Bip44AccountPublic) {
     { address: 'Ae2tdPwUPEZCEhYAUVU7evPfQCJjyuwM6n81x6hSjU9TBMSy2YwZEVydssL', value: '6000000' }
   ]
 
-  const fee = Transaction(inputs, outputs).estimateFee()
+  const fee = Transaction(inputs, outputs).estimateNetworkFee()
   outputs[0].value = (6000000 - Number(fee)).toString()
   return { transaction: Transaction(inputs, outputs).validateAndMake(), inputs }
 }
