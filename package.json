@@ -1,7 +1,7 @@
 {
-  "name": "cardano-js-sdk",
+  "name": "cardano-sdk",
   "version": "0.1.0",
-  "description": "A JavaScript SDK for interacting with the Cardano blockchain",
+  "description": "An SDK for interacting with the Cardano blockchain",
   "main": "dist/index.js",
   "scripts": {
     "build": "rm -rf dist && tsc",
