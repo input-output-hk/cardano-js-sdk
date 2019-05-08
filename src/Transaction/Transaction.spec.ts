@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import Transaction, { TransactionInput, TransactionOutput } from './'
-import { TransactionOverweight, TransactionUnderweight } from './errors'
+import { InsufficientTransactionInput } from './errors'
 import { EmptyArray } from '../lib/validator/errors'
 
 describe('Transaction', () => {
@@ -30,7 +30,7 @@ describe('Transaction', () => {
   })
 
   describe('validateAndMake', () => {
-    it('throws if a transaction has more input than output', () => {
+    it('does not throw if a transaction has more input than output', () => {
       const inputs = [
         { pointer: { id: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef', index: 1 }, value: { address: 'addressWithFunds1', value: '1000000' } },
         { pointer: { id: 'fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210', index: 0 }, value: { address: 'addressWithFunds2', value: '5000000' } }
@@ -40,7 +40,7 @@ describe('Transaction', () => {
         { address: 'Ae2tdPwUPEZCEhYAUVU7evPfQCJjyuwM6n81x6hSjU9TBMSy2YwZEVydssL', value: '10000' }
       ]
 
-      expect(() => Transaction(inputs, outputs).validateAndMake()).to.throw(TransactionUnderweight)
+      expect(() => Transaction(inputs, outputs).validateAndMake()).to.not.throw()
     })
 
     it('throws if a transaction has more output than input', () => {
@@ -53,7 +53,7 @@ describe('Transaction', () => {
         { address: 'Ae2tdPwUPEZCEhYAUVU7evPfQCJjyuwM6n81x6hSjU9TBMSy2YwZEVydssL', value: '2000000' }
       ]
 
-      expect(() => Transaction(inputs, outputs).validateAndMake()).to.throw(TransactionOverweight)
+      expect(() => Transaction(inputs, outputs).validateAndMake()).to.throw(InsufficientTransactionInput)
     })
 
     it('returns a transaction as hex when the transaction is balanced', () => {
