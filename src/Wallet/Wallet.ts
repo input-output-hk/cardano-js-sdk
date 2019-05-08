@@ -8,7 +8,7 @@ export function Wallet (_provider: Provider) {
       getNextReceivingAddress: () => new Error('Not yet implemented'),
       getNextChangeAddress: () => new Error('Not yet implemented'),
       balance: () => new Error('Not yet implemented'),
-      balanceTransaction: (_outputs: TransactionOutput[]) => new Error('Not yet implemented')
+      selectInputsForTransaction: (_outputs: TransactionOutput[]) => new Error('Not yet implemented')
     }
   }
 }

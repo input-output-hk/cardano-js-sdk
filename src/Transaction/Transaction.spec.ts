@@ -56,7 +56,7 @@ describe('Transaction', () => {
     expect(() => Transaction(inputs, outputs)).to.not.throw()
   })
 
-  it('allows access to a transaction as hex when the transaction is balanced', () => {
+  it('allows access to a transaction as hex', () => {
     const inputs = [
       { pointer: { id: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef', index: 1 }, value: { address: 'addressWithFunds1', value: '1000000' } },
       { pointer: { id: 'fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210', index: 0 }, value: { address: 'addressWithFunds2', value: '5000000' } }
