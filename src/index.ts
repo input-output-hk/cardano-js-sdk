@@ -1,21 +1,18 @@
 import Transaction from './Transaction'
 import Wallet from './Wallet'
-import { Provider, SubmitTransaction, QueryUtxo } from './Provider'
-import * as utils from './Utils'
-import { MemoryKeyManager } from './KeyManager'
+import { Provider, HttpProvider } from './Provider'
+import * as Utils from './Utils'
+import { InMemoryKeyManager } from './KeyManager'
 
-export default class CardanoSdk implements Provider {
-  public static Transaction = Transaction
-  public static MemoryKeyManager = MemoryKeyManager
-  public static Utils = utils
+export { Transaction, InMemoryKeyManager, Utils }
 
-  public wallet: ReturnType<typeof Wallet>
-  public submitTransaction: SubmitTransaction;
-  public queryUtxo: QueryUtxo;
+export const providers: { [provider: string]: (connection: string) => Provider } = {
+  http: HttpProvider
+}
 
-  constructor(provider: Provider) {
-    this.submitTransaction = provider.submitTransaction
-    this.queryUtxo = provider.queryUtxo
-    this.wallet = Wallet(provider)
+export function connect(provider: Provider) {
+  return {
+    wallet: Wallet(provider),
+    ...provider
   }
 }

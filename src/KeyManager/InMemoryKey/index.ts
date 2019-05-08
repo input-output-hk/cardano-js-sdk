@@ -7,7 +7,7 @@ const { AccountIndex, AddressKeyIndex, BlockchainSettings, Bip44RootPrivateKey, 
 
 const HARD_DERIVATION_START = 0x80000000
 
-export function MemoryKeyManager({ password, accountNumber, mnemonic }: { password: string, accountNumber?: number, mnemonic: string }): KeyManager {
+export function InMemoryKeyManager({ password, accountNumber, mnemonic }: { password: string, accountNumber?: number, mnemonic: string }): KeyManager {
   if (!accountNumber) {
     accountNumber = 0
   }
