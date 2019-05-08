@@ -1,1 +1,1 @@
-export { MemoryKeyManager } from './MemoryKey'
+export { InMemoryKeyManager } from './InMemoryKey'

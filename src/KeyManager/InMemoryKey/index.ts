@@ -1,17 +1,13 @@
-import { validateMnemonic, generateMnemonic } from 'bip39'
+import { validateMnemonic } from 'bip39'
 import { InvalidMnemonic } from '../errors'
 import { getBindingsForEnvironment } from '../../lib/bindings'
 import { AddressType } from '../../Wallet'
 import { KeyManager } from '../KeyManager'
-const { AccountIndex, AddressKeyIndex, BlockchainSettings, Bip44RootPrivateKey, Entropy, TransactionFinalized, Witness } = getBindingsForEnvironment()
+const { AccountIndex, AddressKeyIndex, BlockchainSettings, Bip44RootPrivateKey, Entropy, Witness } = getBindingsForEnvironment()
 
 const HARD_DERIVATION_START = 0x80000000
 
-export function MemoryKeyManager ({ password, accountNumber, mnemonic }: { password: string, accountNumber?: number, mnemonic?: string }): KeyManager {
-  if (!mnemonic) {
-    mnemonic = generateMnemonic()
-  }
-
+export function InMemoryKeyManager ({ password, accountNumber, mnemonic }: { password: string, accountNumber?: number, mnemonic: string }): KeyManager {
   if (!accountNumber) {
     accountNumber = 0
   }
@@ -26,7 +22,7 @@ export function MemoryKeyManager ({ password, accountNumber, mnemonic }: { passw
   return {
     signTransaction: (transaction, rawInputs, chainSettings = BlockchainSettings.mainnet()) => {
       const transactionId = transaction.id()
-      const transactionFinalizer = new TransactionFinalized(transaction)
+      const transactionFinalizer = transaction.finalize()
 
       rawInputs.forEach(({ addressing }) => {
         const privateKey = key.address_key(addressing.change === 1, AddressKeyIndex.new(addressing.index))
@@ -38,7 +34,10 @@ export function MemoryKeyManager ({ password, accountNumber, mnemonic }: { passw
     },
     signMessage: (addressType, signingIndex, message) => {
       const privateKey = key.address_key(addressType === AddressType.internal, AddressKeyIndex.new(signingIndex))
-      return privateKey.sign(Buffer.from(message)).to_hex()
+      return {
+        signature: privateKey.sign(Buffer.from(message)).to_hex(),
+        publicKey: key.public().address_key(addressType === AddressType.internal, AddressKeyIndex.new(signingIndex)).to_hex()
+      }
     },
     publicAccount: () => key.public()
   }

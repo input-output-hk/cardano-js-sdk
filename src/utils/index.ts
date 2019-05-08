@@ -1,1 +1,0 @@
-export { generateMnemonic } from './mnemonic'

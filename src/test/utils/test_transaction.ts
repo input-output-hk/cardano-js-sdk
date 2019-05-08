@@ -1,6 +1,7 @@
 import { Bip44AccountPublic } from 'cardano-wallet'
 import { addressDiscoveryWithinBounds, AddressType } from '../../Wallet'
 import Transaction, { TransactionInput } from '../../Transaction'
+import { estimateTransactionFee } from '../../Utils/estimate_fee'
 
 export function generateTestTransaction (publicAccount: Bip44AccountPublic) {
   const [address1, address2] = addressDiscoveryWithinBounds({
@@ -27,7 +28,7 @@ export function generateTestTransaction (publicAccount: Bip44AccountPublic) {
     { address: 'Ae2tdPwUPEZCEhYAUVU7evPfQCJjyuwM6n81x6hSjU9TBMSy2YwZEVydssL', value: '6000000' }
   ]
 
-  const fee = Transaction(inputs, outputs).estimateFee()
+  const fee = estimateTransactionFee(inputs, outputs)
   outputs[0].value = (6000000 - Number(fee)).toString()
-  return { transaction: Transaction(inputs, outputs).validateAndMake(), inputs }
+  return { transaction: Transaction(inputs, outputs), inputs }
 }

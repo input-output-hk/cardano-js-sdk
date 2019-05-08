@@ -1,2 +1,1 @@
-export { TransactionOverweight } from './TransactionOverweight'
-export { TransactionUnderweight } from './TransactionUnderweight'
+export { InsufficientTransactionInput } from './InsufficientTransactionInput'
