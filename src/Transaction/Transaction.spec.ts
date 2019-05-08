@@ -2,7 +2,7 @@ import { expect } from 'chai'
 import Transaction, { TransactionInput, TransactionOutput } from './'
 import { InsufficientTransactionInput } from './errors'
 import { EmptyArray } from '../lib/validator/errors'
-import { estimateTransactionFee } from '../Utils/estimate_fee';
+import { estimateTransactionFee } from '../Utils/estimate_fee'
 
 describe('Transaction', () => {
   it('throws if inputs are invalid', () => {

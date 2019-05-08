@@ -1,9 +1,9 @@
 import { Bip44AccountPublic } from 'cardano-wallet'
 import { addressDiscoveryWithinBounds, AddressType } from '../../Wallet'
 import Transaction, { TransactionInput } from '../../Transaction'
-import { estimateTransactionFee } from '../../Utils/estimate_fee';
+import { estimateTransactionFee } from '../../Utils/estimate_fee'
 
-export function generateTestTransaction(publicAccount: Bip44AccountPublic) {
+export function generateTestTransaction (publicAccount: Bip44AccountPublic) {
   const [address1, address2] = addressDiscoveryWithinBounds({
     account: publicAccount,
     type: AddressType.external,

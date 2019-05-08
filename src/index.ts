@@ -10,7 +10,7 @@ export const providers: { [provider: string]: (connection: string) => Provider }
   http: HttpProvider
 }
 
-export function connect(provider: Provider) {
+export function connect (provider: Provider) {
   return {
     wallet: Wallet(provider),
     ...provider

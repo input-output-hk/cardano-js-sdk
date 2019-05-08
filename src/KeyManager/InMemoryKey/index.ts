@@ -3,11 +3,11 @@ import { InvalidMnemonic } from '../errors'
 import { getBindingsForEnvironment } from '../../lib/bindings'
 import { AddressType } from '../../Wallet'
 import { KeyManager } from '../KeyManager'
-const { AccountIndex, AddressKeyIndex, BlockchainSettings, Bip44RootPrivateKey, Entropy, TransactionFinalized, Witness } = getBindingsForEnvironment()
+const { AccountIndex, AddressKeyIndex, BlockchainSettings, Bip44RootPrivateKey, Entropy, Witness } = getBindingsForEnvironment()
 
 const HARD_DERIVATION_START = 0x80000000
 
-export function InMemoryKeyManager({ password, accountNumber, mnemonic }: { password: string, accountNumber?: number, mnemonic: string }): KeyManager {
+export function InMemoryKeyManager ({ password, accountNumber, mnemonic }: { password: string, accountNumber?: number, mnemonic: string }): KeyManager {
   if (!accountNumber) {
     accountNumber = 0
   }

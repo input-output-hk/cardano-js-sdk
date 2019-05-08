@@ -1,4 +1,3 @@
-import { TransactionId, TransactionFinalized as CardanoTransactionFinalized } from 'cardano-wallet'
 import { getBindingsForEnvironment } from '../lib/bindings'
 import { InsufficientTransactionInput } from './errors'
 import { TransactionInput, TransactionInputCodec } from './TransactionInput'
@@ -7,13 +6,7 @@ import { validateCodec } from '../lib/validator'
 import { convertCoinToLovelace } from '../Utils'
 const { TransactionBuilder, TxoPointer, TxOut, Coin, LinearFeeAlgorithm, TransactionFinalized } = getBindingsForEnvironment()
 
-export function Transaction(inputs: TransactionInput[], outputs: TransactionOutput[], feeAlgorithm = LinearFeeAlgorithm.default()): {
-  toHex: () => string
-  toJson: () => string
-  id: () => TransactionId
-  fee: () => string
-  finalize: () => CardanoTransactionFinalized
-} {
+export function Transaction (inputs: TransactionInput[], outputs: TransactionOutput[], feeAlgorithm = LinearFeeAlgorithm.default()) {
   validateCodec<typeof TransactionInputCodec>(TransactionInputCodec, inputs)
   validateCodec<typeof TransactionOutputCodec>(TransactionOutputCodec, outputs)
 
@@ -32,11 +25,11 @@ export function Transaction(inputs: TransactionInput[], outputs: TransactionOutp
     toJson: () => cardanoTransaction.to_json(),
     id: () => cardanoTransaction.id(),
     finalize: () => new TransactionFinalized(cardanoTransaction),
-    fee: () => fee,
+    fee: () => fee
   }
 }
 
-export function buildTransaction(inputs: TransactionInput[], outputs: TransactionOutput[]) {
+export function buildTransaction (inputs: TransactionInput[], outputs: TransactionOutput[]) {
   const transactionBuilder = new TransactionBuilder()
 
   inputs.forEach(input => {
