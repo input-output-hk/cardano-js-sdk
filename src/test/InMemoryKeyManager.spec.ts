@@ -3,10 +3,10 @@ import { Utils, InMemoryKeyManager, connect } from '..'
 import { generateTestTransaction } from './utils/test_transaction'
 import { mockProvider } from './utils/mock_provider'
 
-describe('Example: Memory Key Manager', () => {
+describe('Example: In Memory Key Manager', () => {
   const password = 'secure'
 
-  it('allows a user to create a new memory key from a valid mnemonic, sign a transaction and submit it to the network', () => {
+  it('allows a user to create a key manager in memory from a valid mnemonic, sign a transaction and submit it to the network', () => {
     const mnemonic = Utils.generateMnemonic()
     const keyManager = InMemoryKeyManager({ mnemonic, password })
     const { transaction, inputs } = generateTestTransaction(keyManager.publicAccount())

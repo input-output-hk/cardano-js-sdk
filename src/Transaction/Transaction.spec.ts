@@ -30,7 +30,7 @@ describe('Transaction', () => {
     expect(() => Transaction(inputs, invalidOutputType)).to.throw(/Invalid value/)
   })
 
-  it('throws if a transaction has more output than input', () => {
+  it('throws if a transaction has more combined output value than input value', () => {
     const inputs = [
       { pointer: { id: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef', index: 1 }, value: { address: 'addressWithFunds1', value: '1' } },
       { pointer: { id: 'fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210', index: 0 }, value: { address: 'addressWithFunds2', value: '1' } }
@@ -43,7 +43,7 @@ describe('Transaction', () => {
     expect(() => Transaction(inputs, outputs)).to.throw(InsufficientTransactionInput)
   })
 
-  it('does not throw if a transaction has more input than output', () => {
+  it('accepts more combined input value than output, to cover fees', () => {
     const inputs = [
       { pointer: { id: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef', index: 1 }, value: { address: 'addressWithFunds1', value: '1000000' } },
       { pointer: { id: 'fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210', index: 0 }, value: { address: 'addressWithFunds2', value: '5000000' } }
