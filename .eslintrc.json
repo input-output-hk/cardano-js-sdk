@@ -16,6 +16,10 @@
     "afterEach": "readonly"
   },
   "rules": {
-    "no-unused-vars": 0
+    "no-unused-vars": 0,
+    "linebreak-style": [
+      2,
+      "unix"
+    ]
   }
 }
