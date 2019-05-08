@@ -15,6 +15,14 @@ export function Transaction (inputs: TransactionInput[], outputs: TransactionOut
   const balance = transactionBuilder.get_balance(feeAlgorithm)
   if (balance.is_negative()) throw new InsufficientTransactionInput()
 
+  /*
+    The get_balance_without_fees from the WASM bindings returns:
+
+    Σ(transactionInputValues) - Σ(transactionOutputValues)
+
+    This represents the fee paid on a transaction, as the positive balance
+    between inputs and the associated outputs is equal to the fee paid
+  */
   const feeAsCoinType = transactionBuilder.get_balance_without_fees().value()
   const fee = convertCoinToLovelace(feeAsCoinType)
 
