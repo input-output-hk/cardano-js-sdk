@@ -1,7 +1,7 @@
 import Transaction from './Transaction'
 import Wallet from './Wallet'
 import { Provider, SubmitTransaction, QueryUtxo } from './Provider'
-import * as utils from './utils'
+import * as utils from './Utils'
 import { MemoryKeyManager } from './KeyManager'
 
 export default class CardanoSdk implements Provider {
@@ -13,7 +13,7 @@ export default class CardanoSdk implements Provider {
   public submitTransaction: SubmitTransaction;
   public queryUtxo: QueryUtxo;
 
-  constructor (provider: Provider) {
+  constructor(provider: Provider) {
     this.submitTransaction = provider.submitTransaction
     this.queryUtxo = provider.queryUtxo
     this.wallet = Wallet(provider)

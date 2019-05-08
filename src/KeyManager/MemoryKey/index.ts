@@ -7,7 +7,7 @@ const { AccountIndex, AddressKeyIndex, BlockchainSettings, Bip44RootPrivateKey, 
 
 const HARD_DERIVATION_START = 0x80000000
 
-export function MemoryKeyManager ({ password, accountNumber, mnemonic }: { password: string, accountNumber?: number, mnemonic: string }): KeyManager {
+export function MemoryKeyManager({ password, accountNumber, mnemonic }: { password: string, accountNumber?: number, mnemonic: string }): KeyManager {
   if (!accountNumber) {
     accountNumber = 0
   }
@@ -22,7 +22,7 @@ export function MemoryKeyManager ({ password, accountNumber, mnemonic }: { passw
   return {
     signTransaction: (transaction, rawInputs, chainSettings = BlockchainSettings.mainnet()) => {
       const transactionId = transaction.id()
-      const transactionFinalizer = new TransactionFinalized(transaction)
+      const transactionFinalizer = transaction.finalize()
 
       rawInputs.forEach(({ addressing }) => {
         const privateKey = key.address_key(addressing.change === 1, AddressKeyIndex.new(addressing.index))

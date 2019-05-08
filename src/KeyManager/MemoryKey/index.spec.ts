@@ -4,7 +4,7 @@ import { InvalidMnemonic } from '../errors'
 import { AddressType } from '../../Wallet'
 import { getBindingsForEnvironment } from '../../lib/bindings'
 import { generateTestTransaction } from '../../test/utils/test_transaction'
-import { generateMnemonic } from '../../utils'
+import { generateMnemonic } from '../../Utils'
 const { BlockchainSettings } = getBindingsForEnvironment()
 
 describe('MemoryKeyManager', () => {
