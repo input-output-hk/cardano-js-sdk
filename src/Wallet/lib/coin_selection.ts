@@ -3,6 +3,7 @@ import { TransactionInput, TransactionOutput } from '../../Transaction'
 export interface Utxo {
   address: string
   value: string
+  hash: string
 }
 
 export interface TransactionSelection {
@@ -10,14 +11,14 @@ export interface TransactionSelection {
   changeOutput: TransactionOutput
 }
 
-export function largestFirst(paymentValue: number, utxoSet: Utxo[]): TransactionSelection {
+export function largestFirst (_paymentValue: number, _utxoSet: (Utxo & TransactionInput['addressing'])[]): TransactionSelection {
   return {} as any
 }
 
-export function random(paymentValue: number, utxoSet: Utxo[]): TransactionSelection {
+export function random (_paymentValue: number, _utxoSet: (Utxo & TransactionInput['addressing'])[]): TransactionSelection {
   return {} as any
 }
 
-export function randomImprove(paymentValue: number, utxoSet: Utxo[]): TransactionSelection {
+export function randomImprove (_paymentValue: number, _utxoSet: (Utxo & TransactionInput['addressing'])[]): TransactionSelection {
   return {} as any
 }

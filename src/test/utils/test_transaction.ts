@@ -14,12 +14,12 @@ export function generateTestTransaction (publicAccount: Bip44AccountPublic) {
   const inputs: TransactionInput[] = [
     {
       pointer: { id: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef', index: 1 },
-      value: { address: address1, value: '1000000' },
+      value: { address: address1.address, value: '1000000' },
       addressing: { account: 0, change: 0, index: 0 }
     },
     {
       pointer: { id: 'fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210', index: 0 },
-      value: { address: address2, value: '5000000' },
+      value: { address: address2.address, value: '5000000' },
       addressing: { account: 0, change: 0, index: 1 }
     }
   ]

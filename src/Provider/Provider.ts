@@ -1,7 +1,8 @@
 import { TransactionInput, TransactionOutput } from '../Transaction'
+import { Utxo } from '../Wallet/lib'
 
 export type SubmitTransaction = (signedTransaction: string) => Promise<boolean>
-export type QueryUtxosByAddress = (addresses: string[]) => Promise<{ address: string, value: string }[]>
+export type QueryUtxosByAddress = (addresses: string[]) => Promise<Utxo[]>
 export type QueryTransactionsByAddress = (addresses: string[]) => Promise<{ inputs: TransactionInput[], outputs: TransactionOutput[] }[]>
 
 export interface Provider {

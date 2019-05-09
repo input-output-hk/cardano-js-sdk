@@ -3,7 +3,7 @@ import { Bip44AccountPublic } from 'cardano-wallet'
 import { AddressType, addressDiscoveryWithinBounds } from '..'
 import { SCAN_GAP } from '../config'
 
-export function getNextAddressByType(provider: Provider, account: Bip44AccountPublic, type: AddressType) {
+export function getNextAddressByType (provider: Provider, account: Bip44AccountPublic, type: AddressType) {
   return scanBip44AccountForAddressWithoutTransactions({
     account,
     provider,
@@ -21,7 +21,7 @@ interface ScanRangeParameters {
   type: AddressType
 }
 
-async function scanBip44AccountForAddressWithoutTransactions({ provider, account, lowerBound, upperBound, type }: ScanRangeParameters): Promise<string> {
+async function scanBip44AccountForAddressWithoutTransactions ({ provider, account, lowerBound, upperBound, type }: ScanRangeParameters): Promise<{ address: string, index: number, type: AddressType }> {
   const addresses = addressDiscoveryWithinBounds({
     account,
     lowerBound,
@@ -29,7 +29,7 @@ async function scanBip44AccountForAddressWithoutTransactions({ provider, account
     type
   })
 
-  const transactions = await provider.queryTransactionsByAddress(addresses)
+  const transactions = await provider.queryTransactionsByAddress(addresses.map(a => a.address))
 
   if (transactions.length === 0) {
     return addresses[0]
@@ -38,10 +38,10 @@ async function scanBip44AccountForAddressWithoutTransactions({ provider, account
   // Group transactions by address, if they have inputs for that address, meaning they are "used"
   // The transactions are now garunteed to be in address order, as they are grouped against the
   // address range
-  const sortedTransactions: [string, typeof transactions][] = addresses.map(address => {
+  const sortedTransactions: [{ address: string, index: number, type: AddressType }, typeof transactions][] = addresses.map(address => {
     const transactionsByAddress = transactions.filter(transaction => {
       const transactionInputAddresses = transaction.inputs.map(input => input.value.address)
-      return transactionInputAddresses.includes(address)
+      return transactionInputAddresses.includes(address.address)
     })
 
     return [address, transactionsByAddress]
@@ -66,6 +66,5 @@ async function scanBip44AccountForAddressWithoutTransactions({ provider, account
     })
   }
 
-  const [nextUnusedAddress] = reversedTransactions[lastAddressWithTransactionsIndex - 1][0]
-  return nextUnusedAddress
+  return reversedTransactions[lastAddressWithTransactionsIndex - 1][0]
 }

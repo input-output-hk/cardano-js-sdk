@@ -7,6 +7,16 @@ describe('addressDiscovery', () => {
   const mnemonic = generateMnemonic()
   const account = InMemoryKeyManager({ mnemonic, password: 'foobar' }).publicAccount()
 
+  it('correctly returns address indexes and address type', () => {
+    const internalAddresses = addressDiscoveryWithinBounds({ account, type: AddressType.internal, lowerBound: 0, upperBound: 19 })
+    expect(internalAddresses[0].index).to.eql(0)
+    expect(internalAddresses[0].type).to.eql(AddressType.internal)
+
+    const externalAddresses = addressDiscoveryWithinBounds({ account, type: AddressType.external, lowerBound: 0, upperBound: 19 })
+    expect(externalAddresses[0].index).to.eql(0)
+    expect(externalAddresses[0].type).to.eql(AddressType.external)
+  })
+
   describe('internal', () => {
     it('discovers addresses between bounds', () => {
       const internalAddresses = addressDiscoveryWithinBounds({ account, type: AddressType.internal, lowerBound: 0, upperBound: 19 })
