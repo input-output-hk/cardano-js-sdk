@@ -10,14 +10,14 @@ export async function deriveAddressSet (provider: Provider, account: Bip44Accoun
   const receiptAddresses = addressDiscoveryWithinBounds({
     account,
     lowerBound: 0,
-    upperBound: nextReceivingAddress.index,
+    upperBound: nextReceivingAddress.index - 1,
     type: AddressType.external
   })
 
   const changeAddresses = addressDiscoveryWithinBounds({
     account,
     lowerBound: 0,
-    upperBound: nextChangeAddress.index,
+    upperBound: nextChangeAddress.index - 1,
     type: AddressType.internal
   })
 
