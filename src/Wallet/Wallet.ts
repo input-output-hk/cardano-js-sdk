@@ -1,8 +1,8 @@
 import { Bip44AccountPublic } from 'cardano-wallet'
-import { TransactionOutput, TransactionInput } from '../Transaction'
+import { TransactionOutput } from '../Transaction'
 import { Provider } from '../Provider'
 import { AddressType } from '.'
-import { deriveAddressSet, getNextAddressByType, largestFirst, random, randomImprove, Utxo, TransactionSelection } from './lib'
+import { deriveAddressSet, getNextAddressByType, largestFirst, random, randomImprove, TransactionSelection, UtxoWithAddressing } from './lib'
 
 export enum InputSelectionAlgorithm {
   largestFirst = 'largestFirst',
@@ -27,7 +27,7 @@ export function Wallet (provider: Provider) {
       selectInputsForTransaction: async (paymentOutputs: TransactionOutput[], fee: string, selectionAlgorithm = InputSelectionAlgorithm.random) => {
         const addresses = await deriveAddressSet(provider, account)
         const utxos = await provider.queryUtxosByAddress(addresses.map(({ address }) => address))
-        const utxosMappedWithAddresses: (Utxo & TransactionInput['addressing'])[] = utxos.map(utxo => {
+        const utxosMappedWithAddresses: UtxoWithAddressing[] = utxos.map(utxo => {
           const { index, type } = addresses.find(({ address }) => address === utxo.address)
           return {
             index,
@@ -38,13 +38,14 @@ export function Wallet (provider: Provider) {
 
         const paymentValue = paymentOutputs.reduce((value, output) => value + Number(output.value), 0) + Number(fee)
 
-        const caller: { [algorithm: string]: (paymentValue: number, utxoSet: (Utxo & TransactionInput['addressing'])[]) => TransactionSelection } = {
+        const caller: { [algorithm: string]: (paymentValue: number, utxoSet: UtxoWithAddressing[], changeAddress: string) => TransactionSelection } = {
           [InputSelectionAlgorithm.largestFirst]: largestFirst,
           [InputSelectionAlgorithm.random]: random,
           [InputSelectionAlgorithm.randomImprove]: randomImprove
         }
 
-        return caller[selectionAlgorithm](paymentValue, utxosMappedWithAddresses)
+        const nextChangeAddress = await getNextAddressByType(provider, account, AddressType.internal)
+        return caller[selectionAlgorithm](paymentValue, utxosMappedWithAddresses, nextChangeAddress.address)
       }
     }
   }
