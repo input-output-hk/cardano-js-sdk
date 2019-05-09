@@ -25,7 +25,14 @@ describe('MemoryKeyManager', () => {
     it('adds witnesses to a transaction and returns the hex of the signed transaction', () => {
       const mnemonic = 'height bubble drama century ask online stage camp point loyal hip awesome'
       const keyManager = InMemoryKeyManager({ mnemonic, password: 'securepassword' })
-      const { transaction, inputs } = generateTestTransaction(keyManager.publicAccount())
+
+      const { transaction, inputs } = generateTestTransaction({
+        publicAccount: keyManager.publicAccount(),
+        lowerBoundOfAddresses: 0,
+        testInputs: [{ type: AddressType.external, value: '1000000' }, { type: AddressType.external, value: '5000000' }],
+        testOutputs: [{ address: 'Ae2tdPwUPEZEjJcLmvgKnuwUnfKSVuGCzRW1PqsLcWqmoGJUocBGbvWjjTx', value: '6000000' }]
+      })
+
       const signedTransaction = keyManager.signTransaction(transaction, inputs, BlockchainSettings.mainnet())
       expect(signedTransaction.length).to.eql(838)
     })

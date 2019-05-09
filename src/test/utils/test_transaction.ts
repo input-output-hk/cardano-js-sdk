@@ -3,32 +3,64 @@ import { addressDiscoveryWithinBounds, AddressType } from '../../Wallet'
 import Transaction, { TransactionInput } from '../../Transaction'
 import { estimateTransactionFee } from '../../Utils/estimate_fee'
 
-export function generateTestTransaction (publicAccount: Bip44AccountPublic) {
-  const [address1, address2] = addressDiscoveryWithinBounds({
+/**
+ * generateTestTransaction is a test helper.
+ * It can be used to make relatively realistic transactions that can be used for transaction testing or seeding a mock provider.
+*/
+export function generateTestTransaction ({
+  publicAccount,
+  testInputs,
+  lowerBoundOfAddresses,
+  testOutputs
+}: {
+  publicAccount: Bip44AccountPublic,
+  testInputs: { value: string, type: AddressType }[],
+  lowerBoundOfAddresses: number,
+  testOutputs: { address: string, value: string }[],
+}) {
+  const receiptAddresses = addressDiscoveryWithinBounds({
     account: publicAccount,
     type: AddressType.external,
-    lowerBound: 0,
-    upperBound: 1
+    lowerBound: lowerBoundOfAddresses,
+    upperBound: testInputs.length - 1
   })
 
-  const inputs: TransactionInput[] = [
-    {
-      pointer: { id: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef', index: 1 },
-      value: { address: address1.address, value: '1000000' },
-      addressing: { account: 0, change: 0, index: 0 }
-    },
-    {
-      pointer: { id: 'fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210', index: 0 },
-      value: { address: address2.address, value: '5000000' },
-      addressing: { account: 0, change: 0, index: 1 }
+  const changeAddresses = addressDiscoveryWithinBounds({
+    account: publicAccount,
+    type: AddressType.internal,
+    lowerBound: lowerBoundOfAddresses,
+    upperBound: testInputs.length - 1
+  })
+
+  const inputs: TransactionInput[] = testInputs.map(({ value }, index) => {
+    const { address, index: addressIndex } = testInputs[index].type === AddressType.external
+      ? receiptAddresses[index]
+      : changeAddresses[index]
+
+    return {
+      // Mock a 64 byte transaction id
+      pointer: { id: hexGenerator(64), index },
+      value: { address, value },
+      addressing: { change: testInputs[index].type === AddressType.internal ? 1 : 0, index: addressIndex }
     }
-  ]
+  })
 
-  let outputs = [
-    { address: 'Ae2tdPwUPEZCEhYAUVU7evPfQCJjyuwM6n81x6hSjU9TBMSy2YwZEVydssL', value: '6000000' }
-  ]
+  const fee = estimateTransactionFee(inputs, testOutputs)
 
-  const fee = estimateTransactionFee(inputs, outputs)
-  outputs[0].value = (6000000 - Number(fee)).toString()
-  return { transaction: Transaction(inputs, outputs), inputs }
+  testOutputs[0].value = (Number(testOutputs[0].value) - Number(fee)).toString()
+  return { transaction: Transaction(inputs, testOutputs), inputs }
+}
+
+/** Test helper only */
+function hexGenerator (length: number) {
+  const maxlen = 8
+  const min = Math.pow(16, Math.min(length, maxlen) - 1)
+  const max = Math.pow(16, Math.min(length, maxlen)) - 1
+  const n = Math.floor(Math.random() * (max - min + 1)) + min
+  let r = n.toString(16)
+  while (r.length < length) {
+    r = r + hexGenerator(length - maxlen)
+  }
+
+  return r
 }
