@@ -28,7 +28,7 @@ export function addressDiscoveryWithinBounds ({ type, account, lowerBound, upper
     const address = pubKey.bootstrap_era_address(chainSettings)
     return {
       address: address.to_base58(),
-      index: lowerBound + index,
+      index,
       type
     }
   })
