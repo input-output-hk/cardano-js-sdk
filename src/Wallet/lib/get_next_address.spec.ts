@@ -4,9 +4,9 @@ import { getNextAddressByType } from './get_next_address'
 import { Utils } from '../..'
 import { InMemoryKeyManager } from '../../KeyManager'
 import { addressDiscoveryWithinBounds } from '.'
-import { AddressType } from './address_discovery'
 import { generateTestTransaction } from '../../test/utils/test_transaction'
 import { SCAN_GAP } from '../config'
+import { AddressType } from '..'
 
 describe('getNextAddressByType', () => {
   it('returns the first address index if no transactions exist for internal addresses', async () => {

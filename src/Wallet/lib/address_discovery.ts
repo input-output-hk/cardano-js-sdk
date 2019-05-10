@@ -1,12 +1,7 @@
 import { Bip44AccountPublic } from 'cardano-wallet'
 import { getBindingsForEnvironment } from '../../lib/bindings'
+import { AddressType } from '..'
 const { AddressKeyIndex, BlockchainSettings } = getBindingsForEnvironment()
-
-/** internal = change address & external = receipt address */
-export enum AddressType {
-  internal = 'Internal',
-  external = 'External'
-}
 
 /** BIP44 specifies that discovery should occur for an address type in batches of 20, until no balances exist */
 export function addressDiscoveryWithinBounds ({ type, account, lowerBound, upperBound }: {

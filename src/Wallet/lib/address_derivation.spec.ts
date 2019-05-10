@@ -2,8 +2,9 @@ import { expect } from 'chai'
 import { Utils, InMemoryKeyManager } from '../..'
 import { SCAN_GAP } from '../config'
 import { generateTestTransaction } from '../../test/utils/test_transaction'
-import { AddressType, deriveAddressSet } from '.'
+import { deriveAddressSet } from '.'
 import { mockProvider, seedTransactionSet } from '../../test/utils/mock_provider'
+import { AddressType } from '..'
 
 describe('deriveAddressSet', () => {
   it('combines external and internal addresses up to the end of each range', async () => {

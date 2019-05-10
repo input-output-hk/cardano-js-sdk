@@ -1,6 +1,6 @@
 import { Provider } from '../../Provider'
 import { TransactionInput, TransactionOutput } from '../../Transaction'
-import { Utxo } from '../../Wallet/lib'
+import { Utxo } from '../../Wallet'
 
 let mockUtxoSet: Utxo[] = []
 export function seedUtxoSet (utxos: Utxo[]) {

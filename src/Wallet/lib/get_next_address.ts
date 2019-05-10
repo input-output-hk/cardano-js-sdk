@@ -1,6 +1,6 @@
 import { Provider } from '../../Provider'
 import { Bip44AccountPublic } from 'cardano-wallet'
-import { AddressType, addressDiscoveryWithinBounds } from '..'
+import { AddressType, addressDiscoveryWithinBounds, Address } from '..'
 import { SCAN_GAP } from '../config'
 
 export function getNextAddressByType (provider: Provider, account: Bip44AccountPublic, type: AddressType) {
@@ -21,7 +21,7 @@ interface ScanRangeParameters {
   type: AddressType
 }
 
-async function scanBip44AccountForAddressWithoutTransactions ({ provider, account, lowerBound, upperBound, type }: ScanRangeParameters): Promise<{ address: string, index: number, type: AddressType }> {
+async function scanBip44AccountForAddressWithoutTransactions ({ provider, account, lowerBound, upperBound, type }: ScanRangeParameters): Promise<Address> {
   const addresses = addressDiscoveryWithinBounds({
     account,
     lowerBound,
@@ -38,7 +38,7 @@ async function scanBip44AccountForAddressWithoutTransactions ({ provider, accoun
   // Group transactions by address, if they have inputs for that address, meaning they are "used"
   // The transactions are now garunteed to be in address order, as they are grouped against the
   // address range
-  const sortedTransactions: [{ address: string, index: number, type: AddressType }, typeof transactions][] = addresses.map(address => {
+  const sortedTransactions: [Address, typeof transactions][] = addresses.map(address => {
     const transactionsByAddress = transactions.filter(transaction => {
       const transactionInputAddresses = transaction.inputs.map(input => input.value.address)
       return transactionInputAddresses.includes(address.address)

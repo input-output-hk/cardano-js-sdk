@@ -1,8 +1,8 @@
 import { Bip44AccountPublic } from 'cardano-wallet'
 import { TransactionOutput } from '../Transaction'
 import { Provider } from '../Provider'
-import { AddressType } from '.'
-import { deriveAddressSet, getNextAddressByType, UtxoWithAddressing, selectInputsAndChangeOutput } from './lib'
+import { AddressType, UtxoWithAddressing } from '.'
+import { deriveAddressSet, getNextAddressByType, selectInputsAndChangeOutput } from './lib'
 
 export enum InputSelectionAlgorithm {
   largestFirst = 'largestFirst',
