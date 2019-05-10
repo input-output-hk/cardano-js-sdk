@@ -3,11 +3,7 @@ import { TransactionOutput } from '../Transaction'
 import { Provider } from '../Provider'
 import { AddressType, UtxoWithAddressing } from '.'
 import { deriveAddressSet, getNextAddressByType, selectInputsAndChangeOutput } from './lib'
-
-export enum InputSelectionAlgorithm {
-  largestFirst = 'largestFirst',
-  random = 'random'
-}
+import { InputSelectionAlgorithm } from './InputSelectionAlgorithm'
 
 export function Wallet (provider: Provider) {
   return (account: Bip44AccountPublic) => {

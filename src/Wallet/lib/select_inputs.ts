@@ -2,8 +2,7 @@ import { TransactionInput, TransactionOutput } from '../../Transaction'
 import { InsufficientValueInUtxosForSelection, MaximumTransactionInputsExceeded } from '../errors'
 import { getRandomBytesForEnvironmentAsHex } from '../../lib/bindings'
 import { MAX_TRANSACTION_INPUTS } from '../config'
-import { InputSelectionAlgorithm } from '../Wallet'
-import { UtxoWithAddressing } from '..'
+import { InputSelectionAlgorithm, UtxoWithAddressing } from '..'
 
 export interface TransactionSelection {
   inputs: TransactionInput[]

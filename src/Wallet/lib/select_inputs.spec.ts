@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import { selectInputsAndChangeOutput } from '.'
 import { InsufficientValueInUtxosForSelection, MaximumTransactionInputsExceeded } from '../errors'
-import { InputSelectionAlgorithm } from '../Wallet'
+import { InputSelectionAlgorithm } from '..'
 
 describe('selectInputsAndChangeOutput', () => {
   it('throws if there is insufficient inputs to cover the payment cost', () => {
