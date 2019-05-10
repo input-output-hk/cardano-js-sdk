@@ -2,12 +2,11 @@ import { Bip44AccountPublic } from 'cardano-wallet'
 import { TransactionOutput } from '../Transaction'
 import { Provider } from '../Provider'
 import { AddressType } from '.'
-import { deriveAddressSet, getNextAddressByType, largestFirst, random, randomImprove, TransactionSelection, UtxoWithAddressing } from './lib'
+import { deriveAddressSet, getNextAddressByType, UtxoWithAddressing, selectInputsAndChangeOutput } from './lib'
 
 export enum InputSelectionAlgorithm {
   largestFirst = 'largestFirst',
-  random = 'random',
-  randomImprove = 'randomImprove'
+  random = 'random'
 }
 
 export function Wallet (provider: Provider) {
@@ -37,15 +36,9 @@ export function Wallet (provider: Provider) {
         })
 
         const paymentValue = paymentOutputs.reduce((value, output) => value + Number(output.value), 0) + Number(fee)
-
-        const caller: { [algorithm: string]: (paymentValue: number, utxoSet: UtxoWithAddressing[], changeAddress: string) => TransactionSelection } = {
-          [InputSelectionAlgorithm.largestFirst]: largestFirst,
-          [InputSelectionAlgorithm.random]: random,
-          [InputSelectionAlgorithm.randomImprove]: randomImprove
-        }
-
         const nextChangeAddress = await getNextAddressByType(provider, account, AddressType.internal)
-        return caller[selectionAlgorithm](paymentValue, utxosMappedWithAddresses, nextChangeAddress.address)
+
+        return selectInputsAndChangeOutput(paymentValue, utxosMappedWithAddresses, nextChangeAddress.address, selectionAlgorithm)
       }
     }
   }
