@@ -81,11 +81,11 @@ describe('selectInputsAndChangeOutput', () => {
   describe('random', () => {
     it('falls back to largestFirst if transaction input is exceeded', () => {
       const paymentValue = 100
-      const dustUtxos = [...Array(100000)].map((_, index) => ({ address: `add${index}`, value: '1', hash: 'foobar', index: 0, change: 0 }))
+      const dustUtxos = [...Array(10000)].map((_, index) => ({ address: `add${index}`, value: '1', hash: 'foobar', index: 0, change: 0 }))
       const largestUtxo = { address: `largeAddress`, value: '90', hash: 'foobar', index: 0, change: 0 }
 
       // There is a small chance that the large utxo will end up in the first 50 utxos after a random sort.
-      // However this will hit the code fork 99.95% of the time, and the assertion will always pass
+      // However this will hit the code fork 99.5% of the time, and the assertion will always pass
       const { inputs } = selectInputsAndChangeOutput(paymentValue, [...dustUtxos, largestUtxo], 'changeAddress', InputSelectionAlgorithm.random)
       expect(inputs.length).to.eql(11)
     })

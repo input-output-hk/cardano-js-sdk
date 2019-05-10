@@ -22,13 +22,15 @@ function largestFirstUtxoSort (utxoSet: UtxoWithAddressing[]) {
 }
 
 function randomUtxoSort (utxoSet: UtxoWithAddressing[]) {
-  return utxoSet.map(utxo => {
+  const utxoSetWithRandomBytes = utxoSet.map(utxo => {
     const randomBytes = getRandomBytesForEnvironmentAsHex()
     return {
       randomBytes,
       ...utxo
     }
   })
+
+  return utxoSetWithRandomBytes.sort((a, b) => a.randomBytes > b.randomBytes ? 1 : -1)
 }
 
 export function selectInputsAndChangeOutput (paymentValue: number, utxoSet: UtxoWithAddressing[], changeAddress: string, selectionAlgo: InputSelectionAlgorithm): TransactionSelection {
