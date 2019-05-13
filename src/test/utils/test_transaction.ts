@@ -22,14 +22,14 @@ export function generateTestTransaction ({
     account: publicAccount,
     type: AddressType.external,
     lowerBound: lowerBoundOfAddresses,
-    upperBound: testInputs.length - 1
+    upperBound: lowerBoundOfAddresses + testInputs.length
   })
 
   const changeAddresses = addressDiscoveryWithinBounds({
     account: publicAccount,
     type: AddressType.internal,
     lowerBound: lowerBoundOfAddresses,
-    upperBound: testInputs.length - 1
+    upperBound: lowerBoundOfAddresses + testInputs.length
   })
 
   const inputs: TransactionInput[] = testInputs.map(({ value }, index) => {
