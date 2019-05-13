@@ -1,19 +1,114 @@
+import { Utils, InMemoryKeyManager } from '../..'
+import { addressDiscoveryWithinBounds, AddressType, Utxo } from '../../Wallet'
+import { generateTestTransaction } from './test_transaction'
+
+/*
+  This seed generates the following "chain state"
+
+  Account 1 = mnemonic1:
+  - Some utxos in the first BIP44 range (first 20 addresses), for external addresses
+  - Account 1 can be considered a genesis account, as it moved funds to other accounts without utxos
+  - Its mnemonic won't be exposed as without txOut, it is useless,
+
+  Account 2 = mnemonic2
+  - No change, only receipt, in the first and second BIP44 ranges (first 40 addresses)
+
+  Account 3 = mnemonic3
+  - No utxos
+*/
+export function generateSeed () {
+  const mnemonic1 = Utils.generateMnemonic()
+  const mnemonic2 = Utils.generateMnemonic()
+  const mnemonic3 = Utils.generateMnemonic()
+
+  const account1 = InMemoryKeyManager({ password: '', mnemonic: mnemonic1 }).publicAccount()
+  const account2 = InMemoryKeyManager({ password: '', mnemonic: mnemonic2 }).publicAccount()
+
+  const account2Addresses = addressDiscoveryWithinBounds({
+    account: account2,
+    lowerBound: 0,
+    upperBound: 39,
+    type: AddressType.external
+  })
+
+  const tx1 = generateTestTransaction({
+    publicAccount: account1,
+    testInputs: [
+      { type: AddressType.external, value: '100000' },
+      { type: AddressType.external, value: '200000' },
+      { type: AddressType.external, value: '300000' },
+      { type: AddressType.external, value: '200000' },
+      { type: AddressType.external, value: '100000' }
+    ],
+    lowerBoundOfAddresses: 0,
+    testOutputs: [
+      { address: account2Addresses[0].address, value: '400000' },
+      { address: account2Addresses[5].address, value: '200000' },
+      { address: account2Addresses[10].address, value: '200000' }
+    ]
+  })
+
+  const tx2 = generateTestTransaction({
+    publicAccount: account1,
+    testInputs: [
+      { type: AddressType.external, value: '100000' },
+      { type: AddressType.external, value: '200000' },
+      { type: AddressType.external, value: '300000' },
+      { type: AddressType.external, value: '200000' },
+      { type: AddressType.external, value: '100000' }
+    ],
+    lowerBoundOfAddresses: 4,
+    testOutputs: [
+      { address: account2Addresses[15].address, value: '400000' },
+      { address: account2Addresses[20].address, value: '200000' },
+      { address: account2Addresses[25].address, value: '200000' }
+    ]
+  })
+
+  const account1Utxos: Utxo[] = tx1.inputs.concat(tx2.inputs).map(input => {
+    return { address: input.value.address, id: tx1.transaction.id().to_hex(), index: 0, value: '1000000' }
+  })
+
+  const account2Utxos: Utxo[] = [
+    { id: tx1.transaction.id().to_hex(), index: 0, address: account2Addresses[0].address, value: '200000' },
+    { id: tx1.transaction.id().to_hex(), index: 1, address: account2Addresses[5].address, value: '200000' },
+    { id: tx1.transaction.id().to_hex(), index: 2, address: account2Addresses[10].address, value: '200000' },
+    { id: tx2.transaction.id().to_hex(), index: 3, address: account2Addresses[15].address, value: '200000' },
+    { id: tx2.transaction.id().to_hex(), index: 4, address: account2Addresses[20].address, value: '200000' },
+    { id: tx2.transaction.id().to_hex(), index: 5, address: account2Addresses[25].address, value: '200000' }
+  ]
+
+  return {
+    accountMnemonics: {
+      account1: mnemonic2,
+      account2: mnemonic3
+    },
+    transactions: [
+      { inputs: tx1.inputs, outputs: tx1.transaction.toJson().outputs.map((txOut: any) => ({ address: txOut.address, value: String(txOut.value) })) },
+      { inputs: tx2.inputs, outputs: tx2.transaction.toJson().outputs.map((txOut: any) => ({ address: txOut.address, value: String(txOut.value) })) }
+    ],
+    utxos: account1Utxos.concat(account2Utxos)
+  }
+}
+
+// Uncomment and run this file with `npx ts-node src/test/utils/mock_provider.ts` to regenerate the seed
+// console.log(JSON.stringify(generateSeed(), null, 4))
+
 export const seed = {
   'accountMnemonics': {
-    'account1': 'fatigue labor lizard diamond arrive paper trap funny void hammer country try',
-    'account2': 'wrestle offer banner glass pizza blame desk mimic machine merry knee isolate',
-    'account3': 'sell crumble bright vessel battle cloth enrich jealous clay soda fossil inform'
+    'account1': 'dune bike sunny phrase service clip slice taste game limit define symbol',
+    'account2': 'brave path obscure silk drum mosquito all coffee next summer nothing winner'
   },
   'transactions': [
     {
       'inputs': [
         {
           'pointer': {
-            'id': '2d8d95fe906b1eff139f5804d767a26252a7b71b5815f4bd5dd0adad76f7b19b',
+            'id': 'dedd121350a4337e65b7b6188aada7f2c06add547a3fc722a9910d97998c7759',
             'index': 0
           },
           'value': {
-            'address': 'Ae2tdPwUPEZMsnCdtFGFjBhg7FivT69CrDAbKokAj4dbefGDCXoHQEcWsWn',
+            'address': 'Ae2tdPwUPEZGiQQTVEcNicxT9omVNNTVwkgM3A4atejUQaimxa9Y5FPgaKY',
             'value': '100000'
           },
           'addressing': {
@@ -23,11 +118,11 @@ export const seed = {
         },
         {
           'pointer': {
-            'id': 'eced405c6208962e84336edde556e27c6de446df9f294b22c584576ec59c17c1',
+            'id': '60ef31b7f3033a981182d4c6f08384c74d94e5669360cea680459c27c308088f',
             'index': 1
           },
           'value': {
-            'address': 'Ae2tdPwUPEZ6nXd6pyZbfcfyKfqmhHRz9QcQ8obZ6iNGZHXNCe3M3TAMzd5',
+            'address': 'Ae2tdPwUPEZGfJ2hQvKtJewggrung58P4GWh1K8KgKYgSJ2CB9fHmyArCJX',
             'value': '200000'
           },
           'addressing': {
@@ -37,11 +132,11 @@ export const seed = {
         },
         {
           'pointer': {
-            'id': '500e42d2c1805931277c3dce574cf2a87e59e8a650fead7e9b50563d4868f89d',
+            'id': '91698b97779e76876ea05655ce7f70b75a2bb8f67b75a218a772eadac6bbcb2e',
             'index': 2
           },
           'value': {
-            'address': 'Ae2tdPwUPEZD4qc8ctSVSSwvGr4SqCYCFNF8WfmHLxzGGRwx2PhCSsctP6i',
+            'address': 'Ae2tdPwUPEYzLpMAhWQJ6KQacUWh1D53bCnvJPfXVuab2UMJBPhkAKPCJAb',
             'value': '300000'
           },
           'addressing': {
@@ -51,11 +146,11 @@ export const seed = {
         },
         {
           'pointer': {
-            'id': '6e6bfe1f3de4a3ed6269d39650b5c09e7e7697c54dc40006b20dac174f7f9132',
+            'id': '88543abc5b47664c734d4b0870bd48bdd880d590d39a6792e8fa0298f4311c50',
             'index': 3
           },
           'value': {
-            'address': 'Ae2tdPwUPEZDWXRLyG8ccPWs4QiLSSNacoVPiYfaaQZUBbSsv6zcnyrK8d3',
+            'address': 'Ae2tdPwUPEZKzpvrs2oZSA3ftFKFLGu3eccKZ5iEpMSwzXzfjpMknKDAFZw',
             'value': '200000'
           },
           'addressing': {
@@ -65,11 +160,11 @@ export const seed = {
         },
         {
           'pointer': {
-            'id': 'fb2b6f39742b13133963cf7dd052c4f61ad83f6ec5265d2f4c11d7596ef7042e',
+            'id': '2de5075d9dccb85fc181709679ed4b52539ac5b67b75c15397a1af80dde0d69a',
             'index': 4
           },
           'value': {
-            'address': 'Ae2tdPwUPEZHthq5KfN6aofYQTcrDRZMaqGfxAsBqkFgt1awz16ECPH5858',
+            'address': 'Ae2tdPwUPEZ4Rc8yxB726KP2W15Zvn5FRZR5CZbVoK6yYMYHLnTCt6AeqNQ',
             'value': '100000'
           },
           'addressing': {
@@ -80,15 +175,15 @@ export const seed = {
       ],
       'outputs': [
         {
-          'address': 'Ae2tdPwUPEZJSPZkNWesVs5awFbk38d2JCVMLtprCo3R9GJ1QdXXuBnrt1i',
+          'address': 'Ae2tdPwUPEYxJD58QiQesER14LvUtZKC3CQmnkvgiADAKqpTXPaRMbj4xo2',
           'value': '198036'
         },
         {
-          'address': 'Ae2tdPwUPEZHmtuSqGDuPgof3dXF6pnxGei8tPNDwJzribj58pVbuukncE6',
+          'address': 'Ae2tdPwUPEZ5mjoaDxQeZhqDsD82gdTT8AGmPxFQ6bN7ALXnJXNYoLxYTty',
           'value': '200000'
         },
         {
-          'address': 'Ae2tdPwUPEYwFP322fznRtvVDaHT2xiADcZ99rdwUuL7xb142bvcXZ4kmvh',
+          'address': 'Ae2tdPwUPEZLLSW7Y33qFVhkm2DhUzKamXuijrmQqBx3nstFBzNFaeJpEFh',
           'value': '200000'
         }
       ]
@@ -97,11 +192,11 @@ export const seed = {
       'inputs': [
         {
           'pointer': {
-            'id': 'e03480913113809f2d099e964f8d33dddb685fb48832f51a2c82acfb4f46ff51',
+            'id': '273afe80b119ab518b01e5bbe936425d4cd84e1fb9056d5eef79d60371213787',
             'index': 0
           },
           'value': {
-            'address': 'Ae2tdPwUPEZHthq5KfN6aofYQTcrDRZMaqGfxAsBqkFgt1awz16ECPH5858',
+            'address': 'Ae2tdPwUPEZ4Rc8yxB726KP2W15Zvn5FRZR5CZbVoK6yYMYHLnTCt6AeqNQ',
             'value': '100000'
           },
           'addressing': {
@@ -111,11 +206,11 @@ export const seed = {
         },
         {
           'pointer': {
-            'id': '7c140722c3c7d576e885340aab81ff0fc2f1c7b5f6bd97331704b499dd1630b6',
+            'id': 'f360479df2b54997795cf28be471bf5a16518e895ec637877aa5ded27cb229b3',
             'index': 1
           },
           'value': {
-            'address': 'Ae2tdPwUPEZHAhJmkHmbtazsYuJkyStUuwDh9WsXguEykiCV4ZYspN3M9jh',
+            'address': 'Ae2tdPwUPEZ83naRuph3AxaoPAyGbnLduu7FvgDhd2XjpbpcSSYeTgvuSxW',
             'value': '200000'
           },
           'addressing': {
@@ -125,11 +220,11 @@ export const seed = {
         },
         {
           'pointer': {
-            'id': '2dc1414348cd144e6899c9f1a35139f06feb1540d69b1f71ef56db236aad327d',
+            'id': 'f4ef145e8104828dae1aa6631faefdc08dd962dd21176e9b62a7b9b36e09ab08',
             'index': 2
           },
           'value': {
-            'address': 'Ae2tdPwUPEZKg3UC9GiqRUKKGqSCHMpZouncT9AjqfUjAWsF754aCDt56xk',
+            'address': 'Ae2tdPwUPEYxM2oCK42hHw4gTo8K5p7BthQQxecEJDxRWxTQQMvxvyUCbbV',
             'value': '300000'
           },
           'addressing': {
@@ -139,11 +234,11 @@ export const seed = {
         },
         {
           'pointer': {
-            'id': '396d6e35d94f71e05613f235ee8afa66f03c8ccb5876e34362d8fd505278d3ff',
+            'id': '143508ba21cebacc8c99122676de600450a30e8d51c4cd1ab090975092e47672',
             'index': 3
           },
           'value': {
-            'address': 'Ae2tdPwUPEZ4Jxvm7Xp7aihUkZuvP1wRKT98y3VmNZnmwzjAHCy6txRyYJD',
+            'address': 'Ae2tdPwUPEZEAJKhiMpNFURjybgAboYbaZRFLXtbGZBg7JaY13mLXWBnd6C',
             'value': '200000'
           },
           'addressing': {
@@ -153,11 +248,11 @@ export const seed = {
         },
         {
           'pointer': {
-            'id': 'bd8970f042770a82664b90d0e40dc558bed7f82d30e45eede9bab334b79eb72c',
+            'id': '76cb4ca05a35b37cc84265d52649baf3d6c4910580ece140919babe9426e2a42',
             'index': 4
           },
           'value': {
-            'address': 'Ae2tdPwUPEZMsVsac7Y75i8uFFKFafxJbVgGA1N5DVvGGweyW6HrjYDuLDK',
+            'address': 'Ae2tdPwUPEZEbC3pCF3NwnZfhKo1i5PTgwcsZsNor4po6qbfQbrB12FK9q2',
             'value': '100000'
           },
           'addressing': {
@@ -168,15 +263,15 @@ export const seed = {
       ],
       'outputs': [
         {
-          'address': 'Ae2tdPwUPEYvyteeY53wvpEyTFLBidtP7WP3jnLF5fwW6ickcEFZXcVYe2n',
+          'address': 'Ae2tdPwUPEZC68988DdY4VKUXGHuUadkZiQEc14FJhEDuZoaXzu8gHAiXoL',
           'value': '198036'
         },
         {
-          'address': 'Ae2tdPwUPEZFMef1zZ3xkx2KCqaXAqHUgraLJeCkiygwpzGHygL3nF2XScQ',
+          'address': 'Ae2tdPwUPEZ3mXn6kBpoGfBp6ZjWbeHir6LJQtQ95mJ6DGYt4wGwSWpLyCB',
           'value': '200000'
         },
         {
-          'address': 'Ae2tdPwUPEZHDQwtXvRYoXugeyc2MZosAeFaHTvGwBKTUMa34GUr8eRXpUj',
+          'address': 'Ae2tdPwUPEZKZcGaQderAkYknURwJ34dzxWq3WDPS1y6K2PXjcmuy94zeo7',
           'value': '200000'
         }
       ]
@@ -184,83 +279,99 @@ export const seed = {
   ],
   'utxos': [
     {
-      'address': 'Ae2tdPwUPEZMsnCdtFGFjBhg7FivT69CrDAbKokAj4dbefGDCXoHQEcWsWn',
-      'hash': 'afe1f77e6fee0af36795326ea9d4822a9e489a9d3a399ff5a97fd80bd10dd985',
+      'address': 'Ae2tdPwUPEZGiQQTVEcNicxT9omVNNTVwkgM3A4atejUQaimxa9Y5FPgaKY',
+      'id': 'c4b435294aed00ed3e5cb3208714b76a79096bf037f8a22cb4bafe48795c20a3',
+      'index': 0,
       'value': '1000000'
     },
     {
-      'address': 'Ae2tdPwUPEZ6nXd6pyZbfcfyKfqmhHRz9QcQ8obZ6iNGZHXNCe3M3TAMzd5',
-      'hash': 'afe1f77e6fee0af36795326ea9d4822a9e489a9d3a399ff5a97fd80bd10dd985',
+      'address': 'Ae2tdPwUPEZGfJ2hQvKtJewggrung58P4GWh1K8KgKYgSJ2CB9fHmyArCJX',
+      'id': 'c4b435294aed00ed3e5cb3208714b76a79096bf037f8a22cb4bafe48795c20a3',
+      'index': 0,
       'value': '1000000'
     },
     {
-      'address': 'Ae2tdPwUPEZD4qc8ctSVSSwvGr4SqCYCFNF8WfmHLxzGGRwx2PhCSsctP6i',
-      'hash': 'afe1f77e6fee0af36795326ea9d4822a9e489a9d3a399ff5a97fd80bd10dd985',
+      'address': 'Ae2tdPwUPEYzLpMAhWQJ6KQacUWh1D53bCnvJPfXVuab2UMJBPhkAKPCJAb',
+      'id': 'c4b435294aed00ed3e5cb3208714b76a79096bf037f8a22cb4bafe48795c20a3',
+      'index': 0,
       'value': '1000000'
     },
     {
-      'address': 'Ae2tdPwUPEZDWXRLyG8ccPWs4QiLSSNacoVPiYfaaQZUBbSsv6zcnyrK8d3',
-      'hash': 'afe1f77e6fee0af36795326ea9d4822a9e489a9d3a399ff5a97fd80bd10dd985',
+      'address': 'Ae2tdPwUPEZKzpvrs2oZSA3ftFKFLGu3eccKZ5iEpMSwzXzfjpMknKDAFZw',
+      'id': 'c4b435294aed00ed3e5cb3208714b76a79096bf037f8a22cb4bafe48795c20a3',
+      'index': 0,
       'value': '1000000'
     },
     {
-      'address': 'Ae2tdPwUPEZHthq5KfN6aofYQTcrDRZMaqGfxAsBqkFgt1awz16ECPH5858',
-      'hash': 'afe1f77e6fee0af36795326ea9d4822a9e489a9d3a399ff5a97fd80bd10dd985',
+      'address': 'Ae2tdPwUPEZ4Rc8yxB726KP2W15Zvn5FRZR5CZbVoK6yYMYHLnTCt6AeqNQ',
+      'id': 'c4b435294aed00ed3e5cb3208714b76a79096bf037f8a22cb4bafe48795c20a3',
+      'index': 0,
       'value': '1000000'
     },
     {
-      'address': 'Ae2tdPwUPEZHthq5KfN6aofYQTcrDRZMaqGfxAsBqkFgt1awz16ECPH5858',
-      'hash': 'afe1f77e6fee0af36795326ea9d4822a9e489a9d3a399ff5a97fd80bd10dd985',
+      'address': 'Ae2tdPwUPEZ4Rc8yxB726KP2W15Zvn5FRZR5CZbVoK6yYMYHLnTCt6AeqNQ',
+      'id': 'c4b435294aed00ed3e5cb3208714b76a79096bf037f8a22cb4bafe48795c20a3',
+      'index': 0,
       'value': '1000000'
     },
     {
-      'address': 'Ae2tdPwUPEZHAhJmkHmbtazsYuJkyStUuwDh9WsXguEykiCV4ZYspN3M9jh',
-      'hash': 'afe1f77e6fee0af36795326ea9d4822a9e489a9d3a399ff5a97fd80bd10dd985',
+      'address': 'Ae2tdPwUPEZ83naRuph3AxaoPAyGbnLduu7FvgDhd2XjpbpcSSYeTgvuSxW',
+      'id': 'c4b435294aed00ed3e5cb3208714b76a79096bf037f8a22cb4bafe48795c20a3',
+      'index': 0,
       'value': '1000000'
     },
     {
-      'address': 'Ae2tdPwUPEZKg3UC9GiqRUKKGqSCHMpZouncT9AjqfUjAWsF754aCDt56xk',
-      'hash': 'afe1f77e6fee0af36795326ea9d4822a9e489a9d3a399ff5a97fd80bd10dd985',
+      'address': 'Ae2tdPwUPEYxM2oCK42hHw4gTo8K5p7BthQQxecEJDxRWxTQQMvxvyUCbbV',
+      'id': 'c4b435294aed00ed3e5cb3208714b76a79096bf037f8a22cb4bafe48795c20a3',
+      'index': 0,
       'value': '1000000'
     },
     {
-      'address': 'Ae2tdPwUPEZ4Jxvm7Xp7aihUkZuvP1wRKT98y3VmNZnmwzjAHCy6txRyYJD',
-      'hash': 'afe1f77e6fee0af36795326ea9d4822a9e489a9d3a399ff5a97fd80bd10dd985',
+      'address': 'Ae2tdPwUPEZEAJKhiMpNFURjybgAboYbaZRFLXtbGZBg7JaY13mLXWBnd6C',
+      'id': 'c4b435294aed00ed3e5cb3208714b76a79096bf037f8a22cb4bafe48795c20a3',
+      'index': 0,
       'value': '1000000'
     },
     {
-      'address': 'Ae2tdPwUPEZMsVsac7Y75i8uFFKFafxJbVgGA1N5DVvGGweyW6HrjYDuLDK',
-      'hash': 'afe1f77e6fee0af36795326ea9d4822a9e489a9d3a399ff5a97fd80bd10dd985',
+      'address': 'Ae2tdPwUPEZEbC3pCF3NwnZfhKo1i5PTgwcsZsNor4po6qbfQbrB12FK9q2',
+      'id': 'c4b435294aed00ed3e5cb3208714b76a79096bf037f8a22cb4bafe48795c20a3',
+      'index': 0,
       'value': '1000000'
     },
     {
-      'hash': 'afe1f77e6fee0af36795326ea9d4822a9e489a9d3a399ff5a97fd80bd10dd985',
-      'address': 'Ae2tdPwUPEZJSPZkNWesVs5awFbk38d2JCVMLtprCo3R9GJ1QdXXuBnrt1i',
+      'id': 'c4b435294aed00ed3e5cb3208714b76a79096bf037f8a22cb4bafe48795c20a3',
+      'index': 0,
+      'address': 'Ae2tdPwUPEYxJD58QiQesER14LvUtZKC3CQmnkvgiADAKqpTXPaRMbj4xo2',
       'value': '200000'
     },
     {
-      'hash': 'afe1f77e6fee0af36795326ea9d4822a9e489a9d3a399ff5a97fd80bd10dd985',
-      'address': 'Ae2tdPwUPEZHmtuSqGDuPgof3dXF6pnxGei8tPNDwJzribj58pVbuukncE6',
+      'id': 'c4b435294aed00ed3e5cb3208714b76a79096bf037f8a22cb4bafe48795c20a3',
+      'index': 1,
+      'address': 'Ae2tdPwUPEZ5mjoaDxQeZhqDsD82gdTT8AGmPxFQ6bN7ALXnJXNYoLxYTty',
       'value': '200000'
     },
     {
-      'hash': 'afe1f77e6fee0af36795326ea9d4822a9e489a9d3a399ff5a97fd80bd10dd985',
-      'address': 'Ae2tdPwUPEYwFP322fznRtvVDaHT2xiADcZ99rdwUuL7xb142bvcXZ4kmvh',
+      'id': 'c4b435294aed00ed3e5cb3208714b76a79096bf037f8a22cb4bafe48795c20a3',
+      'index': 2,
+      'address': 'Ae2tdPwUPEZLLSW7Y33qFVhkm2DhUzKamXuijrmQqBx3nstFBzNFaeJpEFh',
       'value': '200000'
     },
     {
-      'hash': '880433fcdef382d92812db3722a893be8a93d8ed4f152790ac9a41c099db42c1',
-      'address': 'Ae2tdPwUPEYvyteeY53wvpEyTFLBidtP7WP3jnLF5fwW6ickcEFZXcVYe2n',
+      'id': 'b8396414af5ce98eb230e5d1abdd0a44b4215c38219134d97866f1d6787bc8de',
+      'index': 3,
+      'address': 'Ae2tdPwUPEZC68988DdY4VKUXGHuUadkZiQEc14FJhEDuZoaXzu8gHAiXoL',
       'value': '200000'
     },
     {
-      'hash': '880433fcdef382d92812db3722a893be8a93d8ed4f152790ac9a41c099db42c1',
-      'address': 'Ae2tdPwUPEZFMef1zZ3xkx2KCqaXAqHUgraLJeCkiygwpzGHygL3nF2XScQ',
+      'id': 'b8396414af5ce98eb230e5d1abdd0a44b4215c38219134d97866f1d6787bc8de',
+      'index': 4,
+      'address': 'Ae2tdPwUPEZ3mXn6kBpoGfBp6ZjWbeHir6LJQtQ95mJ6DGYt4wGwSWpLyCB',
       'value': '200000'
     },
     {
-      'hash': '880433fcdef382d92812db3722a893be8a93d8ed4f152790ac9a41c099db42c1',
-      'address': 'Ae2tdPwUPEZHDQwtXvRYoXugeyc2MZosAeFaHTvGwBKTUMa34GUr8eRXpUj',
+      'id': 'b8396414af5ce98eb230e5d1abdd0a44b4215c38219134d97866f1d6787bc8de',
+      'index': 5,
+      'address': 'Ae2tdPwUPEZKZcGaQderAkYknURwJ34dzxWq3WDPS1y6K2PXjcmuy94zeo7',
       'value': '200000'
     }
   ]

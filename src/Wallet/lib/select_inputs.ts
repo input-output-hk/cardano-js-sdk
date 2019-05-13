@@ -1,92 +1,56 @@
 import { TransactionInput, TransactionOutput } from '../../Transaction'
-import { InsufficientValueInUtxosForSelection, MaximumTransactionInputsExceeded } from '../errors'
-import { getRandomBytesForEnvironmentAsHex } from '../../lib/bindings'
-import { MAX_TRANSACTION_INPUTS } from '../config'
-import { InputSelectionAlgorithm, UtxoWithAddressing } from '..'
+import { getBindingsForEnvironment } from '../../lib/bindings'
+import { UtxoWithAddressing } from '..'
+import { TxInput as CardanoTxInput } from 'cardano-wallet'
+import { convertCoinToLovelace } from '../../Utils'
+const { Coin, TransactionId, TxoPointer, TxInput, TxOut, OutputPolicy, Address, InputSelectionBuilder, LinearFeeAlgorithm } = getBindingsForEnvironment()
 
 export interface TransactionSelection {
   inputs: TransactionInput[]
   changeOutput: TransactionOutput
 }
 
-function largestFirstUtxoSort (utxoSet: UtxoWithAddressing[]) {
-  return utxoSet.sort((a, b) => Number(b.value) - Number(a.value))
-}
-
-function randomUtxoSort (utxoSet: UtxoWithAddressing[]) {
-  const utxoSetWithRandomBytes = utxoSet.map(utxo => {
-    const randomBytes = getRandomBytesForEnvironmentAsHex()
-    return {
-      randomBytes,
-      ...utxo
-    }
+export function selectInputsAndChangeOutput (outputs: TransactionOutput[], utxoSet: UtxoWithAddressing[], changeAddress: string, linearFeeAlgorithm = LinearFeeAlgorithm.default()): TransactionSelection {
+  const potentialInputs: CardanoTxInput[] = utxoSet.map(utxo => {
+    return TxInput.new(
+      TxoPointer.new(TransactionId.from_hex(utxo.id), utxo.index),
+      TxOut.new(Address.from_base58(utxo.address), Coin.from_str(utxo.value))
+    )
   })
 
-  return utxoSetWithRandomBytes.sort((a, b) => a.randomBytes > b.randomBytes ? 1 : -1)
-}
+  const txOuts = outputs.map((out) => TxOut.new(Address.from_base58(out.address), Coin.from_str(out.value)))
+  const changeOutputPolicy = OutputPolicy.change_to_one_address(Address.from_base58(changeAddress))
 
-export function selectInputsAndChangeOutput (paymentValue: number, utxoSet: UtxoWithAddressing[], changeAddress: string, selectionAlgo: InputSelectionAlgorithm): TransactionSelection {
-  const sortedUtxoSet = selectionAlgo === InputSelectionAlgorithm.random
-    ? randomUtxoSort(utxoSet)
-    : largestFirstUtxoSort(utxoSet)
+  let selectionBuilder = InputSelectionBuilder.first_match_first()
+  potentialInputs.forEach(input => selectionBuilder.add_input(input))
+  txOuts.forEach(output => selectionBuilder.add_output(output))
 
-  const { paymentAccumulated, utxos } = accumulateUtxos(paymentValue, sortedUtxoSet)
+  const selectionResult = selectionBuilder.select_inputs(linearFeeAlgorithm, changeOutputPolicy)
 
-  if (paymentAccumulated < paymentValue) {
-    throw new InsufficientValueInUtxosForSelection(paymentValue, paymentAccumulated)
+  const estimatedChange = convertCoinToLovelace(selectionResult.estimated_change())
+  const pointers = potentialInputs.map(i => {
+    return TxoPointer.from_json(i.to_json().ptr)
+  })
+
+  const changeOutput = {
+    value: estimatedChange,
+    address: changeAddress
   }
 
-  if (selectionAlgo === InputSelectionAlgorithm.random && utxos.length > MAX_TRANSACTION_INPUTS) {
-    return selectInputsAndChangeOutput(paymentValue, utxoSet, changeAddress, InputSelectionAlgorithm.largestFirst)
-  }
+  const selectedPointers = pointers.filter((pointer) => selectionResult.is_input(pointer))
 
-  if (utxos.length > MAX_TRANSACTION_INPUTS) {
-    throw new MaximumTransactionInputsExceeded(MAX_TRANSACTION_INPUTS, utxos.length)
-  }
+  const inputs: TransactionInput[] = selectedPointers.map(ptr => {
+    const pointer = ptr.to_json()
+    const relevantUtxo = utxoSet.find(u => u.id === pointer.id)
 
-  const inputs = createTransactionInputsForUtxos(utxos)
+    const value = {
+      address: relevantUtxo.address,
+      value: relevantUtxo.value
+    }
 
-  let changeOutput
-  if (paymentAccumulated > paymentValue) {
-    changeOutput = createChangeOutput(changeAddress, paymentValue, paymentAccumulated)
-  }
+    const addressing = relevantUtxo.addressing
+    return { pointer, value, addressing }
+  })
 
   return { inputs, changeOutput }
-}
-
-function accumulateUtxos (paymentValue: number, sortedUtxo: UtxoWithAddressing[]): { paymentAccumulated: number, utxos: UtxoWithAddressing[] } {
-  return sortedUtxo.reduce((accumulator, utxo) => {
-    if (accumulator.paymentAccumulated < paymentValue) {
-      accumulator.paymentAccumulated = accumulator.paymentAccumulated + Number(utxo.value)
-      accumulator.utxos.push(utxo)
-    }
-
-    return accumulator
-  }, { paymentAccumulated: 0, utxos: [] })
-}
-
-function createTransactionInputsForUtxos (utxoSet: UtxoWithAddressing[]) {
-  return utxoSet.map((utxo, index) => {
-    return {
-      pointer: {
-        id: utxo.hash,
-        index
-      },
-      value: {
-        address: utxo.address,
-        value: utxo.value
-      },
-      addressing: {
-        index: utxo.index,
-        change: 0
-      }
-    }
-  })
-}
-
-function createChangeOutput (changeAddress: string, paymentValue: number, paymentAccumulated: number) {
-  return {
-    address: changeAddress,
-    value: String(paymentAccumulated - paymentValue)
-  }
 }

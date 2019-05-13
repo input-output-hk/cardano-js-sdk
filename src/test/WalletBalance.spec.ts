@@ -11,13 +11,13 @@ describe('Example: Determine the balance for a PublicAccount, in Lovelace', () =
     const keyManager = InMemoryKeyManager({ mnemonic, password: '' })
 
     const balance = await connect(mockProvider).wallet(keyManager.publicAccount()).balance()
-    expect(balance).to.eql(10000000)
+    expect(balance).to.eql(200000 * 6)
   })
 
   it('returns 0 for a new account', async () => {
     seedMockProvider(seed.utxos, seed.transactions)
 
-    const mnemonic = seed.accountMnemonics.account3
+    const mnemonic = seed.accountMnemonics.account2
     const keyManager = InMemoryKeyManager({ mnemonic, password: '' })
 
     const balance = await connect(mockProvider).wallet(keyManager.publicAccount()).balance()

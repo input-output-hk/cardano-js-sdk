@@ -48,30 +48,50 @@ describe('Wallet', () => {
     const targetInternalAddressIndex = 5
     const targetExternalAddressIndex = 5
 
-    const outputs = [{ address: 'Ae2tdPwUPEZEjJcLmvgKnuwUnfKSVuGCzRW1PqsLcWqmoGJUocBGbvWjjTx', value: '1000000' }]
+    const internalOutputs = [...Array(targetInternalAddressIndex)].map((_, index) => {
+      const address = addressDiscoveryWithinBounds({
+        account,
+        type: AddressType.internal,
+        lowerBound: index,
+        upperBound: index
+      })[0].address
+
+      return { value: '1000000', address }
+    })
+
+    const externalOutputs = [...Array(targetExternalAddressIndex)].map((_, index) => {
+      const address = addressDiscoveryWithinBounds({
+        account,
+        type: AddressType.external,
+        lowerBound: index,
+        upperBound: index
+      })[0].address
+
+      return { value: '1000000', address }
+    })
 
     const internalTx = generateTestTransaction({
       publicAccount: account,
       lowerBoundOfAddresses: 0,
       testInputs: [...Array(targetInternalAddressIndex)].map(() => ({ value: '1000000', type: AddressType.internal })),
-      testOutputs: outputs
+      testOutputs: internalOutputs
     })
 
     const externalTx = generateTestTransaction({
       publicAccount: account,
       lowerBoundOfAddresses: 0,
       testInputs: [...Array(targetExternalAddressIndex)].map(() => ({ value: '1000000', type: AddressType.external })),
-      testOutputs: outputs
+      testOutputs: externalOutputs
     })
 
     seedTransactionSet([
-      { inputs: internalTx.inputs, outputs },
-      { inputs: externalTx.inputs, outputs }
+      { inputs: internalTx.inputs, outputs: internalOutputs },
+      { inputs: externalTx.inputs, outputs: externalOutputs }
     ])
 
     seedUtxoSet([
-      { address: internalTx.inputs[0].value.address, hash: internalTx.inputs[0].pointer.id, value: '1000' },
-      { address: externalTx.inputs[0].value.address, hash: internalTx.inputs[0].pointer.id, value: '2000' }
+      { address: internalOutputs[0].address, id: internalTx.inputs[0].pointer.id, index: internalTx.inputs[0].pointer.index, value: '1000' },
+      { address: externalOutputs[0].address, id: internalTx.inputs[0].pointer.id, index: internalTx.inputs[0].pointer.index, value: '2000' }
     ])
 
     const balance = await Wallet(mockProvider)(account).balance()
@@ -84,25 +104,45 @@ describe('Wallet', () => {
     const targetInternalAddressIndex = 5
     const targetExternalAddressIndex = 5
 
-    const outputs = [{ address: 'Ae2tdPwUPEZEjJcLmvgKnuwUnfKSVuGCzRW1PqsLcWqmoGJUocBGbvWjjTx', value: '1000000' }]
+    const internalOutputs = [...Array(targetInternalAddressIndex)].map((_, index) => {
+      const address = addressDiscoveryWithinBounds({
+        account,
+        type: AddressType.internal,
+        lowerBound: index,
+        upperBound: index
+      })[0].address
+
+      return { value: '1000000', address }
+    })
+
+    const externalOutputs = [...Array(targetExternalAddressIndex)].map((_, index) => {
+      const address = addressDiscoveryWithinBounds({
+        account,
+        type: AddressType.external,
+        lowerBound: index,
+        upperBound: index
+      })[0].address
+
+      return { value: '1000000', address }
+    })
 
     const internalTx = generateTestTransaction({
       publicAccount: account,
       lowerBoundOfAddresses: 0,
       testInputs: [...Array(targetInternalAddressIndex)].map(() => ({ value: '1000000', type: AddressType.internal })),
-      testOutputs: outputs
+      testOutputs: internalOutputs
     })
 
     const externalTx = generateTestTransaction({
       publicAccount: account,
       lowerBoundOfAddresses: 0,
       testInputs: [...Array(targetExternalAddressIndex)].map(() => ({ value: '1000000', type: AddressType.external })),
-      testOutputs: outputs
+      testOutputs: externalOutputs
     })
 
     seedTransactionSet([
-      { inputs: internalTx.inputs, outputs },
-      { inputs: externalTx.inputs, outputs }
+      { inputs: internalTx.inputs, outputs: internalOutputs },
+      { inputs: externalTx.inputs, outputs: externalOutputs }
     ])
 
     const transactions = await Wallet(mockProvider)(account).transactions()
@@ -115,33 +155,55 @@ describe('Wallet', () => {
     const targetInternalAddressIndex = 5
     const targetExternalAddressIndex = 5
 
-    const outputs = [{ address: 'Ae2tdPwUPEZEjJcLmvgKnuwUnfKSVuGCzRW1PqsLcWqmoGJUocBGbvWjjTx', value: '1000000' }]
+    const internalOutputs = [...Array(targetInternalAddressIndex)].map((_, index) => {
+      const address = addressDiscoveryWithinBounds({
+        account,
+        type: AddressType.internal,
+        lowerBound: index,
+        upperBound: index
+      })[0].address
+
+      return { value: '1000000', address }
+    })
+
+    const externalOutputs = [...Array(targetExternalAddressIndex)].map((_, index) => {
+      const address = addressDiscoveryWithinBounds({
+        account,
+        type: AddressType.external,
+        lowerBound: index,
+        upperBound: index
+      })[0].address
+
+      return { value: '1000000', address }
+    })
 
     const internalTx = generateTestTransaction({
       publicAccount: account,
       lowerBoundOfAddresses: 0,
       testInputs: [...Array(targetInternalAddressIndex)].map(() => ({ value: '1000000', type: AddressType.internal })),
-      testOutputs: outputs
+      testOutputs: internalOutputs
     })
 
     const externalTx = generateTestTransaction({
       publicAccount: account,
       lowerBoundOfAddresses: 0,
       testInputs: [...Array(targetExternalAddressIndex)].map(() => ({ value: '1000000', type: AddressType.external })),
-      testOutputs: outputs
+      testOutputs: externalOutputs
     })
 
     seedTransactionSet([
-      { inputs: internalTx.inputs, outputs },
-      { inputs: externalTx.inputs, outputs }
+      { inputs: internalTx.inputs, outputs: internalOutputs },
+      { inputs: externalTx.inputs, outputs: externalOutputs }
     ])
 
     seedUtxoSet([
-      { address: internalTx.inputs[0].value.address, hash: internalTx.inputs[0].pointer.id, value: '400000' },
-      { address: externalTx.inputs[0].value.address, hash: internalTx.inputs[0].pointer.id, value: '500000' }
+      { address: internalOutputs[0].address, id: internalTx.inputs[0].pointer.id, index: internalTx.inputs[0].pointer.index, value: '400000' },
+      { address: externalOutputs[0].address, id: internalTx.inputs[0].pointer.id, index: internalTx.inputs[0].pointer.index, value: '500000' }
     ])
 
-    const { inputs, changeOutput } = await Wallet(mockProvider)(account).selectInputsForTransaction(outputs, '1000')
+    const testOutput = [{ address: internalOutputs[4].address, value: '1000' }]
+
+    const { inputs, changeOutput } = await Wallet(mockProvider)(account).selectInputsForTransaction(testOutput)
     expect(inputs.length).to.eql(2)
     expect(!!changeOutput).to.eql(true)
   })

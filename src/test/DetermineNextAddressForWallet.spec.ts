@@ -14,8 +14,8 @@ describe('Example: Key Derivation', () => {
     const { address } = await connect(mockProvider).wallet(keyManager.publicAccount()).getNextReceivingAddress()
     const nextAddressBasedOnSeedContext = addressDiscoveryWithinBounds({
       account: keyManager.publicAccount(),
-      lowerBound: 9,
-      upperBound: 9,
+      lowerBound: 16,
+      upperBound: 16,
       type: AddressType.external
     })[0].address
 

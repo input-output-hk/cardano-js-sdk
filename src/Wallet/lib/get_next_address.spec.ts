@@ -32,11 +32,21 @@ describe('getNextAddressByType', () => {
     const account = InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
     const targetAddressIndex = SCAN_GAP - 5
 
-    const outputs = [{ address: 'Ae2tdPwUPEZEjJcLmvgKnuwUnfKSVuGCzRW1PqsLcWqmoGJUocBGbvWjjTx', value: '6000000' }]
+    const outputs = [...Array(targetAddressIndex)].map((_, index) => {
+      const address = addressDiscoveryWithinBounds({
+        account,
+        type: AddressType.internal,
+        lowerBound: index,
+        upperBound: index
+      })[0].address
+
+      return { value: '1000000', address }
+    })
+
     const { inputs } = generateTestTransaction({
       publicAccount: account,
       lowerBoundOfAddresses: 0,
-      testInputs: [...Array(targetAddressIndex)].map(() => ({ value: '1000000', type: AddressType.internal })),
+      testInputs: [{ value: '1000000000', type: AddressType.internal }],
       testOutputs: outputs
     })
 
@@ -52,11 +62,21 @@ describe('getNextAddressByType', () => {
     const account = InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
     const targetAddressIndex = (SCAN_GAP * 3) - 5
 
-    const outputs = [{ address: 'Ae2tdPwUPEZEjJcLmvgKnuwUnfKSVuGCzRW1PqsLcWqmoGJUocBGbvWjjTx', value: '6000000' }]
+    const outputs = [...Array(targetAddressIndex)].map((_, index) => {
+      const address = addressDiscoveryWithinBounds({
+        account,
+        type: AddressType.internal,
+        lowerBound: index,
+        upperBound: index
+      })[0].address
+
+      return { value: '1000000', address }
+    })
+
     const { inputs } = generateTestTransaction({
       publicAccount: account,
       lowerBoundOfAddresses: 0,
-      testInputs: [...Array(targetAddressIndex)].map(() => ({ value: '1000000', type: AddressType.internal })),
+      testInputs: [{ value: '1000000000', type: AddressType.internal }],
       testOutputs: outputs
     })
 
@@ -90,11 +110,21 @@ describe('getNextAddressByType', () => {
     const account = InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
     const targetAddressIndex = SCAN_GAP - 10
 
-    const outputs = [{ address: 'Ae2tdPwUPEZEjJcLmvgKnuwUnfKSVuGCzRW1PqsLcWqmoGJUocBGbvWjjTx', value: '6000000' }]
+    const outputs = [...Array(targetAddressIndex)].map((_, index) => {
+      const address = addressDiscoveryWithinBounds({
+        account,
+        type: AddressType.external,
+        lowerBound: index,
+        upperBound: index
+      })[0].address
+
+      return { value: '1000000', address }
+    })
+
     const { inputs } = generateTestTransaction({
       publicAccount: account,
       lowerBoundOfAddresses: 0,
-      testInputs: [...Array(targetAddressIndex)].map(() => ({ value: '1000000', type: AddressType.external })),
+      testInputs: [{ value: '1000000000', type: AddressType.internal }],
       testOutputs: outputs
     })
 
@@ -110,11 +140,21 @@ describe('getNextAddressByType', () => {
     const account = InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
     const targetAddressIndex = (SCAN_GAP * 5) - 5
 
-    const outputs = [{ address: 'Ae2tdPwUPEZEjJcLmvgKnuwUnfKSVuGCzRW1PqsLcWqmoGJUocBGbvWjjTx', value: '6000000' }]
+    const outputs = [...Array(targetAddressIndex)].map((_, index) => {
+      const address = addressDiscoveryWithinBounds({
+        account,
+        type: AddressType.external,
+        lowerBound: index,
+        upperBound: index
+      })[0].address
+
+      return { value: '1000000', address }
+    })
+
     const { inputs } = generateTestTransaction({
       publicAccount: account,
       lowerBoundOfAddresses: 0,
-      testInputs: [...Array(targetAddressIndex)].map(() => ({ value: '1000000', type: AddressType.external })),
+      testInputs: [{ value: '1000000000', type: AddressType.internal }],
       testOutputs: outputs
     })
 

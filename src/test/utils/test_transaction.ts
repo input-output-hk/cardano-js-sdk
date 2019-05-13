@@ -52,7 +52,7 @@ export function generateTestTransaction ({
 }
 
 /** Test helper only */
-function hexGenerator (length: number) {
+export function hexGenerator (length: number) {
   const maxlen = 8
   const min = Math.pow(16, Math.min(length, maxlen) - 1)
   const max = Math.pow(16, Math.min(length, maxlen)) - 1

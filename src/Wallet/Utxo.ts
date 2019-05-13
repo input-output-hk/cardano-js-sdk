@@ -3,7 +3,10 @@ import { TransactionInput } from '../Transaction'
 export interface Utxo {
   address: string
   value: string
-  hash: string
+  id: string
+  index: number
 }
 
-export type UtxoWithAddressing = Utxo & TransactionInput['addressing']
+export interface UtxoWithAddressing extends Utxo {
+  addressing: TransactionInput['addressing']
+}

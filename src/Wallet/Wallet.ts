@@ -3,7 +3,8 @@ import { TransactionOutput } from '../Transaction'
 import { Provider } from '../Provider'
 import { AddressType, UtxoWithAddressing } from '.'
 import { deriveAddressSet, getNextAddressByType, selectInputsAndChangeOutput } from './lib'
-import { InputSelectionAlgorithm } from './InputSelectionAlgorithm'
+import { getBindingsForEnvironment } from '../lib/bindings'
+const { LinearFeeAlgorithm } = getBindingsForEnvironment()
 
 export function Wallet (provider: Provider) {
   return (account: Bip44AccountPublic) => {
@@ -19,22 +20,22 @@ export function Wallet (provider: Provider) {
         const addresses = await deriveAddressSet(provider, account)
         return provider.queryTransactionsByAddress(addresses.map(({ address }) => address))
       },
-      selectInputsForTransaction: async (paymentOutputs: TransactionOutput[], fee: string, selectionAlgorithm = InputSelectionAlgorithm.random) => {
+      selectInputsForTransaction: async (paymentOutputs: TransactionOutput[], linearFeeAlgorith = LinearFeeAlgorithm.default()) => {
         const addresses = await deriveAddressSet(provider, account)
         const utxos = await provider.queryUtxosByAddress(addresses.map(({ address }) => address))
         const utxosMappedWithAddresses: UtxoWithAddressing[] = utxos.map(utxo => {
           const { index, type } = addresses.find(({ address }) => address === utxo.address)
           return {
-            index,
-            change: type === AddressType.internal ? 1 : 0,
+            addressing: {
+              index,
+              change: type === AddressType.internal ? 1 : 0
+            },
             ...utxo
           }
         })
 
-        const paymentValue = paymentOutputs.reduce((value, output) => value + Number(output.value), 0) + Number(fee)
         const nextChangeAddress = await getNextAddressByType(provider, account, AddressType.internal)
-
-        return selectInputsAndChangeOutput(paymentValue, utxosMappedWithAddresses, nextChangeAddress.address, selectionAlgorithm)
+        return selectInputsAndChangeOutput(paymentOutputs, utxosMappedWithAddresses, nextChangeAddress.address, linearFeeAlgorith)
       }
     }
   }

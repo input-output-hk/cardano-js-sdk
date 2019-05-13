@@ -35,19 +35,19 @@ async function scanBip44AccountForAddressWithoutTransactions ({ provider, accoun
     return addresses[0]
   }
 
-  // Group transactions by address, if they have inputs for that address, meaning they are "used"
+  // Group transactions by address, if they have outputs for that address, it means they have had a utxo in the past.
   // The transactions are now garunteed to be in address order, as they are grouped against the
   // address range
-  const sortedTransactions: [Address, typeof transactions][] = addresses.map(address => {
+  const sortedAddressesWithTransactions: [Address, typeof transactions][] = addresses.map(address => {
     const transactionsByAddress = transactions.filter(transaction => {
-      const transactionInputAddresses = transaction.inputs.map(input => input.value.address)
-      return transactionInputAddresses.includes(address.address)
+      const transactionOutputAddresses = transaction.outputs.map(output => output.address)
+      return transactionOutputAddresses.includes(address.address)
     })
 
     return [address, transactionsByAddress]
   })
 
-  const reversedTransactions = sortedTransactions.reverse()
+  const reversedTransactions = sortedAddressesWithTransactions.reverse()
   const lastAddressWithTransactionsIndex = reversedTransactions.findIndex(([_address, transactions]) => {
     if (transactions.length > 0) {
       return true
