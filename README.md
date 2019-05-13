@@ -2,10 +2,10 @@
 JavaScript SDK for interacting with Cardano, providing various key management options including support for popular hardware wallets
 
 ## Features
-*This SDK is a work in progress. Feature state as follows:*
+*This SDK is a work in progress and should not be used in production. Feature state as follows:*
 
 - [x] Build a transaction and estimate fees
-- [ ] Balance a transaction (delegate input selection)
+- [x] Transaction input selection
 - [ ] Transaction signing
   - [x] memory
   - [ ] Ledger Nano S
@@ -22,6 +22,9 @@ The below examples are implemented as integration tests, they should be very eas
 
 - [Generate a keypair in memory from a BIP39 mnemonic](src/test/MemoryKeyManager.spec.ts)
 - [Message signatures](src/test/SignAndVerify.spec.ts)
+- [Get the wallet balance for a BIP44 Public Account](src/test/WalletBalance.spec.ts)
+- [Determine the next change and receipt addresses for a BIP44 Public Account](src/test/DetermineNextAddressForWallet.spec.ts)
+- [Transaction input selection](src/test/SelectInputsForTransaction.spec.ts)
 
 ## Development References
 
