@@ -16,7 +16,7 @@ describe('Wallet', () => {
       seedTransactionSet([])
     })
 
-    it('returns the next change address for a BIP44 public account', async () => {
+    it('returns the next change address for a new BIP44 public account', async () => {
       const firstInternalAddress = addressDiscoveryWithinBounds({
         account,
         type: AddressType.internal,
@@ -41,7 +41,7 @@ describe('Wallet', () => {
       seedTransactionSet([])
     })
 
-    it('returns the next receiving address for a BIP44 public account', async () => {
+    it('returns the next receiving address for a new BIP44 public account', async () => {
       const firstExternalAddress = addressDiscoveryWithinBounds({
         account,
         type: AddressType.external,
@@ -93,7 +93,7 @@ describe('Wallet', () => {
       ])
     })
 
-    it('determines the balance for a BIP44 public account', async () => {
+    it('determines the balance for a BIP44 public account with utxos', async () => {
       const balance = await Wallet(mockProvider)(account).balance()
       expect(balance).to.eql(3000)
     })
@@ -131,7 +131,7 @@ describe('Wallet', () => {
       ])
     })
 
-    it('returns a list of transactions for a BIP44 public account', async () => {
+    it('returns a list of transactions for a BIP44 public account with associated transactions', async () => {
       const transactions = await Wallet(mockProvider)(account).transactions()
       expect(transactions.length).to.eql(2)
     })
