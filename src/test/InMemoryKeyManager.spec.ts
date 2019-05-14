@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import { Utils, InMemoryKeyManager, connect } from '..'
-import { generateTestTransaction } from './utils/test_transaction'
+import { generateTestTransaction } from './utils'
 import { mockProvider } from './utils/mock_provider'
 import { AddressType } from '../Wallet'
 
