@@ -1,7 +1,7 @@
 import { AddressType, addressDiscoveryWithinBounds } from '../../Wallet'
 import { Bip44AccountPublic } from 'cardano-wallet'
 
-export function generateTestUtxos({ account, lowerBound, upperBound, type, value }: { account: Bip44AccountPublic, lowerBound: number, upperBound: number, type: AddressType, value: string }) {
+export function generateTestUtxos ({ account, lowerBound, upperBound, type, value }: { account: Bip44AccountPublic, lowerBound: number, upperBound: number, type: AddressType, value: string }) {
   const numberOfUtxos = upperBound - lowerBound
   return [...Array(numberOfUtxos)].map((_, index) => {
     const address = addressDiscoveryWithinBounds({

@@ -10,7 +10,7 @@ export interface TransactionSelection {
   changeOutput: TransactionOutput
 }
 
-export function selectInputsAndChangeOutput(outputs: TransactionOutput[], utxoSet: UtxoWithAddressing[], changeAddress: string, linearFeeAlgorithm = LinearFeeAlgorithm.default()): TransactionSelection {
+export function selectInputsAndChangeOutput (outputs: TransactionOutput[], utxoSet: UtxoWithAddressing[], changeAddress: string, linearFeeAlgorithm = LinearFeeAlgorithm.default()): TransactionSelection {
   const potentialInputs: CardanoTxInput[] = utxoSet.map(utxo => {
     return TxInput.new(
       TxoPointer.new(TransactionId.from_hex(utxo.id), utxo.index),
