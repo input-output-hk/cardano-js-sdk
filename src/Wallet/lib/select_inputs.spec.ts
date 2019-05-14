@@ -27,33 +27,6 @@ describe('selectInputsAndChangeOutput', () => {
     expect(() => selectInputsAndChangeOutput(outputs, utxosWithAddressing, changeAddress.address)).to.throw('NotEnoughInput')
   })
 
-  it('does not return a change output if exact payment is made', () => {
-    const mnemonic = Utils.generateMnemonic()
-    const account = InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
-    const [address1, address2, address3, address4, changeAddress] = addressDiscoveryWithinBounds({
-      account,
-      type: AddressType.internal,
-      lowerBound: 0,
-      upperBound: 5
-    })
-
-    const largestInput = '1200000'
-    const secondLargestInput = '10000'
-
-    const utxosWithAddressing = [
-      { address: address1.address, value: '22', id: hexGenerator(64), index: 0, addressing: { index: 0, change: 0 } },
-      { address: address2.address, value: largestInput, id: hexGenerator(64), index: 1, addressing: { index: 0, change: 0 } },
-      { address: address3.address, value: secondLargestInput, id: hexGenerator(64), index: 2, addressing: { index: 0, change: 0 } }
-    ]
-
-    const outputs = [
-      { address: address4.address, value: '100000' }
-    ]
-
-    const { changeOutput } = selectInputsAndChangeOutput(outputs, utxosWithAddressing, changeAddress.address)
-    expect(changeOutput).to.eql(undefined)
-  })
-
   describe('FirstMatchFirst', () => {
     it('selects valid utxos and produces change', () => {
       const mnemonic = Utils.generateMnemonic()
@@ -74,7 +47,7 @@ describe('selectInputsAndChangeOutput', () => {
       ]
 
       const outputs = [
-        { address: address5.address, value: '100' }
+        { address: address5.address, value: '10000' }
       ]
 
       const { inputs, changeOutput } = selectInputsAndChangeOutput(outputs, utxosWithAddressing, change.address)

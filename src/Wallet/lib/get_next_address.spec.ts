@@ -1,10 +1,9 @@
 import { expect } from 'chai'
-import { mockProvider, seedTransactionSet } from '../../test/utils/mock_provider'
 import { getNextAddressByType } from './get_next_address'
 import { Utils } from '../..'
 import { InMemoryKeyManager } from '../../KeyManager'
 import { addressDiscoveryWithinBounds } from '.'
-import { generateTestTransaction } from '../../test/utils/test_transaction'
+import { generateTestTransaction, generateTestUtxos, mockProvider, seedTransactionSet } from '../../test/utils'
 import { SCAN_GAP } from '../config'
 import { AddressType } from '..'
 
@@ -31,17 +30,7 @@ describe('getNextAddressByType', () => {
     const mnemonic = Utils.generateMnemonic()
     const account = InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
     const targetAddressIndex = SCAN_GAP - 5
-
-    const outputs = [...Array(targetAddressIndex)].map((_, index) => {
-      const address = addressDiscoveryWithinBounds({
-        account,
-        type: AddressType.internal,
-        lowerBound: index,
-        upperBound: index
-      })[0].address
-
-      return { value: '1000000', address }
-    })
+    const outputs = generateTestUtxos({ lowerBound: 0, upperBound: targetAddressIndex, account, type: AddressType.internal, value: '1000000' })
 
     const { inputs } = generateTestTransaction({
       publicAccount: account,
@@ -61,17 +50,7 @@ describe('getNextAddressByType', () => {
     const mnemonic = Utils.generateMnemonic()
     const account = InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
     const targetAddressIndex = (SCAN_GAP * 3) - 5
-
-    const outputs = [...Array(targetAddressIndex)].map((_, index) => {
-      const address = addressDiscoveryWithinBounds({
-        account,
-        type: AddressType.internal,
-        lowerBound: index,
-        upperBound: index
-      })[0].address
-
-      return { value: '1000000', address }
-    })
+    const outputs = generateTestUtxos({ lowerBound: 0, upperBound: targetAddressIndex, account, type: AddressType.internal, value: '1000000' })
 
     const { inputs } = generateTestTransaction({
       publicAccount: account,
@@ -109,17 +88,7 @@ describe('getNextAddressByType', () => {
     const mnemonic = Utils.generateMnemonic()
     const account = InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
     const targetAddressIndex = SCAN_GAP - 10
-
-    const outputs = [...Array(targetAddressIndex)].map((_, index) => {
-      const address = addressDiscoveryWithinBounds({
-        account,
-        type: AddressType.external,
-        lowerBound: index,
-        upperBound: index
-      })[0].address
-
-      return { value: '1000000', address }
-    })
+    const outputs = generateTestUtxos({ lowerBound: 0, upperBound: targetAddressIndex, account, type: AddressType.external, value: '1000000' })
 
     const { inputs } = generateTestTransaction({
       publicAccount: account,
@@ -139,17 +108,7 @@ describe('getNextAddressByType', () => {
     const mnemonic = Utils.generateMnemonic()
     const account = InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
     const targetAddressIndex = (SCAN_GAP * 5) - 5
-
-    const outputs = [...Array(targetAddressIndex)].map((_, index) => {
-      const address = addressDiscoveryWithinBounds({
-        account,
-        type: AddressType.external,
-        lowerBound: index,
-        upperBound: index
-      })[0].address
-
-      return { value: '1000000', address }
-    })
+    const outputs = generateTestUtxos({ lowerBound: 0, upperBound: targetAddressIndex, account, type: AddressType.external, value: '1000000' })
 
     const { inputs } = generateTestTransaction({
       publicAccount: account,

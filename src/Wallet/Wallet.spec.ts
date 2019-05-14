@@ -1,9 +1,8 @@
 import { expect } from 'chai'
 import { Utils, InMemoryKeyManager } from '..'
 import { AddressType, addressDiscoveryWithinBounds } from '.'
-import { mockProvider, seedTransactionSet, seedUtxoSet } from '../test/utils/mock_provider'
+import { mockProvider, seedTransactionSet, seedUtxoSet, generateTestTransaction, generateTestUtxos } from '../test/utils'
 import { Wallet } from './Wallet'
-import { generateTestTransaction } from '../test/utils/test_transaction'
 
 describe('Wallet', () => {
   it('getNextChangeAddress', async () => {
@@ -48,27 +47,8 @@ describe('Wallet', () => {
     const targetInternalAddressIndex = 5
     const targetExternalAddressIndex = 5
 
-    const internalOutputs = [...Array(targetInternalAddressIndex)].map((_, index) => {
-      const address = addressDiscoveryWithinBounds({
-        account,
-        type: AddressType.internal,
-        lowerBound: index,
-        upperBound: index
-      })[0].address
-
-      return { value: '1000000', address }
-    })
-
-    const externalOutputs = [...Array(targetExternalAddressIndex)].map((_, index) => {
-      const address = addressDiscoveryWithinBounds({
-        account,
-        type: AddressType.external,
-        lowerBound: index,
-        upperBound: index
-      })[0].address
-
-      return { value: '1000000', address }
-    })
+    const internalOutputs = generateTestUtxos({ lowerBound: 0, upperBound: targetInternalAddressIndex, account, type: AddressType.internal, value: '1000000' })
+    const externalOutputs = generateTestUtxos({ lowerBound: 0, upperBound: targetExternalAddressIndex, account, type: AddressType.external, value: '1000000' })
 
     const internalTx = generateTestTransaction({
       publicAccount: account,
@@ -104,27 +84,8 @@ describe('Wallet', () => {
     const targetInternalAddressIndex = 5
     const targetExternalAddressIndex = 5
 
-    const internalOutputs = [...Array(targetInternalAddressIndex)].map((_, index) => {
-      const address = addressDiscoveryWithinBounds({
-        account,
-        type: AddressType.internal,
-        lowerBound: index,
-        upperBound: index
-      })[0].address
-
-      return { value: '1000000', address }
-    })
-
-    const externalOutputs = [...Array(targetExternalAddressIndex)].map((_, index) => {
-      const address = addressDiscoveryWithinBounds({
-        account,
-        type: AddressType.external,
-        lowerBound: index,
-        upperBound: index
-      })[0].address
-
-      return { value: '1000000', address }
-    })
+    const internalOutputs = generateTestUtxos({ lowerBound: 0, upperBound: targetInternalAddressIndex, account, type: AddressType.internal, value: '1000000' })
+    const externalOutputs = generateTestUtxos({ lowerBound: 0, upperBound: targetExternalAddressIndex, account, type: AddressType.external, value: '1000000' })
 
     const internalTx = generateTestTransaction({
       publicAccount: account,
@@ -155,27 +116,8 @@ describe('Wallet', () => {
     const targetInternalAddressIndex = 5
     const targetExternalAddressIndex = 5
 
-    const internalOutputs = [...Array(targetInternalAddressIndex)].map((_, index) => {
-      const address = addressDiscoveryWithinBounds({
-        account,
-        type: AddressType.internal,
-        lowerBound: index,
-        upperBound: index
-      })[0].address
-
-      return { value: '1000000', address }
-    })
-
-    const externalOutputs = [...Array(targetExternalAddressIndex)].map((_, index) => {
-      const address = addressDiscoveryWithinBounds({
-        account,
-        type: AddressType.external,
-        lowerBound: index,
-        upperBound: index
-      })[0].address
-
-      return { value: '1000000', address }
-    })
+    const internalOutputs = generateTestUtxos({ lowerBound: 0, upperBound: targetInternalAddressIndex, account, type: AddressType.internal, value: '1000000' })
+    const externalOutputs = generateTestUtxos({ lowerBound: 0, upperBound: targetExternalAddressIndex, account, type: AddressType.external, value: '1000000' })
 
     const internalTx = generateTestTransaction({
       publicAccount: account,

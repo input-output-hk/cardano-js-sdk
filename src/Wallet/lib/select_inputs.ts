@@ -10,7 +10,7 @@ export interface TransactionSelection {
   changeOutput: TransactionOutput
 }
 
-export function selectInputsAndChangeOutput (outputs: TransactionOutput[], utxoSet: UtxoWithAddressing[], changeAddress: string, linearFeeAlgorithm = LinearFeeAlgorithm.default()): TransactionSelection {
+export function selectInputsAndChangeOutput(outputs: TransactionOutput[], utxoSet: UtxoWithAddressing[], changeAddress: string, linearFeeAlgorithm = LinearFeeAlgorithm.default()): TransactionSelection {
   const potentialInputs: CardanoTxInput[] = utxoSet.map(utxo => {
     return TxInput.new(
       TxoPointer.new(TransactionId.from_hex(utxo.id), utxo.index),
@@ -32,9 +32,12 @@ export function selectInputsAndChangeOutput (outputs: TransactionOutput[], utxoS
     return TxoPointer.from_json(i.to_json().ptr)
   })
 
-  const changeOutput = {
-    value: estimatedChange,
-    address: changeAddress
+  let changeOutput
+  if (estimatedChange !== '0') {
+    changeOutput = {
+      value: estimatedChange,
+      address: changeAddress
+    }
   }
 
   const selectedPointers = pointers.filter((pointer) => selectionResult.is_input(pointer))

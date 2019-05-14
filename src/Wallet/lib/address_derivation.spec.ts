@@ -1,9 +1,8 @@
 import { expect } from 'chai'
 import { Utils, InMemoryKeyManager } from '../..'
 import { SCAN_GAP } from '../config'
-import { generateTestTransaction } from '../../test/utils/test_transaction'
-import { deriveAddressSet, addressDiscoveryWithinBounds } from '.'
-import { mockProvider, seedTransactionSet } from '../../test/utils/mock_provider'
+import { generateTestTransaction, mockProvider, seedTransactionSet, generateTestUtxos } from '../../test/utils'
+import { deriveAddressSet } from '.'
 import { AddressType } from '..'
 
 describe('deriveAddressSet', () => {
@@ -12,20 +11,9 @@ describe('deriveAddressSet', () => {
     const account = InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
     const targetInternalAddressIndex = SCAN_GAP - 5
     const targetExternalAddressIndex = (SCAN_GAP * 2) + 3
-
     const targetTotalAddresses = targetExternalAddressIndex + targetInternalAddressIndex + (SCAN_GAP * 2)
 
-    const internalOutputs = [...Array(targetInternalAddressIndex)].map((_, index) => {
-      const address = addressDiscoveryWithinBounds({
-        account,
-        type: AddressType.internal,
-        lowerBound: index,
-        upperBound: index
-      })[0].address
-
-      return { value: '1000000', address }
-    })
-
+    const internalOutputs = generateTestUtxos({ lowerBound: 0, upperBound: targetInternalAddressIndex, account, type: AddressType.internal, value: '1000000' })
     const internalTx = generateTestTransaction({
       publicAccount: account,
       lowerBoundOfAddresses: 0,
@@ -33,17 +21,7 @@ describe('deriveAddressSet', () => {
       testOutputs: internalOutputs
     })
 
-    const externalOutputs = [...Array(targetExternalAddressIndex)].map((_, index) => {
-      const address = addressDiscoveryWithinBounds({
-        account,
-        type: AddressType.external,
-        lowerBound: index,
-        upperBound: index
-      })[0].address
-
-      return { value: '1000000', address }
-    })
-
+    const externalOutputs = generateTestUtxos({ lowerBound: 0, upperBound: targetExternalAddressIndex, account, type: AddressType.external, value: '1000000' })
     const externalTx = generateTestTransaction({
       publicAccount: account,
       lowerBoundOfAddresses: 0,
