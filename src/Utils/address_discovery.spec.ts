@@ -1,8 +1,8 @@
 import { expect } from 'chai'
+import { InMemoryKeyManager } from '../KeyManager'
+import { generateMnemonic } from './mnemonic'
+import { AddressType } from '../Wallet'
 import { addressDiscoveryWithinBounds } from './address_discovery'
-import { InMemoryKeyManager } from '../../KeyManager'
-import { generateMnemonic } from '../../Utils'
-import { AddressType } from '..'
 
 describe('addressDiscovery', () => {
   const mnemonic = generateMnemonic()

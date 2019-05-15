@@ -1,8 +1,9 @@
 import { expect } from 'chai'
-import { selectInputsAndChangeOutput, addressDiscoveryWithinBounds } from '.'
+import { selectInputsAndChangeOutput } from '.'
 import { AddressType } from '..'
 import { Utils, InMemoryKeyManager } from '../..'
 import { hexGenerator } from '../../test/utils'
+import { addressDiscoveryWithinBounds } from '../../Utils'
 
 describe('selectInputsAndChangeOutput', () => {
   it('throws if there is insufficient inputs to cover the payment cost', () => {

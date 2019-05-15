@@ -2,7 +2,8 @@ import { seed } from './utils/seed'
 import { expect } from 'chai'
 import { InMemoryKeyManager, connect } from '..'
 import { mockProvider, seedMockProvider } from './utils/mock_provider'
-import { addressDiscoveryWithinBounds, AddressType } from '../Wallet'
+import { AddressType } from '../Wallet'
+import { addressDiscoveryWithinBounds } from '../Utils'
 
 describe('Example: Key Derivation', () => {
   it('allows a user to determine their next receipt address', async () => {

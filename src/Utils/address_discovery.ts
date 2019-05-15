@@ -1,6 +1,6 @@
 import { Bip44AccountPublic } from 'cardano-wallet'
-import { getBindingsForEnvironment } from '../../lib/bindings'
-import { AddressType } from '..'
+import { getBindingsForEnvironment } from '../lib/bindings'
+import { AddressType } from '../Wallet'
 const { AddressKeyIndex, BlockchainSettings } = getBindingsForEnvironment()
 
 /** BIP44 specifies that discovery should occur for an address type in batches of 20, until no balances exist */

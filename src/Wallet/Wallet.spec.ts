@@ -1,9 +1,10 @@
 import { expect } from 'chai'
 import { Utils, InMemoryKeyManager } from '..'
-import { AddressType, addressDiscoveryWithinBounds, Utxo } from '.'
+import { AddressType, Utxo } from '.'
 import { mockProvider, seedTransactionSet, seedUtxoSet, generateTestTransaction, generateTestUtxos } from '../test/utils'
 import { Wallet } from './Wallet'
 import { Bip44AccountPublic } from 'cardano-wallet'
+import { addressDiscoveryWithinBounds } from '../Utils'
 
 describe('Wallet', () => {
   let account: Bip44AccountPublic

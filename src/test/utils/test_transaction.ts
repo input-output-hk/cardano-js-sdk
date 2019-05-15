@@ -1,7 +1,7 @@
 import { Bip44AccountPublic } from 'cardano-wallet'
-import { addressDiscoveryWithinBounds, AddressType } from '../../Wallet'
+import { AddressType } from '../../Wallet'
 import Transaction, { TransactionInput } from '../../Transaction'
-import { estimateTransactionFee } from '../../Utils/estimate_fee'
+import { addressDiscoveryWithinBounds, estimateTransactionFee } from '../../Utils'
 
 /**
  * generateTestTransaction is a test helper.
