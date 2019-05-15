@@ -1,6 +1,6 @@
 import { expect } from 'chai'
-import { selectInputsAndChangeOutput, addressDiscoveryWithinBounds } from '.'
-import { AddressType } from '..'
+import { selectInputsAndChangeOutput } from '.'
+import { AddressType, addressDiscoveryWithinBounds } from '..'
 import { Utils, InMemoryKeyManager } from '../..'
 import { hexGenerator } from '../../test/utils'
 
