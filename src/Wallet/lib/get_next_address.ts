@@ -36,7 +36,7 @@ async function scanBip44AccountForAddressWithoutTransactions ({ provider, accoun
   }
 
   // Group transactions by address, if they have outputs for that address, it means they have had a UTXO in the past.
-  // The transactions are now garunteed to be in address order, as they are grouped against the
+  // The transactions are now guaranteed to be in address order, as they are grouped against the
   // address range
   const sortedAddressesWithTransactions: [Address, typeof transactions][] = addresses.map(address => {
     const transactionsByAddress = transactions.filter(transaction => {
