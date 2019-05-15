@@ -1,2 +1,2 @@
 export { HttpProvider } from './HttpProvider'
-export { Provider, QueryUtxo, SubmitTransaction } from './Provider'
+export { Provider, QueryUtxosByAddress, QueryTransactionsByAddress, SubmitTransaction } from './Provider'
