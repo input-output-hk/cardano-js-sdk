@@ -1,8 +1,9 @@
 import { Bip44AccountPublic } from 'cardano-wallet'
-import { AddressType, addressDiscoveryWithinBounds } from '..'
+import { AddressType } from '..'
 import { Provider } from '../../Provider'
 import { getNextAddressByType } from '.'
 import { SCAN_GAP } from '../config'
+import { addressDiscoveryWithinBounds } from '../../Utils'
 
 export async function deriveAddressSet (provider: Provider, account: Bip44AccountPublic) {
   const nextReceivingAddress = await getNextAddressByType(provider, account, AddressType.external)

@@ -1,7 +1,8 @@
 import { Provider } from '../../Provider'
 import { Bip44AccountPublic } from 'cardano-wallet'
-import { AddressType, addressDiscoveryWithinBounds, Address } from '..'
+import { AddressType, Address } from '..'
 import { SCAN_GAP } from '../config'
+import { addressDiscoveryWithinBounds } from '../../Utils'
 
 export function getNextAddressByType (provider: Provider, account: Bip44AccountPublic, type: AddressType) {
   return scanBip44AccountForAddressWithoutTransactions({

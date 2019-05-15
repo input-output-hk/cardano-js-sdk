@@ -1,6 +1,7 @@
-import { AddressType, addressDiscoveryWithinBounds } from '../../Wallet'
+import { AddressType } from '../../Wallet'
 import { Bip44AccountPublic } from 'cardano-wallet'
 import { hexGenerator } from '.'
+import { addressDiscoveryWithinBounds } from '../../Utils'
 
 export function generateTestUtxos ({ account, lowerBound, upperBound, type, value }: { account: Bip44AccountPublic, lowerBound: number, upperBound: number, type: AddressType, value: string }) {
   const numberOfUtxos = upperBound - lowerBound

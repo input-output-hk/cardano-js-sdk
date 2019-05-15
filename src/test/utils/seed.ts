@@ -1,6 +1,7 @@
 import { Utils, InMemoryKeyManager } from '../..'
-import { addressDiscoveryWithinBounds, AddressType, Utxo } from '../../Wallet'
+import { AddressType, Utxo } from '../../Wallet'
 import { generateTestTransaction } from './test_transaction'
+import { addressDiscoveryWithinBounds } from '../../Utils'
 
 /*
   This seed generates the following "chain state"
