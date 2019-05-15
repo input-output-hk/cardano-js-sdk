@@ -6,15 +6,15 @@ import { generateTestTransaction } from './test_transaction'
   This seed generates the following "chain state"
 
   Account 1 = mnemonic1:
-  - Some utxos in the first BIP44 range (first 20 addresses), for external addresses
-  - Account 1 can be considered a genesis account, as it moved funds to other accounts without utxos
+  - Some UTXOs in the first BIP44 range (first 20 addresses), for external addresses
+  - Account 1 can be considered a genesis account, as it moved funds to other accounts without UTXOs
   - Its mnemonic won't be exposed as without txOut, it is useless,
 
   Account 2 = mnemonic2
   - No change, only receipt, in the first and second BIP44 ranges (first 40 addresses)
 
   Account 3 = mnemonic3
-  - No utxos
+  - No UTXOs
 */
 export function generateSeed () {
   const mnemonic1 = Utils.generateMnemonic()

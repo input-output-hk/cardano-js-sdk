@@ -28,7 +28,7 @@ describe('selectInputsAndChangeOutput', () => {
   })
 
   describe('FirstMatchFirst', () => {
-    it('selects valid utxos and produces change', () => {
+    it('selects valid UTXOs and produces change', () => {
       const mnemonic = Utils.generateMnemonic()
       const account = InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
       const [address1, address2, address3, address4, address5, change] = addressDiscoveryWithinBounds({

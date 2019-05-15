@@ -6,14 +6,17 @@ import { Wallet } from './Wallet'
 import { Bip44AccountPublic } from 'cardano-wallet'
 
 describe('Wallet', () => {
-  describe('getNextChangeAddress', () => {
-    let account: Bip44AccountPublic
+  let account: Bip44AccountPublic
+  let wallet: ReturnType<ReturnType<typeof Wallet>>
 
+  describe('getNextChangeAddress', () => {
     beforeEach(() => {
       const mnemonic = Utils.generateMnemonic()
       account = InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
 
       seedTransactionSet([])
+
+      wallet = Wallet(mockProvider)(account)
     })
 
     it('returns the next change address for a new BIP44 public account', async () => {
@@ -24,7 +27,7 @@ describe('Wallet', () => {
         upperBound: 0
       })[0].address
 
-      const nextReceivingAddress = await Wallet(mockProvider)(account).getNextChangeAddress()
+      const nextReceivingAddress = await wallet.getNextChangeAddress()
       expect(nextReceivingAddress.address).to.eql(firstInternalAddress)
       expect(nextReceivingAddress.index).to.eql(0)
       expect(nextReceivingAddress.type).to.eql(AddressType.internal)
@@ -32,13 +35,13 @@ describe('Wallet', () => {
   })
 
   describe('getNextReceivingAddress', async () => {
-    let account: Bip44AccountPublic
-
     beforeEach(() => {
       const mnemonic = Utils.generateMnemonic()
       account = InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
 
       seedTransactionSet([])
+
+      wallet = Wallet(mockProvider)(account)
     })
 
     it('returns the next receiving address for a new BIP44 public account', async () => {
@@ -49,7 +52,7 @@ describe('Wallet', () => {
         upperBound: 0
       })[0].address
 
-      const nextReceivingAddress = await Wallet(mockProvider)(account).getNextReceivingAddress()
+      const nextReceivingAddress = await wallet.getNextReceivingAddress()
       expect(nextReceivingAddress.address).to.eql(firstExternalAddress)
       expect(nextReceivingAddress.index).to.eql(0)
       expect(nextReceivingAddress.type).to.eql(AddressType.external)
@@ -57,8 +60,6 @@ describe('Wallet', () => {
   })
 
   describe('balance', async () => {
-    let account: Bip44AccountPublic
-
     beforeEach(() => {
       const mnemonic = Utils.generateMnemonic()
       account = InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
@@ -91,17 +92,17 @@ describe('Wallet', () => {
         { address: internalOutputs[0].address, id: internalTx.inputs[0].pointer.id, index: internalTx.inputs[0].pointer.index, value: '1000' },
         { address: externalOutputs[0].address, id: internalTx.inputs[0].pointer.id, index: internalTx.inputs[0].pointer.index, value: '2000' }
       ])
+
+      wallet = Wallet(mockProvider)(account)
     })
 
-    it('determines the balance for a BIP44 public account with utxos', async () => {
-      const balance = await Wallet(mockProvider)(account).balance()
+    it('determines the balance for a BIP44 public account with UTXOs', async () => {
+      const balance = await wallet.balance()
       expect(balance).to.eql(3000)
     })
   })
 
   describe('transaction', () => {
-    let account: Bip44AccountPublic
-
     beforeEach(() => {
       const mnemonic = Utils.generateMnemonic()
       account = InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
@@ -129,16 +130,17 @@ describe('Wallet', () => {
         { inputs: internalTx.inputs, outputs: internalOutputs },
         { inputs: externalTx.inputs, outputs: externalOutputs }
       ])
+
+      wallet = Wallet(mockProvider)(account)
     })
 
     it('returns a list of transactions for a BIP44 public account with associated transactions', async () => {
-      const transactions = await Wallet(mockProvider)(account).transactions()
+      const transactions = await wallet.transactions()
       expect(transactions.length).to.eql(2)
     })
   })
 
   describe('selectInputsForTransaction', async () => {
-    let account: Bip44AccountPublic
     let internalOutputs: Utxo[]
 
     beforeEach(() => {
@@ -173,12 +175,14 @@ describe('Wallet', () => {
         { address: internalOutputs[0].address, id: internalTx.inputs[0].pointer.id, index: internalTx.inputs[0].pointer.index, value: '400000' },
         { address: externalOutputs[0].address, id: internalTx.inputs[1].pointer.id, index: internalTx.inputs[0].pointer.index, value: '500000' }
       ])
+
+      wallet = Wallet(mockProvider)(account)
     })
 
-    it('selects inputs from the utxo set available for the BIP44 public account', async () => {
+    it('selects inputs from the UTXO set available for the BIP44 public account', async () => {
       const testOutput = [{ address: internalOutputs[4].address, value: '1000' }]
 
-      const { inputs, changeOutput } = await Wallet(mockProvider)(account).selectInputsForTransaction(testOutput)
+      const { inputs, changeOutput } = await wallet.selectInputsForTransaction(testOutput)
       expect(inputs.length).to.eql(1)
       expect(!!changeOutput).to.eql(true)
     })
