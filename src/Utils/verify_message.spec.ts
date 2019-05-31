@@ -5,11 +5,11 @@ import { verifyMessage } from './verify_message'
 
 describe('utils', () => {
   describe('verifyMessage', () => {
-    it('returns true when verifying a correct signature for a message', () => {
+    it('returns true when verifying a correct signature for a message', async () => {
       const message = 'foobar'
       const mnemonic = 'height bubble drama century ask online stage camp point loyal hip awesome'
       const keyManager = InMemoryKeyManager({ mnemonic, password: 'securepassword' })
-      const { signature, publicKey } = keyManager.signMessage(AddressType.external, 0, message)
+      const { signature, publicKey } = await keyManager.signMessage(AddressType.external, 0, message)
 
       const verification = verifyMessage({
         publicKey,
@@ -20,11 +20,11 @@ describe('utils', () => {
       expect(verification).to.eql(true)
     })
 
-    it('returns false when verifying an incorrect message for a valid signature', () => {
+    it('returns false when verifying an incorrect message for a valid signature', async () => {
       const message = 'foobar'
       const mnemonic = 'height bubble drama century ask online stage camp point loyal hip awesome'
       const keyManager = InMemoryKeyManager({ mnemonic, password: 'securepassword' })
-      const { signature, publicKey } = keyManager.signMessage(AddressType.external, 0, message)
+      const { signature, publicKey } = await keyManager.signMessage(AddressType.external, 0, message)
 
       const verification = verifyMessage({
         publicKey,

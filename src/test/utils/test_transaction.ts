@@ -11,12 +11,14 @@ export function generateTestTransaction ({
   publicAccount,
   testInputs,
   lowerBoundOfAddresses,
-  testOutputs
+  testOutputs,
+  inputId
 }: {
   publicAccount: Bip44AccountPublic,
   testInputs: { value: string, type: AddressType }[],
   lowerBoundOfAddresses: number,
   testOutputs: { address: string, value: string }[],
+  inputId?: string
 }) {
   const receiptAddresses = addressDiscoveryWithinBounds({
     account: publicAccount,
@@ -39,7 +41,7 @@ export function generateTestTransaction ({
 
     return {
       // Mock a 64 byte transaction id
-      pointer: { id: hexGenerator(64), index },
+      pointer: { id: inputId || hexGenerator(64), index },
       value: { address, value },
       addressing: { change: testInputs[index].type === AddressType.internal ? 1 : 0, index: addressIndex }
     }

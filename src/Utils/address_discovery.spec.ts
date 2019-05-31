@@ -4,9 +4,9 @@ import { generateMnemonic } from './mnemonic'
 import { AddressType } from '../Wallet'
 import { addressDiscoveryWithinBounds } from './address_discovery'
 
-describe('addressDiscovery', () => {
+describe('addressDiscovery', async () => {
   const mnemonic = generateMnemonic()
-  const account = InMemoryKeyManager({ mnemonic, password: 'foobar' }).publicAccount()
+  const account = await InMemoryKeyManager({ mnemonic, password: 'foobar' }).publicAccount()
 
   it('correctly returns address indexes and address type', () => {
     const internalAddresses = addressDiscoveryWithinBounds({ account, type: AddressType.internal, lowerBound: 0, upperBound: 19 })

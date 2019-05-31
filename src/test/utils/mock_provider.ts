@@ -27,5 +27,6 @@ export const mockProvider: Provider = {
       return inputsExistForAddress || outputsExistForAddress
     })
     return Promise.resolve(associatedTransactions)
-  }
+  },
+  queryTransactionsById: () => Promise.resolve([])
 }

@@ -25,20 +25,20 @@ export function InMemoryKeyManager ({ password, accountNumber, mnemonic }: { pas
       const transactionFinalizer = transaction.finalize()
 
       rawInputs.forEach(({ addressing }) => {
-        const privateKey = key.address_key(addressing.change === 1, AddressKeyIndex.new(addressing.index))
+        const privateKey = key.bip44_chain(addressing.change === 1).address_key(AddressKeyIndex.new(addressing.index))
         const witness = Witness.new_extended_key(chainSettings, privateKey, transactionId)
         transactionFinalizer.add_witness(witness)
       })
 
-      return transactionFinalizer.finalize().to_hex()
+      return Promise.resolve(transactionFinalizer.finalize().to_hex())
     },
-    signMessage: (addressType, signingIndex, message) => {
-      const privateKey = key.address_key(addressType === AddressType.internal, AddressKeyIndex.new(signingIndex))
+    signMessage: async (addressType, signingIndex, message) => {
+      const privateKey = key.bip44_chain(addressType === AddressType.internal).address_key(AddressKeyIndex.new(signingIndex))
       return {
         signature: privateKey.sign(Buffer.from(message)).to_hex(),
-        publicKey: key.public().address_key(addressType === AddressType.internal, AddressKeyIndex.new(signingIndex)).to_hex()
+        publicKey: key.public().bip44_chain(addressType === AddressType.internal).address_key(AddressKeyIndex.new(signingIndex)).to_hex()
       }
     },
-    publicAccount: () => key.public()
+    publicAccount: () => Promise.resolve(key.public())
   }
 }

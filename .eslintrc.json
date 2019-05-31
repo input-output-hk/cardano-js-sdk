@@ -11,6 +11,7 @@
   ],
   "globals": {
     "it": "readonly",
+    "before": "readonly",
     "describe": "readonly",
     "beforeEach": "readonly",
     "afterEach": "readonly"

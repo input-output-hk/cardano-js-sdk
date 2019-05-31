@@ -12,7 +12,7 @@ describe('getNextAddressByType', () => {
     seedTransactionSet([])
 
     const mnemonic = Utils.generateMnemonic()
-    const account = InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
+    const account = await InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
     const firstInternalAddress = addressDiscoveryWithinBounds({
       account,
       type: AddressType.internal,
@@ -28,7 +28,7 @@ describe('getNextAddressByType', () => {
 
   it('returns the first address with no transactions for internal addresses, when the address lives within the first SCAN_GAP', async () => {
     const mnemonic = Utils.generateMnemonic()
-    const account = InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
+    const account = await InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
     const targetAddressIndex = SCAN_GAP - 5
     const outputs = generateTestUtxos({ lowerBound: 0, upperBound: targetAddressIndex, account, type: AddressType.internal, value: '1000000' })
 
@@ -48,7 +48,7 @@ describe('getNextAddressByType', () => {
 
   it('returns the first address with no transactions for internal addresses, when the address lives within beyond the first SCAN_GAP', async () => {
     const mnemonic = Utils.generateMnemonic()
-    const account = InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
+    const account = await InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
     const targetAddressIndex = (SCAN_GAP * 3) - 5
     const outputs = generateTestUtxos({ lowerBound: 0, upperBound: targetAddressIndex, account, type: AddressType.internal, value: '1000000' })
 
@@ -70,7 +70,7 @@ describe('getNextAddressByType', () => {
     seedTransactionSet([])
 
     const mnemonic = Utils.generateMnemonic()
-    const account = InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
+    const account = await InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
     const firstInternalAddress = addressDiscoveryWithinBounds({
       account,
       type: AddressType.external,
@@ -86,7 +86,7 @@ describe('getNextAddressByType', () => {
 
   it('returns the first address with no transactions for external addresses, when the address lives within the first SCAN_GAP', async () => {
     const mnemonic = Utils.generateMnemonic()
-    const account = InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
+    const account = await InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
     const targetAddressIndex = SCAN_GAP - 10
     const outputs = generateTestUtxos({ lowerBound: 0, upperBound: targetAddressIndex, account, type: AddressType.external, value: '1000000' })
 
@@ -106,7 +106,7 @@ describe('getNextAddressByType', () => {
 
   it('returns the first address with no transactions for external addresses, when the address lives within beyond the first SCAN_GAP', async () => {
     const mnemonic = Utils.generateMnemonic()
-    const account = InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
+    const account = await InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
     const targetAddressIndex = (SCAN_GAP * 5) - 5
     const outputs = generateTestUtxos({ lowerBound: 0, upperBound: targetAddressIndex, account, type: AddressType.external, value: '1000000' })
 

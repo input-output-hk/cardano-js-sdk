@@ -26,6 +26,17 @@ The below examples are implemented as integration tests, they should be very eas
 - [Determine the next change and receipt addresses for a BIP44 Public Account](src/test/DetermineNextAddressForWallet.spec.ts)
 - [Transaction input selection](src/test/SelectInputsForTransaction.spec.ts)
 
+## Tests
+
+Run the test suite with `npm test`.
+
+### Ledger Nano S Specs
+To run the ledger specs:
+- Have a Ledger device connect, unlocked and in the Cardano app
+- Run `LEDGER_SPECS=true npm test`
+  
+You will need to interact with the device during the test run.
+
 ## Development References
 
 Hardware wallet transaction preparation - https://github.com/Emurgo/yoroi-frontend/tree/develop/app/api/ada/hardwareWallet

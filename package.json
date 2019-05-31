@@ -51,10 +51,16 @@
     "typescript": "^3.3.3333"
   },
   "dependencies": {
+    "@cardano-foundation/ledgerjs-hw-app-cardano": "^1.0.6",
+    "@ledgerhq/hw-transport-node-hid": "^4.60.3",
+    "@ledgerhq/hw-transport-u2f": "^4.60.3",
+    "@types/ledgerhq__hw-transport-node-hid": "^4.22.1",
+    "@types/ledgerhq__hw-transport-u2f": "^4.21.1",
     "@types/node": "^11.13.8",
+    "babel-polyfill": "^6.26.0",
     "bip39": "^3.0.1",
-    "cardano-wallet": "^0.3.0",
-    "cardano-wallet-browser": "^0.3.0",
+    "cardano-wallet": "1.1.0",
+    "cardano-wallet-browser": "1.1.0",
     "io-ts": "^1.8.5",
     "ts-custom-error": "^3.0.0"
   },

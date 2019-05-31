@@ -12,13 +12,13 @@ describe('Example: In Memory Key Manager', () => {
     const keyManager = InMemoryKeyManager({ mnemonic, password })
 
     const { transaction, inputs } = generateTestTransaction({
-      publicAccount: keyManager.publicAccount(),
+      publicAccount: (await keyManager.publicAccount()),
       lowerBoundOfAddresses: 0,
       testInputs: [{ type: AddressType.external, value: '1000000' }, { type: AddressType.external, value: '5000000' }],
       testOutputs: [{ address: 'Ae2tdPwUPEZEjJcLmvgKnuwUnfKSVuGCzRW1PqsLcWqmoGJUocBGbvWjjTx', value: '6000000' }]
     })
 
-    const signedTransaction = keyManager.signTransaction(transaction, inputs)
+    const signedTransaction = await keyManager.signTransaction(transaction, inputs)
 
     const transactionSubmission = await connect(mockProvider).submitTransaction(signedTransaction)
     expect(transactionSubmission).to.eql(true)

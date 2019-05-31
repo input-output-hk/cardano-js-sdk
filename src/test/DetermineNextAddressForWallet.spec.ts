@@ -11,10 +11,11 @@ describe('Example: Key Derivation', () => {
 
     const mnemonic = seed.accountMnemonics.account1
     const keyManager = InMemoryKeyManager({ mnemonic, password: '' })
+    const publicAccount = await keyManager.publicAccount()
 
-    const { address } = await connect(mockProvider).wallet(keyManager.publicAccount()).getNextReceivingAddress()
+    const { address } = await connect(mockProvider).wallet(publicAccount).getNextReceivingAddress()
     const nextAddressBasedOnSeedContext = addressDiscoveryWithinBounds({
-      account: keyManager.publicAccount(),
+      account: (await keyManager.publicAccount()),
       lowerBound: 16,
       upperBound: 16,
       type: AddressType.external
@@ -28,10 +29,11 @@ describe('Example: Key Derivation', () => {
 
     const mnemonic = seed.accountMnemonics.account1
     const keyManager = InMemoryKeyManager({ mnemonic, password: '' })
+    const publicAccount = await keyManager.publicAccount()
 
-    const { address } = await connect(mockProvider).wallet(keyManager.publicAccount()).getNextChangeAddress()
+    const { address } = await connect(mockProvider).wallet(publicAccount).getNextChangeAddress()
     const nextAddressBasedOnSeedContext = addressDiscoveryWithinBounds({
-      account: keyManager.publicAccount(),
+      account: publicAccount,
       lowerBound: 0,
       upperBound: 0,
       type: AddressType.internal
