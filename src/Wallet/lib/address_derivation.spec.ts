@@ -8,7 +8,7 @@ import { AddressType } from '..'
 describe('deriveAddressSet', () => {
   it('combines external and internal addresses up to the end of each range', async () => {
     const mnemonic = Utils.generateMnemonic()
-    const account = InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
+    const account = await InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
     const targetInternalAddressIndex = SCAN_GAP - 5
     const targetExternalAddressIndex = (SCAN_GAP * 2) + 3
     const targetTotalAddresses = targetExternalAddressIndex + targetInternalAddressIndex + (SCAN_GAP * 2)

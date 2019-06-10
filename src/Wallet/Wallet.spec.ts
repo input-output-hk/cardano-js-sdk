@@ -11,9 +11,9 @@ describe('Wallet', () => {
   let wallet: ReturnType<ReturnType<typeof Wallet>>
 
   describe('getNextChangeAddress', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       const mnemonic = Utils.generateMnemonic()
-      account = InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
+      account = await InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
 
       seedTransactionSet([])
 
@@ -36,9 +36,9 @@ describe('Wallet', () => {
   })
 
   describe('getNextReceivingAddress', async () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       const mnemonic = Utils.generateMnemonic()
-      account = InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
+      account = await InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
 
       seedTransactionSet([])
 
@@ -61,9 +61,9 @@ describe('Wallet', () => {
   })
 
   describe('balance', async () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       const mnemonic = Utils.generateMnemonic()
-      account = InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
+      account = await InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
       const targetInternalAddressIndex = 5
       const targetExternalAddressIndex = 5
 
@@ -104,9 +104,9 @@ describe('Wallet', () => {
   })
 
   describe('transaction', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       const mnemonic = Utils.generateMnemonic()
-      account = InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
+      account = await InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
       const targetInternalAddressIndex = 5
       const targetExternalAddressIndex = 5
 
@@ -144,9 +144,9 @@ describe('Wallet', () => {
   describe('selectInputsForTransaction', async () => {
     let internalOutputs: Utxo[]
 
-    beforeEach(() => {
+    beforeEach(async () => {
       const mnemonic = Utils.generateMnemonic()
-      account = InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
+      account = await InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
       const targetInternalAddressIndex = 5
       const targetExternalAddressIndex = 5
 

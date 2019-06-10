@@ -6,9 +6,9 @@ import { hexGenerator } from '../../test/utils'
 import { addressDiscoveryWithinBounds } from '../../Utils'
 
 describe('selectInputsAndChangeOutput', () => {
-  it('throws if there is insufficient inputs to cover the payment cost', () => {
+  it('throws if there is insufficient inputs to cover the payment cost', async () => {
     const mnemonic = Utils.generateMnemonic()
-    const account = InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
+    const account = await InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
     const [address1, address2, address3, changeAddress] = addressDiscoveryWithinBounds({
       account,
       type: AddressType.internal,
@@ -29,9 +29,9 @@ describe('selectInputsAndChangeOutput', () => {
   })
 
   describe('FirstMatchFirst', () => {
-    it('selects valid UTXOs and produces change', () => {
+    it('selects valid UTXOs and produces change', async () => {
       const mnemonic = Utils.generateMnemonic()
-      const account = InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
+      const account = await InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
       const [address1, address2, address3, address4, address5, change] = addressDiscoveryWithinBounds({
         account,
         type: AddressType.internal,

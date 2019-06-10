@@ -11,7 +11,6 @@ const fullAddress = t.type({
   }),
   cadId: t.string,
   cadIsUsed: t.boolean,
-  account: t.number,
   change: t.number,
   index: t.number
 })

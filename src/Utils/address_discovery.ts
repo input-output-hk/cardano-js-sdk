@@ -15,10 +15,9 @@ export function addressDiscoveryWithinBounds ({ type, account, lowerBound, upper
     .map((_, idx) => lowerBound + idx)
 
   return addressIndices.map(index => {
-    const pubKey = account.address_key(
-      type === AddressType.internal,
-      AddressKeyIndex.new(index)
-    )
+    const pubKey = account
+      .bip44_chain(type === AddressType.internal)
+      .address_key(AddressKeyIndex.new(index))
 
     const address = pubKey.bootstrap_era_address(chainSettings)
     return {

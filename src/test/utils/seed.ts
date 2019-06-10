@@ -17,13 +17,13 @@ import { addressDiscoveryWithinBounds } from '../../Utils'
   Account 3 = mnemonic3
   - No UTXOs
 */
-export function generateSeed () {
+export async function generateSeed () {
   const mnemonic1 = Utils.generateMnemonic()
   const mnemonic2 = Utils.generateMnemonic()
   const mnemonic3 = Utils.generateMnemonic()
 
-  const account1 = InMemoryKeyManager({ password: '', mnemonic: mnemonic1 }).publicAccount()
-  const account2 = InMemoryKeyManager({ password: '', mnemonic: mnemonic2 }).publicAccount()
+  const account1 = await InMemoryKeyManager({ password: '', mnemonic: mnemonic1 }).publicAccount()
+  const account2 = await InMemoryKeyManager({ password: '', mnemonic: mnemonic2 }).publicAccount()
 
   const account2Addresses = addressDiscoveryWithinBounds({
     account: account2,
