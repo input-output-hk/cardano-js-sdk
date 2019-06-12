@@ -7,7 +7,8 @@ const pointer = t.type({
 
 const addressing = t.type({
   change: t.number,
-  index: t.number
+  index: t.number,
+  accountIndex: t.number
 })
 
 const value = t.type({

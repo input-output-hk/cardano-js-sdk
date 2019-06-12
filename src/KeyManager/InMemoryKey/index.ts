@@ -1,13 +1,14 @@
 import { validateMnemonic } from 'bip39'
 import { InvalidMnemonic } from '../errors'
-import { getBindingsForEnvironment } from '../../lib/bindings'
-import { AddressType } from '../../Wallet'
 import { KeyManager } from '../KeyManager'
-const { AccountIndex, AddressKeyIndex, BlockchainSettings, Bip44RootPrivateKey, Entropy, Witness } = getBindingsForEnvironment()
+import { ChainSettings, RustCardano } from '../../Cardano'
 
-const HARD_DERIVATION_START = 0x80000000
-
-export function InMemoryKeyManager ({ password, accountNumber, mnemonic }: { password: string, accountNumber?: number, mnemonic: string }): KeyManager {
+export function InMemoryKeyManager(
+  { password, accountNumber, mnemonic }: {
+    password: string
+    accountNumber?: number
+    mnemonic: string
+  }, cardano = RustCardano): KeyManager {
   if (!accountNumber) {
     accountNumber = 0
   }
@@ -15,30 +16,19 @@ export function InMemoryKeyManager ({ password, accountNumber, mnemonic }: { pas
   const validMnemonic = validateMnemonic(mnemonic)
   if (!validMnemonic) throw new InvalidMnemonic()
 
-  const entropy = Entropy.from_english_mnemonics(mnemonic)
-  const privateKey = Bip44RootPrivateKey.recover(entropy, password)
-  const key = privateKey.bip44_account(AccountIndex.new(accountNumber | HARD_DERIVATION_START))
+  const { privateKey, publicKey } = cardano.account(mnemonic, password, accountNumber)
 
   return {
-    signTransaction: (transaction, rawInputs, chainSettings = BlockchainSettings.mainnet()) => {
-      const transactionId = transaction.id()
-      const transactionFinalizer = transaction.finalize()
-
+    signTransaction: async (transaction, rawInputs, chainSettings = ChainSettings.mainnet) => {
       rawInputs.forEach(({ addressing }) => {
-        const privateKey = key.bip44_chain(addressing.change === 1).address_key(AddressKeyIndex.new(addressing.index))
-        const witness = Witness.new_extended_key(chainSettings, privateKey, transactionId)
-        transactionFinalizer.add_witness(witness)
+        transaction.addWitness({ privateAccount: privateKey, addressing, chainSettings })
       })
 
-      return Promise.resolve(transactionFinalizer.finalize().to_hex())
+      return transaction.finalize()
     },
     signMessage: async (addressType, signingIndex, message) => {
-      const privateKey = key.bip44_chain(addressType === AddressType.internal).address_key(AddressKeyIndex.new(signingIndex))
-      return {
-        signature: privateKey.sign(Buffer.from(message)).to_hex(),
-        publicKey: key.public().bip44_chain(addressType === AddressType.internal).address_key(AddressKeyIndex.new(signingIndex)).to_hex()
-      }
+      return cardano.signMessage({ privateAccount: privateKey, addressType, signingIndex, message })
     },
-    publicAccount: () => Promise.resolve(key.public())
+    publicAccount: async () => publicKey
   }
 }
