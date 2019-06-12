@@ -1,6 +1,7 @@
 import { expect } from 'chai'
 import { Utils, InMemoryKeyManager } from '..'
 import { AddressType } from '../Wallet'
+import { RustCardano } from '../Cardano'
 
 describe('Example: Sign And Verify', () => {
   it('allows a user to sign a message that can be verified by others who have a reference to the public key', async () => {
@@ -9,7 +10,7 @@ describe('Example: Sign And Verify', () => {
     const message = 'hello world'
     const { signature, publicKey } = await keyManager.signMessage(AddressType.external, 0, message)
 
-    expect(Utils.verifyMessage({
+    expect(RustCardano.verifyMessage({
       publicKey,
       message,
       signature: signature

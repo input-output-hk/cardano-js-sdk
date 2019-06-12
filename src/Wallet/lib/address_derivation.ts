@@ -4,7 +4,7 @@ import { getNextAddressByType } from '.'
 import { SCAN_GAP } from '../config'
 import { addressDiscoveryWithinBounds } from '../../Utils'
 
-export async function deriveAddressSet(provider: Provider, account: string) {
+export async function deriveAddressSet (provider: Provider, account: string) {
   const nextReceivingAddress = await getNextAddressByType(provider, account, AddressType.external)
   const nextChangeAddress = await getNextAddressByType(provider, account, AddressType.internal)
 

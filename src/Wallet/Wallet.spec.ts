@@ -3,11 +3,10 @@ import { Utils, InMemoryKeyManager } from '..'
 import { AddressType, Utxo } from '.'
 import { mockProvider, seedTransactionSet, seedUtxoSet, generateTestTransaction, generateTestUtxos } from '../test/utils'
 import { Wallet } from './Wallet'
-import { Bip44AccountPublic } from 'cardano-wallet'
 import { addressDiscoveryWithinBounds } from '../Utils'
 
 describe('Wallet', () => {
-  let account: Bip44AccountPublic
+  let account: string
   let wallet: ReturnType<ReturnType<typeof Wallet>>
 
   describe('getNextChangeAddress', () => {

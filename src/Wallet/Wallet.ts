@@ -4,7 +4,7 @@ import { AddressType, UtxoWithAddressing } from '.'
 import { deriveAddressSet, getNextAddressByType } from './lib'
 import { FeeAlgorithm, RustCardano } from '../Cardano'
 
-export function Wallet(provider: Provider, cardano = RustCardano) {
+export function Wallet (provider: Provider, cardano = RustCardano) {
   return (account: string) => {
     return {
       getNextReceivingAddress: () => getNextAddressByType(provider, account, AddressType.external),

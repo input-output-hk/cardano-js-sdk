@@ -3,7 +3,7 @@ import { AddressType, Address } from '..'
 import { SCAN_GAP } from '../config'
 import { addressDiscoveryWithinBounds } from '../../Utils'
 
-export function getNextAddressByType(provider: Provider, account: string, type: AddressType) {
+export function getNextAddressByType (provider: Provider, account: string, type: AddressType) {
   return scanBip44AccountForAddressWithoutTransactions({
     account,
     provider,
@@ -21,7 +21,7 @@ interface ScanRangeParameters {
   type: AddressType
 }
 
-async function scanBip44AccountForAddressWithoutTransactions({ provider, account, lowerBound, upperBound, type }: ScanRangeParameters): Promise<Address> {
+async function scanBip44AccountForAddressWithoutTransactions ({ provider, account, lowerBound, upperBound, type }: ScanRangeParameters): Promise<Address> {
   const addresses = addressDiscoveryWithinBounds({
     account,
     lowerBound,

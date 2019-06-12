@@ -3,7 +3,7 @@ import { InvalidMnemonic } from '../errors'
 import { KeyManager } from '../KeyManager'
 import { ChainSettings, RustCardano } from '../../Cardano'
 
-export function InMemoryKeyManager(
+export function InMemoryKeyManager (
   { password, accountNumber, mnemonic }: {
     password: string
     accountNumber?: number

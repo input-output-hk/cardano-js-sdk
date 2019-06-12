@@ -6,7 +6,7 @@ import { addressDiscoveryWithinBounds } from '../../Utils'
  * generateTestTransaction is a test helper.
  * It can be used to make relatively realistic transactions that can be used for transaction testing or seeding a mock provider.
 */
-export function generateTestTransaction({
+export function generateTestTransaction ({
   publicAccount,
   testInputs,
   lowerBoundOfAddresses,
@@ -53,7 +53,7 @@ export function generateTestTransaction({
 }
 
 /** Test helper only */
-export function hexGenerator(length: number) {
+export function hexGenerator (length: number) {
   const maxlen = 8
   const min = Math.pow(16, Math.min(length, maxlen) - 1)
   const max = Math.pow(16, Math.min(length, maxlen)) - 1

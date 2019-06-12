@@ -2,8 +2,8 @@ import { expect } from 'chai'
 import { InMemoryKeyManager } from '../KeyManager'
 import { AddressType } from '../Wallet'
 import { RustCardano } from './RustCardano'
-import { Utils } from '..';
-import { hexGenerator } from '../test/utils';
+import { Utils } from '..'
+import { hexGenerator } from '../test/utils'
 
 describe('RustCardano', () => {
   describe('verifyMessage', () => {
@@ -49,8 +49,8 @@ describe('RustCardano', () => {
       })
 
       const utxosWithAddressing = [
-        { address: address1.address, value: '1000', id: hexGenerator(64), index: 0, addressing: { index: 0, change: 0 } },
-        { address: address2.address, value: '1000', id: hexGenerator(64), index: 1, addressing: { index: 0, change: 0 } }
+        { address: address1.address, value: '1000', id: hexGenerator(64), index: 0, addressing: { index: 0, change: 0, accountIndex: 0 } },
+        { address: address2.address, value: '1000', id: hexGenerator(64), index: 1, addressing: { index: 0, change: 0, accountIndex: 0 } }
       ]
 
       const outputs = [
@@ -73,10 +73,10 @@ describe('RustCardano', () => {
 
         // Any combination of these inputs will always produce change
         const utxosWithAddressing = [
-          { address: address1.address, value: '600000', id: hexGenerator(64), index: 0, addressing: { index: 0, change: 0 } },
-          { address: address2.address, value: '500000', id: hexGenerator(64), index: 1, addressing: { index: 0, change: 0 } },
-          { address: address3.address, value: '330000', id: hexGenerator(64), index: 2, addressing: { index: 0, change: 0 } },
-          { address: address4.address, value: '410000', id: hexGenerator(64), index: 3, addressing: { index: 0, change: 0 } }
+          { address: address1.address, value: '600000', id: hexGenerator(64), index: 0, addressing: { index: 0, change: 0, accountIndex: 0 } },
+          { address: address2.address, value: '500000', id: hexGenerator(64), index: 1, addressing: { index: 0, change: 0, accountIndex: 0 } },
+          { address: address3.address, value: '330000', id: hexGenerator(64), index: 2, addressing: { index: 0, change: 0, accountIndex: 0 } },
+          { address: address4.address, value: '410000', id: hexGenerator(64), index: 3, addressing: { index: 0, change: 0, accountIndex: 0 } }
         ]
 
         const outputs = [

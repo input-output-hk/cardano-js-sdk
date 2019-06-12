@@ -7,15 +7,15 @@ import { AddressType } from '../../Wallet'
 
 const { default: Ledger, utils } = require('@cardano-foundation/ledgerjs-hw-app-cardano')
 
-async function connectToLedger() {
+async function connectToLedger () {
   const transport = await getLedgerTransportForEnvironment().create()
   return new Ledger(transport)
 }
 
-export async function LedgerKeyManager(accountIndex = 0, publicKey?: string): Promise<KeyManager> {
+export async function LedgerKeyManager (accountIndex = 0, publicKey?: string): Promise<KeyManager> {
   const ledger = await connectToLedger()
 
-  async function deriveBip44Account() {
+  async function deriveBip44Account () {
     if (!publicKey) {
       const { publicKeyHex, chainCodeHex } = await ledger.getExtendedPublicKey([
         utils.HARDENED + 44,

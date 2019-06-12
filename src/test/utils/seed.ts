@@ -17,7 +17,7 @@ import { addressDiscoveryWithinBounds } from '../../Utils'
   Account 3 = mnemonic3
   - No UTXOs
 */
-export async function generateSeed() {
+export async function generateSeed () {
   const mnemonic1 = Utils.generateMnemonic()
   const mnemonic2 = Utils.generateMnemonic()
   const mnemonic3 = Utils.generateMnemonic()
@@ -98,294 +98,294 @@ export async function generateSeed() {
 // })
 
 export const seed = {
-  "accountMnemonics": {
-    "account1": "access sausage absorb leopard brother wave victory travel confirm draw glimpse animal",
-    "account2": "cycle burst badge budget fabric utility napkin salmon rubber knee hunt reform"
+  'accountMnemonics': {
+    'account1': 'access sausage absorb leopard brother wave victory travel confirm draw glimpse animal',
+    'account2': 'cycle burst badge budget fabric utility napkin salmon rubber knee hunt reform'
   },
-  "transactions": [
+  'transactions': [
     {
-      "inputs": [
+      'inputs': [
         {
-          "pointer": {
-            "id": "50c691765a7b18d1681e3ca3160307e8ecb298c09c935ead26e21e51e36329f1",
-            "index": 0
+          'pointer': {
+            'id': '50c691765a7b18d1681e3ca3160307e8ecb298c09c935ead26e21e51e36329f1',
+            'index': 0
           },
-          "value": {
-            "address": "Ae2tdPwUPEZ6oDR4P2CcWCTzxLiGgQRTezrjFBSPitw4nCDgHbV6iPxQTyk",
-            "value": "1000000"
+          'value': {
+            'address': 'Ae2tdPwUPEZ6oDR4P2CcWCTzxLiGgQRTezrjFBSPitw4nCDgHbV6iPxQTyk',
+            'value': '1000000'
           },
-          "addressing": {
-            "change": 0,
-            "index": 0,
-            "accountIndex": 0
+          'addressing': {
+            'change': 0,
+            'index': 0,
+            'accountIndex': 0
           }
         },
         {
-          "pointer": {
-            "id": "4fa89fff297cbc144729982ab76512c441a6bbbd3d83bb2d29a4395b7bc9dc44",
-            "index": 1
+          'pointer': {
+            'id': '4fa89fff297cbc144729982ab76512c441a6bbbd3d83bb2d29a4395b7bc9dc44',
+            'index': 1
           },
-          "value": {
-            "address": "Ae2tdPwUPEYzrf1toTgJbkEXpvQZ3CCRasPUotJGDp4HjEeK9U4rNiyJ4PL",
-            "value": "2000000"
+          'value': {
+            'address': 'Ae2tdPwUPEYzrf1toTgJbkEXpvQZ3CCRasPUotJGDp4HjEeK9U4rNiyJ4PL',
+            'value': '2000000'
           },
-          "addressing": {
-            "change": 0,
-            "index": 1,
-            "accountIndex": 0
+          'addressing': {
+            'change': 0,
+            'index': 1,
+            'accountIndex': 0
           }
         },
         {
-          "pointer": {
-            "id": "b69742db27f442fe93ca7aef917a45b8ea4bef62b08693ae75d5877bc151ed09",
-            "index": 2
+          'pointer': {
+            'id': 'b69742db27f442fe93ca7aef917a45b8ea4bef62b08693ae75d5877bc151ed09',
+            'index': 2
           },
-          "value": {
-            "address": "Ae2tdPwUPEZ5qQN7ZMrbf52GzsCXSPzfwxFKexJFyGBbKZXb9hQPxh5h89S",
-            "value": "3000000"
+          'value': {
+            'address': 'Ae2tdPwUPEZ5qQN7ZMrbf52GzsCXSPzfwxFKexJFyGBbKZXb9hQPxh5h89S',
+            'value': '3000000'
           },
-          "addressing": {
-            "change": 0,
-            "index": 2,
-            "accountIndex": 0
+          'addressing': {
+            'change': 0,
+            'index': 2,
+            'accountIndex': 0
           }
         },
         {
-          "pointer": {
-            "id": "8cd009c79fd855b8517584692f78618173e4cb06150b4e3a180252ab6f089324",
-            "index": 3
+          'pointer': {
+            'id': '8cd009c79fd855b8517584692f78618173e4cb06150b4e3a180252ab6f089324',
+            'index': 3
           },
-          "value": {
-            "address": "Ae2tdPwUPEZCB5tJAHkszVk3hWDZEPuQGEYqs5T1ieXGeMMCmvqKzk6X1oJ",
-            "value": "2000000"
+          'value': {
+            'address': 'Ae2tdPwUPEZCB5tJAHkszVk3hWDZEPuQGEYqs5T1ieXGeMMCmvqKzk6X1oJ',
+            'value': '2000000'
           },
-          "addressing": {
-            "change": 0,
-            "index": 3,
-            "accountIndex": 0
+          'addressing': {
+            'change': 0,
+            'index': 3,
+            'accountIndex': 0
           }
         },
         {
-          "pointer": {
-            "id": "8882a06acc04f1c2c3e9c284a29fa0b4b551cbeeb69e665b9762e2ef6846bfaa",
-            "index": 4
+          'pointer': {
+            'id': '8882a06acc04f1c2c3e9c284a29fa0b4b551cbeeb69e665b9762e2ef6846bfaa',
+            'index': 4
           },
-          "value": {
-            "address": "Ae2tdPwUPEZ7UVopLf3cA62JjQhAoQJSHLUbPcBhTLrwbZrW6o6yRu7ha5s",
-            "value": "1000000"
+          'value': {
+            'address': 'Ae2tdPwUPEZ7UVopLf3cA62JjQhAoQJSHLUbPcBhTLrwbZrW6o6yRu7ha5s',
+            'value': '1000000'
           },
-          "addressing": {
-            "change": 0,
-            "index": 4,
-            "accountIndex": 0
+          'addressing': {
+            'change': 0,
+            'index': 4,
+            'accountIndex': 0
           }
         }
       ],
-      "outputs": [
+      'outputs': [
         {
-          "address": "Ae2tdPwUPEZLbgtNSaBHc3LEUCaF1GSE1ZgHDApYfgHMo37DGTUZ3Yz47ir",
-          "value": "198036"
+          'address': 'Ae2tdPwUPEZLbgtNSaBHc3LEUCaF1GSE1ZgHDApYfgHMo37DGTUZ3Yz47ir',
+          'value': '198036'
         },
         {
-          "address": "Ae2tdPwUPEZLanS6tvrZGLqy5dQLtTtB3xTCLtQy226V7YAk3SDgwt9V9AZ",
-          "value": "200000"
+          'address': 'Ae2tdPwUPEZLanS6tvrZGLqy5dQLtTtB3xTCLtQy226V7YAk3SDgwt9V9AZ',
+          'value': '200000'
         },
         {
-          "address": "Ae2tdPwUPEZA3mqVuZvzzk28D4uwLkkbj8LpMHVQ9BeGoW8Smi6mzpnKu5n",
-          "value": "200000"
+          'address': 'Ae2tdPwUPEZA3mqVuZvzzk28D4uwLkkbj8LpMHVQ9BeGoW8Smi6mzpnKu5n',
+          'value': '200000'
         }
       ]
     },
     {
-      "inputs": [
+      'inputs': [
         {
-          "pointer": {
-            "id": "645d49b533c54df44ab1380042a35306131ffde58474664ac5681f4e25be5952",
-            "index": 0
+          'pointer': {
+            'id': '645d49b533c54df44ab1380042a35306131ffde58474664ac5681f4e25be5952',
+            'index': 0
           },
-          "value": {
-            "address": "Ae2tdPwUPEZ7UVopLf3cA62JjQhAoQJSHLUbPcBhTLrwbZrW6o6yRu7ha5s",
-            "value": "1000000"
+          'value': {
+            'address': 'Ae2tdPwUPEZ7UVopLf3cA62JjQhAoQJSHLUbPcBhTLrwbZrW6o6yRu7ha5s',
+            'value': '1000000'
           },
-          "addressing": {
-            "change": 0,
-            "index": 4,
-            "accountIndex": 0
+          'addressing': {
+            'change': 0,
+            'index': 4,
+            'accountIndex': 0
           }
         },
         {
-          "pointer": {
-            "id": "5c49483b9016b197da7b8537e9d41a561a381c5f68d9385ea74d17a0a81f54e4",
-            "index": 1
+          'pointer': {
+            'id': '5c49483b9016b197da7b8537e9d41a561a381c5f68d9385ea74d17a0a81f54e4',
+            'index': 1
           },
-          "value": {
-            "address": "Ae2tdPwUPEZN9QPGcGdkrwsS8apBPosQyRBLQMrZ2JW67wY1ndQvbe6Sjn6",
-            "value": "2000000"
+          'value': {
+            'address': 'Ae2tdPwUPEZN9QPGcGdkrwsS8apBPosQyRBLQMrZ2JW67wY1ndQvbe6Sjn6',
+            'value': '2000000'
           },
-          "addressing": {
-            "change": 0,
-            "index": 5,
-            "accountIndex": 0
+          'addressing': {
+            'change': 0,
+            'index': 5,
+            'accountIndex': 0
           }
         },
         {
-          "pointer": {
-            "id": "27adf8b485a20619690dd32f56fbabcead058c8ec4c8a7cc2108b54fe4425127",
-            "index": 2
+          'pointer': {
+            'id': '27adf8b485a20619690dd32f56fbabcead058c8ec4c8a7cc2108b54fe4425127',
+            'index': 2
           },
-          "value": {
-            "address": "Ae2tdPwUPEZCe9QR4svAfHN7Rrr9NUX5V5pDY97oe4PSFbPfbgCEzvMa55R",
-            "value": "3000000"
+          'value': {
+            'address': 'Ae2tdPwUPEZCe9QR4svAfHN7Rrr9NUX5V5pDY97oe4PSFbPfbgCEzvMa55R',
+            'value': '3000000'
           },
-          "addressing": {
-            "change": 0,
-            "index": 6,
-            "accountIndex": 0
+          'addressing': {
+            'change': 0,
+            'index': 6,
+            'accountIndex': 0
           }
         },
         {
-          "pointer": {
-            "id": "633ea0126b27f4d2e8d97bb79a845e1c89248bdafdeccdacaf65d248e7ad38e9",
-            "index": 3
+          'pointer': {
+            'id': '633ea0126b27f4d2e8d97bb79a845e1c89248bdafdeccdacaf65d248e7ad38e9',
+            'index': 3
           },
-          "value": {
-            "address": "Ae2tdPwUPEZ4H5sZ5AJRfrUpXGiCbpGzHGopkcGV9Tdq6iJKYsn2TYmRDra",
-            "value": "2000000"
+          'value': {
+            'address': 'Ae2tdPwUPEZ4H5sZ5AJRfrUpXGiCbpGzHGopkcGV9Tdq6iJKYsn2TYmRDra',
+            'value': '2000000'
           },
-          "addressing": {
-            "change": 0,
-            "index": 7,
-            "accountIndex": 0
+          'addressing': {
+            'change': 0,
+            'index': 7,
+            'accountIndex': 0
           }
         },
         {
-          "pointer": {
-            "id": "3597d347557f4c6cf37c3879f93dc46a92b3d17139ef3e1e7e3330d78452dfbc",
-            "index": 4
+          'pointer': {
+            'id': '3597d347557f4c6cf37c3879f93dc46a92b3d17139ef3e1e7e3330d78452dfbc',
+            'index': 4
           },
-          "value": {
-            "address": "Ae2tdPwUPEZLVRMEve2GjWbxGfFm9ws577j68cttrL9UfYLhUv4zrf53Mrh",
-            "value": "1000000"
+          'value': {
+            'address': 'Ae2tdPwUPEZLVRMEve2GjWbxGfFm9ws577j68cttrL9UfYLhUv4zrf53Mrh',
+            'value': '1000000'
           },
-          "addressing": {
-            "change": 0,
-            "index": 8,
-            "accountIndex": 0
+          'addressing': {
+            'change': 0,
+            'index': 8,
+            'accountIndex': 0
           }
         }
       ],
-      "outputs": [
+      'outputs': [
         {
-          "address": "Ae2tdPwUPEYyhqEXhcYHWZsSwFkeJdiYkNPf2xEyAprzQ9wfruoA3avMVGY",
-          "value": "198036"
+          'address': 'Ae2tdPwUPEYyhqEXhcYHWZsSwFkeJdiYkNPf2xEyAprzQ9wfruoA3avMVGY',
+          'value': '198036'
         },
         {
-          "address": "Ae2tdPwUPEZLtX243BCbEWi4nwdAvcv274GQxmxJpB1FR2UBiy3HHmopD1R",
-          "value": "200000"
+          'address': 'Ae2tdPwUPEZLtX243BCbEWi4nwdAvcv274GQxmxJpB1FR2UBiy3HHmopD1R',
+          'value': '200000'
         },
         {
-          "address": "Ae2tdPwUPEZ3QJWHcWh9gAaacB6rkdHLkxEvUEwMJ6gYRfTshnN7xazAb2P",
-          "value": "200000"
+          'address': 'Ae2tdPwUPEZ3QJWHcWh9gAaacB6rkdHLkxEvUEwMJ6gYRfTshnN7xazAb2P',
+          'value': '200000'
         }
       ]
     }
   ],
-  "utxos": [
+  'utxos': [
     {
-      "address": "Ae2tdPwUPEZ6oDR4P2CcWCTzxLiGgQRTezrjFBSPitw4nCDgHbV6iPxQTyk",
-      "id": "edad308e5d8e0047ef501aef84267646367cc524cdc333dbbb348739594c8de9",
-      "index": 0,
-      "value": "10000000"
+      'address': 'Ae2tdPwUPEZ6oDR4P2CcWCTzxLiGgQRTezrjFBSPitw4nCDgHbV6iPxQTyk',
+      'id': 'edad308e5d8e0047ef501aef84267646367cc524cdc333dbbb348739594c8de9',
+      'index': 0,
+      'value': '10000000'
     },
     {
-      "address": "Ae2tdPwUPEYzrf1toTgJbkEXpvQZ3CCRasPUotJGDp4HjEeK9U4rNiyJ4PL",
-      "id": "edad308e5d8e0047ef501aef84267646367cc524cdc333dbbb348739594c8de9",
-      "index": 0,
-      "value": "10000000"
+      'address': 'Ae2tdPwUPEYzrf1toTgJbkEXpvQZ3CCRasPUotJGDp4HjEeK9U4rNiyJ4PL',
+      'id': 'edad308e5d8e0047ef501aef84267646367cc524cdc333dbbb348739594c8de9',
+      'index': 0,
+      'value': '10000000'
     },
     {
-      "address": "Ae2tdPwUPEZ5qQN7ZMrbf52GzsCXSPzfwxFKexJFyGBbKZXb9hQPxh5h89S",
-      "id": "edad308e5d8e0047ef501aef84267646367cc524cdc333dbbb348739594c8de9",
-      "index": 0,
-      "value": "10000000"
+      'address': 'Ae2tdPwUPEZ5qQN7ZMrbf52GzsCXSPzfwxFKexJFyGBbKZXb9hQPxh5h89S',
+      'id': 'edad308e5d8e0047ef501aef84267646367cc524cdc333dbbb348739594c8de9',
+      'index': 0,
+      'value': '10000000'
     },
     {
-      "address": "Ae2tdPwUPEZCB5tJAHkszVk3hWDZEPuQGEYqs5T1ieXGeMMCmvqKzk6X1oJ",
-      "id": "edad308e5d8e0047ef501aef84267646367cc524cdc333dbbb348739594c8de9",
-      "index": 0,
-      "value": "10000000"
+      'address': 'Ae2tdPwUPEZCB5tJAHkszVk3hWDZEPuQGEYqs5T1ieXGeMMCmvqKzk6X1oJ',
+      'id': 'edad308e5d8e0047ef501aef84267646367cc524cdc333dbbb348739594c8de9',
+      'index': 0,
+      'value': '10000000'
     },
     {
-      "address": "Ae2tdPwUPEZ7UVopLf3cA62JjQhAoQJSHLUbPcBhTLrwbZrW6o6yRu7ha5s",
-      "id": "edad308e5d8e0047ef501aef84267646367cc524cdc333dbbb348739594c8de9",
-      "index": 0,
-      "value": "10000000"
+      'address': 'Ae2tdPwUPEZ7UVopLf3cA62JjQhAoQJSHLUbPcBhTLrwbZrW6o6yRu7ha5s',
+      'id': 'edad308e5d8e0047ef501aef84267646367cc524cdc333dbbb348739594c8de9',
+      'index': 0,
+      'value': '10000000'
     },
     {
-      "address": "Ae2tdPwUPEZ7UVopLf3cA62JjQhAoQJSHLUbPcBhTLrwbZrW6o6yRu7ha5s",
-      "id": "edad308e5d8e0047ef501aef84267646367cc524cdc333dbbb348739594c8de9",
-      "index": 0,
-      "value": "10000000"
+      'address': 'Ae2tdPwUPEZ7UVopLf3cA62JjQhAoQJSHLUbPcBhTLrwbZrW6o6yRu7ha5s',
+      'id': 'edad308e5d8e0047ef501aef84267646367cc524cdc333dbbb348739594c8de9',
+      'index': 0,
+      'value': '10000000'
     },
     {
-      "address": "Ae2tdPwUPEZN9QPGcGdkrwsS8apBPosQyRBLQMrZ2JW67wY1ndQvbe6Sjn6",
-      "id": "edad308e5d8e0047ef501aef84267646367cc524cdc333dbbb348739594c8de9",
-      "index": 0,
-      "value": "10000000"
+      'address': 'Ae2tdPwUPEZN9QPGcGdkrwsS8apBPosQyRBLQMrZ2JW67wY1ndQvbe6Sjn6',
+      'id': 'edad308e5d8e0047ef501aef84267646367cc524cdc333dbbb348739594c8de9',
+      'index': 0,
+      'value': '10000000'
     },
     {
-      "address": "Ae2tdPwUPEZCe9QR4svAfHN7Rrr9NUX5V5pDY97oe4PSFbPfbgCEzvMa55R",
-      "id": "edad308e5d8e0047ef501aef84267646367cc524cdc333dbbb348739594c8de9",
-      "index": 0,
-      "value": "10000000"
+      'address': 'Ae2tdPwUPEZCe9QR4svAfHN7Rrr9NUX5V5pDY97oe4PSFbPfbgCEzvMa55R',
+      'id': 'edad308e5d8e0047ef501aef84267646367cc524cdc333dbbb348739594c8de9',
+      'index': 0,
+      'value': '10000000'
     },
     {
-      "address": "Ae2tdPwUPEZ4H5sZ5AJRfrUpXGiCbpGzHGopkcGV9Tdq6iJKYsn2TYmRDra",
-      "id": "edad308e5d8e0047ef501aef84267646367cc524cdc333dbbb348739594c8de9",
-      "index": 0,
-      "value": "10000000"
+      'address': 'Ae2tdPwUPEZ4H5sZ5AJRfrUpXGiCbpGzHGopkcGV9Tdq6iJKYsn2TYmRDra',
+      'id': 'edad308e5d8e0047ef501aef84267646367cc524cdc333dbbb348739594c8de9',
+      'index': 0,
+      'value': '10000000'
     },
     {
-      "address": "Ae2tdPwUPEZLVRMEve2GjWbxGfFm9ws577j68cttrL9UfYLhUv4zrf53Mrh",
-      "id": "edad308e5d8e0047ef501aef84267646367cc524cdc333dbbb348739594c8de9",
-      "index": 0,
-      "value": "10000000"
+      'address': 'Ae2tdPwUPEZLVRMEve2GjWbxGfFm9ws577j68cttrL9UfYLhUv4zrf53Mrh',
+      'id': 'edad308e5d8e0047ef501aef84267646367cc524cdc333dbbb348739594c8de9',
+      'index': 0,
+      'value': '10000000'
     },
     {
-      "id": "edad308e5d8e0047ef501aef84267646367cc524cdc333dbbb348739594c8de9",
-      "index": 0,
-      "address": "Ae2tdPwUPEZLbgtNSaBHc3LEUCaF1GSE1ZgHDApYfgHMo37DGTUZ3Yz47ir",
-      "value": "200000"
+      'id': 'edad308e5d8e0047ef501aef84267646367cc524cdc333dbbb348739594c8de9',
+      'index': 0,
+      'address': 'Ae2tdPwUPEZLbgtNSaBHc3LEUCaF1GSE1ZgHDApYfgHMo37DGTUZ3Yz47ir',
+      'value': '200000'
     },
     {
-      "id": "edad308e5d8e0047ef501aef84267646367cc524cdc333dbbb348739594c8de9",
-      "index": 1,
-      "address": "Ae2tdPwUPEZLanS6tvrZGLqy5dQLtTtB3xTCLtQy226V7YAk3SDgwt9V9AZ",
-      "value": "200000"
+      'id': 'edad308e5d8e0047ef501aef84267646367cc524cdc333dbbb348739594c8de9',
+      'index': 1,
+      'address': 'Ae2tdPwUPEZLanS6tvrZGLqy5dQLtTtB3xTCLtQy226V7YAk3SDgwt9V9AZ',
+      'value': '200000'
     },
     {
-      "id": "edad308e5d8e0047ef501aef84267646367cc524cdc333dbbb348739594c8de9",
-      "index": 2,
-      "address": "Ae2tdPwUPEZA3mqVuZvzzk28D4uwLkkbj8LpMHVQ9BeGoW8Smi6mzpnKu5n",
-      "value": "200000"
+      'id': 'edad308e5d8e0047ef501aef84267646367cc524cdc333dbbb348739594c8de9',
+      'index': 2,
+      'address': 'Ae2tdPwUPEZA3mqVuZvzzk28D4uwLkkbj8LpMHVQ9BeGoW8Smi6mzpnKu5n',
+      'value': '200000'
     },
     {
-      "id": "9224942d944020ab1abdd6c19046201a316d1846e2269e082b3bde537d1a8a20",
-      "index": 3,
-      "address": "Ae2tdPwUPEYyhqEXhcYHWZsSwFkeJdiYkNPf2xEyAprzQ9wfruoA3avMVGY",
-      "value": "200000"
+      'id': '9224942d944020ab1abdd6c19046201a316d1846e2269e082b3bde537d1a8a20',
+      'index': 3,
+      'address': 'Ae2tdPwUPEYyhqEXhcYHWZsSwFkeJdiYkNPf2xEyAprzQ9wfruoA3avMVGY',
+      'value': '200000'
     },
     {
-      "id": "9224942d944020ab1abdd6c19046201a316d1846e2269e082b3bde537d1a8a20",
-      "index": 4,
-      "address": "Ae2tdPwUPEZLtX243BCbEWi4nwdAvcv274GQxmxJpB1FR2UBiy3HHmopD1R",
-      "value": "200000"
+      'id': '9224942d944020ab1abdd6c19046201a316d1846e2269e082b3bde537d1a8a20',
+      'index': 4,
+      'address': 'Ae2tdPwUPEZLtX243BCbEWi4nwdAvcv274GQxmxJpB1FR2UBiy3HHmopD1R',
+      'value': '200000'
     },
     {
-      "id": "9224942d944020ab1abdd6c19046201a316d1846e2269e082b3bde537d1a8a20",
-      "index": 5,
-      "address": "Ae2tdPwUPEZ3QJWHcWh9gAaacB6rkdHLkxEvUEwMJ6gYRfTshnN7xazAb2P",
-      "value": "200000"
+      'id': '9224942d944020ab1abdd6c19046201a316d1846e2269e082b3bde537d1a8a20',
+      'index': 5,
+      'address': 'Ae2tdPwUPEZ3QJWHcWh9gAaacB6rkdHLkxEvUEwMJ6gYRfTshnN7xazAb2P',
+      'value': '200000'
     }
   ]
 }

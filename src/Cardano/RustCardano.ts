@@ -1,12 +1,15 @@
 import { Cardano, FeeAlgorithm, ChainSettings, TransactionSelection } from './Primitives'
 import { getBindingsForEnvironment } from '../lib/bindings'
 import { InsufficientTransactionInput } from '../Transaction/errors'
+import { TxInput as CardanoTxInput, Coin as CoinT, Bip44AccountPrivate } from 'cardano-wallet'
+
+import { AddressType, UtxoWithAddressing } from '../Wallet'
+import { TransactionOutput, TransactionInput } from '../Transaction'
 const { Transaction, OutputPolicy, InputSelectionBuilder, TxInput, Address, Signature, TransactionSignature, Entropy, Bip44RootPrivateKey, PrivateKey, AccountIndex, AddressKeyIndex, BlockchainSettings, Bip44AccountPublic, PublicKey, TransactionBuilder, TxoPointer, Coin, TxOut, LinearFeeAlgorithm, TransactionFinalized, DerivationScheme, Witness, TransactionId } = getBindingsForEnvironment()
-import { TxInput as CardanoTxInput } from 'cardano-wallet'
 
 const HARD_DERIVATION_START = 0x80000000
 
-function getRustFeeAlgorithm(algo: FeeAlgorithm) {
+function getRustFeeAlgorithm (algo: FeeAlgorithm) {
   const feeAlgoMapping = {
     [FeeAlgorithm.default]: LinearFeeAlgorithm.default()
   }
@@ -20,7 +23,7 @@ function getRustFeeAlgorithm(algo: FeeAlgorithm) {
   return targetAlgo
 }
 
-function getRustChainSettings(chainSettings: ChainSettings) {
+function getRustChainSettings (chainSettings: ChainSettings) {
   const chainSettingsMapping = {
     [ChainSettings.mainnet]: BlockchainSettings.mainnet()
   }
@@ -34,11 +37,7 @@ function getRustChainSettings(chainSettings: ChainSettings) {
   return targetSetting
 }
 
-import { Coin as CoinT, Bip44AccountPrivate } from 'cardano-wallet'
-import { AddressType, UtxoWithAddressing } from '../Wallet';
-import { TransactionOutput, TransactionInput } from '../Transaction';
-
-export function convertCoinToLovelace(coin: CoinT): string {
+export function convertCoinToLovelace (coin: CoinT): string {
   const ada = coin.ada()
   const lovelace = coin.lovelace()
   return String((ada * 1000000) + lovelace)
@@ -65,9 +64,9 @@ export const RustCardano: Cardano = {
 
     /*
       The get_balance_without_fees from the WASM bindings returns:
-  
+
       Σ(transactionInputValues) - Σ(transactionOutputValues)
-  
+
       This represents the fee paid on a transaction, as the positive balance
       between inputs and the associated outputs is equal to the fee paid
     */
@@ -172,7 +171,7 @@ export const RustCardano: Cardano = {
     const publicKeyInterface = PublicKey.from_hex(publicKey)
     return publicKeyInterface.verify(Buffer.from(message), signatureInterface)
   },
-  inputSelection(outputs: TransactionOutput[], utxoSet: UtxoWithAddressing[], changeAddress: string, feeAlgorithm = FeeAlgorithm.default): TransactionSelection {
+  inputSelection (outputs: TransactionOutput[], utxoSet: UtxoWithAddressing[], changeAddress: string, feeAlgorithm = FeeAlgorithm.default): TransactionSelection {
     const potentialInputs: CardanoTxInput[] = utxoSet.map(utxo => {
       return TxInput.new(
         TxoPointer.new(TransactionId.from_hex(utxo.id), utxo.index),
