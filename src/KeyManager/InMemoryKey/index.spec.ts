@@ -2,10 +2,9 @@ import { expect } from 'chai'
 import { InMemoryKeyManager } from '.'
 import { InvalidMnemonic } from '../errors'
 import { AddressType } from '../../Wallet'
-import { getBindingsForEnvironment } from '../../lib/bindings'
 import { generateTestTransaction } from '../../test/utils/test_transaction'
 import { generateMnemonic } from '../../Utils'
-const { BlockchainSettings } = getBindingsForEnvironment()
+import { ChainSettings } from '../../Cardano';
 
 describe('MemoryKeyManager', () => {
   it('throws if the mnemonic passed is invalid', () => {
@@ -34,7 +33,7 @@ describe('MemoryKeyManager', () => {
         testOutputs: [{ address: 'Ae2tdPwUPEZEjJcLmvgKnuwUnfKSVuGCzRW1PqsLcWqmoGJUocBGbvWjjTx', value: '6000000' }]
       })
 
-      const signedTransaction = await keyManager.signTransaction(transaction, inputs, BlockchainSettings.mainnet())
+      const signedTransaction = await keyManager.signTransaction(transaction, inputs, ChainSettings.mainnet)
       expect(signedTransaction.length).to.eql(838)
     })
   })

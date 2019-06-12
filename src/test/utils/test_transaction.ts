@@ -1,20 +1,19 @@
-import { Bip44AccountPublic } from 'cardano-wallet'
 import { AddressType } from '../../Wallet'
 import Transaction, { TransactionInput } from '../../Transaction'
-import { addressDiscoveryWithinBounds, estimateTransactionFee } from '../../Utils'
+import { addressDiscoveryWithinBounds } from '../../Utils'
 
 /**
  * generateTestTransaction is a test helper.
  * It can be used to make relatively realistic transactions that can be used for transaction testing or seeding a mock provider.
 */
-export function generateTestTransaction ({
+export function generateTestTransaction({
   publicAccount,
   testInputs,
   lowerBoundOfAddresses,
   testOutputs,
   inputId
 }: {
-  publicAccount: Bip44AccountPublic,
+  publicAccount: string,
   testInputs: { value: string, type: AddressType }[],
   lowerBoundOfAddresses: number,
   testOutputs: { address: string, value: string }[],
@@ -43,18 +42,18 @@ export function generateTestTransaction ({
       // Mock a 64 byte transaction id
       pointer: { id: inputId || hexGenerator(64), index },
       value: { address, value },
-      addressing: { change: testInputs[index].type === AddressType.internal ? 1 : 0, index: addressIndex }
+      addressing: { change: testInputs[index].type === AddressType.internal ? 1 : 0, index: addressIndex, accountIndex: 0 }
     }
   })
 
-  const fee = estimateTransactionFee(inputs, testOutputs)
+  const fee = Transaction(inputs, testOutputs).estimateFee()
 
   testOutputs[0].value = (Number(testOutputs[0].value) - Number(fee)).toString()
   return { transaction: Transaction(inputs, testOutputs), inputs }
 }
 
 /** Test helper only */
-export function hexGenerator (length: number) {
+export function hexGenerator(length: number) {
   const maxlen = 8
   const min = Math.pow(16, Math.min(length, maxlen) - 1)
   const max = Math.pow(16, Math.min(length, maxlen)) - 1

@@ -2,7 +2,6 @@ import { expect } from 'chai'
 import Transaction, { TransactionInput, TransactionOutput } from './'
 import { InsufficientTransactionInput } from './errors'
 import { EmptyArray } from '../lib/validator/errors'
-import { estimateTransactionFee } from '../Utils/estimate_fee'
 
 describe('Transaction', () => {
   it('throws if inputs are invalid', () => {
@@ -66,7 +65,7 @@ describe('Transaction', () => {
       { address: 'Ae2tdPwUPEZCEhYAUVU7evPfQCJjyuwM6n81x6hSjU9TBMSy2YwZEVydssL', value: '6000000' }
     ]
 
-    const fee = estimateTransactionFee(inputs, outputs)
+    const fee = Transaction(inputs, outputs).estimateFee()
 
     outputs[0].value = (6000000 - Number(fee)).toString()
     const transaction = Transaction(inputs, outputs)
@@ -85,7 +84,7 @@ describe('Transaction', () => {
         { address: 'Ae2tdPwUPEZCEhYAUVU7evPfQCJjyuwM6n81x6hSjU9TBMSy2YwZEVydssL', value: '5000000' }
       ]
 
-      const estimatedFee = estimateTransactionFee(inputs, outputs)
+      const estimatedFee = Transaction(inputs, outputs).estimateFee()
       const realisedFee = Transaction(inputs, outputs).fee()
 
       expect(realisedFee).to.equal('2010000')

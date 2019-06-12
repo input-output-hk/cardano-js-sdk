@@ -1,7 +1,7 @@
 import { Cardano, FeeAlgorithm, ChainSettings, TransactionSelection } from './Primitives'
 import { getBindingsForEnvironment } from '../lib/bindings'
 import { InsufficientTransactionInput } from '../Transaction/errors'
-const { OutputPolicy, InputSelectionBuilder, TxInput, Address, Signature, TransactionSignature, Entropy, Bip44RootPrivateKey, PrivateKey, AccountIndex, AddressKeyIndex, BlockchainSettings, Bip44AccountPublic, PublicKey, TransactionBuilder, TxoPointer, Coin, TxOut, LinearFeeAlgorithm, TransactionFinalized, DerivationScheme, Witness, TransactionId } = getBindingsForEnvironment()
+const { Transaction, OutputPolicy, InputSelectionBuilder, TxInput, Address, Signature, TransactionSignature, Entropy, Bip44RootPrivateKey, PrivateKey, AccountIndex, AddressKeyIndex, BlockchainSettings, Bip44AccountPublic, PublicKey, TransactionBuilder, TxoPointer, Coin, TxOut, LinearFeeAlgorithm, TransactionFinalized, DerivationScheme, Witness, TransactionId } = getBindingsForEnvironment()
 import { TxInput as CardanoTxInput } from 'cardano-wallet'
 
 const HARD_DERIVATION_START = 0x80000000
@@ -84,12 +84,15 @@ export const RustCardano: Cardano = {
 
     const cardanoTransaction = transactionBuilder.make_transaction()
 
+    // This gets around WASM incorrectly freeing the tx allocation when
+    // we want reference to a finalizer
+    const txClone = Transaction.from_json(cardanoTransaction.to_json())
     let finalizer = new TransactionFinalized(cardanoTransaction)
 
     return {
-      toHex: () => cardanoTransaction.to_hex(),
-      toJson: () => cardanoTransaction.to_json(),
-      id: () => cardanoTransaction.id().to_hex(),
+      toHex: () => txClone.to_hex(),
+      toJson: () => txClone.to_json(),
+      id: () => txClone.id().to_hex(),
       addWitness: ({ privateAccount, addressing, chainSettings }) => {
         if (!chainSettings) {
           chainSettings = ChainSettings.mainnet
@@ -134,7 +137,7 @@ export const RustCardano: Cardano = {
     }
   },
   address: (
-    { publicAccount, index, type },
+    { publicAccount, index, type, accountIndex },
     chainSettings = ChainSettings.mainnet
   ) => {
     const pk = PublicKey.from_hex(publicAccount)
@@ -148,7 +151,8 @@ export const RustCardano: Cardano = {
     return {
       address: address.to_base58(),
       index,
-      type
+      type,
+      accountIndex
     }
   },
   signMessage: ({ privateAccount, addressType, signingIndex, message }) => {

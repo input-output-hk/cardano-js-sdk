@@ -41,6 +41,7 @@ export interface Cardano {
       publicAccount: string,
       index: number,
       type: AddressType
+      accountIndex: number
     },
     chainSettings?: ChainSettings
   ) => Address

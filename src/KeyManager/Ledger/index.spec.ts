@@ -2,11 +2,10 @@ import { LedgerKeyManager } from '.'
 import { KeyManager } from '../KeyManager'
 import { generateTestTransaction, generateTestUtxos } from '../../test/utils'
 import { AddressType } from '../../Wallet'
-import { getBindingsForEnvironment } from '../../lib/bindings'
 import { UnsupportedOperation, InsufficientData } from '../errors'
 import { expect, use } from 'chai'
 import * as chaiAsPromised from 'chai-as-promised'
-const { AddressKeyIndex, BlockchainSettings } = getBindingsForEnvironment()
+import { RustCardano, ChainSettings } from '../../Cardano'
 use(chaiAsPromised)
 
 const runLedgerSpecs = process.env.LEDGER_SPECS!! ? describe.only : describe.skip
@@ -22,11 +21,7 @@ runLedgerSpecs('LedgerKeyManager', async function () {
   describe('publicAccount', () => {
     it('exposes a Bip44 public account', async () => {
       const pk = await manager.publicAccount()
-      const address = pk
-        .bip44_chain(false)
-        .address_key(AddressKeyIndex.new(0))
-        .bootstrap_era_address(BlockchainSettings.mainnet())
-        .to_base58()
+      const address = RustCardano.address({ publicAccount: pk, index: 0, type: AddressType.external, accountIndex: 0 })
 
       expect(typeof address).to.be.eql('string')
     })
@@ -56,10 +51,10 @@ runLedgerSpecs('LedgerKeyManager', async function () {
         lowerBoundOfAddresses: 0,
         testInputs: [{ value: '1000000', type: AddressType.external }],
         testOutputs: [{ value: '900000', address: 'Ae2tdPwUPEZEjJcLmvgKnuwUnfKSVuGCzRW1PqsLcWqmoGJUocBGbvWjjTx' }],
-        inputId: transaction.id().to_hex()
+        inputId: transaction.id()
       })
 
-      const insufficientDataForSigning = manager.signTransaction(spendingTransaction.transaction, spendingTransaction.inputs, BlockchainSettings.mainnet(), {})
+      const insufficientDataForSigning = manager.signTransaction(spendingTransaction.transaction, spendingTransaction.inputs, ChainSettings.mainnet, {})
       return expect(insufficientDataForSigning).to.eventually.be.rejectedWith(InsufficientData)
     })
 
@@ -75,7 +70,7 @@ runLedgerSpecs('LedgerKeyManager', async function () {
       })
 
       const transactionsAsProofForSpending = {
-        [transaction.id().to_hex()]: transaction.toHex()
+        [transaction.id()]: transaction.toHex()
       }
 
       const spendingTransaction = generateTestTransaction({
@@ -83,10 +78,10 @@ runLedgerSpecs('LedgerKeyManager', async function () {
         lowerBoundOfAddresses: 0,
         testInputs: [{ value: '1000000', type: AddressType.external }],
         testOutputs: [{ value: '900000', address: 'Ae2tdPwUPEZEjJcLmvgKnuwUnfKSVuGCzRW1PqsLcWqmoGJUocBGbvWjjTx' }],
-        inputId: transaction.id().to_hex()
+        inputId: transaction.id()
       })
 
-      await manager.signTransaction(spendingTransaction.transaction, spendingTransaction.inputs, BlockchainSettings.mainnet(), transactionsAsProofForSpending)
+      await manager.signTransaction(spendingTransaction.transaction, spendingTransaction.inputs, ChainSettings.mainnet, transactionsAsProofForSpending)
     })
   })
 })

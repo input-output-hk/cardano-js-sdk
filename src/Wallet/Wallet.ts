@@ -22,11 +22,12 @@ export function Wallet(provider: Provider, cardano = RustCardano) {
         const addresses = await deriveAddressSet(provider, account)
         const utxos = await provider.queryUtxosByAddress(addresses.map(({ address }) => address))
         const utxosMappedWithAddresses: UtxoWithAddressing[] = utxos.map(utxo => {
-          const { index, type } = addresses.find(({ address }) => address === utxo.address)
+          const { index, type, accountIndex } = addresses.find(({ address }) => address === utxo.address)
           return {
             addressing: {
               index,
               change: type === AddressType.internal ? 1 : 0,
+              accountIndex
             },
             ...utxo
           }

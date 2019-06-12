@@ -8,5 +8,5 @@ export interface Utxo {
 }
 
 export interface UtxoWithAddressing extends Utxo {
-  addressing: Partial<TransactionInput['addressing']>
+  addressing: TransactionInput['addressing']
 }
