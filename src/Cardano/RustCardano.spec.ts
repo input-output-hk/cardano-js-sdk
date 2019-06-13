@@ -40,7 +40,7 @@ describe('RustCardano', () => {
   describe('inputSelection', () => {
     it('throws if there is insufficient inputs to cover the payment cost', async () => {
       const mnemonic = Utils.generateMnemonic()
-      const account = await InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
+      const account = await InMemoryKeyManager({ password: '', mnemonic }).publicParentKey()
       const [address1, address2, address3, changeAddress] = Utils.addressDiscoveryWithinBounds({
         account,
         type: AddressType.internal,
@@ -63,7 +63,7 @@ describe('RustCardano', () => {
     describe('FirstMatchFirst', () => {
       it('selects valid UTXOs and produces change', async () => {
         const mnemonic = Utils.generateMnemonic()
-        const account = await InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
+        const account = await InMemoryKeyManager({ password: '', mnemonic }).publicParentKey()
         const [address1, address2, address3, address4, address5, change] = Utils.addressDiscoveryWithinBounds({
           account,
           type: AddressType.internal,

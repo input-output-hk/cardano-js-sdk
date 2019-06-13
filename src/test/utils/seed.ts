@@ -22,8 +22,8 @@ export async function generateSeed () {
   const mnemonic2 = Utils.generateMnemonic()
   const mnemonic3 = Utils.generateMnemonic()
 
-  const account1 = await InMemoryKeyManager({ password: '', mnemonic: mnemonic1 }).publicAccount()
-  const account2 = await InMemoryKeyManager({ password: '', mnemonic: mnemonic2 }).publicAccount()
+  const account1 = await InMemoryKeyManager({ password: '', mnemonic: mnemonic1 }).publicParentKey()
+  const account2 = await InMemoryKeyManager({ password: '', mnemonic: mnemonic2 }).publicParentKey()
 
   const account2Addresses = addressDiscoveryWithinBounds({
     account: account2,

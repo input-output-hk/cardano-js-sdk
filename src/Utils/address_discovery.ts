@@ -18,5 +18,5 @@ export function addressDiscoveryWithinBounds ({ type, account, lowerBound, upper
     .fill(0)
     .map((_, idx) => lowerBound + idx)
 
-  return addressIndices.map(index => cardano.address({ publicAccount: account, index, type, accountIndex }, chainSettings))
+  return addressIndices.map(index => cardano.address({ publicParentKey: account, index, type, accountIndex }, chainSettings))
 }

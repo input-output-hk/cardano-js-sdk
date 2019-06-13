@@ -11,12 +11,12 @@ describe('Example: Select inputs for transaction', () => {
 
     const mnemonic = seed.accountMnemonics.account1
     const keyManager = InMemoryKeyManager({ mnemonic, password: '' })
-    const publicAccount1 = await keyManager.publicAccount()
+    const publicAccount1 = await keyManager.publicParentKey()
     const wallet = connect(mockProvider).wallet(publicAccount1)
 
     const mnemonic2 = seed.accountMnemonics.account2
     const keyManager2 = InMemoryKeyManager({ mnemonic: mnemonic2, password: '' })
-    const publicAccount2 = await keyManager2.publicAccount()
+    const publicAccount2 = await keyManager2.publicParentKey()
     const targetOutputAddress = await connect(mockProvider).wallet(publicAccount2).getNextReceivingAddress()
 
     const { inputs, changeOutput } = await wallet.selectInputsForTransaction([
@@ -35,12 +35,12 @@ describe('Example: Select inputs for transaction', () => {
 
     const mnemonic = seed.accountMnemonics.account2
     const keyManager = InMemoryKeyManager({ mnemonic, password: '' })
-    const publicAccount1 = await keyManager.publicAccount()
+    const publicAccount1 = await keyManager.publicParentKey()
     const wallet = connect(mockProvider).wallet(publicAccount1)
 
     const mnemonic2 = seed.accountMnemonics.account1
     const keyManager2 = InMemoryKeyManager({ mnemonic: mnemonic2, password: '' })
-    const publicAccount2 = await keyManager2.publicAccount()
+    const publicAccount2 = await keyManager2.publicParentKey()
     const targetOutputAddress = await connect(mockProvider).wallet(publicAccount2).getNextReceivingAddress()
 
     const call = wallet.selectInputsForTransaction([

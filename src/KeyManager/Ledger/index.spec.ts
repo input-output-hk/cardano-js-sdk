@@ -20,8 +20,8 @@ runLedgerSpecs('LedgerKeyManager', async function () {
 
   describe('publicAccount', () => {
     it('exposes a Bip44 public account', async () => {
-      const pk = await manager.publicAccount()
-      const address = RustCardano.address({ publicAccount: pk, index: 0, type: AddressType.external, accountIndex: 0 })
+      const pk = await manager.publicParentKey()
+      const address = RustCardano.address({ publicParentKey: pk, index: 0, type: AddressType.external, accountIndex: 0 })
 
       expect(typeof address).to.be.eql('string')
     })
@@ -36,7 +36,7 @@ runLedgerSpecs('LedgerKeyManager', async function () {
 
   describe('signTransaction', () => {
     it('throws if preceding transactions for inputs being spent are not provided', async () => {
-      const account = await manager.publicAccount()
+      const account = await manager.publicParentKey()
       const outputs = generateTestUtxos({ lowerBound: 0, upperBound: 5, account, type: AddressType.internal, value: '1000000' })
 
       const { transaction } = generateTestTransaction({
@@ -59,7 +59,7 @@ runLedgerSpecs('LedgerKeyManager', async function () {
     })
 
     it('signs a transaction with a ledger device', async () => {
-      const account = await manager.publicAccount()
+      const account = await manager.publicParentKey()
       const outputs = generateTestUtxos({ lowerBound: 0, upperBound: 5, account, type: AddressType.internal, value: '1000000' })
 
       const { transaction } = generateTestTransaction({

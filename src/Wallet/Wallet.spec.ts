@@ -12,7 +12,7 @@ describe('Wallet', () => {
   describe('getNextChangeAddress', () => {
     beforeEach(async () => {
       const mnemonic = Utils.generateMnemonic()
-      account = await InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
+      account = await InMemoryKeyManager({ password: '', mnemonic }).publicParentKey()
 
       seedTransactionSet([])
 
@@ -37,7 +37,7 @@ describe('Wallet', () => {
   describe('getNextReceivingAddress', async () => {
     beforeEach(async () => {
       const mnemonic = Utils.generateMnemonic()
-      account = await InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
+      account = await InMemoryKeyManager({ password: '', mnemonic }).publicParentKey()
 
       seedTransactionSet([])
 
@@ -62,7 +62,7 @@ describe('Wallet', () => {
   describe('balance', async () => {
     beforeEach(async () => {
       const mnemonic = Utils.generateMnemonic()
-      account = await InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
+      account = await InMemoryKeyManager({ password: '', mnemonic }).publicParentKey()
       const targetInternalAddressIndex = 5
       const targetExternalAddressIndex = 5
 
@@ -105,7 +105,7 @@ describe('Wallet', () => {
   describe('transaction', () => {
     beforeEach(async () => {
       const mnemonic = Utils.generateMnemonic()
-      account = await InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
+      account = await InMemoryKeyManager({ password: '', mnemonic }).publicParentKey()
       const targetInternalAddressIndex = 5
       const targetExternalAddressIndex = 5
 
@@ -145,7 +145,7 @@ describe('Wallet', () => {
 
     beforeEach(async () => {
       const mnemonic = Utils.generateMnemonic()
-      account = await InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
+      account = await InMemoryKeyManager({ password: '', mnemonic }).publicParentKey()
       const targetInternalAddressIndex = 5
       const targetExternalAddressIndex = 5
 

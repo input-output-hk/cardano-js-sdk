@@ -12,21 +12,21 @@ async function connectToLedger () {
   return new Ledger(transport)
 }
 
-export async function LedgerKeyManager (accountIndex = 0, publicKey?: string): Promise<KeyManager> {
+export async function LedgerKeyManager (accountIndex = 0, publicParentKey?: string): Promise<KeyManager> {
   const ledger = await connectToLedger()
 
   async function deriveBip44Account () {
-    if (!publicKey) {
+    if (!publicParentKey) {
       const { publicKeyHex, chainCodeHex } = await ledger.getExtendedPublicKey([
         utils.HARDENED + 44,
         utils.HARDENED + 1815,
         utils.HARDENED + accountIndex
       ])
 
-      publicKey = `${publicKeyHex}${chainCodeHex}`
+      publicParentKey = `${publicKeyHex}${chainCodeHex}`
     }
 
-    return publicKey
+    return publicParentKey
   }
 
   return {
@@ -53,13 +53,13 @@ export async function LedgerKeyManager (accountIndex = 0, publicKey?: string): P
       })
 
       const ledgerSignedTransaction = await ledger.signTransaction(inputs, outputs)
-      const bip44AccountPublic = await deriveBip44Account()
+      const publicParentKey = await deriveBip44Account()
 
       ledgerSignedTransaction.witnesses.forEach((ledgerWitness: any) => {
         transaction.addExternalWitness({
           addressType: ledgerWitness.path[3] === 1 ? AddressType.internal : AddressType.external,
           witnessIndex: ledgerWitness.path[4],
-          publicAccount: bip44AccountPublic,
+          publicParentKey,
           witnessHex: ledgerWitness.witnessSignatureHex
         })
       })
@@ -69,6 +69,6 @@ export async function LedgerKeyManager (accountIndex = 0, publicKey?: string): P
     signMessage: async () => {
       throw new UnsupportedOperation('Ledger signMessage')
     },
-    publicAccount: () => deriveBip44Account()
+    publicParentKey: () => deriveBip44Account()
   }
 }

@@ -92,14 +92,14 @@ export const RustCardano: Cardano = {
       toHex: () => txClone.to_hex(),
       toJson: () => txClone.to_json(),
       id: () => txClone.id().to_hex(),
-      addWitness: ({ privateAccount, addressing, chainSettings }) => {
+      addWitness: ({ privateParentKey, addressing, chainSettings }) => {
         if (!chainSettings) {
           chainSettings = ChainSettings.mainnet
         }
 
         const rustChainSettings = getRustChainSettings(chainSettings)
 
-        const privateKey = PrivateKey.from_hex(privateAccount)
+        const privateKey = PrivateKey.from_hex(privateParentKey)
         const privateKeyBip44 = Bip44RootPrivateKey
           .new(privateKey, DerivationScheme.v2())
           .bip44_account(AccountIndex.new(addressing.accountIndex | HARD_DERIVATION_START))
@@ -109,8 +109,8 @@ export const RustCardano: Cardano = {
         const witness = Witness.new_extended_key(rustChainSettings, privateKeyBip44, txClone.id())
         finalizer.add_witness(witness)
       },
-      addExternalWitness: ({ publicAccount, witnessIndex, witnessHex, addressType }) => {
-        const publicKey = PublicKey.from_hex(publicAccount)
+      addExternalWitness: ({ publicParentKey, witnessIndex, witnessHex, addressType }) => {
+        const publicKey = PublicKey.from_hex(publicParentKey)
         const publicKeyBip44 = Bip44AccountPublic
           .new(publicKey, DerivationScheme.v2())
           .bip44_chain(addressType === AddressType.internal)
@@ -131,15 +131,15 @@ export const RustCardano: Cardano = {
     const privateKey = Bip44RootPrivateKey.recover(entropy, passphrase)
     const bip44Account = privateKey.bip44_account(AccountIndex.new(accountIndex | HARD_DERIVATION_START))
     return {
-      privateKey: bip44Account.key().to_hex(),
-      publicKey: bip44Account.public().key().to_hex()
+      privateParentKey: bip44Account.key().to_hex(),
+      publicParentKey: bip44Account.public().key().to_hex()
     }
   },
   address: (
-    { publicAccount, index, type, accountIndex },
+    { publicParentKey, index, type, accountIndex },
     chainSettings = ChainSettings.mainnet
   ) => {
-    const pk = PublicKey.from_hex(publicAccount)
+    const pk = PublicKey.from_hex(publicParentKey)
     const bip44Account = Bip44AccountPublic.new(pk, DerivationScheme.v2())
     const rustChainSettings = getRustChainSettings(chainSettings)
     const pubKey = bip44Account
@@ -154,8 +154,8 @@ export const RustCardano: Cardano = {
       accountIndex
     }
   },
-  signMessage: ({ privateAccount, addressType, signingIndex, message }) => {
-    const pk = PrivateKey.from_hex(privateAccount)
+  signMessage: ({ privateParentKey, addressType, signingIndex, message }) => {
+    const pk = PrivateKey.from_hex(privateParentKey)
     const bip44PrivateKey = Bip44AccountPrivate.new(pk, DerivationScheme.v2())
     const privateKey = bip44PrivateKey
       .bip44_chain(addressType === AddressType.internal)

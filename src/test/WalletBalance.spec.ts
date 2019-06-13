@@ -9,7 +9,7 @@ describe('Example: Determine the balance for a PublicAccount, in Lovelace', () =
 
     const mnemonic = seed.accountMnemonics.account1
     const keyManager = InMemoryKeyManager({ mnemonic, password: '' })
-    const publicAccount = await keyManager.publicAccount()
+    const publicAccount = await keyManager.publicParentKey()
 
     const balance = await connect(mockProvider).wallet(publicAccount).balance()
     expect(balance).to.eql(200000 * 6)
@@ -20,7 +20,7 @@ describe('Example: Determine the balance for a PublicAccount, in Lovelace', () =
 
     const mnemonic = seed.accountMnemonics.account2
     const keyManager = InMemoryKeyManager({ mnemonic, password: '' })
-    const publicAccount = await keyManager.publicAccount()
+    const publicAccount = await keyManager.publicParentKey()
 
     const balance = await connect(mockProvider).wallet(publicAccount).balance()
     expect(balance).to.eql(0)

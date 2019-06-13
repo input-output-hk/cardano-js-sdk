@@ -5,8 +5,8 @@ export interface Transaction {
   toHex: () => string
   toJson: () => any
   id: () => string
-  addWitness: (args: { privateAccount: string, addressing: TransactionInput['addressing'], chainSettings?: ChainSettings }) => void
-  addExternalWitness: (args: { publicAccount: string, addressType: AddressType, witnessIndex: number, witnessHex: string }) => void
+  addWitness: (args: { privateParentKey: string, addressing: TransactionInput['addressing'], chainSettings?: ChainSettings }) => void
+  addExternalWitness: (args: { publicParentKey: string, addressType: AddressType, witnessIndex: number, witnessHex: string }) => void
   finalize: () => string
   fee: () => string
   estimateFee?: () => string
@@ -35,10 +35,10 @@ export interface Cardano {
     mnemonic: string,
     passphrase: string,
     accountIndex: number
-  ) => { privateKey: string, publicKey: string }
+  ) => { privateParentKey: string, publicParentKey: string }
   address: (
     args: {
-      publicAccount: string,
+      publicParentKey: string,
       index: number,
       type: AddressType
       accountIndex: number
@@ -47,7 +47,7 @@ export interface Cardano {
   ) => Address
   signMessage: (
     args: {
-      privateAccount: string
+      privateParentKey: string
       addressType: AddressType
       signingIndex: number
       message: string

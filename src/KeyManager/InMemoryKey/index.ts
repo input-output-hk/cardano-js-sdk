@@ -4,31 +4,31 @@ import { KeyManager } from '../KeyManager'
 import { ChainSettings, RustCardano } from '../../Cardano'
 
 export function InMemoryKeyManager (
-  { password, accountNumber, mnemonic }: {
+  { password, accountIndex, mnemonic }: {
     password: string
-    accountNumber?: number
+    accountIndex?: number
     mnemonic: string
   }, cardano = RustCardano): KeyManager {
-  if (!accountNumber) {
-    accountNumber = 0
+  if (!accountIndex) {
+    accountIndex = 0
   }
 
   const validMnemonic = validateMnemonic(mnemonic)
   if (!validMnemonic) throw new InvalidMnemonic()
 
-  const { privateKey, publicKey } = cardano.account(mnemonic, password, accountNumber)
+  const { privateParentKey, publicParentKey } = cardano.account(mnemonic, password, accountIndex)
 
   return {
     signTransaction: async (transaction, rawInputs, chainSettings = ChainSettings.mainnet) => {
       rawInputs.forEach(({ addressing }) => {
-        transaction.addWitness({ privateAccount: privateKey, addressing, chainSettings })
+        transaction.addWitness({ privateParentKey: privateParentKey, addressing, chainSettings })
       })
 
       return transaction.finalize()
     },
     signMessage: async (addressType, signingIndex, message) => {
-      return cardano.signMessage({ privateAccount: privateKey, addressType, signingIndex, message })
+      return cardano.signMessage({ privateParentKey: privateParentKey, addressType, signingIndex, message })
     },
-    publicAccount: async () => publicKey
+    publicParentKey: async () => publicParentKey
   }
 }

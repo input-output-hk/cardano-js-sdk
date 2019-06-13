@@ -16,7 +16,7 @@ describe('MemoryKeyManager', () => {
     it('exposes a Bip44 public account', () => {
       const mnemonic = generateMnemonic()
       const keyManager = InMemoryKeyManager({ mnemonic, password: 'securepassword' })
-      expect(keyManager.publicAccount).to.be.an.instanceOf(Function)
+      expect(keyManager.publicParentKey).to.be.an.instanceOf(Function)
     })
   })
 
@@ -24,7 +24,7 @@ describe('MemoryKeyManager', () => {
     it('adds witnesses to a transaction and returns the hex of the signed transaction', async () => {
       const mnemonic = 'height bubble drama century ask online stage camp point loyal hip awesome'
       const keyManager = InMemoryKeyManager({ mnemonic, password: 'securepassword' })
-      const publicAccount = await keyManager.publicAccount()
+      const publicAccount = await keyManager.publicParentKey()
 
       const { transaction, inputs } = generateTestTransaction({
         publicAccount,

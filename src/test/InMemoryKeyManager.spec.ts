@@ -12,7 +12,7 @@ describe('Example: In Memory Key Manager', () => {
     const keyManager = InMemoryKeyManager({ mnemonic, password })
 
     const { transaction, inputs } = generateTestTransaction({
-      publicAccount: (await keyManager.publicAccount()),
+      publicAccount: (await keyManager.publicParentKey()),
       lowerBoundOfAddresses: 0,
       testInputs: [{ type: AddressType.external, value: '2000000' }, { type: AddressType.external, value: '5000000' }],
       testOutputs: [{ address: 'Ae2tdPwUPEZEjJcLmvgKnuwUnfKSVuGCzRW1PqsLcWqmoGJUocBGbvWjjTx', value: '6000000' }]

@@ -10,7 +10,7 @@ describe('addressDiscovery', () => {
 
   beforeEach(async () => {
     mnemonic = generateMnemonic()
-    account = await InMemoryKeyManager({ mnemonic, password: 'foobar' }).publicAccount()
+    account = await InMemoryKeyManager({ mnemonic, password: 'foobar' }).publicParentKey()
   })
 
   it('correctly returns address indexes and address type', () => {
