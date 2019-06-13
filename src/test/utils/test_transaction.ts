@@ -49,6 +49,7 @@ export function generateTestTransaction ({
   const fee = Transaction(inputs, testOutputs).estimateFee()
 
   testOutputs[0].value = (Number(testOutputs[0].value) - Number(fee)).toString()
+
   return { transaction: Transaction(inputs, testOutputs), inputs }
 }
 

@@ -14,7 +14,7 @@ describe('Example: In Memory Key Manager', () => {
     const { transaction, inputs } = generateTestTransaction({
       publicAccount: (await keyManager.publicAccount()),
       lowerBoundOfAddresses: 0,
-      testInputs: [{ type: AddressType.external, value: '1000000' }, { type: AddressType.external, value: '5000000' }],
+      testInputs: [{ type: AddressType.external, value: '2000000' }, { type: AddressType.external, value: '5000000' }],
       testOutputs: [{ address: 'Ae2tdPwUPEZEjJcLmvgKnuwUnfKSVuGCzRW1PqsLcWqmoGJUocBGbvWjjTx', value: '6000000' }]
     })
 

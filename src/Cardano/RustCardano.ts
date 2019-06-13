@@ -102,11 +102,11 @@ export const RustCardano: Cardano = {
         const privateKey = PrivateKey.from_hex(privateAccount)
         const privateKeyBip44 = Bip44RootPrivateKey
           .new(privateKey, DerivationScheme.v2())
-          .bip44_account(AccountIndex.new(addressing.accountIndex))
+          .bip44_account(AccountIndex.new(addressing.accountIndex | HARD_DERIVATION_START))
           .bip44_chain(addressing.change === 1)
           .address_key(AddressKeyIndex.new(addressing.index))
 
-        const witness = Witness.new_extended_key(rustChainSettings, privateKeyBip44, cardanoTransaction.id())
+        const witness = Witness.new_extended_key(rustChainSettings, privateKeyBip44, txClone.id())
         finalizer.add_witness(witness)
       },
       addExternalWitness: ({ publicAccount, witnessIndex, witnessHex, addressType }) => {

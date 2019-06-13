@@ -72,14 +72,14 @@ describe('Wallet', () => {
       const internalTx = generateTestTransaction({
         publicAccount: account,
         lowerBoundOfAddresses: 0,
-        testInputs: [...Array(targetInternalAddressIndex)].map(() => ({ value: '1000000', type: AddressType.internal })),
+        testInputs: [...Array(targetInternalAddressIndex)].map(() => ({ value: '10000000', type: AddressType.internal })),
         testOutputs: internalOutputs
       })
 
       const externalTx = generateTestTransaction({
         publicAccount: account,
         lowerBoundOfAddresses: 0,
-        testInputs: [...Array(targetExternalAddressIndex)].map(() => ({ value: '1000000', type: AddressType.external })),
+        testInputs: [...Array(targetExternalAddressIndex)].map(() => ({ value: '10000000', type: AddressType.external })),
         testOutputs: externalOutputs
       })
 
@@ -115,14 +115,14 @@ describe('Wallet', () => {
       const internalTx = generateTestTransaction({
         publicAccount: account,
         lowerBoundOfAddresses: 0,
-        testInputs: [...Array(targetInternalAddressIndex)].map(() => ({ value: '1000000', type: AddressType.internal })),
+        testInputs: [...Array(targetInternalAddressIndex)].map(() => ({ value: '10000000', type: AddressType.internal })),
         testOutputs: internalOutputs
       })
 
       const externalTx = generateTestTransaction({
         publicAccount: account,
         lowerBoundOfAddresses: 0,
-        testInputs: [...Array(targetExternalAddressIndex)].map(() => ({ value: '1000000', type: AddressType.external })),
+        testInputs: [...Array(targetExternalAddressIndex)].map(() => ({ value: '10000000', type: AddressType.external })),
         testOutputs: externalOutputs
       })
 
@@ -155,14 +155,14 @@ describe('Wallet', () => {
       const internalTx = generateTestTransaction({
         publicAccount: account,
         lowerBoundOfAddresses: 0,
-        testInputs: [...Array(targetInternalAddressIndex)].map(() => ({ value: '1000000', type: AddressType.internal })),
+        testInputs: [...Array(targetInternalAddressIndex)].map(() => ({ value: '10000000', type: AddressType.internal })),
         testOutputs: internalOutputs
       })
 
       const externalTx = generateTestTransaction({
         publicAccount: account,
         lowerBoundOfAddresses: 0,
-        testInputs: [...Array(targetExternalAddressIndex)].map(() => ({ value: '1000000', type: AddressType.external })),
+        testInputs: [...Array(targetExternalAddressIndex)].map(() => ({ value: '10000000', type: AddressType.external })),
         testOutputs: externalOutputs
       })
 
