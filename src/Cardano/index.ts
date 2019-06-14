@@ -5,7 +5,6 @@ import { AddressType, Address, UtxoWithAddressing } from '../Wallet'
 import { ChainSettings } from './ChainSettings'
 import { TransactionSelection } from './TransactionSelection'
 
-export { RustCardano } from './lib/RustCardano'
 export { FeeAlgorithm }
 export { ChainSettings }
 export { TransactionSelection }

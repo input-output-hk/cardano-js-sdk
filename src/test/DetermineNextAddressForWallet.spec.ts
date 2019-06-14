@@ -4,7 +4,7 @@ import CardanoSDK from '..'
 import { mockProvider, seedMockProvider } from './utils/mock_provider'
 import { AddressType } from '../Wallet'
 import { addressDiscoveryWithinBounds } from '../Utils'
-import { RustCardano } from '../Cardano'
+import { RustCardano } from '../lib/RustCardanoPrimitives'
 
 describe('Example: Key Derivation', () => {
   let cardano: ReturnType<typeof CardanoSDK>

@@ -4,7 +4,7 @@ import { mockProvider, seedTransactionSet, seedUtxoSet, generateTestTransaction,
 import { Wallet } from './Wallet'
 import { addressDiscoveryWithinBounds, generateMnemonic } from '../Utils'
 import { InMemoryKeyManager } from '../KeyManager'
-import { RustCardano } from '../Cardano'
+import { RustCardano } from '../lib/RustCardanoPrimitives'
 
 describe('Wallet', () => {
   let account: string

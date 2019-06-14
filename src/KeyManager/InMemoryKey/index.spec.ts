@@ -1,10 +1,11 @@
 import { expect } from 'chai'
-import { RustCardano, ChainSettings } from '../../Cardano'
+import { ChainSettings } from '../../Cardano'
 import { InMemoryKeyManager } from '.'
 import { InvalidMnemonic } from '../errors'
 import { AddressType } from '../../Wallet'
 import { generateTestTransaction } from '../../test/utils/test_transaction'
 import { generateMnemonic } from '../../Utils'
+import { RustCardano } from '../../lib/RustCardanoPrimitives'
 
 describe('MemoryKeyManager', () => {
   it('throws if the mnemonic passed is invalid', () => {

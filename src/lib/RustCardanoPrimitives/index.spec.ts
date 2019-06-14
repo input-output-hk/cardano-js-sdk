@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import { InMemoryKeyManager } from '../../KeyManager'
 import { AddressType } from '../../Wallet'
-import { RustCardano } from './RustCardano'
+import { RustCardano } from '.'
 import { hexGenerator } from '../../test/utils'
 import { generateMnemonic, addressDiscoveryWithinBounds } from '../../Utils'
 

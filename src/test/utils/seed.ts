@@ -2,7 +2,7 @@ import { AddressType, Utxo } from '../../Wallet'
 import { generateTestTransaction } from './test_transaction'
 import { addressDiscoveryWithinBounds, generateMnemonic } from '../../Utils'
 import { InMemoryKeyManager } from '../../KeyManager'
-import { RustCardano } from '../../Cardano'
+import { RustCardano } from '../../lib/RustCardanoPrimitives'
 
 /*
   This seed generates the following "chain state"

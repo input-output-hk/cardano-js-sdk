@@ -1,5 +1,5 @@
-import { Cardano, FeeAlgorithm, ChainSettings, TransactionSelection } from '..'
-import { getBindingsForEnvironment } from '../../lib/bindings'
+import { Cardano, FeeAlgorithm, ChainSettings, TransactionSelection } from '../../Cardano'
+import { getBindingsForEnvironment } from '../bindings'
 import { InsufficientTransactionInput } from '../../Transaction/errors'
 import { TxInput as CardanoTxInput, Coin as CoinT, Bip44AccountPrivate } from 'cardano-wallet'
 

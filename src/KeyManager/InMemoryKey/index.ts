@@ -1,10 +1,10 @@
 import { validateMnemonic } from 'bip39'
 import { InvalidMnemonic } from '../errors'
 import { KeyManager } from '../KeyManager'
-import { ChainSettings, RustCardano } from '../../Cardano'
+import { ChainSettings, Cardano } from '../../Cardano'
 
 export function InMemoryKeyManager (
-  cardano = RustCardano,
+  cardano: Cardano,
   { password, accountIndex, mnemonic }: {
     password: string
     accountIndex?: number

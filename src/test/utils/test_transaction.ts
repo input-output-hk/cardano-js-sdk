@@ -1,7 +1,7 @@
 import { AddressType } from '../../Wallet'
 import Transaction, { TransactionInput } from '../../Transaction'
 import { addressDiscoveryWithinBounds } from '../../Utils'
-import { RustCardano } from '../../Cardano'
+import { RustCardano } from '../../lib/RustCardanoPrimitives'
 
 /**
  * generateTestTransaction is a test helper.

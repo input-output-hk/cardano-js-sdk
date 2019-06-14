@@ -5,7 +5,8 @@ import { AddressType } from '../../Wallet'
 import { UnsupportedOperation, InsufficientData } from '../errors'
 import { expect, use } from 'chai'
 import * as chaiAsPromised from 'chai-as-promised'
-import { RustCardano, ChainSettings } from '../../Cardano'
+import { ChainSettings } from '../../Cardano'
+import { RustCardano } from '../../lib/RustCardanoPrimitives'
 use(chaiAsPromised)
 
 const runLedgerSpecs = process.env.LEDGER_SPECS!! ? describe.only : describe.skip

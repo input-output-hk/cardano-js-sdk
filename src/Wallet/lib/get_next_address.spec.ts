@@ -5,8 +5,7 @@ import { InMemoryKeyManager } from '../../KeyManager'
 import { generateTestTransaction, generateTestUtxos, mockProvider, seedTransactionSet } from '../../test/utils'
 import { SCAN_GAP } from '../config'
 import { AddressType } from '..'
-
-import { RustCardano } from '../../Cardano'
+import { RustCardano } from '../../lib/RustCardanoPrimitives'
 
 describe('getNextAddressByType', () => {
   it('returns the first address index if no transactions exist for internal addresses', async () => {

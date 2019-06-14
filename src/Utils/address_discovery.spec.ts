@@ -3,7 +3,7 @@ import { InMemoryKeyManager } from '../KeyManager'
 import { generateMnemonic } from './mnemonic'
 import { AddressType } from '../Wallet'
 import { addressDiscoveryWithinBounds } from './address_discovery'
-import { RustCardano } from '../Cardano'
+import { RustCardano } from '../lib/RustCardanoPrimitives'
 
 describe('addressDiscovery', () => {
   let mnemonic: string
