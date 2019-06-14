@@ -1,20 +1,26 @@
 import { seed } from './utils/seed'
 import { expect } from 'chai'
-import { InMemoryKeyManager, connect } from '..'
+import CardanoSDK from '..'
 import { mockProvider, seedMockProvider } from './utils/mock_provider'
 import { AddressType } from '../Wallet'
 import { addressDiscoveryWithinBounds } from '../Utils'
+import { RustCardano } from '../Cardano'
 
 describe('Example: Key Derivation', () => {
+  let cardano: ReturnType<typeof CardanoSDK>
+  beforeEach(() => {
+    cardano = CardanoSDK()
+  })
+
   it('allows a user to determine their next receipt address', async () => {
     seedMockProvider(seed.utxos, seed.transactions)
 
     const mnemonic = seed.accountMnemonics.account1
-    const keyManager = InMemoryKeyManager({ mnemonic, password: '' })
+    const keyManager = cardano.InMemoryKeyManager({ mnemonic, password: '' })
     const publicAccount = await keyManager.publicParentKey()
 
-    const { address } = await connect(mockProvider).wallet(publicAccount).getNextReceivingAddress()
-    const nextAddressBasedOnSeedContext = addressDiscoveryWithinBounds({
+    const { address } = await cardano.connect(mockProvider).wallet(publicAccount).getNextReceivingAddress()
+    const nextAddressBasedOnSeedContext = addressDiscoveryWithinBounds(RustCardano, {
       account: (await keyManager.publicParentKey()),
       lowerBound: 16,
       upperBound: 16,
@@ -28,11 +34,11 @@ describe('Example: Key Derivation', () => {
     seedMockProvider(seed.utxos, seed.transactions)
 
     const mnemonic = seed.accountMnemonics.account1
-    const keyManager = InMemoryKeyManager({ mnemonic, password: '' })
+    const keyManager = cardano.InMemoryKeyManager({ mnemonic, password: '' })
     const publicAccount = await keyManager.publicParentKey()
 
-    const { address } = await connect(mockProvider).wallet(publicAccount).getNextChangeAddress()
-    const nextAddressBasedOnSeedContext = addressDiscoveryWithinBounds({
+    const { address } = await cardano.connect(mockProvider).wallet(publicAccount).getNextChangeAddress()
+    const nextAddressBasedOnSeedContext = addressDiscoveryWithinBounds(RustCardano, {
       account: publicAccount,
       lowerBound: 0,
       upperBound: 0,

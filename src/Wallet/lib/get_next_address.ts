@@ -2,9 +2,11 @@ import { Provider } from '../../Provider'
 import { AddressType, Address } from '..'
 import { SCAN_GAP } from '../config'
 import { addressDiscoveryWithinBounds } from '../../Utils'
+import { Cardano } from '../../Cardano'
 
-export function getNextAddressByType (provider: Provider, account: string, type: AddressType) {
+export function getNextAddressByType (cardano: Cardano, provider: Provider, account: string, type: AddressType) {
   return scanBip44AccountForAddressWithoutTransactions({
+    cardano,
     account,
     provider,
     lowerBound: 0,
@@ -14,6 +16,7 @@ export function getNextAddressByType (provider: Provider, account: string, type:
 }
 
 interface ScanRangeParameters {
+  cardano: Cardano
   provider: Provider
   account: string
   lowerBound: number
@@ -21,8 +24,8 @@ interface ScanRangeParameters {
   type: AddressType
 }
 
-async function scanBip44AccountForAddressWithoutTransactions ({ provider, account, lowerBound, upperBound, type }: ScanRangeParameters): Promise<Address> {
-  const addresses = addressDiscoveryWithinBounds({
+async function scanBip44AccountForAddressWithoutTransactions ({ cardano, provider, account, lowerBound, upperBound, type }: ScanRangeParameters): Promise<Address> {
+  const addresses = addressDiscoveryWithinBounds(cardano, {
     account,
     lowerBound,
     upperBound,
@@ -58,6 +61,7 @@ async function scanBip44AccountForAddressWithoutTransactions ({ provider, accoun
   // has transactions associated with it, then this range has been consumed
   if (lastAddressWithTransactionsIndex === 0) {
     return scanBip44AccountForAddressWithoutTransactions({
+      cardano,
       provider,
       account,
       lowerBound: lowerBound + SCAN_GAP,

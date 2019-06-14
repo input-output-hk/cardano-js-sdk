@@ -4,11 +4,12 @@ import { KeyManager } from '../KeyManager'
 import { ChainSettings, RustCardano } from '../../Cardano'
 
 export function InMemoryKeyManager (
+  cardano = RustCardano,
   { password, accountIndex, mnemonic }: {
     password: string
     accountIndex?: number
     mnemonic: string
-  }, cardano = RustCardano): KeyManager {
+  }): KeyManager {
   if (!accountIndex) {
     accountIndex = 0
   }

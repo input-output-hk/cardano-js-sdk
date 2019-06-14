@@ -1,16 +1,16 @@
 import { expect } from 'chai'
-import { InMemoryKeyManager } from '../KeyManager'
-import { AddressType } from '../Wallet'
+import { InMemoryKeyManager } from '../../KeyManager'
+import { AddressType } from '../../Wallet'
 import { RustCardano } from './RustCardano'
-import { Utils } from '..'
-import { hexGenerator } from '../test/utils'
+import { hexGenerator } from '../../test/utils'
+import { generateMnemonic, addressDiscoveryWithinBounds } from '../../Utils'
 
 describe('RustCardano', () => {
   describe('verifyMessage', () => {
     it('returns true when verifying a correct signature for a message', async () => {
       const message = 'foobar'
       const mnemonic = 'height bubble drama century ask online stage camp point loyal hip awesome'
-      const keyManager = InMemoryKeyManager({ mnemonic, password: 'securepassword' })
+      const keyManager = InMemoryKeyManager(RustCardano, { mnemonic, password: 'securepassword' })
       const { signature, publicKey } = await keyManager.signMessage(AddressType.external, 0, message)
 
       const verification = RustCardano.verifyMessage({
@@ -25,7 +25,7 @@ describe('RustCardano', () => {
     it('returns false when verifying an incorrect message for a valid signature', async () => {
       const message = 'foobar'
       const mnemonic = 'height bubble drama century ask online stage camp point loyal hip awesome'
-      const keyManager = InMemoryKeyManager({ mnemonic, password: 'securepassword' })
+      const keyManager = InMemoryKeyManager(RustCardano, { mnemonic, password: 'securepassword' })
       const { signature, publicKey } = await keyManager.signMessage(AddressType.external, 0, message)
 
       const verification = RustCardano.verifyMessage({
@@ -39,9 +39,9 @@ describe('RustCardano', () => {
   })
   describe('inputSelection', () => {
     it('throws if there is insufficient inputs to cover the payment cost', async () => {
-      const mnemonic = Utils.generateMnemonic()
-      const account = await InMemoryKeyManager({ password: '', mnemonic }).publicParentKey()
-      const [address1, address2, address3, changeAddress] = Utils.addressDiscoveryWithinBounds({
+      const mnemonic = generateMnemonic()
+      const account = await InMemoryKeyManager(RustCardano, { password: '', mnemonic }).publicParentKey()
+      const [address1, address2, address3, changeAddress] = addressDiscoveryWithinBounds(RustCardano, {
         account,
         type: AddressType.internal,
         lowerBound: 0,
@@ -62,9 +62,9 @@ describe('RustCardano', () => {
 
     describe('FirstMatchFirst', () => {
       it('selects valid UTXOs and produces change', async () => {
-        const mnemonic = Utils.generateMnemonic()
-        const account = await InMemoryKeyManager({ password: '', mnemonic }).publicParentKey()
-        const [address1, address2, address3, address4, address5, change] = Utils.addressDiscoveryWithinBounds({
+        const mnemonic = generateMnemonic()
+        const account = await InMemoryKeyManager(RustCardano, { password: '', mnemonic }).publicParentKey()
+        const [address1, address2, address3, address4, address5, change] = addressDiscoveryWithinBounds(RustCardano, {
           account,
           type: AddressType.internal,
           lowerBound: 0,

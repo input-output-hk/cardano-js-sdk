@@ -1,7 +1,8 @@
-import { Utils, InMemoryKeyManager } from '../..'
 import { AddressType, Utxo } from '../../Wallet'
 import { generateTestTransaction } from './test_transaction'
-import { addressDiscoveryWithinBounds } from '../../Utils'
+import { addressDiscoveryWithinBounds, generateMnemonic } from '../../Utils'
+import { InMemoryKeyManager } from '../../KeyManager'
+import { RustCardano } from '../../Cardano'
 
 /*
   This seed generates the following "chain state"
@@ -18,14 +19,14 @@ import { addressDiscoveryWithinBounds } from '../../Utils'
   - No UTXOs
 */
 export async function generateSeed () {
-  const mnemonic1 = Utils.generateMnemonic()
-  const mnemonic2 = Utils.generateMnemonic()
-  const mnemonic3 = Utils.generateMnemonic()
+  const mnemonic1 = generateMnemonic()
+  const mnemonic2 = generateMnemonic()
+  const mnemonic3 = generateMnemonic()
 
-  const account1 = await InMemoryKeyManager({ password: '', mnemonic: mnemonic1 }).publicParentKey()
-  const account2 = await InMemoryKeyManager({ password: '', mnemonic: mnemonic2 }).publicParentKey()
+  const account1 = await InMemoryKeyManager(RustCardano, { password: '', mnemonic: mnemonic1 }).publicParentKey()
+  const account2 = await InMemoryKeyManager(RustCardano, { password: '', mnemonic: mnemonic2 }).publicParentKey()
 
-  const account2Addresses = addressDiscoveryWithinBounds({
+  const account2Addresses = addressDiscoveryWithinBounds(RustCardano, {
     account: account2,
     lowerBound: 0,
     upperBound: 39,

@@ -1,15 +1,20 @@
 import { AddressType } from '../Wallet'
-import { RustCardano } from '../Cardano'
-import { ChainSettings } from '../Cardano/Primitives'
+import { Cardano, ChainSettings } from '../Cardano'
+
+export interface AddressDiscoveryArgs {
+  type: AddressType
+  account: string
+  lowerBound: number
+  upperBound: number
+  accountIndex?: number
+}
 
 /** BIP44 specifies that discovery should occur for an address type in batches of 20, until no balances exist */
-export function addressDiscoveryWithinBounds ({ type, account, lowerBound, upperBound, accountIndex }: {
-  type: AddressType,
-  account: string,
-  lowerBound: number,
-  upperBound: number
-  accountIndex?: number,
-}, chainSettings = ChainSettings.mainnet, cardano = RustCardano) {
+export function addressDiscoveryWithinBounds (
+  cardano: Cardano,
+  { type, account, lowerBound, upperBound, accountIndex }: AddressDiscoveryArgs,
+  chainSettings = ChainSettings.mainnet
+) {
   if (!accountIndex) {
     accountIndex = 0
   }

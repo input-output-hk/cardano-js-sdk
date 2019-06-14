@@ -1,11 +1,36 @@
-import { Cardano, FeeAlgorithm, ChainSettings, TransactionSelection } from './Primitives'
-import { getBindingsForEnvironment } from '../lib/bindings'
-import { InsufficientTransactionInput } from '../Transaction/errors'
+import { Cardano, FeeAlgorithm, ChainSettings, TransactionSelection } from '..'
+import { getBindingsForEnvironment } from '../../lib/bindings'
+import { InsufficientTransactionInput } from '../../Transaction/errors'
 import { TxInput as CardanoTxInput, Coin as CoinT, Bip44AccountPrivate } from 'cardano-wallet'
 
-import { AddressType, UtxoWithAddressing } from '../Wallet'
-import { TransactionOutput, TransactionInput } from '../Transaction'
-const { Transaction, OutputPolicy, InputSelectionBuilder, TxInput, Address, Signature, TransactionSignature, Entropy, Bip44RootPrivateKey, PrivateKey, AccountIndex, AddressKeyIndex, BlockchainSettings, Bip44AccountPublic, PublicKey, TransactionBuilder, TxoPointer, Coin, TxOut, LinearFeeAlgorithm, TransactionFinalized, DerivationScheme, Witness, TransactionId } = getBindingsForEnvironment()
+import { AddressType, UtxoWithAddressing } from '../../Wallet'
+import { TransactionOutput, TransactionInput } from '../../Transaction'
+const {
+  Transaction,
+  OutputPolicy,
+  InputSelectionBuilder,
+  TxInput,
+  Address,
+  Signature,
+  TransactionSignature,
+  Entropy,
+  Bip44RootPrivateKey,
+  PrivateKey,
+  AccountIndex,
+  AddressKeyIndex,
+  BlockchainSettings,
+  Bip44AccountPublic,
+  PublicKey,
+  TransactionBuilder,
+  TxoPointer,
+  Coin,
+  TxOut,
+  LinearFeeAlgorithm,
+  TransactionFinalized,
+  DerivationScheme,
+  Witness,
+  TransactionId
+} = getBindingsForEnvironment()
 
 const HARD_DERIVATION_START = 0x80000000
 

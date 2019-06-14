@@ -1,2 +1,2 @@
 export { generateMnemonic } from './mnemonic'
-export { addressDiscoveryWithinBounds } from './address_discovery'
+export { addressDiscoveryWithinBounds, AddressDiscoveryArgs } from './address_discovery'

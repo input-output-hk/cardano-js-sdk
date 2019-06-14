@@ -1,6 +1,7 @@
 import { AddressType } from '../../Wallet'
 import Transaction, { TransactionInput } from '../../Transaction'
 import { addressDiscoveryWithinBounds } from '../../Utils'
+import { RustCardano } from '../../Cardano'
 
 /**
  * generateTestTransaction is a test helper.
@@ -19,14 +20,14 @@ export function generateTestTransaction ({
   testOutputs: { address: string, value: string }[],
   inputId?: string
 }) {
-  const receiptAddresses = addressDiscoveryWithinBounds({
+  const receiptAddresses = addressDiscoveryWithinBounds(RustCardano, {
     account: publicAccount,
     type: AddressType.external,
     lowerBound: lowerBoundOfAddresses,
     upperBound: lowerBoundOfAddresses + testInputs.length
   })
 
-  const changeAddresses = addressDiscoveryWithinBounds({
+  const changeAddresses = addressDiscoveryWithinBounds(RustCardano, {
     account: publicAccount,
     type: AddressType.internal,
     lowerBound: lowerBoundOfAddresses,
@@ -46,11 +47,11 @@ export function generateTestTransaction ({
     }
   })
 
-  const fee = Transaction(inputs, testOutputs).estimateFee()
+  const fee = Transaction(RustCardano, inputs, testOutputs).estimateFee()
 
   testOutputs[0].value = (Number(testOutputs[0].value) - Number(fee)).toString()
 
-  return { transaction: Transaction(inputs, testOutputs), inputs }
+  return { transaction: Transaction(RustCardano, inputs, testOutputs), inputs }
 }
 
 /** Test helper only */
