@@ -19,8 +19,8 @@ runLedgerSpecs('LedgerKeyManager', async function () {
     manager = await LedgerKeyManager(0)
   })
 
-  describe('publicAccount', () => {
-    it('exposes a Bip44 public account', async () => {
+  describe('publicParentKey', () => {
+    it('exposes a Bip44 public parent key', async () => {
       const pk = await manager.publicParentKey()
       const address = RustCardano.address({ publicParentKey: pk, index: 0, type: AddressType.external, accountIndex: 0 })
 

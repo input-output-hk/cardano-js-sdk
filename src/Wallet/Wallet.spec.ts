@@ -20,7 +20,7 @@ describe('Wallet', () => {
       wallet = Wallet(RustCardano, mockProvider)(account)
     })
 
-    it('returns the next change address for a new BIP44 public account', async () => {
+    it('returns the next change address for a new BIP44 account', async () => {
       const firstInternalAddress = addressDiscoveryWithinBounds(RustCardano, {
         account,
         type: AddressType.internal,
@@ -45,7 +45,7 @@ describe('Wallet', () => {
       wallet = Wallet(RustCardano, mockProvider)(account)
     })
 
-    it('returns the next receiving address for a new BIP44 public account', async () => {
+    it('returns the next receiving address for a new BIP44 account', async () => {
       const firstExternalAddress = addressDiscoveryWithinBounds(RustCardano, {
         account,
         type: AddressType.external,
@@ -97,7 +97,7 @@ describe('Wallet', () => {
       wallet = Wallet(RustCardano, mockProvider)(account)
     })
 
-    it('determines the balance for a BIP44 public account with UTXOs', async () => {
+    it('determines the balance for a BIP44 account with UTXOs', async () => {
       const balance = await wallet.balance()
       expect(balance).to.eql(3000)
     })
@@ -135,7 +135,7 @@ describe('Wallet', () => {
       wallet = Wallet(RustCardano, mockProvider)(account)
     })
 
-    it('returns a list of transactions for a BIP44 public account with associated transactions', async () => {
+    it('returns a list of transactions for a BIP44 account with associated transactions', async () => {
       const transactions = await wallet.transactions()
       expect(transactions.length).to.eql(2)
     })
@@ -180,7 +180,7 @@ describe('Wallet', () => {
       wallet = Wallet(RustCardano, mockProvider)(account)
     })
 
-    it('selects inputs from the UTXO set available for the BIP44 public account', async () => {
+    it('selects inputs from the UTXO set available for the BIP44 account', async () => {
       const testOutput = [{ address: internalOutputs[4].address, value: '1000' }]
 
       const { inputs, changeOutput } = await wallet.selectInputsForTransaction(testOutput)

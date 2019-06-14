@@ -22,8 +22,8 @@ The below examples are implemented as integration tests, they should be very eas
 
 - [Generate a keypair in memory from a BIP39 mnemonic](src/test/MemoryKeyManager.spec.ts)
 - [Message signatures](src/test/SignAndVerify.spec.ts)
-- [Get the wallet balance for a BIP44 Public Account](src/test/WalletBalance.spec.ts)
-- [Determine the next change and receipt addresses for a BIP44 Public Account](src/test/DetermineNextAddressForWallet.spec.ts)
+- [Get the wallet balance for a BIP44 Account](src/test/WalletBalance.spec.ts)
+- [Determine the next change and receipt addresses for a BIP44 Account](src/test/DetermineNextAddressForWallet.spec.ts)
 - [Transaction input selection](src/test/SelectInputsForTransaction.spec.ts)
 
 ## Tests

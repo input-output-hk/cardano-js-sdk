@@ -13,8 +13,8 @@ describe('MemoryKeyManager', () => {
     expect(() => InMemoryKeyManager(RustCardano, { mnemonic: invalidMnemonic, password: 'xx' })).to.throw(InvalidMnemonic)
   })
 
-  describe('publicAccount', () => {
-    it('exposes a Bip44 public account', () => {
+  describe('publicParentKey', () => {
+    it('exposes a Bip44 public parent key', () => {
       const mnemonic = generateMnemonic()
       const keyManager = InMemoryKeyManager(RustCardano, { mnemonic, password: 'securepassword' })
       expect(keyManager.publicParentKey).to.be.an.instanceOf(Function)
