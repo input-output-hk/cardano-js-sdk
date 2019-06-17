@@ -1,5 +1,5 @@
 import { LedgerKeyManager } from '.'
-import { KeyManager } from '../../KeyManager/KeyManager'
+import { KeyManager } from '../../KeyManager'
 import { generateTestTransaction, generateTestUtxos } from '../../test/utils'
 import { AddressType } from '../../Wallet'
 import { UnsupportedOperation, InsufficientData } from '../../KeyManager/errors'

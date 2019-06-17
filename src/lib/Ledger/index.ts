@@ -1,7 +1,6 @@
 import { getLedgerTransportForEnvironment } from '../bindings'
-import { KeyManager } from '../../KeyManager/KeyManager'
+import { KeyManager, UnsupportedOperation, InsufficientData } from '../../KeyManager'
 import { TransactionOutput } from '../../Transaction'
-import { UnsupportedOperation, InsufficientData } from '../../KeyManager/errors'
 import { ChainSettings } from '../../Cardano'
 import { AddressType } from '../../Wallet'
 
