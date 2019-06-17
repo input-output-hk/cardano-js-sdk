@@ -1,9 +1,8 @@
 import { expect } from 'chai'
-import { InMemoryKeyManager } from '../KeyManager'
 import { generateMnemonic } from './mnemonic'
 import { AddressType } from '../Wallet'
 import { addressDiscoveryWithinBounds } from './address_discovery'
-import { RustCardano } from '../lib/RustCardanoPrimitives'
+import { InMemoryKeyManager, RustCardano } from '../lib'
 import { ChainSettings } from '../Cardano'
 
 describe('addressDiscovery', () => {

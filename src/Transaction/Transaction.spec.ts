@@ -2,7 +2,7 @@ import { expect } from 'chai'
 import Transaction, { TransactionInput, TransactionOutput } from './'
 import { InsufficientTransactionInput } from './errors'
 import { EmptyArray } from '../lib/validator/errors'
-import { RustCardano } from '../lib/RustCardanoPrimitives'
+import { RustCardano } from '../lib'
 
 describe('Transaction', () => {
   it('throws if inputs are invalid', () => {

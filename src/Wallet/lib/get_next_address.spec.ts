@@ -1,11 +1,10 @@
 import { expect } from 'chai'
 import { getNextAddressByType } from './get_next_address'
 import { generateMnemonic, addressDiscoveryWithinBounds } from '../../Utils'
-import { InMemoryKeyManager } from '../../KeyManager'
 import { generateTestTransaction, generateTestUtxos, mockProvider, seedTransactionSet } from '../../test/utils'
 import { SCAN_GAP } from '../config'
 import { AddressType } from '..'
-import { RustCardano } from '../../lib/RustCardanoPrimitives'
+import { InMemoryKeyManager, RustCardano } from '../../lib'
 import { ChainSettings } from '../../Cardano'
 
 describe('getNextAddressByType', () => {

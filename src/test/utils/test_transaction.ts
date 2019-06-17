@@ -1,7 +1,7 @@
 import { AddressType } from '../../Wallet'
 import Transaction, { TransactionInput } from '../../Transaction'
 import { addressDiscoveryWithinBounds } from '../../Utils'
-import { RustCardano } from '../../lib/RustCardanoPrimitives'
+import { RustCardano } from '../../lib'
 import { ChainSettings } from '../../Cardano'
 
 /**

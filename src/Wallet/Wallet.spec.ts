@@ -3,8 +3,7 @@ import { AddressType, Utxo } from '.'
 import { mockProvider, seedTransactionSet, seedUtxoSet, generateTestTransaction, generateTestUtxos } from '../test/utils'
 import { Wallet } from './Wallet'
 import { addressDiscoveryWithinBounds, generateMnemonic } from '../Utils'
-import { InMemoryKeyManager } from '../KeyManager'
-import { RustCardano } from '../lib/RustCardanoPrimitives'
+import { InMemoryKeyManager, RustCardano } from '../lib'
 import { ChainSettings } from '../Cardano'
 
 describe('Wallet', () => {

@@ -1,11 +1,10 @@
 import { expect } from 'chai'
-import { InMemoryKeyManager } from '../../KeyManager'
 import { generateMnemonic } from '../../Utils'
 import { SCAN_GAP } from '../config'
 import { generateTestTransaction, mockProvider, seedTransactionSet, generateTestUtxos } from '../../test/utils'
 import { deriveAddressSet } from '.'
 import { AddressType } from '..'
-import { RustCardano } from '../../lib/RustCardanoPrimitives'
+import { RustCardano, InMemoryKeyManager } from '../../lib'
 
 describe('deriveAddressSet', () => {
   it('combines external and internal addresses up to the end of each range', async () => {

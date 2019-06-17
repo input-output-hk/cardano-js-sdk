@@ -1,6 +1,5 @@
 import { validateMnemonic } from 'bip39'
-import { InvalidMnemonic } from '../errors'
-import { KeyManager } from '../KeyManager'
+import { KeyManager, InvalidMnemonic } from '../../KeyManager'
 import { ChainSettings, Cardano } from '../../Cardano'
 
 export function InMemoryKeyManager (

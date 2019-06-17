@@ -4,7 +4,7 @@ import CardanoSDK from '..'
 import { mockProvider, seedMockProvider } from './utils/mock_provider'
 import { AddressType } from '../Wallet'
 import { addressDiscoveryWithinBounds } from '../Utils'
-import { RustCardano } from '../lib/RustCardanoPrimitives'
+import { RustCardano } from '../lib'
 import { ChainSettings } from '../Cardano'
 
 describe('Example: Key Derivation', () => {

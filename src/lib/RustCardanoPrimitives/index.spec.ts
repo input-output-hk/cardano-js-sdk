@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { InMemoryKeyManager } from '../../KeyManager'
+import { InMemoryKeyManager } from '../../lib'
 import { AddressType } from '../../Wallet'
 import { RustCardano } from '.'
 import { hexGenerator } from '../../test/utils'
