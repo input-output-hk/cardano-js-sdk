@@ -1,1 +1,2 @@
-export { InMemoryKeyManager } from './InMemoryKey'
+export { KeyManager } from './KeyManager'
+export * from './errors'

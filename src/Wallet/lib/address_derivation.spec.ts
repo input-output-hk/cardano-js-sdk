@@ -1,21 +1,22 @@
 import { expect } from 'chai'
-import { Utils, InMemoryKeyManager } from '../..'
+import { generateMnemonic } from '../../Utils'
 import { SCAN_GAP } from '../config'
 import { generateTestTransaction, mockProvider, seedTransactionSet, generateTestUtxos } from '../../test/utils'
 import { deriveAddressSet } from '.'
 import { AddressType } from '..'
+import { RustCardano, InMemoryKeyManager } from '../../lib'
 
 describe('deriveAddressSet', () => {
   it('combines external and internal addresses up to the end of each range', async () => {
-    const mnemonic = Utils.generateMnemonic()
-    const account = await InMemoryKeyManager({ password: '', mnemonic }).publicAccount()
+    const mnemonic = generateMnemonic()
+    const account = await InMemoryKeyManager(RustCardano, { password: '', mnemonic }).publicParentKey()
     const targetInternalAddressIndex = SCAN_GAP - 5
     const targetExternalAddressIndex = (SCAN_GAP * 2) + 3
     const targetTotalAddresses = targetExternalAddressIndex + targetInternalAddressIndex + (SCAN_GAP * 2)
 
     const internalOutputs = generateTestUtxos({ lowerBound: 0, upperBound: targetInternalAddressIndex, account, type: AddressType.internal, value: '1000000' })
     const internalTx = generateTestTransaction({
-      publicAccount: account,
+      account,
       lowerBoundOfAddresses: 0,
       testInputs: [{ type: AddressType.external, value: '6000000000' }],
       testOutputs: internalOutputs
@@ -23,7 +24,7 @@ describe('deriveAddressSet', () => {
 
     const externalOutputs = generateTestUtxos({ lowerBound: 0, upperBound: targetExternalAddressIndex, account, type: AddressType.external, value: '1000000' })
     const externalTx = generateTestTransaction({
-      publicAccount: account,
+      account,
       lowerBoundOfAddresses: 0,
       testInputs: [{ type: AddressType.external, value: '6000000000' }],
       testOutputs: externalOutputs
@@ -34,7 +35,7 @@ describe('deriveAddressSet', () => {
       { inputs: externalTx.inputs, outputs: internalOutputs }
     ])
 
-    const derivedAddressSet = await deriveAddressSet(mockProvider, account)
+    const derivedAddressSet = await deriveAddressSet(RustCardano, mockProvider, account)
     expect(derivedAddressSet.length).to.eql(targetTotalAddresses)
   })
 })

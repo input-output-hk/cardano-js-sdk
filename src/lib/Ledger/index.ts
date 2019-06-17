@@ -1,36 +1,35 @@
-import { getLedgerTransportForEnvironment, getBindingsForEnvironment } from '../../lib/bindings'
-import { KeyManager } from '../KeyManager'
+import { getLedgerTransportForEnvironment } from '../bindings'
+import { KeyManager, UnsupportedOperation, InsufficientData } from '../../KeyManager'
 import { TransactionOutput } from '../../Transaction'
-import { UnsupportedOperation, InsufficientData } from '../errors'
+import { ChainSettings } from '../../Cardano'
+import { AddressType } from '../../Wallet'
 
 const { default: Ledger, utils } = require('@cardano-foundation/ledgerjs-hw-app-cardano')
-const { AddressKeyIndex, DerivationScheme, Bip44AccountPublic, PublicKey, BlockchainSettings, TransactionFinalized, TransactionSignature, Witness, Transaction } = getBindingsForEnvironment()
 
 async function connectToLedger () {
   const transport = await getLedgerTransportForEnvironment().create()
   return new Ledger(transport)
 }
 
-export async function LedgerKeyManager (accountIndex = 0, publicKey?: string): Promise<KeyManager> {
+export async function LedgerKeyManager (accountIndex = 0, publicParentKey?: string): Promise<KeyManager> {
   const ledger = await connectToLedger()
 
   async function deriveBip44Account () {
-    if (!publicKey) {
+    if (!publicParentKey) {
       const { publicKeyHex, chainCodeHex } = await ledger.getExtendedPublicKey([
         utils.HARDENED + 44,
         utils.HARDENED + 1815,
         utils.HARDENED + accountIndex
       ])
 
-      publicKey = `${publicKeyHex}${chainCodeHex}`
+      publicParentKey = `${publicKeyHex}${chainCodeHex}`
     }
 
-    const wasmPublicKey = PublicKey.from_hex(publicKey)
-    return Bip44AccountPublic.new(wasmPublicKey, DerivationScheme.v2())
+    return publicParentKey
   }
 
   return {
-    signTransaction: async (transaction, rawInputs, _chainSettings = BlockchainSettings.mainnet(), transactionsAsProofForSpending) => {
+    signTransaction: async (transaction, rawInputs, _chainSettings = ChainSettings.mainnet, transactionsAsProofForSpending) => {
       const transactionJson = transaction.toJson()
 
       for (const txInput of rawInputs) {
@@ -53,29 +52,22 @@ export async function LedgerKeyManager (accountIndex = 0, publicKey?: string): P
       })
 
       const ledgerSignedTransaction = await ledger.signTransaction(inputs, outputs)
-      const bip44AccountPublic = await deriveBip44Account()
-
-      const tx = Transaction.from_json(transactionJson)
-      const transactionFinalizer = new TransactionFinalized(tx)
+      const publicParentKey = await deriveBip44Account()
 
       ledgerSignedTransaction.witnesses.forEach((ledgerWitness: any) => {
-        const pubKey = bip44AccountPublic
-          .bip44_chain(ledgerWitness.path[3] === 1)
-          .address_key(AddressKeyIndex.new(ledgerWitness.path[4]))
-
-        const txSignature = TransactionSignature.from_hex(
-          ledgerWitness.witnessSignatureHex
-        )
-
-        const witness = Witness.from_external(pubKey, txSignature)
-        transactionFinalizer.add_witness(witness)
+        transaction.addExternalWitness({
+          addressType: ledgerWitness.path[3] === 1 ? AddressType.internal : AddressType.external,
+          witnessIndex: ledgerWitness.path[4],
+          publicParentKey,
+          witnessHex: ledgerWitness.witnessSignatureHex
+        })
       })
 
-      return transactionFinalizer.finalize().to_hex()
+      return transaction.finalize()
     },
     signMessage: async () => {
       throw new UnsupportedOperation('Ledger signMessage')
     },
-    publicAccount: () => deriveBip44Account()
+    publicParentKey: () => deriveBip44Account()
   }
 }

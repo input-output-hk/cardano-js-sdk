@@ -1,11 +1,12 @@
 import { Provider } from '../../Provider'
-import { Bip44AccountPublic } from 'cardano-wallet'
 import { AddressType, Address } from '..'
 import { SCAN_GAP } from '../config'
 import { addressDiscoveryWithinBounds } from '../../Utils'
+import { Cardano, ChainSettings } from '../../Cardano'
 
-export function getNextAddressByType (provider: Provider, account: Bip44AccountPublic, type: AddressType) {
+export function getNextAddressByType (cardano: Cardano, provider: Provider, account: string, type: AddressType) {
   return scanBip44AccountForAddressWithoutTransactions({
+    cardano,
     account,
     provider,
     lowerBound: 0,
@@ -15,20 +16,21 @@ export function getNextAddressByType (provider: Provider, account: Bip44AccountP
 }
 
 interface ScanRangeParameters {
+  cardano: Cardano
   provider: Provider
-  account: Bip44AccountPublic
+  account: string
   lowerBound: number
   upperBound: number
   type: AddressType
 }
 
-async function scanBip44AccountForAddressWithoutTransactions ({ provider, account, lowerBound, upperBound, type }: ScanRangeParameters): Promise<Address> {
-  const addresses = addressDiscoveryWithinBounds({
+async function scanBip44AccountForAddressWithoutTransactions ({ cardano, provider, account, lowerBound, upperBound, type }: ScanRangeParameters): Promise<Address> {
+  const addresses = addressDiscoveryWithinBounds(cardano, {
     account,
     lowerBound,
     upperBound,
     type
-  })
+  }, ChainSettings.mainnet)
 
   const transactions = await provider.queryTransactionsByAddress(addresses.map(a => a.address))
 
@@ -59,6 +61,7 @@ async function scanBip44AccountForAddressWithoutTransactions ({ provider, accoun
   // has transactions associated with it, then this range has been consumed
   if (lastAddressWithTransactionsIndex === 0) {
     return scanBip44AccountForAddressWithoutTransactions({
+      cardano,
       provider,
       account,
       lowerBound: lowerBound + SCAN_GAP,
