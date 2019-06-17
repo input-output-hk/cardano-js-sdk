@@ -13,7 +13,7 @@ export interface AddressDiscoveryArgs {
 export function addressDiscoveryWithinBounds (
   cardano: Cardano,
   { type, account, lowerBound, upperBound, accountIndex }: AddressDiscoveryArgs,
-  chainSettings = ChainSettings.mainnet
+  chainSettings: ChainSettings
 ) {
   if (!accountIndex) {
     accountIndex = 0

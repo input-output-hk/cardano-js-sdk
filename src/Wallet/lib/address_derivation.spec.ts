@@ -17,7 +17,7 @@ describe('deriveAddressSet', () => {
 
     const internalOutputs = generateTestUtxos({ lowerBound: 0, upperBound: targetInternalAddressIndex, account, type: AddressType.internal, value: '1000000' })
     const internalTx = generateTestTransaction({
-      publicAccount: account,
+      account,
       lowerBoundOfAddresses: 0,
       testInputs: [{ type: AddressType.external, value: '6000000000' }],
       testOutputs: internalOutputs
@@ -25,7 +25,7 @@ describe('deriveAddressSet', () => {
 
     const externalOutputs = generateTestUtxos({ lowerBound: 0, upperBound: targetExternalAddressIndex, account, type: AddressType.external, value: '1000000' })
     const externalTx = generateTestTransaction({
-      publicAccount: account,
+      account,
       lowerBoundOfAddresses: 0,
       testInputs: [{ type: AddressType.external, value: '6000000000' }],
       testOutputs: externalOutputs

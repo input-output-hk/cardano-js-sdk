@@ -2,37 +2,38 @@ import { AddressType } from '../../Wallet'
 import Transaction, { TransactionInput } from '../../Transaction'
 import { addressDiscoveryWithinBounds } from '../../Utils'
 import { RustCardano } from '../../lib/RustCardanoPrimitives'
+import { ChainSettings } from '../../Cardano'
 
 /**
  * generateTestTransaction is a test helper.
  * It can be used to make relatively realistic transactions that can be used for transaction testing or seeding a mock provider.
 */
 export function generateTestTransaction ({
-  publicAccount,
+  account,
   testInputs,
   lowerBoundOfAddresses,
   testOutputs,
   inputId
 }: {
-  publicAccount: string,
+  account: string,
   testInputs: { value: string, type: AddressType }[],
   lowerBoundOfAddresses: number,
   testOutputs: { address: string, value: string }[],
   inputId?: string
 }) {
   const receiptAddresses = addressDiscoveryWithinBounds(RustCardano, {
-    account: publicAccount,
+    account,
     type: AddressType.external,
     lowerBound: lowerBoundOfAddresses,
     upperBound: lowerBoundOfAddresses + testInputs.length
-  })
+  }, ChainSettings.mainnet)
 
   const changeAddresses = addressDiscoveryWithinBounds(RustCardano, {
-    account: publicAccount,
+    account,
     type: AddressType.internal,
     lowerBound: lowerBoundOfAddresses,
     upperBound: lowerBoundOfAddresses + testInputs.length
-  })
+  }, ChainSettings.mainnet)
 
   const inputs: TransactionInput[] = testInputs.map(({ value }, index) => {
     const { address, index: addressIndex } = testInputs[index].type === AddressType.external

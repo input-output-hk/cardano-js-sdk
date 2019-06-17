@@ -3,6 +3,7 @@ import { generateTestTransaction } from './test_transaction'
 import { addressDiscoveryWithinBounds, generateMnemonic } from '../../Utils'
 import { InMemoryKeyManager } from '../../KeyManager'
 import { RustCardano } from '../../lib/RustCardanoPrimitives'
+import { ChainSettings } from '../../Cardano'
 
 /*
   This seed generates the following "chain state"
@@ -31,10 +32,10 @@ export async function generateSeed () {
     lowerBound: 0,
     upperBound: 39,
     type: AddressType.external
-  })
+  }, ChainSettings.mainnet)
 
   const tx1 = generateTestTransaction({
-    publicAccount: account1,
+    account: account1,
     testInputs: [
       { type: AddressType.external, value: '1000000' },
       { type: AddressType.external, value: '2000000' },
@@ -51,7 +52,7 @@ export async function generateSeed () {
   })
 
   const tx2 = generateTestTransaction({
-    publicAccount: account1,
+    account: account1,
     testInputs: [
       { type: AddressType.external, value: '1000000' },
       { type: AddressType.external, value: '2000000' },

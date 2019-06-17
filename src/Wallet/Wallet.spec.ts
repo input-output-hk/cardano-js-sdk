@@ -5,6 +5,7 @@ import { Wallet } from './Wallet'
 import { addressDiscoveryWithinBounds, generateMnemonic } from '../Utils'
 import { InMemoryKeyManager } from '../KeyManager'
 import { RustCardano } from '../lib/RustCardanoPrimitives'
+import { ChainSettings } from '../Cardano'
 
 describe('Wallet', () => {
   let account: string
@@ -26,7 +27,7 @@ describe('Wallet', () => {
         type: AddressType.internal,
         lowerBound: 0,
         upperBound: 0
-      })[0].address
+      }, ChainSettings.mainnet)[0].address
 
       const nextReceivingAddress = await wallet.getNextChangeAddress()
       expect(nextReceivingAddress.address).to.eql(firstInternalAddress)
@@ -51,7 +52,7 @@ describe('Wallet', () => {
         type: AddressType.external,
         lowerBound: 0,
         upperBound: 0
-      })[0].address
+      }, ChainSettings.mainnet)[0].address
 
       const nextReceivingAddress = await wallet.getNextReceivingAddress()
       expect(nextReceivingAddress.address).to.eql(firstExternalAddress)
@@ -71,14 +72,14 @@ describe('Wallet', () => {
       const externalOutputs = generateTestUtxos({ lowerBound: 0, upperBound: targetExternalAddressIndex, account, type: AddressType.external, value: '1000000' })
 
       const internalTx = generateTestTransaction({
-        publicAccount: account,
+        account,
         lowerBoundOfAddresses: 0,
         testInputs: [...Array(targetInternalAddressIndex)].map(() => ({ value: '10000000', type: AddressType.internal })),
         testOutputs: internalOutputs
       })
 
       const externalTx = generateTestTransaction({
-        publicAccount: account,
+        account,
         lowerBoundOfAddresses: 0,
         testInputs: [...Array(targetExternalAddressIndex)].map(() => ({ value: '10000000', type: AddressType.external })),
         testOutputs: externalOutputs
@@ -114,14 +115,14 @@ describe('Wallet', () => {
       const externalOutputs = generateTestUtxos({ lowerBound: 0, upperBound: targetExternalAddressIndex, account, type: AddressType.external, value: '1000000' })
 
       const internalTx = generateTestTransaction({
-        publicAccount: account,
+        account,
         lowerBoundOfAddresses: 0,
         testInputs: [...Array(targetInternalAddressIndex)].map(() => ({ value: '10000000', type: AddressType.internal })),
         testOutputs: internalOutputs
       })
 
       const externalTx = generateTestTransaction({
-        publicAccount: account,
+        account,
         lowerBoundOfAddresses: 0,
         testInputs: [...Array(targetExternalAddressIndex)].map(() => ({ value: '10000000', type: AddressType.external })),
         testOutputs: externalOutputs
@@ -154,14 +155,14 @@ describe('Wallet', () => {
       const externalOutputs = generateTestUtxos({ lowerBound: 0, upperBound: targetExternalAddressIndex, account, type: AddressType.external, value: '1000000' })
 
       const internalTx = generateTestTransaction({
-        publicAccount: account,
+        account,
         lowerBoundOfAddresses: 0,
         testInputs: [...Array(targetInternalAddressIndex)].map(() => ({ value: '10000000', type: AddressType.internal })),
         testOutputs: internalOutputs
       })
 
       const externalTx = generateTestTransaction({
-        publicAccount: account,
+        account,
         lowerBoundOfAddresses: 0,
         testInputs: [...Array(targetExternalAddressIndex)].map(() => ({ value: '10000000', type: AddressType.external })),
         testOutputs: externalOutputs

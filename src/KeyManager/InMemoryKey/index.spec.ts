@@ -14,7 +14,7 @@ describe('MemoryKeyManager', () => {
   })
 
   describe('publicParentKey', () => {
-    it('exposes a Bip44 public parent key', () => {
+    it('exposes the Bip44 public parent key', () => {
       const mnemonic = generateMnemonic()
       const keyManager = InMemoryKeyManager(RustCardano, { mnemonic, password: 'securepassword' })
       expect(keyManager.publicParentKey).to.be.an.instanceOf(Function)
@@ -25,10 +25,10 @@ describe('MemoryKeyManager', () => {
     it('adds witnesses to a transaction and returns the hex of the signed transaction', async () => {
       const mnemonic = 'height bubble drama century ask online stage camp point loyal hip awesome'
       const keyManager = InMemoryKeyManager(RustCardano, { mnemonic, password: 'securepassword' })
-      const publicAccount = await keyManager.publicParentKey()
+      const account = await keyManager.publicParentKey()
 
       const { transaction, inputs } = generateTestTransaction({
-        publicAccount,
+        account,
         lowerBoundOfAddresses: 0,
         testInputs: [{ type: AddressType.external, value: '2000000' }, { type: AddressType.external, value: '5000000' }],
         testOutputs: [{ address: 'Ae2tdPwUPEZEjJcLmvgKnuwUnfKSVuGCzRW1PqsLcWqmoGJUocBGbvWjjTx', value: '6000000' }]

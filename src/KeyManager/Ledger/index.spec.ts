@@ -20,7 +20,7 @@ runLedgerSpecs('LedgerKeyManager', async function () {
   })
 
   describe('publicParentKey', () => {
-    it('exposes a Bip44 public parent key', async () => {
+    it('exposes the Bip44 public parent key', async () => {
       const pk = await manager.publicParentKey()
       const address = RustCardano.address({ publicParentKey: pk, index: 0, type: AddressType.external, accountIndex: 0 })
 
@@ -41,14 +41,14 @@ runLedgerSpecs('LedgerKeyManager', async function () {
       const outputs = generateTestUtxos({ lowerBound: 0, upperBound: 5, account, type: AddressType.internal, value: '1000000' })
 
       const { transaction } = generateTestTransaction({
-        publicAccount: account,
+        account,
         lowerBoundOfAddresses: 0,
         testInputs: [{ value: '1000000000', type: AddressType.internal }],
         testOutputs: outputs
       })
 
       const spendingTransaction = generateTestTransaction({
-        publicAccount: account,
+        account,
         lowerBoundOfAddresses: 0,
         testInputs: [{ value: '1000000', type: AddressType.external }],
         testOutputs: [{ value: '900000', address: 'Ae2tdPwUPEZEjJcLmvgKnuwUnfKSVuGCzRW1PqsLcWqmoGJUocBGbvWjjTx' }],
@@ -64,7 +64,7 @@ runLedgerSpecs('LedgerKeyManager', async function () {
       const outputs = generateTestUtxos({ lowerBound: 0, upperBound: 5, account, type: AddressType.internal, value: '1000000' })
 
       const { transaction } = generateTestTransaction({
-        publicAccount: account,
+        account,
         lowerBoundOfAddresses: 0,
         testInputs: [{ value: '1000000000', type: AddressType.internal }],
         testOutputs: outputs
@@ -75,7 +75,7 @@ runLedgerSpecs('LedgerKeyManager', async function () {
       }
 
       const spendingTransaction = generateTestTransaction({
-        publicAccount: account,
+        account,
         lowerBoundOfAddresses: 0,
         testInputs: [{ value: '1000000', type: AddressType.external }],
         testOutputs: [{ value: '900000', address: 'Ae2tdPwUPEZEjJcLmvgKnuwUnfKSVuGCzRW1PqsLcWqmoGJUocBGbvWjjTx' }],

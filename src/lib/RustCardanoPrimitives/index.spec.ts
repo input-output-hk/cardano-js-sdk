@@ -4,6 +4,7 @@ import { AddressType } from '../../Wallet'
 import { RustCardano } from '.'
 import { hexGenerator } from '../../test/utils'
 import { generateMnemonic, addressDiscoveryWithinBounds } from '../../Utils'
+import { ChainSettings } from '../../Cardano'
 
 describe('RustCardano', () => {
   describe('verifyMessage', () => {
@@ -46,7 +47,7 @@ describe('RustCardano', () => {
         type: AddressType.internal,
         lowerBound: 0,
         upperBound: 5
-      })
+      }, ChainSettings.mainnet)
 
       const utxosWithAddressing = [
         { address: address1.address, value: '1000', id: hexGenerator(64), index: 0, addressing: { index: 0, change: 0, accountIndex: 0 } },
@@ -69,7 +70,7 @@ describe('RustCardano', () => {
           type: AddressType.internal,
           lowerBound: 0,
           upperBound: 5
-        })
+        }, ChainSettings.mainnet)
 
         // Any combination of these inputs will always produce change
         const utxosWithAddressing = [

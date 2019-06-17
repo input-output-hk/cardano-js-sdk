@@ -6,6 +6,7 @@ import { generateTestTransaction, generateTestUtxos, mockProvider, seedTransacti
 import { SCAN_GAP } from '../config'
 import { AddressType } from '..'
 import { RustCardano } from '../../lib/RustCardanoPrimitives'
+import { ChainSettings } from '../../Cardano'
 
 describe('getNextAddressByType', () => {
   it('returns the first address index if no transactions exist for internal addresses', async () => {
@@ -18,7 +19,7 @@ describe('getNextAddressByType', () => {
       type: AddressType.internal,
       lowerBound: 0,
       upperBound: 0
-    })[0].address
+    }, ChainSettings.mainnet)[0].address
 
     const nextChangeAddress = await getNextAddressByType(RustCardano, mockProvider, account, AddressType.internal)
     expect(nextChangeAddress.address).to.eql(firstInternalAddress)
@@ -33,7 +34,7 @@ describe('getNextAddressByType', () => {
     const outputs = generateTestUtxos({ lowerBound: 0, upperBound: targetAddressIndex, account, type: AddressType.internal, value: '1000000' })
 
     const { inputs } = generateTestTransaction({
-      publicAccount: account,
+      account,
       lowerBoundOfAddresses: 0,
       testInputs: [{ value: '1000000000', type: AddressType.internal }],
       testOutputs: outputs
@@ -53,7 +54,7 @@ describe('getNextAddressByType', () => {
     const outputs = generateTestUtxos({ lowerBound: 0, upperBound: targetAddressIndex, account, type: AddressType.internal, value: '1000000' })
 
     const { inputs } = generateTestTransaction({
-      publicAccount: account,
+      account,
       lowerBoundOfAddresses: 0,
       testInputs: [{ value: '1000000000', type: AddressType.internal }],
       testOutputs: outputs
@@ -76,7 +77,7 @@ describe('getNextAddressByType', () => {
       type: AddressType.external,
       lowerBound: 0,
       upperBound: 0
-    })[0].address
+    }, ChainSettings.mainnet)[0].address
 
     const nextChangeAddress = await getNextAddressByType(RustCardano, mockProvider, account, AddressType.external)
     expect(nextChangeAddress.address).to.eql(firstInternalAddress)
@@ -91,7 +92,7 @@ describe('getNextAddressByType', () => {
     const outputs = generateTestUtxos({ lowerBound: 0, upperBound: targetAddressIndex, account, type: AddressType.external, value: '1000000' })
 
     const { inputs } = generateTestTransaction({
-      publicAccount: account,
+      account,
       lowerBoundOfAddresses: 0,
       testInputs: [{ value: '1000000000', type: AddressType.internal }],
       testOutputs: outputs
@@ -111,7 +112,7 @@ describe('getNextAddressByType', () => {
     const outputs = generateTestUtxos({ lowerBound: 0, upperBound: targetAddressIndex, account, type: AddressType.external, value: '1000000' })
 
     const { inputs } = generateTestTransaction({
-      publicAccount: account,
+      account,
       lowerBoundOfAddresses: 0,
       testInputs: [{ value: '1000000000', type: AddressType.internal }],
       testOutputs: outputs

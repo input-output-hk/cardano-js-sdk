@@ -2,7 +2,7 @@ import { Provider } from '../../Provider'
 import { AddressType, Address } from '..'
 import { SCAN_GAP } from '../config'
 import { addressDiscoveryWithinBounds } from '../../Utils'
-import { Cardano } from '../../Cardano'
+import { Cardano, ChainSettings } from '../../Cardano'
 
 export function getNextAddressByType (cardano: Cardano, provider: Provider, account: string, type: AddressType) {
   return scanBip44AccountForAddressWithoutTransactions({
@@ -30,7 +30,7 @@ async function scanBip44AccountForAddressWithoutTransactions ({ cardano, provide
     lowerBound,
     upperBound,
     type
-  })
+  }, ChainSettings.mainnet)
 
   const transactions = await provider.queryTransactionsByAddress(addresses.map(a => a.address))
 

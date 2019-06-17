@@ -5,6 +5,7 @@ import { mockProvider, seedMockProvider } from './utils/mock_provider'
 import { AddressType } from '../Wallet'
 import { addressDiscoveryWithinBounds } from '../Utils'
 import { RustCardano } from '../lib/RustCardanoPrimitives'
+import { ChainSettings } from '../Cardano'
 
 describe('Example: Key Derivation', () => {
   let cardano: ReturnType<typeof CardanoSDK>
@@ -25,7 +26,7 @@ describe('Example: Key Derivation', () => {
       lowerBound: 16,
       upperBound: 16,
       type: AddressType.external
-    })[0].address
+    }, ChainSettings.mainnet)[0].address
 
     expect(nextAddressBasedOnSeedContext).to.eql(address)
   })
@@ -43,7 +44,7 @@ describe('Example: Key Derivation', () => {
       lowerBound: 0,
       upperBound: 0,
       type: AddressType.internal
-    })[0].address
+    }, ChainSettings.mainnet)[0].address
 
     expect(nextAddressBasedOnSeedContext).to.eql(address)
   })
