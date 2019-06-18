@@ -6,7 +6,7 @@ JavaScript SDK for interacting with Cardano, providing various key management op
 
 ## Project State: Alpha
 
-This SDK is a work in progress and should not be used in production.
+This SDK is a work in progress and should not be used in production. The initial _provider_ and Cardano _primitive_ implementations are in the base package at this stage, but the intention is to publish separate packages to allow for composition into a clean an minimal bundle.
 
 ### Feature progress
 
