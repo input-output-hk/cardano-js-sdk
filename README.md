@@ -1,11 +1,12 @@
 # Cardano JS SDK
 JavaScript SDK for interacting with Cardano, providing various key management options including support for popular hardware wallets. The library supports multiple Cardano APIs by establishing a [_Provider_](src/Provider/Provider.ts) interface. This is beneficial for both development workflow and production scenarios, as application logic does not become coupled to any one implementation.
 
+ - [Style Guide](docs/style_guide.md)
  - [More documentation](docs)
 
 ## Project State: Alpha
 
-This SDK is a work in progress and should not be used in production.
+This SDK is a work in progress and should not be used in production. The initial _provider_ and Cardano _primitive_ implementations are in the base package at this stage, but the intention is to publish separate packages to allow for composition into a clean and minimal bundle.
 
 ### Feature progress
 
