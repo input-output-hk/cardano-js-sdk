@@ -1,2 +1,4 @@
-export { HttpProvider } from './HttpProvider'
-export { Provider, QueryUtxosByAddress, QueryTransactionsByAddress, SubmitTransaction } from './Provider'
+export { Provider } from './Provider'
+export { CardanoProvider, QueryUtxosByAddress, QueryTransactionsByAddress, SubmitTransaction } from './CardanoProvider'
+export { ProviderType } from './ProviderType'
+export { WalletProvider } from './WalletProvider'
