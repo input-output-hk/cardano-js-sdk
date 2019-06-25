@@ -1,4 +1,4 @@
-import { CardanoProvider } from '../../Provider'
+import { CardanoProvider, ProviderType } from '../../Provider'
 import { TransactionInput, TransactionOutput } from '../../Transaction'
 import { Utxo } from '../../Wallet'
 
@@ -18,6 +18,7 @@ export function seedMockProvider (utxos: Utxo[], transactions: { id: string, inp
 }
 
 export const mockProvider: CardanoProvider = {
+  type: ProviderType.client,
   submitTransaction: (_signedTransaction) => Promise.resolve(true),
   queryUtxosByAddress: (addresses) => Promise.resolve(mockUtxoSet.filter(({ address }) => addresses.includes(address))),
   queryTransactionsByAddress: (addresses) => {

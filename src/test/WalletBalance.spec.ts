@@ -16,7 +16,7 @@ describe('Example: Determine the balance for a PublicAccount, in Lovelace', () =
     const keyManager = cardano.InMemoryKeyManager({ mnemonic, password: '' })
     const publicAccount = await keyManager.publicParentKey()
 
-    const balance = await cardano.connect(mockProvider).wallet(publicAccount).balance()
+    const balance = await cardano.connect(mockProvider).wallet({ publicParentKey: publicAccount }).balance()
     expect(balance).to.eql(200000 * 6)
   })
 
@@ -27,7 +27,7 @@ describe('Example: Determine the balance for a PublicAccount, in Lovelace', () =
     const keyManager = cardano.InMemoryKeyManager({ mnemonic, password: '' })
     const publicAccount = await keyManager.publicParentKey()
 
-    const balance = await cardano.connect(mockProvider).wallet(publicAccount).balance()
+    const balance = await cardano.connect(mockProvider).wallet({ publicParentKey: publicAccount }).balance()
     expect(balance).to.eql(0)
   })
 })

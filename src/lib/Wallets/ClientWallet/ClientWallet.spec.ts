@@ -7,22 +7,22 @@ import { InMemoryKeyManager, RustCardano } from '../..'
 import { ChainSettings } from '../../../Cardano'
 
 describe('Wallet', () => {
-  let parentPublicKey: string
+  let publicParentKey: string
   let wallet: ReturnType<ReturnType<typeof Wallet>>
 
   describe('getNextChangeAddress', () => {
     beforeEach(async () => {
       const mnemonic = generateMnemonic()
-      parentPublicKey = await InMemoryKeyManager(RustCardano, { password: '', mnemonic }).publicParentKey()
+      publicParentKey = await InMemoryKeyManager(RustCardano, { password: '', mnemonic }).publicParentKey()
 
       seedTransactionSet([])
 
-      wallet = Wallet(RustCardano, mockProvider)({ parentPublicKey })
+      wallet = Wallet(RustCardano, mockProvider)({ publicParentKey })
     })
 
     it('returns the next change address for a new BIP44 account', async () => {
       const firstInternalAddress = addressDiscoveryWithinBounds(RustCardano, {
-        account: parentPublicKey,
+        account: publicParentKey,
         type: AddressType.internal,
         lowerBound: 0,
         upperBound: 0
@@ -38,16 +38,16 @@ describe('Wallet', () => {
   describe('getNextReceivingAddress', async () => {
     beforeEach(async () => {
       const mnemonic = generateMnemonic()
-      parentPublicKey = await InMemoryKeyManager(RustCardano, { password: '', mnemonic }).publicParentKey()
+      publicParentKey = await InMemoryKeyManager(RustCardano, { password: '', mnemonic }).publicParentKey()
 
       seedTransactionSet([])
 
-      wallet = Wallet(RustCardano, mockProvider)({ parentPublicKey })
+      wallet = Wallet(RustCardano, mockProvider)({ publicParentKey })
     })
 
     it('returns the next receiving address for a new BIP44 account', async () => {
       const firstExternalAddress = addressDiscoveryWithinBounds(RustCardano, {
-        account: parentPublicKey,
+        account: publicParentKey,
         type: AddressType.external,
         lowerBound: 0,
         upperBound: 0
@@ -63,30 +63,30 @@ describe('Wallet', () => {
   describe('balance', async () => {
     beforeEach(async () => {
       const mnemonic = generateMnemonic()
-      parentPublicKey = await InMemoryKeyManager(RustCardano, { password: '', mnemonic }).publicParentKey()
+      publicParentKey = await InMemoryKeyManager(RustCardano, { password: '', mnemonic }).publicParentKey()
       const targetInternalAddressIndex = 5
       const targetExternalAddressIndex = 5
 
-      const internalOutputs = generateTestUtxos({ lowerBound: 0, upperBound: targetInternalAddressIndex, account: parentPublicKey, type: AddressType.internal, value: '1000000' })
-      const externalOutputs = generateTestUtxos({ lowerBound: 0, upperBound: targetExternalAddressIndex, account: parentPublicKey, type: AddressType.external, value: '1000000' })
+      const internalOutputs = generateTestUtxos({ lowerBound: 0, upperBound: targetInternalAddressIndex, account: publicParentKey, type: AddressType.internal, value: '1000000' })
+      const externalOutputs = generateTestUtxos({ lowerBound: 0, upperBound: targetExternalAddressIndex, account: publicParentKey, type: AddressType.external, value: '1000000' })
 
       const internalTx = generateTestTransaction({
-        account: parentPublicKey,
+        account: publicParentKey,
         lowerBoundOfAddresses: 0,
         testInputs: [...Array(targetInternalAddressIndex)].map(() => ({ value: '10000000', type: AddressType.internal })),
         testOutputs: internalOutputs
       })
 
       const externalTx = generateTestTransaction({
-        account: parentPublicKey,
+        account: publicParentKey,
         lowerBoundOfAddresses: 0,
         testInputs: [...Array(targetExternalAddressIndex)].map(() => ({ value: '10000000', type: AddressType.external })),
         testOutputs: externalOutputs
       })
 
       seedTransactionSet([
-        { inputs: internalTx.inputs, outputs: internalOutputs },
-        { inputs: externalTx.inputs, outputs: externalOutputs }
+        { id: internalTx.transaction.id(), inputs: internalTx.inputs, outputs: internalOutputs },
+        { id: externalTx.transaction.id(), inputs: externalTx.inputs, outputs: externalOutputs }
       ])
 
       seedUtxoSet([
@@ -94,7 +94,7 @@ describe('Wallet', () => {
         { address: externalOutputs[0].address, id: internalTx.inputs[0].pointer.id, index: internalTx.inputs[0].pointer.index, value: '2000' }
       ])
 
-      wallet = Wallet(RustCardano, mockProvider)({ parentPublicKey })
+      wallet = Wallet(RustCardano, mockProvider)({ publicParentKey })
     })
 
     it('determines the balance for a BIP44 account with UTXOs', async () => {
@@ -106,33 +106,33 @@ describe('Wallet', () => {
   describe('transaction', () => {
     beforeEach(async () => {
       const mnemonic = generateMnemonic()
-      parentPublicKey = await InMemoryKeyManager(RustCardano, { password: '', mnemonic }).publicParentKey()
+      publicParentKey = await InMemoryKeyManager(RustCardano, { password: '', mnemonic }).publicParentKey()
       const targetInternalAddressIndex = 5
       const targetExternalAddressIndex = 5
 
-      const internalOutputs = generateTestUtxos({ lowerBound: 0, upperBound: targetInternalAddressIndex, account: parentPublicKey, type: AddressType.internal, value: '1000000' })
-      const externalOutputs = generateTestUtxos({ lowerBound: 0, upperBound: targetExternalAddressIndex, account: parentPublicKey, type: AddressType.external, value: '1000000' })
+      const internalOutputs = generateTestUtxos({ lowerBound: 0, upperBound: targetInternalAddressIndex, account: publicParentKey, type: AddressType.internal, value: '1000000' })
+      const externalOutputs = generateTestUtxos({ lowerBound: 0, upperBound: targetExternalAddressIndex, account: publicParentKey, type: AddressType.external, value: '1000000' })
 
       const internalTx = generateTestTransaction({
-        account: parentPublicKey,
+        account: publicParentKey,
         lowerBoundOfAddresses: 0,
         testInputs: [...Array(targetInternalAddressIndex)].map(() => ({ value: '10000000', type: AddressType.internal })),
         testOutputs: internalOutputs
       })
 
       const externalTx = generateTestTransaction({
-        account: parentPublicKey,
+        account: publicParentKey,
         lowerBoundOfAddresses: 0,
         testInputs: [...Array(targetExternalAddressIndex)].map(() => ({ value: '10000000', type: AddressType.external })),
         testOutputs: externalOutputs
       })
 
       seedTransactionSet([
-        { inputs: internalTx.inputs, outputs: internalOutputs },
-        { inputs: externalTx.inputs, outputs: externalOutputs }
+        { id: internalTx.transaction.id(), inputs: internalTx.inputs, outputs: internalOutputs },
+        { id: externalTx.transaction.id(), inputs: externalTx.inputs, outputs: externalOutputs }
       ])
 
-      wallet = Wallet(RustCardano, mockProvider)({ parentPublicKey })
+      wallet = Wallet(RustCardano, mockProvider)({ publicParentKey })
     })
 
     it('returns a list of transactions for a BIP44 account with associated transactions', async () => {
@@ -146,30 +146,30 @@ describe('Wallet', () => {
 
     beforeEach(async () => {
       const mnemonic = generateMnemonic()
-      parentPublicKey = await InMemoryKeyManager(RustCardano, { password: '', mnemonic }).publicParentKey()
+      publicParentKey = await InMemoryKeyManager(RustCardano, { password: '', mnemonic }).publicParentKey()
       const targetInternalAddressIndex = 5
       const targetExternalAddressIndex = 5
 
-      internalOutputs = generateTestUtxos({ lowerBound: 0, upperBound: targetInternalAddressIndex, account: parentPublicKey, type: AddressType.internal, value: '1000000' })
-      const externalOutputs = generateTestUtxos({ lowerBound: 0, upperBound: targetExternalAddressIndex, account: parentPublicKey, type: AddressType.external, value: '1000000' })
+      internalOutputs = generateTestUtxos({ lowerBound: 0, upperBound: targetInternalAddressIndex, account: publicParentKey, type: AddressType.internal, value: '1000000' })
+      const externalOutputs = generateTestUtxos({ lowerBound: 0, upperBound: targetExternalAddressIndex, account: publicParentKey, type: AddressType.external, value: '1000000' })
 
       const internalTx = generateTestTransaction({
-        account: parentPublicKey,
+        account: publicParentKey,
         lowerBoundOfAddresses: 0,
         testInputs: [...Array(targetInternalAddressIndex)].map(() => ({ value: '10000000', type: AddressType.internal })),
         testOutputs: internalOutputs
       })
 
       const externalTx = generateTestTransaction({
-        account: parentPublicKey,
+        account: publicParentKey,
         lowerBoundOfAddresses: 0,
         testInputs: [...Array(targetExternalAddressIndex)].map(() => ({ value: '10000000', type: AddressType.external })),
         testOutputs: externalOutputs
       })
 
       seedTransactionSet([
-        { inputs: internalTx.inputs, outputs: internalOutputs },
-        { inputs: externalTx.inputs, outputs: externalOutputs }
+        { id: internalTx.transaction.id(), inputs: internalTx.inputs, outputs: internalOutputs },
+        { id: externalTx.transaction.id(), inputs: externalTx.inputs, outputs: externalOutputs }
       ])
 
       seedUtxoSet([
@@ -177,7 +177,7 @@ describe('Wallet', () => {
         { address: externalOutputs[0].address, id: internalTx.inputs[1].pointer.id, index: internalTx.inputs[0].pointer.index, value: '500000' }
       ])
 
-      wallet = Wallet(RustCardano, mockProvider)({ parentPublicKey })
+      wallet = Wallet(RustCardano, mockProvider)({ publicParentKey })
     })
 
     it('selects inputs from the UTXO set available for the BIP44 account', async () => {

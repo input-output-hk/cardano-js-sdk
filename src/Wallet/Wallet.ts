@@ -14,16 +14,16 @@ export interface WalletInstance {
   createAndSignTransaction: (payments: RemotePayment[], passphrase: string) => Promise<{ id: string, inputs: TransactionInput[], outputs: TransactionOutput[] }>
 }
 
-type WalletConstructor = (walletInstanceArgs: { parentPublicKey?: string, walletId?: string }) => WalletInstance
+type WalletConstructor = (walletInstanceArgs: { publicParentKey?: string, walletId?: string }) => WalletInstance
 
 export function Wallet (cardano: Cardano, provider: Provider): WalletConstructor {
   if (provider.type === ProviderType.client) {
-    return ({ parentPublicKey }) => {
-      if (!parentPublicKey) {
+    return ({ publicParentKey }) => {
+      if (!publicParentKey) {
         throw new Error('The client wallet implementation requires access to the parent public key from a local key chain.')
       }
 
-      return ClientWallet(cardano, <CardanoProvider>provider, parentPublicKey)
+      return ClientWallet(cardano, <CardanoProvider>provider, publicParentKey)
     }
   } else {
     return ({ walletId }) => {

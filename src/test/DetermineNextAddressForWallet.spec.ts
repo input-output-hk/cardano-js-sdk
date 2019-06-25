@@ -20,7 +20,7 @@ describe('Example: Key Derivation', () => {
     const keyManager = cardano.InMemoryKeyManager({ mnemonic, password: '' })
     const publicAccount = await keyManager.publicParentKey()
 
-    const { address } = await cardano.connect(mockProvider).wallet(publicAccount).getNextReceivingAddress()
+    const { address } = await cardano.connect(mockProvider).wallet({ publicParentKey: publicAccount }).getNextReceivingAddress()
     const nextAddressBasedOnSeedContext = addressDiscoveryWithinBounds(RustCardano, {
       account: (await keyManager.publicParentKey()),
       lowerBound: 16,
@@ -38,7 +38,7 @@ describe('Example: Key Derivation', () => {
     const keyManager = cardano.InMemoryKeyManager({ mnemonic, password: '' })
     const publicAccount = await keyManager.publicParentKey()
 
-    const { address } = await cardano.connect(mockProvider).wallet(publicAccount).getNextChangeAddress()
+    const { address } = await cardano.connect(mockProvider).wallet({ publicParentKey: publicAccount }).getNextChangeAddress()
     const nextAddressBasedOnSeedContext = addressDiscoveryWithinBounds(RustCardano, {
       account: publicAccount,
       lowerBound: 0,

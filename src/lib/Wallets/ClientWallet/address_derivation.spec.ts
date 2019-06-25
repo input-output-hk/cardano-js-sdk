@@ -31,8 +31,8 @@ describe('deriveAddressSet', () => {
     })
 
     seedTransactionSet([
-      { inputs: internalTx.inputs, outputs: externalOutputs },
-      { inputs: externalTx.inputs, outputs: internalOutputs }
+      { id: internalTx.transaction.id(), inputs: internalTx.inputs, outputs: externalOutputs },
+      { id: externalTx.transaction.id(), inputs: externalTx.inputs, outputs: internalOutputs }
     ])
 
     const derivedAddressSet = await deriveAddressSet(RustCardano, mockProvider, account)
