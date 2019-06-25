@@ -1,6 +1,6 @@
 import { CardanoProvider } from '../../Provider'
 
-export function ClientHttpProvider(_uri: string): CardanoProvider {
+export function ClientHttpProvider (_uri: string): CardanoProvider {
   // To be implemented by: https://github.com/input-output-hk/cardano-js-sdk/issues/4
   // This will likely convert this interface to interact with Jormangandr and remove the any
   // type casting

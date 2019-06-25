@@ -1,6 +1,12 @@
 # Cardano JS SDK
 JavaScript SDK for interacting with Cardano, providing various key management options including support for popular hardware wallets. The library supports multiple Cardano APIs by establishing a [_Provider_](src/Provider/Provider.ts) interface. This is beneficial for both development workflow and production scenarios, as application logic does not become coupled to any one implementation.
 
+There are two _provider_ types, and it is important to understand the difference when using the SDK. We have defined the _CardanoProvider_ and _WalletProvider_.
+
+To satisfy the _CardanoProvider_ interface, the _provider_ must be able to supply a complete, queryable interface into the chain state. Any address should be queryable for both historic transactions and current UTXOs. When interfacing with a _CardanoProvider_, we use the _ClientWallet_ implementation to satisfy wallet behaviour. 
+
+A _WalletProvider_ satisfies a smaller interface than _CardanoProvider_. The _WalletProvider_ maintains historic chain state only for address sets derived from known parent public keys, which are stored server side. When interfacing with a _WalletProvider_, we use the _RemoteWallet_ implementation to satisfy wallet behaviour, which is in most cases a simple mapping directly to the _WalletProvider_.
+
  - [Style Guide](docs/style_guide.md)
  - [More documentation](docs)
 

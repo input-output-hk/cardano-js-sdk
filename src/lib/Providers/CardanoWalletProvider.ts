@@ -1,12 +1,8 @@
 import { WalletProvider } from '../../Provider'
 import axios from 'axios'
+import { RemotePayment } from '../../Wallet'
 
-interface Payment {
-  address: string
-  value: string
-}
-
-export function CardanoWalletProvider(uri: string): WalletProvider {
+export function CardanoWalletProvider (uri: string): WalletProvider {
   return {
     wallets: async () => {
       const { data } = await axios.get(`${uri}/v2/wallets`)
@@ -40,7 +36,7 @@ export function CardanoWalletProvider(uri: string): WalletProvider {
 
       return data
     },
-    createTransaction: async (walletId: number, payments: Payment[], passphrase: string) => {
+    createTransaction: async (walletId: number, payments: RemotePayment[], passphrase: string) => {
       const mappedPayments = payments.map(payment => {
         return {
           address: payment.address,

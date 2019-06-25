@@ -1,10 +1,10 @@
 import { expect } from 'chai'
-import { AddressType, Utxo } from '.'
-import { mockProvider, seedTransactionSet, seedUtxoSet, generateTestTransaction, generateTestUtxos } from '../test/utils'
-import { Wallet } from './Wallet'
-import { addressDiscoveryWithinBounds, generateMnemonic } from '../Utils'
-import { InMemoryKeyManager, RustCardano } from '../lib'
-import { ChainSettings } from '../Cardano'
+import { AddressType, Utxo } from '../../Wallet'
+import { mockProvider, seedTransactionSet, seedUtxoSet, generateTestTransaction, generateTestUtxos } from '../../test/utils'
+import { Wallet } from '../../Wallet/Wallet'
+import { addressDiscoveryWithinBounds, generateMnemonic } from '../../Utils'
+import { InMemoryKeyManager, RustCardano } from '..'
+import { ChainSettings } from '../../Cardano'
 
 describe('Wallet', () => {
   let account: string

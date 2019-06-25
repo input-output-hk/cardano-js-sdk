@@ -1,3 +1,5 @@
 export { InMemoryKeyManager } from './InMemoryKey'
 export { LedgerKeyManager } from './Ledger'
 export { RustCardano } from './RustCardanoPrimitives'
+export { ClientWallet } from './ClientWallet'
+export { RemoteWallet } from './RemoteWallet'

@@ -1,11 +1,11 @@
-import { AddressType } from '..'
-import { Provider } from '../../Provider'
-import { getNextAddressByType } from '.'
-import { SCAN_GAP } from '../config'
+import { AddressType } from '../../Wallet'
+import { CardanoProvider } from '../../Provider'
+import { getNextAddressByType } from '../../Wallet/lib'
+import { SCAN_GAP } from '../../Wallet/config'
 import { addressDiscoveryWithinBounds } from '../../Utils'
 import { Cardano, ChainSettings } from '../../Cardano'
 
-export async function deriveAddressSet (cardano: Cardano, provider: Provider, account: string) {
+export async function deriveAddressSet (cardano: Cardano, provider: CardanoProvider, account: string) {
   const nextReceivingAddress = await getNextAddressByType(cardano, provider, account, AddressType.external)
   const nextChangeAddress = await getNextAddressByType(cardano, provider, account, AddressType.internal)
 
