@@ -1,9 +1,9 @@
-import { Cardano, FeeAlgorithm } from '../../Cardano'
-import { CardanoProvider } from '../../Provider'
+import { Cardano, FeeAlgorithm } from '../../../Cardano'
+import { CardanoProvider } from '../../../Provider'
 import { getNextAddressByType } from './get_next_address'
 import { deriveAddressSet } from './address_derivation'
-import { AddressType, UtxoWithAddressing, WalletInstance } from '../../Wallet'
-import { TransactionOutput } from '../../Transaction'
+import { AddressType, UtxoWithAddressing, WalletInstance } from '../../../Wallet'
+import { TransactionOutput } from '../../../Transaction'
 
 export function ClientWallet (cardano: Cardano, cardanoProvider: CardanoProvider, account: string): WalletInstance {
   return {

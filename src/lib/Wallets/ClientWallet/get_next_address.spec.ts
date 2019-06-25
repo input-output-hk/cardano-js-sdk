@@ -1,11 +1,11 @@
 import { expect } from 'chai'
 import { getNextAddressByType } from './get_next_address'
-import { generateMnemonic, addressDiscoveryWithinBounds } from '../../Utils'
-import { generateTestTransaction, generateTestUtxos, mockProvider, seedTransactionSet } from '../../test/utils'
-import { SCAN_GAP } from '../../Wallet/config'
-import { AddressType } from '../../Wallet'
-import { InMemoryKeyManager, RustCardano } from '..'
-import { ChainSettings } from '../../Cardano'
+import { generateMnemonic, addressDiscoveryWithinBounds } from '../../../Utils'
+import { generateTestTransaction, generateTestUtxos, mockProvider, seedTransactionSet } from '../../../test/utils'
+import { SCAN_GAP } from './config'
+import { AddressType } from '../../../Wallet'
+import { InMemoryKeyManager, RustCardano } from '../..'
+import { ChainSettings } from '../../../Cardano'
 
 describe('getNextAddressByType', () => {
   it('returns the first address index if no transactions exist for internal addresses', async () => {

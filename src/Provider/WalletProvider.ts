@@ -1,8 +1,15 @@
 import { BaseProvider } from './BaseProvider'
+import { RemotePayment, RemoteWallet, RemoteTransaction } from '../Remote'
 
 export interface WalletProvider extends BaseProvider {
-  wallets: Function
-  createWallet: Function
-  transactions: Function
-  createTransaction: Function
+  wallets: () => Promise<RemoteWallet[]>
+  createWallet: (createWalletArgs: {
+    name: string
+    mnemonic: string
+    mnemonicSecondFactor?: string
+    passphrase: string
+  }) => Promise<RemoteWallet>
+  getWallet: (walletId: string) => Promise<RemoteWallet>
+  transactions: (walletId: string, startDate?: string, endDate?: string) => Promise<RemoteTransaction[]>
+  createTransaction: (walletId: string, payments: RemotePayment[], passphrase: string) => Promise<RemoteTransaction>
 }

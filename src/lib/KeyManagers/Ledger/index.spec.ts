@@ -1,12 +1,12 @@
 import { LedgerKeyManager } from '.'
-import { KeyManager } from '../../KeyManager'
-import { generateTestTransaction, generateTestUtxos } from '../../test/utils'
-import { AddressType } from '../../Wallet'
-import { UnsupportedOperation, InsufficientData } from '../../KeyManager/errors'
+import { KeyManager } from '../../../KeyManager'
+import { generateTestTransaction, generateTestUtxos } from '../../../test/utils'
+import { AddressType } from '../../../Wallet'
+import { UnsupportedOperation, InsufficientData } from '../../../KeyManager/errors'
 import { expect, use } from 'chai'
 import * as chaiAsPromised from 'chai-as-promised'
-import { ChainSettings } from '../../Cardano'
-import { RustCardano } from '../RustCardanoPrimitives'
+import { ChainSettings } from '../../../Cardano'
+import { RustCardano } from '../../Primitives/RustCardanoPrimitives'
 use(chaiAsPromised)
 
 const runLedgerSpecs = process.env.LEDGER_SPECS!! ? describe.only : describe.skip

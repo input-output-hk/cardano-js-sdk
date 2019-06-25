@@ -1,17 +1,17 @@
 import { WalletProvider } from '../../Provider'
 import axios from 'axios'
-import { RemotePayment } from '../../Wallet'
+import { RemotePayment, RemoteTransaction, RemoteWallet } from '../../Remote'
 
 export function CardanoWalletProvider (uri: string): WalletProvider {
   return {
     wallets: async () => {
       const { data } = await axios.get(`${uri}/v2/wallets`)
-      return data
+      return data as RemoteWallet[]
     },
     createWallet: async ({ name, mnemonic, mnemonicSecondFactor, passphrase }: {
       name: string
       mnemonic: string
-      mnemonicSecondFactor: string
+      mnemonicSecondFactor?: string
       passphrase: string
     }) => {
       const { data } = await axios.post(`${uri}/v2/wallets`, {
@@ -21,9 +21,13 @@ export function CardanoWalletProvider (uri: string): WalletProvider {
         passphrase
       })
 
-      return data
+      return data as RemoteWallet
     },
-    transactions: async (walletId: number, startDate?: string, endDate?: string) => {
+    getWallet: async (walletId: string) => {
+      const { data } = await axios.get(`${uri}/v2/wallets/${walletId}`)
+      return data as RemoteWallet
+    },
+    transactions: async (walletId: string, startDate?: string, endDate?: string) => {
       const range = startDate && endDate
         ? `inserted-at 20190227T160329Z-*`
         : ``
@@ -34,21 +38,11 @@ export function CardanoWalletProvider (uri: string): WalletProvider {
         }
       })
 
-      return data
+      return data as RemoteTransaction[]
     },
-    createTransaction: async (walletId: number, payments: RemotePayment[], passphrase: string) => {
-      const mappedPayments = payments.map(payment => {
-        return {
-          address: payment.address,
-          amount: {
-            quantity: Number(payment.value),
-            unit: 'lovelace'
-          }
-        }
-      })
-
+    createTransaction: async (walletId: string, payments: RemotePayment[], passphrase: string) => {
       const { data } = await axios.post(`${uri}/v2/wallets/${walletId}/transactions`, {
-        payments: mappedPayments,
+        payments,
         passphrase
       })
 

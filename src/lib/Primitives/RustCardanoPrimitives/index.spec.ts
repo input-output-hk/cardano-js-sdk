@@ -1,10 +1,10 @@
 import { expect } from 'chai'
-import { InMemoryKeyManager } from '../../lib'
-import { AddressType } from '../../Wallet'
+import { InMemoryKeyManager } from '../..'
+import { AddressType } from '../../../Wallet'
 import { RustCardano } from '.'
-import { hexGenerator } from '../../test/utils'
-import { generateMnemonic, addressDiscoveryWithinBounds } from '../../Utils'
-import { ChainSettings } from '../../Cardano'
+import { hexGenerator } from '../../../test/utils'
+import { generateMnemonic, addressDiscoveryWithinBounds } from '../../../Utils'
+import { ChainSettings } from '../../../Cardano'
 
 describe('RustCardano', () => {
   describe('verifyMessage', () => {

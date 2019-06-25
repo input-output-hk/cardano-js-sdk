@@ -1,4 +1,4 @@
-import { Provider } from '../../Provider'
+import { CardanoProvider } from '../../Provider'
 import { TransactionInput, TransactionOutput } from '../../Transaction'
 import { Utxo } from '../../Wallet'
 
@@ -7,17 +7,17 @@ export function seedUtxoSet (utxos: Utxo[]) {
   mockUtxoSet = utxos
 }
 
-let mockTransactionSet: { inputs: TransactionInput[], outputs: TransactionOutput[] }[] = []
-export function seedTransactionSet (transactions: { inputs: TransactionInput[], outputs: TransactionOutput[] }[]) {
+let mockTransactionSet: { id: string, inputs: TransactionInput[], outputs: TransactionOutput[] }[] = []
+export function seedTransactionSet (transactions: { id: string, inputs: TransactionInput[], outputs: TransactionOutput[] }[]) {
   mockTransactionSet = transactions
 }
 
-export function seedMockProvider (utxos: Utxo[], transactions: { inputs: TransactionInput[], outputs: TransactionOutput[] }[]) {
+export function seedMockProvider (utxos: Utxo[], transactions: { id: string, inputs: TransactionInput[], outputs: TransactionOutput[] }[]) {
   mockTransactionSet = transactions
   mockUtxoSet = utxos
 }
 
-export const mockProvider: Provider = {
+export const mockProvider: CardanoProvider = {
   submitTransaction: (_signedTransaction) => Promise.resolve(true),
   queryUtxosByAddress: (addresses) => Promise.resolve(mockUtxoSet.filter(({ address }) => addresses.includes(address))),
   queryTransactionsByAddress: (addresses) => {

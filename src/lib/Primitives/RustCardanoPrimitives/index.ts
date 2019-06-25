@@ -1,10 +1,10 @@
-import { Cardano, FeeAlgorithm, ChainSettings, TransactionSelection } from '../../Cardano'
-import { getBindingsForEnvironment } from '../bindings'
-import { InsufficientTransactionInput } from '../../Transaction/errors'
+import { Cardano, FeeAlgorithm, ChainSettings, TransactionSelection } from '../../../Cardano'
+import { getBindingsForEnvironment } from '../../bindings'
+import { InsufficientTransactionInput } from '../../../Transaction/errors'
 import { TxInput as CardanoTxInput, Coin as CoinT, Bip44AccountPrivate } from 'cardano-wallet'
 
-import { AddressType, UtxoWithAddressing } from '../../Wallet'
-import { TransactionOutput, TransactionInput } from '../../Transaction'
+import { AddressType, UtxoWithAddressing } from '../../../Wallet'
+import { TransactionOutput, TransactionInput } from '../../../Transaction'
 const {
   Transaction,
   OutputPolicy,

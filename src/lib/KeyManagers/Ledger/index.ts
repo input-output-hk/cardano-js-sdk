@@ -1,8 +1,8 @@
-import { getLedgerTransportForEnvironment } from '../bindings'
-import { KeyManager, UnsupportedOperation, InsufficientData } from '../../KeyManager'
-import { TransactionOutput } from '../../Transaction'
-import { ChainSettings } from '../../Cardano'
-import { AddressType } from '../../Wallet'
+import { getLedgerTransportForEnvironment } from '../../bindings'
+import { KeyManager, UnsupportedOperation, InsufficientData } from '../../../KeyManager'
+import { TransactionOutput } from '../../../Transaction'
+import { ChainSettings } from '../../../Cardano'
+import { AddressType } from '../../../Wallet'
 
 const { default: Ledger, utils } = require('@cardano-foundation/ledgerjs-hw-app-cardano')
 
