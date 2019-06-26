@@ -11,7 +11,7 @@ use(chaiAsPromised)
 describe('Example: Interacting with remote wallets', function () {
   this.timeout(20000)
   // The node, wallet and seed are pulled from `Sam-Jeston/cardano-sl-byron`
-  const localApiEndpoint = 'http://localhost:8080'
+  const localApiEndpoint = 'http://localhost:8088'
 
   let cardano: ReturnType<typeof CardanoSDK>
   let connection: ReturnType<typeof cardano.connect>
