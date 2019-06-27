@@ -45,11 +45,7 @@ describe('Example: Interacting with remote wallets', function () {
     describe('list wallets', () => {
       it('allows the connection to list existing wallets', async () => {
         const wallets = await connection.listWallets()
-        const bobsWallet = wallets[0]
-        const alicesWallet = wallets[1]
-
-        expect(bobsWallet.name).to.eql('Bob')
-        expect(alicesWallet.name).to.eql('Alice')
+        expect(wallets.length >= 10).to.eql(true)
       })
     })
 
