@@ -1,8 +1,8 @@
 import { WalletProvider } from '../../Provider'
 import { AxiosWrapper, RequestMethod } from '../RequestHandler'
-import { RemotePayment, RemoteTransaction, RemoteWallet } from '../../Remote'
+import { RemotePayment, RemoteTransaction, RemoteWallet, RemoteAddressState, RemoteAddress } from '../../Remote'
 
-export function CardanoWalletProvider(uri: string, isSocket = false): WalletProvider {
+export function CardanoWalletProvider (uri: string, isSocket = false): WalletProvider {
   const requesterHandler = AxiosWrapper(uri, isSocket)
 
   return {
@@ -34,7 +34,7 @@ export function CardanoWalletProvider(uri: string, isSocket = false): WalletProv
     getWallet: (walletId: string) => {
       return requesterHandler({ path: `/v2/wallets/${walletId}`, method: RequestMethod.GET }) as Promise<RemoteWallet>
     },
-    transactions: async (walletId: string, startDate?: Date, endDate?: Date) => {
+    transactions: (walletId: string, startDate?: Date, endDate?: Date) => {
       const range = startDate && endDate
         ? `inserted-at ${startDate.toISOString()}-${endDate.toISOString()}`
         : `inserted-at *-*`
@@ -47,7 +47,7 @@ export function CardanoWalletProvider(uri: string, isSocket = false): WalletProv
         }
       }) as Promise<RemoteTransaction[]>
     },
-    createTransaction: async (walletId: string, payments: RemotePayment[], passphrase: string) => {
+    createTransaction: (walletId: string, payments: RemotePayment[], passphrase: string) => {
       return requesterHandler({
         path: `/v2/wallets/${walletId}/transactions`,
         method: RequestMethod.POST,
@@ -56,6 +56,12 @@ export function CardanoWalletProvider(uri: string, isSocket = false): WalletProv
           passphrase
         }
       }) as Promise<RemoteTransaction>
+    },
+    addresses: (walletId: string, state: RemoteAddressState) => {
+      return requesterHandler({
+        path: `/v2/wallets/${walletId}/addresses?state=${state}`,
+        method: RequestMethod.GET
+      }) as Promise<RemoteAddress[]>
     }
   }
 }

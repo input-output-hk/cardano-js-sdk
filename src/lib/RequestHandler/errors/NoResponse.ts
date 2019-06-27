@@ -5,7 +5,7 @@ export class NoResponse extends CustomError {
   public path: string
   public uri: string
 
-  constructor(path: string, uri: string) {
+  constructor (path: string, uri: string) {
     super()
     this.statusCode = 1
     this.path = path

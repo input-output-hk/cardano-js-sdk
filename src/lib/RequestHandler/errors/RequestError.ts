@@ -5,7 +5,7 @@ export class RequestError extends CustomError {
   public path: string
   public uri: string
 
-  constructor({ statusCode, path, uri, requestBody, serverError }: {
+  constructor ({ statusCode, path, uri, requestBody, serverError }: {
     statusCode: number,
     path: string,
     uri: string,

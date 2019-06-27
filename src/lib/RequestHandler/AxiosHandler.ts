@@ -1,9 +1,9 @@
 import axios, { AxiosRequestConfig } from 'axios'
 import { RequestHandler } from './RequestHandler'
-import { RequestMethod } from './RequestMethod';
+import { RequestMethod } from './RequestMethod'
 import { RequestError, NoResponse } from './errors'
 
-export function AxiosWrapper(uri: string, isSocket: boolean): RequestHandler {
+export function AxiosWrapper (uri: string, isSocket: boolean): RequestHandler {
   let globalConfig = isSocket
     ? { socketPath: uri }
     : { baseURL: uri }

@@ -9,7 +9,7 @@ export interface WalletInstance {
   getNextReceivingAddress: () => Promise<Address>
   getNextChangeAddress: () => Promise<Address>
   balance: () => Promise<number>
-  transactions: () => Promise<{ id: string, inputs: TransactionInput[], outputs: TransactionOutput[] }[]>
+  transactions: () => Promise<{ id: string, inputs: TransactionInput[], outputs: TransactionOutput[], status?: string }[]>
   selectInputsForTransaction: (paymentOutputs: TransactionOutput[], feeAlgorithm?: FeeAlgorithm) => Promise<TransactionSelection>
   createAndSignTransaction: (payments: RemotePayment[], passphrase: string) => Promise<{ id: string, inputs: TransactionInput[], outputs: TransactionOutput[] }>
 }
