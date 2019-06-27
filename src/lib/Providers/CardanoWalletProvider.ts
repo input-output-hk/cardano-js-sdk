@@ -1,52 +1,61 @@
 import { WalletProvider } from '../../Provider'
-import axios from 'axios'
+import { AxiosWrapper, RequestMethod } from '../RequestHandler'
 import { RemotePayment, RemoteTransaction, RemoteWallet } from '../../Remote'
 
-export function CardanoWalletProvider (uri: string): WalletProvider {
+export function CardanoWalletProvider(uri: string, isSocket = false): WalletProvider {
+  const requesterHandler = AxiosWrapper(uri, isSocket)
+
   return {
-    wallets: async () => {
-      const { data } = await axios.get(`${uri}/v2/wallets`)
-      return data as RemoteWallet[]
+    wallets: () => {
+      return requesterHandler({ path: `v2/wallets`, method: RequestMethod.GET }) as Promise<RemoteWallet[]>
     },
-    createWallet: async ({ name, mnemonic, mnemonicSecondFactor, passphrase }: {
+    createWallet: ({ name, mnemonic, mnemonicSecondFactor, passphrase }: {
       name: string
       mnemonic: string
       mnemonicSecondFactor?: string
       passphrase: string
     }) => {
-      const { data } = await axios.post(`${uri}/v2/wallets`, {
+      const mnemonicAsList = mnemonic.split(' ')
+      const mnemonicSecondFactorAsList = mnemonicSecondFactor ? mnemonicSecondFactor.split(' ') : []
+      const body = {
         name,
-        mnemonic_sentence: mnemonic,
-        mnemonic_second_factor: mnemonicSecondFactor,
+        mnemonic_sentence: mnemonicAsList,
         passphrase
-      })
+      }
 
-      return data as RemoteWallet
+      return requesterHandler({
+        path: '/v2/wallets',
+        method: RequestMethod.POST,
+        body: mnemonicSecondFactorAsList.length
+          ? { mnemonic_second_factor: mnemonicSecondFactorAsList, ...body }
+          : body
+      }) as Promise<RemoteWallet>
     },
-    getWallet: async (walletId: string) => {
-      const { data } = await axios.get(`${uri}/v2/wallets/${walletId}`)
-      return data as RemoteWallet
+    getWallet: (walletId: string) => {
+      return requesterHandler({ path: `/v2/wallets/${walletId}`, method: RequestMethod.GET }) as Promise<RemoteWallet>
     },
-    transactions: async (walletId: string, startDate?: string, endDate?: string) => {
+    transactions: async (walletId: string, startDate?: Date, endDate?: Date) => {
       const range = startDate && endDate
-        ? `inserted-at 20190227T160329Z-*`
-        : ``
+        ? `inserted-at ${startDate.toISOString()}-${endDate.toISOString()}`
+        : `inserted-at *-*`
 
-      const { data } = await axios.get(`${uri}/v2/wallets/${walletId}/transactions`, {
+      return requesterHandler({
+        path: `/v2/wallets/${walletId}/transactions`,
+        method: RequestMethod.GET,
         headers: {
           Range: range
         }
-      })
-
-      return data as RemoteTransaction[]
+      }) as Promise<RemoteTransaction[]>
     },
     createTransaction: async (walletId: string, payments: RemotePayment[], passphrase: string) => {
-      const { data } = await axios.post(`${uri}/v2/wallets/${walletId}/transactions`, {
-        payments,
-        passphrase
-      })
-
-      return data
+      return requesterHandler({
+        path: `/v2/wallets/${walletId}/transactions`,
+        method: RequestMethod.POST,
+        body: {
+          payments,
+          passphrase
+        }
+      }) as Promise<RemoteTransaction>
     }
   }
 }

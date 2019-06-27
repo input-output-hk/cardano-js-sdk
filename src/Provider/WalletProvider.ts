@@ -10,6 +10,6 @@ export interface WalletProvider extends BaseProvider {
     passphrase: string
   }) => Promise<RemoteWallet>
   getWallet: (walletId: string) => Promise<RemoteWallet>
-  transactions: (walletId: string, startDate?: string, endDate?: string) => Promise<RemoteTransaction[]>
+  transactions: (walletId: string, startDate?: Date, endDate?: Date) => Promise<RemoteTransaction[]>
   createTransaction: (walletId: string, payments: RemotePayment[], passphrase: string) => Promise<RemoteTransaction>
 }
