@@ -2,7 +2,7 @@ import { Cardano, FeeAlgorithm } from '../../../Cardano'
 import { CardanoProvider } from '../../../Provider'
 import { getNextAddressByType } from './get_next_address'
 import { deriveAddressSet } from './address_derivation'
-import { AddressType, UtxoWithAddressing, WalletInstance } from '../../../Wallet'
+import { AddressType, UtxoWithAddressing, WalletInstance, UnsupportedWalletOperation } from '../../../Wallet'
 import { TransactionOutput } from '../../../Transaction'
 
 export function ClientWallet (cardano: Cardano, cardanoProvider: CardanoProvider, account: string): WalletInstance {
@@ -36,6 +36,12 @@ export function ClientWallet (cardano: Cardano, cardanoProvider: CardanoProvider
       const nextChangeAddress = await getNextAddressByType(cardano, cardanoProvider, account, AddressType.internal)
       return cardano.inputSelection(paymentOutputs, utxosMappedWithAddresses, nextChangeAddress.address, feeAlgorithm)
     },
-    createAndSignTransaction: () => { throw new Error('Unsupported Client wallet operation. Instead use the Transaction interface to build the transaction, and KeyManager to sign it.') }
+    createAndSignTransaction: () => {
+      throw new UnsupportedWalletOperation(
+        'client',
+        'createAndSignTransaction',
+        'Instead use the Transaction interface to build the transaction, and KeyManager to sign it.'
+      )
+    }
   }
 }
