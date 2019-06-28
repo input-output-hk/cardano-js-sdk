@@ -5,7 +5,7 @@ import { SCAN_GAP } from './config'
 import { addressDiscoveryWithinBounds } from '../../../Utils'
 import { Cardano, ChainSettings } from '../../../Cardano'
 
-export async function deriveAddressSet (cardano: Cardano, provider: CardanoProvider, account: string) {
+export async function deriveAddressSet (cardano: Cardano, provider: CardanoProvider, account: string, chainSettings: ChainSettings) {
   const nextReceivingAddress = await getNextAddressByType(cardano, provider, account, AddressType.external)
   const nextChangeAddress = await getNextAddressByType(cardano, provider, account, AddressType.internal)
 
@@ -14,14 +14,14 @@ export async function deriveAddressSet (cardano: Cardano, provider: CardanoProvi
     lowerBound: 0,
     upperBound: nextReceivingAddress.index + SCAN_GAP - 1,
     type: AddressType.external
-  }, ChainSettings.mainnet)
+  }, chainSettings)
 
   const changeAddresses = addressDiscoveryWithinBounds(cardano, {
     account,
     lowerBound: 0,
     upperBound: nextChangeAddress.index + SCAN_GAP - 1,
     type: AddressType.internal
-  }, ChainSettings.mainnet)
+  }, chainSettings)
 
   return receiptAddresses.concat(changeAddresses)
 }

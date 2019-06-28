@@ -1,5 +1,5 @@
 import { Provider, CardanoProvider, WalletProvider, ProviderType } from '../Provider'
-import { Cardano, FeeAlgorithm, TransactionSelection } from '../Cardano'
+import { Cardano, FeeAlgorithm, TransactionSelection, ChainSettings } from '../Cardano'
 import { Address } from './Address'
 import { ClientWallet, RemoteWallet } from '../lib'
 import { RemotePayment } from '../Remote'
@@ -15,16 +15,20 @@ export interface WalletInstance {
   createAndSignTransaction: (payments: RemotePayment[], passphrase: string) => Promise<{ id: string, inputs: TransactionInput[], outputs: TransactionOutput[] }>
 }
 
-type WalletConstructor = (walletInstanceArgs: { publicParentKey?: string, walletId?: string }) => WalletInstance
+type WalletConstructor = (walletInstanceArgs: { publicParentKey?: string, chainSettings?: ChainSettings, walletId?: string }) => WalletInstance
 
 export function Wallet (cardano: Cardano, provider: Provider): WalletConstructor {
   if (provider.type === ProviderType.cardano) {
-    return ({ publicParentKey }) => {
+    return ({ publicParentKey, chainSettings }) => {
       if (!publicParentKey) {
         throw new InvalidWalletArguments(provider.type, 'publicParentKey')
       }
 
-      return ClientWallet(cardano, <CardanoProvider>provider, publicParentKey)
+      if (!chainSettings) {
+        chainSettings = ChainSettings.mainnet
+      }
+
+      return ClientWallet(cardano, <CardanoProvider>provider, publicParentKey, chainSettings)
     }
   } else {
     return ({ walletId }) => {

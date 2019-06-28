@@ -1,25 +1,25 @@
-import { Cardano, FeeAlgorithm } from '../../../Cardano'
+import { Cardano, FeeAlgorithm, ChainSettings } from '../../../Cardano'
 import { CardanoProvider } from '../../../Provider'
 import { getNextAddressByType } from './get_next_address'
 import { deriveAddressSet } from './address_derivation'
 import { AddressType, UtxoWithAddressing, WalletInstance, UnsupportedWalletOperation } from '../../../Wallet'
 import { TransactionOutput } from '../../../Transaction'
 
-export function ClientWallet (cardano: Cardano, cardanoProvider: CardanoProvider, account: string): WalletInstance {
+export function ClientWallet (cardano: Cardano, cardanoProvider: CardanoProvider, account: string, chainSettings: ChainSettings): WalletInstance {
   return {
     getNextReceivingAddress: () => getNextAddressByType(cardano, cardanoProvider, account, AddressType.external),
     getNextChangeAddress: () => getNextAddressByType(cardano, cardanoProvider, account, AddressType.internal),
     balance: async () => {
-      const addresses = await deriveAddressSet(cardano, cardanoProvider, account)
+      const addresses = await deriveAddressSet(cardano, cardanoProvider, account, chainSettings)
       const utxos = await cardanoProvider.queryUtxosByAddress(addresses.map(({ address }) => address))
       return utxos.reduce((accumulatedBalance, utxo) => accumulatedBalance + Number(utxo.value), 0)
     },
     transactions: async () => {
-      const addresses = await deriveAddressSet(cardano, cardanoProvider, account)
+      const addresses = await deriveAddressSet(cardano, cardanoProvider, account, chainSettings)
       return cardanoProvider.queryTransactionsByAddress(addresses.map(({ address }) => address))
     },
     selectInputsForTransaction: async (paymentOutputs: TransactionOutput[], feeAlgorithm = FeeAlgorithm.default) => {
-      const addresses = await deriveAddressSet(cardano, cardanoProvider, account)
+      const addresses = await deriveAddressSet(cardano, cardanoProvider, account, chainSettings)
       const utxos = await cardanoProvider.queryUtxosByAddress(addresses.map(({ address }) => address))
       const utxosMappedWithAddresses: UtxoWithAddressing[] = utxos.map(utxo => {
         const { index, type, accountIndex } = addresses.find(({ address }) => address === utxo.address)

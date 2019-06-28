@@ -49,6 +49,10 @@ function getRustFeeAlgorithm (algo: FeeAlgorithm) {
 }
 
 function getRustChainSettings (chainSettings: ChainSettings) {
+  if (chainSettings === ChainSettings.testnet) {
+    throw new Error('The wasm bindings do not support the testnet')
+  }
+
   const chainSettingsMapping = {
     [ChainSettings.mainnet]: BlockchainSettings.mainnet()
   }

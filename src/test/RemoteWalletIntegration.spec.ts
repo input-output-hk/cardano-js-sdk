@@ -5,6 +5,7 @@ import { generateMnemonic } from 'bip39'
 import { RemotePayment, RemoteUnit } from '../Remote'
 import { RequestError } from '../lib'
 import { mockProvider } from './utils'
+import { ChainSettings } from '../Cardano'
 const faker = require('faker')
 use(chaiAsPromised)
 
@@ -118,8 +119,7 @@ describe('Example: Interacting with remote wallets', function () {
           expect(!!paymentAsOutput).to.eql(true)
         })
 
-        // INFO: This is failing with "code":"rejected_by_core_node"
-        // Must be the base58 address or something. May resolve once cardano-wallet uses Jormangandr
+        // INFO: This is failing as the wasm binding dont support the tesnet Network Magic
         // Issue to follow up: https://github.com/input-output-hk/cardano-js-sdk/issues/33
         it.skip('creates a transaction for a funded wallet to an external address', async () => {
           const wallets = await connection.listWallets()
@@ -127,7 +127,7 @@ describe('Example: Interacting with remote wallets', function () {
 
           const mnemonic = generateMnemonic()
           const newParentKey = await cardano.InMemoryKeyManager({ mnemonic, password: 'pw' }).publicParentKey()
-          const { address } = await cardano.connect(mockProvider).wallet({ publicParentKey: newParentKey }).getNextReceivingAddress()
+          const { address } = await cardano.connect(mockProvider).wallet({ publicParentKey: newParentKey, chainSettings: ChainSettings.testnet }).getNextReceivingAddress()
 
           const payment: RemotePayment = {
             address,

@@ -39,6 +39,7 @@ The below examples are implemented as integration tests, they should be very eas
 - [Get the wallet balance for a BIP44 Account](src/test/WalletBalance.spec.ts)
 - [Determine the next change and receipt addresses for a BIP44 Account](src/test/DetermineNextAddressForWallet.spec.ts)
 - [Transaction input selection](src/test/SelectInputsForTransaction.spec.ts)
+- [Interact with a remote wallet](src/test/RemoteWalletIntegration.spec.ts)
 
 ## Tests
 

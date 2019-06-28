@@ -5,6 +5,7 @@ import { generateTestTransaction, mockProvider, seedTransactionSet, generateTest
 import { deriveAddressSet } from './address_derivation'
 import { AddressType } from '../../../Wallet'
 import { RustCardano, InMemoryKeyManager } from '../..'
+import { ChainSettings } from '../../../Cardano'
 
 describe('deriveAddressSet', () => {
   it('combines external and internal addresses up to the end of each range', async () => {
@@ -35,7 +36,7 @@ describe('deriveAddressSet', () => {
       { id: externalTx.transaction.id(), inputs: externalTx.inputs, outputs: internalOutputs }
     ])
 
-    const derivedAddressSet = await deriveAddressSet(RustCardano, mockProvider, account)
+    const derivedAddressSet = await deriveAddressSet(RustCardano, mockProvider, account, ChainSettings.mainnet)
     expect(derivedAddressSet.length).to.eql(targetTotalAddresses)
   })
 })
