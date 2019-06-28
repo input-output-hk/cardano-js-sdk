@@ -3,6 +3,10 @@ import { WalletInstance, Address, UnsupportedWalletOperation } from '../../../Wa
 import { TransactionInput, TransactionOutput } from '../../../Transaction'
 import { RemoteUnit, RemoteTransaction, RemoteAddressState } from '../../../Remote'
 
+function convertUnitToLovelace (unit: RemoteUnit, value: number): number {
+  return unit === RemoteUnit.lovelace ? value : value * 1000000
+}
+
 export function RemoteWallet (walletProvider: WalletProvider, walletId: string): WalletInstance {
   return {
     getNextReceivingAddress: async () => {
@@ -24,7 +28,7 @@ export function RemoteWallet (walletProvider: WalletProvider, walletId: string):
     balance: async () => {
       const remoteWallet = await walletProvider.getWallet(walletId)
       const availableBalance = remoteWallet.balance.available.quantity
-      return remoteWallet.balance.available.unit === RemoteUnit.lovelace ? availableBalance : availableBalance * 1000000
+      return convertUnitToLovelace(remoteWallet.balance.available.unit, availableBalance)
     },
     transactions: async () => {
       const remoteTransactions = await walletProvider.transactions(walletId)
@@ -61,18 +65,14 @@ function mapRemoteTransactionToSdkType (remoteTransaction: RemoteTransaction): {
         },
         value: {
           address: input.address,
-          value: input.amount.unit === RemoteUnit.lovelace
-            ? String(input.amount.quantity)
-            : String(input.amount.quantity * 1000000)
+          value: String(convertUnitToLovelace(input.amount.unit, input.amount.quantity))
         }
       }
     }),
     outputs: remoteTransaction.outputs.map(output => {
       return {
         address: output.address,
-        value: output.amount.unit === RemoteUnit.lovelace
-          ? String(output.amount.quantity)
-          : String(output.amount.quantity * 1000000)
+        value: String(convertUnitToLovelace(output.amount.unit, output.amount.quantity))
       }
     }),
     direction: remoteTransaction.direction,
