@@ -36,7 +36,7 @@ export default function CardanoSDK (cardano = RustCardano) {
         listWallets: (<WalletProvider>provider).wallets
       }
 
-      return provider.type === ProviderType.client ? clientConnection : remoteConnection
+      return provider.type === ProviderType.cardano ? clientConnection : remoteConnection
     }
   }
 }

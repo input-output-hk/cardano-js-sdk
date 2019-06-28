@@ -18,7 +18,7 @@ export function seedMockProvider (utxos: Utxo[], transactions: { id: string, inp
 }
 
 export const mockProvider: CardanoProvider = {
-  type: ProviderType.client,
+  type: ProviderType.cardano,
   submitTransaction: (_signedTransaction) => Promise.resolve(true),
   queryUtxosByAddress: (addresses) => Promise.resolve(mockUtxoSet.filter(({ address }) => addresses.includes(address))),
   queryTransactionsByAddress: (addresses) => {

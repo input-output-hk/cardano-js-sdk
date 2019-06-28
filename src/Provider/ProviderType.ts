@@ -1,4 +1,4 @@
 export enum ProviderType {
-  client,
-  server
+  cardano,
+  wallet
 }

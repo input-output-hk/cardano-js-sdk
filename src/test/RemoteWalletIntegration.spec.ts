@@ -118,8 +118,9 @@ describe('Example: Interacting with remote wallets', function () {
           expect(!!paymentAsOutput).to.eql(true)
         })
 
-        // TODO: This is failing with "code":"rejected_by_core_node"
-        // Must be the base58 address or something...
+        // INFO: This is failing with "code":"rejected_by_core_node"
+        // Must be the base58 address or something. May resolve once cardano-wallet uses Jormangandr
+        // Issue to follow up: https://github.com/input-output-hk/cardano-js-sdk/issues/33
         it.skip('creates a transaction for a funded wallet to an external address', async () => {
           const wallets = await connection.listWallets()
           const bobsWalletId = wallets[0].id
@@ -167,13 +168,8 @@ describe('Example: Interacting with remote wallets', function () {
 
       // INFO: Awaiting list transaction implementation in cardano-wallet
       describe.skip('transactions', () => {
-        it('lists no stransactions for a new wallet', () => {
-
-        })
-
-        it('lists transactions for a wallet with on-chain history', () => {
-
-        })
+        it('lists no stransactions for a new wallet')
+        it('lists transactions for a wallet with on-chain history')
       })
     })
   })

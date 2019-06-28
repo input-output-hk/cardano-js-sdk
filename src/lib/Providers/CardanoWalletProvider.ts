@@ -7,7 +7,7 @@ export function CardanoWalletProvider (uri: string, isSocket = false): WalletPro
 
   return {
     wallets: () => {
-      return requesterHandler({ path: `v2/wallets`, method: RequestMethod.GET }) as Promise<RemoteWallet[]>
+      return requesterHandler({ path: `/v2/wallets`, method: RequestMethod.GET }) as Promise<RemoteWallet[]>
     },
     createWallet: ({ name, mnemonic, mnemonicSecondFactor, passphrase }: {
       name: string

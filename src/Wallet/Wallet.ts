@@ -4,6 +4,7 @@ import { Address } from './Address'
 import { ClientWallet, RemoteWallet } from '../lib'
 import { RemotePayment } from '../Remote'
 import { TransactionOutput, TransactionInput } from '../Transaction'
+import { InvalidWalletArguments } from './errors'
 
 export interface WalletInstance {
   getNextReceivingAddress: () => Promise<Address>
@@ -17,10 +18,10 @@ export interface WalletInstance {
 type WalletConstructor = (walletInstanceArgs: { publicParentKey?: string, walletId?: string }) => WalletInstance
 
 export function Wallet (cardano: Cardano, provider: Provider): WalletConstructor {
-  if (provider.type === ProviderType.client) {
+  if (provider.type === ProviderType.cardano) {
     return ({ publicParentKey }) => {
       if (!publicParentKey) {
-        throw new Error('The client wallet implementation requires access to the parent public key from a local key chain.')
+        throw new InvalidWalletArguments(provider.type, 'publicParentKey')
       }
 
       return ClientWallet(cardano, <CardanoProvider>provider, publicParentKey)
@@ -28,7 +29,7 @@ export function Wallet (cardano: Cardano, provider: Provider): WalletConstructor
   } else {
     return ({ walletId }) => {
       if (!walletId) {
-        throw new Error('Remote wallet providers require reference to the walletId.')
+        throw new InvalidWalletArguments(provider.type, 'walletId')
       }
 
       return RemoteWallet(<WalletProvider>provider, walletId)
