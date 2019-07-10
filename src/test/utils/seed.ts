@@ -86,33 +86,34 @@ export async function generateSeed () {
       account2: mnemonic3
     },
     transactions: [
-      { inputs: tx1.inputs, outputs: tx1.transaction.toJson().outputs.map((txOut: any) => ({ address: txOut.address, value: String(txOut.value) })) },
-      { inputs: tx2.inputs, outputs: tx2.transaction.toJson().outputs.map((txOut: any) => ({ address: txOut.address, value: String(txOut.value) })) }
+      { id: tx1.transaction.id(), inputs: tx1.inputs, outputs: tx1.transaction.toJson().outputs.map((txOut: any) => ({ address: txOut.address, value: String(txOut.value) })) },
+      { id: tx2.transaction.id(), inputs: tx2.inputs, outputs: tx2.transaction.toJson().outputs.map((txOut: any) => ({ address: txOut.address, value: String(txOut.value) })) }
     ],
     utxos: account1Utxos.concat(account2Utxos)
   }
 }
 
-// Uncomment and run this file with `npx ts-node src/test/utils/mock_provider.ts` to regenerate the seed
+// Uncomment and run this file with `npx ts-node src/test/utils/seed.ts` to regenerate the seed
 // generateSeed().then(r => {
 //   console.log(JSON.stringify(r, null, 4))
 // })
 
 export const seed = {
   'accountMnemonics': {
-    'account1': 'access sausage absorb leopard brother wave victory travel confirm draw glimpse animal',
-    'account2': 'cycle burst badge budget fabric utility napkin salmon rubber knee hunt reform'
+    'account1': 'tattoo jar maid bus found common else seminar gym choose flip habit',
+    'account2': 'topple easy myth stay glad prison friend display feature antenna marble luxury'
   },
   'transactions': [
     {
+      'id': 'a3f78a5855a6f0ab16b98f3c060530d844038b49c95bd259ded57d148397a2f0',
       'inputs': [
         {
           'pointer': {
-            'id': '50c691765a7b18d1681e3ca3160307e8ecb298c09c935ead26e21e51e36329f1',
+            'id': '54dc5ff4cd5606ad2914cd0f121951e584d48047591514a4384835823d9eb514',
             'index': 0
           },
           'value': {
-            'address': 'Ae2tdPwUPEZ6oDR4P2CcWCTzxLiGgQRTezrjFBSPitw4nCDgHbV6iPxQTyk',
+            'address': 'Ae2tdPwUPEZLVDTRwkaiXxym6fGpzarZB6JriCYA2jnqP7QvqTLPcYhveai',
             'value': '1000000'
           },
           'addressing': {
@@ -123,11 +124,11 @@ export const seed = {
         },
         {
           'pointer': {
-            'id': '4fa89fff297cbc144729982ab76512c441a6bbbd3d83bb2d29a4395b7bc9dc44',
+            'id': 'fb869bce80f2baa1b10cb360d677b7dbaba56a6af3607b855b73848de24915b1',
             'index': 1
           },
           'value': {
-            'address': 'Ae2tdPwUPEYzrf1toTgJbkEXpvQZ3CCRasPUotJGDp4HjEeK9U4rNiyJ4PL',
+            'address': 'Ae2tdPwUPEZLWgc7bd75gdNfr24NSFR4X2mEghXLuji6brXGTCFo7vUCTma',
             'value': '2000000'
           },
           'addressing': {
@@ -138,11 +139,11 @@ export const seed = {
         },
         {
           'pointer': {
-            'id': 'b69742db27f442fe93ca7aef917a45b8ea4bef62b08693ae75d5877bc151ed09',
+            'id': '647cc6c52e192bbaf1ac71226df34f724606f8fe5b81f6f2aa5ad6868665a7fd',
             'index': 2
           },
           'value': {
-            'address': 'Ae2tdPwUPEZ5qQN7ZMrbf52GzsCXSPzfwxFKexJFyGBbKZXb9hQPxh5h89S',
+            'address': 'Ae2tdPwUPEZ3ruXWDNQh7squLAUfDNoK6SMToVHLK26f3sgMNJC1HLgT626',
             'value': '3000000'
           },
           'addressing': {
@@ -153,11 +154,11 @@ export const seed = {
         },
         {
           'pointer': {
-            'id': '8cd009c79fd855b8517584692f78618173e4cb06150b4e3a180252ab6f089324',
+            'id': '5efe355e26734b0e1ee23f61b69bd5e5fc145cf4853d8c5ec8c13d37bf3c8655',
             'index': 3
           },
           'value': {
-            'address': 'Ae2tdPwUPEZCB5tJAHkszVk3hWDZEPuQGEYqs5T1ieXGeMMCmvqKzk6X1oJ',
+            'address': 'Ae2tdPwUPEZ3q7rUnMdpDhjWH5xkXPdbGW5hhoWRuPM9rhAX9G5XVHLZds1',
             'value': '2000000'
           },
           'addressing': {
@@ -168,11 +169,11 @@ export const seed = {
         },
         {
           'pointer': {
-            'id': '8882a06acc04f1c2c3e9c284a29fa0b4b551cbeeb69e665b9762e2ef6846bfaa',
+            'id': '39954ea98e3d2af94e609020159778031b52c3334428be803b8703e2b555f67d',
             'index': 4
           },
           'value': {
-            'address': 'Ae2tdPwUPEZ7UVopLf3cA62JjQhAoQJSHLUbPcBhTLrwbZrW6o6yRu7ha5s',
+            'address': 'Ae2tdPwUPEZHXuQpkx3nQXfrcr7dYipVGBWvZPG75tozqY2QL589R8C1zvW',
             'value': '1000000'
           },
           'addressing': {
@@ -184,28 +185,29 @@ export const seed = {
       ],
       'outputs': [
         {
-          'address': 'Ae2tdPwUPEZLbgtNSaBHc3LEUCaF1GSE1ZgHDApYfgHMo37DGTUZ3Yz47ir',
+          'address': 'Ae2tdPwUPEZGBjLGCz5zodwQSQm21QrXMZFsFR3iFJyFVAYLK6XUUfZRNVu',
           'value': '198036'
         },
         {
-          'address': 'Ae2tdPwUPEZLanS6tvrZGLqy5dQLtTtB3xTCLtQy226V7YAk3SDgwt9V9AZ',
+          'address': 'Ae2tdPwUPEZJSYtd7jXPqduaKBdxTLKnXY8eTDJrWegvB7rAoS5EFDya6Eh',
           'value': '200000'
         },
         {
-          'address': 'Ae2tdPwUPEZA3mqVuZvzzk28D4uwLkkbj8LpMHVQ9BeGoW8Smi6mzpnKu5n',
+          'address': 'Ae2tdPwUPEZ1HJib4J5jjte5wfcs3zx31vr1AJSnmJoFrdvdtRYB2T9Jdc6',
           'value': '200000'
         }
       ]
     },
     {
+      'id': '15d8f7e8c46aea31e1d38ca1144ce5e4a60926d811968980d47ff9b9e835e01a',
       'inputs': [
         {
           'pointer': {
-            'id': '645d49b533c54df44ab1380042a35306131ffde58474664ac5681f4e25be5952',
+            'id': '16314dce8abf6973e114f24ec75a4376d918a3305127971ad8af989d63d01fc6',
             'index': 0
           },
           'value': {
-            'address': 'Ae2tdPwUPEZ7UVopLf3cA62JjQhAoQJSHLUbPcBhTLrwbZrW6o6yRu7ha5s',
+            'address': 'Ae2tdPwUPEZHXuQpkx3nQXfrcr7dYipVGBWvZPG75tozqY2QL589R8C1zvW',
             'value': '1000000'
           },
           'addressing': {
@@ -216,11 +218,11 @@ export const seed = {
         },
         {
           'pointer': {
-            'id': '5c49483b9016b197da7b8537e9d41a561a381c5f68d9385ea74d17a0a81f54e4',
+            'id': '7d26a202cb50a0df98bc1749d8ddcb47fb545192f42294a6a12131883577878f',
             'index': 1
           },
           'value': {
-            'address': 'Ae2tdPwUPEZN9QPGcGdkrwsS8apBPosQyRBLQMrZ2JW67wY1ndQvbe6Sjn6',
+            'address': 'Ae2tdPwUPEZJnWY4TjFiL9meehpAEtnyY39orQrPkpeJGvrPfXAoKcvqFUQ',
             'value': '2000000'
           },
           'addressing': {
@@ -231,11 +233,11 @@ export const seed = {
         },
         {
           'pointer': {
-            'id': '27adf8b485a20619690dd32f56fbabcead058c8ec4c8a7cc2108b54fe4425127',
+            'id': '851f2931b4640e91cb03a4fda994c5383dee1a5350ebc87ad25c14fbdd5b6c34',
             'index': 2
           },
           'value': {
-            'address': 'Ae2tdPwUPEZCe9QR4svAfHN7Rrr9NUX5V5pDY97oe4PSFbPfbgCEzvMa55R',
+            'address': 'Ae2tdPwUPEZ6guYM1SN2uhPZnWVKTz91epqeTdvSfJ4ThxfBe59p4xhgVae',
             'value': '3000000'
           },
           'addressing': {
@@ -246,11 +248,11 @@ export const seed = {
         },
         {
           'pointer': {
-            'id': '633ea0126b27f4d2e8d97bb79a845e1c89248bdafdeccdacaf65d248e7ad38e9',
+            'id': '3a5c577a20161d0280506df9bd77feaae9d9d1e0b9eb4ee5fe593ab6e5af40a6',
             'index': 3
           },
           'value': {
-            'address': 'Ae2tdPwUPEZ4H5sZ5AJRfrUpXGiCbpGzHGopkcGV9Tdq6iJKYsn2TYmRDra',
+            'address': 'Ae2tdPwUPEZ6JDK3Cisn8YYENZM8xxsDPQAe1SG7nYg2wRiUdb1GuT9zaYH',
             'value': '2000000'
           },
           'addressing': {
@@ -261,11 +263,11 @@ export const seed = {
         },
         {
           'pointer': {
-            'id': '3597d347557f4c6cf37c3879f93dc46a92b3d17139ef3e1e7e3330d78452dfbc',
+            'id': '5f5257fe52d5b4a673002af2d43d89fd875d6d3f4a3b78182a0aee07eb657085',
             'index': 4
           },
           'value': {
-            'address': 'Ae2tdPwUPEZLVRMEve2GjWbxGfFm9ws577j68cttrL9UfYLhUv4zrf53Mrh',
+            'address': 'Ae2tdPwUPEYzTfq1F7xf2SGaiJyPPvZFnVqPzjsUWpjrcjzspU8J2WXqzEE',
             'value': '1000000'
           },
           'addressing': {
@@ -277,15 +279,15 @@ export const seed = {
       ],
       'outputs': [
         {
-          'address': 'Ae2tdPwUPEYyhqEXhcYHWZsSwFkeJdiYkNPf2xEyAprzQ9wfruoA3avMVGY',
+          'address': 'Ae2tdPwUPEYztzVbFx9o4sjiXEJ9X1Ro1RVhVABLzcn9ptW7iVfYzoWrS1j',
           'value': '198036'
         },
         {
-          'address': 'Ae2tdPwUPEZLtX243BCbEWi4nwdAvcv274GQxmxJpB1FR2UBiy3HHmopD1R',
+          'address': 'Ae2tdPwUPEZNHdsZxrSgsuunfXKETPjf37Z68VLDAvC2F5KjqZSr3MPHt6L',
           'value': '200000'
         },
         {
-          'address': 'Ae2tdPwUPEZ3QJWHcWh9gAaacB6rkdHLkxEvUEwMJ6gYRfTshnN7xazAb2P',
+          'address': 'Ae2tdPwUPEZ65KZW6P6ZGEDUJaBWiNiDge1fx48e66Fw7gv1CQ2cmWoL55M',
           'value': '200000'
         }
       ]
@@ -293,99 +295,99 @@ export const seed = {
   ],
   'utxos': [
     {
-      'address': 'Ae2tdPwUPEZ6oDR4P2CcWCTzxLiGgQRTezrjFBSPitw4nCDgHbV6iPxQTyk',
-      'id': 'edad308e5d8e0047ef501aef84267646367cc524cdc333dbbb348739594c8de9',
+      'address': 'Ae2tdPwUPEZLVDTRwkaiXxym6fGpzarZB6JriCYA2jnqP7QvqTLPcYhveai',
+      'id': 'a3f78a5855a6f0ab16b98f3c060530d844038b49c95bd259ded57d148397a2f0',
       'index': 0,
       'value': '10000000'
     },
     {
-      'address': 'Ae2tdPwUPEYzrf1toTgJbkEXpvQZ3CCRasPUotJGDp4HjEeK9U4rNiyJ4PL',
-      'id': 'edad308e5d8e0047ef501aef84267646367cc524cdc333dbbb348739594c8de9',
+      'address': 'Ae2tdPwUPEZLWgc7bd75gdNfr24NSFR4X2mEghXLuji6brXGTCFo7vUCTma',
+      'id': 'a3f78a5855a6f0ab16b98f3c060530d844038b49c95bd259ded57d148397a2f0',
       'index': 0,
       'value': '10000000'
     },
     {
-      'address': 'Ae2tdPwUPEZ5qQN7ZMrbf52GzsCXSPzfwxFKexJFyGBbKZXb9hQPxh5h89S',
-      'id': 'edad308e5d8e0047ef501aef84267646367cc524cdc333dbbb348739594c8de9',
+      'address': 'Ae2tdPwUPEZ3ruXWDNQh7squLAUfDNoK6SMToVHLK26f3sgMNJC1HLgT626',
+      'id': 'a3f78a5855a6f0ab16b98f3c060530d844038b49c95bd259ded57d148397a2f0',
       'index': 0,
       'value': '10000000'
     },
     {
-      'address': 'Ae2tdPwUPEZCB5tJAHkszVk3hWDZEPuQGEYqs5T1ieXGeMMCmvqKzk6X1oJ',
-      'id': 'edad308e5d8e0047ef501aef84267646367cc524cdc333dbbb348739594c8de9',
+      'address': 'Ae2tdPwUPEZ3q7rUnMdpDhjWH5xkXPdbGW5hhoWRuPM9rhAX9G5XVHLZds1',
+      'id': 'a3f78a5855a6f0ab16b98f3c060530d844038b49c95bd259ded57d148397a2f0',
       'index': 0,
       'value': '10000000'
     },
     {
-      'address': 'Ae2tdPwUPEZ7UVopLf3cA62JjQhAoQJSHLUbPcBhTLrwbZrW6o6yRu7ha5s',
-      'id': 'edad308e5d8e0047ef501aef84267646367cc524cdc333dbbb348739594c8de9',
+      'address': 'Ae2tdPwUPEZHXuQpkx3nQXfrcr7dYipVGBWvZPG75tozqY2QL589R8C1zvW',
+      'id': 'a3f78a5855a6f0ab16b98f3c060530d844038b49c95bd259ded57d148397a2f0',
       'index': 0,
       'value': '10000000'
     },
     {
-      'address': 'Ae2tdPwUPEZ7UVopLf3cA62JjQhAoQJSHLUbPcBhTLrwbZrW6o6yRu7ha5s',
-      'id': 'edad308e5d8e0047ef501aef84267646367cc524cdc333dbbb348739594c8de9',
+      'address': 'Ae2tdPwUPEZHXuQpkx3nQXfrcr7dYipVGBWvZPG75tozqY2QL589R8C1zvW',
+      'id': 'a3f78a5855a6f0ab16b98f3c060530d844038b49c95bd259ded57d148397a2f0',
       'index': 0,
       'value': '10000000'
     },
     {
-      'address': 'Ae2tdPwUPEZN9QPGcGdkrwsS8apBPosQyRBLQMrZ2JW67wY1ndQvbe6Sjn6',
-      'id': 'edad308e5d8e0047ef501aef84267646367cc524cdc333dbbb348739594c8de9',
+      'address': 'Ae2tdPwUPEZJnWY4TjFiL9meehpAEtnyY39orQrPkpeJGvrPfXAoKcvqFUQ',
+      'id': 'a3f78a5855a6f0ab16b98f3c060530d844038b49c95bd259ded57d148397a2f0',
       'index': 0,
       'value': '10000000'
     },
     {
-      'address': 'Ae2tdPwUPEZCe9QR4svAfHN7Rrr9NUX5V5pDY97oe4PSFbPfbgCEzvMa55R',
-      'id': 'edad308e5d8e0047ef501aef84267646367cc524cdc333dbbb348739594c8de9',
+      'address': 'Ae2tdPwUPEZ6guYM1SN2uhPZnWVKTz91epqeTdvSfJ4ThxfBe59p4xhgVae',
+      'id': 'a3f78a5855a6f0ab16b98f3c060530d844038b49c95bd259ded57d148397a2f0',
       'index': 0,
       'value': '10000000'
     },
     {
-      'address': 'Ae2tdPwUPEZ4H5sZ5AJRfrUpXGiCbpGzHGopkcGV9Tdq6iJKYsn2TYmRDra',
-      'id': 'edad308e5d8e0047ef501aef84267646367cc524cdc333dbbb348739594c8de9',
+      'address': 'Ae2tdPwUPEZ6JDK3Cisn8YYENZM8xxsDPQAe1SG7nYg2wRiUdb1GuT9zaYH',
+      'id': 'a3f78a5855a6f0ab16b98f3c060530d844038b49c95bd259ded57d148397a2f0',
       'index': 0,
       'value': '10000000'
     },
     {
-      'address': 'Ae2tdPwUPEZLVRMEve2GjWbxGfFm9ws577j68cttrL9UfYLhUv4zrf53Mrh',
-      'id': 'edad308e5d8e0047ef501aef84267646367cc524cdc333dbbb348739594c8de9',
+      'address': 'Ae2tdPwUPEYzTfq1F7xf2SGaiJyPPvZFnVqPzjsUWpjrcjzspU8J2WXqzEE',
+      'id': 'a3f78a5855a6f0ab16b98f3c060530d844038b49c95bd259ded57d148397a2f0',
       'index': 0,
       'value': '10000000'
     },
     {
-      'id': 'edad308e5d8e0047ef501aef84267646367cc524cdc333dbbb348739594c8de9',
+      'id': 'a3f78a5855a6f0ab16b98f3c060530d844038b49c95bd259ded57d148397a2f0',
       'index': 0,
-      'address': 'Ae2tdPwUPEZLbgtNSaBHc3LEUCaF1GSE1ZgHDApYfgHMo37DGTUZ3Yz47ir',
+      'address': 'Ae2tdPwUPEZGBjLGCz5zodwQSQm21QrXMZFsFR3iFJyFVAYLK6XUUfZRNVu',
       'value': '200000'
     },
     {
-      'id': 'edad308e5d8e0047ef501aef84267646367cc524cdc333dbbb348739594c8de9',
+      'id': 'a3f78a5855a6f0ab16b98f3c060530d844038b49c95bd259ded57d148397a2f0',
       'index': 1,
-      'address': 'Ae2tdPwUPEZLanS6tvrZGLqy5dQLtTtB3xTCLtQy226V7YAk3SDgwt9V9AZ',
+      'address': 'Ae2tdPwUPEZJSYtd7jXPqduaKBdxTLKnXY8eTDJrWegvB7rAoS5EFDya6Eh',
       'value': '200000'
     },
     {
-      'id': 'edad308e5d8e0047ef501aef84267646367cc524cdc333dbbb348739594c8de9',
+      'id': 'a3f78a5855a6f0ab16b98f3c060530d844038b49c95bd259ded57d148397a2f0',
       'index': 2,
-      'address': 'Ae2tdPwUPEZA3mqVuZvzzk28D4uwLkkbj8LpMHVQ9BeGoW8Smi6mzpnKu5n',
+      'address': 'Ae2tdPwUPEZ1HJib4J5jjte5wfcs3zx31vr1AJSnmJoFrdvdtRYB2T9Jdc6',
       'value': '200000'
     },
     {
-      'id': '9224942d944020ab1abdd6c19046201a316d1846e2269e082b3bde537d1a8a20',
+      'id': '15d8f7e8c46aea31e1d38ca1144ce5e4a60926d811968980d47ff9b9e835e01a',
       'index': 3,
-      'address': 'Ae2tdPwUPEYyhqEXhcYHWZsSwFkeJdiYkNPf2xEyAprzQ9wfruoA3avMVGY',
+      'address': 'Ae2tdPwUPEYztzVbFx9o4sjiXEJ9X1Ro1RVhVABLzcn9ptW7iVfYzoWrS1j',
       'value': '200000'
     },
     {
-      'id': '9224942d944020ab1abdd6c19046201a316d1846e2269e082b3bde537d1a8a20',
+      'id': '15d8f7e8c46aea31e1d38ca1144ce5e4a60926d811968980d47ff9b9e835e01a',
       'index': 4,
-      'address': 'Ae2tdPwUPEZLtX243BCbEWi4nwdAvcv274GQxmxJpB1FR2UBiy3HHmopD1R',
+      'address': 'Ae2tdPwUPEZNHdsZxrSgsuunfXKETPjf37Z68VLDAvC2F5KjqZSr3MPHt6L',
       'value': '200000'
     },
     {
-      'id': '9224942d944020ab1abdd6c19046201a316d1846e2269e082b3bde537d1a8a20',
+      'id': '15d8f7e8c46aea31e1d38ca1144ce5e4a60926d811968980d47ff9b9e835e01a',
       'index': 5,
-      'address': 'Ae2tdPwUPEZ3QJWHcWh9gAaacB6rkdHLkxEvUEwMJ6gYRfTshnN7xazAb2P',
+      'address': 'Ae2tdPwUPEZ65KZW6P6ZGEDUJaBWiNiDge1fx48e66Fw7gv1CQ2cmWoL55M',
       'value': '200000'
     }
   ]

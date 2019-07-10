@@ -17,12 +17,12 @@ describe('Example: Select inputs for transaction', () => {
     const mnemonic = seed.accountMnemonics.account1
     const keyManager = cardano.InMemoryKeyManager({ mnemonic, password: '' })
     const publicAccount1 = await keyManager.publicParentKey()
-    const wallet = cardano.connect(mockProvider).wallet(publicAccount1)
+    const wallet = cardano.connect(mockProvider).wallet({ publicParentKey: publicAccount1 })
 
     const mnemonic2 = seed.accountMnemonics.account2
     const keyManager2 = cardano.InMemoryKeyManager({ mnemonic: mnemonic2, password: '' })
     const publicAccount2 = await keyManager2.publicParentKey()
-    const targetOutputAddress = await cardano.connect(mockProvider).wallet(publicAccount2).getNextReceivingAddress()
+    const targetOutputAddress = await cardano.connect(mockProvider).wallet({ publicParentKey: publicAccount2 }).getNextReceivingAddress()
 
     const { inputs, changeOutput } = await wallet.selectInputsForTransaction([
       { value: '100', address: targetOutputAddress.address }
@@ -41,12 +41,12 @@ describe('Example: Select inputs for transaction', () => {
     const mnemonic = seed.accountMnemonics.account2
     const keyManager = cardano.InMemoryKeyManager({ mnemonic, password: '' })
     const publicAccount1 = await keyManager.publicParentKey()
-    const wallet = cardano.connect(mockProvider).wallet(publicAccount1)
+    const wallet = cardano.connect(mockProvider).wallet({ publicParentKey: publicAccount1 })
 
     const mnemonic2 = seed.accountMnemonics.account1
     const keyManager2 = cardano.InMemoryKeyManager({ mnemonic: mnemonic2, password: '' })
     const publicAccount2 = await keyManager2.publicParentKey()
-    const targetOutputAddress = await cardano.connect(mockProvider).wallet(publicAccount2).getNextReceivingAddress()
+    const targetOutputAddress = await cardano.connect(mockProvider).wallet({ publicParentKey: publicAccount2 }).getNextReceivingAddress()
 
     const call = wallet.selectInputsForTransaction([
       { value: '100', address: targetOutputAddress.address }

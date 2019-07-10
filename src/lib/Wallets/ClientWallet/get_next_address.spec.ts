@@ -1,11 +1,11 @@
 import { expect } from 'chai'
 import { getNextAddressByType } from './get_next_address'
-import { generateMnemonic, addressDiscoveryWithinBounds } from '../../Utils'
-import { generateTestTransaction, generateTestUtxos, mockProvider, seedTransactionSet } from '../../test/utils'
-import { SCAN_GAP } from '../config'
-import { AddressType } from '..'
-import { InMemoryKeyManager, RustCardano } from '../../lib'
-import { ChainSettings } from '../../Cardano'
+import { generateMnemonic, addressDiscoveryWithinBounds } from '../../../Utils'
+import { generateTestTransaction, generateTestUtxos, mockProvider, seedTransactionSet } from '../../../test/utils'
+import { SCAN_GAP } from './config'
+import { AddressType } from '../../../Wallet'
+import { InMemoryKeyManager, RustCardano } from '../..'
+import { ChainSettings } from '../../../Cardano'
 
 describe('getNextAddressByType', () => {
   it('returns the first address index if no transactions exist for internal addresses', async () => {
@@ -32,14 +32,14 @@ describe('getNextAddressByType', () => {
     const targetAddressIndex = SCAN_GAP - 5
     const outputs = generateTestUtxos({ lowerBound: 0, upperBound: targetAddressIndex, account, type: AddressType.internal, value: '1000000' })
 
-    const { inputs } = generateTestTransaction({
+    const { transaction, inputs } = generateTestTransaction({
       account,
       lowerBoundOfAddresses: 0,
       testInputs: [{ value: '1000000000', type: AddressType.internal }],
       testOutputs: outputs
     })
 
-    seedTransactionSet([{ inputs, outputs }])
+    seedTransactionSet([{ id: transaction.id(), inputs, outputs }])
 
     const nextChangeAddress = await getNextAddressByType(RustCardano, mockProvider, account, AddressType.internal)
     expect(nextChangeAddress.index).to.eql(targetAddressIndex)
@@ -52,14 +52,14 @@ describe('getNextAddressByType', () => {
     const targetAddressIndex = (SCAN_GAP * 3) - 5
     const outputs = generateTestUtxos({ lowerBound: 0, upperBound: targetAddressIndex, account, type: AddressType.internal, value: '1000000' })
 
-    const { inputs } = generateTestTransaction({
+    const { transaction, inputs } = generateTestTransaction({
       account,
       lowerBoundOfAddresses: 0,
       testInputs: [{ value: '1000000000', type: AddressType.internal }],
       testOutputs: outputs
     })
 
-    seedTransactionSet([{ inputs, outputs }])
+    seedTransactionSet([{ id: transaction.id(), inputs, outputs }])
 
     const nextChangeAddress = await getNextAddressByType(RustCardano, mockProvider, account, AddressType.internal)
     expect(nextChangeAddress.index).to.eql(targetAddressIndex)
@@ -90,14 +90,14 @@ describe('getNextAddressByType', () => {
     const targetAddressIndex = SCAN_GAP - 10
     const outputs = generateTestUtxos({ lowerBound: 0, upperBound: targetAddressIndex, account, type: AddressType.external, value: '1000000' })
 
-    const { inputs } = generateTestTransaction({
+    const { transaction, inputs } = generateTestTransaction({
       account,
       lowerBoundOfAddresses: 0,
       testInputs: [{ value: '1000000000', type: AddressType.internal }],
       testOutputs: outputs
     })
 
-    seedTransactionSet([{ inputs, outputs }])
+    seedTransactionSet([{ id: transaction.id(), inputs, outputs }])
 
     const nextChangeAddress = await getNextAddressByType(RustCardano, mockProvider, account, AddressType.external)
     expect(nextChangeAddress.index).to.eql(targetAddressIndex)
@@ -110,14 +110,14 @@ describe('getNextAddressByType', () => {
     const targetAddressIndex = (SCAN_GAP * 5) - 5
     const outputs = generateTestUtxos({ lowerBound: 0, upperBound: targetAddressIndex, account, type: AddressType.external, value: '1000000' })
 
-    const { inputs } = generateTestTransaction({
+    const { transaction, inputs } = generateTestTransaction({
       account,
       lowerBoundOfAddresses: 0,
       testInputs: [{ value: '1000000000', type: AddressType.internal }],
       testOutputs: outputs
     })
 
-    seedTransactionSet([{ inputs, outputs }])
+    seedTransactionSet([{ id: transaction.id(), inputs, outputs }])
 
     const nextChangeAddress = await getNextAddressByType(RustCardano, mockProvider, account, AddressType.external)
     expect(nextChangeAddress.index).to.eql(targetAddressIndex)

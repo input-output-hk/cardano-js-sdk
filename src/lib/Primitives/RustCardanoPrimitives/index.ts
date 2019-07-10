@@ -1,10 +1,10 @@
-import { Cardano, FeeAlgorithm, ChainSettings, TransactionSelection } from '../../Cardano'
-import { getBindingsForEnvironment } from '../bindings'
-import { InsufficientTransactionInput } from '../../Transaction/errors'
+import { Cardano, FeeAlgorithm, ChainSettings, TransactionSelection } from '../../../Cardano'
+import { getBindingsForEnvironment } from '../../bindings'
+import { InsufficientTransactionInput } from '../../../Transaction/errors'
 import { TxInput as CardanoTxInput, Coin as CoinT, Bip44AccountPrivate } from 'cardano-wallet'
 
-import { AddressType, UtxoWithAddressing } from '../../Wallet'
-import { TransactionOutput, TransactionInput } from '../../Transaction'
+import { AddressType, UtxoWithAddressing } from '../../../Wallet'
+import { TransactionOutput, TransactionInput } from '../../../Transaction'
 const {
   Transaction,
   OutputPolicy,
@@ -49,6 +49,10 @@ function getRustFeeAlgorithm (algo: FeeAlgorithm) {
 }
 
 function getRustChainSettings (chainSettings: ChainSettings) {
+  if (chainSettings === ChainSettings.testnet) {
+    throw new Error('The wasm bindings do not support the testnet')
+  }
+
   const chainSettingsMapping = {
     [ChainSettings.mainnet]: BlockchainSettings.mainnet()
   }

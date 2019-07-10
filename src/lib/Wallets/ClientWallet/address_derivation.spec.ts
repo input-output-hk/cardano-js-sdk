@@ -1,10 +1,11 @@
 import { expect } from 'chai'
-import { generateMnemonic } from '../../Utils'
-import { SCAN_GAP } from '../config'
-import { generateTestTransaction, mockProvider, seedTransactionSet, generateTestUtxos } from '../../test/utils'
-import { deriveAddressSet } from '.'
-import { AddressType } from '..'
-import { RustCardano, InMemoryKeyManager } from '../../lib'
+import { generateMnemonic } from '../../../Utils'
+import { SCAN_GAP } from './config'
+import { generateTestTransaction, mockProvider, seedTransactionSet, generateTestUtxos } from '../../../test/utils'
+import { deriveAddressSet } from './address_derivation'
+import { AddressType } from '../../../Wallet'
+import { RustCardano, InMemoryKeyManager } from '../..'
+import { ChainSettings } from '../../../Cardano'
 
 describe('deriveAddressSet', () => {
   it('combines external and internal addresses up to the end of each range', async () => {
@@ -31,11 +32,11 @@ describe('deriveAddressSet', () => {
     })
 
     seedTransactionSet([
-      { inputs: internalTx.inputs, outputs: externalOutputs },
-      { inputs: externalTx.inputs, outputs: internalOutputs }
+      { id: internalTx.transaction.id(), inputs: internalTx.inputs, outputs: externalOutputs },
+      { id: externalTx.transaction.id(), inputs: externalTx.inputs, outputs: internalOutputs }
     ])
 
-    const derivedAddressSet = await deriveAddressSet(RustCardano, mockProvider, account)
+    const derivedAddressSet = await deriveAddressSet(RustCardano, mockProvider, account, ChainSettings.mainnet)
     expect(derivedAddressSet.length).to.eql(targetTotalAddresses)
   })
 })

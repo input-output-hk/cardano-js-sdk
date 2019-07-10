@@ -1,5 +1,4 @@
-import { Wallet } from './Wallet'
-
+export { Wallet, WalletInstance } from './Wallet'
 export { Address, AddressType } from './Address'
 export { Utxo, UtxoWithAddressing } from './Utxo'
-export default Wallet
+export { UnsupportedWalletOperation } from './errors'

@@ -1,10 +1,10 @@
-import { Provider } from '../../Provider'
-import { AddressType, Address } from '..'
-import { SCAN_GAP } from '../config'
-import { addressDiscoveryWithinBounds } from '../../Utils'
-import { Cardano, ChainSettings } from '../../Cardano'
+import { CardanoProvider } from '../../../Provider'
+import { AddressType, Address } from '../../../Wallet'
+import { SCAN_GAP } from './config'
+import { addressDiscoveryWithinBounds } from '../../../Utils'
+import { Cardano, ChainSettings } from '../../../Cardano'
 
-export function getNextAddressByType (cardano: Cardano, provider: Provider, account: string, type: AddressType) {
+export function getNextAddressByType (cardano: Cardano, provider: CardanoProvider, account: string, type: AddressType) {
   return scanBip44AccountForAddressWithoutTransactions({
     cardano,
     account,
@@ -17,7 +17,7 @@ export function getNextAddressByType (cardano: Cardano, provider: Provider, acco
 
 interface ScanRangeParameters {
   cardano: Cardano
-  provider: Provider
+  provider: CardanoProvider
   account: string
   lowerBound: number
   upperBound: number
