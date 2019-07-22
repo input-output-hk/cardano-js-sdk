@@ -1,4 +1,7 @@
 # Cardano JS SDK
+
+[![Build Status](http://13.238.211.79:8080/buildStatus/icon?job=cardano-js-sdk)](http://13.238.211.79:8080/job/cardano-js-sdk/)
+
 JavaScript SDK for interacting with Cardano, providing various key management options including support for popular hardware wallets. The library supports multiple Cardano APIs by establishing a [_Provider_](src/Provider/Provider.ts) interface. This is beneficial for both development workflow and production scenarios, as application logic does not become coupled to any one implementation.
 
 There are two _provider_ types, and it is important to understand the difference when using the SDK. We have defined the _CardanoProvider_ and _WalletProvider_.
