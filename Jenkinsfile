@@ -3,8 +3,11 @@ pipeline {
 
   tools {nodejs "Node 10"}
 
-  // Disable concurrent builds due to the docker dependency
-  options { disableConcurrentBuilds() }
+  // Lock concurrent builds due to the docker dependency
+  options {
+    lock resource: 'DockerJob'
+    disableConcurrentBuilds()
+  }
 
   stages {
     stage('Dependency Setup') {
