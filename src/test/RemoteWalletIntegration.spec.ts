@@ -22,7 +22,7 @@ describe('Example: Interacting with remote wallets', function () {
     connection = cardano.connect(CardanoWalletProvider(localApiEndpoint))
   })
 
-  async function createAndGetNewWallet() {
+  async function createAndGetNewWallet () {
     const mnemonic = generateMnemonic(256)
     const newWalletName = faker.name.findName()
 
@@ -32,7 +32,7 @@ describe('Example: Interacting with remote wallets', function () {
     return wallets.find(w => w.name === newWalletName)
   }
 
-  async function pollTransactionUntilConfirmed(walletId: string, transactionId: string): Promise<void> {
+  async function pollTransactionUntilConfirmed (walletId: string, transactionId: string): Promise<void> {
     const transactions = await connection.wallet({ walletId }).transactions()
     const targetTransaction = transactions.find(t => t.id === transactionId)
 

@@ -24,7 +24,7 @@
     "Rhys Bartels-Waller <rhys.bartelswaller@iohk.io> (https://iohk.io)",
     "Sam Jeston <sam.jeston@iohk.io> (https://iohk.io)"
   ],
-  "license": "MIT",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/input-output-hk/cardano-js-sdk/issues"
   },
