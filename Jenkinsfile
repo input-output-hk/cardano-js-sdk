@@ -32,27 +32,27 @@ pipeline {
     tools {nodejs "Node 10"}
 
     stages {
-        stage('Dependency Setup') {
-          steps {
-            sh 'git clone https://github.com/Sam-Jeston/cardano-byron-docker.git sl'
-            sh 'cd sl && sh start.sh && cd ..'
-          }
+      stage('Dependency Setup') {
+        steps {
+          sh 'git clone https://github.com/Sam-Jeston/cardano-byron-docker.git sl'
+          sh 'cd sl && sh start.sh && cd ..'
         }
-        stage('Install') {
-            steps {
-                sh 'npm i'
-            }
+      }
+      stage('Install') {
+        steps {
+          sh 'npm i'
         }
-        stage('Test') {
-            steps {
-                sh 'npm test'
-            }
+      }
+      stage('Test') {
+        steps {
+          sh 'npm test'
         }
-        post {
-          always {
-            sh 'cd sl && sh stop.sh && cd ..'
-            sh 'rm -r sl'
-          }
-        }
+      }
+    }
+    post {
+      always {
+        sh 'cd sl && sh stop.sh && cd ..'
+        sh 'rm -r sl'
+      }
     }
 }
