@@ -20,7 +20,7 @@ JavaScript SDK for interacting with Cardano, providing various key management op
 ## Examples
 The below examples are implemented as integration tests, they should be very easy to understand.
 
-- [Generate a keypair in memory from a BIP39 mnemonic](src/test/MemoryKeyManager.spec.ts)
+- [Generate a keypair in memory from a BIP39 mnemonic](src/test/InMemoryKeyManager.spec.ts)
 - [Message signatures](src/test/SignAndVerify.spec.ts)
 
 ## Development References
