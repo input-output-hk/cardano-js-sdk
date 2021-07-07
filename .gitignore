@@ -1,6 +1,1 @@
 node_modules
-dist
-tsconfig.tsbuildinfo
-.nyc_output
-coverage
-documentation
