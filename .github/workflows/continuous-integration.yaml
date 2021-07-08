@@ -28,25 +28,13 @@ jobs:
       id: package-version
       uses: martinbeentjes/npm-get-version-action@master
       with:
-        path: clients/TypeScript
+        path: .
 
     - name: 🔨 Build
-      working-directory: clients/TypeScript
       run: |
-        yarn install --frozen-lockfile --non-interactive --logevel=error
-        yarn generate-schema-types
+        yarn install --offline --frozen-lockfile --non-interactive --logevel=error
         yarn build
         yarn lint
-
-    - name: 🔬 Test
-      if: matrix.network == 'testnet'
-      working-directory: clients/TypeScript
-      run: |
-        docker run -d --name cardano-node-ogmios -p 1338:1337 -v ${{ runner.temp }}/db-${{ matrix.network }}:/db cardanosolutions/cardano-node-ogmios:${{ github.sha }}-${{ matrix.network }}
-        ../../scripts/wait-for-sync.sh 1338 1
-        yarn test
-        docker stop cardano-node-ogmios
-        docker rm cardano-node-ogmios
 
     - name: 📦 Pack
       run: |
@@ -55,6 +43,22 @@ jobs:
     - name: 📤 Upload npm packages
       uses: actions/upload-artifact@v2
       with:
-        name: cardano-ogmios-clients-ts-packages
+        name: cardano-js-sdk-packages
         path: |
-          packages/prototype/cardano-js-sdk-prototype-${{ steps.package-version.outputs.current-version}}.tgz
+          packages/golden-test-generator/cardano-js-sdk-golden-test-generator-${{ steps.package-version.outputs.current-version}}.tgz
+          
+    - name: 📦 Package REPL
+      working-directory: packages/golden-test-generator
+      run: yarn pkg
+
+    - name: 📤 Upload Golden Test Generator exe - Linux
+      uses: actions/upload-artifact@v2
+      with:
+        name: golden-test-generator-linux
+        path: packages/golden-test-generator/build/golden-test-generator-linux
+
+    - name: 📤 Upload Golden Test Generator exe - macOS
+      uses: actions/upload-artifact@v2
+      with:
+        name: cardano-ogmios-repl-macos
+        path: packages/golden-test-generator/build/golden-test-generator-macos

@@ -1,0 +1,43 @@
+{
+  "name": "@cardano-js-sdk/golden-test-generator",
+  "version": "0.1.0",
+  "description": "Generate golden test files for a range of Cardano concepts",
+  "engines": {
+    "node": "^14"
+  },
+  "bin": "dist/index.js",
+  "main": "dist/index.js",
+  "repository": "https://github.com/input-output-hk/cardano-js-sdk/packages/golden-test-generator",
+  "author": "Rhys Bartels-Waller",
+  "license": "MPL-2.0",
+  "scripts": {
+    "build": "tsc --build ./src",
+    "cleanup": "shx rm -rf dist node_modules",
+    "dev": "API_PORT=3000 OGMIOS_HOST=localhost OGMIOS_PORT=1337 ts-node-dev ./src/index.ts",
+    "lint": "eslint --ignore-path ../../.eslintignore \"**/*.ts\"",
+    "pkg": "yarn build && pkg -o build/golden-test-generator .",
+    "start": "yarn build && API_PORT=3000 OGMIOS_HOST=localhost OGMIOS_PORT=1337 ts-node ./src/index.ts",
+    "test": "shx echo No tests in this package"
+  },
+  "dependencies": {
+    "@cardano-ogmios/client": "^4.0.0-beta.5",
+    "chalk": "^4.1.1",
+    "clear": "^0.1.0",
+    "cli-progress": "^3.9.0",
+    "commander": "^8.0.0",
+    "fs-extra": "^10.0.0"
+  },
+  "devDependencies": {
+    "@types/cli-progress": "^3.9.2",
+    "@types/fs-extra": "^9.0.12",
+    "@types/ws": "^7.4.6",
+    "pkg": "^5.3.0",
+    "shx": "^0.3.3"
+  },
+  "pkg": {
+    "targets": [
+      "node14-linux-x64",
+      "node14-macos-x64"
+    ]
+  }
+}

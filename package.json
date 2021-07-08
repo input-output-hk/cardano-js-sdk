@@ -34,5 +34,20 @@
   "bugs": {
     "url": "https://github.com/input-output-hk/cardano-js-sdk/issues"
   },
-  "homepage": "https://github.com/input-output-hk/cardano-js-sdk#readme"
+  "homepage": "https://github.com/input-output-hk/cardano-js-sdk#readme",
+  "devDependencies": {
+    "@types/node": "^16.0.0",
+    "@typescript-eslint/eslint-plugin": "^4.28.2",
+    "@typescript-eslint/parser": "^4.28.2",
+    "eslint": "^7.30.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.23.4",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^5.1.0",
+    "eslint-plugin-standard": "^5.0.0",
+    "eslint-watch": "^7.0.0",
+    "ts-node": "^10.0.0",
+    "ts-node-dev": "^1.1.8",
+    "typescript": "^4.3.5"
+  }
 }
