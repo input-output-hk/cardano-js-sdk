@@ -9,4 +9,4 @@
 
 ## Overview
 
-A Yarn Workspace containing packages the collectively forms the SDK, written in TypeScript.
+A Yarn Workspace containing packages that collectively forms the SDK, written in TypeScript.
