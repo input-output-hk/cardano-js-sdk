@@ -2,4 +2,5 @@
 
 set -euo pipefail
 
-npm pack --cwd ./packages/prototype
+npm pack --cwd ./packages/core && \
+npm pack --cwd ./packages/golden-test-generator
