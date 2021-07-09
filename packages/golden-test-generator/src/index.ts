@@ -3,6 +3,7 @@
 import chalk from 'chalk'
 import { Command } from 'commander'
 import { addressBalancesCommand } from './AddressBalance'
+import { blocksCommand } from './Block'
 
 const clear = require('clear')
 const packageJson = require('../package.json')
@@ -16,6 +17,7 @@ const program = new Command('cardano-golden-test-generator')
 
 program
   .addCommand(addressBalancesCommand())
+  .addCommand(blocksCommand())
 
 program.version(packageJson.version)
 if (!process.argv.slice(2).length) {
