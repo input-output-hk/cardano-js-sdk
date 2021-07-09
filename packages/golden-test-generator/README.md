@@ -16,6 +16,5 @@ yarn pkg
 ```
 
 ## Todo:
-- [ ] Add support for tokens in `address-balances` command
 - [ ] Add `fetch-blocks` command
 - [ ] Make Ogmios connection configurable

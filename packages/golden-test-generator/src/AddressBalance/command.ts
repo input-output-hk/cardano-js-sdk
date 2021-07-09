@@ -6,8 +6,8 @@ import path from 'path'
 import { getOnChainAddressBalances } from './getOnChainAddressBalances'
 
 export function addressBalancesCommand () {
-  return createCommand('address-balances')
-    .description('Determine the balance of addresses by syncing the chain from Genesis')
+  return createCommand('address-balance')
+    .description('Balance of addresses, determined by syncing the chain from genesis')
     .argument(
       '[addresses]', 'Comma-separated list of addresses',
       (addresses) => addresses.split(',')

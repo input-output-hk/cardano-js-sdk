@@ -5,13 +5,11 @@ import {
   isMaryBlock,
   Schema
 } from '@cardano-ogmios/client'
-
-export const isByronStandardBlock = (block: Schema.Block): block is { byron: Schema.StandardBlock } =>
-  (block as { byron: Schema.StandardBlock }).byron?.header.slot !== undefined
+import { isByronStandardBlock } from '../util'
 
 export type Response = {
   [blockHeight: string]: {
-    [address: string]: number
+    [address: string]: Schema.Value
   }
 }
 
@@ -25,7 +23,9 @@ export async function getOnChainAddressBalances (
     }
   }
 ): Promise<Response> {
-  const balances = new Map(addresses.map(address => [address, 0]))
+  const balances = Object.fromEntries(
+    addresses.map(address => [address, { coins: 0, assets: undefined }])
+  )
   const response: Response = {}
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
@@ -37,7 +37,8 @@ export async function getOnChainAddressBalances (
         options.progress.callback(currentBlock)
       }, options.progress.interval)
     }
-    // Required to ensure existing messages in the pipe are not processed after the completion condition is met
+    // Required to ensure existing messages in the pipe are not processed after the completion
+    // condition is met
     let draining = false
     try {
       const syncClient = await createChainSyncClient({
@@ -71,15 +72,24 @@ export async function getOnChainAddressBalances (
             currentBlock = b.header.blockHeight
             for (const tx of blockBody) {
               for (const output of tx.body.outputs) {
-                const { address } = output
+                const { address, value } = output
                 if (addresses.includes(address)) {
-                  const currentBalance = balances.get(address)
-                  balances.set(address, currentBalance + output.value.coins)
+                  const { assets, coins } = balances[address]
+                  const newAssetsObj: { [asset: string]: number } = {}
+                  if (value.assets !== undefined) {
+                    Object.entries(value.assets).forEach(([asset, qty]) => {
+                      newAssetsObj[asset] = assets[asset] !== undefined ? assets[asset] + qty : qty
+                    })
+                  }
+                  balances[address] = {
+                    coins: coins + output.value.coins,
+                    assets: newAssetsObj
+                  }
                 }
               }
             }
             if (atBlocks.includes(currentBlock)) {
-              response[currentBlock] = Object.fromEntries(balances)
+              response[currentBlock] = balances
               if (atBlocks[atBlocks.length - 1] === currentBlock) {
                 draining = true
                 if (progressInterval !== undefined) {
