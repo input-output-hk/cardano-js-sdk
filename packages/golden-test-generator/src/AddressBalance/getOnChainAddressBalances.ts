@@ -3,7 +3,7 @@ import {
   isAllegraBlock,
   isShelleyBlock,
   isMaryBlock,
-  Schema
+  Schema, ConnectionConfig
 } from '@cardano-ogmios/client'
 import { isByronStandardBlock } from '../util'
 
@@ -17,6 +17,7 @@ export async function getOnChainAddressBalances (
   addresses: string[],
   atBlocks: number[],
   options?: {
+    ogmiosConnectionConfig: ConnectionConfig
     progress?: {
       callback: (slot: number) => void
       interval: number
@@ -104,8 +105,10 @@ export async function getOnChainAddressBalances (
         }
       },
       reject,
-      () => {}
-      )
+      () => {},
+      {
+        connection: options.ogmiosConnectionConfig
+      })
       await syncClient.startSync(['origin'])
     } catch (error) {
       console.error(error)

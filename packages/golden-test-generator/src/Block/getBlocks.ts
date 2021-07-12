@@ -3,7 +3,7 @@ import {
   isAllegraBlock,
   isShelleyBlock,
   isMaryBlock,
-  Schema
+  Schema, ConnectionConfig
 } from '@cardano-ogmios/client'
 import {
   isByronEpochBoundaryBlock,
@@ -17,6 +17,7 @@ export type Response = {
 export async function getBlocks (
   blockHeights: number[],
   options?: {
+    ogmiosConnectionConfig: ConnectionConfig
     progress?: {
       callback: (slot: number) => void
       interval: number
@@ -75,7 +76,10 @@ export async function getBlocks (
         }
       },
       reject,
-      () => {}
+      () => {},
+      {
+        connection: options.ogmiosConnectionConfig
+      }
       )
       await syncClient.startSync(['origin'])
     } catch (error) {

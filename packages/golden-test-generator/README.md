@@ -14,7 +14,3 @@ yarn pkg
 ```console
 ./build/golden-test-generator-{ linux | macos } --help
 ```
-
-## Todo:
-- [ ] Add `fetch-blocks` command
-- [ ] Make Ogmios connection configurable
