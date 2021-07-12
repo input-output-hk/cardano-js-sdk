@@ -45,7 +45,7 @@ jobs:
       with:
         name: cardano-js-sdk-packages
         path: |
-          packages/golden-test-generator/cardano-js-sdk-golden-test-generator-${{ steps.package-version.outputs.current-version}}.tgz
+          ./cardano-js-sdk-golden-test-generator-${{ steps.package-version.outputs.current-version}}.tgz
           
     - name: 📦 Package REPL
       working-directory: packages/golden-test-generator
