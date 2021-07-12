@@ -7,10 +7,12 @@ import {
 } from '@cardano-ogmios/client'
 import { isByronStandardBlock } from '../util'
 
+type AddressBalances = {
+  [address: string]: Schema.Value
+}
+
 export type Response = {
-  [blockHeight: string]: {
-    [address: string]: Schema.Value
-  }
+  [blockHeight: string]: AddressBalances
 }
 
 export async function getOnChainAddressBalances (
@@ -24,10 +26,35 @@ export async function getOnChainAddressBalances (
     }
   }
 ): Promise<Response> {
-  const balances = Object.fromEntries(
-    addresses.map(address => [address, { coins: 0, assets: undefined }])
+  const trackedAddressBalances: AddressBalances = Object.fromEntries(
+    addresses.map(address => [address, { coins: 0, assets: {} }])
   )
   const response: Response = {}
+  const trackedTxs: ({ id: Schema.Hash16 } & Schema.Tx)[] = []
+  const applyValue = (
+    address: string,
+    value: Schema.Value,
+    subtract = false
+  ): Schema.Value => {
+    const addressBalance = trackedAddressBalances[address]
+    if (addressBalance !== undefined) {
+      const assetBalanceToApply: Schema.Value['assets'] = {
+        ...addressBalance.assets
+      } ?? {}
+      const outputAssets = Object.entries(value.assets ?? {})
+      if (outputAssets.length > 0) {
+        outputAssets.forEach(([assetId, qty]) => {
+          assetBalanceToApply[assetId] = (addressBalance.assets[assetId] !== undefined)
+            ? addressBalance.assets[assetId] + (subtract ? -Math.abs(qty) : qty)
+            : (subtract ? -Math.abs(qty) : qty)
+        })
+      }
+      return {
+        coins: addressBalance.coins + (subtract ? -Math.abs(value.coins) : value.coins),
+        assets: assetBalanceToApply
+      }
+    }
+  }
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
     let currentBlock: number
@@ -73,24 +100,28 @@ export async function getOnChainAddressBalances (
             currentBlock = b.header.blockHeight
             for (const tx of blockBody) {
               for (const output of tx.body.outputs) {
-                const { address, value } = output
-                if (addresses.includes(address)) {
-                  const { assets, coins } = balances[address]
-                  const newAssetsObj: { [asset: string]: number } = {}
-                  if (value.assets !== undefined) {
-                    Object.entries(value.assets).forEach(([asset, qty]) => {
-                      newAssetsObj[asset] = assets[asset] !== undefined ? assets[asset] + qty : qty
-                    })
-                  }
-                  balances[address] = {
-                    coins: coins + output.value.coins,
-                    assets: newAssetsObj
+                const addressBalance = trackedAddressBalances[output.address]
+                if (addressBalance !== undefined) {
+                  trackedTxs.push({ id: tx.id, inputs: tx.body.inputs, outputs: tx.body.outputs })
+                  trackedAddressBalances[output.address] = applyValue(
+                    output.address, output.value
+                  )
+                }
+              }
+              for (const input of tx.body.inputs) {
+                const trackedInput = trackedTxs.find(t => t.id === input.txId)?.outputs[input.index]
+                if (trackedInput !== undefined) {
+                  const addressBalance = trackedAddressBalances[trackedInput?.address]
+                  if (addressBalance !== undefined) {
+                    trackedAddressBalances[trackedInput.address] = applyValue(
+                      trackedInput.address, trackedInput.value, true
+                    )
                   }
                 }
               }
             }
             if (atBlocks.includes(currentBlock)) {
-              response[currentBlock] = balances
+              response[currentBlock] = { ...trackedAddressBalances }
               if (atBlocks[atBlocks.length - 1] === currentBlock) {
                 draining = true
                 if (progressInterval !== undefined) {
