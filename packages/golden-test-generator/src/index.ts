@@ -56,27 +56,32 @@ program
   )
   .requiredOption('--out-dir [outDir]', 'File path to write results to')
   .action(async (addresses: string[], { atBlocks, outDir }) => {
-    const { ogmiosHost, ogmiosPort, ogmiosTls } = program.opts()
-    const atBlockHeights = atBlocks.sort((a: number, b: number) => a - b)
-    const lastBlockHeight = atBlockHeights[atBlockHeights.length - 1]
-    const progress = createProgressBar(lastBlockHeight)
-    await ensureDir(outDir)
-    progress.start(lastBlockHeight, 0)
-    const { balances, metadata } = await getOnChainAddressBalances(addresses, atBlockHeights, {
-      ogmiosConnectionConfig: { host: ogmiosHost, port: ogmiosPort, tls: ogmiosTls },
-      onBlock: (blockHeight) => { progress.update(blockHeight) }
-    })
-    const content = await prepareContent<AddressBalancesResponse['balances']>(metadata, balances)
-    progress.stop()
-    const fileName = path.join(outDir, `address-balances-${hash(content)}.json`)
+    try {
+      const { ogmiosHost, ogmiosPort, ogmiosTls } = program.opts()
+      const atBlockHeights = atBlocks.sort((a: number, b: number) => a - b)
+      const lastBlockHeight = atBlockHeights[atBlockHeights.length - 1]
+      const progress = createProgressBar(lastBlockHeight)
+      await ensureDir(outDir)
+      progress.start(lastBlockHeight, 0)
+      const { balances, metadata } = await getOnChainAddressBalances(addresses, atBlockHeights, {
+        ogmiosConnectionConfig: { host: ogmiosHost, port: ogmiosPort, tls: ogmiosTls },
+        onBlock: (blockHeight) => { progress.update(blockHeight) }
+      })
+      const content = await prepareContent<AddressBalancesResponse['balances']>(metadata, balances)
+      progress.stop()
+      const fileName = path.join(outDir, `address-balances-${hash(content)}.json`)
 
-    console.log(`Writing ${fileName}`)
-    await writeJson(
-      fileName,
-      content,
-      { spaces: 2 }
-    )
-    process.exit(0)
+      console.log(`Writing ${fileName}`)
+      await writeJson(
+        fileName,
+        content,
+        { spaces: 2 }
+      )
+      process.exit(0)
+    } catch (error) {
+      console.error(error)
+      process.exit(1)
+    }
   })
 
 program
@@ -88,27 +93,32 @@ program
   )
   .requiredOption('--out-dir [outDir]', 'File path to write results to')
   .action(async (blockHeights: number[], { outDir }) => {
-    const { ogmiosHost, ogmiosPort, ogmiosTls } = program.opts()
-    const sortedblockHeights = blockHeights.sort((a: number, b: number) => a - b)
-    const lastblockHeight = sortedblockHeights[sortedblockHeights.length - 1]
-    const progress = createProgressBar(lastblockHeight)
-    await ensureDir(outDir)
-    progress.start(lastblockHeight, 0)
-    const { blocks, metadata } = await getBlocks(sortedblockHeights, {
-      ogmiosConnectionConfig: { host: ogmiosHost, port: ogmiosPort, tls: ogmiosTls },
-      onBlock: (blockHeight) => { progress.update(blockHeight) }
-    })
-    progress.stop()
-    const content = await prepareContent<GetBlocksResponse['blocks']>(metadata, blocks)
-    const fileName = path.join(outDir, `blocks-${hash(content)}.json`)
+    try {
+      const { ogmiosHost, ogmiosPort, ogmiosTls } = program.opts()
+      const sortedblockHeights = blockHeights.sort((a: number, b: number) => a - b)
+      const lastblockHeight = sortedblockHeights[sortedblockHeights.length - 1]
+      const progress = createProgressBar(lastblockHeight)
+      await ensureDir(outDir)
+      progress.start(lastblockHeight, 0)
+      const { blocks, metadata } = await getBlocks(sortedblockHeights, {
+        ogmiosConnectionConfig: { host: ogmiosHost, port: ogmiosPort, tls: ogmiosTls },
+        onBlock: (blockHeight) => { progress.update(blockHeight) }
+      })
+      progress.stop()
+      const content = await prepareContent<GetBlocksResponse['blocks']>(metadata, blocks)
+      const fileName = path.join(outDir, `blocks-${hash(content)}.json`)
 
-    console.log(`Writing ${fileName}`)
-    await writeJson(
-      fileName,
-      content,
-      { spaces: 2 }
-    )
-    process.exit(0)
+      console.log(`Writing ${fileName}`)
+      await writeJson(
+        fileName,
+        content,
+        { spaces: 2 }
+      )
+      process.exit(0)
+    } catch (error) {
+      console.error(error)
+      process.exit(1)
+    }
   })
 
 program.version(packageJson.version)
