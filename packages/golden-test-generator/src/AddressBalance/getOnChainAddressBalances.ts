@@ -1,18 +1,20 @@
 import {
   createChainSyncClient,
+  genesisConfig,
   isAllegraBlock,
   isShelleyBlock,
   isMaryBlock,
   Schema, ConnectionConfig
 } from '@cardano-ogmios/client'
+import { GeneratorMetadata } from '../Content'
 import { isByronStandardBlock } from '../util'
 
 type AddressBalances = {
   [address: string]: Schema.Value
 }
 
-export type Response = {
-  [blockHeight: string]: AddressBalances
+export type AddressBalancesResponse = GeneratorMetadata & {
+  balances: { [blockHeight: string]: AddressBalances }
 }
 
 export async function getOnChainAddressBalances (
@@ -25,11 +27,19 @@ export async function getOnChainAddressBalances (
       interval: number
     }
   }
-): Promise<Response> {
+): Promise<AddressBalancesResponse> {
   const trackedAddressBalances: AddressBalances = Object.fromEntries(
     addresses.map(address => [address, { coins: 0, assets: {} }])
   )
-  const response: Response = {}
+  const response: AddressBalancesResponse = {
+    metadata: {
+      cardano: {
+        compactGenesis: await genesisConfig(options?.ogmiosConnectionConfig),
+        intersection: undefined
+      }
+    },
+    balances: {}
+  }
   const trackedTxs: ({ id: Schema.Hash16 } & Schema.Tx)[] = []
   const applyValue = (
     address: string,
@@ -38,21 +48,19 @@ export async function getOnChainAddressBalances (
   ): Schema.Value => {
     const addressBalance = trackedAddressBalances[address]
     if (addressBalance !== undefined) {
-      const assetBalanceToApply: Schema.Value['assets'] = {
-        ...addressBalance.assets
-      } ?? {}
+      const balanceToApply: Schema.Value = {
+        assets: addressBalance.assets ?? {},
+        coins: addressBalance.coins + (subtract ? -Math.abs(value.coins) : value.coins)
+      }
       const outputAssets = Object.entries(value.assets ?? {})
       if (outputAssets.length > 0) {
         outputAssets.forEach(([assetId, qty]) => {
-          assetBalanceToApply[assetId] = (addressBalance.assets[assetId] !== undefined)
+          balanceToApply.assets[assetId] = (addressBalance.assets[assetId] !== undefined)
             ? addressBalance.assets[assetId] + (subtract ? -Math.abs(qty) : qty)
             : (subtract ? -Math.abs(qty) : qty)
         })
       }
-      return {
-        coins: addressBalance.coins + (subtract ? -Math.abs(value.coins) : value.coins),
-        assets: assetBalanceToApply
-      }
+      return balanceToApply
     }
   }
   // eslint-disable-next-line no-async-promise-executor
@@ -121,7 +129,7 @@ export async function getOnChainAddressBalances (
               }
             }
             if (atBlocks.includes(currentBlock)) {
-              response[currentBlock] = { ...trackedAddressBalances }
+              response.balances[currentBlock] = { ...trackedAddressBalances }
               if (atBlocks[atBlocks.length - 1] === currentBlock) {
                 draining = true
                 if (progressInterval !== undefined) {
@@ -140,7 +148,7 @@ export async function getOnChainAddressBalances (
       {
         connection: options.ogmiosConnectionConfig
       })
-      await syncClient.startSync(['origin'])
+      response.metadata.cardano.intersection = await syncClient.startSync(['origin'])
     } catch (error) {
       console.error(error)
       return reject(error)

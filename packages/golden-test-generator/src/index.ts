@@ -2,11 +2,13 @@
 
 import chalk from 'chalk'
 import { Command } from 'commander'
-import { getOnChainAddressBalances } from './AddressBalance'
+import hash from 'object-hash'
 import path from 'path'
 import cliProgress from 'cli-progress'
 import { ensureDir, writeJson } from 'fs-extra'
-import { getBlocks } from './Block'
+import { AddressBalancesResponse, getOnChainAddressBalances } from './AddressBalance'
+import { getBlocks, GetBlocksResponse } from './Block'
+import { prepareContent } from './Content'
 
 const clear = require('clear')
 const packageJson = require('../package.json')
@@ -48,7 +50,6 @@ program
     const { ogmiosHost, ogmiosPort, ogmiosTls } = program.opts()
     const atBlockHeights = atBlocks.sort((a: number, b: number) => a - b)
     const lastBlockHeight = atBlockHeights[atBlockHeights.length - 1]
-    const fileName = path.join(outDir, `address-balances-${atBlockHeights.join('-')}.json`)
 
     const progress = new cliProgress.SingleBar({
       format: `Syncing from genesis to block ${lastBlockHeight} | ${chalk.blue('{bar}')} | {percentage}% || {value}/{total} Blocks`,
@@ -58,18 +59,21 @@ program
     })
     await ensureDir(outDir)
     progress.start(lastBlockHeight, 0)
-    const balances = await getOnChainAddressBalances(addresses, atBlockHeights, {
+    const { balances, metadata } = await getOnChainAddressBalances(addresses, atBlockHeights, {
       ogmiosConnectionConfig: { host: ogmiosHost, port: ogmiosPort, tls: ogmiosTls },
       progress: {
         callback: (blockHeight) => progress.update(blockHeight),
         interval: 2000
       }
     })
+    const content = await prepareContent<AddressBalancesResponse['balances']>(metadata, balances)
     progress.stop()
+    const fileName = path.join(outDir, `address-balances-${hash(content)}.json`)
+
     console.log(`Writing ${fileName}`)
     await writeJson(
       fileName,
-      balances,
+      content,
       { spaces: 2 }
     )
     process.exit(0)
@@ -87,7 +91,6 @@ program
     const { ogmiosHost, ogmiosPort, ogmiosTls } = program.opts()
     const sortedblockHeights = blockHeights.sort((a: number, b: number) => a - b)
     const lastblockHeight = sortedblockHeights[sortedblockHeights.length - 1]
-    const fileName = path.join(outDir, `blocks-${sortedblockHeights.join('-')}.json`)
 
     const progress = new cliProgress.SingleBar({
       format: `Syncing from genesis to block ${lastblockHeight} | ${chalk.blue('{bar}')} | {percentage}% || {value}/{total} Blocks`,
@@ -97,7 +100,7 @@ program
     })
     await ensureDir(outDir)
     progress.start(lastblockHeight, 0)
-    const balances = await getBlocks(sortedblockHeights, {
+    const { blocks, metadata } = await getBlocks(sortedblockHeights, {
       ogmiosConnectionConfig: { host: ogmiosHost, port: ogmiosPort, tls: ogmiosTls },
       progress: {
         callback: (blockHeight) => progress.update(blockHeight),
@@ -105,10 +108,13 @@ program
       }
     })
     progress.stop()
+    const content = prepareContent<GetBlocksResponse['blocks']>(metadata, blocks)
+    const fileName = path.join(outDir, `blocks-${hash(content)}.json`)
+
     console.log(`Writing ${fileName}`)
     await writeJson(
       fileName,
-      balances,
+      content,
       { spaces: 2 }
     )
     process.exit(0)

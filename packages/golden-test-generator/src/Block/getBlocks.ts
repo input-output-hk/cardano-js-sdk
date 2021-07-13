@@ -1,17 +1,21 @@
 import {
+  ConnectionConfig,
   createChainSyncClient,
+  genesisConfig,
   isAllegraBlock,
   isShelleyBlock,
   isMaryBlock,
-  Schema, ConnectionConfig
+  Schema
 } from '@cardano-ogmios/client'
+import { GeneratorMetadata } from '../Content'
+
 import {
   isByronEpochBoundaryBlock,
   isByronStandardBlock
 } from '../util'
 
-export type Response = {
-  [blockHeight: string]: Schema.Block
+export type GetBlocksResponse = GeneratorMetadata & {
+  blocks: { [blockHeight: string]: Schema.Block }
 }
 
 export async function getBlocks (
@@ -23,8 +27,17 @@ export async function getBlocks (
       interval: number
     }
   }
-): Promise<Response> {
-  const response = new Map<number, Schema.Block>()
+): Promise<GetBlocksResponse> {
+  const requestedBlocks: { [blockHeight: string]: Schema.Block } = {}
+  const response: GetBlocksResponse = {
+    metadata: {
+      cardano: {
+        compactGenesis: await genesisConfig(options?.ogmiosConnectionConfig),
+        intersection: undefined
+      }
+    },
+    blocks: {}
+  }
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
     let currentBlock: number
@@ -61,14 +74,15 @@ export async function getBlocks (
           if (b !== undefined) {
             currentBlock = b.header.blockHeight
             if (blockHeights.includes(currentBlock)) {
-              response.set(currentBlock, block)
+              requestedBlocks[currentBlock] = block
               if (blockHeights[blockHeights.length - 1] === currentBlock) {
                 draining = true
+                response.blocks = requestedBlocks
                 if (progressInterval !== undefined) {
                   clearInterval(progressInterval)
                 }
                 await syncClient.shutdown()
-                return resolve(Object.fromEntries(response))
+                return resolve(response)
               }
             }
           }
@@ -81,7 +95,7 @@ export async function getBlocks (
         connection: options.ogmiosConnectionConfig
       }
       )
-      await syncClient.startSync(['origin'])
+      response.metadata.cardano.intersection = await syncClient.startSync(['origin'])
     } catch (error) {
       console.error(error)
       return reject(error)
