@@ -10,7 +10,6 @@ import {
 import { GeneratorMetadata } from '../Content'
 
 import {
-  isByronEpochBoundaryBlock,
   isByronStandardBlock
 } from '../util'
 
@@ -57,7 +56,6 @@ export async function getBlocks (
         },
         rollForward: async ({ block }, requestNext) => {
           if (draining) return
-          if (isByronEpochBoundaryBlock(block)) return
           let b: Schema.StandardBlock
             | Schema.BlockShelley
             | Schema.BlockAllegra
