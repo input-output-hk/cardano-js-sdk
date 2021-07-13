@@ -4,7 +4,7 @@ import chalk from 'chalk'
 import { Command } from 'commander'
 import hash from 'object-hash'
 import path from 'path'
-import cliProgress from 'cli-progress'
+import { SingleBar, Options } from 'cli-progress'
 import { ensureDir, writeJson } from 'fs-extra'
 import { AddressBalancesResponse, getOnChainAddressBalances } from './AddressBalance'
 import { getBlocks, GetBlocksResponse } from './Block'
@@ -17,6 +17,15 @@ clear()
 console.log(
   chalk.blue('Cardano Golden Test Generator')
 )
+
+const createProgressBar = (lastblockHeight: number) =>
+  new SingleBar({
+    format: `Syncing from genesis to block ${lastblockHeight} | ${chalk.blue('{bar}')} | {percentage}% || {value}/{total} Blocks`,
+    barCompleteChar: '\u2588',
+    barIncompleteChar: '\u2591',
+    hideCursor: true,
+    renderThrottle: 300
+  } as Options)
 
 const program = new Command('cardano-golden-test-generator')
 
@@ -50,21 +59,12 @@ program
     const { ogmiosHost, ogmiosPort, ogmiosTls } = program.opts()
     const atBlockHeights = atBlocks.sort((a: number, b: number) => a - b)
     const lastBlockHeight = atBlockHeights[atBlockHeights.length - 1]
-
-    const progress = new cliProgress.SingleBar({
-      format: `Syncing from genesis to block ${lastBlockHeight} | ${chalk.blue('{bar}')} | {percentage}% || {value}/{total} Blocks`,
-      barCompleteChar: '\u2588',
-      barIncompleteChar: '\u2591',
-      hideCursor: true
-    })
+    const progress = createProgressBar(lastBlockHeight)
     await ensureDir(outDir)
     progress.start(lastBlockHeight, 0)
     const { balances, metadata } = await getOnChainAddressBalances(addresses, atBlockHeights, {
       ogmiosConnectionConfig: { host: ogmiosHost, port: ogmiosPort, tls: ogmiosTls },
-      progress: {
-        callback: (blockHeight) => progress.update(blockHeight),
-        interval: 2000
-      }
+      onBlock: (blockHeight) => { progress.update(blockHeight) }
     })
     const content = await prepareContent<AddressBalancesResponse['balances']>(metadata, balances)
     progress.stop()
@@ -91,24 +91,15 @@ program
     const { ogmiosHost, ogmiosPort, ogmiosTls } = program.opts()
     const sortedblockHeights = blockHeights.sort((a: number, b: number) => a - b)
     const lastblockHeight = sortedblockHeights[sortedblockHeights.length - 1]
-
-    const progress = new cliProgress.SingleBar({
-      format: `Syncing from genesis to block ${lastblockHeight} | ${chalk.blue('{bar}')} | {percentage}% || {value}/{total} Blocks`,
-      barCompleteChar: '\u2588',
-      barIncompleteChar: '\u2591',
-      hideCursor: true
-    })
+    const progress = createProgressBar(lastblockHeight)
     await ensureDir(outDir)
     progress.start(lastblockHeight, 0)
     const { blocks, metadata } = await getBlocks(sortedblockHeights, {
       ogmiosConnectionConfig: { host: ogmiosHost, port: ogmiosPort, tls: ogmiosTls },
-      progress: {
-        callback: (blockHeight) => progress.update(blockHeight),
-        interval: 2000
-      }
+      onBlock: (blockHeight) => { progress.update(blockHeight) }
     })
     progress.stop()
-    const content = prepareContent<GetBlocksResponse['blocks']>(metadata, blocks)
+    const content = await prepareContent<GetBlocksResponse['blocks']>(metadata, blocks)
     const fileName = path.join(outDir, `blocks-${hash(content)}.json`)
 
     console.log(`Writing ${fileName}`)

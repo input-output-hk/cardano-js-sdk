@@ -22,10 +22,7 @@ export async function getOnChainAddressBalances (
   atBlocks: number[],
   options?: {
     ogmiosConnectionConfig: ConnectionConfig
-    progress?: {
-      callback: (slot: number) => void
-      interval: number
-    }
+    onBlock?: (slot: number) => void
   }
 ): Promise<AddressBalancesResponse> {
   const trackedAddressBalances: AddressBalances = Object.fromEntries(
@@ -66,13 +63,6 @@ export async function getOnChainAddressBalances (
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
     let currentBlock: number
-    let progressInterval: ReturnType<typeof setInterval>
-    if (options?.progress) {
-      progressInterval = setInterval(() => {
-        if (currentBlock === undefined) return
-        options.progress.callback(currentBlock)
-      }, options.progress.interval)
-    }
     // Required to ensure existing messages in the pipe are not processed after the completion
     // condition is met
     let draining = false
@@ -106,6 +96,9 @@ export async function getOnChainAddressBalances (
           }
           if (b !== undefined) {
             currentBlock = b.header.blockHeight
+            if (options?.onBlock !== undefined) {
+              options.onBlock(currentBlock)
+            }
             for (const tx of blockBody) {
               for (const output of tx.body.outputs) {
                 const addressBalance = trackedAddressBalances[output.address]
@@ -132,9 +125,6 @@ export async function getOnChainAddressBalances (
               response.balances[currentBlock] = { ...trackedAddressBalances }
               if (atBlocks[atBlocks.length - 1] === currentBlock) {
                 draining = true
-                if (progressInterval !== undefined) {
-                  clearInterval(progressInterval)
-                }
                 await syncClient.shutdown()
                 return resolve(response)
               }
