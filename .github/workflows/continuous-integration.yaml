@@ -35,6 +35,10 @@ jobs:
         yarn install --offline --frozen-lockfile --non-interactive --logevel=error
         yarn build
         yarn lint
+        
+    - name: 🔬 Test
+      run: |
+        yarn test
 
     - name: 📦 Pack
       run: |

@@ -15,9 +15,12 @@
     "cleanup": "shx rm -rf dist node_modules",
     "dev": "API_PORT=3000 OGMIOS_HOST=localhost OGMIOS_PORT=1337 ts-node-dev ./src/index.ts",
     "lint": "eslint --ignore-path ../../.eslintignore \"**/*.ts\"",
+    "prepkg": "yarn build",
     "pkg": "yarn build && pkg -o build/golden-test-generator .",
-    "start": "yarn build && API_PORT=3000 OGMIOS_HOST=localhost OGMIOS_PORT=1337 ts-node ./src/index.ts",
-    "test": "shx echo No tests in this package"
+    "prestart": "yarn build",
+    "start": "API_PORT=3000 OGMIOS_HOST=localhost OGMIOS_PORT=1337 ts-node ./src/index.ts",
+    "pretest": "yarn build",
+    "test": "jest -c ./test/jest.config.js"
   },
   "dependencies": {
     "@cardano-ogmios/client": "^4.0.0-beta.5",
