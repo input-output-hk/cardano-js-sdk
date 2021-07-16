@@ -47,12 +47,17 @@ program
   .description('Balance of addresses, determined by syncing the chain from genesis')
   .argument(
     '[addresses]', 'Comma-separated list of addresses',
-    (addresses) => addresses.split(',')
+    (addresses) => addresses
+      .split(',')
+      .filter(a => a !== '')
   )
   .requiredOption(
     '--at-blocks [atBlocks]',
     'Balance of the addresses at block heights',
-    (heights) => heights.split(',').map(height => parseInt(height))
+    (heights) => heights
+      .split(',')
+      .filter(b => b !== '')
+      .map(height => parseInt(height))
   )
   .requiredOption('--out-dir [outDir]', 'File path to write results to')
   .action(async (addresses: string[], { atBlocks, outDir }) => {
@@ -89,7 +94,10 @@ program
   .description('Dump the requested blocks in their raw structure')
   .argument(
     '[blockHeights]', 'Comma-separated list of blocks by number',
-    (blockHeights) => blockHeights.split(',').map(blockHeight => parseInt(blockHeight))
+    (blockHeights) => blockHeights
+      .split(',')
+      .filter(b => b !== '')
+      .map(blockHeight => parseInt(blockHeight))
   )
   .requiredOption('--out-dir [outDir]', 'File path to write results to')
   .action(async (blockHeights: number[], { outDir }) => {
