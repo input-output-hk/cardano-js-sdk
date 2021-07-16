@@ -80,8 +80,8 @@ export async function getOnChainAddressBalances (
             }
             for (const tx of blockBody) {
               for (const output of tx.body.outputs) {
-                const addressBalance = trackedAddressBalances[output.address]
-                if (addressBalance !== undefined) {
+                if (trackedAddressBalances[output.address] !== undefined) {
+                  const addressBalance = { ...trackedAddressBalances[output.address] }
                   trackedTxs.push({ id: tx.id, inputs: tx.body.inputs, outputs: tx.body.outputs })
                   trackedAddressBalances[output.address] = applyValue(
                     addressBalance, output.value
@@ -91,8 +91,8 @@ export async function getOnChainAddressBalances (
               for (const input of tx.body.inputs) {
                 const trackedInput = trackedTxs.find(t => t.id === input.txId)?.outputs[input.index]
                 if (trackedInput !== undefined) {
-                  const addressBalance = trackedAddressBalances[trackedInput?.address]
-                  if (addressBalance !== undefined) {
+                  if (trackedAddressBalances[trackedInput?.address] !== undefined) {
+                    const addressBalance = { ...trackedAddressBalances[trackedInput.address] }
                     trackedAddressBalances[trackedInput.address] = applyValue(
                       addressBalance, trackedInput.value, true
                     )
