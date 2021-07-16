@@ -22,7 +22,7 @@ jobs:
     - name: 🧰 Setup Node.js
       uses: actions/setup-node@v1
       with:
-        node-version: 14.4
+        node-version: 14.17
 
     - name: ↪ Set package version
       id: package-version
