@@ -1,5 +1,5 @@
 {
-  "name": "@cardano-js-sdk/core",
+  "name": "@cardano-sdk/core",
   "version": "0.1.0",
   "description": "Core types and libraries for Cardano",
   "engines": {
