@@ -1,5 +1,5 @@
 import {
-  Intersection,
+  ChainSync,
   Schema as Cardano
 } from '@cardano-ogmios/client'
 import { Commit } from 'git-last-commit'
@@ -9,7 +9,7 @@ const packageJson = require('../package.json')
 export type Metadata = {
   cardano: {
     compactGenesis: Cardano.CompactGenesis
-    intersection: Intersection
+    intersection: ChainSync.Intersection
   },
   software: {
     name: string,

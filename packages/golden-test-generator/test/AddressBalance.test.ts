@@ -10,14 +10,14 @@ describe('AddressBalance', () => {
         },
         cd: {
           assets: {
-            12: 10
+            12: 10n
           },
           coins: 400
         },
         ef: {
           assets: {
-            12: 10,
-            34: 20
+            12: 10n,
+            34: 20n
           },
           coins: 500
         }
@@ -45,20 +45,27 @@ describe('AddressBalance', () => {
     describe('values containing an asset', () => {
       const address = 'cd'
       it('adds the coins and asset balance', () => {
-        expect(applyValue(balances[address], { assets: { 12: 10 }, coins: 50 }))
-          .toEqual({ assets: { 12: 20 }, coins: 450 })
+        expect(applyValue(
+          balances[address],
+          {
+            assets: {
+              12: 10n
+            },
+            coins: 50
+          }))
+          .toEqual({ assets: { 12: 20n }, coins: 450 })
       })
       it('subtracts the coins and asset balance when spending', () => {
-        expect(applyValue(balances[address], { assets: { 12: 9 }, coins: 50 }, true))
-          .toEqual({ assets: { 12: 1 }, coins: 350 })
+        expect(applyValue(balances[address], { assets: { 12: 9n }, coins: 50 }, true))
+          .toEqual({ assets: { 12: 1n }, coins: 350 })
       })
       it('returns the same balance if coins and asset is 0', () => {
-        expect(applyValue(balances[address], { assets: { 12: 0 }, coins: 0 }))
-          .toEqual({ assets: { 12: 10 }, coins: 400 })
+        expect(applyValue(balances[address], { assets: { 12: 0n }, coins: 0 }))
+          .toEqual({ assets: { 12: 10n }, coins: 400 })
       })
       it('returns the same balance if coins and asset is 0 when spending', () => {
-        expect(applyValue(balances[address], { assets: { 12: 0 }, coins: 0 }, true))
-          .toEqual({ assets: { 12: 10 }, coins: 400 })
+        expect(applyValue(balances[address], { assets: { 12: 0n }, coins: 0 }, true))
+          .toEqual({ assets: { 12: 10n }, coins: 400 })
       })
     })
     describe('values containing multiple assets', () => {
@@ -67,15 +74,15 @@ describe('AddressBalance', () => {
         expect(applyValue(
           balances[address], {
             assets: {
-              12: 10,
-              34: 55
+              12: 10n,
+              34: 55n
             },
             coins: 50
           }))
           .toEqual({
             assets: {
-              12: 20,
-              34: 75
+              12: 20n,
+              34: 75n
             },
             coins: 550
           })
@@ -84,15 +91,15 @@ describe('AddressBalance', () => {
         expect(applyValue(
           balances[address], {
             assets: {
-              12: 9,
-              34: 15
+              12: 9n,
+              34: 15n
             },
             coins: 50
           }, true))
           .toEqual({
             assets: {
-              12: 1,
-              34: 5
+              12: 1n,
+              34: 5n
             },
             coins: 450
           })
@@ -101,15 +108,15 @@ describe('AddressBalance', () => {
         expect(applyValue(
           balances[address], {
             assets: {
-              new: 100
+              new: 100n
             },
             coins: 1
           }))
           .toEqual({
             assets: {
-              12: 10,
-              34: 20,
-              new: 100
+              12: 10n,
+              34: 20n,
+              new: 100n
             },
             coins: 501
           })
@@ -125,8 +132,8 @@ describe('AddressBalance', () => {
           }
         )).toEqual({
           assets: {
-            12: 10,
-            34: 20
+            12: 10n,
+            34: 20n
           },
           coins: 550
         })
@@ -138,8 +145,8 @@ describe('AddressBalance', () => {
           true
         )).toEqual({
           assets: {
-            12: 10,
-            34: 20
+            12: 10n,
+            34: 20n
           },
           coins: 450
         })
@@ -161,7 +168,7 @@ describe('AddressBalance', () => {
           balances[address],
           {
             assets: {
-              12: 20
+              12: 20n
             },
             coins: 1
           },

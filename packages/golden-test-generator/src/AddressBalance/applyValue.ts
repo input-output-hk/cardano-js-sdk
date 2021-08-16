@@ -1,6 +1,7 @@
 import { Schema } from '@cardano-ogmios/client'
+import { Math as BigIntMath } from '../lib/BigInt'
 
-const throwIfNegative = (value: number): void => {
+const throwIfNegative = (value: bigint | number): void => {
   if (value < 0) {
     throw new Error('The value provided cannot be applied as it will result in a negative balance')
   }
@@ -21,8 +22,8 @@ export const applyValue = (
   if (assets.length > 0) {
     assets.forEach(([assetId, qty]) => {
       balanceToApply.assets[assetId] = (balance.assets[assetId] !== undefined)
-        ? balance.assets[assetId] + (spending ? -Math.abs(qty) : qty)
-        : (spending ? -Math.abs(qty) : qty)
+        ? balance.assets[assetId] + (spending ? -BigIntMath.abs(qty) : qty)
+        : (spending ? -BigIntMath.abs(qty) : qty)
       throwIfNegative(balanceToApply.assets[assetId])
     })
   }

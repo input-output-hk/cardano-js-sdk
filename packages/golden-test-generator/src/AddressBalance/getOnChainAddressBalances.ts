@@ -1,10 +1,10 @@
 import {
   createChainSyncClient,
-  genesisConfig,
+  StateQuery,
   isAllegraBlock,
   isShelleyBlock,
   isMaryBlock,
-  Schema, ConnectionConfig
+  Schema, ConnectionConfig, createInteractionContext
 } from '@cardano-ogmios/client'
 import { GeneratorMetadata } from '../Content'
 import { isByronStandardBlock } from '../util'
@@ -29,15 +29,6 @@ export async function getOnChainAddressBalances (
   const trackedAddressBalances: AddressBalances = Object.fromEntries(
     addresses.map(address => [address, { coins: 0, assets: {} }])
   )
-  const response: AddressBalancesResponse = {
-    metadata: {
-      cardano: {
-        compactGenesis: await genesisConfig(options?.ogmiosConnectionConfig),
-        intersection: undefined
-      }
-    },
-    balances: {}
-  }
   const trackedTxs: ({ id: Schema.Hash16 } & Schema.Tx)[] = []
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
@@ -45,78 +36,89 @@ export async function getOnChainAddressBalances (
     // Required to ensure existing messages in the pipe are not processed after the completion
     // condition is met
     let draining = false
+    const response: AddressBalancesResponse = {
+      metadata: {
+        cardano: {
+          compactGenesis: await StateQuery.genesisConfig(
+            await createInteractionContext(
+              reject, console.log, { connection: options.ogmiosConnectionConfig }
+            )
+          ),
+          intersection: undefined
+        }
+      },
+      balances: {}
+    }
     try {
-      const syncClient = await createChainSyncClient({
-        rollBackward: async (_res, requestNext) => {
-          requestNext()
-        },
-        rollForward: async ({ block }, requestNext) => {
-          if (draining) return
-          let b: Schema.StandardBlock
+      const syncClient = await createChainSyncClient(
+        await createInteractionContext(
+          reject, console.log, { connection: options.ogmiosConnectionConfig }
+        ), {
+          rollBackward: async (_res, requestNext) => {
+            requestNext()
+          },
+          rollForward: async ({ block }, requestNext) => {
+            if (draining) return
+            let b: Schema.StandardBlock
               | Schema.BlockShelley
               | Schema.BlockAllegra
               | Schema.BlockMary
-          let blockBody: Schema.StandardBlock['body']['txPayload']
+            let blockBody: Schema.StandardBlock['body']['txPayload']
               | Schema.BlockShelley['body']
               | Schema.BlockAllegra['body']
               | Schema.BlockMary['body']
-          if (isByronStandardBlock(block)) {
-            b = block.byron as Schema.StandardBlock
-            blockBody = b.body.txPayload
-          } else if (isShelleyBlock(block)) {
-            b = block.shelley as Schema.BlockShelley
-            blockBody = b.body
-          } else if (isAllegraBlock(block)) {
-            b = block.allegra as Schema.BlockAllegra
-            blockBody = b.body
-          } else if (isMaryBlock(block)) {
-            b = block.mary as Schema.BlockMary
-            blockBody = b.body
-          }
-          if (b !== undefined) {
-            currentBlock = b.header.blockHeight
-            if (options?.onBlock !== undefined) {
-              options.onBlock(currentBlock)
+            if (isByronStandardBlock(block)) {
+              b = block.byron as Schema.StandardBlock
+              blockBody = b.body.txPayload
+            } else if (isShelleyBlock(block)) {
+              b = block.shelley as Schema.BlockShelley
+              blockBody = b.body
+            } else if (isAllegraBlock(block)) {
+              b = block.allegra as Schema.BlockAllegra
+              blockBody = b.body
+            } else if (isMaryBlock(block)) {
+              b = block.mary as Schema.BlockMary
+              blockBody = b.body
             }
-            for (const tx of blockBody) {
-              for (const output of tx.body.outputs) {
-                if (trackedAddressBalances[output.address] !== undefined) {
-                  const addressBalance = { ...trackedAddressBalances[output.address] }
-                  trackedTxs.push({ id: tx.id, inputs: tx.body.inputs, outputs: tx.body.outputs })
-                  trackedAddressBalances[output.address] = applyValue(
-                    addressBalance, output.value
-                  )
-                }
+            if (b !== undefined) {
+              currentBlock = b.header.blockHeight
+              if (options?.onBlock !== undefined) {
+                options.onBlock(currentBlock)
               }
-              for (const input of tx.body.inputs) {
-                const trackedInput = trackedTxs.find(t => t.id === input.txId)?.outputs[input.index]
-                if (trackedInput !== undefined) {
-                  if (trackedAddressBalances[trackedInput?.address] !== undefined) {
-                    const addressBalance = { ...trackedAddressBalances[trackedInput.address] }
-                    trackedAddressBalances[trackedInput.address] = applyValue(
-                      addressBalance, trackedInput.value, true
+              for (const tx of blockBody) {
+                for (const output of tx.body.outputs) {
+                  if (trackedAddressBalances[output.address] !== undefined) {
+                    const addressBalance = { ...trackedAddressBalances[output.address] }
+                    trackedTxs.push({ id: tx.id, inputs: tx.body.inputs, outputs: tx.body.outputs })
+                    trackedAddressBalances[output.address] = applyValue(
+                      addressBalance, output.value
                     )
                   }
                 }
+                for (const input of tx.body.inputs) {
+                  const trackedInput = trackedTxs.find(t => t.id === input.txId)?.outputs[input.index]
+                  if (trackedInput !== undefined) {
+                    if (trackedAddressBalances[trackedInput?.address] !== undefined) {
+                      const addressBalance = { ...trackedAddressBalances[trackedInput.address] }
+                      trackedAddressBalances[trackedInput.address] = applyValue(
+                        addressBalance, trackedInput.value, true
+                      )
+                    }
+                  }
+                }
+              }
+              if (atBlocks.includes(currentBlock)) {
+                response.balances[currentBlock] = { ...trackedAddressBalances }
+                if (atBlocks[atBlocks.length - 1] === currentBlock) {
+                  draining = true
+                  await syncClient.shutdown()
+                  return resolve(response)
+                }
               }
             }
-            if (atBlocks.includes(currentBlock)) {
-              response.balances[currentBlock] = { ...trackedAddressBalances }
-              if (atBlocks[atBlocks.length - 1] === currentBlock) {
-                draining = true
-                await syncClient.shutdown()
-                return resolve(response)
-              }
-            }
+            requestNext()
           }
-          requestNext()
-        }
-      },
-      reject,
-      () => {},
-      {
-        connection: options.ogmiosConnectionConfig
-      })
+        })
       response.metadata.cardano.intersection = await syncClient.startSync(['origin'])
     } catch (error) {
       console.error(error)
