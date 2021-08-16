@@ -32,7 +32,7 @@ jobs:
 
     - name: 🔨 Build
       run: |
-        yarn install --offline --frozen-lockfile --non-interactive --logevel=error
+        yarn install --frozen-lockfile --non-interactive --logevel=error
         yarn build
         yarn lint
         
