@@ -1,7 +1,5 @@
 # Cardano JS SDK
 
-[![Build Status](http://13.238.211.79:8080/buildStatus/icon?job=cardano-js-sdk%2Fdevelop)](http://13.238.211.79:8080/blue/organizations/jenkins/cardano-js-sdk/)
-
 JavaScript SDK for interacting with Cardano, providing various key management options including support for popular hardware wallets. The library supports multiple Cardano APIs by establishing a [_Provider_](src/Provider/Provider.ts) interface. This is beneficial for both development workflow and production scenarios, as application logic does not become coupled to any one implementation.
 
 There are two _provider_ types, and it is important to understand the difference when using the SDK. We have defined the _CardanoProvider_ and _WalletProvider_.
@@ -31,13 +29,12 @@ This SDK is a work in progress and should not be used in production. The initial
   - [ ] Trezor  
 - [ ] Cardano Providers
   - [ ] [cardano-wallet](https://github.com/input-output-hk/cardano-wallet)
-  - [ ] [Yoroi/Soshen](https://soshen.io/api-docs.html)
 - [ ] Staking and Delegation
 
 ## Examples
 The below examples are implemented as integration tests, they should be very easy to understand.
 
-- [Generate a keypair in memory from a BIP39 mnemonic](src/test/MemoryKeyManager.spec.ts)
+- [Generate a keypair in memory from a BIP39 mnemonic](src/test/InMemoryKeyManager.spec.ts)
 - [Message signatures](src/test/SignAndVerify.spec.ts)
 - [Get the wallet balance for a BIP44 Account](src/test/WalletBalance.spec.ts)
 - [Determine the next change and receipt addresses for a BIP44 Account](src/test/DetermineNextAddressForWallet.spec.ts)
