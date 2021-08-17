@@ -12,7 +12,47 @@
 
 ## Overview
 
-A Yarn Workspace containing packages that collectively forms the SDK, written in TypeScript.
+A Yarn Workspace containing packages to collectively form the SDK, written in TypeScript.
+
+- [@cardano-sdk/core](./packages/core)
+- [@cardano-sdk/golden-test-generator](./packages/golden-test-generator)
+
+## Development
+#### System Requirements
+- Docker `17.12.0`+
+- Docker Compose
+
+#### Install and Build
+```console
+yarn install && \
+yarn build
+```
+#### Run Tests
+```console
+yarn testnet:up
+```
+_In another terminal_
+```console
+yarn test
+```
+### Lint
+```console
+yarn lint
+```
+### Cleanup
+```
+yarn cleanup
+```
+## Distribute
+
+### Pack
+```console
+./scripts/pack.sh
+```
+### Publish to npm.org
+```console
+./scripts/publish.sh
+```
 
 [img_src_CI]: https://github.com/input-output-hk/cardano-js-sdk/actions/workflows/continuous-integration.yaml/badge.svg
 [workflow_CI]: https://github.com/input-output-hk/cardano-js-sdk/actions/workflows/continuous-integration.yaml

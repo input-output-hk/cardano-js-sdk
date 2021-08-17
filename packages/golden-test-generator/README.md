@@ -1,4 +1,4 @@
-# Golden Test Generator
+# Cardano JS SDK | Golden Test Generator
 Generate golden test files for a range of Cardano concepts, for the purpose of comparing results 
 with application state during integration tests. The intended interface is the CLI, but the 
 module is structured to offer access as libraries.

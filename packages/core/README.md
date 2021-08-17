@@ -1,1 +1,1 @@
-# Core
+# Cardano JS SDK | Core
