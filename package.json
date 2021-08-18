@@ -13,11 +13,18 @@
     "build": "yarn workspaces run build",
     "cleanup": "yarn workspaces run cleanup && shx rm -rf node_modules",
     "lint": "yarn workspaces run lint",
+    "prepare": "husky install",
+    "pre-commit": "lint-staged",
     "mainnet:up": "DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 docker-compose -p sdk-mainnet up",
     "mainnet:down": "docker-compose -p sdk-mainnet down",
     "test": "yarn workspaces run test",
     "testnet:up": "DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 OGMIOS_PORT=1338 NETWORK=testnet docker-compose -p sdk-testnet up",
     "testnet:down": "docker-compose -p sdk-testnet down"
+  },
+  "lint-staged": {
+    "*(apps/**/*.{js,ts}|packages/**/*.{js,ts})": [
+      "yarn lint"
+    ]
   },
   "repository": {
     "type": "git",
@@ -51,7 +58,9 @@
     "eslint-plugin-sonarjs": "^0.9.1",
     "eslint-plugin-unicorn": "^35.0.0",
     "eslint-watch": "^7.0.0",
+    "husky": "^7.0.1",
     "jest": "^27.0.6",
+    "lint-staged": "^11.1.2",
     "prettier": "^2.3.2",
     "ts-jest": "^27.0.3",
     "ts-node": "^10.0.0",

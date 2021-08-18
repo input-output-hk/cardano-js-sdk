@@ -1,1 +1,1 @@
-export * from './getBlocks'
+export * from './getBlocks';

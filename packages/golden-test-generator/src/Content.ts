@@ -1,47 +1,43 @@
-import {
-  ChainSync,
-  Schema as Cardano
-} from '@cardano-ogmios/client'
-import { Commit } from 'git-last-commit'
-import { getLastCommitPromise } from './util'
-const packageJson = require('../package.json')
+import { ChainSync, Schema as Cardano } from '@cardano-ogmios/client';
+import { Commit } from 'git-last-commit';
+import { getLastCommitPromise } from './util';
+const packageJson = require('../package.json');
 
 export type Metadata = {
   cardano: {
-    compactGenesis: Cardano.CompactGenesis
-    intersection: ChainSync.Intersection
-  },
+    compactGenesis: Cardano.CompactGenesis;
+    intersection: ChainSync.Intersection;
+  };
   software: {
-    name: string,
-    version: string,
-    commit: Pick<Commit, 'hash' | 'tags'>
-  }
-}
+    name: string;
+    version: string;
+    commit: Pick<Commit, 'hash' | 'tags'>;
+  };
+};
 
-export type GeneratorMetadata = { metadata: { cardano: Metadata['cardano'] } }
+export type GeneratorMetadata = { metadata: { cardano: Metadata['cardano'] } };
 
 export const prepareContent = async <Body>(
   metadata: Omit<Metadata, 'software'>,
   body: Body
 ): Promise<{
-  metadata: Metadata,
-  body: Body
+  metadata: Metadata;
+  body: Body;
 }> => {
-  const lastCommit = await getLastCommitPromise()
+  const lastCommit = await getLastCommitPromise();
   return {
     metadata: {
       ...metadata,
-      ...{
-        software: {
-          name: packageJson.name,
-          version: packageJson.version,
-          commit: {
-            hash: lastCommit.hash,
-            tags: lastCommit.tags
-          }
+
+      software: {
+        name: packageJson.name,
+        version: packageJson.version,
+        commit: {
+          hash: lastCommit.hash,
+          tags: lastCommit.tags
         }
       }
     },
     body
-  }
-}
+  };
+};
