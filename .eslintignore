@@ -2,4 +2,3 @@
 *.d.ts
 graphql_types.ts
 *jest.config.js
-**/golden-test-generator

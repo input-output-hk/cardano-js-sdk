@@ -20,7 +20,6 @@ export type AddressBalancesResponse = GeneratorMetadata & {
   balances: { [blockHeight: string]: AddressBalances };
 };
 
-// eslint-disable-next-line func-style
 export async function getOnChainAddressBalances(
   addresses: string[],
   atBlocks: number[],
