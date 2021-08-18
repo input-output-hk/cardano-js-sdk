@@ -17,5 +17,8 @@
   },
   "devDependencies": {
     "shx": "^0.3.3"
+  },
+  "dependencies": {
+    "@cardano-ogmios/client": "^4.0.0-beta.6"
   }
 }
