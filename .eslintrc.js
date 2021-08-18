@@ -17,6 +17,8 @@ module.exports = {
     ],
     "no-unused-expressions": 0,
     "no-useless-constructor": 0,
-    "quotes": ["error", "single", { "avoidEscape": true }]
+    "quotes": ["error", "single", { "avoidEscape": true }],
+    "unicorn/filename-case": 0,
+    "@typescript-eslint/ban-types": 0
   }
 }
