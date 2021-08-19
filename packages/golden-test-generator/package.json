@@ -14,7 +14,7 @@
     "build": "tsc --build ./src",
     "cleanup": "shx rm -rf dist node_modules",
     "dev": "API_PORT=3000 OGMIOS_HOST=localhost OGMIOS_PORT=1337 ts-node-dev ./src/index.ts",
-    "lint": "echo todo",
+    "lint": "shx echo linting disabled in this package temporarily",
     "prepkg": "yarn build",
     "pkg": "yarn build && pkg -o build/golden-test-generator .",
     "prestart": "yarn build",
