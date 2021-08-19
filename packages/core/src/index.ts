@@ -1,1 +1,1 @@
-export * from './Genesis'
+export * from './Genesis';

@@ -1,11 +1,14 @@
 module.exports = {
   "parser": "@typescript-eslint/parser",
   "extends": [
-    "standard"
+      "@atixlabs/eslint-config/configurations/node",
+      "plugin:@typescript-eslint/recommended"
   ],
-  "plugins": [
-    "@typescript-eslint"
-  ],
+  "settings": {
+    "import/resolver": {
+      "typescript": {}
+    }
+  },
   "rules": {
     "no-unused-vars": 0,
     "linebreak-style": [
@@ -13,6 +16,9 @@ module.exports = {
       "unix"
     ],
     "no-unused-expressions": 0,
-    "no-useless-constructor": 0
+    "no-useless-constructor": 0,
+    "quotes": ["error", "single", { "avoidEscape": true }],
+    "unicorn/filename-case": 0,
+    "@typescript-eslint/ban-types": 0
   }
 }
