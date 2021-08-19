@@ -22,7 +22,7 @@
     "testnet:down": "docker-compose -p sdk-testnet down"
   },
   "lint-staged": {
-    "*(apps/**/*.{js,ts}|packages/**/*.{js,ts})": [
+    "*(apps/**/*.{js,ts}|packages/!golden-test-generator/*.{js,ts})": [
       "yarn lint"
     ]
   },

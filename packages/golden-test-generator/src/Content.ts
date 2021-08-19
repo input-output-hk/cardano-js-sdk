@@ -8,7 +8,7 @@ export type Metadata = {
     compactGenesis: Cardano.CompactGenesis;
     intersection: ChainSync.Intersection;
   };
-  software: {
+  software:  {
     name: string;
     version: string;
     commit: Pick<Commit, 'hash' | 'tags'>;
