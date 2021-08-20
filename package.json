@@ -44,6 +44,8 @@
   "homepage": "https://github.com/input-output-hk/cardano-js-sdk#readme",
   "devDependencies": {
     "@atixlabs/eslint-config": "^1.2.3",
+    "@commitlint/cli": "^13.1.0",
+    "@commitlint/config-conventional": "^13.1.0",
     "@types/jest": "^26.0.24",
     "@types/node": "^16.0.0",
     "@typescript-eslint/eslint-plugin": "^4.29.0",
