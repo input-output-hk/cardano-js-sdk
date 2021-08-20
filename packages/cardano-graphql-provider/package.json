@@ -1,0 +1,27 @@
+{
+  "name": "@cardano-sdk/cardano-graphql-provider",
+  "version": "0.1.0",
+  "description": "Graphql provider for Cardano",
+  "engines": {
+    "node": "^14"
+  },
+  "main": "dist/index.js",
+  "repository": "https://github.com/input-output-hk/cardano-js-sdk/packages/cardano-graphql-provider",
+  "author": "James Sweetland",
+  "license": "MPL-2.0",
+  "scripts": {
+    "build": "tsc --build ./src",
+    "cleanup": "shx rm -rf dist node_modules",
+    "lint": "eslint --ignore-path ../../.eslintignore \"**/*.ts\"",
+    "test": "jest -c ./test/jest.config.js"
+  },
+  "devDependencies": {
+    "shx": "^0.3.3"
+  },
+  "dependencies": {
+    "@cardano-graphql/client-ts": "^5.1.0-beta.1",
+    "@cardano-ogmios/client": "^4.0.0-beta.6",
+    "graphql": "^15.5.1",
+    "graphql-request": "^3.5.0"
+  }
+}
