@@ -19,6 +19,8 @@ module.exports = {
     "no-useless-constructor": 0,
     "quotes": ["error", "single", { "avoidEscape": true }],
     "unicorn/filename-case": 0,
-    "@typescript-eslint/ban-types": 0
+    "@typescript-eslint/ban-types": 0,
+    "template-tag-spacing": 0,
+    "no-magic-numbers": 0
   }
 }
