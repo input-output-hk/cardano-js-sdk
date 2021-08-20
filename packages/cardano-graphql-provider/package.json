@@ -5,6 +5,7 @@
   "engines": {
     "node": "^14"
   },
+  "bin": "dist/index.js",
   "main": "dist/index.js",
   "repository": "https://github.com/input-output-hk/cardano-js-sdk/packages/cardano-graphql-provider",
   "author": "James Sweetland",
