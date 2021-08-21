@@ -59,5 +59,9 @@ yarn cleanup
 yarn docs
 ```
 
+<p align="center">
+  <a href="https://input-output-hk.github.io/cardano-js-sdk">:book: Documentation</a>
+</p>
+
 [img_src_CI]: https://github.com/input-output-hk/cardano-js-sdk/actions/workflows/continuous-integration.yaml/badge.svg
 [workflow_CI]: https://github.com/input-output-hk/cardano-js-sdk/actions/workflows/continuous-integration.yaml
