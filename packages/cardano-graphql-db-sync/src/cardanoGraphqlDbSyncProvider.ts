@@ -6,10 +6,11 @@ import { Schema as Cardano } from '@cardano-ogmios/client';
 /**
  * Connect to a [cardano-graphql (cardano-db-sync) service](https://github.com/input-output-hk/cardano-graphql)
  * ```typescript
- * const provider = cardanoGraphqlProvider(uri: 'http://localhost:3100');
+ * const provider = cardanoGraphqlDbSyncProvider(uri: 'http://localhost:3100');
  * ```
  */
-export const cardanoGraphqlProvider = (uri: string): CardanoProvider => {
+
+export const cardanoGraphqlDbSyncProvider = (uri: string): CardanoProvider => {
   const client = new GraphQLClient(uri);
 
   const submitTx: CardanoProvider['submitTx'] = async (signedTransaction) => {

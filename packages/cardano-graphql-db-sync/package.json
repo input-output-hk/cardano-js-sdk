@@ -1,13 +1,13 @@
 {
-  "name": "@cardano-sdk/cardano-graphql-provider",
+  "name": "@cardano-sdk/cardano-graphql-db-sync",
   "version": "0.1.0",
-  "description": "Graphql provider for Cardano",
+  "description": "Cardano Graphql (cardano-db-sync) integration",
   "engines": {
     "node": "^14"
   },
   "bin": "dist/index.js",
   "main": "dist/index.js",
-  "repository": "https://github.com/input-output-hk/cardano-js-sdk/packages/cardano-graphql-provider",
+  "repository": "https://github.com/input-output-hk/cardano-js-sdk/packages/cardano-graphql-db-sync",
   "author": "James Sweetland",
   "license": "MPL-2.0",
   "scripts": {
