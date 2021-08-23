@@ -1,0 +1,29 @@
+name: Post-integration
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy-docs:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v2.3.3
+        
+      - name: 🧰 Setup Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.4
+
+      - name: 🔨 Build Docs
+        run: |
+          yarn install --frozen-lockfile --non-interactive --logevel=error
+          yarn docs
+          
+      - name: 📘 Publish
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs

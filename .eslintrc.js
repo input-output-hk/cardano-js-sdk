@@ -2,14 +2,18 @@ module.exports = {
   "parser": "@typescript-eslint/parser",
   "extends": [
       "@atixlabs/eslint-config/configurations/node",
-      "plugin:@typescript-eslint/recommended"
+      "plugin:@typescript-eslint/recommended",
+      "plugin:jsdoc/recommended"
   ],
+  "plugins": ["jsdoc"],
   "settings": {
     "import/resolver": {
       "typescript": {}
     }
   },
   "rules": {
+    "jsdoc/require-param": 0,
+    "jsdoc/require-returns": 0,
     "no-unused-vars": 0,
     "linebreak-style": [
       2,

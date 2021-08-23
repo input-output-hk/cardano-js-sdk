@@ -14,6 +14,7 @@
 
 A Yarn Workspace containing packages to collectively form the SDK, written in TypeScript.
 
+- [@cardano-sdk/cardano-graphql-provider](packages/cardano-graphql-provider)
 - [@cardano-sdk/core](./packages/core)
 - [@cardano-sdk/golden-test-generator](./packages/golden-test-generator)
 
@@ -53,6 +54,14 @@ yarn cleanup
 ```console
 ./scripts/publish.sh
 ```
+### Generate Docs
+```console
+yarn docs
+```
+
+<p align="center">
+  <a href="https://input-output-hk.github.io/cardano-js-sdk">:book: Documentation</a>
+</p>
 
 [img_src_CI]: https://github.com/input-output-hk/cardano-js-sdk/actions/workflows/continuous-integration.yaml/badge.svg
 [workflow_CI]: https://github.com/input-output-hk/cardano-js-sdk/actions/workflows/continuous-integration.yaml

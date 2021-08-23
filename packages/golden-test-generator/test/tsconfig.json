@@ -6,7 +6,5 @@
       "@src/*": ["../src/*"]
     }
   },
-  "references": [
-    { "path": "../src"}
-  ]
+  "references": [{ "path": "../src" }]
 }
