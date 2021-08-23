@@ -14,7 +14,7 @@
 
 A Yarn Workspace containing packages to collectively form the SDK, written in TypeScript.
 
-- [@cardano-sdk/cardano-graphql-provider](packages/cardano-graphql-provider)
+- [@cardano-sdk/cardano-graphql-db-sync](packages/cardano-graphql-db-sync)
 - [@cardano-sdk/core](./packages/core)
 - [@cardano-sdk/golden-test-generator](./packages/golden-test-generator)
 

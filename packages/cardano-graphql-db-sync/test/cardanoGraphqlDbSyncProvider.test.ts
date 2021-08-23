@@ -1,10 +1,10 @@
 /* eslint-disable max-len */
 
 import { GraphQLClient } from 'graphql-request';
-import { cardanoGraphqlProvider } from '../src';
+import { cardanoGraphqlDbSyncProvider } from '../src';
 jest.mock('graphql-request');
 
-describe('cardanoGraphqlProvider', () => {
+describe('cardanoGraphqlDbSyncProvider', () => {
   const uri = 'http://someurl.com';
 
   test('utxo', async () => {
@@ -40,7 +40,7 @@ describe('cardanoGraphqlProvider', () => {
       ]
     };
     GraphQLClient.prototype.request = jest.fn().mockResolvedValue(mockedResponse);
-    const client = cardanoGraphqlProvider(uri);
+    const client = cardanoGraphqlDbSyncProvider(uri);
 
     const response = await client.utxo([
       'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
@@ -126,7 +126,7 @@ describe('cardanoGraphqlProvider', () => {
       ]
     };
     GraphQLClient.prototype.request = jest.fn().mockResolvedValue(mockedResponse);
-    const client = cardanoGraphqlProvider(uri);
+    const client = cardanoGraphqlDbSyncProvider(uri);
 
     const response = await client.queryTransactionsByAddresses([
       'addr_test1qz7xvvc30qghk00sfpzcfhsw3s2nyn7my0r8hq8c2jj47zsxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flkns6sjg2v'
@@ -185,7 +185,7 @@ describe('cardanoGraphqlProvider', () => {
     };
 
     GraphQLClient.prototype.request = jest.fn().mockResolvedValue(mockedResponse);
-    const client = cardanoGraphqlProvider(uri);
+    const client = cardanoGraphqlDbSyncProvider(uri);
 
     const response = await client.queryTransactionsByHashes([
       '886206542d63b23a047864021fbfccf291d78e47c1e59bd4c75fbc67b248c5e8'
