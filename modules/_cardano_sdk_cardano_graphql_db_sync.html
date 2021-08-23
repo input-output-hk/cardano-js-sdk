@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>@cardano-sdk/cardano-graphql-provider | cardano-sdk</title>
+	<title>@cardano-sdk/cardano-graphql-db-sync | cardano-sdk</title>
 	<meta name="description" content="Documentation for cardano-sdk">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -55,10 +55,10 @@
 					<a href="../index.html">cardano-sdk</a>
 				</li>
 				<li>
-					<a href="_cardano_sdk_cardano_graphql_provider.html">@cardano-sdk/cardano-graphql-provider</a>
+					<a href="_cardano_sdk_cardano_graphql_db_sync.html">@cardano-sdk/cardano-graphql-db-sync</a>
 				</li>
 			</ul>
-			<h1>Module @cardano-sdk/cardano-graphql-provider</h1>
+			<h1>Module @cardano-sdk/cardano-graphql-db-sync</h1>
 		</div>
 	</div>
 </header>
@@ -72,13 +72,13 @@
 						<section class="tsd-index-section ">
 							<h3>Interfaces</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/_cardano_sdk_cardano_graphql_provider.CardanoProvider.html" class="tsd-kind-icon">Cardano<wbr>Provider</a></li>
+								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/_cardano_sdk_cardano_graphql_db_sync.CardanoProvider.html" class="tsd-kind-icon">Cardano<wbr>Provider</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Functions</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_cardano_sdk_cardano_graphql_provider.html#cardanoGraphqlProvider" class="tsd-kind-icon">cardano<wbr>Graphql<wbr>Provider</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_cardano_sdk_cardano_graphql_db_sync.html#cardanoGraphqlDbSyncProvider" class="tsd-kind-icon">cardano<wbr>Graphql<wbr>DbSync<wbr>Provider</a></li>
 							</ul>
 						</section>
 					</div>
@@ -87,22 +87,22 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Functions</h2>
 				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
-					<a name="cardanoGraphqlProvider" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagConst">Const</span> cardano<wbr>Graphql<wbr>Provider</h3>
+					<a name="cardanoGraphqlDbSyncProvider" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> cardano<wbr>Graphql<wbr>DbSync<wbr>Provider</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">cardano<wbr>Graphql<wbr>Provider<span class="tsd-signature-symbol">(</span>uri<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/_cardano_sdk_cardano_graphql_provider.CardanoProvider.html" class="tsd-signature-type" data-tsd-kind="Interface">CardanoProvider</a></li>
+						<li class="tsd-signature tsd-kind-icon">cardano<wbr>Graphql<wbr>DbSync<wbr>Provider<span class="tsd-signature-symbol">(</span>uri<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/_cardano_sdk_cardano_graphql_db_sync.CardanoProvider.html" class="tsd-signature-type" data-tsd-kind="Interface">CardanoProvider</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/809eaec/packages/cardano-graphql-provider/src/cardanoGraphqlProvider.ts#L12">cardano-graphql-provider/src/cardanoGraphqlProvider.ts:12</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/a9ee788/packages/cardano-graphql-db-sync/src/cardanoGraphqlDbSyncProvider.ts#L13">cardano-graphql-db-sync/src/cardanoGraphqlDbSyncProvider.ts:13</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
 									<p>Connect to a <a href="https://github.com/input-output-hk/cardano-graphql">cardano-graphql (cardano-db-sync) service</a></p>
-									<pre><code class="language-typescript"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">provider</span><span style="color: #000000"> = </span><span style="color: #795E26">cardanoGraphqlProvider</span><span style="color: #000000">(</span><span style="color: #001080">uri</span><span style="color: #000000">: </span><span style="color: #A31515">&#039;http://localhost:3100&#039;</span><span style="color: #000000">);</span>
+									<pre><code class="language-typescript"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">provider</span><span style="color: #000000"> = </span><span style="color: #795E26">cardanoGraphqlDbSyncProvider</span><span style="color: #000000">(</span><span style="color: #001080">uri</span><span style="color: #000000">: </span><span style="color: #A31515">&#039;http://localhost:3100&#039;</span><span style="color: #000000">);</span>
 </code></pre>
 								</div>
 							</div>
@@ -112,7 +112,7 @@
 									<h5>uri: <span class="tsd-signature-type">string</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="../interfaces/_cardano_sdk_cardano_graphql_provider.CardanoProvider.html" class="tsd-signature-type" data-tsd-kind="Interface">CardanoProvider</a></h4>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/_cardano_sdk_cardano_graphql_db_sync.CardanoProvider.html" class="tsd-signature-type" data-tsd-kind="Interface">CardanoProvider</a></h4>
 						</li>
 					</ul>
 				</section>
@@ -125,7 +125,7 @@
 						<a href="../index.html">Modules</a>
 					</li>
 					<li class="current tsd-kind-module">
-						<a href="_cardano_sdk_cardano_graphql_provider.html">@cardano-<wbr>sdk/cardano-<wbr>graphql-<wbr>provider</a>
+						<a href="_cardano_sdk_cardano_graphql_db_sync.html">@cardano-<wbr>sdk/cardano-<wbr>graphql-<wbr>db-<wbr>sync</a>
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="_cardano_sdk_core.html">@cardano-<wbr>sdk/core</a>
@@ -135,10 +135,10 @@
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="../interfaces/_cardano_sdk_cardano_graphql_provider.CardanoProvider.html" class="tsd-kind-icon">Cardano<wbr>Provider</a>
+						<a href="../interfaces/_cardano_sdk_cardano_graphql_db_sync.CardanoProvider.html" class="tsd-kind-icon">Cardano<wbr>Provider</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module">
-						<a href="_cardano_sdk_cardano_graphql_provider.html#cardanoGraphqlProvider" class="tsd-kind-icon">cardano<wbr>Graphql<wbr>Provider</a>
+						<a href="_cardano_sdk_cardano_graphql_db_sync.html#cardanoGraphqlDbSyncProvider" class="tsd-kind-icon">cardano<wbr>Graphql<wbr>DbSync<wbr>Provider</a>
 					</li>
 				</ul>
 			</nav>
