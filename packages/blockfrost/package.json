@@ -1,0 +1,26 @@
+{
+  "name": "@cardano-sdk/blockfrost",
+  "version": "0.1.0",
+  "description": "Blockfrost provider for Cardano JS SDK",
+  "engines": {
+    "node": "^14"
+  },
+  "bin": "dist/index.js",
+  "main": "dist/index.js",
+  "repository": "https://github.com/input-output-hk/cardano-js-sdk/packages/blockfrost",
+  "author": "James Sweetland",
+  "license": "MPL-2.0",
+  "scripts": {
+    "build": "tsc --build ./src",
+    "cleanup": "shx rm -rf dist node_modules",
+    "lint": "eslint --ignore-path ../../.eslintignore \"**/*.ts\"",
+    "test": "jest -c ./test/jest.config.js"
+  },
+  "devDependencies": {
+    "shx": "^0.3.3"
+  },
+  "dependencies": {
+    "@blockfrost/blockfrost-js": "^0.9.4",
+    "@cardano-ogmios/client": "^4.0.0-beta.6"
+  }
+}
