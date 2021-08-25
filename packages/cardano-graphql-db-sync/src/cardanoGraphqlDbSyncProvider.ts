@@ -2,6 +2,7 @@ import { CardanoProvider } from '@cardano-sdk/core';
 import { gql, GraphQLClient } from 'graphql-request';
 import { TransactionSubmitResponse } from '@cardano-graphql/client-ts';
 import { Schema as Cardano } from '@cardano-ogmios/client';
+import { graphqlTransactionsToCardanoTxs } from './utils';
 
 /**
  * Connect to a [cardano-graphql (cardano-db-sync) service](https://github.com/input-output-hk/cardano-graphql)
@@ -58,12 +59,12 @@ export const cardanoGraphqlDbSyncProvider = (uri: string): CardanoProvider => {
       transaction: { hash: Cardano.Hash16 };
       index: number;
       address: Cardano.Address;
-      value: Cardano.Lovelace;
+      value: string;
       tokens: {
         asset: {
           assetId: string;
         };
-        quantity: Cardano.AssetQuantity;
+        quantity: string;
       }[];
     };
     type Response = { utxos: Utxo[] };
@@ -74,11 +75,11 @@ export const cardanoGraphqlDbSyncProvider = (uri: string): CardanoProvider => {
     return response.utxos.map((uxto) => {
       const assets: Cardano.Value['assets'] = {};
 
-      for (const t of uxto.tokens) assets[t.asset.assetId] = t.quantity;
+      for (const t of uxto.tokens) assets[t.asset.assetId] = BigInt(t.quantity);
 
       return [
         { txId: uxto.transaction.hash, index: uxto.index },
-        { address: uxto.address, value: { coins: uxto.value, assets } }
+        { address: uxto.address, value: { coins: Number(uxto.value), assets } }
       ];
     });
   };
@@ -97,6 +98,12 @@ export const cardanoGraphqlDbSyncProvider = (uri: string): CardanoProvider => {
           outputs {
             address
             value
+            tokens {
+              asset {
+                assetId
+              }
+              quantity
+            }
           }
         }
       }
@@ -106,17 +113,18 @@ export const cardanoGraphqlDbSyncProvider = (uri: string): CardanoProvider => {
       transactions: {
         hash: Cardano.Hash16;
         inputs: { txHash: Cardano.Hash16; sourceTxIndex: number }[];
-        outputs: Cardano.TxOut[];
+        outputs: {
+          address: Cardano.Address;
+          value: string;
+          tokens: { asset: { assetId: string }; quantity: string }[];
+        }[];
       }[];
     };
     type Variables = { addresses: string[] };
 
     const response = await client.request<Response, Variables>(query, { addresses });
 
-    return response.transactions.map((t) => ({
-      ...t,
-      inputs: t.inputs.map((index) => ({ txId: index.txHash, index: index.sourceTxIndex }))
-    }));
+    return graphqlTransactionsToCardanoTxs(response.transactions);
   };
 
   const queryTransactionsByHashes: CardanoProvider['queryTransactionsByHashes'] = async (hashes) => {
@@ -131,6 +139,12 @@ export const cardanoGraphqlDbSyncProvider = (uri: string): CardanoProvider => {
           outputs {
             address
             value
+            tokens {
+              asset {
+                assetId
+              }
+              quantity
+            }
           }
         }
       }
@@ -140,17 +154,18 @@ export const cardanoGraphqlDbSyncProvider = (uri: string): CardanoProvider => {
       transactions: {
         hash: Cardano.Hash16;
         inputs: { txHash: Cardano.Hash16; sourceTxIndex: number }[];
-        outputs: Cardano.TxOut[];
+        outputs: {
+          address: Cardano.Address;
+          value: string;
+          tokens: { asset: { assetId: string }; quantity: string }[];
+        }[];
       }[];
     };
     type Variables = { hashes: string[] };
 
     const response = await client.request<Response, Variables>(query, { hashes });
 
-    return response.transactions.map((t) => ({
-      ...t,
-      inputs: t.inputs.map((index) => ({ txId: index.txHash, index: index.sourceTxIndex }))
-    }));
+    return graphqlTransactionsToCardanoTxs(response.transactions);
   };
 
   return {
