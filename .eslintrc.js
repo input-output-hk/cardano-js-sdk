@@ -26,6 +26,7 @@ module.exports = {
     "unicorn/prevent-abbreviations": 0,
     "@typescript-eslint/ban-types": 0,
     "template-tag-spacing": 0,
-    "no-magic-numbers": 0
+    "no-magic-numbers": 0,
+    "camelcase": 0
   }
 }

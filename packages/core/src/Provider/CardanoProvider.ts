@@ -1,7 +1,7 @@
 import { Schema as Cardano } from '@cardano-ogmios/client';
 
 // Cardano.Tx currently does not have property "hash"
-type Tx = { hash: Cardano.Hash16 } & Cardano.Tx;
+export type Tx = { hash: Cardano.Hash16 } & Cardano.Tx;
 
 export interface CardanoProvider {
   /** @param signedTransaction signed and serialized cbor */
