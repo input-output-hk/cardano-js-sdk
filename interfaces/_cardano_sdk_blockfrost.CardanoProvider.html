@@ -55,10 +55,10 @@
 					<a href="../index.html">cardano-sdk</a>
 				</li>
 				<li>
-					<a href="../modules/_cardano_sdk_core.html">@cardano-sdk/core</a>
+					<a href="../modules/_cardano_sdk_blockfrost.html">@cardano-sdk/blockfrost</a>
 				</li>
 				<li>
-					<a href="_cardano_sdk_core.CardanoProvider.html">CardanoProvider</a>
+					<a href="_cardano_sdk_blockfrost.CardanoProvider.html">CardanoProvider</a>
 				</li>
 			</ul>
 			<h1>Interface CardanoProvider</h1>
@@ -83,10 +83,10 @@
 						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_cardano_sdk_core.CardanoProvider.html#queryTransactionsByAddresses" class="tsd-kind-icon">query<wbr>Transactions<wbr>ByAddresses</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_cardano_sdk_core.CardanoProvider.html#queryTransactionsByHashes" class="tsd-kind-icon">query<wbr>Transactions<wbr>ByHashes</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_cardano_sdk_core.CardanoProvider.html#submitTx" class="tsd-kind-icon">submit<wbr>Tx</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_cardano_sdk_core.CardanoProvider.html#utxo" class="tsd-kind-icon">utxo</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_cardano_sdk_blockfrost.CardanoProvider.html#queryTransactionsByAddresses" class="tsd-kind-icon">query<wbr>Transactions<wbr>ByAddresses</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_cardano_sdk_blockfrost.CardanoProvider.html#queryTransactionsByHashes" class="tsd-kind-icon">query<wbr>Transactions<wbr>ByHashes</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_cardano_sdk_blockfrost.CardanoProvider.html#submitTx" class="tsd-kind-icon">submit<wbr>Tx</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_cardano_sdk_blockfrost.CardanoProvider.html#utxo" class="tsd-kind-icon">utxo</a></li>
 							</ul>
 						</section>
 					</div>
@@ -98,13 +98,13 @@
 					<a name="queryTransactionsByAddresses" class="tsd-anchor"></a>
 					<h3>query<wbr>Transactions<wbr>ByAddresses</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">query<wbr>Transactions<wbr>ByAddresses<span class="tsd-signature-symbol">(</span>addresses<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../modules/_cardano_sdk_core.html#Tx" class="tsd-signature-type" data-tsd-kind="Type alias">Tx</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">query<wbr>Transactions<wbr>ByAddresses<span class="tsd-signature-symbol">(</span>addresses<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Tx</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/aceda77/packages/core/src/Provider/CardanoProvider.ts#L10">packages/core/src/Provider/CardanoProvider.ts:10</a></li>
+									<li>Defined in packages/core/dist/Provider/CardanoProvider.d.ts:8</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -113,7 +113,7 @@
 									<h5>addresses: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../modules/_cardano_sdk_core.html#Tx" class="tsd-signature-type" data-tsd-kind="Type alias">Tx</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Tx</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -121,13 +121,13 @@
 					<a name="queryTransactionsByHashes" class="tsd-anchor"></a>
 					<h3>query<wbr>Transactions<wbr>ByHashes</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">query<wbr>Transactions<wbr>ByHashes<span class="tsd-signature-symbol">(</span>hashes<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../modules/_cardano_sdk_core.html#Tx" class="tsd-signature-type" data-tsd-kind="Type alias">Tx</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">query<wbr>Transactions<wbr>ByHashes<span class="tsd-signature-symbol">(</span>hashes<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Tx</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/aceda77/packages/core/src/Provider/CardanoProvider.ts#L11">packages/core/src/Provider/CardanoProvider.ts:11</a></li>
+									<li>Defined in packages/core/dist/Provider/CardanoProvider.d.ts:9</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -136,7 +136,7 @@
 									<h5>hashes: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../modules/_cardano_sdk_core.html#Tx" class="tsd-signature-type" data-tsd-kind="Type alias">Tx</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Tx</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -150,16 +150,13 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/aceda77/packages/core/src/Provider/CardanoProvider.ts#L8">packages/core/src/Provider/CardanoProvider.ts:8</a></li>
+									<li>Defined in packages/core/dist/Provider/CardanoProvider.d.ts:6</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>signedTransaction: <span class="tsd-signature-type">string</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>signed and serialized cbor</p>
-									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -176,7 +173,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/aceda77/packages/core/src/Provider/CardanoProvider.ts#L9">packages/core/src/Provider/CardanoProvider.ts:9</a></li>
+									<li>Defined in packages/core/dist/Provider/CardanoProvider.d.ts:7</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -197,48 +194,45 @@
 					<li class=" ">
 						<a href="../index.html">Modules</a>
 					</li>
-					<li class=" tsd-kind-module">
+					<li class="current tsd-kind-module">
 						<a href="../modules/_cardano_sdk_blockfrost.html">@cardano-<wbr>sdk/blockfrost</a>
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="../modules/_cardano_sdk_cardano_graphql_db_sync.html">@cardano-<wbr>sdk/cardano-<wbr>graphql-<wbr>db-<wbr>sync</a>
 					</li>
-					<li class="current tsd-kind-module">
+					<li class=" tsd-kind-module">
 						<a href="../modules/_cardano_sdk_core.html">@cardano-<wbr>sdk/core</a>
 					</li>
 				</ul>
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="_cardano_sdk_core.ByronGenesis.html" class="tsd-kind-icon">Byron<wbr>Genesis</a>
-					</li>
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface tsd-parent-kind-module">
-						<a href="_cardano_sdk_core.CardanoProvider.html" class="tsd-kind-icon">Cardano<wbr>Provider</a>
+						<a href="_cardano_sdk_blockfrost.CardanoProvider.html" class="tsd-kind-icon">Cardano<wbr>Provider</a>
 						<ul>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="_cardano_sdk_core.CardanoProvider.html#queryTransactionsByAddresses" class="tsd-kind-icon">query<wbr>Transactions<wbr>ByAddresses</a>
+								<a href="_cardano_sdk_blockfrost.CardanoProvider.html#queryTransactionsByAddresses" class="tsd-kind-icon">query<wbr>Transactions<wbr>ByAddresses</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="_cardano_sdk_core.CardanoProvider.html#queryTransactionsByHashes" class="tsd-kind-icon">query<wbr>Transactions<wbr>ByHashes</a>
+								<a href="_cardano_sdk_blockfrost.CardanoProvider.html#queryTransactionsByHashes" class="tsd-kind-icon">query<wbr>Transactions<wbr>ByHashes</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="_cardano_sdk_core.CardanoProvider.html#submitTx" class="tsd-kind-icon">submit<wbr>Tx</a>
+								<a href="_cardano_sdk_blockfrost.CardanoProvider.html#submitTx" class="tsd-kind-icon">submit<wbr>Tx</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="_cardano_sdk_core.CardanoProvider.html#utxo" class="tsd-kind-icon">utxo</a>
+								<a href="_cardano_sdk_blockfrost.CardanoProvider.html#utxo" class="tsd-kind-icon">utxo</a>
 							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="_cardano_sdk_core.ShelleyGenesis.html" class="tsd-kind-icon">Shelley<wbr>Genesis</a>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module tsd-is-external">
+						<a href="../modules/_cardano_sdk_blockfrost.html#Options" class="tsd-kind-icon">Options</a>
 					</li>
-					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
-						<a href="../modules/_cardano_sdk_core.html#Tx" class="tsd-kind-icon">Tx</a>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="../modules/_cardano_sdk_blockfrost.html#blockfrostProvider" class="tsd-kind-icon">blockfrost<wbr>Provider</a>
 					</li>
 				</ul>
 			</nav>
