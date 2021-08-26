@@ -37,6 +37,12 @@ _In another terminal_
 ```console
 yarn test
 ```
+or
+
+```console
+yarn test:debug
+```
+
 ### Lint
 ```console
 yarn lint

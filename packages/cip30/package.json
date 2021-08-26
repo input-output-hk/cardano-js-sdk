@@ -1,13 +1,12 @@
 {
-  "name": "@cardano-sdk/cardano-graphql-db-sync",
+  "name": "@cardano-sdk/cip30",
   "version": "0.1.0",
-  "description": "Cardano Graphql (cardano-db-sync) integration",
+  "description": "TypeScript definitions for the dApp Connector standard CIP30",
   "engines": {
     "node": "^14"
   },
-  "bin": "dist/index.js",
   "main": "dist/index.js",
-  "repository": "https://github.com/input-output-hk/cardano-js-sdk/packages/cardano-graphql-db-sync",
+  "repository": "https://github.com/input-output-hk/cardano-js-sdk/packages/cip30",
   "author": "James Sweetland",
   "license": "MPL-2.0",
   "scripts": {
@@ -15,15 +14,16 @@
     "tsc": "shx echo typescript --noEmit command not implemented yet",
     "cleanup": "shx rm -rf dist node_modules",
     "lint": "eslint --ignore-path ../../.eslintignore \"**/*.ts\"",
-    "test": "jest -c ./test/jest.config.js"
+    "test": "jest -c ./test/jest.config.js",
+    "test:debug": "DEBUG=true yarn test"
   },
   "devDependencies": {
+    "mock-browser": "^0.92.14",
     "shx": "^0.3.3"
   },
   "dependencies": {
-    "@cardano-graphql/client-ts": "^5.1.0-beta.1",
     "@cardano-ogmios/client": "^4.0.0-beta.6",
-    "graphql": "^15.5.1",
-    "graphql-request": "^3.5.0"
+    "ts-custom-error": "^3.2.0",
+    "ts-log": "^2.2.3"
   }
 }

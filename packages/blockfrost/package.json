@@ -12,6 +12,7 @@
   "license": "MPL-2.0",
   "scripts": {
     "build": "tsc --build ./src",
+    "tsc": "shx echo typescript --noEmit command not implemented yet",
     "cleanup": "shx rm -rf dist node_modules",
     "lint": "eslint --ignore-path ../../.eslintignore \"**/*.ts\"",
     "test": "jest -c ./test/jest.config.js"
@@ -21,6 +22,7 @@
   },
   "dependencies": {
     "@blockfrost/blockfrost-js": "^0.9.4",
-    "@cardano-ogmios/client": "^4.0.0-beta.6"
+    "@cardano-ogmios/client": "^4.0.0-beta.6",
+    "@cardano-sdk/core": "0.1.0"
   }
 }
