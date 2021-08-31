@@ -27,7 +27,9 @@ export const cardanoGraphqlDbSyncProvider = (uri: string): CardanoProvider => {
       type Response = TransactionSubmitResponse;
       type Variables = { transaction: string };
 
-      const response = await client.request<Response, Variables>(mutation, { transaction: signedTransaction });
+      const response = await client.request<Response, Variables>(mutation, {
+        transaction: Buffer.from(signedTransaction.to_bytes()).toString('hex')
+      });
 
       return !!response.hash;
     } catch {

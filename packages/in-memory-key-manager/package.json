@@ -1,0 +1,27 @@
+{
+  "name": "@cardano-sdk/in-memory-key-manager",
+  "version": "0.1.0",
+  "description": "",
+  "engines": {
+    "node": "^14"
+  },
+  "bin": "dist/index.js",
+  "main": "dist/index.js",
+  "repository": "https://github.com/input-output-hk/cardano-js-sdk/packages/in-memory-key-manager",
+  "author": "James Sweetland",
+  "license": "MPL-2.0",
+  "scripts": {
+    "build": "tsc --build ./src",
+    "cleanup": "shx rm -rf dist node_modules",
+    "lint": "eslint --ignore-path ../../.eslintignore \"**/*.ts\"",
+    "test": "jest -c ./test/jest.config.js"
+  },
+  "devDependencies": {
+    "shx": "^0.3.3"
+  },
+  "dependencies": {
+    "@cardano-sdk/cardano-serialization-lib": "0.1.0",
+    "@cardano-sdk/wallet": "0.1.0",
+    "bip39": "^3.0.4"
+  }
+}

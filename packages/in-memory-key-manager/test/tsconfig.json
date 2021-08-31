@@ -8,6 +8,6 @@
   },
   "references": [
     { "path": "../src" },
-    { "path": "../../core/src" }
+    { "path": "../../wallet/src" }
   ]
 }
