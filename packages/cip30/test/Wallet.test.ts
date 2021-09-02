@@ -1,36 +1,17 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import { RequestAccess, Wallet, WalletApi, WalletOptions } from '@src/Wallet';
+import { Wallet, WalletApi, WalletOptions } from '@src/Wallet';
 import { mocks } from 'mock-browser';
-
+import * as testWallet from './testWallet';
 const window = mocks.MockBrowser.createWindow();
 
-const props = { name: 'test-wallet', version: '0.1.0' };
-const _api = <WalletApi>{
-  getUtxos: async (_amount) => [
-    [
-      { txId: '123456', index: 0 },
-      { address: 'asdf', value: { coins: 100, assets: {} } }
-    ]
-  ],
-  getBalance: async () => '100',
-  getUsedAddresses: async () => ['used-address-1', 'used-address-2', 'used-address-3'],
-  getUnusedAddresses: async () => ['unused-address-1', 'unused-address-2', 'unused-address-3'],
-  getChangeAddress: async () => 'change-address',
-  getRewardAddresses: async () => ['reward-address-1', 'reward-address-2'],
-  signTx: async (_tx) => 'signedTransaction',
-  signData: async (_addr, _sig) => 'signedData',
-  submitTx: async (_tx) => 'transactionId'
-};
-const requestAccess: RequestAccess = async () => true;
 // todo test persistAllowList: true when design is finalised
 const options: WalletOptions = { persistAllowList: false };
 
 if (process.env.DEBUG) {
   options.logger = console;
 }
-const wallet = new Wallet(props, _api, window, requestAccess, options);
 
 describe('Wallet', () => {
   const apiMethods = [
@@ -44,59 +25,45 @@ describe('Wallet', () => {
     'signData',
     'submitTx'
   ];
+  let wallet: Wallet;
 
-  test('wallet version', () => {
-    expect(wallet.version).toBeDefined();
+  beforeEach(() => {
+    wallet = new Wallet(testWallet.properties, testWallet.api, testWallet.requestAccess, options);
+  });
+
+  test('constructed state', async () => {
     expect(typeof wallet.version).toBe('string');
     expect(wallet.version).toBe('0.1.0');
-  });
-
-  test('wallet name', () => {
-    expect(wallet.name).toBeDefined();
     expect(typeof wallet.name).toBe('string');
     expect(wallet.name).toBe('test-wallet');
-  });
-
-  test('isEnabled should be false', async () => {
-    expect(wallet.isEnabled).toBeDefined();
     expect(typeof wallet.isEnabled).toBe('function');
-
-    const isEnabled = await wallet.isEnabled();
+    const isEnabled = await wallet.isEnabled(window);
     expect(typeof isEnabled).toBe('boolean');
     expect(isEnabled).toBe(false);
+    expect(typeof wallet.enable).toBe('function');
+  });
+
+  test('getPublicApi', async () => {
+    const publicApi = wallet.getPublicApi(window);
+    expect(publicApi.name).toEqual('test-wallet');
+    expect(await publicApi.isEnabled(window)).toEqual(false);
   });
 
   test('enable', async () => {
-    expect(wallet.enable).toBeDefined();
-    expect(typeof wallet.enable).toBe('function');
-
-    const api = await wallet.enable();
-    expect(api).toBeTruthy();
+    const windowStub = { ...window, location: { hostname: 'test-dapp' } };
+    expect(await wallet.isEnabled(window)).toBe(false);
+    const api = await wallet.enable(windowStub);
     expect(typeof api).toBe('object');
-
     const methods = Object.keys(api);
     expect(methods).toEqual(apiMethods);
-  });
-
-  test('isEnabled should be true', async () => {
-    const isEnabled = await wallet.isEnabled();
-    expect(isEnabled).toBe(true);
-  });
-
-  test('cardano object exists in global scope', async () => {
-    expect(window.cardano).toBeDefined();
-  });
-
-  test('cardano.walletName is type CardanoWalletPublic', async () => {
-    expect(window.cardano['test-wallet']).toBeDefined();
-    expect(Object.keys(window.cardano['test-wallet'])).toEqual(['name', 'version', 'enable', 'isEnabled']);
+    expect(await wallet.isEnabled(windowStub)).toBe(true);
   });
 
   describe('api', () => {
     let api: WalletApi | null;
 
     beforeAll(async () => {
-      api = await wallet.enable();
+      api = await wallet.enable(window);
     });
 
     test('getUtxos', async () => {
