@@ -27,6 +27,9 @@ module.exports = {
     "@typescript-eslint/ban-types": 0,
     "template-tag-spacing": 0,
     "no-magic-numbers": 0,
-    "camelcase": 0
+    "camelcase": 0,
+    "no-shadow": "off", // eslint compains about TS enums hence disable here and enable @typescript-eslint/no-shadow
+    "@typescript-eslint/no-shadow": ["error"],
+    "import/no-unresolved": 0
   }
 }

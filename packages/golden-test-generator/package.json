@@ -12,6 +12,7 @@
   "license": "MPL-2.0",
   "scripts": {
     "build": "tsc --build ./src",
+    "tsc": "shx echo typescript --noEmit command not implemented yet",
     "cleanup": "shx rm -rf dist node_modules",
     "dev": "API_PORT=3000 OGMIOS_HOST=localhost OGMIOS_PORT=1337 ts-node-dev ./src/index.ts",
     "lint": "shx echo linting disabled in this package temporarily",
