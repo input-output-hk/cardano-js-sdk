@@ -64,5 +64,5 @@ jobs:
     - name: 📤 Upload Golden Test Generator exe - macOS
       uses: actions/upload-artifact@v2
       with:
-        name: cardano-ogmios-repl-macos
+        name: golden-test-generator-macos
         path: packages/golden-test-generator/build/golden-test-generator-macos
