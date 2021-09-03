@@ -101,6 +101,7 @@
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="_cardano_sdk_cip30.Wallet.html#allowApplication" class="tsd-kind-icon">allow<wbr>Application</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_cardano_sdk_cip30.Wallet.html#enable" class="tsd-kind-icon">enable</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="_cardano_sdk_cip30.Wallet.html#getAllowList" class="tsd-kind-icon">get<wbr>Allow<wbr>List</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_cardano_sdk_cip30.Wallet.html#getPublicApi" class="tsd-kind-icon">get<wbr>Public<wbr>Api</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_cardano_sdk_cip30.Wallet.html#isEnabled" class="tsd-kind-icon">is<wbr>Enabled</a></li>
 							</ul>
 						</section>
@@ -113,13 +114,13 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Wallet<span class="tsd-signature-symbol">(</span>properties<span class="tsd-signature-symbol">: </span><a href="../modules/_cardano_sdk_cip30.html#WalletProperties" class="tsd-signature-type" data-tsd-kind="Type alias">WalletProperties</a>, api<span class="tsd-signature-symbol">: </span><a href="../interfaces/_cardano_sdk_cip30.WalletApi.html" class="tsd-signature-type" data-tsd-kind="Interface">WalletApi</a>, window<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Window</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-symbol">{ </span>cardano<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="../interfaces/_cardano_sdk_cip30.WalletPublic.html" class="tsd-signature-type" data-tsd-kind="Interface">WalletPublic</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span>, requestAccess<span class="tsd-signature-symbol">: </span><a href="../modules/_cardano_sdk_cip30.html#RequestAccess" class="tsd-signature-type" data-tsd-kind="Type alias">RequestAccess</a>, options<span class="tsd-signature-symbol">?: </span><a href="../modules/_cardano_sdk_cip30.html#WalletOptions" class="tsd-signature-type" data-tsd-kind="Type alias">WalletOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_cip30.Wallet.html" class="tsd-signature-type" data-tsd-kind="Class">Wallet</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Wallet<span class="tsd-signature-symbol">(</span>properties<span class="tsd-signature-symbol">: </span><a href="../modules/_cardano_sdk_cip30.html#WalletProperties" class="tsd-signature-type" data-tsd-kind="Type alias">WalletProperties</a>, api<span class="tsd-signature-symbol">: </span><a href="../interfaces/_cardano_sdk_cip30.WalletApi.html" class="tsd-signature-type" data-tsd-kind="Interface">WalletApi</a>, requestAccess<span class="tsd-signature-symbol">: </span><a href="../modules/_cardano_sdk_cip30.html#RequestAccess" class="tsd-signature-type" data-tsd-kind="Type alias">RequestAccess</a>, options<span class="tsd-signature-symbol">?: </span><a href="../modules/_cardano_sdk_cip30.html#WalletOptions" class="tsd-signature-type" data-tsd-kind="Type alias">WalletOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_cip30.Wallet.html" class="tsd-signature-type" data-tsd-kind="Class">Wallet</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/a1dc329/packages/cip30/src/Wallet/Wallet.ts#L68">packages/cip30/src/Wallet/Wallet.ts:68</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/c0c5d7e/packages/cip30/src/Wallet/Wallet.ts#L41">packages/cip30/src/Wallet/Wallet.ts:41</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -129,9 +130,6 @@
 								</li>
 								<li>
 									<h5>api: <a href="../interfaces/_cardano_sdk_cip30.WalletApi.html" class="tsd-signature-type" data-tsd-kind="Interface">WalletApi</a></h5>
-								</li>
-								<li>
-									<h5>window: <span class="tsd-signature-type">Window</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-symbol">{ </span>cardano<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="../interfaces/_cardano_sdk_cip30.WalletPublic.html" class="tsd-signature-type" data-tsd-kind="Interface">WalletPublic</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span></h5>
 								</li>
 								<li>
 									<h5>requestAccess: <a href="../modules/_cardano_sdk_cip30.html#RequestAccess" class="tsd-signature-type" data-tsd-kind="Type alias">RequestAccess</a></h5>
@@ -153,7 +151,7 @@
 					<div class="tsd-signature tsd-kind-icon">allow<wbr>List<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/a1dc329/packages/cip30/src/Wallet/Wallet.ts#L65">packages/cip30/src/Wallet/Wallet.ts:65</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/c0c5d7e/packages/cip30/src/Wallet/Wallet.ts#L38">packages/cip30/src/Wallet/Wallet.ts:38</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -163,7 +161,7 @@
 					<div class="tsd-signature tsd-kind-icon">logger<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Logger</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/a1dc329/packages/cip30/src/Wallet/Wallet.ts#L66">packages/cip30/src/Wallet/Wallet.ts:66</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/c0c5d7e/packages/cip30/src/Wallet/Wallet.ts#L39">packages/cip30/src/Wallet/Wallet.ts:39</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -173,7 +171,7 @@
 					<div class="tsd-signature tsd-kind-icon">name<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/a1dc329/packages/cip30/src/Wallet/Wallet.ts#L63">packages/cip30/src/Wallet/Wallet.ts:63</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/c0c5d7e/packages/cip30/src/Wallet/Wallet.ts#L36">packages/cip30/src/Wallet/Wallet.ts:36</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -183,7 +181,7 @@
 					<div class="tsd-signature tsd-kind-icon">version<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/a1dc329/packages/cip30/src/Wallet/Wallet.ts#L62">packages/cip30/src/Wallet/Wallet.ts:62</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/c0c5d7e/packages/cip30/src/Wallet/Wallet.ts#L35">packages/cip30/src/Wallet/Wallet.ts:35</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -200,7 +198,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/a1dc329/packages/cip30/src/Wallet/Wallet.ts#L127">packages/cip30/src/Wallet/Wallet.ts:127</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/c0c5d7e/packages/cip30/src/Wallet/Wallet.ts#L71">packages/cip30/src/Wallet/Wallet.ts:71</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -217,15 +215,34 @@
 					<a name="enable" class="tsd-anchor"></a>
 					<h3>enable</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">enable<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_cardano_sdk_cip30.WalletApi.html" class="tsd-signature-type" data-tsd-kind="Interface">WalletApi</a><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">enable<span class="tsd-signature-symbol">(</span>window<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">WindowMaybeWithCardano</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_cardano_sdk_cip30.WalletApi.html" class="tsd-signature-type" data-tsd-kind="Interface">WalletApi</a><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/a1dc329/packages/cip30/src/Wallet/Wallet.ts#L151">packages/cip30/src/Wallet/Wallet.ts:151</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/c0c5d7e/packages/cip30/src/Wallet/Wallet.ts#L118">packages/cip30/src/Wallet/Wallet.ts:118</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>This is the entrypoint to start communication with the user&#39;s wallet.</p>
+								</div>
+								<p>The wallet should request the user&#39;s permission to connect the web page to the user&#39;s wallet,
+								and if permission has been granted, the full API will be returned to the dApp to use.</p>
+								<p>The wallet can choose to maintain a whitelist to not necessarily ask the user&#39;s permission
+									every time access is requested, but this behavior is up to the wallet and should be transparent
+								to web pages using this API.</p>
+								<p>If a wallet is already connected this function should not request access a second time,
+								and instead just return the API object.</p>
+								<p>Errors: <code>ApiError</code></p>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>window: <span class="tsd-signature-type">WindowMaybeWithCardano</span></h5>
+								</li>
+							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_cardano_sdk_cip30.WalletApi.html" class="tsd-signature-type" data-tsd-kind="Interface">WalletApi</a><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
@@ -240,7 +257,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/a1dc329/packages/cip30/src/Wallet/Wallet.ts#L123">packages/cip30/src/Wallet/Wallet.ts:123</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/c0c5d7e/packages/cip30/src/Wallet/Wallet.ts#L67">packages/cip30/src/Wallet/Wallet.ts:67</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h4>
@@ -248,19 +265,57 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="isEnabled" class="tsd-anchor"></a>
-					<h3>is<wbr>Enabled</h3>
+					<a name="getPublicApi" class="tsd-anchor"></a>
+					<h3>get<wbr>Public<wbr>Api</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">is<wbr>Enabled<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Public<wbr>Api<span class="tsd-signature-symbol">(</span>window<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">WindowMaybeWithCardano</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../modules/_cardano_sdk_cip30.html#WalletPublic" class="tsd-signature-type" data-tsd-kind="Type alias">WalletPublic</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/a1dc329/packages/cip30/src/Wallet/Wallet.ts#L145">packages/cip30/src/Wallet/Wallet.ts:145</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/c0c5d7e/packages/cip30/src/Wallet/Wallet.ts#L58">packages/cip30/src/Wallet/Wallet.ts:58</a></li>
 								</ul>
 							</aside>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>window: <span class="tsd-signature-type">WindowMaybeWithCardano</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="../modules/_cardano_sdk_cip30.html#WalletPublic" class="tsd-signature-type" data-tsd-kind="Type alias">WalletPublic</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="isEnabled" class="tsd-anchor"></a>
+					<h3>is<wbr>Enabled</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">is<wbr>Enabled<span class="tsd-signature-symbol">(</span>window<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">WindowMaybeWithCardano</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Boolean</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/c0c5d7e/packages/cip30/src/Wallet/Wallet.ts#L98">packages/cip30/src/Wallet/Wallet.ts:98</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns true if the dApp is already connected to the user&#39;s wallet, or if requesting access
+									would return true without user confirmation (e.g. the dApp is whitelisted), and false otherwise.</p>
+								</div>
+								<p>If this function returns true, then any subsequent calls to wallet.enable()
+								during the current session should succeed and return the API object.</p>
+								<p>Errors: <code>ApiError</code></p>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>window: <span class="tsd-signature-type">WindowMaybeWithCardano</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Boolean</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -345,6 +400,9 @@
 								<a href="_cardano_sdk_cip30.Wallet.html#getAllowList" class="tsd-kind-icon">get<wbr>Allow<wbr>List</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_cardano_sdk_cip30.Wallet.html#getPublicApi" class="tsd-kind-icon">get<wbr>Public<wbr>Api</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_cardano_sdk_cip30.Wallet.html#isEnabled" class="tsd-kind-icon">is<wbr>Enabled</a>
 							</li>
 						</ul>
@@ -354,17 +412,11 @@
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
 						<a href="../interfaces/_cardano_sdk_cip30.WalletApi.html" class="tsd-kind-icon">Wallet<wbr>Api</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="../interfaces/_cardano_sdk_cip30.WalletPublic.html" class="tsd-kind-icon">Wallet<wbr>Public</a>
-					</li>
 					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
 						<a href="../modules/_cardano_sdk_cip30.html#Bytes" class="tsd-kind-icon">Bytes</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
 						<a href="../modules/_cardano_sdk_cip30.html#Cbor" class="tsd-kind-icon">Cbor</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
-						<a href="../modules/_cardano_sdk_cip30.html#Enable" class="tsd-kind-icon">Enable</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
 						<a href="../modules/_cardano_sdk_cip30.html#GetBalance" class="tsd-kind-icon">Get<wbr>Balance</a>
@@ -383,9 +435,6 @@
 					</li>
 					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
 						<a href="../modules/_cardano_sdk_cip30.html#GetUtxos" class="tsd-kind-icon">Get<wbr>Utxos</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
-						<a href="../modules/_cardano_sdk_cip30.html#IsEnabled" class="tsd-kind-icon">Is<wbr>Enabled</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
 						<a href="../modules/_cardano_sdk_cip30.html#Paginate" class="tsd-kind-icon">Paginate</a>
@@ -413,6 +462,9 @@
 					</li>
 					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
 						<a href="../modules/_cardano_sdk_cip30.html#WalletProperties" class="tsd-kind-icon">Wallet<wbr>Properties</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+						<a href="../modules/_cardano_sdk_cip30.html#WalletPublic" class="tsd-kind-icon">Wallet<wbr>Public</a>
 					</li>
 				</ul>
 			</nav>
