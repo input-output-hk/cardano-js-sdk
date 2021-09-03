@@ -1,7 +1,3 @@
-import { Enable, IsEnabled, WalletProperties } from './Wallet';
+import { Wallet } from './Wallet';
 
-export interface WalletPublic extends WalletProperties {
-  enable: Enable;
-
-  isEnabled: IsEnabled;
-}
+export type WalletPublic = Pick<Wallet, 'enable' | 'isEnabled' | 'name' | 'version'>;

@@ -4,6 +4,7 @@ import { WalletApi } from './WalletApi';
 import { ApiError, APIErrorCode } from '../errors';
 import { dummyLogger, Logger } from 'ts-log';
 import { WalletPublic } from './WalletPublic';
+import { WindowMaybeWithCardano } from '../injectWindow';
 
 /**
  * CIP30 Specification version
@@ -14,34 +15,6 @@ export type SpecificationVersion = string;
  * Unique identifier, used to inject into the cardano namespace
  */
 export type WalletName = string;
-
-/**
- * This is the entrypoint to start communication with the user's wallet.
- *
- * The wallet should request the user's permission to connect the web page to the user's wallet,
- * and if permission has been granted, the full API will be returned to the dApp to use.
- *
- * The wallet can choose to maintain a whitelist to not necessarily ask the user's permission
- * every time access is requested, but this behavior is up to the wallet and should be transparent
- * to web pages using this API.
- *
- * If a wallet is already connected this function should not request access a second time,
- * and instead just return the API object.
- *
- * Errors: `ApiError`
- */
-export type Enable = () => Promise<WalletApi>;
-
-/**
- * Returns true if the dApp is already connected to the user's wallet, or if requesting access
- * would return true without user confirmation (e.g. the dApp is whitelisted), and false otherwise.
- *
- * If this function returns true, then any subsequent calls to wallet.enable()
- * during the current session should succeed and return the API object.
- *
- * Errors: `ApiError`
- */
-export type IsEnabled = () => Promise<Boolean>;
 
 export type WalletProperties = { name: WalletName; version: SpecificationVersion };
 
@@ -68,7 +41,6 @@ export class Wallet {
   constructor(
     properties: WalletProperties,
     private api: WalletApi,
-    private window: Window & { cardano?: Record<string, WalletPublic> },
     private requestAccess: RequestAccess,
     private options?: WalletOptions
   ) {
@@ -81,47 +53,19 @@ export class Wallet {
     }
 
     this.allowList = this.options.persistAllowList ? this.getAllowList() : [];
+  }
 
-    if (!this.window.cardano) {
-      this.logger.debug(
-        {
-          module: 'Wallet',
-          walletName: this.name
-        },
-        'Creating cardano global scope'
-      );
-      this.window.cardano = {};
-    } else {
-      this.logger.debug(
-        {
-          module: 'Wallet',
-          walletName: this.name
-        },
-        'Cardano global scope exists'
-      );
-    }
-
-    const walletPublic: WalletPublic = {
+  public getPublicApi(window: WindowMaybeWithCardano): WalletPublic {
+    return {
       name: this.name,
       version: this.version,
-      enable: this.enable,
-      isEnabled: this.isEnabled
+      enable: this.enable.bind(this, window),
+      isEnabled: this.isEnabled.bind(this, window)
     };
-    this.window.cardano[properties.name] = this.window.cardano[properties.name] || walletPublic;
-
-    this.logger.debug(
-      {
-        module: 'Wallet',
-        walletName: this.name,
-        globalCardanoScope: this.window.cardano,
-        allowList: this.allowList
-      },
-      'Constructed'
-    );
   }
 
   private getAllowList(): string[] {
-    return JSON.parse(this.options.storage?.getItem(window.location.hostname)) || [];
+    return JSON.parse(this.options.storage?.getItem(this.name)) || [];
   }
 
   private allowApplication(appName: string) {
@@ -130,7 +74,7 @@ export class Wallet {
     if (this.options.persistAllowList) {
       const currentList = this.getAllowList();
       // Todo: Encrypt
-      this.options.storage?.setItem(window.location.hostname, JSON.stringify([...currentList, appName]));
+      this.options.storage?.setItem(this.name, JSON.stringify([...currentList, appName]));
       this.logger.debug(
         {
           module: 'Wallet',
@@ -142,14 +86,37 @@ export class Wallet {
     }
   }
 
-  async isEnabled() {
-    const appName = this.window.location.hostname;
-
+  /**
+   * Returns true if the dApp is already connected to the user's wallet, or if requesting access
+   * would return true without user confirmation (e.g. the dApp is whitelisted), and false otherwise.
+   *
+   * If this function returns true, then any subsequent calls to wallet.enable()
+   * during the current session should succeed and return the API object.
+   *
+   * Errors: `ApiError`
+   */
+  public async isEnabled(window: WindowMaybeWithCardano): Promise<Boolean> {
+    const appName = window.location.hostname;
     return this.allowList.includes(appName);
   }
 
-  async enable() {
-    const appName = this.window.location.hostname;
+  /**
+   * This is the entrypoint to start communication with the user's wallet.
+   *
+   * The wallet should request the user's permission to connect the web page to the user's wallet,
+   * and if permission has been granted, the full API will be returned to the dApp to use.
+   *
+   * The wallet can choose to maintain a whitelist to not necessarily ask the user's permission
+   * every time access is requested, but this behavior is up to the wallet and should be transparent
+   * to web pages using this API.
+   *
+   * If a wallet is already connected this function should not request access a second time,
+   * and instead just return the API object.
+   *
+   * Errors: `ApiError`
+   */
+  public async enable(window: WindowMaybeWithCardano): Promise<WalletApi> {
+    const appName = window.location.hostname;
 
     if (this.options.persistAllowList && this.allowList.includes(appName)) {
       this.logger.debug(
