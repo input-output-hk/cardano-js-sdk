@@ -1,9 +1,7 @@
 import { CardanoProvider } from '@cardano-sdk/core';
-import { Schema as Cardano } from '@cardano-ogmios/client';
-
 import { BlockFrostAPI } from '@blockfrost/blockfrost-js';
-import { blockfrostOutputToCardanoTxOut, blockfrostTxContentUtxoToCardanoTx } from './utils';
 import { Options } from '@blockfrost/blockfrost-js/lib/types';
+import { BlockfrostToOgmios } from './BlockfrostToOgmios';
 
 /**
  * Connect to the [Blockfrost service](https://docs.blockfrost.io/)
@@ -28,16 +26,7 @@ export const blockfrostProvider = (options: Options): CardanoProvider => {
   const utxo: CardanoProvider['utxo'] = async (addresses) => {
     const results = await Promise.all(
       addresses.map(async (address) =>
-        blockfrost.addressesUtxosAll(address).then(
-          (uxtos) =>
-            uxtos.map((u) => {
-              const txIn: Cardano.TxIn = { txId: u.tx_hash, index: u.tx_index };
-              const txOut: Cardano.TxOut = blockfrostOutputToCardanoTxOut({ ...u, address });
-
-              return [txIn, txOut];
-            }) as Cardano.Utxo
-          // without `as Cardano.Utxo` above TS thinks the return value is (Cardano.TxIn | Cardano.TxOut)[][]
-        )
+        blockfrost.addressesUtxosAll(address).then((result) => BlockfrostToOgmios.addressUtxoContent(address, result))
       )
     );
 
@@ -55,13 +44,13 @@ export const blockfrostProvider = (options: Options): CardanoProvider => {
       )
     );
 
-    return transactionsArray.flat(1).map((tx) => blockfrostTxContentUtxoToCardanoTx(tx));
+    return transactionsArray.flat(1).map((tx) => BlockfrostToOgmios.txContentUtxo(tx));
   };
 
   const queryTransactionsByHashes: CardanoProvider['queryTransactionsByHashes'] = async (hashes) => {
     const transactions = await Promise.all(hashes.map(async (hash) => blockfrost.txsUtxos(hash)));
 
-    return transactions.map((tx) => blockfrostTxContentUtxoToCardanoTx(tx));
+    return transactions.map((tx) => BlockfrostToOgmios.txContentUtxo(tx));
   };
 
   return {

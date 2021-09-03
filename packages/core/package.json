@@ -20,6 +20,6 @@
     "shx": "^0.3.3"
   },
   "dependencies": {
-    "@cardano-ogmios/client": "^4.0.0-beta.6"
+    "@cardano-ogmios/schema": "^4.0.0-beta.6"
   }
 }
