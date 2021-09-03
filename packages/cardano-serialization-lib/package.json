@@ -1,0 +1,34 @@
+{
+  "name": "@cardano-sdk/cardano-serialization-lib",
+  "version": "0.1.0",
+  "description": "Integration with cardano-serialization-lib",
+  "engines": {
+    "node": "^14"
+  },
+  "main": "dist/index.js",
+  "repository": "https://github.com/input-output-hk/cardano-js-sdk/packages/cardano-serialization-lib",
+  "contributors": [
+    "Rhys Bartels-Waller <rhys.bartelswaller@iohk.io> (https://iohk.io)",
+    "James Sweetland"
+  ],
+  "license": "MPL-2.0",
+  "scripts": {
+    "build": "tsc --build ./src",
+    "tsc": "shx echo typescript --noEmit command not implemented yet",
+    "cleanup": "shx rm -rf dist node_modules",
+    "lint": "eslint --ignore-path ../../.eslintignore \"**/*.ts\"",
+    "test": "jest -c ./test/jest.config.js",
+    "test:debug": "DEBUG=true yarn test"
+  },
+  "devDependencies": {
+    "mock-browser": "^0.92.14",
+    "shx": "^0.3.3"
+  },
+  "dependencies": {
+    "@cardano-sdk/core": "0.1.0", 
+    "@emurgo/cardano-serialization-lib-browser": "^8.0.0",
+    "@emurgo/cardano-serialization-lib-nodejs": "^8.0.0",
+    "ts-custom-error": "^3.2.0",
+    "ts-log": "^2.2.3"
+  }
+}
