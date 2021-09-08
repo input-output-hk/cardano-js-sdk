@@ -1,0 +1,32 @@
+{
+  "name": "@cardano-sdk/cip2",
+  "version": "0.1.0",
+  "description": "TypeScript definitions for CIP2 (Coin Selection Algorithms for Cardano)",
+  "engines": {
+    "node": "^14"
+  },
+  "main": "dist/index.js",
+  "repository": "https://github.com/input-output-hk/cardano-js-sdk/packages/cip2",
+  "author": "Martynas Kazlauskas <martynas.kazlauskas@iohk.io>",
+  "license": "MPL-2.0",
+  "scripts": {
+    "build": "tsc --build ./src",
+    "tscNoEmit": "shx echo typescript --noEmit command not implemented yet",
+    "cleanup": "shx rm -rf dist node_modules",
+    "lint": "eslint --ignore-path ../../.eslintignore \"**/*.ts\"",
+    "test": "jest -c ./test/jest.config.js",
+    "test:debug": "DEBUG=true yarn test"
+  },
+  "devDependencies": {
+    "@cardano-ogmios/schema": "^4.0.0-beta.6",
+    "@emurgo/cardano-serialization-lib-nodejs": "^8.0.0",
+    "@types/lodash-es": "^4.17.5",
+    "fast-check": "^2.17.0",
+    "lodash": "^4.17.21",
+    "shx": "^0.3.3"
+  },
+  "dependencies": {
+    "@cardano-sdk/cardano-serialization-lib": "0.1.0",
+    "lodash-es": "^4.17.21"
+  }
+}
