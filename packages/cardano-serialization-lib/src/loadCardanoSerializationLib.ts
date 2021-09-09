@@ -14,4 +14,4 @@ export const isNodeJs = (): boolean => {
  * Dynamically loads the browser library.
  */
 export const loadCardanoSerializationLib = async (): Promise<typeof CardanoSerializationLibNodeJs> =>
-  isNodeJs() ? CardanoSerializationLibNodeJs : await import('@emurgo/cardano-serialization-lib-nodejs');
+  isNodeJs() ? CardanoSerializationLibNodeJs : await import('@emurgo/cardano-serialization-lib-browser');
