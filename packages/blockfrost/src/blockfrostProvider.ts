@@ -23,14 +23,21 @@ export const blockfrostProvider = (options: Options): CardanoProvider => {
     }
   };
 
-  const utxo: CardanoProvider['utxo'] = async (addresses) => {
-    const results = await Promise.all(
+  const utxoDelegationAndRewards: CardanoProvider['utxoDelegationAndRewards'] = async (addresses, stakeKeyHash) => {
+    const utxoResults = await Promise.all(
       addresses.map(async (address) =>
         blockfrost.addressesUtxosAll(address).then((result) => BlockfrostToOgmios.addressUtxoContent(address, result))
       )
     );
+    const utxo = utxoResults.flat(1);
 
-    return results.flat(1);
+    const accountResponse = await blockfrost.accounts(stakeKeyHash);
+    const delegationAndRewards = {
+      delegate: accountResponse.pool_id,
+      rewards: Number(accountResponse.withdrawable_amount)
+    };
+
+    return { utxo, delegationAndRewards };
   };
 
   const queryTransactionsByAddresses: CardanoProvider['queryTransactionsByAddresses'] = async (addresses) => {
@@ -55,7 +62,7 @@ export const blockfrostProvider = (options: Options): CardanoProvider => {
 
   return {
     submitTx,
-    utxo,
+    utxoDelegationAndRewards,
     queryTransactionsByAddresses,
     queryTransactionsByHashes
   };
