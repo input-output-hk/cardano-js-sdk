@@ -86,7 +86,7 @@
 								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_cardano_sdk_cardano_graphql_db_sync.CardanoProvider.html#queryTransactionsByAddresses" class="tsd-kind-icon">query<wbr>Transactions<wbr>ByAddresses</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_cardano_sdk_cardano_graphql_db_sync.CardanoProvider.html#queryTransactionsByHashes" class="tsd-kind-icon">query<wbr>Transactions<wbr>ByHashes</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_cardano_sdk_cardano_graphql_db_sync.CardanoProvider.html#submitTx" class="tsd-kind-icon">submit<wbr>Tx</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_cardano_sdk_cardano_graphql_db_sync.CardanoProvider.html#utxo" class="tsd-kind-icon">utxo</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_cardano_sdk_cardano_graphql_db_sync.CardanoProvider.html#utxoDelegationAndRewards" class="tsd-kind-icon">utxo<wbr>Delegation<wbr>And<wbr>Rewards</a></li>
 							</ul>
 						</section>
 					</div>
@@ -104,7 +104,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in packages/core/dist/Provider/CardanoProvider.d.ts:6</li>
+									<li>Defined in packages/core/dist/Provider/CardanoProvider.d.ts:9</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -127,7 +127,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in packages/core/dist/Provider/CardanoProvider.d.ts:7</li>
+									<li>Defined in packages/core/dist/Provider/CardanoProvider.d.ts:10</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -164,10 +164,10 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
-					<a name="utxo" class="tsd-anchor"></a>
-					<h3>utxo</h3>
+					<a name="utxoDelegationAndRewards" class="tsd-anchor"></a>
+					<h3>utxo<wbr>Delegation<wbr>And<wbr>Rewards</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">utxo<span class="tsd-signature-symbol">(</span>addresses<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Utxo</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">utxo<wbr>Delegation<wbr>And<wbr>Rewards<span class="tsd-signature-symbol">(</span>addresses<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span>, stakeKeyHash<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">{ </span>delegationAndRewards<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">DelegationsAndRewards</span><span class="tsd-signature-symbol">; </span>utxo<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Utxo</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
@@ -181,8 +181,11 @@
 								<li>
 									<h5>addresses: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
 								</li>
+								<li>
+									<h5>stakeKeyHash: <span class="tsd-signature-type">string</span></h5>
+								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Utxo</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">{ </span>delegationAndRewards<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">DelegationsAndRewards</span><span class="tsd-signature-symbol">; </span>utxo<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Utxo</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -228,7 +231,7 @@
 								<a href="_cardano_sdk_cardano_graphql_db_sync.CardanoProvider.html#submitTx" class="tsd-kind-icon">submit<wbr>Tx</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="_cardano_sdk_cardano_graphql_db_sync.CardanoProvider.html#utxo" class="tsd-kind-icon">utxo</a>
+								<a href="_cardano_sdk_cardano_graphql_db_sync.CardanoProvider.html#utxoDelegationAndRewards" class="tsd-kind-icon">utxo<wbr>Delegation<wbr>And<wbr>Rewards</a>
 							</li>
 						</ul>
 					</li>
