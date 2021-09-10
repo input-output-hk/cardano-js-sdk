@@ -1,85 +1,12 @@
 /* eslint-disable max-len */
 
 import { GraphQLClient } from 'graphql-request';
-import { Schema as Cardano } from '@cardano-ogmios/client';
 import { Tx } from '@cardano-sdk/core';
 import { cardanoGraphqlDbSyncProvider } from '../src';
 jest.mock('graphql-request');
 
 describe('cardanoGraphqlDbSyncProvider', () => {
   const uri = 'http://someurl.com';
-
-  test('utxo', async () => {
-    const mockedResponse = {
-      utxos: [
-        {
-          transaction: {
-            hash: '6f04f2cd96b609b8d5675f89fe53159bab859fb1d62bb56c6001ccf58d9ac128'
-          },
-          index: 0,
-          address:
-            'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp',
-          value: '1097647',
-          tokens: []
-        },
-        {
-          transaction: {
-            hash: '0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5'
-          },
-          index: 0,
-          address:
-            'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp',
-          value: '50928877',
-          tokens: [
-            {
-              asset: {
-                assetId: 'b01fb3b8c3dd6b3705a5dc8bcd5a70759f70ad5d97a72005caeac3c652657675746f31333237'
-              },
-              quantity: '1'
-            }
-          ]
-        }
-      ]
-    };
-    GraphQLClient.prototype.request = jest.fn().mockResolvedValue(mockedResponse);
-    const client = cardanoGraphqlDbSyncProvider(uri);
-
-    const response = await client.utxo([
-      'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
-    ]);
-
-    expect(response).toHaveLength(2);
-
-    expect(response[0]).toHaveLength(2);
-    expect(response[0][0]).toMatchObject<Cardano.TxIn>({
-      txId: '6f04f2cd96b609b8d5675f89fe53159bab859fb1d62bb56c6001ccf58d9ac128',
-      index: 0
-    });
-    expect(response[0][1]).toMatchObject<Cardano.TxOut>({
-      address:
-        'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp',
-      value: {
-        coins: 1_097_647,
-        assets: {}
-      }
-    });
-
-    expect(response[1]).toHaveLength(2);
-    expect(response[1][0]).toMatchObject<Cardano.TxIn>({
-      txId: '0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5',
-      index: 0
-    });
-    expect(response[1][1]).toMatchObject<Cardano.TxOut>({
-      address:
-        'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp',
-      value: {
-        coins: 50_928_877,
-        assets: {
-          b01fb3b8c3dd6b3705a5dc8bcd5a70759f70ad5d97a72005caeac3c652657675746f31333237: BigInt(1)
-        }
-      }
-    });
-  });
 
   test('queryTransactionsByAddresses', async () => {
     const mockedResponse = {

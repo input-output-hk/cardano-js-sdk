@@ -35,53 +35,9 @@ export const cardanoGraphqlDbSyncProvider = (uri: string): CardanoProvider => {
     }
   };
 
-  const utxo: CardanoProvider['utxo'] = async (addresses) => {
-    const query = gql`
-      query ($addresses: [String]!) {
-        utxos(where: { address: { _in: $addresses } }) {
-          transaction {
-            hash
-          }
-          index
-          address
-          value # coins
-          tokens {
-            asset {
-              assetId # asset key
-            }
-            quantity
-          }
-        }
-      }
-    `;
-
-    type Utxo = {
-      transaction: { hash: Cardano.Hash16 };
-      index: number;
-      address: Cardano.Address;
-      value: string;
-      tokens: {
-        asset: {
-          assetId: string;
-        };
-        quantity: string;
-      }[];
-    };
-    type Response = { utxos: Utxo[] };
-    type Variables = { addresses: string[] };
-
-    const response = await client.request<Response, Variables>(query, { addresses });
-
-    return response.utxos.map((uxto) => {
-      const assets: Cardano.Value['assets'] = {};
-
-      for (const t of uxto.tokens) assets[t.asset.assetId] = BigInt(t.quantity);
-
-      return [
-        { txId: uxto.transaction.hash, index: uxto.index },
-        { address: uxto.address, value: { coins: Number(uxto.value), assets } }
-      ];
-    });
+  // eslint-disable-next-line unicorn/consistent-function-scoping
+  const utxoDelegationAndRewards: CardanoProvider['utxoDelegationAndRewards'] = async () => {
+    throw new Error('Not implemented yet.');
   };
 
   const queryTransactionsByAddresses: CardanoProvider['queryTransactionsByAddresses'] = async (addresses) => {
@@ -170,7 +126,7 @@ export const cardanoGraphqlDbSyncProvider = (uri: string): CardanoProvider => {
 
   return {
     submitTx,
-    utxo,
+    utxoDelegationAndRewards,
     queryTransactionsByAddresses,
     queryTransactionsByHashes
   };

@@ -9,8 +9,8 @@ jest.mock('@blockfrost/blockfrost-js');
 describe('blockfrostProvider', () => {
   const apiKey = 'someapikey';
 
-  test('utxo', async () => {
-    const mockedResponse = [
+  test('utxoDelegationAndRewards', async () => {
+    const addressesUtxosAllMockResponse = [
       {
         tx_hash: '0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5',
         tx_index: 0,
@@ -40,21 +40,35 @@ describe('blockfrostProvider', () => {
         block: '500de01367988d4698266ca02148bf2308eab96c0876c9df00ee843772ccb326'
       }
     ];
-    BlockFrostAPI.prototype.addressesUtxosAll = jest.fn().mockResolvedValue(mockedResponse);
+    BlockFrostAPI.prototype.addressesUtxosAll = jest.fn().mockResolvedValue(addressesUtxosAllMockResponse);
+
+    const accountsMockResponse = {
+      stake_address: 'stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27',
+      active: true,
+      active_epoch: 81,
+      controlled_amount: '95565690389731',
+      rewards_sum: '615803862289',
+      withdrawals_sum: '0',
+      reserves_sum: '0',
+      treasury_sum: '0',
+      withdrawable_amount: '615803862289',
+      pool_id: 'pool1y6chk7x7fup4ms9leesdr57r4qy9cwxuee0msan72x976a6u0nc'
+    };
+    BlockFrostAPI.prototype.accounts = jest.fn().mockResolvedValue(accountsMockResponse);
 
     const client = blockfrostProvider({ projectId: apiKey, isTestnet: true });
-    const response = await client.utxo([
-      'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
-    ]);
+    const response = await client.utxoDelegationAndRewards(
+      ['addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'],
+      'stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27'
+    );
 
-    expect(response).toHaveLength(2);
-
-    expect(response[0]).toHaveLength(2);
-    expect(response[0][0]).toMatchObject<Cardano.TxIn>({
+    expect(response.utxo).toBeTruthy();
+    expect(response.utxo[0]).toHaveLength(2);
+    expect(response.utxo[0][0]).toMatchObject<Cardano.TxIn>({
       txId: '0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5',
       index: 0
     });
-    expect(response[0][1]).toMatchObject<Cardano.TxOut>({
+    expect(response.utxo[0][1]).toMatchObject<Cardano.TxOut>({
       address:
         'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp',
       value: {
@@ -65,12 +79,12 @@ describe('blockfrostProvider', () => {
       }
     });
 
-    expect(response[1]).toHaveLength(2);
-    expect(response[1][0]).toMatchObject<Cardano.TxIn>({
+    expect(response.utxo[1]).toHaveLength(2);
+    expect(response.utxo[1][0]).toMatchObject<Cardano.TxIn>({
       txId: '6f04f2cd96b609b8d5675f89fe53159bab859fb1d62bb56c6001ccf58d9ac128',
       index: 0
     });
-    expect(response[1][1]).toMatchObject<Cardano.TxOut>({
+    expect(response.utxo[1][1]).toMatchObject<Cardano.TxOut>({
       address:
         'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp',
       value: {
@@ -78,6 +92,9 @@ describe('blockfrostProvider', () => {
         assets: {}
       }
     });
+
+    expect(response.delegationAndRewards.delegate).toEqual(accountsMockResponse.pool_id);
+    expect(response.delegationAndRewards.rewards).toEqual(Number(accountsMockResponse.withdrawable_amount));
   });
 
   test('queryTransactionsByAddresses', async () => {
