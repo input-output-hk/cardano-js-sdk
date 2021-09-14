@@ -1,0 +1,27 @@
+{
+  "name": "@cardano-sdk/wallet",
+  "version": "0.1.0",
+  "description": "Wallet modules",
+  "engines": {
+    "node": "^14"
+  },
+  "main": "dist/index.js",
+  "repository": "https://github.com/input-output-hk/cardano-js-sdk/packages/wallet",
+  "contributors": [
+    "Rhys Bartels-Waller <rhys.bartelswaller@iohk.io> (https://iohk.io)",
+    "James Sweetland <james.sweetland@iohk.io> (https://iohk.io)",
+    "Martynas Kazlauskas <martynas.kazlauskas@iohk.io> (https://iohk.io)"
+  ],
+  "license": "MPL-2.0",
+  "scripts": {
+    "build": "which tsc",
+    "tsc": "shx echo typescript --noEmit command not implemented yet",
+    "cleanup": "shx rm -rf dist node_modules",
+    "lint": "eslint --ignore-path ../../.eslintignore \"**/*.ts\"",
+    "test": "shx echo No tests in this package",
+    "test:debug": "DEBUG=true yarn test"
+  },
+  "devDependencies": {
+    "shx": "^0.3.3"
+  }
+}
