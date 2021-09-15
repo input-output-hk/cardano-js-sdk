@@ -284,4 +284,38 @@ describe('blockfrostProvider', () => {
       ]
     });
   });
+
+  test('currentWalletProtocolParameters', async () => {
+    const mockedResponse = {
+      data: {
+        min_fee_a: 44,
+        min_fee_b: 155_381,
+        key_deposit: '2000000',
+        pool_deposit: '500000000',
+        protocol_major_ver: 5,
+        protocol_minor_ver: 0,
+        min_pool_cost: '340000000',
+        max_val_size: '1000',
+        max_collateral_inputs: 1,
+        coins_per_utxo_word: '0'
+      }
+    };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    BlockFrostAPI.prototype.axiosInstance = jest.fn().mockResolvedValue(mockedResponse) as any;
+
+    const client = blockfrostProvider({ projectId: apiKey, isTestnet: true });
+    const response = await client.currentWalletProtocolParameters();
+
+    expect(response).toMatchObject({
+      minFeeCoefficient: 44,
+      minFeeConstant: 155_381,
+      stakeKeyDeposit: 2_000_000,
+      poolDeposit: 500_000_000,
+      protocolVersion: { major: 5, minor: 0 },
+      minPoolCost: 340_000_000,
+      maxValueSize: 1000,
+      maxCollateralInputs: 1,
+      coinsPerUtxoWord: 0
+    });
+  });
 });

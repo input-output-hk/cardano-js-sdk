@@ -24,6 +24,7 @@ module.exports = {
     "quotes": ["error", "single", { "avoidEscape": true }],
     "unicorn/filename-case": 0,
     "unicorn/prevent-abbreviations": 0,
+    "unicorn/no-null": 0,
     "@typescript-eslint/ban-types": 0,
     "template-tag-spacing": 0,
     "no-magic-numbers": 0,

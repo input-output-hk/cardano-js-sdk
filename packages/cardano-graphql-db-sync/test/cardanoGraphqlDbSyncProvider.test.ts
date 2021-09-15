@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 
 import { GraphQLClient } from 'graphql-request';
-import { Tx } from '@cardano-sdk/core';
+import { ProtocolParametersRequiredByWallet, Tx } from '@cardano-sdk/core';
 import { cardanoGraphqlDbSyncProvider } from '../src';
 jest.mock('graphql-request');
 
@@ -171,6 +171,49 @@ describe('cardanoGraphqlDbSyncProvider', () => {
           value: { coins: 9_515_281_005_985, assets: {} }
         }
       ]
+    });
+  });
+
+  test('currentWalletProtocolParameters', async () => {
+    const mockedResponse = {
+      cardano: {
+        currentEpoch: {
+          protocolParams: {
+            coinsPerUtxoWord: 34_482,
+            maxValSize: '5000',
+            keyDeposit: 2_000_000,
+            maxCollateralInputs: 3,
+            minFeeA: 44,
+            minFeeB: 155_381,
+            minPoolCost: 340_000_000,
+            poolDeposit: 500_000_000,
+            protocolVersion: {
+              major: 5,
+              minor: 5
+            }
+          }
+        }
+      }
+    };
+
+    GraphQLClient.prototype.request = jest.fn().mockResolvedValue(mockedResponse);
+    const client = cardanoGraphqlDbSyncProvider(uri);
+
+    const response = await client.currentWalletProtocolParameters();
+
+    expect(response).toMatchObject<ProtocolParametersRequiredByWallet>({
+      coinsPerUtxoWord: 34_482,
+      maxValueSize: 5000,
+      stakeKeyDeposit: 2_000_000,
+      maxCollateralInputs: 3,
+      minFeeCoefficient: 44,
+      minFeeConstant: 155_381,
+      minPoolCost: 340_000_000,
+      poolDeposit: 500_000_000,
+      protocolVersion: {
+        major: 5,
+        minor: 5
+      }
     });
   });
 });
