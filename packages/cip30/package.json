@@ -7,7 +7,10 @@
   },
   "main": "dist/index.js",
   "repository": "https://github.com/input-output-hk/cardano-js-sdk/packages/cip30",
-  "author": "James Sweetland",
+  "contributors": [
+    "Rhys Bartels-Waller <rhys.bartelswaller@iohk.io> (https://iohk.io)",
+    "James Sweetland"
+  ],
   "license": "MPL-2.0",
   "scripts": {
     "build": "tsc --build ./src",
@@ -18,8 +21,10 @@
     "test:debug": "DEBUG=true yarn test"
   },
   "devDependencies": {
+    "@types/webextension-polyfill": "^0.8.0",
     "mock-browser": "^0.92.14",
-    "shx": "^0.3.3"
+    "shx": "^0.3.3",
+    "webextension-polyfill": "^0.8.0"
   },
   "dependencies": {
     "@cardano-ogmios/client": "^4.0.0-beta.6",
