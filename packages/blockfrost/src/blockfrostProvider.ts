@@ -60,10 +60,19 @@ export const blockfrostProvider = (options: Options): CardanoProvider => {
     return transactions.map((tx) => BlockfrostToOgmios.txContentUtxo(tx));
   };
 
+  const currentWalletProtocolParameters: CardanoProvider['currentWalletProtocolParameters'] = async () => {
+    const response = await blockfrost.axiosInstance({
+      url: `${blockfrost.apiUrl}/epochs/latest/parameters`
+    });
+
+    return BlockfrostToOgmios.currentWalletProtocolParameters(response.data);
+  };
+
   return {
     submitTx,
     utxoDelegationAndRewards,
     queryTransactionsByAddresses,
-    queryTransactionsByHashes
+    queryTransactionsByHashes,
+    currentWalletProtocolParameters
   };
 };

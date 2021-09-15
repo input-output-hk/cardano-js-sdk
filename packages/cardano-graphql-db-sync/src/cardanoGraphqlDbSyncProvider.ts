@@ -2,7 +2,7 @@ import { CardanoProvider } from '@cardano-sdk/core';
 import { gql, GraphQLClient } from 'graphql-request';
 import { TransactionSubmitResponse } from '@cardano-graphql/client-ts';
 import { Schema as Cardano } from '@cardano-ogmios/client';
-import { graphqlTransactionsToCardanoTxs } from './utils';
+import { CardanoGraphqlToOgmios, GraphqlCurrentWalletProtocolParameters } from './CardanoGraphqlToOgmios';
 
 /**
  * Connect to a [cardano-graphql (cardano-db-sync) service](https://github.com/input-output-hk/cardano-graphql)
@@ -80,7 +80,7 @@ export const cardanoGraphqlDbSyncProvider = (uri: string): CardanoProvider => {
 
     const response = await client.request<Response, Variables>(query, { addresses });
 
-    return graphqlTransactionsToCardanoTxs(response.transactions);
+    return CardanoGraphqlToOgmios.graphqlTransactionsToCardanoTxs(response.transactions);
   };
 
   const queryTransactionsByHashes: CardanoProvider['queryTransactionsByHashes'] = async (hashes) => {
@@ -121,13 +121,48 @@ export const cardanoGraphqlDbSyncProvider = (uri: string): CardanoProvider => {
 
     const response = await client.request<Response, Variables>(query, { hashes });
 
-    return graphqlTransactionsToCardanoTxs(response.transactions);
+    return CardanoGraphqlToOgmios.graphqlTransactionsToCardanoTxs(response.transactions);
+  };
+
+  const currentWalletProtocolParameters: CardanoProvider['currentWalletProtocolParameters'] = async () => {
+    const query = gql`
+      query {
+        cardano {
+          currentEpoch {
+            protocolParams {
+              coinsPerUtxoWord
+              maxValSize
+              keyDeposit
+              maxCollateralInputs
+              minFeeA
+              minFeeB
+              minPoolCost
+              poolDeposit
+              protocolVersion
+            }
+          }
+        }
+      }
+    `;
+
+    type Response = {
+      cardano: {
+        currentEpoch: {
+          protocolParams: GraphqlCurrentWalletProtocolParameters;
+        };
+      };
+    };
+
+    const response = await client.request<Response>(query);
+
+    return CardanoGraphqlToOgmios.currentWalletProtocolParameters(response.cardano.currentEpoch.protocolParams);
   };
 
   return {
     submitTx,
     utxoDelegationAndRewards,
     queryTransactionsByAddresses,
-    queryTransactionsByHashes
+    queryTransactionsByHashes,
+    currentWalletProtocolParameters
   };
 };

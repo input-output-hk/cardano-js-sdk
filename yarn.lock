@@ -476,22 +476,23 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@blockfrost/blockfrost-js@^0.9.4":
-  version "0.9.4"
-  resolved "https://registry.yarnpkg.com/@blockfrost/blockfrost-js/-/blockfrost-js-0.9.4.tgz#8bb6e1b63c6bd130ceb1569b7be47c13d7e006a3"
-  integrity sha512-vfoKCBQjW1LeM1R4dhbqm0Jz0IW5jXjAooBDY81vmN3HPbGNoffFTfj98yGiUaqp4YfNyPH1BuYOqB/Gky5wCA==
+"@blockfrost/blockfrost-js@^1.3.0":
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/@blockfrost/blockfrost-js/-/blockfrost-js-1.3.0.tgz#7c5d9fc5c778f5f3ea0b021bca6b687126d79035"
+  integrity sha512-Sgq8ILgQZT1FnkV3ICvjkb8XgxPI22f5gW41TbBHoDhVE7q+ECbYu9z00xNX5ZK54gR3kfcAcoEcF70fFolsyQ==
   dependencies:
-    "@blockfrost/openapi" "0.1.24"
-    "@emurgo/cardano-serialization-lib-nodejs" "^7.1.0"
+    "@blockfrost/openapi" "0.1.27"
+    "@emurgo/cardano-serialization-lib-nodejs" "^8.1.0"
+    "@emurgo/cip14-js" "2.0.0"
     axios "^0.21.1"
     form-data "^4.0.0"
     retry-axios "^2.4.0"
     url-join "^4.0.1"
 
-"@blockfrost/openapi@0.1.24":
-  version "0.1.24"
-  resolved "https://registry.yarnpkg.com/@blockfrost/openapi/-/openapi-0.1.24.tgz#dd091d509a8111ccc0a313ec2d851a40240e6e34"
-  integrity sha512-3G5BMutgi07JcSXcuY0l/Rb5VL0G6od6YTVk/ncz6kylhnvB9mzjLxnlOxqQZmOBtYeOyoy8+34E2XzLB8UPNQ==
+"@blockfrost/openapi@0.1.27":
+  version "0.1.27"
+  resolved "https://registry.yarnpkg.com/@blockfrost/openapi/-/openapi-0.1.27.tgz#98b00ee1218c734d62e723639c39db62f27ffe4d"
+  integrity sha512-lCGFPZ5D87lwhwP6nowJsVsJEaSFSAi87ORIF3RSakohilZRCgxOA5j5xFDA4mccUnfy1vbTc+CaQ8TKOQPaDA==
 
 "@cardano-graphql/client-ts@^5.1.0-beta.1":
   version "5.1.0-beta.1"
@@ -671,15 +672,23 @@
   resolved "https://registry.yarnpkg.com/@emurgo/cardano-serialization-lib-browser/-/cardano-serialization-lib-browser-8.0.0.tgz#b938890b035222d8514030410aa2bfe52e6098a0"
   integrity sha512-JoYF8LfnELddD9oGVhrEZ6j1PPvXladT80XVGCGmwBARag/iNNUYZEZwklGPf5YBztX26Xzj2zAK0/4hK407Eg==
 
-"@emurgo/cardano-serialization-lib-nodejs@^7.1.0":
-  version "7.1.0"
-  resolved "https://registry.yarnpkg.com/@emurgo/cardano-serialization-lib-nodejs/-/cardano-serialization-lib-nodejs-7.1.0.tgz#657ce11655d29560c2e302b616dc0fe86c4d2920"
-  integrity sha512-ogAUL23kJLDdc5nfRGBMhx/84aq0hnmEJea6VNozm3vnTYPsE1tmdvcYAmoRvsn+k745/E89ToSYBrjwnuZZpg==
-
 "@emurgo/cardano-serialization-lib-nodejs@^8.0.0":
   version "8.0.0"
   resolved "https://registry.yarnpkg.com/@emurgo/cardano-serialization-lib-nodejs/-/cardano-serialization-lib-nodejs-8.0.0.tgz#9666c4fe4afc08df53cb4a9d12c19fe91112e9b5"
   integrity sha512-GHN1w1B//JwLRKr3/VE5xTGpY3Nof0FnZ6pMvxYaZ8LbXHlW7vfcqzz/5cEc2m1oyULzdCPQm8/8u5I9VTvJlg==
+
+"@emurgo/cardano-serialization-lib-nodejs@^8.1.0":
+  version "8.1.0"
+  resolved "https://registry.yarnpkg.com/@emurgo/cardano-serialization-lib-nodejs/-/cardano-serialization-lib-nodejs-8.1.0.tgz#76b0bfbec1eda4fe185de621c7b948f018e07319"
+  integrity sha512-BH8MhQQt+BDqWM4Yqa9Asn/vhJJLxi43pp7Crq6bdQuj2NOT2F6e3nhdLS2KJhvb47YGFdg0pnvGaH+TCmUoIA==
+
+"@emurgo/cip14-js@2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@emurgo/cip14-js/-/cip14-js-2.0.0.tgz#6ef78ddac8a35f2725e9ccebfd5ae114716c4b48"
+  integrity sha512-EvjgTs4NCqH1j0wxXqWCj31P7NmTzl3aR+9am0OLSsf3NA9GsdKH5QNyXJrvSZILM4yWzlZNum3y8S5PfdM1aA==
+  dependencies:
+    bech32 "2.0.0"
+    blake2b "2.1.3"
 
 "@es-joy/jsdoccomment@0.10.7":
   version "0.10.7"
@@ -2181,6 +2190,11 @@ bcrypt-pbkdf@^1.0.0, bcrypt-pbkdf@^1.0.2:
   dependencies:
     tweetnacl "^0.14.3"
 
+bech32@2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/bech32/-/bech32-2.0.0.tgz#078d3686535075c8c79709f054b1b226a133b355"
+  integrity sha512-LcknSilhIGatDAsY1ak2I8VtGaHNhgMSYVxFrGLXv+xLHytaKZKcaUJJUE7qmBr7h33o5YQwP55pMI0xmkpJwg==
+
 begoo@1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/begoo/-/begoo-1.1.2.tgz#3eb047aa08e6a25d0789fa1aea34eecaceb7ab9d"
@@ -2222,6 +2236,21 @@ bl@^4.0.3, bl@^4.1.0:
     buffer "^5.5.0"
     inherits "^2.0.4"
     readable-stream "^3.4.0"
+
+blake2b-wasm@^1.1.0:
+  version "1.1.7"
+  resolved "https://registry.yarnpkg.com/blake2b-wasm/-/blake2b-wasm-1.1.7.tgz#e4d075da10068e5d4c3ec1fb9accc4d186c55d81"
+  integrity sha512-oFIHvXhlz/DUgF0kq5B1CqxIDjIJwh9iDeUUGQUcvgiGz7Wdw03McEO7CfLBy7QKGdsydcMCgO9jFNBAFCtFcA==
+  dependencies:
+    nanoassert "^1.0.0"
+
+blake2b@2.1.3:
+  version "2.1.3"
+  resolved "https://registry.yarnpkg.com/blake2b/-/blake2b-2.1.3.tgz#f5388be424768e7c6327025dad0c3c6d83351bca"
+  integrity sha512-pkDss4xFVbMb4270aCyGD3qLv92314Et+FsKzilCLxDz5DuZ2/1g3w4nmBbu6nKApPspnjG7JcwTjGZnduB1yg==
+  dependencies:
+    blake2b-wasm "^1.1.0"
+    nanoassert "^1.0.0"
 
 boolean@^3.0.1:
   version "3.1.2"
@@ -5835,6 +5864,11 @@ mute-stream@0.0.8:
   version "0.0.8"
   resolved "https://registry.yarnpkg.com/mute-stream/-/mute-stream-0.0.8.tgz#1630c42b2251ff81e2a283de96a5497ea92e5e0d"
   integrity sha512-nnbWWOkoWyUsTjKrhgD0dcz22mdkSnpYqbEjIm2nhwhuxlSkpywJmBo8h0ZqJdkp73mb90SssHkN4rsRaBAfAA==
+
+nanoassert@^1.0.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/nanoassert/-/nanoassert-1.1.0.tgz#4f3152e09540fde28c76f44b19bbcd1d5a42478d"
+  integrity sha1-TzFS4JVA/eKMdvRLGbvNHVpCR40=
 
 nanoid@^3.1.22:
   version "3.1.23"
