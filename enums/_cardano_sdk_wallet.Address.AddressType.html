@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>util | cardano-sdk</title>
+	<title>AddressType | cardano-sdk</title>
 	<meta name="description" content="Documentation for cardano-sdk">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -55,83 +55,64 @@
 					<a href="../index.html">cardano-sdk</a>
 				</li>
 				<li>
-					<a href="_cardano_sdk_core.html">@cardano-sdk/core</a>
+					<a href="../modules/_cardano_sdk_wallet.html">@cardano-sdk/wallet</a>
 				</li>
 				<li>
-					<a href="_cardano_sdk_core.Asset.html">Asset</a>
+					<a href="../modules/_cardano_sdk_wallet.Address.html">Address</a>
 				</li>
 				<li>
-					<a href="_cardano_sdk_core.Asset.util.html">util</a>
+					<a href="_cardano_sdk_wallet.Address.AddressType.html">AddressType</a>
 				</li>
 			</ul>
-			<h1>Namespace util</h1>
+			<h1>Enumeration AddressType</h1>
 		</div>
 	</div>
 </header>
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>internal = change address &amp; external = receipt address</p>
+					</div>
+				</div>
+			</section>
 			<section class="tsd-panel-group tsd-index-group">
 				<h2>Index</h2>
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section ">
-							<h3>Functions</h3>
+							<h3>Enumeration members</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="_cardano_sdk_core.Asset.util.html#assetNameFromAssetId" class="tsd-kind-icon">asset<wbr>Name<wbr>From<wbr>Asset<wbr>Id</a></li>
-								<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="_cardano_sdk_core.Asset.util.html#policyIdFromAssetId" class="tsd-kind-icon">policy<wbr>IdFrom<wbr>Asset<wbr>Id</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="_cardano_sdk_wallet.Address.AddressType.html#external" class="tsd-kind-icon">external</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="_cardano_sdk_wallet.Address.AddressType.html#internal" class="tsd-kind-icon">internal</a></li>
 							</ul>
 						</section>
 					</div>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
-				<h2>Functions</h2>
-				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-namespace">
-					<a name="assetNameFromAssetId" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagConst">Const</span> asset<wbr>Name<wbr>From<wbr>Asset<wbr>Id</h3>
-					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-namespace">
-						<li class="tsd-signature tsd-kind-icon">asset<wbr>Name<wbr>From<wbr>Asset<wbr>Id<span class="tsd-signature-symbol">(</span>assetId<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/161d8b5/packages/core/src/Asset/util.ts#L3">packages/core/src/Asset/util.ts:3</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>assetId: <span class="tsd-signature-type">string</span></h5>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
-						</li>
-					</ul>
+				<h2>Enumeration members</h2>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
+					<a name="external" class="tsd-anchor"></a>
+					<h3>external</h3>
+					<div class="tsd-signature tsd-kind-icon">external<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = &quot;External&quot;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/161d8b5/packages/wallet/src/Address.ts#L4">packages/wallet/src/Address.ts:4</a></li>
+						</ul>
+					</aside>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-namespace">
-					<a name="policyIdFromAssetId" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagConst">Const</span> policy<wbr>IdFrom<wbr>Asset<wbr>Id</h3>
-					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-namespace">
-						<li class="tsd-signature tsd-kind-icon">policy<wbr>IdFrom<wbr>Asset<wbr>Id<span class="tsd-signature-symbol">(</span>assetId<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/161d8b5/packages/core/src/Asset/util.ts#L1">packages/core/src/Asset/util.ts:1</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>assetId: <span class="tsd-signature-type">string</span></h5>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
-						</li>
-					</ul>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
+					<a name="internal" class="tsd-anchor"></a>
+					<h3>internal</h3>
+					<div class="tsd-signature tsd-kind-icon">internal<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = &quot;Internal&quot;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/161d8b5/packages/wallet/src/Address.ts#L3">packages/wallet/src/Address.ts:3</a></li>
+						</ul>
+					</aside>
 				</section>
 			</section>
 		</div>
@@ -145,11 +126,23 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
-					<li class=" tsd-kind-function tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_core.Asset.util.html#assetNameFromAssetId" class="tsd-kind-icon">asset<wbr>Name<wbr>From<wbr>Asset<wbr>Id</a>
+				</ul>
+				<ul class="current">
+					<li class="current tsd-kind-enum tsd-parent-kind-namespace">
+						<a href="_cardano_sdk_wallet.Address.AddressType.html" class="tsd-kind-icon">Address<wbr>Type</a>
+						<ul>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="_cardano_sdk_wallet.Address.AddressType.html#external" class="tsd-kind-icon">external</a>
+							</li>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="_cardano_sdk_wallet.Address.AddressType.html#internal" class="tsd-kind-icon">internal</a>
+							</li>
+						</ul>
 					</li>
-					<li class=" tsd-kind-function tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_core.Asset.util.html#policyIdFromAssetId" class="tsd-kind-icon">policy<wbr>IdFrom<wbr>Asset<wbr>Id</a>
+				</ul>
+				<ul class="after-current">
+					<li class=" tsd-kind-interface tsd-parent-kind-namespace">
+						<a href="../interfaces/_cardano_sdk_wallet.Address.Address.html" class="tsd-kind-icon">Address</a>
 					</li>
 				</ul>
 			</nav>

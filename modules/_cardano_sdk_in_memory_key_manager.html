@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>@cardano-sdk/core | cardano-sdk</title>
+	<title>@cardano-sdk/in-memory-key-manager | cardano-sdk</title>
 	<meta name="description" content="Documentation for cardano-sdk">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -55,10 +55,10 @@
 					<a href="../index.html">cardano-sdk</a>
 				</li>
 				<li>
-					<a href="_cardano_sdk_core.html">@cardano-sdk/core</a>
+					<a href="_cardano_sdk_in_memory_key_manager.html">@cardano-sdk/in-memory-key-manager</a>
 				</li>
 			</ul>
-			<h1>Module @cardano-sdk/core</h1>
+			<h1>Module @cardano-sdk/in-memory-key-manager</h1>
 		</div>
 	</div>
 </header>
@@ -72,49 +72,53 @@
 						<section class="tsd-index-section ">
 							<h3>Namespaces</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-namespace tsd-parent-kind-module"><a href="_cardano_sdk_core.Asset.html" class="tsd-kind-icon">Asset</a></li>
-								<li class="tsd-kind-namespace tsd-parent-kind-module"><a href="_cardano_sdk_core.Cardano.html" class="tsd-kind-icon">Cardano</a></li>
+								<li class="tsd-kind-namespace tsd-parent-kind-module"><a href="_cardano_sdk_in_memory_key_manager.util.html" class="tsd-kind-icon">util</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
-							<h3>Interfaces</h3>
+							<h3>Functions</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/_cardano_sdk_core.ByronGenesis.html" class="tsd-kind-icon">Byron<wbr>Genesis</a></li>
-								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/_cardano_sdk_core.CardanoProvider.html" class="tsd-kind-icon">Cardano<wbr>Provider</a></li>
-								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/_cardano_sdk_core.ShelleyGenesis.html" class="tsd-kind-icon">Shelley<wbr>Genesis</a></li>
-							</ul>
-						</section>
-						<section class="tsd-index-section ">
-							<h3>Type aliases</h3>
-							<ul class="tsd-index-list">
-								<li class="tsd-kind-type-alias tsd-parent-kind-module"><a href="_cardano_sdk_core.html#ProtocolParametersRequiredByWallet" class="tsd-kind-icon">Protocol<wbr>Parameters<wbr>Required<wbr>ByWallet</a></li>
-								<li class="tsd-kind-type-alias tsd-parent-kind-module"><a href="_cardano_sdk_core.html#Tx" class="tsd-kind-icon">Tx</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_cardano_sdk_in_memory_key_manager.html#createInMemoryKeyManager" class="tsd-kind-icon">create<wbr>InMemory<wbr>Key<wbr>Manager</a></li>
 							</ul>
 						</section>
 					</div>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
-				<h2>Type aliases</h2>
-				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-module">
-					<a name="ProtocolParametersRequiredByWallet" class="tsd-anchor"></a>
-					<h3>Protocol<wbr>Parameters<wbr>Required<wbr>ByWallet</h3>
-					<div class="tsd-signature tsd-kind-icon">Protocol<wbr>Parameters<wbr>Required<wbr>ByWallet<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Pick</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">ProtocolParametersAlonzo</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">&quot;coinsPerUtxoWord&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;maxValueSize&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;stakeKeyDeposit&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;maxCollateralInputs&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;minFeeCoefficient&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;minFeeConstant&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;minPoolCost&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;poolDeposit&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;protocolVersion&quot;</span><span class="tsd-signature-symbol">&gt;</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/161d8b5/packages/core/src/Provider/CardanoProvider.ts#L6">packages/core/src/Provider/CardanoProvider.ts:6</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-module">
-					<a name="Tx" class="tsd-anchor"></a>
-					<h3>Tx</h3>
-					<div class="tsd-signature tsd-kind-icon">Tx<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>hash<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">OgmiosSchema.Hash16</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">OgmiosSchema.Tx</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/161d8b5/packages/core/src/Transaction/Tx.ts#L3">packages/core/src/Transaction/Tx.ts:3</a></li>
-						</ul>
-					</aside>
+				<h2>Functions</h2>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="createInMemoryKeyManager" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> create<wbr>InMemory<wbr>Key<wbr>Manager</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">create<wbr>InMemory<wbr>Key<wbr>Manager<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>accountIndex<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>mnemonic<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>password<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">KeyManager</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/161d8b5/packages/in-memory-key-manager/src/InMemoryKey.ts#L10">packages/in-memory-key-manager/src/InMemoryKey.ts:10</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>__namedParameters: <span class="tsd-signature-symbol">{ </span>accountIndex<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>mnemonic<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>password<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span></h5>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter">
+											<h5><span class="tsd-flag ts-flagOptional">Optional</span> account<wbr>Index<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span></h5>
+										</li>
+										<li class="tsd-parameter">
+											<h5>mnemonic<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
+										</li>
+										<li class="tsd-parameter">
+											<h5>password<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
+										</li>
+									</ul>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">KeyManager</span></h4>
+						</li>
+					</ul>
 				</section>
 			</section>
 		</div>
@@ -136,10 +140,10 @@
 					<li class=" tsd-kind-module">
 						<a href="_cardano_sdk_cip30.html">@cardano-<wbr>sdk/cip30</a>
 					</li>
-					<li class="current tsd-kind-module">
+					<li class=" tsd-kind-module">
 						<a href="_cardano_sdk_core.html">@cardano-<wbr>sdk/core</a>
 					</li>
-					<li class=" tsd-kind-module">
+					<li class="current tsd-kind-module">
 						<a href="_cardano_sdk_in_memory_key_manager.html">@cardano-<wbr>sdk/in-<wbr>memory-<wbr>key-<wbr>manager</a>
 					</li>
 					<li class=" tsd-kind-module">
@@ -149,20 +153,8 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="../interfaces/_cardano_sdk_core.ByronGenesis.html" class="tsd-kind-icon">Byron<wbr>Genesis</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="../interfaces/_cardano_sdk_core.CardanoProvider.html" class="tsd-kind-icon">Cardano<wbr>Provider</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="../interfaces/_cardano_sdk_core.ShelleyGenesis.html" class="tsd-kind-icon">Shelley<wbr>Genesis</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
-						<a href="_cardano_sdk_core.html#ProtocolParametersRequiredByWallet" class="tsd-kind-icon">Protocol<wbr>Parameters<wbr>Required<wbr>ByWallet</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
-						<a href="_cardano_sdk_core.html#Tx" class="tsd-kind-icon">Tx</a>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="_cardano_sdk_in_memory_key_manager.html#createInMemoryKeyManager" class="tsd-kind-icon">create<wbr>InMemory<wbr>Key<wbr>Manager</a>
 					</li>
 				</ul>
 			</nav>

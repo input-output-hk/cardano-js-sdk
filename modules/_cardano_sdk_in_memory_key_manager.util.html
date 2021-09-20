@@ -55,13 +55,10 @@
 					<a href="../index.html">cardano-sdk</a>
 				</li>
 				<li>
-					<a href="_cardano_sdk_core.html">@cardano-sdk/core</a>
+					<a href="_cardano_sdk_in_memory_key_manager.html">@cardano-sdk/in-memory-key-manager</a>
 				</li>
 				<li>
-					<a href="_cardano_sdk_core.Asset.html">Asset</a>
-				</li>
-				<li>
-					<a href="_cardano_sdk_core.Asset.util.html">util</a>
+					<a href="_cardano_sdk_in_memory_key_manager.util.html">util</a>
 				</li>
 			</ul>
 			<h1>Namespace util</h1>
@@ -78,8 +75,9 @@
 						<section class="tsd-index-section ">
 							<h3>Functions</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="_cardano_sdk_core.Asset.util.html#assetNameFromAssetId" class="tsd-kind-icon">asset<wbr>Name<wbr>From<wbr>Asset<wbr>Id</a></li>
-								<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="_cardano_sdk_core.Asset.util.html#policyIdFromAssetId" class="tsd-kind-icon">policy<wbr>IdFrom<wbr>Asset<wbr>Id</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="_cardano_sdk_in_memory_key_manager.util.html#generateMnemonic" class="tsd-kind-icon">generate<wbr>Mnemonic</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="_cardano_sdk_in_memory_key_manager.util.html#harden" class="tsd-kind-icon">harden</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="_cardano_sdk_in_memory_key_manager.util.html#validateMnemonic" class="tsd-kind-icon">validate<wbr>Mnemonic</a></li>
 							</ul>
 						</section>
 					</div>
@@ -88,22 +86,27 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Functions</h2>
 				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-namespace">
-					<a name="assetNameFromAssetId" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagConst">Const</span> asset<wbr>Name<wbr>From<wbr>Asset<wbr>Id</h3>
+					<a name="generateMnemonic" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> generate<wbr>Mnemonic</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-namespace">
-						<li class="tsd-signature tsd-kind-icon">asset<wbr>Name<wbr>From<wbr>Asset<wbr>Id<span class="tsd-signature-symbol">(</span>assetId<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+						<li class="tsd-signature tsd-kind-icon">generate<wbr>Mnemonic<span class="tsd-signature-symbol">(</span>strength<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/161d8b5/packages/core/src/Asset/util.ts#L3">packages/core/src/Asset/util.ts:3</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/161d8b5/packages/in-memory-key-manager/src/util.ts#L6">packages/in-memory-key-manager/src/util.ts:6</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>A wrapper around the bip39 package function, with default strength applied to produce 24 words</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>assetId: <span class="tsd-signature-type">string</span></h5>
+									<h5>strength: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 256</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
@@ -111,25 +114,56 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-namespace">
-					<a name="policyIdFromAssetId" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagConst">Const</span> policy<wbr>IdFrom<wbr>Asset<wbr>Id</h3>
+					<a name="harden" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> harden</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-namespace">
-						<li class="tsd-signature tsd-kind-icon">policy<wbr>IdFrom<wbr>Asset<wbr>Id<span class="tsd-signature-symbol">(</span>assetId<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+						<li class="tsd-signature tsd-kind-icon">harden<span class="tsd-signature-symbol">(</span>num<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/161d8b5/packages/core/src/Asset/util.ts#L1">packages/core/src/Asset/util.ts:1</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/161d8b5/packages/in-memory-key-manager/src/util.ts#L13">packages/in-memory-key-manager/src/util.ts:13</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>assetId: <span class="tsd-signature-type">string</span></h5>
+									<h5>num: <span class="tsd-signature-type">number</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-namespace">
+					<a name="validateMnemonic" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> validate<wbr>Mnemonic</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-namespace">
+						<li class="tsd-signature tsd-kind-icon">validate<wbr>Mnemonic<span class="tsd-signature-symbol">(</span>mnemonic<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, wordlist<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/161d8b5/packages/in-memory-key-manager/src/util.ts#L11">packages/in-memory-key-manager/src/util.ts:11</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>A wrapper around the bip39 package function</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>mnemonic: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> wordlist: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -146,10 +180,13 @@
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
 					<li class=" tsd-kind-function tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_core.Asset.util.html#assetNameFromAssetId" class="tsd-kind-icon">asset<wbr>Name<wbr>From<wbr>Asset<wbr>Id</a>
+						<a href="_cardano_sdk_in_memory_key_manager.util.html#generateMnemonic" class="tsd-kind-icon">generate<wbr>Mnemonic</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_core.Asset.util.html#policyIdFromAssetId" class="tsd-kind-icon">policy<wbr>IdFrom<wbr>Asset<wbr>Id</a>
+						<a href="_cardano_sdk_in_memory_key_manager.util.html#harden" class="tsd-kind-icon">harden</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-namespace">
+						<a href="_cardano_sdk_in_memory_key_manager.util.html#validateMnemonic" class="tsd-kind-icon">validate<wbr>Mnemonic</a>
 					</li>
 				</ul>
 			</nav>
