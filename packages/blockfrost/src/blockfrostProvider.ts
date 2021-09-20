@@ -13,6 +13,11 @@ import { BlockfrostToOgmios } from './BlockfrostToOgmios';
 export const blockfrostProvider = (options: Options): CardanoProvider => {
   const blockfrost = new BlockFrostAPI(options);
 
+  const ledgerTip: CardanoProvider['ledgerTip'] = async () => {
+    const block = await blockfrost.blocksLatest();
+    return BlockfrostToOgmios.blockToTip(block);
+  };
+
   const submitTx: CardanoProvider['submitTx'] = async (signedTransaction) => {
     try {
       const hash = await blockfrost.txSubmit(signedTransaction.to_bytes());
@@ -69,6 +74,7 @@ export const blockfrostProvider = (options: Options): CardanoProvider => {
   };
 
   return {
+    ledgerTip,
     submitTx,
     utxoDelegationAndRewards,
     queryTransactionsByAddresses,

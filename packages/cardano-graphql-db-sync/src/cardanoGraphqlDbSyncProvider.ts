@@ -2,7 +2,11 @@ import { CardanoProvider } from '@cardano-sdk/core';
 import { gql, GraphQLClient } from 'graphql-request';
 import { TransactionSubmitResponse } from '@cardano-graphql/client-ts';
 import { Schema as Cardano } from '@cardano-ogmios/client';
-import { CardanoGraphqlToOgmios, GraphqlCurrentWalletProtocolParameters } from './CardanoGraphqlToOgmios';
+import {
+  CardanoGraphqlToOgmios,
+  GraphqlCurrentWalletProtocolParameters,
+  CardanoGraphQlTip
+} from './CardanoGraphqlToOgmios';
 
 /**
  * Connect to a [cardano-graphql (cardano-db-sync) service](https://github.com/input-output-hk/cardano-graphql)
@@ -13,6 +17,30 @@ import { CardanoGraphqlToOgmios, GraphqlCurrentWalletProtocolParameters } from '
 
 export const cardanoGraphqlDbSyncProvider = (uri: string): CardanoProvider => {
   const client = new GraphQLClient(uri);
+
+  const ledgerTip: CardanoProvider['ledgerTip'] = async () => {
+    const query = gql`
+      query {
+        cardano {
+          tip {
+            hash
+            number
+            slotNo
+          }
+        }
+      }
+    `;
+
+    type Response = {
+      cardano: {
+        tip: CardanoGraphQlTip;
+      };
+    };
+
+    const response = await client.request<Response>(query);
+
+    return CardanoGraphqlToOgmios.tip(response.cardano.tip);
+  };
 
   const submitTx: CardanoProvider['submitTx'] = async (signedTransaction) => {
     try {
@@ -162,6 +190,7 @@ export const cardanoGraphqlDbSyncProvider = (uri: string): CardanoProvider => {
   };
 
   return {
+    ledgerTip,
     submitTx,
     utxoDelegationAndRewards,
     queryTransactionsByAddresses,

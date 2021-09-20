@@ -18,6 +18,12 @@ export const BlockfrostToOgmios = {
     ]) as OgmiosSchema.Utxo,
   // without `as OgmiosSchema.Utxo` above TS thinks the return value is (OgmiosSchema.TxIn | OgmiosSchema.TxOut)[][]
 
+  blockToTip: (block: Responses['block_content']): OgmiosSchema.Tip => ({
+    blockNo: block.height,
+    hash: block.hash,
+    slot: block.slot
+  }),
+
   inputFromUtxo: (address: string, utxo: BlockfrostUtxo): BlockfrostInput => ({
     address,
     amount: utxo.amount,

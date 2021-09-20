@@ -18,6 +18,7 @@ export type ProtocolParametersRequiredByWallet = Pick<
 >;
 
 export interface CardanoProvider {
+  ledgerTip: () => Promise<Cardano.Tip>;
   /** @param signedTransaction signed and serialized cbor */
   submitTx: (tx: CardanoSerializationLib.Transaction) => Promise<boolean>;
   utxoDelegationAndRewards: (
