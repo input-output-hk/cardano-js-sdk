@@ -64,6 +64,7 @@ export const BlockfrostToOgmios = {
   currentWalletProtocolParameters: (
     blockfrost: Responses['epoch_param_content']
   ): ProtocolParametersRequiredByWallet => ({
+    maxTxSize: Number(blockfrost.max_tx_size),
     minFeeCoefficient: blockfrost.min_fee_a,
     minFeeConstant: blockfrost.min_fee_b,
     stakeKeyDeposit: Number(blockfrost.key_deposit),

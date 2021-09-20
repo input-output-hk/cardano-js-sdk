@@ -180,6 +180,7 @@ describe('cardanoGraphqlDbSyncProvider', () => {
         currentEpoch: {
           protocolParams: {
             coinsPerUtxoWord: 34_482,
+            maxTxSize: 16_384,
             maxValSize: '5000',
             keyDeposit: 2_000_000,
             maxCollateralInputs: 3,
@@ -203,6 +204,7 @@ describe('cardanoGraphqlDbSyncProvider', () => {
 
     expect(response).toMatchObject<ProtocolParametersRequiredByWallet>({
       coinsPerUtxoWord: 34_482,
+      maxTxSize: 16_384,
       maxValueSize: 5000,
       stakeKeyDeposit: 2_000_000,
       maxCollateralInputs: 3,

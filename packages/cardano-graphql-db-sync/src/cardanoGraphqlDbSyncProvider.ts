@@ -133,6 +133,7 @@ export const cardanoGraphqlDbSyncProvider = (uri: string): CardanoProvider => {
           currentEpoch {
             protocolParams {
               coinsPerUtxoWord
+              maxTxSize
               maxValSize
               keyDeposit
               maxCollateralInputs

@@ -6,6 +6,7 @@ import { Tx } from '../Transaction';
 export type ProtocolParametersRequiredByWallet = Pick<
   ProtocolParametersAlonzo,
   | 'coinsPerUtxoWord'
+  | 'maxTxSize'
   | 'maxValueSize'
   | 'stakeKeyDeposit'
   | 'maxCollateralInputs'
