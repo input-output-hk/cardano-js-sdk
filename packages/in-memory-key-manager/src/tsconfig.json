@@ -5,7 +5,7 @@
     "rootDir": "."
   },
   "references": [
-    { "path": "../../cardano-serialization-lib/src" },
-    { "path": "../../core/src" }
+    { "path": "../../core/src" },
+    { "path": "../../wallet/src" }
   ]
 }

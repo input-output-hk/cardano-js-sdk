@@ -15,7 +15,7 @@ export const blockfrostProvider = (options: Options): CardanoProvider => {
 
   const submitTx: CardanoProvider['submitTx'] = async (signedTransaction) => {
     try {
-      const hash = await blockfrost.txSubmit(signedTransaction);
+      const hash = await blockfrost.txSubmit(signedTransaction.to_bytes());
 
       return !!hash;
     } catch {
