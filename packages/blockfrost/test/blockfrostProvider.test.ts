@@ -295,6 +295,7 @@ describe('blockfrostProvider', () => {
         protocol_major_ver: 5,
         protocol_minor_ver: 0,
         min_pool_cost: '340000000',
+        max_tx_size: '16384',
         max_val_size: '1000',
         max_collateral_inputs: 1,
         coins_per_utxo_word: '0'
@@ -313,6 +314,7 @@ describe('blockfrostProvider', () => {
       poolDeposit: 500_000_000,
       protocolVersion: { major: 5, minor: 0 },
       minPoolCost: 340_000_000,
+      maxTxSize: 16_384,
       maxValueSize: 1000,
       maxCollateralInputs: 1,
       coinsPerUtxoWord: 0

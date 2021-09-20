@@ -16,6 +16,7 @@ export type GraphqlCurrentWalletProtocolParameters = {
   maxValSize: string;
   keyDeposit: number;
   maxCollateralInputs: number;
+  maxTxSize: number;
   minFeeA: number;
   minFeeB: number;
   minPoolCost: number;
@@ -46,6 +47,7 @@ export const CardanoGraphqlToOgmios = {
     ...params,
     maxValueSize: Number(params.maxValSize),
     stakeKeyDeposit: params.keyDeposit,
+    maxTxSize: params.maxTxSize,
     minFeeCoefficient: params.minFeeA,
     minFeeConstant: params.minFeeB
   })
