@@ -15,7 +15,7 @@
   "license": "MPL-2.0",
   "scripts": {
     "build": "which tsc",
-    "tsc": "shx echo typescript --noEmit command not implemented yet",
+    "tscNoEmit": "shx echo typescript --noEmit command not implemented yet",
     "cleanup": "shx rm -rf dist node_modules",
     "lint": "eslint --ignore-path ../../.eslintignore \"**/*.ts\"",
     "test": "shx echo No tests in this package",
