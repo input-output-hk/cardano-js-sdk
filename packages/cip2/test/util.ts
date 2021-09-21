@@ -1,6 +1,6 @@
-// Review: these are utilities used by tests.
-// They are not tested. Some of them are pretty generic and could be moved
-// to another package and tested, to be reused across all packages
+// These are utilities used by tests. They are not tested.
+// Consider moving some of them to core package utils.
+// And some of them to a new 'dev-util' package.
 import { CardanoSerializationLib } from '@cardano-sdk/cardano-serialization-lib/src/loadCardanoSerializationLib';
 import {
   TransactionUnspentOutput,

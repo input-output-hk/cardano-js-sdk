@@ -1,4 +1,4 @@
-import { RoundRobinRandomImprove } from '@src/RoundRobinRandomImprove';
+import { roundRobinRandomImprove } from '@src/RoundRobinRandomImprove';
 import { EstimateTxFee, InputSelector } from '@src/types';
 import { TransactionOutput, TransactionUnspentOutput } from '@emurgo/cardano-serialization-lib-nodejs';
 import {
@@ -13,8 +13,9 @@ import {
 import { InputSelectionError, InputSelectionFailure } from '@src/InputSelectionError';
 import { loadCardanoSerializationLib, CardanoSerializationLib } from '@cardano-sdk/cardano-serialization-lib';
 import fc from 'fast-check';
+import { computeMinUtxoValue } from '@src/util';
 
-const getRoundRobinRandomImprove = (CSL: CardanoSerializationLib) => new RoundRobinRandomImprove(coinsPerUtxoWord, CSL);
+const getRoundRobinRandomImprove = (CSL: CardanoSerializationLib) => roundRobinRandomImprove(CSL, coinsPerUtxoWord);
 
 interface InputSelectionFailureModeTestParams {
   /**
@@ -195,14 +196,16 @@ describe('RoundRobinRandomImprove', () => {
         // If this is used to test other algorithms refactor this
         // to clone outputs before and do deepEquals to assert it wasn't mutated
         expect(results.selection.outputs).toEqual(outputsObj);
+
+        // Min UTxO coin requirement for change
+        const minUtxo = computeMinUtxoValue(coinsPerUtxoWord);
+        for (const value of results.selection.change) {
+          expect(BigInt(value.coin().to_str())).toBeGreaterThanOrEqual(minUtxo);
+        }
       }),
       {
         interruptAfterTimeLimit: 100_000,
         markInterruptAsFailure: true,
-        // Not sure how many numRuns we should use, on my PC:
-        // * 100: baseline (default value), entire test suite in ~3.1s
-        // * 500: +0.5s
-        // * 1000: +0.85s
         numRuns: 500
         // To rerun failed test:
         // seed: number

@@ -11,10 +11,6 @@ import {
 } from '@src/util';
 import { TestUtils, createCslTestUtils, TSLA_Asset, PXL_Asset } from './util';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-(BigInt.prototype as any).toJSON = function () {
-  return this.toString();
-};
 describe('util', () => {
   let CSL: CardanoSerializationLib;
   let cslUtils: CslUtils;
@@ -49,7 +45,7 @@ describe('util', () => {
         expect(value.coin().to_str()).toEqual(quantities.coins.toString());
         const multiasset = value.multiasset();
         expect(multiasset.len()).toBe(2);
-        for (const assetId of Object.keys(quantities.assets)) {
+        for (const assetId in quantities.assets) {
           const { scriptHash, assetName } = assetSerializer.parseId(assetId);
           const assetQuantity = BigInt(multiasset.get(scriptHash).get(assetName).to_str());
           expect(assetQuantity).toBe(quantities.assets[assetId]);

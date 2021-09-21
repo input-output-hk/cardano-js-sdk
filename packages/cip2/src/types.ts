@@ -55,6 +55,8 @@ export interface InputSelectionParameters {
   estimateTxFee: EstimateTxFee;
   /**
    * A limit on the number of inputs that can be selected.
+   * Review: this was in original spec. Is there a maximum input count for Cardano transactions?
+   * Perhaps make this optional and just use utxo.length by default?
    */
   maximumInputCount: number;
 }

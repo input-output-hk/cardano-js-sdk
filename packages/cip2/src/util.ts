@@ -1,6 +1,6 @@
-// Review: I suggest that of these utils are moved out of cip2 package
+// TODO: move all of these utils to core package
 import { CardanoSerializationLib } from '@cardano-sdk/cardano-serialization-lib';
-import { Asset } from '@cardano-sdk/core';
+import { Asset, BigIntMath } from '@cardano-sdk/core';
 import {
   AssetName,
   ScriptHash,
@@ -33,8 +33,7 @@ export const transactionOutputsToArray = (outputs: TransactionOutputs): Transact
   return result;
 };
 
-// Review: running into this ESLint rule a lot. Is there a good reason to disallow implicit types?
-// You can get the type with ReturnType<typeof exportedFnWithImplicitReturn>.
+// TODO: disable this rule and no-reduce
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const createAssetSerializer = (csl: CardanoSerializationLib) => {
   const bech32Prefix = 'b32_';
@@ -46,7 +45,7 @@ export const createAssetSerializer = (csl: CardanoSerializationLib) => {
      * Operation can be reversed with *parse(assetId)*
      */
     createId: (scriptHash: ScriptHash, assetName: AssetName): string =>
-      // Review: I suggest to move this to @cardano-sdk/core so it's together with
+      // TODO: I suggest to move this to @cardano-sdk/core so it's together with
       // policyIdFromAssetId and assetNameFromAssetId, because it's
       // relying on bech32 length and it can have different length prefix.
       scriptHash.to_bech32(bech32Prefix) + decoder.decode(assetName.name()),
@@ -95,7 +94,8 @@ export const createCslUtils = (csl: CardanoSerializationLib, assetSerializer = c
   };
 
   // Review: This is equivalent to OgmiosToCardanoWasm.value(), so they should be merged.
-  // Note that OgmiosToCardanoWasm imports nodejs version of CSL, so it cannot be used in browser.
+  // Note that current implementation of OgmiosToCardanoWasm
+  // imports nodejs version of CSL, so it cannot be used in browser.
   // Also note that this function needs to know what bech32 prefix was used in order to recreate
   // policy ID and asset name from an asset ID
   const valueQuantitiesToValue = ({ coins, assets }: ValueQuantities): Value => {
@@ -123,18 +123,13 @@ export const createCslUtils = (csl: CardanoSerializationLib, assetSerializer = c
 
 export type CslUtils = ReturnType<typeof createCslUtils>;
 
-// TODO: move utility functions and their types to util.ts
-// TODO: In golden test generator pkg. Lift it to the core package. Separate commit.
-export const bigintAbs = (big: bigint): bigint => (big < 0 ? big * BigInt(-1) : big);
-export const bigintSum = (arr: bigint[]): bigint => arr.reduce((result, num) => result + num, 0n);
-
 /**
  * Sum asset quantities
  */
 const coalesceAssetTotals = (...totals: (AssetQuantities | undefined)[]): AssetQuantities | undefined => {
   const result: AssetQuantities = {};
   for (const assetTotals of totals.filter((quantities) => !!quantities)) {
-    for (const assetKey of Object.keys(assetTotals)) {
+    for (const assetKey in assetTotals) {
       result[assetKey] = (result[assetKey] || 0n) + assetTotals[assetKey];
     }
   }
@@ -149,7 +144,7 @@ const coalesceAssetTotals = (...totals: (AssetQuantities | undefined)[]): AssetQ
  * Sum all quantities
  */
 export const coalesceValueQuantities = (...quantities: ValueQuantities[]): ValueQuantities => ({
-  coins: bigintSum(quantities.map(({ coins }) => coins)),
+  coins: BigIntMath.sum(quantities.map(({ coins }) => coins)),
   assets: coalesceAssetTotals(...quantities.map(({ assets }) => assets))
 });
 
