@@ -1,5 +1,6 @@
 import { Schema as Cardano } from '@cardano-ogmios/client';
 import { ProtocolParametersRequiredByWallet, Tx } from '@cardano-sdk/core';
+import { Block } from '@cardano-graphql/client-ts';
 
 type GraphqlTransaction = {
   hash: Cardano.Hash16;
@@ -27,6 +28,8 @@ export type GraphqlCurrentWalletProtocolParameters = {
   };
 };
 
+export type CardanoGraphQlTip = Pick<Block, 'hash' | 'number' | 'slotNo'>;
+
 export const CardanoGraphqlToOgmios = {
   graphqlTransactionsToCardanoTxs: (transactions: GraphqlTransaction[]): Tx[] =>
     transactions.map((tx) => ({
@@ -50,5 +53,11 @@ export const CardanoGraphqlToOgmios = {
     maxTxSize: params.maxTxSize,
     minFeeCoefficient: params.minFeeA,
     minFeeConstant: params.minFeeB
+  }),
+
+  tip: (tip: CardanoGraphQlTip): Cardano.Tip => ({
+    blockNo: tip.number,
+    hash: tip.hash,
+    slot: tip.slotNo
   })
 };

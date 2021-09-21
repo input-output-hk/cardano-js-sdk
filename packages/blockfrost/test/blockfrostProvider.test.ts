@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 
-import { BlockFrostAPI } from '@blockfrost/blockfrost-js';
+import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
 import { blockfrostProvider } from '../src';
 import { Schema as Cardano } from '@cardano-ogmios/client';
 import { Tx } from '@cardano-sdk/core';
@@ -318,6 +318,37 @@ describe('blockfrostProvider', () => {
       maxValueSize: 1000,
       maxCollateralInputs: 1,
       coinsPerUtxoWord: 0
+    });
+  });
+
+  test('ledgerTip', async () => {
+    const mockedResponse = {
+      time: 1_632_136_410,
+      height: 2_927_618,
+      hash: '86e837d8a6cdfddaf364525ce9857eb93430b7e59a5fd776f0a9e11df476a7e5',
+      slot: 37_767_194,
+      epoch: 157,
+      epoch_slot: 312_794,
+      slot_leader: 'pool1zuevzm3xlrhmwjw87ec38mzs02tlkwec9wxpgafcaykmwg7efhh',
+      size: 1050,
+      tx_count: 3,
+      output: '9249073880',
+      fees: '513839',
+      block_vrf: 'vrf_vk19j362pkr4t9y0m3qxgmrv0365vd7c4ze03ny4jh84q8agjy4ep4s99zvg8',
+      previous_block: 'da56fa53483a3a087c893b41aa0d73a303148c2887b3f7535e0b505ea5dc10aa',
+      next_block: null,
+      confirmations: 0
+    } as Responses['block_content'];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    BlockFrostAPI.prototype.blocksLatest = jest.fn().mockResolvedValue(mockedResponse) as any;
+
+    const client = blockfrostProvider({ projectId: apiKey, isTestnet: true });
+    const response = await client.ledgerTip();
+
+    expect(response).toMatchObject({
+      blockNo: 2_927_618,
+      hash: '86e837d8a6cdfddaf364525ce9857eb93430b7e59a5fd776f0a9e11df476a7e5',
+      slot: 37_767_194
     });
   });
 });

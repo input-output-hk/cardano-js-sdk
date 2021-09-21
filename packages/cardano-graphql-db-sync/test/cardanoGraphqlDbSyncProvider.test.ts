@@ -3,6 +3,7 @@
 import { GraphQLClient } from 'graphql-request';
 import { ProtocolParametersRequiredByWallet, Tx } from '@cardano-sdk/core';
 import { cardanoGraphqlDbSyncProvider } from '../src';
+import { Schema as Cardano } from '@cardano-ogmios/client';
 jest.mock('graphql-request');
 
 describe('cardanoGraphqlDbSyncProvider', () => {
@@ -216,6 +217,29 @@ describe('cardanoGraphqlDbSyncProvider', () => {
         major: 5,
         minor: 5
       }
+    });
+  });
+
+  test('ledgerTip', async () => {
+    const mockedResponse = {
+      cardano: {
+        tip: {
+          hash: 'af310732fdd99892fa78584aca1d2be147e6001030ae51b054e38feeb4fd762d',
+          number: 2_884_196,
+          slotNo: 36_370_316
+        }
+      }
+    };
+
+    GraphQLClient.prototype.request = jest.fn().mockResolvedValue(mockedResponse);
+    const client = cardanoGraphqlDbSyncProvider(uri);
+
+    const response = await client.ledgerTip();
+
+    expect(response).toMatchObject<Cardano.Tip>({
+      hash: 'af310732fdd99892fa78584aca1d2be147e6001030ae51b054e38feeb4fd762d',
+      blockNo: 2_884_196,
+      slot: 36_370_316
     });
   });
 });
