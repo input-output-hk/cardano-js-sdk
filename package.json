@@ -15,7 +15,7 @@
     "docs": "typedoc --packages .",
     "cleanup": "yarn workspaces run cleanup && shx rm -rf node_modules",
     "lint": "yarn workspaces run lint",
-    "tsc": "yarn workspaces run tsc",
+    "tscNoEmit": "yarn workspaces run tscNoEmit",
     "prepare": "husky install",
     "pre-commit": "lint-staged",
     "mainnet:up": "DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 docker-compose -p sdk-mainnet up",
@@ -28,7 +28,7 @@
   "lint-staged": {
     "*(apps/**/*.{js,ts}|packages/!(*golden-test-generator)/**/*.{js,ts})": [
       "yarn lint",
-      "yarn tsc"
+      "yarn tscNoEmit"
     ]
   },
   "repository": {
