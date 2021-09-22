@@ -6,5 +6,8 @@
       "@src/*": ["../src/*"]
     }
   },
-  "references": [{ "path": "../src" }]
+  "references": [
+    { "path": "../src" },
+    { "path": "../../cardano-serialization-lib/src" }
+  ]
 }

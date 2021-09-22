@@ -1,13 +1,7 @@
 // TODO: move all of these utils to core package
 import { CardanoSerializationLib } from '@cardano-sdk/cardano-serialization-lib';
 import { Asset, BigIntMath } from '@cardano-sdk/core';
-import {
-  AssetName,
-  ScriptHash,
-  TransactionOutput,
-  TransactionOutputs,
-  Value
-} from '@emurgo/cardano-serialization-lib-nodejs';
+import { TransactionOutput, TransactionOutputs, Value } from '@emurgo/cardano-serialization-lib-nodejs';
 import { Value as OgmiosValue } from '@cardano-ogmios/schema';
 
 /**
@@ -33,38 +27,10 @@ export const transactionOutputsToArray = (outputs: TransactionOutputs): Transact
   return result;
 };
 
-export const createAssetSerializer = (csl: CardanoSerializationLib) => {
-  const bech32Prefix = 'b32_';
-  const encoder = new TextEncoder();
-  const decoder = new TextDecoder();
-  return {
-    /**
-     * Combine script hash and asset name into unique asset identifier.
-     * Operation can be reversed with *parse(assetId)*
-     */
-    createId: (scriptHash: ScriptHash, assetName: AssetName): string =>
-      // TODO: I suggest to move this to @cardano-sdk/core so it's together with
-      // policyIdFromAssetId and assetNameFromAssetId, because it's
-      // relying on bech32 length and it can have different length prefix.
-      scriptHash.to_bech32(bech32Prefix) + decoder.decode(assetName.name()),
-    /**
-     * Get asset scripthash bech32 and asset name
-     * from id created by *create(scriptHashBech32, assetName)*.
-     */
-    parseId: (id: string) => {
-      const scriptHashBech32 = Asset.util.policyIdFromAssetId(id);
-      const assetName = Asset.util.assetNameFromAssetId(id);
-      return {
-        scriptHash: csl.ScriptHash.from_bech32(scriptHashBech32),
-        assetName: csl.AssetName.new(encoder.encode(assetName))
-      };
-    }
-  };
-};
-
-export type AssetSerializer = ReturnType<typeof createAssetSerializer>;
-
-export const createCslUtils = (csl: CardanoSerializationLib, assetSerializer = createAssetSerializer(csl)) => {
+export const createCslUtils = (
+  csl: CardanoSerializationLib,
+  assetSerializer = Asset.util.createAssetSerializer(csl)
+) => {
   const valueToValueQuantities = (value: Value): ValueQuantities => {
     const result: ValueQuantities = {
       coins: BigInt(value.coin().to_str())

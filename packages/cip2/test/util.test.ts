@@ -1,9 +1,8 @@
 import { CardanoSerializationLib, loadCardanoSerializationLib } from '@cardano-sdk/cardano-serialization-lib';
+import { Asset } from '@cardano-sdk/core';
 import {
-  AssetSerializer,
   coalesceValueQuantities,
   computeMinUtxoValue,
-  createAssetSerializer,
   createCslUtils,
   CslUtils,
   transactionOutputsToArray,
@@ -15,23 +14,15 @@ describe('util', () => {
   let CSL: CardanoSerializationLib;
   let cslUtils: CslUtils;
   let testUtils: TestUtils;
-  let assetSerializer: AssetSerializer;
+  let assetSerializer: Asset.util.AssetSerializer;
   beforeAll(async () => {
     CSL = await loadCardanoSerializationLib();
-    assetSerializer = createAssetSerializer(CSL);
+    assetSerializer = Asset.util.createAssetSerializer(CSL);
     cslUtils = createCslUtils(CSL, assetSerializer);
     testUtils = createCslTestUtils(CSL);
   });
 
   describe('createCslUtils', () => {
-    it('createAssetSerializer', () => {
-      const serializer = createAssetSerializer(CSL);
-      const tsla = serializer.parseId(TSLA_Asset);
-      expect(new TextDecoder().decode(tsla.assetName.name())).toEqual('TSLA');
-      expect(tsla.scriptHash.to_bech32('b32_')).toEqual('b32_1vk0jj9lmv0cjkvmxw337u467atqcgkauwd4eczaugzagyghp25l');
-      expect(serializer.createId(tsla.scriptHash, tsla.assetName)).toEqual(TSLA_Asset);
-    });
-
     describe('valueQuantitiesToValue', () => {
       it('coin only', () => {
         const quantities = { coins: 100_000n };
