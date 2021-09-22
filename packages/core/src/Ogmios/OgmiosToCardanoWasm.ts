@@ -19,7 +19,7 @@ export const OgmiosToCardanoWasm = {
     ),
   value: (ogmios: OgmiosSchema.Value): CardanoWasm.Value => {
     const value = CardanoWasm.Value.new(CardanoWasm.BigNum.from_str(ogmios.coins.toString()));
-    const assets = Object.entries(ogmios.assets);
+    const assets = ogmios.assets !== undefined ? Object.entries(ogmios.assets) : [];
     if (assets.length === 0) {
       return value;
     }
