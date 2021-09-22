@@ -1,5 +1,5 @@
 import CardanoWasm from '@emurgo/cardano-serialization-lib-nodejs';
-import { OgmiosToCardanoWasm } from '@src/OgmiosToCardanoWasm';
+import { OgmiosToCardanoWasm } from '../../src/Ogmios';
 import * as OgmiosSchema from '@cardano-ogmios/schema';
 
 const txIn: OgmiosSchema.TxIn = { txId: '0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5', index: 0 };

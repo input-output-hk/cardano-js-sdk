@@ -3,5 +3,10 @@
   "compilerOptions": {
     "outDir": "../dist/",
     "rootDir": "."
-  }
+  },
+  "references": [
+    {
+      "path": "../../cardano-serialization-lib/src"
+    }
+  ]
 }
