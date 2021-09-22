@@ -72,7 +72,6 @@ export const generateValidUtxoAndOutputs = (() => {
           .map((assets) =>
             assets
               .filter(({ amount }) => amount > 0n)
-              // eslint-disable-next-line unicorn/no-array-reduce
               .reduce((quantities, { amount, asset }) => {
                 quantities[asset] = amount;
                 return quantities;
@@ -115,7 +114,6 @@ export const generateValidUtxoAndOutputs = (() => {
  * Checks whether UTxO is included in an array of UTxO.
  * Compares utxo.to_bytes().
  */
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const containsUtxo = (haystack: TransactionUnspentOutput[], needleUtxo: TransactionUnspentOutput) => {
   const needleUtxoBytes = needleUtxo.to_bytes();
   return haystack.some((haystackUtxo: TransactionUnspentOutput) => {
@@ -132,7 +130,6 @@ export const containsUtxo = (haystack: TransactionUnspentOutput[], needleUtxo: T
   });
 };
 
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const createCslTestUtils = (CSL: CardanoSerializationLib) => {
   const createTxInput = (() => {
     let defaultIdx = 0;
@@ -157,14 +154,12 @@ export const createCslTestUtils = (CSL: CardanoSerializationLib) => {
   const getTotalInputAmounts = (results: SelectionResult): ValueQuantities =>
     results.selection.inputs
       .map((input) => input.output().amount())
-      // eslint-disable-next-line unicorn/no-array-reduce
       .reduce<ValueQuantities>((sum, value) => coalesceValueQuantities(sum, cslUtils.valueToValueQuantities(value)), {
         coins: 0n,
         assets: {}
       });
 
   const getTotalChangeAmounts = (results: SelectionResult): ValueQuantities =>
-    // eslint-disable-next-line unicorn/no-array-reduce
     results.selection.change.reduce<ValueQuantities>(
       (sum, value) => coalesceValueQuantities(sum, cslUtils.valueToValueQuantities(value)),
       {

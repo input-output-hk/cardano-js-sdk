@@ -33,8 +33,6 @@ export const transactionOutputsToArray = (outputs: TransactionOutputs): Transact
   return result;
 };
 
-// TODO: disable this rule and no-reduce
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const createAssetSerializer = (csl: CardanoSerializationLib) => {
   const bech32Prefix = 'b32_';
   const encoder = new TextEncoder();
@@ -66,7 +64,6 @@ export const createAssetSerializer = (csl: CardanoSerializationLib) => {
 
 export type AssetSerializer = ReturnType<typeof createAssetSerializer>;
 
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const createCslUtils = (csl: CardanoSerializationLib, assetSerializer = createAssetSerializer(csl)) => {
   const valueToValueQuantities = (value: Value): ValueQuantities => {
     const result: ValueQuantities = {

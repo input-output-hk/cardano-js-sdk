@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-
 import { WalletApi } from './WalletApi';
 import { ApiError, APIErrorCode } from '../errors';
 import { dummyLogger, Logger } from 'ts-log';
