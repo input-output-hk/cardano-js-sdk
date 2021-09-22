@@ -14,9 +14,10 @@
     "tscNoEmit": "shx echo typescript --noEmit command not implemented yet",
     "cleanup": "shx rm -rf dist node_modules",
     "lint": "eslint --ignore-path ../../.eslintignore \"**/*.ts\"",
-    "test": "jest -c ./test/jest.config.js"
+    "test": "jest -c ./jest.config.js"
   },
   "devDependencies": {
+    "@cardano-sdk/cardano-serialization-lib": "0.1.0",
     "shx": "^0.3.3"
   },
   "dependencies": {

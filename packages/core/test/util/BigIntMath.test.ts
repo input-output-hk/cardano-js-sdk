@@ -1,4 +1,4 @@
-import { BigIntMath } from '@src/BigIntMath';
+import { BigIntMath } from '../../src/util/BigIntMath';
 
 describe('BigIntMath', () => {
   describe('abs', () => {
