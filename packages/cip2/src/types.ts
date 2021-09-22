@@ -1,4 +1,4 @@
-import { TransactionUnspentOutput, Value, TransactionOutputs } from '@emurgo/cardano-serialization-lib-nodejs';
+import { CSL } from '@cardano-sdk/cardano-serialization-lib';
 
 export interface SelectionResult {
   selection: {
@@ -8,17 +8,17 @@ export interface SelectionResult {
      * From the point of view of a wallet, this represents the value
      * that has been selected from the wallet in order to cover the total payment value.
      */
-    inputs: TransactionUnspentOutput[];
+    inputs: CSL.TransactionUnspentOutput[];
     /**
      * Set of payments to be made to recipient addresses.
      */
-    outputs: TransactionOutputs;
+    outputs: CSL.TransactionOutputs;
     /**
      * A set of change values. Does not account for fee.
      *
      * From the point of view of a wallet, this represents the change to be returned to the wallet.
      */
-    change: Value[];
+    change: CSL.Value[];
     /**
      * Estimated fee for the transaction.
      * This value is included in 'change', so the actual change returned by the transaction is change-fee.
@@ -31,24 +31,24 @@ export interface SelectionResult {
    * It represents the set of values that remain after the coin selection algorithm
    * has removed values to pay for entries in the requested output set.
    */
-  remainingUTxO: TransactionUnspentOutput[];
+  remainingUTxO: CSL.TransactionUnspentOutput[];
 }
 
 export type EstimateTxFee = (
-  utxo: TransactionUnspentOutput[],
-  outputs: TransactionOutputs,
-  change: Value[]
+  utxo: CSL.TransactionUnspentOutput[],
+  outputs: CSL.TransactionOutputs,
+  change: CSL.Value[]
 ) => Promise<bigint>;
 
 export interface InputSelectionParameters {
   /**
    * The set of inputs available for selection.
    */
-  utxo: TransactionUnspentOutput[];
+  utxo: CSL.TransactionUnspentOutput[];
   /**
    * The set of outputs requested for payment.
    */
-  outputs: TransactionOutputs;
+  outputs: CSL.TransactionOutputs;
   /**
    * Function to estimate transaction fee for selected inputs.
    */

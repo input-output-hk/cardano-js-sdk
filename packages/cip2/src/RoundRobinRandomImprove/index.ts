@@ -1,13 +1,14 @@
 import { CardanoSerializationLib } from '@cardano-sdk/cardano-serialization-lib';
+import { Cardano } from '@cardano-sdk/core';
 import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
 import { InputSelectionParameters, InputSelector, SelectionResult } from '../types';
-import { computeMinUtxoValue, createCslUtils, transactionOutputsToArray } from '../util';
+import { createCslUtils, transactionOutputsToArray } from '../util';
 import { computeChangeAndAdjustForFee } from './change';
 import { roundRobinSelection } from './roundRobin';
 import { assertIsBalanceSufficient, preprocessArgs } from './util';
 
 export const roundRobinRandomImprove = (CSL: CardanoSerializationLib, coinsPerUtxoWord: bigint): InputSelector => {
-  const minUtxoCoinValue = computeMinUtxoValue(coinsPerUtxoWord);
+  const minUtxoCoinValue = Cardano.util.computeMinUtxoValue(coinsPerUtxoWord);
   const cslUtils = createCslUtils(CSL);
 
   return {

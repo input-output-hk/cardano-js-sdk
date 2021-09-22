@@ -1,10 +1,11 @@
-import { TransactionUnspentOutput, Value } from '@emurgo/cardano-serialization-lib-nodejs';
+import { CSL } from '@cardano-sdk/cardano-serialization-lib';
+import { Ogmios } from '@cardano-sdk/core';
 import { orderBy } from 'lodash-es';
 import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
-import { AssetQuantities, coalesceValueQuantities, CslUtils, ValueQuantities } from '../util';
+import { AssetQuantities, CslUtils, ValueQuantities } from '../util';
 import { assetQuantitySelector, getCoinQuantity, OutputWithTotals, UtxoSelection, UtxoWithTotals } from './util';
 
-type EstimateTxFeeWithOriginalOutputs = (utxo: TransactionUnspentOutput[], change: Value[]) => Promise<bigint>;
+type EstimateTxFeeWithOriginalOutputs = (utxo: CSL.TransactionUnspentOutput[], change: CSL.Value[]) => Promise<bigint>;
 
 interface ChangeComputationArgs {
   cslUtils: CslUtils;
@@ -16,9 +17,9 @@ interface ChangeComputationArgs {
 }
 
 interface ChangeComputationResult {
-  remainingUTxO: TransactionUnspentOutput[];
-  inputs: TransactionUnspentOutput[];
-  change: Value[];
+  remainingUTxO: CSL.TransactionUnspentOutput[];
+  inputs: CSL.TransactionUnspentOutput[];
+  change: CSL.Value[];
   fee: bigint;
 }
 
@@ -177,7 +178,7 @@ const coalesceChangeBundlesForMinAdaRequirement = (
   let sortedBundles = orderBy(changeBundles, ({ coins }) => coins, 'desc');
   while (sortedBundles.length > 1 && sortedBundles[sortedBundles.length - 1].coins < minUtxoCoinValue) {
     const smallestBundle = sortedBundles.pop();
-    sortedBundles[sortedBundles.length - 1] = coalesceValueQuantities(
+    sortedBundles[sortedBundles.length - 1] = Ogmios.util.coalesceValueQuantities(
       sortedBundles[sortedBundles.length - 1],
       smallestBundle
     );
@@ -258,6 +259,7 @@ export const computeChangeAndAdjustForFee = async ({
 
   if (getCoinQuantity(changeBundles.map((totals) => ({ totals }))) < fee) {
     if (utxoRemaining.length === 0) {
+      // This is not tested
       throw new InputSelectionError(InputSelectionFailure.UtxoBalanceInsufficient);
     }
     // Recompute change and fee with an extra selected UTxO

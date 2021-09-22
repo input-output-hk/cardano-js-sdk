@@ -1,5 +1,5 @@
 import { BigIntMath } from '@cardano-sdk/core';
-import { TransactionOutput, TransactionUnspentOutput } from '@emurgo/cardano-serialization-lib-nodejs';
+import { CSL } from '@cardano-sdk/cardano-serialization-lib';
 import { uniq } from 'lodash-es';
 import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
 import { CslUtils, ValueQuantities } from '../util';
@@ -9,11 +9,11 @@ export interface Totals {
 }
 
 export interface UtxoWithTotals extends Totals {
-  utxo: TransactionUnspentOutput;
+  utxo: CSL.TransactionUnspentOutput;
 }
 
 export interface OutputWithTotals extends Totals {
-  output: TransactionOutput;
+  output: CSL.TransactionOutput;
 }
 
 export interface RoundRobinRandomImproveArgs {
@@ -29,8 +29,8 @@ export interface UtxoSelection {
 
 export const preprocessArgs = (
   cslUtils: CslUtils,
-  availableUtxo: TransactionUnspentOutput[],
-  outputs: TransactionOutput[]
+  availableUtxo: CSL.TransactionUnspentOutput[],
+  outputs: CSL.TransactionOutput[]
 ): RoundRobinRandomImproveArgs => {
   const utxoWithTotals = availableUtxo.map((utxo) => ({
     utxo,

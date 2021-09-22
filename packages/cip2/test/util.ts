@@ -1,28 +1,17 @@
 // These are utilities used by tests. They are not tested.
 // Consider moving some of them to core package utils.
 // And some of them to a new 'dev-util' package.
-import { CardanoSerializationLib } from '@cardano-sdk/cardano-serialization-lib/src/loadCardanoSerializationLib';
-import {
-  TransactionUnspentOutput,
-  TransactionOutput,
-  ScriptHash,
-  Assets
-} from '@emurgo/cardano-serialization-lib-nodejs';
-import { SelectionResult } from '@src/types';
-import {
-  coalesceValueQuantities,
-  ValueQuantities,
-  createCslUtils,
-  AssetQuantities,
-  computeMinUtxoValue
-} from '@src/util';
+import { CardanoSerializationLib, CSL } from '@cardano-sdk/cardano-serialization-lib';
+import { Ogmios, Cardano } from '@cardano-sdk/core';
+import { SelectionResult } from '../src/types';
+import { ValueQuantities, createCslUtils, AssetQuantities } from '../src/util';
 import fc, { Arbitrary } from 'fast-check';
 
 export const coinsPerUtxoWord = 34_482n;
 
 export interface TxAssets {
-  key: ScriptHash;
-  value: Assets;
+  key: CSL.ScriptHash;
+  value: CSL.Assets;
 }
 
 export const TSLA_Asset = 'b32_1vk0jj9lmv0cjkvmxw337u467atqcgkauwd4eczaugzagyghp25lTSLA';
@@ -35,7 +24,7 @@ export const AllAssets = [TSLA_Asset, PXL_Asset, Unit_Asset];
  */
 export const generateValidUtxoAndOutputs = (() => {
   const MAX_U64 = 18_446_744_073_709_551_615n;
-  const MIN_UTXO_VALUE = computeMinUtxoValue(coinsPerUtxoWord);
+  const MIN_UTXO_VALUE = Cardano.util.computeMinUtxoValue(coinsPerUtxoWord);
 
   type GetAssetAmount = (asset: string) => bigint;
 
@@ -47,7 +36,7 @@ export const generateValidUtxoAndOutputs = (() => {
     maxCoin = MAX_U64,
     getAssetMax: GetAssetAmount
   ): boolean => {
-    const totals = coalesceValueQuantities(...quantities);
+    const totals = Ogmios.util.coalesceValueQuantities(...quantities);
     if (totals.coins > maxCoin) {
       return false;
     }
@@ -99,10 +88,10 @@ export const generateValidUtxoAndOutputs = (() => {
       if (utxoAmounts.length === 0) {
         return fc.constant({ utxoAmounts, outputsAmounts: [] });
       }
-      const utxoTotals = coalesceValueQuantities(...utxoAmounts);
+      const utxoTotals = Ogmios.util.coalesceValueQuantities(...utxoAmounts);
       return arrayOfCoinAndAssets(utxoTotals.coins, (asset) => utxoTotals.assets?.[asset] || 0n)
         .filter((outputsAmounts) => {
-          const outputsTotals = coalesceValueQuantities(...outputsAmounts);
+          const outputsTotals = Ogmios.util.coalesceValueQuantities(...outputsAmounts);
           // Change has to be >= minUtxoValue
           return utxoTotals.coins - outputsTotals.coins >= MIN_UTXO_VALUE;
         })
@@ -114,9 +103,9 @@ export const generateValidUtxoAndOutputs = (() => {
  * Checks whether UTxO is included in an array of UTxO.
  * Compares utxo.to_bytes().
  */
-export const containsUtxo = (haystack: TransactionUnspentOutput[], needleUtxo: TransactionUnspentOutput) => {
+export const containsUtxo = (haystack: CSL.TransactionUnspentOutput[], needleUtxo: CSL.TransactionUnspentOutput) => {
   const needleUtxoBytes = needleUtxo.to_bytes();
-  return haystack.some((haystackUtxo: TransactionUnspentOutput) => {
+  return haystack.some((haystackUtxo: CSL.TransactionUnspentOutput) => {
     const haystackUtxoBytes = haystackUtxo.to_bytes();
     if (haystackUtxoBytes.length !== needleUtxoBytes.length) {
       return false;
@@ -130,23 +119,23 @@ export const containsUtxo = (haystack: TransactionUnspentOutput[], needleUtxo: T
   });
 };
 
-export const createCslTestUtils = (CSL: CardanoSerializationLib) => {
+export const createCslTestUtils = (csl: CardanoSerializationLib) => {
   const createTxInput = (() => {
     let defaultIdx = 0;
     return (bech32TxHash = 'base16_1sw0vvt7mgxghdewkrsptd2n0twueg2a7q88t9cjhtqmpk7xwc07shpk2uq', index?: number) =>
-      CSL.TransactionInput.new(CSL.TransactionHash.from_bech32(bech32TxHash), index || defaultIdx++);
+      csl.TransactionInput.new(csl.TransactionHash.from_bech32(bech32TxHash), index || defaultIdx++);
   })();
 
-  const cslUtils = createCslUtils(CSL);
+  const cslUtils = createCslUtils(csl);
 
-  const getTotalOutputAmounts = (outputs: TransactionOutput[]): ValueQuantities => {
+  const getTotalOutputAmounts = (outputs: CSL.TransactionOutput[]): ValueQuantities => {
     let result: ValueQuantities = {
       coins: 0n,
       assets: {} as Record<string, bigint>
     };
     for (const output of outputs) {
       const amount = output.amount();
-      result = coalesceValueQuantities(result, cslUtils.valueToValueQuantities(amount));
+      result = Ogmios.util.coalesceValueQuantities(result, cslUtils.valueToValueQuantities(amount));
     }
     return result;
   };
@@ -154,22 +143,25 @@ export const createCslTestUtils = (CSL: CardanoSerializationLib) => {
   const getTotalInputAmounts = (results: SelectionResult): ValueQuantities =>
     results.selection.inputs
       .map((input) => input.output().amount())
-      .reduce<ValueQuantities>((sum, value) => coalesceValueQuantities(sum, cslUtils.valueToValueQuantities(value)), {
-        coins: 0n,
-        assets: {}
-      });
+      .reduce<ValueQuantities>(
+        (sum, value) => Ogmios.util.coalesceValueQuantities(sum, cslUtils.valueToValueQuantities(value)),
+        {
+          coins: 0n,
+          assets: {}
+        }
+      );
 
   const getTotalChangeAmounts = (results: SelectionResult): ValueQuantities =>
     results.selection.change.reduce<ValueQuantities>(
-      (sum, value) => coalesceValueQuantities(sum, cslUtils.valueToValueQuantities(value)),
+      (sum, value) => Ogmios.util.coalesceValueQuantities(sum, cslUtils.valueToValueQuantities(value)),
       {
         assets: {},
         coins: 0n
       }
     );
 
-  const createOutputsObj = (outputs: TransactionOutput[]) => {
-    const result = CSL.TransactionOutputs.new();
+  const createOutputsObj = (outputs: CSL.TransactionOutput[]) => {
+    const result = csl.TransactionOutputs.new();
     for (const output of outputs) {
       result.add(output);
     }
@@ -179,17 +171,17 @@ export const createCslTestUtils = (CSL: CardanoSerializationLib) => {
   const createUnspentTxOutput = (
     valueQuantities: ValueQuantities,
     bech32Addr = 'addr1vy36kffjf87vzkuyqc5g0ys3fe3pez5zvqg9r5z9q9kfrkg2cs093'
-  ): TransactionUnspentOutput => {
-    const address = CSL.Address.from_bech32(bech32Addr);
+  ): CSL.TransactionUnspentOutput => {
+    const address = csl.Address.from_bech32(bech32Addr);
     const amount = cslUtils.valueQuantitiesToValue(valueQuantities);
-    return CSL.TransactionUnspentOutput.new(createTxInput(), CSL.TransactionOutput.new(address, amount));
+    return csl.TransactionUnspentOutput.new(createTxInput(), csl.TransactionOutput.new(address, amount));
   };
 
   const createOutput = (
     valueQuantities: ValueQuantities,
     bech32Addr = 'addr1vyeljkh3vr4h9s3lyxe7g2meushk3m4nwyzdgtlg96e6mrgg8fnle'
-  ): TransactionOutput =>
-    CSL.TransactionOutput.new(CSL.Address.from_bech32(bech32Addr), cslUtils.valueQuantitiesToValue(valueQuantities));
+  ): CSL.TransactionOutput =>
+    csl.TransactionOutput.new(csl.Address.from_bech32(bech32Addr), cslUtils.valueQuantitiesToValue(valueQuantities));
 
   return {
     createUnspentTxOutput,

@@ -8,18 +8,17 @@ Currently there is only 1 input selection algorithm: RoundRobinRandomImprove, wh
 
 ```typescript
 import { roundRobinRandomImprove, InputSelector, SelectionResult } from '@cardano-sdk/cip2';
-import { loadCardanoSerializationLib } from '@cardano-sdk/cardano-serialization-lib';
-import { TransactionOutputs, TransactionUnspentOutput } from '@emurgo/cardano-serialization-lib-browser';
+import { loadCardanoSerializationLib, CSL, CardanoSerializationLib } from '@cardano-sdk/cardano-serialization-lib';
 import { ProtocolParametersAlonzo } from '@cardano-ogmios/schema';
 
 const demo = async ({ coinsPerUtxoWord }: ProtocolParametersAlonzo): Promise<SelectionResult> => {
-  const CSL = await loadCardanoSerializationLib();
-  const selector: InputSelector = roundRobinRandomImprove(CSL, coinsPerUtxoWord);
+  const csl: CardanoSerializationLib = await loadCardanoSerializationLib();
+  const selector: InputSelector = roundRobinRandomImprove(csl, coinsPerUtxoWord);
   // It is important that you use the same instance of cardano-serialization-lib across your application.
   // Bad: TransactionUnspentOutput.new(...)
-  // Good: CSL.TransactionUnspentOutput.new(...)
-  const utxo = [CSL.TransactionUnspentOutput.new(...), ...];
-  const outputs = CSL.TransactionOutputs.new(...);
+  // Good: csl.TransactionUnspentOutput.new(...)
+  const utxo: CSL.TransactionUnspentOutput[] = [csl.TransactionUnspentOutput.new(...), ...];
+  const outputs: CSL.TransactionOutputs = csl.TransactionOutputs.new(...);
 
   return selector.select({
     utxo,

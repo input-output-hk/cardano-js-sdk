@@ -1,13 +1,6 @@
 import { CardanoSerializationLib, loadCardanoSerializationLib } from '@cardano-sdk/cardano-serialization-lib';
 import { Asset } from '@cardano-sdk/core';
-import {
-  coalesceValueQuantities,
-  computeMinUtxoValue,
-  createCslUtils,
-  CslUtils,
-  transactionOutputsToArray,
-  ValueQuantities
-} from '@src/util';
+import { createCslUtils, CslUtils, transactionOutputsToArray, ValueQuantities } from '../src/util';
 import { TestUtils, createCslTestUtils, TSLA_Asset, PXL_Asset } from './util';
 
 describe('util', () => {
@@ -70,37 +63,5 @@ describe('util', () => {
     // Would test whether it's the same objects instead,
     // but TransactionOutputs.add seems to create a new object.
     expect(result.map((r) => cslUtils.valueToValueQuantities(r.amount()))).toEqual(quantities);
-  });
-
-  describe('coalesceValueQuantities', () => {
-    it('coin only', () => {
-      const q1: ValueQuantities = { coins: 50n };
-      const q2: ValueQuantities = { coins: 100n };
-      expect(coalesceValueQuantities(q1, q2)).toEqual({ coins: 150n });
-    });
-    it('coin and assets', () => {
-      const q1: ValueQuantities = {
-        coins: 50n,
-        assets: {
-          [TSLA_Asset]: 50n,
-          [PXL_Asset]: 100n
-        }
-      };
-      const q2: ValueQuantities = { coins: 100n };
-      const q3: ValueQuantities = {
-        coins: 20n,
-        assets: {
-          [TSLA_Asset]: 20n
-        }
-      };
-      expect(coalesceValueQuantities(q1, q2, q3)).toEqual({
-        coins: 170n,
-        assets: {
-          [TSLA_Asset]: 70n,
-          [PXL_Asset]: 100n
-        }
-      });
-    });
-    it('computeMinUtxoValue', () => expect(typeof computeMinUtxoValue(100n)).toBe('bigint'));
   });
 });

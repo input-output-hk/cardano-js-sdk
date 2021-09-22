@@ -1,6 +1,5 @@
-import { roundRobinRandomImprove } from '@src/RoundRobinRandomImprove';
-import { EstimateTxFee, InputSelector } from '@src/types';
-import { TransactionOutput, TransactionUnspentOutput } from '@emurgo/cardano-serialization-lib-nodejs';
+import { roundRobinRandomImprove } from '../src/RoundRobinRandomImprove';
+import { EstimateTxFee, InputSelector } from '../src/types';
 import {
   TestUtils,
   createCslTestUtils,
@@ -10,12 +9,12 @@ import {
   coinsPerUtxoWord,
   generateValidUtxoAndOutputs
 } from './util';
-import { InputSelectionError, InputSelectionFailure } from '@src/InputSelectionError';
-import { loadCardanoSerializationLib, CardanoSerializationLib } from '@cardano-sdk/cardano-serialization-lib';
+import { InputSelectionError, InputSelectionFailure } from '../src/InputSelectionError';
+import { loadCardanoSerializationLib, CardanoSerializationLib, CSL } from '@cardano-sdk/cardano-serialization-lib';
+import { Cardano } from '@cardano-sdk/core';
 import fc from 'fast-check';
-import { computeMinUtxoValue } from '@src/util';
 
-const getRoundRobinRandomImprove = (CSL: CardanoSerializationLib) => roundRobinRandomImprove(CSL, coinsPerUtxoWord);
+const getRoundRobinRandomImprove = (csl: CardanoSerializationLib) => roundRobinRandomImprove(csl, coinsPerUtxoWord);
 
 interface InputSelectionFailureModeTestParams {
   /**
@@ -25,11 +24,11 @@ interface InputSelectionFailureModeTestParams {
   /**
    * Available UTxO
    */
-  createUtxo: (utils: TestUtils) => TransactionUnspentOutput[];
+  createUtxo: (utils: TestUtils) => CSL.TransactionUnspentOutput[];
   /**
    * Transaction outputs
    */
-  createOutputs: (utils: TestUtils) => TransactionOutput[];
+  createOutputs: (utils: TestUtils) => CSL.TransactionOutput[];
   /**
    * A limit on the number of inputs that can be selected.
    */
@@ -148,9 +147,9 @@ describe('RoundRobinRandomImprove', () => {
     // "UTxO Not Fragmented Enough" doesn't apply for this algorithm
   });
   it('Properties', async () => {
-    const CSL = await loadCardanoSerializationLib();
-    const utils = createCslTestUtils(CSL);
-    const algorithm = getRoundRobinRandomImprove(CSL);
+    const csl = await loadCardanoSerializationLib();
+    const utils = createCslTestUtils(csl);
+    const algorithm = getRoundRobinRandomImprove(csl);
 
     await fc.assert(
       fc.asyncProperty(generateValidUtxoAndOutputs(), async ({ utxoAmounts, outputsAmounts }) => {
@@ -198,7 +197,7 @@ describe('RoundRobinRandomImprove', () => {
         expect(results.selection.outputs).toEqual(outputsObj);
 
         // Min UTxO coin requirement for change
-        const minUtxo = computeMinUtxoValue(coinsPerUtxoWord);
+        const minUtxo = Cardano.util.computeMinUtxoValue(coinsPerUtxoWord);
         for (const value of results.selection.change) {
           expect(BigInt(value.coin().to_str())).toBeGreaterThanOrEqual(minUtxo);
         }

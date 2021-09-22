@@ -1,25 +1,16 @@
-// TODO: move all of these utils to core package
-import { CardanoSerializationLib } from '@cardano-sdk/cardano-serialization-lib';
-import { Asset, BigIntMath } from '@cardano-sdk/core';
-import { TransactionOutput, TransactionOutputs, Value } from '@emurgo/cardano-serialization-lib-nodejs';
-import { Value as OgmiosValue } from '@cardano-ogmios/schema';
+// TODO: move these utils to either core or cardano-serialization-lib package,
+// depending which one has a dependency on the other,
+// because valueQuantitiesToValue will have a dependency on core/Assets.
+// Current impelmentation of OgmiosToCardanoWasm.value() uses number instead of bigint for lovelace.
+// These utils should be moved after CSL is updated to use bigint.
+import { CardanoSerializationLib, CSL } from '@cardano-sdk/cardano-serialization-lib';
+import { Asset, Ogmios } from '@cardano-sdk/core';
 
-/**
- * {[assetId]: amount}
- */
-export type AssetQuantities = OgmiosValue['assets'];
+export type AssetQuantities = Ogmios.util.AssetQuantities;
+export type ValueQuantities = Ogmios.util.ValueQuantities;
 
-/**
- * Total quantities of Coin and Assets in a Value.
- * TODO: Use Ogmios Value type after it changes lovelaces to bigint;
- */
-export interface ValueQuantities {
-  coins: bigint;
-  assets?: AssetQuantities;
-}
-
-export const transactionOutputsToArray = (outputs: TransactionOutputs): TransactionOutput[] => {
-  const result: TransactionOutput[] = [];
+export const transactionOutputsToArray = (outputs: CSL.TransactionOutputs): CSL.TransactionOutput[] => {
+  const result: CSL.TransactionOutput[] = [];
   for (let outputIdx = 0; outputIdx < outputs.len(); outputIdx++) {
     const output = outputs.get(outputIdx);
     result.push(output);
@@ -31,7 +22,7 @@ export const createCslUtils = (
   csl: CardanoSerializationLib,
   assetSerializer = Asset.util.createAssetSerializer(csl)
 ) => {
-  const valueToValueQuantities = (value: Value): ValueQuantities => {
+  const valueToValueQuantities = (value: CSL.Value): ValueQuantities => {
     const result: ValueQuantities = {
       coins: BigInt(value.coin().to_str())
     };
@@ -56,12 +47,12 @@ export const createCslUtils = (
     return result;
   };
 
-  // Review: This is equivalent to OgmiosToCardanoWasm.value(), so they should be merged.
+  // This is equivalent to OgmiosToCardanoWasm.value(), so they should be merged.
   // Note that current implementation of OgmiosToCardanoWasm
   // imports nodejs version of CSL, so it cannot be used in browser.
   // Also note that this function needs to know what bech32 prefix was used in order to recreate
   // policy ID and asset name from an asset ID
-  const valueQuantitiesToValue = ({ coins, assets }: ValueQuantities): Value => {
+  const valueQuantitiesToValue = ({ coins, assets }: ValueQuantities): CSL.Value => {
     const value = csl.Value.new(csl.BigNum.from_str(coins.toString()));
     if (!assets) {
       return value;
@@ -85,33 +76,3 @@ export const createCslUtils = (
 };
 
 export type CslUtils = ReturnType<typeof createCslUtils>;
-
-/**
- * Sum asset quantities
- */
-const coalesceAssetTotals = (...totals: (AssetQuantities | undefined)[]): AssetQuantities | undefined => {
-  const result: AssetQuantities = {};
-  for (const assetTotals of totals.filter((quantities) => !!quantities)) {
-    for (const assetKey in assetTotals) {
-      result[assetKey] = (result[assetKey] || 0n) + assetTotals[assetKey];
-    }
-  }
-  if (Object.keys(result).length === 0) {
-    return undefined;
-  }
-  // eslint-disable-next-line consistent-return
-  return result;
-};
-
-/**
- * Sum all quantities
- */
-export const coalesceValueQuantities = (...quantities: ValueQuantities[]): ValueQuantities => ({
-  coins: BigIntMath.sum(quantities.map(({ coins }) => coins)),
-  assets: coalesceAssetTotals(...quantities.map(({ assets }) => assets))
-});
-
-/**
- * Blockchain restriction for minimum coin quantity in a UTxO
- */
-export const computeMinUtxoValue = (coinsPerUtxoWord: bigint): bigint => coinsPerUtxoWord * 29n;
