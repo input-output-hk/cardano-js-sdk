@@ -14,13 +14,15 @@
     "tscNoEmit": "shx echo typescript --noEmit command not implemented yet",
     "cleanup": "shx rm -rf dist node_modules",
     "lint": "eslint --ignore-path ../../.eslintignore \"**/*.ts\"",
-    "test": "shx echo No tests in this package"
+    "test": "jest -c ./jest.config.js"
   },
   "devDependencies": {
+    "@cardano-sdk/cardano-serialization-lib": "0.1.0",
     "shx": "^0.3.3"
   },
   "dependencies": {
     "@cardano-ogmios/schema": "^4.0.0-beta.6",
-    "@emurgo/cardano-serialization-lib-nodejs": "8.0.0"
+    "@emurgo/cardano-serialization-lib-nodejs": "8.0.0",
+    "buffer": "^6.0.3"
   }
 }

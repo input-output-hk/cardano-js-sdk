@@ -1,6 +1,6 @@
 import CardanoWasm from '@emurgo/cardano-serialization-lib-nodejs';
 import OgmiosSchema from '@cardano-ogmios/schema';
-import { Asset } from '@cardano-sdk/core';
+import * as Asset from '../Asset';
 
 export const OgmiosToCardanoWasm = {
   txIn: (ogmios: OgmiosSchema.TxIn): CardanoWasm.TransactionInput =>
