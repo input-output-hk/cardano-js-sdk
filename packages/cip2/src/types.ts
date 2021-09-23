@@ -34,11 +34,39 @@ export interface SelectionResult {
   remainingUTxO: CSL.TransactionUnspentOutput[];
 }
 
-export type EstimateTxFee = (
-  utxo: CSL.TransactionUnspentOutput[],
-  outputs: CSL.TransactionOutputs,
-  change: CSL.Value[]
-) => Promise<bigint>;
+export interface SelectionSkeleton {
+  utxo: CSL.TransactionUnspentOutput[];
+  outputs: CSL.TransactionOutputs;
+  change: CSL.Value[];
+}
+
+/**
+ * @returns minimum transaction fee in Lovelace.
+ */
+export type EstimateTxFee = (selectionSkeleton: SelectionSkeleton) => Promise<bigint>;
+
+/**
+ * @returns true if token bundle size exceeds it's maximum size limit.
+ */
+export type TokenBundleSizeExceedsLimit = (tokenBundle: CSL.Value) => boolean;
+
+/**
+ * @returns minimum lovelace amount in a UTxO
+ */
+export type ComputeMinimumCoinQuantity = (assetQuantities: CSL.MultiAsset) => bigint;
+
+/**
+ * @returns an upper bound for the number of ordinary inputs to
+ * select, given a current set of outputs.
+ */
+export type ComputeSelectionLimit = (selectionSkeleton: SelectionSkeleton) => Promise<number>;
+
+export interface SelectionConstraints {
+  computeMinimumCost: EstimateTxFee;
+  tokenBundleSizeExceedsLimit: TokenBundleSizeExceedsLimit;
+  computeMinimumCoinQuantity: ComputeMinimumCoinQuantity;
+  computeSelectionLimit: ComputeSelectionLimit;
+}
 
 export interface InputSelectionParameters {
   /**
@@ -50,15 +78,9 @@ export interface InputSelectionParameters {
    */
   outputs: CSL.TransactionOutputs;
   /**
-   * Function to estimate transaction fee for selected inputs.
+   * Input selection constraints
    */
-  estimateTxFee: EstimateTxFee;
-  /**
-   * A limit on the number of inputs that can be selected.
-   * Review: this was in original spec. Is there a maximum input count for Cardano transactions?
-   * Perhaps make this optional and just use utxo.length by default?
-   */
-  maximumInputCount: number;
+  constraints: SelectionConstraints;
 }
 
 export interface InputSelector {

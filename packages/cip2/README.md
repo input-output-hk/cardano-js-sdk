@@ -7,7 +7,7 @@ Currently there is only 1 input selection algorithm: RoundRobinRandomImprove, wh
 ## Usage Example
 
 ```typescript
-import { roundRobinRandomImprove, InputSelector, SelectionResult } from '@cardano-sdk/cip2';
+import { roundRobinRandomImprove, InputSelector, SelectionResult, SelectionConstraints } from '@cardano-sdk/cip2';
 import { loadCardanoSerializationLib, CSL, CardanoSerializationLib } from '@cardano-sdk/cardano-serialization-lib';
 import { ProtocolParametersAlonzo } from '@cardano-ogmios/schema';
 
@@ -19,14 +19,20 @@ const demo = async ({ coinsPerUtxoWord }: ProtocolParametersAlonzo): Promise<Sel
   // Good: csl.TransactionUnspentOutput.new(...)
   const utxo: CSL.TransactionUnspentOutput[] = [csl.TransactionUnspentOutput.new(...), ...];
   const outputs: CSL.TransactionOutputs = csl.TransactionOutputs.new(...);
+  const constraints: SelectionConstraints = {
+    computeMinimumCoinQuantity: (): bigint => coinsPerUtxoWord * 29n,
+    tokenBundleSizeExceedsLimit: (tokenBundle: CSL.MultiAsset): boolean =>
+      throw new Error('Return true if token bundle is too large'),
+    computeMinimumCost: (): Promise<bigint> =>
+      throw new Error('Build the transaction and estimate minimum fee'),
+    computeSelectionLimit: (): Promise<number> =>
+      throw new Error('Compute max number of selected input utxo to not exceed max transaction size'),
+  };
 
   return selector.select({
     utxo,
     outputs,
-    maximumInputCount: availableUtxo.length,
-    estimateTxFee: (utxo, outputs, change) => {
-      throw new Error("TODO: build the transaction and return a Promise of it's size in bytes.");
-    }
+    constraints,
   });
 };
 ```

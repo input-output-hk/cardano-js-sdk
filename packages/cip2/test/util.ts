@@ -2,12 +2,10 @@
 // Consider moving some of them to core package utils.
 // And some of them to a new 'dev-util' package.
 import { CardanoSerializationLib, CSL } from '@cardano-sdk/cardano-serialization-lib';
-import { Ogmios, Cardano } from '@cardano-sdk/core';
+import { Ogmios } from '@cardano-sdk/core';
 import { SelectionResult } from '../src/types';
 import { ValueQuantities, createCslUtils, AssetQuantities } from '../src/util';
 import fc, { Arbitrary } from 'fast-check';
-
-export const coinsPerUtxoWord = 34_482n;
 
 export interface TxAssets {
   key: CSL.ScriptHash;
@@ -24,7 +22,6 @@ export const AllAssets = [TSLA_Asset, PXL_Asset, Unit_Asset];
  */
 export const generateValidUtxoAndOutputs = (() => {
   const MAX_U64 = 18_446_744_073_709_551_615n;
-  const MIN_UTXO_VALUE = Cardano.util.computeMinUtxoValue(coinsPerUtxoWord);
 
   type GetAssetAmount = (asset: string) => bigint;
 
@@ -49,10 +46,10 @@ export const generateValidUtxoAndOutputs = (() => {
   /**
    * Generate random amount of coin and assets.
    */
-  const coinAndAssets = (maxCoin: bigint, getAssetMax: GetAssetAmount) =>
+  const coinAndAssets = (minUtxoValue: bigint, maxCoin: bigint, getAssetMax: GetAssetAmount) =>
     fc
       .tuple(
-        fc.bigInt(MIN_UTXO_VALUE, maxCoin),
+        fc.bigInt(minUtxoValue, maxCoin),
         fc
           .set(fc.oneof(...AllAssets.map((asset) => fc.constant(asset))))
           .chain((assets) =>
@@ -72,28 +69,33 @@ export const generateValidUtxoAndOutputs = (() => {
   /**
    * Generate an array of random quantities of coin and assets.
    */
-  const arrayOfCoinAndAssets = (maxCoin = MAX_U64, getAssetMax: GetAssetAmount = () => MAX_U64) =>
+  const arrayOfCoinAndAssets = (minUtxoValue: bigint, maxCoin = MAX_U64, getAssetMax: GetAssetAmount = () => MAX_U64) =>
     fc
-      .array(coinAndAssets(maxCoin, getAssetMax))
+      .array(coinAndAssets(minUtxoValue, maxCoin, getAssetMax))
       // Verify that sum of all array items doesn't exceed limit quantities
       .filter((results) => doesntExceedAmounts(results, maxCoin, getAssetMax));
 
-  return (): Arbitrary<{
+  return (
+    // TODO: when working on improving tests,
+    // create MockSelectionConstraints type, where functions don't need any args
+    // and pass the entire object to create this arbitrary
+    minUtxoValue: bigint
+  ): Arbitrary<{
     utxoAmounts: ValueQuantities[];
     outputsAmounts: ValueQuantities[];
   }> =>
-    arrayOfCoinAndAssets().chain((utxoAmounts) => {
+    arrayOfCoinAndAssets(minUtxoValue).chain((utxoAmounts) => {
       // Generate outputs with quantities not exceeding utxo quantities.
       // Testing balance insufficient and other failures in example-based tests.
       if (utxoAmounts.length === 0) {
         return fc.constant({ utxoAmounts, outputsAmounts: [] });
       }
       const utxoTotals = Ogmios.util.coalesceValueQuantities(...utxoAmounts);
-      return arrayOfCoinAndAssets(utxoTotals.coins, (asset) => utxoTotals.assets?.[asset] || 0n)
+      return arrayOfCoinAndAssets(minUtxoValue, utxoTotals.coins, (asset) => utxoTotals.assets?.[asset] || 0n)
         .filter((outputsAmounts) => {
           const outputsTotals = Ogmios.util.coalesceValueQuantities(...outputsAmounts);
           // Change has to be >= minUtxoValue
-          return utxoTotals.coins - outputsTotals.coins >= MIN_UTXO_VALUE;
+          return utxoTotals.coins - outputsTotals.coins >= minUtxoValue;
         })
         .map((outputsAmounts) => ({ utxoAmounts, outputsAmounts }));
     });
