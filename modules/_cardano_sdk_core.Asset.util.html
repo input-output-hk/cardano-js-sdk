@@ -79,6 +79,8 @@
 							<h3>Functions</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="_cardano_sdk_core.Asset.util.html#assetNameFromAssetId" class="tsd-kind-icon">asset<wbr>Name<wbr>From<wbr>Asset<wbr>Id</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="_cardano_sdk_core.Asset.util.html#createAssetId" class="tsd-kind-icon">create<wbr>Asset<wbr>Id</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="_cardano_sdk_core.Asset.util.html#parseAssetId" class="tsd-kind-icon">parse<wbr>Asset<wbr>Id</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="_cardano_sdk_core.Asset.util.html#policyIdFromAssetId" class="tsd-kind-icon">policy<wbr>IdFrom<wbr>Asset<wbr>Id</a></li>
 							</ul>
 						</section>
@@ -97,7 +99,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/39472d2/packages/core/src/Asset/util.ts#L3">packages/core/src/Asset/util.ts:3</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/259cc74/packages/core/src/Asset/util.ts#L6">packages/core/src/Asset/util.ts:6</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -111,6 +113,67 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-namespace">
+					<a name="createAssetId" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> create<wbr>Asset<wbr>Id</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-namespace">
+						<li class="tsd-signature tsd-kind-icon">create<wbr>Asset<wbr>Id<span class="tsd-signature-symbol">(</span>scriptHash<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ScriptHash</span>, assetName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">AssetName</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/259cc74/packages/core/src/Asset/util.ts#L11">packages/core/src/Asset/util.ts:11</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>scriptHash: <span class="tsd-signature-type">ScriptHash</span></h5>
+								</li>
+								<li>
+									<h5>assetName: <span class="tsd-signature-type">AssetName</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+							<p>concatenated hex-encoded policy id and asset name</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-namespace">
+					<a name="parseAssetId" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> parse<wbr>Asset<wbr>Id</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-namespace">
+						<li class="tsd-signature tsd-kind-icon">parse<wbr>Asset<wbr>Id<span class="tsd-signature-symbol">(</span>assetId<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, csl<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">__module</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>assetName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">AssetName</span><span class="tsd-signature-symbol">; </span>scriptHash<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ScriptHash</span><span class="tsd-signature-symbol"> }</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/259cc74/packages/core/src/Asset/util.ts#L14">packages/core/src/Asset/util.ts:14</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>assetId: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>csl: <span class="tsd-signature-type">__module</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">{ </span>assetName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">AssetName</span><span class="tsd-signature-symbol">; </span>scriptHash<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ScriptHash</span><span class="tsd-signature-symbol"> }</span></h4>
+							<ul class="tsd-parameters">
+								<li class="tsd-parameter">
+									<h5>asset<wbr>Name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">AssetName</span></h5>
+								</li>
+								<li class="tsd-parameter">
+									<h5>script<wbr>Hash<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ScriptHash</span></h5>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-namespace">
 					<a name="policyIdFromAssetId" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> policy<wbr>IdFrom<wbr>Asset<wbr>Id</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-namespace">
@@ -120,7 +183,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/39472d2/packages/core/src/Asset/util.ts#L1">packages/core/src/Asset/util.ts:1</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/259cc74/packages/core/src/Asset/util.ts#L5">packages/core/src/Asset/util.ts:5</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -147,6 +210,12 @@
 				<ul class="before-current">
 					<li class=" tsd-kind-function tsd-parent-kind-namespace">
 						<a href="_cardano_sdk_core.Asset.util.html#assetNameFromAssetId" class="tsd-kind-icon">asset<wbr>Name<wbr>From<wbr>Asset<wbr>Id</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-namespace">
+						<a href="_cardano_sdk_core.Asset.util.html#createAssetId" class="tsd-kind-icon">create<wbr>Asset<wbr>Id</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-namespace">
+						<a href="_cardano_sdk_core.Asset.util.html#parseAssetId" class="tsd-kind-icon">parse<wbr>Asset<wbr>Id</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-namespace">
 						<a href="_cardano_sdk_core.Asset.util.html#policyIdFromAssetId" class="tsd-kind-icon">policy<wbr>IdFrom<wbr>Asset<wbr>Id</a>
