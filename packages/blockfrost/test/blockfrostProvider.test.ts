@@ -3,7 +3,7 @@
 import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
 import { blockfrostProvider } from '../src';
 import { Schema as Cardano } from '@cardano-ogmios/client';
-import { Tx } from '@cardano-sdk/core';
+import { Transaction } from '@cardano-sdk/core';
 jest.mock('@blockfrost/blockfrost-js');
 
 describe('blockfrostProvider', () => {
@@ -165,7 +165,7 @@ describe('blockfrostProvider', () => {
     ]);
 
     expect(response).toHaveLength(1);
-    expect(response[0]).toMatchObject<Tx>({
+    expect(response[0]).toMatchObject<Transaction.WithHash>({
       hash: '4123d70f66414cc921f6ffc29a899aafc7137a99a0fd453d6b200863ef5702d6',
       inputs: [
         {
@@ -253,7 +253,7 @@ describe('blockfrostProvider', () => {
     ]);
 
     expect(response).toHaveLength(1);
-    expect(response[0]).toMatchObject<Tx>({
+    expect(response[0]).toMatchObject<Transaction.WithHash>({
       hash: '4123d70f66414cc921f6ffc29a899aafc7137a99a0fd453d6b200863ef5702d6',
       inputs: [
         {

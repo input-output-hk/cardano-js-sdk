@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 
 import { GraphQLClient } from 'graphql-request';
-import { ProtocolParametersRequiredByWallet, Tx } from '@cardano-sdk/core';
+import { ProtocolParametersRequiredByWallet, Transaction } from '@cardano-sdk/core';
 import { cardanoGraphqlDbSyncProvider } from '../src';
 import { Schema as Cardano } from '@cardano-ogmios/client';
 jest.mock('graphql-request');
@@ -75,7 +75,7 @@ describe('cardanoGraphqlDbSyncProvider', () => {
 
     expect(response).toHaveLength(2);
 
-    expect(response[0]).toMatchObject<Tx>({
+    expect(response[0]).toMatchObject<Transaction.WithHash>({
       hash: '886206542d63b23a047864021fbfccf291d78e47c1e59bd4c75fbc67b248c5e8',
       inputs: [
         {
@@ -147,7 +147,7 @@ describe('cardanoGraphqlDbSyncProvider', () => {
     ]);
 
     expect(response).toHaveLength(1);
-    expect(response[0]).toMatchObject<Tx>({
+    expect(response[0]).toMatchObject<Transaction.WithHash>({
       hash: '886206542d63b23a047864021fbfccf291d78e47c1e59bd4c75fbc67b248c5e8',
       inputs: [
         {

@@ -1,6 +1,6 @@
 import { Responses } from '@blockfrost/blockfrost-js';
 import * as OgmiosSchema from '@cardano-ogmios/schema';
-import { ProtocolParametersRequiredByWallet, Tx } from '@cardano-sdk/core';
+import { ProtocolParametersRequiredByWallet, Transaction } from '@cardano-sdk/core';
 
 type Unpacked<T> = T extends (infer U)[] ? U : T;
 type BlockfrostAddressUtxoContent = Responses['address_utxo_content'];
@@ -41,7 +41,7 @@ export const BlockfrostToOgmios = {
   outputs: (outputs: BlockfrostOutputs): OgmiosSchema.TxOut[] =>
     outputs.map((output) => BlockfrostToOgmios.txOut(output)),
 
-  txContentUtxo: (blockfrost: Responses['tx_content_utxo']): Tx => ({
+  txContentUtxo: (blockfrost: Responses['tx_content_utxo']): Transaction.WithHash => ({
     hash: blockfrost.hash,
     inputs: BlockfrostToOgmios.inputs(blockfrost.inputs),
     outputs: BlockfrostToOgmios.outputs(blockfrost.outputs)
