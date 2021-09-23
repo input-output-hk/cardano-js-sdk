@@ -1,16 +1,18 @@
 import { loadCardanoSerializationLib } from '@cardano-sdk/cardano-serialization-lib';
-import { util } from '../../src/Asset';
+import { createAssetId, parseAssetId } from '../../src/Asset/util';
+import { Buffer } from 'buffer';
 
 describe('Asset', () => {
   describe('util', () => {
-    it('createAssetSerializer', async () => {
-      const CSL = await loadCardanoSerializationLib();
-      const serializer = util.createAssetSerializer(CSL);
-      const assetId = 'b32_1vk0jj9lmv0cjkvmxw337u467atqcgkauwd4eczaugzagyghp25lTSLA';
-      const tsla = serializer.parseId(assetId);
+    it('createAssetId and parseAssetId', async () => {
+      const csl = await loadCardanoSerializationLib();
+      const assetId = '659f2917fb63f12b33667463ee575eeac1845bbc736b9c0bbc40ba8254534c41';
+      const tsla = parseAssetId(assetId, csl);
       expect(new TextDecoder().decode(tsla.assetName.name())).toEqual('TSLA');
-      expect(tsla.scriptHash.to_bech32('b32_')).toEqual('b32_1vk0jj9lmv0cjkvmxw337u467atqcgkauwd4eczaugzagyghp25l');
-      expect(serializer.createId(tsla.scriptHash, tsla.assetName)).toEqual(assetId);
+      expect(Buffer.from(tsla.scriptHash.to_bytes()).toString('hex')).toEqual(
+        '659f2917fb63f12b33667463ee575eeac1845bbc736b9c0bbc40ba82'
+      );
+      expect(createAssetId(tsla.scriptHash, tsla.assetName)).toEqual(assetId);
     });
   });
 });

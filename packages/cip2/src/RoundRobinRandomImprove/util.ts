@@ -2,7 +2,7 @@ import { BigIntMath } from '@cardano-sdk/core';
 import { CSL } from '@cardano-sdk/cardano-serialization-lib';
 import { uniq } from 'lodash-es';
 import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
-import { CslUtils, ValueQuantities } from '../util';
+import { ValueQuantities, valueToValueQuantities } from '../util';
 
 export interface Totals {
   totals: ValueQuantities;
@@ -28,17 +28,16 @@ export interface UtxoSelection {
 }
 
 export const preprocessArgs = (
-  cslUtils: CslUtils,
   availableUtxo: CSL.TransactionUnspentOutput[],
   outputs: CSL.TransactionOutput[]
 ): RoundRobinRandomImproveArgs => {
   const utxoWithTotals = availableUtxo.map((utxo) => ({
     utxo,
-    totals: cslUtils.valueToValueQuantities(utxo.output().amount())
+    totals: valueToValueQuantities(utxo.output().amount())
   }));
   const outputsWithTotals = outputs.map((output) => ({
     output,
-    totals: cslUtils.valueToValueQuantities(output.amount())
+    totals: valueToValueQuantities(output.amount())
   }));
   const uniqueOutputAssetIDs = uniq(
     outputsWithTotals.flatMap(({ totals: { assets } }) => (assets && Object.keys(assets)) || [])
@@ -64,8 +63,8 @@ export const assertIsBalanceSufficient = (
   utxoWithTotals: UtxoWithTotals[],
   outputsWithTotals: OutputWithTotals[]
 ): void => {
-  for (const id of uniqueOutputAssetIDs) {
-    const getAssetQuantity = assetQuantitySelector(id);
+  for (const assetId of uniqueOutputAssetIDs) {
+    const getAssetQuantity = assetQuantitySelector(assetId);
     const utxoTotal = getAssetQuantity(utxoWithTotals);
     const outputsTotal = getAssetQuantity(outputsWithTotals);
     if (outputsTotal > utxoTotal) {

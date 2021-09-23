@@ -1,15 +1,15 @@
-import { CSL } from '@cardano-sdk/cardano-serialization-lib';
+import { CardanoSerializationLib, CSL } from '@cardano-sdk/cardano-serialization-lib';
 import { Ogmios } from '@cardano-sdk/core';
 import { orderBy } from 'lodash-es';
 import { ComputeMinimumCoinQuantity, TokenBundleSizeExceedsLimit } from '../types';
 import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
-import { AssetQuantities, CslUtils, ValueQuantities } from '../util';
+import { AssetQuantities, ValueQuantities, valueQuantitiesToValue } from '../util';
 import { assetQuantitySelector, getCoinQuantity, OutputWithTotals, UtxoSelection, UtxoWithTotals } from './util';
 
 type EstimateTxFeeWithOriginalOutputs = (utxo: CSL.TransactionUnspentOutput[], change: CSL.Value[]) => Promise<bigint>;
 
 interface ChangeComputationArgs {
-  cslUtils: CslUtils;
+  csl: CardanoSerializationLib;
   utxoSelection: UtxoSelection;
   outputsWithTotals: OutputWithTotals[];
   uniqueOutputAssetIDs: string[];
@@ -55,8 +55,8 @@ const redistributeLeftoverAssets = (
   const leftovers = getLeftoverAssets(utxoSelected, uniqueOutputAssetIDs);
   // Distribute leftovers to result bundles
   const resultBundles = [...requestedAssetChangeBundles];
-  for (const id in leftovers) {
-    const quantities = orderBy(leftovers[id], (q) => q, 'desc');
+  for (const assetId in leftovers) {
+    const quantities = orderBy(leftovers[assetId], (q) => q, 'desc');
     while (quantities.length > resultBundles.length) {
       // Coalesce the smallest quantities together
       const smallestQuantity = quantities.pop();
@@ -68,7 +68,7 @@ const redistributeLeftoverAssets = (
         coins: originalBundle.coins,
         assets: {
           ...originalBundle.assets,
-          [id]: quantity
+          [assetId]: quantity
         }
       });
     }
@@ -92,13 +92,13 @@ const createBundlePerOutput = (
         return { coins };
       }
       const assets: AssetQuantities = {};
-      for (const id of Object.keys(outputTotals.assets)) {
-        const outputAmount = outputTotals.assets[id] || 0n;
-        const { selected, requested } = assetTotals[id];
+      for (const assetId of Object.keys(outputTotals.assets)) {
+        const outputAmount = outputTotals.assets[assetId] || 0n;
+        const { selected, requested } = assetTotals[assetId];
         const assetChangeTotal = selected - requested;
         const assetChange = (assetChangeTotal * outputAmount) / selected;
-        totalAssetsBundled[id] = (totalAssetsBundled[id] || 0n) + assetChange;
-        assets[id] = assetChange;
+        totalAssetsBundled[assetId] = (totalAssetsBundled[assetId] || 0n) + assetChange;
+        assets[assetId] = assetChange;
       }
       return { coins, assets };
     })
@@ -120,9 +120,9 @@ const computeRequestedAssetChangeBundles = (
   uniqueOutputAssetIDs: string[]
 ): ValueQuantities[] => {
   const assetTotals: Record<string, { selected: bigint; requested: bigint }> = {};
-  for (const id of uniqueOutputAssetIDs) {
-    const getQuantity = assetQuantitySelector(id);
-    assetTotals[id] = {
+  for (const assetId of uniqueOutputAssetIDs) {
+    const getQuantity = assetQuantitySelector(assetId);
+    assetTotals[assetId] = {
       selected: getQuantity(utxoSelected),
       requested: getQuantity(outputsWithTotals)
     };
@@ -143,13 +143,13 @@ const computeRequestedAssetChangeBundles = (
   if (coinLost > 0) {
     bundles[0].coins += coinLost;
   }
-  for (const id of uniqueOutputAssetIDs) {
-    const assetTotal = assetTotals[id];
-    const assetLost = assetTotal.selected - assetTotal.requested - totalAssetsBundled[id];
+  for (const assetId of uniqueOutputAssetIDs) {
+    const assetTotal = assetTotals[assetId];
+    const assetLost = assetTotal.selected - assetTotal.requested - totalAssetsBundled[assetId];
     if (assetLost > 0n) {
-      const anyBundle = bundles.find(({ assets }) => assets?.[id]) || bundles[0];
+      const anyBundle = bundles.find(({ assets }) => assets?.[assetId]) || bundles[0];
       anyBundle.assets ||= {};
-      anyBundle.assets[id] = (anyBundle.assets[id] || 0n) + assetLost;
+      anyBundle.assets[assetId] = (anyBundle.assets[assetId] || 0n) + assetLost;
     }
   }
 
@@ -171,7 +171,7 @@ const pickExtraRandomUtxo = ({ utxoRemaining, utxoSelected }: UtxoSelection): Ut
 };
 
 const coalesceChangeBundlesForMinCoinRequirement = (
-  cslUtils: CslUtils,
+  csl: CardanoSerializationLib,
   changeBundles: ValueQuantities[],
   computeMinimumCoinQuantity: ComputeMinimumCoinQuantity
 ): ValueQuantities[] | undefined => {
@@ -180,7 +180,7 @@ const coalesceChangeBundlesForMinCoinRequirement = (
   }
   let sortedBundles = orderBy(changeBundles, ({ coins }) => coins, 'desc');
   const satisfiesMinCoinRequirement = (valueQuantities: ValueQuantities) =>
-    valueQuantities.coins >= computeMinimumCoinQuantity(cslUtils.valueQuantitiesToValue(valueQuantities).multiasset());
+    valueQuantities.coins >= computeMinimumCoinQuantity(valueQuantitiesToValue(valueQuantities, csl).multiasset());
 
   while (sortedBundles.length > 1 && !satisfiesMinCoinRequirement(sortedBundles[sortedBundles.length - 1])) {
     const smallestBundle = sortedBundles.pop();
@@ -200,7 +200,7 @@ const coalesceChangeBundlesForMinCoinRequirement = (
 };
 
 const computeChangeBundles = (
-  cslUtils: CslUtils,
+  csl: CardanoSerializationLib,
   utxoSelection: UtxoSelection,
   outputsWithTotals: OutputWithTotals[],
   uniqueOutputAssetIDs: string[],
@@ -217,7 +217,7 @@ const computeChangeBundles = (
     uniqueOutputAssetIDs
   );
   const changeBundles = coalesceChangeBundlesForMinCoinRequirement(
-    cslUtils,
+    csl,
     requestedAssetChangeBundlesWithLeftoverAssets,
     computeMinimumCoinQuantity
   );
@@ -225,7 +225,7 @@ const computeChangeBundles = (
     // Coalesced all bundles to 1 and it's still less than min utxo value
     if (utxoSelection.utxoRemaining.length > 0) {
       return computeChangeBundles(
-        cslUtils,
+        csl,
         pickExtraRandomUtxo(utxoSelection),
         outputsWithTotals,
         uniqueOutputAssetIDs,
@@ -246,7 +246,7 @@ const computeChangeBundles = (
  * @throws InputSelectionError { UtxoFullyDepleted, UtxoBalanceInsufficient }
  */
 export const computeChangeAndAdjustForFee = async ({
-  cslUtils,
+  csl,
   computeMinimumCoinQuantity,
   tokenBundleSizeExceedsLimit,
   estimateTxFee,
@@ -255,14 +255,14 @@ export const computeChangeAndAdjustForFee = async ({
   utxoSelection
 }: ChangeComputationArgs): Promise<ChangeComputationResult> => {
   const { changeBundles, utxoSelected, utxoRemaining } = computeChangeBundles(
-    cslUtils,
+    csl,
     utxoSelection,
     outputsWithTotals,
     uniqueOutputAssetIDs,
     computeMinimumCoinQuantity
   );
 
-  const change = changeBundles.map((bundle) => cslUtils.valueQuantitiesToValue(bundle));
+  const change = changeBundles.map((bundle) => valueQuantitiesToValue(bundle, csl));
   for (const value of change) {
     if (tokenBundleSizeExceedsLimit(value)) {
       // Algorithm could be improved to attempt to rebalance the bundles
@@ -282,7 +282,7 @@ export const computeChangeAndAdjustForFee = async ({
     }
     // Recompute change and fee with an extra selected UTxO
     return computeChangeAndAdjustForFee({
-      cslUtils,
+      csl,
       computeMinimumCoinQuantity,
       tokenBundleSizeExceedsLimit,
       outputsWithTotals,

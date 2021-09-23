@@ -26,6 +26,7 @@ module.exports = {
     "unicorn/prevent-abbreviations": 0,
     "unicorn/no-null": 0,
     "unicorn/no-array-reduce": 0,
+    "unicorn/prefer-node-protocol": 0,
     '@typescript-eslint/explicit-module-boundary-types': 0,
     "@typescript-eslint/ban-types": 0,
     "template-tag-spacing": 0,
