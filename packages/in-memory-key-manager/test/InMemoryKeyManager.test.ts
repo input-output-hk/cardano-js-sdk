@@ -1,6 +1,7 @@
 import { createInMemoryKeyManager } from '@src/InMemoryKey';
 import { util } from '@src/.';
 import { loadCardanoSerializationLib } from '@cardano-sdk/cardano-serialization-lib';
+import { Cardano } from '@cardano-sdk/core';
 import { KeyManagement } from '@cardano-sdk/wallet';
 import CardanoSerializationLib from '@emurgo/cardano-serialization-lib-nodejs';
 
@@ -13,6 +14,7 @@ describe('InMemoryKeyManager', () => {
     const mnemonic = util.generateMnemonic();
     keyManager = createInMemoryKeyManager({
       mnemonic,
+      networkId: Cardano.NetworkId.testnet,
       password: '123'
     });
     expect(keyManager.publicKey).toBeInstanceOf(CardanoSerializationLib.PublicKey);
@@ -20,6 +22,12 @@ describe('InMemoryKeyManager', () => {
 
   test('initial state publicKey', async () => {
     expect(keyManager.publicKey).toBeDefined();
+    expect(keyManager.publicParentKey).toBeDefined();
+  });
+
+  test('deriveAddress', async () => {
+    const address = await keyManager.deriveAddress(0, 0);
+    expect(address).toBeDefined();
     expect(keyManager.publicParentKey).toBeDefined();
   });
 

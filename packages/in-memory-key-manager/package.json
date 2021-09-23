@@ -22,6 +22,7 @@
     "shx": "^0.3.3"
   },
   "dependencies": {
+    "@cardano-sdk/core": "0.1.0",
     "@cardano-sdk/wallet": "0.1.0",
     "bip39": "^3.0.4"
   }

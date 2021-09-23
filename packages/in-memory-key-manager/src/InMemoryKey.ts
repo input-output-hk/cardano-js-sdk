@@ -3,6 +3,7 @@ import * as bip39 from 'bip39';
 import CardanoSerializationLib from '@emurgo/cardano-serialization-lib-nodejs';
 import { KeyManagement } from '@cardano-sdk/wallet';
 import { harden } from './util';
+import { Cardano } from '@cardano-sdk/core';
 
 /**
  *
@@ -10,11 +11,13 @@ import { harden } from './util';
 export const createInMemoryKeyManager = ({
   password,
   accountIndex,
-  mnemonic
+  mnemonic,
+  networkId
 }: {
   password: string;
   accountIndex?: number;
   mnemonic: string;
+  networkId: Cardano.NetworkId;
 }): KeyManagement.KeyManager => {
   if (!accountIndex) {
     accountIndex = 0;
@@ -24,7 +27,7 @@ export const createInMemoryKeyManager = ({
   if (!validMnemonic) throw new KeyManagement.errors.InvalidMnemonic();
 
   const entropy = bip39.mnemonicToEntropy(mnemonic);
-  const account = CardanoSerializationLib.Bip32PrivateKey.from_bip39_entropy(
+  const accountPrivateKey = CardanoSerializationLib.Bip32PrivateKey.from_bip39_entropy(
     Buffer.from(entropy, 'hex'),
     Buffer.from(password)
   )
@@ -32,10 +35,22 @@ export const createInMemoryKeyManager = ({
     .derive(harden(1815))
     .derive(harden(accountIndex));
 
-  const privateParentKey = account.derive(0).derive(0);
-  const publicParentKey = privateParentKey.to_public().to_raw_key();
+  const privateParentKey = accountPrivateKey.derive(0).derive(0);
+  const publicParentKey = privateParentKey.to_public();
+  const publicKey = accountPrivateKey.to_public();
+  const stakeKey = publicKey.derive(2).derive(0);
 
   return {
+    deriveAddress: (addressIndex, index) => {
+      const utxoPubKey = publicKey.derive(index).derive(addressIndex);
+      const baseAddr = CardanoSerializationLib.BaseAddress.new(
+        networkId,
+        CardanoSerializationLib.StakeCredential.from_keyhash(utxoPubKey.to_raw_key().hash()),
+        CardanoSerializationLib.StakeCredential.from_keyhash(stakeKey.to_raw_key().hash())
+      );
+
+      return baseAddr.to_address().to_bech32();
+    },
     signMessage: async (_addressType, _signingIndex, message) => ({
       publicKey: publicParentKey.toString(),
       signature: `Signature for ${message} is not implemented yet`
@@ -48,7 +63,8 @@ export const createInMemoryKeyManager = ({
       witnessSet.set_vkeys(vkeyWitnesses);
       return witnessSet;
     },
-    publicKey: account.to_public().to_raw_key(),
-    publicParentKey
+    stakeKey: stakeKey.to_raw_key(),
+    publicKey: publicKey.to_raw_key(),
+    publicParentKey: publicParentKey.to_raw_key()
   };
 };
