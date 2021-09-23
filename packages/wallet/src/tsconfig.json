@@ -6,6 +6,7 @@
   },
   "references": [
     { "path": "../../cardano-serialization-lib/src" },
+    { "path": "../../cip2/src" },
     { "path": "../../core/src" }
   ]
 }

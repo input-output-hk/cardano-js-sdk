@@ -18,15 +18,19 @@
     "tscNoEmit": "shx echo typescript --noEmit command not implemented yet",
     "cleanup": "shx rm -rf dist node_modules",
     "lint": "eslint --ignore-path ../../.eslintignore \"**/*.ts\"",
-    "test": "shx echo No tests in this package",
+    "test": "jest -c ./test/jest.config.js",
     "test:debug": "DEBUG=true yarn test"
   },
   "devDependencies": {
-    "@emurgo/cardano-serialization-lib-nodejs": "^8.0.0",
+    "@cardano-sdk/in-memory-key-manager": "0.1.0",
     "shx": "^0.3.3"
   },
   "dependencies": {
     "@cardano-ogmios/schema": "^4.0.0-beta.6",
-    "@cardano-sdk/cardano-serialization-lib": "0.1.0"
+    "@cardano-sdk/cardano-serialization-lib": "0.1.0",
+    "@cardano-sdk/cip2": "0.1.0",
+    "@cardano-sdk/core": "0.1.0",
+    "@emurgo/cardano-serialization-lib-nodejs": "^8.0.0",
+    "ts-log": "^2.2.3"
   }
 }
