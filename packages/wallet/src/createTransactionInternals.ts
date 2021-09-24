@@ -1,11 +1,10 @@
-// Importing types from cardano-serialization-lib-browser will cause TypeScript errors.
-import CardanoSerializationLib from '@emurgo/cardano-serialization-lib-nodejs';
+import { CardanoSerializationLib, CSL } from '@cardano-sdk/cardano-serialization-lib';
 import { SelectionResult } from '@cardano-sdk/cip2';
 import { Transaction } from '@cardano-sdk/core';
 
 export type TxInternals = {
-  hash: CardanoSerializationLib.TransactionHash;
-  body: CardanoSerializationLib.TransactionBody;
+  hash: CSL.TransactionHash;
+  body: CSL.TransactionBody;
 };
 
 export type CreateTxInternalsProps = {
@@ -15,17 +14,17 @@ export type CreateTxInternalsProps = {
 };
 
 export const createTransactionInternals = async (
-  cardanoSerializationLib: typeof CardanoSerializationLib,
+  csl: CardanoSerializationLib,
   props: CreateTxInternalsProps
 ): Promise<TxInternals> => {
-  const inputs = cardanoSerializationLib.TransactionInputs.new();
+  const inputs = csl.TransactionInputs.new();
   for (const utxo of props.inputSelection.inputs) {
     inputs.add(utxo.input());
   }
-  const body = cardanoSerializationLib.TransactionBody.new(
+  const body = csl.TransactionBody.new(
     inputs,
     props.inputSelection.outputs,
-    cardanoSerializationLib.BigNum.from_str(props.inputSelection.fee.toString()),
+    csl.BigNum.from_str(props.inputSelection.fee.toString()),
     props.validityInterval.invalidHereafter
   );
   if (props.validityInterval.invalidBefore !== undefined) {
@@ -33,6 +32,6 @@ export const createTransactionInternals = async (
   }
   return {
     body,
-    hash: cardanoSerializationLib.hash_transaction(body)
+    hash: csl.hash_transaction(body)
   };
 };

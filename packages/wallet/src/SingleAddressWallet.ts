@@ -1,5 +1,5 @@
 import Schema from '@cardano-ogmios/schema';
-import CardanoSerializationLib from '@emurgo/cardano-serialization-lib-nodejs';
+import { CardanoSerializationLib, CSL } from '@cardano-sdk/cardano-serialization-lib';
 import { CardanoProvider, Ogmios, Transaction } from '@cardano-sdk/core';
 import { createTransactionInternals, KeyManagement, TxInternals, UtxoRepository } from './';
 import { dummyLogger, Logger } from 'ts-log';
@@ -14,11 +14,8 @@ export type InitializeTxProps = {
 export interface SingleAddressWallet {
   address: Schema.Address;
   initializeTx: (props: InitializeTxProps) => Promise<TxInternals>;
-  signTx: (
-    body: CardanoSerializationLib.TransactionBody,
-    hash: CardanoSerializationLib.TransactionHash
-  ) => Promise<CardanoSerializationLib.Transaction>;
-  submitTx: (tx: CardanoSerializationLib.Transaction) => Promise<boolean>;
+  signTx: (body: CSL.TransactionBody, hash: CSL.TransactionHash) => Promise<CSL.Transaction>;
+  submitTx: (tx: CSL.Transaction) => Promise<boolean>;
 }
 
 const ensureValidityInterval = (
@@ -29,7 +26,7 @@ const ensureValidityInterval = (
   ({ invalidHereafter: currentSlot + 3600, ...validityInterval });
 
 export const createSingleAddressWallet = async (
-  CSL: typeof CardanoSerializationLib,
+  csl: CardanoSerializationLib,
   provider: CardanoProvider,
   keyManager: KeyManagement.KeyManager,
   utxoRepository: UtxoRepository,
@@ -42,13 +39,13 @@ export const createSingleAddressWallet = async (
     initializeTx: async (props) => {
       const tip = await provider.ledgerTip();
       const validityInterval = ensureValidityInterval(tip.slot, props.options?.validityInterval);
-      const txOutputs = CSL.TransactionOutputs.new();
+      const txOutputs = csl.TransactionOutputs.new();
       for (const output of props.outputs) {
         txOutputs.add(Ogmios.OgmiosToCardanoWasm.txOut(output));
       }
       const inputSelectionResult = await utxoRepository.selectInputs(txOutputs, {
         computeMinimumCost: async ({ utxo, outputs, change }) => {
-          const transactionInternals = await createTransactionInternals(CSL, {
+          const transactionInternals = await createTransactionInternals(csl, {
             changeAddress: address,
             inputSelection: {
               outputs,
@@ -59,15 +56,17 @@ export const createSingleAddressWallet = async (
             validityInterval
           });
           const witnessSet = await keyManager.signTransaction(transactionInternals.hash);
-          const tx = CSL.Transaction.new(transactionInternals.body, witnessSet);
+          const tx = csl.Transaction.new(transactionInternals.body, witnessSet);
           return BigInt(
-            CSL.min_fee(
-              tx,
-              CSL.LinearFee.new(
-                CSL.BigNum.from_str(protocolParameters.minFeeCoefficient.toString()),
-                CSL.BigNum.from_str(protocolParameters.minFeeConstant.toString())
+            csl
+              .min_fee(
+                tx,
+                csl.LinearFee.new(
+                  csl.BigNum.from_str(protocolParameters.minFeeCoefficient.toString()),
+                  csl.BigNum.from_str(protocolParameters.minFeeConstant.toString())
+                )
               )
-            ).to_str()
+              .to_str()
           );
         },
         tokenBundleSizeExceedsLimit: (tokenBundle) => {
@@ -86,7 +85,7 @@ export const createSingleAddressWallet = async (
           return 5;
         }
       });
-      return createTransactionInternals(CSL, {
+      return createTransactionInternals(csl, {
         changeAddress: address,
         inputSelection: inputSelectionResult.selection,
         validityInterval
@@ -94,7 +93,7 @@ export const createSingleAddressWallet = async (
     },
     signTx: async (body, hash) => {
       const witnessSet = await keyManager.signTransaction(hash);
-      return CSL.Transaction.new(body, witnessSet);
+      return csl.Transaction.new(body, witnessSet);
     },
     submitTx: async (tx) => provider.submitTx(tx)
   };

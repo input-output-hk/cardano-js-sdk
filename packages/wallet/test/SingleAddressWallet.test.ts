@@ -1,41 +1,36 @@
 /* eslint-disable max-len */
 
-// All types should be imported from cardano-serialization-lib-nodejs.
-// Importing from cardano-serialization-lib-browser will cause TypeScript errors.
-// Do not create objects from direct imports of serialization lib, use @cardano-sdk/cardano-serialization-lib.
-
 import { createSingleAddressWallet, SingleAddressWallet } from '@src/SingleAddressWallet';
 import * as KeyManagement from '@src/KeyManagement';
 import { Cardano, CardanoProvider } from '@cardano-sdk/core';
 import { createInMemoryKeyManager, util } from '@cardano-sdk/in-memory-key-manager';
-import CardanoSerializationLib from '@emurgo/cardano-serialization-lib-nodejs';
-import { loadCardanoSerializationLib } from '@cardano-sdk/cardano-serialization-lib';
+import { loadCardanoSerializationLib, CardanoSerializationLib } from '@cardano-sdk/cardano-serialization-lib';
 import { InMemoryUtxoRepository } from '@src/InMemoryUtxoRepository';
 import { UtxoRepository } from '@src/UtxoRepository';
 import { InputSelector, roundRobinRandomImprove } from '@cardano-sdk/cip2';
 import { providerStub } from './ProviderStub';
 
 describe('Wallet', () => {
-  let CSL: typeof CardanoSerializationLib;
+  let csl: CardanoSerializationLib;
   let inputSelector: InputSelector;
   let keyManager: KeyManagement.KeyManager;
   let provider: CardanoProvider;
   let utxoRepository: UtxoRepository;
 
   beforeEach(async () => {
-    CSL = await loadCardanoSerializationLib();
+    csl = await loadCardanoSerializationLib();
     keyManager = createInMemoryKeyManager({
       mnemonic: util.generateMnemonic(),
       networkId: Cardano.NetworkId.testnet,
       password: '123'
     });
     provider = providerStub();
-    inputSelector = roundRobinRandomImprove(CSL);
+    inputSelector = roundRobinRandomImprove(csl);
     utxoRepository = new InMemoryUtxoRepository(provider, keyManager, inputSelector);
   });
 
   test('createWallet', async () => {
-    const wallet = await createSingleAddressWallet(CSL, provider, keyManager, utxoRepository);
+    const wallet = await createSingleAddressWallet(csl, provider, keyManager, utxoRepository);
     expect(wallet.address).toBeDefined();
     expect(typeof wallet.initializeTx).toBe('function');
     expect(typeof wallet.signTx).toBe('function');
@@ -54,13 +49,13 @@ describe('Wallet', () => {
     };
 
     beforeEach(async () => {
-      wallet = await createSingleAddressWallet(CSL, provider, keyManager, utxoRepository);
+      wallet = await createSingleAddressWallet(csl, provider, keyManager, utxoRepository);
     });
 
     test('initializeTx', async () => {
       const txInternals = await wallet.initializeTx(props);
-      expect(txInternals.body).toBeInstanceOf(CSL.TransactionBody);
-      expect(txInternals.hash).toBeInstanceOf(CSL.TransactionHash);
+      expect(txInternals.body).toBeInstanceOf(csl.TransactionBody);
+      expect(txInternals.hash).toBeInstanceOf(csl.TransactionHash);
     });
 
     test('signTx', async () => {

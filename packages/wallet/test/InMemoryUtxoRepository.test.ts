@@ -2,8 +2,7 @@ import { CardanoProvider, Ogmios } from '@cardano-sdk/core';
 import { UtxoRepository } from '@src/UtxoRepository';
 import { InMemoryUtxoRepository } from '@src/InMemoryUtxoRepository';
 import { roundRobinRandomImprove, InputSelector } from '@cardano-sdk/cip2';
-import CardanoSerializationLib from '@emurgo/cardano-serialization-lib-nodejs';
-import { loadCardanoSerializationLib } from '@cardano-sdk/cardano-serialization-lib';
+import { loadCardanoSerializationLib, CardanoSerializationLib, CSL } from '@cardano-sdk/cardano-serialization-lib';
 import { providerStub, delegate, rewards } from './ProviderStub';
 import { createInMemoryKeyManager, util } from '@cardano-sdk/in-memory-key-manager';
 import { NO_CONSTRAINTS } from './util';
@@ -18,7 +17,7 @@ const addresses = [
 //   { txId: '08fc1f8af3abbc8fc1f8a466e6e754833a08a62a059bf059bf5483a8a66e6e74', index: 0 }
 // ];
 
-const outputs = CardanoSerializationLib.TransactionOutputs.new();
+const outputs = CSL.TransactionOutputs.new();
 
 outputs.add(
   Ogmios.OgmiosToCardanoWasm.txOut({
@@ -39,12 +38,12 @@ describe('InMemoryUtxoRepository', () => {
   let utxoRepository: UtxoRepository;
   let provider: CardanoProvider;
   let inputSelector: InputSelector;
-  let cardanoSerializationLib: typeof CardanoSerializationLib;
+  let csl: CardanoSerializationLib;
 
   beforeEach(async () => {
     provider = providerStub();
-    cardanoSerializationLib = await loadCardanoSerializationLib();
-    inputSelector = roundRobinRandomImprove(cardanoSerializationLib);
+    csl = await loadCardanoSerializationLib();
+    inputSelector = roundRobinRandomImprove(csl);
     const keyManager = createInMemoryKeyManager({
       mnemonic: util.generateMnemonic(),
       networkId: 0,

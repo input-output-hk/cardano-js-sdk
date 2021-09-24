@@ -1,4 +1,4 @@
-import CardanoSerializationLib from '@emurgo/cardano-serialization-lib-nodejs';
+import { CSL } from '@cardano-sdk/cardano-serialization-lib';
 import { Address } from '../';
 
 export interface KeyManager {
@@ -8,10 +8,8 @@ export interface KeyManager {
     signingIndex: number,
     message: string
   ) => Promise<{ publicKey: string; signature: string }>;
-  publicKey: CardanoSerializationLib.PublicKey;
-  publicParentKey: CardanoSerializationLib.PublicKey;
-  signTransaction: (
-    txHash: CardanoSerializationLib.TransactionHash
-  ) => Promise<CardanoSerializationLib.TransactionWitnessSet>;
-  stakeKey: CardanoSerializationLib.PublicKey;
+  publicKey: CSL.PublicKey;
+  publicParentKey: CSL.PublicKey;
+  signTransaction: (txHash: CSL.TransactionHash) => Promise<CSL.TransactionWitnessSet>;
+  stakeKey: CSL.PublicKey;
 }

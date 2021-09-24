@@ -3,7 +3,7 @@ import { UtxoRepository } from './UtxoRepository';
 import { CardanoProvider, Ogmios } from '@cardano-sdk/core';
 import { dummyLogger, Logger } from 'ts-log';
 import { InputSelector, SelectionConstraints, SelectionResult } from '@cardano-sdk/cip2';
-import CardanoSerializationLib from '@emurgo/cardano-serialization-lib-nodejs';
+import { CSL } from '@cardano-sdk/cardano-serialization-lib';
 import { KeyManager } from './KeyManagement';
 
 export class InMemoryUtxoRepository implements UtxoRepository {
@@ -47,7 +47,7 @@ export class InMemoryUtxoRepository implements UtxoRepository {
   }
 
   public async selectInputs(
-    outputs: CardanoSerializationLib.TransactionOutputs,
+    outputs: CSL.TransactionOutputs,
     constraints: SelectionConstraints
   ): Promise<SelectionResult> {
     if (this.#utxoSet.size === 0) {

@@ -30,7 +30,6 @@
     "@cardano-sdk/cardano-serialization-lib": "0.1.0",
     "@cardano-sdk/cip2": "0.1.0",
     "@cardano-sdk/core": "0.1.0",
-    "@emurgo/cardano-serialization-lib-nodejs": "^8.0.0",
     "ts-log": "^2.2.3"
   }
 }
