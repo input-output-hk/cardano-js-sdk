@@ -14,14 +14,14 @@ const address =
 const outputs = CSL.TransactionOutputs.new();
 
 outputs.add(
-  Ogmios.OgmiosToCardanoWasm.txOut({
+  Ogmios.ogmiosToCsl.txOut({
     address,
     // value: { coins: 4_000_000, assets: { '2a286ad895d091f2b3d168a6091ad2627d30a72761a5bc36eef00740': 20n } }
     value: { coins: 4_000_000 }
   })
 );
 outputs.add(
-  Ogmios.OgmiosToCardanoWasm.txOut({
+  Ogmios.ogmiosToCsl.txOut({
     address,
     // value: { coins: 2_000_000, assets: { '2a286ad895d091f2b3d168a6091ad2627d30a72761a5bc36eef00740': 20n } }
     value: { coins: 2_000_000 }

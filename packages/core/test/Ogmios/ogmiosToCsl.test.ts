@@ -1,5 +1,5 @@
 import { CSL } from '@cardano-sdk/cardano-serialization-lib';
-import { OgmiosToCardanoWasm } from '../../src/Ogmios';
+import { ogmiosToCsl } from '../../src/Ogmios';
 import * as OgmiosSchema from '@cardano-ogmios/schema';
 
 const txIn: OgmiosSchema.TxIn = { txId: '0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5', index: 0 };
@@ -9,17 +9,17 @@ const txOut: OgmiosSchema.TxOut = {
   value: { coins: 10, assets: { '2a286ad895d091f2b3d168a6091ad2627d30a72761a5bc36eef00740': 20n } }
 };
 
-describe('OgmiosToCardanoWasm', () => {
+describe('ogmiosToCsl', () => {
   test('txIn', () => {
-    expect(OgmiosToCardanoWasm.txIn(txIn)).toBeInstanceOf(CSL.TransactionInput);
+    expect(ogmiosToCsl.txIn(txIn)).toBeInstanceOf(CSL.TransactionInput);
   });
   test('txOut', () => {
-    expect(OgmiosToCardanoWasm.txOut(txOut)).toBeInstanceOf(CSL.TransactionOutput);
+    expect(ogmiosToCsl.txOut(txOut)).toBeInstanceOf(CSL.TransactionOutput);
   });
   test('utxo', () => {
-    expect(OgmiosToCardanoWasm.utxo([[txIn, txOut]])[0]).toBeInstanceOf(CSL.TransactionUnspentOutput);
+    expect(ogmiosToCsl.utxo([[txIn, txOut]])[0]).toBeInstanceOf(CSL.TransactionUnspentOutput);
   });
   test('value', () => {
-    expect(OgmiosToCardanoWasm.value(txOut.value)).toBeInstanceOf(CSL.Value);
+    expect(ogmiosToCsl.value(txOut.value)).toBeInstanceOf(CSL.Value);
   });
 });

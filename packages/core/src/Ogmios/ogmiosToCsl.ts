@@ -2,15 +2,13 @@ import { CSL } from '@cardano-sdk/cardano-serialization-lib';
 import OgmiosSchema from '@cardano-ogmios/schema';
 import * as Asset from '../Asset';
 
-export const OgmiosToCardanoWasm = {
+export const ogmiosToCsl = {
   txIn: (ogmios: OgmiosSchema.TxIn): CSL.TransactionInput =>
     CSL.TransactionInput.new(CSL.TransactionHash.from_bytes(Buffer.from(ogmios.txId, 'hex')), ogmios.index),
   txOut: (ogmios: OgmiosSchema.TxOut): CSL.TransactionOutput =>
-    CSL.TransactionOutput.new(CSL.Address.from_bech32(ogmios.address), OgmiosToCardanoWasm.value(ogmios.value)),
+    CSL.TransactionOutput.new(CSL.Address.from_bech32(ogmios.address), ogmiosToCsl.value(ogmios.value)),
   utxo: (ogmios: OgmiosSchema.Utxo): CSL.TransactionUnspentOutput[] =>
-    ogmios.map((item) =>
-      CSL.TransactionUnspentOutput.new(OgmiosToCardanoWasm.txIn(item[0]), OgmiosToCardanoWasm.txOut(item[1]))
-    ),
+    ogmios.map((item) => CSL.TransactionUnspentOutput.new(ogmiosToCsl.txIn(item[0]), ogmiosToCsl.txOut(item[1]))),
   value: (ogmios: OgmiosSchema.Value): CSL.Value => {
     const value = CSL.Value.new(CSL.BigNum.from_str(ogmios.coins.toString()));
     const assets = ogmios.assets !== undefined ? Object.entries(ogmios.assets) : [];

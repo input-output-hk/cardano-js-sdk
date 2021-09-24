@@ -55,7 +55,7 @@ export class InMemoryUtxoRepository implements UtxoRepository {
       await this.sync();
     }
     return this.#inputSelector.select({
-      utxo: Ogmios.OgmiosToCardanoWasm.utxo([...this.#utxoSet.values()]),
+      utxo: Ogmios.ogmiosToCsl.utxo([...this.#utxoSet.values()]),
       outputs,
       constraints
     });
