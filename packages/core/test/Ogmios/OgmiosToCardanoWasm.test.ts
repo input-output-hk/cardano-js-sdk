@@ -1,4 +1,4 @@
-import CardanoWasm from '@emurgo/cardano-serialization-lib-nodejs';
+import { CSL } from '@cardano-sdk/cardano-serialization-lib';
 import { OgmiosToCardanoWasm } from '../../src/Ogmios';
 import * as OgmiosSchema from '@cardano-ogmios/schema';
 
@@ -11,15 +11,15 @@ const txOut: OgmiosSchema.TxOut = {
 
 describe('OgmiosToCardanoWasm', () => {
   test('txIn', () => {
-    expect(OgmiosToCardanoWasm.txIn(txIn)).toBeInstanceOf(CardanoWasm.TransactionInput);
+    expect(OgmiosToCardanoWasm.txIn(txIn)).toBeInstanceOf(CSL.TransactionInput);
   });
   test('txOut', () => {
-    expect(OgmiosToCardanoWasm.txOut(txOut)).toBeInstanceOf(CardanoWasm.TransactionOutput);
+    expect(OgmiosToCardanoWasm.txOut(txOut)).toBeInstanceOf(CSL.TransactionOutput);
   });
   test('utxo', () => {
-    expect(OgmiosToCardanoWasm.utxo([[txIn, txOut]])[0]).toBeInstanceOf(CardanoWasm.TransactionUnspentOutput);
+    expect(OgmiosToCardanoWasm.utxo([[txIn, txOut]])[0]).toBeInstanceOf(CSL.TransactionUnspentOutput);
   });
   test('value', () => {
-    expect(OgmiosToCardanoWasm.value(txOut.value)).toBeInstanceOf(CardanoWasm.Value);
+    expect(OgmiosToCardanoWasm.value(txOut.value)).toBeInstanceOf(CSL.Value);
   });
 });

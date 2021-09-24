@@ -1,5 +1,4 @@
-// Importing types from cardano-serialization-lib-browser will cause TypeScript errors.
-import CardanoSerializationLib from '@emurgo/cardano-serialization-lib-nodejs';
+import { CSL } from '@cardano-sdk/cardano-serialization-lib';
 import Cardano, { ProtocolParametersAlonzo } from '@cardano-ogmios/schema';
 import { Transaction } from '../';
 
@@ -20,7 +19,7 @@ export type ProtocolParametersRequiredByWallet = Pick<
 export interface CardanoProvider {
   ledgerTip: () => Promise<Cardano.Tip>;
   /** @param signedTransaction signed and serialized cbor */
-  submitTx: (tx: CardanoSerializationLib.Transaction) => Promise<boolean>;
+  submitTx: (tx: CSL.Transaction) => Promise<boolean>;
   utxoDelegationAndRewards: (
     addresses: Cardano.Address[],
     stakeKeyHash: Cardano.Hash16
