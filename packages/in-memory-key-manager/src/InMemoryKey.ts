@@ -1,6 +1,5 @@
-// Importing types from cardano-serialization-lib-browser will cause TypeScript errors.
 import * as bip39 from 'bip39';
-import CardanoSerializationLib from '@emurgo/cardano-serialization-lib-nodejs';
+import { CardanoSerializationLib, CSL } from '@cardano-sdk/cardano-serialization-lib';
 import { KeyManagement } from '@cardano-sdk/wallet';
 import { harden } from './util';
 import { Cardano } from '@cardano-sdk/core';
@@ -9,11 +8,13 @@ import { Cardano } from '@cardano-sdk/core';
  *
  */
 export const createInMemoryKeyManager = ({
+  csl,
   password,
   accountIndex,
   mnemonic,
   networkId
 }: {
+  csl: CardanoSerializationLib;
   password: string;
   accountIndex?: number;
   mnemonic: string;
@@ -27,10 +28,7 @@ export const createInMemoryKeyManager = ({
   if (!validMnemonic) throw new KeyManagement.errors.InvalidMnemonic();
 
   const entropy = bip39.mnemonicToEntropy(mnemonic);
-  const accountPrivateKey = CardanoSerializationLib.Bip32PrivateKey.from_bip39_entropy(
-    Buffer.from(entropy, 'hex'),
-    Buffer.from(password)
-  )
+  const accountPrivateKey = csl.Bip32PrivateKey.from_bip39_entropy(Buffer.from(entropy, 'hex'), Buffer.from(password))
     .derive(harden(1852))
     .derive(harden(1815))
     .derive(harden(accountIndex));
@@ -43,10 +41,10 @@ export const createInMemoryKeyManager = ({
   return {
     deriveAddress: (addressIndex, index) => {
       const utxoPubKey = publicKey.derive(index).derive(addressIndex);
-      const baseAddr = CardanoSerializationLib.BaseAddress.new(
+      const baseAddr = csl.BaseAddress.new(
         networkId,
-        CardanoSerializationLib.StakeCredential.from_keyhash(utxoPubKey.to_raw_key().hash()),
-        CardanoSerializationLib.StakeCredential.from_keyhash(stakeKey.to_raw_key().hash())
+        csl.StakeCredential.from_keyhash(utxoPubKey.to_raw_key().hash()),
+        csl.StakeCredential.from_keyhash(stakeKey.to_raw_key().hash())
       );
 
       return baseAddr.to_address().to_bech32();
@@ -55,10 +53,10 @@ export const createInMemoryKeyManager = ({
       publicKey: publicParentKey.toString(),
       signature: `Signature for ${message} is not implemented yet`
     }),
-    signTransaction: async (txHash: CardanoSerializationLib.TransactionHash) => {
-      const witnessSet = CardanoSerializationLib.TransactionWitnessSet.new();
-      const vkeyWitnesses = CardanoSerializationLib.Vkeywitnesses.new();
-      const vkeyWitness = CardanoSerializationLib.make_vkey_witness(txHash, privateParentKey.to_raw_key());
+    signTransaction: async (txHash: CSL.TransactionHash) => {
+      const witnessSet = csl.TransactionWitnessSet.new();
+      const vkeyWitnesses = csl.Vkeywitnesses.new();
+      const vkeyWitness = csl.make_vkey_witness(txHash, privateParentKey.to_raw_key());
       vkeyWitnesses.add(vkeyWitness);
       witnessSet.set_vkeys(vkeyWitnesses);
       return witnessSet;

@@ -20,6 +20,7 @@ describe('Wallet', () => {
   beforeEach(async () => {
     csl = await loadCardanoSerializationLib();
     keyManager = createInMemoryKeyManager({
+      csl,
       mnemonic: util.generateMnemonic(),
       networkId: Cardano.NetworkId.testnet,
       password: '123'

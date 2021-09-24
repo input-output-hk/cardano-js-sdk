@@ -45,6 +45,7 @@ describe('InMemoryUtxoRepository', () => {
     csl = await loadCardanoSerializationLib();
     inputSelector = roundRobinRandomImprove(csl);
     const keyManager = createInMemoryKeyManager({
+      csl,
       mnemonic: util.generateMnemonic(),
       networkId: 0,
       password: '123'

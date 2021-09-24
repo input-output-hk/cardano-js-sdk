@@ -39,6 +39,7 @@ describe('createTransactionInternals', () => {
     provider = providerStub();
     inputSelector = roundRobinRandomImprove(csl);
     const keyManager = createInMemoryKeyManager({
+      csl,
       mnemonic: util.generateMnemonic(),
       networkId: Cardano.NetworkId.testnet,
       password: '123'
