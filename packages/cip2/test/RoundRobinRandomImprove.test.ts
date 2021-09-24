@@ -135,8 +135,8 @@ describe('RoundRobinRandomImprove', () => {
       it('Change bundle size exceeds constraint', async () => {
         await testInputSelectionFailureMode({
           getAlgorithm: getRoundRobinRandomImprove,
-          createUtxo: (utils) => [utils.createUnspentTxOutput({ coins: 2_000_000n })],
-          createOutputs: (utils) => [utils.createOutput({ coins: 1_000_000n })],
+          createUtxo: (utils) => [utils.createUnspentTxOutput({ coins: 2_000_000n, assets: { [TSLA_Asset]: 1000n } })],
+          createOutputs: (utils) => [utils.createOutput({ coins: 1_000_000n, assets: { [TSLA_Asset]: 500n } })],
           constraints: {
             ...NO_CONSTRAINTS,
             tokenBundleSizeExceedsLimit: () => true
