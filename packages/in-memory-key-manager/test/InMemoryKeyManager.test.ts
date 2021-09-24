@@ -1,6 +1,6 @@
 import { createInMemoryKeyManager } from '@src/InMemoryKey';
 import { util } from '@src/.';
-import { CardanoSerializationLib, CSL, loadCardanoSerializationLib } from '@cardano-sdk/cardano-serialization-lib';
+import { CardanoSerializationLib, loadCardanoSerializationLib } from '@cardano-sdk/cardano-serialization-lib';
 import { Cardano } from '@cardano-sdk/core';
 import { KeyManagement } from '@cardano-sdk/wallet';
 
@@ -17,7 +17,7 @@ describe('InMemoryKeyManager', () => {
       networkId: Cardano.NetworkId.testnet,
       password: '123'
     });
-    expect(keyManager.publicKey).toBeInstanceOf(CSL.PublicKey);
+    expect(keyManager.publicKey).toBeInstanceOf(csl.PublicKey);
   });
 
   test('initial state publicKey', async () => {
@@ -36,6 +36,6 @@ describe('InMemoryKeyManager', () => {
       Buffer.from('8561258e210352fba2ac0488afed67b3427a27ccf1d41ec030c98a8199bc22ec', 'hex')
     );
     const witnessSet = await keyManager.signTransaction(txHash);
-    expect(witnessSet).toBeInstanceOf(CSL.TransactionWitnessSet);
+    expect(witnessSet).toBeInstanceOf(csl.TransactionWitnessSet);
   });
 });
