@@ -264,7 +264,9 @@ export const computeChangeAndAdjustForFee = async ({
 
   const change = changeBundles.map((bundle) => valueQuantitiesToValue(bundle, csl));
   for (const value of change) {
-    if (tokenBundleSizeExceedsLimit(value)) {
+    const multiasset = value.multiasset();
+    if (!multiasset) continue;
+    if (tokenBundleSizeExceedsLimit(multiasset)) {
       // Algorithm could be improved to attempt to rebalance the bundles
       throw new InputSelectionError(InputSelectionFailure.UtxoFullyDepleted);
     }

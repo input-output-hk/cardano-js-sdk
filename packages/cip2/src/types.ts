@@ -48,7 +48,7 @@ export type EstimateTxFee = (selectionSkeleton: SelectionSkeleton) => Promise<bi
 /**
  * @returns true if token bundle size exceeds it's maximum size limit.
  */
-export type TokenBundleSizeExceedsLimit = (tokenBundle: CSL.Value) => boolean;
+export type TokenBundleSizeExceedsLimit = (tokenBundle: CSL.MultiAsset) => boolean;
 
 /**
  * @returns minimum lovelace amount in a UTxO
