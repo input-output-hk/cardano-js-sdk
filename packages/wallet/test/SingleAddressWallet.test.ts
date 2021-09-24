@@ -27,7 +27,7 @@ describe('Wallet', () => {
     });
     provider = providerStub();
     inputSelector = roundRobinRandomImprove(csl);
-    utxoRepository = new InMemoryUtxoRepository(provider, keyManager, inputSelector);
+    utxoRepository = new InMemoryUtxoRepository(csl, provider, keyManager, inputSelector);
   });
 
   test('createWallet', async () => {

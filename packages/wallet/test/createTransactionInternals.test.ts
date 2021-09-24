@@ -11,28 +11,12 @@ import { NO_CONSTRAINTS } from './util';
 const address =
   'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g';
 
-const outputs = CSL.TransactionOutputs.new();
-
-outputs.add(
-  Ogmios.ogmiosToCsl.txOut({
-    address,
-    // value: { coins: 4_000_000, assets: { '2a286ad895d091f2b3d168a6091ad2627d30a72761a5bc36eef00740': 20n } }
-    value: { coins: 4_000_000 }
-  })
-);
-outputs.add(
-  Ogmios.ogmiosToCsl.txOut({
-    address,
-    // value: { coins: 2_000_000, assets: { '2a286ad895d091f2b3d168a6091ad2627d30a72761a5bc36eef00740': 20n } }
-    value: { coins: 2_000_000 }
-  })
-);
-
 describe('createTransactionInternals', () => {
   let csl: CardanoSerializationLib;
   let provider: CardanoProvider;
   let inputSelector: InputSelector;
   let utxoRepository: UtxoRepository;
+  let outputs: CSL.TransactionOutputs;
 
   beforeEach(async () => {
     csl = await loadCardanoSerializationLib();
@@ -44,7 +28,21 @@ describe('createTransactionInternals', () => {
       networkId: Cardano.NetworkId.testnet,
       password: '123'
     });
-    utxoRepository = new InMemoryUtxoRepository(provider, keyManager, inputSelector);
+    outputs = CSL.TransactionOutputs.new();
+
+    outputs.add(
+      Ogmios.ogmiosToCsl(csl).txOut({
+        address,
+        value: { coins: 4_000_000 }
+      })
+    );
+    outputs.add(
+      Ogmios.ogmiosToCsl(csl).txOut({
+        address,
+        value: { coins: 2_000_000 }
+      })
+    );
+    utxoRepository = new InMemoryUtxoRepository(csl, provider, keyManager, inputSelector);
   });
 
   test('simple transaction', async () => {

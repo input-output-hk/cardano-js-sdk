@@ -41,7 +41,7 @@ export const createSingleAddressWallet = async (
       const validityInterval = ensureValidityInterval(tip.slot, props.options?.validityInterval);
       const txOutputs = csl.TransactionOutputs.new();
       for (const output of props.outputs) {
-        txOutputs.add(Ogmios.ogmiosToCsl.txOut(output));
+        txOutputs.add(Ogmios.ogmiosToCsl(csl).txOut(output));
       }
       const inputSelectionResult = await utxoRepository.selectInputs(txOutputs, {
         computeMinimumCost: async ({ utxo, outputs, change }) => {

@@ -1,4 +1,4 @@
-import { CSL } from '@cardano-sdk/cardano-serialization-lib';
+import { CardanoSerializationLib, CSL, loadCardanoSerializationLib } from '@cardano-sdk/cardano-serialization-lib';
 import { ogmiosToCsl } from '../../src/Ogmios';
 import * as OgmiosSchema from '@cardano-ogmios/schema';
 
@@ -10,16 +10,20 @@ const txOut: OgmiosSchema.TxOut = {
 };
 
 describe('ogmiosToCsl', () => {
+  let csl: CardanoSerializationLib;
+  beforeAll(async () => {
+    csl = await loadCardanoSerializationLib();
+  });
   test('txIn', () => {
-    expect(ogmiosToCsl.txIn(txIn)).toBeInstanceOf(CSL.TransactionInput);
+    expect(ogmiosToCsl(csl).txIn(txIn)).toBeInstanceOf(CSL.TransactionInput);
   });
   test('txOut', () => {
-    expect(ogmiosToCsl.txOut(txOut)).toBeInstanceOf(CSL.TransactionOutput);
+    expect(ogmiosToCsl(csl).txOut(txOut)).toBeInstanceOf(CSL.TransactionOutput);
   });
   test('utxo', () => {
-    expect(ogmiosToCsl.utxo([[txIn, txOut]])[0]).toBeInstanceOf(CSL.TransactionUnspentOutput);
+    expect(ogmiosToCsl(csl).utxo([[txIn, txOut]])[0]).toBeInstanceOf(CSL.TransactionUnspentOutput);
   });
   test('value', () => {
-    expect(ogmiosToCsl.value(txOut.value)).toBeInstanceOf(CSL.Value);
+    expect(ogmiosToCsl(csl).value(txOut.value)).toBeInstanceOf(CSL.Value);
   });
 });

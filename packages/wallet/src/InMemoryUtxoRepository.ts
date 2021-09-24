@@ -3,10 +3,11 @@ import { UtxoRepository } from './UtxoRepository';
 import { CardanoProvider, Ogmios } from '@cardano-sdk/core';
 import { dummyLogger, Logger } from 'ts-log';
 import { InputSelector, SelectionConstraints, SelectionResult } from '@cardano-sdk/cip2';
-import { CSL } from '@cardano-sdk/cardano-serialization-lib';
+import { CardanoSerializationLib, CSL } from '@cardano-sdk/cardano-serialization-lib';
 import { KeyManager } from './KeyManagement';
 
 export class InMemoryUtxoRepository implements UtxoRepository {
+  #csl: CardanoSerializationLib;
   #delegationAndRewards: Schema.DelegationsAndRewards;
   #inputSelector: InputSelector;
   #keyManager: KeyManager;
@@ -14,7 +15,14 @@ export class InMemoryUtxoRepository implements UtxoRepository {
   #provider: CardanoProvider;
   #utxoSet: Set<[TxIn, TxOut]>;
 
-  constructor(provider: CardanoProvider, keyManager: KeyManager, inputSelector: InputSelector, logger?: Logger) {
+  constructor(
+    csl: CardanoSerializationLib,
+    provider: CardanoProvider,
+    keyManager: KeyManager,
+    inputSelector: InputSelector,
+    logger?: Logger
+  ) {
+    this.#csl = csl;
     this.#logger = logger ?? dummyLogger;
     this.#provider = provider;
     this.#utxoSet = new Set();
@@ -55,7 +63,7 @@ export class InMemoryUtxoRepository implements UtxoRepository {
       await this.sync();
     }
     return this.#inputSelector.select({
-      utxo: Ogmios.ogmiosToCsl.utxo([...this.#utxoSet.values()]),
+      utxo: Ogmios.ogmiosToCsl(this.#csl).utxo([...this.#utxoSet.values()]),
       outputs,
       constraints
     });
