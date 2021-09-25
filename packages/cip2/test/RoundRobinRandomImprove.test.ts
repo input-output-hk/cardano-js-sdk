@@ -1,237 +1,175 @@
 import { roundRobinRandomImprove } from '../src/RoundRobinRandomImprove';
-import { InputSelector, SelectionConstraints } from '../src/types';
 import {
-  TestUtils,
+  assertInputSelectionProperties,
+  assertFailureProperties,
   createCslTestUtils,
-  containsUtxo,
+  generateSelectionParams,
+  NO_CONSTRAINTS,
+  PXL_Asset,
+  testInputSelectionFailureMode,
+  toConstraints,
   TSLA_Asset,
-  AllAssets,
-  generateValidUtxoAndOutputs
+  testInputSelectionProperties
 } from './util';
 import { InputSelectionError, InputSelectionFailure } from '../src/InputSelectionError';
-import { loadCardanoSerializationLib, CardanoSerializationLib, CSL } from '@cardano-sdk/cardano-serialization-lib';
+import { loadCardanoSerializationLib, CardanoSerializationLib } from '@cardano-sdk/cardano-serialization-lib';
 import fc from 'fast-check';
 
 const getRoundRobinRandomImprove = (csl: CardanoSerializationLib) => roundRobinRandomImprove(csl);
 
-const NO_CONSTRAINTS: SelectionConstraints = {
-  computeMinimumCoinQuantity: () => 0n,
-  tokenBundleSizeExceedsLimit: () => false,
-  computeMinimumCost: async () => 0n,
-  computeSelectionLimit: async () => Number.POSITIVE_INFINITY
-};
-
-interface InputSelectionFailureModeTestParams {
-  /**
-   * Test subject (Input Selection algorithm under test)
-   */
-  getAlgorithm: (SerializationLib: CardanoSerializationLib) => InputSelector;
-  /**
-   * Available UTxO
-   */
-  createUtxo: (utils: TestUtils) => CSL.TransactionUnspentOutput[];
-  /**
-   * Transaction outputs
-   */
-  createOutputs: (utils: TestUtils) => CSL.TransactionOutput[];
-  /**
-   * Input selection constraints passed to the algorithm.
-   */
-  constraints: SelectionConstraints;
-  /**
-   * Error that should be thrown
-   */
-  expectedError: InputSelectionFailure;
-}
-
-/**
- * Run input selection and assert that implementation throws error of specific failure.
- */
-const testInputSelectionFailureMode = async ({
-  getAlgorithm,
-  createUtxo,
-  createOutputs,
-  expectedError,
-  constraints
-}: InputSelectionFailureModeTestParams) => {
-  const SerializationLib = await loadCardanoSerializationLib();
-  const utils = createCslTestUtils(SerializationLib);
-  const utxo = createUtxo(utils);
-  const outputs = createOutputs(utils);
-  const algorithm = getAlgorithm(SerializationLib);
-  await expect(algorithm.select({ utxo, outputs: utils.createOutputsObj(outputs), constraints })).rejects.toThrowError(
-    new InputSelectionError(expectedError)
-  );
-};
-
 describe('RoundRobinRandomImprove', () => {
-  describe('Failure Modes', () => {
-    describe('UtxoBalanceInsufficient', () => {
-      it('Coin (Outputs>UTxO)', async () => {
-        await testInputSelectionFailureMode({
+  describe('Examples', () => {
+    describe('Properties', () => {
+      it('No change', async () => {
+        await testInputSelectionProperties({
           getAlgorithm: getRoundRobinRandomImprove,
-          createUtxo: (utils) => [
-            utils.createUnspentTxOutput({ coins: 3_000_000n, assets: {} }),
-            utils.createUnspentTxOutput({ coins: 10_000_000n, assets: {} })
-          ],
-          createOutputs: (utils) => [
-            utils.createOutput({ coins: 12_000_000n, assets: {} }),
-            utils.createOutput({ coins: 2_000_000n, assets: {} })
-          ],
-          constraints: NO_CONSTRAINTS,
-          expectedError: InputSelectionFailure.UtxoBalanceInsufficient
-        });
-      });
-      it('Coin (Outputs+Fee>UTxO)', async () => {
-        await testInputSelectionFailureMode({
-          getAlgorithm: getRoundRobinRandomImprove,
-          createUtxo: (utils) => [
-            utils.createUnspentTxOutput({ coins: 4_910_000n, assets: {} }),
-            utils.createUnspentTxOutput({ coins: 5_000_000n, assets: {} })
-          ],
-          createOutputs: (utils) => [utils.createOutput({ coins: 10_000_000n, assets: {} })],
-          constraints: {
-            ...NO_CONSTRAINTS,
-            computeMinimumCost: async () => 100_000n
-          },
-          expectedError: InputSelectionFailure.UtxoBalanceInsufficient
-        });
-      });
-      it('Asset', async () => {
-        await testInputSelectionFailureMode({
-          getAlgorithm: getRoundRobinRandomImprove,
-          createUtxo: (utils) => [utils.createUnspentTxOutput({ coins: 10_000_000n, assets: { [TSLA_Asset]: 7000n } })],
-          createOutputs: (utils) => [utils.createOutput({ coins: 5_000_000n, assets: { [TSLA_Asset]: 7001n } })],
-          constraints: NO_CONSTRAINTS,
-          expectedError: InputSelectionFailure.UtxoBalanceInsufficient
-        });
-      });
-      it('No UTxO', async () => {
-        await testInputSelectionFailureMode({
-          getAlgorithm: getRoundRobinRandomImprove,
-          createUtxo: () => [],
-          createOutputs: (utils) => [utils.createOutput({ coins: 5_000_000n })],
-          constraints: NO_CONSTRAINTS,
-          expectedError: InputSelectionFailure.UtxoBalanceInsufficient
+          createUtxo: (utils) => [utils.createUnspentTxOutput({ coins: 3_000_000n, assets: {} })],
+          createOutputs: (utils) => [utils.createOutput({ coins: 3_000_000n, assets: {} })],
+          mockConstraints: NO_CONSTRAINTS
         });
       });
     });
-    describe('UTxO Fully Depleted', () => {
-      it('Change bundle value is less than constrained', async () => {
+    describe('Failure Modes', () => {
+      describe('UtxoBalanceInsufficient', () => {
+        it('Coin (Outputs>UTxO)', async () => {
+          await testInputSelectionFailureMode({
+            getAlgorithm: getRoundRobinRandomImprove,
+            createUtxo: (utils) => [
+              utils.createUnspentTxOutput({ coins: 3_000_000n, assets: {} }),
+              utils.createUnspentTxOutput({ coins: 10_000_000n, assets: {} })
+            ],
+            createOutputs: (utils) => [
+              utils.createOutput({ coins: 12_000_000n, assets: {} }),
+              utils.createOutput({ coins: 2_000_000n, assets: {} })
+            ],
+            mockConstraints: NO_CONSTRAINTS,
+            expectedError: InputSelectionFailure.UtxoBalanceInsufficient
+          });
+        });
+        it('Coin (Outputs+Fee>UTxO)', async () => {
+          await testInputSelectionFailureMode({
+            getAlgorithm: getRoundRobinRandomImprove,
+            createUtxo: (utils) => [
+              utils.createUnspentTxOutput({ coins: 4_910_000n, assets: {} }),
+              utils.createUnspentTxOutput({ coins: 5_000_000n, assets: {} })
+            ],
+            createOutputs: (utils) => [utils.createOutput({ coins: 10_000_000n, assets: {} })],
+            mockConstraints: {
+              ...NO_CONSTRAINTS,
+              minimumCost: 100_000n
+            },
+            expectedError: InputSelectionFailure.UtxoBalanceInsufficient
+          });
+        });
+        it('Asset', async () => {
+          await testInputSelectionFailureMode({
+            getAlgorithm: getRoundRobinRandomImprove,
+            createUtxo: (utils) => [
+              utils.createUnspentTxOutput({ coins: 10_000_000n, assets: { [TSLA_Asset]: 7000n } })
+            ],
+            createOutputs: (utils) => [utils.createOutput({ coins: 5_000_000n, assets: { [TSLA_Asset]: 7001n } })],
+            mockConstraints: NO_CONSTRAINTS,
+            expectedError: InputSelectionFailure.UtxoBalanceInsufficient
+          });
+        });
+        it('No UTxO', async () => {
+          await testInputSelectionFailureMode({
+            getAlgorithm: getRoundRobinRandomImprove,
+            createUtxo: () => [],
+            createOutputs: (utils) => [utils.createOutput({ coins: 5_000_000n })],
+            mockConstraints: NO_CONSTRAINTS,
+            expectedError: InputSelectionFailure.UtxoBalanceInsufficient
+          });
+        });
+      });
+      describe('UTxO Fully Depleted', () => {
+        it('Change bundle value is less than constrained', async () => {
+          await testInputSelectionFailureMode({
+            getAlgorithm: getRoundRobinRandomImprove,
+            createUtxo: (utils) => [
+              utils.createUnspentTxOutput({ coins: 1_000_000n }),
+              utils.createUnspentTxOutput({ coins: 2_000_000n })
+            ],
+            createOutputs: (utils) => [utils.createOutput({ coins: 2_999_999n })],
+            mockConstraints: {
+              ...NO_CONSTRAINTS,
+              minimumCoinQuantity: 2n
+            },
+            expectedError: InputSelectionFailure.UtxoFullyDepleted
+          });
+        });
+        it('Change bundle size exceeds constraint', async () => {
+          await testInputSelectionFailureMode({
+            getAlgorithm: getRoundRobinRandomImprove,
+            createUtxo: (utils) => [
+              utils.createUnspentTxOutput({ coins: 2_000_000n, assets: { [TSLA_Asset]: 1000n, [PXL_Asset]: 1000n } })
+            ],
+            createOutputs: (utils) => [
+              utils.createOutput({ coins: 1_000_000n, assets: { [TSLA_Asset]: 500n, [PXL_Asset]: 500n } })
+            ],
+            mockConstraints: {
+              ...NO_CONSTRAINTS,
+              maxTokenBundleSize: 1
+            },
+            expectedError: InputSelectionFailure.UtxoFullyDepleted
+          });
+        });
+      });
+      it('Maximum Input Count Exceeded', async () => {
         await testInputSelectionFailureMode({
           getAlgorithm: getRoundRobinRandomImprove,
           createUtxo: (utils) => [
-            utils.createUnspentTxOutput({ coins: 1_000_000n }),
-            utils.createUnspentTxOutput({ coins: 2_000_000n })
+            utils.createUnspentTxOutput({ coins: 2_000_000n }),
+            utils.createUnspentTxOutput({ coins: 2_000_000n }),
+            utils.createUnspentTxOutput({ coins: 3_000_000n })
           ],
-          createOutputs: (utils) => [utils.createOutput({ coins: 2_999_999n })],
-          constraints: {
+          createOutputs: (utils) => [utils.createOutput({ coins: 6_000_000n })],
+          mockConstraints: {
             ...NO_CONSTRAINTS,
-            computeMinimumCoinQuantity: () => 2n
+            selectionLimit: 2
           },
-          expectedError: InputSelectionFailure.UtxoFullyDepleted
+          expectedError: InputSelectionFailure.MaximumInputCountExceeded
         });
       });
-      it('Change bundle size exceeds constraint', async () => {
-        await testInputSelectionFailureMode({
-          getAlgorithm: getRoundRobinRandomImprove,
-          createUtxo: (utils) => [utils.createUnspentTxOutput({ coins: 2_000_000n, assets: { [TSLA_Asset]: 1000n } })],
-          createOutputs: (utils) => [utils.createOutput({ coins: 1_000_000n, assets: { [TSLA_Asset]: 500n } })],
-          constraints: {
-            ...NO_CONSTRAINTS,
-            tokenBundleSizeExceedsLimit: () => true
-          },
-          expectedError: InputSelectionFailure.UtxoFullyDepleted
-        });
-      });
+      // "UTxO Not Fragmented Enough" doesn't apply for this algorithm
     });
-    it('Maximum Input Count Exceeded', async () => {
-      await testInputSelectionFailureMode({
-        getAlgorithm: getRoundRobinRandomImprove,
-        createUtxo: (utils) => [
-          utils.createUnspentTxOutput({ coins: 2_000_000n }),
-          utils.createUnspentTxOutput({ coins: 2_000_000n }),
-          utils.createUnspentTxOutput({ coins: 3_000_000n })
-        ],
-        createOutputs: (utils) => [utils.createOutput({ coins: 6_000_000n })],
-        constraints: {
-          ...NO_CONSTRAINTS,
-          computeSelectionLimit: async () => 2
-        },
-        expectedError: InputSelectionFailure.MaximumInputCountExceeded
-      });
-    });
-    // "UTxO Not Fragmented Enough" doesn't apply for this algorithm
   });
-  it('Properties', async () => {
+  it('fast-check', async () => {
     const csl = await loadCardanoSerializationLib();
     const utils = createCslTestUtils(csl);
     const algorithm = getRoundRobinRandomImprove(csl);
 
-    const constraints = {
-      ...NO_CONSTRAINTS,
-      computeMinimumCoinQuantity: () => 34_482n * 29n
-    };
-
     await fc.assert(
-      fc.asyncProperty(
-        generateValidUtxoAndOutputs(constraints.computeMinimumCoinQuantity()),
-        async ({ utxoAmounts, outputsAmounts }) => {
-          // Run input selection
-          const utxo = utxoAmounts.map((valueQuantities) => utils.createUnspentTxOutput(valueQuantities));
-          const outputs = outputsAmounts.map((valueQuantities) => utils.createOutput(valueQuantities));
-          const outputsObj = utils.createOutputsObj(outputs);
+      fc.asyncProperty(generateSelectionParams(), async ({ utxoAmounts, outputsAmounts, constraints }) => {
+        // Run input selection
+        const utxo = utxoAmounts.map((valueQuantities) => utils.createUnspentTxOutput(valueQuantities));
+        const outputs = outputsAmounts.map((valueQuantities) => utils.createOutput(valueQuantities));
+        const outputsObj = utils.createOutputsObj(outputs);
+
+        try {
           const results = await algorithm.select({
             utxo,
             outputs: outputsObj,
-            constraints
+            constraints: toConstraints(constraints)
           });
-
-          const vSelected = utils.getTotalInputAmounts(results);
-          const vRequested = utils.getTotalOutputAmounts(outputs);
-
-          // Coverage of Payments
-          expect(vSelected.coins).toBeGreaterThanOrEqual(vRequested.coins);
-          for (const assetName of AllAssets) {
-            expect(vSelected.assets?.[assetName] || 0n).toBeGreaterThanOrEqual(vRequested.assets?.[assetName] || 0n);
-          }
-
-          // Correctness of Change
-          const vChange = utils.getTotalChangeAmounts(results);
-          expect(vSelected.coins).toEqual(vRequested.coins + vChange.coins);
-          for (const assetName of AllAssets) {
-            expect(vSelected.assets?.[assetName] || 0n).toEqual(
-              (vRequested.assets?.[assetName] || 0n) + (vChange.assets?.[assetName] || 0n)
-            );
-          }
-
-          // Conservation of UTxO
-          for (const utxoEntry of utxo) {
-            const isInInputSelectionInputsSet = containsUtxo(results.selection.inputs, utxoEntry);
-            const isInRemainingUtxoSet = containsUtxo(results.remainingUTxO, utxoEntry);
-            expect(isInInputSelectionInputsSet || isInRemainingUtxoSet).toBe(true);
-            expect(isInInputSelectionInputsSet).not.toEqual(isInRemainingUtxoSet);
-          }
-
-          // Conservation of Outputs
-          // If this is used to test other algorithms refactor this
-          // to clone outputs before and do deepEquals to assert it wasn't mutated
-          expect(results.selection.outputs).toEqual(outputsObj);
-
-          // Min UTxO coin requirement for change
-          const minUtxo = constraints.computeMinimumCoinQuantity();
-          for (const value of results.selection.change) {
-            expect(BigInt(value.coin().to_str())).toBeGreaterThanOrEqual(minUtxo);
+          assertInputSelectionProperties({ utils, results, outputs, utxo, outputsObj, constraints });
+        } catch (error) {
+          if (error instanceof InputSelectionError) {
+            assertFailureProperties({ error, utxoAmounts, outputsAmounts, constraints });
+          } else {
+            throw error;
           }
         }
-      ),
+      }),
       {
         interruptAfterTimeLimit: 100_000,
         markInterruptAsFailure: true,
+        // endOnFailure: true,
+        // seed: 895_642_751,
+        // eslint-disable-next-line max-len
+        // path: '8:3:1:2:1:2:2:1:5:1:1:6:2:4:4:1:7:1:4:1:4:1:3:1:1:3:1:1:1:1:13:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:16:12:12:14:14:11:11:13:11:12:11:14:12:11:12:11:14:13:11:11:14:11:11:11:12:13:11:12:11:15:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:15:14:14:16:0:4:1:11:1:1:10:1:1:1:1:2:2:2:2:3:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:3:4:3:3:5:1:1',
+        // numRuns: 1
         numRuns: 500
-        // To rerun failed test:
-        // seed: number
-        // path: string
       }
     );
   });
