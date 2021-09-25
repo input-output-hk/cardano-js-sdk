@@ -5,10 +5,10 @@ import {
   createCslTestUtils,
   generateSelectionParams,
   NO_CONSTRAINTS,
-  PXL_Asset,
-  testInputSelectionFailureMode,
   toConstraints,
+  PXL_Asset,
   TSLA_Asset,
+  testInputSelectionFailureMode,
   testInputSelectionProperties
 } from './util';
 import { InputSelectionError, InputSelectionFailure } from '../src/InputSelectionError';
@@ -23,8 +23,8 @@ describe('RoundRobinRandomImprove', () => {
       it('No change', async () => {
         await testInputSelectionProperties({
           getAlgorithm: getRoundRobinRandomImprove,
-          createUtxo: (utils) => [utils.createUnspentTxOutput({ coins: 3_000_000n, assets: {} })],
-          createOutputs: (utils) => [utils.createOutput({ coins: 3_000_000n, assets: {} })],
+          createUtxo: (utils) => [utils.createUnspentTxOutput({ coins: 3_000_000n })],
+          createOutputs: (utils) => [utils.createOutput({ coins: 3_000_000n })],
           mockConstraints: NO_CONSTRAINTS
         });
       });
@@ -35,12 +35,12 @@ describe('RoundRobinRandomImprove', () => {
           await testInputSelectionFailureMode({
             getAlgorithm: getRoundRobinRandomImprove,
             createUtxo: (utils) => [
-              utils.createUnspentTxOutput({ coins: 3_000_000n, assets: {} }),
-              utils.createUnspentTxOutput({ coins: 10_000_000n, assets: {} })
+              utils.createUnspentTxOutput({ coins: 3_000_000n }),
+              utils.createUnspentTxOutput({ coins: 10_000_000n })
             ],
             createOutputs: (utils) => [
-              utils.createOutput({ coins: 12_000_000n, assets: {} }),
-              utils.createOutput({ coins: 2_000_000n, assets: {} })
+              utils.createOutput({ coins: 12_000_000n }),
+              utils.createOutput({ coins: 2_000_000n })
             ],
             mockConstraints: NO_CONSTRAINTS,
             expectedError: InputSelectionFailure.UtxoBalanceInsufficient
@@ -50,10 +50,10 @@ describe('RoundRobinRandomImprove', () => {
           await testInputSelectionFailureMode({
             getAlgorithm: getRoundRobinRandomImprove,
             createUtxo: (utils) => [
-              utils.createUnspentTxOutput({ coins: 4_910_000n, assets: {} }),
-              utils.createUnspentTxOutput({ coins: 5_000_000n, assets: {} })
+              utils.createUnspentTxOutput({ coins: 4_910_000n }),
+              utils.createUnspentTxOutput({ coins: 5_000_000n })
             ],
-            createOutputs: (utils) => [utils.createOutput({ coins: 10_000_000n, assets: {} })],
+            createOutputs: (utils) => [utils.createOutput({ coins: 10_000_000n })],
             mockConstraints: {
               ...NO_CONSTRAINTS,
               minimumCost: 100_000n
@@ -164,12 +164,9 @@ describe('RoundRobinRandomImprove', () => {
       {
         interruptAfterTimeLimit: 100_000,
         markInterruptAsFailure: true,
-        // endOnFailure: true,
-        // seed: 895_642_751,
-        // eslint-disable-next-line max-len
-        // path: '8:3:1:2:1:2:2:1:5:1:1:6:2:4:4:1:7:1:4:1:4:1:3:1:1:3:1:1:1:1:13:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:7:16:12:12:14:14:11:11:13:11:12:11:14:12:11:12:11:14:13:11:11:14:11:11:11:12:13:11:12:11:15:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:14:15:14:14:16:0:4:1:11:1:1:10:1:1:1:1:2:2:2:2:3:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:2:3:4:3:3:5:1:1',
-        // numRuns: 1
-        numRuns: 500
+        // Review: we probably want to use low numRuns in development and high numRuns in CI.
+        // 500 is too low when generating constraints. 1000 is fine, but leaves a few untested paths.
+        numRuns: 1000
       }
     );
   });

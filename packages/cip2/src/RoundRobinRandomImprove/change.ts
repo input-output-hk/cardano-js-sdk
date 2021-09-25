@@ -190,9 +190,9 @@ const coalesceChangeBundlesForMinCoinRequirement = (
     // eslint-disable-next-line consistent-return
     return undefined;
   }
-  // TODO: remove empty bundles
+  // Filter empty bundles
   // eslint-disable-next-line consistent-return
-  return sortedBundles;
+  return sortedBundles.filter((bundle) => bundle.coins > 0n || Object.keys(bundle.assets || {}).length > 0);
 };
 
 const computeChangeBundles = (

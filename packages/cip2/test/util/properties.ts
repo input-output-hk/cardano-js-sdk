@@ -2,10 +2,26 @@ import { AllAssets, containsUtxo, TestUtils } from './util';
 import { SelectionResult } from '../../src/types';
 import { CSL } from '@cardano-sdk/cardano-serialization-lib';
 import { InputSelectionError, InputSelectionFailure } from '../../src/InputSelectionError';
-import { AssetQuantities, ValueQuantities } from '../../src/util';
+import { AssetQuantities, ValueQuantities, valueToValueQuantities } from '../../src/util';
 import { Ogmios } from '@cardano-sdk/core';
 import fc, { Arbitrary } from 'fast-check';
 import { MockSelectionConstraints } from './constraints';
+
+const assertExtraChangeProperties = ({ minimumCoinQuantity }: MockSelectionConstraints, results: SelectionResult) => {
+  for (const value of results.selection.change) {
+    const { coins, assets } = valueToValueQuantities(value);
+    // Min UTxO coin requirement for change
+    expect(coins).toBeGreaterThanOrEqual(minimumCoinQuantity);
+    // No 0 quantity assets
+    if (assets) {
+      for (const quantity of Object.values(assets)) {
+        expect(quantity).toBeGreaterThan(0n);
+      }
+    }
+    // No empty change bundles.
+    expect(coins > 0n || Object.keys(assets || {}).length > 0).toBe(true);
+  }
+};
 
 export const assertInputSelectionProperties = ({
   utils,
@@ -53,11 +69,7 @@ export const assertInputSelectionProperties = ({
   // to clone outputs before and do deepEquals to assert it wasn't mutated
   expect(results.selection.outputs).toEqual(outputsObj);
 
-  // Min UTxO coin requirement for change
-  const minUtxo = constraints.minimumCoinQuantity;
-  for (const value of results.selection.change) {
-    expect(BigInt(value.coin().to_str())).toBeGreaterThanOrEqual(minUtxo);
-  }
+  assertExtraChangeProperties(constraints, results);
 };
 
 export const assertFailureProperties = ({
