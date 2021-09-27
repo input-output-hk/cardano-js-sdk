@@ -47,6 +47,9 @@ RoundRobinRandomImprove has 100% code coverage when using high `numRuns` option 
 
 Note that to run it with high `numRuns` you need to increase _Jest_ and _fast-check_ timeout.
 
+See [code coverage report].
+
 [cip-0002]: https://cips.cardano.org/cips/cip2/
 [random-improve]: https://cips.cardano.org/cips/cip2/#randomimprove
 [fast-check]: https://github.com/dubzzz/fast-check
+[code coverage report]: https://input-output-hk.github.io/cardano-js-sdk/coverage/cip2

@@ -15,6 +15,7 @@
     "cleanup": "shx rm -rf dist node_modules",
     "lint": "eslint --ignore-path ../../.eslintignore \"**/*.ts\"",
     "test": "jest -c ./jest.config.js",
+    "coverage": "yarn test --coverage",
     "test:debug": "DEBUG=true yarn test"
   },
   "devDependencies": {
