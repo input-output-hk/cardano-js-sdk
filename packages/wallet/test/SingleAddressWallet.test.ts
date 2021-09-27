@@ -2,9 +2,8 @@
 
 import { createSingleAddressWallet, SingleAddressWallet } from '@src/SingleAddressWallet';
 import * as KeyManagement from '@src/KeyManagement';
-import { Cardano, CardanoProvider } from '@cardano-sdk/core';
+import { loadCardanoSerializationLib, CardanoSerializationLib, Cardano, CardanoProvider } from '@cardano-sdk/core';
 import { createInMemoryKeyManager, util } from '@cardano-sdk/in-memory-key-manager';
-import { loadCardanoSerializationLib, CardanoSerializationLib } from '@cardano-sdk/cardano-serialization-lib';
 import { InMemoryUtxoRepository } from '@src/InMemoryUtxoRepository';
 import { UtxoRepository } from '@src/UtxoRepository';
 import { InputSelector, roundRobinRandomImprove } from '@cardano-sdk/cip2';

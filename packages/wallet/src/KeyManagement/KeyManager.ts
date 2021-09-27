@@ -1,4 +1,4 @@
-import { CSL } from '@cardano-sdk/cardano-serialization-lib';
+import { CSL } from '@cardano-sdk/core';
 import { Address } from '../';
 
 export interface KeyManager {

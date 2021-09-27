@@ -1,7 +1,6 @@
 import { createInMemoryKeyManager } from '@src/InMemoryKey';
 import { util } from '@src/.';
-import { CardanoSerializationLib, loadCardanoSerializationLib } from '@cardano-sdk/cardano-serialization-lib';
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, CardanoSerializationLib, loadCardanoSerializationLib } from '@cardano-sdk/core';
 import { KeyManagement } from '@cardano-sdk/wallet';
 
 describe('InMemoryKeyManager', () => {

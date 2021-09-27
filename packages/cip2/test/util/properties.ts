@@ -1,9 +1,8 @@
 import { AllAssets, containsUtxo, TestUtils } from './util';
 import { SelectionResult } from '../../src/types';
-import { CSL } from '@cardano-sdk/cardano-serialization-lib';
+import { CSL, Ogmios } from '@cardano-sdk/core';
 import { InputSelectionError, InputSelectionFailure } from '../../src/InputSelectionError';
 import { AssetQuantities, ValueQuantities, valueToValueQuantities } from '../../src/util';
-import { Ogmios } from '@cardano-sdk/core';
 import fc, { Arbitrary } from 'fast-check';
 import { MockSelectionConstraints } from './constraints';
 

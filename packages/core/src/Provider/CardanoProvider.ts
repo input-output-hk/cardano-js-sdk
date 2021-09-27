@@ -1,4 +1,4 @@
-import { CSL } from '@cardano-sdk/cardano-serialization-lib';
+import { CSL } from '../CSL';
 import Cardano, { ProtocolParametersAlonzo } from '@cardano-ogmios/schema';
 import { Transaction } from '../';
 

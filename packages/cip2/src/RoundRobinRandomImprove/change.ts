@@ -1,5 +1,4 @@
-import { CardanoSerializationLib, CSL } from '@cardano-sdk/cardano-serialization-lib';
-import { Ogmios } from '@cardano-sdk/core';
+import { CardanoSerializationLib, CSL, Ogmios } from '@cardano-sdk/core';
 import { orderBy } from 'lodash-es';
 import { ComputeMinimumCoinQuantity, TokenBundleSizeExceedsLimit } from '../types';
 import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';

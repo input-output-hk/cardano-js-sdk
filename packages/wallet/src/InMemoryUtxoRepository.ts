@@ -1,9 +1,8 @@
 import Schema, { TxIn, TxOut } from '@cardano-ogmios/schema';
 import { UtxoRepository } from './UtxoRepository';
-import { CardanoProvider, Ogmios } from '@cardano-sdk/core';
+import { CardanoProvider, Ogmios, CardanoSerializationLib, CSL } from '@cardano-sdk/core';
 import { dummyLogger, Logger } from 'ts-log';
 import { InputSelector, SelectionConstraints, SelectionResult } from '@cardano-sdk/cip2';
-import { CardanoSerializationLib, CSL } from '@cardano-sdk/cardano-serialization-lib';
 import { KeyManager } from './KeyManagement';
 
 export class InMemoryUtxoRepository implements UtxoRepository {

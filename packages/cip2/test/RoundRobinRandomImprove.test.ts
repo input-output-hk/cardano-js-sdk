@@ -12,7 +12,7 @@ import {
   testInputSelectionProperties
 } from './util';
 import { InputSelectionError, InputSelectionFailure } from '../src/InputSelectionError';
-import { loadCardanoSerializationLib, CardanoSerializationLib } from '@cardano-sdk/cardano-serialization-lib';
+import { loadCardanoSerializationLib, CardanoSerializationLib } from '@cardano-sdk/core';
 import fc from 'fast-check';
 
 const getRoundRobinRandomImprove = (csl: CardanoSerializationLib) => roundRobinRandomImprove(csl);

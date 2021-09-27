@@ -1,4 +1,4 @@
-import { CardanoSerializationLib, CSL, loadCardanoSerializationLib } from '@cardano-sdk/cardano-serialization-lib';
+import { CardanoSerializationLib, CSL, loadCardanoSerializationLib } from '@cardano-sdk/core';
 import { createCslTestUtils, TestUtils } from './util';
 import { InputSelector } from '../../src/types';
 import { InputSelectionError, InputSelectionFailure } from '../../src/InputSelectionError';

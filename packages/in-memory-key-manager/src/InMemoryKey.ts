@@ -1,8 +1,7 @@
 import * as bip39 from 'bip39';
-import { CardanoSerializationLib, CSL } from '@cardano-sdk/cardano-serialization-lib';
+import { Cardano, CardanoSerializationLib, CSL } from '@cardano-sdk/core';
 import { KeyManagement } from '@cardano-sdk/wallet';
 import { harden } from './util';
-import { Cardano } from '@cardano-sdk/core';
 
 /**
  *

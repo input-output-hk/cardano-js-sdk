@@ -1,4 +1,4 @@
-import { CardanoSerializationLib } from '@cardano-sdk/cardano-serialization-lib';
+import { CardanoSerializationLib } from '@cardano-sdk/core';
 import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
 import { InputSelectionParameters, InputSelector, SelectionResult } from '../types';
 import { transactionOutputsToArray } from '../util';

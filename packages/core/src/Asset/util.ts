@@ -1,4 +1,4 @@
-import { CardanoSerializationLib, CSL } from '@cardano-sdk/cardano-serialization-lib';
+import { CardanoSerializationLib, CSL } from '../CSL';
 import { Buffer } from 'buffer';
 
 export const policyIdFromAssetId = (assetId: string): string => assetId.slice(0, 56);

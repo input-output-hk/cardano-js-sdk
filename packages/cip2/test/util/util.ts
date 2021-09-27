@@ -1,8 +1,7 @@
 // These are utilities used by tests. They are not tested.
 // Consider moving some of them to core package utils.
 // And some of them to a new 'dev-util' package.
-import { CardanoSerializationLib, CSL } from '@cardano-sdk/cardano-serialization-lib';
-import { Ogmios } from '@cardano-sdk/core';
+import { CardanoSerializationLib, CSL, Ogmios } from '@cardano-sdk/core';
 import { SelectionResult } from '../../src/types';
 import { ValueQuantities, valueToValueQuantities, valueQuantitiesToValue } from '../../src/util';
 

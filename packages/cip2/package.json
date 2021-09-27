@@ -26,7 +26,6 @@
     "shx": "^0.3.3"
   },
   "dependencies": {
-    "@cardano-sdk/cardano-serialization-lib": "0.1.0",
     "@cardano-sdk/core": "0.1.0",
     "lodash-es": "^4.17.21"
   }
