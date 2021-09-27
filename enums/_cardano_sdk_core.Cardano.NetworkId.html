@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>util | cardano-sdk</title>
+	<title>NetworkId | cardano-sdk</title>
 	<meta name="description" content="Documentation for cardano-sdk">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -55,16 +55,16 @@
 					<a href="../index.html">cardano-sdk</a>
 				</li>
 				<li>
-					<a href="_cardano_sdk_core.html">@cardano-sdk/core</a>
+					<a href="../modules/_cardano_sdk_core.html">@cardano-sdk/core</a>
 				</li>
 				<li>
-					<a href="_cardano_sdk_core.Cardano.html">Cardano</a>
+					<a href="../modules/_cardano_sdk_core.Cardano.html">Cardano</a>
 				</li>
 				<li>
-					<a href="_cardano_sdk_core.Cardano.util.html">util</a>
+					<a href="_cardano_sdk_core.Cardano.NetworkId.html">NetworkId</a>
 				</li>
 			</ul>
-			<h1>Namespace util</h1>
+			<h1>Enumeration NetworkId</h1>
 		</div>
 	</div>
 </header>
@@ -76,43 +76,36 @@
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section ">
-							<h3>Functions</h3>
+							<h3>Enumeration members</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="_cardano_sdk_core.Cardano.util.html#computeMinUtxoValue" class="tsd-kind-icon">compute<wbr>Min<wbr>Utxo<wbr>Value</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="_cardano_sdk_core.Cardano.NetworkId.html#mainnet" class="tsd-kind-icon">mainnet</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="_cardano_sdk_core.Cardano.NetworkId.html#testnet" class="tsd-kind-icon">testnet</a></li>
 							</ul>
 						</section>
 					</div>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
-				<h2>Functions</h2>
-				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-namespace">
-					<a name="computeMinUtxoValue" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagConst">Const</span> compute<wbr>Min<wbr>Utxo<wbr>Value</h3>
-					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-namespace">
-						<li class="tsd-signature tsd-kind-icon">compute<wbr>Min<wbr>Utxo<wbr>Value<span class="tsd-signature-symbol">(</span>coinsPerUtxoWord<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">bigint</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">bigint</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/885d261/packages/core/src/Cardano/util.ts#L4">packages/core/src/Cardano/util.ts:4</a></li>
-								</ul>
-							</aside>
-							<div class="tsd-comment tsd-typography">
-								<div class="lead">
-									<p>Blockchain restriction for minimum coin quantity in a UTxO</p>
-								</div>
-							</div>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>coinsPerUtxoWord: <span class="tsd-signature-type">bigint</span></h5>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">bigint</span></h4>
-						</li>
-					</ul>
+				<h2>Enumeration members</h2>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
+					<a name="mainnet" class="tsd-anchor"></a>
+					<h3>mainnet</h3>
+					<div class="tsd-signature tsd-kind-icon">mainnet<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 1</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/885d261/packages/core/src/Cardano/NetworkId.ts#L2">packages/core/src/Cardano/NetworkId.ts:2</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
+					<a name="testnet" class="tsd-anchor"></a>
+					<h3>testnet</h3>
+					<div class="tsd-signature tsd-kind-icon">testnet<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 0</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/885d261/packages/core/src/Cardano/NetworkId.ts#L3">packages/core/src/Cardano/NetworkId.ts:3</a></li>
+						</ul>
+					</aside>
 				</section>
 			</section>
 		</div>
@@ -126,9 +119,21 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
-					<li class=" tsd-kind-function tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_core.Cardano.util.html#computeMinUtxoValue" class="tsd-kind-icon">compute<wbr>Min<wbr>Utxo<wbr>Value</a>
+				</ul>
+				<ul class="current">
+					<li class="current tsd-kind-enum tsd-parent-kind-namespace">
+						<a href="_cardano_sdk_core.Cardano.NetworkId.html" class="tsd-kind-icon">Network<wbr>Id</a>
+						<ul>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="_cardano_sdk_core.Cardano.NetworkId.html#mainnet" class="tsd-kind-icon">mainnet</a>
+							</li>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="_cardano_sdk_core.Cardano.NetworkId.html#testnet" class="tsd-kind-icon">testnet</a>
+							</li>
+						</ul>
 					</li>
+				</ul>
+				<ul class="after-current">
 				</ul>
 			</nav>
 		</div>
