@@ -18,6 +18,31 @@ export const blockfrostProvider = (options: Options): CardanoProvider => {
     return BlockfrostToOgmios.blockToTip(block);
   };
 
+  const networkInfo: CardanoProvider['networkInfo'] = async () => {
+    const currentEpoch = await blockfrost.epochsLatest();
+    const { stake, supply } = await blockfrost.network();
+    return {
+      currentEpoch: {
+        end: {
+          date: new Date(currentEpoch.end_time)
+        },
+        number: currentEpoch.epoch,
+        start: {
+          date: new Date(currentEpoch.start_time)
+        }
+      },
+      lovelaceSupply: {
+        circulating: BigInt(supply.circulating),
+        max: BigInt(supply.max),
+        total: BigInt(supply.total)
+      },
+      stake: {
+        active: BigInt(stake.active),
+        live: BigInt(stake.live)
+      }
+    };
+  };
+
   const submitTx: CardanoProvider['submitTx'] = async (signedTransaction) => {
     try {
       const hash = await blockfrost.txSubmit(signedTransaction.to_bytes());
@@ -75,6 +100,7 @@ export const blockfrostProvider = (options: Options): CardanoProvider => {
 
   return {
     ledgerTip,
+    networkInfo,
     submitTx,
     utxoDelegationAndRewards,
     queryTransactionsByAddresses,

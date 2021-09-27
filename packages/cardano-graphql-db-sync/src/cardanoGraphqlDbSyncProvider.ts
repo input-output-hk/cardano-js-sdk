@@ -42,6 +42,81 @@ export const cardanoGraphqlDbSyncProvider = (uri: string): CardanoProvider => {
     return CardanoGraphqlToOgmios.tip(response.cardano.tip);
   };
 
+  const networkInfo: CardanoProvider['networkInfo'] = async () => {
+    const query = gql`
+      query {
+        activeStake_aggregate {
+          aggregate {
+            sum {
+              amount
+            }
+          }
+        }
+        ada {
+          supply {
+            circulating
+            max
+            total
+          }
+        }
+        cardano {
+          currentEpoch {
+            lastBlockTime
+            number
+            startedAt
+          }
+        }
+      }
+    `;
+
+    type Response = {
+      activeStake_aggregate: {
+        aggregate: {
+          sum: {
+            amount: string;
+          };
+        };
+      };
+      ada: {
+        supply: {
+          circulating: string;
+          max: string;
+          total: string;
+        };
+      };
+      cardano: {
+        currentEpoch: {
+          lastBlockTime: string;
+          number: number;
+          startedAt: string;
+        };
+      };
+    };
+
+    const response = await client.request<Response>(query);
+    return {
+      currentEpoch: {
+        end: {
+          date: new Date(response.cardano.currentEpoch.lastBlockTime)
+        },
+        number: response.cardano.currentEpoch.number,
+        start: {
+          date: new Date(response.cardano.currentEpoch.startedAt)
+        }
+      },
+      lovelaceSupply: {
+        circulating: BigInt(response.ada.supply.circulating),
+        max: BigInt(response.ada.supply.max),
+        total: BigInt(response.ada.supply.total)
+      },
+      stake: {
+        active: BigInt(response.activeStake_aggregate.aggregate.sum.amount),
+        // Todo: This value cannot be provided by this service yet
+        live: BigInt(0)
+      }
+    };
+  };
+
   const submitTx: CardanoProvider['submitTx'] = async (signedTransaction) => {
     try {
       const mutation = gql`
@@ -191,6 +266,7 @@ export const cardanoGraphqlDbSyncProvider = (uri: string): CardanoProvider => {
 
   return {
     ledgerTip,
+    networkInfo,
     submitTx,
     utxoDelegationAndRewards,
     queryTransactionsByAddresses,

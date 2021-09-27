@@ -64,7 +64,34 @@ export const providerStub = (): CardanoProvider => ({
     hash: '10d64cc11e9b20e15b6c46aa7b1fed11246f437e62225655a30ea47bf8cc22d0',
     slot: 37_834_496
   }),
+  networkInfo: async () => ({
+    currentEpoch: {
+      number: 158,
+      start: {
+        date: new Date(1_632_255_616)
+      },
+      end: {
+        date: new Date(1_632_687_616)
+      }
+    },
+    lovelaceSupply: {
+      circulating: 42_064_399_450_423_723n,
+      max: 45_000_000_000_000_000n,
+      total: 40_267_211_394_073_980n
+    },
+    stake: {
+      active: 1_060_378_314_781_343n,
+      live: 15_001_884_895_856_815n
+    }
+  }),
   submitTx: async () => true,
+  stakePoolStats: async () => ({
+    qty: {
+      active: 1000,
+      retired: 500,
+      retiring: 5
+    }
+  }),
   utxoDelegationAndRewards: async () => {
     const delegationAndRewards = {
       delegate,
