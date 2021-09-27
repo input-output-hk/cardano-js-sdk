@@ -1,5 +1,4 @@
-import { BigIntMath } from '@cardano-sdk/core';
-import { CSL } from '@cardano-sdk/cardano-serialization-lib';
+import { BigIntMath, CSL } from '@cardano-sdk/core';
 import { uniq } from 'lodash-es';
 import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
 import { ValueQuantities, valueToValueQuantities } from '../util';

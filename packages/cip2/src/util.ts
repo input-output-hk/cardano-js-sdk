@@ -1,8 +1,7 @@
 // TODO: move these utils to either core package.
 // Current implementation of ogmiosToCsl.value() uses number instead of bigint for lovelace.
 // These utils should be moved after CSL is updated to use bigint.
-import { CardanoSerializationLib, CSL } from '@cardano-sdk/cardano-serialization-lib';
-import { Asset, Ogmios } from '@cardano-sdk/core';
+import { CardanoSerializationLib, CSL, Asset, Ogmios } from '@cardano-sdk/core';
 
 export type AssetQuantities = Ogmios.util.AssetQuantities;
 export type ValueQuantities = Ogmios.util.ValueQuantities;

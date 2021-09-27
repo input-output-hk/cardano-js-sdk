@@ -1,5 +1,4 @@
-import { CardanoSerializationLib, loadCardanoSerializationLib } from '@cardano-sdk/cardano-serialization-lib';
-import { Asset } from '@cardano-sdk/core';
+import { CardanoSerializationLib, loadCardanoSerializationLib, Asset } from '@cardano-sdk/core';
 import {
   transactionOutputsToArray,
   ValueQuantities,

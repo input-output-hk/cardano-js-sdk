@@ -1,4 +1,4 @@
-import { CardanoSerializationLib, loadCardanoSerializationLib } from '@cardano-sdk/cardano-serialization-lib';
+import { CardanoSerializationLib, loadCardanoSerializationLib } from '../../src/CSL';
 import { ogmiosToCsl } from '../../src/Ogmios';
 import * as OgmiosSchema from '@cardano-ogmios/schema';
 

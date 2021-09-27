@@ -19,7 +19,6 @@
     "coverage": "shx echo No coverage report for this package"
   },
   "devDependencies": {
-    "@cardano-sdk/cardano-serialization-lib": "0.1.0",
     "shx": "^0.3.3"
   },
   "dependencies": {

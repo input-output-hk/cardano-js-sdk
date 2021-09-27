@@ -1,4 +1,4 @@
-import { loadCardanoSerializationLib } from '@cardano-sdk/cardano-serialization-lib';
+import { loadCardanoSerializationLib } from '@cardano-sdk/core';
 import { createAssetId, parseAssetId } from '../../src/Asset/util';
 import { Buffer } from 'buffer';
 

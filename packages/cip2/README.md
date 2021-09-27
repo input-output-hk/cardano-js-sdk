@@ -8,7 +8,7 @@ Currently there is only 1 input selection algorithm: RoundRobinRandomImprove, wh
 
 ```typescript
 import { roundRobinRandomImprove, InputSelector, SelectionResult, SelectionConstraints } from '@cardano-sdk/cip2';
-import { loadCardanoSerializationLib, CSL, CardanoSerializationLib } from '@cardano-sdk/cardano-serialization-lib';
+import { loadCardanoSerializationLib, CSL, CardanoSerializationLib } from '@cardano-sdk/core';
 import { ProtocolParametersAlonzo } from '@cardano-ogmios/schema';
 
 const demo = async ({ coinsPerUtxoWord }: ProtocolParametersAlonzo): Promise<SelectionResult> => {

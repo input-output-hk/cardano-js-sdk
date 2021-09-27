@@ -1,6 +1,5 @@
 import Schema from '@cardano-ogmios/schema';
-import { CardanoSerializationLib, CSL } from '@cardano-sdk/cardano-serialization-lib';
-import { CardanoProvider, Ogmios, Transaction } from '@cardano-sdk/core';
+import { CardanoProvider, Ogmios, Transaction, CardanoSerializationLib, CSL } from '@cardano-sdk/core';
 import { createTransactionInternals, KeyManagement, TxInternals, UtxoRepository } from './';
 import { dummyLogger, Logger } from 'ts-log';
 

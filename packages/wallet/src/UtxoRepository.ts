@@ -1,6 +1,6 @@
 import Schema from '@cardano-ogmios/schema';
 import { SelectionConstraints, SelectionResult } from '@cardano-sdk/cip2';
-import { CSL } from '@cardano-sdk/cardano-serialization-lib';
+import { CSL } from '@cardano-sdk/core';
 
 export interface UtxoRepository {
   allUtxos: Schema.Utxo;

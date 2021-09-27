@@ -5,8 +5,7 @@
   },
   "references": [
     { "path": "../src" },
-    { "path": "../../core/src" },
-    { "path": "../../cardano-serialization-lib/src" }
+    { "path": "../../core/src" }
   ]
 }
 

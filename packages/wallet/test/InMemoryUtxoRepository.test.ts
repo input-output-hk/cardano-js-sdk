@@ -1,8 +1,7 @@
-import { CardanoProvider, Ogmios } from '@cardano-sdk/core';
+import { loadCardanoSerializationLib, CardanoSerializationLib, CSL, CardanoProvider, Ogmios } from '@cardano-sdk/core';
 import { UtxoRepository } from '@src/UtxoRepository';
 import { InMemoryUtxoRepository } from '@src/InMemoryUtxoRepository';
 import { roundRobinRandomImprove, InputSelector } from '@cardano-sdk/cip2';
-import { loadCardanoSerializationLib, CardanoSerializationLib, CSL } from '@cardano-sdk/cardano-serialization-lib';
 import { providerStub, delegate, rewards } from './ProviderStub';
 import { createInMemoryKeyManager, util } from '@cardano-sdk/in-memory-key-manager';
 import { NO_CONSTRAINTS } from './util';

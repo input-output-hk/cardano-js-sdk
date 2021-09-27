@@ -1,4 +1,4 @@
-import { loadCardanoSerializationLib } from '@src/loadCardanoSerializationLib';
+import { loadCardanoSerializationLib } from '../../src/CSL/loadCardanoSerializationLib';
 
 describe('loadLibrary', () => {
   it('loads the appropriate library in Node.js', async () => {
