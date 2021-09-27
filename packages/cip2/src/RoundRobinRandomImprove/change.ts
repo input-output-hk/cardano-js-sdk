@@ -84,25 +84,23 @@ const createBundlePerOutput = (
 ) => {
   let totalCoinBundled = 0n;
   const totalAssetsBundled: Record<string, bigint> = {};
-  const bundles = outputsWithTotals
-    .map(({ totals: outputTotals }) => {
-      const coins = coinTotalRequested > 0n ? (coinChangeTotal * outputTotals.coins) / coinTotalRequested : 0n;
-      totalCoinBundled += coins;
-      if (!outputTotals.assets) {
-        return { coins };
-      }
-      const assets: AssetQuantities = {};
-      for (const assetId of Object.keys(outputTotals.assets)) {
-        const outputAmount = outputTotals.assets[assetId] || 0n;
-        const { selected, requested } = assetTotals[assetId];
-        const assetChangeTotal = selected - requested;
-        const assetChange = (assetChangeTotal * outputAmount) / selected;
-        totalAssetsBundled[assetId] = (totalAssetsBundled[assetId] || 0n) + assetChange;
-        assets[assetId] = assetChange;
-      }
-      return { coins, assets };
-    })
-    .filter(({ coins, assets }) => coins > 0n || (assets && Object.keys(assets).length > 0));
+  const bundles = outputsWithTotals.map(({ totals: outputTotals }) => {
+    const coins = coinTotalRequested > 0n ? (coinChangeTotal * outputTotals.coins) / coinTotalRequested : 0n;
+    totalCoinBundled += coins;
+    if (!outputTotals.assets) {
+      return { coins };
+    }
+    const assets: AssetQuantities = {};
+    for (const assetId of Object.keys(outputTotals.assets)) {
+      const outputAmount = outputTotals.assets[assetId];
+      const { selected, requested } = assetTotals[assetId];
+      const assetChangeTotal = selected - requested;
+      const assetChange = (assetChangeTotal * outputAmount) / selected;
+      totalAssetsBundled[assetId] = (totalAssetsBundled[assetId] || 0n) + assetChange;
+      assets[assetId] = assetChange;
+    }
+    return { coins, assets };
+  });
   return { totalCoinBundled, bundles, totalAssetsBundled };
 };
 
@@ -147,8 +145,7 @@ const computeRequestedAssetChangeBundles = (
     const assetTotal = assetTotals[assetId];
     const assetLost = assetTotal.selected - assetTotal.requested - totalAssetsBundled[assetId];
     if (assetLost > 0n) {
-      const anyBundle = bundles.find(({ assets }) => assets?.[assetId]) || bundles[0];
-      anyBundle.assets ||= {};
+      const anyBundle = bundles.find(({ assets }) => typeof assets?.[assetId] === 'bigint');
       anyBundle.assets[assetId] = (anyBundle.assets[assetId] || 0n) + assetLost;
     }
   }
@@ -175,9 +172,6 @@ const coalesceChangeBundlesForMinCoinRequirement = (
   changeBundles: ValueQuantities[],
   computeMinimumCoinQuantity: ComputeMinimumCoinQuantity
 ): ValueQuantities[] | undefined => {
-  if (changeBundles.length === 0) {
-    return changeBundles;
-  }
   let sortedBundles = orderBy(changeBundles, ({ coins }) => coins, 'desc');
   const satisfiesMinCoinRequirement = (valueQuantities: ValueQuantities) =>
     valueQuantities.coins >= computeMinimumCoinQuantity(valueQuantitiesToValue(valueQuantities, csl).multiasset());
@@ -196,7 +190,9 @@ const coalesceChangeBundlesForMinCoinRequirement = (
     // eslint-disable-next-line consistent-return
     return undefined;
   }
-  return sortedBundles;
+  // Filter empty bundles
+  // eslint-disable-next-line consistent-return
+  return sortedBundles.filter((bundle) => bundle.coins > 0n || Object.keys(bundle.assets || {}).length > 0);
 };
 
 const computeChangeBundles = (
@@ -279,7 +275,6 @@ export const computeChangeAndAdjustForFee = async ({
 
   if (getCoinQuantity(changeBundles.map((totals) => ({ totals }))) < fee) {
     if (utxoRemaining.length === 0) {
-      // This is not tested
       throw new InputSelectionError(InputSelectionFailure.UtxoBalanceInsufficient);
     }
     // Recompute change and fee with an extra selected UTxO

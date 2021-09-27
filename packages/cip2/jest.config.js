@@ -4,5 +4,5 @@ module.exports = {
   transform: {
     "^.+\\.test.ts?$": "ts-jest"
   },
-  testTimeout: 120000
+  testTimeout: process.env.CI ? 120000 : 12000,
 }

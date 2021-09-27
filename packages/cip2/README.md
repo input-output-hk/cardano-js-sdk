@@ -37,5 +37,16 @@ const demo = async ({ coinsPerUtxoWord }: ProtocolParametersAlonzo): Promise<Sel
 };
 ```
 
+## Tests
+
+Input selection is tested with property-based tests using [fast-check], as well as a few regular example-based tests.
+
+Due to nature of property-based tests, code coverage report is slightly different on each build.
+
+RoundRobinRandomImprove has 100% code coverage when using high `numRuns` option (e.g. 100_000).
+
+Note that to run it with high `numRuns` you need to increase _Jest_ and _fast-check_ timeout.
+
 [cip-0002]: https://cips.cardano.org/cips/cip2/
 [random-improve]: https://cips.cardano.org/cips/cip2/#randomimprove
+[fast-check]: https://github.com/dubzzz/fast-check
