@@ -50,13 +50,13 @@ describe('RoundRobinRandomImprove', () => {
           await testInputSelectionFailureMode({
             getAlgorithm: getRoundRobinRandomImprove,
             createUtxo: (utils) => [
-              utils.createUnspentTxOutput({ coins: 4_910_000n }),
+              utils.createUnspentTxOutput({ coins: 4_000_000n }),
               utils.createUnspentTxOutput({ coins: 5_000_000n })
             ],
-            createOutputs: (utils) => [utils.createOutput({ coins: 10_000_000n })],
+            createOutputs: (utils) => [utils.createOutput({ coins: 9_000_000n })],
             mockConstraints: {
               ...NO_CONSTRAINTS,
-              minimumCost: 100_000n
+              minimumCost: 1n
             },
             expectedError: InputSelectionFailure.UtxoBalanceInsufficient
           });
@@ -160,14 +160,7 @@ describe('RoundRobinRandomImprove', () => {
             throw error;
           }
         }
-      }),
-      {
-        interruptAfterTimeLimit: 100_000,
-        markInterruptAsFailure: true,
-        // Review: we probably want to use low numRuns in development and high numRuns in CI.
-        // 500 is too low when generating constraints. 1000 is fine, but leaves a few untested paths.
-        numRuns: 1000
-      }
+      })
     );
   });
 });
