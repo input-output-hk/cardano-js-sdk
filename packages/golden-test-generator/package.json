@@ -21,7 +21,8 @@
     "prestart": "yarn build",
     "start": "API_PORT=3000 OGMIOS_HOST=localhost OGMIOS_PORT=1337 ts-node ./src/index.ts",
     "pretest": "yarn build",
-    "test": "jest -c ./test/jest.config.js"
+    "test": "jest -c ./test/jest.config.js",
+    "coverage": "shx echo No coverage report for this package"
   },
   "dependencies": {
     "@cardano-ogmios/client": "^4.0.0-beta.6",
