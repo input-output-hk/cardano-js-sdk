@@ -1,1 +1,2 @@
-export * from './Tx';
+export * from './ValidityInterval';
+export * from './WithHash';

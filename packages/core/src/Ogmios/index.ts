@@ -1,2 +1,2 @@
-export * from './OgmiosToCardanoWasm';
+export * from './ogmiosToCsl';
 export * as util from './util';

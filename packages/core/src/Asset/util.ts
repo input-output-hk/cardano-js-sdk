@@ -1,5 +1,4 @@
-import { CardanoSerializationLib } from '@cardano-sdk/cardano-serialization-lib';
-import { AssetName, ScriptHash } from '@emurgo/cardano-serialization-lib-nodejs';
+import { CardanoSerializationLib, CSL } from '@cardano-sdk/cardano-serialization-lib';
 import { Buffer } from 'buffer';
 
 export const policyIdFromAssetId = (assetId: string): string => assetId.slice(0, 56);
@@ -8,7 +7,7 @@ export const assetNameFromAssetId = (assetId: string): string => assetId.slice(5
 /**
  * @returns {string} concatenated hex-encoded policy id and asset name
  */
-export const createAssetId = (scriptHash: ScriptHash, assetName: AssetName): string =>
+export const createAssetId = (scriptHash: CSL.ScriptHash, assetName: CSL.AssetName): string =>
   Buffer.from(scriptHash.to_bytes()).toString('hex') + Buffer.from(assetName.name()).toString('hex');
 
 export const parseAssetId = (assetId: string, csl: CardanoSerializationLib) => {

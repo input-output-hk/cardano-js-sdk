@@ -1,5 +1,5 @@
 // TODO: move these utils to either core package.
-// Current impelmentation of OgmiosToCardanoWasm.value() uses number instead of bigint for lovelace.
+// Current implementation of ogmiosToCsl.value() uses number instead of bigint for lovelace.
 // These utils should be moved after CSL is updated to use bigint.
 import { CardanoSerializationLib, CSL } from '@cardano-sdk/cardano-serialization-lib';
 import { Asset, Ogmios } from '@cardano-sdk/core';
@@ -41,9 +41,7 @@ export const valueToValueQuantities = (value: CSL.Value): ValueQuantities => {
   return result;
 };
 
-// This is equivalent to OgmiosToCardanoWasm.value(), so they should be merged.
-// Note that current implementation of OgmiosToCardanoWasm
-// imports nodejs version of CSL, so it cannot be used in browser.
+// This is equivalent to ogmiosToCsl.value(), so they should be merged.
 export const valueQuantitiesToValue = ({ coins, assets }: ValueQuantities, csl: CardanoSerializationLib): CSL.Value => {
   const value = csl.Value.new(csl.BigNum.from_str(coins.toString()));
   if (!assets) {

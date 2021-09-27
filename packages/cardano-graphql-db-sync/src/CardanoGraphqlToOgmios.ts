@@ -1,5 +1,5 @@
 import { Schema as Cardano } from '@cardano-ogmios/client';
-import { ProtocolParametersRequiredByWallet, Tx } from '@cardano-sdk/core';
+import { ProtocolParametersRequiredByWallet, Transaction } from '@cardano-sdk/core';
 import { Block } from '@cardano-graphql/client-ts';
 
 type GraphqlTransaction = {
@@ -31,7 +31,7 @@ export type GraphqlCurrentWalletProtocolParameters = {
 export type CardanoGraphQlTip = Pick<Block, 'hash' | 'number' | 'slotNo'>;
 
 export const CardanoGraphqlToOgmios = {
-  graphqlTransactionsToCardanoTxs: (transactions: GraphqlTransaction[]): Tx[] =>
+  graphqlTransactionsToCardanoTxs: (transactions: GraphqlTransaction[]): Transaction.WithHash[] =>
     transactions.map((tx) => ({
       hash: tx.hash,
       inputs: tx.inputs.map((index) => ({ txId: index.txHash, index: index.sourceTxIndex })),
