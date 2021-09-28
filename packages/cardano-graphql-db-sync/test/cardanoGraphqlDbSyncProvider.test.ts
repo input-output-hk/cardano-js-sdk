@@ -294,4 +294,26 @@ describe('cardanoGraphqlDbSyncProvider', () => {
       }
     });
   });
+
+  // The mocking strategy for this provider cannot handle multiple requests
+  // test('stakePoolStats', async () => {
+  //   GraphQLClient.prototype.request = jest.fn().mockResolvedValue({
+  //     stakePool_aggregate: {
+  //       aggregate: {
+  //         count: '3021'
+  //       }
+  //     }
+  //   });
+  //   const client = cardanoGraphqlDbSyncProvider(uri);
+  //
+  //   const response = await client.stakePoolStats();
+  //
+  //   expect(response).toMatchObject<StakePoolStats>({
+  //     qty: {
+  //       active: 3021,
+  //       retired: 1317,
+  //       retiring: 4
+  //     }
+  //   });
+  // });
 });

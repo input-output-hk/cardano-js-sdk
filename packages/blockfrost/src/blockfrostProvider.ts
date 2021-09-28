@@ -43,6 +43,24 @@ export const blockfrostProvider = (options: Options): CardanoProvider => {
     };
   };
 
+  const stakePoolStats: CardanoProvider['stakePoolStats'] = async () => {
+    const tallyPools = async (query: 'pools' | 'poolsRetired' | 'poolsRetiring', count = 0, page = 1) => {
+      const result = await blockfrost[query]({ page });
+      const newCount = count + result.length;
+      if (result.length === 100) {
+        await tallyPools(query, newCount, page + 1);
+      }
+      return newCount;
+    };
+    return {
+      qty: {
+        active: await tallyPools('pools'),
+        retired: await tallyPools('poolsRetired'),
+        retiring: await tallyPools('poolsRetiring')
+      }
+    };
+  };
+
   const submitTx: CardanoProvider['submitTx'] = async (signedTransaction) => {
     try {
       const hash = await blockfrost.txSubmit(signedTransaction.to_bytes());
@@ -101,6 +119,7 @@ export const blockfrostProvider = (options: Options): CardanoProvider => {
   return {
     ledgerTip,
     networkInfo,
+    stakePoolStats,
     submitTx,
     utxoDelegationAndRewards,
     queryTransactionsByAddresses,

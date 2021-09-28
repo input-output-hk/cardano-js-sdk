@@ -117,6 +117,95 @@ export const cardanoGraphqlDbSyncProvider = (uri: string): CardanoProvider => {
     };
   };
 
+  const stakePoolStats: CardanoProvider['stakePoolStats'] = async () => {
+    const currentEpochResponse = await client.request<{
+      cardano: {
+        currentEpoch: {
+          number: number;
+        };
+      };
+    }>(gql`
+      query {
+        cardano {
+          currentEpoch {
+            number
+          }
+        }
+      }
+    `);
+
+    const currentEpochNo = currentEpochResponse.cardano.currentEpoch.number;
+
+    // It's not possible to alias the fields, so multiple requests are needed:
+    // See https://github.com/input-output-hk/cardano-graphql/issues/164
+
+    type Response = {
+      stakePool_aggregate: {
+        aggregate: {
+          count: string;
+        };
+      };
+    };
+
+    const activeResponse = await client.request<Response>(
+      gql`
+        query ActiveStakePoolsCount {
+          active: stakePools_aggregate(where: { _not: { retirements: { announcedIn: {} } } }) {
+            aggregate {
+              count
+            }
+          }
+        }
+      `
+    );
+
+    const retiredResponse = await client.request<Response>(
+      gql`
+        query RetiredStakePoolsCount($currentEpochNo: Int) {
+          stakePools_aggregate(where: { retirements: { _and: { inEffectFrom: { _lte: $currentEpochNo } } } }) {
+            aggregate {
+              count
+            }
+          }
+        }
+      `,
+      {
+        currentEpochNo
+      }
+    );
+
+    const retiringResponse = await client.request<Response>(
+      gql`
+        query RetiringStakePoolsCount($currentEpochNo: Int) {
+          stakePools_aggregate(
+            where: {
+              retirements: {
+                _and: {
+                  announcedIn: { block: { epoch: { number: { _lte: $currentEpochNo } } } }
+                  inEffectFrom: { _gt: $currentEpochNo }
+                }
+              }
+            }
+          ) {
+            aggregate {
+              count
+            }
+          }
+        }
+      `,
+      {
+        currentEpochNo
+      }
+    );
+    return {
+      qty: {
+        active: Number(activeResponse.stakePool_aggregate.aggregate.count),
+        retired: Number(retiredResponse.stakePool_aggregate.aggregate.count),
+        retiring: Number(retiringResponse.stakePool_aggregate.aggregate.count)
+      }
+    };
+  };
+
   const submitTx: CardanoProvider['submitTx'] = async (signedTransaction) => {
     try {
       const mutation = gql`
@@ -267,6 +356,7 @@ export const cardanoGraphqlDbSyncProvider = (uri: string): CardanoProvider => {
   return {
     ledgerTip,
     networkInfo,
+    stakePoolStats,
     submitTx,
     utxoDelegationAndRewards,
     queryTransactionsByAddresses,

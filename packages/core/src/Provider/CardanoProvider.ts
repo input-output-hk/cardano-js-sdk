@@ -30,6 +30,14 @@ export type StakeSummary = {
   live: Lovelace;
 };
 
+export type StakePoolStats = {
+  qty: {
+    active: number;
+    retired: number;
+    retiring: number;
+  };
+};
+
 export type NetworkInfo = {
   currentEpoch: {
     number: Cardano.Epoch;
@@ -49,6 +57,7 @@ export type NetworkInfo = {
 export interface CardanoProvider {
   ledgerTip: () => Promise<Cardano.Tip>;
   networkInfo: () => Promise<NetworkInfo>;
+  stakePoolStats?: () => Promise<StakePoolStats>;
   /** @param signedTransaction signed and serialized cbor */
   submitTx: (tx: CSL.Transaction) => Promise<boolean>;
   utxoDelegationAndRewards: (
