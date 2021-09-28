@@ -3,11 +3,104 @@
 import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
 import { blockfrostProvider } from '../src';
 import { Schema as Cardano } from '@cardano-ogmios/client';
-import { Transaction } from '@cardano-sdk/core';
+import { NetworkInfo, StakePoolStats, Transaction } from '@cardano-sdk/core';
 jest.mock('@blockfrost/blockfrost-js');
 
 describe('blockfrostProvider', () => {
   const apiKey = 'someapikey';
+
+  test('networkInfo', async () => {
+    const mockedEpochsLatestResponse = {
+      epoch: 158,
+      start_time: 1_632_255_616,
+      end_time: 1_632_687_616,
+      first_block_time: 1_632_255_656,
+      last_block_time: 1_632_571_205,
+      block_count: 9593,
+      tx_count: 20_736,
+      output: '10876219159738237',
+      fees: '4426764732',
+      active_stake: '1060378314781343'
+    } as Responses['epoch_content'];
+
+    const mockedNetworkResponse = {
+      stake: {
+        live: '15001884895856815',
+        active: '1060378314781343'
+      },
+      supply: {
+        max: '45000000000000000',
+        total: '40267211394073980',
+        circulating: '42064399450423723',
+        locked: '6161981104458'
+      }
+    } as Responses['network'];
+
+    BlockFrostAPI.prototype.epochsLatest = jest.fn().mockResolvedValue(mockedEpochsLatestResponse);
+    BlockFrostAPI.prototype.network = jest.fn().mockResolvedValue(mockedNetworkResponse);
+
+    const client = blockfrostProvider({ projectId: apiKey, isTestnet: true });
+    const response = await client.networkInfo();
+
+    expect(response).toMatchObject<NetworkInfo>({
+      currentEpoch: {
+        end: {
+          date: new Date(1_632_687_616)
+        },
+        number: 158,
+        start: {
+          date: new Date(1_632_255_616)
+        }
+      },
+      lovelaceSupply: {
+        circulating: 42_064_399_450_423_723n,
+        max: 45_000_000_000_000_000n,
+        total: 40_267_211_394_073_980n
+      },
+      stake: {
+        active: 1_060_378_314_781_343n,
+        live: 15_001_884_895_856_815n
+      }
+    });
+  });
+
+  test('stakePoolStats', async () => {
+    const mockedActivePoolsResponse = [
+      'pool1adur9jcn0dkjpm3v8ayf94yn3fe5xfk2rqfz7rfpuh6cw6evd7w',
+      'pool18kd2k7kqt9gje9y0azahww4dqak9azeeg8ayl0xl7dzewg70vlf',
+      'pool13dgxp4ph2ut5datuh5na4wy7hrnqgkj4fyvac3e8fzfqcc7qh0h',
+      'pool1wnf793xkgrw3s800tfdkkg3s3ddgxkucenahzs7490g4q0cpe0v',
+      'pool156gxlrk0e3phxadasa33yzk9e94wg7tv3au02jge8eanv9zc4ym',
+      'pool1znzwjv7cr7zjdnsncrg6jrtxwd3myys9p63sj3jajpnn22mwcy2',
+      'pool1qa22ym0t8w9fg0ejlp0duhzcy6a24uyfjsyx5jugrjw6wsfetyd'
+    ] as Responses['pool_list'];
+
+    const mockedRetiredPoolsResponse = [
+      'pool1adur9jcn0dkjpm3v8ayf94yn3fe5xfk2rqfz7rfpuh6cw6evd7w',
+      'pool18kd2k7kqt9gje9y0azahww4dqak9azeeg8ayl0xl7dzewg70vlf',
+      'pool1qa22ym0t8w9fg0ejlp0duhzcy6a24uyfjsyx5jugrjw6wsfetyd'
+    ] as Responses['pool_list'];
+
+    const mockedRetiringPoolsResponse = [
+      'pool1adur9jcn0dkjpm3v8ayf94yn3fe5xfk2rqfz7rfpuh6cw6evd7w',
+      'pool13dgxp4ph2ut5datuh5na4wy7hrnqgkj4fyvac3e8fzfqcc7qh0h'
+    ] as Responses['pool_list'];
+
+    BlockFrostAPI.prototype.pools = jest.fn().mockResolvedValue(mockedActivePoolsResponse);
+    BlockFrostAPI.prototype.poolsRetired = jest.fn().mockResolvedValue(mockedRetiredPoolsResponse);
+    BlockFrostAPI.prototype.poolsRetiring = jest.fn().mockResolvedValue(mockedRetiringPoolsResponse);
+
+    const client = blockfrostProvider({ projectId: apiKey, isTestnet: true });
+    const response = await client.stakePoolStats();
+
+    expect(response).toMatchObject<StakePoolStats>({
+      qty: {
+        active: 7,
+        retired: 3,
+        retiring: 2
+      }
+    });
+  });
 
   test('utxoDelegationAndRewards', async () => {
     const addressesUtxosAllMockResponse = [
@@ -339,8 +432,8 @@ describe('blockfrostProvider', () => {
       next_block: null,
       confirmations: 0
     } as Responses['block_content'];
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    BlockFrostAPI.prototype.blocksLatest = jest.fn().mockResolvedValue(mockedResponse) as any;
+
+    BlockFrostAPI.prototype.blocksLatest = jest.fn().mockResolvedValue(mockedResponse);
 
     const client = blockfrostProvider({ projectId: apiKey, isTestnet: true });
     const response = await client.ledgerTip();

@@ -18,6 +18,49 @@ export const blockfrostProvider = (options: Options): CardanoProvider => {
     return BlockfrostToOgmios.blockToTip(block);
   };
 
+  const networkInfo: CardanoProvider['networkInfo'] = async () => {
+    const currentEpoch = await blockfrost.epochsLatest();
+    const { stake, supply } = await blockfrost.network();
+    return {
+      currentEpoch: {
+        end: {
+          date: new Date(currentEpoch.end_time)
+        },
+        number: currentEpoch.epoch,
+        start: {
+          date: new Date(currentEpoch.start_time)
+        }
+      },
+      lovelaceSupply: {
+        circulating: BigInt(supply.circulating),
+        max: BigInt(supply.max),
+        total: BigInt(supply.total)
+      },
+      stake: {
+        active: BigInt(stake.active),
+        live: BigInt(stake.live)
+      }
+    };
+  };
+
+  const stakePoolStats: CardanoProvider['stakePoolStats'] = async () => {
+    const tallyPools = async (query: 'pools' | 'poolsRetired' | 'poolsRetiring', count = 0, page = 1) => {
+      const result = await blockfrost[query]({ page });
+      const newCount = count + result.length;
+      if (result.length === 100) {
+        await tallyPools(query, newCount, page + 1);
+      }
+      return newCount;
+    };
+    return {
+      qty: {
+        active: await tallyPools('pools'),
+        retired: await tallyPools('poolsRetired'),
+        retiring: await tallyPools('poolsRetiring')
+      }
+    };
+  };
+
   const submitTx: CardanoProvider['submitTx'] = async (signedTransaction) => {
     try {
       const hash = await blockfrost.txSubmit(signedTransaction.to_bytes());
@@ -75,6 +118,8 @@ export const blockfrostProvider = (options: Options): CardanoProvider => {
 
   return {
     ledgerTip,
+    networkInfo,
+    stakePoolStats,
     submitTx,
     utxoDelegationAndRewards,
     queryTransactionsByAddresses,

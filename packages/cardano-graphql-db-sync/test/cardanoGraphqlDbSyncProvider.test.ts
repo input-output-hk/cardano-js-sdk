@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 
 import { GraphQLClient } from 'graphql-request';
-import { ProtocolParametersRequiredByWallet, Transaction } from '@cardano-sdk/core';
+import { NetworkInfo, ProtocolParametersRequiredByWallet, Transaction } from '@cardano-sdk/core';
 import { cardanoGraphqlDbSyncProvider } from '../src';
 import { Schema as Cardano } from '@cardano-ogmios/client';
 jest.mock('graphql-request');
@@ -242,4 +242,78 @@ describe('cardanoGraphqlDbSyncProvider', () => {
       slot: 36_370_316
     });
   });
+
+  test('networkInfo', async () => {
+    const mockedResponse = {
+      activeStake_aggregate: {
+        aggregate: {
+          sum: {
+            amount: '1663852188977832700'
+          }
+        }
+      },
+      ada: {
+        supply: {
+          circulating: '32825132667938671',
+          max: '45000000000000000',
+          total: '33139680532518730'
+        }
+      },
+      cardano: {
+        currentEpoch: {
+          lastBlockTime: '2021-09-28T04:59:09Z',
+          number: 290,
+          startedAt: '2021-09-27T21:46:53Z'
+        }
+      }
+    };
+
+    GraphQLClient.prototype.request = jest.fn().mockResolvedValue(mockedResponse);
+    const client = cardanoGraphqlDbSyncProvider(uri);
+
+    const response = await client.networkInfo();
+
+    expect(response).toMatchObject<NetworkInfo>({
+      currentEpoch: {
+        end: {
+          date: new Date('2021-09-28T04:59:09Z')
+        },
+        number: 290,
+        start: {
+          date: new Date('2021-09-27T21:46:53Z')
+        }
+      },
+      lovelaceSupply: {
+        circulating: 32_825_132_667_938_671n,
+        max: 45_000_000_000_000_000n,
+        total: 33_139_680_532_518_730n
+      },
+      stake: {
+        active: 1_663_852_188_977_832_700n,
+        live: 0n
+      }
+    });
+  });
+
+  // The mocking strategy for this provider cannot handle multiple requests
+  // test('stakePoolStats', async () => {
+  //   GraphQLClient.prototype.request = jest.fn().mockResolvedValue({
+  //     stakePool_aggregate: {
+  //       aggregate: {
+  //         count: '3021'
+  //       }
+  //     }
+  //   });
+  //   const client = cardanoGraphqlDbSyncProvider(uri);
+  //
+  //   const response = await client.stakePoolStats();
+  //
+  //   expect(response).toMatchObject<StakePoolStats>({
+  //     qty: {
+  //       active: 3021,
+  //       retired: 1317,
+  //       retiring: 4
+  //     }
+  //   });
+  // });
 });
