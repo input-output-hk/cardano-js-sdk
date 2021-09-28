@@ -36,9 +36,8 @@ describe('blockfrostProvider', () => {
       }
     } as Responses['network'];
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    BlockFrostAPI.prototype.epochsLatest = jest.fn().mockResolvedValue(mockedEpochsLatestResponse) as any;
-    BlockFrostAPI.prototype.network = jest.fn().mockResolvedValue(mockedNetworkResponse) as any;
+    BlockFrostAPI.prototype.epochsLatest = jest.fn().mockResolvedValue(mockedEpochsLatestResponse);
+    BlockFrostAPI.prototype.network = jest.fn().mockResolvedValue(mockedNetworkResponse);
 
     const client = blockfrostProvider({ projectId: apiKey, isTestnet: true });
     const response = await client.networkInfo();
@@ -87,10 +86,9 @@ describe('blockfrostProvider', () => {
       'pool13dgxp4ph2ut5datuh5na4wy7hrnqgkj4fyvac3e8fzfqcc7qh0h'
     ] as Responses['pool_list'];
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    BlockFrostAPI.prototype.pools = jest.fn().mockResolvedValue(mockedActivePoolsResponse) as any;
-    BlockFrostAPI.prototype.poolsRetired = jest.fn().mockResolvedValue(mockedRetiredPoolsResponse) as any;
-    BlockFrostAPI.prototype.poolsRetiring = jest.fn().mockResolvedValue(mockedRetiringPoolsResponse) as any;
+    BlockFrostAPI.prototype.pools = jest.fn().mockResolvedValue(mockedActivePoolsResponse);
+    BlockFrostAPI.prototype.poolsRetired = jest.fn().mockResolvedValue(mockedRetiredPoolsResponse);
+    BlockFrostAPI.prototype.poolsRetiring = jest.fn().mockResolvedValue(mockedRetiringPoolsResponse);
 
     const client = blockfrostProvider({ projectId: apiKey, isTestnet: true });
     const response = await client.stakePoolStats();
@@ -434,8 +432,8 @@ describe('blockfrostProvider', () => {
       next_block: null,
       confirmations: 0
     } as Responses['block_content'];
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    BlockFrostAPI.prototype.blocksLatest = jest.fn().mockResolvedValue(mockedResponse) as any;
+
+    BlockFrostAPI.prototype.blocksLatest = jest.fn().mockResolvedValue(mockedResponse);
 
     const client = blockfrostProvider({ projectId: apiKey, isTestnet: true });
     const response = await client.ledgerTip();
