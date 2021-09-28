@@ -20,6 +20,9 @@
   "devDependencies": {
     "shx": "^0.3.3"
   },
+  "browser": {
+    "./dist/CSL/nodejs.js": false
+  },
   "dependencies": {
     "@cardano-ogmios/schema": "^4.0.0-beta.6",
     "@emurgo/cardano-serialization-lib-nodejs": "8.0.0",
