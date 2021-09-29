@@ -7,11 +7,11 @@ Currently there is only 1 input selection algorithm: RoundRobinRandomImprove, wh
 ## Usage Example
 
 ```typescript
-import { roundRobinRandomImprove, InputSelector, SelectionResult, SelectionConstraints } from '@cardano-sdk/cip2';
-import { loadCardanoSerializationLib, CSL, CardanoSerializationLib } from '@cardano-sdk/core';
+import { roundRobinRandomImprove, defaultSelectionConstraints, InputSelector, SelectionResult, SelectionSkeleton } from '@cardano-sdk/cip2';
+import { loadCardanoSerializationLib, CSL, CardanoSerializationLib, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
 import { ProtocolParametersAlonzo } from '@cardano-ogmios/schema';
 
-const demo = async ({ coinsPerUtxoWord }: ProtocolParametersAlonzo): Promise<SelectionResult> => {
+const demo = async (protocolParameters: ProtocolParametersRequiredByWallet): Promise<SelectionResult> => {
   const csl: CardanoSerializationLib = await loadCardanoSerializationLib();
   const selector: InputSelector = roundRobinRandomImprove(csl, coinsPerUtxoWord);
   // It is important that you use the same instance of cardano-serialization-lib across your application.
@@ -19,15 +19,11 @@ const demo = async ({ coinsPerUtxoWord }: ProtocolParametersAlonzo): Promise<Sel
   // Good: csl.TransactionUnspentOutput.new(...)
   const utxo: CSL.TransactionUnspentOutput[] = [csl.TransactionUnspentOutput.new(...), ...];
   const outputs: CSL.TransactionOutputs = csl.TransactionOutputs.new(...);
-  const constraints: SelectionConstraints = {
-    computeMinimumCoinQuantity: (): bigint => coinsPerUtxoWord * 29n,
-    tokenBundleSizeExceedsLimit: (tokenBundle: CSL.MultiAsset): boolean =>
-      throw new Error('Return true if token bundle is too large'),
-    computeMinimumCost: (): Promise<bigint> =>
-      throw new Error('Build the transaction and estimate minimum fee'),
-    computeSelectionLimit: (): Promise<number> =>
-      throw new Error('Compute max number of selected input utxo to not exceed max transaction size'),
-  };
+  // Used to estimate min fee and validate transaction size
+  const buildTx = (inputSelection: SelectionSkeleton): Promise<CSL.Transaction> => {...};
+  const constraints = defaultSelectionConstraints({
+    csl, protocolParameters, buildTx,
+  });
 
   return selector.select({
     utxo,
