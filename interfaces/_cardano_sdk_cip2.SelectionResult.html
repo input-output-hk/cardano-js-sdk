@@ -98,7 +98,7 @@
 					<div class="tsd-signature tsd-kind-icon">remainingUTxO<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">TransactionUnspentOutput</span><span class="tsd-signature-symbol">[]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cb48551/packages/cip2/src/types.ts#L34">packages/cip2/src/types.ts:34</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/ca25342/packages/cip2/src/types.ts#L34">packages/cip2/src/types.ts:34</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -112,10 +112,10 @@
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="selection" class="tsd-anchor"></a>
 					<h3>selection</h3>
-					<div class="tsd-signature tsd-kind-icon">selection<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>change<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Value</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">; </span>fee<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">bigint</span><span class="tsd-signature-symbol">; </span>inputs<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TransactionUnspentOutput</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">; </span>outputs<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TransactionOutputs</span><span class="tsd-signature-symbol"> }</span></div>
+					<div class="tsd-signature tsd-kind-icon">selection<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>change<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Value</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">; </span>fee<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">BigNum</span><span class="tsd-signature-symbol">; </span>inputs<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TransactionUnspentOutput</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">; </span>outputs<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TransactionOutputs</span><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cb48551/packages/cip2/src/types.ts#L4">packages/cip2/src/types.ts:4</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/ca25342/packages/cip2/src/types.ts#L4">packages/cip2/src/types.ts:4</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -131,7 +131,7 @@
 								</div>
 							</li>
 							<li class="tsd-parameter">
-								<h5>fee<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">bigint</span></h5>
+								<h5>fee<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">BigNum</span></h5>
 								<div class="tsd-comment tsd-typography">
 									<div class="lead">
 										<p>Estimated fee for the transaction.
@@ -194,6 +194,9 @@
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="_cardano_sdk_cip2.DefaultSelectionConstraintsProps.html" class="tsd-kind-icon">Default<wbr>Selection<wbr>Constraints<wbr>Props</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
 						<a href="_cardano_sdk_cip2.InputSelectionParameters.html" class="tsd-kind-icon">Input<wbr>Selection<wbr>Parameters</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
@@ -221,6 +224,9 @@
 						<a href="_cardano_sdk_cip2.SelectionSkeleton.html" class="tsd-kind-icon">Selection<wbr>Skeleton</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+						<a href="../modules/_cardano_sdk_cip2.html#BuildTx" class="tsd-kind-icon">Build<wbr>Tx</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
 						<a href="../modules/_cardano_sdk_cip2.html#ComputeMinimumCoinQuantity" class="tsd-kind-icon">Compute<wbr>Minimum<wbr>Coin<wbr>Quantity</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
@@ -233,7 +239,22 @@
 						<a href="../modules/_cardano_sdk_cip2.html#TokenBundleSizeExceedsLimit" class="tsd-kind-icon">Token<wbr>Bundle<wbr>Size<wbr>Exceeds<wbr>Limit</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="../modules/_cardano_sdk_cip2.html#computeMinimumCoinQuantity" class="tsd-kind-icon">compute<wbr>Minimum<wbr>Coin<wbr>Quantity</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="../modules/_cardano_sdk_cip2.html#computeMinimumCost" class="tsd-kind-icon">compute<wbr>Minimum<wbr>Cost</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="../modules/_cardano_sdk_cip2.html#computeSelectionLimit" class="tsd-kind-icon">compute<wbr>Selection<wbr>Limit</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="../modules/_cardano_sdk_cip2.html#defaultSelectionConstraints" class="tsd-kind-icon">default<wbr>Selection<wbr>Constraints</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
 						<a href="../modules/_cardano_sdk_cip2.html#roundRobinRandomImprove" class="tsd-kind-icon">round<wbr>Robin<wbr>Random<wbr>Improve</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="../modules/_cardano_sdk_cip2.html#tokenBundleSizeExceedsLimit" class="tsd-kind-icon">token<wbr>Bundle<wbr>Size<wbr>Exceeds<wbr>Limit</a>
 					</li>
 				</ul>
 			</nav>
