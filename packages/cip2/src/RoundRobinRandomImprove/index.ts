@@ -22,7 +22,7 @@ export const roundRobinRandomImprove = (csl: CardanoSerializationLib): InputSele
             (
               await computeMinimumCost({
                 change: [],
-                utxo,
+                inputs: utxo,
                 fee: maxBigNum(csl),
                 outputs
               })
@@ -48,14 +48,14 @@ export const roundRobinRandomImprove = (csl: CardanoSerializationLib): InputSele
       utxoSelection: roundRobinSelectionResult,
       estimateTxFee: (utxos, changeValues) =>
         computeMinimumCost({
-          utxo: utxos,
+          inputs: utxos,
           change: changeValues,
           fee: maxBigNum(csl),
           outputs
         })
     });
 
-    if (inputs.length > (await computeSelectionLimit({ utxo: inputs, change, fee: maxBigNum(csl), outputs }))) {
+    if (inputs.length > (await computeSelectionLimit({ inputs, change, fee: maxBigNum(csl), outputs }))) {
       throw new InputSelectionError(InputSelectionFailure.MaximumInputCountExceeded);
     }
 

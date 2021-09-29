@@ -13,7 +13,7 @@ import { valueQuantitiesToValue } from '../src/util';
 
 describe('defaultSelectionConstraints', () => {
   let csl: CardanoSerializationLib;
-  const protocolParams = {
+  const protocolParameters = {
     minFeeCoefficient: 44,
     minFeeConstant: 155_381,
     coinsPerUtxoWord: 34_482,
@@ -35,7 +35,7 @@ describe('defaultSelectionConstraints', () => {
     const selectionSkeleton = {} as SelectionSkeleton;
     const constraints = defaultSelectionConstraints({
       csl: stubCsl,
-      protocolParams,
+      protocolParameters,
       buildTx
     });
     const result = await constraints.computeMinimumCost(selectionSkeleton);
@@ -55,7 +55,10 @@ describe('defaultSelectionConstraints', () => {
       },
       csl
     ).multiasset();
-    const constraints = defaultSelectionConstraints({ csl, protocolParams } as DefaultSelectionConstraintsProps);
+    const constraints = defaultSelectionConstraints({
+      csl,
+      protocolParameters
+    } as DefaultSelectionConstraintsProps);
     const minCoinWithAssets = constraints.computeMinimumCoinQuantity(withAssets);
     const minCoinWithoutAssets = constraints.computeMinimumCoinQuantity();
     expect(typeof minCoinWithAssets).toBe('bigint');
@@ -69,19 +72,19 @@ describe('defaultSelectionConstraints', () => {
     it("doesn't exceed max tx size", async () => {
       const constraints = defaultSelectionConstraints({
         csl,
-        protocolParams,
-        buildTx: buildTxOfLength(protocolParams.maxTxSize)
+        protocolParameters,
+        buildTx: buildTxOfLength(protocolParameters.maxTxSize)
       });
-      expect(await constraints.computeSelectionLimit({ utxo: [1, 2] as any } as SelectionSkeleton)).toEqual(2);
+      expect(await constraints.computeSelectionLimit({ inputs: [1, 2] as any } as SelectionSkeleton)).toEqual(2);
     });
 
     it('exceeds max tx size', async () => {
       const constraints = defaultSelectionConstraints({
         csl,
-        protocolParams,
-        buildTx: buildTxOfLength(protocolParams.maxTxSize + 1)
+        protocolParameters,
+        buildTx: buildTxOfLength(protocolParameters.maxTxSize + 1)
       });
-      expect(await constraints.computeSelectionLimit({ utxo: [1, 2] as any } as SelectionSkeleton)).toEqual(3);
+      expect(await constraints.computeSelectionLimit({ inputs: [1, 2] as any } as SelectionSkeleton)).toEqual(3);
     });
   });
 
@@ -98,22 +101,26 @@ describe('defaultSelectionConstraints', () => {
       } as any as CardanoSerializationLib);
 
     it('empty bundle', () => {
-      const constraints = defaultSelectionConstraints({ csl, protocolParams, buildTx: jest.fn() });
+      const constraints = defaultSelectionConstraints({
+        csl,
+        protocolParameters,
+        buildTx: jest.fn()
+      });
       expect(constraints.tokenBundleSizeExceedsLimit()).toBe(false);
     });
 
     it("doesn't exceed max value size", () => {
       const constraints = defaultSelectionConstraints({
-        csl: stubCslWithValueLength(protocolParams.maxValueSize),
-        protocolParams
+        csl: stubCslWithValueLength(protocolParameters.maxValueSize),
+        protocolParameters
       } as DefaultSelectionConstraintsProps);
       expect(constraints.tokenBundleSizeExceedsLimit({} as any)).toBe(false);
     });
 
     it('exceeds max value size', () => {
       const constraints = defaultSelectionConstraints({
-        csl: stubCslWithValueLength(protocolParams.maxValueSize + 1),
-        protocolParams
+        csl: stubCslWithValueLength(protocolParameters.maxValueSize + 1),
+        protocolParameters
       } as DefaultSelectionConstraintsProps);
       expect(constraints.tokenBundleSizeExceedsLimit({} as any)).toBe(true);
     });

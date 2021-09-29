@@ -35,7 +35,7 @@ export interface SelectionResult {
 }
 
 export interface SelectionSkeleton {
-  utxo: CSL.TransactionUnspentOutput[];
+  inputs: CSL.TransactionUnspentOutput[];
   outputs: CSL.TransactionOutputs;
   change: CSL.Value[];
   fee: CSL.BigNum;

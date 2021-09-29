@@ -1,12 +1,12 @@
 import { CardanoSerializationLib, CSL, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
 import { ComputeSelectionLimit, SelectionConstraints, TokenBundleSizeExceedsLimit } from '.';
 import { ComputeMinimumCoinQuantity, EstimateTxFee, SelectionSkeleton } from './types';
-import { MAX_U64 } from './util';
+import { maxBigNum } from './util';
 
 export type BuildTx = (selection: SelectionSkeleton) => Promise<CSL.Transaction>;
 export interface DefaultSelectionConstraintsProps {
   csl: CardanoSerializationLib;
-  protocolParams: ProtocolParametersRequiredByWallet;
+  protocolParameters: ProtocolParametersRequiredByWallet;
   buildTx: BuildTx;
 }
 
@@ -51,7 +51,7 @@ export const tokenBundleSizeExceedsLimit =
     if (!tokenBundle) {
       return false;
     }
-    const value = csl.Value.new(csl.BigNum.from_str(MAX_U64.toString()));
+    const value = csl.Value.new(maxBigNum(csl));
     value.set_multiasset(tokenBundle);
     return value.to_bytes().length > maxValueSize;
   };
@@ -71,18 +71,18 @@ export const computeSelectionLimit =
     const tx = await buildTx(selectionSkeleton);
     const txSize = getTxSize(tx);
     if (txSize <= maxTxSize) {
-      return selectionSkeleton.utxo.length;
+      return selectionSkeleton.inputs.length;
     }
-    return selectionSkeleton.utxo.length + 1;
+    return selectionSkeleton.inputs.length + 1;
   };
 
 export const defaultSelectionConstraints = ({
   csl,
-  protocolParams,
+  protocolParameters,
   buildTx
 }: DefaultSelectionConstraintsProps): SelectionConstraints => ({
-  computeMinimumCost: computeMinimumCost(csl, protocolParams, buildTx),
-  computeMinimumCoinQuantity: computeMinimumCoinQuantity(csl, protocolParams),
-  computeSelectionLimit: computeSelectionLimit(protocolParams, buildTx),
-  tokenBundleSizeExceedsLimit: tokenBundleSizeExceedsLimit(csl, protocolParams)
+  computeMinimumCost: computeMinimumCost(csl, protocolParameters, buildTx),
+  computeMinimumCoinQuantity: computeMinimumCoinQuantity(csl, protocolParameters),
+  computeSelectionLimit: computeSelectionLimit(protocolParameters, buildTx),
+  tokenBundleSizeExceedsLimit: tokenBundleSizeExceedsLimit(csl, protocolParameters)
 });
