@@ -34,7 +34,7 @@ describe('createTransactionInternals', () => {
       networkId: Cardano.NetworkId.testnet,
       password: '123'
     });
-    outputs = CSL.TransactionOutputs.new();
+    outputs = csl.TransactionOutputs.new();
 
     outputs.add(
       Ogmios.ogmiosToCsl(csl).txOut({

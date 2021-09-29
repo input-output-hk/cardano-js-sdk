@@ -1,16 +1,10 @@
-export const isNodeJs = (): boolean => {
-  try {
-    return !!process;
-  } catch {
-    return false;
-  }
-};
+export const isNodeJs = (): boolean => typeof process !== 'undefined' && !!process.versions && !!process.versions.node;
 
-export type CardanoSerializationLib = typeof import('@emurgo/cardano-serialization-lib-nodejs');
+export type CardanoSerializationLib = typeof import('./browser');
 
 /**
  * Dynamically loads the environment-specific library.
  * The type of each complete library is the same.
  */
 export const loadCardanoSerializationLib = (): Promise<CardanoSerializationLib> =>
-  isNodeJs() ? import('@emurgo/cardano-serialization-lib-nodejs') : import('@emurgo/cardano-serialization-lib-browser');
+  isNodeJs() ? import('./nodejs') : import('./browser');

@@ -1,3 +1,4 @@
-export * from './loadCardanoSerializationLib';
 // Only to be used for types
-export * as CSL from '@emurgo/cardano-serialization-lib-nodejs';
+import type * as CSL from '@emurgo/cardano-serialization-lib-browser';
+export * from './loadCardanoSerializationLib';
+export { CSL };
