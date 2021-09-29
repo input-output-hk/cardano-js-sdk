@@ -23,13 +23,13 @@
     "test:debug": "DEBUG=true yarn test"
   },
   "devDependencies": {
-    "@cardano-sdk/in-memory-key-manager": "0.1.0",
     "shx": "^0.3.3"
   },
   "dependencies": {
     "@cardano-ogmios/schema": "^4.0.0-beta.6",
     "@cardano-sdk/cip2": "0.1.0",
     "@cardano-sdk/core": "0.1.0",
+    "bip39": "^3.0.4",
     "ts-log": "^2.2.3"
   }
 }

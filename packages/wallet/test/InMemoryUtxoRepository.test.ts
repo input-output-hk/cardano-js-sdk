@@ -3,7 +3,7 @@ import { UtxoRepository } from '@src/UtxoRepository';
 import { InMemoryUtxoRepository } from '@src/InMemoryUtxoRepository';
 import { roundRobinRandomImprove, InputSelector } from '@cardano-sdk/cip2';
 import { providerStub, delegate, rewards } from './ProviderStub';
-import { createInMemoryKeyManager, util } from '@cardano-sdk/in-memory-key-manager';
+import { createInMemoryKeyManager, util } from '@src/KeyManagement';
 import { NO_CONSTRAINTS } from './util';
 
 const addresses = [

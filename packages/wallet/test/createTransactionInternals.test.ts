@@ -11,7 +11,7 @@ import {
 import { providerStub } from './ProviderStub';
 import { UtxoRepository } from '@src/UtxoRepository';
 import { InMemoryUtxoRepository } from '@src/InMemoryUtxoRepository';
-import { createInMemoryKeyManager, util } from '@cardano-sdk/in-memory-key-manager';
+import { createInMemoryKeyManager, util } from '@src/KeyManagement';
 import { NO_CONSTRAINTS } from './util';
 
 const address =

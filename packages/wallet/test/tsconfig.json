@@ -9,7 +9,6 @@
   "references": [
     { "path": "../src" },
     { "path": "../../cip2/src" },
-    { "path": "../../core/src" },
-    { "path": "../../in-memory-key-manager/src" }
+    { "path": "../../core/src" }
   ]
 }
