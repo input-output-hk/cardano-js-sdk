@@ -1,4 +1,3 @@
-import { createTransactionInternals } from '@src/createTransactionInternals';
 import { InputSelector, roundRobinRandomImprove } from '@cardano-sdk/cip2';
 import {
   loadCardanoSerializationLib,
@@ -9,9 +8,7 @@ import {
   Ogmios
 } from '@cardano-sdk/core';
 import { providerStub } from './ProviderStub';
-import { UtxoRepository } from '@src/UtxoRepository';
-import { InMemoryUtxoRepository } from '@src/InMemoryUtxoRepository';
-import { createInMemoryKeyManager, util } from '@cardano-sdk/in-memory-key-manager';
+import { createTransactionInternals, InMemoryUtxoRepository, KeyManagement, UtxoRepository } from '../src';
 import { NO_CONSTRAINTS } from './util';
 
 const address =
@@ -28,9 +25,9 @@ describe('createTransactionInternals', () => {
     csl = await loadCardanoSerializationLib();
     provider = providerStub();
     inputSelector = roundRobinRandomImprove(csl);
-    const keyManager = createInMemoryKeyManager({
+    const keyManager = KeyManagement.createInMemoryKeyManager({
       csl,
-      mnemonic: util.generateMnemonic(),
+      mnemonic: KeyManagement.util.generateMnemonic(),
       networkId: Cardano.NetworkId.testnet,
       password: '123'
     });

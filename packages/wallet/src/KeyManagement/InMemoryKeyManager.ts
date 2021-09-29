@@ -1,6 +1,7 @@
 import * as bip39 from 'bip39';
 import { Cardano, CardanoSerializationLib, CSL } from '@cardano-sdk/core';
-import { KeyManagement } from '@cardano-sdk/wallet';
+import * as errors from './errors';
+import { KeyManager } from './KeyManager';
 import { harden } from './util';
 
 /**
@@ -18,13 +19,13 @@ export const createInMemoryKeyManager = ({
   accountIndex?: number;
   mnemonic: string;
   networkId: Cardano.NetworkId;
-}): KeyManagement.KeyManager => {
+}): KeyManager => {
   if (!accountIndex) {
     accountIndex = 0;
   }
 
   const validMnemonic = bip39.validateMnemonic(mnemonic);
-  if (!validMnemonic) throw new KeyManagement.errors.InvalidMnemonic();
+  if (!validMnemonic) throw new errors.InvalidMnemonic();
 
   const entropy = bip39.mnemonicToEntropy(mnemonic);
   const accountPrivateKey = csl.Bip32PrivateKey.from_bip39_entropy(Buffer.from(entropy, 'hex'), Buffer.from(password))

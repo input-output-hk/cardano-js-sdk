@@ -1,4 +1,4 @@
-import { KeyManager } from './KeyManager';
-import * as errors from './errors';
-
-export { errors, KeyManager };
+export * as errors from './errors';
+export * from './KeyManager';
+export * from './InMemoryKeyManager';
+export * as util from './util';

@@ -1,13 +1,14 @@
 /* eslint-disable max-len */
-
-import { createSingleAddressWallet, SingleAddressWallet } from '@src/SingleAddressWallet';
-import * as KeyManagement from '@src/KeyManagement';
 import { loadCardanoSerializationLib, CardanoSerializationLib, Cardano, CardanoProvider } from '@cardano-sdk/core';
-import { createInMemoryKeyManager, util } from '@cardano-sdk/in-memory-key-manager';
-import { InMemoryUtxoRepository } from '@src/InMemoryUtxoRepository';
-import { UtxoRepository } from '@src/UtxoRepository';
 import { InputSelector, roundRobinRandomImprove } from '@cardano-sdk/cip2';
 import { providerStub } from './ProviderStub';
+import {
+  createSingleAddressWallet,
+  InMemoryUtxoRepository,
+  KeyManagement,
+  SingleAddressWallet,
+  UtxoRepository
+} from '../src';
 
 describe('Wallet', () => {
   let csl: CardanoSerializationLib;
@@ -18,9 +19,9 @@ describe('Wallet', () => {
 
   beforeEach(async () => {
     csl = await loadCardanoSerializationLib();
-    keyManager = createInMemoryKeyManager({
+    keyManager = KeyManagement.createInMemoryKeyManager({
       csl,
-      mnemonic: util.generateMnemonic(),
+      mnemonic: KeyManagement.util.generateMnemonic(),
       networkId: Cardano.NetworkId.testnet,
       password: '123'
     });
