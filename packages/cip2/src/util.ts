@@ -6,6 +6,9 @@ import { CardanoSerializationLib, CSL, Asset, Ogmios } from '@cardano-sdk/core';
 export type AssetQuantities = Ogmios.util.AssetQuantities;
 export type ValueQuantities = Ogmios.util.ValueQuantities;
 
+export const MAX_U64 = 18_446_744_073_709_551_615n;
+export const maxBigNum = (csl: CardanoSerializationLib) => csl.BigNum.from_str(MAX_U64.toString());
+
 export const transactionOutputsToArray = (outputs: CSL.TransactionOutputs): CSL.TransactionOutput[] => {
   const result: CSL.TransactionOutput[] = [];
   for (let outputIdx = 0; outputIdx < outputs.len(); outputIdx++) {

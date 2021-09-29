@@ -23,7 +23,7 @@ export interface SelectionResult {
      * Estimated fee for the transaction.
      * This value is included in 'change', so the actual change returned by the transaction is change-fee.
      */
-    fee: bigint;
+    fee: CSL.BigNum;
   };
   /**
    * The remaining UTxO set is a subset of the initial UTxO set.
@@ -35,9 +35,10 @@ export interface SelectionResult {
 }
 
 export interface SelectionSkeleton {
-  utxo: CSL.TransactionUnspentOutput[];
+  inputs: CSL.TransactionUnspentOutput[];
   outputs: CSL.TransactionOutputs;
   change: CSL.Value[];
+  fee: CSL.BigNum;
 }
 
 /**
@@ -48,12 +49,12 @@ export type EstimateTxFee = (selectionSkeleton: SelectionSkeleton) => Promise<bi
 /**
  * @returns true if token bundle size exceeds it's maximum size limit.
  */
-export type TokenBundleSizeExceedsLimit = (tokenBundle: CSL.MultiAsset) => boolean;
+export type TokenBundleSizeExceedsLimit = (tokenBundle?: CSL.MultiAsset) => boolean;
 
 /**
  * @returns minimum lovelace amount in a UTxO
  */
-export type ComputeMinimumCoinQuantity = (assetQuantities: CSL.MultiAsset) => bigint;
+export type ComputeMinimumCoinQuantity = (assetQuantities?: CSL.MultiAsset) => bigint;
 
 /**
  * @returns an upper bound for the number of ordinary inputs to

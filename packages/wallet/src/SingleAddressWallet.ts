@@ -2,6 +2,7 @@ import Schema from '@cardano-ogmios/schema';
 import { CardanoProvider, Ogmios, Transaction, CardanoSerializationLib, CSL } from '@cardano-sdk/core';
 import { createTransactionInternals, KeyManagement, TxInternals, UtxoRepository } from './';
 import { dummyLogger, Logger } from 'ts-log';
+import { defaultSelectionConstraints } from '@cardano-sdk/cip2';
 
 export type InitializeTxProps = {
   outputs: Schema.TxOut[];
@@ -42,48 +43,21 @@ export const createSingleAddressWallet = async (
       for (const output of props.outputs) {
         txOutputs.add(Ogmios.ogmiosToCsl(csl).txOut(output));
       }
-      const inputSelectionResult = await utxoRepository.selectInputs(txOutputs, {
-        computeMinimumCost: async ({ utxo, outputs, change }) => {
+      const constraints = defaultSelectionConstraints({
+        csl,
+        protocolParameters,
+        buildTx: async (inputSelection) => {
+          logger.debug('Building TX for selection constraints', inputSelection);
           const transactionInternals = await createTransactionInternals(csl, {
             changeAddress: address,
-            inputSelection: {
-              outputs,
-              inputs: utxo,
-              change,
-              fee: 0n
-            },
+            inputSelection,
             validityInterval
           });
           const witnessSet = await keyManager.signTransaction(transactionInternals.hash);
-          const tx = csl.Transaction.new(transactionInternals.body, witnessSet);
-          return BigInt(
-            csl
-              .min_fee(
-                tx,
-                csl.LinearFee.new(
-                  csl.BigNum.from_str(protocolParameters.minFeeCoefficient.toString()),
-                  csl.BigNum.from_str(protocolParameters.minFeeConstant.toString())
-                )
-              )
-              .to_str()
-          );
-        },
-        tokenBundleSizeExceedsLimit: (tokenBundle) => {
-          logger.debug('SelectionConstraint: tokenBundleSizeExceedsLimit', tokenBundle);
-          // Todo: Replace with real implementation
-          return false;
-        },
-        computeMinimumCoinQuantity: (assetQuantities) => {
-          logger.debug('SelectionConstraint: computeMinimumCoinQuantity', assetQuantities);
-          // Todo: Replace with real implementation
-          return 1_000_000n;
-        },
-        computeSelectionLimit: async (selectionSkeleton) => {
-          logger.debug('SelectionConstraint: computeSelectionLimit', selectionSkeleton);
-          // Todo: Replace with real implementation
-          return 5;
+          return csl.Transaction.new(transactionInternals.body, witnessSet);
         }
       });
+      const inputSelectionResult = await utxoRepository.selectInputs(txOutputs, constraints);
       return createTransactionInternals(csl, {
         changeAddress: address,
         inputSelection: inputSelectionResult.selection,

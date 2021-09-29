@@ -23,7 +23,7 @@ export const createTransactionInternals = async (
   const body = csl.TransactionBody.new(
     inputs,
     props.inputSelection.outputs,
-    csl.BigNum.from_str(props.inputSelection.fee.toString()),
+    props.inputSelection.fee,
     props.validityInterval.invalidHereafter
   );
   if (props.validityInterval.invalidBefore !== undefined) {

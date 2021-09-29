@@ -2,7 +2,7 @@ import { AllAssets, containsUtxo, TestUtils } from './util';
 import { SelectionResult } from '../../src/types';
 import { CSL, Ogmios } from '@cardano-sdk/core';
 import { InputSelectionError, InputSelectionFailure } from '../../src/InputSelectionError';
-import { AssetQuantities, ValueQuantities, valueToValueQuantities } from '../../src/util';
+import { AssetQuantities, MAX_U64, ValueQuantities, valueToValueQuantities } from '../../src/util';
 import fc, { Arbitrary } from 'fast-check';
 import { MockSelectionConstraints } from './constraints';
 
@@ -116,8 +116,6 @@ export const assertFailureProperties = ({
  * @returns {Arbitrary} fast-check arbitrary that generates valid sets of UTxO and outputs for input selection.
  */
 export const generateSelectionParams = (() => {
-  const MAX_U64 = 18_446_744_073_709_551_615n;
-
   /**
    * Generate random amount of coin and assets.
    */

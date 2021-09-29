@@ -1,7 +1,7 @@
 import { CardanoSerializationLib } from '@cardano-sdk/core';
 import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
 import { InputSelectionParameters, InputSelector, SelectionResult } from '../types';
-import { transactionOutputsToArray } from '../util';
+import { maxBigNum, transactionOutputsToArray } from '../util';
 import { computeChangeAndAdjustForFee } from './change';
 import { roundRobinSelection } from './roundRobin';
 import { assertIsBalanceSufficient, preprocessArgs } from './util';
@@ -18,11 +18,16 @@ export const roundRobinRandomImprove = (csl: CardanoSerializationLib): InputSele
         remainingUTxO: utxo,
         selection: {
           inputs: [],
-          fee: await computeMinimumCost({
-            change: [],
-            utxo,
-            outputs
-          }),
+          fee: csl.BigNum.from_str(
+            (
+              await computeMinimumCost({
+                change: [],
+                inputs: utxo,
+                fee: maxBigNum(csl),
+                outputs
+              })
+            ).toString()
+          ),
           change: [],
           outputs
         }
@@ -43,13 +48,14 @@ export const roundRobinRandomImprove = (csl: CardanoSerializationLib): InputSele
       utxoSelection: roundRobinSelectionResult,
       estimateTxFee: (utxos, changeValues) =>
         computeMinimumCost({
-          utxo: utxos,
+          inputs: utxos,
           change: changeValues,
+          fee: maxBigNum(csl),
           outputs
         })
     });
 
-    if (inputs.length > (await computeSelectionLimit({ utxo: inputs, change, outputs }))) {
+    if (inputs.length > (await computeSelectionLimit({ inputs, change, fee: maxBigNum(csl), outputs }))) {
       throw new InputSelectionError(InputSelectionFailure.MaximumInputCountExceeded);
     }
 
@@ -58,7 +64,7 @@ export const roundRobinRandomImprove = (csl: CardanoSerializationLib): InputSele
         change,
         inputs,
         outputs,
-        fee
+        fee: csl.BigNum.from_str(fee.toString())
       },
       remainingUTxO
     };
