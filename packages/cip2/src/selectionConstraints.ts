@@ -1,6 +1,7 @@
 import { CardanoSerializationLib, CSL, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
 import { ComputeSelectionLimit, SelectionConstraints, TokenBundleSizeExceedsLimit } from '.';
 import { ComputeMinimumCoinQuantity, EstimateTxFee, SelectionSkeleton } from './types';
+import { MAX_U64 } from './util';
 
 export type BuildTx = (selection: SelectionSkeleton) => Promise<CSL.Transaction>;
 export interface DefaultSelectionConstraintsProps {
@@ -36,7 +37,7 @@ export const computeMinimumCoinQuantity =
     { coinsPerUtxoWord }: ProtocolParametersRequiredByWallet
   ): ComputeMinimumCoinQuantity =>
   (multiasset) => {
-    const minUTxOValue = CSL.BigNum.from_str((coinsPerUtxoWord * 29).toString());
+    const minUTxOValue = csl.BigNum.from_str((coinsPerUtxoWord * 29).toString());
     const value = csl.Value.new(csl.BigNum.from_str('0'));
     if (multiasset) {
       value.set_multiasset(multiasset);
@@ -50,8 +51,7 @@ export const tokenBundleSizeExceedsLimit =
     if (!tokenBundle) {
       return false;
     }
-    // Review: assuming coin serializes to the same size regardless of quantity
-    const value = csl.Value.new(csl.BigNum.from_str('0'));
+    const value = csl.Value.new(csl.BigNum.from_str(MAX_U64.toString()));
     value.set_multiasset(tokenBundle);
     return value.to_bytes().length > maxValueSize;
   };

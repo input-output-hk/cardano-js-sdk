@@ -1,7 +1,7 @@
 import { CardanoSerializationLib } from '@cardano-sdk/core';
 import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
 import { InputSelectionParameters, InputSelector, SelectionResult } from '../types';
-import { transactionOutputsToArray } from '../util';
+import { maxBigNum, transactionOutputsToArray } from '../util';
 import { computeChangeAndAdjustForFee } from './change';
 import { roundRobinSelection } from './roundRobin';
 import { assertIsBalanceSufficient, preprocessArgs } from './util';
@@ -21,6 +21,7 @@ export const roundRobinRandomImprove = (csl: CardanoSerializationLib): InputSele
           fee: await computeMinimumCost({
             change: [],
             utxo,
+            fee: maxBigNum(csl),
             outputs
           }),
           change: [],
@@ -45,11 +46,12 @@ export const roundRobinRandomImprove = (csl: CardanoSerializationLib): InputSele
         computeMinimumCost({
           utxo: utxos,
           change: changeValues,
+          fee: maxBigNum(csl),
           outputs
         })
     });
 
-    if (inputs.length > (await computeSelectionLimit({ utxo: inputs, change, outputs }))) {
+    if (inputs.length > (await computeSelectionLimit({ utxo: inputs, change, fee: maxBigNum(csl), outputs }))) {
       throw new InputSelectionError(InputSelectionFailure.MaximumInputCountExceeded);
     }
 
