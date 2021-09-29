@@ -18,12 +18,16 @@ export const roundRobinRandomImprove = (csl: CardanoSerializationLib): InputSele
         remainingUTxO: utxo,
         selection: {
           inputs: [],
-          fee: await computeMinimumCost({
-            change: [],
-            utxo,
-            fee: maxBigNum(csl),
-            outputs
-          }),
+          fee: csl.BigNum.from_str(
+            (
+              await computeMinimumCost({
+                change: [],
+                utxo,
+                fee: maxBigNum(csl),
+                outputs
+              })
+            ).toString()
+          ),
           change: [],
           outputs
         }
@@ -60,7 +64,7 @@ export const roundRobinRandomImprove = (csl: CardanoSerializationLib): InputSele
         change,
         inputs,
         outputs,
-        fee
+        fee: csl.BigNum.from_str(fee.toString())
       },
       remainingUTxO
     };

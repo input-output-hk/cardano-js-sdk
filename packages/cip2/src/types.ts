@@ -22,9 +22,8 @@ export interface SelectionResult {
     /**
      * Estimated fee for the transaction.
      * This value is included in 'change', so the actual change returned by the transaction is change-fee.
-     * TODO: refactor this to return CSL.BigNum?
      */
-    fee: bigint;
+    fee: CSL.BigNum;
   };
   /**
    * The remaining UTxO set is a subset of the initial UTxO set.

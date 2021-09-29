@@ -56,8 +56,6 @@ export const tokenBundleSizeExceedsLimit =
     return value.to_bytes().length > maxValueSize;
   };
 
-// TODO: move this to core package and test it by comparing
-// the result to result of serializing the transaction via cardano-cli
 const getTxSize = (tx: CSL.Transaction) => tx.to_bytes().length;
 
 /**
