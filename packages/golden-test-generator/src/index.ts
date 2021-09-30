@@ -5,7 +5,8 @@ import { Command } from 'commander';
 import hash from 'object-hash';
 import path from 'node:path';
 import { SingleBar, Options } from 'cli-progress';
-import { ensureDir, writeJson } from 'fs-extra';
+import { ensureDir, writeFile } from 'fs-extra';
+import JSONBig from 'json-bigint';
 import { AddressBalancesResponse, getOnChainAddressBalances } from './AddressBalance';
 import { getBlocks, GetBlocksResponse } from './Block';
 import { prepareContent } from './Content';
@@ -68,7 +69,7 @@ program
       const fileName = path.join(outDir, `address-balances-${hash(content)}.json`);
 
       console.log(`Writing ${fileName}`);
-      await writeJson(fileName, content, { spaces: 2 });
+      await writeFile(fileName, JSONBig.stringify(content, undefined, 2));
       process.exit(0);
     } catch (error) {
       console.error(error);
@@ -95,6 +96,7 @@ program
       await ensureDir(outDir);
       progress.start(lastblockHeight, 0);
       const { blocks, metadata } = await getBlocks(sortedblockHeights, {
+        logger: console,
         ogmiosConnectionConfig: { host: ogmiosHost, port: ogmiosPort, tls: ogmiosTls },
         onBlock: (blockHeight) => {
           progress.update(blockHeight);
@@ -105,7 +107,7 @@ program
       const fileName = path.join(outDir, `blocks-${hash(content)}.json`);
 
       console.log(`Writing ${fileName}`);
-      await writeJson(fileName, content, { spaces: 2 });
+      await writeFile(fileName, JSONBig.stringify(content, undefined, 2));
       process.exit(0);
     } catch (error) {
       console.error(error);
