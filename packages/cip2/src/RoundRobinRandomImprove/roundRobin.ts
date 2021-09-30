@@ -1,7 +1,7 @@
 import { BigIntMath } from '@cardano-sdk/core';
 import {
-  assetQuantitySelector,
-  getCoinQuantity,
+  assetTotalsQuantitySelector,
+  getCoinTotalsQuantity,
   OutputWithTotals,
   Totals,
   UtxoSelection,
@@ -36,7 +36,7 @@ const improvesSelection = (
 
 const listTokensWithin = (uniqueOutputAssetIDs: string[], outputs: OutputWithTotals[]) => [
   ...uniqueOutputAssetIDs.map((id) => {
-    const getQuantity = assetQuantitySelector(id);
+    const getQuantity = assetTotalsQuantitySelector(id);
     return {
       getQuantity,
       minimumTarget: getQuantity(outputs),
@@ -45,8 +45,8 @@ const listTokensWithin = (uniqueOutputAssetIDs: string[], outputs: OutputWithTot
   }),
   {
     // Lovelace
-    getQuantity: (totals: Totals[]) => getCoinQuantity(totals),
-    minimumTarget: getCoinQuantity(outputs),
+    getQuantity: (totals: Totals[]) => getCoinTotalsQuantity(totals),
+    minimumTarget: getCoinTotalsQuantity(outputs),
     filterUtxo: (utxo: UtxoWithTotals[]) => utxo
   }
 ];
@@ -56,8 +56,6 @@ const listTokensWithin = (uniqueOutputAssetIDs: string[], outputs: OutputWithTot
  *
  * Assumes we have already checked that the available UTxO balance is sufficient to cover all tokens in the outputs.
  * Considers all outputs collectively, as a combined output bundle.
- *
- * @throws InputSelectionError (UtxoBalanceInsufficient)
  */
 export const roundRobinSelection = (
   availableUtxo: UtxoWithTotals[],

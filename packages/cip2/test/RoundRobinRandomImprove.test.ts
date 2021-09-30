@@ -28,6 +28,19 @@ describe('RoundRobinRandomImprove', () => {
           mockConstraints: NO_CONSTRAINTS
         });
       });
+      it('No outputs', async () => {
+        // Regression
+        await testInputSelectionProperties({
+          getAlgorithm: getRoundRobinRandomImprove,
+          createUtxo: (utils) => [utils.createUnspentTxOutput({ coins: 11_999_994n })],
+          createOutputs: () => [],
+          mockConstraints: {
+            ...NO_CONSTRAINTS,
+            minimumCoinQuantity: 9_999_991n,
+            minimumCost: 2_000_003n
+          }
+        });
+      });
     });
     describe('Failure Modes', () => {
       describe('UtxoBalanceInsufficient', () => {

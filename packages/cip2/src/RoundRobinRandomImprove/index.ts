@@ -4,7 +4,7 @@ import { InputSelectionParameters, InputSelector, SelectionResult } from '../typ
 import { maxBigNum, transactionOutputsToArray } from '../util';
 import { computeChangeAndAdjustForFee } from './change';
 import { roundRobinSelection } from './roundRobin';
-import { assertIsBalanceSufficient, preprocessArgs } from './util';
+import { assertIsBalanceSufficient, preprocessArgs, totalsToValueQuantities } from './util';
 
 export const roundRobinRandomImprove = (csl: CardanoSerializationLib): InputSelector => ({
   select: async ({
@@ -13,29 +13,11 @@ export const roundRobinRandomImprove = (csl: CardanoSerializationLib): InputSele
     constraints: { computeMinimumCost, computeSelectionLimit, computeMinimumCoinQuantity, tokenBundleSizeExceedsLimit }
   }: InputSelectionParameters): Promise<SelectionResult> => {
     const outputsArray = transactionOutputsToArray(outputs);
-    if (outputsArray.length === 0) {
-      return {
-        remainingUTxO: utxo,
-        selection: {
-          inputs: [],
-          fee: csl.BigNum.from_str(
-            (
-              await computeMinimumCost({
-                change: [],
-                inputs: utxo,
-                fee: maxBigNum(csl),
-                outputs
-              })
-            ).toString()
-          ),
-          change: [],
-          outputs
-        }
-      };
-    }
-
     const { uniqueOutputAssetIDs, utxoWithTotals, outputsWithTotals } = preprocessArgs(utxo, outputsArray);
-    assertIsBalanceSufficient(uniqueOutputAssetIDs, utxoWithTotals, outputsWithTotals);
+
+    const utxoQuantities = totalsToValueQuantities(utxoWithTotals);
+    const outputsQuantities = totalsToValueQuantities(outputsWithTotals);
+    assertIsBalanceSufficient(uniqueOutputAssetIDs, utxoQuantities, outputsQuantities);
 
     const roundRobinSelectionResult = roundRobinSelection(utxoWithTotals, outputsWithTotals, uniqueOutputAssetIDs);
 
@@ -43,7 +25,7 @@ export const roundRobinRandomImprove = (csl: CardanoSerializationLib): InputSele
       csl,
       computeMinimumCoinQuantity,
       tokenBundleSizeExceedsLimit,
-      outputsWithTotals,
+      outputsQuantities,
       uniqueOutputAssetIDs,
       utxoSelection: roundRobinSelectionResult,
       estimateTxFee: (utxos, changeValues) =>

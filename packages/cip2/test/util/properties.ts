@@ -48,7 +48,8 @@ export const assertInputSelectionProperties = ({
 
   // Correctness of Change
   const vChange = utils.getTotalChangeAmounts(results);
-  expect(vSelected.coins).toEqual(vRequested.coins + vChange.coins);
+  const vFee = BigInt(results.selection.fee.to_str());
+  expect(vSelected.coins).toEqual(vRequested.coins + vChange.coins + vFee);
   for (const assetName of AllAssets) {
     expect(vSelected.assets?.[assetName] || 0n).toEqual(
       (vRequested.assets?.[assetName] || 0n) + (vChange.assets?.[assetName] || 0n)
@@ -98,8 +99,9 @@ export const assertFailureProperties = ({
     case InputSelectionFailure.UtxoFullyDepleted: {
       const numUtxoAssets = Object.keys(utxoTotals.assets || {}).length;
       const bundleSizePotentiallyTooLarge = numUtxoAssets > constraints.maxTokenBundleSize;
-      const minimumCoinQuantityNotMet = utxoTotals.coins - outputsTotals.coins < constraints.minimumCoinQuantity;
-      expect(bundleSizePotentiallyTooLarge || minimumCoinQuantityNotMet).toBe(true);
+      const changeMinimumCoinQuantityNotMet =
+        utxoTotals.coins - outputsTotals.coins - constraints.minimumCost < constraints.minimumCoinQuantity;
+      expect(bundleSizePotentiallyTooLarge || changeMinimumCoinQuantityNotMet).toBe(true);
       return;
     }
     case InputSelectionFailure.MaximumInputCountExceeded: {

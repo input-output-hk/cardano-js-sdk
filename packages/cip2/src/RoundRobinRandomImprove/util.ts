@@ -44,12 +44,29 @@ export const preprocessArgs = (
   return { uniqueOutputAssetIDs, utxoWithTotals, outputsWithTotals };
 };
 
+export const totalsToValueQuantities = (totals: Totals[]) => totals.map((t) => t.totals);
 export const assetQuantitySelector =
   (id: string) =>
+  (quantities: ValueQuantities[]): bigint =>
+    BigIntMath.sum(quantities.map(({ assets }) => assets?.[id] || 0n));
+export const assetTotalsQuantitySelector =
+  (id: string) =>
   (totals: Totals[]): bigint =>
-    BigIntMath.sum(totals.map(({ totals: { assets } }) => assets?.[id] || 0n));
-export const getCoinQuantity = (totals: Totals[]): bigint =>
-  BigIntMath.sum(totals.map(({ totals: { coins } }) => coins));
+    assetQuantitySelector(id)(totalsToValueQuantities(totals));
+export const getCoinQuantity = (quantities: ValueQuantities[]): bigint =>
+  BigIntMath.sum(quantities.map(({ coins }) => coins));
+export const getCoinTotalsQuantity = (totals: Totals[]): bigint => getCoinQuantity(totalsToValueQuantities(totals));
+
+export const assertIsCoinBalanceSufficient = (
+  utxoQuantities: ValueQuantities[],
+  outputsQuantities: ValueQuantities[]
+) => {
+  const utxoCoinTotal = getCoinQuantity(utxoQuantities);
+  const outputsCoinTotal = getCoinQuantity(outputsQuantities);
+  if (outputsCoinTotal > utxoCoinTotal) {
+    throw new InputSelectionError(InputSelectionFailure.UtxoBalanceInsufficient);
+  }
+};
 
 /**
  * Asserts that available balance of coin and assets
@@ -59,20 +76,16 @@ export const getCoinQuantity = (totals: Totals[]): bigint =>
  */
 export const assertIsBalanceSufficient = (
   uniqueOutputAssetIDs: string[],
-  utxoWithTotals: UtxoWithTotals[],
-  outputsWithTotals: OutputWithTotals[]
+  utxoQuantities: ValueQuantities[],
+  outputsQuantities: ValueQuantities[]
 ): void => {
   for (const assetId of uniqueOutputAssetIDs) {
     const getAssetQuantity = assetQuantitySelector(assetId);
-    const utxoTotal = getAssetQuantity(utxoWithTotals);
-    const outputsTotal = getAssetQuantity(outputsWithTotals);
+    const utxoTotal = getAssetQuantity(utxoQuantities);
+    const outputsTotal = getAssetQuantity(outputsQuantities);
     if (outputsTotal > utxoTotal) {
       throw new InputSelectionError(InputSelectionFailure.UtxoBalanceInsufficient);
     }
   }
-  const utxoCoinTotal = BigIntMath.sum(utxoWithTotals.map(({ totals: { coins } }) => coins));
-  const outputsCoinTotal = BigIntMath.sum(outputsWithTotals.map(({ totals: { coins } }) => coins));
-  if (outputsCoinTotal > utxoCoinTotal) {
-    throw new InputSelectionError(InputSelectionFailure.UtxoBalanceInsufficient);
-  }
+  assertIsCoinBalanceSufficient(utxoQuantities, outputsQuantities);
 };
