@@ -23,7 +23,8 @@
     "test": "yarn workspaces run test",
     "test:debug": "DEBUG=true yarn workspaces run test",
     "testnet:up": "DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 OGMIOS_PORT=1338 NETWORK=testnet docker-compose -p sdk-testnet up",
-    "testnet:down": "docker-compose -p sdk-testnet down"
+    "testnet:down": "docker-compose -p sdk-testnet down",
+    "bump-version": "npx standard-version"
   },
   "lint-staged": {
     "*(apps/**/*.{js,ts}|packages/!(*golden-test-generator)/**/*.{js,ts})": [
