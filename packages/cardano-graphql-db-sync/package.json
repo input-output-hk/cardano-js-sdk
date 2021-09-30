@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@cardano-graphql/client-ts": "^5.1.0-beta.1",
-    "@cardano-ogmios/client": "^4.0.0-beta.6",
+    "@cardano-ogmios/client": "4.0.0",
     "graphql": "^15.5.1",
     "graphql-request": "^3.5.0"
   }

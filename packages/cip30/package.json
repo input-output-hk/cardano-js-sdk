@@ -28,7 +28,7 @@
     "webextension-polyfill": "^0.8.0"
   },
   "dependencies": {
-    "@cardano-ogmios/client": "^4.0.0-beta.6",
+    "@cardano-ogmios/client": "4.0.0",
     "ts-custom-error": "^3.2.0",
     "ts-log": "^2.2.3"
   }

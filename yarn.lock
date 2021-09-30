@@ -499,7 +499,7 @@
   resolved "https://registry.yarnpkg.com/@cardano-graphql/client-ts/-/client-ts-5.1.0-beta.1.tgz#440d1e48a07e6e454e9b5d9fb4336d6e649127f4"
   integrity sha512-FrOv5eV74o4BNrh95VNmzl166QeLxr7K8HYqHI3N+tFujbU6ELjRu8A15HKzcsjYaUiakFaj0d7PGzY5SG8r5w==
 
-"@cardano-ogmios/client@^4.0.0":
+"@cardano-ogmios/client@4.0.0":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@cardano-ogmios/client/-/client-4.0.0.tgz#0d8637753db15cf6b1f72d553d434f2658b0c078"
   integrity sha512-WYxX2CI78RSAPjOZAqgrepBp6PG36i5h+QFxUvK33ih8BgOatsqk2haURY/SHnd2RT96053t9DeZpyGz5PgbgQ==
@@ -514,35 +514,10 @@
     ts-custom-error "^3.2.0"
     ws "^7.4.6"
 
-"@cardano-ogmios/client@^4.0.0-beta.6":
-  version "4.0.0-beta.6"
-  resolved "https://registry.yarnpkg.com/@cardano-ogmios/client/-/client-4.0.0-beta.6.tgz#ba16c227c49cfd58d44d8b06354bee3e4ad68ed6"
-  integrity sha512-cOxNLRH2sjha3yLrSZgetT2KeTv7ZfWN7CmEHBOINiqmK9AHLGQdq/1W/A38BBbYR7tepF2sF9LSzO3FjEInyw==
-  dependencies:
-    "@cardano-ogmios/schema" "4.0.0-beta.6"
-    "@types/json-bigint" "^1.0.1"
-    cross-fetch "^3.1.4"
-    fastq "^1.11.0"
-    isomorphic-ws "^4.0.1"
-    json-bigint "^1.0.0"
-    nanoid "^3.1.22"
-    ts-custom-error "^3.2.0"
-    ws "^7.4.6"
-
 "@cardano-ogmios/schema@4.0.0":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@cardano-ogmios/schema/-/schema-4.0.0.tgz#47d35aa17ce1e63295962c0624f562fda3244e03"
   integrity sha512-fZnkNjQlolTx6FiGyz/D7YFsmugxKjIyx4Wr5ZPKJOHqAt5td/eU733atL9Dn2j0eb+ChM7Q5aTe1s7O6I9BrQ==
-
-"@cardano-ogmios/schema@4.0.0-beta.6":
-  version "4.0.0-beta.6"
-  resolved "https://registry.yarnpkg.com/@cardano-ogmios/schema/-/schema-4.0.0-beta.6.tgz#4aca740b6b70e310d342fb187bc7b03438447bef"
-  integrity sha512-7pHaU/fje4dRwV45rmLPowEe/3L5DuZt1f0892iCfvA76FTe3psRQNgvSN+vJ4lpPumz+IWKpMxrpZfKwzUdHw==
-
-"@cardano-ogmios/schema@^4.0.0-beta.6":
-  version "4.0.0-beta.9"
-  resolved "https://registry.yarnpkg.com/@cardano-ogmios/schema/-/schema-4.0.0-beta.9.tgz#081b96e03deb541fd9ce391c77d365104fc064d0"
-  integrity sha512-F/UYk2Ur83RnMFPgJzrnT7rev7K1i6A/wNWH7hUXU5eh1rAP6YqJaanKWicPiqjUzAFlMzyCxVUfgzP8WhL4JA==
 
 "@commitlint/cli@^13.1.0":
   version "13.1.0"
