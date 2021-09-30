@@ -37,7 +37,8 @@ export const roundRobinRandomImprove = (csl: CardanoSerializationLib): InputSele
         })
     });
 
-    if (inputs.length > (await computeSelectionLimit({ inputs, change, fee: maxBigNum(csl), outputs }))) {
+    const feeBigNum = csl.BigNum.from_str(fee.toString());
+    if (inputs.length > (await computeSelectionLimit({ inputs, change, fee: feeBigNum, outputs }))) {
       throw new InputSelectionError(InputSelectionFailure.MaximumInputCountExceeded);
     }
 
@@ -46,7 +47,7 @@ export const roundRobinRandomImprove = (csl: CardanoSerializationLib): InputSele
         change,
         inputs,
         outputs,
-        fee: csl.BigNum.from_str(fee.toString())
+        fee: feeBigNum
       },
       remainingUTxO
     };
