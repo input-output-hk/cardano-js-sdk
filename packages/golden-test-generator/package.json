@@ -25,14 +25,16 @@
     "coverage": "shx echo No coverage report for this package"
   },
   "dependencies": {
-    "@cardano-ogmios/client": "^4.0.0-beta.6",
+    "@cardano-ogmios/client": "4.0.0",
     "chalk": "^4.1.1",
     "clear": "^0.1.0",
     "cli-progress": "^3.9.0",
     "commander": "^8.0.0",
     "fs-extra": "^10.0.0",
     "git-last-commit": "^1.0.0",
-    "object-hash": "^2.2.0"
+    "json-bigint": "^1.0.0",
+    "object-hash": "^2.2.0",
+    "ts-log": "^2.2.3"
   },
   "devDependencies": {
     "@types/cli-progress": "^3.9.2",

@@ -1,9 +1,11 @@
+import { Logger, dummyLogger } from 'ts-log';
 import {
   ConnectionConfig,
   createChainSyncClient,
   createInteractionContext,
   StateQuery,
   isAllegraBlock,
+  isAlonzoBlock,
   isShelleyBlock,
   isMaryBlock,
   Schema
@@ -16,13 +18,15 @@ export type GetBlocksResponse = GeneratorMetadata & {
   blocks: { [blockHeight: string]: Schema.Block };
 };
 
-export async function getBlocks(
+export const getBlocks = async (
   blockHeights: number[],
   options?: {
+    logger?: Logger;
     ogmiosConnectionConfig: ConnectionConfig;
     onBlock?: (slot: number) => void;
   }
-): Promise<GetBlocksResponse> {
+): Promise<GetBlocksResponse> => {
+  const logger = options?.logger ?? dummyLogger;
   const requestedBlocks: { [blockHeight: string]: Schema.Block } = {};
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
@@ -33,7 +37,7 @@ export async function getBlocks(
       metadata: {
         cardano: {
           compactGenesis: await StateQuery.genesisConfig(
-            await createInteractionContext(reject, console.log, { connection: options.ogmiosConnectionConfig })
+            await createInteractionContext(reject, logger.info, { connection: options.ogmiosConnectionConfig })
           ),
           intersection: undefined
         }
@@ -42,14 +46,19 @@ export async function getBlocks(
     };
     try {
       const syncClient = await createChainSyncClient(
-        await createInteractionContext(reject, console.log, { connection: options.ogmiosConnectionConfig }),
+        await createInteractionContext(reject, logger.info, { connection: options.ogmiosConnectionConfig }),
         {
           rollBackward: async (_res, requestNext) => {
             requestNext();
           },
           rollForward: async ({ block }, requestNext) => {
             if (draining) return;
-            let b: Schema.StandardBlock | Schema.BlockShelley | Schema.BlockAllegra | Schema.BlockMary;
+            let b:
+              | Schema.StandardBlock
+              | Schema.BlockShelley
+              | Schema.BlockAllegra
+              | Schema.BlockMary
+              | Schema.BlockAlonzo;
             if (isByronStandardBlock(block)) {
               b = block.byron as Schema.StandardBlock;
             } else if (isShelleyBlock(block)) {
@@ -58,6 +67,8 @@ export async function getBlocks(
               b = block.allegra as Schema.BlockAllegra;
             } else if (isMaryBlock(block)) {
               b = block.mary as Schema.BlockMary;
+            } else if (isAlonzoBlock(block)) {
+              b = block.alonzo as Schema.BlockAlonzo;
             }
             if (b !== undefined) {
               currentBlock = b.header.blockHeight;
@@ -80,8 +91,8 @@ export async function getBlocks(
       );
       response.metadata.cardano.intersection = await syncClient.startSync(['origin']);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       return reject(error);
     }
   });
-}
+};

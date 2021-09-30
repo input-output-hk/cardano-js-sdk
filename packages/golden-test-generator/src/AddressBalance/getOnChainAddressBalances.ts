@@ -1,12 +1,14 @@
+import { dummyLogger, Logger } from 'ts-log';
 import {
   createChainSyncClient,
   StateQuery,
   isAllegraBlock,
+  isAlonzoBlock,
   isShelleyBlock,
   isMaryBlock,
   Schema,
   ConnectionConfig,
-  createInteractionContext
+  createInteractionContext,
 } from '@cardano-ogmios/client';
 import { GeneratorMetadata } from '../Content';
 import { isByronStandardBlock } from '../util';
@@ -20,14 +22,16 @@ export type AddressBalancesResponse = GeneratorMetadata & {
   balances: { [blockHeight: string]: AddressBalances };
 };
 
-export async function getOnChainAddressBalances(
+export const getOnChainAddressBalances = (
   addresses: string[],
   atBlocks: number[],
   options?: {
+    logger?: Logger;
     ogmiosConnectionConfig: ConnectionConfig;
     onBlock?: (slot: number) => void;
   }
-): Promise<AddressBalancesResponse> {
+): Promise<AddressBalancesResponse> => {
+  const logger = options?.logger ?? dummyLogger;
   const trackedAddressBalances: AddressBalances = Object.fromEntries(
     addresses.map((address) => [address, { coins: 0, assets: {} }])
   );
@@ -41,7 +45,7 @@ export async function getOnChainAddressBalances(
       metadata: {
         cardano: {
           compactGenesis: await StateQuery.genesisConfig(
-            await createInteractionContext(reject, console.log, { connection: options.ogmiosConnectionConfig })
+            await createInteractionContext(reject, logger.info, { connection: options.ogmiosConnectionConfig })
           ),
           intersection: undefined
         }
@@ -50,19 +54,25 @@ export async function getOnChainAddressBalances(
     };
     try {
       const syncClient = await createChainSyncClient(
-        await createInteractionContext(reject, console.log, { connection: options.ogmiosConnectionConfig }),
+        await createInteractionContext(reject, logger.info, { connection: options.ogmiosConnectionConfig }),
         {
           rollBackward: async (_res, requestNext) => {
             requestNext();
           },
           rollForward: async ({ block }, requestNext) => {
             if (draining) return;
-            let b: Schema.StandardBlock | Schema.BlockShelley | Schema.BlockAllegra | Schema.BlockMary;
+            let b:
+              | Schema.StandardBlock
+              | Schema.BlockShelley
+              | Schema.BlockAllegra
+              | Schema.BlockMary
+              | Schema.BlockAlonzo;
             let blockBody:
               | Schema.StandardBlock['body']['txPayload']
               | Schema.BlockShelley['body']
               | Schema.BlockAllegra['body']
-              | Schema.BlockMary['body'];
+              | Schema.BlockMary['body']
+              | Schema.BlockAlonzo['body'];
             if (isByronStandardBlock(block)) {
               b = block.byron as Schema.StandardBlock;
               blockBody = b.body.txPayload;
@@ -75,6 +85,8 @@ export async function getOnChainAddressBalances(
             } else if (isMaryBlock(block)) {
               b = block.mary as Schema.BlockMary;
               blockBody = b.body;
+            } else if (isAlonzoBlock(block)) {
+              b = block.alonzo as Schema.BlockAlonzo;
             }
             if (b !== undefined) {
               currentBlock = b.header.blockHeight;
@@ -112,8 +124,8 @@ export async function getOnChainAddressBalances(
       );
       response.metadata.cardano.intersection = await syncClient.startSync(['origin']);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       return reject(error);
     }
   });
-}
+};
