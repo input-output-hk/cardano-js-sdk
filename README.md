@@ -77,6 +77,18 @@ yarn cleanup
 yarn docs
 ```
 
+## Maintenance
+
+## Bump Version
+```console
+yarn bump-version
+```
+
+New package checklist:
+1. Extend packageMap in [.versionrc.js](./.versionrc.js)
+2. Extend [pack.sh](./scripts/pack.sh)
+3. Extend [publish.sh](./scripts/publish.sh)
+
 <p align="center">
   <a href="https://input-output-hk.github.io/cardano-js-sdk">:book: Documentation</a>
 </p>
