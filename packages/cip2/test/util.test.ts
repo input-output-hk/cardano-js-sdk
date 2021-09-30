@@ -1,5 +1,5 @@
 import { CardanoSerializationLib, loadCardanoSerializationLib, Asset } from '@cardano-sdk/core';
-import { ValueQuantities, valueQuantitiesToValue, valueToValueQuantities } from '../src/util';
+import { OgmiosValue, ogmiosValueToCslValue, valueToValueQuantities } from '../src/util';
 import { TSLA_Asset, PXL_Asset } from './util';
 
 describe('util', () => {
@@ -8,16 +8,16 @@ describe('util', () => {
     csl = await loadCardanoSerializationLib();
   });
 
-  describe('valueQuantitiesToValue', () => {
+  describe('ogmiosValueToCslValue', () => {
     it('coin only', () => {
       const quantities = { coins: 100_000n };
-      const value = valueQuantitiesToValue(quantities, csl);
+      const value = ogmiosValueToCslValue(quantities, csl);
       expect(value.coin().to_str()).toEqual(quantities.coins.toString());
       expect(value.multiasset()).toBeUndefined();
     });
     it('coin with assets', () => {
-      const quantities: ValueQuantities = { coins: 100_000n, assets: { [TSLA_Asset]: 100n, [PXL_Asset]: 200n } };
-      const value = valueQuantitiesToValue(quantities, csl);
+      const quantities: OgmiosValue = { coins: 100_000n, assets: { [TSLA_Asset]: 100n, [PXL_Asset]: 200n } };
+      const value = ogmiosValueToCslValue(quantities, csl);
       expect(value.coin().to_str()).toEqual(quantities.coins.toString());
       const multiasset = value.multiasset();
       expect(multiasset.len()).toBe(2);
@@ -39,7 +39,7 @@ describe('util', () => {
     it('coin with assets', () => {
       const coins = 100_000n;
       const assets = { [TSLA_Asset]: 100n, [PXL_Asset]: 200n };
-      const value = valueQuantitiesToValue({ coins, assets }, csl);
+      const value = ogmiosValueToCslValue({ coins, assets }, csl);
       const quantities = valueToValueQuantities(value);
       expect(quantities.coins).toEqual(coins);
       expect(quantities.assets).toEqual(assets);

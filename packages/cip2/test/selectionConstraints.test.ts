@@ -9,7 +9,7 @@ import {
 import { PXL_Asset, TSLA_Asset } from './util';
 import { defaultSelectionConstraints, DefaultSelectionConstraintsProps } from '../src/selectionConstraints';
 import { SelectionSkeleton } from '../src/types';
-import { valueQuantitiesToValue } from '../src/util';
+import { ogmiosValueToCslValue } from '../src/util';
 
 describe('defaultSelectionConstraints', () => {
   let csl: CardanoSerializationLib;
@@ -45,7 +45,7 @@ describe('defaultSelectionConstraints', () => {
   });
 
   it('computeMinimumCoinQuantity', () => {
-    const withAssets = valueQuantitiesToValue(
+    const withAssets = ogmiosValueToCslValue(
       {
         coins: 10_000n,
         assets: {

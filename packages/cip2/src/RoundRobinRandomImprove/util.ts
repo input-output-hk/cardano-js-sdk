@@ -1,10 +1,10 @@
 import { BigIntMath, CSL } from '@cardano-sdk/core';
 import { uniq } from 'lodash-es';
 import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
-import { ValueQuantities, valueToValueQuantities } from '../util';
+import { OgmiosValue, valueToValueQuantities } from '../util';
 
 export interface Totals {
-  totals: ValueQuantities;
+  totals: OgmiosValue;
 }
 
 export interface UtxoWithTotals extends Totals {
@@ -47,22 +47,19 @@ export const preprocessArgs = (
 export const totalsToValueQuantities = (totals: Totals[]) => totals.map((t) => t.totals);
 export const assetQuantitySelector =
   (id: string) =>
-  (quantities: ValueQuantities[]): bigint =>
+  (quantities: OgmiosValue[]): bigint =>
     BigIntMath.sum(quantities.map(({ assets }) => assets?.[id] || 0n));
 export const assetTotalsQuantitySelector =
   (id: string) =>
   (totals: Totals[]): bigint =>
     assetQuantitySelector(id)(totalsToValueQuantities(totals));
-export const getCoinQuantity = (quantities: ValueQuantities[]): bigint =>
+export const getCoinQuantity = (quantities: OgmiosValue[]): bigint =>
   BigIntMath.sum(quantities.map(({ coins }) => coins));
 export const getCoinTotalsQuantity = (totals: Totals[]): bigint => getCoinQuantity(totalsToValueQuantities(totals));
 
-export const assertIsCoinBalanceSufficient = (
-  utxoQuantities: ValueQuantities[],
-  outputsQuantities: ValueQuantities[]
-) => {
-  const utxoCoinTotal = getCoinQuantity(utxoQuantities);
-  const outputsCoinTotal = getCoinQuantity(outputsQuantities);
+export const assertIsCoinBalanceSufficient = (utxoValues: OgmiosValue[], outputValues: OgmiosValue[]) => {
+  const utxoCoinTotal = getCoinQuantity(utxoValues);
+  const outputsCoinTotal = getCoinQuantity(outputValues);
   if (outputsCoinTotal > utxoCoinTotal) {
     throw new InputSelectionError(InputSelectionFailure.UtxoBalanceInsufficient);
   }
@@ -76,16 +73,16 @@ export const assertIsCoinBalanceSufficient = (
  */
 export const assertIsBalanceSufficient = (
   uniqueOutputAssetIDs: string[],
-  utxoQuantities: ValueQuantities[],
-  outputsQuantities: ValueQuantities[]
+  utxoValues: OgmiosValue[],
+  outputValues: OgmiosValue[]
 ): void => {
   for (const assetId of uniqueOutputAssetIDs) {
     const getAssetQuantity = assetQuantitySelector(assetId);
-    const utxoTotal = getAssetQuantity(utxoQuantities);
-    const outputsTotal = getAssetQuantity(outputsQuantities);
+    const utxoTotal = getAssetQuantity(utxoValues);
+    const outputsTotal = getAssetQuantity(outputValues);
     if (outputsTotal > utxoTotal) {
       throw new InputSelectionError(InputSelectionFailure.UtxoBalanceInsufficient);
     }
   }
-  assertIsCoinBalanceSufficient(utxoQuantities, outputsQuantities);
+  assertIsCoinBalanceSufficient(utxoValues, outputValues);
 };

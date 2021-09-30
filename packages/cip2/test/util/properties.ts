@@ -2,7 +2,7 @@ import { AllAssets, containsUtxo, TestUtils } from './util';
 import { SelectionResult } from '../../src/types';
 import { CSL, Ogmios } from '@cardano-sdk/core';
 import { InputSelectionError, InputSelectionFailure } from '../../src/InputSelectionError';
-import { AssetQuantities, MAX_U64, ValueQuantities, valueToValueQuantities } from '../../src/util';
+import { TokenMap, MAX_U64, OgmiosValue, valueToValueQuantities } from '../../src/util';
 import fc, { Arbitrary } from 'fast-check';
 import { MockSelectionConstraints } from './constraints';
 
@@ -77,8 +77,8 @@ export const assertFailureProperties = ({
   outputsAmounts
 }: {
   error: InputSelectionError;
-  utxoAmounts: ValueQuantities[];
-  outputsAmounts: ValueQuantities[];
+  utxoAmounts: OgmiosValue[];
+  outputsAmounts: OgmiosValue[];
   constraints: MockSelectionConstraints;
 }) => {
   const utxoTotals = Ogmios.util.coalesceValueQuantities(...utxoAmounts);
@@ -122,7 +122,7 @@ export const generateSelectionParams = (() => {
   const arrayOfCoinAndAssets = () =>
     fc
       .array(
-        fc.record<ValueQuantities>({
+        fc.record<OgmiosValue>({
           coins: fc.bigUint(MAX_U64),
           assets: fc.oneof(
             fc
@@ -134,7 +134,7 @@ export const generateSelectionParams = (() => {
                 assets.reduce((quantities, { amount, asset }) => {
                   quantities[asset] = amount;
                   return quantities;
-                }, {} as AssetQuantities)
+                }, {} as TokenMap)
               ),
             fc.constant(void 0)
           )
@@ -148,8 +148,8 @@ export const generateSelectionParams = (() => {
       });
 
   return (): Arbitrary<{
-    utxoAmounts: ValueQuantities[];
-    outputsAmounts: ValueQuantities[];
+    utxoAmounts: OgmiosValue[];
+    outputsAmounts: OgmiosValue[];
     constraints: MockSelectionConstraints;
   }> =>
     fc.record({

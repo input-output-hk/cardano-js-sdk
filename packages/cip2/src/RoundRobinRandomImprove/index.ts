@@ -14,9 +14,9 @@ export const roundRobinRandomImprove = (csl: CardanoSerializationLib): InputSele
   }: InputSelectionParameters): Promise<SelectionResult> => {
     const { uniqueOutputAssetIDs, utxoWithTotals, outputsWithTotals } = preprocessArgs(utxo, outputs);
 
-    const utxoQuantities = totalsToValueQuantities(utxoWithTotals);
-    const outputsQuantities = totalsToValueQuantities(outputsWithTotals);
-    assertIsBalanceSufficient(uniqueOutputAssetIDs, utxoQuantities, outputsQuantities);
+    const utxoValues = totalsToValueQuantities(utxoWithTotals);
+    const outputValues = totalsToValueQuantities(outputsWithTotals);
+    assertIsBalanceSufficient(uniqueOutputAssetIDs, utxoValues, outputValues);
 
     const roundRobinSelectionResult = roundRobinSelection(utxoWithTotals, outputsWithTotals, uniqueOutputAssetIDs);
 
@@ -24,7 +24,7 @@ export const roundRobinRandomImprove = (csl: CardanoSerializationLib): InputSele
       csl,
       computeMinimumCoinQuantity,
       tokenBundleSizeExceedsLimit,
-      outputsQuantities,
+      outputValues,
       uniqueOutputAssetIDs,
       utxoSelection: roundRobinSelectionResult,
       estimateTxFee: (utxos, changeValues) =>
