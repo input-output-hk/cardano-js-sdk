@@ -62,7 +62,7 @@ describe('Wallet', () => {
     test('signTx', async () => {
       const { body, hash } = await wallet.initializeTx(props);
       const tx = await wallet.signTx(body, hash);
-      await expect(tx.body().outputs().len()).toBe(1);
+      await expect(tx.body().outputs().len()).toBe(2);
       await expect(tx.body().inputs().len()).toBeGreaterThan(0);
     });
 
