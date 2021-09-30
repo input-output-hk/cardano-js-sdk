@@ -11,15 +11,26 @@
 <hr/>
 
 ## Overview
+A suite of TypeScript packages suitable for both Node.js and browser-based development. 
 
-A Yarn Workspace containing packages to collectively form the SDK, written in TypeScript.
-
-- [@cardano-sdk/blockfrost](packages/blockfrost)
-- [@cardano-sdk/cardano-graphql-db-sync](packages/cardano-graphql-db-sync)
 - [@cardano-sdk/core](./packages/core)
+- [@cardano-sdk/cip2](./packages/cip2)
+- [@cardano-sdk/cip30](./packages/cip30)
+- [@cardano-sdk/wallet](./packages/wallet)
+
+### Cardano Provider Implementations
+- [@cardano-sdk/cardano-graphql-db-sync](packages/cardano-graphql-db-sync)
+- [@cardano-sdk/blockfrost](packages/blockfrost)
+
+:information_source: Looking to use a Cardano service not listed here? [Let us know!]
+
+### Testing
 - [@cardano-sdk/golden-test-generator](./packages/golden-test-generator)
 
 ## Development
+
+A Yarn Workspace maintaining a single version across all packages.
+
 #### System Requirements
 - Docker `17.12.0`+
 - Docker Compose
@@ -72,3 +83,4 @@ yarn docs
 
 [img_src_CI]: https://github.com/input-output-hk/cardano-js-sdk/actions/workflows/continuous-integration.yaml/badge.svg
 [workflow_CI]: https://github.com/input-output-hk/cardano-js-sdk/actions/workflows/continuous-integration.yaml
+[Let us know!]: https://github.com/input-output-hk/cardano-graphql/discussions/new
