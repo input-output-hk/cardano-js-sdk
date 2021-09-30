@@ -1,18 +1,18 @@
 import { BigIntMath } from '@cardano-sdk/core';
 import {
-  assetTotalsQuantitySelector,
-  getCoinTotalsQuantity,
-  OutputWithTotals,
-  Totals,
+  assetWithValueQuantitySelector,
+  getWithValuesCoinQuantity,
+  OutputWithValue,
+  WithValue,
   UtxoSelection,
-  UtxoWithTotals
+  UtxoWithValue
 } from './util';
 
 const improvesSelection = (
-  utxoAlreadySelected: UtxoWithTotals[],
-  input: UtxoWithTotals,
+  utxoAlreadySelected: UtxoWithValue[],
+  input: UtxoWithValue,
   minimumTarget: bigint,
-  getQuantity: (totals: Totals[]) => bigint
+  getQuantity: (totals: WithValue[]) => bigint
 ): boolean => {
   const oldQuantity = getQuantity(utxoAlreadySelected);
   // We still haven't reached the minimum target of
@@ -34,20 +34,20 @@ const improvesSelection = (
   return false;
 };
 
-const listTokensWithin = (uniqueOutputAssetIDs: string[], outputs: OutputWithTotals[]) => [
+const listTokensWithin = (uniqueOutputAssetIDs: string[], outputs: OutputWithValue[]) => [
   ...uniqueOutputAssetIDs.map((id) => {
-    const getQuantity = assetTotalsQuantitySelector(id);
+    const getQuantity = assetWithValueQuantitySelector(id);
     return {
       getQuantity,
       minimumTarget: getQuantity(outputs),
-      filterUtxo: (utxo: UtxoWithTotals[]) => utxo.filter(({ totals: { assets } }) => assets?.[id])
+      filterUtxo: (utxo: UtxoWithValue[]) => utxo.filter(({ value: { assets } }) => assets?.[id])
     };
   }),
   {
     // Lovelace
-    getQuantity: (totals: Totals[]) => getCoinTotalsQuantity(totals),
-    minimumTarget: getCoinTotalsQuantity(outputs),
-    filterUtxo: (utxo: UtxoWithTotals[]) => utxo
+    getQuantity: (totals: WithValue[]) => getWithValuesCoinQuantity(totals),
+    minimumTarget: getWithValuesCoinQuantity(outputs),
+    filterUtxo: (utxo: UtxoWithValue[]) => utxo
   }
 ];
 
@@ -58,12 +58,12 @@ const listTokensWithin = (uniqueOutputAssetIDs: string[], outputs: OutputWithTot
  * Considers all outputs collectively, as a combined output bundle.
  */
 export const roundRobinSelection = (
-  availableUtxo: UtxoWithTotals[],
-  outputs: OutputWithTotals[],
+  availableUtxo: UtxoWithValue[],
+  outputs: OutputWithValue[],
   uniqueOutputAssetIDs: string[]
 ): UtxoSelection => {
   // The subset of the UTxO that has already been selected:
-  const utxoSelected: UtxoWithTotals[] = [];
+  const utxoSelected: UtxoWithValue[] = [];
   // The subset of the UTxO that remains available for selection:
   const utxoRemaining = [...availableUtxo];
   // The set of tokens that we still need to cover:

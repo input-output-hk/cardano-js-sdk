@@ -4,7 +4,7 @@ import { BigIntMath } from '../util/BigIntMath';
 /**
  * {[assetId]: amount}
  */
-export type AssetQuantities = _OgmiosValue['assets'];
+export type TokenMap = _OgmiosValue['assets'];
 
 /**
  * Total quantities of Coin and Assets in a Value.
@@ -12,14 +12,14 @@ export type AssetQuantities = _OgmiosValue['assets'];
  */
 export interface OgmiosValue {
   coins: bigint;
-  assets?: AssetQuantities;
+  assets?: TokenMap;
 }
 
 /**
  * Sum asset quantities
  */
-const coalesceAssetTotals = (...totals: (AssetQuantities | undefined)[]): AssetQuantities | undefined => {
-  const result: AssetQuantities = {};
+const coalesceTokenMaps = (...totals: (TokenMap | undefined)[]): TokenMap | undefined => {
+  const result: TokenMap = {};
   for (const assetTotals of totals.filter((quantities) => !!quantities)) {
     for (const assetKey in assetTotals) {
       result[assetKey] = (result[assetKey] || 0n) + assetTotals[assetKey];
@@ -37,5 +37,5 @@ const coalesceAssetTotals = (...totals: (AssetQuantities | undefined)[]): AssetQ
  */
 export const coalesceValueQuantities = (...quantities: OgmiosValue[]): OgmiosValue => ({
   coins: BigIntMath.sum(quantities.map(({ coins }) => coins)),
-  assets: coalesceAssetTotals(...quantities.map(({ assets }) => assets))
+  assets: coalesceTokenMaps(...quantities.map(({ assets }) => assets))
 });

@@ -3,7 +3,7 @@
 // These utils should be moved after CSL is updated to use bigint.
 import { CardanoSerializationLib, CSL, Asset, Ogmios } from '@cardano-sdk/core';
 
-export type TokenMap = Ogmios.util.AssetQuantities;
+export type TokenMap = Ogmios.util.TokenMap;
 export type OgmiosValue = Ogmios.util.OgmiosValue;
 
 export const MAX_U64 = 18_446_744_073_709_551_615n;

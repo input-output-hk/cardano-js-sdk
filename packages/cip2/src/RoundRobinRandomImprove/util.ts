@@ -3,59 +3,59 @@ import { uniq } from 'lodash-es';
 import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
 import { OgmiosValue, valueToValueQuantities } from '../util';
 
-export interface Totals {
-  totals: OgmiosValue;
+export interface WithValue {
+  value: OgmiosValue;
 }
 
-export interface UtxoWithTotals extends Totals {
+export interface UtxoWithValue extends WithValue {
   utxo: CSL.TransactionUnspentOutput;
 }
 
-export interface OutputWithTotals extends Totals {
+export interface OutputWithValue extends WithValue {
   output: CSL.TransactionOutput;
 }
 
 export interface RoundRobinRandomImproveArgs {
-  utxoWithTotals: UtxoWithTotals[];
-  outputsWithTotals: OutputWithTotals[];
+  utxosWithValue: UtxoWithValue[];
+  outputsWithValue: OutputWithValue[];
   uniqueOutputAssetIDs: string[];
 }
 
 export interface UtxoSelection {
-  utxoSelected: UtxoWithTotals[];
-  utxoRemaining: UtxoWithTotals[];
+  utxoSelected: UtxoWithValue[];
+  utxoRemaining: UtxoWithValue[];
 }
 
 export const preprocessArgs = (
   availableUtxo: CSL.TransactionUnspentOutput[],
   outputs: CSL.TransactionOutput[]
 ): RoundRobinRandomImproveArgs => {
-  const utxoWithTotals = availableUtxo.map((utxo) => ({
+  const utxosWithValue = availableUtxo.map((utxo) => ({
     utxo,
-    totals: valueToValueQuantities(utxo.output().amount())
+    value: valueToValueQuantities(utxo.output().amount())
   }));
-  const outputsWithTotals = outputs.map((output) => ({
+  const outputsWithValue = outputs.map((output) => ({
     output,
-    totals: valueToValueQuantities(output.amount())
+    value: valueToValueQuantities(output.amount())
   }));
   const uniqueOutputAssetIDs = uniq(
-    outputsWithTotals.flatMap(({ totals: { assets } }) => (assets && Object.keys(assets)) || [])
+    outputsWithValue.flatMap(({ value: { assets } }) => (assets && Object.keys(assets)) || [])
   );
-  return { uniqueOutputAssetIDs, utxoWithTotals, outputsWithTotals };
+  return { uniqueOutputAssetIDs, utxosWithValue, outputsWithValue };
 };
 
-export const totalsToValueQuantities = (totals: Totals[]) => totals.map((t) => t.totals);
+export const withValuesToValues = (totals: WithValue[]) => totals.map((t) => t.value);
 export const assetQuantitySelector =
   (id: string) =>
   (quantities: OgmiosValue[]): bigint =>
     BigIntMath.sum(quantities.map(({ assets }) => assets?.[id] || 0n));
-export const assetTotalsQuantitySelector =
+export const assetWithValueQuantitySelector =
   (id: string) =>
-  (totals: Totals[]): bigint =>
-    assetQuantitySelector(id)(totalsToValueQuantities(totals));
+  (totals: WithValue[]): bigint =>
+    assetQuantitySelector(id)(withValuesToValues(totals));
 export const getCoinQuantity = (quantities: OgmiosValue[]): bigint =>
   BigIntMath.sum(quantities.map(({ coins }) => coins));
-export const getCoinTotalsQuantity = (totals: Totals[]): bigint => getCoinQuantity(totalsToValueQuantities(totals));
+export const getWithValuesCoinQuantity = (totals: WithValue[]): bigint => getCoinQuantity(withValuesToValues(totals));
 
 export const assertIsCoinBalanceSufficient = (utxoValues: OgmiosValue[], outputValues: OgmiosValue[]) => {
   const utxoCoinTotal = getCoinQuantity(utxoValues);

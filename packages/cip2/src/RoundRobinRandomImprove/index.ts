@@ -4,7 +4,7 @@ import { InputSelectionParameters, InputSelector, SelectionResult } from '../typ
 import { maxBigNum } from '../util';
 import { computeChangeAndAdjustForFee } from './change';
 import { roundRobinSelection } from './roundRobin';
-import { assertIsBalanceSufficient, preprocessArgs, totalsToValueQuantities } from './util';
+import { assertIsBalanceSufficient, preprocessArgs, withValuesToValues } from './util';
 
 export const roundRobinRandomImprove = (csl: CardanoSerializationLib): InputSelector => ({
   select: async ({
@@ -12,13 +12,13 @@ export const roundRobinRandomImprove = (csl: CardanoSerializationLib): InputSele
     outputs,
     constraints: { computeMinimumCost, computeSelectionLimit, computeMinimumCoinQuantity, tokenBundleSizeExceedsLimit }
   }: InputSelectionParameters): Promise<SelectionResult> => {
-    const { uniqueOutputAssetIDs, utxoWithTotals, outputsWithTotals } = preprocessArgs(utxo, outputs);
+    const { uniqueOutputAssetIDs, utxosWithValue, outputsWithValue } = preprocessArgs(utxo, outputs);
 
-    const utxoValues = totalsToValueQuantities(utxoWithTotals);
-    const outputValues = totalsToValueQuantities(outputsWithTotals);
+    const utxoValues = withValuesToValues(utxosWithValue);
+    const outputValues = withValuesToValues(outputsWithValue);
     assertIsBalanceSufficient(uniqueOutputAssetIDs, utxoValues, outputValues);
 
-    const roundRobinSelectionResult = roundRobinSelection(utxoWithTotals, outputsWithTotals, uniqueOutputAssetIDs);
+    const roundRobinSelectionResult = roundRobinSelection(utxosWithValue, outputsWithValue, uniqueOutputAssetIDs);
 
     const { change, inputs, remainingUTxO, fee } = await computeChangeAndAdjustForFee({
       csl,
