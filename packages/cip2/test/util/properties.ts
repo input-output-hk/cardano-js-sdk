@@ -2,7 +2,7 @@ import { AllAssets, containsUtxo, TestUtils } from './util';
 import { SelectionResult } from '../../src/types';
 import { CSL, Ogmios } from '@cardano-sdk/core';
 import { InputSelectionError, InputSelectionFailure } from '../../src/InputSelectionError';
-import { AssetQuantities, MAX_U64, ValueQuantities, valueToValueQuantities } from '../../src/util';
+import { TokenMap, MAX_U64, OgmiosValue, valueToValueQuantities } from '../../src/util';
 import fc, { Arbitrary } from 'fast-check';
 import { MockSelectionConstraints } from './constraints';
 
@@ -27,14 +27,12 @@ export const assertInputSelectionProperties = ({
   results,
   outputs,
   utxo,
-  outputsObj,
   constraints
 }: {
   utils: TestUtils;
   results: SelectionResult;
   outputs: CSL.TransactionOutput[];
   utxo: CSL.TransactionUnspentOutput[];
-  outputsObj: CSL.TransactionOutputs;
   constraints: MockSelectionConstraints;
 }) => {
   const vSelected = utils.getTotalInputAmounts(results);
@@ -48,7 +46,8 @@ export const assertInputSelectionProperties = ({
 
   // Correctness of Change
   const vChange = utils.getTotalChangeAmounts(results);
-  expect(vSelected.coins).toEqual(vRequested.coins + vChange.coins);
+  const vFee = BigInt(results.selection.fee.to_str());
+  expect(vSelected.coins).toEqual(vRequested.coins + vChange.coins + vFee);
   for (const assetName of AllAssets) {
     expect(vSelected.assets?.[assetName] || 0n).toEqual(
       (vRequested.assets?.[assetName] || 0n) + (vChange.assets?.[assetName] || 0n)
@@ -66,7 +65,7 @@ export const assertInputSelectionProperties = ({
   // Conservation of Outputs
   // If this is used to test other algorithms refactor this
   // to clone outputs before and do deepEquals to assert it wasn't mutated
-  expect(results.selection.outputs).toEqual(outputsObj);
+  expect(results.selection.outputs).toBe(outputs);
 
   assertExtraChangeProperties(constraints, results);
 };
@@ -78,8 +77,8 @@ export const assertFailureProperties = ({
   outputsAmounts
 }: {
   error: InputSelectionError;
-  utxoAmounts: ValueQuantities[];
-  outputsAmounts: ValueQuantities[];
+  utxoAmounts: OgmiosValue[];
+  outputsAmounts: OgmiosValue[];
   constraints: MockSelectionConstraints;
 }) => {
   const utxoTotals = Ogmios.util.coalesceValueQuantities(...utxoAmounts);
@@ -98,8 +97,9 @@ export const assertFailureProperties = ({
     case InputSelectionFailure.UtxoFullyDepleted: {
       const numUtxoAssets = Object.keys(utxoTotals.assets || {}).length;
       const bundleSizePotentiallyTooLarge = numUtxoAssets > constraints.maxTokenBundleSize;
-      const minimumCoinQuantityNotMet = utxoTotals.coins - outputsTotals.coins < constraints.minimumCoinQuantity;
-      expect(bundleSizePotentiallyTooLarge || minimumCoinQuantityNotMet).toBe(true);
+      const changeMinimumCoinQuantityNotMet =
+        utxoTotals.coins - outputsTotals.coins - constraints.minimumCost < constraints.minimumCoinQuantity;
+      expect(bundleSizePotentiallyTooLarge || changeMinimumCoinQuantityNotMet).toBe(true);
       return;
     }
     case InputSelectionFailure.MaximumInputCountExceeded: {
@@ -122,7 +122,7 @@ export const generateSelectionParams = (() => {
   const arrayOfCoinAndAssets = () =>
     fc
       .array(
-        fc.record<ValueQuantities>({
+        fc.record<OgmiosValue>({
           coins: fc.bigUint(MAX_U64),
           assets: fc.oneof(
             fc
@@ -134,7 +134,7 @@ export const generateSelectionParams = (() => {
                 assets.reduce((quantities, { amount, asset }) => {
                   quantities[asset] = amount;
                   return quantities;
-                }, {} as AssetQuantities)
+                }, {} as TokenMap)
               ),
             fc.constant(void 0)
           )
@@ -148,8 +148,8 @@ export const generateSelectionParams = (() => {
       });
 
   return (): Arbitrary<{
-    utxoAmounts: ValueQuantities[];
-    outputsAmounts: ValueQuantities[];
+    utxoAmounts: OgmiosValue[];
+    outputsAmounts: OgmiosValue[];
     constraints: MockSelectionConstraints;
   }> =>
     fc.record({

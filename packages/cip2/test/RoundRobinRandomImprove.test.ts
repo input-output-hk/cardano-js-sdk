@@ -28,6 +28,19 @@ describe('RoundRobinRandomImprove', () => {
           mockConstraints: NO_CONSTRAINTS
         });
       });
+      it('No outputs', async () => {
+        // Regression
+        await testInputSelectionProperties({
+          getAlgorithm: getRoundRobinRandomImprove,
+          createUtxo: (utils) => [utils.createUnspentTxOutput({ coins: 11_999_994n })],
+          createOutputs: () => [],
+          mockConstraints: {
+            ...NO_CONSTRAINTS,
+            minimumCoinQuantity: 9_999_991n,
+            minimumCost: 2_000_003n
+          }
+        });
+      });
     });
     describe('Failure Modes', () => {
       describe('UtxoBalanceInsufficient', () => {
@@ -144,15 +157,14 @@ describe('RoundRobinRandomImprove', () => {
         // Run input selection
         const utxo = utxoAmounts.map((valueQuantities) => utils.createUnspentTxOutput(valueQuantities));
         const outputs = outputsAmounts.map((valueQuantities) => utils.createOutput(valueQuantities));
-        const outputsObj = utils.createOutputsObj(outputs);
 
         try {
           const results = await algorithm.select({
             utxo,
-            outputs: outputsObj,
+            outputs,
             constraints: toConstraints(constraints)
           });
-          assertInputSelectionProperties({ utils, results, outputs, utxo, outputsObj, constraints });
+          assertInputSelectionProperties({ utils, results, outputs, utxo, constraints });
         } catch (error) {
           if (error instanceof InputSelectionError) {
             assertFailureProperties({ error, utxoAmounts, outputsAmounts, constraints });

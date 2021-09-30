@@ -3,23 +3,14 @@
 // These utils should be moved after CSL is updated to use bigint.
 import { CardanoSerializationLib, CSL, Asset, Ogmios } from '@cardano-sdk/core';
 
-export type AssetQuantities = Ogmios.util.AssetQuantities;
-export type ValueQuantities = Ogmios.util.ValueQuantities;
+export type TokenMap = Ogmios.util.TokenMap;
+export type OgmiosValue = Ogmios.util.OgmiosValue;
 
 export const MAX_U64 = 18_446_744_073_709_551_615n;
 export const maxBigNum = (csl: CardanoSerializationLib) => csl.BigNum.from_str(MAX_U64.toString());
 
-export const transactionOutputsToArray = (outputs: CSL.TransactionOutputs): CSL.TransactionOutput[] => {
-  const result: CSL.TransactionOutput[] = [];
-  for (let outputIdx = 0; outputIdx < outputs.len(); outputIdx++) {
-    const output = outputs.get(outputIdx);
-    result.push(output);
-  }
-  return result;
-};
-
-export const valueToValueQuantities = (value: CSL.Value): ValueQuantities => {
-  const result: ValueQuantities = {
+export const valueToValueQuantities = (value: CSL.Value): OgmiosValue => {
+  const result: OgmiosValue = {
     coins: BigInt(value.coin().to_str())
   };
   const multiasset = value.multiasset();
@@ -44,7 +35,7 @@ export const valueToValueQuantities = (value: CSL.Value): ValueQuantities => {
 };
 
 // This is equivalent to ogmiosToCsl.value(), so they should be merged.
-export const valueQuantitiesToValue = ({ coins, assets }: ValueQuantities, csl: CardanoSerializationLib): CSL.Value => {
+export const ogmiosValueToCslValue = ({ coins, assets }: OgmiosValue, csl: CardanoSerializationLib): CSL.Value => {
   const value = csl.Value.new(csl.BigNum.from_str(coins.toString()));
   if (!assets) {
     return value;

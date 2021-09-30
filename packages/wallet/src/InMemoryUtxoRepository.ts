@@ -54,7 +54,7 @@ export class InMemoryUtxoRepository implements UtxoRepository {
   }
 
   public async selectInputs(
-    outputs: CSL.TransactionOutputs,
+    outputs: CSL.TransactionOutput[],
     constraints: SelectionConstraints
   ): Promise<SelectionResult> {
     if (this.#utxoSet.size === 0) {

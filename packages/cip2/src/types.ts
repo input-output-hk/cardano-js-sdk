@@ -12,7 +12,7 @@ export interface SelectionResult {
     /**
      * Set of payments to be made to recipient addresses.
      */
-    outputs: CSL.TransactionOutputs;
+    outputs: CSL.TransactionOutput[];
     /**
      * A set of change values. Does not account for fee.
      *
@@ -36,7 +36,7 @@ export interface SelectionResult {
 
 export interface SelectionSkeleton {
   inputs: CSL.TransactionUnspentOutput[];
-  outputs: CSL.TransactionOutputs;
+  outputs: CSL.TransactionOutput[];
   change: CSL.Value[];
   fee: CSL.BigNum;
 }
@@ -77,7 +77,7 @@ export interface InputSelectionParameters {
   /**
    * The set of outputs requested for payment.
    */
-  outputs: CSL.TransactionOutputs;
+  outputs: CSL.TransactionOutput[];
   /**
    * Input selection constraints
    */

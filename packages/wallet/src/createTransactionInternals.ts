@@ -20,9 +20,16 @@ export const createTransactionInternals = async (
   for (const utxo of props.inputSelection.inputs) {
     inputs.add(utxo.input());
   }
+  const outputs = csl.TransactionOutputs.new();
+  for (const output of props.inputSelection.outputs) {
+    outputs.add(output);
+  }
+  for (const value of props.inputSelection.change) {
+    outputs.add(csl.TransactionOutput.new(csl.Address.from_bech32(props.changeAddress), value));
+  }
   const body = csl.TransactionBody.new(
     inputs,
-    props.inputSelection.outputs,
+    outputs,
     props.inputSelection.fee,
     props.validityInterval.invalidHereafter
   );

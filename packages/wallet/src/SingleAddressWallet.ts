@@ -39,10 +39,7 @@ export const createSingleAddressWallet = async (
     initializeTx: async (props) => {
       const tip = await provider.ledgerTip();
       const validityInterval = ensureValidityInterval(tip.slot, props.options?.validityInterval);
-      const txOutputs = csl.TransactionOutputs.new();
-      for (const output of props.outputs) {
-        txOutputs.add(Ogmios.ogmiosToCsl(csl).txOut(output));
-      }
+      const txOutputs = props.outputs.map((output) => Ogmios.ogmiosToCsl(csl).txOut(output));
       const constraints = defaultSelectionConstraints({
         csl,
         protocolParameters,

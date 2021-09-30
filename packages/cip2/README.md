@@ -18,7 +18,7 @@ const demo = async (protocolParameters: ProtocolParametersRequiredByWallet): Pro
   // Bad: TransactionUnspentOutput.new(...)
   // Good: csl.TransactionUnspentOutput.new(...)
   const utxo: CSL.TransactionUnspentOutput[] = [csl.TransactionUnspentOutput.new(...), ...];
-  const outputs: CSL.TransactionOutputs = csl.TransactionOutputs.new(...);
+  const outputs: CSL.TransactionOutput[] = [csl.TransactionOutput.new(...), ...];
   // Used to estimate min fee and validate transaction size
   const buildTx = (inputSelection: SelectionSkeleton): Promise<CSL.Transaction> => {...};
   const constraints = defaultSelectionConstraints({

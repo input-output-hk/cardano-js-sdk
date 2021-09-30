@@ -1,10 +1,10 @@
 import { CardanoSerializationLib } from '@cardano-sdk/core';
 import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
 import { InputSelectionParameters, InputSelector, SelectionResult } from '../types';
-import { maxBigNum, transactionOutputsToArray } from '../util';
+import { maxBigNum } from '../util';
 import { computeChangeAndAdjustForFee } from './change';
 import { roundRobinSelection } from './roundRobin';
-import { assertIsBalanceSufficient, preprocessArgs } from './util';
+import { assertIsBalanceSufficient, preprocessArgs, withValuesToValues } from './util';
 
 export const roundRobinRandomImprove = (csl: CardanoSerializationLib): InputSelector => ({
   select: async ({
@@ -12,38 +12,19 @@ export const roundRobinRandomImprove = (csl: CardanoSerializationLib): InputSele
     outputs,
     constraints: { computeMinimumCost, computeSelectionLimit, computeMinimumCoinQuantity, tokenBundleSizeExceedsLimit }
   }: InputSelectionParameters): Promise<SelectionResult> => {
-    const outputsArray = transactionOutputsToArray(outputs);
-    if (outputsArray.length === 0) {
-      return {
-        remainingUTxO: utxo,
-        selection: {
-          inputs: [],
-          fee: csl.BigNum.from_str(
-            (
-              await computeMinimumCost({
-                change: [],
-                inputs: utxo,
-                fee: maxBigNum(csl),
-                outputs
-              })
-            ).toString()
-          ),
-          change: [],
-          outputs
-        }
-      };
-    }
+    const { uniqueOutputAssetIDs, utxosWithValue, outputsWithValue } = preprocessArgs(utxo, outputs);
 
-    const { uniqueOutputAssetIDs, utxoWithTotals, outputsWithTotals } = preprocessArgs(utxo, outputsArray);
-    assertIsBalanceSufficient(uniqueOutputAssetIDs, utxoWithTotals, outputsWithTotals);
+    const utxoValues = withValuesToValues(utxosWithValue);
+    const outputValues = withValuesToValues(outputsWithValue);
+    assertIsBalanceSufficient(uniqueOutputAssetIDs, utxoValues, outputValues);
 
-    const roundRobinSelectionResult = roundRobinSelection(utxoWithTotals, outputsWithTotals, uniqueOutputAssetIDs);
+    const roundRobinSelectionResult = roundRobinSelection(utxosWithValue, outputsWithValue, uniqueOutputAssetIDs);
 
     const { change, inputs, remainingUTxO, fee } = await computeChangeAndAdjustForFee({
       csl,
       computeMinimumCoinQuantity,
       tokenBundleSizeExceedsLimit,
-      outputsWithTotals,
+      outputValues,
       uniqueOutputAssetIDs,
       utxoSelection: roundRobinSelectionResult,
       estimateTxFee: (utxos, changeValues) =>
@@ -55,7 +36,8 @@ export const roundRobinRandomImprove = (csl: CardanoSerializationLib): InputSele
         })
     });
 
-    if (inputs.length > (await computeSelectionLimit({ inputs, change, fee: maxBigNum(csl), outputs }))) {
+    const feeBigNum = csl.BigNum.from_str(fee.toString());
+    if (inputs.length > (await computeSelectionLimit({ inputs, change, fee: feeBigNum, outputs }))) {
       throw new InputSelectionError(InputSelectionFailure.MaximumInputCountExceeded);
     }
 
@@ -64,7 +46,7 @@ export const roundRobinRandomImprove = (csl: CardanoSerializationLib): InputSele
         change,
         inputs,
         outputs,
-        fee: csl.BigNum.from_str(fee.toString())
+        fee: feeBigNum
       },
       remainingUTxO
     };

@@ -13,7 +13,7 @@ describe('InMemoryUtxoRepository', () => {
   let provider: CardanoProvider;
   let inputSelector: InputSelector;
   let csl: CardanoSerializationLib;
-  let outputs: CSL.TransactionOutputs;
+  let outputs: CSL.TransactionOutput[];
 
   beforeEach(async () => {
     provider = providerStub();
@@ -25,19 +25,16 @@ describe('InMemoryUtxoRepository', () => {
       networkId: 0,
       password: '123'
     });
-    outputs = csl.TransactionOutputs.new();
-    outputs.add(
+    outputs = [
       Ogmios.ogmiosToCsl(csl).txOut({
         address: addresses[0],
         value: { coins: 4_000_000 }
-      })
-    );
-    outputs.add(
+      }),
       Ogmios.ogmiosToCsl(csl).txOut({
         address: addresses[0],
         value: { coins: 2_000_000 }
       })
-    );
+    ];
     utxoRepository = new InMemoryUtxoRepository(csl, provider, keyManager, inputSelector);
   });
 
