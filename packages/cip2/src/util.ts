@@ -9,15 +9,6 @@ export type ValueQuantities = Ogmios.util.ValueQuantities;
 export const MAX_U64 = 18_446_744_073_709_551_615n;
 export const maxBigNum = (csl: CardanoSerializationLib) => csl.BigNum.from_str(MAX_U64.toString());
 
-export const transactionOutputsToArray = (outputs: CSL.TransactionOutputs): CSL.TransactionOutput[] => {
-  const result: CSL.TransactionOutput[] = [];
-  for (let outputIdx = 0; outputIdx < outputs.len(); outputIdx++) {
-    const output = outputs.get(outputIdx);
-    result.push(output);
-  }
-  return result;
-};
-
 export const valueToValueQuantities = (value: CSL.Value): ValueQuantities => {
   const result: ValueQuantities = {
     coins: BigInt(value.coin().to_str())

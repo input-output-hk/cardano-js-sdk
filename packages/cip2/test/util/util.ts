@@ -66,14 +66,6 @@ export const createCslTestUtils = (csl: CardanoSerializationLib) => {
       csl.TransactionInput.new(csl.TransactionHash.from_bech32(bech32TxHash), index || defaultIdx++);
   })();
 
-  const createOutputsObj = (outputs: CSL.TransactionOutput[]) => {
-    const result = csl.TransactionOutputs.new();
-    for (const output of outputs) {
-      result.add(output);
-    }
-    return result;
-  };
-
   const createUnspentTxOutput = (
     valueQuantities: ValueQuantities,
     bech32Addr = 'addr1vy36kffjf87vzkuyqc5g0ys3fe3pez5zvqg9r5z9q9kfrkg2cs093'
@@ -92,7 +84,6 @@ export const createCslTestUtils = (csl: CardanoSerializationLib) => {
   return {
     createUnspentTxOutput,
     createOutput,
-    createOutputsObj,
     getTotalOutputAmounts,
     getTotalInputAmounts,
     getTotalChangeAmounts

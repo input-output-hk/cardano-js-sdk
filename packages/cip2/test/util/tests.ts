@@ -46,9 +46,9 @@ export const testInputSelectionFailureMode = async ({
   const utxo = createUtxo(utils);
   const outputs = createOutputs(utils);
   const algorithm = getAlgorithm(SerializationLib);
-  await expect(
-    algorithm.select({ utxo, outputs: utils.createOutputsObj(outputs), constraints: toConstraints(mockConstraints) })
-  ).rejects.toThrowError(new InputSelectionError(expectedError));
+  await expect(algorithm.select({ utxo, outputs, constraints: toConstraints(mockConstraints) })).rejects.toThrowError(
+    new InputSelectionError(expectedError)
+  );
 };
 
 /**
@@ -64,8 +64,7 @@ export const testInputSelectionProperties = async ({
   const utils = createCslTestUtils(SerializationLib);
   const utxo = createUtxo(utils);
   const outputs = createOutputs(utils);
-  const outputsObj = utils.createOutputsObj(outputs);
   const algorithm = getAlgorithm(SerializationLib);
-  const results = await algorithm.select({ utxo, outputs: outputsObj, constraints: toConstraints(mockConstraints) });
-  assertInputSelectionProperties({ utils, results, outputs, outputsObj, constraints: mockConstraints, utxo });
+  const results = await algorithm.select({ utxo, outputs, constraints: toConstraints(mockConstraints) });
+  assertInputSelectionProperties({ utils, results, outputs, constraints: mockConstraints, utxo });
 };

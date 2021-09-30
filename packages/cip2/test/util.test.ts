@@ -1,18 +1,11 @@
 import { CardanoSerializationLib, loadCardanoSerializationLib, Asset } from '@cardano-sdk/core';
-import {
-  transactionOutputsToArray,
-  ValueQuantities,
-  valueQuantitiesToValue,
-  valueToValueQuantities
-} from '../src/util';
-import { TestUtils, createCslTestUtils, TSLA_Asset, PXL_Asset } from './util';
+import { ValueQuantities, valueQuantitiesToValue, valueToValueQuantities } from '../src/util';
+import { TSLA_Asset, PXL_Asset } from './util';
 
 describe('util', () => {
   let csl: CardanoSerializationLib;
-  let testUtils: TestUtils;
   beforeAll(async () => {
     csl = await loadCardanoSerializationLib();
-    testUtils = createCslTestUtils(csl);
   });
 
   describe('valueQuantitiesToValue', () => {
@@ -51,15 +44,5 @@ describe('util', () => {
       expect(quantities.coins).toEqual(coins);
       expect(quantities.assets).toEqual(assets);
     });
-  });
-
-  it('transactionOutputsToArray', () => {
-    const quantities = [10_000n, 20_000n].map((coins) => ({ coins }));
-    const outputsObj = testUtils.createOutputsObj(quantities.map((q) => testUtils.createOutput(q)));
-    const result = transactionOutputsToArray(outputsObj);
-    expect(result.length).toBe(quantities.length);
-    // Would test whether it's the same objects instead,
-    // but TransactionOutputs.add seems to create a new object.
-    expect(result.map((r) => valueToValueQuantities(r.amount()))).toEqual(quantities);
   });
 });

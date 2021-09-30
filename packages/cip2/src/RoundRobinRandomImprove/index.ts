@@ -1,7 +1,7 @@
 import { CardanoSerializationLib } from '@cardano-sdk/core';
 import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
 import { InputSelectionParameters, InputSelector, SelectionResult } from '../types';
-import { maxBigNum, transactionOutputsToArray } from '../util';
+import { maxBigNum } from '../util';
 import { computeChangeAndAdjustForFee } from './change';
 import { roundRobinSelection } from './roundRobin';
 import { assertIsBalanceSufficient, preprocessArgs, totalsToValueQuantities } from './util';
@@ -12,8 +12,7 @@ export const roundRobinRandomImprove = (csl: CardanoSerializationLib): InputSele
     outputs,
     constraints: { computeMinimumCost, computeSelectionLimit, computeMinimumCoinQuantity, tokenBundleSizeExceedsLimit }
   }: InputSelectionParameters): Promise<SelectionResult> => {
-    const outputsArray = transactionOutputsToArray(outputs);
-    const { uniqueOutputAssetIDs, utxoWithTotals, outputsWithTotals } = preprocessArgs(utxo, outputsArray);
+    const { uniqueOutputAssetIDs, utxoWithTotals, outputsWithTotals } = preprocessArgs(utxo, outputs);
 
     const utxoQuantities = totalsToValueQuantities(utxoWithTotals);
     const outputsQuantities = totalsToValueQuantities(outputsWithTotals);

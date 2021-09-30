@@ -27,14 +27,12 @@ export const assertInputSelectionProperties = ({
   results,
   outputs,
   utxo,
-  outputsObj,
   constraints
 }: {
   utils: TestUtils;
   results: SelectionResult;
   outputs: CSL.TransactionOutput[];
   utxo: CSL.TransactionUnspentOutput[];
-  outputsObj: CSL.TransactionOutputs;
   constraints: MockSelectionConstraints;
 }) => {
   const vSelected = utils.getTotalInputAmounts(results);
@@ -67,7 +65,7 @@ export const assertInputSelectionProperties = ({
   // Conservation of Outputs
   // If this is used to test other algorithms refactor this
   // to clone outputs before and do deepEquals to assert it wasn't mutated
-  expect(results.selection.outputs).toEqual(outputsObj);
+  expect(results.selection.outputs).toBe(outputs);
 
   assertExtraChangeProperties(constraints, results);
 };

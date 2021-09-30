@@ -157,15 +157,14 @@ describe('RoundRobinRandomImprove', () => {
         // Run input selection
         const utxo = utxoAmounts.map((valueQuantities) => utils.createUnspentTxOutput(valueQuantities));
         const outputs = outputsAmounts.map((valueQuantities) => utils.createOutput(valueQuantities));
-        const outputsObj = utils.createOutputsObj(outputs);
 
         try {
           const results = await algorithm.select({
             utxo,
-            outputs: outputsObj,
+            outputs,
             constraints: toConstraints(constraints)
           });
-          assertInputSelectionProperties({ utils, results, outputs, utxo, outputsObj, constraints });
+          assertInputSelectionProperties({ utils, results, outputs, utxo, constraints });
         } catch (error) {
           if (error instanceof InputSelectionError) {
             assertFailureProperties({ error, utxoAmounts, outputsAmounts, constraints });
