@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/cardano-graphql-db-sync",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Cardano Graphql (cardano-db-sync) integration",
   "engines": {
     "node": "^14"
