@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/blockfrost",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Blockfrost provider for Cardano JS SDK",
   "engines": {
     "node": "^14"
@@ -24,6 +24,6 @@
   "dependencies": {
     "@blockfrost/blockfrost-js": "^1.3.0",
     "@cardano-ogmios/schema": "4.0.0",
-    "@cardano-sdk/core": "0.1.0"
+    "@cardano-sdk/core": "0.1.1"
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/wallet",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Wallet modules",
   "engines": {
     "node": "^14"
@@ -27,8 +27,8 @@
   },
   "dependencies": {
     "@cardano-ogmios/schema": "4.0.0",
-    "@cardano-sdk/cip2": "0.1.0",
-    "@cardano-sdk/core": "0.1.0",
+    "@cardano-sdk/cip2": "0.1.1",
+    "@cardano-sdk/core": "0.1.1",
     "bip39": "^3.0.4",
     "ts-log": "^2.2.3"
   }

@@ -1,6 +1,6 @@
 const packageMap = [
   {
-    filename: "packages/package.json",
+    filename: "package.json",
     type: "json"
   },
   {
