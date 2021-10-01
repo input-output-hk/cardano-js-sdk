@@ -1,7 +1,7 @@
 import { expect, use } from 'chai'
 import * as chaiAsPromised from 'chai-as-promised'
 import CardanoSDK, { CardanoWalletProvider } from '..'
-import { generateMnemonic } from 'bip39'
+import { generateMnemonic } from 'isomorphic-bip39'
 import { RemotePayment, RemoteUnit } from '../Remote'
 import { RequestError } from '../lib'
 import { mockProvider } from './utils'

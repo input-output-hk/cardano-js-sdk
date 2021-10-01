@@ -1,4 +1,4 @@
-import * as bip39 from 'bip39';
+import * as bip39 from 'isomorphic-bip39';
 
 /**
  * A wrapper around the bip39 package function, with default strength applied to produce 24 words

@@ -1,5 +1,6 @@
-import * as bip39 from 'bip39';
+import * as bip39 from 'isomorphic-bip39';
 import { Cardano, CardanoSerializationLib, CSL } from '@cardano-sdk/core';
+import { Buffer } from 'buffer';
 import * as errors from './errors';
 import { KeyManager } from './KeyManager';
 import { harden } from './util';
