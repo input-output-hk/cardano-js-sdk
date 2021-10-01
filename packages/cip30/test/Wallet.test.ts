@@ -60,7 +60,7 @@ describe('Wallet', () => {
   });
 
   describe('api', () => {
-    let api: WalletApi | null;
+    let api: WalletApi;
 
     beforeAll(async () => {
       api = await wallet.enable(window);

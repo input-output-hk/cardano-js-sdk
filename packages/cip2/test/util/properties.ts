@@ -89,7 +89,7 @@ export const assertFailureProperties = ({
       const insufficientAsset =
         outputsTotals.assets &&
         Object.keys(outputsTotals.assets).some(
-          (assetId) => (utxoTotals.assets?.[assetId] || 0n) < outputsTotals.assets[assetId]
+          (assetId) => (utxoTotals.assets?.[assetId] || 0n) < outputsTotals.assets![assetId]
         );
       expect(insufficientCoin || insufficientAsset).toBe(true);
       return;

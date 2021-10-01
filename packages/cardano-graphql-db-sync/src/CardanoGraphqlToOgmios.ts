@@ -56,8 +56,9 @@ export const CardanoGraphqlToOgmios = {
   }),
 
   tip: (tip: CardanoGraphQlTip): Cardano.Tip => ({
-    blockNo: tip.number,
+    // Review: if number and slot can actually be undefined we should check it and either throw or return something else
+    blockNo: tip.number!,
     hash: tip.hash,
-    slot: tip.slotNo
+    slot: tip.slotNo!
   })
 };

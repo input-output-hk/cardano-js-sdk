@@ -29,11 +29,15 @@ module.exports = {
     "unicorn/prefer-node-protocol": 0,
     '@typescript-eslint/explicit-module-boundary-types': 0,
     "@typescript-eslint/ban-types": 0,
+    '@typescript-eslint/no-non-null-assertion': 0,
+    "@typescript-eslint/no-shadow": ["error"],
+    "@typescript-eslint/no-unused-vars": ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
     "template-tag-spacing": 0,
     "no-magic-numbers": 0,
+    'promise/avoid-new': 0,
+    'consistent-return': 0, // typescript checks return types
     "camelcase": 0,
     "no-shadow": "off", // eslint compains about TS enums hence disable here and enable @typescript-eslint/no-shadow
-    "@typescript-eslint/no-shadow": ["error"],
     "import/no-unresolved": 0
   }
 }

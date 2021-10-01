@@ -15,7 +15,6 @@ export const handleMessages = (walletApi: WalletApi, logger: Logger = dummyLogge
       return;
     }
 
-    // eslint-disable-next-line consistent-return
     return walletMethod(...msg.arguments);
   });
 };

@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/cognitive-complexity */
 import { Logger, dummyLogger } from 'ts-log';
 import {
   ConnectionConfig,
@@ -13,6 +14,7 @@ import {
 import { GeneratorMetadata } from '../Content';
 
 import { isByronStandardBlock } from '../util';
+import { Intersection } from '@cardano-ogmios/client/dist/ChainSync';
 
 export type GetBlocksResponse = GeneratorMetadata & {
   blocks: { [blockHeight: string]: Schema.Block };
@@ -20,7 +22,7 @@ export type GetBlocksResponse = GeneratorMetadata & {
 
 export const getBlocks = async (
   blockHeights: number[],
-  options?: {
+  options: {
     logger?: Logger;
     ogmiosConnectionConfig: ConnectionConfig;
     onBlock?: (slot: number) => void;
@@ -28,7 +30,6 @@ export const getBlocks = async (
 ): Promise<GetBlocksResponse> => {
   const logger = options?.logger ?? dummyLogger;
   const requestedBlocks: { [blockHeight: string]: Schema.Block } = {};
-  // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
     let currentBlock: number;
     // Required to ensure existing messages in the pipe are not processed after the completion condition is met
@@ -39,7 +40,8 @@ export const getBlocks = async (
           compactGenesis: await StateQuery.genesisConfig(
             await createInteractionContext(reject, logger.info, { connection: options.ogmiosConnectionConfig })
           ),
-          intersection: undefined
+          // Review: this can't be undefined acccording to type
+          intersection: undefined as unknown as Intersection
         }
       },
       blocks: {}
@@ -69,9 +71,11 @@ export const getBlocks = async (
               b = block.mary as Schema.BlockMary;
             } else if (isAlonzoBlock(block)) {
               b = block.alonzo as Schema.BlockAlonzo;
+            } else {
+              throw new Error('No support for block');
             }
             if (b !== undefined) {
-              currentBlock = b.header.blockHeight;
+              currentBlock = b.header!.blockHeight;
               if (options?.onBlock !== undefined) {
                 options.onBlock(currentBlock);
               }

@@ -68,7 +68,7 @@ const redistributeLeftoverAssets = (
     const quantities = orderBy(leftovers[assetId], (q) => q, 'desc');
     while (quantities.length > resultBundles.length) {
       // Coalesce the smallest quantities together
-      const smallestQuantity = quantities.pop();
+      const smallestQuantity = quantities.pop()!;
       quantities[quantities.length - 1] += smallestQuantity;
     }
     for (const [idx, quantity] of quantities.entries()) {
@@ -158,8 +158,8 @@ const computeRequestedAssetChangeBundles = (
     const assetTotal = assetTotals[assetId];
     const assetLost = assetTotal.selected - assetTotal.requested - totalAssetsBundled[assetId];
     if (assetLost > 0n) {
-      const anyBundle = bundles.find(({ assets }) => typeof assets?.[assetId] === 'bigint');
-      anyBundle.assets[assetId] = (anyBundle.assets[assetId] || 0n) + assetLost;
+      const anyBundle = bundles.find(({ assets }) => typeof assets?.[assetId] === 'bigint')!;
+      anyBundle.assets![assetId] = (anyBundle.assets![assetId] || 0n) + assetLost;
     }
   }
 
@@ -194,7 +194,7 @@ const coalesceChangeBundlesForMinCoinRequirement = (
     valueQuantities.coins >= computeMinimumCoinQuantity(ogmiosValueToCslValue(valueQuantities, csl).multiasset());
 
   while (sortedBundles.length > 1 && !satisfiesMinCoinRequirement(sortedBundles[sortedBundles.length - 1])) {
-    const smallestBundle = sortedBundles.pop();
+    const smallestBundle = sortedBundles.pop()!;
     sortedBundles[sortedBundles.length - 1] = Ogmios.util.coalesceValueQuantities(
       sortedBundles[sortedBundles.length - 1],
       smallestBundle
@@ -204,11 +204,9 @@ const coalesceChangeBundlesForMinCoinRequirement = (
   }
   if (!satisfiesMinCoinRequirement(sortedBundles[0])) {
     // Coalesced all bundles to 1 and it's still less than min utxo value
-    // eslint-disable-next-line consistent-return
     return undefined;
   }
   // Filter empty bundles
-  // eslint-disable-next-line consistent-return
   return sortedBundles.filter((bundle) => bundle.coins > 0n || Object.keys(bundle.assets || {}).length > 0);
 };
 

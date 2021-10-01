@@ -19,11 +19,11 @@ describe('util', () => {
       const quantities: OgmiosValue = { coins: 100_000n, assets: { [TSLA_Asset]: 100n, [PXL_Asset]: 200n } };
       const value = ogmiosValueToCslValue(quantities, csl);
       expect(value.coin().to_str()).toEqual(quantities.coins.toString());
-      const multiasset = value.multiasset();
+      const multiasset = value.multiasset()!;
       expect(multiasset.len()).toBe(2);
       for (const assetId in quantities.assets) {
         const { scriptHash, assetName } = Asset.util.parseAssetId(assetId, csl);
-        const assetQuantity = BigInt(multiasset.get(scriptHash).get(assetName).to_str());
+        const assetQuantity = BigInt(multiasset.get(scriptHash)!.get(assetName)!.to_str());
         expect(assetQuantity).toBe(quantities.assets[assetId]);
       }
     });

@@ -28,7 +28,6 @@ const coalesceTokenMaps = (...totals: (TokenMap | undefined)[]): TokenMap | unde
   if (Object.keys(result).length === 0) {
     return undefined;
   }
-  // eslint-disable-next-line consistent-return
   return result;
 };
 

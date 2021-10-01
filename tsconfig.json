@@ -13,6 +13,7 @@
     "removeComments": true,
     "preserveConstEnums": true,
     "sourceMap": true,
+    "strictNullChecks": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true
   }

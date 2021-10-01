@@ -1,13 +1,13 @@
+/* eslint-disable no-loop-func */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable unicorn/consistent-function-scoping */
-import {
-  CardanoSerializationLib,
-  CSL,
-  loadCardanoSerializationLib,
-  ProtocolParametersRequiredByWallet
-} from '@cardano-sdk/core';
+import { CardanoSerializationLib, CSL, loadCardanoSerializationLib } from '@cardano-sdk/core';
 import { PXL_Asset, TSLA_Asset } from './util';
-import { defaultSelectionConstraints, DefaultSelectionConstraintsProps } from '../src/selectionConstraints';
+import {
+  defaultSelectionConstraints,
+  DefaultSelectionConstraintsProps,
+  ProtocolParametersRequiredBySelectionConstraints
+} from '../src/selectionConstraints';
 import { SelectionSkeleton } from '../src/types';
 import { ogmiosValueToCslValue } from '../src/util';
 
@@ -19,7 +19,7 @@ describe('defaultSelectionConstraints', () => {
     coinsPerUtxoWord: 34_482,
     maxTxSize: 16_384,
     maxValueSize: 5000
-  } as ProtocolParametersRequiredByWallet;
+  } as ProtocolParametersRequiredBySelectionConstraints;
 
   beforeAll(async () => (csl = await loadCardanoSerializationLib()));
 
@@ -73,7 +73,7 @@ describe('defaultSelectionConstraints', () => {
       const constraints = defaultSelectionConstraints({
         csl,
         protocolParameters,
-        buildTx: buildTxOfLength(protocolParameters.maxTxSize)
+        buildTx: buildTxOfLength(protocolParameters.maxTxSize!)
       });
       expect(await constraints.computeSelectionLimit({ inputs: [1, 2] as any } as SelectionSkeleton)).toEqual(2);
     });
@@ -82,7 +82,7 @@ describe('defaultSelectionConstraints', () => {
       const constraints = defaultSelectionConstraints({
         csl,
         protocolParameters,
-        buildTx: buildTxOfLength(protocolParameters.maxTxSize + 1)
+        buildTx: buildTxOfLength(protocolParameters.maxTxSize! + 1)
       });
       expect(await constraints.computeSelectionLimit({ inputs: [1, 2] as any } as SelectionSkeleton)).toEqual(3);
     });
@@ -111,7 +111,7 @@ describe('defaultSelectionConstraints', () => {
 
     it("doesn't exceed max value size", () => {
       const constraints = defaultSelectionConstraints({
-        csl: stubCslWithValueLength(protocolParameters.maxValueSize),
+        csl: stubCslWithValueLength(protocolParameters.maxValueSize!),
         protocolParameters
       } as DefaultSelectionConstraintsProps);
       expect(constraints.tokenBundleSizeExceedsLimit({} as any)).toBe(false);
@@ -119,7 +119,7 @@ describe('defaultSelectionConstraints', () => {
 
     it('exceeds max value size', () => {
       const constraints = defaultSelectionConstraints({
-        csl: stubCslWithValueLength(protocolParameters.maxValueSize + 1),
+        csl: stubCslWithValueLength(protocolParameters.maxValueSize! + 1),
         protocolParameters
       } as DefaultSelectionConstraintsProps);
       expect(constraints.tokenBundleSizeExceedsLimit({} as any)).toBe(true);

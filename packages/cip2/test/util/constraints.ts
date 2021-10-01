@@ -18,5 +18,5 @@ export const toConstraints = (constraints: MockSelectionConstraints): SelectionC
   computeMinimumCoinQuantity: () => constraints.minimumCoinQuantity,
   computeMinimumCost: async () => constraints.minimumCost,
   computeSelectionLimit: async () => constraints.selectionLimit,
-  tokenBundleSizeExceedsLimit: (multiasset) => multiasset.len() > constraints.maxTokenBundleSize
+  tokenBundleSizeExceedsLimit: (multiasset) => (multiasset?.len() || 0) > constraints.maxTokenBundleSize
 });

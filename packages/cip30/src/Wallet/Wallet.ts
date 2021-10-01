@@ -29,27 +29,29 @@ export type WalletOptions = {
   storage?: Storage;
 };
 
+const defaultOptions = {
+  logger: dummyLogger,
+  persistAllowList: false,
+  storage: window.localStorage
+};
+
 export class Wallet {
   readonly version: SpecificationVersion;
   readonly name: WalletName;
 
   private allowList: string[];
   private logger: Logger;
+  private readonly options: Required<WalletOptions>;
 
   constructor(
     properties: WalletProperties,
     private api: WalletApi,
     private requestAccess: RequestAccess,
-    private options?: WalletOptions
+    options?: WalletOptions
   ) {
-    this.logger = options.logger ?? dummyLogger;
+    this.options = { ...defaultOptions, ...options };
     this.name = properties.name;
     this.version = properties.version;
-
-    if (typeof options.persistAllowList === 'undefined') {
-      options.persistAllowList = false;
-    }
-
     this.allowList = this.options.persistAllowList ? this.getAllowList() : [];
   }
 
@@ -63,7 +65,8 @@ export class Wallet {
   }
 
   private getAllowList(): string[] {
-    return JSON.parse(this.options.storage?.getItem(this.name)) || [];
+    // JSON.parse(null) seems to be legit
+    return JSON.parse(this.options.storage.getItem(this.name)!) || [];
   }
 
   private allowApplication(appName: string) {

@@ -4,8 +4,8 @@ import { CSL } from '@cardano-sdk/core';
 
 export interface UtxoRepository {
   allUtxos: Schema.Utxo;
-  rewards: Schema.Lovelace;
-  delegation: Schema.PoolId;
+  rewards: Schema.Lovelace | null;
+  delegation: Schema.PoolId | null;
   sync: () => Promise<void>;
   selectInputs: (outputs: CSL.TransactionOutput[], constraints: SelectionConstraints) => Promise<SelectionResult>;
 }

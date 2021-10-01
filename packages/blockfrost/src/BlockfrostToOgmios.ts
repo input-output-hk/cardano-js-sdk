@@ -19,9 +19,10 @@ export const BlockfrostToOgmios = {
   // without `as OgmiosSchema.Utxo` above TS thinks the return value is (OgmiosSchema.TxIn | OgmiosSchema.TxOut)[][]
 
   blockToTip: (block: Responses['block_content']): OgmiosSchema.Tip => ({
-    blockNo: block.height,
+    // Review: if height and slot be actually be null we should check it and either throw or return something else
+    blockNo: block.height!,
     hash: block.hash,
-    slot: block.slot
+    slot: block.slot!
   }),
 
   inputFromUtxo: (address: string, utxo: BlockfrostUtxo): BlockfrostInput => ({
@@ -61,7 +62,7 @@ export const BlockfrostToOgmios = {
     return {
       address: blockfrost.address,
       value: {
-        coins: Number(blockfrost.amount.find(({ unit }) => unit === 'lovelace').quantity),
+        coins: Number(blockfrost.amount.find(({ unit }) => unit === 'lovelace')!.quantity),
         assets
       }
     };

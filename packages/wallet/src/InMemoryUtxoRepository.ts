@@ -26,7 +26,7 @@ export class InMemoryUtxoRepository implements UtxoRepository {
     this.#logger = logger ?? dummyLogger;
     this.#provider = provider;
     this.#utxoSet = new Set();
-    this.#delegationAndRewards = { rewards: null, delegate: null };
+    this.#delegationAndRewards = { rewards: undefined, delegate: undefined };
     this.#inputSelector = inputSelector;
     this.#keyManager = keyManager;
   }
@@ -73,11 +73,11 @@ export class InMemoryUtxoRepository implements UtxoRepository {
     return [...this.#utxoSet.values()];
   }
 
-  public get rewards(): Schema.Lovelace {
-    return this.#delegationAndRewards.rewards;
+  public get rewards(): Schema.Lovelace | null {
+    return this.#delegationAndRewards.rewards ?? null;
   }
 
-  public get delegation(): Schema.PoolId {
-    return this.#delegationAndRewards.delegate;
+  public get delegation(): Schema.PoolId | null {
+    return this.#delegationAndRewards.delegate ?? null;
   }
 }

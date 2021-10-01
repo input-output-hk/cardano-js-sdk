@@ -81,7 +81,7 @@ export const blockfrostProvider = (options: Options): CardanoProvider => {
 
     const accountResponse = await blockfrost.accounts(stakeKeyHash);
     const delegationAndRewards = {
-      delegate: accountResponse.pool_id,
+      delegate: accountResponse.pool_id || undefined,
       rewards: Number(accountResponse.withdrawable_amount)
     };
 
