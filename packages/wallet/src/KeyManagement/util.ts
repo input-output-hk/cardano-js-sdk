@@ -3,7 +3,8 @@ import * as bip39 from 'isomorphic-bip39';
 /**
  * A wrapper around the bip39 package function, with default strength applied to produce 24 words
  */
-export const generateMnemonic = (strength = 256) => bip39.generateMnemonic(strength);
+export const generateMnemonicWords = (strength = 256) => bip39.generateMnemonic(strength).split(' ');
+export const joinMnemonicWords = (mnenomic: string[]) => mnenomic.join(' ');
 
 /**
  * A wrapper around the bip39 package function
