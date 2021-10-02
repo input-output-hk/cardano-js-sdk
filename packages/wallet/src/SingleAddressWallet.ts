@@ -18,6 +18,14 @@ export interface SingleAddressWallet {
   submitTx: (tx: CSL.Transaction) => Promise<boolean>;
 }
 
+export interface SingleAddressWalletDependencies {
+  csl: CardanoSerializationLib;
+  keyManager: KeyManagement.KeyManager;
+  logger?: Logger;
+  provider: CardanoProvider;
+  utxoRepository: UtxoRepository;
+}
+
 const ensureValidityInterval = (
   currentSlot: number,
   validityInterval?: Transaction.ValidityInterval
@@ -25,13 +33,13 @@ const ensureValidityInterval = (
   // Todo: Based this on slot duration, to equal 2hrs
   ({ invalidHereafter: currentSlot + 3600, ...validityInterval });
 
-export const createSingleAddressWallet = async (
-  csl: CardanoSerializationLib,
-  provider: CardanoProvider,
-  keyManager: KeyManagement.KeyManager,
-  utxoRepository: UtxoRepository,
-  logger: Logger = dummyLogger
-): Promise<SingleAddressWallet> => {
+export const createSingleAddressWallet = async ({
+  csl,
+  provider,
+  keyManager,
+  utxoRepository,
+  logger = dummyLogger
+}: SingleAddressWalletDependencies): Promise<SingleAddressWallet> => {
   const address = keyManager.deriveAddress(0, 0);
   const protocolParameters = await provider.currentWalletProtocolParameters();
   return {
