@@ -12,6 +12,7 @@ import {
 } from '../src';
 
 describe('Wallet', () => {
+  const name = 'Test Wallet';
   let csl: CardanoSerializationLib;
   let inputSelector: InputSelector;
   let keyManager: KeyManagement.KeyManager;
@@ -34,8 +35,9 @@ describe('Wallet', () => {
   });
 
   test('createWallet', async () => {
-    const wallet = await createSingleAddressWallet(walletDependencies);
+    const wallet = await createSingleAddressWallet({ name }, walletDependencies);
     expect(wallet.address).toBeDefined();
+    expect(wallet.name).toBe(name);
     expect(typeof wallet.initializeTx).toBe('function');
     expect(typeof wallet.signTx).toBe('function');
   });
@@ -53,7 +55,7 @@ describe('Wallet', () => {
     };
 
     beforeEach(async () => {
-      wallet = await createSingleAddressWallet(walletDependencies);
+      wallet = await createSingleAddressWallet({ name }, walletDependencies);
     });
 
     test('initializeTx', async () => {
