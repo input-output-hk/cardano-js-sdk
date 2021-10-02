@@ -21,7 +21,7 @@ describe('InMemoryUtxoRepository', () => {
     inputSelector = roundRobinRandomImprove(csl);
     const keyManager = KeyManagement.createInMemoryKeyManager({
       csl,
-      mnemonic: KeyManagement.util.generateMnemonic(),
+      mnemonicWords: KeyManagement.util.generateMnemonicWords(),
       networkId: 0,
       password: '123'
     });

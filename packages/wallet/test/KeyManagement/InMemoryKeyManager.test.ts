@@ -1,4 +1,5 @@
 import { Cardano, CardanoSerializationLib, loadCardanoSerializationLib } from '@cardano-sdk/core';
+import { Buffer } from 'buffer';
 import { KeyManagement } from '../../src';
 
 describe('InMemoryKeyManager', () => {
@@ -7,10 +8,10 @@ describe('InMemoryKeyManager', () => {
 
   beforeEach(async () => {
     csl = await loadCardanoSerializationLib();
-    const mnemonic = KeyManagement.util.generateMnemonic();
+    const mnemonicWords = KeyManagement.util.generateMnemonicWords();
     keyManager = KeyManagement.createInMemoryKeyManager({
       csl,
-      mnemonic,
+      mnemonicWords,
       networkId: Cardano.NetworkId.testnet,
       password: '123'
     });

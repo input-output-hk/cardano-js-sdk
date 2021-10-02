@@ -1,8 +1,9 @@
-import * as bip39 from 'bip39';
+import * as bip39 from 'isomorphic-bip39';
 import { Cardano, CardanoSerializationLib, CSL } from '@cardano-sdk/core';
+import { Buffer } from 'buffer';
 import * as errors from './errors';
 import { KeyManager } from './KeyManager';
-import { harden } from './util';
+import { harden, joinMnemonicWords } from './util';
 
 /**
  *
@@ -11,19 +12,20 @@ export const createInMemoryKeyManager = ({
   csl,
   password,
   accountIndex,
-  mnemonic,
+  mnemonicWords,
   networkId
 }: {
   csl: CardanoSerializationLib;
   password: string;
   accountIndex?: number;
-  mnemonic: string;
+  mnemonicWords: string[];
   networkId: Cardano.NetworkId;
 }): KeyManager => {
   if (!accountIndex) {
     accountIndex = 0;
   }
 
+  const mnemonic = joinMnemonicWords(mnemonicWords);
   const validMnemonic = bip39.validateMnemonic(mnemonic);
   if (!validMnemonic) throw new errors.InvalidMnemonic();
 

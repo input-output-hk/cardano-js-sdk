@@ -1,4 +1,5 @@
 import Schema, { TxIn, TxOut } from '@cardano-ogmios/schema';
+import { Buffer } from 'buffer';
 import { UtxoRepository } from './UtxoRepository';
 import { CardanoProvider, Ogmios, CardanoSerializationLib, CSL } from '@cardano-sdk/core';
 import { dummyLogger, Logger } from 'ts-log';

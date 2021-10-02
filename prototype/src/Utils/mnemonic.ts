@@ -1,1 +1,1 @@
-export { generateMnemonic } from 'bip39'
+export { generateMnemonic } from 'isomorphic-bip39'

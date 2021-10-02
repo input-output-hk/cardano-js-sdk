@@ -1,5 +1,6 @@
 import { CardanoSerializationLib, CSL } from '../CSL';
 import OgmiosSchema from '@cardano-ogmios/schema';
+import { Buffer } from 'buffer';
 import * as Asset from '../Asset';
 
 export const ogmiosToCsl = (csl: CardanoSerializationLib) => ({
