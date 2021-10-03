@@ -24,7 +24,7 @@
     "./dist/CSL/nodejs.js": false
   },
   "dependencies": {
-    "@cardano-ogmios/schema": "4.0.0",
+    "@cardano-ogmios/schema": "4.1.0",
     "@emurgo/cardano-serialization-lib-nodejs": "8.0.0",
     "@emurgo/cardano-serialization-lib-browser": "8.0.0",
     "buffer": "^6.0.3"

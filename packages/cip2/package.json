@@ -19,7 +19,7 @@
     "test:debug": "DEBUG=true yarn test"
   },
   "devDependencies": {
-    "@cardano-ogmios/schema": "4.0.0",
+    "@cardano-ogmios/schema": "4.1.0",
     "@types/lodash-es": "^4.17.5",
     "fast-check": "^2.17.0",
     "lodash": "^4.17.21",
