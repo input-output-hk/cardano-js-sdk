@@ -130,6 +130,7 @@ yarn docs
 ```console
 yarn bump-version
 ```
+Then update the sibling dependencies manually.
 
 ### New package checklist
 
