@@ -7,15 +7,18 @@ import {
   InMemoryUtxoRepository,
   KeyManagement,
   SingleAddressWallet,
+  SingleAddressWalletDependencies,
   UtxoRepository
 } from '../src';
 
 describe('Wallet', () => {
+  const name = 'Test Wallet';
   let csl: CardanoSerializationLib;
   let inputSelector: InputSelector;
   let keyManager: KeyManagement.KeyManager;
   let provider: CardanoProvider;
   let utxoRepository: UtxoRepository;
+  let walletDependencies: SingleAddressWalletDependencies;
 
   beforeEach(async () => {
     csl = await loadCardanoSerializationLib();
@@ -28,11 +31,13 @@ describe('Wallet', () => {
     provider = providerStub();
     inputSelector = roundRobinRandomImprove(csl);
     utxoRepository = new InMemoryUtxoRepository(csl, provider, keyManager, inputSelector);
+    walletDependencies = { csl, keyManager, provider, utxoRepository };
   });
 
   test('createWallet', async () => {
-    const wallet = await createSingleAddressWallet(csl, provider, keyManager, utxoRepository);
+    const wallet = await createSingleAddressWallet({ name }, walletDependencies);
     expect(wallet.address).toBeDefined();
+    expect(wallet.name).toBe(name);
     expect(typeof wallet.initializeTx).toBe('function');
     expect(typeof wallet.signTx).toBe('function');
   });
@@ -50,7 +55,7 @@ describe('Wallet', () => {
     };
 
     beforeEach(async () => {
-      wallet = await createSingleAddressWallet(csl, provider, keyManager, utxoRepository);
+      wallet = await createSingleAddressWallet({ name }, walletDependencies);
     });
 
     test('initializeTx', async () => {

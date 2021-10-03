@@ -14,8 +14,21 @@ export type InitializeTxProps = {
 export interface SingleAddressWallet {
   address: Schema.Address;
   initializeTx: (props: InitializeTxProps) => Promise<TxInternals>;
+  name: string;
   signTx: (body: CSL.TransactionBody, hash: CSL.TransactionHash) => Promise<CSL.Transaction>;
   submitTx: (tx: CSL.Transaction) => Promise<boolean>;
+}
+
+export interface SingleAddressWalletDependencies {
+  csl: CardanoSerializationLib;
+  keyManager: KeyManagement.KeyManager;
+  logger?: Logger;
+  provider: CardanoProvider;
+  utxoRepository: UtxoRepository;
+}
+
+export interface SingleAddressWalletProps {
+  name: string;
 }
 
 const ensureValidityInterval = (
@@ -26,11 +39,8 @@ const ensureValidityInterval = (
   ({ invalidHereafter: currentSlot + 3600, ...validityInterval });
 
 export const createSingleAddressWallet = async (
-  csl: CardanoSerializationLib,
-  provider: CardanoProvider,
-  keyManager: KeyManagement.KeyManager,
-  utxoRepository: UtxoRepository,
-  logger: Logger = dummyLogger
+  { name }: SingleAddressWalletProps,
+  { csl, provider, keyManager, utxoRepository, logger = dummyLogger }: SingleAddressWalletDependencies
 ): Promise<SingleAddressWallet> => {
   const address = keyManager.deriveAddress(0, 0);
   const protocolParameters = await provider.currentWalletProtocolParameters();
@@ -61,6 +71,7 @@ export const createSingleAddressWallet = async (
         validityInterval
       });
     },
+    name,
     signTx: async (body, hash) => {
       const witnessSet = await keyManager.signTransaction(hash);
       return csl.Transaction.new(body, witnessSet);
