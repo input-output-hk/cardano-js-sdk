@@ -1,7 +1,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import { Wallet, WalletApi, WalletOptions } from '@src/Wallet';
+import { Wallet, WalletApi, WalletOptions } from '../src/Wallet';
 import { mocks } from 'mock-browser';
 import * as testWallet from './testWallet';
 const window = mocks.MockBrowser.createWindow();
