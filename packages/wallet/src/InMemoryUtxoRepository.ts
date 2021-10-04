@@ -55,7 +55,7 @@ export class InMemoryUtxoRepository implements UtxoRepository {
   }
 
   public async selectInputs(
-    outputs: CSL.TransactionOutput[],
+    outputs: Set<CSL.TransactionOutput>,
     constraints: SelectionConstraints
   ): Promise<SelectionResult> {
     if (this.#utxoSet.size === 0) {
@@ -63,7 +63,7 @@ export class InMemoryUtxoRepository implements UtxoRepository {
       await this.sync();
     }
     return this.#inputSelector.select({
-      utxo: Ogmios.ogmiosToCsl(this.#csl).utxo(this.allUtxos),
+      utxo: new Set(Ogmios.ogmiosToCsl(this.#csl).utxo(this.allUtxos)),
       outputs,
       constraints
     });

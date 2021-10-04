@@ -155,12 +155,12 @@ describe('RoundRobinRandomImprove', () => {
     await fc.assert(
       fc.asyncProperty(generateSelectionParams(), async ({ utxoAmounts, outputsAmounts, constraints }) => {
         // Run input selection
-        const utxo = utxoAmounts.map((valueQuantities) => utils.createUnspentTxOutput(valueQuantities));
-        const outputs = outputsAmounts.map((valueQuantities) => utils.createOutput(valueQuantities));
+        const utxo = new Set(utxoAmounts.map((valueQuantities) => utils.createUnspentTxOutput(valueQuantities)));
+        const outputs = new Set(outputsAmounts.map((valueQuantities) => utils.createOutput(valueQuantities)));
 
         try {
           const results = await algorithm.select({
-            utxo,
+            utxo: new Set(utxo),
             outputs,
             constraints: toConstraints(constraints)
           });

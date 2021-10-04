@@ -86,7 +86,9 @@ describe('defaultSelectionConstraints', () => {
         protocolParameters,
         buildTx: buildTxOfLength(protocolParameters.maxTxSize!)
       });
-      expect(await constraints.computeSelectionLimit({ inputs: [1, 2] as any } as SelectionSkeleton)).toEqual(2);
+      expect(await constraints.computeSelectionLimit({ inputs: new Set([1, 2]) as any } as SelectionSkeleton)).toEqual(
+        2
+      );
     });
 
     it('exceeds max tx size', async () => {
@@ -95,7 +97,9 @@ describe('defaultSelectionConstraints', () => {
         protocolParameters,
         buildTx: buildTxOfLength(protocolParameters.maxTxSize! + 1)
       });
-      expect(await constraints.computeSelectionLimit({ inputs: [1, 2] as any } as SelectionSkeleton)).toEqual(3);
+      expect(await constraints.computeSelectionLimit({ inputs: new Set([1, 2]) as any } as SelectionSkeleton)).toEqual(
+        3
+      );
     });
   });
 

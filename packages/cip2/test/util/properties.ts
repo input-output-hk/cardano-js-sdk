@@ -1,4 +1,4 @@
-import { AllAssets, containsUtxo, TestUtils } from './util';
+import { AllAssets, TestUtils } from './util';
 import { SelectionResult } from '../../src/types';
 import { CSL, cslUtil, Ogmios } from '@cardano-sdk/core';
 import { InputSelectionError, InputSelectionFailure } from '../../src/InputSelectionError';
@@ -30,12 +30,12 @@ export const assertInputSelectionProperties = ({
 }: {
   utils: TestUtils;
   results: SelectionResult;
-  outputs: CSL.TransactionOutput[];
-  utxo: CSL.TransactionUnspentOutput[];
+  outputs: Set<CSL.TransactionOutput>;
+  utxo: Set<CSL.TransactionUnspentOutput>;
   constraints: MockSelectionConstraints;
 }) => {
   const vSelected = utils.getTotalInputAmounts(results);
-  const vRequested = utils.getTotalOutputAmounts(outputs);
+  const vRequested = utils.getTotalOutputAmounts([...outputs]);
 
   // Coverage of Payments
   expect(vSelected.coins).toBeGreaterThanOrEqual(vRequested.coins);
@@ -55,8 +55,8 @@ export const assertInputSelectionProperties = ({
 
   // Conservation of UTxO
   for (const utxoEntry of utxo) {
-    const isInInputSelectionInputsSet = containsUtxo(results.selection.inputs, utxoEntry);
-    const isInRemainingUtxoSet = containsUtxo(results.remainingUTxO, utxoEntry);
+    const isInInputSelectionInputsSet = results.selection.inputs.has(utxoEntry);
+    const isInRemainingUtxoSet = results.remainingUTxO.has(utxoEntry);
     expect(isInInputSelectionInputsSet || isInRemainingUtxoSet).toBe(true);
     expect(isInInputSelectionInputsSet).not.toEqual(isInRemainingUtxoSet);
   }

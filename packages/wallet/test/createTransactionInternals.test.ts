@@ -19,7 +19,7 @@ describe('createTransactionInternals', () => {
   let provider: CardanoProvider;
   let inputSelector: InputSelector;
   let utxoRepository: UtxoRepository;
-  let outputs: CSL.TransactionOutput[];
+  let outputs: Set<CSL.TransactionOutput>;
 
   beforeEach(async () => {
     csl = await loadCardanoSerializationLib();
@@ -32,7 +32,7 @@ describe('createTransactionInternals', () => {
       password: '123'
     });
 
-    outputs = [
+    outputs = new Set([
       Ogmios.ogmiosToCsl(csl).txOut({
         address,
         value: { coins: 4_000_000 }
@@ -41,7 +41,7 @@ describe('createTransactionInternals', () => {
         address,
         value: { coins: 2_000_000 }
       })
-    ];
+    ]);
     utxoRepository = new InMemoryUtxoRepository(csl, provider, keyManager, inputSelector);
   });
 

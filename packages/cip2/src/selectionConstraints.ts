@@ -74,9 +74,9 @@ export const computeSelectionLimit =
     const tx = await buildTx(selectionSkeleton);
     const txSize = getTxSize(tx);
     if (txSize <= maxTxSize) {
-      return selectionSkeleton.inputs.length;
+      return selectionSkeleton.inputs.size;
     }
-    return selectionSkeleton.inputs.length + 1;
+    return selectionSkeleton.inputs.size + 1;
   };
 
 export const defaultSelectionConstraints = ({

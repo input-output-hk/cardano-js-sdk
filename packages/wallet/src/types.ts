@@ -7,5 +7,5 @@ export interface UtxoRepository {
   rewards: Schema.Lovelace | null;
   delegation: Schema.PoolId | null;
   sync: () => Promise<void>;
-  selectInputs: (outputs: CSL.TransactionOutput[], constraints: SelectionConstraints) => Promise<SelectionResult>;
+  selectInputs: (outputs: Set<CSL.TransactionOutput>, constraints: SelectionConstraints) => Promise<SelectionResult>;
 }

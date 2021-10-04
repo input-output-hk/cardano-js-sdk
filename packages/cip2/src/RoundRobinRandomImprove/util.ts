@@ -26,14 +26,14 @@ export interface UtxoSelection {
 }
 
 export const preprocessArgs = (
-  availableUtxo: CSL.TransactionUnspentOutput[],
-  outputs: CSL.TransactionOutput[]
+  availableUtxo: Set<CSL.TransactionUnspentOutput>,
+  outputs: Set<CSL.TransactionOutput>
 ): RoundRobinRandomImproveArgs => {
-  const utxosWithValue = availableUtxo.map((utxo) => ({
+  const utxosWithValue = [...availableUtxo].map((utxo) => ({
     utxo,
     value: Ogmios.cslToOgmios.value(utxo.output().amount())
   }));
-  const outputsWithValue = outputs.map((output) => ({
+  const outputsWithValue = [...outputs].map((output) => ({
     output,
     value: Ogmios.cslToOgmios.value(output.amount())
   }));

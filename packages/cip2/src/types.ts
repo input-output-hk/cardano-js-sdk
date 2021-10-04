@@ -1,44 +1,41 @@
 import { CSL } from '@cardano-sdk/core';
 
+export interface SelectionSkeleton {
+  /**
+   * A set of inputs, equivalent to a subset of the initial UTxO set.
+   *
+   * From the point of view of a wallet, this represents the value
+   * that has been selected from the wallet in order to cover the total payment value.
+   */
+  inputs: Set<CSL.TransactionUnspentOutput>;
+  /**
+   * Set of payments to be made to recipient addresses.
+   */
+  outputs: Set<CSL.TransactionOutput>;
+  /**
+   * A set of change values. Does not account for fee.
+   *
+   * From the point of view of a wallet, this represents the change to be returned to the wallet.
+   */
+  change: Set<CSL.Value>;
+  /**
+   * Estimated fee for the transaction.
+   * This value is included in 'change', so the actual change returned by the transaction is change-fee.
+   */
+  fee: CSL.BigNum;
+}
+
+export type Selection = SelectionSkeleton;
+
 export interface SelectionResult {
-  selection: {
-    /**
-     * A set of inputs, equivalent to a subset of the initial UTxO set.
-     *
-     * From the point of view of a wallet, this represents the value
-     * that has been selected from the wallet in order to cover the total payment value.
-     */
-    inputs: CSL.TransactionUnspentOutput[];
-    /**
-     * Set of payments to be made to recipient addresses.
-     */
-    outputs: CSL.TransactionOutput[];
-    /**
-     * A set of change values. Does not account for fee.
-     *
-     * From the point of view of a wallet, this represents the change to be returned to the wallet.
-     */
-    change: CSL.Value[];
-    /**
-     * Estimated fee for the transaction.
-     * This value is included in 'change', so the actual change returned by the transaction is change-fee.
-     */
-    fee: CSL.BigNum;
-  };
+  selection: Selection;
   /**
    * The remaining UTxO set is a subset of the initial UTxO set.
    *
    * It represents the set of values that remain after the coin selection algorithm
    * has removed values to pay for entries in the requested output set.
    */
-  remainingUTxO: CSL.TransactionUnspentOutput[];
-}
-
-export interface SelectionSkeleton {
-  inputs: CSL.TransactionUnspentOutput[];
-  outputs: CSL.TransactionOutput[];
-  change: CSL.Value[];
-  fee: CSL.BigNum;
+  remainingUTxO: Set<CSL.TransactionUnspentOutput>;
 }
 
 /**
@@ -73,11 +70,11 @@ export interface InputSelectionParameters {
   /**
    * The set of inputs available for selection.
    */
-  utxo: CSL.TransactionUnspentOutput[];
+  utxo: Set<CSL.TransactionUnspentOutput>;
   /**
    * The set of outputs requested for payment.
    */
-  outputs: CSL.TransactionOutput[];
+  outputs: Set<CSL.TransactionOutput>;
   /**
    * Input selection constraints
    */

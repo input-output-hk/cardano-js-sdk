@@ -9,26 +9,6 @@ export const PXL_Asset = '1ec85dcee27f2d90ec1f9a1e4ce74a667dc9be8b184463223f9c96
 export const Unit_Asset = 'a5425bd7bc4182325188af2340415827a73f845846c165d9e14c5aed556e6974';
 export const AllAssets = [TSLA_Asset, PXL_Asset, Unit_Asset];
 
-/**
- * Checks whether UTxO is included in an array of UTxO.
- * Compares utxo.to_bytes().
- */
-export const containsUtxo = (haystack: CSL.TransactionUnspentOutput[], needleUtxo: CSL.TransactionUnspentOutput) => {
-  const needleUtxoBytes = needleUtxo.to_bytes();
-  return haystack.some((haystackUtxo: CSL.TransactionUnspentOutput) => {
-    const haystackUtxoBytes = haystackUtxo.to_bytes();
-    if (haystackUtxoBytes.length !== needleUtxoBytes.length) {
-      return false;
-    }
-    for (const [idx, utxoByte] of needleUtxoBytes.entries()) {
-      if (haystackUtxoBytes[idx] !== utxoByte) {
-        return false;
-      }
-    }
-    return true;
-  });
-};
-
 const getTotalOutputAmounts = (outputs: CSL.TransactionOutput[]): Ogmios.util.OgmiosValue => {
   let result: Ogmios.util.OgmiosValue = {
     coins: 0n,
@@ -42,7 +22,7 @@ const getTotalOutputAmounts = (outputs: CSL.TransactionOutput[]): Ogmios.util.Og
 };
 
 const getTotalInputAmounts = (results: SelectionResult): Ogmios.util.OgmiosValue =>
-  results.selection.inputs
+  [...results.selection.inputs]
     .map((input) => input.output().amount())
     .reduce<Ogmios.util.OgmiosValue>(
       (sum, value) => Ogmios.util.coalesceValueQuantities(sum, Ogmios.cslToOgmios.value(value)),
@@ -53,7 +33,7 @@ const getTotalInputAmounts = (results: SelectionResult): Ogmios.util.OgmiosValue
     );
 
 const getTotalChangeAmounts = (results: SelectionResult): Ogmios.util.OgmiosValue =>
-  results.selection.change.reduce<Ogmios.util.OgmiosValue>(
+  [...results.selection.change].reduce<Ogmios.util.OgmiosValue>(
     (sum, value) => Ogmios.util.coalesceValueQuantities(sum, Ogmios.cslToOgmios.value(value)),
     {
       assets: {},
