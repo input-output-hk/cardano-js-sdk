@@ -53,6 +53,7 @@ export class Wallet {
     this.name = properties.name;
     this.version = properties.version;
     this.allowList = this.options.persistAllowList ? this.getAllowList() : [];
+    this.logger = this.options.logger;
   }
 
   public getPublicApi(window: WindowMaybeWithCardano): WalletPublic {
