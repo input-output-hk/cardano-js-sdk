@@ -1,7 +1,6 @@
-import { CardanoSerializationLib } from '@cardano-sdk/core';
+import { CardanoSerializationLib, cslUtil } from '@cardano-sdk/core';
 import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
 import { InputSelectionParameters, InputSelector, SelectionResult } from '../types';
-import { maxBigNum } from '../util';
 import { computeChangeAndAdjustForFee } from './change';
 import { roundRobinSelection } from './roundRobin';
 import { assertIsBalanceSufficient, preprocessArgs, withValuesToValues } from './util';
@@ -31,7 +30,7 @@ export const roundRobinRandomImprove = (csl: CardanoSerializationLib): InputSele
         computeMinimumCost({
           inputs: utxos,
           change: changeValues,
-          fee: maxBigNum(csl),
+          fee: cslUtil.maxBigNum(csl),
           outputs
         })
     });

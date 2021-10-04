@@ -1,12 +1,12 @@
 import {
   CardanoSerializationLib,
   CSL,
+  cslUtil,
   InvalidProtocolParametersError,
   ProtocolParametersRequiredByWallet
 } from '@cardano-sdk/core';
 import { ComputeSelectionLimit, SelectionConstraints, TokenBundleSizeExceedsLimit } from '.';
 import { ComputeMinimumCoinQuantity, EstimateTxFee, SelectionSkeleton } from './types';
-import { maxBigNum } from './util';
 
 export type BuildTx = (selection: SelectionSkeleton) => Promise<CSL.Transaction>;
 
@@ -54,7 +54,7 @@ export const tokenBundleSizeExceedsLimit =
     if (!tokenBundle) {
       return false;
     }
-    const value = csl.Value.new(maxBigNum(csl));
+    const value = csl.Value.new(cslUtil.maxBigNum(csl));
     value.set_multiasset(tokenBundle);
     return value.to_bytes().length > maxValueSize;
   };

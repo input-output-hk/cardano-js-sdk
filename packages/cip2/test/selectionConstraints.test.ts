@@ -4,6 +4,7 @@
 import {
   CardanoSerializationLib,
   CSL,
+  Ogmios,
   InvalidProtocolParametersError,
   loadCardanoSerializationLib,
   ProtocolParametersRequiredByWallet
@@ -11,7 +12,6 @@ import {
 import { PXL_Asset, TSLA_Asset } from './util';
 import { defaultSelectionConstraints, DefaultSelectionConstraintsProps } from '../src/selectionConstraints';
 import { SelectionSkeleton } from '../src/types';
-import { ogmiosValueToCslValue } from '../src/util';
 
 describe('defaultSelectionConstraints', () => {
   let csl: CardanoSerializationLib;
@@ -57,16 +57,15 @@ describe('defaultSelectionConstraints', () => {
   });
 
   it('computeMinimumCoinQuantity', () => {
-    const withAssets = ogmiosValueToCslValue(
-      {
+    const withAssets = Ogmios.ogmiosToCsl(csl)
+      .value({
         coins: 10_000n,
         assets: {
           [TSLA_Asset]: 5000n,
           [PXL_Asset]: 3000n
         }
-      },
-      csl
-    ).multiasset();
+      })
+      .multiasset();
     const constraints = defaultSelectionConstraints({
       csl,
       protocolParameters

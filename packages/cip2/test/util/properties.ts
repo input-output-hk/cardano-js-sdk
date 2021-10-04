@@ -1,14 +1,13 @@
 import { AllAssets, containsUtxo, TestUtils } from './util';
 import { SelectionResult } from '../../src/types';
-import { CSL, Ogmios } from '@cardano-sdk/core';
+import { CSL, cslUtil, Ogmios } from '@cardano-sdk/core';
 import { InputSelectionError, InputSelectionFailure } from '../../src/InputSelectionError';
-import { TokenMap, MAX_U64, OgmiosValue, valueToValueQuantities } from '../../src/util';
 import fc, { Arbitrary } from 'fast-check';
 import { MockSelectionConstraints } from './constraints';
 
 const assertExtraChangeProperties = ({ minimumCoinQuantity }: MockSelectionConstraints, results: SelectionResult) => {
   for (const value of results.selection.change) {
-    const { coins, assets } = valueToValueQuantities(value);
+    const { coins, assets } = Ogmios.cslToOgmios.value(value);
     // Min UTxO coin requirement for change
     expect(coins).toBeGreaterThanOrEqual(minimumCoinQuantity);
     // No 0 quantity assets
@@ -77,8 +76,8 @@ export const assertFailureProperties = ({
   outputsAmounts
 }: {
   error: InputSelectionError;
-  utxoAmounts: OgmiosValue[];
-  outputsAmounts: OgmiosValue[];
+  utxoAmounts: Ogmios.util.OgmiosValue[];
+  outputsAmounts: Ogmios.util.OgmiosValue[];
   constraints: MockSelectionConstraints;
 }) => {
   const utxoTotals = Ogmios.util.coalesceValueQuantities(...utxoAmounts);
@@ -122,19 +121,19 @@ export const generateSelectionParams = (() => {
   const arrayOfCoinAndAssets = () =>
     fc
       .array(
-        fc.record<OgmiosValue>({
-          coins: fc.bigUint(MAX_U64),
+        fc.record<Ogmios.util.OgmiosValue>({
+          coins: fc.bigUint(cslUtil.MAX_U64),
           assets: fc.oneof(
             fc
               .set(fc.oneof(...AllAssets.map((asset) => fc.constant(asset))))
               .chain((assets) =>
-                fc.tuple(...assets.map((asset) => fc.bigUint(MAX_U64).map((amount) => ({ asset, amount }))))
+                fc.tuple(...assets.map((asset) => fc.bigUint(cslUtil.MAX_U64).map((amount) => ({ asset, amount }))))
               )
               .map((assets) =>
                 assets.reduce((quantities, { amount, asset }) => {
                   quantities[asset] = amount;
                   return quantities;
-                }, {} as TokenMap)
+                }, {} as Ogmios.util.TokenMap)
               ),
             fc.constant(void 0)
           )
@@ -144,12 +143,15 @@ export const generateSelectionParams = (() => {
       .filter((values) => {
         // sum of coin or any asset can't exceed MAX_U64
         const { coins, assets } = Ogmios.util.coalesceValueQuantities(...values);
-        return coins <= MAX_U64 && (!assets || Object.values(assets).every((quantity) => quantity <= MAX_U64));
+        return (
+          coins <= cslUtil.MAX_U64 &&
+          (!assets || Object.values(assets).every((quantity) => quantity <= cslUtil.MAX_U64))
+        );
       });
 
   return (): Arbitrary<{
-    utxoAmounts: OgmiosValue[];
-    outputsAmounts: OgmiosValue[];
+    utxoAmounts: Ogmios.util.OgmiosValue[];
+    outputsAmounts: Ogmios.util.OgmiosValue[];
     constraints: MockSelectionConstraints;
   }> =>
     fc.record({

@@ -4,7 +4,7 @@ import { BigIntMath } from '../util/BigIntMath';
 /**
  * {[assetId]: amount}
  */
-export type TokenMap = _OgmiosValue['assets'];
+export type TokenMap = NonNullable<_OgmiosValue['assets']>;
 
 /**
  * Total quantities of Coin and Assets in a Value.
