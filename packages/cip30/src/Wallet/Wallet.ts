@@ -1,7 +1,6 @@
-import { WalletApi } from './WalletApi';
+import { WalletApi } from './types';
 import { ApiError, APIErrorCode } from '../errors';
 import { dummyLogger, Logger } from 'ts-log';
-import { WalletPublic } from './WalletPublic';
 import { WindowMaybeWithCardano } from '../injectWindow';
 
 /**
@@ -56,7 +55,7 @@ export class Wallet {
     this.logger = this.options.logger;
   }
 
-  public getPublicApi(window: WindowMaybeWithCardano): WalletPublic {
+  public getPublicApi(window: WindowMaybeWithCardano) {
     return {
       name: this.name,
       version: this.version,
@@ -143,3 +142,5 @@ export class Wallet {
     return this.api;
   }
 }
+
+export type WalletPublic = ReturnType<Wallet['getPublicApi']>;

@@ -46,7 +46,7 @@ describe('Wallet', () => {
   test('getPublicApi', async () => {
     const publicApi = wallet.getPublicApi(window);
     expect(publicApi.name).toEqual('test-wallet');
-    expect(await publicApi.isEnabled(window)).toEqual(false);
+    expect(await publicApi.isEnabled()).toEqual(false);
   });
 
   test('enable', async () => {

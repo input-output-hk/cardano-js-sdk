@@ -1,5 +1,5 @@
 import { CSL } from '@cardano-sdk/core';
-import { Address } from '../';
+import { Address } from '..';
 
 export interface KeyManager {
   deriveAddress: (addressIndex: number, index: 0 | 1) => string;

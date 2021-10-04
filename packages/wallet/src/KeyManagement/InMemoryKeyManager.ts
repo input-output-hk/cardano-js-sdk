@@ -2,12 +2,9 @@ import * as bip39 from 'isomorphic-bip39';
 import { Cardano, CardanoSerializationLib, CSL } from '@cardano-sdk/core';
 import { Buffer } from 'buffer';
 import * as errors from './errors';
-import { KeyManager } from './KeyManager';
+import { KeyManager } from './types';
 import { harden, joinMnemonicWords } from './util';
 
-/**
- *
- */
 export const createInMemoryKeyManager = ({
   csl,
   password,

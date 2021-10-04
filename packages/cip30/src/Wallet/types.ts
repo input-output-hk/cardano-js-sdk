@@ -1,5 +1,5 @@
 import Schema from '@cardano-ogmios/schema';
-import { Bytes, Cbor, Paginate } from '../dataTypes';
+import { Bytes, Cbor, Paginate } from '../types';
 
 /**
  * If `amount` is `undefined`, this shall return a list of all UTxOs (unspent transaction outputs)
