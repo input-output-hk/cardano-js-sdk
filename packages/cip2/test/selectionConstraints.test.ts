@@ -1,13 +1,15 @@
 /* eslint-disable no-loop-func */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable unicorn/consistent-function-scoping */
-import { CardanoSerializationLib, CSL, loadCardanoSerializationLib } from '@cardano-sdk/core';
-import { PXL_Asset, TSLA_Asset } from './util';
 import {
-  defaultSelectionConstraints,
-  DefaultSelectionConstraintsProps,
-  ProtocolParametersRequiredBySelectionConstraints
-} from '../src/selectionConstraints';
+  CardanoSerializationLib,
+  CSL,
+  InvalidProtocolParametersError,
+  loadCardanoSerializationLib,
+  ProtocolParametersRequiredByWallet
+} from '@cardano-sdk/core';
+import { PXL_Asset, TSLA_Asset } from './util';
+import { defaultSelectionConstraints, DefaultSelectionConstraintsProps } from '../src/selectionConstraints';
 import { SelectionSkeleton } from '../src/types';
 import { ogmiosValueToCslValue } from '../src/util';
 
@@ -19,9 +21,19 @@ describe('defaultSelectionConstraints', () => {
     coinsPerUtxoWord: 34_482,
     maxTxSize: 16_384,
     maxValueSize: 5000
-  } as ProtocolParametersRequiredBySelectionConstraints;
+  } as ProtocolParametersRequiredByWallet;
 
   beforeAll(async () => (csl = await loadCardanoSerializationLib()));
+
+  it('Invalid parameters', () => {
+    for (const param of ['minFeeCoefficient', 'minFeeConstant', 'coinsPerUtxoWord', 'maxTxSize', 'maxValueSize']) {
+      expect(() =>
+        defaultSelectionConstraints({
+          protocolParameters: { ...protocolParameters, [param]: null }
+        } as DefaultSelectionConstraintsProps)
+      ).toThrowError(InvalidProtocolParametersError);
+    }
+  });
 
   it('computeMinimumCost', async () => {
     const fee = 200_000n;

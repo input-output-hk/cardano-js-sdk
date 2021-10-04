@@ -1,24 +1,18 @@
-import { CardanoSerializationLib, CSL, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
+import {
+  CardanoSerializationLib,
+  CSL,
+  InvalidProtocolParametersError,
+  ProtocolParametersRequiredByWallet
+} from '@cardano-sdk/core';
 import { ComputeSelectionLimit, SelectionConstraints, TokenBundleSizeExceedsLimit } from '.';
 import { ComputeMinimumCoinQuantity, EstimateTxFee, SelectionSkeleton } from './types';
 import { maxBigNum } from './util';
 
 export type BuildTx = (selection: SelectionSkeleton) => Promise<CSL.Transaction>;
 
-// Review: we might want to use this for ProtocolParametersRequiredByWallet instead
-type NonNullableFields<T> = {
-  [K in keyof T]: NonNullable<T[K]>;
-};
-export type ProtocolParametersRequiredBySelectionConstraints = NonNullableFields<
-  Pick<
-    ProtocolParametersRequiredByWallet,
-    'coinsPerUtxoWord' | 'maxTxSize' | 'maxValueSize' | 'minFeeCoefficient' | 'minFeeConstant'
-  >
->;
-
 export interface DefaultSelectionConstraintsProps {
   csl: CardanoSerializationLib;
-  protocolParameters: ProtocolParametersRequiredBySelectionConstraints;
+  protocolParameters: ProtocolParametersRequiredByWallet;
   buildTx: BuildTx;
 }
 
@@ -89,9 +83,16 @@ export const defaultSelectionConstraints = ({
   csl,
   protocolParameters: { coinsPerUtxoWord, maxTxSize, maxValueSize, minFeeCoefficient, minFeeConstant },
   buildTx
-}: DefaultSelectionConstraintsProps): SelectionConstraints => ({
-  computeMinimumCost: computeMinimumCost(csl, { minFeeCoefficient, minFeeConstant }, buildTx),
-  computeMinimumCoinQuantity: computeMinimumCoinQuantity(csl, coinsPerUtxoWord),
-  computeSelectionLimit: computeSelectionLimit(maxTxSize, buildTx),
-  tokenBundleSizeExceedsLimit: tokenBundleSizeExceedsLimit(csl, maxValueSize)
-});
+}: DefaultSelectionConstraintsProps): SelectionConstraints => {
+  if (!coinsPerUtxoWord || !maxTxSize || !maxValueSize || !minFeeCoefficient || !minFeeConstant) {
+    throw new InvalidProtocolParametersError(
+      'Missing one of: coinsPerUtxoWord, maxTxSize, maxValueSize, minFeeCoefficient, minFeeConstant'
+    );
+  }
+  return {
+    computeMinimumCost: computeMinimumCost(csl, { minFeeCoefficient, minFeeConstant }, buildTx),
+    computeMinimumCoinQuantity: computeMinimumCoinQuantity(csl, coinsPerUtxoWord),
+    computeSelectionLimit: computeSelectionLimit(maxTxSize, buildTx),
+    tokenBundleSizeExceedsLimit: tokenBundleSizeExceedsLimit(csl, maxValueSize)
+  };
+};
