@@ -3,7 +3,6 @@ import { SelectionResult } from '../../src/types';
 import { CSL, cslUtil, Ogmios } from '@cardano-sdk/core';
 import { InputSelectionError, InputSelectionFailure } from '../../src/InputSelectionError';
 import fc, { Arbitrary } from 'fast-check';
-import { coalesceValueQuantities } from '@cardano-sdk/core/src/Ogmios/util';
 
 const assertExtraChangeProperties = (
   { minimumCoinQuantity }: SelectionConstraints.MockSelectionConstraints,
@@ -35,10 +34,10 @@ export const assertInputSelectionProperties = ({
   utxo: Set<CSL.TransactionUnspentOutput>;
   constraints: SelectionConstraints.MockSelectionConstraints;
 }) => {
-  const vSelected = coalesceValueQuantities(
+  const vSelected = Ogmios.util.coalesceValueQuantities(
     ...[...results.selection.inputs].map((selectedUtxo) => Ogmios.cslToOgmios.value(selectedUtxo.output().amount()))
   );
-  const vRequested = coalesceValueQuantities(
+  const vRequested = Ogmios.util.coalesceValueQuantities(
     ...[...outputs].map((output) => Ogmios.cslToOgmios.value(output.amount()))
   );
 

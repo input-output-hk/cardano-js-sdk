@@ -8,7 +8,7 @@ import {
 } from './util';
 import { InputSelectionError, InputSelectionFailure } from '../src/InputSelectionError';
 import { loadCardanoSerializationLib, CardanoSerializationLib } from '@cardano-sdk/core';
-import { AssetId, CslUtil, SelectionConstraints } from '@cardano-sdk/util-dev';
+import { AssetId, CslTestUtil, SelectionConstraints } from '@cardano-sdk/util-dev';
 import fc from 'fast-check';
 
 const getRoundRobinRandomImprove = (csl: CardanoSerializationLib) => roundRobinRandomImprove(csl);
@@ -19,8 +19,8 @@ describe('RoundRobinRandomImprove', () => {
       it('No change', async () => {
         await testInputSelectionProperties({
           getAlgorithm: getRoundRobinRandomImprove,
-          createUtxo: (csl) => [CslUtil.createUnspentTxOutput(csl, { coins: 3_000_000n })],
-          createOutputs: (csl) => [CslUtil.createOutput(csl, { coins: 3_000_000n })],
+          createUtxo: (csl) => [CslTestUtil.createUnspentTxOutput(csl, { coins: 3_000_000n })],
+          createOutputs: (csl) => [CslTestUtil.createOutput(csl, { coins: 3_000_000n })],
           mockConstraints: SelectionConstraints.MOCK_NO_CONSTRAINTS
         });
       });
@@ -28,7 +28,7 @@ describe('RoundRobinRandomImprove', () => {
         // Regression
         await testInputSelectionProperties({
           getAlgorithm: getRoundRobinRandomImprove,
-          createUtxo: (csl) => [CslUtil.createUnspentTxOutput(csl, { coins: 11_999_994n })],
+          createUtxo: (csl) => [CslTestUtil.createUnspentTxOutput(csl, { coins: 11_999_994n })],
           createOutputs: () => [],
           mockConstraints: {
             ...SelectionConstraints.MOCK_NO_CONSTRAINTS,
@@ -44,12 +44,12 @@ describe('RoundRobinRandomImprove', () => {
           await testInputSelectionFailureMode({
             getAlgorithm: getRoundRobinRandomImprove,
             createUtxo: (csl) => [
-              CslUtil.createUnspentTxOutput(csl, { coins: 3_000_000n }),
-              CslUtil.createUnspentTxOutput(csl, { coins: 10_000_000n })
+              CslTestUtil.createUnspentTxOutput(csl, { coins: 3_000_000n }),
+              CslTestUtil.createUnspentTxOutput(csl, { coins: 10_000_000n })
             ],
             createOutputs: (csl) => [
-              CslUtil.createOutput(csl, { coins: 12_000_000n }),
-              CslUtil.createOutput(csl, { coins: 2_000_000n })
+              CslTestUtil.createOutput(csl, { coins: 12_000_000n }),
+              CslTestUtil.createOutput(csl, { coins: 2_000_000n })
             ],
             mockConstraints: SelectionConstraints.MOCK_NO_CONSTRAINTS,
             expectedError: InputSelectionFailure.UtxoBalanceInsufficient
@@ -59,10 +59,10 @@ describe('RoundRobinRandomImprove', () => {
           await testInputSelectionFailureMode({
             getAlgorithm: getRoundRobinRandomImprove,
             createUtxo: (csl) => [
-              CslUtil.createUnspentTxOutput(csl, { coins: 4_000_000n }),
-              CslUtil.createUnspentTxOutput(csl, { coins: 5_000_000n })
+              CslTestUtil.createUnspentTxOutput(csl, { coins: 4_000_000n }),
+              CslTestUtil.createUnspentTxOutput(csl, { coins: 5_000_000n })
             ],
-            createOutputs: (csl) => [CslUtil.createOutput(csl, { coins: 9_000_000n })],
+            createOutputs: (csl) => [CslTestUtil.createOutput(csl, { coins: 9_000_000n })],
             mockConstraints: {
               ...SelectionConstraints.MOCK_NO_CONSTRAINTS,
               minimumCost: 1n
@@ -74,10 +74,10 @@ describe('RoundRobinRandomImprove', () => {
           await testInputSelectionFailureMode({
             getAlgorithm: getRoundRobinRandomImprove,
             createUtxo: (csl) => [
-              CslUtil.createUnspentTxOutput(csl, { coins: 10_000_000n, assets: { [AssetId.TSLA]: 7000n } })
+              CslTestUtil.createUnspentTxOutput(csl, { coins: 10_000_000n, assets: { [AssetId.TSLA]: 7000n } })
             ],
             createOutputs: (csl) => [
-              CslUtil.createOutput(csl, { coins: 5_000_000n, assets: { [AssetId.TSLA]: 7001n } })
+              CslTestUtil.createOutput(csl, { coins: 5_000_000n, assets: { [AssetId.TSLA]: 7001n } })
             ],
             mockConstraints: SelectionConstraints.MOCK_NO_CONSTRAINTS,
             expectedError: InputSelectionFailure.UtxoBalanceInsufficient
@@ -87,7 +87,7 @@ describe('RoundRobinRandomImprove', () => {
           await testInputSelectionFailureMode({
             getAlgorithm: getRoundRobinRandomImprove,
             createUtxo: () => [],
-            createOutputs: (csl) => [CslUtil.createOutput(csl, { coins: 5_000_000n })],
+            createOutputs: (csl) => [CslTestUtil.createOutput(csl, { coins: 5_000_000n })],
             mockConstraints: SelectionConstraints.MOCK_NO_CONSTRAINTS,
             expectedError: InputSelectionFailure.UtxoBalanceInsufficient
           });
@@ -98,10 +98,10 @@ describe('RoundRobinRandomImprove', () => {
           await testInputSelectionFailureMode({
             getAlgorithm: getRoundRobinRandomImprove,
             createUtxo: (csl) => [
-              CslUtil.createUnspentTxOutput(csl, { coins: 1_000_000n }),
-              CslUtil.createUnspentTxOutput(csl, { coins: 2_000_000n })
+              CslTestUtil.createUnspentTxOutput(csl, { coins: 1_000_000n }),
+              CslTestUtil.createUnspentTxOutput(csl, { coins: 2_000_000n })
             ],
-            createOutputs: (csl) => [CslUtil.createOutput(csl, { coins: 2_999_999n })],
+            createOutputs: (csl) => [CslTestUtil.createOutput(csl, { coins: 2_999_999n })],
             mockConstraints: {
               ...SelectionConstraints.MOCK_NO_CONSTRAINTS,
               minimumCoinQuantity: 2n
@@ -113,13 +113,16 @@ describe('RoundRobinRandomImprove', () => {
           await testInputSelectionFailureMode({
             getAlgorithm: getRoundRobinRandomImprove,
             createUtxo: (csl) => [
-              CslUtil.createUnspentTxOutput(csl, {
+              CslTestUtil.createUnspentTxOutput(csl, {
                 coins: 2_000_000n,
                 assets: { [AssetId.TSLA]: 1000n, [AssetId.PXL]: 1000n }
               })
             ],
             createOutputs: (csl) => [
-              CslUtil.createOutput(csl, { coins: 1_000_000n, assets: { [AssetId.TSLA]: 500n, [AssetId.PXL]: 500n } })
+              CslTestUtil.createOutput(csl, {
+                coins: 1_000_000n,
+                assets: { [AssetId.TSLA]: 500n, [AssetId.PXL]: 500n }
+              })
             ],
             mockConstraints: {
               ...SelectionConstraints.MOCK_NO_CONSTRAINTS,
@@ -133,11 +136,11 @@ describe('RoundRobinRandomImprove', () => {
         await testInputSelectionFailureMode({
           getAlgorithm: getRoundRobinRandomImprove,
           createUtxo: (csl) => [
-            CslUtil.createUnspentTxOutput(csl, { coins: 2_000_000n }),
-            CslUtil.createUnspentTxOutput(csl, { coins: 2_000_000n }),
-            CslUtil.createUnspentTxOutput(csl, { coins: 3_000_000n })
+            CslTestUtil.createUnspentTxOutput(csl, { coins: 2_000_000n }),
+            CslTestUtil.createUnspentTxOutput(csl, { coins: 2_000_000n }),
+            CslTestUtil.createUnspentTxOutput(csl, { coins: 3_000_000n })
           ],
-          createOutputs: (csl) => [CslUtil.createOutput(csl, { coins: 6_000_000n })],
+          createOutputs: (csl) => [CslTestUtil.createOutput(csl, { coins: 6_000_000n })],
           mockConstraints: {
             ...SelectionConstraints.MOCK_NO_CONSTRAINTS,
             selectionLimit: 2
@@ -155,8 +158,12 @@ describe('RoundRobinRandomImprove', () => {
     await fc.assert(
       fc.asyncProperty(generateSelectionParams(), async ({ utxoAmounts, outputsAmounts, constraints }) => {
         // Run input selection
-        const utxo = new Set(utxoAmounts.map((valueQuantities) => CslUtil.createUnspentTxOutput(csl, valueQuantities)));
-        const outputs = new Set(outputsAmounts.map((valueQuantities) => CslUtil.createOutput(csl, valueQuantities)));
+        const utxo = new Set(
+          utxoAmounts.map((valueQuantities) => CslTestUtil.createUnspentTxOutput(csl, valueQuantities))
+        );
+        const outputs = new Set(
+          outputsAmounts.map((valueQuantities) => CslTestUtil.createOutput(csl, valueQuantities))
+        );
 
         try {
           const results = await algorithm.select({

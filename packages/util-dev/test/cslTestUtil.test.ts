@@ -1,5 +1,5 @@
 import { CardanoSerializationLib, loadCardanoSerializationLib } from '@cardano-sdk/core';
-import { createTxInput, createOutput, createUnspentTxOutput } from '../src/cslUtil';
+import { createTxInput, createOutput, createUnspentTxOutput } from '../src/cslTestUtil';
 
 describe('cslUtil', () => {
   let csl: CardanoSerializationLib;

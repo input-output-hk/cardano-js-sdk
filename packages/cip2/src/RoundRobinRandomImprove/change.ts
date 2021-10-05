@@ -10,7 +10,6 @@ import {
   UtxoSelection,
   UtxoWithValue
 } from './util';
-import { ogmiosToCsl } from '@cardano-sdk/core/src/Ogmios';
 
 type EstimateTxFeeWithOriginalOutputs = (utxo: CSL.TransactionUnspentOutput[], change: CSL.Value[]) => Promise<bigint>;
 
@@ -191,7 +190,7 @@ const coalesceChangeBundlesForMinCoinRequirement = (
 
   let sortedBundles = orderBy(changeBundles, ({ coins }) => coins, 'desc');
   const satisfiesMinCoinRequirement = (valueQuantities: Ogmios.util.OgmiosValue) =>
-    valueQuantities.coins >= computeMinimumCoinQuantity(ogmiosToCsl(csl).value(valueQuantities).multiasset());
+    valueQuantities.coins >= computeMinimumCoinQuantity(Ogmios.ogmiosToCsl(csl).value(valueQuantities).multiasset());
 
   while (sortedBundles.length > 1 && !satisfiesMinCoinRequirement(sortedBundles[sortedBundles.length - 1])) {
     const smallestBundle = sortedBundles.pop()!;
@@ -266,7 +265,7 @@ const changeBundlesToValues = (
   changeBundles: Ogmios.util.OgmiosValue[],
   tokenBundleSizeExceedsLimit: TokenBundleSizeExceedsLimit
 ) => {
-  const otc = ogmiosToCsl(csl);
+  const otc = Ogmios.ogmiosToCsl(csl);
   const values = changeBundles.map((bundle) => otc.value(bundle));
   for (const value of values) {
     const multiasset = value.multiasset();

@@ -1,3 +1,3 @@
 export * as AssetId from './assetId';
-export * as CslUtil from './cslUtil';
+export * as CslTestUtil from './cslTestUtil';
 export * as SelectionConstraints from './selectionConstraints';
