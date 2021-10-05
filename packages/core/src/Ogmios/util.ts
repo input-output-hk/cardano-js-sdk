@@ -18,7 +18,7 @@ export interface OgmiosValue {
 /**
  * Sum asset quantities
  */
-const coalesceTokenMaps = (...totals: (TokenMap | undefined)[]): TokenMap | undefined => {
+const coalesceTokenMaps = (totals: (TokenMap | undefined)[]): TokenMap | undefined => {
   const result: TokenMap = {};
   for (const assetTotals of totals.filter((quantities) => !!quantities)) {
     for (const assetKey in assetTotals) {
@@ -34,7 +34,7 @@ const coalesceTokenMaps = (...totals: (TokenMap | undefined)[]): TokenMap | unde
 /**
  * Sum all quantities
  */
-export const coalesceValueQuantities = (...quantities: OgmiosValue[]): OgmiosValue => ({
+export const coalesceValueQuantities = (quantities: OgmiosValue[]): OgmiosValue => ({
   coins: BigIntMath.sum(quantities.map(({ coins }) => coins)),
-  assets: coalesceTokenMaps(...quantities.map(({ assets }) => assets))
+  assets: coalesceTokenMaps(quantities.map(({ assets }) => assets))
 });

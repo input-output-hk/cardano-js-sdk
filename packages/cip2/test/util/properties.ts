@@ -35,10 +35,10 @@ export const assertInputSelectionProperties = ({
   constraints: SelectionConstraints.MockSelectionConstraints;
 }) => {
   const vSelected = Ogmios.util.coalesceValueQuantities(
-    ...[...results.selection.inputs].map((selectedUtxo) => Ogmios.cslToOgmios.value(selectedUtxo.output().amount()))
+    [...results.selection.inputs].map((selectedUtxo) => Ogmios.cslToOgmios.value(selectedUtxo.output().amount()))
   );
   const vRequested = Ogmios.util.coalesceValueQuantities(
-    ...[...outputs].map((output) => Ogmios.cslToOgmios.value(output.amount()))
+    [...outputs].map((output) => Ogmios.cslToOgmios.value(output.amount()))
   );
 
   // Coverage of Payments
@@ -49,7 +49,7 @@ export const assertInputSelectionProperties = ({
 
   // Correctness of Change
   const vChange = Ogmios.util.coalesceValueQuantities(
-    ...[...results.selection.change].map((value) => Ogmios.cslToOgmios.value(value))
+    [...results.selection.change].map((value) => Ogmios.cslToOgmios.value(value))
   );
   const vFee = BigInt(results.selection.fee.to_str());
   expect(vSelected.coins).toEqual(vRequested.coins + vChange.coins + vFee);
@@ -86,8 +86,8 @@ export const assertFailureProperties = ({
   outputsAmounts: Ogmios.util.OgmiosValue[];
   constraints: SelectionConstraints.MockSelectionConstraints;
 }) => {
-  const utxoTotals = Ogmios.util.coalesceValueQuantities(...utxoAmounts);
-  const outputsTotals = Ogmios.util.coalesceValueQuantities(...outputsAmounts);
+  const utxoTotals = Ogmios.util.coalesceValueQuantities(utxoAmounts);
+  const outputsTotals = Ogmios.util.coalesceValueQuantities(outputsAmounts);
   switch (error.failure) {
     case InputSelectionFailure.UtxoBalanceInsufficient: {
       const insufficientCoin = utxoTotals.coins < outputsTotals.coins + constraints.minimumCost;
@@ -148,7 +148,7 @@ export const generateSelectionParams = (() => {
       )
       .filter((values) => {
         // sum of coin or any asset can't exceed MAX_U64
-        const { coins, assets } = Ogmios.util.coalesceValueQuantities(...values);
+        const { coins, assets } = Ogmios.util.coalesceValueQuantities(values);
         return (
           coins <= cslUtil.MAX_U64 &&
           (!assets || Object.values(assets).every((quantity) => quantity <= cslUtil.MAX_U64))

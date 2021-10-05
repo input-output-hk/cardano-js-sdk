@@ -194,10 +194,10 @@ const coalesceChangeBundlesForMinCoinRequirement = (
 
   while (sortedBundles.length > 1 && !satisfiesMinCoinRequirement(sortedBundles[sortedBundles.length - 1])) {
     const smallestBundle = sortedBundles.pop()!;
-    sortedBundles[sortedBundles.length - 1] = Ogmios.util.coalesceValueQuantities(
+    sortedBundles[sortedBundles.length - 1] = Ogmios.util.coalesceValueQuantities([
       sortedBundles[sortedBundles.length - 1],
       smallestBundle
-    );
+    ]);
     // Re-sort because last bundle is not necessarily the smallest one after merging it
     sortedBundles = orderBy(sortedBundles, ({ coins }) => coins, 'desc');
   }
