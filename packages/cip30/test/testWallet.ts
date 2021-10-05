@@ -1,4 +1,4 @@
-import { RequestAccess, WalletApi } from '@src/Wallet';
+import { RequestAccess, WalletApi } from '../src/Wallet';
 
 export const api = <WalletApi>{
   getUtxos: async (_amount) => [

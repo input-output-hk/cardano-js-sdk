@@ -45,13 +45,13 @@ describe('Wallet', () => {
   describe('wallet behaviour', () => {
     let wallet: SingleAddressWallet;
     const props = {
-      outputs: [
+      outputs: new Set([
         {
           address:
             'addr_test1qpu5vlrf4xkxv2qpwngf6cjhtw542ayty80v8dyr49rf5ewvxwdrt70qlcpeeagscasafhffqsxy36t90ldv06wqrk2qum8x5w',
           value: { coins: 11_111_111 }
         }
-      ]
+      ])
     };
 
     beforeEach(async () => {

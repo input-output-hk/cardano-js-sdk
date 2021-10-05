@@ -1,7 +1,6 @@
-import { CardanoSerializationLib } from '@cardano-sdk/core';
+import { CardanoSerializationLib, cslUtil } from '@cardano-sdk/core';
 import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
 import { InputSelectionParameters, InputSelector, SelectionResult } from '../types';
-import { maxBigNum } from '../util';
 import { computeChangeAndAdjustForFee } from './change';
 import { roundRobinSelection } from './roundRobin';
 import { assertIsBalanceSufficient, preprocessArgs, withValuesToValues } from './util';
@@ -20,7 +19,7 @@ export const roundRobinRandomImprove = (csl: CardanoSerializationLib): InputSele
 
     const roundRobinSelectionResult = roundRobinSelection(utxosWithValue, outputsWithValue, uniqueOutputAssetIDs);
 
-    const { change, inputs, remainingUTxO, fee } = await computeChangeAndAdjustForFee({
+    const result = await computeChangeAndAdjustForFee({
       csl,
       computeMinimumCoinQuantity,
       tokenBundleSizeExceedsLimit,
@@ -29,15 +28,18 @@ export const roundRobinRandomImprove = (csl: CardanoSerializationLib): InputSele
       utxoSelection: roundRobinSelectionResult,
       estimateTxFee: (utxos, changeValues) =>
         computeMinimumCost({
-          inputs: utxos,
-          change: changeValues,
-          fee: maxBigNum(csl),
+          inputs: new Set(utxos),
+          change: new Set(changeValues),
+          fee: cslUtil.maxBigNum(csl),
           outputs
         })
     });
 
-    const feeBigNum = csl.BigNum.from_str(fee.toString());
-    if (inputs.length > (await computeSelectionLimit({ inputs, change, fee: feeBigNum, outputs }))) {
+    const inputs = new Set(result.inputs);
+    const change = new Set(result.change);
+    const fee = csl.BigNum.from_str(result.fee.toString());
+
+    if (result.inputs.length > (await computeSelectionLimit({ inputs, change, fee, outputs }))) {
       throw new InputSelectionError(InputSelectionFailure.MaximumInputCountExceeded);
     }
 
@@ -46,9 +48,9 @@ export const roundRobinRandomImprove = (csl: CardanoSerializationLib): InputSele
         change,
         inputs,
         outputs,
-        fee: feeBigNum
+        fee
       },
-      remainingUTxO
+      remainingUTxO: new Set(result.remainingUTxO)
     };
   }
 });

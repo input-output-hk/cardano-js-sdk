@@ -1,7 +1,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import { Wallet, WalletApi, WalletOptions } from '@src/Wallet';
+import { Wallet, WalletApi, WalletOptions } from '../src/Wallet';
 import { mocks } from 'mock-browser';
 import * as testWallet from './testWallet';
 const window = mocks.MockBrowser.createWindow();
@@ -46,7 +46,7 @@ describe('Wallet', () => {
   test('getPublicApi', async () => {
     const publicApi = wallet.getPublicApi(window);
     expect(publicApi.name).toEqual('test-wallet');
-    expect(await publicApi.isEnabled(window)).toEqual(false);
+    expect(await publicApi.isEnabled()).toEqual(false);
   });
 
   test('enable', async () => {
@@ -60,7 +60,7 @@ describe('Wallet', () => {
   });
 
   describe('api', () => {
-    let api: WalletApi | null;
+    let api: WalletApi;
 
     beforeAll(async () => {
       api = await wallet.enable(window);

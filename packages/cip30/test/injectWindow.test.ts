@@ -1,7 +1,7 @@
 import { mocks } from 'mock-browser';
-import { Wallet } from '@src/Wallet';
+import { Wallet } from '../src/Wallet';
 import { api, properties, requestAccess } from './testWallet';
-import { injectWindow, WindowMaybeWithCardano } from '@src/injectWindow';
+import { injectWindow, WindowMaybeWithCardano } from '../src/injectWindow';
 
 describe('injectWindow', () => {
   let wallet: Wallet;

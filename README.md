@@ -33,8 +33,8 @@ You may use the following config when bundling this SDK with Webpack:
 ```js
 const { IgnorePlugin, ProvidePlugin } = require('webpack');
 {
-  // For browser builds only
   resolve: {
+    // For browser builds only
     fallback: {
       // May want to install readable-stream as an explicit dependency
       stream: require.resolve('readable-stream'),
@@ -43,9 +43,8 @@ const { IgnorePlugin, ProvidePlugin } = require('webpack');
   },
   plugins: [
     new HtmlWebpackHarddiskPlugin(),
-      // see https://www.npmjs.com/package/bip39
-      new IgnorePlugin(/^\.\/wordlists\/(?!english)/, /bip39\/src$/),
-    ],
+    // see https://www.npmjs.com/package/bip39
+    new IgnorePlugin(/^\.\/wordlists\/(?!english)/, /bip39\/src$/),
   ],
   experiments: {
     asyncWebAssembly: true
@@ -130,6 +129,7 @@ yarn docs
 ```console
 yarn bump-version
 ```
+
 Then update the sibling dependencies manually.
 
 ### New package checklist

@@ -1,4 +1,4 @@
-import { AddressBalances, applyValue } from '@src/AddressBalance';
+import { AddressBalances, applyValue } from '../src/AddressBalance';
 
 describe('AddressBalance', () => {
   describe('applyValueToBalance', () => {

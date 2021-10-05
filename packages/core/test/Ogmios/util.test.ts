@@ -6,7 +6,7 @@ describe('Ogmios', () => {
       it('coin only', () => {
         const q1: OgmiosValue = { coins: 50n };
         const q2: OgmiosValue = { coins: 100n };
-        expect(coalesceValueQuantities(q1, q2)).toEqual({ coins: 150n });
+        expect(coalesceValueQuantities([q1, q2])).toEqual({ coins: 150n });
       });
       it('coin and assets', () => {
         const TSLA_Asset = 'b32_1vk0jj9lmv0cjkvmxw337u467atqcgkauwd4eczaugzagyghp25lTSLA';
@@ -25,7 +25,7 @@ describe('Ogmios', () => {
             [TSLA_Asset]: 20n
           }
         };
-        expect(coalesceValueQuantities(q1, q2, q3)).toEqual({
+        expect(coalesceValueQuantities([q1, q2, q3])).toEqual({
           coins: 170n,
           assets: {
             [TSLA_Asset]: 70n,

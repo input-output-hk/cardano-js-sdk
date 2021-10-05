@@ -91,7 +91,7 @@ describe('blockfrostProvider', () => {
     BlockFrostAPI.prototype.poolsRetiring = jest.fn().mockResolvedValue(mockedRetiringPoolsResponse);
 
     const client = blockfrostProvider({ projectId: apiKey, isTestnet: true });
-    const response = await client.stakePoolStats();
+    const response = await client.stakePoolStats!();
 
     expect(response).toMatchObject<StakePoolStats>({
       qty: {

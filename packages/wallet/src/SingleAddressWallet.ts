@@ -5,7 +5,7 @@ import { dummyLogger, Logger } from 'ts-log';
 import { defaultSelectionConstraints } from '@cardano-sdk/cip2';
 
 export type InitializeTxProps = {
-  outputs: Schema.TxOut[];
+  outputs: Set<Schema.TxOut>;
   options?: {
     validityInterval?: Transaction.ValidityInterval;
   };
@@ -49,7 +49,7 @@ export const createSingleAddressWallet = async (
     initializeTx: async (props) => {
       const tip = await provider.ledgerTip();
       const validityInterval = ensureValidityInterval(tip.slot, props.options?.validityInterval);
-      const txOutputs = props.outputs.map((output) => Ogmios.ogmiosToCsl(csl).txOut(output));
+      const txOutputs = new Set([...props.outputs].map((output) => Ogmios.ogmiosToCsl(csl).txOut(output)));
       const constraints = defaultSelectionConstraints({
         csl,
         protocolParameters,

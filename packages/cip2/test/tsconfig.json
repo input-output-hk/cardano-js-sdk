@@ -5,7 +5,8 @@
   },
   "references": [
     { "path": "../src" },
-    { "path": "../../core/src" }
+    { "path": "../../core/src" },
+    { "path": "../../util-dev/src" }
   ]
 }
 

@@ -1,3 +1,4 @@
+/* eslint-disable complexity */
 import { dummyLogger, Logger } from 'ts-log';
 import {
   createChainSyncClient,
@@ -9,6 +10,7 @@ import {
   Schema,
   ConnectionConfig,
   createInteractionContext,
+  ChainSync
 } from '@cardano-ogmios/client';
 import { GeneratorMetadata } from '../Content';
 import { isByronStandardBlock } from '../util';
@@ -25,7 +27,7 @@ export type AddressBalancesResponse = GeneratorMetadata & {
 export const getOnChainAddressBalances = (
   addresses: string[],
   atBlocks: number[],
-  options?: {
+  options: {
     logger?: Logger;
     ogmiosConnectionConfig: ConnectionConfig;
     onBlock?: (slot: number) => void;
@@ -36,6 +38,7 @@ export const getOnChainAddressBalances = (
     addresses.map((address) => [address, { coins: 0, assets: {} }])
   );
   const trackedTxs: ({ id: Schema.Hash16 } & Schema.Tx)[] = [];
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   return new Promise(async (resolve, reject) => {
     let currentBlock: number;
     // Required to ensure existing messages in the pipe are not processed after the completion
@@ -47,7 +50,7 @@ export const getOnChainAddressBalances = (
           compactGenesis: await StateQuery.genesisConfig(
             await createInteractionContext(reject, logger.info, { connection: options.ogmiosConnectionConfig })
           ),
-          intersection: undefined
+          intersection: undefined as unknown as ChainSync.Intersection
         }
       },
       balances: {}
@@ -59,6 +62,7 @@ export const getOnChainAddressBalances = (
           rollBackward: async (_res, requestNext) => {
             requestNext();
           },
+          // eslint-disable-next-line max-statements
           rollForward: async ({ block }, requestNext) => {
             if (draining) return;
             let b:
@@ -87,13 +91,15 @@ export const getOnChainAddressBalances = (
               blockBody = b.body;
             } else if (isAlonzoBlock(block)) {
               b = block.alonzo as Schema.BlockAlonzo;
+            } else {
+              throw new Error('No support for block');
             }
             if (b !== undefined) {
-              currentBlock = b.header.blockHeight;
+              currentBlock = b.header!.blockHeight;
               if (options?.onBlock !== undefined) {
                 options.onBlock(currentBlock);
               }
-              for (const tx of blockBody) {
+              for (const tx of blockBody!) {
                 for (const output of tx.body.outputs) {
                   if (trackedAddressBalances[output.address] !== undefined) {
                     const addressBalance = { ...trackedAddressBalances[output.address] };

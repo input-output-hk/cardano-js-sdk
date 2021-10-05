@@ -1,6 +1,6 @@
 import Schema, { TxIn, TxOut } from '@cardano-ogmios/schema';
 import { Buffer } from 'buffer';
-import { UtxoRepository } from './UtxoRepository';
+import { UtxoRepository } from './types';
 import { CardanoProvider, Ogmios, CardanoSerializationLib, CSL } from '@cardano-sdk/core';
 import { dummyLogger, Logger } from 'ts-log';
 import { InputSelector, SelectionConstraints, SelectionResult } from '@cardano-sdk/cip2';
@@ -26,7 +26,7 @@ export class InMemoryUtxoRepository implements UtxoRepository {
     this.#logger = logger ?? dummyLogger;
     this.#provider = provider;
     this.#utxoSet = new Set();
-    this.#delegationAndRewards = { rewards: null, delegate: null };
+    this.#delegationAndRewards = { rewards: undefined, delegate: undefined };
     this.#inputSelector = inputSelector;
     this.#keyManager = keyManager;
   }
@@ -55,7 +55,7 @@ export class InMemoryUtxoRepository implements UtxoRepository {
   }
 
   public async selectInputs(
-    outputs: CSL.TransactionOutput[],
+    outputs: Set<CSL.TransactionOutput>,
     constraints: SelectionConstraints
   ): Promise<SelectionResult> {
     if (this.#utxoSet.size === 0) {
@@ -63,7 +63,7 @@ export class InMemoryUtxoRepository implements UtxoRepository {
       await this.sync();
     }
     return this.#inputSelector.select({
-      utxo: Ogmios.ogmiosToCsl(this.#csl).utxo(this.allUtxos),
+      utxo: new Set(Ogmios.ogmiosToCsl(this.#csl).utxo(this.allUtxos)),
       outputs,
       constraints
     });
@@ -73,11 +73,11 @@ export class InMemoryUtxoRepository implements UtxoRepository {
     return [...this.#utxoSet.values()];
   }
 
-  public get rewards(): Schema.Lovelace {
-    return this.#delegationAndRewards.rewards;
+  public get rewards(): Schema.Lovelace | null {
+    return this.#delegationAndRewards.rewards ?? null;
   }
 
-  public get delegation(): Schema.PoolId {
-    return this.#delegationAndRewards.delegate;
+  public get delegation(): Schema.PoolId | null {
+    return this.#delegationAndRewards.delegate ?? null;
   }
 }

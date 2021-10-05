@@ -1,8 +1,8 @@
 import { roundRobinRandomImprove, InputSelector } from '@cardano-sdk/cip2';
 import { loadCardanoSerializationLib, CardanoSerializationLib, CSL, CardanoProvider, Ogmios } from '@cardano-sdk/core';
+import { SelectionConstraints } from '@cardano-sdk/util-dev';
 import { providerStub, delegate, rewards } from './ProviderStub';
 import { InMemoryUtxoRepository, KeyManagement, UtxoRepository } from '../src';
-import { NO_CONSTRAINTS } from './util';
 
 const addresses = [
   'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g'
@@ -13,7 +13,7 @@ describe('InMemoryUtxoRepository', () => {
   let provider: CardanoProvider;
   let inputSelector: InputSelector;
   let csl: CardanoSerializationLib;
-  let outputs: CSL.TransactionOutput[];
+  let outputs: Set<CSL.TransactionOutput>;
 
   beforeEach(async () => {
     provider = providerStub();
@@ -25,7 +25,7 @@ describe('InMemoryUtxoRepository', () => {
       networkId: 0,
       password: '123'
     });
-    outputs = [
+    outputs = new Set([
       Ogmios.ogmiosToCsl(csl).txOut({
         address: addresses[0],
         value: { coins: 4_000_000 }
@@ -34,7 +34,7 @@ describe('InMemoryUtxoRepository', () => {
         address: addresses[0],
         value: { coins: 2_000_000 }
       })
-    ];
+    ]);
     utxoRepository = new InMemoryUtxoRepository(csl, provider, keyManager, inputSelector);
   });
 
@@ -53,13 +53,13 @@ describe('InMemoryUtxoRepository', () => {
 
   describe('selectInputs', () => {
     it('can be called without explicitly syncing', async () => {
-      const result = await utxoRepository.selectInputs(outputs, NO_CONSTRAINTS);
+      const result = await utxoRepository.selectInputs(outputs, SelectionConstraints.NO_CONSTRAINTS);
       await expect(utxoRepository.allUtxos.length).toBe(3);
       await expect(utxoRepository.rewards).toBe(rewards);
       await expect(utxoRepository.delegation).toBe(delegate);
-      await expect(result.selection.inputs.length).toBeGreaterThan(0);
+      await expect(result.selection.inputs.size).toBeGreaterThan(0);
       await expect(result.selection.outputs).toBe(outputs);
-      await expect(result.selection.change.length).toBe(2);
+      await expect(result.selection.change.size).toBe(2);
     });
   });
 });

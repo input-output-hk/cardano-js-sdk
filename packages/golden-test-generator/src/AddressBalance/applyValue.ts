@@ -19,11 +19,11 @@ export const applyValue = (balance: Schema.Value, value: Schema.Value, spending 
   const assets = Object.entries(value.assets ?? {});
   if (assets.length > 0) {
     for (const [assetId, qty] of assets) {
-      balanceToApply.assets[assetId] =
-        balance.assets[assetId] !== undefined
-          ? balance.assets[assetId] + (spending ? -BigIntMath.abs(qty) : qty)
+      balanceToApply.assets![assetId] =
+        balance.assets![assetId] !== undefined
+          ? balance.assets![assetId] + (spending ? -BigIntMath.abs(qty) : qty)
           : (spending ? -BigIntMath.abs(qty) : qty);
-      throwIfNegative(balanceToApply.assets[assetId]);
+      throwIfNegative(balanceToApply.assets![assetId]);
     }
   }
 
