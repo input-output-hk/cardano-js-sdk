@@ -23,6 +23,14 @@ const assertExtraChangeProperties = (
   }
 };
 
+const totalOutputsValue = (outputs: Set<CSL.TransactionOutput>) =>
+  Ogmios.util.coalesceValueQuantities([...outputs].map((output) => Ogmios.cslToOgmios.value(output.amount())));
+
+const totalUtxosValue = (results: SelectionResult) =>
+  Ogmios.util.coalesceValueQuantities(
+    [...results.selection.inputs].map((selectedUtxo) => Ogmios.cslToOgmios.value(selectedUtxo.output().amount()))
+  );
+
 export const assertInputSelectionProperties = ({
   results,
   outputs,
@@ -34,12 +42,8 @@ export const assertInputSelectionProperties = ({
   utxo: Set<CSL.TransactionUnspentOutput>;
   constraints: SelectionConstraints.MockSelectionConstraints;
 }) => {
-  const vSelected = Ogmios.util.coalesceValueQuantities(
-    [...results.selection.inputs].map((selectedUtxo) => Ogmios.cslToOgmios.value(selectedUtxo.output().amount()))
-  );
-  const vRequested = Ogmios.util.coalesceValueQuantities(
-    [...outputs].map((output) => Ogmios.cslToOgmios.value(output.amount()))
-  );
+  const vSelected = totalUtxosValue(results);
+  const vRequested = totalOutputsValue(outputs);
 
   // Coverage of Payments
   expect(vSelected.coins).toBeGreaterThanOrEqual(vRequested.coins);
