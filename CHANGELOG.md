@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.3](https://github.com/input-output-hk/cardano-js-sdk/compare/0.1.2...0.1.3) (2021-10-05)
+
+
+### Features
+
+* **wallet:** add SingleAddressWallet.name ([7eb4e78](https://github.com/input-output-hk/cardano-js-sdk/commit/7eb4e78cb557c92da038d91b3e4507d873d46818))
+
 ### [0.1.2](https://github.com/input-output-hk/cardano-js-sdk/compare/0.1.1...0.1.2) (2021-09-30)
 
 
