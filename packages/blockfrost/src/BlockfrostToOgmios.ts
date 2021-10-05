@@ -19,7 +19,6 @@ export const BlockfrostToOgmios = {
   // without `as OgmiosSchema.Utxo` above TS thinks the return value is (OgmiosSchema.TxIn | OgmiosSchema.TxOut)[][]
 
   blockToTip: (block: Responses['block_content']): OgmiosSchema.Tip => ({
-    // Review: if height and slot be actually be null we should check it and either throw or return something else
     blockNo: block.height!,
     hash: block.hash,
     slot: block.slot!

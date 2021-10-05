@@ -9,12 +9,12 @@ import {
   isAlonzoBlock,
   isShelleyBlock,
   isMaryBlock,
-  Schema
+  Schema,
+  ChainSync
 } from '@cardano-ogmios/client';
 import { GeneratorMetadata } from '../Content';
 
 import { isByronStandardBlock } from '../util';
-import { Intersection } from '@cardano-ogmios/client/dist/ChainSync';
 
 export type GetBlocksResponse = GeneratorMetadata & {
   blocks: { [blockHeight: string]: Schema.Block };
@@ -40,8 +40,7 @@ export const getBlocks = async (
           compactGenesis: await StateQuery.genesisConfig(
             await createInteractionContext(reject, logger.info, { connection: options.ogmiosConnectionConfig })
           ),
-          // Review: this can't be undefined acccording to type
-          intersection: undefined as unknown as Intersection
+          intersection: undefined as unknown as ChainSync.Intersection
         }
       },
       blocks: {}

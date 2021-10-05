@@ -9,12 +9,12 @@ import {
   isMaryBlock,
   Schema,
   ConnectionConfig,
-  createInteractionContext
+  createInteractionContext,
+  ChainSync
 } from '@cardano-ogmios/client';
 import { GeneratorMetadata } from '../Content';
 import { isByronStandardBlock } from '../util';
 import { applyValue } from './applyValue';
-import { Intersection } from '@cardano-ogmios/client/dist/ChainSync';
 
 export type AddressBalances = {
   [address: string]: Schema.Value;
@@ -50,8 +50,7 @@ export const getOnChainAddressBalances = (
           compactGenesis: await StateQuery.genesisConfig(
             await createInteractionContext(reject, logger.info, { connection: options.ogmiosConnectionConfig })
           ),
-          // Review: this can't be undefined acccording to type
-          intersection: undefined as unknown as Intersection
+          intersection: undefined as unknown as ChainSync.Intersection
         }
       },
       balances: {}

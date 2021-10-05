@@ -1,25 +1,30 @@
+import { CardanoSerializationLib, CSL, cslUtil, InvalidProtocolParametersError } from '@cardano-sdk/core';
+import { ProtocolParametersRequiredByInputSelection } from '.';
 import {
-  CardanoSerializationLib,
-  CSL,
-  cslUtil,
-  InvalidProtocolParametersError,
-  ProtocolParametersRequiredByWallet
-} from '@cardano-sdk/core';
-import { ComputeSelectionLimit, SelectionConstraints, TokenBundleSizeExceedsLimit } from '.';
-import { ComputeMinimumCoinQuantity, EstimateTxFee, SelectionSkeleton } from './types';
+  TokenBundleSizeExceedsLimit,
+  ComputeMinimumCoinQuantity,
+  EstimateTxFee,
+  SelectionSkeleton,
+  ComputeSelectionLimit,
+  ProtocolParametersForInputSelection,
+  SelectionConstraints
+} from './types';
 
 export type BuildTx = (selection: SelectionSkeleton) => Promise<CSL.Transaction>;
 
 export interface DefaultSelectionConstraintsProps {
   csl: CardanoSerializationLib;
-  protocolParameters: ProtocolParametersRequiredByWallet;
+  protocolParameters: ProtocolParametersForInputSelection;
   buildTx: BuildTx;
 }
 
 export const computeMinimumCost =
   (
     csl: CardanoSerializationLib,
-    { minFeeCoefficient, minFeeConstant }: { minFeeCoefficient: number; minFeeConstant: number },
+    {
+      minFeeCoefficient,
+      minFeeConstant
+    }: Pick<ProtocolParametersRequiredByInputSelection, 'minFeeCoefficient' | 'minFeeConstant'>,
     buildTx: BuildTx
   ): EstimateTxFee =>
   async (selection) => {
@@ -38,7 +43,10 @@ export const computeMinimumCost =
   };
 
 export const computeMinimumCoinQuantity =
-  (csl: CardanoSerializationLib, coinsPerUtxoWord: number): ComputeMinimumCoinQuantity =>
+  (
+    csl: CardanoSerializationLib,
+    coinsPerUtxoWord: ProtocolParametersRequiredByInputSelection['coinsPerUtxoWord']
+  ): ComputeMinimumCoinQuantity =>
   (multiasset) => {
     const minUTxOValue = csl.BigNum.from_str((coinsPerUtxoWord * 29).toString());
     const value = csl.Value.new(csl.BigNum.from_str('0'));
@@ -49,7 +57,10 @@ export const computeMinimumCoinQuantity =
   };
 
 export const tokenBundleSizeExceedsLimit =
-  (csl: CardanoSerializationLib, maxValueSize: number): TokenBundleSizeExceedsLimit =>
+  (
+    csl: CardanoSerializationLib,
+    maxValueSize: ProtocolParametersRequiredByInputSelection['maxValueSize']
+  ): TokenBundleSizeExceedsLimit =>
   (tokenBundle) => {
     if (!tokenBundle) {
       return false;
@@ -69,7 +80,7 @@ const getTxSize = (tx: CSL.Transaction) => tx.to_bytes().length;
  * @returns {ComputeSelectionLimit} constraint that returns txSize <= maxTxSize ? utxo[].length : utxo[].length+1
  */
 export const computeSelectionLimit =
-  (maxTxSize: number, buildTx: BuildTx): ComputeSelectionLimit =>
+  (maxTxSize: ProtocolParametersRequiredByInputSelection['maxTxSize'], buildTx: BuildTx): ComputeSelectionLimit =>
   async (selectionSkeleton) => {
     const tx = await buildTx(selectionSkeleton);
     const txSize = getTxSize(tx);

@@ -6,12 +6,11 @@ import {
   CSL,
   Ogmios,
   InvalidProtocolParametersError,
-  loadCardanoSerializationLib,
-  ProtocolParametersRequiredByWallet
+  loadCardanoSerializationLib
 } from '@cardano-sdk/core';
 import { AssetId } from '@cardano-sdk/util-dev';
 import { defaultSelectionConstraints, DefaultSelectionConstraintsProps } from '../src/selectionConstraints';
-import { SelectionSkeleton } from '../src/types';
+import { ProtocolParametersForInputSelection, SelectionSkeleton } from '../src/types';
 
 describe('defaultSelectionConstraints', () => {
   let csl: CardanoSerializationLib;
@@ -21,7 +20,7 @@ describe('defaultSelectionConstraints', () => {
     coinsPerUtxoWord: 34_482,
     maxTxSize: 16_384,
     maxValueSize: 5000
-  } as ProtocolParametersRequiredByWallet;
+  } as ProtocolParametersForInputSelection;
 
   beforeAll(async () => (csl = await loadCardanoSerializationLib()));
 

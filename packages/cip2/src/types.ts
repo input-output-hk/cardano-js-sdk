@@ -1,3 +1,4 @@
+import { ProtocolParametersAlonzo } from '@cardano-ogmios/schema';
 import { CSL } from '@cardano-sdk/core';
 
 export interface SelectionSkeleton {
@@ -89,3 +90,12 @@ export interface InputSelector {
    */
   select(params: InputSelectionParameters): Promise<SelectionResult>;
 }
+
+export type ProtocolParametersForInputSelection = Pick<
+  ProtocolParametersAlonzo,
+  'coinsPerUtxoWord' | 'maxTxSize' | 'maxValueSize' | 'minFeeCoefficient' | 'minFeeConstant'
+>;
+
+export type ProtocolParametersRequiredByInputSelection = {
+  [k in keyof ProtocolParametersForInputSelection]: NonNullable<ProtocolParametersForInputSelection[k]>;
+};
