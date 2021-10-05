@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>22/22</span>
+                <span class='fraction'>19/19</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>20/20</span>
+                <span class='fraction'>17/17</span>
             </div>
         
             
@@ -127,14 +127,12 @@
 <a name='L68'></a><a href='#L68'>68</a>
 <a name='L69'></a><a href='#L69'>69</a>
 <a name='L70'></a><a href='#L70'>70</a>
-<a name='L71'></a><a href='#L71'>71</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -163,7 +161,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -175,7 +175,6 @@
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">7x</span>
-<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -183,7 +182,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -194,33 +193,35 @@
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { CardanoSerializationLib, CSL, loadCardanoSerializationLib } from '@cardano-sdk/core';
-import { createCslTestUtils, TestUtils } from './util';
 import { InputSelector } from '../../src/types';
 import { InputSelectionError, InputSelectionFailure } from '../../src/InputSelectionError';
-import { MockSelectionConstraints, toConstraints } from './constraints';
+import { SelectionConstraints } from '@cardano-sdk/util-dev';
 import { assertInputSelectionProperties } from './properties';
 &nbsp;
 export interface InputSelectionPropertiesTestParams {
   /**
    * Test subject (Input Selection algorithm under test)
    */
-  getAlgorithm: (SerializationLib: CardanoSerializationLib) =&gt; InputSelector;
+  getAlgorithm: (csl: CardanoSerializationLib) =&gt; InputSelector;
   /**
    * Available UTxO
    */
-  createUtxo: (utils: TestUtils) =&gt; CSL.TransactionUnspentOutput[];
+  createUtxo: (csl: CardanoSerializationLib) =&gt; CSL.TransactionUnspentOutput[];
   /**
    * Transaction outputs
    */
-  createOutputs: (utils: TestUtils) =&gt; CSL.TransactionOutput[];
+  createOutputs: (csl: CardanoSerializationLib) =&gt; CSL.TransactionOutput[];
   /**
    * Input selection constraints passed to the algorithm.
    */
-  mockConstraints: MockSelectionConstraints;
+  mockConstraints: SelectionConstraints.MockSelectionConstraints;
 }
 &nbsp;
 export interface InputSelectionFailureModeTestParams extends InputSelectionPropertiesTestParams {
@@ -240,14 +241,13 @@ export const testInputSelectionFailureMode = async ({
   expectedError,
   mockConstraints
 }: InputSelectionFailureModeTestParams) =&gt; {
-  const SerializationLib = await loadCardanoSerializationLib();
-  const utils = createCslTestUtils(SerializationLib);
-  const utxo = createUtxo(utils);
-  const outputs = createOutputs(utils);
-  const algorithm = getAlgorithm(SerializationLib);
-  await expect(algorithm.select({ utxo, outputs, constraints: toConstraints(mockConstraints) })).rejects.toThrowError(
-    new InputSelectionError(expectedError)
-  );
+  const csl = await loadCardanoSerializationLib();
+  const utxo = new Set(createUtxo(csl));
+  const outputs = new Set(createOutputs(csl));
+  const algorithm = getAlgorithm(csl);
+  await expect(
+    algorithm.select({ utxo, outputs, constraints: SelectionConstraints.mockConstraintsToConstraints(mockConstraints) })
+  ).rejects.toThrowError(new InputSelectionError(expectedError));
 };
 &nbsp;
 /**
@@ -259,13 +259,16 @@ export const testInputSelectionProperties = async ({
   createOutputs,
   mockConstraints
 }: InputSelectionPropertiesTestParams) =&gt; {
-  const SerializationLib = await loadCardanoSerializationLib();
-  const utils = createCslTestUtils(SerializationLib);
-  const utxo = createUtxo(utils);
-  const outputs = createOutputs(utils);
-  const algorithm = getAlgorithm(SerializationLib);
-  const results = await algorithm.select({ utxo, outputs, constraints: toConstraints(mockConstraints) });
-  assertInputSelectionProperties({ utils, results, outputs, constraints: mockConstraints, utxo });
+  const csl = await loadCardanoSerializationLib();
+  const utxo = new Set(createUtxo(csl));
+  const outputs = new Set(createOutputs(csl));
+  const algorithm = getAlgorithm(csl);
+  const results = await algorithm.select({
+    utxo,
+    outputs,
+    constraints: SelectionConstraints.mockConstraintsToConstraints(mockConstraints)
+  });
+  assertInputSelectionProperties({ results, outputs, constraints: mockConstraints, utxo });
 };
 &nbsp;</pre></td></tr></table></pre>
 
@@ -274,7 +277,7 @@ export const testInputSelectionProperties = async ({
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Sun Oct 03 2021 05:11:27 GMT+0000 (Coordinated Universal Time)
+                at Tue Oct 05 2021 10:09:08 GMT+0000 (Coordinated Universal Time)
             </div>
         </div>
         <script src="../../prettify.js"></script>

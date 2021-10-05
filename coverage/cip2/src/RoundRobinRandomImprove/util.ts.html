@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>48/48</span>
+                <span class='fraction'>47/47</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>35/35</span>
+                <span class='fraction'>34/34</span>
             </div>
         
             
@@ -145,8 +145,9 @@
 <a name='L86'></a><a href='#L86'>86</a>
 <a name='L87'></a><a href='#L87'>87</a>
 <a name='L88'></a><a href='#L88'>88</a>
-<a name='L89'></a><a href='#L89'>89</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -186,29 +187,32 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2409x</span>
-<span class="cline-any cline-yes">2203x</span>
+<span class="cline-any cline-yes">2175x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2409x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">11051x</span>
+<span class="cline-any cline-yes">11433x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1105x</span>
-<span class="cline-any cline-yes">2718x</span>
+<span class="cline-any cline-yes">1052x</span>
+<span class="cline-any cline-yes">2590x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">72x</span>
-<span class="cline-any cline-yes">96x</span>
+<span class="cline-any cline-yes">83x</span>
+<span class="cline-any cline-yes">99x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">12908x</span>
-<span class="cline-any cline-yes">6137x</span>
+<span class="cline-any cline-yes">13598x</span>
+<span class="cline-any cline-yes">6516x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1616x</span>
-<span class="cline-any cline-yes">1616x</span>
-<span class="cline-any cline-yes">1616x</span>
-<span class="cline-any cline-yes">488x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1659x</span>
+<span class="cline-any cline-yes">1659x</span>
+<span class="cline-any cline-yes">1659x</span>
+<span class="cline-any cline-yes">486x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -224,22 +228,21 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2409x</span>
-<span class="cline-any cline-yes">973x</span>
-<span class="cline-any cline-yes">973x</span>
-<span class="cline-any cline-yes">973x</span>
-<span class="cline-any cline-yes">973x</span>
-<span class="cline-any cline-yes">793x</span>
+<span class="cline-any cline-yes">907x</span>
+<span class="cline-any cline-yes">907x</span>
+<span class="cline-any cline-yes">907x</span>
+<span class="cline-any cline-yes">907x</span>
+<span class="cline-any cline-yes">750x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1616x</span>
+<span class="cline-any cline-yes">1659x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { BigIntMath, CSL } from '@cardano-sdk/core';
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { BigIntMath, CSL, Ogmios } from '@cardano-sdk/core';
 import { uniq } from 'lodash-es';
 import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
-import { OgmiosValue, valueToValueQuantities } from '../util';
 &nbsp;
 export interface WithValue {
-  value: OgmiosValue;
+  value: Ogmios.util.OgmiosValue;
 }
 &nbsp;
 export interface UtxoWithValue extends WithValue {
@@ -262,16 +265,16 @@ export interface UtxoSelection {
 }
 &nbsp;
 export const preprocessArgs = (
-  availableUtxo: CSL.TransactionUnspentOutput[],
-  outputs: CSL.TransactionOutput[]
+  availableUtxo: Set&lt;CSL.TransactionUnspentOutput&gt;,
+  outputs: Set&lt;CSL.TransactionOutput&gt;
 ): RoundRobinRandomImproveArgs =&gt; {
-  const utxosWithValue = availableUtxo.map((utxo) =&gt; ({
+  const utxosWithValue = [...availableUtxo].map((utxo) =&gt; ({
     utxo,
-    value: valueToValueQuantities(utxo.output().amount())
+    value: Ogmios.cslToOgmios.value(utxo.output().amount())
   }));
-  const outputsWithValue = outputs.map((output) =&gt; ({
+  const outputsWithValue = [...outputs].map((output) =&gt; ({
     output,
-    value: valueToValueQuantities(output.amount())
+    value: Ogmios.cslToOgmios.value(output.amount())
   }));
   const uniqueOutputAssetIDs = uniq(
     outputsWithValue.flatMap(({ value: { assets } }) =&gt; (assets &amp;&amp; Object.keys(assets)) || [])
@@ -282,17 +285,20 @@ export const preprocessArgs = (
 export const withValuesToValues = (totals: WithValue[]) =&gt; totals.map((t) =&gt; t.value);
 export const assetQuantitySelector =
   (id: string) =&gt;
-  (quantities: OgmiosValue[]): bigint =&gt;
+  (quantities: Ogmios.util.OgmiosValue[]): bigint =&gt;
     BigIntMath.sum(quantities.map(({ assets }) =&gt; assets?.[id] || 0n));
 export const assetWithValueQuantitySelector =
   (id: string) =&gt;
   (totals: WithValue[]): bigint =&gt;
     assetQuantitySelector(id)(withValuesToValues(totals));
-export const getCoinQuantity = (quantities: OgmiosValue[]): bigint =&gt;
+export const getCoinQuantity = (quantities: Ogmios.util.OgmiosValue[]): bigint =&gt;
   BigIntMath.sum(quantities.map(({ coins }) =&gt; coins));
 export const getWithValuesCoinQuantity = (totals: WithValue[]): bigint =&gt; getCoinQuantity(withValuesToValues(totals));
 &nbsp;
-export const assertIsCoinBalanceSufficient = (utxoValues: OgmiosValue[], outputValues: OgmiosValue[]) =&gt; {
+export const assertIsCoinBalanceSufficient = (
+  utxoValues: Ogmios.util.OgmiosValue[],
+  outputValues: Ogmios.util.OgmiosValue[]
+) =&gt; {
   const utxoCoinTotal = getCoinQuantity(utxoValues);
   const outputsCoinTotal = getCoinQuantity(outputValues);
   if (outputsCoinTotal &gt; utxoCoinTotal) {
@@ -308,8 +314,8 @@ export const assertIsCoinBalanceSufficient = (utxoValues: OgmiosValue[], outputV
  */
 export const assertIsBalanceSufficient = (
   uniqueOutputAssetIDs: string[],
-  utxoValues: OgmiosValue[],
-  outputValues: OgmiosValue[]
+  utxoValues: Ogmios.util.OgmiosValue[],
+  outputValues: Ogmios.util.OgmiosValue[]
 ): void =&gt; {
   for (const assetId of uniqueOutputAssetIDs) {
     const getAssetQuantity = assetQuantitySelector(assetId);
@@ -328,7 +334,7 @@ export const assertIsBalanceSufficient = (
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Sun Oct 03 2021 05:11:27 GMT+0000 (Coordinated Universal Time)
+                at Tue Oct 05 2021 10:09:08 GMT+0000 (Coordinated Universal Time)
             </div>
         </div>
         <script src="../../prettify.js"></script>

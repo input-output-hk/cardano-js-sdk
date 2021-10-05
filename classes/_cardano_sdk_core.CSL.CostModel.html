@@ -94,9 +94,7 @@
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="_cardano_sdk_core.CSL.CostModel.html#free" class="tsd-kind-icon">free</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="_cardano_sdk_core.CSL.CostModel.html#get" class="tsd-kind-icon">get</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="_cardano_sdk_core.CSL.CostModel.html#insert" class="tsd-kind-icon">insert</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="_cardano_sdk_core.CSL.CostModel.html#keys" class="tsd-kind-icon">keys</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="_cardano_sdk_core.CSL.CostModel.html#len" class="tsd-kind-icon">len</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="_cardano_sdk_core.CSL.CostModel.html#set" class="tsd-kind-icon">set</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="_cardano_sdk_core.CSL.CostModel.html#to_bytes" class="tsd-kind-icon">to_<wbr>bytes</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static tsd-is-external"><a href="_cardano_sdk_core.CSL.CostModel.html#from_bytes" class="tsd-kind-icon">from_<wbr>bytes</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static tsd-is-external"><a href="_cardano_sdk_core.CSL.CostModel.html#new" class="tsd-kind-icon">new</a></li>
@@ -134,7 +132,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in node_modules/@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib.d.ts:969</li>
+									<li>Defined in node_modules/@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib.d.ts:994</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -145,82 +143,48 @@
 					<a name="get" class="tsd-anchor"></a>
 					<h3>get</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">get<span class="tsd-signature-symbol">(</span>key<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_core.CSL.BigInt.html" class="tsd-signature-type" data-tsd-kind="Class">BigInt</a></li>
+						<li class="tsd-signature tsd-kind-icon">get<span class="tsd-signature-symbol">(</span>operation<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_core.CSL.Int.html" class="tsd-signature-type" data-tsd-kind="Class">Int</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in node_modules/@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib.d.ts:997</li>
+									<li>Defined in node_modules/@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib.d.ts:1018</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>key: <span class="tsd-signature-type">string</span></h5>
+									<h5>operation: <span class="tsd-signature-type">number</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="_cardano_sdk_core.CSL.BigInt.html" class="tsd-signature-type" data-tsd-kind="Class">BigInt</a></h4>
+							<h4 class="tsd-returns-title">Returns <a href="_cardano_sdk_core.CSL.Int.html" class="tsd-signature-type" data-tsd-kind="Class">Int</a></h4>
 						</li>
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-external">
-					<a name="insert" class="tsd-anchor"></a>
-					<h3>insert</h3>
+					<a name="set" class="tsd-anchor"></a>
+					<h3>set</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">insert<span class="tsd-signature-symbol">(</span>key<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, value<span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_core.CSL.BigInt.html" class="tsd-signature-type" data-tsd-kind="Class">BigInt</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_core.CSL.BigInt.html" class="tsd-signature-type" data-tsd-kind="Class">BigInt</a></li>
+						<li class="tsd-signature tsd-kind-icon">set<span class="tsd-signature-symbol">(</span>operation<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, cost<span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_core.CSL.Int.html" class="tsd-signature-type" data-tsd-kind="Class">Int</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_core.CSL.Int.html" class="tsd-signature-type" data-tsd-kind="Class">Int</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in node_modules/@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib.d.ts:992</li>
+									<li>Defined in node_modules/@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib.d.ts:1013</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>key: <span class="tsd-signature-type">string</span></h5>
+									<h5>operation: <span class="tsd-signature-type">number</span></h5>
 								</li>
 								<li>
-									<h5>value: <a href="_cardano_sdk_core.CSL.BigInt.html" class="tsd-signature-type" data-tsd-kind="Class">BigInt</a></h5>
+									<h5>cost: <a href="_cardano_sdk_core.CSL.Int.html" class="tsd-signature-type" data-tsd-kind="Class">Int</a></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="_cardano_sdk_core.CSL.BigInt.html" class="tsd-signature-type" data-tsd-kind="Class">BigInt</a></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-external">
-					<a name="keys" class="tsd-anchor"></a>
-					<h3>keys</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">keys<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_core.CSL.Strings.html" class="tsd-signature-type" data-tsd-kind="Class">Strings</a></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in node_modules/@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib.d.ts:1001</li>
-								</ul>
-							</aside>
-							<h4 class="tsd-returns-title">Returns <a href="_cardano_sdk_core.CSL.Strings.html" class="tsd-signature-type" data-tsd-kind="Class">Strings</a></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-external">
-					<a name="len" class="tsd-anchor"></a>
-					<h3>len</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">len<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in node_modules/@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib.d.ts:986</li>
-								</ul>
-							</aside>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+							<h4 class="tsd-returns-title">Returns <a href="_cardano_sdk_core.CSL.Int.html" class="tsd-signature-type" data-tsd-kind="Class">Int</a></h4>
 						</li>
 					</ul>
 				</section>
@@ -234,7 +198,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in node_modules/@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib.d.ts:973</li>
+									<li>Defined in node_modules/@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib.d.ts:998</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Uint8Array</span></h4>
@@ -251,7 +215,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in node_modules/@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib.d.ts:978</li>
+									<li>Defined in node_modules/@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib.d.ts:1003</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -274,7 +238,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in node_modules/@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib.d.ts:982</li>
+									<li>Defined in node_modules/@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib.d.ts:1007</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="_cardano_sdk_core.CSL.CostModel.html" class="tsd-signature-type" data-tsd-kind="Class">CostModel</a></h4>
@@ -308,13 +272,7 @@
 								<a href="_cardano_sdk_core.CSL.CostModel.html#get" class="tsd-kind-icon">get</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-external">
-								<a href="_cardano_sdk_core.CSL.CostModel.html#insert" class="tsd-kind-icon">insert</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-external">
-								<a href="_cardano_sdk_core.CSL.CostModel.html#keys" class="tsd-kind-icon">keys</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-external">
-								<a href="_cardano_sdk_core.CSL.CostModel.html#len" class="tsd-kind-icon">len</a>
+								<a href="_cardano_sdk_core.CSL.CostModel.html#set" class="tsd-kind-icon">set</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-external">
 								<a href="_cardano_sdk_core.CSL.CostModel.html#to_bytes" class="tsd-kind-icon">to_<wbr>bytes</a>

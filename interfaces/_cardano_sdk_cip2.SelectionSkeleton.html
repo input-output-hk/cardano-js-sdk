@@ -97,12 +97,18 @@
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="change" class="tsd-anchor"></a>
 					<h3>change</h3>
-					<div class="tsd-signature tsd-kind-icon">change<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Value</span><span class="tsd-signature-symbol">[]</span></div>
+					<div class="tsd-signature tsd-kind-icon">change<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Set</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Value</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/f07bfef/packages/cip2/src/types.ts#L40">packages/cip2/src/types.ts:40</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1587e0c/packages/cip2/src/types.ts#L21">packages/cip2/src/types.ts:21</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>A set of change values. Does not account for fee.</p>
+						</div>
+						<p>From the point of view of a wallet, this represents the change to be returned to the wallet.</p>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="fee" class="tsd-anchor"></a>
@@ -110,29 +116,47 @@
 					<div class="tsd-signature tsd-kind-icon">fee<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">BigNum</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/f07bfef/packages/cip2/src/types.ts#L41">packages/cip2/src/types.ts:41</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1587e0c/packages/cip2/src/types.ts#L26">packages/cip2/src/types.ts:26</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Estimated fee for the transaction.
+							This value is included in &#39;change&#39;, so the actual change returned by the transaction is change-fee.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="inputs" class="tsd-anchor"></a>
 					<h3>inputs</h3>
-					<div class="tsd-signature tsd-kind-icon">inputs<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">TransactionUnspentOutput</span><span class="tsd-signature-symbol">[]</span></div>
+					<div class="tsd-signature tsd-kind-icon">inputs<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Set</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TransactionUnspentOutput</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/f07bfef/packages/cip2/src/types.ts#L38">packages/cip2/src/types.ts:38</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1587e0c/packages/cip2/src/types.ts#L11">packages/cip2/src/types.ts:11</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>A set of inputs, equivalent to a subset of the initial UTxO set.</p>
+						</div>
+						<p>From the point of view of a wallet, this represents the value
+						that has been selected from the wallet in order to cover the total payment value.</p>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="outputs" class="tsd-anchor"></a>
 					<h3>outputs</h3>
-					<div class="tsd-signature tsd-kind-icon">outputs<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">TransactionOutput</span><span class="tsd-signature-symbol">[]</span></div>
+					<div class="tsd-signature tsd-kind-icon">outputs<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Set</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TransactionOutput</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/f07bfef/packages/cip2/src/types.ts#L39">packages/cip2/src/types.ts:39</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1587e0c/packages/cip2/src/types.ts#L15">packages/cip2/src/types.ts:15</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Set of payments to be made to recipient addresses.</p>
+						</div>
+					</div>
 				</section>
 			</section>
 		</div>
@@ -156,6 +180,9 @@
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="../modules/_cardano_sdk_core.html">@cardano-<wbr>sdk/core</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/_cardano_sdk_util_dev.html">@cardano-<wbr>sdk/util-<wbr>dev</a>
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="../modules/_cardano_sdk_wallet.html">@cardano-<wbr>sdk/wallet</a>
@@ -211,6 +238,15 @@
 					</li>
 					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
 						<a href="../modules/_cardano_sdk_cip2.html#EstimateTxFee" class="tsd-kind-icon">Estimate<wbr>TxFee</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+						<a href="../modules/_cardano_sdk_cip2.html#ProtocolParametersForInputSelection" class="tsd-kind-icon">Protocol<wbr>Parameters<wbr>For<wbr>Input<wbr>Selection</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+						<a href="../modules/_cardano_sdk_cip2.html#ProtocolParametersRequiredByInputSelection" class="tsd-kind-icon">Protocol<wbr>Parameters<wbr>Required<wbr>ByInput<wbr>Selection</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+						<a href="../modules/_cardano_sdk_cip2.html#Selection" class="tsd-kind-icon">Selection</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
 						<a href="../modules/_cardano_sdk_cip2.html#TokenBundleSizeExceedsLimit" class="tsd-kind-icon">Token<wbr>Bundle<wbr>Size<wbr>Exceeds<wbr>Limit</a>
