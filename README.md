@@ -18,6 +18,7 @@ A suite of TypeScript packages suitable for both Node.js and browser-based devel
 - [@cardano-sdk/cip2](./packages/cip2)
 - [@cardano-sdk/cip30](./packages/cip30)
 - [@cardano-sdk/wallet](./packages/wallet)
+- [@cardano-sdk/util-dev](./packages/util-dev)
 
 ### Cardano Provider Implementations
 
