@@ -1,12 +1,10 @@
 {
   "extends": "../../../tsconfig.json",
   "compilerOptions": {
-    "baseUrl": "."
+    "outDir": "../dist/",
+    "rootDir": "."
   },
   "references": [
-    { "path": "../src" },
-    { "path": "../../util-dev/src" },
-    { "path": "../../cip2/src" },
     { "path": "../../core/src" }
   ]
 }

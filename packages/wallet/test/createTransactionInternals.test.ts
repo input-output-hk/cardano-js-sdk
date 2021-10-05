@@ -7,9 +7,9 @@ import {
   CardanoProvider,
   Ogmios
 } from '@cardano-sdk/core';
+import { SelectionConstraints } from '@cardano-sdk/util-dev';
 import { providerStub } from './ProviderStub';
 import { createTransactionInternals, InMemoryUtxoRepository, KeyManagement, UtxoRepository } from '../src';
-import { NO_CONSTRAINTS } from './util';
 
 const address =
   'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g';
@@ -46,7 +46,7 @@ describe('createTransactionInternals', () => {
   });
 
   test('simple transaction', async () => {
-    const result = await utxoRepository.selectInputs(outputs, NO_CONSTRAINTS);
+    const result = await utxoRepository.selectInputs(outputs, SelectionConstraints.NO_CONSTRAINTS);
     const ledgerTip = await provider.ledgerTip();
     const { body, hash } = await createTransactionInternals(csl, {
       changeAddress: 'addr_test1gz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzerspqgpsqe70et',

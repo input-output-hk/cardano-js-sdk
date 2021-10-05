@@ -9,7 +9,7 @@ import {
   loadCardanoSerializationLib,
   ProtocolParametersRequiredByWallet
 } from '@cardano-sdk/core';
-import { PXL_Asset, TSLA_Asset } from './util';
+import { AssetId } from '@cardano-sdk/util-dev';
 import { defaultSelectionConstraints, DefaultSelectionConstraintsProps } from '../src/selectionConstraints';
 import { SelectionSkeleton } from '../src/types';
 
@@ -61,8 +61,8 @@ describe('defaultSelectionConstraints', () => {
       .value({
         coins: 10_000n,
         assets: {
-          [TSLA_Asset]: 5000n,
-          [PXL_Asset]: 3000n
+          [AssetId.TSLA]: 5000n,
+          [AssetId.PXL]: 3000n
         }
       })
       .multiasset();

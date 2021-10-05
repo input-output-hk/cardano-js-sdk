@@ -1,27 +1,26 @@
 import { CardanoSerializationLib, CSL, loadCardanoSerializationLib } from '@cardano-sdk/core';
-import { createCslTestUtils, TestUtils } from './util';
 import { InputSelector } from '../../src/types';
 import { InputSelectionError, InputSelectionFailure } from '../../src/InputSelectionError';
-import { MockSelectionConstraints, toConstraints } from './constraints';
+import { SelectionConstraints } from '@cardano-sdk/util-dev';
 import { assertInputSelectionProperties } from './properties';
 
 export interface InputSelectionPropertiesTestParams {
   /**
    * Test subject (Input Selection algorithm under test)
    */
-  getAlgorithm: (SerializationLib: CardanoSerializationLib) => InputSelector;
+  getAlgorithm: (csl: CardanoSerializationLib) => InputSelector;
   /**
    * Available UTxO
    */
-  createUtxo: (utils: TestUtils) => CSL.TransactionUnspentOutput[];
+  createUtxo: (csl: CardanoSerializationLib) => CSL.TransactionUnspentOutput[];
   /**
    * Transaction outputs
    */
-  createOutputs: (utils: TestUtils) => CSL.TransactionOutput[];
+  createOutputs: (csl: CardanoSerializationLib) => CSL.TransactionOutput[];
   /**
    * Input selection constraints passed to the algorithm.
    */
-  mockConstraints: MockSelectionConstraints;
+  mockConstraints: SelectionConstraints.MockSelectionConstraints;
 }
 
 export interface InputSelectionFailureModeTestParams extends InputSelectionPropertiesTestParams {
@@ -41,14 +40,13 @@ export const testInputSelectionFailureMode = async ({
   expectedError,
   mockConstraints
 }: InputSelectionFailureModeTestParams) => {
-  const SerializationLib = await loadCardanoSerializationLib();
-  const utils = createCslTestUtils(SerializationLib);
-  const utxo = new Set(createUtxo(utils));
-  const outputs = new Set(createOutputs(utils));
-  const algorithm = getAlgorithm(SerializationLib);
-  await expect(algorithm.select({ utxo, outputs, constraints: toConstraints(mockConstraints) })).rejects.toThrowError(
-    new InputSelectionError(expectedError)
-  );
+  const csl = await loadCardanoSerializationLib();
+  const utxo = new Set(createUtxo(csl));
+  const outputs = new Set(createOutputs(csl));
+  const algorithm = getAlgorithm(csl);
+  await expect(
+    algorithm.select({ utxo, outputs, constraints: SelectionConstraints.mockConstraintsToConstraints(mockConstraints) })
+  ).rejects.toThrowError(new InputSelectionError(expectedError));
 };
 
 /**
@@ -60,15 +58,14 @@ export const testInputSelectionProperties = async ({
   createOutputs,
   mockConstraints
 }: InputSelectionPropertiesTestParams) => {
-  const SerializationLib = await loadCardanoSerializationLib();
-  const utils = createCslTestUtils(SerializationLib);
-  const utxo = new Set(createUtxo(utils));
-  const outputs = new Set(createOutputs(utils));
-  const algorithm = getAlgorithm(SerializationLib);
+  const csl = await loadCardanoSerializationLib();
+  const utxo = new Set(createUtxo(csl));
+  const outputs = new Set(createOutputs(csl));
+  const algorithm = getAlgorithm(csl);
   const results = await algorithm.select({
     utxo,
     outputs,
-    constraints: toConstraints(mockConstraints)
+    constraints: SelectionConstraints.mockConstraintsToConstraints(mockConstraints)
   });
-  assertInputSelectionProperties({ utils, results, outputs, constraints: mockConstraints, utxo });
+  assertInputSelectionProperties({ results, outputs, constraints: mockConstraints, utxo });
 };

@@ -18,6 +18,7 @@
     "coverage": "shx echo No coverage report for this package"
   },
   "devDependencies": {
+    "@cardano-sdk/util-dev": "0.1.2",
     "shx": "^0.3.3"
   },
   "browser": {

@@ -1,11 +1,14 @@
-import { AllAssets, TestUtils } from './util';
+import { AssetId, SelectionConstraints } from '@cardano-sdk/util-dev';
 import { SelectionResult } from '../../src/types';
 import { CSL, cslUtil, Ogmios } from '@cardano-sdk/core';
 import { InputSelectionError, InputSelectionFailure } from '../../src/InputSelectionError';
 import fc, { Arbitrary } from 'fast-check';
-import { MockSelectionConstraints } from './constraints';
+import { coalesceValueQuantities } from '@cardano-sdk/core/src/Ogmios/util';
 
-const assertExtraChangeProperties = ({ minimumCoinQuantity }: MockSelectionConstraints, results: SelectionResult) => {
+const assertExtraChangeProperties = (
+  { minimumCoinQuantity }: SelectionConstraints.MockSelectionConstraints,
+  results: SelectionResult
+) => {
   for (const value of results.selection.change) {
     const { coins, assets } = Ogmios.cslToOgmios.value(value);
     // Min UTxO coin requirement for change
@@ -22,32 +25,36 @@ const assertExtraChangeProperties = ({ minimumCoinQuantity }: MockSelectionConst
 };
 
 export const assertInputSelectionProperties = ({
-  utils,
   results,
   outputs,
   utxo,
   constraints
 }: {
-  utils: TestUtils;
   results: SelectionResult;
   outputs: Set<CSL.TransactionOutput>;
   utxo: Set<CSL.TransactionUnspentOutput>;
-  constraints: MockSelectionConstraints;
+  constraints: SelectionConstraints.MockSelectionConstraints;
 }) => {
-  const vSelected = utils.getTotalInputAmounts(results);
-  const vRequested = utils.getTotalOutputAmounts([...outputs]);
+  const vSelected = coalesceValueQuantities(
+    ...[...results.selection.inputs].map((selectedUtxo) => Ogmios.cslToOgmios.value(selectedUtxo.output().amount()))
+  );
+  const vRequested = coalesceValueQuantities(
+    ...[...outputs].map((output) => Ogmios.cslToOgmios.value(output.amount()))
+  );
 
   // Coverage of Payments
   expect(vSelected.coins).toBeGreaterThanOrEqual(vRequested.coins);
-  for (const assetName of AllAssets) {
+  for (const assetName of AssetId.All) {
     expect(vSelected.assets?.[assetName] || 0n).toBeGreaterThanOrEqual(vRequested.assets?.[assetName] || 0n);
   }
 
   // Correctness of Change
-  const vChange = utils.getTotalChangeAmounts(results);
+  const vChange = Ogmios.util.coalesceValueQuantities(
+    ...[...results.selection.change].map((value) => Ogmios.cslToOgmios.value(value))
+  );
   const vFee = BigInt(results.selection.fee.to_str());
   expect(vSelected.coins).toEqual(vRequested.coins + vChange.coins + vFee);
-  for (const assetName of AllAssets) {
+  for (const assetName of AssetId.All) {
     expect(vSelected.assets?.[assetName] || 0n).toEqual(
       (vRequested.assets?.[assetName] || 0n) + (vChange.assets?.[assetName] || 0n)
     );
@@ -78,7 +85,7 @@ export const assertFailureProperties = ({
   error: InputSelectionError;
   utxoAmounts: Ogmios.util.OgmiosValue[];
   outputsAmounts: Ogmios.util.OgmiosValue[];
-  constraints: MockSelectionConstraints;
+  constraints: SelectionConstraints.MockSelectionConstraints;
 }) => {
   const utxoTotals = Ogmios.util.coalesceValueQuantities(...utxoAmounts);
   const outputsTotals = Ogmios.util.coalesceValueQuantities(...outputsAmounts);
@@ -125,7 +132,7 @@ export const generateSelectionParams = (() => {
           coins: fc.bigUint(cslUtil.MAX_U64),
           assets: fc.oneof(
             fc
-              .set(fc.oneof(...AllAssets.map((asset) => fc.constant(asset))))
+              .set(fc.oneof(...AssetId.All.map((asset) => fc.constant(asset))))
               .chain((assets) =>
                 fc.tuple(...assets.map((asset) => fc.bigUint(cslUtil.MAX_U64).map((amount) => ({ asset, amount }))))
               )
@@ -152,13 +159,13 @@ export const generateSelectionParams = (() => {
   return (): Arbitrary<{
     utxoAmounts: Ogmios.util.OgmiosValue[];
     outputsAmounts: Ogmios.util.OgmiosValue[];
-    constraints: MockSelectionConstraints;
+    constraints: SelectionConstraints.MockSelectionConstraints;
   }> =>
     fc.record({
       utxoAmounts: arrayOfCoinAndAssets(),
       outputsAmounts: arrayOfCoinAndAssets(),
-      constraints: fc.record<MockSelectionConstraints>({
-        maxTokenBundleSize: fc.nat(AllAssets.length),
+      constraints: fc.record<SelectionConstraints.MockSelectionConstraints>({
+        maxTokenBundleSize: fc.nat(AssetId.All.length),
         minimumCoinQuantity: fc.oneof(...[0n, 1n, 34_482n * 29n, 9_999_991n].map((n) => fc.constant(n))),
         minimumCost: fc.oneof(...[0n, 1n, 200_000n, 2_000_003n].map((n) => fc.constant(n))),
         selectionLimit: fc.oneof(...[0, 1, 2, 7, 30, Number.MAX_SAFE_INTEGER].map((n) => fc.constant(n)))

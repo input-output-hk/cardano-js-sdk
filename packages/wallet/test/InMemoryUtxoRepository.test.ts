@@ -1,8 +1,8 @@
 import { roundRobinRandomImprove, InputSelector } from '@cardano-sdk/cip2';
 import { loadCardanoSerializationLib, CardanoSerializationLib, CSL, CardanoProvider, Ogmios } from '@cardano-sdk/core';
+import { SelectionConstraints } from '@cardano-sdk/util-dev';
 import { providerStub, delegate, rewards } from './ProviderStub';
 import { InMemoryUtxoRepository, KeyManagement, UtxoRepository } from '../src';
-import { NO_CONSTRAINTS } from './util';
 
 const addresses = [
   'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g'
@@ -53,7 +53,7 @@ describe('InMemoryUtxoRepository', () => {
 
   describe('selectInputs', () => {
     it('can be called without explicitly syncing', async () => {
-      const result = await utxoRepository.selectInputs(outputs, NO_CONSTRAINTS);
+      const result = await utxoRepository.selectInputs(outputs, SelectionConstraints.NO_CONSTRAINTS);
       await expect(utxoRepository.allUtxos.length).toBe(3);
       await expect(utxoRepository.rewards).toBe(rewards);
       await expect(utxoRepository.delegation).toBe(delegate);
