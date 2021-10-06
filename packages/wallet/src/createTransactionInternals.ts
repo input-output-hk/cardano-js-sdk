@@ -1,5 +1,6 @@
 import { SelectionResult } from '@cardano-sdk/cip2';
 import { Transaction, CardanoSerializationLib, CSL } from '@cardano-sdk/core';
+import { Withdrawal } from './Delegation';
 
 export type TxInternals = {
   hash: CSL.TransactionHash;
@@ -10,6 +11,8 @@ export type CreateTxInternalsProps = {
   changeAddress: string;
   inputSelection: SelectionResult['selection'];
   validityInterval: Transaction.ValidityInterval;
+  certificates?: CSL.Certificate[];
+  withdrawals?: Withdrawal[];
 };
 
 export const createTransactionInternals = async (
@@ -36,6 +39,22 @@ export const createTransactionInternals = async (
   if (props.validityInterval.invalidBefore !== undefined) {
     body.set_validity_start_interval(props.validityInterval.invalidBefore);
   }
+  if (props.certificates?.length) {
+    const certs = csl.Certificates.new();
+    for (const cert of props.certificates) {
+      certs.add(cert);
+    }
+    body.set_certs(certs);
+  }
+  if (props.withdrawals?.length) {
+    const withdrawals = csl.Withdrawals.new();
+    for (const { address, quantity } of props.withdrawals) {
+      withdrawals.insert(address, quantity);
+    }
+    body.set_withdrawals(withdrawals);
+  }
+  // csl.get_deposit()        // for deposit
+  // csl.get_implicit_input() // for withdrawals
   return {
     body,
     hash: csl.hash_transaction(body)

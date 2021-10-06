@@ -6,6 +6,8 @@ import { defaultSelectionConstraints } from '@cardano-sdk/cip2';
 
 export type InitializeTxProps = {
   outputs: Set<Schema.TxOut>;
+  certificates?: CSL.Certificate[];
+  withdrawals?: Schema.Withdrawals;
   options?: {
     validityInterval?: Transaction.ValidityInterval;
   };
@@ -44,6 +46,10 @@ export const createSingleAddressWallet = async (
 ): Promise<SingleAddressWallet> => {
   const address = keyManager.deriveAddress(0, 0);
   const protocolParameters = await provider.currentWalletProtocolParameters();
+  const signTx = async (body: CSL.TransactionBody, hash: CSL.TransactionHash) => {
+    const witnessSet = await keyManager.signTransaction(hash);
+    return csl.Transaction.new(body, witnessSet);
+  };
   return {
     address,
     initializeTx: async (props) => {
@@ -55,13 +61,12 @@ export const createSingleAddressWallet = async (
         protocolParameters,
         buildTx: async (inputSelection) => {
           logger.debug('Building TX for selection constraints', inputSelection);
-          const transactionInternals = await createTransactionInternals(csl, {
+          const { body, hash } = await createTransactionInternals(csl, {
             changeAddress: address,
             inputSelection,
             validityInterval
           });
-          const witnessSet = await keyManager.signTransaction(transactionInternals.hash);
-          return csl.Transaction.new(transactionInternals.body, witnessSet);
+          return signTx(body, hash);
         }
       });
       const inputSelectionResult = await utxoRepository.selectInputs(txOutputs, constraints);
@@ -72,10 +77,7 @@ export const createSingleAddressWallet = async (
       });
     },
     name,
-    signTx: async (body, hash) => {
-      const witnessSet = await keyManager.signTransaction(hash);
-      return csl.Transaction.new(body, witnessSet);
-    },
+    signTx,
     submitTx: async (tx) => provider.submitTx(tx)
   };
 };
