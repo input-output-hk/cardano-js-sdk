@@ -1,4 +1,4 @@
-import { ProtocolParametersAlonzo } from '@cardano-ogmios/schema';
+import { Lovelace, ProtocolParametersAlonzo } from '@cardano-ogmios/schema';
 import { CSL } from '@cardano-sdk/core';
 
 export interface SelectionSkeleton {
@@ -67,6 +67,20 @@ export interface SelectionConstraints {
   computeSelectionLimit: ComputeSelectionLimit;
 }
 
+/**
+ * Implicit coin quantities used in the transaction
+ */
+export interface ImplicitCoin {
+  /**
+   * Delegation withdrawals + refunds
+   */
+  input?: Lovelace;
+  /**
+   * Delegation registration deposit
+   */
+  deposit?: Lovelace;
+}
+
 export interface InputSelectionParameters {
   /**
    * The set of inputs available for selection.
@@ -80,6 +94,10 @@ export interface InputSelectionParameters {
    * Input selection constraints
    */
   constraints: SelectionConstraints;
+  /**
+   * Implicit coin quantities used in the transaction
+   */
+  implicitCoin?: ImplicitCoin;
 }
 
 export interface InputSelector {
