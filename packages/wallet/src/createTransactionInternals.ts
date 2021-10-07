@@ -53,8 +53,6 @@ export const createTransactionInternals = async (
     }
     body.set_withdrawals(withdrawals);
   }
-  // csl.get_deposit()        // for deposit
-  // csl.get_implicit_input() // for withdrawals
   return {
     body,
     hash: csl.hash_transaction(body)

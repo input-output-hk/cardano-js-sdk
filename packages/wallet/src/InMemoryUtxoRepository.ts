@@ -3,7 +3,7 @@ import { Buffer } from 'buffer';
 import { UtxoRepository } from './types';
 import { CardanoProvider, Ogmios, CardanoSerializationLib, CSL } from '@cardano-sdk/core';
 import { dummyLogger, Logger } from 'ts-log';
-import { InputSelector, SelectionConstraints, SelectionResult } from '@cardano-sdk/cip2';
+import { ImplicitCoin, InputSelector, SelectionConstraints, SelectionResult } from '@cardano-sdk/cip2';
 import { KeyManager } from './KeyManagement';
 
 export class InMemoryUtxoRepository implements UtxoRepository {
@@ -56,7 +56,8 @@ export class InMemoryUtxoRepository implements UtxoRepository {
 
   public async selectInputs(
     outputs: Set<CSL.TransactionOutput>,
-    constraints: SelectionConstraints
+    constraints: SelectionConstraints,
+    implicitCoin?: ImplicitCoin
   ): Promise<SelectionResult> {
     if (this.#utxoSet.size === 0) {
       this.#logger.debug('Local UTxO set is empty. Syncing...');
@@ -65,7 +66,8 @@ export class InMemoryUtxoRepository implements UtxoRepository {
     return this.#inputSelector.select({
       utxo: new Set(Ogmios.ogmiosToCsl(this.#csl).utxo(this.allUtxos)),
       outputs,
-      constraints
+      constraints,
+      implicitCoin
     });
   }
 

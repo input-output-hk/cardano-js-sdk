@@ -1,17 +1,10 @@
 import Schema from '@cardano-ogmios/schema';
 import { CardanoProvider, Ogmios, Transaction, CardanoSerializationLib, CSL } from '@cardano-sdk/core';
-import { createTransactionInternals, KeyManagement, TxInternals, UtxoRepository } from './';
+import { InitializeTxProps, UtxoRepository } from './types';
 import { dummyLogger, Logger } from 'ts-log';
 import { defaultSelectionConstraints } from '@cardano-sdk/cip2';
-
-export type InitializeTxProps = {
-  outputs: Set<Schema.TxOut>;
-  certificates?: CSL.Certificate[];
-  withdrawals?: Schema.Withdrawals;
-  options?: {
-    validityInterval?: Transaction.ValidityInterval;
-  };
-};
+import { createTransactionInternals, KeyManagement, TxInternals } from '.';
+import { computeImplicitCoin } from './Delegation';
 
 export interface SingleAddressWallet {
   address: Schema.Address;
@@ -69,7 +62,8 @@ export const createSingleAddressWallet = async (
           return signTx(body, hash);
         }
       });
-      const inputSelectionResult = await utxoRepository.selectInputs(txOutputs, constraints);
+      const implicitCoin = computeImplicitCoin(protocolParameters, props);
+      const inputSelectionResult = await utxoRepository.selectInputs(txOutputs, constraints, implicitCoin);
       return createTransactionInternals(csl, {
         changeAddress: address,
         inputSelection: inputSelectionResult.selection,
