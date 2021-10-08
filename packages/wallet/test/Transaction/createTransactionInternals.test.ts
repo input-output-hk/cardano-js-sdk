@@ -1,22 +1,22 @@
 import { InputSelector, roundRobinRandomImprove } from '@cardano-sdk/cip2';
 import { loadCardanoSerializationLib, CardanoSerializationLib, CSL, CardanoProvider, Ogmios } from '@cardano-sdk/core';
 import { SelectionConstraints } from '@cardano-sdk/util-dev';
-import { providerStub } from './ProviderStub';
+import { providerStub } from '../ProviderStub';
 import {
+  CertificateFactory,
   createTransactionInternals,
   CreateTxInternalsProps,
-  Delegation,
-  InMemoryUtxoRepository,
-  UtxoRepository
-} from '../src';
-import { KeyManager } from '../src/KeyManagement';
-import { Withdrawal } from '../src/Delegation';
-import { testKeyManager } from './testKeyManager';
+  Withdrawal
+} from '../../src/Transaction';
+import { KeyManager } from '../../src/KeyManagement';
+import { testKeyManager } from '../testKeyManager';
+import { UtxoRepository } from '../../src/types';
+import { InMemoryUtxoRepository } from '../../src/InMemoryUtxoRepository';
 
 const address =
   'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g';
 
-describe('createTransactionInternals', () => {
+describe('Transaction.createTransactionInternals', () => {
   let csl: CardanoSerializationLib;
   let provider: CardanoProvider;
   let inputSelector: InputSelector;
@@ -79,7 +79,7 @@ describe('createTransactionInternals', () => {
 
   test('transaction with certificates', async () => {
     const delegatee = 'pool1qqvukkkfr3ux4qylfkrky23f6trl2l6xjluv36z90ax7gfa8yxt';
-    const certFactory = new Delegation.CertificateFactory(csl, keyManager);
+    const certFactory = new CertificateFactory(csl, keyManager);
     const certificates = [certFactory.stakeKeyRegistration(), certFactory.stakeDelegation(delegatee)];
     const { body } = await createSimpleTransactionInternals({ certificates });
     expect(body.certs()!.len()).toBe(certificates.length);

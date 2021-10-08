@@ -1,9 +1,9 @@
 import { CardanoSerializationLib, loadCardanoSerializationLib } from '@cardano-sdk/core';
 import { testKeyManager } from '../testKeyManager';
-import { CertificateFactory } from '../../src/Delegation';
+import { CertificateFactory } from '../../src/Transaction';
 import { KeyManager } from '../../src/KeyManagement';
 
-describe('Delegation.CertificateFactory', () => {
+describe('Transaction.CertificateFactory', () => {
   let csl: CardanoSerializationLib;
   let stakeKey: string;
   let keyManager: KeyManager;

@@ -1,10 +1,10 @@
 import Schema from '@cardano-ogmios/schema';
 import { CardanoProvider, Ogmios, Transaction, CardanoSerializationLib, CSL } from '@cardano-sdk/core';
-import { InitializeTxProps, UtxoRepository } from './types';
+import { UtxoRepository } from './types';
 import { dummyLogger, Logger } from 'ts-log';
 import { defaultSelectionConstraints } from '@cardano-sdk/cip2';
-import { createTransactionInternals, KeyManagement, TxInternals } from '.';
-import { computeImplicitCoin } from './Delegation';
+import { computeImplicitCoin, createTransactionInternals, InitializeTxProps, TxInternals } from './Transaction';
+import { KeyManagement } from '.';
 
 export interface SingleAddressWallet {
   address: Schema.Address;

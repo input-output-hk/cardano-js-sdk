@@ -1,6 +1,6 @@
 import { SelectionResult } from '@cardano-sdk/cip2';
 import { Transaction, CardanoSerializationLib, CSL } from '@cardano-sdk/core';
-import { Withdrawal } from './Delegation';
+import { Withdrawal } from './withdrawal';
 
 export type TxInternals = {
   hash: CSL.TransactionHash;

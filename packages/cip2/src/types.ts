@@ -72,7 +72,7 @@ export interface SelectionConstraints {
  */
 export interface ImplicitCoin {
   /**
-   * Delegation withdrawals + refunds
+   * Delegation withdrawals + reclaims
    */
   input?: Lovelace;
   /**

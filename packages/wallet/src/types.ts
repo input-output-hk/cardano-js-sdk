@@ -1,7 +1,6 @@
 import Schema from '@cardano-ogmios/schema';
 import { ImplicitCoin, SelectionConstraints, SelectionResult } from '@cardano-sdk/cip2';
-import { CSL, Transaction } from '@cardano-sdk/core';
-import { Withdrawal } from './Delegation';
+import { CSL } from '@cardano-sdk/core';
 
 export interface UtxoRepository {
   allUtxos: Schema.Utxo;
@@ -14,12 +13,3 @@ export interface UtxoRepository {
     implicitCoin?: ImplicitCoin
   ) => Promise<SelectionResult>;
 }
-
-export type InitializeTxProps = {
-  outputs: Set<Schema.TxOut>;
-  certificates?: CSL.Certificate[];
-  withdrawals?: Withdrawal[];
-  options?: {
-    validityInterval?: Transaction.ValidityInterval;
-  };
-};
