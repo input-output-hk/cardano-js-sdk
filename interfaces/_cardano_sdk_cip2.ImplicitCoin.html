@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>ExUnits | cardano-sdk</title>
+	<title>ImplicitCoin | cardano-sdk</title>
 	<meta name="description" content="Documentation for cardano-sdk">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -55,24 +55,31 @@
 					<a href="../index.html">cardano-sdk</a>
 				</li>
 				<li>
-					<a href="../modules/_cardano_sdk_core.html">@cardano-sdk/core</a>
+					<a href="../modules/_cardano_sdk_cip2.html">@cardano-sdk/cip2</a>
 				</li>
 				<li>
-					<a href="_cardano_sdk_core.ExUnits.html">ExUnits</a>
+					<a href="_cardano_sdk_cip2.ImplicitCoin.html">ImplicitCoin</a>
 				</li>
 			</ul>
-			<h1>Interface ExUnits</h1>
+			<h1>Interface ImplicitCoin</h1>
 		</div>
 	</div>
 </header>
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>Implicit coin quantities used in the transaction</p>
+					</div>
+				</div>
+			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">ExUnits</span>
+						<span class="target">ImplicitCoin</span>
 					</li>
 				</ul>
 			</section>
@@ -83,8 +90,8 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.ExUnits.html#exUnitsMem" class="tsd-kind-icon">ex<wbr>Units<wbr>Mem</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.ExUnits.html#exUnitsSteps" class="tsd-kind-icon">ex<wbr>Units<wbr>Steps</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_cip2.ImplicitCoin.html#deposit" class="tsd-kind-icon">deposit</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_cip2.ImplicitCoin.html#input" class="tsd-kind-icon">input</a></li>
 							</ul>
 						</section>
 					</div>
@@ -93,24 +100,34 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="exUnitsMem" class="tsd-anchor"></a>
-					<h3>ex<wbr>Units<wbr>Mem</h3>
-					<div class="tsd-signature tsd-kind-icon">ex<wbr>Units<wbr>Mem<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<a name="deposit" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> deposit</h3>
+					<div class="tsd-signature tsd-kind-icon">deposit<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d7909a3/packages/core/src/Genesis/types/AlonzoGenesis.ts#L2">packages/core/src/Genesis/types/AlonzoGenesis.ts:2</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d7909a3/packages/cip2/src/types.ts#L81">packages/cip2/src/types.ts:81</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Delegation registration deposit</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="exUnitsSteps" class="tsd-anchor"></a>
-					<h3>ex<wbr>Units<wbr>Steps</h3>
-					<div class="tsd-signature tsd-kind-icon">ex<wbr>Units<wbr>Steps<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<a name="input" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> input</h3>
+					<div class="tsd-signature tsd-kind-icon">input<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d7909a3/packages/core/src/Genesis/types/AlonzoGenesis.ts#L3">packages/core/src/Genesis/types/AlonzoGenesis.ts:3</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d7909a3/packages/cip2/src/types.ts#L77">packages/cip2/src/types.ts:77</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Delegation withdrawals + reclaims</p>
+						</div>
+					</div>
 				</section>
 			</section>
 		</div>
@@ -126,13 +143,13 @@
 					<li class=" tsd-kind-module">
 						<a href="../modules/_cardano_sdk_cardano_graphql_db_sync.html">@cardano-<wbr>sdk/cardano-<wbr>graphql-<wbr>db-<wbr>sync</a>
 					</li>
-					<li class=" tsd-kind-module">
+					<li class="current tsd-kind-module">
 						<a href="../modules/_cardano_sdk_cip2.html">@cardano-<wbr>sdk/cip2</a>
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="../modules/_cardano_sdk_cip30.html">@cardano-<wbr>sdk/cip30</a>
 					</li>
-					<li class="current tsd-kind-module">
+					<li class=" tsd-kind-module">
 						<a href="../modules/_cardano_sdk_core.html">@cardano-<wbr>sdk/core</a>
 					</li>
 					<li class=" tsd-kind-module">
@@ -145,65 +162,80 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
-					<li class=" tsd-kind-class tsd-parent-kind-module">
-						<a href="../classes/_cardano_sdk_core.InvalidProtocolParametersError.html" class="tsd-kind-icon">Invalid<wbr>Protocol<wbr>Parameters<wbr>Error</a>
-					</li>
-					<li class=" tsd-kind-class tsd-parent-kind-module">
-						<a href="../classes/_cardano_sdk_core.NotImplementedError.html" class="tsd-kind-icon">Not<wbr>Implemented<wbr>Error</a>
-					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="_cardano_sdk_core.AlonzoGenesis.html" class="tsd-kind-icon">Alonzo<wbr>Genesis</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="_cardano_sdk_core.ByronGenesis.html" class="tsd-kind-icon">Byron<wbr>Genesis</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="_cardano_sdk_core.CardanoProvider.html" class="tsd-kind-icon">Cardano<wbr>Provider</a>
+						<a href="_cardano_sdk_cip2.DefaultSelectionConstraintsProps.html" class="tsd-kind-icon">Default<wbr>Selection<wbr>Constraints<wbr>Props</a>
 					</li>
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface tsd-parent-kind-module">
-						<a href="_cardano_sdk_core.ExUnits.html" class="tsd-kind-icon">Ex<wbr>Units</a>
+						<a href="_cardano_sdk_cip2.ImplicitCoin.html" class="tsd-kind-icon">Implicit<wbr>Coin</a>
 						<ul>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_cardano_sdk_core.ExUnits.html#exUnitsMem" class="tsd-kind-icon">ex<wbr>Units<wbr>Mem</a>
+								<a href="_cardano_sdk_cip2.ImplicitCoin.html#deposit" class="tsd-kind-icon">deposit</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_cardano_sdk_core.ExUnits.html#exUnitsSteps" class="tsd-kind-icon">ex<wbr>Units<wbr>Steps</a>
+								<a href="_cardano_sdk_cip2.ImplicitCoin.html#input" class="tsd-kind-icon">input</a>
 							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="_cardano_sdk_core.ShelleyGenesis.html" class="tsd-kind-icon">Shelley<wbr>Genesis</a>
+						<a href="_cardano_sdk_cip2.InputSelectionParameters.html" class="tsd-kind-icon">Input<wbr>Selection<wbr>Parameters</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="_cardano_sdk_cip2.InputSelector.html" class="tsd-kind-icon">Input<wbr>Selector</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="_cardano_sdk_cip2.SelectionConstraints.html" class="tsd-kind-icon">Selection<wbr>Constraints</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="_cardano_sdk_cip2.SelectionResult.html" class="tsd-kind-icon">Selection<wbr>Result</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="_cardano_sdk_cip2.SelectionSkeleton.html" class="tsd-kind-icon">Selection<wbr>Skeleton</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
-						<a href="../modules/_cardano_sdk_core.html#AssetSupply" class="tsd-kind-icon">Asset<wbr>Supply</a>
+						<a href="../modules/_cardano_sdk_cip2.html#BuildTx" class="tsd-kind-icon">Build<wbr>Tx</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
-						<a href="../modules/_cardano_sdk_core.html#CardanoSerializationLib" class="tsd-kind-icon">Cardano<wbr>Serialization<wbr>Lib</a>
+						<a href="../modules/_cardano_sdk_cip2.html#ComputeMinimumCoinQuantity" class="tsd-kind-icon">Compute<wbr>Minimum<wbr>Coin<wbr>Quantity</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
-						<a href="../modules/_cardano_sdk_core.html#NetworkInfo" class="tsd-kind-icon">Network<wbr>Info</a>
+						<a href="../modules/_cardano_sdk_cip2.html#ComputeSelectionLimit" class="tsd-kind-icon">Compute<wbr>Selection<wbr>Limit</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
-						<a href="../modules/_cardano_sdk_core.html#ProtocolParametersRequiredByWallet" class="tsd-kind-icon">Protocol<wbr>Parameters<wbr>Required<wbr>ByWallet</a>
+						<a href="../modules/_cardano_sdk_cip2.html#EstimateTxFee" class="tsd-kind-icon">Estimate<wbr>TxFee</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
-						<a href="../modules/_cardano_sdk_core.html#StakePoolStats" class="tsd-kind-icon">Stake<wbr>Pool<wbr>Stats</a>
+						<a href="../modules/_cardano_sdk_cip2.html#ProtocolParametersForInputSelection" class="tsd-kind-icon">Protocol<wbr>Parameters<wbr>For<wbr>Input<wbr>Selection</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
-						<a href="../modules/_cardano_sdk_core.html#StakeSummary" class="tsd-kind-icon">Stake<wbr>Summary</a>
+						<a href="../modules/_cardano_sdk_cip2.html#ProtocolParametersRequiredByInputSelection" class="tsd-kind-icon">Protocol<wbr>Parameters<wbr>Required<wbr>ByInput<wbr>Selection</a>
 					</li>
-					<li class=" tsd-kind-variable tsd-parent-kind-module">
-						<a href="../modules/_cardano_sdk_core.html#BigIntMath" class="tsd-kind-icon">Big<wbr>Int<wbr>Math</a>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+						<a href="../modules/_cardano_sdk_cip2.html#Selection" class="tsd-kind-icon">Selection</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+						<a href="../modules/_cardano_sdk_cip2.html#TokenBundleSizeExceedsLimit" class="tsd-kind-icon">Token<wbr>Bundle<wbr>Size<wbr>Exceeds<wbr>Limit</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module">
-						<a href="../modules/_cardano_sdk_core.html#isNodeJs" class="tsd-kind-icon">is<wbr>Node<wbr>Js</a>
+						<a href="../modules/_cardano_sdk_cip2.html#computeMinimumCoinQuantity" class="tsd-kind-icon">compute<wbr>Minimum<wbr>Coin<wbr>Quantity</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module">
-						<a href="../modules/_cardano_sdk_core.html#loadCardanoSerializationLib" class="tsd-kind-icon">load<wbr>Cardano<wbr>Serialization<wbr>Lib</a>
+						<a href="../modules/_cardano_sdk_cip2.html#computeMinimumCost" class="tsd-kind-icon">compute<wbr>Minimum<wbr>Cost</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="../modules/_cardano_sdk_cip2.html#computeSelectionLimit" class="tsd-kind-icon">compute<wbr>Selection<wbr>Limit</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="../modules/_cardano_sdk_cip2.html#defaultSelectionConstraints" class="tsd-kind-icon">default<wbr>Selection<wbr>Constraints</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="../modules/_cardano_sdk_cip2.html#roundRobinRandomImprove" class="tsd-kind-icon">round<wbr>Robin<wbr>Random<wbr>Improve</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="../modules/_cardano_sdk_cip2.html#tokenBundleSizeExceedsLimit" class="tsd-kind-icon">token<wbr>Bundle<wbr>Size<wbr>Exceeds<wbr>Limit</a>
 					</li>
 				</ul>
 			</nav>
