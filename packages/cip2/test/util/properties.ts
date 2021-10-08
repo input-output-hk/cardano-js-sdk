@@ -1,5 +1,5 @@
 import { AssetId, SelectionConstraints } from '@cardano-sdk/util-dev';
-import { SelectionResult } from '../../src/types';
+import { ImplicitCoin, SelectionResult } from '../../src/types';
 import { CSL, cslUtil, Ogmios } from '@cardano-sdk/core';
 import { InputSelectionError, InputSelectionFailure } from '../../src/InputSelectionError';
 import fc, { Arbitrary } from 'fast-check';
@@ -31,19 +31,46 @@ const totalUtxosValue = (results: SelectionResult) =>
     [...results.selection.inputs].map((selectedUtxo) => Ogmios.cslToOgmios.value(selectedUtxo.output().amount()))
   );
 
+const inputSelectionTotals = ({
+  results,
+  outputs,
+  implicitCoin
+}: {
+  results: SelectionResult;
+  outputs: Set<CSL.TransactionOutput>;
+  implicitCoin?: ImplicitCoin;
+}) => {
+  const vSelectedUtxo = totalUtxosValue(results);
+  const vSelected = {
+    ...vSelectedUtxo,
+    coins: vSelectedUtxo.coins + BigInt(implicitCoin?.input || 0)
+  };
+  const vRequestedOutputs = totalOutputsValue(outputs);
+  const vFee = BigInt(results.selection.fee.to_str());
+  const vRequested = {
+    ...vRequestedOutputs,
+    coins: vRequestedOutputs.coins + BigInt(implicitCoin?.deposit || 0) + vFee
+  };
+  const vChange = Ogmios.util.coalesceValueQuantities(
+    [...results.selection.change].map((value) => Ogmios.cslToOgmios.value(value))
+  );
+  return { vSelected, vRequested, vChange };
+};
+
 export const assertInputSelectionProperties = ({
   results,
   outputs,
   utxo,
-  constraints
+  constraints,
+  implicitCoin
 }: {
   results: SelectionResult;
   outputs: Set<CSL.TransactionOutput>;
   utxo: Set<CSL.TransactionUnspentOutput>;
   constraints: SelectionConstraints.MockSelectionConstraints;
+  implicitCoin?: ImplicitCoin;
 }) => {
-  const vSelected = totalUtxosValue(results);
-  const vRequested = totalOutputsValue(outputs);
+  const { vSelected, vRequested, vChange } = inputSelectionTotals({ results, outputs, implicitCoin });
 
   // Coverage of Payments
   expect(vSelected.coins).toBeGreaterThanOrEqual(vRequested.coins);
@@ -52,11 +79,7 @@ export const assertInputSelectionProperties = ({
   }
 
   // Correctness of Change
-  const vChange = Ogmios.util.coalesceValueQuantities(
-    [...results.selection.change].map((value) => Ogmios.cslToOgmios.value(value))
-  );
-  const vFee = BigInt(results.selection.fee.to_str());
-  expect(vSelected.coins).toEqual(vRequested.coins + vChange.coins + vFee);
+  expect(vSelected.coins).toEqual(vRequested.coins + vChange.coins);
   for (const assetName of AssetId.All) {
     expect(vSelected.assets?.[assetName] || 0n).toEqual(
       (vRequested.assets?.[assetName] || 0n) + (vChange.assets?.[assetName] || 0n)
@@ -83,31 +106,39 @@ export const assertFailureProperties = ({
   error,
   constraints,
   utxoAmounts,
-  outputsAmounts
+  outputsAmounts,
+  implicitCoin
 }: {
   error: InputSelectionError;
   utxoAmounts: Ogmios.util.OgmiosValue[];
   outputsAmounts: Ogmios.util.OgmiosValue[];
   constraints: SelectionConstraints.MockSelectionConstraints;
+  implicitCoin?: ImplicitCoin;
 }) => {
-  const utxoTotals = Ogmios.util.coalesceValueQuantities(utxoAmounts);
-  const outputsTotals = Ogmios.util.coalesceValueQuantities(outputsAmounts);
+  const availableQuantities = Ogmios.util.coalesceValueQuantities([
+    ...utxoAmounts,
+    { coins: BigInt(implicitCoin?.input || 0) }
+  ]);
+  const requestedQuantities = Ogmios.util.coalesceValueQuantities([
+    ...outputsAmounts,
+    { coins: BigInt(implicitCoin?.deposit || 0) + constraints.minimumCost }
+  ]);
   switch (error.failure) {
     case InputSelectionFailure.UtxoBalanceInsufficient: {
-      const insufficientCoin = utxoTotals.coins < outputsTotals.coins + constraints.minimumCost;
+      const insufficientCoin = availableQuantities.coins < requestedQuantities.coins;
       const insufficientAsset =
-        outputsTotals.assets &&
-        Object.keys(outputsTotals.assets).some(
-          (assetId) => (utxoTotals.assets?.[assetId] || 0n) < outputsTotals.assets![assetId]
+        requestedQuantities.assets &&
+        Object.keys(requestedQuantities.assets).some(
+          (assetId) => (availableQuantities.assets?.[assetId] || 0n) < requestedQuantities.assets![assetId]
         );
       expect(insufficientCoin || insufficientAsset).toBe(true);
       return;
     }
     case InputSelectionFailure.UtxoFullyDepleted: {
-      const numUtxoAssets = Object.keys(utxoTotals.assets || {}).length;
+      const numUtxoAssets = Object.keys(availableQuantities.assets || {}).length;
       const bundleSizePotentiallyTooLarge = numUtxoAssets > constraints.maxTokenBundleSize;
       const changeMinimumCoinQuantityNotMet =
-        utxoTotals.coins - outputsTotals.coins - constraints.minimumCost < constraints.minimumCoinQuantity;
+        availableQuantities.coins - requestedQuantities.coins < constraints.minimumCoinQuantity;
       expect(bundleSizePotentiallyTooLarge || changeMinimumCoinQuantityNotMet).toBe(true);
       return;
     }
@@ -128,11 +159,11 @@ export const generateSelectionParams = (() => {
   /**
    * Generate random amount of coin and assets.
    */
-  const arrayOfCoinAndAssets = () =>
+  const arrayOfCoinAndAssets = (implicitCoin = 0) =>
     fc
       .array(
         fc.record<Ogmios.util.OgmiosValue>({
-          coins: fc.bigUint(cslUtil.MAX_U64),
+          coins: fc.bigUint(cslUtil.MAX_U64 - BigInt(implicitCoin)),
           assets: fc.oneof(
             fc
               .set(fc.oneof(...AssetId.All.map((asset) => fc.constant(asset))))
@@ -159,19 +190,48 @@ export const generateSelectionParams = (() => {
         );
       });
 
+  const generateImplicitCoin: Arbitrary<ImplicitCoin | undefined> = fc.oneof(
+    fc.constant(void 0),
+    fc.record({
+      deposit: fc.oneof(
+        fc.constant(void 0),
+        fc
+          .tuple(fc.nat(2), fc.nat(2))
+          .map(([numKeyDeposits, numPoolDeposits]) => numKeyDeposits * 2_000_000 + numPoolDeposits * 500_000_000)
+      ),
+      input: fc.oneof(
+        fc.constant(void 0),
+        fc
+          .tuple(
+            fc.nat(2),
+            fc.nat(2),
+            fc.oneof(fc.constant(0), fc.constant(1), fc.constant(200_000), fc.constant(2_000_003))
+          )
+          .map(
+            ([numKeyDeposits, numPoolDeposits, withdrawals]) =>
+              numKeyDeposits * 2_000_000 + numPoolDeposits * 500_000_000 + withdrawals
+          )
+      )
+    })
+  );
+
   return (): Arbitrary<{
     utxoAmounts: Ogmios.util.OgmiosValue[];
     outputsAmounts: Ogmios.util.OgmiosValue[];
     constraints: SelectionConstraints.MockSelectionConstraints;
+    implicitCoin?: ImplicitCoin;
   }> =>
-    fc.record({
-      utxoAmounts: arrayOfCoinAndAssets(),
-      outputsAmounts: arrayOfCoinAndAssets(),
-      constraints: fc.record<SelectionConstraints.MockSelectionConstraints>({
-        maxTokenBundleSize: fc.nat(AssetId.All.length),
-        minimumCoinQuantity: fc.oneof(...[0n, 1n, 34_482n * 29n, 9_999_991n].map((n) => fc.constant(n))),
-        minimumCost: fc.oneof(...[0n, 1n, 200_000n, 2_000_003n].map((n) => fc.constant(n))),
-        selectionLimit: fc.oneof(...[0, 1, 2, 7, 30, Number.MAX_SAFE_INTEGER].map((n) => fc.constant(n)))
+    generateImplicitCoin.chain((implicitCoin) =>
+      fc.record({
+        utxoAmounts: arrayOfCoinAndAssets(implicitCoin?.input),
+        outputsAmounts: arrayOfCoinAndAssets(implicitCoin?.deposit),
+        constraints: fc.record<SelectionConstraints.MockSelectionConstraints>({
+          maxTokenBundleSize: fc.nat(AssetId.All.length),
+          minimumCoinQuantity: fc.oneof(...[0n, 1n, 34_482n * 29n, 9_999_991n].map((n) => fc.constant(n))),
+          minimumCost: fc.oneof(...[0n, 1n, 200_000n, 2_000_003n].map((n) => fc.constant(n))),
+          selectionLimit: fc.oneof(...[0, 1, 2, 7, 30, Number.MAX_SAFE_INTEGER].map((n) => fc.constant(n)))
+        }),
+        implicitCoin: fc.constant(implicitCoin)
       })
-    });
+    );
 })();

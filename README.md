@@ -39,12 +39,11 @@ const { IgnorePlugin, ProvidePlugin } = require('webpack');
     fallback: {
       // May want to install readable-stream as an explicit dependency
       stream: require.resolve('readable-stream'),
-      events: require.resolve("events/")
     }
   },
   plugins: [
     new HtmlWebpackHarddiskPlugin(),
-    // see https://www.npmjs.com/package/bip39
+    // see https://www.npmjs.com/package/isomorphic-bip39 README
     new IgnorePlugin(/^\.\/wordlists\/(?!english)/, /bip39\/src$/),
   ],
   experiments: {

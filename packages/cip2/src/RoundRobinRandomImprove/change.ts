@@ -7,6 +7,7 @@ import {
   assetWithValueQuantitySelector,
   getCoinQuantity,
   getWithValuesCoinQuantity,
+  ImplicitCoinBigint,
   UtxoSelection,
   UtxoWithValue
 } from './util';
@@ -18,6 +19,7 @@ interface ChangeComputationArgs {
   utxoSelection: UtxoSelection;
   outputValues: Ogmios.util.OgmiosValue[];
   uniqueOutputAssetIDs: string[];
+  implicitCoin: ImplicitCoinBigint;
   estimateTxFee: EstimateTxFeeWithOriginalOutputs;
   computeMinimumCoinQuantity: ComputeMinimumCoinQuantity;
   tokenBundleSizeExceedsLimit: TokenBundleSizeExceedsLimit;
@@ -124,6 +126,7 @@ const computeRequestedAssetChangeBundles = (
   utxoSelected: UtxoWithValue[],
   outputValues: Ogmios.util.OgmiosValue[],
   uniqueOutputAssetIDs: string[],
+  implicitCoin: ImplicitCoinBigint,
   fee: bigint
 ): Ogmios.util.OgmiosValue[] => {
   const assetTotals: Record<string, { selected: bigint; requested: bigint }> = {};
@@ -133,8 +136,8 @@ const computeRequestedAssetChangeBundles = (
       requested: assetQuantitySelector(assetId)(outputValues)
     };
   }
-  const coinTotalSelected = getWithValuesCoinQuantity(utxoSelected);
-  const coinTotalRequested = getCoinQuantity(outputValues) + fee;
+  const coinTotalSelected = getWithValuesCoinQuantity(utxoSelected) + implicitCoin.input;
+  const coinTotalRequested = getCoinQuantity(outputValues) + fee + implicitCoin.deposit;
   const coinChangeTotal = coinTotalSelected - coinTotalRequested;
 
   const { totalCoinBundled, bundles, totalAssetsBundled } = createBundlePerOutput(
@@ -214,6 +217,7 @@ const computeChangeBundles = ({
   utxoSelection,
   outputValues,
   uniqueOutputAssetIDs,
+  implicitCoin,
   computeMinimumCoinQuantity,
   fee = 0n
 }: {
@@ -221,6 +225,7 @@ const computeChangeBundles = ({
   utxoSelection: UtxoSelection;
   outputValues: Ogmios.util.OgmiosValue[];
   uniqueOutputAssetIDs: string[];
+  implicitCoin: ImplicitCoinBigint;
   computeMinimumCoinQuantity: ComputeMinimumCoinQuantity;
   fee?: bigint;
 }): UtxoSelection & { changeBundles: Ogmios.util.OgmiosValue[] } => {
@@ -228,6 +233,7 @@ const computeChangeBundles = ({
     utxoSelection.utxoSelected,
     outputValues,
     uniqueOutputAssetIDs,
+    implicitCoin,
     fee
   );
   const requestedAssetChangeBundlesWithLeftoverAssets = redistributeLeftoverAssets(
@@ -248,6 +254,7 @@ const computeChangeBundles = ({
         utxoSelection: pickExtraRandomUtxo(utxoSelection),
         outputValues,
         uniqueOutputAssetIDs,
+        implicitCoin,
         computeMinimumCoinQuantity,
         fee
       });
@@ -295,6 +302,7 @@ export const computeChangeAndAdjustForFee = async ({
   estimateTxFee,
   outputValues,
   uniqueOutputAssetIDs,
+  implicitCoin,
   utxoSelection
 }: ChangeComputationArgs): Promise<ChangeComputationResult> => {
   const changeInclFee = computeChangeBundles({
@@ -302,6 +310,7 @@ export const computeChangeAndAdjustForFee = async ({
     utxoSelection,
     outputValues,
     uniqueOutputAssetIDs,
+    implicitCoin,
     computeMinimumCoinQuantity
   });
 
@@ -314,8 +323,9 @@ export const computeChangeAndAdjustForFee = async ({
   );
 
   // Ensure fee quantity is covered by current selection
-  const outputValuesWithFee = [...outputValues, { coins: fee }];
-  if (getCoinQuantity(outputValuesWithFee) > getWithValuesCoinQuantity(changeInclFee.utxoSelected)) {
+  const totalOutputCoin = getCoinQuantity(outputValues) + fee + implicitCoin.deposit;
+  const totalInputCoin = getWithValuesCoinQuantity(changeInclFee.utxoSelected) + implicitCoin.input;
+  if (totalOutputCoin > totalInputCoin) {
     if (changeInclFee.utxoRemaining.length === 0) {
       throw new InputSelectionError(InputSelectionFailure.UtxoBalanceInsufficient);
     }
@@ -327,6 +337,7 @@ export const computeChangeAndAdjustForFee = async ({
       outputValues,
       uniqueOutputAssetIDs,
       estimateTxFee,
+      implicitCoin,
       utxoSelection: pickExtraRandomUtxo(changeInclFee)
     });
   }
@@ -336,6 +347,7 @@ export const computeChangeAndAdjustForFee = async ({
     utxoSelection: { utxoRemaining: changeInclFee.utxoRemaining, utxoSelected: changeInclFee.utxoSelected },
     outputValues,
     uniqueOutputAssetIDs,
+    implicitCoin,
     computeMinimumCoinQuantity,
     fee
   });

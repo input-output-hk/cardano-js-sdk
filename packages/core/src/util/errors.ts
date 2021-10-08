@@ -5,3 +5,9 @@ export class InvalidProtocolParametersError extends CustomError {
     super(reason);
   }
 }
+
+export class NotImplementedError extends CustomError {
+  public constructor(missingFeature: string) {
+    super(`Not implemented: ${missingFeature}`);
+  }
+}

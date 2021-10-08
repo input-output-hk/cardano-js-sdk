@@ -1,5 +1,6 @@
 import { BigIntMath, CSL, Ogmios } from '@cardano-sdk/core';
 import { uniq } from 'lodash-es';
+import { ImplicitCoin } from '../types';
 import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
 
 export interface WithValue {
@@ -14,10 +15,16 @@ export interface OutputWithValue extends WithValue {
   output: CSL.TransactionOutput;
 }
 
+export interface ImplicitCoinBigint {
+  input: bigint;
+  deposit: bigint;
+}
+
 export interface RoundRobinRandomImproveArgs {
   utxosWithValue: UtxoWithValue[];
   outputsWithValue: OutputWithValue[];
   uniqueOutputAssetIDs: string[];
+  implicitCoin: ImplicitCoinBigint;
 }
 
 export interface UtxoSelection {
@@ -25,9 +32,15 @@ export interface UtxoSelection {
   utxoRemaining: UtxoWithValue[];
 }
 
+const noImplicitCoin = {
+  deposit: 0,
+  input: 0
+};
+
 export const preprocessArgs = (
   availableUtxo: Set<CSL.TransactionUnspentOutput>,
-  outputs: Set<CSL.TransactionOutput>
+  outputs: Set<CSL.TransactionOutput>,
+  implicitCoinAsNumber: ImplicitCoin = noImplicitCoin
 ): RoundRobinRandomImproveArgs => {
   const utxosWithValue = [...availableUtxo].map((utxo) => ({
     utxo,
@@ -40,7 +53,11 @@ export const preprocessArgs = (
   const uniqueOutputAssetIDs = uniq(
     outputsWithValue.flatMap(({ value: { assets } }) => (assets && Object.keys(assets)) || [])
   );
-  return { uniqueOutputAssetIDs, utxosWithValue, outputsWithValue };
+  const implicitCoin: ImplicitCoinBigint = {
+    deposit: BigInt(implicitCoinAsNumber.deposit || 0),
+    input: BigInt(implicitCoinAsNumber.input || 0)
+  };
+  return { uniqueOutputAssetIDs, utxosWithValue, outputsWithValue, implicitCoin };
 };
 
 export const withValuesToValues = (totals: WithValue[]) => totals.map((t) => t.value);
@@ -58,11 +75,12 @@ export const getWithValuesCoinQuantity = (totals: WithValue[]): bigint => getCoi
 
 export const assertIsCoinBalanceSufficient = (
   utxoValues: Ogmios.util.OgmiosValue[],
-  outputValues: Ogmios.util.OgmiosValue[]
+  outputValues: Ogmios.util.OgmiosValue[],
+  implicitCoin: ImplicitCoinBigint
 ) => {
   const utxoCoinTotal = getCoinQuantity(utxoValues);
   const outputsCoinTotal = getCoinQuantity(outputValues);
-  if (outputsCoinTotal > utxoCoinTotal) {
+  if (outputsCoinTotal + implicitCoin.deposit > utxoCoinTotal + implicitCoin.input) {
     throw new InputSelectionError(InputSelectionFailure.UtxoBalanceInsufficient);
   }
 };
@@ -76,7 +94,8 @@ export const assertIsCoinBalanceSufficient = (
 export const assertIsBalanceSufficient = (
   uniqueOutputAssetIDs: string[],
   utxoValues: Ogmios.util.OgmiosValue[],
-  outputValues: Ogmios.util.OgmiosValue[]
+  outputValues: Ogmios.util.OgmiosValue[],
+  implicitCoin: ImplicitCoinBigint
 ): void => {
   for (const assetId of uniqueOutputAssetIDs) {
     const getAssetQuantity = assetQuantitySelector(assetId);
@@ -86,5 +105,5 @@ export const assertIsBalanceSufficient = (
       throw new InputSelectionError(InputSelectionFailure.UtxoBalanceInsufficient);
     }
   }
-  assertIsCoinBalanceSufficient(utxoValues, outputValues);
+  assertIsCoinBalanceSufficient(utxoValues, outputValues, implicitCoin);
 };

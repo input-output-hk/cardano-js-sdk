@@ -1,15 +1,10 @@
 import Schema from '@cardano-ogmios/schema';
 import { CardanoProvider, Ogmios, Transaction, CardanoSerializationLib, CSL } from '@cardano-sdk/core';
-import { createTransactionInternals, KeyManagement, TxInternals, UtxoRepository } from './';
+import { UtxoRepository } from './types';
 import { dummyLogger, Logger } from 'ts-log';
 import { defaultSelectionConstraints } from '@cardano-sdk/cip2';
-
-export type InitializeTxProps = {
-  outputs: Set<Schema.TxOut>;
-  options?: {
-    validityInterval?: Transaction.ValidityInterval;
-  };
-};
+import { computeImplicitCoin, createTransactionInternals, InitializeTxProps, TxInternals } from './Transaction';
+import { KeyManagement } from '.';
 
 export interface SingleAddressWallet {
   address: Schema.Address;
@@ -44,6 +39,10 @@ export const createSingleAddressWallet = async (
 ): Promise<SingleAddressWallet> => {
   const address = keyManager.deriveAddress(0, 0);
   const protocolParameters = await provider.currentWalletProtocolParameters();
+  const signTx = async (body: CSL.TransactionBody, hash: CSL.TransactionHash) => {
+    const witnessSet = await keyManager.signTransaction(hash);
+    return csl.Transaction.new(body, witnessSet);
+  };
   return {
     address,
     initializeTx: async (props) => {
@@ -55,16 +54,16 @@ export const createSingleAddressWallet = async (
         protocolParameters,
         buildTx: async (inputSelection) => {
           logger.debug('Building TX for selection constraints', inputSelection);
-          const transactionInternals = await createTransactionInternals(csl, {
+          const { body, hash } = await createTransactionInternals(csl, {
             changeAddress: address,
             inputSelection,
             validityInterval
           });
-          const witnessSet = await keyManager.signTransaction(transactionInternals.hash);
-          return csl.Transaction.new(transactionInternals.body, witnessSet);
+          return signTx(body, hash);
         }
       });
-      const inputSelectionResult = await utxoRepository.selectInputs(txOutputs, constraints);
+      const implicitCoin = computeImplicitCoin(protocolParameters, props);
+      const inputSelectionResult = await utxoRepository.selectInputs(txOutputs, constraints, implicitCoin);
       return createTransactionInternals(csl, {
         changeAddress: address,
         inputSelection: inputSelectionResult.selection,
@@ -72,10 +71,7 @@ export const createSingleAddressWallet = async (
       });
     },
     name,
-    signTx: async (body, hash) => {
-      const witnessSet = await keyManager.signTransaction(hash);
-      return csl.Transaction.new(body, witnessSet);
-    },
+    signTx,
     submitTx: async (tx) => provider.submitTx(tx)
   };
 };

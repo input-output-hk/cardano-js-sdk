@@ -1,5 +1,5 @@
 export * as Address from './Address';
-export * from './createTransactionInternals';
+export * as Transaction from './Transaction';
 export * from './InMemoryUtxoRepository';
 export * as KeyManagement from './KeyManagement';
 export * from './SingleAddressWallet';
