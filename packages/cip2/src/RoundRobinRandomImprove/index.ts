@@ -9,15 +9,25 @@ export const roundRobinRandomImprove = (csl: CardanoSerializationLib): InputSele
   select: async ({
     utxo,
     outputs,
-    constraints: { computeMinimumCost, computeSelectionLimit, computeMinimumCoinQuantity, tokenBundleSizeExceedsLimit }
+    constraints: { computeMinimumCost, computeSelectionLimit, computeMinimumCoinQuantity, tokenBundleSizeExceedsLimit },
+    implicitCoin: implicitCoinAsNumber
   }: InputSelectionParameters): Promise<SelectionResult> => {
-    const { uniqueOutputAssetIDs, utxosWithValue, outputsWithValue } = preprocessArgs(utxo, outputs);
+    const { utxosWithValue, outputsWithValue, uniqueOutputAssetIDs, implicitCoin } = preprocessArgs(
+      utxo,
+      outputs,
+      implicitCoinAsNumber
+    );
 
     const utxoValues = withValuesToValues(utxosWithValue);
     const outputValues = withValuesToValues(outputsWithValue);
-    assertIsBalanceSufficient(uniqueOutputAssetIDs, utxoValues, outputValues);
+    assertIsBalanceSufficient(uniqueOutputAssetIDs, utxoValues, outputValues, implicitCoin);
 
-    const roundRobinSelectionResult = roundRobinSelection(utxosWithValue, outputsWithValue, uniqueOutputAssetIDs);
+    const roundRobinSelectionResult = roundRobinSelection({
+      implicitCoin,
+      outputsWithValue,
+      utxosWithValue,
+      uniqueOutputAssetIDs
+    });
 
     const result = await computeChangeAndAdjustForFee({
       csl,
@@ -25,6 +35,7 @@ export const roundRobinRandomImprove = (csl: CardanoSerializationLib): InputSele
       tokenBundleSizeExceedsLimit,
       outputValues,
       uniqueOutputAssetIDs,
+      implicitCoin,
       utxoSelection: roundRobinSelectionResult,
       estimateTxFee: (utxos, changeValues) =>
         computeMinimumCost({

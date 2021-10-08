@@ -156,30 +156,34 @@ describe('RoundRobinRandomImprove', () => {
     const algorithm = getRoundRobinRandomImprove(csl);
 
     await fc.assert(
-      fc.asyncProperty(generateSelectionParams(), async ({ utxoAmounts, outputsAmounts, constraints }) => {
-        // Run input selection
-        const utxo = new Set(
-          utxoAmounts.map((valueQuantities) => CslTestUtil.createUnspentTxOutput(csl, valueQuantities))
-        );
-        const outputs = new Set(
-          outputsAmounts.map((valueQuantities) => CslTestUtil.createOutput(csl, valueQuantities))
-        );
+      fc.asyncProperty(
+        generateSelectionParams(),
+        async ({ utxoAmounts, outputsAmounts, constraints, implicitCoin }) => {
+          // Run input selection
+          const utxo = new Set(
+            utxoAmounts.map((valueQuantities) => CslTestUtil.createUnspentTxOutput(csl, valueQuantities))
+          );
+          const outputs = new Set(
+            outputsAmounts.map((valueQuantities) => CslTestUtil.createOutput(csl, valueQuantities))
+          );
 
-        try {
-          const results = await algorithm.select({
-            utxo: new Set(utxo),
-            outputs,
-            constraints: SelectionConstraints.mockConstraintsToConstraints(constraints)
-          });
-          assertInputSelectionProperties({ results, outputs, utxo, constraints });
-        } catch (error) {
-          if (error instanceof InputSelectionError) {
-            assertFailureProperties({ error, utxoAmounts, outputsAmounts, constraints });
-          } else {
-            throw error;
+          try {
+            const results = await algorithm.select({
+              utxo: new Set(utxo),
+              outputs,
+              constraints: SelectionConstraints.mockConstraintsToConstraints(constraints),
+              implicitCoin
+            });
+            assertInputSelectionProperties({ results, outputs, utxo, constraints, implicitCoin });
+          } catch (error) {
+            if (error instanceof InputSelectionError) {
+              assertFailureProperties({ error, utxoAmounts, outputsAmounts, constraints, implicitCoin });
+            } else {
+              throw error;
+            }
           }
         }
-      })
+      )
     );
   });
 });
