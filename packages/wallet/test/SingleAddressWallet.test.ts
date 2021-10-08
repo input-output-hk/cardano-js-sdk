@@ -10,6 +10,7 @@ import {
   SingleAddressWalletDependencies,
   UtxoRepository
 } from '../src';
+import { txTracker } from './mockTransactionTracker';
 
 describe('Wallet', () => {
   const name = 'Test Wallet';
@@ -30,7 +31,7 @@ describe('Wallet', () => {
     });
     provider = providerStub();
     inputSelector = roundRobinRandomImprove(csl);
-    utxoRepository = new InMemoryUtxoRepository(csl, provider, keyManager, inputSelector);
+    utxoRepository = new InMemoryUtxoRepository({ csl, provider, keyManager, inputSelector, txTracker });
     walletDependencies = { csl, keyManager, provider, utxoRepository };
   });
 
