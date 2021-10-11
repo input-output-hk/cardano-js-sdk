@@ -19,6 +19,9 @@ async () => {
     withdrawals: [Transaction.withdrawal(csl, keyManager, 5_000_000n)],
     ...
   });
+  
+  // Calculated fee is returned by invoking body.fee()
+  
   const tx = await wallet.signTx(body, hash);
 
   await wallet.submitTx(tx);
