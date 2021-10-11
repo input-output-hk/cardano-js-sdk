@@ -4,14 +4,32 @@ import { UtxoRepository } from './types';
 import { dummyLogger, Logger } from 'ts-log';
 import { defaultSelectionConstraints } from '@cardano-sdk/cip2';
 import { computeImplicitCoin, createTransactionInternals, InitializeTxProps, TxInternals } from './Transaction';
-import { KeyManagement } from '.';
+import { KeyManagement, TransactionTracker } from '.';
 
+export interface SubmitTxResult {
+  /**
+   * Resolves when transaction is submitted.
+   * Rejects with ProviderError.
+   */
+  submitted: Promise<void>;
+  /**
+   * Resolves when transaction is submitted and confirmed.
+   * Rejects with TransactionError.
+   */
+  confirmed: Promise<void>;
+}
 export interface SingleAddressWallet {
   address: Schema.Address;
   initializeTx: (props: InitializeTxProps) => Promise<TxInternals>;
   name: string;
   signTx: (body: CSL.TransactionBody, hash: CSL.TransactionHash) => Promise<CSL.Transaction>;
-  submitTx: (tx: CSL.Transaction) => Promise<boolean>;
+  /**
+   * Submits transaction.
+   *
+   * @returns {Promise<SubmitTxResult>} promise that resolves when transaction is submitted,
+   * but not confirmed yet. Rejects with TransactionError { FailedToSubmit }
+   */
+  submitTx: (tx: CSL.Transaction) => SubmitTxResult;
 }
 
 export interface SingleAddressWalletDependencies {
@@ -20,6 +38,7 @@ export interface SingleAddressWalletDependencies {
   logger?: Logger;
   provider: CardanoProvider;
   utxoRepository: UtxoRepository;
+  txTracker: TransactionTracker;
 }
 
 export interface SingleAddressWalletProps {
@@ -35,7 +54,7 @@ const ensureValidityInterval = (
 
 export const createSingleAddressWallet = async (
   { name }: SingleAddressWalletProps,
-  { csl, provider, keyManager, utxoRepository, logger = dummyLogger }: SingleAddressWalletDependencies
+  { csl, provider, keyManager, utxoRepository, txTracker, logger = dummyLogger }: SingleAddressWalletDependencies
 ): Promise<SingleAddressWallet> => {
   const address = keyManager.deriveAddress(0, 0);
   const protocolParameters = await provider.currentWalletProtocolParameters();
@@ -72,6 +91,12 @@ export const createSingleAddressWallet = async (
     },
     name,
     signTx,
-    submitTx: async (tx) => provider.submitTx(tx)
+    submitTx: (tx) => {
+      const submitted = provider.submitTx(tx);
+      return {
+        submitted,
+        confirmed: submitted.then(() => txTracker.trackTransaction(tx))
+      };
+    }
   };
 };

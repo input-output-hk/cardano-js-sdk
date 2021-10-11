@@ -59,7 +59,7 @@ export interface CardanoProvider {
   networkInfo: () => Promise<NetworkInfo>;
   stakePoolStats?: () => Promise<StakePoolStats>;
   /** @param signedTransaction signed and serialized cbor */
-  submitTx: (tx: CSL.Transaction) => Promise<boolean>;
+  submitTx: (signedTransaction: CSL.Transaction) => Promise<void>;
   utxoDelegationAndRewards: (
     addresses: Cardano.Address[],
     stakeKeyHash: Cardano.Hash16

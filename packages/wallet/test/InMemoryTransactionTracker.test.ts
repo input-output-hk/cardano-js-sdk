@@ -1,4 +1,4 @@
-import { CardanoSerializationLib, CSL } from '@cardano-sdk/core';
+import { CardanoSerializationLib, CSL, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { dummyLogger } from 'ts-log';
 import { InMemoryTransactionTracker } from '../src/InMemoryTransactionTracker';
 import { TransactionFailure } from '../src/Transaction/TransactionError';
@@ -68,7 +68,7 @@ describe('InMemoryTransactionTracker', () => {
 
       it('throws CannotTrack on ledger tip fetch error', async () => {
         provider.queryTransactionsByHashes.mockResolvedValueOnce([]);
-        provider.ledgerTip.mockRejectedValueOnce(new Error('error'));
+        provider.ledgerTip.mockRejectedValueOnce(new ProviderError(ProviderFailure.Unknown));
         await expect(txTracker.trackTransaction(transaction)).rejects.toThrowError(TransactionFailure.CannotTrack);
         expect(provider.ledgerTip).toBeCalledTimes(1);
         expect(provider.queryTransactionsByHashes).toBeCalledTimes(1);
@@ -77,9 +77,7 @@ describe('InMemoryTransactionTracker', () => {
       it('polls provider at "pollInterval" until it returns the transaction', async () => {
         // resolve [] or reject with 404 should be treated the same
         provider.queryTransactionsByHashes.mockResolvedValueOnce([]);
-        provider.queryTransactionsByHashes.mockRejectedValueOnce({
-          status_code: 404
-        });
+        provider.queryTransactionsByHashes.mockRejectedValueOnce(new ProviderError(ProviderFailure.NotFound));
         await txTracker.trackTransaction(transaction);
         expect(provider.queryTransactionsByHashes).toBeCalledTimes(3);
         expect(mockDelay).toBeCalledTimes(3);

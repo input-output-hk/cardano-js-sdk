@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
-import { loadCardanoSerializationLib, CardanoSerializationLib, Cardano, CardanoProvider } from '@cardano-sdk/core';
+import { loadCardanoSerializationLib, CardanoSerializationLib, Cardano } from '@cardano-sdk/core';
 import { InputSelector, roundRobinRandomImprove } from '@cardano-sdk/cip2';
-import { providerStub } from './ProviderStub';
+import { ProviderStub, providerStub } from './ProviderStub';
 import {
   createSingleAddressWallet,
   InMemoryUtxoRepository,
@@ -17,7 +17,7 @@ describe('Wallet', () => {
   let csl: CardanoSerializationLib;
   let inputSelector: InputSelector;
   let keyManager: KeyManagement.KeyManager;
-  let provider: CardanoProvider;
+  let provider: ProviderStub;
   let utxoRepository: UtxoRepository;
   let walletDependencies: SingleAddressWalletDependencies;
 
@@ -32,7 +32,7 @@ describe('Wallet', () => {
     provider = providerStub();
     inputSelector = roundRobinRandomImprove(csl);
     utxoRepository = new InMemoryUtxoRepository({ csl, provider, keyManager, inputSelector, txTracker });
-    walletDependencies = { csl, keyManager, provider, utxoRepository };
+    walletDependencies = { csl, keyManager, provider, utxoRepository, txTracker };
   });
 
   test('createWallet', async () => {
@@ -75,8 +75,12 @@ describe('Wallet', () => {
     test('submitTx', async () => {
       const { body, hash } = await wallet.initializeTx(props);
       const tx = await wallet.signTx(body, hash);
-      const result = await wallet.submitTx(tx);
-      expect(result).toBe(true);
+      const { confirmed } = wallet.submitTx(tx);
+      await confirmed;
+      expect(provider.submitTx).toBeCalledTimes(1);
+      expect(provider.submitTx).toBeCalledWith(tx);
+      expect(txTracker.trackTransaction).toBeCalledTimes(1);
+      expect(txTracker.trackTransaction).toBeCalledWith(tx);
     });
   });
 });

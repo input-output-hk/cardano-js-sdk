@@ -2,7 +2,6 @@ import { CustomError } from 'ts-custom-error';
 
 export enum TransactionFailure {
   CannotTrack = 'CANNOT_TRACK',
-  Unknown = 'UNKNOWN',
   Timeout = 'TIMEOUT'
 }
 

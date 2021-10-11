@@ -115,7 +115,7 @@ export const providerStub = () => ({
       live: 15_001_884_895_856_815n
     }
   }),
-  submitTx: async () => true,
+  submitTx: jest.fn().mockResolvedValue(void 0),
   stakePoolStats: async () => ({
     qty: {
       active: 1000,
