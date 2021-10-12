@@ -75,12 +75,12 @@ describe('Wallet', () => {
     test('submitTx', async () => {
       const { body, hash } = await wallet.initializeTx(props);
       const tx = await wallet.signTx(body, hash);
-      const { confirmed } = wallet.submitTx(tx);
+      const { submitted, confirmed } = wallet.submitTx(tx);
       await confirmed;
       expect(provider.submitTx).toBeCalledTimes(1);
       expect(provider.submitTx).toBeCalledWith(tx);
       expect(txTracker.trackTransaction).toBeCalledTimes(1);
-      expect(txTracker.trackTransaction).toBeCalledWith(tx);
+      expect(txTracker.trackTransaction).toBeCalledWith(tx, submitted);
     });
   });
 });

@@ -19,7 +19,6 @@ export interface InMemoryUtxoRepositoryProps {
   logger?: Logger;
 }
 
-// Review: is comparing txIn enough to identify unique utxo?
 const utxoEquals = ([txIn1]: [Schema.TxIn, Schema.TxOut], [txIn2]: [Schema.TxIn, Schema.TxOut]): boolean =>
   txIn1.txId === txIn2.txId && txIn1.index === txIn2.index;
 export class InMemoryUtxoRepository extends Emittery<UtxoRepositoryEvents> implements UtxoRepository {
@@ -93,7 +92,7 @@ export class InMemoryUtxoRepository extends Emittery<UtxoRepositoryEvents> imple
       await this.sync();
     }
     return this.#inputSelector.select({
-      utxo: new Set(Ogmios.ogmiosToCsl(this.#csl).utxo(this.allUtxos)),
+      utxo: new Set(Ogmios.ogmiosToCsl(this.#csl).utxo(this.availableUtxos)),
       outputs,
       constraints,
       implicitCoin

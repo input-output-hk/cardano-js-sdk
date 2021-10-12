@@ -30,7 +30,8 @@ export class InMemoryTransactionTracker extends Emittery<TransactionTrackerEvent
     this.#pollInterval = pollInterval;
   }
 
-  async trackTransaction(transaction: CSL.Transaction): Promise<void> {
+  async trackTransaction(transaction: CSL.Transaction, submitted: Promise<void> = Promise.resolve()): Promise<void> {
+    await submitted;
     const body = transaction.body();
     const hash = Buffer.from(this.#csl.hash_transaction(body).to_bytes()).toString('hex');
     this.#logger.debug('InMemoryTransactionTracker.trackTransaction', hash);

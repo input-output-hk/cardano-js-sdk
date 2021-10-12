@@ -1,20 +1,20 @@
 import Schema from '@cardano-ogmios/schema';
-import { CardanoProvider, Ogmios, Transaction, CardanoSerializationLib, CSL } from '@cardano-sdk/core';
+import { CardanoProvider, Ogmios, Transaction, CardanoSerializationLib, CSL, ProviderError } from '@cardano-sdk/core';
 import { UtxoRepository } from './types';
 import { dummyLogger, Logger } from 'ts-log';
 import { defaultSelectionConstraints } from '@cardano-sdk/cip2';
 import { computeImplicitCoin, createTransactionInternals, InitializeTxProps, TxInternals } from './Transaction';
-import { KeyManagement, TransactionTracker } from '.';
+import { KeyManagement, TransactionError, TransactionFailure, TransactionTracker } from '.';
 
 export interface SubmitTxResult {
   /**
    * Resolves when transaction is submitted.
-   * Rejects with ProviderError.
+   * Rejects with {TransactionError}.
    */
   submitted: Promise<void>;
   /**
    * Resolves when transaction is submitted and confirmed.
-   * Rejects with TransactionError.
+   * Rejects with {TransactionError}.
    */
   confirmed: Promise<void>;
 }
@@ -23,12 +23,6 @@ export interface SingleAddressWallet {
   initializeTx: (props: InitializeTxProps) => Promise<TxInternals>;
   name: string;
   signTx: (body: CSL.TransactionBody, hash: CSL.TransactionHash) => Promise<CSL.Transaction>;
-  /**
-   * Submits transaction.
-   *
-   * @returns {Promise<SubmitTxResult>} promise that resolves when transaction is submitted,
-   * but not confirmed yet. Rejects with TransactionError { FailedToSubmit }
-   */
   submitTx: (tx: CSL.Transaction) => SubmitTxResult;
 }
 
@@ -92,10 +86,16 @@ export const createSingleAddressWallet = async (
     name,
     signTx,
     submitTx: (tx) => {
-      const submitted = provider.submitTx(tx);
+      const submitted = provider.submitTx(tx).catch((error) => {
+        if (error instanceof ProviderError) {
+          throw new TransactionError(TransactionFailure.FailedToSubmit, error, error.detail);
+        }
+        throw new TransactionError(TransactionFailure.FailedToSubmit, error);
+      });
+      const confirmed = txTracker.trackTransaction(tx, submitted);
       return {
         submitted,
-        confirmed: submitted.then(() => txTracker.trackTransaction(tx))
+        confirmed
       };
     }
   };

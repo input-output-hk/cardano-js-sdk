@@ -30,5 +30,5 @@ export interface TransactionTracker extends Emittery<TransactionTrackerEvents> {
   /**
    * Track a new transaction
    */
-  trackTransaction(transaction: CSL.Transaction): Promise<void>;
+  trackTransaction(transaction: CSL.Transaction, submitted?: Promise<void>): Promise<void>;
 }
