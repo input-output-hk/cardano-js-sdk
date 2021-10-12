@@ -17,7 +17,7 @@
     "build": "tsc --build ./src",
     "tscNoEmit": "shx echo typescript --noEmit command not implemented yet",
     "cleanup": "shx rm -rf dist node_modules",
-    "coverage": "shx echo No coverage report for this package",
+    "coverage": "yarn test --coverage",
     "lint": "eslint --ignore-path ../../.eslintignore \"**/*.ts\"",
     "test": "jest -c ./jest.config.js",
     "test:debug": "DEBUG=true yarn test"

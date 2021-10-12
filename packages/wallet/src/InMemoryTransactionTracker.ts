@@ -2,7 +2,7 @@ import { TransactionTracker, TransactionTrackerEvents } from './types';
 import Emittery from 'emittery';
 import { Hash16, Slot, Tip } from '@cardano-ogmios/schema';
 import { CardanoProvider, ProviderError, CardanoSerializationLib, CSL, ProviderFailure } from '@cardano-sdk/core';
-import { TransactionError, TransactionFailure } from './Transaction/TransactionError';
+import { TransactionError, TransactionFailure } from './TransactionError';
 import { dummyLogger, Logger } from 'ts-log';
 import delay from 'delay';
 

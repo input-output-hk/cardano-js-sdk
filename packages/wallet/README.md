@@ -1,29 +1,10 @@
 # Cardano JS SDK | Wallet
 
-# Examples
+See [examples]
 
-## Delegation
+## Tests
 
-```typescript
-import { loadCardanoSerializationLib } from '@cardano-sdk/core';
-import { createSingleAddressWallet, KeyManagement, Transaction, SingleAddressWalletDependencies } from '@cardano-sdk/wallet';
+See [code coverage report]
 
-async () => {
-  const csl = await loadCardanoSerializationLib();
-  const keyManager = KeyManagement.createInMemoryKeyManager({ csl, ... });
-  const wallet = await createSingleAddressWallet({ name: 'some-wallet' }, { csl, keyManager, ... });
-
-  const certs = new Transaction.CertificateFactory(keyManager);
-  const { body, hash } = await wallet.initializeTx({
-    certificates: [certs.stakeKeyDeregistration()],
-    withdrawals: [Transaction.withdrawal(csl, keyManager, 5_000_000n)],
-    ...
-  });
-  
-  // Calculated fee is returned by invoking body.fee()
-  
-  const tx = await wallet.signTx(body, hash);
-
-  await wallet.submitTx(tx);
-}
-```
+[examples]: https://github.com/input-output-hk/cardano-js-sdk/tree/master/packages/wallet/examples
+[code coverage report]: https://input-output-hk.github.io/cardano-js-sdk/coverage/wallet

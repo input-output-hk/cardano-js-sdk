@@ -1,7 +1,7 @@
 import { CardanoSerializationLib, CSL, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { dummyLogger } from 'ts-log';
 import { InMemoryTransactionTracker } from '../src/InMemoryTransactionTracker';
-import { TransactionFailure } from '../src/Transaction/TransactionError';
+import { TransactionFailure } from '../src/TransactionError';
 import { ledgerTip, providerStub, ProviderStub, queryTransactionsResult } from './ProviderStub';
 import mockDelay from 'delay';
 

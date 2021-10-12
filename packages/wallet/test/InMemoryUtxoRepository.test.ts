@@ -7,7 +7,7 @@ import { InMemoryUtxoRepository, KeyManagement, UtxoRepository } from '../src';
 import { MockTransactionTracker } from './mockTransactionTracker';
 import { ogmiosToCsl } from '@cardano-sdk/core/src/Ogmios';
 import { TxIn, TxOut } from '@cardano-ogmios/schema';
-import { TransactionError, TransactionFailure } from '../src/Transaction/TransactionError';
+import { TransactionError, TransactionFailure } from '../src/TransactionError';
 
 const addresses = [
   'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g'

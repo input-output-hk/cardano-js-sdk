@@ -8,7 +8,7 @@ import { KeyManager } from './KeyManagement';
 import { OnTransactionArgs, TransactionTracker, UtxoRepositoryEvents } from '.';
 import { cslToOgmios } from '@cardano-sdk/core/src/Ogmios';
 import Emittery from 'emittery';
-import { TransactionError, TransactionFailure } from './Transaction/TransactionError';
+import { TransactionError, TransactionFailure } from './TransactionError';
 
 export interface InMemoryUtxoRepositoryProps {
   csl: CardanoSerializationLib;
