@@ -1,6 +1,6 @@
 /* eslint-disable promise/param-names */
 import { roundRobinRandomImprove, InputSelector } from '@cardano-sdk/cip2';
-import { loadCardanoSerializationLib, CardanoSerializationLib, CSL, Ogmios } from '@cardano-sdk/core';
+import { loadCardanoSerializationLib, CardanoSerializationLib, CSL, Ogmios, Cardano } from '@cardano-sdk/core';
 import { flushPromises, SelectionConstraints } from '@cardano-sdk/util-dev';
 import { providerStub, delegate, rewards, ProviderStub, utxo, delegationAndRewards } from './ProviderStub';
 import {
@@ -24,6 +24,7 @@ describe('InMemoryUtxoRepository', () => {
   let provider: ProviderStub;
   let inputSelector: InputSelector;
   let csl: CardanoSerializationLib;
+  let keyManager: KeyManagement.KeyManager;
   let outputs: Set<CSL.TransactionOutput>;
   let txTracker: MockTransactionTracker;
 
@@ -31,7 +32,7 @@ describe('InMemoryUtxoRepository', () => {
     provider = providerStub();
     csl = await loadCardanoSerializationLib();
     inputSelector = roundRobinRandomImprove(csl);
-    const keyManager = KeyManagement.createInMemoryKeyManager({
+    keyManager = KeyManagement.createInMemoryKeyManager({
       csl,
       mnemonicWords: KeyManagement.util.generateMnemonicWords(),
       networkId: 0,
@@ -48,19 +49,25 @@ describe('InMemoryUtxoRepository', () => {
       })
     ]);
     txTracker = new MockTransactionTracker();
-    utxoRepository = new InMemoryUtxoRepository({ csl, provider, keyManager, inputSelector, txTracker });
+    utxoRepository = new InMemoryUtxoRepository({
+      csl,
+      provider,
+      keyManager,
+      inputSelector,
+      txTracker
+    });
   });
 
   test('constructed state', async () => {
     await expect(utxoRepository.allUtxos.length).toBe(0);
-    await expect(utxoRepository.rewards).toBe(null);
+    await expect(utxoRepository.allRewards).toBe(null);
     await expect(utxoRepository.delegation).toBe(null);
   });
 
   test('sync', async () => {
     await utxoRepository.sync();
     await expect(utxoRepository.allUtxos.length).toBe(3);
-    await expect(utxoRepository.rewards).toBe(rewards);
+    await expect(utxoRepository.allRewards).toBe(rewards);
     await expect(utxoRepository.delegation).toBe(delegate);
     const identicalUtxo = [{ ...utxo[1][0] }, { ...utxo[1][1] }] as const; // clone UTxO
     provider.utxoDelegationAndRewards.mockResolvedValueOnce({
@@ -78,7 +85,7 @@ describe('InMemoryUtxoRepository', () => {
     it('can be called without explicitly syncing', async () => {
       const result = await utxoRepository.selectInputs(outputs, SelectionConstraints.NO_CONSTRAINTS);
       await expect(utxoRepository.allUtxos.length).toBe(3);
-      await expect(utxoRepository.rewards).toBe(rewards);
+      await expect(utxoRepository.allRewards).toBe(rewards);
       await expect(utxoRepository.delegation).toBe(delegate);
       await expect(result.selection.inputs.size).toBeGreaterThan(0);
       await expect(result.selection.outputs).toBe(outputs);
@@ -86,11 +93,14 @@ describe('InMemoryUtxoRepository', () => {
     });
   });
 
-  describe('availableUtxos', () => {
+  describe('availableUtxos and availableRewards', () => {
     let transactionUtxo: [TxIn, TxOut];
     let transaction: CSL.Transaction;
     let numUtxoPreTransaction: number;
-    let onTransactionUntracked: jest.Mock;
+    let rewardsPreTransaction: bigint;
+    let onOutOfSync: jest.Mock;
+    let completeConfirmation: Function;
+    const transactionWithdrawal = 1n;
 
     const trackTransaction = async (confirmed: Promise<void>) => {
       await txTracker.emit(TransactionTrackerEvent.NewTransaction, {
@@ -109,64 +119,92 @@ describe('InMemoryUtxoRepository', () => {
           inputs: () => ({
             len: () => 1,
             get: () => ogmiosToCsl(csl).txIn(transactionUtxo[0])
+          }),
+          withdrawals: () => ({
+            keys: () => ({
+              len: () => 1,
+              get: () =>
+                csl.RewardAddress.new(
+                  Cardano.NetworkId.testnet,
+                  csl.StakeCredential.from_keyhash(keyManager.stakeKey.hash())
+                )
+            }),
+            len: () => 1,
+            get: () => csl.BigNum.from_str(transactionWithdrawal.toString())
           })
         })
       } as unknown as CSL.Transaction;
       await utxoRepository.sync();
       numUtxoPreTransaction = utxoRepository.allUtxos.length;
-      onTransactionUntracked = jest.fn();
-      utxoRepository.on(UtxoRepositoryEvent.TransactionUntracked, onTransactionUntracked);
+      rewardsPreTransaction = utxoRepository.allRewards!;
+      onOutOfSync = jest.fn();
+      utxoRepository.on(UtxoRepositoryEvent.OutOfSync, onOutOfSync);
     });
 
     it('preconditions', () => {
       expect(utxoRepository.availableUtxos).toHaveLength(utxoRepository.allUtxos.length);
       expect(utxoRepository.availableUtxos).toContain(transactionUtxo);
+      expect(utxoRepository.availableRewards).toBe(rewardsPreTransaction);
     });
 
-    it('transaction confirmed', async () => {
-      let completeConfirmation: Function;
+    describe('sync success', () => {
+      beforeEach(() => {
+        // Simulate spent utxo and rewards
+        expect(provider.utxoDelegationAndRewards).toBeCalledTimes(1);
+        provider.utxoDelegationAndRewards.mockResolvedValueOnce({
+          utxo: utxo.slice(1),
+          delegationAndRewards: {
+            ...delegationAndRewards,
+            rewards: rewards - transactionWithdrawal
+          }
+        });
+      });
+
+      it('transaction confirmed', async () => {
+        await trackTransaction(new Promise<void>((resolve) => (completeConfirmation = resolve)));
+      });
+
+      it('transaction confirmation failed', async () => {
+        // setup for transaction to timeout
+        await trackTransaction(
+          new Promise<void>(
+            (_, reject) => (completeConfirmation = () => reject(new TransactionError(TransactionFailure.Timeout)))
+          )
+        );
+      });
+
+      afterEach(async () => {
+        // Review: is it ok to reuse code by utilizing afterEach, or should we only use it for test cleanup?
+        // transaction confirmed or rejected, based on 'completeConfirmation' function set by test
+        await completeConfirmation!();
+        await flushPromises();
+        // Assert values from provider sync
+        expect(provider.utxoDelegationAndRewards).toBeCalledTimes(2);
+        expect(utxoRepository.availableUtxos).toHaveLength(numUtxoPreTransaction - 1);
+        expect(utxoRepository.availableUtxos).not.toContain(transactionUtxo);
+        expect(utxoRepository.availableRewards).toBe(rewardsPreTransaction - transactionWithdrawal);
+        expect(onOutOfSync).not.toBeCalled();
+      });
+    });
+
+    it('emits OutOfSync on sync failure', async () => {
+      provider.utxoDelegationAndRewards.mockRejectedValueOnce(new Error('any error'));
+
       const confirmed = new Promise<void>((resolve) => (completeConfirmation = resolve));
       await trackTransaction(confirmed);
 
       // transaction confirmed
       await completeConfirmation!();
-      expect(utxoRepository.availableUtxos).toHaveLength(numUtxoPreTransaction - 1);
-      expect(utxoRepository.availableUtxos).toHaveLength(utxoRepository.allUtxos.length);
-      expect(utxoRepository.availableUtxos).not.toContain(transactionUtxo);
-    });
-
-    it('transaction timed out', async () => {
-      // setup for transaction to timeout
-      let completeConfirmation: Function;
-      const confirmed = new Promise<void>(
-        (_, reject) => (completeConfirmation = () => reject(new TransactionError(TransactionFailure.Timeout)))
-      );
-      await trackTransaction(confirmed);
-
-      // transaction rejected
-      await completeConfirmation!();
-      expect(onTransactionUntracked).not.toBeCalled();
-      expect(utxoRepository.availableUtxos).toHaveLength(numUtxoPreTransaction);
-      expect(utxoRepository.availableUtxos).toHaveLength(utxoRepository.allUtxos.length);
-      expect(utxoRepository.availableUtxos).toContain(transactionUtxo);
-    });
-
-    it('emits transactionUntracked on any other transaction tracker error', async () => {
-      // setup for transaction to timeout
-      let completeConfirmation: Function;
-      const confirmed = new Promise<void>(
-        (_, reject) => (completeConfirmation = () => reject(new TransactionError(TransactionFailure.CannotTrack)))
-      );
-      await trackTransaction(confirmed);
-
-      // Assuming UTxO is still available, SDK user should call TransactionTracker.trackTransaction to lock it again.
-      await completeConfirmation!();
       await flushPromises();
-      expect(onTransactionUntracked).toBeCalledTimes(1);
-      expect(onTransactionUntracked).toBeCalledWith(transaction);
       expect(utxoRepository.availableUtxos).toHaveLength(numUtxoPreTransaction);
-      expect(utxoRepository.availableUtxos).toHaveLength(utxoRepository.allUtxos.length);
       expect(utxoRepository.availableUtxos).toContain(transactionUtxo);
+      expect(utxoRepository.allRewards).toBe(rewardsPreTransaction);
+      expect(onOutOfSync).toBeCalledTimes(1);
+    });
+
+    afterEach(() => {
+      expect(utxoRepository.availableUtxos).toHaveLength(utxoRepository.allUtxos.length);
+      expect(utxoRepository.allRewards).toBe(utxoRepository.availableRewards);
     });
   });
 });
