@@ -72,7 +72,12 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">InMemoryUtxoRepository</span>
+						<span class="tsd-signature-type">Emittery</span><span class="tsd-signature-symbol">&lt;</span><a href="../modules/_cardano_sdk_wallet.html#UtxoRepositoryEvents" class="tsd-signature-type" data-tsd-kind="Type alias">UtxoRepositoryEvents</a><span class="tsd-signature-symbol">&gt;</span>
+						<ul class="tsd-hierarchy">
+							<li>
+								<span class="target">InMemoryUtxoRepository</span>
+							</li>
+						</ul>
 					</li>
 				</ul>
 			</section>
@@ -89,25 +94,31 @@
 						<section class="tsd-index-section ">
 							<h3>Constructors</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#constructor" class="tsd-kind-icon">constructor</a></li>
+								<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#constructor" class="tsd-kind-icon">constructor</a></li>
 							</ul>
 						</section>
-						<section class="tsd-index-section tsd-is-private tsd-is-private-protected">
+						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#_csl" class="tsd-kind-icon">#csl</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#_delegationAndRewards" class="tsd-kind-icon">#delegation<wbr>And<wbr>Rewards</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#_inputSelector" class="tsd-kind-icon">#input<wbr>Selector</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#_keyManager" class="tsd-kind-icon">#key<wbr>Manager</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#_lockedUtxoSet" class="tsd-kind-icon">#locked<wbr>Utxo<wbr>Set</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#_logger" class="tsd-kind-icon">#logger</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#_provider" class="tsd-kind-icon">#provider</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#_utxoSet" class="tsd-kind-icon">#utxo<wbr>Set</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#debug" class="tsd-kind-icon">debug</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#isDebugEnabled" class="tsd-kind-icon">is<wbr>Debug<wbr>Enabled</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#listenerAdded" class="tsd-kind-icon">listener<wbr>Added</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#listenerRemoved" class="tsd-kind-icon">listener<wbr>Removed</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Accessors</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#allUtxos" class="tsd-kind-icon">all<wbr>Utxos</a></li>
+								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#availableUtxos" class="tsd-kind-icon">available<wbr>Utxos</a></li>
 								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#delegation" class="tsd-kind-icon">delegation</a></li>
 								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#rewards" class="tsd-kind-icon">rewards</a></li>
 							</ul>
@@ -115,8 +126,22 @@
 						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#_onTransaction" class="tsd-kind-icon">#on<wbr>Transaction</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#anyEvent" class="tsd-kind-icon">any<wbr>Event</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#bindMethods" class="tsd-kind-icon">bind<wbr>Methods</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-external"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#clearListeners" class="tsd-kind-icon">clear<wbr>Listeners</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-external"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#emit" class="tsd-kind-icon">emit</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-external"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#emitSerial" class="tsd-kind-icon">emit<wbr>Serial</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-external"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#events" class="tsd-kind-icon">events</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-external"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#listenerCount" class="tsd-kind-icon">listener<wbr>Count</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-external"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#off" class="tsd-kind-icon">off</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#offAny" class="tsd-kind-icon">off<wbr>Any</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-external"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#on" class="tsd-kind-icon">on</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#onAny" class="tsd-kind-icon">on<wbr>Any</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-external"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#once" class="tsd-kind-icon">once</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#selectInputs" class="tsd-kind-icon">select<wbr>Inputs</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#sync" class="tsd-kind-icon">sync</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#mixin" class="tsd-kind-icon">mixin</a></li>
 							</ul>
 						</section>
 					</div>
@@ -124,35 +149,24 @@
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Constructors</h2>
-				<section class="tsd-panel tsd-member tsd-kind-constructor tsd-parent-kind-class">
+				<section class="tsd-panel tsd-member tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite">
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
-					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>InMemory<wbr>Utxo<wbr>Repository<span class="tsd-signature-symbol">(</span>csl<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">__module</span>, provider<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">CardanoProvider</span>, keyManager<span class="tsd-signature-symbol">: </span><a href="../interfaces/_cardano_sdk_wallet.KeyManagement.KeyManager.html" class="tsd-signature-type" data-tsd-kind="Interface">KeyManager</a>, inputSelector<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">InputSelector</span>, logger<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Logger</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html" class="tsd-signature-type" data-tsd-kind="Class">InMemoryUtxoRepository</a></li>
+					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite">
+						<li class="tsd-signature tsd-kind-icon">new <wbr>InMemory<wbr>Utxo<wbr>Repository<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><a href="../interfaces/_cardano_sdk_wallet.InMemoryUtxoRepositoryProps.html" class="tsd-signature-type" data-tsd-kind="Interface">InMemoryUtxoRepositoryProps</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html" class="tsd-signature-type" data-tsd-kind="Class">InMemoryUtxoRepository</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
+								<p>Overrides Emittery&lt;UtxoRepositoryEvents&gt;.constructor</p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/80bd495/packages/wallet/src/InMemoryUtxoRepository.ts#L18">packages/wallet/src/InMemoryUtxoRepository.ts:18</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d110f8d/packages/wallet/src/InMemoryUtxoRepository.ts#L41">packages/wallet/src/InMemoryUtxoRepository.ts:41</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>csl: <span class="tsd-signature-type">__module</span></h5>
-								</li>
-								<li>
-									<h5>provider: <span class="tsd-signature-type">CardanoProvider</span></h5>
-								</li>
-								<li>
-									<h5>keyManager: <a href="../interfaces/_cardano_sdk_wallet.KeyManagement.KeyManager.html" class="tsd-signature-type" data-tsd-kind="Interface">KeyManager</a></h5>
-								</li>
-								<li>
-									<h5>inputSelector: <span class="tsd-signature-type">InputSelector</span></h5>
-								</li>
-								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> logger: <span class="tsd-signature-type">Logger</span></h5>
+									<h5>__namedParameters: <a href="../interfaces/_cardano_sdk_wallet.InMemoryUtxoRepositoryProps.html" class="tsd-signature-type" data-tsd-kind="Interface">InMemoryUtxoRepositoryProps</a></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html" class="tsd-signature-type" data-tsd-kind="Class">InMemoryUtxoRepository</a></h4>
@@ -160,7 +174,7 @@
 					</ul>
 				</section>
 			</section>
-			<section class="tsd-panel-group tsd-member-group tsd-is-private tsd-is-private-protected">
+			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
 					<a name="_csl" class="tsd-anchor"></a>
@@ -168,7 +182,7 @@
 					<div class="tsd-signature tsd-kind-icon">#csl<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">__module</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/80bd495/packages/wallet/src/InMemoryUtxoRepository.ts#L10">packages/wallet/src/InMemoryUtxoRepository.ts:10</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d110f8d/packages/wallet/src/InMemoryUtxoRepository.ts#L32">packages/wallet/src/InMemoryUtxoRepository.ts:32</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -178,7 +192,7 @@
 					<div class="tsd-signature tsd-kind-icon">#delegation<wbr>And<wbr>Rewards<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">DelegationsAndRewards</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/80bd495/packages/wallet/src/InMemoryUtxoRepository.ts#L11">packages/wallet/src/InMemoryUtxoRepository.ts:11</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d110f8d/packages/wallet/src/InMemoryUtxoRepository.ts#L33">packages/wallet/src/InMemoryUtxoRepository.ts:33</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -188,7 +202,7 @@
 					<div class="tsd-signature tsd-kind-icon">#input<wbr>Selector<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">InputSelector</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/80bd495/packages/wallet/src/InMemoryUtxoRepository.ts#L12">packages/wallet/src/InMemoryUtxoRepository.ts:12</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d110f8d/packages/wallet/src/InMemoryUtxoRepository.ts#L34">packages/wallet/src/InMemoryUtxoRepository.ts:34</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -198,7 +212,17 @@
 					<div class="tsd-signature tsd-kind-icon">#key<wbr>Manager<span class="tsd-signature-symbol">:</span> <a href="../interfaces/_cardano_sdk_wallet.KeyManagement.KeyManager.html" class="tsd-signature-type" data-tsd-kind="Interface">KeyManager</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/80bd495/packages/wallet/src/InMemoryUtxoRepository.ts#L13">packages/wallet/src/InMemoryUtxoRepository.ts:13</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d110f8d/packages/wallet/src/InMemoryUtxoRepository.ts#L35">packages/wallet/src/InMemoryUtxoRepository.ts:35</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
+					<a name="_lockedUtxoSet" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> #locked<wbr>Utxo<wbr>Set</h3>
+					<div class="tsd-signature tsd-kind-icon">#locked<wbr>Utxo<wbr>Set<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Set</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">TxIn</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TxOut</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d110f8d/packages/wallet/src/InMemoryUtxoRepository.ts#L39">packages/wallet/src/InMemoryUtxoRepository.ts:39</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -208,7 +232,7 @@
 					<div class="tsd-signature tsd-kind-icon">#logger<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Logger</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/80bd495/packages/wallet/src/InMemoryUtxoRepository.ts#L14">packages/wallet/src/InMemoryUtxoRepository.ts:14</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d110f8d/packages/wallet/src/InMemoryUtxoRepository.ts#L36">packages/wallet/src/InMemoryUtxoRepository.ts:36</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -218,7 +242,7 @@
 					<div class="tsd-signature tsd-kind-icon">#provider<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">CardanoProvider</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/80bd495/packages/wallet/src/InMemoryUtxoRepository.ts#L15">packages/wallet/src/InMemoryUtxoRepository.ts:15</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d110f8d/packages/wallet/src/InMemoryUtxoRepository.ts#L37">packages/wallet/src/InMemoryUtxoRepository.ts:37</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -228,9 +252,146 @@
 					<div class="tsd-signature tsd-kind-icon">#utxo<wbr>Set<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Set</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">TxIn</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TxOut</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/80bd495/packages/wallet/src/InMemoryUtxoRepository.ts#L16">packages/wallet/src/InMemoryUtxoRepository.ts:16</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d110f8d/packages/wallet/src/InMemoryUtxoRepository.ts#L38">packages/wallet/src/InMemoryUtxoRepository.ts:38</a></li>
 						</ul>
 					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="debug" class="tsd-anchor"></a>
+					<h3>debug</h3>
+					<div class="tsd-signature tsd-kind-icon">debug<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">DebugOptions</span><span class="tsd-signature-symbol">&lt;</span><a href="../modules/_cardano_sdk_wallet.html#UtxoRepositoryEvents" class="tsd-signature-type" data-tsd-kind="Type alias">UtxoRepositoryEvents</a><span class="tsd-signature-symbol">&gt;</span></div>
+					<aside class="tsd-sources">
+						<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html">UtxoRepository</a>.<a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html#debug">debug</a></p>
+						<p>Inherited from Emittery.debug</p>
+						<ul>
+							<li>Defined in packages/wallet/node_modules/emittery/index.d.ts:261</li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Debugging options for the current instance.</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external">
+					<a name="isDebugEnabled" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> is<wbr>Debug<wbr>Enabled</h3>
+					<div class="tsd-signature tsd-kind-icon">is<wbr>Debug<wbr>Enabled<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from Emittery.isDebugEnabled</p>
+						<ul>
+							<li>Defined in packages/wallet/node_modules/emittery/index.d.ts:202</li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Toggle debug mode for all instances.</p>
+						</div>
+						<p>Default: <code>true</code> if the <code>DEBUG</code> environment variable is set to <code>emittery</code> or <code>*</code>, otherwise <code>false</code>.</p>
+						<dl class="tsd-comment-tags">
+							<dt>example</dt>
+							<dd><pre><code><span style="color: #AF00DB">import</span><span style="color: #000000"> </span><span style="color: #001080">Emittery</span><span style="color: #000000"> = </span><span style="color: #AF00DB">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;emittery&#039;</span><span style="color: #000000">);</span>
+
+<span style="color: #001080">Emittery</span><span style="color: #000000">.</span><span style="color: #001080">isDebugEnabled</span><span style="color: #000000"> = </span><span style="color: #0000FF">true</span><span style="color: #000000">;</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">emitter1</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">Emittery</span><span style="color: #000000">({</span><span style="color: #001080">debug:</span><span style="color: #000000"> {</span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;myEmitter1&#039;</span><span style="color: #000000">}});</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">emitter2</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">Emittery</span><span style="color: #000000">({</span><span style="color: #001080">debug:</span><span style="color: #000000"> {</span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;myEmitter2&#039;</span><span style="color: #000000">}});</span>
+
+<span style="color: #001080">emitter1</span><span style="color: #000000">.</span><span style="color: #795E26">on</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;test&#039;</span><span style="color: #000000">, </span><span style="color: #001080">data</span><span style="color: #000000"> </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #008000">// …</span>
+<span style="color: #000000">});</span>
+
+<span style="color: #001080">emitter2</span><span style="color: #000000">.</span><span style="color: #795E26">on</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;otherTest&#039;</span><span style="color: #000000">, </span><span style="color: #001080">data</span><span style="color: #000000"> </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #008000">// …</span>
+<span style="color: #000000">});</span>
+
+<span style="color: #001080">emitter1</span><span style="color: #000000">.</span><span style="color: #795E26">emit</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;test&#039;</span><span style="color: #000000">);</span>
+<span style="color: #008000">//=&gt; [16:43:20.417][emittery:subscribe][myEmitter1] Event Name: test</span>
+<span style="color: #008000">//    data: undefined</span>
+
+<span style="color: #001080">emitter2</span><span style="color: #000000">.</span><span style="color: #795E26">emit</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;otherTest&#039;</span><span style="color: #000000">);</span>
+<span style="color: #008000">//=&gt; [16:43:20.417][emittery:subscribe][myEmitter2] Event Name: otherTest</span>
+<span style="color: #008000">//    data: undefined</span>
+</code></pre>
+							</dd>
+						</dl>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external">
+					<a name="listenerAdded" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> <span class="tsd-flag ts-flagReadonly">Readonly</span> listener<wbr>Added</h3>
+					<div class="tsd-signature tsd-kind-icon">listener<wbr>Added<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">typeof </span><span class="tsd-signature-type">listenerAdded</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from Emittery.listenerAdded</p>
+						<ul>
+							<li>Defined in packages/wallet/node_modules/emittery/index.d.ts:228</li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Fires when an event listener was added.</p>
+						</div>
+						<p>An object with <code>listener</code> and <code>eventName</code> (if <code>on</code> or <code>off</code> was used) is provided as event data.</p>
+						<dl class="tsd-comment-tags">
+							<dt>example</dt>
+							<dd><pre><code><span style="color: #AF00DB">import</span><span style="color: #000000"> </span><span style="color: #001080">Emittery</span><span style="color: #000000"> = </span><span style="color: #AF00DB">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;emittery&#039;</span><span style="color: #000000">);</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">emitter</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">Emittery</span><span style="color: #000000">();</span>
+
+<span style="color: #001080">emitter</span><span style="color: #000000">.</span><span style="color: #795E26">on</span><span style="color: #000000">(</span><span style="color: #001080">Emittery</span><span style="color: #000000">.</span><span style="color: #001080">listenerAdded</span><span style="color: #000000">, ({</span><span style="color: #001080">listener</span><span style="color: #000000">, </span><span style="color: #001080">eventName</span><span style="color: #000000">}) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #001080">listener</span><span style="color: #000000">);</span>
+<span style="color: #008000">//=&gt; data =&gt; {}</span>
+
+<span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #001080">eventName</span><span style="color: #000000">);</span>
+<span style="color: #008000">//=&gt; &#039;🦄&#039;</span>
+<span style="color: #000000">});</span>
+
+<span style="color: #001080">emitter</span><span style="color: #000000">.</span><span style="color: #795E26">on</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;🦄&#039;</span><span style="color: #000000">, </span><span style="color: #001080">data</span><span style="color: #000000"> </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #008000">// Handle data</span>
+<span style="color: #000000">});</span>
+</code></pre>
+							</dd>
+						</dl>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external">
+					<a name="listenerRemoved" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> <span class="tsd-flag ts-flagReadonly">Readonly</span> listener<wbr>Removed</h3>
+					<div class="tsd-signature tsd-kind-icon">listener<wbr>Removed<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">typeof </span><span class="tsd-signature-type">listenerRemoved</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from Emittery.listenerRemoved</p>
+						<ul>
+							<li>Defined in packages/wallet/node_modules/emittery/index.d.ts:256</li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Fires when an event listener was removed.</p>
+						</div>
+						<p>An object with <code>listener</code> and <code>eventName</code> (if <code>on</code> or <code>off</code> was used) is provided as event data.</p>
+						<dl class="tsd-comment-tags">
+							<dt>example</dt>
+							<dd><pre><code><span style="color: #AF00DB">import</span><span style="color: #000000"> </span><span style="color: #001080">Emittery</span><span style="color: #000000"> = </span><span style="color: #AF00DB">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;emittery&#039;</span><span style="color: #000000">);</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">emitter</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">Emittery</span><span style="color: #000000">();</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">off</span><span style="color: #000000"> = </span><span style="color: #001080">emitter</span><span style="color: #000000">.</span><span style="color: #795E26">on</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;🦄&#039;</span><span style="color: #000000">, </span><span style="color: #001080">data</span><span style="color: #000000"> </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #008000">// Handle data</span>
+<span style="color: #000000">});</span>
+
+<span style="color: #001080">emitter</span><span style="color: #000000">.</span><span style="color: #795E26">on</span><span style="color: #000000">(</span><span style="color: #001080">Emittery</span><span style="color: #000000">.</span><span style="color: #001080">listenerRemoved</span><span style="color: #000000">, ({</span><span style="color: #001080">listener</span><span style="color: #000000">, </span><span style="color: #001080">eventName</span><span style="color: #000000">}) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #001080">listener</span><span style="color: #000000">);</span>
+<span style="color: #008000">//=&gt; data =&gt; {}</span>
+
+<span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #001080">eventName</span><span style="color: #000000">);</span>
+<span style="color: #008000">//=&gt; &#039;🦄&#039;</span>
+<span style="color: #000000">});</span>
+
+<span style="color: #795E26">off</span><span style="color: #000000">();</span>
+</code></pre>
+							</dd>
+						</dl>
+					</div>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
@@ -246,7 +407,25 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html">UtxoRepository</a>.<a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html#allUtxos">allUtxos</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/80bd495/packages/wallet/src/InMemoryUtxoRepository.ts#L74">packages/wallet/src/InMemoryUtxoRepository.ts:74</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d110f8d/packages/wallet/src/InMemoryUtxoRepository.ts#L109">packages/wallet/src/InMemoryUtxoRepository.ts:109</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Utxo</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class">
+					<a name="availableUtxos" class="tsd-anchor"></a>
+					<h3>available<wbr>Utxos</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> availableUtxos<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Utxo</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html">UtxoRepository</a>.<a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html#availableUtxos">availableUtxos</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d110f8d/packages/wallet/src/InMemoryUtxoRepository.ts#L113">packages/wallet/src/InMemoryUtxoRepository.ts:113</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Utxo</span></h4>
@@ -264,7 +443,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html">UtxoRepository</a>.<a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html#delegation">delegation</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/80bd495/packages/wallet/src/InMemoryUtxoRepository.ts#L82">packages/wallet/src/InMemoryUtxoRepository.ts:82</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d110f8d/packages/wallet/src/InMemoryUtxoRepository.ts#L121">packages/wallet/src/InMemoryUtxoRepository.ts:121</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h4>
@@ -282,7 +461,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html">UtxoRepository</a>.<a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html#rewards">rewards</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/80bd495/packages/wallet/src/InMemoryUtxoRepository.ts#L78">packages/wallet/src/InMemoryUtxoRepository.ts:78</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d110f8d/packages/wallet/src/InMemoryUtxoRepository.ts#L117">packages/wallet/src/InMemoryUtxoRepository.ts:117</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span></h4>
@@ -292,6 +471,757 @@
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private">
+					<a name="_onTransaction" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> #on<wbr>Transaction</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private">
+						<li class="tsd-signature tsd-kind-icon">#on<wbr>Transaction<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><a href="../interfaces/_cardano_sdk_wallet.OnTransactionArgs.html" class="tsd-signature-type" data-tsd-kind="Interface">OnTransactionArgs</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d110f8d/packages/wallet/src/InMemoryUtxoRepository.ts#L125">packages/wallet/src/InMemoryUtxoRepository.ts:125</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>__namedParameters: <a href="../interfaces/_cardano_sdk_wallet.OnTransactionArgs.html" class="tsd-signature-type" data-tsd-kind="Interface">OnTransactionArgs</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="anyEvent" class="tsd-anchor"></a>
+					<h3>any<wbr>Event</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">any<wbr>Event<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">AsyncIterableIterator</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">&quot;transaction-untracked&quot;</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">Transaction</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html">UtxoRepository</a>.<a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html#anyEvent">anyEvent</a></p>
+								<p>Inherited from Emittery.anyEvent</p>
+								<ul>
+									<li>Defined in packages/wallet/node_modules/emittery/index.d.ts:532</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Get an async iterator which buffers a tuple of an event name and data each time an event is emitted.</p>
+								</div>
+								<p>Call <code>return()</code> on the iterator to remove the subscription.</p>
+								<p>In the same way as for <code>events</code>, you can subscribe by using the <code>for await</code> statement.</p>
+								<dl class="tsd-comment-tags">
+									<dt>example</dt>
+									<dd><pre><code><span style="color: #AF00DB">import</span><span style="color: #000000"> </span><span style="color: #001080">Emittery</span><span style="color: #000000"> = </span><span style="color: #AF00DB">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;emittery&#039;</span><span style="color: #000000">);</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">emitter</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">Emittery</span><span style="color: #000000">();</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">iterator</span><span style="color: #000000"> = </span><span style="color: #001080">emitter</span><span style="color: #000000">.</span><span style="color: #795E26">anyEvent</span><span style="color: #000000">();</span>
+
+<span style="color: #001080">emitter</span><span style="color: #000000">.</span><span style="color: #795E26">emit</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;🦄&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;🌈1&#039;</span><span style="color: #000000">); </span><span style="color: #008000">// Buffered</span>
+<span style="color: #001080">emitter</span><span style="color: #000000">.</span><span style="color: #795E26">emit</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;🌟&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;🌈2&#039;</span><span style="color: #000000">); </span><span style="color: #008000">// Buffered</span>
+
+<span style="color: #001080">iterator</span><span style="color: #000000">.</span><span style="color: #795E26">next</span><span style="color: #000000">()</span>
+<span style="color: #000000">.</span><span style="color: #795E26">then</span><span style="color: #000000">(({</span><span style="color: #001080">value</span><span style="color: #000000">, </span><span style="color: #001080">done</span><span style="color: #000000">}) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #008000">// done is false</span>
+<span style="color: #008000">// value is [&#039;🦄&#039;, &#039;🌈1&#039;]</span>
+<span style="color: #AF00DB">return</span><span style="color: #000000"> </span><span style="color: #001080">iterator</span><span style="color: #000000">.</span><span style="color: #795E26">next</span><span style="color: #000000">();</span>
+<span style="color: #000000">})</span>
+<span style="color: #000000">.</span><span style="color: #795E26">then</span><span style="color: #000000">(({</span><span style="color: #001080">value</span><span style="color: #000000">, </span><span style="color: #001080">done</span><span style="color: #000000">}) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #008000">// done is false</span>
+<span style="color: #008000">// value is [&#039;🌟&#039;, &#039;🌈2&#039;]</span>
+<span style="color: #008000">// revoke subscription</span>
+<span style="color: #AF00DB">return</span><span style="color: #000000"> </span><span style="color: #001080">iterator</span><span style="color: #000000">.</span><span style="color: #795E26">return</span><span style="color: #000000">();</span>
+<span style="color: #000000">})</span>
+<span style="color: #000000">.</span><span style="color: #795E26">then</span><span style="color: #000000">(({</span><span style="color: #001080">done</span><span style="color: #000000">}) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #008000">// done is true</span>
+<span style="color: #000000">});</span>
+</code></pre>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">AsyncIterableIterator</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">&quot;transaction-untracked&quot;</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">Transaction</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="bindMethods" class="tsd-anchor"></a>
+					<h3>bind<wbr>Methods</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">bind<wbr>Methods<span class="tsd-signature-symbol">(</span>target<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">&gt;</span>, methodNames<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html">UtxoRepository</a>.<a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html#bindMethods">bindMethods</a></p>
+								<p>Inherited from Emittery.bindMethods</p>
+								<ul>
+									<li>Defined in packages/wallet/node_modules/emittery/index.d.ts:572</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Bind the given <code>methodNames</code>, or all <code>Emittery</code> methods if <code>methodNames</code> is not defined, into the <code>target</code> object.</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>example</dt>
+									<dd><pre><code><span style="color: #AF00DB">import</span><span style="color: #000000"> </span><span style="color: #001080">Emittery</span><span style="color: #000000"> = </span><span style="color: #AF00DB">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;emittery&#039;</span><span style="color: #000000">);</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">object</span><span style="color: #000000"> = {};</span>
+
+<span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">Emittery</span><span style="color: #000000">().</span><span style="color: #795E26">bindMethods</span><span style="color: #000000">(</span><span style="color: #001080">object</span><span style="color: #000000">);</span>
+
+<span style="color: #001080">object</span><span style="color: #000000">.</span><span style="color: #795E26">emit</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;event&#039;</span><span style="color: #000000">);</span>
+</code></pre>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>target: <span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">&gt;</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> methodNames: <span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-external">
+					<a name="clearListeners" class="tsd-anchor"></a>
+					<h3>clear<wbr>Listeners</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">clear<wbr>Listeners&lt;Name&gt;<span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Name</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Name</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html">UtxoRepository</a>.<a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html#clearListeners">clearListeners</a></p>
+								<p>Inherited from Emittery.clearListeners</p>
+								<ul>
+									<li>Defined in packages/wallet/node_modules/emittery/index.d.ts:551</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Clear all event listeners on the instance.</p>
+								</div>
+								<p>If <code>eventName</code> is given, only the listeners for that event are cleared.</p>
+							</div>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>Name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">&quot;transaction-untracked&quot;</span></h4>
+								</li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> eventName: <span class="tsd-signature-type">Name</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Name</span><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-external">
+					<a name="emit" class="tsd-anchor"></a>
+					<h3>emit</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">emit&lt;Name&gt;<span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Name</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">emit&lt;Name&gt;<span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Name</span>, eventData<span class="tsd-signature-symbol">: </span><a href="../modules/_cardano_sdk_wallet.html#UtxoRepositoryEvents" class="tsd-signature-type" data-tsd-kind="Type alias">UtxoRepositoryEvents</a><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">Name</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html">UtxoRepository</a>.<a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html#emit">emit</a></p>
+								<p>Inherited from Emittery.emit</p>
+								<ul>
+									<li>Defined in packages/wallet/node_modules/emittery/index.d.ts:467</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Trigger an event asynchronously, optionally with some data. Listeners are called in the order they were added, but executed concurrently.</p>
+								</div>
+							</div>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>Name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">never</span></h4>
+								</li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>eventName: <span class="tsd-signature-type">Name</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>A promise that resolves when all the event listeners are done. <em>Done</em> meaning executed if synchronous or resolved when an async/promise-returning function. You usually wouldn&#39;t want to wait for this, but you could for example catch possible errors. If any of the listeners throw/reject, the returned promise will be rejected with the error, but the other listeners will not be affected.</p>
+						</li>
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html">UtxoRepository</a>.<a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html#emit">emit</a></p>
+								<p>Inherited from Emittery.emit</p>
+								<ul>
+									<li>Defined in packages/wallet/node_modules/emittery/index.d.ts:468</li>
+								</ul>
+							</aside>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>Name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">&quot;transaction-untracked&quot;</span></h4>
+								</li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>eventName: <span class="tsd-signature-type">Name</span></h5>
+								</li>
+								<li>
+									<h5>eventData: <a href="../modules/_cardano_sdk_wallet.html#UtxoRepositoryEvents" class="tsd-signature-type" data-tsd-kind="Type alias">UtxoRepositoryEvents</a><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">Name</span><span class="tsd-signature-symbol">]</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-external">
+					<a name="emitSerial" class="tsd-anchor"></a>
+					<h3>emit<wbr>Serial</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">emit<wbr>Serial&lt;Name&gt;<span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Name</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">emit<wbr>Serial&lt;Name&gt;<span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Name</span>, eventData<span class="tsd-signature-symbol">: </span><a href="../modules/_cardano_sdk_wallet.html#UtxoRepositoryEvents" class="tsd-signature-type" data-tsd-kind="Type alias">UtxoRepositoryEvents</a><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">Name</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html">UtxoRepository</a>.<a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html#emitSerial">emitSerial</a></p>
+								<p>Inherited from Emittery.emitSerial</p>
+								<ul>
+									<li>Defined in packages/wallet/node_modules/emittery/index.d.ts:480</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Same as <code>emit()</code>, but it waits for each listener to resolve before triggering the next one. This can be useful if your events depend on each other. Although ideally they should not. Prefer <code>emit()</code> whenever possible.</p>
+								</div>
+								<p>If any of the listeners throw/reject, the returned promise will be rejected with the error and the remaining listeners will <em>not</em> be called.</p>
+							</div>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>Name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">never</span></h4>
+								</li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>eventName: <span class="tsd-signature-type">Name</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>A promise that resolves when all the event listeners are done.</p>
+						</li>
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html">UtxoRepository</a>.<a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html#emitSerial">emitSerial</a></p>
+								<p>Inherited from Emittery.emitSerial</p>
+								<ul>
+									<li>Defined in packages/wallet/node_modules/emittery/index.d.ts:481</li>
+								</ul>
+							</aside>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>Name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">&quot;transaction-untracked&quot;</span></h4>
+								</li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>eventName: <span class="tsd-signature-type">Name</span></h5>
+								</li>
+								<li>
+									<h5>eventData: <a href="../modules/_cardano_sdk_wallet.html#UtxoRepositoryEvents" class="tsd-signature-type" data-tsd-kind="Type alias">UtxoRepositoryEvents</a><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">Name</span><span class="tsd-signature-symbol">]</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-external">
+					<a name="events" class="tsd-anchor"></a>
+					<h3>events</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">events&lt;Name&gt;<span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Name</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Name</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">AsyncIterableIterator</span><span class="tsd-signature-symbol">&lt;</span><a href="../modules/_cardano_sdk_wallet.html#UtxoRepositoryEvents" class="tsd-signature-type" data-tsd-kind="Type alias">UtxoRepositoryEvents</a><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">Name</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html">UtxoRepository</a>.<a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html#events">events</a></p>
+								<p>Inherited from Emittery.events</p>
+								<ul>
+									<li>Defined in packages/wallet/node_modules/emittery/index.d.ts:403</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Get an async iterator which buffers data each time an event is emitted.</p>
+								</div>
+								<p>Call <code>return()</code> on the iterator to remove the subscription.</p>
+								<dl class="tsd-comment-tags">
+									<dt>example</dt>
+									<dd><pre><code><span style="color: #AF00DB">import</span><span style="color: #000000"> </span><span style="color: #001080">Emittery</span><span style="color: #000000"> = </span><span style="color: #AF00DB">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;emittery&#039;</span><span style="color: #000000">);</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">emitter</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">Emittery</span><span style="color: #000000">();</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">iterator</span><span style="color: #000000"> = </span><span style="color: #001080">emitter</span><span style="color: #000000">.</span><span style="color: #795E26">events</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;🦄&#039;</span><span style="color: #000000">);</span>
+
+<span style="color: #001080">emitter</span><span style="color: #000000">.</span><span style="color: #795E26">emit</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;🦄&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;🌈1&#039;</span><span style="color: #000000">); </span><span style="color: #008000">// Buffered</span>
+<span style="color: #001080">emitter</span><span style="color: #000000">.</span><span style="color: #795E26">emit</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;🦄&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;🌈2&#039;</span><span style="color: #000000">); </span><span style="color: #008000">// Buffered</span>
+
+<span style="color: #001080">iterator</span>
+<span style="color: #000000">.</span><span style="color: #795E26">next</span><span style="color: #000000">()</span>
+<span style="color: #000000">.</span><span style="color: #795E26">then</span><span style="color: #000000">(({</span><span style="color: #001080">value</span><span style="color: #000000">, </span><span style="color: #001080">done</span><span style="color: #000000">}) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #008000">// done === false</span>
+<span style="color: #008000">// value === &#039;🌈1&#039;</span>
+<span style="color: #AF00DB">return</span><span style="color: #000000"> </span><span style="color: #001080">iterator</span><span style="color: #000000">.</span><span style="color: #795E26">next</span><span style="color: #000000">();</span>
+<span style="color: #000000">})</span>
+<span style="color: #000000">.</span><span style="color: #795E26">then</span><span style="color: #000000">(({</span><span style="color: #001080">value</span><span style="color: #000000">, </span><span style="color: #001080">done</span><span style="color: #000000">}) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #008000">// done === false</span>
+<span style="color: #008000">// value === &#039;🌈2&#039;</span>
+<span style="color: #008000">// Revoke subscription</span>
+<span style="color: #AF00DB">return</span><span style="color: #000000"> </span><span style="color: #001080">iterator</span><span style="color: #000000">.</span><span style="color: #795E26">return</span><span style="color: #000000">();</span>
+<span style="color: #000000">})</span>
+<span style="color: #000000">.</span><span style="color: #795E26">then</span><span style="color: #000000">(({</span><span style="color: #001080">done</span><span style="color: #000000">}) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #008000">// done === true</span>
+<span style="color: #000000">});</span>
+</code></pre>
+										<p>In practice you would usually consume the events using the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for-await...of">for await</a> statement. In that case, to revoke the subscription simply break the loop.</p>
+									</dd>
+									<dt>example</dt>
+									<dd><pre><code><span style="color: #AF00DB">import</span><span style="color: #000000"> </span><span style="color: #001080">Emittery</span><span style="color: #000000"> = </span><span style="color: #AF00DB">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;emittery&#039;</span><span style="color: #000000">);</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">emitter</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">Emittery</span><span style="color: #000000">();</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">iterator</span><span style="color: #000000"> = </span><span style="color: #001080">emitter</span><span style="color: #000000">.</span><span style="color: #795E26">events</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;🦄&#039;</span><span style="color: #000000">);</span>
+
+<span style="color: #001080">emitter</span><span style="color: #000000">.</span><span style="color: #795E26">emit</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;🦄&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;🌈1&#039;</span><span style="color: #000000">); </span><span style="color: #008000">// Buffered</span>
+<span style="color: #001080">emitter</span><span style="color: #000000">.</span><span style="color: #795E26">emit</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;🦄&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;🌈2&#039;</span><span style="color: #000000">); </span><span style="color: #008000">// Buffered</span>
+
+<span style="color: #008000">// In an async context.</span>
+<span style="color: #AF00DB">for</span><span style="color: #000000"> </span><span style="color: #AF00DB">await</span><span style="color: #000000"> (</span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">data</span><span style="color: #000000"> </span><span style="color: #0000FF">of</span><span style="color: #000000"> </span><span style="color: #001080">iterator</span><span style="color: #000000">) {</span>
+<span style="color: #AF00DB">if</span><span style="color: #000000"> (</span><span style="color: #001080">data</span><span style="color: #000000"> === </span><span style="color: #A31515">&#039;🌈2&#039;</span><span style="color: #000000">) {</span>
+<span style="color: #AF00DB">break</span><span style="color: #000000">; </span><span style="color: #008000">// Revoke the subscription when we see the value `🌈2`.</span>
+<span style="color: #000000">}</span>
+<span style="color: #000000">}</span>
+</code></pre>
+										<p>It accepts multiple event names.</p>
+									</dd>
+									<dt>example</dt>
+									<dd><pre><code><span style="color: #AF00DB">import</span><span style="color: #000000"> </span><span style="color: #001080">Emittery</span><span style="color: #000000"> = </span><span style="color: #AF00DB">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;emittery&#039;</span><span style="color: #000000">);</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">emitter</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">Emittery</span><span style="color: #000000">();</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">iterator</span><span style="color: #000000"> = </span><span style="color: #001080">emitter</span><span style="color: #000000">.</span><span style="color: #795E26">events</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;🦄&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;🦊&#039;</span><span style="color: #000000">]);</span>
+
+<span style="color: #001080">emitter</span><span style="color: #000000">.</span><span style="color: #795E26">emit</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;🦄&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;🌈1&#039;</span><span style="color: #000000">); </span><span style="color: #008000">// Buffered</span>
+<span style="color: #001080">emitter</span><span style="color: #000000">.</span><span style="color: #795E26">emit</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;🦊&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;🌈2&#039;</span><span style="color: #000000">); </span><span style="color: #008000">// Buffered</span>
+
+<span style="color: #001080">iterator</span>
+<span style="color: #000000">.</span><span style="color: #795E26">next</span><span style="color: #000000">()</span>
+<span style="color: #000000">.</span><span style="color: #795E26">then</span><span style="color: #000000">(({</span><span style="color: #001080">value</span><span style="color: #000000">, </span><span style="color: #001080">done</span><span style="color: #000000">}) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #008000">// done === false</span>
+<span style="color: #008000">// value === &#039;🌈1&#039;</span>
+<span style="color: #AF00DB">return</span><span style="color: #000000"> </span><span style="color: #001080">iterator</span><span style="color: #000000">.</span><span style="color: #795E26">next</span><span style="color: #000000">();</span>
+<span style="color: #000000">})</span>
+<span style="color: #000000">.</span><span style="color: #795E26">then</span><span style="color: #000000">(({</span><span style="color: #001080">value</span><span style="color: #000000">, </span><span style="color: #001080">done</span><span style="color: #000000">}) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #008000">// done === false</span>
+<span style="color: #008000">// value === &#039;🌈2&#039;</span>
+<span style="color: #008000">// Revoke subscription</span>
+<span style="color: #AF00DB">return</span><span style="color: #000000"> </span><span style="color: #001080">iterator</span><span style="color: #000000">.</span><span style="color: #795E26">return</span><span style="color: #000000">();</span>
+<span style="color: #000000">})</span>
+<span style="color: #000000">.</span><span style="color: #795E26">then</span><span style="color: #000000">(({</span><span style="color: #001080">done</span><span style="color: #000000">}) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #008000">// done === true</span>
+<span style="color: #000000">});</span>
+</code></pre>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>Name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">&quot;transaction-untracked&quot;</span></h4>
+								</li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>eventName: <span class="tsd-signature-type">Name</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Name</span><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">AsyncIterableIterator</span><span class="tsd-signature-symbol">&lt;</span><a href="../modules/_cardano_sdk_wallet.html#UtxoRepositoryEvents" class="tsd-signature-type" data-tsd-kind="Type alias">UtxoRepositoryEvents</a><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">Name</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-external">
+					<a name="listenerCount" class="tsd-anchor"></a>
+					<h3>listener<wbr>Count</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">listener<wbr>Count&lt;Name&gt;<span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Name</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Name</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html">UtxoRepository</a>.<a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html#listenerCount">listenerCount</a></p>
+								<p>Inherited from Emittery.listenerCount</p>
+								<ul>
+									<li>Defined in packages/wallet/node_modules/emittery/index.d.ts:556</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>The number of listeners for the <code>eventName</code> or all events if not specified.</p>
+								</div>
+							</div>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>Name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">&quot;transaction-untracked&quot;</span></h4>
+								</li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> eventName: <span class="tsd-signature-type">Name</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Name</span><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-external">
+					<a name="off" class="tsd-anchor"></a>
+					<h3>off</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">off&lt;Name&gt;<span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Name</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Name</span><span class="tsd-signature-symbol">[]</span>, listener<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>eventData<span class="tsd-signature-symbol">: </span><a href="../modules/_cardano_sdk_wallet.html#UtxoRepositoryEvents" class="tsd-signature-type" data-tsd-kind="Type alias">UtxoRepositoryEvents</a><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">OmnipresentEventData</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">Name</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html">UtxoRepository</a>.<a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html#off">off</a></p>
+								<p>Inherited from Emittery.off</p>
+								<ul>
+									<li>Defined in packages/wallet/node_modules/emittery/index.d.ts:430</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Remove one or more event subscriptions.</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>example</dt>
+									<dd><pre><code><span style="color: #AF00DB">import</span><span style="color: #000000"> </span><span style="color: #001080">Emittery</span><span style="color: #000000"> = </span><span style="color: #AF00DB">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;emittery&#039;</span><span style="color: #000000">);</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">emitter</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">Emittery</span><span style="color: #000000">();</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #795E26">listener</span><span style="color: #000000"> = </span><span style="color: #001080">data</span><span style="color: #000000"> </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #001080">data</span><span style="color: #000000">);</span>
+<span style="color: #000000">(</span><span style="color: #0000FF">async</span><span style="color: #000000"> () </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #001080">emitter</span><span style="color: #000000">.</span><span style="color: #795E26">on</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;🦄&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;🐶&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;🦊&#039;</span><span style="color: #000000">], </span><span style="color: #001080">listener</span><span style="color: #000000">);</span>
+<span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #001080">emitter</span><span style="color: #000000">.</span><span style="color: #795E26">emit</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;🦄&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;a&#039;</span><span style="color: #000000">);</span>
+<span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #001080">emitter</span><span style="color: #000000">.</span><span style="color: #795E26">emit</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;🐶&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;b&#039;</span><span style="color: #000000">);</span>
+<span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #001080">emitter</span><span style="color: #000000">.</span><span style="color: #795E26">emit</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;🦊&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;c&#039;</span><span style="color: #000000">);</span>
+<span style="color: #001080">emitter</span><span style="color: #000000">.</span><span style="color: #795E26">off</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;🦄&#039;</span><span style="color: #000000">, </span><span style="color: #001080">listener</span><span style="color: #000000">);</span>
+<span style="color: #001080">emitter</span><span style="color: #000000">.</span><span style="color: #795E26">off</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;🐶&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;🦊&#039;</span><span style="color: #000000">], </span><span style="color: #001080">listener</span><span style="color: #000000">);</span>
+<span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #001080">emitter</span><span style="color: #000000">.</span><span style="color: #795E26">emit</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;🦄&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;a&#039;</span><span style="color: #000000">); </span><span style="color: #008000">// nothing happens</span>
+<span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #001080">emitter</span><span style="color: #000000">.</span><span style="color: #795E26">emit</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;🐶&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;b&#039;</span><span style="color: #000000">); </span><span style="color: #008000">// nothing happens</span>
+<span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #001080">emitter</span><span style="color: #000000">.</span><span style="color: #795E26">emit</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;🦊&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;c&#039;</span><span style="color: #000000">); </span><span style="color: #008000">// nothing happens</span>
+<span style="color: #000000">})();</span>
+</code></pre>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>Name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">&quot;transaction-untracked&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">keyof </span><span class="tsd-signature-type">OmnipresentEventData</span></h4>
+								</li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>eventName: <span class="tsd-signature-type">Name</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Name</span><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+								<li>
+									<h5>listener: <span class="tsd-signature-symbol">(</span>eventData<span class="tsd-signature-symbol">: </span><a href="../modules/_cardano_sdk_wallet.html#UtxoRepositoryEvents" class="tsd-signature-type" data-tsd-kind="Type alias">UtxoRepositoryEvents</a><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">OmnipresentEventData</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">Name</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h5>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter-signature">
+											<ul class="tsd-signatures tsd-kind-type-literal tsd-is-external">
+												<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>eventData<span class="tsd-signature-symbol">: </span><a href="../modules/_cardano_sdk_wallet.html#UtxoRepositoryEvents" class="tsd-signature-type" data-tsd-kind="Type alias">UtxoRepositoryEvents</a><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">OmnipresentEventData</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">Name</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+											</ul>
+											<ul class="tsd-descriptions">
+												<li class="tsd-description">
+													<h4 class="tsd-parameters-title">Parameters</h4>
+													<ul class="tsd-parameters">
+														<li>
+															<h5>eventData: <a href="../modules/_cardano_sdk_wallet.html#UtxoRepositoryEvents" class="tsd-signature-type" data-tsd-kind="Type alias">UtxoRepositoryEvents</a><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">OmnipresentEventData</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">Name</span><span class="tsd-signature-symbol">]</span></h5>
+														</li>
+													</ul>
+													<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+												</li>
+											</ul>
+										</li>
+									</ul>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="offAny" class="tsd-anchor"></a>
+					<h3>off<wbr>Any</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">off<wbr>Any<span class="tsd-signature-symbol">(</span>listener<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">&quot;transaction-untracked&quot;</span>, eventData<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Transaction</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html">UtxoRepository</a>.<a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html#offAny">offAny</a></p>
+								<p>Inherited from Emittery.offAny</p>
+								<ul>
+									<li>Defined in packages/wallet/node_modules/emittery/index.d.ts:539</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Remove an <code>onAny</code> subscription.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>listener: <span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">&quot;transaction-untracked&quot;</span>, eventData<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Transaction</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h5>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter-signature">
+											<ul class="tsd-signatures tsd-kind-type-literal tsd-is-external">
+												<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">&quot;transaction-untracked&quot;</span>, eventData<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Transaction</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+											</ul>
+											<ul class="tsd-descriptions">
+												<li class="tsd-description">
+													<h4 class="tsd-parameters-title">Parameters</h4>
+													<ul class="tsd-parameters">
+														<li>
+															<h5>eventName: <span class="tsd-signature-type">&quot;transaction-untracked&quot;</span></h5>
+														</li>
+														<li>
+															<h5>eventData: <span class="tsd-signature-type">Transaction</span></h5>
+														</li>
+													</ul>
+													<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+												</li>
+											</ul>
+										</li>
+									</ul>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-external">
+					<a name="on" class="tsd-anchor"></a>
+					<h3>on</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">on&lt;Name&gt;<span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Name</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Name</span><span class="tsd-signature-symbol">[]</span>, listener<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>eventData<span class="tsd-signature-symbol">: </span><a href="../modules/_cardano_sdk_wallet.html#UtxoRepositoryEvents" class="tsd-signature-type" data-tsd-kind="Type alias">UtxoRepositoryEvents</a><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">OmnipresentEventData</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">Name</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">UnsubscribeFn</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html">UtxoRepository</a>.<a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html#on">on</a></p>
+								<p>Inherited from Emittery.on</p>
+								<ul>
+									<li>Defined in packages/wallet/node_modules/emittery/index.d.ts:315</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Subscribe to one or more events.</p>
+								</div>
+								<p>Using the same listener multiple times for the same event will result in only one method call per emitted event.</p>
+								<dl class="tsd-comment-tags">
+									<dt>example</dt>
+									<dd><pre><code><span style="color: #AF00DB">import</span><span style="color: #000000"> </span><span style="color: #001080">Emittery</span><span style="color: #000000"> = </span><span style="color: #AF00DB">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;emittery&#039;</span><span style="color: #000000">);</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">emitter</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">Emittery</span><span style="color: #000000">();</span>
+
+<span style="color: #001080">emitter</span><span style="color: #000000">.</span><span style="color: #795E26">on</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;🦄&#039;</span><span style="color: #000000">, </span><span style="color: #001080">data</span><span style="color: #000000"> </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #001080">data</span><span style="color: #000000">);</span>
+<span style="color: #000000">});</span>
+
+<span style="color: #001080">emitter</span><span style="color: #000000">.</span><span style="color: #795E26">on</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;🦄&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;🐶&#039;</span><span style="color: #000000">], </span><span style="color: #001080">data</span><span style="color: #000000"> </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #001080">data</span><span style="color: #000000">);</span>
+<span style="color: #000000">});</span>
+
+<span style="color: #001080">emitter</span><span style="color: #000000">.</span><span style="color: #795E26">emit</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;🦄&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;🌈&#039;</span><span style="color: #000000">); </span><span style="color: #008000">// log =&gt; &#039;🌈&#039; x2</span>
+<span style="color: #001080">emitter</span><span style="color: #000000">.</span><span style="color: #795E26">emit</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;🐶&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;🍖&#039;</span><span style="color: #000000">); </span><span style="color: #008000">// log =&gt; &#039;🍖&#039;</span>
+</code></pre>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>Name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">&quot;transaction-untracked&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">keyof </span><span class="tsd-signature-type">OmnipresentEventData</span></h4>
+								</li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>eventName: <span class="tsd-signature-type">Name</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Name</span><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+								<li>
+									<h5>listener: <span class="tsd-signature-symbol">(</span>eventData<span class="tsd-signature-symbol">: </span><a href="../modules/_cardano_sdk_wallet.html#UtxoRepositoryEvents" class="tsd-signature-type" data-tsd-kind="Type alias">UtxoRepositoryEvents</a><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">OmnipresentEventData</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">Name</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h5>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter-signature">
+											<ul class="tsd-signatures tsd-kind-type-literal tsd-is-external">
+												<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>eventData<span class="tsd-signature-symbol">: </span><a href="../modules/_cardano_sdk_wallet.html#UtxoRepositoryEvents" class="tsd-signature-type" data-tsd-kind="Type alias">UtxoRepositoryEvents</a><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">OmnipresentEventData</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">Name</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+											</ul>
+											<ul class="tsd-descriptions">
+												<li class="tsd-description">
+													<h4 class="tsd-parameters-title">Parameters</h4>
+													<ul class="tsd-parameters">
+														<li>
+															<h5>eventData: <a href="../modules/_cardano_sdk_wallet.html#UtxoRepositoryEvents" class="tsd-signature-type" data-tsd-kind="Type alias">UtxoRepositoryEvents</a><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">OmnipresentEventData</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">Name</span><span class="tsd-signature-symbol">]</span></h5>
+														</li>
+													</ul>
+													<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+												</li>
+											</ul>
+										</li>
+									</ul>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">UnsubscribeFn</span></h4>
+							<p>An unsubscribe method.</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="onAny" class="tsd-anchor"></a>
+					<h3>on<wbr>Any</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">on<wbr>Any<span class="tsd-signature-symbol">(</span>listener<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">&quot;transaction-untracked&quot;</span>, eventData<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Transaction</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">UnsubscribeFn</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html">UtxoRepository</a>.<a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html#onAny">onAny</a></p>
+								<p>Inherited from Emittery.onAny</p>
+								<ul>
+									<li>Defined in packages/wallet/node_modules/emittery/index.d.ts:491</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Subscribe to be notified about any event.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>listener: <span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">&quot;transaction-untracked&quot;</span>, eventData<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Transaction</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h5>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter-signature">
+											<ul class="tsd-signatures tsd-kind-type-literal tsd-is-external">
+												<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">&quot;transaction-untracked&quot;</span>, eventData<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Transaction</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+											</ul>
+											<ul class="tsd-descriptions">
+												<li class="tsd-description">
+													<h4 class="tsd-parameters-title">Parameters</h4>
+													<ul class="tsd-parameters">
+														<li>
+															<h5>eventName: <span class="tsd-signature-type">&quot;transaction-untracked&quot;</span></h5>
+														</li>
+														<li>
+															<h5>eventData: <span class="tsd-signature-type">Transaction</span></h5>
+														</li>
+													</ul>
+													<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+												</li>
+											</ul>
+										</li>
+									</ul>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">UnsubscribeFn</span></h4>
+							<p>A method to unsubscribe.</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-external">
+					<a name="once" class="tsd-anchor"></a>
+					<h3>once</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">once&lt;Name&gt;<span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Name</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Name</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../modules/_cardano_sdk_wallet.html#UtxoRepositoryEvents" class="tsd-signature-type" data-tsd-kind="Type alias">UtxoRepositoryEvents</a><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">OmnipresentEventData</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">Name</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html">UtxoRepository</a>.<a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html#once">once</a></p>
+								<p>Inherited from Emittery.once</p>
+								<ul>
+									<li>Defined in packages/wallet/node_modules/emittery/index.d.ts:460</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Subscribe to one or more events only once. It will be unsubscribed after the first
+									event.</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>example</dt>
+									<dd><pre><code><span style="color: #AF00DB">import</span><span style="color: #000000"> </span><span style="color: #001080">Emittery</span><span style="color: #000000"> = </span><span style="color: #AF00DB">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;emittery&#039;</span><span style="color: #000000">);</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">emitter</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">Emittery</span><span style="color: #000000">();</span>
+
+<span style="color: #001080">emitter</span><span style="color: #000000">.</span><span style="color: #795E26">once</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;🦄&#039;</span><span style="color: #000000">).</span><span style="color: #795E26">then</span><span style="color: #000000">(</span><span style="color: #001080">data</span><span style="color: #000000"> </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #001080">data</span><span style="color: #000000">);</span>
+<span style="color: #008000">//=&gt; &#039;🌈&#039;</span>
+<span style="color: #000000">});</span>
+
+<span style="color: #001080">emitter</span><span style="color: #000000">.</span><span style="color: #795E26">once</span><span style="color: #000000">([</span><span style="color: #A31515">&#039;🦄&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;🐶&#039;</span><span style="color: #000000">]).</span><span style="color: #795E26">then</span><span style="color: #000000">(</span><span style="color: #001080">data</span><span style="color: #000000"> </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #001080">data</span><span style="color: #000000">);</span>
+<span style="color: #000000">});</span>
+
+<span style="color: #001080">emitter</span><span style="color: #000000">.</span><span style="color: #795E26">emit</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;🦄&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;🌈&#039;</span><span style="color: #000000">); </span><span style="color: #008000">// Logs `🌈` twice</span>
+<span style="color: #001080">emitter</span><span style="color: #000000">.</span><span style="color: #795E26">emit</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;🐶&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;🍖&#039;</span><span style="color: #000000">); </span><span style="color: #008000">// Nothing happens</span>
+</code></pre>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>Name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">&quot;transaction-untracked&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">keyof </span><span class="tsd-signature-type">OmnipresentEventData</span></h4>
+								</li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>eventName: <span class="tsd-signature-type">Name</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Name</span><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../modules/_cardano_sdk_wallet.html#UtxoRepositoryEvents" class="tsd-signature-type" data-tsd-kind="Type alias">UtxoRepositoryEvents</a><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">OmnipresentEventData</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">Name</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>The event data when <code>eventName</code> is emitted.</p>
+						</li>
+					</ul>
+				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
 					<a name="selectInputs" class="tsd-anchor"></a>
 					<h3>select<wbr>Inputs</h3>
@@ -303,7 +1233,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html">UtxoRepository</a>.<a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html#selectInputs">selectInputs</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/80bd495/packages/wallet/src/InMemoryUtxoRepository.ts#L57">packages/wallet/src/InMemoryUtxoRepository.ts:57</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d110f8d/packages/wallet/src/InMemoryUtxoRepository.ts#L92">packages/wallet/src/InMemoryUtxoRepository.ts:92</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -333,10 +1263,97 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html">UtxoRepository</a>.<a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html#sync">sync</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/80bd495/packages/wallet/src/InMemoryUtxoRepository.ts#L34">packages/wallet/src/InMemoryUtxoRepository.ts:34</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d110f8d/packages/wallet/src/InMemoryUtxoRepository.ts#L63">packages/wallet/src/InMemoryUtxoRepository.ts:63</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external">
+					<a name="mixin" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> mixin</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">mixin<span class="tsd-signature-symbol">(</span>emitteryPropertyName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span>, methodNames<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span>&lt;T&gt;<span class="tsd-signature-symbol">(</span>klass<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">T</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from Emittery.mixin</p>
+								<ul>
+									<li>Defined in packages/wallet/node_modules/emittery/index.d.ts:285</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>In TypeScript, it returns a decorator which mixins <code>Emittery</code> as property <code>emitteryPropertyName</code> and <code>methodNames</code>, or all <code>Emittery</code> methods if <code>methodNames</code> is not defined, into the target class.</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>example</dt>
+									<dd><pre><code><span style="color: #AF00DB">import</span><span style="color: #000000"> </span><span style="color: #001080">Emittery</span><span style="color: #000000"> = </span><span style="color: #AF00DB">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;emittery&#039;</span><span style="color: #000000">);</span>
+
+<span style="color: #000000">@</span><span style="color: #001080">Emittery</span><span style="color: #000000">.</span><span style="color: #795E26">mixin</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;emittery&#039;</span><span style="color: #000000">)</span>
+<span style="color: #0000FF">class</span><span style="color: #000000"> </span><span style="color: #267F99">MyClass</span><span style="color: #000000"> {}</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">instance</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">MyClass</span><span style="color: #000000">();</span>
+
+<span style="color: #001080">instance</span><span style="color: #000000">.</span><span style="color: #795E26">emit</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;event&#039;</span><span style="color: #000000">);</span>
+</code></pre>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>emitteryPropertyName: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> methodNames: <span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns &lt;T&gt;<span class="tsd-signature-symbol">(</span>klass<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">T</span></h4>
+							<ul class="tsd-parameters">
+								<li class="tsd-parameter-signature">
+									<ul class="tsd-signatures tsd-kind-type-literal tsd-has-type-parameter tsd-is-external">
+										<li class="tsd-signature tsd-kind-icon">&lt;T&gt;<span class="tsd-signature-symbol">(</span>klass<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span></li>
+									</ul>
+									<ul class="tsd-descriptions">
+										<li class="tsd-description">
+											<div class="tsd-comment tsd-typography">
+												<div class="lead">
+													<p>In TypeScript, it returns a decorator which mixins <code>Emittery</code> as property <code>emitteryPropertyName</code> and <code>methodNames</code>, or all <code>Emittery</code> methods if <code>methodNames</code> is not defined, into the target class.</p>
+												</div>
+												<dl class="tsd-comment-tags">
+													<dt>example</dt>
+													<dd><pre><code><span style="color: #AF00DB">import</span><span style="color: #000000"> </span><span style="color: #001080">Emittery</span><span style="color: #000000"> = </span><span style="color: #AF00DB">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;emittery&#039;</span><span style="color: #000000">);</span>
+
+<span style="color: #000000">@</span><span style="color: #001080">Emittery</span><span style="color: #000000">.</span><span style="color: #795E26">mixin</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;emittery&#039;</span><span style="color: #000000">)</span>
+<span style="color: #0000FF">class</span><span style="color: #000000"> </span><span style="color: #267F99">MyClass</span><span style="color: #000000"> {}</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">instance</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">MyClass</span><span style="color: #000000">();</span>
+
+<span style="color: #001080">instance</span><span style="color: #000000">.</span><span style="color: #795E26">emit</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;event&#039;</span><span style="color: #000000">);</span>
+</code></pre>
+													</dd>
+												</dl>
+											</div>
+											<h4 class="tsd-type-parameters-title">Type parameters</h4>
+											<ul class="tsd-type-parameters">
+												<li>
+													<h4>T<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">new </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">any</span></h4>
+												</li>
+											</ul>
+											<h4 class="tsd-parameters-title">Parameters</h4>
+											<ul class="tsd-parameters">
+												<li>
+													<h5>klass: <span class="tsd-signature-type">T</span></h5>
+												</li>
+											</ul>
+											<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">T</span></h4>
+										</li>
+									</ul>
+								</li>
+							</ul>
 						</li>
 					</ul>
 				</section>
@@ -373,12 +1390,24 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
+					<li class=" tsd-kind-enum tsd-parent-kind-module">
+						<a href="../enums/_cardano_sdk_wallet.TransactionFailure.html" class="tsd-kind-icon">Transaction<wbr>Failure</a>
+					</li>
+					<li class=" tsd-kind-enum tsd-parent-kind-module">
+						<a href="../enums/_cardano_sdk_wallet.TransactionTrackerEvent.html" class="tsd-kind-icon">Transaction<wbr>Tracker<wbr>Event</a>
+					</li>
+					<li class=" tsd-kind-enum tsd-parent-kind-module">
+						<a href="../enums/_cardano_sdk_wallet.UtxoRepositoryEvent.html" class="tsd-kind-icon">Utxo<wbr>Repository<wbr>Event</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="_cardano_sdk_wallet.InMemoryTransactionTracker.html" class="tsd-kind-icon">In<wbr>Memory<wbr>Transaction<wbr>Tracker</a>
+					</li>
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-class tsd-parent-kind-module">
 						<a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html" class="tsd-kind-icon">In<wbr>Memory<wbr>Utxo<wbr>Repository</a>
 						<ul>
-							<li class=" tsd-kind-constructor tsd-parent-kind-class">
+							<li class=" tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite">
 								<a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#constructor" class="tsd-kind-icon">constructor</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
@@ -394,6 +1423,9 @@
 								<a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#_keyManager" class="tsd-kind-icon">#key<wbr>Manager</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
+								<a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#_lockedUtxoSet" class="tsd-kind-icon">#locked<wbr>Utxo<wbr>Set</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
 								<a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#_logger" class="tsd-kind-icon">#logger</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
@@ -402,8 +1434,23 @@
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
 								<a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#_utxoSet" class="tsd-kind-icon">#utxo<wbr>Set</a>
 							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#debug" class="tsd-kind-icon">debug</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external">
+								<a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#isDebugEnabled" class="tsd-kind-icon">is<wbr>Debug<wbr>Enabled</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external">
+								<a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#listenerAdded" class="tsd-kind-icon">listener<wbr>Added</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external">
+								<a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#listenerRemoved" class="tsd-kind-icon">listener<wbr>Removed</a>
+							</li>
 							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
 								<a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#allUtxos" class="tsd-kind-icon">all<wbr>Utxos</a>
+							</li>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
+								<a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#availableUtxos" class="tsd-kind-icon">available<wbr>Utxos</a>
 							</li>
 							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
 								<a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#delegation" class="tsd-kind-icon">delegation</a>
@@ -411,16 +1458,70 @@
 							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
 								<a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#rewards" class="tsd-kind-icon">rewards</a>
 							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-private">
+								<a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#_onTransaction" class="tsd-kind-icon">#on<wbr>Transaction</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#anyEvent" class="tsd-kind-icon">any<wbr>Event</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#bindMethods" class="tsd-kind-icon">bind<wbr>Methods</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-external">
+								<a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#clearListeners" class="tsd-kind-icon">clear<wbr>Listeners</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-external">
+								<a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#emit" class="tsd-kind-icon">emit</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-external">
+								<a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#emitSerial" class="tsd-kind-icon">emit<wbr>Serial</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-external">
+								<a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#events" class="tsd-kind-icon">events</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-external">
+								<a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#listenerCount" class="tsd-kind-icon">listener<wbr>Count</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-external">
+								<a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#off" class="tsd-kind-icon">off</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#offAny" class="tsd-kind-icon">off<wbr>Any</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-external">
+								<a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#on" class="tsd-kind-icon">on</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#onAny" class="tsd-kind-icon">on<wbr>Any</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-external">
+								<a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#once" class="tsd-kind-icon">once</a>
+							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#selectInputs" class="tsd-kind-icon">select<wbr>Inputs</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#sync" class="tsd-kind-icon">sync</a>
 							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external">
+								<a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#mixin" class="tsd-kind-icon">mixin</a>
+							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="_cardano_sdk_wallet.TransactionError.html" class="tsd-kind-icon">Transaction<wbr>Error</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="../interfaces/_cardano_sdk_wallet.InMemoryTransactionTrackerProps.html" class="tsd-kind-icon">In<wbr>Memory<wbr>Transaction<wbr>Tracker<wbr>Props</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="../interfaces/_cardano_sdk_wallet.InMemoryUtxoRepositoryProps.html" class="tsd-kind-icon">In<wbr>Memory<wbr>Utxo<wbr>Repository<wbr>Props</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="../interfaces/_cardano_sdk_wallet.OnTransactionArgs.html" class="tsd-kind-icon">On<wbr>Transaction<wbr>Args</a>
+					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
 						<a href="../interfaces/_cardano_sdk_wallet.SingleAddressWallet.html" class="tsd-kind-icon">Single<wbr>Address<wbr>Wallet</a>
 					</li>
@@ -431,7 +1532,22 @@
 						<a href="../interfaces/_cardano_sdk_wallet.SingleAddressWalletProps.html" class="tsd-kind-icon">Single<wbr>Address<wbr>Wallet<wbr>Props</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="../interfaces/_cardano_sdk_wallet.SubmitTxResult.html" class="tsd-kind-icon">Submit<wbr>TxResult</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="../interfaces/_cardano_sdk_wallet.TransactionTracker.html" class="tsd-kind-icon">Transaction<wbr>Tracker</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
 						<a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html" class="tsd-kind-icon">Utxo<wbr>Repository</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+						<a href="../modules/_cardano_sdk_wallet.html#Milliseconds" class="tsd-kind-icon">Milliseconds</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+						<a href="../modules/_cardano_sdk_wallet.html#TransactionTrackerEvents" class="tsd-kind-icon">Transaction<wbr>Tracker<wbr>Events</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+						<a href="../modules/_cardano_sdk_wallet.html#UtxoRepositoryEvents" class="tsd-kind-icon">Utxo<wbr>Repository<wbr>Events</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module">
 						<a href="../modules/_cardano_sdk_wallet.html#createSingleAddressWallet" class="tsd-kind-icon">create<wbr>Single<wbr>Address<wbr>Wallet</a>
@@ -457,13 +1573,14 @@
 				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
 			</ul>
 			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
+			</ul>
+			<ul class="tsd-legend">
 				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
 			</ul>
 		</div>
 	</div>
