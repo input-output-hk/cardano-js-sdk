@@ -30,7 +30,7 @@ const utxoEquals = ([txIn1]: [Schema.TxIn, Schema.TxOut], [txIn2]: [Schema.TxIn,
 
 export class InMemoryUtxoRepository extends Emittery<UtxoRepositoryEvents> implements UtxoRepository {
   #csl: CardanoSerializationLib;
-  #delegationAndRewards: Schema.DelegationsAndRewards;
+  #delegationAndRewards: Ogmios.DelegationsAndRewards;
   #inputSelector: InputSelector;
   #keyManager: KeyManager;
   #logger: Logger;
@@ -84,7 +84,9 @@ export class InMemoryUtxoRepository extends Emittery<UtxoRepositoryEvents> imple
       this.#logger.debug('Delegation stored', result.delegationAndRewards.delegate);
     }
     if (this.#delegationAndRewards.rewards !== result.delegationAndRewards.rewards) {
-      this.#delegationAndRewards.rewards = result.delegationAndRewards.rewards;
+      this.#delegationAndRewards.rewards = result.delegationAndRewards.rewards
+        ? BigInt(result.delegationAndRewards.rewards)
+        : undefined;
       this.#logger.debug('Rewards balance stored', result.delegationAndRewards.rewards);
     }
   }
@@ -114,7 +116,7 @@ export class InMemoryUtxoRepository extends Emittery<UtxoRepositoryEvents> imple
     return this.allUtxos.filter((utxo) => !this.#lockedUtxoSet.has(utxo));
   }
 
-  public get rewards(): Schema.Lovelace | null {
+  public get rewards(): Ogmios.Lovelace | null {
     return this.#delegationAndRewards.rewards ?? null;
   }
 

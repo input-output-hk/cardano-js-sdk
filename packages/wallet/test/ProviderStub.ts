@@ -49,7 +49,7 @@ export const utxo: Schema.Utxo = [
 ];
 
 export const delegate = 'pool185g59xpqzt7gf0ljr8v8f3akl95qnmardf2f8auwr3ffx7atjj5';
-export const rewards = 33_333;
+export const rewards = 33_333n;
 export const delegationAndRewards = { delegate, rewards };
 
 export const queryTransactionsResult = [

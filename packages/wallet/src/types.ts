@@ -1,6 +1,6 @@
 import Schema from '@cardano-ogmios/schema';
 import { ImplicitCoin, SelectionConstraints, SelectionResult } from '@cardano-sdk/cip2';
-import { CSL } from '@cardano-sdk/core';
+import { CSL, Ogmios } from '@cardano-sdk/core';
 import Emittery from 'emittery';
 
 export enum UtxoRepositoryEvent {
@@ -11,7 +11,7 @@ export type UtxoRepositoryEvents = { 'transaction-untracked': CSL.Transaction };
 export interface UtxoRepository extends Emittery<UtxoRepositoryEvents> {
   allUtxos: Schema.Utxo;
   availableUtxos: Schema.Utxo;
-  rewards: Schema.Lovelace | null;
+  rewards: Ogmios.Lovelace | null;
   delegation: Schema.PoolId | null;
   sync: () => Promise<void>;
   selectInputs: (

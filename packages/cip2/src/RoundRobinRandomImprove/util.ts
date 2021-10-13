@@ -4,7 +4,7 @@ import { ImplicitCoin } from '../types';
 import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
 
 export interface WithValue {
-  value: Ogmios.util.OgmiosValue;
+  value: Ogmios.Value;
 }
 
 export interface UtxoWithValue extends WithValue {
@@ -33,14 +33,14 @@ export interface UtxoSelection {
 }
 
 const noImplicitCoin = {
-  deposit: 0,
-  input: 0
+  deposit: 0n,
+  input: 0n
 };
 
 export const preprocessArgs = (
   availableUtxo: Set<CSL.TransactionUnspentOutput>,
   outputs: Set<CSL.TransactionOutput>,
-  implicitCoinAsNumber: ImplicitCoin = noImplicitCoin
+  partialImplicitCoin: ImplicitCoin = noImplicitCoin
 ): RoundRobinRandomImproveArgs => {
   const utxosWithValue = [...availableUtxo].map((utxo) => ({
     utxo,
@@ -54,8 +54,8 @@ export const preprocessArgs = (
     outputsWithValue.flatMap(({ value: { assets } }) => (assets && Object.keys(assets)) || [])
   );
   const implicitCoin: ImplicitCoinBigint = {
-    deposit: BigInt(implicitCoinAsNumber.deposit || 0),
-    input: BigInt(implicitCoinAsNumber.input || 0)
+    deposit: partialImplicitCoin.deposit || 0n,
+    input: partialImplicitCoin.input || 0n
   };
   return { uniqueOutputAssetIDs, utxosWithValue, outputsWithValue, implicitCoin };
 };
@@ -63,19 +63,19 @@ export const preprocessArgs = (
 export const withValuesToValues = (totals: WithValue[]) => totals.map((t) => t.value);
 export const assetQuantitySelector =
   (id: string) =>
-  (quantities: Ogmios.util.OgmiosValue[]): bigint =>
+  (quantities: Ogmios.Value[]): bigint =>
     BigIntMath.sum(quantities.map(({ assets }) => assets?.[id] || 0n));
 export const assetWithValueQuantitySelector =
   (id: string) =>
   (totals: WithValue[]): bigint =>
     assetQuantitySelector(id)(withValuesToValues(totals));
-export const getCoinQuantity = (quantities: Ogmios.util.OgmiosValue[]): bigint =>
+export const getCoinQuantity = (quantities: Ogmios.Value[]): bigint =>
   BigIntMath.sum(quantities.map(({ coins }) => coins));
 export const getWithValuesCoinQuantity = (totals: WithValue[]): bigint => getCoinQuantity(withValuesToValues(totals));
 
 export const assertIsCoinBalanceSufficient = (
-  utxoValues: Ogmios.util.OgmiosValue[],
-  outputValues: Ogmios.util.OgmiosValue[],
+  utxoValues: Ogmios.Value[],
+  outputValues: Ogmios.Value[],
   implicitCoin: ImplicitCoinBigint
 ) => {
   const utxoCoinTotal = getCoinQuantity(utxoValues);
@@ -93,8 +93,8 @@ export const assertIsCoinBalanceSufficient = (
  */
 export const assertIsBalanceSufficient = (
   uniqueOutputAssetIDs: string[],
-  utxoValues: Ogmios.util.OgmiosValue[],
-  outputValues: Ogmios.util.OgmiosValue[],
+  utxoValues: Ogmios.Value[],
+  outputValues: Ogmios.Value[],
   implicitCoin: ImplicitCoinBigint
 ): void => {
   for (const assetId of uniqueOutputAssetIDs) {

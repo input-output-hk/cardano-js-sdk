@@ -67,7 +67,7 @@ describe('integration/withdrawal', () => {
 
     const { body, hash } = await wallet.initializeTx({
       certificates: [certFactory.stakeKeyDeregistration()],
-      withdrawals: [Transaction.withdrawal(csl, keyManager, utxoRepository.rewards || 0)],
+      withdrawals: [Transaction.withdrawal(csl, keyManager, utxoRepository.rewards || 0n)],
       outputs: new Set() // In a real transaction you would probably want to have some outputs
     });
     // Calculated fee is returned by invoking body.fee()

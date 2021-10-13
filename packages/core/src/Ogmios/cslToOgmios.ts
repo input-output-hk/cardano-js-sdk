@@ -1,14 +1,10 @@
 import { TxIn } from '@cardano-ogmios/schema';
 import { Asset } from '..';
 import { CSL } from '../CSL';
-import { OgmiosValue } from './util';
+import { Value } from './types';
 
-/**
- * OgmiosValue is currently incompatible with Ogmios.Value due to 'coins' type (bigint vs number).
- * TODO: Use Ogmios.Value when ogmios updates lovelace type to bigint
- */
-export const value = (cslValue: CSL.Value): OgmiosValue => {
-  const result: OgmiosValue = {
+export const value = (cslValue: CSL.Value): Value => {
+  const result: Value = {
     coins: BigInt(cslValue.coin().to_str())
   };
   const multiasset = cslValue.multiasset();

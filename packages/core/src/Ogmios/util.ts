@@ -1,19 +1,5 @@
-import { Value as _OgmiosValue } from '@cardano-ogmios/schema';
 import { BigIntMath } from '../util/BigIntMath';
-
-/**
- * {[assetId]: amount}
- */
-export type TokenMap = NonNullable<_OgmiosValue['assets']>;
-
-/**
- * Total quantities of Coin and Assets in a Value.
- * TODO: Use Ogmios Value type after it changes lovelaces to bigint;
- */
-export interface OgmiosValue {
-  coins: bigint;
-  assets?: TokenMap;
-}
+import { Value, TokenMap } from './types';
 
 /**
  * Sum asset quantities
@@ -34,7 +20,7 @@ const coalesceTokenMaps = (totals: (TokenMap | undefined)[]): TokenMap | undefin
 /**
  * Sum all quantities
  */
-export const coalesceValueQuantities = (quantities: OgmiosValue[]): OgmiosValue => ({
+export const coalesceValueQuantities = (quantities: Value[]): Value => ({
   coins: BigIntMath.sum(quantities.map(({ coins }) => coins)),
   assets: coalesceTokenMaps(quantities.map(({ assets }) => assets))
 });

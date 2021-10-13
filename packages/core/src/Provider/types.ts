@@ -1,6 +1,6 @@
 import { CSL } from '../CSL';
 import Cardano, { ProtocolParametersAlonzo } from '@cardano-ogmios/schema';
-import { Transaction } from '..';
+import { Ogmios, Transaction } from '..';
 
 export type ProtocolParametersRequiredByWallet = Pick<
   ProtocolParametersAlonzo,
@@ -16,18 +16,15 @@ export type ProtocolParametersRequiredByWallet = Pick<
   | 'protocolVersion'
 >;
 
-// Todo: Use Cardano.Lovelace when type is updated
-type Lovelace = bigint;
-
 export type AssetSupply = {
-  circulating: Lovelace;
-  max: Lovelace;
-  total: Lovelace;
+  circulating: Ogmios.Lovelace;
+  max: Ogmios.Lovelace;
+  total: Ogmios.Lovelace;
 };
 
 export type StakeSummary = {
-  active: Lovelace;
-  live: Lovelace;
+  active: Ogmios.Lovelace;
+  live: Ogmios.Lovelace;
 };
 
 export type StakePoolStats = {

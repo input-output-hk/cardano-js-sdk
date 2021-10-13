@@ -2,7 +2,7 @@ import { CardanoSerializationLib, CSL } from '../CSL';
 import OgmiosSchema from '@cardano-ogmios/schema';
 import { Buffer } from 'buffer';
 import * as Asset from '../Asset';
-import { OgmiosValue } from './util';
+import { Value } from './types';
 
 export const ogmiosToCsl = (csl: CardanoSerializationLib) => ({
   txIn: (ogmios: OgmiosSchema.TxIn): CSL.TransactionInput =>
@@ -14,7 +14,7 @@ export const ogmiosToCsl = (csl: CardanoSerializationLib) => ({
       csl.TransactionUnspentOutput.new(ogmiosToCsl(csl).txIn(item[0]), ogmiosToCsl(csl).txOut(item[1]))
     ),
   // TODO: Keep only OgmiosSchema.Value when ogmios updates lovelace type to bigint
-  value: ({ coins, assets }: OgmiosValue | OgmiosSchema.Value): CSL.Value => {
+  value: ({ coins, assets }: Value | OgmiosSchema.Value): CSL.Value => {
     const value = csl.Value.new(csl.BigNum.from_str(coins.toString()));
     if (!assets) {
       return value;

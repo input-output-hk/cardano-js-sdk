@@ -16,11 +16,11 @@ describe('Transaction.computeImplicitCoin', () => {
       certs.poolRetirement(keyManager.stakeKey.hash().to_bech32('key'), 1000),
       certs.stakeDelegation('pool1qqvukkkfr3ux4qylfkrky23f6trl2l6xjluv36z90ax7gfa8yxt')
     ];
-    const withdrawals = [Transaction.withdrawal(csl, keyManager, 5)];
+    const withdrawals = [Transaction.withdrawal(csl, keyManager, 5n)];
     const txProps = { certificates, withdrawals } as unknown as InitializeTxProps;
 
     const coin = Transaction.computeImplicitCoin(protocolParameters, txProps);
-    expect(coin.deposit).toBe(2 + 2);
-    expect(coin.input).toBe(2 + 3 + 5);
+    expect(coin.deposit).toBe(2n + 2n);
+    expect(coin.input).toBe(2n + 3n + 5n);
   });
 });

@@ -17,7 +17,7 @@ type EstimateTxFeeWithOriginalOutputs = (utxo: CSL.TransactionUnspentOutput[], c
 interface ChangeComputationArgs {
   csl: CardanoSerializationLib;
   utxoSelection: UtxoSelection;
-  outputValues: Ogmios.util.OgmiosValue[];
+  outputValues: Ogmios.Value[];
   uniqueOutputAssetIDs: string[];
   implicitCoin: ImplicitCoinBigint;
   estimateTxFee: EstimateTxFeeWithOriginalOutputs;
@@ -56,7 +56,7 @@ const getLeftoverAssets = (utxoSelected: UtxoWithValue[], uniqueOutputAssetIDs: 
  */
 const redistributeLeftoverAssets = (
   utxoSelected: UtxoWithValue[],
-  requestedAssetChangeBundles: Ogmios.util.OgmiosValue[],
+  requestedAssetChangeBundles: Ogmios.Value[],
   uniqueOutputAssetIDs: string[]
 ) => {
   const leftovers = getLeftoverAssets(utxoSelected, uniqueOutputAssetIDs);
@@ -87,7 +87,7 @@ const redistributeLeftoverAssets = (
 };
 
 const createBundlePerOutput = (
-  outputValues: Ogmios.util.OgmiosValue[],
+  outputValues: Ogmios.Value[],
   coinTotalRequested: bigint,
   coinChangeTotal: bigint,
   assetTotals: Record<string, { selected: bigint; requested: bigint }>
@@ -100,7 +100,7 @@ const createBundlePerOutput = (
     if (!value.assets) {
       return { coins };
     }
-    const assets: Ogmios.util.TokenMap = {};
+    const assets: Ogmios.TokenMap = {};
     for (const assetId of Object.keys(value.assets)) {
       const outputAmount = value.assets[assetId];
       const { selected, requested } = assetTotals[assetId];
@@ -124,11 +124,11 @@ const createBundlePerOutput = (
  */
 const computeRequestedAssetChangeBundles = (
   utxoSelected: UtxoWithValue[],
-  outputValues: Ogmios.util.OgmiosValue[],
+  outputValues: Ogmios.Value[],
   uniqueOutputAssetIDs: string[],
   implicitCoin: ImplicitCoinBigint,
   fee: bigint
-): Ogmios.util.OgmiosValue[] => {
+): Ogmios.Value[] => {
   const assetTotals: Record<string, { selected: bigint; requested: bigint }> = {};
   for (const assetId of uniqueOutputAssetIDs) {
     assetTotals[assetId] = {
@@ -184,15 +184,15 @@ const pickExtraRandomUtxo = ({ utxoRemaining, utxoSelected }: UtxoSelection): Ut
 
 const coalesceChangeBundlesForMinCoinRequirement = (
   csl: CardanoSerializationLib,
-  changeBundles: Ogmios.util.OgmiosValue[],
+  changeBundles: Ogmios.Value[],
   computeMinimumCoinQuantity: ComputeMinimumCoinQuantity
-): Ogmios.util.OgmiosValue[] | undefined => {
+): Ogmios.Value[] | undefined => {
   if (changeBundles.length === 0) {
     return changeBundles;
   }
 
   let sortedBundles = orderBy(changeBundles, ({ coins }) => coins, 'desc');
-  const satisfiesMinCoinRequirement = (valueQuantities: Ogmios.util.OgmiosValue) =>
+  const satisfiesMinCoinRequirement = (valueQuantities: Ogmios.Value) =>
     valueQuantities.coins >= computeMinimumCoinQuantity(Ogmios.ogmiosToCsl(csl).value(valueQuantities).multiasset());
 
   while (sortedBundles.length > 1 && !satisfiesMinCoinRequirement(sortedBundles[sortedBundles.length - 1])) {
@@ -223,12 +223,12 @@ const computeChangeBundles = ({
 }: {
   csl: CardanoSerializationLib;
   utxoSelection: UtxoSelection;
-  outputValues: Ogmios.util.OgmiosValue[];
+  outputValues: Ogmios.Value[];
   uniqueOutputAssetIDs: string[];
   implicitCoin: ImplicitCoinBigint;
   computeMinimumCoinQuantity: ComputeMinimumCoinQuantity;
   fee?: bigint;
-}): UtxoSelection & { changeBundles: Ogmios.util.OgmiosValue[] } => {
+}): UtxoSelection & { changeBundles: Ogmios.Value[] } => {
   const requestedAssetChangeBundles = computeRequestedAssetChangeBundles(
     utxoSelection.utxoSelected,
     outputValues,
@@ -269,7 +269,7 @@ const computeChangeBundles = ({
 
 const changeBundlesToValues = (
   csl: CardanoSerializationLib,
-  changeBundles: Ogmios.util.OgmiosValue[],
+  changeBundles: Ogmios.Value[],
   tokenBundleSizeExceedsLimit: TokenBundleSizeExceedsLimit
 ) => {
   const otc = Ogmios.ogmiosToCsl(csl);
