@@ -12,6 +12,7 @@ import { KeyManager } from '../../src/KeyManagement';
 import { testKeyManager } from '../testKeyManager';
 import { UtxoRepository } from '../../src/types';
 import { InMemoryUtxoRepository } from '../../src/InMemoryUtxoRepository';
+import { txTracker } from '../mockTransactionTracker';
 
 const address =
   'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g';
@@ -53,7 +54,7 @@ describe('Transaction.createTransactionInternals', () => {
         value: { coins: 2_000_000 }
       })
     ]);
-    utxoRepository = new InMemoryUtxoRepository(csl, provider, keyManager, inputSelector);
+    utxoRepository = new InMemoryUtxoRepository({ csl, provider, keyManager, inputSelector, txTracker });
   });
 
   test('simple transaction', async () => {

@@ -1,3 +1,4 @@
+import { TxIn } from '@cardano-ogmios/schema';
 import { Asset } from '..';
 import { CSL } from '../CSL';
 import { OgmiosValue } from './util';
@@ -30,3 +31,8 @@ export const value = (cslValue: CSL.Value): OgmiosValue => {
   }
   return result;
 };
+
+export const txIn = (input: CSL.TransactionInput): TxIn => ({
+  txId: Buffer.from(input.transaction_id().to_bytes()).toString('hex'),
+  index: input.index()
+});

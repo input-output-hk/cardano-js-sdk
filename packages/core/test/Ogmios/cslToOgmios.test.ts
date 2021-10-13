@@ -1,5 +1,5 @@
 import { CardanoSerializationLib, loadCardanoSerializationLib } from '@cardano-sdk/core';
-import { AssetId } from '@cardano-sdk/util-dev';
+import { AssetId, CslTestUtil } from '@cardano-sdk/util-dev';
 import { cslToOgmios, ogmiosToCsl } from '../../src/Ogmios';
 
 describe('util', () => {
@@ -8,7 +8,7 @@ describe('util', () => {
     csl = await loadCardanoSerializationLib();
   });
 
-  describe('valueToValueQuantities', () => {
+  describe('value', () => {
     it('coin only', () => {
       const coins = 100_000n;
       const value = csl.Value.new(csl.BigNum.from_str(coins.toString()));
@@ -24,5 +24,12 @@ describe('util', () => {
       expect(quantities.coins).toEqual(coins);
       expect(quantities.assets).toEqual(assets);
     });
+  });
+
+  it('txIn', () => {
+    const cslInput = CslTestUtil.createTxInput(csl);
+    const txIn = cslToOgmios.txIn(cslInput);
+    expect(typeof txIn.index).toBe('number');
+    expect(typeof txIn.txId).toBe('string');
   });
 });

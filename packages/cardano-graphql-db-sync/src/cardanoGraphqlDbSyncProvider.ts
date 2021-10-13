@@ -1,4 +1,4 @@
-import { CardanoProvider } from '@cardano-sdk/core';
+import { CardanoProvider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { gql, GraphQLClient } from 'graphql-request';
 import { TransactionSubmitResponse } from '@cardano-graphql/client-ts';
 import { Schema as Cardano } from '@cardano-ogmios/client';
@@ -224,9 +224,11 @@ export const cardanoGraphqlDbSyncProvider = (uri: string): CardanoProvider => {
         transaction: Buffer.from(signedTransaction.to_bytes()).toString('hex')
       });
 
-      return !!response.hash;
-    } catch {
-      return false;
+      if (!response.hash) {
+        throw new Error('No "hash" in graphql response');
+      }
+    } catch (error) {
+      throw new ProviderError(ProviderFailure.Unknown, error);
     }
   };
 

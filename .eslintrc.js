@@ -1,5 +1,9 @@
 module.exports = {
   "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": "./tsconfig.json",
+    "tsconfigRootDir": __dirname
+  },
   "extends": [
       "@atixlabs/eslint-config/configurations/node",
       "plugin:@typescript-eslint/recommended",
@@ -27,6 +31,8 @@ module.exports = {
     "unicorn/no-null": 0,
     "unicorn/no-array-reduce": 0,
     "unicorn/prefer-node-protocol": 0,
+    "@typescript-eslint/no-floating-promises": ["error"],
+    '@typescript-eslint/no-var-requires': 0, // covered by unicorn/prefer-module
     '@typescript-eslint/explicit-module-boundary-types': 0,
     "@typescript-eslint/ban-types": 0,
     '@typescript-eslint/no-non-null-assertion': 0,
