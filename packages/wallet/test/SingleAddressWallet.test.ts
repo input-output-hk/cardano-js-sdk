@@ -79,8 +79,8 @@ describe('Wallet', () => {
       await confirmed;
       expect(provider.submitTx).toBeCalledTimes(1);
       expect(provider.submitTx).toBeCalledWith(tx);
-      expect(txTracker.trackTransaction).toBeCalledTimes(1);
-      expect(txTracker.trackTransaction).toBeCalledWith(tx, submitted);
+      expect(txTracker.track).toBeCalledTimes(1);
+      expect(txTracker.track).toBeCalledWith(tx, submitted);
     });
   });
 });

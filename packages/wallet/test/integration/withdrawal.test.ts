@@ -11,11 +11,11 @@ import {
   TransactionError,
   TransactionFailure,
   TransactionTracker,
-  UtxoRepository
+  UtxoRepository,
+  UtxoRepositoryEvent
 } from '@cardano-sdk/wallet';
-import { providerStub } from '../ProviderStub';
 // Not testing with a real provider
-// import { blockfrostProvider } from '@cardano-sdk/blockfrost';
+import { providerStub } from '../ProviderStub';
 
 const walletProps: SingleAddressWalletProps = { name: 'some-wallet' };
 const networkId = Cardano.NetworkId.mainnet;
@@ -50,10 +50,10 @@ describe('integration/withdrawal', () => {
 
   it('does not throw', async () => {
     // This is not testing anything, just a usage example
-    utxoRepository.on('transactionUntracked', (tx) => {
+    utxoRepository.on(UtxoRepositoryEvent.TransactionUntracked, (tx) => {
       // UtxoRepository is not sure whether it's UTxO can be spent due to failing to track transaction confirmation.
-      // SubmitTxResult.confirmed has rejected. Calling trackTransaction will lock UTxO again:
-      txTracker.trackTransaction(tx).catch((error) => {
+      // SubmitTxResult.confirmed has rejected. Calling track() will lock UTxO again:
+      txTracker.track(tx).catch((error) => {
         /* eslint-disable-next-line sonarjs/no-all-duplicated-branches */
         if (error instanceof TransactionError && error.reason === TransactionFailure.Timeout) {
           // Transaction has expired and will not be confirmed. Therefore it's safe to spend the UTxO again.

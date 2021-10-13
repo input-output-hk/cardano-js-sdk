@@ -92,7 +92,7 @@ export const createSingleAddressWallet = async (
         }
         throw new TransactionError(TransactionFailure.FailedToSubmit, error);
       });
-      const confirmed = txTracker.trackTransaction(tx, submitted);
+      const confirmed = txTracker.track(tx, submitted);
       return {
         submitted,
         confirmed

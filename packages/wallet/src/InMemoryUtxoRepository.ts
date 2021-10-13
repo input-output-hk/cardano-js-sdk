@@ -5,7 +5,13 @@ import { CardanoProvider, Ogmios, CardanoSerializationLib, CSL } from '@cardano-
 import { dummyLogger, Logger } from 'ts-log';
 import { ImplicitCoin, InputSelector, SelectionConstraints, SelectionResult } from '@cardano-sdk/cip2';
 import { KeyManager } from './KeyManagement';
-import { OnTransactionArgs, TransactionTracker, UtxoRepositoryEvents } from '.';
+import {
+  OnTransactionArgs,
+  TransactionTracker,
+  TransactionTrackerEvent,
+  UtxoRepositoryEvent,
+  UtxoRepositoryEvents
+} from '.';
 import { cslToOgmios } from '@cardano-sdk/core/src/Ogmios';
 import Emittery from 'emittery';
 import { TransactionError, TransactionFailure } from './TransactionError';
@@ -21,6 +27,7 @@ export interface InMemoryUtxoRepositoryProps {
 
 const utxoEquals = ([txIn1]: [Schema.TxIn, Schema.TxOut], [txIn2]: [Schema.TxIn, Schema.TxOut]): boolean =>
   txIn1.txId === txIn2.txId && txIn1.index === txIn2.index;
+
 export class InMemoryUtxoRepository extends Emittery<UtxoRepositoryEvents> implements UtxoRepository {
   #csl: CardanoSerializationLib;
   #delegationAndRewards: Schema.DelegationsAndRewards;
@@ -47,7 +54,7 @@ export class InMemoryUtxoRepository extends Emittery<UtxoRepositoryEvents> imple
     this.#delegationAndRewards = { rewards: undefined, delegate: undefined };
     this.#inputSelector = inputSelector;
     this.#keyManager = keyManager;
-    txTracker.on('transaction', (args) => {
+    txTracker.on(TransactionTrackerEvent.NewTransaction, (args) => {
       // not blocking to make it testable easier
       this.#onTransaction(args).catch(this.#logger.error);
     });
@@ -136,7 +143,7 @@ export class InMemoryUtxoRepository extends Emittery<UtxoRepositoryEvents> imple
     } catch (error) {
       unlock(false);
       if (!(error instanceof TransactionError) || error.reason !== TransactionFailure.Timeout) {
-        await this.emit('transactionUntracked', transaction).catch(this.#logger.error);
+        await this.emit(UtxoRepositoryEvent.TransactionUntracked, transaction).catch(this.#logger.error);
       }
     }
   }

@@ -1,9 +1,8 @@
 import { CardanoSerializationLib, CSL, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { dummyLogger } from 'ts-log';
-import { InMemoryTransactionTracker } from '../src/InMemoryTransactionTracker';
-import { TransactionFailure } from '../src/TransactionError';
 import { ledgerTip, providerStub, ProviderStub, queryTransactionsResult } from './ProviderStub';
 import mockDelay from 'delay';
+import { TransactionTrackerEvent, InMemoryTransactionTracker, TransactionFailure } from '../src';
 
 jest.mock('delay', () => jest.fn().mockResolvedValue(void 0));
 
@@ -37,17 +36,17 @@ describe('InMemoryTransactionTracker', () => {
     (mockDelay as unknown as jest.Mock).mockReset();
   });
 
-  describe('trackTransaction', () => {
+  describe('track', () => {
     let onTransaction: jest.Mock;
 
     beforeEach(() => {
       onTransaction = jest.fn();
-      txTracker.on('transaction', onTransaction);
+      txTracker.on(TransactionTrackerEvent.NewTransaction, onTransaction);
     });
 
-    it('invalid transaction (no ttl)', async () => {
+    it('cannot track transactions that have no validity interval', async () => {
       await expect(() =>
-        txTracker.trackTransaction({
+        txTracker.track({
           body: () => ({
             ttl: () => void 0
           })
@@ -69,7 +68,7 @@ describe('InMemoryTransactionTracker', () => {
       it('throws CannotTrack on ledger tip fetch error', async () => {
         provider.queryTransactionsByHashes.mockResolvedValueOnce([]);
         provider.ledgerTip.mockRejectedValueOnce(new ProviderError(ProviderFailure.Unknown));
-        await expect(txTracker.trackTransaction(transaction)).rejects.toThrowError(TransactionFailure.CannotTrack);
+        await expect(txTracker.track(transaction)).rejects.toThrowError(TransactionFailure.CannotTrack);
         expect(provider.ledgerTip).toBeCalledTimes(1);
         expect(provider.queryTransactionsByHashes).toBeCalledTimes(1);
       });
@@ -78,7 +77,7 @@ describe('InMemoryTransactionTracker', () => {
         // resolve [] or reject with 404 should be treated the same
         provider.queryTransactionsByHashes.mockResolvedValueOnce([]);
         provider.queryTransactionsByHashes.mockRejectedValueOnce(new ProviderError(ProviderFailure.NotFound));
-        await txTracker.trackTransaction(transaction);
+        await txTracker.track(transaction);
         expect(provider.queryTransactionsByHashes).toBeCalledTimes(3);
         expect(mockDelay).toBeCalledTimes(3);
         expect(mockDelay).toBeCalledWith(POLL_INTERVAL);
@@ -87,20 +86,20 @@ describe('InMemoryTransactionTracker', () => {
       it('throws after timeout', async () => {
         provider.queryTransactionsByHashes.mockResolvedValueOnce([]);
         provider.ledgerTip.mockResolvedValueOnce({ slot: ledgerTipSlot + 1 });
-        await expect(txTracker.trackTransaction(transaction)).rejects.toThrowError(TransactionFailure.Timeout);
+        await expect(txTracker.track(transaction)).rejects.toThrowError(TransactionFailure.Timeout);
       });
 
       it('emits "transaction" event for tracked transactions, returns promise unique per pending tx', async () => {
-        const promise1 = txTracker.trackTransaction(transaction);
-        const promise2 = txTracker.trackTransaction(transaction);
+        const promise1 = txTracker.track(transaction);
+        const promise2 = txTracker.track(transaction);
         await promise1;
         await promise2;
         mockHashTransactionReturn('other-hash');
-        await txTracker.trackTransaction(transaction);
+        await txTracker.track(transaction);
         expect(provider.queryTransactionsByHashes).toBeCalledTimes(2);
         expect(onTransaction).toBeCalledTimes(2);
         // assert it clears cache
-        await txTracker.trackTransaction(transaction);
+        await txTracker.track(transaction);
         expect(provider.queryTransactionsByHashes).toBeCalledTimes(3);
         expect(onTransaction).toBeCalledTimes(3);
       });

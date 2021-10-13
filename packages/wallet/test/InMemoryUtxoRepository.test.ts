@@ -3,7 +3,13 @@ import { roundRobinRandomImprove, InputSelector } from '@cardano-sdk/cip2';
 import { loadCardanoSerializationLib, CardanoSerializationLib, CSL, Ogmios } from '@cardano-sdk/core';
 import { flushPromises, SelectionConstraints } from '@cardano-sdk/util-dev';
 import { providerStub, delegate, rewards, ProviderStub, utxo, delegationAndRewards } from './ProviderStub';
-import { InMemoryUtxoRepository, KeyManagement, UtxoRepository } from '../src';
+import {
+  InMemoryUtxoRepository,
+  KeyManagement,
+  TransactionTrackerEvent,
+  UtxoRepository,
+  UtxoRepositoryEvent
+} from '../src';
 import { MockTransactionTracker } from './mockTransactionTracker';
 import { ogmiosToCsl } from '@cardano-sdk/core/src/Ogmios';
 import { TxIn, TxOut } from '@cardano-ogmios/schema';
@@ -87,7 +93,7 @@ describe('InMemoryUtxoRepository', () => {
     let onTransactionUntracked: jest.Mock;
 
     const trackTransaction = async (confirmed: Promise<void>) => {
-      await txTracker.emit('transaction', {
+      await txTracker.emit(TransactionTrackerEvent.NewTransaction, {
         transaction,
         confirmed
       });
@@ -109,7 +115,7 @@ describe('InMemoryUtxoRepository', () => {
       await utxoRepository.sync();
       numUtxoPreTransaction = utxoRepository.allUtxos.length;
       onTransactionUntracked = jest.fn();
-      utxoRepository.on('transactionUntracked', onTransactionUntracked);
+      utxoRepository.on(UtxoRepositoryEvent.TransactionUntracked, onTransactionUntracked);
     });
 
     it('preconditions', () => {

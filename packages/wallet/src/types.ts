@@ -3,7 +3,11 @@ import { ImplicitCoin, SelectionConstraints, SelectionResult } from '@cardano-sd
 import { CSL } from '@cardano-sdk/core';
 import Emittery from 'emittery';
 
-export type UtxoRepositoryEvents = { transactionUntracked: CSL.Transaction };
+export enum UtxoRepositoryEvent {
+  TransactionUntracked = 'transaction-untracked'
+}
+
+export type UtxoRepositoryEvents = { 'transaction-untracked': CSL.Transaction };
 export interface UtxoRepository extends Emittery<UtxoRepositoryEvents> {
   allUtxos: Schema.Utxo;
   availableUtxos: Schema.Utxo;
@@ -25,10 +29,18 @@ export interface OnTransactionArgs {
    */
   confirmed: Promise<void>;
 }
-export type TransactionTrackerEvents = { transaction: OnTransactionArgs };
+
+export enum TransactionTrackerEvent {
+  NewTransaction = 'new-transaction'
+}
+
+export type TransactionTrackerEvents = { 'new-transaction': OnTransactionArgs };
 export interface TransactionTracker extends Emittery<TransactionTrackerEvents> {
   /**
-   * Track a new transaction
+   * Track a new transaction.
+   *
+   * @param {CSL.Transaction} transaction transaction to track.
+   * @param {Promise<void>} submitted defer checking for transaction confirmation until this resolves.
    */
-  trackTransaction(transaction: CSL.Transaction, submitted?: Promise<void>): Promise<void>;
+  track(transaction: CSL.Transaction, submitted?: Promise<void>): Promise<void>;
 }

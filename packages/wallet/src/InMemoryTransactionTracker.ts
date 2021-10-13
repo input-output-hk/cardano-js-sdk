@@ -5,6 +5,7 @@ import { CardanoProvider, ProviderError, CardanoSerializationLib, CSL, ProviderF
 import { TransactionError, TransactionFailure } from './TransactionError';
 import { dummyLogger, Logger } from 'ts-log';
 import delay from 'delay';
+import { TransactionTrackerEvent } from '.';
 
 export type Milliseconds = number;
 
@@ -30,7 +31,7 @@ export class InMemoryTransactionTracker extends Emittery<TransactionTrackerEvent
     this.#pollInterval = pollInterval;
   }
 
-  async trackTransaction(transaction: CSL.Transaction, submitted: Promise<void> = Promise.resolve()): Promise<void> {
+  async track(transaction: CSL.Transaction, submitted: Promise<void> = Promise.resolve()): Promise<void> {
     await submitted;
     const body = transaction.body();
     const hash = Buffer.from(this.#csl.hash_transaction(body).to_bytes()).toString('hex');
@@ -45,15 +46,15 @@ export class InMemoryTransactionTracker extends Emittery<TransactionTrackerEvent
       throw new TransactionError(TransactionFailure.CannotTrack, undefined, 'no TTL');
     }
 
-    const promise = this.#trackTransaction(hash, invalidHereafter);
+    const promise = this.#checkTransactionViaProvider(hash, invalidHereafter);
     this.#pendingTransactions.set(hash, promise);
-    this.emit('transaction', { transaction, confirmed: promise }).catch(this.#logger.error);
+    this.emit(TransactionTrackerEvent.NewTransaction, { transaction, confirmed: promise }).catch(this.#logger.error);
     void promise.catch(() => void 0).then(() => this.#pendingTransactions.delete(hash));
 
     return promise;
   }
 
-  async #trackTransaction(hash: Hash16, invalidHereafter: Slot): Promise<void> {
+  async #checkTransactionViaProvider(hash: Hash16, invalidHereafter: Slot): Promise<void> {
     await delay(this.#pollInterval);
     try {
       const tx = await this.#provider.queryTransactionsByHashes([hash]);
@@ -81,6 +82,6 @@ export class InMemoryTransactionTracker extends Emittery<TransactionTrackerEvent
     if (tip && tip.slot > invalidHereafter) {
       throw new TransactionError(TransactionFailure.Timeout);
     }
-    return this.#trackTransaction(hash, invalidHereafter);
+    return this.#checkTransactionViaProvider(hash, invalidHereafter);
   }
 }
