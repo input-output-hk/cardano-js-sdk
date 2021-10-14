@@ -219,7 +219,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2409x</span>
-<span class="cline-any cline-yes">2233x</span>
+<span class="cline-any cline-yes">2222x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2409x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -228,28 +228,28 @@
 <span class="cline-any cline-yes">2409x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">10708x</span>
+<span class="cline-any cline-yes">10615x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1086x</span>
-<span class="cline-any cline-yes">2603x</span>
+<span class="cline-any cline-yes">1148x</span>
+<span class="cline-any cline-yes">2861x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">87x</span>
-<span class="cline-any cline-yes">110x</span>
+<span class="cline-any cline-yes">95x</span>
+<span class="cline-any cline-yes">115x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">12287x</span>
-<span class="cline-any cline-yes">5780x</span>
+<span class="cline-any cline-yes">12110x</span>
+<span class="cline-any cline-yes">5682x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1631x</span>
-<span class="cline-any cline-yes">1631x</span>
-<span class="cline-any cline-yes">1631x</span>
-<span class="cline-any cline-yes">569x</span>
+<span class="cline-any cline-yes">1611x</span>
+<span class="cline-any cline-yes">1611x</span>
+<span class="cline-any cline-yes">1611x</span>
+<span class="cline-any cline-yes">542x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -266,14 +266,14 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2409x</span>
-<span class="cline-any cline-yes">927x</span>
-<span class="cline-any cline-yes">927x</span>
-<span class="cline-any cline-yes">927x</span>
-<span class="cline-any cline-yes">927x</span>
-<span class="cline-any cline-yes">778x</span>
+<span class="cline-any cline-yes">981x</span>
+<span class="cline-any cline-yes">981x</span>
+<span class="cline-any cline-yes">981x</span>
+<span class="cline-any cline-yes">981x</span>
+<span class="cline-any cline-yes">798x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1631x</span>
+<span class="cline-any cline-yes">1611x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { BigIntMath, CSL, Ogmios } from '@cardano-sdk/core';
 import { uniq } from 'lodash-es';
@@ -281,7 +281,7 @@ import { ImplicitCoin } from '../types';
 import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
 &nbsp;
 export interface WithValue {
-  value: Ogmios.util.OgmiosValue;
+  value: Ogmios.Value;
 }
 &nbsp;
 export interface UtxoWithValue extends WithValue {
@@ -310,14 +310,14 @@ export interface UtxoSelection {
 }
 &nbsp;
 const noImplicitCoin = {
-  deposit: 0,
-  input: 0
+  deposit: 0n,
+  input: 0n
 };
 &nbsp;
 export const preprocessArgs = (
   availableUtxo: Set&lt;CSL.TransactionUnspentOutput&gt;,
   outputs: Set&lt;CSL.TransactionOutput&gt;,
-  implicitCoinAsNumber: ImplicitCoin = noImplicitCoin
+  partialImplicitCoin: ImplicitCoin = noImplicitCoin
 ): RoundRobinRandomImproveArgs =&gt; {
   const utxosWithValue = [...availableUtxo].map((utxo) =&gt; ({
     utxo,
@@ -331,8 +331,8 @@ export const preprocessArgs = (
     outputsWithValue.flatMap(({ value: { assets } }) =&gt; (assets &amp;&amp; Object.keys(assets)) || [])
   );
   const implicitCoin: ImplicitCoinBigint = {
-    deposit: BigInt(implicitCoinAsNumber.deposit || 0),
-    input: BigInt(implicitCoinAsNumber.input || 0)
+    deposit: partialImplicitCoin.deposit || 0n,
+    input: partialImplicitCoin.input || 0n
   };
   return { uniqueOutputAssetIDs, utxosWithValue, outputsWithValue, implicitCoin };
 };
@@ -340,19 +340,19 @@ export const preprocessArgs = (
 export const withValuesToValues = (totals: WithValue[]) =&gt; totals.map((t) =&gt; t.value);
 export const assetQuantitySelector =
   (id: string) =&gt;
-  (quantities: Ogmios.util.OgmiosValue[]): bigint =&gt;
+  (quantities: Ogmios.Value[]): bigint =&gt;
     BigIntMath.sum(quantities.map(({ assets }) =&gt; assets?.[id] || 0n));
 export const assetWithValueQuantitySelector =
   (id: string) =&gt;
   (totals: WithValue[]): bigint =&gt;
     assetQuantitySelector(id)(withValuesToValues(totals));
-export const getCoinQuantity = (quantities: Ogmios.util.OgmiosValue[]): bigint =&gt;
+export const getCoinQuantity = (quantities: Ogmios.Value[]): bigint =&gt;
   BigIntMath.sum(quantities.map(({ coins }) =&gt; coins));
 export const getWithValuesCoinQuantity = (totals: WithValue[]): bigint =&gt; getCoinQuantity(withValuesToValues(totals));
 &nbsp;
 export const assertIsCoinBalanceSufficient = (
-  utxoValues: Ogmios.util.OgmiosValue[],
-  outputValues: Ogmios.util.OgmiosValue[],
+  utxoValues: Ogmios.Value[],
+  outputValues: Ogmios.Value[],
   implicitCoin: ImplicitCoinBigint
 ) =&gt; {
   const utxoCoinTotal = getCoinQuantity(utxoValues);
@@ -370,8 +370,8 @@ export const assertIsCoinBalanceSufficient = (
  */
 export const assertIsBalanceSufficient = (
   uniqueOutputAssetIDs: string[],
-  utxoValues: Ogmios.util.OgmiosValue[],
-  outputValues: Ogmios.util.OgmiosValue[],
+  utxoValues: Ogmios.Value[],
+  outputValues: Ogmios.Value[],
   implicitCoin: ImplicitCoinBigint
 ): void =&gt; {
   for (const assetId of uniqueOutputAssetIDs) {
@@ -391,7 +391,7 @@ export const assertIsBalanceSufficient = (
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Wed Oct 13 2021 11:17:16 GMT+0000 (Coordinated Universal Time)
+                at Thu Oct 14 2021 12:57:50 GMT+0000 (Coordinated Universal Time)
             </div>
         </div>
         <script src="../../prettify.js"></script>

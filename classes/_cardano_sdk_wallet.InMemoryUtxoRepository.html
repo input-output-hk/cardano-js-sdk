@@ -84,7 +84,7 @@
 			<section class="tsd-panel">
 				<h3>Implements</h3>
 				<ul class="tsd-hierarchy">
-					<li><a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html" class="tsd-signature-type" data-tsd-kind="Interface">UtxoRepository</a></li>
+					<li><a href="../modules/_cardano_sdk_wallet.html#UtxoRepository" class="tsd-signature-type" data-tsd-kind="Type alias">UtxoRepository</a></li>
 				</ul>
 			</section>
 			<section class="tsd-panel-group tsd-index-group">
@@ -104,6 +104,7 @@
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#_delegationAndRewards" class="tsd-kind-icon">#delegation<wbr>And<wbr>Rewards</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#_inputSelector" class="tsd-kind-icon">#input<wbr>Selector</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#_keyManager" class="tsd-kind-icon">#key<wbr>Manager</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#_lockedRewards" class="tsd-kind-icon">#locked<wbr>Rewards</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#_lockedUtxoSet" class="tsd-kind-icon">#locked<wbr>Utxo<wbr>Set</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#_logger" class="tsd-kind-icon">#logger</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#_provider" class="tsd-kind-icon">#provider</a></li>
@@ -117,16 +118,20 @@
 						<section class="tsd-index-section ">
 							<h3>Accessors</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#allRewards" class="tsd-kind-icon">all<wbr>Rewards</a></li>
 								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#allUtxos" class="tsd-kind-icon">all<wbr>Utxos</a></li>
+								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#availableRewards" class="tsd-kind-icon">available<wbr>Rewards</a></li>
 								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#availableUtxos" class="tsd-kind-icon">available<wbr>Utxos</a></li>
 								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#delegation" class="tsd-kind-icon">delegation</a></li>
-								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#rewards" class="tsd-kind-icon">rewards</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#_emitSynced" class="tsd-kind-icon">#emit<wbr>Synced</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#_getOwnTransactionWithdrawalQty" class="tsd-kind-icon">#get<wbr>Own<wbr>Transaction<wbr>Withdrawal<wbr>Qty</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#_onTransaction" class="tsd-kind-icon">#on<wbr>Transaction</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#_trySync" class="tsd-kind-icon">#try<wbr>Sync</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#anyEvent" class="tsd-kind-icon">any<wbr>Event</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#bindMethods" class="tsd-kind-icon">bind<wbr>Methods</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-external"><a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#clearListeners" class="tsd-kind-icon">clear<wbr>Listeners</a></li>
@@ -160,7 +165,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides Emittery&lt;UtxoRepositoryEvents&gt;.constructor</p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d110f8d/packages/wallet/src/InMemoryUtxoRepository.ts#L41">packages/wallet/src/InMemoryUtxoRepository.ts:41</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/e17f9c6/packages/wallet/src/InMemoryUtxoRepository.ts#L41">packages/wallet/src/InMemoryUtxoRepository.ts:41</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -182,7 +187,7 @@
 					<div class="tsd-signature tsd-kind-icon">#csl<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">__module</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d110f8d/packages/wallet/src/InMemoryUtxoRepository.ts#L32">packages/wallet/src/InMemoryUtxoRepository.ts:32</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/e17f9c6/packages/wallet/src/InMemoryUtxoRepository.ts#L31">packages/wallet/src/InMemoryUtxoRepository.ts:31</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -192,7 +197,7 @@
 					<div class="tsd-signature tsd-kind-icon">#delegation<wbr>And<wbr>Rewards<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">DelegationsAndRewards</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d110f8d/packages/wallet/src/InMemoryUtxoRepository.ts#L33">packages/wallet/src/InMemoryUtxoRepository.ts:33</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/e17f9c6/packages/wallet/src/InMemoryUtxoRepository.ts#L32">packages/wallet/src/InMemoryUtxoRepository.ts:32</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -202,7 +207,7 @@
 					<div class="tsd-signature tsd-kind-icon">#input<wbr>Selector<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">InputSelector</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d110f8d/packages/wallet/src/InMemoryUtxoRepository.ts#L34">packages/wallet/src/InMemoryUtxoRepository.ts:34</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/e17f9c6/packages/wallet/src/InMemoryUtxoRepository.ts#L33">packages/wallet/src/InMemoryUtxoRepository.ts:33</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -212,7 +217,17 @@
 					<div class="tsd-signature tsd-kind-icon">#key<wbr>Manager<span class="tsd-signature-symbol">:</span> <a href="../interfaces/_cardano_sdk_wallet.KeyManagement.KeyManager.html" class="tsd-signature-type" data-tsd-kind="Interface">KeyManager</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d110f8d/packages/wallet/src/InMemoryUtxoRepository.ts#L35">packages/wallet/src/InMemoryUtxoRepository.ts:35</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/e17f9c6/packages/wallet/src/InMemoryUtxoRepository.ts#L34">packages/wallet/src/InMemoryUtxoRepository.ts:34</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
+					<a name="_lockedRewards" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> #locked<wbr>Rewards</h3>
+					<div class="tsd-signature tsd-kind-icon">#locked<wbr>Rewards<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">bigint</span><span class="tsd-signature-symbol"> = ...</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/e17f9c6/packages/wallet/src/InMemoryUtxoRepository.ts#L39">packages/wallet/src/InMemoryUtxoRepository.ts:39</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -222,7 +237,7 @@
 					<div class="tsd-signature tsd-kind-icon">#locked<wbr>Utxo<wbr>Set<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Set</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">TxIn</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TxOut</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d110f8d/packages/wallet/src/InMemoryUtxoRepository.ts#L39">packages/wallet/src/InMemoryUtxoRepository.ts:39</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/e17f9c6/packages/wallet/src/InMemoryUtxoRepository.ts#L38">packages/wallet/src/InMemoryUtxoRepository.ts:38</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -232,7 +247,7 @@
 					<div class="tsd-signature tsd-kind-icon">#logger<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Logger</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d110f8d/packages/wallet/src/InMemoryUtxoRepository.ts#L36">packages/wallet/src/InMemoryUtxoRepository.ts:36</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/e17f9c6/packages/wallet/src/InMemoryUtxoRepository.ts#L35">packages/wallet/src/InMemoryUtxoRepository.ts:35</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -242,7 +257,7 @@
 					<div class="tsd-signature tsd-kind-icon">#provider<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">CardanoProvider</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d110f8d/packages/wallet/src/InMemoryUtxoRepository.ts#L37">packages/wallet/src/InMemoryUtxoRepository.ts:37</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/e17f9c6/packages/wallet/src/InMemoryUtxoRepository.ts#L36">packages/wallet/src/InMemoryUtxoRepository.ts:36</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -252,7 +267,7 @@
 					<div class="tsd-signature tsd-kind-icon">#utxo<wbr>Set<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Set</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">TxIn</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">TxOut</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d110f8d/packages/wallet/src/InMemoryUtxoRepository.ts#L38">packages/wallet/src/InMemoryUtxoRepository.ts:38</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/e17f9c6/packages/wallet/src/InMemoryUtxoRepository.ts#L37">packages/wallet/src/InMemoryUtxoRepository.ts:37</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -261,7 +276,7 @@
 					<h3>debug</h3>
 					<div class="tsd-signature tsd-kind-icon">debug<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">DebugOptions</span><span class="tsd-signature-symbol">&lt;</span><a href="../modules/_cardano_sdk_wallet.html#UtxoRepositoryEvents" class="tsd-signature-type" data-tsd-kind="Type alias">UtxoRepositoryEvents</a><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
-						<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html">UtxoRepository</a>.<a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html#debug">debug</a></p>
+						<p>Implementation of UtxoRepository.debug</p>
 						<p>Inherited from Emittery.debug</p>
 						<ul>
 							<li>Defined in packages/wallet/node_modules/emittery/index.d.ts:261</li>
@@ -397,6 +412,23 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Accessors</h2>
 				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class">
+					<a name="allRewards" class="tsd-anchor"></a>
+					<h3>all<wbr>Rewards</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> allRewards<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">bigint</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/e17f9c6/packages/wallet/src/InMemoryUtxoRepository.ts#L120">packages/wallet/src/InMemoryUtxoRepository.ts:120</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">bigint</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class">
 					<a name="allUtxos" class="tsd-anchor"></a>
 					<h3>all<wbr>Utxos</h3>
 					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class">
@@ -405,12 +437,28 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html">UtxoRepository</a>.<a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html#allUtxos">allUtxos</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d110f8d/packages/wallet/src/InMemoryUtxoRepository.ts#L109">packages/wallet/src/InMemoryUtxoRepository.ts:109</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/e17f9c6/packages/wallet/src/InMemoryUtxoRepository.ts#L112">packages/wallet/src/InMemoryUtxoRepository.ts:112</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Utxo</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class">
+					<a name="availableRewards" class="tsd-anchor"></a>
+					<h3>available<wbr>Rewards</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> availableRewards<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">bigint</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/e17f9c6/packages/wallet/src/InMemoryUtxoRepository.ts#L124">packages/wallet/src/InMemoryUtxoRepository.ts:124</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">bigint</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -423,9 +471,8 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html">UtxoRepository</a>.<a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html#availableUtxos">availableUtxos</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d110f8d/packages/wallet/src/InMemoryUtxoRepository.ts#L113">packages/wallet/src/InMemoryUtxoRepository.ts:113</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/e17f9c6/packages/wallet/src/InMemoryUtxoRepository.ts#L116">packages/wallet/src/InMemoryUtxoRepository.ts:116</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Utxo</span></h4>
@@ -441,36 +488,57 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html">UtxoRepository</a>.<a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html#delegation">delegation</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d110f8d/packages/wallet/src/InMemoryUtxoRepository.ts#L121">packages/wallet/src/InMemoryUtxoRepository.ts:121</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/e17f9c6/packages/wallet/src/InMemoryUtxoRepository.ts#L129">packages/wallet/src/InMemoryUtxoRepository.ts:129</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h4>
 						</li>
 					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class">
-					<a name="rewards" class="tsd-anchor"></a>
-					<h3>rewards</h3>
-					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> rewards<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span></li>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private">
+					<a name="_emitSynced" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> #emit<wbr>Synced</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private">
+						<li class="tsd-signature tsd-kind-icon">#emit<wbr>Synced<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html">UtxoRepository</a>.<a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html#rewards">rewards</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d110f8d/packages/wallet/src/InMemoryUtxoRepository.ts#L117">packages/wallet/src/InMemoryUtxoRepository.ts:117</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/e17f9c6/packages/wallet/src/InMemoryUtxoRepository.ts#L133">packages/wallet/src/InMemoryUtxoRepository.ts:133</a></li>
 								</ul>
 							</aside>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 						</li>
 					</ul>
 				</section>
-			</section>
-			<section class="tsd-panel-group tsd-member-group ">
-				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private">
+					<a name="_getOwnTransactionWithdrawalQty" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> #get<wbr>Own<wbr>Transaction<wbr>Withdrawal<wbr>Qty</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private">
+						<li class="tsd-signature tsd-kind-icon">#get<wbr>Own<wbr>Transaction<wbr>Withdrawal<wbr>Qty<span class="tsd-signature-symbol">(</span>transaction<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Transaction</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">bigint</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/e17f9c6/packages/wallet/src/InMemoryUtxoRepository.ts#L178">packages/wallet/src/InMemoryUtxoRepository.ts:178</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>transaction: <span class="tsd-signature-type">Transaction</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">bigint</span></h4>
+						</li>
+					</ul>
+				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private">
 					<a name="_onTransaction" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagPrivate">Private</span> #on<wbr>Transaction</h3>
@@ -481,7 +549,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d110f8d/packages/wallet/src/InMemoryUtxoRepository.ts#L125">packages/wallet/src/InMemoryUtxoRepository.ts:125</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/e17f9c6/packages/wallet/src/InMemoryUtxoRepository.ts#L143">packages/wallet/src/InMemoryUtxoRepository.ts:143</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -494,16 +562,33 @@
 						</li>
 					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
-					<a name="anyEvent" class="tsd-anchor"></a>
-					<h3>any<wbr>Event</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">any<wbr>Event<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">AsyncIterableIterator</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">&quot;transaction-untracked&quot;</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">Transaction</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">&gt;</span></li>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private">
+					<a name="_trySync" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> #try<wbr>Sync</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private">
+						<li class="tsd-signature tsd-kind-icon">#try<wbr>Sync<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html">UtxoRepository</a>.<a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html#anyEvent">anyEvent</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/e17f9c6/packages/wallet/src/InMemoryUtxoRepository.ts#L169">packages/wallet/src/InMemoryUtxoRepository.ts:169</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="anyEvent" class="tsd-anchor"></a>
+					<h3>any<wbr>Event</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">any<wbr>Event<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">AsyncIterableIterator</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-symbol">keyof </span><a href="../modules/_cardano_sdk_wallet.html#UtxoRepositoryEvents" class="tsd-signature-type" data-tsd-kind="Type alias">UtxoRepositoryEvents</a><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><a href="../interfaces/_cardano_sdk_wallet.UtxoRepositoryFields.html" class="tsd-signature-type" data-tsd-kind="Interface">UtxoRepositoryFields</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Transaction</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of UtxoRepository.anyEvent</p>
 								<p>Inherited from Emittery.anyEvent</p>
 								<ul>
 									<li>Defined in packages/wallet/node_modules/emittery/index.d.ts:532</li>
@@ -544,7 +629,7 @@
 									</dd>
 								</dl>
 							</div>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">AsyncIterableIterator</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">&quot;transaction-untracked&quot;</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">Transaction</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">AsyncIterableIterator</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-symbol">keyof </span><a href="../modules/_cardano_sdk_wallet.html#UtxoRepositoryEvents" class="tsd-signature-type" data-tsd-kind="Type alias">UtxoRepositoryEvents</a><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><a href="../interfaces/_cardano_sdk_wallet.UtxoRepositoryFields.html" class="tsd-signature-type" data-tsd-kind="Interface">UtxoRepositoryFields</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Transaction</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -557,7 +642,7 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html">UtxoRepository</a>.<a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html#bindMethods">bindMethods</a></p>
+								<p>Implementation of UtxoRepository.bindMethods</p>
 								<p>Inherited from Emittery.bindMethods</p>
 								<ul>
 									<li>Defined in packages/wallet/node_modules/emittery/index.d.ts:572</li>
@@ -602,7 +687,7 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html">UtxoRepository</a>.<a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html#clearListeners">clearListeners</a></p>
+								<p>Implementation of UtxoRepository.clearListeners</p>
 								<p>Inherited from Emittery.clearListeners</p>
 								<ul>
 									<li>Defined in packages/wallet/node_modules/emittery/index.d.ts:551</li>
@@ -617,7 +702,7 @@
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
 							<ul class="tsd-type-parameters">
 								<li>
-									<h4>Name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">&quot;transaction-untracked&quot;</span></h4>
+									<h4>Name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">keyof </span><a href="../modules/_cardano_sdk_wallet.html#UtxoRepositoryEvents" class="tsd-signature-type" data-tsd-kind="Type alias">UtxoRepositoryEvents</a></h4>
 								</li>
 							</ul>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -640,7 +725,7 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html">UtxoRepository</a>.<a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html#emit">emit</a></p>
+								<p>Implementation of UtxoRepository.emit</p>
 								<p>Inherited from Emittery.emit</p>
 								<ul>
 									<li>Defined in packages/wallet/node_modules/emittery/index.d.ts:467</li>
@@ -668,7 +753,7 @@
 						</li>
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html">UtxoRepository</a>.<a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html#emit">emit</a></p>
+								<p>Implementation of UtxoRepository.emit</p>
 								<p>Inherited from Emittery.emit</p>
 								<ul>
 									<li>Defined in packages/wallet/node_modules/emittery/index.d.ts:468</li>
@@ -677,7 +762,7 @@
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
 							<ul class="tsd-type-parameters">
 								<li>
-									<h4>Name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">&quot;transaction-untracked&quot;</span></h4>
+									<h4>Name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">keyof </span><a href="../modules/_cardano_sdk_wallet.html#UtxoRepositoryEvents" class="tsd-signature-type" data-tsd-kind="Type alias">UtxoRepositoryEvents</a></h4>
 								</li>
 							</ul>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -703,7 +788,7 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html">UtxoRepository</a>.<a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html#emitSerial">emitSerial</a></p>
+								<p>Implementation of UtxoRepository.emitSerial</p>
 								<p>Inherited from Emittery.emitSerial</p>
 								<ul>
 									<li>Defined in packages/wallet/node_modules/emittery/index.d.ts:480</li>
@@ -732,7 +817,7 @@
 						</li>
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html">UtxoRepository</a>.<a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html#emitSerial">emitSerial</a></p>
+								<p>Implementation of UtxoRepository.emitSerial</p>
 								<p>Inherited from Emittery.emitSerial</p>
 								<ul>
 									<li>Defined in packages/wallet/node_modules/emittery/index.d.ts:481</li>
@@ -741,7 +826,7 @@
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
 							<ul class="tsd-type-parameters">
 								<li>
-									<h4>Name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">&quot;transaction-untracked&quot;</span></h4>
+									<h4>Name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">keyof </span><a href="../modules/_cardano_sdk_wallet.html#UtxoRepositoryEvents" class="tsd-signature-type" data-tsd-kind="Type alias">UtxoRepositoryEvents</a></h4>
 								</li>
 							</ul>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -766,7 +851,7 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html">UtxoRepository</a>.<a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html#events">events</a></p>
+								<p>Implementation of UtxoRepository.events</p>
 								<p>Inherited from Emittery.events</p>
 								<ul>
 									<li>Defined in packages/wallet/node_modules/emittery/index.d.ts:403</li>
@@ -856,7 +941,7 @@
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
 							<ul class="tsd-type-parameters">
 								<li>
-									<h4>Name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">&quot;transaction-untracked&quot;</span></h4>
+									<h4>Name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">keyof </span><a href="../modules/_cardano_sdk_wallet.html#UtxoRepositoryEvents" class="tsd-signature-type" data-tsd-kind="Type alias">UtxoRepositoryEvents</a></h4>
 								</li>
 							</ul>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -878,7 +963,7 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html">UtxoRepository</a>.<a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html#listenerCount">listenerCount</a></p>
+								<p>Implementation of UtxoRepository.listenerCount</p>
 								<p>Inherited from Emittery.listenerCount</p>
 								<ul>
 									<li>Defined in packages/wallet/node_modules/emittery/index.d.ts:556</li>
@@ -892,7 +977,7 @@
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
 							<ul class="tsd-type-parameters">
 								<li>
-									<h4>Name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">&quot;transaction-untracked&quot;</span></h4>
+									<h4>Name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">keyof </span><a href="../modules/_cardano_sdk_wallet.html#UtxoRepositoryEvents" class="tsd-signature-type" data-tsd-kind="Type alias">UtxoRepositoryEvents</a></h4>
 								</li>
 							</ul>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -914,7 +999,7 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html">UtxoRepository</a>.<a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html#off">off</a></p>
+								<p>Implementation of UtxoRepository.off</p>
 								<p>Inherited from Emittery.off</p>
 								<ul>
 									<li>Defined in packages/wallet/node_modules/emittery/index.d.ts:430</li>
@@ -949,7 +1034,7 @@
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
 							<ul class="tsd-type-parameters">
 								<li>
-									<h4>Name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">&quot;transaction-untracked&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">keyof </span><span class="tsd-signature-type">OmnipresentEventData</span></h4>
+									<h4>Name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">keyof </span><a href="../modules/_cardano_sdk_wallet.html#UtxoRepositoryEvents" class="tsd-signature-type" data-tsd-kind="Type alias">UtxoRepositoryEvents</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">keyof </span><span class="tsd-signature-type">OmnipresentEventData</span></h4>
 								</li>
 							</ul>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -987,12 +1072,12 @@
 					<a name="offAny" class="tsd-anchor"></a>
 					<h3>off<wbr>Any</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">off<wbr>Any<span class="tsd-signature-symbol">(</span>listener<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">&quot;transaction-untracked&quot;</span>, eventData<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Transaction</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">off<wbr>Any<span class="tsd-signature-symbol">(</span>listener<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">keyof </span><a href="../modules/_cardano_sdk_wallet.html#UtxoRepositoryEvents" class="tsd-signature-type" data-tsd-kind="Type alias">UtxoRepositoryEvents</a>, eventData<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><a href="../interfaces/_cardano_sdk_wallet.UtxoRepositoryFields.html" class="tsd-signature-type" data-tsd-kind="Interface">UtxoRepositoryFields</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Transaction</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html">UtxoRepository</a>.<a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html#offAny">offAny</a></p>
+								<p>Implementation of UtxoRepository.offAny</p>
 								<p>Inherited from Emittery.offAny</p>
 								<ul>
 									<li>Defined in packages/wallet/node_modules/emittery/index.d.ts:539</li>
@@ -1006,21 +1091,21 @@
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>listener: <span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">&quot;transaction-untracked&quot;</span>, eventData<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Transaction</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h5>
+									<h5>listener: <span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">keyof </span><a href="../modules/_cardano_sdk_wallet.html#UtxoRepositoryEvents" class="tsd-signature-type" data-tsd-kind="Type alias">UtxoRepositoryEvents</a>, eventData<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><a href="../interfaces/_cardano_sdk_wallet.UtxoRepositoryFields.html" class="tsd-signature-type" data-tsd-kind="Interface">UtxoRepositoryFields</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Transaction</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h5>
 									<ul class="tsd-parameters">
 										<li class="tsd-parameter-signature">
 											<ul class="tsd-signatures tsd-kind-type-literal tsd-is-external">
-												<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">&quot;transaction-untracked&quot;</span>, eventData<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Transaction</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+												<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">keyof </span><a href="../modules/_cardano_sdk_wallet.html#UtxoRepositoryEvents" class="tsd-signature-type" data-tsd-kind="Type alias">UtxoRepositoryEvents</a>, eventData<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><a href="../interfaces/_cardano_sdk_wallet.UtxoRepositoryFields.html" class="tsd-signature-type" data-tsd-kind="Interface">UtxoRepositoryFields</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Transaction</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
 											</ul>
 											<ul class="tsd-descriptions">
 												<li class="tsd-description">
 													<h4 class="tsd-parameters-title">Parameters</h4>
 													<ul class="tsd-parameters">
 														<li>
-															<h5>eventName: <span class="tsd-signature-type">&quot;transaction-untracked&quot;</span></h5>
+															<h5>eventName: <span class="tsd-signature-symbol">keyof </span><a href="../modules/_cardano_sdk_wallet.html#UtxoRepositoryEvents" class="tsd-signature-type" data-tsd-kind="Type alias">UtxoRepositoryEvents</a></h5>
 														</li>
 														<li>
-															<h5>eventData: <span class="tsd-signature-type">Transaction</span></h5>
+															<h5>eventData: <span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><a href="../interfaces/_cardano_sdk_wallet.UtxoRepositoryFields.html" class="tsd-signature-type" data-tsd-kind="Interface">UtxoRepositoryFields</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Transaction</span></h5>
 														</li>
 													</ul>
 													<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -1043,7 +1128,7 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html">UtxoRepository</a>.<a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html#on">on</a></p>
+								<p>Implementation of UtxoRepository.on</p>
 								<p>Inherited from Emittery.on</p>
 								<ul>
 									<li>Defined in packages/wallet/node_modules/emittery/index.d.ts:315</li>
@@ -1077,7 +1162,7 @@
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
 							<ul class="tsd-type-parameters">
 								<li>
-									<h4>Name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">&quot;transaction-untracked&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">keyof </span><span class="tsd-signature-type">OmnipresentEventData</span></h4>
+									<h4>Name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">keyof </span><a href="../modules/_cardano_sdk_wallet.html#UtxoRepositoryEvents" class="tsd-signature-type" data-tsd-kind="Type alias">UtxoRepositoryEvents</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">keyof </span><span class="tsd-signature-type">OmnipresentEventData</span></h4>
 								</li>
 							</ul>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1116,12 +1201,12 @@
 					<a name="onAny" class="tsd-anchor"></a>
 					<h3>on<wbr>Any</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">on<wbr>Any<span class="tsd-signature-symbol">(</span>listener<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">&quot;transaction-untracked&quot;</span>, eventData<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Transaction</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">UnsubscribeFn</span></li>
+						<li class="tsd-signature tsd-kind-icon">on<wbr>Any<span class="tsd-signature-symbol">(</span>listener<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">keyof </span><a href="../modules/_cardano_sdk_wallet.html#UtxoRepositoryEvents" class="tsd-signature-type" data-tsd-kind="Type alias">UtxoRepositoryEvents</a>, eventData<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><a href="../interfaces/_cardano_sdk_wallet.UtxoRepositoryFields.html" class="tsd-signature-type" data-tsd-kind="Interface">UtxoRepositoryFields</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Transaction</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">UnsubscribeFn</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html">UtxoRepository</a>.<a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html#onAny">onAny</a></p>
+								<p>Implementation of UtxoRepository.onAny</p>
 								<p>Inherited from Emittery.onAny</p>
 								<ul>
 									<li>Defined in packages/wallet/node_modules/emittery/index.d.ts:491</li>
@@ -1135,21 +1220,21 @@
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>listener: <span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">&quot;transaction-untracked&quot;</span>, eventData<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Transaction</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h5>
+									<h5>listener: <span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">keyof </span><a href="../modules/_cardano_sdk_wallet.html#UtxoRepositoryEvents" class="tsd-signature-type" data-tsd-kind="Type alias">UtxoRepositoryEvents</a>, eventData<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><a href="../interfaces/_cardano_sdk_wallet.UtxoRepositoryFields.html" class="tsd-signature-type" data-tsd-kind="Interface">UtxoRepositoryFields</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Transaction</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h5>
 									<ul class="tsd-parameters">
 										<li class="tsd-parameter-signature">
 											<ul class="tsd-signatures tsd-kind-type-literal tsd-is-external">
-												<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">&quot;transaction-untracked&quot;</span>, eventData<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Transaction</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+												<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">keyof </span><a href="../modules/_cardano_sdk_wallet.html#UtxoRepositoryEvents" class="tsd-signature-type" data-tsd-kind="Type alias">UtxoRepositoryEvents</a>, eventData<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><a href="../interfaces/_cardano_sdk_wallet.UtxoRepositoryFields.html" class="tsd-signature-type" data-tsd-kind="Interface">UtxoRepositoryFields</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Transaction</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
 											</ul>
 											<ul class="tsd-descriptions">
 												<li class="tsd-description">
 													<h4 class="tsd-parameters-title">Parameters</h4>
 													<ul class="tsd-parameters">
 														<li>
-															<h5>eventName: <span class="tsd-signature-type">&quot;transaction-untracked&quot;</span></h5>
+															<h5>eventName: <span class="tsd-signature-symbol">keyof </span><a href="../modules/_cardano_sdk_wallet.html#UtxoRepositoryEvents" class="tsd-signature-type" data-tsd-kind="Type alias">UtxoRepositoryEvents</a></h5>
 														</li>
 														<li>
-															<h5>eventData: <span class="tsd-signature-type">Transaction</span></h5>
+															<h5>eventData: <span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><a href="../interfaces/_cardano_sdk_wallet.UtxoRepositoryFields.html" class="tsd-signature-type" data-tsd-kind="Interface">UtxoRepositoryFields</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Transaction</span></h5>
 														</li>
 													</ul>
 													<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -1173,7 +1258,7 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html">UtxoRepository</a>.<a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html#once">once</a></p>
+								<p>Implementation of UtxoRepository.once</p>
 								<p>Inherited from Emittery.once</p>
 								<ul>
 									<li>Defined in packages/wallet/node_modules/emittery/index.d.ts:460</li>
@@ -1208,7 +1293,7 @@
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
 							<ul class="tsd-type-parameters">
 								<li>
-									<h4>Name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">&quot;transaction-untracked&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">keyof </span><span class="tsd-signature-type">OmnipresentEventData</span></h4>
+									<h4>Name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">keyof </span><a href="../modules/_cardano_sdk_wallet.html#UtxoRepositoryEvents" class="tsd-signature-type" data-tsd-kind="Type alias">UtxoRepositoryEvents</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">keyof </span><span class="tsd-signature-type">OmnipresentEventData</span></h4>
 								</li>
 							</ul>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1231,9 +1316,9 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html">UtxoRepository</a>.<a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html#selectInputs">selectInputs</a></p>
+								<p>Implementation of UtxoRepository.selectInputs</p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d110f8d/packages/wallet/src/InMemoryUtxoRepository.ts#L92">packages/wallet/src/InMemoryUtxoRepository.ts:92</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/e17f9c6/packages/wallet/src/InMemoryUtxoRepository.ts#L95">packages/wallet/src/InMemoryUtxoRepository.ts:95</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1261,9 +1346,9 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html">UtxoRepository</a>.<a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html#sync">sync</a></p>
+								<p>Implementation of UtxoRepository.sync</p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d110f8d/packages/wallet/src/InMemoryUtxoRepository.ts#L63">packages/wallet/src/InMemoryUtxoRepository.ts:63</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/e17f9c6/packages/wallet/src/InMemoryUtxoRepository.ts#L63">packages/wallet/src/InMemoryUtxoRepository.ts:63</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -1391,6 +1476,9 @@
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
 					<li class=" tsd-kind-enum tsd-parent-kind-module">
+						<a href="../enums/_cardano_sdk_wallet.BalanceTrackerEvent.html" class="tsd-kind-icon">Balance<wbr>Tracker<wbr>Event</a>
+					</li>
+					<li class=" tsd-kind-enum tsd-parent-kind-module">
 						<a href="../enums/_cardano_sdk_wallet.TransactionFailure.html" class="tsd-kind-icon">Transaction<wbr>Failure</a>
 					</li>
 					<li class=" tsd-kind-enum tsd-parent-kind-module">
@@ -1398,6 +1486,9 @@
 					</li>
 					<li class=" tsd-kind-enum tsd-parent-kind-module">
 						<a href="../enums/_cardano_sdk_wallet.UtxoRepositoryEvent.html" class="tsd-kind-icon">Utxo<wbr>Repository<wbr>Event</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="_cardano_sdk_wallet.BalanceTracker.html" class="tsd-kind-icon">Balance<wbr>Tracker</a>
 					</li>
 					<li class=" tsd-kind-class tsd-parent-kind-module">
 						<a href="_cardano_sdk_wallet.InMemoryTransactionTracker.html" class="tsd-kind-icon">In<wbr>Memory<wbr>Transaction<wbr>Tracker</a>
@@ -1421,6 +1512,9 @@
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
 								<a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#_keyManager" class="tsd-kind-icon">#key<wbr>Manager</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
+								<a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#_lockedRewards" class="tsd-kind-icon">#locked<wbr>Rewards</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
 								<a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#_lockedUtxoSet" class="tsd-kind-icon">#locked<wbr>Utxo<wbr>Set</a>
@@ -1447,7 +1541,13 @@
 								<a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#listenerRemoved" class="tsd-kind-icon">listener<wbr>Removed</a>
 							</li>
 							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
+								<a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#allRewards" class="tsd-kind-icon">all<wbr>Rewards</a>
+							</li>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
 								<a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#allUtxos" class="tsd-kind-icon">all<wbr>Utxos</a>
+							</li>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
+								<a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#availableRewards" class="tsd-kind-icon">available<wbr>Rewards</a>
 							</li>
 							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
 								<a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#availableUtxos" class="tsd-kind-icon">available<wbr>Utxos</a>
@@ -1455,11 +1555,17 @@
 							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
 								<a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#delegation" class="tsd-kind-icon">delegation</a>
 							</li>
-							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
-								<a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#rewards" class="tsd-kind-icon">rewards</a>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-private">
+								<a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#_emitSynced" class="tsd-kind-icon">#emit<wbr>Synced</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-private">
+								<a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#_getOwnTransactionWithdrawalQty" class="tsd-kind-icon">#get<wbr>Own<wbr>Transaction<wbr>Withdrawal<wbr>Qty</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-private">
 								<a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#_onTransaction" class="tsd-kind-icon">#on<wbr>Transaction</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-private">
+								<a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#_trySync" class="tsd-kind-icon">#try<wbr>Sync</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
 								<a href="_cardano_sdk_wallet.InMemoryUtxoRepository.html#anyEvent" class="tsd-kind-icon">any<wbr>Event</a>
@@ -1514,6 +1620,15 @@
 						<a href="_cardano_sdk_wallet.TransactionError.html" class="tsd-kind-icon">Transaction<wbr>Error</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="../interfaces/_cardano_sdk_wallet.Balance.html" class="tsd-kind-icon">Balance</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="../interfaces/_cardano_sdk_wallet.BalanceTrackerEvents.html" class="tsd-kind-icon">Balance<wbr>Tracker<wbr>Events</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="../interfaces/_cardano_sdk_wallet.Balances.html" class="tsd-kind-icon">Balances</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
 						<a href="../interfaces/_cardano_sdk_wallet.InMemoryTransactionTrackerProps.html" class="tsd-kind-icon">In<wbr>Memory<wbr>Transaction<wbr>Tracker<wbr>Props</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
@@ -1538,13 +1653,16 @@
 						<a href="../interfaces/_cardano_sdk_wallet.TransactionTracker.html" class="tsd-kind-icon">Transaction<wbr>Tracker</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html" class="tsd-kind-icon">Utxo<wbr>Repository</a>
+						<a href="../interfaces/_cardano_sdk_wallet.UtxoRepositoryFields.html" class="tsd-kind-icon">Utxo<wbr>Repository<wbr>Fields</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
 						<a href="../modules/_cardano_sdk_wallet.html#Milliseconds" class="tsd-kind-icon">Milliseconds</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
 						<a href="../modules/_cardano_sdk_wallet.html#TransactionTrackerEvents" class="tsd-kind-icon">Transaction<wbr>Tracker<wbr>Events</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+						<a href="../modules/_cardano_sdk_wallet.html#UtxoRepository" class="tsd-kind-icon">Utxo<wbr>Repository</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
 						<a href="../modules/_cardano_sdk_wallet.html#UtxoRepositoryEvents" class="tsd-kind-icon">Utxo<wbr>Repository<wbr>Events</a>

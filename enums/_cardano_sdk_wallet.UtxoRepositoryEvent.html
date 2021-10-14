@@ -75,7 +75,8 @@
 						<section class="tsd-index-section ">
 							<h3>Enumeration members</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="_cardano_sdk_wallet.UtxoRepositoryEvent.html#TransactionUntracked" class="tsd-kind-icon">Transaction<wbr>Untracked</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="_cardano_sdk_wallet.UtxoRepositoryEvent.html#Changed" class="tsd-kind-icon">Changed</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="_cardano_sdk_wallet.UtxoRepositoryEvent.html#OutOfSync" class="tsd-kind-icon">Out<wbr>OfSync</a></li>
 							</ul>
 						</section>
 					</div>
@@ -84,12 +85,22 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Enumeration members</h2>
 				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
-					<a name="TransactionUntracked" class="tsd-anchor"></a>
-					<h3>Transaction<wbr>Untracked</h3>
-					<div class="tsd-signature tsd-kind-icon">Transaction<wbr>Untracked<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = &quot;transaction-untracked&quot;</span></div>
+					<a name="Changed" class="tsd-anchor"></a>
+					<h3>Changed</h3>
+					<div class="tsd-signature tsd-kind-icon">Changed<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = &quot;changed&quot;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d110f8d/packages/wallet/src/types.ts#L7">packages/wallet/src/types.ts:7</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/e17f9c6/packages/wallet/src/types.ts#L7">packages/wallet/src/types.ts:7</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
+					<a name="OutOfSync" class="tsd-anchor"></a>
+					<h3>Out<wbr>OfSync</h3>
+					<div class="tsd-signature tsd-kind-icon">Out<wbr>OfSync<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = &quot;out-of-sync&quot;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/e17f9c6/packages/wallet/src/types.ts#L8">packages/wallet/src/types.ts:8</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -127,6 +138,9 @@
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
 					<li class=" tsd-kind-enum tsd-parent-kind-module">
+						<a href="_cardano_sdk_wallet.BalanceTrackerEvent.html" class="tsd-kind-icon">Balance<wbr>Tracker<wbr>Event</a>
+					</li>
+					<li class=" tsd-kind-enum tsd-parent-kind-module">
 						<a href="_cardano_sdk_wallet.TransactionFailure.html" class="tsd-kind-icon">Transaction<wbr>Failure</a>
 					</li>
 					<li class=" tsd-kind-enum tsd-parent-kind-module">
@@ -138,12 +152,18 @@
 						<a href="_cardano_sdk_wallet.UtxoRepositoryEvent.html" class="tsd-kind-icon">Utxo<wbr>Repository<wbr>Event</a>
 						<ul>
 							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
-								<a href="_cardano_sdk_wallet.UtxoRepositoryEvent.html#TransactionUntracked" class="tsd-kind-icon">Transaction<wbr>Untracked</a>
+								<a href="_cardano_sdk_wallet.UtxoRepositoryEvent.html#Changed" class="tsd-kind-icon">Changed</a>
+							</li>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="_cardano_sdk_wallet.UtxoRepositoryEvent.html#OutOfSync" class="tsd-kind-icon">Out<wbr>OfSync</a>
 							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="../classes/_cardano_sdk_wallet.BalanceTracker.html" class="tsd-kind-icon">Balance<wbr>Tracker</a>
+					</li>
 					<li class=" tsd-kind-class tsd-parent-kind-module">
 						<a href="../classes/_cardano_sdk_wallet.InMemoryTransactionTracker.html" class="tsd-kind-icon">In<wbr>Memory<wbr>Transaction<wbr>Tracker</a>
 					</li>
@@ -152,6 +172,15 @@
 					</li>
 					<li class=" tsd-kind-class tsd-parent-kind-module">
 						<a href="../classes/_cardano_sdk_wallet.TransactionError.html" class="tsd-kind-icon">Transaction<wbr>Error</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="../interfaces/_cardano_sdk_wallet.Balance.html" class="tsd-kind-icon">Balance</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="../interfaces/_cardano_sdk_wallet.BalanceTrackerEvents.html" class="tsd-kind-icon">Balance<wbr>Tracker<wbr>Events</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="../interfaces/_cardano_sdk_wallet.Balances.html" class="tsd-kind-icon">Balances</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
 						<a href="../interfaces/_cardano_sdk_wallet.InMemoryTransactionTrackerProps.html" class="tsd-kind-icon">In<wbr>Memory<wbr>Transaction<wbr>Tracker<wbr>Props</a>
@@ -178,13 +207,16 @@
 						<a href="../interfaces/_cardano_sdk_wallet.TransactionTracker.html" class="tsd-kind-icon">Transaction<wbr>Tracker</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="../interfaces/_cardano_sdk_wallet.UtxoRepository.html" class="tsd-kind-icon">Utxo<wbr>Repository</a>
+						<a href="../interfaces/_cardano_sdk_wallet.UtxoRepositoryFields.html" class="tsd-kind-icon">Utxo<wbr>Repository<wbr>Fields</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
 						<a href="../modules/_cardano_sdk_wallet.html#Milliseconds" class="tsd-kind-icon">Milliseconds</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
 						<a href="../modules/_cardano_sdk_wallet.html#TransactionTrackerEvents" class="tsd-kind-icon">Transaction<wbr>Tracker<wbr>Events</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+						<a href="../modules/_cardano_sdk_wallet.html#UtxoRepository" class="tsd-kind-icon">Utxo<wbr>Repository</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
 						<a href="../modules/_cardano_sdk_wallet.html#UtxoRepositoryEvents" class="tsd-kind-icon">Utxo<wbr>Repository<wbr>Events</a>
