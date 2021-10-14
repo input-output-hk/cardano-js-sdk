@@ -1,5 +1,5 @@
 import { CardanoSerializationLib, loadCardanoSerializationLib } from '@cardano-sdk/core';
-import { testKeyManager } from '../testKeyManager';
+import { testKeyManager } from '../mocks';
 import { CertificateFactory } from '../../src/Transaction';
 import { KeyManager } from '../../src/KeyManagement';
 
@@ -43,8 +43,8 @@ describe('Transaction.CertificateFactory', () => {
     };
     const params = certs
       .poolRegistration({
-        cost: 1000,
-        pledge: 10_000,
+        cost: 1000n,
+        pledge: 10_000n,
         margin: { denominator: 5, numerator: 1 },
         owners: [owner],
         poolKeyHash: stakeKey,

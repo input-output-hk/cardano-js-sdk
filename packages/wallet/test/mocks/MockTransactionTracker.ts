@@ -1,5 +1,5 @@
 import Emittery from 'emittery';
-import { TransactionTrackerEvents } from '../src';
+import { TransactionTrackerEvents } from '../../src';
 
 export class MockTransactionTracker extends Emittery<TransactionTrackerEvents> {
   track = jest.fn();

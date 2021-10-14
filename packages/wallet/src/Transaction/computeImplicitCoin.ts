@@ -1,26 +1,32 @@
 import { ImplicitCoin } from '@cardano-sdk/cip2';
-import { ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
-import { sum } from 'lodash-es';
+import { BigIntMath, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
 import { InitializeTxProps } from './types';
 
 /**
  * Implementation is the same as in csl.get_implicit_input() and csl.get_deposit().
- * TODO: change lodash.sum to BigIntMath.sum when Lovelace type is aliased to bigint
  */
 export const computeImplicitCoin = (
   { stakeKeyDeposit, poolDeposit }: ProtocolParametersRequiredByWallet,
   { certificates, withdrawals }: InitializeTxProps
 ): ImplicitCoin => {
-  const deposit = sum(
+  const stakeKeyDepositBigint = stakeKeyDeposit && BigInt(stakeKeyDeposit);
+  const poolDepositBigint = poolDeposit && BigInt(poolDeposit);
+  const deposit = BigIntMath.sum(
     certificates?.map(
-      (cert) => (cert.as_stake_registration() && stakeKeyDeposit) || (cert.as_pool_registration() && poolDeposit) || 0
+      (cert) =>
+        (cert.as_stake_registration() && stakeKeyDepositBigint) ||
+        (cert.as_pool_registration() && poolDepositBigint) ||
+        0n
     ) || []
   );
   const withdrawalsTotal =
-    (withdrawals && sum(withdrawals.map(({ quantity }) => Number.parseInt(quantity.to_str())))) || 0;
-  const reclaimTotal = sum(
+    (withdrawals && BigIntMath.sum(withdrawals.map(({ quantity }) => BigInt(quantity.to_str())))) || 0n;
+  const reclaimTotal = BigIntMath.sum(
     certificates?.map(
-      (cert) => (cert.as_stake_deregistration() && stakeKeyDeposit) || (cert.as_pool_retirement() && poolDeposit) || 0
+      (cert) =>
+        (cert.as_stake_deregistration() && stakeKeyDepositBigint) ||
+        (cert.as_pool_retirement() && poolDepositBigint) ||
+        0n
     ) || []
   );
   return {

@@ -1,20 +1,19 @@
 import Schema, { TxIn, TxOut } from '@cardano-ogmios/schema';
 import { Buffer } from 'buffer';
-import { UtxoRepository } from './types';
-import { CardanoProvider, Ogmios, CardanoSerializationLib, CSL } from '@cardano-sdk/core';
+import { CardanoProvider, Ogmios, CardanoSerializationLib, CSL, cslUtil } from '@cardano-sdk/core';
 import { dummyLogger, Logger } from 'ts-log';
 import { ImplicitCoin, InputSelector, SelectionConstraints, SelectionResult } from '@cardano-sdk/cip2';
 import { KeyManager } from './KeyManagement';
 import {
+  UtxoRepository,
   OnTransactionArgs,
   TransactionTracker,
   TransactionTrackerEvent,
   UtxoRepositoryEvent,
   UtxoRepositoryEvents
-} from '.';
+} from './types';
 import { cslToOgmios } from '@cardano-sdk/core/src/Ogmios';
 import Emittery from 'emittery';
-import { TransactionError, TransactionFailure } from './TransactionError';
 
 export interface InMemoryUtxoRepositoryProps {
   csl: CardanoSerializationLib;
@@ -30,13 +29,14 @@ const utxoEquals = ([txIn1]: [Schema.TxIn, Schema.TxOut], [txIn2]: [Schema.TxIn,
 
 export class InMemoryUtxoRepository extends Emittery<UtxoRepositoryEvents> implements UtxoRepository {
   #csl: CardanoSerializationLib;
-  #delegationAndRewards: Schema.DelegationsAndRewards;
+  #delegationAndRewards: Ogmios.DelegationsAndRewards;
   #inputSelector: InputSelector;
   #keyManager: KeyManager;
   #logger: Logger;
   #provider: CardanoProvider;
   #utxoSet: Set<[TxIn, TxOut]>;
   #lockedUtxoSet: Set<[TxIn, TxOut]> = new Set();
+  #lockedRewards = 0n;
 
   constructor({
     csl,
@@ -84,9 +84,12 @@ export class InMemoryUtxoRepository extends Emittery<UtxoRepositoryEvents> imple
       this.#logger.debug('Delegation stored', result.delegationAndRewards.delegate);
     }
     if (this.#delegationAndRewards.rewards !== result.delegationAndRewards.rewards) {
-      this.#delegationAndRewards.rewards = result.delegationAndRewards.rewards;
+      this.#delegationAndRewards.rewards = result.delegationAndRewards.rewards
+        ? BigInt(result.delegationAndRewards.rewards)
+        : undefined;
       this.#logger.debug('Rewards balance stored', result.delegationAndRewards.rewards);
     }
+    this.#emitSynced();
   }
 
   public async selectInputs(
@@ -114,15 +117,34 @@ export class InMemoryUtxoRepository extends Emittery<UtxoRepositoryEvents> imple
     return this.allUtxos.filter((utxo) => !this.#lockedUtxoSet.has(utxo));
   }
 
-  public get rewards(): Schema.Lovelace | null {
+  public get allRewards(): Ogmios.Lovelace | null {
     return this.#delegationAndRewards.rewards ?? null;
+  }
+
+  public get availableRewards(): Ogmios.Lovelace | null {
+    if (!this.allRewards) return null;
+    return this.allRewards - this.#lockedRewards;
   }
 
   public get delegation(): Schema.PoolId | null {
     return this.#delegationAndRewards.delegate ?? null;
   }
 
+  #emitSynced() {
+    this.emit(UtxoRepositoryEvent.Changed, {
+      allUtxos: this.allUtxos,
+      availableUtxos: this.availableUtxos,
+      allRewards: this.allRewards,
+      availableRewards: this.availableRewards,
+      delegation: this.delegation
+    }).catch(this.#logger.error);
+  }
+
   async #onTransaction({ transaction, confirmed }: OnTransactionArgs) {
+    // Lock reward
+    const rewardsLockedByTx = this.#getOwnTransactionWithdrawalQty(transaction);
+    this.#lockedRewards += rewardsLockedByTx;
+    // Lock utxo
     const utxoLockedByTx: Schema.Utxo = [];
     const inputs = transaction.body().inputs();
     for (let inputIdx = 0; inputIdx < inputs.len(); inputIdx++) {
@@ -131,20 +153,40 @@ export class InMemoryUtxoRepository extends Emittery<UtxoRepositoryEvents> imple
       this.#lockedUtxoSet.add(utxo);
       utxoLockedByTx.push(utxo);
     }
-    const unlock = (spent?: boolean) => {
-      for (const utxo of utxoLockedByTx) {
-        this.#lockedUtxoSet.delete(utxo);
-        spent && this.#utxoSet.delete(utxo);
-      }
-    };
+    this.#emitSynced();
+    // Await confirmation. Rejection should be handled by the user after submitting transaction.
+    await confirmed.catch(() => void 0);
+    // Unlock utxo
+    for (const utxo of utxoLockedByTx) {
+      this.#lockedUtxoSet.delete(utxo);
+    }
+    // Unlock rewards
+    this.#lockedRewards -= rewardsLockedByTx;
+    // Sync utxo and rewards with the provider
+    await this.#trySync();
+  }
+
+  async #trySync() {
     try {
-      await confirmed;
-      unlock(true);
+      await this.sync();
     } catch (error) {
-      unlock(false);
-      if (!(error instanceof TransactionError) || error.reason !== TransactionFailure.Timeout) {
-        await this.emit(UtxoRepositoryEvent.TransactionUntracked, transaction).catch(this.#logger.error);
+      this.#logger.debug('InMemoryUtxoRepository.#trySync failed:', error);
+      this.emit(UtxoRepositoryEvent.OutOfSync, void 0).catch(this.#logger.error);
+    }
+  }
+
+  #getOwnTransactionWithdrawalQty(transaction: CSL.Transaction) {
+    const withdrawals = transaction.body().withdrawals();
+    if (!withdrawals) return 0n;
+    const ownStakeCredential = this.#csl.StakeCredential.from_keyhash(this.#keyManager.stakeKey.hash());
+    const withdrawalKeys = withdrawals.keys();
+    let withdrawalTotal = 0n;
+    for (let withdrawalKeyIdx = 0; withdrawalKeyIdx < withdrawalKeys.len(); withdrawalKeyIdx++) {
+      const rewardAddress = withdrawalKeys.get(withdrawalKeyIdx);
+      if (cslUtil.bytewiseEquals(rewardAddress.payment_cred(), ownStakeCredential)) {
+        withdrawalTotal += BigInt(withdrawals.get(rewardAddress)!.to_str());
       }
     }
+    return withdrawalTotal;
   }
 }

@@ -1,18 +1,14 @@
 import { InputSelector, roundRobinRandomImprove } from '@cardano-sdk/cip2';
 import { loadCardanoSerializationLib, CardanoSerializationLib, CSL, CardanoProvider, Ogmios } from '@cardano-sdk/core';
 import { SelectionConstraints } from '@cardano-sdk/util-dev';
-import { providerStub } from '../ProviderStub';
+import { providerStub, txTracker, testKeyManager } from '../mocks';
 import {
   CertificateFactory,
   createTransactionInternals,
   CreateTxInternalsProps,
   Withdrawal
 } from '../../src/Transaction';
-import { KeyManager } from '../../src/KeyManagement';
-import { testKeyManager } from '../testKeyManager';
-import { UtxoRepository } from '../../src/types';
-import { InMemoryUtxoRepository } from '../../src/InMemoryUtxoRepository';
-import { txTracker } from '../mockTransactionTracker';
+import { UtxoRepository, InMemoryUtxoRepository, KeyManagement } from '../../src';
 
 const address =
   'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g';
@@ -22,7 +18,7 @@ describe('Transaction.createTransactionInternals', () => {
   let provider: CardanoProvider;
   let inputSelector: InputSelector;
   let utxoRepository: UtxoRepository;
-  let keyManager: KeyManager;
+  let keyManager: KeyManagement.KeyManager;
   let outputs: Set<CSL.TransactionOutput>;
 
   const createSimpleTransactionInternals = async (props?: Partial<CreateTxInternalsProps>) => {

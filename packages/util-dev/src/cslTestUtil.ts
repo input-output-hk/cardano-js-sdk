@@ -11,7 +11,7 @@ export const createTxInput = (() => {
 
 export const createUnspentTxOutput = (
   csl: CardanoSerializationLib,
-  valueQuantities: Ogmios.util.OgmiosValue,
+  valueQuantities: Ogmios.Value,
   bech32Addr = 'addr1vy36kffjf87vzkuyqc5g0ys3fe3pez5zvqg9r5z9q9kfrkg2cs093'
 ): CSL.TransactionUnspentOutput => {
   const address = csl.Address.from_bech32(bech32Addr);
@@ -21,7 +21,7 @@ export const createUnspentTxOutput = (
 
 export const createOutput = (
   csl: CardanoSerializationLib,
-  valueQuantities: Ogmios.util.OgmiosValue,
+  valueQuantities: Ogmios.Value,
   bech32Addr = 'addr1vyeljkh3vr4h9s3lyxe7g2meushk3m4nwyzdgtlg96e6mrgg8fnle'
 ): CSL.TransactionOutput =>
   csl.TransactionOutput.new(csl.Address.from_bech32(bech32Addr), Ogmios.ogmiosToCsl(csl).value(valueQuantities));

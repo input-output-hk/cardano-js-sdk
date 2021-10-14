@@ -1,5 +1,5 @@
-import { Lovelace, ProtocolParametersAlonzo } from '@cardano-ogmios/schema';
-import { CSL } from '@cardano-sdk/core';
+import { ProtocolParametersAlonzo } from '@cardano-ogmios/schema';
+import { CSL, Ogmios } from '@cardano-sdk/core';
 
 export interface SelectionSkeleton {
   /**
@@ -74,11 +74,11 @@ export interface ImplicitCoin {
   /**
    * Delegation withdrawals + reclaims
    */
-  input?: Lovelace;
+  input?: Ogmios.Lovelace;
   /**
    * Delegation registration deposit
    */
-  deposit?: Lovelace;
+  deposit?: Ogmios.Lovelace;
 }
 
 export interface InputSelectionParameters {

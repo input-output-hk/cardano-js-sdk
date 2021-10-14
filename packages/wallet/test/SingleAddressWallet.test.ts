@@ -1,8 +1,9 @@
 /* eslint-disable max-len */
 import { loadCardanoSerializationLib, CardanoSerializationLib, Cardano } from '@cardano-sdk/core';
 import { InputSelector, roundRobinRandomImprove } from '@cardano-sdk/cip2';
-import { ProviderStub, providerStub } from './ProviderStub';
+import { ProviderStub, providerStub, txTracker } from './mocks';
 import {
+  BalanceTracker,
   createSingleAddressWallet,
   InMemoryUtxoRepository,
   KeyManagement,
@@ -10,7 +11,6 @@ import {
   SingleAddressWalletDependencies,
   UtxoRepository
 } from '../src';
-import { txTracker } from './mockTransactionTracker';
 
 describe('Wallet', () => {
   const name = 'Test Wallet';
@@ -41,6 +41,7 @@ describe('Wallet', () => {
     expect(wallet.name).toBe(name);
     expect(typeof wallet.initializeTx).toBe('function');
     expect(typeof wallet.signTx).toBe('function');
+    expect(wallet.balance).toBeInstanceOf(BalanceTracker);
   });
 
   describe('wallet behaviour', () => {

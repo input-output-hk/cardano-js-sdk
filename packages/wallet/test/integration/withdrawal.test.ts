@@ -1,6 +1,8 @@
+/* eslint-disable no-fallthrough */
 import { roundRobinRandomImprove } from '@cardano-sdk/cip2';
 import { Cardano, CardanoSerializationLib, loadCardanoSerializationLib } from '@cardano-sdk/core';
 import {
+  BalanceTrackerEvent,
   createSingleAddressWallet,
   InMemoryTransactionTracker,
   InMemoryUtxoRepository,
@@ -15,7 +17,7 @@ import {
   UtxoRepositoryEvent
 } from '@cardano-sdk/wallet';
 // Not testing with a real provider
-import { providerStub } from '../ProviderStub';
+import { providerStub } from '../mocks';
 
 const walletProps: SingleAddressWalletProps = { name: 'some-wallet' };
 const networkId = Cardano.NetworkId.mainnet;
@@ -34,7 +36,7 @@ describe('integration/withdrawal', () => {
     keyManager = KeyManagement.createInMemoryKeyManager({ csl, mnemonicWords, password, networkId });
     const provider = providerStub();
     const inputSelector = roundRobinRandomImprove(csl);
-    txTracker = new InMemoryTransactionTracker({ csl, provider });
+    txTracker = new InMemoryTransactionTracker({ csl, provider, pollInterval: 1 });
     utxoRepository = new InMemoryUtxoRepository({ csl, provider, txTracker, inputSelector, keyManager });
     wallet = await createSingleAddressWallet(walletProps, {
       csl,
@@ -48,35 +50,59 @@ describe('integration/withdrawal', () => {
     await utxoRepository.sync();
   });
 
-  it('does not throw', async () => {
-    // This is not testing anything, just a usage example
-    utxoRepository.on(UtxoRepositoryEvent.TransactionUntracked, (tx) => {
-      // UtxoRepository is not sure whether it's UTxO can be spent due to failing to track transaction confirmation.
-      // SubmitTxResult.confirmed has rejected. Calling track() will lock UTxO again:
-      txTracker.track(tx).catch((error) => {
-        /* eslint-disable-next-line sonarjs/no-all-duplicated-branches */
-        if (error instanceof TransactionError && error.reason === TransactionFailure.Timeout) {
-          // Transaction has expired and will not be confirmed. Therefore it's safe to spend the UTxO again.
-        } else {
-          // Probably wait a little bit and retry
-        }
-      });
-    });
+  it('has balance', () => {
+    expect(wallet.balance.total).toBeTruthy();
+    expect(wallet.balance.available).toBeTruthy();
+  });
 
+  it('has events', () => {
+    wallet.balance.on(BalanceTrackerEvent.Changed, ({ total, available }) => {
+      expect(total).toBeTruthy();
+      expect(available).toBeTruthy();
+      // This is emitted after transaction is submitted and balance is locked before confirmation
+      // And after UtxoRepository.sync()
+    });
+    utxoRepository.on(UtxoRepositoryEvent.OutOfSync, () => {
+      // This is emitted when cardano-js-sdk calls sync() internally and it fails.
+      // User should attempt to resync using utxoRepository.sync()
+    });
+  });
+
+  it('can submit transaction', async () => {
     const certFactory = new Transaction.CertificateFactory(csl, keyManager);
 
     const { body, hash } = await wallet.initializeTx({
       certificates: [certFactory.stakeKeyDeregistration()],
-      withdrawals: [Transaction.withdrawal(csl, keyManager, utxoRepository.rewards || 0)],
+      withdrawals: [Transaction.withdrawal(csl, keyManager, utxoRepository.availableRewards || 0n)],
       outputs: new Set() // In a real transaction you would probably want to have some outputs
     });
     // Calculated fee is returned by invoking body.fee()
     const tx = await wallet.signTx(body, hash);
 
     const { submitted, confirmed } = wallet.submitTx(tx);
-    // Transaction is submitting. UTxO is locked.
-    await submitted;
-    // Transaction is successfully submitted, but not confirmed yet
-    await confirmed;
+    try {
+      // Transaction is submitting. UTxO is locked.
+      await submitted;
+      // Transaction is successfully submitted, but not confirmed yet
+      await confirmed;
+    } catch (error) {
+      if (error instanceof TransactionError) {
+        switch (error.reason) {
+          case TransactionFailure.InvalidTransaction:
+          // Invalid transaction, probably no validity interval set
+          case TransactionFailure.Timeout:
+          // Transaction has expired and will not be confirmed. Therefore it's safe to spend the UTxO again.
+          case TransactionFailure.FailedToSubmit:
+          // Probably attempt to resubmit
+          case TransactionFailure.CannotTrack:
+          // Failed when attempting to track transaction confirmation.
+          // Probably just attempt to track it again by calling txTracker.track(tx)
+          case TransactionFailure.Unknown:
+          // Most likely a bug in cardano-js-sdk
+        }
+      } else {
+        // Most likely a bug in cardano-js-sdk
+      }
+    }
   });
 });

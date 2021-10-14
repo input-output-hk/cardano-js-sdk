@@ -110,8 +110,8 @@ export const assertFailureProperties = ({
   implicitCoin
 }: {
   error: InputSelectionError;
-  utxoAmounts: Ogmios.util.OgmiosValue[];
-  outputsAmounts: Ogmios.util.OgmiosValue[];
+  utxoAmounts: Ogmios.Value[];
+  outputsAmounts: Ogmios.Value[];
   constraints: SelectionConstraints.MockSelectionConstraints;
   implicitCoin?: ImplicitCoin;
 }) => {
@@ -159,11 +159,11 @@ export const generateSelectionParams = (() => {
   /**
    * Generate random amount of coin and assets.
    */
-  const arrayOfCoinAndAssets = (implicitCoin = 0) =>
+  const arrayOfCoinAndAssets = (implicitCoin = 0n) =>
     fc
       .array(
-        fc.record<Ogmios.util.OgmiosValue>({
-          coins: fc.bigUint(cslUtil.MAX_U64 - BigInt(implicitCoin)),
+        fc.record<Ogmios.Value>({
+          coins: fc.bigUint(cslUtil.MAX_U64 - implicitCoin),
           assets: fc.oneof(
             fc
               .set(fc.oneof(...AssetId.All.map((asset) => fc.constant(asset))))
@@ -174,7 +174,7 @@ export const generateSelectionParams = (() => {
                 assets.reduce((quantities, { amount, asset }) => {
                   quantities[asset] = amount;
                   return quantities;
-                }, {} as Ogmios.util.TokenMap)
+                }, {} as Ogmios.TokenMap)
               ),
             fc.constant(void 0)
           )
@@ -196,28 +196,28 @@ export const generateSelectionParams = (() => {
       deposit: fc.oneof(
         fc.constant(void 0),
         fc
-          .tuple(fc.nat(2), fc.nat(2))
-          .map(([numKeyDeposits, numPoolDeposits]) => numKeyDeposits * 2_000_000 + numPoolDeposits * 500_000_000)
+          .tuple(fc.bigUint(2n), fc.bigUint(2n))
+          .map(([numKeyDeposits, numPoolDeposits]) => numKeyDeposits * 2_000_000n + numPoolDeposits * 500_000_000n)
       ),
       input: fc.oneof(
         fc.constant(void 0),
         fc
           .tuple(
-            fc.nat(2),
-            fc.nat(2),
-            fc.oneof(fc.constant(0), fc.constant(1), fc.constant(200_000), fc.constant(2_000_003))
+            fc.bigUint(2n),
+            fc.bigUint(2n),
+            fc.oneof(fc.constant(0n), fc.constant(1n), fc.constant(200_000n), fc.constant(2_000_003n))
           )
           .map(
             ([numKeyDeposits, numPoolDeposits, withdrawals]) =>
-              numKeyDeposits * 2_000_000 + numPoolDeposits * 500_000_000 + withdrawals
+              numKeyDeposits * 2_000_000n + numPoolDeposits * 500_000_000n + withdrawals
           )
       )
     })
   );
 
   return (): Arbitrary<{
-    utxoAmounts: Ogmios.util.OgmiosValue[];
-    outputsAmounts: Ogmios.util.OgmiosValue[];
+    utxoAmounts: Ogmios.Value[];
+    outputsAmounts: Ogmios.Value[];
     constraints: SelectionConstraints.MockSelectionConstraints;
     implicitCoin?: ImplicitCoin;
   }> =>

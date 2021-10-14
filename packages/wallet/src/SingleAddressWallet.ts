@@ -4,7 +4,14 @@ import { UtxoRepository } from './types';
 import { dummyLogger, Logger } from 'ts-log';
 import { defaultSelectionConstraints } from '@cardano-sdk/cip2';
 import { computeImplicitCoin, createTransactionInternals, InitializeTxProps, TxInternals } from './Transaction';
-import { KeyManagement, TransactionError, TransactionFailure, TransactionTracker } from '.';
+import {
+  BalanceTracker,
+  InMemoryTransactionTracker,
+  KeyManagement,
+  TransactionError,
+  TransactionFailure,
+  TransactionTracker
+} from '.';
 
 export interface SubmitTxResult {
   /**
@@ -20,6 +27,7 @@ export interface SubmitTxResult {
 }
 export interface SingleAddressWallet {
   address: Schema.Address;
+  balance: BalanceTracker;
   initializeTx: (props: InitializeTxProps) => Promise<TxInternals>;
   name: string;
   signTx: (body: CSL.TransactionBody, hash: CSL.TransactionHash) => Promise<CSL.Transaction>;
@@ -32,7 +40,8 @@ export interface SingleAddressWalletDependencies {
   logger?: Logger;
   provider: CardanoProvider;
   utxoRepository: UtxoRepository;
-  txTracker: TransactionTracker;
+  txTracker?: TransactionTracker;
+  balanceTracker?: BalanceTracker;
 }
 
 export interface SingleAddressWalletProps {
@@ -48,7 +57,15 @@ const ensureValidityInterval = (
 
 export const createSingleAddressWallet = async (
   { name }: SingleAddressWalletProps,
-  { csl, provider, keyManager, utxoRepository, txTracker, logger = dummyLogger }: SingleAddressWalletDependencies
+  {
+    csl,
+    provider,
+    keyManager,
+    utxoRepository,
+    txTracker = new InMemoryTransactionTracker({ csl, provider }),
+    balanceTracker = new BalanceTracker(utxoRepository),
+    logger = dummyLogger
+  }: SingleAddressWalletDependencies
 ): Promise<SingleAddressWallet> => {
   const address = keyManager.deriveAddress(0, 0);
   const protocolParameters = await provider.currentWalletProtocolParameters();
@@ -58,6 +75,7 @@ export const createSingleAddressWallet = async (
   };
   return {
     address,
+    balance: balanceTracker,
     initializeTx: async (props) => {
       const tip = await provider.ledgerTip();
       const validityInterval = ensureValidityInterval(tip.slot, props.options?.validityInterval);
