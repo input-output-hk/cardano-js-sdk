@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 import { loadCardanoSerializationLib, CardanoSerializationLib, Cardano } from '@cardano-sdk/core';
 import { InputSelector, roundRobinRandomImprove } from '@cardano-sdk/cip2';
-import { ProviderStub, providerStub } from './ProviderStub';
+import { ProviderStub, providerStub, txTracker } from './mocks';
 import {
   createSingleAddressWallet,
   InMemoryUtxoRepository,
@@ -10,7 +10,6 @@ import {
   SingleAddressWalletDependencies,
   UtxoRepository
 } from '../src';
-import { txTracker } from './mockTransactionTracker';
 
 describe('Wallet', () => {
   const name = 'Test Wallet';

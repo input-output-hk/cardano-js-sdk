@@ -16,7 +16,7 @@ import {
   UtxoRepositoryEvent
 } from '@cardano-sdk/wallet';
 // Not testing with a real provider
-import { providerStub } from '../ProviderStub';
+import { providerStub } from '../mocks';
 
 const walletProps: SingleAddressWalletProps = { name: 'some-wallet' };
 const networkId = Cardano.NetworkId.mainnet;

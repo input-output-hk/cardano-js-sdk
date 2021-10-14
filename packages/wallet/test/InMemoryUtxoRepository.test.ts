@@ -1,8 +1,17 @@
+/* eslint-disable unicorn/consistent-function-scoping */
 /* eslint-disable promise/param-names */
 import { roundRobinRandomImprove, InputSelector } from '@cardano-sdk/cip2';
 import { loadCardanoSerializationLib, CardanoSerializationLib, CSL, Ogmios, Cardano } from '@cardano-sdk/core';
 import { flushPromises, SelectionConstraints } from '@cardano-sdk/util-dev';
-import { providerStub, delegate, rewards, ProviderStub, utxo, delegationAndRewards } from './ProviderStub';
+import {
+  providerStub,
+  delegate,
+  rewards,
+  ProviderStub,
+  utxo,
+  delegationAndRewards,
+  MockTransactionTracker
+} from './mocks';
 import {
   InMemoryUtxoRepository,
   KeyManagement,
@@ -11,7 +20,6 @@ import {
   UtxoRepositoryEvent,
   UtxoRepositoryFields
 } from '../src';
-import { MockTransactionTracker } from './mockTransactionTracker';
 import { ogmiosToCsl } from '@cardano-sdk/core/src/Ogmios';
 import { TxIn, TxOut } from '@cardano-ogmios/schema';
 import { TransactionError, TransactionFailure } from '../src/TransactionError';
@@ -60,9 +68,9 @@ describe('InMemoryUtxoRepository', () => {
   });
 
   test('constructed state', async () => {
-    await expect(utxoRepository.allUtxos.length).toBe(0);
-    await expect(utxoRepository.allRewards).toBe(null);
-    await expect(utxoRepository.delegation).toBe(null);
+    expect(utxoRepository.allUtxos.length).toBe(0);
+    expect(utxoRepository.allRewards).toBe(null);
+    expect(utxoRepository.delegation).toBe(null);
   });
 
   test('sync', async () => {
@@ -79,31 +87,28 @@ describe('InMemoryUtxoRepository', () => {
     expect(utxoRepository).toMatchObject(expectedFields);
     expect(syncedHandler).toBeCalledTimes(1);
     expect(syncedHandler).toBeCalledWith(expectedFields);
-    // await expect(utxoRepository.allUtxos.length).toBe(3);
-    // await expect(utxoRepository.allRewards).toBe(rewards);
-    // await expect(utxoRepository.delegation).toBe(delegate);
     const identicalUtxo = [{ ...utxo[1][0] }, { ...utxo[1][1] }] as const; // clone UTxO
     provider.utxoDelegationAndRewards.mockResolvedValueOnce({
       utxo: [utxo[0], identicalUtxo],
       delegationAndRewards
     });
     await utxoRepository.sync();
-    await expect(utxoRepository.allUtxos.length).toBe(2);
+    expect(utxoRepository.allUtxos.length).toBe(2);
     // Verify we're not replacing the object with an identical one in the UTxO set
-    await expect(utxoRepository.allUtxos).not.toContain(identicalUtxo);
-    await expect(utxoRepository.allUtxos).toContain(utxo[1]);
+    expect(utxoRepository.allUtxos).not.toContain(identicalUtxo);
+    expect(utxoRepository.allUtxos).toContain(utxo[1]);
     expect(syncedHandler).toBeCalledTimes(2);
   });
 
   describe('selectInputs', () => {
     it('can be called without explicitly syncing', async () => {
       const result = await utxoRepository.selectInputs(outputs, SelectionConstraints.NO_CONSTRAINTS);
-      await expect(utxoRepository.allUtxos.length).toBe(3);
-      await expect(utxoRepository.allRewards).toBe(rewards);
-      await expect(utxoRepository.delegation).toBe(delegate);
-      await expect(result.selection.inputs.size).toBeGreaterThan(0);
-      await expect(result.selection.outputs).toBe(outputs);
-      await expect(result.selection.change.size).toBe(2);
+      expect(utxoRepository.allUtxos.length).toBe(3);
+      expect(utxoRepository.allRewards).toBe(rewards);
+      expect(utxoRepository.delegation).toBe(delegate);
+      expect(result.selection.inputs.size).toBeGreaterThan(0);
+      expect(result.selection.outputs).toBe(outputs);
+      expect(result.selection.change.size).toBe(2);
     });
   });
 
@@ -134,6 +139,11 @@ describe('InMemoryUtxoRepository', () => {
         availableRewards: rewards - transactionWithdrawal,
         delegation: delegate
       } as UtxoRepositoryFields);
+    };
+
+    const assertThereAreNoPendingTransactionsOrRewards = () => {
+      expect(utxoRepository.availableUtxos).toHaveLength(utxoRepository.allUtxos.length);
+      expect(utxoRepository.allRewards).toBe(utxoRepository.availableRewards);
     };
 
     beforeEach(async () => {
@@ -184,8 +194,21 @@ describe('InMemoryUtxoRepository', () => {
         });
       });
 
+      const confirmTxAndAssertUtxoRepositorySynced = async () => {
+        await completeConfirmation!();
+        await flushPromises();
+        // Assert values from provider sync
+        expect(provider.utxoDelegationAndRewards).toBeCalledTimes(2);
+        expect(utxoRepository.availableUtxos).toHaveLength(numUtxoPreTransaction - 1);
+        expect(utxoRepository.availableUtxos).not.toContain(transactionUtxo);
+        expect(utxoRepository.availableRewards).toBe(rewardsPreTransaction - transactionWithdrawal);
+        expect(onOutOfSync).not.toBeCalled();
+      };
+
       it('transaction confirmed', async () => {
         await trackTransaction(new Promise<void>((resolve) => (completeConfirmation = resolve)));
+        await confirmTxAndAssertUtxoRepositorySynced();
+        assertThereAreNoPendingTransactionsOrRewards();
       });
 
       it('transaction confirmation failed', async () => {
@@ -195,19 +218,8 @@ describe('InMemoryUtxoRepository', () => {
             (_, reject) => (completeConfirmation = () => reject(new TransactionError(TransactionFailure.Timeout)))
           )
         );
-      });
-
-      afterEach(async () => {
-        // Review: is it ok to reuse code by utilizing afterEach, or should we only use it for test cleanup?
-        // transaction confirmed or rejected, based on 'completeConfirmation' function set by test
-        await completeConfirmation!();
-        await flushPromises();
-        // Assert values from provider sync
-        expect(provider.utxoDelegationAndRewards).toBeCalledTimes(2);
-        expect(utxoRepository.availableUtxos).toHaveLength(numUtxoPreTransaction - 1);
-        expect(utxoRepository.availableUtxos).not.toContain(transactionUtxo);
-        expect(utxoRepository.availableRewards).toBe(rewardsPreTransaction - transactionWithdrawal);
-        expect(onOutOfSync).not.toBeCalled();
+        await confirmTxAndAssertUtxoRepositorySynced();
+        assertThereAreNoPendingTransactionsOrRewards();
       });
     });
 
@@ -224,11 +236,7 @@ describe('InMemoryUtxoRepository', () => {
       expect(utxoRepository.availableUtxos).toContain(transactionUtxo);
       expect(utxoRepository.allRewards).toBe(rewardsPreTransaction);
       expect(onOutOfSync).toBeCalledTimes(1);
-    });
-
-    afterEach(() => {
-      expect(utxoRepository.availableUtxos).toHaveLength(utxoRepository.allUtxos.length);
-      expect(utxoRepository.allRewards).toBe(utxoRepository.availableRewards);
+      assertThereAreNoPendingTransactionsOrRewards();
     });
   });
 });

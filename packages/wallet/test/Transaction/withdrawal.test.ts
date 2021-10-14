@@ -1,5 +1,5 @@
 import { loadCardanoSerializationLib } from '@cardano-sdk/core';
-import { testKeyManager } from '../testKeyManager';
+import { testKeyManager } from '../mocks';
 import { Transaction } from '../../src';
 
 describe('Transaction.withdrawal', () => {

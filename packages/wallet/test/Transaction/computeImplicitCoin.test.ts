@@ -1,5 +1,5 @@
 import { loadCardanoSerializationLib, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
-import { testKeyManager } from '../testKeyManager';
+import { testKeyManager } from '../mocks';
 import { Transaction } from '../../src';
 import { InitializeTxProps } from '../../src/Transaction';
 

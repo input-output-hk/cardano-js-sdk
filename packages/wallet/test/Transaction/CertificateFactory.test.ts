@@ -1,5 +1,5 @@
 import { CardanoSerializationLib, loadCardanoSerializationLib } from '@cardano-sdk/core';
-import { testKeyManager } from '../testKeyManager';
+import { testKeyManager } from '../mocks';
 import { CertificateFactory } from '../../src/Transaction';
 import { KeyManager } from '../../src/KeyManagement';
 
