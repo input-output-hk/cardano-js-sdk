@@ -8,7 +8,8 @@ import {
   KeyManagement,
   TransactionTrackerEvent,
   UtxoRepository,
-  UtxoRepositoryEvent
+  UtxoRepositoryEvent,
+  UtxoRepositoryFields
 } from '../src';
 import { MockTransactionTracker } from './mockTransactionTracker';
 import { ogmiosToCsl } from '@cardano-sdk/core/src/Ogmios';
@@ -65,10 +66,22 @@ describe('InMemoryUtxoRepository', () => {
   });
 
   test('sync', async () => {
+    const syncedHandler = jest.fn();
+    utxoRepository.on(UtxoRepositoryEvent.Changed, syncedHandler);
     await utxoRepository.sync();
-    await expect(utxoRepository.allUtxos.length).toBe(3);
-    await expect(utxoRepository.allRewards).toBe(rewards);
-    await expect(utxoRepository.delegation).toBe(delegate);
+    const expectedFields: UtxoRepositoryFields = {
+      allUtxos: utxo,
+      availableUtxos: utxo,
+      allRewards: rewards,
+      availableRewards: rewards,
+      delegation: delegate
+    };
+    expect(utxoRepository).toMatchObject(expectedFields);
+    expect(syncedHandler).toBeCalledTimes(1);
+    expect(syncedHandler).toBeCalledWith(expectedFields);
+    // await expect(utxoRepository.allUtxos.length).toBe(3);
+    // await expect(utxoRepository.allRewards).toBe(rewards);
+    // await expect(utxoRepository.delegation).toBe(delegate);
     const identicalUtxo = [{ ...utxo[1][0] }, { ...utxo[1][1] }] as const; // clone UTxO
     provider.utxoDelegationAndRewards.mockResolvedValueOnce({
       utxo: [utxo[0], identicalUtxo],
@@ -79,6 +92,7 @@ describe('InMemoryUtxoRepository', () => {
     // Verify we're not replacing the object with an identical one in the UTxO set
     await expect(utxoRepository.allUtxos).not.toContain(identicalUtxo);
     await expect(utxoRepository.allUtxos).toContain(utxo[1]);
+    expect(syncedHandler).toBeCalledTimes(2);
   });
 
   describe('selectInputs', () => {
@@ -103,6 +117,8 @@ describe('InMemoryUtxoRepository', () => {
     const transactionWithdrawal = 1n;
 
     const trackTransaction = async (confirmed: Promise<void>) => {
+      const syncedHandler = jest.fn();
+      utxoRepository.on(UtxoRepositoryEvent.Changed, syncedHandler);
       await txTracker.emit(TransactionTrackerEvent.NewTransaction, {
         transaction,
         confirmed
@@ -110,6 +126,14 @@ describe('InMemoryUtxoRepository', () => {
       // transaction not yet confirmed
       expect(utxoRepository.availableUtxos).toHaveLength(utxoRepository.allUtxos.length - 1);
       expect(utxoRepository.availableUtxos).not.toContain(transactionUtxo);
+      expect(syncedHandler).toBeCalledTimes(1);
+      expect(syncedHandler).toBeCalledWith({
+        allUtxos: utxo,
+        availableUtxos: utxo.slice(1),
+        allRewards: rewards,
+        availableRewards: rewards - transactionWithdrawal,
+        delegation: delegate
+      } as UtxoRepositoryFields);
     };
 
     beforeEach(async () => {

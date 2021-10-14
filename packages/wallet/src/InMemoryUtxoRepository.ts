@@ -1,17 +1,17 @@
 import Schema, { TxIn, TxOut } from '@cardano-ogmios/schema';
 import { Buffer } from 'buffer';
-import { UtxoRepository } from './types';
 import { CardanoProvider, Ogmios, CardanoSerializationLib, CSL, cslUtil } from '@cardano-sdk/core';
 import { dummyLogger, Logger } from 'ts-log';
 import { ImplicitCoin, InputSelector, SelectionConstraints, SelectionResult } from '@cardano-sdk/cip2';
 import { KeyManager } from './KeyManagement';
 import {
+  UtxoRepository,
   OnTransactionArgs,
   TransactionTracker,
   TransactionTrackerEvent,
   UtxoRepositoryEvent,
   UtxoRepositoryEvents
-} from '.';
+} from './types';
 import { cslToOgmios } from '@cardano-sdk/core/src/Ogmios';
 import Emittery from 'emittery';
 
@@ -89,6 +89,7 @@ export class InMemoryUtxoRepository extends Emittery<UtxoRepositoryEvents> imple
         : undefined;
       this.#logger.debug('Rewards balance stored', result.delegationAndRewards.rewards);
     }
+    this.#emitSynced();
   }
 
   public async selectInputs(
@@ -129,6 +130,16 @@ export class InMemoryUtxoRepository extends Emittery<UtxoRepositoryEvents> imple
     return this.#delegationAndRewards.delegate ?? null;
   }
 
+  #emitSynced() {
+    this.emit(UtxoRepositoryEvent.Changed, {
+      allUtxos: this.allUtxos,
+      availableUtxos: this.availableUtxos,
+      allRewards: this.allRewards,
+      availableRewards: this.availableRewards,
+      delegation: this.delegation
+    }).catch(this.#logger.error);
+  }
+
   async #onTransaction({ transaction, confirmed }: OnTransactionArgs) {
     // Lock reward
     const rewardsLockedByTx = this.#getOwnTransactionWithdrawalQty(transaction);
@@ -142,6 +153,7 @@ export class InMemoryUtxoRepository extends Emittery<UtxoRepositoryEvents> imple
       this.#lockedUtxoSet.add(utxo);
       utxoLockedByTx.push(utxo);
     }
+    this.#emitSynced();
     // Await confirmation. Rejection should be handled by the user after submitting transaction.
     await confirmed.catch(() => void 0);
     // Unlock utxo

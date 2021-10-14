@@ -4,36 +4,32 @@ import { CSL, Ogmios } from '@cardano-sdk/core';
 import Emittery from 'emittery';
 
 export enum UtxoRepositoryEvent {
-  OutOfSync = 'out-of-sync',
-  UtxoChanged = 'utxo-changed',
-  RewardsChanged = 'rewards-changed'
+  Changed = 'changed',
+  OutOfSync = 'out-of-sync'
 }
 
-export type UtxoRepositoryEvents = {
-  'out-of-sync': void;
-  'transaction-untracked': CSL.Transaction;
-  'utxo-changed': {
-    allUtxos: Schema.Utxo;
-    availableUtxos: Schema.Utxo;
-  };
-  'rewards-changed': {
-    allRewards: Schema.Lovelace;
-    availableRewards: Ogmios.Lovelace;
-  };
-};
-export interface UtxoRepository extends Emittery<UtxoRepositoryEvents> {
+export interface UtxoRepositoryFields {
   allUtxos: Schema.Utxo;
   availableUtxos: Schema.Utxo;
   allRewards: Ogmios.Lovelace | null;
   availableRewards: Ogmios.Lovelace | null;
   delegation: Schema.PoolId | null;
+}
+
+export type UtxoRepositoryEvents = {
+  changed: UtxoRepositoryFields;
+  'out-of-sync': void;
+  'transaction-untracked': CSL.Transaction;
+};
+export type UtxoRepository = {
   sync: () => Promise<void>;
   selectInputs: (
     outputs: Set<CSL.TransactionOutput>,
     constraints: SelectionConstraints,
     implicitCoin?: ImplicitCoin
   ) => Promise<SelectionResult>;
-}
+} & UtxoRepositoryFields &
+  Emittery<UtxoRepositoryEvents>;
 
 export interface OnTransactionArgs {
   transaction: CSL.Transaction;
