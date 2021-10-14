@@ -2,6 +2,7 @@
 import { roundRobinRandomImprove } from '@cardano-sdk/cip2';
 import { Cardano, CardanoSerializationLib, loadCardanoSerializationLib } from '@cardano-sdk/core';
 import {
+  BalanceTrackerEvent,
   createSingleAddressWallet,
   InMemoryTransactionTracker,
   InMemoryUtxoRepository,
@@ -49,12 +50,25 @@ describe('integration/withdrawal', () => {
     await utxoRepository.sync();
   });
 
-  it('does not throw', async () => {
+  it('has balance', () => {
+    expect(wallet.balance.total).toBeTruthy();
+    expect(wallet.balance.available).toBeTruthy();
+  });
+
+  it('has events', () => {
+    wallet.balance.on(BalanceTrackerEvent.Changed, ({ total, available }) => {
+      expect(total).toBeTruthy();
+      expect(available).toBeTruthy();
+      // This is emitted after transaction is submitted and balance is locked before confirmation
+      // And after UtxoRepository.sync()
+    });
     utxoRepository.on(UtxoRepositoryEvent.OutOfSync, () => {
       // This is emitted when cardano-js-sdk calls sync() internally and it fails.
       // User should attempt to resync using utxoRepository.sync()
     });
+  });
 
+  it('can submit transaction', async () => {
     const certFactory = new Transaction.CertificateFactory(csl, keyManager);
 
     const { body, hash } = await wallet.initializeTx({

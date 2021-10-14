@@ -3,6 +3,7 @@ import { loadCardanoSerializationLib, CardanoSerializationLib, Cardano } from '@
 import { InputSelector, roundRobinRandomImprove } from '@cardano-sdk/cip2';
 import { ProviderStub, providerStub, txTracker } from './mocks';
 import {
+  BalanceTracker,
   createSingleAddressWallet,
   InMemoryUtxoRepository,
   KeyManagement,
@@ -40,6 +41,7 @@ describe('Wallet', () => {
     expect(wallet.name).toBe(name);
     expect(typeof wallet.initializeTx).toBe('function');
     expect(typeof wallet.signTx).toBe('function');
+    expect(wallet.balance).toBeInstanceOf(BalanceTracker);
   });
 
   describe('wallet behaviour', () => {
