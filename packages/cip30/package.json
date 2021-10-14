@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/cip30",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "TypeScript definitions for the dApp Connector standard CIP30",
   "engines": {
     "node": "^14"
