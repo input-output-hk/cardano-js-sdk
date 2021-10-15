@@ -3,7 +3,7 @@ import { BigIntMath, ProtocolParametersRequiredByWallet } from '@cardano-sdk/cor
 import { InitializeTxProps } from './types';
 
 /**
- * Implementation is the same as in csl.get_implicit_input() and csl.get_deposit().
+ * Implementation is the same as in CSL.get_implicit_input() and CSL.get_deposit().
  */
 export const computeImplicitCoin = (
   { stakeKeyDeposit, poolDeposit }: ProtocolParametersRequiredByWallet,

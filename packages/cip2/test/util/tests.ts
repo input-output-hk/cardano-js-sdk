@@ -1,4 +1,4 @@
-import { CardanoSerializationLib, CSL, loadCardanoSerializationLib } from '@cardano-sdk/core';
+import { CSL } from '@cardano-sdk/core';
 import { InputSelector } from '../../src/types';
 import { InputSelectionError, InputSelectionFailure } from '../../src/InputSelectionError';
 import { SelectionConstraints } from '@cardano-sdk/util-dev';
@@ -8,15 +8,15 @@ export interface InputSelectionPropertiesTestParams {
   /**
    * Test subject (Input Selection algorithm under test)
    */
-  getAlgorithm: (csl: CardanoSerializationLib) => InputSelector;
+  getAlgorithm: () => InputSelector;
   /**
    * Available UTxO
    */
-  createUtxo: (csl: CardanoSerializationLib) => CSL.TransactionUnspentOutput[];
+  createUtxo: () => CSL.TransactionUnspentOutput[];
   /**
    * Transaction outputs
    */
-  createOutputs: (csl: CardanoSerializationLib) => CSL.TransactionOutput[];
+  createOutputs: () => CSL.TransactionOutput[];
   /**
    * Input selection constraints passed to the algorithm.
    */
@@ -40,10 +40,9 @@ export const testInputSelectionFailureMode = async ({
   expectedError,
   mockConstraints
 }: InputSelectionFailureModeTestParams) => {
-  const csl = await loadCardanoSerializationLib();
-  const utxo = new Set(createUtxo(csl));
-  const outputs = new Set(createOutputs(csl));
-  const algorithm = getAlgorithm(csl);
+  const utxo = new Set(createUtxo());
+  const outputs = new Set(createOutputs());
+  const algorithm = getAlgorithm();
   await expect(
     algorithm.select({ utxo, outputs, constraints: SelectionConstraints.mockConstraintsToConstraints(mockConstraints) })
   ).rejects.toThrowError(new InputSelectionError(expectedError));
@@ -58,10 +57,9 @@ export const testInputSelectionProperties = async ({
   createOutputs,
   mockConstraints
 }: InputSelectionPropertiesTestParams) => {
-  const csl = await loadCardanoSerializationLib();
-  const utxo = new Set(createUtxo(csl));
-  const outputs = new Set(createOutputs(csl));
-  const algorithm = getAlgorithm(csl);
+  const utxo = new Set(createUtxo());
+  const outputs = new Set(createOutputs());
+  const algorithm = getAlgorithm();
   const results = await algorithm.select({
     utxo,
     outputs,

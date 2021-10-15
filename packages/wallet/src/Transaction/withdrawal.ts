@@ -1,4 +1,4 @@
-import { Cardano, CardanoSerializationLib, CSL, Ogmios } from '@cardano-sdk/core';
+import { Cardano, Ogmios, CSL } from '@cardano-sdk/core';
 import { KeyManager } from '../KeyManagement';
 
 export type Withdrawal = {
@@ -7,11 +7,10 @@ export type Withdrawal = {
 };
 
 export const withdrawal = (
-  csl: CardanoSerializationLib,
   keyManager: KeyManager,
   quantity: Ogmios.Lovelace,
   network: number = Cardano.NetworkId.mainnet
 ): Withdrawal => ({
-  address: csl.RewardAddress.new(network, csl.StakeCredential.from_keyhash(keyManager.stakeKey.hash())),
-  quantity: csl.BigNum.from_str(quantity.toString())
+  address: CSL.RewardAddress.new(network, CSL.StakeCredential.from_keyhash(keyManager.stakeKey.hash())),
+  quantity: CSL.BigNum.from_str(quantity.toString())
 });

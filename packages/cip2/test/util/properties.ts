@@ -1,6 +1,6 @@
 import { AssetId, SelectionConstraints } from '@cardano-sdk/util-dev';
 import { ImplicitCoin, SelectionResult } from '../../src/types';
-import { CSL, cslUtil, Ogmios } from '@cardano-sdk/core';
+import { cslUtil, Ogmios, CSL } from '@cardano-sdk/core';
 import { InputSelectionError, InputSelectionFailure } from '../../src/InputSelectionError';
 import fc, { Arbitrary } from 'fast-check';
 

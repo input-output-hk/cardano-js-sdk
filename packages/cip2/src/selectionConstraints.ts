@@ -1,4 +1,4 @@
-import { CardanoSerializationLib, CSL, cslUtil, InvalidProtocolParametersError } from '@cardano-sdk/core';
+import { cslUtil, InvalidProtocolParametersError, CSL } from '@cardano-sdk/core';
 import { ProtocolParametersRequiredByInputSelection } from '.';
 import {
   TokenBundleSizeExceedsLimit,
@@ -13,14 +13,12 @@ import {
 export type BuildTx = (selection: SelectionSkeleton) => Promise<CSL.Transaction>;
 
 export interface DefaultSelectionConstraintsProps {
-  csl: CardanoSerializationLib;
   protocolParameters: ProtocolParametersForInputSelection;
   buildTx: BuildTx;
 }
 
 export const computeMinimumCost =
   (
-    csl: CardanoSerializationLib,
     {
       minFeeCoefficient,
       minFeeConstant
@@ -30,42 +28,34 @@ export const computeMinimumCost =
   async (selection) => {
     const tx = await buildTx(selection);
     return BigInt(
-      csl
-        .min_fee(
-          tx,
-          csl.LinearFee.new(
-            csl.BigNum.from_str(minFeeCoefficient.toString()),
-            csl.BigNum.from_str(minFeeConstant.toString())
-          )
+      CSL.min_fee(
+        tx,
+        CSL.LinearFee.new(
+          CSL.BigNum.from_str(minFeeCoefficient.toString()),
+          CSL.BigNum.from_str(minFeeConstant.toString())
         )
-        .to_str()
+      ).to_str()
     );
   };
 
 export const computeMinimumCoinQuantity =
-  (
-    csl: CardanoSerializationLib,
-    coinsPerUtxoWord: ProtocolParametersRequiredByInputSelection['coinsPerUtxoWord']
-  ): ComputeMinimumCoinQuantity =>
+  (coinsPerUtxoWord: ProtocolParametersRequiredByInputSelection['coinsPerUtxoWord']): ComputeMinimumCoinQuantity =>
   (multiasset) => {
-    const minUTxOValue = csl.BigNum.from_str((coinsPerUtxoWord * 29).toString());
-    const value = csl.Value.new(csl.BigNum.from_str('0'));
+    const minUTxOValue = CSL.BigNum.from_str((coinsPerUtxoWord * 29).toString());
+    const value = CSL.Value.new(CSL.BigNum.from_str('0'));
     if (multiasset) {
       value.set_multiasset(multiasset);
     }
-    return BigInt(csl.min_ada_required(value, minUTxOValue).to_str());
+    return BigInt(CSL.min_ada_required(value, minUTxOValue).to_str());
   };
 
 export const tokenBundleSizeExceedsLimit =
-  (
-    csl: CardanoSerializationLib,
-    maxValueSize: ProtocolParametersRequiredByInputSelection['maxValueSize']
-  ): TokenBundleSizeExceedsLimit =>
+  (maxValueSize: ProtocolParametersRequiredByInputSelection['maxValueSize']): TokenBundleSizeExceedsLimit =>
   (tokenBundle) => {
     if (!tokenBundle) {
       return false;
     }
-    const value = csl.Value.new(cslUtil.maxBigNum(csl));
+    const value = CSL.Value.new(cslUtil.maxBigNum);
     value.set_multiasset(tokenBundle);
     return value.to_bytes().length > maxValueSize;
   };
@@ -91,7 +81,6 @@ export const computeSelectionLimit =
   };
 
 export const defaultSelectionConstraints = ({
-  csl,
   protocolParameters: { coinsPerUtxoWord, maxTxSize, maxValueSize, minFeeCoefficient, minFeeConstant },
   buildTx
 }: DefaultSelectionConstraintsProps): SelectionConstraints => {
@@ -101,9 +90,9 @@ export const defaultSelectionConstraints = ({
     );
   }
   return {
-    computeMinimumCost: computeMinimumCost(csl, { minFeeCoefficient, minFeeConstant }, buildTx),
-    computeMinimumCoinQuantity: computeMinimumCoinQuantity(csl, coinsPerUtxoWord),
+    computeMinimumCost: computeMinimumCost({ minFeeCoefficient, minFeeConstant }, buildTx),
+    computeMinimumCoinQuantity: computeMinimumCoinQuantity(coinsPerUtxoWord),
     computeSelectionLimit: computeSelectionLimit(maxTxSize, buildTx),
-    tokenBundleSizeExceedsLimit: tokenBundleSizeExceedsLimit(csl, maxValueSize)
+    tokenBundleSizeExceedsLimit: tokenBundleSizeExceedsLimit(maxValueSize)
   };
 };

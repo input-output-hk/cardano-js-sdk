@@ -1,6 +1,6 @@
 /* eslint-disable no-fallthrough */
 import { roundRobinRandomImprove } from '@cardano-sdk/cip2';
-import { Cardano, CardanoSerializationLib, loadCardanoSerializationLib } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
 import {
   BalanceTrackerEvent,
   createSingleAddressWallet,
@@ -25,21 +25,18 @@ const mnemonicWords = KeyManagement.util.generateMnemonicWords();
 const password = 'your_password';
 
 describe('integration/withdrawal', () => {
-  let csl: CardanoSerializationLib;
   let keyManager: KeyManagement.KeyManager;
   let txTracker: TransactionTracker;
   let utxoRepository: UtxoRepository;
   let wallet: SingleAddressWallet;
 
   beforeAll(async () => {
-    csl = await loadCardanoSerializationLib();
-    keyManager = KeyManagement.createInMemoryKeyManager({ csl, mnemonicWords, password, networkId });
+    keyManager = KeyManagement.createInMemoryKeyManager({ mnemonicWords, password, networkId });
     const provider = providerStub();
-    const inputSelector = roundRobinRandomImprove(csl);
-    txTracker = new InMemoryTransactionTracker({ csl, provider, pollInterval: 1 });
-    utxoRepository = new InMemoryUtxoRepository({ csl, provider, txTracker, inputSelector, keyManager });
+    const inputSelector = roundRobinRandomImprove();
+    txTracker = new InMemoryTransactionTracker({ provider, pollInterval: 1 });
+    utxoRepository = new InMemoryUtxoRepository({ provider, txTracker, inputSelector, keyManager });
     wallet = await createSingleAddressWallet(walletProps, {
-      csl,
       keyManager,
       provider,
       utxoRepository,
@@ -69,11 +66,11 @@ describe('integration/withdrawal', () => {
   });
 
   it('can submit transaction', async () => {
-    const certFactory = new Transaction.CertificateFactory(csl, keyManager);
+    const certFactory = new Transaction.CertificateFactory(keyManager);
 
     const { body, hash } = await wallet.initializeTx({
       certificates: [certFactory.stakeKeyDeregistration()],
-      withdrawals: [Transaction.withdrawal(csl, keyManager, utxoRepository.availableRewards || 0n)],
+      withdrawals: [Transaction.withdrawal(keyManager, utxoRepository.availableRewards || 0n)],
       outputs: new Set() // In a real transaction you would probably want to have some outputs
     });
     // Calculated fee is returned by invoking body.fee()

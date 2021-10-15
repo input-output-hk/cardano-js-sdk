@@ -1,6 +1,6 @@
 import Schema, { TxIn, TxOut } from '@cardano-ogmios/schema';
 import { Buffer } from 'buffer';
-import { CardanoProvider, Ogmios, CardanoSerializationLib, CSL, cslUtil } from '@cardano-sdk/core';
+import { CardanoProvider, Ogmios, cslUtil, CSL } from '@cardano-sdk/core';
 import { dummyLogger, Logger } from 'ts-log';
 import { ImplicitCoin, InputSelector, SelectionConstraints, SelectionResult } from '@cardano-sdk/cip2';
 import { KeyManager } from './KeyManagement';
@@ -12,11 +12,9 @@ import {
   UtxoRepositoryEvent,
   UtxoRepositoryEvents
 } from './types';
-import { cslToOgmios } from '@cardano-sdk/core/src/Ogmios';
 import Emittery from 'emittery';
 
 export interface InMemoryUtxoRepositoryProps {
-  csl: CardanoSerializationLib;
   provider: CardanoProvider;
   keyManager: KeyManager;
   inputSelector: InputSelector;
@@ -28,7 +26,6 @@ const utxoEquals = ([txIn1]: [Schema.TxIn, Schema.TxOut], [txIn2]: [Schema.TxIn,
   txIn1.txId === txIn2.txId && txIn1.index === txIn2.index;
 
 export class InMemoryUtxoRepository extends Emittery<UtxoRepositoryEvents> implements UtxoRepository {
-  #csl: CardanoSerializationLib;
   #delegationAndRewards: Ogmios.DelegationsAndRewards;
   #inputSelector: InputSelector;
   #keyManager: KeyManager;
@@ -38,16 +35,8 @@ export class InMemoryUtxoRepository extends Emittery<UtxoRepositoryEvents> imple
   #lockedUtxoSet: Set<[TxIn, TxOut]> = new Set();
   #lockedRewards = 0n;
 
-  constructor({
-    csl,
-    logger = dummyLogger,
-    provider,
-    inputSelector,
-    keyManager,
-    txTracker
-  }: InMemoryUtxoRepositoryProps) {
+  constructor({ logger = dummyLogger, provider, inputSelector, keyManager, txTracker }: InMemoryUtxoRepositoryProps) {
     super();
-    this.#csl = csl;
     this.#logger = logger;
     this.#provider = provider;
     this.#utxoSet = new Set();
@@ -102,7 +91,7 @@ export class InMemoryUtxoRepository extends Emittery<UtxoRepositoryEvents> imple
       await this.sync();
     }
     return this.#inputSelector.select({
-      utxo: new Set(Ogmios.ogmiosToCsl(this.#csl).utxo(this.availableUtxos)),
+      utxo: new Set(Ogmios.ogmiosToCsl.utxo(this.availableUtxos)),
       outputs,
       constraints,
       implicitCoin
@@ -148,7 +137,7 @@ export class InMemoryUtxoRepository extends Emittery<UtxoRepositoryEvents> imple
     const utxoLockedByTx: Schema.Utxo = [];
     const inputs = transaction.body().inputs();
     for (let inputIdx = 0; inputIdx < inputs.len(); inputIdx++) {
-      const { txId, index } = cslToOgmios.txIn(inputs.get(inputIdx));
+      const { txId, index } = Ogmios.cslToOgmios.txIn(inputs.get(inputIdx));
       const utxo = this.allUtxos.find(([txIn]) => txIn.txId === txId && txIn.index === index)!;
       this.#lockedUtxoSet.add(utxo);
       utxoLockedByTx.push(utxo);
@@ -178,7 +167,7 @@ export class InMemoryUtxoRepository extends Emittery<UtxoRepositoryEvents> imple
   #getOwnTransactionWithdrawalQty(transaction: CSL.Transaction) {
     const withdrawals = transaction.body().withdrawals();
     if (!withdrawals) return 0n;
-    const ownStakeCredential = this.#csl.StakeCredential.from_keyhash(this.#keyManager.stakeKey.hash());
+    const ownStakeCredential = CSL.StakeCredential.from_keyhash(this.#keyManager.stakeKey.hash());
     const withdrawalKeys = withdrawals.keys();
     let withdrawalTotal = 0n;
     for (let withdrawalKeyIdx = 0; withdrawalKeyIdx < withdrawalKeys.len(); withdrawalKeyIdx++) {

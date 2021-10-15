@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { loadCardanoSerializationLib, CardanoSerializationLib, Cardano } from '@cardano-sdk/core';
+import { Cardano, CSL } from '@cardano-sdk/core';
 import { InputSelector, roundRobinRandomImprove } from '@cardano-sdk/cip2';
 import { ProviderStub, providerStub, txTracker } from './mocks';
 import {
@@ -14,7 +14,6 @@ import {
 
 describe('Wallet', () => {
   const name = 'Test Wallet';
-  let csl: CardanoSerializationLib;
   let inputSelector: InputSelector;
   let keyManager: KeyManagement.KeyManager;
   let provider: ProviderStub;
@@ -22,17 +21,15 @@ describe('Wallet', () => {
   let walletDependencies: SingleAddressWalletDependencies;
 
   beforeEach(async () => {
-    csl = await loadCardanoSerializationLib();
     keyManager = KeyManagement.createInMemoryKeyManager({
-      csl,
       mnemonicWords: KeyManagement.util.generateMnemonicWords(),
       networkId: Cardano.NetworkId.testnet,
       password: '123'
     });
     provider = providerStub();
-    inputSelector = roundRobinRandomImprove(csl);
-    utxoRepository = new InMemoryUtxoRepository({ csl, provider, keyManager, inputSelector, txTracker });
-    walletDependencies = { csl, keyManager, provider, utxoRepository, txTracker };
+    inputSelector = roundRobinRandomImprove();
+    utxoRepository = new InMemoryUtxoRepository({ provider, keyManager, inputSelector, txTracker });
+    walletDependencies = { keyManager, provider, utxoRepository, txTracker };
   });
 
   test('createWallet', async () => {
@@ -62,8 +59,8 @@ describe('Wallet', () => {
 
     test('initializeTx', async () => {
       const txInternals = await wallet.initializeTx(props);
-      expect(txInternals.body).toBeInstanceOf(csl.TransactionBody);
-      expect(txInternals.hash).toBeInstanceOf(csl.TransactionHash);
+      expect(txInternals.body).toBeInstanceOf(CSL.TransactionBody);
+      expect(txInternals.hash).toBeInstanceOf(CSL.TransactionHash);
     });
 
     test('signTx', async () => {

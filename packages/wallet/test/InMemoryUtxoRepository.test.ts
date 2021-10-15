@@ -1,7 +1,7 @@
 /* eslint-disable unicorn/consistent-function-scoping */
 /* eslint-disable promise/param-names */
 import { roundRobinRandomImprove, InputSelector } from '@cardano-sdk/cip2';
-import { loadCardanoSerializationLib, CardanoSerializationLib, CSL, Ogmios, Cardano } from '@cardano-sdk/core';
+import { Ogmios, Cardano, CSL } from '@cardano-sdk/core';
 import { flushPromises, SelectionConstraints } from '@cardano-sdk/util-dev';
 import {
   providerStub,
@@ -20,7 +20,6 @@ import {
   UtxoRepositoryEvent,
   UtxoRepositoryFields
 } from '../src';
-import { ogmiosToCsl } from '@cardano-sdk/core/src/Ogmios';
 import { TxIn, TxOut } from '@cardano-ogmios/schema';
 import { TransactionError, TransactionFailure } from '../src/TransactionError';
 
@@ -32,34 +31,30 @@ describe('InMemoryUtxoRepository', () => {
   let utxoRepository: UtxoRepository;
   let provider: ProviderStub;
   let inputSelector: InputSelector;
-  let csl: CardanoSerializationLib;
   let keyManager: KeyManagement.KeyManager;
   let outputs: Set<CSL.TransactionOutput>;
   let txTracker: MockTransactionTracker;
 
   beforeEach(async () => {
     provider = providerStub();
-    csl = await loadCardanoSerializationLib();
-    inputSelector = roundRobinRandomImprove(csl);
+    inputSelector = roundRobinRandomImprove();
     keyManager = KeyManagement.createInMemoryKeyManager({
-      csl,
       mnemonicWords: KeyManagement.util.generateMnemonicWords(),
       networkId: 0,
       password: '123'
     });
     outputs = new Set([
-      Ogmios.ogmiosToCsl(csl).txOut({
+      Ogmios.ogmiosToCsl.txOut({
         address: addresses[0],
         value: { coins: 4_000_000 }
       }),
-      Ogmios.ogmiosToCsl(csl).txOut({
+      Ogmios.ogmiosToCsl.txOut({
         address: addresses[0],
         value: { coins: 2_000_000 }
       })
     ]);
     txTracker = new MockTransactionTracker();
     utxoRepository = new InMemoryUtxoRepository({
-      csl,
       provider,
       keyManager,
       inputSelector,
@@ -152,19 +147,19 @@ describe('InMemoryUtxoRepository', () => {
         body: () => ({
           inputs: () => ({
             len: () => 1,
-            get: () => ogmiosToCsl(csl).txIn(transactionUtxo[0])
+            get: () => Ogmios.ogmiosToCsl.txIn(transactionUtxo[0])
           }),
           withdrawals: () => ({
             keys: () => ({
               len: () => 1,
               get: () =>
-                csl.RewardAddress.new(
+                CSL.RewardAddress.new(
                   Cardano.NetworkId.testnet,
-                  csl.StakeCredential.from_keyhash(keyManager.stakeKey.hash())
+                  CSL.StakeCredential.from_keyhash(keyManager.stakeKey.hash())
                 )
             }),
             len: () => 1,
-            get: () => csl.BigNum.from_str(transactionWithdrawal.toString())
+            get: () => CSL.BigNum.from_str(transactionWithdrawal.toString())
           })
         })
       } as unknown as CSL.Transaction;

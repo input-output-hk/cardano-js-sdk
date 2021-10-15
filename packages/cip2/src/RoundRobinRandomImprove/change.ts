@@ -1,4 +1,4 @@
-import { CardanoSerializationLib, CSL, Ogmios } from '@cardano-sdk/core';
+import { Ogmios, CSL } from '@cardano-sdk/core';
 import { orderBy } from 'lodash-es';
 import { ComputeMinimumCoinQuantity, TokenBundleSizeExceedsLimit } from '../types';
 import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
@@ -15,7 +15,6 @@ import {
 type EstimateTxFeeWithOriginalOutputs = (utxo: CSL.TransactionUnspentOutput[], change: CSL.Value[]) => Promise<bigint>;
 
 interface ChangeComputationArgs {
-  csl: CardanoSerializationLib;
   utxoSelection: UtxoSelection;
   outputValues: Ogmios.Value[];
   uniqueOutputAssetIDs: string[];
@@ -183,7 +182,6 @@ const pickExtraRandomUtxo = ({ utxoRemaining, utxoSelected }: UtxoSelection): Ut
 };
 
 const coalesceChangeBundlesForMinCoinRequirement = (
-  csl: CardanoSerializationLib,
   changeBundles: Ogmios.Value[],
   computeMinimumCoinQuantity: ComputeMinimumCoinQuantity
 ): Ogmios.Value[] | undefined => {
@@ -193,7 +191,7 @@ const coalesceChangeBundlesForMinCoinRequirement = (
 
   let sortedBundles = orderBy(changeBundles, ({ coins }) => coins, 'desc');
   const satisfiesMinCoinRequirement = (valueQuantities: Ogmios.Value) =>
-    valueQuantities.coins >= computeMinimumCoinQuantity(Ogmios.ogmiosToCsl(csl).value(valueQuantities).multiasset());
+    valueQuantities.coins >= computeMinimumCoinQuantity(Ogmios.ogmiosToCsl.value(valueQuantities).multiasset());
 
   while (sortedBundles.length > 1 && !satisfiesMinCoinRequirement(sortedBundles[sortedBundles.length - 1])) {
     const smallestBundle = sortedBundles.pop()!;
@@ -213,7 +211,6 @@ const coalesceChangeBundlesForMinCoinRequirement = (
 };
 
 const computeChangeBundles = ({
-  csl,
   utxoSelection,
   outputValues,
   uniqueOutputAssetIDs,
@@ -221,7 +218,6 @@ const computeChangeBundles = ({
   computeMinimumCoinQuantity,
   fee = 0n
 }: {
-  csl: CardanoSerializationLib;
   utxoSelection: UtxoSelection;
   outputValues: Ogmios.Value[];
   uniqueOutputAssetIDs: string[];
@@ -242,7 +238,6 @@ const computeChangeBundles = ({
     uniqueOutputAssetIDs
   );
   const changeBundles = coalesceChangeBundlesForMinCoinRequirement(
-    csl,
     requestedAssetChangeBundlesWithLeftoverAssets,
     computeMinimumCoinQuantity
   );
@@ -250,7 +245,6 @@ const computeChangeBundles = ({
     // Coalesced all bundles to 1 and it's still less than min utxo value
     if (utxoSelection.utxoRemaining.length > 0) {
       return computeChangeBundles({
-        csl,
         utxoSelection: pickExtraRandomUtxo(utxoSelection),
         outputValues,
         uniqueOutputAssetIDs,
@@ -268,12 +262,10 @@ const computeChangeBundles = ({
 };
 
 const changeBundlesToValues = (
-  csl: CardanoSerializationLib,
   changeBundles: Ogmios.Value[],
   tokenBundleSizeExceedsLimit: TokenBundleSizeExceedsLimit
 ) => {
-  const otc = Ogmios.ogmiosToCsl(csl);
-  const values = changeBundles.map((bundle) => otc.value(bundle));
+  const values = changeBundles.map((bundle) => Ogmios.ogmiosToCsl.value(bundle));
   for (const value of values) {
     const multiasset = value.multiasset();
     if (!multiasset) continue;
@@ -296,7 +288,6 @@ const changeBundlesToValues = (
  * @throws InputSelectionError { UtxoFullyDepleted, UtxoBalanceInsufficient }
  */
 export const computeChangeAndAdjustForFee = async ({
-  csl,
   computeMinimumCoinQuantity,
   tokenBundleSizeExceedsLimit,
   estimateTxFee,
@@ -306,7 +297,6 @@ export const computeChangeAndAdjustForFee = async ({
   utxoSelection
 }: ChangeComputationArgs): Promise<ChangeComputationResult> => {
   const changeInclFee = computeChangeBundles({
-    csl,
     utxoSelection,
     outputValues,
     uniqueOutputAssetIDs,
@@ -319,7 +309,7 @@ export const computeChangeAndAdjustForFee = async ({
   // where fee is excluded from change bundles
   const fee = await estimateTxFee(
     changeInclFee.utxoSelected.map(({ utxo }) => utxo),
-    changeBundlesToValues(csl, changeInclFee.changeBundles, tokenBundleSizeExceedsLimit)
+    changeBundlesToValues(changeInclFee.changeBundles, tokenBundleSizeExceedsLimit)
   );
 
   // Ensure fee quantity is covered by current selection
@@ -331,7 +321,6 @@ export const computeChangeAndAdjustForFee = async ({
     }
     // Recompute change and fee with an extra selected UTxO
     return computeChangeAndAdjustForFee({
-      csl,
       computeMinimumCoinQuantity,
       tokenBundleSizeExceedsLimit,
       outputValues,
@@ -343,7 +332,6 @@ export const computeChangeAndAdjustForFee = async ({
   }
 
   const { changeBundles, utxoSelected, utxoRemaining } = computeChangeBundles({
-    csl,
     utxoSelection: { utxoRemaining: changeInclFee.utxoRemaining, utxoSelected: changeInclFee.utxoSelected },
     outputValues,
     uniqueOutputAssetIDs,
@@ -355,7 +343,7 @@ export const computeChangeAndAdjustForFee = async ({
   return {
     remainingUTxO: utxoRemaining.map(({ utxo }) => utxo),
     inputs: utxoSelected.map(({ utxo }) => utxo),
-    change: changeBundlesToValues(csl, changeBundles, tokenBundleSizeExceedsLimit),
+    change: changeBundlesToValues(changeBundles, tokenBundleSizeExceedsLimit),
     fee
   };
 };
