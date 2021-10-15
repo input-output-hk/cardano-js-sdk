@@ -1,9 +1,11 @@
 {
   "compilerOptions": {
     "composite": true,
-    "module": "commonjs",
+    "module": "es2020",
+    "moduleResolution": "node",
     "target": "es2020",
     "esModuleInterop": true,
+    "allowJs": true,
     "declaration": true,
     "declarationMap": true,
     "noEmitOnError": true,
