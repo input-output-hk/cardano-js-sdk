@@ -28,6 +28,10 @@ const packageMap = [
     type: "json"
   },
   {
+    filename: "packages/util-dev/package.json",
+    type: "json"
+  },
+  {
     filename: "packages/wallet/package.json",
     type: "json"
   }
