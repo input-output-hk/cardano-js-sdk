@@ -4,14 +4,7 @@ import { UtxoRepository } from './types';
 import { dummyLogger, Logger } from 'ts-log';
 import { defaultSelectionConstraints } from '@cardano-sdk/cip2';
 import { computeImplicitCoin, createTransactionInternals, InitializeTxProps, TxInternals } from './Transaction';
-import {
-  BalanceTracker,
-  InMemoryTransactionTracker,
-  KeyManagement,
-  TransactionError,
-  TransactionFailure,
-  TransactionTracker
-} from '.';
+import { BalanceTracker, KeyManagement, TransactionError, TransactionFailure, TransactionTracker } from '.';
 
 export interface SubmitTxResult {
   /**
@@ -39,7 +32,7 @@ export interface SingleAddressWalletDependencies {
   logger?: Logger;
   provider: CardanoProvider;
   utxoRepository: UtxoRepository;
-  txTracker?: TransactionTracker;
+  txTracker: TransactionTracker;
   balanceTracker?: BalanceTracker;
 }
 
@@ -60,7 +53,7 @@ export const createSingleAddressWallet = async (
     provider,
     keyManager,
     utxoRepository,
-    txTracker = new InMemoryTransactionTracker({ provider }),
+    txTracker,
     balanceTracker = new BalanceTracker(utxoRepository),
     logger = dummyLogger
   }: SingleAddressWalletDependencies
