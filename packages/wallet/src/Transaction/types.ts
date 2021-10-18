@@ -1,5 +1,5 @@
 import * as Schema from '@cardano-ogmios/schema';
-import { CSL, Transaction } from '@cardano-sdk/core';
+import { Transaction, CSL } from '@cardano-sdk/core';
 import { Withdrawal } from './withdrawal';
 
 export type InitializeTxProps = {

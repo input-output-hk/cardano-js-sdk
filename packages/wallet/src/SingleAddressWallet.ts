@@ -1,17 +1,10 @@
 import Schema from '@cardano-ogmios/schema';
-import { CardanoProvider, Ogmios, Transaction, CardanoSerializationLib, CSL, ProviderError } from '@cardano-sdk/core';
+import { CardanoProvider, Ogmios, Transaction, ProviderError, CSL } from '@cardano-sdk/core';
 import { UtxoRepository } from './types';
 import { dummyLogger, Logger } from 'ts-log';
 import { defaultSelectionConstraints } from '@cardano-sdk/cip2';
 import { computeImplicitCoin, createTransactionInternals, InitializeTxProps, TxInternals } from './Transaction';
-import {
-  BalanceTracker,
-  InMemoryTransactionTracker,
-  KeyManagement,
-  TransactionError,
-  TransactionFailure,
-  TransactionTracker
-} from '.';
+import { BalanceTracker, KeyManagement, TransactionError, TransactionFailure, TransactionTracker } from '.';
 
 export interface SubmitTxResult {
   /**
@@ -35,12 +28,11 @@ export interface SingleAddressWallet {
 }
 
 export interface SingleAddressWalletDependencies {
-  csl: CardanoSerializationLib;
   keyManager: KeyManagement.KeyManager;
   logger?: Logger;
   provider: CardanoProvider;
   utxoRepository: UtxoRepository;
-  txTracker?: TransactionTracker;
+  txTracker: TransactionTracker;
   balanceTracker?: BalanceTracker;
 }
 
@@ -58,11 +50,10 @@ const ensureValidityInterval = (
 export const createSingleAddressWallet = async (
   { name }: SingleAddressWalletProps,
   {
-    csl,
     provider,
     keyManager,
     utxoRepository,
-    txTracker = new InMemoryTransactionTracker({ csl, provider }),
+    txTracker,
     balanceTracker = new BalanceTracker(utxoRepository),
     logger = dummyLogger
   }: SingleAddressWalletDependencies
@@ -71,7 +62,7 @@ export const createSingleAddressWallet = async (
   const protocolParameters = await provider.currentWalletProtocolParameters();
   const signTx = async (body: CSL.TransactionBody, hash: CSL.TransactionHash) => {
     const witnessSet = await keyManager.signTransaction(hash);
-    return csl.Transaction.new(body, witnessSet);
+    return CSL.Transaction.new(body, witnessSet);
   };
   return {
     address,
@@ -79,13 +70,12 @@ export const createSingleAddressWallet = async (
     initializeTx: async (props) => {
       const tip = await provider.ledgerTip();
       const validityInterval = ensureValidityInterval(tip.slot, props.options?.validityInterval);
-      const txOutputs = new Set([...props.outputs].map((output) => Ogmios.ogmiosToCsl(csl).txOut(output)));
+      const txOutputs = new Set([...props.outputs].map((output) => Ogmios.ogmiosToCsl.txOut(output)));
       const constraints = defaultSelectionConstraints({
-        csl,
         protocolParameters,
         buildTx: async (inputSelection) => {
           logger.debug('Building TX for selection constraints', inputSelection);
-          const { body, hash } = await createTransactionInternals(csl, {
+          const { body, hash } = await createTransactionInternals({
             changeAddress: address,
             inputSelection,
             validityInterval
@@ -95,7 +85,7 @@ export const createSingleAddressWallet = async (
       });
       const implicitCoin = computeImplicitCoin(protocolParameters, props);
       const inputSelectionResult = await utxoRepository.selectInputs(txOutputs, constraints, implicitCoin);
-      return createTransactionInternals(csl, {
+      return createTransactionInternals({
         changeAddress: address,
         inputSelection: inputSelectionResult.selection,
         validityInterval

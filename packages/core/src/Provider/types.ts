@@ -1,6 +1,5 @@
-import { CSL } from '../CSL';
 import Cardano, { ProtocolParametersAlonzo } from '@cardano-ogmios/schema';
-import { Ogmios, Transaction } from '..';
+import { Ogmios, Transaction, CSL } from '..';
 
 export type ProtocolParametersRequiredByWallet = Pick<
   ProtocolParametersAlonzo,

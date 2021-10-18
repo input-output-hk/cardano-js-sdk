@@ -1,5 +1,5 @@
-// Only to be used for types
-import type * as CSL from '@emurgo/cardano-serialization-lib-browser';
-export * from './loadCardanoSerializationLib';
+import * as CSL from '@emurgo/cardano-serialization-lib-nodejs';
+
 export * as cslUtil from './util';
-export { CSL };
+export * as CSL from '@emurgo/cardano-serialization-lib-nodejs';
+export type CardanoSerializationLib = typeof CSL;

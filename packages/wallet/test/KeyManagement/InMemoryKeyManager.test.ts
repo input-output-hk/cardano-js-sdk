@@ -1,24 +1,21 @@
-import { Cardano, CardanoSerializationLib, loadCardanoSerializationLib } from '@cardano-sdk/core';
+import { Cardano, CSL } from '@cardano-sdk/core';
 import { Buffer } from 'buffer';
 import { KeyManagement } from '../../src';
 
 describe('InMemoryKeyManager', () => {
   let keyManager: KeyManagement.KeyManager;
-  let csl: CardanoSerializationLib;
 
-  beforeEach(async () => {
-    csl = await loadCardanoSerializationLib();
+  beforeEach(() => {
     const mnemonicWords = KeyManagement.util.generateMnemonicWords();
     keyManager = KeyManagement.createInMemoryKeyManager({
-      csl,
       mnemonicWords,
       networkId: Cardano.NetworkId.testnet,
       password: '123'
     });
-    expect(keyManager.publicKey).toBeInstanceOf(csl.PublicKey);
+    expect(keyManager.publicKey).toBeInstanceOf(CSL.PublicKey);
   });
 
-  test('initial state publicKey', async () => {
+  test('initial state publicKey', () => {
     expect(keyManager.publicKey).toBeDefined();
     expect(keyManager.publicParentKey).toBeDefined();
   });
@@ -30,10 +27,10 @@ describe('InMemoryKeyManager', () => {
   });
 
   test('signTransaction', async () => {
-    const txHash = csl.TransactionHash.from_bytes(
+    const txHash = CSL.TransactionHash.from_bytes(
       Buffer.from('8561258e210352fba2ac0488afed67b3427a27ccf1d41ec030c98a8199bc22ec', 'hex')
     );
     const witnessSet = await keyManager.signTransaction(txHash);
-    expect(witnessSet).toBeInstanceOf(csl.TransactionWitnessSet);
+    expect(witnessSet).toBeInstanceOf(CSL.TransactionWitnessSet);
   });
 });

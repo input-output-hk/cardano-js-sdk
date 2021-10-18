@@ -1,5 +1,5 @@
 import { ProtocolParametersAlonzo } from '@cardano-ogmios/schema';
-import { CSL, Ogmios } from '@cardano-sdk/core';
+import { Ogmios, CSL } from '@cardano-sdk/core';
 
 export interface SelectionSkeleton {
   /**

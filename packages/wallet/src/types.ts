@@ -1,6 +1,6 @@
 import Schema from '@cardano-ogmios/schema';
 import { ImplicitCoin, SelectionConstraints, SelectionResult } from '@cardano-sdk/cip2';
-import { CSL, Ogmios } from '@cardano-sdk/core';
+import { Ogmios, CSL } from '@cardano-sdk/core';
 import Emittery from 'emittery';
 
 export enum UtxoRepositoryEvent {

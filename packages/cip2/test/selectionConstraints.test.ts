@@ -1,19 +1,26 @@
+/* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable no-loop-func */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable unicorn/consistent-function-scoping */
-import {
-  CardanoSerializationLib,
-  CSL,
-  Ogmios,
-  InvalidProtocolParametersError,
-  loadCardanoSerializationLib
-} from '@cardano-sdk/core';
+import { Ogmios, InvalidProtocolParametersError, CSL } from '@cardano-sdk/core';
 import { AssetId } from '@cardano-sdk/util-dev';
 import { defaultSelectionConstraints, DefaultSelectionConstraintsProps } from '../src/selectionConstraints';
 import { ProtocolParametersForInputSelection, SelectionSkeleton } from '../src/types';
 
+jest.mock('@emurgo/cardano-serialization-lib-nodejs', () => {
+  const actualCsl = jest.requireActual('@emurgo/cardano-serialization-lib-nodejs');
+  return {
+    ...actualCsl,
+    min_fee: jest.fn(),
+    Value: {
+      new: jest.fn()
+    }
+  };
+});
+const cslActual = jest.requireActual('@emurgo/cardano-serialization-lib-nodejs');
+const cslMock = jest.requireMock('@emurgo/cardano-serialization-lib-nodejs');
+
 describe('defaultSelectionConstraints', () => {
-  let csl: CardanoSerializationLib;
   const protocolParameters = {
     minFeeCoefficient: 44,
     minFeeConstant: 155_381,
@@ -21,8 +28,6 @@ describe('defaultSelectionConstraints', () => {
     maxTxSize: 16_384,
     maxValueSize: 5000
   } as ProtocolParametersForInputSelection;
-
-  beforeAll(async () => (csl = await loadCardanoSerializationLib()));
 
   it('Invalid parameters', () => {
     for (const param of ['minFeeCoefficient', 'minFeeConstant', 'coinsPerUtxoWord', 'maxTxSize', 'maxValueSize']) {
@@ -37,15 +42,10 @@ describe('defaultSelectionConstraints', () => {
   it('computeMinimumCost', async () => {
     const fee = 200_000n;
     // Need this to not have to build Tx
-    const stubCsl = {
-      min_fee: jest.fn().mockReturnValueOnce(csl.BigNum.from_str(fee.toString())),
-      LinearFee: csl.LinearFee,
-      BigNum: csl.BigNum
-    } as any as CardanoSerializationLib;
+    cslMock.min_fee.mockReturnValueOnce(cslMock.BigNum.from_str(fee.toString()));
     const buildTx = jest.fn();
     const selectionSkeleton = {} as SelectionSkeleton;
     const constraints = defaultSelectionConstraints({
-      csl: stubCsl,
       protocolParameters,
       buildTx
     });
@@ -56,7 +56,8 @@ describe('defaultSelectionConstraints', () => {
   });
 
   it('computeMinimumCoinQuantity', () => {
-    const withAssets = Ogmios.ogmiosToCsl(csl)
+    cslMock.Value.new.mockImplementation(cslActual.Value.new);
+    const withAssets = Ogmios.ogmiosToCsl
       .value({
         coins: 10_000n,
         assets: {
@@ -66,7 +67,6 @@ describe('defaultSelectionConstraints', () => {
       })
       .multiasset();
     const constraints = defaultSelectionConstraints({
-      csl,
       protocolParameters
     } as DefaultSelectionConstraintsProps);
     const minCoinWithAssets = constraints.computeMinimumCoinQuantity(withAssets);
@@ -81,7 +81,6 @@ describe('defaultSelectionConstraints', () => {
 
     it("doesn't exceed max tx size", async () => {
       const constraints = defaultSelectionConstraints({
-        csl,
         protocolParameters,
         buildTx: buildTxOfLength(protocolParameters.maxTxSize!)
       });
@@ -92,7 +91,6 @@ describe('defaultSelectionConstraints', () => {
 
     it('exceeds max tx size', async () => {
       const constraints = defaultSelectionConstraints({
-        csl,
         protocolParameters,
         buildTx: buildTxOfLength(protocolParameters.maxTxSize! + 1)
       });
@@ -103,20 +101,15 @@ describe('defaultSelectionConstraints', () => {
   });
 
   describe('tokenBundleSizeExceedsLimit', () => {
-    const stubCslWithValueLength = (length: number) =>
-      ({
-        Value: {
-          new: () => ({
-            set_multiasset: jest.fn(),
-            to_bytes: () => ({ length })
-          })
-        },
-        BigNum: csl.BigNum
-      } as any as CardanoSerializationLib);
+    const stubCslValueLength = (length: number) => {
+      cslMock.Value.new.mockReturnValue({
+        set_multiasset: jest.fn(),
+        to_bytes: () => ({ length })
+      });
+    };
 
     it('empty bundle', () => {
       const constraints = defaultSelectionConstraints({
-        csl,
         protocolParameters,
         buildTx: jest.fn()
       });
@@ -124,16 +117,16 @@ describe('defaultSelectionConstraints', () => {
     });
 
     it("doesn't exceed max value size", () => {
+      stubCslValueLength(protocolParameters.maxValueSize!);
       const constraints = defaultSelectionConstraints({
-        csl: stubCslWithValueLength(protocolParameters.maxValueSize!),
         protocolParameters
       } as DefaultSelectionConstraintsProps);
       expect(constraints.tokenBundleSizeExceedsLimit({} as any)).toBe(false);
     });
 
     it('exceeds max value size', () => {
+      stubCslValueLength(protocolParameters.maxValueSize! + 1);
       const constraints = defaultSelectionConstraints({
-        csl: stubCslWithValueLength(protocolParameters.maxValueSize! + 1),
         protocolParameters
       } as DefaultSelectionConstraintsProps);
       expect(constraints.tokenBundleSizeExceedsLimit({} as any)).toBe(true);

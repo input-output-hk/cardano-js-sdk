@@ -1,4 +1,4 @@
-import { CardanoSerializationLib, CSL } from '../CSL';
+import { CSL } from '../CSL';
 import { Buffer } from 'buffer';
 
 export const policyIdFromAssetId = (assetId: string): string => assetId.slice(0, 56);
@@ -10,11 +10,11 @@ export const assetNameFromAssetId = (assetId: string): string => assetId.slice(5
 export const createAssetId = (scriptHash: CSL.ScriptHash, assetName: CSL.AssetName): string =>
   Buffer.from(scriptHash.to_bytes()).toString('hex') + Buffer.from(assetName.name()).toString('hex');
 
-export const parseAssetId = (assetId: string, csl: CardanoSerializationLib) => {
+export const parseAssetId = (assetId: string) => {
   const policyId = policyIdFromAssetId(assetId);
   const assetName = assetNameFromAssetId(assetId);
   return {
-    scriptHash: csl.ScriptHash.from_bytes(Buffer.from(policyId, 'hex')),
-    assetName: csl.AssetName.new(Buffer.from(assetName, 'hex'))
+    scriptHash: CSL.ScriptHash.from_bytes(Buffer.from(policyId, 'hex')),
+    assetName: CSL.AssetName.new(Buffer.from(assetName, 'hex'))
   };
 };

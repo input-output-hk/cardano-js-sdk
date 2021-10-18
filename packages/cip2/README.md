@@ -13,16 +13,16 @@ import { ProtocolParametersAlonzo } from '@cardano-ogmios/schema';
 
 const demo = async (protocolParameters: ProtocolParametersRequiredByWallet): Promise<SelectionResult> => {
   const csl: CardanoSerializationLib = await loadCardanoSerializationLib();
-  const selector: InputSelector = roundRobinRandomImprove(csl, coinsPerUtxoWord);
+  const selector: InputSelector = roundRobinRandomImprove(coinsPerUtxoWord);
   // It is important that you use the same instance of cardano-serialization-lib across your application.
   // Bad: TransactionUnspentOutput.new(...)
-  // Good: csl.TransactionUnspentOutput.new(...)
-  const utxo: CSL.TransactionUnspentOutput[] = [csl.TransactionUnspentOutput.new(...), ...];
-  const outputs: CSL.TransactionOutput[] = [csl.TransactionOutput.new(...), ...];
+  // Good: CSL.TransactionUnspentOutput.new(...)
+  const utxo: CSL.TransactionUnspentOutput[] = [CSL.TransactionUnspentOutput.new(...), ...];
+  const outputs: CSL.TransactionOutput[] = [CSL.TransactionOutput.new(...), ...];
   // Used to estimate min fee and validate transaction size
   const buildTx = (inputSelection: SelectionSkeleton): Promise<CSL.Transaction> => {...};
   const constraints = defaultSelectionConstraints({
-    csl, protocolParameters, buildTx,
+    protocolParameters, buildTx,
   });
 
   return selector.select({

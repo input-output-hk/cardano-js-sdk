@@ -1,7 +1,7 @@
 import { TransactionTracker, TransactionTrackerEvents } from './types';
 import Emittery from 'emittery';
 import { Hash16, Slot, Tip } from '@cardano-ogmios/schema';
-import { CardanoProvider, ProviderError, CardanoSerializationLib, CSL, ProviderFailure } from '@cardano-sdk/core';
+import { CardanoProvider, ProviderError, ProviderFailure, CSL } from '@cardano-sdk/core';
 import { TransactionError, TransactionFailure } from './TransactionError';
 import { dummyLogger, Logger } from 'ts-log';
 import delay from 'delay';
@@ -11,7 +11,6 @@ export type Milliseconds = number;
 
 export interface InMemoryTransactionTrackerProps {
   provider: CardanoProvider;
-  csl: CardanoSerializationLib;
   logger?: Logger;
   pollInterval?: Milliseconds;
 }
@@ -19,14 +18,12 @@ export interface InMemoryTransactionTrackerProps {
 export class InMemoryTransactionTracker extends Emittery<TransactionTrackerEvents> implements TransactionTracker {
   readonly #provider: CardanoProvider;
   readonly #pendingTransactions = new Map<string, Promise<void>>();
-  readonly #csl: CardanoSerializationLib;
   readonly #logger: Logger;
   readonly #pollInterval: number;
 
-  constructor({ provider, csl, logger = dummyLogger, pollInterval = 2000 }: InMemoryTransactionTrackerProps) {
+  constructor({ provider, logger = dummyLogger, pollInterval = 2000 }: InMemoryTransactionTrackerProps) {
     super();
     this.#provider = provider;
-    this.#csl = csl;
     this.#logger = logger;
     this.#pollInterval = pollInterval;
   }
@@ -34,7 +31,7 @@ export class InMemoryTransactionTracker extends Emittery<TransactionTrackerEvent
   async track(transaction: CSL.Transaction, submitted: Promise<void> = Promise.resolve()): Promise<void> {
     await submitted;
     const body = transaction.body();
-    const hash = Buffer.from(this.#csl.hash_transaction(body).to_bytes()).toString('hex');
+    const hash = Buffer.from(CSL.hash_transaction(body).to_bytes()).toString('hex');
     this.#logger.debug('InMemoryTransactionTracker.trackTransaction', hash);
 
     if (this.#pendingTransactions.has(hash)) {

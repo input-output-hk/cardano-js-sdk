@@ -1,20 +1,17 @@
-import { CardanoSerializationLib, loadCardanoSerializationLib } from '@cardano-sdk/core';
 import { testKeyManager } from '../mocks';
 import { CertificateFactory } from '../../src/Transaction';
 import { KeyManager } from '../../src/KeyManagement';
 
 describe('Transaction.CertificateFactory', () => {
-  let csl: CardanoSerializationLib;
   let stakeKey: string;
   let keyManager: KeyManager;
   let certs: CertificateFactory;
   const delegatee = 'pool1qqvukkkfr3ux4qylfkrky23f6trl2l6xjluv36z90ax7gfa8yxt';
 
   beforeAll(async () => {
-    csl = await loadCardanoSerializationLib();
-    keyManager = testKeyManager(csl);
+    keyManager = testKeyManager();
     stakeKey = keyManager.stakeKey.hash().to_bech32('ed25519_pk');
-    certs = new CertificateFactory(csl, keyManager);
+    certs = new CertificateFactory(keyManager);
   });
 
   it('stakeKeyRegistration', () =>

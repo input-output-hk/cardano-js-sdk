@@ -1,18 +1,16 @@
 import * as bip39 from 'isomorphic-bip39';
-import { Cardano, CardanoSerializationLib, CSL } from '@cardano-sdk/core';
+import { Cardano, CSL } from '@cardano-sdk/core';
 import { Buffer } from 'buffer';
 import * as errors from './errors';
 import { KeyManager } from './types';
 import { harden, joinMnemonicWords } from './util';
 
 export const createInMemoryKeyManager = ({
-  csl,
   password,
   accountIndex,
   mnemonicWords,
   networkId
 }: {
-  csl: CardanoSerializationLib;
   password: string;
   accountIndex?: number;
   mnemonicWords: string[];
@@ -27,7 +25,7 @@ export const createInMemoryKeyManager = ({
   if (!validMnemonic) throw new errors.InvalidMnemonic();
 
   const entropy = bip39.mnemonicToEntropy(mnemonic);
-  const accountPrivateKey = csl.Bip32PrivateKey.from_bip39_entropy(Buffer.from(entropy, 'hex'), Buffer.from(password))
+  const accountPrivateKey = CSL.Bip32PrivateKey.from_bip39_entropy(Buffer.from(entropy, 'hex'), Buffer.from(password))
     .derive(harden(1852))
     .derive(harden(1815))
     .derive(harden(accountIndex));
@@ -40,10 +38,10 @@ export const createInMemoryKeyManager = ({
   return {
     deriveAddress: (addressIndex, index) => {
       const utxoPubKey = publicKey.derive(index).derive(addressIndex);
-      const baseAddr = csl.BaseAddress.new(
+      const baseAddr = CSL.BaseAddress.new(
         networkId,
-        csl.StakeCredential.from_keyhash(utxoPubKey.to_raw_key().hash()),
-        csl.StakeCredential.from_keyhash(stakeKey.to_raw_key().hash())
+        CSL.StakeCredential.from_keyhash(utxoPubKey.to_raw_key().hash()),
+        CSL.StakeCredential.from_keyhash(stakeKey.to_raw_key().hash())
       );
 
       return baseAddr.to_address().to_bech32();
@@ -53,9 +51,9 @@ export const createInMemoryKeyManager = ({
       signature: `Signature for ${message} is not implemented yet`
     }),
     signTransaction: async (txHash: CSL.TransactionHash) => {
-      const witnessSet = csl.TransactionWitnessSet.new();
-      const vkeyWitnesses = csl.Vkeywitnesses.new();
-      const vkeyWitness = csl.make_vkey_witness(txHash, privateParentKey.to_raw_key());
+      const witnessSet = CSL.TransactionWitnessSet.new();
+      const vkeyWitnesses = CSL.Vkeywitnesses.new();
+      const vkeyWitness = CSL.make_vkey_witness(txHash, privateParentKey.to_raw_key());
       vkeyWitnesses.add(vkeyWitness);
       witnessSet.set_vkeys(vkeyWitnesses);
       return witnessSet;

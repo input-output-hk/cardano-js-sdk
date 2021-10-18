@@ -1,6 +1,6 @@
 import { TxIn } from '@cardano-ogmios/schema';
-import { Asset } from '..';
 import { CSL } from '../CSL';
+import { Asset } from '..';
 import { Value } from './types';
 
 export const value = (cslValue: CSL.Value): Value => {

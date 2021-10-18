@@ -34,15 +34,7 @@ You may use the following config when bundling this SDK with Webpack:
 ```js
 const { IgnorePlugin, ProvidePlugin } = require('webpack');
 {
-  resolve: {
-    // For browser builds only
-    fallback: {
-      // May want to install readable-stream as an explicit dependency
-      stream: require.resolve('readable-stream'),
-    }
-  },
   plugins: [
-    new HtmlWebpackHarddiskPlugin(),
     // see https://www.npmjs.com/package/isomorphic-bip39 README
     new IgnorePlugin(/^\.\/wordlists\/(?!english)/, /bip39\/src$/),
   ],
@@ -50,6 +42,27 @@ const { IgnorePlugin, ProvidePlugin } = require('webpack');
     asyncWebAssembly: true
   }
 }
+```
+
+Additionally, for browser builds:
+
+```js
+const { NormalModuleReplacementPlugin } = require('webpack');
+{
+  resolve: {
+    fallback: {
+      // May want to install readable-stream as an explicit dependency
+      stream: require.resolve('readable-stream'),
+    }
+  },
+  plugins: [
+    new NormalModuleReplacementPlugin(
+      /@emurgo\/cardano-serialization-lib-nodejs/,
+      '@emurgo/cardano-serialization-lib-browser'
+    )
+  ]
+}
+
 ```
 
 ### Testing

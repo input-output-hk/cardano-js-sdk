@@ -1,5 +1,5 @@
 import { SelectionResult } from '@cardano-sdk/cip2';
-import { Transaction, CardanoSerializationLib, CSL } from '@cardano-sdk/core';
+import { Transaction, CSL } from '@cardano-sdk/core';
 import { Withdrawal } from './withdrawal';
 
 export type TxInternals = {
@@ -15,22 +15,19 @@ export type CreateTxInternalsProps = {
   withdrawals?: Withdrawal[];
 };
 
-export const createTransactionInternals = async (
-  csl: CardanoSerializationLib,
-  props: CreateTxInternalsProps
-): Promise<TxInternals> => {
-  const inputs = csl.TransactionInputs.new();
+export const createTransactionInternals = async (props: CreateTxInternalsProps): Promise<TxInternals> => {
+  const inputs = CSL.TransactionInputs.new();
   for (const utxo of props.inputSelection.inputs) {
     inputs.add(utxo.input());
   }
-  const outputs = csl.TransactionOutputs.new();
+  const outputs = CSL.TransactionOutputs.new();
   for (const output of props.inputSelection.outputs) {
     outputs.add(output);
   }
   for (const value of props.inputSelection.change) {
-    outputs.add(csl.TransactionOutput.new(csl.Address.from_bech32(props.changeAddress), value));
+    outputs.add(CSL.TransactionOutput.new(CSL.Address.from_bech32(props.changeAddress), value));
   }
-  const body = csl.TransactionBody.new(
+  const body = CSL.TransactionBody.new(
     inputs,
     outputs,
     props.inputSelection.fee,
@@ -40,14 +37,14 @@ export const createTransactionInternals = async (
     body.set_validity_start_interval(props.validityInterval.invalidBefore);
   }
   if (props.certificates?.length) {
-    const certs = csl.Certificates.new();
+    const certs = CSL.Certificates.new();
     for (const cert of props.certificates) {
       certs.add(cert);
     }
     body.set_certs(certs);
   }
   if (props.withdrawals?.length) {
-    const withdrawals = csl.Withdrawals.new();
+    const withdrawals = CSL.Withdrawals.new();
     for (const { address, quantity } of props.withdrawals) {
       withdrawals.insert(address, quantity);
     }
@@ -55,6 +52,6 @@ export const createTransactionInternals = async (
   }
   return {
     body,
-    hash: csl.hash_transaction(body)
+    hash: CSL.hash_transaction(body)
   };
 };

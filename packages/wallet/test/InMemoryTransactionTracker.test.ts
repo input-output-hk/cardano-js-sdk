@@ -1,40 +1,44 @@
-import { CardanoSerializationLib, CSL, ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { ProviderError, ProviderFailure, CSL } from '@cardano-sdk/core';
 import { dummyLogger } from 'ts-log';
 import { ledgerTip, providerStub, ProviderStub, queryTransactionsResult } from './mocks';
 import mockDelay from 'delay';
 import { TransactionTrackerEvent, InMemoryTransactionTracker, TransactionFailure } from '../src';
 
 jest.mock('delay', () => jest.fn().mockResolvedValue(void 0));
+// eslint-disable-next-line sonarjs/no-duplicate-string
+jest.mock('@emurgo/cardano-serialization-lib-nodejs', () => ({
+  ...jest.requireActual('@emurgo/cardano-serialization-lib-nodejs'),
+  hash_transaction: jest.fn()
+}));
+const cslMock = jest.requireMock('@emurgo/cardano-serialization-lib-nodejs');
+const mockHashTransactionReturn = (resultHash: string) => {
+  cslMock.hash_transaction.mockReturnValue({
+    to_bytes() {
+      return Buffer.from(resultHash);
+    }
+  });
+};
 
 describe('InMemoryTransactionTracker', () => {
   const POLL_INTERVAL = 1000;
   let ledgerTipSlot: number;
   let provider: ProviderStub;
   let txTracker: InMemoryTransactionTracker;
-  let hash_transaction: jest.Mock;
-
-  const mockHashTransactionReturn = (resultHash: string) => {
-    hash_transaction.mockReturnValue({
-      to_bytes() {
-        return Buffer.from(resultHash);
-      }
-    });
-  };
 
   beforeEach(() => {
     provider = providerStub();
     provider.queryTransactionsByHashes.mockReturnValue([queryTransactionsResult[0]]);
-    hash_transaction = jest.fn();
     mockHashTransactionReturn('some-hash');
     txTracker = new InMemoryTransactionTracker({
       provider,
-      csl: { hash_transaction } as unknown as CardanoSerializationLib,
       logger: dummyLogger,
       pollInterval: POLL_INTERVAL
     });
     ledgerTipSlot = ledgerTip.slot;
     (mockDelay as unknown as jest.Mock).mockReset();
   });
+
+  afterEach(() => cslMock.hash_transaction.mockReset());
 
   describe('track', () => {
     let onTransaction: jest.Mock;
