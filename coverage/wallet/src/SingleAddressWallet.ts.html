@@ -30,9 +30,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">40% </span>
+                <span class="strong">50% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>2/5</span>
+                <span class='fraction'>2/4</span>
             </div>
         
             
@@ -167,31 +167,13 @@
 <a name='L108'></a><a href='#L108'>108</a>
 <a name='L109'></a><a href='#L109'>109</a>
 <a name='L110'></a><a href='#L110'>110</a>
-<a name='L111'></a><a href='#L111'>111</a>
-<a name='L112'></a><a href='#L112'>112</a>
-<a name='L113'></a><a href='#L113'>113</a>
-<a name='L114'></a><a href='#L114'>114</a>
-<a name='L115'></a><a href='#L115'>115</a>
-<a name='L116'></a><a href='#L116'>116</a>
-<a name='L117'></a><a href='#L117'>117</a>
-<a name='L118'></a><a href='#L118'>118</a>
-<a name='L119'></a><a href='#L119'>119</a>
-<a name='L120'></a><a href='#L120'>120</a>
-<a name='L121'></a><a href='#L121'>121</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L111'></a><a href='#L111'>111</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-yes">10x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -235,7 +217,6 @@
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">10x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -260,7 +241,6 @@
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">6x</span>
@@ -298,19 +278,12 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import Schema from '@cardano-ogmios/schema';
-import { CardanoProvider, Ogmios, Transaction, CardanoSerializationLib, CSL, ProviderError } from '@cardano-sdk/core';
+import { CardanoProvider, Ogmios, Transaction, ProviderError, CSL } from '@cardano-sdk/core';
 import { UtxoRepository } from './types';
 import { dummyLogger, Logger } from 'ts-log';
 import { defaultSelectionConstraints } from '@cardano-sdk/cip2';
 import { computeImplicitCoin, createTransactionInternals, InitializeTxProps, TxInternals } from './Transaction';
-import {
-  BalanceTracker,
-  InMemoryTransactionTracker,
-  KeyManagement,
-  TransactionError,
-  TransactionFailure,
-  TransactionTracker
-} from '.';
+import { BalanceTracker, KeyManagement, TransactionError, TransactionFailure, TransactionTracker } from '.';
 &nbsp;
 export interface SubmitTxResult {
   /**
@@ -334,12 +307,11 @@ export interface SingleAddressWallet {
 }
 &nbsp;
 export interface SingleAddressWalletDependencies {
-  csl: CardanoSerializationLib;
   keyManager: KeyManagement.KeyManager;
   logger?: Logger;
   provider: CardanoProvider;
   utxoRepository: UtxoRepository;
-  txTracker?: TransactionTracker;
+  txTracker: TransactionTracker;
   balanceTracker?: BalanceTracker;
 }
 &nbsp;
@@ -357,11 +329,10 @@ const ensureValidityInterval = (
 export const createSingleAddressWallet = async (
   { name }: SingleAddressWalletProps,
   {
-    csl,
     provider,
     keyManager,
     utxoRepository,
-    txTracker = <span class="branch-0 cbranch-no" title="branch not covered" >new InMemoryTransactionTracker({ csl, provider }),</span>
+    txTracker,
     balanceTracker = new BalanceTracker(utxoRepository),
     logger = dummyLogger
   }: SingleAddressWalletDependencies
@@ -370,7 +341,7 @@ export const createSingleAddressWallet = async (
   const protocolParameters = await provider.currentWalletProtocolParameters();
   const signTx = async (body: CSL.TransactionBody, hash: CSL.TransactionHash) =&gt; {
     const witnessSet = await keyManager.signTransaction(hash);
-    return csl.Transaction.new(body, witnessSet);
+    return CSL.Transaction.new(body, witnessSet);
   };
   return {
     address,
@@ -378,13 +349,12 @@ export const createSingleAddressWallet = async (
     initializeTx: async (props) =&gt; {
       const tip = await provider.ledgerTip();
       const validityInterval = ensureValidityInterval(tip.slot, props.options?.validityInterval);
-      const txOutputs = new Set([...props.outputs].map((output) =&gt; Ogmios.ogmiosToCsl(csl).txOut(output)));
+      const txOutputs = new Set([...props.outputs].map((output) =&gt; Ogmios.ogmiosToCsl.txOut(output)));
       const constraints = defaultSelectionConstraints({
-        csl,
         protocolParameters,
         buildTx: async (inputSelection) =&gt; {
           logger.debug('Building TX for selection constraints', inputSelection);
-          const { body, hash } = await createTransactionInternals(csl, {
+          const { body, hash } = await createTransactionInternals({
             changeAddress: address,
             inputSelection,
             validityInterval
@@ -394,7 +364,7 @@ export const createSingleAddressWallet = async (
       });
       const implicitCoin = computeImplicitCoin(protocolParameters, props);
       const inputSelectionResult = await utxoRepository.selectInputs(txOutputs, constraints, implicitCoin);
-      return createTransactionInternals(csl, {
+      return createTransactionInternals({
         changeAddress: address,
         inputSelection: inputSelectionResult.selection,
         validityInterval
@@ -424,7 +394,7 @@ export const createSingleAddressWallet = async (
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Thu Oct 14 2021 13:53:42 GMT+0000 (Coordinated Universal Time)
+                at Mon Oct 18 2021 07:01:40 GMT+0000 (Coordinated Universal Time)
             </div>
         </div>
         <script src="../prettify.js"></script>

@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">41.67% </span>
+                <span class="strong">39.13% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>20/48</span>
+                <span class='fraction'>18/46</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">46.51% </span>
+                <span class="strong">43.9% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>20/43</span>
+                <span class='fraction'>18/41</span>
             </div>
         
             
@@ -128,19 +128,17 @@
 <a name='L69'></a><a href='#L69'>69</a>
 <a name='L70'></a><a href='#L70'>70</a>
 <a name='L71'></a><a href='#L71'>71</a>
-<a name='L72'></a><a href='#L72'>72</a>
-<a name='L73'></a><a href='#L73'>73</a>
-<a name='L74'></a><a href='#L74'>74</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L72'></a><a href='#L72'>72</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
@@ -148,8 +146,6 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -215,60 +211,58 @@ var __classPrivateFieldGet = (this &amp;&amp; this.__classPrivateFieldGet) || fu
     <span class="missing-if-branch" title="if path not taken" >I</span>if (typeof state === "function" ? <span class="branch-0 cbranch-no" title="branch not covered" >receiver !== state || !f </span>: !state.has(receiver)) <span class="cstat-no" title="statement not covered" >throw new TypeError("Cannot read private member from an object whose class did not declare it");</span>
     return kind === "m" ? <span class="branch-0 cbranch-no" title="branch not covered" >f </span>: kind === "a" ? <span class="branch-0 cbranch-no" title="branch not covered" >f.call(receiver) </span>: f ? <span class="branch-0 cbranch-no" title="branch not covered" >f.value </span>: state.get(receiver);
 };
-var _CertificateFactory_instances, _CertificateFactory_stakeCredential, _CertificateFactory_csl, _CertificateFactory_createCslRelays;
+var _CertificateFactory_instances, _CertificateFactory_stakeCredential, _CertificateFactory_createCslRelays;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CertificateFactory = void 0;
 const core_1 = require("@cardano-sdk/core");
 class CertificateFactory {
-    constructor(csl, keyManager) {
+    constructor(keyManager) {
         _CertificateFactory_instances.add(this);
         _CertificateFactory_stakeCredential.set(this, void 0);
-        _CertificateFactory_csl.set(this, void 0);
-        __classPrivateFieldSet(this, _CertificateFactory_csl, csl, "f");
-        __classPrivateFieldSet(this, _CertificateFactory_stakeCredential, csl.StakeCredential.from_keyhash(keyManager.stakeKey.hash()), "f");
+        __classPrivateFieldSet(this, _CertificateFactory_stakeCredential, core_1.CSL.StakeCredential.from_keyhash(keyManager.stakeKey.hash()), "f");
     }
 <span class="fstat-no" title="function not covered" >    st</span>akeKeyRegistration() {
-<span class="cstat-no" title="statement not covered" >        return __classPrivateFieldGet(this, _CertificateFactory_csl, "f").Certificate.new_stake_registration(__classPrivateFieldGet(this, _CertificateFactory_csl, "f").StakeRegistration.new(__classPrivateFieldGet(this, _CertificateFactory_stakeCredential, "f")));</span>
+<span class="cstat-no" title="statement not covered" >        return core_1.CSL.Certificate.new_stake_registration(core_1.CSL.StakeRegistration.new(__classPrivateFieldGet(this, _CertificateFactory_stakeCredential, "f")));</span>
     }
     stakeKeyDeregistration() {
-        return __classPrivateFieldGet(this, _CertificateFactory_csl, "f").Certificate.new_stake_deregistration(__classPrivateFieldGet(this, _CertificateFactory_csl, "f").StakeDeregistration.new(__classPrivateFieldGet(this, _CertificateFactory_stakeCredential, "f")));
+        return core_1.CSL.Certificate.new_stake_deregistration(core_1.CSL.StakeDeregistration.new(__classPrivateFieldGet(this, _CertificateFactory_stakeCredential, "f")));
     }
 <span class="fstat-no" title="function not covered" >    po</span>olRegistration({ poolKeyHash, vrfKeyHash, pledge, cost, margin, rewardAddress, owners, relays, poolMetadata }) {
-        const cslOwners = <span class="cstat-no" title="statement not covered" >__classPrivateFieldGet(this, _CertificateFactory_csl, "f").Ed25519KeyHashes.new();</span>
+        const cslOwners = <span class="cstat-no" title="statement not covered" >core_1.CSL.Ed25519KeyHashes.new();</span>
 <span class="cstat-no" title="statement not covered" >        for (const owner of owners) {</span>
-<span class="cstat-no" title="statement not covered" >            cslOwners.add(__classPrivateFieldGet(this, _CertificateFactory_csl, "f").Ed25519KeyHash.from_bech32(owner));</span>
+<span class="cstat-no" title="statement not covered" >            cslOwners.add(core_1.CSL.Ed25519KeyHash.from_bech32(owner));</span>
         }
         const cslRelays = <span class="cstat-no" title="statement not covered" >__classPrivateFieldGet(this, _CertificateFactory_instances, "m", _CertificateFactory_createCslRelays).call(this, relays);</span>
-        const poolParams = <span class="cstat-no" title="statement not covered" >__classPrivateFieldGet(this, _CertificateFactory_csl, "f").PoolParams.new(__classPrivateFieldGet(this, _CertificateFactory_csl, "f").Ed25519KeyHash.from_bech32(poolKeyHash), __classPrivateFieldGet(this, _CertificateFactory_csl, "f").VRFKeyHash.from_bech32(vrfKeyHash), __classPrivateFieldGet(this, _CertificateFactory_csl, "f").BigNum.from_str(pledge.toString()), __classPrivateFieldGet(this, _CertificateFactory_csl, "f").BigNum.from_str(cost.toString()), __classPrivateFieldGet(this, _CertificateFactory_csl, "f").UnitInterval.new(__classPrivateFieldGet(this, _CertificateFactory_csl, "f").BigNum.from_str(margin.numerator.toString()), __classPrivateFieldGet(this, _CertificateFactory_csl, "f").BigNum.from_str(margin.denominator.toString())), __classPrivateFieldGet(this, _CertificateFactory_csl, "f").RewardAddress.from_address(__classPrivateFieldGet(this, _CertificateFactory_csl, "f").Address.from_bech32(rewardAddress)), cslOwners, cslRelays, poolMetadata</span>
-            ? __classPrivateFieldGet(this, _CertificateFactory_csl, "f").PoolMetadata.new(__classPrivateFieldGet(this, _CertificateFactory_csl, "f").URL.new(poolMetadata.url), __classPrivateFieldGet(this, _CertificateFactory_csl, "f").PoolMetadataHash.from_bech32(poolMetadata.hash))
+        const poolParams = <span class="cstat-no" title="statement not covered" >core_1.CSL.PoolParams.new(core_1.CSL.Ed25519KeyHash.from_bech32(poolKeyHash), core_1.CSL.VRFKeyHash.from_bech32(vrfKeyHash), core_1.CSL.BigNum.from_str(pledge.toString()), core_1.CSL.BigNum.from_str(cost.toString()), core_1.CSL.UnitInterval.new(core_1.CSL.BigNum.from_str(margin.numerator.toString()), core_1.CSL.BigNum.from_str(margin.denominator.toString())), core_1.CSL.RewardAddress.from_address(core_1.CSL.Address.from_bech32(rewardAddress)), cslOwners, cslRelays, poolMetadata</span>
+            ? core_1.CSL.PoolMetadata.new(core_1.CSL.URL.new(poolMetadata.url), core_1.CSL.PoolMetadataHash.from_bech32(poolMetadata.hash))
             : undefined);
-<span class="cstat-no" title="statement not covered" >        return __classPrivateFieldGet(this, _CertificateFactory_csl, "f").Certificate.new_pool_registration(__classPrivateFieldGet(this, _CertificateFactory_csl, "f").PoolRegistration.new(poolParams));</span>
+<span class="cstat-no" title="statement not covered" >        return core_1.CSL.Certificate.new_pool_registration(core_1.CSL.PoolRegistration.new(poolParams));</span>
     }
 <span class="fstat-no" title="function not covered" >    po</span>olRetirement(poolKeyHash, epoch) {
-<span class="cstat-no" title="statement not covered" >        return __classPrivateFieldGet(this, _CertificateFactory_csl, "f").Certificate.new_pool_retirement(__classPrivateFieldGet(this, _CertificateFactory_csl, "f").PoolRetirement.new(__classPrivateFieldGet(this, _CertificateFactory_csl, "f").Ed25519KeyHash.from_bech32(poolKeyHash), epoch));</span>
+<span class="cstat-no" title="statement not covered" >        return core_1.CSL.Certificate.new_pool_retirement(core_1.CSL.PoolRetirement.new(core_1.CSL.Ed25519KeyHash.from_bech32(poolKeyHash), epoch));</span>
     }
 <span class="fstat-no" title="function not covered" >    st</span>akeDelegation(delegatee) {
-<span class="cstat-no" title="statement not covered" >        return __classPrivateFieldGet(this, _CertificateFactory_csl, "f").Certificate.new_stake_delegation(__classPrivateFieldGet(this, _CertificateFactory_csl, "f").StakeDelegation.new(__classPrivateFieldGet(this, _CertificateFactory_stakeCredential, "f"), __classPrivateFieldGet(this, _CertificateFactory_csl, "f").Ed25519KeyHash.from_bech32(delegatee)));</span>
+<span class="cstat-no" title="statement not covered" >        return core_1.CSL.Certificate.new_stake_delegation(core_1.CSL.StakeDelegation.new(__classPrivateFieldGet(this, _CertificateFactory_stakeCredential, "f"), core_1.CSL.Ed25519KeyHash.from_bech32(delegatee)));</span>
     }
 }
 exports.CertificateFactory = CertificateFactory;
-_CertificateFactory_stakeCredential = new WeakMap(), _CertificateFactory_csl = new WeakMap(), _CertificateFactory_instances = new WeakSet(), _CertificateFactory_createCslRelays = function <span class="fstat-no" title="function not covered" >_CertificateFactory_createCslRelays(</span>relays) {
-    const cslRelays = <span class="cstat-no" title="statement not covered" >__classPrivateFieldGet(this, _CertificateFactory_csl, "f").Relays.new();</span>
+_CertificateFactory_stakeCredential = new WeakMap(), _CertificateFactory_instances = new WeakSet(), _CertificateFactory_createCslRelays = function <span class="fstat-no" title="function not covered" >_CertificateFactory_createCslRelays(</span>relays) {
+    const cslRelays = <span class="cstat-no" title="statement not covered" >core_1.CSL.Relays.new();</span>
 <span class="cstat-no" title="statement not covered" >    for (const relay of relays) {</span>
 <span class="cstat-no" title="statement not covered" >        switch (relay.relayType) {</span>
             case 'singlehost-addr':
 <span class="cstat-no" title="statement not covered" >                if (relay.ipv6) {</span>
 <span class="cstat-no" title="statement not covered" >                    throw new core_1.NotImplementedError('Parse IPv6 to byte array');</span>
                 }
-<span class="cstat-no" title="statement not covered" >                cslRelays.add(__classPrivateFieldGet(this, _CertificateFactory_csl, "f").Relay.new_single_host_addr(__classPrivateFieldGet(this, _CertificateFactory_csl, "f").SingleHostAddr.new(relay.port, relay.ipv4</span>
-                    ? __classPrivateFieldGet(this, _CertificateFactory_csl, "f").Ipv4.new(new Uint8Array(relay.ipv4.split('.').map(<span class="fstat-no" title="function not covered" >(s</span>egment) =&gt; <span class="cstat-no" title="statement not covered" >Number.parseInt(segment))</span>))
+<span class="cstat-no" title="statement not covered" >                cslRelays.add(core_1.CSL.Relay.new_single_host_addr(core_1.CSL.SingleHostAddr.new(relay.port, relay.ipv4</span>
+                    ? core_1.CSL.Ipv4.new(new Uint8Array(relay.ipv4.split('.').map(<span class="fstat-no" title="function not covered" >(s</span>egment) =&gt; <span class="cstat-no" title="statement not covered" >Number.parseInt(segment))</span>))
                     : undefined)));
 <span class="cstat-no" title="statement not covered" >                break;</span>
             case 'singlehost-name':
-<span class="cstat-no" title="statement not covered" >                cslRelays.add(__classPrivateFieldGet(this, _CertificateFactory_csl, "f").Relay.new_single_host_name(__classPrivateFieldGet(this, _CertificateFactory_csl, "f").SingleHostName.new(relay.port || undefined, __classPrivateFieldGet(this, _CertificateFactory_csl, "f").DNSRecordAorAAAA.new(relay.hostname))));</span>
+<span class="cstat-no" title="statement not covered" >                cslRelays.add(core_1.CSL.Relay.new_single_host_name(core_1.CSL.SingleHostName.new(relay.port || undefined, core_1.CSL.DNSRecordAorAAAA.new(relay.hostname))));</span>
 <span class="cstat-no" title="statement not covered" >                break;</span>
             case 'multihost-name':
-<span class="cstat-no" title="statement not covered" >                cslRelays.add(__classPrivateFieldGet(this, _CertificateFactory_csl, "f").Relay.new_multi_host_name(__classPrivateFieldGet(this, _CertificateFactory_csl, "f").MultiHostName.new(__classPrivateFieldGet(this, _CertificateFactory_csl, "f").DNSRecordSRV.new(relay.dnsName))));</span>
+<span class="cstat-no" title="statement not covered" >                cslRelays.add(core_1.CSL.Relay.new_multi_host_name(core_1.CSL.MultiHostName.new(core_1.CSL.DNSRecordSRV.new(relay.dnsName))));</span>
 <span class="cstat-no" title="statement not covered" >                break;</span>
             default:
 <span class="cstat-no" title="statement not covered" >                throw new core_1.NotImplementedError('Relay type');</span>
@@ -283,7 +277,7 @@ _CertificateFactory_stakeCredential = new WeakMap(), _CertificateFactory_csl = n
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Thu Oct 14 2021 13:53:42 GMT+0000 (Coordinated Universal Time)
+                at Mon Oct 18 2021 07:01:40 GMT+0000 (Coordinated Universal Time)
             </div>
         </div>
         <script src="../../prettify.js"></script>

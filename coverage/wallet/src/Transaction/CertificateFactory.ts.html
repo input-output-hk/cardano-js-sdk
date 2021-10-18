@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">93.55% </span>
+                <span class="strong">93.1% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>29/31</span>
+                <span class='fraction'>27/29</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">93.55% </span>
+                <span class="strong">93.1% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>29/31</span>
+                <span class='fraction'>27/29</span>
             </div>
         
             
@@ -204,14 +204,7 @@
 <a name='L145'></a><a href='#L145'>145</a>
 <a name='L146'></a><a href='#L146'>146</a>
 <a name='L147'></a><a href='#L147'>147</a>
-<a name='L148'></a><a href='#L148'>148</a>
-<a name='L149'></a><a href='#L149'>149</a>
-<a name='L150'></a><a href='#L150'>150</a>
-<a name='L151'></a><a href='#L151'>151</a>
-<a name='L152'></a><a href='#L152'>152</a>
-<a name='L153'></a><a href='#L153'>153</a>
-<a name='L154'></a><a href='#L154'>154</a>
-<a name='L155'></a><a href='#L155'>155</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L148'></a><a href='#L148'>148</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -262,10 +255,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -294,9 +285,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -355,8 +343,6 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -366,7 +352,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { ByName } from '@cardano-ogmios/schema';
-import { CardanoSerializationLib, CSL, NotImplementedError, Ogmios } from '@cardano-sdk/core';
+import { NotImplementedError, Ogmios, CSL } from '@cardano-sdk/core';
 import { KeyManager } from '../KeyManagement';
 &nbsp;
 export type Ed25519KeyHashBech32 = string;
@@ -416,19 +402,17 @@ interface PoolParameters {
 &nbsp;
 export class CertificateFactory {
   readonly #stakeCredential: CSL.StakeCredential;
-  readonly #csl: CardanoSerializationLib;
 &nbsp;
-  constructor(csl: CardanoSerializationLib, keyManager: KeyManager) {
-    this.#csl = csl;
-    this.#stakeCredential = csl.StakeCredential.from_keyhash(keyManager.stakeKey.hash());
+  constructor(keyManager: KeyManager) {
+    this.#stakeCredential = CSL.StakeCredential.from_keyhash(keyManager.stakeKey.hash());
   }
 &nbsp;
   stakeKeyRegistration() {
-    return this.#csl.Certificate.new_stake_registration(this.#csl.StakeRegistration.new(this.#stakeCredential));
+    return CSL.Certificate.new_stake_registration(CSL.StakeRegistration.new(this.#stakeCredential));
   }
 &nbsp;
   stakeKeyDeregistration() {
-    return this.#csl.Certificate.new_stake_deregistration(this.#csl.StakeDeregistration.new(this.#stakeCredential));
+    return CSL.Certificate.new_stake_deregistration(CSL.StakeDeregistration.new(this.#stakeCredential));
   }
 &nbsp;
   poolRegistration({
@@ -442,47 +426,44 @@ export class CertificateFactory {
     relays,
     poolMetadata
   }: PoolParameters) {
-    const cslOwners = this.#csl.Ed25519KeyHashes.new();
+    const cslOwners = CSL.Ed25519KeyHashes.new();
     for (const owner of owners) {
-      cslOwners.add(this.#csl.Ed25519KeyHash.from_bech32(owner));
+      cslOwners.add(CSL.Ed25519KeyHash.from_bech32(owner));
     }
     const cslRelays = this.#createCslRelays(relays);
-    const poolParams = this.#csl.PoolParams.new(
-      this.#csl.Ed25519KeyHash.from_bech32(poolKeyHash),
-      this.#csl.VRFKeyHash.from_bech32(vrfKeyHash),
-      this.#csl.BigNum.from_str(pledge.toString()),
-      this.#csl.BigNum.from_str(cost.toString()),
-      this.#csl.UnitInterval.new(
-        this.#csl.BigNum.from_str(margin.numerator.toString()),
-        this.#csl.BigNum.from_str(margin.denominator.toString())
+    const poolParams = CSL.PoolParams.new(
+      CSL.Ed25519KeyHash.from_bech32(poolKeyHash),
+      CSL.VRFKeyHash.from_bech32(vrfKeyHash),
+      CSL.BigNum.from_str(pledge.toString()),
+      CSL.BigNum.from_str(cost.toString()),
+      CSL.UnitInterval.new(
+        CSL.BigNum.from_str(margin.numerator.toString()),
+        CSL.BigNum.from_str(margin.denominator.toString())
       ),
-      this.#csl.RewardAddress.from_address(this.#csl.Address.from_bech32(rewardAddress))!,
+      CSL.RewardAddress.from_address(CSL.Address.from_bech32(rewardAddress))!,
       cslOwners,
       cslRelays,
       poolMetadata
-        ? this.#csl.PoolMetadata.new(
-            this.#csl.URL.new(poolMetadata.url),
-            this.#csl.PoolMetadataHash.from_bech32(poolMetadata.hash)
-          )
+        ? CSL.PoolMetadata.new(CSL.URL.new(poolMetadata.url), CSL.PoolMetadataHash.from_bech32(poolMetadata.hash))
         : <span class="branch-1 cbranch-no" title="branch not covered" >undefined</span>
     );
-    return this.#csl.Certificate.new_pool_registration(this.#csl.PoolRegistration.new(poolParams));
+    return CSL.Certificate.new_pool_registration(CSL.PoolRegistration.new(poolParams));
   }
 &nbsp;
   poolRetirement(poolKeyHash: Ed25519KeyHashBech32, epoch: number) {
-    return this.#csl.Certificate.new_pool_retirement(
-      this.#csl.PoolRetirement.new(this.#csl.Ed25519KeyHash.from_bech32(poolKeyHash), epoch)
+    return CSL.Certificate.new_pool_retirement(
+      CSL.PoolRetirement.new(CSL.Ed25519KeyHash.from_bech32(poolKeyHash), epoch)
     );
   }
 &nbsp;
   stakeDelegation(delegatee: Ed25519KeyHashBech32) {
-    return this.#csl.Certificate.new_stake_delegation(
-      this.#csl.StakeDelegation.new(this.#stakeCredential, this.#csl.Ed25519KeyHash.from_bech32(delegatee))
+    return CSL.Certificate.new_stake_delegation(
+      CSL.StakeDelegation.new(this.#stakeCredential, CSL.Ed25519KeyHash.from_bech32(delegatee))
     );
   }
 &nbsp;
   #createCslRelays(relays: Relay[]) {
-    const cslRelays = this.#csl.Relays.new();
+    const cslRelays = CSL.Relays.new();
     for (const relay of relays) {
       switch (relay.relayType) {
         case 'singlehost-addr':
@@ -490,11 +471,11 @@ export class CertificateFactory {
 <span class="cstat-no" title="statement not covered" >            throw new NotImplementedError('Parse IPv6 to byte array');</span>
           }
           cslRelays.add(
-            this.#csl.Relay.new_single_host_addr(
-              this.#csl.SingleHostAddr.new(
+            CSL.Relay.new_single_host_addr(
+              CSL.SingleHostAddr.new(
                 relay.port,
                 relay.ipv4
-                  ? this.#csl.Ipv4.new(new Uint8Array(relay.ipv4.split('.').map((segment) =&gt; Number.parseInt(segment))))
+                  ? CSL.Ipv4.new(new Uint8Array(relay.ipv4.split('.').map((segment) =&gt; Number.parseInt(segment))))
                   : <span class="branch-1 cbranch-no" title="branch not covered" >undefined</span>
               )
             )
@@ -502,15 +483,13 @@ export class CertificateFactory {
           break;
         case 'singlehost-name':
           cslRelays.add(
-            this.#csl.Relay.new_single_host_name(
-              this.#csl.SingleHostName.new(relay.port || <span class="branch-1 cbranch-no" title="branch not covered" >undefined,</span> this.#csl.DNSRecordAorAAAA.new(relay.hostname))
+            CSL.Relay.new_single_host_name(
+              CSL.SingleHostName.new(relay.port || <span class="branch-1 cbranch-no" title="branch not covered" >undefined,</span> CSL.DNSRecordAorAAAA.new(relay.hostname))
             )
           );
           break;
         case 'multihost-name':
-          cslRelays.add(
-            this.#csl.Relay.new_multi_host_name(this.#csl.MultiHostName.new(this.#csl.DNSRecordSRV.new(relay.dnsName)))
-          );
+          cslRelays.add(CSL.Relay.new_multi_host_name(CSL.MultiHostName.new(CSL.DNSRecordSRV.new(relay.dnsName))));
           break;
 <span class="branch-3 cbranch-no" title="branch not covered" >        default:</span>
 <span class="cstat-no" title="statement not covered" >          throw new NotImplementedError('Relay type');</span>
@@ -526,7 +505,7 @@ export class CertificateFactory {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Thu Oct 14 2021 13:53:42 GMT+0000 (Coordinated Universal Time)
+                at Mon Oct 18 2021 07:01:40 GMT+0000 (Coordinated Universal Time)
             </div>
         </div>
         <script src="../../prettify.js"></script>

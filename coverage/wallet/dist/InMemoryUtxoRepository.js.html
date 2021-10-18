@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">76.52% </span>
+                <span class="strong">75.89% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>88/115</span>
+                <span class='fraction'>85/112</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">81.37% </span>
+                <span class="strong">80.81% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>83/102</span>
+                <span class='fraction'>80/99</span>
             </div>
         
             
@@ -211,26 +211,22 @@
 <a name='L152'></a><a href='#L152'>152</a>
 <a name='L153'></a><a href='#L153'>153</a>
 <a name='L154'></a><a href='#L154'>154</a>
-<a name='L155'></a><a href='#L155'>155</a>
-<a name='L156'></a><a href='#L156'>156</a>
-<a name='L157'></a><a href='#L157'>157</a>
-<a name='L158'></a><a href='#L158'>158</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L155'></a><a href='#L155'>155</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">9x</span>
-<span class="cline-any cline-yes">9x</span>
-<span class="cline-any cline-yes">9x</span>
-<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">88x</span>
-<span class="cline-any cline-yes">88x</span>
-<span class="cline-any cline-yes">88x</span>
+<span class="cline-any cline-yes">87x</span>
+<span class="cline-any cline-yes">87x</span>
+<span class="cline-any cline-yes">87x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -241,8 +237,6 @@
 <span class="cline-any cline-yes">21x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -386,21 +380,19 @@ var __classPrivateFieldGet = (this &amp;&amp; this.__classPrivateFieldGet) || fu
 var __importDefault = (this &amp;&amp; this.__importDefault) || function (mod) {
     return (mod &amp;&amp; mod.__esModule) ? <span class="branch-0 cbranch-no" title="branch not covered" >mod </span>: { "default": mod };
 };
-var _InMemoryUtxoRepository_instances, _InMemoryUtxoRepository_csl, _InMemoryUtxoRepository_delegationAndRewards, _InMemoryUtxoRepository_inputSelector, _InMemoryUtxoRepository_keyManager, _InMemoryUtxoRepository_logger, _InMemoryUtxoRepository_provider, _InMemoryUtxoRepository_utxoSet, _InMemoryUtxoRepository_lockedUtxoSet, _InMemoryUtxoRepository_lockedRewards, _InMemoryUtxoRepository_emitSynced, _InMemoryUtxoRepository_onTransaction, _InMemoryUtxoRepository_trySync, _InMemoryUtxoRepository_getOwnTransactionWithdrawalQty;
+var _InMemoryUtxoRepository_instances, _InMemoryUtxoRepository_delegationAndRewards, _InMemoryUtxoRepository_inputSelector, _InMemoryUtxoRepository_keyManager, _InMemoryUtxoRepository_logger, _InMemoryUtxoRepository_provider, _InMemoryUtxoRepository_utxoSet, _InMemoryUtxoRepository_lockedUtxoSet, _InMemoryUtxoRepository_lockedRewards, _InMemoryUtxoRepository_emitSynced, _InMemoryUtxoRepository_onTransaction, _InMemoryUtxoRepository_trySync, _InMemoryUtxoRepository_getOwnTransactionWithdrawalQty;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.InMemoryUtxoRepository = void 0;
 const buffer_1 = require("buffer");
 const core_1 = require("@cardano-sdk/core");
 const ts_log_1 = require("ts-log");
 const types_1 = require("./types");
-const Ogmios_1 = require("@cardano-sdk/core/src/Ogmios");
 const emittery_1 = __importDefault(require("emittery"));
 const utxoEquals = ([txIn1], [txIn2]) =&gt; txIn1.txId === txIn2.txId &amp;&amp; txIn1.index === txIn2.index;
 class InMemoryUtxoRepository extends emittery_1.default {
-    constructor({ csl, logger = ts_log_1.dummyLogger, provider, inputSelector, keyManager, txTracker }) {
+    constructor({ logger = ts_log_1.dummyLogger, provider, inputSelector, keyManager, txTracker }) {
         super();
         _InMemoryUtxoRepository_instances.add(this);
-        _InMemoryUtxoRepository_csl.set(this, void 0);
         _InMemoryUtxoRepository_delegationAndRewards.set(this, void 0);
         _InMemoryUtxoRepository_inputSelector.set(this, void 0);
         _InMemoryUtxoRepository_keyManager.set(this, void 0);
@@ -409,7 +401,6 @@ class InMemoryUtxoRepository extends emittery_1.default {
         _InMemoryUtxoRepository_utxoSet.set(this, void 0);
         _InMemoryUtxoRepository_lockedUtxoSet.set(this, new Set());
         _InMemoryUtxoRepository_lockedRewards.set(this, 0n);
-        __classPrivateFieldSet(this, _InMemoryUtxoRepository_csl, csl, "f");
         __classPrivateFieldSet(this, _InMemoryUtxoRepository_logger, logger, "f");
         __classPrivateFieldSet(this, _InMemoryUtxoRepository_provider, provider, "f");
         __classPrivateFieldSet(this, _InMemoryUtxoRepository_utxoSet, new Set(), "f");
@@ -454,7 +445,7 @@ class InMemoryUtxoRepository extends emittery_1.default {
 <span class="cstat-no" title="statement not covered" >            await this.sync();</span>
         }
         return __classPrivateFieldGet(this, _InMemoryUtxoRepository_inputSelector, "f").select({
-            utxo: new Set(core_1.Ogmios.ogmiosToCsl(__classPrivateFieldGet(this, _InMemoryUtxoRepository_csl, "f")).utxo(this.availableUtxos)),
+            utxo: new Set(core_1.Ogmios.ogmiosToCsl.utxo(this.availableUtxos)),
             outputs,
             constraints,
             implicitCoin
@@ -479,7 +470,7 @@ class InMemoryUtxoRepository extends emittery_1.default {
     }
 }
 exports.InMemoryUtxoRepository = InMemoryUtxoRepository;
-_InMemoryUtxoRepository_csl = new WeakMap(), _InMemoryUtxoRepository_delegationAndRewards = new WeakMap(), _InMemoryUtxoRepository_inputSelector = new WeakMap(), _InMemoryUtxoRepository_keyManager = new WeakMap(), _InMemoryUtxoRepository_logger = new WeakMap(), _InMemoryUtxoRepository_provider = new WeakMap(), _InMemoryUtxoRepository_utxoSet = new WeakMap(), _InMemoryUtxoRepository_lockedUtxoSet = new WeakMap(), _InMemoryUtxoRepository_lockedRewards = new WeakMap(), _InMemoryUtxoRepository_instances = new WeakSet(), _InMemoryUtxoRepository_emitSynced = function _InMemoryUtxoRepository_emitSynced() {
+_InMemoryUtxoRepository_delegationAndRewards = new WeakMap(), _InMemoryUtxoRepository_inputSelector = new WeakMap(), _InMemoryUtxoRepository_keyManager = new WeakMap(), _InMemoryUtxoRepository_logger = new WeakMap(), _InMemoryUtxoRepository_provider = new WeakMap(), _InMemoryUtxoRepository_utxoSet = new WeakMap(), _InMemoryUtxoRepository_lockedUtxoSet = new WeakMap(), _InMemoryUtxoRepository_lockedRewards = new WeakMap(), _InMemoryUtxoRepository_instances = new WeakSet(), _InMemoryUtxoRepository_emitSynced = function _InMemoryUtxoRepository_emitSynced() {
     this.emit(types_1.UtxoRepositoryEvent.Changed, {
         allUtxos: this.allUtxos,
         availableUtxos: this.availableUtxos,
@@ -493,7 +484,7 @@ _InMemoryUtxoRepository_csl = new WeakMap(), _InMemoryUtxoRepository_delegationA
     const utxoLockedByTx = [];
     const inputs = transaction.body().inputs();
     for (let inputIdx = 0; inputIdx &lt; inputs.len(); inputIdx++) {
-        const { txId, index } = <span class="cstat-no" title="statement not covered" >Ogmios_1.cslToOgmios.txIn(inputs.get(inputIdx));</span>
+        const { txId, index } = <span class="cstat-no" title="statement not covered" >core_1.Ogmios.cslToOgmios.txIn(inputs.get(inputIdx));</span>
         const utxo = <span class="cstat-no" title="statement not covered" >this.allUtxos.find(<span class="fstat-no" title="function not covered" >([</span>txIn]) =&gt; <span class="cstat-no" title="statement not covered" >txIn.txId === txId &amp;&amp; txIn.index === index)</span>;</span>
 <span class="cstat-no" title="statement not covered" >        __classPrivateFieldGet(this, _InMemoryUtxoRepository_lockedUtxoSet, "f").add(utxo);</span>
 <span class="cstat-no" title="statement not covered" >        utxoLockedByTx.push(utxo);</span>
@@ -517,7 +508,7 @@ _InMemoryUtxoRepository_csl = new WeakMap(), _InMemoryUtxoRepository_delegationA
     const withdrawals = transaction.body().withdrawals();
     <span class="missing-if-branch" title="else path not taken" >E</span>if (!withdrawals)
         return 0n;
-    const ownStakeCredential = <span class="cstat-no" title="statement not covered" >__classPrivateFieldGet(this, _InMemoryUtxoRepository_csl, "f").StakeCredential.from_keyhash(__classPrivateFieldGet(this, _InMemoryUtxoRepository_keyManager, "f").stakeKey.hash());</span>
+    const ownStakeCredential = <span class="cstat-no" title="statement not covered" >core_1.CSL.StakeCredential.from_keyhash(__classPrivateFieldGet(this, _InMemoryUtxoRepository_keyManager, "f").stakeKey.hash());</span>
     const withdrawalKeys = <span class="cstat-no" title="statement not covered" >withdrawals.keys();</span>
     let withdrawalTotal = <span class="cstat-no" title="statement not covered" >0n;</span>
 <span class="cstat-no" title="statement not covered" >    for (let withdrawalKeyIdx = <span class="cstat-no" title="statement not covered" >0;</span> withdrawalKeyIdx &lt; withdrawalKeys.len(); withdrawalKeyIdx++) {</span>
@@ -535,7 +526,7 @@ _InMemoryUtxoRepository_csl = new WeakMap(), _InMemoryUtxoRepository_delegationA
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Thu Oct 14 2021 13:53:42 GMT+0000 (Coordinated Universal Time)
+                at Mon Oct 18 2021 07:01:40 GMT+0000 (Coordinated Universal Time)
             </div>
         </div>
         <script src="../prettify.js"></script>

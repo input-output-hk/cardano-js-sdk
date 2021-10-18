@@ -155,19 +155,7 @@
 <a name='L96'></a><a href='#L96'>96</a>
 <a name='L97'></a><a href='#L97'>97</a>
 <a name='L98'></a><a href='#L98'>98</a>
-<a name='L99'></a><a href='#L99'>99</a>
-<a name='L100'></a><a href='#L100'>100</a>
-<a name='L101'></a><a href='#L101'>101</a>
-<a name='L102'></a><a href='#L102'>102</a>
-<a name='L103'></a><a href='#L103'>103</a>
-<a name='L104'></a><a href='#L104'>104</a>
-<a name='L105'></a><a href='#L105'>105</a>
-<a name='L106'></a><a href='#L106'>106</a>
-<a name='L107'></a><a href='#L107'>107</a>
-<a name='L108'></a><a href='#L108'>108</a>
-<a name='L109'></a><a href='#L109'>109</a>
-<a name='L110'></a><a href='#L110'>110</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L99'></a><a href='#L99'>99</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -188,7 +176,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -208,13 +195,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
@@ -226,9 +208,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -262,7 +241,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -275,7 +253,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { CardanoSerializationLib, CSL, cslUtil, InvalidProtocolParametersError } from '@cardano-sdk/core';
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { cslUtil, InvalidProtocolParametersError, CSL } from '@cardano-sdk/core';
 import { ProtocolParametersRequiredByInputSelection } from '.';
 import {
   TokenBundleSizeExceedsLimit,
@@ -290,14 +268,12 @@ import {
 export type BuildTx = (selection: SelectionSkeleton) =&gt; Promise&lt;CSL.Transaction&gt;;
 &nbsp;
 export interface DefaultSelectionConstraintsProps {
-  csl: CardanoSerializationLib;
   protocolParameters: ProtocolParametersForInputSelection;
   buildTx: BuildTx;
 }
 &nbsp;
 export const computeMinimumCost =
   (
-    csl: CardanoSerializationLib,
     {
       minFeeCoefficient,
       minFeeConstant
@@ -307,42 +283,34 @@ export const computeMinimumCost =
   async (selection) =&gt; {
     const tx = await buildTx(selection);
     return BigInt(
-      csl
-        .min_fee(
-          tx,
-          csl.LinearFee.new(
-            csl.BigNum.from_str(minFeeCoefficient.toString()),
-            csl.BigNum.from_str(minFeeConstant.toString())
-          )
+      CSL.min_fee(
+        tx,
+        CSL.LinearFee.new(
+          CSL.BigNum.from_str(minFeeCoefficient.toString()),
+          CSL.BigNum.from_str(minFeeConstant.toString())
         )
-        .to_str()
+      ).to_str()
     );
   };
 &nbsp;
 export const computeMinimumCoinQuantity =
-  (
-    csl: CardanoSerializationLib,
-    coinsPerUtxoWord: ProtocolParametersRequiredByInputSelection['coinsPerUtxoWord']
-  ): ComputeMinimumCoinQuantity =&gt;
+  (coinsPerUtxoWord: ProtocolParametersRequiredByInputSelection['coinsPerUtxoWord']): ComputeMinimumCoinQuantity =&gt;
   (multiasset) =&gt; {
-    const minUTxOValue = csl.BigNum.from_str((coinsPerUtxoWord * 29).toString());
-    const value = csl.Value.new(csl.BigNum.from_str('0'));
+    const minUTxOValue = CSL.BigNum.from_str((coinsPerUtxoWord * 29).toString());
+    const value = CSL.Value.new(CSL.BigNum.from_str('0'));
     if (multiasset) {
       value.set_multiasset(multiasset);
     }
-    return BigInt(csl.min_ada_required(value, minUTxOValue).to_str());
+    return BigInt(CSL.min_ada_required(value, minUTxOValue).to_str());
   };
 &nbsp;
 export const tokenBundleSizeExceedsLimit =
-  (
-    csl: CardanoSerializationLib,
-    maxValueSize: ProtocolParametersRequiredByInputSelection['maxValueSize']
-  ): TokenBundleSizeExceedsLimit =&gt;
+  (maxValueSize: ProtocolParametersRequiredByInputSelection['maxValueSize']): TokenBundleSizeExceedsLimit =&gt;
   (tokenBundle) =&gt; {
     if (!tokenBundle) {
       return false;
     }
-    const value = csl.Value.new(cslUtil.maxBigNum(csl));
+    const value = CSL.Value.new(cslUtil.maxBigNum);
     value.set_multiasset(tokenBundle);
     return value.to_bytes().length &gt; maxValueSize;
   };
@@ -368,7 +336,6 @@ export const computeSelectionLimit =
   };
 &nbsp;
 export const defaultSelectionConstraints = ({
-  csl,
   protocolParameters: { coinsPerUtxoWord, maxTxSize, maxValueSize, minFeeCoefficient, minFeeConstant },
   buildTx
 }: DefaultSelectionConstraintsProps): SelectionConstraints =&gt; {
@@ -378,10 +345,10 @@ export const defaultSelectionConstraints = ({
     );
   }
   return {
-    computeMinimumCost: computeMinimumCost(csl, { minFeeCoefficient, minFeeConstant }, buildTx),
-    computeMinimumCoinQuantity: computeMinimumCoinQuantity(csl, coinsPerUtxoWord),
+    computeMinimumCost: computeMinimumCost({ minFeeCoefficient, minFeeConstant }, buildTx),
+    computeMinimumCoinQuantity: computeMinimumCoinQuantity(coinsPerUtxoWord),
     computeSelectionLimit: computeSelectionLimit(maxTxSize, buildTx),
-    tokenBundleSizeExceedsLimit: tokenBundleSizeExceedsLimit(csl, maxValueSize)
+    tokenBundleSizeExceedsLimit: tokenBundleSizeExceedsLimit(maxValueSize)
   };
 };
 &nbsp;</pre></td></tr></table></pre>
@@ -391,7 +358,7 @@ export const defaultSelectionConstraints = ({
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Thu Oct 14 2021 13:53:17 GMT+0000 (Coordinated Universal Time)
+                at Mon Oct 18 2021 07:01:15 GMT+0000 (Coordinated Universal Time)
             </div>
         </div>
         <script src="../prettify.js"></script>

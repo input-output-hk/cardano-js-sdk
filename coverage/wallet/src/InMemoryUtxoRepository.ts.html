@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">98.95% </span>
+                <span class="strong">98.91% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>94/95</span>
+                <span class='fraction'>91/92</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>86/86</span>
+                <span class='fraction'>83/83</span>
             </div>
         
             
@@ -238,18 +238,7 @@
 <a name='L179'></a><a href='#L179'>179</a>
 <a name='L180'></a><a href='#L180'>180</a>
 <a name='L181'></a><a href='#L181'>181</a>
-<a name='L182'></a><a href='#L182'>182</a>
-<a name='L183'></a><a href='#L183'>183</a>
-<a name='L184'></a><a href='#L184'>184</a>
-<a name='L185'></a><a href='#L185'>185</a>
-<a name='L186'></a><a href='#L186'>186</a>
-<a name='L187'></a><a href='#L187'>187</a>
-<a name='L188'></a><a href='#L188'>188</a>
-<a name='L189'></a><a href='#L189'>189</a>
-<a name='L190'></a><a href='#L190'>190</a>
-<a name='L191'></a><a href='#L191'>191</a>
-<a name='L192'></a><a href='#L192'>192</a>
-<a name='L193'></a><a href='#L193'>193</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L182'></a><a href='#L182'>182</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-yes">10x</span>
@@ -264,8 +253,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">10x</span>
-<span class="cline-any cline-yes">10x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -287,17 +274,8 @@
 <span class="cline-any cline-yes">14x</span>
 <span class="cline-any cline-yes">14x</span>
 <span class="cline-any cline-yes">14x</span>
-<span class="cline-any cline-yes">14x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">14x</span>
 <span class="cline-any cline-yes">14x</span>
 <span class="cline-any cline-yes">14x</span>
 <span class="cline-any cline-yes">14x</span>
@@ -443,7 +421,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import Schema, { TxIn, TxOut } from '@cardano-ogmios/schema';
 import { Buffer } from 'buffer';
-import { CardanoProvider, Ogmios, CardanoSerializationLib, CSL, cslUtil } from '@cardano-sdk/core';
+import { CardanoProvider, Ogmios, cslUtil, CSL } from '@cardano-sdk/core';
 import { dummyLogger, Logger } from 'ts-log';
 import { ImplicitCoin, InputSelector, SelectionConstraints, SelectionResult } from '@cardano-sdk/cip2';
 import { KeyManager } from './KeyManagement';
@@ -455,11 +433,9 @@ import {
   UtxoRepositoryEvent,
   UtxoRepositoryEvents
 } from './types';
-import { cslToOgmios } from '@cardano-sdk/core/src/Ogmios';
 import Emittery from 'emittery';
 &nbsp;
 export interface InMemoryUtxoRepositoryProps {
-  csl: CardanoSerializationLib;
   provider: CardanoProvider;
   keyManager: KeyManager;
   inputSelector: InputSelector;
@@ -471,7 +447,6 @@ const utxoEquals = ([txIn1]: [Schema.TxIn, Schema.TxOut], [txIn2]: [Schema.TxIn,
   txIn1.txId === txIn2.txId &amp;&amp; txIn1.index === txIn2.index;
 &nbsp;
 export class InMemoryUtxoRepository extends Emittery&lt;UtxoRepositoryEvents&gt; implements UtxoRepository {
-  #csl: CardanoSerializationLib;
   #delegationAndRewards: Ogmios.DelegationsAndRewards;
   #inputSelector: InputSelector;
   #keyManager: KeyManager;
@@ -481,16 +456,8 @@ export class InMemoryUtxoRepository extends Emittery&lt;UtxoRepositoryEvents&gt;
   #lockedUtxoSet: Set&lt;[TxIn, TxOut]&gt; = new Set();
   #lockedRewards = 0n;
 &nbsp;
-  constructor({
-    csl,
-    logger = dummyLogger,
-    provider,
-    inputSelector,
-    keyManager,
-    txTracker
-  }: InMemoryUtxoRepositoryProps) {
+  constructor({ logger = dummyLogger, provider, inputSelector, keyManager, txTracker }: InMemoryUtxoRepositoryProps) {
     super();
-    this.#csl = csl;
     this.#logger = logger;
     this.#provider = provider;
     this.#utxoSet = new Set();
@@ -545,7 +512,7 @@ export class InMemoryUtxoRepository extends Emittery&lt;UtxoRepositoryEvents&gt;
       await this.sync();
     }
     return this.#inputSelector.select({
-      utxo: new Set(Ogmios.ogmiosToCsl(this.#csl).utxo(this.availableUtxos)),
+      utxo: new Set(Ogmios.ogmiosToCsl.utxo(this.availableUtxos)),
       outputs,
       constraints,
       implicitCoin
@@ -591,7 +558,7 @@ export class InMemoryUtxoRepository extends Emittery&lt;UtxoRepositoryEvents&gt;
     const utxoLockedByTx: Schema.Utxo = [];
     const inputs = transaction.body().inputs();
     for (let inputIdx = 0; inputIdx &lt; inputs.len(); inputIdx++) {
-      const { txId, index } = cslToOgmios.txIn(inputs.get(inputIdx));
+      const { txId, index } = Ogmios.cslToOgmios.txIn(inputs.get(inputIdx));
       const utxo = this.allUtxos.find(([txIn]) =&gt; txIn.txId === txId &amp;&amp; txIn.index === index)!;
       this.#lockedUtxoSet.add(utxo);
       utxoLockedByTx.push(utxo);
@@ -621,7 +588,7 @@ export class InMemoryUtxoRepository extends Emittery&lt;UtxoRepositoryEvents&gt;
   #getOwnTransactionWithdrawalQty(transaction: CSL.Transaction) {
     const withdrawals = transaction.body().withdrawals();
     <span class="missing-if-branch" title="if path not taken" >I</span>if (!withdrawals) <span class="cstat-no" title="statement not covered" >return 0n;</span>
-    const ownStakeCredential = this.#csl.StakeCredential.from_keyhash(this.#keyManager.stakeKey.hash());
+    const ownStakeCredential = CSL.StakeCredential.from_keyhash(this.#keyManager.stakeKey.hash());
     const withdrawalKeys = withdrawals.keys();
     let withdrawalTotal = 0n;
     for (let withdrawalKeyIdx = 0; withdrawalKeyIdx &lt; withdrawalKeys.len(); withdrawalKeyIdx++) {
@@ -640,7 +607,7 @@ export class InMemoryUtxoRepository extends Emittery&lt;UtxoRepositoryEvents&gt;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Thu Oct 14 2021 13:53:42 GMT+0000 (Coordinated Universal Time)
+                at Mon Oct 18 2021 07:01:40 GMT+0000 (Coordinated Universal Time)
             </div>
         </div>
         <script src="../prettify.js"></script>

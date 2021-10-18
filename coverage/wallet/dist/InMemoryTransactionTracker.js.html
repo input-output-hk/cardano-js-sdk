@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">73.53% </span>
+                <span class="strong">72.73% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>50/68</span>
+                <span class='fraction'>48/66</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">80.33% </span>
+                <span class="strong">79.66% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>49/61</span>
+                <span class='fraction'>47/59</span>
             </div>
         
             
@@ -140,19 +140,17 @@
 <a name='L81'></a><a href='#L81'>81</a>
 <a name='L82'></a><a href='#L82'>82</a>
 <a name='L83'></a><a href='#L83'>83</a>
-<a name='L84'></a><a href='#L84'>84</a>
-<a name='L85'></a><a href='#L85'>85</a>
-<a name='L86'></a><a href='#L86'>86</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L84'></a><a href='#L84'>84</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">9x</span>
-<span class="cline-any cline-yes">9x</span>
-<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">2x</span>
@@ -168,8 +166,6 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -242,7 +238,7 @@ var __classPrivateFieldGet = (this &amp;&amp; this.__classPrivateFieldGet) || fu
 var __importDefault = (this &amp;&amp; this.__importDefault) || function (mod) {
     return (mod &amp;&amp; mod.__esModule) ? <span class="branch-0 cbranch-no" title="branch not covered" >mod </span>: { "default": mod };
 };
-var _InMemoryTransactionTracker_instances, _InMemoryTransactionTracker_provider, _InMemoryTransactionTracker_pendingTransactions, _InMemoryTransactionTracker_csl, _InMemoryTransactionTracker_logger, _InMemoryTransactionTracker_pollInterval, _InMemoryTransactionTracker_checkTransactionViaProvider, _InMemoryTransactionTracker_onTransactionNotFound;
+var _InMemoryTransactionTracker_instances, _InMemoryTransactionTracker_provider, _InMemoryTransactionTracker_pendingTransactions, _InMemoryTransactionTracker_logger, _InMemoryTransactionTracker_pollInterval, _InMemoryTransactionTracker_checkTransactionViaProvider, _InMemoryTransactionTracker_onTransactionNotFound;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.InMemoryTransactionTracker = void 0;
 const emittery_1 = __importDefault(require("emittery"));
@@ -252,23 +248,21 @@ const ts_log_1 = require("ts-log");
 const delay_1 = __importDefault(require("delay"));
 const _1 = require(".");
 class InMemoryTransactionTracker extends emittery_1.default {
-    constructor({ provider, csl, logger = ts_log_1.dummyLogger, pollInterval = <span class="branch-0 cbranch-no" title="branch not covered" >2000 </span>}) {
+    constructor({ provider, logger = ts_log_1.dummyLogger, pollInterval = <span class="branch-0 cbranch-no" title="branch not covered" >2000 </span>}) {
         super();
         _InMemoryTransactionTracker_instances.add(this);
         _InMemoryTransactionTracker_provider.set(this, void 0);
         _InMemoryTransactionTracker_pendingTransactions.set(this, new Map());
-        _InMemoryTransactionTracker_csl.set(this, void 0);
         _InMemoryTransactionTracker_logger.set(this, void 0);
         _InMemoryTransactionTracker_pollInterval.set(this, void 0);
         __classPrivateFieldSet(this, _InMemoryTransactionTracker_provider, provider, "f");
-        __classPrivateFieldSet(this, _InMemoryTransactionTracker_csl, csl, "f");
         __classPrivateFieldSet(this, _InMemoryTransactionTracker_logger, logger, "f");
         __classPrivateFieldSet(this, _InMemoryTransactionTracker_pollInterval, pollInterval, "f");
     }
     async track(transaction, submitted = <span class="branch-0 cbranch-no" title="branch not covered" >Promise.resolve())</span> {
         await submitted;
         const body = transaction.body();
-        const hash = Buffer.from(__classPrivateFieldGet(this, _InMemoryTransactionTracker_csl, "f").hash_transaction(body).to_bytes()).toString('hex');
+        const hash = Buffer.from(core_1.CSL.hash_transaction(body).to_bytes()).toString('hex');
         __classPrivateFieldGet(this, _InMemoryTransactionTracker_logger, "f").debug('InMemoryTransactionTracker.trackTransaction', hash);
         <span class="missing-if-branch" title="if path not taken" >I</span>if (__classPrivateFieldGet(this, _InMemoryTransactionTracker_pendingTransactions, "f").has(hash)) {
 <span class="cstat-no" title="statement not covered" >            return __classPrivateFieldGet(this, _InMemoryTransactionTracker_pendingTransactions, "f").get(hash);</span>
@@ -285,7 +279,7 @@ class InMemoryTransactionTracker extends emittery_1.default {
     }
 }
 exports.InMemoryTransactionTracker = InMemoryTransactionTracker;
-_InMemoryTransactionTracker_provider = new WeakMap(), _InMemoryTransactionTracker_pendingTransactions = new WeakMap(), _InMemoryTransactionTracker_csl = new WeakMap(), _InMemoryTransactionTracker_logger = new WeakMap(), _InMemoryTransactionTracker_pollInterval = new WeakMap(), _InMemoryTransactionTracker_instances = new WeakSet(), _InMemoryTransactionTracker_checkTransactionViaProvider = async function _InMemoryTransactionTracker_checkTransactionViaProvider(hash, invalidHereafter) {
+_InMemoryTransactionTracker_provider = new WeakMap(), _InMemoryTransactionTracker_pendingTransactions = new WeakMap(), _InMemoryTransactionTracker_logger = new WeakMap(), _InMemoryTransactionTracker_pollInterval = new WeakMap(), _InMemoryTransactionTracker_instances = new WeakSet(), _InMemoryTransactionTracker_checkTransactionViaProvider = async function _InMemoryTransactionTracker_checkTransactionViaProvider(hash, invalidHereafter) {
     await delay_1.default(__classPrivateFieldGet(this, _InMemoryTransactionTracker_pollInterval, "f"));
     try {
         const tx = await __classPrivateFieldGet(this, _InMemoryTransactionTracker_provider, "f").queryTransactionsByHashes([hash]);
@@ -319,7 +313,7 @@ _InMemoryTransactionTracker_provider = new WeakMap(), _InMemoryTransactionTracke
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Thu Oct 14 2021 13:53:42 GMT+0000 (Coordinated Universal Time)
+                at Mon Oct 18 2021 07:01:40 GMT+0000 (Coordinated Universal Time)
             </div>
         </div>
         <script src="../prettify.js"></script>
