@@ -6,3 +6,4 @@ export * from './Provider';
 export * as Transaction from './Transaction';
 export * from './CSL';
 export * from './util';
+export * from './StakePool';

@@ -152,7 +152,7 @@ export const blockfrostProvider = (options: Options): CardanoProvider => {
     return BlockfrostToOgmios.currentWalletProtocolParameters(response.data);
   };
 
-  const providerFunctions = {
+  const providerFunctions: CardanoProvider = {
     ledgerTip,
     networkInfo,
     stakePoolStats,
@@ -161,10 +161,10 @@ export const blockfrostProvider = (options: Options): CardanoProvider => {
     queryTransactionsByAddresses,
     queryTransactionsByHashes,
     currentWalletProtocolParameters
-  } as any;
+  };
 
   return Object.keys(providerFunctions).reduce((provider, key) => {
-    provider[key] = (...args: any[]) => providerFunctions[key](...args).catch(toProviderError);
+    provider[key] = (...args: any[]) => (providerFunctions as any)[key](...args).catch(toProviderError);
     return provider;
   }, {} as any) as CardanoProvider;
 };
