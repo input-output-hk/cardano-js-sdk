@@ -125,6 +125,11 @@ export const blockfrostProvider = (options: Options): CardanoProvider => {
     return { utxo, delegationAndRewards };
   };
 
+  const queryTransactionsByHashes: CardanoProvider['queryTransactionsByHashes'] = async (hashes) => {
+    const transactions = await Promise.all(hashes.map(async (hash) => blockfrost.txsUtxos(hash)));
+    return transactions.map((tx) => BlockfrostToOgmios.txContentUtxo(tx));
+  };
+
   const queryTransactionsByAddresses: CardanoProvider['queryTransactionsByAddresses'] = async (addresses) => {
     const addressTransactions = await Promise.all(
       addresses.map(async (address) => blockfrost.addressesTransactionsAll(address))
@@ -132,17 +137,11 @@ export const blockfrostProvider = (options: Options): CardanoProvider => {
 
     const transactionsArray = await Promise.all(
       addressTransactions.map((transactionArray) =>
-        Promise.all(transactionArray.map(async ({ tx_hash }) => blockfrost.txsUtxos(tx_hash)))
+        queryTransactionsByHashes(transactionArray.map(({ tx_hash }) => tx_hash))
       )
     );
 
-    return transactionsArray.flat(1).map((tx) => BlockfrostToOgmios.txContentUtxo(tx));
-  };
-
-  const queryTransactionsByHashes: CardanoProvider['queryTransactionsByHashes'] = async (hashes) => {
-    const transactions = await Promise.all(hashes.map(async (hash) => blockfrost.txsUtxos(hash)));
-
-    return transactions.map((tx) => BlockfrostToOgmios.txContentUtxo(tx));
+    return transactionsArray.flat(1);
   };
 
   const currentWalletProtocolParameters: CardanoProvider['currentWalletProtocolParameters'] = async () => {
