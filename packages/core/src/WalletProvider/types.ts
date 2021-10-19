@@ -50,7 +50,7 @@ export type NetworkInfo = {
   stake: StakeSummary;
 };
 
-export interface CardanoProvider {
+export interface WalletProvider {
   ledgerTip: () => Promise<Cardano.Tip>;
   networkInfo: () => Promise<NetworkInfo>;
   stakePoolStats?: () => Promise<StakePoolStats>;

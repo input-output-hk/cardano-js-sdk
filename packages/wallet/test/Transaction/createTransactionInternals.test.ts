@@ -1,5 +1,5 @@
 import { InputSelector, roundRobinRandomImprove } from '@cardano-sdk/cip2';
-import { CardanoProvider, Ogmios, CSL } from '@cardano-sdk/core';
+import { WalletProvider, Ogmios, CSL } from '@cardano-sdk/core';
 import { SelectionConstraints } from '@cardano-sdk/util-dev';
 import { providerStub, txTracker, testKeyManager } from '../mocks';
 import {
@@ -14,7 +14,7 @@ const address =
   'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g';
 
 describe('Transaction.createTransactionInternals', () => {
-  let provider: CardanoProvider;
+  let provider: WalletProvider;
   let inputSelector: InputSelector;
   let utxoRepository: UtxoRepository;
   let keyManager: KeyManagement.KeyManager;

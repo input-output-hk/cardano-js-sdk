@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { CardanoProvider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { WalletProvider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { BlockFrostAPI, Error as BlockfrostError } from '@blockfrost/blockfrost-js';
 import { Options } from '@blockfrost/blockfrost-js/lib/types';
 import { BlockfrostToOgmios } from './BlockfrostToOgmios';
@@ -51,17 +51,17 @@ const toProviderError = (error: unknown) => {
  * Connect to the [Blockfrost service](https://docs.blockfrost.io/)
  *
  * @param {Options} options BlockFrostAPI options
- * @returns {CardanoProvider} CardanoProvider
+ * @returns {WalletProvider} WalletProvider
  */
-export const blockfrostProvider = (options: Options): CardanoProvider => {
+export const blockfrostProvider = (options: Options): WalletProvider => {
   const blockfrost = new BlockFrostAPI(options);
 
-  const ledgerTip: CardanoProvider['ledgerTip'] = async () => {
+  const ledgerTip: WalletProvider['ledgerTip'] = async () => {
     const block = await blockfrost.blocksLatest();
     return BlockfrostToOgmios.blockToTip(block);
   };
 
-  const networkInfo: CardanoProvider['networkInfo'] = async () => {
+  const networkInfo: WalletProvider['networkInfo'] = async () => {
     const currentEpoch = await blockfrost.epochsLatest();
     const { stake, supply } = await blockfrost.network();
     return {
@@ -86,7 +86,7 @@ export const blockfrostProvider = (options: Options): CardanoProvider => {
     };
   };
 
-  const stakePoolStats: CardanoProvider['stakePoolStats'] = async () => {
+  const stakePoolStats: WalletProvider['stakePoolStats'] = async () => {
     const tallyPools = async (query: 'pools' | 'poolsRetired' | 'poolsRetiring', count = 0, page = 1) => {
       const result = await blockfrost[query]({ page });
       const newCount = count + result.length;
@@ -104,11 +104,11 @@ export const blockfrostProvider = (options: Options): CardanoProvider => {
     };
   };
 
-  const submitTx: CardanoProvider['submitTx'] = async (signedTransaction) => {
+  const submitTx: WalletProvider['submitTx'] = async (signedTransaction) => {
     await blockfrost.txSubmit(signedTransaction.to_bytes());
   };
 
-  const utxoDelegationAndRewards: CardanoProvider['utxoDelegationAndRewards'] = async (addresses, stakeKeyHash) => {
+  const utxoDelegationAndRewards: WalletProvider['utxoDelegationAndRewards'] = async (addresses, stakeKeyHash) => {
     const utxoResults = await Promise.all(
       addresses.map(async (address) =>
         blockfrost.addressesUtxosAll(address).then((result) => BlockfrostToOgmios.addressUtxoContent(address, result))
@@ -125,12 +125,12 @@ export const blockfrostProvider = (options: Options): CardanoProvider => {
     return { utxo, delegationAndRewards };
   };
 
-  const queryTransactionsByHashes: CardanoProvider['queryTransactionsByHashes'] = async (hashes) => {
+  const queryTransactionsByHashes: WalletProvider['queryTransactionsByHashes'] = async (hashes) => {
     const transactions = await Promise.all(hashes.map(async (hash) => blockfrost.txsUtxos(hash)));
     return transactions.map((tx) => BlockfrostToOgmios.txContentUtxo(tx));
   };
 
-  const queryTransactionsByAddresses: CardanoProvider['queryTransactionsByAddresses'] = async (addresses) => {
+  const queryTransactionsByAddresses: WalletProvider['queryTransactionsByAddresses'] = async (addresses) => {
     const addressTransactions = await Promise.all(
       addresses.map(async (address) => blockfrost.addressesTransactionsAll(address))
     );
@@ -144,7 +144,7 @@ export const blockfrostProvider = (options: Options): CardanoProvider => {
     return transactionsArray.flat(1);
   };
 
-  const currentWalletProtocolParameters: CardanoProvider['currentWalletProtocolParameters'] = async () => {
+  const currentWalletProtocolParameters: WalletProvider['currentWalletProtocolParameters'] = async () => {
     const response = await blockfrost.axiosInstance({
       url: `${blockfrost.apiUrl}/epochs/latest/parameters`
     });
@@ -152,7 +152,7 @@ export const blockfrostProvider = (options: Options): CardanoProvider => {
     return BlockfrostToOgmios.currentWalletProtocolParameters(response.data);
   };
 
-  const providerFunctions: CardanoProvider = {
+  const providerFunctions: WalletProvider = {
     ledgerTip,
     networkInfo,
     stakePoolStats,
@@ -166,5 +166,5 @@ export const blockfrostProvider = (options: Options): CardanoProvider => {
   return Object.keys(providerFunctions).reduce((provider, key) => {
     provider[key] = (...args: any[]) => (providerFunctions as any)[key](...args).catch(toProviderError);
     return provider;
-  }, {} as any) as CardanoProvider;
+  }, {} as any) as WalletProvider;
 };

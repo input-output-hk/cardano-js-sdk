@@ -99,7 +99,7 @@ export const ledgerTip = {
 /**
  * Provider stub for testing
  *
- * returns CardanoProvider-compatible object
+ * returns WalletProvider-compatible object
  */
 export const providerStub = () => ({
   ledgerTip: jest.fn().mockResolvedValue(ledgerTip),
