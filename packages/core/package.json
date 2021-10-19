@@ -21,9 +21,6 @@
     "@cardano-sdk/util-dev": "0.1.4",
     "shx": "^0.3.3"
   },
-  "browser": {
-    "./dist/CSL/nodejs.js": false
-  },
   "dependencies": {
     "@cardano-ogmios/schema": "4.1.0",
     "@emurgo/cardano-serialization-lib-nodejs": "9.1.0",
