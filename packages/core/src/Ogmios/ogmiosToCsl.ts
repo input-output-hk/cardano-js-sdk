@@ -1,5 +1,4 @@
 import OgmiosSchema from '@cardano-ogmios/schema';
-import { Buffer } from 'buffer';
 import { CSL } from '../CSL';
 import * as Asset from '../Asset';
 import { Value } from './types';

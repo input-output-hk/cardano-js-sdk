@@ -1,4 +1,4 @@
-import { validateMnemonic } from 'isomorphic-bip39'
+import { validateMnemonic } from 'bip39'
 import { KeyManager, InvalidMnemonic } from '../../../KeyManager'
 import { ChainSettings, Cardano } from '../../../Cardano'
 

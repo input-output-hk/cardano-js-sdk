@@ -1,5 +1,4 @@
 import Schema, { TxIn, TxOut } from '@cardano-ogmios/schema';
-import { Buffer } from 'buffer';
 import { CardanoProvider, Ogmios, cslUtil, CSL } from '@cardano-sdk/core';
 import { dummyLogger, Logger } from 'ts-log';
 import { ImplicitCoin, InputSelector, SelectionConstraints, SelectionResult } from '@cardano-sdk/cip2';

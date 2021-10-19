@@ -2,7 +2,6 @@ import { CardanoProvider, ProviderError, ProviderFailure } from '@cardano-sdk/co
 import { gql, GraphQLClient } from 'graphql-request';
 import { TransactionSubmitResponse } from '@cardano-graphql/client-ts';
 import { Schema as Cardano } from '@cardano-ogmios/client';
-import { Buffer } from 'buffer';
 import {
   CardanoGraphqlToOgmios,
   GraphqlCurrentWalletProtocolParameters,

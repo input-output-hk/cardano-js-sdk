@@ -1,5 +1,4 @@
 import { createAssetId, parseAssetId } from '../../src/Asset/util';
-import { Buffer } from 'buffer';
 
 describe('Asset', () => {
   describe('util', () => {

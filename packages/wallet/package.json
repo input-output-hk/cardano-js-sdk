@@ -30,10 +30,9 @@
     "@cardano-ogmios/schema": "4.1.0",
     "@cardano-sdk/cip2": "0.1.4",
     "@cardano-sdk/core": "0.1.4",
-    "buffer": "^6.0.3",
     "delay": "^5.0.0",
     "emittery": "^0.10.0",
-    "isomorphic-bip39": "^3.0.5",
+    "bip39": "^3.0.4",
     "lodash-es": "^4.17.21",
     "ts-custom-error": "^3.2.0",
     "ts-log": "^2.2.3"

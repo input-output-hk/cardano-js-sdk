@@ -25,7 +25,6 @@
     "@cardano-graphql/client-ts": "^5.1.0-beta.1",
     "@cardano-ogmios/client": "4.1.0",
     "graphql": "^15.5.1",
-    "buffer": "^6.0.3",
     "graphql-request": "^3.5.0"
   }
 }

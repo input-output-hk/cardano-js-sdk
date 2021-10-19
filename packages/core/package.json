@@ -24,7 +24,6 @@
   "dependencies": {
     "@cardano-ogmios/schema": "4.1.0",
     "@emurgo/cardano-serialization-lib-nodejs": "9.1.0",
-    "@emurgo/cardano-serialization-lib-browser": "9.1.0",
-    "buffer": "^6.0.3"
+    "@emurgo/cardano-serialization-lib-browser": "9.1.0"
   }
 }

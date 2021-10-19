@@ -1,5 +1,4 @@
 import { Cardano, CSL } from '@cardano-sdk/core';
-import { Buffer } from 'buffer';
 import { KeyManagement } from '../../src';
 
 describe('InMemoryKeyManager', () => {
