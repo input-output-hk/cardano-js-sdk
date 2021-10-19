@@ -1,13 +1,17 @@
 {
-  "name": "@cardano-sdk/cardano-graphql-sps-provider",
+  "name": "@cardano-sdk/cardano-graphql",
   "version": "0.1.4",
-  "description": "Cardano Graphql Stake Pool Search Provider",
+  "description": "Cardano GraphQL Providers",
   "engines": {
     "node": "^14"
   },
   "main": "dist/index.js",
-  "repository": "https://github.com/input-output-hk/cardano-js-sdk/packages/cardano-graphql-sps-provider",
+  "repository": "https://github.com/input-output-hk/cardano-js-sdk/packages/cardano-graphql",
   "author": "Martynas Kazlauskas <martynas.kazlauskas@iohk.io>",
+  "contributors": [
+    "Rhys Bartels-Waller <rhys.bartelswaller@iohk.io> (https://iohk.io)",
+    "James Sweetland"
+  ],
   "license": "MPL-2.0",
   "scripts": {
     "build": "tsc --build ./src",
@@ -23,6 +27,10 @@
     "shx": "^0.3.3"
   },
   "dependencies": {
-    "@cardano-sdk/core": "0.1.4"
+    "@cardano-sdk/core": "0.1.4",
+    "@cardano-graphql/client-ts": "^5.1.0-beta.1",
+    "@cardano-ogmios/client": "4.1.0",
+    "graphql": "^15.5.1",
+    "graphql-request": "^3.5.0"
   }
 }

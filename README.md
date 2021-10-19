@@ -23,11 +23,8 @@ A suite of TypeScript packages suitable for both Node.js and browser-based devel
 ### Cardano Provider Implementations
 
 - [@cardano-sdk/cardano-graphql-db-sync](packages/cardano-graphql-db-sync)
+- [@cardano-sdk/cardano-graphql](packages/cardano-graphql)
 - [@cardano-sdk/blockfrost](packages/blockfrost)
-
-### Cardano Stake Pool Search Provider Implementation
-
-- [@cardano-sdk/cardano-graphql-sps-provider](packages/cardano-graphql-sps-provider)
 
 :information_source: Looking to use a Cardano service not listed here? [Let us know!]
 

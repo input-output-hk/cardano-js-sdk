@@ -1,0 +1,71 @@
+type StakePoolMetricsStake {
+  live: String!
+  active: String!
+}
+
+type StakePoolMetricsSize {
+  live: Float!
+  active: Float!
+}
+
+type StakePoolMetrics {
+  blocksCreated: Int!
+  livePledge: String!
+  stake: StakePoolMetricsStake!
+  size: StakePoolMetricsSize!
+  saturation: Float!;
+  delegators: Int!;
+}
+
+type StakePoolTransactions {
+  registration: [String!]!
+  retirement: [String!]!
+}
+
+type StakePoolMetadataJson {
+  hash: String!
+  url: String!
+}
+
+type StakePoolMetadata {
+  ticker: String!
+  name: String!
+  description: String!
+  homepage: String!
+  extDataUrl: String
+  extSigUrl: String
+  extVkey: String
+}
+
+type StakePoolRelayByAddress {
+  ipv4: String
+  ipv6: String;
+  port: Number;
+}
+type StakePoolRelayByName {
+  hostname: String!;
+  port: Number;
+}
+union StakePoolRelay = StakePoolRelayByAddress | StakePoolRelayByName;
+
+type StakePool {
+  id: ID!
+  hexId: String!
+  owners: [String!]!;
+  cost: String!;
+  margin: Float!;
+  vrf: String!;
+  relays: [StakePoolRelay!]!;
+  rewardAccount: String!;
+  pledge: String!
+  metrics: StakePoolMetrics!
+  transactions: StakePoolTransactions!
+  metadataJson: StakePoolMetadataJson
+  metadata: StakePoolMetadata
+}
+
+union PartialIdNameOrTicker = String | ID
+
+type Query {
+  stakePools(partialIdsNamesOrTickers: [PartialIdNameOrTicker!]!): [StakePool!]!
+}

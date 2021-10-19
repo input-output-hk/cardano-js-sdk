@@ -1,6 +1,6 @@
-import { PoolId, Hash16, PoolParameters, PoolMetadata } from '@cardano-ogmios/schema';
+import { Hash16, PoolParameters, PoolMetadata } from '@cardano-ogmios/schema';
 import { ExtendedStakePoolMetadata } from './ExtendedStakePoolMetadata';
-import { Ogmios } from '../..';
+import { Ogmios } from '../../';
 
 /**
  * Within range [0; 1]
@@ -85,12 +85,8 @@ export interface StakePoolMetrics {
   delegators: number;
 }
 
-// TODO: don't omit pledge when Ogmios.Lovelace becomes bigint
-export interface StakePool extends Omit<PoolParameters, 'pledge' | 'metadata'> {
-  /**
-   * Stake pool ID as a bech32 string
-   */
-  id: PoolId;
+// TODO: don't omit pledge and cost when Ogmios.Lovelace becomes bigint
+export interface StakePool extends Omit<PoolParameters, 'pledge' | 'cost' | 'margin' | 'metadata'> {
   /**
    * Stake pool ID as a hex string
    */
@@ -99,6 +95,14 @@ export interface StakePool extends Omit<PoolParameters, 'pledge' | 'metadata'> {
    * Declared pledge quantity.
    */
   pledge: Ogmios.Lovelace;
+  /**
+   * Fixed stake pool running cost
+   */
+  cost: Ogmios.Lovelace;
+  /**
+   * Stake pool margin percentage
+   */
+  margin: Percent;
   /**
    * Stake pool metrics
    */
