@@ -1,0 +1,14 @@
+schema: ./dist/schema.graphql
+documents: ./src/operations/*.graphql
+generates:
+  ./src/sdk.ts:
+    plugins:
+      - typescript
+      - typescript-operations
+      - typescript-graphql-request
+config:
+  strictScalars: true
+  scalars:
+    BigInt: string
+    Percentage: number
+    PoolStatus: "'active' | 'retired' | 'offline' | 'experimental' | 'private'"

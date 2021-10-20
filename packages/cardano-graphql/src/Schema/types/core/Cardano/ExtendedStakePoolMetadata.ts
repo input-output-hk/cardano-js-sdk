@@ -1,7 +1,14 @@
 import { Cardano } from '@cardano-sdk/core';
-import { Field, Int, ObjectType, registerEnumType } from 'type-graphql';
+import { GraphQLScalarType } from 'graphql';
+import { Field, Int, ObjectType } from 'type-graphql';
 
-registerEnumType(Cardano.PoolStatus, { name: 'PoolStatus' });
+// Review: enum would be more natural, but ran into an issue
+// where it's difficult to cast between 2 different enums
+// with same members (between query response and core type)
+const PoolStatusScalar = new GraphQLScalarType({
+  name: 'PoolStatus',
+  description: "'active' | 'retired' | 'offline' | 'experimental' | 'private'"
+});
 
 @ObjectType()
 export class ITNVerification implements Cardano.ITNVerification {
@@ -53,7 +60,7 @@ export class ExtendedStakePoolMetadataFields implements Cardano.ExtendedStakePoo
   id: string;
   @Field({ nullable: true })
   country?: string;
-  @Field(() => Cardano.PoolStatus, { nullable: true })
+  @Field(() => PoolStatusScalar, { nullable: true })
   status?: Cardano.PoolStatus;
   @Field(() => PoolContactData, { nullable: true })
   contact?: Cardano.PoolContactData;

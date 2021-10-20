@@ -1,0 +1,83 @@
+query StakePoolsByFragments($fragments: [String!]!) {
+  stakePoolsByFragments(fragments: $fragments) {
+    id
+    hexId
+    owners
+    cost
+    margin
+    vrf
+    relays {
+      __typename
+      ... on RelayByName {
+        hostname
+        port
+      }
+      ... on RelayByAddress {
+        ipv4
+        ipv6
+        port
+      }
+    }
+    rewardAccount
+    pledge
+    metrics {
+      blocksCreated
+      livePledge
+      stake {
+        live
+        active
+      }
+      size {
+        live
+        active
+      }
+      saturation
+      delegators
+    }
+    transactions {
+      registration
+      retirement
+    }
+    metadataJson {
+      hash
+      url
+    }
+    metadata {
+      ticker
+      name
+      description
+      homepage
+      extDataUrl
+      extSigUrl
+      extVkey
+      ext {
+        serial
+        pool {
+          id
+          country
+          status
+          contact {
+            primary
+            email
+            facebook
+            github
+            feed
+            telegram
+            twitter
+          }
+          media_assets {
+            icon_png_64x64
+            logo_png
+            logo_svg
+            color_fg
+            color_bg
+          }
+          itn {
+            owner
+            witness
+          }
+        }
+      }
+    }
+  }
+}

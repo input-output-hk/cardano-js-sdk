@@ -1,8 +1,8 @@
 /* eslint-disable max-len */
 import { ProviderError, StakePoolSearchProvider } from '@cardano-sdk/core';
 import { GraphQLClient } from 'graphql-request';
+import { StakePoolsByFragmentsQuery } from '../../src/sdk';
 import { createGraphQLStakePoolSearchProvider } from '../../src/StakePoolSearchProvider/CardanoGraphQLStakePoolSearchProvider';
-import { StakePoolsQueryResponse } from '../../src/StakePoolSearchProvider/types';
 const mockRequest = (GraphQLClient.prototype.request = jest.fn());
 
 describe('StakePoolSearchClient', () => {
@@ -13,8 +13,8 @@ describe('StakePoolSearchClient', () => {
 
   describe('queryStakePoolsWithMetadata', () => {
     it('makes a graphql query and coerces result to core types', async () => {
-      const mockedResponse: StakePoolsQueryResponse = {
-        stakePools: [
+      const mockedResponse: StakePoolsByFragmentsQuery = {
+        stakePoolsByFragments: [
           {
             id: 'some-pool',
             hexId: '0abc',
@@ -31,7 +31,15 @@ describe('StakePoolSearchClient', () => {
               ticker: 'TICKR',
               extDataUrl: 'http://extdata',
               extSigUrl: 'http://extsig',
-              extVkey: '2abc'
+              extVkey: '2abc',
+              ext: {
+                serial: 123,
+                pool: {
+                  id: 'pool-id',
+                  status: 'active',
+                  country: 'LT'
+                }
+              }
             },
             metrics: {
               blocksCreated: 123,
@@ -56,8 +64,8 @@ describe('StakePoolSearchClient', () => {
               retirement: ['dawdb']
             },
             relays: [
-              { __typename: 'StakePoolRelayByName', hostname: 'http://relay', port: 156 },
-              { __typename: 'StakePoolRelayByAddress', port: 567, ipv4: '0.0.0.0', ipv6: '::1' }
+              { __typename: 'RelayByName', hostname: 'http://relay', port: 156 },
+              { __typename: 'RelayByAddress', port: 567, ipv4: '0.0.0.0', ipv6: '::1' }
             ]
           }
         ]
@@ -67,6 +75,8 @@ describe('StakePoolSearchClient', () => {
 
       expect(typeof response[0]).toBe('object');
       expect(typeof response[0].cost).toBe('bigint');
+      expect(typeof response[0].metadata).toBe('object');
+      expect(typeof response[0].metadata!.ext).toBe('object');
     });
 
     it('wraps errors to ProviderError', async () => {

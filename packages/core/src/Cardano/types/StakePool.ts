@@ -93,8 +93,20 @@ export interface StakePoolTransactions {
   retirement: TransactionId[];
 }
 
+export interface ByAddress {
+  ipv4?: string;
+  ipv6?: string;
+  port?: number;
+}
+export interface ByName {
+  hostname: string;
+  port?: number;
+}
+
+export type Relay = ByAddress | ByName;
+
 // TODO: don't omit pledge and cost when Ogmios.Lovelace becomes bigint
-export interface StakePool extends Omit<PoolParameters, 'pledge' | 'cost' | 'margin' | 'metadata'> {
+export interface StakePool extends Omit<PoolParameters, 'pledge' | 'cost' | 'margin' | 'metadata' | 'relays'> {
   /**
    * Stake pool ID as a hex string
    */
@@ -115,6 +127,10 @@ export interface StakePool extends Omit<PoolParameters, 'pledge' | 'cost' | 'mar
    * Stake pool metrics
    */
   metrics: StakePoolMetrics;
+  /**
+   * Stake pool relays
+   */
+  relays: Relay[];
   /**
    * Transactions provisioning the stake pool
    */

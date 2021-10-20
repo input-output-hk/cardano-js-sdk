@@ -19,7 +19,7 @@ export class StakePoolResolver {
   }
 
   @Query(() => [StakePool], { description: 'Query stake pools that match any fragment' })
-  async queryStakePools(
+  async stakePoolsByFragments(
     @Args()
     { fragments }: QueryStakePoolArgs
   ): Promise<StakePool[]> {

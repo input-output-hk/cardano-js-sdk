@@ -1,90 +1,33 @@
 import { ProviderError, ProviderFailure, Cardano, StakePoolSearchProvider } from '@cardano-sdk/core';
-import { gql, GraphQLClient } from 'graphql-request';
-import { StakePoolsQueryResponse } from './types';
+import { GraphQLClient } from 'graphql-request';
+import { getSdk } from '../sdk';
+import { replaceNullsWithUndefineds } from '../util';
 
-export const createGraphQLStakePoolSearchProvider = (graphQLClient: GraphQLClient): StakePoolSearchProvider => ({
-  async queryStakePools(fragments: string[]): Promise<Cardano.StakePool[]> {
-    const query = gql`
-      stakePools($partialIdsNamesOrTickers) {
-        id
-        hexId
-        owners
-        cost
-        margin
-        vrf
-        relays {
-          __typename
-          ... on StakePoolRelayByName {
-            hostname
-            port
-          }
-          ... on StakePoolRelayByAddress {
-            ipv4
-            ipv6
-            port
-          }
-        }
-        rewardAccount
-        pledge
-        metrics {
-          blocksCreated
-          livePledge
-          stake {
-            live
-            active
-          }
-          size {
-            live
-            active
-          }
-          saturation
-          delegators
-        }
-        transactions {
-          registration
-          retirement
-        }
-        metadataJson {
-          hash
-          url
-        }
-        metadata {
-          ticker
-          name
-          description
-          homepage
-          extDataUrl
-          extSigUrl
-          extVkey
-        }
+export const createGraphQLStakePoolSearchProvider = (graphQLClient: GraphQLClient): StakePoolSearchProvider => {
+  const sdk = getSdk(graphQLClient);
+  return {
+    async queryStakePools(fragments: string[]): Promise<Cardano.StakePool[]> {
+      try {
+        const response = await sdk.StakePoolsByFragments({ fragments });
+        return response.stakePoolsByFragments.map((responseStakePool) => {
+          const stakePool = replaceNullsWithUndefineds(responseStakePool);
+          return {
+            ...stakePool,
+            pledge: BigInt(stakePool.pledge),
+            metrics: {
+              ...stakePool.metrics!,
+              livePledge: BigInt(stakePool.metrics.livePledge),
+              stake: {
+                active: BigInt(stakePool.metrics.stake.active),
+                live: BigInt(stakePool.metrics.stake.live)
+              }
+            },
+            cost: BigInt(stakePool.cost)
+          };
+        });
+      } catch (error) {
+        throw new ProviderError(ProviderFailure.Unknown, error);
       }
-    `;
-
-    try {
-      const response = await graphQLClient.request<StakePoolsQueryResponse>(query, {
-        partialIdsNamesOrTickers: fragments
-      });
-      return response.stakePools.map((stakePool) => ({
-        ...stakePool,
-        pledge: BigInt(stakePool.pledge),
-        metrics: {
-          ...stakePool.metrics,
-          livePledge: BigInt(stakePool.metrics.livePledge),
-          stake: {
-            active: BigInt(stakePool.metrics.stake.active),
-            live: BigInt(stakePool.metrics.stake.live)
-          }
-        },
-        metadata: {
-          ...stakePool.metadata,
-          extDataUrl: stakePool.metadata.extDataUrl || undefined,
-          extSigUrl: stakePool.metadata.extSigUrl || undefined,
-          extVkey: stakePool.metadata.extVkey || undefined
-        },
-        cost: BigInt(stakePool.cost)
-      }));
-    } catch (error) {
-      throw new ProviderError(ProviderFailure.Unknown, error);
     }
-  }
-});
+  };
+};

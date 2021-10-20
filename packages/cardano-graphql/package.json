@@ -14,8 +14,11 @@
   ],
   "license": "MPL-2.0",
   "scripts": {
-    "build": "tsc --build ./src",
+    "build": "run-s build:ts build:schema",
+    "build:ts": "tsc --build ./src",
     "build:schema": "node ./scripts/buildSchema.js",
+    "generate": "run-s build graphql-codegen",
+    "graphql-codegen": "graphql-codegen",
     "tscNoEmit": "shx echo typescript --noEmit command not implemented yet",
     "cleanup": "shx rm -rf dist node_modules",
     "lint": "eslint --ignore-path ../../.eslintignore \"**/*.ts\"",
@@ -25,7 +28,12 @@
   },
   "devDependencies": {
     "@cardano-ogmios/schema": "4.1.0",
+    "@graphql-codegen/cli": "^2.2.1",
+    "@graphql-codegen/typescript": "^2.2.4",
+    "@graphql-codegen/typescript-graphql-request": "^4.1.6",
+    "@graphql-codegen/typescript-operations": "^2.1.8",
     "@graphql-tools/utils": "^8.4.0",
+    "npm-run-all": "^4.1.5",
     "shx": "^0.3.3"
   },
   "dependencies": {

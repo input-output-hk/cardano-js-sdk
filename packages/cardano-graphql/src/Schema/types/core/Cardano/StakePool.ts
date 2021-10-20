@@ -56,8 +56,8 @@ export class StakePoolMetadataJson implements Ogmios.PoolMetadata {
 export class RelayByName implements Ogmios.ByName {
   @Field()
   hostname: string;
-  @Field(() => Int)
-  port: number | null;
+  @Field(() => Int, { nullable: true })
+  port: number;
 }
 
 @ObjectType()
@@ -123,7 +123,7 @@ export class StakePool implements Cardano.StakePool {
   @Field()
   vrf: string;
   @Field(() => [Relay])
-  relays: Ogmios.Relay[];
+  relays: Cardano.Relay[];
   @Field()
   rewardAccount: string;
 }

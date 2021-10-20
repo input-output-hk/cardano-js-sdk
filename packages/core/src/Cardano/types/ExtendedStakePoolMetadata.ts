@@ -24,13 +24,8 @@ export type DeclaredPoolLocation = string;
 /**
  * the current operative status
  */
-export enum PoolStatus {
-  Active = 'active',
-  Retired = 'retired',
-  Offline = 'offline',
-  Experimental = 'experimental',
-  Private = 'private'
-}
+export type PoolStatus = 'active' | 'retired' | 'offline' | 'experimental' | 'private';
+
 /**
  * the pools prefered communication channel
  */
