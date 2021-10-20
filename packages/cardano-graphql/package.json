@@ -15,6 +15,7 @@
   "license": "MPL-2.0",
   "scripts": {
     "build": "tsc --build ./src",
+    "build:schema": "node ./scripts/buildSchema.js",
     "tscNoEmit": "shx echo typescript --noEmit command not implemented yet",
     "cleanup": "shx rm -rf dist node_modules",
     "lint": "eslint --ignore-path ../../.eslintignore \"**/*.ts\"",
@@ -24,13 +25,18 @@
   },
   "devDependencies": {
     "@cardano-ogmios/schema": "4.1.0",
+    "@graphql-tools/utils": "^8.4.0",
     "shx": "^0.3.3"
   },
   "dependencies": {
-    "@cardano-sdk/core": "0.1.4",
     "@cardano-graphql/client-ts": "^5.1.0-beta.1",
     "@cardano-ogmios/client": "4.1.0",
-    "graphql": "^15.5.1",
-    "graphql-request": "^3.5.0"
+    "@cardano-sdk/core": "0.1.4",
+    "class-validator": "^0.13.1",
+    "graphql": "^15.6.1",
+    "graphql-request": "^3.5.0",
+    "reflect-metadata": "^0.1.13",
+    "type-graphql": "^1.1.1",
+    "typedi": "^0.10.0"
   }
 }

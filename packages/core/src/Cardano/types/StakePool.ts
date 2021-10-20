@@ -61,6 +61,15 @@ export type StakePoolMetadata = StakePoolMetadataFields &
     ext?: ExtendedStakePoolMetadata;
   };
 
+export interface StakePoolMetricsStake {
+  live: Ogmios.Lovelace;
+  active: Ogmios.Lovelace;
+}
+
+export interface StakePoolMetricsSize {
+  live: Percent;
+  active: Percent;
+}
 export interface StakePoolMetrics {
   /**
    * Total blocks created by the pool
@@ -70,19 +79,18 @@ export interface StakePoolMetrics {
   /**
    * Stake quantity
    */
-  stake: {
-    live: Ogmios.Lovelace;
-    active: Ogmios.Lovelace;
-  };
+  stake: StakePoolMetricsStake;
   /**
    * Percentage of total stake
    */
-  size: {
-    live: Percent;
-    active: Percent;
-  };
+  size: StakePoolMetricsSize;
   saturation: Percent;
   delegators: number;
+}
+
+export interface StakePoolTransactions {
+  registration: TransactionId[];
+  retirement: TransactionId[];
 }
 
 // TODO: don't omit pledge and cost when Ogmios.Lovelace becomes bigint
@@ -110,10 +118,7 @@ export interface StakePool extends Omit<PoolParameters, 'pledge' | 'cost' | 'mar
   /**
    * Transactions provisioning the stake pool
    */
-  transactions: {
-    registration: TransactionId[];
-    retirement: TransactionId[];
-  };
+  transactions: StakePoolTransactions;
   metadataJson?: PoolMetadata;
   metadata?: StakePoolMetadata;
 }

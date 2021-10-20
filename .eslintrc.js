@@ -23,6 +23,7 @@ module.exports = {
       2,
       "unix"
     ],
+    "new-cap": 0,
     "no-unused-expressions": 0,
     "no-useless-constructor": 0,
     "quotes": ["error", "single", { "avoidEscape": true }],
@@ -31,6 +32,7 @@ module.exports = {
     "unicorn/no-null": 0,
     "unicorn/no-array-reduce": 0,
     "unicorn/prefer-node-protocol": 0,
+    "unicorn/prefer-module": 0,
     "@typescript-eslint/no-floating-promises": ["error"],
     '@typescript-eslint/no-var-requires': 0, // covered by unicorn/prefer-module
     '@typescript-eslint/explicit-module-boundary-types': 0,
