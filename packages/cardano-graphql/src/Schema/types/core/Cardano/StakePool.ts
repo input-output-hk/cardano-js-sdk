@@ -1,33 +1,34 @@
 import * as Ogmios from '@cardano-ogmios/schema';
 import { Cardano } from '@cardano-sdk/core';
-import { createUnionType, Field, Float, ID, Int, ObjectType } from 'type-graphql';
-import { BigIntScalar, PercentageScalar } from '../../util';
+import { createUnionType, Directive, Field, Float, Int, ObjectType } from 'type-graphql';
+import { BigIntsAsStrings, coinDescription, percentageDescription } from '../../util';
 import { ExtendedStakePoolMetadata } from './ExtendedStakePoolMetadata';
 
 @ObjectType()
-export class StakePoolMetricsStake implements Cardano.StakePoolMetricsStake {
-  @Field(() => BigIntScalar)
-  live: bigint;
-  @Field(() => BigIntScalar)
-  active: bigint;
+export class StakePoolMetricsStake implements BigIntsAsStrings<Cardano.StakePoolMetricsStake> {
+  @Field({ description: coinDescription })
+  live: string;
+  @Field({ description: coinDescription })
+  active: string;
 }
 
 @ObjectType()
 export class StakePoolMetricsSize implements Cardano.StakePoolMetricsSize {
-  @Field(() => PercentageScalar)
+  @Field({ description: percentageDescription })
   live: number;
-  @Field(() => PercentageScalar)
+  @Field({ description: percentageDescription })
+  // @Field()
   active: number;
 }
 
 @ObjectType()
-export class StakePoolMetrics implements Cardano.StakePoolMetrics {
+export class StakePoolMetrics implements BigIntsAsStrings<Cardano.StakePoolMetrics> {
   @Field(() => Int)
   blocksCreated: number;
-  @Field(() => BigIntScalar)
-  livePledge: bigint;
+  @Field({ description: coinDescription })
+  livePledge: string;
   @Field(() => StakePoolMetricsStake)
-  stake: Cardano.StakePoolMetricsStake;
+  stake: BigIntsAsStrings<Cardano.StakePoolMetricsStake>;
   @Field(() => StakePoolMetricsSize)
   size: Cardano.StakePoolMetricsSize;
   @Field(() => Float)
@@ -98,26 +99,27 @@ export class StakePoolMetadata implements Cardano.StakePoolMetadata {
 }
 
 @ObjectType()
-export class StakePool implements Cardano.StakePool {
-  @Field(() => ID)
+export class StakePool implements BigIntsAsStrings<Cardano.StakePool> {
+  @Directive('@id')
+  @Field()
   id: string;
   @Field()
   hexId: string;
-  @Field(() => BigIntScalar)
-  pledge: bigint;
-  @Field(() => BigIntScalar)
-  cost: bigint;
+  @Field({ description: coinDescription })
+  pledge: string;
+  @Field({ description: coinDescription })
+  cost: string;
   @Field(() => Float)
   margin: number;
   @Field(() => StakePoolMetrics)
-  metrics: Cardano.StakePoolMetrics;
+  metrics: BigIntsAsStrings<Cardano.StakePoolMetrics>;
   @Field(() => StakePoolTransactions)
   transactions: Cardano.StakePoolTransactions;
   @Field(() => StakePoolMetadataJson, { nullable: true })
   metadataJson?: Ogmios.PoolMetadata;
   // Review: what would be a good complexity number?
   @Field(() => StakePoolMetadata, { nullable: true, complexity: 5 })
-  metadata?: Cardano.StakePoolMetadata;
+  metadata?: BigIntsAsStrings<Cardano.StakePoolMetadata>;
   @Field(() => [String])
   owners: string[];
   @Field()

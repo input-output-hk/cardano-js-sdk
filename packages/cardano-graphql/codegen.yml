@@ -1,4 +1,4 @@
-schema: ./dist/schema.graphql
+schema: ./dist/dgraph.graphql
 documents: ./src/operations/*.graphql
 generates:
   ./src/sdk.ts:

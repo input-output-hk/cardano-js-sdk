@@ -8,12 +8,13 @@ This package generates GraphQL schema from TypeScript types.
 
 ```typescript
 // Import this before using DI, or import 'reflect-metadata' before registering services for DI
-import { Schema, StakePoolSearchService } from '@cardano-sdk/cardano-graphql';
+import { Schema } from '@cardano-sdk/cardano-graphql';
+import { GraphQLSchema } from 'graphql';
 import { Service } from 'typedi';
 
 // Register services for DI
-@Service(ServiceType.StakePoolSearch)
-class StakePoolSearch implements StakePoolSearchService {
+@Service(Schema.ServiceType.StakePoolSearch)
+class StakePoolSearch implements Schema.StakePoolSearchService {
   // Implement the service
 }
 

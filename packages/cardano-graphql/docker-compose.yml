@@ -1,0 +1,10 @@
+version: "3.5"
+services:
+  dgraph:
+    image: dgraph/standalone:v21.03.0
+    ports:
+      - 8080:8080
+    volumes:
+      - dgraph:/dgraph
+volumes:
+  dgraph:
