@@ -4,23 +4,11 @@ This package implements StakePoolSearchProvider using GraphQL
 
 ## Server-side usage
 
-This package generates GraphQL schema from TypeScript types.
+This package:
 
-```typescript
-// Import this before using DI, or import 'reflect-metadata' before registering services for DI
-import { Schema } from '@cardano-sdk/cardano-graphql';
-import { GraphQLSchema } from 'graphql';
-import { Service } from 'typedi';
-
-// Register services for DI
-@Service(Schema.ServiceType.StakePoolSearch)
-class StakePoolSearch implements Schema.StakePoolSearchService {
-  // Implement the service
-}
-
-const schemaBuilt: Promise<GraphQLSchema> = Schema.build();
-// Use the schema
-```
+1. Generates GraphQL SDL schema from TypeScript types (`yarn build:schema`, also part of `yarn build`) `=> dist/schema.graphql`
+2. Generates Dgraph schema (`yarn build:schema:dgraph`; requires local dgraph server running at port 8080, see [docker-compose.yml](./docker-compose.yml)) `=> dist/dgraph.graphql`
+3. Generates [dgraph client](./src/sdk.ts) from Dgraph schema and [operations](./src/operations), which can then be used to implement `*Provider` interfaces (`yarn generate`)
 
 ## Tests
 

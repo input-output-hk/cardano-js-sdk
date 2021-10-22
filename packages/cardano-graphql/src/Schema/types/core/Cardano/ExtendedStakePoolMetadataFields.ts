@@ -1,5 +1,15 @@
 import { Cardano } from '@cardano-sdk/core';
-import { Directive, Field, Int, ObjectType } from 'type-graphql';
+import { Directive, Field, ObjectType, registerEnumType } from 'type-graphql';
+
+enum PoolStatus {
+  active = 'active',
+  retired = 'retired',
+  offline = 'offline',
+  experimental = 'experimental',
+  private = 'private'
+}
+
+registerEnumType(PoolStatus, { name: 'PoolStatus' });
 
 @ObjectType()
 export class ITNVerification implements Cardano.ITNVerification {
@@ -52,10 +62,7 @@ export class ExtendedStakePoolMetadataFields implements Cardano.ExtendedStakePoo
   id: string;
   @Field({ nullable: true })
   country?: string;
-  // Review: enum would be more natural, but ran into an issue
-  // where it's difficult to cast between 2 different enums
-  // with same members (between query response and core type)
-  @Field(() => String, {
+  @Field(() => PoolStatus, {
     nullable: true,
     description: 'active | retired | offline | experimental | private'
   })
@@ -66,13 +73,4 @@ export class ExtendedStakePoolMetadataFields implements Cardano.ExtendedStakePoo
   media_assets?: Cardano.ThePoolsMediaAssets;
   @Field(() => ITNVerification, { nullable: true })
   itn?: Cardano.ITNVerification;
-}
-
-@ObjectType()
-export class ExtendedStakePoolMetadata implements Cardano.ExtendedStakePoolMetadata {
-  [k: string]: unknown;
-  @Field(() => Int)
-  serial: number;
-  @Field(() => ExtendedStakePoolMetadataFields)
-  pool: Cardano.ExtendedStakePoolMetadataFields;
 }

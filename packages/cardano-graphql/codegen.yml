@@ -9,6 +9,5 @@ generates:
 config:
   strictScalars: true
   scalars:
-    BigInt: string
-    Percentage: number
-    PoolStatus: "'active' | 'retired' | 'offline' | 'experimental' | 'private'"
+    DateTime: string
+    Int64: number

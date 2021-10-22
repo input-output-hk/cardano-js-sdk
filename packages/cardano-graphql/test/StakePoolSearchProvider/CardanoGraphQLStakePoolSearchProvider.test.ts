@@ -1,20 +1,27 @@
 /* eslint-disable max-len */
 import { ProviderError, StakePoolSearchProvider } from '@cardano-sdk/core';
 import { GraphQLClient } from 'graphql-request';
-import { StakePoolsByFragmentsQuery } from '../../src/sdk';
+import { StakePoolsQuery, StakePoolsByMetadataQuery, PoolStatus } from '../../src/sdk';
 import { createGraphQLStakePoolSearchProvider } from '../../src/StakePoolSearchProvider/CardanoGraphQLStakePoolSearchProvider';
-const mockRequest = (GraphQLClient.prototype.request = jest.fn());
 
 describe('StakePoolSearchClient', () => {
   let client: StakePoolSearchProvider;
+  const sdk = {
+    StakePools: jest.fn(),
+    StakePoolsByMetadata: jest.fn()
+  };
   beforeEach(() => {
-    client = createGraphQLStakePoolSearchProvider(new GraphQLClient('http://someurl.com'));
+    client = createGraphQLStakePoolSearchProvider(new GraphQLClient('http://someurl.com'), () => sdk);
+  });
+  afterEach(() => {
+    sdk.StakePools.mockReset();
+    sdk.StakePoolsByMetadata.mockReset();
   });
 
   describe('queryStakePoolsWithMetadata', () => {
     it('makes a graphql query and coerces result to core types', async () => {
-      const mockedResponse: StakePoolsByFragmentsQuery = {
-        stakePoolsByFragments: [
+      const stakePoolsQueryResponse: StakePoolsQuery = {
+        queryStakePool: [
           {
             id: 'some-pool',
             hexId: '0abc',
@@ -36,7 +43,7 @@ describe('StakePoolSearchClient', () => {
                 serial: 123,
                 pool: {
                   id: 'pool-id',
-                  status: 'active',
+                  status: PoolStatus.Active,
                   country: 'LT'
                 }
               }
@@ -70,17 +77,34 @@ describe('StakePoolSearchClient', () => {
           }
         ]
       };
-      mockRequest.mockResolvedValueOnce(mockedResponse);
+      const stakePoolsQueryByMetadataResponse: StakePoolsByMetadataQuery = {
+        queryStakePoolMetadata: [
+          {
+            stakePool: {
+              ...stakePoolsQueryResponse.queryStakePool![0]!,
+              metadata: undefined
+            }
+          }
+        ]
+      };
+      sdk.StakePools.mockResolvedValue(stakePoolsQueryResponse);
+      sdk.StakePoolsByMetadata.mockResolvedValueOnce(stakePoolsQueryByMetadataResponse);
       const response = await client.queryStakePools(['some', 'stake', 'pools']);
 
+      expect(response).toHaveLength(2);
+      expect(sdk.StakePoolsByMetadata).toBeCalledWith({
+        query: 'some stake pools',
+        omit: [stakePoolsQueryResponse.queryStakePool![0]!.id]
+      });
       expect(typeof response[0]).toBe('object');
       expect(typeof response[0].cost).toBe('bigint');
       expect(typeof response[0].metadata).toBe('object');
       expect(typeof response[0].metadata!.ext).toBe('object');
+      expect(response[1].metadata).toBeUndefined();
     });
 
     it('wraps errors to ProviderError', async () => {
-      mockRequest.mockRejectedValueOnce(new Error('some error'));
+      sdk.StakePools.mockRejectedValueOnce(new Error('some error'));
       await expect(client.queryStakePools(['stakepool'])).rejects.toThrowError(ProviderError);
     });
   });

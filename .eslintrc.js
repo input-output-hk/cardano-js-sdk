@@ -33,6 +33,7 @@ module.exports = {
     "unicorn/no-array-reduce": 0,
     "unicorn/prefer-node-protocol": 0,
     "unicorn/prefer-module": 0,
+    "unicorn/no-array-callback-reference": 0, // needed for inference from type guards
     "@typescript-eslint/no-floating-promises": ["error"],
     '@typescript-eslint/no-var-requires': 0, // covered by unicorn/prefer-module
     '@typescript-eslint/explicit-module-boundary-types': 0,

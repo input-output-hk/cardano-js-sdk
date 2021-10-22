@@ -1,8 +1,21 @@
+/* eslint-disable no-use-before-define */
 import * as Ogmios from '@cardano-ogmios/schema';
 import { Cardano } from '@cardano-sdk/core';
 import { createUnionType, Directive, Field, Float, Int, ObjectType } from 'type-graphql';
 import { BigIntsAsStrings, coinDescription, percentageDescription } from '../../util';
-import { ExtendedStakePoolMetadata } from './ExtendedStakePoolMetadata';
+import { ExtendedStakePoolMetadataFields } from './ExtendedStakePoolMetadataFields';
+
+//  This is not in ./ExtendedStakePoolMetadata to avoid circular import
+@ObjectType()
+export class ExtendedStakePoolMetadata implements Cardano.ExtendedStakePoolMetadata {
+  [k: string]: unknown;
+  @Field(() => Int)
+  serial: number;
+  @Field(() => ExtendedStakePoolMetadataFields)
+  pool: Cardano.ExtendedStakePoolMetadataFields;
+  @Field(() => StakePoolMetadata)
+  metadata: Cardano.StakePoolMetadata;
+}
 
 @ObjectType()
 export class StakePoolMetricsStake implements BigIntsAsStrings<Cardano.StakePoolMetricsStake> {
@@ -79,8 +92,14 @@ const Relay = createUnionType({
 
 @ObjectType()
 export class StakePoolMetadata implements Cardano.StakePoolMetadata {
+  @Directive('@id')
+  @Field()
+  stakePoolId: string;
+  // eslint-disable-next-line sonarjs/no-duplicate-string
+  @Directive('@search(by: [fulltext])')
   @Field()
   ticker: string;
+  @Directive('@search(by: [fulltext])')
   @Field()
   name: string;
   @Field()
@@ -93,13 +112,16 @@ export class StakePoolMetadata implements Cardano.StakePoolMetadata {
   extSigUrl?: string;
   @Field({ nullable: true })
   extVkey?: string;
-  // Review: what would be a good complexity number?
-  @Field(() => ExtendedStakePoolMetadata, { nullable: true, complexity: 5 })
+  @Field(() => ExtendedStakePoolMetadata, { nullable: true })
+  @Directive('@hasInverse(field: metadata)')
   ext?: Cardano.ExtendedStakePoolMetadata;
+  @Field(() => StakePool)
+  stakePool: Cardano.StakePool;
 }
 
 @ObjectType()
 export class StakePool implements BigIntsAsStrings<Cardano.StakePool> {
+  @Directive('@search(by: [fulltext])')
   @Directive('@id')
   @Field()
   id: string;
@@ -117,8 +139,8 @@ export class StakePool implements BigIntsAsStrings<Cardano.StakePool> {
   transactions: Cardano.StakePoolTransactions;
   @Field(() => StakePoolMetadataJson, { nullable: true })
   metadataJson?: Ogmios.PoolMetadata;
-  // Review: what would be a good complexity number?
-  @Field(() => StakePoolMetadata, { nullable: true, complexity: 5 })
+  @Directive('@hasInverse(field: stakePool)')
+  @Field(() => StakePoolMetadata, { nullable: true })
   metadata?: BigIntsAsStrings<Cardano.StakePoolMetadata>;
   @Field(() => [String])
   owners: string[];
