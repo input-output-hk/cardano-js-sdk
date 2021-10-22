@@ -1,6 +1,5 @@
 /* eslint-disable max-len */
 import { ProviderError, StakePoolSearchProvider } from '@cardano-sdk/core';
-import { GraphQLClient } from 'graphql-request';
 import { StakePoolsQuery, StakePoolsByMetadataQuery, PoolStatus } from '../../src/sdk';
 import { createGraphQLStakePoolSearchProvider } from '../../src/StakePoolSearchProvider/CardanoGraphQLStakePoolSearchProvider';
 
@@ -11,7 +10,7 @@ describe('StakePoolSearchClient', () => {
     StakePoolsByMetadata: jest.fn()
   };
   beforeEach(() => {
-    client = createGraphQLStakePoolSearchProvider(new GraphQLClient('http://someurl.com'), () => sdk);
+    client = createGraphQLStakePoolSearchProvider('http://someurl.com', undefined, () => sdk);
   });
   afterEach(() => {
     sdk.StakePools.mockReset();

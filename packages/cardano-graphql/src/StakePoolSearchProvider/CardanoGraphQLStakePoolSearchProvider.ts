@@ -6,9 +6,11 @@ import { isNotNil, replaceNullsWithUndefineds } from '../util';
 export type GraphQLClien = GraphQLClient['options'];
 
 export const createGraphQLStakePoolSearchProvider = (
-  graphQLClient: GraphQLClient,
+  url: string,
+  options?: RequestInit,
   initSdk = getSdk
 ): StakePoolSearchProvider => {
+  const graphQLClient = new GraphQLClient(url, options);
   const sdk = initSdk(graphQLClient);
   return {
     async queryStakePools(fragments: string[]): Promise<Cardano.StakePool[]> {
