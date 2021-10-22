@@ -22,6 +22,7 @@
     "@cardano-sdk/cip2": "0.1.4"
   },
   "dependencies": {
-    "@cardano-sdk/core": "0.1.4"
+    "@cardano-sdk/core": "0.1.4",
+    "delay": "^5.0.0"
   }
 }
