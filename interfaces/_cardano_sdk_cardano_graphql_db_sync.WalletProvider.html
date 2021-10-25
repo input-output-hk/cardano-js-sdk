@@ -1,0 +1,370 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>WalletProvider | cardano-sdk</title>
+	<meta name="description" content="Documentation for cardano-sdk">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../assets/css/main.css">
+	<script async src="../assets/js/search.js" id="search-script"></script>
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="../assets/js/search.json" data-base="..">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="../index.html" class="title">cardano-sdk</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="../index.html">cardano-sdk</a>
+				</li>
+				<li>
+					<a href="../modules/_cardano_sdk_cardano_graphql_db_sync.html">@cardano-sdk/cardano-graphql-db-sync</a>
+				</li>
+				<li>
+					<a href="_cardano_sdk_cardano_graphql_db_sync.WalletProvider.html">WalletProvider</a>
+				</li>
+			</ul>
+			<h1>Interface WalletProvider</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-hierarchy">
+				<h3>Hierarchy</h3>
+				<ul class="tsd-hierarchy">
+					<li>
+						<span class="target">WalletProvider</span>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel-group tsd-index-group">
+				<h2>Index</h2>
+				<section class="tsd-panel tsd-index-panel">
+					<div class="tsd-index-content">
+						<section class="tsd-index-section ">
+							<h3>Methods</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_cardano_sdk_cardano_graphql_db_sync.WalletProvider.html#currentWalletProtocolParameters" class="tsd-kind-icon">current<wbr>Wallet<wbr>Protocol<wbr>Parameters</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_cardano_sdk_cardano_graphql_db_sync.WalletProvider.html#ledgerTip" class="tsd-kind-icon">ledger<wbr>Tip</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_cardano_sdk_cardano_graphql_db_sync.WalletProvider.html#networkInfo" class="tsd-kind-icon">network<wbr>Info</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_cardano_sdk_cardano_graphql_db_sync.WalletProvider.html#queryTransactionsByAddresses" class="tsd-kind-icon">query<wbr>Transactions<wbr>ByAddresses</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_cardano_sdk_cardano_graphql_db_sync.WalletProvider.html#queryTransactionsByHashes" class="tsd-kind-icon">query<wbr>Transactions<wbr>ByHashes</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_cardano_sdk_cardano_graphql_db_sync.WalletProvider.html#stakePoolStats" class="tsd-kind-icon">stake<wbr>Pool<wbr>Stats</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_cardano_sdk_cardano_graphql_db_sync.WalletProvider.html#submitTx" class="tsd-kind-icon">submit<wbr>Tx</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_cardano_sdk_cardano_graphql_db_sync.WalletProvider.html#utxoDelegationAndRewards" class="tsd-kind-icon">utxo<wbr>Delegation<wbr>And<wbr>Rewards</a></li>
+							</ul>
+						</section>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+					<a name="currentWalletProtocolParameters" class="tsd-anchor"></a>
+					<h3>current<wbr>Wallet<wbr>Protocol<wbr>Parameters</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+						<li class="tsd-signature tsd-kind-icon">current<wbr>Wallet<wbr>Protocol<wbr>Parameters<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">ProtocolParametersRequiredByWallet</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in packages/core/dist/WalletProvider/types.d.ts:44</li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">ProtocolParametersRequiredByWallet</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+					<a name="ledgerTip" class="tsd-anchor"></a>
+					<h3>ledger<wbr>Tip</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+						<li class="tsd-signature tsd-kind-icon">ledger<wbr>Tip<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Tip</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in packages/core/dist/WalletProvider/types.d.ts:34</li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Tip</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+					<a name="networkInfo" class="tsd-anchor"></a>
+					<h3>network<wbr>Info</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+						<li class="tsd-signature tsd-kind-icon">network<wbr>Info<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">NetworkInfo</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in packages/core/dist/WalletProvider/types.d.ts:35</li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">NetworkInfo</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+					<a name="queryTransactionsByAddresses" class="tsd-anchor"></a>
+					<h3>query<wbr>Transactions<wbr>ByAddresses</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+						<li class="tsd-signature tsd-kind-icon">query<wbr>Transactions<wbr>ByAddresses<span class="tsd-signature-symbol">(</span>addresses<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">WithHash</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in packages/core/dist/WalletProvider/types.d.ts:42</li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>addresses: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">WithHash</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+					<a name="queryTransactionsByHashes" class="tsd-anchor"></a>
+					<h3>query<wbr>Transactions<wbr>ByHashes</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+						<li class="tsd-signature tsd-kind-icon">query<wbr>Transactions<wbr>ByHashes<span class="tsd-signature-symbol">(</span>hashes<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">WithHash</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in packages/core/dist/WalletProvider/types.d.ts:43</li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>hashes: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">WithHash</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+					<a name="stakePoolStats" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> stake<wbr>Pool<wbr>Stats</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+						<li class="tsd-signature tsd-kind-icon">stake<wbr>Pool<wbr>Stats<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">StakePoolStats</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in packages/core/dist/WalletProvider/types.d.ts:36</li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">StakePoolStats</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+					<a name="submitTx" class="tsd-anchor"></a>
+					<h3>submit<wbr>Tx</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+						<li class="tsd-signature tsd-kind-icon">submit<wbr>Tx<span class="tsd-signature-symbol">(</span>signedTransaction<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Transaction</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in packages/core/dist/WalletProvider/types.d.ts:37</li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>signedTransaction: <span class="tsd-signature-type">Transaction</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+					<a name="utxoDelegationAndRewards" class="tsd-anchor"></a>
+					<h3>utxo<wbr>Delegation<wbr>And<wbr>Rewards</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+						<li class="tsd-signature tsd-kind-icon">utxo<wbr>Delegation<wbr>And<wbr>Rewards<span class="tsd-signature-symbol">(</span>addresses<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span>, stakeKeyHash<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">{ </span>delegationAndRewards<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">DelegationsAndRewards</span><span class="tsd-signature-symbol">; </span>utxo<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Utxo</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in packages/core/dist/WalletProvider/types.d.ts:38</li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>addresses: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+								<li>
+									<h5>stakeKeyHash: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">{ </span>delegationAndRewards<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">DelegationsAndRewards</span><span class="tsd-signature-symbol">; </span>utxo<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Utxo</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class=" ">
+						<a href="../index.html">Modules</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/_cardano_sdk_blockfrost.html">@cardano-<wbr>sdk/blockfrost</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/_cardano_sdk_cardano_graphql.html">@cardano-<wbr>sdk/cardano-<wbr>graphql</a>
+					</li>
+					<li class="current tsd-kind-module">
+						<a href="../modules/_cardano_sdk_cardano_graphql_db_sync.html">@cardano-<wbr>sdk/cardano-<wbr>graphql-<wbr>db-<wbr>sync</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/_cardano_sdk_cip2.html">@cardano-<wbr>sdk/cip2</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/_cardano_sdk_cip30.html">@cardano-<wbr>sdk/cip30</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/_cardano_sdk_core.html">@cardano-<wbr>sdk/core</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/_cardano_sdk_util_dev.html">@cardano-<wbr>sdk/util-<wbr>dev</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/_cardano_sdk_wallet.html">@cardano-<wbr>sdk/wallet</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+				</ul>
+				<ul class="current">
+					<li class="current tsd-kind-interface tsd-parent-kind-module">
+						<a href="_cardano_sdk_cardano_graphql_db_sync.WalletProvider.html" class="tsd-kind-icon">Wallet<wbr>Provider</a>
+						<ul>
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
+								<a href="_cardano_sdk_cardano_graphql_db_sync.WalletProvider.html#currentWalletProtocolParameters" class="tsd-kind-icon">current<wbr>Wallet<wbr>Protocol<wbr>Parameters</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
+								<a href="_cardano_sdk_cardano_graphql_db_sync.WalletProvider.html#ledgerTip" class="tsd-kind-icon">ledger<wbr>Tip</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
+								<a href="_cardano_sdk_cardano_graphql_db_sync.WalletProvider.html#networkInfo" class="tsd-kind-icon">network<wbr>Info</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
+								<a href="_cardano_sdk_cardano_graphql_db_sync.WalletProvider.html#queryTransactionsByAddresses" class="tsd-kind-icon">query<wbr>Transactions<wbr>ByAddresses</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
+								<a href="_cardano_sdk_cardano_graphql_db_sync.WalletProvider.html#queryTransactionsByHashes" class="tsd-kind-icon">query<wbr>Transactions<wbr>ByHashes</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
+								<a href="_cardano_sdk_cardano_graphql_db_sync.WalletProvider.html#stakePoolStats" class="tsd-kind-icon">stake<wbr>Pool<wbr>Stats</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
+								<a href="_cardano_sdk_cardano_graphql_db_sync.WalletProvider.html#submitTx" class="tsd-kind-icon">submit<wbr>Tx</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
+								<a href="_cardano_sdk_cardano_graphql_db_sync.WalletProvider.html#utxoDelegationAndRewards" class="tsd-kind-icon">utxo<wbr>Delegation<wbr>And<wbr>Rewards</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+				<ul class="after-current">
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="../modules/_cardano_sdk_cardano_graphql_db_sync.html#cardanoGraphqlDbSyncProvider" class="tsd-kind-icon">cardano<wbr>Graphql<wbr>DbSync<wbr>Provider</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-namespace"><span class="tsd-kind-icon">Namespace</span></li>
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>CardanoProvider | cardano-sdk</title>
+	<title>WalletProvider | cardano-sdk</title>
 	<meta name="description" content="Documentation for cardano-sdk">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -55,13 +55,13 @@
 					<a href="../index.html">cardano-sdk</a>
 				</li>
 				<li>
-					<a href="../modules/_cardano_sdk_cardano_graphql_db_sync.html">@cardano-sdk/cardano-graphql-db-sync</a>
+					<a href="../modules/_cardano_sdk_blockfrost.html">@cardano-sdk/blockfrost</a>
 				</li>
 				<li>
-					<a href="_cardano_sdk_cardano_graphql_db_sync.CardanoProvider.html">CardanoProvider</a>
+					<a href="_cardano_sdk_blockfrost.WalletProvider.html">WalletProvider</a>
 				</li>
 			</ul>
-			<h1>Interface CardanoProvider</h1>
+			<h1>Interface WalletProvider</h1>
 		</div>
 	</div>
 </header>
@@ -72,7 +72,7 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">CardanoProvider</span>
+						<span class="target">WalletProvider</span>
 					</li>
 				</ul>
 			</section>
@@ -83,14 +83,14 @@
 						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_cardano_sdk_cardano_graphql_db_sync.CardanoProvider.html#currentWalletProtocolParameters" class="tsd-kind-icon">current<wbr>Wallet<wbr>Protocol<wbr>Parameters</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_cardano_sdk_cardano_graphql_db_sync.CardanoProvider.html#ledgerTip" class="tsd-kind-icon">ledger<wbr>Tip</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_cardano_sdk_cardano_graphql_db_sync.CardanoProvider.html#networkInfo" class="tsd-kind-icon">network<wbr>Info</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_cardano_sdk_cardano_graphql_db_sync.CardanoProvider.html#queryTransactionsByAddresses" class="tsd-kind-icon">query<wbr>Transactions<wbr>ByAddresses</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_cardano_sdk_cardano_graphql_db_sync.CardanoProvider.html#queryTransactionsByHashes" class="tsd-kind-icon">query<wbr>Transactions<wbr>ByHashes</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_cardano_sdk_cardano_graphql_db_sync.CardanoProvider.html#stakePoolStats" class="tsd-kind-icon">stake<wbr>Pool<wbr>Stats</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_cardano_sdk_cardano_graphql_db_sync.CardanoProvider.html#submitTx" class="tsd-kind-icon">submit<wbr>Tx</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_cardano_sdk_cardano_graphql_db_sync.CardanoProvider.html#utxoDelegationAndRewards" class="tsd-kind-icon">utxo<wbr>Delegation<wbr>And<wbr>Rewards</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_cardano_sdk_blockfrost.WalletProvider.html#currentWalletProtocolParameters" class="tsd-kind-icon">current<wbr>Wallet<wbr>Protocol<wbr>Parameters</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_cardano_sdk_blockfrost.WalletProvider.html#ledgerTip" class="tsd-kind-icon">ledger<wbr>Tip</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_cardano_sdk_blockfrost.WalletProvider.html#networkInfo" class="tsd-kind-icon">network<wbr>Info</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_cardano_sdk_blockfrost.WalletProvider.html#queryTransactionsByAddresses" class="tsd-kind-icon">query<wbr>Transactions<wbr>ByAddresses</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_cardano_sdk_blockfrost.WalletProvider.html#queryTransactionsByHashes" class="tsd-kind-icon">query<wbr>Transactions<wbr>ByHashes</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_cardano_sdk_blockfrost.WalletProvider.html#stakePoolStats" class="tsd-kind-icon">stake<wbr>Pool<wbr>Stats</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_cardano_sdk_blockfrost.WalletProvider.html#submitTx" class="tsd-kind-icon">submit<wbr>Tx</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_cardano_sdk_blockfrost.WalletProvider.html#utxoDelegationAndRewards" class="tsd-kind-icon">utxo<wbr>Delegation<wbr>And<wbr>Rewards</a></li>
 							</ul>
 						</section>
 					</div>
@@ -108,7 +108,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in packages/core/dist/Provider/types.d.ts:44</li>
+									<li>Defined in packages/core/dist/WalletProvider/types.d.ts:44</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">ProtocolParametersRequiredByWallet</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -125,7 +125,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in packages/core/dist/Provider/types.d.ts:34</li>
+									<li>Defined in packages/core/dist/WalletProvider/types.d.ts:34</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Tip</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -142,7 +142,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in packages/core/dist/Provider/types.d.ts:35</li>
+									<li>Defined in packages/core/dist/WalletProvider/types.d.ts:35</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">NetworkInfo</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -159,7 +159,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in packages/core/dist/Provider/types.d.ts:42</li>
+									<li>Defined in packages/core/dist/WalletProvider/types.d.ts:42</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -182,7 +182,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in packages/core/dist/Provider/types.d.ts:43</li>
+									<li>Defined in packages/core/dist/WalletProvider/types.d.ts:43</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -205,7 +205,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in packages/core/dist/Provider/types.d.ts:36</li>
+									<li>Defined in packages/core/dist/WalletProvider/types.d.ts:36</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">StakePoolStats</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -222,7 +222,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in packages/core/dist/Provider/types.d.ts:37</li>
+									<li>Defined in packages/core/dist/WalletProvider/types.d.ts:37</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -245,7 +245,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in packages/core/dist/Provider/types.d.ts:38</li>
+									<li>Defined in packages/core/dist/WalletProvider/types.d.ts:38</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -269,10 +269,13 @@
 					<li class=" ">
 						<a href="../index.html">Modules</a>
 					</li>
-					<li class=" tsd-kind-module">
+					<li class="current tsd-kind-module">
 						<a href="../modules/_cardano_sdk_blockfrost.html">@cardano-<wbr>sdk/blockfrost</a>
 					</li>
-					<li class="current tsd-kind-module">
+					<li class=" tsd-kind-module">
+						<a href="../modules/_cardano_sdk_cardano_graphql.html">@cardano-<wbr>sdk/cardano-<wbr>graphql</a>
+					</li>
+					<li class=" tsd-kind-module">
 						<a href="../modules/_cardano_sdk_cardano_graphql_db_sync.html">@cardano-<wbr>sdk/cardano-<wbr>graphql-<wbr>db-<wbr>sync</a>
 					</li>
 					<li class=" tsd-kind-module">
@@ -297,38 +300,41 @@
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface tsd-parent-kind-module">
-						<a href="_cardano_sdk_cardano_graphql_db_sync.CardanoProvider.html" class="tsd-kind-icon">Cardano<wbr>Provider</a>
+						<a href="_cardano_sdk_blockfrost.WalletProvider.html" class="tsd-kind-icon">Wallet<wbr>Provider</a>
 						<ul>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="_cardano_sdk_cardano_graphql_db_sync.CardanoProvider.html#currentWalletProtocolParameters" class="tsd-kind-icon">current<wbr>Wallet<wbr>Protocol<wbr>Parameters</a>
+								<a href="_cardano_sdk_blockfrost.WalletProvider.html#currentWalletProtocolParameters" class="tsd-kind-icon">current<wbr>Wallet<wbr>Protocol<wbr>Parameters</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="_cardano_sdk_cardano_graphql_db_sync.CardanoProvider.html#ledgerTip" class="tsd-kind-icon">ledger<wbr>Tip</a>
+								<a href="_cardano_sdk_blockfrost.WalletProvider.html#ledgerTip" class="tsd-kind-icon">ledger<wbr>Tip</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="_cardano_sdk_cardano_graphql_db_sync.CardanoProvider.html#networkInfo" class="tsd-kind-icon">network<wbr>Info</a>
+								<a href="_cardano_sdk_blockfrost.WalletProvider.html#networkInfo" class="tsd-kind-icon">network<wbr>Info</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="_cardano_sdk_cardano_graphql_db_sync.CardanoProvider.html#queryTransactionsByAddresses" class="tsd-kind-icon">query<wbr>Transactions<wbr>ByAddresses</a>
+								<a href="_cardano_sdk_blockfrost.WalletProvider.html#queryTransactionsByAddresses" class="tsd-kind-icon">query<wbr>Transactions<wbr>ByAddresses</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="_cardano_sdk_cardano_graphql_db_sync.CardanoProvider.html#queryTransactionsByHashes" class="tsd-kind-icon">query<wbr>Transactions<wbr>ByHashes</a>
+								<a href="_cardano_sdk_blockfrost.WalletProvider.html#queryTransactionsByHashes" class="tsd-kind-icon">query<wbr>Transactions<wbr>ByHashes</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="_cardano_sdk_cardano_graphql_db_sync.CardanoProvider.html#stakePoolStats" class="tsd-kind-icon">stake<wbr>Pool<wbr>Stats</a>
+								<a href="_cardano_sdk_blockfrost.WalletProvider.html#stakePoolStats" class="tsd-kind-icon">stake<wbr>Pool<wbr>Stats</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="_cardano_sdk_cardano_graphql_db_sync.CardanoProvider.html#submitTx" class="tsd-kind-icon">submit<wbr>Tx</a>
+								<a href="_cardano_sdk_blockfrost.WalletProvider.html#submitTx" class="tsd-kind-icon">submit<wbr>Tx</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="_cardano_sdk_cardano_graphql_db_sync.CardanoProvider.html#utxoDelegationAndRewards" class="tsd-kind-icon">utxo<wbr>Delegation<wbr>And<wbr>Rewards</a>
+								<a href="_cardano_sdk_blockfrost.WalletProvider.html#utxoDelegationAndRewards" class="tsd-kind-icon">utxo<wbr>Delegation<wbr>And<wbr>Rewards</a>
 							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module tsd-is-external">
+						<a href="../modules/_cardano_sdk_blockfrost.html#Options" class="tsd-kind-icon">Options</a>
+					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module">
-						<a href="../modules/_cardano_sdk_cardano_graphql_db_sync.html#cardanoGraphqlDbSyncProvider" class="tsd-kind-icon">cardano<wbr>Graphql<wbr>DbSync<wbr>Provider</a>
+						<a href="../modules/_cardano_sdk_blockfrost.html#blockfrostProvider" class="tsd-kind-icon">blockfrost<wbr>Provider</a>
 					</li>
 				</ul>
 			</nav>
