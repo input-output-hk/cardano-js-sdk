@@ -1,0 +1,50 @@
+{
+  "name": "@cardano-sdk/cardano-graphql",
+  "version": "0.1.4",
+  "description": "Cardano GraphQL Providers",
+  "engines": {
+    "node": "^14"
+  },
+  "main": "dist/index.js",
+  "repository": "https://github.com/input-output-hk/cardano-js-sdk/packages/cardano-graphql",
+  "author": "Martynas Kazlauskas <martynas.kazlauskas@iohk.io>",
+  "contributors": [
+    "Rhys Bartels-Waller <rhys.bartelswaller@iohk.io> (https://iohk.io)",
+    "James Sweetland"
+  ],
+  "license": "MPL-2.0",
+  "scripts": {
+    "build": "run-s build:ts build:schema",
+    "build:ts": "tsc --build ./src",
+    "build:schema": "node ./scripts/buildSchema.js",
+    "build:schema:dgraph": "node ./scripts/buildDgraphSchema.js",
+    "generate": "run-s build:ts build:schema:dgraph graphql-codegen",
+    "graphql-codegen": "graphql-codegen",
+    "tscNoEmit": "shx echo typescript --noEmit command not implemented yet",
+    "cleanup": "shx rm -rf dist node_modules",
+    "lint": "eslint --ignore-path ../../.eslintignore \"**/*.ts\"",
+    "test": "jest -c ./jest.config.js",
+    "coverage": "yarn test --coverage",
+    "test:debug": "DEBUG=true yarn test"
+  },
+  "devDependencies": {
+    "@cardano-ogmios/schema": "4.1.0",
+    "@graphql-codegen/cli": "^2.2.1",
+    "@graphql-codegen/typescript": "^2.2.4",
+    "@graphql-codegen/typescript-graphql-request": "^4.1.6",
+    "@graphql-codegen/typescript-operations": "^2.1.8",
+    "@graphql-tools/utils": "^8.4.0",
+    "npm-run-all": "^4.1.5",
+    "shx": "^0.3.3"
+  },
+  "dependencies": {
+    "@cardano-graphql/client-ts": "^5.1.0-beta.1",
+    "@cardano-ogmios/client": "4.1.0",
+    "@cardano-sdk/core": "0.1.4",
+    "class-validator": "^0.13.1",
+    "graphql": "^15.6.1",
+    "graphql-request": "^3.5.0",
+    "reflect-metadata": "^0.1.13",
+    "type-graphql": "^1.1.1"
+  }
+}

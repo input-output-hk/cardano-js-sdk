@@ -1,5 +1,5 @@
 import Schema from '@cardano-ogmios/schema';
-import { CardanoProvider, Ogmios, Transaction, ProviderError, CSL } from '@cardano-sdk/core';
+import { WalletProvider, Ogmios, Transaction, ProviderError, CSL } from '@cardano-sdk/core';
 import { UtxoRepository } from './types';
 import { dummyLogger, Logger } from 'ts-log';
 import { defaultSelectionConstraints } from '@cardano-sdk/cip2';
@@ -30,7 +30,7 @@ export interface SingleAddressWallet {
 export interface SingleAddressWalletDependencies {
   keyManager: KeyManagement.KeyManager;
   logger?: Logger;
-  provider: CardanoProvider;
+  provider: WalletProvider;
   utxoRepository: UtxoRepository;
   txTracker: TransactionTracker;
   balanceTracker?: BalanceTracker;

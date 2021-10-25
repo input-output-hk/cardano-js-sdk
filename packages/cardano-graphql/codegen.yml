@@ -1,0 +1,13 @@
+schema: ./dist/dgraph.graphql
+documents: ./src/operations/*.graphql
+generates:
+  ./src/sdk.ts:
+    plugins:
+      - typescript
+      - typescript-operations
+      - typescript-graphql-request
+config:
+  strictScalars: true
+  scalars:
+    DateTime: string
+    Int64: number

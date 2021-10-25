@@ -1,4 +1,4 @@
-import { CardanoProvider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { WalletProvider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { gql, GraphQLClient } from 'graphql-request';
 import { TransactionSubmitResponse } from '@cardano-graphql/client-ts';
 import { Schema as Cardano } from '@cardano-ogmios/client';
@@ -16,10 +16,10 @@ import {
  * ```
  */
 
-export const cardanoGraphqlDbSyncProvider = (uri: string): CardanoProvider => {
+export const cardanoGraphqlDbSyncProvider = (uri: string): WalletProvider => {
   const client = new GraphQLClient(uri);
 
-  const ledgerTip: CardanoProvider['ledgerTip'] = async () => {
+  const ledgerTip: WalletProvider['ledgerTip'] = async () => {
     const query = gql`
       query {
         cardano {
@@ -43,7 +43,7 @@ export const cardanoGraphqlDbSyncProvider = (uri: string): CardanoProvider => {
     return CardanoGraphqlToOgmios.tip(response.cardano.tip);
   };
 
-  const networkInfo: CardanoProvider['networkInfo'] = async () => {
+  const networkInfo: WalletProvider['networkInfo'] = async () => {
     const query = gql`
       query {
         activeStake_aggregate {
@@ -118,7 +118,7 @@ export const cardanoGraphqlDbSyncProvider = (uri: string): CardanoProvider => {
     };
   };
 
-  const stakePoolStats: CardanoProvider['stakePoolStats'] = async () => {
+  const stakePoolStats: WalletProvider['stakePoolStats'] = async () => {
     const currentEpochResponse = await client.request<{
       cardano: {
         currentEpoch: {
@@ -207,7 +207,7 @@ export const cardanoGraphqlDbSyncProvider = (uri: string): CardanoProvider => {
     };
   };
 
-  const submitTx: CardanoProvider['submitTx'] = async (signedTransaction) => {
+  const submitTx: WalletProvider['submitTx'] = async (signedTransaction) => {
     try {
       const mutation = gql`
         mutation ($transaction: String!) {
@@ -233,11 +233,11 @@ export const cardanoGraphqlDbSyncProvider = (uri: string): CardanoProvider => {
   };
 
   // eslint-disable-next-line unicorn/consistent-function-scoping
-  const utxoDelegationAndRewards: CardanoProvider['utxoDelegationAndRewards'] = async () => {
+  const utxoDelegationAndRewards: WalletProvider['utxoDelegationAndRewards'] = async () => {
     throw new Error('Not implemented yet.');
   };
 
-  const queryTransactionsByAddresses: CardanoProvider['queryTransactionsByAddresses'] = async (addresses) => {
+  const queryTransactionsByAddresses: WalletProvider['queryTransactionsByAddresses'] = async (addresses) => {
     const query = gql`
       query ($addresses: [String]!) {
         transactions(
@@ -280,7 +280,7 @@ export const cardanoGraphqlDbSyncProvider = (uri: string): CardanoProvider => {
     return CardanoGraphqlToOgmios.graphqlTransactionsToCardanoTxs(response.transactions);
   };
 
-  const queryTransactionsByHashes: CardanoProvider['queryTransactionsByHashes'] = async (hashes) => {
+  const queryTransactionsByHashes: WalletProvider['queryTransactionsByHashes'] = async (hashes) => {
     const query = gql`
       query ($hashes: [Hash32Hex]!) {
         transactions(where: { hash: { _in: $hashes } }) {
@@ -321,7 +321,7 @@ export const cardanoGraphqlDbSyncProvider = (uri: string): CardanoProvider => {
     return CardanoGraphqlToOgmios.graphqlTransactionsToCardanoTxs(response.transactions);
   };
 
-  const currentWalletProtocolParameters: CardanoProvider['currentWalletProtocolParameters'] = async () => {
+  const currentWalletProtocolParameters: WalletProvider['currentWalletProtocolParameters'] = async () => {
     const query = gql`
       query {
         cardano {

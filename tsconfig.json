@@ -13,6 +13,7 @@
     "preserveConstEnums": true,
     "sourceMap": true,
     "strict": true,
+    "strictPropertyInitialization": false,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true
   }

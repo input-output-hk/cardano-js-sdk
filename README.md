@@ -23,6 +23,7 @@ A suite of TypeScript packages suitable for both Node.js and browser-based devel
 ### Cardano Provider Implementations
 
 - [@cardano-sdk/cardano-graphql-db-sync](packages/cardano-graphql-db-sync)
+- [@cardano-sdk/cardano-graphql](packages/cardano-graphql)
 - [@cardano-sdk/blockfrost](packages/blockfrost)
 
 :information_source: Looking to use a Cardano service not listed here? [Let us know!]
@@ -35,11 +36,13 @@ You may use the following config when bundling this SDK with Webpack:
 const { IgnorePlugin, ProvidePlugin } = require('webpack');
 {
   plugins: [
-    // see https://www.npmjs.com/package/isomorphic-bip39 README
+    // see https://www.npmjs.com/package/bip39 README
     new IgnorePlugin(/^\.\/wordlists\/(?!english)/, /bip39\/src$/),
   ],
   experiments: {
-    asyncWebAssembly: true
+    // Requires code splitting to work.
+    // Must dynamically `import()` a chunk that imports '@cardano-sdk/*'.
+    syncWebAssembly: true
   }
 }
 ```
@@ -51,8 +54,9 @@ const { NormalModuleReplacementPlugin } = require('webpack');
 {
   resolve: {
     fallback: {
-      // May want to install readable-stream as an explicit dependency
+      // Node.js polyfills. May want to install as explicit dependencies.
       stream: require.resolve('readable-stream'),
+      buffer: require.resolve('buffer'),
     }
   },
   plugins: [

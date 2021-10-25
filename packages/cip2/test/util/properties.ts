@@ -185,7 +185,7 @@ export const generateSelectionParams = (() => {
         // sum of coin or any asset can't exceed MAX_U64
         const { coins, assets } = Ogmios.util.coalesceValueQuantities(values);
         return (
-          coins <= cslUtil.MAX_U64 &&
+          coins + implicitCoin <= cslUtil.MAX_U64 &&
           (!assets || Object.values(assets).every((quantity) => quantity <= cslUtil.MAX_U64))
         );
       });

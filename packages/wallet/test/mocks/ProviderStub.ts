@@ -99,7 +99,7 @@ export const ledgerTip = {
 /**
  * Provider stub for testing
  *
- * returns CardanoProvider-compatible object
+ * returns WalletProvider-compatible object
  */
 export const providerStub = () => ({
   ledgerTip: jest.fn().mockResolvedValue(ledgerTip),
@@ -145,7 +145,9 @@ export const providerStub = () => ({
     maxValueSize: 1000,
     maxCollateralInputs: 1,
     coinsPerUtxoWord: 34_482
-  })
+  }),
+  stakePools: jest.fn(),
+  stakePoolMetadata: jest.fn()
 });
 
 export type ProviderStub = ReturnType<typeof providerStub>;

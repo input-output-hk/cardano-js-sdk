@@ -1,0 +1,2 @@
+schema: 'dist/schema.graphql'
+documents: 'src/operations/*.graphql'

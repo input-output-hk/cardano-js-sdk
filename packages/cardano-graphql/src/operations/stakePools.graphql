@@ -1,0 +1,105 @@
+fragment allStakePoolFields on StakePool {
+  id
+  hexId
+  owners
+  cost
+  margin
+  vrf
+  relays {
+    __typename
+    ... on RelayByName {
+      hostname
+      port
+    }
+    ... on RelayByAddress {
+      ipv4
+      ipv6
+      port
+    }
+  }
+  rewardAccount
+  pledge
+  metrics {
+    blocksCreated
+    livePledge
+    stake {
+      live
+      active
+    }
+    size {
+      live
+      active
+    }
+    saturation
+    delegators
+  }
+  transactions {
+    registration
+    retirement
+  }
+  metadataJson {
+    hash
+    url
+  }
+  metadata {
+    ticker
+    name
+    description
+    homepage
+    extDataUrl
+    extSigUrl
+    extVkey
+    ext {
+      serial
+      pool {
+        id
+        country
+        status
+        contact {
+          primary
+          email
+          facebook
+          github
+          feed
+          telegram
+          twitter
+        }
+        media_assets {
+          icon_png_64x64
+          logo_png
+          logo_svg
+          color_fg
+          color_bg
+        }
+        itn {
+          owner
+          witness
+        }
+      }
+    }
+  }
+}
+
+query StakePoolsByMetadata(
+  $query: String!
+  $omit: [String!] = ["NEED_THIS_BECAUSE_IN_OPERATOR_WONT_WORK_WITH_EMPTY_ARR"]
+) {
+  queryStakePoolMetadata(
+    filter: {
+      and: [
+        { or: [{ name: { anyoftext: $query } }, { ticker: { anyoftext: $query } }] }
+        { not: { stakePoolId: { in: $omit } } }
+      ]
+    }
+  ) {
+    stakePool {
+      ...allStakePoolFields
+    }
+  }
+}
+
+query StakePools($query: String!) {
+  queryStakePool(filter: { id: { anyoftext: $query } }) {
+    ...allStakePoolFields
+  }
+}

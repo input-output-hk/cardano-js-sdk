@@ -1,7 +1,7 @@
 import { TransactionTracker, TransactionTrackerEvents } from './types';
 import Emittery from 'emittery';
 import { Hash16, Slot, Tip } from '@cardano-ogmios/schema';
-import { CardanoProvider, ProviderError, ProviderFailure, CSL } from '@cardano-sdk/core';
+import { WalletProvider, ProviderError, ProviderFailure, CSL } from '@cardano-sdk/core';
 import { TransactionError, TransactionFailure } from './TransactionError';
 import { dummyLogger, Logger } from 'ts-log';
 import delay from 'delay';
@@ -10,13 +10,13 @@ import { TransactionTrackerEvent } from '.';
 export type Milliseconds = number;
 
 export interface InMemoryTransactionTrackerProps {
-  provider: CardanoProvider;
+  provider: WalletProvider;
   logger?: Logger;
   pollInterval?: Milliseconds;
 }
 
 export class InMemoryTransactionTracker extends Emittery<TransactionTrackerEvents> implements TransactionTracker {
-  readonly #provider: CardanoProvider;
+  readonly #provider: WalletProvider;
   readonly #pendingTransactions = new Map<string, Promise<void>>();
   readonly #logger: Logger;
   readonly #pollInterval: number;

@@ -1,5 +1,4 @@
 import { CSL } from '../CSL';
-import { Buffer } from 'buffer';
 
 export const policyIdFromAssetId = (assetId: string): string => assetId.slice(0, 56);
 export const assetNameFromAssetId = (assetId: string): string => assetId.slice(56);

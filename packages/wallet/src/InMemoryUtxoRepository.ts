@@ -1,6 +1,5 @@
 import Schema, { TxIn, TxOut } from '@cardano-ogmios/schema';
-import { Buffer } from 'buffer';
-import { CardanoProvider, Ogmios, cslUtil, CSL } from '@cardano-sdk/core';
+import { WalletProvider, Ogmios, cslUtil, CSL } from '@cardano-sdk/core';
 import { dummyLogger, Logger } from 'ts-log';
 import { ImplicitCoin, InputSelector, SelectionConstraints, SelectionResult } from '@cardano-sdk/cip2';
 import { KeyManager } from './KeyManagement';
@@ -15,7 +14,7 @@ import {
 import Emittery from 'emittery';
 
 export interface InMemoryUtxoRepositoryProps {
-  provider: CardanoProvider;
+  provider: WalletProvider;
   keyManager: KeyManager;
   inputSelector: InputSelector;
   txTracker: TransactionTracker;
@@ -30,7 +29,7 @@ export class InMemoryUtxoRepository extends Emittery<UtxoRepositoryEvents> imple
   #inputSelector: InputSelector;
   #keyManager: KeyManager;
   #logger: Logger;
-  #provider: CardanoProvider;
+  #provider: WalletProvider;
   #utxoSet: Set<[TxIn, TxOut]>;
   #lockedUtxoSet: Set<[TxIn, TxOut]> = new Set();
   #lockedRewards = 0n;

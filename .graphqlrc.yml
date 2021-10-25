@@ -1,0 +1,2 @@
+schema: 'packages/cardano-graphql/dist/dgraph.graphql'
+documents: 'packages/cardano-graphql/src/operations/**/*.graphql'
