@@ -132,6 +132,7 @@ export const providerStub = () => ({
     }
   }),
   utxoDelegationAndRewards: jest.fn().mockResolvedValue({ utxo, delegationAndRewards }),
+  transactionDetails: jest.fn(),
   queryTransactionsByAddresses: queryTransactions(),
   queryTransactionsByHashes: queryTransactions(),
   currentWalletProtocolParameters: async () => ({

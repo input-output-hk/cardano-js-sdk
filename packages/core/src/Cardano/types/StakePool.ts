@@ -27,7 +27,7 @@ export interface Cip6MetadataFields {
    * the public Key for verification
    * optional, 68 Characters
    */
-  extVkey?: Hash16; // Review: is this the correct type alias?
+  extVkey?: Hash16; // TODO: figure out if this is the correct type alias
 }
 
 export interface StakePoolMetadataFields {

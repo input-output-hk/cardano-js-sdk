@@ -1,13 +1,13 @@
 import { WalletProvider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { gql, GraphQLClient } from 'graphql-request';
 import { TransactionSubmitResponse } from '@cardano-graphql/client-ts';
-import { Schema as Cardano } from '@cardano-ogmios/client';
 import { Buffer } from 'buffer';
 import {
   CardanoGraphqlToOgmios,
   GraphqlCurrentWalletProtocolParameters,
   CardanoGraphQlTip
 } from './CardanoGraphqlToOgmios';
+import { CardanoGraphqlToCore, TransactionsResponse } from './cardanoGraphqlToCore';
 
 /**
  * Connect to a [cardano-graphql (cardano-db-sync) service](https://github.com/input-output-hk/cardano-graphql)
@@ -245,6 +245,7 @@ export const cardanoGraphqlDbSyncProvider = (uri: string): WalletProvider => {
         ) {
           hash
           inputs {
+            address
             txHash
             sourceTxIndex
           }
@@ -262,22 +263,11 @@ export const cardanoGraphqlDbSyncProvider = (uri: string): WalletProvider => {
       }
     `;
 
-    type Response = {
-      transactions: {
-        hash: Cardano.Hash16;
-        inputs: { txHash: Cardano.Hash16; sourceTxIndex: number }[];
-        outputs: {
-          address: Cardano.Address;
-          value: string;
-          tokens: { asset: { assetId: string }; quantity: string }[];
-        }[];
-      }[];
-    };
     type Variables = { addresses: string[] };
 
-    const response = await client.request<Response, Variables>(query, { addresses });
+    const response = await client.request<TransactionsResponse, Variables>(query, { addresses });
 
-    return CardanoGraphqlToOgmios.graphqlTransactionsToCardanoTxs(response.transactions);
+    return CardanoGraphqlToCore.transactions(response);
   };
 
   const queryTransactionsByHashes: WalletProvider['queryTransactionsByHashes'] = async (hashes) => {
@@ -303,22 +293,11 @@ export const cardanoGraphqlDbSyncProvider = (uri: string): WalletProvider => {
       }
     `;
 
-    type Response = {
-      transactions: {
-        hash: Cardano.Hash16;
-        inputs: { txHash: Cardano.Hash16; sourceTxIndex: number }[];
-        outputs: {
-          address: Cardano.Address;
-          value: string;
-          tokens: { asset: { assetId: string }; quantity: string }[];
-        }[];
-      }[];
-    };
     type Variables = { hashes: string[] };
 
-    const response = await client.request<Response, Variables>(query, { hashes });
+    const response = await client.request<TransactionsResponse, Variables>(query, { hashes });
 
-    return CardanoGraphqlToOgmios.graphqlTransactionsToCardanoTxs(response.transactions);
+    return CardanoGraphqlToCore.transactions(response);
   };
 
   const currentWalletProtocolParameters: WalletProvider['currentWalletProtocolParameters'] = async () => {
@@ -356,12 +335,18 @@ export const cardanoGraphqlDbSyncProvider = (uri: string): WalletProvider => {
     return CardanoGraphqlToOgmios.currentWalletProtocolParameters(response.cardano.currentEpoch.protocolParams);
   };
 
+  // eslint-disable-next-line unicorn/consistent-function-scoping
+  const transactionDetails: WalletProvider['transactionDetails'] = async () => {
+    throw new ProviderError(ProviderFailure.NotImplemented);
+  };
+
   return {
     ledgerTip,
     networkInfo,
     stakePoolStats,
     submitTx,
     utxoDelegationAndRewards,
+    transactionDetails,
     queryTransactionsByAddresses,
     queryTransactionsByHashes,
     currentWalletProtocolParameters

@@ -1,5 +1,5 @@
-import Cardano, { ProtocolParametersAlonzo } from '@cardano-ogmios/schema';
-import { Ogmios, Transaction, CSL } from '..';
+import OgmiosSchema, { ProtocolParametersAlonzo } from '@cardano-ogmios/schema';
+import { Ogmios, Transaction, CSL, Cardano } from '..';
 
 export type ProtocolParametersRequiredByWallet = Pick<
   ProtocolParametersAlonzo,
@@ -36,7 +36,7 @@ export type StakePoolStats = {
 
 export type NetworkInfo = {
   currentEpoch: {
-    number: Cardano.Epoch;
+    number: OgmiosSchema.Epoch;
     start: {
       /** Local date */
       date: Date;
@@ -51,7 +51,7 @@ export type NetworkInfo = {
 };
 
 export interface WalletProvider {
-  ledgerTip: () => Promise<Cardano.Tip>;
+  ledgerTip: () => Promise<OgmiosSchema.Tip>;
   networkInfo: () => Promise<NetworkInfo>;
   // TODO: move stakePoolStats out to other provider type, since it's not required for wallet operation
   stakePoolStats?: () => Promise<StakePoolStats>;
@@ -59,10 +59,16 @@ export interface WalletProvider {
   submitTx: (signedTransaction: CSL.Transaction) => Promise<void>;
   // TODO: split utxoDelegationAndRewards this into 2 or 3 functions
   utxoDelegationAndRewards: (
-    addresses: Cardano.Address[],
-    stakeKeyHash: Cardano.Hash16
-  ) => Promise<{ utxo: Cardano.Utxo; delegationAndRewards: Cardano.DelegationsAndRewards }>;
-  queryTransactionsByAddresses: (addresses: Cardano.Address[]) => Promise<Transaction.WithHash[]>;
-  queryTransactionsByHashes: (hashes: Cardano.Hash16[]) => Promise<Transaction.WithHash[]>;
+    addresses: OgmiosSchema.Address[],
+    stakeKeyHash: OgmiosSchema.Hash16
+  ) => Promise<{ utxo: Cardano.Utxo[]; delegationAndRewards: OgmiosSchema.DelegationsAndRewards }>;
+  transactionDetails: (hash: OgmiosSchema.Hash16) => Promise<Transaction.TxDetails>;
+  /**
+   * TODO: add an optional 'since: Slot' argument for querying transactions and utxos.
+   * When doing so we need to also consider how best we can use the volatile block range of the chain
+   * to minimise over-fetching and assist the application in handling rollback scenarios.
+   */
+  queryTransactionsByAddresses: (addresses: OgmiosSchema.Address[]) => Promise<Transaction.Tx[]>;
+  queryTransactionsByHashes: (hashes: OgmiosSchema.Hash16[]) => Promise<Transaction.Tx[]>;
   currentWalletProtocolParameters: () => Promise<ProtocolParametersRequiredByWallet>;
 }

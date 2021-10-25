@@ -16,6 +16,8 @@ describe('cardanoGraphqlDbSyncProvider', () => {
           hash: '886206542d63b23a047864021fbfccf291d78e47c1e59bd4c75fbc67b248c5e8',
           inputs: [
             {
+              address:
+                'addr_test1qr05llxkwg5t6c4j3ck5mqfax9wmz35rpcgw3qthrn9z7xcxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flknstdz3k2',
               txHash: '886206542d63b23a047864021fbfccf291d78e47c1e59bd4c75fbc67b248c5e8',
               sourceTxIndex: 1
             }
@@ -46,6 +48,8 @@ describe('cardanoGraphqlDbSyncProvider', () => {
           hash: '390ec1131b8cc95125f1dc2d2c02d54c79939f04f3f5723e47606279ddc822b3',
           inputs: [
             {
+              address:
+                'addr_test1qr05llxkwg5t6c4j3ck5mqfax9wmz35rpcgw3qthrn9z7xcxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flknstdz3k2',
               txHash: '390ec1131b8cc95125f1dc2d2c02d54c79939f04f3f5723e47606279ddc822b3',
               sourceTxIndex: 1
             }
@@ -75,10 +79,12 @@ describe('cardanoGraphqlDbSyncProvider', () => {
 
     expect(response).toHaveLength(2);
 
-    expect(response[0]).toMatchObject<Transaction.WithHash>({
+    expect(response[0]).toMatchObject<Transaction.Tx>({
       hash: '886206542d63b23a047864021fbfccf291d78e47c1e59bd4c75fbc67b248c5e8',
       inputs: [
         {
+          address:
+            'addr_test1qr05llxkwg5t6c4j3ck5mqfax9wmz35rpcgw3qthrn9z7xcxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flknstdz3k2',
           txId: '886206542d63b23a047864021fbfccf291d78e47c1e59bd4c75fbc67b248c5e8',
           index: 1
         }
@@ -110,6 +116,8 @@ describe('cardanoGraphqlDbSyncProvider', () => {
           hash: '886206542d63b23a047864021fbfccf291d78e47c1e59bd4c75fbc67b248c5e8',
           inputs: [
             {
+              address:
+                'addr_test1qr05llxkwg5t6c4j3ck5mqfax9wmz35rpcgw3qthrn9z7xcxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flknstdz3k2',
               txHash: '886206542d63b23a047864021fbfccf291d78e47c1e59bd4c75fbc67b248c5e8',
               sourceTxIndex: 1
             }
@@ -147,10 +155,12 @@ describe('cardanoGraphqlDbSyncProvider', () => {
     ]);
 
     expect(response).toHaveLength(1);
-    expect(response[0]).toMatchObject<Transaction.WithHash>({
+    expect(response[0]).toMatchObject<Transaction.Tx>({
       hash: '886206542d63b23a047864021fbfccf291d78e47c1e59bd4c75fbc67b248c5e8',
       inputs: [
         {
+          address:
+            'addr_test1qr05llxkwg5t6c4j3ck5mqfax9wmz35rpcgw3qthrn9z7xcxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flknstdz3k2',
           txId: '886206542d63b23a047864021fbfccf291d78e47c1e59bd4c75fbc67b248c5e8',
           index: 1
         }

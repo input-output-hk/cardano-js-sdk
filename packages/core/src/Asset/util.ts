@@ -1,15 +1,17 @@
 import { CSL } from '../CSL';
 
-export const policyIdFromAssetId = (assetId: string): string => assetId.slice(0, 56);
-export const assetNameFromAssetId = (assetId: string): string => assetId.slice(56);
+export type AssetId = string;
+
+export const policyIdFromAssetId = (assetId: AssetId): string => assetId.slice(0, 56);
+export const assetNameFromAssetId = (assetId: AssetId): string => assetId.slice(56);
 
 /**
  * @returns {string} concatenated hex-encoded policy id and asset name
  */
-export const createAssetId = (scriptHash: CSL.ScriptHash, assetName: CSL.AssetName): string =>
+export const createAssetId = (scriptHash: CSL.ScriptHash, assetName: CSL.AssetName): AssetId =>
   Buffer.from(scriptHash.to_bytes()).toString('hex') + Buffer.from(assetName.name()).toString('hex');
 
-export const parseAssetId = (assetId: string) => {
+export const parseAssetId = (assetId: AssetId) => {
   const policyId = policyIdFromAssetId(assetId);
   const assetName = assetNameFromAssetId(assetId);
   return {

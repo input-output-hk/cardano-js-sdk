@@ -1,10 +1,10 @@
 import { Schema as Cardano } from '@cardano-ogmios/client';
-import { ProtocolParametersRequiredByWallet, Transaction } from '@cardano-sdk/core';
+import { ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
 import { Block } from '@cardano-graphql/client-ts';
 
 type GraphqlTransaction = {
   hash: Cardano.Hash16;
-  inputs: { txHash: Cardano.Hash16; sourceTxIndex: number }[];
+  inputs: { txHash: Cardano.Hash16; sourceTxIndex: number; address: Cardano.Address }[];
   outputs: {
     address: Cardano.Address;
     value: string;
@@ -30,18 +30,25 @@ export type GraphqlCurrentWalletProtocolParameters = {
 
 export type CardanoGraphQlTip = Pick<Block, 'hash' | 'number' | 'slotNo'>;
 
+const txIn = ({ sourceTxIndex, txHash }: GraphqlTransaction['inputs'][0]): Cardano.TxIn => ({
+  txId: txHash,
+  index: sourceTxIndex
+});
+
+const txOut = ({ address, tokens, value }: GraphqlTransaction['outputs'][0]) => {
+  const assets: Cardano.Value['assets'] = {};
+  for (const token of tokens) assets[token.asset.assetId] = BigInt(token.quantity);
+  return { address, value: { coins: Number(value), assets } };
+};
+
 export const CardanoGraphqlToOgmios = {
-  graphqlTransactionsToCardanoTxs: (transactions: GraphqlTransaction[]): Transaction.WithHash[] =>
+  txIn,
+  txOut,
+
+  graphqlTransactionsToCardanoTxs: (transactions: GraphqlTransaction[]): Cardano.Tx[] =>
     transactions.map((tx) => ({
-      hash: tx.hash,
-      inputs: tx.inputs.map((index) => ({ txId: index.txHash, index: index.sourceTxIndex })),
-      outputs: tx.outputs.map((output) => {
-        const assets: Cardano.Value['assets'] = {};
-
-        for (const token of output.tokens) assets[token.asset.assetId] = BigInt(token.quantity);
-
-        return { address: output.address, value: { coins: Number(output.value), assets } };
-      })
+      inputs: tx.inputs.map(txIn),
+      outputs: tx.outputs.map(txOut)
     })),
 
   currentWalletProtocolParameters: (
