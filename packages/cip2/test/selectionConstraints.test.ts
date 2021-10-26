@@ -2,7 +2,7 @@
 /* eslint-disable no-loop-func */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable unicorn/consistent-function-scoping */
-import { Ogmios, InvalidProtocolParametersError, CSL } from '@cardano-sdk/core';
+import { InvalidProtocolParametersError, CSL, coreToCsl } from '@cardano-sdk/core';
 import { AssetId } from '@cardano-sdk/util-dev';
 import { defaultSelectionConstraints, DefaultSelectionConstraintsProps } from '../src/selectionConstraints';
 import { ProtocolParametersForInputSelection, SelectionSkeleton } from '../src/types';
@@ -57,7 +57,7 @@ describe('defaultSelectionConstraints', () => {
 
   it('computeMinimumCoinQuantity', () => {
     cslMock.Value.new.mockImplementation(cslActual.Value.new);
-    const withAssets = Ogmios.ogmiosToCsl
+    const withAssets = coreToCsl
       .value({
         coins: 10_000n,
         assets: {

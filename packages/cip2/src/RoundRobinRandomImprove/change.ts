@@ -1,4 +1,4 @@
-import { Ogmios, CSL } from '@cardano-sdk/core';
+import { Ogmios, CSL, coreToCsl } from '@cardano-sdk/core';
 import { orderBy } from 'lodash-es';
 import { ComputeMinimumCoinQuantity, TokenBundleSizeExceedsLimit } from '../types';
 import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
@@ -191,7 +191,7 @@ const coalesceChangeBundlesForMinCoinRequirement = (
 
   let sortedBundles = orderBy(changeBundles, ({ coins }) => coins, 'desc');
   const satisfiesMinCoinRequirement = (valueQuantities: Ogmios.Value) =>
-    valueQuantities.coins >= computeMinimumCoinQuantity(Ogmios.ogmiosToCsl.value(valueQuantities).multiasset());
+    valueQuantities.coins >= computeMinimumCoinQuantity(coreToCsl.value(valueQuantities).multiasset());
 
   while (sortedBundles.length > 1 && !satisfiesMinCoinRequirement(sortedBundles[sortedBundles.length - 1])) {
     const smallestBundle = sortedBundles.pop()!;
@@ -265,7 +265,7 @@ const changeBundlesToValues = (
   changeBundles: Ogmios.Value[],
   tokenBundleSizeExceedsLimit: TokenBundleSizeExceedsLimit
 ) => {
-  const values = changeBundles.map((bundle) => Ogmios.ogmiosToCsl.value(bundle));
+  const values = changeBundles.map((bundle) => coreToCsl.value(bundle));
   for (const value of values) {
     const multiasset = value.multiasset();
     if (!multiasset) continue;

@@ -1,7 +1,7 @@
 import { InputSelector, roundRobinRandomImprove } from '@cardano-sdk/cip2';
-import { WalletProvider, Ogmios, CSL } from '@cardano-sdk/core';
+import { WalletProvider, CSL, coreToCsl } from '@cardano-sdk/core';
 import { SelectionConstraints } from '@cardano-sdk/util-dev';
-import { providerStub, txTracker, testKeyManager } from '../mocks';
+import { MockTransactionTracker, providerStub, testKeyManager } from '../mocks';
 import {
   CertificateFactory,
   createTransactionInternals,
@@ -39,16 +39,21 @@ describe('Transaction.createTransactionInternals', () => {
     keyManager = testKeyManager();
 
     outputs = new Set([
-      Ogmios.ogmiosToCsl.txOut({
+      coreToCsl.txOut({
         address,
         value: { coins: 4_000_000 }
       }),
-      Ogmios.ogmiosToCsl.txOut({
+      coreToCsl.txOut({
         address,
         value: { coins: 2_000_000 }
       })
     ]);
-    utxoRepository = new InMemoryUtxoRepository({ provider, keyManager, inputSelector, txTracker });
+    utxoRepository = new InMemoryUtxoRepository({
+      provider,
+      keyManager,
+      inputSelector,
+      txTracker: new MockTransactionTracker()
+    });
   });
 
   test('simple transaction', async () => {

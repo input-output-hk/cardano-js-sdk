@@ -1,5 +1,5 @@
 import Schema, { TxIn, TxOut } from '@cardano-ogmios/schema';
-import { WalletProvider, Ogmios, cslUtil, CSL } from '@cardano-sdk/core';
+import { WalletProvider, Ogmios, cslUtil, CSL, coreToCsl, cslToCore } from '@cardano-sdk/core';
 import { dummyLogger, Logger } from 'ts-log';
 import { ImplicitCoin, InputSelector, SelectionConstraints, SelectionResult } from '@cardano-sdk/cip2';
 import { KeyManager } from './KeyManagement';
@@ -90,7 +90,7 @@ export class InMemoryUtxoRepository extends Emittery<UtxoRepositoryEvents> imple
       await this.sync();
     }
     return this.#inputSelector.select({
-      utxo: new Set(Ogmios.ogmiosToCsl.utxo(this.availableUtxos)),
+      utxo: new Set(coreToCsl.utxo(this.availableUtxos)),
       outputs,
       constraints,
       implicitCoin
@@ -136,7 +136,7 @@ export class InMemoryUtxoRepository extends Emittery<UtxoRepositoryEvents> imple
     const utxoLockedByTx: Schema.Utxo = [];
     const inputs = transaction.body().inputs();
     for (let inputIdx = 0; inputIdx < inputs.len(); inputIdx++) {
-      const { txId, index } = Ogmios.cslToOgmios.txIn(inputs.get(inputIdx));
+      const { txId, index } = cslToCore.txIn(inputs.get(inputIdx));
       const utxo = this.allUtxos.find(([txIn]) => txIn.txId === txId && txIn.index === index)!;
       this.#lockedUtxoSet.add(utxo);
       utxoLockedByTx.push(utxo);

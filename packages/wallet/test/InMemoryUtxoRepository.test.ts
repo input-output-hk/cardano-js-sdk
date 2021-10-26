@@ -1,7 +1,7 @@
 /* eslint-disable unicorn/consistent-function-scoping */
 /* eslint-disable promise/param-names */
 import { roundRobinRandomImprove, InputSelector } from '@cardano-sdk/cip2';
-import { Ogmios, Cardano, CSL } from '@cardano-sdk/core';
+import { Cardano, CSL, coreToCsl } from '@cardano-sdk/core';
 import { flushPromises, SelectionConstraints } from '@cardano-sdk/util-dev';
 import {
   providerStub,
@@ -44,11 +44,11 @@ describe('InMemoryUtxoRepository', () => {
       password: '123'
     });
     outputs = new Set([
-      Ogmios.ogmiosToCsl.txOut({
+      coreToCsl.txOut({
         address: addresses[0],
         value: { coins: 4_000_000 }
       }),
-      Ogmios.ogmiosToCsl.txOut({
+      coreToCsl.txOut({
         address: addresses[0],
         value: { coins: 2_000_000 }
       })
@@ -147,7 +147,7 @@ describe('InMemoryUtxoRepository', () => {
         body: () => ({
           inputs: () => ({
             len: () => 1,
-            get: () => Ogmios.ogmiosToCsl.txIn(transactionUtxo[0])
+            get: () => coreToCsl.txIn(transactionUtxo[0])
           }),
           withdrawals: () => ({
             keys: () => ({

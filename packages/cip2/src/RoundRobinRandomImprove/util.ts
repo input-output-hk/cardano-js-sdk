@@ -1,4 +1,4 @@
-import { BigIntMath, Ogmios, CSL } from '@cardano-sdk/core';
+import { BigIntMath, Ogmios, CSL, cslToCore } from '@cardano-sdk/core';
 import { uniq } from 'lodash-es';
 import { ImplicitCoin } from '../types';
 import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
@@ -44,11 +44,11 @@ export const preprocessArgs = (
 ): RoundRobinRandomImproveArgs => {
   const utxosWithValue = [...availableUtxo].map((utxo) => ({
     utxo,
-    value: Ogmios.cslToOgmios.value(utxo.output().amount())
+    value: cslToCore.value(utxo.output().amount())
   }));
   const outputsWithValue = [...outputs].map((output) => ({
     output,
-    value: Ogmios.cslToOgmios.value(output.amount())
+    value: cslToCore.value(output.amount())
   }));
   const uniqueOutputAssetIDs = uniq(
     outputsWithValue.flatMap(({ value: { assets } }) => (assets && Object.keys(assets)) || [])

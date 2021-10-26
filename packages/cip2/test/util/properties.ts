@@ -1,6 +1,6 @@
 import { AssetId, SelectionConstraints } from '@cardano-sdk/util-dev';
 import { ImplicitCoin, SelectionResult } from '../../src/types';
-import { cslUtil, Ogmios, CSL } from '@cardano-sdk/core';
+import { cslUtil, Ogmios, CSL, cslToCore } from '@cardano-sdk/core';
 import { InputSelectionError, InputSelectionFailure } from '../../src/InputSelectionError';
 import fc, { Arbitrary } from 'fast-check';
 
@@ -9,7 +9,7 @@ const assertExtraChangeProperties = (
   results: SelectionResult
 ) => {
   for (const value of results.selection.change) {
-    const { coins, assets } = Ogmios.cslToOgmios.value(value);
+    const { coins, assets } = cslToCore.value(value);
     // Min UTxO coin requirement for change
     expect(coins).toBeGreaterThanOrEqual(minimumCoinQuantity);
     // No 0 quantity assets
@@ -24,11 +24,11 @@ const assertExtraChangeProperties = (
 };
 
 const totalOutputsValue = (outputs: Set<CSL.TransactionOutput>) =>
-  Ogmios.util.coalesceValueQuantities([...outputs].map((output) => Ogmios.cslToOgmios.value(output.amount())));
+  Ogmios.util.coalesceValueQuantities([...outputs].map((output) => cslToCore.value(output.amount())));
 
 const totalUtxosValue = (results: SelectionResult) =>
   Ogmios.util.coalesceValueQuantities(
-    [...results.selection.inputs].map((selectedUtxo) => Ogmios.cslToOgmios.value(selectedUtxo.output().amount()))
+    [...results.selection.inputs].map((selectedUtxo) => cslToCore.value(selectedUtxo.output().amount()))
   );
 
 const inputSelectionTotals = ({
@@ -52,7 +52,7 @@ const inputSelectionTotals = ({
     coins: vRequestedOutputs.coins + BigInt(implicitCoin?.deposit || 0) + vFee
   };
   const vChange = Ogmios.util.coalesceValueQuantities(
-    [...results.selection.change].map((value) => Ogmios.cslToOgmios.value(value))
+    [...results.selection.change].map((value) => cslToCore.value(value))
   );
   return { vSelected, vRequested, vChange };
 };

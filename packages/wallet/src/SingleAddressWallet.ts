@@ -1,5 +1,5 @@
 import Schema from '@cardano-ogmios/schema';
-import { WalletProvider, Ogmios, Transaction, ProviderError, CSL } from '@cardano-sdk/core';
+import { WalletProvider, Transaction, ProviderError, CSL, coreToCsl } from '@cardano-sdk/core';
 import { UtxoRepository } from './types';
 import { dummyLogger, Logger } from 'ts-log';
 import { defaultSelectionConstraints } from '@cardano-sdk/cip2';
@@ -70,7 +70,7 @@ export const createSingleAddressWallet = async (
     initializeTx: async (props) => {
       const tip = await provider.ledgerTip();
       const validityInterval = ensureValidityInterval(tip.slot, props.options?.validityInterval);
-      const txOutputs = new Set([...props.outputs].map((output) => Ogmios.ogmiosToCsl.txOut(output)));
+      const txOutputs = new Set([...props.outputs].map((output) => coreToCsl.txOut(output)));
       const constraints = defaultSelectionConstraints({
         protocolParameters,
         buildTx: async (inputSelection) => {
