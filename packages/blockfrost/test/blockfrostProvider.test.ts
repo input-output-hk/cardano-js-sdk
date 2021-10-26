@@ -48,11 +48,11 @@ describe('blockfrostProvider', () => {
     expect(response).toMatchObject<NetworkInfo>({
       currentEpoch: {
         end: {
-          date: new Date(1_632_687_616)
+          date: new Date('2021-09-26T20:20:16.000Z')
         },
         number: 158,
         start: {
-          date: new Date(1_632_255_616)
+          date: new Date('2021-09-21T20:20:16.000Z')
         }
       },
       lovelaceSupply: {
