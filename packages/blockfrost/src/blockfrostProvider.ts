@@ -67,11 +67,11 @@ export const blockfrostProvider = (options: Options): WalletProvider => {
     return {
       currentEpoch: {
         end: {
-          date: new Date(currentEpoch.end_time)
+          date: new Date(currentEpoch.end_time * 1000)
         },
         number: currentEpoch.epoch,
         start: {
-          date: new Date(currentEpoch.start_time)
+          date: new Date(currentEpoch.start_time * 1000)
         }
       },
       lovelaceSupply: {
