@@ -94,7 +94,7 @@ describe('cardanoGraphqlDbSyncProvider', () => {
           address:
             'addr_test1qzhj44x8qdyj8uzzk98h85wmwjaxwfelnsce78y2823n67klx3h666clw83vu7askvacnvtlh0megn8ue60afer83hfseeq9q7',
           value: {
-            coins: 1_000_000_000,
+            coins: 1_000_000_000n,
             assets: {
               b01fb3b8c3dd6b3705a5dc8bcd5a70759f70ad5d97a72005caeac3c652657675746f31333237: BigInt('1')
             }
@@ -103,7 +103,7 @@ describe('cardanoGraphqlDbSyncProvider', () => {
         {
           address:
             'addr_test1qz7xvvc30qghk00sfpzcfhsw3s2nyn7my0r8hq8c2jj47zsxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flkns6sjg2v',
-          value: { coins: 9_515_281_005_985, assets: {} }
+          value: { coins: 9_515_281_005_985n, assets: {} }
         }
       ]
     });
@@ -170,7 +170,7 @@ describe('cardanoGraphqlDbSyncProvider', () => {
           address:
             'addr_test1qzhj44x8qdyj8uzzk98h85wmwjaxwfelnsce78y2823n67klx3h666clw83vu7askvacnvtlh0megn8ue60afer83hfseeq9q7',
           value: {
-            coins: 1_000_000_000,
+            coins: 1_000_000_000n,
             assets: {
               b01fb3b8c3dd6b3705a5dc8bcd5a70759f70ad5d97a72005caeac3c652657675746f31333237: BigInt('1')
             }
@@ -179,7 +179,7 @@ describe('cardanoGraphqlDbSyncProvider', () => {
         {
           address:
             'addr_test1qz7xvvc30qghk00sfpzcfhsw3s2nyn7my0r8hq8c2jj47zsxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flkns6sjg2v',
-          value: { coins: 9_515_281_005_985, assets: {} }
+          value: { coins: 9_515_281_005_985n, assets: {} }
         }
       ]
     });

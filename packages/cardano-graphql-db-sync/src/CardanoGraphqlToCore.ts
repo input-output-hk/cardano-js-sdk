@@ -1,5 +1,4 @@
-import { Schema as Cardano } from '@cardano-ogmios/client';
-import { ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
+import { ProtocolParametersRequiredByWallet, Cardano, Transaction } from '@cardano-sdk/core';
 import { Block } from '@cardano-graphql/client-ts';
 
 type GraphqlTransaction = {
@@ -30,25 +29,40 @@ export type GraphqlCurrentWalletProtocolParameters = {
 
 export type CardanoGraphQlTip = Pick<Block, 'hash' | 'number' | 'slotNo'>;
 
-const txIn = ({ sourceTxIndex, txHash }: GraphqlTransaction['inputs'][0]): Cardano.TxIn => ({
+export type CardanoGraphqlTxIn = { txHash: Cardano.Hash16; sourceTxIndex: number; address: Cardano.Address };
+export type TransactionsResponse = {
+  transactions: {
+    hash: Cardano.Hash16;
+    inputs: CardanoGraphqlTxIn[];
+    outputs: {
+      address: Cardano.Address;
+      value: string;
+      tokens: { asset: { assetId: string }; quantity: string }[];
+    }[];
+  }[];
+};
+
+const txIn = ({ sourceTxIndex, txHash, address }: GraphqlTransaction['inputs'][0]): Cardano.TxIn => ({
   txId: txHash,
-  index: sourceTxIndex
+  index: sourceTxIndex,
+  address
 });
 
 const txOut = ({ address, tokens, value }: GraphqlTransaction['outputs'][0]) => {
   const assets: Cardano.Value['assets'] = {};
   for (const token of tokens) assets[token.asset.assetId] = BigInt(token.quantity);
-  return { address, value: { coins: Number(value), assets } };
+  return { address, value: { coins: BigInt(value), assets } };
 };
 
-export const CardanoGraphqlToOgmios = {
+export const CardanoGraphqlToCore = {
   txIn,
   txOut,
 
-  graphqlTransactionsToCardanoTxs: (transactions: GraphqlTransaction[]): Cardano.Tx[] =>
+  graphqlTransactionsToCardanoTxs: (transactions: GraphqlTransaction[]): Transaction.Tx[] =>
     transactions.map((tx) => ({
       inputs: tx.inputs.map(txIn),
-      outputs: tx.outputs.map(txOut)
+      outputs: tx.outputs.map(txOut),
+      hash: tx.hash
     })),
 
   currentWalletProtocolParameters: (
@@ -66,5 +80,12 @@ export const CardanoGraphqlToOgmios = {
     blockNo: tip.number!,
     hash: tip.hash,
     slot: tip.slotNo!
-  })
+  }),
+
+  transactions: (response: TransactionsResponse) =>
+    response.transactions.map(({ hash, inputs, outputs }) => ({
+      hash,
+      inputs: inputs.map(txIn),
+      outputs: outputs.map(txOut)
+    }))
 };

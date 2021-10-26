@@ -1,5 +1,5 @@
-import OgmiosSchema, { ProtocolParametersAlonzo } from '@cardano-ogmios/schema';
-import { Ogmios, Transaction, CSL, Cardano } from '..';
+import { ProtocolParametersAlonzo } from '@cardano-ogmios/schema';
+import { Transaction, CSL, Cardano } from '..';
 
 export type ProtocolParametersRequiredByWallet = Pick<
   ProtocolParametersAlonzo,
@@ -16,14 +16,14 @@ export type ProtocolParametersRequiredByWallet = Pick<
 >;
 
 export type AssetSupply = {
-  circulating: Ogmios.Lovelace;
-  max: Ogmios.Lovelace;
-  total: Ogmios.Lovelace;
+  circulating: Cardano.Lovelace;
+  max: Cardano.Lovelace;
+  total: Cardano.Lovelace;
 };
 
 export type StakeSummary = {
-  active: Ogmios.Lovelace;
-  live: Ogmios.Lovelace;
+  active: Cardano.Lovelace;
+  live: Cardano.Lovelace;
 };
 
 export type StakePoolStats = {
@@ -36,7 +36,7 @@ export type StakePoolStats = {
 
 export type NetworkInfo = {
   currentEpoch: {
-    number: OgmiosSchema.Epoch;
+    number: Cardano.Epoch;
     start: {
       /** Local date */
       date: Date;
@@ -51,7 +51,7 @@ export type NetworkInfo = {
 };
 
 export interface WalletProvider {
-  ledgerTip: () => Promise<OgmiosSchema.Tip>;
+  ledgerTip: () => Promise<Cardano.Tip>;
   networkInfo: () => Promise<NetworkInfo>;
   // TODO: move stakePoolStats out to other provider type, since it's not required for wallet operation
   stakePoolStats?: () => Promise<StakePoolStats>;
@@ -59,16 +59,16 @@ export interface WalletProvider {
   submitTx: (signedTransaction: CSL.Transaction) => Promise<void>;
   // TODO: split utxoDelegationAndRewards this into 2 or 3 functions
   utxoDelegationAndRewards: (
-    addresses: OgmiosSchema.Address[],
-    stakeKeyHash: OgmiosSchema.Hash16
-  ) => Promise<{ utxo: Cardano.Utxo[]; delegationAndRewards: OgmiosSchema.DelegationsAndRewards }>;
-  transactionDetails: (hash: OgmiosSchema.Hash16) => Promise<Transaction.TxDetails>;
+    addresses: Cardano.Address[],
+    stakeKeyHash: Cardano.Hash16
+  ) => Promise<{ utxo: Cardano.Utxo[]; delegationAndRewards: Cardano.DelegationsAndRewards }>;
+  transactionDetails: (hash: Cardano.Hash16) => Promise<Transaction.TxDetails>;
   /**
    * TODO: add an optional 'since: Slot' argument for querying transactions and utxos.
    * When doing so we need to also consider how best we can use the volatile block range of the chain
    * to minimise over-fetching and assist the application in handling rollback scenarios.
    */
-  queryTransactionsByAddresses: (addresses: OgmiosSchema.Address[]) => Promise<Transaction.Tx[]>;
-  queryTransactionsByHashes: (hashes: OgmiosSchema.Hash16[]) => Promise<Transaction.Tx[]>;
+  queryTransactionsByAddresses: (addresses: Cardano.Address[]) => Promise<Transaction.Tx[]>;
+  queryTransactionsByHashes: (hashes: Cardano.Hash16[]) => Promise<Transaction.Tx[]>;
   currentWalletProtocolParameters: () => Promise<ProtocolParametersRequiredByWallet>;
 }

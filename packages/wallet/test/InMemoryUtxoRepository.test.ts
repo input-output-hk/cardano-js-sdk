@@ -20,7 +20,6 @@ import {
   UtxoRepositoryEvent,
   UtxoRepositoryFields
 } from '../src';
-import { TxIn, TxOut } from '@cardano-ogmios/schema';
 import { TransactionError, TransactionFailure } from '../src/TransactionError';
 
 const addresses = [
@@ -46,11 +45,11 @@ describe('InMemoryUtxoRepository', () => {
     outputs = new Set([
       coreToCsl.txOut({
         address: addresses[0],
-        value: { coins: 4_000_000 }
+        value: { coins: 4_000_000n }
       }),
       coreToCsl.txOut({
         address: addresses[0],
-        value: { coins: 2_000_000 }
+        value: { coins: 2_000_000n }
       })
     ]);
     txTracker = new MockTransactionTracker();
@@ -108,7 +107,7 @@ describe('InMemoryUtxoRepository', () => {
   });
 
   describe('availableUtxos and availableRewards', () => {
-    let transactionUtxo: [TxIn, TxOut];
+    let transactionUtxo: Cardano.Utxo;
     let transaction: CSL.Transaction;
     let numUtxoPreTransaction: number;
     let rewardsPreTransaction: bigint;

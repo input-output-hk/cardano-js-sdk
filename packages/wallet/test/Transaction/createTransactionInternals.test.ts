@@ -41,11 +41,11 @@ describe('Transaction.createTransactionInternals', () => {
     outputs = new Set([
       coreToCsl.txOut({
         address,
-        value: { coins: 4_000_000 }
+        value: { coins: 4_000_000n }
       }),
       coreToCsl.txOut({
         address,
-        value: { coins: 2_000_000 }
+        value: { coins: 2_000_000n }
       })
     ]);
     utxoRepository = new InMemoryUtxoRepository({

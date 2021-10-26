@@ -1,3 +1,6 @@
 export * from './StakePool';
 export * from './ExtendedStakePoolMetadata';
-export * from './utxo';
+export * from './Utxo';
+export * from './Value';
+export * from './DelegationsAndRewards';
+export * from './misc';

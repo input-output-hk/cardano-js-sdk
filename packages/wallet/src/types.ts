@@ -1,6 +1,5 @@
-import Schema from '@cardano-ogmios/schema';
 import { ImplicitCoin, SelectionConstraints, SelectionResult } from '@cardano-sdk/cip2';
-import { Ogmios, CSL } from '@cardano-sdk/core';
+import { Cardano, CSL } from '@cardano-sdk/core';
 import Emittery from 'emittery';
 
 export enum UtxoRepositoryEvent {
@@ -9,11 +8,11 @@ export enum UtxoRepositoryEvent {
 }
 
 export interface UtxoRepositoryFields {
-  allUtxos: Schema.Utxo;
-  availableUtxos: Schema.Utxo;
-  allRewards: Ogmios.Lovelace | null;
-  availableRewards: Ogmios.Lovelace | null;
-  delegation: Schema.PoolId | null;
+  allUtxos: Cardano.Utxo[];
+  availableUtxos: Cardano.Utxo[];
+  allRewards: Cardano.Lovelace | null;
+  availableRewards: Cardano.Lovelace | null;
+  delegation: Cardano.PoolId | null;
 }
 
 export type UtxoRepositoryEvents = {

@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { WalletProvider, ProviderError, ProviderFailure, Ogmios, Transaction } from '@cardano-sdk/core';
+import { WalletProvider, ProviderError, ProviderFailure, Cardano, Transaction } from '@cardano-sdk/core';
 import { BlockFrostAPI, Error as BlockfrostError, Responses } from '@blockfrost/blockfrost-js';
 import { Options } from '@blockfrost/blockfrost-js/lib/types';
-import { BlockfrostToOgmios } from './BlockfrostToOgmios';
-import { BlockfrostToCore } from './blockfrostToCore';
+import { BlockfrostToCore } from './BlockfrostToCore';
 import { dummyLogger } from 'ts-log';
 
 const formatBlockfrostError = (error: unknown) => {
@@ -60,7 +59,7 @@ export const blockfrostProvider = (options: Options, logger = dummyLogger): Wall
 
   const ledgerTip: WalletProvider['ledgerTip'] = async () => {
     const block = await blockfrost.blocksLatest();
-    return BlockfrostToOgmios.blockToTip(block);
+    return BlockfrostToCore.blockToTip(block);
   };
 
   const networkInfo: WalletProvider['networkInfo'] = async () => {
@@ -121,7 +120,7 @@ export const blockfrostProvider = (options: Options, logger = dummyLogger): Wall
     const accountResponse = await blockfrost.accounts(stakeKeyHash);
     const delegationAndRewards = {
       delegate: accountResponse.pool_id || undefined,
-      rewards: Number(accountResponse.withdrawable_amount)
+      rewards: BigInt(accountResponse.withdrawable_amount)
     };
 
     return { utxo, delegationAndRewards };
@@ -151,7 +150,7 @@ export const blockfrostProvider = (options: Options, logger = dummyLogger): Wall
       url: `${blockfrost.apiUrl}/epochs/latest/parameters`
     });
 
-    return BlockfrostToOgmios.currentWalletProtocolParameters(response.data);
+    return BlockfrostToCore.currentWalletProtocolParameters(response.data);
   };
 
   const fetchRedeemers = async ({
@@ -192,7 +191,7 @@ export const blockfrostProvider = (options: Options, logger = dummyLogger): Wall
   const fetchMint = async ({
     asset_mint_or_burn_count,
     hash
-  }: Responses['tx_content']): Promise<Ogmios.TokenMap | undefined> => {
+  }: Responses['tx_content']): Promise<Cardano.TokenMap | undefined> => {
     if (!asset_mint_or_burn_count) return;
     logger.warn(`Skipped fetching asset mint/burn for tx "${hash}": not implemented for Blockfrost provider`);
   };

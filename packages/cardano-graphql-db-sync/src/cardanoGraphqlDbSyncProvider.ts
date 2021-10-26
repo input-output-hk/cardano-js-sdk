@@ -3,11 +3,11 @@ import { gql, GraphQLClient } from 'graphql-request';
 import { TransactionSubmitResponse } from '@cardano-graphql/client-ts';
 import { Buffer } from 'buffer';
 import {
-  CardanoGraphqlToOgmios,
+  CardanoGraphqlToCore,
   GraphqlCurrentWalletProtocolParameters,
-  CardanoGraphQlTip
-} from './CardanoGraphqlToOgmios';
-import { CardanoGraphqlToCore, TransactionsResponse } from './cardanoGraphqlToCore';
+  CardanoGraphQlTip,
+  TransactionsResponse
+} from './CardanoGraphqlToCore';
 
 /**
  * Connect to a [cardano-graphql (cardano-db-sync) service](https://github.com/input-output-hk/cardano-graphql)
@@ -40,7 +40,7 @@ export const cardanoGraphqlDbSyncProvider = (uri: string): WalletProvider => {
 
     const response = await client.request<Response>(query);
 
-    return CardanoGraphqlToOgmios.tip(response.cardano.tip);
+    return CardanoGraphqlToCore.tip(response.cardano.tip);
   };
 
   const networkInfo: WalletProvider['networkInfo'] = async () => {
@@ -332,7 +332,7 @@ export const cardanoGraphqlDbSyncProvider = (uri: string): WalletProvider => {
 
     const response = await client.request<Response>(query);
 
-    return CardanoGraphqlToOgmios.currentWalletProtocolParameters(response.cardano.currentEpoch.protocolParams);
+    return CardanoGraphqlToCore.currentWalletProtocolParameters(response.cardano.currentEpoch.protocolParams);
   };
 
   // eslint-disable-next-line unicorn/consistent-function-scoping

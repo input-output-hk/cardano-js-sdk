@@ -1,3 +1,4 @@
+import { TokenMap } from '../Cardano';
 import { CSL } from '../CSL';
 
 export type AssetId = string;
@@ -18,4 +19,20 @@ export const parseAssetId = (assetId: AssetId) => {
     scriptHash: CSL.ScriptHash.from_bytes(Buffer.from(policyId, 'hex')),
     assetName: CSL.AssetName.new(Buffer.from(assetName, 'hex'))
   };
+};
+
+/**
+ * Sum asset quantities
+ */
+export const coalesceTokenMaps = (totals: (TokenMap | undefined)[]): TokenMap | undefined => {
+  const result: TokenMap = {};
+  for (const assetTotals of totals.filter((quantities) => !!quantities)) {
+    for (const assetKey in assetTotals) {
+      result[assetKey] = (result[assetKey] || 0n) + assetTotals[assetKey];
+    }
+  }
+  if (Object.keys(result).length === 0) {
+    return undefined;
+  }
+  return result;
 };

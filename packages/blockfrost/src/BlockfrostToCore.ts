@@ -1,6 +1,5 @@
 import { Responses } from '@blockfrost/blockfrost-js';
-import * as OgmiosSchema from '@cardano-ogmios/schema';
-import { ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
+import { Cardano, ProtocolParametersRequiredByWallet, Transaction } from '@cardano-sdk/core';
 
 type Unpacked<T> = T extends (infer U)[] ? U : T;
 type BlockfrostAddressUtxoContent = Responses['address_utxo_content'];
@@ -10,15 +9,23 @@ type BlockfrostOutputs = Responses['tx_content_utxo']['outputs'];
 type BlockfrostOutput = Unpacked<BlockfrostOutputs>;
 type BlockfrostUtxo = Unpacked<BlockfrostAddressUtxoContent>;
 
-export const BlockfrostToOgmios = {
-  addressUtxoContent: (address: string, blockfrost: Responses['address_utxo_content']): OgmiosSchema.Utxo =>
+export const BlockfrostToCore = {
+  addressUtxoContent: (address: string, blockfrost: Responses['address_utxo_content']): Cardano.Utxo[] =>
     blockfrost.map((utxo) => [
-      BlockfrostToOgmios.txIn(BlockfrostToOgmios.inputFromUtxo(address, utxo)),
-      BlockfrostToOgmios.txOut(BlockfrostToOgmios.outputFromUtxo(address, utxo))
-    ]) as OgmiosSchema.Utxo,
+      BlockfrostToCore.txIn(BlockfrostToCore.inputFromUtxo(address, utxo)),
+      BlockfrostToCore.txOut(BlockfrostToCore.outputFromUtxo(address, utxo))
+    ]) as Cardano.Utxo[],
   // without `as OgmiosSchema.Utxo` above TS thinks the return value is (OgmiosSchema.TxIn | OgmiosSchema.TxOut)[][]
 
-  blockToTip: (block: Responses['block_content']): OgmiosSchema.Tip => ({
+  transaction: (tx: Responses['tx_content_utxo']) => ({
+    inputs: tx.inputs.map((input) => ({
+      ...BlockfrostToCore.txIn(input),
+      address: input.address
+    })),
+    outputs: tx.outputs.map(BlockfrostToCore.txOut),
+    hash: tx.hash
+  }),
+  blockToTip: (block: Responses['block_content']): Cardano.Tip => ({
     blockNo: block.height!,
     hash: block.hash,
     slot: block.slot!
@@ -31,28 +38,29 @@ export const BlockfrostToOgmios = {
     tx_hash: utxo.tx_hash
   }),
 
-  inputs: (inputs: BlockfrostInputs): OgmiosSchema.TxIn[] => inputs.map((input) => BlockfrostToOgmios.txIn(input)),
+  inputs: (inputs: BlockfrostInputs): Cardano.TxIn[] => inputs.map((input) => BlockfrostToCore.txIn(input)),
 
   outputFromUtxo: (address: string, utxo: BlockfrostUtxo): BlockfrostOutput => ({
     address,
     amount: utxo.amount
   }),
 
-  outputs: (outputs: BlockfrostOutputs): OgmiosSchema.TxOut[] =>
-    outputs.map((output) => BlockfrostToOgmios.txOut(output)),
+  outputs: (outputs: BlockfrostOutputs): Cardano.TxOut[] => outputs.map((output) => BlockfrostToCore.txOut(output)),
 
-  txContentUtxo: (blockfrost: Responses['tx_content_utxo']): OgmiosSchema.Tx => ({
-    inputs: BlockfrostToOgmios.inputs(blockfrost.inputs),
-    outputs: BlockfrostToOgmios.outputs(blockfrost.outputs)
+  txContentUtxo: (blockfrost: Responses['tx_content_utxo']): Transaction.Tx => ({
+    inputs: BlockfrostToCore.inputs(blockfrost.inputs),
+    outputs: BlockfrostToCore.outputs(blockfrost.outputs),
+    hash: blockfrost.hash
   }),
 
-  txIn: (blockfrost: BlockfrostInput): OgmiosSchema.TxIn => ({
+  txIn: (blockfrost: BlockfrostInput): Cardano.TxIn => ({
     txId: blockfrost.tx_hash,
-    index: blockfrost.output_index
+    index: blockfrost.output_index,
+    address: blockfrost.address
   }),
 
-  txOut: (blockfrost: BlockfrostOutput): OgmiosSchema.TxOut => {
-    const assets: OgmiosSchema.Value['assets'] = {};
+  txOut: (blockfrost: BlockfrostOutput): Cardano.TxOut => {
+    const assets: Cardano.Value['assets'] = {};
     for (const amount of blockfrost.amount) {
       if (amount.unit === 'lovelace') continue;
       assets[amount.unit] = BigInt(amount.quantity);
@@ -60,7 +68,7 @@ export const BlockfrostToOgmios = {
     return {
       address: blockfrost.address,
       value: {
-        coins: Number(blockfrost.amount.find(({ unit }) => unit === 'lovelace')!.quantity),
+        coins: BigInt(blockfrost.amount.find(({ unit }) => unit === 'lovelace')!.quantity),
         assets
       }
     };

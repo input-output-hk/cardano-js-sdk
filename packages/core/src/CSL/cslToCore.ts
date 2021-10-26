@@ -1,7 +1,6 @@
 import { TxIn } from '@cardano-ogmios/schema';
 import { CSL } from '.';
-import { Asset } from '..';
-import { Value } from '../Ogmios/types';
+import { Asset, Cardano } from '..';
 import { Transaction } from '@emurgo/cardano-serialization-lib-nodejs';
 import { Tx, TxDetails } from '../Transaction';
 
@@ -9,8 +8,8 @@ export const tx = (_input: Transaction): Tx & { details: TxDetails } => {
   throw new Error('Not implemented');
 };
 
-export const value = (cslValue: CSL.Value): Value => {
-  const result: Value = {
+export const value = (cslValue: CSL.Value): Cardano.Value => {
+  const result: Cardano.Value = {
     coins: BigInt(cslValue.coin().to_str())
   };
   const multiasset = cslValue.multiasset();

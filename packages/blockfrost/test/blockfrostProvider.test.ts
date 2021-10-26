@@ -3,8 +3,7 @@
 
 import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
 import { blockfrostProvider } from '../src';
-import { Schema as Cardano } from '@cardano-ogmios/client';
-import { NetworkInfo, StakePoolStats, Transaction } from '@cardano-sdk/core';
+import { Cardano, NetworkInfo, StakePoolStats, Transaction } from '@cardano-sdk/core';
 jest.mock('@blockfrost/blockfrost-js');
 
 describe('blockfrostProvider', () => {
@@ -159,6 +158,8 @@ describe('blockfrostProvider', () => {
     expect(response.utxo).toBeTruthy();
     expect(response.utxo[0]).toHaveLength(2);
     expect(response.utxo[0][0]).toMatchObject<Cardano.TxIn>({
+      address:
+        'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp',
       txId: '0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5',
       index: 0
     });
@@ -166,7 +167,7 @@ describe('blockfrostProvider', () => {
       address:
         'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp',
       value: {
-        coins: 50_928_877,
+        coins: 50_928_877n,
         assets: {
           b01fb3b8c3dd6b3705a5dc8bcd5a70759f70ad5d97a72005caeac3c652657675746f31333237: BigInt(1)
         }
@@ -175,6 +176,8 @@ describe('blockfrostProvider', () => {
 
     expect(response.utxo[1]).toHaveLength(2);
     expect(response.utxo[1][0]).toMatchObject<Cardano.TxIn>({
+      address:
+        'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp',
       txId: '6f04f2cd96b609b8d5675f89fe53159bab859fb1d62bb56c6001ccf58d9ac128',
       index: 0
     });
@@ -182,13 +185,13 @@ describe('blockfrostProvider', () => {
       address:
         'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp',
       value: {
-        coins: 1_097_647,
+        coins: 1_097_647n,
         assets: {}
       }
     });
 
     expect(response.delegationAndRewards.delegate).toEqual(accountsMockResponse.pool_id);
-    expect(response.delegationAndRewards.rewards).toEqual(Number(accountsMockResponse.withdrawable_amount));
+    expect(response.delegationAndRewards.rewards?.toString()).toEqual(accountsMockResponse.withdrawable_amount);
   });
 
   test('queryTransactionsByAddresses', async () => {
@@ -274,7 +277,7 @@ describe('blockfrostProvider', () => {
           address:
             'addr_test1qzx9hu8j4ah3auytk0mwcupd69hpc52t0cw39a65ndrah86djs784u92a3m5w475w3w35tyd6v3qumkze80j8a6h5tuqq5xe8y',
           value: {
-            coins: 1_000_000_000,
+            coins: 1_000_000_000n,
             assets: {
               '06f8c5655b4e2b5911fee8ef2fc66b4ce64c8835642695c730a3d108617364': BigInt(63),
               '06f8c5655b4e2b5911fee8ef2fc66b4ce64c8835642695c730a3d108646464': BigInt(22)
@@ -285,7 +288,7 @@ describe('blockfrostProvider', () => {
           address:
             'addr_test1qra788mu4sg8kwd93ns9nfdh3k4ufxwg4xhz2r3n064tzfgxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flkns6cy45x',
           value: {
-            coins: 9_731_978_536_963,
+            coins: 9_731_978_536_963n,
             assets: {}
           }
         }
@@ -364,7 +367,7 @@ describe('blockfrostProvider', () => {
           address:
             'addr_test1qzx9hu8j4ah3auytk0mwcupd69hpc52t0cw39a65ndrah86djs784u92a3m5w475w3w35tyd6v3qumkze80j8a6h5tuqq5xe8y',
           value: {
-            coins: 1_000_000_000,
+            coins: 1_000_000_000n,
             assets: {
               '06f8c5655b4e2b5911fee8ef2fc66b4ce64c8835642695c730a3d108617364': BigInt(63),
               '06f8c5655b4e2b5911fee8ef2fc66b4ce64c8835642695c730a3d108646464': BigInt(22)
@@ -375,7 +378,7 @@ describe('blockfrostProvider', () => {
           address:
             'addr_test1qra788mu4sg8kwd93ns9nfdh3k4ufxwg4xhz2r3n064tzfgxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flkns6cy45x',
           value: {
-            coins: 9_731_978_536_963,
+            coins: 9_731_978_536_963n,
             assets: {}
           }
         }

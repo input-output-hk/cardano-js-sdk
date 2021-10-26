@@ -1,5 +1,5 @@
 import { ByName } from '@cardano-ogmios/schema';
-import { NotImplementedError, Ogmios, CSL } from '@cardano-sdk/core';
+import { NotImplementedError, Cardano, CSL } from '@cardano-sdk/core';
 import { KeyManager } from '../KeyManagement';
 
 export type Ed25519KeyHashBech32 = string;
@@ -38,8 +38,8 @@ interface PoolMetadata {
 interface PoolParameters {
   poolKeyHash: Ed25519KeyHashBech32;
   vrfKeyHash: VrfKeyHashBech32;
-  pledge: Ogmios.Lovelace;
-  cost: Ogmios.Lovelace;
+  pledge: Cardano.Lovelace;
+  cost: Cardano.Lovelace;
   margin: Ratio;
   rewardAddress: AddressBech32;
   owners: Ed25519KeyHashBech32[];

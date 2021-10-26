@@ -1,6 +1,5 @@
-import { Slot, Hash16, Tip, Address, Epoch, PoolId, ExUnits } from '@cardano-ogmios/schema';
-import { Ogmios, Cardano } from '..';
-import { Lovelace, TokenMap } from '../Ogmios';
+import { Slot, Tip, Address, Epoch, PoolId, ExUnits } from '@cardano-ogmios/schema';
+import { Cardano } from '..';
 
 export interface ValidityInterval {
   invalidBefore?: Slot;
@@ -10,14 +9,14 @@ export interface ValidityInterval {
 export interface Tx {
   inputs: Cardano.TxIn[];
   outputs: Cardano.TxOut[];
-  hash: Hash16;
+  hash: Cardano.Hash16;
 }
 
 export type Block = Tip;
 
 export interface Withdrawal {
   address: Address;
-  quantity: Lovelace;
+  quantity: Cardano.Lovelace;
 }
 
 export enum CertificateType {
@@ -33,10 +32,10 @@ export enum CertificateType {
 export interface Redeemer {
   index: number;
   purpose: 'spend' | 'mint' | 'cert' | 'reward';
-  scriptHash: Hash16;
-  datumHash: Hash16;
+  scriptHash: Cardano.Hash16;
+  datumHash: Cardano.Hash16;
   executionUnits: ExUnits;
-  fee: Lovelace;
+  fee: Cardano.Lovelace;
 }
 
 export interface StakeAddressCertificate {
@@ -65,16 +64,16 @@ export interface MirCertificate {
   type: CertificateType.MIR;
   certIndex: number;
   address: Address;
-  quantity: Lovelace;
+  quantity: Cardano.Lovelace;
   pot: 'reserve' | 'treasury';
 }
 
 export interface GenesisKeyDelegationCertificate {
   type: CertificateType.GenesisKeyDelegation;
   certIndex: number;
-  genesisHash: Hash16;
-  genesisDelegateHash: Hash16;
-  vrfKeyHash: Hash16;
+  genesisHash: Cardano.Hash16;
+  genesisDelegateHash: Cardano.Hash16;
+  vrfKeyHash: Cardano.Hash16;
 }
 
 export type Certificate =
@@ -87,14 +86,14 @@ export type Certificate =
 export interface TxDetails {
   block: Block;
   index: number;
-  fee: Ogmios.Lovelace;
-  deposit: Ogmios.Lovelace;
+  fee: Cardano.Lovelace;
+  deposit: Cardano.Lovelace;
   size: number;
   invalidBefore?: Slot;
   invalidHereafter?: Slot;
   withdrawals?: Withdrawal[];
   certificates?: Certificate[];
-  mint?: TokenMap;
+  mint?: Cardano.TokenMap;
   redeemers?: Redeemer[];
   validContract?: boolean;
 }

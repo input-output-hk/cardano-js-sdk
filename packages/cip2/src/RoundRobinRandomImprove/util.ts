@@ -1,10 +1,10 @@
-import { BigIntMath, Ogmios, CSL, cslToCore } from '@cardano-sdk/core';
+import { BigIntMath, Cardano, CSL, cslToCore } from '@cardano-sdk/core';
 import { uniq } from 'lodash-es';
 import { ImplicitCoin } from '../types';
 import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
 
 export interface WithValue {
-  value: Ogmios.Value;
+  value: Cardano.Value;
 }
 
 export interface UtxoWithValue extends WithValue {
@@ -63,19 +63,19 @@ export const preprocessArgs = (
 export const withValuesToValues = (totals: WithValue[]) => totals.map((t) => t.value);
 export const assetQuantitySelector =
   (id: string) =>
-  (quantities: Ogmios.Value[]): bigint =>
+  (quantities: Cardano.Value[]): bigint =>
     BigIntMath.sum(quantities.map(({ assets }) => assets?.[id] || 0n));
 export const assetWithValueQuantitySelector =
   (id: string) =>
   (totals: WithValue[]): bigint =>
     assetQuantitySelector(id)(withValuesToValues(totals));
-export const getCoinQuantity = (quantities: Ogmios.Value[]): bigint =>
+export const getCoinQuantity = (quantities: Cardano.Value[]): bigint =>
   BigIntMath.sum(quantities.map(({ coins }) => coins));
 export const getWithValuesCoinQuantity = (totals: WithValue[]): bigint => getCoinQuantity(withValuesToValues(totals));
 
 export const assertIsCoinBalanceSufficient = (
-  utxoValues: Ogmios.Value[],
-  outputValues: Ogmios.Value[],
+  utxoValues: Cardano.Value[],
+  outputValues: Cardano.Value[],
   implicitCoin: ImplicitCoinBigint
 ) => {
   const utxoCoinTotal = getCoinQuantity(utxoValues);
@@ -93,8 +93,8 @@ export const assertIsCoinBalanceSufficient = (
  */
 export const assertIsBalanceSufficient = (
   uniqueOutputAssetIDs: string[],
-  utxoValues: Ogmios.Value[],
-  outputValues: Ogmios.Value[],
+  utxoValues: Cardano.Value[],
+  outputValues: Cardano.Value[],
   implicitCoin: ImplicitCoinBigint
 ): void => {
   for (const assetId of uniqueOutputAssetIDs) {

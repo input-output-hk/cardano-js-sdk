@@ -1,12 +1,14 @@
 /* eslint-disable max-len */
-import * as Schema from '@cardano-ogmios/schema';
+import { Cardano } from '@cardano-sdk/core';
 import { PXL, TSLA } from '@cardano-sdk/util-dev/src/assetId';
 
 export const stakeKeyHash = 'stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d';
 
-export const utxo: Schema.Utxo = [
+export const utxo: Cardano.Utxo[] = [
   [
     {
+      address:
+        'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g',
       txId: 'bb217abaca60fc0ca68c1555eca6a96d2478547818ae76ce6836133f3cc546e0',
       index: 1
     },
@@ -14,17 +16,18 @@ export const utxo: Schema.Utxo = [
       address:
         'addr_test1qzs0umu0s2ammmpw0hea0w2crtcymdjvvlqngpgqy76gpfnuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qp3y3vz',
       value: {
-        coins: 4_027_026_465,
+        coins: 4_027_026_465n,
         assets: {
           [TSLA]: 10n,
           [PXL]: 5n
         }
-      },
-      datum: null
+      }
     }
   ],
   [
     {
+      address:
+        'addr_test1qzs0umu0s2ammmpw0hea0w2crtcymdjvvlqngpgqy76gpfnuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qp3y3vz',
       txId: 'c7c0973c6bbf1a04a9f306da7814b4fa564db649bf48b0bd93c273bd03143547',
       index: 0
     },
@@ -32,16 +35,17 @@ export const utxo: Schema.Utxo = [
       address:
         'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g',
       value: {
-        coins: 3_289_566,
+        coins: 3_289_566n,
         assets: {
           [TSLA]: 15n
         }
-      },
-      datum: null
+      }
     }
   ],
   [
     {
+      address:
+        'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g',
       txId: 'ea1517b8c36fea3148df9aa1f49bbee66ff59a5092331a67bd8b3c427e1d79d7',
       index: 2
     },
@@ -49,9 +53,8 @@ export const utxo: Schema.Utxo = [
       address:
         'addr_test1qqydn46r6mhge0kfpqmt36m6q43knzsd9ga32n96m89px3nuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qypp3m9',
       value: {
-        coins: 9_825_963
-      },
-      datum: null
+        coins: 9_825_963n
+      }
     }
   ]
 ];

@@ -1,5 +1,4 @@
-import Schema from '@cardano-ogmios/schema';
-import { WalletProvider, Transaction, ProviderError, CSL, coreToCsl } from '@cardano-sdk/core';
+import { WalletProvider, Transaction, ProviderError, CSL, coreToCsl, Cardano } from '@cardano-sdk/core';
 import { UtxoRepository } from './types';
 import { dummyLogger, Logger } from 'ts-log';
 import { defaultSelectionConstraints } from '@cardano-sdk/cip2';
@@ -19,7 +18,7 @@ export interface SubmitTxResult {
   confirmed: Promise<void>;
 }
 export interface SingleAddressWallet {
-  address: Schema.Address;
+  address: Cardano.Address;
   balance: BalanceTracker;
   initializeTx: (props: InitializeTxProps) => Promise<TxInternals>;
   name: string;
