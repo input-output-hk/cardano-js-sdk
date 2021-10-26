@@ -22,8 +22,10 @@ describe('cslToCore', () => {
 
   it('txIn', () => {
     const cslInput = CslTestUtil.createTxInput();
-    const txIn = cslToCore.txIn(cslInput);
+    const address = 'addr_test1vrdkagyspkmt96k6z87rnt9dzzy8mlcex7awjymm8wx434q837u24';
+    const txIn = cslToCore.txIn(cslInput, address);
     expect(typeof txIn.index).toBe('number');
     expect(typeof txIn.txId).toBe('string');
+    expect(txIn.address).toBe(address);
   });
 });

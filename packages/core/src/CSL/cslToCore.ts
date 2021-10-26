@@ -1,4 +1,3 @@
-import { TxIn } from '@cardano-ogmios/schema';
 import { CSL } from '.';
 import { Asset, Cardano } from '..';
 import { Transaction } from '@emurgo/cardano-serialization-lib-nodejs';
@@ -33,7 +32,8 @@ export const value = (cslValue: CSL.Value): Cardano.Value => {
   return result;
 };
 
-export const txIn = (input: CSL.TransactionInput): TxIn => ({
+export const txIn = (input: CSL.TransactionInput, address: Cardano.Address): Cardano.TxIn => ({
   txId: Buffer.from(input.transaction_id().to_bytes()).toString('hex'),
-  index: input.index()
+  index: input.index(),
+  address
 });

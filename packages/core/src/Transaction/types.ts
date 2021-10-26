@@ -1,9 +1,8 @@
-import { Slot, Tip, Address, Epoch, PoolId, ExUnits } from '@cardano-ogmios/schema';
 import { Cardano } from '..';
 
 export interface ValidityInterval {
-  invalidBefore?: Slot;
-  invalidHereafter?: Slot;
+  invalidBefore?: Cardano.Slot;
+  invalidHereafter?: Cardano.Slot;
 }
 
 export interface Tx {
@@ -12,10 +11,10 @@ export interface Tx {
   hash: Cardano.Hash16;
 }
 
-export type Block = Tip;
+export type Block = Cardano.Tip;
 
 export interface Withdrawal {
-  address: Address;
+  address: Cardano.Address;
   quantity: Cardano.Lovelace;
 }
 
@@ -34,36 +33,36 @@ export interface Redeemer {
   purpose: 'spend' | 'mint' | 'cert' | 'reward';
   scriptHash: Cardano.Hash16;
   datumHash: Cardano.Hash16;
-  executionUnits: ExUnits;
+  executionUnits: Cardano.ExUnits;
   fee: Cardano.Lovelace;
 }
 
 export interface StakeAddressCertificate {
   type: CertificateType.StakeRegistration | CertificateType.StakeDeregistration;
   certIndex: number;
-  address: Address;
+  address: Cardano.Address;
 }
 
 export interface PoolCertificate {
   type: CertificateType.PoolRegistration | CertificateType.PoolRetirement;
   certIndex: number;
-  poolId: PoolId;
-  epoch: Epoch;
+  poolId: Cardano.PoolId;
+  epoch: Cardano.Epoch;
 }
 
 export interface StakeDelegationCertificate {
   type: CertificateType.StakeDelegation;
   certIndex: number;
   delegationIndex: number;
-  address: Address;
-  poolId: PoolId;
-  epoch: Epoch;
+  address: Cardano.Address;
+  poolId: Cardano.PoolId;
+  epoch: Cardano.Epoch;
 }
 
 export interface MirCertificate {
   type: CertificateType.MIR;
   certIndex: number;
-  address: Address;
+  address: Cardano.Address;
   quantity: Cardano.Lovelace;
   pot: 'reserve' | 'treasury';
 }
@@ -89,8 +88,8 @@ export interface TxDetails {
   fee: Cardano.Lovelace;
   deposit: Cardano.Lovelace;
   size: number;
-  invalidBefore?: Slot;
-  invalidHereafter?: Slot;
+  invalidBefore?: Cardano.Slot;
+  invalidHereafter?: Cardano.Slot;
   withdrawals?: Withdrawal[];
   certificates?: Certificate[];
   mint?: Cardano.TokenMap;

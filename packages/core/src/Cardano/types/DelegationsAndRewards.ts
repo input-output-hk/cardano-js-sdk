@@ -1,5 +1,4 @@
-import { PoolId } from './StakePool';
-import { Lovelace } from './Value';
+import { PoolId, Lovelace } from '.';
 
 /**
  * TODO: re-export Ogmios/DelegationsAndRewards type after it changes lovelaces to bigint;

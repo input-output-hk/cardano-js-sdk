@@ -1,8 +1,7 @@
-import { ProtocolParametersAlonzo } from '@cardano-ogmios/schema';
 import { Transaction, CSL, Cardano } from '..';
 
 export type ProtocolParametersRequiredByWallet = Pick<
-  ProtocolParametersAlonzo,
+  Cardano.ProtocolParametersAlonzo,
   | 'coinsPerUtxoWord'
   | 'maxTxSize'
   | 'maxValueSize'

@@ -1,3 +1,4 @@
+import { PoolId } from '.';
 /* eslint-disable max-len */
 /**
  * Schema from:
@@ -13,10 +14,6 @@
  * by using YYYYMMDDxx (xx each day start by 01 and is incremented on each update
  */
 export type SerialNumber = number;
-/**
- * the pools unique id in hex format
- */
-export type PoolID = string;
 /**
  * 3 letter country code as defined in https://www.iso.org/iso-3166-country-codes.html (alpha-3)
  */
@@ -114,7 +111,7 @@ export interface ITNVerification {
  * pool related metadata
  */
 export interface ExtendedStakePoolMetadataFields {
-  id: PoolID;
+  id: PoolId;
   country?: DeclaredPoolLocation;
   status?: PoolStatus;
   contact?: PoolContactData;

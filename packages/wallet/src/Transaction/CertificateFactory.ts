@@ -1,4 +1,3 @@
-import { ByName } from '@cardano-ogmios/schema';
 import { NotImplementedError, Cardano, CSL } from '@cardano-sdk/core';
 import { KeyManager } from '../KeyManagement';
 
@@ -26,7 +25,7 @@ type SingleHostAddrRelay = {
 
 type SingleHostNameRelay = {
   relayType: 'singlehost-name';
-} & ByName;
+} & Cardano.ByName;
 
 type Relay = MultiHostNameRelay | SingleHostAddrRelay | SingleHostNameRelay;
 

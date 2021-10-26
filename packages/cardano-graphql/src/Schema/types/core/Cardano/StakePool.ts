@@ -1,5 +1,4 @@
 /* eslint-disable no-use-before-define */
-import * as Ogmios from '@cardano-ogmios/schema';
 import { Cardano } from '@cardano-sdk/core';
 import { createUnionType, Directive, Field, Float, Int, ObjectType } from 'type-graphql';
 import { BigIntsAsStrings, coinDescription, percentageDescription } from '../../util';
@@ -59,7 +58,7 @@ export class StakePoolTransactions implements Cardano.StakePoolTransactions {
 }
 
 @ObjectType()
-export class StakePoolMetadataJson implements Ogmios.PoolMetadata {
+export class StakePoolMetadataJson implements Cardano.PoolMetadata {
   @Field()
   hash: string;
   @Field()
@@ -67,7 +66,7 @@ export class StakePoolMetadataJson implements Ogmios.PoolMetadata {
 }
 
 @ObjectType()
-export class RelayByName implements Ogmios.ByName {
+export class RelayByName implements Cardano.ByName {
   @Field()
   hostname: string;
   @Field(() => Int, { nullable: true })
@@ -75,13 +74,13 @@ export class RelayByName implements Ogmios.ByName {
 }
 
 @ObjectType()
-export class RelayByAddress implements Ogmios.ByAddress {
+export class RelayByAddress implements Cardano.ByAddress {
   @Field(() => String, { nullable: true })
-  ipv4: string | null;
+  ipv4?: string;
   @Field(() => String, { nullable: true })
-  ipv6: string | null;
+  ipv6?: string;
   @Field(() => Int, { nullable: true })
-  port: number | null;
+  port?: number;
 }
 
 const Relay = createUnionType({
@@ -138,7 +137,7 @@ export class StakePool implements BigIntsAsStrings<Cardano.StakePool> {
   @Field(() => StakePoolTransactions)
   transactions: Cardano.StakePoolTransactions;
   @Field(() => StakePoolMetadataJson, { nullable: true })
-  metadataJson?: Ogmios.PoolMetadata;
+  metadataJson?: Cardano.PoolMetadata;
   @Directive('@hasInverse(field: stakePool)')
   @Field(() => StakePoolMetadata, { nullable: true })
   metadata?: BigIntsAsStrings<Cardano.StakePoolMetadata>;

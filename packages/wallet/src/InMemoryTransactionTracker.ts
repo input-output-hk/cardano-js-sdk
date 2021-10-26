@@ -1,7 +1,6 @@
 import { TransactionTracker, TransactionTrackerEvents } from './types';
 import Emittery from 'emittery';
-import { Hash16, Slot, Tip } from '@cardano-ogmios/schema';
-import { WalletProvider, ProviderError, ProviderFailure, CSL } from '@cardano-sdk/core';
+import { WalletProvider, ProviderError, ProviderFailure, CSL, Cardano } from '@cardano-sdk/core';
 import { TransactionError, TransactionFailure } from './TransactionError';
 import { dummyLogger, Logger } from 'ts-log';
 import delay from 'delay';
@@ -51,7 +50,7 @@ export class InMemoryTransactionTracker extends Emittery<TransactionTrackerEvent
     return promise;
   }
 
-  async #checkTransactionViaProvider(hash: Hash16, invalidHereafter: Slot): Promise<void> {
+  async #checkTransactionViaProvider(hash: Cardano.Hash16, invalidHereafter: Cardano.Slot): Promise<void> {
     await delay(this.#pollInterval);
     try {
       const tx = await this.#provider.queryTransactionsByHashes([hash]);
@@ -66,7 +65,7 @@ export class InMemoryTransactionTracker extends Emittery<TransactionTrackerEvent
   }
 
   async #onTransactionNotFound(hash: string, invalidHereafter: number) {
-    let tip: Tip | undefined;
+    let tip: Cardano.Tip | undefined;
     try {
       tip = await this.#provider.ledgerTip();
     } catch (error: unknown) {

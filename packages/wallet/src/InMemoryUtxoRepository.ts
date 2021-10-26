@@ -135,7 +135,8 @@ export class InMemoryUtxoRepository extends Emittery<UtxoRepositoryEvents> imple
     const utxoLockedByTx: Cardano.Utxo[] = [];
     const inputs = transaction.body().inputs();
     for (let inputIdx = 0; inputIdx < inputs.len(); inputIdx++) {
-      const { txId, index } = cslToCore.txIn(inputs.get(inputIdx));
+      // don't need the address, not using it
+      const { txId, index } = cslToCore.txIn(inputs.get(inputIdx), '' as Cardano.Address);
       const utxo = this.allUtxos.find(([txIn]) => txIn.txId === txId && txIn.index === index)!;
       this.#lockedUtxoSet.add(utxo);
       utxoLockedByTx.push(utxo);
