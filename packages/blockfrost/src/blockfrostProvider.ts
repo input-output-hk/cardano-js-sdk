@@ -87,11 +87,15 @@ export const blockfrostProvider = (options: Options): WalletProvider => {
   };
 
   const stakePoolStats: WalletProvider['stakePoolStats'] = async () => {
-    const tallyPools = async (query: 'pools' | 'poolsRetired' | 'poolsRetiring', count = 0, page = 1) => {
+    const tallyPools = async (
+      query: 'pools' | 'poolsRetired' | 'poolsRetiring',
+      count = 0,
+      page = 1
+    ): Promise<number> => {
       const result = await blockfrost[query]({ page });
       const newCount = count + result.length;
       if (result.length === 100) {
-        await tallyPools(query, newCount, page + 1);
+        return tallyPools(query, newCount, page + 1);
       }
       return newCount;
     };

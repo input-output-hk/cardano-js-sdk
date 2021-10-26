@@ -6,6 +6,9 @@ import { Schema as Cardano } from '@cardano-ogmios/client';
 import { NetworkInfo, StakePoolStats, Transaction } from '@cardano-sdk/core';
 jest.mock('@blockfrost/blockfrost-js');
 
+const generatePoolsResponseMock = (qty: number) =>
+  [...Array.from({ length: qty }).keys()].map((num) => String(Math.random() * num)) as Responses['pool_list'];
+
 describe('blockfrostProvider', () => {
   const apiKey = 'someapikey';
 
@@ -65,39 +68,34 @@ describe('blockfrostProvider', () => {
   });
 
   test('stakePoolStats', async () => {
-    const mockedActivePoolsResponse = [
-      'pool1adur9jcn0dkjpm3v8ayf94yn3fe5xfk2rqfz7rfpuh6cw6evd7w',
-      'pool18kd2k7kqt9gje9y0azahww4dqak9azeeg8ayl0xl7dzewg70vlf',
-      'pool13dgxp4ph2ut5datuh5na4wy7hrnqgkj4fyvac3e8fzfqcc7qh0h',
-      'pool1wnf793xkgrw3s800tfdkkg3s3ddgxkucenahzs7490g4q0cpe0v',
-      'pool156gxlrk0e3phxadasa33yzk9e94wg7tv3au02jge8eanv9zc4ym',
-      'pool1znzwjv7cr7zjdnsncrg6jrtxwd3myys9p63sj3jajpnn22mwcy2',
-      'pool1qa22ym0t8w9fg0ejlp0duhzcy6a24uyfjsyx5jugrjw6wsfetyd'
-    ] as Responses['pool_list'];
+    // Simulate batch fetching
+    BlockFrostAPI.prototype.pools = jest
+      .fn()
+      .mockReturnValueOnce(generatePoolsResponseMock(100))
+      .mockReturnValueOnce(generatePoolsResponseMock(100))
+      .mockReturnValueOnce(generatePoolsResponseMock(100))
+      .mockReturnValueOnce(generatePoolsResponseMock(100))
+      .mockReturnValueOnce(generatePoolsResponseMock(89));
 
-    const mockedRetiredPoolsResponse = [
-      'pool1adur9jcn0dkjpm3v8ayf94yn3fe5xfk2rqfz7rfpuh6cw6evd7w',
-      'pool18kd2k7kqt9gje9y0azahww4dqak9azeeg8ayl0xl7dzewg70vlf',
-      'pool1qa22ym0t8w9fg0ejlp0duhzcy6a24uyfjsyx5jugrjw6wsfetyd'
-    ] as Responses['pool_list'];
+    BlockFrostAPI.prototype.poolsRetired = jest
+      .fn()
+      .mockReturnValueOnce(generatePoolsResponseMock(100))
+      .mockReturnValueOnce(generatePoolsResponseMock(100))
+      .mockReturnValueOnce(generatePoolsResponseMock(36));
 
-    const mockedRetiringPoolsResponse = [
-      'pool1adur9jcn0dkjpm3v8ayf94yn3fe5xfk2rqfz7rfpuh6cw6evd7w',
-      'pool13dgxp4ph2ut5datuh5na4wy7hrnqgkj4fyvac3e8fzfqcc7qh0h'
-    ] as Responses['pool_list'];
-
-    BlockFrostAPI.prototype.pools = jest.fn().mockResolvedValue(mockedActivePoolsResponse);
-    BlockFrostAPI.prototype.poolsRetired = jest.fn().mockResolvedValue(mockedRetiredPoolsResponse);
-    BlockFrostAPI.prototype.poolsRetiring = jest.fn().mockResolvedValue(mockedRetiringPoolsResponse);
+    BlockFrostAPI.prototype.poolsRetiring = jest
+      .fn()
+      .mockReturnValueOnce(generatePoolsResponseMock(100))
+      .mockReturnValueOnce(generatePoolsResponseMock(77));
 
     const client = blockfrostProvider({ projectId: apiKey, isTestnet: true });
     const response = await client.stakePoolStats!();
 
     expect(response).toMatchObject<StakePoolStats>({
       qty: {
-        active: 7,
-        retired: 3,
-        retiring: 2
+        active: 489,
+        retired: 236,
+        retiring: 177
       }
     });
   });
