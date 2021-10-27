@@ -147,38 +147,17 @@
 <span class="cline-any cline-yes">2409x</span>
 <span class="cline-any cline-yes">2409x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1127x</span>
+<span class="cline-any cline-yes">1112x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1127x</span>
+<span class="cline-any cline-yes">1112x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1245x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">776x</span>
-<span class="cline-any cline-yes">776x</span>
-<span class="cline-any cline-yes">776x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">776x</span>
-<span class="cline-any cline-yes">83x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">693x</span>
+<span class="cline-any cline-yes">1225x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -189,12 +168,33 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { cslUtil, CSL } from '@cardano-sdk/core';
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">753x</span>
+<span class="cline-any cline-yes">753x</span>
+<span class="cline-any cline-yes">753x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">753x</span>
+<span class="cline-any cline-yes">87x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">666x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { CSL, cslUtil } from '@cardano-sdk/core';
 import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
 import { InputSelectionParameters, InputSelector, SelectionResult } from '../types';
+import { assertIsBalanceSufficient, preprocessArgs, withValuesToValues } from './util';
 import { computeChangeAndAdjustForFee } from './change';
 import { roundRobinSelection } from './roundRobin';
-import { assertIsBalanceSufficient, preprocessArgs, withValuesToValues } from './util';
 &nbsp;
 export const roundRobinRandomImprove = (): InputSelector =&gt; ({
   select: async ({
@@ -216,42 +216,42 @@ export const roundRobinRandomImprove = (): InputSelector =&gt; ({
     const roundRobinSelectionResult = roundRobinSelection({
       implicitCoin,
       outputsWithValue,
-      utxosWithValue,
-      uniqueOutputAssetIDs
+      uniqueOutputAssetIDs,
+      utxosWithValue
     });
 &nbsp;
     const result = await computeChangeAndAdjustForFee({
       computeMinimumCoinQuantity,
-      tokenBundleSizeExceedsLimit,
-      outputValues,
-      uniqueOutputAssetIDs,
-      implicitCoin,
-      utxoSelection: roundRobinSelectionResult,
       estimateTxFee: (utxos, changeValues) =&gt;
         computeMinimumCost({
-          inputs: new Set(utxos),
           change: new Set(changeValues),
           fee: cslUtil.maxBigNum,
+          inputs: new Set(utxos),
           outputs
-        })
+        }),
+      implicitCoin,
+      outputValues,
+      tokenBundleSizeExceedsLimit,
+      uniqueOutputAssetIDs,
+      utxoSelection: roundRobinSelectionResult
     });
 &nbsp;
     const inputs = new Set(result.inputs);
     const change = new Set(result.change);
     const fee = CSL.BigNum.from_str(result.fee.toString());
 &nbsp;
-    if (result.inputs.length &gt; (await computeSelectionLimit({ inputs, change, fee, outputs }))) {
+    if (result.inputs.length &gt; (await computeSelectionLimit({ change, fee, inputs, outputs }))) {
       throw new InputSelectionError(InputSelectionFailure.MaximumInputCountExceeded);
     }
 &nbsp;
     return {
+      remainingUTxO: new Set(result.remainingUTxO),
       selection: {
         change,
+        fee,
         inputs,
-        outputs,
-        fee
-      },
-      remainingUTxO: new Set(result.remainingUTxO)
+        outputs
+      }
     };
   }
 });
@@ -262,7 +262,7 @@ export const roundRobinRandomImprove = (): InputSelector =&gt; ({
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Wed Oct 27 2021 12:46:17 GMT+0000 (Coordinated Universal Time)
+                at Wed Oct 27 2021 20:38:36 GMT+0000 (Coordinated Universal Time)
             </div>
         </div>
         <script src="../../prettify.js"></script>
