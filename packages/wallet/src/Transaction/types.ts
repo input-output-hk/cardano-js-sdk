@@ -1,4 +1,4 @@
-import { Transaction, CSL, Cardano } from '@cardano-sdk/core';
+import { CSL, Cardano } from '@cardano-sdk/core';
 import { Withdrawal } from './withdrawal';
 
 export type InitializeTxProps = {
@@ -6,6 +6,6 @@ export type InitializeTxProps = {
   certificates?: CSL.Certificate[];
   withdrawals?: Withdrawal[];
   options?: {
-    validityInterval?: Transaction.ValidityInterval;
+    validityInterval?: Cardano.ValidityInterval;
   };
 };

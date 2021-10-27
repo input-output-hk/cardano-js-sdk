@@ -1,4 +1,4 @@
-import { ImplicitCoin, SelectionConstraints, SelectionResult } from '@cardano-sdk/cip2';
+import { SelectionConstraints, SelectionResult } from '@cardano-sdk/cip2';
 import { Cardano, CSL } from '@cardano-sdk/core';
 import Emittery from 'emittery';
 
@@ -25,7 +25,7 @@ export type UtxoRepository = {
   selectInputs: (
     outputs: Set<CSL.TransactionOutput>,
     constraints: SelectionConstraints,
-    implicitCoin?: ImplicitCoin
+    implicitCoin?: Cardano.ImplicitCoin
   ) => Promise<SelectionResult>;
 } & UtxoRepositoryFields &
   Emittery<UtxoRepositoryEvents>;

@@ -267,7 +267,7 @@ export const cardanoGraphqlDbSyncProvider = (uri: string): WalletProvider => {
 
     const response = await client.request<TransactionsResponse, Variables>(query, { addresses });
 
-    return CardanoGraphqlToCore.transactions(response);
+    return CardanoGraphqlToCore.graphqlTransactionsToCardanoTxs(response);
   };
 
   const queryTransactionsByHashes: WalletProvider['queryTransactionsByHashes'] = async (hashes) => {
@@ -297,7 +297,7 @@ export const cardanoGraphqlDbSyncProvider = (uri: string): WalletProvider => {
 
     const response = await client.request<TransactionsResponse, Variables>(query, { hashes });
 
-    return CardanoGraphqlToCore.transactions(response);
+    return CardanoGraphqlToCore.graphqlTransactionsToCardanoTxs(response);
   };
 
   const currentWalletProtocolParameters: WalletProvider['currentWalletProtocolParameters'] = async () => {
@@ -335,18 +335,12 @@ export const cardanoGraphqlDbSyncProvider = (uri: string): WalletProvider => {
     return CardanoGraphqlToCore.currentWalletProtocolParameters(response.cardano.currentEpoch.protocolParams);
   };
 
-  // eslint-disable-next-line unicorn/consistent-function-scoping
-  const transactionDetails: WalletProvider['transactionDetails'] = async () => {
-    throw new ProviderError(ProviderFailure.NotImplemented);
-  };
-
   return {
     ledgerTip,
     networkInfo,
     stakePoolStats,
     submitTx,
     utxoDelegationAndRewards,
-    transactionDetails,
     queryTransactionsByAddresses,
     queryTransactionsByHashes,
     currentWalletProtocolParameters

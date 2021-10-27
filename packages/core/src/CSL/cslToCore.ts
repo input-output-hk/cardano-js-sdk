@@ -1,9 +1,8 @@
 import { CSL } from '.';
 import { Asset, Cardano } from '..';
 import { Transaction } from '@emurgo/cardano-serialization-lib-nodejs';
-import { Tx, TxDetails } from '../Transaction';
 
-export const tx = (_input: Transaction): Tx & { details: TxDetails } => {
+export const tx = (_input: Transaction): Cardano.TxAlonzo => {
   throw new Error('Not implemented');
 };
 

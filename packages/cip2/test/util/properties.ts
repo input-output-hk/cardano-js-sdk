@@ -1,5 +1,5 @@
 import { AssetId, SelectionConstraints } from '@cardano-sdk/util-dev';
-import { ImplicitCoin, SelectionResult } from '../../src/types';
+import { SelectionResult } from '../../src/types';
 import { cslUtil, Cardano, CSL, cslToCore } from '@cardano-sdk/core';
 import { InputSelectionError, InputSelectionFailure } from '../../src/InputSelectionError';
 import fc, { Arbitrary } from 'fast-check';
@@ -38,7 +38,7 @@ const inputSelectionTotals = ({
 }: {
   results: SelectionResult;
   outputs: Set<CSL.TransactionOutput>;
-  implicitCoin?: ImplicitCoin;
+  implicitCoin?: Cardano.ImplicitCoin;
 }) => {
   const vSelectedUtxo = totalUtxosValue(results);
   const vSelected = {
@@ -68,7 +68,7 @@ export const assertInputSelectionProperties = ({
   outputs: Set<CSL.TransactionOutput>;
   utxo: Set<CSL.TransactionUnspentOutput>;
   constraints: SelectionConstraints.MockSelectionConstraints;
-  implicitCoin?: ImplicitCoin;
+  implicitCoin?: Cardano.ImplicitCoin;
 }) => {
   const { vSelected, vRequested, vChange } = inputSelectionTotals({ results, outputs, implicitCoin });
 
@@ -113,7 +113,7 @@ export const assertFailureProperties = ({
   utxoAmounts: Cardano.Value[];
   outputsAmounts: Cardano.Value[];
   constraints: SelectionConstraints.MockSelectionConstraints;
-  implicitCoin?: ImplicitCoin;
+  implicitCoin?: Cardano.ImplicitCoin;
 }) => {
   const availableQuantities = Cardano.util.coalesceValueQuantities([
     ...utxoAmounts,
@@ -190,7 +190,7 @@ export const generateSelectionParams = (() => {
         );
       });
 
-  const generateImplicitCoin: Arbitrary<ImplicitCoin | undefined> = fc.oneof(
+  const generateImplicitCoin: Arbitrary<Cardano.ImplicitCoin | undefined> = fc.oneof(
     fc.constant(void 0),
     fc.record({
       deposit: fc.oneof(
@@ -219,7 +219,7 @@ export const generateSelectionParams = (() => {
     utxoAmounts: Cardano.Value[];
     outputsAmounts: Cardano.Value[];
     constraints: SelectionConstraints.MockSelectionConstraints;
-    implicitCoin?: ImplicitCoin;
+    implicitCoin?: Cardano.ImplicitCoin;
   }> =>
     generateImplicitCoin.chain((implicitCoin) =>
       fc.record({

@@ -1,6 +1,5 @@
 import { BigIntMath, Cardano, CSL, cslToCore } from '@cardano-sdk/core';
 import { uniq } from 'lodash-es';
-import { ImplicitCoin } from '../types';
 import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
 
 export interface WithValue {
@@ -40,7 +39,7 @@ const noImplicitCoin = {
 export const preprocessArgs = (
   availableUtxo: Set<CSL.TransactionUnspentOutput>,
   outputs: Set<CSL.TransactionOutput>,
-  partialImplicitCoin: ImplicitCoin = noImplicitCoin
+  partialImplicitCoin: Cardano.ImplicitCoin = noImplicitCoin
 ): RoundRobinRandomImproveArgs => {
   const utxosWithValue = [...availableUtxo].map((utxo) => ({
     utxo,

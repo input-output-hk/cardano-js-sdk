@@ -1,6 +1,6 @@
 import { WalletProvider, Cardano, cslUtil, CSL, coreToCsl, cslToCore } from '@cardano-sdk/core';
 import { dummyLogger, Logger } from 'ts-log';
-import { ImplicitCoin, InputSelector, SelectionConstraints, SelectionResult } from '@cardano-sdk/cip2';
+import { InputSelector, SelectionConstraints, SelectionResult } from '@cardano-sdk/cip2';
 import { KeyManager } from './KeyManagement';
 import {
   UtxoRepository,
@@ -82,7 +82,7 @@ export class InMemoryUtxoRepository extends Emittery<UtxoRepositoryEvents> imple
   public async selectInputs(
     outputs: Set<CSL.TransactionOutput>,
     constraints: SelectionConstraints,
-    implicitCoin?: ImplicitCoin
+    implicitCoin?: Cardano.ImplicitCoin
   ): Promise<SelectionResult> {
     if (this.#utxoSet.size === 0) {
       this.#logger.debug('Local UTxO set is empty. Syncing...');

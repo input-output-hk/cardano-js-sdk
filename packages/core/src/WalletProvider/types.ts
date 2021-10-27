@@ -1,4 +1,4 @@
-import { Transaction, CSL, Cardano } from '..';
+import { CSL, Cardano } from '..';
 
 export type ProtocolParametersRequiredByWallet = Pick<
   Cardano.ProtocolParametersAlonzo,
@@ -61,13 +61,12 @@ export interface WalletProvider {
     addresses: Cardano.Address[],
     stakeKeyHash: Cardano.Hash16
   ) => Promise<{ utxo: Cardano.Utxo[]; delegationAndRewards: Cardano.DelegationsAndRewards }>;
-  transactionDetails: (hash: Cardano.Hash16) => Promise<Transaction.TxDetails>;
   /**
    * TODO: add an optional 'since: Slot' argument for querying transactions and utxos.
    * When doing so we need to also consider how best we can use the volatile block range of the chain
    * to minimise over-fetching and assist the application in handling rollback scenarios.
    */
-  queryTransactionsByAddresses: (addresses: Cardano.Address[]) => Promise<Transaction.Tx[]>;
-  queryTransactionsByHashes: (hashes: Cardano.Hash16[]) => Promise<Transaction.Tx[]>;
+  queryTransactionsByAddresses: (addresses: Cardano.Address[]) => Promise<Cardano.TxAlonzo[]>;
+  queryTransactionsByHashes: (hashes: Cardano.Hash16[]) => Promise<Cardano.TxAlonzo[]>;
   currentWalletProtocolParameters: () => Promise<ProtocolParametersRequiredByWallet>;
 }

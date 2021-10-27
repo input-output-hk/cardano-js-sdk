@@ -66,20 +66,6 @@ export interface SelectionConstraints {
   computeSelectionLimit: ComputeSelectionLimit;
 }
 
-/**
- * Implicit coin quantities used in the transaction
- */
-export interface ImplicitCoin {
-  /**
-   * Delegation withdrawals + reclaims
-   */
-  input?: Cardano.Lovelace;
-  /**
-   * Delegation registration deposit
-   */
-  deposit?: Cardano.Lovelace;
-}
-
 export interface InputSelectionParameters {
   /**
    * The set of inputs available for selection.
@@ -96,7 +82,7 @@ export interface InputSelectionParameters {
   /**
    * Implicit coin quantities used in the transaction
    */
-  implicitCoin?: ImplicitCoin;
+  implicitCoin?: Cardano.ImplicitCoin;
 }
 
 export interface InputSelector {
@@ -113,6 +99,8 @@ export type ProtocolParametersForInputSelection = Pick<
   'coinsPerUtxoWord' | 'maxTxSize' | 'maxValueSize' | 'minFeeCoefficient' | 'minFeeConstant'
 >;
 
-export type ProtocolParametersRequiredByInputSelection = {
-  [k in keyof ProtocolParametersForInputSelection]: NonNullable<ProtocolParametersForInputSelection[k]>;
-};
+export type ProtocolParametersRequiredByInputSelection = Required<
+  {
+    [k in keyof ProtocolParametersForInputSelection]: ProtocolParametersForInputSelection[k];
+  }
+>;

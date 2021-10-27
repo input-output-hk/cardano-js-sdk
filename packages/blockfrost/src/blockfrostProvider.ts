@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { WalletProvider, ProviderError, ProviderFailure, Cardano, Transaction } from '@cardano-sdk/core';
+import { WalletProvider, ProviderError, ProviderFailure, Cardano } from '@cardano-sdk/core';
 import { BlockFrostAPI, Error as BlockfrostError, Responses } from '@blockfrost/blockfrost-js';
 import { Options } from '@blockfrost/blockfrost-js/lib/types';
 import { BlockfrostToCore } from './BlockfrostToCore';
@@ -126,10 +126,166 @@ export const blockfrostProvider = (options: Options, logger = dummyLogger): Wall
     return { utxo, delegationAndRewards };
   };
 
-  const queryTransactionsByHashes: WalletProvider['queryTransactionsByHashes'] = async (hashes) => {
-    const transactions = await Promise.all(hashes.map(async (hash) => blockfrost.txsUtxos(hash)));
-    return transactions.map(BlockfrostToCore.transaction);
+  const fetchRedeemers = async ({
+    redeemer_count,
+    hash
+  }: Responses['tx_content']): Promise<Cardano.Redeemer[] | undefined> => {
+    if (!redeemer_count) return;
+    const response = await blockfrost.txsRedeemers(hash);
+    return response.map(
+      ({ purpose, script_hash, unit_mem, unit_steps, tx_index }): Cardano.Redeemer => ({
+        index: tx_index,
+        executionUnits: {
+          memory: Number.parseInt(unit_mem),
+          steps: Number.parseInt(unit_steps)
+        },
+        purpose: ((): Cardano.Redeemer['purpose'] => {
+          switch (purpose) {
+            case 'cert':
+              return 'certificate';
+            case 'reward':
+              return 'withdrawal';
+            default:
+              return purpose;
+          }
+        })(),
+        // TODO: need to confirm that this is correct encoding
+        scriptHash: Buffer.from(script_hash, 'hex').toString('base64')
+      })
+    );
   };
+
+  const fetchWithdrawals = async ({
+    withdrawal_count,
+    hash
+  }: Responses['tx_content']): Promise<Cardano.Withdrawal[] | undefined> => {
+    if (!withdrawal_count) return;
+    const response = await blockfrost.txsWithdrawals(hash);
+    return response.map(
+      ({ address, amount }): Cardano.Withdrawal => ({
+        address,
+        quantity: BigInt(amount)
+      })
+    );
+  };
+
+  const fetchMint = async ({
+    asset_mint_or_burn_count,
+    hash
+  }: Responses['tx_content']): Promise<Cardano.TokenMap | undefined> => {
+    if (!asset_mint_or_burn_count) return;
+    logger.warn(`Skipped fetching asset mint/burn for tx "${hash}": not implemented for Blockfrost provider`);
+  };
+
+  const fetchPoolRetireCerts = async (hash: string): Promise<Cardano.PoolCertificate[]> => {
+    const response = await blockfrost.txsPoolRetires(hash);
+    return response.map(({ cert_index, pool_id, retiring_epoch }) => ({
+      epoch: retiring_epoch,
+      certIndex: cert_index,
+      poolId: pool_id,
+      type: Cardano.CertificateType.PoolRetirement
+    }));
+  };
+
+  const fetchPoolUpdateCerts = async (hash: string): Promise<Cardano.PoolCertificate[]> => {
+    const response = await blockfrost.txsPoolUpdates(hash);
+    return response.map(({ cert_index, pool_id, active_epoch }) => ({
+      epoch: active_epoch,
+      certIndex: cert_index,
+      poolId: pool_id,
+      type: Cardano.CertificateType.PoolRegistration
+    }));
+  };
+
+  const fetchMirCerts = async (hash: string): Promise<Cardano.MirCertificate[]> => {
+    const response = await blockfrost.txsMirs(hash);
+    return response.map(({ address, amount, cert_index, pot }) => ({
+      type: Cardano.CertificateType.MIR,
+      address,
+      quantity: BigInt(amount),
+      certIndex: cert_index,
+      pot
+    }));
+  };
+
+  const fetchStakeCerts = async (hash: string): Promise<Cardano.StakeAddressCertificate[]> => {
+    const response = await blockfrost.txsStakes(hash);
+    return response.map(({ address, cert_index, registration }) => ({
+      type: registration ? Cardano.CertificateType.StakeRegistration : Cardano.CertificateType.StakeDeregistration,
+      address,
+      certIndex: cert_index
+    }));
+  };
+
+  const fetchDelegationCerts = async (hash: string): Promise<Cardano.StakeDelegationCertificate[]> => {
+    const response = await blockfrost.txsDelegations(hash);
+    return response.map(({ cert_index, index, address, active_epoch, pool_id }) => ({
+      type: Cardano.CertificateType.StakeDelegation,
+      certIndex: cert_index,
+      delegationIndex: index,
+      address,
+      epoch: active_epoch,
+      poolId: pool_id
+    }));
+  };
+
+  const fetchCertificates = async ({
+    pool_retire_count,
+    pool_update_count,
+    mir_cert_count,
+    stake_cert_count,
+    delegation_count,
+    hash
+  }: Responses['tx_content']): Promise<Cardano.Certificate[] | undefined> => {
+    if (pool_retire_count + pool_update_count + mir_cert_count + stake_cert_count + delegation_count === 0) return;
+    return [
+      ...(pool_update_count ? await fetchPoolRetireCerts(hash) : []),
+      ...(pool_update_count ? await fetchPoolUpdateCerts(hash) : []),
+      ...(mir_cert_count ? await fetchMirCerts(hash) : []),
+      ...(stake_cert_count ? await fetchStakeCerts(hash) : []),
+      ...(delegation_count ? await fetchDelegationCerts(hash) : [])
+    ];
+  };
+
+  // eslint-disable-next-line unicorn/consistent-function-scoping
+  const parseValidityInterval = (num: string | null) => Number.parseInt(num || '') || undefined;
+  const fetchTransaction = async (hash: string): Promise<Cardano.TxAlonzo> => {
+    const { inputs, outputs } = BlockfrostToCore.transactionUtxos(await blockfrost.txsUtxos(hash));
+    const response = await blockfrost.txs(hash);
+    return {
+      id: hash,
+      blockHeader: {
+        slot: response.slot,
+        blockHeight: response.block_height,
+        blockHash: response.block
+      },
+      txSize: response.size,
+      implicitCoin: {
+        deposit: BigInt(response.deposit)
+        // TODO: use computeImplicitCoin to compute implicit input
+      },
+      body: {
+        index: response.index,
+        inputs,
+        outputs,
+        fee: BigInt(response.fees),
+        validityInterval: {
+          invalidBefore: parseValidityInterval(response.invalid_before),
+          invalidHereafter: parseValidityInterval(response.invalid_hereafter)
+        },
+        withdrawals: await fetchWithdrawals(response),
+        mint: await fetchMint(response),
+        certificates: await fetchCertificates(response)
+      },
+      witness: {
+        redeemers: await fetchRedeemers(response)
+      }
+      // TODO: fetch metadata; not sure we can get the metadata hash and scripts from Blockfrost
+    };
+  };
+
+  const queryTransactionsByHashes: WalletProvider['queryTransactionsByHashes'] = async (hashes) =>
+    Promise.all(hashes.map(fetchTransaction));
 
   const queryTransactionsByAddresses: WalletProvider['queryTransactionsByAddresses'] = async (addresses) => {
     const addressTransactions = await Promise.all(
@@ -153,152 +309,12 @@ export const blockfrostProvider = (options: Options, logger = dummyLogger): Wall
     return BlockfrostToCore.currentWalletProtocolParameters(response.data);
   };
 
-  const fetchRedeemers = async ({
-    redeemer_count,
-    hash
-  }: Responses['tx_content']): Promise<Transaction.Redeemer[] | undefined> => {
-    if (!redeemer_count) return;
-    const response = await blockfrost.txsRedeemers(hash);
-    return response.map(
-      ({ datum_hash, fee, purpose, script_hash, unit_mem, unit_steps, tx_index }): Transaction.Redeemer => ({
-        index: tx_index,
-        datumHash: datum_hash,
-        executionUnits: {
-          memory: Number.parseInt(unit_mem),
-          steps: Number.parseInt(unit_steps)
-        },
-        fee: BigInt(fee),
-        purpose,
-        scriptHash: script_hash
-      })
-    );
-  };
-
-  const fetchWithdrawals = async ({
-    withdrawal_count,
-    hash
-  }: Responses['tx_content']): Promise<Transaction.Withdrawal[] | undefined> => {
-    if (!withdrawal_count) return;
-    const response = await blockfrost.txsWithdrawals(hash);
-    return response.map(
-      ({ address, amount }): Transaction.Withdrawal => ({
-        address,
-        quantity: BigInt(amount)
-      })
-    );
-  };
-
-  const fetchMint = async ({
-    asset_mint_or_burn_count,
-    hash
-  }: Responses['tx_content']): Promise<Cardano.TokenMap | undefined> => {
-    if (!asset_mint_or_burn_count) return;
-    logger.warn(`Skipped fetching asset mint/burn for tx "${hash}": not implemented for Blockfrost provider`);
-  };
-
-  const fetchPoolRetireCerts = async (hash: string): Promise<Transaction.PoolCertificate[]> => {
-    const response = await blockfrost.txsPoolRetires(hash);
-    return response.map(({ cert_index, pool_id, retiring_epoch }) => ({
-      epoch: retiring_epoch,
-      certIndex: cert_index,
-      poolId: pool_id,
-      type: Transaction.CertificateType.PoolRetirement
-    }));
-  };
-
-  const fetchPoolUpdateCerts = async (hash: string): Promise<Transaction.PoolCertificate[]> => {
-    const response = await blockfrost.txsPoolUpdates(hash);
-    return response.map(({ cert_index, pool_id, active_epoch }) => ({
-      epoch: active_epoch,
-      certIndex: cert_index,
-      poolId: pool_id,
-      type: Transaction.CertificateType.PoolRegistration
-    }));
-  };
-
-  const fetchMirCerts = async (hash: string): Promise<Transaction.MirCertificate[]> => {
-    const response = await blockfrost.txsMirs(hash);
-    return response.map(({ address, amount, cert_index, pot }) => ({
-      type: Transaction.CertificateType.MIR,
-      address,
-      quantity: BigInt(amount),
-      certIndex: cert_index,
-      pot
-    }));
-  };
-
-  const fetchStakeCerts = async (hash: string): Promise<Transaction.StakeAddressCertificate[]> => {
-    const response = await blockfrost.txsStakes(hash);
-    return response.map(({ address, cert_index, registration }) => ({
-      type: registration
-        ? Transaction.CertificateType.StakeRegistration
-        : Transaction.CertificateType.StakeDeregistration,
-      address,
-      certIndex: cert_index
-    }));
-  };
-
-  const fetchDelegationCerts = async (hash: string): Promise<Transaction.StakeDelegationCertificate[]> => {
-    const response = await blockfrost.txsDelegations(hash);
-    return response.map(({ cert_index, index, address, active_epoch, pool_id }) => ({
-      type: Transaction.CertificateType.StakeDelegation,
-      certIndex: cert_index,
-      delegationIndex: index,
-      address,
-      epoch: active_epoch,
-      poolId: pool_id
-    }));
-  };
-
-  const fetchCertificates = async ({
-    pool_retire_count,
-    pool_update_count,
-    mir_cert_count,
-    stake_cert_count,
-    delegation_count,
-    hash
-  }: Responses['tx_content']): Promise<Transaction.Certificate[] | undefined> => {
-    if (pool_retire_count + pool_update_count + mir_cert_count + stake_cert_count + delegation_count === 0) return;
-    return [
-      ...(await fetchPoolRetireCerts(hash)),
-      ...(await fetchPoolUpdateCerts(hash)),
-      ...(await fetchMirCerts(hash)),
-      ...(await fetchStakeCerts(hash)),
-      ...(await fetchDelegationCerts(hash))
-    ];
-  };
-
-  // eslint-disable-next-line unicorn/consistent-function-scoping
-  const parseValidityInterval = (num: string | null) => Number.parseInt(num || '') || undefined;
-  const transactionDetails: WalletProvider['transactionDetails'] = async (hash) => {
-    const response = await blockfrost.txs(hash);
-    return {
-      block: {
-        slot: response.slot,
-        blockNo: response.block_height,
-        hash: response.block
-      },
-      index: response.index,
-      deposit: BigInt(response.deposit),
-      fee: BigInt(response.fees),
-      size: response.size,
-      validContract: response.valid_contract,
-      invalidBefore: parseValidityInterval(response.invalid_before),
-      invalidHereafter: parseValidityInterval(response.invalid_hereafter),
-      redeemers: await fetchRedeemers(response),
-      withdrawals: await fetchWithdrawals(response),
-      mint: await fetchMint(response),
-      certificates: await fetchCertificates(response)
-    };
-  };
-
   const providerFunctions: WalletProvider = {
     ledgerTip,
     networkInfo,
     stakePoolStats,
     submitTx,
     utxoDelegationAndRewards,
-    transactionDetails,
     queryTransactionsByAddresses,
     queryTransactionsByHashes,
     currentWalletProtocolParameters

@@ -1,4 +1,4 @@
-import { ProtocolParametersRequiredByWallet, Cardano, Transaction } from '@cardano-sdk/core';
+import { ProtocolParametersRequiredByWallet, Cardano, NotImplementedError } from '@cardano-sdk/core';
 import { Block } from '@cardano-graphql/client-ts';
 
 type GraphqlTransaction = {
@@ -58,12 +58,14 @@ export const CardanoGraphqlToCore = {
   txIn,
   txOut,
 
-  graphqlTransactionsToCardanoTxs: (transactions: GraphqlTransaction[]): Transaction.Tx[] =>
-    transactions.map((tx) => ({
-      inputs: tx.inputs.map(txIn),
-      outputs: tx.outputs.map(txOut),
-      hash: tx.hash
-    })),
+  graphqlTransactionsToCardanoTxs: (_transactions: TransactionsResponse): Cardano.TxAlonzo[] => {
+    // transactions.map((tx) => ({
+    //   inputs: tx.inputs.map(txIn),
+    //   outputs: tx.outputs.map(txOut),
+    //   hash: tx.hash
+    // })),
+    throw new NotImplementedError('Need to query more data to support this');
+  },
 
   currentWalletProtocolParameters: (
     params: GraphqlCurrentWalletProtocolParameters
@@ -80,12 +82,5 @@ export const CardanoGraphqlToCore = {
     blockNo: tip.number!,
     hash: tip.hash,
     slot: tip.slotNo!
-  }),
-
-  transactions: (response: TransactionsResponse) =>
-    response.transactions.map(({ hash, inputs, outputs }) => ({
-      hash,
-      inputs: inputs.map(txIn),
-      outputs: outputs.map(txOut)
-    }))
+  })
 };

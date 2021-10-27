@@ -1,5 +1,5 @@
 import { Responses } from '@blockfrost/blockfrost-js';
-import { Cardano, ProtocolParametersRequiredByWallet, Transaction } from '@cardano-sdk/core';
+import { Cardano, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
 
 type Unpacked<T> = T extends (infer U)[] ? U : T;
 type BlockfrostAddressUtxoContent = Responses['address_utxo_content'];
@@ -17,13 +17,12 @@ export const BlockfrostToCore = {
     ]) as Cardano.Utxo[],
   // without `as OgmiosSchema.Utxo` above TS thinks the return value is (OgmiosSchema.TxIn | OgmiosSchema.TxOut)[][]
 
-  transaction: (tx: Responses['tx_content_utxo']) => ({
-    inputs: tx.inputs.map((input) => ({
+  transactionUtxos: (utxoResponse: Responses['tx_content_utxo']) => ({
+    inputs: utxoResponse.inputs.map((input) => ({
       ...BlockfrostToCore.txIn(input),
       address: input.address
     })),
-    outputs: tx.outputs.map(BlockfrostToCore.txOut),
-    hash: tx.hash
+    outputs: utxoResponse.outputs.map(BlockfrostToCore.txOut)
   }),
   blockToTip: (block: Responses['block_content']): Cardano.Tip => ({
     blockNo: block.height!,
@@ -47,7 +46,7 @@ export const BlockfrostToCore = {
 
   outputs: (outputs: BlockfrostOutputs): Cardano.TxOut[] => outputs.map((output) => BlockfrostToCore.txOut(output)),
 
-  txContentUtxo: (blockfrost: Responses['tx_content_utxo']): Transaction.Tx => ({
+  txContentUtxo: (blockfrost: Responses['tx_content_utxo']) => ({
     inputs: BlockfrostToCore.inputs(blockfrost.inputs),
     outputs: BlockfrostToCore.outputs(blockfrost.outputs),
     hash: blockfrost.hash
@@ -85,7 +84,7 @@ export const BlockfrostToCore = {
     minPoolCost: Number(blockfrost.min_pool_cost),
     coinsPerUtxoWord: Number(blockfrost.coins_per_utxo_word),
     maxValueSize: Number(blockfrost.max_val_size),
-    maxCollateralInputs: blockfrost.max_collateral_inputs,
+    maxCollateralInputs: blockfrost.max_collateral_inputs || undefined,
     protocolVersion: { major: blockfrost.protocol_major_ver, minor: blockfrost.protocol_minor_ver }
   })
 };

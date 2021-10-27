@@ -1,4 +1,4 @@
-import { WalletProvider, Transaction, ProviderError, CSL, coreToCsl, Cardano } from '@cardano-sdk/core';
+import { WalletProvider, ProviderError, CSL, coreToCsl, Cardano } from '@cardano-sdk/core';
 import { UtxoRepository } from './types';
 import { dummyLogger, Logger } from 'ts-log';
 import { defaultSelectionConstraints } from '@cardano-sdk/cip2';
@@ -41,8 +41,8 @@ export interface SingleAddressWalletProps {
 
 const ensureValidityInterval = (
   currentSlot: number,
-  validityInterval?: Transaction.ValidityInterval
-): Transaction.ValidityInterval =>
+  validityInterval?: Cardano.ValidityInterval
+): Cardano.ValidityInterval =>
   // Todo: Based this on slot duration, to equal 2hrs
   ({ invalidHereafter: currentSlot + 3600, ...validityInterval });
 

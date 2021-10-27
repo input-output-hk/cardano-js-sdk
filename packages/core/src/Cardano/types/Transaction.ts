@@ -1,17 +1,8 @@
-import { Cardano } from '..';
+import * as Cardano from '.';
+import { BlockAlonzo, BlockBodyAlonzo } from '@cardano-ogmios/schema';
 
-export interface ValidityInterval {
-  invalidBefore?: Cardano.Slot;
-  invalidHereafter?: Cardano.Slot;
-}
-
-export interface Tx {
-  inputs: Cardano.TxIn[];
-  outputs: Cardano.TxOut[];
-  hash: Cardano.Hash16;
-}
-
-export type Block = Cardano.Tip;
+type OgmiosHeader = NonNullable<BlockAlonzo['header']>;
+export type PartialBlockHeader = Pick<OgmiosHeader, 'blockHeight' | 'slot' | 'blockHash'>;
 
 export interface Withdrawal {
   address: Cardano.Address;
@@ -26,15 +17,6 @@ export enum CertificateType {
   StakeDelegation = 'StakeDelegation',
   MIR = 'MoveInstantaneousRewards',
   GenesisKeyDelegation = 'GenesisKeyDelegation'
-}
-
-export interface Redeemer {
-  index: number;
-  purpose: 'spend' | 'mint' | 'cert' | 'reward';
-  scriptHash: Cardano.Hash16;
-  datumHash: Cardano.Hash16;
-  executionUnits: Cardano.ExUnits;
-  fee: Cardano.Lovelace;
 }
 
 export interface StakeAddressCertificate {
@@ -82,29 +64,60 @@ export type Certificate =
   | MirCertificate
   | GenesisKeyDelegationCertificate;
 
-export interface TxDetails {
-  block: Block;
+export interface TxBodyAlonzo {
   index: number;
+  inputs: Cardano.TxIn[];
+  collaterals?: Cardano.TxIn[];
+  outputs: Cardano.TxOut[];
   fee: Cardano.Lovelace;
-  deposit: Cardano.Lovelace;
-  size: number;
-  invalidBefore?: Cardano.Slot;
-  invalidHereafter?: Cardano.Slot;
+  validityInterval: Cardano.ValidityInterval;
   withdrawals?: Withdrawal[];
   certificates?: Certificate[];
   mint?: Cardano.TokenMap;
-  redeemers?: Redeemer[];
-  validContract?: boolean;
+  scriptIntegrityHash?: Cardano.Hash16;
+  requiredExtraSignatures?: Cardano.Hash16[];
 }
 
-// TODO: consider consolidating all core types from Cardano/ Core/ Ogmios/types, maybe under Cardano?
+/**
+ * Implicit coin quantities used in the transaction
+ */
+export interface ImplicitCoin {
+  /**
+   * Reward withdrawals + deposit reclaims
+   */
+  input?: Cardano.Lovelace;
+  /**
+   * Delegation registration deposit
+   */
+  deposit?: Cardano.Lovelace;
+}
+
+export interface Redeemer {
+  index: number;
+  purpose: 'spend' | 'mint' | 'certificate' | 'withdrawal';
+  scriptHash: Cardano.Hash64;
+  executionUnits: Cardano.ExUnits;
+}
+
+export type Witness = Omit<Partial<BlockBodyAlonzo['witness']>, 'redeemers'> & {
+  redeemers?: Redeemer[];
+};
+export interface TxAlonzo {
+  id: Cardano.Hash16;
+  blockHeader: PartialBlockHeader;
+  body: TxBodyAlonzo;
+  implicitCoin: ImplicitCoin;
+  txSize: number;
+  witness: Witness;
+  metadata?: Cardano.AuxiliaryData;
+}
 
 export enum TransactionStatus {
   Pending = 'pending',
   Confirmed = 'confirmed'
 }
 
-export interface DetailedTransaction extends Tx {
-  details: TxDetails;
+export interface SubmittedTransaction {
+  tx: TxAlonzo;
   status: TransactionStatus;
 }
