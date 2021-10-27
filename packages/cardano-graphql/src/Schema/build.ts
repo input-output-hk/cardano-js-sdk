@@ -1,6 +1,6 @@
-import { GraphQLSchema } from 'graphql';
-import { Field, ObjectType, Query, Resolver, buildSchema } from 'type-graphql';
 import * as types from './types';
+import { Field, ObjectType, Query, Resolver, buildSchema } from 'type-graphql';
+import { GraphQLSchema } from 'graphql';
 
 @ObjectType()
 class Nothing {
@@ -17,8 +17,8 @@ export class NothingResolver {
 
 export const build = async (): Promise<GraphQLSchema> => {
   const schema = await buildSchema({
-    resolvers: [NothingResolver],
-    orphanedTypes: Object.values(types)
+    orphanedTypes: Object.values(types),
+    resolvers: [NothingResolver]
   });
   const config = schema.toConfig();
   config.types = config.types.filter(({ name }) => !['Query', 'Nothing'].includes(name));

@@ -19,7 +19,8 @@
     "cleanup": "shx rm -rf dist node_modules",
     "coverage": "yarn test --coverage",
     "lint": "eslint --ignore-path ../../.eslintignore \"**/*.ts\"",
-    "prepack": "yarn build",
+    "lint:fix": "eslint --fix --ignore-path ../../.eslintignore \"**/*.ts\"",
+    "prepack": "yarn build",  
     "test": "jest -c ./jest.config.js",
     "test:debug": "DEBUG=true yarn test"
   },

@@ -1,12 +1,12 @@
 import { BigIntMath } from '@cardano-sdk/core';
 import {
-  assetWithValueQuantitySelector,
-  getWithValuesCoinQuantity,
+  ImplicitCoinBigint,
   OutputWithValue,
+  RoundRobinRandomImproveArgs,
   UtxoSelection,
   UtxoWithValue,
-  RoundRobinRandomImproveArgs,
-  ImplicitCoinBigint
+  assetWithValueQuantitySelector,
+  getWithValuesCoinQuantity
 } from './util';
 
 const improvesSelection = (
@@ -43,16 +43,16 @@ const listTokensWithin = (
   ...uniqueOutputAssetIDs.map((id) => {
     const getQuantity = assetWithValueQuantitySelector(id);
     return {
+      filterUtxo: (utxo: UtxoWithValue[]) => utxo.filter(({ value: { assets } }) => assets?.[id]),
       getTotalSelectedQuantity: (utxo: UtxoWithValue[]) => getQuantity(utxo),
-      minimumTarget: getQuantity(outputs),
-      filterUtxo: (utxo: UtxoWithValue[]) => utxo.filter(({ value: { assets } }) => assets?.[id])
+      minimumTarget: getQuantity(outputs)
     };
   }),
   {
+    filterUtxo: (utxo: UtxoWithValue[]) => utxo,
     // Lovelace
     getTotalSelectedQuantity: (utxo: UtxoWithValue[]) => getWithValuesCoinQuantity(utxo) + implicitCoin.input,
-    minimumTarget: getWithValuesCoinQuantity(outputs) + implicitCoin.deposit,
-    filterUtxo: (utxo: UtxoWithValue[]) => utxo
+    minimumTarget: getWithValuesCoinQuantity(outputs) + implicitCoin.deposit
   }
 ];
 
@@ -105,5 +105,5 @@ export const roundRobinSelection = ({
       }
     }
   }
-  return { utxoSelected, utxoRemaining };
+  return { utxoRemaining, utxoSelected };
 };

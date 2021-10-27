@@ -14,25 +14,25 @@ describe('Cardano', () => {
         const TSLA_Asset = 'b32_1vk0jj9lmv0cjkvmxw337u467atqcgkauwd4eczaugzagyghp25lTSLA';
         const PXL_Asset = 'b32_1rmy9mnhz0ukepmqlng0yee62ve7un05trpzxxg3lnjtqzp4dmmrPXL';
         const q1: Cardano.Value = {
-          coins: 50n,
           assets: {
-            [TSLA_Asset]: 50n,
-            [PXL_Asset]: 100n
-          }
+            [PXL_Asset]: 100n,
+            [TSLA_Asset]: 50n
+          },
+          coins: 50n
         };
         const q2: Cardano.Value = { coins: 100n };
         const q3: Cardano.Value = {
-          coins: 20n,
           assets: {
             [TSLA_Asset]: 20n
-          }
+          },
+          coins: 20n
         };
         expect(Cardano.util.coalesceValueQuantities([q1, q2, q3])).toEqual({
-          coins: 170n,
           assets: {
-            [TSLA_Asset]: 70n,
-            [PXL_Asset]: 100n
-          }
+            [PXL_Asset]: 100n,
+            [TSLA_Asset]: 70n
+          },
+          coins: 170n
         });
       });
     });

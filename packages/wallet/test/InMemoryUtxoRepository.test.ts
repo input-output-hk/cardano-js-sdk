@@ -1,17 +1,6 @@
 /* eslint-disable unicorn/consistent-function-scoping */
 /* eslint-disable promise/param-names */
-import { roundRobinRandomImprove, InputSelector } from '@cardano-sdk/cip2';
-import { Cardano, CSL, coreToCsl } from '@cardano-sdk/core';
-import { flushPromises, SelectionConstraints } from '@cardano-sdk/util-dev';
-import {
-  providerStub,
-  delegate,
-  rewards,
-  ProviderStub,
-  utxo,
-  delegationAndRewards,
-  MockTransactionTracker
-} from './mocks';
+import { CSL, Cardano, coreToCsl } from '@cardano-sdk/core';
 import {
   InMemoryUtxoRepository,
   KeyManagement,
@@ -20,6 +9,17 @@ import {
   UtxoRepositoryEvent,
   UtxoRepositoryFields
 } from '../src';
+import { InputSelector, roundRobinRandomImprove } from '@cardano-sdk/cip2';
+import {
+  MockTransactionTracker,
+  ProviderStub,
+  delegate,
+  delegationAndRewards,
+  providerStub,
+  rewards,
+  utxo
+} from './mocks';
+import { SelectionConstraints, flushPromises } from '@cardano-sdk/util-dev';
 import { TransactionError, TransactionFailure } from '../src/TransactionError';
 
 const addresses = [
@@ -54,9 +54,9 @@ describe('InMemoryUtxoRepository', () => {
     ]);
     txTracker = new MockTransactionTracker();
     utxoRepository = new InMemoryUtxoRepository({
-      provider,
-      keyManager,
       inputSelector,
+      keyManager,
+      provider,
       txTracker
     });
   });
@@ -72,10 +72,10 @@ describe('InMemoryUtxoRepository', () => {
     utxoRepository.on(UtxoRepositoryEvent.Changed, syncedHandler);
     await utxoRepository.sync();
     const expectedFields: UtxoRepositoryFields = {
-      allUtxos: utxo,
-      availableUtxos: utxo,
       allRewards: rewards,
+      allUtxos: utxo,
       availableRewards: rewards,
+      availableUtxos: utxo,
       delegation: delegate
     };
     expect(utxoRepository).toMatchObject(expectedFields);
@@ -83,8 +83,8 @@ describe('InMemoryUtxoRepository', () => {
     expect(syncedHandler).toBeCalledWith(expectedFields);
     const identicalUtxo = [{ ...utxo[1][0] }, { ...utxo[1][1] }] as const; // clone UTxO
     provider.utxoDelegationAndRewards.mockResolvedValueOnce({
-      utxo: [utxo[0], identicalUtxo],
-      delegationAndRewards
+      delegationAndRewards,
+      utxo: [utxo[0], identicalUtxo]
     });
     await utxoRepository.sync();
     expect(utxoRepository.allUtxos.length).toBe(2);
@@ -119,18 +119,18 @@ describe('InMemoryUtxoRepository', () => {
       const syncedHandler = jest.fn();
       utxoRepository.on(UtxoRepositoryEvent.Changed, syncedHandler);
       await txTracker.emit(TransactionTrackerEvent.NewTransaction, {
-        transaction,
-        confirmed
+        confirmed,
+        transaction
       });
       // transaction not yet confirmed
       expect(utxoRepository.availableUtxos).toHaveLength(utxoRepository.allUtxos.length - 1);
       expect(utxoRepository.availableUtxos).not.toContain(transactionUtxo);
       expect(syncedHandler).toBeCalledTimes(1);
       expect(syncedHandler).toBeCalledWith({
-        allUtxos: utxo,
-        availableUtxos: utxo.slice(1),
         allRewards: rewards,
+        allUtxos: utxo,
         availableRewards: rewards - transactionWithdrawal,
+        availableUtxos: utxo.slice(1),
         delegation: delegate
       } as UtxoRepositoryFields);
     };
@@ -145,20 +145,20 @@ describe('InMemoryUtxoRepository', () => {
       transaction = {
         body: () => ({
           inputs: () => ({
-            len: () => 1,
-            get: () => coreToCsl.txIn(transactionUtxo[0])
+            get: () => coreToCsl.txIn(transactionUtxo[0]),
+            len: () => 1
           }),
           withdrawals: () => ({
+            get: () => CSL.BigNum.from_str(transactionWithdrawal.toString()),
             keys: () => ({
-              len: () => 1,
               get: () =>
                 CSL.RewardAddress.new(
                   Cardano.NetworkId.testnet,
                   CSL.StakeCredential.from_keyhash(keyManager.stakeKey.hash())
-                )
+                ),
+              len: () => 1
             }),
-            len: () => 1,
-            get: () => CSL.BigNum.from_str(transactionWithdrawal.toString())
+            len: () => 1
           })
         })
       } as unknown as CSL.Transaction;
@@ -180,11 +180,11 @@ describe('InMemoryUtxoRepository', () => {
         // Simulate spent utxo and rewards
         expect(provider.utxoDelegationAndRewards).toBeCalledTimes(1);
         provider.utxoDelegationAndRewards.mockResolvedValueOnce({
-          utxo: utxo.slice(1),
           delegationAndRewards: {
             ...delegationAndRewards,
             rewards: rewards - transactionWithdrawal
-          }
+          },
+          utxo: utxo.slice(1)
         });
       });
 

@@ -1,13 +1,13 @@
-import { WalletProvider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
-import { gql, GraphQLClient } from 'graphql-request';
-import { TransactionSubmitResponse } from '@cardano-graphql/client-ts';
 import { Buffer } from 'buffer';
 import {
+  CardanoGraphQlTip,
   CardanoGraphqlToCore,
   GraphqlCurrentWalletProtocolParameters,
-  CardanoGraphQlTip,
   TransactionsResponse
 } from './CardanoGraphqlToCore';
+import { GraphQLClient, gql } from 'graphql-request';
+import { ProviderError, ProviderFailure, WalletProvider } from '@cardano-sdk/core';
+import { TransactionSubmitResponse } from '@cardano-graphql/client-ts';
 
 /**
  * Connect to a [cardano-graphql (cardano-db-sync) service](https://github.com/input-output-hk/cardano-graphql)
@@ -336,13 +336,13 @@ export const cardanoGraphqlDbSyncProvider = (uri: string): WalletProvider => {
   };
 
   return {
+    currentWalletProtocolParameters,
     ledgerTip,
     networkInfo,
-    stakePoolStats,
-    submitTx,
-    utxoDelegationAndRewards,
     queryTransactionsByAddresses,
     queryTransactionsByHashes,
-    currentWalletProtocolParameters
+    stakePoolStats,
+    submitTx,
+    utxoDelegationAndRewards
   };
 };

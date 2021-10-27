@@ -1,11 +1,11 @@
-import { ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
-import { testKeyManager } from '../mocks';
-import { Transaction } from '../../src';
 import { InitializeTxProps } from '../../src/Transaction';
+import { ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
+import { Transaction } from '../../src';
+import { testKeyManager } from '../mocks';
 
 describe('Transaction.computeImplicitCoin', () => {
   it('sums registrations for deposit, withdrawals and deregistrations for input', async () => {
-    const protocolParameters = { stakeKeyDeposit: 2, poolDeposit: 3 } as ProtocolParametersRequiredByWallet;
+    const protocolParameters = { poolDeposit: 3, stakeKeyDeposit: 2 } as ProtocolParametersRequiredByWallet;
     const keyManager = testKeyManager();
     const certs = new Transaction.CertificateFactory(keyManager);
     const certificates = [

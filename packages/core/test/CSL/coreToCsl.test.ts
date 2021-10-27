@@ -1,20 +1,20 @@
 import { Asset, CSL, Cardano, coreToCsl } from '../../src';
 
 const txIn: Cardano.TxIn = {
-  txId: '0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5',
-  index: 0,
   address:
-    'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
+    'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp',
+  index: 0,
+  txId: '0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5'
 };
 const txOut: Cardano.TxOut = {
   address:
     'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp',
   value: {
-    coins: 10n,
     assets: {
       '2a286ad895d091f2b3d168a6091ad2627d30a72761a5bc36eef00740': 20n,
       '659f2917fb63f12b33667463ee575eeac1845bbc736b9c0bbc40ba8254534c41': 50n
-    }
+    },
+    coins: 10n
   }
 };
 

@@ -1,6 +1,6 @@
-import { testKeyManager } from '../mocks';
 import { CertificateFactory } from '../../src/Transaction';
 import { KeyManager } from '../../src/KeyManagement';
+import { testKeyManager } from '../mocks';
 
 describe('Transaction.CertificateFactory', () => {
   let stakeKey: string;
@@ -41,22 +41,22 @@ describe('Transaction.CertificateFactory', () => {
     const params = certs
       .poolRegistration({
         cost: 1000n,
-        pledge: 10_000n,
         margin: { denominator: 5, numerator: 1 },
         owners: [owner],
+        pledge: 10_000n,
         poolKeyHash: stakeKey,
+        poolMetadata,
         relays: [
-          { relayType: 'singlehost-name', hostname: 'example.com', port: 5000 },
+          { hostname: 'example.com', port: 5000, relayType: 'singlehost-name' },
           {
-            relayType: 'singlehost-addr',
+            ipv4: '127.0.0.1',
             port: 6000,
-            ipv4: '127.0.0.1'
+            relayType: 'singlehost-addr'
           },
-          { relayType: 'multihost-name', dnsName: 'example.com' }
+          { dnsName: 'example.com', relayType: 'multihost-name' }
         ],
-        vrfKeyHash,
         rewardAddress,
-        poolMetadata
+        vrfKeyHash
       })
       .as_pool_registration()!
       .pool_params();

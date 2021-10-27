@@ -9,7 +9,7 @@ module.exports = {
       "plugin:@typescript-eslint/recommended",
       "plugin:jsdoc/recommended"
   ],
-  "plugins": ["jsdoc"],
+  "plugins": ["jsdoc", "sort-keys-fix", "sort-imports-es6-autofix"],
   "settings": {
     "import/resolver": {
       "typescript": {}
@@ -27,6 +27,9 @@ module.exports = {
     "no-unused-expressions": 0,
     "no-useless-constructor": 0,
     "quotes": ["error", "single", { "avoidEscape": true }],
+    "sort-keys-fix/sort-keys-fix": ["warn", "asc", {"natural": true}],
+    "sort-imports-es6-autofix/sort-imports-es6": "warn",
+    "sort-imports": ["warn", {ignoreDeclarationSort: true}],
     "unicorn/filename-case": 0,
     "unicorn/prevent-abbreviations": 0,
     "unicorn/no-null": 0,

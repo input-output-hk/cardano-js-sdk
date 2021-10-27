@@ -1,7 +1,7 @@
 /* eslint-disable no-use-before-define */
-import { Cardano } from '@cardano-sdk/core';
-import { createUnionType, Directive, Field, Float, Int, ObjectType } from 'type-graphql';
 import { BigIntsAsStrings, coinDescription, percentageDescription } from '../../util';
+import { Cardano } from '@cardano-sdk/core';
+import { Directive, Field, Float, Int, ObjectType, createUnionType } from 'type-graphql';
 import { ExtendedStakePoolMetadataFields } from './ExtendedStakePoolMetadataFields';
 
 //  This is not in ./ExtendedStakePoolMetadata to avoid circular import
@@ -84,9 +84,11 @@ export class RelayByAddress implements Cardano.ByAddress {
 }
 
 const Relay = createUnionType({
-  name: 'SearchResult', // the name of the GraphQL union
-  types: () => [RelayByName, RelayByAddress] as const, // function that returns tuple of object types classes,
-  resolveType: (value) => ('hostname' in value ? RelayByName : RelayByAddress)
+  name: 'SearchResult',
+  // function that returns tuple of object types classes,
+  resolveType: (value) => ('hostname' in value ? RelayByName : RelayByAddress),
+  // the name of the GraphQL union
+  types: () => [RelayByName, RelayByAddress] as const
 });
 
 @ObjectType()

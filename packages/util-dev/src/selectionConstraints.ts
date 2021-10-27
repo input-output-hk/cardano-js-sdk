@@ -9,8 +9,8 @@ export interface MockSelectionConstraints {
 }
 
 export const MOCK_NO_CONSTRAINTS: MockSelectionConstraints = {
-  minimumCoinQuantity: 0n,
   maxTokenBundleSize: Number.POSITIVE_INFINITY,
+  minimumCoinQuantity: 0n,
   minimumCost: 0n,
   selectionLimit: Number.POSITIVE_INFINITY
 };

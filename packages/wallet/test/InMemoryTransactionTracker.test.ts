@@ -1,8 +1,8 @@
-import { ProviderError, ProviderFailure, CSL } from '@cardano-sdk/core';
+import { CSL, ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { InMemoryTransactionTracker, TransactionFailure, TransactionTrackerEvent } from '../src';
+import { ProviderStub, ledgerTip, providerStub, queryTransactionsResult } from './mocks';
 import { dummyLogger } from 'ts-log';
-import { ledgerTip, providerStub, ProviderStub, queryTransactionsResult } from './mocks';
 import mockDelay from 'delay';
-import { TransactionTrackerEvent, InMemoryTransactionTracker, TransactionFailure } from '../src';
 
 jest.mock('delay', () => jest.fn().mockResolvedValue(void 0));
 // eslint-disable-next-line sonarjs/no-duplicate-string
@@ -30,9 +30,9 @@ describe('InMemoryTransactionTracker', () => {
     provider.queryTransactionsByHashes.mockReturnValue([queryTransactionsResult[0]]);
     mockHashTransactionReturn('some-hash');
     txTracker = new InMemoryTransactionTracker({
-      provider,
       logger: dummyLogger,
-      pollInterval: POLL_INTERVAL
+      pollInterval: POLL_INTERVAL,
+      provider
     });
     ledgerTipSlot = ledgerTip.slot;
     (mockDelay as unknown as jest.Mock).mockReset();

@@ -19,11 +19,11 @@ console.log(chalk.blue('Cardano Golden Test Generator'));
 
 const createProgressBar = (lastblockHeight: number) =>
   new SingleBar({
+    barCompleteChar: '\u2588',
+    barIncompleteChar: '\u2591',
     format: `Syncing from genesis to block ${lastblockHeight} | ${chalk.blue(
       '{bar}'
     )} | {percentage}% || {value}/{total} Blocks`,
-    barCompleteChar: '\u2588',
-    barIncompleteChar: '\u2591',
     hideCursor: true,
     renderThrottle: 300
   } as Options);

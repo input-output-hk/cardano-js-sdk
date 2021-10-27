@@ -1,5 +1,5 @@
-import { ProtocolParametersRequiredByWallet, Cardano, NotImplementedError } from '@cardano-sdk/core';
 import { Block } from '@cardano-graphql/client-ts';
+import { Cardano, NotImplementedError, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
 
 type GraphqlTransaction = {
   hash: Cardano.Hash16;
@@ -43,21 +43,28 @@ export type TransactionsResponse = {
 };
 
 const txIn = ({ sourceTxIndex, txHash, address }: GraphqlTransaction['inputs'][0]): Cardano.TxIn => ({
-  txId: txHash,
+  address,
   index: sourceTxIndex,
-  address
+  txId: txHash
 });
 
 const txOut = ({ address, tokens, value }: GraphqlTransaction['outputs'][0]) => {
   const assets: Cardano.Value['assets'] = {};
   for (const token of tokens) assets[token.asset.assetId] = BigInt(token.quantity);
-  return { address, value: { coins: BigInt(value), assets } };
+  return { address, value: { assets, coins: BigInt(value) } };
 };
 
 export const CardanoGraphqlToCore = {
-  txIn,
-  txOut,
-
+  currentWalletProtocolParameters: (
+    params: GraphqlCurrentWalletProtocolParameters
+  ): ProtocolParametersRequiredByWallet => ({
+    ...params,
+    maxTxSize: params.maxTxSize,
+    maxValueSize: Number(params.maxValSize),
+    minFeeCoefficient: params.minFeeA,
+    minFeeConstant: params.minFeeB,
+    stakeKeyDeposit: params.keyDeposit
+  }),
   graphqlTransactionsToCardanoTxs: (_transactions: TransactionsResponse): Cardano.TxAlonzo[] => {
     // transactions.map((tx) => ({
     //   inputs: tx.inputs.map(txIn),
@@ -67,20 +74,13 @@ export const CardanoGraphqlToCore = {
     throw new NotImplementedError('Need to query more data to support this');
   },
 
-  currentWalletProtocolParameters: (
-    params: GraphqlCurrentWalletProtocolParameters
-  ): ProtocolParametersRequiredByWallet => ({
-    ...params,
-    maxValueSize: Number(params.maxValSize),
-    stakeKeyDeposit: params.keyDeposit,
-    maxTxSize: params.maxTxSize,
-    minFeeCoefficient: params.minFeeA,
-    minFeeConstant: params.minFeeB
-  }),
-
   tip: (tip: CardanoGraphQlTip): Cardano.Tip => ({
     blockNo: tip.number!,
     hash: tip.hash,
     slot: tip.slotNo!
-  })
+  }),
+
+  txIn,
+
+  txOut
 };

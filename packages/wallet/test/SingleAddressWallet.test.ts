@@ -1,16 +1,16 @@
 /* eslint-disable max-len */
-import { Cardano, CSL } from '@cardano-sdk/core';
-import { InputSelector, roundRobinRandomImprove } from '@cardano-sdk/cip2';
-import { ProviderStub, providerStub, txTracker } from './mocks';
 import {
   BalanceTracker,
-  createSingleAddressWallet,
   InMemoryUtxoRepository,
   KeyManagement,
   SingleAddressWallet,
   SingleAddressWalletDependencies,
-  UtxoRepository
+  UtxoRepository,
+  createSingleAddressWallet
 } from '../src';
+import { CSL, Cardano } from '@cardano-sdk/core';
+import { InputSelector, roundRobinRandomImprove } from '@cardano-sdk/cip2';
+import { ProviderStub, providerStub, txTracker } from './mocks';
 
 describe('Wallet', () => {
   const name = 'Test Wallet';
@@ -28,8 +28,8 @@ describe('Wallet', () => {
     });
     provider = providerStub();
     inputSelector = roundRobinRandomImprove();
-    utxoRepository = new InMemoryUtxoRepository({ provider, keyManager, inputSelector, txTracker });
-    walletDependencies = { keyManager, provider, utxoRepository, txTracker };
+    utxoRepository = new InMemoryUtxoRepository({ inputSelector, keyManager, provider, txTracker });
+    walletDependencies = { keyManager, provider, txTracker, utxoRepository };
   });
 
   test('createWallet', async () => {

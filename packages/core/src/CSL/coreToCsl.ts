@@ -1,3 +1,5 @@
+import * as Asset from '../Asset';
+import * as Cardano from '../Cardano';
 import {
   Address,
   Assets,
@@ -9,8 +11,6 @@ import {
   TransactionUnspentOutput,
   Value
 } from '@emurgo/cardano-serialization-lib-nodejs';
-import * as Asset from '../Asset';
-import * as Cardano from '../Cardano';
 
 export const value = ({ coins, assets }: Cardano.Value): Value => {
   const result = Value.new(BigNum.from_str(coins.toString()));

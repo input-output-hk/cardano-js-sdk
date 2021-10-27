@@ -1,5 +1,5 @@
+import { CSL, Cardano } from '@cardano-sdk/core';
 import { SelectionConstraints, SelectionResult } from '@cardano-sdk/cip2';
-import { Cardano, CSL } from '@cardano-sdk/core';
 import Emittery from 'emittery';
 
 export enum UtxoRepositoryEvent {

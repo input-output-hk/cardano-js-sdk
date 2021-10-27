@@ -1,6 +1,6 @@
 import * as bip39 from 'bip39';
-import { Cardano, CSL } from '@cardano-sdk/core';
 import * as errors from './errors';
+import { CSL, Cardano } from '@cardano-sdk/core';
 import { KeyManager } from './types';
 import { harden, joinMnemonicWords } from './util';
 
@@ -45,6 +45,8 @@ export const createInMemoryKeyManager = ({
 
       return baseAddr.to_address().to_bech32();
     },
+    publicKey: publicKey.to_raw_key(),
+    publicParentKey: publicParentKey.to_raw_key(),
     signMessage: async (_addressType, _signingIndex, message) => ({
       publicKey: publicParentKey.toString(),
       signature: `Signature for ${message} is not implemented yet`
@@ -57,8 +59,6 @@ export const createInMemoryKeyManager = ({
       witnessSet.set_vkeys(vkeyWitnesses);
       return witnessSet;
     },
-    stakeKey: stakeKey.to_raw_key(),
-    publicKey: publicKey.to_raw_key(),
-    publicParentKey: publicParentKey.to_raw_key()
+    stakeKey: stakeKey.to_raw_key()
   };
 };

@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
+import { PoolStatus, StakePoolsByMetadataQuery, StakePoolsQuery } from '../../src/sdk';
 import { ProviderError, StakePoolSearchProvider } from '@cardano-sdk/core';
-import { StakePoolsQuery, StakePoolsByMetadataQuery, PoolStatus } from '../../src/sdk';
 import { createGraphQLStakePoolSearchProvider } from '../../src/StakePoolSearchProvider/CardanoGraphQLStakePoolSearchProvider';
 
 describe('StakePoolSearchClient', () => {
@@ -22,30 +22,30 @@ describe('StakePoolSearchClient', () => {
       const stakePoolsQueryResponse: StakePoolsQuery = {
         queryStakePool: [
           {
-            id: 'some-pool',
-            hexId: '0abc',
             cost: '123',
+            hexId: '0abc',
+            id: 'some-pool',
             margin: 0.15,
-            metadataJson: {
-              hash: '1abc',
-              url: 'http://someurl'
-            },
             metadata: {
               description: 'some pool desc',
-              name: 'some pool',
-              homepage: 'http://homepage',
-              ticker: 'TICKR',
+              ext: {
+                pool: {
+                  country: 'LT',
+                  id: 'pool-id',
+                  status: PoolStatus.Active
+                },
+                serial: 123
+              },
               extDataUrl: 'http://extdata',
               extSigUrl: 'http://extsig',
               extVkey: '2abc',
-              ext: {
-                serial: 123,
-                pool: {
-                  id: 'pool-id',
-                  status: PoolStatus.Active,
-                  country: 'LT'
-                }
-              }
+              homepage: 'http://homepage',
+              name: 'some pool',
+              ticker: 'TICKR'
+            },
+            metadataJson: {
+              hash: '1abc',
+              url: 'http://someurl'
             },
             metrics: {
               blocksCreated: 123,
@@ -63,16 +63,16 @@ describe('StakePoolSearchClient', () => {
             },
             owners: ['5bd'],
             pledge: '1235',
-            vrf: '76bc',
+            relays: [
+              { __typename: 'RelayByName', hostname: 'http://relay', port: 156 },
+              { __typename: 'RelayByAddress', ipv4: '0.0.0.0', ipv6: '::1', port: 567 }
+            ],
             rewardAccount: '745b',
             transactions: {
               registration: ['6345b'],
               retirement: ['dawdb']
             },
-            relays: [
-              { __typename: 'RelayByName', hostname: 'http://relay', port: 156 },
-              { __typename: 'RelayByAddress', port: 567, ipv4: '0.0.0.0', ipv6: '::1' }
-            ]
+            vrf: '76bc'
           }
         ]
       };
@@ -92,8 +92,8 @@ describe('StakePoolSearchClient', () => {
 
       expect(response).toHaveLength(2);
       expect(sdk.StakePoolsByMetadata).toBeCalledWith({
-        query: 'some stake pools',
-        omit: [stakePoolsQueryResponse.queryStakePool![0]!.id]
+        omit: [stakePoolsQueryResponse.queryStakePool![0]!.id],
+        query: 'some stake pools'
       });
       expect(typeof response[0]).toBe('object');
       expect(typeof response[0].cost).toBe('bigint');

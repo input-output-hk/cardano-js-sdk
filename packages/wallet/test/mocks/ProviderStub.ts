@@ -9,18 +9,18 @@ export const utxo: Cardano.Utxo[] = [
     {
       address:
         'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g',
-      txId: 'bb217abaca60fc0ca68c1555eca6a96d2478547818ae76ce6836133f3cc546e0',
-      index: 1
+      index: 1,
+      txId: 'bb217abaca60fc0ca68c1555eca6a96d2478547818ae76ce6836133f3cc546e0'
     },
     {
       address:
         'addr_test1qzs0umu0s2ammmpw0hea0w2crtcymdjvvlqngpgqy76gpfnuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qp3y3vz',
       value: {
-        coins: 4_027_026_465n,
         assets: {
-          [TSLA]: 10n,
-          [PXL]: 5n
-        }
+          [PXL]: 5n,
+          [TSLA]: 10n
+        },
+        coins: 4_027_026_465n
       }
     }
   ],
@@ -28,17 +28,17 @@ export const utxo: Cardano.Utxo[] = [
     {
       address:
         'addr_test1qzs0umu0s2ammmpw0hea0w2crtcymdjvvlqngpgqy76gpfnuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qp3y3vz',
-      txId: 'c7c0973c6bbf1a04a9f306da7814b4fa564db649bf48b0bd93c273bd03143547',
-      index: 0
+      index: 0,
+      txId: 'c7c0973c6bbf1a04a9f306da7814b4fa564db649bf48b0bd93c273bd03143547'
     },
     {
       address:
         'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g',
       value: {
-        coins: 3_289_566n,
         assets: {
           [TSLA]: 15n
-        }
+        },
+        coins: 3_289_566n
       }
     }
   ],
@@ -46,8 +46,8 @@ export const utxo: Cardano.Utxo[] = [
     {
       address:
         'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g',
-      txId: 'ea1517b8c36fea3148df9aa1f49bbee66ff59a5092331a67bd8b3c427e1d79d7',
-      index: 2
+      index: 2,
+      txId: 'ea1517b8c36fea3148df9aa1f49bbee66ff59a5092331a67bd8b3c427e1d79d7'
     },
     {
       address:
@@ -70,8 +70,8 @@ export const queryTransactionsResult: Cardano.TxAlonzo[] = [
         {
           address:
             'addr_test1qpfhhfy2qgls50r9u4yh0l7z67xpg0a5rrhkmvzcuqrd0znuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q9gw0lz',
-          txId: 'bb217abaca60fc0ca68c1555eca6a96d2478547818ae76ce6836133f3cc546e0',
-          index: 0
+          index: 0,
+          txId: 'bb217abaca60fc0ca68c1555eca6a96d2478547818ae76ce6836133f3cc546e0'
         }
       ],
       outputs: [
@@ -108,15 +108,27 @@ export const ledgerTip = {
  * returns WalletProvider-compatible object
  */
 export const providerStub = () => ({
+  currentWalletProtocolParameters: async () => ({
+    coinsPerUtxoWord: 34_482,
+    maxCollateralInputs: 1,
+    maxTxSize: 16_384,
+    maxValueSize: 1000,
+    minFeeCoefficient: 44,
+    minFeeConstant: 155_381,
+    minPoolCost: 340_000_000,
+    poolDeposit: 500_000_000,
+    protocolVersion: { major: 5, minor: 0 },
+    stakeKeyDeposit: 2_000_000
+  }),
   ledgerTip: jest.fn().mockResolvedValue(ledgerTip),
   networkInfo: async () => ({
     currentEpoch: {
+      end: {
+        date: new Date(1_632_687_616)
+      },
       number: 158,
       start: {
         date: new Date(1_632_255_616)
-      },
-      end: {
-        date: new Date(1_632_687_616)
       }
     },
     lovelaceSupply: {
@@ -129,7 +141,9 @@ export const providerStub = () => ({
       live: 15_001_884_895_856_815n
     }
   }),
-  submitTx: jest.fn().mockResolvedValue(void 0),
+  queryTransactionsByAddresses: queryTransactions(),
+  queryTransactionsByHashes: queryTransactions(),
+  stakePoolMetadata: jest.fn(),
   stakePoolStats: async () => ({
     qty: {
       active: 1000,
@@ -137,23 +151,9 @@ export const providerStub = () => ({
       retiring: 5
     }
   }),
-  utxoDelegationAndRewards: jest.fn().mockResolvedValue({ utxo, delegationAndRewards }),
-  queryTransactionsByAddresses: queryTransactions(),
-  queryTransactionsByHashes: queryTransactions(),
-  currentWalletProtocolParameters: async () => ({
-    minFeeCoefficient: 44,
-    minFeeConstant: 155_381,
-    stakeKeyDeposit: 2_000_000,
-    poolDeposit: 500_000_000,
-    protocolVersion: { major: 5, minor: 0 },
-    minPoolCost: 340_000_000,
-    maxTxSize: 16_384,
-    maxValueSize: 1000,
-    maxCollateralInputs: 1,
-    coinsPerUtxoWord: 34_482
-  }),
   stakePools: jest.fn(),
-  stakePoolMetadata: jest.fn()
+  submitTx: jest.fn().mockResolvedValue(void 0),
+  utxoDelegationAndRewards: jest.fn().mockResolvedValue({ delegationAndRewards, utxo })
 });
 
 export type ProviderStub = ReturnType<typeof providerStub>;

@@ -1,5 +1,5 @@
 import { AssetId, CslTestUtil } from '@cardano-sdk/util-dev';
-import { cslToCore, coreToCsl, CSL } from '../../src';
+import { CSL, coreToCsl, cslToCore } from '../../src';
 
 describe('cslToCore', () => {
   describe('value', () => {
@@ -13,7 +13,7 @@ describe('cslToCore', () => {
     it('coin with assets', () => {
       const coins = 100_000n;
       const assets = { [AssetId.TSLA]: 100n, [AssetId.PXL]: 200n };
-      const value = coreToCsl.value({ coins, assets });
+      const value = coreToCsl.value({ assets, coins });
       const quantities = cslToCore.value(value);
       expect(quantities.coins).toEqual(coins);
       expect(quantities.assets).toEqual(assets);

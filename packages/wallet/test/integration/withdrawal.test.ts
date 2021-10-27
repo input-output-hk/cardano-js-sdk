@@ -1,9 +1,6 @@
 /* eslint-disable no-fallthrough */
-import { roundRobinRandomImprove } from '@cardano-sdk/cip2';
-import { Cardano } from '@cardano-sdk/core';
 import {
   BalanceTrackerEvent,
-  createSingleAddressWallet,
   InMemoryTransactionTracker,
   InMemoryUtxoRepository,
   KeyManagement,
@@ -14,10 +11,13 @@ import {
   TransactionFailure,
   TransactionTracker,
   UtxoRepository,
-  UtxoRepositoryEvent
+  UtxoRepositoryEvent,
+  createSingleAddressWallet
 } from '@cardano-sdk/wallet';
-// Not testing with a real provider
+import { Cardano } from '@cardano-sdk/core';
 import { providerStub } from '../mocks';
+import { roundRobinRandomImprove } from '@cardano-sdk/cip2';
+// Not testing with a real provider
 
 const walletProps: SingleAddressWalletProps = { name: 'some-wallet' };
 const networkId = Cardano.NetworkId.mainnet;
@@ -31,16 +31,16 @@ describe('integration/withdrawal', () => {
   let wallet: SingleAddressWallet;
 
   beforeAll(async () => {
-    keyManager = KeyManagement.createInMemoryKeyManager({ mnemonicWords, password, networkId });
+    keyManager = KeyManagement.createInMemoryKeyManager({ mnemonicWords, networkId, password });
     const provider = providerStub();
     const inputSelector = roundRobinRandomImprove();
-    txTracker = new InMemoryTransactionTracker({ provider, pollInterval: 1 });
-    utxoRepository = new InMemoryUtxoRepository({ provider, txTracker, inputSelector, keyManager });
+    txTracker = new InMemoryTransactionTracker({ pollInterval: 1, provider });
+    utxoRepository = new InMemoryUtxoRepository({ inputSelector, keyManager, provider, txTracker });
     wallet = await createSingleAddressWallet(walletProps, {
       keyManager,
       provider,
-      utxoRepository,
-      txTracker
+      txTracker,
+      utxoRepository
     });
 
     // Call this to sync available balance
@@ -70,8 +70,9 @@ describe('integration/withdrawal', () => {
 
     const { body, hash } = await wallet.initializeTx({
       certificates: [certFactory.stakeKeyDeregistration()],
-      withdrawals: [Transaction.withdrawal(keyManager, utxoRepository.availableRewards || 0n)],
-      outputs: new Set() // In a real transaction you would probably want to have some outputs
+      outputs: new Set(),
+      // In a real transaction you would probably want to have some outputs
+      withdrawals: [Transaction.withdrawal(keyManager, utxoRepository.availableRewards || 0n)]
     });
     // Calculated fee is returned by invoking body.fee()
     const tx = await wallet.signTx(body, hash);

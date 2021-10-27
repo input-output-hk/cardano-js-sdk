@@ -1,9 +1,9 @@
-import { cslUtil, CSL } from '@cardano-sdk/core';
+import { CSL, cslUtil } from '@cardano-sdk/core';
 import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
 import { InputSelectionParameters, InputSelector, SelectionResult } from '../types';
+import { assertIsBalanceSufficient, preprocessArgs, withValuesToValues } from './util';
 import { computeChangeAndAdjustForFee } from './change';
 import { roundRobinSelection } from './roundRobin';
-import { assertIsBalanceSufficient, preprocessArgs, withValuesToValues } from './util';
 
 export const roundRobinRandomImprove = (): InputSelector => ({
   select: async ({
@@ -25,42 +25,42 @@ export const roundRobinRandomImprove = (): InputSelector => ({
     const roundRobinSelectionResult = roundRobinSelection({
       implicitCoin,
       outputsWithValue,
-      utxosWithValue,
-      uniqueOutputAssetIDs
+      uniqueOutputAssetIDs,
+      utxosWithValue
     });
 
     const result = await computeChangeAndAdjustForFee({
       computeMinimumCoinQuantity,
-      tokenBundleSizeExceedsLimit,
-      outputValues,
-      uniqueOutputAssetIDs,
-      implicitCoin,
-      utxoSelection: roundRobinSelectionResult,
       estimateTxFee: (utxos, changeValues) =>
         computeMinimumCost({
-          inputs: new Set(utxos),
           change: new Set(changeValues),
           fee: cslUtil.maxBigNum,
+          inputs: new Set(utxos),
           outputs
-        })
+        }),
+      implicitCoin,
+      outputValues,
+      tokenBundleSizeExceedsLimit,
+      uniqueOutputAssetIDs,
+      utxoSelection: roundRobinSelectionResult
     });
 
     const inputs = new Set(result.inputs);
     const change = new Set(result.change);
     const fee = CSL.BigNum.from_str(result.fee.toString());
 
-    if (result.inputs.length > (await computeSelectionLimit({ inputs, change, fee, outputs }))) {
+    if (result.inputs.length > (await computeSelectionLimit({ change, fee, inputs, outputs }))) {
       throw new InputSelectionError(InputSelectionFailure.MaximumInputCountExceeded);
     }
 
     return {
+      remainingUTxO: new Set(result.remainingUTxO),
       selection: {
         change,
+        fee,
         inputs,
-        outputs,
-        fee
-      },
-      remainingUTxO: new Set(result.remainingUTxO)
+        outputs
+      }
     };
   }
 });
