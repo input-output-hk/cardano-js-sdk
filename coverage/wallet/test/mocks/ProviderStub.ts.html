@@ -210,7 +210,13 @@
 <a name='L151'></a><a href='#L151'>151</a>
 <a name='L152'></a><a href='#L152'>152</a>
 <a name='L153'></a><a href='#L153'>153</a>
-<a name='L154'></a><a href='#L154'>154</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -268,11 +274,17 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -364,14 +376,16 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/* eslint-disable max-len */
-import * as Schema from '@cardano-ogmios/schema';
+import { Cardano } from '@cardano-sdk/core';
 import { PXL, TSLA } from '@cardano-sdk/util-dev/src/assetId';
 &nbsp;
 export const stakeKeyHash = 'stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d';
 &nbsp;
-export const utxo: Schema.Utxo = [
+export const utxo: Cardano.Utxo[] = [
   [
     {
+      address:
+        'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g',
       txId: 'bb217abaca60fc0ca68c1555eca6a96d2478547818ae76ce6836133f3cc546e0',
       index: 1
     },
@@ -379,17 +393,18 @@ export const utxo: Schema.Utxo = [
       address:
         'addr_test1qzs0umu0s2ammmpw0hea0w2crtcymdjvvlqngpgqy76gpfnuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qp3y3vz',
       value: {
-        coins: 4_027_026_465,
+        coins: 4_027_026_465n,
         assets: {
           [TSLA]: 10n,
           [PXL]: 5n
         }
-      },
-      datum: null
+      }
     }
   ],
   [
     {
+      address:
+        'addr_test1qzs0umu0s2ammmpw0hea0w2crtcymdjvvlqngpgqy76gpfnuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qp3y3vz',
       txId: 'c7c0973c6bbf1a04a9f306da7814b4fa564db649bf48b0bd93c273bd03143547',
       index: 0
     },
@@ -397,16 +412,17 @@ export const utxo: Schema.Utxo = [
       address:
         'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g',
       value: {
-        coins: 3_289_566,
+        coins: 3_289_566n,
         assets: {
           [TSLA]: 15n
         }
-      },
-      datum: null
+      }
     }
   ],
   [
     {
+      address:
+        'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g',
       txId: 'ea1517b8c36fea3148df9aa1f49bbee66ff59a5092331a67bd8b3c427e1d79d7',
       index: 2
     },
@@ -414,9 +430,8 @@ export const utxo: Schema.Utxo = [
       address:
         'addr_test1qqydn46r6mhge0kfpqmt36m6q43knzsd9ga32n96m89px3nuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qypp3m9',
       value: {
-        coins: 9_825_963
-      },
-      datum: null
+        coins: 9_825_963n
+      }
     }
   ]
 ];
@@ -425,33 +440,36 @@ export const delegate = 'pool185g59xpqzt7gf0ljr8v8f3akl95qnmardf2f8auwr3ffx7atjj
 export const rewards = 33_333n;
 export const delegationAndRewards = { delegate, rewards };
 &nbsp;
-export const queryTransactionsResult = [
+export const queryTransactionsResult: Cardano.TxAlonzo[] = [
   {
-    hash: 'ea1517b8c36fea3148df9aa1f49bbee66ff59a5092331a67bd8b3c427e1d79d7',
-    inputs: [
-      {
-        txId: 'bb217abaca60fc0ca68c1555eca6a96d2478547818ae76ce6836133f3cc546e0',
-        index: 0
-      }
-    ],
-    outputs: [
-      {
-        address:
-          'addr_test1qpfhhfy2qgls50r9u4yh0l7z67xpg0a5rrhkmvzcuqrd0znuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q9gw0lz',
-        value: { coins: 5_000_000 }
-      },
-      {
-        address:
-          'addr_test1qplfzem2xsc29wxysf8wkdqrm4s4mmncd40qnjq9sk84l3tuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q52ukj5',
-        value: { coins: 5_000_000 }
-      },
-      {
-        address:
-          'addr_test1qqydn46r6mhge0kfpqmt36m6q43knzsd9ga32n96m89px3nuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qypp3m9',
-        value: { coins: 9_825_963 }
-      }
-    ]
-  }
+    body: {
+      inputs: [
+        {
+          address:
+            'addr_test1qpfhhfy2qgls50r9u4yh0l7z67xpg0a5rrhkmvzcuqrd0znuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q9gw0lz',
+          txId: 'bb217abaca60fc0ca68c1555eca6a96d2478547818ae76ce6836133f3cc546e0',
+          index: 0
+        }
+      ],
+      outputs: [
+        {
+          address:
+            'addr_test1qpfhhfy2qgls50r9u4yh0l7z67xpg0a5rrhkmvzcuqrd0znuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q9gw0lz',
+          value: { coins: 5_000_000 }
+        },
+        {
+          address:
+            'addr_test1qplfzem2xsc29wxysf8wkdqrm4s4mmncd40qnjq9sk84l3tuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q52ukj5',
+          value: { coins: 5_000_000 }
+        },
+        {
+          address:
+            'addr_test1qqydn46r6mhge0kfpqmt36m6q43knzsd9ga32n96m89px3nuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qypp3m9',
+          value: { coins: 9_825_963 }
+        }
+      ]
+    }
+  } as unknown as Cardano.TxAlonzo
 ];
 const queryTransactions = () =&gt; jest.fn().mockResolvedValue(queryTransactionsResult);
 &nbsp;
@@ -523,7 +541,7 @@ export type ProviderStub = ReturnType&lt;typeof providerStub&gt;;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Tue Oct 26 2021 09:20:03 GMT+0000 (Coordinated Universal Time)
+                at Wed Oct 27 2021 11:34:26 GMT+0000 (Coordinated Universal Time)
             </div>
         </div>
         <script src="../../prettify.js"></script>

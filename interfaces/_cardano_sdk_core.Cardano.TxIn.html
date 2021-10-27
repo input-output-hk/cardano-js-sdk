@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>ValidityInterval | cardano-sdk</title>
+	<title>TxIn | cardano-sdk</title>
 	<meta name="description" content="Documentation for cardano-sdk">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -58,13 +58,13 @@
 					<a href="../modules/_cardano_sdk_core.html">@cardano-sdk/core</a>
 				</li>
 				<li>
-					<a href="../modules/_cardano_sdk_core.Transaction.html">Transaction</a>
+					<a href="../modules/_cardano_sdk_core.Cardano.html">Cardano</a>
 				</li>
 				<li>
-					<a href="_cardano_sdk_core.Transaction.ValidityInterval.html">ValidityInterval</a>
+					<a href="_cardano_sdk_core.Cardano.TxIn.html">TxIn</a>
 				</li>
 			</ul>
-			<h1>Interface ValidityInterval</h1>
+			<h1>Interface TxIn</h1>
 		</div>
 	</div>
 </header>
@@ -75,7 +75,12 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">ValidityInterval</span>
+						<span class="tsd-signature-type">OgmiosTxIn</span>
+						<ul class="tsd-hierarchy">
+							<li>
+								<span class="target">TxIn</span>
+							</li>
+						</ul>
 					</li>
 				</ul>
 			</section>
@@ -86,8 +91,9 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.Transaction.ValidityInterval.html#invalidBefore" class="tsd-kind-icon">invalid<wbr>Before</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.Transaction.ValidityInterval.html#invalidHereafter" class="tsd-kind-icon">invalid<wbr>Hereafter</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.Cardano.TxIn.html#address" class="tsd-kind-icon">address</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited tsd-is-external"><a href="_cardano_sdk_core.Cardano.TxIn.html#index" class="tsd-kind-icon">index</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited tsd-is-external"><a href="_cardano_sdk_core.Cardano.TxIn.html#txId" class="tsd-kind-icon">tx<wbr>Id</a></li>
 							</ul>
 						</section>
 					</div>
@@ -96,22 +102,34 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="invalidBefore" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> invalid<wbr>Before</h3>
-					<div class="tsd-signature tsd-kind-icon">invalid<wbr>Before<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<a name="address" class="tsd-anchor"></a>
+					<h3>address</h3>
+					<div class="tsd-signature tsd-kind-icon">address<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/877a41e/packages/core/src/Transaction/types.ts#L4">packages/core/src/Transaction/types.ts:4</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/6ae44e5/packages/core/src/Cardano/types/Utxo.ts#L6">packages/core/src/Cardano/types/Utxo.ts:6</a></li>
 						</ul>
 					</aside>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="invalidHereafter" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> invalid<wbr>Hereafter</h3>
-					<div class="tsd-signature tsd-kind-icon">invalid<wbr>Hereafter<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited tsd-is-external">
+					<a name="index" class="tsd-anchor"></a>
+					<h3>index</h3>
+					<div class="tsd-signature tsd-kind-icon">index<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
+						<p>Inherited from OgmiosTxIn.index</p>
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/877a41e/packages/core/src/Transaction/types.ts#L5">packages/core/src/Transaction/types.ts:5</a></li>
+							<li>Defined in node_modules/@cardano-ogmios/schema/dist/index.d.ts:426</li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited tsd-is-external">
+					<a name="txId" class="tsd-anchor"></a>
+					<h3>tx<wbr>Id</h3>
+					<div class="tsd-signature tsd-kind-icon">tx<wbr>Id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from OgmiosTxIn.txId</p>
+						<ul>
+							<li>Defined in node_modules/@cardano-ogmios/schema/dist/index.d.ts:425</li>
 						</ul>
 					</aside>
 				</section>
@@ -130,21 +148,21 @@
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_core.Transaction.ValidityInterval.html" class="tsd-kind-icon">Validity<wbr>Interval</a>
+						<a href="_cardano_sdk_core.Cardano.TxIn.html" class="tsd-kind-icon">Tx<wbr>In</a>
 						<ul>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_cardano_sdk_core.Transaction.ValidityInterval.html#invalidBefore" class="tsd-kind-icon">invalid<wbr>Before</a>
+								<a href="_cardano_sdk_core.Cardano.TxIn.html#address" class="tsd-kind-icon">address</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_cardano_sdk_core.Transaction.ValidityInterval.html#invalidHereafter" class="tsd-kind-icon">invalid<wbr>Hereafter</a>
+							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-inherited tsd-is-external">
+								<a href="_cardano_sdk_core.Cardano.TxIn.html#index" class="tsd-kind-icon">index</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-inherited tsd-is-external">
+								<a href="_cardano_sdk_core.Cardano.TxIn.html#txId" class="tsd-kind-icon">tx<wbr>Id</a>
 							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
-					<li class=" tsd-kind-type-alias tsd-parent-kind-namespace">
-						<a href="../modules/_cardano_sdk_core.Transaction.html#WithHash" class="tsd-kind-icon">With<wbr>Hash</a>
-					</li>
 				</ul>
 			</nav>
 		</div>

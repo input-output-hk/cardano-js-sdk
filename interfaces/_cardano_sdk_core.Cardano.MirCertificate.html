@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Value | cardano-sdk</title>
+	<title>MirCertificate | cardano-sdk</title>
 	<meta name="description" content="Documentation for cardano-sdk">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -58,32 +58,24 @@
 					<a href="../modules/_cardano_sdk_core.html">@cardano-sdk/core</a>
 				</li>
 				<li>
-					<a href="../modules/_cardano_sdk_core.Ogmios.html">Ogmios</a>
+					<a href="../modules/_cardano_sdk_core.Cardano.html">Cardano</a>
 				</li>
 				<li>
-					<a href="_cardano_sdk_core.Ogmios.Value.html">Value</a>
+					<a href="_cardano_sdk_core.Cardano.MirCertificate.html">MirCertificate</a>
 				</li>
 			</ul>
-			<h1>Interface Value</h1>
+			<h1>Interface MirCertificate</h1>
 		</div>
 	</div>
 </header>
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
-			<section class="tsd-panel tsd-comment">
-				<div class="tsd-comment tsd-typography">
-					<div class="lead">
-						<p>Total quantities of Coin and Assets in a Value.
-						TODO: Use Ogmios Value type after it changes lovelaces to bigint;</p>
-					</div>
-				</div>
-			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">Value</span>
+						<span class="target">MirCertificate</span>
 					</li>
 				</ul>
 			</section>
@@ -94,8 +86,11 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.Ogmios.Value.html#assets" class="tsd-kind-icon">assets</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.Ogmios.Value.html#coins" class="tsd-kind-icon">coins</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.Cardano.MirCertificate.html#address" class="tsd-kind-icon">address</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.Cardano.MirCertificate.html#certIndex" class="tsd-kind-icon">cert<wbr>Index</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.Cardano.MirCertificate.html#pot" class="tsd-kind-icon">pot</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.Cardano.MirCertificate.html#quantity" class="tsd-kind-icon">quantity</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.Cardano.MirCertificate.html#type" class="tsd-kind-icon">type</a></li>
 							</ul>
 						</section>
 					</div>
@@ -104,30 +99,52 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="assets" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> assets</h3>
-					<div class="tsd-signature tsd-kind-icon">assets<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{}</span></div>
+					<a name="address" class="tsd-anchor"></a>
+					<h3>address</h3>
+					<div class="tsd-signature tsd-kind-icon">address<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/877a41e/packages/core/src/Ogmios/types.ts#L16">packages/core/src/Ogmios/types.ts:16</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/6ae44e5/packages/core/src/Cardano/types/Transaction.ts#L47">packages/core/src/Cardano/types/Transaction.ts:47</a></li>
 						</ul>
 					</aside>
-					<div class="tsd-type-declaration">
-						<h4>Type declaration</h4>
-						<ul class="tsd-parameters">
-							<li class="tsd-parameter-index-signature">
-								<h5><span class="tsd-signature-symbol">[</span>k: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]: </span><span class="tsd-signature-type">AssetQuantity</span></h5>
-							</li>
-						</ul>
-					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="coins" class="tsd-anchor"></a>
-					<h3>coins</h3>
-					<div class="tsd-signature tsd-kind-icon">coins<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">bigint</span></div>
+					<a name="certIndex" class="tsd-anchor"></a>
+					<h3>cert<wbr>Index</h3>
+					<div class="tsd-signature tsd-kind-icon">cert<wbr>Index<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/877a41e/packages/core/src/Ogmios/types.ts#L15">packages/core/src/Ogmios/types.ts:15</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/6ae44e5/packages/core/src/Cardano/types/Transaction.ts#L46">packages/core/src/Cardano/types/Transaction.ts:46</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="pot" class="tsd-anchor"></a>
+					<h3>pot</h3>
+					<div class="tsd-signature tsd-kind-icon">pot<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;reserve&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;treasury&quot;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/6ae44e5/packages/core/src/Cardano/types/Transaction.ts#L49">packages/core/src/Cardano/types/Transaction.ts:49</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="quantity" class="tsd-anchor"></a>
+					<h3>quantity</h3>
+					<div class="tsd-signature tsd-kind-icon">quantity<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">bigint</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/6ae44e5/packages/core/src/Cardano/types/Transaction.ts#L48">packages/core/src/Cardano/types/Transaction.ts:48</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="type" class="tsd-anchor"></a>
+					<h3>type</h3>
+					<div class="tsd-signature tsd-kind-icon">type<span class="tsd-signature-symbol">:</span> <a href="../enums/_cardano_sdk_core.Cardano.CertificateType.html#MIR" class="tsd-signature-type" data-tsd-kind="Enumeration member">MIR</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/6ae44e5/packages/core/src/Cardano/types/Transaction.ts#L45">packages/core/src/Cardano/types/Transaction.ts:45</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -143,30 +160,30 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
-					<li class=" tsd-kind-interface tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_core.Ogmios.DelegationsAndRewards.html" class="tsd-kind-icon">Delegations<wbr>And<wbr>Rewards</a>
-					</li>
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_core.Ogmios.Value.html" class="tsd-kind-icon">Value</a>
+						<a href="_cardano_sdk_core.Cardano.MirCertificate.html" class="tsd-kind-icon">Mir<wbr>Certificate</a>
 						<ul>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_cardano_sdk_core.Ogmios.Value.html#assets" class="tsd-kind-icon">assets</a>
+								<a href="_cardano_sdk_core.Cardano.MirCertificate.html#address" class="tsd-kind-icon">address</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_cardano_sdk_core.Ogmios.Value.html#coins" class="tsd-kind-icon">coins</a>
+								<a href="_cardano_sdk_core.Cardano.MirCertificate.html#certIndex" class="tsd-kind-icon">cert<wbr>Index</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="_cardano_sdk_core.Cardano.MirCertificate.html#pot" class="tsd-kind-icon">pot</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="_cardano_sdk_core.Cardano.MirCertificate.html#quantity" class="tsd-kind-icon">quantity</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="_cardano_sdk_core.Cardano.MirCertificate.html#type" class="tsd-kind-icon">type</a>
 							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
-					<li class=" tsd-kind-type-alias tsd-parent-kind-namespace">
-						<a href="../modules/_cardano_sdk_core.Ogmios.html#Lovelace" class="tsd-kind-icon">Lovelace</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-parent-kind-namespace">
-						<a href="../modules/_cardano_sdk_core.Ogmios.html#TokenMap" class="tsd-kind-icon">Token<wbr>Map</a>
-					</li>
 				</ul>
 			</nav>
 		</div>

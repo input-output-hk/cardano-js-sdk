@@ -237,8 +237,7 @@
 <a name='L178'></a><a href='#L178'>178</a>
 <a name='L179'></a><a href='#L179'>179</a>
 <a name='L180'></a><a href='#L180'>180</a>
-<a name='L181'></a><a href='#L181'>181</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">10x</span>
+<a name='L181'></a><a href='#L181'>181</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -375,6 +374,7 @@
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
@@ -417,10 +417,9 @@
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import Schema, { TxIn, TxOut } from '@cardano-ogmios/schema';
-import { WalletProvider, Ogmios, cslUtil, CSL } from '@cardano-sdk/core';
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { WalletProvider, Cardano, cslUtil, CSL, coreToCsl, cslToCore } from '@cardano-sdk/core';
 import { dummyLogger, Logger } from 'ts-log';
-import { ImplicitCoin, InputSelector, SelectionConstraints, SelectionResult } from '@cardano-sdk/cip2';
+import { InputSelector, SelectionConstraints, SelectionResult } from '@cardano-sdk/cip2';
 import { KeyManager } from './KeyManagement';
 import {
   UtxoRepository,
@@ -440,17 +439,17 @@ export interface InMemoryUtxoRepositoryProps {
   logger?: Logger;
 }
 &nbsp;
-const utxoEquals = ([txIn1]: [Schema.TxIn, Schema.TxOut], [txIn2]: [Schema.TxIn, Schema.TxOut]): boolean =&gt;
+const utxoEquals = ([txIn1]: Cardano.Utxo, [txIn2]: Cardano.Utxo): boolean =&gt;
   txIn1.txId === txIn2.txId &amp;&amp; txIn1.index === txIn2.index;
 &nbsp;
 export class InMemoryUtxoRepository extends Emittery&lt;UtxoRepositoryEvents&gt; implements UtxoRepository {
-  #delegationAndRewards: Ogmios.DelegationsAndRewards;
+  #delegationAndRewards: Cardano.DelegationsAndRewards;
   #inputSelector: InputSelector;
   #keyManager: KeyManager;
   #logger: Logger;
   #provider: WalletProvider;
-  #utxoSet: Set&lt;[TxIn, TxOut]&gt;;
-  #lockedUtxoSet: Set&lt;[TxIn, TxOut]&gt; = new Set();
+  #utxoSet: Set&lt;Cardano.Utxo&gt;;
+  #lockedUtxoSet: Set&lt;Cardano.Utxo&gt; = new Set();
   #lockedRewards = 0n;
 &nbsp;
   constructor({ logger = dummyLogger, provider, inputSelector, keyManager, txTracker }: InMemoryUtxoRepositoryProps) {
@@ -502,38 +501,38 @@ export class InMemoryUtxoRepository extends Emittery&lt;UtxoRepositoryEvents&gt;
   public async selectInputs(
     outputs: Set&lt;CSL.TransactionOutput&gt;,
     constraints: SelectionConstraints,
-    implicitCoin?: ImplicitCoin
+    implicitCoin?: Cardano.ImplicitCoin
   ): Promise&lt;SelectionResult&gt; {
     <span class="missing-if-branch" title="else path not taken" >E</span>if (this.#utxoSet.size === 0) {
       this.#logger.debug('Local UTxO set is empty. Syncing...');
       await this.sync();
     }
     return this.#inputSelector.select({
-      utxo: new Set(Ogmios.ogmiosToCsl.utxo(this.availableUtxos)),
+      utxo: new Set(coreToCsl.utxo(this.availableUtxos)),
       outputs,
       constraints,
       implicitCoin
     });
   }
 &nbsp;
-  public get allUtxos(): Schema.Utxo {
+  public get allUtxos(): Cardano.Utxo[] {
     return [...this.#utxoSet.values()];
   }
 &nbsp;
-  public get availableUtxos(): Schema.Utxo {
+  public get availableUtxos(): Cardano.Utxo[] {
     return this.allUtxos.filter((utxo) =&gt; !this.#lockedUtxoSet.has(utxo));
   }
 &nbsp;
-  public get allRewards(): Ogmios.Lovelace | null {
+  public get allRewards(): Cardano.Lovelace | null {
     return this.#delegationAndRewards.rewards ?? null;
   }
 &nbsp;
-  public get availableRewards(): Ogmios.Lovelace | null {
+  public get availableRewards(): Cardano.Lovelace | null {
     if (!this.allRewards) return null;
     return this.allRewards - this.#lockedRewards;
   }
 &nbsp;
-  public get delegation(): Schema.PoolId | null {
+  public get delegation(): Cardano.PoolId | null {
     return this.#delegationAndRewards.delegate ?? null;
   }
 &nbsp;
@@ -552,10 +551,11 @@ export class InMemoryUtxoRepository extends Emittery&lt;UtxoRepositoryEvents&gt;
     const rewardsLockedByTx = this.#getOwnTransactionWithdrawalQty(transaction);
     this.#lockedRewards += rewardsLockedByTx;
     // Lock utxo
-    const utxoLockedByTx: Schema.Utxo = [];
+    const utxoLockedByTx: Cardano.Utxo[] = [];
     const inputs = transaction.body().inputs();
     for (let inputIdx = 0; inputIdx &lt; inputs.len(); inputIdx++) {
-      const { txId, index } = Ogmios.cslToOgmios.txIn(inputs.get(inputIdx));
+      // don't need the address, not using it
+      const { txId, index } = cslToCore.txIn(inputs.get(inputIdx), '' as Cardano.Address);
       const utxo = this.allUtxos.find(([txIn]) =&gt; txIn.txId === txId &amp;&amp; txIn.index === index)!;
       this.#lockedUtxoSet.add(utxo);
       utxoLockedByTx.push(utxo);
@@ -604,7 +604,7 @@ export class InMemoryUtxoRepository extends Emittery&lt;UtxoRepositoryEvents&gt;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Tue Oct 26 2021 09:20:03 GMT+0000 (Coordinated Universal Time)
+                at Wed Oct 27 2021 11:34:26 GMT+0000 (Coordinated Universal Time)
             </div>
         </div>
         <script src="../prettify.js"></script>

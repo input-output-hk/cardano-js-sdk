@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>DelegationsAndRewards | cardano-sdk</title>
+	<title>SubmittedTransaction | cardano-sdk</title>
 	<meta name="description" content="Documentation for cardano-sdk">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -58,31 +58,24 @@
 					<a href="../modules/_cardano_sdk_core.html">@cardano-sdk/core</a>
 				</li>
 				<li>
-					<a href="../modules/_cardano_sdk_core.Ogmios.html">Ogmios</a>
+					<a href="../modules/_cardano_sdk_core.Cardano.html">Cardano</a>
 				</li>
 				<li>
-					<a href="_cardano_sdk_core.Ogmios.DelegationsAndRewards.html">DelegationsAndRewards</a>
+					<a href="_cardano_sdk_core.Cardano.SubmittedTransaction.html">SubmittedTransaction</a>
 				</li>
 			</ul>
-			<h1>Interface DelegationsAndRewards</h1>
+			<h1>Interface SubmittedTransaction</h1>
 		</div>
 	</div>
 </header>
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
-			<section class="tsd-panel tsd-comment">
-				<div class="tsd-comment tsd-typography">
-					<div class="lead">
-						<p>TODO: Use Ogmios type after it changes lovelaces to bigint;</p>
-					</div>
-				</div>
-			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">DelegationsAndRewards</span>
+						<span class="target">SubmittedTransaction</span>
 					</li>
 				</ul>
 			</section>
@@ -93,8 +86,8 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.Ogmios.DelegationsAndRewards.html#delegate" class="tsd-kind-icon">delegate</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.Ogmios.DelegationsAndRewards.html#rewards" class="tsd-kind-icon">rewards</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.Cardano.SubmittedTransaction.html#status" class="tsd-kind-icon">status</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.Cardano.SubmittedTransaction.html#tx" class="tsd-kind-icon">tx</a></li>
 							</ul>
 						</section>
 					</div>
@@ -103,22 +96,22 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="delegate" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> delegate</h3>
-					<div class="tsd-signature tsd-kind-icon">delegate<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<a name="status" class="tsd-anchor"></a>
+					<h3>status</h3>
+					<div class="tsd-signature tsd-kind-icon">status<span class="tsd-signature-symbol">:</span> <a href="../enums/_cardano_sdk_core.Cardano.TransactionStatus.html" class="tsd-signature-type" data-tsd-kind="Enumeration">TransactionStatus</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/877a41e/packages/core/src/Ogmios/types.ts#L23">packages/core/src/Ogmios/types.ts:23</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/6ae44e5/packages/core/src/Cardano/types/Transaction.ts#L122">packages/core/src/Cardano/types/Transaction.ts:122</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="rewards" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> rewards</h3>
-					<div class="tsd-signature tsd-kind-icon">rewards<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">bigint</span></div>
+					<a name="tx" class="tsd-anchor"></a>
+					<h3>tx</h3>
+					<div class="tsd-signature tsd-kind-icon">tx<span class="tsd-signature-symbol">:</span> <a href="_cardano_sdk_core.Cardano.TxAlonzo.html" class="tsd-signature-type" data-tsd-kind="Interface">TxAlonzo</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/877a41e/packages/core/src/Ogmios/types.ts#L24">packages/core/src/Ogmios/types.ts:24</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/6ae44e5/packages/core/src/Cardano/types/Transaction.ts#L121">packages/core/src/Cardano/types/Transaction.ts:121</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -137,27 +130,18 @@
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_core.Ogmios.DelegationsAndRewards.html" class="tsd-kind-icon">Delegations<wbr>And<wbr>Rewards</a>
+						<a href="_cardano_sdk_core.Cardano.SubmittedTransaction.html" class="tsd-kind-icon">Submitted<wbr>Transaction</a>
 						<ul>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_cardano_sdk_core.Ogmios.DelegationsAndRewards.html#delegate" class="tsd-kind-icon">delegate</a>
+								<a href="_cardano_sdk_core.Cardano.SubmittedTransaction.html#status" class="tsd-kind-icon">status</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_cardano_sdk_core.Ogmios.DelegationsAndRewards.html#rewards" class="tsd-kind-icon">rewards</a>
+								<a href="_cardano_sdk_core.Cardano.SubmittedTransaction.html#tx" class="tsd-kind-icon">tx</a>
 							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
-					<li class=" tsd-kind-interface tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_core.Ogmios.Value.html" class="tsd-kind-icon">Value</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-parent-kind-namespace">
-						<a href="../modules/_cardano_sdk_core.Ogmios.html#Lovelace" class="tsd-kind-icon">Lovelace</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-parent-kind-namespace">
-						<a href="../modules/_cardano_sdk_core.Ogmios.html#TokenMap" class="tsd-kind-icon">Token<wbr>Map</a>
-					</li>
 				</ul>
 			</nav>
 		</div>
