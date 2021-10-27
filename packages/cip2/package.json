@@ -16,6 +16,7 @@
     "lint": "eslint --ignore-path ../../.eslintignore \"**/*.ts\"",
     "test": "jest -c ./jest.config.js",
     "coverage": "yarn test --coverage",
+    "prepack": "yarn build",
     "test:debug": "DEBUG=true yarn test"
   },
   "devDependencies": {
@@ -29,5 +30,11 @@
     "@cardano-sdk/core": "0.1.4",
     "lodash-es": "^4.17.21",
     "ts-custom-error": "^3.2.0"
-  }
+  },
+  "files": [
+    "dist/*",
+    "!dist/tsconfig.tsbuildinfo",
+    "LICENSE",
+    "NOTICE"
+  ]
 }
