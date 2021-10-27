@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.5](https://github.com/input-output-hk/cardano-js-sdk/compare/0.1.4...0.1.5) (2021-10-27)
+
+
+### Features
+
+* add WalletProvider.transactionDetails, add address to TxIn ([889a39b](https://github.com/input-output-hk/cardano-js-sdk/commit/889a39b1feb988144dd2249c6c47f91e8096fd48))
+* **cardano-graphql:** dgraph integration ([e1195e9](https://github.com/input-output-hk/cardano-js-sdk/commit/e1195e9cd9da84d49fb4160d5e2c69f134afdcac))
+* **cardano-graphql:** generate graphql client from shema+operations ([9632eb4](https://github.com/input-output-hk/cardano-js-sdk/commit/9632eb40263cabc0eea8ff813180be90af63eacb))
+* **cardano-graphql:** generate graphql schema from ts code ([a3e90ad](https://github.com/input-output-hk/cardano-js-sdk/commit/a3e90ad8e5c790ea250bc779b7e10f4657cdccbd))
+* **cardano-graphql:** implement CardanoGraphQLStakePoolSearchProvider (wip) ([80deda6](https://github.com/input-output-hk/cardano-js-sdk/commit/80deda6963a0c07b2f0b24a0a5465c488305d83c))
+* **cardano-graphql:** implement search stake pools via dgraph schema ([5487db8](https://github.com/input-output-hk/cardano-js-sdk/commit/5487db818c8a91c8648836d13febfd150392d390))
+* **cardano-graphql:** initial implementation of StakePoolSearchClient ([8f4f72a](https://github.com/input-output-hk/cardano-js-sdk/commit/8f4f72af7f6ca61b025f2d98e2edf24108b6e38c))
+* **core:** isAddress util ([3f53e79](https://github.com/input-output-hk/cardano-js-sdk/commit/3f53e79f08fd0fd10764c3c648e356d368398df5))
+* **util-dev:** add createStubStakePoolSearchProvider ([2e0906b](https://github.com/input-output-hk/cardano-js-sdk/commit/2e0906bc19acdf91b805e1eb647e88aa33ed1b7b))
+
+
+### Bug Fixes
+
+* **blockfrost:** early return from tallyPools function ([2ab1afc](https://github.com/input-output-hk/cardano-js-sdk/commit/2ab1afcce3f7b02b17352a8abe82b5adb17d8d52))
+* **blockfrost:** invalid handling of timestamp ([eed927c](https://github.com/input-output-hk/cardano-js-sdk/commit/eed927ce579426eef38a15797d2223e8df21a40f))
+* **wallet:** make txTracker not optional to ensure it's the same as UtxoRepository uses ([653b8d9](https://github.com/input-output-hk/cardano-js-sdk/commit/653b8d90409e79e6624f01368ebb73f61aac1aeb))
+
 ### [0.1.4](https://github.com/input-output-hk/cardano-js-sdk/compare/0.1.3...0.1.4) (2021-10-14)
 
 
