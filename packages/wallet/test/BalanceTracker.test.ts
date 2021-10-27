@@ -1,6 +1,6 @@
-import { MockUtxoRepository } from './mocks';
 import { BalanceTracker, UtxoRepositoryEvent, UtxoRepositoryFields } from '../src';
 import { Cardano } from '@cardano-sdk/core';
+import { MockUtxoRepository } from './mocks';
 
 const numAssets = (tokenMap?: Cardano.TokenMap) => Object.keys(tokenMap || {}).length;
 
@@ -25,10 +25,10 @@ describe('BalanceTracker', () => {
     const allRewards = utxoRepository.allRewards - 1n;
     const availableRewards = utxoRepository.allRewards - 2n;
     await utxoRepository.emit(UtxoRepositoryEvent.Changed, {
-      allUtxos: utxoRepository.allUtxos.slice(1),
-      availableUtxos: utxoRepository.allUtxos.slice(2),
       allRewards,
+      allUtxos: utxoRepository.allUtxos.slice(1),
       availableRewards,
+      availableUtxos: utxoRepository.allUtxos.slice(2),
       delegation: null
     } as UtxoRepositoryFields);
 

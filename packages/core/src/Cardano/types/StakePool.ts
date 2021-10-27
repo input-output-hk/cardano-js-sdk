@@ -1,6 +1,6 @@
-import { PoolParameters } from '@cardano-ogmios/schema';
-import { Hash16, Lovelace, PoolMetadata } from '.';
 import { ExtendedStakePoolMetadata } from './ExtendedStakePoolMetadata';
+import { Hash16, Lovelace, PoolMetadata } from '.';
+import { PoolParameters } from '@cardano-ogmios/schema';
 
 /**
  * Within range [0; 1]

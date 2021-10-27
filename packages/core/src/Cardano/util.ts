@@ -10,6 +10,6 @@ export const computeMinUtxoValue = (coinsPerUtxoWord: bigint): bigint => coinsPe
  * Sum all quantities
  */
 export const coalesceValueQuantities = (quantities: Value[]): Value => ({
-  coins: BigIntMath.sum(quantities.map(({ coins }) => coins)),
-  assets: Asset.util.coalesceTokenMaps(quantities.map(({ assets }) => assets))
+  assets: Asset.util.coalesceTokenMaps(quantities.map(({ assets }) => assets)),
+  coins: BigIntMath.sum(quantities.map(({ coins }) => coins))
 });

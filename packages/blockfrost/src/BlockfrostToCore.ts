@@ -1,5 +1,5 @@
-import { Responses } from '@blockfrost/blockfrost-js';
 import { Cardano, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
+import { Responses } from '@blockfrost/blockfrost-js';
 
 type Unpacked<T> = T extends (infer U)[] ? U : T;
 type BlockfrostAddressUtxoContent = Responses['address_utxo_content'];
@@ -15,19 +15,26 @@ export const BlockfrostToCore = {
       BlockfrostToCore.txIn(BlockfrostToCore.inputFromUtxo(address, utxo)),
       BlockfrostToCore.txOut(BlockfrostToCore.outputFromUtxo(address, utxo))
     ]) as Cardano.Utxo[],
-  // without `as OgmiosSchema.Utxo` above TS thinks the return value is (OgmiosSchema.TxIn | OgmiosSchema.TxOut)[][]
 
-  transactionUtxos: (utxoResponse: Responses['tx_content_utxo']) => ({
-    inputs: utxoResponse.inputs.map((input) => ({
-      ...BlockfrostToCore.txIn(input),
-      address: input.address
-    })),
-    outputs: utxoResponse.outputs.map(BlockfrostToCore.txOut)
-  }),
   blockToTip: (block: Responses['block_content']): Cardano.Tip => ({
     blockNo: block.height!,
     hash: block.hash,
     slot: block.slot!
+  }),
+
+  currentWalletProtocolParameters: (
+    blockfrost: Responses['epoch_param_content']
+  ): ProtocolParametersRequiredByWallet => ({
+    coinsPerUtxoWord: Number(blockfrost.coins_per_utxo_word),
+    maxCollateralInputs: blockfrost.max_collateral_inputs || undefined,
+    maxTxSize: Number(blockfrost.max_tx_size),
+    maxValueSize: Number(blockfrost.max_val_size),
+    minFeeCoefficient: blockfrost.min_fee_a,
+    minFeeConstant: blockfrost.min_fee_b,
+    minPoolCost: Number(blockfrost.min_pool_cost),
+    poolDeposit: Number(blockfrost.pool_deposit),
+    protocolVersion: { major: blockfrost.protocol_major_ver, minor: blockfrost.protocol_minor_ver },
+    stakeKeyDeposit: Number(blockfrost.key_deposit)
   }),
 
   inputFromUtxo: (address: string, utxo: BlockfrostUtxo): BlockfrostInput => ({
@@ -46,16 +53,25 @@ export const BlockfrostToCore = {
 
   outputs: (outputs: BlockfrostOutputs): Cardano.TxOut[] => outputs.map((output) => BlockfrostToCore.txOut(output)),
 
+  // without `as OgmiosSchema.Utxo` above TS thinks the return value is (OgmiosSchema.TxIn | OgmiosSchema.TxOut)[][]
+  transactionUtxos: (utxoResponse: Responses['tx_content_utxo']) => ({
+    inputs: utxoResponse.inputs.map((input) => ({
+      ...BlockfrostToCore.txIn(input),
+      address: input.address
+    })),
+    outputs: utxoResponse.outputs.map(BlockfrostToCore.txOut)
+  }),
+
   txContentUtxo: (blockfrost: Responses['tx_content_utxo']) => ({
+    hash: blockfrost.hash,
     inputs: BlockfrostToCore.inputs(blockfrost.inputs),
-    outputs: BlockfrostToCore.outputs(blockfrost.outputs),
-    hash: blockfrost.hash
+    outputs: BlockfrostToCore.outputs(blockfrost.outputs)
   }),
 
   txIn: (blockfrost: BlockfrostInput): Cardano.TxIn => ({
-    txId: blockfrost.tx_hash,
+    address: blockfrost.address,
     index: blockfrost.output_index,
-    address: blockfrost.address
+    txId: blockfrost.tx_hash
   }),
 
   txOut: (blockfrost: BlockfrostOutput): Cardano.TxOut => {
@@ -67,24 +83,9 @@ export const BlockfrostToCore = {
     return {
       address: blockfrost.address,
       value: {
-        coins: BigInt(blockfrost.amount.find(({ unit }) => unit === 'lovelace')!.quantity),
-        assets
+        assets,
+        coins: BigInt(blockfrost.amount.find(({ unit }) => unit === 'lovelace')!.quantity)
       }
     };
-  },
-
-  currentWalletProtocolParameters: (
-    blockfrost: Responses['epoch_param_content']
-  ): ProtocolParametersRequiredByWallet => ({
-    maxTxSize: Number(blockfrost.max_tx_size),
-    minFeeCoefficient: blockfrost.min_fee_a,
-    minFeeConstant: blockfrost.min_fee_b,
-    stakeKeyDeposit: Number(blockfrost.key_deposit),
-    poolDeposit: Number(blockfrost.pool_deposit),
-    minPoolCost: Number(blockfrost.min_pool_cost),
-    coinsPerUtxoWord: Number(blockfrost.coins_per_utxo_word),
-    maxValueSize: Number(blockfrost.max_val_size),
-    maxCollateralInputs: blockfrost.max_collateral_inputs || undefined,
-    protocolVersion: { major: blockfrost.protocol_major_ver, minor: blockfrost.protocol_minor_ver }
-  })
+  }
 };

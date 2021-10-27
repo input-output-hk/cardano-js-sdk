@@ -1,14 +1,14 @@
-import { cslUtil, InvalidProtocolParametersError, CSL } from '@cardano-sdk/core';
-import { ProtocolParametersRequiredByInputSelection } from '.';
+import { CSL, InvalidProtocolParametersError, cslUtil } from '@cardano-sdk/core';
 import {
-  TokenBundleSizeExceedsLimit,
   ComputeMinimumCoinQuantity,
-  EstimateTxFee,
-  SelectionSkeleton,
   ComputeSelectionLimit,
+  EstimateTxFee,
   ProtocolParametersForInputSelection,
-  SelectionConstraints
+  SelectionConstraints,
+  SelectionSkeleton,
+  TokenBundleSizeExceedsLimit
 } from './types';
+import { ProtocolParametersRequiredByInputSelection } from '.';
 
 export type BuildTx = (selection: SelectionSkeleton) => Promise<CSL.Transaction>;
 
@@ -90,8 +90,8 @@ export const defaultSelectionConstraints = ({
     );
   }
   return {
-    computeMinimumCost: computeMinimumCost({ minFeeCoefficient, minFeeConstant }, buildTx),
     computeMinimumCoinQuantity: computeMinimumCoinQuantity(coinsPerUtxoWord),
+    computeMinimumCost: computeMinimumCost({ minFeeCoefficient, minFeeConstant }, buildTx),
     computeSelectionLimit: computeSelectionLimit(maxTxSize, buildTx),
     tokenBundleSizeExceedsLimit: tokenBundleSizeExceedsLimit(maxValueSize)
   };

@@ -1,4 +1,4 @@
-import { Hash16, Address } from '.';
+import { Address, Hash16 } from '.';
 import { TxIn as OgmiosTxIn } from '@cardano-ogmios/schema';
 import { Value } from './Value';
 

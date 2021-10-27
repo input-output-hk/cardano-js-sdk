@@ -1,4 +1,4 @@
-import { Cardano, CSL } from '@cardano-sdk/core';
+import { CSL, Cardano } from '@cardano-sdk/core';
 
 export interface SelectionSkeleton {
   /**

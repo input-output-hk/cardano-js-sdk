@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 
+import { Cardano, NetworkInfo, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
 import { GraphQLClient } from 'graphql-request';
-import { NetworkInfo, Cardano, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
 import { cardanoGraphqlDbSyncProvider } from '../src';
 jest.mock('graphql-request');
 
@@ -112,10 +112,10 @@ describe('cardanoGraphqlDbSyncProvider', () => {
         currentEpoch: {
           protocolParams: {
             coinsPerUtxoWord: 34_482,
-            maxTxSize: 16_384,
-            maxValSize: '5000',
             keyDeposit: 2_000_000,
             maxCollateralInputs: 3,
+            maxTxSize: 16_384,
+            maxValSize: '5000',
             minFeeA: 44,
             minFeeB: 155_381,
             minPoolCost: 340_000_000,
@@ -136,10 +136,9 @@ describe('cardanoGraphqlDbSyncProvider', () => {
 
     expect(response).toMatchObject<ProtocolParametersRequiredByWallet>({
       coinsPerUtxoWord: 34_482,
+      maxCollateralInputs: 3,
       maxTxSize: 16_384,
       maxValueSize: 5000,
-      stakeKeyDeposit: 2_000_000,
-      maxCollateralInputs: 3,
       minFeeCoefficient: 44,
       minFeeConstant: 155_381,
       minPoolCost: 340_000_000,
@@ -147,7 +146,8 @@ describe('cardanoGraphqlDbSyncProvider', () => {
       protocolVersion: {
         major: 5,
         minor: 5
-      }
+      },
+      stakeKeyDeposit: 2_000_000
     });
   });
 
@@ -168,8 +168,8 @@ describe('cardanoGraphqlDbSyncProvider', () => {
     const response = await client.ledgerTip();
 
     expect(response).toMatchObject<Cardano.Tip>({
-      hash: 'af310732fdd99892fa78584aca1d2be147e6001030ae51b054e38feeb4fd762d',
       blockNo: 2_884_196,
+      hash: 'af310732fdd99892fa78584aca1d2be147e6001030ae51b054e38feeb4fd762d',
       slot: 36_370_316
     });
   });

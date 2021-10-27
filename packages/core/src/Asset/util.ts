@@ -1,5 +1,5 @@
-import { TokenMap } from '../Cardano';
 import { CSL } from '../CSL';
+import { TokenMap } from '../Cardano';
 
 export type AssetId = string;
 
@@ -16,8 +16,8 @@ export const parseAssetId = (assetId: AssetId) => {
   const policyId = policyIdFromAssetId(assetId);
   const assetName = assetNameFromAssetId(assetId);
   return {
-    scriptHash: CSL.ScriptHash.from_bytes(Buffer.from(policyId, 'hex')),
-    assetName: CSL.AssetName.new(Buffer.from(assetName, 'hex'))
+    assetName: CSL.AssetName.new(Buffer.from(assetName, 'hex')),
+    scriptHash: CSL.ScriptHash.from_bytes(Buffer.from(policyId, 'hex'))
   };
 };
 

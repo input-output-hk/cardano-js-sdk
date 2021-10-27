@@ -1,7 +1,7 @@
 import { AssetId, SelectionConstraints } from '@cardano-sdk/util-dev';
-import { SelectionResult } from '../../src/types';
-import { cslUtil, Cardano, CSL, cslToCore } from '@cardano-sdk/core';
+import { CSL, Cardano, cslToCore, cslUtil } from '@cardano-sdk/core';
 import { InputSelectionError, InputSelectionFailure } from '../../src/InputSelectionError';
+import { SelectionResult } from '../../src/types';
 import fc, { Arbitrary } from 'fast-check';
 
 const assertExtraChangeProperties = (
@@ -54,7 +54,7 @@ const inputSelectionTotals = ({
   const vChange = Cardano.util.coalesceValueQuantities(
     [...results.selection.change].map((value) => cslToCore.value(value))
   );
-  return { vSelected, vRequested, vChange };
+  return { vChange, vRequested, vSelected };
 };
 
 export const assertInputSelectionProperties = ({
@@ -70,7 +70,7 @@ export const assertInputSelectionProperties = ({
   constraints: SelectionConstraints.MockSelectionConstraints;
   implicitCoin?: Cardano.ImplicitCoin;
 }) => {
-  const { vSelected, vRequested, vChange } = inputSelectionTotals({ results, outputs, implicitCoin });
+  const { vSelected, vRequested, vChange } = inputSelectionTotals({ implicitCoin, outputs, results });
 
   // Coverage of Payments
   expect(vSelected.coins).toBeGreaterThanOrEqual(vRequested.coins);
@@ -163,12 +163,11 @@ export const generateSelectionParams = (() => {
     fc
       .array(
         fc.record<Cardano.Value>({
-          coins: fc.bigUint(cslUtil.MAX_U64 - implicitCoin),
           assets: fc.oneof(
             fc
               .set(fc.oneof(...AssetId.All.map((asset) => fc.constant(asset))))
               .chain((assets) =>
-                fc.tuple(...assets.map((asset) => fc.bigUint(cslUtil.MAX_U64).map((amount) => ({ asset, amount }))))
+                fc.tuple(...assets.map((asset) => fc.bigUint(cslUtil.MAX_U64).map((amount) => ({ amount, asset }))))
               )
               .map((assets) =>
                 assets.reduce((quantities, { amount, asset }) => {
@@ -177,7 +176,8 @@ export const generateSelectionParams = (() => {
                 }, {} as Cardano.TokenMap)
               ),
             fc.constant(void 0)
-          )
+          ),
+          coins: fc.bigUint(cslUtil.MAX_U64 - implicitCoin)
         }),
         { maxLength: 11 }
       )
@@ -223,15 +223,15 @@ export const generateSelectionParams = (() => {
   }> =>
     generateImplicitCoin.chain((implicitCoin) =>
       fc.record({
-        utxoAmounts: arrayOfCoinAndAssets(implicitCoin?.input),
-        outputsAmounts: arrayOfCoinAndAssets(implicitCoin?.deposit),
         constraints: fc.record<SelectionConstraints.MockSelectionConstraints>({
           maxTokenBundleSize: fc.nat(AssetId.All.length),
           minimumCoinQuantity: fc.oneof(...[0n, 1n, 34_482n * 29n, 9_999_991n].map((n) => fc.constant(n))),
           minimumCost: fc.oneof(...[0n, 1n, 200_000n, 2_000_003n].map((n) => fc.constant(n))),
           selectionLimit: fc.oneof(...[0, 1, 2, 7, 30, Number.MAX_SAFE_INTEGER].map((n) => fc.constant(n)))
         }),
-        implicitCoin: fc.constant(implicitCoin)
+        implicitCoin: fc.constant(implicitCoin),
+        outputsAmounts: arrayOfCoinAndAssets(implicitCoin?.deposit),
+        utxoAmounts: arrayOfCoinAndAssets(implicitCoin?.input)
       })
     );
 })();

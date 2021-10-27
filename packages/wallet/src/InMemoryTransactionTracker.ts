@@ -1,10 +1,10 @@
-import { TransactionTracker, TransactionTrackerEvents } from './types';
-import Emittery from 'emittery';
-import { WalletProvider, ProviderError, ProviderFailure, CSL, Cardano } from '@cardano-sdk/core';
+import { CSL, Cardano, ProviderError, ProviderFailure, WalletProvider } from '@cardano-sdk/core';
+import { Logger, dummyLogger } from 'ts-log';
 import { TransactionError, TransactionFailure } from './TransactionError';
-import { dummyLogger, Logger } from 'ts-log';
-import delay from 'delay';
+import { TransactionTracker, TransactionTrackerEvents } from './types';
 import { TransactionTrackerEvent } from '.';
+import Emittery from 'emittery';
+import delay from 'delay';
 
 export type Milliseconds = number;
 
@@ -44,7 +44,7 @@ export class InMemoryTransactionTracker extends Emittery<TransactionTrackerEvent
 
     const promise = this.#checkTransactionViaProvider(hash, invalidHereafter);
     this.#pendingTransactions.set(hash, promise);
-    this.emit(TransactionTrackerEvent.NewTransaction, { transaction, confirmed: promise }).catch(this.#logger.error);
+    this.emit(TransactionTrackerEvent.NewTransaction, { confirmed: promise, transaction }).catch(this.#logger.error);
     void promise.catch(() => void 0).then(() => this.#pendingTransactions.delete(hash));
 
     return promise;

@@ -1,5 +1,5 @@
+import { Logger, dummyLogger } from 'ts-log';
 import { Wallet, WalletPublic } from './Wallet';
-import { dummyLogger, Logger } from 'ts-log';
 
 export type WindowMaybeWithCardano = Window & { cardano?: { [k: string]: WalletPublic } };
 

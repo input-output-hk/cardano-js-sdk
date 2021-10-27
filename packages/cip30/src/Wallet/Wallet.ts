@@ -1,6 +1,6 @@
+import { APIErrorCode, ApiError } from '../errors';
+import { Logger, dummyLogger } from 'ts-log';
 import { WalletApi } from './types';
-import { ApiError, APIErrorCode } from '../errors';
-import { dummyLogger, Logger } from 'ts-log';
 import { WindowMaybeWithCardano } from '../injectWindow';
 
 /**
@@ -57,10 +57,10 @@ export class Wallet {
 
   public getPublicApi(window: WindowMaybeWithCardano) {
     return {
-      name: this.name,
-      version: this.version,
       enable: this.enable.bind(this, window),
-      isEnabled: this.isEnabled.bind(this, window)
+      isEnabled: this.isEnabled.bind(this, window),
+      name: this.name,
+      version: this.version
     };
   }
 
@@ -78,9 +78,9 @@ export class Wallet {
       this.options.storage?.setItem(this.name, JSON.stringify([...currentList, appName]));
       this.logger.debug(
         {
+          allowList: this.getAllowList(),
           module: 'Wallet',
-          walletName: this.name,
-          allowList: this.getAllowList()
+          walletName: this.name
         },
         'Allow list persisted'
       );

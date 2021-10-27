@@ -1,7 +1,7 @@
-import { WalletApi } from '..';
-import { dummyLogger, Logger } from 'ts-log';
-import { sendMessage } from './sendMessage';
+import { Logger, dummyLogger } from 'ts-log';
 import { Message } from './types';
+import { WalletApi } from '..';
+import { sendMessage } from './sendMessage';
 
 export const createUiWallet = (logger: Logger = dummyLogger): WalletApi => {
   const methodNames = [
@@ -20,7 +20,7 @@ export const createUiWallet = (logger: Logger = dummyLogger): WalletApi => {
       Object.fromEntries(
         methodNames.map((method) => [
           method,
-          (...args: Message['arguments']) => sendMessage({ method, arguments: args }, logger)
+          (...args: Message['arguments']) => sendMessage({ arguments: args, method }, logger)
         ])
       )
     ))

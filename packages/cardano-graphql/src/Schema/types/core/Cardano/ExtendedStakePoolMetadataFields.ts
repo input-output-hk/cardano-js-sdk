@@ -63,8 +63,8 @@ export class ExtendedStakePoolMetadataFields implements Cardano.ExtendedStakePoo
   @Field({ nullable: true })
   country?: string;
   @Field(() => PoolStatus, {
-    nullable: true,
-    description: 'active | retired | offline | experimental | private'
+    description: 'active | retired | offline | experimental | private',
+    nullable: true
   })
   status?: Cardano.PoolStatus;
   @Field(() => PoolContactData, { nullable: true })

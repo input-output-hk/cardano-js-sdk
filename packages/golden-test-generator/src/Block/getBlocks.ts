@@ -35,6 +35,7 @@ export const getBlocks = async (
     // Required to ensure existing messages in the pipe are not processed after the completion condition is met
     let draining = false;
     const response: GetBlocksResponse = {
+      blocks: {},
       metadata: {
         cardano: {
           compactGenesis: await StateQuery.genesisConfig(
@@ -42,8 +43,7 @@ export const getBlocks = async (
           ),
           intersection: undefined as unknown as ChainSync.Intersection
         }
-      },
-      blocks: {}
+      }
     };
     try {
       const syncClient = await createChainSyncClient(

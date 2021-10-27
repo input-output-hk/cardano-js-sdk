@@ -1,6 +1,6 @@
-import { BigIntMath, Cardano, CSL, cslToCore } from '@cardano-sdk/core';
-import { uniq } from 'lodash-es';
+import { BigIntMath, CSL, Cardano, cslToCore } from '@cardano-sdk/core';
 import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
+import { uniq } from 'lodash-es';
 
 export interface WithValue {
   value: Cardano.Value;
@@ -56,7 +56,7 @@ export const preprocessArgs = (
     deposit: partialImplicitCoin.deposit || 0n,
     input: partialImplicitCoin.input || 0n
   };
-  return { uniqueOutputAssetIDs, utxosWithValue, outputsWithValue, implicitCoin };
+  return { implicitCoin, outputsWithValue, uniqueOutputAssetIDs, utxosWithValue };
 };
 
 export const withValuesToValues = (totals: WithValue[]) => totals.map((t) => t.value);

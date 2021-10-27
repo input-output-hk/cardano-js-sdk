@@ -1,6 +1,6 @@
-import Emittery from 'emittery';
-import { delegate, rewards, utxo } from './ProviderStub';
 import { UtxoRepository, UtxoRepositoryEvents } from '../../src';
+import { delegate, rewards, utxo } from './ProviderStub';
+import Emittery from 'emittery';
 
 export class MockUtxoRepository extends Emittery<UtxoRepositoryEvents> implements UtxoRepository {
   sync = jest.fn().mockResolvedValue(void 0);

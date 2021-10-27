@@ -1,5 +1,5 @@
 import { CSL } from '@cardano-sdk/core';
-import { createTxInput, createOutput, createUnspentTxOutput } from '../src/cslTestUtil';
+import { createOutput, createTxInput, createUnspentTxOutput } from '../src/cslTestUtil';
 
 describe('cslUtil', () => {
   describe('createTxInput', () => {

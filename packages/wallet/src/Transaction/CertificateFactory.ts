@@ -1,4 +1,4 @@
-import { NotImplementedError, Cardano, CSL } from '@cardano-sdk/core';
+import { CSL, Cardano, NotImplementedError } from '@cardano-sdk/core';
 import { KeyManager } from '../KeyManagement';
 
 export type Ed25519KeyHashBech32 = string;

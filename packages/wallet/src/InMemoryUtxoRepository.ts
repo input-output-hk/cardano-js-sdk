@@ -1,12 +1,12 @@
-import { WalletProvider, Cardano, cslUtil, CSL, coreToCsl, cslToCore } from '@cardano-sdk/core';
-import { dummyLogger, Logger } from 'ts-log';
+import { CSL, Cardano, WalletProvider, coreToCsl, cslToCore, cslUtil } from '@cardano-sdk/core';
 import { InputSelector, SelectionConstraints, SelectionResult } from '@cardano-sdk/cip2';
 import { KeyManager } from './KeyManagement';
+import { Logger, dummyLogger } from 'ts-log';
 import {
-  UtxoRepository,
   OnTransactionArgs,
   TransactionTracker,
   TransactionTrackerEvent,
+  UtxoRepository,
   UtxoRepositoryEvent,
   UtxoRepositoryEvents
 } from './types';
@@ -38,7 +38,7 @@ export class InMemoryUtxoRepository extends Emittery<UtxoRepositoryEvents> imple
     this.#logger = logger;
     this.#provider = provider;
     this.#utxoSet = new Set();
-    this.#delegationAndRewards = { rewards: undefined, delegate: undefined };
+    this.#delegationAndRewards = { delegate: undefined, rewards: undefined };
     this.#inputSelector = inputSelector;
     this.#keyManager = keyManager;
     txTracker.on(TransactionTrackerEvent.NewTransaction, (args) => {
@@ -89,10 +89,10 @@ export class InMemoryUtxoRepository extends Emittery<UtxoRepositoryEvents> imple
       await this.sync();
     }
     return this.#inputSelector.select({
-      utxo: new Set(coreToCsl.utxo(this.availableUtxos)),
-      outputs,
       constraints,
-      implicitCoin
+      implicitCoin,
+      outputs,
+      utxo: new Set(coreToCsl.utxo(this.availableUtxos))
     });
   }
 
@@ -119,10 +119,10 @@ export class InMemoryUtxoRepository extends Emittery<UtxoRepositoryEvents> imple
 
   #emitSynced() {
     this.emit(UtxoRepositoryEvent.Changed, {
-      allUtxos: this.allUtxos,
-      availableUtxos: this.availableUtxos,
       allRewards: this.allRewards,
+      allUtxos: this.allUtxos,
       availableRewards: this.availableRewards,
+      availableUtxos: this.availableUtxos,
       delegation: this.delegation
     }).catch(this.#logger.error);
   }

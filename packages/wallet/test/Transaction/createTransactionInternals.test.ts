@@ -1,14 +1,14 @@
-import { InputSelector, roundRobinRandomImprove } from '@cardano-sdk/cip2';
-import { WalletProvider, CSL, coreToCsl } from '@cardano-sdk/core';
-import { SelectionConstraints } from '@cardano-sdk/util-dev';
-import { MockTransactionTracker, providerStub, testKeyManager } from '../mocks';
+import { CSL, WalletProvider, coreToCsl } from '@cardano-sdk/core';
 import {
   CertificateFactory,
-  createTransactionInternals,
   CreateTxInternalsProps,
-  Withdrawal
+  Withdrawal,
+  createTransactionInternals
 } from '../../src/Transaction';
-import { UtxoRepository, InMemoryUtxoRepository, KeyManagement } from '../../src';
+import { InMemoryUtxoRepository, KeyManagement, UtxoRepository } from '../../src';
+import { InputSelector, roundRobinRandomImprove } from '@cardano-sdk/cip2';
+import { MockTransactionTracker, providerStub, testKeyManager } from '../mocks';
+import { SelectionConstraints } from '@cardano-sdk/util-dev';
 
 const address =
   'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g';
@@ -49,9 +49,9 @@ describe('Transaction.createTransactionInternals', () => {
       })
     ]);
     utxoRepository = new InMemoryUtxoRepository({
-      provider,
-      keyManager,
       inputSelector,
+      keyManager,
+      provider,
       txTracker: new MockTransactionTracker()
     });
   });

@@ -1,9 +1,9 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
+import * as testWallet from './testWallet';
 import { Wallet, WalletApi, WalletOptions } from '../src/Wallet';
 import { mocks } from 'mock-browser';
-import * as testWallet from './testWallet';
 const window = mocks.MockBrowser.createWindow();
 
 // todo test persistAllowList: true when design is finalised
@@ -15,14 +15,14 @@ if (process.env.DEBUG) {
 
 describe('Wallet', () => {
   const apiMethods = [
-    'getUtxos',
     'getBalance',
-    'getUsedAddresses',
-    'getUnusedAddresses',
     'getChangeAddress',
     'getRewardAddresses',
-    'signTx',
+    'getUnusedAddresses',
+    'getUsedAddresses',
+    'getUtxos',
     'signData',
+    'signTx',
     'submitTx'
   ];
   let wallet: Wallet;
@@ -73,8 +73,8 @@ describe('Wallet', () => {
       const uxtos = await api.getUtxos();
       expect(uxtos).toEqual([
         [
-          { txId: '123456', index: 0 },
-          { address: 'asdf', value: { coins: 100n, assets: {} } }
+          { index: 0, txId: '123456' },
+          { address: 'asdf', value: { assets: {}, coins: 100n } }
         ]
       ]);
     });

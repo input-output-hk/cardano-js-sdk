@@ -1,7 +1,7 @@
-import { mocks } from 'mock-browser';
 import { Wallet } from '../src/Wallet';
+import { WindowMaybeWithCardano, injectWindow } from '../src/injectWindow';
 import { api, properties, requestAccess } from './testWallet';
-import { injectWindow, WindowMaybeWithCardano } from '../src/injectWindow';
+import { mocks } from 'mock-browser';
 
 describe('injectWindow', () => {
   let wallet: Wallet;
@@ -27,7 +27,7 @@ describe('injectWindow', () => {
     let anotherObj: any;
 
     beforeEach(() => {
-      anotherObj = { could: 'be', anything: 'here' };
+      anotherObj = { anything: 'here', could: 'be' };
       expect(window.cardano).not.toBeDefined();
       window.cardano = {} as WindowMaybeWithCardano;
       window.cardano['another-obj'] = anotherObj;
@@ -38,7 +38,7 @@ describe('injectWindow', () => {
       expect(window.cardano).toBeDefined();
       injectWindow(window, wallet);
       expect(window.cardano[properties.name].name).toBe(properties.name);
-      expect(Object.keys(window.cardano[properties.name])).toEqual(['name', 'version', 'enable', 'isEnabled']);
+      expect(Object.keys(window.cardano[properties.name])).toEqual(['enable', 'isEnabled', 'name', 'version']);
       expect(window.cardano['another-obj']).toBe(anotherObj);
     });
   });

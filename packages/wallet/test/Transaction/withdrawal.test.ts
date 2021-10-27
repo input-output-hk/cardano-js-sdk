@@ -1,6 +1,6 @@
 import { CSL } from '@cardano-sdk/core';
-import { testKeyManager } from '../mocks';
 import { Transaction } from '../../src';
+import { testKeyManager } from '../mocks';
 
 describe('Transaction.withdrawal', () => {
   it('creates objects of correct types', async () => {

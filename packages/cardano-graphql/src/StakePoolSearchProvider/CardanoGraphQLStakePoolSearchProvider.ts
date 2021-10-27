@@ -1,4 +1,4 @@
-import { ProviderError, ProviderFailure, Cardano, StakePoolSearchProvider, util } from '@cardano-sdk/core';
+import { Cardano, ProviderError, ProviderFailure, StakePoolSearchProvider, util } from '@cardano-sdk/core';
 import { GraphQLClient } from 'graphql-request';
 import { getSdk } from '../sdk';
 import { isNotNil } from '../util';
@@ -18,8 +18,8 @@ export const createGraphQLStakePoolSearchProvider = (
       try {
         const byStakePoolFields = (await sdk.StakePools({ query })).queryStakePool?.filter(isNotNil);
         const byMetadataFields = await sdk.StakePoolsByMetadata({
-          query,
-          omit: byStakePoolFields?.length ? byStakePoolFields?.map((sp) => sp.id) : undefined
+          omit: byStakePoolFields?.length ? byStakePoolFields?.map((sp) => sp.id) : undefined,
+          query
         });
         const responseStakePools = [
           ...(byStakePoolFields || []),
@@ -31,15 +31,6 @@ export const createGraphQLStakePoolSearchProvider = (
           const ext = metadata?.ext;
           return {
             ...stakePool,
-            pledge: BigInt(stakePool.pledge),
-            metrics: {
-              ...stakePool.metrics!,
-              livePledge: BigInt(stakePool.metrics.livePledge),
-              stake: {
-                active: BigInt(stakePool.metrics.stake.active),
-                live: BigInt(stakePool.metrics.stake.live)
-              }
-            },
             cost: BigInt(stakePool.cost),
             metadata: metadata
               ? {
@@ -54,7 +45,16 @@ export const createGraphQLStakePoolSearchProvider = (
                       }
                     : undefined
                 }
-              : undefined
+              : undefined,
+            metrics: {
+              ...stakePool.metrics!,
+              livePledge: BigInt(stakePool.metrics.livePledge),
+              stake: {
+                active: BigInt(stakePool.metrics.stake.active),
+                live: BigInt(stakePool.metrics.stake.live)
+              }
+            },
+            pledge: BigInt(stakePool.pledge)
           };
         });
       } catch (error) {

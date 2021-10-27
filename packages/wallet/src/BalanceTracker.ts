@@ -1,7 +1,7 @@
 import { Cardano } from '@cardano-sdk/core';
-import Emittery from 'emittery';
-import { dummyLogger } from 'ts-log';
 import { UtxoRepository, UtxoRepositoryEvent, UtxoRepositoryFields } from './types';
+import { dummyLogger } from 'ts-log';
+import Emittery from 'emittery';
 
 export interface Balance extends Cardano.Value {
   rewards: Cardano.Lovelace;

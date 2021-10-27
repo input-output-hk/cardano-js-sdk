@@ -1,5 +1,5 @@
-import { Cardano } from '@cardano-sdk/core';
 import { Bytes, Cbor, Paginate } from '../types';
+import { Cardano } from '@cardano-sdk/core';
 
 /**
  * If `amount` is `undefined`, this shall return a list of all UTxOs (unspent transaction outputs)

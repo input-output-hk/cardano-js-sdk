@@ -1,5 +1,5 @@
-import { SelectionResult } from '@cardano-sdk/cip2';
 import { CSL, Cardano } from '@cardano-sdk/core';
+import { SelectionResult } from '@cardano-sdk/cip2';
 import { Withdrawal } from './withdrawal';
 
 export type TxInternals = {

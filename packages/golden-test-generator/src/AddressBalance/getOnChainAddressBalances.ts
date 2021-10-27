@@ -35,7 +35,7 @@ export const getOnChainAddressBalances = (
 ): Promise<AddressBalancesResponse> => {
   const logger = options?.logger ?? dummyLogger;
   const trackedAddressBalances: AddressBalances = Object.fromEntries(
-    addresses.map((address) => [address, { coins: 0, assets: {} }])
+    addresses.map((address) => [address, { assets: {}, coins: 0 }])
   );
   const trackedTxs: ({ id: Schema.Hash16 } & Schema.Tx)[] = [];
   // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -45,6 +45,7 @@ export const getOnChainAddressBalances = (
     // condition is met
     let draining = false;
     const response: AddressBalancesResponse = {
+      balances: {},
       metadata: {
         cardano: {
           compactGenesis: await StateQuery.genesisConfig(
@@ -52,8 +53,7 @@ export const getOnChainAddressBalances = (
           ),
           intersection: undefined as unknown as ChainSync.Intersection
         }
-      },
-      balances: {}
+      }
     };
     try {
       const syncClient = await createChainSyncClient(

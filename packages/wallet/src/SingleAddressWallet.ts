@@ -1,9 +1,9 @@
-import { WalletProvider, ProviderError, CSL, coreToCsl, Cardano } from '@cardano-sdk/core';
-import { UtxoRepository } from './types';
-import { dummyLogger, Logger } from 'ts-log';
-import { defaultSelectionConstraints } from '@cardano-sdk/cip2';
-import { computeImplicitCoin, createTransactionInternals, InitializeTxProps, TxInternals } from './Transaction';
 import { BalanceTracker, KeyManagement, TransactionError, TransactionFailure, TransactionTracker } from '.';
+import { CSL, Cardano, ProviderError, WalletProvider, coreToCsl } from '@cardano-sdk/core';
+import { InitializeTxProps, TxInternals, computeImplicitCoin, createTransactionInternals } from './Transaction';
+import { Logger, dummyLogger } from 'ts-log';
+import { UtxoRepository } from './types';
+import { defaultSelectionConstraints } from '@cardano-sdk/cip2';
 
 export interface SubmitTxResult {
   /**
@@ -71,7 +71,6 @@ export const createSingleAddressWallet = async (
       const validityInterval = ensureValidityInterval(tip.slot, props.options?.validityInterval);
       const txOutputs = new Set([...props.outputs].map((output) => coreToCsl.txOut(output)));
       const constraints = defaultSelectionConstraints({
-        protocolParameters,
         buildTx: async (inputSelection) => {
           logger.debug('Building TX for selection constraints', inputSelection);
           const { body, hash } = await createTransactionInternals({
@@ -80,7 +79,8 @@ export const createSingleAddressWallet = async (
             validityInterval
           });
           return signTx(body, hash);
-        }
+        },
+        protocolParameters
       });
       const implicitCoin = computeImplicitCoin(protocolParameters, props);
       const inputSelectionResult = await utxoRepository.selectInputs(txOutputs, constraints, implicitCoin);
@@ -101,8 +101,8 @@ export const createSingleAddressWallet = async (
       });
       const confirmed = txTracker.track(tx, submitted);
       return {
-        submitted,
-        confirmed
+        confirmed,
+        submitted
       };
     }
   };

@@ -1,11 +1,7 @@
+/* eslint-disable max-len */
 import { isAddress } from '../../src/Address/util';
 
 export const addresses = {
-  shelley: {
-    testnet:
-      'addr_test1qqydn46r6mhge0kfpqmt36m6q43knzsd9ga32n96m89px3nuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qypp3m9',
-    mainnet: 'addr1qx52knza2h5x090n4a5r7yraz3pwcamk9ppvuh7e26nfks7pnmhxqavtqy02zezklh27jt9r6z62sav3mugappdc7xnskxy2pn'
-  },
   byron: {
     mainnet: {
       daedalus:
@@ -19,9 +15,14 @@ export const addresses = {
     }
   },
   invalid: {
-    short: 'EkxDbkPo',
     networkMagic:
-      '3reY92cShRkjtmz7q31547czPNHbrhbRGhVLehTrNDNDNeDaKJwcM8aMmWg2zd7cHVFvhdui4a86nEdsSEE7g7kcZKKvBw7nzixnbX1'
+      '3reY92cShRkjtmz7q31547czPNHbrhbRGhVLehTrNDNDNeDaKJwcM8aMmWg2zd7cHVFvhdui4a86nEdsSEE7g7kcZKKvBw7nzixnbX1',
+    short: 'EkxDbkPo'
+  },
+  shelley: {
+    mainnet: 'addr1qx52knza2h5x090n4a5r7yraz3pwcamk9ppvuh7e26nfks7pnmhxqavtqy02zezklh27jt9r6z62sav3mugappdc7xnskxy2pn',
+    testnet:
+      'addr_test1qqydn46r6mhge0kfpqmt36m6q43knzsd9ga32n96m89px3nuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qypp3m9'
   }
 };
 

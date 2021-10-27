@@ -1,6 +1,6 @@
 import { CSL } from '@cardano-sdk/core';
-import { InputSelector } from '../../src/types';
 import { InputSelectionError, InputSelectionFailure } from '../../src/InputSelectionError';
+import { InputSelector } from '../../src/types';
 import { SelectionConstraints } from '@cardano-sdk/util-dev';
 import { assertInputSelectionProperties } from './properties';
 
@@ -44,7 +44,7 @@ export const testInputSelectionFailureMode = async ({
   const outputs = new Set(createOutputs());
   const algorithm = getAlgorithm();
   await expect(
-    algorithm.select({ utxo, outputs, constraints: SelectionConstraints.mockConstraintsToConstraints(mockConstraints) })
+    algorithm.select({ constraints: SelectionConstraints.mockConstraintsToConstraints(mockConstraints), outputs, utxo })
   ).rejects.toThrowError(new InputSelectionError(expectedError));
 };
 
@@ -61,9 +61,9 @@ export const testInputSelectionProperties = async ({
   const outputs = new Set(createOutputs());
   const algorithm = getAlgorithm();
   const results = await algorithm.select({
-    utxo,
+    constraints: SelectionConstraints.mockConstraintsToConstraints(mockConstraints),
     outputs,
-    constraints: SelectionConstraints.mockConstraintsToConstraints(mockConstraints)
+    utxo
   });
-  assertInputSelectionProperties({ results, outputs, constraints: mockConstraints, utxo });
+  assertInputSelectionProperties({ constraints: mockConstraints, outputs, results, utxo });
 };

@@ -1,4 +1,4 @@
-import { Cardano, CSL, coreToCsl } from '@cardano-sdk/core';
+import { CSL, Cardano, coreToCsl } from '@cardano-sdk/core';
 
 export const createTxInput = (() => {
   let defaultIdx = 0;
