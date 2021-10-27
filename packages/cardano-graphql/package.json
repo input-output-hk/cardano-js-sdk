@@ -25,6 +25,7 @@
     "lint": "eslint --ignore-path ../../.eslintignore \"**/*.ts\"",
     "test": "jest -c ./jest.config.js",
     "coverage": "yarn test --coverage",
+    "prepack": "yarn build",
     "test:debug": "DEBUG=true yarn test"
   },
   "devDependencies": {
@@ -45,5 +46,11 @@
     "graphql-request": "^3.5.0",
     "reflect-metadata": "^0.1.13",
     "type-graphql": "^1.1.1"
-  }
+  },
+  "files": [
+    "dist/*",
+    "!dist/tsconfig.tsbuildinfo",
+    "LICENSE",
+    "NOTICE"
+  ]
 }

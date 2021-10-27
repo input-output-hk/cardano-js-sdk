@@ -16,7 +16,8 @@
     "cleanup": "shx rm -rf dist node_modules",
     "lint": "eslint --ignore-path ../../.eslintignore \"**/*.ts\"",
     "test": "jest -c ./jest.config.js",
-    "coverage": "shx echo No coverage report for this package"
+    "coverage": "shx echo No coverage report for this package",
+    "prepack": "yarn build"
   },
   "devDependencies": {
     "shx": "^0.3.3"
@@ -24,5 +25,11 @@
   "dependencies": {
     "@blockfrost/blockfrost-js": "^1.3.0",
     "@cardano-sdk/core": "0.1.4"
-  }
+  },
+  "files": [
+    "dist/*",
+    "!dist/tsconfig.tsbuildinfo",
+    "LICENSE",
+    "NOTICE"
+  ]
 }

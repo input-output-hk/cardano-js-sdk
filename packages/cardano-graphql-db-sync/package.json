@@ -16,7 +16,8 @@
     "cleanup": "shx rm -rf dist node_modules",
     "lint": "eslint --ignore-path ../../.eslintignore \"**/*.ts\"",
     "test": "jest -c ./jest.config.js",
-    "coverage": "shx echo No coverage report for this package"
+    "coverage": "shx echo No coverage report for this package",
+    "prepack": "yarn build"
   },
   "devDependencies": {
     "shx": "^0.3.3"
@@ -27,5 +28,11 @@
     "graphql": "^15.5.1",
     "buffer": "^6.0.3",
     "graphql-request": "^3.5.0"
-  }
+  },
+  "files": [
+    "dist/*",
+    "!dist/tsconfig.tsbuildinfo",
+    "LICENSE",
+    "NOTICE"
+  ]
 }

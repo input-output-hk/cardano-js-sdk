@@ -20,6 +20,7 @@
     "pkg": "yarn build && pkg -o build/golden-test-generator .",
     "prestart": "yarn build",
     "start": "API_PORT=3000 OGMIOS_HOST=localhost OGMIOS_PORT=1337 ts-node ./src/index.ts",
+    "prepack": "yarn build",
     "pretest": "yarn build",
     "test": "jest -c ./jest.config.js",
     "coverage": "shx echo No coverage report for this package"
@@ -49,5 +50,11 @@
       "node14-linux-x64",
       "node14-macos-x64"
     ]
-  }
+  },
+  "files": [
+    "dist/*",
+    "!dist/tsconfig.tsbuildinfo",
+    "LICENSE",
+    "NOTICE"
+  ]
 }

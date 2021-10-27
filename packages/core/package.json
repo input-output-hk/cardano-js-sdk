@@ -15,7 +15,8 @@
     "cleanup": "shx rm -rf dist node_modules",
     "lint": "eslint --ignore-path ../../.eslintignore \"**/*.ts\"",
     "test": "jest -c ./jest.config.js",
-    "coverage": "shx echo No coverage report for this package"
+    "coverage": "shx echo No coverage report for this package",
+    "prepack": "yarn build"
   },
   "devDependencies": {
     "@cardano-sdk/util-dev": "0.1.4",
@@ -25,5 +26,11 @@
     "@cardano-ogmios/schema": "4.1.0",
     "@emurgo/cardano-serialization-lib-nodejs": "9.1.0",
     "@emurgo/cardano-serialization-lib-browser": "9.1.0"
-  }
+  },
+  "files": [
+    "dist/*",
+    "!dist/tsconfig.tsbuildinfo",
+    "LICENSE",
+    "NOTICE"
+  ]
 }

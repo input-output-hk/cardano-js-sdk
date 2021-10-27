@@ -19,6 +19,7 @@
     "cleanup": "shx rm -rf dist node_modules",
     "coverage": "yarn test --coverage",
     "lint": "eslint --ignore-path ../../.eslintignore \"**/*.ts\"",
+    "prepack": "yarn build",
     "test": "jest -c ./jest.config.js",
     "test:debug": "DEBUG=true yarn test"
   },
@@ -35,5 +36,11 @@
     "lodash-es": "^4.17.21",
     "ts-custom-error": "^3.2.0",
     "ts-log": "^2.2.3"
-  }
+  },
+  "files": [
+    "dist/*",
+    "!dist/tsconfig.tsbuildinfo",
+    "LICENSE",
+    "NOTICE"
+  ]
 }
