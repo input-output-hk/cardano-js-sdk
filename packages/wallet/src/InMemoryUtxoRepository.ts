@@ -1,7 +1,6 @@
-import Schema, { TxIn, TxOut } from '@cardano-ogmios/schema';
-import { WalletProvider, Ogmios, cslUtil, CSL } from '@cardano-sdk/core';
+import { WalletProvider, Cardano, cslUtil, CSL, coreToCsl, cslToCore } from '@cardano-sdk/core';
 import { dummyLogger, Logger } from 'ts-log';
-import { ImplicitCoin, InputSelector, SelectionConstraints, SelectionResult } from '@cardano-sdk/cip2';
+import { InputSelector, SelectionConstraints, SelectionResult } from '@cardano-sdk/cip2';
 import { KeyManager } from './KeyManagement';
 import {
   UtxoRepository,
@@ -21,17 +20,17 @@ export interface InMemoryUtxoRepositoryProps {
   logger?: Logger;
 }
 
-const utxoEquals = ([txIn1]: [Schema.TxIn, Schema.TxOut], [txIn2]: [Schema.TxIn, Schema.TxOut]): boolean =>
+const utxoEquals = ([txIn1]: Cardano.Utxo, [txIn2]: Cardano.Utxo): boolean =>
   txIn1.txId === txIn2.txId && txIn1.index === txIn2.index;
 
 export class InMemoryUtxoRepository extends Emittery<UtxoRepositoryEvents> implements UtxoRepository {
-  #delegationAndRewards: Ogmios.DelegationsAndRewards;
+  #delegationAndRewards: Cardano.DelegationsAndRewards;
   #inputSelector: InputSelector;
   #keyManager: KeyManager;
   #logger: Logger;
   #provider: WalletProvider;
-  #utxoSet: Set<[TxIn, TxOut]>;
-  #lockedUtxoSet: Set<[TxIn, TxOut]> = new Set();
+  #utxoSet: Set<Cardano.Utxo>;
+  #lockedUtxoSet: Set<Cardano.Utxo> = new Set();
   #lockedRewards = 0n;
 
   constructor({ logger = dummyLogger, provider, inputSelector, keyManager, txTracker }: InMemoryUtxoRepositoryProps) {
@@ -83,38 +82,38 @@ export class InMemoryUtxoRepository extends Emittery<UtxoRepositoryEvents> imple
   public async selectInputs(
     outputs: Set<CSL.TransactionOutput>,
     constraints: SelectionConstraints,
-    implicitCoin?: ImplicitCoin
+    implicitCoin?: Cardano.ImplicitCoin
   ): Promise<SelectionResult> {
     if (this.#utxoSet.size === 0) {
       this.#logger.debug('Local UTxO set is empty. Syncing...');
       await this.sync();
     }
     return this.#inputSelector.select({
-      utxo: new Set(Ogmios.ogmiosToCsl.utxo(this.availableUtxos)),
+      utxo: new Set(coreToCsl.utxo(this.availableUtxos)),
       outputs,
       constraints,
       implicitCoin
     });
   }
 
-  public get allUtxos(): Schema.Utxo {
+  public get allUtxos(): Cardano.Utxo[] {
     return [...this.#utxoSet.values()];
   }
 
-  public get availableUtxos(): Schema.Utxo {
+  public get availableUtxos(): Cardano.Utxo[] {
     return this.allUtxos.filter((utxo) => !this.#lockedUtxoSet.has(utxo));
   }
 
-  public get allRewards(): Ogmios.Lovelace | null {
+  public get allRewards(): Cardano.Lovelace | null {
     return this.#delegationAndRewards.rewards ?? null;
   }
 
-  public get availableRewards(): Ogmios.Lovelace | null {
+  public get availableRewards(): Cardano.Lovelace | null {
     if (!this.allRewards) return null;
     return this.allRewards - this.#lockedRewards;
   }
 
-  public get delegation(): Schema.PoolId | null {
+  public get delegation(): Cardano.PoolId | null {
     return this.#delegationAndRewards.delegate ?? null;
   }
 
@@ -133,10 +132,11 @@ export class InMemoryUtxoRepository extends Emittery<UtxoRepositoryEvents> imple
     const rewardsLockedByTx = this.#getOwnTransactionWithdrawalQty(transaction);
     this.#lockedRewards += rewardsLockedByTx;
     // Lock utxo
-    const utxoLockedByTx: Schema.Utxo = [];
+    const utxoLockedByTx: Cardano.Utxo[] = [];
     const inputs = transaction.body().inputs();
     for (let inputIdx = 0; inputIdx < inputs.len(); inputIdx++) {
-      const { txId, index } = Ogmios.cslToOgmios.txIn(inputs.get(inputIdx));
+      // don't need the address, not using it
+      const { txId, index } = cslToCore.txIn(inputs.get(inputIdx), '' as Cardano.Address);
       const utxo = this.allUtxos.find(([txIn]) => txIn.txId === txId && txIn.index === index)!;
       this.#lockedUtxoSet.add(utxo);
       utxoLockedByTx.push(utxo);

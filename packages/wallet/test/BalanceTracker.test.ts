@@ -1,8 +1,8 @@
-import { Ogmios } from '@cardano-sdk/core';
 import { MockUtxoRepository } from './mocks';
 import { BalanceTracker, UtxoRepositoryEvent, UtxoRepositoryFields } from '../src';
+import { Cardano } from '@cardano-sdk/core';
 
-const numAssets = (tokenMap?: Ogmios.TokenMap) => Object.keys(tokenMap || {}).length;
+const numAssets = (tokenMap?: Cardano.TokenMap) => Object.keys(tokenMap || {}).length;
 
 describe('BalanceTracker', () => {
   let balanceTracker: BalanceTracker;

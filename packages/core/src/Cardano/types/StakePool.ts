@@ -1,6 +1,6 @@
-import { Hash16, PoolParameters, PoolMetadata } from '@cardano-ogmios/schema';
+import { PoolParameters } from '@cardano-ogmios/schema';
+import { Hash16, Lovelace, PoolMetadata } from '.';
 import { ExtendedStakePoolMetadata } from './ExtendedStakePoolMetadata';
-import { Ogmios } from '../../';
 
 /**
  * Within range [0; 1]
@@ -27,7 +27,7 @@ export interface Cip6MetadataFields {
    * the public Key for verification
    * optional, 68 Characters
    */
-  extVkey?: Hash16; // Review: is this the correct type alias?
+  extVkey?: Hash16; // TODO: figure out if this is the correct type alias
 }
 
 export interface StakePoolMetadataFields {
@@ -62,8 +62,8 @@ export type StakePoolMetadata = StakePoolMetadataFields &
   };
 
 export interface StakePoolMetricsStake {
-  live: Ogmios.Lovelace;
-  active: Ogmios.Lovelace;
+  live: Lovelace;
+  active: Lovelace;
 }
 
 export interface StakePoolMetricsSize {
@@ -75,7 +75,7 @@ export interface StakePoolMetrics {
    * Total blocks created by the pool
    */
   blocksCreated: number;
-  livePledge: Ogmios.Lovelace;
+  livePledge: Lovelace;
   /**
    * Stake quantity
    */
@@ -105,7 +105,7 @@ export interface ByName {
 
 export type Relay = ByAddress | ByName;
 
-// TODO: don't omit pledge and cost when Ogmios.Lovelace becomes bigint
+// TODO: don't omit pledge and cost when Lovelace becomes bigint
 export interface StakePool extends Omit<PoolParameters, 'pledge' | 'cost' | 'margin' | 'metadata' | 'relays'> {
   /**
    * Stake pool ID as a hex string
@@ -114,11 +114,11 @@ export interface StakePool extends Omit<PoolParameters, 'pledge' | 'cost' | 'mar
   /**
    * Declared pledge quantity.
    */
-  pledge: Ogmios.Lovelace;
+  pledge: Lovelace;
   /**
    * Fixed stake pool running cost
    */
-  cost: Ogmios.Lovelace;
+  cost: Lovelace;
   /**
    * Stake pool margin percentage
    */

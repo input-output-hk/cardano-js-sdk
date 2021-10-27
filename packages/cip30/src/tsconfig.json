@@ -3,5 +3,8 @@
   "compilerOptions": {
     "outDir": "../dist/",
     "rootDir": "."
-  }
+  },
+  "references": [
+    { "path": "../../core/src" }
+  ]
 }

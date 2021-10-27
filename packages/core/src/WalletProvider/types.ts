@@ -1,8 +1,7 @@
-import Cardano, { ProtocolParametersAlonzo } from '@cardano-ogmios/schema';
-import { Ogmios, Transaction, CSL } from '..';
+import { CSL, Cardano } from '..';
 
 export type ProtocolParametersRequiredByWallet = Pick<
-  ProtocolParametersAlonzo,
+  Cardano.ProtocolParametersAlonzo,
   | 'coinsPerUtxoWord'
   | 'maxTxSize'
   | 'maxValueSize'
@@ -16,14 +15,14 @@ export type ProtocolParametersRequiredByWallet = Pick<
 >;
 
 export type AssetSupply = {
-  circulating: Ogmios.Lovelace;
-  max: Ogmios.Lovelace;
-  total: Ogmios.Lovelace;
+  circulating: Cardano.Lovelace;
+  max: Cardano.Lovelace;
+  total: Cardano.Lovelace;
 };
 
 export type StakeSummary = {
-  active: Ogmios.Lovelace;
-  live: Ogmios.Lovelace;
+  active: Cardano.Lovelace;
+  live: Cardano.Lovelace;
 };
 
 export type StakePoolStats = {
@@ -61,8 +60,13 @@ export interface WalletProvider {
   utxoDelegationAndRewards: (
     addresses: Cardano.Address[],
     stakeKeyHash: Cardano.Hash16
-  ) => Promise<{ utxo: Cardano.Utxo; delegationAndRewards: Cardano.DelegationsAndRewards }>;
-  queryTransactionsByAddresses: (addresses: Cardano.Address[]) => Promise<Transaction.WithHash[]>;
-  queryTransactionsByHashes: (hashes: Cardano.Hash16[]) => Promise<Transaction.WithHash[]>;
+  ) => Promise<{ utxo: Cardano.Utxo[]; delegationAndRewards: Cardano.DelegationsAndRewards }>;
+  /**
+   * TODO: add an optional 'since: Slot' argument for querying transactions and utxos.
+   * When doing so we need to also consider how best we can use the volatile block range of the chain
+   * to minimise over-fetching and assist the application in handling rollback scenarios.
+   */
+  queryTransactionsByAddresses: (addresses: Cardano.Address[]) => Promise<Cardano.TxAlonzo[]>;
+  queryTransactionsByHashes: (hashes: Cardano.Hash16[]) => Promise<Cardano.TxAlonzo[]>;
   currentWalletProtocolParameters: () => Promise<ProtocolParametersRequiredByWallet>;
 }

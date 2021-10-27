@@ -1,9 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-len */
 
 import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
 import { blockfrostProvider } from '../src';
-import { Schema as Cardano } from '@cardano-ogmios/client';
-import { NetworkInfo, StakePoolStats, Transaction } from '@cardano-sdk/core';
+import { Cardano, NetworkInfo, StakePoolStats } from '@cardano-sdk/core';
 jest.mock('@blockfrost/blockfrost-js');
 
 const generatePoolsResponseMock = (qty: number) =>
@@ -156,6 +156,8 @@ describe('blockfrostProvider', () => {
     expect(response.utxo).toBeTruthy();
     expect(response.utxo[0]).toHaveLength(2);
     expect(response.utxo[0][0]).toMatchObject<Cardano.TxIn>({
+      address:
+        'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp',
       txId: '0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5',
       index: 0
     });
@@ -163,7 +165,7 @@ describe('blockfrostProvider', () => {
       address:
         'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp',
       value: {
-        coins: 50_928_877,
+        coins: 50_928_877n,
         assets: {
           b01fb3b8c3dd6b3705a5dc8bcd5a70759f70ad5d97a72005caeac3c652657675746f31333237: BigInt(1)
         }
@@ -172,6 +174,8 @@ describe('blockfrostProvider', () => {
 
     expect(response.utxo[1]).toHaveLength(2);
     expect(response.utxo[1][0]).toMatchObject<Cardano.TxIn>({
+      address:
+        'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp',
       txId: '6f04f2cd96b609b8d5675f89fe53159bab859fb1d62bb56c6001ccf58d9ac128',
       index: 0
     });
@@ -179,28 +183,19 @@ describe('blockfrostProvider', () => {
       address:
         'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp',
       value: {
-        coins: 1_097_647,
+        coins: 1_097_647n,
         assets: {}
       }
     });
 
     expect(response.delegationAndRewards.delegate).toEqual(accountsMockResponse.pool_id);
-    expect(response.delegationAndRewards.rewards).toEqual(Number(accountsMockResponse.withdrawable_amount));
+    expect(response.delegationAndRewards.rewards?.toString()).toEqual(accountsMockResponse.withdrawable_amount);
   });
 
-  test('queryTransactionsByAddresses', async () => {
-    const addressesTransactionsAllMockedResponse = [
-      {
-        tx_hash: '4123d70f66414cc921f6ffc29a899aafc7137a99a0fd453d6b200863ef5702d6',
-        tx_index: 1,
-        block_height: 2_540_728
-      }
-    ];
-    BlockFrostAPI.prototype.addressesTransactionsAll = jest
-      .fn()
-      .mockResolvedValue(addressesTransactionsAllMockedResponse);
+  test.todo('queryTransactionsByAddresses (same implementation as querying by hashes)');
 
-    const txsUtxosMockedResponse = {
+  describe('queryTransactionsByHashes', () => {
+    const txsUtxosResponse = {
       hash: '4123d70f66414cc921f6ffc29a899aafc7137a99a0fd453d6b200863ef5702d6',
       inputs: [
         {
@@ -247,133 +242,106 @@ describe('blockfrostProvider', () => {
         }
       ]
     };
-    BlockFrostAPI.prototype.txsUtxos = jest.fn().mockResolvedValue(txsUtxosMockedResponse);
+    BlockFrostAPI.prototype.txsUtxos = jest.fn().mockResolvedValue(txsUtxosResponse);
 
-    const client = blockfrostProvider({ projectId: apiKey, isTestnet: true });
-
-    const response = await client.queryTransactionsByAddresses([
-      'addr_test1qz7xvvc30qghk00sfpzcfhsw3s2nyn7my0r8hq8c2jj47zsxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flkns6sjg2v'
-    ]);
-
-    expect(response).toHaveLength(1);
-    expect(response[0]).toMatchObject<Transaction.WithHash>({
-      hash: '4123d70f66414cc921f6ffc29a899aafc7137a99a0fd453d6b200863ef5702d6',
-      inputs: [
-        {
-          txId: '6d50c330a6fba79de6949a8dcd5e4b7ffa3f9442f0c5bed7a78fa6d786c6c863',
-          index: 1
-        }
-      ],
-      outputs: [
-        {
-          address:
-            'addr_test1qzx9hu8j4ah3auytk0mwcupd69hpc52t0cw39a65ndrah86djs784u92a3m5w475w3w35tyd6v3qumkze80j8a6h5tuqq5xe8y',
-          value: {
-            coins: 1_000_000_000,
-            assets: {
-              '06f8c5655b4e2b5911fee8ef2fc66b4ce64c8835642695c730a3d108617364': BigInt(63),
-              '06f8c5655b4e2b5911fee8ef2fc66b4ce64c8835642695c730a3d108646464': BigInt(22)
-            }
+    it('without extra tx properties', async () => {
+      const mockedResponse = {
+        hash: '1e043f100dce12d107f679685acd2fc0610e10f72a92d412794c9773d11d8477',
+        block: '356b7d7dbb696ccd12775c016941057a9dc70898d87a63fc752271bb46856940',
+        block_height: 123_456,
+        slot: 42_000_000,
+        index: 1,
+        output_amount: [
+          {
+            unit: 'lovelace',
+            quantity: '42000000'
+          },
+          {
+            unit: 'b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e',
+            quantity: '12'
           }
+        ],
+        fees: '182485',
+        deposit: '5',
+        size: 433,
+        invalid_before: null,
+        invalid_hereafter: '13885913',
+        utxo_count: 2,
+        withdrawal_count: 0,
+        mir_cert_count: 0,
+        delegation_count: 0,
+        stake_cert_count: 0,
+        pool_update_count: 0,
+        pool_retire_count: 0,
+        asset_mint_or_burn_count: 0,
+        redeemer_count: 0,
+        valid_contract: true
+      };
+      BlockFrostAPI.prototype.txs = jest.fn().mockResolvedValue(mockedResponse) as any;
+      const client = blockfrostProvider({ projectId: apiKey, isTestnet: true });
+      const response = await client.queryTransactionsByHashes([
+        '4123d70f66414cc921f6ffc29a899aafc7137a99a0fd453d6b200863ef5702d6'
+      ]);
+
+      expect(response).toHaveLength(1);
+      expect(response[0]).toMatchObject({
+        id: '4123d70f66414cc921f6ffc29a899aafc7137a99a0fd453d6b200863ef5702d6',
+        blockHeader: {
+          slot: 42_000_000,
+          blockHash: '356b7d7dbb696ccd12775c016941057a9dc70898d87a63fc752271bb46856940',
+          blockHeight: 123_456
         },
-        {
-          address:
-            'addr_test1qra788mu4sg8kwd93ns9nfdh3k4ufxwg4xhz2r3n064tzfgxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flkns6cy45x',
-          value: {
-            coins: 9_731_978_536_963,
-            assets: {}
-          }
-        }
-      ]
-    });
-  });
-
-  test('queryTransactionsByHashes', async () => {
-    const mockedResponse = {
-      hash: '4123d70f66414cc921f6ffc29a899aafc7137a99a0fd453d6b200863ef5702d6',
-      inputs: [
-        {
-          address:
-            'addr_test1qr05llxkwg5t6c4j3ck5mqfax9wmz35rpcgw3qthrn9z7xcxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flknstdz3k2',
-          amount: [
+        txSize: 433,
+        body: {
+          fee: 182_485n,
+          index: 1,
+          validityInterval: {
+            invalidHereafter: 13_885_913
+          },
+          inputs: [
             {
-              unit: 'lovelace',
-              quantity: '9732978705764'
+              address:
+                'addr_test1qr05llxkwg5t6c4j3ck5mqfax9wmz35rpcgw3qthrn9z7xcxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flknstdz3k2',
+              txId: '6d50c330a6fba79de6949a8dcd5e4b7ffa3f9442f0c5bed7a78fa6d786c6c863',
+              index: 1
             }
           ],
-          tx_hash: '6d50c330a6fba79de6949a8dcd5e4b7ffa3f9442f0c5bed7a78fa6d786c6c863',
-          output_index: 1
-        }
-      ],
-      outputs: [
-        {
-          address:
-            'addr_test1qzx9hu8j4ah3auytk0mwcupd69hpc52t0cw39a65ndrah86djs784u92a3m5w475w3w35tyd6v3qumkze80j8a6h5tuqq5xe8y',
-          amount: [
+          outputs: [
             {
-              unit: 'lovelace',
-              quantity: '1000000000'
+              address:
+                'addr_test1qzx9hu8j4ah3auytk0mwcupd69hpc52t0cw39a65ndrah86djs784u92a3m5w475w3w35tyd6v3qumkze80j8a6h5tuqq5xe8y',
+              value: {
+                coins: 1_000_000_000n,
+                assets: {
+                  '06f8c5655b4e2b5911fee8ef2fc66b4ce64c8835642695c730a3d108617364': BigInt(63),
+                  '06f8c5655b4e2b5911fee8ef2fc66b4ce64c8835642695c730a3d108646464': BigInt(22)
+                }
+              }
             },
             {
-              unit: '06f8c5655b4e2b5911fee8ef2fc66b4ce64c8835642695c730a3d108617364',
-              quantity: '63'
-            },
-            {
-              unit: '06f8c5655b4e2b5911fee8ef2fc66b4ce64c8835642695c730a3d108646464',
-              quantity: '22'
+              address:
+                'addr_test1qra788mu4sg8kwd93ns9nfdh3k4ufxwg4xhz2r3n064tzfgxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flkns6cy45x',
+              value: {
+                coins: 9_731_978_536_963n,
+                assets: {}
+              }
             }
           ]
         },
-        {
-          address:
-            'addr_test1qra788mu4sg8kwd93ns9nfdh3k4ufxwg4xhz2r3n064tzfgxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flkns6cy45x',
-          amount: [
-            {
-              unit: 'lovelace',
-              quantity: '9731978536963'
-            }
-          ]
+        implicitCoin: {
+          deposit: 5n
         }
-      ]
-    };
-    BlockFrostAPI.prototype.txsUtxos = jest.fn().mockResolvedValue(mockedResponse);
-
-    const client = blockfrostProvider({ projectId: apiKey, isTestnet: true });
-    const response = await client.queryTransactionsByHashes([
-      '4123d70f66414cc921f6ffc29a899aafc7137a99a0fd453d6b200863ef5702d6'
-    ]);
-
-    expect(response).toHaveLength(1);
-    expect(response[0]).toMatchObject<Transaction.WithHash>({
-      hash: '4123d70f66414cc921f6ffc29a899aafc7137a99a0fd453d6b200863ef5702d6',
-      inputs: [
-        {
-          txId: '6d50c330a6fba79de6949a8dcd5e4b7ffa3f9442f0c5bed7a78fa6d786c6c863',
-          index: 1
-        }
-      ],
-      outputs: [
-        {
-          address:
-            'addr_test1qzx9hu8j4ah3auytk0mwcupd69hpc52t0cw39a65ndrah86djs784u92a3m5w475w3w35tyd6v3qumkze80j8a6h5tuqq5xe8y',
-          value: {
-            coins: 1_000_000_000,
-            assets: {
-              '06f8c5655b4e2b5911fee8ef2fc66b4ce64c8835642695c730a3d108617364': BigInt(63),
-              '06f8c5655b4e2b5911fee8ef2fc66b4ce64c8835642695c730a3d108646464': BigInt(22)
-            }
-          }
-        },
-        {
-          address:
-            'addr_test1qra788mu4sg8kwd93ns9nfdh3k4ufxwg4xhz2r3n064tzfgxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flkns6cy45x',
-          value: {
-            coins: 9_731_978_536_963,
-            assets: {}
-          }
-        }
-      ]
+      } as Cardano.TxAlonzo);
     });
+    it.todo('with withdrawals');
+    it.todo('with redeemer');
+    it.todo('with mint');
+    it.todo('with MIR cert');
+    it.todo('with delegation cert');
+    it.todo('with stake certs');
+    it.todo('with pool update certs');
+    it.todo('with pool retire certs');
+    it.todo('with metadata');
   });
 
   test('currentWalletProtocolParameters', async () => {
@@ -392,7 +360,6 @@ describe('blockfrostProvider', () => {
         coins_per_utxo_word: '0'
       }
     };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     BlockFrostAPI.prototype.axiosInstance = jest.fn().mockResolvedValue(mockedResponse) as any;
 
     const client = blockfrostProvider({ projectId: apiKey, isTestnet: true });

@@ -1,5 +1,5 @@
 import { SelectionResult } from '@cardano-sdk/cip2';
-import { Transaction, CSL } from '@cardano-sdk/core';
+import { CSL, Cardano } from '@cardano-sdk/core';
 import { Withdrawal } from './withdrawal';
 
 export type TxInternals = {
@@ -10,7 +10,7 @@ export type TxInternals = {
 export type CreateTxInternalsProps = {
   changeAddress: string;
   inputSelection: SelectionResult['selection'];
-  validityInterval: Transaction.ValidityInterval;
+  validityInterval: Cardano.ValidityInterval;
   certificates?: CSL.Certificate[];
   withdrawals?: Withdrawal[];
 };
@@ -31,9 +31,9 @@ export const createTransactionInternals = async (props: CreateTxInternalsProps):
     inputs,
     outputs,
     props.inputSelection.fee,
-    props.validityInterval.invalidHereafter
+    props.validityInterval.invalidHereafter || undefined
   );
-  if (props.validityInterval.invalidBefore !== undefined) {
+  if (props.validityInterval.invalidBefore) {
     body.set_validity_start_interval(props.validityInterval.invalidBefore);
   }
   if (props.certificates?.length) {

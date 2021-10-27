@@ -1,4 +1,4 @@
-import { Ogmios, CSL } from '@cardano-sdk/core';
+import { CSL, Cardano, coreToCsl } from '@cardano-sdk/core';
 import { orderBy } from 'lodash-es';
 import { ComputeMinimumCoinQuantity, TokenBundleSizeExceedsLimit } from '../types';
 import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
@@ -16,7 +16,7 @@ type EstimateTxFeeWithOriginalOutputs = (utxo: CSL.TransactionUnspentOutput[], c
 
 interface ChangeComputationArgs {
   utxoSelection: UtxoSelection;
-  outputValues: Ogmios.Value[];
+  outputValues: Cardano.Value[];
   uniqueOutputAssetIDs: string[];
   implicitCoin: ImplicitCoinBigint;
   estimateTxFee: EstimateTxFeeWithOriginalOutputs;
@@ -55,7 +55,7 @@ const getLeftoverAssets = (utxoSelected: UtxoWithValue[], uniqueOutputAssetIDs: 
  */
 const redistributeLeftoverAssets = (
   utxoSelected: UtxoWithValue[],
-  requestedAssetChangeBundles: Ogmios.Value[],
+  requestedAssetChangeBundles: Cardano.Value[],
   uniqueOutputAssetIDs: string[]
 ) => {
   const leftovers = getLeftoverAssets(utxoSelected, uniqueOutputAssetIDs);
@@ -86,7 +86,7 @@ const redistributeLeftoverAssets = (
 };
 
 const createBundlePerOutput = (
-  outputValues: Ogmios.Value[],
+  outputValues: Cardano.Value[],
   coinTotalRequested: bigint,
   coinChangeTotal: bigint,
   assetTotals: Record<string, { selected: bigint; requested: bigint }>
@@ -99,7 +99,7 @@ const createBundlePerOutput = (
     if (!value.assets) {
       return { coins };
     }
-    const assets: Ogmios.TokenMap = {};
+    const assets: Cardano.TokenMap = {};
     for (const assetId of Object.keys(value.assets)) {
       const outputAmount = value.assets[assetId];
       const { selected, requested } = assetTotals[assetId];
@@ -123,11 +123,11 @@ const createBundlePerOutput = (
  */
 const computeRequestedAssetChangeBundles = (
   utxoSelected: UtxoWithValue[],
-  outputValues: Ogmios.Value[],
+  outputValues: Cardano.Value[],
   uniqueOutputAssetIDs: string[],
   implicitCoin: ImplicitCoinBigint,
   fee: bigint
-): Ogmios.Value[] => {
+): Cardano.Value[] => {
   const assetTotals: Record<string, { selected: bigint; requested: bigint }> = {};
   for (const assetId of uniqueOutputAssetIDs) {
     assetTotals[assetId] = {
@@ -182,20 +182,20 @@ const pickExtraRandomUtxo = ({ utxoRemaining, utxoSelected }: UtxoSelection): Ut
 };
 
 const coalesceChangeBundlesForMinCoinRequirement = (
-  changeBundles: Ogmios.Value[],
+  changeBundles: Cardano.Value[],
   computeMinimumCoinQuantity: ComputeMinimumCoinQuantity
-): Ogmios.Value[] | undefined => {
+): Cardano.Value[] | undefined => {
   if (changeBundles.length === 0) {
     return changeBundles;
   }
 
   let sortedBundles = orderBy(changeBundles, ({ coins }) => coins, 'desc');
-  const satisfiesMinCoinRequirement = (valueQuantities: Ogmios.Value) =>
-    valueQuantities.coins >= computeMinimumCoinQuantity(Ogmios.ogmiosToCsl.value(valueQuantities).multiasset());
+  const satisfiesMinCoinRequirement = (valueQuantities: Cardano.Value) =>
+    valueQuantities.coins >= computeMinimumCoinQuantity(coreToCsl.value(valueQuantities).multiasset());
 
   while (sortedBundles.length > 1 && !satisfiesMinCoinRequirement(sortedBundles[sortedBundles.length - 1])) {
     const smallestBundle = sortedBundles.pop()!;
-    sortedBundles[sortedBundles.length - 1] = Ogmios.util.coalesceValueQuantities([
+    sortedBundles[sortedBundles.length - 1] = Cardano.util.coalesceValueQuantities([
       sortedBundles[sortedBundles.length - 1],
       smallestBundle
     ]);
@@ -219,12 +219,12 @@ const computeChangeBundles = ({
   fee = 0n
 }: {
   utxoSelection: UtxoSelection;
-  outputValues: Ogmios.Value[];
+  outputValues: Cardano.Value[];
   uniqueOutputAssetIDs: string[];
   implicitCoin: ImplicitCoinBigint;
   computeMinimumCoinQuantity: ComputeMinimumCoinQuantity;
   fee?: bigint;
-}): UtxoSelection & { changeBundles: Ogmios.Value[] } => {
+}): UtxoSelection & { changeBundles: Cardano.Value[] } => {
   const requestedAssetChangeBundles = computeRequestedAssetChangeBundles(
     utxoSelection.utxoSelected,
     outputValues,
@@ -262,10 +262,10 @@ const computeChangeBundles = ({
 };
 
 const changeBundlesToValues = (
-  changeBundles: Ogmios.Value[],
+  changeBundles: Cardano.Value[],
   tokenBundleSizeExceedsLimit: TokenBundleSizeExceedsLimit
 ) => {
-  const values = changeBundles.map((bundle) => Ogmios.ogmiosToCsl.value(bundle));
+  const values = changeBundles.map((bundle) => coreToCsl.value(bundle));
   for (const value of values) {
     const multiasset = value.multiasset();
     if (!multiasset) continue;

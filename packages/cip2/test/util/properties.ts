@@ -1,6 +1,6 @@
 import { AssetId, SelectionConstraints } from '@cardano-sdk/util-dev';
-import { ImplicitCoin, SelectionResult } from '../../src/types';
-import { cslUtil, Ogmios, CSL } from '@cardano-sdk/core';
+import { SelectionResult } from '../../src/types';
+import { cslUtil, Cardano, CSL, cslToCore } from '@cardano-sdk/core';
 import { InputSelectionError, InputSelectionFailure } from '../../src/InputSelectionError';
 import fc, { Arbitrary } from 'fast-check';
 
@@ -9,7 +9,7 @@ const assertExtraChangeProperties = (
   results: SelectionResult
 ) => {
   for (const value of results.selection.change) {
-    const { coins, assets } = Ogmios.cslToOgmios.value(value);
+    const { coins, assets } = cslToCore.value(value);
     // Min UTxO coin requirement for change
     expect(coins).toBeGreaterThanOrEqual(minimumCoinQuantity);
     // No 0 quantity assets
@@ -24,11 +24,11 @@ const assertExtraChangeProperties = (
 };
 
 const totalOutputsValue = (outputs: Set<CSL.TransactionOutput>) =>
-  Ogmios.util.coalesceValueQuantities([...outputs].map((output) => Ogmios.cslToOgmios.value(output.amount())));
+  Cardano.util.coalesceValueQuantities([...outputs].map((output) => cslToCore.value(output.amount())));
 
 const totalUtxosValue = (results: SelectionResult) =>
-  Ogmios.util.coalesceValueQuantities(
-    [...results.selection.inputs].map((selectedUtxo) => Ogmios.cslToOgmios.value(selectedUtxo.output().amount()))
+  Cardano.util.coalesceValueQuantities(
+    [...results.selection.inputs].map((selectedUtxo) => cslToCore.value(selectedUtxo.output().amount()))
   );
 
 const inputSelectionTotals = ({
@@ -38,7 +38,7 @@ const inputSelectionTotals = ({
 }: {
   results: SelectionResult;
   outputs: Set<CSL.TransactionOutput>;
-  implicitCoin?: ImplicitCoin;
+  implicitCoin?: Cardano.ImplicitCoin;
 }) => {
   const vSelectedUtxo = totalUtxosValue(results);
   const vSelected = {
@@ -51,8 +51,8 @@ const inputSelectionTotals = ({
     ...vRequestedOutputs,
     coins: vRequestedOutputs.coins + BigInt(implicitCoin?.deposit || 0) + vFee
   };
-  const vChange = Ogmios.util.coalesceValueQuantities(
-    [...results.selection.change].map((value) => Ogmios.cslToOgmios.value(value))
+  const vChange = Cardano.util.coalesceValueQuantities(
+    [...results.selection.change].map((value) => cslToCore.value(value))
   );
   return { vSelected, vRequested, vChange };
 };
@@ -68,7 +68,7 @@ export const assertInputSelectionProperties = ({
   outputs: Set<CSL.TransactionOutput>;
   utxo: Set<CSL.TransactionUnspentOutput>;
   constraints: SelectionConstraints.MockSelectionConstraints;
-  implicitCoin?: ImplicitCoin;
+  implicitCoin?: Cardano.ImplicitCoin;
 }) => {
   const { vSelected, vRequested, vChange } = inputSelectionTotals({ results, outputs, implicitCoin });
 
@@ -110,16 +110,16 @@ export const assertFailureProperties = ({
   implicitCoin
 }: {
   error: InputSelectionError;
-  utxoAmounts: Ogmios.Value[];
-  outputsAmounts: Ogmios.Value[];
+  utxoAmounts: Cardano.Value[];
+  outputsAmounts: Cardano.Value[];
   constraints: SelectionConstraints.MockSelectionConstraints;
-  implicitCoin?: ImplicitCoin;
+  implicitCoin?: Cardano.ImplicitCoin;
 }) => {
-  const availableQuantities = Ogmios.util.coalesceValueQuantities([
+  const availableQuantities = Cardano.util.coalesceValueQuantities([
     ...utxoAmounts,
     { coins: BigInt(implicitCoin?.input || 0) }
   ]);
-  const requestedQuantities = Ogmios.util.coalesceValueQuantities([
+  const requestedQuantities = Cardano.util.coalesceValueQuantities([
     ...outputsAmounts,
     { coins: BigInt(implicitCoin?.deposit || 0) + constraints.minimumCost }
   ]);
@@ -162,7 +162,7 @@ export const generateSelectionParams = (() => {
   const arrayOfCoinAndAssets = (implicitCoin = 0n) =>
     fc
       .array(
-        fc.record<Ogmios.Value>({
+        fc.record<Cardano.Value>({
           coins: fc.bigUint(cslUtil.MAX_U64 - implicitCoin),
           assets: fc.oneof(
             fc
@@ -174,7 +174,7 @@ export const generateSelectionParams = (() => {
                 assets.reduce((quantities, { amount, asset }) => {
                   quantities[asset] = amount;
                   return quantities;
-                }, {} as Ogmios.TokenMap)
+                }, {} as Cardano.TokenMap)
               ),
             fc.constant(void 0)
           )
@@ -183,14 +183,14 @@ export const generateSelectionParams = (() => {
       )
       .filter((values) => {
         // sum of coin or any asset can't exceed MAX_U64
-        const { coins, assets } = Ogmios.util.coalesceValueQuantities(values);
+        const { coins, assets } = Cardano.util.coalesceValueQuantities(values);
         return (
           coins + implicitCoin <= cslUtil.MAX_U64 &&
           (!assets || Object.values(assets).every((quantity) => quantity <= cslUtil.MAX_U64))
         );
       });
 
-  const generateImplicitCoin: Arbitrary<ImplicitCoin | undefined> = fc.oneof(
+  const generateImplicitCoin: Arbitrary<Cardano.ImplicitCoin | undefined> = fc.oneof(
     fc.constant(void 0),
     fc.record({
       deposit: fc.oneof(
@@ -216,10 +216,10 @@ export const generateSelectionParams = (() => {
   );
 
   return (): Arbitrary<{
-    utxoAmounts: Ogmios.Value[];
-    outputsAmounts: Ogmios.Value[];
+    utxoAmounts: Cardano.Value[];
+    outputsAmounts: Cardano.Value[];
     constraints: SelectionConstraints.MockSelectionConstraints;
-    implicitCoin?: ImplicitCoin;
+    implicitCoin?: Cardano.ImplicitCoin;
   }> =>
     generateImplicitCoin.chain((implicitCoin) =>
       fc.record({

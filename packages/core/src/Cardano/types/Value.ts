@@ -1,4 +1,4 @@
-import { PoolId, Value as _OgmiosValue } from '@cardano-ogmios/schema';
+import { Value as _OgmiosValue } from '@cardano-ogmios/schema';
 
 export type Lovelace = bigint;
 
@@ -14,12 +14,4 @@ export type TokenMap = NonNullable<_OgmiosValue['assets']>;
 export interface Value {
   coins: Lovelace;
   assets?: TokenMap;
-}
-
-/**
- * TODO: Use Ogmios type after it changes lovelaces to bigint;
- */
-export interface DelegationsAndRewards {
-  delegate?: PoolId;
-  rewards?: Lovelace;
 }

@@ -74,7 +74,7 @@ describe('Wallet', () => {
       expect(uxtos).toEqual([
         [
           { txId: '123456', index: 0 },
-          { address: 'asdf', value: { coins: 100, assets: {} } }
+          { address: 'asdf', value: { coins: 100n, assets: {} } }
         ]
       ]);
     });

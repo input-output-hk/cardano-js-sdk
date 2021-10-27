@@ -1,5 +1,4 @@
-import { ImplicitCoin } from '@cardano-sdk/cip2';
-import { BigIntMath, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
+import { BigIntMath, Cardano, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
 import { InitializeTxProps } from './types';
 
 /**
@@ -8,7 +7,7 @@ import { InitializeTxProps } from './types';
 export const computeImplicitCoin = (
   { stakeKeyDeposit, poolDeposit }: ProtocolParametersRequiredByWallet,
   { certificates, withdrawals }: InitializeTxProps
-): ImplicitCoin => {
+): Cardano.ImplicitCoin => {
   const stakeKeyDepositBigint = stakeKeyDeposit && BigInt(stakeKeyDeposit);
   const poolDepositBigint = poolDeposit && BigInt(poolDeposit);
   const deposit = BigIntMath.sum(

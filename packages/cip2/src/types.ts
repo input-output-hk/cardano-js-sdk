@@ -1,5 +1,4 @@
-import { ProtocolParametersAlonzo } from '@cardano-ogmios/schema';
-import { Ogmios, CSL } from '@cardano-sdk/core';
+import { Cardano, CSL } from '@cardano-sdk/core';
 
 export interface SelectionSkeleton {
   /**
@@ -67,20 +66,6 @@ export interface SelectionConstraints {
   computeSelectionLimit: ComputeSelectionLimit;
 }
 
-/**
- * Implicit coin quantities used in the transaction
- */
-export interface ImplicitCoin {
-  /**
-   * Delegation withdrawals + reclaims
-   */
-  input?: Ogmios.Lovelace;
-  /**
-   * Delegation registration deposit
-   */
-  deposit?: Ogmios.Lovelace;
-}
-
 export interface InputSelectionParameters {
   /**
    * The set of inputs available for selection.
@@ -97,7 +82,7 @@ export interface InputSelectionParameters {
   /**
    * Implicit coin quantities used in the transaction
    */
-  implicitCoin?: ImplicitCoin;
+  implicitCoin?: Cardano.ImplicitCoin;
 }
 
 export interface InputSelector {
@@ -110,10 +95,12 @@ export interface InputSelector {
 }
 
 export type ProtocolParametersForInputSelection = Pick<
-  ProtocolParametersAlonzo,
+  Cardano.ProtocolParametersAlonzo,
   'coinsPerUtxoWord' | 'maxTxSize' | 'maxValueSize' | 'minFeeCoefficient' | 'minFeeConstant'
 >;
 
-export type ProtocolParametersRequiredByInputSelection = {
-  [k in keyof ProtocolParametersForInputSelection]: NonNullable<ProtocolParametersForInputSelection[k]>;
-};
+export type ProtocolParametersRequiredByInputSelection = Required<
+  {
+    [k in keyof ProtocolParametersForInputSelection]: ProtocolParametersForInputSelection[k];
+  }
+>;

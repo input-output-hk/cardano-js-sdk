@@ -1,11 +1,10 @@
-import { Utxo } from '@cardano-ogmios/schema';
-import { Ogmios } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
 import Emittery from 'emittery';
 import { dummyLogger } from 'ts-log';
 import { UtxoRepository, UtxoRepositoryEvent, UtxoRepositoryFields } from './types';
 
-export interface Balance extends Ogmios.Value {
-  rewards: Ogmios.Lovelace;
+export interface Balance extends Cardano.Value {
+  rewards: Cardano.Lovelace;
 }
 
 export interface Balances {
@@ -48,15 +47,7 @@ export class BalanceTracker extends Emittery<BalanceTrackerEvents> implements Ba
     };
   }
 
-  #getBalance(utxo: Utxo): Ogmios.Value {
-    return Ogmios.util.coalesceValueQuantities(
-      utxo.map(([_, txOut]) => {
-        const { coins, assets } = txOut.value;
-        return {
-          coins: BigInt(coins),
-          assets
-        };
-      })
-    );
+  #getBalance(utxo: Cardano.Utxo[]): Cardano.Value {
+    return Cardano.util.coalesceValueQuantities(utxo.map(([_, txOut]) => txOut.value));
   }
 }

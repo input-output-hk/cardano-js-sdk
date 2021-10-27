@@ -27,7 +27,6 @@
     "shx": "^0.3.3"
   },
   "dependencies": {
-    "@cardano-ogmios/schema": "4.1.0",
     "@cardano-sdk/cip2": "0.1.4",
     "@cardano-sdk/core": "0.1.4",
     "delay": "^5.0.0",
