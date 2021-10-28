@@ -109,8 +109,10 @@ export interface TxAlonzo {
   implicitCoin: ImplicitCoin;
   txSize: number;
   witness: Witness;
-  metadata?: Cardano.AuxiliaryData;
+  auxiliaryData?: Cardano.AuxiliaryData;
 }
+
+export type NewTxAlonzo = Omit<TxAlonzo, 'blockHeader' | 'implicitCoin' | 'txSize'>;
 
 export enum TransactionStatus {
   Pending = 'pending',
