@@ -113,13 +113,3 @@ export interface TxAlonzo {
 }
 
 export type NewTxAlonzo = Omit<TxAlonzo, 'blockHeader' | 'implicitCoin' | 'txSize'>;
-
-export enum TransactionStatus {
-  Pending = 'pending',
-  Confirmed = 'confirmed'
-}
-
-export interface SubmittedTransaction {
-  tx: TxAlonzo;
-  status: TransactionStatus;
-}

@@ -1,17 +1,19 @@
 import { CSL, Cardano } from '..';
 
-export type ProtocolParametersRequiredByWallet = Pick<
-  Cardano.ProtocolParametersAlonzo,
-  | 'coinsPerUtxoWord'
-  | 'maxTxSize'
-  | 'maxValueSize'
-  | 'stakeKeyDeposit'
-  | 'maxCollateralInputs'
-  | 'minFeeCoefficient'
-  | 'minFeeConstant'
-  | 'minPoolCost'
-  | 'poolDeposit'
-  | 'protocolVersion'
+export type ProtocolParametersRequiredByWallet = Required<
+  Pick<
+    Cardano.ProtocolParametersAlonzo,
+    | 'coinsPerUtxoWord'
+    | 'maxTxSize'
+    | 'maxValueSize'
+    | 'stakeKeyDeposit'
+    | 'maxCollateralInputs'
+    | 'minFeeCoefficient'
+    | 'minFeeConstant'
+    | 'minPoolCost'
+    | 'poolDeposit'
+    | 'protocolVersion'
+  >
 >;
 
 export type AssetSupply = {
