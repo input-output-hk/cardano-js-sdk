@@ -1,0 +1,179 @@
+import { CSL, Cardano, WalletProvider } from '@cardano-sdk/core';
+import {
+  DirectionalTransaction,
+  FailedTx,
+  NewTx,
+  SimpleProvider,
+  TransactionDirection,
+  Transactions
+} from '../prototype/types';
+import {
+  EMPTY,
+  Observable,
+  concat,
+  filter,
+  from,
+  map,
+  merge,
+  mergeMap,
+  of,
+  race,
+  scan,
+  share,
+  startWith,
+  take,
+  takeUntil,
+  tap
+} from 'rxjs';
+import { Hash16 } from '@cardano-ogmios/schema';
+import { ProviderTrackerSubject, SourceTrackerConfig } from './util';
+import { TrackerSubject } from './util/TrackerSubject';
+import { TransactionFailure } from '..';
+import { flatten } from 'lodash-es';
+
+export interface TransactionsTrackerProps {
+  tip$: Observable<Cardano.Tip>;
+  transactionsProvider: SimpleProvider<DirectionalTransaction[]>;
+  config: SourceTrackerConfig;
+  newTransactions: {
+    submitting$: Observable<NewTx>;
+    pending$: Observable<NewTx>;
+    failedToSubmit$: Observable<FailedTx>;
+  };
+}
+
+export interface TransactionsTrackerInternals {
+  transactionsSource$?: ProviderTrackerSubject<DirectionalTransaction[]>;
+}
+
+export const createAddressTransactionsProvider$ =
+  (walletProvider: WalletProvider, addresses: Cardano.Address[]): SimpleProvider<DirectionalTransaction[]> =>
+  () => {
+    const isMyAddress = ({ address }: { address: Cardano.Address }) => addresses.includes(address);
+    return from(
+      walletProvider.queryTransactionsByAddresses(addresses).then((transactions) =>
+        flatten(
+          transactions.map((tx) => {
+            const {
+              body: { inputs, outputs }
+            } = tx;
+            const incoming = outputs.some(isMyAddress) ? [{ direction: TransactionDirection.Incoming, tx }] : [];
+            const outgoing = inputs.some(isMyAddress) ? [{ direction: TransactionDirection.Outgoing, tx }] : [];
+            return [...incoming, ...outgoing];
+          })
+        )
+      )
+    );
+  };
+
+const newTransactions$ = (transactions$: Observable<Cardano.TxAlonzo[]>) =>
+  transactions$.pipe(
+    take(1),
+    map((transactions) => transactions.map(({ id }) => id)),
+    mergeMap((initialTransactionIds) => {
+      const ignoredTransactionIds: Hash16[] = [...initialTransactionIds];
+      return transactions$.pipe(
+        map((transactions) => transactions.filter(({ id }) => !ignoredTransactionIds.includes(id))),
+        tap((newTransactions) => ignoredTransactionIds.push(...newTransactions.map(({ id }) => id))),
+        mergeMap((newTransactions) => concat(...newTransactions.map((tx) => of(tx))))
+      );
+    })
+  );
+
+export const createTransactionsTracker = (
+  {
+    tip$,
+    transactionsProvider,
+    newTransactions: { submitting$, pending$, failedToSubmit$ },
+    config
+  }: TransactionsTrackerProps,
+  {
+    transactionsSource$ = new ProviderTrackerSubject({ config, provider: transactionsProvider })
+  }: TransactionsTrackerInternals = {}
+): Transactions => {
+  const providerTransactionsByDirection$ = (direction: TransactionDirection) =>
+    transactionsSource$.pipe(
+      map((transactions) => transactions.filter((tx) => tx.direction === direction).map(({ tx }) => tx))
+    );
+  const incomingTransactionHistory$ = new TrackerSubject<Cardano.TxAlonzo[]>(
+    providerTransactionsByDirection$(TransactionDirection.Incoming)
+  );
+  const outgoingTransactionHistory$ = new TrackerSubject<Cardano.TxAlonzo[]>(
+    providerTransactionsByDirection$(TransactionDirection.Outgoing)
+  );
+
+  const txConfirmed$ = (tx: NewTx) => {
+    const txId = Buffer.from(CSL.hash_transaction(tx.body()).to_bytes()).toString('hex');
+    return newTransactions$(outgoingTransactionHistory$).pipe(
+      filter((historyTx) => historyTx.id === txId),
+      take(1),
+      map(() => tx)
+    );
+  };
+
+  const failed$: Observable<FailedTx> = submitting$.pipe(
+    mergeMap((tx) => {
+      const invalidHereafter = tx.body().ttl();
+      return race(
+        failedToSubmit$.pipe(
+          filter((failed) => failed.tx === tx),
+          take(1)
+        ),
+        invalidHereafter
+          ? tip$.pipe(
+              filter(({ slot }) => slot > invalidHereafter),
+              map(() => ({ reason: TransactionFailure.Timeout, tx })),
+              take(1)
+            )
+          : EMPTY
+      ).pipe(takeUntil(txConfirmed$(tx)));
+    }),
+    share()
+  );
+
+  const txFailed$ = (tx: NewTx) =>
+    failed$.pipe(
+      filter((failed) => failed.tx === tx),
+      take(1)
+    );
+
+  const inFlight$ = new TrackerSubject<NewTx[]>(
+    submitting$.pipe(
+      mergeMap((tx) =>
+        merge(
+          of({ op: 'add' as const, tx }),
+          race(txConfirmed$(tx), txFailed$(tx)).pipe(map(() => ({ op: 'remove' as const, tx })))
+        )
+      ),
+      scan((inFlight, { op, tx }) => {
+        if (op === 'add') {
+          return [...inFlight, tx];
+        }
+        const idx = inFlight.indexOf(tx);
+        return [...inFlight.splice(0, idx), ...inFlight.splice(idx + 1)];
+      }, [] as NewTx[]),
+      startWith([])
+    )
+  );
+
+  return {
+    history: {
+      all$: transactionsSource$,
+      incoming$: incomingTransactionHistory$,
+      outgoing$: outgoingTransactionHistory$
+    },
+    incoming$: newTransactions$(incomingTransactionHistory$),
+    outgoing: {
+      confirmed$: submitting$.pipe(mergeMap((tx) => txConfirmed$(tx).pipe(takeUntil(txFailed$(tx))))),
+      failed$,
+      inFlight$,
+      pending$,
+      submitting$
+    },
+    shutdown: () => {
+      transactionsSource$.complete();
+      inFlight$.complete();
+    },
+    sync: () => transactionsSource$.sync()
+  };
+};

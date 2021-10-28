@@ -102,24 +102,26 @@ export const ledgerTip = {
   slot: 37_834_496
 };
 
+export const protocolParameters = {
+  coinsPerUtxoWord: 34_482,
+  maxCollateralInputs: 1,
+  maxTxSize: 16_384,
+  maxValueSize: 1000,
+  minFeeCoefficient: 44,
+  minFeeConstant: 155_381,
+  minPoolCost: 340_000_000,
+  poolDeposit: 500_000_000,
+  protocolVersion: { major: 5, minor: 0 },
+  stakeKeyDeposit: 2_000_000
+};
+
 /**
  * Provider stub for testing
  *
  * returns WalletProvider-compatible object
  */
 export const providerStub = () => ({
-  currentWalletProtocolParameters: async () => ({
-    coinsPerUtxoWord: 34_482,
-    maxCollateralInputs: 1,
-    maxTxSize: 16_384,
-    maxValueSize: 1000,
-    minFeeCoefficient: 44,
-    minFeeConstant: 155_381,
-    minPoolCost: 340_000_000,
-    poolDeposit: 500_000_000,
-    protocolVersion: { major: 5, minor: 0 },
-    stakeKeyDeposit: 2_000_000
-  }),
+  currentWalletProtocolParameters: jest.fn().mockResolvedValue(protocolParameters),
   ledgerTip: jest.fn().mockResolvedValue(ledgerTip),
   networkInfo: async () => ({
     currentEpoch: {

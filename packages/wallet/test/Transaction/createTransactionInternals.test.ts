@@ -5,10 +5,10 @@ import {
   Withdrawal,
   createTransactionInternals
 } from '../../src/Transaction';
-import { InMemoryUtxoRepository, KeyManagement, UtxoRepository } from '../../src';
 import { InputSelector, roundRobinRandomImprove } from '@cardano-sdk/cip2';
-import { MockTransactionTracker, providerStub, testKeyManager } from '../mocks';
+import { KeyManagement } from '../../src';
 import { SelectionConstraints } from '@cardano-sdk/util-dev';
+import { providerStub, testKeyManager, utxo } from '../mocks';
 
 const address =
   'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g';
@@ -16,12 +16,15 @@ const address =
 describe('Transaction.createTransactionInternals', () => {
   let provider: WalletProvider;
   let inputSelector: InputSelector;
-  let utxoRepository: UtxoRepository;
   let keyManager: KeyManagement.KeyManager;
   let outputs: Set<CSL.TransactionOutput>;
 
   const createSimpleTransactionInternals = async (props?: Partial<CreateTxInternalsProps>) => {
-    const result = await utxoRepository.selectInputs(outputs, SelectionConstraints.NO_CONSTRAINTS);
+    const result = await inputSelector.select({
+      constraints: SelectionConstraints.NO_CONSTRAINTS,
+      outputs,
+      utxo: new Set(coreToCsl.utxo(utxo))
+    });
     const ledgerTip = await provider.ledgerTip();
     return await createTransactionInternals({
       changeAddress: 'addr_test1gz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzerspqgpsqe70et',
@@ -48,12 +51,6 @@ describe('Transaction.createTransactionInternals', () => {
         value: { coins: 2_000_000n }
       })
     ]);
-    utxoRepository = new InMemoryUtxoRepository({
-      inputSelector,
-      keyManager,
-      provider,
-      txTracker: new MockTransactionTracker()
-    });
   });
 
   test('simple transaction', async () => {
