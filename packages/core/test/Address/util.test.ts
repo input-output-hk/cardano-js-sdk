@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { isAddress } from '../../src/Address/util';
+import { Address } from '../../src';
 
 export const addresses = {
   byron: {
@@ -30,16 +30,16 @@ describe('Address', () => {
   describe('util', () => {
     describe('isAddress', () => {
       it('returns true if the input is a valid Shelley or Byron-era address, on either the mainnet or testnets', async () => {
-        expect(isAddress(addresses.shelley.testnet)).toBe(true);
-        expect(isAddress(addresses.shelley.mainnet)).toBe(true);
-        expect(isAddress(addresses.byron.mainnet.daedalus)).toBe(true);
-        expect(isAddress(addresses.byron.mainnet.icarus)).toBe(true);
-        expect(isAddress(addresses.byron.testnet.daedalus)).toBe(true);
-        expect(isAddress(addresses.byron.testnet.icarus)).toBe(true);
+        expect(Address.util.isAddress(addresses.shelley.testnet)).toBe(true);
+        expect(Address.util.isAddress(addresses.shelley.mainnet)).toBe(true);
+        expect(Address.util.isAddress(addresses.byron.mainnet.daedalus)).toBe(true);
+        expect(Address.util.isAddress(addresses.byron.mainnet.icarus)).toBe(true);
+        expect(Address.util.isAddress(addresses.byron.testnet.daedalus)).toBe(true);
+        expect(Address.util.isAddress(addresses.byron.testnet.icarus)).toBe(true);
       });
       test('returns false if the input is not a Cardano address', async () => {
-        expect(isAddress(addresses.invalid.short)).toBe(false);
-        expect(isAddress(addresses.invalid.networkMagic)).toBe(false);
+        expect(Address.util.isAddress(addresses.invalid.short)).toBe(false);
+        expect(Address.util.isAddress(addresses.invalid.networkMagic)).toBe(false);
       });
     });
   });
