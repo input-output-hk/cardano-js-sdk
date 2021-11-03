@@ -32,6 +32,8 @@ export const createGraphQLStakePoolSearchProvider = (
           return {
             ...stakePool,
             cost: BigInt(stakePool.cost),
+            // TODO: Rebuild sdk.ts and convert 'margin' and 'relays' to updated types
+            margin: {} as Cardano.Fraction,
             metadata: metadata
               ? {
                   ...metadata,
@@ -54,7 +56,8 @@ export const createGraphQLStakePoolSearchProvider = (
                 live: BigInt(stakePool.metrics.stake.live)
               }
             },
-            pledge: BigInt(stakePool.pledge)
+            pledge: BigInt(stakePool.pledge),
+            relays: []
           };
         });
       } catch (error) {

@@ -1,4 +1,4 @@
-import { CSL, Cardano } from '..';
+import { Cardano } from '..';
 
 export type ProtocolParametersRequiredByWallet = Required<
   Pick<
@@ -57,7 +57,7 @@ export interface WalletProvider {
   // TODO: move stakePoolStats out to other provider type, since it's not required for wallet operation
   stakePoolStats?: () => Promise<StakePoolStats>;
   /** @param signedTransaction signed and serialized cbor */
-  submitTx: (signedTransaction: CSL.Transaction) => Promise<void>;
+  submitTx: (signedTransaction: Uint8Array) => Promise<void>;
   // TODO: split utxoDelegationAndRewards this into 2 or 3 functions
   utxoDelegationAndRewards: (
     addresses: Cardano.Address[],

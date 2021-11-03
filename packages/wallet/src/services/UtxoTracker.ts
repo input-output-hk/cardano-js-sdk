@@ -1,11 +1,11 @@
-import { Cardano, WalletProvider, cslToCore } from '@cardano-sdk/core';
-import { NewTx, SimpleProvider, SourceTransactionalTracker } from '../prototype/types';
+import { Cardano, WalletProvider } from '@cardano-sdk/core';
 import { Observable, combineLatest, from, map } from 'rxjs';
 import { ProviderTrackerSubject, SourceTrackerConfig, TrackerSubject } from './util';
+import { SimpleProvider, SourceTransactionalTracker } from './types';
 
 export interface UtxoTrackerProps {
   utxoProvider: SimpleProvider<Cardano.Utxo[]>;
-  transactionsInFlight$: Observable<NewTx[]>;
+  transactionsInFlight$: Observable<Cardano.NewTxAlonzo[]>;
   config: SourceTrackerConfig;
 }
 
@@ -28,9 +28,9 @@ export const createUtxoTracker = (
       map(([utxo, transactionsInFlight]) =>
         utxo.filter(
           ([utxoTxIn]) =>
-            !transactionsInFlight
-              .map((tx) => cslToCore.txInputs(tx.body().inputs(), ''))
-              .some((inputs) => inputs.some((input) => input.txId === utxoTxIn.txId && input.index === utxoTxIn.index))
+            !transactionsInFlight.some(({ body: { inputs } }) =>
+              inputs.some((input) => input.txId === utxoTxIn.txId && input.index === utxoTxIn.index)
+            )
         )
       )
     )
@@ -39,7 +39,6 @@ export const createUtxoTracker = (
     available$,
     shutdown: () => {
       utxoSource$.complete();
-      // TODO: this may be redundant, test it
       available$.complete();
     },
 

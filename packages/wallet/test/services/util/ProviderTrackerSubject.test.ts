@@ -47,6 +47,7 @@ describe('ProviderTrackerSubject', () => {
     });
   });
 
+  // The code is fairly simple, but quite a few additional tests are needed to test all paths
   it.todo('external trigger cancels an ongoing interval request and makes a new one');
   it.todo('external trigger cancels an ongoing external trigger request and makes a new one');
   it.todo('sync() calls external trigger');

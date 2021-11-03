@@ -1,17 +1,7 @@
 import { Cardano } from '@cardano-sdk/core';
-import { NewTx } from '../../src/prototype';
 import { ProviderTrackerSubject, createUtxoProvider$, createUtxoTracker } from '../../src/services';
 import { createTestScheduler } from '../testScheduler';
 import { providerStub, utxo } from '../mocks';
-
-// eslint-disable-next-line sonarjs/no-duplicate-string
-jest.mock('@cardano-sdk/core', () => ({
-  ...jest.requireActual('@cardano-sdk/core'),
-  cslToCore: {
-    ...jest.requireActual('@cardano-sdk/core').cslToCore,
-    txInputs: () => [utxo[0][0]]
-  }
-}));
 
 describe('createUtxoTracker', () => {
   it('fetches utxo from WalletProvider and locks when spent in a transaction in flight', () => {
@@ -22,13 +12,10 @@ describe('createUtxoTracker', () => {
         a: [],
         b: [
           {
-            body: () => ({
-              inputs: () => ({
-                get: () => null, // converted to [utxo[0][0]] in jest.mock above
-                len: () => 1
-              })
-            })
-          } as unknown as NewTx
+            body: {
+              inputs: [utxo[0][0]]
+            }
+          } as Cardano.NewTxAlonzo
         ]
       });
       const utxoTracker = createUtxoTracker(

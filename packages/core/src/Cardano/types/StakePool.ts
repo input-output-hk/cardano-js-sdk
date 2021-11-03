@@ -1,6 +1,5 @@
 import { ExtendedStakePoolMetadata } from './ExtendedStakePoolMetadata';
-import { Hash16, Lovelace, PoolMetadata } from '.';
-import { PoolParameters } from '@cardano-ogmios/schema';
+import { Hash16, Lovelace, PoolParameters } from '.';
 
 /**
  * Within range [0; 1]
@@ -93,48 +92,21 @@ export interface StakePoolTransactions {
   retirement: TransactionId[];
 }
 
-export interface ByAddress {
-  ipv4?: string;
-  ipv6?: string;
-  port?: number;
-}
-export interface ByName {
-  hostname: string;
-  port?: number;
-}
-
-export type Relay = ByAddress | ByName;
-
-// TODO: don't omit pledge and cost when Lovelace becomes bigint
-export interface StakePool extends Omit<PoolParameters, 'pledge' | 'cost' | 'margin' | 'metadata' | 'relays'> {
+export interface StakePool extends PoolParameters {
   /**
    * Stake pool ID as a hex string
    */
   hexId: Hash16;
   /**
-   * Declared pledge quantity.
-   */
-  pledge: Lovelace;
-  /**
-   * Fixed stake pool running cost
-   */
-  cost: Lovelace;
-  /**
-   * Stake pool margin percentage
-   */
-  margin: Percent;
-  /**
    * Stake pool metrics
    */
   metrics: StakePoolMetrics;
   /**
-   * Stake pool relays
-   */
-  relays: Relay[];
-  /**
    * Transactions provisioning the stake pool
    */
   transactions: StakePoolTransactions;
-  metadataJson?: PoolMetadata;
+  /**
+   * Metadata content
+   */
   metadata?: StakePoolMetadata;
 }

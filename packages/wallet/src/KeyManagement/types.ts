@@ -1,5 +1,5 @@
 import { Address } from '..';
-import { CSL } from '@cardano-sdk/core';
+import { CSL, Cardano } from '@cardano-sdk/core';
 
 export interface KeyManager {
   deriveAddress: (addressIndex: number, index: 0 | 1) => string;
@@ -8,8 +8,10 @@ export interface KeyManager {
     signingIndex: number,
     message: string
   ) => Promise<{ publicKey: string; signature: string }>;
+  // TODO: do not expose CSL objects publicly
   publicKey: CSL.PublicKey;
   publicParentKey: CSL.PublicKey;
-  signTransaction: (txHash: CSL.TransactionHash) => Promise<CSL.TransactionWitnessSet>;
+  // TODO: make signatures object key type clear with type alias
+  signTransaction: (txHash: Cardano.Hash16) => Promise<Cardano.Witness['signatures']>;
   stakeKey: CSL.PublicKey;
 }

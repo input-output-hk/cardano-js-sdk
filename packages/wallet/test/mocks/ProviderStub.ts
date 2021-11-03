@@ -63,6 +63,12 @@ export const delegate = 'pool185g59xpqzt7gf0ljr8v8f3akl95qnmardf2f8auwr3ffx7atjj
 export const rewards = 33_333n;
 export const delegationAndRewards = { delegate, rewards };
 
+export const ledgerTip = {
+  blockNo: 1_111_111,
+  hash: '10d64cc11e9b20e15b6c46aa7b1fed11246f437e62225655a30ea47bf8cc22d0',
+  slot: 37_834_496
+};
+
 export const queryTransactionsResult: Cardano.TxAlonzo[] = [
   {
     body: {
@@ -78,29 +84,26 @@ export const queryTransactionsResult: Cardano.TxAlonzo[] = [
         {
           address:
             'addr_test1qpfhhfy2qgls50r9u4yh0l7z67xpg0a5rrhkmvzcuqrd0znuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q9gw0lz',
-          value: { coins: 5_000_000 }
+          value: { coins: 5_000_000n }
         },
         {
           address:
             'addr_test1qplfzem2xsc29wxysf8wkdqrm4s4mmncd40qnjq9sk84l3tuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q52ukj5',
-          value: { coins: 5_000_000 }
+          value: { coins: 5_000_000n }
         },
         {
           address:
             'addr_test1qqydn46r6mhge0kfpqmt36m6q43knzsd9ga32n96m89px3nuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qypp3m9',
-          value: { coins: 9_825_963 }
+          value: { coins: 9_825_963n }
         }
-      ]
+      ],
+      validityInterval: {
+        invalidHereafter: ledgerTip.slot + 1
+      }
     }
   } as unknown as Cardano.TxAlonzo
 ];
 const queryTransactions = () => jest.fn().mockResolvedValue(queryTransactionsResult);
-
-export const ledgerTip = {
-  blockNo: 1_111_111,
-  hash: '10d64cc11e9b20e15b6c46aa7b1fed11246f437e62225655a30ea47bf8cc22d0',
-  slot: 37_834_496
-};
 
 export const protocolParameters = {
   coinsPerUtxoWord: 34_482,

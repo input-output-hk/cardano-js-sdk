@@ -1,22 +1,20 @@
-import { InitializeTxProps } from '../../src/Transaction';
-import { ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
-import { Transaction } from '../../src';
-import { testKeyManager } from '../mocks';
+import { Cardano, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
+import { CertificateType } from '@cardano-sdk/core/src/Cardano';
+import { InitializeTxProps, Transaction } from '../../src';
 
 describe('Transaction.computeImplicitCoin', () => {
   it('sums registrations for deposit, withdrawals and deregistrations for input', async () => {
     const protocolParameters = { poolDeposit: 3, stakeKeyDeposit: 2 } as ProtocolParametersRequiredByWallet;
-    const keyManager = testKeyManager();
-    const certs = new Transaction.CertificateFactory(keyManager);
-    const certificates = [
-      certs.stakeKeyRegistration(),
-      certs.stakeKeyDeregistration(),
-      certs.stakeKeyRegistration(),
-      certs.poolRetirement(keyManager.stakeKey.hash().to_bech32('key'), 1000),
-      certs.stakeDelegation('pool1qqvukkkfr3ux4qylfkrky23f6trl2l6xjluv36z90ax7gfa8yxt')
+    const address = 'stake...';
+    const certificates: Cardano.Certificate[] = [
+      { __typename: CertificateType.StakeRegistration, address },
+      { __typename: CertificateType.StakeDeregistration, address },
+      { __typename: CertificateType.StakeRegistration, address },
+      { __typename: CertificateType.PoolRetirement, epoch: 500, poolId: 'pool...' },
+      { __typename: CertificateType.StakeDelegation, address, epoch: 500, poolId: 'pool...' }
     ];
-    const withdrawals = [Transaction.withdrawal(keyManager, 5n)];
-    const txProps = { certificates, withdrawals } as unknown as InitializeTxProps;
+    const withdrawals: Cardano.Withdrawal[] = [{ address, quantity: 5n }];
+    const txProps = { certificates, withdrawals } as InitializeTxProps;
 
     const coin = Transaction.computeImplicitCoin(protocolParameters, txProps);
     expect(coin.deposit).toBe(2n + 2n);

@@ -1,7 +1,6 @@
-import { Balance } from '..';
+import { Balance, TransactionalTracker } from './types';
 import { Cardano } from '@cardano-sdk/core';
 import { TrackerSubject } from './util';
-import { TransactionalTracker } from '../prototype/types';
 import { combineLatest, map } from 'rxjs';
 
 const mapToBalances = map<[Cardano.Utxo[], Cardano.Lovelace], Balance>(([utxo, rewards]) => ({

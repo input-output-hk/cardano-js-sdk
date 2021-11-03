@@ -1,16 +1,10 @@
-import { CSL, Cardano, WalletProvider } from '@cardano-sdk/core';
-import {
-  DirectionalTransaction,
-  FailedTx,
-  NewTx,
-  SimpleProvider,
-  TransactionDirection,
-  Transactions
-} from '../prototype/types';
+import { Cardano, WalletProvider } from '@cardano-sdk/core';
+import { DirectionalTransaction, FailedTx, SimpleProvider, TransactionDirection, Transactions } from './types';
 import {
   EMPTY,
   Observable,
   concat,
+  distinctUntilChanged,
   filter,
   from,
   map,
@@ -28,7 +22,7 @@ import {
 import { Hash16 } from '@cardano-ogmios/schema';
 import { ProviderTrackerSubject, SourceTrackerConfig } from './util';
 import { TrackerSubject } from './util/TrackerSubject';
-import { TransactionFailure } from '..';
+import { TransactionFailure } from './TransactionError';
 import { flatten } from 'lodash-es';
 
 export interface TransactionsTrackerProps {
@@ -36,8 +30,8 @@ export interface TransactionsTrackerProps {
   transactionsProvider: SimpleProvider<DirectionalTransaction[]>;
   config: SourceTrackerConfig;
   newTransactions: {
-    submitting$: Observable<NewTx>;
-    pending$: Observable<NewTx>;
+    submitting$: Observable<Cardano.NewTxAlonzo>;
+    pending$: Observable<Cardano.NewTxAlonzo>;
     failedToSubmit$: Observable<FailedTx>;
   };
 }
@@ -93,7 +87,8 @@ export const createTransactionsTracker = (
 ): Transactions => {
   const providerTransactionsByDirection$ = (direction: TransactionDirection) =>
     transactionsSource$.pipe(
-      map((transactions) => transactions.filter((tx) => tx.direction === direction).map(({ tx }) => tx))
+      map((transactions) => transactions.filter((tx) => tx.direction === direction).map(({ tx }) => tx)),
+      distinctUntilChanged((a, b) => a.length === b.length && a.every((tx) => b.includes(tx)))
     );
   const incomingTransactionHistory$ = new TrackerSubject<Cardano.TxAlonzo[]>(
     providerTransactionsByDirection$(TransactionDirection.Incoming)
@@ -102,18 +97,16 @@ export const createTransactionsTracker = (
     providerTransactionsByDirection$(TransactionDirection.Outgoing)
   );
 
-  const txConfirmed$ = (tx: NewTx) => {
-    const txId = Buffer.from(CSL.hash_transaction(tx.body()).to_bytes()).toString('hex');
-    return newTransactions$(outgoingTransactionHistory$).pipe(
-      filter((historyTx) => historyTx.id === txId),
+  const txConfirmed$ = (tx: Cardano.NewTxAlonzo) =>
+    newTransactions$(outgoingTransactionHistory$).pipe(
+      filter((historyTx) => historyTx.id === tx.id),
       take(1),
       map(() => tx)
     );
-  };
 
   const failed$: Observable<FailedTx> = submitting$.pipe(
     mergeMap((tx) => {
-      const invalidHereafter = tx.body().ttl();
+      const invalidHereafter = tx.body.validityInterval.invalidHereafter;
       return race(
         failedToSubmit$.pipe(
           filter((failed) => failed.tx === tx),
@@ -131,13 +124,13 @@ export const createTransactionsTracker = (
     share()
   );
 
-  const txFailed$ = (tx: NewTx) =>
+  const txFailed$ = (tx: Cardano.NewTxAlonzo) =>
     failed$.pipe(
       filter((failed) => failed.tx === tx),
       take(1)
     );
 
-  const inFlight$ = new TrackerSubject<NewTx[]>(
+  const inFlight$ = new TrackerSubject<Cardano.NewTxAlonzo[]>(
     submitting$.pipe(
       mergeMap((tx) =>
         merge(
@@ -151,7 +144,7 @@ export const createTransactionsTracker = (
         }
         const idx = inFlight.indexOf(tx);
         return [...inFlight.splice(0, idx), ...inFlight.splice(idx + 1)];
-      }, [] as NewTx[]),
+      }, [] as Cardano.NewTxAlonzo[]),
       startWith([])
     )
   );

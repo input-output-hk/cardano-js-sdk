@@ -292,7 +292,6 @@ describe('blockfrostProvider', () => {
         },
         body: {
           fee: 182_485n,
-          index: 1,
           inputs: [
             {
               address:
@@ -330,6 +329,7 @@ describe('blockfrostProvider', () => {
         implicitCoin: {
           deposit: 5n
         },
+        index: 1,
         txSize: 433
       } as Cardano.TxAlonzo);
     });

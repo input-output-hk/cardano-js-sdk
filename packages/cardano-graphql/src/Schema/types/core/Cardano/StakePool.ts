@@ -67,6 +67,7 @@ export class StakePoolMetadataJson implements Cardano.PoolMetadata {
 
 @ObjectType()
 export class RelayByName implements Cardano.ByName {
+  type: 'singlehost-by-name';
   @Field()
   hostname: string;
   @Field(() => Int, { nullable: true })
@@ -75,6 +76,7 @@ export class RelayByName implements Cardano.ByName {
 
 @ObjectType()
 export class RelayByAddress implements Cardano.ByAddress {
+  type: 'singlehost-by-address';
   @Field(() => String, { nullable: true })
   ipv4?: string;
   @Field(() => String, { nullable: true })
@@ -121,6 +123,14 @@ export class StakePoolMetadata implements Cardano.StakePoolMetadata {
 }
 
 @ObjectType()
+export class Fraction implements Cardano.Fraction {
+  @Field(() => Int)
+  numerator: number;
+  @Field(() => Int)
+  denominator: number;
+}
+
+@ObjectType()
 export class StakePool implements BigIntsAsStrings<Cardano.StakePool> {
   @Directive('@search(by: [fulltext])')
   @Directive('@id')
@@ -133,7 +143,7 @@ export class StakePool implements BigIntsAsStrings<Cardano.StakePool> {
   @Field({ description: coinDescription })
   cost: string;
   @Field(() => Float)
-  margin: number;
+  margin: Fraction;
   @Field(() => StakePoolMetrics)
   metrics: BigIntsAsStrings<Cardano.StakePoolMetrics>;
   @Field(() => StakePoolTransactions)

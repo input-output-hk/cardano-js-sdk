@@ -1,4 +1,4 @@
-import { Milliseconds } from '../../types';
+import { Milliseconds } from '../types';
 import { Observable, Subject, exhaustMap, interval, merge, startWith, switchMap, takeUntil } from 'rxjs';
 import { TrackerSubject } from './TrackerSubject';
 import { retryBackoff } from 'backoff-rxjs';
@@ -12,12 +12,6 @@ export interface SourceTrackerConfig {
 export interface SourceTrackerProps<T> {
   provider: () => Observable<T>;
   config: SourceTrackerConfig;
-}
-
-// TODO: remove this or move to types.ts
-export interface ProviderSubscription {
-  sync(): void;
-  shutdown(): void;
 }
 
 export interface ProviderTrackerSubjectInternals {

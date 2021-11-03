@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 import * as mocks from './mocks';
-import { CSL, Cardano } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
 import { KeyManagement, SingleAddressWallet } from '../src';
 import { coalesceValueQuantities } from '@cardano-sdk/core/src/Cardano/util';
 import { firstValueFrom, skip } from 'rxjs';
@@ -72,16 +72,17 @@ describe('SingleAddressWallet', () => {
     };
 
     it('initializeTx', async () => {
-      const txInternals = await wallet.initializeTx(props);
-      expect(txInternals.body).toBeInstanceOf(CSL.TransactionBody);
-      expect(txInternals.hash).toBeInstanceOf(CSL.TransactionHash);
+      const { body, hash } = await wallet.initializeTx(props);
+      expect(body.outputs).toHaveLength(props.outputs.size + 1 /* change output */);
+      expect(typeof hash).toBe('string');
     });
 
     it('finalizeTx', async () => {
-      const { body, hash } = await wallet.initializeTx(props);
-      const tx = await wallet.finalizeTx({ body, hash });
-      expect(tx.body().outputs().len()).toBe(2);
-      expect(tx.body().inputs().len()).toBeGreaterThan(0);
+      const txInternals = await wallet.initializeTx(props);
+      const tx = await wallet.finalizeTx(txInternals);
+      expect(tx.body).toBe(txInternals.body);
+      expect(tx.id).toBe(txInternals.hash);
+      expect(Object.keys(tx.witness.signatures)).toHaveLength(1);
     });
 
     it('submitTx', async () => {
@@ -91,7 +92,6 @@ describe('SingleAddressWallet', () => {
       const txInFlight = firstValueFrom(wallet.transactions.outgoing.inFlight$.pipe(skip(1)));
       await wallet.submitTx(tx);
       expect(walletProvider.submitTx).toBeCalledTimes(1);
-      expect(walletProvider.submitTx).toBeCalledWith(tx);
       expect(await txSubmitting).toBe(tx);
       expect(await txPending).toBe(tx);
       expect(await txInFlight).toEqual([tx]);
