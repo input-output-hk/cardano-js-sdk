@@ -1,7 +1,7 @@
 import { Cardano } from '@cardano-sdk/core';
 import { Directive, Field, ObjectType, registerEnumType } from 'type-graphql';
 
-enum PoolStatus {
+enum ExtendedPoolStatus {
   active = 'active',
   retired = 'retired',
   offline = 'offline',
@@ -9,7 +9,7 @@ enum PoolStatus {
   private = 'private'
 }
 
-registerEnumType(PoolStatus, { name: 'PoolStatus' });
+registerEnumType(ExtendedPoolStatus, { name: 'ExtendedPoolStatus' });
 
 @ObjectType()
 export class ITNVerification implements Cardano.ITNVerification {
@@ -62,11 +62,11 @@ export class ExtendedStakePoolMetadataFields implements Cardano.ExtendedStakePoo
   id: string;
   @Field({ nullable: true })
   country?: string;
-  @Field(() => PoolStatus, {
+  @Field(() => ExtendedPoolStatus, {
     description: 'active | retired | offline | experimental | private',
     nullable: true
   })
-  status?: Cardano.PoolStatus;
+  status?: Cardano.ExtendedPoolStatus;
   @Field(() => PoolContactData, { nullable: true })
   contact?: Cardano.PoolContactData;
   @Field(() => ThePoolsMediaAssets, { nullable: true })

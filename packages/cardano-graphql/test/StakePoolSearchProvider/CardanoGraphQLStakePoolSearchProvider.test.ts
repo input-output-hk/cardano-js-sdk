@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { PoolStatus, StakePoolsByMetadataQuery, StakePoolsQuery } from '../../src/sdk';
+import { ExtendedPoolStatus, StakePoolStatus, StakePoolsByMetadataQuery, StakePoolsQuery } from '../../src/sdk';
 import { ProviderError, StakePoolSearchProvider } from '@cardano-sdk/core';
 import { createGraphQLStakePoolSearchProvider } from '../../src/StakePoolSearchProvider/CardanoGraphQLStakePoolSearchProvider';
 
@@ -25,14 +25,17 @@ describe('StakePoolSearchClient', () => {
             cost: '123',
             hexId: '0abc',
             id: 'some-pool',
-            margin: 0.15,
+            margin: {
+              denominator: 3,
+              numerator: 1
+            },
             metadata: {
               description: 'some pool desc',
               ext: {
                 pool: {
                   country: 'LT',
                   id: 'pool-id',
-                  status: PoolStatus.Active
+                  status: ExtendedPoolStatus.Active
                 },
                 serial: 123
               },
@@ -68,6 +71,7 @@ describe('StakePoolSearchClient', () => {
               { __typename: 'RelayByAddress', ipv4: '0.0.0.0', ipv6: '::1', port: 567 }
             ],
             rewardAccount: '745b',
+            status: StakePoolStatus.Active,
             transactions: {
               registration: ['6345b'],
               retirement: ['dawdb']
@@ -99,6 +103,8 @@ describe('StakePoolSearchClient', () => {
       expect(typeof response[0].cost).toBe('bigint');
       expect(typeof response[0].metadata).toBe('object');
       expect(typeof response[0].metadata!.ext).toBe('object');
+      expect(response[0].status).toBe(StakePoolStatus.Active);
+      expect(response[0].margin.numerator).toBe(1);
       expect(response[1].metadata).toBeUndefined();
     });
 

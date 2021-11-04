@@ -1,8 +1,16 @@
 /* eslint-disable no-use-before-define */
 import { BigIntsAsStrings, coinDescription, percentageDescription } from '../../util';
 import { Cardano } from '@cardano-sdk/core';
-import { Directive, Field, Float, Int, ObjectType, createUnionType } from 'type-graphql';
+import { Directive, Field, Float, Int, ObjectType, createUnionType, registerEnumType } from 'type-graphql';
 import { ExtendedStakePoolMetadataFields } from './ExtendedStakePoolMetadataFields';
+
+enum StakePoolStatus {
+  active = 'active',
+  retired = 'retired',
+  retiring = 'retiring'
+}
+
+registerEnumType(StakePoolStatus, { name: 'StakePoolStatus' });
 
 //  This is not in ./ExtendedStakePoolMetadata to avoid circular import
 @ObjectType()
@@ -66,8 +74,7 @@ export class StakePoolMetadataJson implements Cardano.PoolMetadata {
 }
 
 @ObjectType()
-export class RelayByName implements Cardano.ByName {
-  type: 'singlehost-by-name';
+export class RelayByName implements Omit<Cardano.RelayByName, '__typename'> {
   @Field()
   hostname: string;
   @Field(() => Int, { nullable: true })
@@ -75,8 +82,7 @@ export class RelayByName implements Cardano.ByName {
 }
 
 @ObjectType()
-export class RelayByAddress implements Cardano.ByAddress {
-  type: 'singlehost-by-address';
+export class RelayByAddress implements Omit<Cardano.RelayByAddress, '__typename'> {
   @Field(() => String, { nullable: true })
   ipv4?: string;
   @Field(() => String, { nullable: true })
@@ -85,12 +91,23 @@ export class RelayByAddress implements Cardano.ByAddress {
   port?: number;
 }
 
+@ObjectType()
+export class RelayByNameMultihost implements Omit<Cardano.RelayByNameMultihost, '__typename'> {
+  type: 'multihost-by-name';
+  @Field()
+  dnsName: string;
+}
+
 const Relay = createUnionType({
   name: 'SearchResult',
   // function that returns tuple of object types classes,
-  resolveType: (value) => ('hostname' in value ? RelayByName : RelayByAddress),
+  resolveType: (value) => {
+    if ('hostname' in value) return RelayByName;
+    if ('dnsName' in value) return RelayByNameMultihost;
+    return RelayByAddress;
+  },
   // the name of the GraphQL union
-  types: () => [RelayByName, RelayByAddress] as const
+  types: () => [RelayByName, RelayByAddress, RelayByNameMultihost] as const
 });
 
 @ObjectType()
@@ -138,11 +155,15 @@ export class StakePool implements BigIntsAsStrings<Cardano.StakePool> {
   id: string;
   @Field()
   hexId: string;
+  @Field(() => StakePoolStatus, {
+    description: 'active | retired | retiring'
+  })
+  status: Cardano.StakePoolStatus;
   @Field({ description: coinDescription })
   pledge: string;
   @Field({ description: coinDescription })
   cost: string;
-  @Field(() => Float)
+  @Field(() => Fraction)
   margin: Fraction;
   @Field(() => StakePoolMetrics)
   metrics: BigIntsAsStrings<Cardano.StakePoolMetrics>;

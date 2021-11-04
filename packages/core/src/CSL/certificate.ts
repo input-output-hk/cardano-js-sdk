@@ -41,8 +41,8 @@ export const stakeKeyDeregistration = (address: Cardano.Address) =>
 const createCslRelays = (relays: Cardano.Relay[]) => {
   const cslRelays = Relays.new();
   for (const relay of relays) {
-    switch (relay.type) {
-      case 'singlehost-by-address':
+    switch (relay.__typename) {
+      case 'RelayByAddress':
         if (relay.ipv6) {
           throw new NotImplementedError('Parse IPv6 to byte array');
         }
@@ -57,12 +57,12 @@ const createCslRelays = (relays: Cardano.Relay[]) => {
           )
         );
         break;
-      case 'singlehost-by-name':
+      case 'RelayByName':
         cslRelays.add(
           Relay.new_single_host_name(SingleHostName.new(relay.port || undefined, DNSRecordAorAAAA.new(relay.hostname)))
         );
         break;
-      case 'multihost-by-name':
+      case 'RelayByNameMultihost':
         cslRelays.add(Relay.new_multi_host_name(MultiHostName.new(DNSRecordSRV.new(relay.dnsName))));
         break;
       default:

@@ -27,27 +27,9 @@ export const createGraphQLStakePoolSearchProvider = (
         ].filter(isNotNil);
         return responseStakePools.map((responseStakePool) => {
           const stakePool = util.replaceNullsWithUndefineds(responseStakePool);
-          const metadata = stakePool.metadata;
-          const ext = metadata?.ext;
           return {
             ...stakePool,
             cost: BigInt(stakePool.cost),
-            // TODO: Rebuild sdk.ts and convert 'margin' and 'relays' to updated types
-            margin: {} as Cardano.Fraction,
-            metadata: metadata
-              ? {
-                  ...metadata,
-                  ext: ext
-                    ? {
-                        ...ext,
-                        pool: {
-                          ...ext.pool,
-                          status: ext.pool.status as unknown as Cardano.PoolStatus
-                        }
-                      }
-                    : undefined
-                }
-              : undefined,
             metrics: {
               ...stakePool.metrics!,
               livePledge: BigInt(stakePool.metrics.livePledge),
@@ -56,8 +38,7 @@ export const createGraphQLStakePoolSearchProvider = (
                 live: BigInt(stakePool.metrics.stake.live)
               }
             },
-            pledge: BigInt(stakePool.pledge),
-            relays: []
+            pledge: BigInt(stakePool.pledge)
           };
         });
       } catch (error) {

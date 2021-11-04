@@ -1,9 +1,13 @@
 fragment allStakePoolFields on StakePool {
   id
   hexId
+  status
   owners
   cost
-  margin
+  margin {
+    numerator
+    denominator
+  }
   vrf
   relays {
     __typename
@@ -15,6 +19,9 @@ fragment allStakePoolFields on StakePool {
       ipv4
       ipv6
       port
+    }
+    ... on RelayByNameMultihost {
+      dnsName
     }
   }
   rewardAccount

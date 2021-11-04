@@ -51,13 +51,13 @@ describe('coreToCsl.certificate', () => {
         owners: [owner],
         pledge: 10_000n,
         relays: [
-          { hostname: 'example.com', port: 5000, type: 'singlehost-by-name' },
+          { __typename: 'RelayByName', hostname: 'example.com', port: 5000 },
           {
+            __typename: 'RelayByAddress',
             ipv4: '127.0.0.1',
-            port: 6000,
-            type: 'singlehost-by-address'
+            port: 6000
           },
-          { dnsName: 'example.com', type: 'multihost-by-name' }
+          { __typename: 'RelayByNameMultihost', dnsName: 'example.com' }
         ],
         rewardAccount,
         vrf

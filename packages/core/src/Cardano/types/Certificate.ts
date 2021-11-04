@@ -1,24 +1,24 @@
 import { Address, Epoch, Hash16, Lovelace, PoolId } from '.';
 import { PoolParameters as OgmiosPoolParameters, PoolMetadata } from '@cardano-ogmios/schema';
 
-export interface ByAddress {
-  type: 'singlehost-by-address';
+export interface RelayByAddress {
+  __typename: 'RelayByAddress';
   ipv4?: string;
   ipv6?: string;
   port?: number;
 }
-export interface ByName {
-  type: 'singlehost-by-name';
+export interface RelayByName {
+  __typename: 'RelayByName';
   hostname: string;
   port?: number;
 }
 
-export interface MultihostByName {
-  type: 'multihost-by-name';
+export interface RelayByNameMultihost {
+  __typename: 'RelayByNameMultihost';
   dnsName: string;
 }
 
-export type Relay = ByAddress | ByName | MultihostByName;
+export type Relay = RelayByAddress | RelayByName | RelayByNameMultihost;
 
 export interface Fraction {
   numerator: number;

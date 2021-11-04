@@ -92,6 +92,12 @@ export interface StakePoolTransactions {
   retirement: TransactionId[];
 }
 
+export enum StakePoolStatus {
+  Active = 'active',
+  Retired = 'retired',
+  Retiring = 'retiring'
+}
+
 export interface StakePool extends PoolParameters {
   /**
    * Stake pool ID as a hex string
@@ -101,6 +107,10 @@ export interface StakePool extends PoolParameters {
    * Stake pool metrics
    */
   metrics: StakePoolMetrics;
+  /**
+   * Stake pool status
+   */
+  status: StakePoolStatus;
   /**
    * Transactions provisioning the stake pool
    */
