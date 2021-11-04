@@ -1,6 +1,8 @@
 module.exports = {
-  setupFilesAfterEnv: [require.resolve('./jest.setup.js')],
   preset: 'ts-jest',
+  moduleNameMapper: {
+    "^lodash-es$": "lodash"
+  },
   transform: {
     "^.+\\.test.ts?$": "ts-jest"
   },
