@@ -7,7 +7,7 @@ import { InitializeTxProps } from '../types';
  */
 export const computeImplicitCoin = (
   { stakeKeyDeposit, poolDeposit }: ProtocolParametersRequiredByWallet,
-  { certificates, withdrawals }: InitializeTxProps
+  { certificates, withdrawals }: Pick<InitializeTxProps, 'certificates' | 'withdrawals'>
 ): Cardano.ImplicitCoin => {
   const stakeKeyDepositBigint = stakeKeyDeposit && BigInt(stakeKeyDeposit);
   const poolDepositBigint = poolDeposit && BigInt(poolDeposit);
