@@ -12,12 +12,12 @@ import {
   SourceTransactionalTracker,
   TransactionalTracker,
   Transactions,
-  createAddressTransactionsProvider$,
+  createAddressTransactionsProvider,
   createBalanceTracker,
-  createRewardsProvider$,
+  createRewardsProvider,
   createRewardsTracker,
   createTransactionsTracker,
-  createUtxoProvider$,
+  createUtxoProvider,
   createUtxoTracker
 } from './services';
 import { Cardano, ProtocolParametersRequiredByWallet, WalletProvider, coreToCsl } from '@cardano-sdk/core';
@@ -89,10 +89,10 @@ export class SingleAddressWallet implements Wallet {
         index: 0,
         type: AddressType.External
       },
-      utxoProvider = createUtxoProvider$(walletProvider, [address.bech32]),
+      utxoProvider = createUtxoProvider(walletProvider, [address.bech32]),
       tipProvider = () => from(walletProvider.ledgerTip()),
-      rewardsProvider = createRewardsProvider$(walletProvider, [address.bech32], keyManager),
-      transactionsProvider = createAddressTransactionsProvider$(walletProvider, [address.bech32]),
+      rewardsProvider = createRewardsProvider(walletProvider, keyManager),
+      transactionsProvider = createAddressTransactionsProvider(walletProvider, [address.bech32]),
       protocolParametersProvider = () => from(walletProvider.currentWalletProtocolParameters()),
       sourceTrackerConfig: config = {
         maxInterval,

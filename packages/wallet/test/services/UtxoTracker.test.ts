@@ -1,5 +1,5 @@
 import { Cardano } from '@cardano-sdk/core';
-import { ProviderTrackerSubject, createUtxoProvider$, createUtxoTracker } from '../../src/services';
+import { ProviderTrackerSubject, createUtxoProvider, createUtxoTracker } from '../../src/services';
 import { createTestScheduler } from '../testScheduler';
 import { providerStub, utxo } from '../mocks';
 
@@ -22,7 +22,7 @@ describe('createUtxoTracker', () => {
         {
           config: { maxInterval: 100, pollInterval: 100 }, // not relevant for this test, overwriting utxoSource$
           transactionsInFlight$,
-          utxoProvider: createUtxoProvider$(provider, [address])
+          utxoProvider: createUtxoProvider(provider, [address])
         },
         { utxoSource$: cold('a---|', { a: utxo }) as unknown as ProviderTrackerSubject<Cardano.Utxo[]> }
       );

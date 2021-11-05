@@ -17,16 +17,12 @@ export interface RewardsTrackerInternals {
 const getStakeKeyHash = (keyManager: KeyManager): string =>
   Buffer.from(keyManager.stakeKey.hash().to_bytes()).toString('hex');
 
-export const createRewardsProvider$ =
-  (
-    walletProvider: WalletProvider,
-    addresses: Cardano.Address[],
-    keyManager: KeyManager
-  ): (() => Observable<Cardano.Lovelace>) =>
+export const createRewardsProvider =
+  (walletProvider: WalletProvider, keyManager: KeyManager): (() => Observable<Cardano.Lovelace>) =>
   () =>
     from(
       walletProvider
-        .utxoDelegationAndRewards(addresses, getStakeKeyHash(keyManager))
+        .utxoDelegationAndRewards([], getStakeKeyHash(keyManager))
         .then(({ delegationAndRewards: { rewards } }) => rewards || 0n)
     );
 

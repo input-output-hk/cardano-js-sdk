@@ -13,7 +13,7 @@ export interface UtxoTrackerInternals {
   utxoSource$?: ProviderTrackerSubject<Cardano.Utxo[]>;
 }
 
-export const createUtxoProvider$ =
+export const createUtxoProvider =
   (walletProvider: WalletProvider, addresses: Cardano.Address[]): (() => Observable<Cardano.Utxo[]>) =>
   () =>
     from(walletProvider.utxoDelegationAndRewards(addresses, '').then(({ utxo }) => utxo));

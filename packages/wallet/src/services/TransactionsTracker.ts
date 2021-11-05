@@ -40,7 +40,7 @@ export interface TransactionsTrackerInternals {
   transactionsSource$?: ProviderTrackerSubject<DirectionalTransaction[]>;
 }
 
-export const createAddressTransactionsProvider$ =
+export const createAddressTransactionsProvider =
   (walletProvider: WalletProvider, addresses: Cardano.Address[]): SimpleProvider<DirectionalTransaction[]> =>
   () => {
     const isMyAddress = ({ address }: { address: Cardano.Address }) => addresses.includes(address);
