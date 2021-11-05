@@ -25,28 +25,28 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>5/5</span>
+                <span class='fraction'>3/3</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>4/4</span>
-            </div>
-        
-            
-            <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
-                <span class="quiet">Functions</span>
                 <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>5/5</span>
+                <span class='fraction'>3/3</span>
             </div>
         
             
@@ -116,9 +116,23 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">10x</span>
-<span class="cline-any cline-yes">10x</span>
-<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -153,74 +167,60 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">10x</span>
-<span class="cline-any cline-yes">10x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { CSL, Cardano } from '@cardano-sdk/core';
-import { SelectionConstraints, SelectionResult } from '@cardano-sdk/cip2';
-import Emittery from 'emittery';
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import {
+  Balance,
+  BehaviorObservable,
+  ProviderSubscription,
+  SourceTransactionalTracker,
+  TransactionalTracker,
+  Transactions
+} from './services';
+import { Cardano, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
+import { TxInternals } from './Transaction';
 &nbsp;
-export enum UtxoRepositoryEvent {
-  Changed = 'changed',
-  OutOfSync = 'out-of-sync'
+/** Internal = change address &amp; External = receipt address */
+export enum AddressType {
+  /**
+   * Change address
+   */
+  Internal = 'Internal',
+  /**
+   * Receipt address
+   */
+  External = 'External'
 }
 &nbsp;
-export interface UtxoRepositoryFields {
-  allUtxos: Cardano.Utxo[];
-  availableUtxos: Cardano.Utxo[];
-  allRewards: Cardano.Lovelace | null;
-  availableRewards: Cardano.Lovelace | null;
-  delegation: Cardano.PoolId | null;
+export interface Address {
+  bech32: Cardano.Address;
+  index: number;
+  type: AddressType;
+  accountIndex: number;
 }
 &nbsp;
-export type UtxoRepositoryEvents = {
-  changed: UtxoRepositoryFields;
-  'out-of-sync': void;
-  'transaction-untracked': CSL.Transaction;
+export type InitializeTxProps = {
+  outputs: Set&lt;Cardano.TxOut&gt;;
+  certificates?: Cardano.Certificate[];
+  withdrawals?: Cardano.Withdrawal[];
+  options?: {
+    validityInterval?: Cardano.ValidityInterval;
+  };
 };
-export type UtxoRepository = {
-  sync: () =&gt; Promise&lt;void&gt;;
-  selectInputs: (
-    outputs: Set&lt;CSL.TransactionOutput&gt;,
-    constraints: SelectionConstraints,
-    implicitCoin?: Cardano.ImplicitCoin
-  ) =&gt; Promise&lt;SelectionResult&gt;;
-} &amp; UtxoRepositoryFields &amp;
-  Emittery&lt;UtxoRepositoryEvents&gt;;
 &nbsp;
-export interface OnTransactionArgs {
-  transaction: CSL.Transaction;
-  /**
-   * Resolves when transaction is confirmed.
-   * Rejects if transaction fails to submit or validate.
-   */
-  confirmed: Promise&lt;void&gt;;
+export interface FinalizeTxProps {
+  readonly body: Cardano.TxBodyAlonzo;
 }
 &nbsp;
-export enum TransactionTrackerEvent {
-  NewTransaction = 'new-transaction'
-}
-&nbsp;
-export type TransactionTrackerEvents = { 'new-transaction': OnTransactionArgs };
-export interface TransactionTracker extends Emittery&lt;TransactionTrackerEvents&gt; {
-  /**
-   * Track a new transaction.
-   *
-   * @param {CSL.Transaction} transaction transaction to track.
-   * @param {Promise&lt;void&gt;} submitted defer checking for transaction confirmation until this resolves.
-   */
-  track(transaction: CSL.Transaction, submitted?: Promise&lt;void&gt;): Promise&lt;void&gt;;
+export interface Wallet extends ProviderSubscription {
+  name: string;
+  readonly balance: TransactionalTracker&lt;Balance&gt;;
+  readonly utxo: SourceTransactionalTracker&lt;Cardano.Utxo[]&gt;;
+  readonly transactions: Transactions;
+  readonly tip$: BehaviorObservable&lt;Cardano.Tip&gt;;
+  readonly protocolParameters$: BehaviorObservable&lt;ProtocolParametersRequiredByWallet&gt;;
+  get addresses(): Address[];
+  initializeTx(props: InitializeTxProps): Promise&lt;TxInternals&gt;;
+  finalizeTx(props: TxInternals): Promise&lt;Cardano.NewTxAlonzo&gt;;
+  submitTx(tx: Cardano.NewTxAlonzo): Promise&lt;void&gt;;
 }
 &nbsp;</pre></td></tr></table></pre>
 
@@ -229,7 +229,7 @@ export interface TransactionTracker extends Emittery&lt;TransactionTrackerEvents
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Fri Oct 29 2021 06:26:30 GMT+0000 (Coordinated Universal Time)
+                at Fri Nov 05 2021 10:37:45 GMT+0000 (Coordinated Universal Time)
             </div>
         </div>
         <script src="../prettify.js"></script>

@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>12/12</span>
+                <span class='fraction'>13/13</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>10/10</span>
+                <span class='fraction'>11/11</span>
             </div>
         
             
@@ -92,68 +92,68 @@
 <a name='L33'></a><a href='#L33'>33</a>
 <a name='L34'></a><a href='#L34'>34</a>
 <a name='L35'></a><a href='#L35'>35</a>
-<a name='L36'></a><a href='#L36'>36</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">10x</span>
+<a name='L36'></a><a href='#L36'>36</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { BigIntMath, Cardano, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
-import { InitializeTxProps } from './types';
+import { CertificateType } from '@cardano-sdk/core/src/Cardano';
+import { InitializeTxProps } from '../types';
 &nbsp;
 /**
  * Implementation is the same as in CSL.get_implicit_input() and CSL.get_deposit().
  */
 export const computeImplicitCoin = (
   { stakeKeyDeposit, poolDeposit }: ProtocolParametersRequiredByWallet,
-  { certificates, withdrawals }: InitializeTxProps
+  { certificates, withdrawals }: Pick&lt;InitializeTxProps, 'certificates' | 'withdrawals'&gt;
 ): Cardano.ImplicitCoin =&gt; {
   const stakeKeyDepositBigint = stakeKeyDeposit &amp;&amp; BigInt(stakeKeyDeposit);
   const poolDepositBigint = poolDeposit &amp;&amp; BigInt(poolDeposit);
   const deposit = BigIntMath.sum(
     certificates?.map(
       (cert) =&gt;
-        (cert.as_stake_registration() &amp;&amp; stakeKeyDepositBigint) ||
-        (cert.as_pool_registration() &amp;&amp; <span class="branch-3 cbranch-no" title="branch not covered" >poolDepositBigint)</span> ||
+        (cert.__typename === CertificateType.StakeRegistration &amp;&amp; stakeKeyDepositBigint) ||
+        (cert.__typename === CertificateType.PoolRegistration &amp;&amp; <span class="branch-3 cbranch-no" title="branch not covered" >poolDepositBigint)</span> ||
         0n
     ) || []
   );
-  const withdrawalsTotal =
-    (withdrawals &amp;&amp; BigIntMath.sum(withdrawals.map(({ quantity }) =&gt; BigInt(quantity.to_str())))) || 0n;
+  const withdrawalsTotal = (withdrawals &amp;&amp; BigIntMath.sum(withdrawals.map(({ quantity }) =&gt; quantity))) || 0n;
   const reclaimTotal = BigIntMath.sum(
     certificates?.map(
       (cert) =&gt;
-        (cert.as_stake_deregistration() &amp;&amp; stakeKeyDepositBigint) ||
-        (cert.as_pool_retirement() &amp;&amp; poolDepositBigint) ||
+        (cert.__typename === CertificateType.StakeDeregistration &amp;&amp; stakeKeyDepositBigint) ||
+        (cert.__typename === CertificateType.PoolRetirement &amp;&amp; poolDepositBigint) ||
         0n
     ) || []
   );
@@ -169,7 +169,7 @@ export const computeImplicitCoin = (
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Fri Oct 29 2021 06:26:30 GMT+0000 (Coordinated Universal Time)
+                at Fri Nov 05 2021 10:37:45 GMT+0000 (Coordinated Universal Time)
             </div>
         </div>
         <script src="../../prettify.js"></script>

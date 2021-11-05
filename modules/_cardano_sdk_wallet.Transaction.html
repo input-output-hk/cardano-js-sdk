@@ -73,22 +73,10 @@
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section ">
-							<h3>Classes</h3>
-							<ul class="tsd-index-list">
-								<li class="tsd-kind-class tsd-parent-kind-namespace"><a href="../classes/_cardano_sdk_wallet.Transaction.CertificateFactory.html" class="tsd-kind-icon">Certificate<wbr>Factory</a></li>
-							</ul>
-						</section>
-						<section class="tsd-index-section ">
 							<h3>Type aliases</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-type-alias tsd-parent-kind-namespace"><a href="_cardano_sdk_wallet.Transaction.html#AddressBech32" class="tsd-kind-icon">Address<wbr>Bech32</a></li>
 								<li class="tsd-kind-type-alias tsd-parent-kind-namespace"><a href="_cardano_sdk_wallet.Transaction.html#CreateTxInternalsProps" class="tsd-kind-icon">Create<wbr>TxInternals<wbr>Props</a></li>
-								<li class="tsd-kind-type-alias tsd-parent-kind-namespace"><a href="_cardano_sdk_wallet.Transaction.html#Ed25519KeyHashBech32" class="tsd-kind-icon">Ed25519<wbr>Key<wbr>Hash<wbr>Bech32</a></li>
-								<li class="tsd-kind-type-alias tsd-parent-kind-namespace"><a href="_cardano_sdk_wallet.Transaction.html#InitializeTxProps" class="tsd-kind-icon">Initialize<wbr>TxProps</a></li>
-								<li class="tsd-kind-type-alias tsd-parent-kind-namespace"><a href="_cardano_sdk_wallet.Transaction.html#PoolMetadataHashBech32" class="tsd-kind-icon">Pool<wbr>Metadata<wbr>Hash<wbr>Bech32</a></li>
 								<li class="tsd-kind-type-alias tsd-parent-kind-namespace"><a href="_cardano_sdk_wallet.Transaction.html#TxInternals" class="tsd-kind-icon">Tx<wbr>Internals</a></li>
-								<li class="tsd-kind-type-alias tsd-parent-kind-namespace"><a href="_cardano_sdk_wallet.Transaction.html#VrfKeyHashBech32" class="tsd-kind-icon">Vrf<wbr>Key<wbr>Hash<wbr>Bech32</a></li>
-								<li class="tsd-kind-type-alias tsd-parent-kind-namespace"><a href="_cardano_sdk_wallet.Transaction.html#Withdrawal" class="tsd-kind-icon">Withdrawal</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
@@ -96,7 +84,7 @@
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="_cardano_sdk_wallet.Transaction.html#computeImplicitCoin" class="tsd-kind-icon">compute<wbr>Implicit<wbr>Coin</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="_cardano_sdk_wallet.Transaction.html#createTransactionInternals" class="tsd-kind-icon">create<wbr>Transaction<wbr>Internals</a></li>
-								<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="_cardano_sdk_wallet.Transaction.html#withdrawal" class="tsd-kind-icon">withdrawal</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="_cardano_sdk_wallet.Transaction.html#ensureValidityInterval" class="tsd-kind-icon">ensure<wbr>Validity<wbr>Interval</a></li>
 							</ul>
 						</section>
 					</div>
@@ -105,29 +93,19 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Type aliases</h2>
 				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-namespace">
-					<a name="AddressBech32" class="tsd-anchor"></a>
-					<h3>Address<wbr>Bech32</h3>
-					<div class="tsd-signature tsd-kind-icon">Address<wbr>Bech32<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/a5721fa/packages/wallet/src/Transaction/CertificateFactory.ts#L6">packages/wallet/src/Transaction/CertificateFactory.ts:6</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-namespace">
 					<a name="CreateTxInternalsProps" class="tsd-anchor"></a>
 					<h3>Create<wbr>TxInternals<wbr>Props</h3>
-					<div class="tsd-signature tsd-kind-icon">Create<wbr>TxInternals<wbr>Props<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>certificates<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">CSL.Certificate</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">; </span>changeAddress<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>inputSelection<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">SelectionResult</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">&quot;selection&quot;</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">; </span>validityInterval<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Cardano.ValidityInterval</span><span class="tsd-signature-symbol">; </span>withdrawals<span class="tsd-signature-symbol">?: </span><a href="_cardano_sdk_wallet.Transaction.html#Withdrawal" class="tsd-signature-type" data-tsd-kind="Type alias">Withdrawal</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> }</span></div>
+					<div class="tsd-signature tsd-kind-icon">Create<wbr>TxInternals<wbr>Props<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>certificates<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Cardano.Certificate</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">; </span>changeAddress<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>inputSelection<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">SelectionResult</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">&quot;selection&quot;</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">; </span>validityInterval<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Cardano.ValidityInterval</span><span class="tsd-signature-symbol">; </span>withdrawals<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Cardano.Withdrawal</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/a5721fa/packages/wallet/src/Transaction/createTransactionInternals.ts#L10">packages/wallet/src/Transaction/createTransactionInternals.ts:10</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/02f7378/packages/wallet/src/Transaction/createTransactionInternals.ts#L10">packages/wallet/src/Transaction/createTransactionInternals.ts:10</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
 						<h4>Type declaration</h4>
 						<ul class="tsd-parameters">
 							<li class="tsd-parameter">
-								<h5><span class="tsd-flag ts-flagOptional">Optional</span> certificates<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">CSL.Certificate</span><span class="tsd-signature-symbol">[]</span></h5>
+								<h5><span class="tsd-flag ts-flagOptional">Optional</span> certificates<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Cardano.Certificate</span><span class="tsd-signature-symbol">[]</span></h5>
 							</li>
 							<li class="tsd-parameter">
 								<h5>change<wbr>Address<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
@@ -139,111 +117,28 @@
 								<h5>validity<wbr>Interval<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Cardano.ValidityInterval</span></h5>
 							</li>
 							<li class="tsd-parameter">
-								<h5><span class="tsd-flag ts-flagOptional">Optional</span> withdrawals<span class="tsd-signature-symbol">?: </span><a href="_cardano_sdk_wallet.Transaction.html#Withdrawal" class="tsd-signature-type" data-tsd-kind="Type alias">Withdrawal</a><span class="tsd-signature-symbol">[]</span></h5>
+								<h5><span class="tsd-flag ts-flagOptional">Optional</span> withdrawals<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Cardano.Withdrawal</span><span class="tsd-signature-symbol">[]</span></h5>
 							</li>
 						</ul>
 					</div>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-namespace">
-					<a name="Ed25519KeyHashBech32" class="tsd-anchor"></a>
-					<h3>Ed25519<wbr>Key<wbr>Hash<wbr>Bech32</h3>
-					<div class="tsd-signature tsd-kind-icon">Ed25519<wbr>Key<wbr>Hash<wbr>Bech32<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/a5721fa/packages/wallet/src/Transaction/CertificateFactory.ts#L4">packages/wallet/src/Transaction/CertificateFactory.ts:4</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-namespace">
-					<a name="InitializeTxProps" class="tsd-anchor"></a>
-					<h3>Initialize<wbr>TxProps</h3>
-					<div class="tsd-signature tsd-kind-icon">Initialize<wbr>TxProps<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>certificates<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">CSL.Certificate</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">; </span>options<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">{ </span>validityInterval<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Cardano.ValidityInterval</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>outputs<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Set</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Cardano.TxOut</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>withdrawals<span class="tsd-signature-symbol">?: </span><a href="_cardano_sdk_wallet.Transaction.html#Withdrawal" class="tsd-signature-type" data-tsd-kind="Type alias">Withdrawal</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> }</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/a5721fa/packages/wallet/src/Transaction/types.ts#L4">packages/wallet/src/Transaction/types.ts:4</a></li>
-						</ul>
-					</aside>
-					<div class="tsd-type-declaration">
-						<h4>Type declaration</h4>
-						<ul class="tsd-parameters">
-							<li class="tsd-parameter">
-								<h5><span class="tsd-flag ts-flagOptional">Optional</span> certificates<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">CSL.Certificate</span><span class="tsd-signature-symbol">[]</span></h5>
-							</li>
-							<li class="tsd-parameter">
-								<h5><span class="tsd-flag ts-flagOptional">Optional</span> options<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">{ </span>validityInterval<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Cardano.ValidityInterval</span><span class="tsd-signature-symbol"> }</span></h5>
-								<ul class="tsd-parameters">
-									<li class="tsd-parameter">
-										<h5><span class="tsd-flag ts-flagOptional">Optional</span> validity<wbr>Interval<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Cardano.ValidityInterval</span></h5>
-									</li>
-								</ul>
-							</li>
-							<li class="tsd-parameter">
-								<h5>outputs<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Set</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Cardano.TxOut</span><span class="tsd-signature-symbol">&gt;</span></h5>
-							</li>
-							<li class="tsd-parameter">
-								<h5><span class="tsd-flag ts-flagOptional">Optional</span> withdrawals<span class="tsd-signature-symbol">?: </span><a href="_cardano_sdk_wallet.Transaction.html#Withdrawal" class="tsd-signature-type" data-tsd-kind="Type alias">Withdrawal</a><span class="tsd-signature-symbol">[]</span></h5>
-							</li>
-						</ul>
-					</div>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-namespace">
-					<a name="PoolMetadataHashBech32" class="tsd-anchor"></a>
-					<h3>Pool<wbr>Metadata<wbr>Hash<wbr>Bech32</h3>
-					<div class="tsd-signature tsd-kind-icon">Pool<wbr>Metadata<wbr>Hash<wbr>Bech32<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/a5721fa/packages/wallet/src/Transaction/CertificateFactory.ts#L7">packages/wallet/src/Transaction/CertificateFactory.ts:7</a></li>
-						</ul>
-					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-namespace">
 					<a name="TxInternals" class="tsd-anchor"></a>
 					<h3>Tx<wbr>Internals</h3>
-					<div class="tsd-signature tsd-kind-icon">Tx<wbr>Internals<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>body<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">CSL.TransactionBody</span><span class="tsd-signature-symbol">; </span>hash<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">CSL.TransactionHash</span><span class="tsd-signature-symbol"> }</span></div>
+					<div class="tsd-signature tsd-kind-icon">Tx<wbr>Internals<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>body<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Cardano.TxBodyAlonzo</span><span class="tsd-signature-symbol">; </span>hash<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Hash16</span><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/a5721fa/packages/wallet/src/Transaction/createTransactionInternals.ts#L5">packages/wallet/src/Transaction/createTransactionInternals.ts:5</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/02f7378/packages/wallet/src/Transaction/createTransactionInternals.ts#L5">packages/wallet/src/Transaction/createTransactionInternals.ts:5</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
 						<h4>Type declaration</h4>
 						<ul class="tsd-parameters">
 							<li class="tsd-parameter">
-								<h5>body<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">CSL.TransactionBody</span></h5>
+								<h5>body<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Cardano.TxBodyAlonzo</span></h5>
 							</li>
 							<li class="tsd-parameter">
-								<h5>hash<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">CSL.TransactionHash</span></h5>
-							</li>
-						</ul>
-					</div>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-namespace">
-					<a name="VrfKeyHashBech32" class="tsd-anchor"></a>
-					<h3>Vrf<wbr>Key<wbr>Hash<wbr>Bech32</h3>
-					<div class="tsd-signature tsd-kind-icon">Vrf<wbr>Key<wbr>Hash<wbr>Bech32<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/a5721fa/packages/wallet/src/Transaction/CertificateFactory.ts#L5">packages/wallet/src/Transaction/CertificateFactory.ts:5</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-namespace">
-					<a name="Withdrawal" class="tsd-anchor"></a>
-					<h3>Withdrawal</h3>
-					<div class="tsd-signature tsd-kind-icon">Withdrawal<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>address<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">CSL.RewardAddress</span><span class="tsd-signature-symbol">; </span>quantity<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">CSL.BigNum</span><span class="tsd-signature-symbol"> }</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/a5721fa/packages/wallet/src/Transaction/withdrawal.ts#L4">packages/wallet/src/Transaction/withdrawal.ts:4</a></li>
-						</ul>
-					</aside>
-					<div class="tsd-type-declaration">
-						<h4>Type declaration</h4>
-						<ul class="tsd-parameters">
-							<li class="tsd-parameter">
-								<h5>address<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">CSL.RewardAddress</span></h5>
-							</li>
-							<li class="tsd-parameter">
-								<h5>quantity<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">CSL.BigNum</span></h5>
+								<h5>hash<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Hash16</span></h5>
 							</li>
 						</ul>
 					</div>
@@ -255,13 +150,13 @@
 					<a name="computeImplicitCoin" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> compute<wbr>Implicit<wbr>Coin</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-namespace">
-						<li class="tsd-signature tsd-kind-icon">compute<wbr>Implicit<wbr>Coin<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ProtocolParametersRequiredByWallet</span>, __namedParameters<span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_wallet.Transaction.html#InitializeTxProps" class="tsd-signature-type" data-tsd-kind="Type alias">InitializeTxProps</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ImplicitCoin</span></li>
+						<li class="tsd-signature tsd-kind-icon">compute<wbr>Implicit<wbr>Coin<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Required</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Pick</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">ProtocolParametersAlonzo</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">&quot;minFeeCoefficient&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;minFeeConstant&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;maxTxSize&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;stakeKeyDeposit&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;poolDeposit&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;minPoolCost&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;coinsPerUtxoWord&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;maxValueSize&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;maxCollateralInputs&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;protocolVersion&quot;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span>, __namedParameters<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Pick</span><span class="tsd-signature-symbol">&lt;</span><a href="_cardano_sdk_wallet.html#InitializeTxProps" class="tsd-signature-type" data-tsd-kind="Type alias">InitializeTxProps</a><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">&quot;certificates&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;withdrawals&quot;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ImplicitCoin</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/a5721fa/packages/wallet/src/Transaction/computeImplicitCoin.ts#L7">packages/wallet/src/Transaction/computeImplicitCoin.ts:7</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/02f7378/packages/wallet/src/Transaction/computeImplicitCoin.ts#L8">packages/wallet/src/Transaction/computeImplicitCoin.ts:8</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -272,10 +167,10 @@
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>__namedParameters: <span class="tsd-signature-type">ProtocolParametersRequiredByWallet</span></h5>
+									<h5>__namedParameters: <span class="tsd-signature-type">Required</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Pick</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">ProtocolParametersAlonzo</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">&quot;minFeeCoefficient&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;minFeeConstant&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;maxTxSize&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;stakeKeyDeposit&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;poolDeposit&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;minPoolCost&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;coinsPerUtxoWord&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;maxValueSize&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;maxCollateralInputs&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;protocolVersion&quot;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h5>
 								</li>
 								<li>
-									<h5>__namedParameters: <a href="_cardano_sdk_wallet.Transaction.html#InitializeTxProps" class="tsd-signature-type" data-tsd-kind="Type alias">InitializeTxProps</a></h5>
+									<h5>__namedParameters: <span class="tsd-signature-type">Pick</span><span class="tsd-signature-symbol">&lt;</span><a href="_cardano_sdk_wallet.html#InitializeTxProps" class="tsd-signature-type" data-tsd-kind="Type alias">InitializeTxProps</a><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">&quot;certificates&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;withdrawals&quot;</span><span class="tsd-signature-symbol">&gt;</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">ImplicitCoin</span></h4>
@@ -286,19 +181,19 @@
 					<a name="createTransactionInternals" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> create<wbr>Transaction<wbr>Internals</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-namespace">
-						<li class="tsd-signature tsd-kind-icon">create<wbr>Transaction<wbr>Internals<span class="tsd-signature-symbol">(</span>props<span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_wallet.Transaction.html#CreateTxInternalsProps" class="tsd-signature-type" data-tsd-kind="Type alias">CreateTxInternalsProps</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="_cardano_sdk_wallet.Transaction.html#TxInternals" class="tsd-signature-type" data-tsd-kind="Type alias">TxInternals</a><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">create<wbr>Transaction<wbr>Internals<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_wallet.Transaction.html#CreateTxInternalsProps" class="tsd-signature-type" data-tsd-kind="Type alias">CreateTxInternalsProps</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="_cardano_sdk_wallet.Transaction.html#TxInternals" class="tsd-signature-type" data-tsd-kind="Type alias">TxInternals</a><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/a5721fa/packages/wallet/src/Transaction/createTransactionInternals.ts#L18">packages/wallet/src/Transaction/createTransactionInternals.ts:18</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/02f7378/packages/wallet/src/Transaction/createTransactionInternals.ts#L18">packages/wallet/src/Transaction/createTransactionInternals.ts:18</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>props: <a href="_cardano_sdk_wallet.Transaction.html#CreateTxInternalsProps" class="tsd-signature-type" data-tsd-kind="Type alias">CreateTxInternalsProps</a></h5>
+									<h5>__namedParameters: <a href="_cardano_sdk_wallet.Transaction.html#CreateTxInternalsProps" class="tsd-signature-type" data-tsd-kind="Type alias">CreateTxInternalsProps</a></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="_cardano_sdk_wallet.Transaction.html#TxInternals" class="tsd-signature-type" data-tsd-kind="Type alias">TxInternals</a><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -306,31 +201,28 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-namespace">
-					<a name="withdrawal" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagConst">Const</span> withdrawal</h3>
+					<a name="ensureValidityInterval" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> ensure<wbr>Validity<wbr>Interval</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-namespace">
-						<li class="tsd-signature tsd-kind-icon">withdrawal<span class="tsd-signature-symbol">(</span>keyManager<span class="tsd-signature-symbol">: </span><a href="../interfaces/_cardano_sdk_wallet.KeyManagement.KeyManager.html" class="tsd-signature-type" data-tsd-kind="Interface">KeyManager</a>, quantity<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">bigint</span>, network<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_wallet.Transaction.html#Withdrawal" class="tsd-signature-type" data-tsd-kind="Type alias">Withdrawal</a></li>
+						<li class="tsd-signature tsd-kind-icon">ensure<wbr>Validity<wbr>Interval<span class="tsd-signature-symbol">(</span>currentSlot<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, validityInterval<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">ValidityInterval</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ValidityInterval</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/a5721fa/packages/wallet/src/Transaction/withdrawal.ts#L9">packages/wallet/src/Transaction/withdrawal.ts:9</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/02f7378/packages/wallet/src/Transaction/ensureValidityInterval.ts#L3">packages/wallet/src/Transaction/ensureValidityInterval.ts:3</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>keyManager: <a href="../interfaces/_cardano_sdk_wallet.KeyManagement.KeyManager.html" class="tsd-signature-type" data-tsd-kind="Interface">KeyManager</a></h5>
+									<h5>currentSlot: <span class="tsd-signature-type">number</span></h5>
 								</li>
 								<li>
-									<h5>quantity: <span class="tsd-signature-type">bigint</span></h5>
-								</li>
-								<li>
-									<h5>network: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = ...</span></h5>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> validityInterval: <span class="tsd-signature-type">ValidityInterval</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="_cardano_sdk_wallet.Transaction.html#Withdrawal" class="tsd-signature-type" data-tsd-kind="Type alias">Withdrawal</a></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">ValidityInterval</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -346,32 +238,11 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
-					<li class=" tsd-kind-class tsd-parent-kind-namespace">
-						<a href="../classes/_cardano_sdk_wallet.Transaction.CertificateFactory.html" class="tsd-kind-icon">Certificate<wbr>Factory</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_wallet.Transaction.html#AddressBech32" class="tsd-kind-icon">Address<wbr>Bech32</a>
-					</li>
 					<li class=" tsd-kind-type-alias tsd-parent-kind-namespace">
 						<a href="_cardano_sdk_wallet.Transaction.html#CreateTxInternalsProps" class="tsd-kind-icon">Create<wbr>TxInternals<wbr>Props</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_wallet.Transaction.html#Ed25519KeyHashBech32" class="tsd-kind-icon">Ed25519<wbr>Key<wbr>Hash<wbr>Bech32</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_wallet.Transaction.html#InitializeTxProps" class="tsd-kind-icon">Initialize<wbr>TxProps</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_wallet.Transaction.html#PoolMetadataHashBech32" class="tsd-kind-icon">Pool<wbr>Metadata<wbr>Hash<wbr>Bech32</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-parent-kind-namespace">
 						<a href="_cardano_sdk_wallet.Transaction.html#TxInternals" class="tsd-kind-icon">Tx<wbr>Internals</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_wallet.Transaction.html#VrfKeyHashBech32" class="tsd-kind-icon">Vrf<wbr>Key<wbr>Hash<wbr>Bech32</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_wallet.Transaction.html#Withdrawal" class="tsd-kind-icon">Withdrawal</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-namespace">
 						<a href="_cardano_sdk_wallet.Transaction.html#computeImplicitCoin" class="tsd-kind-icon">compute<wbr>Implicit<wbr>Coin</a>
@@ -380,7 +251,7 @@
 						<a href="_cardano_sdk_wallet.Transaction.html#createTransactionInternals" class="tsd-kind-icon">create<wbr>Transaction<wbr>Internals</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_wallet.Transaction.html#withdrawal" class="tsd-kind-icon">withdrawal</a>
+						<a href="_cardano_sdk_wallet.Transaction.html#ensureValidityInterval" class="tsd-kind-icon">ensure<wbr>Validity<wbr>Interval</a>
 					</li>
 				</ul>
 			</nav>
@@ -396,15 +267,18 @@
 				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
 				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
 				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
 			</ul>
 		</div>
 	</div>
