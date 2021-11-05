@@ -6,7 +6,7 @@ import {
   TransactionalTracker,
   Transactions
 } from './services';
-import { Cardano, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
+import { Cardano, NetworkInfo, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
 import { TxInternals } from './Transaction';
 
 /** Internal = change address & External = receipt address */
@@ -47,6 +47,7 @@ export interface Wallet extends ProviderSubscription {
   readonly utxo: SourceTransactionalTracker<Cardano.Utxo[]>;
   readonly transactions: Transactions;
   readonly tip$: BehaviorObservable<Cardano.Tip>;
+  readonly networkInfo$: BehaviorObservable<NetworkInfo>;
   readonly protocolParameters$: BehaviorObservable<ProtocolParametersRequiredByWallet>;
   get addresses(): Address[];
   initializeTx(props: InitializeTxProps): Promise<TxInternals>;

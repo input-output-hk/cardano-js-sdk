@@ -20,7 +20,7 @@ import {
   createUtxoProvider,
   createUtxoTracker
 } from './services';
-import { Cardano, ProtocolParametersRequiredByWallet, WalletProvider, coreToCsl } from '@cardano-sdk/core';
+import { Cardano, NetworkInfo, ProtocolParametersRequiredByWallet, WalletProvider, coreToCsl } from '@cardano-sdk/core';
 import { InputSelector, defaultSelectionConstraints, roundRobinRandomImprove } from '@cardano-sdk/cip2';
 import { KeyManager } from './KeyManagement';
 import { Logger, dummyLogger } from 'ts-log';
@@ -45,6 +45,7 @@ export interface SingleAddressWalletConfiguration {
   readonly address?: Address;
   readonly utxoProvider?: SimpleProvider<Cardano.Utxo[]>;
   readonly tipProvider?: SimpleProvider<Cardano.Tip>;
+  readonly networkInfoProvider?: SimpleProvider<NetworkInfo>;
   readonly rewardsProvider?: SimpleProvider<Cardano.Lovelace>;
   readonly protocolParametersProvider?: SimpleProvider<ProtocolParametersRequiredByWallet>;
   readonly transactionsProvider?: SimpleProvider<DirectionalTransaction[]>;
@@ -58,6 +59,7 @@ export class SingleAddressWallet implements Wallet {
   #address: Address;
   #logger: Logger;
   #tip$: ProviderTrackerSubject<Cardano.Tip>;
+  #networkInfo$: ProviderTrackerSubject<NetworkInfo>;
   #protocolParameters$: ProviderTrackerSubject<ProtocolParametersRequiredByWallet>;
   #newTransactions = {
     failedToSubmit$: new Subject<FailedTx>(),
@@ -69,6 +71,7 @@ export class SingleAddressWallet implements Wallet {
   balance: TransactionalTracker<Balance>;
   transactions: Transactions;
   tip$: BehaviorObservable<Cardano.Tip>;
+  networkInfo$: BehaviorObservable<NetworkInfo>;
   protocolParameters$: BehaviorObservable<ProtocolParametersRequiredByWallet>;
   name: string;
 
@@ -92,6 +95,7 @@ export class SingleAddressWallet implements Wallet {
       },
       utxoProvider = createUtxoProvider(walletProvider, [address.bech32]),
       tipProvider = () => from(walletProvider.ledgerTip()),
+      networkInfoProvider = () => from(walletProvider.networkInfo()),
       rewardsProvider = createRewardsProvider(walletProvider, keyManager),
       transactionsProvider = createAddressTransactionsProvider(walletProvider, [address.bech32]),
       protocolParametersProvider = () => from(walletProvider.currentWalletProtocolParameters()),
@@ -107,6 +111,11 @@ export class SingleAddressWallet implements Wallet {
     this.#keyManager = keyManager;
     this.#address = address;
     this.#tip$ = this.tip$ = new ProviderTrackerSubject({ config, equals: isEqual, provider: tipProvider });
+    this.#networkInfo$ = this.networkInfo$ = new ProviderTrackerSubject({
+      config,
+      equals: isEqual,
+      provider: networkInfoProvider
+    });
     this.#protocolParameters$ = this.protocolParameters$ = new ProviderTrackerSubject({
       config,
       equals: isEqual,
@@ -203,6 +212,7 @@ export class SingleAddressWallet implements Wallet {
     this.utxo.sync();
     this.transactions.sync();
     this.#tip$.sync();
+    this.#networkInfo$.sync();
     this.#protocolParameters$.sync();
     this.#rewards.sync();
   }
@@ -211,6 +221,7 @@ export class SingleAddressWallet implements Wallet {
     this.utxo.shutdown();
     this.transactions.shutdown();
     this.#tip$.complete();
+    this.#networkInfo$.complete();
     this.#protocolParameters$.complete();
   }
 }
