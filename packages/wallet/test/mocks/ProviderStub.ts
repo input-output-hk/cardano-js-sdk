@@ -147,7 +147,7 @@ export const rewardsHistory: EpochRewards[] = [
 export const providerStub = () => ({
   currentWalletProtocolParameters: jest.fn().mockResolvedValue(protocolParameters),
   ledgerTip: jest.fn().mockResolvedValue(ledgerTip),
-  networkInfo: async () => ({
+  networkInfo: jest.fn().mockResolvedValue({
     currentEpoch,
     lovelaceSupply: {
       circulating: 42_064_399_450_423_723n,

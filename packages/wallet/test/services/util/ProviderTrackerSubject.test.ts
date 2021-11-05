@@ -1,4 +1,4 @@
-import { ProviderTrackerSubject } from '../../../src/services/util';
+import { ProviderTrackerSubject, strictEquals as equals } from '../../../src/services/util';
 import { createTestScheduler } from '../../testScheduler';
 import { interval, take } from 'rxjs';
 
@@ -8,14 +8,14 @@ const trigger = ({ pollInterval, numTriggers }: { pollInterval: number; numTrigg
 describe('ProviderTrackerSubject', () => {
   const config = { maxInterval: 25, pollInterval: 5 };
 
-  it('calls the provider immediately and then every [pollInterval]', () => {
+  it('calls the provider immediately and then every [pollInterval], only emitting distinct values', () => {
     createTestScheduler().run(({ cold, expectObservable, flush }) => {
-      const provider = jest.fn().mockReturnValue(cold('--a|'));
+      const provider = jest.fn().mockReturnValue(cold('--b|')).mockReturnValueOnce(cold('--a|'));
       const tracker$ = new ProviderTrackerSubject(
-        { config, provider },
+        { config, equals, provider },
         { trigger$: trigger({ numTriggers: 3, pollInterval: 5 }) }
       );
-      expectObservable(tracker$.asObservable()).toBe('--a----a----a----a');
+      expectObservable(tracker$.asObservable()).toBe('--a----b');
       flush();
       expect(provider).toBeCalledTimes(4);
     });
@@ -25,7 +25,7 @@ describe('ProviderTrackerSubject', () => {
     createTestScheduler().run(({ cold, flush }) => {
       const provider = jest.fn().mockReturnValue(cold('--a|'));
       const tracker$ = new ProviderTrackerSubject(
-        { config, provider },
+        { config, equals, provider },
         { trigger$: trigger({ numTriggers: 3, pollInterval: 5 }) }
       );
       flush();
@@ -36,12 +36,12 @@ describe('ProviderTrackerSubject', () => {
 
   it('throttles interval requests to provider', () => {
     createTestScheduler().run(({ cold, expectObservable, flush }) => {
-      const provider = jest.fn().mockReturnValue(cold('-----a|'));
+      const provider = jest.fn().mockReturnValueOnce(cold('-----a|')).mockReturnValueOnce(cold('-----b|'));
       const tracker$ = new ProviderTrackerSubject(
-        { config, provider },
+        { config, equals, provider },
         { trigger$: trigger({ numTriggers: 3, pollInterval: 5 }) }
       );
-      expectObservable(tracker$).toBe('-----a---------a');
+      expectObservable(tracker$).toBe('-----a---------b');
       flush();
       expect(provider).toBeCalledTimes(2);
     });

@@ -20,7 +20,7 @@ import {
   tap
 } from 'rxjs';
 import { Hash16 } from '@cardano-ogmios/schema';
-import { ProviderTrackerSubject, SourceTrackerConfig } from './util';
+import { ProviderTrackerSubject, SourceTrackerConfig, directionalTransactionsEquals } from './util';
 import { TrackerSubject } from './util/TrackerSubject';
 import { TransactionFailure } from './TransactionError';
 import { flatten } from 'lodash-es';
@@ -82,7 +82,11 @@ export const createTransactionsTracker = (
     config
   }: TransactionsTrackerProps,
   {
-    transactionsSource$ = new ProviderTrackerSubject({ config, provider: transactionsProvider })
+    transactionsSource$ = new ProviderTrackerSubject({
+      config,
+      equals: directionalTransactionsEquals,
+      provider: transactionsProvider
+    })
   }: TransactionsTrackerInternals = {}
 ): Transactions => {
   const providerTransactionsByDirection$ = (direction: TransactionDirection) =>

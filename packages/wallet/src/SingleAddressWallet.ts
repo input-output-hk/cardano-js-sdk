@@ -27,6 +27,7 @@ import { Logger, dummyLogger } from 'ts-log';
 import { Subject, combineLatest, from, lastValueFrom, mergeMap, take } from 'rxjs';
 import { TransactionFailure } from './services/TransactionError';
 import { TxInternals, computeImplicitCoin, createTransactionInternals, ensureValidityInterval } from './Transaction';
+import { isEqual } from 'lodash-es';
 
 export interface SingleAddressWalletProps {
   readonly name: string;
@@ -105,9 +106,10 @@ export class SingleAddressWallet implements Wallet {
     this.#walletProvider = walletProvider;
     this.#keyManager = keyManager;
     this.#address = address;
-    this.#tip$ = this.tip$ = new ProviderTrackerSubject({ config, provider: tipProvider });
+    this.#tip$ = this.tip$ = new ProviderTrackerSubject({ config, equals: isEqual, provider: tipProvider });
     this.#protocolParameters$ = this.protocolParameters$ = new ProviderTrackerSubject({
       config,
+      equals: isEqual,
       provider: protocolParametersProvider
     });
 

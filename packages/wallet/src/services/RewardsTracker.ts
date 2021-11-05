@@ -1,7 +1,7 @@
 import { BigIntMath, Cardano, WalletProvider } from '@cardano-sdk/core';
 import { KeyManager } from '../KeyManagement';
 import { Observable, combineLatest, from, map } from 'rxjs';
-import { ProviderTrackerSubject, SourceTrackerConfig, TrackerSubject } from './util';
+import { ProviderTrackerSubject, SourceTrackerConfig, TrackerSubject, strictEquals } from './util';
 import { SimpleProvider, SourceTransactionalTracker } from './types';
 
 export interface RewardsTrackerProps {
@@ -31,7 +31,9 @@ const getWithdrawalQuantity = ({ body: { withdrawals } }: Cardano.NewTxAlonzo): 
 
 export const createRewardsTracker = (
   { rewardsProvider, transactionsInFlight$, config }: RewardsTrackerProps,
-  { rewardsSource$ = new ProviderTrackerSubject({ config, provider: rewardsProvider }) }: RewardsTrackerInternals = {}
+  {
+    rewardsSource$ = new ProviderTrackerSubject({ config, equals: strictEquals, provider: rewardsProvider })
+  }: RewardsTrackerInternals = {}
 ): SourceTransactionalTracker<Cardano.Lovelace> => {
   const available$ = new TrackerSubject<Cardano.Lovelace>(
     combineLatest([rewardsSource$, transactionsInFlight$]).pipe(

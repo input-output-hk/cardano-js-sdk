@@ -22,18 +22,18 @@ describe('createTransactionsTracker', () => {
   let transactionsProvider: SimpleProvider<DirectionalTransaction[]>;
 
   it('observable properties behave correctly on successful transaction', async () => {
-    const tx = queryTransactionsResult[0];
-    const incomingTx = { direction: TransactionDirection.Incoming, tx };
-    const outgoingTx = { direction: TransactionDirection.Outgoing, tx };
+    const outgoingTx = queryTransactionsResult[0];
+    const incomingDirectionalTx = { direction: TransactionDirection.Incoming, tx: { ...outgoingTx, id: 'other-id' } };
+    const outgoingDirectionalTx = { direction: TransactionDirection.Outgoing, tx: outgoingTx };
     createTestScheduler().run(({ cold, expectObservable }) => {
       const failedToSubmit$ = cold<FailedTx>( '----|');
       const tip$ = cold<Cardano.Tip>(         '----|');
-      const submitting$ = cold(               '-a--|', { a: tx });
-      const pending$ = cold(                  '--a-|', { a: tx });
+      const submitting$ = cold(               '-a--|', { a: outgoingTx });
+      const pending$ = cold(                  '--a-|', { a: outgoingTx });
       const transactionsSource$ = cold(       'a-bc|', {
         a: [],
-        b: [incomingTx],
-        c: [incomingTx, outgoingTx]
+        b: [incomingDirectionalTx],
+        c: [incomingDirectionalTx, outgoingDirectionalTx]
       }) as unknown as ProviderTrackerSubject<DirectionalTransaction[]>;
       const transactionsTracker = createTransactionsTracker(
         {
@@ -50,16 +50,20 @@ describe('createTransactionsTracker', () => {
           transactionsSource$
         }
       );
-      expectObservable(transactionsTracker.incoming$).toBe(           '--a-|', { a: incomingTx.tx });
-      expectObservable(transactionsTracker.outgoing.submitting$).toBe('-a--|', { a: tx });
-      expectObservable(transactionsTracker.outgoing.pending$).toBe(   '--a-|', { a: tx });
-      expectObservable(transactionsTracker.outgoing.confirmed$).toBe( '---a|', { a: tx });
-      expectObservable(transactionsTracker.outgoing.inFlight$).toBe(  'ab-c|', { a: [], b: [tx], c: [] });
+      expectObservable(transactionsTracker.incoming$).toBe(           '--a-|', { a: incomingDirectionalTx.tx });
+      expectObservable(transactionsTracker.outgoing.submitting$).toBe('-a--|', { a: outgoingTx });
+      expectObservable(transactionsTracker.outgoing.pending$).toBe(   '--a-|', { a: outgoingTx });
+      expectObservable(transactionsTracker.outgoing.confirmed$).toBe( '---a|', { a: outgoingTx });
+      expectObservable(transactionsTracker.outgoing.inFlight$).toBe(  'ab-c|', { a: [], b: [outgoingTx], c: [] });
       expectObservable(transactionsTracker.outgoing.failed$).toBe(    '----|');
-      expectObservable(transactionsTracker.history.incoming$).toBe(   'a-b-|', { a: [], b: [incomingTx.tx] });
-      expectObservable(transactionsTracker.history.outgoing$).toBe(   'a--b|', { a: [], b: [outgoingTx.tx] });
+      expectObservable(transactionsTracker.history.incoming$).toBe(   'a-b-|', {
+        a: [], b: [incomingDirectionalTx.tx]
+      });
+      expectObservable(transactionsTracker.history.outgoing$).toBe(   'a--b|', {
+        a: [], b: [outgoingDirectionalTx.tx]
+      });
       expectObservable(transactionsTracker.history.all$).toBe(        'a-bc|', {
-        a: [], b: [incomingTx], c: [incomingTx, outgoingTx]
+        a: [], b: [incomingDirectionalTx], c: [incomingDirectionalTx, outgoingDirectionalTx]
       });
     });
   });
