@@ -27,25 +27,9 @@ export const createGraphQLStakePoolSearchProvider = (
         ].filter(isNotNil);
         return responseStakePools.map((responseStakePool) => {
           const stakePool = util.replaceNullsWithUndefineds(responseStakePool);
-          const metadata = stakePool.metadata;
-          const ext = metadata?.ext;
           return {
             ...stakePool,
             cost: BigInt(stakePool.cost),
-            metadata: metadata
-              ? {
-                  ...metadata,
-                  ext: ext
-                    ? {
-                        ...ext,
-                        pool: {
-                          ...ext.pool,
-                          status: ext.pool.status as unknown as Cardano.PoolStatus
-                        }
-                      }
-                    : undefined
-                }
-              : undefined,
             metrics: {
               ...stakePool.metrics!,
               livePledge: BigInt(stakePool.metrics.livePledge),

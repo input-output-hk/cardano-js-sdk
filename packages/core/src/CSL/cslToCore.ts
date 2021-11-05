@@ -36,3 +36,20 @@ export const txIn = (input: CSL.TransactionInput, address: Cardano.Address): Car
   index: input.index(),
   txId: Buffer.from(input.transaction_id().to_bytes()).toString('hex')
 });
+
+export const txOut = (output: CSL.TransactionOutput): Cardano.TxOut => {
+  const dataHashBytes = output.data_hash()?.to_bytes();
+  return {
+    address: output.address().to_bech32(),
+    datum: dataHashBytes ? Buffer.from(dataHashBytes).toString('hex') : undefined,
+    value: value(output.amount())
+  };
+};
+
+export const txInputs = (inputs: CSL.TransactionInputs, address: Cardano.Address): Cardano.TxIn[] => {
+  const result: Cardano.TxIn[] = [];
+  for (let i = 0; i < inputs.len(); i++) {
+    result.push(txIn(inputs.get(i), address));
+  }
+  return result;
+};

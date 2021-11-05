@@ -26,10 +26,10 @@ describe('InMemoryKeyManager', () => {
   });
 
   test('signTransaction', async () => {
-    const txHash = CSL.TransactionHash.from_bytes(
-      Buffer.from('8561258e210352fba2ac0488afed67b3427a27ccf1d41ec030c98a8199bc22ec', 'hex')
+    const witnessSet = await keyManager.signTransaction(
+      '8561258e210352fba2ac0488afed67b3427a27ccf1d41ec030c98a8199bc22ec'
     );
-    const witnessSet = await keyManager.signTransaction(txHash);
-    expect(witnessSet).toBeInstanceOf(CSL.TransactionWitnessSet);
+    expect(Object.keys(witnessSet)).toHaveLength(1);
+    expect(typeof witnessSet[Object.keys(witnessSet)[0]]).toBe('string');
   });
 });

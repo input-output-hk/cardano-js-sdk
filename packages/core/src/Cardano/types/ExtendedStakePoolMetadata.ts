@@ -7,6 +7,7 @@ import { PoolId } from '.';
  *
  * There are a few changes:
  * - discriminated union => enum
+ * - PoolStatus => ExtendedPoolStatus
  */
 
 /**
@@ -21,7 +22,13 @@ export type DeclaredPoolLocation = string;
 /**
  * the current operative status
  */
-export type PoolStatus = 'active' | 'retired' | 'offline' | 'experimental' | 'private';
+export enum ExtendedPoolStatus {
+  Active = 'active',
+  Retired = 'retired',
+  Offline = 'offline',
+  Experimental = 'experimental',
+  Private = 'private'
+}
 
 /**
  * the pools prefered communication channel
@@ -113,7 +120,7 @@ export interface ITNVerification {
 export interface ExtendedStakePoolMetadataFields {
   id: PoolId;
   country?: DeclaredPoolLocation;
-  status?: PoolStatus;
+  status?: ExtendedPoolStatus;
   contact?: PoolContactData;
   media_assets?: ThePoolsMediaAssets;
   itn?: ITNVerification;

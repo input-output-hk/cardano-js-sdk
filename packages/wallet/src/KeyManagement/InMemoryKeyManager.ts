@@ -51,13 +51,12 @@ export const createInMemoryKeyManager = ({
       publicKey: publicParentKey.toString(),
       signature: `Signature for ${message} is not implemented yet`
     }),
-    signTransaction: async (txHash: CSL.TransactionHash) => {
-      const witnessSet = CSL.TransactionWitnessSet.new();
-      const vkeyWitnesses = CSL.Vkeywitnesses.new();
-      const vkeyWitness = CSL.make_vkey_witness(txHash, privateParentKey.to_raw_key());
-      vkeyWitnesses.add(vkeyWitness);
-      witnessSet.set_vkeys(vkeyWitnesses);
-      return witnessSet;
+    signTransaction: async (txHash: Cardano.Hash16) => {
+      const cslHash = CSL.TransactionHash.from_bytes(Buffer.from(txHash, 'hex'));
+      const vkeyWitness = CSL.make_vkey_witness(cslHash, privateParentKey.to_raw_key());
+      return {
+        [vkeyWitness.vkey().public_key().to_bech32()]: vkeyWitness.signature().to_hex()
+      };
     },
     stakeKey: stakeKey.to_raw_key()
   };

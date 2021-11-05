@@ -1,57 +1,49 @@
-import { CSL, Cardano } from '@cardano-sdk/core';
+import { CSL, Cardano, coreToCsl, cslToCore } from '@cardano-sdk/core';
+import { Hash16 } from '@cardano-ogmios/schema';
 import { SelectionResult } from '@cardano-sdk/cip2';
-import { Withdrawal } from './withdrawal';
 
 export type TxInternals = {
-  hash: CSL.TransactionHash;
-  body: CSL.TransactionBody;
+  hash: Hash16;
+  body: Cardano.TxBodyAlonzo;
 };
 
 export type CreateTxInternalsProps = {
   changeAddress: string;
   inputSelection: SelectionResult['selection'];
   validityInterval: Cardano.ValidityInterval;
-  certificates?: CSL.Certificate[];
-  withdrawals?: Withdrawal[];
+  certificates?: Cardano.Certificate[];
+  withdrawals?: Cardano.Withdrawal[];
 };
 
-export const createTransactionInternals = async (props: CreateTxInternalsProps): Promise<TxInternals> => {
-  const inputs = CSL.TransactionInputs.new();
-  for (const utxo of props.inputSelection.inputs) {
-    inputs.add(utxo.input());
+export const createTransactionInternals = async ({
+  changeAddress,
+  withdrawals,
+  certificates,
+  validityInterval,
+  inputSelection
+}: CreateTxInternalsProps): Promise<TxInternals> => {
+  const outputs = [...inputSelection.outputs].map(cslToCore.txOut);
+  for (const cslValue of inputSelection.change) {
+    const value = cslToCore.value(cslValue);
+    outputs.push({
+      address: changeAddress,
+      value
+    });
   }
-  const outputs = CSL.TransactionOutputs.new();
-  for (const output of props.inputSelection.outputs) {
-    outputs.add(output);
-  }
-  for (const value of props.inputSelection.change) {
-    outputs.add(CSL.TransactionOutput.new(CSL.Address.from_bech32(props.changeAddress), value));
-  }
-  const body = CSL.TransactionBody.new(
-    inputs,
+  const body = {
+    // TODO: return more fields. Also add support in coreToCsl.txBody:
+    // collaterals, mint, requiredExtraSignatures, scriptIntegrityHash
+    certificates,
+    fee: BigInt(inputSelection.fee.to_str()),
+    inputs: [...inputSelection.inputs].map((cslInput) =>
+      cslToCore.txIn(cslInput.input(), cslInput.output().address().to_bech32())
+    ),
     outputs,
-    props.inputSelection.fee,
-    props.validityInterval.invalidHereafter || undefined
-  );
-  if (props.validityInterval.invalidBefore) {
-    body.set_validity_start_interval(props.validityInterval.invalidBefore);
-  }
-  if (props.certificates?.length) {
-    const certs = CSL.Certificates.new();
-    for (const cert of props.certificates) {
-      certs.add(cert);
-    }
-    body.set_certs(certs);
-  }
-  if (props.withdrawals?.length) {
-    const withdrawals = CSL.Withdrawals.new();
-    for (const { address, quantity } of props.withdrawals) {
-      withdrawals.insert(address, quantity);
-    }
-    body.set_withdrawals(withdrawals);
-  }
+    validityInterval,
+    withdrawals
+  };
   return {
     body,
-    hash: CSL.hash_transaction(body)
+    hash: Buffer.from(CSL.hash_transaction(coreToCsl.txBody(body)).to_bytes()).toString('hex')
   };
 };

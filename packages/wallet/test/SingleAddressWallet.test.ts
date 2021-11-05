@@ -1,24 +1,16 @@
 /* eslint-disable max-len */
-import {
-  BalanceTracker,
-  InMemoryUtxoRepository,
-  KeyManagement,
-  SingleAddressWallet,
-  SingleAddressWalletDependencies,
-  UtxoRepository,
-  createSingleAddressWallet
-} from '../src';
-import { CSL, Cardano } from '@cardano-sdk/core';
-import { InputSelector, roundRobinRandomImprove } from '@cardano-sdk/cip2';
-import { ProviderStub, providerStub, txTracker } from './mocks';
+import * as mocks from './mocks';
+import { Cardano } from '@cardano-sdk/core';
+import { KeyManagement, SingleAddressWallet } from '../src';
+import { coalesceValueQuantities } from '@cardano-sdk/core/src/Cardano/util';
+import { firstValueFrom, skip } from 'rxjs';
 
-describe('Wallet', () => {
+describe('SingleAddressWallet', () => {
   const name = 'Test Wallet';
-  let inputSelector: InputSelector;
+  const address = mocks.queryTransactionsResult[0].body.inputs[0].address;
   let keyManager: KeyManagement.KeyManager;
-  let provider: ProviderStub;
-  let utxoRepository: UtxoRepository;
-  let walletDependencies: SingleAddressWalletDependencies;
+  let walletProvider: mocks.ProviderStub;
+  let wallet: SingleAddressWallet;
 
   beforeEach(async () => {
     keyManager = KeyManagement.createInMemoryKeyManager({
@@ -26,23 +18,49 @@ describe('Wallet', () => {
       networkId: Cardano.NetworkId.testnet,
       password: '123'
     });
-    provider = providerStub();
-    inputSelector = roundRobinRandomImprove();
-    utxoRepository = new InMemoryUtxoRepository({ inputSelector, keyManager, provider, txTracker });
-    walletDependencies = { keyManager, provider, txTracker, utxoRepository };
+    walletProvider = mocks.providerStub();
+    keyManager.deriveAddress = jest.fn().mockReturnValue(address);
+    wallet = new SingleAddressWallet({ name }, { keyManager, walletProvider });
   });
 
-  test('createWallet', async () => {
-    const wallet = await createSingleAddressWallet({ name }, walletDependencies);
-    expect(wallet.address).toBeDefined();
-    expect(wallet.name).toBe(name);
-    expect(typeof wallet.initializeTx).toBe('function');
-    expect(typeof wallet.signTx).toBe('function');
-    expect(wallet.balance).toBeInstanceOf(BalanceTracker);
+  afterEach(() => wallet.shutdown());
+
+  describe('has property', () => {
+    it('"name"', async () => {
+      expect(wallet.name).toBe(name);
+    });
+    it('"utxo"', async () => {
+      await firstValueFrom(wallet.utxo.available$);
+      await firstValueFrom(wallet.utxo.total$);
+      expect(wallet.utxo.available$.value).toEqual(mocks.utxo);
+      expect(wallet.utxo.total$.value).toEqual(mocks.utxo);
+    });
+    it('"balance"', async () => {
+      await firstValueFrom(wallet.balance.available$);
+      await firstValueFrom(wallet.balance.total$);
+      expect(wallet.balance.available$.value?.coins).toEqual(
+        coalesceValueQuantities(mocks.utxo.map((utxo) => utxo[1].value)).coins
+      );
+      expect(wallet.balance.total$.value?.rewards).toBe(mocks.rewards);
+    });
+    it('"transactions"', async () => {
+      await firstValueFrom(wallet.transactions.history.all$);
+      expect(wallet.transactions.history.all$.value?.length).toBeGreaterThan(0);
+    });
+    it('"tip$"', async () => {
+      await firstValueFrom(wallet.tip$);
+      expect(wallet.tip$.value).toEqual(mocks.ledgerTip);
+    });
+    it('"protocolParameters$"', async () => {
+      await firstValueFrom(wallet.protocolParameters$);
+      expect(wallet.protocolParameters$.value).toEqual(mocks.protocolParameters);
+    });
+    it('"addresses"', () => {
+      expect(wallet.addresses.map(({ bech32 }) => bech32)).toEqual([address]);
+    });
   });
 
-  describe('wallet behaviour', () => {
-    let wallet: SingleAddressWallet;
+  describe('creating transactions', () => {
     const props = {
       outputs: new Set([
         {
@@ -53,32 +71,48 @@ describe('Wallet', () => {
       ])
     };
 
-    beforeEach(async () => {
-      wallet = await createSingleAddressWallet({ name }, walletDependencies);
+    it('initializeTx', async () => {
+      const { body, hash } = await wallet.initializeTx(props);
+      expect(body.outputs).toHaveLength(props.outputs.size + 1 /* change output */);
+      expect(typeof hash).toBe('string');
     });
 
-    test('initializeTx', async () => {
+    it('finalizeTx', async () => {
       const txInternals = await wallet.initializeTx(props);
-      expect(txInternals.body).toBeInstanceOf(CSL.TransactionBody);
-      expect(txInternals.hash).toBeInstanceOf(CSL.TransactionHash);
+      const tx = await wallet.finalizeTx(txInternals);
+      expect(tx.body).toBe(txInternals.body);
+      expect(tx.id).toBe(txInternals.hash);
+      expect(Object.keys(tx.witness.signatures)).toHaveLength(1);
     });
 
-    test('signTx', async () => {
-      const { body, hash } = await wallet.initializeTx(props);
-      const tx = await wallet.signTx(body, hash);
-      await expect(tx.body().outputs().len()).toBe(2);
-      await expect(tx.body().inputs().len()).toBeGreaterThan(0);
+    it('submitTx', async () => {
+      const tx = await wallet.finalizeTx(await wallet.initializeTx(props));
+      const txSubmitting = firstValueFrom(wallet.transactions.outgoing.submitting$);
+      const txPending = firstValueFrom(wallet.transactions.outgoing.pending$);
+      const txInFlight = firstValueFrom(wallet.transactions.outgoing.inFlight$.pipe(skip(1)));
+      await wallet.submitTx(tx);
+      expect(walletProvider.submitTx).toBeCalledTimes(1);
+      expect(await txSubmitting).toBe(tx);
+      expect(await txPending).toBe(tx);
+      expect(await txInFlight).toEqual([tx]);
     });
+  });
 
-    test('submitTx', async () => {
-      const { body, hash } = await wallet.initializeTx(props);
-      const tx = await wallet.signTx(body, hash);
-      const { submitted, confirmed } = wallet.submitTx(tx);
-      await confirmed;
-      expect(provider.submitTx).toBeCalledTimes(1);
-      expect(provider.submitTx).toBeCalledWith(tx);
-      expect(txTracker.track).toBeCalledTimes(1);
-      expect(txTracker.track).toBeCalledWith(tx, submitted);
-    });
+  it('sync() calls wallet provider functions until shutdown()', () => {
+    expect(walletProvider.ledgerTip).toHaveBeenCalledTimes(1);
+    expect(walletProvider.currentWalletProtocolParameters).toHaveBeenCalledTimes(1);
+    expect(walletProvider.queryTransactionsByAddresses).toHaveBeenCalledTimes(1);
+    expect(walletProvider.utxoDelegationAndRewards).toHaveBeenCalledTimes(2); // one call for utxo, one for rewards
+    wallet.sync();
+    expect(walletProvider.ledgerTip).toHaveBeenCalledTimes(2);
+    expect(walletProvider.currentWalletProtocolParameters).toHaveBeenCalledTimes(2);
+    expect(walletProvider.queryTransactionsByAddresses).toHaveBeenCalledTimes(2);
+    expect(walletProvider.utxoDelegationAndRewards).toHaveBeenCalledTimes(4);
+    wallet.shutdown();
+    wallet.sync();
+    expect(walletProvider.ledgerTip).toHaveBeenCalledTimes(2);
+    expect(walletProvider.currentWalletProtocolParameters).toHaveBeenCalledTimes(2);
+    expect(walletProvider.queryTransactionsByAddresses).toHaveBeenCalledTimes(2);
+    expect(walletProvider.utxoDelegationAndRewards).toHaveBeenCalledTimes(4);
   });
 });

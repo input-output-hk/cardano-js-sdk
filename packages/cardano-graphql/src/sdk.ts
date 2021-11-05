@@ -31,7 +31,7 @@ export type AddExtendedStakePoolMetadataFieldsInput = {
   itn?: Maybe<ItnVerificationRef>;
   media_assets?: Maybe<ThePoolsMediaAssetsRef>;
   /** active | retired | offline | experimental | private */
-  status?: Maybe<PoolStatus>;
+  status?: Maybe<ExtendedPoolStatus>;
 };
 
 export type AddExtendedStakePoolMetadataFieldsPayload = {
@@ -66,6 +66,25 @@ export type AddExtendedStakePoolMetadataPayloadExtendedStakePoolMetadataArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<ExtendedStakePoolMetadataOrder>;
+};
+
+export type AddFractionInput = {
+  denominator: Scalars['Int'];
+  numerator: Scalars['Int'];
+};
+
+export type AddFractionPayload = {
+  __typename?: 'AddFractionPayload';
+  fraction?: Maybe<Array<Maybe<Fraction>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type AddFractionPayloadFractionArgs = {
+  filter?: Maybe<FractionFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<FractionOrder>;
 };
 
 export type AddItnVerificationInput = {
@@ -136,6 +155,24 @@ export type AddRelayByNameInput = {
   port?: Maybe<Scalars['Int']>;
 };
 
+export type AddRelayByNameMultihostInput = {
+  dnsName: Scalars['String'];
+};
+
+export type AddRelayByNameMultihostPayload = {
+  __typename?: 'AddRelayByNameMultihostPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  relayByNameMultihost?: Maybe<Array<Maybe<RelayByNameMultihost>>>;
+};
+
+
+export type AddRelayByNameMultihostPayloadRelayByNameMultihostArgs = {
+  filter?: Maybe<RelayByNameMultihostFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<RelayByNameMultihostOrder>;
+};
+
 export type AddRelayByNamePayload = {
   __typename?: 'AddRelayByNamePayload';
   numUids?: Maybe<Scalars['Int']>;
@@ -155,7 +192,7 @@ export type AddStakePoolInput = {
   cost: Scalars['String'];
   hexId: Scalars['String'];
   id: Scalars['String'];
-  margin: Scalars['Float'];
+  margin: FractionRef;
   metadata?: Maybe<StakePoolMetadataRef>;
   metadataJson?: Maybe<StakePoolMetadataJsonRef>;
   metrics: StakePoolMetricsRef;
@@ -164,6 +201,8 @@ export type AddStakePoolInput = {
   pledge: Scalars['String'];
   relays: Array<SearchResultRef>;
   rewardAccount: Scalars['String'];
+  /** active | retired | retiring */
+  status: StakePoolStatus;
   transactions: StakePoolTransactionsRef;
   vrf: Scalars['String'];
 };
@@ -403,6 +442,21 @@ export type DeleteExtendedStakePoolMetadataPayloadExtendedStakePoolMetadataArgs 
   order?: Maybe<ExtendedStakePoolMetadataOrder>;
 };
 
+export type DeleteFractionPayload = {
+  __typename?: 'DeleteFractionPayload';
+  fraction?: Maybe<Array<Maybe<Fraction>>>;
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type DeleteFractionPayloadFractionArgs = {
+  filter?: Maybe<FractionFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<FractionOrder>;
+};
+
 export type DeleteItnVerificationPayload = {
   __typename?: 'DeleteITNVerificationPayload';
   iTNVerification?: Maybe<Array<Maybe<ItnVerification>>>;
@@ -446,6 +500,21 @@ export type DeleteRelayByAddressPayloadRelayByAddressArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<RelayByAddressOrder>;
+};
+
+export type DeleteRelayByNameMultihostPayload = {
+  __typename?: 'DeleteRelayByNameMultihostPayload';
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+  relayByNameMultihost?: Maybe<Array<Maybe<RelayByNameMultihost>>>;
+};
+
+
+export type DeleteRelayByNameMultihostPayloadRelayByNameMultihostArgs = {
+  filter?: Maybe<RelayByNameMultihostFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<RelayByNameMultihostOrder>;
 };
 
 export type DeleteRelayByNamePayload = {
@@ -600,6 +669,14 @@ export enum DgraphIndex {
   Year = 'year'
 }
 
+export enum ExtendedPoolStatus {
+  Active = 'active',
+  Experimental = 'experimental',
+  Offline = 'offline',
+  Private = 'private',
+  Retired = 'retired'
+}
+
 export type ExtendedStakePoolMetadata = {
   __typename?: 'ExtendedStakePoolMetadata';
   metadata: StakePoolMetadata;
@@ -634,7 +711,7 @@ export type ExtendedStakePoolMetadataFields = {
   itn?: Maybe<ItnVerification>;
   media_assets?: Maybe<ThePoolsMediaAssets>;
   /** active | retired | offline | experimental | private */
-  status?: Maybe<PoolStatus>;
+  status?: Maybe<ExtendedPoolStatus>;
 };
 
 
@@ -695,7 +772,7 @@ export type ExtendedStakePoolMetadataFieldsPatch = {
   itn?: Maybe<ItnVerificationRef>;
   media_assets?: Maybe<ThePoolsMediaAssetsRef>;
   /** active | retired | offline | experimental | private */
-  status?: Maybe<PoolStatus>;
+  status?: Maybe<ExtendedPoolStatus>;
 };
 
 export type ExtendedStakePoolMetadataFieldsRef = {
@@ -705,7 +782,7 @@ export type ExtendedStakePoolMetadataFieldsRef = {
   itn?: Maybe<ItnVerificationRef>;
   media_assets?: Maybe<ThePoolsMediaAssetsRef>;
   /** active | retired | offline | experimental | private */
-  status?: Maybe<PoolStatus>;
+  status?: Maybe<ExtendedPoolStatus>;
 };
 
 export type ExtendedStakePoolMetadataFilter = {
@@ -756,6 +833,58 @@ export type FloatFilter = {
 export type FloatRange = {
   max: Scalars['Float'];
   min: Scalars['Float'];
+};
+
+export type Fraction = {
+  __typename?: 'Fraction';
+  denominator: Scalars['Int'];
+  numerator: Scalars['Int'];
+};
+
+export type FractionAggregateResult = {
+  __typename?: 'FractionAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+  denominatorAvg?: Maybe<Scalars['Float']>;
+  denominatorMax?: Maybe<Scalars['Int']>;
+  denominatorMin?: Maybe<Scalars['Int']>;
+  denominatorSum?: Maybe<Scalars['Int']>;
+  numeratorAvg?: Maybe<Scalars['Float']>;
+  numeratorMax?: Maybe<Scalars['Int']>;
+  numeratorMin?: Maybe<Scalars['Int']>;
+  numeratorSum?: Maybe<Scalars['Int']>;
+};
+
+export type FractionFilter = {
+  and?: Maybe<Array<Maybe<FractionFilter>>>;
+  has?: Maybe<Array<Maybe<FractionHasFilter>>>;
+  not?: Maybe<FractionFilter>;
+  or?: Maybe<Array<Maybe<FractionFilter>>>;
+};
+
+export enum FractionHasFilter {
+  Denominator = 'denominator',
+  Numerator = 'numerator'
+}
+
+export type FractionOrder = {
+  asc?: Maybe<FractionOrderable>;
+  desc?: Maybe<FractionOrderable>;
+  then?: Maybe<FractionOrder>;
+};
+
+export enum FractionOrderable {
+  Denominator = 'denominator',
+  Numerator = 'numerator'
+}
+
+export type FractionPatch = {
+  denominator?: Maybe<Scalars['Int']>;
+  numerator?: Maybe<Scalars['Int']>;
+};
+
+export type FractionRef = {
+  denominator?: Maybe<Scalars['Int']>;
+  numerator?: Maybe<Scalars['Int']>;
 };
 
 export type GenerateMutationParams = {
@@ -880,10 +1009,12 @@ export type Mutation = {
   __typename?: 'Mutation';
   addExtendedStakePoolMetadata?: Maybe<AddExtendedStakePoolMetadataPayload>;
   addExtendedStakePoolMetadataFields?: Maybe<AddExtendedStakePoolMetadataFieldsPayload>;
+  addFraction?: Maybe<AddFractionPayload>;
   addITNVerification?: Maybe<AddItnVerificationPayload>;
   addPoolContactData?: Maybe<AddPoolContactDataPayload>;
   addRelayByAddress?: Maybe<AddRelayByAddressPayload>;
   addRelayByName?: Maybe<AddRelayByNamePayload>;
+  addRelayByNameMultihost?: Maybe<AddRelayByNameMultihostPayload>;
   addStakePool?: Maybe<AddStakePoolPayload>;
   addStakePoolMetadata?: Maybe<AddStakePoolMetadataPayload>;
   addStakePoolMetadataJson?: Maybe<AddStakePoolMetadataJsonPayload>;
@@ -894,10 +1025,12 @@ export type Mutation = {
   addThePoolsMediaAssets?: Maybe<AddThePoolsMediaAssetsPayload>;
   deleteExtendedStakePoolMetadata?: Maybe<DeleteExtendedStakePoolMetadataPayload>;
   deleteExtendedStakePoolMetadataFields?: Maybe<DeleteExtendedStakePoolMetadataFieldsPayload>;
+  deleteFraction?: Maybe<DeleteFractionPayload>;
   deleteITNVerification?: Maybe<DeleteItnVerificationPayload>;
   deletePoolContactData?: Maybe<DeletePoolContactDataPayload>;
   deleteRelayByAddress?: Maybe<DeleteRelayByAddressPayload>;
   deleteRelayByName?: Maybe<DeleteRelayByNamePayload>;
+  deleteRelayByNameMultihost?: Maybe<DeleteRelayByNameMultihostPayload>;
   deleteStakePool?: Maybe<DeleteStakePoolPayload>;
   deleteStakePoolMetadata?: Maybe<DeleteStakePoolMetadataPayload>;
   deleteStakePoolMetadataJson?: Maybe<DeleteStakePoolMetadataJsonPayload>;
@@ -908,10 +1041,12 @@ export type Mutation = {
   deleteThePoolsMediaAssets?: Maybe<DeleteThePoolsMediaAssetsPayload>;
   updateExtendedStakePoolMetadata?: Maybe<UpdateExtendedStakePoolMetadataPayload>;
   updateExtendedStakePoolMetadataFields?: Maybe<UpdateExtendedStakePoolMetadataFieldsPayload>;
+  updateFraction?: Maybe<UpdateFractionPayload>;
   updateITNVerification?: Maybe<UpdateItnVerificationPayload>;
   updatePoolContactData?: Maybe<UpdatePoolContactDataPayload>;
   updateRelayByAddress?: Maybe<UpdateRelayByAddressPayload>;
   updateRelayByName?: Maybe<UpdateRelayByNamePayload>;
+  updateRelayByNameMultihost?: Maybe<UpdateRelayByNameMultihostPayload>;
   updateStakePool?: Maybe<UpdateStakePoolPayload>;
   updateStakePoolMetadata?: Maybe<UpdateStakePoolMetadataPayload>;
   updateStakePoolMetadataJson?: Maybe<UpdateStakePoolMetadataJsonPayload>;
@@ -934,6 +1069,11 @@ export type MutationAddExtendedStakePoolMetadataFieldsArgs = {
 };
 
 
+export type MutationAddFractionArgs = {
+  input: Array<AddFractionInput>;
+};
+
+
 export type MutationAddItnVerificationArgs = {
   input: Array<AddItnVerificationInput>;
 };
@@ -951,6 +1091,11 @@ export type MutationAddRelayByAddressArgs = {
 
 export type MutationAddRelayByNameArgs = {
   input: Array<AddRelayByNameInput>;
+};
+
+
+export type MutationAddRelayByNameMultihostArgs = {
+  input: Array<AddRelayByNameMultihostInput>;
 };
 
 
@@ -1006,6 +1151,11 @@ export type MutationDeleteExtendedStakePoolMetadataFieldsArgs = {
 };
 
 
+export type MutationDeleteFractionArgs = {
+  filter: FractionFilter;
+};
+
+
 export type MutationDeleteItnVerificationArgs = {
   filter: ItnVerificationFilter;
 };
@@ -1023,6 +1173,11 @@ export type MutationDeleteRelayByAddressArgs = {
 
 export type MutationDeleteRelayByNameArgs = {
   filter: RelayByNameFilter;
+};
+
+
+export type MutationDeleteRelayByNameMultihostArgs = {
+  filter: RelayByNameMultihostFilter;
 };
 
 
@@ -1076,6 +1231,11 @@ export type MutationUpdateExtendedStakePoolMetadataFieldsArgs = {
 };
 
 
+export type MutationUpdateFractionArgs = {
+  input: UpdateFractionInput;
+};
+
+
 export type MutationUpdateItnVerificationArgs = {
   input: UpdateItnVerificationInput;
 };
@@ -1093,6 +1253,11 @@ export type MutationUpdateRelayByAddressArgs = {
 
 export type MutationUpdateRelayByNameArgs = {
   input: UpdateRelayByNameInput;
+};
+
+
+export type MutationUpdateRelayByNameMultihostArgs = {
+  input: UpdateRelayByNameMultihostInput;
 };
 
 
@@ -1264,22 +1429,16 @@ export type PoolContactDataRef = {
   twitter?: Maybe<Scalars['String']>;
 };
 
-export enum PoolStatus {
-  Active = 'active',
-  Experimental = 'experimental',
-  Offline = 'offline',
-  Private = 'private',
-  Retired = 'retired'
-}
-
 export type Query = {
   __typename?: 'Query';
   aggregateExtendedStakePoolMetadata?: Maybe<ExtendedStakePoolMetadataAggregateResult>;
   aggregateExtendedStakePoolMetadataFields?: Maybe<ExtendedStakePoolMetadataFieldsAggregateResult>;
+  aggregateFraction?: Maybe<FractionAggregateResult>;
   aggregateITNVerification?: Maybe<ItnVerificationAggregateResult>;
   aggregatePoolContactData?: Maybe<PoolContactDataAggregateResult>;
   aggregateRelayByAddress?: Maybe<RelayByAddressAggregateResult>;
   aggregateRelayByName?: Maybe<RelayByNameAggregateResult>;
+  aggregateRelayByNameMultihost?: Maybe<RelayByNameMultihostAggregateResult>;
   aggregateStakePool?: Maybe<StakePoolAggregateResult>;
   aggregateStakePoolMetadata?: Maybe<StakePoolMetadataAggregateResult>;
   aggregateStakePoolMetadataJson?: Maybe<StakePoolMetadataJsonAggregateResult>;
@@ -1293,10 +1452,12 @@ export type Query = {
   getStakePoolMetadata?: Maybe<StakePoolMetadata>;
   queryExtendedStakePoolMetadata?: Maybe<Array<Maybe<ExtendedStakePoolMetadata>>>;
   queryExtendedStakePoolMetadataFields?: Maybe<Array<Maybe<ExtendedStakePoolMetadataFields>>>;
+  queryFraction?: Maybe<Array<Maybe<Fraction>>>;
   queryITNVerification?: Maybe<Array<Maybe<ItnVerification>>>;
   queryPoolContactData?: Maybe<Array<Maybe<PoolContactData>>>;
   queryRelayByAddress?: Maybe<Array<Maybe<RelayByAddress>>>;
   queryRelayByName?: Maybe<Array<Maybe<RelayByName>>>;
+  queryRelayByNameMultihost?: Maybe<Array<Maybe<RelayByNameMultihost>>>;
   queryStakePool?: Maybe<Array<Maybe<StakePool>>>;
   queryStakePoolMetadata?: Maybe<Array<Maybe<StakePoolMetadata>>>;
   queryStakePoolMetadataJson?: Maybe<Array<Maybe<StakePoolMetadataJson>>>;
@@ -1318,6 +1479,11 @@ export type QueryAggregateExtendedStakePoolMetadataFieldsArgs = {
 };
 
 
+export type QueryAggregateFractionArgs = {
+  filter?: Maybe<FractionFilter>;
+};
+
+
 export type QueryAggregateItnVerificationArgs = {
   filter?: Maybe<ItnVerificationFilter>;
 };
@@ -1335,6 +1501,11 @@ export type QueryAggregateRelayByAddressArgs = {
 
 export type QueryAggregateRelayByNameArgs = {
   filter?: Maybe<RelayByNameFilter>;
+};
+
+
+export type QueryAggregateRelayByNameMultihostArgs = {
+  filter?: Maybe<RelayByNameMultihostFilter>;
 };
 
 
@@ -1409,6 +1580,14 @@ export type QueryQueryExtendedStakePoolMetadataFieldsArgs = {
 };
 
 
+export type QueryQueryFractionArgs = {
+  filter?: Maybe<FractionFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<FractionOrder>;
+};
+
+
 export type QueryQueryItnVerificationArgs = {
   filter?: Maybe<ItnVerificationFilter>;
   first?: Maybe<Scalars['Int']>;
@@ -1438,6 +1617,14 @@ export type QueryQueryRelayByNameArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<RelayByNameOrder>;
+};
+
+
+export type QueryQueryRelayByNameMultihostArgs = {
+  filter?: Maybe<RelayByNameMultihostFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<RelayByNameMultihostOrder>;
 };
 
 
@@ -1589,6 +1776,47 @@ export enum RelayByNameHasFilter {
   Port = 'port'
 }
 
+export type RelayByNameMultihost = {
+  __typename?: 'RelayByNameMultihost';
+  dnsName: Scalars['String'];
+};
+
+export type RelayByNameMultihostAggregateResult = {
+  __typename?: 'RelayByNameMultihostAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+  dnsNameMax?: Maybe<Scalars['String']>;
+  dnsNameMin?: Maybe<Scalars['String']>;
+};
+
+export type RelayByNameMultihostFilter = {
+  and?: Maybe<Array<Maybe<RelayByNameMultihostFilter>>>;
+  has?: Maybe<Array<Maybe<RelayByNameMultihostHasFilter>>>;
+  not?: Maybe<RelayByNameMultihostFilter>;
+  or?: Maybe<Array<Maybe<RelayByNameMultihostFilter>>>;
+};
+
+export enum RelayByNameMultihostHasFilter {
+  DnsName = 'dnsName'
+}
+
+export type RelayByNameMultihostOrder = {
+  asc?: Maybe<RelayByNameMultihostOrderable>;
+  desc?: Maybe<RelayByNameMultihostOrderable>;
+  then?: Maybe<RelayByNameMultihostOrder>;
+};
+
+export enum RelayByNameMultihostOrderable {
+  DnsName = 'dnsName'
+}
+
+export type RelayByNameMultihostPatch = {
+  dnsName?: Maybe<Scalars['String']>;
+};
+
+export type RelayByNameMultihostRef = {
+  dnsName?: Maybe<Scalars['String']>;
+};
+
 export type RelayByNameOrder = {
   asc?: Maybe<RelayByNameOrderable>;
   desc?: Maybe<RelayByNameOrderable>;
@@ -1610,22 +1838,25 @@ export type RelayByNameRef = {
   port?: Maybe<Scalars['Int']>;
 };
 
-export type SearchResult = RelayByAddress | RelayByName;
+export type SearchResult = RelayByAddress | RelayByName | RelayByNameMultihost;
 
 export type SearchResultFilter = {
   memberTypes?: Maybe<Array<SearchResultType>>;
   relayByAddressFilter?: Maybe<RelayByAddressFilter>;
   relayByNameFilter?: Maybe<RelayByNameFilter>;
+  relayByNameMultihostFilter?: Maybe<RelayByNameMultihostFilter>;
 };
 
 export type SearchResultRef = {
   relayByAddressRef?: Maybe<RelayByAddressRef>;
+  relayByNameMultihostRef?: Maybe<RelayByNameMultihostRef>;
   relayByNameRef?: Maybe<RelayByNameRef>;
 };
 
 export enum SearchResultType {
   RelayByAddress = 'RelayByAddress',
-  RelayByName = 'RelayByName'
+  RelayByName = 'RelayByName',
+  RelayByNameMultihost = 'RelayByNameMultihost'
 }
 
 export type StakePool = {
@@ -1634,7 +1865,7 @@ export type StakePool = {
   cost: Scalars['String'];
   hexId: Scalars['String'];
   id: Scalars['String'];
-  margin: Scalars['Float'];
+  margin: Fraction;
   metadata?: Maybe<StakePoolMetadata>;
   metadataJson?: Maybe<StakePoolMetadataJson>;
   metrics: StakePoolMetrics;
@@ -1643,8 +1874,15 @@ export type StakePool = {
   pledge: Scalars['String'];
   relays: Array<SearchResult>;
   rewardAccount: Scalars['String'];
+  /** active | retired | retiring */
+  status: StakePoolStatus;
   transactions: StakePoolTransactions;
   vrf: Scalars['String'];
+};
+
+
+export type StakePoolMarginArgs = {
+  filter?: Maybe<FractionFilter>;
 };
 
 
@@ -1683,10 +1921,6 @@ export type StakePoolAggregateResult = {
   hexIdMin?: Maybe<Scalars['String']>;
   idMax?: Maybe<Scalars['String']>;
   idMin?: Maybe<Scalars['String']>;
-  marginAvg?: Maybe<Scalars['Float']>;
-  marginMax?: Maybe<Scalars['Float']>;
-  marginMin?: Maybe<Scalars['Float']>;
-  marginSum?: Maybe<Scalars['Float']>;
   pledgeMax?: Maybe<Scalars['String']>;
   pledgeMin?: Maybe<Scalars['String']>;
   rewardAccountMax?: Maybe<Scalars['String']>;
@@ -1715,6 +1949,7 @@ export enum StakePoolHasFilter {
   Pledge = 'pledge',
   Relays = 'relays',
   RewardAccount = 'rewardAccount',
+  Status = 'status',
   Transactions = 'transactions',
   Vrf = 'vrf'
 }
@@ -2088,7 +2323,6 @@ export enum StakePoolOrderable {
   Cost = 'cost',
   HexId = 'hexId',
   Id = 'id',
-  Margin = 'margin',
   Pledge = 'pledge',
   RewardAccount = 'rewardAccount',
   Vrf = 'vrf'
@@ -2098,7 +2332,7 @@ export type StakePoolPatch = {
   /** Coin quantity */
   cost?: Maybe<Scalars['String']>;
   hexId?: Maybe<Scalars['String']>;
-  margin?: Maybe<Scalars['Float']>;
+  margin?: Maybe<FractionRef>;
   metadata?: Maybe<StakePoolMetadataRef>;
   metadataJson?: Maybe<StakePoolMetadataJsonRef>;
   metrics?: Maybe<StakePoolMetricsRef>;
@@ -2107,6 +2341,8 @@ export type StakePoolPatch = {
   pledge?: Maybe<Scalars['String']>;
   relays?: Maybe<Array<SearchResultRef>>;
   rewardAccount?: Maybe<Scalars['String']>;
+  /** active | retired | retiring */
+  status?: Maybe<StakePoolStatus>;
   transactions?: Maybe<StakePoolTransactionsRef>;
   vrf?: Maybe<Scalars['String']>;
 };
@@ -2116,7 +2352,7 @@ export type StakePoolRef = {
   cost?: Maybe<Scalars['String']>;
   hexId?: Maybe<Scalars['String']>;
   id?: Maybe<Scalars['String']>;
-  margin?: Maybe<Scalars['Float']>;
+  margin?: Maybe<FractionRef>;
   metadata?: Maybe<StakePoolMetadataRef>;
   metadataJson?: Maybe<StakePoolMetadataJsonRef>;
   metrics?: Maybe<StakePoolMetricsRef>;
@@ -2125,9 +2361,17 @@ export type StakePoolRef = {
   pledge?: Maybe<Scalars['String']>;
   relays?: Maybe<Array<SearchResultRef>>;
   rewardAccount?: Maybe<Scalars['String']>;
+  /** active | retired | retiring */
+  status?: Maybe<StakePoolStatus>;
   transactions?: Maybe<StakePoolTransactionsRef>;
   vrf?: Maybe<Scalars['String']>;
 };
+
+export enum StakePoolStatus {
+  Active = 'active',
+  Retired = 'retired',
+  Retiring = 'retiring'
+}
 
 export type StakePoolTransactions = {
   __typename?: 'StakePoolTransactions';
@@ -2312,6 +2556,26 @@ export type UpdateExtendedStakePoolMetadataPayloadExtendedStakePoolMetadataArgs 
   order?: Maybe<ExtendedStakePoolMetadataOrder>;
 };
 
+export type UpdateFractionInput = {
+  filter: FractionFilter;
+  remove?: Maybe<FractionPatch>;
+  set?: Maybe<FractionPatch>;
+};
+
+export type UpdateFractionPayload = {
+  __typename?: 'UpdateFractionPayload';
+  fraction?: Maybe<Array<Maybe<Fraction>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type UpdateFractionPayloadFractionArgs = {
+  filter?: Maybe<FractionFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<FractionOrder>;
+};
+
 export type UpdateItnVerificationInput = {
   filter: ItnVerificationFilter;
   remove?: Maybe<ItnVerificationPatch>;
@@ -2376,6 +2640,26 @@ export type UpdateRelayByNameInput = {
   filter: RelayByNameFilter;
   remove?: Maybe<RelayByNamePatch>;
   set?: Maybe<RelayByNamePatch>;
+};
+
+export type UpdateRelayByNameMultihostInput = {
+  filter: RelayByNameMultihostFilter;
+  remove?: Maybe<RelayByNameMultihostPatch>;
+  set?: Maybe<RelayByNameMultihostPatch>;
+};
+
+export type UpdateRelayByNameMultihostPayload = {
+  __typename?: 'UpdateRelayByNameMultihostPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  relayByNameMultihost?: Maybe<Array<Maybe<RelayByNameMultihost>>>;
+};
+
+
+export type UpdateRelayByNameMultihostPayloadRelayByNameMultihostArgs = {
+  filter?: Maybe<RelayByNameMultihostFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<RelayByNameMultihostOrder>;
 };
 
 export type UpdateRelayByNamePayload = {
@@ -2555,7 +2839,7 @@ export type WithinFilter = {
   polygon: PolygonRef;
 };
 
-export type AllStakePoolFieldsFragment = { __typename?: 'StakePool', id: string, hexId: string, owners: Array<string>, cost: string, margin: number, vrf: string, rewardAccount: string, pledge: string, relays: Array<{ __typename: 'RelayByAddress', ipv4?: string | null | undefined, ipv6?: string | null | undefined, port?: number | null | undefined } | { __typename: 'RelayByName', hostname: string, port?: number | null | undefined }>, metrics: { __typename?: 'StakePoolMetrics', blocksCreated: number, livePledge: string, saturation: number, delegators: number, stake: { __typename?: 'StakePoolMetricsStake', live: string, active: string }, size: { __typename?: 'StakePoolMetricsSize', live: number, active: number } }, transactions: { __typename?: 'StakePoolTransactions', registration: Array<string>, retirement: Array<string> }, metadataJson?: { __typename?: 'StakePoolMetadataJson', hash: string, url: string } | null | undefined, metadata?: { __typename?: 'StakePoolMetadata', ticker: string, name: string, description: string, homepage: string, extDataUrl?: string | null | undefined, extSigUrl?: string | null | undefined, extVkey?: string | null | undefined, ext?: { __typename?: 'ExtendedStakePoolMetadata', serial: number, pool: { __typename?: 'ExtendedStakePoolMetadataFields', id: string, country?: string | null | undefined, status?: PoolStatus | null | undefined, contact?: { __typename?: 'PoolContactData', primary: string, email?: string | null | undefined, facebook?: string | null | undefined, github?: string | null | undefined, feed?: string | null | undefined, telegram?: string | null | undefined, twitter?: string | null | undefined } | null | undefined, media_assets?: { __typename?: 'ThePoolsMediaAssets', icon_png_64x64: string, logo_png?: string | null | undefined, logo_svg?: string | null | undefined, color_fg?: string | null | undefined, color_bg?: string | null | undefined } | null | undefined, itn?: { __typename?: 'ITNVerification', owner: string, witness: string } | null | undefined } } | null | undefined } | null | undefined };
+export type AllStakePoolFieldsFragment = { __typename?: 'StakePool', id: string, hexId: string, status: StakePoolStatus, owners: Array<string>, cost: string, vrf: string, rewardAccount: string, pledge: string, margin: { __typename?: 'Fraction', numerator: number, denominator: number }, relays: Array<{ __typename: 'RelayByAddress', ipv4?: string | null | undefined, ipv6?: string | null | undefined, port?: number | null | undefined } | { __typename: 'RelayByName', hostname: string, port?: number | null | undefined } | { __typename: 'RelayByNameMultihost', dnsName: string }>, metrics: { __typename?: 'StakePoolMetrics', blocksCreated: number, livePledge: string, saturation: number, delegators: number, stake: { __typename?: 'StakePoolMetricsStake', live: string, active: string }, size: { __typename?: 'StakePoolMetricsSize', live: number, active: number } }, transactions: { __typename?: 'StakePoolTransactions', registration: Array<string>, retirement: Array<string> }, metadataJson?: { __typename?: 'StakePoolMetadataJson', hash: string, url: string } | null | undefined, metadata?: { __typename?: 'StakePoolMetadata', ticker: string, name: string, description: string, homepage: string, extDataUrl?: string | null | undefined, extSigUrl?: string | null | undefined, extVkey?: string | null | undefined, ext?: { __typename?: 'ExtendedStakePoolMetadata', serial: number, pool: { __typename?: 'ExtendedStakePoolMetadataFields', id: string, country?: string | null | undefined, status?: ExtendedPoolStatus | null | undefined, contact?: { __typename?: 'PoolContactData', primary: string, email?: string | null | undefined, facebook?: string | null | undefined, github?: string | null | undefined, feed?: string | null | undefined, telegram?: string | null | undefined, twitter?: string | null | undefined } | null | undefined, media_assets?: { __typename?: 'ThePoolsMediaAssets', icon_png_64x64: string, logo_png?: string | null | undefined, logo_svg?: string | null | undefined, color_fg?: string | null | undefined, color_bg?: string | null | undefined } | null | undefined, itn?: { __typename?: 'ITNVerification', owner: string, witness: string } | null | undefined } } | null | undefined } | null | undefined };
 
 export type StakePoolsByMetadataQueryVariables = Exact<{
   query: Scalars['String'];
@@ -2563,22 +2847,26 @@ export type StakePoolsByMetadataQueryVariables = Exact<{
 }>;
 
 
-export type StakePoolsByMetadataQuery = { __typename?: 'Query', queryStakePoolMetadata?: Array<{ __typename?: 'StakePoolMetadata', stakePool: { __typename?: 'StakePool', id: string, hexId: string, owners: Array<string>, cost: string, margin: number, vrf: string, rewardAccount: string, pledge: string, relays: Array<{ __typename: 'RelayByAddress', ipv4?: string | null | undefined, ipv6?: string | null | undefined, port?: number | null | undefined } | { __typename: 'RelayByName', hostname: string, port?: number | null | undefined }>, metrics: { __typename?: 'StakePoolMetrics', blocksCreated: number, livePledge: string, saturation: number, delegators: number, stake: { __typename?: 'StakePoolMetricsStake', live: string, active: string }, size: { __typename?: 'StakePoolMetricsSize', live: number, active: number } }, transactions: { __typename?: 'StakePoolTransactions', registration: Array<string>, retirement: Array<string> }, metadataJson?: { __typename?: 'StakePoolMetadataJson', hash: string, url: string } | null | undefined, metadata?: { __typename?: 'StakePoolMetadata', ticker: string, name: string, description: string, homepage: string, extDataUrl?: string | null | undefined, extSigUrl?: string | null | undefined, extVkey?: string | null | undefined, ext?: { __typename?: 'ExtendedStakePoolMetadata', serial: number, pool: { __typename?: 'ExtendedStakePoolMetadataFields', id: string, country?: string | null | undefined, status?: PoolStatus | null | undefined, contact?: { __typename?: 'PoolContactData', primary: string, email?: string | null | undefined, facebook?: string | null | undefined, github?: string | null | undefined, feed?: string | null | undefined, telegram?: string | null | undefined, twitter?: string | null | undefined } | null | undefined, media_assets?: { __typename?: 'ThePoolsMediaAssets', icon_png_64x64: string, logo_png?: string | null | undefined, logo_svg?: string | null | undefined, color_fg?: string | null | undefined, color_bg?: string | null | undefined } | null | undefined, itn?: { __typename?: 'ITNVerification', owner: string, witness: string } | null | undefined } } | null | undefined } | null | undefined } } | null | undefined> | null | undefined };
+export type StakePoolsByMetadataQuery = { __typename?: 'Query', queryStakePoolMetadata?: Array<{ __typename?: 'StakePoolMetadata', stakePool: { __typename?: 'StakePool', id: string, hexId: string, status: StakePoolStatus, owners: Array<string>, cost: string, vrf: string, rewardAccount: string, pledge: string, margin: { __typename?: 'Fraction', numerator: number, denominator: number }, relays: Array<{ __typename: 'RelayByAddress', ipv4?: string | null | undefined, ipv6?: string | null | undefined, port?: number | null | undefined } | { __typename: 'RelayByName', hostname: string, port?: number | null | undefined } | { __typename: 'RelayByNameMultihost', dnsName: string }>, metrics: { __typename?: 'StakePoolMetrics', blocksCreated: number, livePledge: string, saturation: number, delegators: number, stake: { __typename?: 'StakePoolMetricsStake', live: string, active: string }, size: { __typename?: 'StakePoolMetricsSize', live: number, active: number } }, transactions: { __typename?: 'StakePoolTransactions', registration: Array<string>, retirement: Array<string> }, metadataJson?: { __typename?: 'StakePoolMetadataJson', hash: string, url: string } | null | undefined, metadata?: { __typename?: 'StakePoolMetadata', ticker: string, name: string, description: string, homepage: string, extDataUrl?: string | null | undefined, extSigUrl?: string | null | undefined, extVkey?: string | null | undefined, ext?: { __typename?: 'ExtendedStakePoolMetadata', serial: number, pool: { __typename?: 'ExtendedStakePoolMetadataFields', id: string, country?: string | null | undefined, status?: ExtendedPoolStatus | null | undefined, contact?: { __typename?: 'PoolContactData', primary: string, email?: string | null | undefined, facebook?: string | null | undefined, github?: string | null | undefined, feed?: string | null | undefined, telegram?: string | null | undefined, twitter?: string | null | undefined } | null | undefined, media_assets?: { __typename?: 'ThePoolsMediaAssets', icon_png_64x64: string, logo_png?: string | null | undefined, logo_svg?: string | null | undefined, color_fg?: string | null | undefined, color_bg?: string | null | undefined } | null | undefined, itn?: { __typename?: 'ITNVerification', owner: string, witness: string } | null | undefined } } | null | undefined } | null | undefined } } | null | undefined> | null | undefined };
 
 export type StakePoolsQueryVariables = Exact<{
   query: Scalars['String'];
 }>;
 
 
-export type StakePoolsQuery = { __typename?: 'Query', queryStakePool?: Array<{ __typename?: 'StakePool', id: string, hexId: string, owners: Array<string>, cost: string, margin: number, vrf: string, rewardAccount: string, pledge: string, relays: Array<{ __typename: 'RelayByAddress', ipv4?: string | null | undefined, ipv6?: string | null | undefined, port?: number | null | undefined } | { __typename: 'RelayByName', hostname: string, port?: number | null | undefined }>, metrics: { __typename?: 'StakePoolMetrics', blocksCreated: number, livePledge: string, saturation: number, delegators: number, stake: { __typename?: 'StakePoolMetricsStake', live: string, active: string }, size: { __typename?: 'StakePoolMetricsSize', live: number, active: number } }, transactions: { __typename?: 'StakePoolTransactions', registration: Array<string>, retirement: Array<string> }, metadataJson?: { __typename?: 'StakePoolMetadataJson', hash: string, url: string } | null | undefined, metadata?: { __typename?: 'StakePoolMetadata', ticker: string, name: string, description: string, homepage: string, extDataUrl?: string | null | undefined, extSigUrl?: string | null | undefined, extVkey?: string | null | undefined, ext?: { __typename?: 'ExtendedStakePoolMetadata', serial: number, pool: { __typename?: 'ExtendedStakePoolMetadataFields', id: string, country?: string | null | undefined, status?: PoolStatus | null | undefined, contact?: { __typename?: 'PoolContactData', primary: string, email?: string | null | undefined, facebook?: string | null | undefined, github?: string | null | undefined, feed?: string | null | undefined, telegram?: string | null | undefined, twitter?: string | null | undefined } | null | undefined, media_assets?: { __typename?: 'ThePoolsMediaAssets', icon_png_64x64: string, logo_png?: string | null | undefined, logo_svg?: string | null | undefined, color_fg?: string | null | undefined, color_bg?: string | null | undefined } | null | undefined, itn?: { __typename?: 'ITNVerification', owner: string, witness: string } | null | undefined } } | null | undefined } | null | undefined } | null | undefined> | null | undefined };
+export type StakePoolsQuery = { __typename?: 'Query', queryStakePool?: Array<{ __typename?: 'StakePool', id: string, hexId: string, status: StakePoolStatus, owners: Array<string>, cost: string, vrf: string, rewardAccount: string, pledge: string, margin: { __typename?: 'Fraction', numerator: number, denominator: number }, relays: Array<{ __typename: 'RelayByAddress', ipv4?: string | null | undefined, ipv6?: string | null | undefined, port?: number | null | undefined } | { __typename: 'RelayByName', hostname: string, port?: number | null | undefined } | { __typename: 'RelayByNameMultihost', dnsName: string }>, metrics: { __typename?: 'StakePoolMetrics', blocksCreated: number, livePledge: string, saturation: number, delegators: number, stake: { __typename?: 'StakePoolMetricsStake', live: string, active: string }, size: { __typename?: 'StakePoolMetricsSize', live: number, active: number } }, transactions: { __typename?: 'StakePoolTransactions', registration: Array<string>, retirement: Array<string> }, metadataJson?: { __typename?: 'StakePoolMetadataJson', hash: string, url: string } | null | undefined, metadata?: { __typename?: 'StakePoolMetadata', ticker: string, name: string, description: string, homepage: string, extDataUrl?: string | null | undefined, extSigUrl?: string | null | undefined, extVkey?: string | null | undefined, ext?: { __typename?: 'ExtendedStakePoolMetadata', serial: number, pool: { __typename?: 'ExtendedStakePoolMetadataFields', id: string, country?: string | null | undefined, status?: ExtendedPoolStatus | null | undefined, contact?: { __typename?: 'PoolContactData', primary: string, email?: string | null | undefined, facebook?: string | null | undefined, github?: string | null | undefined, feed?: string | null | undefined, telegram?: string | null | undefined, twitter?: string | null | undefined } | null | undefined, media_assets?: { __typename?: 'ThePoolsMediaAssets', icon_png_64x64: string, logo_png?: string | null | undefined, logo_svg?: string | null | undefined, color_fg?: string | null | undefined, color_bg?: string | null | undefined } | null | undefined, itn?: { __typename?: 'ITNVerification', owner: string, witness: string } | null | undefined } } | null | undefined } | null | undefined } | null | undefined> | null | undefined };
 
 export const AllStakePoolFieldsFragmentDoc = gql`
     fragment allStakePoolFields on StakePool {
   id
   hexId
+  status
   owners
   cost
-  margin
+  margin {
+    numerator
+    denominator
+  }
   vrf
   relays {
     __typename
@@ -2590,6 +2878,9 @@ export const AllStakePoolFieldsFragmentDoc = gql`
       ipv4
       ipv6
       port
+    }
+    ... on RelayByNameMultihost {
+      dnsName
     }
   }
   rewardAccount

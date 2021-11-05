@@ -1,109 +1,214 @@
-import { BalanceTracker, KeyManagement, TransactionError, TransactionFailure, TransactionTracker } from '.';
-import { CSL, Cardano, ProviderError, WalletProvider, coreToCsl } from '@cardano-sdk/core';
-import { InitializeTxProps, TxInternals, computeImplicitCoin, createTransactionInternals } from './Transaction';
+import { Address, InitializeTxProps, Wallet } from './types';
+import { AddressType } from '.';
+import {
+  Balance,
+  BehaviorObservable,
+  DirectionalTransaction,
+  FailedTx,
+  PollingConfig,
+  ProviderTrackerSubject,
+  SimpleProvider,
+  SourceTrackerConfig,
+  SourceTransactionalTracker,
+  TransactionalTracker,
+  Transactions,
+  createAddressTransactionsProvider,
+  createBalanceTracker,
+  createRewardsProvider,
+  createRewardsTracker,
+  createTransactionsTracker,
+  createUtxoProvider,
+  createUtxoTracker
+} from './services';
+import { Cardano, ProtocolParametersRequiredByWallet, WalletProvider, coreToCsl } from '@cardano-sdk/core';
+import { InputSelector, defaultSelectionConstraints, roundRobinRandomImprove } from '@cardano-sdk/cip2';
+import { KeyManager } from './KeyManagement';
 import { Logger, dummyLogger } from 'ts-log';
-import { UtxoRepository } from './types';
-import { defaultSelectionConstraints } from '@cardano-sdk/cip2';
+import { Subject, combineLatest, from, lastValueFrom, mergeMap, take } from 'rxjs';
+import { TransactionFailure } from './services/TransactionError';
+import { TxInternals, computeImplicitCoin, createTransactionInternals, ensureValidityInterval } from './Transaction';
 
-export interface SubmitTxResult {
-  /**
-   * Resolves when transaction is submitted.
-   * Rejects with {TransactionError}.
-   */
-  submitted: Promise<void>;
-  /**
-   * Resolves when transaction is submitted and confirmed.
-   * Rejects with {TransactionError}.
-   */
-  confirmed: Promise<void>;
-}
-export interface SingleAddressWallet {
-  address: Cardano.Address;
-  balance: BalanceTracker;
-  initializeTx: (props: InitializeTxProps) => Promise<TxInternals>;
-  name: string;
-  signTx: (body: CSL.TransactionBody, hash: CSL.TransactionHash) => Promise<CSL.Transaction>;
-  submitTx: (tx: CSL.Transaction) => SubmitTxResult;
+export interface SingleAddressWalletProps {
+  readonly name: string;
+  readonly polling?: PollingConfig;
 }
 
 export interface SingleAddressWalletDependencies {
-  keyManager: KeyManagement.KeyManager;
-  logger?: Logger;
-  provider: WalletProvider;
-  utxoRepository: UtxoRepository;
-  txTracker: TransactionTracker;
-  balanceTracker?: BalanceTracker;
+  readonly keyManager: KeyManager;
+  readonly walletProvider: WalletProvider;
+  readonly inputSelector?: InputSelector;
+  readonly logger?: Logger;
 }
 
-export interface SingleAddressWalletProps {
+export interface SingleAddressWalletConfiguration {
+  readonly address?: Address;
+  readonly utxoProvider?: SimpleProvider<Cardano.Utxo[]>;
+  readonly tipProvider?: SimpleProvider<Cardano.Tip>;
+  readonly rewardsProvider?: SimpleProvider<Cardano.Lovelace>;
+  readonly protocolParametersProvider?: SimpleProvider<ProtocolParametersRequiredByWallet>;
+  readonly transactionsProvider?: SimpleProvider<DirectionalTransaction[]>;
+  readonly sourceTrackerConfig?: SourceTrackerConfig;
+}
+
+export class SingleAddressWallet implements Wallet {
+  #inputSelector: InputSelector;
+  #keyManager: KeyManager;
+  #walletProvider: WalletProvider;
+  #address: Address;
+  #logger: Logger;
+  #tip$: ProviderTrackerSubject<Cardano.Tip>;
+  #protocolParameters$: ProviderTrackerSubject<ProtocolParametersRequiredByWallet>;
+  #newTransactions = {
+    failedToSubmit$: new Subject<FailedTx>(),
+    pending$: new Subject<Cardano.NewTxAlonzo>(),
+    submitting$: new Subject<Cardano.NewTxAlonzo>()
+  };
+  #rewards: SourceTransactionalTracker<Cardano.Lovelace>;
+  utxo: SourceTransactionalTracker<Cardano.Utxo[]>;
+  balance: TransactionalTracker<Balance>;
+  transactions: Transactions;
+  tip$: BehaviorObservable<Cardano.Tip>;
+  protocolParameters$: BehaviorObservable<ProtocolParametersRequiredByWallet>;
   name: string;
-}
 
-const ensureValidityInterval = (
-  currentSlot: number,
-  validityInterval?: Cardano.ValidityInterval
-): Cardano.ValidityInterval =>
-  // Todo: Based this on slot duration, to equal 2hrs
-  ({ invalidHereafter: currentSlot + 3600, ...validityInterval });
+  constructor(
+    {
+      name,
+      polling: { interval, maxInterval } = { interval: 15_000, maxInterval: 15_000 * 10 }
+    }: SingleAddressWalletProps,
+    {
+      walletProvider,
+      keyManager,
+      logger = dummyLogger,
+      inputSelector = roundRobinRandomImprove()
+    }: SingleAddressWalletDependencies,
+    {
+      address = {
+        accountIndex: 0,
+        bech32: keyManager.deriveAddress(0, 0),
+        index: 0,
+        type: AddressType.External
+      },
+      utxoProvider = createUtxoProvider(walletProvider, [address.bech32]),
+      tipProvider = () => from(walletProvider.ledgerTip()),
+      rewardsProvider = createRewardsProvider(walletProvider, keyManager),
+      transactionsProvider = createAddressTransactionsProvider(walletProvider, [address.bech32]),
+      protocolParametersProvider = () => from(walletProvider.currentWalletProtocolParameters()),
+      sourceTrackerConfig: config = {
+        maxInterval,
+        pollInterval: interval
+      }
+    }: SingleAddressWalletConfiguration = {}
+  ) {
+    this.#logger = logger;
+    this.#inputSelector = inputSelector;
+    this.#walletProvider = walletProvider;
+    this.#keyManager = keyManager;
+    this.#address = address;
+    this.#tip$ = this.tip$ = new ProviderTrackerSubject({ config, provider: tipProvider });
+    this.#protocolParameters$ = this.protocolParameters$ = new ProviderTrackerSubject({
+      config,
+      provider: protocolParametersProvider
+    });
 
-export const createSingleAddressWallet = async (
-  { name }: SingleAddressWalletProps,
-  {
-    provider,
-    keyManager,
-    utxoRepository,
-    txTracker,
-    balanceTracker = new BalanceTracker(utxoRepository),
-    logger = dummyLogger
-  }: SingleAddressWalletDependencies
-): Promise<SingleAddressWallet> => {
-  const address = keyManager.deriveAddress(0, 0);
-  const protocolParameters = await provider.currentWalletProtocolParameters();
-  const signTx = async (body: CSL.TransactionBody, hash: CSL.TransactionHash) => {
-    const witnessSet = await keyManager.signTransaction(hash);
-    return CSL.Transaction.new(body, witnessSet);
-  };
-  return {
-    address,
-    balance: balanceTracker,
-    initializeTx: async (props) => {
-      const tip = await provider.ledgerTip();
-      const validityInterval = ensureValidityInterval(tip.slot, props.options?.validityInterval);
-      const txOutputs = new Set([...props.outputs].map((output) => coreToCsl.txOut(output)));
-      const constraints = defaultSelectionConstraints({
-        buildTx: async (inputSelection) => {
-          logger.debug('Building TX for selection constraints', inputSelection);
-          const { body, hash } = await createTransactionInternals({
-            changeAddress: address,
-            inputSelection,
-            validityInterval
+    this.name = name;
+    this.transactions = createTransactionsTracker({
+      config,
+      newTransactions: this.#newTransactions,
+      tip$: this.tip$,
+      transactionsProvider
+    });
+    this.utxo = createUtxoTracker({
+      config,
+      transactionsInFlight$: this.transactions.outgoing.inFlight$,
+      utxoProvider
+    });
+    this.#rewards = createRewardsTracker({
+      config,
+      rewardsProvider,
+      transactionsInFlight$: this.transactions.outgoing.inFlight$
+    });
+    this.balance = createBalanceTracker(this.utxo, this.#rewards);
+  }
+  get addresses(): Address[] {
+    return [this.#address];
+  }
+  initializeTx(props: InitializeTxProps): Promise<TxInternals> {
+    return lastValueFrom(
+      combineLatest([this.tip$, this.utxo.available$, this.protocolParameters$]).pipe(
+        take(1),
+        mergeMap(([tip, utxo, protocolParameters]) => {
+          const validityInterval = ensureValidityInterval(tip.slot, props.options?.validityInterval);
+          const txOutputs = new Set([...props.outputs].map((output) => coreToCsl.txOut(output)));
+          const changeAddress = this.addresses[0].bech32;
+          const constraints = defaultSelectionConstraints({
+            buildTx: async (inputSelection) => {
+              this.#logger.debug('Building TX for selection constraints', inputSelection);
+              const txInternals = await createTransactionInternals({
+                changeAddress,
+                inputSelection,
+                validityInterval
+              });
+              return coreToCsl.tx(await this.finalizeTx(txInternals));
+            },
+            protocolParameters
           });
-          return signTx(body, hash);
-        },
-        protocolParameters
+          const implicitCoin = computeImplicitCoin(protocolParameters, props);
+          return from(
+            this.#inputSelector
+              .select({
+                constraints,
+                implicitCoin,
+                outputs: txOutputs,
+                utxo: new Set(coreToCsl.utxo(utxo))
+              })
+              .then((inputSelectionResult) =>
+                createTransactionInternals({
+                  changeAddress,
+                  inputSelection: inputSelectionResult.selection,
+                  validityInterval
+                })
+              )
+          );
+        })
+      )
+    );
+  }
+  async finalizeTx({ body, hash }: TxInternals, auxiliaryData?: Cardano.AuxiliaryData): Promise<Cardano.NewTxAlonzo> {
+    const signatures = await this.#keyManager.signTransaction(hash);
+    return {
+      auxiliaryData,
+      body,
+      id: hash,
+      // TODO: add support for the rest of the witness properties
+      witness: { signatures }
+    };
+  }
+  async submitTx(tx: Cardano.NewTxAlonzo): Promise<void> {
+    this.#newTransactions.submitting$.next(tx);
+    try {
+      await this.#walletProvider.submitTx(coreToCsl.tx(tx).to_bytes());
+      this.#newTransactions.pending$.next(tx);
+    } catch (error) {
+      this.#newTransactions.failedToSubmit$.next({
+        reason: TransactionFailure.FailedToSubmit,
+        tx
       });
-      const implicitCoin = computeImplicitCoin(protocolParameters, props);
-      const inputSelectionResult = await utxoRepository.selectInputs(txOutputs, constraints, implicitCoin);
-      return createTransactionInternals({
-        changeAddress: address,
-        inputSelection: inputSelectionResult.selection,
-        validityInterval
-      });
-    },
-    name,
-    signTx,
-    submitTx: (tx) => {
-      const submitted = provider.submitTx(tx).catch((error) => {
-        if (error instanceof ProviderError) {
-          throw new TransactionError(TransactionFailure.FailedToSubmit, error, error.detail);
-        }
-        throw new TransactionError(TransactionFailure.FailedToSubmit, error);
-      });
-      const confirmed = txTracker.track(tx, submitted);
-      return {
-        confirmed,
-        submitted
-      };
+      throw error;
     }
-  };
-};
+  }
+  sync() {
+    this.utxo.sync();
+    this.transactions.sync();
+    this.#tip$.sync();
+    this.#protocolParameters$.sync();
+    this.#rewards.sync();
+  }
+  shutdown() {
+    this.#rewards.shutdown();
+    this.utxo.shutdown();
+    this.transactions.shutdown();
+    this.#tip$.complete();
+    this.#protocolParameters$.complete();
+  }
+}

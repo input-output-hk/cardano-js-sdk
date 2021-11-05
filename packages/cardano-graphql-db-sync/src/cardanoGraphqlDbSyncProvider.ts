@@ -221,7 +221,7 @@ export const cardanoGraphqlDbSyncProvider = (uri: string): WalletProvider => {
       type Variables = { transaction: string };
 
       const response = await client.request<Response, Variables>(mutation, {
-        transaction: Buffer.from(signedTransaction.to_bytes()).toString('hex')
+        transaction: Buffer.from(signedTransaction).toString('hex')
       });
 
       if (!response.hash) {

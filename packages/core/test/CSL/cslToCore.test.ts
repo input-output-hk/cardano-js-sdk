@@ -28,4 +28,13 @@ describe('cslToCore', () => {
     expect(typeof txIn.txId).toBe('string');
     expect(txIn.address).toBe(address);
   });
+
+  it('txOut', () => {
+    const value = { coins: 100_000n };
+    const cslOutput = CslTestUtil.createOutput(value);
+    const txOut = cslToCore.txOut(cslOutput);
+    expect(typeof txOut.address).toBe('string');
+    expect(txOut.value).toEqual(value);
+    expect(txOut.datum).toBeUndefined();
+  });
 });

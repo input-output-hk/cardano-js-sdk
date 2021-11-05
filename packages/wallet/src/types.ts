@@ -1,55 +1,55 @@
-import { CSL, Cardano } from '@cardano-sdk/core';
-import { SelectionConstraints, SelectionResult } from '@cardano-sdk/cip2';
-import Emittery from 'emittery';
+import {
+  Balance,
+  BehaviorObservable,
+  ProviderSubscription,
+  SourceTransactionalTracker,
+  TransactionalTracker,
+  Transactions
+} from './services';
+import { Cardano, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
+import { TxInternals } from './Transaction';
 
-export enum UtxoRepositoryEvent {
-  Changed = 'changed',
-  OutOfSync = 'out-of-sync'
+/** Internal = change address & External = receipt address */
+export enum AddressType {
+  /**
+   * Change address
+   */
+  Internal = 'Internal',
+  /**
+   * Receipt address
+   */
+  External = 'External'
 }
 
-export interface UtxoRepositoryFields {
-  allUtxos: Cardano.Utxo[];
-  availableUtxos: Cardano.Utxo[];
-  allRewards: Cardano.Lovelace | null;
-  availableRewards: Cardano.Lovelace | null;
-  delegation: Cardano.PoolId | null;
+export interface Address {
+  bech32: Cardano.Address;
+  index: number;
+  type: AddressType;
+  accountIndex: number;
 }
 
-export type UtxoRepositoryEvents = {
-  changed: UtxoRepositoryFields;
-  'out-of-sync': void;
-  'transaction-untracked': CSL.Transaction;
+export type InitializeTxProps = {
+  outputs: Set<Cardano.TxOut>;
+  certificates?: Cardano.Certificate[];
+  withdrawals?: Cardano.Withdrawal[];
+  options?: {
+    validityInterval?: Cardano.ValidityInterval;
+  };
 };
-export type UtxoRepository = {
-  sync: () => Promise<void>;
-  selectInputs: (
-    outputs: Set<CSL.TransactionOutput>,
-    constraints: SelectionConstraints,
-    implicitCoin?: Cardano.ImplicitCoin
-  ) => Promise<SelectionResult>;
-} & UtxoRepositoryFields &
-  Emittery<UtxoRepositoryEvents>;
 
-export interface OnTransactionArgs {
-  transaction: CSL.Transaction;
-  /**
-   * Resolves when transaction is confirmed.
-   * Rejects if transaction fails to submit or validate.
-   */
-  confirmed: Promise<void>;
+export interface FinalizeTxProps {
+  readonly body: Cardano.TxBodyAlonzo;
 }
 
-export enum TransactionTrackerEvent {
-  NewTransaction = 'new-transaction'
-}
-
-export type TransactionTrackerEvents = { 'new-transaction': OnTransactionArgs };
-export interface TransactionTracker extends Emittery<TransactionTrackerEvents> {
-  /**
-   * Track a new transaction.
-   *
-   * @param {CSL.Transaction} transaction transaction to track.
-   * @param {Promise<void>} submitted defer checking for transaction confirmation until this resolves.
-   */
-  track(transaction: CSL.Transaction, submitted?: Promise<void>): Promise<void>;
+export interface Wallet extends ProviderSubscription {
+  name: string;
+  readonly balance: TransactionalTracker<Balance>;
+  readonly utxo: SourceTransactionalTracker<Cardano.Utxo[]>;
+  readonly transactions: Transactions;
+  readonly tip$: BehaviorObservable<Cardano.Tip>;
+  readonly protocolParameters$: BehaviorObservable<ProtocolParametersRequiredByWallet>;
+  get addresses(): Address[];
+  initializeTx(props: InitializeTxProps): Promise<TxInternals>;
+  finalizeTx(props: TxInternals): Promise<Cardano.NewTxAlonzo>;
+  submitTx(tx: Cardano.NewTxAlonzo): Promise<void>;
 }

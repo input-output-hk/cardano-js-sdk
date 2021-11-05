@@ -19,6 +19,9 @@ export * from './Utxo';
 export * from './Value';
 export * from './DelegationsAndRewards';
 export * from './Transaction';
+export * from './Certificate';
+
+export type Ed25519KeyHashBech32 = string;
 
 export type ProtocolParametersAlonzo = util.OptionalUndefined<
   util.RecursivelyReplaceNullWithUndefined<Ogmios.ProtocolParametersAlonzo>
