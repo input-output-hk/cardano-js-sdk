@@ -36,7 +36,7 @@ export const createTransactionInternals = async ({
     certificates,
     fee: BigInt(inputSelection.fee.to_str()),
     inputs: [...inputSelection.inputs].map((cslInput) =>
-      cslToCore.txIn(cslInput.input(), cslInput.output().address().to_bech32('addr'))
+      cslToCore.txIn(cslInput.input(), cslInput.output().address().to_bech32())
     ),
     outputs,
     validityInterval,

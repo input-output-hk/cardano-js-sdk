@@ -1,3 +1,5 @@
+import { Address, InitializeTxProps, Wallet } from './types';
+import { AddressType } from '.';
 import {
   Balance,
   BehaviorObservable,
@@ -19,7 +21,6 @@ import {
   createUtxoTracker
 } from './services';
 import { Cardano, ProtocolParametersRequiredByWallet, WalletProvider, coreToCsl } from '@cardano-sdk/core';
-import { InitializeTxProps, Wallet } from './types';
 import { InputSelector, defaultSelectionConstraints, roundRobinRandomImprove } from '@cardano-sdk/cip2';
 import { KeyManager } from './KeyManagement';
 import { Logger, dummyLogger } from 'ts-log';
@@ -40,7 +41,7 @@ export interface SingleAddressWalletDependencies {
 }
 
 export interface SingleAddressWalletConfiguration {
-  readonly address?: Cardano.Address;
+  readonly address?: Address;
   readonly utxoProvider?: SimpleProvider<Cardano.Utxo[]>;
   readonly tipProvider?: SimpleProvider<Cardano.Tip>;
   readonly rewardsProvider?: SimpleProvider<Cardano.Lovelace>;
@@ -53,7 +54,7 @@ export class SingleAddressWallet implements Wallet {
   #inputSelector: InputSelector;
   #keyManager: KeyManager;
   #walletProvider: WalletProvider;
-  #address: Cardano.Address;
+  #address: Address;
   #logger: Logger;
   #tip$: ProviderTrackerSubject<Cardano.Tip>;
   #protocolParameters$: ProviderTrackerSubject<ProtocolParametersRequiredByWallet>;
@@ -82,11 +83,16 @@ export class SingleAddressWallet implements Wallet {
       inputSelector = roundRobinRandomImprove()
     }: SingleAddressWalletDependencies,
     {
-      address = keyManager.deriveAddress(0, 0),
-      utxoProvider = createUtxoProvider$(walletProvider, [address]),
+      address = {
+        accountIndex: 0,
+        bech32: keyManager.deriveAddress(0, 0),
+        index: 0,
+        type: AddressType.External
+      },
+      utxoProvider = createUtxoProvider$(walletProvider, [address.bech32]),
       tipProvider = () => from(walletProvider.ledgerTip()),
-      rewardsProvider = createRewardsProvider$(walletProvider, [address], keyManager),
-      transactionsProvider = createAddressTransactionsProvider$(walletProvider, [address]),
+      rewardsProvider = createRewardsProvider$(walletProvider, [address.bech32], keyManager),
+      transactionsProvider = createAddressTransactionsProvider$(walletProvider, [address.bech32]),
       protocolParametersProvider = () => from(walletProvider.currentWalletProtocolParameters()),
       sourceTrackerConfig: config = {
         maxInterval,
@@ -118,14 +124,13 @@ export class SingleAddressWallet implements Wallet {
       utxoProvider
     });
     this.#rewards = createRewardsTracker({
-      addresses: this.addresses,
       config,
       rewardsProvider,
       transactionsInFlight$: this.transactions.outgoing.inFlight$
     });
     this.balance = createBalanceTracker(this.utxo, this.#rewards);
   }
-  get addresses(): string[] {
+  get addresses(): Address[] {
     return [this.#address];
   }
   initializeTx(props: InitializeTxProps): Promise<TxInternals> {
@@ -135,7 +140,7 @@ export class SingleAddressWallet implements Wallet {
         mergeMap(([tip, utxo, protocolParameters]) => {
           const validityInterval = ensureValidityInterval(tip.slot, props.options?.validityInterval);
           const txOutputs = new Set([...props.outputs].map((output) => coreToCsl.txOut(output)));
-          const changeAddress = this.addresses[0];
+          const changeAddress = this.addresses[0].bech32;
           const constraints = defaultSelectionConstraints({
             buildTx: async (inputSelection) => {
               this.#logger.debug('Building TX for selection constraints', inputSelection);

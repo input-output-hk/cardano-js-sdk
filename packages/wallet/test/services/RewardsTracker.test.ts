@@ -16,8 +16,8 @@ describe('createRewardsTracker', () => {
             body: {
               withdrawals: [
                 {
-                  address,
-                  quantity: 100n
+                  quantity: 100n,
+                  stakeAddress: address
                 }
               ]
             }
@@ -26,7 +26,6 @@ describe('createRewardsTracker', () => {
       });
       const rewardsTracker = createRewardsTracker(
         {
-          addresses: [address],
           // not relevant for this test, overwriting rewardsSource$
           config: { maxInterval: 100, pollInterval: 100 },
           rewardsProvider: createRewardsProvider$(provider, [address], keyManager),

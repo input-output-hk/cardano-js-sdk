@@ -56,7 +56,7 @@ describe('SingleAddressWallet', () => {
       expect(wallet.protocolParameters$.value).toEqual(mocks.protocolParameters);
     });
     it('"addresses"', () => {
-      expect(wallet.addresses).toEqual([address]);
+      expect(wallet.addresses.map(({ bech32 }) => bech32)).toEqual([address]);
     });
   });
 

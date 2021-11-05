@@ -1,10 +1,10 @@
-import { Address } from '..';
+import { AddressType } from '..';
 import { CSL, Cardano } from '@cardano-sdk/core';
 
 export interface KeyManager {
   deriveAddress: (addressIndex: number, index: 0 | 1) => string;
   signMessage: (
-    addressType: Address.AddressType,
+    addressType: AddressType,
     signingIndex: number,
     message: string
   ) => Promise<{ publicKey: string; signature: string }>;

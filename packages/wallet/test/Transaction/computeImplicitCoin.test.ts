@@ -13,7 +13,7 @@ describe('Transaction.computeImplicitCoin', () => {
       { __typename: CertificateType.PoolRetirement, epoch: 500, poolId: 'pool...' },
       { __typename: CertificateType.StakeDelegation, address, epoch: 500, poolId: 'pool...' }
     ];
-    const withdrawals: Cardano.Withdrawal[] = [{ address, quantity: 5n }];
+    const withdrawals: Cardano.Withdrawal[] = [{ quantity: 5n, stakeAddress: address }];
     const txProps = { certificates, withdrawals } as InitializeTxProps;
 
     const coin = Transaction.computeImplicitCoin(protocolParameters, txProps);
