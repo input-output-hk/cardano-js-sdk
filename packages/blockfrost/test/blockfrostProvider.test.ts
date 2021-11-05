@@ -2,7 +2,7 @@
 /* eslint-disable max-len */
 
 import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
-import { Cardano, NetworkInfo, StakePoolStats } from '@cardano-sdk/core';
+import { Cardano, NetworkInfo, StakePoolStats, WalletProvider } from '@cardano-sdk/core';
 import { blockfrostProvider } from '../src';
 jest.mock('@blockfrost/blockfrost-js');
 
@@ -407,6 +407,56 @@ describe('blockfrostProvider', () => {
       blockNo: 2_927_618,
       hash: '86e837d8a6cdfddaf364525ce9857eb93430b7e59a5fd776f0a9e11df476a7e5',
       slot: 37_767_194
+    });
+  });
+
+  describe('rewardsHistory', () => {
+    const pool_id = 'pool1pu5jlj4q9w9jlxeu370a3c9myx47md5j5m2str0naunn2q3lkdy';
+    const generateRewardsResponse = (numEpochs: number, firstEpoch = 0): Responses['account_reward_content'] =>
+      [...Array.from({ length: numEpochs }).keys()].map((epoch) => ({
+        amount: '1000',
+        epoch: firstEpoch + epoch,
+        pool_id
+      }));
+    let client: WalletProvider;
+
+    beforeEach(() => {
+      BlockFrostAPI.prototype.accountsRewards = jest
+        .fn()
+        .mockResolvedValue(generateRewardsResponse(2, 98))
+        .mockResolvedValueOnce(generateRewardsResponse(100));
+      client = blockfrostProvider({ isTestnet: true, projectId: apiKey });
+    });
+
+    test('epoch bounds & query per stake address', async () => {
+      const response = await client.rewardsHistory({
+        epochs: {
+          lowerBound: 98,
+          upperBound: 98
+        },
+        stakeAddresses: [
+          'stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27',
+          'stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy28'
+        ]
+      });
+
+      expect(BlockFrostAPI.prototype.accountsRewards).toBeCalledTimes(2);
+      expect(response).toMatchObject([{ epoch: 98, rewards: 2000n }]);
+    });
+
+    test('pagination', async () => {
+      const response = await client.rewardsHistory({
+        epochs: {
+          lowerBound: 98
+        },
+        stakeAddresses: ['stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy28']
+      });
+
+      expect(BlockFrostAPI.prototype.accountsRewards).toBeCalledTimes(2);
+      expect(response).toMatchObject([
+        { epoch: 98, rewards: 2000n },
+        { epoch: 99, rewards: 2000n }
+      ]);
     });
   });
 });

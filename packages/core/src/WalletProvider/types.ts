@@ -51,6 +51,27 @@ export type NetworkInfo = {
   stake: StakeSummary;
 };
 
+export interface EpochRange {
+  /**
+   * Inclusive
+   */
+  lowerBound?: Cardano.Epoch;
+  /**
+   * Inclusive
+   */
+  upperBound?: Cardano.Epoch;
+}
+
+export interface RewardHistoryProps {
+  stakeAddresses: Cardano.Address[];
+  epochs?: EpochRange;
+}
+
+export interface EpochRewards {
+  epoch: Cardano.Epoch;
+  rewards: Cardano.Lovelace;
+}
+
 export interface WalletProvider {
   ledgerTip: () => Promise<Cardano.Tip>;
   networkInfo: () => Promise<NetworkInfo>;
@@ -71,4 +92,10 @@ export interface WalletProvider {
   queryTransactionsByAddresses: (addresses: Cardano.Address[]) => Promise<Cardano.TxAlonzo[]>;
   queryTransactionsByHashes: (hashes: Cardano.Hash16[]) => Promise<Cardano.TxAlonzo[]>;
   currentWalletProtocolParameters: () => Promise<ProtocolParametersRequiredByWallet>;
+  /**
+   * Query rewards history for provided stake addresses.
+   *
+   * @returns Rewards quantity for every epoch that had any rewards in ascending order.
+   */
+  rewardsHistory: (props: RewardHistoryProps) => Promise<EpochRewards[]>;
 }

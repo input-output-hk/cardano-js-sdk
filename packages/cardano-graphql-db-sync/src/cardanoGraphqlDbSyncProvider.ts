@@ -234,7 +234,12 @@ export const cardanoGraphqlDbSyncProvider = (uri: string): WalletProvider => {
 
   // eslint-disable-next-line unicorn/consistent-function-scoping
   const utxoDelegationAndRewards: WalletProvider['utxoDelegationAndRewards'] = async () => {
-    throw new Error('Not implemented yet.');
+    throw new ProviderError(ProviderFailure.NotImplemented);
+  };
+
+  // eslint-disable-next-line unicorn/consistent-function-scoping
+  const rewardsHistory: WalletProvider['rewardsHistory'] = async () => {
+    throw new ProviderError(ProviderFailure.NotImplemented);
   };
 
   const queryTransactionsByAddresses: WalletProvider['queryTransactionsByAddresses'] = async (addresses) => {
@@ -341,6 +346,7 @@ export const cardanoGraphqlDbSyncProvider = (uri: string): WalletProvider => {
     networkInfo,
     queryTransactionsByAddresses,
     queryTransactionsByHashes,
+    rewardsHistory,
     stakePoolStats,
     submitTx,
     utxoDelegationAndRewards

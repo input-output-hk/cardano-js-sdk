@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, EpochRewards } from '@cardano-sdk/core';
 import { PXL, TSLA } from '@cardano-sdk/util-dev/src/assetId';
 
 export const stakeKeyHash = 'stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d';
@@ -118,6 +118,27 @@ export const protocolParameters = {
   stakeKeyDeposit: 2_000_000
 };
 
+export const currentEpoch = {
+  end: {
+    date: new Date(1_632_687_616)
+  },
+  number: 158,
+  start: {
+    date: new Date(1_632_255_616)
+  }
+};
+
+export const rewardsHistory: EpochRewards[] = [
+  {
+    epoch: currentEpoch.number - 3,
+    rewards: 10_000n
+  },
+  {
+    epoch: currentEpoch.number - 2,
+    rewards: 11_000n
+  }
+];
+
 /**
  * Provider stub for testing
  *
@@ -127,15 +148,7 @@ export const providerStub = () => ({
   currentWalletProtocolParameters: jest.fn().mockResolvedValue(protocolParameters),
   ledgerTip: jest.fn().mockResolvedValue(ledgerTip),
   networkInfo: async () => ({
-    currentEpoch: {
-      end: {
-        date: new Date(1_632_687_616)
-      },
-      number: 158,
-      start: {
-        date: new Date(1_632_255_616)
-      }
-    },
+    currentEpoch,
     lovelaceSupply: {
       circulating: 42_064_399_450_423_723n,
       max: 45_000_000_000_000_000n,
@@ -148,6 +161,7 @@ export const providerStub = () => ({
   }),
   queryTransactionsByAddresses: queryTransactions(),
   queryTransactionsByHashes: queryTransactions(),
+  rewardsHistory: jest.fn().mockResolvedValue(rewardsHistory),
   stakePoolMetadata: jest.fn(),
   stakePoolStats: async () => ({
     qty: {

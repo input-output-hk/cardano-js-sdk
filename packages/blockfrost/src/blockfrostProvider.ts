@@ -1,9 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import {
+  BigIntMath,
+  Cardano,
+  EpochRange,
+  EpochRewards,
+  ProviderError,
+  ProviderFailure,
+  WalletProvider
+} from '@cardano-sdk/core';
 import { BlockFrostAPI, Error as BlockfrostError, Responses } from '@blockfrost/blockfrost-js';
 import { BlockfrostToCore } from './BlockfrostToCore';
-import { Cardano, ProviderError, ProviderFailure, WalletProvider } from '@cardano-sdk/core';
 import { Options } from '@blockfrost/blockfrost-js/lib/types';
 import { dummyLogger } from 'ts-log';
+import { flatten, groupBy } from 'lodash-es';
 
 const formatBlockfrostError = (error: unknown) => {
   const blockfrostError = error as BlockfrostError;
@@ -318,12 +327,46 @@ export const blockfrostProvider = (options: Options, logger = dummyLogger): Wall
     return BlockfrostToCore.currentWalletProtocolParameters(response.data);
   };
 
+  const accountRewards = async (
+    stakeAddress: Cardano.Address,
+    { lowerBound = 0, upperBound = Number.MAX_SAFE_INTEGER }: EpochRange = {}
+  ): Promise<EpochRewards[]> => {
+    const result: EpochRewards[] = [];
+    const batchSize = 100;
+    let page = 1;
+    let haveMorePages = true;
+    while (haveMorePages) {
+      const rewards = await blockfrost.accountsRewards(stakeAddress, { count: batchSize, page });
+      result.push(
+        ...rewards
+          .filter(({ epoch }) => lowerBound <= epoch && epoch <= upperBound)
+          .map(({ epoch, amount }) => ({
+            epoch,
+            rewards: BigInt(amount)
+          }))
+      );
+      haveMorePages = rewards[rewards.length - 1].epoch < upperBound && rewards.length === 100;
+      page += 1;
+    }
+    return result;
+  };
+
+  const rewardsHistory: WalletProvider['rewardsHistory'] = async ({ stakeAddresses, epochs }) => {
+    const allAddressRewards = await Promise.all(stakeAddresses.map((address) => accountRewards(address, epochs)));
+    const accountRewardsByEpoch = groupBy(flatten(allAddressRewards), ({ epoch }) => epoch);
+    return Object.keys(accountRewardsByEpoch).map((key) => ({
+      epoch: accountRewardsByEpoch[key][0].epoch,
+      rewards: BigIntMath.sum(accountRewardsByEpoch[key].map(({ rewards }) => rewards))
+    }));
+  };
+
   const providerFunctions: WalletProvider = {
     currentWalletProtocolParameters,
     ledgerTip,
     networkInfo,
     queryTransactionsByAddresses,
     queryTransactionsByHashes,
+    rewardsHistory,
     stakePoolStats,
     submitTx,
     utxoDelegationAndRewards
