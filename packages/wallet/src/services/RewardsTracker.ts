@@ -1,12 +1,13 @@
-import { BigIntMath, Cardano, WalletProvider } from '@cardano-sdk/core';
+import { BigIntMath, Cardano, NetworkInfo, WalletProvider } from '@cardano-sdk/core';
 import { KeyManager } from '../KeyManagement';
 import { Observable, combineLatest, from, map } from 'rxjs';
-import { ProviderTrackerSubject, SourceTrackerConfig, TrackerSubject, strictEquals } from './util';
+import { ProviderTrackerSubject, SourceTrackerConfig, TrackerSubject, epoch$, strictEquals } from './util';
 import { SimpleProvider, SourceTransactionalTracker } from './types';
 
 export interface RewardsTrackerProps {
   rewardsProvider: SimpleProvider<Cardano.Lovelace>;
   transactionsInFlight$: Observable<Cardano.NewTxAlonzo[]>;
+  networkInfo$: Observable<NetworkInfo>;
   config: SourceTrackerConfig;
 }
 
@@ -30,9 +31,12 @@ const getWithdrawalQuantity = ({ body: { withdrawals } }: Cardano.NewTxAlonzo): 
   BigIntMath.sum(withdrawals?.map(({ quantity }) => quantity) || []);
 
 export const createRewardsTracker = (
-  { rewardsProvider, transactionsInFlight$, config }: RewardsTrackerProps,
+  { rewardsProvider, transactionsInFlight$, networkInfo$, config }: RewardsTrackerProps,
   {
-    rewardsSource$ = new ProviderTrackerSubject({ config, equals: strictEquals, provider: rewardsProvider })
+    rewardsSource$ = new ProviderTrackerSubject(
+      { config, equals: strictEquals, provider: rewardsProvider },
+      { trigger$: epoch$(networkInfo$) }
+    )
   }: RewardsTrackerInternals = {}
 ): SourceTransactionalTracker<Cardano.Lovelace> => {
   const available$ = new TrackerSubject<Cardano.Lovelace>(

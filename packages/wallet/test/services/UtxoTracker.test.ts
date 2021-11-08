@@ -1,9 +1,14 @@
 import { Cardano } from '@cardano-sdk/core';
-import { ProviderTrackerSubject, createUtxoProvider, createUtxoTracker } from '../../src/services';
+import { Observable } from 'rxjs';
+import { ProviderTrackerSubject, SourceTrackerConfig, createUtxoProvider, createUtxoTracker } from '../../src/services';
 import { createTestScheduler } from '../testScheduler';
 import { providerStub, utxo } from '../mocks';
 
 describe('createUtxoTracker', () => {
+  // both variables are not relevant for this test, overwriting rewardsSource$
+  let config: SourceTrackerConfig;
+  let tip$: Observable<Cardano.Tip>;
+
   it('fetches utxo from WalletProvider and locks when spent in a transaction in flight', () => {
     const address = utxo[0][0].address;
     const provider = providerStub();
@@ -20,7 +25,8 @@ describe('createUtxoTracker', () => {
       });
       const utxoTracker = createUtxoTracker(
         {
-          config: { maxInterval: 100, pollInterval: 100 }, // not relevant for this test, overwriting utxoSource$
+          config,
+          tip$,
           transactionsInFlight$,
           utxoProvider: createUtxoProvider(provider, [address])
         },

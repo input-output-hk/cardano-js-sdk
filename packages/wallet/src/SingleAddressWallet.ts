@@ -12,13 +12,15 @@ import {
   SourceTransactionalTracker,
   TransactionalTracker,
   Transactions,
+  block$,
   createAddressTransactionsProvider,
   createBalanceTracker,
   createRewardsProvider,
   createRewardsTracker,
   createTransactionsTracker,
   createUtxoProvider,
-  createUtxoTracker
+  createUtxoTracker,
+  epoch$
 } from './services';
 import { Cardano, NetworkInfo, ProtocolParametersRequiredByWallet, WalletProvider, coreToCsl } from '@cardano-sdk/core';
 import { InputSelector, defaultSelectionConstraints, roundRobinRandomImprove } from '@cardano-sdk/cip2';
@@ -110,19 +112,26 @@ export class SingleAddressWallet implements Wallet {
     this.#walletProvider = walletProvider;
     this.#keyManager = keyManager;
     this.#address = address;
-    this.#tip$ = this.tip$ = new ProviderTrackerSubject({ config, equals: isEqual, provider: tipProvider });
-    this.#networkInfo$ = this.networkInfo$ = new ProviderTrackerSubject({
-      config,
-      equals: isEqual,
-      provider: networkInfoProvider
-    });
-    this.#protocolParameters$ = this.protocolParameters$ = new ProviderTrackerSubject({
-      config,
-      equals: isEqual,
-      provider: protocolParametersProvider
-    });
-
     this.name = name;
+    this.#tip$ = this.tip$ = new ProviderTrackerSubject({ config, equals: isEqual, provider: tipProvider });
+    this.#networkInfo$ = this.networkInfo$ = new ProviderTrackerSubject(
+      {
+        config,
+        equals: isEqual,
+        provider: networkInfoProvider
+      },
+      { trigger$: block$(this.tip$) }
+    );
+    this.#protocolParameters$ = this.protocolParameters$ = new ProviderTrackerSubject(
+      {
+        config,
+        equals: isEqual,
+        provider: protocolParametersProvider
+      },
+      {
+        trigger$: epoch$(this.networkInfo$)
+      }
+    );
     this.transactions = createTransactionsTracker({
       config,
       newTransactions: this.#newTransactions,
@@ -131,11 +140,13 @@ export class SingleAddressWallet implements Wallet {
     });
     this.utxo = createUtxoTracker({
       config,
+      tip$: this.tip$,
       transactionsInFlight$: this.transactions.outgoing.inFlight$,
       utxoProvider
     });
     this.#rewards = createRewardsTracker({
       config,
+      networkInfo$: this.networkInfo$,
       rewardsProvider,
       transactionsInFlight$: this.transactions.outgoing.inFlight$
     });
