@@ -360,8 +360,25 @@ export const blockfrostProvider = (options: Options, logger = dummyLogger): Wall
     }));
   };
 
+  const genesisParameters: WalletProvider['genesisParameters'] = async () => {
+    const response = await blockfrost.genesis();
+    return {
+      activeSlotsCoefficient: response.active_slots_coefficient,
+      epochLength: response.epoch_length,
+      maxKesEvolutions: response.max_kes_evolutions,
+      maxLovelaceSupply: BigInt(response.max_lovelace_supply),
+      networkMagic: response.network_magic,
+      securityParameter: response.security_param,
+      slotLength: response.slot_length,
+      slotsPerKesPeriod: response.slots_per_kes_period,
+      systemStart: new Date(response.system_start * 1000),
+      updateQuorum: response.update_quorum
+    };
+  };
+
   const providerFunctions: WalletProvider = {
     currentWalletProtocolParameters,
+    genesisParameters,
     ledgerTip,
     networkInfo,
     queryTransactionsByAddresses,

@@ -344,6 +344,38 @@ describe('blockfrostProvider', () => {
     it.todo('with metadata');
   });
 
+  test('genesisParameters', async () => {
+    const mockedResponse = {
+      active_slots_coefficient: 0.05,
+      epoch_length: 432_000,
+      max_kes_evolutions: 62,
+      max_lovelace_supply: '45000000000000000',
+      network_magic: 764_824_073,
+      security_param: 2160,
+      slot_length: 1,
+      slots_per_kes_period: 129_600,
+      system_start: 1_506_203_091,
+      update_quorum: 5
+    };
+    BlockFrostAPI.prototype.genesis = jest.fn().mockResolvedValue(mockedResponse);
+
+    const client = blockfrostProvider({ isTestnet: true, projectId: apiKey });
+    const response = await client.genesisParameters();
+
+    expect(response).toMatchObject({
+      activeSlotsCoefficient: 0.05,
+      epochLength: 432_000,
+      maxKesEvolutions: 62,
+      maxLovelaceSupply: 45_000_000_000_000_000n,
+      networkMagic: 764_824_073,
+      securityParameter: 2160,
+      slotLength: 1,
+      slotsPerKesPeriod: 129_600,
+      systemStart: new Date(1_506_203_091_000),
+      updateQuorum: 5
+    } as Cardano.CompactGenesis);
+  });
+
   test('currentWalletProtocolParameters', async () => {
     const mockedResponse = {
       data: {

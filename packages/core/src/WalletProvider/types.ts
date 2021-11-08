@@ -92,6 +92,7 @@ export interface WalletProvider {
   queryTransactionsByAddresses: (addresses: Cardano.Address[]) => Promise<Cardano.TxAlonzo[]>;
   queryTransactionsByHashes: (hashes: Cardano.Hash16[]) => Promise<Cardano.TxAlonzo[]>;
   currentWalletProtocolParameters: () => Promise<ProtocolParametersRequiredByWallet>;
+  genesisParameters: () => Promise<Cardano.CompactGenesis>;
   /**
    * Query rewards history for provided stake addresses.
    *
