@@ -47,6 +47,7 @@ export interface Wallet extends ProviderSubscription {
   readonly utxo: SourceTransactionalTracker<Cardano.Utxo[]>;
   readonly transactions: Transactions;
   readonly tip$: BehaviorObservable<Cardano.Tip>;
+  readonly genesisParameters$: BehaviorObservable<Cardano.CompactGenesis>;
   readonly networkInfo$: BehaviorObservable<NetworkInfo>;
   readonly protocolParameters$: BehaviorObservable<ProtocolParametersRequiredByWallet>;
   get addresses(): Address[];

@@ -50,6 +50,7 @@ export interface SingleAddressWalletConfiguration {
   readonly networkInfoProvider?: SimpleProvider<NetworkInfo>;
   readonly rewardsProvider?: SimpleProvider<Cardano.Lovelace>;
   readonly protocolParametersProvider?: SimpleProvider<ProtocolParametersRequiredByWallet>;
+  readonly genesisParametersProvider?: SimpleProvider<Cardano.CompactGenesis>;
   readonly transactionsProvider?: SimpleProvider<DirectionalTransaction[]>;
   readonly sourceTrackerConfig?: SourceTrackerConfig;
 }
@@ -63,6 +64,7 @@ export class SingleAddressWallet implements Wallet {
   #tip$: ProviderTrackerSubject<Cardano.Tip>;
   #networkInfo$: ProviderTrackerSubject<NetworkInfo>;
   #protocolParameters$: ProviderTrackerSubject<ProtocolParametersRequiredByWallet>;
+  #genesisParameters$: ProviderTrackerSubject<Cardano.CompactGenesis>;
   #newTransactions = {
     failedToSubmit$: new Subject<FailedTx>(),
     pending$: new Subject<Cardano.NewTxAlonzo>(),
@@ -75,6 +77,7 @@ export class SingleAddressWallet implements Wallet {
   tip$: BehaviorObservable<Cardano.Tip>;
   networkInfo$: BehaviorObservable<NetworkInfo>;
   protocolParameters$: BehaviorObservable<ProtocolParametersRequiredByWallet>;
+  genesisParameters$: BehaviorObservable<Cardano.CompactGenesis>;
   name: string;
 
   constructor(
@@ -101,6 +104,7 @@ export class SingleAddressWallet implements Wallet {
       rewardsProvider = createRewardsProvider(walletProvider, keyManager),
       transactionsProvider = createAddressTransactionsProvider(walletProvider, [address.bech32]),
       protocolParametersProvider = () => from(walletProvider.currentWalletProtocolParameters()),
+      genesisParametersProvider = () => from(walletProvider.genesisParameters()),
       sourceTrackerConfig: config = {
         maxInterval,
         pollInterval: interval
@@ -127,6 +131,16 @@ export class SingleAddressWallet implements Wallet {
         config,
         equals: isEqual,
         provider: protocolParametersProvider
+      },
+      {
+        trigger$: epoch$(this.networkInfo$)
+      }
+    );
+    this.#genesisParameters$ = this.genesisParameters$ = new ProviderTrackerSubject(
+      {
+        config,
+        equals: isEqual,
+        provider: genesisParametersProvider
       },
       {
         trigger$: epoch$(this.networkInfo$)
@@ -220,12 +234,13 @@ export class SingleAddressWallet implements Wallet {
     }
   }
   sync() {
+    this.#rewards.sync();
     this.utxo.sync();
     this.transactions.sync();
     this.#tip$.sync();
     this.#networkInfo$.sync();
     this.#protocolParameters$.sync();
-    this.#rewards.sync();
+    this.#genesisParameters$.sync();
   }
   shutdown() {
     this.#rewards.shutdown();
@@ -234,5 +249,6 @@ export class SingleAddressWallet implements Wallet {
     this.#tip$.complete();
     this.#networkInfo$.complete();
     this.#protocolParameters$.complete();
+    this.#genesisParameters$.complete();
   }
 }

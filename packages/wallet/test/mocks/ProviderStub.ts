@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { Cardano, EpochRewards } from '@cardano-sdk/core';
+import { Cardano, EpochRewards, WalletProvider } from '@cardano-sdk/core';
 import { PXL, TSLA } from '@cardano-sdk/util-dev/src/assetId';
 
 export const stakeKeyHash = 'stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d';
@@ -139,13 +139,27 @@ export const rewardsHistory: EpochRewards[] = [
   }
 ];
 
+export const genesisParameters = {
+  activeSlotsCoefficient: 0.05,
+  epochLength: 432_000,
+  maxKesEvolutions: 62,
+  maxLovelaceSupply: 45_000_000_000_000_000n,
+  networkMagic: 764_824_073,
+  securityParameter: 2160,
+  slotLength: 1,
+  slotsPerKesPeriod: 129_600,
+  systemStart: new Date(1_506_203_091_000),
+  updateQuorum: 5
+};
+
 /**
  * Provider stub for testing
  *
  * returns WalletProvider-compatible object
  */
-export const providerStub = () => ({
+export const providerStub = (): WalletProvider => ({
   currentWalletProtocolParameters: jest.fn().mockResolvedValue(protocolParameters),
+  genesisParameters: jest.fn().mockResolvedValue(genesisParameters),
   ledgerTip: jest.fn().mockResolvedValue(ledgerTip),
   networkInfo: jest.fn().mockResolvedValue({
     currentEpoch,
@@ -162,7 +176,6 @@ export const providerStub = () => ({
   queryTransactionsByAddresses: queryTransactions(),
   queryTransactionsByHashes: queryTransactions(),
   rewardsHistory: jest.fn().mockResolvedValue(rewardsHistory),
-  stakePoolMetadata: jest.fn(),
   stakePoolStats: async () => ({
     qty: {
       active: 1000,
@@ -170,7 +183,6 @@ export const providerStub = () => ({
       retiring: 5
     }
   }),
-  stakePools: jest.fn(),
   submitTx: jest.fn().mockResolvedValue(void 0),
   utxoDelegationAndRewards: jest.fn().mockResolvedValue({ delegationAndRewards, utxo })
 });
