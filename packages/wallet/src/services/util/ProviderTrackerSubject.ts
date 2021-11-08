@@ -35,6 +35,7 @@ export class ProviderTrackerSubject<T> extends TrackerSubject<T> {
 
   constructor(
     { provider: provider$, config: { pollInterval, maxInterval }, equals }: SourceTrackerProps<T>,
+    // TODO: move trigger$ from internals to props
     { externalTrigger$ = new Subject(), trigger$ = interval(pollInterval) }: ProviderTrackerSubjectInternals = {}
   ) {
     super(

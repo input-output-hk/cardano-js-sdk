@@ -1,6 +1,7 @@
 import {
   Balance,
   BehaviorObservable,
+  Delegation,
   ProviderSubscription,
   SourceTransactionalTracker,
   TransactionalTracker,
@@ -44,6 +45,7 @@ export interface FinalizeTxProps {
 export interface Wallet extends ProviderSubscription {
   name: string;
   readonly balance: TransactionalTracker<Balance>;
+  readonly delegation: Delegation;
   readonly utxo: SourceTransactionalTracker<Cardano.Utxo[]>;
   readonly transactions: Transactions;
   readonly tip$: BehaviorObservable<Cardano.Tip>;

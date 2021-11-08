@@ -69,9 +69,28 @@ export const ledgerTip = {
   slot: 37_834_496
 };
 
+export const currentEpoch = {
+  end: {
+    date: new Date(1_632_687_616)
+  },
+  number: 158,
+  start: {
+    date: new Date(1_632_255_616)
+  }
+};
+
 export const queryTransactionsResult: Cardano.TxAlonzo[] = [
   {
+    blockHeader: {
+      slot: ledgerTip.slot - 100_000
+    },
     body: {
+      certificates: [
+        {
+          __typename: Cardano.CertificateType.StakeDelegation,
+          epoch: currentEpoch.number - 10
+        }
+      ],
       inputs: [
         {
           address:
@@ -101,7 +120,7 @@ export const queryTransactionsResult: Cardano.TxAlonzo[] = [
         invalidHereafter: ledgerTip.slot + 1
       }
     }
-  } as unknown as Cardano.TxAlonzo
+  } as Cardano.TxAlonzo
 ];
 const queryTransactions = () => jest.fn().mockResolvedValue(queryTransactionsResult);
 
@@ -116,16 +135,6 @@ export const protocolParameters = {
   poolDeposit: 500_000_000,
   protocolVersion: { major: 5, minor: 0 },
   stakeKeyDeposit: 2_000_000
-};
-
-export const currentEpoch = {
-  end: {
-    date: new Date(1_632_687_616)
-  },
-  number: 158,
-  start: {
-    date: new Date(1_632_255_616)
-  }
 };
 
 export const rewardsHistory: EpochRewards[] = [

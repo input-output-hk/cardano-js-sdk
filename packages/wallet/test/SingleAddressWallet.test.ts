@@ -63,6 +63,10 @@ describe('SingleAddressWallet', () => {
       await firstValueFrom(wallet.genesisParameters$);
       expect(wallet.genesisParameters$.value).toEqual(mocks.genesisParameters);
     });
+    it('"delegation"', async () => {
+      await firstValueFrom(wallet.delegation.rewardsHistory$);
+      expect(wallet.delegation.rewardsHistory$.value?.all).toEqual(mocks.rewardsHistory);
+    });
     it('"addresses"', () => {
       expect(wallet.addresses.map(({ bech32 }) => bech32)).toEqual([address]);
     });

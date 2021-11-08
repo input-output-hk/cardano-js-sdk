@@ -1,5 +1,5 @@
 import { Address, InitializeTxProps, Wallet } from './types';
-import { AddressType } from '.';
+import { AddressType, Delegation, RewardsHistory, TransactionFailure, createRewardsHistoryProvider } from '.';
 import {
   Balance,
   BehaviorObservable,
@@ -15,6 +15,7 @@ import {
   block$,
   createAddressTransactionsProvider,
   createBalanceTracker,
+  createDelegationTracker,
   createRewardsProvider,
   createRewardsTracker,
   createTransactionsTracker,
@@ -27,7 +28,6 @@ import { InputSelector, defaultSelectionConstraints, roundRobinRandomImprove } f
 import { KeyManager } from './KeyManagement';
 import { Logger, dummyLogger } from 'ts-log';
 import { Subject, combineLatest, from, lastValueFrom, mergeMap, take } from 'rxjs';
-import { TransactionFailure } from './services/TransactionError';
 import { TxInternals, computeImplicitCoin, createTransactionInternals, ensureValidityInterval } from './Transaction';
 import { isEqual } from 'lodash-es';
 
@@ -51,6 +51,7 @@ export interface SingleAddressWalletConfiguration {
   readonly rewardsProvider?: SimpleProvider<Cardano.Lovelace>;
   readonly protocolParametersProvider?: SimpleProvider<ProtocolParametersRequiredByWallet>;
   readonly genesisParametersProvider?: SimpleProvider<Cardano.CompactGenesis>;
+  readonly rewardsHistoryProvider?: SimpleProvider<RewardsHistory>;
   readonly transactionsProvider?: SimpleProvider<DirectionalTransaction[]>;
   readonly sourceTrackerConfig?: SourceTrackerConfig;
 }
@@ -74,6 +75,7 @@ export class SingleAddressWallet implements Wallet {
   utxo: SourceTransactionalTracker<Cardano.Utxo[]>;
   balance: TransactionalTracker<Balance>;
   transactions: Transactions;
+  delegation: Delegation;
   tip$: BehaviorObservable<Cardano.Tip>;
   networkInfo$: BehaviorObservable<NetworkInfo>;
   protocolParameters$: BehaviorObservable<ProtocolParametersRequiredByWallet>;
@@ -105,6 +107,7 @@ export class SingleAddressWallet implements Wallet {
       transactionsProvider = createAddressTransactionsProvider(walletProvider, [address.bech32]),
       protocolParametersProvider = () => from(walletProvider.currentWalletProtocolParameters()),
       genesisParametersProvider = () => from(walletProvider.genesisParameters()),
+      rewardsHistoryProvider,
       sourceTrackerConfig: config = {
         maxInterval,
         pollInterval: interval
@@ -165,6 +168,13 @@ export class SingleAddressWallet implements Wallet {
       transactionsInFlight$: this.transactions.outgoing.inFlight$
     });
     this.balance = createBalanceTracker(this.utxo, this.#rewards);
+    this.delegation = createDelegationTracker({
+      config,
+      networkInfo$: this.networkInfo$,
+      rewardsHistoryProvider:
+        rewardsHistoryProvider || createRewardsHistoryProvider(walletProvider, keyManager, this.transactions),
+      transactionsTracker: this.transactions
+    });
   }
   get addresses(): Address[] {
     return [this.#address];
