@@ -1,8 +1,8 @@
-import { Address, InitializeTxProps, Wallet } from './types';
-import { AddressType, Delegation, RewardsHistory, TransactionFailure, createRewardsHistoryProvider } from '.';
+import { Address, AddressType, InitializeTxProps, Wallet } from './types';
 import {
   Balance,
   BehaviorObservable,
+  Delegation,
   DirectionalTransaction,
   FailedTx,
   PollingConfig,
@@ -10,9 +10,9 @@ import {
   SimpleProvider,
   SourceTrackerConfig,
   SourceTransactionalTracker,
+  TransactionFailure,
   TransactionalTracker,
   Transactions,
-  block$,
   createAddressTransactionsProvider,
   createBalanceTracker,
   createDelegationTracker,
@@ -21,12 +21,21 @@ import {
   createTransactionsTracker,
   createUtxoProvider,
   createUtxoTracker,
-  epoch$
+  sharedDistinctBlock,
+  sharedDistinctEpoch
 } from './services';
-import { Cardano, NetworkInfo, ProtocolParametersRequiredByWallet, WalletProvider, coreToCsl } from '@cardano-sdk/core';
+import {
+  Cardano,
+  NetworkInfo,
+  ProtocolParametersRequiredByWallet,
+  StakePoolSearchProvider,
+  WalletProvider,
+  coreToCsl
+} from '@cardano-sdk/core';
 import { InputSelector, defaultSelectionConstraints, roundRobinRandomImprove } from '@cardano-sdk/cip2';
 import { KeyManager } from './KeyManagement';
 import { Logger, dummyLogger } from 'ts-log';
+import { RetryBackoffConfig } from 'backoff-rxjs';
 import { Subject, combineLatest, from, lastValueFrom, mergeMap, take } from 'rxjs';
 import { TxInternals, computeImplicitCoin, createTransactionInternals, ensureValidityInterval } from './Transaction';
 import { isEqual } from 'lodash-es';
@@ -39,6 +48,7 @@ export interface SingleAddressWalletProps {
 export interface SingleAddressWalletDependencies {
   readonly keyManager: KeyManager;
   readonly walletProvider: WalletProvider;
+  readonly stakePoolSearchProvider: StakePoolSearchProvider;
   readonly inputSelector?: InputSelector;
   readonly logger?: Logger;
 }
@@ -51,9 +61,10 @@ export interface SingleAddressWalletConfiguration {
   readonly rewardsProvider?: SimpleProvider<Cardano.Lovelace>;
   readonly protocolParametersProvider?: SimpleProvider<ProtocolParametersRequiredByWallet>;
   readonly genesisParametersProvider?: SimpleProvider<Cardano.CompactGenesis>;
-  readonly rewardsHistoryProvider?: SimpleProvider<RewardsHistory>;
   readonly transactionsProvider?: SimpleProvider<DirectionalTransaction[]>;
   readonly sourceTrackerConfig?: SourceTrackerConfig;
+  // TODO: use this in place of sourceTrackerConfig for ProviderTrackerSubject
+  readonly retryBackoffConfig?: RetryBackoffConfig;
 }
 
 export class SingleAddressWallet implements Wallet {
@@ -89,6 +100,7 @@ export class SingleAddressWallet implements Wallet {
     }: SingleAddressWalletProps,
     {
       walletProvider,
+      stakePoolSearchProvider,
       keyManager,
       logger = dummyLogger,
       inputSelector = roundRobinRandomImprove()
@@ -107,10 +119,13 @@ export class SingleAddressWallet implements Wallet {
       transactionsProvider = createAddressTransactionsProvider(walletProvider, [address.bech32]),
       protocolParametersProvider = () => from(walletProvider.currentWalletProtocolParameters()),
       genesisParametersProvider = () => from(walletProvider.genesisParameters()),
-      rewardsHistoryProvider,
       sourceTrackerConfig: config = {
         maxInterval,
         pollInterval: interval
+      },
+      retryBackoffConfig = {
+        initialInterval: Math.min(interval, 1000),
+        maxInterval
       }
     }: SingleAddressWalletConfiguration = {}
   ) {
@@ -121,14 +136,16 @@ export class SingleAddressWallet implements Wallet {
     this.#address = address;
     this.name = name;
     this.#tip$ = this.tip$ = new ProviderTrackerSubject({ config, equals: isEqual, provider: tipProvider });
+    const block$ = sharedDistinctBlock(this.tip$);
     this.#networkInfo$ = this.networkInfo$ = new ProviderTrackerSubject(
       {
         config,
         equals: isEqual,
         provider: networkInfoProvider
       },
-      { trigger$: block$(this.tip$) }
+      { trigger$: block$ }
     );
+    const epoch$ = sharedDistinctEpoch(this.networkInfo$);
     this.#protocolParameters$ = this.protocolParameters$ = new ProviderTrackerSubject(
       {
         config,
@@ -136,7 +153,7 @@ export class SingleAddressWallet implements Wallet {
         provider: protocolParametersProvider
       },
       {
-        trigger$: epoch$(this.networkInfo$)
+        trigger$: epoch$
       }
     );
     this.#genesisParameters$ = this.genesisParameters$ = new ProviderTrackerSubject(
@@ -146,7 +163,7 @@ export class SingleAddressWallet implements Wallet {
         provider: genesisParametersProvider
       },
       {
-        trigger$: epoch$(this.networkInfo$)
+        trigger$: epoch$
       }
     );
     this.transactions = createTransactionsTracker({
@@ -169,11 +186,12 @@ export class SingleAddressWallet implements Wallet {
     });
     this.balance = createBalanceTracker(this.utxo, this.#rewards);
     this.delegation = createDelegationTracker({
-      config,
-      networkInfo$: this.networkInfo$,
-      rewardsHistoryProvider:
-        rewardsHistoryProvider || createRewardsHistoryProvider(walletProvider, keyManager, this.transactions),
-      transactionsTracker: this.transactions
+      epoch$,
+      keyManager,
+      retryBackoffConfig,
+      stakePoolSearchProvider,
+      transactionsTracker: this.transactions,
+      walletProvider
     });
   }
   get addresses(): Address[] {

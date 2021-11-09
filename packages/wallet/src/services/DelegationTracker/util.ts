@@ -1,19 +1,15 @@
 import { Cardano } from '@cardano-sdk/core';
-import { Transactions } from '../types';
-import { filter, map } from 'rxjs';
+import { isNil } from 'lodash-es';
 
-export const certificateTransactions = (
-  transactionsTracker: Transactions,
+// TODO: hoist to core. Duplicated in cardano-graphql package.
+export const isNotNil = <T>(item: T | null | undefined): item is T => !isNil(item);
+
+export interface TxWithEpoch {
+  tx: Cardano.TxAlonzo;
+  epoch: Cardano.Epoch;
+}
+
+export const transactionHasAnyCertificate = (
+  { body: { certificates } }: Cardano.TxAlonzo,
   certificateTypes: Cardano.CertificateType[]
-) =>
-  transactionsTracker.history.outgoing$.pipe(
-    map((transactions) =>
-      transactions.filter(
-        ({ body: { certificates } }) =>
-          certificates?.some(({ __typename }) => certificateTypes.includes(__typename)) || false
-      )
-    ),
-    filter((transactions) => transactions.length > 0)
-    // TODO
-    // distinctUntilChanged(transactionsEquals)
-  );
+) => certificates?.some(({ __typename }) => certificateTypes.includes(__typename)) || false;

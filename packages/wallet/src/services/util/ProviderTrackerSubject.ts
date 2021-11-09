@@ -20,7 +20,7 @@ export interface SourceTrackerConfig {
 }
 
 export interface SourceTrackerProps<T> {
-  provider: () => Observable<T>;
+  provider: () => Observable<T>; // TODO: think about reworking this to be just an observable.
   config: SourceTrackerConfig;
   equals: (t1: T, t2: T) => boolean;
 }

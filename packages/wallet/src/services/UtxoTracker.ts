@@ -1,6 +1,6 @@
 import { Cardano, WalletProvider } from '@cardano-sdk/core';
 import { Observable, combineLatest, from, map } from 'rxjs';
-import { ProviderTrackerSubject, SourceTrackerConfig, TrackerSubject, block$, utxoEquals } from './util';
+import { ProviderTrackerSubject, SourceTrackerConfig, TrackerSubject, sharedDistinctBlock, utxoEquals } from './util';
 import { SimpleProvider, SourceTransactionalTracker } from './types';
 
 export interface UtxoTrackerProps {
@@ -24,7 +24,7 @@ export const createUtxoTracker = (
   {
     utxoSource$ = new ProviderTrackerSubject(
       { config, equals: utxoEquals, provider: utxoProvider },
-      { trigger$: block$(tip$) }
+      { trigger$: sharedDistinctBlock(tip$) }
     )
   }: UtxoTrackerInternals = {}
 ): SourceTransactionalTracker<Cardano.Utxo[]> => {

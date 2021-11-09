@@ -1,7 +1,7 @@
 import { BigIntMath, Cardano, NetworkInfo, WalletProvider } from '@cardano-sdk/core';
 import { KeyManager } from '../KeyManagement';
 import { Observable, combineLatest, from, map } from 'rxjs';
-import { ProviderTrackerSubject, SourceTrackerConfig, TrackerSubject, epoch$, strictEquals } from './util';
+import { ProviderTrackerSubject, SourceTrackerConfig, TrackerSubject, sharedDistinctEpoch, strictEquals } from './util';
 import { SimpleProvider, SourceTransactionalTracker } from './types';
 
 export interface RewardsTrackerProps {
@@ -35,7 +35,7 @@ export const createRewardsTracker = (
   {
     rewardsSource$ = new ProviderTrackerSubject(
       { config, equals: strictEquals, provider: rewardsProvider },
-      { trigger$: epoch$(networkInfo$) }
+      { trigger$: sharedDistinctEpoch(networkInfo$) }
     )
   }: RewardsTrackerInternals = {}
 ): SourceTransactionalTracker<Cardano.Lovelace> => {

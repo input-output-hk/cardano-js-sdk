@@ -1,3 +1,4 @@
+// TODO: rename to MockWalletProvider since it's using jest.fn() mocks
 /* eslint-disable max-len */
 import { Cardano, EpochRewards, WalletProvider } from '@cardano-sdk/core';
 import { PXL, TSLA } from '@cardano-sdk/util-dev/src/assetId';
@@ -182,6 +183,7 @@ export const providerStub = (): WalletProvider => ({
       live: 15_001_884_895_856_815n
     }
   }),
+  queryBlocksByHashes: jest.fn().mockResolvedValue([]),
   queryTransactionsByAddresses: queryTransactions(),
   queryTransactionsByHashes: queryTransactions(),
   rewardsHistory: jest.fn().mockResolvedValue(rewardsHistory),

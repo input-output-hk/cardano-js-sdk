@@ -3,6 +3,7 @@ import * as mocks from './mocks';
 import { Cardano } from '@cardano-sdk/core';
 import { KeyManagement, SingleAddressWallet } from '../src';
 import { coalesceValueQuantities } from '@cardano-sdk/core/src/Cardano/util';
+import { createStubStakePoolSearchProvider } from '@cardano-sdk/util-dev';
 import { firstValueFrom, skip } from 'rxjs';
 
 describe('SingleAddressWallet', () => {
@@ -19,8 +20,9 @@ describe('SingleAddressWallet', () => {
       password: '123'
     });
     walletProvider = mocks.providerStub();
+    const stakePoolSearchProvider = createStubStakePoolSearchProvider();
     keyManager.deriveAddress = jest.fn().mockReturnValue(address);
-    wallet = new SingleAddressWallet({ name }, { keyManager, walletProvider });
+    wallet = new SingleAddressWallet({ name }, { keyManager, stakePoolSearchProvider, walletProvider });
   });
 
   afterEach(() => wallet.shutdown());
@@ -66,6 +68,8 @@ describe('SingleAddressWallet', () => {
     it('"delegation"', async () => {
       await firstValueFrom(wallet.delegation.rewardsHistory$);
       expect(wallet.delegation.rewardsHistory$.value?.all).toEqual(mocks.rewardsHistory);
+      await firstValueFrom(wallet.delegation.delegatee$);
+      expect(wallet.delegation.delegatee$.value?.nextNextEpoch).toBeNull();
     });
     it('"addresses"', () => {
       expect(wallet.addresses.map(({ bech32 }) => bech32)).toEqual([address]);

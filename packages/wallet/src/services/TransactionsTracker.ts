@@ -19,11 +19,15 @@ import {
   takeUntil,
   tap
 } from 'rxjs';
-import { Hash16 } from '@cardano-ogmios/schema';
-import { ProviderTrackerSubject, SourceTrackerConfig, block$, directionalTransactionsEquals } from './util';
+import {
+  ProviderTrackerSubject,
+  SourceTrackerConfig,
+  directionalTransactionsEquals,
+  sharedDistinctBlock
+} from './util';
 import { TrackerSubject } from './util/TrackerSubject';
 import { TransactionFailure } from './TransactionError';
-import { flatten } from 'lodash-es';
+import { flatten, sortBy } from 'lodash-es';
 
 export interface TransactionsTrackerProps {
   tip$: Observable<Cardano.Tip>;
@@ -47,7 +51,11 @@ export const createAddressTransactionsProvider =
     return from(
       walletProvider.queryTransactionsByAddresses(addresses).then((transactions) =>
         flatten(
-          transactions.map((tx) => {
+          sortBy(
+            transactions,
+            ({ blockHeader: { blockHeight } }) => blockHeight,
+            ({ index }) => index
+          ).map((tx) => {
             const {
               body: { inputs, outputs }
             } = tx;
@@ -65,7 +73,7 @@ const newTransactions$ = (transactions$: Observable<Cardano.TxAlonzo[]>) =>
     take(1),
     map((transactions) => transactions.map(({ id }) => id)),
     mergeMap((initialTransactionIds) => {
-      const ignoredTransactionIds: Hash16[] = [...initialTransactionIds];
+      const ignoredTransactionIds: Cardano.Hash16[] = [...initialTransactionIds];
       return transactions$.pipe(
         map((transactions) => transactions.filter(({ id }) => !ignoredTransactionIds.includes(id))),
         tap((newTransactions) => ignoredTransactionIds.push(...newTransactions.map(({ id }) => id))),
@@ -89,7 +97,7 @@ export const createTransactionsTracker = (
         provider: transactionsProvider
       },
       {
-        trigger$: block$(tip$)
+        trigger$: sharedDistinctBlock(tip$)
       }
     )
   }: TransactionsTrackerInternals = {}

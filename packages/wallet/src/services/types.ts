@@ -67,15 +67,15 @@ export interface RewardsHistory {
 }
 
 export interface Delegatee {
-  currentEpoch: Cardano.StakePool;
-  nextEpoch: Cardano.StakePool;
-  nextNextEpoch: Cardano.StakePool;
+  currentEpoch: Cardano.StakePool | null;
+  nextEpoch: Cardano.StakePool | null;
+  nextNextEpoch: Cardano.StakePool | null;
 }
 
-export interface Delegation extends ProviderSubscription {
+export interface Delegation {
   rewardsHistory$: BehaviorObservable<RewardsHistory>;
   delegatee$: BehaviorObservable<Delegatee>;
+  shutdown(): void;
 }
 
 export type SimpleProvider<T> = () => Observable<T>;
-export type ProviderWithArg<T, A> = (arg: A) => Observable<T>;

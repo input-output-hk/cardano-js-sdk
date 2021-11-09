@@ -1,5 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { arrayEquals, directionalTransactionsEquals, strictEquals, utxoEquals } from '../../../src';
+import { Cardano } from '@cardano-sdk/core';
+import { TxAlonzo } from '@cardano-sdk/core/src/Cardano';
+import {
+  arrayEquals,
+  directionalTransactionsEquals,
+  strictEquals,
+  transactionsEquals,
+  txEquals,
+  utxoEquals
+} from '../../../src';
 
 describe('equals', () => {
   test('strictEquals', () => {
@@ -11,6 +20,17 @@ describe('equals', () => {
     expect(arrayEquals([], [], strictEquals)).toBe(true);
     expect(arrayEquals(['a'], ['a', 'b'], strictEquals)).toBe(false);
     expect(arrayEquals(['a', 'b'], ['a', 'b'], strictEquals)).toBe(true);
+  });
+
+  test('txEquals', () => {
+    expect(txEquals({ id: 'tx1' } as Cardano.TxAlonzo, { id: 'tx2' } as Cardano.TxAlonzo)).toBe(false);
+    expect(txEquals({ id: 'tx1' } as Cardano.TxAlonzo, { id: 'tx1' } as Cardano.TxAlonzo)).toBe(true);
+  });
+
+  test('transactionsEquals', () => {
+    expect(transactionsEquals([], [])).toBe(true);
+    expect(transactionsEquals([{ id: 'id1' } as TxAlonzo], [{ id: 'id2' } as TxAlonzo])).toBe(false);
+    expect(transactionsEquals([{ id: 'id1' } as TxAlonzo], [{ id: 'id1' } as TxAlonzo])).toBe(true);
   });
 
   test('directionalTransactionsEquals ', () => {

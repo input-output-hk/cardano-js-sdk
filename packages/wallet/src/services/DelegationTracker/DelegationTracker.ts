@@ -1,69 +1,80 @@
-import { Cardano, NetworkInfo, StakePoolSearchProvider } from '@cardano-sdk/core';
-import { Delegation, RewardsHistory } from '../types';
-import { EMPTY, Observable, from, merge } from 'rxjs';
-import { ProviderTrackerSubject, SourceTrackerConfig, epoch$ } from '../util';
-import { SimpleProvider } from '../..';
-import { Transactions } from '..';
-import { certificateTransactions } from './util';
-import { isEqual } from 'lodash-es';
+import { Cardano, StakePoolSearchProvider, WalletProvider } from '@cardano-sdk/core';
+import { CertificateType, Epoch } from '@cardano-sdk/core/src/Cardano';
+import { Delegation, Transactions } from '../types';
+import { KeyManager } from '../../KeyManagement';
+import { Observable, distinctUntilChanged, filter, map, share, switchMap } from 'rxjs';
+import { ObservableStakePoolSearchProvider, createDelegateeTracker, createQueryStakePoolsProvider } from './Delegatee';
+import { RetryBackoffConfig } from 'backoff-rxjs';
+import { RewardsHistoryProvider, createRewardsHistoryTracker } from './RewardsHistory';
+import { TrackerSubject, coldObservableProvider, transactionsEquals } from '../util';
+import { TxWithEpoch, transactionHasAnyCertificate } from './util';
+import { createRewardsHistoryProvider } from '.';
 
-export type ObservableStakePoolSearchProvider = (fragments: string[]) => Observable<Cardano.StakePool[]>;
+export const createBlockEpochProvider =
+  (walletProvider: WalletProvider, retryBackoffConfig: RetryBackoffConfig) => (blockHashes: Cardano.Hash16[]) =>
+    coldObservableProvider(() => walletProvider.queryBlocksByHashes(blockHashes), retryBackoffConfig).pipe(
+      map((blocks) => blocks.map(({ epoch }) => epoch))
+    );
+
+export type BlockEpochProvider = ReturnType<typeof createBlockEpochProvider>;
 
 export interface DelegationTrackerProps {
-  // TODO
-  // stakePoolSearchProvider: ObservableStakePoolSearchProvider;
-  rewardsHistoryProvider: SimpleProvider<RewardsHistory>;
+  walletProvider: WalletProvider;
+  keyManager: KeyManager;
+  stakePoolSearchProvider: StakePoolSearchProvider;
+  epoch$: Observable<Epoch>;
   transactionsTracker: Transactions;
-  config: SourceTrackerConfig;
-  networkInfo$: Observable<NetworkInfo>;
+  retryBackoffConfig: RetryBackoffConfig;
+  internals?: {
+    queryStakePoolsProvider?: ObservableStakePoolSearchProvider;
+    rewardsHistoryProvider?: RewardsHistoryProvider;
+    blockEpochProvider?: BlockEpochProvider;
+  };
 }
 
-export const createStakePoolSearchProvider =
-  (stakePoolSearchProvider: StakePoolSearchProvider): ObservableStakePoolSearchProvider =>
-  (fragments) =>
-    from(stakePoolSearchProvider.queryStakePools(fragments));
+export const certificateTransactionsWithEpochs = (
+  transactionsTracker: Transactions,
+  blockEpochProvider: BlockEpochProvider,
+  certificateTypes: Cardano.CertificateType[]
+): Observable<TxWithEpoch[]> =>
+  transactionsTracker.history.outgoing$.pipe(
+    map((transactions) => transactions.filter((tx) => transactionHasAnyCertificate(tx, certificateTypes))),
+    distinctUntilChanged(transactionsEquals),
+    filter((transactions) => transactions.length > 0),
+    switchMap((transactions) =>
+      blockEpochProvider(transactions.map((tx) => tx.blockHeader.blockHash)).pipe(
+        map((epochs) => transactions.map((tx, txIndex) => ({ epoch: epochs[txIndex], tx })))
+      )
+    ),
+    share()
+  );
 
 export const createDelegationTracker = ({
-  config,
-  rewardsHistoryProvider,
+  keyManager,
+  epoch$,
+  walletProvider,
+  retryBackoffConfig,
   transactionsTracker,
-  networkInfo$
+  stakePoolSearchProvider,
+  internals: {
+    queryStakePoolsProvider = createQueryStakePoolsProvider(stakePoolSearchProvider, retryBackoffConfig),
+    rewardsHistoryProvider = createRewardsHistoryProvider(walletProvider, keyManager, retryBackoffConfig),
+    blockEpochProvider = createBlockEpochProvider(walletProvider, retryBackoffConfig)
+  } = {}
 }: DelegationTrackerProps): Delegation => {
-  const rewardsHistory$ = new ProviderTrackerSubject(
-    {
-      config,
-      // TODO: add new util to compare only .all
-      equals: isEqual,
-      provider: rewardsHistoryProvider
-    },
-    {
-      trigger$: epoch$(networkInfo$)
-    }
-  );
-  const delegatee$ = new ProviderTrackerSubject(
-    {
-      config,
-      equals: isEqual,
-      // TODO: add new util to compare only ID, metadata hash and ext metadata hash
-      provider: () => EMPTY
-    },
-    {
-      trigger$: merge(
-        epoch$(networkInfo$),
-        certificateTransactions(transactionsTracker, [Cardano.CertificateType.StakeDelegation])
-      )
-    }
-  );
+  const transactions$ = certificateTransactionsWithEpochs(transactionsTracker, blockEpochProvider, [
+    CertificateType.StakeDelegation,
+    CertificateType.StakeRegistration,
+    CertificateType.StakeDeregistration
+  ]);
+  const rewardsHistory$ = new TrackerSubject(createRewardsHistoryTracker(transactions$, rewardsHistoryProvider));
+  const delegatee$ = new TrackerSubject(createDelegateeTracker(queryStakePoolsProvider, epoch$, transactions$));
   return {
     delegatee$,
     rewardsHistory$,
     shutdown: () => {
       rewardsHistory$.complete();
       delegatee$.complete();
-    },
-    sync: () => {
-      rewardsHistory$.sync();
-      delegatee$.sync();
     }
   };
 };
