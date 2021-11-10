@@ -91,6 +91,10 @@ export interface WalletProvider {
    */
   queryTransactionsByAddresses: (addresses: Cardano.Address[]) => Promise<Cardano.TxAlonzo[]>;
   queryTransactionsByHashes: (hashes: Cardano.Hash16[]) => Promise<Cardano.TxAlonzo[]>;
+  /**
+   * @returns an array of blocks, same length and in the same order as `hashes` argument.
+   */
+  queryBlocksByHashes: (hashes: Cardano.Hash16[]) => Promise<Cardano.Block[]>;
   currentWalletProtocolParameters: () => Promise<ProtocolParametersRequiredByWallet>;
   genesisParameters: () => Promise<Cardano.CompactGenesis>;
   /**

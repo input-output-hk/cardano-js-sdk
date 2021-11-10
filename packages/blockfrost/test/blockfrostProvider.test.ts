@@ -9,6 +9,24 @@ jest.mock('@blockfrost/blockfrost-js');
 const generatePoolsResponseMock = (qty: number) =>
   [...Array.from({ length: qty }).keys()].map((num) => String(Math.random() * num)) as Responses['pool_list'];
 
+const blockResponse = {
+  block_vrf: 'vrf_vk19j362pkr4t9y0m3qxgmrv0365vd7c4ze03ny4jh84q8agjy4ep4s99zvg8',
+  confirmations: 0,
+  epoch: 157,
+  epoch_slot: 312_794,
+  fees: '513839',
+  hash: '86e837d8a6cdfddaf364525ce9857eb93430b7e59a5fd776f0a9e11df476a7e5',
+  height: 2_927_618,
+  next_block: null,
+  output: '9249073880',
+  previous_block: 'da56fa53483a3a087c893b41aa0d73a303148c2887b3f7535e0b505ea5dc10aa',
+  size: 1050,
+  slot: 37_767_194,
+  slot_leader: 'pool1zuevzm3xlrhmwjw87ec38mzs02tlkwec9wxpgafcaykmwg7efhh',
+  time: 1_632_136_410,
+  tx_count: 3
+} as Responses['block_content'];
+
 describe('blockfrostProvider', () => {
   const apiKey = 'someapikey';
 
@@ -412,25 +430,7 @@ describe('blockfrostProvider', () => {
   });
 
   test('ledgerTip', async () => {
-    const mockedResponse = {
-      block_vrf: 'vrf_vk19j362pkr4t9y0m3qxgmrv0365vd7c4ze03ny4jh84q8agjy4ep4s99zvg8',
-      confirmations: 0,
-      epoch: 157,
-      epoch_slot: 312_794,
-      fees: '513839',
-      hash: '86e837d8a6cdfddaf364525ce9857eb93430b7e59a5fd776f0a9e11df476a7e5',
-      height: 2_927_618,
-      next_block: null,
-      output: '9249073880',
-      previous_block: 'da56fa53483a3a087c893b41aa0d73a303148c2887b3f7535e0b505ea5dc10aa',
-      size: 1050,
-      slot: 37_767_194,
-      slot_leader: 'pool1zuevzm3xlrhmwjw87ec38mzs02tlkwec9wxpgafcaykmwg7efhh',
-      time: 1_632_136_410,
-      tx_count: 3
-    } as Responses['block_content'];
-
-    BlockFrostAPI.prototype.blocksLatest = jest.fn().mockResolvedValue(mockedResponse);
+    BlockFrostAPI.prototype.blocksLatest = jest.fn().mockResolvedValue(blockResponse);
 
     const client = blockfrostProvider({ isTestnet: true, projectId: apiKey });
     const response = await client.ledgerTip();
@@ -440,6 +440,35 @@ describe('blockfrostProvider', () => {
       hash: '86e837d8a6cdfddaf364525ce9857eb93430b7e59a5fd776f0a9e11df476a7e5',
       slot: 37_767_194
     });
+  });
+
+  test('queryBlocksByHashes', async () => {
+    BlockFrostAPI.prototype.blocks = jest.fn().mockResolvedValue(blockResponse);
+
+    const client = blockfrostProvider({ isTestnet: true, projectId: apiKey });
+    const response = await client.queryBlocksByHashes(['somehash']);
+
+    expect(response).toMatchObject([
+      {
+        confirmations: 0,
+        date: new Date(1_632_136_410_000),
+        epoch: 157,
+        epochSlot: 312_794,
+        fees: 513_839n,
+        header: {
+          blockHash: '86e837d8a6cdfddaf364525ce9857eb93430b7e59a5fd776f0a9e11df476a7e5',
+          blockHeight: 2_927_618,
+          slot: 37_767_194
+        },
+        nextBlock: undefined,
+        previousBlock: 'da56fa53483a3a087c893b41aa0d73a303148c2887b3f7535e0b505ea5dc10aa',
+        size: 1050,
+        slotLeader: 'pool1zuevzm3xlrhmwjw87ec38mzs02tlkwec9wxpgafcaykmwg7efhh',
+        totalOutput: 9_249_073_880n,
+        txCount: 3,
+        vrf: 'vrf_vk19j362pkr4t9y0m3qxgmrv0365vd7c4ze03ny4jh84q8agjy4ep4s99zvg8'
+      } as Cardano.Block
+    ]);
   });
 
   describe('rewardsHistory', () => {

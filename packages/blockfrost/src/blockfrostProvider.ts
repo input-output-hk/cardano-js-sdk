@@ -376,11 +376,40 @@ export const blockfrostProvider = (options: Options, logger = dummyLogger): Wall
     };
   };
 
+  const queryBlocksByHashes: WalletProvider['queryBlocksByHashes'] = async (hashes) => {
+    const responses = await Promise.all(hashes.map((hash) => blockfrost.blocks(hash)));
+    return responses.map((response) => {
+      if (!response.epoch || !response.epoch_slot || !response.height || !response.slot || !response.block_vrf) {
+        throw new ProviderError(ProviderFailure.Unknown, null, 'Queried unsupported block');
+      }
+      return {
+        confirmations: response.confirmations,
+        date: new Date(response.time * 1000),
+        epoch: response.epoch,
+        epochSlot: response.epoch_slot,
+        fees: BigInt(response.fees || '0'),
+        header: {
+          blockHash: response.hash,
+          blockHeight: response.height,
+          slot: response.slot
+        },
+        nextBlock: response.next_block || undefined,
+        previousBlock: response.previous_block || undefined,
+        size: response.size,
+        slotLeader: response.slot_leader,
+        totalOutput: BigInt(response.output || '0'),
+        txCount: response.tx_count,
+        vrf: response.block_vrf
+      };
+    });
+  };
+
   const providerFunctions: WalletProvider = {
     currentWalletProtocolParameters,
     genesisParameters,
     ledgerTip,
     networkInfo,
+    queryBlocksByHashes,
     queryTransactionsByAddresses,
     queryTransactionsByHashes,
     rewardsHistory,

@@ -247,6 +247,11 @@ export const cardanoGraphqlDbSyncProvider = (uri: string): WalletProvider => {
     throw new ProviderError(ProviderFailure.NotImplemented);
   };
 
+  // eslint-disable-next-line unicorn/consistent-function-scoping
+  const queryBlocksByHashes: WalletProvider['queryBlocksByHashes'] = async () => {
+    throw new ProviderError(ProviderFailure.NotImplemented);
+  };
+
   const queryTransactionsByAddresses: WalletProvider['queryTransactionsByAddresses'] = async (addresses) => {
     const query = gql`
       query ($addresses: [String]!) {
@@ -350,6 +355,7 @@ export const cardanoGraphqlDbSyncProvider = (uri: string): WalletProvider => {
     genesisParameters,
     ledgerTip,
     networkInfo,
+    queryBlocksByHashes,
     queryTransactionsByAddresses,
     queryTransactionsByHashes,
     rewardsHistory,
