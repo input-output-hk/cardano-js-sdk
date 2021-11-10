@@ -234,7 +234,22 @@ export const cardanoGraphqlDbSyncProvider = (uri: string): WalletProvider => {
 
   // eslint-disable-next-line unicorn/consistent-function-scoping
   const utxoDelegationAndRewards: WalletProvider['utxoDelegationAndRewards'] = async () => {
-    throw new Error('Not implemented yet.');
+    throw new ProviderError(ProviderFailure.NotImplemented);
+  };
+
+  // eslint-disable-next-line unicorn/consistent-function-scoping
+  const rewardsHistory: WalletProvider['rewardsHistory'] = async () => {
+    throw new ProviderError(ProviderFailure.NotImplemented);
+  };
+
+  // eslint-disable-next-line unicorn/consistent-function-scoping
+  const genesisParameters: WalletProvider['genesisParameters'] = async () => {
+    throw new ProviderError(ProviderFailure.NotImplemented);
+  };
+
+  // eslint-disable-next-line unicorn/consistent-function-scoping
+  const queryBlocksByHashes: WalletProvider['queryBlocksByHashes'] = async () => {
+    throw new ProviderError(ProviderFailure.NotImplemented);
   };
 
   const queryTransactionsByAddresses: WalletProvider['queryTransactionsByAddresses'] = async (addresses) => {
@@ -337,10 +352,13 @@ export const cardanoGraphqlDbSyncProvider = (uri: string): WalletProvider => {
 
   return {
     currentWalletProtocolParameters,
+    genesisParameters,
     ledgerTip,
     networkInfo,
+    queryBlocksByHashes,
     queryTransactionsByAddresses,
     queryTransactionsByHashes,
+    rewardsHistory,
     stakePoolStats,
     submitTx,
     utxoDelegationAndRewards

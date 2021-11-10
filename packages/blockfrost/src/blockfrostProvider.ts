@@ -1,9 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import {
+  BigIntMath,
+  Cardano,
+  EpochRange,
+  EpochRewards,
+  ProviderError,
+  ProviderFailure,
+  WalletProvider
+} from '@cardano-sdk/core';
 import { BlockFrostAPI, Error as BlockfrostError, Responses } from '@blockfrost/blockfrost-js';
 import { BlockfrostToCore } from './BlockfrostToCore';
-import { Cardano, ProviderError, ProviderFailure, WalletProvider } from '@cardano-sdk/core';
 import { Options } from '@blockfrost/blockfrost-js/lib/types';
 import { dummyLogger } from 'ts-log';
+import { flatten, groupBy } from 'lodash-es';
 
 const formatBlockfrostError = (error: unknown) => {
   const blockfrostError = error as BlockfrostError;
@@ -318,12 +327,92 @@ export const blockfrostProvider = (options: Options, logger = dummyLogger): Wall
     return BlockfrostToCore.currentWalletProtocolParameters(response.data);
   };
 
+  const accountRewards = async (
+    stakeAddress: Cardano.Address,
+    { lowerBound = 0, upperBound = Number.MAX_SAFE_INTEGER }: EpochRange = {}
+  ): Promise<EpochRewards[]> => {
+    const result: EpochRewards[] = [];
+    const batchSize = 100;
+    let page = 1;
+    let haveMorePages = true;
+    while (haveMorePages) {
+      const rewards = await blockfrost.accountsRewards(stakeAddress, { count: batchSize, page });
+      result.push(
+        ...rewards
+          .filter(({ epoch }) => lowerBound <= epoch && epoch <= upperBound)
+          .map(({ epoch, amount }) => ({
+            epoch,
+            rewards: BigInt(amount)
+          }))
+      );
+      haveMorePages = rewards[rewards.length - 1].epoch < upperBound && rewards.length === 100;
+      page += 1;
+    }
+    return result;
+  };
+
+  const rewardsHistory: WalletProvider['rewardsHistory'] = async ({ stakeAddresses, epochs }) => {
+    const allAddressRewards = await Promise.all(stakeAddresses.map((address) => accountRewards(address, epochs)));
+    const accountRewardsByEpoch = groupBy(flatten(allAddressRewards), ({ epoch }) => epoch);
+    return Object.keys(accountRewardsByEpoch).map((key) => ({
+      epoch: accountRewardsByEpoch[key][0].epoch,
+      rewards: BigIntMath.sum(accountRewardsByEpoch[key].map(({ rewards }) => rewards))
+    }));
+  };
+
+  const genesisParameters: WalletProvider['genesisParameters'] = async () => {
+    const response = await blockfrost.genesis();
+    return {
+      activeSlotsCoefficient: response.active_slots_coefficient,
+      epochLength: response.epoch_length,
+      maxKesEvolutions: response.max_kes_evolutions,
+      maxLovelaceSupply: BigInt(response.max_lovelace_supply),
+      networkMagic: response.network_magic,
+      securityParameter: response.security_param,
+      slotLength: response.slot_length,
+      slotsPerKesPeriod: response.slots_per_kes_period,
+      systemStart: new Date(response.system_start * 1000),
+      updateQuorum: response.update_quorum
+    };
+  };
+
+  const queryBlocksByHashes: WalletProvider['queryBlocksByHashes'] = async (hashes) => {
+    const responses = await Promise.all(hashes.map((hash) => blockfrost.blocks(hash)));
+    return responses.map((response) => {
+      if (!response.epoch || !response.epoch_slot || !response.height || !response.slot || !response.block_vrf) {
+        throw new ProviderError(ProviderFailure.Unknown, null, 'Queried unsupported block');
+      }
+      return {
+        confirmations: response.confirmations,
+        date: new Date(response.time * 1000),
+        epoch: response.epoch,
+        epochSlot: response.epoch_slot,
+        fees: BigInt(response.fees || '0'),
+        header: {
+          blockHash: response.hash,
+          blockHeight: response.height,
+          slot: response.slot
+        },
+        nextBlock: response.next_block || undefined,
+        previousBlock: response.previous_block || undefined,
+        size: response.size,
+        slotLeader: response.slot_leader,
+        totalOutput: BigInt(response.output || '0'),
+        txCount: response.tx_count,
+        vrf: response.block_vrf
+      };
+    });
+  };
+
   const providerFunctions: WalletProvider = {
     currentWalletProtocolParameters,
+    genesisParameters,
     ledgerTip,
     networkInfo,
+    queryBlocksByHashes,
     queryTransactionsByAddresses,
     queryTransactionsByHashes,
+    rewardsHistory,
     stakePoolStats,
     submitTx,
     utxoDelegationAndRewards

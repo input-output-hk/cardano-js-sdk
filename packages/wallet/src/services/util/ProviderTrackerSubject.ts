@@ -1,5 +1,15 @@
 import { Milliseconds } from '../types';
-import { Observable, Subject, exhaustMap, interval, merge, startWith, switchMap, takeUntil } from 'rxjs';
+import {
+  Observable,
+  Subject,
+  distinctUntilChanged,
+  exhaustMap,
+  interval,
+  merge,
+  startWith,
+  switchMap,
+  takeUntil
+} from 'rxjs';
 import { TrackerSubject } from './TrackerSubject';
 import { retryBackoff } from 'backoff-rxjs';
 
@@ -10,8 +20,9 @@ export interface SourceTrackerConfig {
 }
 
 export interface SourceTrackerProps<T> {
-  provider: () => Observable<T>;
+  provider: () => Observable<T>; // TODO: think about reworking this to be just an observable.
   config: SourceTrackerConfig;
+  equals: (t1: T, t2: T) => boolean;
 }
 
 export interface ProviderTrackerSubjectInternals {
@@ -23,7 +34,8 @@ export class ProviderTrackerSubject<T> extends TrackerSubject<T> {
   #externalTrigger$ = new Subject<void>();
 
   constructor(
-    { provider: provider$, config: { pollInterval, maxInterval } }: SourceTrackerProps<T>,
+    { provider: provider$, config: { pollInterval, maxInterval }, equals }: SourceTrackerProps<T>,
+    // TODO: move trigger$ from internals to props
     { externalTrigger$ = new Subject(), trigger$ = interval(pollInterval) }: ProviderTrackerSubjectInternals = {}
   ) {
     super(
@@ -36,7 +48,7 @@ export class ProviderTrackerSubject<T> extends TrackerSubject<T> {
         ),
         // Always immediately restart request on external trigger
         externalTrigger$.pipe(switchMap(provider$))
-      ).pipe(retryBackoff({ initialInterval: pollInterval, maxInterval }))
+      ).pipe(distinctUntilChanged(equals), retryBackoff({ initialInterval: pollInterval, maxInterval }))
     );
     this.#externalTrigger$ = externalTrigger$;
   }

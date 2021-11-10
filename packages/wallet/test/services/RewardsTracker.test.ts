@@ -1,9 +1,19 @@
-import { Cardano } from '@cardano-sdk/core';
-import { ProviderTrackerSubject, createRewardsProvider, createRewardsTracker } from '../../src/services';
+import { Cardano, NetworkInfo } from '@cardano-sdk/core';
+import { Observable } from 'rxjs';
+import {
+  ProviderTrackerSubject,
+  SourceTrackerConfig,
+  createRewardsProvider,
+  createRewardsTracker
+} from '../../src/services';
 import { createTestScheduler } from '../testScheduler';
 import { providerStub, testKeyManager } from '../mocks';
 
 describe('createRewardsTracker', () => {
+  // both variables are not relevant for this test, overwriting rewardsSource$
+  let config: SourceTrackerConfig;
+  let networkInfo$: Observable<NetworkInfo>;
+
   it('fetches rewards from WalletProvider and locks when spent in a transaction in flight', () => {
     const keyManager = testKeyManager();
     const stakeAddress = keyManager.stakeKey.to_bech32();
@@ -26,8 +36,8 @@ describe('createRewardsTracker', () => {
       });
       const rewardsTracker = createRewardsTracker(
         {
-          // not relevant for this test, overwriting rewardsSource$
-          config: { maxInterval: 100, pollInterval: 100 },
+          config,
+          networkInfo$,
           rewardsProvider: createRewardsProvider(provider, keyManager),
           transactionsInFlight$
         },

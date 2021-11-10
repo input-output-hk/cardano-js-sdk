@@ -3,6 +3,7 @@ import * as mocks from './mocks';
 import { Cardano } from '@cardano-sdk/core';
 import { KeyManagement, SingleAddressWallet } from '../src';
 import { coalesceValueQuantities } from '@cardano-sdk/core/src/Cardano/util';
+import { createStubStakePoolSearchProvider } from '@cardano-sdk/util-dev';
 import { firstValueFrom, skip } from 'rxjs';
 
 describe('SingleAddressWallet', () => {
@@ -19,8 +20,9 @@ describe('SingleAddressWallet', () => {
       password: '123'
     });
     walletProvider = mocks.providerStub();
+    const stakePoolSearchProvider = createStubStakePoolSearchProvider();
     keyManager.deriveAddress = jest.fn().mockReturnValue(address);
-    wallet = new SingleAddressWallet({ name }, { keyManager, walletProvider });
+    wallet = new SingleAddressWallet({ name }, { keyManager, stakePoolSearchProvider, walletProvider });
   });
 
   afterEach(() => wallet.shutdown());
@@ -51,9 +53,23 @@ describe('SingleAddressWallet', () => {
       await firstValueFrom(wallet.tip$);
       expect(wallet.tip$.value).toEqual(mocks.ledgerTip);
     });
+    it('"networkInfo$"', async () => {
+      await firstValueFrom(wallet.networkInfo$);
+      expect(wallet.networkInfo$.value?.currentEpoch).toEqual(mocks.currentEpoch);
+    });
     it('"protocolParameters$"', async () => {
       await firstValueFrom(wallet.protocolParameters$);
       expect(wallet.protocolParameters$.value).toEqual(mocks.protocolParameters);
+    });
+    it('"genesisParameters$"', async () => {
+      await firstValueFrom(wallet.genesisParameters$);
+      expect(wallet.genesisParameters$.value).toEqual(mocks.genesisParameters);
+    });
+    it('"delegation"', async () => {
+      await firstValueFrom(wallet.delegation.rewardsHistory$);
+      expect(wallet.delegation.rewardsHistory$.value?.all).toEqual(mocks.rewardsHistory);
+      await firstValueFrom(wallet.delegation.delegatee$);
+      expect(wallet.delegation.delegatee$.value?.nextNextEpoch).toBeNull();
     });
     it('"addresses"', () => {
       expect(wallet.addresses.map(({ bech32 }) => bech32)).toEqual([address]);
@@ -100,18 +116,24 @@ describe('SingleAddressWallet', () => {
 
   it('sync() calls wallet provider functions until shutdown()', () => {
     expect(walletProvider.ledgerTip).toHaveBeenCalledTimes(1);
+    expect(walletProvider.networkInfo).toHaveBeenCalledTimes(1);
     expect(walletProvider.currentWalletProtocolParameters).toHaveBeenCalledTimes(1);
+    expect(walletProvider.genesisParameters).toHaveBeenCalledTimes(1);
     expect(walletProvider.queryTransactionsByAddresses).toHaveBeenCalledTimes(1);
     expect(walletProvider.utxoDelegationAndRewards).toHaveBeenCalledTimes(2); // one call for utxo, one for rewards
     wallet.sync();
     expect(walletProvider.ledgerTip).toHaveBeenCalledTimes(2);
+    expect(walletProvider.networkInfo).toHaveBeenCalledTimes(2);
     expect(walletProvider.currentWalletProtocolParameters).toHaveBeenCalledTimes(2);
+    expect(walletProvider.genesisParameters).toHaveBeenCalledTimes(2);
     expect(walletProvider.queryTransactionsByAddresses).toHaveBeenCalledTimes(2);
     expect(walletProvider.utxoDelegationAndRewards).toHaveBeenCalledTimes(4);
     wallet.shutdown();
     wallet.sync();
     expect(walletProvider.ledgerTip).toHaveBeenCalledTimes(2);
+    expect(walletProvider.networkInfo).toHaveBeenCalledTimes(2);
     expect(walletProvider.currentWalletProtocolParameters).toHaveBeenCalledTimes(2);
+    expect(walletProvider.genesisParameters).toHaveBeenCalledTimes(2);
     expect(walletProvider.queryTransactionsByAddresses).toHaveBeenCalledTimes(2);
     expect(walletProvider.utxoDelegationAndRewards).toHaveBeenCalledTimes(4);
   });

@@ -1,5 +1,5 @@
 import { BehaviorObservable } from './util';
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, EpochRewards } from '@cardano-sdk/core';
 import { Observable } from 'rxjs';
 import { TransactionFailure } from './TransactionError';
 
@@ -57,6 +57,25 @@ export interface Transactions extends ProviderSubscription {
     readonly confirmed$: Observable<Cardano.NewTxAlonzo>;
   };
   readonly incoming$: Observable<Cardano.TxAlonzo>;
+}
+
+export interface RewardsHistory {
+  all: EpochRewards[];
+  lastReward: EpochRewards | null;
+  avgReward: Cardano.Lovelace | null;
+  lifetimeRewards: Cardano.Lovelace;
+}
+
+export interface Delegatee {
+  currentEpoch: Cardano.StakePool | null;
+  nextEpoch: Cardano.StakePool | null;
+  nextNextEpoch: Cardano.StakePool | null;
+}
+
+export interface Delegation {
+  rewardsHistory$: BehaviorObservable<RewardsHistory>;
+  delegatee$: BehaviorObservable<Delegatee>;
+  shutdown(): void;
 }
 
 export type SimpleProvider<T> = () => Observable<T>;

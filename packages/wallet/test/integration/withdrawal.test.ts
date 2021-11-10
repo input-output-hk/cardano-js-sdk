@@ -1,6 +1,7 @@
 import { Cardano } from '@cardano-sdk/core';
 import { CertificateType } from '@cardano-sdk/core/src/Cardano';
 import { KeyManagement, SingleAddressWallet, SingleAddressWalletProps, TransactionFailure } from '../../src';
+import { createStubStakePoolSearchProvider } from '@cardano-sdk/util-dev';
 import { firstValueFrom } from 'rxjs';
 import { providerStub } from '../mocks';
 
@@ -16,8 +17,10 @@ describe('integration/withdrawal', () => {
   beforeAll(async () => {
     keyManager = KeyManagement.createInMemoryKeyManager({ mnemonicWords, networkId, password });
     const walletProvider = providerStub();
+    const stakePoolSearchProvider = createStubStakePoolSearchProvider();
     wallet = new SingleAddressWallet(walletProps, {
       keyManager,
+      stakePoolSearchProvider,
       walletProvider
     });
   });

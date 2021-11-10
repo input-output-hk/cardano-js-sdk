@@ -14,4 +14,6 @@ export interface KeyManager {
   // TODO: make signatures object key type clear with type alias
   signTransaction: (txHash: Cardano.Hash16) => Promise<Cardano.Witness['signatures']>;
   stakeKey: CSL.PublicKey;
+  // TODO:
+  // stakeAddress: CardanoAddress;
 }
