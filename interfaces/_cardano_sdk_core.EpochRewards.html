@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>AlonzoGenesis | cardano-sdk</title>
+	<title>EpochRewards | cardano-sdk</title>
 	<meta name="description" content="Documentation for cardano-sdk">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -58,10 +58,10 @@
 					<a href="../modules/_cardano_sdk_core.html">@cardano-sdk/core</a>
 				</li>
 				<li>
-					<a href="_cardano_sdk_core.AlonzoGenesis.html">AlonzoGenesis</a>
+					<a href="_cardano_sdk_core.EpochRewards.html">EpochRewards</a>
 				</li>
 			</ul>
-			<h1>Interface AlonzoGenesis</h1>
+			<h1>Interface EpochRewards</h1>
 		</div>
 	</div>
 </header>
@@ -72,7 +72,7 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">AlonzoGenesis</span>
+						<span class="target">EpochRewards</span>
 					</li>
 				</ul>
 			</section>
@@ -83,13 +83,8 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.AlonzoGenesis.html#adaPerUTxOWord" class="tsd-kind-icon">ada<wbr>PerUTxOWord</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.AlonzoGenesis.html#collateralPercentage" class="tsd-kind-icon">collateral<wbr>Percentage</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.AlonzoGenesis.html#executionPrices" class="tsd-kind-icon">execution<wbr>Prices</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.AlonzoGenesis.html#maxBlockExUnits" class="tsd-kind-icon">max<wbr>Block<wbr>ExUnits</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.AlonzoGenesis.html#maxCollateralInputs" class="tsd-kind-icon">max<wbr>Collateral<wbr>Inputs</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.AlonzoGenesis.html#maxTxExUnits" class="tsd-kind-icon">max<wbr>TxEx<wbr>Units</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.AlonzoGenesis.html#maxValueSize" class="tsd-kind-icon">max<wbr>Value<wbr>Size</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.EpochRewards.html#epoch" class="tsd-kind-icon">epoch</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.EpochRewards.html#rewards" class="tsd-kind-icon">rewards</a></li>
 							</ul>
 						</section>
 					</div>
@@ -98,83 +93,22 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="adaPerUTxOWord" class="tsd-anchor"></a>
-					<h3>ada<wbr>PerUTxOWord</h3>
-					<div class="tsd-signature tsd-kind-icon">ada<wbr>PerUTxOWord<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<a name="epoch" class="tsd-anchor"></a>
+					<h3>epoch</h3>
+					<div class="tsd-signature tsd-kind-icon">epoch<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/02f7378/packages/core/src/Genesis/types/AlonzoGenesis.ts#L7">packages/core/src/Genesis/types/AlonzoGenesis.ts:7</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/ae6a66c/packages/core/src/WalletProvider/types.ts#L71">packages/core/src/WalletProvider/types.ts:71</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="collateralPercentage" class="tsd-anchor"></a>
-					<h3>collateral<wbr>Percentage</h3>
-					<div class="tsd-signature tsd-kind-icon">collateral<wbr>Percentage<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<a name="rewards" class="tsd-anchor"></a>
+					<h3>rewards</h3>
+					<div class="tsd-signature tsd-kind-icon">rewards<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">bigint</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/02f7378/packages/core/src/Genesis/types/AlonzoGenesis.ts#L15">packages/core/src/Genesis/types/AlonzoGenesis.ts:15</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="executionPrices" class="tsd-anchor"></a>
-					<h3>execution<wbr>Prices</h3>
-					<div class="tsd-signature tsd-kind-icon">execution<wbr>Prices<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>prMem<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>prSteps<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> }</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/02f7378/packages/core/src/Genesis/types/AlonzoGenesis.ts#L8">packages/core/src/Genesis/types/AlonzoGenesis.ts:8</a></li>
-						</ul>
-					</aside>
-					<div class="tsd-type-declaration">
-						<h4>Type declaration</h4>
-						<ul class="tsd-parameters">
-							<li class="tsd-parameter">
-								<h5>pr<wbr>Mem<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></h5>
-							</li>
-							<li class="tsd-parameter">
-								<h5>pr<wbr>Steps<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></h5>
-							</li>
-						</ul>
-					</div>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="maxBlockExUnits" class="tsd-anchor"></a>
-					<h3>max<wbr>Block<wbr>ExUnits</h3>
-					<div class="tsd-signature tsd-kind-icon">max<wbr>Block<wbr>ExUnits<span class="tsd-signature-symbol">:</span> <a href="_cardano_sdk_core.ExUnits.html" class="tsd-signature-type" data-tsd-kind="Interface">ExUnits</a></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/02f7378/packages/core/src/Genesis/types/AlonzoGenesis.ts#L13">packages/core/src/Genesis/types/AlonzoGenesis.ts:13</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="maxCollateralInputs" class="tsd-anchor"></a>
-					<h3>max<wbr>Collateral<wbr>Inputs</h3>
-					<div class="tsd-signature tsd-kind-icon">max<wbr>Collateral<wbr>Inputs<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/02f7378/packages/core/src/Genesis/types/AlonzoGenesis.ts#L16">packages/core/src/Genesis/types/AlonzoGenesis.ts:16</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="maxTxExUnits" class="tsd-anchor"></a>
-					<h3>max<wbr>TxEx<wbr>Units</h3>
-					<div class="tsd-signature tsd-kind-icon">max<wbr>TxEx<wbr>Units<span class="tsd-signature-symbol">:</span> <a href="_cardano_sdk_core.ExUnits.html" class="tsd-signature-type" data-tsd-kind="Interface">ExUnits</a></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/02f7378/packages/core/src/Genesis/types/AlonzoGenesis.ts#L12">packages/core/src/Genesis/types/AlonzoGenesis.ts:12</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="maxValueSize" class="tsd-anchor"></a>
-					<h3>max<wbr>Value<wbr>Size</h3>
-					<div class="tsd-signature tsd-kind-icon">max<wbr>Value<wbr>Size<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/02f7378/packages/core/src/Genesis/types/AlonzoGenesis.ts#L14">packages/core/src/Genesis/types/AlonzoGenesis.ts:14</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/ae6a66c/packages/core/src/WalletProvider/types.ts#L72">packages/core/src/WalletProvider/types.ts:72</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -232,44 +166,26 @@
 					<li class=" tsd-kind-class tsd-parent-kind-module">
 						<a href="../classes/_cardano_sdk_core.SerializationError.html" class="tsd-kind-icon">Serialization<wbr>Error</a>
 					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="_cardano_sdk_core.EpochRange.html" class="tsd-kind-icon">Epoch<wbr>Range</a>
+					</li>
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface tsd-parent-kind-module">
-						<a href="_cardano_sdk_core.AlonzoGenesis.html" class="tsd-kind-icon">Alonzo<wbr>Genesis</a>
+						<a href="_cardano_sdk_core.EpochRewards.html" class="tsd-kind-icon">Epoch<wbr>Rewards</a>
 						<ul>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_cardano_sdk_core.AlonzoGenesis.html#adaPerUTxOWord" class="tsd-kind-icon">ada<wbr>PerUTxOWord</a>
+								<a href="_cardano_sdk_core.EpochRewards.html#epoch" class="tsd-kind-icon">epoch</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_cardano_sdk_core.AlonzoGenesis.html#collateralPercentage" class="tsd-kind-icon">collateral<wbr>Percentage</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_cardano_sdk_core.AlonzoGenesis.html#executionPrices" class="tsd-kind-icon">execution<wbr>Prices</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_cardano_sdk_core.AlonzoGenesis.html#maxBlockExUnits" class="tsd-kind-icon">max<wbr>Block<wbr>ExUnits</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_cardano_sdk_core.AlonzoGenesis.html#maxCollateralInputs" class="tsd-kind-icon">max<wbr>Collateral<wbr>Inputs</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_cardano_sdk_core.AlonzoGenesis.html#maxTxExUnits" class="tsd-kind-icon">max<wbr>TxEx<wbr>Units</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_cardano_sdk_core.AlonzoGenesis.html#maxValueSize" class="tsd-kind-icon">max<wbr>Value<wbr>Size</a>
+								<a href="_cardano_sdk_core.EpochRewards.html#rewards" class="tsd-kind-icon">rewards</a>
 							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="_cardano_sdk_core.ByronGenesis.html" class="tsd-kind-icon">Byron<wbr>Genesis</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="_cardano_sdk_core.ExUnits.html" class="tsd-kind-icon">Ex<wbr>Units</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="_cardano_sdk_core.ShelleyGenesis.html" class="tsd-kind-icon">Shelley<wbr>Genesis</a>
+						<a href="_cardano_sdk_core.RewardHistoryProps.html" class="tsd-kind-icon">Reward<wbr>History<wbr>Props</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
 						<a href="_cardano_sdk_core.StakePoolSearchProvider.html" class="tsd-kind-icon">Stake<wbr>Pool<wbr>Search<wbr>Provider</a>
@@ -311,6 +227,7 @@
 				<li class="tsd-kind-namespace"><span class="tsd-kind-icon">Namespace</span></li>
 				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
 				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
 				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
 				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
 			</ul>

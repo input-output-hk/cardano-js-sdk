@@ -104,10 +104,32 @@
 <a name='L45'></a><a href='#L45'>45</a>
 <a name='L46'></a><a href='#L46'>46</a>
 <a name='L47'></a><a href='#L47'>47</a>
-<a name='L48'></a><a href='#L48'>48</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">11x</span>
-<span class="cline-any cline-yes">11x</span>
-<span class="cline-any cline-yes">11x</span>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17x</span>
+<span class="cline-any cline-yes">17x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -125,34 +147,46 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">11x</span>
-<span class="cline-any cline-yes">63x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17x</span>
+<span class="cline-any cline-yes">108x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">63x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">108x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">70x</span>
+<span class="cline-any cline-yes">115x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">63x</span>
+<span class="cline-any cline-yes">108x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">14x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Milliseconds } from '../types';
-import { Observable, Subject, exhaustMap, interval, merge, startWith, switchMap, takeUntil } from 'rxjs';
+import {
+  Observable,
+  Subject,
+  distinctUntilChanged,
+  exhaustMap,
+  interval,
+  merge,
+  startWith,
+  switchMap,
+  takeUntil
+} from 'rxjs';
 import { TrackerSubject } from './TrackerSubject';
 import { retryBackoff } from 'backoff-rxjs';
 &nbsp;
@@ -163,8 +197,9 @@ export interface SourceTrackerConfig {
 }
 &nbsp;
 export interface SourceTrackerProps&lt;T&gt; {
-  provider: () =&gt; Observable&lt;T&gt;;
+  provider: () =&gt; Observable&lt;T&gt;; // TODO: think about reworking this to be just an observable.
   config: SourceTrackerConfig;
+  equals: (t1: T, t2: T) =&gt; boolean;
 }
 &nbsp;
 export interface ProviderTrackerSubjectInternals {
@@ -176,7 +211,8 @@ export class ProviderTrackerSubject&lt;T&gt; extends TrackerSubject&lt;T&gt; {
   #externalTrigger$ = new Subject&lt;void&gt;();
 &nbsp;
   constructor(
-    { provider: provider$, config: { pollInterval, maxInterval } }: SourceTrackerProps&lt;T&gt;,
+    { provider: provider$, config: { pollInterval, maxInterval }, equals }: SourceTrackerProps&lt;T&gt;,
+    // TODO: move trigger$ from internals to props
     { externalTrigger$ = new Subject(), trigger$ = interval(pollInterval) }: ProviderTrackerSubjectInternals = {}
   ) {
     super(
@@ -189,7 +225,7 @@ export class ProviderTrackerSubject&lt;T&gt; extends TrackerSubject&lt;T&gt; {
         ),
         // Always immediately restart request on external trigger
         externalTrigger$.pipe(switchMap(provider$))
-      ).pipe(retryBackoff({ initialInterval: pollInterval, maxInterval }))
+      ).pipe(distinctUntilChanged(equals), retryBackoff({ initialInterval: pollInterval, maxInterval }))
     );
     this.#externalTrigger$ = externalTrigger$;
   }
@@ -205,7 +241,7 @@ export class ProviderTrackerSubject&lt;T&gt; extends TrackerSubject&lt;T&gt; {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Fri Nov 05 2021 10:37:45 GMT+0000 (Coordinated Universal Time)
+                at Wed Nov 10 2021 12:41:53 GMT+0000 (Coordinated Universal Time)
             </div>
         </div>
         <script src="../../../prettify.js"></script>
