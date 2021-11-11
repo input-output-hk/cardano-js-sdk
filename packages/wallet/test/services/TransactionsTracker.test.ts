@@ -9,15 +9,22 @@ import {
   TrackerSubject,
   TransactionDirection,
   TransactionFailure,
+  createAddressTransactionsProvider,
   createTransactionsTracker
 } from '../../src';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { createTestScheduler } from '../testScheduler';
-import { queryTransactionsResult } from '../mocks';
+import { firstValueFrom, of } from 'rxjs';
+import { providerStub, queryTransactionsResult } from '../mocks';
 
 describe('TransactionsTracker', () => {
-  describe('createAddressTransactionsProvider', () => {
-    it.todo('queries underlying provider and emits sorted directional transactions');
+  test('createAddressTransactionsProvider', async () => {
+    const provider$ = createAddressTransactionsProvider(
+      providerStub(), [queryTransactionsResult[0].body.inputs[0].address], { initialInterval: 1 }, of(300)
+    );
+    expect(await firstValueFrom(provider$)).toEqual([
+      { direction: TransactionDirection.Outgoing, tx: queryTransactionsResult[0] }
+    ]);
   });
 
   describe('createTransactionsTracker', () => {

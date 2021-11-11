@@ -38,9 +38,9 @@ describe('createRewardsTracker', () => {
           transactionsInFlight$,
           walletProvider
         },
-        { rewardsSource$: cold('a---|', { a: 10_000n }) as unknown as SyncableIntervalTrackerSubject<Cardano.Lovelace> }
+        { rewardsSource$: cold('a--a|', { a: 10_000n }) as unknown as SyncableIntervalTrackerSubject<Cardano.Lovelace> }
       );
-      expectObservable(rewardsTracker.total$).toBe('a---|', { a: 10_000n });
+      expectObservable(rewardsTracker.total$).toBe('a--a|', { a: 10_000n });
       expectObservable(rewardsTracker.available$).toBe('-a-b-', { a: 10_000n, b: 10_000n - 100n });
     });
   });

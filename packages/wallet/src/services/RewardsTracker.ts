@@ -49,7 +49,7 @@ export const createRewardsTracker = (
         ([rewards, transactionsInFlight]) =>
           rewards - transactionsInFlight.reduce((total, tx) => total + getWithdrawalQuantity(tx), 0n)
       ),
-      distinctUntilChanged(strictEquals) // TODO: test this
+      distinctUntilChanged(strictEquals)
     )
   );
   return {

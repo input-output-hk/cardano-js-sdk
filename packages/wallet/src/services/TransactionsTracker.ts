@@ -22,7 +22,7 @@ import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TrackerSubject } from './util/TrackerSubject';
 import { TransactionFailure } from './TransactionError';
 import { coldObservableProvider, sharedDistinctBlock, transactionsEquals } from './util';
-import { flatten, sortBy } from 'lodash-es';
+import { sortBy } from 'lodash-es';
 
 export interface TransactionsTrackerProps {
   walletProvider: WalletProvider;
@@ -54,20 +54,16 @@ export const createAddressTransactionsProvider = (
     transactionsEquals
   ).pipe(
     map((transactions) =>
-      flatten(
-        sortBy(
-          transactions,
-          ({ blockHeader: { blockHeight } }) => blockHeight,
-          ({ index }) => index
-        ).map((tx) => {
-          const {
-            body: { inputs, outputs }
-          } = tx;
-          const incoming = outputs.some(isMyAddress) ? [{ direction: TransactionDirection.Incoming, tx }] : [];
-          const outgoing = inputs.some(isMyAddress) ? [{ direction: TransactionDirection.Outgoing, tx }] : [];
-          return [...incoming, ...outgoing];
-        })
-      )
+      sortBy(
+        transactions,
+        ({ blockHeader: { blockHeight } }) => blockHeight,
+        ({ index }) => index
+      ).map((tx) => {
+        const direction = tx.body.inputs.some(isMyAddress)
+          ? TransactionDirection.Outgoing
+          : TransactionDirection.Incoming;
+        return { direction, tx };
+      })
     )
   );
 };

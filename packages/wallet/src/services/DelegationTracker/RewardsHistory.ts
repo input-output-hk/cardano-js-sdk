@@ -6,7 +6,6 @@ import { TxWithEpoch, isNotNil, transactionHasAnyCertificate } from './util';
 import { coldObservableProvider } from '../util';
 import { first } from 'lodash-es';
 
-// TODO; test this
 export const createRewardsHistoryProvider =
   (walletProvider: WalletProvider, keyManager: KeyManager, retryBackoffConfig: RetryBackoffConfig) =>
   (lowerBound: Cardano.Epoch) =>
