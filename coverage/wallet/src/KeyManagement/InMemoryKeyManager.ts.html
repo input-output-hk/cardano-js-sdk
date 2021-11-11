@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">92.31% </span>
+                <span class="strong">92.86% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>24/26</span>
+                <span class='fraction'>26/28</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">95.83% </span>
+                <span class="strong">96.15% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>23/24</span>
+                <span class='fraction'>25/26</span>
             </div>
         
             
@@ -120,7 +120,11 @@
 <a name='L61'></a><a href='#L61'>61</a>
 <a name='L62'></a><a href='#L62'>62</a>
 <a name='L63'></a><a href='#L63'>63</a>
-<a name='L64'></a><a href='#L64'>64</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">13x</span>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">13x</span>
 <span class="cline-any cline-yes">13x</span>
 <span class="cline-any cline-yes">13x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -137,26 +141,29 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">20x</span>
-<span class="cline-any cline-yes">20x</span>
+<span class="cline-any cline-yes">21x</span>
+<span class="cline-any cline-yes">21x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">20x</span>
-<span class="cline-any cline-yes">20x</span>
-<span class="cline-any cline-yes">20x</span>
+<span class="cline-any cline-yes">21x</span>
+<span class="cline-any cline-yes">21x</span>
+<span class="cline-any cline-yes">21x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">20x</span>
-<span class="cline-any cline-yes">20x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">21x</span>
+<span class="cline-any cline-yes">21x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">20x</span>
-<span class="cline-any cline-yes">20x</span>
-<span class="cline-any cline-yes">20x</span>
-<span class="cline-any cline-yes">20x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">20x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">21x</span>
+<span class="cline-any cline-yes">21x</span>
+<span class="cline-any cline-yes">21x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">21x</span>
+<span class="cline-any cline-yes">21x</span>
+<span class="cline-any cline-yes">21x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">21x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
@@ -166,6 +173,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -217,7 +225,10 @@ export const createInMemoryKeyManager = ({
   const privateParentKey = accountPrivateKey.derive(0).derive(0);
   const publicParentKey = privateParentKey.to_public();
   const publicKey = accountPrivateKey.to_public();
+&nbsp;
   const stakeKey = publicKey.derive(2).derive(0);
+  const stakeKeyRaw = stakeKey.to_raw_key();
+  const stakeKeyCredential = CSL.StakeCredential.from_keyhash(stakeKeyRaw.hash());
 &nbsp;
   return {
     deriveAddress: (addressIndex, index) =&gt; {
@@ -225,13 +236,14 @@ export const createInMemoryKeyManager = ({
       const baseAddr = CSL.BaseAddress.new(
         networkId,
         CSL.StakeCredential.from_keyhash(utxoPubKey.to_raw_key().hash()),
-        CSL.StakeCredential.from_keyhash(stakeKey.to_raw_key().hash())
+        stakeKeyCredential
       );
 &nbsp;
       return baseAddr.to_address().to_bech32();
     },
     publicKey: publicKey.to_raw_key(),
     publicParentKey: publicParentKey.to_raw_key(),
+    rewardAccount: CSL.RewardAddress.new(networkId, stakeKeyCredential).to_address().to_bech32(),
     signMessage: <span class="fstat-no" title="function not covered" >async </span>(_addressType, _signingIndex, message) =&gt; (<span class="cstat-no" title="statement not covered" >{</span>
       publicKey: publicParentKey.toString(),
       signature: `Signature for ${message} is not implemented yet`
@@ -243,7 +255,7 @@ export const createInMemoryKeyManager = ({
         [vkeyWitness.vkey().public_key().to_bech32()]: vkeyWitness.signature().to_hex()
       };
     },
-    stakeKey: stakeKey.to_raw_key()
+    stakeKey: stakeKeyRaw
   };
 };
 &nbsp;</pre></td></tr></table></pre>
@@ -253,7 +265,7 @@ export const createInMemoryKeyManager = ({
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Thu Nov 11 2021 14:47:19 GMT+0000 (Coordinated Universal Time)
+                at Thu Nov 11 2021 15:37:45 GMT+0000 (Coordinated Universal Time)
             </div>
         </div>
         <script src="../../prettify.js"></script>
