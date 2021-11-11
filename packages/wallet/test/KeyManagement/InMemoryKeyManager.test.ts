@@ -32,4 +32,8 @@ describe('InMemoryKeyManager', () => {
     expect(Object.keys(witnessSet)).toHaveLength(1);
     expect(typeof witnessSet[Object.keys(witnessSet)[0]]).toBe('string');
   });
+
+  test('rewardAccount', () => {
+    expect(keyManager.rewardAccount.startsWith('stake_test')).toBe(true);
+  });
 });

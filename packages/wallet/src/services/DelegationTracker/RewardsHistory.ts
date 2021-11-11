@@ -10,8 +10,7 @@ export const createRewardsHistoryProvider =
   (walletProvider: WalletProvider, keyManager: KeyManager, retryBackoffConfig: RetryBackoffConfig) =>
   (lowerBound: Cardano.Epoch) =>
     coldObservableProvider(
-      () =>
-        walletProvider.rewardsHistory({ epochs: { lowerBound }, stakeAddresses: [keyManager.stakeKey.to_bech32()] }),
+      () => walletProvider.rewardsHistory({ epochs: { lowerBound }, stakeAddresses: [keyManager.rewardAccount] }),
       retryBackoffConfig
     );
 
