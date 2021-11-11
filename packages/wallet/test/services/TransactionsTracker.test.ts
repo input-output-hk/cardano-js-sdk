@@ -1,17 +1,17 @@
 /* eslint-disable no-multi-spaces */
 /* eslint-disable space-in-parens */
 /* eslint-disable prettier/prettier */
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, WalletProvider } from '@cardano-sdk/core';
 import {
   DirectionalTransaction,
   FailedTx,
-  ProviderTrackerSubject,
-  SimpleProvider,
-  SourceTrackerConfig,
+  SyncableIntervalTrackerSubject,
+  TrackerSubject,
   TransactionDirection,
   TransactionFailure,
   createTransactionsTracker
 } from '../../src';
+import { RetryBackoffConfig } from 'backoff-rxjs';
 import { createTestScheduler } from '../testScheduler';
 import { queryTransactionsResult } from '../mocks';
 
@@ -21,10 +21,11 @@ describe('TransactionsTracker', () => {
   });
 
   describe('createTransactionsTracker', () => {
-    // both of these variables are not relevant for tests, because
+    // these variables are not relevant for tests, because
     // they're using mock transactionsSource$
-    let config: SourceTrackerConfig;
-    let transactionsProvider: SimpleProvider<DirectionalTransaction[]>;
+    let retryBackoffConfig: RetryBackoffConfig;
+    let walletProvider: WalletProvider;
+    let addresses: Cardano.Address[];
 
     it('observable properties behave correctly on successful transaction', async () => {
       const outgoingTx = queryTransactionsResult[0];
@@ -39,17 +40,18 @@ describe('TransactionsTracker', () => {
           a: [],
           b: [incomingDirectionalTx],
           c: [incomingDirectionalTx, outgoingDirectionalTx]
-        }) as unknown as ProviderTrackerSubject<DirectionalTransaction[]>;
+        }) as unknown as SyncableIntervalTrackerSubject<DirectionalTransaction[]>;
         const transactionsTracker = createTransactionsTracker(
           {
-            config,
+            addresses,
             newTransactions: {
               failedToSubmit$,
               pending$,
               submitting$
             },
+            retryBackoffConfig,
             tip$,
-            transactionsProvider
+            walletProvider
           },
           {
             transactionsSource$
@@ -81,17 +83,18 @@ describe('TransactionsTracker', () => {
         const tip$ = hot<Cardano.Tip>(          '---a|', { a: tip });
         const submitting$ = cold(               '-a--|', { a: tx });
         const pending$ = cold(                  '--a-|', { a: tx });
-        const transactionsSource$ = cold(       '----|') as unknown as ProviderTrackerSubject<DirectionalTransaction[]>;
+        const transactionsSource$ = cold(       '----|')as unknown as TrackerSubject<DirectionalTransaction[]>;
         const transactionsTracker = createTransactionsTracker(
           {
-            config,
+            addresses,
             newTransactions: {
               failedToSubmit$,
               pending$,
               submitting$
             },
+            retryBackoffConfig,
             tip$,
-            transactionsProvider
+            walletProvider
           },
           {
             transactionsSource$
@@ -114,17 +117,18 @@ describe('TransactionsTracker', () => {
         const tip$ = hot<Cardano.Tip>(        '----|');
         const submitting$ = cold(             '-a--|', { a: tx });
         const pending$ = cold(                '--a-|', { a: tx });
-        const transactionsSource$ = cold(     '----|') as unknown as ProviderTrackerSubject<DirectionalTransaction[]>;
+        const transactionsSource$ = cold(     '----|') as unknown as TrackerSubject<DirectionalTransaction[]>;
         const transactionsTracker = createTransactionsTracker(
           {
-            config,
+            addresses,
             newTransactions: {
               failedToSubmit$,
               pending$,
               submitting$
             },
+            retryBackoffConfig,
             tip$,
-            transactionsProvider
+            walletProvider
           },
           {
             transactionsSource$
@@ -140,4 +144,4 @@ describe('TransactionsTracker', () => {
       });
     });
   });
-  });
+});

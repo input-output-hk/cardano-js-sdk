@@ -1,12 +1,4 @@
-import {
-  Balance,
-  BehaviorObservable,
-  Delegation,
-  ProviderSubscription,
-  SourceTransactionalTracker,
-  TransactionalTracker,
-  Transactions
-} from './services';
+import { Balance, BehaviorObservable, Delegation, TransactionalTracker, Transactions } from './services';
 import { Cardano, NetworkInfo, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
 import { TxInternals } from './Transaction';
 
@@ -42,11 +34,11 @@ export interface FinalizeTxProps {
   readonly body: Cardano.TxBodyAlonzo;
 }
 
-export interface Wallet extends ProviderSubscription {
+export interface Wallet {
   name: string;
   readonly balance: TransactionalTracker<Balance>;
   readonly delegation: Delegation;
-  readonly utxo: SourceTransactionalTracker<Cardano.Utxo[]>;
+  readonly utxo: TransactionalTracker<Cardano.Utxo[]>;
   readonly transactions: Transactions;
   readonly tip$: BehaviorObservable<Cardano.Tip>;
   readonly genesisParameters$: BehaviorObservable<Cardano.CompactGenesis>;
@@ -56,4 +48,6 @@ export interface Wallet extends ProviderSubscription {
   initializeTx(props: InitializeTxProps): Promise<TxInternals>;
   finalizeTx(props: TxInternals): Promise<Cardano.NewTxAlonzo>;
   submitTx(tx: Cardano.NewTxAlonzo): Promise<void>;
+  sync(): void;
+  shutdown(): void;
 }

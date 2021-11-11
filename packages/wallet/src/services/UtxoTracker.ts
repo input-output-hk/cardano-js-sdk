@@ -1,33 +1,40 @@
 import { Cardano, WalletProvider } from '@cardano-sdk/core';
-import { Observable, combineLatest, from, map } from 'rxjs';
-import { ProviderTrackerSubject, SourceTrackerConfig, TrackerSubject, sharedDistinctBlock, utxoEquals } from './util';
-import { SimpleProvider, SourceTransactionalTracker } from './types';
+import { Observable, combineLatest, map } from 'rxjs';
+import { RetryBackoffConfig } from 'backoff-rxjs';
+import { TrackerSubject, coldObservableProvider, utxoEquals } from './util';
+import { TransactionalTracker } from './types';
 
 export interface UtxoTrackerProps {
-  utxoProvider: SimpleProvider<Cardano.Utxo[]>;
+  walletProvider: WalletProvider;
+  addresses: Cardano.Address[];
   transactionsInFlight$: Observable<Cardano.NewTxAlonzo[]>;
-  tip$: Observable<Cardano.Tip>;
-  config: SourceTrackerConfig;
+  tipBlockHeight$: Observable<number>;
+  retryBackoffConfig: RetryBackoffConfig;
 }
 
 export interface UtxoTrackerInternals {
-  utxoSource$?: ProviderTrackerSubject<Cardano.Utxo[]>;
+  utxoSource$?: TrackerSubject<Cardano.Utxo[]>;
 }
 
-export const createUtxoProvider =
-  (walletProvider: WalletProvider, addresses: Cardano.Address[]): (() => Observable<Cardano.Utxo[]>) =>
-  () =>
-    from(walletProvider.utxoDelegationAndRewards(addresses, '').then(({ utxo }) => utxo));
+export const createUtxoProvider = (
+  walletProvider: WalletProvider,
+  addresses: Cardano.Address[],
+  tipBlockHeight$: Observable<number>,
+  retryBackoffConfig: RetryBackoffConfig
+) =>
+  coldObservableProvider(
+    () => walletProvider.utxoDelegationAndRewards(addresses, '').then(({ utxo }) => utxo),
+    retryBackoffConfig,
+    tipBlockHeight$,
+    utxoEquals
+  );
 
 export const createUtxoTracker = (
-  { utxoProvider, transactionsInFlight$, config, tip$ }: UtxoTrackerProps,
+  { walletProvider, addresses, transactionsInFlight$, retryBackoffConfig, tipBlockHeight$ }: UtxoTrackerProps,
   {
-    utxoSource$ = new ProviderTrackerSubject(
-      { config, equals: utxoEquals, provider: utxoProvider },
-      { trigger$: sharedDistinctBlock(tip$) }
-    )
+    utxoSource$ = new TrackerSubject(createUtxoProvider(walletProvider, addresses, tipBlockHeight$, retryBackoffConfig))
   }: UtxoTrackerInternals = {}
-): SourceTransactionalTracker<Cardano.Utxo[]> => {
+): TransactionalTracker<Cardano.Utxo[]> => {
   const available$ = new TrackerSubject<Cardano.Utxo[]>(
     combineLatest([utxoSource$, transactionsInFlight$]).pipe(
       // filter to utxo that are not included in in-flight transactions
@@ -47,9 +54,7 @@ export const createUtxoTracker = (
       utxoSource$.complete();
       available$.complete();
     },
-
-    sync: () => utxoSource$.sync(),
-    // Currently querying ALL utxo. In the future this will not be providerUtxo$,
+    // Currently querying ALL utxo. In the future this will not be utxoSource$,
     // as the initial utxo set will be loaded from storage.
     // Same pattern in TransactionsTracker.
     total$: utxoSource$

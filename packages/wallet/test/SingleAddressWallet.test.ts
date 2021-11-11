@@ -116,25 +116,10 @@ describe('SingleAddressWallet', () => {
 
   it('sync() calls wallet provider functions until shutdown()', () => {
     expect(walletProvider.ledgerTip).toHaveBeenCalledTimes(1);
-    expect(walletProvider.networkInfo).toHaveBeenCalledTimes(1);
-    expect(walletProvider.currentWalletProtocolParameters).toHaveBeenCalledTimes(1);
-    expect(walletProvider.genesisParameters).toHaveBeenCalledTimes(1);
-    expect(walletProvider.queryTransactionsByAddresses).toHaveBeenCalledTimes(1);
-    expect(walletProvider.utxoDelegationAndRewards).toHaveBeenCalledTimes(2); // one call for utxo, one for rewards
     wallet.sync();
     expect(walletProvider.ledgerTip).toHaveBeenCalledTimes(2);
-    expect(walletProvider.networkInfo).toHaveBeenCalledTimes(2);
-    expect(walletProvider.currentWalletProtocolParameters).toHaveBeenCalledTimes(2);
-    expect(walletProvider.genesisParameters).toHaveBeenCalledTimes(2);
-    expect(walletProvider.queryTransactionsByAddresses).toHaveBeenCalledTimes(2);
-    expect(walletProvider.utxoDelegationAndRewards).toHaveBeenCalledTimes(4);
     wallet.shutdown();
     wallet.sync();
     expect(walletProvider.ledgerTip).toHaveBeenCalledTimes(2);
-    expect(walletProvider.networkInfo).toHaveBeenCalledTimes(2);
-    expect(walletProvider.currentWalletProtocolParameters).toHaveBeenCalledTimes(2);
-    expect(walletProvider.genesisParameters).toHaveBeenCalledTimes(2);
-    expect(walletProvider.queryTransactionsByAddresses).toHaveBeenCalledTimes(2);
-    expect(walletProvider.utxoDelegationAndRewards).toHaveBeenCalledTimes(4);
   });
 });

@@ -7,25 +7,23 @@ export interface Balance extends Cardano.Value {
   rewards: Cardano.Lovelace;
 }
 
-export interface ProviderSubscription {
-  sync(): void;
-  shutdown(): void;
-}
-
-export interface TransactionalTracker<T> {
+export interface TransactionalObservables<T> {
   total$: BehaviorObservable<T>;
   available$: BehaviorObservable<T>;
 }
 
+export interface TransactionalTracker<T> extends TransactionalObservables<T> {
+  shutdown(): void;
+}
+
 export type Milliseconds = number;
 
-export type SourceTransactionalTracker<T> = ProviderSubscription & TransactionalTracker<T>;
 export interface PollingConfig {
-  readonly interval: Milliseconds;
+  readonly interval?: Milliseconds;
   /**
    * Max timeout for exponential backoff on errors
    */
-  readonly maxInterval: Milliseconds;
+  readonly maxInterval?: Milliseconds;
 }
 
 export enum TransactionDirection {
@@ -43,7 +41,7 @@ export interface FailedTx {
   reason: TransactionFailure;
 }
 
-export interface Transactions extends ProviderSubscription {
+export interface Transactions {
   readonly history: {
     all$: BehaviorObservable<DirectionalTransaction[]>;
     outgoing$: BehaviorObservable<Cardano.TxAlonzo[]>;
@@ -57,6 +55,7 @@ export interface Transactions extends ProviderSubscription {
     readonly confirmed$: Observable<Cardano.NewTxAlonzo>;
   };
   readonly incoming$: Observable<Cardano.TxAlonzo>;
+  shutdown(): void;
 }
 
 export interface RewardsHistory {
@@ -77,5 +76,3 @@ export interface Delegation {
   delegatee$: BehaviorObservable<Delegatee>;
   shutdown(): void;
 }
-
-export type SimpleProvider<T> = () => Observable<T>;

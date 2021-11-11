@@ -4,15 +4,6 @@ import { createStubTxWithCertificates } from './stub-tx';
 import { createTestScheduler } from '../../testScheduler';
 import { rewardsHistory } from '../../mocks';
 
-// TODO: use this to test retryBackoff
-// const stubObservableProvider = <T>(...calls: Observable<T>[]) => {
-//   let numCall = 0;
-//   return new Observable<T>((subscriber) => {
-//     const sub = calls[numCall++].subscribe(subscriber);
-//     return () => sub.unsubscribe();
-//   });
-// };
-
 describe('RewardsHistory', () => {
   describe('createRewardsHistoryTracker', () => {
     it('queries and maps reward history starting from first delgation epoch+2', () => {

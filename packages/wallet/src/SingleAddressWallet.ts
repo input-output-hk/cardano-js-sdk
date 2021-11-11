@@ -3,23 +3,18 @@ import {
   Balance,
   BehaviorObservable,
   Delegation,
-  DirectionalTransaction,
   FailedTx,
   PollingConfig,
-  ProviderTrackerSubject,
-  SimpleProvider,
-  SourceTrackerConfig,
-  SourceTransactionalTracker,
+  SyncableIntervalTrackerSubject,
+  TrackerSubject,
   TransactionFailure,
   TransactionalTracker,
   Transactions,
-  createAddressTransactionsProvider,
+  coldObservableProvider,
   createBalanceTracker,
   createDelegationTracker,
-  createRewardsProvider,
   createRewardsTracker,
   createTransactionsTracker,
-  createUtxoProvider,
   createUtxoTracker,
   sharedDistinctBlock,
   sharedDistinctEpoch
@@ -43,6 +38,8 @@ import { isEqual } from 'lodash-es';
 export interface SingleAddressWalletProps {
   readonly name: string;
   readonly polling?: PollingConfig;
+  readonly address?: Address;
+  readonly retryBackoffConfig?: RetryBackoffConfig;
 }
 
 export interface SingleAddressWalletDependencies {
@@ -53,37 +50,23 @@ export interface SingleAddressWalletDependencies {
   readonly logger?: Logger;
 }
 
-export interface SingleAddressWalletConfiguration {
-  readonly address?: Address;
-  readonly utxoProvider?: SimpleProvider<Cardano.Utxo[]>;
-  readonly tipProvider?: SimpleProvider<Cardano.Tip>;
-  readonly networkInfoProvider?: SimpleProvider<NetworkInfo>;
-  readonly rewardsProvider?: SimpleProvider<Cardano.Lovelace>;
-  readonly protocolParametersProvider?: SimpleProvider<ProtocolParametersRequiredByWallet>;
-  readonly genesisParametersProvider?: SimpleProvider<Cardano.CompactGenesis>;
-  readonly transactionsProvider?: SimpleProvider<DirectionalTransaction[]>;
-  readonly sourceTrackerConfig?: SourceTrackerConfig;
-  // TODO: use this in place of sourceTrackerConfig for ProviderTrackerSubject
-  readonly retryBackoffConfig?: RetryBackoffConfig;
-}
-
 export class SingleAddressWallet implements Wallet {
   #inputSelector: InputSelector;
   #keyManager: KeyManager;
   #walletProvider: WalletProvider;
   #address: Address;
   #logger: Logger;
-  #tip$: ProviderTrackerSubject<Cardano.Tip>;
-  #networkInfo$: ProviderTrackerSubject<NetworkInfo>;
-  #protocolParameters$: ProviderTrackerSubject<ProtocolParametersRequiredByWallet>;
-  #genesisParameters$: ProviderTrackerSubject<Cardano.CompactGenesis>;
+  #tip$: SyncableIntervalTrackerSubject<Cardano.Tip>;
+  #networkInfo$: TrackerSubject<NetworkInfo>;
+  #protocolParameters$: TrackerSubject<ProtocolParametersRequiredByWallet>;
+  #genesisParameters$: TrackerSubject<Cardano.CompactGenesis>;
   #newTransactions = {
     failedToSubmit$: new Subject<FailedTx>(),
     pending$: new Subject<Cardano.NewTxAlonzo>(),
     submitting$: new Subject<Cardano.NewTxAlonzo>()
   };
-  #rewards: SourceTransactionalTracker<Cardano.Lovelace>;
-  utxo: SourceTransactionalTracker<Cardano.Utxo[]>;
+  #rewards: TransactionalTracker<Cardano.Lovelace>;
+  utxo: TransactionalTracker<Cardano.Utxo[]>;
   balance: TransactionalTracker<Balance>;
   transactions: Transactions;
   delegation: Delegation;
@@ -96,7 +79,12 @@ export class SingleAddressWallet implements Wallet {
   constructor(
     {
       name,
-      polling: { interval, maxInterval } = { interval: 15_000, maxInterval: 15_000 * 10 }
+      polling: { interval: pollInterval = 15_000, maxInterval = 15_000 * 10 } = {},
+      address,
+      retryBackoffConfig = {
+        initialInterval: Math.min(pollInterval, 1000),
+        maxInterval
+      }
     }: SingleAddressWalletProps,
     {
       walletProvider,
@@ -104,85 +92,55 @@ export class SingleAddressWallet implements Wallet {
       keyManager,
       logger = dummyLogger,
       inputSelector = roundRobinRandomImprove()
-    }: SingleAddressWalletDependencies,
-    {
-      address = {
-        accountIndex: 0,
-        bech32: keyManager.deriveAddress(0, 0),
-        index: 0,
-        type: AddressType.External
-      },
-      utxoProvider = createUtxoProvider(walletProvider, [address.bech32]),
-      tipProvider = () => from(walletProvider.ledgerTip()),
-      networkInfoProvider = () => from(walletProvider.networkInfo()),
-      rewardsProvider = createRewardsProvider(walletProvider, keyManager),
-      transactionsProvider = createAddressTransactionsProvider(walletProvider, [address.bech32]),
-      protocolParametersProvider = () => from(walletProvider.currentWalletProtocolParameters()),
-      genesisParametersProvider = () => from(walletProvider.genesisParameters()),
-      sourceTrackerConfig: config = {
-        maxInterval,
-        pollInterval: interval
-      },
-      retryBackoffConfig = {
-        initialInterval: Math.min(interval, 1000),
-        maxInterval
-      }
-    }: SingleAddressWalletConfiguration = {}
+    }: SingleAddressWalletDependencies
   ) {
     this.#logger = logger;
     this.#inputSelector = inputSelector;
     this.#walletProvider = walletProvider;
     this.#keyManager = keyManager;
-    this.#address = address;
+    this.#address = address || {
+      accountIndex: 0,
+      bech32: keyManager.deriveAddress(0, 0),
+      index: 0,
+      type: AddressType.External
+    };
     this.name = name;
-    this.#tip$ = this.tip$ = new ProviderTrackerSubject({ config, equals: isEqual, provider: tipProvider });
-    const block$ = sharedDistinctBlock(this.tip$);
-    this.#networkInfo$ = this.networkInfo$ = new ProviderTrackerSubject(
-      {
-        config,
-        equals: isEqual,
-        provider: networkInfoProvider
-      },
-      { trigger$: block$ }
+    this.#tip$ = this.tip$ = new SyncableIntervalTrackerSubject({
+      pollInterval,
+      provider$: coldObservableProvider(walletProvider.ledgerTip, retryBackoffConfig)
+    });
+    const tipBlockHeight$ = sharedDistinctBlock(this.tip$);
+    this.#networkInfo$ = this.networkInfo$ = new TrackerSubject(
+      coldObservableProvider(walletProvider.networkInfo, retryBackoffConfig, tipBlockHeight$, isEqual)
     );
     const epoch$ = sharedDistinctEpoch(this.networkInfo$);
-    this.#protocolParameters$ = this.protocolParameters$ = new ProviderTrackerSubject(
-      {
-        config,
-        equals: isEqual,
-        provider: protocolParametersProvider
-      },
-      {
-        trigger$: epoch$
-      }
+    this.#protocolParameters$ = this.protocolParameters$ = new TrackerSubject(
+      coldObservableProvider(walletProvider.currentWalletProtocolParameters, retryBackoffConfig, epoch$, isEqual)
     );
-    this.#genesisParameters$ = this.genesisParameters$ = new ProviderTrackerSubject(
-      {
-        config,
-        equals: isEqual,
-        provider: genesisParametersProvider
-      },
-      {
-        trigger$: epoch$
-      }
+    this.#genesisParameters$ = this.genesisParameters$ = new TrackerSubject(
+      coldObservableProvider(walletProvider.genesisParameters, retryBackoffConfig, epoch$, isEqual)
     );
+    const addresses = this.addresses.map(({ bech32 }) => bech32);
     this.transactions = createTransactionsTracker({
-      config,
+      addresses,
       newTransactions: this.#newTransactions,
+      retryBackoffConfig,
       tip$: this.tip$,
-      transactionsProvider
+      walletProvider
     });
     this.utxo = createUtxoTracker({
-      config,
-      tip$: this.tip$,
+      addresses,
+      retryBackoffConfig,
+      tipBlockHeight$,
       transactionsInFlight$: this.transactions.outgoing.inFlight$,
-      utxoProvider
+      walletProvider
     });
     this.#rewards = createRewardsTracker({
-      config,
-      networkInfo$: this.networkInfo$,
-      rewardsProvider,
-      transactionsInFlight$: this.transactions.outgoing.inFlight$
+      epoch$,
+      keyManager,
+      retryBackoffConfig,
+      transactionsInFlight$: this.transactions.outgoing.inFlight$,
+      walletProvider
     });
     this.balance = createBalanceTracker(this.utxo, this.#rewards);
     this.delegation = createDelegationTracker({
@@ -262,21 +220,16 @@ export class SingleAddressWallet implements Wallet {
     }
   }
   sync() {
-    this.#rewards.sync();
-    this.utxo.sync();
-    this.transactions.sync();
     this.#tip$.sync();
-    this.#networkInfo$.sync();
-    this.#protocolParameters$.sync();
-    this.#genesisParameters$.sync();
   }
   shutdown() {
+    this.balance.shutdown();
     this.#rewards.shutdown();
     this.utxo.shutdown();
     this.transactions.shutdown();
-    this.#tip$.complete();
     this.#networkInfo$.complete();
     this.#protocolParameters$.complete();
     this.#genesisParameters$.complete();
+    this.#tip$.complete();
   }
 }
