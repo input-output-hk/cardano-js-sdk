@@ -1,8 +1,8 @@
-import { BigIntMath, Cardano, WalletProvider } from '@cardano-sdk/core';
+import { BigIntMath, Cardano, WalletProvider, util } from '@cardano-sdk/core';
 import { KeyManager } from '../../KeyManagement';
 import { Observable, distinctUntilChanged, filter, map, switchMap } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { TxWithEpoch, isNotNil, transactionHasAnyCertificate } from './util';
+import { TxWithEpoch, transactionHasAnyCertificate } from './util';
 import { coldObservableProvider } from '../util';
 import { first } from 'lodash-es';
 
@@ -24,7 +24,7 @@ const firstDelegationEpoch$ = (transactions$: Observable<TxWithEpoch[]>) =>
         transactions.filter(({ tx }) => transactionHasAnyCertificate(tx, [Cardano.CertificateType.StakeDelegation]))
       )
     ),
-    filter(isNotNil),
+    filter(util.isNotNil),
     map(({ epoch }) => epoch + 2),
     distinctUntilChanged()
   );

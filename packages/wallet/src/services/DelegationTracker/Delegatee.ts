@@ -1,8 +1,8 @@
-import { Cardano, StakePoolSearchProvider } from '@cardano-sdk/core';
+import { Cardano, StakePoolSearchProvider, util } from '@cardano-sdk/core';
 import { Delegatee } from '../types';
 import { Observable, combineLatest, map, switchMap } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { TxWithEpoch, isNotNil, transactionHasAnyCertificate } from './util';
+import { TxWithEpoch, transactionHasAnyCertificate } from './util';
 import { coldObservableProvider } from '../util';
 import { findLast, uniq } from 'lodash-es';
 
@@ -47,7 +47,7 @@ export const createDelegateeTracker = (
   combineLatest([transactions$, epoch$]).pipe(
     switchMap(([transactions, lastEpoch]) => {
       const stakePoolIds = [lastEpoch, lastEpoch + 1, lastEpoch + 2].map(getStakePoolIdAtEpoch(transactions));
-      return stakePoolSearchProvider(uniq(stakePoolIds.filter(isNotNil))).pipe(
+      return stakePoolSearchProvider(uniq(stakePoolIds.filter(util.isNotNil))).pipe(
         map((stakePools) => stakePoolIds.map((poolId) => stakePools.find((pool) => pool.id === poolId) || null)),
         map(([currentEpoch, nextEpoch, nextNextEpoch]) => ({ currentEpoch, nextEpoch, nextNextEpoch }))
       );
