@@ -32,7 +32,10 @@ export const createInMemoryKeyManager = ({
   const privateParentKey = accountPrivateKey.derive(0).derive(0);
   const publicParentKey = privateParentKey.to_public();
   const publicKey = accountPrivateKey.to_public();
+
   const stakeKey = publicKey.derive(2).derive(0);
+  const stakeKeyRaw = stakeKey.to_raw_key();
+  const stakeKeyCredential = CSL.StakeCredential.from_keyhash(stakeKeyRaw.hash());
 
   return {
     deriveAddress: (addressIndex, index) => {
@@ -40,13 +43,14 @@ export const createInMemoryKeyManager = ({
       const baseAddr = CSL.BaseAddress.new(
         networkId,
         CSL.StakeCredential.from_keyhash(utxoPubKey.to_raw_key().hash()),
-        CSL.StakeCredential.from_keyhash(stakeKey.to_raw_key().hash())
+        stakeKeyCredential
       );
 
       return baseAddr.to_address().to_bech32();
     },
     publicKey: publicKey.to_raw_key(),
     publicParentKey: publicParentKey.to_raw_key(),
+    rewardAccount: CSL.RewardAddress.new(networkId, stakeKeyCredential).to_address().to_bech32(),
     signMessage: async (_addressType, _signingIndex, message) => ({
       publicKey: publicParentKey.toString(),
       signature: `Signature for ${message} is not implemented yet`
@@ -58,6 +62,6 @@ export const createInMemoryKeyManager = ({
         [vkeyWitness.vkey().public_key().to_bech32()]: vkeyWitness.signature().to_hex()
       };
     },
-    stakeKey: stakeKey.to_raw_key()
+    stakeKey: stakeKeyRaw
   };
 };
