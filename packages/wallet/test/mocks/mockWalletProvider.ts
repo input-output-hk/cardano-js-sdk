@@ -167,7 +167,7 @@ export const genesisParameters = {
  *
  * returns WalletProvider-compatible object
  */
-export const providerStub = (): WalletProvider => ({
+export const mockWalletProvider = (): WalletProvider => ({
   currentWalletProtocolParameters: jest.fn().mockResolvedValue(protocolParameters),
   genesisParameters: jest.fn().mockResolvedValue(genesisParameters),
   ledgerTip: jest.fn().mockResolvedValue(ledgerTip),
@@ -198,4 +198,4 @@ export const providerStub = (): WalletProvider => ({
   utxoDelegationAndRewards: jest.fn().mockResolvedValue({ delegationAndRewards, utxo })
 });
 
-export type ProviderStub = ReturnType<typeof providerStub>;
+export type ProviderStub = ReturnType<typeof mockWalletProvider>;

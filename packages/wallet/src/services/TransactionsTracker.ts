@@ -1,12 +1,11 @@
 import { Cardano, WalletProvider } from '@cardano-sdk/core';
-import { DirectionalTransaction, FailedTx, SimpleProvider, TransactionDirection, Transactions } from './types';
+import { DirectionalTransaction, FailedTx, TransactionDirection, Transactions } from './types';
 import {
   EMPTY,
   Observable,
   concat,
   distinctUntilChanged,
   filter,
-  from,
   map,
   merge,
   mergeMap,
@@ -19,20 +18,17 @@ import {
   takeUntil,
   tap
 } from 'rxjs';
-import {
-  ProviderTrackerSubject,
-  SourceTrackerConfig,
-  directionalTransactionsEquals,
-  sharedDistinctBlock
-} from './util';
+import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TrackerSubject } from './util/TrackerSubject';
 import { TransactionFailure } from './TransactionError';
-import { flatten, sortBy } from 'lodash-es';
+import { coldObservableProvider, sharedDistinctBlock, transactionsEquals } from './util';
+import { sortBy } from 'lodash-es';
 
 export interface TransactionsTrackerProps {
+  walletProvider: WalletProvider;
+  addresses: Cardano.Address[];
   tip$: Observable<Cardano.Tip>;
-  transactionsProvider: SimpleProvider<DirectionalTransaction[]>;
-  config: SourceTrackerConfig;
+  retryBackoffConfig: RetryBackoffConfig;
   newTransactions: {
     submitting$: Observable<Cardano.NewTxAlonzo>;
     pending$: Observable<Cardano.NewTxAlonzo>;
@@ -41,32 +37,36 @@ export interface TransactionsTrackerProps {
 }
 
 export interface TransactionsTrackerInternals {
-  transactionsSource$?: ProviderTrackerSubject<DirectionalTransaction[]>;
+  transactionsSource$?: TrackerSubject<DirectionalTransaction[]>;
 }
 
-export const createAddressTransactionsProvider =
-  (walletProvider: WalletProvider, addresses: Cardano.Address[]): SimpleProvider<DirectionalTransaction[]> =>
-  () => {
-    const isMyAddress = ({ address }: { address: Cardano.Address }) => addresses.includes(address);
-    return from(
-      walletProvider.queryTransactionsByAddresses(addresses).then((transactions) =>
-        flatten(
-          sortBy(
-            transactions,
-            ({ blockHeader: { blockHeight } }) => blockHeight,
-            ({ index }) => index
-          ).map((tx) => {
-            const {
-              body: { inputs, outputs }
-            } = tx;
-            const incoming = outputs.some(isMyAddress) ? [{ direction: TransactionDirection.Incoming, tx }] : [];
-            const outgoing = inputs.some(isMyAddress) ? [{ direction: TransactionDirection.Outgoing, tx }] : [];
-            return [...incoming, ...outgoing];
-          })
-        )
-      )
-    );
-  };
+export const createAddressTransactionsProvider = (
+  walletProvider: WalletProvider,
+  addresses: Cardano.Address[],
+  retryBackoffConfig: RetryBackoffConfig,
+  tipBlockHeight$: Observable<number>
+): Observable<DirectionalTransaction[]> => {
+  const isMyAddress = ({ address }: { address: Cardano.Address }) => addresses.includes(address);
+  return coldObservableProvider(
+    () => walletProvider.queryTransactionsByAddresses(addresses),
+    retryBackoffConfig,
+    tipBlockHeight$,
+    transactionsEquals
+  ).pipe(
+    map((transactions) =>
+      sortBy(
+        transactions,
+        ({ blockHeader: { blockHeight } }) => blockHeight,
+        ({ index }) => index
+      ).map((tx) => {
+        const direction = tx.body.inputs.some(isMyAddress)
+          ? TransactionDirection.Outgoing
+          : TransactionDirection.Incoming;
+        return { direction, tx };
+      })
+    )
+  );
+};
 
 const newTransactions$ = (transactions$: Observable<Cardano.TxAlonzo[]>) =>
   transactions$.pipe(
@@ -85,27 +85,21 @@ const newTransactions$ = (transactions$: Observable<Cardano.TxAlonzo[]>) =>
 export const createTransactionsTracker = (
   {
     tip$,
-    transactionsProvider,
+    walletProvider,
+    addresses,
     newTransactions: { submitting$, pending$, failedToSubmit$ },
-    config
+    retryBackoffConfig
   }: TransactionsTrackerProps,
   {
-    transactionsSource$ = new ProviderTrackerSubject(
-      {
-        config,
-        equals: directionalTransactionsEquals,
-        provider: transactionsProvider
-      },
-      {
-        trigger$: sharedDistinctBlock(tip$)
-      }
+    transactionsSource$ = new TrackerSubject(
+      createAddressTransactionsProvider(walletProvider, addresses, retryBackoffConfig, sharedDistinctBlock(tip$))
     )
   }: TransactionsTrackerInternals = {}
 ): Transactions => {
   const providerTransactionsByDirection$ = (direction: TransactionDirection) =>
     transactionsSource$.pipe(
       map((transactions) => transactions.filter((tx) => tx.direction === direction).map(({ tx }) => tx)),
-      distinctUntilChanged((a, b) => a.length === b.length && a.every((tx) => b.includes(tx)))
+      distinctUntilChanged(transactionsEquals)
     );
   const incomingTransactionHistory$ = new TrackerSubject<Cardano.TxAlonzo[]>(
     providerTransactionsByDirection$(TransactionDirection.Incoming)
@@ -183,7 +177,6 @@ export const createTransactionsTracker = (
     shutdown: () => {
       transactionsSource$.complete();
       inFlight$.complete();
-    },
-    sync: () => transactionsSource$.sync()
+    }
   };
 };

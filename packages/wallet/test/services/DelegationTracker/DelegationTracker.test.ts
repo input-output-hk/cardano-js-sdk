@@ -33,7 +33,6 @@ describe('DelegationTracker', () => {
 
   describe('certificateTransactionsWithEpochs', () => {
     it('emits outgoing transactions containing given certificate types, retries on error', () => {
-      // TODO: test error after moving getEpoch$ to WalletProvider
       createTestScheduler().run(({ cold, expectObservable }) => {
         const transactions = [
           createStubTxWithCertificates([Cardano.CertificateType.StakeRegistration]),

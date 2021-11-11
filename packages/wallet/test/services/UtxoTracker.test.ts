@@ -1,17 +1,18 @@
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, WalletProvider } from '@cardano-sdk/core';
 import { Observable } from 'rxjs';
-import { ProviderTrackerSubject, SourceTrackerConfig, createUtxoProvider, createUtxoTracker } from '../../src/services';
+import { RetryBackoffConfig } from 'backoff-rxjs';
+import { SyncableIntervalTrackerSubject, createUtxoTracker } from '../../src/services';
 import { createTestScheduler } from '../testScheduler';
-import { providerStub, utxo } from '../mocks';
+import { utxo } from '../mocks';
 
 describe('createUtxoTracker', () => {
-  // both variables are not relevant for this test, overwriting rewardsSource$
-  let config: SourceTrackerConfig;
-  let tip$: Observable<Cardano.Tip>;
+  // these variables are not relevant for this test, overwriting rewardsSource$
+  let retryBackoffConfig: RetryBackoffConfig;
+  let tipBlockHeight$: Observable<number>;
+  let walletProvider: WalletProvider;
 
   it('fetches utxo from WalletProvider and locks when spent in a transaction in flight', () => {
     const address = utxo[0][0].address;
-    const provider = providerStub();
     createTestScheduler().run(({ cold, expectObservable }) => {
       const transactionsInFlight$ = cold('-a-b|', {
         a: [],
@@ -25,12 +26,13 @@ describe('createUtxoTracker', () => {
       });
       const utxoTracker = createUtxoTracker(
         {
-          config,
-          tip$,
+          addresses: [address],
+          retryBackoffConfig,
+          tipBlockHeight$,
           transactionsInFlight$,
-          utxoProvider: createUtxoProvider(provider, [address])
+          walletProvider
         },
-        { utxoSource$: cold('a---|', { a: utxo }) as unknown as ProviderTrackerSubject<Cardano.Utxo[]> }
+        { utxoSource$: cold('a---|', { a: utxo }) as unknown as SyncableIntervalTrackerSubject<Cardano.Utxo[]> }
       );
       expectObservable(utxoTracker.total$).toBe('a---|', { a: utxo });
       expectObservable(utxoTracker.available$).toBe('-a-b|', {

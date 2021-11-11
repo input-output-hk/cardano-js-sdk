@@ -1,10 +1,19 @@
-import { Observable, from } from 'rxjs';
+import { Observable, distinctUntilChanged, from, of, switchMap } from 'rxjs';
 import { RetryBackoffConfig, retryBackoff } from 'backoff-rxjs';
+import { strictEquals } from './equals';
 
-// TODO: use this when converting providers from functions to cold observables
-export const coldObservableProvider = <T>(provider: () => Promise<T>, retryBackoffConfig: RetryBackoffConfig) =>
+export const coldObservableProvider = <T>(
+  provider: () => Promise<T>,
+  retryBackoffConfig: RetryBackoffConfig,
+  trigger$: Observable<unknown> = of(true),
+  equals: (t1: T, t2: T) => boolean = strictEquals
+) =>
   new Observable<T>((subscriber) => {
-    const promise = provider();
-    const sub = from(promise).pipe(retryBackoff(retryBackoffConfig)).subscribe(subscriber);
+    const sub = trigger$
+      .pipe(
+        switchMap(() => from(provider()).pipe(retryBackoff(retryBackoffConfig))),
+        distinctUntilChanged(equals)
+      )
+      .subscribe(subscriber);
     return () => sub.unsubscribe();
   });

@@ -2,7 +2,7 @@ import { CreateTxInternalsProps, createTransactionInternals } from '../../src/Tr
 import { SelectionConstraints } from '@cardano-sdk/util-dev';
 import { SelectionSkeleton, roundRobinRandomImprove } from '@cardano-sdk/cip2';
 import { WalletProvider, coreToCsl } from '@cardano-sdk/core';
-import { providerStub, utxo } from '../mocks';
+import { mockWalletProvider, utxo } from '../mocks';
 
 const address =
   'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g';
@@ -18,7 +18,7 @@ describe('Transaction.createTransactionInternals', () => {
   let provider: WalletProvider;
 
   beforeEach(() => {
-    provider = providerStub();
+    provider = mockWalletProvider();
   });
 
   const createSimpleTransactionInternals = async (

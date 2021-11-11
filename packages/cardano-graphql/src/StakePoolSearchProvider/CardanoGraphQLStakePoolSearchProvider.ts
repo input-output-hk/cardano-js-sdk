@@ -1,7 +1,6 @@
 import { Cardano, ProviderError, ProviderFailure, StakePoolSearchProvider, util } from '@cardano-sdk/core';
 import { GraphQLClient } from 'graphql-request';
 import { getSdk } from '../sdk';
-import { isNotNil } from '../util';
 
 export type GraphQLClien = GraphQLClient['options'];
 
@@ -16,7 +15,7 @@ export const createGraphQLStakePoolSearchProvider = (
     async queryStakePools(fragments: string[]): Promise<Cardano.StakePool[]> {
       const query = fragments.join(' ');
       try {
-        const byStakePoolFields = (await sdk.StakePools({ query })).queryStakePool?.filter(isNotNil);
+        const byStakePoolFields = (await sdk.StakePools({ query })).queryStakePool?.filter(util.isNotNil);
         const byMetadataFields = await sdk.StakePoolsByMetadata({
           omit: byStakePoolFields?.length ? byStakePoolFields?.map((sp) => sp.id) : undefined,
           query
@@ -24,7 +23,7 @@ export const createGraphQLStakePoolSearchProvider = (
         const responseStakePools = [
           ...(byStakePoolFields || []),
           ...(byMetadataFields.queryStakePoolMetadata || []).map((sp) => sp?.stakePool)
-        ].filter(isNotNil);
+        ].filter(util.isNotNil);
         return responseStakePools.map((responseStakePool) => {
           const stakePool = util.replaceNullsWithUndefineds(responseStakePool);
           return {
