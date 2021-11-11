@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>18/18</span>
+                <span class='fraction'>17/17</span>
             </div>
         
             
@@ -39,14 +39,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>10/10</span>
+                <span class='fraction'>9/9</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>15/15</span>
+                <span class='fraction'>13/13</span>
             </div>
         
             
@@ -114,31 +114,43 @@
 <a name='L55'></a><a href='#L55'>55</a>
 <a name='L56'></a><a href='#L56'>56</a>
 <a name='L57'></a><a href='#L57'>57</a>
-<a name='L58'></a><a href='#L58'>58</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">13x</span>
-<span class="cline-any cline-yes">13x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">13x</span>
-<span class="cline-any cline-yes">13x</span>
-<span class="cline-any cline-yes">16x</span>
-<span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">13x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">13x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">13x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -164,43 +176,48 @@
 <span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Cardano, WalletProvider } from '@cardano-sdk/core';
-import { Observable, combineLatest, from, map } from 'rxjs';
-import { ProviderTrackerSubject, SourceTrackerConfig, TrackerSubject, sharedDistinctBlock, utxoEquals } from './util';
-import { SimpleProvider, SourceTransactionalTracker } from './types';
+import { Observable, combineLatest, map } from 'rxjs';
+import { RetryBackoffConfig } from 'backoff-rxjs';
+import { TrackerSubject, coldObservableProvider, utxoEquals } from './util';
+import { TransactionalTracker } from './types';
 &nbsp;
 export interface UtxoTrackerProps {
-  utxoProvider: SimpleProvider&lt;Cardano.Utxo[]&gt;;
+  walletProvider: WalletProvider;
+  addresses: Cardano.Address[];
   transactionsInFlight$: Observable&lt;Cardano.NewTxAlonzo[]&gt;;
-  tip$: Observable&lt;Cardano.Tip&gt;;
-  config: SourceTrackerConfig;
+  tipBlockHeight$: Observable&lt;number&gt;;
+  retryBackoffConfig: RetryBackoffConfig;
 }
 &nbsp;
 export interface UtxoTrackerInternals {
-  utxoSource$?: ProviderTrackerSubject&lt;Cardano.Utxo[]&gt;;
+  utxoSource$?: TrackerSubject&lt;Cardano.Utxo[]&gt;;
 }
 &nbsp;
-export const createUtxoProvider =
-  (walletProvider: WalletProvider, addresses: Cardano.Address[]): (() =&gt; Observable&lt;Cardano.Utxo[]&gt;) =&gt;
-  () =&gt;
-    from(walletProvider.utxoDelegationAndRewards(addresses, '').then(({ utxo }) =&gt; utxo));
+export const createUtxoProvider = (
+  walletProvider: WalletProvider,
+  addresses: Cardano.Address[],
+  tipBlockHeight$: Observable&lt;number&gt;,
+  retryBackoffConfig: RetryBackoffConfig
+) =&gt;
+  coldObservableProvider(
+    () =&gt; walletProvider.utxoDelegationAndRewards(addresses, '').then(({ utxo }) =&gt; utxo),
+    retryBackoffConfig,
+    tipBlockHeight$,
+    utxoEquals
+  );
 &nbsp;
 export const createUtxoTracker = (
-  { utxoProvider, transactionsInFlight$, config, tip$ }: UtxoTrackerProps,
+  { walletProvider, addresses, transactionsInFlight$, retryBackoffConfig, tipBlockHeight$ }: UtxoTrackerProps,
   {
-    utxoSource$ = new ProviderTrackerSubject(
-      { config, equals: utxoEquals, provider: utxoProvider },
-      { trigger$: sharedDistinctBlock(tip$) }
-    )
+    utxoSource$ = new TrackerSubject(createUtxoProvider(walletProvider, addresses, tipBlockHeight$, retryBackoffConfig))
   }: UtxoTrackerInternals = {}
-): SourceTransactionalTracker&lt;Cardano.Utxo[]&gt; =&gt; {
+): TransactionalTracker&lt;Cardano.Utxo[]&gt; =&gt; {
   const available$ = new TrackerSubject&lt;Cardano.Utxo[]&gt;(
     combineLatest([utxoSource$, transactionsInFlight$]).pipe(
       // filter to utxo that are not included in in-flight transactions
@@ -220,9 +237,7 @@ export const createUtxoTracker = (
       utxoSource$.complete();
       available$.complete();
     },
-&nbsp;
-    sync: () =&gt; utxoSource$.sync(),
-    // Currently querying ALL utxo. In the future this will not be providerUtxo$,
+    // Currently querying ALL utxo. In the future this will not be utxoSource$,
     // as the initial utxo set will be loaded from storage.
     // Same pattern in TransactionsTracker.
     total$: utxoSource$
@@ -235,7 +250,7 @@ export const createUtxoTracker = (
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Wed Nov 10 2021 12:45:47 GMT+0000 (Coordinated Universal Time)
+                at Thu Nov 11 2021 14:47:19 GMT+0000 (Coordinated Universal Time)
             </div>
         </div>
         <script src="../../prettify.js"></script>

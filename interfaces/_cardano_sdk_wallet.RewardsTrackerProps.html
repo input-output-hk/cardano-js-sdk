@@ -83,10 +83,11 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_wallet.RewardsTrackerProps.html#config" class="tsd-kind-icon">config</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_wallet.RewardsTrackerProps.html#networkInfo_" class="tsd-kind-icon">network<wbr>Info$</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_wallet.RewardsTrackerProps.html#rewardsProvider" class="tsd-kind-icon">rewards<wbr>Provider</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_wallet.RewardsTrackerProps.html#epoch_" class="tsd-kind-icon">epoch$</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_wallet.RewardsTrackerProps.html#keyManager" class="tsd-kind-icon">key<wbr>Manager</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_wallet.RewardsTrackerProps.html#retryBackoffConfig" class="tsd-kind-icon">retry<wbr>Backoff<wbr>Config</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_wallet.RewardsTrackerProps.html#transactionsInFlight_" class="tsd-kind-icon">transactions<wbr>InFlight$</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_wallet.RewardsTrackerProps.html#walletProvider" class="tsd-kind-icon">wallet<wbr>Provider</a></li>
 							</ul>
 						</section>
 					</div>
@@ -95,32 +96,32 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="config" class="tsd-anchor"></a>
-					<h3>config</h3>
-					<div class="tsd-signature tsd-kind-icon">config<span class="tsd-signature-symbol">:</span> <a href="_cardano_sdk_wallet.SourceTrackerConfig.html" class="tsd-signature-type" data-tsd-kind="Interface">SourceTrackerConfig</a></div>
+					<a name="epoch_" class="tsd-anchor"></a>
+					<h3>epoch$</h3>
+					<div class="tsd-signature tsd-kind-icon">epoch$<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/9b68a47/packages/wallet/src/services/RewardsTracker.ts#L11">packages/wallet/src/services/RewardsTracker.ts:11</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/2a317f9/packages/wallet/src/services/RewardsTracker.ts#L28">packages/wallet/src/services/RewardsTracker.ts:28</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="networkInfo_" class="tsd-anchor"></a>
-					<h3>network<wbr>Info$</h3>
-					<div class="tsd-signature tsd-kind-icon">network<wbr>Info$<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">NetworkInfo</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<a name="keyManager" class="tsd-anchor"></a>
+					<h3>key<wbr>Manager</h3>
+					<div class="tsd-signature tsd-kind-icon">key<wbr>Manager<span class="tsd-signature-symbol">:</span> <a href="_cardano_sdk_wallet.KeyManagement.KeyManager.html" class="tsd-signature-type" data-tsd-kind="Interface">KeyManager</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/9b68a47/packages/wallet/src/services/RewardsTracker.ts#L10">packages/wallet/src/services/RewardsTracker.ts:10</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/2a317f9/packages/wallet/src/services/RewardsTracker.ts#L25">packages/wallet/src/services/RewardsTracker.ts:25</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="rewardsProvider" class="tsd-anchor"></a>
-					<h3>rewards<wbr>Provider</h3>
-					<div class="tsd-signature tsd-kind-icon">rewards<wbr>Provider<span class="tsd-signature-symbol">:</span> <a href="../modules/_cardano_sdk_wallet.html#SimpleProvider" class="tsd-signature-type" data-tsd-kind="Type alias">SimpleProvider</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">bigint</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<a name="retryBackoffConfig" class="tsd-anchor"></a>
+					<h3>retry<wbr>Backoff<wbr>Config</h3>
+					<div class="tsd-signature tsd-kind-icon">retry<wbr>Backoff<wbr>Config<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">RetryBackoffConfig</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/9b68a47/packages/wallet/src/services/RewardsTracker.ts#L8">packages/wallet/src/services/RewardsTracker.ts:8</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/2a317f9/packages/wallet/src/services/RewardsTracker.ts#L26">packages/wallet/src/services/RewardsTracker.ts:26</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -130,7 +131,17 @@
 					<div class="tsd-signature tsd-kind-icon">transactions<wbr>InFlight$<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">NewTxAlonzo</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/9b68a47/packages/wallet/src/services/RewardsTracker.ts#L9">packages/wallet/src/services/RewardsTracker.ts:9</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/2a317f9/packages/wallet/src/services/RewardsTracker.ts#L27">packages/wallet/src/services/RewardsTracker.ts:27</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="walletProvider" class="tsd-anchor"></a>
+					<h3>wallet<wbr>Provider</h3>
+					<div class="tsd-signature tsd-kind-icon">wallet<wbr>Provider<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">WalletProvider</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/2a317f9/packages/wallet/src/services/RewardsTracker.ts#L24">packages/wallet/src/services/RewardsTracker.ts:24</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -176,16 +187,19 @@
 						<a href="_cardano_sdk_wallet.RewardsTrackerProps.html" class="tsd-kind-icon">Rewards<wbr>Tracker<wbr>Props</a>
 						<ul>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_cardano_sdk_wallet.RewardsTrackerProps.html#config" class="tsd-kind-icon">config</a>
+								<a href="_cardano_sdk_wallet.RewardsTrackerProps.html#epoch_" class="tsd-kind-icon">epoch$</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_cardano_sdk_wallet.RewardsTrackerProps.html#networkInfo_" class="tsd-kind-icon">network<wbr>Info$</a>
+								<a href="_cardano_sdk_wallet.RewardsTrackerProps.html#keyManager" class="tsd-kind-icon">key<wbr>Manager</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_cardano_sdk_wallet.RewardsTrackerProps.html#rewardsProvider" class="tsd-kind-icon">rewards<wbr>Provider</a>
+								<a href="_cardano_sdk_wallet.RewardsTrackerProps.html#retryBackoffConfig" class="tsd-kind-icon">retry<wbr>Backoff<wbr>Config</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
 								<a href="_cardano_sdk_wallet.RewardsTrackerProps.html#transactionsInFlight_" class="tsd-kind-icon">transactions<wbr>InFlight$</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="_cardano_sdk_wallet.RewardsTrackerProps.html#walletProvider" class="tsd-kind-icon">wallet<wbr>Provider</a>
 							</li>
 						</ul>
 					</li>
@@ -206,7 +220,6 @@
 				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
 				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
 				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
-				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>

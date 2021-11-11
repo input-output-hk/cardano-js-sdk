@@ -91,14 +91,8 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_wallet.SourceTrackerProps.html#config" class="tsd-kind-icon">config</a></li>
-							</ul>
-						</section>
-						<section class="tsd-index-section ">
-							<h3>Methods</h3>
-							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_cardano_sdk_wallet.SourceTrackerProps.html#equals" class="tsd-kind-icon">equals</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_cardano_sdk_wallet.SourceTrackerProps.html#provider" class="tsd-kind-icon">provider</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_wallet.SourceTrackerProps.html#pollInterval" class="tsd-kind-icon">poll<wbr>Interval</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_wallet.SourceTrackerProps.html#provider_" class="tsd-kind-icon">provider$</a></li>
 							</ul>
 						</section>
 					</div>
@@ -107,60 +101,24 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="config" class="tsd-anchor"></a>
-					<h3>config</h3>
-					<div class="tsd-signature tsd-kind-icon">config<span class="tsd-signature-symbol">:</span> <a href="_cardano_sdk_wallet.SourceTrackerConfig.html" class="tsd-signature-type" data-tsd-kind="Interface">SourceTrackerConfig</a></div>
+					<a name="pollInterval" class="tsd-anchor"></a>
+					<h3>poll<wbr>Interval</h3>
+					<div class="tsd-signature tsd-kind-icon">poll<wbr>Interval<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/9b68a47/packages/wallet/src/services/util/ProviderTrackerSubject.ts#L24">packages/wallet/src/services/util/ProviderTrackerSubject.ts:24</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/2a317f9/packages/wallet/src/services/util/SyncableIntervalTrackerSubject.ts#L10">packages/wallet/src/services/util/SyncableIntervalTrackerSubject.ts:10</a></li>
 						</ul>
 					</aside>
 				</section>
-			</section>
-			<section class="tsd-panel-group tsd-member-group ">
-				<h2>Methods</h2>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
-					<a name="equals" class="tsd-anchor"></a>
-					<h3>equals</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">equals<span class="tsd-signature-symbol">(</span>t1<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span>, t2<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/9b68a47/packages/wallet/src/services/util/ProviderTrackerSubject.ts#L25">packages/wallet/src/services/util/ProviderTrackerSubject.ts:25</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>t1: <span class="tsd-signature-type">T</span></h5>
-								</li>
-								<li>
-									<h5>t2: <span class="tsd-signature-type">T</span></h5>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
-					<a name="provider" class="tsd-anchor"></a>
-					<h3>provider</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">provider<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/9b68a47/packages/wallet/src/services/util/ProviderTrackerSubject.ts#L23">packages/wallet/src/services/util/ProviderTrackerSubject.ts:23</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h4>
-						</li>
-					</ul>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="provider_" class="tsd-anchor"></a>
+					<h3>provider$</h3>
+					<div class="tsd-signature tsd-kind-icon">provider$<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/2a317f9/packages/wallet/src/services/util/SyncableIntervalTrackerSubject.ts#L9">packages/wallet/src/services/util/SyncableIntervalTrackerSubject.ts:9</a></li>
+						</ul>
+					</aside>
 				</section>
 			</section>
 		</div>
@@ -204,13 +162,10 @@
 						<a href="_cardano_sdk_wallet.SourceTrackerProps.html" class="tsd-kind-icon">Source<wbr>Tracker<wbr>Props</a>
 						<ul>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_cardano_sdk_wallet.SourceTrackerProps.html#config" class="tsd-kind-icon">config</a>
+								<a href="_cardano_sdk_wallet.SourceTrackerProps.html#pollInterval" class="tsd-kind-icon">poll<wbr>Interval</a>
 							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="_cardano_sdk_wallet.SourceTrackerProps.html#equals" class="tsd-kind-icon">equals</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="_cardano_sdk_wallet.SourceTrackerProps.html#provider" class="tsd-kind-icon">provider</a>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="_cardano_sdk_wallet.SourceTrackerProps.html#provider_" class="tsd-kind-icon">provider$</a>
 							</li>
 						</ul>
 					</li>
@@ -231,13 +186,11 @@
 				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
 				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
 				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
-				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
 				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
 				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
