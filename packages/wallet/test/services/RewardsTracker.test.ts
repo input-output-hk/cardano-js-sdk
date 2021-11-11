@@ -13,7 +13,7 @@ describe('createRewardsTracker', () => {
 
   it('fetches rewards from WalletProvider and locks when spent in a transaction in flight', () => {
     const keyManager = testKeyManager();
-    const stakeAddress = keyManager.stakeKey.to_bech32();
+    const stakeAddress = keyManager.rewardAccount;
     createTestScheduler().run(({ cold, expectObservable }) => {
       const transactionsInFlight$ = cold('-a-b-', {
         a: [],

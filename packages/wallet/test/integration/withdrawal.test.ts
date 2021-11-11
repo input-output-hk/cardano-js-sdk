@@ -36,9 +36,9 @@ describe('integration/withdrawal', () => {
     const availableRewards = wallet.balance.available$.value!.rewards;
 
     const txInternals = await wallet.initializeTx({
-      certificates: [{ __typename: CertificateType.StakeDeregistration, address: keyManager.stakeKey.to_bech32() }],
+      certificates: [{ __typename: CertificateType.StakeDeregistration, address: keyManager.rewardAccount }],
       outputs: new Set(), // In a real transaction you would probably want to have some outputs
-      withdrawals: [{ quantity: availableRewards, stakeAddress: keyManager.stakeKey.to_bech32() }]
+      withdrawals: [{ quantity: availableRewards, stakeAddress: keyManager.rewardAccount }]
     });
     expect(typeof txInternals.body.fee).toBe('bigint');
     const tx = await wallet.finalizeTx(txInternals);

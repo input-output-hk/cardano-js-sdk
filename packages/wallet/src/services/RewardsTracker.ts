@@ -5,9 +5,6 @@ import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TrackerSubject, coldObservableProvider, strictEquals } from './util';
 import { TransactionalTracker } from './types';
 
-const getStakeKeyHash = (keyManager: KeyManager): string =>
-  Buffer.from(keyManager.stakeKey.hash().to_bytes()).toString('hex');
-
 export const createRewardsProvider = (
   epoch$: Observable<Cardano.Epoch>,
   walletProvider: WalletProvider,
@@ -15,7 +12,7 @@ export const createRewardsProvider = (
   retryBackoffConfig: RetryBackoffConfig
 ) =>
   coldObservableProvider(
-    () => walletProvider.utxoDelegationAndRewards([], getStakeKeyHash(keyManager)),
+    () => walletProvider.utxoDelegationAndRewards([], keyManager.rewardAccount),
     retryBackoffConfig,
     epoch$
   ).pipe(map(({ delegationAndRewards: { rewards } }) => rewards || 0n));
