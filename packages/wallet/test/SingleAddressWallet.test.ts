@@ -19,7 +19,7 @@ describe('SingleAddressWallet', () => {
       networkId: Cardano.NetworkId.testnet,
       password: '123'
     });
-    walletProvider = mocks.providerStub();
+    walletProvider = mocks.mockWalletProvider();
     const stakePoolSearchProvider = createStubStakePoolSearchProvider();
     keyManager.deriveAddress = jest.fn().mockReturnValue(address);
     wallet = new SingleAddressWallet({ name }, { keyManager, stakePoolSearchProvider, walletProvider });

@@ -3,11 +3,11 @@ import { RewardsHistory, createRewardsHistoryProvider, createRewardsHistoryTrack
 import { createStubTxWithCertificates } from './stub-tx';
 import { createTestScheduler } from '../../testScheduler';
 import { firstValueFrom } from 'rxjs';
-import { providerStub, rewardsHistory, testKeyManager } from '../../mocks';
+import { mockWalletProvider, rewardsHistory, testKeyManager } from '../../mocks';
 
 describe('RewardsHistory', () => {
   test('createRewardsHistoryProvider', async () => {
-    const provider = createRewardsHistoryProvider(providerStub(), testKeyManager(), { initialInterval: 1 });
+    const provider = createRewardsHistoryProvider(mockWalletProvider(), testKeyManager(), { initialInterval: 1 });
     expect(await firstValueFrom(provider(1))).toBe(rewardsHistory);
   });
 

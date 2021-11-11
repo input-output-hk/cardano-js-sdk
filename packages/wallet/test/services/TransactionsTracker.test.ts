@@ -15,12 +15,12 @@ import {
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { createTestScheduler } from '../testScheduler';
 import { firstValueFrom, of } from 'rxjs';
-import { providerStub, queryTransactionsResult } from '../mocks';
+import { mockWalletProvider, queryTransactionsResult } from '../mocks';
 
 describe('TransactionsTracker', () => {
   test('createAddressTransactionsProvider', async () => {
     const provider$ = createAddressTransactionsProvider(
-      providerStub(), [queryTransactionsResult[0].body.inputs[0].address], { initialInterval: 1 }, of(300)
+      mockWalletProvider(), [queryTransactionsResult[0].body.inputs[0].address], { initialInterval: 1 }, of(300)
     );
     expect(await firstValueFrom(provider$)).toEqual([
       { direction: TransactionDirection.Outgoing, tx: queryTransactionsResult[0] }
