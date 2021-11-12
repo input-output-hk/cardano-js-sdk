@@ -183,7 +183,7 @@ export const mockWalletProvider = (): WalletProvider => ({
       live: 15_001_884_895_856_815n
     }
   }),
-  queryBlocksByHashes: jest.fn().mockResolvedValue([]),
+  queryBlocksByHashes: jest.fn().mockResolvedValue([{ epoch: currentEpoch.number - 3 } as Cardano.Block]),
   queryTransactionsByAddresses: queryTransactions(),
   queryTransactionsByHashes: queryTransactions(),
   rewardsHistory: jest.fn().mockResolvedValue(rewardsHistory),

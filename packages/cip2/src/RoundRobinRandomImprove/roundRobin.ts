@@ -105,5 +105,9 @@ export const roundRobinSelection = ({
       }
     }
   }
+  if (utxoSelected.length === 0) {
+    utxoSelected.push(utxoRemaining[0]);
+    utxoRemaining.splice(0, 1);
+  }
   return { utxoRemaining, utxoSelected };
 };

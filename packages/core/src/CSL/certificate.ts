@@ -18,7 +18,6 @@ import {
   RewardAddress,
   SingleHostAddr,
   SingleHostName,
-  StakeCredential,
   StakeDelegation,
   StakeDeregistration,
   StakeRegistration,
@@ -26,11 +25,23 @@ import {
   UnitInterval,
   VRFKeyHash
 } from '@emurgo/cardano-serialization-lib-nodejs';
-import { Cardano, NotImplementedError } from '..';
+import { Cardano, NotImplementedError, SerializationError, SerializationFailure } from '..';
 import { CertificateType } from '../Cardano';
 
-export const stakeAddressToCredential = (address: Cardano.Address) =>
-  StakeCredential.from_keyhash(Ed25519KeyHash.from_bech32(address));
+export const stakeAddressToCredential = (address: Cardano.Address) => {
+  try {
+    const rewardAddress = RewardAddress.from_address(Address.from_bech32(address));
+    if (!rewardAddress)
+      throw new SerializationError(SerializationFailure.InvalidAddress, `Invalid reward account address: ${address}`);
+    return rewardAddress.payment_cred();
+  } catch (error) {
+    throw new SerializationError(
+      SerializationFailure.InvalidAddress,
+      `Invalid reward account address: ${address}`,
+      error
+    );
+  }
+};
 
 export const stakeKeyRegistration = (address: Cardano.Address) =>
   Certificate.new_stake_registration(StakeRegistration.new(stakeAddressToCredential(address)));

@@ -1,15 +1,17 @@
 import { Cardano } from '@cardano-sdk/core';
 import { SingleAddressWallet, Wallet } from '../../src';
-import { filter, firstValueFrom, tap } from 'rxjs';
-import { keyManager, stakePoolSearchProvider, walletProvider } from './config';
+import { combineLatest, filter, firstValueFrom, skip, tap } from 'rxjs';
+import { keyManager, poolId1, poolId2, stakePoolSearchProvider, walletProvider } from './config';
 
 const faucetAddress =
   'addr_test1qqr585tvlc7ylnqvz8pyqwauzrdu0mxag3m7q56grgmgu7sxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flknswgndm3';
 
 describe('SingleAddressWallet', () => {
+  let rewardAccount: Cardano.Address;
   let wallet: Wallet;
 
   beforeAll(() => {
+    rewardAccount = keyManager.rewardAccount; // TODO: make this available from Wallet.addresses
     wallet = new SingleAddressWallet(
       { name: 'Test Wallet' },
       {
@@ -24,6 +26,48 @@ describe('SingleAddressWallet', () => {
 
   it('has an address', () => {
     expect(wallet.addresses[0].bech32.startsWith('addr')).toBe(true);
+  });
+
+  test('delegation', async () => {
+    const delegateeBefore1stTx = await firstValueFrom(wallet.delegation.delegatee$);
+    // swap poolId if it's already delegating to one of the pools
+    const poolId = delegateeBefore1stTx.nextNextEpoch?.id === poolId2 ? poolId1 : poolId2;
+    const isStakeKeyRegistered = !!delegateeBefore1stTx.nextNextEpoch;
+    const {
+      currentEpoch: { number: epoch }
+    } = await firstValueFrom(wallet.networkInfo$);
+
+    // Make a 1st tx with key registration (if not already registered) and stake delegation
+    const tx1Internals = await wallet.initializeTx({
+      certificates: [
+        ...(isStakeKeyRegistered
+          ? []
+          : ([
+              { __typename: Cardano.CertificateType.StakeRegistration, address: rewardAccount }
+            ] as Cardano.Certificate[])),
+        { __typename: Cardano.CertificateType.StakeDelegation, address: rewardAccount, epoch, poolId }
+      ],
+      // TODO: make outputs optional. Coin selection has to select at least 1 utxo for change output in this case.
+      outputs: new Set()
+    });
+    await wallet.submitTx(await wallet.finalizeTx(tx1Internals));
+    const delegateeAfter1stTx = await firstValueFrom(wallet.delegation.delegatee$.pipe(skip(1)));
+    expect(delegateeAfter1stTx.nextNextEpoch?.id).toBe(poolId);
+
+    // Wait for utxo to be unlocked to make a 2nd transaction
+    await firstValueFrom(
+      combineLatest([wallet.balance.available$, wallet.balance.total$]).pipe(
+        filter(([total, available]) => total.coins === available.coins)
+      )
+    );
+    // Make a 2nd tx with key deregistration
+    const tx2Internals = await wallet.initializeTx({
+      certificates: [{ __typename: Cardano.CertificateType.StakeDeregistration, address: rewardAccount }],
+      outputs: new Set()
+    });
+    await wallet.submitTx(await wallet.finalizeTx(tx2Internals));
+    const delegateeAfter2ndTx = await firstValueFrom(wallet.delegation.delegatee$.pipe(skip(1)));
+    expect(delegateeAfter2ndTx.nextNextEpoch?.id).toBeUndefined();
   });
 
   test('balance', async () => {

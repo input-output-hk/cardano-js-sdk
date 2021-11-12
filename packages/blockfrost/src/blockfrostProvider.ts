@@ -395,7 +395,7 @@ export const blockfrostProvider = (options: Options, logger = dummyLogger): Wall
             rewards: BigInt(amount)
           }))
       );
-      haveMorePages = rewards[rewards.length - 1].epoch < upperBound && rewards.length === 100;
+      haveMorePages = rewards.length === 100 && rewards[rewards.length - 1].epoch < upperBound;
       page += 1;
     }
     return result;

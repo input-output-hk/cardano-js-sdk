@@ -30,3 +30,9 @@ export const stakePoolSearchProvider = (() => {
   }
   throw new Error(`STAKE_POOL_SEARCH_PROVIDER unsupported: ${stakePoolSearchProviderName}`);
 })();
+
+export const poolId1 = process.env.POOL_ID_1!;
+if (!poolId1) throw new Error('POOL_ID_1 not set');
+
+export const poolId2 = process.env.POOL_ID_2!;
+if (!poolId1) throw new Error('POOL_ID_2 not set');

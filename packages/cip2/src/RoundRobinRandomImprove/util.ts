@@ -96,6 +96,9 @@ export const assertIsBalanceSufficient = (
   outputValues: Cardano.Value[],
   implicitCoin: ImplicitCoinBigint
 ): void => {
+  if (utxoValues.length === 0) {
+    throw new InputSelectionError(InputSelectionFailure.UtxoBalanceInsufficient);
+  }
   for (const assetId of uniqueOutputAssetIDs) {
     const getAssetQuantity = assetQuantitySelector(assetId);
     const utxoTotal = getAssetQuantity(utxoValues);

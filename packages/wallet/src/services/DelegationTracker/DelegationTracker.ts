@@ -2,7 +2,7 @@ import { Cardano, StakePoolSearchProvider, WalletProvider } from '@cardano-sdk/c
 import { CertificateType, Epoch } from '@cardano-sdk/core/src/Cardano';
 import { Delegation, Transactions } from '../types';
 import { KeyManager } from '../../KeyManagement';
-import { Observable, distinctUntilChanged, filter, map, share, switchMap } from 'rxjs';
+import { Observable, distinctUntilChanged, map, share, switchMap } from 'rxjs';
 import { ObservableStakePoolSearchProvider, createDelegateeTracker, createQueryStakePoolsProvider } from './Delegatee';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { RewardsHistoryProvider, createRewardsHistoryTracker } from './RewardsHistory';
@@ -40,7 +40,6 @@ export const certificateTransactionsWithEpochs = (
   transactionsTracker.history.outgoing$.pipe(
     map((transactions) => transactions.filter((tx) => transactionHasAnyCertificate(tx, certificateTypes))),
     distinctUntilChanged(transactionsEquals),
-    filter((transactions) => transactions.length > 0),
     switchMap((transactions) =>
       blockEpochProvider(transactions.map((tx) => tx.blockHeader.blockHash)).pipe(
         map((epochs) => transactions.map((tx, txIndex) => ({ epoch: epochs[txIndex], tx })))

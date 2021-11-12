@@ -167,9 +167,11 @@ export class SingleAddressWallet implements Wallet {
             buildTx: async (inputSelection) => {
               this.#logger.debug('Building TX for selection constraints', inputSelection);
               const txInternals = await createTransactionInternals({
+                certificates: props.certificates,
                 changeAddress,
                 inputSelection,
-                validityInterval
+                validityInterval,
+                withdrawals: props.withdrawals
               });
               return coreToCsl.tx(await this.finalizeTx(txInternals));
             },
@@ -186,9 +188,11 @@ export class SingleAddressWallet implements Wallet {
               })
               .then((inputSelectionResult) =>
                 createTransactionInternals({
+                  certificates: props.certificates,
                   changeAddress,
                   inputSelection: inputSelectionResult.selection,
-                  validityInterval
+                  validityInterval,
+                  withdrawals: props.withdrawals
                 })
               )
           );
@@ -196,12 +200,12 @@ export class SingleAddressWallet implements Wallet {
       )
     );
   }
-  async finalizeTx({ body, hash }: TxInternals, auxiliaryData?: Cardano.AuxiliaryData): Promise<Cardano.NewTxAlonzo> {
-    const signatures = await this.#keyManager.signTransaction(hash);
+  async finalizeTx(tx: TxInternals, auxiliaryData?: Cardano.AuxiliaryData): Promise<Cardano.NewTxAlonzo> {
+    const signatures = await this.#keyManager.signTransaction(tx);
     return {
       auxiliaryData,
-      body,
-      id: hash,
+      body: tx.body,
+      id: tx.hash,
       // TODO: add support for the rest of the witness properties
       witness: { signatures }
     };
