@@ -82,8 +82,8 @@ export interface WalletProvider {
   // TODO: split utxoDelegationAndRewards this into 2 or 3 functions
   utxoDelegationAndRewards: (
     addresses: Cardano.Address[],
-    stakeKeyHash: Cardano.Hash16
-  ) => Promise<{ utxo: Cardano.Utxo[]; delegationAndRewards: Cardano.DelegationsAndRewards }>;
+    rewardAccount?: Cardano.Address
+  ) => Promise<{ utxo: Cardano.Utxo[]; delegationAndRewards?: Cardano.DelegationsAndRewards }>;
   /**
    * TODO: add an optional 'since: Slot' argument for querying transactions and utxos.
    * When doing so we need to also consider how best we can use the volatile block range of the chain
