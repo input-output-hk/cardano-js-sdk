@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/cardano-graphql",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Cardano GraphQL Providers",
   "engines": {
     "node": "^14"
@@ -41,7 +41,7 @@
   "dependencies": {
     "@cardano-graphql/client-ts": "^5.1.0-beta.1",
     "@cardano-ogmios/client": "4.1.0",
-    "@cardano-sdk/core": "0.1.5",
+    "@cardano-sdk/core": " 0.1.6",
     "class-validator": "^0.13.1",
     "graphql": "^15.6.1",
     "graphql-request": "^3.5.0",

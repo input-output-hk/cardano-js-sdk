@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/core",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Core types and libraries for Cardano",
   "engines": {
     "node": "^14"
@@ -20,7 +20,7 @@
     "prepack": "yarn build"
   },
   "devDependencies": {
-    "@cardano-sdk/util-dev": "0.1.5",
+    "@cardano-sdk/util-dev": " 0.1.6",
     "shx": "^0.3.3"
   },
   "dependencies": {
