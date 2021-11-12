@@ -163,20 +163,22 @@ export const blockfrostProvider = (options: Options, logger = dummyLogger): Wall
       )
     );
     const utxo = utxoResults.flat(1);
-
-    try {
-      const accountResponse = await blockfrost.accounts(rewardAccount);
-      const delegationAndRewards = {
-        delegate: accountResponse.pool_id || undefined,
-        rewards: BigInt(accountResponse.withdrawable_amount)
-      };
-      return { delegationAndRewards, utxo };
-    } catch (error) {
-      if (error.status_code === 404) {
-        return { utxo };
+    if (rewardAccount !== undefined) {
+      try {
+        const accountResponse = await blockfrost.accounts(rewardAccount);
+        const delegationAndRewards = {
+          delegate: accountResponse.pool_id || undefined,
+          rewards: BigInt(accountResponse.withdrawable_amount)
+        };
+        return { delegationAndRewards, utxo };
+      } catch (error) {
+        if (error.status_code === 404) {
+          return { utxo };
+        }
+        throw error;
       }
-      throw error;
     }
+    return { utxo };
   };
 
   const fetchRedeemers = async ({
