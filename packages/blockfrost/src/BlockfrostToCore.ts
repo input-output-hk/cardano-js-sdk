@@ -7,7 +7,8 @@ type BlockfrostInputs = Responses['tx_content_utxo']['inputs'];
 type BlockfrostInput = Pick<Unpacked<BlockfrostInputs>, 'address' | 'amount' | 'output_index' | 'tx_hash'>;
 type BlockfrostOutputs = Responses['tx_content_utxo']['outputs'];
 type BlockfrostOutput = Unpacked<BlockfrostOutputs>;
-type BlockfrostUtxo = Unpacked<BlockfrostAddressUtxoContent>;
+export type BlockfrostTransactionContent = Unpacked<Responses['address_transactions_content']>;
+export type BlockfrostUtxo = Unpacked<BlockfrostAddressUtxoContent>;
 
 export const BlockfrostToCore = {
   addressUtxoContent: (address: string, blockfrost: Responses['address_utxo_content']): Cardano.Utxo[] =>

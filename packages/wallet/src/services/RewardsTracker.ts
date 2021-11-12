@@ -15,7 +15,7 @@ export const createRewardsProvider = (
     () => walletProvider.utxoDelegationAndRewards([], keyManager.rewardAccount),
     retryBackoffConfig,
     epoch$
-  ).pipe(map(({ delegationAndRewards: { rewards } }) => rewards || 0n));
+  ).pipe(map(({ delegationAndRewards }) => delegationAndRewards?.rewards || 0n));
 
 export interface RewardsTrackerProps {
   walletProvider: WalletProvider;

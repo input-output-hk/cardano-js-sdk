@@ -9,8 +9,8 @@ import {
   WalletProvider
 } from '@cardano-sdk/core';
 import { BlockFrostAPI, Error as BlockfrostError, Responses } from '@blockfrost/blockfrost-js';
-import { BlockfrostToCore } from './BlockfrostToCore';
-import { Options } from '@blockfrost/blockfrost-js/lib/types';
+import { BlockfrostToCore, BlockfrostTransactionContent, BlockfrostUtxo } from './BlockfrostToCore';
+import { Options, PaginationOptions } from '@blockfrost/blockfrost-js/lib/types';
 import { dummyLogger } from 'ts-log';
 import { flatten, groupBy } from 'lodash-es';
 
@@ -65,6 +65,35 @@ const toProviderError = (error: unknown) => {
  */
 export const blockfrostProvider = (options: Options, logger = dummyLogger): WalletProvider => {
   const blockfrost = new BlockFrostAPI(options);
+
+  const fetchByAddressSequentially = async <Item, Response>(
+    props: {
+      address: Cardano.Address;
+      request: (address: Cardano.Address, pagination: PaginationOptions) => Promise<Response[]>;
+      responseTranslator?: (address: Cardano.Address, response: Response[]) => Item[];
+    },
+    accumulated: Item[] = [],
+    count = 0,
+    page = 1
+  ): Promise<Item[]> => {
+    try {
+      const response = await props.request(props.address, { count, page });
+      const totalCount = count + response.length;
+      const maybeTranslatedResponse = props.responseTranslator
+        ? props.responseTranslator(props.address, response)
+        : response;
+      const newAccumulatedItems = [...accumulated, ...maybeTranslatedResponse] as Item[];
+      if (response.length === 100) {
+        return fetchByAddressSequentially<Item, Response>(props, newAccumulatedItems, totalCount, page + 1);
+      }
+      return newAccumulatedItems;
+    } catch (error) {
+      if (error.status_code === 404) {
+        return [];
+      }
+      throw error;
+    }
+  };
 
   const ledgerTip: WalletProvider['ledgerTip'] = async () => {
     const block = await blockfrost.blocksLatest();
@@ -122,21 +151,32 @@ export const blockfrostProvider = (options: Options, logger = dummyLogger): Wall
     await blockfrost.txSubmit(signedTransaction);
   };
 
-  const utxoDelegationAndRewards: WalletProvider['utxoDelegationAndRewards'] = async (addresses, stakeKeyHash) => {
+  const utxoDelegationAndRewards: WalletProvider['utxoDelegationAndRewards'] = async (addresses, rewardAccount) => {
     const utxoResults = await Promise.all(
       addresses.map(async (address) =>
-        blockfrost.addressesUtxosAll(address).then((result) => BlockfrostToCore.addressUtxoContent(address, result))
+        fetchByAddressSequentially<Cardano.Utxo, BlockfrostUtxo>({
+          address,
+          request: (addr: Cardano.Address, pagination) => blockfrost.addressesUtxos(addr, pagination),
+          responseTranslator: (addr: Cardano.Address, response: Responses['address_utxo_content']) =>
+            BlockfrostToCore.addressUtxoContent(addr, response)
+        })
       )
     );
     const utxo = utxoResults.flat(1);
 
-    const accountResponse = await blockfrost.accounts(stakeKeyHash);
-    const delegationAndRewards = {
-      delegate: accountResponse.pool_id || undefined,
-      rewards: BigInt(accountResponse.withdrawable_amount)
-    };
-
-    return { delegationAndRewards, utxo };
+    try {
+      const accountResponse = await blockfrost.accounts(rewardAccount);
+      const delegationAndRewards = {
+        delegate: accountResponse.pool_id || undefined,
+        rewards: BigInt(accountResponse.withdrawable_amount)
+      };
+      return { delegationAndRewards, utxo };
+    } catch (error) {
+      if (error.status_code === 404) {
+        return { utxo };
+      }
+      throw error;
+    }
   };
 
   const fetchRedeemers = async ({
@@ -307,7 +347,15 @@ export const blockfrostProvider = (options: Options, logger = dummyLogger): Wall
 
   const queryTransactionsByAddresses: WalletProvider['queryTransactionsByAddresses'] = async (addresses) => {
     const addressTransactions = await Promise.all(
-      addresses.map(async (address) => blockfrost.addressesTransactionsAll(address))
+      addresses.map(async (address) =>
+        fetchByAddressSequentially<
+          { tx_hash: string; tx_index: number; block_height: number },
+          BlockfrostTransactionContent
+        >({
+          address,
+          request: (addr: Cardano.Address, pagination) => blockfrost.addressesTransactions(addr, pagination)
+        })
+      )
     );
 
     const transactionsArray = await Promise.all(
