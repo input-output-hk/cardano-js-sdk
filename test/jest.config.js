@@ -1,11 +1,4 @@
 module.exports = {
-  preset: 'ts-jest',
-  moduleNameMapper: {
-    "^lodash-es$": "lodash"
-  },
-  transform: {
-    "^.+\\.test.ts?$": "ts-jest"
-  },
-  coveragePathIgnorePatterns: ['\.config\.js'],
-  testTimeout: process.env.CI ? 120000 : 12000,
+  ...require('./base.jest.config'),
+  testPathIgnorePatterns: ['/e2e/']
 }
