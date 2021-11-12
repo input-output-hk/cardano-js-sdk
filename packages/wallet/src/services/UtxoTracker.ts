@@ -23,7 +23,7 @@ export const createUtxoProvider = (
   retryBackoffConfig: RetryBackoffConfig
 ) =>
   coldObservableProvider(
-    () => walletProvider.utxoDelegationAndRewards(addresses, '').then(({ utxo }) => utxo),
+    () => walletProvider.utxoDelegationAndRewards(addresses).then(({ utxo }) => utxo),
     retryBackoffConfig,
     tipBlockHeight$,
     utxoEquals
