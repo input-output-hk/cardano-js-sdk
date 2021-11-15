@@ -1,5 +1,5 @@
 import { Cardano } from '@cardano-sdk/core';
-import { SingleAddressWallet, Wallet } from '../../src';
+import { DelegationKeyStatus, SingleAddressWallet, Wallet } from '../../src';
 import { filter, firstValueFrom, skip, tap } from 'rxjs';
 import { keyManager, poolId1, poolId2, stakePoolSearchProvider, walletProvider } from './config';
 
@@ -10,7 +10,9 @@ const createDelegationCertificates = async (wallet: Wallet, rewardAccount: Carda
   const delegateeBefore1stTx = await firstValueFrom(wallet.delegation.delegatee$);
   // swap poolId if it's already delegating to one of the pools
   const poolId = delegateeBefore1stTx.nextNextEpoch?.id === poolId2 ? poolId1 : poolId2;
-  const isStakeKeyRegistered = !!delegateeBefore1stTx.nextNextEpoch;
+  const isStakeKeyRegistered = (await firstValueFrom(wallet.delegation.rewardAccounts$)).some(
+    (acc) => acc.keyStatus === DelegationKeyStatus.Registered
+  );
   const {
     currentEpoch: { number: epoch }
   } = await firstValueFrom(wallet.networkInfo$);
@@ -66,9 +68,12 @@ describe('SingleAddressWallet', () => {
     expect(initialTotalBalance.coins).toBe(initialAvailableBalance.coins);
     const tx1OutputCoins = 1_000_000n;
 
+    const { poolId, certificates, isStakeKeyRegistered } = await createDelegationCertificates(wallet, rewardAccount);
+    const initialDeposit = isStakeKeyRegistered ? stakeKeyDeposit : 0n;
+    expect(initialAvailableBalance.deposit).toBe(initialDeposit);
+
     // Make a 1st tx with key registration (if not already registered) and stake delegation
     // Also send some coin to faucet
-    const { poolId, certificates, isStakeKeyRegistered } = await createDelegationCertificates(wallet, rewardAccount);
     const tx1Internals = await wallet.initializeTx({
       certificates,
       outputs: new Set([{ address: faucetAddress, value: { coins: tx1OutputCoins } }])
@@ -81,6 +86,7 @@ describe('SingleAddressWallet', () => {
       tx1Internals.body.fee -
       (isStakeKeyRegistered ? 0n : stakeKeyDeposit);
 
+    await firstValueFrom(wallet.transactions.outgoing.inFlight$.pipe(filter((txs) => txs.length > 0)));
     // Assert changes after submitting the tx
     await Promise.all([
       // Test it locks available balance after tx is submitted
@@ -119,5 +125,6 @@ describe('SingleAddressWallet', () => {
 
     // Deposit is returned to wallet balance
     await waitForBalanceCoins(expectedCoinsAfterTx1 + stakeKeyDeposit - tx2Internals.body.fee);
+    expect((await firstValueFrom(wallet.balance.total$)).deposit).toBe(0n);
   });
 });

@@ -5,6 +5,7 @@ import { TransactionFailure } from './TransactionError';
 
 export interface Balance extends Cardano.Value {
   rewards: Cardano.Lovelace;
+  deposit: Cardano.Lovelace;
 }
 
 export interface TransactionalObservables<T> {
@@ -41,6 +42,7 @@ export interface FailedTx {
   reason: TransactionFailure;
 }
 
+// TODO: rename -> TransactionsTracker
 export interface Transactions {
   readonly history: {
     all$: BehaviorObservable<DirectionalTransaction[]>;
@@ -71,8 +73,23 @@ export interface Delegatee {
   nextNextEpoch: Cardano.StakePool | null;
 }
 
+export enum DelegationKeyStatus {
+  Registering = 'REGISTERING',
+  Registered = 'REGISTERED',
+  Unregistering = 'UNREGISTERING',
+  Unregistered = 'UNREGISTERED'
+}
+
+export interface RewardAccount {
+  address: Cardano.Address;
+  keyStatus: DelegationKeyStatus;
+  // Maybe add rewardsHistory$ and delegatee$ for each reward account too
+}
+
+// TODO: rename -> DelegationTracker
 export interface Delegation {
   rewardsHistory$: BehaviorObservable<RewardsHistory>;
   delegatee$: BehaviorObservable<Delegatee>;
+  rewardAccounts$: BehaviorObservable<RewardAccount[]>;
   shutdown(): void;
 }

@@ -2,8 +2,8 @@ import { BigIntMath, Cardano, WalletProvider } from '@cardano-sdk/core';
 import { KeyManager } from '../../KeyManagement';
 import { Observable, distinctUntilChanged, map, of, switchMap } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { TxWithEpoch, transactionHasAnyCertificate } from './util';
-import { coldObservableProvider } from '../util';
+import { TxWithEpoch } from './types';
+import { coldObservableProvider, transactionHasAnyCertificate } from '../util';
 import { first } from 'lodash-es';
 import { isNotNil } from '@cardano-sdk/core/src/util/misc';
 

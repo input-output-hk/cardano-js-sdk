@@ -142,7 +142,6 @@ export class SingleAddressWallet implements Wallet {
       transactionsInFlight$: this.transactions.outgoing.inFlight$,
       walletProvider
     });
-    this.balance = createBalanceTracker(this.utxo, this.#rewards);
     this.delegation = createDelegationTracker({
       epoch$,
       keyManager,
@@ -151,6 +150,7 @@ export class SingleAddressWallet implements Wallet {
       transactionsTracker: this.transactions,
       walletProvider
     });
+    this.balance = createBalanceTracker(this.protocolParameters$, this.utxo, this.#rewards, this.delegation);
   }
   get addresses(): Address[] {
     return [this.#address];

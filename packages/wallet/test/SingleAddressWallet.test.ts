@@ -70,6 +70,8 @@ describe('SingleAddressWallet', () => {
       expect(wallet.delegation.rewardsHistory$.value?.all).toEqual(mocks.rewardsHistory);
       await firstValueFrom(wallet.delegation.delegatee$);
       expect(wallet.delegation.delegatee$.value?.nextNextEpoch).toBeNull();
+      await firstValueFrom(wallet.delegation.rewardAccounts$);
+      expect(Array.isArray(wallet.delegation.rewardAccounts$.value)).toBe(true);
     });
     it('"addresses"', () => {
       expect(wallet.addresses.map(({ bech32 }) => bech32)).toEqual([address]);

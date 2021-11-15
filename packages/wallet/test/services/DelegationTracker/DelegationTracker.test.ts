@@ -1,7 +1,13 @@
 import { Cardano, WalletProvider } from '@cardano-sdk/core';
+import { DelegationKeyStatus, Transactions } from '../../../src/services';
+import { NewTxAlonzo } from '@cardano-sdk/core/src/Cardano';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { Transactions } from '../../../src/services';
-import { certificateTransactionsWithEpochs, createBlockEpochProvider } from '../../../src/services/DelegationTracker';
+import { TxWithEpoch } from '../../../src/services/DelegationTracker/types';
+import {
+  certificateTransactionsWithEpochs,
+  createBlockEpochProvider,
+  createRewardAccountsTracker
+} from '../../../src/services/DelegationTracker';
 import { createStubTxWithCertificates } from './stub-tx';
 import { createTestScheduler } from '../../testScheduler';
 
@@ -11,6 +17,49 @@ const coldObservableProviderMock: jest.Mock = jest.requireMock(
 ).coldObservableProvider;
 
 describe('DelegationTracker', () => {
+  test('createRewardAccountsTracker', () => {
+    createTestScheduler().run(({ cold, expectObservable }) => {
+      const address = 'stake...';
+      const transactions$ = cold('a-b-c', {
+        a: [],
+        b: [
+          {
+            tx: { body: { certificates: [{ __typename: Cardano.CertificateType.StakeRegistration, address }] } }
+          } as TxWithEpoch
+        ],
+        c: [
+          {
+            tx: { body: { certificates: [{ __typename: Cardano.CertificateType.StakeRegistration, address }] } }
+          } as TxWithEpoch,
+          {
+            tx: { body: { certificates: [{ __typename: Cardano.CertificateType.StakeDeregistration, address }] } }
+          } as TxWithEpoch
+        ]
+      });
+      const transactionsInFlight$ = cold('abaca', {
+        a: [],
+        b: [
+          {
+            body: { certificates: [{ __typename: Cardano.CertificateType.StakeRegistration, address }] }
+          } as NewTxAlonzo
+        ],
+        c: [
+          {
+            body: { certificates: [{ __typename: Cardano.CertificateType.StakeDeregistration, address }] }
+          } as NewTxAlonzo
+        ]
+      });
+      const tracker$ = createRewardAccountsTracker(transactions$, transactionsInFlight$);
+      expectObservable(tracker$).toBe('abcde', {
+        a: [],
+        b: [{ address, keyStatus: DelegationKeyStatus.Registering }],
+        c: [{ address, keyStatus: DelegationKeyStatus.Registered }],
+        d: [{ address, keyStatus: DelegationKeyStatus.Unregistering }],
+        e: [{ address, keyStatus: DelegationKeyStatus.Unregistered }]
+      });
+    });
+  });
+
   test('createBlockEpochProvider', () => {
     createTestScheduler().run(({ cold, expectObservable, flush }) => {
       coldObservableProviderMock.mockReturnValue(
