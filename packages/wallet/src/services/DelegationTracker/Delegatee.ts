@@ -3,8 +3,9 @@ import { Delegatee } from '../types';
 import { Observable, combineLatest, map, switchMap } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TxWithEpoch } from './types';
-import { coldObservableProvider, isLastStakeKeyCertOfType, transactionHasAnyCertificate } from '../util';
+import { coldObservableProvider } from '../util';
 import { findLast, uniq } from 'lodash-es';
+import { isLastStakeKeyCertOfType, transactionHasAnyCertificate } from './transactionCertificates';
 
 export const createQueryStakePoolsProvider =
   (stakePoolSearchProvider: StakePoolSearchProvider, retryBackoffConfig: RetryBackoffConfig) =>

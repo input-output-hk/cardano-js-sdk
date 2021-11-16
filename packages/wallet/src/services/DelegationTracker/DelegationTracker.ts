@@ -6,15 +6,14 @@ import { Observable, combineLatest, distinctUntilChanged, map, share, switchMap 
 import { ObservableStakePoolSearchProvider, createDelegateeTracker, createQueryStakePoolsProvider } from './Delegatee';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { RewardsHistoryProvider, createRewardsHistoryProvider, createRewardsHistoryTracker } from './RewardsHistory';
+import { TrackerSubject, coldObservableProvider } from '../util';
+import { TxWithEpoch } from './types';
+import { isEqual, uniq } from 'lodash-es';
 import {
-  TrackerSubject,
-  coldObservableProvider,
   isLastStakeKeyCertOfType,
   outgoingTransactionsWithCertificates,
   transactionStakeKeyCertficates
-} from '../util';
-import { TxWithEpoch } from './types';
-import { isEqual, uniq } from 'lodash-es';
+} from './transactionCertificates';
 
 export const createBlockEpochProvider =
   (walletProvider: WalletProvider, retryBackoffConfig: RetryBackoffConfig) => (blockHashes: Cardano.Hash16[]) =>

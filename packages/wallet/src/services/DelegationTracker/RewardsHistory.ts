@@ -3,8 +3,9 @@ import { KeyManager } from '../../KeyManagement';
 import { Observable, distinctUntilChanged, map, of, switchMap } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TxWithEpoch } from './types';
-import { coldObservableProvider, transactionHasAnyCertificate } from '../util';
+import { coldObservableProvider } from '../util';
 import { first } from 'lodash-es';
+import { transactionHasAnyCertificate } from './transactionCertificates';
 
 export const createRewardsHistoryProvider =
   (walletProvider: WalletProvider, keyManager: KeyManager, retryBackoffConfig: RetryBackoffConfig) =>
