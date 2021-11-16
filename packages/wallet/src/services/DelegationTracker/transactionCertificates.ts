@@ -1,6 +1,5 @@
 import { Cardano, util } from '@cardano-sdk/core';
-import { TransactionsTracker } from '../types';
-import { distinctUntilChanged, map } from 'rxjs';
+import { Observable, distinctUntilChanged, map } from 'rxjs';
 import { last } from 'lodash-es';
 import { transactionsEquals } from '../util/equals';
 
@@ -9,25 +8,28 @@ export const RegAndDeregCertificateTypes = [
   Cardano.CertificateType.StakeKeyDeregistration
 ];
 
-export const transactionStakeKeyCertficates = (body: Cardano.TxBodyAlonzo) =>
-  (body.certificates || []).filter((certificate): certificate is Cardano.StakeAddressCertificate =>
+export const stakeKeyCertficates = (certificates?: Cardano.Certificate[]) =>
+  certificates?.filter((certificate): certificate is Cardano.StakeAddressCertificate =>
     RegAndDeregCertificateTypes.includes(certificate.__typename)
-  );
+  ) || [];
+
+export const includesAnyCertificate = (haystack: Cardano.Certificate[], needle: Cardano.CertificateType[]) =>
+  haystack.some(({ __typename }) => needle.includes(__typename)) || false;
 
 export const transactionHasAnyCertificate = (
   { body: { certificates } }: Cardano.TxAlonzo,
   certificateTypes: Cardano.CertificateType[]
-) => certificates?.some(({ __typename }) => certificateTypes.includes(__typename)) || false;
+) => includesAnyCertificate(certificates || [], certificateTypes);
 
 export const isLastStakeKeyCertOfType = (
-  transactions: { body: Cardano.TxBodyAlonzo }[],
+  transactionsCertificates: Cardano.Certificate[][],
   certType: Cardano.CertificateType.StakeKeyRegistration | Cardano.CertificateType.StakeKeyDeregistration,
   rewardAccount?: Cardano.Address
 ) => {
   const lastRegOrDereg = last(
-    transactions
-      .map(({ body }) => {
-        const allStakeKeyCertificates = transactionStakeKeyCertficates(body);
+    transactionsCertificates
+      .map((certificates) => {
+        const allStakeKeyCertificates = stakeKeyCertficates(certificates);
         const addressStakeKeyCertificates = rewardAccount
           ? allStakeKeyCertificates.filter(({ address }) => rewardAccount === address)
           : allStakeKeyCertificates;
@@ -38,11 +40,11 @@ export const isLastStakeKeyCertOfType = (
   return lastRegOrDereg?.__typename === certType;
 };
 
-export const outgoingTransactionsWithCertificates = (
-  transactionsTracker: TransactionsTracker,
+export const transactionsWithCertificates = (
+  transactions$: Observable<Cardano.TxAlonzo[]>,
   certificateTypes: Cardano.CertificateType[]
 ) =>
-  transactionsTracker.history.outgoing$.pipe(
+  transactions$.pipe(
     map((transactions) => transactions.filter((tx) => transactionHasAnyCertificate(tx, certificateTypes))),
     distinctUntilChanged(transactionsEquals)
   );

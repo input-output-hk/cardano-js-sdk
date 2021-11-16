@@ -67,10 +67,10 @@ describe('SingleAddressWallet', () => {
     it('"delegation"', async () => {
       await firstValueFrom(wallet.delegation.rewardsHistory$);
       expect(wallet.delegation.rewardsHistory$.value?.all).toEqual(mocks.rewardsHistory);
-      await firstValueFrom(wallet.delegation.delegatee$);
-      expect(wallet.delegation.delegatee$.value?.nextNextEpoch).toBeNull();
-      await firstValueFrom(wallet.delegation.rewardAccounts$);
-      expect(Array.isArray(wallet.delegation.rewardAccounts$.value)).toBe(true);
+      const rewardAccounts = await firstValueFrom(wallet.delegation.rewardAccounts$);
+      expect(rewardAccounts).toHaveLength(1);
+      expect(rewardAccounts[0].address).toBe(keyManager.rewardAccount);
+      expect(rewardAccounts[0].delegatee.nextNextEpoch).toBeNull();
     });
     it('"addresses"', () => {
       expect(wallet.addresses.map(({ bech32 }) => bech32)).toEqual([address]);

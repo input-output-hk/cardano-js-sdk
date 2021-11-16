@@ -82,12 +82,12 @@ export enum StakeKeyStatus {
 export interface RewardAccount {
   address: Cardano.Address;
   keyStatus: StakeKeyStatus;
-  // Maybe add rewardsHistory$ and delegatee$ for each reward account too
+  delegatee: Delegatee;
+  // Maybe add rewardsHistory$ for each reward account too
 }
 
 export interface DelegationTracker {
   rewardsHistory$: BehaviorObservable<RewardsHistory>;
-  delegatee$: BehaviorObservable<Delegatee>;
-  rewardAccounts$: BehaviorObservable<RewardAccount[]>;
+  rewardAccounts$: Observable<RewardAccount[]>;
   shutdown(): void;
 }
