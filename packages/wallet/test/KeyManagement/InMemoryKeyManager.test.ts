@@ -26,10 +26,13 @@ describe('InMemoryKeyManager', () => {
   });
 
   test('signTransaction', async () => {
-    const witnessSet = await keyManager.signTransaction(
-      '8561258e210352fba2ac0488afed67b3427a27ccf1d41ec030c98a8199bc22ec'
-    );
-    expect(Object.keys(witnessSet)).toHaveLength(1);
+    const witnessSet = await keyManager.signTransaction({
+      body: {
+        certificates: [{ __typename: Cardano.CertificateType.StakeKeyRegistration }]
+      } as unknown as Cardano.TxBodyAlonzo,
+      hash: '8561258e210352fba2ac0488afed67b3427a27ccf1d41ec030c98a8199bc22ec'
+    });
+    expect(Object.keys(witnessSet)).toHaveLength(2);
     expect(typeof witnessSet[Object.keys(witnessSet)[0]]).toBe('string');
   });
 

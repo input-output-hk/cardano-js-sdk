@@ -1,7 +1,6 @@
-// TODO: rename to MockWalletProvider since it's using jest.fn() mocks
 /* eslint-disable max-len */
+import { AssetId } from '@cardano-sdk/util-dev';
 import { Cardano, EpochRewards, WalletProvider } from '@cardano-sdk/core';
-import { PXL, TSLA } from '@cardano-sdk/util-dev/src/assetId';
 
 export const stakeKeyHash = 'stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d';
 
@@ -18,8 +17,8 @@ export const utxo: Cardano.Utxo[] = [
         'addr_test1qzs0umu0s2ammmpw0hea0w2crtcymdjvvlqngpgqy76gpfnuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qp3y3vz',
       value: {
         assets: {
-          [PXL]: 5n,
-          [TSLA]: 10n
+          [AssetId.PXL]: 5n,
+          [AssetId.TSLA]: 10n
         },
         coins: 4_027_026_465n
       }
@@ -37,7 +36,7 @@ export const utxo: Cardano.Utxo[] = [
         'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g',
       value: {
         assets: {
-          [TSLA]: 15n
+          [AssetId.TSLA]: 15n
         },
         coins: 3_289_566n
       }
@@ -183,7 +182,7 @@ export const mockWalletProvider = (): WalletProvider => ({
       live: 15_001_884_895_856_815n
     }
   }),
-  queryBlocksByHashes: jest.fn().mockResolvedValue([]),
+  queryBlocksByHashes: jest.fn().mockResolvedValue([{ epoch: currentEpoch.number - 3 } as Cardano.Block]),
   queryTransactionsByAddresses: queryTransactions(),
   queryTransactionsByHashes: queryTransactions(),
   rewardsHistory: jest.fn().mockResolvedValue(rewardsHistory),

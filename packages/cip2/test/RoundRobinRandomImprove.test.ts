@@ -34,6 +34,17 @@ describe('RoundRobinRandomImprove', () => {
           }
         });
       });
+      it('Selects UTxO even when implicit input covers outputs', async () => {
+        const utxo = new Set([CslTestUtil.createUnspentTxOutput({ coins: 10_000_000n })]);
+        const outputs = new Set([CslTestUtil.createOutput({ coins: 1_000_000n })]);
+        const results = await roundRobinRandomImprove().select({
+          constraints: SelectionConstraints.NO_CONSTRAINTS,
+          implicitCoin: { input: 2_000_000n },
+          outputs,
+          utxo
+        });
+        expect(results.selection.inputs.size).toBe(1);
+      });
     });
     describe('Failure Modes', () => {
       describe('UtxoBalanceInsufficient', () => {

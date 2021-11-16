@@ -7,12 +7,12 @@ import { currentEpoch } from '../../mocks';
 describe('Delegatee', () => {
   test('getStakePoolIdAtEpoch ', () => {
     const transactions = [
-      { epoch: 100, tx: createStubTxWithCertificates([Cardano.CertificateType.StakeRegistration]) },
+      { epoch: 100, tx: createStubTxWithCertificates([Cardano.CertificateType.StakeKeyRegistration]) },
       {
         epoch: 101,
         tx: createStubTxWithCertificates([Cardano.CertificateType.StakeDelegation], { poolId: 'pool1' })
       },
-      { epoch: 102, tx: createStubTxWithCertificates([Cardano.CertificateType.StakeDeregistration]) },
+      { epoch: 102, tx: createStubTxWithCertificates([Cardano.CertificateType.StakeKeyDeregistration]) },
       {
         epoch: 103,
         tx: createStubTxWithCertificates([Cardano.CertificateType.StakeDelegation], { poolId: 'pool2' })
@@ -36,7 +36,7 @@ describe('Delegatee', () => {
           epoch$,
           cold('a', {
             a: [
-              { epoch: epoch - 2, tx: createStubTxWithCertificates([Cardano.CertificateType.StakeRegistration]) },
+              { epoch: epoch - 2, tx: createStubTxWithCertificates([Cardano.CertificateType.StakeKeyRegistration]) },
               {
                 epoch: epoch - 2,
                 tx: createStubTxWithCertificates([Cardano.CertificateType.StakeDelegation], { poolId: 'pool1' })

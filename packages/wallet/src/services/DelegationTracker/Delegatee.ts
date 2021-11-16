@@ -2,9 +2,10 @@ import { Cardano, StakePoolSearchProvider, util } from '@cardano-sdk/core';
 import { Delegatee } from '../types';
 import { Observable, combineLatest, map, switchMap } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { TxWithEpoch, transactionHasAnyCertificate } from './util';
+import { TxWithEpoch } from './types';
 import { coldObservableProvider } from '../util';
 import { findLast, uniq } from 'lodash-es';
+import { isLastStakeKeyCertOfType, transactionHasAnyCertificate } from './transactionCertificates';
 
 export const createQueryStakePoolsProvider =
   (stakePoolSearchProvider: StakePoolSearchProvider, retryBackoffConfig: RetryBackoffConfig) =>
@@ -16,27 +17,14 @@ export type ObservableStakePoolSearchProvider = ReturnType<typeof createQuerySta
 const isDelegationCertificate = (cert: Cardano.Certificate): cert is Cardano.StakeDelegationCertificate =>
   cert.__typename === Cardano.CertificateType.StakeDelegation;
 
-const RegAndDeregCertificateTypes = [
-  Cardano.CertificateType.StakeRegistration,
-  Cardano.CertificateType.StakeDeregistration
-];
-
 export const getStakePoolIdAtEpoch = (transactions: TxWithEpoch[]) => (atEpoch: Cardano.Epoch) => {
-  const transactionsUpToEpoch = transactions.filter(({ epoch }) => epoch <= atEpoch - 2);
-  const lastRegOrDereg = findLast(transactionsUpToEpoch, ({ tx }) =>
-    transactionHasAnyCertificate(tx, RegAndDeregCertificateTypes)
-  );
-  if (!lastRegOrDereg) return;
-  const isStakeKeyRegistered =
-    findLast(
-      lastRegOrDereg.tx.body.certificates!.filter(({ __typename }) => RegAndDeregCertificateTypes.includes(__typename))
-    )?.__typename === Cardano.CertificateType.StakeRegistration;
-  if (!isStakeKeyRegistered) return;
-  const delegationTx = findLast(transactionsUpToEpoch, ({ tx }) =>
+  const transactionsUpToEpoch = transactions.filter(({ epoch }) => epoch <= atEpoch - 2).map(({ tx }) => tx);
+  if (!isLastStakeKeyCertOfType(transactionsUpToEpoch, Cardano.CertificateType.StakeKeyRegistration)) return;
+  const delegationTx = findLast(transactionsUpToEpoch, (tx) =>
     transactionHasAnyCertificate(tx, [Cardano.CertificateType.StakeDelegation])
   );
   if (!delegationTx) return;
-  return findLast(delegationTx?.tx.body.certificates?.filter(isDelegationCertificate))?.poolId;
+  return findLast(delegationTx?.body.certificates?.filter(isDelegationCertificate))?.poolId;
 };
 
 export const createDelegateeTracker = (

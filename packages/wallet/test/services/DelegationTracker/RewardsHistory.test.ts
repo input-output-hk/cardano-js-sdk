@@ -21,7 +21,7 @@ describe('RewardsHistory', () => {
             a: [
               {
                 epoch: 0,
-                tx: createStubTxWithCertificates([Cardano.CertificateType.StakeDeregistration])
+                tx: createStubTxWithCertificates([Cardano.CertificateType.StakeKeyDeregistration])
               },
               {
                 epoch,

@@ -2,7 +2,6 @@
 import * as mocks from './mocks';
 import { Cardano } from '@cardano-sdk/core';
 import { KeyManagement, SingleAddressWallet } from '../src';
-import { coalesceValueQuantities } from '@cardano-sdk/core/src/Cardano/util';
 import { createStubStakePoolSearchProvider } from '@cardano-sdk/util-dev';
 import { firstValueFrom, skip } from 'rxjs';
 
@@ -41,7 +40,7 @@ describe('SingleAddressWallet', () => {
       await firstValueFrom(wallet.balance.available$);
       await firstValueFrom(wallet.balance.total$);
       expect(wallet.balance.available$.value?.coins).toEqual(
-        coalesceValueQuantities(mocks.utxo.map((utxo) => utxo[1].value)).coins
+        Cardano.util.coalesceValueQuantities(mocks.utxo.map((utxo) => utxo[1].value)).coins
       );
       expect(wallet.balance.total$.value?.rewards).toBe(mocks.rewards);
     });
@@ -70,6 +69,8 @@ describe('SingleAddressWallet', () => {
       expect(wallet.delegation.rewardsHistory$.value?.all).toEqual(mocks.rewardsHistory);
       await firstValueFrom(wallet.delegation.delegatee$);
       expect(wallet.delegation.delegatee$.value?.nextNextEpoch).toBeNull();
+      await firstValueFrom(wallet.delegation.rewardAccounts$);
+      expect(Array.isArray(wallet.delegation.rewardAccounts$.value)).toBe(true);
     });
     it('"addresses"', () => {
       expect(wallet.addresses.map(({ bech32 }) => bech32)).toEqual([address]);

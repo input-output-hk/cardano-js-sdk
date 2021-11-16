@@ -125,6 +125,7 @@ export const assertFailureProperties = ({
   ]);
   switch (error.failure) {
     case InputSelectionFailure.UtxoBalanceInsufficient: {
+      if (utxoAmounts.length === 0) return; // must select at least 1 utxo
       const insufficientCoin = availableQuantities.coins < requestedQuantities.coins;
       const insufficientAsset =
         requestedQuantities.assets &&

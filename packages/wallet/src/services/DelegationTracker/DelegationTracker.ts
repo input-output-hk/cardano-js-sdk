@@ -1,14 +1,19 @@
+/* eslint-disable unicorn/no-nested-ternary */
 import { Cardano, StakePoolSearchProvider, WalletProvider } from '@cardano-sdk/core';
-import { CertificateType, Epoch } from '@cardano-sdk/core/src/Cardano';
-import { Delegation, Transactions } from '../types';
+import { DelegationTracker, StakeKeyStatus, TransactionsTracker } from '../types';
 import { KeyManager } from '../../KeyManagement';
-import { Observable, distinctUntilChanged, filter, map, share, switchMap } from 'rxjs';
+import { Observable, combineLatest, distinctUntilChanged, map, share, switchMap } from 'rxjs';
 import { ObservableStakePoolSearchProvider, createDelegateeTracker, createQueryStakePoolsProvider } from './Delegatee';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { RewardsHistoryProvider, createRewardsHistoryTracker } from './RewardsHistory';
-import { TrackerSubject, coldObservableProvider, transactionsEquals } from '../util';
-import { TxWithEpoch, transactionHasAnyCertificate } from './util';
-import { createRewardsHistoryProvider } from '.';
+import { RewardsHistoryProvider, createRewardsHistoryProvider, createRewardsHistoryTracker } from './RewardsHistory';
+import { TrackerSubject, coldObservableProvider } from '../util';
+import { TxWithEpoch } from './types';
+import { isEqual, uniq } from 'lodash-es';
+import {
+  isLastStakeKeyCertOfType,
+  outgoingTransactionsWithCertificates,
+  transactionStakeKeyCertficates
+} from './transactionCertificates';
 
 export const createBlockEpochProvider =
   (walletProvider: WalletProvider, retryBackoffConfig: RetryBackoffConfig) => (blockHashes: Cardano.Hash16[]) =>
@@ -22,8 +27,8 @@ export interface DelegationTrackerProps {
   walletProvider: WalletProvider;
   keyManager: KeyManager;
   stakePoolSearchProvider: StakePoolSearchProvider;
-  epoch$: Observable<Epoch>;
-  transactionsTracker: Transactions;
+  epoch$: Observable<Cardano.Epoch>;
+  transactionsTracker: TransactionsTracker;
   retryBackoffConfig: RetryBackoffConfig;
   internals?: {
     queryStakePoolsProvider?: ObservableStakePoolSearchProvider;
@@ -33,20 +38,60 @@ export interface DelegationTrackerProps {
 }
 
 export const certificateTransactionsWithEpochs = (
-  transactionsTracker: Transactions,
+  transactionsTracker: TransactionsTracker,
   blockEpochProvider: BlockEpochProvider,
   certificateTypes: Cardano.CertificateType[]
 ): Observable<TxWithEpoch[]> =>
-  transactionsTracker.history.outgoing$.pipe(
-    map((transactions) => transactions.filter((tx) => transactionHasAnyCertificate(tx, certificateTypes))),
-    distinctUntilChanged(transactionsEquals),
-    filter((transactions) => transactions.length > 0),
+  outgoingTransactionsWithCertificates(transactionsTracker, certificateTypes).pipe(
     switchMap((transactions) =>
       blockEpochProvider(transactions.map((tx) => tx.blockHeader.blockHash)).pipe(
         map((epochs) => transactions.map((tx, txIndex) => ({ epoch: epochs[txIndex], tx })))
       )
     ),
     share()
+  );
+
+export const createRewardAccountsTracker = (
+  transactions$: Observable<TxWithEpoch[]>,
+  transactionsInFlight$: Observable<Cardano.NewTxAlonzo[]>
+) =>
+  combineLatest([transactions$, transactionsInFlight$]).pipe(
+    map(([transactions, transactionsInFlight]) => [transactions.map(({ tx }) => tx), transactionsInFlight]),
+    map(([transactions, transactionsInFlight]) => {
+      const rewardAccounts = uniq(
+        [...transactions, ...transactionsInFlight].flatMap(({ body }) =>
+          transactionStakeKeyCertficates(body).map((cert) => cert.address)
+        )
+      );
+      return rewardAccounts.map((address) => {
+        const isRegistered = isLastStakeKeyCertOfType(
+          transactions,
+          Cardano.CertificateType.StakeKeyRegistration,
+          address
+        );
+        const isRegistering = isLastStakeKeyCertOfType(
+          transactionsInFlight,
+          Cardano.CertificateType.StakeKeyRegistration,
+          address
+        );
+        const isUnregistering = isLastStakeKeyCertOfType(
+          transactionsInFlight,
+          Cardano.CertificateType.StakeKeyDeregistration,
+          address
+        );
+        return {
+          address,
+          keyStatus: isRegistering
+            ? StakeKeyStatus.Registering
+            : isUnregistering
+            ? StakeKeyStatus.Unregistering
+            : isRegistered
+            ? StakeKeyStatus.Registered
+            : StakeKeyStatus.Unregistered
+        };
+      });
+    }),
+    distinctUntilChanged(isEqual)
   );
 
 export const createDelegationTracker = ({
@@ -61,18 +106,23 @@ export const createDelegationTracker = ({
     rewardsHistoryProvider = createRewardsHistoryProvider(walletProvider, keyManager, retryBackoffConfig),
     blockEpochProvider = createBlockEpochProvider(walletProvider, retryBackoffConfig)
   } = {}
-}: DelegationTrackerProps): Delegation => {
+}: DelegationTrackerProps): DelegationTracker => {
   const transactions$ = certificateTransactionsWithEpochs(transactionsTracker, blockEpochProvider, [
-    CertificateType.StakeDelegation,
-    CertificateType.StakeRegistration,
-    CertificateType.StakeDeregistration
+    Cardano.CertificateType.StakeDelegation,
+    Cardano.CertificateType.StakeKeyRegistration,
+    Cardano.CertificateType.StakeKeyDeregistration
   ]);
   const rewardsHistory$ = new TrackerSubject(createRewardsHistoryTracker(transactions$, rewardsHistoryProvider));
   const delegatee$ = new TrackerSubject(createDelegateeTracker(queryStakePoolsProvider, epoch$, transactions$));
+  const rewardAccounts$ = new TrackerSubject(
+    createRewardAccountsTracker(transactions$, transactionsTracker.outgoing.inFlight$)
+  );
   return {
     delegatee$,
+    rewardAccounts$,
     rewardsHistory$,
     shutdown: () => {
+      rewardAccounts$.complete();
       rewardsHistory$.complete();
       delegatee$.complete();
     }

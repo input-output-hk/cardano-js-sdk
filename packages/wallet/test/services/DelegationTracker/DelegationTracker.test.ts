@@ -1,7 +1,12 @@
 import { Cardano, WalletProvider } from '@cardano-sdk/core';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { Transactions } from '../../../src/services';
-import { certificateTransactionsWithEpochs, createBlockEpochProvider } from '../../../src/services/DelegationTracker';
+import { StakeKeyStatus, TransactionsTracker } from '../../../src/services';
+import { TxWithEpoch } from '../../../src/services/DelegationTracker/types';
+import {
+  certificateTransactionsWithEpochs,
+  createBlockEpochProvider,
+  createRewardAccountsTracker
+} from '../../../src/services/DelegationTracker';
 import { createStubTxWithCertificates } from './stub-tx';
 import { createTestScheduler } from '../../testScheduler';
 
@@ -11,6 +16,49 @@ const coldObservableProviderMock: jest.Mock = jest.requireMock(
 ).coldObservableProvider;
 
 describe('DelegationTracker', () => {
+  test('createRewardAccountsTracker', () => {
+    createTestScheduler().run(({ cold, expectObservable }) => {
+      const address = 'stake...';
+      const transactions$ = cold('a-b-c', {
+        a: [],
+        b: [
+          {
+            tx: { body: { certificates: [{ __typename: Cardano.CertificateType.StakeKeyRegistration, address }] } }
+          } as TxWithEpoch
+        ],
+        c: [
+          {
+            tx: { body: { certificates: [{ __typename: Cardano.CertificateType.StakeKeyRegistration, address }] } }
+          } as TxWithEpoch,
+          {
+            tx: { body: { certificates: [{ __typename: Cardano.CertificateType.StakeKeyDeregistration, address }] } }
+          } as TxWithEpoch
+        ]
+      });
+      const transactionsInFlight$ = cold('abaca', {
+        a: [],
+        b: [
+          {
+            body: { certificates: [{ __typename: Cardano.CertificateType.StakeKeyRegistration, address }] }
+          } as Cardano.NewTxAlonzo
+        ],
+        c: [
+          {
+            body: { certificates: [{ __typename: Cardano.CertificateType.StakeKeyDeregistration, address }] }
+          } as Cardano.NewTxAlonzo
+        ]
+      });
+      const tracker$ = createRewardAccountsTracker(transactions$, transactionsInFlight$);
+      expectObservable(tracker$).toBe('abcde', {
+        a: [],
+        b: [{ address, keyStatus: StakeKeyStatus.Registering }],
+        c: [{ address, keyStatus: StakeKeyStatus.Registered }],
+        d: [{ address, keyStatus: StakeKeyStatus.Unregistering }],
+        e: [{ address, keyStatus: StakeKeyStatus.Unregistered }]
+      });
+    });
+  });
+
   test('createBlockEpochProvider', () => {
     createTestScheduler().run(({ cold, expectObservable, flush }) => {
       coldObservableProviderMock.mockReturnValue(
@@ -35,13 +83,13 @@ describe('DelegationTracker', () => {
     it('emits outgoing transactions containing given certificate types, retries on error', () => {
       createTestScheduler().run(({ cold, expectObservable }) => {
         const transactions = [
-          createStubTxWithCertificates([Cardano.CertificateType.StakeRegistration]),
+          createStubTxWithCertificates([Cardano.CertificateType.StakeKeyRegistration]),
           createStubTxWithCertificates([
             Cardano.CertificateType.PoolRetirement,
             Cardano.CertificateType.StakeDelegation
           ]),
           createStubTxWithCertificates(),
-          createStubTxWithCertificates([Cardano.CertificateType.StakeDeregistration])
+          createStubTxWithCertificates([Cardano.CertificateType.StakeKeyDeregistration])
         ];
         const blockEpochProvider = jest.fn().mockReturnValue(cold('-a', { a: [284, 285] }));
         const target$ = certificateTransactionsWithEpochs(
@@ -51,9 +99,9 @@ describe('DelegationTracker', () => {
                 a: transactions
               })
             }
-          } as unknown as Transactions,
+          } as unknown as TransactionsTracker,
           blockEpochProvider,
-          [Cardano.CertificateType.StakeDelegation, Cardano.CertificateType.StakeDeregistration]
+          [Cardano.CertificateType.StakeDelegation, Cardano.CertificateType.StakeKeyDeregistration]
         );
         expectObservable(target$).toBe('-a', {
           a: [

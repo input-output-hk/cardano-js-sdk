@@ -1,6 +1,5 @@
 /* eslint-disable max-len */
 import { Asset, CSL, Cardano, coreToCsl } from '../../src';
-import { CertificateType } from '@cardano-sdk/core/src/Cardano';
 
 const txIn: Cardano.TxIn = {
   address:
@@ -23,7 +22,7 @@ const txOut: Cardano.TxOut = {
 const coreTxBody: Cardano.TxBodyAlonzo = {
   certificates: [
     {
-      __typename: CertificateType.PoolRetirement,
+      __typename: Cardano.CertificateType.PoolRetirement,
       epoch: 500,
       poolId: 'pool1y6chk7x7fup4ms9leesdr57r4qy9cwxuee0msan72x976a6u0nc'
     }

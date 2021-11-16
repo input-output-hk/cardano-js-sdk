@@ -269,8 +269,8 @@ export const blockfrostProvider = (options: Options, logger = dummyLogger): Wall
     const response = await blockfrost.txsStakes(hash);
     return response.map(({ address, cert_index, registration }) => ({
       __typename: registration
-        ? Cardano.CertificateType.StakeRegistration
-        : Cardano.CertificateType.StakeDeregistration,
+        ? Cardano.CertificateType.StakeKeyRegistration
+        : Cardano.CertificateType.StakeKeyDeregistration,
       address,
       certIndex: cert_index
     }));
@@ -395,7 +395,7 @@ export const blockfrostProvider = (options: Options, logger = dummyLogger): Wall
             rewards: BigInt(amount)
           }))
       );
-      haveMorePages = rewards[rewards.length - 1].epoch < upperBound && rewards.length === 100;
+      haveMorePages = rewards.length === 100 && rewards[rewards.length - 1].epoch < upperBound;
       page += 1;
     }
     return result;

@@ -1,4 +1,4 @@
-import { Balance, BehaviorObservable, Delegation, TransactionalTracker, Transactions } from './services';
+import { Balance, BehaviorObservable, DelegationTracker, TransactionalTracker, TransactionsTracker } from './services';
 import { Cardano, NetworkInfo, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
 import { TxInternals } from './Transaction';
 
@@ -22,7 +22,7 @@ export interface Address {
 }
 
 export type InitializeTxProps = {
-  outputs: Set<Cardano.TxOut>;
+  outputs?: Set<Cardano.TxOut>;
   certificates?: Cardano.Certificate[];
   withdrawals?: Cardano.Withdrawal[];
   options?: {
@@ -37,9 +37,9 @@ export interface FinalizeTxProps {
 export interface Wallet {
   name: string;
   readonly balance: TransactionalTracker<Balance>;
-  readonly delegation: Delegation;
+  readonly delegation: DelegationTracker;
   readonly utxo: TransactionalTracker<Cardano.Utxo[]>;
-  readonly transactions: Transactions;
+  readonly transactions: TransactionsTracker;
   readonly tip$: BehaviorObservable<Cardano.Tip>;
   readonly genesisParameters$: BehaviorObservable<Cardano.CompactGenesis>;
   readonly networkInfo$: BehaviorObservable<NetworkInfo>;
