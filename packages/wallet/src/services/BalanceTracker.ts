@@ -1,4 +1,4 @@
-import { Balance, Delegation, DelegationKeyStatus, TransactionalObservables, TransactionalTracker } from './types';
+import { Balance, DelegationTracker, StakeKeyStatus, TransactionalObservables, TransactionalTracker } from './types';
 import { Cardano, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
 import { Observable, combineLatest, distinctUntilChanged, map, share } from 'rxjs';
 import { TrackerSubject } from './util';
@@ -20,7 +20,7 @@ const createDepositTracker = (
     distinctUntilChanged()
   );
 
-const numRewardAccountsWithKeyStatus = (delegationTracker: Delegation, keyStatus: DelegationKeyStatus) =>
+const numRewardAccountsWithKeyStatus = (delegationTracker: DelegationTracker, keyStatus: StakeKeyStatus) =>
   delegationTracker.rewardAccounts$.pipe(
     map((accounts) => accounts.filter((account) => account.keyStatus === keyStatus).length)
   );
@@ -29,17 +29,17 @@ export const createBalanceTracker = (
   protocolParameters$: Observable<ProtocolParametersRequiredByWallet>,
   utxoTracker: TransactionalObservables<Cardano.Utxo[]>,
   rewardsTracker: TransactionalObservables<Cardano.Lovelace>,
-  delegationTracker: Delegation
+  delegationTracker: DelegationTracker
 ): TransactionalTracker<Balance> => {
   const depositTotal$ = createDepositTracker(
     protocolParameters$,
-    numRewardAccountsWithKeyStatus(delegationTracker, DelegationKeyStatus.Registered)
+    numRewardAccountsWithKeyStatus(delegationTracker, StakeKeyStatus.Registered)
   ).pipe(share());
   const depositAvailable$ = combineLatest([
     depositTotal$,
     createDepositTracker(
       protocolParameters$,
-      numRewardAccountsWithKeyStatus(delegationTracker, DelegationKeyStatus.Unregistering)
+      numRewardAccountsWithKeyStatus(delegationTracker, StakeKeyStatus.Unregistering)
     )
   ]).pipe(map(([totalDeposit, depositBeingSpent]) => totalDeposit - depositBeingSpent));
   const available$ = new TrackerSubject<Balance>(

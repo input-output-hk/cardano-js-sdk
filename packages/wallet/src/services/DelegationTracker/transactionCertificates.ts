@@ -1,5 +1,5 @@
 import { Cardano, util } from '@cardano-sdk/core';
-import { Transactions } from '../types';
+import { TransactionsTracker } from '../types';
 import { distinctUntilChanged, map } from 'rxjs';
 import { last } from 'lodash-es';
 import { transactionsEquals } from '../util/equals';
@@ -39,7 +39,7 @@ export const isLastStakeKeyCertOfType = (
 };
 
 export const outgoingTransactionsWithCertificates = (
-  transactionsTracker: Transactions,
+  transactionsTracker: TransactionsTracker,
   certificateTypes: Cardano.CertificateType[]
 ) =>
   transactionsTracker.history.outgoing$.pipe(

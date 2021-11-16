@@ -1,5 +1,5 @@
 import { Cardano, WalletProvider } from '@cardano-sdk/core';
-import { DirectionalTransaction, FailedTx, TransactionDirection, Transactions } from './types';
+import { DirectionalTransaction, FailedTx, TransactionDirection, TransactionsTracker } from './types';
 import {
   EMPTY,
   Observable,
@@ -95,7 +95,7 @@ export const createTransactionsTracker = (
       createAddressTransactionsProvider(walletProvider, addresses, retryBackoffConfig, sharedDistinctBlock(tip$))
     )
   }: TransactionsTrackerInternals = {}
-): Transactions => {
+): TransactionsTracker => {
   const providerTransactionsByDirection$ = (direction: TransactionDirection) =>
     transactionsSource$.pipe(
       map((transactions) => transactions.filter((tx) => tx.direction === direction).map(({ tx }) => tx)),

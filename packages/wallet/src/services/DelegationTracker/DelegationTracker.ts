@@ -1,7 +1,6 @@
 /* eslint-disable unicorn/no-nested-ternary */
 import { Cardano, StakePoolSearchProvider, WalletProvider } from '@cardano-sdk/core';
-import { Delegation, Transactions } from '../types';
-import { DelegationKeyStatus } from '..';
+import { DelegationTracker, StakeKeyStatus, TransactionsTracker } from '../types';
 import { KeyManager } from '../../KeyManagement';
 import { Observable, combineLatest, distinctUntilChanged, map, share, switchMap } from 'rxjs';
 import { ObservableStakePoolSearchProvider, createDelegateeTracker, createQueryStakePoolsProvider } from './Delegatee';
@@ -30,7 +29,7 @@ export interface DelegationTrackerProps {
   keyManager: KeyManager;
   stakePoolSearchProvider: StakePoolSearchProvider;
   epoch$: Observable<Cardano.Epoch>;
-  transactionsTracker: Transactions;
+  transactionsTracker: TransactionsTracker;
   retryBackoffConfig: RetryBackoffConfig;
   internals?: {
     queryStakePoolsProvider?: ObservableStakePoolSearchProvider;
@@ -40,7 +39,7 @@ export interface DelegationTrackerProps {
 }
 
 export const certificateTransactionsWithEpochs = (
-  transactionsTracker: Transactions,
+  transactionsTracker: TransactionsTracker,
   blockEpochProvider: BlockEpochProvider,
   certificateTypes: Cardano.CertificateType[]
 ): Observable<TxWithEpoch[]> =>
@@ -80,12 +79,12 @@ export const createRewardAccountsTracker = (
         return {
           address,
           keyStatus: isRegistering
-            ? DelegationKeyStatus.Registering
+            ? StakeKeyStatus.Registering
             : isUnregistering
-            ? DelegationKeyStatus.Unregistering
+            ? StakeKeyStatus.Unregistering
             : isRegistered
-            ? DelegationKeyStatus.Registered
-            : DelegationKeyStatus.Unregistered
+            ? StakeKeyStatus.Registered
+            : StakeKeyStatus.Unregistered
         };
       });
     }),
@@ -104,7 +103,7 @@ export const createDelegationTracker = ({
     rewardsHistoryProvider = createRewardsHistoryProvider(walletProvider, keyManager, retryBackoffConfig),
     blockEpochProvider = createBlockEpochProvider(walletProvider, retryBackoffConfig)
   } = {}
-}: DelegationTrackerProps): Delegation => {
+}: DelegationTrackerProps): DelegationTracker => {
   const transactions$ = certificateTransactionsWithEpochs(transactionsTracker, blockEpochProvider, [
     Cardano.CertificateType.StakeDelegation,
     Cardano.CertificateType.StakeRegistration,

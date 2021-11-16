@@ -2,14 +2,14 @@ import { Address, AddressType, InitializeTxProps, Wallet } from './types';
 import {
   Balance,
   BehaviorObservable,
-  Delegation,
+  DelegationTracker,
   FailedTx,
   PollingConfig,
   SyncableIntervalTrackerSubject,
   TrackerSubject,
   TransactionFailure,
   TransactionalTracker,
-  Transactions,
+  TransactionsTracker,
   coldObservableProvider,
   createBalanceTracker,
   createDelegationTracker,
@@ -68,8 +68,8 @@ export class SingleAddressWallet implements Wallet {
   #rewards: TransactionalTracker<Cardano.Lovelace>;
   utxo: TransactionalTracker<Cardano.Utxo[]>;
   balance: TransactionalTracker<Balance>;
-  transactions: Transactions;
-  delegation: Delegation;
+  transactions: TransactionsTracker;
+  delegation: DelegationTracker;
   tip$: BehaviorObservable<Cardano.Tip>;
   networkInfo$: BehaviorObservable<NetworkInfo>;
   protocolParameters$: BehaviorObservable<ProtocolParametersRequiredByWallet>;

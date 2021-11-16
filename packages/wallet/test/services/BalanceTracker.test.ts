@@ -2,7 +2,7 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable no-multi-spaces */
 /* eslint-disable space-in-parens */
-import { BehaviorObservable, Delegation, DelegationKeyStatus, RewardAccount, createBalanceTracker } from '../../src/services';
+import { BehaviorObservable, DelegationTracker, RewardAccount, StakeKeyStatus, createBalanceTracker } from '../../src/services';
 import { Cardano, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
 import { createTestScheduler } from '../testScheduler';
 import { utxo } from '../mocks';
@@ -17,13 +17,13 @@ describe('createBalanceTracker', () => {
       const utxoTotal = cold(           '-a-----', { a: utxo }) as unknown as BehaviorObservable<Cardano.Utxo[]>;
       const rewardAccounts$ = cold(     'a----bc', {
         a: [],
-        b: [{ keyStatus: DelegationKeyStatus.Registered } as RewardAccount],
-        c: [{ keyStatus: DelegationKeyStatus.Registered } as RewardAccount, { keyStatus: DelegationKeyStatus.Unregistering }] }) as unknown as BehaviorObservable<RewardAccount[]>;
+        b: [{ keyStatus: StakeKeyStatus.Registered } as RewardAccount],
+        c: [{ keyStatus: StakeKeyStatus.Registered } as RewardAccount, { keyStatus: StakeKeyStatus.Unregistering }] }) as unknown as BehaviorObservable<RewardAccount[]>;
       const balanceTracker = createBalanceTracker(
         protocolParameters$,
         { available$: utxoAvailable, total$: utxoTotal },
         { available$: rewardsAvailable, total$: rewardsTotal },
-        { rewardAccounts$ } as Delegation
+        { rewardAccounts$ } as DelegationTracker
       );
       expectObservable(balanceTracker.total$).toBe('-a--bc-', {
         a: { ...Cardano.util.coalesceValueQuantities(utxo.map((u) => u[1].value)), deposit: 0n, rewards: 10n },

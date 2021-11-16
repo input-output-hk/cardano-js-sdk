@@ -1,6 +1,6 @@
 import { Cardano, WalletProvider } from '@cardano-sdk/core';
-import { DelegationKeyStatus, Transactions } from '../../../src/services';
 import { RetryBackoffConfig } from 'backoff-rxjs';
+import { StakeKeyStatus, TransactionsTracker } from '../../../src/services';
 import { TxWithEpoch } from '../../../src/services/DelegationTracker/types';
 import {
   certificateTransactionsWithEpochs,
@@ -51,10 +51,10 @@ describe('DelegationTracker', () => {
       const tracker$ = createRewardAccountsTracker(transactions$, transactionsInFlight$);
       expectObservable(tracker$).toBe('abcde', {
         a: [],
-        b: [{ address, keyStatus: DelegationKeyStatus.Registering }],
-        c: [{ address, keyStatus: DelegationKeyStatus.Registered }],
-        d: [{ address, keyStatus: DelegationKeyStatus.Unregistering }],
-        e: [{ address, keyStatus: DelegationKeyStatus.Unregistered }]
+        b: [{ address, keyStatus: StakeKeyStatus.Registering }],
+        c: [{ address, keyStatus: StakeKeyStatus.Registered }],
+        d: [{ address, keyStatus: StakeKeyStatus.Unregistering }],
+        e: [{ address, keyStatus: StakeKeyStatus.Unregistered }]
       });
     });
   });
@@ -99,7 +99,7 @@ describe('DelegationTracker', () => {
                 a: transactions
               })
             }
-          } as unknown as Transactions,
+          } as unknown as TransactionsTracker,
           blockEpochProvider,
           [Cardano.CertificateType.StakeDelegation, Cardano.CertificateType.StakeDeregistration]
         );

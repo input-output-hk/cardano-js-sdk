@@ -42,8 +42,7 @@ export interface FailedTx {
   reason: TransactionFailure;
 }
 
-// TODO: rename -> TransactionsTracker
-export interface Transactions {
+export interface TransactionsTracker {
   readonly history: {
     all$: BehaviorObservable<DirectionalTransaction[]>;
     outgoing$: BehaviorObservable<Cardano.TxAlonzo[]>;
@@ -73,7 +72,7 @@ export interface Delegatee {
   nextNextEpoch: Cardano.StakePool | null;
 }
 
-export enum DelegationKeyStatus {
+export enum StakeKeyStatus {
   Registering = 'REGISTERING',
   Registered = 'REGISTERED',
   Unregistering = 'UNREGISTERING',
@@ -82,12 +81,11 @@ export enum DelegationKeyStatus {
 
 export interface RewardAccount {
   address: Cardano.Address;
-  keyStatus: DelegationKeyStatus;
+  keyStatus: StakeKeyStatus;
   // Maybe add rewardsHistory$ and delegatee$ for each reward account too
 }
 
-// TODO: rename -> DelegationTracker
-export interface Delegation {
+export interface DelegationTracker {
   rewardsHistory$: BehaviorObservable<RewardsHistory>;
   delegatee$: BehaviorObservable<Delegatee>;
   rewardAccounts$: BehaviorObservable<RewardAccount[]>;

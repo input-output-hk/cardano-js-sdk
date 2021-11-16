@@ -1,5 +1,5 @@
 import { Cardano } from '@cardano-sdk/core';
-import { DelegationKeyStatus, SingleAddressWallet, Wallet } from '../../src';
+import { SingleAddressWallet, StakeKeyStatus, Wallet } from '../../src';
 import { filter, firstValueFrom, skip, tap } from 'rxjs';
 import { keyManager, poolId1, poolId2, stakePoolSearchProvider, walletProvider } from './config';
 
@@ -11,7 +11,7 @@ const createDelegationCertificates = async (wallet: Wallet, rewardAccount: Carda
   // swap poolId if it's already delegating to one of the pools
   const poolId = delegateeBefore1stTx.nextNextEpoch?.id === poolId2 ? poolId1 : poolId2;
   const isStakeKeyRegistered = (await firstValueFrom(wallet.delegation.rewardAccounts$)).some(
-    (acc) => acc.keyStatus === DelegationKeyStatus.Registered
+    (acc) => acc.keyStatus === StakeKeyStatus.Registered
   );
   const {
     currentEpoch: { number: epoch }
