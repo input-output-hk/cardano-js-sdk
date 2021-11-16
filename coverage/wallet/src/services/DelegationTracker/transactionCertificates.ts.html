@@ -3,15 +3,15 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for src/Transaction/createTransactionInternals.ts</title>
+    <title>Code coverage report for src/services/DelegationTracker/transactionCertificates.ts</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="../../prettify.css" />
-    <link rel="stylesheet" href="../../base.css" />
-    <link rel="shortcut icon" type="image/x-icon" href="../../favicon.png" />
+    <link rel="stylesheet" href="../../../prettify.css" />
+    <link rel="stylesheet" href="../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style type='text/css'>
         .coverage-summary .sorter {
-            background-image: url(../../sort-arrow-sprite.png);
+            background-image: url(../../../sort-arrow-sprite.png);
         }
     </style>
 </head>
@@ -19,34 +19,34 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../index.html">All files</a> / <a href="index.html">src/Transaction</a> createTransactionInternals.ts</h1>
+        <h1><a href="../../../index.html">All files</a> / <a href="index.html">src/services/DelegationTracker</a> transactionCertificates.ts</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>10/10</span>
+                <span class='fraction'>26/26</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/0</span>
+                <span class='fraction'>6/6</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>2/2</span>
+                <span class='fraction'>10/10</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>9/9</span>
+                <span class='fraction'>20/20</span>
             </div>
         
             
@@ -105,105 +105,102 @@
 <a name='L46'></a><a href='#L46'>46</a>
 <a name='L47'></a><a href='#L47'>47</a>
 <a name='L48'></a><a href='#L48'>48</a>
-<a name='L49'></a><a href='#L49'>49</a>
-<a name='L50'></a><a href='#L50'>50</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">14x</span>
+<a name='L49'></a><a href='#L49'>49</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">112x</span>
+<span class="cline-any cline-yes">119x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">51x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">76x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">83x</span>
+<span class="cline-any cline-yes">83x</span>
+<span class="cline-any cline-yes">19x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">83x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">76x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">14x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">14x</span>
-<span class="cline-any cline-yes">14x</span>
-<span class="cline-any cline-yes">14x</span>
-<span class="cline-any cline-yes">14x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">14x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">17x</span>
+<span class="cline-any cline-yes">25x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">14x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { CSL, Cardano, coreToCsl, cslToCore } from '@cardano-sdk/core';
-import { Hash16 } from '@cardano-ogmios/schema';
-import { SelectionResult } from '@cardano-sdk/cip2';
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Cardano, util } from '@cardano-sdk/core';
+import { TransactionsTracker } from '../types';
+import { distinctUntilChanged, map } from 'rxjs';
+import { last } from 'lodash-es';
+import { transactionsEquals } from '../util/equals';
 &nbsp;
-export type TxInternals = {
-  hash: Hash16;
-  body: Cardano.TxBodyAlonzo;
+export const RegAndDeregCertificateTypes = [
+  Cardano.CertificateType.StakeKeyRegistration,
+  Cardano.CertificateType.StakeKeyDeregistration
+];
+&nbsp;
+export const transactionStakeKeyCertficates = (body: Cardano.TxBodyAlonzo) =&gt;
+  (body.certificates || []).filter((certificate): certificate is Cardano.StakeAddressCertificate =&gt;
+    RegAndDeregCertificateTypes.includes(certificate.__typename)
+  );
+&nbsp;
+export const transactionHasAnyCertificate = (
+  { body: { certificates } }: Cardano.TxAlonzo,
+  certificateTypes: Cardano.CertificateType[]
+) =&gt; certificates?.some(({ __typename }) =&gt; certificateTypes.includes(__typename)) || false;
+&nbsp;
+export const isLastStakeKeyCertOfType = (
+  transactions: { body: Cardano.TxBodyAlonzo }[],
+  certType: Cardano.CertificateType.StakeKeyRegistration | Cardano.CertificateType.StakeKeyDeregistration,
+  rewardAccount?: Cardano.Address
+) =&gt; {
+  const lastRegOrDereg = last(
+    transactions
+      .map(({ body }) =&gt; {
+        const allStakeKeyCertificates = transactionStakeKeyCertficates(body);
+        const addressStakeKeyCertificates = rewardAccount
+          ? allStakeKeyCertificates.filter(({ address }) =&gt; rewardAccount === address)
+          : allStakeKeyCertificates;
+        return last(addressStakeKeyCertificates);
+      })
+      .filter(util.isNotNil)
+  );
+  return lastRegOrDereg?.__typename === certType;
 };
 &nbsp;
-export type CreateTxInternalsProps = {
-  changeAddress: string;
-  inputSelection: SelectionResult['selection'];
-  validityInterval: Cardano.ValidityInterval;
-  certificates?: Cardano.Certificate[];
-  withdrawals?: Cardano.Withdrawal[];
-};
-&nbsp;
-export const createTransactionInternals = async ({
-  changeAddress,
-  withdrawals,
-  certificates,
-  validityInterval,
-  inputSelection
-}: CreateTxInternalsProps): Promise&lt;TxInternals&gt; =&gt; {
-  const outputs = [...inputSelection.outputs].map(cslToCore.txOut);
-  for (const cslValue of inputSelection.change) {
-    const value = cslToCore.value(cslValue);
-    outputs.push({
-      address: changeAddress,
-      value
-    });
-  }
-  const body = {
-    // TODO: return more fields. Also add support in coreToCsl.txBody:
-    // collaterals, mint, requiredExtraSignatures, scriptIntegrityHash
-    certificates,
-    fee: BigInt(inputSelection.fee.to_str()),
-    inputs: [...inputSelection.inputs].map((cslInput) =&gt;
-      cslToCore.txIn(cslInput.input(), cslInput.output().address().to_bech32())
-    ),
-    outputs,
-    validityInterval,
-    withdrawals
-  };
-  return {
-    body,
-    hash: Buffer.from(CSL.hash_transaction(coreToCsl.txBody(body)).to_bytes()).toString('hex')
-  };
-};
+export const outgoingTransactionsWithCertificates = (
+  transactionsTracker: TransactionsTracker,
+  certificateTypes: Cardano.CertificateType[]
+) =&gt;
+  transactionsTracker.history.outgoing$.pipe(
+    map((transactions) =&gt; transactions.filter((tx) =&gt; transactionHasAnyCertificate(tx, certificateTypes))),
+    distinctUntilChanged(transactionsEquals)
+  );
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -214,14 +211,14 @@ export const createTransactionInternals = async ({
                 at Tue Nov 16 2021 10:15:49 GMT+0000 (Coordinated Universal Time)
             </div>
         </div>
-        <script src="../../prettify.js"></script>
+        <script src="../../../prettify.js"></script>
         <script>
             window.onload = function () {
                 prettyPrint();
             };
         </script>
-        <script src="../../sorter.js"></script>
-        <script src="../../block-navigation.js"></script>
+        <script src="../../../sorter.js"></script>
+        <script src="../../../block-navigation.js"></script>
     </body>
 </html>
     

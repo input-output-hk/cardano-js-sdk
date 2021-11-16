@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">92.86% </span>
+                <span class="strong">94.12% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>26/28</span>
+                <span class='fraction'>32/34</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">66.67% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>2/4</span>
+                <span class='fraction'>4/6</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">75% </span>
+                <span class="strong">80% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>3/4</span>
+                <span class='fraction'>4/5</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">96.15% </span>
+                <span class="strong">96.88% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>25/26</span>
+                <span class='fraction'>31/32</span>
             </div>
         
             
@@ -124,13 +124,26 @@
 <a name='L65'></a><a href='#L65'>65</a>
 <a name='L66'></a><a href='#L66'>66</a>
 <a name='L67'></a><a href='#L67'>67</a>
-<a name='L68'></a><a href='#L68'>68</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">13x</span>
-<span class="cline-any cline-yes">13x</span>
-<span class="cline-any cline-yes">13x</span>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">14x</span>
+<span class="cline-any cline-yes">14x</span>
+<span class="cline-any cline-yes">14x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">13x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">13x</span>
+<span class="cline-any cline-yes">14x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">14x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -159,6 +172,7 @@
 <span class="cline-any cline-yes">21x</span>
 <span class="cline-any cline-yes">21x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">21x</span>
 <span class="cline-any cline-yes">21x</span>
 <span class="cline-any cline-yes">21x</span>
 <span class="cline-any cline-yes">21x</span>
@@ -185,6 +199,16 @@
 <span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -195,6 +219,7 @@
 import * as errors from './errors';
 import { CSL, Cardano } from '@cardano-sdk/core';
 import { KeyManager } from './types';
+import { TxInternals } from '../Transaction';
 import { harden, joinMnemonicWords } from './util';
 &nbsp;
 export const createInMemoryKeyManager = ({
@@ -222,17 +247,18 @@ export const createInMemoryKeyManager = ({
     .derive(harden(1815))
     .derive(harden(accountIndex));
 &nbsp;
-  const privateParentKey = accountPrivateKey.derive(0).derive(0);
-  const publicParentKey = privateParentKey.to_public();
-  const publicKey = accountPrivateKey.to_public();
+  const privateParentPaymentKey = accountPrivateKey.derive(0).derive(0);
+  const publicParentPaymentKey = privateParentPaymentKey.to_public();
+  const publicPaymentKey = accountPrivateKey.to_public();
 &nbsp;
-  const stakeKey = publicKey.derive(2).derive(0);
-  const stakeKeyRaw = stakeKey.to_raw_key();
-  const stakeKeyCredential = CSL.StakeCredential.from_keyhash(stakeKeyRaw.hash());
+  const privateStakeKey = accountPrivateKey.derive(2).derive(0);
+  const publicStakeKey = privateStakeKey.to_public();
+  const publicRawSakeKey = publicStakeKey.to_raw_key();
+  const stakeKeyCredential = CSL.StakeCredential.from_keyhash(publicRawSakeKey.hash());
 &nbsp;
   return {
     deriveAddress: (addressIndex, index) =&gt; {
-      const utxoPubKey = publicKey.derive(index).derive(addressIndex);
+      const utxoPubKey = publicPaymentKey.derive(index).derive(addressIndex);
       const baseAddr = CSL.BaseAddress.new(
         networkId,
         CSL.StakeCredential.from_keyhash(utxoPubKey.to_raw_key().hash()),
@@ -241,21 +267,31 @@ export const createInMemoryKeyManager = ({
 &nbsp;
       return baseAddr.to_address().to_bech32();
     },
-    publicKey: publicKey.to_raw_key(),
-    publicParentKey: publicParentKey.to_raw_key(),
+    publicKey: publicPaymentKey.to_raw_key(),
+    publicParentKey: publicParentPaymentKey.to_raw_key(),
     rewardAccount: CSL.RewardAddress.new(networkId, stakeKeyCredential).to_address().to_bech32(),
     signMessage: <span class="fstat-no" title="function not covered" >async </span>(_addressType, _signingIndex, message) =&gt; (<span class="cstat-no" title="statement not covered" >{</span>
-      publicKey: publicParentKey.toString(),
+      publicKey: publicParentPaymentKey.toString(),
       signature: `Signature for ${message} is not implemented yet`
     }),
-    signTransaction: async (txHash: Cardano.Hash16) =&gt; {
-      const cslHash = CSL.TransactionHash.from_bytes(Buffer.from(txHash, 'hex'));
-      const vkeyWitness = CSL.make_vkey_witness(cslHash, privateParentKey.to_raw_key());
+    signTransaction: async ({ body, hash }: TxInternals) =&gt; {
+      const cslHash = CSL.TransactionHash.from_bytes(Buffer.from(hash, 'hex'));
+      const paymentVkeyWitness = CSL.make_vkey_witness(cslHash, privateParentPaymentKey.to_raw_key());
+      const stakeWitnesses = (() =&gt; {
+        if (!body.certificates) {
+          return {};
+        }
+        const stakeVkeyWitness = CSL.make_vkey_witness(cslHash, privateStakeKey.to_raw_key());
+        return {
+          [stakeVkeyWitness.vkey().public_key().to_bech32()]: stakeVkeyWitness.signature().to_hex()
+        };
+      })();
       return {
-        [vkeyWitness.vkey().public_key().to_bech32()]: vkeyWitness.signature().to_hex()
+        [paymentVkeyWitness.vkey().public_key().to_bech32()]: paymentVkeyWitness.signature().to_hex(),
+        ...stakeWitnesses
       };
     },
-    stakeKey: stakeKeyRaw
+    stakeKey: publicRawSakeKey
   };
 };
 &nbsp;</pre></td></tr></table></pre>
@@ -265,7 +301,7 @@ export const createInMemoryKeyManager = ({
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Fri Nov 12 2021 12:35:46 GMT+0000 (Coordinated Universal Time)
+                at Tue Nov 16 2021 10:15:49 GMT+0000 (Coordinated Universal Time)
             </div>
         </div>
         <script src="../../prettify.js"></script>
