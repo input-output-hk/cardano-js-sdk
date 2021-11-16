@@ -1,8 +1,7 @@
-import { StakePool } from '@cardano-sdk/core/src/Cardano';
-import { StakePoolSearchProvider } from '@cardano-sdk/core';
+import { Cardano, StakePoolSearchProvider } from '@cardano-sdk/core';
 import delay from 'delay';
 
-export const somePartialStakePools: StakePool[] = [
+export const somePartialStakePools: Cardano.StakePool[] = [
   {
     hexId: 'cf12a9dcaacdc09778616d60502011a88ed4542c482f2ddd08d8ac5a',
     id: 'pool1euf2nh92ehqfw7rpd4s9qgq34z8dg4pvfqhjmhggmzk95gcd402',
@@ -23,13 +22,13 @@ export const somePartialStakePools: StakePool[] = [
       ticker: 'VEGA2'
     }
   }
-] as StakePool[];
+] as Cardano.StakePool[];
 
 /**
  * Good source for testnet pools: https://testnet.adatools.io/pools
  */
 export const createStubStakePoolSearchProvider = (
-  stakePools: StakePool[] = somePartialStakePools,
+  stakePools: Cardano.StakePool[] = somePartialStakePools,
   delayMs?: number
 ): StakePoolSearchProvider => ({
   queryStakePools: async (fragments) => {

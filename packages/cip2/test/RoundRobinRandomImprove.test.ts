@@ -7,7 +7,6 @@ import {
   testInputSelectionFailureMode,
   testInputSelectionProperties
 } from './util';
-import { createOutput } from '@cardano-sdk/util-dev/src/cslTestUtil';
 import { roundRobinRandomImprove } from '../src/RoundRobinRandomImprove';
 import fc from 'fast-check';
 
@@ -37,7 +36,7 @@ describe('RoundRobinRandomImprove', () => {
       });
       it('Selects UTxO even when implicit input covers outputs', async () => {
         const utxo = new Set([CslTestUtil.createUnspentTxOutput({ coins: 10_000_000n })]);
-        const outputs = new Set([createOutput({ coins: 1_000_000n })]);
+        const outputs = new Set([CslTestUtil.createOutput({ coins: 1_000_000n })]);
         const results = await roundRobinRandomImprove().select({
           constraints: SelectionConstraints.NO_CONSTRAINTS,
           implicitCoin: { input: 2_000_000n },

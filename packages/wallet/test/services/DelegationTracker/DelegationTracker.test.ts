@@ -1,6 +1,5 @@
 import { Cardano, WalletProvider } from '@cardano-sdk/core';
 import { DelegationKeyStatus, Transactions } from '../../../src/services';
-import { NewTxAlonzo } from '@cardano-sdk/core/src/Cardano';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TxWithEpoch } from '../../../src/services/DelegationTracker/types';
 import {
@@ -41,12 +40,12 @@ describe('DelegationTracker', () => {
         b: [
           {
             body: { certificates: [{ __typename: Cardano.CertificateType.StakeRegistration, address }] }
-          } as NewTxAlonzo
+          } as Cardano.NewTxAlonzo
         ],
         c: [
           {
             body: { certificates: [{ __typename: Cardano.CertificateType.StakeDeregistration, address }] }
-          } as NewTxAlonzo
+          } as Cardano.NewTxAlonzo
         ]
       });
       const tracker$ = createRewardAccountsTracker(transactions$, transactionsInFlight$);

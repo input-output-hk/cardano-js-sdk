@@ -23,6 +23,9 @@ module.exports = {
       2,
       "unix"
     ],
+    "no-restricted-imports": ["error", {
+      "patterns": ["@cardano-sdk/*/src/*"]
+    }],
     "new-cap": 0,
     "no-unused-expressions": 0,
     "no-useless-constructor": 0,

@@ -1,5 +1,4 @@
 import { BigIntMath, Cardano, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
-import { CertificateType } from '@cardano-sdk/core/src/Cardano';
 import { InitializeTxProps } from '../types';
 
 /**
@@ -14,8 +13,8 @@ export const computeImplicitCoin = (
   const deposit = BigIntMath.sum(
     certificates?.map(
       (cert) =>
-        (cert.__typename === CertificateType.StakeRegistration && stakeKeyDepositBigint) ||
-        (cert.__typename === CertificateType.PoolRegistration && poolDepositBigint) ||
+        (cert.__typename === Cardano.CertificateType.StakeRegistration && stakeKeyDepositBigint) ||
+        (cert.__typename === Cardano.CertificateType.PoolRegistration && poolDepositBigint) ||
         0n
     ) || []
   );
@@ -23,8 +22,8 @@ export const computeImplicitCoin = (
   const reclaimTotal = BigIntMath.sum(
     certificates?.map(
       (cert) =>
-        (cert.__typename === CertificateType.StakeDeregistration && stakeKeyDepositBigint) ||
-        (cert.__typename === CertificateType.PoolRetirement && poolDepositBigint) ||
+        (cert.__typename === Cardano.CertificateType.StakeDeregistration && stakeKeyDepositBigint) ||
+        (cert.__typename === Cardano.CertificateType.PoolRetirement && poolDepositBigint) ||
         0n
     ) || []
   );

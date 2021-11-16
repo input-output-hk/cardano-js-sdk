@@ -4,7 +4,6 @@
 /* eslint-disable space-in-parens */
 import { BehaviorObservable, Delegation, DelegationKeyStatus, RewardAccount, createBalanceTracker } from '../../src/services';
 import { Cardano, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
-import { coalesceValueQuantities } from '@cardano-sdk/core/src/Cardano/util';
 import { createTestScheduler } from '../testScheduler';
 import { utxo } from '../mocks';
 
@@ -27,16 +26,16 @@ describe('createBalanceTracker', () => {
         { rewardAccounts$ } as Delegation
       );
       expectObservable(balanceTracker.total$).toBe('-a--bc-', {
-        a: { ...coalesceValueQuantities(utxo.map((u) => u[1].value)), deposit: 0n, rewards: 10n },
-        b: { ...coalesceValueQuantities(utxo.map((u) => u[1].value)), deposit: 0n, rewards: 20n },
-        c: { ...coalesceValueQuantities(utxo.map((u) => u[1].value)), deposit: 2n, rewards: 20n }
+        a: { ...Cardano.util.coalesceValueQuantities(utxo.map((u) => u[1].value)), deposit: 0n, rewards: 10n },
+        b: { ...Cardano.util.coalesceValueQuantities(utxo.map((u) => u[1].value)), deposit: 0n, rewards: 20n },
+        c: { ...Cardano.util.coalesceValueQuantities(utxo.map((u) => u[1].value)), deposit: 2n, rewards: 20n }
       });
       expectObservable(balanceTracker.available$).toBe('--abcde', {
-        a: { ...coalesceValueQuantities(utxo.map((u) => u[1].value)), deposit: 0n, rewards: 10n },
-        b: { ...coalesceValueQuantities(utxo.map((u) => u[1].value)), deposit: 0n, rewards: 5n },
-        c: { ...coalesceValueQuantities(utxo.slice(1).map((u) => u[1].value)), deposit: 0n, rewards: 5n },
-        d: { ...coalesceValueQuantities(utxo.slice(1).map((u) => u[1].value)), deposit: 2n, rewards: 5n },
-        e: { ...coalesceValueQuantities(utxo.slice(1).map((u) => u[1].value)), deposit: 0n, rewards: 5n }
+        a: { ...Cardano.util.coalesceValueQuantities(utxo.map((u) => u[1].value)), deposit: 0n, rewards: 10n },
+        b: { ...Cardano.util.coalesceValueQuantities(utxo.map((u) => u[1].value)), deposit: 0n, rewards: 5n },
+        c: { ...Cardano.util.coalesceValueQuantities(utxo.slice(1).map((u) => u[1].value)), deposit: 0n, rewards: 5n },
+        d: { ...Cardano.util.coalesceValueQuantities(utxo.slice(1).map((u) => u[1].value)), deposit: 2n, rewards: 5n },
+        e: { ...Cardano.util.coalesceValueQuantities(utxo.slice(1).map((u) => u[1].value)), deposit: 0n, rewards: 5n }
       });
     });
   });

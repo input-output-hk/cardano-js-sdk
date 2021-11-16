@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Cardano } from '@cardano-sdk/core';
-import { TxAlonzo } from '@cardano-sdk/core/src/Cardano';
 import { arrayEquals, strictEquals, transactionsEquals, txEquals, utxoEquals } from '../../../src';
 
 describe('equals', () => {
@@ -22,8 +21,8 @@ describe('equals', () => {
 
   test('transactionsEquals', () => {
     expect(transactionsEquals([], [])).toBe(true);
-    expect(transactionsEquals([{ id: 'id1' } as TxAlonzo], [{ id: 'id2' } as TxAlonzo])).toBe(false);
-    expect(transactionsEquals([{ id: 'id1' } as TxAlonzo], [{ id: 'id1' } as TxAlonzo])).toBe(true);
+    expect(transactionsEquals([{ id: 'id1' } as Cardano.TxAlonzo], [{ id: 'id2' } as Cardano.TxAlonzo])).toBe(false);
+    expect(transactionsEquals([{ id: 'id1' } as Cardano.TxAlonzo], [{ id: 'id1' } as Cardano.TxAlonzo])).toBe(true);
   });
 
   test('utxoEquals ', () => {

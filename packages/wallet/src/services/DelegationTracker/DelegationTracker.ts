@@ -1,6 +1,5 @@
 /* eslint-disable unicorn/no-nested-ternary */
 import { Cardano, StakePoolSearchProvider, WalletProvider } from '@cardano-sdk/core';
-import { CertificateType, Epoch, NewTxAlonzo } from '@cardano-sdk/core/src/Cardano';
 import { Delegation, Transactions } from '../types';
 import { DelegationKeyStatus } from '..';
 import { KeyManager } from '../../KeyManagement';
@@ -30,7 +29,7 @@ export interface DelegationTrackerProps {
   walletProvider: WalletProvider;
   keyManager: KeyManager;
   stakePoolSearchProvider: StakePoolSearchProvider;
-  epoch$: Observable<Epoch>;
+  epoch$: Observable<Cardano.Epoch>;
   transactionsTracker: Transactions;
   retryBackoffConfig: RetryBackoffConfig;
   internals?: {
@@ -56,7 +55,7 @@ export const certificateTransactionsWithEpochs = (
 
 export const createRewardAccountsTracker = (
   transactions$: Observable<TxWithEpoch[]>,
-  transactionsInFlight$: Observable<NewTxAlonzo[]>
+  transactionsInFlight$: Observable<Cardano.NewTxAlonzo[]>
 ) =>
   combineLatest([transactions$, transactionsInFlight$]).pipe(
     map(([transactions, transactionsInFlight]) => [transactions.map(({ tx }) => tx), transactionsInFlight]),
@@ -107,9 +106,9 @@ export const createDelegationTracker = ({
   } = {}
 }: DelegationTrackerProps): Delegation => {
   const transactions$ = certificateTransactionsWithEpochs(transactionsTracker, blockEpochProvider, [
-    CertificateType.StakeDelegation,
-    CertificateType.StakeRegistration,
-    CertificateType.StakeDeregistration
+    Cardano.CertificateType.StakeDelegation,
+    Cardano.CertificateType.StakeRegistration,
+    Cardano.CertificateType.StakeDeregistration
   ]);
   const rewardsHistory$ = new TrackerSubject(createRewardsHistoryTracker(transactions$, rewardsHistoryProvider));
   const delegatee$ = new TrackerSubject(createDelegateeTracker(queryStakePoolsProvider, epoch$, transactions$));

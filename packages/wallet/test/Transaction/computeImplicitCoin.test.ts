@@ -1,5 +1,4 @@
 import { Cardano, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
-import { CertificateType } from '@cardano-sdk/core/src/Cardano';
 import { InitializeTxProps, Transaction } from '../../src';
 
 describe('Transaction.computeImplicitCoin', () => {
@@ -7,11 +6,11 @@ describe('Transaction.computeImplicitCoin', () => {
     const protocolParameters = { poolDeposit: 3, stakeKeyDeposit: 2 } as ProtocolParametersRequiredByWallet;
     const address = 'stake...';
     const certificates: Cardano.Certificate[] = [
-      { __typename: CertificateType.StakeRegistration, address },
-      { __typename: CertificateType.StakeDeregistration, address },
-      { __typename: CertificateType.StakeRegistration, address },
-      { __typename: CertificateType.PoolRetirement, epoch: 500, poolId: 'pool...' },
-      { __typename: CertificateType.StakeDelegation, address, epoch: 500, poolId: 'pool...' }
+      { __typename: Cardano.CertificateType.StakeRegistration, address },
+      { __typename: Cardano.CertificateType.StakeDeregistration, address },
+      { __typename: Cardano.CertificateType.StakeRegistration, address },
+      { __typename: Cardano.CertificateType.PoolRetirement, epoch: 500, poolId: 'pool...' },
+      { __typename: Cardano.CertificateType.StakeDelegation, address, epoch: 500, poolId: 'pool...' }
     ];
     const withdrawals: Cardano.Withdrawal[] = [{ quantity: 5n, stakeAddress: address }];
     const txProps = { certificates, withdrawals } as InitializeTxProps;

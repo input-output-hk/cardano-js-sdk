@@ -1,6 +1,5 @@
 import { Cardano, util } from '@cardano-sdk/core';
 import { Transactions } from '../types';
-import { TxBodyAlonzo } from '@cardano-sdk/core/src/Cardano';
 import { distinctUntilChanged, map } from 'rxjs';
 import { last } from 'lodash-es';
 import { transactionsEquals } from '../util/equals';
@@ -10,7 +9,7 @@ export const RegAndDeregCertificateTypes = [
   Cardano.CertificateType.StakeDeregistration
 ];
 
-export const transactionStakeKeyCertficates = (body: TxBodyAlonzo) =>
+export const transactionStakeKeyCertficates = (body: Cardano.TxBodyAlonzo) =>
   (body.certificates || []).filter((certificate): certificate is Cardano.StakeAddressCertificate =>
     RegAndDeregCertificateTypes.includes(certificate.__typename)
   );
@@ -21,7 +20,7 @@ export const transactionHasAnyCertificate = (
 ) => certificates?.some(({ __typename }) => certificateTypes.includes(__typename)) || false;
 
 export const isLastStakeKeyCertOfType = (
-  transactions: { body: TxBodyAlonzo }[],
+  transactions: { body: Cardano.TxBodyAlonzo }[],
   certType: Cardano.CertificateType.StakeRegistration | Cardano.CertificateType.StakeDeregistration,
   rewardAccount?: Cardano.Address
 ) => {
