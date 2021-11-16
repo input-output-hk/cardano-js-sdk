@@ -19,7 +19,7 @@ const isDelegationCertificate = (cert: Cardano.Certificate): cert is Cardano.Sta
 
 export const getStakePoolIdAtEpoch = (transactions: TxWithEpoch[]) => (atEpoch: Cardano.Epoch) => {
   const transactionsUpToEpoch = transactions.filter(({ epoch }) => epoch <= atEpoch - 2).map(({ tx }) => tx);
-  if (!isLastStakeKeyCertOfType(transactionsUpToEpoch, Cardano.CertificateType.StakeRegistration)) return;
+  if (!isLastStakeKeyCertOfType(transactionsUpToEpoch, Cardano.CertificateType.StakeKeyRegistration)) return;
   const delegationTx = findLast(transactionsUpToEpoch, (tx) =>
     transactionHasAnyCertificate(tx, [Cardano.CertificateType.StakeDelegation])
   );

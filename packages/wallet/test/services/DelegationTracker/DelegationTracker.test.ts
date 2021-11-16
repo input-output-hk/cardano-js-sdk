@@ -23,15 +23,15 @@ describe('DelegationTracker', () => {
         a: [],
         b: [
           {
-            tx: { body: { certificates: [{ __typename: Cardano.CertificateType.StakeRegistration, address }] } }
+            tx: { body: { certificates: [{ __typename: Cardano.CertificateType.StakeKeyRegistration, address }] } }
           } as TxWithEpoch
         ],
         c: [
           {
-            tx: { body: { certificates: [{ __typename: Cardano.CertificateType.StakeRegistration, address }] } }
+            tx: { body: { certificates: [{ __typename: Cardano.CertificateType.StakeKeyRegistration, address }] } }
           } as TxWithEpoch,
           {
-            tx: { body: { certificates: [{ __typename: Cardano.CertificateType.StakeDeregistration, address }] } }
+            tx: { body: { certificates: [{ __typename: Cardano.CertificateType.StakeKeyDeregistration, address }] } }
           } as TxWithEpoch
         ]
       });
@@ -39,12 +39,12 @@ describe('DelegationTracker', () => {
         a: [],
         b: [
           {
-            body: { certificates: [{ __typename: Cardano.CertificateType.StakeRegistration, address }] }
+            body: { certificates: [{ __typename: Cardano.CertificateType.StakeKeyRegistration, address }] }
           } as Cardano.NewTxAlonzo
         ],
         c: [
           {
-            body: { certificates: [{ __typename: Cardano.CertificateType.StakeDeregistration, address }] }
+            body: { certificates: [{ __typename: Cardano.CertificateType.StakeKeyDeregistration, address }] }
           } as Cardano.NewTxAlonzo
         ]
       });
@@ -83,13 +83,13 @@ describe('DelegationTracker', () => {
     it('emits outgoing transactions containing given certificate types, retries on error', () => {
       createTestScheduler().run(({ cold, expectObservable }) => {
         const transactions = [
-          createStubTxWithCertificates([Cardano.CertificateType.StakeRegistration]),
+          createStubTxWithCertificates([Cardano.CertificateType.StakeKeyRegistration]),
           createStubTxWithCertificates([
             Cardano.CertificateType.PoolRetirement,
             Cardano.CertificateType.StakeDelegation
           ]),
           createStubTxWithCertificates(),
-          createStubTxWithCertificates([Cardano.CertificateType.StakeDeregistration])
+          createStubTxWithCertificates([Cardano.CertificateType.StakeKeyDeregistration])
         ];
         const blockEpochProvider = jest.fn().mockReturnValue(cold('-a', { a: [284, 285] }));
         const target$ = certificateTransactionsWithEpochs(
@@ -101,7 +101,7 @@ describe('DelegationTracker', () => {
             }
           } as unknown as TransactionsTracker,
           blockEpochProvider,
-          [Cardano.CertificateType.StakeDelegation, Cardano.CertificateType.StakeDeregistration]
+          [Cardano.CertificateType.StakeDelegation, Cardano.CertificateType.StakeKeyDeregistration]
         );
         expectObservable(target$).toBe('-a', {
           a: [

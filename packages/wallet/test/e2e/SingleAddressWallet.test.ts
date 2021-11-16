@@ -21,7 +21,7 @@ const createDelegationCertificates = async (wallet: Wallet, rewardAccount: Carda
       ...(isStakeKeyRegistered
         ? []
         : ([
-            { __typename: Cardano.CertificateType.StakeRegistration, address: rewardAccount }
+            { __typename: Cardano.CertificateType.StakeKeyRegistration, address: rewardAccount }
           ] as Cardano.Certificate[])),
       { __typename: Cardano.CertificateType.StakeDelegation, address: rewardAccount, epoch, poolId }
     ] as Cardano.Certificate[],
@@ -113,7 +113,7 @@ describe('SingleAddressWallet', () => {
 
     // Make a 2nd tx with key deregistration
     const tx2Internals = await wallet.initializeTx({
-      certificates: [{ __typename: Cardano.CertificateType.StakeDeregistration, address: rewardAccount }]
+      certificates: [{ __typename: Cardano.CertificateType.StakeKeyDeregistration, address: rewardAccount }]
     });
     await wallet.submitTx(await wallet.finalizeTx(tx2Internals));
 

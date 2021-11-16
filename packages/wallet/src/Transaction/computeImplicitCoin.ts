@@ -13,7 +13,7 @@ export const computeImplicitCoin = (
   const deposit = BigIntMath.sum(
     certificates?.map(
       (cert) =>
-        (cert.__typename === Cardano.CertificateType.StakeRegistration && stakeKeyDepositBigint) ||
+        (cert.__typename === Cardano.CertificateType.StakeKeyRegistration && stakeKeyDepositBigint) ||
         (cert.__typename === Cardano.CertificateType.PoolRegistration && poolDepositBigint) ||
         0n
     ) || []
@@ -22,7 +22,7 @@ export const computeImplicitCoin = (
   const reclaimTotal = BigIntMath.sum(
     certificates?.map(
       (cert) =>
-        (cert.__typename === Cardano.CertificateType.StakeDeregistration && stakeKeyDepositBigint) ||
+        (cert.__typename === Cardano.CertificateType.StakeKeyDeregistration && stakeKeyDepositBigint) ||
         (cert.__typename === Cardano.CertificateType.PoolRetirement && poolDepositBigint) ||
         0n
     ) || []

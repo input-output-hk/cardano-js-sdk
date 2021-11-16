@@ -5,8 +5,8 @@ import { last } from 'lodash-es';
 import { transactionsEquals } from '../util/equals';
 
 export const RegAndDeregCertificateTypes = [
-  Cardano.CertificateType.StakeRegistration,
-  Cardano.CertificateType.StakeDeregistration
+  Cardano.CertificateType.StakeKeyRegistration,
+  Cardano.CertificateType.StakeKeyDeregistration
 ];
 
 export const transactionStakeKeyCertficates = (body: Cardano.TxBodyAlonzo) =>
@@ -21,7 +21,7 @@ export const transactionHasAnyCertificate = (
 
 export const isLastStakeKeyCertOfType = (
   transactions: { body: Cardano.TxBodyAlonzo }[],
-  certType: Cardano.CertificateType.StakeRegistration | Cardano.CertificateType.StakeDeregistration,
+  certType: Cardano.CertificateType.StakeKeyRegistration | Cardano.CertificateType.StakeKeyDeregistration,
   rewardAccount?: Cardano.Address
 ) => {
   const lastRegOrDereg = last(

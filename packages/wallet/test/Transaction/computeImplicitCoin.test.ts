@@ -6,9 +6,9 @@ describe('Transaction.computeImplicitCoin', () => {
     const protocolParameters = { poolDeposit: 3, stakeKeyDeposit: 2 } as ProtocolParametersRequiredByWallet;
     const address = 'stake...';
     const certificates: Cardano.Certificate[] = [
-      { __typename: Cardano.CertificateType.StakeRegistration, address },
-      { __typename: Cardano.CertificateType.StakeDeregistration, address },
-      { __typename: Cardano.CertificateType.StakeRegistration, address },
+      { __typename: Cardano.CertificateType.StakeKeyRegistration, address },
+      { __typename: Cardano.CertificateType.StakeKeyDeregistration, address },
+      { __typename: Cardano.CertificateType.StakeKeyRegistration, address },
       { __typename: Cardano.CertificateType.PoolRetirement, epoch: 500, poolId: 'pool...' },
       { __typename: Cardano.CertificateType.StakeDelegation, address, epoch: 500, poolId: 'pool...' }
     ];

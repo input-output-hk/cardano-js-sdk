@@ -13,33 +13,33 @@ describe('transactionCertificates', () => {
     const certificates = transactionStakeKeyCertficates({
       certificates: [
         { __typename: Cardano.CertificateType.StakeDelegation } as Cardano.Certificate,
-        { __typename: Cardano.CertificateType.StakeRegistration } as Cardano.Certificate,
-        { __typename: Cardano.CertificateType.StakeDeregistration } as Cardano.Certificate
+        { __typename: Cardano.CertificateType.StakeKeyRegistration } as Cardano.Certificate,
+        { __typename: Cardano.CertificateType.StakeKeyDeregistration } as Cardano.Certificate
       ]
     } as Cardano.TxBodyAlonzo);
     expect(certificates).toHaveLength(2);
-    expect(certificates[0].__typename).toBe(Cardano.CertificateType.StakeRegistration);
-    expect(certificates[1].__typename).toBe(Cardano.CertificateType.StakeDeregistration);
+    expect(certificates[0].__typename).toBe(Cardano.CertificateType.StakeKeyRegistration);
+    expect(certificates[1].__typename).toBe(Cardano.CertificateType.StakeKeyDeregistration);
   });
 
   test('transactionHasAnyCertificate', () => {
     const tx = {
       body: {
         certificates: [
-          { __typename: Cardano.CertificateType.StakeRegistration } as Cardano.Certificate,
+          { __typename: Cardano.CertificateType.StakeKeyRegistration } as Cardano.Certificate,
           { __typename: Cardano.CertificateType.StakeDelegation } as Cardano.Certificate
         ]
       }
     } as Cardano.TxAlonzo;
     expect(
       transactionHasAnyCertificate(tx, [
-        Cardano.CertificateType.StakeDeregistration,
+        Cardano.CertificateType.StakeKeyDeregistration,
         Cardano.CertificateType.StakeDelegation
       ])
     ).toBe(true);
     expect(
       transactionHasAnyCertificate(tx, [
-        Cardano.CertificateType.StakeDeregistration,
+        Cardano.CertificateType.StakeKeyDeregistration,
         Cardano.CertificateType.PoolRegistration
       ])
     ).toBe(false);
@@ -51,7 +51,7 @@ describe('transactionCertificates', () => {
       {
         body: {
           certificates: [
-            { __typename: Cardano.CertificateType.StakeRegistration, address } as Cardano.Certificate,
+            { __typename: Cardano.CertificateType.StakeKeyRegistration, address } as Cardano.Certificate,
             { __typename: Cardano.CertificateType.StakeDelegation } as Cardano.Certificate
           ]
         }
@@ -60,14 +60,14 @@ describe('transactionCertificates', () => {
         body: {
           certificates: [
             { __typename: Cardano.CertificateType.PoolRegistration } as Cardano.Certificate,
-            { __typename: Cardano.CertificateType.StakeDeregistration } as Cardano.Certificate
+            { __typename: Cardano.CertificateType.StakeKeyDeregistration } as Cardano.Certificate
           ]
         }
       } as Cardano.TxAlonzo
     ];
-    expect(isLastStakeKeyCertOfType(transactions, Cardano.CertificateType.StakeRegistration)).toBe(false);
-    expect(isLastStakeKeyCertOfType(transactions, Cardano.CertificateType.StakeRegistration, address)).toBe(true);
-    expect(isLastStakeKeyCertOfType(transactions, Cardano.CertificateType.StakeDeregistration)).toBe(true);
+    expect(isLastStakeKeyCertOfType(transactions, Cardano.CertificateType.StakeKeyRegistration)).toBe(false);
+    expect(isLastStakeKeyCertOfType(transactions, Cardano.CertificateType.StakeKeyRegistration, address)).toBe(true);
+    expect(isLastStakeKeyCertOfType(transactions, Cardano.CertificateType.StakeKeyDeregistration)).toBe(true);
   });
 
   test('outgoingTransactionsWithCertificates', () => {

@@ -269,8 +269,8 @@ export const blockfrostProvider = (options: Options, logger = dummyLogger): Wall
     const response = await blockfrost.txsStakes(hash);
     return response.map(({ address, cert_index, registration }) => ({
       __typename: registration
-        ? Cardano.CertificateType.StakeRegistration
-        : Cardano.CertificateType.StakeDeregistration,
+        ? Cardano.CertificateType.StakeKeyRegistration
+        : Cardano.CertificateType.StakeKeyDeregistration,
       address,
       certIndex: cert_index
     }));

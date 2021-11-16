@@ -64,15 +64,19 @@ export const createRewardAccountsTracker = (
         )
       );
       return rewardAccounts.map((address) => {
-        const isRegistered = isLastStakeKeyCertOfType(transactions, Cardano.CertificateType.StakeRegistration, address);
+        const isRegistered = isLastStakeKeyCertOfType(
+          transactions,
+          Cardano.CertificateType.StakeKeyRegistration,
+          address
+        );
         const isRegistering = isLastStakeKeyCertOfType(
           transactionsInFlight,
-          Cardano.CertificateType.StakeRegistration,
+          Cardano.CertificateType.StakeKeyRegistration,
           address
         );
         const isUnregistering = isLastStakeKeyCertOfType(
           transactionsInFlight,
-          Cardano.CertificateType.StakeDeregistration,
+          Cardano.CertificateType.StakeKeyDeregistration,
           address
         );
         return {
@@ -105,8 +109,8 @@ export const createDelegationTracker = ({
 }: DelegationTrackerProps): DelegationTracker => {
   const transactions$ = certificateTransactionsWithEpochs(transactionsTracker, blockEpochProvider, [
     Cardano.CertificateType.StakeDelegation,
-    Cardano.CertificateType.StakeRegistration,
-    Cardano.CertificateType.StakeDeregistration
+    Cardano.CertificateType.StakeKeyRegistration,
+    Cardano.CertificateType.StakeKeyDeregistration
   ]);
   const rewardsHistory$ = new TrackerSubject(createRewardsHistoryTracker(transactions$, rewardsHistoryProvider));
   const delegatee$ = new TrackerSubject(createDelegateeTracker(queryStakePoolsProvider, epoch$, transactions$));

@@ -51,8 +51,8 @@ export interface PoolParameters
 }
 
 export enum CertificateType {
-  StakeRegistration = 'StakeRegistration',
-  StakeDeregistration = 'StakeDeregistration',
+  StakeKeyRegistration = 'StakeKeyRegistration',
+  StakeKeyDeregistration = 'StakeKeyDeregistration',
   PoolRegistration = 'PoolRegistration',
   PoolRetirement = 'PoolRetirement',
   StakeDelegation = 'StakeDelegation',
@@ -61,7 +61,7 @@ export enum CertificateType {
 }
 
 export interface StakeAddressCertificate {
-  __typename: CertificateType.StakeRegistration | CertificateType.StakeDeregistration;
+  __typename: CertificateType.StakeKeyRegistration | CertificateType.StakeKeyDeregistration;
   address: Address;
 }
 

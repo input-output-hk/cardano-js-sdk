@@ -131,9 +131,9 @@ export const create = (certificate: Cardano.Certificate) => {
       return poolRetirement(certificate.poolId, certificate.epoch);
     case CertificateType.StakeDelegation:
       return stakeDelegation(certificate.address, certificate.poolId);
-    case CertificateType.StakeDeregistration:
+    case CertificateType.StakeKeyDeregistration:
       return stakeKeyDeregistration(certificate.address);
-    case CertificateType.StakeRegistration:
+    case CertificateType.StakeKeyRegistration:
       return stakeKeyRegistration(certificate.address);
     default:
       throw new NotImplementedError(`certificate.create ${certificate.__typename}`);
