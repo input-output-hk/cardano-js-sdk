@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/util-dev",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Utilities for tests in other packages",
   "engines": {
     "node": "^14"
@@ -21,10 +21,10 @@
     "test:debug": "DEBUG=true yarn test"
   },
   "devDependencies": {
-    "@cardano-sdk/cip2": " 0.1.6"
+    "@cardano-sdk/cip2": " 0.1.7"
   },
   "dependencies": {
-    "@cardano-sdk/core": " 0.1.6",
+    "@cardano-sdk/core": " 0.1.7",
     "delay": "^5.0.0"
   },
   "files": [
