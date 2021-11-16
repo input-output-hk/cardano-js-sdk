@@ -1,4 +1,3 @@
-// TODO: rename to MockWalletProvider since it's using jest.fn() mocks
 /* eslint-disable max-len */
 import { AssetId } from '@cardano-sdk/util-dev';
 import { Cardano, EpochRewards, WalletProvider } from '@cardano-sdk/core';

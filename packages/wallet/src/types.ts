@@ -22,7 +22,7 @@ export interface Address {
 }
 
 export type InitializeTxProps = {
-  outputs: Set<Cardano.TxOut>;
+  outputs?: Set<Cardano.TxOut>;
   certificates?: Cardano.Certificate[];
   withdrawals?: Cardano.Withdrawal[];
   options?: {

@@ -61,7 +61,6 @@ export const createInMemoryKeyManager = ({
       const cslHash = CSL.TransactionHash.from_bytes(Buffer.from(hash, 'hex'));
       const paymentVkeyWitness = CSL.make_vkey_witness(cslHash, privateParentPaymentKey.to_raw_key());
       const stakeWitnesses = (() => {
-        // TODO: not all certificate types might need a stake key witness
         if (!body.certificates) {
           return {};
         }

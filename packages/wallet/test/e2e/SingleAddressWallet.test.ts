@@ -113,9 +113,7 @@ describe('SingleAddressWallet', () => {
 
     // Make a 2nd tx with key deregistration
     const tx2Internals = await wallet.initializeTx({
-      certificates: [{ __typename: Cardano.CertificateType.StakeDeregistration, address: rewardAccount }],
-      // TODO: make outputs optional. Coin selection has to select at least 1 utxo for change output in this case.
-      outputs: new Set()
+      certificates: [{ __typename: Cardano.CertificateType.StakeDeregistration, address: rewardAccount }]
     });
     await wallet.submitTx(await wallet.finalizeTx(tx2Internals));
 

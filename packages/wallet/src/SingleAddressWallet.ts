@@ -161,7 +161,7 @@ export class SingleAddressWallet implements Wallet {
         take(1),
         mergeMap(([tip, utxo, protocolParameters]) => {
           const validityInterval = ensureValidityInterval(tip.slot, props.options?.validityInterval);
-          const txOutputs = new Set([...props.outputs].map((output) => coreToCsl.txOut(output)));
+          const txOutputs = new Set([...(props.outputs || [])].map((output) => coreToCsl.txOut(output)));
           const changeAddress = this.addresses[0].bech32;
           const constraints = defaultSelectionConstraints({
             buildTx: async (inputSelection) => {
