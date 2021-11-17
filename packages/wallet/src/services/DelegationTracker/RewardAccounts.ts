@@ -92,16 +92,19 @@ export const createDelegateeTracker = (
   stakePoolSearchProvider: ObservableStakePoolSearchProvider,
   epoch$: Observable<Cardano.Epoch>,
   certificates$: Observable<TransactionsCertificates>
-): Observable<Delegatee> =>
+): Observable<Delegatee | undefined> =>
   combineLatest([certificates$, epoch$]).pipe(
     switchMap(([transactions, lastEpoch]) => {
       const stakePoolIds = [lastEpoch, lastEpoch + 1, lastEpoch + 2].map(getStakePoolIdAtEpoch(transactions));
       return stakePoolSearchProvider(uniq(stakePoolIds.filter(util.isNotNil))).pipe(
-        map((stakePools) => stakePoolIds.map((poolId) => stakePools.find((pool) => pool.id === poolId) || null)),
-        map(([currentEpoch, nextEpoch, nextNextEpoch]) => ({ currentEpoch, nextEpoch, nextNextEpoch }))
+        map((stakePools) => stakePoolIds.map((poolId) => stakePools.find((pool) => pool.id === poolId) || undefined)),
+        map(([currentEpoch, nextEpoch, nextNextEpoch]) => {
+          if (!nextNextEpoch) return;
+          return { currentEpoch, nextEpoch, nextNextEpoch };
+        })
       );
     }),
-    distinctUntilChanged(isEqual)
+    distinctUntilChanged((a, b) => isEqual(a, b))
   );
 
 export const addressKeyStatuses = (
@@ -128,7 +131,7 @@ export const addressDelegatees = (
 
 export const toRewardAccounts =
   (addresses: Cardano.Address[]) =>
-  ([statuses, delegatees]: [StakeKeyStatus[], Delegatee[]]) =>
+  ([statuses, delegatees]: [StakeKeyStatus[], (Delegatee | undefined)[]]) =>
     addresses.map(
       (address, i): RewardAccount => ({
         address,

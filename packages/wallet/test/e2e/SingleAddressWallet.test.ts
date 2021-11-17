@@ -13,7 +13,7 @@ const createDelegationCertificates = async (wallet: Wallet) => {
     keyStatus
   } = (await firstValueFrom(wallet.delegation.rewardAccounts$))[0];
   // swap poolId if it's already delegating to one of the pools
-  const poolId = delegateeBefore1stTx.nextNextEpoch?.id === poolId2 ? poolId1 : poolId2;
+  const poolId = delegateeBefore1stTx?.nextNextEpoch.id === poolId2 ? poolId1 : poolId2;
   const isStakeKeyRegistered = keyStatus === StakeKeyStatus.Registered;
   const {
     currentEpoch: { number: epoch }
@@ -36,7 +36,7 @@ const waitForNewStakePoolIdAfterTx = (wallet: Wallet) =>
   firstValueFrom(
     merge(
       wallet.delegation.rewardAccounts$.pipe(
-        map(([acc]) => acc.delegatee.nextNextEpoch?.id),
+        map(([acc]) => acc.delegatee?.nextNextEpoch.id),
         distinctUntilChanged(),
         skip(1)
       ),

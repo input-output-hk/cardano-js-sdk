@@ -67,9 +67,9 @@ export interface RewardsHistory {
 }
 
 export interface Delegatee {
-  currentEpoch: Cardano.StakePool | null;
-  nextEpoch: Cardano.StakePool | null;
-  nextNextEpoch: Cardano.StakePool | null;
+  currentEpoch?: Cardano.StakePool;
+  nextEpoch?: Cardano.StakePool;
+  nextNextEpoch: Cardano.StakePool;
 }
 
 export enum StakeKeyStatus {
@@ -82,8 +82,8 @@ export enum StakeKeyStatus {
 export interface RewardAccount {
   address: Cardano.Address;
   keyStatus: StakeKeyStatus;
-  delegatee: Delegatee;
-  // Maybe add rewardsHistory$ for each reward account too
+  delegatee?: Delegatee;
+  // Maybe add rewardsHistory for each reward account too
 }
 
 export interface DelegationTracker {

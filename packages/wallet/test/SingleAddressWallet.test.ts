@@ -70,7 +70,7 @@ describe('SingleAddressWallet', () => {
       const rewardAccounts = await firstValueFrom(wallet.delegation.rewardAccounts$);
       expect(rewardAccounts).toHaveLength(1);
       expect(rewardAccounts[0].address).toBe(keyManager.rewardAccount);
-      expect(rewardAccounts[0].delegatee.nextNextEpoch).toBeNull();
+      expect(rewardAccounts[0].delegatee).toBeUndefined();
     });
     it('"addresses"', () => {
       expect(wallet.addresses.map(({ bech32 }) => bech32)).toEqual([address]);
