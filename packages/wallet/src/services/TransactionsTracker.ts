@@ -3,6 +3,7 @@ import { DirectionalTransaction, FailedTx, TransactionDirection, TransactionsTra
 import {
   EMPTY,
   Observable,
+  Subject,
   concat,
   distinctUntilChanged,
   filter,
@@ -12,7 +13,6 @@ import {
   of,
   race,
   scan,
-  share,
   startWith,
   take,
   takeUntil,
@@ -115,25 +115,27 @@ export const createTransactionsTracker = (
       map(() => tx)
     );
 
-  const failed$: Observable<FailedTx> = submitting$.pipe(
-    mergeMap((tx) => {
-      const invalidHereafter = tx.body.validityInterval.invalidHereafter;
-      return race(
-        failedToSubmit$.pipe(
-          filter((failed) => failed.tx === tx),
-          take(1)
-        ),
-        invalidHereafter
-          ? tip$.pipe(
-              filter(({ slot }) => slot > invalidHereafter),
-              map(() => ({ reason: TransactionFailure.Timeout, tx })),
-              take(1)
-            )
-          : EMPTY
-      ).pipe(takeUntil(txConfirmed$(tx)));
-    }),
-    share()
-  );
+  const failed$ = new Subject<FailedTx>();
+  const failedSubscription = submitting$
+    .pipe(
+      mergeMap((tx) => {
+        const invalidHereafter = tx.body.validityInterval.invalidHereafter;
+        return race(
+          failedToSubmit$.pipe(
+            filter((failed) => failed.tx === tx),
+            take(1)
+          ),
+          invalidHereafter
+            ? tip$.pipe(
+                filter(({ slot }) => slot > invalidHereafter),
+                map(() => ({ reason: TransactionFailure.Timeout, tx })),
+                take(1)
+              )
+            : EMPTY
+        ).pipe(takeUntil(txConfirmed$(tx)));
+      })
+    )
+    .subscribe(failed$);
 
   const txFailed$ = (tx: Cardano.NewTxAlonzo) =>
     failed$.pipe(
@@ -160,6 +162,11 @@ export const createTransactionsTracker = (
     )
   );
 
+  const confirmed$ = new Subject<Cardano.NewTxAlonzo>();
+  const confirmedSubscription = submitting$
+    .pipe(mergeMap((tx) => txConfirmed$(tx).pipe(takeUntil(txFailed$(tx)))))
+    .subscribe(confirmed$);
+
   return {
     history: {
       all$: transactionsSource$,
@@ -168,7 +175,7 @@ export const createTransactionsTracker = (
     },
     incoming$: newTransactions$(incomingTransactionHistory$),
     outgoing: {
-      confirmed$: submitting$.pipe(mergeMap((tx) => txConfirmed$(tx).pipe(takeUntil(txFailed$(tx))))),
+      confirmed$,
       failed$,
       inFlight$,
       pending$,
@@ -177,6 +184,10 @@ export const createTransactionsTracker = (
     shutdown: () => {
       transactionsSource$.complete();
       inFlight$.complete();
+      confirmedSubscription.unsubscribe();
+      confirmed$.complete();
+      failedSubscription.unsubscribe();
+      failed$.complete();
     }
   };
 };
