@@ -23,7 +23,7 @@ describe('createBalanceTracker', () => {
         protocolParameters$,
         { available$: utxoAvailable, total$: utxoTotal },
         { available$: rewardsAvailable, total$: rewardsTotal },
-        { rewardAccounts$ } as DelegationTracker
+        { rewardAccounts$ } as unknown as DelegationTracker
       );
       expectObservable(balanceTracker.total$).toBe('-a--bc-', {
         a: { ...Cardano.util.coalesceValueQuantities(utxo.map((u) => u[1].value)), deposit: 0n, rewards: 10n },

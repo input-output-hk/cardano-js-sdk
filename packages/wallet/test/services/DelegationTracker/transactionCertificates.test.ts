@@ -1,22 +1,19 @@
 import { Cardano } from '@cardano-sdk/core';
-import {
-  TransactionsTracker,
-  isLastStakeKeyCertOfType,
-  outgoingTransactionsWithCertificates,
-  transactionHasAnyCertificate,
-  transactionStakeKeyCertficates
-} from '../../../src';
 import { createTestScheduler } from '../../testScheduler';
+import {
+  isLastStakeKeyCertOfType,
+  stakeKeyCertficates,
+  transactionHasAnyCertificate,
+  transactionsWithCertificates
+} from '../../../src';
 
 describe('transactionCertificates', () => {
   test('transactionStakeKeyCertficates', () => {
-    const certificates = transactionStakeKeyCertficates({
-      certificates: [
-        { __typename: Cardano.CertificateType.StakeDelegation } as Cardano.Certificate,
-        { __typename: Cardano.CertificateType.StakeKeyRegistration } as Cardano.Certificate,
-        { __typename: Cardano.CertificateType.StakeKeyDeregistration } as Cardano.Certificate
-      ]
-    } as Cardano.TxBodyAlonzo);
+    const certificates = stakeKeyCertficates([
+      { __typename: Cardano.CertificateType.StakeDelegation } as Cardano.Certificate,
+      { __typename: Cardano.CertificateType.StakeKeyRegistration } as Cardano.Certificate,
+      { __typename: Cardano.CertificateType.StakeKeyDeregistration } as Cardano.Certificate
+    ]);
     expect(certificates).toHaveLength(2);
     expect(certificates[0].__typename).toBe(Cardano.CertificateType.StakeKeyRegistration);
     expect(certificates[1].__typename).toBe(Cardano.CertificateType.StakeKeyDeregistration);
@@ -47,27 +44,19 @@ describe('transactionCertificates', () => {
 
   test('isLastStakeKeyCertOfType', () => {
     const address = 'stake...';
-    const transactions = [
-      {
-        body: {
-          certificates: [
-            { __typename: Cardano.CertificateType.StakeKeyRegistration, address } as Cardano.Certificate,
-            { __typename: Cardano.CertificateType.StakeDelegation } as Cardano.Certificate
-          ]
-        }
-      } as Cardano.TxAlonzo,
-      {
-        body: {
-          certificates: [
-            { __typename: Cardano.CertificateType.PoolRegistration } as Cardano.Certificate,
-            { __typename: Cardano.CertificateType.StakeKeyDeregistration } as Cardano.Certificate
-          ]
-        }
-      } as Cardano.TxAlonzo
+    const certificates = [
+      [
+        { __typename: Cardano.CertificateType.StakeKeyRegistration, address } as Cardano.Certificate,
+        { __typename: Cardano.CertificateType.StakeDelegation } as Cardano.Certificate
+      ],
+      [
+        ({ __typename: Cardano.CertificateType.PoolRegistration } as Cardano.Certificate,
+        { __typename: Cardano.CertificateType.StakeKeyDeregistration } as Cardano.Certificate)
+      ]
     ];
-    expect(isLastStakeKeyCertOfType(transactions, Cardano.CertificateType.StakeKeyRegistration)).toBe(false);
-    expect(isLastStakeKeyCertOfType(transactions, Cardano.CertificateType.StakeKeyRegistration, address)).toBe(true);
-    expect(isLastStakeKeyCertOfType(transactions, Cardano.CertificateType.StakeKeyDeregistration)).toBe(true);
+    expect(isLastStakeKeyCertOfType(certificates, Cardano.CertificateType.StakeKeyRegistration)).toBe(false);
+    expect(isLastStakeKeyCertOfType(certificates, Cardano.CertificateType.StakeKeyRegistration, address)).toBe(true);
+    expect(isLastStakeKeyCertOfType(certificates, Cardano.CertificateType.StakeKeyDeregistration)).toBe(true);
   });
 
   test('outgoingTransactionsWithCertificates', () => {
@@ -79,16 +68,16 @@ describe('transactionCertificates', () => {
       } as Cardano.TxAlonzo;
       const outgoing$ = cold('abc', {
         a: [],
-        b: [{ body: { certificates: [{ __typename: Cardano.CertificateType.MIR }] } }],
+        b: [{ body: { certificates: [{ __typename: Cardano.CertificateType.MIR }] } } as Cardano.TxAlonzo],
         c: [{ body: {} } as Cardano.TxAlonzo, tx]
       });
-      const txTracker = { history: { outgoing$ } } as unknown as TransactionsTracker;
-      expectObservable(
-        outgoingTransactionsWithCertificates(txTracker, [Cardano.CertificateType.PoolRegistration])
-      ).toBe('a-b', {
-        a: [],
-        b: [tx]
-      });
+      expectObservable(transactionsWithCertificates(outgoing$, [Cardano.CertificateType.PoolRegistration])).toBe(
+        'a-b',
+        {
+          a: [],
+          b: [tx]
+        }
+      );
     });
   });
 });

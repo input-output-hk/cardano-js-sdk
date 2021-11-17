@@ -1,12 +1,7 @@
 import { Cardano, WalletProvider } from '@cardano-sdk/core';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { StakeKeyStatus, TransactionsTracker } from '../../../src/services';
-import { TxWithEpoch } from '../../../src/services/DelegationTracker/types';
-import {
-  certificateTransactionsWithEpochs,
-  createBlockEpochProvider,
-  createRewardAccountsTracker
-} from '../../../src/services/DelegationTracker';
+import { TransactionsTracker } from '../../../src/services';
+import { certificateTransactionsWithEpochs, createBlockEpochProvider } from '../../../src/services/DelegationTracker';
 import { createStubTxWithCertificates } from './stub-tx';
 import { createTestScheduler } from '../../testScheduler';
 
@@ -16,49 +11,6 @@ const coldObservableProviderMock: jest.Mock = jest.requireMock(
 ).coldObservableProvider;
 
 describe('DelegationTracker', () => {
-  test('createRewardAccountsTracker', () => {
-    createTestScheduler().run(({ cold, expectObservable }) => {
-      const address = 'stake...';
-      const transactions$ = cold('a-b-c', {
-        a: [],
-        b: [
-          {
-            tx: { body: { certificates: [{ __typename: Cardano.CertificateType.StakeKeyRegistration, address }] } }
-          } as TxWithEpoch
-        ],
-        c: [
-          {
-            tx: { body: { certificates: [{ __typename: Cardano.CertificateType.StakeKeyRegistration, address }] } }
-          } as TxWithEpoch,
-          {
-            tx: { body: { certificates: [{ __typename: Cardano.CertificateType.StakeKeyDeregistration, address }] } }
-          } as TxWithEpoch
-        ]
-      });
-      const transactionsInFlight$ = cold('abaca', {
-        a: [],
-        b: [
-          {
-            body: { certificates: [{ __typename: Cardano.CertificateType.StakeKeyRegistration, address }] }
-          } as Cardano.NewTxAlonzo
-        ],
-        c: [
-          {
-            body: { certificates: [{ __typename: Cardano.CertificateType.StakeKeyDeregistration, address }] }
-          } as Cardano.NewTxAlonzo
-        ]
-      });
-      const tracker$ = createRewardAccountsTracker(transactions$, transactionsInFlight$);
-      expectObservable(tracker$).toBe('abcde', {
-        a: [],
-        b: [{ address, keyStatus: StakeKeyStatus.Registering }],
-        c: [{ address, keyStatus: StakeKeyStatus.Registered }],
-        d: [{ address, keyStatus: StakeKeyStatus.Unregistering }],
-        e: [{ address, keyStatus: StakeKeyStatus.Unregistered }]
-      });
-    });
-  });
-
   test('createBlockEpochProvider', () => {
     createTestScheduler().run(({ cold, expectObservable, flush }) => {
       coldObservableProviderMock.mockReturnValue(

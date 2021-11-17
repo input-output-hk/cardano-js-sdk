@@ -87,6 +87,9 @@ export const queryTransactionsResult: Cardano.TxAlonzo[] = [
     body: {
       certificates: [
         {
+          __typename: Cardano.CertificateType.StakeKeyRegistration
+        },
+        {
           __typename: Cardano.CertificateType.StakeDelegation,
           epoch: currentEpoch.number - 10
         }

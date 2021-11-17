@@ -1,18 +1,20 @@
 import { Cardano } from '@cardano-sdk/core';
 import { SingleAddressWallet, StakeKeyStatus, Wallet } from '../../src';
-import { filter, firstValueFrom, skip, tap } from 'rxjs';
+import { distinctUntilChanged, filter, firstValueFrom, map, merge, mergeMap, skip, tap, timer } from 'rxjs';
 import { keyManager, poolId1, poolId2, stakePoolSearchProvider, walletProvider } from './config';
 
 const faucetAddress =
   'addr_test1qqr585tvlc7ylnqvz8pyqwauzrdu0mxag3m7q56grgmgu7sxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flknswgndm3';
 
-const createDelegationCertificates = async (wallet: Wallet, rewardAccount: Cardano.Address) => {
-  const delegateeBefore1stTx = await firstValueFrom(wallet.delegation.delegatee$);
+const createDelegationCertificates = async (wallet: Wallet) => {
+  const {
+    delegatee: delegateeBefore1stTx,
+    address: rewardAccount,
+    keyStatus
+  } = (await firstValueFrom(wallet.delegation.rewardAccounts$))[0];
   // swap poolId if it's already delegating to one of the pools
-  const poolId = delegateeBefore1stTx.nextNextEpoch?.id === poolId2 ? poolId1 : poolId2;
-  const isStakeKeyRegistered = (await firstValueFrom(wallet.delegation.rewardAccounts$)).some(
-    (acc) => acc.keyStatus === StakeKeyStatus.Registered
-  );
+  const poolId = delegateeBefore1stTx?.nextNextEpoch.id === poolId2 ? poolId1 : poolId2;
+  const isStakeKeyRegistered = keyStatus === StakeKeyStatus.Registered;
   const {
     currentEpoch: { number: epoch }
   } = await firstValueFrom(wallet.networkInfo$);
@@ -29,6 +31,20 @@ const createDelegationCertificates = async (wallet: Wallet, rewardAccount: Carda
     poolId
   };
 };
+
+const waitForNewStakePoolIdAfterTx = (wallet: Wallet) =>
+  firstValueFrom(
+    merge(
+      wallet.delegation.rewardAccounts$.pipe(
+        map(([acc]) => acc.delegatee?.nextNextEpoch.id),
+        distinctUntilChanged(),
+        skip(1)
+      ),
+      wallet.transactions.outgoing.failed$,
+      // Test will fail if fetching new stake pool takes more than 30s
+      wallet.transactions.outgoing.confirmed$.pipe(mergeMap(() => timer(30_000)))
+    )
+  );
 
 describe('SingleAddressWallet', () => {
   let rewardAccount: Cardano.Address;
@@ -68,7 +84,7 @@ describe('SingleAddressWallet', () => {
     expect(initialTotalBalance.coins).toBe(initialAvailableBalance.coins);
     const tx1OutputCoins = 1_000_000n;
 
-    const { poolId, certificates, isStakeKeyRegistered } = await createDelegationCertificates(wallet, rewardAccount);
+    const { poolId, certificates, isStakeKeyRegistered } = await createDelegationCertificates(wallet);
     const initialDeposit = isStakeKeyRegistered ? stakeKeyDeposit : 0n;
     expect(initialAvailableBalance.deposit).toBe(initialDeposit);
 
@@ -106,9 +122,12 @@ describe('SingleAddressWallet', () => {
       })(),
       // Test it updates wallet.delegation after delegating to stake pool
       (async () => {
-        const delegateeAfter1stTx = await firstValueFrom(wallet.delegation.delegatee$.pipe(skip(1)));
-        expect(delegateeAfter1stTx.nextNextEpoch?.id).toBe(poolId);
-      })()
+        expect(await waitForNewStakePoolIdAfterTx(wallet)).toBe(poolId);
+      })(),
+      // Test confirmed$
+      async () => {
+        expect(await firstValueFrom(wallet.transactions.outgoing.confirmed$)).toBeTruthy();
+      }
     ]);
 
     // Make a 2nd tx with key deregistration
@@ -118,8 +137,7 @@ describe('SingleAddressWallet', () => {
     await wallet.submitTx(await wallet.finalizeTx(tx2Internals));
 
     // No longer delegating
-    const delegateeAfter2ndTx = await firstValueFrom(wallet.delegation.delegatee$.pipe(skip(1)));
-    expect(delegateeAfter2ndTx.nextNextEpoch?.id).toBeUndefined();
+    expect(await waitForNewStakePoolIdAfterTx(wallet)).toBeUndefined();
 
     // Deposit is returned to wallet balance
     await waitForBalanceCoins(expectedCoinsAfterTx1 + stakeKeyDeposit - tx2Internals.body.fee);
