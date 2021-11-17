@@ -58,8 +58,7 @@ describe('SingleAddressWallet', () => {
       )
     );
 
-  beforeAll(() => {
-    rewardAccount = keyManager.rewardAccount; // TODO: make this available from Wallet.addresses
+  beforeAll(async () => {
     wallet = new SingleAddressWallet(
       { name: 'Test Wallet' },
       {
@@ -68,12 +67,13 @@ describe('SingleAddressWallet', () => {
         walletProvider
       }
     );
+    [{ rewardAccount }] = await firstValueFrom(wallet.addresses$);
   });
 
   afterAll(() => wallet.shutdown());
 
   it('has an address', () => {
-    expect(wallet.addresses[0].bech32.startsWith('addr')).toBe(true);
+    expect(wallet.addresses$.value![0].address.startsWith('addr')).toBe(true);
   });
 
   test('balance & transaction', async () => {

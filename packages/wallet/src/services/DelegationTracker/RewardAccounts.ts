@@ -1,21 +1,64 @@
 /* eslint-disable unicorn/no-nested-ternary */
-import { Cardano, StakePoolSearchProvider, util } from '@cardano-sdk/core';
+import { BigIntMath, Cardano, StakePoolSearchProvider, WalletProvider, util } from '@cardano-sdk/core';
 import { Delegatee, RewardAccount, StakeKeyStatus } from '../types';
-import { Observable, combineLatest, distinctUntilChanged, map, switchMap } from 'rxjs';
+import { Observable, combineLatest, distinctUntilChanged, filter, map, merge, switchMap } from 'rxjs';
 import { RegAndDeregCertificateTypes } from '.';
 import { RetryBackoffConfig } from 'backoff-rxjs';
+import { RewardBalance, includesAnyCertificate } from '..';
 import { TxWithEpoch } from './types';
-import { coldObservableProvider, shallowArrayEquals } from '../util';
+import { coldObservableProvider, deepEquals, shallowArrayEquals } from '../util';
 import { findLast, isEqual, uniq } from 'lodash-es';
-import { includesAnyCertificate } from '..';
 import { isLastStakeKeyCertOfType } from './transactionCertificates';
 
 export const createQueryStakePoolsProvider =
   (stakePoolSearchProvider: StakePoolSearchProvider, retryBackoffConfig: RetryBackoffConfig) =>
   (fragments: Cardano.PoolId[]) =>
     coldObservableProvider(() => stakePoolSearchProvider.queryStakePools(fragments), retryBackoffConfig);
-
 export type ObservableStakePoolSearchProvider = ReturnType<typeof createQueryStakePoolsProvider>;
+
+const getWithdrawalQuantity = (
+  { body: { withdrawals } }: Cardano.NewTxAlonzo,
+  rewardAccount?: Cardano.RewardAccount
+): Cardano.Lovelace =>
+  BigIntMath.sum(
+    withdrawals?.map(({ quantity, stakeAddress }) => (stakeAddress === rewardAccount ? quantity : 0n)) || []
+  );
+
+export const fetchRewardsTrigger$ = (
+  epoch$: Observable<Cardano.Epoch>,
+  txConfirmed$: Observable<Cardano.NewTxAlonzo>,
+  rewardAccount: Cardano.RewardAccount
+) =>
+  merge(
+    // Reload every epoch and after every tx that has withdrawals for this reward account
+    epoch$,
+    txConfirmed$.pipe(
+      map((tx) => getWithdrawalQuantity(tx, rewardAccount)),
+      filter((withdrawalQty) => withdrawalQty > 0n)
+    )
+  );
+
+export const createRewardsProvider =
+  (
+    epoch$: Observable<Cardano.Epoch>,
+    txConfirmed$: Observable<Cardano.NewTxAlonzo>,
+    walletProvider: WalletProvider,
+    retryBackoffConfig: RetryBackoffConfig
+  ) =>
+  (rewardAccounts: Cardano.RewardAccount[]) =>
+    combineLatest(
+      rewardAccounts.map((rewardAccount) =>
+        coldObservableProvider(
+          () => walletProvider.utxoDelegationAndRewards([], rewardAccount),
+          retryBackoffConfig,
+          fetchRewardsTrigger$(epoch$, txConfirmed$, rewardAccount)
+        ).pipe(
+          map(({ delegationAndRewards }) => delegationAndRewards?.rewards || 0n),
+          distinctUntilChanged()
+        )
+      )
+    );
+export type ObservableRewardsProvider = ReturnType<typeof createRewardsProvider>;
 
 const isDelegationCertificate = (cert: Cardano.Certificate): cert is Cardano.StakeDelegationCertificate =>
   cert.__typename === Cardano.CertificateType.StakeDelegation;
@@ -56,7 +99,10 @@ const getAccountsKeyStatus =
     });
   };
 
-const accountCertificateTransactions = (transactions$: Observable<TxWithEpoch[]>, rewardAccount: Cardano.Address) =>
+const accountCertificateTransactions = (
+  transactions$: Observable<TxWithEpoch[]>,
+  rewardAccount: Cardano.RewardAccount
+) =>
   transactions$.pipe(
     map((transactions) =>
       transactions
@@ -108,7 +154,7 @@ export const createDelegateeTracker = (
   );
 
 export const addressKeyStatuses = (
-  addresses: Cardano.Address[],
+  addresses: Cardano.RewardAccount[],
   transactions$: Observable<TxWithEpoch[]>,
   transactionsInFlight$: Observable<Cardano.NewTxAlonzo[]>
 ) =>
@@ -118,7 +164,7 @@ export const addressKeyStatuses = (
   );
 
 export const addressDelegatees = (
-  addresses: Cardano.Address[],
+  addresses: Cardano.RewardAccount[],
   transactions$: Observable<TxWithEpoch[]>,
   stakePoolSearchProvider: ObservableStakePoolSearchProvider,
   epoch$: Observable<Cardano.Epoch>
@@ -129,29 +175,55 @@ export const addressDelegatees = (
     )
   );
 
+export const addressRewards = (
+  rewardAccounts: Cardano.RewardAccount[],
+  transactionsInFlight$: Observable<Cardano.NewTxAlonzo[]>,
+  rewardsProvider: ObservableRewardsProvider
+): Observable<RewardBalance[]> =>
+  combineLatest([rewardsProvider(rewardAccounts), transactionsInFlight$]).pipe(
+    map(([totalRewards, transactionsInFlight]) =>
+      totalRewards.map((total, i) => ({
+        available:
+          total - transactionsInFlight.reduce((sum, tx) => sum + getWithdrawalQuantity(tx, rewardAccounts[i]), 0n),
+        total
+      }))
+    ),
+    distinctUntilChanged(deepEquals)
+  );
+
 export const toRewardAccounts =
-  (addresses: Cardano.Address[]) =>
-  ([statuses, delegatees]: [StakeKeyStatus[], (Delegatee | undefined)[]]) =>
+  (addresses: Cardano.RewardAccount[]) =>
+  ([statuses, delegatees, rewards]: [StakeKeyStatus[], (Delegatee | undefined)[], RewardBalance[]]) =>
     addresses.map(
       (address, i): RewardAccount => ({
         address,
         delegatee: delegatees[i],
-        keyStatus: statuses[i]
+        keyStatus: statuses[i],
+        rewardBalance: rewards[i]
       })
     );
 
-export const createRewardAccountsTracker = (
-  rewardAccounts$: Observable<Cardano.Address[]>,
-  stakePoolSearchProvider: ObservableStakePoolSearchProvider,
-  epoch$: Observable<Cardano.Epoch>,
-  transactions$: Observable<TxWithEpoch[]>,
-  transactionsInFlight$: Observable<Cardano.NewTxAlonzo[]>
-) =>
-  rewardAccounts$.pipe(
-    switchMap((addresses) =>
+export const createRewardAccountsTracker = ({
+  rewardAccountAddresses$,
+  stakePoolSearchProvider,
+  rewardsProvider,
+  epoch$,
+  transactions$,
+  transactionsInFlight$
+}: {
+  rewardAccountAddresses$: Observable<Cardano.RewardAccount[]>;
+  stakePoolSearchProvider: ObservableStakePoolSearchProvider;
+  rewardsProvider: ObservableRewardsProvider;
+  epoch$: Observable<Cardano.Epoch>;
+  transactions$: Observable<TxWithEpoch[]>;
+  transactionsInFlight$: Observable<Cardano.NewTxAlonzo[]>;
+}) =>
+  rewardAccountAddresses$.pipe(
+    switchMap((rewardAccounts) =>
       combineLatest([
-        addressKeyStatuses(addresses, transactions$, transactionsInFlight$),
-        addressDelegatees(addresses, transactions$, stakePoolSearchProvider, epoch$)
-      ]).pipe(map(toRewardAccounts(addresses)))
+        addressKeyStatuses(rewardAccounts, transactions$, transactionsInFlight$),
+        addressDelegatees(rewardAccounts, transactions$, stakePoolSearchProvider, epoch$),
+        addressRewards(rewardAccounts, transactionsInFlight$, rewardsProvider)
+      ]).pipe(map(toRewardAccounts(rewardAccounts)))
     )
   );

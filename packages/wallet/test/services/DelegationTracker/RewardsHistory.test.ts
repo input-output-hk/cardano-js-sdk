@@ -2,12 +2,18 @@ import { Cardano } from '@cardano-sdk/core';
 import { RewardsHistory, createRewardsHistoryProvider, createRewardsHistoryTracker } from '../../../src/services';
 import { createStubTxWithCertificates } from './stub-tx';
 import { createTestScheduler } from '../../testScheduler';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, of } from 'rxjs';
 import { mockWalletProvider, rewardsHistory, testKeyManager } from '../../mocks';
 
 describe('RewardsHistory', () => {
   test('createRewardsHistoryProvider', async () => {
-    const provider = createRewardsHistoryProvider(mockWalletProvider(), testKeyManager(), { initialInterval: 1 });
+    const provider = createRewardsHistoryProvider(
+      mockWalletProvider(),
+      of([testKeyManager().deriveAddress(0, 0).rewardAccount]),
+      {
+        initialInterval: 1
+      }
+    );
     expect(await firstValueFrom(provider(1))).toBe(rewardsHistory);
   });
 

@@ -8,6 +8,7 @@ import { firstValueFrom, skip } from 'rxjs';
 describe('SingleAddressWallet', () => {
   const name = 'Test Wallet';
   const address = mocks.queryTransactionsResult[0].body.inputs[0].address;
+  const rewardAccount = mocks.stakeKeyHash;
   let keyManager: KeyManagement.KeyManager;
   let walletProvider: mocks.ProviderStub;
   let wallet: SingleAddressWallet;
@@ -20,7 +21,10 @@ describe('SingleAddressWallet', () => {
     });
     walletProvider = mocks.mockWalletProvider();
     const stakePoolSearchProvider = createStubStakePoolSearchProvider();
-    keyManager.deriveAddress = jest.fn().mockReturnValue(address);
+    keyManager.deriveAddress = jest.fn().mockReturnValue({
+      address,
+      rewardAccount
+    });
     wallet = new SingleAddressWallet({ name }, { keyManager, stakePoolSearchProvider, walletProvider });
   });
 
@@ -65,15 +69,17 @@ describe('SingleAddressWallet', () => {
       expect(wallet.genesisParameters$.value).toEqual(mocks.genesisParameters);
     });
     it('"delegation"', async () => {
-      await firstValueFrom(wallet.delegation.rewardsHistory$);
-      expect(wallet.delegation.rewardsHistory$.value?.all).toEqual(mocks.rewardsHistory);
+      const rewardsHistory = await firstValueFrom(wallet.delegation.rewardsHistory$);
+      expect(rewardsHistory.all).toEqual(mocks.rewardsHistory);
       const rewardAccounts = await firstValueFrom(wallet.delegation.rewardAccounts$);
       expect(rewardAccounts).toHaveLength(1);
-      expect(rewardAccounts[0].address).toBe(keyManager.rewardAccount);
+      expect(rewardAccounts[0].address).toBe(rewardAccount);
       expect(rewardAccounts[0].delegatee).toBeUndefined();
+      expect(rewardAccounts[0].rewardBalance.total).toBe(mocks.rewards);
     });
     it('"addresses"', () => {
-      expect(wallet.addresses.map(({ bech32 }) => bech32)).toEqual([address]);
+      expect(wallet.addresses$.value[0].address).toEqual(address);
+      expect(wallet.addresses$.value[0].rewardAccount).toEqual(rewardAccount);
     });
   });
 

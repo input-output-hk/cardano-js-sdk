@@ -9,31 +9,30 @@ import { utxo } from '../mocks';
 
 describe('createBalanceTracker', () => {
   it('combines data from rewardsTracker & utxoTracker', () => {
-    createTestScheduler().run(({ cold, expectObservable }) => {
-      const protocolParameters$ = cold( 'a------', { a: { stakeKeyDeposit: 2 } as ProtocolParametersRequiredByWallet });
-      const utxoAvailable = cold(       '--a-b--', { a: utxo, b: utxo.slice(1) }) as unknown as BehaviorObservable<Cardano.Utxo[]>;
-      const rewardsAvailable = cold(    '-a-b---', { a: 10n, b: 5n }) as unknown as BehaviorObservable<Cardano.Lovelace>;
-      const rewardsTotal = cold(        'a---b--', { a: 10n, b: 20n }) as unknown as BehaviorObservable<Cardano.Lovelace>;
-      const utxoTotal = cold(           '-a-----', { a: utxo }) as unknown as BehaviorObservable<Cardano.Utxo[]>;
-      const rewardAccounts$ = cold(     'a----bc', {
+    createTestScheduler().run(({ hot, expectObservable }) => {
+      const protocolParameters$ = hot( 'a------', { a: { stakeKeyDeposit: 2 } as ProtocolParametersRequiredByWallet });
+      const utxoAvailable = hot(       '--a-b--', { a: utxo, b: utxo.slice(1) }) as unknown as BehaviorObservable<Cardano.Utxo[]>;
+      const utxoTotal = hot(           '-a-----', { a: utxo }) as unknown as BehaviorObservable<Cardano.Utxo[]>;
+      const rewardAccounts$ = hot(     'a--b-cd', {
         a: [],
-        b: [{ keyStatus: StakeKeyStatus.Registered } as RewardAccount],
-        c: [{ keyStatus: StakeKeyStatus.Registered } as RewardAccount, { keyStatus: StakeKeyStatus.Unregistering }] }) as unknown as BehaviorObservable<RewardAccount[]>;
+        b: [{ keyStatus: StakeKeyStatus.Registered, rewardBalance: { available: 0n, total: 0n } }],
+        c: [{ keyStatus: StakeKeyStatus.Registered, rewardBalance: { available: 5n, total: 10n } }],
+        d: [{ keyStatus: StakeKeyStatus.Unregistering, rewardBalance: { available: 5n, total: 10n } }]
+      }) as unknown as BehaviorObservable<RewardAccount[]>;
       const balanceTracker = createBalanceTracker(
         protocolParameters$,
         { available$: utxoAvailable, total$: utxoTotal },
-        { available$: rewardsAvailable, total$: rewardsTotal },
         { rewardAccounts$ } as unknown as DelegationTracker
       );
-      expectObservable(balanceTracker.total$).toBe('-a--bc-', {
-        a: { ...Cardano.util.coalesceValueQuantities(utxo.map((u) => u[1].value)), deposit: 0n, rewards: 10n },
-        b: { ...Cardano.util.coalesceValueQuantities(utxo.map((u) => u[1].value)), deposit: 0n, rewards: 20n },
-        c: { ...Cardano.util.coalesceValueQuantities(utxo.map((u) => u[1].value)), deposit: 2n, rewards: 20n }
+      expectObservable(balanceTracker.total$).toBe('-a-b-c', {
+        a: { ...Cardano.util.coalesceValueQuantities(utxo.map((u) => u[1].value)), deposit: 0n, rewards: 0n },
+        b: { ...Cardano.util.coalesceValueQuantities(utxo.map((u) => u[1].value)), deposit: 2n, rewards: 0n },
+        c: { ...Cardano.util.coalesceValueQuantities(utxo.map((u) => u[1].value)), deposit: 2n, rewards: 10n }
       });
       expectObservable(balanceTracker.available$).toBe('--abcde', {
-        a: { ...Cardano.util.coalesceValueQuantities(utxo.map((u) => u[1].value)), deposit: 0n, rewards: 10n },
-        b: { ...Cardano.util.coalesceValueQuantities(utxo.map((u) => u[1].value)), deposit: 0n, rewards: 5n },
-        c: { ...Cardano.util.coalesceValueQuantities(utxo.slice(1).map((u) => u[1].value)), deposit: 0n, rewards: 5n },
+        a: { ...Cardano.util.coalesceValueQuantities(utxo.map((u) => u[1].value)), deposit: 0n, rewards: 0n },
+        b: { ...Cardano.util.coalesceValueQuantities(utxo.map((u) => u[1].value)), deposit: 2n, rewards: 0n },
+        c: { ...Cardano.util.coalesceValueQuantities(utxo.slice(1).map((u) => u[1].value)), deposit: 2n, rewards: 0n },
         d: { ...Cardano.util.coalesceValueQuantities(utxo.slice(1).map((u) => u[1].value)), deposit: 2n, rewards: 5n },
         e: { ...Cardano.util.coalesceValueQuantities(utxo.slice(1).map((u) => u[1].value)), deposit: 0n, rewards: 5n }
       });

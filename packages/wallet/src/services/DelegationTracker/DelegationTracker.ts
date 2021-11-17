@@ -1,11 +1,12 @@
 import { Cardano, StakePoolSearchProvider, WalletProvider } from '@cardano-sdk/core';
 import { DelegationTracker, TransactionsTracker } from '../types';
-import { KeyManager } from '../../KeyManagement';
-import { Observable, map, of, share, switchMap } from 'rxjs';
+import { Observable, map, share, switchMap } from 'rxjs';
 import {
+  ObservableRewardsProvider,
   ObservableStakePoolSearchProvider,
   createQueryStakePoolsProvider,
-  createRewardAccountsTracker
+  createRewardAccountsTracker,
+  createRewardsProvider
 } from './RewardAccounts';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { RewardsHistoryProvider, createRewardsHistoryProvider, createRewardsHistoryTracker } from './RewardsHistory';
@@ -23,13 +24,14 @@ export type BlockEpochProvider = ReturnType<typeof createBlockEpochProvider>;
 
 export interface DelegationTrackerProps {
   walletProvider: WalletProvider;
-  keyManager: KeyManager;
+  rewardAccountAddresses$: Observable<Cardano.RewardAccount[]>;
   stakePoolSearchProvider: StakePoolSearchProvider;
   epoch$: Observable<Cardano.Epoch>;
   transactionsTracker: TransactionsTracker;
   retryBackoffConfig: RetryBackoffConfig;
   internals?: {
     queryStakePoolsProvider?: ObservableStakePoolSearchProvider;
+    rewardsProvider?: ObservableRewardsProvider;
     rewardsHistoryProvider?: RewardsHistoryProvider;
     blockEpochProvider?: BlockEpochProvider;
   };
@@ -50,7 +52,7 @@ export const certificateTransactionsWithEpochs = (
   );
 
 export const createDelegationTracker = ({
-  keyManager,
+  rewardAccountAddresses$,
   epoch$,
   walletProvider,
   retryBackoffConfig,
@@ -58,7 +60,13 @@ export const createDelegationTracker = ({
   stakePoolSearchProvider,
   internals: {
     queryStakePoolsProvider = createQueryStakePoolsProvider(stakePoolSearchProvider, retryBackoffConfig),
-    rewardsHistoryProvider = createRewardsHistoryProvider(walletProvider, keyManager, retryBackoffConfig),
+    rewardsHistoryProvider = createRewardsHistoryProvider(walletProvider, rewardAccountAddresses$, retryBackoffConfig),
+    rewardsProvider = createRewardsProvider(
+      epoch$,
+      transactionsTracker.outgoing.confirmed$,
+      walletProvider,
+      retryBackoffConfig
+    ),
     blockEpochProvider = createBlockEpochProvider(walletProvider, retryBackoffConfig)
   } = {}
 }: DelegationTrackerProps): DelegationTracker => {
@@ -69,13 +77,14 @@ export const createDelegationTracker = ({
   ]);
   const rewardsHistory$ = new TrackerSubject(createRewardsHistoryTracker(transactions$, rewardsHistoryProvider));
   const rewardAccounts$ = new TrackerSubject(
-    createRewardAccountsTracker(
-      of([keyManager.rewardAccount]),
-      queryStakePoolsProvider,
+    createRewardAccountsTracker({
       epoch$,
+      rewardAccountAddresses$,
+      rewardsProvider,
+      stakePoolSearchProvider: queryStakePoolsProvider,
       transactions$,
-      transactionsTracker.outgoing.inFlight$
-    )
+      transactionsInFlight$: transactionsTracker.outgoing.inFlight$
+    })
   );
   return {
     rewardAccounts$,

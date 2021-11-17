@@ -1,12 +1,12 @@
 import { Cardano, WalletProvider } from '@cardano-sdk/core';
-import { Observable, combineLatest, map } from 'rxjs';
+import { Observable, combineLatest, map, switchMap } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TrackerSubject, coldObservableProvider, utxoEquals } from './util';
 import { TransactionalTracker } from './types';
 
 export interface UtxoTrackerProps {
   walletProvider: WalletProvider;
-  addresses: Cardano.Address[];
+  addresses$: Observable<Cardano.Address[]>;
   transactionsInFlight$: Observable<Cardano.NewTxAlonzo[]>;
   tipBlockHeight$: Observable<number>;
   retryBackoffConfig: RetryBackoffConfig;
@@ -18,21 +18,27 @@ export interface UtxoTrackerInternals {
 
 export const createUtxoProvider = (
   walletProvider: WalletProvider,
-  addresses: Cardano.Address[],
+  addresses$: Observable<Cardano.Address[]>,
   tipBlockHeight$: Observable<number>,
   retryBackoffConfig: RetryBackoffConfig
 ) =>
-  coldObservableProvider(
-    () => walletProvider.utxoDelegationAndRewards(addresses).then(({ utxo }) => utxo),
-    retryBackoffConfig,
-    tipBlockHeight$,
-    utxoEquals
+  addresses$.pipe(
+    switchMap((addresses) =>
+      coldObservableProvider(
+        () => walletProvider.utxoDelegationAndRewards(addresses).then(({ utxo }) => utxo),
+        retryBackoffConfig,
+        tipBlockHeight$,
+        utxoEquals
+      )
+    )
   );
 
 export const createUtxoTracker = (
-  { walletProvider, addresses, transactionsInFlight$, retryBackoffConfig, tipBlockHeight$ }: UtxoTrackerProps,
+  { walletProvider, addresses$, transactionsInFlight$, retryBackoffConfig, tipBlockHeight$ }: UtxoTrackerProps,
   {
-    utxoSource$ = new TrackerSubject(createUtxoProvider(walletProvider, addresses, tipBlockHeight$, retryBackoffConfig))
+    utxoSource$ = new TrackerSubject(
+      createUtxoProvider(walletProvider, addresses$, tipBlockHeight$, retryBackoffConfig)
+    )
   }: UtxoTrackerInternals = {}
 ): TransactionalTracker<Cardano.Utxo[]> => {
   const available$ = new TrackerSubject<Cardano.Utxo[]>(

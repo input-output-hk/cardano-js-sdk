@@ -1,13 +1,25 @@
-import { Cardano } from '@cardano-sdk/core';
+/* eslint-disable space-in-parens */
+/* eslint-disable no-multi-spaces */
+/* eslint-disable prettier/prettier */
+import { Cardano, WalletProvider } from '@cardano-sdk/core';
+import { EMPTY, Observable } from 'rxjs';
+import { RetryBackoffConfig } from 'backoff-rxjs';
 import {
   StakeKeyStatus,
   addressKeyStatuses,
   createDelegateeTracker,
+  createRewardsProvider,
+  fetchRewardsTrigger$,
   getStakePoolIdAtEpoch
 } from '../../../src/services';
 import { TxWithEpoch } from '../../../src/services/DelegationTracker/types';
 import { createTestScheduler } from '../../testScheduler';
 import { currentEpoch } from '../../mocks';
+
+jest.mock('../../../src/services/util/coldObservableProvider', () => ({ coldObservableProvider: jest.fn() }));
+const coldObservableProviderMock: jest.Mock = jest.requireMock(
+  '../../../src/services/util/coldObservableProvider'
+).coldObservableProvider;
 
 describe('RewardAccounts', () => {
   test('getStakePoolIdAtEpoch ', () => {
@@ -80,6 +92,58 @@ describe('RewardAccounts', () => {
         c: [StakeKeyStatus.Registered],
         d: [StakeKeyStatus.Unregistering]
       });
+    });
+  });
+
+  describe('fetchRewardsTrigger$', () => {
+    it('emits every epoch and after making a transaction with withdrawals', () => {
+      const rewardAccount = 'stake...';
+      createTestScheduler().run(({ cold, expectObservable }) => {
+        const tx2 = { body: { withdrawals: [{ quantity: 5n, stakeAddress: rewardAccount }] } } as Cardano.TxAlonzo;
+        const epoch$ = cold(      'a-b--', { a: 100, b: 101 });
+        const txConfirmed$ = cold('-a--b', {
+          a: { body: { withdrawals: [{ quantity: 3n, stakeAddress: 'stakeother...' }] } } as Cardano.TxAlonzo,
+          b: tx2
+        });
+        const target$ = fetchRewardsTrigger$(epoch$, txConfirmed$, rewardAccount);
+        expectObservable(target$).toBe('a-b-c', {
+          a: 100, b: 101, c: 5n
+        });
+      });
+    });
+  });
+
+  test('createRewardsProvider', () => {
+    const walletProvider = null as unknown as WalletProvider; // not used in this test
+    const config = null as unknown as RetryBackoffConfig; // not used in this test
+    const epoch$ = null as unknown as Observable<Cardano.Epoch>; // not used in this test
+    const txConfirmed$ = EMPTY as Observable<Cardano.NewTxAlonzo>;
+    createTestScheduler().run(({ cold, expectObservable, flush }) => {
+      coldObservableProviderMock
+        .mockReturnValueOnce(
+          cold('a-b-c', {
+            a: {},
+            b: { delegationAndRewards: { rewards: 5n } },
+            c: { delegationAndRewards: { rewards: 5n } }
+          })
+        )
+        .mockReturnValueOnce(
+          cold('-a', {
+            a: { delegationAndRewards: { rewards: 3n } }
+          })
+        );
+      const target$ = createRewardsProvider(
+        epoch$,
+        txConfirmed$,
+        walletProvider,
+        config
+      )(['stake...', 'stakeother...']);
+      expectObservable(target$).toBe('-ab', {
+        a: [0n, 3n],
+        b: [5n, 3n]
+      });
+      flush();
+      expect(coldObservableProviderMock).toBeCalledTimes(2);
     });
   });
 
