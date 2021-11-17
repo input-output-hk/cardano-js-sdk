@@ -25,28 +25,28 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>26/26</span>
+                <span class='fraction'>29/29</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">87.5% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>6/6</span>
+                <span class='fraction'>7/8</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>10/10</span>
+                <span class='fraction'>11/11</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>20/20</span>
+                <span class='fraction'>22/22</span>
             </div>
         
             
@@ -105,8 +105,9 @@
 <a name='L46'></a><a href='#L46'>46</a>
 <a name='L47'></a><a href='#L47'>47</a>
 <a name='L48'></a><a href='#L48'>48</a>
-<a name='L49'></a><a href='#L49'>49</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">15x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">15x</span>
 <span class="cline-any cline-yes">15x</span>
 <span class="cline-any cline-yes">15x</span>
 <span class="cline-any cline-yes">15x</span>
@@ -117,32 +118,35 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">15x</span>
-<span class="cline-any cline-yes">112x</span>
-<span class="cline-any cline-yes">119x</span>
+<span class="cline-any cline-yes">59x</span>
+<span class="cline-any cline-yes">77x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">65x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">15x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">51x</span>
+<span class="cline-any cline-yes">45x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">15x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">76x</span>
+<span class="cline-any cline-yes">127x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">83x</span>
-<span class="cline-any cline-yes">83x</span>
-<span class="cline-any cline-yes">19x</span>
+<span class="cline-any cline-yes">58x</span>
+<span class="cline-any cline-yes">58x</span>
+<span class="cline-any cline-yes">34x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">83x</span>
+<span class="cline-any cline-yes">58x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">76x</span>
+<span class="cline-any cline-yes">127x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">15x</span>
@@ -154,8 +158,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Cardano, util } from '@cardano-sdk/core';
-import { TransactionsTracker } from '../types';
-import { distinctUntilChanged, map } from 'rxjs';
+import { Observable, distinctUntilChanged, map } from 'rxjs';
 import { last } from 'lodash-es';
 import { transactionsEquals } from '../util/equals';
 &nbsp;
@@ -164,25 +167,28 @@ export const RegAndDeregCertificateTypes = [
   Cardano.CertificateType.StakeKeyDeregistration
 ];
 &nbsp;
-export const transactionStakeKeyCertficates = (body: Cardano.TxBodyAlonzo) =&gt;
-  (body.certificates || []).filter((certificate): certificate is Cardano.StakeAddressCertificate =&gt;
+export const stakeKeyCertficates = (certificates?: Cardano.Certificate[]) =&gt;
+  certificates?.filter((certificate): certificate is Cardano.StakeAddressCertificate =&gt;
     RegAndDeregCertificateTypes.includes(certificate.__typename)
-  );
+  ) || <span class="branch-1 cbranch-no" title="branch not covered" >[];</span>
+&nbsp;
+export const includesAnyCertificate = (haystack: Cardano.Certificate[], needle: Cardano.CertificateType[]) =&gt;
+  haystack.some(({ __typename }) =&gt; needle.includes(__typename)) || false;
 &nbsp;
 export const transactionHasAnyCertificate = (
   { body: { certificates } }: Cardano.TxAlonzo,
   certificateTypes: Cardano.CertificateType[]
-) =&gt; certificates?.some(({ __typename }) =&gt; certificateTypes.includes(__typename)) || false;
+) =&gt; includesAnyCertificate(certificates || [], certificateTypes);
 &nbsp;
 export const isLastStakeKeyCertOfType = (
-  transactions: { body: Cardano.TxBodyAlonzo }[],
+  transactionsCertificates: Cardano.Certificate[][],
   certType: Cardano.CertificateType.StakeKeyRegistration | Cardano.CertificateType.StakeKeyDeregistration,
   rewardAccount?: Cardano.Address
 ) =&gt; {
   const lastRegOrDereg = last(
-    transactions
-      .map(({ body }) =&gt; {
-        const allStakeKeyCertificates = transactionStakeKeyCertficates(body);
+    transactionsCertificates
+      .map((certificates) =&gt; {
+        const allStakeKeyCertificates = stakeKeyCertficates(certificates);
         const addressStakeKeyCertificates = rewardAccount
           ? allStakeKeyCertificates.filter(({ address }) =&gt; rewardAccount === address)
           : allStakeKeyCertificates;
@@ -193,11 +199,11 @@ export const isLastStakeKeyCertOfType = (
   return lastRegOrDereg?.__typename === certType;
 };
 &nbsp;
-export const outgoingTransactionsWithCertificates = (
-  transactionsTracker: TransactionsTracker,
+export const transactionsWithCertificates = (
+  transactions$: Observable&lt;Cardano.TxAlonzo[]&gt;,
   certificateTypes: Cardano.CertificateType[]
 ) =&gt;
-  transactionsTracker.history.outgoing$.pipe(
+  transactions$.pipe(
     map((transactions) =&gt; transactions.filter((tx) =&gt; transactionHasAnyCertificate(tx, certificateTypes))),
     distinctUntilChanged(transactionsEquals)
   );
@@ -208,7 +214,7 @@ export const outgoingTransactionsWithCertificates = (
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Tue Nov 16 2021 15:21:40 GMT+0000 (Coordinated Universal Time)
+                at Wed Nov 17 2021 10:39:23 GMT+0000 (Coordinated Universal Time)
             </div>
         </div>
         <script src="../../../prettify.js"></script>
