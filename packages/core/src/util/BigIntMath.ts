@@ -2,6 +2,14 @@ export const BigIntMath = {
   abs(x: bigint): bigint {
     return x < 0n ? -x : x;
   },
+  max(arr: bigint[]): bigint | null {
+    if (arr.length === 0) return null;
+    let max = arr[0];
+    for (const num of arr.slice(1)) {
+      if (num > max) max = num;
+    }
+    return max;
+  },
   sum(arr: bigint[]): bigint {
     return arr.reduce((result, num) => result + num, 0n);
   }
