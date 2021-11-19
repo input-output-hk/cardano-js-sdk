@@ -55,9 +55,6 @@ export class SingleAddressWallet implements Wallet {
   #walletProvider: WalletProvider;
   #logger: Logger;
   #tip$: SyncableIntervalTrackerSubject<Cardano.Tip>;
-  #networkInfo$: TrackerSubject<NetworkInfo>;
-  #protocolParameters$: TrackerSubject<ProtocolParametersRequiredByWallet>;
-  #genesisParameters$: TrackerSubject<Cardano.CompactGenesis>;
   #newTransactions = {
     failedToSubmit$: new Subject<FailedTx>(),
     pending$: new Subject<Cardano.NewTxAlonzo>(),
@@ -68,10 +65,10 @@ export class SingleAddressWallet implements Wallet {
   transactions: TransactionsTracker;
   delegation: DelegationTracker;
   tip$: BehaviorObservable<Cardano.Tip>;
-  networkInfo$: BehaviorObservable<NetworkInfo>;
+  networkInfo$: TrackerSubject<NetworkInfo>;
   addresses$: BehaviorSubject<GroupedAddress[]>;
-  protocolParameters$: BehaviorObservable<ProtocolParametersRequiredByWallet>;
-  genesisParameters$: BehaviorObservable<Cardano.CompactGenesis>;
+  protocolParameters$: TrackerSubject<ProtocolParametersRequiredByWallet>;
+  genesisParameters$: TrackerSubject<Cardano.CompactGenesis>;
   name: string;
 
   constructor(
@@ -103,14 +100,14 @@ export class SingleAddressWallet implements Wallet {
       provider$: coldObservableProvider(walletProvider.ledgerTip, retryBackoffConfig)
     });
     const tipBlockHeight$ = sharedDistinctBlock(this.tip$);
-    this.#networkInfo$ = this.networkInfo$ = new TrackerSubject(
+    this.networkInfo$ = new TrackerSubject(
       coldObservableProvider(walletProvider.networkInfo, retryBackoffConfig, tipBlockHeight$, isEqual)
     );
     const epoch$ = sharedDistinctEpoch(this.networkInfo$);
-    this.#protocolParameters$ = this.protocolParameters$ = new TrackerSubject(
+    this.protocolParameters$ = new TrackerSubject(
       coldObservableProvider(walletProvider.currentWalletProtocolParameters, retryBackoffConfig, epoch$, isEqual)
     );
-    this.#genesisParameters$ = this.genesisParameters$ = new TrackerSubject(
+    this.genesisParameters$ = new TrackerSubject(
       coldObservableProvider(walletProvider.genesisParameters, retryBackoffConfig, epoch$, isEqual)
     );
 
@@ -218,9 +215,9 @@ export class SingleAddressWallet implements Wallet {
     this.balance.shutdown();
     this.utxo.shutdown();
     this.transactions.shutdown();
-    this.#networkInfo$.complete();
-    this.#protocolParameters$.complete();
-    this.#genesisParameters$.complete();
+    this.networkInfo$.complete();
+    this.protocolParameters$.complete();
+    this.genesisParameters$.complete();
     this.#tip$.complete();
   }
 }
