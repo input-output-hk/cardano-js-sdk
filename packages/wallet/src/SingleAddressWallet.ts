@@ -1,5 +1,15 @@
 import { AddressType, GroupedAddress, KeyManager } from './KeyManagement';
 import {
+  AssetProvider,
+  Cardano,
+  NetworkInfo,
+  ProtocolParametersRequiredByWallet,
+  StakePoolSearchProvider,
+  WalletProvider,
+  coreToCsl
+} from '@cardano-sdk/core';
+import { Assets } from '.';
+import {
   Balance,
   BehaviorObservable,
   DelegationTracker,
@@ -11,6 +21,7 @@ import {
   TransactionalTracker,
   TransactionsTracker,
   coldObservableProvider,
+  createAssetsTracker,
   createBalanceTracker,
   createDelegationTracker,
   createTransactionsTracker,
@@ -19,14 +30,6 @@ import {
   sharedDistinctEpoch
 } from './services';
 import { BehaviorSubject, Subject, combineLatest, from, lastValueFrom, map, mergeMap, take } from 'rxjs';
-import {
-  Cardano,
-  NetworkInfo,
-  ProtocolParametersRequiredByWallet,
-  StakePoolSearchProvider,
-  WalletProvider,
-  coreToCsl
-} from '@cardano-sdk/core';
 import { InitializeTxProps, Wallet } from './types';
 import { InputSelector, defaultSelectionConstraints, roundRobinRandomImprove } from '@cardano-sdk/cip2';
 import { Logger, dummyLogger } from 'ts-log';
@@ -45,6 +48,7 @@ export interface SingleAddressWalletDependencies {
   readonly keyManager: KeyManager;
   readonly walletProvider: WalletProvider;
   readonly stakePoolSearchProvider: StakePoolSearchProvider;
+  readonly assetProvider: AssetProvider;
   readonly inputSelector?: InputSelector;
   readonly logger?: Logger;
 }
@@ -69,6 +73,7 @@ export class SingleAddressWallet implements Wallet {
   addresses$: BehaviorSubject<GroupedAddress[]>;
   protocolParameters$: TrackerSubject<ProtocolParametersRequiredByWallet>;
   genesisParameters$: TrackerSubject<Cardano.CompactGenesis>;
+  assets$: TrackerSubject<Assets>;
   name: string;
 
   constructor(
@@ -85,6 +90,7 @@ export class SingleAddressWallet implements Wallet {
       walletProvider,
       stakePoolSearchProvider,
       keyManager,
+      assetProvider,
       logger = dummyLogger,
       inputSelector = roundRobinRandomImprove()
     }: SingleAddressWalletDependencies
@@ -139,6 +145,13 @@ export class SingleAddressWallet implements Wallet {
       walletProvider
     });
     this.balance = createBalanceTracker(this.protocolParameters$, this.utxo, this.delegation);
+    this.assets$ = new TrackerSubject(
+      createAssetsTracker({
+        assetProvider,
+        balanceTracker: this.balance,
+        retryBackoffConfig
+      })
+    );
   }
   initializeTx(props: InitializeTxProps): Promise<TxInternals> {
     return lastValueFrom(

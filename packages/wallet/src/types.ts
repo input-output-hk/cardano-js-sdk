@@ -16,6 +16,8 @@ export interface FinalizeTxProps {
   readonly body: Cardano.TxBodyAlonzo;
 }
 
+export type Assets = Partial<Record<Cardano.AssetId, Cardano.Asset>>;
+
 export interface Wallet {
   name: string;
   readonly balance: TransactionalTracker<Balance>;
@@ -27,6 +29,7 @@ export interface Wallet {
   readonly networkInfo$: BehaviorObservable<NetworkInfo>;
   readonly protocolParameters$: BehaviorObservable<ProtocolParametersRequiredByWallet>;
   readonly addresses$: BehaviorObservable<GroupedAddress[]>;
+  readonly assets$: BehaviorObservable<Assets>;
   initializeTx(props: InitializeTxProps): Promise<TxInternals>;
   finalizeTx(props: TxInternals): Promise<Cardano.NewTxAlonzo>;
   submitTx(tx: Cardano.NewTxAlonzo): Promise<void>;

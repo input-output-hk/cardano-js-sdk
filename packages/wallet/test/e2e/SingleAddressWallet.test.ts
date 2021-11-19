@@ -1,7 +1,7 @@
 import { Cardano } from '@cardano-sdk/core';
 import { SingleAddressWallet, StakeKeyStatus, Wallet } from '../../src';
+import { assetProvider, keyManager, poolId1, poolId2, stakePoolSearchProvider, walletProvider } from './config';
 import { distinctUntilChanged, filter, firstValueFrom, map, merge, mergeMap, skip, tap, timer } from 'rxjs';
-import { keyManager, poolId1, poolId2, stakePoolSearchProvider, walletProvider } from './config';
 
 const faucetAddress =
   'addr_test1qqr585tvlc7ylnqvz8pyqwauzrdu0mxag3m7q56grgmgu7sxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flknswgndm3';
@@ -62,6 +62,7 @@ describe('SingleAddressWallet', () => {
     wallet = new SingleAddressWallet(
       { name: 'Test Wallet' },
       {
+        assetProvider,
         keyManager,
         stakePoolSearchProvider,
         walletProvider
@@ -74,6 +75,10 @@ describe('SingleAddressWallet', () => {
 
   it('has an address', () => {
     expect(wallet.addresses$.value![0].address.startsWith('addr')).toBe(true);
+  });
+
+  it('has assets$', async () => {
+    expect(typeof (await firstValueFrom(wallet.assets$))).toBe('object');
   });
 
   test('balance & transaction', async () => {
