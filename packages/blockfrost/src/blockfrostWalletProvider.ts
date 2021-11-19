@@ -63,7 +63,7 @@ const toProviderError = (error: unknown) => {
  * @param {Options} options BlockFrostAPI options
  * @returns {WalletProvider} WalletProvider
  */
-export const blockfrostProvider = (options: Options, logger = dummyLogger): WalletProvider => {
+export const blockfrostWalletProvider = (options: Options, logger = dummyLogger): WalletProvider => {
   const blockfrost = new BlockFrostAPI(options);
 
   const fetchByAddressSequentially = async <Item, Response>(
@@ -87,7 +87,7 @@ export const blockfrostProvider = (options: Options, logger = dummyLogger): Wall
         return fetchByAddressSequentially<Item, Response>(props, newAccumulatedItems, totalCount, page + 1);
       }
       return newAccumulatedItems;
-    } catch (error) {
+    } catch (error: any) {
       if (error.status_code === 404) {
         return [];
       }
@@ -172,7 +172,7 @@ export const blockfrostProvider = (options: Options, logger = dummyLogger): Wall
         };
         return { delegationAndRewards, utxo };
       } catch (error) {
-        if (error.status_code === 404) {
+        if (formatBlockfrostError(error).status_code === 404) {
           return { utxo };
         }
         throw error;
