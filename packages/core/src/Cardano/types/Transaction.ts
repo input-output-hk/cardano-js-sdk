@@ -3,6 +3,7 @@ import { BlockAlonzo, BlockBodyAlonzo } from '@cardano-ogmios/schema';
 
 type OgmiosHeader = NonNullable<BlockAlonzo['header']>;
 export type PartialBlockHeader = Pick<OgmiosHeader, 'blockHeight' | 'slot' | 'blockHash'>;
+export type TransactionId = Cardano.Hash16;
 
 export type Ed25519SignatureHash16 = string;
 
@@ -51,7 +52,7 @@ export type Witness = Omit<Partial<BlockBodyAlonzo['witness']>, 'redeemers' | 's
   }>;
 };
 export interface TxAlonzo {
-  id: Cardano.Hash16;
+  id: TransactionId;
   index: number;
   blockHeader: PartialBlockHeader;
   body: TxBodyAlonzo;

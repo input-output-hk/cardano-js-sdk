@@ -1,12 +1,10 @@
 import { ExtendedStakePoolMetadata } from './ExtendedStakePoolMetadata';
-import { Hash16, Lovelace, PoolParameters } from '.';
+import { Hash16, Lovelace, PoolParameters, TransactionId } from '.';
 
 /**
  * Within range [0; 1]
  */
 export type Percent = number;
-
-export type TransactionId = Hash16;
 
 /**
  * https://github.com/cardano-foundation/CIPs/blob/master/CIP-0006/CIP-0006.md#on-chain-referenced-main-metadata-file

@@ -1,7 +1,5 @@
+import { AssetId, TokenMap } from '../Cardano';
 import { CSL } from '../CSL';
-import { TokenMap } from '../Cardano';
-
-export type AssetId = string;
 
 export const policyIdFromAssetId = (assetId: AssetId): string => assetId.slice(0, 56);
 export const assetNameFromAssetId = (assetId: AssetId): string => assetId.slice(56);

@@ -1,4 +1,4 @@
-import { Cardano } from '..';
+import { Cardano } from '../..';
 
 export type ProtocolParametersRequiredByWallet = Required<
   Pick<

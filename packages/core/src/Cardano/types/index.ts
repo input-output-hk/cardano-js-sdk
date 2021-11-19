@@ -23,6 +23,7 @@ export * from './Transaction';
 export * from './Certificate';
 export * from './Genesis';
 export * from './Block';
+export * from './Asset';
 
 export type Ed25519KeyHashBech32 = string;
 
