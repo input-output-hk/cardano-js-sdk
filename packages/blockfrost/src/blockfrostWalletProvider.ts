@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   BigIntMath,
   Cardano,
@@ -8,92 +7,35 @@ import {
   ProviderFailure,
   WalletProvider
 } from '@cardano-sdk/core';
-import { BlockFrostAPI, Error as BlockfrostError, Responses } from '@blockfrost/blockfrost-js';
+import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
 import { BlockfrostToCore, BlockfrostTransactionContent, BlockfrostUtxo } from './BlockfrostToCore';
 import { Options, PaginationOptions } from '@blockfrost/blockfrost-js/lib/types';
 import { dummyLogger } from 'ts-log';
+import { fetchSequentially, formatBlockfrostError, withProviderErrors } from './util';
 import { flatten, groupBy } from 'lodash-es';
 
-const formatBlockfrostError = (error: unknown) => {
-  const blockfrostError = error as BlockfrostError;
-  if (typeof blockfrostError === 'string') {
-    throw new ProviderError(ProviderFailure.Unknown, error, blockfrostError);
-  }
-  if (typeof blockfrostError !== 'object') {
-    throw new ProviderError(ProviderFailure.Unknown, error, 'failed to parse error (response type)');
-  }
-  const errorAsType1 = blockfrostError as {
-    status_code: number;
-    message: string;
-    error: string;
-  };
-  if (errorAsType1.status_code) {
-    return errorAsType1;
-  }
-  const errorAsType2 = blockfrostError as {
-    errno: number;
-    message: string;
-    code: string;
-  };
-  if (errorAsType2.code) {
-    const status_code = Number.parseInt(errorAsType2.code);
-    if (!status_code) {
-      throw new ProviderError(ProviderFailure.Unknown, error, 'failed to parse error (status code)');
-    }
-    return {
-      error: errorAsType2.errno.toString(),
-      message: errorAsType1.message,
-      status_code
-    };
-  }
-  throw new ProviderError(ProviderFailure.Unknown, error, 'failed to parse error (response json)');
-};
-
-const toProviderError = (error: unknown) => {
-  const { status_code } = formatBlockfrostError(error);
-  if (status_code === 404) {
-    throw new ProviderError(ProviderFailure.NotFound);
-  }
-  throw new ProviderError(ProviderFailure.Unknown, error, `status_code: ${status_code}`);
-};
+const fetchByAddressSequentially = async <Item, Response>(props: {
+  address: Cardano.Address;
+  request: (address: Cardano.Address, pagination: PaginationOptions) => Promise<Response[]>;
+  responseTranslator?: (address: Cardano.Address, response: Response[]) => Item[];
+}): Promise<Item[]> =>
+  fetchSequentially({
+    arg: props.address,
+    request: props.request,
+    responseTranslator: props.responseTranslator
+      ? (response, arg) => props.responseTranslator!(arg, response)
+      : undefined
+  });
 
 /**
  * Connect to the [Blockfrost service](https://docs.blockfrost.io/)
  *
  * @param {Options} options BlockFrostAPI options
  * @returns {WalletProvider} WalletProvider
+ * @throws {ProviderFailure}
  */
 export const blockfrostWalletProvider = (options: Options, logger = dummyLogger): WalletProvider => {
   const blockfrost = new BlockFrostAPI(options);
-
-  const fetchByAddressSequentially = async <Item, Response>(
-    props: {
-      address: Cardano.Address;
-      request: (address: Cardano.Address, pagination: PaginationOptions) => Promise<Response[]>;
-      responseTranslator?: (address: Cardano.Address, response: Response[]) => Item[];
-    },
-    accumulated: Item[] = [],
-    count = 0,
-    page = 1
-  ): Promise<Item[]> => {
-    try {
-      const response = await props.request(props.address, { count, page });
-      const totalCount = count + response.length;
-      const maybeTranslatedResponse = props.responseTranslator
-        ? props.responseTranslator(props.address, response)
-        : response;
-      const newAccumulatedItems = [...accumulated, ...maybeTranslatedResponse] as Item[];
-      if (response.length === 100) {
-        return fetchByAddressSequentially<Item, Response>(props, newAccumulatedItems, totalCount, page + 1);
-      }
-      return newAccumulatedItems;
-    } catch (error: any) {
-      if (error.status_code === 404) {
-        return [];
-      }
-      throw error;
-    }
-  };
 
   const ledgerTip: WalletProvider['ledgerTip'] = async () => {
     const block = await blockfrost.blocksLatest();
@@ -468,8 +410,5 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
     utxoDelegationAndRewards
   };
 
-  return Object.keys(providerFunctions).reduce((provider, key) => {
-    provider[key] = (...args: any[]) => (providerFunctions as any)[key](...args).catch(toProviderError);
-    return provider;
-  }, {} as any) as WalletProvider;
+  return withProviderErrors(providerFunctions);
 };
