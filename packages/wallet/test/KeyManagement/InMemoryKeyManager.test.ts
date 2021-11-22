@@ -11,12 +11,14 @@ describe('InMemoryKeyManager', () => {
       networkId: Cardano.NetworkId.testnet,
       password: '123'
     });
-    expect(keyManager.publicAccountKey).toBeInstanceOf(CSL.PublicKey);
   });
 
-  test('initial state publicKey', () => {
-    expect(keyManager.publicAccountKey).toBeDefined();
-    expect(keyManager.publicStakeKey).toBeDefined();
+  test('initial state has extendedAccountPublicKey', () => {
+    expect(keyManager.extendedAccountPublicKey).toBeInstanceOf(CSL.Bip32PublicKey);
+  });
+
+  test('derivePublicKey', () => {
+    expect(keyManager.derivePublicKey(KeyManagement.KeyType.Stake, 1)).toBeInstanceOf(CSL.PublicKey);
   });
 
   test('deriveAddress', async () => {

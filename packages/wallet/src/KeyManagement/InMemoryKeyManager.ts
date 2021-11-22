@@ -21,17 +21,19 @@ export const createInMemoryKeyManager = ({
   if (!validMnemonic) throw new errors.InvalidMnemonic();
 
   const entropy = bip39.mnemonicToEntropy(mnemonic);
-  const accountPrivateKey = CSL.Bip32PrivateKey.from_bip39_entropy(Buffer.from(entropy, 'hex'), Buffer.from(password))
+  const extendedAccountPrivateKey = CSL.Bip32PrivateKey.from_bip39_entropy(
+    Buffer.from(entropy, 'hex'),
+    Buffer.from(password)
+  )
     .derive(harden(1852))
     .derive(harden(1815))
     .derive(harden(accountIndex));
-  const accountPublicKey = accountPrivateKey.to_public();
-  const accountPublicKeyRaw = accountPublicKey.to_raw_key();
+  const extendedAccountPublicKey = extendedAccountPrivateKey.to_public();
 
-  const privateParentPaymentKeyRaw = accountPrivateKey.derive(0).derive(0).to_raw_key();
+  const privateParentPaymentKeyRaw = extendedAccountPrivateKey.derive(0).derive(0).to_raw_key();
   const publicParentPaymentKeyRawBech32 = privateParentPaymentKeyRaw.to_public().to_bech32();
 
-  const privateStakeKey = accountPrivateKey.derive(2).derive(0);
+  const privateStakeKey = extendedAccountPrivateKey.derive(2).derive(0);
   const privateStakeKeyRaw = privateStakeKey.to_raw_key();
   const publicStakeKey = privateStakeKey.to_public();
   const publicStakeKeyRaw = publicStakeKey.to_raw_key();
@@ -40,7 +42,7 @@ export const createInMemoryKeyManager = ({
 
   return {
     deriveAddress: (type, addressIndex) => {
-      const derivedPublicUtxoKeyHash = accountPrivateKey
+      const derivedPublicPaymentKeyHash = extendedAccountPrivateKey
         .derive(type)
         .derive(addressIndex)
         .to_public()
@@ -49,7 +51,7 @@ export const createInMemoryKeyManager = ({
       const stakeKeyCredential = CSL.StakeCredential.from_keyhash(publicStakeKeyRawHash);
       const address = CSL.BaseAddress.new(
         networkId,
-        CSL.StakeCredential.from_keyhash(derivedPublicUtxoKeyHash),
+        CSL.StakeCredential.from_keyhash(derivedPublicPaymentKeyHash),
         stakeKeyCredential
       )
         .to_address()
@@ -65,10 +67,10 @@ export const createInMemoryKeyManager = ({
         type
       };
     },
-    publicAccountKey: accountPublicKeyRaw,
-    publicStakeKey: publicStakeKeyRaw,
+    derivePublicKey: (type, addressIndex) => extendedAccountPublicKey.derive(type).derive(addressIndex).to_raw_key(),
+    extendedAccountPublicKey,
     signMessage: async (_addressType, _signingIndex, message) => ({
-      publicKey: accountPublicKey.toString(),
+      publicKey: extendedAccountPublicKey.toString(),
       signature: `Signature for ${message} is not implemented yet`
     }),
     signTransaction: async ({ body, hash }: TxInternals) => {

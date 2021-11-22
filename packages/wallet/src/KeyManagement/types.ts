@@ -13,6 +13,12 @@ export enum AddressType {
   External = 0
 }
 
+export enum KeyType {
+  External = 0,
+  Internal = 1,
+  Stake = 2
+}
+
 export interface GroupedAddress {
   networkId: Cardano.NetworkId;
   type: AddressType;
@@ -25,8 +31,8 @@ export interface GroupedAddress {
 export interface KeyManager {
   // TODO: do not expose CSL objects publicly
   // Reconsider which keys should be exposed, if any.
-  publicAccountKey: CSL.PublicKey;
-  publicStakeKey: CSL.PublicKey;
+  extendedAccountPublicKey: CSL.Bip32PublicKey;
+  derivePublicKey: (type: KeyType, index: number) => CSL.PublicKey;
   // See https://github.com/cardano-foundation/CIPs/tree/master/CIP-1852#specification
   deriveAddress: (type: AddressType, index: number) => GroupedAddress;
   signMessage: (
