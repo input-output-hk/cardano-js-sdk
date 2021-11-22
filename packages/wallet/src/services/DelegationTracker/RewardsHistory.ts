@@ -38,7 +38,7 @@ const firstDelegationEpoch$ = (transactions$: Observable<TxWithEpoch[]>) =>
         transactions.filter(({ tx }) => transactionHasAnyCertificate(tx, [Cardano.CertificateType.StakeDelegation]))
       )
     ),
-    map((tx) => (util.isNotNil(tx) ? tx.epoch + 2 : null)),
+    map((tx) => (util.isNotNil(tx) ? tx.epoch + 3 : null)),
     distinctUntilChanged()
   );
 

@@ -92,6 +92,7 @@ describe('SingleAddressWallet', () => {
     const { poolId, certificates, isStakeKeyRegistered } = await createDelegationCertificates(wallet);
     const initialDeposit = isStakeKeyRegistered ? stakeKeyDeposit : 0n;
     expect(initialAvailableBalance.deposit).toBe(initialDeposit);
+    const [initialDelegatee] = await firstValueFrom(wallet.delegation.rewardAccounts$);
 
     // Make a 1st tx with key registration (if not already registered) and stake delegation
     // Also send some coin to faucet
@@ -128,6 +129,10 @@ describe('SingleAddressWallet', () => {
       // Test it updates wallet.delegation after delegating to stake pool
       (async () => {
         expect(await waitForNewStakePoolIdAfterTx(wallet)).toBe(poolId);
+        const [newDelegatee] = await firstValueFrom(wallet.delegation.rewardAccounts$);
+        // nothing changes for 2 epochs
+        expect(newDelegatee.delegatee?.nextEpoch).toEqual(initialDelegatee?.delegatee?.nextEpoch);
+        expect(newDelegatee.delegatee?.currentEpoch).toEqual(initialDelegatee?.delegatee?.currentEpoch);
       })(),
       // Test confirmed$
       async () => {
