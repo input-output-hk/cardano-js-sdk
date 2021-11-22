@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Address | cardano-sdk</title>
+	<title>GroupedAddress | cardano-sdk</title>
 	<meta name="description" content="Documentation for cardano-sdk">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -58,10 +58,13 @@
 					<a href="../modules/_cardano_sdk_wallet.html">@cardano-sdk/wallet</a>
 				</li>
 				<li>
-					<a href="_cardano_sdk_wallet.Address.html">Address</a>
+					<a href="../modules/_cardano_sdk_wallet.KeyManagement.html">KeyManagement</a>
+				</li>
+				<li>
+					<a href="_cardano_sdk_wallet.KeyManagement.GroupedAddress.html">GroupedAddress</a>
 				</li>
 			</ul>
-			<h1>Interface Address</h1>
+			<h1>Interface GroupedAddress</h1>
 		</div>
 	</div>
 </header>
@@ -72,7 +75,7 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">Address</span>
+						<span class="target">GroupedAddress</span>
 					</li>
 				</ul>
 			</section>
@@ -83,10 +86,12 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_wallet.Address.html#accountIndex" class="tsd-kind-icon">account<wbr>Index</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_wallet.Address.html#bech32" class="tsd-kind-icon">bech32</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_wallet.Address.html#index" class="tsd-kind-icon">index</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_wallet.Address.html#type" class="tsd-kind-icon">type</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_wallet.KeyManagement.GroupedAddress.html#accountIndex" class="tsd-kind-icon">account<wbr>Index</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_wallet.KeyManagement.GroupedAddress.html#address" class="tsd-kind-icon">address</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_wallet.KeyManagement.GroupedAddress.html#addressIndex" class="tsd-kind-icon">address<wbr>Index</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_wallet.KeyManagement.GroupedAddress.html#networkId" class="tsd-kind-icon">network<wbr>Id</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_wallet.KeyManagement.GroupedAddress.html#rewardAccount" class="tsd-kind-icon">reward<wbr>Account</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_wallet.KeyManagement.GroupedAddress.html#type" class="tsd-kind-icon">type</a></li>
 							</ul>
 						</section>
 					</div>
@@ -100,37 +105,57 @@
 					<div class="tsd-signature tsd-kind-icon">account<wbr>Index<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/a8f033c/packages/wallet/src/types.ts#L21">packages/wallet/src/types.ts:21</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/7e96a8e/packages/wallet/src/KeyManagement/types.ts#L25">packages/wallet/src/KeyManagement/types.ts:25</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="bech32" class="tsd-anchor"></a>
-					<h3>bech32</h3>
-					<div class="tsd-signature tsd-kind-icon">bech32<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<a name="address" class="tsd-anchor"></a>
+					<h3>address</h3>
+					<div class="tsd-signature tsd-kind-icon">address<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/a8f033c/packages/wallet/src/types.ts#L18">packages/wallet/src/types.ts:18</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/7e96a8e/packages/wallet/src/KeyManagement/types.ts#L27">packages/wallet/src/KeyManagement/types.ts:27</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="index" class="tsd-anchor"></a>
-					<h3>index</h3>
-					<div class="tsd-signature tsd-kind-icon">index<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<a name="addressIndex" class="tsd-anchor"></a>
+					<h3>address<wbr>Index</h3>
+					<div class="tsd-signature tsd-kind-icon">address<wbr>Index<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/a8f033c/packages/wallet/src/types.ts#L19">packages/wallet/src/types.ts:19</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/7e96a8e/packages/wallet/src/KeyManagement/types.ts#L26">packages/wallet/src/KeyManagement/types.ts:26</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="networkId" class="tsd-anchor"></a>
+					<h3>network<wbr>Id</h3>
+					<div class="tsd-signature tsd-kind-icon">network<wbr>Id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">NetworkId</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/7e96a8e/packages/wallet/src/KeyManagement/types.ts#L23">packages/wallet/src/KeyManagement/types.ts:23</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="rewardAccount" class="tsd-anchor"></a>
+					<h3>reward<wbr>Account</h3>
+					<div class="tsd-signature tsd-kind-icon">reward<wbr>Account<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/7e96a8e/packages/wallet/src/KeyManagement/types.ts#L28">packages/wallet/src/KeyManagement/types.ts:28</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="type" class="tsd-anchor"></a>
 					<h3>type</h3>
-					<div class="tsd-signature tsd-kind-icon">type<span class="tsd-signature-symbol">:</span> <a href="../enums/_cardano_sdk_wallet.AddressType.html" class="tsd-signature-type" data-tsd-kind="Enumeration">AddressType</a></div>
+					<div class="tsd-signature tsd-kind-icon">type<span class="tsd-signature-symbol">:</span> <a href="../enums/_cardano_sdk_wallet.KeyManagement.AddressType.html" class="tsd-signature-type" data-tsd-kind="Enumeration">AddressType</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/a8f033c/packages/wallet/src/types.ts#L20">packages/wallet/src/types.ts:20</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/7e96a8e/packages/wallet/src/KeyManagement/types.ts#L24">packages/wallet/src/KeyManagement/types.ts:24</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -142,55 +167,49 @@
 					<li class=" ">
 						<a href="../index.html">Modules</a>
 					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/_cardano_sdk_blockfrost.html">@cardano-<wbr>sdk/blockfrost</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/_cardano_sdk_cardano_graphql.html">@cardano-<wbr>sdk/cardano-<wbr>graphql</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/_cardano_sdk_cardano_graphql_db_sync.html">@cardano-<wbr>sdk/cardano-<wbr>graphql-<wbr>db-<wbr>sync</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/_cardano_sdk_cip2.html">@cardano-<wbr>sdk/cip2</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/_cardano_sdk_cip30.html">@cardano-<wbr>sdk/cip30</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/_cardano_sdk_core.html">@cardano-<wbr>sdk/core</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/_cardano_sdk_util_dev.html">@cardano-<wbr>sdk/util-<wbr>dev</a>
-					</li>
-					<li class="current tsd-kind-module">
-						<a href="../modules/_cardano_sdk_wallet.html">@cardano-<wbr>sdk/wallet</a>
-					</li>
 				</ul>
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
+					<li class=" tsd-kind-enum tsd-parent-kind-namespace">
+						<a href="../enums/_cardano_sdk_wallet.KeyManagement.AddressType.html" class="tsd-kind-icon">Address<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-enum tsd-parent-kind-namespace">
+						<a href="../enums/_cardano_sdk_wallet.KeyManagement.KeyType.html" class="tsd-kind-icon">Key<wbr>Type</a>
+					</li>
 				</ul>
 				<ul class="current">
-					<li class="current tsd-kind-interface tsd-parent-kind-module">
-						<a href="_cardano_sdk_wallet.Address.html" class="tsd-kind-icon">Address</a>
+					<li class="current tsd-kind-interface tsd-parent-kind-namespace">
+						<a href="_cardano_sdk_wallet.KeyManagement.GroupedAddress.html" class="tsd-kind-icon">Grouped<wbr>Address</a>
 						<ul>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_cardano_sdk_wallet.Address.html#accountIndex" class="tsd-kind-icon">account<wbr>Index</a>
+								<a href="_cardano_sdk_wallet.KeyManagement.GroupedAddress.html#accountIndex" class="tsd-kind-icon">account<wbr>Index</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_cardano_sdk_wallet.Address.html#bech32" class="tsd-kind-icon">bech32</a>
+								<a href="_cardano_sdk_wallet.KeyManagement.GroupedAddress.html#address" class="tsd-kind-icon">address</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_cardano_sdk_wallet.Address.html#index" class="tsd-kind-icon">index</a>
+								<a href="_cardano_sdk_wallet.KeyManagement.GroupedAddress.html#addressIndex" class="tsd-kind-icon">address<wbr>Index</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_cardano_sdk_wallet.Address.html#type" class="tsd-kind-icon">type</a>
+								<a href="_cardano_sdk_wallet.KeyManagement.GroupedAddress.html#networkId" class="tsd-kind-icon">network<wbr>Id</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="_cardano_sdk_wallet.KeyManagement.GroupedAddress.html#rewardAccount" class="tsd-kind-icon">reward<wbr>Account</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="_cardano_sdk_wallet.KeyManagement.GroupedAddress.html#type" class="tsd-kind-icon">type</a>
 							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
+					<li class=" tsd-kind-interface tsd-parent-kind-namespace">
+						<a href="_cardano_sdk_wallet.KeyManagement.KeyManager.html" class="tsd-kind-icon">Key<wbr>Manager</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-namespace">
+						<a href="../modules/_cardano_sdk_wallet.KeyManagement.html#createInMemoryKeyManager" class="tsd-kind-icon">create<wbr>InMemory<wbr>Key<wbr>Manager</a>
+					</li>
 				</ul>
 			</nav>
 		</div>

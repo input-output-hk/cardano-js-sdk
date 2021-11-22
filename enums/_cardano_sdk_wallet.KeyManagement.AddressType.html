@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Redeemer | cardano-sdk</title>
+	<title>AddressType | cardano-sdk</title>
 	<meta name="description" content="Documentation for cardano-sdk">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -55,87 +55,74 @@
 					<a href="../index.html">cardano-sdk</a>
 				</li>
 				<li>
-					<a href="../modules/_cardano_sdk_core.html">@cardano-sdk/core</a>
+					<a href="../modules/_cardano_sdk_wallet.html">@cardano-sdk/wallet</a>
 				</li>
 				<li>
-					<a href="../modules/_cardano_sdk_core.Cardano.html">Cardano</a>
+					<a href="../modules/_cardano_sdk_wallet.KeyManagement.html">KeyManagement</a>
 				</li>
 				<li>
-					<a href="_cardano_sdk_core.Cardano.Redeemer.html">Redeemer</a>
+					<a href="_cardano_sdk_wallet.KeyManagement.AddressType.html">AddressType</a>
 				</li>
 			</ul>
-			<h1>Interface Redeemer</h1>
+			<h1>Enumeration AddressType</h1>
 		</div>
 	</div>
 </header>
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
-			<section class="tsd-panel tsd-hierarchy">
-				<h3>Hierarchy</h3>
-				<ul class="tsd-hierarchy">
-					<li>
-						<span class="target">Redeemer</span>
-					</li>
-				</ul>
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>Internal = change address &amp; External = receipt address</p>
+					</div>
+				</div>
 			</section>
 			<section class="tsd-panel-group tsd-index-group">
 				<h2>Index</h2>
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section ">
-							<h3>Properties</h3>
+							<h3>Enumeration members</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.Cardano.Redeemer.html#executionUnits" class="tsd-kind-icon">execution<wbr>Units</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.Cardano.Redeemer.html#index" class="tsd-kind-icon">index</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.Cardano.Redeemer.html#purpose" class="tsd-kind-icon">purpose</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.Cardano.Redeemer.html#scriptHash" class="tsd-kind-icon">script<wbr>Hash</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="_cardano_sdk_wallet.KeyManagement.AddressType.html#External" class="tsd-kind-icon">External</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="_cardano_sdk_wallet.KeyManagement.AddressType.html#Internal" class="tsd-kind-icon">Internal</a></li>
 							</ul>
 						</section>
 					</div>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
-				<h2>Properties</h2>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="executionUnits" class="tsd-anchor"></a>
-					<h3>execution<wbr>Units</h3>
-					<div class="tsd-signature tsd-kind-icon">execution<wbr>Units<span class="tsd-signature-symbol">:</span> <a href="_cardano_sdk_core.Cardano.ExUnits.html" class="tsd-signature-type" data-tsd-kind="Interface">ExUnits</a></div>
+				<h2>Enumeration members</h2>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
+					<a name="External" class="tsd-anchor"></a>
+					<h3>External</h3>
+					<div class="tsd-signature tsd-kind-icon">External<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 0</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/7e96a8e/packages/core/src/Cardano/types/Transaction.ts#L44">packages/core/src/Cardano/types/Transaction.ts:44</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/7e96a8e/packages/wallet/src/KeyManagement/types.ts#L13">packages/wallet/src/KeyManagement/types.ts:13</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Receipt address</p>
+						</div>
+					</div>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="index" class="tsd-anchor"></a>
-					<h3>index</h3>
-					<div class="tsd-signature tsd-kind-icon">index<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
+					<a name="Internal" class="tsd-anchor"></a>
+					<h3>Internal</h3>
+					<div class="tsd-signature tsd-kind-icon">Internal<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 1</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/7e96a8e/packages/core/src/Cardano/types/Transaction.ts#L41">packages/core/src/Cardano/types/Transaction.ts:41</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/7e96a8e/packages/wallet/src/KeyManagement/types.ts#L9">packages/wallet/src/KeyManagement/types.ts:9</a></li>
 						</ul>
 					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="purpose" class="tsd-anchor"></a>
-					<h3>purpose</h3>
-					<div class="tsd-signature tsd-kind-icon">purpose<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;spend&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;mint&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;certificate&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;withdrawal&quot;</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/7e96a8e/packages/core/src/Cardano/types/Transaction.ts#L42">packages/core/src/Cardano/types/Transaction.ts:42</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="scriptHash" class="tsd-anchor"></a>
-					<h3>script<wbr>Hash</h3>
-					<div class="tsd-signature tsd-kind-icon">script<wbr>Hash<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/7e96a8e/packages/core/src/Cardano/types/Transaction.ts#L43">packages/core/src/Cardano/types/Transaction.ts:43</a></li>
-						</ul>
-					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Change address</p>
+						</div>
+					</div>
 				</section>
 			</section>
 		</div>
@@ -151,25 +138,31 @@
 				<ul class="before-current">
 				</ul>
 				<ul class="current">
-					<li class="current tsd-kind-interface tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_core.Cardano.Redeemer.html" class="tsd-kind-icon">Redeemer</a>
+					<li class="current tsd-kind-enum tsd-parent-kind-namespace">
+						<a href="_cardano_sdk_wallet.KeyManagement.AddressType.html" class="tsd-kind-icon">Address<wbr>Type</a>
 						<ul>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_cardano_sdk_core.Cardano.Redeemer.html#executionUnits" class="tsd-kind-icon">execution<wbr>Units</a>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="_cardano_sdk_wallet.KeyManagement.AddressType.html#External" class="tsd-kind-icon">External</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_cardano_sdk_core.Cardano.Redeemer.html#index" class="tsd-kind-icon">index</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_cardano_sdk_core.Cardano.Redeemer.html#purpose" class="tsd-kind-icon">purpose</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_cardano_sdk_core.Cardano.Redeemer.html#scriptHash" class="tsd-kind-icon">script<wbr>Hash</a>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="_cardano_sdk_wallet.KeyManagement.AddressType.html#Internal" class="tsd-kind-icon">Internal</a>
 							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
+					<li class=" tsd-kind-enum tsd-parent-kind-namespace">
+						<a href="_cardano_sdk_wallet.KeyManagement.KeyType.html" class="tsd-kind-icon">Key<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-namespace">
+						<a href="../interfaces/_cardano_sdk_wallet.KeyManagement.GroupedAddress.html" class="tsd-kind-icon">Grouped<wbr>Address</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-namespace">
+						<a href="../interfaces/_cardano_sdk_wallet.KeyManagement.KeyManager.html" class="tsd-kind-icon">Key<wbr>Manager</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-namespace">
+						<a href="../modules/_cardano_sdk_wallet.KeyManagement.html#createInMemoryKeyManager" class="tsd-kind-icon">create<wbr>InMemory<wbr>Key<wbr>Manager</a>
+					</li>
 				</ul>
 			</nav>
 		</div>
@@ -189,7 +182,6 @@
 			<ul class="tsd-legend">
 				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
 				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
-				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>

@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>69/69</span>
+                <span class='fraction'>71/71</span>
             </div>
         
             
@@ -39,14 +39,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>36/36</span>
+                <span class='fraction'>38/38</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>60/60</span>
+                <span class='fraction'>63/63</span>
             </div>
         
             
@@ -250,9 +250,17 @@
 <a name='L191'></a><a href='#L191'>191</a>
 <a name='L192'></a><a href='#L192'>192</a>
 <a name='L193'></a><a href='#L193'>193</a>
-<a name='L194'></a><a href='#L194'>194</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">15x</span>
-<span class="cline-any cline-yes">15x</span>
+<a name='L194'></a><a href='#L194'>194</a>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">14x</span>
+<span class="cline-any cline-yes">14x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -271,10 +279,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">15x</span>
-<span class="cline-any cline-yes">15x</span>
-<span class="cline-any cline-yes">15x</span>
-<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">14x</span>
+<span class="cline-any cline-yes">14x</span>
+<span class="cline-any cline-yes">14x</span>
+<span class="cline-any cline-yes">14x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -292,7 +301,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">14x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -301,6 +311,10 @@
 <span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -320,7 +334,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">14x</span>
 <span class="cline-any cline-yes">33x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">10x</span>
@@ -334,7 +350,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">14x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -459,6 +475,7 @@ import {
   race,
   scan,
   startWith,
+  switchMap,
   take,
   takeUntil,
   tap
@@ -471,7 +488,7 @@ import { sortBy } from 'lodash-es';
 &nbsp;
 export interface TransactionsTrackerProps {
   walletProvider: WalletProvider;
-  addresses: Cardano.Address[];
+  addresses$: Observable&lt;Cardano.Address[]&gt;;
   tip$: Observable&lt;Cardano.Tip&gt;;
   retryBackoffConfig: RetryBackoffConfig;
   newTransactions: {
@@ -487,28 +504,35 @@ export interface TransactionsTrackerInternals {
 &nbsp;
 export const createAddressTransactionsProvider = (
   walletProvider: WalletProvider,
-  addresses: Cardano.Address[],
+  addresses$: Observable&lt;Cardano.Address[]&gt;,
   retryBackoffConfig: RetryBackoffConfig,
   tipBlockHeight$: Observable&lt;number&gt;
 ): Observable&lt;DirectionalTransaction[]&gt; =&gt; {
-  const isMyAddress = ({ address }: { address: Cardano.Address }) =&gt; addresses.includes(address);
-  return coldObservableProvider(
-    () =&gt; walletProvider.queryTransactionsByAddresses(addresses),
-    retryBackoffConfig,
-    tipBlockHeight$,
-    transactionsEquals
-  ).pipe(
-    map((transactions) =&gt;
-      sortBy(
-        transactions,
-        ({ blockHeader: { blockHeight } }) =&gt; blockHeight,
-        ({ index }) =&gt; index
-      ).map((tx) =&gt; {
-        const direction = tx.body.inputs.some(isMyAddress)
-          ? TransactionDirection.Outgoing
-          : TransactionDirection.Incoming;
-        return { direction, tx };
-      })
+  const isMyAddress =
+    (addresses: Cardano.Address[]) =&gt;
+    ({ address }: { address: Cardano.Address }) =&gt;
+      addresses.includes(address);
+  return addresses$.pipe(
+    switchMap((addresses) =&gt;
+      coldObservableProvider(
+        () =&gt; walletProvider.queryTransactionsByAddresses(addresses),
+        retryBackoffConfig,
+        tipBlockHeight$,
+        transactionsEquals
+      ).pipe(
+        map((transactions) =&gt;
+          sortBy(
+            transactions,
+            ({ blockHeader: { blockHeight } }) =&gt; blockHeight,
+            ({ index }) =&gt; index
+          ).map((tx) =&gt; {
+            const direction = tx.body.inputs.some(isMyAddress(addresses))
+              ? TransactionDirection.Outgoing
+              : TransactionDirection.Incoming;
+            return { direction, tx };
+          })
+        )
+      )
     )
   );
 };
@@ -531,13 +555,13 @@ export const createTransactionsTracker = (
   {
     tip$,
     walletProvider,
-    addresses,
+    addresses$,
     newTransactions: { submitting$, pending$, failedToSubmit$ },
     retryBackoffConfig
   }: TransactionsTrackerProps,
   {
     transactionsSource$ = new TrackerSubject(
-      createAddressTransactionsProvider(walletProvider, addresses, retryBackoffConfig, sharedDistinctBlock(tip$))
+      createAddressTransactionsProvider(walletProvider, addresses$, retryBackoffConfig, sharedDistinctBlock(tip$))
     )
   }: TransactionsTrackerInternals = {}
 ): TransactionsTracker =&gt; {
@@ -643,7 +667,7 @@ export const createTransactionsTracker = (
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Wed Nov 17 2021 10:39:23 GMT+0000 (Coordinated Universal Time)
+                at Mon Nov 22 2021 12:37:08 GMT+0000 (Coordinated Universal Time)
             </div>
         </div>
         <script src="../../prettify.js"></script>
