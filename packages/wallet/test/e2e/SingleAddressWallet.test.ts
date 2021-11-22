@@ -1,7 +1,7 @@
 import { Cardano } from '@cardano-sdk/core';
 import { SingleAddressWallet, StakeKeyStatus, Wallet } from '../../src';
+import { assetProvider, keyManager, poolId1, poolId2, stakePoolSearchProvider, walletProvider } from './config';
 import { distinctUntilChanged, filter, firstValueFrom, map, merge, mergeMap, skip, tap, timer } from 'rxjs';
-import { keyManager, poolId1, poolId2, stakePoolSearchProvider, walletProvider } from './config';
 
 const faucetAddress =
   'addr_test1qqr585tvlc7ylnqvz8pyqwauzrdu0mxag3m7q56grgmgu7sxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flknswgndm3';
@@ -62,6 +62,7 @@ describe('SingleAddressWallet', () => {
     wallet = new SingleAddressWallet(
       { name: 'Test Wallet' },
       {
+        assetProvider,
         keyManager,
         stakePoolSearchProvider,
         walletProvider
@@ -76,6 +77,10 @@ describe('SingleAddressWallet', () => {
     expect(wallet.addresses$.value![0].address.startsWith('addr')).toBe(true);
   });
 
+  it('has assets$', async () => {
+    expect(typeof (await firstValueFrom(wallet.assets$))).toBe('object');
+  });
+
   test('balance & transaction', async () => {
     const stakeKeyDeposit = BigInt((await firstValueFrom(wallet.protocolParameters$)).stakeKeyDeposit);
     const initialTotalBalance = await firstValueFrom(wallet.balance.total$);
@@ -87,6 +92,7 @@ describe('SingleAddressWallet', () => {
     const { poolId, certificates, isStakeKeyRegistered } = await createDelegationCertificates(wallet);
     const initialDeposit = isStakeKeyRegistered ? stakeKeyDeposit : 0n;
     expect(initialAvailableBalance.deposit).toBe(initialDeposit);
+    const [initialDelegatee] = await firstValueFrom(wallet.delegation.rewardAccounts$);
 
     // Make a 1st tx with key registration (if not already registered) and stake delegation
     // Also send some coin to faucet
@@ -123,6 +129,10 @@ describe('SingleAddressWallet', () => {
       // Test it updates wallet.delegation after delegating to stake pool
       (async () => {
         expect(await waitForNewStakePoolIdAfterTx(wallet)).toBe(poolId);
+        const [newDelegatee] = await firstValueFrom(wallet.delegation.rewardAccounts$);
+        // nothing changes for 2 epochs
+        expect(newDelegatee.delegatee?.nextEpoch).toEqual(initialDelegatee?.delegatee?.nextEpoch);
+        expect(newDelegatee.delegatee?.currentEpoch).toEqual(initialDelegatee?.delegatee?.currentEpoch);
       })(),
       // Test confirmed$
       async () => {

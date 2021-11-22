@@ -1,4 +1,4 @@
-import { Cardano } from '../..';
+import { Cardano } from '../../..';
 
 export interface StakePoolSearchProvider {
   /**

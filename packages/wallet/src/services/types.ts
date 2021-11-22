@@ -67,6 +67,10 @@ export interface RewardsHistory {
 }
 
 export interface Delegatee {
+  /**
+   * Rewards at the end of current epoch will
+   * be from this stake pool
+   */
   currentEpoch?: Cardano.StakePool;
   nextEpoch?: Cardano.StakePool;
   nextNextEpoch: Cardano.StakePool;

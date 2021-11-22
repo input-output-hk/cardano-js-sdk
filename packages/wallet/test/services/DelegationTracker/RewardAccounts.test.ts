@@ -48,9 +48,10 @@ describe('RewardAccounts', () => {
       }
     ];
     expect(getStakePoolIdAtEpoch(transactions)(102)).toBeUndefined();
-    expect(getStakePoolIdAtEpoch(transactions)(103)).toBe('pool1');
-    expect(getStakePoolIdAtEpoch(transactions)(104)).toBeUndefined();
+    expect(getStakePoolIdAtEpoch(transactions)(103)).toBeUndefined();
+    expect(getStakePoolIdAtEpoch(transactions)(104)).toBe('pool1');
     expect(getStakePoolIdAtEpoch(transactions)(105)).toBeUndefined();
+    expect(getStakePoolIdAtEpoch(transactions)(106)).toBeUndefined();
   });
 
   test('addressKeyStatuses ', () => {
@@ -161,12 +162,7 @@ describe('RewardAccounts', () => {
             a: [
               {
                 certificates: [
-                  { __typename: Cardano.CertificateType.StakeKeyRegistration } as Cardano.StakeAddressCertificate
-                ],
-                epoch: epoch - 2
-              },
-              {
-                certificates: [
+                  { __typename: Cardano.CertificateType.StakeKeyRegistration } as Cardano.StakeAddressCertificate,
                   {
                     __typename: Cardano.CertificateType.StakeDelegation,
                     poolId: 'pool1'

@@ -18,7 +18,7 @@ describe('RewardsHistory', () => {
   });
 
   describe('createRewardsHistoryTracker', () => {
-    it('queries and maps reward history starting from first delgation epoch+2', () => {
+    it('queries and maps reward history starting from first delgation epoch+3', () => {
       createTestScheduler().run(({ cold, expectObservable, flush }) => {
         const epoch = rewardsHistory[0].epoch;
         const getRewardsHistory = jest.fn().mockReturnValue(cold('-a', { a: rewardsHistory }));
@@ -47,7 +47,7 @@ describe('RewardsHistory', () => {
         });
         flush();
         expect(getRewardsHistory).toBeCalledTimes(1);
-        expect(getRewardsHistory).toBeCalledWith(epoch + 2);
+        expect(getRewardsHistory).toBeCalledWith(epoch + 3);
       });
     });
   });
