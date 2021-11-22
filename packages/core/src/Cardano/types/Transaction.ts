@@ -1,4 +1,5 @@
 import * as Cardano from '.';
+import { AuxiliaryData } from './AuxiliaryData';
 import { BlockAlonzo, BlockBodyAlonzo } from '@cardano-ogmios/schema';
 
 type OgmiosHeader = NonNullable<BlockAlonzo['header']>;
@@ -51,6 +52,7 @@ export type Witness = Omit<Partial<BlockBodyAlonzo['witness']>, 'redeemers' | 's
     [k: string]: Ed25519SignatureHash16;
   }>;
 };
+
 export interface TxAlonzo {
   id: TransactionId;
   index: number;
@@ -59,7 +61,7 @@ export interface TxAlonzo {
   implicitCoin: ImplicitCoin;
   txSize: number;
   witness: Witness;
-  auxiliaryData?: Cardano.AuxiliaryData;
+  auxiliaryData?: AuxiliaryData;
 }
 
 export type NewTxAlonzo = Omit<TxAlonzo, 'blockHeader' | 'implicitCoin' | 'txSize' | 'index'>;
