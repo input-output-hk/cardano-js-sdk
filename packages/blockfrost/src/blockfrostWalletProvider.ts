@@ -256,7 +256,6 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { json_metadata, label } = metadatum as any;
         if (!json_metadata || !label) return map;
-        // not sure how Blockfrost represents integer metadatum. Might need to convert to bigint here.
         map[label] = json_metadata;
         return map;
       }, {} as Cardano.MetadatumMap);
