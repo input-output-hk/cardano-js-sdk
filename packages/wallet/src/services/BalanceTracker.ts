@@ -1,7 +1,7 @@
 import { Balance, DelegationTracker, StakeKeyStatus, TransactionalObservables, TransactionalTracker } from './types';
-import { Cardano, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
+import { BigIntMath, Cardano, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
 import { Observable, combineLatest, distinctUntilChanged, map, share } from 'rxjs';
-import { TrackerSubject } from './util';
+import { TrackerSubject, deepEquals } from './util';
 
 const mapToBalances = map<[Cardano.Utxo[], Cardano.Lovelace, Cardano.Lovelace], Balance>(
   ([utxo, rewards, deposit]) => ({
@@ -20,33 +20,59 @@ const createDepositTracker = (
     distinctUntilChanged()
   );
 
-const numRewardAccountsWithKeyStatus = (delegationTracker: DelegationTracker, keyStatus: StakeKeyStatus) =>
+const numRewardAccountsWithKeyStatus = (delegationTracker: DelegationTracker, keyStatuses: StakeKeyStatus[]) =>
   delegationTracker.rewardAccounts$.pipe(
-    map((accounts) => accounts.filter((account) => account.keyStatus === keyStatus).length)
+    map((accounts) => accounts.filter((account) => keyStatuses.includes(account.keyStatus)).length)
   );
 
 export const createBalanceTracker = (
   protocolParameters$: Observable<ProtocolParametersRequiredByWallet>,
   utxoTracker: TransactionalObservables<Cardano.Utxo[]>,
-  rewardsTracker: TransactionalObservables<Cardano.Lovelace>,
   delegationTracker: DelegationTracker
 ): TransactionalTracker<Balance> => {
   const depositTotal$ = createDepositTracker(
     protocolParameters$,
-    numRewardAccountsWithKeyStatus(delegationTracker, StakeKeyStatus.Registered)
-  ).pipe(share());
-  const depositAvailable$ = combineLatest([
-    depositTotal$,
-    createDepositTracker(
-      protocolParameters$,
-      numRewardAccountsWithKeyStatus(delegationTracker, StakeKeyStatus.Unregistering)
-    )
-  ]).pipe(map(([totalDeposit, depositBeingSpent]) => totalDeposit - depositBeingSpent));
+    numRewardAccountsWithKeyStatus(delegationTracker, [StakeKeyStatus.Registered, StakeKeyStatus.Unregistering])
+  ).pipe(distinctUntilChanged());
+  const depositRegistered$ = createDepositTracker(
+    protocolParameters$,
+    numRewardAccountsWithKeyStatus(delegationTracker, [StakeKeyStatus.Registered])
+  );
+  const depositUnregistering$ = createDepositTracker(
+    protocolParameters$,
+    numRewardAccountsWithKeyStatus(delegationTracker, [StakeKeyStatus.Unregistering])
+  );
+  const depositAvailable$ = combineLatest([depositRegistered$, depositUnregistering$]).pipe(
+    map(([totalDeposit, depositBeingSpent]) => BigIntMath.max([totalDeposit - depositBeingSpent, 0n])!),
+    distinctUntilChanged()
+  );
+  const rewardsAggregate$ = delegationTracker.rewardAccounts$.pipe(
+    map((accounts) =>
+      accounts.reduce(
+        (sum, { rewardBalance: { available, total } }) => ({
+          available: sum.available + available,
+          total: sum.total + total
+        }),
+        {
+          available: 0n,
+          total: 0n
+        }
+      )
+    ),
+    distinctUntilChanged(deepEquals),
+    share()
+  );
   const available$ = new TrackerSubject<Balance>(
-    combineLatest([utxoTracker.available$, rewardsTracker.available$, depositAvailable$]).pipe(mapToBalances)
+    combineLatest([
+      utxoTracker.available$,
+      rewardsAggregate$.pipe(map(({ available }) => available)),
+      depositAvailable$
+    ]).pipe(mapToBalances)
   );
   const total$ = new TrackerSubject<Balance>(
-    combineLatest([utxoTracker.total$, rewardsTracker.total$, depositTotal$]).pipe(mapToBalances)
+    combineLatest([utxoTracker.total$, rewardsAggregate$.pipe(map(({ total }) => total)), depositTotal$]).pipe(
+      mapToBalances
+    )
   );
   return {
     available$,

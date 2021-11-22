@@ -20,7 +20,7 @@ import { mockWalletProvider, queryTransactionsResult } from '../mocks';
 describe('TransactionsTracker', () => {
   test('createAddressTransactionsProvider', async () => {
     const provider$ = createAddressTransactionsProvider(
-      mockWalletProvider(), [queryTransactionsResult[0].body.inputs[0].address], { initialInterval: 1 }, of(300)
+      mockWalletProvider(), of([queryTransactionsResult[0].body.inputs[0].address]), { initialInterval: 1 }, of(300)
     );
     expect(await firstValueFrom(provider$)).toEqual([
       { direction: TransactionDirection.Outgoing, tx: queryTransactionsResult[0] }
@@ -32,7 +32,7 @@ describe('TransactionsTracker', () => {
     // they're using mock transactionsSource$
     let retryBackoffConfig: RetryBackoffConfig;
     let walletProvider: WalletProvider;
-    let addresses: Cardano.Address[];
+    const addresses$ = of([queryTransactionsResult[0].body.inputs[0].address]);
 
     it('observable properties behave correctly on successful transaction', async () => {
       const outgoingTx = queryTransactionsResult[0];
@@ -51,7 +51,7 @@ describe('TransactionsTracker', () => {
         const confirmedSubscription =         '--^--'; // regression: subscribing after submitting$ emits
         const transactionsTracker = createTransactionsTracker(
           {
-            addresses,
+            addresses$,
             newTransactions: {
               failedToSubmit$,
               pending$,
@@ -98,7 +98,7 @@ describe('TransactionsTracker', () => {
         const failedSubscription =              '--^---'; // regression: subscribing after submitting$ emits
         const transactionsTracker = createTransactionsTracker(
           {
-            addresses,
+            addresses$,
             newTransactions: {
               failedToSubmit$,
               pending$,
@@ -134,7 +134,7 @@ describe('TransactionsTracker', () => {
         const transactionsSource$ = cold(     '----|') as unknown as TrackerSubject<DirectionalTransaction[]>;
         const transactionsTracker = createTransactionsTracker(
           {
-            addresses,
+            addresses$,
             newTransactions: {
               failedToSubmit$,
               pending$,

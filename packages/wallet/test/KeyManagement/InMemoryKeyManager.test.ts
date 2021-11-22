@@ -11,18 +11,19 @@ describe('InMemoryKeyManager', () => {
       networkId: Cardano.NetworkId.testnet,
       password: '123'
     });
-    expect(keyManager.publicKey).toBeInstanceOf(CSL.PublicKey);
   });
 
-  test('initial state publicKey', () => {
-    expect(keyManager.publicKey).toBeDefined();
-    expect(keyManager.publicParentKey).toBeDefined();
+  test('initial state has extendedAccountPublicKey', () => {
+    expect(keyManager.extendedAccountPublicKey).toBeInstanceOf(CSL.Bip32PublicKey);
+  });
+
+  test('derivePublicKey', () => {
+    expect(keyManager.derivePublicKey(KeyManagement.KeyType.Stake, 1)).toBeInstanceOf(CSL.PublicKey);
   });
 
   test('deriveAddress', async () => {
     const address = await keyManager.deriveAddress(0, 0);
     expect(address).toBeDefined();
-    expect(keyManager.publicParentKey).toBeDefined();
   });
 
   test('signTransaction', async () => {
@@ -34,9 +35,5 @@ describe('InMemoryKeyManager', () => {
     });
     expect(Object.keys(witnessSet)).toHaveLength(2);
     expect(typeof witnessSet[Object.keys(witnessSet)[0]]).toBe('string');
-  });
-
-  test('rewardAccount', () => {
-    expect(keyManager.rewardAccount.startsWith('stake_test')).toBe(true);
   });
 });

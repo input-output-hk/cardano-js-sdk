@@ -1,6 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Cardano } from '@cardano-sdk/core';
-import { arrayEquals, shallowArrayEquals, strictEquals, transactionsEquals, txEquals, utxoEquals } from '../../../src';
+import {
+  arrayEquals,
+  deepEquals,
+  shallowArrayEquals,
+  strictEquals,
+  transactionsEquals,
+  txEquals,
+  utxoEquals
+} from '../../../src';
 
 describe('equals', () => {
   test('strictEquals', () => {
@@ -20,6 +28,13 @@ describe('equals', () => {
     const b = { prop: 'prop' };
     expect(shallowArrayEquals([a], [b])).toBe(false);
     expect(shallowArrayEquals([a], [a])).toBe(true);
+  });
+
+  test('deepEquals', () => {
+    expect(deepEquals([], [])).toBe(true);
+    expect(deepEquals({}, {})).toBe(true);
+    expect(deepEquals([{ prop: 'prop' }], [{ prop: 'prop' }])).toBe(true);
+    expect(deepEquals([{ prop: 'prop' }], [{ prop: 'prop2' }])).toBe(false);
   });
 
   test('txEquals', () => {

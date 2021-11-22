@@ -14,6 +14,7 @@ import {
   race,
   scan,
   startWith,
+  switchMap,
   take,
   takeUntil,
   tap
@@ -26,7 +27,7 @@ import { sortBy } from 'lodash-es';
 
 export interface TransactionsTrackerProps {
   walletProvider: WalletProvider;
-  addresses: Cardano.Address[];
+  addresses$: Observable<Cardano.Address[]>;
   tip$: Observable<Cardano.Tip>;
   retryBackoffConfig: RetryBackoffConfig;
   newTransactions: {
@@ -42,28 +43,35 @@ export interface TransactionsTrackerInternals {
 
 export const createAddressTransactionsProvider = (
   walletProvider: WalletProvider,
-  addresses: Cardano.Address[],
+  addresses$: Observable<Cardano.Address[]>,
   retryBackoffConfig: RetryBackoffConfig,
   tipBlockHeight$: Observable<number>
 ): Observable<DirectionalTransaction[]> => {
-  const isMyAddress = ({ address }: { address: Cardano.Address }) => addresses.includes(address);
-  return coldObservableProvider(
-    () => walletProvider.queryTransactionsByAddresses(addresses),
-    retryBackoffConfig,
-    tipBlockHeight$,
-    transactionsEquals
-  ).pipe(
-    map((transactions) =>
-      sortBy(
-        transactions,
-        ({ blockHeader: { blockHeight } }) => blockHeight,
-        ({ index }) => index
-      ).map((tx) => {
-        const direction = tx.body.inputs.some(isMyAddress)
-          ? TransactionDirection.Outgoing
-          : TransactionDirection.Incoming;
-        return { direction, tx };
-      })
+  const isMyAddress =
+    (addresses: Cardano.Address[]) =>
+    ({ address }: { address: Cardano.Address }) =>
+      addresses.includes(address);
+  return addresses$.pipe(
+    switchMap((addresses) =>
+      coldObservableProvider(
+        () => walletProvider.queryTransactionsByAddresses(addresses),
+        retryBackoffConfig,
+        tipBlockHeight$,
+        transactionsEquals
+      ).pipe(
+        map((transactions) =>
+          sortBy(
+            transactions,
+            ({ blockHeader: { blockHeight } }) => blockHeight,
+            ({ index }) => index
+          ).map((tx) => {
+            const direction = tx.body.inputs.some(isMyAddress(addresses))
+              ? TransactionDirection.Outgoing
+              : TransactionDirection.Incoming;
+            return { direction, tx };
+          })
+        )
+      )
     )
   );
 };
@@ -86,13 +94,13 @@ export const createTransactionsTracker = (
   {
     tip$,
     walletProvider,
-    addresses,
+    addresses$,
     newTransactions: { submitting$, pending$, failedToSubmit$ },
     retryBackoffConfig
   }: TransactionsTrackerProps,
   {
     transactionsSource$ = new TrackerSubject(
-      createAddressTransactionsProvider(walletProvider, addresses, retryBackoffConfig, sharedDistinctBlock(tip$))
+      createAddressTransactionsProvider(walletProvider, addresses$, retryBackoffConfig, sharedDistinctBlock(tip$))
     )
   }: TransactionsTrackerInternals = {}
 ): TransactionsTracker => {

@@ -1,25 +1,7 @@
 import { Balance, BehaviorObservable, DelegationTracker, TransactionalTracker, TransactionsTracker } from './services';
 import { Cardano, NetworkInfo, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
+import { GroupedAddress } from './KeyManagement';
 import { TxInternals } from './Transaction';
-
-/** Internal = change address & External = receipt address */
-export enum AddressType {
-  /**
-   * Change address
-   */
-  Internal = 'Internal',
-  /**
-   * Receipt address
-   */
-  External = 'External'
-}
-
-export interface Address {
-  bech32: Cardano.Address;
-  index: number;
-  type: AddressType;
-  accountIndex: number;
-}
 
 export type InitializeTxProps = {
   outputs?: Set<Cardano.TxOut>;
@@ -44,7 +26,7 @@ export interface Wallet {
   readonly genesisParameters$: BehaviorObservable<Cardano.CompactGenesis>;
   readonly networkInfo$: BehaviorObservable<NetworkInfo>;
   readonly protocolParameters$: BehaviorObservable<ProtocolParametersRequiredByWallet>;
-  get addresses(): Address[];
+  readonly addresses$: BehaviorObservable<GroupedAddress[]>;
   initializeTx(props: InitializeTxProps): Promise<TxInternals>;
   finalizeTx(props: TxInternals): Promise<Cardano.NewTxAlonzo>;
   submitTx(tx: Cardano.NewTxAlonzo): Promise<void>;

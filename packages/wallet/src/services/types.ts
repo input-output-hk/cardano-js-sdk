@@ -79,10 +79,15 @@ export enum StakeKeyStatus {
   Unregistered = 'UNREGISTERED'
 }
 
+export interface RewardBalance {
+  total: Cardano.Lovelace;
+  available: Cardano.Lovelace;
+}
 export interface RewardAccount {
   address: Cardano.Address;
   keyStatus: StakeKeyStatus;
   delegatee?: Delegatee;
+  rewardBalance: RewardBalance;
   // Maybe add rewardsHistory for each reward account too
 }
 
