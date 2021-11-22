@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.8](https://github.com/input-output-hk/cardano-js-sdk/compare/0.1.7...0.1.8) (2021-11-22)
+
+
+### Features
+
+* **blockfrost:** add blockfrostAssetProvider ([8b5acbc](https://github.com/input-output-hk/cardano-js-sdk/commit/8b5acbcfa96b9fa04f43a8747727b75e8d139bd1))
+* **blockfrost:** fetch tx metadata, update blockfrost sdk to 2.0.2 ([f5c16a6](https://github.com/input-output-hk/cardano-js-sdk/commit/f5c16a629465df6b4c4db4bb4470420d860b1c7b))
+* **core:** add BigIntMath.max, export Cardano.RewardAccount type ([bc14ec8](https://github.com/input-output-hk/cardano-js-sdk/commit/bc14ec8d61854f218d861dc01750030d11f8b336))
+* **wallet:** add KeyManager.derivePublicKey and KeyManager.extendedAccountPublicKey ([f3a53b0](https://github.com/input-output-hk/cardano-js-sdk/commit/f3a53b07d83e601d45f5113899f0ed68a4227177))
+* **wallet:** add Wallet.assets$ ([351b8e7](https://github.com/input-output-hk/cardano-js-sdk/commit/351b8e7a82ab925ec75c90edc293afc9ef9c47d4))
+
+
+### Bug Fixes
+
+* **wallet:** delegation changes reflect at end of cuurrent epoch + 2 ([ee0ee2b](https://github.com/input-output-hk/cardano-js-sdk/commit/ee0ee2bc38ce0bac0970848d07364f981bbc5dfd))
+* **wallet:** subscribing to confirmed$ and failed$ after tx submission ([1e651bc](https://github.com/input-output-hk/cardano-js-sdk/commit/1e651bcc256f2ee43866ccc42b968055fe920f30))
+
 ### [0.1.7](https://github.com/input-output-hk/cardano-js-sdk/compare/0.1.6...0.1.7) (2021-11-16)
 
 
