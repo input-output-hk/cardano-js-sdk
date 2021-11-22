@@ -11,7 +11,7 @@ import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
 import { BlockfrostToCore, BlockfrostTransactionContent, BlockfrostUtxo } from './BlockfrostToCore';
 import { Options, PaginationOptions } from '@blockfrost/blockfrost-js/lib/types';
 import { dummyLogger } from 'ts-log';
-import { fetchSequentially, formatBlockfrostError, withProviderErrors } from './util';
+import { fetchSequentially, formatBlockfrostError, replaceNumbersWithBigints, withProviderErrors } from './util';
 import { flatten, groupBy } from 'lodash-es';
 
 const fetchByAddressSequentially = async <Item, Response>(props: {
@@ -256,7 +256,7 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { json_metadata, label } = metadatum as any;
         if (!json_metadata || !label) return map;
-        map[label] = json_metadata;
+        map[label] = replaceNumbersWithBigints(json_metadata) as Cardano.MetadatumMap;
         return map;
       }, {} as Cardano.MetadatumMap);
     } catch (error) {

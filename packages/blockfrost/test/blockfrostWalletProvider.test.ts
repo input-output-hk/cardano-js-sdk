@@ -325,7 +325,7 @@ describe('blockfrostWalletProvider', () => {
             ADAUSD: [
               {
                 source: 'ergoOracles',
-                value: '0.10409800535729975'
+                value: 3
               }
             ]
           },
@@ -352,7 +352,7 @@ describe('blockfrostWalletProvider', () => {
                 ADAUSD: [
                   {
                     source: 'ergoOracles',
-                    value: '0.10409800535729975'
+                    value: 3n
                   }
                 ]
               }
