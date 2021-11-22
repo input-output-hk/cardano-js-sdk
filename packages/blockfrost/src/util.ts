@@ -52,7 +52,6 @@ export const withProviderErrors = <T>(providerImplementation: T) =>
     return provider;
   }, {} as any) as T;
 
-// TODO: test this
 export const fetchSequentially = async <Item, Arg, Response>(
   props: {
     arg: Arg;

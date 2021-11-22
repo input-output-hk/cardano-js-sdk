@@ -248,12 +248,38 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
     ];
   };
 
+  const fetchJsonMetadata = async (txHash: Cardano.Hash16): Promise<Cardano.MetadatumMap | null> => {
+    try {
+      const response = await blockfrost.txsMetadata(txHash);
+      return response.reduce((map, metadatum) => {
+        // Not sure if types are correct, missing 'label', but it's present in docs
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { json_metadata, label } = metadatum as any;
+        if (!json_metadata || !label) return map;
+        // not sure how Blockfrost represents integer metadatum. Might need to convert to bigint here.
+        map[label] = json_metadata;
+        return map;
+      }, {} as Cardano.MetadatumMap);
+    } catch (error) {
+      if (formatBlockfrostError(error).status_code === 404) {
+        return null;
+      }
+      throw error;
+    }
+  };
+
   // eslint-disable-next-line unicorn/consistent-function-scoping
   const parseValidityInterval = (num: string | null) => Number.parseInt(num || '') || undefined;
   const fetchTransaction = async (hash: string): Promise<Cardano.TxAlonzo> => {
     const { inputs, outputs } = BlockfrostToCore.transactionUtxos(await blockfrost.txsUtxos(hash));
     const response = await blockfrost.txs(hash);
+    const metadata = await fetchJsonMetadata(hash);
     return {
+      auxiliaryData: metadata
+        ? {
+            body: { blob: metadata }
+          }
+        : undefined,
       blockHeader: {
         blockHash: response.block,
         blockHeight: response.block_height,
@@ -282,7 +308,6 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
         redeemers: await fetchRedeemers(response),
         signatures: {}
       }
-      // TODO: fetch metadata; not sure we can get the metadata hash and scripts from Blockfrost
     };
   };
 

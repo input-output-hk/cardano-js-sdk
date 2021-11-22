@@ -11,8 +11,7 @@ export {
   PoolId,
   Slot,
   ExUnits,
-  RewardAccount,
-  AuxiliaryData
+  RewardAccount
 } from '@cardano-ogmios/schema';
 export * from './StakePool';
 export * from './ExtendedStakePoolMetadata';

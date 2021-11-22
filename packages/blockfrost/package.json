@@ -24,7 +24,7 @@
     "shx": "^0.3.3"
   },
   "dependencies": {
-    "@blockfrost/blockfrost-js": "^1.3.0",
+    "@blockfrost/blockfrost-js": "2.0.2",
     "@cardano-sdk/core": " 0.1.7"
   },
   "files": [

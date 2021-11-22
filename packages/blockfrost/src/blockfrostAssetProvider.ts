@@ -10,7 +10,9 @@ const mapMetadata = (
   const metadata = { ...onChain, ...offChain };
   return {
     ...util.replaceNullsWithUndefineds(metadata),
-    desc: metadata.description
+    desc: metadata.description,
+    // The other type option is any[] - not sure what it means, omitting if no string.
+    image: typeof metadata.image === 'string' ? metadata.image : undefined
   };
 };
 
