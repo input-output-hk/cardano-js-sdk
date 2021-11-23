@@ -25,6 +25,7 @@ export * from './Genesis';
 export * from './Block';
 export * from './Asset';
 export * from './AuxiliaryData';
+export * from './Strings';
 export * as TxSubmissionErrors from './TxSubmissionErrors';
 
 export type TxSubmissionError = CustomError;
