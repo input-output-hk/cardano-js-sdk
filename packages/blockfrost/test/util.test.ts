@@ -1,6 +1,16 @@
-import { fetchSequentially } from '../src/util';
+import { fetchSequentially, replaceNumbersWithBigints } from '../src/util';
 
 describe('util', () => {
+  test('replaceNumbersWithBigints', () => {
+    expect(replaceNumbersWithBigints(1)).toBe(1n);
+    expect(replaceNumbersWithBigints('a')).toBe('a');
+    expect(replaceNumbersWithBigints(null)).toBe(null);
+    // eslint-disable-next-line unicorn/no-useless-undefined
+    expect(replaceNumbersWithBigints(undefined)).toBe(undefined);
+    expect(replaceNumbersWithBigints(['a', 1, [2]])).toEqual(['a', 1n, [2n]]);
+    expect(replaceNumbersWithBigints({ a: 'a', b: 1, c: { d: 2 } })).toEqual({ a: 'a', b: 1n, c: { d: 2n } });
+  });
+
   test('fetchSequentially', async () => {
     const batch1 = [{ a: 1 }, { a: 2 }];
     const batch2 = [{ a: 3 }, { a: 4 }];

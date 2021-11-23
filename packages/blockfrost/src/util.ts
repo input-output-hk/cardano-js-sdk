@@ -77,3 +77,19 @@ export const fetchSequentially = async <Item, Arg, Response>(
     throw error;
   }
 };
+
+/**
+ * Recursively replaces all numbers with bigints.
+ */
+export const replaceNumbersWithBigints = (obj: unknown): unknown => {
+  if (typeof obj === 'number') return BigInt(obj);
+  if (typeof obj !== 'object' || obj === null) return obj;
+  if (Array.isArray(obj)) {
+    return obj.map(replaceNumbersWithBigints);
+  }
+  const newObj: any = {};
+  for (const k in obj) {
+    newObj[k] = replaceNumbersWithBigints((obj as any)[k]);
+  }
+  return newObj;
+};
