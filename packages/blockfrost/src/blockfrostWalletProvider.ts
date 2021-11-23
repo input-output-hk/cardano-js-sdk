@@ -113,7 +113,7 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
       try {
         const accountResponse = await blockfrost.accounts(rewardAccount);
         const delegationAndRewards = {
-          delegate: accountResponse.pool_id || undefined,
+          delegate: accountResponse.pool_id ? Cardano.PoolId(accountResponse.pool_id) : undefined,
           rewards: BigInt(accountResponse.withdrawable_amount)
         };
         return { delegationAndRewards, utxo };
@@ -183,7 +183,7 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
     return response.map(({ pool_id, retiring_epoch }) => ({
       __typename: Cardano.CertificateType.PoolRetirement,
       epoch: retiring_epoch,
-      poolId: pool_id
+      poolId: Cardano.PoolId(pool_id)
     }));
   };
 
@@ -192,7 +192,7 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
     return response.map(({ pool_id, active_epoch }) => ({
       __typename: Cardano.CertificateType.PoolRegistration,
       epoch: active_epoch,
-      poolId: pool_id,
+      poolId: Cardano.PoolId(pool_id),
       poolParameters: ((): Cardano.PoolParameters => {
         logger.warn('Omitting poolParameters for certificate in tx', hash);
         return null as unknown as Cardano.PoolParameters;
@@ -230,7 +230,7 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
       certIndex: cert_index,
       delegationIndex: index,
       epoch: active_epoch,
-      poolId: pool_id
+      poolId: Cardano.PoolId(pool_id)
     }));
   };
 
@@ -416,7 +416,7 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
         nextBlock: response.next_block || undefined,
         previousBlock: response.previous_block || undefined,
         size: response.size,
-        slotLeader: response.slot_leader,
+        slotLeader: Cardano.PoolId(response.slot_leader),
         totalOutput: BigInt(response.output || '0'),
         txCount: response.tx_count,
         vrf: response.block_vrf

@@ -1,4 +1,11 @@
-import { Cardano, ProviderError, ProviderFailure, StakePoolSearchProvider, util } from '@cardano-sdk/core';
+import {
+  Cardano,
+  InvalidStringError,
+  ProviderError,
+  ProviderFailure,
+  StakePoolSearchProvider,
+  util
+} from '@cardano-sdk/core';
 import { GraphQLClient } from 'graphql-request';
 import { getSdk } from '../sdk';
 
@@ -29,6 +36,22 @@ export const createGraphQLStakePoolSearchProvider = (
           return {
             ...stakePool,
             cost: BigInt(stakePool.cost),
+            hexId: Cardano.PoolIdHex(stakePool.hexId),
+            id: Cardano.PoolId(stakePool.id),
+            metadata: stakePool.metadata
+              ? {
+                  ...stakePool.metadata,
+                  ext: stakePool.metadata.ext
+                    ? {
+                        ...stakePool.metadata.ext,
+                        pool: {
+                          ...stakePool.metadata.ext.pool,
+                          id: Cardano.PoolIdHex(stakePool.metadata.ext.pool.id)
+                        }
+                      }
+                    : undefined
+                }
+              : undefined,
             metrics: {
               ...stakePool.metrics!,
               livePledge: BigInt(stakePool.metrics.livePledge),
@@ -41,7 +64,8 @@ export const createGraphQLStakePoolSearchProvider = (
           };
         });
       } catch (error) {
-        throw new ProviderError(ProviderFailure.Unknown, error);
+        const failure = error instanceof InvalidStringError ? ProviderFailure.InvalidResponse : ProviderFailure.Unknown;
+        throw new ProviderError(failure, error);
       }
     }
   };

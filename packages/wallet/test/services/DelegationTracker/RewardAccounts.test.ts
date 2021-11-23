@@ -22,6 +22,9 @@ const coldObservableProviderMock: jest.Mock = jest.requireMock(
 ).coldObservableProvider;
 
 describe('RewardAccounts', () => {
+  const poolId1 = Cardano.PoolId('pool1zuevzm3xlrhmwjw87ec38mzs02tlkwec9wxpgafcaykmwg7efhh');
+  const poolId2 = Cardano.PoolId('pool1y6chk7x7fup4ms9leesdr57r4qy9cwxuee0msan72x976a6u0nc');
+
   test('getStakePoolIdAtEpoch ', () => {
     const transactions = [
       {
@@ -29,9 +32,9 @@ describe('RewardAccounts', () => {
         epoch: 100
       },
       {
-        certificates: [
-          { __typename: Cardano.CertificateType.StakeDelegation, poolId: 'pool1' } as Cardano.StakeDelegationCertificate
-        ],
+        certificates: [{
+          __typename: Cardano.CertificateType.StakeDelegation, poolId: poolId1
+        } as Cardano.StakeDelegationCertificate],
         epoch: 101
       },
       {
@@ -42,14 +45,14 @@ describe('RewardAccounts', () => {
       },
       {
         certificates: [
-          { __typename: Cardano.CertificateType.StakeDelegation, poolId: 'pool2' } as Cardano.StakeDelegationCertificate
+          { __typename: Cardano.CertificateType.StakeDelegation, poolId: poolId2 } as Cardano.StakeDelegationCertificate
         ],
         epoch: 103
       }
     ];
     expect(getStakePoolIdAtEpoch(transactions)(102)).toBeUndefined();
     expect(getStakePoolIdAtEpoch(transactions)(103)).toBeUndefined();
-    expect(getStakePoolIdAtEpoch(transactions)(104)).toBe('pool1');
+    expect(getStakePoolIdAtEpoch(transactions)(104)).toBe(poolId1);
     expect(getStakePoolIdAtEpoch(transactions)(105)).toBeUndefined();
     expect(getStakePoolIdAtEpoch(transactions)(106)).toBeUndefined();
   });
@@ -153,7 +156,7 @@ describe('RewardAccounts', () => {
       createTestScheduler().run(({ cold, expectObservable, flush }) => {
         const epoch = currentEpoch.number;
         const epoch$ = cold('-a', { a: epoch });
-        const stakePoolQueryResult = [{ id: 'pool1' }, { id: 'pool2' }];
+        const stakePoolQueryResult = [{ id: poolId1 }, { id: poolId2 }];
         const stakePoolSearchProvider = jest.fn().mockReturnValue(cold('-a', { a: stakePoolQueryResult }));
         const target$ = createDelegateeTracker(
           stakePoolSearchProvider,
@@ -165,7 +168,7 @@ describe('RewardAccounts', () => {
                   { __typename: Cardano.CertificateType.StakeKeyRegistration } as Cardano.StakeAddressCertificate,
                   {
                     __typename: Cardano.CertificateType.StakeDelegation,
-                    poolId: 'pool1'
+                    poolId: poolId1
                   } as Cardano.StakeDelegationCertificate
                 ],
                 epoch: epoch - 2
@@ -174,7 +177,7 @@ describe('RewardAccounts', () => {
                 certificates: [
                   {
                     __typename: Cardano.CertificateType.StakeDelegation,
-                    poolId: 'pool2'
+                    poolId: poolId2
                   } as Cardano.StakeDelegationCertificate
                 ],
                 epoch: epoch - 1
@@ -191,7 +194,7 @@ describe('RewardAccounts', () => {
         });
         flush();
         expect(stakePoolSearchProvider).toBeCalledTimes(1);
-        expect(stakePoolSearchProvider).toBeCalledWith(['pool1', 'pool2']);
+        expect(stakePoolSearchProvider).toBeCalledWith([poolId1, poolId2]);
       });
     });
   });

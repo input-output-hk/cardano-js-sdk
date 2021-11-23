@@ -13,7 +13,10 @@ import { isLastStakeKeyCertOfType } from './transactionCertificates';
 export const createQueryStakePoolsProvider =
   (stakePoolSearchProvider: StakePoolSearchProvider, retryBackoffConfig: RetryBackoffConfig) =>
   (fragments: Cardano.PoolId[]) =>
-    coldObservableProvider(() => stakePoolSearchProvider.queryStakePools(fragments), retryBackoffConfig);
+    coldObservableProvider(
+      () => stakePoolSearchProvider.queryStakePools(fragments as unknown as string[]),
+      retryBackoffConfig
+    );
 export type ObservableStakePoolSearchProvider = ReturnType<typeof createQueryStakePoolsProvider>;
 
 const getWithdrawalQuantity = (

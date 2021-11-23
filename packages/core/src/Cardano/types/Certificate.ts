@@ -27,7 +27,8 @@ export interface Fraction {
 
 export interface PoolParameters
   // TODO: don't omit pledge and cost when Lovelace becomes bigint
-  extends Omit<OgmiosPoolParameters, 'pledge' | 'cost' | 'margin' | 'metadata' | 'relays'> {
+  extends Omit<OgmiosPoolParameters, 'id' | 'pledge' | 'cost' | 'margin' | 'metadata' | 'relays'> {
+  id: PoolId;
   /**
    * Declared pledge quantity.
    */

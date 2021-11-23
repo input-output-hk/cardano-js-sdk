@@ -1,5 +1,5 @@
 import { ExtendedStakePoolMetadata } from './ExtendedStakePoolMetadata';
-import { Hash16, Lovelace, PoolParameters, TransactionId } from '.';
+import { Hash16, Lovelace, PoolIdHex, PoolParameters, TransactionId } from '.';
 
 /**
  * Within range [0; 1]
@@ -100,7 +100,7 @@ export interface StakePool extends PoolParameters {
   /**
    * Stake pool ID as a hex string
    */
-  hexId: Hash16;
+  hexId: PoolIdHex;
   /**
    * Stake pool metrics
    */

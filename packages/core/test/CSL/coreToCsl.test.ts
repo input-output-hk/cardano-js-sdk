@@ -24,7 +24,7 @@ const coreTxBody: Cardano.TxBodyAlonzo = {
     {
       __typename: Cardano.CertificateType.PoolRetirement,
       epoch: 500,
-      poolId: 'pool1y6chk7x7fup4ms9leesdr57r4qy9cwxuee0msan72x976a6u0nc'
+      poolId: Cardano.PoolId('pool1y6chk7x7fup4ms9leesdr57r4qy9cwxuee0msan72x976a6u0nc')
     }
   ],
   fee: 10n,

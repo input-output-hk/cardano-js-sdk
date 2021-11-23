@@ -3,6 +3,7 @@ import { CustomError } from 'ts-custom-error';
 export enum ProviderFailure {
   NotFound = 'NOT_FOUND',
   Unknown = 'UNKNOWN',
+  InvalidResponse = 'INVALID_RESPONSE',
   NotImplemented = 'NOT_IMPLEMENTED'
 }
 

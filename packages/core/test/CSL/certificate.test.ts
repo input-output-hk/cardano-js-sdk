@@ -2,15 +2,15 @@ import { CSL, Cardano, SerializationError, coreToCsl } from '../../src';
 
 describe('coreToCsl.certificate', () => {
   let stakeKey: Cardano.Address;
-  let poolKeyHash: Cardano.Address;
+  let poolKeyHash: Cardano.PoolId;
 
   beforeAll(async () => {
     stakeKey = 'stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr';
-    poolKeyHash = 'pool1mpgg03jxj52qwxvvy7cmj58a96vl9pvxcqqvuw0kumheygxmn34';
+    poolKeyHash = Cardano.PoolId('pool1mpgg03jxj52qwxvvy7cmj58a96vl9pvxcqqvuw0kumheygxmn34');
   });
 
   it('throws SerializationError with invalid stake key', () => {
-    expect(() => coreToCsl.certificate.stakeKeyRegistration(poolKeyHash)).toThrowError(SerializationError);
+    expect(() => coreToCsl.certificate.stakeKeyRegistration(poolKeyHash.toString())).toThrowError(SerializationError);
   });
 
   it('stakeKeyRegistration', () =>

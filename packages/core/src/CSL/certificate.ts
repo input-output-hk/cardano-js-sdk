@@ -100,7 +100,7 @@ export const poolRegistration = ({
   }
   const cslRelays = createCslRelays(relays);
   const poolParams = PoolParams.new(
-    Ed25519KeyHash.from_bech32(id),
+    Ed25519KeyHash.from_bech32(id.toString()),
     VRFKeyHash.from_bytes(Buffer.from(vrf, 'hex')),
     BigNum.from_str(pledge.toString()),
     BigNum.from_str(cost.toString()),
@@ -115,12 +115,12 @@ export const poolRegistration = ({
   return Certificate.new_pool_registration(PoolRegistration.new(poolParams));
 };
 
-export const poolRetirement = (poolKeyHash: Cardano.Ed25519KeyHashBech32, epoch: number) =>
-  Certificate.new_pool_retirement(PoolRetirement.new(Ed25519KeyHash.from_bech32(poolKeyHash), epoch));
+export const poolRetirement = (poolId: Cardano.PoolId, epoch: number) =>
+  Certificate.new_pool_retirement(PoolRetirement.new(Ed25519KeyHash.from_bech32(poolId.toString()), epoch));
 
-export const stakeDelegation = (address: Cardano.Address, delegatee: Cardano.Ed25519KeyHashBech32) =>
+export const stakeDelegation = (address: Cardano.Address, delegatee: Cardano.PoolId) =>
   Certificate.new_stake_delegation(
-    StakeDelegation.new(stakeAddressToCredential(address), Ed25519KeyHash.from_bech32(delegatee))
+    StakeDelegation.new(stakeAddressToCredential(address), Ed25519KeyHash.from_bech32(delegatee.toString()))
   );
 
 export const create = (certificate: Cardano.Certificate) => {

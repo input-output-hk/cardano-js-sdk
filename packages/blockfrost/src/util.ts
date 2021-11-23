@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Error as BlockfrostError } from '@blockfrost/blockfrost-js';
+import { InvalidStringError, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { PaginationOptions } from '@blockfrost/blockfrost-js/lib/types';
-import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
 
 export const formatBlockfrostError = (error: unknown) => {
   const blockfrostError = error as BlockfrostError;
@@ -10,6 +10,9 @@ export const formatBlockfrostError = (error: unknown) => {
   }
   if (typeof blockfrostError !== 'object') {
     throw new ProviderError(ProviderFailure.Unknown, error, 'failed to parse error (response type)');
+  }
+  if (error instanceof InvalidStringError) {
+    throw new ProviderError(ProviderFailure.InvalidResponse, error);
   }
   const errorAsType1 = blockfrostError as {
     status_code: number;

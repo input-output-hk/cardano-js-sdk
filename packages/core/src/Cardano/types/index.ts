@@ -9,7 +9,6 @@ export {
   Epoch,
   Tip,
   PoolMetadata,
-  PoolId,
   Slot,
   ExUnits,
   RewardAccount
@@ -29,8 +28,6 @@ export * from './Strings';
 export * as TxSubmissionErrors from './TxSubmissionErrors';
 
 export type TxSubmissionError = CustomError;
-
-export type Ed25519KeyHashBech32 = string;
 
 export type ProtocolParametersAlonzo = util.OptionalUndefined<
   util.RecursivelyReplaceNullWithUndefined<Ogmios.ProtocolParametersAlonzo>

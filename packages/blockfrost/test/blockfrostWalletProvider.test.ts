@@ -530,7 +530,7 @@ describe('blockfrostWalletProvider', () => {
         nextBlock: undefined,
         previousBlock: 'da56fa53483a3a087c893b41aa0d73a303148c2887b3f7535e0b505ea5dc10aa',
         size: 1050,
-        slotLeader: 'pool1zuevzm3xlrhmwjw87ec38mzs02tlkwec9wxpgafcaykmwg7efhh',
+        slotLeader: Cardano.PoolId('pool1zuevzm3xlrhmwjw87ec38mzs02tlkwec9wxpgafcaykmwg7efhh'),
         totalOutput: 9_249_073_880n,
         txCount: 3,
         vrf: 'vrf_vk19j362pkr4t9y0m3qxgmrv0365vd7c4ze03ny4jh84q8agjy4ep4s99zvg8'

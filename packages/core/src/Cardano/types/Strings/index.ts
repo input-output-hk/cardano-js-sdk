@@ -1,2 +1,2 @@
 export * from './util';
-// export * from './Hashes';
+export * from './Hashes';

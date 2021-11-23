@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 import { ExtendedPoolStatus, StakePoolStatus, StakePoolsByMetadataQuery, StakePoolsQuery } from '../../src/sdk';
-import { ProviderError, StakePoolSearchProvider } from '@cardano-sdk/core';
+import { InvalidStringError, ProviderError, ProviderFailure, StakePoolSearchProvider } from '@cardano-sdk/core';
 import { createGraphQLStakePoolSearchProvider } from '../../src/StakePoolSearchProvider/CardanoGraphQLStakePoolSearchProvider';
 
 describe('StakePoolSearchClient', () => {
@@ -23,8 +23,8 @@ describe('StakePoolSearchClient', () => {
         queryStakePool: [
           {
             cost: '123',
-            hexId: '0abc',
-            id: 'some-pool',
+            hexId: 'e4b1c8ec89415ce6349755a1aa44b4affbb5f1248ff29943d190c715',
+            id: 'pool1ujcu3myfg9wwvdyh2ks653954lamtufy3lefjs73jrr327q53j4',
             margin: {
               denominator: 3,
               numerator: 1
@@ -34,7 +34,7 @@ describe('StakePoolSearchClient', () => {
               ext: {
                 pool: {
                   country: 'LT',
-                  id: 'pool-id',
+                  id: 'e4b1c8ec89415ce6349755a1aa44b4affbb5f1248ff29943d190c715',
                   status: ExtendedPoolStatus.Active
                 },
                 serial: 123
@@ -111,6 +111,12 @@ describe('StakePoolSearchClient', () => {
     it('wraps errors to ProviderError', async () => {
       sdk.StakePools.mockRejectedValueOnce(new Error('some error'));
       await expect(client.queryStakePools(['stakepool'])).rejects.toThrowError(ProviderError);
+
+      const invalidStringError = new InvalidStringError('some error');
+      sdk.StakePools.mockRejectedValueOnce(invalidStringError);
+      await expect(client.queryStakePools(['stakepool'])).rejects.toThrowError(
+        new ProviderError(ProviderFailure.InvalidResponse, invalidStringError)
+      );
     });
   });
 });

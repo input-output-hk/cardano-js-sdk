@@ -113,8 +113,8 @@ const Relay = createUnionType({
 @ObjectType()
 export class StakePoolMetadata implements Cardano.StakePoolMetadata {
   @Directive('@id')
-  @Field()
-  stakePoolId: string;
+  @Field(() => String)
+  stakePoolId: Cardano.PoolId;
   // eslint-disable-next-line sonarjs/no-duplicate-string
   @Directive('@search(by: [fulltext])')
   @Field()
@@ -151,8 +151,8 @@ export class Fraction implements Cardano.Fraction {
 export class StakePool implements BigIntsAsStrings<Cardano.StakePool> {
   @Directive('@search(by: [fulltext])')
   @Directive('@id')
-  @Field()
-  id: string;
+  @Field(() => String)
+  id: Cardano.PoolId;
   @Field()
   hexId: string;
   @Field(() => StakePoolStatus, {
