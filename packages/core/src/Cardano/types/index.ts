@@ -1,4 +1,5 @@
 import * as Ogmios from '@cardano-ogmios/schema';
+import { CustomError } from 'ts-custom-error';
 import { util } from '../../util';
 
 export {
@@ -24,6 +25,9 @@ export * from './Genesis';
 export * from './Block';
 export * from './Asset';
 export * from './AuxiliaryData';
+export * as TxSubmissionErrors from './TxSubmissionErrors';
+
+export type TxSubmissionError = CustomError;
 
 export type Ed25519KeyHashBech32 = string;
 

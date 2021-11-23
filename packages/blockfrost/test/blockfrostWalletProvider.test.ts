@@ -48,6 +48,17 @@ const blockResponse = {
 describe('blockfrostWalletProvider', () => {
   const apiKey = 'someapikey';
 
+  describe('submitTx', () => {
+    it('wraps error in UnknownTxSubmissionError', async () => {
+      const innerError = new Error('some error');
+      BlockFrostAPI.prototype.txSubmit = jest.fn().mockRejectedValue(innerError);
+      const provider = blockfrostWalletProvider({ isTestnet: true, projectId: apiKey });
+      await expect(provider.submitTx(null as any)).rejects.toThrowError(
+        Cardano.TxSubmissionErrors.UnknownTxSubmissionError
+      );
+    });
+  });
+
   test('networkInfo', async () => {
     const mockedEpochsLatestResponse = {
       active_stake: '1060378314781343',

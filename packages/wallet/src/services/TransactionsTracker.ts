@@ -1,5 +1,11 @@
 import { Cardano, WalletProvider } from '@cardano-sdk/core';
-import { DirectionalTransaction, FailedTx, TransactionDirection, TransactionsTracker } from './types';
+import {
+  DirectionalTransaction,
+  FailedTx,
+  TransactionDirection,
+  TransactionFailure,
+  TransactionsTracker
+} from './types';
 import {
   EMPTY,
   Observable,
@@ -21,7 +27,6 @@ import {
 } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TrackerSubject } from './util/TrackerSubject';
-import { TransactionFailure } from './TransactionError';
 import { coldObservableProvider, sharedDistinctBlock, transactionsEquals } from './util';
 import { sortBy } from 'lodash-es';
 

@@ -32,6 +32,9 @@ export interface Wallet {
   readonly assets$: BehaviorObservable<Assets>;
   initializeTx(props: InitializeTxProps): Promise<TxInternals>;
   finalizeTx(props: TxInternals): Promise<Cardano.NewTxAlonzo>;
+  /**
+   * @throws {Cardano.TxSubmissionError}
+   */
   submitTx(tx: Cardano.NewTxAlonzo): Promise<void>;
   sync(): void;
   shutdown(): void;
