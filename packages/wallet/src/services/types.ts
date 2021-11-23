@@ -1,7 +1,14 @@
 import { BehaviorObservable } from './util';
 import { Cardano, EpochRewards } from '@cardano-sdk/core';
 import { Observable } from 'rxjs';
-import { TransactionFailure } from './TransactionError';
+
+export enum TransactionFailure {
+  InvalidTransaction = 'INVALID_TRANSACTION',
+  FailedToSubmit = 'FAILED_TO_SUBMIT',
+  Unknown = 'UNKNOWN',
+  CannotTrack = 'CANNOT_TRACK',
+  Timeout = 'TIMEOUT'
+}
 
 export interface Balance extends Cardano.Value {
   rewards: Cardano.Lovelace;
@@ -40,6 +47,7 @@ export interface DirectionalTransaction {
 export interface FailedTx {
   tx: Cardano.NewTxAlonzo;
   reason: TransactionFailure;
+  error?: Cardano.TxSubmissionError;
 }
 
 export interface TransactionsTracker {

@@ -215,6 +215,7 @@ export class SingleAddressWallet implements Wallet {
       this.#newTransactions.pending$.next(tx);
     } catch (error) {
       this.#newTransactions.failedToSubmit$.next({
+        error: error as Cardano.TxSubmissionError,
         reason: TransactionFailure.FailedToSubmit,
         tx
       });
