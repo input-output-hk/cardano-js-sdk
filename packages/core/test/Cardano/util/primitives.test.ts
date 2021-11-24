@@ -1,6 +1,7 @@
-import { InvalidStringError, assertIsBech32WithPrefix, assertIsHexString } from '../../../../src/Cardano';
+import { InvalidStringError } from '../../../src/errors';
+import { assertIsBech32WithPrefix, assertIsHexString } from '../../../src/Cardano/util';
 
-describe('Cardano/types/Strings/util', () => {
+describe('Cardano.util/primitives', () => {
   describe('assertIsBech32WithPrefix', () => {
     it('does not throw when asserting a valid bech32', () => {
       expect(() =>

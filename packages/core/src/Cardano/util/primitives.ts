@@ -1,5 +1,5 @@
-import { CustomError } from 'ts-custom-error';
 import { Decoded, bech32 } from 'bech32';
+import { InvalidStringError } from '../../errors';
 
 const MAX_BECH32_LENGTH_LIMIT = 1023;
 
@@ -12,12 +12,6 @@ export declare class OpaqueString<T extends string> extends String {
    * makes typescript recognize it as such.
    */
   toString(): string;
-}
-
-export class InvalidStringError extends CustomError {
-  constructor(expectation: string, public innerError?: unknown) {
-    super(`Invalid string: "${expectation}"`);
-  }
 }
 
 /**

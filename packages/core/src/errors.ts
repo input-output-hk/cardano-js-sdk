@@ -36,3 +36,9 @@ export class NotImplementedError extends CustomError {
     super(`Not implemented: ${missingFeature}`);
   }
 }
+
+export class InvalidStringError extends CustomError {
+  constructor(expectation: string, public innerError?: unknown) {
+    super(`Invalid string: "${expectation}"`);
+  }
+}

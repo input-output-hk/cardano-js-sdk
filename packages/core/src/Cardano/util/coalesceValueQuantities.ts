@@ -1,10 +1,5 @@
-import { Asset, BigIntMath } from '..';
-import { Value } from './types';
-
-/**
- * Blockchain restriction for minimum coin quantity in a UTxO
- */
-export const computeMinUtxoValue = (coinsPerUtxoWord: bigint): bigint => coinsPerUtxoWord * 29n;
+import { Asset, BigIntMath } from '../..';
+import { Value } from '../types';
 
 /**
  * Sum all quantities

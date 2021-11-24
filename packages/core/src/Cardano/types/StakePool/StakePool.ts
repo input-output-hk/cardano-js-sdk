@@ -1,5 +1,6 @@
 import { ExtendedStakePoolMetadata } from './ExtendedStakePoolMetadata';
-import { Hash16, Lovelace, PoolIdHex, PoolParameters, TransactionId } from '.';
+import { Hash16, Lovelace, PoolParameters, TransactionId } from '..';
+import { PoolIdHex } from './primitives';
 
 /**
  * Within range [0; 1]

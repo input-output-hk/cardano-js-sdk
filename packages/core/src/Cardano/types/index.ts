@@ -14,7 +14,6 @@ export {
   RewardAccount
 } from '@cardano-ogmios/schema';
 export * from './StakePool';
-export * from './ExtendedStakePoolMetadata';
 export * from './Utxo';
 export * from './Value';
 export * from './DelegationsAndRewards';
@@ -24,7 +23,6 @@ export * from './Genesis';
 export * from './Block';
 export * from './Asset';
 export * from './AuxiliaryData';
-export * from './Strings';
 export * as TxSubmissionErrors from './TxSubmissionErrors';
 
 export type TxSubmissionError = CustomError;

@@ -1,4 +1,4 @@
-import { PoolIdHex } from './Strings';
+import { PoolIdHex } from './primitives';
 /* eslint-disable max-len */
 /**
  * Schema from:
