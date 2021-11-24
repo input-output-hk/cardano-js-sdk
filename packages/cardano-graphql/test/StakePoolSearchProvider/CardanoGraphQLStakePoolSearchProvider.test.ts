@@ -73,8 +73,8 @@ describe('StakePoolSearchClient', () => {
             rewardAccount: '745b',
             status: StakePoolStatus.Active,
             transactions: {
-              registration: ['6345b'],
-              retirement: ['dawdb']
+              registration: ['4123d70f66414cc921f6ffc29a899aafc7137a99a0fd453d6b200863ef5702d6'],
+              retirement: ['01d7366549986d83edeea262e97b68eca3430d3bb052ed1c37d2202fd5458872']
             },
             vrf: '76bc'
           }

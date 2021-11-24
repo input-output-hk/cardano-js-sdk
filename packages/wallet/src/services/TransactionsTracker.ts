@@ -86,7 +86,7 @@ const newTransactions$ = (transactions$: Observable<Cardano.TxAlonzo[]>) =>
     take(1),
     map((transactions) => transactions.map(({ id }) => id)),
     mergeMap((initialTransactionIds) => {
-      const ignoredTransactionIds: Cardano.Hash16[] = [...initialTransactionIds];
+      const ignoredTransactionIds: Cardano.TransactionId[] = [...initialTransactionIds];
       return transactions$.pipe(
         map((transactions) => transactions.filter(({ id }) => !ignoredTransactionIds.includes(id))),
         tap((newTransactions) => ignoredTransactionIds.push(...newTransactions.map(({ id }) => id))),

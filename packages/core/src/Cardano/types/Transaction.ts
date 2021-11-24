@@ -1,10 +1,25 @@
 import * as Cardano from '.';
 import { AuxiliaryData } from './AuxiliaryData';
 import { BlockAlonzo, BlockBodyAlonzo } from '@cardano-ogmios/schema';
+import { OpaqueString, assertIsHexString } from '../util';
 
 type OgmiosHeader = NonNullable<BlockAlonzo['header']>;
 export type PartialBlockHeader = Pick<OgmiosHeader, 'blockHeight' | 'slot' | 'blockHash'>;
-export type TransactionId = Cardano.Hash16;
+
+/**
+ * transaction hash as hex string
+ */
+export type TransactionId = OpaqueString<'TransactionId'>;
+
+/**
+ * @param {string} value transaction hash as hex string
+ * @throws InvalidStringError
+ */
+export const TransactionId = (value: string): TransactionId => {
+  assertIsHexString(value, 64);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return value as any as TransactionId;
+};
 
 export type Ed25519SignatureHash16 = string;
 

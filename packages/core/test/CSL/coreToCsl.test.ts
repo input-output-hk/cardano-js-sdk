@@ -2,14 +2,16 @@
 import { Asset, CSL, Cardano, coreToCsl } from '../../src';
 
 const txIn: Cardano.TxIn = {
-  address:
-    'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp',
+  address: Cardano.Address(
+    'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
+  ),
   index: 0,
-  txId: '0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5'
+  txId: Cardano.TransactionId('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5')
 };
 const txOut: Cardano.TxOut = {
-  address:
-    'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp',
+  address: Cardano.Address(
+    'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
+  ),
   value: {
     assets: {
       '2a286ad895d091f2b3d168a6091ad2627d30a72761a5bc36eef00740': 20n,
@@ -37,7 +39,7 @@ const coreTxBody: Cardano.TxBodyAlonzo = {
   withdrawals: [
     {
       quantity: 5n,
-      stakeAddress: 'stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27'
+      stakeAddress: Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27')
     }
   ]
 };
@@ -92,10 +94,10 @@ describe('coreToCsl', () => {
       'bdea87fca1b4b4df8a9b8fb4183c0fab2f8261eb6c5e4bc42c800bb9c8918755bdea87fca1b4b4df8a9b8fb4183c0fab2f8261eb6c5e4bc42c800bb9c8918755';
     const coreTx: Cardano.NewTxAlonzo = {
       body: coreTxBody,
-      id: 'doesnt-matter',
+      id: Cardano.TransactionId('886206542d63b23a047864021fbfccf291d78e47c1e59bd4c75fbc67b248c5e8'),
       witness: {
         signatures: {
-          [vkey]: signature
+          [vkey]: Cardano.Ed25519Signature(signature)
         }
       }
     };

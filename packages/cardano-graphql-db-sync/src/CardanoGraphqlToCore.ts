@@ -2,10 +2,10 @@ import { Block } from '@cardano-graphql/client-ts';
 import { Cardano, NotImplementedError, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
 
 type GraphqlTransaction = {
-  hash: Cardano.Hash16;
-  inputs: { txHash: Cardano.Hash16; sourceTxIndex: number; address: Cardano.Address }[];
+  hash: Cardano.TransactionId;
+  inputs: { txHash: string; sourceTxIndex: number; address: string }[];
   outputs: {
-    address: Cardano.Address;
+    address: string;
     value: string;
     tokens: { asset: { assetId: string }; quantity: string }[];
   }[];
@@ -29,13 +29,13 @@ export type GraphqlCurrentWalletProtocolParameters = {
 
 export type CardanoGraphQlTip = Pick<Block, 'hash' | 'number' | 'slotNo'>;
 
-export type CardanoGraphqlTxIn = { txHash: Cardano.Hash16; sourceTxIndex: number; address: Cardano.Address };
+export type CardanoGraphqlTxIn = { txHash: string; sourceTxIndex: number; address: string };
 export type TransactionsResponse = {
   transactions: {
-    hash: Cardano.Hash16;
+    hash: string;
     inputs: CardanoGraphqlTxIn[];
     outputs: {
-      address: Cardano.Address;
+      address: string;
       value: string;
       tokens: { asset: { assetId: string }; quantity: string }[];
     }[];
@@ -43,9 +43,9 @@ export type TransactionsResponse = {
 };
 
 const txIn = ({ sourceTxIndex, txHash, address }: GraphqlTransaction['inputs'][0]): Cardano.TxIn => ({
-  address,
+  address: Cardano.Address(address),
   index: sourceTxIndex,
-  txId: txHash
+  txId: Cardano.TransactionId(txHash)
 });
 
 const txOut = ({ address, tokens, value }: GraphqlTransaction['outputs'][0]) => {

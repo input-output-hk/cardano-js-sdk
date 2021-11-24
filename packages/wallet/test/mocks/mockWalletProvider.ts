@@ -11,7 +11,7 @@ export const utxo: Cardano.Utxo[] = [
         'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g'
       ),
       index: 1,
-      txId: 'bb217abaca60fc0ca68c1555eca6a96d2478547818ae76ce6836133f3cc546e0'
+      txId: Cardano.TransactionId('bb217abaca60fc0ca68c1555eca6a96d2478547818ae76ce6836133f3cc546e0')
     },
     {
       address: Cardano.Address(
@@ -32,7 +32,7 @@ export const utxo: Cardano.Utxo[] = [
         'addr_test1qzs0umu0s2ammmpw0hea0w2crtcymdjvvlqngpgqy76gpfnuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qp3y3vz'
       ),
       index: 0,
-      txId: 'c7c0973c6bbf1a04a9f306da7814b4fa564db649bf48b0bd93c273bd03143547'
+      txId: Cardano.TransactionId('c7c0973c6bbf1a04a9f306da7814b4fa564db649bf48b0bd93c273bd03143547')
     },
     {
       address: Cardano.Address(
@@ -52,7 +52,7 @@ export const utxo: Cardano.Utxo[] = [
         'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g'
       ),
       index: 2,
-      txId: 'ea1517b8c36fea3148df9aa1f49bbee66ff59a5092331a67bd8b3c427e1d79d7'
+      txId: Cardano.TransactionId('ea1517b8c36fea3148df9aa1f49bbee66ff59a5092331a67bd8b3c427e1d79d7')
     },
     {
       address: Cardano.Address(
@@ -106,7 +106,7 @@ export const queryTransactionsResult: Cardano.TxAlonzo[] = [
             'addr_test1qpfhhfy2qgls50r9u4yh0l7z67xpg0a5rrhkmvzcuqrd0znuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q9gw0lz'
           ),
           index: 0,
-          txId: 'bb217abaca60fc0ca68c1555eca6a96d2478547818ae76ce6836133f3cc546e0'
+          txId: Cardano.TransactionId('bb217abaca60fc0ca68c1555eca6a96d2478547818ae76ce6836133f3cc546e0')
         }
       ],
       outputs: [

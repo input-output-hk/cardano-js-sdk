@@ -60,7 +60,11 @@ export const createGraphQLStakePoolSearchProvider = (
                 live: BigInt(stakePool.metrics.stake.live)
               }
             },
-            pledge: BigInt(stakePool.pledge)
+            pledge: BigInt(stakePool.pledge),
+            transactions: {
+              registration: stakePool.transactions.registration.map(Cardano.TransactionId),
+              retirement: stakePool.transactions.retirement.map(Cardano.TransactionId)
+            }
           };
         });
       } catch (error) {

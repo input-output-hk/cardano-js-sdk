@@ -184,7 +184,7 @@ describe('blockfrostWalletProvider', () => {
           'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
         ),
         index: 0,
-        txId: '0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5'
+        txId: Cardano.TransactionId('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5')
       });
       expect(response.utxo[0][1]).toMatchObject<Cardano.TxOut>({
         address: Cardano.Address(
@@ -204,7 +204,7 @@ describe('blockfrostWalletProvider', () => {
           'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
         ),
         index: 1,
-        txId: '0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5'
+        txId: Cardano.TransactionId('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5')
       });
       expect(response.utxo[1][1]).toMatchObject<Cardano.TxOut>({
         address: Cardano.Address(
@@ -350,9 +350,9 @@ describe('blockfrostWalletProvider', () => {
       BlockFrostAPI.prototype.txs = jest.fn().mockResolvedValue(mockedTxResponse);
       BlockFrostAPI.prototype.txsMetadata = jest.fn().mockResolvedValue(mockedMetadataResponse);
       const client = blockfrostWalletProvider({ isTestnet: true, projectId: apiKey });
-      const response = await client.queryTransactionsByHashes([
-        '4123d70f66414cc921f6ffc29a899aafc7137a99a0fd453d6b200863ef5702d6'
-      ]);
+      const response = await client.queryTransactionsByHashes(
+        ['4123d70f66414cc921f6ffc29a899aafc7137a99a0fd453d6b200863ef5702d6'].map(Cardano.TransactionId)
+      );
 
       expect(response).toHaveLength(1);
       expect(response[0]).toMatchObject({
@@ -387,7 +387,7 @@ describe('blockfrostWalletProvider', () => {
                 'addr_test1qr05llxkwg5t6c4j3ck5mqfax9wmz35rpcgw3qthrn9z7xcxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flknstdz3k2'
               ),
               index: 1,
-              txId: '6d50c330a6fba79de6949a8dcd5e4b7ffa3f9442f0c5bed7a78fa6d786c6c863'
+              txId: Cardano.TransactionId('6d50c330a6fba79de6949a8dcd5e4b7ffa3f9442f0c5bed7a78fa6d786c6c863')
             }
           ],
           outputs: [
@@ -417,7 +417,7 @@ describe('blockfrostWalletProvider', () => {
             invalidHereafter: 13_885_913
           }
         },
-        id: '4123d70f66414cc921f6ffc29a899aafc7137a99a0fd453d6b200863ef5702d6',
+        id: Cardano.TransactionId('4123d70f66414cc921f6ffc29a899aafc7137a99a0fd453d6b200863ef5702d6'),
         implicitCoin: {
           deposit: 5n
         },

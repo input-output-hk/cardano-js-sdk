@@ -2,7 +2,7 @@
 import * as util from '../../util';
 
 /**
- * bech32-encoded pool operator verification key hash
+ * pool operator verification key hash as bech32 string
  */
 export type PoolId = util.OpaqueString<'PoolId'>;
 
@@ -15,6 +15,9 @@ export const PoolId = (value: string): PoolId => {
   return value as any as PoolId;
 };
 
+/**
+ * pool operator verification key hash as hex string
+ */
 export type PoolIdHex = util.OpaqueString<'PoolIdHex'>;
 
 /**

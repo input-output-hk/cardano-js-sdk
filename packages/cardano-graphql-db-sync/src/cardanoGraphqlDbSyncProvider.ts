@@ -308,7 +308,7 @@ export const cardanoGraphqlDbSyncProvider = (uri: string): WalletProvider => {
       }
     `;
 
-    type Variables = { hashes: string[] };
+    type Variables = { hashes: Cardano.TransactionId[] };
 
     const response = await client.request<TransactionsResponse, Variables>(query, { hashes });
 

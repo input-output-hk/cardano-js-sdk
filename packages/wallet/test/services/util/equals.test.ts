@@ -11,6 +11,9 @@ import {
 } from '../../../src';
 
 describe('equals', () => {
+  const txId1 = Cardano.TransactionId('4123d70f66414cc921f6ffc29a899aafc7137a99a0fd453d6b200863ef5702d6');
+  const txId2 = Cardano.TransactionId('01d7366549986d83edeea262e97b68eca3430d3bb052ed1c37d2202fd5458872');
+
   test('strictEquals', () => {
     expect(strictEquals('1', 1 as unknown as string)).toBe(false);
     expect(strictEquals('1', '1')).toBe(true);
@@ -38,14 +41,14 @@ describe('equals', () => {
   });
 
   test('txEquals', () => {
-    expect(txEquals({ id: 'tx1' } as Cardano.TxAlonzo, { id: 'tx2' } as Cardano.TxAlonzo)).toBe(false);
-    expect(txEquals({ id: 'tx1' } as Cardano.TxAlonzo, { id: 'tx1' } as Cardano.TxAlonzo)).toBe(true);
+    expect(txEquals({ id: txId1 } as Cardano.TxAlonzo, { id: txId2 } as Cardano.TxAlonzo)).toBe(false);
+    expect(txEquals({ id: txId1 } as Cardano.TxAlonzo, { id: txId1 } as Cardano.TxAlonzo)).toBe(true);
   });
 
   test('transactionsEquals', () => {
     expect(transactionsEquals([], [])).toBe(true);
-    expect(transactionsEquals([{ id: 'id1' } as Cardano.TxAlonzo], [{ id: 'id2' } as Cardano.TxAlonzo])).toBe(false);
-    expect(transactionsEquals([{ id: 'id1' } as Cardano.TxAlonzo], [{ id: 'id1' } as Cardano.TxAlonzo])).toBe(true);
+    expect(transactionsEquals([{ id: txId1 } as Cardano.TxAlonzo], [{ id: txId2 } as Cardano.TxAlonzo])).toBe(false);
+    expect(transactionsEquals([{ id: txId1 } as Cardano.TxAlonzo], [{ id: txId1 } as Cardano.TxAlonzo])).toBe(true);
   });
 
   test('utxoEquals ', () => {

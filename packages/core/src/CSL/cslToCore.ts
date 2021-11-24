@@ -34,7 +34,7 @@ export const value = (cslValue: CSL.Value): Cardano.Value => {
 export const txIn = (input: CSL.TransactionInput, address: Cardano.Address): Cardano.TxIn => ({
   address,
   index: input.index(),
-  txId: Buffer.from(input.transaction_id().to_bytes()).toString('hex')
+  txId: Cardano.TransactionId(Buffer.from(input.transaction_id().to_bytes()).toString('hex'))
 });
 
 export const txOut = (output: CSL.TransactionOutput): Cardano.TxOut => {

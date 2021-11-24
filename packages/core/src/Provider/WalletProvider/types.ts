@@ -93,7 +93,7 @@ export interface WalletProvider {
    * to minimise over-fetching and assist the application in handling rollback scenarios.
    */
   queryTransactionsByAddresses: (addresses: Cardano.Address[]) => Promise<Cardano.TxAlonzo[]>;
-  queryTransactionsByHashes: (hashes: Cardano.Hash16[]) => Promise<Cardano.TxAlonzo[]>;
+  queryTransactionsByHashes: (hashes: Cardano.TransactionId[]) => Promise<Cardano.TxAlonzo[]>;
   /**
    * @returns an array of blocks, same length and in the same order as `hashes` argument.
    */

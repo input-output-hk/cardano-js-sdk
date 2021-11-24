@@ -34,7 +34,7 @@ export const blockfrostAssetProvider = (options: Options): AssetProvider => {
         response.map(({ action, amount, tx_hash }) => ({
           action: action === 'minted' ? Cardano.AssetProvisioning.Mint : Cardano.AssetProvisioning.Burn,
           quantity: BigInt(amount),
-          transactionId: tx_hash
+          transactionId: Cardano.TransactionId(tx_hash)
         }))
     });
 
@@ -47,7 +47,13 @@ export const blockfrostAssetProvider = (options: Options): AssetProvider => {
       fingerprint: response.fingerprint,
       history:
         response.mint_or_burn_count === 1
-          ? [{ action: Cardano.AssetProvisioning.Mint, quantity, transactionId: response.initial_mint_tx_hash }]
+          ? [
+              {
+                action: Cardano.AssetProvisioning.Mint,
+                quantity,
+                transactionId: Cardano.TransactionId(response.initial_mint_tx_hash)
+              }
+            ]
           : await getAssetHistory(assetId),
       metadata: mapMetadata(response.onchain_metadata, response.metadata),
       name,

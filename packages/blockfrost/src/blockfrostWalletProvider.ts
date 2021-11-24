@@ -252,9 +252,9 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
     ];
   };
 
-  const fetchJsonMetadata = async (txHash: Cardano.Hash16): Promise<Cardano.MetadatumMap | null> => {
+  const fetchJsonMetadata = async (txHash: Cardano.TransactionId): Promise<Cardano.MetadatumMap | null> => {
     try {
-      const response = await blockfrost.txsMetadata(txHash);
+      const response = await blockfrost.txsMetadata(txHash.toString());
       return response.reduce((map, metadatum) => {
         // Not sure if types are correct, missing 'label', but it's present in docs
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -273,9 +273,9 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
 
   // eslint-disable-next-line unicorn/consistent-function-scoping
   const parseValidityInterval = (num: string | null) => Number.parseInt(num || '') || undefined;
-  const fetchTransaction = async (hash: string): Promise<Cardano.TxAlonzo> => {
-    const { inputs, outputs } = BlockfrostToCore.transactionUtxos(await blockfrost.txsUtxos(hash));
-    const response = await blockfrost.txs(hash);
+  const fetchTransaction = async (hash: Cardano.TransactionId): Promise<Cardano.TxAlonzo> => {
+    const { inputs, outputs } = BlockfrostToCore.transactionUtxos(await blockfrost.txsUtxos(hash.toString()));
+    const response = await blockfrost.txs(hash.toString());
     const metadata = await fetchJsonMetadata(hash);
     return {
       auxiliaryData: metadata
@@ -332,7 +332,7 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
 
     const transactionsArray = await Promise.all(
       addressTransactions.map((transactionArray) =>
-        queryTransactionsByHashes(transactionArray.map(({ tx_hash }) => tx_hash))
+        queryTransactionsByHashes(transactionArray.map(({ tx_hash }) => Cardano.TransactionId(tx_hash)))
       )
     );
 

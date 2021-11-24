@@ -72,7 +72,7 @@ export const BlockfrostToCore = {
   txIn: (blockfrost: BlockfrostInput): Cardano.TxIn => ({
     address: Cardano.Address(blockfrost.address),
     index: blockfrost.output_index,
-    txId: blockfrost.tx_hash
+    txId: Cardano.TransactionId(blockfrost.tx_hash)
   }),
 
   txOut: (blockfrost: BlockfrostOutput): Cardano.TxOut => {

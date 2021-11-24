@@ -1,8 +1,9 @@
-import { Address, Hash16 } from '.';
-import { TxIn as OgmiosTxIn } from '@cardano-ogmios/schema';
+import { Address, Hash16, TransactionId } from '.';
 import { Value } from './Value';
 
-export interface TxIn extends OgmiosTxIn {
+export interface TxIn {
+  txId: TransactionId;
+  index: number;
   address: Address;
 }
 

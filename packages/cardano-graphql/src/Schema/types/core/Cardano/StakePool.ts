@@ -60,9 +60,9 @@ export class StakePoolMetrics implements BigIntsAsStrings<Cardano.StakePoolMetri
 @ObjectType()
 export class StakePoolTransactions implements Cardano.StakePoolTransactions {
   @Field(() => [String])
-  registration: string[];
+  registration: Cardano.TransactionId[];
   @Field(() => [String])
-  retirement: string[];
+  retirement: Cardano.TransactionId[];
 }
 
 @ObjectType()

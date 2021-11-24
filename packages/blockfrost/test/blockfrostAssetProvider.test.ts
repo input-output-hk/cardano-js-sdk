@@ -46,7 +46,7 @@ describe('blockfrostAssetProvider', () => {
           {
             action: Cardano.AssetProvisioning.Mint,
             quantity: 12_000n,
-            transactionId: '6804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99cad'
+            transactionId: Cardano.TransactionId('6804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99cad')
           }
         ],
         metadata: {
@@ -72,12 +72,12 @@ describe('blockfrostAssetProvider', () => {
         {
           action: 'minted',
           amount: '13000',
-          tx_hash: 'tx1hash'
+          tx_hash: '4123d70f66414cc921f6ffc29a899aafc7137a99a0fd453d6b200863ef5702d6'
         },
         {
           action: 'burned',
           amount: '1000',
-          tx_hash: 'tx2hash'
+          tx_hash: '01d7366549986d83edeea262e97b68eca3430d3bb052ed1c37d2202fd5458872'
         }
       ] as Responses['asset_history']);
 
@@ -91,12 +91,12 @@ describe('blockfrostAssetProvider', () => {
           {
             action: Cardano.AssetProvisioning.Mint,
             quantity: 13_000n,
-            transactionId: 'tx1hash'
+            transactionId: Cardano.TransactionId('4123d70f66414cc921f6ffc29a899aafc7137a99a0fd453d6b200863ef5702d6')
           },
           {
             action: Cardano.AssetProvisioning.Burn,
             quantity: 1000n,
-            transactionId: 'tx2hash'
+            transactionId: Cardano.TransactionId('01d7366549986d83edeea262e97b68eca3430d3bb052ed1c37d2202fd5458872')
           }
         ],
         metadata: {
