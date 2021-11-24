@@ -173,21 +173,23 @@ describe('blockfrostWalletProvider', () => {
       const response = await client.utxoDelegationAndRewards(
         [
           'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
-        ],
-        'stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27'
+        ].map(Cardano.Address),
+        Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27')
       );
 
       expect(response.utxo).toBeTruthy();
       expect(response.utxo[0]).toHaveLength(2);
       expect(response.utxo[0][0]).toMatchObject<Cardano.TxIn>({
-        address:
-          'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp',
+        address: Cardano.Address(
+          'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
+        ),
         index: 0,
         txId: '0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5'
       });
       expect(response.utxo[0][1]).toMatchObject<Cardano.TxOut>({
-        address:
-          'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp',
+        address: Cardano.Address(
+          'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
+        ),
         value: {
           assets: {
             b01fb3b8c3dd6b3705a5dc8bcd5a70759f70ad5d97a72005caeac3c652657675746f31333237: BigInt(1)
@@ -198,14 +200,16 @@ describe('blockfrostWalletProvider', () => {
 
       expect(response.utxo[1]).toHaveLength(2);
       expect(response.utxo[1][0]).toMatchObject<Cardano.TxIn>({
-        address:
-          'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp',
+        address: Cardano.Address(
+          'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
+        ),
         index: 1,
         txId: '0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5'
       });
       expect(response.utxo[1][1]).toMatchObject<Cardano.TxOut>({
-        address:
-          'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp',
+        address: Cardano.Address(
+          'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
+        ),
         value: {
           assets: {},
           coins: 50_928_878n
@@ -229,8 +233,8 @@ describe('blockfrostWalletProvider', () => {
       const response = await client.utxoDelegationAndRewards(
         [
           'addr_test1qz44wna7xvs8n2ukxw0qat3vktymndgk8nerey6mlxr97s47n48hk78hcuyku03lj7qplmfqscm87j9wv3amxqaur2hs055pjt'
-        ],
-        'stake_test1h6w577mc7lrsjm3787tcq8ldyzrrvl6g4ej8hvcrhsd27vgzsn7'
+        ].map(Cardano.Address),
+        Cardano.RewardAccount('stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d')
       );
       expect(response.utxo).toBeTruthy();
       expect(response.utxo.length).toBe(0);
@@ -379,16 +383,18 @@ describe('blockfrostWalletProvider', () => {
           fee: 182_485n,
           inputs: [
             {
-              address:
-                'addr_test1qr05llxkwg5t6c4j3ck5mqfax9wmz35rpcgw3qthrn9z7xcxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flknstdz3k2',
+              address: Cardano.Address(
+                'addr_test1qr05llxkwg5t6c4j3ck5mqfax9wmz35rpcgw3qthrn9z7xcxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flknstdz3k2'
+              ),
               index: 1,
               txId: '6d50c330a6fba79de6949a8dcd5e4b7ffa3f9442f0c5bed7a78fa6d786c6c863'
             }
           ],
           outputs: [
             {
-              address:
-                'addr_test1qzx9hu8j4ah3auytk0mwcupd69hpc52t0cw39a65ndrah86djs784u92a3m5w475w3w35tyd6v3qumkze80j8a6h5tuqq5xe8y',
+              address: Cardano.Address(
+                'addr_test1qzx9hu8j4ah3auytk0mwcupd69hpc52t0cw39a65ndrah86djs784u92a3m5w475w3w35tyd6v3qumkze80j8a6h5tuqq5xe8y'
+              ),
               value: {
                 assets: {
                   '06f8c5655b4e2b5911fee8ef2fc66b4ce64c8835642695c730a3d108617364': BigInt(63),
@@ -398,8 +404,9 @@ describe('blockfrostWalletProvider', () => {
               }
             },
             {
-              address:
-                'addr_test1qra788mu4sg8kwd93ns9nfdh3k4ufxwg4xhz2r3n064tzfgxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flkns6cy45x',
+              address: Cardano.Address(
+                'addr_test1qra788mu4sg8kwd93ns9nfdh3k4ufxwg4xhz2r3n064tzfgxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flkns6cy45x'
+              ),
               value: {
                 assets: {},
                 coins: 9_731_978_536_963n
@@ -564,8 +571,8 @@ describe('blockfrostWalletProvider', () => {
         },
         stakeAddresses: [
           'stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27',
-          'stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy28'
-        ]
+          'stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d'
+        ].map(Cardano.RewardAccount)
       });
 
       expect(BlockFrostAPI.prototype.accountsRewards).toBeCalledTimes(2);
@@ -577,7 +584,7 @@ describe('blockfrostWalletProvider', () => {
         epochs: {
           lowerBound: 98
         },
-        stakeAddresses: ['stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy28']
+        stakeAddresses: [Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27')]
       });
 
       expect(BlockFrostAPI.prototype.accountsRewards).toBeCalledTimes(2);

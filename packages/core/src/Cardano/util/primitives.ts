@@ -14,23 +14,30 @@ export declare class OpaqueString<T extends string> extends String {
   toString(): string;
 }
 
+const isOneOf = <T>(target: T, options: T | T[]) =>
+  (Array.isArray(options) && options.includes(target)) || target === options;
+
 /**
  * @param {string} target bech32 string to decode
  * @param {string} prefix expected prefix
  * @param {string} expectedDecodedLength number of expected words, >0
  * @throws {InvalidStringError}
  */
-export const assertIsBech32WithPrefix = (target: string, prefix: string, expectedDecodedLength?: number): void => {
+export const assertIsBech32WithPrefix = (
+  target: string,
+  prefix: string | string[],
+  expectedDecodedLength?: number | number[]
+): void => {
   let decoded: Decoded;
   try {
     decoded = bech32.decode(target, MAX_BECH32_LENGTH_LIMIT);
   } catch (error) {
     throw new InvalidStringError(`expected bech32-encoded string with '${prefix}' prefix`, error);
   }
-  if (decoded.prefix !== prefix) {
+  if (!isOneOf(decoded.prefix, prefix)) {
     throw new InvalidStringError(`expected bech32 prefix '${prefix}', got '${decoded.prefix}''`);
   }
-  if (expectedDecodedLength && decoded.words.length !== expectedDecodedLength) {
+  if (expectedDecodedLength && !isOneOf(decoded.words.length, expectedDecodedLength)) {
     throw new InvalidStringError(
       `expected decoded length of '${expectedDecodedLength}', got '${decoded.words.length}'`
     );

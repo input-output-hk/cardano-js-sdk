@@ -1,11 +1,12 @@
+import { Cardano, WalletProvider, coreToCsl } from '@cardano-sdk/core';
 import { CreateTxInternalsProps, createTransactionInternals } from '../../src/Transaction';
 import { SelectionConstraints } from '@cardano-sdk/util-dev';
 import { SelectionSkeleton, roundRobinRandomImprove } from '@cardano-sdk/cip2';
-import { WalletProvider, coreToCsl } from '@cardano-sdk/core';
 import { mockWalletProvider, utxo } from '../mocks';
 
-const address =
-  'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g';
+const address = Cardano.Address(
+  'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g'
+);
 
 const outputs = [
   {
@@ -32,7 +33,9 @@ describe('Transaction.createTransactionInternals', () => {
     const ledgerTip = await provider.ledgerTip();
     const overrides = props(result.selection);
     return await createTransactionInternals({
-      changeAddress: 'addr_test1gz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzerspqgpsqe70et',
+      changeAddress: Cardano.Address(
+        'addr_test1qqydn46r6mhge0kfpqmt36m6q43knzsd9ga32n96m89px3nuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qypp3m9'
+      ),
       validityInterval: {
         invalidHereafter: ledgerTip.slot + 3600
       },

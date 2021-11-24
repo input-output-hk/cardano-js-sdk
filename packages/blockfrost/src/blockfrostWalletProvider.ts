@@ -102,16 +102,16 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
       addresses.map(async (address) =>
         fetchByAddressSequentially<Cardano.Utxo, BlockfrostUtxo>({
           address,
-          request: (addr: Cardano.Address, pagination) => blockfrost.addressesUtxos(addr, pagination),
+          request: (addr: Cardano.Address, pagination) => blockfrost.addressesUtxos(addr.toString(), pagination),
           responseTranslator: (addr: Cardano.Address, response: Responses['address_utxo_content']) =>
-            BlockfrostToCore.addressUtxoContent(addr, response)
+            BlockfrostToCore.addressUtxoContent(addr.toString(), response)
         })
       )
     );
     const utxo = utxoResults.flat(1);
     if (rewardAccount !== undefined) {
       try {
-        const accountResponse = await blockfrost.accounts(rewardAccount);
+        const accountResponse = await blockfrost.accounts(rewardAccount.toString());
         const delegationAndRewards = {
           delegate: accountResponse.pool_id ? Cardano.PoolId(accountResponse.pool_id) : undefined,
           rewards: BigInt(accountResponse.withdrawable_amount)
@@ -165,7 +165,7 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
     return response.map(
       ({ address, amount }): Cardano.Withdrawal => ({
         quantity: BigInt(amount),
-        stakeAddress: address
+        stakeAddress: Cardano.RewardAccount(address)
       })
     );
   };
@@ -204,7 +204,7 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
     const response = await blockfrost.txsMirs(hash);
     return response.map(({ address, amount, cert_index, pot }) => ({
       __typename: Cardano.CertificateType.MIR,
-      address,
+      address: Cardano.Address(address),
       certIndex: cert_index,
       pot,
       quantity: BigInt(amount)
@@ -217,8 +217,8 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
       __typename: registration
         ? Cardano.CertificateType.StakeKeyRegistration
         : Cardano.CertificateType.StakeKeyDeregistration,
-      address,
-      certIndex: cert_index
+      certIndex: cert_index,
+      rewardAccount: Cardano.RewardAccount(address)
     }));
   };
 
@@ -226,11 +226,11 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
     const response = await blockfrost.txsDelegations(hash);
     return response.map(({ cert_index, index, address, active_epoch, pool_id }) => ({
       __typename: Cardano.CertificateType.StakeDelegation,
-      address,
       certIndex: cert_index,
       delegationIndex: index,
       epoch: active_epoch,
-      poolId: Cardano.PoolId(pool_id)
+      poolId: Cardano.PoolId(pool_id),
+      rewardAccount: Cardano.RewardAccount(address)
     }));
   };
 
@@ -325,7 +325,7 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
           BlockfrostTransactionContent
         >({
           address,
-          request: (addr: Cardano.Address, pagination) => blockfrost.addressesTransactions(addr, pagination)
+          request: (addr: Cardano.Address, pagination) => blockfrost.addressesTransactions(addr.toString(), pagination)
         })
       )
     );
@@ -348,7 +348,7 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
   };
 
   const accountRewards = async (
-    stakeAddress: Cardano.Address,
+    stakeAddress: Cardano.RewardAccount,
     { lowerBound = 0, upperBound = Number.MAX_SAFE_INTEGER }: EpochRange = {}
   ): Promise<EpochRewards[]> => {
     const result: EpochRewards[] = [];
@@ -356,7 +356,7 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
     let page = 1;
     let haveMorePages = true;
     while (haveMorePages) {
-      const rewards = await blockfrost.accountsRewards(stakeAddress, { count: batchSize, page });
+      const rewards = await blockfrost.accountsRewards(stakeAddress.toString(), { count: batchSize, page });
       result.push(
         ...rewards
           .filter(({ epoch }) => lowerBound <= epoch && epoch <= upperBound)

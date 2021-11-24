@@ -40,7 +40,7 @@ export const txIn = (input: CSL.TransactionInput, address: Cardano.Address): Car
 export const txOut = (output: CSL.TransactionOutput): Cardano.TxOut => {
   const dataHashBytes = output.data_hash()?.to_bytes();
   return {
-    address: output.address().to_bech32(),
+    address: Cardano.Address(output.address().to_bech32()),
     datum: dataHashBytes ? Buffer.from(dataHashBytes).toString('hex') : undefined,
     value: value(output.amount())
   };

@@ -4,11 +4,11 @@ import { InitializeTxProps, Transaction } from '../../src';
 describe('Transaction.computeImplicitCoin', () => {
   it('sums registrations for deposit, withdrawals and deregistrations for input', async () => {
     const protocolParameters = { poolDeposit: 3, stakeKeyDeposit: 2 } as ProtocolParametersRequiredByWallet;
-    const address = 'stake...';
+    const rewardAccount = Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27');
     const certificates: Cardano.Certificate[] = [
-      { __typename: Cardano.CertificateType.StakeKeyRegistration, address },
-      { __typename: Cardano.CertificateType.StakeKeyDeregistration, address },
-      { __typename: Cardano.CertificateType.StakeKeyRegistration, address },
+      { __typename: Cardano.CertificateType.StakeKeyRegistration, rewardAccount },
+      { __typename: Cardano.CertificateType.StakeKeyDeregistration, rewardAccount },
+      { __typename: Cardano.CertificateType.StakeKeyRegistration, rewardAccount },
       {
         __typename: Cardano.CertificateType.PoolRetirement,
         epoch: 500,
@@ -16,12 +16,12 @@ describe('Transaction.computeImplicitCoin', () => {
       },
       {
         __typename: Cardano.CertificateType.StakeDelegation,
-        address,
         epoch: 500,
-        poolId: Cardano.PoolId('pool1zuevzm3xlrhmwjw87ec38mzs02tlkwec9wxpgafcaykmwg7efhh')
+        poolId: Cardano.PoolId('pool1zuevzm3xlrhmwjw87ec38mzs02tlkwec9wxpgafcaykmwg7efhh'),
+        rewardAccount
       }
     ];
-    const withdrawals: Cardano.Withdrawal[] = [{ quantity: 5n, stakeAddress: address }];
+    const withdrawals: Cardano.Withdrawal[] = [{ quantity: 5n, stakeAddress: rewardAccount }];
     const txProps = { certificates, withdrawals } as InitializeTxProps;
 
     const coin = Transaction.computeImplicitCoin(protocolParameters, txProps);

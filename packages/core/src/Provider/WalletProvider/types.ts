@@ -63,7 +63,7 @@ export interface EpochRange {
 }
 
 export interface RewardHistoryProps {
-  stakeAddresses: Cardano.Address[];
+  stakeAddresses: Cardano.RewardAccount[];
   epochs?: EpochRange;
 }
 
@@ -85,7 +85,7 @@ export interface WalletProvider {
   // TODO: split utxoDelegationAndRewards this into 2 or 3 functions
   utxoDelegationAndRewards: (
     addresses: Cardano.Address[],
-    rewardAccount?: Cardano.Address
+    rewardAccount?: Cardano.RewardAccount
   ) => Promise<{ utxo: Cardano.Utxo[]; delegationAndRewards?: Cardano.DelegationsAndRewards }>;
   /**
    * TODO: add an optional 'since: Slot' argument for querying transactions and utxos.

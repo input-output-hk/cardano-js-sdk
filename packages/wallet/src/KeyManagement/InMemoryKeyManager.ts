@@ -53,17 +53,15 @@ export const createInMemoryKeyManager = ({
         networkId,
         CSL.StakeCredential.from_keyhash(derivedPublicPaymentKeyHash),
         stakeKeyCredential
-      )
-        .to_address()
-        .to_bech32();
+      ).to_address();
 
-      const rewardAccount = CSL.RewardAddress.new(networkId, stakeKeyCredential).to_address().to_bech32();
+      const rewardAccount = CSL.RewardAddress.new(networkId, stakeKeyCredential).to_address();
       return {
         accountIndex,
-        address,
+        address: Cardano.Address(address.to_bech32()),
         addressIndex,
         networkId,
-        rewardAccount,
+        rewardAccount: Cardano.RewardAccount(rewardAccount.to_bech32()),
         type
       };
     },

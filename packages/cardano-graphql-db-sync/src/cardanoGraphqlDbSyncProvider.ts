@@ -1,4 +1,5 @@
 import { Buffer } from 'buffer';
+import { Cardano, ProviderError, ProviderFailure, WalletProvider } from '@cardano-sdk/core';
 import {
   CardanoGraphQlTip,
   CardanoGraphqlToCore,
@@ -6,7 +7,6 @@ import {
   TransactionsResponse
 } from './CardanoGraphqlToCore';
 import { GraphQLClient, gql } from 'graphql-request';
-import { ProviderError, ProviderFailure, WalletProvider } from '@cardano-sdk/core';
 import { TransactionSubmitResponse } from '@cardano-graphql/client-ts';
 
 /**
@@ -278,7 +278,7 @@ export const cardanoGraphqlDbSyncProvider = (uri: string): WalletProvider => {
       }
     `;
 
-    type Variables = { addresses: string[] };
+    type Variables = { addresses: Cardano.Address[] };
 
     const response = await client.request<TransactionsResponse, Variables>(query, { addresses });
 

@@ -1,4 +1,4 @@
-import { Address, Epoch, Hash16, Lovelace, PoolId } from '.';
+import { Address, Epoch, Hash16, Lovelace, PoolId, RewardAccount } from '.';
 import { PoolParameters as OgmiosPoolParameters, PoolMetadata } from '@cardano-ogmios/schema';
 
 export interface RelayByAddress {
@@ -63,7 +63,7 @@ export enum CertificateType {
 
 export interface StakeAddressCertificate {
   __typename: CertificateType.StakeKeyRegistration | CertificateType.StakeKeyDeregistration;
-  address: Address;
+  rewardAccount: RewardAccount;
 }
 
 export interface PoolRegistrationCertificate {
@@ -81,13 +81,14 @@ export interface PoolRetirementCertificate {
 
 export interface StakeDelegationCertificate {
   __typename: CertificateType.StakeDelegation;
-  address: Address;
+  rewardAccount: RewardAccount;
   poolId: PoolId;
   epoch: Epoch;
 }
 
 export interface MirCertificate {
   __typename: CertificateType.MIR;
+  // Review: need to learn what this cert is and figure out if 'address' is actually an Address or a RewardAccount
   address: Address;
   quantity: Lovelace;
   pot: 'reserve' | 'treasury';

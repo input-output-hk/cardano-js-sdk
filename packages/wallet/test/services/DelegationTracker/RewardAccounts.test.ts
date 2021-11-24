@@ -59,20 +59,26 @@ describe('RewardAccounts', () => {
 
   test('addressKeyStatuses ', () => {
     createTestScheduler().run(({ cold, expectObservable }) => {
-      const address = 'stake...';
+      const rewardAccount = Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27');
       const transactions$ = cold('a-b-c', {
         a: [],
         b: [
           {
-            tx: { body: { certificates: [{ __typename: Cardano.CertificateType.StakeKeyRegistration, address }] } }
+            tx: { body: { certificates: [{
+              __typename: Cardano.CertificateType.StakeKeyRegistration, rewardAccount
+            }] } }
           } as TxWithEpoch
         ],
         c: [
           {
-            tx: { body: { certificates: [{ __typename: Cardano.CertificateType.StakeKeyRegistration, address }] } }
+            tx: { body: { certificates: [{
+              __typename: Cardano.CertificateType.StakeKeyRegistration, rewardAccount
+            }] } }
           } as TxWithEpoch,
           {
-            tx: { body: { certificates: [{ __typename: Cardano.CertificateType.StakeKeyDeregistration, address }] } }
+            tx: { body: { certificates: [{
+              __typename: Cardano.CertificateType.StakeKeyDeregistration, rewardAccount
+            }] } }
           } as TxWithEpoch
         ]
       });
@@ -80,16 +86,16 @@ describe('RewardAccounts', () => {
         a: [],
         b: [
           {
-            body: { certificates: [{ __typename: Cardano.CertificateType.StakeKeyRegistration, address }] }
+            body: { certificates: [{ __typename: Cardano.CertificateType.StakeKeyRegistration, rewardAccount }] }
           } as Cardano.NewTxAlonzo
         ],
         c: [
           {
-            body: { certificates: [{ __typename: Cardano.CertificateType.StakeKeyDeregistration, address }] }
+            body: { certificates: [{ __typename: Cardano.CertificateType.StakeKeyDeregistration, rewardAccount }] }
           } as Cardano.NewTxAlonzo
         ]
       });
-      const tracker$ = addressKeyStatuses([address], transactions$, transactionsInFlight$);
+      const tracker$ = addressKeyStatuses([rewardAccount], transactions$, transactionsInFlight$);
       expectObservable(tracker$).toBe('abcda', {
         a: [StakeKeyStatus.Unregistered],
         b: [StakeKeyStatus.Registering],
@@ -101,12 +107,16 @@ describe('RewardAccounts', () => {
 
   describe('fetchRewardsTrigger$', () => {
     it('emits every epoch and after making a transaction with withdrawals', () => {
-      const rewardAccount = 'stake...';
+      const rewardAccount = Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27');
       createTestScheduler().run(({ cold, expectObservable }) => {
         const tx2 = { body: { withdrawals: [{ quantity: 5n, stakeAddress: rewardAccount }] } } as Cardano.TxAlonzo;
         const epoch$ = cold(      'a-b--', { a: 100, b: 101 });
         const txConfirmed$ = cold('-a--b', {
-          a: { body: { withdrawals: [{ quantity: 3n, stakeAddress: 'stakeother...' }] } } as Cardano.TxAlonzo,
+          a: { body: {
+            withdrawals: [{
+              quantity: 3n,
+              stakeAddress: Cardano.RewardAccount('stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d')
+            }] } } as Cardano.TxAlonzo,
           b: tx2
         });
         const target$ = fetchRewardsTrigger$(epoch$, txConfirmed$, rewardAccount);
@@ -141,7 +151,10 @@ describe('RewardAccounts', () => {
         txConfirmed$,
         walletProvider,
         config
-      )(['stake...', 'stakeother...']);
+      )([
+        'stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27',
+        'stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d'
+      ].map(Cardano.RewardAccount));
       expectObservable(target$).toBe('-ab', {
         a: [0n, 3n],
         b: [5n, 3n]

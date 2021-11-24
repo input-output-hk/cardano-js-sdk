@@ -55,7 +55,7 @@ export const txIn = (core: Cardano.TxIn): TransactionInput =>
   TransactionInput.new(TransactionHash.from_bytes(Buffer.from(core.txId, 'hex')), core.index);
 
 export const txOut = (core: Cardano.TxOut): TransactionOutput =>
-  TransactionOutput.new(Address.from_bech32(core.address), value(core.value));
+  TransactionOutput.new(Address.from_bech32(core.address.toString()), value(core.value));
 
 export const utxo = (core: Cardano.Utxo[]): TransactionUnspentOutput[] =>
   core.map((item) => TransactionUnspentOutput.new(txIn(item[0]), txOut(item[1])));
@@ -95,7 +95,7 @@ export const txBody = ({
   if (withdrawals?.length) {
     const cslWithdrawals = Withdrawals.new();
     for (const { stakeAddress, quantity } of withdrawals) {
-      const cslAddress = RewardAddress.from_address(Address.from_bech32(stakeAddress));
+      const cslAddress = RewardAddress.from_address(Address.from_bech32(stakeAddress.toString()));
       if (!cslAddress) {
         throw new SerializationError(
           SerializationFailure.InvalidAddress,

@@ -38,7 +38,7 @@ describe('integration/withdrawal', () => {
 
     const rewardAccount = wallet.addresses$.value[0].rewardAccount;
     const txInternals = await wallet.initializeTx({
-      certificates: [{ __typename: Cardano.CertificateType.StakeKeyDeregistration, address: rewardAccount }],
+      certificates: [{ __typename: Cardano.CertificateType.StakeKeyDeregistration, rewardAccount }],
       outputs: new Set(), // In a real transaction you would probably want to have some outputs
       withdrawals: [{ quantity: availableRewards, stakeAddress: rewardAccount }]
     });

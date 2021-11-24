@@ -8,13 +8,22 @@ describe('Cardano.util/primitives', () => {
         assertIsBech32WithPrefix('pool1ujcu3myfg9wwvdyh2ks653954lamtufy3lefjs73jrr327q53j4', 'pool')
       ).not.toThrow();
       expect(() =>
+        assertIsBech32WithPrefix('pool1ujcu3myfg9wwvdyh2ks653954lamtufy3lefjs73jrr327q53j4', ['pool', 'pool_vk'])
+      ).not.toThrow();
+      expect(() =>
         assertIsBech32WithPrefix('pool1ujcu3myfg9wwvdyh2ks653954lamtufy3lefjs73jrr327q53j4', 'pool', 45)
+      ).not.toThrow();
+      expect(() =>
+        assertIsBech32WithPrefix('pool1ujcu3myfg9wwvdyh2ks653954lamtufy3lefjs73jrr327q53j4', 'pool', [45, 55])
       ).not.toThrow();
     });
 
     it('throws when decoded words length does not match the last argument', () => {
       expect(() =>
         assertIsBech32WithPrefix('pool1ujcu3myfg9wwvdyh2ks653954lamtufy3lefjs73jrr327q53j4', 'pool', 55)
+      ).toThrowError(InvalidStringError);
+      expect(() =>
+        assertIsBech32WithPrefix('pool1ujcu3myfg9wwvdyh2ks653954lamtufy3lefjs73jrr327q53j4', 'pool', [55, 56])
       ).toThrowError(InvalidStringError);
     });
 

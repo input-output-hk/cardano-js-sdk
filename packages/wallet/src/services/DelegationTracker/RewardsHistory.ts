@@ -1,7 +1,6 @@
 import { BigIntMath, Cardano, WalletProvider, util } from '@cardano-sdk/core';
 import { Observable, distinctUntilChanged, map, of, switchMap } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { RewardAccount } from '@cardano-ogmios/schema';
 import { TxWithEpoch } from './types';
 import { coldObservableProvider } from '../util';
 import { first } from 'lodash-es';
@@ -10,7 +9,7 @@ import { transactionHasAnyCertificate } from './transactionCertificates';
 export const createRewardsHistoryProvider =
   (
     walletProvider: WalletProvider,
-    rewardAccountAddresses$: Observable<RewardAccount[]>,
+    rewardAccountAddresses$: Observable<Cardano.RewardAccount[]>,
     retryBackoffConfig: RetryBackoffConfig
   ) =>
   (lowerBound: Cardano.Epoch | null) =>

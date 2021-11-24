@@ -8,7 +8,7 @@ export type TxInternals = {
 };
 
 export type CreateTxInternalsProps = {
-  changeAddress: string;
+  changeAddress: Cardano.Address;
   inputSelection: SelectionResult['selection'];
   validityInterval: Cardano.ValidityInterval;
   certificates?: Cardano.Certificate[];
@@ -36,7 +36,7 @@ export const createTransactionInternals = async ({
     certificates,
     fee: BigInt(inputSelection.fee.to_str()),
     inputs: [...inputSelection.inputs].map((cslInput) =>
-      cslToCore.txIn(cslInput.input(), cslInput.output().address().to_bech32())
+      cslToCore.txIn(cslInput.input(), Cardano.Address(cslInput.output().address().to_bech32()))
     ),
     outputs,
     validityInterval,

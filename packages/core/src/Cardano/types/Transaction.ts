@@ -9,7 +9,7 @@ export type TransactionId = Cardano.Hash16;
 export type Ed25519SignatureHash16 = string;
 
 export interface Withdrawal {
-  stakeAddress: Cardano.Address;
+  stakeAddress: Cardano.RewardAccount;
   quantity: Cardano.Lovelace;
 }
 export interface TxBodyAlonzo {

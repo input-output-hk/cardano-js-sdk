@@ -58,7 +58,7 @@ export const BlockfrostToCore = {
   transactionUtxos: (utxoResponse: Responses['tx_content_utxo']) => ({
     inputs: utxoResponse.inputs.map((input) => ({
       ...BlockfrostToCore.txIn(input),
-      address: input.address
+      address: Cardano.Address(input.address)
     })),
     outputs: utxoResponse.outputs.map(BlockfrostToCore.txOut)
   }),
@@ -70,7 +70,7 @@ export const BlockfrostToCore = {
   }),
 
   txIn: (blockfrost: BlockfrostInput): Cardano.TxIn => ({
-    address: blockfrost.address,
+    address: Cardano.Address(blockfrost.address),
     index: blockfrost.output_index,
     txId: blockfrost.tx_hash
   }),
@@ -82,7 +82,7 @@ export const BlockfrostToCore = {
       assets[amount.unit] = BigInt(amount.quantity);
     }
     return {
-      address: blockfrost.address,
+      address: Cardano.Address(blockfrost.address),
       value: {
         assets,
         coins: BigInt(blockfrost.amount.find(({ unit }) => unit === 'lovelace')!.quantity)

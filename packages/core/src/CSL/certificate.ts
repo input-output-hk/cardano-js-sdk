@@ -28,26 +28,29 @@ import {
 import { Cardano, NotImplementedError, SerializationError, SerializationFailure } from '..';
 import { CertificateType } from '../Cardano';
 
-export const stakeAddressToCredential = (address: Cardano.Address) => {
+export const stakeAddressToCredential = (rewardAccount: Cardano.RewardAccount) => {
   try {
-    const rewardAddress = RewardAddress.from_address(Address.from_bech32(address));
+    const rewardAddress = RewardAddress.from_address(Address.from_bech32(rewardAccount.toString()));
     if (!rewardAddress)
-      throw new SerializationError(SerializationFailure.InvalidAddress, `Invalid reward account address: ${address}`);
+      throw new SerializationError(
+        SerializationFailure.InvalidAddress,
+        `Invalid reward account address: ${rewardAccount}`
+      );
     return rewardAddress.payment_cred();
   } catch (error) {
     throw new SerializationError(
       SerializationFailure.InvalidAddress,
-      `Invalid reward account address: ${address}`,
+      `Invalid reward account address: ${rewardAccount}`,
       error
     );
   }
 };
 
-export const stakeKeyRegistration = (address: Cardano.Address) =>
-  Certificate.new_stake_registration(StakeRegistration.new(stakeAddressToCredential(address)));
+export const stakeKeyRegistration = (rewardAccount: Cardano.RewardAccount) =>
+  Certificate.new_stake_registration(StakeRegistration.new(stakeAddressToCredential(rewardAccount)));
 
-export const stakeKeyDeregistration = (address: Cardano.Address) =>
-  Certificate.new_stake_deregistration(StakeDeregistration.new(stakeAddressToCredential(address)));
+export const stakeKeyDeregistration = (rewardAccount: Cardano.RewardAccount) =>
+  Certificate.new_stake_deregistration(StakeDeregistration.new(stakeAddressToCredential(rewardAccount)));
 
 const createCslRelays = (relays: Cardano.Relay[]) => {
   const cslRelays = Relays.new();
@@ -118,9 +121,9 @@ export const poolRegistration = ({
 export const poolRetirement = (poolId: Cardano.PoolId, epoch: number) =>
   Certificate.new_pool_retirement(PoolRetirement.new(Ed25519KeyHash.from_bech32(poolId.toString()), epoch));
 
-export const stakeDelegation = (address: Cardano.Address, delegatee: Cardano.PoolId) =>
+export const stakeDelegation = (rewardAccount: Cardano.RewardAccount, delegatee: Cardano.PoolId) =>
   Certificate.new_stake_delegation(
-    StakeDelegation.new(stakeAddressToCredential(address), Ed25519KeyHash.from_bech32(delegatee.toString()))
+    StakeDelegation.new(stakeAddressToCredential(rewardAccount), Ed25519KeyHash.from_bech32(delegatee.toString()))
   );
 
 export const create = (certificate: Cardano.Certificate) => {
@@ -130,11 +133,11 @@ export const create = (certificate: Cardano.Certificate) => {
     case CertificateType.PoolRetirement:
       return poolRetirement(certificate.poolId, certificate.epoch);
     case CertificateType.StakeDelegation:
-      return stakeDelegation(certificate.address, certificate.poolId);
+      return stakeDelegation(certificate.rewardAccount, certificate.poolId);
     case CertificateType.StakeKeyDeregistration:
-      return stakeKeyDeregistration(certificate.address);
+      return stakeKeyDeregistration(certificate.rewardAccount);
     case CertificateType.StakeKeyRegistration:
-      return stakeKeyRegistration(certificate.address);
+      return stakeKeyRegistration(certificate.rewardAccount);
     default:
       throw new NotImplementedError(`certificate.create ${certificate.__typename}`);
   }
