@@ -1,20 +1,20 @@
 /* eslint-disable complexity */
-import { dummyLogger, Logger } from 'ts-log';
 import {
-  createChainSyncClient,
+  ChainSync,
+  ConnectionConfig,
+  Schema,
   StateQuery,
+  createChainSyncClient,
+  createInteractionContext,
   isAllegraBlock,
   isAlonzoBlock,
-  isShelleyBlock,
   isMaryBlock,
-  Schema,
-  ConnectionConfig,
-  createInteractionContext,
-  ChainSync
+  isShelleyBlock
 } from '@cardano-ogmios/client';
 import { GeneratorMetadata } from '../Content';
-import { isByronStandardBlock } from '../util';
+import { Logger, dummyLogger } from 'ts-log';
 import { applyValue } from './applyValue';
+import { isByronStandardBlock } from '../util';
 
 export type AddressBalances = {
   [address: string]: Schema.Value;
@@ -37,6 +37,7 @@ export const getOnChainAddressBalances = (
   const trackedAddressBalances: AddressBalances = Object.fromEntries(
     addresses.map((address) => [address, { assets: {}, coins: 0 }])
   );
+  // TODO: Review: should this be refactored too? Haven't done anything with golden-test-generator yet
   const trackedTxs: ({ id: Schema.Hash16 } & Schema.Tx)[] = [];
   // eslint-disable-next-line sonarjs/cognitive-complexity
   return new Promise(async (resolve, reject) => {

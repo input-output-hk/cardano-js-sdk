@@ -80,11 +80,12 @@ export const createInMemoryKeyManager = ({
         }
         const stakeVkeyWitness = CSL.make_vkey_witness(cslHash, privateStakeKeyRaw);
         return {
-          [publicStakeKeyRawBech32]: stakeVkeyWitness.signature().to_hex()
+          [publicStakeKeyRawBech32]: Cardano.Ed25519Signature(stakeVkeyWitness.signature().to_hex())
         };
       })();
+      const paymentVkeyWitnessHex = Cardano.Ed25519Signature(paymentVkeyWitness.signature().to_hex());
       return {
-        [publicParentPaymentKeyRawBech32]: paymentVkeyWitness.signature().to_hex(),
+        [publicParentPaymentKeyRawBech32]: paymentVkeyWitnessHex,
         ...stakeWitnesses
       };
     }
