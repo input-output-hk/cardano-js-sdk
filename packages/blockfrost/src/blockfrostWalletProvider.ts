@@ -284,7 +284,7 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
           }
         : undefined,
       blockHeader: {
-        blockHash: response.block,
+        blockHash: Cardano.BlockId(response.block),
         blockHeight: response.block_height,
         slot: response.slot
       },
@@ -397,7 +397,7 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
   };
 
   const queryBlocksByHashes: WalletProvider['queryBlocksByHashes'] = async (hashes) => {
-    const responses = await Promise.all(hashes.map((hash) => blockfrost.blocks(hash)));
+    const responses = await Promise.all(hashes.map((hash) => blockfrost.blocks(hash.toString())));
     return responses.map((response) => {
       if (!response.epoch || !response.epoch_slot || !response.height || !response.slot || !response.block_vrf) {
         throw new ProviderError(ProviderFailure.Unknown, null, 'Queried unsupported block');
@@ -409,12 +409,12 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
         epochSlot: response.epoch_slot,
         fees: BigInt(response.fees || '0'),
         header: {
-          blockHash: response.hash,
+          blockHash: Cardano.BlockId(response.hash),
           blockHeight: response.height,
           slot: response.slot
         },
-        nextBlock: response.next_block || undefined,
-        previousBlock: response.previous_block || undefined,
+        nextBlock: response.next_block ? Cardano.BlockId(response.next_block) : undefined,
+        previousBlock: response.previous_block ? Cardano.BlockId(response.previous_block) : undefined,
         size: response.size,
         slotLeader: Cardano.PoolId(response.slot_leader),
         totalOutput: BigInt(response.output || '0'),

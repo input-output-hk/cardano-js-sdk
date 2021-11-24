@@ -1,10 +1,8 @@
 import * as Cardano from '.';
 import { AuxiliaryData } from './AuxiliaryData';
-import { BlockAlonzo, BlockBodyAlonzo } from '@cardano-ogmios/schema';
+import { BlockBodyAlonzo } from '@cardano-ogmios/schema';
 import { OpaqueString, assertIsHexString } from '../util';
-
-type OgmiosHeader = NonNullable<BlockAlonzo['header']>;
-export type PartialBlockHeader = Pick<OgmiosHeader, 'blockHeight' | 'slot' | 'blockHash'>;
+import { PartialBlockHeader } from './Block';
 
 /**
  * transaction hash as hex string

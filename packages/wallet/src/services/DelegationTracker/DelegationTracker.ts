@@ -15,7 +15,7 @@ import { TxWithEpoch } from './types';
 import { transactionsWithCertificates } from './transactionCertificates';
 
 export const createBlockEpochProvider =
-  (walletProvider: WalletProvider, retryBackoffConfig: RetryBackoffConfig) => (blockHashes: Cardano.Hash16[]) =>
+  (walletProvider: WalletProvider, retryBackoffConfig: RetryBackoffConfig) => (blockHashes: Cardano.BlockId[]) =>
     coldObservableProvider(() => walletProvider.queryBlocksByHashes(blockHashes), retryBackoffConfig).pipe(
       map((blocks) => blocks.map(({ epoch }) => epoch))
     );

@@ -375,7 +375,7 @@ describe('blockfrostWalletProvider', () => {
           }
         },
         blockHeader: {
-          blockHash: '356b7d7dbb696ccd12775c016941057a9dc70898d87a63fc752271bb46856940',
+          blockHash: Cardano.BlockId('356b7d7dbb696ccd12775c016941057a9dc70898d87a63fc752271bb46856940'),
           blockHeight: 123_456,
           slot: 42_000_000
         },
@@ -520,7 +520,9 @@ describe('blockfrostWalletProvider', () => {
     BlockFrostAPI.prototype.blocks = jest.fn().mockResolvedValue(blockResponse);
 
     const client = blockfrostWalletProvider({ isTestnet: true, projectId: apiKey });
-    const response = await client.queryBlocksByHashes(['somehash']);
+    const response = await client.queryBlocksByHashes([
+      Cardano.BlockId('0dbe461fb5f981c0d01615332b8666340eb1a692b3034f46bcb5f5ea4172b2ed')
+    ]);
 
     expect(response).toMatchObject([
       {
@@ -530,12 +532,12 @@ describe('blockfrostWalletProvider', () => {
         epochSlot: 312_794,
         fees: 513_839n,
         header: {
-          blockHash: '86e837d8a6cdfddaf364525ce9857eb93430b7e59a5fd776f0a9e11df476a7e5',
+          blockHash: Cardano.BlockId('86e837d8a6cdfddaf364525ce9857eb93430b7e59a5fd776f0a9e11df476a7e5'),
           blockHeight: 2_927_618,
           slot: 37_767_194
         },
         nextBlock: undefined,
-        previousBlock: 'da56fa53483a3a087c893b41aa0d73a303148c2887b3f7535e0b505ea5dc10aa',
+        previousBlock: Cardano.BlockId('da56fa53483a3a087c893b41aa0d73a303148c2887b3f7535e0b505ea5dc10aa'),
         size: 1050,
         slotLeader: Cardano.PoolId('pool1zuevzm3xlrhmwjw87ec38mzs02tlkwec9wxpgafcaykmwg7efhh'),
         totalOutput: 9_249_073_880n,

@@ -97,7 +97,7 @@ export interface WalletProvider {
   /**
    * @returns an array of blocks, same length and in the same order as `hashes` argument.
    */
-  queryBlocksByHashes: (hashes: Cardano.Hash16[]) => Promise<Cardano.Block[]>;
+  queryBlocksByHashes: (hashes: Cardano.BlockId[]) => Promise<Cardano.Block[]>;
   currentWalletProtocolParameters: () => Promise<ProtocolParametersRequiredByWallet>;
   genesisParameters: () => Promise<Cardano.CompactGenesis>;
   /**
