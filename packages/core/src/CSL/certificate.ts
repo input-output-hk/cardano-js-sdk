@@ -108,7 +108,7 @@ export const poolRegistration = ({
     BigNum.from_str(pledge.toString()),
     BigNum.from_str(cost.toString()),
     UnitInterval.new(BigNum.from_str(margin.numerator.toString()), BigNum.from_str(margin.denominator.toString())),
-    RewardAddress.from_address(Address.from_bech32(rewardAccount))!,
+    RewardAddress.from_address(Address.from_bech32(rewardAccount.toString()))!,
     cslOwners,
     cslRelays,
     metadataJson

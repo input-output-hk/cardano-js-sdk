@@ -1,5 +1,5 @@
 import { Address, Epoch, Hash16, Lovelace, PoolId, RewardAccount } from '.';
-import { PoolParameters as OgmiosPoolParameters, PoolMetadata } from '@cardano-ogmios/schema';
+import { PoolMetadata } from '@cardano-ogmios/schema';
 
 export interface RelayByAddress {
   __typename: 'RelayByAddress';
@@ -25,10 +25,9 @@ export interface Fraction {
   denominator: number;
 }
 
-export interface PoolParameters
-  // TODO: don't omit pledge and cost when Lovelace becomes bigint
-  extends Omit<OgmiosPoolParameters, 'id' | 'pledge' | 'cost' | 'margin' | 'metadata' | 'relays'> {
+export interface PoolParameters {
   id: PoolId;
+  rewardAccount: RewardAccount;
   /**
    * Declared pledge quantity.
    */
@@ -44,11 +43,15 @@ export interface PoolParameters
   /**
    * Metadata location and hash
    */
-  metadataJson?: PoolMetadata;
+  metadataJson?: PoolMetadata; // TODO: replace this type's hash with a safer hash16
   /**
    * Stake pool relays
    */
   relays: Relay[];
+
+  // TODO: verify these types and replace with stricter ones
+  owners: Hash16[];
+  vrf: Hash16;
 }
 
 export enum CertificateType {

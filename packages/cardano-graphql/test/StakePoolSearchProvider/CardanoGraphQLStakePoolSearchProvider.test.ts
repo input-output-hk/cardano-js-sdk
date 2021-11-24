@@ -70,7 +70,7 @@ describe('StakePoolSearchClient', () => {
               { __typename: 'RelayByName', hostname: 'http://relay', port: 156 },
               { __typename: 'RelayByAddress', ipv4: '0.0.0.0', ipv6: '::1', port: 567 }
             ],
-            rewardAccount: '745b',
+            rewardAccount: 'stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27',
             status: StakePoolStatus.Active,
             transactions: {
               registration: ['4123d70f66414cc921f6ffc29a899aafc7137a99a0fd453d6b200863ef5702d6'],

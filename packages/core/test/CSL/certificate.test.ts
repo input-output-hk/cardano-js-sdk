@@ -1,16 +1,18 @@
 import { CSL, Cardano, SerializationError, coreToCsl } from '../../src';
 
 describe('coreToCsl.certificate', () => {
-  let stakeKey: Cardano.Address;
-  let poolKeyHash: Cardano.PoolId;
+  let stakeKey: Cardano.RewardAccount;
+  let poolId: Cardano.PoolId;
 
   beforeAll(async () => {
-    stakeKey = 'stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr';
-    poolKeyHash = Cardano.PoolId('pool1mpgg03jxj52qwxvvy7cmj58a96vl9pvxcqqvuw0kumheygxmn34');
+    stakeKey = Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr');
+    poolId = Cardano.PoolId('pool1mpgg03jxj52qwxvvy7cmj58a96vl9pvxcqqvuw0kumheygxmn34');
   });
 
   it('throws SerializationError with invalid stake key', () => {
-    expect(() => coreToCsl.certificate.stakeKeyRegistration(poolKeyHash.toString())).toThrowError(SerializationError);
+    expect(() => coreToCsl.certificate.stakeKeyRegistration(poolId as unknown as Cardano.RewardAccount)).toThrowError(
+      SerializationError
+    );
   });
 
   it('stakeKeyRegistration', () =>
@@ -34,9 +36,9 @@ describe('coreToCsl.certificate', () => {
     ).toBe(stakeKey));
 
   it('stakeDelegation', () => {
-    const delegation = coreToCsl.certificate.stakeDelegation(stakeKey, poolKeyHash).as_stake_delegation()!;
+    const delegation = coreToCsl.certificate.stakeDelegation(stakeKey, poolId).as_stake_delegation()!;
     expect(CSL.RewardAddress.new(1, delegation.stake_credential()).to_address().to_bech32()).toBe(stakeKey);
-    expect(delegation.pool_keyhash().to_bech32('pool')).toBe(poolKeyHash);
+    expect(delegation.pool_keyhash().to_bech32('pool')).toBe(poolId);
   });
 
   it('poolRegistration', () => {
@@ -50,7 +52,7 @@ describe('coreToCsl.certificate', () => {
     const params = coreToCsl.certificate
       .poolRegistration({
         cost: 1000n,
-        id: poolKeyHash,
+        id: poolId,
         margin: { denominator: 5, numerator: 1 },
         metadataJson,
         owners: [owner],
@@ -77,7 +79,7 @@ describe('coreToCsl.certificate', () => {
     const owners = params.pool_owners();
     expect(owners.len()).toBe(1);
     expect(owners.get(0).to_bech32('ed25519_pk')).toBe(owner);
-    expect(params.operator().to_bech32('pool')).toBe(poolKeyHash);
+    expect(params.operator().to_bech32('pool')).toBe(poolId);
     const relays = params.relays();
     expect(relays.len()).toBe(3);
     expect(Buffer.from(params.vrf_keyhash().to_bytes()).toString('hex')).toBe(vrf);
@@ -88,8 +90,8 @@ describe('coreToCsl.certificate', () => {
   });
 
   it('poolRetirement', () => {
-    const retirement = coreToCsl.certificate.poolRetirement(poolKeyHash, 1000).as_pool_retirement()!;
-    expect(retirement.pool_keyhash().to_bech32('pool')).toEqual(poolKeyHash);
+    const retirement = coreToCsl.certificate.poolRetirement(poolId, 1000).as_pool_retirement()!;
+    expect(retirement.pool_keyhash().to_bech32('pool')).toEqual(poolId);
     expect(retirement.epoch()).toEqual(1000);
   });
 });

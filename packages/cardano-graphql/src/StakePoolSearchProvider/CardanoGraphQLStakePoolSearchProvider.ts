@@ -61,6 +61,7 @@ export const createGraphQLStakePoolSearchProvider = (
               }
             },
             pledge: BigInt(stakePool.pledge),
+            rewardAccount: Cardano.RewardAccount(stakePool.rewardAccount),
             transactions: {
               registration: stakePool.transactions.registration.map(Cardano.TransactionId),
               retirement: stakePool.transactions.retirement.map(Cardano.TransactionId)
