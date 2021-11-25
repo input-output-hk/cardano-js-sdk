@@ -203,10 +203,10 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
     const response = await blockfrost.txsMirs(hash);
     return response.map(({ address, amount, cert_index, pot }) => ({
       __typename: Cardano.CertificateType.MIR,
-      address: Cardano.Address(address),
       certIndex: cert_index,
       pot,
-      quantity: BigInt(amount)
+      quantity: BigInt(amount),
+      rewardAccount: Cardano.RewardAccount(address)
     }));
   };
 

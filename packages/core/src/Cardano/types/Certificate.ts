@@ -1,4 +1,4 @@
-import { Address, Epoch, Hash32ByteBase16, Lovelace, PoolId, PoolParameters, RewardAccount } from '.';
+import { Epoch, Hash32ByteBase16, Lovelace, PoolId, PoolParameters, RewardAccount } from '.';
 
 export enum CertificateType {
   StakeKeyRegistration = 'StakeKeyRegistration',
@@ -37,8 +37,7 @@ export interface StakeDelegationCertificate {
 
 export interface MirCertificate {
   __typename: CertificateType.MIR;
-  // Review: need to learn what this cert is and figure out if 'address' is actually an Address or a RewardAccount
-  address: Address;
+  rewardAccount: RewardAccount;
   quantity: Lovelace;
   pot: 'reserve' | 'treasury';
 }
