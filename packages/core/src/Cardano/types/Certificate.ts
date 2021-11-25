@@ -45,7 +45,7 @@ export interface MirCertificate {
 
 export interface GenesisKeyDelegationCertificate {
   __typename: CertificateType.GenesisKeyDelegation;
-  // Review: need to find examples of these hashes to figure out type and length
+  // TODO: need to find examples of these hashes to figure out type and length
   genesisHash: Hash32ByteBase16;
   genesisDelegateHash: Hash32ByteBase16;
   vrfKeyHash: Hash32ByteBase16;

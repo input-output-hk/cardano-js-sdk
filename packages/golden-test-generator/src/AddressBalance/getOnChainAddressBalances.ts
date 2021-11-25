@@ -37,7 +37,6 @@ export const getOnChainAddressBalances = (
   const trackedAddressBalances: AddressBalances = Object.fromEntries(
     addresses.map((address) => [address, { assets: {}, coins: 0 }])
   );
-  // TODO: Review: should this be refactored too? Haven't done anything with golden-test-generator yet
   const trackedTxs: ({ id: Schema.Hash16 } & Schema.Tx)[] = [];
   // eslint-disable-next-line sonarjs/cognitive-complexity
   return new Promise(async (resolve, reject) => {

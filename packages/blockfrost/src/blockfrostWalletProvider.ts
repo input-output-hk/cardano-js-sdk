@@ -150,8 +150,7 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
               return purpose;
           }
         })(),
-        // TODO: need to confirm that this is correct encoding
-        scriptHash: Buffer.from(script_hash, 'hex').toString('base64')
+        scriptHash: Cardano.Hash28ByteBase16(script_hash)
       })
     );
   };
@@ -309,7 +308,8 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
       txSize: response.size,
       witness: {
         redeemers: await fetchRedeemers(response),
-        signatures: {}
+        // Review: not available in blockfrost? Or should it only be on NewTxAlonzo type?
+        signatures: new Map()
       }
     };
   };

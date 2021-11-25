@@ -96,9 +96,7 @@ describe('coreToCsl', () => {
       body: coreTxBody,
       id: Cardano.TransactionId('886206542d63b23a047864021fbfccf291d78e47c1e59bd4c75fbc67b248c5e8'),
       witness: {
-        signatures: {
-          [vkey]: Cardano.Ed25519Signature(signature)
-        }
+        signatures: new Map([[Cardano.Ed25519PublicKey(vkey), Cardano.Ed25519Signature(signature)]])
       }
     };
     const cslTx = coreToCsl.tx(coreTx);

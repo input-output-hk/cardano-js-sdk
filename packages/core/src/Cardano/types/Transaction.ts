@@ -57,8 +57,12 @@ export interface TxBodyAlonzo {
   withdrawals?: Withdrawal[];
   certificates?: Cardano.Certificate[];
   mint?: Cardano.TokenMap;
-  scriptIntegrityHash?: Hash32ByteBase16; // TODO: Review: need to find an example of this to verify type and length
-  requiredExtraSignatures?: Hash32ByteBase16[]; // TODO: Review: need to find an example of this to verify type and length
+  scriptIntegrityHash?: Cardano.Hash28ByteBase16;
+  // TODO: need to find an example of this to verify type and length
+  // This is the type we use for witness object keys too, which kinda
+  // makes sense to have as bech32, because you might want to display
+  // it to the user to show who signed the tx
+  requiredExtraSignatures?: Cardano.Ed25519PublicKey[];
 }
 
 /**
@@ -78,18 +82,13 @@ export interface ImplicitCoin {
 export interface Redeemer {
   index: number;
   purpose: 'spend' | 'mint' | 'certificate' | 'withdrawal';
-  scriptHash: Cardano.Hash64;
+  scriptHash: Cardano.Hash28ByteBase16;
   executionUnits: Cardano.ExUnits;
 }
 
 export type Witness = Omit<Partial<BlockBodyAlonzo['witness']>, 'redeemers' | 'signatures'> & {
   redeemers?: Redeemer[];
-  /**
-   * Key type is Ed25519PublicKey
-   */
-  signatures: Partial<{
-    [k: string]: Ed25519Signature;
-  }>;
+  signatures: Map<Ed25519PublicKey, Ed25519Signature>;
 };
 
 export interface TxAlonzo {

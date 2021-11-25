@@ -112,13 +112,10 @@ export const txBody = ({
 export const tx = ({ body, witness }: Cardano.NewTxAlonzo): Transaction => {
   const witnessSet = TransactionWitnessSet.new();
   const vkeyWitnesses = Vkeywitnesses.new();
-  for (const vkey in witness.signatures) {
-    if (Object.prototype.hasOwnProperty.call(witness.signatures, vkey)) {
-      const signature = witness.signatures[vkey]!;
-      const publicKey = PublicKey.from_bech32(vkey);
-      const vkeyWitness = Vkeywitness.new(Vkey.new(publicKey), Ed25519Signature.from_hex(signature.toString()));
-      vkeyWitnesses.add(vkeyWitness);
-    }
+  for (const [vkey, signature] of witness.signatures.entries()) {
+    const publicKey = PublicKey.from_bech32(vkey.toString());
+    const vkeyWitness = Vkeywitness.new(Vkey.new(publicKey), Ed25519Signature.from_hex(signature.toString()));
+    vkeyWitnesses.add(vkeyWitness);
   }
   witnessSet.set_vkeys(vkeyWitnesses);
   return Transaction.new(coreToCsl.txBody(body), witnessSet);

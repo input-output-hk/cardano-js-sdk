@@ -26,6 +26,6 @@ export interface AuxiliaryDataBody {
 }
 
 export interface AuxiliaryData {
-  hash?: Cardano.Hash32ByteBase16; // TODO: Review: need to find an example of this to verify type and length
+  hash?: Cardano.Hash32ByteBase16; // TODO: need to find an example of this to verify type and length
   body: AuxiliaryDataBody;
 }

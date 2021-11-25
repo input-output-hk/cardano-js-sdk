@@ -33,7 +33,7 @@ describe('InMemoryKeyManager', () => {
       } as unknown as Cardano.TxBodyAlonzo,
       hash: Cardano.TransactionId('8561258e210352fba2ac0488afed67b3427a27ccf1d41ec030c98a8199bc22ec')
     });
-    expect(Object.keys(witnessSet)).toHaveLength(2);
-    expect(typeof witnessSet[Object.keys(witnessSet)[0]]).toBe('string');
+    expect(witnessSet.size).toBe(2);
+    expect(typeof [...witnessSet.values()][0]).toBe('string');
   });
 });

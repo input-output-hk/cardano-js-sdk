@@ -9,7 +9,7 @@ export interface Fraction {
   denominator: number;
 }
 export interface PoolMetadataJson {
-  hash: Hash32ByteBase16; // TODO: verify this is the correct length (64 chars)
+  hash: Hash32ByteBase16;
   url: string;
 }
 

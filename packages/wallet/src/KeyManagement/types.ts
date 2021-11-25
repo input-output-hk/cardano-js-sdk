@@ -40,6 +40,5 @@ export interface KeyManager {
     signingIndex: number,
     message: string
   ) => Promise<{ publicKey: string; signature: string }>;
-  // TODO: make signatures object key type clear with type alias
   signTransaction: (tx: TxInternals) => Promise<Cardano.Witness['signatures']>;
 }

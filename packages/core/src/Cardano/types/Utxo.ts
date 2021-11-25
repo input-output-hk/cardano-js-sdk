@@ -10,7 +10,7 @@ export interface TxIn {
 export interface TxOut {
   address: Address;
   value: Value;
-  datum?: Hash32ByteBase16; // TODO: Review: need to find an example of this to verify type and length
+  datum?: Hash32ByteBase16;
 }
 
 export type Utxo = [TxIn, TxOut];

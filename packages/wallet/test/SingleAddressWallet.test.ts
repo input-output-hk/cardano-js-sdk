@@ -113,7 +113,7 @@ describe('SingleAddressWallet', () => {
       const tx = await wallet.finalizeTx(txInternals);
       expect(tx.body).toBe(txInternals.body);
       expect(tx.id).toBe(txInternals.hash);
-      expect(Object.keys(tx.witness.signatures)).toHaveLength(1);
+      expect(tx.witness.signatures.size).toBe(1);
     });
 
     it('submitTx', async () => {
