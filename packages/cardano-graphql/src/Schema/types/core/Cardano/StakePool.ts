@@ -68,7 +68,7 @@ export class StakePoolTransactions implements Cardano.StakePoolTransactions {
 @ObjectType()
 export class StakePoolMetadataJson implements Cardano.PoolMetadataJson {
   @Field(() => String)
-  hash: Cardano.Hash16;
+  hash: Cardano.Hash32ByteBase16;
   @Field()
   url: string;
 }
@@ -131,7 +131,7 @@ export class StakePoolMetadata implements Cardano.StakePoolMetadata {
   @Field({ nullable: true })
   extSigUrl?: string;
   @Field(() => String, { nullable: true })
-  extVkey?: Cardano.Hash16;
+  extVkey?: Cardano.Hash32ByteBase16;
   @Field(() => ExtendedStakePoolMetadata, { nullable: true })
   @Directive('@hasInverse(field: metadata)')
   ext?: Cardano.ExtendedStakePoolMetadata;

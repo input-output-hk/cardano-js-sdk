@@ -1,4 +1,4 @@
-import { Hash16 } from '../../util';
+import { Hash32ByteBase16 } from '../../util';
 import { Lovelace } from '../Value';
 import { PoolId, VrfKeyHash } from './primitives';
 import { Relay } from './Relay';
@@ -9,7 +9,7 @@ export interface Fraction {
   denominator: number;
 }
 export interface PoolMetadataJson {
-  hash: Hash16; // TODO: verify this is the correct length (64 chars)
+  hash: Hash32ByteBase16; // TODO: verify this is the correct length (64 chars)
   url: string;
 }
 

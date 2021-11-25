@@ -1,4 +1,9 @@
-import { Hash16, assertIsBech32WithPrefix, assertIsHexString } from '../../../src/Cardano/util';
+import {
+  Hash28ByteBase16,
+  Hash32ByteBase16,
+  assertIsBech32WithPrefix,
+  assertIsHexString
+} from '../../../src/Cardano/util';
 import { InvalidStringError } from '../../../src/errors';
 
 describe('Cardano.util/primitives', () => {
@@ -67,19 +72,37 @@ describe('Cardano.util/primitives', () => {
     });
   });
 
-  describe('Hash16', () => {
+  describe('Hash32ByteBase16', () => {
     it('expects a hex string with length of 64', () => {
-      expect(() => Hash16('3e33018e8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d')).not.toThrow();
+      expect(() => Hash32ByteBase16('3e33018e8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d')).not.toThrow();
     });
 
     it('throws with non-hex string', () => {
-      expect(() => Hash16('ge33018e8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d')).toThrowError(
+      expect(() => Hash32ByteBase16('ge33018e8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d')).toThrowError(
         InvalidStringError
       );
     });
 
     it('throws with hex string of different length', () => {
-      expect(() => Hash16('e33018e8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d')).toThrowError(
+      expect(() => Hash32ByteBase16('e33018e8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d')).toThrowError(
+        InvalidStringError
+      );
+    });
+  });
+
+  describe('Hash28ByteBase16', () => {
+    it('expects a hex string with length of 64', () => {
+      expect(() => Hash28ByteBase16('8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d')).not.toThrow();
+    });
+
+    it('throws with non-hex string', () => {
+      expect(() => Hash28ByteBase16('g293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d')).toThrowError(
+        InvalidStringError
+      );
+    });
+
+    it('throws with hex string of different length', () => {
+      expect(() => Hash28ByteBase16('293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d')).toThrowError(
         InvalidStringError
       );
     });

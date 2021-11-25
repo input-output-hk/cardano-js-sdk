@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Hash16, OpaqueString, assertIsBech32WithPrefix, assertIsHexString } from '../../util';
+import { Hash28ByteBase16, Hash32ByteBase16, OpaqueString, assertIsBech32WithPrefix } from '../../util';
 
 /**
  * pool operator verification key hash as bech32 string
@@ -18,24 +18,21 @@ export const PoolId = (value: string): PoolId => {
 /**
  * pool operator verification key hash as hex string
  */
-export type PoolIdHex = OpaqueString<'PoolIdHex'>;
+export type PoolIdHex = Hash28ByteBase16<'PoolIdHex'>;
 
 /**
  * @param {string} value operator verification key hash as hex string
  * @throws InvalidStringError
  */
-export const PoolIdHex = (value: string): PoolIdHex => {
-  assertIsHexString(value, 56);
-  return value as any as PoolIdHex;
-};
+export const PoolIdHex = (value: string): PoolIdHex => Hash28ByteBase16(value);
 
 /**
  * VRF key hash as hex string
  */
-export type VrfKeyHash = Hash16<'VrfKeyHash'>;
+export type VrfKeyHash = Hash32ByteBase16<'VrfKeyHash'>;
 
 /**
  * @param {string} value VRF key hash as hex string
  * @throws InvalidStringError
  */
-export const VrfKeyHash = (value: string): VrfKeyHash => Hash16<'VrfKeyHash'>(value);
+export const VrfKeyHash = (value: string): VrfKeyHash => Hash32ByteBase16<'VrfKeyHash'>(value);

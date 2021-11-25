@@ -16,7 +16,7 @@ type GraphqlStakePool = NonNullable<
   NonNullable<Awaited<ReturnType<ReturnType<typeof getSdk>['StakePoolsByMetadata']>>['queryStakePoolMetadata']>[0]
 >['stakePool'];
 
-const toCoreStakePool = (responseStakePool: Awaited<GraphqlStakePool>) => {
+const toCoreStakePool = (responseStakePool: GraphqlStakePool) => {
   const stakePool = util.replaceNullsWithUndefineds(responseStakePool);
   return {
     ...stakePool,
@@ -35,13 +35,13 @@ const toCoreStakePool = (responseStakePool: Awaited<GraphqlStakePool>) => {
                 }
               }
             : undefined,
-          extVkey: stakePool.metadata.extVkey ? Cardano.Hash16(stakePool.metadata.extVkey) : undefined
+          extVkey: stakePool.metadata.extVkey ? Cardano.Hash32ByteBase16(stakePool.metadata.extVkey) : undefined
         }
       : undefined,
     metadataJson: stakePool.metadataJson
       ? {
           ...stakePool.metadataJson,
-          hash: Cardano.Hash16(stakePool.metadataJson.hash)
+          hash: Cardano.Hash32ByteBase16(stakePool.metadataJson.hash)
         }
       : undefined,
     metrics: {

@@ -59,17 +59,32 @@ export const assertIsHexString = (target: string, expectedLength?: number): void
   }
 };
 
-/**
- * hash as hex string
- */
-export type Hash16<T extends string = 'Hash16'> = OpaqueString<T>;
+const hashNByteBase16 = <T>(value: string, length: number): T => {
+  assertIsHexString(value, length);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return value as any as T;
+};
 
 /**
- * @param {string} value block hash as hex string
+ * 32 byte hash as hex string
+ */
+export type Hash32ByteBase16<T extends string = 'Hash32ByteBase16'> = OpaqueString<T>;
+
+/**
+ * @param {string} value 32 byte hash as hex string
  * @throws InvalidStringError
  */
-export const Hash16 = <T extends string = 'Hash16'>(value: string): Hash16<T> => {
-  assertIsHexString(value, 64);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return value as any as Hash16<T>;
-};
+export const Hash32ByteBase16 = <T extends string = 'Hash32ByteBase16'>(value: string): Hash32ByteBase16<T> =>
+  hashNByteBase16<Hash32ByteBase16<T>>(value, 64);
+
+/**
+ * 28 byte hash as hex string
+ */
+export type Hash28ByteBase16<T extends string = 'Hash28ByteBase16'> = OpaqueString<T>;
+
+/**
+ * @param {string} value 28 byte hash as hex string
+ * @throws InvalidStringError
+ */
+export const Hash28ByteBase16 = <T extends string = 'Hash28ByteBase16'>(value: string): Hash28ByteBase16<T> =>
+  hashNByteBase16<Hash32ByteBase16<T>>(value, 56);

@@ -3,7 +3,7 @@ import { CustomError } from 'ts-custom-error';
 import { util } from '../../util';
 
 export { Hash64, Epoch, Tip, Slot, ExUnits } from '@cardano-ogmios/schema';
-export { Hash16 } from '../util';
+export { Hash32ByteBase16, Hash28ByteBase16 } from '../util';
 export * from './Address';
 export * from './RewardAccount';
 export * from './StakePool';

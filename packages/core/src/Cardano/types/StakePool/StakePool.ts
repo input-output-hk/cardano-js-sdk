@@ -1,5 +1,5 @@
 import { ExtendedStakePoolMetadata } from './ExtendedStakePoolMetadata';
-import { Hash16, Lovelace, TransactionId } from '..';
+import { Hash32ByteBase16, Lovelace, TransactionId } from '..';
 import { PoolIdHex } from './primitives';
 import { PoolParameters } from './PoolParameters';
 
@@ -27,7 +27,7 @@ export interface Cip6MetadataFields {
    * the public Key for verification
    * optional, 68 Characters
    */
-  extVkey?: Hash16;
+  extVkey?: Hash32ByteBase16;
 }
 
 export interface StakePoolMetadataFields {

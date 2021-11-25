@@ -41,7 +41,7 @@ export const txOut = (output: CSL.TransactionOutput): Cardano.TxOut => {
   const dataHashBytes = output.data_hash()?.to_bytes();
   return {
     address: Cardano.Address(output.address().to_bech32()),
-    datum: dataHashBytes ? Cardano.Hash16(Buffer.from(dataHashBytes).toString('hex')) : undefined,
+    datum: dataHashBytes ? Cardano.Hash32ByteBase16(Buffer.from(dataHashBytes).toString('hex')) : undefined,
     value: value(output.amount())
   };
 };

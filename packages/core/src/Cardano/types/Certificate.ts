@@ -1,4 +1,4 @@
-import { Address, Epoch, Hash16, Lovelace, PoolId, PoolParameters, RewardAccount } from '.';
+import { Address, Epoch, Hash32ByteBase16, Lovelace, PoolId, PoolParameters, RewardAccount } from '.';
 
 export enum CertificateType {
   StakeKeyRegistration = 'StakeKeyRegistration',
@@ -46,9 +46,9 @@ export interface MirCertificate {
 export interface GenesisKeyDelegationCertificate {
   __typename: CertificateType.GenesisKeyDelegation;
   // Review: need to find examples of these hashes to figure out type and length
-  genesisHash: Hash16;
-  genesisDelegateHash: Hash16;
-  vrfKeyHash: Hash16;
+  genesisHash: Hash32ByteBase16;
+  genesisDelegateHash: Hash32ByteBase16;
+  vrfKeyHash: Hash32ByteBase16;
 }
 
 export type Certificate =
