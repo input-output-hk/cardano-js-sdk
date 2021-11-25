@@ -1,6 +1,6 @@
-import { Ed25519KeyHash, PoolId, VrfKeyHash } from './primitives';
 import { Hash16 } from '../../util';
 import { Lovelace } from '../Value';
+import { PoolId, VrfKeyHash } from './primitives';
 import { Relay } from './Relay';
 import { RewardAccount } from '../RewardAccount';
 
@@ -37,6 +37,6 @@ export interface PoolParameters {
    */
   relays: Relay[];
 
-  owners: Ed25519KeyHash[];
+  owners: RewardAccount[];
   vrf: VrfKeyHash;
 }

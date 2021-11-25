@@ -52,7 +52,7 @@ const toCoreStakePool = (responseStakePool: Awaited<GraphqlStakePool>) => {
         live: BigInt(stakePool.metrics.stake.live)
       }
     },
-    owners: stakePool.owners.map(Cardano.Ed25519KeyHash),
+    owners: stakePool.owners.map(Cardano.RewardAccount),
     pledge: BigInt(stakePool.pledge),
     rewardAccount: Cardano.RewardAccount(stakePool.rewardAccount),
     transactions: {

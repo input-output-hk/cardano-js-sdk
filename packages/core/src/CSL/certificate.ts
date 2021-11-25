@@ -99,7 +99,7 @@ export const poolRegistration = ({
 }: Cardano.PoolParameters) => {
   const cslOwners = Ed25519KeyHashes.new();
   for (const owner of owners) {
-    const hash = Ed25519KeyHash.from_bytes(Buffer.from(owner, 'hex'));
+    const hash = RewardAddress.from_address(Address.from_bech32(owner.toString()))!.payment_cred().to_keyhash()!;
     cslOwners.add(hash);
   }
   const cslRelays = createCslRelays(relays);

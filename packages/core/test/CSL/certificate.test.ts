@@ -42,7 +42,7 @@ describe('coreToCsl.certificate', () => {
   });
 
   it('poolRegistration', () => {
-    const owner = Cardano.Ed25519KeyHash('4f422168f468aeba6b472c90bb98c3162035f79c28ae15a2e02fc52f');
+    const owner = Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr');
     const vrf = Cardano.VrfKeyHash('8dd154228946bd12967c12bedb1cb6038b78f8b84a1760b1a788fa72a4af3db0');
     const rewardAccount = stakeKey;
     const metadataJson = {
@@ -78,7 +78,11 @@ describe('coreToCsl.certificate', () => {
     expect(margin.denominator().to_str()).toBe('5');
     const owners = params.pool_owners();
     expect(owners.len()).toBe(1);
-    expect(Buffer.from(owners.get(0).to_bytes()).toString('hex')).toBe(owner);
+    expect(
+      CSL.RewardAddress.new(1, CSL.StakeCredential.from_keyhash(owners.get(0)))
+        .to_address()
+        .to_bech32()
+    ).toBe(owner);
     expect(params.operator().to_bech32('pool')).toBe(poolId);
     const relays = params.relays();
     expect(relays.len()).toBe(3);

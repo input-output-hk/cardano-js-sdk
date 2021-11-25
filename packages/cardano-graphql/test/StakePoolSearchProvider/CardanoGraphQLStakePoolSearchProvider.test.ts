@@ -64,7 +64,7 @@ describe('StakePoolSearchClient', () => {
                 live: '12344'
               }
             },
-            owners: ['4f422168f468aeba6b472c90bb98c3162035f79c28ae15a2e02fc52f'],
+            owners: ['stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27'],
             pledge: '1235',
             relays: [
               { __typename: 'RelayByName', hostname: 'http://relay', port: 156 },

@@ -30,21 +30,6 @@ export const PoolIdHex = (value: string): PoolIdHex => {
 };
 
 /**
- * Ed25519 key hash as hex string
- */
-export type Ed25519KeyHash = OpaqueString<'Ed25519KeyHash'>;
-
-/**
- * @param {string} value Ed25519 key hash as hex string
- * @throws InvalidStringError
- */
-export const Ed25519KeyHash = (value: string): Ed25519KeyHash => {
-  assertIsHexString(value, 56);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return value as any as Ed25519KeyHash;
-};
-
-/**
  * VRF key hash as hex string
  */
 export type VrfKeyHash = Hash16<'VrfKeyHash'>;
