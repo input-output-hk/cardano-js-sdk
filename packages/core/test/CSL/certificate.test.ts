@@ -42,11 +42,11 @@ describe('coreToCsl.certificate', () => {
   });
 
   it('poolRegistration', () => {
-    const owner = 'ed25519_pk1fapzz685dzht56689jgthxxrzcsrtauu9zhptghq9lzj7w8xara';
-    const vrf = '8dd154228946bd12967c12bedb1cb6038b78f8b84a1760b1a788fa72a4af3db0';
+    const owner = Cardano.Ed25519KeyHash('4f422168f468aeba6b472c90bb98c3162035f79c28ae15a2e02fc52f');
+    const vrf = Cardano.VrfKeyHash('8dd154228946bd12967c12bedb1cb6038b78f8b84a1760b1a788fa72a4af3db0');
     const rewardAccount = stakeKey;
     const metadataJson = {
-      hash: 'pool1ntpzzu5g6xhqkns4csd435lqtgfjqm7e4wquk9v58eqhf0esey9st6vf29',
+      hash: Cardano.Hash16('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5'),
       url: 'https://example.com'
     };
     const params = coreToCsl.certificate
@@ -78,7 +78,7 @@ describe('coreToCsl.certificate', () => {
     expect(margin.denominator().to_str()).toBe('5');
     const owners = params.pool_owners();
     expect(owners.len()).toBe(1);
-    expect(owners.get(0).to_bech32('ed25519_pk')).toBe(owner);
+    expect(Buffer.from(owners.get(0).to_bytes()).toString('hex')).toBe(owner);
     expect(params.operator().to_bech32('pool')).toBe(poolId);
     const relays = params.relays();
     expect(relays.len()).toBe(3);
@@ -86,7 +86,7 @@ describe('coreToCsl.certificate', () => {
     expect(params.reward_account().to_address().to_bech32('stake')).toBe(rewardAccount);
     const metadata = params.pool_metadata()!;
     expect(metadata.url().url()).toBe(metadataJson.url);
-    expect(metadata.pool_metadata_hash().to_bech32('pool')).toBe(metadataJson.hash);
+    expect(Buffer.from(metadata.pool_metadata_hash().to_bytes()).toString('hex')).toBe(metadataJson.hash);
   });
 
   it('poolRetirement', () => {

@@ -58,3 +58,18 @@ export const assertIsHexString = (target: string, expectedLength?: number): void
     throw new InvalidStringError('expected hex string');
   }
 };
+
+/**
+ * hash as hex string
+ */
+export type Hash16<T extends string = 'Hash16'> = OpaqueString<T>;
+
+/**
+ * @param {string} value block hash as hex string
+ * @throws InvalidStringError
+ */
+export const Hash16 = <T extends string = 'Hash16'>(value: string): Hash16<T> => {
+  assertIsHexString(value, 64);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return value as any as Hash16<T>;
+};

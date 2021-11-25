@@ -2,7 +2,8 @@ import * as Ogmios from '@cardano-ogmios/schema';
 import { CustomError } from 'ts-custom-error';
 import { util } from '../../util';
 
-export { Hash16, Hash64, Epoch, Tip, PoolMetadata, Slot, ExUnits } from '@cardano-ogmios/schema';
+export { Hash64, Epoch, Tip, Slot, ExUnits } from '@cardano-ogmios/schema';
+export { Hash16 } from '../util';
 export * from './Address';
 export * from './RewardAccount';
 export * from './StakePool';

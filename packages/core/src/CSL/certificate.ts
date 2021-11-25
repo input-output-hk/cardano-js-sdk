@@ -99,7 +99,8 @@ export const poolRegistration = ({
 }: Cardano.PoolParameters) => {
   const cslOwners = Ed25519KeyHashes.new();
   for (const owner of owners) {
-    cslOwners.add(Ed25519KeyHash.from_bech32(owner));
+    const hash = Ed25519KeyHash.from_bytes(Buffer.from(owner, 'hex'));
+    cslOwners.add(hash);
   }
   const cslRelays = createCslRelays(relays);
   const poolParams = PoolParams.new(
@@ -112,7 +113,7 @@ export const poolRegistration = ({
     cslOwners,
     cslRelays,
     metadataJson
-      ? PoolMetadata.new(URL.new(metadataJson.url), PoolMetadataHash.from_bech32(metadataJson.hash))
+      ? PoolMetadata.new(URL.new(metadataJson.url), PoolMetadataHash.from_bytes(Buffer.from(metadataJson.hash, 'hex')))
       : undefined
   );
   return Certificate.new_pool_registration(PoolRegistration.new(poolParams));

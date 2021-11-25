@@ -1,5 +1,5 @@
+import { Hash16, assertIsBech32WithPrefix, assertIsHexString } from '../../../src/Cardano/util';
 import { InvalidStringError } from '../../../src/errors';
-import { assertIsBech32WithPrefix, assertIsHexString } from '../../../src/Cardano/util';
 
 describe('Cardano.util/primitives', () => {
   describe('assertIsBech32WithPrefix', () => {
@@ -64,6 +64,24 @@ describe('Cardano.util/primitives', () => {
     it('throws when string has an non base16 character', () => {
       expect(() => assertIsHexString(' 1234567890abcdef')).toThrowError(InvalidStringError);
       expect(() => assertIsHexString('1234567890abcdefg')).toThrowError(InvalidStringError);
+    });
+  });
+
+  describe('Hash16', () => {
+    it('expects a hex string with length of 64', () => {
+      expect(() => Hash16('3e33018e8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d')).not.toThrow();
+    });
+
+    it('throws with non-hex string', () => {
+      expect(() => Hash16('ge33018e8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d')).toThrowError(
+        InvalidStringError
+      );
+    });
+
+    it('throws with hex string of different length', () => {
+      expect(() => Hash16('e33018e8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d')).toThrowError(
+        InvalidStringError
+      );
     });
   });
 });

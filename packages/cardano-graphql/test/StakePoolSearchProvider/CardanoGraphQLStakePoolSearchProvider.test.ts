@@ -23,8 +23,8 @@ describe('StakePoolSearchClient', () => {
         queryStakePool: [
           {
             cost: '123',
-            hexId: 'e4b1c8ec89415ce6349755a1aa44b4affbb5f1248ff29943d190c715',
-            id: 'pool1ujcu3myfg9wwvdyh2ks653954lamtufy3lefjs73jrr327q53j4',
+            hexId: '52e22df52e90370f639c99f5c760f0cd67d7f871cd0d0764fae47cd9',
+            id: 'pool12t3zmafwjqms7cuun86uwc8se4na07r3e5xswe86u37djr5f0lx',
             margin: {
               denominator: 3,
               numerator: 1
@@ -34,20 +34,20 @@ describe('StakePoolSearchClient', () => {
               ext: {
                 pool: {
                   country: 'LT',
-                  id: 'e4b1c8ec89415ce6349755a1aa44b4affbb5f1248ff29943d190c715',
+                  id: '52e22df52e90370f639c99f5c760f0cd67d7f871cd0d0764fae47cd9',
                   status: ExtendedPoolStatus.Active
                 },
                 serial: 123
               },
               extDataUrl: 'http://extdata',
               extSigUrl: 'http://extsig',
-              extVkey: '2abc',
+              extVkey: '886206542d63b23a047864021fbfccf291d78e47c1e59bd4c75fbc67b248c5e8',
               homepage: 'http://homepage',
               name: 'some pool',
               ticker: 'TICKR'
             },
             metadataJson: {
-              hash: '1abc',
+              hash: '886206542d63b23a047864021fbfccf291d78e47c1e59bd4c75fbc67b248c5e8',
               url: 'http://someurl'
             },
             metrics: {
@@ -64,7 +64,7 @@ describe('StakePoolSearchClient', () => {
                 live: '12344'
               }
             },
-            owners: ['5bd'],
+            owners: ['4f422168f468aeba6b472c90bb98c3162035f79c28ae15a2e02fc52f'],
             pledge: '1235',
             relays: [
               { __typename: 'RelayByName', hostname: 'http://relay', port: 156 },
@@ -76,7 +76,7 @@ describe('StakePoolSearchClient', () => {
               registration: ['4123d70f66414cc921f6ffc29a899aafc7137a99a0fd453d6b200863ef5702d6'],
               retirement: ['01d7366549986d83edeea262e97b68eca3430d3bb052ed1c37d2202fd5458872']
             },
-            vrf: '76bc'
+            vrf: '8dd154228946bd12967c12bedb1cb6038b78f8b84a1760b1a788fa72a4af3db0'
           }
         ]
       };

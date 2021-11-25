@@ -1,6 +1,7 @@
 import { ExtendedStakePoolMetadata } from './ExtendedStakePoolMetadata';
-import { Hash16, Lovelace, PoolParameters, TransactionId } from '..';
+import { Hash16, Lovelace, TransactionId } from '..';
 import { PoolIdHex } from './primitives';
+import { PoolParameters } from './PoolParameters';
 
 /**
  * Within range [0; 1]
@@ -21,11 +22,12 @@ export interface Cip6MetadataFields {
    * 128 Characters Maximum, must be a valid URL
    */
   extSigUrl?: string;
+  // TODO: this is probably wrong, as CIP says it's 68 characters long. Find and validate the correct format.
   /**
    * the public Key for verification
    * optional, 68 Characters
    */
-  extVkey?: Hash16; // TODO: Review: need to find an example of this to verify type and length
+  extVkey?: Hash16;
 }
 
 export interface StakePoolMetadataFields {

@@ -2,22 +2,19 @@
 import * as Cardano from '.';
 import { AuxiliaryData } from './AuxiliaryData';
 import { BlockBodyAlonzo } from '@cardano-ogmios/schema';
-import { OpaqueString, assertIsBech32WithPrefix, assertIsHexString } from '../util';
+import { Hash16, OpaqueString, assertIsBech32WithPrefix, assertIsHexString } from '../util';
 import { PartialBlockHeader } from './Block';
 
 /**
  * transaction hash as hex string
  */
-export type TransactionId = OpaqueString<'TransactionId'>;
+export type TransactionId = Hash16<'TransactionId'>;
 
 /**
  * @param {string} value transaction hash as hex string
  * @throws InvalidStringError
  */
-export const TransactionId = (value: string): TransactionId => {
-  assertIsHexString(value, 64);
-  return value as any as TransactionId;
-};
+export const TransactionId = (value: string): TransactionId => Hash16<'TransactionId'>(value);
 
 /**
  * Ed25519 signature as hex string
@@ -60,8 +57,8 @@ export interface TxBodyAlonzo {
   withdrawals?: Withdrawal[];
   certificates?: Cardano.Certificate[];
   mint?: Cardano.TokenMap;
-  scriptIntegrityHash?: Cardano.Hash16; // TODO: Review: need to find an example of this to verify type and length
-  requiredExtraSignatures?: Cardano.Hash16[]; // TODO: Review: need to find an example of this to verify type and length
+  scriptIntegrityHash?: Hash16; // TODO: Review: need to find an example of this to verify type and length
+  requiredExtraSignatures?: Hash16[]; // TODO: Review: need to find an example of this to verify type and length
 }
 
 /**

@@ -11,6 +11,58 @@ import { getSdk } from '../sdk';
 
 export type GraphQLClien = GraphQLClient['options'];
 
+type Awaited<T> = T extends PromiseLike<infer U> ? U : T;
+type GraphqlStakePool = NonNullable<
+  NonNullable<Awaited<ReturnType<ReturnType<typeof getSdk>['StakePoolsByMetadata']>>['queryStakePoolMetadata']>[0]
+>['stakePool'];
+
+const toCoreStakePool = (responseStakePool: Awaited<GraphqlStakePool>) => {
+  const stakePool = util.replaceNullsWithUndefineds(responseStakePool);
+  return {
+    ...stakePool,
+    cost: BigInt(stakePool.cost),
+    hexId: Cardano.PoolIdHex(stakePool.hexId),
+    id: Cardano.PoolId(stakePool.id),
+    metadata: stakePool.metadata
+      ? {
+          ...stakePool.metadata,
+          ext: stakePool.metadata.ext
+            ? {
+                ...stakePool.metadata.ext,
+                pool: {
+                  ...stakePool.metadata.ext.pool,
+                  id: Cardano.PoolIdHex(stakePool.metadata.ext.pool.id)
+                }
+              }
+            : undefined,
+          extVkey: stakePool.metadata.extVkey ? Cardano.Hash16(stakePool.metadata.extVkey) : undefined
+        }
+      : undefined,
+    metadataJson: stakePool.metadataJson
+      ? {
+          ...stakePool.metadataJson,
+          hash: Cardano.Hash16(stakePool.metadataJson.hash)
+        }
+      : undefined,
+    metrics: {
+      ...stakePool.metrics!,
+      livePledge: BigInt(stakePool.metrics.livePledge),
+      stake: {
+        active: BigInt(stakePool.metrics.stake.active),
+        live: BigInt(stakePool.metrics.stake.live)
+      }
+    },
+    owners: stakePool.owners.map(Cardano.Ed25519KeyHash),
+    pledge: BigInt(stakePool.pledge),
+    rewardAccount: Cardano.RewardAccount(stakePool.rewardAccount),
+    transactions: {
+      registration: stakePool.transactions.registration.map(Cardano.TransactionId),
+      retirement: stakePool.transactions.retirement.map(Cardano.TransactionId)
+    },
+    vrf: Cardano.VrfKeyHash(stakePool.vrf)
+  };
+};
+
 export const createGraphQLStakePoolSearchProvider = (
   url: string,
   options?: RequestInit,
@@ -31,43 +83,7 @@ export const createGraphQLStakePoolSearchProvider = (
           ...(byStakePoolFields || []),
           ...(byMetadataFields.queryStakePoolMetadata || []).map((sp) => sp?.stakePool)
         ].filter(util.isNotNil);
-        return responseStakePools.map((responseStakePool) => {
-          const stakePool = util.replaceNullsWithUndefineds(responseStakePool);
-          return {
-            ...stakePool,
-            cost: BigInt(stakePool.cost),
-            hexId: Cardano.PoolIdHex(stakePool.hexId),
-            id: Cardano.PoolId(stakePool.id),
-            metadata: stakePool.metadata
-              ? {
-                  ...stakePool.metadata,
-                  ext: stakePool.metadata.ext
-                    ? {
-                        ...stakePool.metadata.ext,
-                        pool: {
-                          ...stakePool.metadata.ext.pool,
-                          id: Cardano.PoolIdHex(stakePool.metadata.ext.pool.id)
-                        }
-                      }
-                    : undefined
-                }
-              : undefined,
-            metrics: {
-              ...stakePool.metrics!,
-              livePledge: BigInt(stakePool.metrics.livePledge),
-              stake: {
-                active: BigInt(stakePool.metrics.stake.active),
-                live: BigInt(stakePool.metrics.stake.live)
-              }
-            },
-            pledge: BigInt(stakePool.pledge),
-            rewardAccount: Cardano.RewardAccount(stakePool.rewardAccount),
-            transactions: {
-              registration: stakePool.transactions.registration.map(Cardano.TransactionId),
-              retirement: stakePool.transactions.retirement.map(Cardano.TransactionId)
-            }
-          };
-        });
+        return responseStakePools.map(toCoreStakePool);
       } catch (error) {
         const failure = error instanceof InvalidStringError ? ProviderFailure.InvalidResponse : ProviderFailure.Unknown;
         throw new ProviderError(failure, error);
