@@ -1,4 +1,4 @@
-import { BlockAlonzo, BlockSize } from '@cardano-ogmios/schema';
+import { BlockAlonzo, BlockNo, BlockSize, Slot } from '@cardano-ogmios/schema';
 import { Cardano } from '../..';
 import { Epoch, Lovelace, PoolId } from '.';
 import { Hash32ByteBase16 } from '../util';
@@ -7,6 +7,12 @@ import { Hash32ByteBase16 } from '../util';
  * block hash as hex string
  */
 export type BlockId = Hash32ByteBase16<'BlockId'>;
+
+export interface Tip {
+  slot: Slot;
+  hash: BlockId;
+  blockNo: BlockNo;
+}
 
 /**
  * @param {string} value block hash as hex string

@@ -19,7 +19,7 @@ export const BlockfrostToCore = {
 
   blockToTip: (block: Responses['block_content']): Cardano.Tip => ({
     blockNo: block.height!,
-    hash: block.hash,
+    hash: Cardano.BlockId(block.hash),
     slot: block.slot!
   }),
 
