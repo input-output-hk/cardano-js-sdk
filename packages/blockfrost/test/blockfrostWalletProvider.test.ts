@@ -191,9 +191,9 @@ describe('blockfrostWalletProvider', () => {
           'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
         ),
         value: {
-          assets: {
-            b01fb3b8c3dd6b3705a5dc8bcd5a70759f70ad5d97a72005caeac3c652657675746f31333237: BigInt(1)
-          },
+          assets: new Map([
+            [Cardano.AssetId('b01fb3b8c3dd6b3705a5dc8bcd5a70759f70ad5d97a72005caeac3c652657675746f31333237'), 1n]
+          ]),
           coins: 50_928_877n
         }
       });
@@ -211,7 +211,10 @@ describe('blockfrostWalletProvider', () => {
           'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
         ),
         value: {
-          assets: {},
+          // Review: not sure how this was passing originally. Generated UTxO all have an asset.
+          assets: new Map([
+            [Cardano.AssetId('b01fb3b8c3dd6b3705a5dc8bcd5a70759f70ad5d97a72005caeac3c652657675746f31333237'), 2n]
+          ]),
           coins: 50_928_878n
         }
       });
@@ -396,10 +399,10 @@ describe('blockfrostWalletProvider', () => {
                 'addr_test1qzx9hu8j4ah3auytk0mwcupd69hpc52t0cw39a65ndrah86djs784u92a3m5w475w3w35tyd6v3qumkze80j8a6h5tuqq5xe8y'
               ),
               value: {
-                assets: {
-                  '06f8c5655b4e2b5911fee8ef2fc66b4ce64c8835642695c730a3d108617364': BigInt(63),
-                  '06f8c5655b4e2b5911fee8ef2fc66b4ce64c8835642695c730a3d108646464': BigInt(22)
-                },
+                assets: new Map([
+                  [Cardano.AssetId('06f8c5655b4e2b5911fee8ef2fc66b4ce64c8835642695c730a3d108617364'), 63n],
+                  [Cardano.AssetId('06f8c5655b4e2b5911fee8ef2fc66b4ce64c8835642695c730a3d108646464'), 22n]
+                ]),
                 coins: 1_000_000_000n
               }
             },

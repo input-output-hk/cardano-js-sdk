@@ -13,10 +13,10 @@ const txOut: Cardano.TxOut = {
     'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
   ),
   value: {
-    assets: {
-      '2a286ad895d091f2b3d168a6091ad2627d30a72761a5bc36eef00740': 20n,
-      '659f2917fb63f12b33667463ee575eeac1845bbc736b9c0bbc40ba8254534c41': 50n
-    },
+    assets: new Map([
+      [Cardano.AssetId('2a286ad895d091f2b3d168a6091ad2627d30a72761a5bc36eef00740'), 20n],
+      [Cardano.AssetId('659f2917fb63f12b33667463ee575eeac1845bbc736b9c0bbc40ba8254534c41'), 50n]
+    ]),
     coins: 10n
   }
 };
@@ -66,10 +66,10 @@ describe('coreToCsl', () => {
       expect(value.coin().to_str()).toEqual(txOut.value.coins.toString());
       const multiasset = value.multiasset()!;
       expect(multiasset.len()).toBe(2);
-      for (const assetId in txOut.value.assets) {
+      for (const [assetId, expectedAssetQuantity] of txOut.value.assets!.entries()) {
         const { scriptHash, assetName } = Asset.util.parseAssetId(assetId);
         const assetQuantity = BigInt(multiasset.get(scriptHash)!.get(assetName)!.to_str());
-        expect(assetQuantity).toBe(txOut.value.assets[assetId]);
+        expect(assetQuantity).toBe(expectedAssetQuantity);
       }
       expect(value).toBeInstanceOf(CSL.Value);
     });

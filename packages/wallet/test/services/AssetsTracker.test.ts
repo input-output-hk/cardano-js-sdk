@@ -10,12 +10,12 @@ describe('createAssetsTracker', () => {
       const balanceTracker = {
         total$: cold('a-b-c', {
           a: {} as Balance,
-          b: { assets: { [AssetId.TSLA]: 1n } as Cardano.TokenMap } as Balance,
+          b: { assets: new Map([[AssetId.TSLA, 1n]]) } as Balance,
           c: {
-            assets: {
-              [AssetId.TSLA]: 1n,
-              [AssetId.PXL]: 2n
-            } as Cardano.TokenMap
+            assets: new Map([
+              [AssetId.TSLA, 1n],
+              [AssetId.PXL, 2n]
+            ])
           } as Balance
         })
       } as unknown as TransactionalTracker<Balance>;
@@ -25,13 +25,11 @@ describe('createAssetsTracker', () => {
       const target$ = createAssetsTracker({ balanceTracker } as AssetsTrackerProps, { getAssetProvider });
       expectObservable(target$).toBe('a-b-c', {
         a: {},
-        b: {
-          [AssetId.TSLA]: asset1
-        },
-        c: {
-          [AssetId.TSLA]: asset1,
-          [AssetId.PXL]: asset2
-        }
+        b: new Map([[AssetId.TSLA, asset1]]),
+        c: new Map([
+          [AssetId.TSLA, asset1],
+          [AssetId.PXL, asset2]
+        ])
       });
     });
   });

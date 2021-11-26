@@ -37,11 +37,13 @@ describe('blockfrostAssetProvider', () => {
       BlockFrostAPI.prototype.assetsById = jest.fn().mockResolvedValue(mockedAssetResponse);
 
       const client = blockfrostAssetProvider({ isTestnet: true, projectId: apiKey });
-      const response = await client.getAsset('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e');
+      const response = await client.getAsset(
+        Cardano.AssetId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e')
+      );
 
       expect(response).toMatchObject<Cardano.Asset>({
-        assetId: 'b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e',
-        fingerprint: 'asset1pkpwyknlvul7az0xx8czhl60pyel45rpje4z8w',
+        assetId: Cardano.AssetId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e'),
+        fingerprint: Cardano.AssetFingerprint('asset1pkpwyknlvul7az0xx8czhl60pyel45rpje4z8w'),
         history: [
           {
             action: Cardano.AssetProvisioning.Mint,
@@ -58,7 +60,7 @@ describe('blockfrostAssetProvider', () => {
           url: 'https://www.stakenuts.com/'
         },
         name: 'nutcoin',
-        policyId: 'b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a7',
+        policyId: Cardano.PolicyId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a7'),
         quantity: 12_000n
       });
     });
@@ -82,11 +84,13 @@ describe('blockfrostAssetProvider', () => {
       ] as Responses['asset_history']);
 
       const client = blockfrostAssetProvider({ isTestnet: true, projectId: apiKey });
-      const response = await client.getAsset('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e');
+      const response = await client.getAsset(
+        Cardano.AssetId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e')
+      );
 
       expect(response).toMatchObject<Cardano.Asset>({
-        assetId: 'b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e',
-        fingerprint: 'asset1pkpwyknlvul7az0xx8czhl60pyel45rpje4z8w',
+        assetId: Cardano.AssetId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e'),
+        fingerprint: Cardano.AssetFingerprint('asset1pkpwyknlvul7az0xx8czhl60pyel45rpje4z8w'),
         history: [
           {
             action: Cardano.AssetProvisioning.Mint,
@@ -108,7 +112,7 @@ describe('blockfrostAssetProvider', () => {
           url: 'https://www.stakenuts.com/'
         },
         name: 'nutcoin',
-        policyId: 'b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a7',
+        policyId: Cardano.PolicyId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a7'),
         quantity: 12_000n
       });
     });

@@ -84,9 +84,7 @@ describe('SingleAddressWallet', () => {
       expect(wallet.addresses$.value[0].rewardAccount).toEqual(rewardAccount);
     });
     it('"assets$"', async () => {
-      expect(await firstValueFrom(wallet.assets$)).toEqual({
-        [AssetId.TSLA]: mocks.asset
-      });
+      expect(await firstValueFrom(wallet.assets$)).toEqual(new Map([[AssetId.TSLA, mocks.asset]]));
     });
   });
 

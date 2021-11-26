@@ -14,12 +14,12 @@ const assertExtraChangeProperties = (
     expect(coins).toBeGreaterThanOrEqual(minimumCoinQuantity);
     // No 0 quantity assets
     if (assets) {
-      for (const quantity of Object.values(assets)) {
+      for (const quantity of assets.values()) {
         expect(quantity).toBeGreaterThan(0n);
       }
     }
     // No empty change bundles.
-    expect(coins > 0n || Object.keys(assets || {}).length > 0).toBe(true);
+    expect(coins > 0n || (assets?.size || 0) > 0).toBe(true);
   }
 };
 
@@ -75,14 +75,14 @@ export const assertInputSelectionProperties = ({
   // Coverage of Payments
   expect(vSelected.coins).toBeGreaterThanOrEqual(vRequested.coins);
   for (const assetName of AssetId.All) {
-    expect(vSelected.assets?.[assetName] || 0n).toBeGreaterThanOrEqual(vRequested.assets?.[assetName] || 0n);
+    expect(vSelected.assets?.get(assetName) || 0n).toBeGreaterThanOrEqual(vRequested.assets?.get(assetName) || 0n);
   }
 
   // Correctness of Change
   expect(vSelected.coins).toEqual(vRequested.coins + vChange.coins);
   for (const assetName of AssetId.All) {
-    expect(vSelected.assets?.[assetName] || 0n).toEqual(
-      (vRequested.assets?.[assetName] || 0n) + (vChange.assets?.[assetName] || 0n)
+    expect(vSelected.assets?.get(assetName) || 0n).toEqual(
+      (vRequested.assets?.get(assetName) || 0n) + (vChange.assets?.get(assetName) || 0n)
     );
   }
 
@@ -129,14 +129,14 @@ export const assertFailureProperties = ({
       const insufficientCoin = availableQuantities.coins < requestedQuantities.coins;
       const insufficientAsset =
         requestedQuantities.assets &&
-        Object.keys(requestedQuantities.assets).some(
-          (assetId) => (availableQuantities.assets?.[assetId] || 0n) < requestedQuantities.assets![assetId]
+        [...requestedQuantities.assets.keys()].some(
+          (assetId) => (availableQuantities.assets?.get(assetId) || 0n) < requestedQuantities.assets!.get(assetId)!
         );
       expect(insufficientCoin || insufficientAsset).toBe(true);
       return;
     }
     case InputSelectionFailure.UtxoFullyDepleted: {
-      const numUtxoAssets = Object.keys(availableQuantities.assets || {}).length;
+      const numUtxoAssets = availableQuantities.assets?.size || 0;
       const bundleSizePotentiallyTooLarge = numUtxoAssets > constraints.maxTokenBundleSize;
       const changeMinimumCoinQuantityNotMet =
         availableQuantities.coins - requestedQuantities.coins < constraints.minimumCoinQuantity;
@@ -170,11 +170,9 @@ export const generateSelectionParams = (() => {
               .chain((assets) =>
                 fc.tuple(...assets.map((asset) => fc.bigUint(cslUtil.MAX_U64).map((amount) => ({ amount, asset }))))
               )
-              .map((assets) =>
-                assets.reduce((quantities, { amount, asset }) => {
-                  quantities[asset] = amount;
-                  return quantities;
-                }, {} as Cardano.TokenMap)
+              .map(
+                (assets) =>
+                  new Map<Cardano.AssetId, Cardano.Lovelace>(assets.map(({ amount, asset }) => [asset, amount]))
               ),
             fc.constant(void 0)
           ),
@@ -187,7 +185,7 @@ export const generateSelectionParams = (() => {
         const { coins, assets } = Cardano.util.coalesceValueQuantities(values);
         return (
           coins + implicitCoin <= cslUtil.MAX_U64 &&
-          (!assets || Object.values(assets).every((quantity) => quantity <= cslUtil.MAX_U64))
+          (!assets || [...assets.values()].every((quantity) => quantity <= cslUtil.MAX_U64))
         );
       });
 

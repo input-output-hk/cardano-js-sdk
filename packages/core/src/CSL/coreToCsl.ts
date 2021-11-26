@@ -36,13 +36,13 @@ export const value = ({ coins, assets }: Cardano.Value): Value => {
   if (!assets) {
     return result;
   }
-  const assetIds = Object.keys(assets);
+  const assetIds = [...assets.keys()];
   if (assetIds.length > 0) {
     const multiasset = MultiAsset.new();
     for (const assetId of assetIds) {
       const { scriptHash, assetName } = Asset.util.parseAssetId(assetId);
       const assetsObj = Assets.new();
-      const amount = BigNum.from_str(assets[assetId].toString());
+      const amount = BigNum.from_str(assets.get(assetId)!.toString());
       assetsObj.insert(assetName, amount);
       multiasset.insert(scriptHash, assetsObj);
     }

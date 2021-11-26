@@ -18,10 +18,10 @@ export const utxo: Cardano.Utxo[] = [
         'addr_test1qzs0umu0s2ammmpw0hea0w2crtcymdjvvlqngpgqy76gpfnuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qp3y3vz'
       ),
       value: {
-        assets: {
-          [AssetId.PXL]: 5n,
-          [AssetId.TSLA]: 10n
-        },
+        assets: new Map([
+          [AssetId.PXL, 5n],
+          [AssetId.TSLA, 10n]
+        ]),
         coins: 4_027_026_465n
       }
     }
@@ -39,9 +39,7 @@ export const utxo: Cardano.Utxo[] = [
         'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g'
       ),
       value: {
-        assets: {
-          [AssetId.TSLA]: 15n
-        },
+        assets: new Map([[AssetId.TSLA, 15n]]),
         coins: 3_289_566n
       }
     }

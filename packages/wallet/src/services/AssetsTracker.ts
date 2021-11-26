@@ -29,15 +29,9 @@ export const createAssetsTracker = (
   { getAssetProvider = createGetAssetProvider(assetProvider, retryBackoffConfig) }: AssetsTrackerInternals = {}
 ) =>
   balanceTracker.total$.pipe(
-    mergeMap(({ assets }) => from(Object.keys(assets || {}))),
+    mergeMap(({ assets }) => from(assets?.keys() || [])),
     distinct(),
     mergeMap((assetId) => getAssetProvider(assetId)),
-    scan(
-      (assets, asset) => ({
-        ...assets,
-        [asset.assetId]: asset
-      }),
-      {} as Assets
-    ),
+    scan((assets, asset) => new Map([...assets, [asset.assetId, asset]]), new Map<Cardano.AssetId, Cardano.Asset>()),
     startWith({} as Assets)
   );

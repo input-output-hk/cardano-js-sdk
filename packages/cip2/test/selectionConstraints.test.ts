@@ -59,10 +59,10 @@ describe('defaultSelectionConstraints', () => {
     cslMock.Value.new.mockImplementation(cslActual.Value.new);
     const withAssets = coreToCsl
       .value({
-        assets: {
-          [AssetId.TSLA]: 5000n,
-          [AssetId.PXL]: 3000n
-        },
+        assets: new Map([
+          [AssetId.TSLA, 5000n],
+          [AssetId.PXL, 3000n]
+        ]),
         coins: 10_000n
       })
       .multiasset();

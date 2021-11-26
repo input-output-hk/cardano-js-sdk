@@ -49,8 +49,8 @@ const txIn = ({ sourceTxIndex, txHash, address }: GraphqlTransaction['inputs'][0
 });
 
 const txOut = ({ address, tokens, value }: GraphqlTransaction['outputs'][0]) => {
-  const assets: Cardano.Value['assets'] = {};
-  for (const token of tokens) assets[token.asset.assetId] = BigInt(token.quantity);
+  const assets: Cardano.TokenMap = new Map();
+  for (const token of tokens) assets.set(Cardano.AssetId(token.asset.assetId), BigInt(token.quantity));
   return { address, value: { assets, coins: BigInt(value) } };
 };
 

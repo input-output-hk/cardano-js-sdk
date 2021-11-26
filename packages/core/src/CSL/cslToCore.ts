@@ -1,5 +1,4 @@
-import { Asset, Cardano } from '..';
-import { CSL } from '.';
+import { Asset, CSL, Cardano } from '..';
 import { Transaction } from '@emurgo/cardano-serialization-lib-nodejs';
 
 export const tx = (_input: Transaction): Cardano.TxAlonzo => {
@@ -14,7 +13,7 @@ export const value = (cslValue: CSL.Value): Cardano.Value => {
   if (!multiasset) {
     return result;
   }
-  result.assets = {};
+  result.assets = new Map();
   const scriptHashes = multiasset.keys();
   for (let scriptHashIdx = 0; scriptHashIdx < scriptHashes.len(); scriptHashIdx++) {
     const scriptHash = scriptHashes.get(scriptHashIdx);
@@ -24,7 +23,7 @@ export const value = (cslValue: CSL.Value): Cardano.Value => {
       const assetName = assetKeys.get(assetIdx);
       const assetAmount = BigInt(assets.get(assetName)!.to_str());
       if (assetAmount > 0n) {
-        result.assets[Asset.util.createAssetId(scriptHash, assetName)] = assetAmount;
+        result.assets.set(Asset.util.createAssetId(scriptHash, assetName), assetAmount);
       }
     }
   }
