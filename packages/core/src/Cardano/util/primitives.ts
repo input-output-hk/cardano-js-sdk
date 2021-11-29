@@ -44,6 +44,15 @@ export const assertIsBech32WithPrefix = (
   }
 };
 
+export const typedBech32 = <T>(
+  target: string,
+  prefix: string | string[],
+  expectedDecodedLength?: number | number[]
+) => {
+  assertIsBech32WithPrefix(target, prefix, expectedDecodedLength);
+  return target as unknown as T;
+};
+
 /**
  * @param {string} target bech32 string to decode
  * @param {string} expectedLength expected string length, >0

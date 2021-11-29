@@ -419,7 +419,7 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
         slotLeader: Cardano.PoolId(response.slot_leader),
         totalOutput: BigInt(response.output || '0'),
         txCount: response.tx_count,
-        vrf: response.block_vrf
+        vrf: Cardano.VrfVkBech32(response.block_vrf)
       };
     });
   };

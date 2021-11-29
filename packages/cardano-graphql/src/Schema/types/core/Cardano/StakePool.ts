@@ -131,7 +131,7 @@ export class StakePoolMetadata implements Cardano.StakePoolMetadata {
   @Field({ nullable: true })
   extSigUrl?: string;
   @Field(() => String, { nullable: true })
-  extVkey?: Cardano.Hash32ByteBase16;
+  extVkey?: Cardano.VrfVkBech32;
   @Field(() => ExtendedStakePoolMetadata, { nullable: true })
   @Directive('@hasInverse(field: metadata)')
   ext?: Cardano.ExtendedStakePoolMetadata;

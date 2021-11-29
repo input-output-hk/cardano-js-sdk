@@ -41,7 +41,7 @@ describe('StakePoolSearchClient', () => {
               },
               extDataUrl: 'http://extdata',
               extSigUrl: 'http://extsig',
-              extVkey: '886206542d63b23a047864021fbfccf291d78e47c1e59bd4c75fbc67b248c5e8',
+              extVkey: 'poolmd_vk19j362pkr4t9y0m3qxgmrv0365vd7c4ze03ny4jh84q8agjy4ep4stmm43m',
               homepage: 'http://homepage',
               name: 'some pool',
               ticker: 'TICKR'

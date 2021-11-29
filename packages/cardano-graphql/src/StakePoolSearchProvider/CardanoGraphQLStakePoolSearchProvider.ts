@@ -35,7 +35,7 @@ const toCoreStakePool = (responseStakePool: GraphqlStakePool) => {
                 }
               }
             : undefined,
-          extVkey: stakePool.metadata.extVkey ? Cardano.Hash32ByteBase16(stakePool.metadata.extVkey) : undefined
+          extVkey: stakePool.metadata.extVkey ? Cardano.VrfVkBech32(stakePool.metadata.extVkey) : undefined
         }
       : undefined,
     metadataJson: stakePool.metadataJson
