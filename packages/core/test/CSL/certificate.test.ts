@@ -43,7 +43,7 @@ describe('coreToCsl.certificate', () => {
 
   it('poolRegistration', () => {
     const owner = Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr');
-    const vrf = Cardano.VrfKeyHash('8dd154228946bd12967c12bedb1cb6038b78f8b84a1760b1a788fa72a4af3db0');
+    const vrf = Cardano.VrfVkHex('8dd154228946bd12967c12bedb1cb6038b78f8b84a1760b1a788fa72a4af3db0');
     const rewardAccount = stakeKey;
     const metadataJson = {
       hash: Cardano.Hash32ByteBase16('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5'),

@@ -24,10 +24,9 @@ export { BlockSize };
 
 /**
  * 32 byte ed25519 verification key as bech32 string.
- * poolmd_vk prefix might be used in extended stake pool metadata (cip6).
  */
 export type VrfVkBech32 = OpaqueString<'VrfVkBech32'>;
-export const VrfVkBech32 = (value: string) => typedBech32<VrfVkBech32>(value, ['vrf_vk', 'poolmd_vk'], 52);
+export const VrfVkBech32 = (value: string) => typedBech32<VrfVkBech32>(value, 'vrf_vk', 52);
 
 type OgmiosHeader = NonNullable<BlockAlonzo['header']>;
 export type PartialBlockHeader = Pick<OgmiosHeader, 'blockHeight' | 'slot'> & {

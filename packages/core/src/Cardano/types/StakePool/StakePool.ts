@@ -1,5 +1,6 @@
 import { ExtendedStakePoolMetadata } from './ExtendedStakePoolMetadata';
-import { Lovelace, TransactionId, VrfVkBech32 } from '..';
+import { Lovelace, TransactionId } from '..';
+import { OpaqueString, typedBech32 } from '../../util';
 import { PoolIdHex } from './primitives';
 import { PoolParameters } from './PoolParameters';
 
@@ -7,6 +8,12 @@ import { PoolParameters } from './PoolParameters';
  * Within range [0; 1]
  */
 export type Percent = number;
+
+/**
+ * 32 byte ed25519 verification key as bech32 string with 'poolmd_vk' prefix.
+ */
+export type PoolmdVkey = OpaqueString<'PoolmdVk'>;
+export const PoolmdVkey = (target: string): PoolmdVkey => typedBech32(target, 'poolmd_vk', 52);
 
 /**
  * https://github.com/cardano-foundation/CIPs/blob/master/CIP-0006/CIP-0006.md#on-chain-referenced-main-metadata-file
@@ -26,7 +33,7 @@ export interface Cip6MetadataFields {
    * the public Key for verification
    * optional, 68 Characters
    */
-  extVkey?: VrfVkBech32;
+  extVkey?: PoolmdVkey;
 }
 
 export interface StakePoolMetadataFields {

@@ -1,8 +1,9 @@
 import { Hash32ByteBase16 } from '../../util';
 import { Lovelace } from '../Value';
-import { PoolId, VrfKeyHash } from './primitives';
+import { PoolId } from './primitives';
 import { Relay } from './Relay';
 import { RewardAccount } from '../RewardAccount';
+import { VrfVkHex } from '.';
 
 export interface Fraction {
   numerator: number;
@@ -38,5 +39,5 @@ export interface PoolParameters {
   relays: Relay[];
 
   owners: RewardAccount[];
-  vrf: VrfKeyHash;
+  vrf: VrfVkHex;
 }

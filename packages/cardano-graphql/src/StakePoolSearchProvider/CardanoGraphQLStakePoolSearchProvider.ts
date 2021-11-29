@@ -35,7 +35,7 @@ const toCoreStakePool = (responseStakePool: GraphqlStakePool) => {
                 }
               }
             : undefined,
-          extVkey: stakePool.metadata.extVkey ? Cardano.VrfVkBech32(stakePool.metadata.extVkey) : undefined
+          extVkey: stakePool.metadata.extVkey ? Cardano.PoolmdVkey(stakePool.metadata.extVkey) : undefined
         }
       : undefined,
     metadataJson: stakePool.metadataJson
@@ -59,7 +59,7 @@ const toCoreStakePool = (responseStakePool: GraphqlStakePool) => {
       registration: stakePool.transactions.registration.map(Cardano.TransactionId),
       retirement: stakePool.transactions.retirement.map(Cardano.TransactionId)
     },
-    vrf: Cardano.VrfKeyHash(stakePool.vrf)
+    vrf: Cardano.VrfVkHex(stakePool.vrf)
   };
 };
 
