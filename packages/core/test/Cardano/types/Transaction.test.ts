@@ -1,4 +1,4 @@
-import { Ed25519PublicKey, Ed25519Signature, TransactionId } from '../../../src/Cardano';
+import { Ed25519KeyHash, Ed25519PublicKey, Ed25519Signature, TransactionId } from '../../../src/Cardano';
 
 describe('Cardano/types/Transaction', () => {
   it('TransactionId() accepts a valid transaction hash hex string', () => {
@@ -16,5 +16,9 @@ describe('Cardano/types/Transaction', () => {
 
   it('Ed25519PublicKey() accepts a valid public key hex string', () => {
     expect(() => Ed25519PublicKey('6199186adb51974690d7247d2646097d2c62763b767b528816fb7ed3f9f55d39')).not.toThrow();
+  });
+
+  it('Ed25519KeyHash() accepts a key hash hex string', () => {
+    expect(() => Ed25519KeyHash('6199186adb51974690d7247d2646097d2c62763b767b528816fb7ed3f9f55d39')).not.toThrow();
   });
 });
