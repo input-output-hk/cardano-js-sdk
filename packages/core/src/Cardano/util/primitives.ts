@@ -17,13 +17,7 @@ export declare class OpaqueString<T extends string> extends String {
 const isOneOf = <T>(target: T, options: T | T[]) =>
   (Array.isArray(options) && options.includes(target)) || target === options;
 
-/**
- * @param {string} target bech32 string to decode
- * @param {string} prefix expected prefix
- * @param {string} expectedDecodedLength number of expected words, >0
- * @throws {InvalidStringError}
- */
-export const assertIsBech32WithPrefix = (
+const assertIsBech32WithPrefix = (
   target: string,
   prefix: string | string[],
   expectedDecodedLength?: number | number[]
@@ -44,6 +38,12 @@ export const assertIsBech32WithPrefix = (
   }
 };
 
+/**
+ * @param {string} target bech32 string to decode
+ * @param {string} prefix expected prefix
+ * @param {string} expectedDecodedLength number of expected words, >0
+ * @throws {InvalidStringError}
+ */
 export const typedBech32 = <T>(
   target: string,
   prefix: string | string[],
@@ -54,7 +54,7 @@ export const typedBech32 = <T>(
 };
 
 /**
- * @param {string} target bech32 string to decode
+ * @param {string} target hex string to validate
  * @param {string} expectedLength expected string length, >0
  * @throws {InvalidStringError}
  */
@@ -68,7 +68,12 @@ export const assertIsHexString = (target: string, expectedLength?: number): void
   }
 };
 
-export const hexOfLength = <T>(value: string, length: number): T => {
+/**
+ * @param {string} value hex string to validate
+ * @param {string} length expected string length, >0
+ * @throws {InvalidStringError}
+ */
+export const typedHex = <T>(value: string, length?: number): T => {
   assertIsHexString(value, length);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return value as any as T;
@@ -84,7 +89,7 @@ export type Hash32ByteBase16<T extends string = 'Hash32ByteBase16'> = OpaqueStri
  * @throws InvalidStringError
  */
 export const Hash32ByteBase16 = <T extends string = 'Hash32ByteBase16'>(value: string): Hash32ByteBase16<T> =>
-  hexOfLength<Hash32ByteBase16<T>>(value, 64);
+  typedHex<Hash32ByteBase16<T>>(value, 64);
 
 /**
  * 28 byte hash as hex string
@@ -96,4 +101,4 @@ export type Hash28ByteBase16<T extends string = 'Hash28ByteBase16'> = OpaqueStri
  * @throws InvalidStringError
  */
 export const Hash28ByteBase16 = <T extends string = 'Hash28ByteBase16'>(value: string): Hash28ByteBase16<T> =>
-  hexOfLength<Hash32ByteBase16<T>>(value, 56);
+  typedHex<Hash32ByteBase16<T>>(value, 56);

@@ -10,8 +10,4 @@ export type RewardAccount = util.OpaqueString<'RewardAccount'>;
  * @param {string} value mainnet or testnet stake address as bech32 string
  * @throws InvalidStringError
  */
-export const RewardAccount = (value: string): RewardAccount => {
-  util.assertIsBech32WithPrefix(value, ['stake', 'stake_test'], 47);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return value as any as RewardAccount;
-};
+export const RewardAccount = (value: string): RewardAccount => util.typedBech32(value, ['stake', 'stake_test'], 47);

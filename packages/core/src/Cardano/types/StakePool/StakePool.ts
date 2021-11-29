@@ -12,8 +12,8 @@ export type Percent = number;
 /**
  * 32 byte ed25519 verification key as bech32 string with 'poolmd_vk' prefix.
  */
-export type PoolmdVkey = OpaqueString<'PoolmdVk'>;
-export const PoolmdVkey = (target: string): PoolmdVkey => typedBech32(target, 'poolmd_vk', 52);
+export type PoolMdVk = OpaqueString<'PoolMdVk'>;
+export const PoolMdVk = (target: string): PoolMdVk => typedBech32(target, 'poolmd_vk', 52);
 
 /**
  * https://github.com/cardano-foundation/CIPs/blob/master/CIP-0006/CIP-0006.md#on-chain-referenced-main-metadata-file
@@ -33,7 +33,7 @@ export interface Cip6MetadataFields {
    * the public Key for verification
    * optional, 68 Characters
    */
-  extVkey?: PoolmdVkey;
+  extVkey?: PoolMdVk;
 }
 
 export interface StakePoolMetadataFields {

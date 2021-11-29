@@ -1,12 +1,26 @@
 import { Cardano } from '../../../src';
 
+jest.mock('../../../src/Cardano/util/primitives', () => {
+  const actual = jest.requireActual('../../../src/Cardano/util/primitives');
+  return {
+    typedBech32: jest.fn().mockImplementation((...args) => actual.typedBech32(...args))
+  };
+});
+
 describe('Cardano/types/Address', () => {
-  it('Address() accepts a valid mainnet grouped address', () => {
+  afterEach(() => (Cardano.util.typedBech32 as jest.Mock).mockReset());
+
+  it('Address() accepts a valid mainnet grouped address and is implemented using util.typedBech32', () => {
     expect(() =>
       Cardano.Address(
         'addr1qx52knza2h5x090n4a5r7yraz3pwcamk9ppvuh7e26nfks7pnmhxqavtqy02zezklh27jt9r6z62sav3mugappdc7xnskxy2pn'
       )
     ).not.toThrow();
+    expect(Cardano.util.typedBech32).toBeCalledWith(
+      'addr1qx52knza2h5x090n4a5r7yraz3pwcamk9ppvuh7e26nfks7pnmhxqavtqy02zezklh27jt9r6z62sav3mugappdc7xnskxy2pn',
+      ['addr', 'addr_test'],
+      [47, 92]
+    );
   });
 
   it('Address() accepts a valid testnet grouped address', () => {

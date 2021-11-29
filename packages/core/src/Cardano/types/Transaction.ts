@@ -2,7 +2,7 @@
 import * as Cardano from '.';
 import { AuxiliaryData } from './AuxiliaryData';
 import { BlockBodyAlonzo } from '@cardano-ogmios/schema';
-import { Hash32ByteBase16, OpaqueString, hexOfLength } from '../util';
+import { Hash32ByteBase16, OpaqueString, typedHex } from '../util';
 import { PartialBlockHeader } from './Block';
 
 /**
@@ -25,7 +25,7 @@ export type Ed25519Signature = OpaqueString<'Ed25519Signature'>;
  * @param {string} value Ed25519 signature as hex string
  * @throws InvalidStringError
  */
-export const Ed25519Signature = (value: string): Ed25519Signature => hexOfLength(value, 128);
+export const Ed25519Signature = (value: string): Ed25519Signature => typedHex(value, 128);
 
 /**
  * Ed25519 public key as hex string
@@ -36,13 +36,13 @@ export type Ed25519PublicKey = OpaqueString<'Ed25519PublicKey'>;
  * @param {string} value Ed25519 public key as hex string
  * @throws InvalidStringError
  */
-export const Ed25519PublicKey = (value: string): Ed25519PublicKey => hexOfLength(value, 64);
+export const Ed25519PublicKey = (value: string): Ed25519PublicKey => typedHex(value, 64);
 
 /**
  * 32 byte ED25519 key hash as hex string
  */
 export type Ed25519KeyHash = OpaqueString<'Ed25519KeyHash'>;
-export const Ed25519KeyHash = (value: string): Ed25519KeyHash => hexOfLength(value, 64);
+export const Ed25519KeyHash = (value: string): Ed25519KeyHash => Hash32ByteBase16(value);
 
 export interface Withdrawal {
   stakeAddress: Cardano.RewardAccount;

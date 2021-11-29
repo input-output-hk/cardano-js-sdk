@@ -11,7 +11,7 @@ describe('Cardano/types/StakePool', () => {
 
   it('PoolmdVkey() accepts a valid vrf verification key bech32 poolmd_vk prefix', () => {
     expect(() =>
-      Cardano.PoolmdVkey('poolmd_vk19j362pkr4t9y0m3qxgmrv0365vd7c4ze03ny4jh84q8agjy4ep4stmm43m')
+      Cardano.PoolMdVk('poolmd_vk19j362pkr4t9y0m3qxgmrv0365vd7c4ze03ny4jh84q8agjy4ep4stmm43m')
     ).not.toThrow();
   });
 });

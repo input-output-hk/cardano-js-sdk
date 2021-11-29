@@ -1,4 +1,4 @@
-import { Hash28ByteBase16, OpaqueString, assertIsBech32WithPrefix, assertIsHexString } from '../util';
+import { Hash28ByteBase16, OpaqueString, assertIsHexString, typedBech32 } from '../util';
 import { InvalidStringError } from '../..';
 import { TransactionId } from './Transaction';
 
@@ -6,8 +6,11 @@ export type AssetId = OpaqueString<'AssetId'>;
 
 export type AssetName = OpaqueString<'AssetName'>;
 export const AssetName = (value: string): AssetName => {
-  if (value.length > 64) {
-    throw new InvalidStringError('too long');
+  if (value.length > 0) {
+    assertIsHexString(value);
+    if (value.length > 64) {
+      throw new InvalidStringError('too long');
+    }
   }
   return value as unknown as AssetName;
 };
@@ -18,6 +21,7 @@ export const AssetName = (value: string): AssetName => {
  */
 export const AssetId = (value: string): AssetId => {
   assertIsHexString(value);
+  if (value.length > 120) throw new InvalidStringError('too long');
   if (value.length < 56) throw new InvalidStringError('too short');
   return value as unknown as AssetId;
 };
@@ -30,10 +34,7 @@ export const PolicyId = (value: string): PolicyId => Hash28ByteBase16(value);
  * See CIP-0014
  */
 export type AssetFingerprint = OpaqueString<'AssetFingerprint'>;
-export const AssetFingerprint = (value: string) => {
-  assertIsBech32WithPrefix(value, 'asset', 32);
-  return value as unknown as AssetFingerprint;
-};
+export const AssetFingerprint = (value: string): AssetFingerprint => typedBech32(value, 'asset', 32);
 
 /**
  * Either on-chain or off-chain asset metadata
