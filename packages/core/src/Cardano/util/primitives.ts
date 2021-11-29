@@ -68,7 +68,7 @@ export const assertIsHexString = (target: string, expectedLength?: number): void
   }
 };
 
-const hashNByteBase16 = <T>(value: string, length: number): T => {
+export const hexNByte = <T>(value: string, length: number): T => {
   assertIsHexString(value, length);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return value as any as T;
@@ -84,7 +84,7 @@ export type Hash32ByteBase16<T extends string = 'Hash32ByteBase16'> = OpaqueStri
  * @throws InvalidStringError
  */
 export const Hash32ByteBase16 = <T extends string = 'Hash32ByteBase16'>(value: string): Hash32ByteBase16<T> =>
-  hashNByteBase16<Hash32ByteBase16<T>>(value, 64);
+  hexNByte<Hash32ByteBase16<T>>(value, 64);
 
 /**
  * 28 byte hash as hex string
@@ -96,4 +96,4 @@ export type Hash28ByteBase16<T extends string = 'Hash28ByteBase16'> = OpaqueStri
  * @throws InvalidStringError
  */
 export const Hash28ByteBase16 = <T extends string = 'Hash28ByteBase16'>(value: string): Hash28ByteBase16<T> =>
-  hashNByteBase16<Hash32ByteBase16<T>>(value, 56);
+  hexNByte<Hash32ByteBase16<T>>(value, 56);

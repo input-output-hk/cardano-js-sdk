@@ -14,9 +14,7 @@ describe('Cardano/types/Transaction', () => {
     ).not.toThrow();
   });
 
-  it('Ed25519PublicKey() accepts a valid public key bech32 string', () => {
-    expect(() =>
-      Ed25519PublicKey('ed25519_pk1vxv3s6km2xt5dyxhy37jv3sf05kxya3mwea49zqkldld8704t5usy6nye4')
-    ).not.toThrow();
+  it('Ed25519PublicKey() accepts a valid public key hex string', () => {
+    expect(() => Ed25519PublicKey('6199186adb51974690d7247d2646097d2c62763b767b528816fb7ed3f9f55d39')).not.toThrow();
   });
 });

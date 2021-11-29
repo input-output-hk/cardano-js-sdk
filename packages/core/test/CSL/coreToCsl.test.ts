@@ -89,7 +89,7 @@ describe('coreToCsl', () => {
     );
   });
   it('tx', () => {
-    const vkey = 'ed25519_pk1dgaagyh470y66p899txcl3r0jaeaxu6yd7z2dxyk55qcycdml8gszkxze2';
+    const vkey = '6199186adb51974690d7247d2646097d2c62763b767b528816fb7ed3f9f55d39';
     const signature =
       'bdea87fca1b4b4df8a9b8fb4183c0fab2f8261eb6c5e4bc42c800bb9c8918755bdea87fca1b4b4df8a9b8fb4183c0fab2f8261eb6c5e4bc42c800bb9c8918755';
     const coreTx: Cardano.NewTxAlonzo = {
@@ -102,7 +102,7 @@ describe('coreToCsl', () => {
     const cslTx = coreToCsl.tx(coreTx);
     expect(cslTx.body()).toBeInstanceOf(CSL.TransactionBody);
     const witness = cslTx.witness_set().vkeys()!.get(0)!;
-    expect(witness.vkey().public_key().to_bech32()).toBe(vkey);
+    expect(Buffer.from(witness.vkey().public_key().as_bytes()).toString('hex')).toBe(vkey);
     expect(witness.signature().to_hex()).toBe(signature);
   });
 });

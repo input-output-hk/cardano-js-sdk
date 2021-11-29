@@ -2,7 +2,7 @@
 import * as Cardano from '.';
 import { AuxiliaryData } from './AuxiliaryData';
 import { BlockBodyAlonzo } from '@cardano-ogmios/schema';
-import { Hash32ByteBase16, OpaqueString, assertIsBech32WithPrefix, assertIsHexString } from '../util';
+import { Hash32ByteBase16, OpaqueString, hexNByte } from '../util';
 import { PartialBlockHeader } from './Block';
 
 /**
@@ -25,24 +25,18 @@ export type Ed25519Signature = OpaqueString<'Ed25519Signature'>;
  * @param {string} value Ed25519 signature as hex string
  * @throws InvalidStringError
  */
-export const Ed25519Signature = (value: string): Ed25519Signature => {
-  assertIsHexString(value, 128);
-  return value as any as Ed25519Signature;
-};
+export const Ed25519Signature = (value: string): Ed25519Signature => hexNByte(value, 128);
 
 /**
- * Ed25519 public key as bech32 string
+ * Ed25519 public key as hex string
  */
 export type Ed25519PublicKey = OpaqueString<'Ed25519PublicKey'>;
 
 /**
- * @param {string} value Ed25519 public key as bech32 string
+ * @param {string} value Ed25519 public key as hex string
  * @throws InvalidStringError
  */
-export const Ed25519PublicKey = (value: string): Ed25519PublicKey => {
-  assertIsBech32WithPrefix(value, 'ed25519_pk', 52);
-  return value as any as Ed25519PublicKey;
-};
+export const Ed25519PublicKey = (value: string): Ed25519PublicKey => hexNByte(value, 64);
 
 export interface Withdrawal {
   stakeAddress: Cardano.RewardAccount;
@@ -58,10 +52,6 @@ export interface TxBodyAlonzo {
   certificates?: Cardano.Certificate[];
   mint?: Cardano.TokenMap;
   scriptIntegrityHash?: Cardano.Hash28ByteBase16;
-  // TODO: need to find an example of this to verify type and length
-  // This is the type we use for witness object keys too, which kinda
-  // makes sense to have as bech32, because you might want to display
-  // it to the user to show who signed the tx
   requiredExtraSignatures?: Cardano.Ed25519PublicKey[];
 }
 

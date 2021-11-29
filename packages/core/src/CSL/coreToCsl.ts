@@ -113,7 +113,7 @@ export const tx = ({ body, witness }: Cardano.NewTxAlonzo): Transaction => {
   const witnessSet = TransactionWitnessSet.new();
   const vkeyWitnesses = Vkeywitnesses.new();
   for (const [vkey, signature] of witness.signatures.entries()) {
-    const publicKey = PublicKey.from_bech32(vkey.toString());
+    const publicKey = PublicKey.from_bytes(Buffer.from(vkey, 'hex'));
     const vkeyWitness = Vkeywitness.new(Vkey.new(publicKey), Ed25519Signature.from_hex(signature.toString()));
     vkeyWitnesses.add(vkeyWitness);
   }
