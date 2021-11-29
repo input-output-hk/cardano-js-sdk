@@ -211,7 +211,6 @@ describe('blockfrostWalletProvider', () => {
           'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
         ),
         value: {
-          // Review: not sure how this was passing originally. Generated UTxO all have an asset.
           assets: new Map([
             [Cardano.AssetId('b01fb3b8c3dd6b3705a5dc8bcd5a70759f70ad5d97a72005caeac3c652657675746f31333237'), 2n]
           ]),

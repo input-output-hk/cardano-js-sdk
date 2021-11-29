@@ -308,8 +308,7 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
       txSize: response.size,
       witness: {
         redeemers: await fetchRedeemers(response),
-        // Review: not available in blockfrost? Or should it only be on NewTxAlonzo type?
-        signatures: new Map()
+        signatures: new Map() // not available in blockfrost
       }
     };
   };
