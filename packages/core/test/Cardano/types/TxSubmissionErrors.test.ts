@@ -1,6 +1,6 @@
-import { Cardano } from '../../src';
+import { Cardano } from '../../../src';
 
-describe('Cardano', () => {
+describe('Cardano/types/TxSuubmissionErrors', () => {
   test('TxSubmissionError can be narrowed down with "instanceof"', () => {
     const error: Cardano.TxSubmissionError = new Cardano.TxSubmissionErrors.FeeTooSmallError({
       feeTooSmall: { actualFee: 50, requiredFee: 51 }

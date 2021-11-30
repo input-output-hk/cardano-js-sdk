@@ -169,7 +169,7 @@ describe('cardanoGraphqlDbSyncProvider', () => {
 
     expect(response).toMatchObject<Cardano.Tip>({
       blockNo: 2_884_196,
-      hash: 'af310732fdd99892fa78584aca1d2be147e6001030ae51b054e38feeb4fd762d',
+      hash: Cardano.BlockId('af310732fdd99892fa78584aca1d2be147e6001030ae51b054e38feeb4fd762d'),
       slot: 36_370_316
     });
   });

@@ -31,13 +31,15 @@ export const createInMemoryKeyManager = ({
   const extendedAccountPublicKey = extendedAccountPrivateKey.to_public();
 
   const privateParentPaymentKeyRaw = extendedAccountPrivateKey.derive(0).derive(0).to_raw_key();
-  const publicParentPaymentKeyRawBech32 = privateParentPaymentKeyRaw.to_public().to_bech32();
+  const publicParentPaymentKeyRawHex = Cardano.Ed25519PublicKey(
+    Buffer.from(privateParentPaymentKeyRaw.to_public().as_bytes()).toString('hex')
+  );
 
   const privateStakeKey = extendedAccountPrivateKey.derive(2).derive(0);
   const privateStakeKeyRaw = privateStakeKey.to_raw_key();
   const publicStakeKey = privateStakeKey.to_public();
   const publicStakeKeyRaw = publicStakeKey.to_raw_key();
-  const publicStakeKeyRawBech32 = publicStakeKeyRaw.to_bech32();
+  const publicStakeKeyRawHex = Cardano.Ed25519PublicKey(Buffer.from(publicStakeKeyRaw.as_bytes()).toString('hex'));
   const publicStakeKeyRawHash = publicStakeKeyRaw.hash();
 
   return {
@@ -53,17 +55,15 @@ export const createInMemoryKeyManager = ({
         networkId,
         CSL.StakeCredential.from_keyhash(derivedPublicPaymentKeyHash),
         stakeKeyCredential
-      )
-        .to_address()
-        .to_bech32();
+      ).to_address();
 
-      const rewardAccount = CSL.RewardAddress.new(networkId, stakeKeyCredential).to_address().to_bech32();
+      const rewardAccount = CSL.RewardAddress.new(networkId, stakeKeyCredential).to_address();
       return {
         accountIndex,
-        address,
+        address: Cardano.Address(address.to_bech32()),
         addressIndex,
         networkId,
-        rewardAccount,
+        rewardAccount: Cardano.RewardAccount(rewardAccount.to_bech32()),
         type
       };
     },
@@ -78,17 +78,16 @@ export const createInMemoryKeyManager = ({
       const paymentVkeyWitness = CSL.make_vkey_witness(cslHash, privateParentPaymentKeyRaw);
       const stakeWitnesses = (() => {
         if (!body.certificates) {
-          return {};
+          return [];
         }
         const stakeVkeyWitness = CSL.make_vkey_witness(cslHash, privateStakeKeyRaw);
-        return {
-          [publicStakeKeyRawBech32]: stakeVkeyWitness.signature().to_hex()
-        };
+        return [[publicStakeKeyRawHex, Cardano.Ed25519Signature(stakeVkeyWitness.signature().to_hex())] as const];
       })();
-      return {
-        [publicParentPaymentKeyRawBech32]: paymentVkeyWitness.signature().to_hex(),
+      const paymentVkeyWitnessHex = Cardano.Ed25519Signature(paymentVkeyWitness.signature().to_hex());
+      return new Map<Cardano.Ed25519PublicKey, Cardano.Ed25519Signature>([
+        [publicParentPaymentKeyRawHex, paymentVkeyWitnessHex],
         ...stakeWitnesses
-      };
+      ]);
     }
   };
 };

@@ -8,7 +8,7 @@ import { firstValueFrom, skip } from 'rxjs';
 describe('SingleAddressWallet', () => {
   const name = 'Test Wallet';
   const address = mocks.queryTransactionsResult[0].body.inputs[0].address;
-  const rewardAccount = mocks.stakeKeyHash;
+  const rewardAccount = mocks.rewardAccount;
   let keyManager: KeyManagement.KeyManager;
   let walletProvider: mocks.ProviderStub;
   let assetProvider: mocks.MockAssetProvider;
@@ -84,9 +84,7 @@ describe('SingleAddressWallet', () => {
       expect(wallet.addresses$.value[0].rewardAccount).toEqual(rewardAccount);
     });
     it('"assets$"', async () => {
-      expect(await firstValueFrom(wallet.assets$)).toEqual({
-        [AssetId.TSLA]: mocks.asset
-      });
+      expect(await firstValueFrom(wallet.assets$)).toEqual(new Map([[AssetId.TSLA, mocks.asset]]));
     });
   });
 
@@ -94,8 +92,9 @@ describe('SingleAddressWallet', () => {
     const props = {
       outputs: new Set([
         {
-          address:
-            'addr_test1qpu5vlrf4xkxv2qpwngf6cjhtw542ayty80v8dyr49rf5ewvxwdrt70qlcpeeagscasafhffqsxy36t90ldv06wqrk2qum8x5w',
+          address: Cardano.Address(
+            'addr_test1qpu5vlrf4xkxv2qpwngf6cjhtw542ayty80v8dyr49rf5ewvxwdrt70qlcpeeagscasafhffqsxy36t90ldv06wqrk2qum8x5w'
+          ),
           value: { coins: 11_111_111n }
         }
       ])
@@ -112,7 +111,7 @@ describe('SingleAddressWallet', () => {
       const tx = await wallet.finalizeTx(txInternals);
       expect(tx.body).toBe(txInternals.body);
       expect(tx.id).toBe(txInternals.hash);
-      expect(Object.keys(tx.witness.signatures)).toHaveLength(1);
+      expect(tx.witness.signatures.size).toBe(1);
     });
 
     it('submitTx', async () => {

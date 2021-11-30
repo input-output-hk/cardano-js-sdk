@@ -1,54 +1,4 @@
-import { Address, Epoch, Hash16, Lovelace, PoolId } from '.';
-import { PoolParameters as OgmiosPoolParameters, PoolMetadata } from '@cardano-ogmios/schema';
-
-export interface RelayByAddress {
-  __typename: 'RelayByAddress';
-  ipv4?: string;
-  ipv6?: string;
-  port?: number;
-}
-export interface RelayByName {
-  __typename: 'RelayByName';
-  hostname: string;
-  port?: number;
-}
-
-export interface RelayByNameMultihost {
-  __typename: 'RelayByNameMultihost';
-  dnsName: string;
-}
-
-export type Relay = RelayByAddress | RelayByName | RelayByNameMultihost;
-
-export interface Fraction {
-  numerator: number;
-  denominator: number;
-}
-
-export interface PoolParameters
-  // TODO: don't omit pledge and cost when Lovelace becomes bigint
-  extends Omit<OgmiosPoolParameters, 'pledge' | 'cost' | 'margin' | 'metadata' | 'relays'> {
-  /**
-   * Declared pledge quantity.
-   */
-  pledge: Lovelace;
-  /**
-   * Fixed stake pool running cost
-   */
-  cost: Lovelace;
-  /**
-   * Stake pool margin percentage
-   */
-  margin: Fraction;
-  /**
-   * Metadata location and hash
-   */
-  metadataJson?: PoolMetadata;
-  /**
-   * Stake pool relays
-   */
-  relays: Relay[];
-}
+import { Epoch, Hash32ByteBase16, Lovelace, PoolId, PoolParameters, RewardAccount } from '.';
 
 export enum CertificateType {
   StakeKeyRegistration = 'StakeKeyRegistration',
@@ -62,7 +12,7 @@ export enum CertificateType {
 
 export interface StakeAddressCertificate {
   __typename: CertificateType.StakeKeyRegistration | CertificateType.StakeKeyDeregistration;
-  address: Address;
+  rewardAccount: RewardAccount;
 }
 
 export interface PoolRegistrationCertificate {
@@ -80,23 +30,23 @@ export interface PoolRetirementCertificate {
 
 export interface StakeDelegationCertificate {
   __typename: CertificateType.StakeDelegation;
-  address: Address;
+  rewardAccount: RewardAccount;
   poolId: PoolId;
   epoch: Epoch;
 }
 
 export interface MirCertificate {
   __typename: CertificateType.MIR;
-  address: Address;
+  rewardAccount: RewardAccount;
   quantity: Lovelace;
   pot: 'reserve' | 'treasury';
 }
 
 export interface GenesisKeyDelegationCertificate {
   __typename: CertificateType.GenesisKeyDelegation;
-  genesisHash: Hash16;
-  genesisDelegateHash: Hash16;
-  vrfKeyHash: Hash16;
+  genesisHash: Hash32ByteBase16;
+  genesisDelegateHash: Hash32ByteBase16;
+  vrfKeyHash: Hash32ByteBase16;
 }
 
 export type Certificate =

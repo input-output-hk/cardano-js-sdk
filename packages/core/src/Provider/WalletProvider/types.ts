@@ -63,7 +63,7 @@ export interface EpochRange {
 }
 
 export interface RewardHistoryProps {
-  stakeAddresses: Cardano.Address[];
+  stakeAddresses: Cardano.RewardAccount[];
   epochs?: EpochRange;
 }
 
@@ -85,7 +85,7 @@ export interface WalletProvider {
   // TODO: split utxoDelegationAndRewards this into 2 or 3 functions
   utxoDelegationAndRewards: (
     addresses: Cardano.Address[],
-    rewardAccount?: Cardano.Address
+    rewardAccount?: Cardano.RewardAccount
   ) => Promise<{ utxo: Cardano.Utxo[]; delegationAndRewards?: Cardano.DelegationsAndRewards }>;
   /**
    * TODO: add an optional 'since: Slot' argument for querying transactions and utxos.
@@ -93,11 +93,11 @@ export interface WalletProvider {
    * to minimise over-fetching and assist the application in handling rollback scenarios.
    */
   queryTransactionsByAddresses: (addresses: Cardano.Address[]) => Promise<Cardano.TxAlonzo[]>;
-  queryTransactionsByHashes: (hashes: Cardano.Hash16[]) => Promise<Cardano.TxAlonzo[]>;
+  queryTransactionsByHashes: (hashes: Cardano.TransactionId[]) => Promise<Cardano.TxAlonzo[]>;
   /**
    * @returns an array of blocks, same length and in the same order as `hashes` argument.
    */
-  queryBlocksByHashes: (hashes: Cardano.Hash16[]) => Promise<Cardano.Block[]>;
+  queryBlocksByHashes: (hashes: Cardano.BlockId[]) => Promise<Cardano.Block[]>;
   currentWalletProtocolParameters: () => Promise<ProtocolParametersRequiredByWallet>;
   genesisParameters: () => Promise<Cardano.CompactGenesis>;
   /**

@@ -1,20 +1,20 @@
 /* eslint-disable complexity */
-import { dummyLogger, Logger } from 'ts-log';
 import {
-  createChainSyncClient,
+  ChainSync,
+  ConnectionConfig,
+  Schema,
   StateQuery,
+  createChainSyncClient,
+  createInteractionContext,
   isAllegraBlock,
   isAlonzoBlock,
-  isShelleyBlock,
   isMaryBlock,
-  Schema,
-  ConnectionConfig,
-  createInteractionContext,
-  ChainSync
+  isShelleyBlock
 } from '@cardano-ogmios/client';
 import { GeneratorMetadata } from '../Content';
-import { isByronStandardBlock } from '../util';
+import { Logger, dummyLogger } from 'ts-log';
 import { applyValue } from './applyValue';
+import { isByronStandardBlock } from '../util';
 
 export type AddressBalances = {
   [address: string]: Schema.Value;

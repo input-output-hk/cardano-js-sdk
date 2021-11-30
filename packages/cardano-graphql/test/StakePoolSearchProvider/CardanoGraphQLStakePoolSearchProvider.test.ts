@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 import { ExtendedPoolStatus, StakePoolStatus, StakePoolsByMetadataQuery, StakePoolsQuery } from '../../src/sdk';
-import { ProviderError, StakePoolSearchProvider } from '@cardano-sdk/core';
+import { InvalidStringError, ProviderError, ProviderFailure, StakePoolSearchProvider } from '@cardano-sdk/core';
 import { createGraphQLStakePoolSearchProvider } from '../../src/StakePoolSearchProvider/CardanoGraphQLStakePoolSearchProvider';
 
 describe('StakePoolSearchClient', () => {
@@ -23,8 +23,8 @@ describe('StakePoolSearchClient', () => {
         queryStakePool: [
           {
             cost: '123',
-            hexId: '0abc',
-            id: 'some-pool',
+            hexId: '52e22df52e90370f639c99f5c760f0cd67d7f871cd0d0764fae47cd9',
+            id: 'pool12t3zmafwjqms7cuun86uwc8se4na07r3e5xswe86u37djr5f0lx',
             margin: {
               denominator: 3,
               numerator: 1
@@ -34,20 +34,20 @@ describe('StakePoolSearchClient', () => {
               ext: {
                 pool: {
                   country: 'LT',
-                  id: 'pool-id',
+                  id: '52e22df52e90370f639c99f5c760f0cd67d7f871cd0d0764fae47cd9',
                   status: ExtendedPoolStatus.Active
                 },
                 serial: 123
               },
               extDataUrl: 'http://extdata',
               extSigUrl: 'http://extsig',
-              extVkey: '2abc',
+              extVkey: 'poolmd_vk19j362pkr4t9y0m3qxgmrv0365vd7c4ze03ny4jh84q8agjy4ep4stmm43m',
               homepage: 'http://homepage',
               name: 'some pool',
               ticker: 'TICKR'
             },
             metadataJson: {
-              hash: '1abc',
+              hash: '886206542d63b23a047864021fbfccf291d78e47c1e59bd4c75fbc67b248c5e8',
               url: 'http://someurl'
             },
             metrics: {
@@ -64,19 +64,19 @@ describe('StakePoolSearchClient', () => {
                 live: '12344'
               }
             },
-            owners: ['5bd'],
+            owners: ['stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27'],
             pledge: '1235',
             relays: [
               { __typename: 'RelayByName', hostname: 'http://relay', port: 156 },
               { __typename: 'RelayByAddress', ipv4: '0.0.0.0', ipv6: '::1', port: 567 }
             ],
-            rewardAccount: '745b',
+            rewardAccount: 'stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27',
             status: StakePoolStatus.Active,
             transactions: {
-              registration: ['6345b'],
-              retirement: ['dawdb']
+              registration: ['4123d70f66414cc921f6ffc29a899aafc7137a99a0fd453d6b200863ef5702d6'],
+              retirement: ['01d7366549986d83edeea262e97b68eca3430d3bb052ed1c37d2202fd5458872']
             },
-            vrf: '76bc'
+            vrf: '8dd154228946bd12967c12bedb1cb6038b78f8b84a1760b1a788fa72a4af3db0'
           }
         ]
       };
@@ -111,6 +111,12 @@ describe('StakePoolSearchClient', () => {
     it('wraps errors to ProviderError', async () => {
       sdk.StakePools.mockRejectedValueOnce(new Error('some error'));
       await expect(client.queryStakePools(['stakepool'])).rejects.toThrowError(ProviderError);
+
+      const invalidStringError = new InvalidStringError('some error');
+      sdk.StakePools.mockRejectedValueOnce(invalidStringError);
+      await expect(client.queryStakePools(['stakepool'])).rejects.toThrowError(
+        new ProviderError(ProviderFailure.InvalidResponse, invalidStringError)
+      );
     });
   });
 });

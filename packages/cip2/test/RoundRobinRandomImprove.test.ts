@@ -80,9 +80,11 @@ describe('RoundRobinRandomImprove', () => {
         });
         it('Asset', async () => {
           await testInputSelectionFailureMode({
-            createOutputs: () => [CslTestUtil.createOutput({ assets: { [AssetId.TSLA]: 7001n }, coins: 5_000_000n })],
+            createOutputs: () => [
+              CslTestUtil.createOutput({ assets: new Map([[AssetId.TSLA, 7001n]]), coins: 5_000_000n })
+            ],
             createUtxo: () => [
-              CslTestUtil.createUnspentTxOutput({ assets: { [AssetId.TSLA]: 7000n }, coins: 10_000_000n })
+              CslTestUtil.createUnspentTxOutput({ assets: new Map([[AssetId.TSLA, 7000n]]), coins: 10_000_000n })
             ],
             expectedError: InputSelectionFailure.UtxoBalanceInsufficient,
             getAlgorithm: roundRobinRandomImprove,
@@ -119,13 +121,19 @@ describe('RoundRobinRandomImprove', () => {
           await testInputSelectionFailureMode({
             createOutputs: () => [
               CslTestUtil.createOutput({
-                assets: { [AssetId.TSLA]: 500n, [AssetId.PXL]: 500n },
+                assets: new Map([
+                  [AssetId.TSLA, 500n],
+                  [AssetId.PXL, 500n]
+                ]),
                 coins: 1_000_000n
               })
             ],
             createUtxo: () => [
               CslTestUtil.createUnspentTxOutput({
-                assets: { [AssetId.TSLA]: 1000n, [AssetId.PXL]: 1000n },
+                assets: new Map([
+                  [AssetId.TSLA, 1000n],
+                  [AssetId.PXL, 1000n]
+                ]),
                 coins: 2_000_000n
               })
             ],

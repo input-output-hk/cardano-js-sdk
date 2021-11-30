@@ -36,13 +36,13 @@ export const value = ({ coins, assets }: Cardano.Value): Value => {
   if (!assets) {
     return result;
   }
-  const assetIds = Object.keys(assets);
+  const assetIds = [...assets.keys()];
   if (assetIds.length > 0) {
     const multiasset = MultiAsset.new();
     for (const assetId of assetIds) {
       const { scriptHash, assetName } = Asset.util.parseAssetId(assetId);
       const assetsObj = Assets.new();
-      const amount = BigNum.from_str(assets[assetId].toString());
+      const amount = BigNum.from_str(assets.get(assetId)!.toString());
       assetsObj.insert(assetName, amount);
       multiasset.insert(scriptHash, assetsObj);
     }
@@ -55,7 +55,7 @@ export const txIn = (core: Cardano.TxIn): TransactionInput =>
   TransactionInput.new(TransactionHash.from_bytes(Buffer.from(core.txId, 'hex')), core.index);
 
 export const txOut = (core: Cardano.TxOut): TransactionOutput =>
-  TransactionOutput.new(Address.from_bech32(core.address), value(core.value));
+  TransactionOutput.new(Address.from_bech32(core.address.toString()), value(core.value));
 
 export const utxo = (core: Cardano.Utxo[]): TransactionUnspentOutput[] =>
   core.map((item) => TransactionUnspentOutput.new(txIn(item[0]), txOut(item[1])));
@@ -95,7 +95,7 @@ export const txBody = ({
   if (withdrawals?.length) {
     const cslWithdrawals = Withdrawals.new();
     for (const { stakeAddress, quantity } of withdrawals) {
-      const cslAddress = RewardAddress.from_address(Address.from_bech32(stakeAddress));
+      const cslAddress = RewardAddress.from_address(Address.from_bech32(stakeAddress.toString()));
       if (!cslAddress) {
         throw new SerializationError(
           SerializationFailure.InvalidAddress,
@@ -112,13 +112,10 @@ export const txBody = ({
 export const tx = ({ body, witness }: Cardano.NewTxAlonzo): Transaction => {
   const witnessSet = TransactionWitnessSet.new();
   const vkeyWitnesses = Vkeywitnesses.new();
-  for (const vkey in witness.signatures) {
-    if (Object.prototype.hasOwnProperty.call(witness.signatures, vkey)) {
-      const signature = witness.signatures[vkey]!;
-      const publicKey = PublicKey.from_bech32(vkey);
-      const vkeyWitness = Vkeywitness.new(Vkey.new(publicKey), Ed25519Signature.from_hex(signature));
-      vkeyWitnesses.add(vkeyWitness);
-    }
+  for (const [vkey, signature] of witness.signatures.entries()) {
+    const publicKey = PublicKey.from_bytes(Buffer.from(vkey, 'hex'));
+    const vkeyWitness = Vkeywitness.new(Vkey.new(publicKey), Ed25519Signature.from_hex(signature.toString()));
+    vkeyWitnesses.add(vkeyWitness);
   }
   witnessSet.set_vkeys(vkeyWitnesses);
   return Transaction.new(coreToCsl.txBody(body), witnessSet);

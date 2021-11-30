@@ -43,10 +43,13 @@ describe('transactionCertificates', () => {
   });
 
   test('isLastStakeKeyCertOfType', () => {
-    const address = 'stake...';
+    const rewardAccount = Cardano.RewardAccount('stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d');
     const certificates = [
       [
-        { __typename: Cardano.CertificateType.StakeKeyRegistration, address } as Cardano.Certificate,
+        {
+          __typename: Cardano.CertificateType.StakeKeyRegistration,
+          rewardAccount
+        } as Cardano.Certificate,
         { __typename: Cardano.CertificateType.StakeDelegation } as Cardano.Certificate
       ],
       [
@@ -55,7 +58,9 @@ describe('transactionCertificates', () => {
       ]
     ];
     expect(isLastStakeKeyCertOfType(certificates, Cardano.CertificateType.StakeKeyRegistration)).toBe(false);
-    expect(isLastStakeKeyCertOfType(certificates, Cardano.CertificateType.StakeKeyRegistration, address)).toBe(true);
+    expect(isLastStakeKeyCertOfType(certificates, Cardano.CertificateType.StakeKeyRegistration, rewardAccount)).toBe(
+      true
+    );
     expect(isLastStakeKeyCertOfType(certificates, Cardano.CertificateType.StakeKeyDeregistration)).toBe(true);
   });
 

@@ -22,7 +22,7 @@ export interface ImplicitCoinBigint {
 export interface RoundRobinRandomImproveArgs {
   utxosWithValue: UtxoWithValue[];
   outputsWithValue: OutputWithValue[];
-  uniqueOutputAssetIDs: string[];
+  uniqueOutputAssetIDs: Cardano.AssetId[];
   implicitCoin: ImplicitCoinBigint;
 }
 
@@ -49,9 +49,7 @@ export const preprocessArgs = (
     output,
     value: cslToCore.value(output.amount())
   }));
-  const uniqueOutputAssetIDs = uniq(
-    outputsWithValue.flatMap(({ value: { assets } }) => (assets && Object.keys(assets)) || [])
-  );
+  const uniqueOutputAssetIDs = uniq(outputsWithValue.flatMap(({ value: { assets } }) => [...(assets?.keys() || [])]));
   const implicitCoin: ImplicitCoinBigint = {
     deposit: partialImplicitCoin.deposit || 0n,
     input: partialImplicitCoin.input || 0n
@@ -61,11 +59,11 @@ export const preprocessArgs = (
 
 export const withValuesToValues = (totals: WithValue[]) => totals.map((t) => t.value);
 export const assetQuantitySelector =
-  (id: string) =>
+  (id: Cardano.AssetId) =>
   (quantities: Cardano.Value[]): bigint =>
-    BigIntMath.sum(quantities.map(({ assets }) => assets?.[id] || 0n));
+    BigIntMath.sum(quantities.map(({ assets }) => assets?.get(id) || 0n));
 export const assetWithValueQuantitySelector =
-  (id: string) =>
+  (id: Cardano.AssetId) =>
   (totals: WithValue[]): bigint =>
     assetQuantitySelector(id)(withValuesToValues(totals));
 export const getCoinQuantity = (quantities: Cardano.Value[]): bigint =>
@@ -91,7 +89,7 @@ export const assertIsCoinBalanceSufficient = (
  * @throws InputSelectionError { UtxoBalanceInsufficient }
  */
 export const assertIsBalanceSufficient = (
-  uniqueOutputAssetIDs: string[],
+  uniqueOutputAssetIDs: Cardano.AssetId[],
   utxoValues: Cardano.Value[],
   outputValues: Cardano.Value[],
   implicitCoin: ImplicitCoinBigint

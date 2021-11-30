@@ -1,4 +1,4 @@
-import { PoolId } from '.';
+import { PoolIdHex } from './primitives';
 /* eslint-disable max-len */
 /**
  * Schema from:
@@ -118,7 +118,7 @@ export interface ITNVerification {
  * pool related metadata
  */
 export interface ExtendedStakePoolMetadataFields {
-  id: PoolId;
+  id: PoolIdHex;
   country?: DeclaredPoolLocation;
   status?: ExtendedPoolStatus;
   contact?: PoolContactData;

@@ -1,15 +1,51 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Cardano from '.';
 import { AuxiliaryData } from './AuxiliaryData';
-import { BlockAlonzo, BlockBodyAlonzo } from '@cardano-ogmios/schema';
+import { BlockBodyAlonzo } from '@cardano-ogmios/schema';
+import { Hash32ByteBase16, OpaqueString, typedHex } from '../util';
+import { PartialBlockHeader } from './Block';
 
-type OgmiosHeader = NonNullable<BlockAlonzo['header']>;
-export type PartialBlockHeader = Pick<OgmiosHeader, 'blockHeight' | 'slot' | 'blockHash'>;
-export type TransactionId = Cardano.Hash16;
+/**
+ * transaction hash as hex string
+ */
+export type TransactionId = Hash32ByteBase16<'TransactionId'>;
 
-export type Ed25519SignatureHash16 = string;
+/**
+ * @param {string} value transaction hash as hex string
+ * @throws InvalidStringError
+ */
+export const TransactionId = (value: string): TransactionId => Hash32ByteBase16<'TransactionId'>(value);
+
+/**
+ * Ed25519 signature as hex string
+ */
+export type Ed25519Signature = OpaqueString<'Ed25519Signature'>;
+
+/**
+ * @param {string} value Ed25519 signature as hex string
+ * @throws InvalidStringError
+ */
+export const Ed25519Signature = (value: string): Ed25519Signature => typedHex(value, 128);
+
+/**
+ * Ed25519 public key as hex string
+ */
+export type Ed25519PublicKey = OpaqueString<'Ed25519PublicKey'>;
+
+/**
+ * @param {string} value Ed25519 public key as hex string
+ * @throws InvalidStringError
+ */
+export const Ed25519PublicKey = (value: string): Ed25519PublicKey => typedHex(value, 64);
+
+/**
+ * 32 byte ED25519 key hash as hex string
+ */
+export type Ed25519KeyHash = OpaqueString<'Ed25519KeyHash'>;
+export const Ed25519KeyHash = (value: string): Ed25519KeyHash => Hash32ByteBase16(value);
 
 export interface Withdrawal {
-  stakeAddress: Cardano.Address;
+  stakeAddress: Cardano.RewardAccount;
   quantity: Cardano.Lovelace;
 }
 export interface TxBodyAlonzo {
@@ -21,8 +57,8 @@ export interface TxBodyAlonzo {
   withdrawals?: Withdrawal[];
   certificates?: Cardano.Certificate[];
   mint?: Cardano.TokenMap;
-  scriptIntegrityHash?: Cardano.Hash16;
-  requiredExtraSignatures?: Cardano.Hash16[];
+  scriptIntegrityHash?: Cardano.Hash28ByteBase16;
+  requiredExtraSignatures?: Cardano.Ed25519KeyHash[];
 }
 
 /**
@@ -42,15 +78,13 @@ export interface ImplicitCoin {
 export interface Redeemer {
   index: number;
   purpose: 'spend' | 'mint' | 'certificate' | 'withdrawal';
-  scriptHash: Cardano.Hash64;
+  scriptHash: Cardano.Hash28ByteBase16;
   executionUnits: Cardano.ExUnits;
 }
 
 export type Witness = Omit<Partial<BlockBodyAlonzo['witness']>, 'redeemers' | 'signatures'> & {
   redeemers?: Redeemer[];
-  signatures: Partial<{
-    [k: string]: Ed25519SignatureHash16;
-  }>;
+  signatures: Map<Ed25519PublicKey, Ed25519Signature>;
 };
 
 export interface TxAlonzo {

@@ -1,3 +1,4 @@
+import { AssetId } from './Asset';
 import { Value as _OgmiosValue } from '@cardano-ogmios/schema';
 
 export type Lovelace = bigint;
@@ -5,11 +6,10 @@ export type Lovelace = bigint;
 /**
  * {[assetId]: amount}
  */
-export type TokenMap = NonNullable<_OgmiosValue['assets']>;
+export type TokenMap = Map<AssetId, bigint>;
 
 /**
  * Total quantities of Coin and Assets in a Value.
- * TODO: Use Ogmios Value type after it changes lovelaces to bigint;
  */
 export interface Value {
   coins: Lovelace;

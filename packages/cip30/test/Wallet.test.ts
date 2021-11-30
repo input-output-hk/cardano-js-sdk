@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import * as testWallet from './testWallet';
+import { Cardano } from '@cardano-sdk/core';
 import { Wallet, WalletApi, WalletOptions } from '../src/Wallet';
 import { mocks } from 'mock-browser';
 const window = mocks.MockBrowser.createWindow();
@@ -73,8 +74,14 @@ describe('Wallet', () => {
       const uxtos = await api.getUtxos();
       expect(uxtos).toEqual([
         [
-          { index: 0, txId: '123456' },
-          { address: 'asdf', value: { assets: {}, coins: 100n } }
+          { index: 0, txId: Cardano.TransactionId('886206542d63b23a047864021fbfccf291d78e47c1e59bd4c75fbc67b248c5e8') },
+          {
+            address: Cardano.Address(
+              // eslint-disable-next-line max-len
+              'addr_test1qra788mu4sg8kwd93ns9nfdh3k4ufxwg4xhz2r3n064tzfgxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flkns6cy45x'
+            ),
+            value: { assets: {}, coins: 100n }
+          }
         ]
       ]);
     });

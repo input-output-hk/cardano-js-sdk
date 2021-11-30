@@ -60,15 +60,15 @@ export class StakePoolMetrics implements BigIntsAsStrings<Cardano.StakePoolMetri
 @ObjectType()
 export class StakePoolTransactions implements Cardano.StakePoolTransactions {
   @Field(() => [String])
-  registration: string[];
+  registration: Cardano.TransactionId[];
   @Field(() => [String])
-  retirement: string[];
+  retirement: Cardano.TransactionId[];
 }
 
 @ObjectType()
-export class StakePoolMetadataJson implements Cardano.PoolMetadata {
-  @Field()
-  hash: string;
+export class StakePoolMetadataJson implements Cardano.PoolMetadataJson {
+  @Field(() => String)
+  hash: Cardano.Hash32ByteBase16;
   @Field()
   url: string;
 }
@@ -113,8 +113,8 @@ const Relay = createUnionType({
 @ObjectType()
 export class StakePoolMetadata implements Cardano.StakePoolMetadata {
   @Directive('@id')
-  @Field()
-  stakePoolId: string;
+  @Field(() => String)
+  stakePoolId: Cardano.PoolId;
   // eslint-disable-next-line sonarjs/no-duplicate-string
   @Directive('@search(by: [fulltext])')
   @Field()
@@ -130,8 +130,8 @@ export class StakePoolMetadata implements Cardano.StakePoolMetadata {
   extDataUrl?: string;
   @Field({ nullable: true })
   extSigUrl?: string;
-  @Field({ nullable: true })
-  extVkey?: string;
+  @Field(() => String, { nullable: true })
+  extVkey?: Cardano.PoolMdVk;
   @Field(() => ExtendedStakePoolMetadata, { nullable: true })
   @Directive('@hasInverse(field: metadata)')
   ext?: Cardano.ExtendedStakePoolMetadata;
@@ -151,8 +151,8 @@ export class Fraction implements Cardano.Fraction {
 export class StakePool implements BigIntsAsStrings<Cardano.StakePool> {
   @Directive('@search(by: [fulltext])')
   @Directive('@id')
-  @Field()
-  id: string;
+  @Field(() => String)
+  id: Cardano.PoolId;
   @Field()
   hexId: string;
   @Field(() => StakePoolStatus, {
@@ -170,7 +170,7 @@ export class StakePool implements BigIntsAsStrings<Cardano.StakePool> {
   @Field(() => StakePoolTransactions)
   transactions: Cardano.StakePoolTransactions;
   @Field(() => StakePoolMetadataJson, { nullable: true })
-  metadataJson?: Cardano.PoolMetadata;
+  metadataJson?: Cardano.PoolMetadataJson;
   @Directive('@hasInverse(field: stakePool)')
   @Field(() => StakePoolMetadata, { nullable: true })
   metadata?: BigIntsAsStrings<Cardano.StakePoolMetadata>;

@@ -37,16 +37,18 @@ describe('blockfrostAssetProvider', () => {
       BlockFrostAPI.prototype.assetsById = jest.fn().mockResolvedValue(mockedAssetResponse);
 
       const client = blockfrostAssetProvider({ isTestnet: true, projectId: apiKey });
-      const response = await client.getAsset('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e');
+      const response = await client.getAsset(
+        Cardano.AssetId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e')
+      );
 
       expect(response).toMatchObject<Cardano.Asset>({
-        assetId: 'b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e',
-        fingerprint: 'asset1pkpwyknlvul7az0xx8czhl60pyel45rpje4z8w',
+        assetId: Cardano.AssetId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e'),
+        fingerprint: Cardano.AssetFingerprint('asset1pkpwyknlvul7az0xx8czhl60pyel45rpje4z8w'),
         history: [
           {
             action: Cardano.AssetProvisioning.Mint,
             quantity: 12_000n,
-            transactionId: '6804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99cad'
+            transactionId: Cardano.TransactionId('6804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99cad')
           }
         ],
         metadata: {
@@ -58,7 +60,7 @@ describe('blockfrostAssetProvider', () => {
           url: 'https://www.stakenuts.com/'
         },
         name: 'nutcoin',
-        policyId: 'b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a7',
+        policyId: Cardano.PolicyId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a7'),
         quantity: 12_000n
       });
     });
@@ -72,31 +74,33 @@ describe('blockfrostAssetProvider', () => {
         {
           action: 'minted',
           amount: '13000',
-          tx_hash: 'tx1hash'
+          tx_hash: '4123d70f66414cc921f6ffc29a899aafc7137a99a0fd453d6b200863ef5702d6'
         },
         {
           action: 'burned',
           amount: '1000',
-          tx_hash: 'tx2hash'
+          tx_hash: '01d7366549986d83edeea262e97b68eca3430d3bb052ed1c37d2202fd5458872'
         }
       ] as Responses['asset_history']);
 
       const client = blockfrostAssetProvider({ isTestnet: true, projectId: apiKey });
-      const response = await client.getAsset('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e');
+      const response = await client.getAsset(
+        Cardano.AssetId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e')
+      );
 
       expect(response).toMatchObject<Cardano.Asset>({
-        assetId: 'b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e',
-        fingerprint: 'asset1pkpwyknlvul7az0xx8czhl60pyel45rpje4z8w',
+        assetId: Cardano.AssetId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e'),
+        fingerprint: Cardano.AssetFingerprint('asset1pkpwyknlvul7az0xx8czhl60pyel45rpje4z8w'),
         history: [
           {
             action: Cardano.AssetProvisioning.Mint,
             quantity: 13_000n,
-            transactionId: 'tx1hash'
+            transactionId: Cardano.TransactionId('4123d70f66414cc921f6ffc29a899aafc7137a99a0fd453d6b200863ef5702d6')
           },
           {
             action: Cardano.AssetProvisioning.Burn,
             quantity: 1000n,
-            transactionId: 'tx2hash'
+            transactionId: Cardano.TransactionId('01d7366549986d83edeea262e97b68eca3430d3bb052ed1c37d2202fd5458872')
           }
         ],
         metadata: {
@@ -108,7 +112,7 @@ describe('blockfrostAssetProvider', () => {
           url: 'https://www.stakenuts.com/'
         },
         name: 'nutcoin',
-        policyId: 'b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a7',
+        policyId: Cardano.PolicyId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a7'),
         quantity: 12_000n
       });
     });

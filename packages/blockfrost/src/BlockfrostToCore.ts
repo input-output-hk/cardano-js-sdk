@@ -19,7 +19,7 @@ export const BlockfrostToCore = {
 
   blockToTip: (block: Responses['block_content']): Cardano.Tip => ({
     blockNo: block.height!,
-    hash: block.hash,
+    hash: Cardano.BlockId(block.hash),
     slot: block.slot!
   }),
 
@@ -58,7 +58,7 @@ export const BlockfrostToCore = {
   transactionUtxos: (utxoResponse: Responses['tx_content_utxo']) => ({
     inputs: utxoResponse.inputs.map((input) => ({
       ...BlockfrostToCore.txIn(input),
-      address: input.address
+      address: Cardano.Address(input.address)
     })),
     outputs: utxoResponse.outputs.map(BlockfrostToCore.txOut)
   }),
@@ -70,19 +70,19 @@ export const BlockfrostToCore = {
   }),
 
   txIn: (blockfrost: BlockfrostInput): Cardano.TxIn => ({
-    address: blockfrost.address,
+    address: Cardano.Address(blockfrost.address),
     index: blockfrost.output_index,
-    txId: blockfrost.tx_hash
+    txId: Cardano.TransactionId(blockfrost.tx_hash)
   }),
 
   txOut: (blockfrost: BlockfrostOutput): Cardano.TxOut => {
-    const assets: Cardano.Value['assets'] = {};
-    for (const amount of blockfrost.amount) {
-      if (amount.unit === 'lovelace') continue;
-      assets[amount.unit] = BigInt(amount.quantity);
+    const assets: Cardano.TokenMap = new Map();
+    for (const { quantity, unit } of blockfrost.amount) {
+      if (unit === 'lovelace') continue;
+      assets.set(Cardano.AssetId(unit), BigInt(quantity));
     }
     return {
-      address: blockfrost.address,
+      address: Cardano.Address(blockfrost.address),
       value: {
         assets,
         coins: BigInt(blockfrost.amount.find(({ unit }) => unit === 'lovelace')!.quantity)

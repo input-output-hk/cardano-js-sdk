@@ -58,8 +58,8 @@ export class ThePoolsMediaAssets implements Cardano.ThePoolsMediaAssets {
 export class ExtendedStakePoolMetadataFields implements Cardano.ExtendedStakePoolMetadataFields {
   [k: string]: unknown;
   @Directive('@id')
-  @Field()
-  id: string;
+  @Field(() => String)
+  id: Cardano.PoolIdHex;
   @Field({ nullable: true })
   country?: string;
   @Field(() => ExtendedPoolStatus, {

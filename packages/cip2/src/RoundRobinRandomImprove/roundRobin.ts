@@ -1,4 +1,4 @@
-import { BigIntMath } from '@cardano-sdk/core';
+import { BigIntMath, Cardano } from '@cardano-sdk/core';
 import {
   ImplicitCoinBigint,
   OutputWithValue,
@@ -36,14 +36,14 @@ const improvesSelection = (
 };
 
 const listTokensWithin = (
-  uniqueOutputAssetIDs: string[],
+  uniqueOutputAssetIDs: Cardano.AssetId[],
   outputs: OutputWithValue[],
   implicitCoin: ImplicitCoinBigint
 ) => [
   ...uniqueOutputAssetIDs.map((id) => {
     const getQuantity = assetWithValueQuantitySelector(id);
     return {
-      filterUtxo: (utxo: UtxoWithValue[]) => utxo.filter(({ value: { assets } }) => assets?.[id]),
+      filterUtxo: (utxo: UtxoWithValue[]) => utxo.filter(({ value: { assets } }) => assets?.get(id)),
       getTotalSelectedQuantity: (utxo: UtxoWithValue[]) => getQuantity(utxo),
       minimumTarget: getQuantity(outputs)
     };

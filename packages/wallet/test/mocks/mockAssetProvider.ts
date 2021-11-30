@@ -1,11 +1,17 @@
 import { Cardano } from '@cardano-sdk/core';
 
 export const asset = {
-  assetId: '659f2917fb63f12b33667463ee575eeac1845bbc736b9c0bbc40ba8254534c41',
-  fingerprint: 'asset...',
-  history: [{ action: Cardano.AssetProvisioning.Mint, quantity: 1000n, transactionId: 'some-tx-id...' }],
+  assetId: Cardano.AssetId('659f2917fb63f12b33667463ee575eeac1845bbc736b9c0bbc40ba8254534c41'),
+  fingerprint: Cardano.AssetFingerprint('asset1rjklcrnsdzqp65wjgrg55sy9723kw09mlgvlc3'),
+  history: [
+    {
+      action: Cardano.AssetProvisioning.Mint,
+      quantity: 1000n,
+      transactionId: Cardano.TransactionId('886206542d63b23a047864021fbfccf291d78e47c1e59bd4c75fbc67b248c5e8')
+    }
+  ],
   name: 'TSLA',
-  policyId: '659f2917fb63f12b33667463ee575eeac1845bbc736b9c0bbc40ba82',
+  policyId: Cardano.PolicyId('7eae28af2208be856f7a119668ae52a49b73725e326dc16579dcc373'),
   quantity: 1000n
 } as Cardano.Asset;
 

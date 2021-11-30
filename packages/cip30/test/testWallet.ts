@@ -1,3 +1,4 @@
+import { Cardano } from '@cardano-sdk/core';
 import { RequestAccess, WalletApi } from '../src/Wallet';
 
 export const api = <WalletApi>{
@@ -10,9 +11,14 @@ export const api = <WalletApi>{
     [
       {
         index: 0,
-        txId: '123456'
+        txId: Cardano.TransactionId('886206542d63b23a047864021fbfccf291d78e47c1e59bd4c75fbc67b248c5e8')
       },
-      { address: 'asdf', value: { assets: {}, coins: 100n } }
+      {
+        address: Cardano.Address(
+          'addr_test1qra788mu4sg8kwd93ns9nfdh3k4ufxwg4xhz2r3n064tzfgxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flkns6cy45x'
+        ),
+        value: { assets: {}, coins: 100n }
+      }
     ]
   ],
   signData: async (_addr, _sig) => 'signedData',

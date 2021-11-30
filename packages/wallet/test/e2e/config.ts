@@ -1,3 +1,4 @@
+import { Cardano } from '@cardano-sdk/core';
 import { blockfrostAssetProvider, blockfrostWalletProvider } from '@cardano-sdk/blockfrost';
 import { createInMemoryKeyManager } from '../../src/KeyManagement';
 import { createStubStakePoolSearchProvider } from '@cardano-sdk/util-dev';
@@ -38,8 +39,8 @@ export const stakePoolSearchProvider = (() => {
   throw new Error(`STAKE_POOL_SEARCH_PROVIDER unsupported: ${stakePoolSearchProviderName}`);
 })();
 
-export const poolId1 = process.env.POOL_ID_1!;
-if (!poolId1) throw new Error('POOL_ID_1 not set');
+if (!process.env.POOL_ID_1) throw new Error('POOL_ID_1 not set');
+export const poolId1 = Cardano.PoolId(process.env.POOL_ID_1!);
 
-export const poolId2 = process.env.POOL_ID_2!;
-if (!poolId1) throw new Error('POOL_ID_2 not set');
+if (!process.env.POOL_ID_2) throw new Error('POOL_ID_2 not set');
+export const poolId2 = Cardano.PoolId(process.env.POOL_ID_2!);

@@ -1,14 +1,13 @@
 import { CSL, Cardano, coreToCsl, cslToCore } from '@cardano-sdk/core';
-import { Hash16 } from '@cardano-ogmios/schema';
 import { SelectionResult } from '@cardano-sdk/cip2';
 
 export type TxInternals = {
-  hash: Hash16;
+  hash: Cardano.TransactionId;
   body: Cardano.TxBodyAlonzo;
 };
 
 export type CreateTxInternalsProps = {
-  changeAddress: string;
+  changeAddress: Cardano.Address;
   inputSelection: SelectionResult['selection'];
   validityInterval: Cardano.ValidityInterval;
   certificates?: Cardano.Certificate[];
@@ -36,7 +35,7 @@ export const createTransactionInternals = async ({
     certificates,
     fee: BigInt(inputSelection.fee.to_str()),
     inputs: [...inputSelection.inputs].map((cslInput) =>
-      cslToCore.txIn(cslInput.input(), cslInput.output().address().to_bech32())
+      cslToCore.txIn(cslInput.input(), Cardano.Address(cslInput.output().address().to_bech32()))
     ),
     outputs,
     validityInterval,
@@ -44,6 +43,6 @@ export const createTransactionInternals = async ({
   };
   return {
     body,
-    hash: Buffer.from(CSL.hash_transaction(coreToCsl.txBody(body)).to_bytes()).toString('hex')
+    hash: Cardano.TransactionId(Buffer.from(CSL.hash_transaction(coreToCsl.txBody(body)).to_bytes()).toString('hex'))
   };
 };

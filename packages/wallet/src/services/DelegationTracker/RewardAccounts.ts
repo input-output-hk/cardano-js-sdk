@@ -13,7 +13,10 @@ import { isLastStakeKeyCertOfType } from './transactionCertificates';
 export const createQueryStakePoolsProvider =
   (stakePoolSearchProvider: StakePoolSearchProvider, retryBackoffConfig: RetryBackoffConfig) =>
   (fragments: Cardano.PoolId[]) =>
-    coldObservableProvider(() => stakePoolSearchProvider.queryStakePools(fragments), retryBackoffConfig);
+    coldObservableProvider(
+      () => stakePoolSearchProvider.queryStakePools(fragments as unknown as string[]),
+      retryBackoffConfig
+    );
 export type ObservableStakePoolSearchProvider = ReturnType<typeof createQueryStakePoolsProvider>;
 
 const getWithdrawalQuantity = (
@@ -64,7 +67,7 @@ const isDelegationCertificate = (cert: Cardano.Certificate): cert is Cardano.Sta
   cert.__typename === Cardano.CertificateType.StakeDelegation;
 
 const getAccountsKeyStatus =
-  (addresses: string[]) =>
+  (addresses: Cardano.RewardAccount[]) =>
   ([transactions, transactionsInFlight]: [TxWithEpoch[], Cardano.NewTxAlonzo[]]) => {
     const certificatesInFlight = transactionsInFlight.map(({ body: { certificates } }) => certificates || []);
     return addresses.map((address) => {
@@ -111,7 +114,7 @@ const accountCertificateTransactions = (
             .filter((cert): cert is Cardano.StakeDelegationCertificate | Cardano.StakeAddressCertificate =>
               [...RegAndDeregCertificateTypes, Cardano.CertificateType.StakeDelegation].includes(cert.__typename)
             )
-            .filter((cert) => cert.address === rewardAccount),
+            .filter((cert) => cert.rewardAccount === rewardAccount),
           epoch
         }))
         .filter(({ certificates }) => certificates.length > 0)

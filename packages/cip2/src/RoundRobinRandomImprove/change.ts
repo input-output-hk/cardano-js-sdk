@@ -17,7 +17,7 @@ type EstimateTxFeeWithOriginalOutputs = (utxo: CSL.TransactionUnspentOutput[], c
 interface ChangeComputationArgs {
   utxoSelection: UtxoSelection;
   outputValues: Cardano.Value[];
-  uniqueOutputAssetIDs: string[];
+  uniqueOutputAssetIDs: Cardano.AssetId[];
   implicitCoin: ImplicitCoinBigint;
   estimateTxFee: EstimateTxFeeWithOriginalOutputs;
   computeMinimumCoinQuantity: ComputeMinimumCoinQuantity;
@@ -31,15 +31,16 @@ interface ChangeComputationResult {
   fee: bigint;
 }
 
-const getLeftoverAssets = (utxoSelected: UtxoWithValue[], uniqueOutputAssetIDs: string[]) => {
-  const leftovers: Record<string, Array<bigint>> = {};
+const getLeftoverAssets = (utxoSelected: UtxoWithValue[], uniqueOutputAssetIDs: Cardano.AssetId[]) => {
+  const leftovers: Map<Cardano.AssetId, Array<bigint>> = new Map();
   for (const {
     value: { assets }
   } of utxoSelected) {
     if (assets) {
-      const leftoverAssetKeys = Object.keys(assets).filter((id) => !uniqueOutputAssetIDs.includes(id));
+      const leftoverAssetKeys = [...assets.keys()].filter((id) => !uniqueOutputAssetIDs.includes(id));
       for (const assetKey of leftoverAssetKeys) {
-        (leftovers[assetKey] ||= []).push(assets[assetKey]);
+        const assetLeftovers = leftovers.get(assetKey) || [];
+        leftovers.set(assetKey, [...assetLeftovers, assets.get(assetKey)!]);
       }
     }
   }
@@ -56,16 +57,16 @@ const getLeftoverAssets = (utxoSelected: UtxoWithValue[], uniqueOutputAssetIDs: 
 const redistributeLeftoverAssets = (
   utxoSelected: UtxoWithValue[],
   requestedAssetChangeBundles: Cardano.Value[],
-  uniqueOutputAssetIDs: string[]
+  uniqueOutputAssetIDs: Cardano.AssetId[]
 ) => {
   const leftovers = getLeftoverAssets(utxoSelected, uniqueOutputAssetIDs);
   // Distribute leftovers to result bundles
   const resultBundles = [...requestedAssetChangeBundles];
-  for (const assetId in leftovers) {
+  for (const assetId of leftovers.keys()) {
     if (resultBundles.length === 0) {
       resultBundles.push({ coins: 0n });
     }
-    const quantities = orderBy(leftovers[assetId], (q) => q, 'desc');
+    const quantities = orderBy(leftovers.get(assetId), (q) => q, 'desc');
     while (quantities.length > resultBundles.length) {
       // Coalesce the smallest quantities together
       const smallestQuantity = quantities.pop()!;
@@ -73,11 +74,9 @@ const redistributeLeftoverAssets = (
     }
     for (const [idx, quantity] of quantities.entries()) {
       const originalBundle = resultBundles[idx];
+      const originalBundleAssets = originalBundle.assets?.entries() || [];
       resultBundles.splice(idx, 1, {
-        assets: {
-          ...originalBundle.assets,
-          [assetId]: quantity
-        },
+        assets: new Map([...originalBundleAssets, [assetId, quantity]]),
         coins: originalBundle.coins
       });
     }
@@ -89,24 +88,23 @@ const createBundlePerOutput = (
   outputValues: Cardano.Value[],
   coinTotalRequested: bigint,
   coinChangeTotal: bigint,
-  assetTotals: Record<string, { selected: bigint; requested: bigint }>
+  assetTotals: Map<Cardano.AssetId, { selected: bigint; requested: bigint }>
 ) => {
   let totalCoinBundled = 0n;
-  const totalAssetsBundled: Record<string, bigint> = {};
+  const totalAssetsBundled: Cardano.TokenMap = new Map();
   const bundles = outputValues.map((value) => {
     const coins = coinTotalRequested > 0n ? (coinChangeTotal * value.coins) / coinTotalRequested : 0n;
     totalCoinBundled += coins;
     if (!value.assets) {
       return { coins };
     }
-    const assets: Cardano.TokenMap = {};
-    for (const assetId of Object.keys(value.assets)) {
-      const outputAmount = value.assets[assetId];
-      const { selected, requested } = assetTotals[assetId];
+    const assets: Cardano.TokenMap = new Map();
+    for (const [assetId, outputAmount] of value.assets.entries()) {
+      const { selected, requested } = assetTotals.get(assetId)!;
       const assetChangeTotal = selected - requested;
       const assetChange = (assetChangeTotal * outputAmount) / selected;
-      totalAssetsBundled[assetId] = (totalAssetsBundled[assetId] || 0n) + assetChange;
-      assets[assetId] = assetChange;
+      totalAssetsBundled.set(assetId, (totalAssetsBundled.get(assetId) || 0n) + assetChange);
+      assets.set(assetId, assetChange);
     }
     return { assets, coins };
   });
@@ -124,16 +122,16 @@ const createBundlePerOutput = (
 const computeRequestedAssetChangeBundles = (
   utxoSelected: UtxoWithValue[],
   outputValues: Cardano.Value[],
-  uniqueOutputAssetIDs: string[],
+  uniqueOutputAssetIDs: Cardano.AssetId[],
   implicitCoin: ImplicitCoinBigint,
   fee: bigint
 ): Cardano.Value[] => {
-  const assetTotals: Record<string, { selected: bigint; requested: bigint }> = {};
+  const assetTotals: Map<Cardano.AssetId, { selected: bigint; requested: bigint }> = new Map();
   for (const assetId of uniqueOutputAssetIDs) {
-    assetTotals[assetId] = {
+    assetTotals.set(assetId, {
       requested: assetQuantitySelector(assetId)(outputValues),
       selected: assetWithValueQuantitySelector(assetId)(utxoSelected)
-    };
+    });
   }
   const coinTotalSelected = getWithValuesCoinQuantity(utxoSelected) + implicitCoin.input;
   const coinTotalRequested = getCoinQuantity(outputValues) + fee + implicitCoin.deposit;
@@ -156,11 +154,11 @@ const computeRequestedAssetChangeBundles = (
     }
   }
   for (const assetId of uniqueOutputAssetIDs) {
-    const assetTotal = assetTotals[assetId];
-    const assetLost = assetTotal.selected - assetTotal.requested - totalAssetsBundled[assetId];
+    const assetTotal = assetTotals.get(assetId)!;
+    const assetLost = assetTotal.selected - assetTotal.requested - totalAssetsBundled.get(assetId)!;
     if (assetLost > 0n) {
-      const anyBundle = bundles.find(({ assets }) => typeof assets?.[assetId] === 'bigint')!;
-      anyBundle.assets![assetId] = (anyBundle.assets![assetId] || 0n) + assetLost;
+      const anyBundle = bundles.find(({ assets }) => assets?.has(assetId))!;
+      anyBundle.assets?.set(assetId, anyBundle.assets!.get(assetId)! + assetLost);
     }
   }
 
@@ -207,7 +205,7 @@ const coalesceChangeBundlesForMinCoinRequirement = (
     return undefined;
   }
   // Filter empty bundles
-  return sortedBundles.filter((bundle) => bundle.coins > 0n || Object.keys(bundle.assets || {}).length > 0);
+  return sortedBundles.filter((bundle) => bundle.coins > 0n || (bundle.assets?.size || 0) > 0);
 };
 
 const computeChangeBundles = ({
@@ -220,7 +218,7 @@ const computeChangeBundles = ({
 }: {
   utxoSelection: UtxoSelection;
   outputValues: Cardano.Value[];
-  uniqueOutputAssetIDs: string[];
+  uniqueOutputAssetIDs: Cardano.AssetId[];
   implicitCoin: ImplicitCoinBigint;
   computeMinimumCoinQuantity: ComputeMinimumCoinQuantity;
   fee?: bigint;

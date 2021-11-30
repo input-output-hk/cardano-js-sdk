@@ -96,7 +96,7 @@ export interface RewardBalance {
   available: Cardano.Lovelace;
 }
 export interface RewardAccount {
-  address: Cardano.Address;
+  address: Cardano.RewardAccount;
   keyStatus: StakeKeyStatus;
   delegatee?: Delegatee;
   rewardBalance: RewardBalance;

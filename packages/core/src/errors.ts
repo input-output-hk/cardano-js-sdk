@@ -3,6 +3,7 @@ import { CustomError } from 'ts-custom-error';
 export enum ProviderFailure {
   NotFound = 'NOT_FOUND',
   Unknown = 'UNKNOWN',
+  InvalidResponse = 'INVALID_RESPONSE',
   NotImplemented = 'NOT_IMPLEMENTED'
 }
 
@@ -33,5 +34,11 @@ export class InvalidProtocolParametersError extends CustomError {
 export class NotImplementedError extends CustomError {
   public constructor(missingFeature: string) {
     super(`Not implemented: ${missingFeature}`);
+  }
+}
+
+export class InvalidStringError extends CustomError {
+  constructor(expectation: string, public innerError?: unknown) {
+    super(`Invalid string: "${expectation}"`);
   }
 }

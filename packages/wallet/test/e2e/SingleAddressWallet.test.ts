@@ -3,8 +3,9 @@ import { SingleAddressWallet, StakeKeyStatus, Wallet } from '../../src';
 import { assetProvider, keyManager, poolId1, poolId2, stakePoolSearchProvider, walletProvider } from './config';
 import { distinctUntilChanged, filter, firstValueFrom, map, merge, mergeMap, skip, tap, timer } from 'rxjs';
 
-const faucetAddress =
-  'addr_test1qqr585tvlc7ylnqvz8pyqwauzrdu0mxag3m7q56grgmgu7sxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flknswgndm3';
+const faucetAddress = Cardano.Address(
+  'addr_test1qqr585tvlc7ylnqvz8pyqwauzrdu0mxag3m7q56grgmgu7sxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flknswgndm3'
+);
 
 const createDelegationCertificates = async (wallet: Wallet) => {
   const {
@@ -22,10 +23,8 @@ const createDelegationCertificates = async (wallet: Wallet) => {
     certificates: [
       ...(isStakeKeyRegistered
         ? []
-        : ([
-            { __typename: Cardano.CertificateType.StakeKeyRegistration, address: rewardAccount }
-          ] as Cardano.Certificate[])),
-      { __typename: Cardano.CertificateType.StakeDelegation, address: rewardAccount, epoch, poolId }
+        : ([{ __typename: Cardano.CertificateType.StakeKeyRegistration, rewardAccount }] as Cardano.Certificate[])),
+      { __typename: Cardano.CertificateType.StakeDelegation, epoch, poolId, rewardAccount }
     ] as Cardano.Certificate[],
     isStakeKeyRegistered,
     poolId
@@ -47,7 +46,7 @@ const waitForNewStakePoolIdAfterTx = (wallet: Wallet) =>
   );
 
 describe('SingleAddressWallet', () => {
-  let rewardAccount: Cardano.Address;
+  let rewardAccount: Cardano.RewardAccount;
   let wallet: Wallet;
 
   const waitForBalanceCoins = (expectedCoins: Cardano.Lovelace) =>
@@ -142,7 +141,7 @@ describe('SingleAddressWallet', () => {
 
     // Make a 2nd tx with key deregistration
     const tx2Internals = await wallet.initializeTx({
-      certificates: [{ __typename: Cardano.CertificateType.StakeKeyDeregistration, address: rewardAccount }]
+      certificates: [{ __typename: Cardano.CertificateType.StakeKeyDeregistration, rewardAccount }]
     });
     await wallet.submitTx(await wallet.finalizeTx(tx2Internals));
 

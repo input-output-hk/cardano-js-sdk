@@ -1,6 +1,16 @@
-import { fetchSequentially, replaceNumbersWithBigints } from '../src/util';
+import { InvalidStringError, ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { fetchSequentially, formatBlockfrostError, replaceNumbersWithBigints } from '../src/util';
 
 describe('util', () => {
+  describe('formatBlockfrostError', () => {
+    it('converts InvalidStringError to ProviderError', () => {
+      const originalError = new InvalidStringError('');
+      expect(() => formatBlockfrostError(originalError)).toThrowError(
+        new ProviderError(ProviderFailure.InvalidResponse, originalError)
+      );
+    });
+  });
+
   test('replaceNumbersWithBigints', () => {
     expect(replaceNumbersWithBigints(1)).toBe(1n);
     expect(replaceNumbersWithBigints('a')).toBe('a');

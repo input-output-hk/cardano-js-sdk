@@ -16,7 +16,7 @@ export interface FinalizeTxProps {
   readonly body: Cardano.TxBodyAlonzo;
 }
 
-export type Assets = Partial<Record<Cardano.AssetId, Cardano.Asset>>;
+export type Assets = Map<Cardano.AssetId, Cardano.Asset>;
 
 export interface Wallet {
   name: string;

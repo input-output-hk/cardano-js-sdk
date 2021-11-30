@@ -2,20 +2,11 @@ import * as Ogmios from '@cardano-ogmios/schema';
 import { CustomError } from 'ts-custom-error';
 import { util } from '../../util';
 
-export {
-  Address,
-  Hash16,
-  Hash64,
-  Epoch,
-  Tip,
-  PoolMetadata,
-  PoolId,
-  Slot,
-  ExUnits,
-  RewardAccount
-} from '@cardano-ogmios/schema';
+export { Epoch, Slot, ExUnits } from '@cardano-ogmios/schema';
+export { Hash32ByteBase16, Hash28ByteBase16 } from '../util';
+export * from './Address';
+export * from './RewardAccount';
 export * from './StakePool';
-export * from './ExtendedStakePoolMetadata';
 export * from './Utxo';
 export * from './Value';
 export * from './DelegationsAndRewards';
@@ -28,8 +19,6 @@ export * from './AuxiliaryData';
 export * as TxSubmissionErrors from './TxSubmissionErrors';
 
 export type TxSubmissionError = CustomError;
-
-export type Ed25519KeyHashBech32 = string;
 
 export type ProtocolParametersAlonzo = util.OptionalUndefined<
   util.RecursivelyReplaceNullWithUndefined<Ogmios.ProtocolParametersAlonzo>

@@ -24,14 +24,14 @@ export const transactionHasAnyCertificate = (
 export const isLastStakeKeyCertOfType = (
   transactionsCertificates: Cardano.Certificate[][],
   certType: Cardano.CertificateType.StakeKeyRegistration | Cardano.CertificateType.StakeKeyDeregistration,
-  rewardAccount?: Cardano.Address
+  rewardAccount?: Cardano.RewardAccount
 ) => {
   const lastRegOrDereg = last(
     transactionsCertificates
       .map((certificates) => {
         const allStakeKeyCertificates = stakeKeyCertficates(certificates);
         const addressStakeKeyCertificates = rewardAccount
-          ? allStakeKeyCertificates.filter(({ address }) => rewardAccount === address)
+          ? allStakeKeyCertificates.filter(({ rewardAccount: address }) => rewardAccount === address)
           : allStakeKeyCertificates;
         return last(addressStakeKeyCertificates);
       })
