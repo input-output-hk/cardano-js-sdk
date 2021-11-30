@@ -95,10 +95,10 @@
 				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-namespace">
 					<a name="CreateTxInternalsProps" class="tsd-anchor"></a>
 					<h3>Create<wbr>TxInternals<wbr>Props</h3>
-					<div class="tsd-signature tsd-kind-icon">Create<wbr>TxInternals<wbr>Props<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>certificates<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Cardano.Certificate</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">; </span>changeAddress<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>inputSelection<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">SelectionResult</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">&quot;selection&quot;</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">; </span>validityInterval<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Cardano.ValidityInterval</span><span class="tsd-signature-symbol">; </span>withdrawals<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Cardano.Withdrawal</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> }</span></div>
+					<div class="tsd-signature tsd-kind-icon">Create<wbr>TxInternals<wbr>Props<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>certificates<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Cardano.Certificate</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">; </span>changeAddress<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Cardano.Address</span><span class="tsd-signature-symbol">; </span>inputSelection<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">SelectionResult</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">&quot;selection&quot;</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">; </span>validityInterval<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Cardano.ValidityInterval</span><span class="tsd-signature-symbol">; </span>withdrawals<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Cardano.Withdrawal</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/f628f37/packages/wallet/src/Transaction/createTransactionInternals.ts#L10">packages/wallet/src/Transaction/createTransactionInternals.ts:10</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/365e7a6/packages/wallet/src/Transaction/createTransactionInternals.ts#L9">packages/wallet/src/Transaction/createTransactionInternals.ts:9</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -108,7 +108,7 @@
 								<h5><span class="tsd-flag ts-flagOptional">Optional</span> certificates<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Cardano.Certificate</span><span class="tsd-signature-symbol">[]</span></h5>
 							</li>
 							<li class="tsd-parameter">
-								<h5>change<wbr>Address<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
+								<h5>change<wbr>Address<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Cardano.Address</span></h5>
 							</li>
 							<li class="tsd-parameter">
 								<h5>input<wbr>Selection<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">SelectionResult</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">&quot;selection&quot;</span><span class="tsd-signature-symbol">]</span></h5>
@@ -125,10 +125,10 @@
 				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-namespace">
 					<a name="TxInternals" class="tsd-anchor"></a>
 					<h3>Tx<wbr>Internals</h3>
-					<div class="tsd-signature tsd-kind-icon">Tx<wbr>Internals<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>body<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Cardano.TxBodyAlonzo</span><span class="tsd-signature-symbol">; </span>hash<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Hash16</span><span class="tsd-signature-symbol"> }</span></div>
+					<div class="tsd-signature tsd-kind-icon">Tx<wbr>Internals<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>body<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Cardano.TxBodyAlonzo</span><span class="tsd-signature-symbol">; </span>hash<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Cardano.TransactionId</span><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/f628f37/packages/wallet/src/Transaction/createTransactionInternals.ts#L5">packages/wallet/src/Transaction/createTransactionInternals.ts:5</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/365e7a6/packages/wallet/src/Transaction/createTransactionInternals.ts#L4">packages/wallet/src/Transaction/createTransactionInternals.ts:4</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -138,7 +138,7 @@
 								<h5>body<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Cardano.TxBodyAlonzo</span></h5>
 							</li>
 							<li class="tsd-parameter">
-								<h5>hash<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Hash16</span></h5>
+								<h5>hash<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Cardano.TransactionId</span></h5>
 							</li>
 						</ul>
 					</div>
@@ -156,7 +156,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/f628f37/packages/wallet/src/Transaction/computeImplicitCoin.ts#L7">packages/wallet/src/Transaction/computeImplicitCoin.ts:7</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/365e7a6/packages/wallet/src/Transaction/computeImplicitCoin.ts#L7">packages/wallet/src/Transaction/computeImplicitCoin.ts:7</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -187,7 +187,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/f628f37/packages/wallet/src/Transaction/createTransactionInternals.ts#L18">packages/wallet/src/Transaction/createTransactionInternals.ts:18</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/365e7a6/packages/wallet/src/Transaction/createTransactionInternals.ts#L17">packages/wallet/src/Transaction/createTransactionInternals.ts:17</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -210,7 +210,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/f628f37/packages/wallet/src/Transaction/ensureValidityInterval.ts#L3">packages/wallet/src/Transaction/ensureValidityInterval.ts:3</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/365e7a6/packages/wallet/src/Transaction/ensureValidityInterval.ts#L3">packages/wallet/src/Transaction/ensureValidityInterval.ts:3</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>

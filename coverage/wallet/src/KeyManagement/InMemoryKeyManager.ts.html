@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">94.59% </span>
+                <span class="strong">94.74% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>35/37</span>
+                <span class='fraction'>36/38</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">97.14% </span>
+                <span class="strong">97.22% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>34/35</span>
+                <span class='fraction'>35/36</span>
             </div>
         
             
@@ -150,8 +150,7 @@
 <a name='L91'></a><a href='#L91'>91</a>
 <a name='L92'></a><a href='#L92'>92</a>
 <a name='L93'></a><a href='#L93'>93</a>
-<a name='L94'></a><a href='#L94'>94</a>
-<a name='L95'></a><a href='#L95'>95</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">13x</span>
+<a name='L94'></a><a href='#L94'>94</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">13x</span>
 <span class="cline-any cline-yes">13x</span>
 <span class="cline-any cline-yes">13x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -185,6 +184,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">21x</span>
 <span class="cline-any cline-yes">21x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">21x</span>
 <span class="cline-any cline-yes">21x</span>
@@ -203,8 +204,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -236,8 +235,7 @@
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -278,13 +276,15 @@ export const createInMemoryKeyManager = ({
   const extendedAccountPublicKey = extendedAccountPrivateKey.to_public();
 &nbsp;
   const privateParentPaymentKeyRaw = extendedAccountPrivateKey.derive(0).derive(0).to_raw_key();
-  const publicParentPaymentKeyRawBech32 = privateParentPaymentKeyRaw.to_public().to_bech32();
+  const publicParentPaymentKeyRawHex = Cardano.Ed25519PublicKey(
+    Buffer.from(privateParentPaymentKeyRaw.to_public().as_bytes()).toString('hex')
+  );
 &nbsp;
   const privateStakeKey = extendedAccountPrivateKey.derive(2).derive(0);
   const privateStakeKeyRaw = privateStakeKey.to_raw_key();
   const publicStakeKey = privateStakeKey.to_public();
   const publicStakeKeyRaw = publicStakeKey.to_raw_key();
-  const publicStakeKeyRawBech32 = publicStakeKeyRaw.to_bech32();
+  const publicStakeKeyRawHex = Cardano.Ed25519PublicKey(Buffer.from(publicStakeKeyRaw.as_bytes()).toString('hex'));
   const publicStakeKeyRawHash = publicStakeKeyRaw.hash();
 &nbsp;
   return {
@@ -300,17 +300,15 @@ export const createInMemoryKeyManager = ({
         networkId,
         CSL.StakeCredential.from_keyhash(derivedPublicPaymentKeyHash),
         stakeKeyCredential
-      )
-        .to_address()
-        .to_bech32();
+      ).to_address();
 &nbsp;
-      const rewardAccount = CSL.RewardAddress.new(networkId, stakeKeyCredential).to_address().to_bech32();
+      const rewardAccount = CSL.RewardAddress.new(networkId, stakeKeyCredential).to_address();
       return {
         accountIndex,
-        address,
+        address: Cardano.Address(address.to_bech32()),
         addressIndex,
         networkId,
-        rewardAccount,
+        rewardAccount: Cardano.RewardAccount(rewardAccount.to_bech32()),
         type
       };
     },
@@ -325,17 +323,16 @@ export const createInMemoryKeyManager = ({
       const paymentVkeyWitness = CSL.make_vkey_witness(cslHash, privateParentPaymentKeyRaw);
       const stakeWitnesses = (() =&gt; {
         if (!body.certificates) {
-          return {};
+          return [];
         }
         const stakeVkeyWitness = CSL.make_vkey_witness(cslHash, privateStakeKeyRaw);
-        return {
-          [publicStakeKeyRawBech32]: stakeVkeyWitness.signature().to_hex()
-        };
+        return [[publicStakeKeyRawHex, Cardano.Ed25519Signature(stakeVkeyWitness.signature().to_hex())] as const];
       })();
-      return {
-        [publicParentPaymentKeyRawBech32]: paymentVkeyWitness.signature().to_hex(),
+      const paymentVkeyWitnessHex = Cardano.Ed25519Signature(paymentVkeyWitness.signature().to_hex());
+      return new Map&lt;Cardano.Ed25519PublicKey, Cardano.Ed25519Signature&gt;([
+        [publicParentPaymentKeyRawHex, paymentVkeyWitnessHex],
         ...stakeWitnesses
-      };
+      ]);
     }
   };
 };
@@ -346,7 +343,7 @@ export const createInMemoryKeyManager = ({
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Tue Nov 23 2021 11:04:31 GMT+0000 (Coordinated Universal Time)
+                at Tue Nov 30 2021 03:26:56 GMT+0000 (Coordinated Universal Time)
             </div>
         </div>
         <script src="../../prettify.js"></script>

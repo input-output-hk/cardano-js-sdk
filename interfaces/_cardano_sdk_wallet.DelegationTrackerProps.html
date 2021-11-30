@@ -103,35 +103,35 @@
 					<div class="tsd-signature tsd-kind-icon">epoch$<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/f628f37/packages/wallet/src/services/DelegationTracker/DelegationTracker.ts#L29">packages/wallet/src/services/DelegationTracker/DelegationTracker.ts:29</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/365e7a6/packages/wallet/src/services/DelegationTracker/DelegationTracker.ts#L29">packages/wallet/src/services/DelegationTracker/DelegationTracker.ts:29</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="internals" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagOptional">Optional</span> internals</h3>
-					<div class="tsd-signature tsd-kind-icon">internals<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>blockEpochProvider<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">(</span>blockHashes<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>queryStakePoolsProvider<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">(</span>fragments<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">StakePool</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>rewardsHistoryProvider<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">(</span>lowerBound<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">EpochRewards</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>rewardsProvider<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">(</span>rewardAccounts<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">bigint</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span></div>
+					<div class="tsd-signature tsd-kind-icon">internals<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>blockEpochProvider<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">(</span>blockHashes<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">BlockId</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>queryStakePoolsProvider<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">(</span>fragments<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">PoolId</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">StakePool</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>rewardsHistoryProvider<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">(</span>lowerBound<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">EpochRewards</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>rewardsProvider<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">(</span>rewardAccounts<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">RewardAccount</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">bigint</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/f628f37/packages/wallet/src/services/DelegationTracker/DelegationTracker.ts#L32">packages/wallet/src/services/DelegationTracker/DelegationTracker.ts:32</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/365e7a6/packages/wallet/src/services/DelegationTracker/DelegationTracker.ts#L32">packages/wallet/src/services/DelegationTracker/DelegationTracker.ts:32</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
 						<h4>Type declaration</h4>
 						<ul class="tsd-parameters">
 							<li class="tsd-parameter">
-								<h5><span class="tsd-flag ts-flagOptional">Optional</span> block<wbr>Epoch<wbr>Provider<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">(</span>blockHashes<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h5>
+								<h5><span class="tsd-flag ts-flagOptional">Optional</span> block<wbr>Epoch<wbr>Provider<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">(</span>blockHashes<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">BlockId</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h5>
 								<ul class="tsd-parameters">
 									<li class="tsd-parameter-signature">
 										<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-type-literal">
-											<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>blockHashes<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></li>
+											<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>blockHashes<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">BlockId</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></li>
 										</ul>
 										<ul class="tsd-descriptions">
 											<li class="tsd-description">
 												<h4 class="tsd-parameters-title">Parameters</h4>
 												<ul class="tsd-parameters">
 													<li>
-														<h5>blockHashes: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
+														<h5>blockHashes: <span class="tsd-signature-type">BlockId</span><span class="tsd-signature-symbol">[]</span></h5>
 													</li>
 												</ul>
 												<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -141,18 +141,18 @@
 								</ul>
 							</li>
 							<li class="tsd-parameter">
-								<h5><span class="tsd-flag ts-flagOptional">Optional</span> query<wbr>Stake<wbr>Pools<wbr>Provider<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">(</span>fragments<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">StakePool</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h5>
+								<h5><span class="tsd-flag ts-flagOptional">Optional</span> query<wbr>Stake<wbr>Pools<wbr>Provider<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">(</span>fragments<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">PoolId</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">StakePool</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h5>
 								<ul class="tsd-parameters">
 									<li class="tsd-parameter-signature">
 										<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-type-literal">
-											<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>fragments<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">StakePool</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></li>
+											<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>fragments<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">PoolId</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">StakePool</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></li>
 										</ul>
 										<ul class="tsd-descriptions">
 											<li class="tsd-description">
 												<h4 class="tsd-parameters-title">Parameters</h4>
 												<ul class="tsd-parameters">
 													<li>
-														<h5>fragments: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
+														<h5>fragments: <span class="tsd-signature-type">PoolId</span><span class="tsd-signature-symbol">[]</span></h5>
 													</li>
 												</ul>
 												<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">StakePool</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -183,18 +183,18 @@
 								</ul>
 							</li>
 							<li class="tsd-parameter">
-								<h5><span class="tsd-flag ts-flagOptional">Optional</span> rewards<wbr>Provider<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">(</span>rewardAccounts<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">bigint</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h5>
+								<h5><span class="tsd-flag ts-flagOptional">Optional</span> rewards<wbr>Provider<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">(</span>rewardAccounts<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">RewardAccount</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">bigint</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h5>
 								<ul class="tsd-parameters">
 									<li class="tsd-parameter-signature">
 										<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-type-literal">
-											<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>rewardAccounts<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">bigint</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></li>
+											<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>rewardAccounts<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">RewardAccount</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">bigint</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></li>
 										</ul>
 										<ul class="tsd-descriptions">
 											<li class="tsd-description">
 												<h4 class="tsd-parameters-title">Parameters</h4>
 												<ul class="tsd-parameters">
 													<li>
-														<h5>rewardAccounts: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
+														<h5>rewardAccounts: <span class="tsd-signature-type">RewardAccount</span><span class="tsd-signature-symbol">[]</span></h5>
 													</li>
 												</ul>
 												<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">bigint</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -212,17 +212,17 @@
 					<div class="tsd-signature tsd-kind-icon">retry<wbr>Backoff<wbr>Config<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">RetryBackoffConfig</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/f628f37/packages/wallet/src/services/DelegationTracker/DelegationTracker.ts#L31">packages/wallet/src/services/DelegationTracker/DelegationTracker.ts:31</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/365e7a6/packages/wallet/src/services/DelegationTracker/DelegationTracker.ts#L31">packages/wallet/src/services/DelegationTracker/DelegationTracker.ts:31</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="rewardAccountAddresses_" class="tsd-anchor"></a>
 					<h3>reward<wbr>Account<wbr>Addresses$</h3>
-					<div class="tsd-signature tsd-kind-icon">reward<wbr>Account<wbr>Addresses$<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<div class="tsd-signature tsd-kind-icon">reward<wbr>Account<wbr>Addresses$<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">RewardAccount</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/f628f37/packages/wallet/src/services/DelegationTracker/DelegationTracker.ts#L27">packages/wallet/src/services/DelegationTracker/DelegationTracker.ts:27</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/365e7a6/packages/wallet/src/services/DelegationTracker/DelegationTracker.ts#L27">packages/wallet/src/services/DelegationTracker/DelegationTracker.ts:27</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -232,7 +232,7 @@
 					<div class="tsd-signature tsd-kind-icon">stake<wbr>Pool<wbr>Search<wbr>Provider<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">StakePoolSearchProvider</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/f628f37/packages/wallet/src/services/DelegationTracker/DelegationTracker.ts#L28">packages/wallet/src/services/DelegationTracker/DelegationTracker.ts:28</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/365e7a6/packages/wallet/src/services/DelegationTracker/DelegationTracker.ts#L28">packages/wallet/src/services/DelegationTracker/DelegationTracker.ts:28</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -242,7 +242,7 @@
 					<div class="tsd-signature tsd-kind-icon">transactions<wbr>Tracker<span class="tsd-signature-symbol">:</span> <a href="_cardano_sdk_wallet.TransactionsTracker.html" class="tsd-signature-type" data-tsd-kind="Interface">TransactionsTracker</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/f628f37/packages/wallet/src/services/DelegationTracker/DelegationTracker.ts#L30">packages/wallet/src/services/DelegationTracker/DelegationTracker.ts:30</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/365e7a6/packages/wallet/src/services/DelegationTracker/DelegationTracker.ts#L30">packages/wallet/src/services/DelegationTracker/DelegationTracker.ts:30</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -252,7 +252,7 @@
 					<div class="tsd-signature tsd-kind-icon">wallet<wbr>Provider<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">WalletProvider</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/f628f37/packages/wallet/src/services/DelegationTracker/DelegationTracker.ts#L26">packages/wallet/src/services/DelegationTracker/DelegationTracker.ts:26</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/365e7a6/packages/wallet/src/services/DelegationTracker/DelegationTracker.ts#L26">packages/wallet/src/services/DelegationTracker/DelegationTracker.ts:26</a></li>
 						</ul>
 					</aside>
 				</section>
