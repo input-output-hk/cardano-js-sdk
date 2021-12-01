@@ -1,6 +1,33 @@
-import { CSL, Cardano } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
 import { TxInternals } from '../Transaction';
 
+// TODO: test
+export type HexBlob = Cardano.util.OpaqueString<'HexBlob'>;
+export const HexBlob = (target: string): HexBlob => Cardano.util.typedHex(target);
+
+// TODO: convert to hex opaque string type and possibly move to core
+export type Bip32PublicKey = string;
+
+export interface SignBlobResult {
+  publicKey: Cardano.Ed25519PublicKey;
+  signature: Cardano.Ed25519Signature;
+}
+
+export enum KeyAgentType {
+  InMemory = 'InMemory',
+  Ledger = 'Ledger'
+}
+
+export enum KeyType {
+  External = 0,
+  Internal = 1,
+  Stake = 2
+}
+
+export interface AccountKeyDerivationPath {
+  type: KeyType;
+  index: number;
+}
 /** Internal = change address & External = receipt address */
 export enum AddressType {
   /**
@@ -13,32 +40,52 @@ export enum AddressType {
   External = 0
 }
 
-export enum KeyType {
-  External = 0,
-  Internal = 1,
-  Stake = 2
+export interface AccountAddressDerivationPath {
+  type: AddressType;
+  index: number;
 }
 
 export interface GroupedAddress {
-  networkId: Cardano.NetworkId;
   type: AddressType;
+  index: number;
+  networkId: Cardano.NetworkId;
   accountIndex: number;
-  addressIndex: number;
   address: Cardano.Address;
   rewardAccount: Cardano.RewardAccount;
 }
 
-export interface KeyManager {
-  // TODO: do not expose CSL objects publicly
-  // Reconsider which keys should be exposed, if any.
-  extendedAccountPublicKey: CSL.Bip32PublicKey;
-  derivePublicKey: (type: KeyType, index: number) => CSL.PublicKey;
-  // See https://github.com/cardano-foundation/CIPs/tree/master/CIP-1852#specification
-  deriveAddress: (type: AddressType, index: number) => GroupedAddress;
-  signMessage: (
-    addressType: AddressType,
-    signingIndex: number,
-    message: string
-  ) => Promise<{ publicKey: string; signature: string }>;
-  signTransaction: (tx: TxInternals) => Promise<Cardano.Witness['signatures']>;
+/**
+ * number[] is used by InMemoryKeyAgent
+ */
+export type AgentSpecificData = number[] | null;
+
+export interface SerializableKeyAgentDataBase {
+  networkId: Cardano.NetworkId;
+  accountIndex: number;
+}
+
+export interface SerializableInMemoryKeyAgentData extends SerializableKeyAgentDataBase {
+  __typename: KeyAgentType.InMemory;
+  encryptedRootPrivateKeyBytes: number[];
+}
+
+export interface SerializableLedgerKeyAgentData extends SerializableKeyAgentDataBase {
+  __typename: KeyAgentType.Ledger;
+}
+
+export type SerializableKeyAgentData = SerializableInMemoryKeyAgentData | SerializableLedgerKeyAgentData;
+
+// TODO: utility to cache password for specified duration
+export type Authenticate = () => Promise<Uint8Array>;
+
+export interface KeyAgent {
+  get networkId(): Cardano.NetworkId;
+  get accountIndex(): number;
+  get extendedAccountPublicKey(): Promise<Bip32PublicKey>;
+  get serializableData(): SerializableKeyAgentData;
+  signBlob(derivationPath: AccountKeyDerivationPath, blob: HexBlob): Promise<SignBlobResult>;
+  signTransaction(txInternals: TxInternals): Promise<Cardano.Witness['signatures']>;
+  derivePublicKey(derivationPath: AccountKeyDerivationPath): Promise<Cardano.Ed25519PublicKey>;
+  deriveAddress(derivationPath: AccountAddressDerivationPath): Promise<GroupedAddress>;
+  exportPrivateKey(): Promise<Uint8Array>;
 }

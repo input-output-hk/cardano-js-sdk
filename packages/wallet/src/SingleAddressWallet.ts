@@ -29,11 +29,11 @@ import {
   sharedDistinctBlock,
   sharedDistinctEpoch
 } from './services';
-import { BehaviorSubject, Subject, combineLatest, from, lastValueFrom, map, mergeMap, take } from 'rxjs';
 import { InitializeTxProps, Wallet } from './types';
 import { InputSelector, defaultSelectionConstraints, roundRobinRandomImprove } from '@cardano-sdk/cip2';
 import { Logger, dummyLogger } from 'ts-log';
 import { RetryBackoffConfig } from 'backoff-rxjs';
+import { Subject, combineLatest, from, lastValueFrom, map, mergeMap, of, take } from 'rxjs';
 import { TxInternals, computeImplicitCoin, createTransactionInternals, ensureValidityInterval } from './Transaction';
 import { isEqual } from 'lodash-es';
 
@@ -70,7 +70,7 @@ export class SingleAddressWallet implements Wallet {
   delegation: DelegationTracker;
   tip$: BehaviorObservable<Cardano.Tip>;
   networkInfo$: TrackerSubject<NetworkInfo>;
-  addresses$: BehaviorSubject<GroupedAddress[]>;
+  addresses$: TrackerSubject<GroupedAddress[]>;
   protocolParameters$: TrackerSubject<ProtocolParametersRequiredByWallet>;
   genesisParameters$: TrackerSubject<Cardano.CompactGenesis>;
   assets$: TrackerSubject<Assets>;
@@ -99,7 +99,17 @@ export class SingleAddressWallet implements Wallet {
     this.#inputSelector = inputSelector;
     this.#walletProvider = walletProvider;
     this.#keyManager = keyManager;
-    this.addresses$ = new BehaviorSubject([address || keyManager.deriveAddress(AddressType.External, 0)]);
+    this.addresses$ = new TrackerSubject(
+      (address
+        ? of(address)
+        : from(
+            keyManager.deriveAddress({
+              index: 0,
+              type: AddressType.External
+            })
+          )
+      ).pipe(map((addr) => [addr]))
+    );
     this.name = name;
     this.#tip$ = this.tip$ = new SyncableIntervalTrackerSubject({
       pollInterval,
@@ -155,12 +165,11 @@ export class SingleAddressWallet implements Wallet {
   }
   initializeTx(props: InitializeTxProps): Promise<TxInternals> {
     return lastValueFrom(
-      combineLatest([this.tip$, this.utxo.available$, this.protocolParameters$]).pipe(
+      combineLatest([this.tip$, this.utxo.available$, this.protocolParameters$, this.addresses$]).pipe(
         take(1),
-        mergeMap(([tip, utxo, protocolParameters]) => {
+        mergeMap(([tip, utxo, protocolParameters, [{ address: changeAddress }]]) => {
           const validityInterval = ensureValidityInterval(tip.slot, props.options?.validityInterval);
           const txOutputs = new Set([...(props.outputs || [])].map((output) => coreToCsl.txOut(output)));
-          const changeAddress = this.addresses$.value[0].address;
           const constraints = defaultSelectionConstraints({
             buildTx: async (inputSelection) => {
               this.#logger.debug('Building TX for selection constraints', inputSelection);
@@ -233,5 +242,6 @@ export class SingleAddressWallet implements Wallet {
     this.protocolParameters$.complete();
     this.genesisParameters$.complete();
     this.#tip$.complete();
+    this.addresses$.complete();
   }
 }

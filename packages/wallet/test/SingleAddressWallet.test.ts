@@ -4,6 +4,7 @@ import { AssetId, createStubStakePoolSearchProvider } from '@cardano-sdk/util-de
 import { Cardano } from '@cardano-sdk/core';
 import { KeyManagement, SingleAddressWallet } from '../src';
 import { firstValueFrom, skip } from 'rxjs';
+import { testKeyManager } from './mocks';
 
 describe('SingleAddressWallet', () => {
   const name = 'Test Wallet';
@@ -15,15 +16,11 @@ describe('SingleAddressWallet', () => {
   let wallet: SingleAddressWallet;
 
   beforeEach(async () => {
-    keyManager = KeyManagement.createInMemoryKeyManager({
-      mnemonicWords: KeyManagement.util.generateMnemonicWords(),
-      networkId: Cardano.NetworkId.testnet,
-      password: '123'
-    });
+    keyManager = await testKeyManager();
     walletProvider = mocks.mockWalletProvider();
     assetProvider = mocks.mockAssetProvider();
     const stakePoolSearchProvider = createStubStakePoolSearchProvider();
-    keyManager.deriveAddress = jest.fn().mockReturnValue({
+    keyManager.deriveAddress = jest.fn().mockResolvedValue({
       address,
       rewardAccount
     });
@@ -79,9 +76,10 @@ describe('SingleAddressWallet', () => {
       expect(rewardAccounts[0].delegatee).toBeUndefined();
       expect(rewardAccounts[0].rewardBalance.total).toBe(mocks.rewards);
     });
-    it('"addresses$"', () => {
-      expect(wallet.addresses$.value[0].address).toEqual(address);
-      expect(wallet.addresses$.value[0].rewardAccount).toEqual(rewardAccount);
+    it('"addresses$"', async () => {
+      const addresses = await firstValueFrom(wallet.addresses$);
+      expect(addresses[0].address).toEqual(address);
+      expect(addresses[0].rewardAccount).toEqual(rewardAccount);
     });
     it('"assets$"', async () => {
       expect(await firstValueFrom(wallet.assets$)).toEqual(new Map([[AssetId.TSLA, mocks.asset]]));
