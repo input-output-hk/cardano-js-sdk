@@ -27,7 +27,7 @@ import {
 } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TrackerSubject } from './util/TrackerSubject';
-import { coldObservableProvider, sharedDistinctBlock, transactionsEquals } from './util';
+import { coldObservableProvider, distinctBlock, transactionsEquals } from './util';
 import { sortBy } from 'lodash-es';
 
 export interface TransactionsTrackerProps {
@@ -105,7 +105,7 @@ export const createTransactionsTracker = (
   }: TransactionsTrackerProps,
   {
     transactionsSource$ = new TrackerSubject(
-      createAddressTransactionsProvider(walletProvider, addresses$, retryBackoffConfig, sharedDistinctBlock(tip$))
+      createAddressTransactionsProvider(walletProvider, addresses$, retryBackoffConfig, distinctBlock(tip$))
     )
   }: TransactionsTrackerInternals = {}
 ): TransactionsTracker => {

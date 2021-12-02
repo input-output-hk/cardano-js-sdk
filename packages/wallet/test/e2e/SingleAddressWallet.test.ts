@@ -72,8 +72,9 @@ describe('SingleAddressWallet', () => {
 
   afterAll(() => wallet.shutdown());
 
-  it('has an address', () => {
-    expect(wallet.addresses$.value![0].address.startsWith('addr')).toBe(true);
+  it('has an address', async () => {
+    const addresses = await firstValueFrom(wallet.addresses$);
+    expect(addresses[0].address.startsWith('addr')).toBe(true);
   });
 
   it('has assets$', async () => {

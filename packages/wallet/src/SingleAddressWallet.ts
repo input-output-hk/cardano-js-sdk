@@ -26,14 +26,14 @@ import {
   createDelegationTracker,
   createTransactionsTracker,
   createUtxoTracker,
-  sharedDistinctBlock,
-  sharedDistinctEpoch
+  distinctBlock,
+  distinctEpoch
 } from './services';
 import { InitializeTxProps, Wallet } from './types';
 import { InputSelector, defaultSelectionConstraints, roundRobinRandomImprove } from '@cardano-sdk/cip2';
 import { Logger, dummyLogger } from 'ts-log';
+import { Observable, Subject, combineLatest, from, lastValueFrom, map, mergeMap, take } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { Subject, combineLatest, from, lastValueFrom, map, mergeMap, of, take } from 'rxjs';
 import { TxInternals, computeImplicitCoin, createTransactionInternals, ensureValidityInterval } from './Transaction';
 import { isEqual } from 'lodash-es';
 
@@ -99,27 +99,17 @@ export class SingleAddressWallet implements Wallet {
     this.#inputSelector = inputSelector;
     this.#walletProvider = walletProvider;
     this.#keyManager = keyManager;
-    this.addresses$ = new TrackerSubject(
-      (address
-        ? of(address)
-        : from(
-            keyManager.deriveAddress({
-              index: 0,
-              type: AddressType.External
-            })
-          )
-      ).pipe(map((addr) => [addr]))
-    );
+    this.addresses$ = new TrackerSubject<GroupedAddress[]>(this.#initializeAddress(address));
     this.name = name;
     this.#tip$ = this.tip$ = new SyncableIntervalTrackerSubject({
       pollInterval,
       provider$: coldObservableProvider(walletProvider.ledgerTip, retryBackoffConfig)
     });
-    const tipBlockHeight$ = sharedDistinctBlock(this.tip$);
+    const tipBlockHeight$ = distinctBlock(this.tip$);
     this.networkInfo$ = new TrackerSubject(
       coldObservableProvider(walletProvider.networkInfo, retryBackoffConfig, tipBlockHeight$, isEqual)
     );
-    const epoch$ = sharedDistinctEpoch(this.networkInfo$);
+    const epoch$ = distinctEpoch(this.networkInfo$);
     this.protocolParameters$ = new TrackerSubject(
       coldObservableProvider(walletProvider.currentWalletProtocolParameters, retryBackoffConfig, epoch$, isEqual)
     );
@@ -163,6 +153,7 @@ export class SingleAddressWallet implements Wallet {
       })
     );
   }
+
   initializeTx(props: InitializeTxProps): Promise<TxInternals> {
     return lastValueFrom(
       combineLatest([this.tip$, this.utxo.available$, this.protocolParameters$, this.addresses$]).pipe(
@@ -243,5 +234,21 @@ export class SingleAddressWallet implements Wallet {
     this.genesisParameters$.complete();
     this.#tip$.complete();
     this.addresses$.complete();
+  }
+
+  #initializeAddress(existingAddress?: GroupedAddress): Observable<GroupedAddress[]> {
+    return new Observable((observer) => {
+      if (existingAddress) {
+        observer.next([existingAddress]);
+        return;
+      }
+      this.#keyManager
+        .deriveAddress({
+          index: 0,
+          type: AddressType.External
+        })
+        .then((newAddress) => observer.next([newAddress]))
+        .catch(observer.error);
+    });
   }
 }
