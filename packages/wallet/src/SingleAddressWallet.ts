@@ -1,4 +1,4 @@
-import { AddressType, GroupedAddress, KeyManager } from './KeyManagement';
+import { AddressType, GroupedAddress, KeyAgent } from './KeyManagement';
 import {
   AssetProvider,
   Cardano,
@@ -45,7 +45,7 @@ export interface SingleAddressWalletProps {
 }
 
 export interface SingleAddressWalletDependencies {
-  readonly keyManager: KeyManager;
+  readonly keyAgent: KeyAgent;
   readonly walletProvider: WalletProvider;
   readonly stakePoolSearchProvider: StakePoolSearchProvider;
   readonly assetProvider: AssetProvider;
@@ -55,7 +55,7 @@ export interface SingleAddressWalletDependencies {
 
 export class SingleAddressWallet implements Wallet {
   #inputSelector: InputSelector;
-  #keyManager: KeyManager;
+  #keyAgent: KeyAgent;
   #walletProvider: WalletProvider;
   #logger: Logger;
   #tip$: SyncableIntervalTrackerSubject<Cardano.Tip>;
@@ -89,7 +89,7 @@ export class SingleAddressWallet implements Wallet {
     {
       walletProvider,
       stakePoolSearchProvider,
-      keyManager,
+      keyAgent,
       assetProvider,
       logger = dummyLogger,
       inputSelector = roundRobinRandomImprove()
@@ -98,7 +98,7 @@ export class SingleAddressWallet implements Wallet {
     this.#logger = logger;
     this.#inputSelector = inputSelector;
     this.#walletProvider = walletProvider;
-    this.#keyManager = keyManager;
+    this.#keyAgent = keyAgent;
     this.addresses$ = new TrackerSubject<GroupedAddress[]>(this.#initializeAddress(address));
     this.name = name;
     this.#tip$ = this.tip$ = new SyncableIntervalTrackerSubject({
@@ -199,7 +199,7 @@ export class SingleAddressWallet implements Wallet {
     );
   }
   async finalizeTx(tx: TxInternals, auxiliaryData?: Cardano.AuxiliaryData): Promise<Cardano.NewTxAlonzo> {
-    const signatures = await this.#keyManager.signTransaction(tx);
+    const signatures = await this.#keyAgent.signTransaction(tx);
     return {
       auxiliaryData,
       body: tx.body,
@@ -242,7 +242,7 @@ export class SingleAddressWallet implements Wallet {
         observer.next([existingAddress]);
         return;
       }
-      this.#keyManager
+      this.#keyAgent
         .deriveAddress({
           index: 0,
           type: AddressType.External

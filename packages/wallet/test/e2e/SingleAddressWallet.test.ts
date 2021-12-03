@@ -1,6 +1,6 @@
 import { Cardano } from '@cardano-sdk/core';
 import { SingleAddressWallet, StakeKeyStatus, Wallet } from '../../src';
-import { assetProvider, keyManager, poolId1, poolId2, stakePoolSearchProvider, walletProvider } from './config';
+import { assetProvider, keyAgentReady, poolId1, poolId2, stakePoolSearchProvider, walletProvider } from './config';
 import { distinctUntilChanged, filter, firstValueFrom, map, merge, mergeMap, skip, tap, timer } from 'rxjs';
 
 const faucetAddress = Cardano.Address(
@@ -62,7 +62,7 @@ describe('SingleAddressWallet', () => {
       { name: 'Test Wallet' },
       {
         assetProvider,
-        keyManager,
+        keyAgent: await keyAgentReady,
         stakePoolSearchProvider,
         walletProvider
       }

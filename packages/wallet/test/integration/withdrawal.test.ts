@@ -7,15 +7,15 @@ import { mockAssetProvider, mockWalletProvider } from '../mocks';
 const walletProps: SingleAddressWalletProps = { name: 'some-wallet' };
 const networkId = Cardano.NetworkId.mainnet;
 const mnemonicWords = KeyManagement.util.generateMnemonicWords();
-const authenticate = async () => Buffer.from('your_password');
+const getPassword = async () => Buffer.from('your_password');
 
 describe('integration/withdrawal', () => {
-  let keyManager: KeyManagement.KeyManager;
+  let keyAgent: KeyManagement.KeyAgent;
   let wallet: SingleAddressWallet;
 
   beforeAll(async () => {
-    keyManager = await KeyManagement.InMemoryKeyAgent.fromBip39MnemonicWords({
-      authenticate,
+    keyAgent = await KeyManagement.InMemoryKeyAgent.fromBip39MnemonicWords({
+      getPassword,
       mnemonicWords,
       networkId
     });
@@ -24,7 +24,7 @@ describe('integration/withdrawal', () => {
     const assetProvider = mockAssetProvider();
     wallet = new SingleAddressWallet(walletProps, {
       assetProvider,
-      keyManager,
+      keyAgent,
       stakePoolSearchProvider,
       walletProvider
     });

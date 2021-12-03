@@ -1,8 +1,9 @@
 import * as errors from './errors';
 import {
   AccountKeyDerivationPath,
-  Authenticate,
+  Bip32PrivateKey,
   Bip32PublicKey,
+  GetPassword,
   HexBlob,
   KeyAgentType,
   SerializableKeyAgentData,
@@ -17,13 +18,13 @@ export interface InMemoryKeyAgentProps {
   networkId: Cardano.NetworkId;
   accountIndex: number;
   encryptedRootPrivateKey: Uint8Array;
-  authenticate: Authenticate;
+  getPassword: GetPassword;
 }
 
 export interface FromBip39MnemonicWordsProps {
   networkId: Cardano.NetworkId;
   mnemonicWords: string[];
-  authenticate: Authenticate;
+  getPassword: GetPassword;
   accountIndex?: number;
 }
 
@@ -31,9 +32,9 @@ export interface FromBip39MnemonicWordsProps {
 // See https://github.com/Emurgo/yoroi-frontend/blob/aea5c9d69bfa091dfc3957dfefa0e9beccb5331c/packages/yoroi-extension/app/api/ada/lib/cardanoCrypto/cryptoWallet.js#L70-L76
 const EMPTY_PASSWORD = Buffer.from('');
 
-const getPassword = async (authenticate: Authenticate) => {
+const getPasswordRethrowTypedError = async (getPassword: GetPassword) => {
   try {
-    return await authenticate();
+    return await getPassword();
   } catch {
     // TODO: create new error types for KeyAgent failures
     throw new Error('Failed to enter password');
@@ -44,14 +45,14 @@ export class InMemoryKeyAgent extends KeyAgentBase {
   readonly #networkId: Cardano.NetworkId;
   readonly #accountIndex: number;
   readonly #encryptedRootPrivateKey: Uint8Array;
-  readonly #authenticate: Authenticate;
+  readonly #getPassword: GetPassword;
 
-  constructor({ networkId, accountIndex, encryptedRootPrivateKey, authenticate }: InMemoryKeyAgentProps) {
+  constructor({ networkId, accountIndex, encryptedRootPrivateKey, getPassword }: InMemoryKeyAgentProps) {
     super();
     this.#accountIndex = accountIndex;
     this.#networkId = networkId;
     this.#encryptedRootPrivateKey = encryptedRootPrivateKey;
-    this.#authenticate = authenticate;
+    this.#getPassword = getPassword;
   }
 
   get __typename(): KeyAgentType {
@@ -67,12 +68,6 @@ export class InMemoryKeyAgent extends KeyAgentBase {
     };
   }
 
-  get extendedAccountPublicKey(): Promise<Bip32PublicKey> {
-    return this.#deriveAccountPrivateKey().then((privateKey) =>
-      Buffer.from(privateKey.to_public().as_bytes()).toString('hex')
-    );
-  }
-
   get networkId(): Cardano.NetworkId {
     return this.#networkId;
   }
@@ -80,9 +75,9 @@ export class InMemoryKeyAgent extends KeyAgentBase {
     return this.#accountIndex;
   }
 
-  get agentSpecificData() {
-    // eslint-disable-next-line unicorn/no-useless-undefined
-    return [...this.#encryptedRootPrivateKey];
+  async getExtendedAccountPublicKey(): Promise<Bip32PublicKey> {
+    const privateKey = await this.#deriveAccountPrivateKey();
+    return Buffer.from(privateKey.to_public().as_bytes()).toString('hex');
   }
 
   async signBlob({ index, type }: AccountKeyDerivationPath, blob: HexBlob): Promise<SignBlobResult> {
@@ -103,14 +98,14 @@ export class InMemoryKeyAgent extends KeyAgentBase {
   // rootPrivateKey = CSL.Bip32PrivateKey.from_bip39_entropy(entropy, EMPTY_PASSWORD);
   // eslint-disable-next-line max-len
   // https://github.com/Emurgo/cardano-serialization-lib/blob/f817a033ade7a2255591d7c6444fa4f9ffbcf061/rust/src/chain_crypto/derive.rs#L30-L38
-  async exportPrivateKey(): Promise<Uint8Array> {
-    const rootPrivateKey = await this.#decryptRootPrivateKey();
-    return rootPrivateKey.as_bytes();
+  async exportRootPrivateKey(): Promise<Bip32PrivateKey> {
+    const rootPrivateKey = await this.#decryptRootPrivateKey(true);
+    return Buffer.from(rootPrivateKey.as_bytes()).toString('hex');
   }
 
   static async fromBip39MnemonicWords({
     networkId,
-    authenticate,
+    getPassword,
     mnemonicWords,
     accountIndex = 0
   }: FromBip39MnemonicWordsProps): Promise<InMemoryKeyAgent> {
@@ -119,12 +114,12 @@ export class InMemoryKeyAgent extends KeyAgentBase {
     if (!validMnemonic) throw new errors.InvalidMnemonic();
     const entropy = Buffer.from(mnemonicWordsToEntropy(mnemonicWords), 'hex');
     const rootPrivateKey = CSL.Bip32PrivateKey.from_bip39_entropy(entropy, EMPTY_PASSWORD);
-    const password = await getPassword(authenticate);
+    const password = await getPasswordRethrowTypedError(getPassword);
     const encryptedRootPrivateKey = await emip3encrypt(rootPrivateKey.as_bytes(), password);
     return new InMemoryKeyAgent({
       accountIndex,
-      authenticate,
       encryptedRootPrivateKey,
+      getPassword,
       networkId
     });
   }
@@ -134,10 +129,10 @@ export class InMemoryKeyAgent extends KeyAgentBase {
     return rootPrivateKey.derive(harden(1852)).derive(harden(1815)).derive(harden(this.accountIndex));
   }
 
-  async #decryptRootPrivateKey() {
+  async #decryptRootPrivateKey(noCache?: true) {
     const decryptedAccountKeyBytes = await emip3decrypt(
       this.#encryptedRootPrivateKey,
-      await getPassword(this.#authenticate)
+      await getPasswordRethrowTypedError(() => this.#getPassword(noCache))
     );
     if (!decryptedAccountKeyBytes) {
       // TODO: create new error types for KeyAgent failures

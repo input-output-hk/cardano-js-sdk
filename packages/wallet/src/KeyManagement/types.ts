@@ -7,6 +7,7 @@ export const HexBlob = (target: string): HexBlob => Cardano.util.typedHex(target
 
 // TODO: convert to hex opaque string type and possibly move to core
 export type Bip32PublicKey = string;
+export type Bip32PrivateKey = string;
 
 export interface SignBlobResult {
   publicKey: Cardano.Ed25519PublicKey;
@@ -76,16 +77,19 @@ export interface SerializableLedgerKeyAgentData extends SerializableKeyAgentData
 export type SerializableKeyAgentData = SerializableInMemoryKeyAgentData | SerializableLedgerKeyAgentData;
 
 // TODO: utility to cache password for specified duration
-export type Authenticate = () => Promise<Uint8Array>;
+/**
+ * @returns password used to decrypt root private key
+ */
+export type GetPassword = (noCache?: true) => Promise<Uint8Array>;
 
 export interface KeyAgent {
   get networkId(): Cardano.NetworkId;
   get accountIndex(): number;
-  get extendedAccountPublicKey(): Promise<Bip32PublicKey>;
   get serializableData(): SerializableKeyAgentData;
+  getExtendedAccountPublicKey(): Promise<Bip32PublicKey>;
   signBlob(derivationPath: AccountKeyDerivationPath, blob: HexBlob): Promise<SignBlobResult>;
   signTransaction(txInternals: TxInternals): Promise<Cardano.Witness['signatures']>;
   derivePublicKey(derivationPath: AccountKeyDerivationPath): Promise<Cardano.Ed25519PublicKey>;
   deriveAddress(derivationPath: AccountAddressDerivationPath): Promise<GroupedAddress>;
-  exportPrivateKey(): Promise<Uint8Array>;
+  exportRootPrivateKey(): Promise<Bip32PrivateKey>;
 }

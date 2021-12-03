@@ -1,6 +1,7 @@
 import {
   AccountAddressDerivationPath,
   AccountKeyDerivationPath,
+  Bip32PrivateKey,
   Bip32PublicKey,
   GroupedAddress,
   HexBlob,
@@ -15,11 +16,11 @@ import { TxInternals } from '../Transaction';
 export abstract class KeyAgentBase implements KeyAgent {
   abstract get networkId(): Cardano.NetworkId;
   abstract get accountIndex(): number;
-  abstract get extendedAccountPublicKey(): Promise<Bip32PublicKey>;
   abstract get serializableData(): SerializableKeyAgentData;
+  abstract getExtendedAccountPublicKey(): Promise<Bip32PublicKey>;
   abstract signBlob(derivationPath: AccountKeyDerivationPath, blob: HexBlob): Promise<SignBlobResult>;
   abstract derivePublicKey(derivationPath: AccountKeyDerivationPath): Promise<Cardano.Ed25519PublicKey>;
-  abstract exportPrivateKey(): Promise<Uint8Array>;
+  abstract exportRootPrivateKey(): Promise<Bip32PrivateKey>;
 
   /**
    * See https://github.com/cardano-foundation/CIPs/tree/master/CIP-1852#specification
@@ -60,7 +61,7 @@ export abstract class KeyAgentBase implements KeyAgent {
     const blob = HexBlob(hash.toString());
     const paymentVkeyWitness = await this.signBlob({ index: 0, type: KeyType.External }, blob);
     const stakeWitnesses = await (async () => {
-      if (!body.certificates) {
+      if (!body.certificates?.length) {
         return [];
       }
       const { publicKey, signature } = await this.signBlob({ index: 0, type: KeyType.Stake }, blob);

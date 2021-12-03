@@ -4,27 +4,27 @@ import { AssetId, createStubStakePoolSearchProvider } from '@cardano-sdk/util-de
 import { Cardano } from '@cardano-sdk/core';
 import { KeyManagement, SingleAddressWallet } from '../src';
 import { firstValueFrom, skip } from 'rxjs';
-import { testKeyManager } from './mocks';
+import { testKeyAgent } from './mocks';
 
 describe('SingleAddressWallet', () => {
   const name = 'Test Wallet';
   const address = mocks.queryTransactionsResult[0].body.inputs[0].address;
   const rewardAccount = mocks.rewardAccount;
-  let keyManager: KeyManagement.KeyManager;
+  let keyAgent: KeyManagement.KeyAgent;
   let walletProvider: mocks.ProviderStub;
   let assetProvider: mocks.MockAssetProvider;
   let wallet: SingleAddressWallet;
 
   beforeEach(async () => {
-    keyManager = await testKeyManager();
+    keyAgent = await testKeyAgent();
     walletProvider = mocks.mockWalletProvider();
     assetProvider = mocks.mockAssetProvider();
     const stakePoolSearchProvider = createStubStakePoolSearchProvider();
-    keyManager.deriveAddress = jest.fn().mockResolvedValue({
+    keyAgent.deriveAddress = jest.fn().mockResolvedValue({
       address,
       rewardAccount
     });
-    wallet = new SingleAddressWallet({ name }, { assetProvider, keyManager, stakePoolSearchProvider, walletProvider });
+    wallet = new SingleAddressWallet({ name }, { assetProvider, keyAgent, stakePoolSearchProvider, walletProvider });
   });
 
   afterEach(() => wallet.shutdown());

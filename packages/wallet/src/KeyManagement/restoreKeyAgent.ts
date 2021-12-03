@@ -1,7 +1,7 @@
 /* eslint-disable func-style */
 /* eslint-disable sonarjs/no-small-switch */
 import {
-  Authenticate,
+  GetPassword,
   KeyAgentType,
   SerializableInMemoryKeyAgentData,
   SerializableKeyAgentData,
@@ -14,30 +14,28 @@ export interface RestoreInMemoryKeyAgentProps {
   /**
    * Required for InMemoryKeyAgent
    */
-  authenticate?: Authenticate;
+  getPassword?: GetPassword;
 }
 
 export function restoreKeyAgent(data: SerializableLedgerKeyAgentData): KeyAgentBase;
-export function restoreKeyAgent(data: SerializableInMemoryKeyAgentData, authenticate: Authenticate): InMemoryKeyAgent;
+export function restoreKeyAgent(data: SerializableInMemoryKeyAgentData, getPassword: GetPassword): InMemoryKeyAgent;
+export function restoreKeyAgent(data: SerializableKeyAgentData, getPassword?: GetPassword): InMemoryKeyAgent;
 /**
  * Restore key agent from serializable data
  */
-export function restoreKeyAgent<T extends SerializableKeyAgentData>(
-  data: T,
-  authenticate?: Authenticate
-): KeyAgentBase {
+export function restoreKeyAgent<T extends SerializableKeyAgentData>(data: T, getPassword?: GetPassword): KeyAgentBase {
   switch (data.__typename) {
     case KeyAgentType.InMemory:
       if (!data.encryptedRootPrivateKeyBytes || data.encryptedRootPrivateKeyBytes.length !== 64) {
         throw new Error('Expected encrypted root private key in "agentData" for InMemoryKeyAgent"');
       }
-      if (!authenticate) {
-        throw new Error('Expected "authenticate" in RestoreKeyAgentProps for InMemoryKeyAgent"');
+      if (!getPassword) {
+        throw new Error('Expected "getPassowrd" in RestoreKeyAgentProps for InMemoryKeyAgent"');
       }
       return new InMemoryKeyAgent({
         accountIndex: data.accountIndex,
-        authenticate,
         encryptedRootPrivateKey: new Uint8Array(data.encryptedRootPrivateKeyBytes),
+        getPassword,
         networkId: data.networkId
       });
     default:
