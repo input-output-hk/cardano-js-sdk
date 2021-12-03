@@ -1,13 +1,8 @@
 import { Cardano } from '@cardano-sdk/core';
 import { TxInternals } from '../Transaction';
 
-// TODO: test
 export type HexBlob = Cardano.util.OpaqueString<'HexBlob'>;
 export const HexBlob = (target: string): HexBlob => Cardano.util.typedHex(target);
-
-// TODO: convert to hex opaque string type and possibly move to core
-export type Bip32PublicKey = string;
-export type Bip32PrivateKey = string;
 
 export interface SignBlobResult {
   publicKey: Cardano.Ed25519PublicKey;
@@ -86,10 +81,10 @@ export interface KeyAgent {
   get networkId(): Cardano.NetworkId;
   get accountIndex(): number;
   get serializableData(): SerializableKeyAgentData;
-  getExtendedAccountPublicKey(): Promise<Bip32PublicKey>;
+  getExtendedAccountPublicKey(): Promise<Cardano.Bip32PublicKey>;
   signBlob(derivationPath: AccountKeyDerivationPath, blob: HexBlob): Promise<SignBlobResult>;
-  signTransaction(txInternals: TxInternals): Promise<Cardano.Witness['signatures']>;
+  signTransaction(txInternals: TxInternals): Promise<Cardano.Signatures>;
   derivePublicKey(derivationPath: AccountKeyDerivationPath): Promise<Cardano.Ed25519PublicKey>;
   deriveAddress(derivationPath: AccountAddressDerivationPath): Promise<GroupedAddress>;
-  exportRootPrivateKey(): Promise<Bip32PrivateKey>;
+  exportRootPrivateKey(): Promise<Cardano.Bip32PrivateKey>;
 }

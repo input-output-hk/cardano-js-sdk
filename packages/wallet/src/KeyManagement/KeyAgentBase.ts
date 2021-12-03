@@ -1,8 +1,6 @@
 import {
   AccountAddressDerivationPath,
   AccountKeyDerivationPath,
-  Bip32PrivateKey,
-  Bip32PublicKey,
   GroupedAddress,
   HexBlob,
   KeyAgent,
@@ -17,10 +15,10 @@ export abstract class KeyAgentBase implements KeyAgent {
   abstract get networkId(): Cardano.NetworkId;
   abstract get accountIndex(): number;
   abstract get serializableData(): SerializableKeyAgentData;
-  abstract getExtendedAccountPublicKey(): Promise<Bip32PublicKey>;
+  abstract getExtendedAccountPublicKey(): Promise<Cardano.Bip32PublicKey>;
   abstract signBlob(derivationPath: AccountKeyDerivationPath, blob: HexBlob): Promise<SignBlobResult>;
   abstract derivePublicKey(derivationPath: AccountKeyDerivationPath): Promise<Cardano.Ed25519PublicKey>;
-  abstract exportRootPrivateKey(): Promise<Bip32PrivateKey>;
+  abstract exportRootPrivateKey(): Promise<Cardano.Bip32PrivateKey>;
 
   /**
    * See https://github.com/cardano-foundation/CIPs/tree/master/CIP-1852#specification
@@ -55,8 +53,7 @@ export abstract class KeyAgentBase implements KeyAgent {
     };
   }
 
-  // TODO: export Cardano.Witness['signatures'] as separate type from core
-  async signTransaction({ body, hash }: TxInternals): Promise<Cardano.Witness['signatures']> {
+  async signTransaction({ body, hash }: TxInternals): Promise<Cardano.Signatures> {
     // Possible optimization is casting strings to OpaqueString types directly and skipping validation
     const blob = HexBlob(hash.toString());
     const paymentVkeyWitness = await this.signBlob({ index: 0, type: KeyType.External }, blob);

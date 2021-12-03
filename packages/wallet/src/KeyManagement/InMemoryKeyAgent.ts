@@ -1,8 +1,6 @@
 import * as errors from './errors';
 import {
   AccountKeyDerivationPath,
-  Bip32PrivateKey,
-  Bip32PublicKey,
   GetPassword,
   HexBlob,
   KeyAgentType,
@@ -75,9 +73,9 @@ export class InMemoryKeyAgent extends KeyAgentBase {
     return this.#accountIndex;
   }
 
-  async getExtendedAccountPublicKey(): Promise<Bip32PublicKey> {
+  async getExtendedAccountPublicKey(): Promise<Cardano.Bip32PublicKey> {
     const privateKey = await this.#deriveAccountPrivateKey();
-    return Buffer.from(privateKey.to_public().as_bytes()).toString('hex');
+    return Cardano.Bip32PublicKey(Buffer.from(privateKey.to_public().as_bytes()).toString('hex'));
   }
 
   async signBlob({ index, type }: AccountKeyDerivationPath, blob: HexBlob): Promise<SignBlobResult> {
@@ -98,9 +96,9 @@ export class InMemoryKeyAgent extends KeyAgentBase {
   // rootPrivateKey = CSL.Bip32PrivateKey.from_bip39_entropy(entropy, EMPTY_PASSWORD);
   // eslint-disable-next-line max-len
   // https://github.com/Emurgo/cardano-serialization-lib/blob/f817a033ade7a2255591d7c6444fa4f9ffbcf061/rust/src/chain_crypto/derive.rs#L30-L38
-  async exportRootPrivateKey(): Promise<Bip32PrivateKey> {
+  async exportRootPrivateKey(): Promise<Cardano.Bip32PrivateKey> {
     const rootPrivateKey = await this.#decryptRootPrivateKey(true);
-    return Buffer.from(rootPrivateKey.as_bytes()).toString('hex');
+    return Cardano.Bip32PrivateKey(Buffer.from(rootPrivateKey.as_bytes()).toString('hex'));
   }
 
   static async fromBip39MnemonicWords({
