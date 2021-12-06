@@ -1,6 +1,6 @@
 import { Cardano } from '@cardano-sdk/core';
+import { InMemoryKeyAgent } from '../../src/KeyManagement';
 import { blockfrostAssetProvider, blockfrostWalletProvider } from '@cardano-sdk/blockfrost';
-import { createInMemoryKeyManager } from '../../src/KeyManagement';
 import { createStubStakePoolSearchProvider } from '@cardano-sdk/util-dev';
 
 const networkId = Number.parseInt(process.env.NETWORK_ID || '');
@@ -23,12 +23,16 @@ export const assetProvider = (() => {
   return blockfrostAssetProvider({ isTestnet, projectId });
 })();
 
-export const keyManager = (() => {
+export const keyAgentReady = (() => {
   const mnemonicWords = (process.env.MNEMONIC_WORDS || '').split(' ');
   if (mnemonicWords.length === 0) throw new Error('MNEMONIC_WORDS not set');
   const password = process.env.WALLET_PASSWORD;
   if (!password) throw new Error('WALLET_PASSWORD not set');
-  return createInMemoryKeyManager({ mnemonicWords, networkId, password });
+  return InMemoryKeyAgent.fromBip39MnemonicWords({
+    getPassword: async () => Buffer.from(password),
+    mnemonicWords,
+    networkId
+  });
 })();
 
 export const stakePoolSearchProvider = (() => {

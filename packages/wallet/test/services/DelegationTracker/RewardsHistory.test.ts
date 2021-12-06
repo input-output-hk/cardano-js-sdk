@@ -1,15 +1,23 @@
+import { AddressType, KeyAgent } from '../../../src/KeyManagement';
 import { Cardano } from '@cardano-sdk/core';
 import { RewardsHistory, createRewardsHistoryProvider, createRewardsHistoryTracker } from '../../../src/services';
 import { createStubTxWithCertificates } from './stub-tx';
 import { createTestScheduler } from '../../testScheduler';
-import { firstValueFrom, of } from 'rxjs';
-import { mockWalletProvider, rewardsHistory, testKeyManager } from '../../mocks';
+import { firstValueFrom, from } from 'rxjs';
+import { mockWalletProvider, rewardsHistory, testKeyAgent } from '../../mocks';
 
 describe('RewardsHistory', () => {
+  let keyAgent: KeyAgent;
+  beforeAll(async () => {
+    keyAgent = await testKeyAgent();
+  });
+
   test('createRewardsHistoryProvider', async () => {
     const provider = createRewardsHistoryProvider(
       mockWalletProvider(),
-      of([testKeyManager().deriveAddress(0, 0).rewardAccount]),
+      from(
+        keyAgent.deriveAddress({ index: 0, type: AddressType.External }).then(({ rewardAccount }) => [rewardAccount])
+      ),
       {
         initialInterval: 1
       }

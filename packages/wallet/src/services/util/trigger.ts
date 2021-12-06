@@ -1,16 +1,14 @@
 import { Cardano, NetworkInfo } from '@cardano-sdk/core';
-import { Observable, distinctUntilChanged, map, share } from 'rxjs';
+import { Observable, distinctUntilChanged, map } from 'rxjs';
 
-export const sharedDistinctBlock = (tip$: Observable<Cardano.Tip>) =>
+export const distinctBlock = (tip$: Observable<Cardano.Tip>) =>
   tip$.pipe(
     map(({ blockNo }) => blockNo),
-    distinctUntilChanged(),
-    share()
+    distinctUntilChanged()
   );
 
-export const sharedDistinctEpoch = (networkInfo$: Observable<NetworkInfo>) =>
+export const distinctEpoch = (networkInfo$: Observable<NetworkInfo>) =>
   networkInfo$.pipe(
     map(({ currentEpoch: { number } }) => number),
-    distinctUntilChanged(),
-    share()
+    distinctUntilChanged()
   );

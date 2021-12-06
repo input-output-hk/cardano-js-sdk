@@ -7,20 +7,24 @@ import { mockAssetProvider, mockWalletProvider } from '../mocks';
 const walletProps: SingleAddressWalletProps = { name: 'some-wallet' };
 const networkId = Cardano.NetworkId.mainnet;
 const mnemonicWords = KeyManagement.util.generateMnemonicWords();
-const password = 'your_password';
+const getPassword = async () => Buffer.from('your_password');
 
 describe('integration/withdrawal', () => {
-  let keyManager: KeyManagement.KeyManager;
+  let keyAgent: KeyManagement.KeyAgent;
   let wallet: SingleAddressWallet;
 
   beforeAll(async () => {
-    keyManager = KeyManagement.createInMemoryKeyManager({ mnemonicWords, networkId, password });
+    keyAgent = await KeyManagement.InMemoryKeyAgent.fromBip39MnemonicWords({
+      getPassword,
+      mnemonicWords,
+      networkId
+    });
     const walletProvider = mockWalletProvider();
     const stakePoolSearchProvider = createStubStakePoolSearchProvider();
     const assetProvider = mockAssetProvider();
     wallet = new SingleAddressWallet(walletProps, {
       assetProvider,
-      keyManager,
+      keyAgent,
       stakePoolSearchProvider,
       walletProvider
     });
@@ -36,7 +40,7 @@ describe('integration/withdrawal', () => {
     await firstValueFrom(wallet.balance.available$);
     const availableRewards = wallet.balance.available$.value!.rewards;
 
-    const rewardAccount = wallet.addresses$.value[0].rewardAccount;
+    const rewardAccount = (await firstValueFrom(wallet.addresses$))[0].rewardAccount;
     const txInternals = await wallet.initializeTx({
       certificates: [{ __typename: Cardano.CertificateType.StakeKeyDeregistration, rewardAccount }],
       outputs: new Set(), // In a real transaction you would probably want to have some outputs

@@ -3,6 +3,20 @@ import { Cardano, NetworkInfo, ProtocolParametersRequiredByWallet } from '@carda
 import { GroupedAddress } from './KeyManagement';
 import { TxInternals } from './Transaction';
 
+export interface SerializableStatic<T, OpaqueStringT> {
+  deserialize(serialized: OpaqueStringT): T;
+}
+
+export const staticImplements =
+  <T>() =>
+  <U extends T>(constructor: U) => {
+    constructor;
+  };
+
+export interface Serializable<OpaqueStringT> {
+  serialize(): OpaqueStringT;
+}
+
 export type InitializeTxProps = {
   outputs?: Set<Cardano.TxOut>;
   certificates?: Cardano.Certificate[];
