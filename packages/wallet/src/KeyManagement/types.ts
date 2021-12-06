@@ -10,8 +10,7 @@ export interface SignBlobResult {
 }
 
 export enum KeyAgentType {
-  InMemory = 'InMemory',
-  Ledger = 'Ledger'
+  InMemory = 'InMemory'
 }
 
 export enum KeyType {
@@ -65,11 +64,7 @@ export interface SerializableInMemoryKeyAgentData extends SerializableKeyAgentDa
   encryptedRootPrivateKeyBytes: number[];
 }
 
-export interface SerializableLedgerKeyAgentData extends SerializableKeyAgentDataBase {
-  __typename: KeyAgentType.Ledger;
-}
-
-export type SerializableKeyAgentData = SerializableInMemoryKeyAgentData | SerializableLedgerKeyAgentData;
+export type SerializableKeyAgentData = SerializableInMemoryKeyAgentData;
 
 // TODO: utility to cache password for specified duration
 /**

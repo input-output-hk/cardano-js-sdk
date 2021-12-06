@@ -5,8 +5,7 @@ import {
   KeyAgent,
   KeyAgentType,
   SerializableInMemoryKeyAgentData,
-  SerializableKeyAgentData,
-  SerializableLedgerKeyAgentData
+  SerializableKeyAgentData
 } from './types';
 import { InMemoryKeyAgent } from './InMemoryKeyAgent';
 import { InvalidSerializableDataError } from './errors';
@@ -18,7 +17,6 @@ export interface RestoreInMemoryKeyAgentProps {
   getPassword?: GetPassword;
 }
 
-export function restoreKeyAgent(data: SerializableLedgerKeyAgentData): Promise<KeyAgent>;
 export function restoreKeyAgent(data: SerializableInMemoryKeyAgentData, getPassword: GetPassword): Promise<KeyAgent>;
 export function restoreKeyAgent(data: SerializableKeyAgentData, getPassword?: GetPassword): Promise<KeyAgent>;
 /**
