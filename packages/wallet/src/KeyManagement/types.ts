@@ -81,10 +81,28 @@ export interface KeyAgent {
   get networkId(): Cardano.NetworkId;
   get accountIndex(): number;
   get serializableData(): SerializableKeyAgentData;
+  /**
+   * @throws AuthenticationError
+   */
   getExtendedAccountPublicKey(): Promise<Cardano.Bip32PublicKey>;
+  /**
+   * @throws AuthenticationError
+   */
   signBlob(derivationPath: AccountKeyDerivationPath, blob: HexBlob): Promise<SignBlobResult>;
+  /**
+   * @throws AuthenticationError
+   */
   signTransaction(txInternals: TxInternals): Promise<Cardano.Signatures>;
+  /**
+   * @throws AuthenticationError
+   */
   derivePublicKey(derivationPath: AccountKeyDerivationPath): Promise<Cardano.Ed25519PublicKey>;
+  /**
+   * @throws AuthenticationError
+   */
   deriveAddress(derivationPath: AccountAddressDerivationPath): Promise<GroupedAddress>;
+  /**
+   * @throws AuthenticationError
+   */
   exportRootPrivateKey(): Promise<Cardano.Bip32PrivateKey>;
 }

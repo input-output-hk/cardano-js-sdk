@@ -1,3 +1,4 @@
+import { AuthenticationError, InvalidSerializableDataError } from '../../src/KeyManagement/errors';
 import { KeyManagement } from '../../src';
 
 describe('KeyManagement/restoreKeyAgent', () => {
@@ -32,17 +33,32 @@ describe('KeyManagement/restoreKeyAgent', () => {
           },
           getPassword
         )
-      ).rejects.toThrow();
+      ).rejects.toThrowError(
+        // Review: testing errors like is probably too specific and brittle.
+        // I think the sweet spot would be asserting 'error instanceof InvalidSerializableDataError'
+        // however I didn't find a way to do that in jest, might need to create a custom matcher for that.
+        new InvalidSerializableDataError('Expected encrypted root private key in "agentData" for InMemoryKeyAgent"')
+      );
     });
 
     it('throws when attempting to restore key manager from valid data and no password', async () => {
-      await expect(() => KeyManagement.restoreKeyAgent(inMemoryKeyAgentData)).rejects.toThrow();
+      await expect(() => KeyManagement.restoreKeyAgent(inMemoryKeyAgentData)).rejects.toThrowError(
+        new InvalidSerializableDataError('Expected "getPassword" in RestoreKeyAgentProps for InMemoryKeyAgent"')
+      );
     });
 
     it('throws when attempting to restore key manager from valid data and invalid password', async () => {
       await expect(() =>
         KeyManagement.restoreKeyAgent(inMemoryKeyAgentData, async () => Buffer.from('123'))
-      ).rejects.toThrow();
+      ).rejects.toThrowError(new AuthenticationError('Failed to decrypt root private key'));
+    });
+
+    it('throws when attempting to restore key manager of unsupported __typename', async () => {
+      await expect(() =>
+        KeyManagement.restoreKeyAgent({ ...inMemoryKeyAgentData, __typename: 'OTHER' as KeyManagement.KeyAgentType })
+      ).rejects.toThrowError(
+        new InvalidSerializableDataError("Restoring key agent of __typename 'OTHER' is not implemented")
+      );
     });
   });
 });

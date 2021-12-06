@@ -1,3 +1,4 @@
+import { AuthenticationError } from '../../src/KeyManagement/errors';
 import { Cardano } from '@cardano-sdk/core';
 import { KeyManagement } from '../../src';
 
@@ -47,9 +48,23 @@ describe('InMemoryKeyAgent', () => {
     });
   });
 
-  test('getExtendedAccountPublicKey', async () => {
-    const extendedAccountPublicKey = await keyAgent.getExtendedAccountPublicKey();
-    expect(typeof extendedAccountPublicKey).toBe('string');
+  describe('getExtendedAccountPublicKey', () => {
+    it('resolves on sucessful decryption', async () => {
+      const extendedAccountPublicKey = await keyAgent.getExtendedAccountPublicKey();
+      expect(typeof extendedAccountPublicKey).toBe('string');
+    });
+    it('rejects on getPassword rejection', async () => {
+      getPassword.mockRejectedValueOnce(new Error('any error'));
+      await expect(() => keyAgent.getExtendedAccountPublicKey()).rejects.toThrowError(
+        new AuthenticationError('Failed to enter password')
+      );
+    });
+    it('rejects on incorrect password', async () => {
+      getPassword.mockResolvedValueOnce(Buffer.from('incorrect password'));
+      await expect(() => keyAgent.getExtendedAccountPublicKey()).rejects.toThrowError(
+        new AuthenticationError('Failed to decrypt root private key')
+      );
+    });
   });
 
   test('signBlob', async () => {

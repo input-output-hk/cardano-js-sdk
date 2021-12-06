@@ -9,6 +9,7 @@ import {
   SerializableLedgerKeyAgentData
 } from './types';
 import { InMemoryKeyAgent } from './InMemoryKeyAgent';
+import { InvalidSerializableDataError } from './errors';
 
 export interface RestoreInMemoryKeyAgentProps {
   /**
@@ -22,6 +23,8 @@ export function restoreKeyAgent(data: SerializableInMemoryKeyAgentData, getPassw
 export function restoreKeyAgent(data: SerializableKeyAgentData, getPassword?: GetPassword): Promise<KeyAgent>;
 /**
  * Restore key agent from serializable data
+ *
+ * @throws InvalidSerializableDataError, AuthenticationError
  */
 export async function restoreKeyAgent<T extends SerializableKeyAgentData>(
   data: T,
@@ -30,10 +33,12 @@ export async function restoreKeyAgent<T extends SerializableKeyAgentData>(
   switch (data.__typename) {
     case KeyAgentType.InMemory: {
       if (!data.encryptedRootPrivateKeyBytes || data.encryptedRootPrivateKeyBytes.length !== 156) {
-        throw new Error('Expected encrypted root private key in "agentData" for InMemoryKeyAgent"');
+        throw new InvalidSerializableDataError(
+          'Expected encrypted root private key in "agentData" for InMemoryKeyAgent"'
+        );
       }
       if (!getPassword) {
-        throw new Error('Expected "getPassowrd" in RestoreKeyAgentProps for InMemoryKeyAgent"');
+        throw new InvalidSerializableDataError('Expected "getPassword" in RestoreKeyAgentProps for InMemoryKeyAgent"');
       }
       const keyAgent = new InMemoryKeyAgent({
         accountIndex: data.accountIndex,
@@ -45,6 +50,8 @@ export async function restoreKeyAgent<T extends SerializableKeyAgentData>(
       return keyAgent;
     }
     default:
-      throw new Error('Not implemented');
+      throw new InvalidSerializableDataError(
+        `Restoring key agent of __typename '${data.__typename}' is not implemented`
+      );
   }
 }

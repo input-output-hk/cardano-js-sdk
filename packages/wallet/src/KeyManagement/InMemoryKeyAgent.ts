@@ -7,6 +7,7 @@ import {
   SerializableKeyAgentData,
   SignBlobResult
 } from './types';
+import { AuthenticationError } from './errors';
 import { CSL, Cardano } from '@cardano-sdk/core';
 import { KeyAgentBase } from './KeyAgentBase';
 import { emip3decrypt, emip3encrypt } from './emip3';
@@ -33,9 +34,8 @@ const EMPTY_PASSWORD = Buffer.from('');
 const getPasswordRethrowTypedError = async (getPassword: GetPassword) => {
   try {
     return await getPassword();
-  } catch {
-    // TODO: create new error types for KeyAgent failures
-    throw new Error('Failed to enter password');
+  } catch (error) {
+    throw new AuthenticationError('Failed to enter password', error);
   }
 };
 
@@ -101,6 +101,9 @@ export class InMemoryKeyAgent extends KeyAgentBase {
     return Cardano.Bip32PrivateKey(Buffer.from(rootPrivateKey.as_bytes()).toString('hex'));
   }
 
+  /**
+   * @throws AuthenticationError
+   */
   static async fromBip39MnemonicWords({
     networkId,
     getPassword,
@@ -109,7 +112,7 @@ export class InMemoryKeyAgent extends KeyAgentBase {
   }: FromBip39MnemonicWordsProps): Promise<InMemoryKeyAgent> {
     const mnemonic = joinMnemonicWords(mnemonicWords);
     const validMnemonic = validateMnemonic(mnemonic);
-    if (!validMnemonic) throw new errors.InvalidMnemonic();
+    if (!validMnemonic) throw new errors.InvalidMnemonicError();
     const entropy = Buffer.from(mnemonicWordsToEntropy(mnemonicWords), 'hex');
     const rootPrivateKey = CSL.Bip32PrivateKey.from_bip39_entropy(entropy, EMPTY_PASSWORD);
     const password = await getPasswordRethrowTypedError(getPassword);
@@ -128,14 +131,13 @@ export class InMemoryKeyAgent extends KeyAgentBase {
   }
 
   async #decryptRootPrivateKey(noCache?: true) {
-    const decryptedAccountKeyBytes = await emip3decrypt(
-      this.#encryptedRootPrivateKey,
-      await getPasswordRethrowTypedError(() => this.#getPassword(noCache))
-    );
-    if (!decryptedAccountKeyBytes) {
-      // TODO: create new error types for KeyAgent failures
-      throw new Error('Failed to decrypt account key');
+    const password = await getPasswordRethrowTypedError(() => this.#getPassword(noCache));
+    let decryptedRootKeyBytes: Uint8Array;
+    try {
+      decryptedRootKeyBytes = await emip3decrypt(this.#encryptedRootPrivateKey, password);
+    } catch (error) {
+      throw new AuthenticationError('Failed to decrypt root private key', error);
     }
-    return CSL.Bip32PrivateKey.from_bytes(decryptedAccountKeyBytes);
+    return CSL.Bip32PrivateKey.from_bytes(decryptedRootKeyBytes);
   }
 }
