@@ -110,7 +110,7 @@ describe('SingleAddressWallet', () => {
 
     describe('validateTx', () => {
       it('returns minimum coin quantity per output', async () => {
-        const { minimumCoinQuantities } = await wallet.validateTx(props);
+        const { minimumCoinQuantities } = await wallet.validateInitializeTxProps(props);
         expect(minimumCoinQuantities.size).toBe(2);
         const outputWithoutAssetsMinimumCoin = minimumCoinQuantities.get(outputs[0])!;
         const outputWithAssetsMinimumCoin = minimumCoinQuantities.get(outputs[1])!;

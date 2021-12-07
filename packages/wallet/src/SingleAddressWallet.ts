@@ -30,7 +30,7 @@ import {
   distinctBlock,
   distinctEpoch
 } from './services';
-import { InitializeTxProps, MinimumCoinQuantity, TxValidationResult, Wallet } from './types';
+import { InitializeTxProps, InitializeTxPropsValidationResult, MinimumCoinQuantity, Wallet } from './types';
 import {
   InputSelector,
   computeMinimumCoinQuantity,
@@ -159,7 +159,7 @@ export class SingleAddressWallet implements Wallet {
       })
     );
   }
-  async validateTx(props: InitializeTxProps): Promise<TxValidationResult> {
+  async validateInitializeTxProps(props: InitializeTxProps): Promise<InitializeTxPropsValidationResult> {
     const { coinsPerUtxoWord } = await firstValueFrom(this.protocolParameters$);
     const minimumCoinQuantities = new Map<Cardano.TxOut, MinimumCoinQuantity>();
     for (const output of props.outputs || []) {
