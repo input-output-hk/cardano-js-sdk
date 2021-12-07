@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 import * as mocks from './mocks';
 import { AssetId, createStubStakePoolSearchProvider } from '@cardano-sdk/util-dev';
-import { Cardano } from '@cardano-sdk/core';
+import { CSL, Cardano } from '@cardano-sdk/core';
 import { KeyManagement, SingleAddressWallet } from '../src';
 import { firstValueFrom, skip } from 'rxjs';
 import { testKeyAgent } from './mocks';
@@ -124,9 +124,13 @@ describe('SingleAddressWallet', () => {
     });
 
     it('initializeTx', async () => {
-      const { body, hash } = await wallet.initializeTx(props);
+      const { body, hash, inputSelection } = await wallet.initializeTx(props);
       expect(body.outputs).toHaveLength(props.outputs.size + 1 /* change output */);
       expect(typeof hash).toBe('string');
+      expect(inputSelection.outputs.size).toBe(props.outputs.size);
+      expect(inputSelection.inputs.size).toBeGreaterThan(0);
+      expect(inputSelection.fee instanceof CSL.BigNum).toBe(true);
+      expect(inputSelection.change.size).toBeGreaterThan(0);
     });
 
     it('finalizeTx', async () => {

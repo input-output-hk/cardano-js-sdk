@@ -1,6 +1,7 @@
 import { Balance, BehaviorObservable, DelegationTracker, TransactionalTracker, TransactionsTracker } from './services';
 import { Cardano, NetworkInfo, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
 import { GroupedAddress } from './KeyManagement';
+import { SelectionSkeleton } from '@cardano-sdk/cip2';
 import { TxInternals } from './Transaction';
 
 export interface SerializableStatic<T, OpaqueStringT> {
@@ -42,7 +43,7 @@ export interface TxValidationResult {
   minimumCoinQuantities: MinimumCoinQuantityPerOutput;
 }
 
-export type InitializeTxResult = TxInternals;
+export type InitializeTxResult = TxInternals & { inputSelection: SelectionSkeleton };
 
 export interface Wallet {
   name: string;
@@ -62,7 +63,7 @@ export interface Wallet {
    * @param props transaction body data
    */
   validateTx(props: InitializeTxProps): Promise<TxValidationResult>;
-  initializeTx(props: InitializeTxProps): Promise<TxInternals>;
+  initializeTx(props: InitializeTxProps): Promise<InitializeTxResult>;
   finalizeTx(props: TxInternals): Promise<Cardano.NewTxAlonzo>;
   /**
    * @throws {Cardano.TxSubmissionError}

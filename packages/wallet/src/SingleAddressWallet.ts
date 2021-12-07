@@ -9,7 +9,7 @@ import {
   WalletProvider,
   coreToCsl
 } from '@cardano-sdk/core';
-import { Assets } from '.';
+import { Assets, InitializeTxResult } from '.';
 import {
   Balance,
   BehaviorObservable,
@@ -172,21 +172,22 @@ export class SingleAddressWallet implements Wallet {
     }
     return { minimumCoinQuantities };
   }
-  async initializeTx(props: InitializeTxProps): Promise<TxInternals> {
+  async initializeTx(props: InitializeTxProps): Promise<InitializeTxResult> {
     const { constraints, utxo, implicitCoin, validityInterval, changeAddress } = await this.#prepareTx(props);
-    const selectionResult = await this.#inputSelector.select({
+    const { selection: inputSelection } = await this.#inputSelector.select({
       constraints,
       implicitCoin,
       outputs: new Set([...(props.outputs || [])].map((output) => coreToCsl.txOut(output))),
       utxo: new Set(coreToCsl.utxo(utxo))
     });
-    return createTransactionInternals({
+    const { body, hash } = await createTransactionInternals({
       certificates: props.certificates,
       changeAddress,
-      inputSelection: selectionResult.selection,
+      inputSelection,
       validityInterval,
       withdrawals: props.withdrawals
     });
+    return { body, hash, inputSelection };
   }
   async finalizeTx(tx: TxInternals, auxiliaryData?: Cardano.AuxiliaryData): Promise<Cardano.NewTxAlonzo> {
     const signatures = await this.#keyAgent.signTransaction(tx);
