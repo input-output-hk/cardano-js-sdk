@@ -32,6 +32,18 @@ export interface FinalizeTxProps {
 
 export type Assets = Map<Cardano.AssetId, Cardano.Asset>;
 
+export interface MinimumCoinQuantity {
+  minimumCoin: bigint;
+  coinMissing: bigint;
+}
+export type MinimumCoinQuantityPerOutput = Map<Cardano.TxOut, MinimumCoinQuantity>;
+
+export interface TxValidationResult {
+  minimumCoinQuantities: MinimumCoinQuantityPerOutput;
+}
+
+export type InitializeTxResult = TxInternals;
+
 export interface Wallet {
   name: string;
   readonly balance: TransactionalTracker<Balance>;
@@ -44,6 +56,12 @@ export interface Wallet {
   readonly protocolParameters$: BehaviorObservable<ProtocolParametersRequiredByWallet>;
   readonly addresses$: BehaviorObservable<GroupedAddress[]>;
   readonly assets$: BehaviorObservable<Assets>;
+  /**
+   * Compute minimum coin quantity for each transaction output
+   *
+   * @param props transaction body data
+   */
+  validateTx(props: InitializeTxProps): Promise<TxValidationResult>;
   initializeTx(props: InitializeTxProps): Promise<TxInternals>;
   finalizeTx(props: TxInternals): Promise<Cardano.NewTxAlonzo>;
   /**

@@ -1,6 +1,7 @@
 import { AddressType, GroupedAddress, KeyAgent } from './KeyManagement';
 import {
   AssetProvider,
+  BigIntMath,
   Cardano,
   NetworkInfo,
   ProtocolParametersRequiredByWallet,
@@ -29,10 +30,15 @@ import {
   distinctBlock,
   distinctEpoch
 } from './services';
-import { InitializeTxProps, Wallet } from './types';
-import { InputSelector, defaultSelectionConstraints, roundRobinRandomImprove } from '@cardano-sdk/cip2';
+import { InitializeTxProps, MinimumCoinQuantity, TxValidationResult, Wallet } from './types';
+import {
+  InputSelector,
+  computeMinimumCoinQuantity,
+  defaultSelectionConstraints,
+  roundRobinRandomImprove
+} from '@cardano-sdk/cip2';
 import { Logger, dummyLogger } from 'ts-log';
-import { Observable, Subject, combineLatest, from, lastValueFrom, map, mergeMap, take } from 'rxjs';
+import { Observable, Subject, combineLatest, firstValueFrom, lastValueFrom, map, take } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TxInternals, computeImplicitCoin, createTransactionInternals, ensureValidityInterval } from './Transaction';
 import { isEqual } from 'lodash-es';
@@ -153,50 +159,34 @@ export class SingleAddressWallet implements Wallet {
       })
     );
   }
-
-  initializeTx(props: InitializeTxProps): Promise<TxInternals> {
-    return lastValueFrom(
-      combineLatest([this.tip$, this.utxo.available$, this.protocolParameters$, this.addresses$]).pipe(
-        take(1),
-        mergeMap(([tip, utxo, protocolParameters, [{ address: changeAddress }]]) => {
-          const validityInterval = ensureValidityInterval(tip.slot, props.options?.validityInterval);
-          const txOutputs = new Set([...(props.outputs || [])].map((output) => coreToCsl.txOut(output)));
-          const constraints = defaultSelectionConstraints({
-            buildTx: async (inputSelection) => {
-              this.#logger.debug('Building TX for selection constraints', inputSelection);
-              const txInternals = await createTransactionInternals({
-                certificates: props.certificates,
-                changeAddress,
-                inputSelection,
-                validityInterval,
-                withdrawals: props.withdrawals
-              });
-              return coreToCsl.tx(await this.finalizeTx(txInternals));
-            },
-            protocolParameters
-          });
-          const implicitCoin = computeImplicitCoin(protocolParameters, props);
-          return from(
-            this.#inputSelector
-              .select({
-                constraints,
-                implicitCoin,
-                outputs: txOutputs,
-                utxo: new Set(coreToCsl.utxo(utxo))
-              })
-              .then((inputSelectionResult) =>
-                createTransactionInternals({
-                  certificates: props.certificates,
-                  changeAddress,
-                  inputSelection: inputSelectionResult.selection,
-                  validityInterval,
-                  withdrawals: props.withdrawals
-                })
-              )
-          );
-        })
-      )
-    );
+  async validateTx(props: InitializeTxProps): Promise<TxValidationResult> {
+    const { coinsPerUtxoWord } = await firstValueFrom(this.protocolParameters$);
+    const minimumCoinQuantities = new Map<Cardano.TxOut, MinimumCoinQuantity>();
+    for (const output of props.outputs || []) {
+      const multiasset = output.value.assets ? coreToCsl.value(output.value).multiasset() : undefined;
+      const minimumCoin = BigInt(computeMinimumCoinQuantity(coinsPerUtxoWord)(multiasset));
+      minimumCoinQuantities.set(output, {
+        coinMissing: BigIntMath.max([minimumCoin - output.value.coins, 0n])!,
+        minimumCoin
+      });
+    }
+    return { minimumCoinQuantities };
+  }
+  async initializeTx(props: InitializeTxProps): Promise<TxInternals> {
+    const { constraints, utxo, implicitCoin, validityInterval, changeAddress } = await this.#prepareTx(props);
+    const selectionResult = await this.#inputSelector.select({
+      constraints,
+      implicitCoin,
+      outputs: new Set([...(props.outputs || [])].map((output) => coreToCsl.txOut(output))),
+      utxo: new Set(coreToCsl.utxo(utxo))
+    });
+    return createTransactionInternals({
+      certificates: props.certificates,
+      changeAddress,
+      inputSelection: selectionResult.selection,
+      validityInterval,
+      withdrawals: props.withdrawals
+    });
   }
   async finalizeTx(tx: TxInternals, auxiliaryData?: Cardano.AuxiliaryData): Promise<Cardano.NewTxAlonzo> {
     const signatures = await this.#keyAgent.signTransaction(tx);
@@ -234,6 +224,33 @@ export class SingleAddressWallet implements Wallet {
     this.genesisParameters$.complete();
     this.#tip$.complete();
     this.addresses$.complete();
+  }
+
+  #prepareTx(props: InitializeTxProps) {
+    return lastValueFrom(
+      combineLatest([this.tip$, this.utxo.available$, this.protocolParameters$, this.addresses$]).pipe(
+        take(1),
+        map(([tip, utxo, protocolParameters, [{ address: changeAddress }]]) => {
+          const validityInterval = ensureValidityInterval(tip.slot, props.options?.validityInterval);
+          const constraints = defaultSelectionConstraints({
+            buildTx: async (inputSelection) => {
+              this.#logger.debug('Building TX for selection constraints', inputSelection);
+              const txInternals = await createTransactionInternals({
+                certificates: props.certificates,
+                changeAddress,
+                inputSelection,
+                validityInterval,
+                withdrawals: props.withdrawals
+              });
+              return coreToCsl.tx(await this.finalizeTx(txInternals));
+            },
+            protocolParameters
+          });
+          const implicitCoin = computeImplicitCoin(protocolParameters, props);
+          return { changeAddress, constraints, implicitCoin, utxo, validityInterval };
+        })
+      )
+    );
   }
 
   #initializeAddress(existingAddress?: GroupedAddress): Observable<GroupedAddress[]> {
