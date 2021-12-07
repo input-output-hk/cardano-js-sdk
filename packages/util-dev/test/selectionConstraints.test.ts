@@ -12,7 +12,7 @@ describe('selectionConstraints', () => {
     expect(constraints.computeMinimumCoinQuantity()).toBe(10n);
     expect(await constraints.computeMinimumCost({} as any)).toBe(20n);
     expect(await constraints.computeSelectionLimit({} as any)).toBe(3);
-    expect(await constraints.tokenBundleSizeExceedsLimit()).toBe(false);
-    expect(await constraints.tokenBundleSizeExceedsLimit({ len: () => 2 } as any)).toBe(true);
+    expect(constraints.tokenBundleSizeExceedsLimit()).toBe(false);
+    expect(constraints.tokenBundleSizeExceedsLimit({ size: 2 } as any)).toBe(true);
   });
 });

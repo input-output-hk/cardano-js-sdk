@@ -1,4 +1,4 @@
-import { CSL } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
 import { SelectionConstraints } from '@cardano-sdk/cip2';
 
 export interface MockSelectionConstraints {
@@ -19,8 +19,7 @@ export const mockConstraintsToConstraints = (constraints: MockSelectionConstrain
   computeMinimumCoinQuantity: () => constraints.minimumCoinQuantity,
   computeMinimumCost: async () => constraints.minimumCost,
   computeSelectionLimit: async () => constraints.selectionLimit,
-  tokenBundleSizeExceedsLimit: (multiasset?: CSL.MultiAsset) =>
-    (multiasset?.len() || 0) > constraints.maxTokenBundleSize
+  tokenBundleSizeExceedsLimit: (assets?: Cardano.TokenMap) => (assets?.size || 0) > constraints.maxTokenBundleSize
 });
 
 export const NO_CONSTRAINTS = mockConstraintsToConstraints(MOCK_NO_CONSTRAINTS);
