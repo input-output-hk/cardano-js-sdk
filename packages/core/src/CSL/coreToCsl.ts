@@ -31,22 +31,25 @@ import { SerializationFailure } from '..';
 import { coreToCsl } from '.';
 export * as certificate from './certificate';
 
+export const tokenMap = (assets: Cardano.TokenMap) => {
+  const multiasset = MultiAsset.new();
+  for (const assetId of assets.keys()) {
+    const { scriptHash, assetName } = Asset.util.parseAssetId(assetId);
+    const assetsObj = Assets.new();
+    const amount = BigNum.from_str(assets.get(assetId)!.toString());
+    assetsObj.insert(assetName, amount);
+    multiasset.insert(scriptHash, assetsObj);
+  }
+  return multiasset;
+};
+
 export const value = ({ coins, assets }: Cardano.Value): Value => {
   const result = Value.new(BigNum.from_str(coins.toString()));
   if (!assets) {
     return result;
   }
-  const assetIds = [...assets.keys()];
-  if (assetIds.length > 0) {
-    const multiasset = MultiAsset.new();
-    for (const assetId of assetIds) {
-      const { scriptHash, assetName } = Asset.util.parseAssetId(assetId);
-      const assetsObj = Assets.new();
-      const amount = BigNum.from_str(assets.get(assetId)!.toString());
-      assetsObj.insert(assetName, amount);
-      multiasset.insert(scriptHash, assetsObj);
-    }
-    result.set_multiasset(multiasset);
+  if (assets.size > 0) {
+    result.set_multiasset(tokenMap(assets));
   }
   return result;
 };
