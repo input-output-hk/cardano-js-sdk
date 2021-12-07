@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable unicorn/consistent-function-scoping */
 import { AssetId } from '@cardano-sdk/util-dev';
-import { CSL, InvalidProtocolParametersError, coreToCsl } from '@cardano-sdk/core';
+import { CSL, InvalidProtocolParametersError } from '@cardano-sdk/core';
 import { DefaultSelectionConstraintsProps, defaultSelectionConstraints } from '../src/selectionConstraints';
 import { ProtocolParametersForInputSelection, SelectionSkeleton } from '../src/types';
 
@@ -57,19 +57,14 @@ describe('defaultSelectionConstraints', () => {
 
   it('computeMinimumCoinQuantity', () => {
     cslMock.Value.new.mockImplementation(cslActual.Value.new);
-    const withAssets = coreToCsl
-      .value({
-        assets: new Map([
-          [AssetId.TSLA, 5000n],
-          [AssetId.PXL, 3000n]
-        ]),
-        coins: 10_000n
-      })
-      .multiasset();
+    const assets = new Map([
+      [AssetId.TSLA, 5000n],
+      [AssetId.PXL, 3000n]
+    ]);
     const constraints = defaultSelectionConstraints({
       protocolParameters
     } as DefaultSelectionConstraintsProps);
-    const minCoinWithAssets = constraints.computeMinimumCoinQuantity(withAssets);
+    const minCoinWithAssets = constraints.computeMinimumCoinQuantity(assets);
     const minCoinWithoutAssets = constraints.computeMinimumCoinQuantity();
     expect(typeof minCoinWithAssets).toBe('bigint');
     expect(typeof minCoinWithoutAssets).toBe('bigint');
@@ -121,7 +116,7 @@ describe('defaultSelectionConstraints', () => {
       const constraints = defaultSelectionConstraints({
         protocolParameters
       } as DefaultSelectionConstraintsProps);
-      expect(constraints.tokenBundleSizeExceedsLimit({} as any)).toBe(false);
+      expect(constraints.tokenBundleSizeExceedsLimit(new Map())).toBe(false);
     });
 
     it('exceeds max value size', () => {
@@ -129,7 +124,7 @@ describe('defaultSelectionConstraints', () => {
       const constraints = defaultSelectionConstraints({
         protocolParameters
       } as DefaultSelectionConstraintsProps);
-      expect(constraints.tokenBundleSizeExceedsLimit({} as any)).toBe(true);
+      expect(constraints.tokenBundleSizeExceedsLimit(new Map())).toBe(true);
     });
   });
 });

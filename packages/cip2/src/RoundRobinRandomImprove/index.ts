@@ -1,32 +1,30 @@
-import { CSL, cslUtil } from '@cardano-sdk/core';
 import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
 import { InputSelectionParameters, InputSelector, SelectionResult } from '../types';
-import { assertIsBalanceSufficient, preprocessArgs, withValuesToValues } from './util';
+import { assertIsBalanceSufficient, preprocessArgs, toValues } from './util';
 import { computeChangeAndAdjustForFee } from './change';
+import { cslUtil } from '@cardano-sdk/core';
 import { roundRobinSelection } from './roundRobin';
 
 export const roundRobinRandomImprove = (): InputSelector => ({
   select: async ({
-    utxo,
-    outputs,
+    utxo: utxoSet,
+    outputs: outputSet,
     constraints: { computeMinimumCost, computeSelectionLimit, computeMinimumCoinQuantity, tokenBundleSizeExceedsLimit },
     implicitCoin: implicitCoinAsNumber
   }: InputSelectionParameters): Promise<SelectionResult> => {
-    const { utxosWithValue, outputsWithValue, uniqueOutputAssetIDs, implicitCoin } = preprocessArgs(
-      utxo,
-      outputs,
+    const { utxo, outputs, uniqueOutputAssetIDs, implicitCoin } = preprocessArgs(
+      utxoSet,
+      outputSet,
       implicitCoinAsNumber
     );
 
-    const utxoValues = withValuesToValues(utxosWithValue);
-    const outputValues = withValuesToValues(outputsWithValue);
-    assertIsBalanceSufficient(uniqueOutputAssetIDs, utxoValues, outputValues, implicitCoin);
+    assertIsBalanceSufficient(uniqueOutputAssetIDs, utxo, outputs, implicitCoin);
 
     const roundRobinSelectionResult = roundRobinSelection({
       implicitCoin,
-      outputsWithValue,
+      outputs,
       uniqueOutputAssetIDs,
-      utxosWithValue
+      utxo
     });
 
     const result = await computeChangeAndAdjustForFee({
@@ -34,12 +32,12 @@ export const roundRobinRandomImprove = (): InputSelector => ({
       estimateTxFee: (utxos, changeValues) =>
         computeMinimumCost({
           change: new Set(changeValues),
-          fee: cslUtil.maxBigNum,
+          fee: cslUtil.MAX_U64,
           inputs: new Set(utxos),
-          outputs
+          outputs: outputSet
         }),
       implicitCoin,
-      outputValues,
+      outputValues: toValues(outputs),
       tokenBundleSizeExceedsLimit,
       uniqueOutputAssetIDs,
       utxoSelection: roundRobinSelectionResult
@@ -47,9 +45,8 @@ export const roundRobinRandomImprove = (): InputSelector => ({
 
     const inputs = new Set(result.inputs);
     const change = new Set(result.change);
-    const fee = CSL.BigNum.from_str(result.fee.toString());
 
-    if (result.inputs.length > (await computeSelectionLimit({ change, fee, inputs, outputs }))) {
+    if (result.inputs.length > (await computeSelectionLimit({ change, fee: result.fee, inputs, outputs: outputSet }))) {
       throw new InputSelectionError(InputSelectionFailure.MaximumInputCountExceeded);
     }
 
@@ -57,9 +54,9 @@ export const roundRobinRandomImprove = (): InputSelector => ({
       remainingUTxO: new Set(result.remainingUTxO),
       selection: {
         change,
-        fee,
+        fee: result.fee,
         inputs,
-        outputs
+        outputs: outputSet
       }
     };
   }

@@ -1,4 +1,4 @@
-import { CSL } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
 import { InputSelectionError, InputSelectionFailure } from '../../src/InputSelectionError';
 import { InputSelector } from '../../src/types';
 import { SelectionConstraints } from '@cardano-sdk/util-dev';
@@ -12,11 +12,11 @@ export interface InputSelectionPropertiesTestParams {
   /**
    * Available UTxO
    */
-  createUtxo: () => CSL.TransactionUnspentOutput[];
+  createUtxo: () => Cardano.Utxo[];
   /**
    * Transaction outputs
    */
-  createOutputs: () => CSL.TransactionOutput[];
+  createOutputs: () => Cardano.TxOut[];
   /**
    * Input selection constraints passed to the algorithm.
    */

@@ -1,19 +1,11 @@
 import { BigIntMath, Cardano } from '@cardano-sdk/core';
-import {
-  ImplicitCoinBigint,
-  OutputWithValue,
-  RoundRobinRandomImproveArgs,
-  UtxoSelection,
-  UtxoWithValue,
-  assetWithValueQuantitySelector,
-  getWithValuesCoinQuantity
-} from './util';
+import { RoundRobinRandomImproveArgs, UtxoSelection, assetQuantitySelector, getCoinQuantity, toValues } from './util';
 
 const improvesSelection = (
-  utxoAlreadySelected: UtxoWithValue[],
-  input: UtxoWithValue,
+  utxoAlreadySelected: Cardano.Utxo[],
+  input: Cardano.Utxo,
   minimumTarget: bigint,
-  getQuantity: (utxo: UtxoWithValue[]) => bigint
+  getQuantity: (utxo: Cardano.Utxo[]) => bigint
 ): boolean => {
   const oldQuantity = getQuantity(utxoAlreadySelected);
   // We still haven't reached the minimum target of
@@ -37,22 +29,30 @@ const improvesSelection = (
 
 const listTokensWithin = (
   uniqueOutputAssetIDs: Cardano.AssetId[],
-  outputs: OutputWithValue[],
-  implicitCoin: ImplicitCoinBigint
+  outputs: Cardano.TxOut[],
+  implicitCoin: Required<Cardano.ImplicitCoin>
 ) => [
   ...uniqueOutputAssetIDs.map((id) => {
-    const getQuantity = assetWithValueQuantitySelector(id);
+    const getQuantity = assetQuantitySelector(id);
     return {
-      filterUtxo: (utxo: UtxoWithValue[]) => utxo.filter(({ value: { assets } }) => assets?.get(id)),
-      getTotalSelectedQuantity: (utxo: UtxoWithValue[]) => getQuantity(utxo),
-      minimumTarget: getQuantity(outputs)
+      filterUtxo: (utxo: Cardano.Utxo[]) =>
+        utxo.filter(
+          ([
+            _,
+            {
+              value: { assets }
+            }
+          ]) => assets?.get(id)
+        ),
+      getTotalSelectedQuantity: (utxo: Cardano.Utxo[]) => getQuantity(toValues(utxo)),
+      minimumTarget: getQuantity(toValues(outputs))
     };
   }),
   {
-    filterUtxo: (utxo: UtxoWithValue[]) => utxo,
+    filterUtxo: (utxo: Cardano.Utxo[]) => utxo,
     // Lovelace
-    getTotalSelectedQuantity: (utxo: UtxoWithValue[]) => getWithValuesCoinQuantity(utxo) + implicitCoin.input,
-    minimumTarget: getWithValuesCoinQuantity(outputs) + implicitCoin.deposit
+    getTotalSelectedQuantity: (utxo: Cardano.Utxo[]) => getCoinQuantity(toValues(utxo)) + implicitCoin.input,
+    minimumTarget: getCoinQuantity(toValues(outputs)) + implicitCoin.deposit
   }
 ];
 
@@ -63,13 +63,13 @@ const listTokensWithin = (
  * Considers all outputs collectively, as a combined output bundle.
  */
 export const roundRobinSelection = ({
-  utxosWithValue,
-  outputsWithValue,
+  utxo: utxosWithValue,
+  outputs: outputsWithValue,
   uniqueOutputAssetIDs,
   implicitCoin
 }: RoundRobinRandomImproveArgs): UtxoSelection => {
   // The subset of the UTxO that has already been selected:
-  const utxoSelected: UtxoWithValue[] = [];
+  const utxoSelected: Cardano.Utxo[] = [];
   // The subset of the UTxO that remains available for selection:
   const utxoRemaining = [...utxosWithValue];
   // The set of tokens that we still need to cover:
