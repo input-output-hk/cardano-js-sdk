@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 import * as mocks from './mocks';
 import { AssetId, createStubStakePoolSearchProvider } from '@cardano-sdk/util-dev';
-import { CSL, Cardano } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
 import { KeyManagement, SingleAddressWallet } from '../src';
 import { firstValueFrom, skip } from 'rxjs';
 import { testKeyAgent } from './mocks';
@@ -129,7 +129,7 @@ describe('SingleAddressWallet', () => {
       expect(typeof hash).toBe('string');
       expect(inputSelection.outputs.size).toBe(props.outputs.size);
       expect(inputSelection.inputs.size).toBeGreaterThan(0);
-      expect(inputSelection.fee instanceof CSL.BigNum).toBe(true);
+      expect(inputSelection.fee).toBeGreaterThan(0n);
       expect(inputSelection.change.size).toBeGreaterThan(0);
     });
 

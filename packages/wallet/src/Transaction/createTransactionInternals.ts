@@ -1,4 +1,4 @@
-import { CSL, Cardano, coreToCsl, cslToCore } from '@cardano-sdk/core';
+import { CSL, Cardano, coreToCsl } from '@cardano-sdk/core';
 import { SelectionResult } from '@cardano-sdk/cip2';
 
 export type TxInternals = {
@@ -21,9 +21,8 @@ export const createTransactionInternals = async ({
   validityInterval,
   inputSelection
 }: CreateTxInternalsProps): Promise<TxInternals> => {
-  const outputs = [...inputSelection.outputs].map(cslToCore.txOut);
-  for (const cslValue of inputSelection.change) {
-    const value = cslToCore.value(cslValue);
+  const outputs = [...inputSelection.outputs];
+  for (const value of inputSelection.change) {
     outputs.push({
       address: changeAddress,
       value
@@ -33,10 +32,8 @@ export const createTransactionInternals = async ({
     // TODO: return more fields. Also add support in coreToCsl.txBody:
     // collaterals, mint, requiredExtraSignatures, scriptIntegrityHash
     certificates,
-    fee: BigInt(inputSelection.fee.to_str()),
-    inputs: [...inputSelection.inputs].map((cslInput) =>
-      cslToCore.txIn(cslInput.input(), Cardano.Address(cslInput.output().address().to_bech32()))
-    ),
+    fee: inputSelection.fee,
+    inputs: [...inputSelection.inputs].map(([txIn]) => txIn),
     outputs,
     validityInterval,
     withdrawals

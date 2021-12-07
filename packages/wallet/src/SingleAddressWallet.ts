@@ -163,8 +163,7 @@ export class SingleAddressWallet implements Wallet {
     const { coinsPerUtxoWord } = await firstValueFrom(this.protocolParameters$);
     const minimumCoinQuantities = new Map<Cardano.TxOut, MinimumCoinQuantity>();
     for (const output of props.outputs || []) {
-      const multiasset = output.value.assets ? coreToCsl.value(output.value).multiasset() : undefined;
-      const minimumCoin = BigInt(computeMinimumCoinQuantity(coinsPerUtxoWord)(multiasset));
+      const minimumCoin = BigInt(computeMinimumCoinQuantity(coinsPerUtxoWord)(output.value.assets));
       minimumCoinQuantities.set(output, {
         coinMissing: BigIntMath.max([minimumCoin - output.value.coins, 0n])!,
         minimumCoin
@@ -177,8 +176,8 @@ export class SingleAddressWallet implements Wallet {
     const { selection: inputSelection } = await this.#inputSelector.select({
       constraints,
       implicitCoin,
-      outputs: new Set([...(props.outputs || [])].map((output) => coreToCsl.txOut(output))),
-      utxo: new Set(coreToCsl.utxo(utxo))
+      outputs: props.outputs || new Set(),
+      utxo: new Set(utxo)
     });
     const { body, hash } = await createTransactionInternals({
       certificates: props.certificates,
