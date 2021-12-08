@@ -1,4 +1,4 @@
-import { CSL, Cardano } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
 
 export interface SelectionSkeleton {
   /**
@@ -7,22 +7,22 @@ export interface SelectionSkeleton {
    * From the point of view of a wallet, this represents the value
    * that has been selected from the wallet in order to cover the total payment value.
    */
-  inputs: Set<CSL.TransactionUnspentOutput>;
+  inputs: Set<Cardano.Utxo>;
   /**
    * Set of payments to be made to recipient addresses.
    */
-  outputs: Set<CSL.TransactionOutput>;
+  outputs: Set<Cardano.TxOut>;
   /**
    * A set of change values. Does not account for fee.
    *
    * From the point of view of a wallet, this represents the change to be returned to the wallet.
    */
-  change: Set<CSL.Value>;
+  change: Set<Cardano.Value>;
   /**
    * Estimated fee for the transaction.
    * This value is included in 'change', so the actual change returned by the transaction is change-fee.
    */
-  fee: CSL.BigNum;
+  fee: Cardano.Lovelace;
 }
 
 export type Selection = SelectionSkeleton;
@@ -35,23 +35,23 @@ export interface SelectionResult {
    * It represents the set of values that remain after the coin selection algorithm
    * has removed values to pay for entries in the requested output set.
    */
-  remainingUTxO: Set<CSL.TransactionUnspentOutput>;
+  remainingUTxO: Set<Cardano.Utxo>;
 }
 
 /**
  * @returns minimum transaction fee in Lovelace.
  */
-export type EstimateTxFee = (selectionSkeleton: SelectionSkeleton) => Promise<bigint>;
+export type EstimateTxFee = (selectionSkeleton: SelectionSkeleton) => Promise<Cardano.Lovelace>;
 
 /**
  * @returns true if token bundle size exceeds it's maximum size limit.
  */
-export type TokenBundleSizeExceedsLimit = (tokenBundle?: CSL.MultiAsset) => boolean;
+export type TokenBundleSizeExceedsLimit = (tokenBundle?: Cardano.TokenMap) => boolean;
 
 /**
  * @returns minimum lovelace amount in a UTxO
  */
-export type ComputeMinimumCoinQuantity = (assetQuantities?: CSL.MultiAsset) => bigint;
+export type ComputeMinimumCoinQuantity = (assetQuantities?: Cardano.TokenMap) => Cardano.Lovelace;
 
 /**
  * @returns an upper bound for the number of ordinary inputs to
@@ -70,11 +70,11 @@ export interface InputSelectionParameters {
   /**
    * The set of inputs available for selection.
    */
-  utxo: Set<CSL.TransactionUnspentOutput>;
+  utxo: Set<Cardano.Utxo>;
   /**
    * The set of outputs requested for payment.
    */
-  outputs: Set<CSL.TransactionOutput>;
+  outputs: Set<Cardano.TxOut>;
   /**
    * Input selection constraints
    */

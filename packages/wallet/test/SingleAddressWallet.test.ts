@@ -87,21 +87,50 @@ describe('SingleAddressWallet', () => {
   });
 
   describe('creating transactions', () => {
-    const props = {
-      outputs: new Set([
-        {
-          address: Cardano.Address(
-            'addr_test1qpu5vlrf4xkxv2qpwngf6cjhtw542ayty80v8dyr49rf5ewvxwdrt70qlcpeeagscasafhffqsxy36t90ldv06wqrk2qum8x5w'
-          ),
-          value: { coins: 11_111_111n }
+    const outputs = [
+      {
+        address: Cardano.Address(
+          'addr_test1qpu5vlrf4xkxv2qpwngf6cjhtw542ayty80v8dyr49rf5ewvxwdrt70qlcpeeagscasafhffqsxy36t90ldv06wqrk2qum8x5w'
+        ),
+        value: { coins: 11_111_111n }
+      },
+      {
+        address: Cardano.Address(
+          'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
+        ),
+        value: {
+          assets: new Map([[AssetId.TSLA, 6n]]),
+          coins: 5n
         }
-      ])
+      }
+    ];
+    const props = {
+      outputs: new Set<Cardano.TxOut>(outputs)
     };
 
+    describe('validateTx', () => {
+      it('returns minimum coin quantity per output', async () => {
+        const { minimumCoinQuantities } = await wallet.validateInitializeTxProps(props);
+        expect(minimumCoinQuantities.size).toBe(2);
+        const outputWithoutAssetsMinimumCoin = minimumCoinQuantities.get(outputs[0])!;
+        const outputWithAssetsMinimumCoin = minimumCoinQuantities.get(outputs[1])!;
+        expect(outputWithoutAssetsMinimumCoin.minimumCoin).toBeGreaterThan(0n);
+        expect(outputWithAssetsMinimumCoin.minimumCoin).toBeGreaterThan(outputWithoutAssetsMinimumCoin.minimumCoin);
+        expect(outputWithoutAssetsMinimumCoin.coinMissing).toBe(0n);
+        expect(outputWithAssetsMinimumCoin.coinMissing).toBe(
+          outputWithAssetsMinimumCoin.minimumCoin - outputs[1].value.coins
+        );
+      });
+    });
+
     it('initializeTx', async () => {
-      const { body, hash } = await wallet.initializeTx(props);
+      const { body, hash, inputSelection } = await wallet.initializeTx(props);
       expect(body.outputs).toHaveLength(props.outputs.size + 1 /* change output */);
       expect(typeof hash).toBe('string');
+      expect(inputSelection.outputs.size).toBe(props.outputs.size);
+      expect(inputSelection.inputs.size).toBeGreaterThan(0);
+      expect(inputSelection.fee).toBeGreaterThan(0n);
+      expect(inputSelection.change.size).toBeGreaterThan(0);
     });
 
     it('finalizeTx', async () => {

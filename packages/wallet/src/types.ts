@@ -1,6 +1,7 @@
 import { Balance, BehaviorObservable, DelegationTracker, TransactionalTracker, TransactionsTracker } from './services';
 import { Cardano, NetworkInfo, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
 import { GroupedAddress } from './KeyManagement';
+import { SelectionSkeleton } from '@cardano-sdk/cip2';
 import { TxInternals } from './Transaction';
 
 export interface SerializableStatic<T, OpaqueStringT> {
@@ -32,6 +33,18 @@ export interface FinalizeTxProps {
 
 export type Assets = Map<Cardano.AssetId, Cardano.Asset>;
 
+export interface MinimumCoinQuantity {
+  minimumCoin: Cardano.Lovelace;
+  coinMissing: Cardano.Lovelace;
+}
+export type MinimumCoinQuantityPerOutput = Map<Cardano.TxOut, MinimumCoinQuantity>;
+
+export interface InitializeTxPropsValidationResult {
+  minimumCoinQuantities: MinimumCoinQuantityPerOutput;
+}
+
+export type InitializeTxResult = TxInternals & { inputSelection: SelectionSkeleton };
+
 export interface Wallet {
   name: string;
   readonly balance: TransactionalTracker<Balance>;
@@ -44,7 +57,14 @@ export interface Wallet {
   readonly protocolParameters$: BehaviorObservable<ProtocolParametersRequiredByWallet>;
   readonly addresses$: BehaviorObservable<GroupedAddress[]>;
   readonly assets$: BehaviorObservable<Assets>;
-  initializeTx(props: InitializeTxProps): Promise<TxInternals>;
+  /**
+   * Compute minimum coin quantity for each transaction output
+   */
+  validateInitializeTxProps(props: InitializeTxProps): Promise<InitializeTxPropsValidationResult>;
+  /**
+   * @throws InputSelectionError
+   */
+  initializeTx(props: InitializeTxProps): Promise<InitializeTxResult>;
   finalizeTx(props: TxInternals): Promise<Cardano.NewTxAlonzo>;
   /**
    * @throws {Cardano.TxSubmissionError}

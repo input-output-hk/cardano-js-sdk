@@ -74,6 +74,16 @@ describe('coreToCsl', () => {
       expect(value).toBeInstanceOf(CSL.Value);
     });
   });
+  it('tokenMap', () => {
+    const multiasset = coreToCsl.tokenMap(txOut.value.assets!);
+    expect(multiasset).toBeInstanceOf(CSL.MultiAsset);
+    expect(multiasset.len()).toBe(2);
+    for (const [assetId, expectedAssetQuantity] of txOut.value.assets!.entries()) {
+      const { scriptHash, assetName } = Asset.util.parseAssetId(assetId);
+      const assetQuantity = BigInt(multiasset.get(scriptHash)!.get(assetName)!.to_str());
+      expect(assetQuantity).toBe(expectedAssetQuantity);
+    }
+  });
   it('txBody', () => {
     const cslBody = coreToCsl.txBody(coreTxBody);
     expect(cslBody.certs()?.get(0).as_pool_retirement()?.epoch()).toBe(500);

@@ -1,4 +1,4 @@
-import { Cardano, WalletProvider, coreToCsl } from '@cardano-sdk/core';
+import { Cardano, WalletProvider } from '@cardano-sdk/core';
 import { CreateTxInternalsProps, createTransactionInternals } from '../../src/Transaction';
 import { SelectionConstraints } from '@cardano-sdk/util-dev';
 import { SelectionSkeleton, roundRobinRandomImprove } from '@cardano-sdk/cip2';
@@ -27,8 +27,8 @@ describe('Transaction.createTransactionInternals', () => {
   ) => {
     const result = await roundRobinRandomImprove().select({
       constraints: SelectionConstraints.NO_CONSTRAINTS,
-      outputs: new Set(outputs.map((output) => coreToCsl.txOut(output))),
-      utxo: new Set(coreToCsl.utxo(utxo))
+      outputs: new Set(outputs),
+      utxo: new Set(utxo)
     });
     const ledgerTip = await provider.ledgerTip();
     const overrides = props(result.selection);

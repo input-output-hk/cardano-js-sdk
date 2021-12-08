@@ -1,5 +1,5 @@
 import { AssetId, SelectionConstraints } from '@cardano-sdk/util-dev';
-import { CSL, Cardano, cslToCore, cslUtil } from '@cardano-sdk/core';
+import { Cardano, cslUtil } from '@cardano-sdk/core';
 import { InputSelectionError, InputSelectionFailure } from '../../src/InputSelectionError';
 import { SelectionResult } from '../../src/types';
 import fc, { Arbitrary } from 'fast-check';
@@ -8,8 +8,7 @@ const assertExtraChangeProperties = (
   { minimumCoinQuantity }: SelectionConstraints.MockSelectionConstraints,
   results: SelectionResult
 ) => {
-  for (const value of results.selection.change) {
-    const { coins, assets } = cslToCore.value(value);
+  for (const { coins, assets } of results.selection.change) {
     // Min UTxO coin requirement for change
     expect(coins).toBeGreaterThanOrEqual(minimumCoinQuantity);
     // No 0 quantity assets
@@ -23,13 +22,11 @@ const assertExtraChangeProperties = (
   }
 };
 
-const totalOutputsValue = (outputs: Set<CSL.TransactionOutput>) =>
-  Cardano.util.coalesceValueQuantities([...outputs].map((output) => cslToCore.value(output.amount())));
+const totalOutputsValue = (outputs: Set<Cardano.TxOut>) =>
+  Cardano.util.coalesceValueQuantities([...outputs].map(({ value }) => value));
 
 const totalUtxosValue = (results: SelectionResult) =>
-  Cardano.util.coalesceValueQuantities(
-    [...results.selection.inputs].map((selectedUtxo) => cslToCore.value(selectedUtxo.output().amount()))
-  );
+  Cardano.util.coalesceValueQuantities([...results.selection.inputs].map(([_, { value }]) => value));
 
 const inputSelectionTotals = ({
   results,
@@ -37,7 +34,7 @@ const inputSelectionTotals = ({
   implicitCoin
 }: {
   results: SelectionResult;
-  outputs: Set<CSL.TransactionOutput>;
+  outputs: Set<Cardano.TxOut>;
   implicitCoin?: Cardano.ImplicitCoin;
 }) => {
   const vSelectedUtxo = totalUtxosValue(results);
@@ -46,14 +43,12 @@ const inputSelectionTotals = ({
     coins: vSelectedUtxo.coins + BigInt(implicitCoin?.input || 0)
   };
   const vRequestedOutputs = totalOutputsValue(outputs);
-  const vFee = BigInt(results.selection.fee.to_str());
+  const vFee = results.selection.fee;
   const vRequested = {
     ...vRequestedOutputs,
     coins: vRequestedOutputs.coins + BigInt(implicitCoin?.deposit || 0) + vFee
   };
-  const vChange = Cardano.util.coalesceValueQuantities(
-    [...results.selection.change].map((value) => cslToCore.value(value))
-  );
+  const vChange = Cardano.util.coalesceValueQuantities([...results.selection.change]);
   return { vChange, vRequested, vSelected };
 };
 
@@ -65,8 +60,8 @@ export const assertInputSelectionProperties = ({
   implicitCoin
 }: {
   results: SelectionResult;
-  outputs: Set<CSL.TransactionOutput>;
-  utxo: Set<CSL.TransactionUnspentOutput>;
+  outputs: Set<Cardano.TxOut>;
+  utxo: Set<Cardano.Utxo>;
   constraints: SelectionConstraints.MockSelectionConstraints;
   implicitCoin?: Cardano.ImplicitCoin;
 }) => {

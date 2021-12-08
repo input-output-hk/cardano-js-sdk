@@ -1,4 +1,4 @@
-import { CSL, InvalidProtocolParametersError, cslUtil } from '@cardano-sdk/core';
+import { CSL, InvalidProtocolParametersError, coreToCsl, cslUtil } from '@cardano-sdk/core';
 import {
   ComputeMinimumCoinQuantity,
   ComputeSelectionLimit,
@@ -44,7 +44,7 @@ export const computeMinimumCoinQuantity =
     const minUTxOValue = CSL.BigNum.from_str((coinsPerUtxoWord * 29).toString());
     const value = CSL.Value.new(CSL.BigNum.from_str('0'));
     if (multiasset) {
-      value.set_multiasset(multiasset);
+      value.set_multiasset(coreToCsl.tokenMap(multiasset));
     }
     return BigInt(CSL.min_ada_required(value, minUTxOValue).to_str());
   };
@@ -56,7 +56,7 @@ export const tokenBundleSizeExceedsLimit =
       return false;
     }
     const value = CSL.Value.new(cslUtil.maxBigNum);
-    value.set_multiasset(tokenBundle);
+    value.set_multiasset(coreToCsl.tokenMap(tokenBundle));
     return value.to_bytes().length > maxValueSize;
   };
 
