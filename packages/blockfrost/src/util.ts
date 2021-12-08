@@ -49,12 +49,6 @@ export const toProviderError = (error: unknown) => {
   throw new ProviderError(ProviderFailure.Unknown, error, `status_code: ${status_code}`);
 };
 
-export const withProviderErrors = <T>(providerImplementation: T) =>
-  Object.keys(providerImplementation).reduce((provider, key) => {
-    provider[key] = (...args: any[]) => (providerImplementation as any)[key](...args).catch(toProviderError);
-    return provider;
-  }, {} as any) as T;
-
 export const fetchSequentially = async <Item, Arg, Response>(
   props: {
     arg: Arg;

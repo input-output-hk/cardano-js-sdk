@@ -5,13 +5,14 @@ import {
   EpochRewards,
   ProviderError,
   ProviderFailure,
+  ProviderUtil,
   WalletProvider
 } from '@cardano-sdk/core';
 import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
 import { BlockfrostToCore, BlockfrostTransactionContent, BlockfrostUtxo } from './BlockfrostToCore';
 import { Options, PaginationOptions } from '@blockfrost/blockfrost-js/lib/types';
 import { dummyLogger } from 'ts-log';
-import { fetchSequentially, formatBlockfrostError, replaceNumbersWithBigints, withProviderErrors } from './util';
+import { fetchSequentially, formatBlockfrostError, replaceNumbersWithBigints, toProviderError } from './util';
 import { flatten, groupBy } from 'lodash-es';
 
 const fetchByAddressSequentially = async <Item, Response>(props: {
@@ -285,8 +286,8 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
           }
         : undefined,
       blockHeader: {
-        blockHash: Cardano.BlockId(response.block),
-        blockHeight: response.block_height,
+        blockNo: response.block_height,
+        hash: Cardano.BlockId(response.block),
         slot: response.slot
       },
       body: {
@@ -411,8 +412,8 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
         epochSlot: response.epoch_slot,
         fees: BigInt(response.fees || '0'),
         header: {
-          blockHash: Cardano.BlockId(response.hash),
-          blockHeight: response.height,
+          blockNo: response.height,
+          hash: Cardano.BlockId(response.hash),
           slot: response.slot
         },
         nextBlock: response.next_block ? Cardano.BlockId(response.next_block) : undefined,
@@ -441,7 +442,7 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
   };
 
   return {
-    ...withProviderErrors(providerFunctions),
+    ...ProviderUtil.withProviderErrors(providerFunctions, toProviderError),
     submitTx
   };
 };

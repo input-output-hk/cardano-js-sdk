@@ -377,8 +377,8 @@ describe('blockfrostWalletProvider', () => {
           }
         },
         blockHeader: {
-          blockHash: Cardano.BlockId('356b7d7dbb696ccd12775c016941057a9dc70898d87a63fc752271bb46856940'),
-          blockHeight: 123_456,
+          blockNo: 123_456,
+          hash: Cardano.BlockId('356b7d7dbb696ccd12775c016941057a9dc70898d87a63fc752271bb46856940'),
           slot: 42_000_000
         },
         body: {
@@ -534,8 +534,8 @@ describe('blockfrostWalletProvider', () => {
         epochSlot: 312_794,
         fees: 513_839n,
         header: {
-          blockHash: Cardano.BlockId('86e837d8a6cdfddaf364525ce9857eb93430b7e59a5fd776f0a9e11df476a7e5'),
-          blockHeight: 2_927_618,
+          blockNo: 2_927_618,
+          hash: Cardano.BlockId('86e837d8a6cdfddaf364525ce9857eb93430b7e59a5fd776f0a9e11df476a7e5'),
           slot: 37_767_194
         },
         nextBlock: undefined,
