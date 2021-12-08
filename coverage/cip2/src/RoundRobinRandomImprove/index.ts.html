@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>21/21</span>
+                <span class='fraction'>18/18</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>19/19</span>
+                <span class='fraction'>16/16</span>
             </div>
         
             
@@ -120,12 +120,9 @@
 <a name='L61'></a><a href='#L61'>61</a>
 <a name='L62'></a><a href='#L62'>62</a>
 <a name='L63'></a><a href='#L63'>63</a>
-<a name='L64'></a><a href='#L64'>64</a>
-<a name='L65'></a><a href='#L65'>65</a>
-<a name='L66'></a><a href='#L66'>66</a>
-<a name='L67'></a><a href='#L67'>67</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<a name='L64'></a><a href='#L64'>64</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -144,20 +141,18 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2410x</span>
-<span class="cline-any cline-yes">2410x</span>
-<span class="cline-any cline-yes">2410x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">843x</span>
+<span class="cline-any cline-yes">770x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">843x</span>
+<span class="cline-any cline-yes">770x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">583x</span>
+<span class="cline-any cline-yes">507x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -170,16 +165,14 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">577x</span>
-<span class="cline-any cline-yes">577x</span>
-<span class="cline-any cline-yes">577x</span>
+<span class="cline-any cline-yes">499x</span>
+<span class="cline-any cline-yes">499x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">577x</span>
-<span class="cline-any cline-yes">100x</span>
+<span class="cline-any cline-yes">499x</span>
+<span class="cline-any cline-yes">82x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">477x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">417x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -189,35 +182,34 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { CSL, cslUtil } from '@cardano-sdk/core';
-import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
 import { InputSelectionParameters, InputSelector, SelectionResult } from '../types';
-import { assertIsBalanceSufficient, preprocessArgs, withValuesToValues } from './util';
+import { assertIsBalanceSufficient, preprocessArgs, toValues } from './util';
 import { computeChangeAndAdjustForFee } from './change';
+import { cslUtil } from '@cardano-sdk/core';
 import { roundRobinSelection } from './roundRobin';
 &nbsp;
 export const roundRobinRandomImprove = (): InputSelector =&gt; ({
   select: async ({
-    utxo,
-    outputs,
+    utxo: utxoSet,
+    outputs: outputSet,
     constraints: { computeMinimumCost, computeSelectionLimit, computeMinimumCoinQuantity, tokenBundleSizeExceedsLimit },
     implicitCoin: implicitCoinAsNumber
   }: InputSelectionParameters): Promise&lt;SelectionResult&gt; =&gt; {
-    const { utxosWithValue, outputsWithValue, uniqueOutputAssetIDs, implicitCoin } = preprocessArgs(
-      utxo,
-      outputs,
+    const { utxo, outputs, uniqueOutputAssetIDs, implicitCoin } = preprocessArgs(
+      utxoSet,
+      outputSet,
       implicitCoinAsNumber
     );
 &nbsp;
-    const utxoValues = withValuesToValues(utxosWithValue);
-    const outputValues = withValuesToValues(outputsWithValue);
-    assertIsBalanceSufficient(uniqueOutputAssetIDs, utxoValues, outputValues, implicitCoin);
+    assertIsBalanceSufficient(uniqueOutputAssetIDs, utxo, outputs, implicitCoin);
 &nbsp;
     const roundRobinSelectionResult = roundRobinSelection({
       implicitCoin,
-      outputsWithValue,
+      outputs,
       uniqueOutputAssetIDs,
-      utxosWithValue
+      utxo
     });
 &nbsp;
     const result = await computeChangeAndAdjustForFee({
@@ -225,12 +217,12 @@ export const roundRobinRandomImprove = (): InputSelector =&gt; ({
       estimateTxFee: (utxos, changeValues) =&gt;
         computeMinimumCost({
           change: new Set(changeValues),
-          fee: cslUtil.maxBigNum,
+          fee: cslUtil.MAX_U64,
           inputs: new Set(utxos),
-          outputs
+          outputs: outputSet
         }),
       implicitCoin,
-      outputValues,
+      outputValues: toValues(outputs),
       tokenBundleSizeExceedsLimit,
       uniqueOutputAssetIDs,
       utxoSelection: roundRobinSelectionResult
@@ -238,9 +230,8 @@ export const roundRobinRandomImprove = (): InputSelector =&gt; ({
 &nbsp;
     const inputs = new Set(result.inputs);
     const change = new Set(result.change);
-    const fee = CSL.BigNum.from_str(result.fee.toString());
 &nbsp;
-    if (result.inputs.length &gt; (await computeSelectionLimit({ change, fee, inputs, outputs }))) {
+    if (result.inputs.length &gt; (await computeSelectionLimit({ change, fee: result.fee, inputs, outputs: outputSet }))) {
       throw new InputSelectionError(InputSelectionFailure.MaximumInputCountExceeded);
     }
 &nbsp;
@@ -248,9 +239,9 @@ export const roundRobinRandomImprove = (): InputSelector =&gt; ({
       remainingUTxO: new Set(result.remainingUTxO),
       selection: {
         change,
-        fee,
+        fee: result.fee,
         inputs,
-        outputs
+        outputs: outputSet
       }
     };
   }
@@ -262,7 +253,7 @@ export const roundRobinRandomImprove = (): InputSelector =&gt; ({
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Mon Dec 06 2021 14:45:59 GMT+0000 (Coordinated Universal Time)
+                at Wed Dec 08 2021 07:00:20 GMT+0000 (Coordinated Universal Time)
             </div>
         </div>
         <script src="../../prettify.js"></script>
