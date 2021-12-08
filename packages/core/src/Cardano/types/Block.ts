@@ -1,18 +1,22 @@
-import { BlockAlonzo, BlockNo, BlockSize, Slot } from '@cardano-ogmios/schema';
+import { BlockNo, BlockSize, Slot } from '@cardano-ogmios/schema';
 import { Cardano } from '../..';
 import { Epoch, Lovelace, PoolId } from '.';
 import { Hash32ByteBase16, OpaqueString, typedBech32 } from '../util';
+
+export { BlockNo } from '@cardano-ogmios/schema';
 
 /**
  * block hash as hex string
  */
 export type BlockId = Hash32ByteBase16<'BlockId'>;
 
-export interface Tip {
+export interface PartialBlockHeader {
+  blockNo: BlockNo;
   slot: Slot;
   hash: BlockId;
-  blockNo: BlockNo;
 }
+
+export type Tip = PartialBlockHeader;
 
 /**
  * @param {string} value block hash as hex string
@@ -27,11 +31,6 @@ export { BlockSize };
  */
 export type VrfVkBech32 = OpaqueString<'VrfVkBech32'>;
 export const VrfVkBech32 = (value: string) => typedBech32<VrfVkBech32>(value, 'vrf_vk', 52);
-
-type OgmiosHeader = NonNullable<BlockAlonzo['header']>;
-export type PartialBlockHeader = Pick<OgmiosHeader, 'blockHeight' | 'slot'> & {
-  blockHash: BlockId;
-};
 
 export interface Block {
   header: PartialBlockHeader;
