@@ -3,5 +3,7 @@ const { printSchemaWithDirectives } = require('@graphql-tools/utils');
 
 module.exports = async () => {
   const graphqlSchema = await Schema.build();
-  return printSchemaWithDirectives(graphqlSchema);
+  const printedSchema = printSchemaWithDirectives(graphqlSchema);
+  // remove custom scalars as dgraph doesn't support them, needed for DateTime
+  return printedSchema.replace(/\n?""".+"""\nscalar .+/g, '');
 };

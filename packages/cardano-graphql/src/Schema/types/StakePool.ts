@@ -1,5 +1,5 @@
 /* eslint-disable no-use-before-define */
-import { BigIntsAsStrings, coinDescription, percentageDescription } from '../../util';
+import { BigIntsAsStrings, coinDescription, percentageDescription } from './util';
 import { Cardano } from '@cardano-sdk/core';
 import { Directive, Field, Float, Int, ObjectType, createUnionType, registerEnumType } from 'type-graphql';
 import { ExtendedStakePoolMetadataFields } from './ExtendedStakePoolMetadataFields';

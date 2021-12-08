@@ -24,6 +24,534 @@ export type Scalars = {
   Int64: number;
 };
 
+export type ActiveStake = {
+  __typename?: 'ActiveStake';
+  address: Scalars['String'];
+  epoch: Epoch;
+  quantity: Scalars['String'];
+  stakePool: StakePool;
+};
+
+
+export type ActiveStakeEpochArgs = {
+  filter?: Maybe<EpochFilter>;
+};
+
+
+export type ActiveStakeStakePoolArgs = {
+  filter?: Maybe<StakePoolFilter>;
+};
+
+export type ActiveStakeAggregateResult = {
+  __typename?: 'ActiveStakeAggregateResult';
+  addressMax?: Maybe<Scalars['String']>;
+  addressMin?: Maybe<Scalars['String']>;
+  count?: Maybe<Scalars['Int']>;
+  quantityMax?: Maybe<Scalars['String']>;
+  quantityMin?: Maybe<Scalars['String']>;
+};
+
+export type ActiveStakeFilter = {
+  and?: Maybe<Array<Maybe<ActiveStakeFilter>>>;
+  has?: Maybe<Array<Maybe<ActiveStakeHasFilter>>>;
+  not?: Maybe<ActiveStakeFilter>;
+  or?: Maybe<Array<Maybe<ActiveStakeFilter>>>;
+};
+
+export enum ActiveStakeHasFilter {
+  Address = 'address',
+  Epoch = 'epoch',
+  Quantity = 'quantity',
+  StakePool = 'stakePool'
+}
+
+export type ActiveStakeOrder = {
+  asc?: Maybe<ActiveStakeOrderable>;
+  desc?: Maybe<ActiveStakeOrderable>;
+  then?: Maybe<ActiveStakeOrder>;
+};
+
+export enum ActiveStakeOrderable {
+  Address = 'address',
+  Quantity = 'quantity'
+}
+
+export type ActiveStakePatch = {
+  address?: Maybe<Scalars['String']>;
+  epoch?: Maybe<EpochRef>;
+  quantity?: Maybe<Scalars['String']>;
+  stakePool?: Maybe<StakePoolRef>;
+};
+
+export type ActiveStakeRef = {
+  address?: Maybe<Scalars['String']>;
+  epoch?: Maybe<EpochRef>;
+  quantity?: Maybe<Scalars['String']>;
+  stakePool?: Maybe<StakePoolRef>;
+};
+
+export type AdaPots = {
+  __typename?: 'AdaPots';
+  deposits: Scalars['String'];
+  fees: Scalars['String'];
+  reserves: Scalars['String'];
+  rewards: Scalars['String'];
+  slot: Slot;
+  treasury: Scalars['String'];
+  utxo: Scalars['String'];
+};
+
+
+export type AdaPotsSlotArgs = {
+  filter?: Maybe<SlotFilter>;
+};
+
+export type AdaPotsAggregateResult = {
+  __typename?: 'AdaPotsAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+  depositsMax?: Maybe<Scalars['String']>;
+  depositsMin?: Maybe<Scalars['String']>;
+  feesMax?: Maybe<Scalars['String']>;
+  feesMin?: Maybe<Scalars['String']>;
+  reservesMax?: Maybe<Scalars['String']>;
+  reservesMin?: Maybe<Scalars['String']>;
+  rewardsMax?: Maybe<Scalars['String']>;
+  rewardsMin?: Maybe<Scalars['String']>;
+  treasuryMax?: Maybe<Scalars['String']>;
+  treasuryMin?: Maybe<Scalars['String']>;
+  utxoMax?: Maybe<Scalars['String']>;
+  utxoMin?: Maybe<Scalars['String']>;
+};
+
+export type AdaPotsFilter = {
+  and?: Maybe<Array<Maybe<AdaPotsFilter>>>;
+  has?: Maybe<Array<Maybe<AdaPotsHasFilter>>>;
+  not?: Maybe<AdaPotsFilter>;
+  or?: Maybe<Array<Maybe<AdaPotsFilter>>>;
+};
+
+export enum AdaPotsHasFilter {
+  Deposits = 'deposits',
+  Fees = 'fees',
+  Reserves = 'reserves',
+  Rewards = 'rewards',
+  Slot = 'slot',
+  Treasury = 'treasury',
+  Utxo = 'utxo'
+}
+
+export type AdaPotsOrder = {
+  asc?: Maybe<AdaPotsOrderable>;
+  desc?: Maybe<AdaPotsOrderable>;
+  then?: Maybe<AdaPotsOrder>;
+};
+
+export enum AdaPotsOrderable {
+  Deposits = 'deposits',
+  Fees = 'fees',
+  Reserves = 'reserves',
+  Rewards = 'rewards',
+  Treasury = 'treasury',
+  Utxo = 'utxo'
+}
+
+export type AdaPotsPatch = {
+  deposits?: Maybe<Scalars['String']>;
+  fees?: Maybe<Scalars['String']>;
+  reserves?: Maybe<Scalars['String']>;
+  rewards?: Maybe<Scalars['String']>;
+  slot?: Maybe<SlotRef>;
+  treasury?: Maybe<Scalars['String']>;
+  utxo?: Maybe<Scalars['String']>;
+};
+
+export type AdaPotsRef = {
+  deposits?: Maybe<Scalars['String']>;
+  fees?: Maybe<Scalars['String']>;
+  reserves?: Maybe<Scalars['String']>;
+  rewards?: Maybe<Scalars['String']>;
+  slot?: Maybe<SlotRef>;
+  treasury?: Maybe<Scalars['String']>;
+  utxo?: Maybe<Scalars['String']>;
+};
+
+export type AddActiveStakeInput = {
+  address: Scalars['String'];
+  epoch: EpochRef;
+  quantity: Scalars['String'];
+  stakePool: StakePoolRef;
+};
+
+export type AddActiveStakePayload = {
+  __typename?: 'AddActiveStakePayload';
+  activeStake?: Maybe<Array<Maybe<ActiveStake>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type AddActiveStakePayloadActiveStakeArgs = {
+  filter?: Maybe<ActiveStakeFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ActiveStakeOrder>;
+};
+
+export type AddAdaPotsInput = {
+  deposits: Scalars['String'];
+  fees: Scalars['String'];
+  reserves: Scalars['String'];
+  rewards: Scalars['String'];
+  slot: SlotRef;
+  treasury: Scalars['String'];
+  utxo: Scalars['String'];
+};
+
+export type AddAdaPotsPayload = {
+  __typename?: 'AddAdaPotsPayload';
+  adaPots?: Maybe<Array<Maybe<AdaPots>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type AddAdaPotsPayloadAdaPotsArgs = {
+  filter?: Maybe<AdaPotsFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<AdaPotsOrder>;
+};
+
+export type AddAlonzoGenesisInput = {
+  collateralPercentage: Scalars['Int'];
+  executionPrices: ExecutionPricesRef;
+  lovelacePerUTxOWord: Scalars['Int'];
+  maxBlockExUnits: ExecutionUnitsRef;
+  maxCollateralInputs: Scalars['Int'];
+  maxTxExUnits: ExecutionUnitsRef;
+  maxValueSize: Scalars['Int'];
+};
+
+export type AddAlonzoGenesisPayload = {
+  __typename?: 'AddAlonzoGenesisPayload';
+  alonzoGenesis?: Maybe<Array<Maybe<AlonzoGenesis>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type AddAlonzoGenesisPayloadAlonzoGenesisArgs = {
+  filter?: Maybe<AlonzoGenesisFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<AlonzoGenesisOrder>;
+};
+
+export type AddAssetInput = {
+  assetId: Scalars['String'];
+  assetName: Scalars['String'];
+  decimals: Scalars['Int'];
+  description: Scalars['String'];
+  fingerprint: Scalars['String'];
+};
+
+export type AddAssetPayload = {
+  __typename?: 'AddAssetPayload';
+  asset?: Maybe<Array<Maybe<Asset>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type AddAssetPayloadAssetArgs = {
+  filter?: Maybe<AssetFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<AssetOrder>;
+};
+
+export type AddAuxiliaryDataBodyInput = {
+  auxiliaryData: AuxiliaryDataRef;
+  blob?: Maybe<Array<MetadatumRef>>;
+  scripts?: Maybe<Array<ScriptRef>>;
+};
+
+export type AddAuxiliaryDataBodyPayload = {
+  __typename?: 'AddAuxiliaryDataBodyPayload';
+  auxiliaryDataBody?: Maybe<Array<Maybe<AuxiliaryDataBody>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type AddAuxiliaryDataBodyPayloadAuxiliaryDataBodyArgs = {
+  filter?: Maybe<AuxiliaryDataBodyFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+export type AddAuxiliaryDataInput = {
+  body: AuxiliaryDataBodyRef;
+  hash: Scalars['String'];
+  transaction: TransactionRef;
+};
+
+export type AddAuxiliaryDataPayload = {
+  __typename?: 'AddAuxiliaryDataPayload';
+  auxiliaryData?: Maybe<Array<Maybe<AuxiliaryData>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type AddAuxiliaryDataPayloadAuxiliaryDataArgs = {
+  filter?: Maybe<AuxiliaryDataFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<AuxiliaryDataOrder>;
+};
+
+export type AddBlockInput = {
+  blockNo: Scalars['Int'];
+  confirmations: Scalars['Int'];
+  epoch: EpochRef;
+  fees: Scalars['String'];
+  hash: Scalars['String'];
+  nextBlock: BlockRef;
+  nextBlockProtocolVersion: Scalars['String'];
+  opCert: Scalars['String'];
+  previousBlock: BlockRef;
+  size: Scalars['Int'];
+  slot: SlotRef;
+  slotLeader: StakePoolRef;
+  totalOutput: Scalars['String'];
+  transactions: Array<TransactionRef>;
+  vrf: Scalars['String'];
+};
+
+export type AddBlockPayload = {
+  __typename?: 'AddBlockPayload';
+  block?: Maybe<Array<Maybe<Block>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type AddBlockPayloadBlockArgs = {
+  filter?: Maybe<BlockFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<BlockOrder>;
+};
+
+export type AddByronBlockVersionDataInput = {
+  heavyDelThd: Scalars['String'];
+  maxBlockSize: Scalars['Int'];
+  maxHeaderSize: Scalars['Int'];
+  maxProposalSize: Scalars['Int'];
+  maxTxSize: Scalars['Int'];
+  mpcThd: Scalars['String'];
+  scriptVerson: Scalars['Int'];
+  slotDuration: Scalars['Int'];
+  softforkRule: ByronSoftForkRuleRef;
+  txFeePolicy: ByronTxFeePolicyRef;
+  unlockStakeEpoch: Scalars['String'];
+  updateImplicit: Scalars['String'];
+  updateProposalThd: Scalars['String'];
+  updateVoteThd: Scalars['String'];
+};
+
+export type AddByronBlockVersionDataPayload = {
+  __typename?: 'AddByronBlockVersionDataPayload';
+  byronBlockVersionData?: Maybe<Array<Maybe<ByronBlockVersionData>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type AddByronBlockVersionDataPayloadByronBlockVersionDataArgs = {
+  filter?: Maybe<ByronBlockVersionDataFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ByronBlockVersionDataOrder>;
+};
+
+export type AddByronGenesisInput = {
+  avvmDistr: Scalars['String'];
+  blockVersionData: ByronBlockVersionDataRef;
+  bootStakeholders: Scalars['String'];
+  heavyDelegation: Scalars['String'];
+  nonAvvmBalances: Scalars['String'];
+  protocolConsts: ByronProtocolConstsRef;
+  startTime: Scalars['DateTime'];
+};
+
+export type AddByronGenesisPayload = {
+  __typename?: 'AddByronGenesisPayload';
+  byronGenesis?: Maybe<Array<Maybe<ByronGenesis>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type AddByronGenesisPayloadByronGenesisArgs = {
+  filter?: Maybe<ByronGenesisFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ByronGenesisOrder>;
+};
+
+export type AddByronProtocolConstsInput = {
+  k: Scalars['Int'];
+  protocolMagic?: Maybe<Scalars['Int']>;
+};
+
+export type AddByronProtocolConstsPayload = {
+  __typename?: 'AddByronProtocolConstsPayload';
+  byronProtocolConsts?: Maybe<Array<Maybe<ByronProtocolConsts>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type AddByronProtocolConstsPayloadByronProtocolConstsArgs = {
+  filter?: Maybe<ByronProtocolConstsFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ByronProtocolConstsOrder>;
+};
+
+export type AddByronSoftForkRuleInput = {
+  initThd: Scalars['String'];
+  minThd: Scalars['String'];
+  thdDecrement: Scalars['String'];
+};
+
+export type AddByronSoftForkRulePayload = {
+  __typename?: 'AddByronSoftForkRulePayload';
+  byronSoftForkRule?: Maybe<Array<Maybe<ByronSoftForkRule>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type AddByronSoftForkRulePayloadByronSoftForkRuleArgs = {
+  filter?: Maybe<ByronSoftForkRuleFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ByronSoftForkRuleOrder>;
+};
+
+export type AddByronTxFeePolicyInput = {
+  minThd: Scalars['String'];
+  summand: Scalars['String'];
+};
+
+export type AddByronTxFeePolicyPayload = {
+  __typename?: 'AddByronTxFeePolicyPayload';
+  byronTxFeePolicy?: Maybe<Array<Maybe<ByronTxFeePolicy>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type AddByronTxFeePolicyPayloadByronTxFeePolicyArgs = {
+  filter?: Maybe<ByronTxFeePolicyFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ByronTxFeePolicyOrder>;
+};
+
+export type AddBytesMetadatumInput = {
+  value: Scalars['String'];
+  valueType: MetadatumStringType;
+};
+
+export type AddBytesMetadatumPayload = {
+  __typename?: 'AddBytesMetadatumPayload';
+  bytesMetadatum?: Maybe<Array<Maybe<BytesMetadatum>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type AddBytesMetadatumPayloadBytesMetadatumArgs = {
+  filter?: Maybe<BytesMetadatumFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<BytesMetadatumOrder>;
+};
+
+export type AddEpochInput = {
+  activeStake: Array<ActiveStakeRef>;
+  adaPots: AdaPotsRef;
+  blocks: Array<BlockRef>;
+  endedAt: SlotRef;
+  fees: Scalars['String'];
+  nonce: Scalars['String'];
+  number: Scalars['Int'];
+  output: Scalars['String'];
+  protocolParams: ProtocolParametersRef;
+  startedAt: SlotRef;
+};
+
+export type AddEpochPayload = {
+  __typename?: 'AddEpochPayload';
+  epoch?: Maybe<Array<Maybe<Epoch>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type AddEpochPayloadEpochArgs = {
+  filter?: Maybe<EpochFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<EpochOrder>;
+};
+
+export type AddExecutionPriceInput = {
+  denominator: Scalars['Int'];
+  numerator: Scalars['Int'];
+};
+
+export type AddExecutionPricePayload = {
+  __typename?: 'AddExecutionPricePayload';
+  executionPrice?: Maybe<Array<Maybe<ExecutionPrice>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type AddExecutionPricePayloadExecutionPriceArgs = {
+  filter?: Maybe<ExecutionPriceFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ExecutionPriceOrder>;
+};
+
+export type AddExecutionPricesInput = {
+  prMem: ExecutionPriceRef;
+  prSteps: ExecutionPriceRef;
+};
+
+export type AddExecutionPricesPayload = {
+  __typename?: 'AddExecutionPricesPayload';
+  executionPrices?: Maybe<Array<Maybe<ExecutionPrices>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type AddExecutionPricesPayloadExecutionPricesArgs = {
+  filter?: Maybe<ExecutionPricesFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+export type AddExecutionUnitsInput = {
+  memory: Scalars['Int'];
+  steps: Scalars['Int'];
+};
+
+export type AddExecutionUnitsPayload = {
+  __typename?: 'AddExecutionUnitsPayload';
+  executionUnits?: Maybe<Array<Maybe<ExecutionUnits>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type AddExecutionUnitsPayloadExecutionUnitsArgs = {
+  filter?: Maybe<ExecutionUnitsFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ExecutionUnitsOrder>;
+};
+
 export type AddExtendedStakePoolMetadataFieldsInput = {
   contact?: Maybe<PoolContactDataRef>;
   country?: Maybe<Scalars['String']>;
@@ -87,6 +615,25 @@ export type AddFractionPayloadFractionArgs = {
   order?: Maybe<FractionOrder>;
 };
 
+export type AddGenesisInput = {
+  alonzo: AlonzoGenesisRef;
+  byron: ByronGenesisRef;
+  shelley: ShelleyGenesisRef;
+};
+
+export type AddGenesisPayload = {
+  __typename?: 'AddGenesisPayload';
+  genesis?: Maybe<Array<Maybe<Genesis>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type AddGenesisPayloadGenesisArgs = {
+  filter?: Maybe<GenesisFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
 export type AddItnVerificationInput = {
   owner: Scalars['String'];
   witness: Scalars['String'];
@@ -104,6 +651,79 @@ export type AddItnVerificationPayloadITnVerificationArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<ItnVerificationOrder>;
+};
+
+export type AddIntegerMetadatumInput = {
+  value: Scalars['Int'];
+};
+
+export type AddIntegerMetadatumPayload = {
+  __typename?: 'AddIntegerMetadatumPayload';
+  integerMetadatum?: Maybe<Array<Maybe<IntegerMetadatum>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type AddIntegerMetadatumPayloadIntegerMetadatumArgs = {
+  filter?: Maybe<IntegerMetadatumFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<IntegerMetadatumOrder>;
+};
+
+export type AddKeyValueMetadatumInput = {
+  key: Scalars['String'];
+  metadatum: MetadatumRef;
+};
+
+export type AddKeyValueMetadatumPayload = {
+  __typename?: 'AddKeyValueMetadatumPayload';
+  keyValueMetadatum?: Maybe<Array<Maybe<KeyValueMetadatum>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type AddKeyValueMetadatumPayloadKeyValueMetadatumArgs = {
+  filter?: Maybe<KeyValueMetadatumFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<KeyValueMetadatumOrder>;
+};
+
+export type AddMetadatumArrayInput = {
+  value: Array<MetadatumRef>;
+  valueType: MetadatumArrayType;
+};
+
+export type AddMetadatumArrayPayload = {
+  __typename?: 'AddMetadatumArrayPayload';
+  metadatumArray?: Maybe<Array<Maybe<MetadatumArray>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type AddMetadatumArrayPayloadMetadatumArrayArgs = {
+  filter?: Maybe<MetadatumArrayFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+export type AddMetadatumMapInput = {
+  value: Array<KeyValueMetadatumRef>;
+  valueType: MetadatumArrayType;
+};
+
+export type AddMetadatumMapPayload = {
+  __typename?: 'AddMetadatumMapPayload';
+  metadatumMap?: Maybe<Array<Maybe<MetadatumMap>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type AddMetadatumMapPayloadMetadatumMapArgs = {
+  filter?: Maybe<MetadatumMapFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
 };
 
 export type AddPoolContactDataInput = {
@@ -128,6 +748,71 @@ export type AddPoolContactDataPayloadPoolContactDataArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<PoolContactDataOrder>;
+};
+
+export type AddProtocolParametersInput = {
+  a0: Scalars['Float'];
+  coinsPerUtxoWord?: Maybe<Scalars['Int']>;
+  collateralPercent?: Maybe<Scalars['Int']>;
+  costModels?: Maybe<Scalars['String']>;
+  decentralizationParam: Scalars['Float'];
+  eMax: Scalars['Int'];
+  executionPrices?: Maybe<ExecutionPricesRef>;
+  extraEntropy?: Maybe<Scalars['String']>;
+  keyDeposit: Scalars['Int'];
+  maxBlockBodySize: Scalars['Int'];
+  maxBlockExUnits?: Maybe<ExecutionUnitsRef>;
+  maxBlockHeaderSize: Scalars['Int'];
+  maxCollateralInputs?: Maybe<Scalars['Int']>;
+  maxTxExUnits?: Maybe<ExecutionUnitsRef>;
+  maxTxSize: Scalars['Int'];
+  maxValSize: Scalars['Int'];
+  minFeeA: Scalars['Int'];
+  minFeeB: Scalars['Int'];
+  minPoolCost: Scalars['Int'];
+  minUTxOValue: Scalars['Int'];
+  nOpt: Scalars['Int'];
+  poolDeposit: Scalars['Int'];
+  protocolVersion: Scalars['String'];
+  rho: Scalars['Float'];
+  tau: Scalars['Float'];
+};
+
+export type AddProtocolParametersPayload = {
+  __typename?: 'AddProtocolParametersPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  protocolParameters?: Maybe<Array<Maybe<ProtocolParameters>>>;
+};
+
+
+export type AddProtocolParametersPayloadProtocolParametersArgs = {
+  filter?: Maybe<ProtocolParametersFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ProtocolParametersOrder>;
+};
+
+export type AddRedeemerInput = {
+  executionUnits: ExecutionUnitsRef;
+  fee: Scalars['String'];
+  index: Scalars['Int'];
+  purpose: Scalars['String'];
+  scriptHash: Scalars['String'];
+  transaction: TransactionRef;
+};
+
+export type AddRedeemerPayload = {
+  __typename?: 'AddRedeemerPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  redeemer?: Maybe<Array<Maybe<Redeemer>>>;
+};
+
+
+export type AddRedeemerPayloadRedeemerArgs = {
+  filter?: Maybe<RedeemerFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<RedeemerOrder>;
 };
 
 export type AddRelayByAddressInput = {
@@ -185,6 +870,99 @@ export type AddRelayByNamePayloadRelayByNameArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<RelayByNameOrder>;
+};
+
+export type AddScriptInput = {
+  auxiliaryDataBody: AuxiliaryDataBodyRef;
+  hash: Scalars['String'];
+  serializedSize: Scalars['Int'];
+  type: Scalars['String'];
+};
+
+export type AddScriptPayload = {
+  __typename?: 'AddScriptPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  script?: Maybe<Array<Maybe<Script>>>;
+};
+
+
+export type AddScriptPayloadScriptArgs = {
+  filter?: Maybe<ScriptFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ScriptOrder>;
+};
+
+export type AddShelleyGenesisInput = {
+  activeSlotsCoeff: Scalars['Float'];
+  epochLength: Scalars['Int'];
+  genDelegs?: Maybe<Scalars['String']>;
+  initialFunds: Scalars['String'];
+  maxKESEvolutions: Scalars['Int'];
+  maxLovelaceSupply: Scalars['String'];
+  networkId: Scalars['String'];
+  networkMagic: Scalars['Int'];
+  protocolParams: ProtocolParametersRef;
+  securityParam: Scalars['Int'];
+  slotLength: Scalars['Int'];
+  slotsPerKESPeriod: Scalars['Int'];
+  staking: ShelleyGenesisStakingRef;
+  systemStart: Scalars['String'];
+  updateQuorum: Scalars['Int'];
+};
+
+export type AddShelleyGenesisPayload = {
+  __typename?: 'AddShelleyGenesisPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  shelleyGenesis?: Maybe<Array<Maybe<ShelleyGenesis>>>;
+};
+
+
+export type AddShelleyGenesisPayloadShelleyGenesisArgs = {
+  filter?: Maybe<ShelleyGenesisFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ShelleyGenesisOrder>;
+};
+
+export type AddShelleyGenesisStakingInput = {
+  pools: Scalars['String'];
+  stake: Scalars['String'];
+};
+
+export type AddShelleyGenesisStakingPayload = {
+  __typename?: 'AddShelleyGenesisStakingPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  shelleyGenesisStaking?: Maybe<Array<Maybe<ShelleyGenesisStaking>>>;
+};
+
+
+export type AddShelleyGenesisStakingPayloadShelleyGenesisStakingArgs = {
+  filter?: Maybe<ShelleyGenesisStakingFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ShelleyGenesisStakingOrder>;
+};
+
+export type AddSlotInput = {
+  block?: Maybe<BlockRef>;
+  date: Scalars['DateTime'];
+  number: Scalars['Int'];
+  slotInEpoch: Scalars['Int'];
+};
+
+export type AddSlotPayload = {
+  __typename?: 'AddSlotPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  slot?: Maybe<Array<Maybe<Slot>>>;
+};
+
+
+export type AddSlotPayloadSlotArgs = {
+  filter?: Maybe<SlotFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<SlotOrder>;
 };
 
 export type AddStakePoolInput = {
@@ -351,6 +1129,25 @@ export type AddStakePoolTransactionsPayloadStakePoolTransactionsArgs = {
   offset?: Maybe<Scalars['Int']>;
 };
 
+export type AddStringMetadatumInput = {
+  value: Scalars['String'];
+  valueType: MetadatumStringType;
+};
+
+export type AddStringMetadatumPayload = {
+  __typename?: 'AddStringMetadatumPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  stringMetadatum?: Maybe<Array<Maybe<StringMetadatum>>>;
+};
+
+
+export type AddStringMetadatumPayloadStringMetadatumArgs = {
+  filter?: Maybe<StringMetadatumFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<StringMetadatumOrder>;
+};
+
 export type AddThePoolsMediaAssetsInput = {
   color_bg?: Maybe<Scalars['String']>;
   color_fg?: Maybe<Scalars['String']>;
@@ -373,11 +1170,1040 @@ export type AddThePoolsMediaAssetsPayloadThePoolsMediaAssetsArgs = {
   order?: Maybe<ThePoolsMediaAssetsOrder>;
 };
 
+export type AddTokenInput = {
+  asset: AssetRef;
+  quantity: Scalars['String'];
+  transactionOutput: TransactionOutputRef;
+};
+
+export type AddTokenPayload = {
+  __typename?: 'AddTokenPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  token?: Maybe<Array<Maybe<Token>>>;
+};
+
+
+export type AddTokenPayloadTokenArgs = {
+  filter?: Maybe<TokenFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<TokenOrder>;
+};
+
+export type AddTransactionInput = {
+  auxiliaryData?: Maybe<AuxiliaryDataRef>;
+  block: BlockRef;
+  blockIndex: Scalars['Int'];
+  collateral?: Maybe<Array<TransactionInputRef>>;
+  deposit: Scalars['String'];
+  fee: Scalars['String'];
+  hash: Scalars['String'];
+  inputs: Array<TransactionInputRef>;
+  invalidBefore?: Maybe<Scalars['Int']>;
+  invalidHereafter?: Maybe<Scalars['Int']>;
+  mint?: Maybe<Array<TokenRef>>;
+  outputs: Array<TransactionOutputRef>;
+  redeemers?: Maybe<Array<RedeemerRef>>;
+  size: Scalars['Int'];
+  totalOutputCoin: Scalars['String'];
+  validContract: Scalars['Boolean'];
+  withdrawals?: Maybe<Array<WithdrawalRef>>;
+};
+
+export type AddTransactionInputInput = {
+  address: Scalars['String'];
+  index: Scalars['Int'];
+  redeemer?: Maybe<RedeemerRef>;
+  transaction: TransactionRef;
+  value: ValueRef;
+};
+
+export type AddTransactionInputPayload = {
+  __typename?: 'AddTransactionInputPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  transactionInput?: Maybe<Array<Maybe<TransactionInput>>>;
+};
+
+
+export type AddTransactionInputPayloadTransactionInputArgs = {
+  filter?: Maybe<TransactionInputFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<TransactionInputOrder>;
+};
+
+export type AddTransactionOutputInput = {
+  address: Scalars['String'];
+  addressHasScript: Scalars['Boolean'];
+  index: Scalars['Int'];
+  transaction: TransactionRef;
+  value: ValueRef;
+};
+
+export type AddTransactionOutputPayload = {
+  __typename?: 'AddTransactionOutputPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  transactionOutput?: Maybe<Array<Maybe<TransactionOutput>>>;
+};
+
+
+export type AddTransactionOutputPayloadTransactionOutputArgs = {
+  filter?: Maybe<TransactionOutputFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<TransactionOutputOrder>;
+};
+
+export type AddTransactionPayload = {
+  __typename?: 'AddTransactionPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  transaction?: Maybe<Array<Maybe<Transaction>>>;
+};
+
+
+export type AddTransactionPayloadTransactionArgs = {
+  filter?: Maybe<TransactionFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<TransactionOrder>;
+};
+
+export type AddValueInput = {
+  assets?: Maybe<Array<TokenRef>>;
+  coin: Scalars['String'];
+};
+
+export type AddValuePayload = {
+  __typename?: 'AddValuePayload';
+  numUids?: Maybe<Scalars['Int']>;
+  value?: Maybe<Array<Maybe<Value>>>;
+};
+
+
+export type AddValuePayloadValueArgs = {
+  filter?: Maybe<ValueFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ValueOrder>;
+};
+
+export type AddWithdrawalInput = {
+  quantity: Scalars['String'];
+  redeemer?: Maybe<Scalars['String']>;
+  rewardAccount: Scalars['String'];
+  transaction: TransactionRef;
+};
+
+export type AddWithdrawalPayload = {
+  __typename?: 'AddWithdrawalPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  withdrawal?: Maybe<Array<Maybe<Withdrawal>>>;
+};
+
+
+export type AddWithdrawalPayloadWithdrawalArgs = {
+  filter?: Maybe<WithdrawalFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<WithdrawalOrder>;
+};
+
+export type AlonzoGenesis = {
+  __typename?: 'AlonzoGenesis';
+  collateralPercentage: Scalars['Int'];
+  executionPrices: ExecutionPrices;
+  lovelacePerUTxOWord: Scalars['Int'];
+  maxBlockExUnits: ExecutionUnits;
+  maxCollateralInputs: Scalars['Int'];
+  maxTxExUnits: ExecutionUnits;
+  maxValueSize: Scalars['Int'];
+};
+
+
+export type AlonzoGenesisExecutionPricesArgs = {
+  filter?: Maybe<ExecutionPricesFilter>;
+};
+
+
+export type AlonzoGenesisMaxBlockExUnitsArgs = {
+  filter?: Maybe<ExecutionUnitsFilter>;
+};
+
+
+export type AlonzoGenesisMaxTxExUnitsArgs = {
+  filter?: Maybe<ExecutionUnitsFilter>;
+};
+
+export type AlonzoGenesisAggregateResult = {
+  __typename?: 'AlonzoGenesisAggregateResult';
+  collateralPercentageAvg?: Maybe<Scalars['Float']>;
+  collateralPercentageMax?: Maybe<Scalars['Int']>;
+  collateralPercentageMin?: Maybe<Scalars['Int']>;
+  collateralPercentageSum?: Maybe<Scalars['Int']>;
+  count?: Maybe<Scalars['Int']>;
+  lovelacePerUTxOWordAvg?: Maybe<Scalars['Float']>;
+  lovelacePerUTxOWordMax?: Maybe<Scalars['Int']>;
+  lovelacePerUTxOWordMin?: Maybe<Scalars['Int']>;
+  lovelacePerUTxOWordSum?: Maybe<Scalars['Int']>;
+  maxCollateralInputsAvg?: Maybe<Scalars['Float']>;
+  maxCollateralInputsMax?: Maybe<Scalars['Int']>;
+  maxCollateralInputsMin?: Maybe<Scalars['Int']>;
+  maxCollateralInputsSum?: Maybe<Scalars['Int']>;
+  maxValueSizeAvg?: Maybe<Scalars['Float']>;
+  maxValueSizeMax?: Maybe<Scalars['Int']>;
+  maxValueSizeMin?: Maybe<Scalars['Int']>;
+  maxValueSizeSum?: Maybe<Scalars['Int']>;
+};
+
+export type AlonzoGenesisFilter = {
+  and?: Maybe<Array<Maybe<AlonzoGenesisFilter>>>;
+  has?: Maybe<Array<Maybe<AlonzoGenesisHasFilter>>>;
+  not?: Maybe<AlonzoGenesisFilter>;
+  or?: Maybe<Array<Maybe<AlonzoGenesisFilter>>>;
+};
+
+export enum AlonzoGenesisHasFilter {
+  CollateralPercentage = 'collateralPercentage',
+  ExecutionPrices = 'executionPrices',
+  LovelacePerUTxOWord = 'lovelacePerUTxOWord',
+  MaxBlockExUnits = 'maxBlockExUnits',
+  MaxCollateralInputs = 'maxCollateralInputs',
+  MaxTxExUnits = 'maxTxExUnits',
+  MaxValueSize = 'maxValueSize'
+}
+
+export type AlonzoGenesisOrder = {
+  asc?: Maybe<AlonzoGenesisOrderable>;
+  desc?: Maybe<AlonzoGenesisOrderable>;
+  then?: Maybe<AlonzoGenesisOrder>;
+};
+
+export enum AlonzoGenesisOrderable {
+  CollateralPercentage = 'collateralPercentage',
+  LovelacePerUTxOWord = 'lovelacePerUTxOWord',
+  MaxCollateralInputs = 'maxCollateralInputs',
+  MaxValueSize = 'maxValueSize'
+}
+
+export type AlonzoGenesisPatch = {
+  collateralPercentage?: Maybe<Scalars['Int']>;
+  executionPrices?: Maybe<ExecutionPricesRef>;
+  lovelacePerUTxOWord?: Maybe<Scalars['Int']>;
+  maxBlockExUnits?: Maybe<ExecutionUnitsRef>;
+  maxCollateralInputs?: Maybe<Scalars['Int']>;
+  maxTxExUnits?: Maybe<ExecutionUnitsRef>;
+  maxValueSize?: Maybe<Scalars['Int']>;
+};
+
+export type AlonzoGenesisRef = {
+  collateralPercentage?: Maybe<Scalars['Int']>;
+  executionPrices?: Maybe<ExecutionPricesRef>;
+  lovelacePerUTxOWord?: Maybe<Scalars['Int']>;
+  maxBlockExUnits?: Maybe<ExecutionUnitsRef>;
+  maxCollateralInputs?: Maybe<Scalars['Int']>;
+  maxTxExUnits?: Maybe<ExecutionUnitsRef>;
+  maxValueSize?: Maybe<Scalars['Int']>;
+};
+
+export type Asset = {
+  __typename?: 'Asset';
+  assetId: Scalars['String'];
+  assetName: Scalars['String'];
+  decimals: Scalars['Int'];
+  description: Scalars['String'];
+  fingerprint: Scalars['String'];
+};
+
+export type AssetAggregateResult = {
+  __typename?: 'AssetAggregateResult';
+  assetIdMax?: Maybe<Scalars['String']>;
+  assetIdMin?: Maybe<Scalars['String']>;
+  assetNameMax?: Maybe<Scalars['String']>;
+  assetNameMin?: Maybe<Scalars['String']>;
+  count?: Maybe<Scalars['Int']>;
+  decimalsAvg?: Maybe<Scalars['Float']>;
+  decimalsMax?: Maybe<Scalars['Int']>;
+  decimalsMin?: Maybe<Scalars['Int']>;
+  decimalsSum?: Maybe<Scalars['Int']>;
+  descriptionMax?: Maybe<Scalars['String']>;
+  descriptionMin?: Maybe<Scalars['String']>;
+  fingerprintMax?: Maybe<Scalars['String']>;
+  fingerprintMin?: Maybe<Scalars['String']>;
+};
+
+export type AssetFilter = {
+  and?: Maybe<Array<Maybe<AssetFilter>>>;
+  has?: Maybe<Array<Maybe<AssetHasFilter>>>;
+  not?: Maybe<AssetFilter>;
+  or?: Maybe<Array<Maybe<AssetFilter>>>;
+};
+
+export enum AssetHasFilter {
+  AssetId = 'assetId',
+  AssetName = 'assetName',
+  Decimals = 'decimals',
+  Description = 'description',
+  Fingerprint = 'fingerprint'
+}
+
+export type AssetOrder = {
+  asc?: Maybe<AssetOrderable>;
+  desc?: Maybe<AssetOrderable>;
+  then?: Maybe<AssetOrder>;
+};
+
+export enum AssetOrderable {
+  AssetId = 'assetId',
+  AssetName = 'assetName',
+  Decimals = 'decimals',
+  Description = 'description',
+  Fingerprint = 'fingerprint'
+}
+
+export type AssetPatch = {
+  assetId?: Maybe<Scalars['String']>;
+  assetName?: Maybe<Scalars['String']>;
+  decimals?: Maybe<Scalars['Int']>;
+  description?: Maybe<Scalars['String']>;
+  fingerprint?: Maybe<Scalars['String']>;
+};
+
+export type AssetRef = {
+  assetId?: Maybe<Scalars['String']>;
+  assetName?: Maybe<Scalars['String']>;
+  decimals?: Maybe<Scalars['Int']>;
+  description?: Maybe<Scalars['String']>;
+  fingerprint?: Maybe<Scalars['String']>;
+};
+
 export type AuthRule = {
   and?: Maybe<Array<Maybe<AuthRule>>>;
   not?: Maybe<AuthRule>;
   or?: Maybe<Array<Maybe<AuthRule>>>;
   rule?: Maybe<Scalars['String']>;
+};
+
+export type AuxiliaryData = {
+  __typename?: 'AuxiliaryData';
+  body: AuxiliaryDataBody;
+  hash: Scalars['String'];
+  transaction: Transaction;
+};
+
+
+export type AuxiliaryDataBodyArgs = {
+  filter?: Maybe<AuxiliaryDataBodyFilter>;
+};
+
+
+export type AuxiliaryDataTransactionArgs = {
+  filter?: Maybe<TransactionFilter>;
+};
+
+export type AuxiliaryDataAggregateResult = {
+  __typename?: 'AuxiliaryDataAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+  hashMax?: Maybe<Scalars['String']>;
+  hashMin?: Maybe<Scalars['String']>;
+};
+
+export type AuxiliaryDataBody = {
+  __typename?: 'AuxiliaryDataBody';
+  auxiliaryData: AuxiliaryData;
+  blob?: Maybe<Array<Metadatum>>;
+  scripts?: Maybe<Array<Script>>;
+  scriptsAggregate?: Maybe<ScriptAggregateResult>;
+};
+
+
+export type AuxiliaryDataBodyAuxiliaryDataArgs = {
+  filter?: Maybe<AuxiliaryDataFilter>;
+};
+
+
+export type AuxiliaryDataBodyBlobArgs = {
+  filter?: Maybe<MetadatumFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+
+export type AuxiliaryDataBodyScriptsArgs = {
+  filter?: Maybe<ScriptFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ScriptOrder>;
+};
+
+
+export type AuxiliaryDataBodyScriptsAggregateArgs = {
+  filter?: Maybe<ScriptFilter>;
+};
+
+export type AuxiliaryDataBodyAggregateResult = {
+  __typename?: 'AuxiliaryDataBodyAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+};
+
+export type AuxiliaryDataBodyFilter = {
+  and?: Maybe<Array<Maybe<AuxiliaryDataBodyFilter>>>;
+  has?: Maybe<Array<Maybe<AuxiliaryDataBodyHasFilter>>>;
+  not?: Maybe<AuxiliaryDataBodyFilter>;
+  or?: Maybe<Array<Maybe<AuxiliaryDataBodyFilter>>>;
+};
+
+export enum AuxiliaryDataBodyHasFilter {
+  AuxiliaryData = 'auxiliaryData',
+  Blob = 'blob',
+  Scripts = 'scripts'
+}
+
+export type AuxiliaryDataBodyPatch = {
+  auxiliaryData?: Maybe<AuxiliaryDataRef>;
+  blob?: Maybe<Array<MetadatumRef>>;
+  scripts?: Maybe<Array<ScriptRef>>;
+};
+
+export type AuxiliaryDataBodyRef = {
+  auxiliaryData?: Maybe<AuxiliaryDataRef>;
+  blob?: Maybe<Array<MetadatumRef>>;
+  scripts?: Maybe<Array<ScriptRef>>;
+};
+
+export type AuxiliaryDataFilter = {
+  and?: Maybe<Array<Maybe<AuxiliaryDataFilter>>>;
+  has?: Maybe<Array<Maybe<AuxiliaryDataHasFilter>>>;
+  not?: Maybe<AuxiliaryDataFilter>;
+  or?: Maybe<Array<Maybe<AuxiliaryDataFilter>>>;
+};
+
+export enum AuxiliaryDataHasFilter {
+  Body = 'body',
+  Hash = 'hash',
+  Transaction = 'transaction'
+}
+
+export type AuxiliaryDataOrder = {
+  asc?: Maybe<AuxiliaryDataOrderable>;
+  desc?: Maybe<AuxiliaryDataOrderable>;
+  then?: Maybe<AuxiliaryDataOrder>;
+};
+
+export enum AuxiliaryDataOrderable {
+  Hash = 'hash'
+}
+
+export type AuxiliaryDataPatch = {
+  body?: Maybe<AuxiliaryDataBodyRef>;
+  hash?: Maybe<Scalars['String']>;
+  transaction?: Maybe<TransactionRef>;
+};
+
+export type AuxiliaryDataRef = {
+  body?: Maybe<AuxiliaryDataBodyRef>;
+  hash?: Maybe<Scalars['String']>;
+  transaction?: Maybe<TransactionRef>;
+};
+
+export type Block = {
+  __typename?: 'Block';
+  blockNo: Scalars['Int'];
+  confirmations: Scalars['Int'];
+  epoch: Epoch;
+  fees: Scalars['String'];
+  hash: Scalars['String'];
+  nextBlock: Block;
+  nextBlockProtocolVersion: Scalars['String'];
+  opCert: Scalars['String'];
+  previousBlock: Block;
+  size: Scalars['Int'];
+  slot: Slot;
+  slotLeader: StakePool;
+  totalOutput: Scalars['String'];
+  transactions: Array<Transaction>;
+  transactionsAggregate?: Maybe<TransactionAggregateResult>;
+  vrf: Scalars['String'];
+};
+
+
+export type BlockEpochArgs = {
+  filter?: Maybe<EpochFilter>;
+};
+
+
+export type BlockNextBlockArgs = {
+  filter?: Maybe<BlockFilter>;
+};
+
+
+export type BlockPreviousBlockArgs = {
+  filter?: Maybe<BlockFilter>;
+};
+
+
+export type BlockSlotArgs = {
+  filter?: Maybe<SlotFilter>;
+};
+
+
+export type BlockSlotLeaderArgs = {
+  filter?: Maybe<StakePoolFilter>;
+};
+
+
+export type BlockTransactionsArgs = {
+  filter?: Maybe<TransactionFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<TransactionOrder>;
+};
+
+
+export type BlockTransactionsAggregateArgs = {
+  filter?: Maybe<TransactionFilter>;
+};
+
+export type BlockAggregateResult = {
+  __typename?: 'BlockAggregateResult';
+  blockNoAvg?: Maybe<Scalars['Float']>;
+  blockNoMax?: Maybe<Scalars['Int']>;
+  blockNoMin?: Maybe<Scalars['Int']>;
+  blockNoSum?: Maybe<Scalars['Int']>;
+  confirmationsAvg?: Maybe<Scalars['Float']>;
+  confirmationsMax?: Maybe<Scalars['Int']>;
+  confirmationsMin?: Maybe<Scalars['Int']>;
+  confirmationsSum?: Maybe<Scalars['Int']>;
+  count?: Maybe<Scalars['Int']>;
+  feesMax?: Maybe<Scalars['String']>;
+  feesMin?: Maybe<Scalars['String']>;
+  hashMax?: Maybe<Scalars['String']>;
+  hashMin?: Maybe<Scalars['String']>;
+  nextBlockProtocolVersionMax?: Maybe<Scalars['String']>;
+  nextBlockProtocolVersionMin?: Maybe<Scalars['String']>;
+  opCertMax?: Maybe<Scalars['String']>;
+  opCertMin?: Maybe<Scalars['String']>;
+  sizeAvg?: Maybe<Scalars['Float']>;
+  sizeMax?: Maybe<Scalars['Int']>;
+  sizeMin?: Maybe<Scalars['Int']>;
+  sizeSum?: Maybe<Scalars['Int']>;
+  totalOutputMax?: Maybe<Scalars['String']>;
+  totalOutputMin?: Maybe<Scalars['String']>;
+  vrfMax?: Maybe<Scalars['String']>;
+  vrfMin?: Maybe<Scalars['String']>;
+};
+
+export type BlockFilter = {
+  and?: Maybe<Array<Maybe<BlockFilter>>>;
+  has?: Maybe<Array<Maybe<BlockHasFilter>>>;
+  hash?: Maybe<StringHashFilter>;
+  not?: Maybe<BlockFilter>;
+  or?: Maybe<Array<Maybe<BlockFilter>>>;
+};
+
+export enum BlockHasFilter {
+  BlockNo = 'blockNo',
+  Confirmations = 'confirmations',
+  Epoch = 'epoch',
+  Fees = 'fees',
+  Hash = 'hash',
+  NextBlock = 'nextBlock',
+  NextBlockProtocolVersion = 'nextBlockProtocolVersion',
+  OpCert = 'opCert',
+  PreviousBlock = 'previousBlock',
+  Size = 'size',
+  Slot = 'slot',
+  SlotLeader = 'slotLeader',
+  TotalOutput = 'totalOutput',
+  Transactions = 'transactions',
+  Vrf = 'vrf'
+}
+
+export type BlockOrder = {
+  asc?: Maybe<BlockOrderable>;
+  desc?: Maybe<BlockOrderable>;
+  then?: Maybe<BlockOrder>;
+};
+
+export enum BlockOrderable {
+  BlockNo = 'blockNo',
+  Confirmations = 'confirmations',
+  Fees = 'fees',
+  Hash = 'hash',
+  NextBlockProtocolVersion = 'nextBlockProtocolVersion',
+  OpCert = 'opCert',
+  Size = 'size',
+  TotalOutput = 'totalOutput',
+  Vrf = 'vrf'
+}
+
+export type BlockPatch = {
+  blockNo?: Maybe<Scalars['Int']>;
+  confirmations?: Maybe<Scalars['Int']>;
+  epoch?: Maybe<EpochRef>;
+  fees?: Maybe<Scalars['String']>;
+  nextBlock?: Maybe<BlockRef>;
+  nextBlockProtocolVersion?: Maybe<Scalars['String']>;
+  opCert?: Maybe<Scalars['String']>;
+  previousBlock?: Maybe<BlockRef>;
+  size?: Maybe<Scalars['Int']>;
+  slot?: Maybe<SlotRef>;
+  slotLeader?: Maybe<StakePoolRef>;
+  totalOutput?: Maybe<Scalars['String']>;
+  transactions?: Maybe<Array<TransactionRef>>;
+  vrf?: Maybe<Scalars['String']>;
+};
+
+export type BlockRef = {
+  blockNo?: Maybe<Scalars['Int']>;
+  confirmations?: Maybe<Scalars['Int']>;
+  epoch?: Maybe<EpochRef>;
+  fees?: Maybe<Scalars['String']>;
+  hash?: Maybe<Scalars['String']>;
+  nextBlock?: Maybe<BlockRef>;
+  nextBlockProtocolVersion?: Maybe<Scalars['String']>;
+  opCert?: Maybe<Scalars['String']>;
+  previousBlock?: Maybe<BlockRef>;
+  size?: Maybe<Scalars['Int']>;
+  slot?: Maybe<SlotRef>;
+  slotLeader?: Maybe<StakePoolRef>;
+  totalOutput?: Maybe<Scalars['String']>;
+  transactions?: Maybe<Array<TransactionRef>>;
+  vrf?: Maybe<Scalars['String']>;
+};
+
+export type ByronBlockVersionData = {
+  __typename?: 'ByronBlockVersionData';
+  heavyDelThd: Scalars['String'];
+  maxBlockSize: Scalars['Int'];
+  maxHeaderSize: Scalars['Int'];
+  maxProposalSize: Scalars['Int'];
+  maxTxSize: Scalars['Int'];
+  mpcThd: Scalars['String'];
+  scriptVerson: Scalars['Int'];
+  slotDuration: Scalars['Int'];
+  softforkRule: ByronSoftForkRule;
+  txFeePolicy: ByronTxFeePolicy;
+  unlockStakeEpoch: Scalars['String'];
+  updateImplicit: Scalars['String'];
+  updateProposalThd: Scalars['String'];
+  updateVoteThd: Scalars['String'];
+};
+
+
+export type ByronBlockVersionDataSoftforkRuleArgs = {
+  filter?: Maybe<ByronSoftForkRuleFilter>;
+};
+
+
+export type ByronBlockVersionDataTxFeePolicyArgs = {
+  filter?: Maybe<ByronTxFeePolicyFilter>;
+};
+
+export type ByronBlockVersionDataAggregateResult = {
+  __typename?: 'ByronBlockVersionDataAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+  heavyDelThdMax?: Maybe<Scalars['String']>;
+  heavyDelThdMin?: Maybe<Scalars['String']>;
+  maxBlockSizeAvg?: Maybe<Scalars['Float']>;
+  maxBlockSizeMax?: Maybe<Scalars['Int']>;
+  maxBlockSizeMin?: Maybe<Scalars['Int']>;
+  maxBlockSizeSum?: Maybe<Scalars['Int']>;
+  maxHeaderSizeAvg?: Maybe<Scalars['Float']>;
+  maxHeaderSizeMax?: Maybe<Scalars['Int']>;
+  maxHeaderSizeMin?: Maybe<Scalars['Int']>;
+  maxHeaderSizeSum?: Maybe<Scalars['Int']>;
+  maxProposalSizeAvg?: Maybe<Scalars['Float']>;
+  maxProposalSizeMax?: Maybe<Scalars['Int']>;
+  maxProposalSizeMin?: Maybe<Scalars['Int']>;
+  maxProposalSizeSum?: Maybe<Scalars['Int']>;
+  maxTxSizeAvg?: Maybe<Scalars['Float']>;
+  maxTxSizeMax?: Maybe<Scalars['Int']>;
+  maxTxSizeMin?: Maybe<Scalars['Int']>;
+  maxTxSizeSum?: Maybe<Scalars['Int']>;
+  mpcThdMax?: Maybe<Scalars['String']>;
+  mpcThdMin?: Maybe<Scalars['String']>;
+  scriptVersonAvg?: Maybe<Scalars['Float']>;
+  scriptVersonMax?: Maybe<Scalars['Int']>;
+  scriptVersonMin?: Maybe<Scalars['Int']>;
+  scriptVersonSum?: Maybe<Scalars['Int']>;
+  slotDurationAvg?: Maybe<Scalars['Float']>;
+  slotDurationMax?: Maybe<Scalars['Int']>;
+  slotDurationMin?: Maybe<Scalars['Int']>;
+  slotDurationSum?: Maybe<Scalars['Int']>;
+  unlockStakeEpochMax?: Maybe<Scalars['String']>;
+  unlockStakeEpochMin?: Maybe<Scalars['String']>;
+  updateImplicitMax?: Maybe<Scalars['String']>;
+  updateImplicitMin?: Maybe<Scalars['String']>;
+  updateProposalThdMax?: Maybe<Scalars['String']>;
+  updateProposalThdMin?: Maybe<Scalars['String']>;
+  updateVoteThdMax?: Maybe<Scalars['String']>;
+  updateVoteThdMin?: Maybe<Scalars['String']>;
+};
+
+export type ByronBlockVersionDataFilter = {
+  and?: Maybe<Array<Maybe<ByronBlockVersionDataFilter>>>;
+  has?: Maybe<Array<Maybe<ByronBlockVersionDataHasFilter>>>;
+  not?: Maybe<ByronBlockVersionDataFilter>;
+  or?: Maybe<Array<Maybe<ByronBlockVersionDataFilter>>>;
+};
+
+export enum ByronBlockVersionDataHasFilter {
+  HeavyDelThd = 'heavyDelThd',
+  MaxBlockSize = 'maxBlockSize',
+  MaxHeaderSize = 'maxHeaderSize',
+  MaxProposalSize = 'maxProposalSize',
+  MaxTxSize = 'maxTxSize',
+  MpcThd = 'mpcThd',
+  ScriptVerson = 'scriptVerson',
+  SlotDuration = 'slotDuration',
+  SoftforkRule = 'softforkRule',
+  TxFeePolicy = 'txFeePolicy',
+  UnlockStakeEpoch = 'unlockStakeEpoch',
+  UpdateImplicit = 'updateImplicit',
+  UpdateProposalThd = 'updateProposalThd',
+  UpdateVoteThd = 'updateVoteThd'
+}
+
+export type ByronBlockVersionDataOrder = {
+  asc?: Maybe<ByronBlockVersionDataOrderable>;
+  desc?: Maybe<ByronBlockVersionDataOrderable>;
+  then?: Maybe<ByronBlockVersionDataOrder>;
+};
+
+export enum ByronBlockVersionDataOrderable {
+  HeavyDelThd = 'heavyDelThd',
+  MaxBlockSize = 'maxBlockSize',
+  MaxHeaderSize = 'maxHeaderSize',
+  MaxProposalSize = 'maxProposalSize',
+  MaxTxSize = 'maxTxSize',
+  MpcThd = 'mpcThd',
+  ScriptVerson = 'scriptVerson',
+  SlotDuration = 'slotDuration',
+  UnlockStakeEpoch = 'unlockStakeEpoch',
+  UpdateImplicit = 'updateImplicit',
+  UpdateProposalThd = 'updateProposalThd',
+  UpdateVoteThd = 'updateVoteThd'
+}
+
+export type ByronBlockVersionDataPatch = {
+  heavyDelThd?: Maybe<Scalars['String']>;
+  maxBlockSize?: Maybe<Scalars['Int']>;
+  maxHeaderSize?: Maybe<Scalars['Int']>;
+  maxProposalSize?: Maybe<Scalars['Int']>;
+  maxTxSize?: Maybe<Scalars['Int']>;
+  mpcThd?: Maybe<Scalars['String']>;
+  scriptVerson?: Maybe<Scalars['Int']>;
+  slotDuration?: Maybe<Scalars['Int']>;
+  softforkRule?: Maybe<ByronSoftForkRuleRef>;
+  txFeePolicy?: Maybe<ByronTxFeePolicyRef>;
+  unlockStakeEpoch?: Maybe<Scalars['String']>;
+  updateImplicit?: Maybe<Scalars['String']>;
+  updateProposalThd?: Maybe<Scalars['String']>;
+  updateVoteThd?: Maybe<Scalars['String']>;
+};
+
+export type ByronBlockVersionDataRef = {
+  heavyDelThd?: Maybe<Scalars['String']>;
+  maxBlockSize?: Maybe<Scalars['Int']>;
+  maxHeaderSize?: Maybe<Scalars['Int']>;
+  maxProposalSize?: Maybe<Scalars['Int']>;
+  maxTxSize?: Maybe<Scalars['Int']>;
+  mpcThd?: Maybe<Scalars['String']>;
+  scriptVerson?: Maybe<Scalars['Int']>;
+  slotDuration?: Maybe<Scalars['Int']>;
+  softforkRule?: Maybe<ByronSoftForkRuleRef>;
+  txFeePolicy?: Maybe<ByronTxFeePolicyRef>;
+  unlockStakeEpoch?: Maybe<Scalars['String']>;
+  updateImplicit?: Maybe<Scalars['String']>;
+  updateProposalThd?: Maybe<Scalars['String']>;
+  updateVoteThd?: Maybe<Scalars['String']>;
+};
+
+export type ByronGenesis = {
+  __typename?: 'ByronGenesis';
+  avvmDistr: Scalars['String'];
+  blockVersionData: ByronBlockVersionData;
+  bootStakeholders: Scalars['String'];
+  heavyDelegation: Scalars['String'];
+  nonAvvmBalances: Scalars['String'];
+  protocolConsts: ByronProtocolConsts;
+  startTime: Scalars['DateTime'];
+};
+
+
+export type ByronGenesisBlockVersionDataArgs = {
+  filter?: Maybe<ByronBlockVersionDataFilter>;
+};
+
+
+export type ByronGenesisProtocolConstsArgs = {
+  filter?: Maybe<ByronProtocolConstsFilter>;
+};
+
+export type ByronGenesisAggregateResult = {
+  __typename?: 'ByronGenesisAggregateResult';
+  avvmDistrMax?: Maybe<Scalars['String']>;
+  avvmDistrMin?: Maybe<Scalars['String']>;
+  bootStakeholdersMax?: Maybe<Scalars['String']>;
+  bootStakeholdersMin?: Maybe<Scalars['String']>;
+  count?: Maybe<Scalars['Int']>;
+  heavyDelegationMax?: Maybe<Scalars['String']>;
+  heavyDelegationMin?: Maybe<Scalars['String']>;
+  nonAvvmBalancesMax?: Maybe<Scalars['String']>;
+  nonAvvmBalancesMin?: Maybe<Scalars['String']>;
+  startTimeMax?: Maybe<Scalars['DateTime']>;
+  startTimeMin?: Maybe<Scalars['DateTime']>;
+};
+
+export type ByronGenesisFilter = {
+  and?: Maybe<Array<Maybe<ByronGenesisFilter>>>;
+  has?: Maybe<Array<Maybe<ByronGenesisHasFilter>>>;
+  not?: Maybe<ByronGenesisFilter>;
+  or?: Maybe<Array<Maybe<ByronGenesisFilter>>>;
+};
+
+export enum ByronGenesisHasFilter {
+  AvvmDistr = 'avvmDistr',
+  BlockVersionData = 'blockVersionData',
+  BootStakeholders = 'bootStakeholders',
+  HeavyDelegation = 'heavyDelegation',
+  NonAvvmBalances = 'nonAvvmBalances',
+  ProtocolConsts = 'protocolConsts',
+  StartTime = 'startTime'
+}
+
+export type ByronGenesisOrder = {
+  asc?: Maybe<ByronGenesisOrderable>;
+  desc?: Maybe<ByronGenesisOrderable>;
+  then?: Maybe<ByronGenesisOrder>;
+};
+
+export enum ByronGenesisOrderable {
+  AvvmDistr = 'avvmDistr',
+  BootStakeholders = 'bootStakeholders',
+  HeavyDelegation = 'heavyDelegation',
+  NonAvvmBalances = 'nonAvvmBalances',
+  StartTime = 'startTime'
+}
+
+export type ByronGenesisPatch = {
+  avvmDistr?: Maybe<Scalars['String']>;
+  blockVersionData?: Maybe<ByronBlockVersionDataRef>;
+  bootStakeholders?: Maybe<Scalars['String']>;
+  heavyDelegation?: Maybe<Scalars['String']>;
+  nonAvvmBalances?: Maybe<Scalars['String']>;
+  protocolConsts?: Maybe<ByronProtocolConstsRef>;
+  startTime?: Maybe<Scalars['DateTime']>;
+};
+
+export type ByronGenesisRef = {
+  avvmDistr?: Maybe<Scalars['String']>;
+  blockVersionData?: Maybe<ByronBlockVersionDataRef>;
+  bootStakeholders?: Maybe<Scalars['String']>;
+  heavyDelegation?: Maybe<Scalars['String']>;
+  nonAvvmBalances?: Maybe<Scalars['String']>;
+  protocolConsts?: Maybe<ByronProtocolConstsRef>;
+  startTime?: Maybe<Scalars['DateTime']>;
+};
+
+export type ByronProtocolConsts = {
+  __typename?: 'ByronProtocolConsts';
+  k: Scalars['Int'];
+  protocolMagic?: Maybe<Scalars['Int']>;
+};
+
+export type ByronProtocolConstsAggregateResult = {
+  __typename?: 'ByronProtocolConstsAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+  kAvg?: Maybe<Scalars['Float']>;
+  kMax?: Maybe<Scalars['Int']>;
+  kMin?: Maybe<Scalars['Int']>;
+  kSum?: Maybe<Scalars['Int']>;
+  protocolMagicAvg?: Maybe<Scalars['Float']>;
+  protocolMagicMax?: Maybe<Scalars['Int']>;
+  protocolMagicMin?: Maybe<Scalars['Int']>;
+  protocolMagicSum?: Maybe<Scalars['Int']>;
+};
+
+export type ByronProtocolConstsFilter = {
+  and?: Maybe<Array<Maybe<ByronProtocolConstsFilter>>>;
+  has?: Maybe<Array<Maybe<ByronProtocolConstsHasFilter>>>;
+  not?: Maybe<ByronProtocolConstsFilter>;
+  or?: Maybe<Array<Maybe<ByronProtocolConstsFilter>>>;
+};
+
+export enum ByronProtocolConstsHasFilter {
+  K = 'k',
+  ProtocolMagic = 'protocolMagic'
+}
+
+export type ByronProtocolConstsOrder = {
+  asc?: Maybe<ByronProtocolConstsOrderable>;
+  desc?: Maybe<ByronProtocolConstsOrderable>;
+  then?: Maybe<ByronProtocolConstsOrder>;
+};
+
+export enum ByronProtocolConstsOrderable {
+  K = 'k',
+  ProtocolMagic = 'protocolMagic'
+}
+
+export type ByronProtocolConstsPatch = {
+  k?: Maybe<Scalars['Int']>;
+  protocolMagic?: Maybe<Scalars['Int']>;
+};
+
+export type ByronProtocolConstsRef = {
+  k?: Maybe<Scalars['Int']>;
+  protocolMagic?: Maybe<Scalars['Int']>;
+};
+
+export type ByronSoftForkRule = {
+  __typename?: 'ByronSoftForkRule';
+  initThd: Scalars['String'];
+  minThd: Scalars['String'];
+  thdDecrement: Scalars['String'];
+};
+
+export type ByronSoftForkRuleAggregateResult = {
+  __typename?: 'ByronSoftForkRuleAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+  initThdMax?: Maybe<Scalars['String']>;
+  initThdMin?: Maybe<Scalars['String']>;
+  minThdMax?: Maybe<Scalars['String']>;
+  minThdMin?: Maybe<Scalars['String']>;
+  thdDecrementMax?: Maybe<Scalars['String']>;
+  thdDecrementMin?: Maybe<Scalars['String']>;
+};
+
+export type ByronSoftForkRuleFilter = {
+  and?: Maybe<Array<Maybe<ByronSoftForkRuleFilter>>>;
+  has?: Maybe<Array<Maybe<ByronSoftForkRuleHasFilter>>>;
+  not?: Maybe<ByronSoftForkRuleFilter>;
+  or?: Maybe<Array<Maybe<ByronSoftForkRuleFilter>>>;
+};
+
+export enum ByronSoftForkRuleHasFilter {
+  InitThd = 'initThd',
+  MinThd = 'minThd',
+  ThdDecrement = 'thdDecrement'
+}
+
+export type ByronSoftForkRuleOrder = {
+  asc?: Maybe<ByronSoftForkRuleOrderable>;
+  desc?: Maybe<ByronSoftForkRuleOrderable>;
+  then?: Maybe<ByronSoftForkRuleOrder>;
+};
+
+export enum ByronSoftForkRuleOrderable {
+  InitThd = 'initThd',
+  MinThd = 'minThd',
+  ThdDecrement = 'thdDecrement'
+}
+
+export type ByronSoftForkRulePatch = {
+  initThd?: Maybe<Scalars['String']>;
+  minThd?: Maybe<Scalars['String']>;
+  thdDecrement?: Maybe<Scalars['String']>;
+};
+
+export type ByronSoftForkRuleRef = {
+  initThd?: Maybe<Scalars['String']>;
+  minThd?: Maybe<Scalars['String']>;
+  thdDecrement?: Maybe<Scalars['String']>;
+};
+
+export type ByronTxFeePolicy = {
+  __typename?: 'ByronTxFeePolicy';
+  minThd: Scalars['String'];
+  summand: Scalars['String'];
+};
+
+export type ByronTxFeePolicyAggregateResult = {
+  __typename?: 'ByronTxFeePolicyAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+  minThdMax?: Maybe<Scalars['String']>;
+  minThdMin?: Maybe<Scalars['String']>;
+  summandMax?: Maybe<Scalars['String']>;
+  summandMin?: Maybe<Scalars['String']>;
+};
+
+export type ByronTxFeePolicyFilter = {
+  and?: Maybe<Array<Maybe<ByronTxFeePolicyFilter>>>;
+  has?: Maybe<Array<Maybe<ByronTxFeePolicyHasFilter>>>;
+  not?: Maybe<ByronTxFeePolicyFilter>;
+  or?: Maybe<Array<Maybe<ByronTxFeePolicyFilter>>>;
+};
+
+export enum ByronTxFeePolicyHasFilter {
+  MinThd = 'minThd',
+  Summand = 'summand'
+}
+
+export type ByronTxFeePolicyOrder = {
+  asc?: Maybe<ByronTxFeePolicyOrderable>;
+  desc?: Maybe<ByronTxFeePolicyOrderable>;
+  then?: Maybe<ByronTxFeePolicyOrder>;
+};
+
+export enum ByronTxFeePolicyOrderable {
+  MinThd = 'minThd',
+  Summand = 'summand'
+}
+
+export type ByronTxFeePolicyPatch = {
+  minThd?: Maybe<Scalars['String']>;
+  summand?: Maybe<Scalars['String']>;
+};
+
+export type ByronTxFeePolicyRef = {
+  minThd?: Maybe<Scalars['String']>;
+  summand?: Maybe<Scalars['String']>;
+};
+
+export type BytesMetadatum = {
+  __typename?: 'BytesMetadatum';
+  value: Scalars['String'];
+  valueType: MetadatumStringType;
+};
+
+export type BytesMetadatumAggregateResult = {
+  __typename?: 'BytesMetadatumAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+  valueMax?: Maybe<Scalars['String']>;
+  valueMin?: Maybe<Scalars['String']>;
+};
+
+export type BytesMetadatumFilter = {
+  and?: Maybe<Array<Maybe<BytesMetadatumFilter>>>;
+  has?: Maybe<Array<Maybe<BytesMetadatumHasFilter>>>;
+  not?: Maybe<BytesMetadatumFilter>;
+  or?: Maybe<Array<Maybe<BytesMetadatumFilter>>>;
+};
+
+export enum BytesMetadatumHasFilter {
+  Value = 'value',
+  ValueType = 'valueType'
+}
+
+export type BytesMetadatumOrder = {
+  asc?: Maybe<BytesMetadatumOrderable>;
+  desc?: Maybe<BytesMetadatumOrderable>;
+  then?: Maybe<BytesMetadatumOrder>;
+};
+
+export enum BytesMetadatumOrderable {
+  Value = 'value'
+}
+
+export type BytesMetadatumPatch = {
+  value?: Maybe<Scalars['String']>;
+  valueType?: Maybe<MetadatumStringType>;
+};
+
+export type BytesMetadatumRef = {
+  value?: Maybe<Scalars['String']>;
+  valueType?: Maybe<MetadatumStringType>;
 };
 
 export type ContainsFilter = {
@@ -410,6 +2236,259 @@ export type DateTimeFilter = {
 export type DateTimeRange = {
   max: Scalars['DateTime'];
   min: Scalars['DateTime'];
+};
+
+export type DeleteActiveStakePayload = {
+  __typename?: 'DeleteActiveStakePayload';
+  activeStake?: Maybe<Array<Maybe<ActiveStake>>>;
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type DeleteActiveStakePayloadActiveStakeArgs = {
+  filter?: Maybe<ActiveStakeFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ActiveStakeOrder>;
+};
+
+export type DeleteAdaPotsPayload = {
+  __typename?: 'DeleteAdaPotsPayload';
+  adaPots?: Maybe<Array<Maybe<AdaPots>>>;
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type DeleteAdaPotsPayloadAdaPotsArgs = {
+  filter?: Maybe<AdaPotsFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<AdaPotsOrder>;
+};
+
+export type DeleteAlonzoGenesisPayload = {
+  __typename?: 'DeleteAlonzoGenesisPayload';
+  alonzoGenesis?: Maybe<Array<Maybe<AlonzoGenesis>>>;
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type DeleteAlonzoGenesisPayloadAlonzoGenesisArgs = {
+  filter?: Maybe<AlonzoGenesisFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<AlonzoGenesisOrder>;
+};
+
+export type DeleteAssetPayload = {
+  __typename?: 'DeleteAssetPayload';
+  asset?: Maybe<Array<Maybe<Asset>>>;
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type DeleteAssetPayloadAssetArgs = {
+  filter?: Maybe<AssetFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<AssetOrder>;
+};
+
+export type DeleteAuxiliaryDataBodyPayload = {
+  __typename?: 'DeleteAuxiliaryDataBodyPayload';
+  auxiliaryDataBody?: Maybe<Array<Maybe<AuxiliaryDataBody>>>;
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type DeleteAuxiliaryDataBodyPayloadAuxiliaryDataBodyArgs = {
+  filter?: Maybe<AuxiliaryDataBodyFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+export type DeleteAuxiliaryDataPayload = {
+  __typename?: 'DeleteAuxiliaryDataPayload';
+  auxiliaryData?: Maybe<Array<Maybe<AuxiliaryData>>>;
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type DeleteAuxiliaryDataPayloadAuxiliaryDataArgs = {
+  filter?: Maybe<AuxiliaryDataFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<AuxiliaryDataOrder>;
+};
+
+export type DeleteBlockPayload = {
+  __typename?: 'DeleteBlockPayload';
+  block?: Maybe<Array<Maybe<Block>>>;
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type DeleteBlockPayloadBlockArgs = {
+  filter?: Maybe<BlockFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<BlockOrder>;
+};
+
+export type DeleteByronBlockVersionDataPayload = {
+  __typename?: 'DeleteByronBlockVersionDataPayload';
+  byronBlockVersionData?: Maybe<Array<Maybe<ByronBlockVersionData>>>;
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type DeleteByronBlockVersionDataPayloadByronBlockVersionDataArgs = {
+  filter?: Maybe<ByronBlockVersionDataFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ByronBlockVersionDataOrder>;
+};
+
+export type DeleteByronGenesisPayload = {
+  __typename?: 'DeleteByronGenesisPayload';
+  byronGenesis?: Maybe<Array<Maybe<ByronGenesis>>>;
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type DeleteByronGenesisPayloadByronGenesisArgs = {
+  filter?: Maybe<ByronGenesisFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ByronGenesisOrder>;
+};
+
+export type DeleteByronProtocolConstsPayload = {
+  __typename?: 'DeleteByronProtocolConstsPayload';
+  byronProtocolConsts?: Maybe<Array<Maybe<ByronProtocolConsts>>>;
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type DeleteByronProtocolConstsPayloadByronProtocolConstsArgs = {
+  filter?: Maybe<ByronProtocolConstsFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ByronProtocolConstsOrder>;
+};
+
+export type DeleteByronSoftForkRulePayload = {
+  __typename?: 'DeleteByronSoftForkRulePayload';
+  byronSoftForkRule?: Maybe<Array<Maybe<ByronSoftForkRule>>>;
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type DeleteByronSoftForkRulePayloadByronSoftForkRuleArgs = {
+  filter?: Maybe<ByronSoftForkRuleFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ByronSoftForkRuleOrder>;
+};
+
+export type DeleteByronTxFeePolicyPayload = {
+  __typename?: 'DeleteByronTxFeePolicyPayload';
+  byronTxFeePolicy?: Maybe<Array<Maybe<ByronTxFeePolicy>>>;
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type DeleteByronTxFeePolicyPayloadByronTxFeePolicyArgs = {
+  filter?: Maybe<ByronTxFeePolicyFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ByronTxFeePolicyOrder>;
+};
+
+export type DeleteBytesMetadatumPayload = {
+  __typename?: 'DeleteBytesMetadatumPayload';
+  bytesMetadatum?: Maybe<Array<Maybe<BytesMetadatum>>>;
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type DeleteBytesMetadatumPayloadBytesMetadatumArgs = {
+  filter?: Maybe<BytesMetadatumFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<BytesMetadatumOrder>;
+};
+
+export type DeleteEpochPayload = {
+  __typename?: 'DeleteEpochPayload';
+  epoch?: Maybe<Array<Maybe<Epoch>>>;
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type DeleteEpochPayloadEpochArgs = {
+  filter?: Maybe<EpochFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<EpochOrder>;
+};
+
+export type DeleteExecutionPricePayload = {
+  __typename?: 'DeleteExecutionPricePayload';
+  executionPrice?: Maybe<Array<Maybe<ExecutionPrice>>>;
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type DeleteExecutionPricePayloadExecutionPriceArgs = {
+  filter?: Maybe<ExecutionPriceFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ExecutionPriceOrder>;
+};
+
+export type DeleteExecutionPricesPayload = {
+  __typename?: 'DeleteExecutionPricesPayload';
+  executionPrices?: Maybe<Array<Maybe<ExecutionPrices>>>;
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type DeleteExecutionPricesPayloadExecutionPricesArgs = {
+  filter?: Maybe<ExecutionPricesFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+export type DeleteExecutionUnitsPayload = {
+  __typename?: 'DeleteExecutionUnitsPayload';
+  executionUnits?: Maybe<Array<Maybe<ExecutionUnits>>>;
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type DeleteExecutionUnitsPayloadExecutionUnitsArgs = {
+  filter?: Maybe<ExecutionUnitsFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ExecutionUnitsOrder>;
 };
 
 export type DeleteExtendedStakePoolMetadataFieldsPayload = {
@@ -457,6 +2536,20 @@ export type DeleteFractionPayloadFractionArgs = {
   order?: Maybe<FractionOrder>;
 };
 
+export type DeleteGenesisPayload = {
+  __typename?: 'DeleteGenesisPayload';
+  genesis?: Maybe<Array<Maybe<Genesis>>>;
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type DeleteGenesisPayloadGenesisArgs = {
+  filter?: Maybe<GenesisFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
 export type DeleteItnVerificationPayload = {
   __typename?: 'DeleteITNVerificationPayload';
   iTNVerification?: Maybe<Array<Maybe<ItnVerification>>>;
@@ -472,6 +2565,64 @@ export type DeleteItnVerificationPayloadITnVerificationArgs = {
   order?: Maybe<ItnVerificationOrder>;
 };
 
+export type DeleteIntegerMetadatumPayload = {
+  __typename?: 'DeleteIntegerMetadatumPayload';
+  integerMetadatum?: Maybe<Array<Maybe<IntegerMetadatum>>>;
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type DeleteIntegerMetadatumPayloadIntegerMetadatumArgs = {
+  filter?: Maybe<IntegerMetadatumFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<IntegerMetadatumOrder>;
+};
+
+export type DeleteKeyValueMetadatumPayload = {
+  __typename?: 'DeleteKeyValueMetadatumPayload';
+  keyValueMetadatum?: Maybe<Array<Maybe<KeyValueMetadatum>>>;
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type DeleteKeyValueMetadatumPayloadKeyValueMetadatumArgs = {
+  filter?: Maybe<KeyValueMetadatumFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<KeyValueMetadatumOrder>;
+};
+
+export type DeleteMetadatumArrayPayload = {
+  __typename?: 'DeleteMetadatumArrayPayload';
+  metadatumArray?: Maybe<Array<Maybe<MetadatumArray>>>;
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type DeleteMetadatumArrayPayloadMetadatumArrayArgs = {
+  filter?: Maybe<MetadatumArrayFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+export type DeleteMetadatumMapPayload = {
+  __typename?: 'DeleteMetadatumMapPayload';
+  metadatumMap?: Maybe<Array<Maybe<MetadatumMap>>>;
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type DeleteMetadatumMapPayloadMetadatumMapArgs = {
+  filter?: Maybe<MetadatumMapFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
 export type DeletePoolContactDataPayload = {
   __typename?: 'DeletePoolContactDataPayload';
   msg?: Maybe<Scalars['String']>;
@@ -485,6 +2636,36 @@ export type DeletePoolContactDataPayloadPoolContactDataArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<PoolContactDataOrder>;
+};
+
+export type DeleteProtocolParametersPayload = {
+  __typename?: 'DeleteProtocolParametersPayload';
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+  protocolParameters?: Maybe<Array<Maybe<ProtocolParameters>>>;
+};
+
+
+export type DeleteProtocolParametersPayloadProtocolParametersArgs = {
+  filter?: Maybe<ProtocolParametersFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ProtocolParametersOrder>;
+};
+
+export type DeleteRedeemerPayload = {
+  __typename?: 'DeleteRedeemerPayload';
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+  redeemer?: Maybe<Array<Maybe<Redeemer>>>;
+};
+
+
+export type DeleteRedeemerPayloadRedeemerArgs = {
+  filter?: Maybe<RedeemerFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<RedeemerOrder>;
 };
 
 export type DeleteRelayByAddressPayload = {
@@ -530,6 +2711,66 @@ export type DeleteRelayByNamePayloadRelayByNameArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<RelayByNameOrder>;
+};
+
+export type DeleteScriptPayload = {
+  __typename?: 'DeleteScriptPayload';
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+  script?: Maybe<Array<Maybe<Script>>>;
+};
+
+
+export type DeleteScriptPayloadScriptArgs = {
+  filter?: Maybe<ScriptFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ScriptOrder>;
+};
+
+export type DeleteShelleyGenesisPayload = {
+  __typename?: 'DeleteShelleyGenesisPayload';
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+  shelleyGenesis?: Maybe<Array<Maybe<ShelleyGenesis>>>;
+};
+
+
+export type DeleteShelleyGenesisPayloadShelleyGenesisArgs = {
+  filter?: Maybe<ShelleyGenesisFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ShelleyGenesisOrder>;
+};
+
+export type DeleteShelleyGenesisStakingPayload = {
+  __typename?: 'DeleteShelleyGenesisStakingPayload';
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+  shelleyGenesisStaking?: Maybe<Array<Maybe<ShelleyGenesisStaking>>>;
+};
+
+
+export type DeleteShelleyGenesisStakingPayloadShelleyGenesisStakingArgs = {
+  filter?: Maybe<ShelleyGenesisStakingFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ShelleyGenesisStakingOrder>;
+};
+
+export type DeleteSlotPayload = {
+  __typename?: 'DeleteSlotPayload';
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+  slot?: Maybe<Array<Maybe<Slot>>>;
+};
+
+
+export type DeleteSlotPayloadSlotArgs = {
+  filter?: Maybe<SlotFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<SlotOrder>;
 };
 
 export type DeleteStakePoolMetadataJsonPayload = {
@@ -636,6 +2877,21 @@ export type DeleteStakePoolTransactionsPayloadStakePoolTransactionsArgs = {
   offset?: Maybe<Scalars['Int']>;
 };
 
+export type DeleteStringMetadatumPayload = {
+  __typename?: 'DeleteStringMetadatumPayload';
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+  stringMetadatum?: Maybe<Array<Maybe<StringMetadatum>>>;
+};
+
+
+export type DeleteStringMetadatumPayloadStringMetadatumArgs = {
+  filter?: Maybe<StringMetadatumFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<StringMetadatumOrder>;
+};
+
 export type DeleteThePoolsMediaAssetsPayload = {
   __typename?: 'DeleteThePoolsMediaAssetsPayload';
   msg?: Maybe<Scalars['String']>;
@@ -649,6 +2905,96 @@ export type DeleteThePoolsMediaAssetsPayloadThePoolsMediaAssetsArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<ThePoolsMediaAssetsOrder>;
+};
+
+export type DeleteTokenPayload = {
+  __typename?: 'DeleteTokenPayload';
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+  token?: Maybe<Array<Maybe<Token>>>;
+};
+
+
+export type DeleteTokenPayloadTokenArgs = {
+  filter?: Maybe<TokenFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<TokenOrder>;
+};
+
+export type DeleteTransactionInputPayload = {
+  __typename?: 'DeleteTransactionInputPayload';
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+  transactionInput?: Maybe<Array<Maybe<TransactionInput>>>;
+};
+
+
+export type DeleteTransactionInputPayloadTransactionInputArgs = {
+  filter?: Maybe<TransactionInputFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<TransactionInputOrder>;
+};
+
+export type DeleteTransactionOutputPayload = {
+  __typename?: 'DeleteTransactionOutputPayload';
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+  transactionOutput?: Maybe<Array<Maybe<TransactionOutput>>>;
+};
+
+
+export type DeleteTransactionOutputPayloadTransactionOutputArgs = {
+  filter?: Maybe<TransactionOutputFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<TransactionOutputOrder>;
+};
+
+export type DeleteTransactionPayload = {
+  __typename?: 'DeleteTransactionPayload';
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+  transaction?: Maybe<Array<Maybe<Transaction>>>;
+};
+
+
+export type DeleteTransactionPayloadTransactionArgs = {
+  filter?: Maybe<TransactionFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<TransactionOrder>;
+};
+
+export type DeleteValuePayload = {
+  __typename?: 'DeleteValuePayload';
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+  value?: Maybe<Array<Maybe<Value>>>;
+};
+
+
+export type DeleteValuePayloadValueArgs = {
+  filter?: Maybe<ValueFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ValueOrder>;
+};
+
+export type DeleteWithdrawalPayload = {
+  __typename?: 'DeleteWithdrawalPayload';
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+  withdrawal?: Maybe<Array<Maybe<Withdrawal>>>;
+};
+
+
+export type DeleteWithdrawalPayloadWithdrawalArgs = {
+  filter?: Maybe<WithdrawalFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<WithdrawalOrder>;
 };
 
 export enum DgraphIndex {
@@ -668,6 +3014,289 @@ export enum DgraphIndex {
   Trigram = 'trigram',
   Year = 'year'
 }
+
+export type Epoch = {
+  __typename?: 'Epoch';
+  activeStake: Array<ActiveStake>;
+  activeStakeAggregate?: Maybe<ActiveStakeAggregateResult>;
+  adaPots: AdaPots;
+  blocks: Array<Block>;
+  blocksAggregate?: Maybe<BlockAggregateResult>;
+  endedAt: Slot;
+  fees: Scalars['String'];
+  nonce: Scalars['String'];
+  number: Scalars['Int'];
+  output: Scalars['String'];
+  protocolParams: ProtocolParameters;
+  startedAt: Slot;
+};
+
+
+export type EpochActiveStakeArgs = {
+  filter?: Maybe<ActiveStakeFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ActiveStakeOrder>;
+};
+
+
+export type EpochActiveStakeAggregateArgs = {
+  filter?: Maybe<ActiveStakeFilter>;
+};
+
+
+export type EpochAdaPotsArgs = {
+  filter?: Maybe<AdaPotsFilter>;
+};
+
+
+export type EpochBlocksArgs = {
+  filter?: Maybe<BlockFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<BlockOrder>;
+};
+
+
+export type EpochBlocksAggregateArgs = {
+  filter?: Maybe<BlockFilter>;
+};
+
+
+export type EpochEndedAtArgs = {
+  filter?: Maybe<SlotFilter>;
+};
+
+
+export type EpochProtocolParamsArgs = {
+  filter?: Maybe<ProtocolParametersFilter>;
+};
+
+
+export type EpochStartedAtArgs = {
+  filter?: Maybe<SlotFilter>;
+};
+
+export type EpochAggregateResult = {
+  __typename?: 'EpochAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+  feesMax?: Maybe<Scalars['String']>;
+  feesMin?: Maybe<Scalars['String']>;
+  nonceMax?: Maybe<Scalars['String']>;
+  nonceMin?: Maybe<Scalars['String']>;
+  numberAvg?: Maybe<Scalars['Float']>;
+  numberMax?: Maybe<Scalars['Int']>;
+  numberMin?: Maybe<Scalars['Int']>;
+  numberSum?: Maybe<Scalars['Int']>;
+  outputMax?: Maybe<Scalars['String']>;
+  outputMin?: Maybe<Scalars['String']>;
+};
+
+export type EpochFilter = {
+  and?: Maybe<Array<Maybe<EpochFilter>>>;
+  has?: Maybe<Array<Maybe<EpochHasFilter>>>;
+  not?: Maybe<EpochFilter>;
+  number?: Maybe<IntFilter>;
+  or?: Maybe<Array<Maybe<EpochFilter>>>;
+};
+
+export enum EpochHasFilter {
+  ActiveStake = 'activeStake',
+  AdaPots = 'adaPots',
+  Blocks = 'blocks',
+  EndedAt = 'endedAt',
+  Fees = 'fees',
+  Nonce = 'nonce',
+  Number = 'number',
+  Output = 'output',
+  ProtocolParams = 'protocolParams',
+  StartedAt = 'startedAt'
+}
+
+export type EpochOrder = {
+  asc?: Maybe<EpochOrderable>;
+  desc?: Maybe<EpochOrderable>;
+  then?: Maybe<EpochOrder>;
+};
+
+export enum EpochOrderable {
+  Fees = 'fees',
+  Nonce = 'nonce',
+  Number = 'number',
+  Output = 'output'
+}
+
+export type EpochPatch = {
+  activeStake?: Maybe<Array<ActiveStakeRef>>;
+  adaPots?: Maybe<AdaPotsRef>;
+  blocks?: Maybe<Array<BlockRef>>;
+  endedAt?: Maybe<SlotRef>;
+  fees?: Maybe<Scalars['String']>;
+  nonce?: Maybe<Scalars['String']>;
+  output?: Maybe<Scalars['String']>;
+  protocolParams?: Maybe<ProtocolParametersRef>;
+  startedAt?: Maybe<SlotRef>;
+};
+
+export type EpochRef = {
+  activeStake?: Maybe<Array<ActiveStakeRef>>;
+  adaPots?: Maybe<AdaPotsRef>;
+  blocks?: Maybe<Array<BlockRef>>;
+  endedAt?: Maybe<SlotRef>;
+  fees?: Maybe<Scalars['String']>;
+  nonce?: Maybe<Scalars['String']>;
+  number?: Maybe<Scalars['Int']>;
+  output?: Maybe<Scalars['String']>;
+  protocolParams?: Maybe<ProtocolParametersRef>;
+  startedAt?: Maybe<SlotRef>;
+};
+
+export type ExecutionPrice = {
+  __typename?: 'ExecutionPrice';
+  denominator: Scalars['Int'];
+  numerator: Scalars['Int'];
+};
+
+export type ExecutionPriceAggregateResult = {
+  __typename?: 'ExecutionPriceAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+  denominatorAvg?: Maybe<Scalars['Float']>;
+  denominatorMax?: Maybe<Scalars['Int']>;
+  denominatorMin?: Maybe<Scalars['Int']>;
+  denominatorSum?: Maybe<Scalars['Int']>;
+  numeratorAvg?: Maybe<Scalars['Float']>;
+  numeratorMax?: Maybe<Scalars['Int']>;
+  numeratorMin?: Maybe<Scalars['Int']>;
+  numeratorSum?: Maybe<Scalars['Int']>;
+};
+
+export type ExecutionPriceFilter = {
+  and?: Maybe<Array<Maybe<ExecutionPriceFilter>>>;
+  has?: Maybe<Array<Maybe<ExecutionPriceHasFilter>>>;
+  not?: Maybe<ExecutionPriceFilter>;
+  or?: Maybe<Array<Maybe<ExecutionPriceFilter>>>;
+};
+
+export enum ExecutionPriceHasFilter {
+  Denominator = 'denominator',
+  Numerator = 'numerator'
+}
+
+export type ExecutionPriceOrder = {
+  asc?: Maybe<ExecutionPriceOrderable>;
+  desc?: Maybe<ExecutionPriceOrderable>;
+  then?: Maybe<ExecutionPriceOrder>;
+};
+
+export enum ExecutionPriceOrderable {
+  Denominator = 'denominator',
+  Numerator = 'numerator'
+}
+
+export type ExecutionPricePatch = {
+  denominator?: Maybe<Scalars['Int']>;
+  numerator?: Maybe<Scalars['Int']>;
+};
+
+export type ExecutionPriceRef = {
+  denominator?: Maybe<Scalars['Int']>;
+  numerator?: Maybe<Scalars['Int']>;
+};
+
+export type ExecutionPrices = {
+  __typename?: 'ExecutionPrices';
+  prMem: ExecutionPrice;
+  prSteps: ExecutionPrice;
+};
+
+
+export type ExecutionPricesPrMemArgs = {
+  filter?: Maybe<ExecutionPriceFilter>;
+};
+
+
+export type ExecutionPricesPrStepsArgs = {
+  filter?: Maybe<ExecutionPriceFilter>;
+};
+
+export type ExecutionPricesAggregateResult = {
+  __typename?: 'ExecutionPricesAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+};
+
+export type ExecutionPricesFilter = {
+  and?: Maybe<Array<Maybe<ExecutionPricesFilter>>>;
+  has?: Maybe<Array<Maybe<ExecutionPricesHasFilter>>>;
+  not?: Maybe<ExecutionPricesFilter>;
+  or?: Maybe<Array<Maybe<ExecutionPricesFilter>>>;
+};
+
+export enum ExecutionPricesHasFilter {
+  PrMem = 'prMem',
+  PrSteps = 'prSteps'
+}
+
+export type ExecutionPricesPatch = {
+  prMem?: Maybe<ExecutionPriceRef>;
+  prSteps?: Maybe<ExecutionPriceRef>;
+};
+
+export type ExecutionPricesRef = {
+  prMem?: Maybe<ExecutionPriceRef>;
+  prSteps?: Maybe<ExecutionPriceRef>;
+};
+
+export type ExecutionUnits = {
+  __typename?: 'ExecutionUnits';
+  memory: Scalars['Int'];
+  steps: Scalars['Int'];
+};
+
+export type ExecutionUnitsAggregateResult = {
+  __typename?: 'ExecutionUnitsAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+  memoryAvg?: Maybe<Scalars['Float']>;
+  memoryMax?: Maybe<Scalars['Int']>;
+  memoryMin?: Maybe<Scalars['Int']>;
+  memorySum?: Maybe<Scalars['Int']>;
+  stepsAvg?: Maybe<Scalars['Float']>;
+  stepsMax?: Maybe<Scalars['Int']>;
+  stepsMin?: Maybe<Scalars['Int']>;
+  stepsSum?: Maybe<Scalars['Int']>;
+};
+
+export type ExecutionUnitsFilter = {
+  and?: Maybe<Array<Maybe<ExecutionUnitsFilter>>>;
+  has?: Maybe<Array<Maybe<ExecutionUnitsHasFilter>>>;
+  not?: Maybe<ExecutionUnitsFilter>;
+  or?: Maybe<Array<Maybe<ExecutionUnitsFilter>>>;
+};
+
+export enum ExecutionUnitsHasFilter {
+  Memory = 'memory',
+  Steps = 'steps'
+}
+
+export type ExecutionUnitsOrder = {
+  asc?: Maybe<ExecutionUnitsOrderable>;
+  desc?: Maybe<ExecutionUnitsOrderable>;
+  then?: Maybe<ExecutionUnitsOrder>;
+};
+
+export enum ExecutionUnitsOrderable {
+  Memory = 'memory',
+  Steps = 'steps'
+}
+
+export type ExecutionUnitsPatch = {
+  memory?: Maybe<Scalars['Int']>;
+  steps?: Maybe<Scalars['Int']>;
+};
+
+export type ExecutionUnitsRef = {
+  memory?: Maybe<Scalars['Int']>;
+  steps?: Maybe<Scalars['Int']>;
+};
 
 export enum ExtendedPoolStatus {
   Active = 'active',
@@ -900,6 +3529,58 @@ export type GenerateQueryParams = {
   query?: Maybe<Scalars['Boolean']>;
 };
 
+export type Genesis = {
+  __typename?: 'Genesis';
+  alonzo: AlonzoGenesis;
+  byron: ByronGenesis;
+  shelley: ShelleyGenesis;
+};
+
+
+export type GenesisAlonzoArgs = {
+  filter?: Maybe<AlonzoGenesisFilter>;
+};
+
+
+export type GenesisByronArgs = {
+  filter?: Maybe<ByronGenesisFilter>;
+};
+
+
+export type GenesisShelleyArgs = {
+  filter?: Maybe<ShelleyGenesisFilter>;
+};
+
+export type GenesisAggregateResult = {
+  __typename?: 'GenesisAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+};
+
+export type GenesisFilter = {
+  and?: Maybe<Array<Maybe<GenesisFilter>>>;
+  has?: Maybe<Array<Maybe<GenesisHasFilter>>>;
+  not?: Maybe<GenesisFilter>;
+  or?: Maybe<Array<Maybe<GenesisFilter>>>;
+};
+
+export enum GenesisHasFilter {
+  Alonzo = 'alonzo',
+  Byron = 'byron',
+  Shelley = 'shelley'
+}
+
+export type GenesisPatch = {
+  alonzo?: Maybe<AlonzoGenesisRef>;
+  byron?: Maybe<ByronGenesisRef>;
+  shelley?: Maybe<ShelleyGenesisRef>;
+};
+
+export type GenesisRef = {
+  alonzo?: Maybe<AlonzoGenesisRef>;
+  byron?: Maybe<ByronGenesisRef>;
+  shelley?: Maybe<ShelleyGenesisRef>;
+};
+
 export enum HttpMethod {
   Delete = 'DELETE',
   Get = 'GET',
@@ -986,10 +3667,227 @@ export type IntRange = {
   min: Scalars['Int'];
 };
 
+export type IntegerMetadatum = {
+  __typename?: 'IntegerMetadatum';
+  value: Scalars['Int'];
+};
+
+export type IntegerMetadatumAggregateResult = {
+  __typename?: 'IntegerMetadatumAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+  valueAvg?: Maybe<Scalars['Float']>;
+  valueMax?: Maybe<Scalars['Int']>;
+  valueMin?: Maybe<Scalars['Int']>;
+  valueSum?: Maybe<Scalars['Int']>;
+};
+
+export type IntegerMetadatumFilter = {
+  and?: Maybe<Array<Maybe<IntegerMetadatumFilter>>>;
+  has?: Maybe<Array<Maybe<IntegerMetadatumHasFilter>>>;
+  not?: Maybe<IntegerMetadatumFilter>;
+  or?: Maybe<Array<Maybe<IntegerMetadatumFilter>>>;
+};
+
+export enum IntegerMetadatumHasFilter {
+  Value = 'value'
+}
+
+export type IntegerMetadatumOrder = {
+  asc?: Maybe<IntegerMetadatumOrderable>;
+  desc?: Maybe<IntegerMetadatumOrderable>;
+  then?: Maybe<IntegerMetadatumOrder>;
+};
+
+export enum IntegerMetadatumOrderable {
+  Value = 'value'
+}
+
+export type IntegerMetadatumPatch = {
+  value?: Maybe<Scalars['Int']>;
+};
+
+export type IntegerMetadatumRef = {
+  value?: Maybe<Scalars['Int']>;
+};
+
 export type IntersectsFilter = {
   multiPolygon?: Maybe<MultiPolygonRef>;
   polygon?: Maybe<PolygonRef>;
 };
+
+export type KeyValueMetadatum = {
+  __typename?: 'KeyValueMetadatum';
+  key: Scalars['String'];
+  metadatum: Metadatum;
+};
+
+
+export type KeyValueMetadatumMetadatumArgs = {
+  filter?: Maybe<MetadatumFilter>;
+};
+
+export type KeyValueMetadatumAggregateResult = {
+  __typename?: 'KeyValueMetadatumAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+  keyMax?: Maybe<Scalars['String']>;
+  keyMin?: Maybe<Scalars['String']>;
+};
+
+export type KeyValueMetadatumFilter = {
+  and?: Maybe<Array<Maybe<KeyValueMetadatumFilter>>>;
+  has?: Maybe<Array<Maybe<KeyValueMetadatumHasFilter>>>;
+  not?: Maybe<KeyValueMetadatumFilter>;
+  or?: Maybe<Array<Maybe<KeyValueMetadatumFilter>>>;
+};
+
+export enum KeyValueMetadatumHasFilter {
+  Key = 'key',
+  Metadatum = 'metadatum'
+}
+
+export type KeyValueMetadatumOrder = {
+  asc?: Maybe<KeyValueMetadatumOrderable>;
+  desc?: Maybe<KeyValueMetadatumOrderable>;
+  then?: Maybe<KeyValueMetadatumOrder>;
+};
+
+export enum KeyValueMetadatumOrderable {
+  Key = 'key'
+}
+
+export type KeyValueMetadatumPatch = {
+  key?: Maybe<Scalars['String']>;
+  metadatum?: Maybe<MetadatumRef>;
+};
+
+export type KeyValueMetadatumRef = {
+  key?: Maybe<Scalars['String']>;
+  metadatum?: Maybe<MetadatumRef>;
+};
+
+export type Metadatum = BytesMetadatum | IntegerMetadatum | MetadatumArray | MetadatumMap | StringMetadatum;
+
+export type MetadatumArray = {
+  __typename?: 'MetadatumArray';
+  value: Array<Metadatum>;
+  valueType: MetadatumArrayType;
+};
+
+
+export type MetadatumArrayValueArgs = {
+  filter?: Maybe<MetadatumFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+export type MetadatumArrayAggregateResult = {
+  __typename?: 'MetadatumArrayAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+};
+
+export type MetadatumArrayFilter = {
+  and?: Maybe<Array<Maybe<MetadatumArrayFilter>>>;
+  has?: Maybe<Array<Maybe<MetadatumArrayHasFilter>>>;
+  not?: Maybe<MetadatumArrayFilter>;
+  or?: Maybe<Array<Maybe<MetadatumArrayFilter>>>;
+};
+
+export enum MetadatumArrayHasFilter {
+  Value = 'value',
+  ValueType = 'valueType'
+}
+
+export type MetadatumArrayPatch = {
+  value?: Maybe<Array<MetadatumRef>>;
+  valueType?: Maybe<MetadatumArrayType>;
+};
+
+export type MetadatumArrayRef = {
+  value?: Maybe<Array<MetadatumRef>>;
+  valueType?: Maybe<MetadatumArrayType>;
+};
+
+export enum MetadatumArrayType {
+  Array = 'array',
+  Map = 'map'
+}
+
+export type MetadatumFilter = {
+  bytesMetadatumFilter?: Maybe<BytesMetadatumFilter>;
+  integerMetadatumFilter?: Maybe<IntegerMetadatumFilter>;
+  memberTypes?: Maybe<Array<MetadatumType>>;
+  metadatumArrayFilter?: Maybe<MetadatumArrayFilter>;
+  metadatumMapFilter?: Maybe<MetadatumMapFilter>;
+  stringMetadatumFilter?: Maybe<StringMetadatumFilter>;
+};
+
+export type MetadatumMap = {
+  __typename?: 'MetadatumMap';
+  value: Array<KeyValueMetadatum>;
+  valueAggregate?: Maybe<KeyValueMetadatumAggregateResult>;
+  valueType: MetadatumArrayType;
+};
+
+
+export type MetadatumMapValueArgs = {
+  filter?: Maybe<KeyValueMetadatumFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<KeyValueMetadatumOrder>;
+};
+
+
+export type MetadatumMapValueAggregateArgs = {
+  filter?: Maybe<KeyValueMetadatumFilter>;
+};
+
+export type MetadatumMapAggregateResult = {
+  __typename?: 'MetadatumMapAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+};
+
+export type MetadatumMapFilter = {
+  and?: Maybe<Array<Maybe<MetadatumMapFilter>>>;
+  has?: Maybe<Array<Maybe<MetadatumMapHasFilter>>>;
+  not?: Maybe<MetadatumMapFilter>;
+  or?: Maybe<Array<Maybe<MetadatumMapFilter>>>;
+};
+
+export enum MetadatumMapHasFilter {
+  Value = 'value',
+  ValueType = 'valueType'
+}
+
+export type MetadatumMapPatch = {
+  value?: Maybe<Array<KeyValueMetadatumRef>>;
+  valueType?: Maybe<MetadatumArrayType>;
+};
+
+export type MetadatumMapRef = {
+  value?: Maybe<Array<KeyValueMetadatumRef>>;
+  valueType?: Maybe<MetadatumArrayType>;
+};
+
+export type MetadatumRef = {
+  bytesMetadatumRef?: Maybe<BytesMetadatumRef>;
+  integerMetadatumRef?: Maybe<IntegerMetadatumRef>;
+  metadatumArrayRef?: Maybe<MetadatumArrayRef>;
+  metadatumMapRef?: Maybe<MetadatumMapRef>;
+  stringMetadatumRef?: Maybe<StringMetadatumRef>;
+};
+
+export enum MetadatumStringType {
+  Bytes = 'bytes',
+  Other = 'other'
+}
+
+export enum MetadatumType {
+  BytesMetadatum = 'BytesMetadatum',
+  IntegerMetadatum = 'IntegerMetadatum',
+  MetadatumArray = 'MetadatumArray',
+  MetadatumMap = 'MetadatumMap',
+  StringMetadatum = 'StringMetadatum'
+}
 
 export enum Mode {
   Batch = 'BATCH',
@@ -1007,14 +3905,42 @@ export type MultiPolygonRef = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  addActiveStake?: Maybe<AddActiveStakePayload>;
+  addAdaPots?: Maybe<AddAdaPotsPayload>;
+  addAlonzoGenesis?: Maybe<AddAlonzoGenesisPayload>;
+  addAsset?: Maybe<AddAssetPayload>;
+  addAuxiliaryData?: Maybe<AddAuxiliaryDataPayload>;
+  addAuxiliaryDataBody?: Maybe<AddAuxiliaryDataBodyPayload>;
+  addBlock?: Maybe<AddBlockPayload>;
+  addByronBlockVersionData?: Maybe<AddByronBlockVersionDataPayload>;
+  addByronGenesis?: Maybe<AddByronGenesisPayload>;
+  addByronProtocolConsts?: Maybe<AddByronProtocolConstsPayload>;
+  addByronSoftForkRule?: Maybe<AddByronSoftForkRulePayload>;
+  addByronTxFeePolicy?: Maybe<AddByronTxFeePolicyPayload>;
+  addBytesMetadatum?: Maybe<AddBytesMetadatumPayload>;
+  addEpoch?: Maybe<AddEpochPayload>;
+  addExecutionPrice?: Maybe<AddExecutionPricePayload>;
+  addExecutionPrices?: Maybe<AddExecutionPricesPayload>;
+  addExecutionUnits?: Maybe<AddExecutionUnitsPayload>;
   addExtendedStakePoolMetadata?: Maybe<AddExtendedStakePoolMetadataPayload>;
   addExtendedStakePoolMetadataFields?: Maybe<AddExtendedStakePoolMetadataFieldsPayload>;
   addFraction?: Maybe<AddFractionPayload>;
+  addGenesis?: Maybe<AddGenesisPayload>;
   addITNVerification?: Maybe<AddItnVerificationPayload>;
+  addIntegerMetadatum?: Maybe<AddIntegerMetadatumPayload>;
+  addKeyValueMetadatum?: Maybe<AddKeyValueMetadatumPayload>;
+  addMetadatumArray?: Maybe<AddMetadatumArrayPayload>;
+  addMetadatumMap?: Maybe<AddMetadatumMapPayload>;
   addPoolContactData?: Maybe<AddPoolContactDataPayload>;
+  addProtocolParameters?: Maybe<AddProtocolParametersPayload>;
+  addRedeemer?: Maybe<AddRedeemerPayload>;
   addRelayByAddress?: Maybe<AddRelayByAddressPayload>;
   addRelayByName?: Maybe<AddRelayByNamePayload>;
   addRelayByNameMultihost?: Maybe<AddRelayByNameMultihostPayload>;
+  addScript?: Maybe<AddScriptPayload>;
+  addShelleyGenesis?: Maybe<AddShelleyGenesisPayload>;
+  addShelleyGenesisStaking?: Maybe<AddShelleyGenesisStakingPayload>;
+  addSlot?: Maybe<AddSlotPayload>;
   addStakePool?: Maybe<AddStakePoolPayload>;
   addStakePoolMetadata?: Maybe<AddStakePoolMetadataPayload>;
   addStakePoolMetadataJson?: Maybe<AddStakePoolMetadataJsonPayload>;
@@ -1022,15 +3948,50 @@ export type Mutation = {
   addStakePoolMetricsSize?: Maybe<AddStakePoolMetricsSizePayload>;
   addStakePoolMetricsStake?: Maybe<AddStakePoolMetricsStakePayload>;
   addStakePoolTransactions?: Maybe<AddStakePoolTransactionsPayload>;
+  addStringMetadatum?: Maybe<AddStringMetadatumPayload>;
   addThePoolsMediaAssets?: Maybe<AddThePoolsMediaAssetsPayload>;
+  addToken?: Maybe<AddTokenPayload>;
+  addTransaction?: Maybe<AddTransactionPayload>;
+  addTransactionInput?: Maybe<AddTransactionInputPayload>;
+  addTransactionOutput?: Maybe<AddTransactionOutputPayload>;
+  addValue?: Maybe<AddValuePayload>;
+  addWithdrawal?: Maybe<AddWithdrawalPayload>;
+  deleteActiveStake?: Maybe<DeleteActiveStakePayload>;
+  deleteAdaPots?: Maybe<DeleteAdaPotsPayload>;
+  deleteAlonzoGenesis?: Maybe<DeleteAlonzoGenesisPayload>;
+  deleteAsset?: Maybe<DeleteAssetPayload>;
+  deleteAuxiliaryData?: Maybe<DeleteAuxiliaryDataPayload>;
+  deleteAuxiliaryDataBody?: Maybe<DeleteAuxiliaryDataBodyPayload>;
+  deleteBlock?: Maybe<DeleteBlockPayload>;
+  deleteByronBlockVersionData?: Maybe<DeleteByronBlockVersionDataPayload>;
+  deleteByronGenesis?: Maybe<DeleteByronGenesisPayload>;
+  deleteByronProtocolConsts?: Maybe<DeleteByronProtocolConstsPayload>;
+  deleteByronSoftForkRule?: Maybe<DeleteByronSoftForkRulePayload>;
+  deleteByronTxFeePolicy?: Maybe<DeleteByronTxFeePolicyPayload>;
+  deleteBytesMetadatum?: Maybe<DeleteBytesMetadatumPayload>;
+  deleteEpoch?: Maybe<DeleteEpochPayload>;
+  deleteExecutionPrice?: Maybe<DeleteExecutionPricePayload>;
+  deleteExecutionPrices?: Maybe<DeleteExecutionPricesPayload>;
+  deleteExecutionUnits?: Maybe<DeleteExecutionUnitsPayload>;
   deleteExtendedStakePoolMetadata?: Maybe<DeleteExtendedStakePoolMetadataPayload>;
   deleteExtendedStakePoolMetadataFields?: Maybe<DeleteExtendedStakePoolMetadataFieldsPayload>;
   deleteFraction?: Maybe<DeleteFractionPayload>;
+  deleteGenesis?: Maybe<DeleteGenesisPayload>;
   deleteITNVerification?: Maybe<DeleteItnVerificationPayload>;
+  deleteIntegerMetadatum?: Maybe<DeleteIntegerMetadatumPayload>;
+  deleteKeyValueMetadatum?: Maybe<DeleteKeyValueMetadatumPayload>;
+  deleteMetadatumArray?: Maybe<DeleteMetadatumArrayPayload>;
+  deleteMetadatumMap?: Maybe<DeleteMetadatumMapPayload>;
   deletePoolContactData?: Maybe<DeletePoolContactDataPayload>;
+  deleteProtocolParameters?: Maybe<DeleteProtocolParametersPayload>;
+  deleteRedeemer?: Maybe<DeleteRedeemerPayload>;
   deleteRelayByAddress?: Maybe<DeleteRelayByAddressPayload>;
   deleteRelayByName?: Maybe<DeleteRelayByNamePayload>;
   deleteRelayByNameMultihost?: Maybe<DeleteRelayByNameMultihostPayload>;
+  deleteScript?: Maybe<DeleteScriptPayload>;
+  deleteShelleyGenesis?: Maybe<DeleteShelleyGenesisPayload>;
+  deleteShelleyGenesisStaking?: Maybe<DeleteShelleyGenesisStakingPayload>;
+  deleteSlot?: Maybe<DeleteSlotPayload>;
   deleteStakePool?: Maybe<DeleteStakePoolPayload>;
   deleteStakePoolMetadata?: Maybe<DeleteStakePoolMetadataPayload>;
   deleteStakePoolMetadataJson?: Maybe<DeleteStakePoolMetadataJsonPayload>;
@@ -1038,15 +3999,50 @@ export type Mutation = {
   deleteStakePoolMetricsSize?: Maybe<DeleteStakePoolMetricsSizePayload>;
   deleteStakePoolMetricsStake?: Maybe<DeleteStakePoolMetricsStakePayload>;
   deleteStakePoolTransactions?: Maybe<DeleteStakePoolTransactionsPayload>;
+  deleteStringMetadatum?: Maybe<DeleteStringMetadatumPayload>;
   deleteThePoolsMediaAssets?: Maybe<DeleteThePoolsMediaAssetsPayload>;
+  deleteToken?: Maybe<DeleteTokenPayload>;
+  deleteTransaction?: Maybe<DeleteTransactionPayload>;
+  deleteTransactionInput?: Maybe<DeleteTransactionInputPayload>;
+  deleteTransactionOutput?: Maybe<DeleteTransactionOutputPayload>;
+  deleteValue?: Maybe<DeleteValuePayload>;
+  deleteWithdrawal?: Maybe<DeleteWithdrawalPayload>;
+  updateActiveStake?: Maybe<UpdateActiveStakePayload>;
+  updateAdaPots?: Maybe<UpdateAdaPotsPayload>;
+  updateAlonzoGenesis?: Maybe<UpdateAlonzoGenesisPayload>;
+  updateAsset?: Maybe<UpdateAssetPayload>;
+  updateAuxiliaryData?: Maybe<UpdateAuxiliaryDataPayload>;
+  updateAuxiliaryDataBody?: Maybe<UpdateAuxiliaryDataBodyPayload>;
+  updateBlock?: Maybe<UpdateBlockPayload>;
+  updateByronBlockVersionData?: Maybe<UpdateByronBlockVersionDataPayload>;
+  updateByronGenesis?: Maybe<UpdateByronGenesisPayload>;
+  updateByronProtocolConsts?: Maybe<UpdateByronProtocolConstsPayload>;
+  updateByronSoftForkRule?: Maybe<UpdateByronSoftForkRulePayload>;
+  updateByronTxFeePolicy?: Maybe<UpdateByronTxFeePolicyPayload>;
+  updateBytesMetadatum?: Maybe<UpdateBytesMetadatumPayload>;
+  updateEpoch?: Maybe<UpdateEpochPayload>;
+  updateExecutionPrice?: Maybe<UpdateExecutionPricePayload>;
+  updateExecutionPrices?: Maybe<UpdateExecutionPricesPayload>;
+  updateExecutionUnits?: Maybe<UpdateExecutionUnitsPayload>;
   updateExtendedStakePoolMetadata?: Maybe<UpdateExtendedStakePoolMetadataPayload>;
   updateExtendedStakePoolMetadataFields?: Maybe<UpdateExtendedStakePoolMetadataFieldsPayload>;
   updateFraction?: Maybe<UpdateFractionPayload>;
+  updateGenesis?: Maybe<UpdateGenesisPayload>;
   updateITNVerification?: Maybe<UpdateItnVerificationPayload>;
+  updateIntegerMetadatum?: Maybe<UpdateIntegerMetadatumPayload>;
+  updateKeyValueMetadatum?: Maybe<UpdateKeyValueMetadatumPayload>;
+  updateMetadatumArray?: Maybe<UpdateMetadatumArrayPayload>;
+  updateMetadatumMap?: Maybe<UpdateMetadatumMapPayload>;
   updatePoolContactData?: Maybe<UpdatePoolContactDataPayload>;
+  updateProtocolParameters?: Maybe<UpdateProtocolParametersPayload>;
+  updateRedeemer?: Maybe<UpdateRedeemerPayload>;
   updateRelayByAddress?: Maybe<UpdateRelayByAddressPayload>;
   updateRelayByName?: Maybe<UpdateRelayByNamePayload>;
   updateRelayByNameMultihost?: Maybe<UpdateRelayByNameMultihostPayload>;
+  updateScript?: Maybe<UpdateScriptPayload>;
+  updateShelleyGenesis?: Maybe<UpdateShelleyGenesisPayload>;
+  updateShelleyGenesisStaking?: Maybe<UpdateShelleyGenesisStakingPayload>;
+  updateSlot?: Maybe<UpdateSlotPayload>;
   updateStakePool?: Maybe<UpdateStakePoolPayload>;
   updateStakePoolMetadata?: Maybe<UpdateStakePoolMetadataPayload>;
   updateStakePoolMetadataJson?: Maybe<UpdateStakePoolMetadataJsonPayload>;
@@ -1054,7 +4050,101 @@ export type Mutation = {
   updateStakePoolMetricsSize?: Maybe<UpdateStakePoolMetricsSizePayload>;
   updateStakePoolMetricsStake?: Maybe<UpdateStakePoolMetricsStakePayload>;
   updateStakePoolTransactions?: Maybe<UpdateStakePoolTransactionsPayload>;
+  updateStringMetadatum?: Maybe<UpdateStringMetadatumPayload>;
   updateThePoolsMediaAssets?: Maybe<UpdateThePoolsMediaAssetsPayload>;
+  updateToken?: Maybe<UpdateTokenPayload>;
+  updateTransaction?: Maybe<UpdateTransactionPayload>;
+  updateTransactionInput?: Maybe<UpdateTransactionInputPayload>;
+  updateTransactionOutput?: Maybe<UpdateTransactionOutputPayload>;
+  updateValue?: Maybe<UpdateValuePayload>;
+  updateWithdrawal?: Maybe<UpdateWithdrawalPayload>;
+};
+
+
+export type MutationAddActiveStakeArgs = {
+  input: Array<AddActiveStakeInput>;
+};
+
+
+export type MutationAddAdaPotsArgs = {
+  input: Array<AddAdaPotsInput>;
+};
+
+
+export type MutationAddAlonzoGenesisArgs = {
+  input: Array<AddAlonzoGenesisInput>;
+};
+
+
+export type MutationAddAssetArgs = {
+  input: Array<AddAssetInput>;
+};
+
+
+export type MutationAddAuxiliaryDataArgs = {
+  input: Array<AddAuxiliaryDataInput>;
+};
+
+
+export type MutationAddAuxiliaryDataBodyArgs = {
+  input: Array<AddAuxiliaryDataBodyInput>;
+};
+
+
+export type MutationAddBlockArgs = {
+  input: Array<AddBlockInput>;
+  upsert?: Maybe<Scalars['Boolean']>;
+};
+
+
+export type MutationAddByronBlockVersionDataArgs = {
+  input: Array<AddByronBlockVersionDataInput>;
+};
+
+
+export type MutationAddByronGenesisArgs = {
+  input: Array<AddByronGenesisInput>;
+};
+
+
+export type MutationAddByronProtocolConstsArgs = {
+  input: Array<AddByronProtocolConstsInput>;
+};
+
+
+export type MutationAddByronSoftForkRuleArgs = {
+  input: Array<AddByronSoftForkRuleInput>;
+};
+
+
+export type MutationAddByronTxFeePolicyArgs = {
+  input: Array<AddByronTxFeePolicyInput>;
+};
+
+
+export type MutationAddBytesMetadatumArgs = {
+  input: Array<AddBytesMetadatumInput>;
+};
+
+
+export type MutationAddEpochArgs = {
+  input: Array<AddEpochInput>;
+  upsert?: Maybe<Scalars['Boolean']>;
+};
+
+
+export type MutationAddExecutionPriceArgs = {
+  input: Array<AddExecutionPriceInput>;
+};
+
+
+export type MutationAddExecutionPricesArgs = {
+  input: Array<AddExecutionPricesInput>;
+};
+
+
+export type MutationAddExecutionUnitsArgs = {
+  input: Array<AddExecutionUnitsInput>;
 };
 
 
@@ -1074,13 +4164,48 @@ export type MutationAddFractionArgs = {
 };
 
 
+export type MutationAddGenesisArgs = {
+  input: Array<AddGenesisInput>;
+};
+
+
 export type MutationAddItnVerificationArgs = {
   input: Array<AddItnVerificationInput>;
 };
 
 
+export type MutationAddIntegerMetadatumArgs = {
+  input: Array<AddIntegerMetadatumInput>;
+};
+
+
+export type MutationAddKeyValueMetadatumArgs = {
+  input: Array<AddKeyValueMetadatumInput>;
+};
+
+
+export type MutationAddMetadatumArrayArgs = {
+  input: Array<AddMetadatumArrayInput>;
+};
+
+
+export type MutationAddMetadatumMapArgs = {
+  input: Array<AddMetadatumMapInput>;
+};
+
+
 export type MutationAddPoolContactDataArgs = {
   input: Array<AddPoolContactDataInput>;
+};
+
+
+export type MutationAddProtocolParametersArgs = {
+  input: Array<AddProtocolParametersInput>;
+};
+
+
+export type MutationAddRedeemerArgs = {
+  input: Array<AddRedeemerInput>;
 };
 
 
@@ -1096,6 +4221,28 @@ export type MutationAddRelayByNameArgs = {
 
 export type MutationAddRelayByNameMultihostArgs = {
   input: Array<AddRelayByNameMultihostInput>;
+};
+
+
+export type MutationAddScriptArgs = {
+  input: Array<AddScriptInput>;
+  upsert?: Maybe<Scalars['Boolean']>;
+};
+
+
+export type MutationAddShelleyGenesisArgs = {
+  input: Array<AddShelleyGenesisInput>;
+};
+
+
+export type MutationAddShelleyGenesisStakingArgs = {
+  input: Array<AddShelleyGenesisStakingInput>;
+};
+
+
+export type MutationAddSlotArgs = {
+  input: Array<AddSlotInput>;
+  upsert?: Maybe<Scalars['Boolean']>;
 };
 
 
@@ -1136,8 +4283,129 @@ export type MutationAddStakePoolTransactionsArgs = {
 };
 
 
+export type MutationAddStringMetadatumArgs = {
+  input: Array<AddStringMetadatumInput>;
+};
+
+
 export type MutationAddThePoolsMediaAssetsArgs = {
   input: Array<AddThePoolsMediaAssetsInput>;
+};
+
+
+export type MutationAddTokenArgs = {
+  input: Array<AddTokenInput>;
+};
+
+
+export type MutationAddTransactionArgs = {
+  input: Array<AddTransactionInput>;
+  upsert?: Maybe<Scalars['Boolean']>;
+};
+
+
+export type MutationAddTransactionInputArgs = {
+  input: Array<AddTransactionInputInput>;
+};
+
+
+export type MutationAddTransactionOutputArgs = {
+  input: Array<AddTransactionOutputInput>;
+};
+
+
+export type MutationAddValueArgs = {
+  input: Array<AddValueInput>;
+};
+
+
+export type MutationAddWithdrawalArgs = {
+  input: Array<AddWithdrawalInput>;
+};
+
+
+export type MutationDeleteActiveStakeArgs = {
+  filter: ActiveStakeFilter;
+};
+
+
+export type MutationDeleteAdaPotsArgs = {
+  filter: AdaPotsFilter;
+};
+
+
+export type MutationDeleteAlonzoGenesisArgs = {
+  filter: AlonzoGenesisFilter;
+};
+
+
+export type MutationDeleteAssetArgs = {
+  filter: AssetFilter;
+};
+
+
+export type MutationDeleteAuxiliaryDataArgs = {
+  filter: AuxiliaryDataFilter;
+};
+
+
+export type MutationDeleteAuxiliaryDataBodyArgs = {
+  filter: AuxiliaryDataBodyFilter;
+};
+
+
+export type MutationDeleteBlockArgs = {
+  filter: BlockFilter;
+};
+
+
+export type MutationDeleteByronBlockVersionDataArgs = {
+  filter: ByronBlockVersionDataFilter;
+};
+
+
+export type MutationDeleteByronGenesisArgs = {
+  filter: ByronGenesisFilter;
+};
+
+
+export type MutationDeleteByronProtocolConstsArgs = {
+  filter: ByronProtocolConstsFilter;
+};
+
+
+export type MutationDeleteByronSoftForkRuleArgs = {
+  filter: ByronSoftForkRuleFilter;
+};
+
+
+export type MutationDeleteByronTxFeePolicyArgs = {
+  filter: ByronTxFeePolicyFilter;
+};
+
+
+export type MutationDeleteBytesMetadatumArgs = {
+  filter: BytesMetadatumFilter;
+};
+
+
+export type MutationDeleteEpochArgs = {
+  filter: EpochFilter;
+};
+
+
+export type MutationDeleteExecutionPriceArgs = {
+  filter: ExecutionPriceFilter;
+};
+
+
+export type MutationDeleteExecutionPricesArgs = {
+  filter: ExecutionPricesFilter;
+};
+
+
+export type MutationDeleteExecutionUnitsArgs = {
+  filter: ExecutionUnitsFilter;
 };
 
 
@@ -1156,13 +4424,48 @@ export type MutationDeleteFractionArgs = {
 };
 
 
+export type MutationDeleteGenesisArgs = {
+  filter: GenesisFilter;
+};
+
+
 export type MutationDeleteItnVerificationArgs = {
   filter: ItnVerificationFilter;
 };
 
 
+export type MutationDeleteIntegerMetadatumArgs = {
+  filter: IntegerMetadatumFilter;
+};
+
+
+export type MutationDeleteKeyValueMetadatumArgs = {
+  filter: KeyValueMetadatumFilter;
+};
+
+
+export type MutationDeleteMetadatumArrayArgs = {
+  filter: MetadatumArrayFilter;
+};
+
+
+export type MutationDeleteMetadatumMapArgs = {
+  filter: MetadatumMapFilter;
+};
+
+
 export type MutationDeletePoolContactDataArgs = {
   filter: PoolContactDataFilter;
+};
+
+
+export type MutationDeleteProtocolParametersArgs = {
+  filter: ProtocolParametersFilter;
+};
+
+
+export type MutationDeleteRedeemerArgs = {
+  filter: RedeemerFilter;
 };
 
 
@@ -1178,6 +4481,26 @@ export type MutationDeleteRelayByNameArgs = {
 
 export type MutationDeleteRelayByNameMultihostArgs = {
   filter: RelayByNameMultihostFilter;
+};
+
+
+export type MutationDeleteScriptArgs = {
+  filter: ScriptFilter;
+};
+
+
+export type MutationDeleteShelleyGenesisArgs = {
+  filter: ShelleyGenesisFilter;
+};
+
+
+export type MutationDeleteShelleyGenesisStakingArgs = {
+  filter: ShelleyGenesisStakingFilter;
+};
+
+
+export type MutationDeleteSlotArgs = {
+  filter: SlotFilter;
 };
 
 
@@ -1216,8 +4539,128 @@ export type MutationDeleteStakePoolTransactionsArgs = {
 };
 
 
+export type MutationDeleteStringMetadatumArgs = {
+  filter: StringMetadatumFilter;
+};
+
+
 export type MutationDeleteThePoolsMediaAssetsArgs = {
   filter: ThePoolsMediaAssetsFilter;
+};
+
+
+export type MutationDeleteTokenArgs = {
+  filter: TokenFilter;
+};
+
+
+export type MutationDeleteTransactionArgs = {
+  filter: TransactionFilter;
+};
+
+
+export type MutationDeleteTransactionInputArgs = {
+  filter: TransactionInputFilter;
+};
+
+
+export type MutationDeleteTransactionOutputArgs = {
+  filter: TransactionOutputFilter;
+};
+
+
+export type MutationDeleteValueArgs = {
+  filter: ValueFilter;
+};
+
+
+export type MutationDeleteWithdrawalArgs = {
+  filter: WithdrawalFilter;
+};
+
+
+export type MutationUpdateActiveStakeArgs = {
+  input: UpdateActiveStakeInput;
+};
+
+
+export type MutationUpdateAdaPotsArgs = {
+  input: UpdateAdaPotsInput;
+};
+
+
+export type MutationUpdateAlonzoGenesisArgs = {
+  input: UpdateAlonzoGenesisInput;
+};
+
+
+export type MutationUpdateAssetArgs = {
+  input: UpdateAssetInput;
+};
+
+
+export type MutationUpdateAuxiliaryDataArgs = {
+  input: UpdateAuxiliaryDataInput;
+};
+
+
+export type MutationUpdateAuxiliaryDataBodyArgs = {
+  input: UpdateAuxiliaryDataBodyInput;
+};
+
+
+export type MutationUpdateBlockArgs = {
+  input: UpdateBlockInput;
+};
+
+
+export type MutationUpdateByronBlockVersionDataArgs = {
+  input: UpdateByronBlockVersionDataInput;
+};
+
+
+export type MutationUpdateByronGenesisArgs = {
+  input: UpdateByronGenesisInput;
+};
+
+
+export type MutationUpdateByronProtocolConstsArgs = {
+  input: UpdateByronProtocolConstsInput;
+};
+
+
+export type MutationUpdateByronSoftForkRuleArgs = {
+  input: UpdateByronSoftForkRuleInput;
+};
+
+
+export type MutationUpdateByronTxFeePolicyArgs = {
+  input: UpdateByronTxFeePolicyInput;
+};
+
+
+export type MutationUpdateBytesMetadatumArgs = {
+  input: UpdateBytesMetadatumInput;
+};
+
+
+export type MutationUpdateEpochArgs = {
+  input: UpdateEpochInput;
+};
+
+
+export type MutationUpdateExecutionPriceArgs = {
+  input: UpdateExecutionPriceInput;
+};
+
+
+export type MutationUpdateExecutionPricesArgs = {
+  input: UpdateExecutionPricesInput;
+};
+
+
+export type MutationUpdateExecutionUnitsArgs = {
+  input: UpdateExecutionUnitsInput;
 };
 
 
@@ -1236,13 +4679,48 @@ export type MutationUpdateFractionArgs = {
 };
 
 
+export type MutationUpdateGenesisArgs = {
+  input: UpdateGenesisInput;
+};
+
+
 export type MutationUpdateItnVerificationArgs = {
   input: UpdateItnVerificationInput;
 };
 
 
+export type MutationUpdateIntegerMetadatumArgs = {
+  input: UpdateIntegerMetadatumInput;
+};
+
+
+export type MutationUpdateKeyValueMetadatumArgs = {
+  input: UpdateKeyValueMetadatumInput;
+};
+
+
+export type MutationUpdateMetadatumArrayArgs = {
+  input: UpdateMetadatumArrayInput;
+};
+
+
+export type MutationUpdateMetadatumMapArgs = {
+  input: UpdateMetadatumMapInput;
+};
+
+
 export type MutationUpdatePoolContactDataArgs = {
   input: UpdatePoolContactDataInput;
+};
+
+
+export type MutationUpdateProtocolParametersArgs = {
+  input: UpdateProtocolParametersInput;
+};
+
+
+export type MutationUpdateRedeemerArgs = {
+  input: UpdateRedeemerInput;
 };
 
 
@@ -1258,6 +4736,26 @@ export type MutationUpdateRelayByNameArgs = {
 
 export type MutationUpdateRelayByNameMultihostArgs = {
   input: UpdateRelayByNameMultihostInput;
+};
+
+
+export type MutationUpdateScriptArgs = {
+  input: UpdateScriptInput;
+};
+
+
+export type MutationUpdateShelleyGenesisArgs = {
+  input: UpdateShelleyGenesisInput;
+};
+
+
+export type MutationUpdateShelleyGenesisStakingArgs = {
+  input: UpdateShelleyGenesisStakingInput;
+};
+
+
+export type MutationUpdateSlotArgs = {
+  input: UpdateSlotInput;
 };
 
 
@@ -1296,8 +4794,43 @@ export type MutationUpdateStakePoolTransactionsArgs = {
 };
 
 
+export type MutationUpdateStringMetadatumArgs = {
+  input: UpdateStringMetadatumInput;
+};
+
+
 export type MutationUpdateThePoolsMediaAssetsArgs = {
   input: UpdateThePoolsMediaAssetsInput;
+};
+
+
+export type MutationUpdateTokenArgs = {
+  input: UpdateTokenInput;
+};
+
+
+export type MutationUpdateTransactionArgs = {
+  input: UpdateTransactionInput;
+};
+
+
+export type MutationUpdateTransactionInputArgs = {
+  input: UpdateTransactionInputInput;
+};
+
+
+export type MutationUpdateTransactionOutputArgs = {
+  input: UpdateTransactionOutputInput;
+};
+
+
+export type MutationUpdateValueArgs = {
+  input: UpdateValueInput;
+};
+
+
+export type MutationUpdateWithdrawalArgs = {
+  input: UpdateWithdrawalInput;
 };
 
 export type NearFilter = {
@@ -1429,16 +4962,297 @@ export type PoolContactDataRef = {
   twitter?: Maybe<Scalars['String']>;
 };
 
+export type ProtocolParameters = {
+  __typename?: 'ProtocolParameters';
+  a0: Scalars['Float'];
+  coinsPerUtxoWord?: Maybe<Scalars['Int']>;
+  collateralPercent?: Maybe<Scalars['Int']>;
+  costModels?: Maybe<Scalars['String']>;
+  decentralizationParam: Scalars['Float'];
+  eMax: Scalars['Int'];
+  executionPrices?: Maybe<ExecutionPrices>;
+  extraEntropy?: Maybe<Scalars['String']>;
+  keyDeposit: Scalars['Int'];
+  maxBlockBodySize: Scalars['Int'];
+  maxBlockExUnits?: Maybe<ExecutionUnits>;
+  maxBlockHeaderSize: Scalars['Int'];
+  maxCollateralInputs?: Maybe<Scalars['Int']>;
+  maxTxExUnits?: Maybe<ExecutionUnits>;
+  maxTxSize: Scalars['Int'];
+  maxValSize: Scalars['Int'];
+  minFeeA: Scalars['Int'];
+  minFeeB: Scalars['Int'];
+  minPoolCost: Scalars['Int'];
+  minUTxOValue: Scalars['Int'];
+  nOpt: Scalars['Int'];
+  poolDeposit: Scalars['Int'];
+  protocolVersion: Scalars['String'];
+  rho: Scalars['Float'];
+  tau: Scalars['Float'];
+};
+
+
+export type ProtocolParametersExecutionPricesArgs = {
+  filter?: Maybe<ExecutionPricesFilter>;
+};
+
+
+export type ProtocolParametersMaxBlockExUnitsArgs = {
+  filter?: Maybe<ExecutionUnitsFilter>;
+};
+
+
+export type ProtocolParametersMaxTxExUnitsArgs = {
+  filter?: Maybe<ExecutionUnitsFilter>;
+};
+
+export type ProtocolParametersAggregateResult = {
+  __typename?: 'ProtocolParametersAggregateResult';
+  a0Avg?: Maybe<Scalars['Float']>;
+  a0Max?: Maybe<Scalars['Float']>;
+  a0Min?: Maybe<Scalars['Float']>;
+  a0Sum?: Maybe<Scalars['Float']>;
+  coinsPerUtxoWordAvg?: Maybe<Scalars['Float']>;
+  coinsPerUtxoWordMax?: Maybe<Scalars['Int']>;
+  coinsPerUtxoWordMin?: Maybe<Scalars['Int']>;
+  coinsPerUtxoWordSum?: Maybe<Scalars['Int']>;
+  collateralPercentAvg?: Maybe<Scalars['Float']>;
+  collateralPercentMax?: Maybe<Scalars['Int']>;
+  collateralPercentMin?: Maybe<Scalars['Int']>;
+  collateralPercentSum?: Maybe<Scalars['Int']>;
+  costModelsMax?: Maybe<Scalars['String']>;
+  costModelsMin?: Maybe<Scalars['String']>;
+  count?: Maybe<Scalars['Int']>;
+  decentralizationParamAvg?: Maybe<Scalars['Float']>;
+  decentralizationParamMax?: Maybe<Scalars['Float']>;
+  decentralizationParamMin?: Maybe<Scalars['Float']>;
+  decentralizationParamSum?: Maybe<Scalars['Float']>;
+  eMaxAvg?: Maybe<Scalars['Float']>;
+  eMaxMax?: Maybe<Scalars['Int']>;
+  eMaxMin?: Maybe<Scalars['Int']>;
+  eMaxSum?: Maybe<Scalars['Int']>;
+  extraEntropyMax?: Maybe<Scalars['String']>;
+  extraEntropyMin?: Maybe<Scalars['String']>;
+  keyDepositAvg?: Maybe<Scalars['Float']>;
+  keyDepositMax?: Maybe<Scalars['Int']>;
+  keyDepositMin?: Maybe<Scalars['Int']>;
+  keyDepositSum?: Maybe<Scalars['Int']>;
+  maxBlockBodySizeAvg?: Maybe<Scalars['Float']>;
+  maxBlockBodySizeMax?: Maybe<Scalars['Int']>;
+  maxBlockBodySizeMin?: Maybe<Scalars['Int']>;
+  maxBlockBodySizeSum?: Maybe<Scalars['Int']>;
+  maxBlockHeaderSizeAvg?: Maybe<Scalars['Float']>;
+  maxBlockHeaderSizeMax?: Maybe<Scalars['Int']>;
+  maxBlockHeaderSizeMin?: Maybe<Scalars['Int']>;
+  maxBlockHeaderSizeSum?: Maybe<Scalars['Int']>;
+  maxCollateralInputsAvg?: Maybe<Scalars['Float']>;
+  maxCollateralInputsMax?: Maybe<Scalars['Int']>;
+  maxCollateralInputsMin?: Maybe<Scalars['Int']>;
+  maxCollateralInputsSum?: Maybe<Scalars['Int']>;
+  maxTxSizeAvg?: Maybe<Scalars['Float']>;
+  maxTxSizeMax?: Maybe<Scalars['Int']>;
+  maxTxSizeMin?: Maybe<Scalars['Int']>;
+  maxTxSizeSum?: Maybe<Scalars['Int']>;
+  maxValSizeAvg?: Maybe<Scalars['Float']>;
+  maxValSizeMax?: Maybe<Scalars['Int']>;
+  maxValSizeMin?: Maybe<Scalars['Int']>;
+  maxValSizeSum?: Maybe<Scalars['Int']>;
+  minFeeAAvg?: Maybe<Scalars['Float']>;
+  minFeeAMax?: Maybe<Scalars['Int']>;
+  minFeeAMin?: Maybe<Scalars['Int']>;
+  minFeeASum?: Maybe<Scalars['Int']>;
+  minFeeBAvg?: Maybe<Scalars['Float']>;
+  minFeeBMax?: Maybe<Scalars['Int']>;
+  minFeeBMin?: Maybe<Scalars['Int']>;
+  minFeeBSum?: Maybe<Scalars['Int']>;
+  minPoolCostAvg?: Maybe<Scalars['Float']>;
+  minPoolCostMax?: Maybe<Scalars['Int']>;
+  minPoolCostMin?: Maybe<Scalars['Int']>;
+  minPoolCostSum?: Maybe<Scalars['Int']>;
+  minUTxOValueAvg?: Maybe<Scalars['Float']>;
+  minUTxOValueMax?: Maybe<Scalars['Int']>;
+  minUTxOValueMin?: Maybe<Scalars['Int']>;
+  minUTxOValueSum?: Maybe<Scalars['Int']>;
+  nOptAvg?: Maybe<Scalars['Float']>;
+  nOptMax?: Maybe<Scalars['Int']>;
+  nOptMin?: Maybe<Scalars['Int']>;
+  nOptSum?: Maybe<Scalars['Int']>;
+  poolDepositAvg?: Maybe<Scalars['Float']>;
+  poolDepositMax?: Maybe<Scalars['Int']>;
+  poolDepositMin?: Maybe<Scalars['Int']>;
+  poolDepositSum?: Maybe<Scalars['Int']>;
+  protocolVersionMax?: Maybe<Scalars['String']>;
+  protocolVersionMin?: Maybe<Scalars['String']>;
+  rhoAvg?: Maybe<Scalars['Float']>;
+  rhoMax?: Maybe<Scalars['Float']>;
+  rhoMin?: Maybe<Scalars['Float']>;
+  rhoSum?: Maybe<Scalars['Float']>;
+  tauAvg?: Maybe<Scalars['Float']>;
+  tauMax?: Maybe<Scalars['Float']>;
+  tauMin?: Maybe<Scalars['Float']>;
+  tauSum?: Maybe<Scalars['Float']>;
+};
+
+export type ProtocolParametersFilter = {
+  and?: Maybe<Array<Maybe<ProtocolParametersFilter>>>;
+  has?: Maybe<Array<Maybe<ProtocolParametersHasFilter>>>;
+  not?: Maybe<ProtocolParametersFilter>;
+  or?: Maybe<Array<Maybe<ProtocolParametersFilter>>>;
+};
+
+export enum ProtocolParametersHasFilter {
+  A0 = 'a0',
+  CoinsPerUtxoWord = 'coinsPerUtxoWord',
+  CollateralPercent = 'collateralPercent',
+  CostModels = 'costModels',
+  DecentralizationParam = 'decentralizationParam',
+  EMax = 'eMax',
+  ExecutionPrices = 'executionPrices',
+  ExtraEntropy = 'extraEntropy',
+  KeyDeposit = 'keyDeposit',
+  MaxBlockBodySize = 'maxBlockBodySize',
+  MaxBlockExUnits = 'maxBlockExUnits',
+  MaxBlockHeaderSize = 'maxBlockHeaderSize',
+  MaxCollateralInputs = 'maxCollateralInputs',
+  MaxTxExUnits = 'maxTxExUnits',
+  MaxTxSize = 'maxTxSize',
+  MaxValSize = 'maxValSize',
+  MinFeeA = 'minFeeA',
+  MinFeeB = 'minFeeB',
+  MinPoolCost = 'minPoolCost',
+  MinUTxOValue = 'minUTxOValue',
+  NOpt = 'nOpt',
+  PoolDeposit = 'poolDeposit',
+  ProtocolVersion = 'protocolVersion',
+  Rho = 'rho',
+  Tau = 'tau'
+}
+
+export type ProtocolParametersOrder = {
+  asc?: Maybe<ProtocolParametersOrderable>;
+  desc?: Maybe<ProtocolParametersOrderable>;
+  then?: Maybe<ProtocolParametersOrder>;
+};
+
+export enum ProtocolParametersOrderable {
+  A0 = 'a0',
+  CoinsPerUtxoWord = 'coinsPerUtxoWord',
+  CollateralPercent = 'collateralPercent',
+  CostModels = 'costModels',
+  DecentralizationParam = 'decentralizationParam',
+  EMax = 'eMax',
+  ExtraEntropy = 'extraEntropy',
+  KeyDeposit = 'keyDeposit',
+  MaxBlockBodySize = 'maxBlockBodySize',
+  MaxBlockHeaderSize = 'maxBlockHeaderSize',
+  MaxCollateralInputs = 'maxCollateralInputs',
+  MaxTxSize = 'maxTxSize',
+  MaxValSize = 'maxValSize',
+  MinFeeA = 'minFeeA',
+  MinFeeB = 'minFeeB',
+  MinPoolCost = 'minPoolCost',
+  MinUTxOValue = 'minUTxOValue',
+  NOpt = 'nOpt',
+  PoolDeposit = 'poolDeposit',
+  ProtocolVersion = 'protocolVersion',
+  Rho = 'rho',
+  Tau = 'tau'
+}
+
+export type ProtocolParametersPatch = {
+  a0?: Maybe<Scalars['Float']>;
+  coinsPerUtxoWord?: Maybe<Scalars['Int']>;
+  collateralPercent?: Maybe<Scalars['Int']>;
+  costModels?: Maybe<Scalars['String']>;
+  decentralizationParam?: Maybe<Scalars['Float']>;
+  eMax?: Maybe<Scalars['Int']>;
+  executionPrices?: Maybe<ExecutionPricesRef>;
+  extraEntropy?: Maybe<Scalars['String']>;
+  keyDeposit?: Maybe<Scalars['Int']>;
+  maxBlockBodySize?: Maybe<Scalars['Int']>;
+  maxBlockExUnits?: Maybe<ExecutionUnitsRef>;
+  maxBlockHeaderSize?: Maybe<Scalars['Int']>;
+  maxCollateralInputs?: Maybe<Scalars['Int']>;
+  maxTxExUnits?: Maybe<ExecutionUnitsRef>;
+  maxTxSize?: Maybe<Scalars['Int']>;
+  maxValSize?: Maybe<Scalars['Int']>;
+  minFeeA?: Maybe<Scalars['Int']>;
+  minFeeB?: Maybe<Scalars['Int']>;
+  minPoolCost?: Maybe<Scalars['Int']>;
+  minUTxOValue?: Maybe<Scalars['Int']>;
+  nOpt?: Maybe<Scalars['Int']>;
+  poolDeposit?: Maybe<Scalars['Int']>;
+  protocolVersion?: Maybe<Scalars['String']>;
+  rho?: Maybe<Scalars['Float']>;
+  tau?: Maybe<Scalars['Float']>;
+};
+
+export type ProtocolParametersRef = {
+  a0?: Maybe<Scalars['Float']>;
+  coinsPerUtxoWord?: Maybe<Scalars['Int']>;
+  collateralPercent?: Maybe<Scalars['Int']>;
+  costModels?: Maybe<Scalars['String']>;
+  decentralizationParam?: Maybe<Scalars['Float']>;
+  eMax?: Maybe<Scalars['Int']>;
+  executionPrices?: Maybe<ExecutionPricesRef>;
+  extraEntropy?: Maybe<Scalars['String']>;
+  keyDeposit?: Maybe<Scalars['Int']>;
+  maxBlockBodySize?: Maybe<Scalars['Int']>;
+  maxBlockExUnits?: Maybe<ExecutionUnitsRef>;
+  maxBlockHeaderSize?: Maybe<Scalars['Int']>;
+  maxCollateralInputs?: Maybe<Scalars['Int']>;
+  maxTxExUnits?: Maybe<ExecutionUnitsRef>;
+  maxTxSize?: Maybe<Scalars['Int']>;
+  maxValSize?: Maybe<Scalars['Int']>;
+  minFeeA?: Maybe<Scalars['Int']>;
+  minFeeB?: Maybe<Scalars['Int']>;
+  minPoolCost?: Maybe<Scalars['Int']>;
+  minUTxOValue?: Maybe<Scalars['Int']>;
+  nOpt?: Maybe<Scalars['Int']>;
+  poolDeposit?: Maybe<Scalars['Int']>;
+  protocolVersion?: Maybe<Scalars['String']>;
+  rho?: Maybe<Scalars['Float']>;
+  tau?: Maybe<Scalars['Float']>;
+};
+
 export type Query = {
   __typename?: 'Query';
+  aggregateActiveStake?: Maybe<ActiveStakeAggregateResult>;
+  aggregateAdaPots?: Maybe<AdaPotsAggregateResult>;
+  aggregateAlonzoGenesis?: Maybe<AlonzoGenesisAggregateResult>;
+  aggregateAsset?: Maybe<AssetAggregateResult>;
+  aggregateAuxiliaryData?: Maybe<AuxiliaryDataAggregateResult>;
+  aggregateAuxiliaryDataBody?: Maybe<AuxiliaryDataBodyAggregateResult>;
+  aggregateBlock?: Maybe<BlockAggregateResult>;
+  aggregateByronBlockVersionData?: Maybe<ByronBlockVersionDataAggregateResult>;
+  aggregateByronGenesis?: Maybe<ByronGenesisAggregateResult>;
+  aggregateByronProtocolConsts?: Maybe<ByronProtocolConstsAggregateResult>;
+  aggregateByronSoftForkRule?: Maybe<ByronSoftForkRuleAggregateResult>;
+  aggregateByronTxFeePolicy?: Maybe<ByronTxFeePolicyAggregateResult>;
+  aggregateBytesMetadatum?: Maybe<BytesMetadatumAggregateResult>;
+  aggregateEpoch?: Maybe<EpochAggregateResult>;
+  aggregateExecutionPrice?: Maybe<ExecutionPriceAggregateResult>;
+  aggregateExecutionPrices?: Maybe<ExecutionPricesAggregateResult>;
+  aggregateExecutionUnits?: Maybe<ExecutionUnitsAggregateResult>;
   aggregateExtendedStakePoolMetadata?: Maybe<ExtendedStakePoolMetadataAggregateResult>;
   aggregateExtendedStakePoolMetadataFields?: Maybe<ExtendedStakePoolMetadataFieldsAggregateResult>;
   aggregateFraction?: Maybe<FractionAggregateResult>;
+  aggregateGenesis?: Maybe<GenesisAggregateResult>;
   aggregateITNVerification?: Maybe<ItnVerificationAggregateResult>;
+  aggregateIntegerMetadatum?: Maybe<IntegerMetadatumAggregateResult>;
+  aggregateKeyValueMetadatum?: Maybe<KeyValueMetadatumAggregateResult>;
+  aggregateMetadatumArray?: Maybe<MetadatumArrayAggregateResult>;
+  aggregateMetadatumMap?: Maybe<MetadatumMapAggregateResult>;
   aggregatePoolContactData?: Maybe<PoolContactDataAggregateResult>;
+  aggregateProtocolParameters?: Maybe<ProtocolParametersAggregateResult>;
+  aggregateRedeemer?: Maybe<RedeemerAggregateResult>;
   aggregateRelayByAddress?: Maybe<RelayByAddressAggregateResult>;
   aggregateRelayByName?: Maybe<RelayByNameAggregateResult>;
   aggregateRelayByNameMultihost?: Maybe<RelayByNameMultihostAggregateResult>;
+  aggregateScript?: Maybe<ScriptAggregateResult>;
+  aggregateShelleyGenesis?: Maybe<ShelleyGenesisAggregateResult>;
+  aggregateShelleyGenesisStaking?: Maybe<ShelleyGenesisStakingAggregateResult>;
+  aggregateSlot?: Maybe<SlotAggregateResult>;
   aggregateStakePool?: Maybe<StakePoolAggregateResult>;
   aggregateStakePoolMetadata?: Maybe<StakePoolMetadataAggregateResult>;
   aggregateStakePoolMetadataJson?: Maybe<StakePoolMetadataJsonAggregateResult>;
@@ -1446,18 +5260,58 @@ export type Query = {
   aggregateStakePoolMetricsSize?: Maybe<StakePoolMetricsSizeAggregateResult>;
   aggregateStakePoolMetricsStake?: Maybe<StakePoolMetricsStakeAggregateResult>;
   aggregateStakePoolTransactions?: Maybe<StakePoolTransactionsAggregateResult>;
+  aggregateStringMetadatum?: Maybe<StringMetadatumAggregateResult>;
   aggregateThePoolsMediaAssets?: Maybe<ThePoolsMediaAssetsAggregateResult>;
+  aggregateToken?: Maybe<TokenAggregateResult>;
+  aggregateTransaction?: Maybe<TransactionAggregateResult>;
+  aggregateTransactionInput?: Maybe<TransactionInputAggregateResult>;
+  aggregateTransactionOutput?: Maybe<TransactionOutputAggregateResult>;
+  aggregateValue?: Maybe<ValueAggregateResult>;
+  aggregateWithdrawal?: Maybe<WithdrawalAggregateResult>;
+  getBlock?: Maybe<Block>;
+  getEpoch?: Maybe<Epoch>;
   getExtendedStakePoolMetadataFields?: Maybe<ExtendedStakePoolMetadataFields>;
+  getScript?: Maybe<Script>;
+  getSlot?: Maybe<Slot>;
   getStakePool?: Maybe<StakePool>;
   getStakePoolMetadata?: Maybe<StakePoolMetadata>;
+  getTransaction?: Maybe<Transaction>;
+  queryActiveStake?: Maybe<Array<Maybe<ActiveStake>>>;
+  queryAdaPots?: Maybe<Array<Maybe<AdaPots>>>;
+  queryAlonzoGenesis?: Maybe<Array<Maybe<AlonzoGenesis>>>;
+  queryAsset?: Maybe<Array<Maybe<Asset>>>;
+  queryAuxiliaryData?: Maybe<Array<Maybe<AuxiliaryData>>>;
+  queryAuxiliaryDataBody?: Maybe<Array<Maybe<AuxiliaryDataBody>>>;
+  queryBlock?: Maybe<Array<Maybe<Block>>>;
+  queryByronBlockVersionData?: Maybe<Array<Maybe<ByronBlockVersionData>>>;
+  queryByronGenesis?: Maybe<Array<Maybe<ByronGenesis>>>;
+  queryByronProtocolConsts?: Maybe<Array<Maybe<ByronProtocolConsts>>>;
+  queryByronSoftForkRule?: Maybe<Array<Maybe<ByronSoftForkRule>>>;
+  queryByronTxFeePolicy?: Maybe<Array<Maybe<ByronTxFeePolicy>>>;
+  queryBytesMetadatum?: Maybe<Array<Maybe<BytesMetadatum>>>;
+  queryEpoch?: Maybe<Array<Maybe<Epoch>>>;
+  queryExecutionPrice?: Maybe<Array<Maybe<ExecutionPrice>>>;
+  queryExecutionPrices?: Maybe<Array<Maybe<ExecutionPrices>>>;
+  queryExecutionUnits?: Maybe<Array<Maybe<ExecutionUnits>>>;
   queryExtendedStakePoolMetadata?: Maybe<Array<Maybe<ExtendedStakePoolMetadata>>>;
   queryExtendedStakePoolMetadataFields?: Maybe<Array<Maybe<ExtendedStakePoolMetadataFields>>>;
   queryFraction?: Maybe<Array<Maybe<Fraction>>>;
+  queryGenesis?: Maybe<Array<Maybe<Genesis>>>;
   queryITNVerification?: Maybe<Array<Maybe<ItnVerification>>>;
+  queryIntegerMetadatum?: Maybe<Array<Maybe<IntegerMetadatum>>>;
+  queryKeyValueMetadatum?: Maybe<Array<Maybe<KeyValueMetadatum>>>;
+  queryMetadatumArray?: Maybe<Array<Maybe<MetadatumArray>>>;
+  queryMetadatumMap?: Maybe<Array<Maybe<MetadatumMap>>>;
   queryPoolContactData?: Maybe<Array<Maybe<PoolContactData>>>;
+  queryProtocolParameters?: Maybe<Array<Maybe<ProtocolParameters>>>;
+  queryRedeemer?: Maybe<Array<Maybe<Redeemer>>>;
   queryRelayByAddress?: Maybe<Array<Maybe<RelayByAddress>>>;
   queryRelayByName?: Maybe<Array<Maybe<RelayByName>>>;
   queryRelayByNameMultihost?: Maybe<Array<Maybe<RelayByNameMultihost>>>;
+  queryScript?: Maybe<Array<Maybe<Script>>>;
+  queryShelleyGenesis?: Maybe<Array<Maybe<ShelleyGenesis>>>;
+  queryShelleyGenesisStaking?: Maybe<Array<Maybe<ShelleyGenesisStaking>>>;
+  querySlot?: Maybe<Array<Maybe<Slot>>>;
   queryStakePool?: Maybe<Array<Maybe<StakePool>>>;
   queryStakePoolMetadata?: Maybe<Array<Maybe<StakePoolMetadata>>>;
   queryStakePoolMetadataJson?: Maybe<Array<Maybe<StakePoolMetadataJson>>>;
@@ -1465,7 +5319,99 @@ export type Query = {
   queryStakePoolMetricsSize?: Maybe<Array<Maybe<StakePoolMetricsSize>>>;
   queryStakePoolMetricsStake?: Maybe<Array<Maybe<StakePoolMetricsStake>>>;
   queryStakePoolTransactions?: Maybe<Array<Maybe<StakePoolTransactions>>>;
+  queryStringMetadatum?: Maybe<Array<Maybe<StringMetadatum>>>;
   queryThePoolsMediaAssets?: Maybe<Array<Maybe<ThePoolsMediaAssets>>>;
+  queryToken?: Maybe<Array<Maybe<Token>>>;
+  queryTransaction?: Maybe<Array<Maybe<Transaction>>>;
+  queryTransactionInput?: Maybe<Array<Maybe<TransactionInput>>>;
+  queryTransactionOutput?: Maybe<Array<Maybe<TransactionOutput>>>;
+  queryValue?: Maybe<Array<Maybe<Value>>>;
+  queryWithdrawal?: Maybe<Array<Maybe<Withdrawal>>>;
+};
+
+
+export type QueryAggregateActiveStakeArgs = {
+  filter?: Maybe<ActiveStakeFilter>;
+};
+
+
+export type QueryAggregateAdaPotsArgs = {
+  filter?: Maybe<AdaPotsFilter>;
+};
+
+
+export type QueryAggregateAlonzoGenesisArgs = {
+  filter?: Maybe<AlonzoGenesisFilter>;
+};
+
+
+export type QueryAggregateAssetArgs = {
+  filter?: Maybe<AssetFilter>;
+};
+
+
+export type QueryAggregateAuxiliaryDataArgs = {
+  filter?: Maybe<AuxiliaryDataFilter>;
+};
+
+
+export type QueryAggregateAuxiliaryDataBodyArgs = {
+  filter?: Maybe<AuxiliaryDataBodyFilter>;
+};
+
+
+export type QueryAggregateBlockArgs = {
+  filter?: Maybe<BlockFilter>;
+};
+
+
+export type QueryAggregateByronBlockVersionDataArgs = {
+  filter?: Maybe<ByronBlockVersionDataFilter>;
+};
+
+
+export type QueryAggregateByronGenesisArgs = {
+  filter?: Maybe<ByronGenesisFilter>;
+};
+
+
+export type QueryAggregateByronProtocolConstsArgs = {
+  filter?: Maybe<ByronProtocolConstsFilter>;
+};
+
+
+export type QueryAggregateByronSoftForkRuleArgs = {
+  filter?: Maybe<ByronSoftForkRuleFilter>;
+};
+
+
+export type QueryAggregateByronTxFeePolicyArgs = {
+  filter?: Maybe<ByronTxFeePolicyFilter>;
+};
+
+
+export type QueryAggregateBytesMetadatumArgs = {
+  filter?: Maybe<BytesMetadatumFilter>;
+};
+
+
+export type QueryAggregateEpochArgs = {
+  filter?: Maybe<EpochFilter>;
+};
+
+
+export type QueryAggregateExecutionPriceArgs = {
+  filter?: Maybe<ExecutionPriceFilter>;
+};
+
+
+export type QueryAggregateExecutionPricesArgs = {
+  filter?: Maybe<ExecutionPricesFilter>;
+};
+
+
+export type QueryAggregateExecutionUnitsArgs = {
+  filter?: Maybe<ExecutionUnitsFilter>;
 };
 
 
@@ -1484,13 +5430,48 @@ export type QueryAggregateFractionArgs = {
 };
 
 
+export type QueryAggregateGenesisArgs = {
+  filter?: Maybe<GenesisFilter>;
+};
+
+
 export type QueryAggregateItnVerificationArgs = {
   filter?: Maybe<ItnVerificationFilter>;
 };
 
 
+export type QueryAggregateIntegerMetadatumArgs = {
+  filter?: Maybe<IntegerMetadatumFilter>;
+};
+
+
+export type QueryAggregateKeyValueMetadatumArgs = {
+  filter?: Maybe<KeyValueMetadatumFilter>;
+};
+
+
+export type QueryAggregateMetadatumArrayArgs = {
+  filter?: Maybe<MetadatumArrayFilter>;
+};
+
+
+export type QueryAggregateMetadatumMapArgs = {
+  filter?: Maybe<MetadatumMapFilter>;
+};
+
+
 export type QueryAggregatePoolContactDataArgs = {
   filter?: Maybe<PoolContactDataFilter>;
+};
+
+
+export type QueryAggregateProtocolParametersArgs = {
+  filter?: Maybe<ProtocolParametersFilter>;
+};
+
+
+export type QueryAggregateRedeemerArgs = {
+  filter?: Maybe<RedeemerFilter>;
 };
 
 
@@ -1506,6 +5487,26 @@ export type QueryAggregateRelayByNameArgs = {
 
 export type QueryAggregateRelayByNameMultihostArgs = {
   filter?: Maybe<RelayByNameMultihostFilter>;
+};
+
+
+export type QueryAggregateScriptArgs = {
+  filter?: Maybe<ScriptFilter>;
+};
+
+
+export type QueryAggregateShelleyGenesisArgs = {
+  filter?: Maybe<ShelleyGenesisFilter>;
+};
+
+
+export type QueryAggregateShelleyGenesisStakingArgs = {
+  filter?: Maybe<ShelleyGenesisStakingFilter>;
+};
+
+
+export type QueryAggregateSlotArgs = {
+  filter?: Maybe<SlotFilter>;
 };
 
 
@@ -1544,13 +5545,68 @@ export type QueryAggregateStakePoolTransactionsArgs = {
 };
 
 
+export type QueryAggregateStringMetadatumArgs = {
+  filter?: Maybe<StringMetadatumFilter>;
+};
+
+
 export type QueryAggregateThePoolsMediaAssetsArgs = {
   filter?: Maybe<ThePoolsMediaAssetsFilter>;
 };
 
 
+export type QueryAggregateTokenArgs = {
+  filter?: Maybe<TokenFilter>;
+};
+
+
+export type QueryAggregateTransactionArgs = {
+  filter?: Maybe<TransactionFilter>;
+};
+
+
+export type QueryAggregateTransactionInputArgs = {
+  filter?: Maybe<TransactionInputFilter>;
+};
+
+
+export type QueryAggregateTransactionOutputArgs = {
+  filter?: Maybe<TransactionOutputFilter>;
+};
+
+
+export type QueryAggregateValueArgs = {
+  filter?: Maybe<ValueFilter>;
+};
+
+
+export type QueryAggregateWithdrawalArgs = {
+  filter?: Maybe<WithdrawalFilter>;
+};
+
+
+export type QueryGetBlockArgs = {
+  hash: Scalars['String'];
+};
+
+
+export type QueryGetEpochArgs = {
+  number: Scalars['Int'];
+};
+
+
 export type QueryGetExtendedStakePoolMetadataFieldsArgs = {
   id: Scalars['String'];
+};
+
+
+export type QueryGetScriptArgs = {
+  hash: Scalars['String'];
+};
+
+
+export type QueryGetSlotArgs = {
+  number: Scalars['Int'];
 };
 
 
@@ -1561,6 +5617,145 @@ export type QueryGetStakePoolArgs = {
 
 export type QueryGetStakePoolMetadataArgs = {
   stakePoolId: Scalars['String'];
+};
+
+
+export type QueryGetTransactionArgs = {
+  hash: Scalars['String'];
+};
+
+
+export type QueryQueryActiveStakeArgs = {
+  filter?: Maybe<ActiveStakeFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ActiveStakeOrder>;
+};
+
+
+export type QueryQueryAdaPotsArgs = {
+  filter?: Maybe<AdaPotsFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<AdaPotsOrder>;
+};
+
+
+export type QueryQueryAlonzoGenesisArgs = {
+  filter?: Maybe<AlonzoGenesisFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<AlonzoGenesisOrder>;
+};
+
+
+export type QueryQueryAssetArgs = {
+  filter?: Maybe<AssetFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<AssetOrder>;
+};
+
+
+export type QueryQueryAuxiliaryDataArgs = {
+  filter?: Maybe<AuxiliaryDataFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<AuxiliaryDataOrder>;
+};
+
+
+export type QueryQueryAuxiliaryDataBodyArgs = {
+  filter?: Maybe<AuxiliaryDataBodyFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+
+export type QueryQueryBlockArgs = {
+  filter?: Maybe<BlockFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<BlockOrder>;
+};
+
+
+export type QueryQueryByronBlockVersionDataArgs = {
+  filter?: Maybe<ByronBlockVersionDataFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ByronBlockVersionDataOrder>;
+};
+
+
+export type QueryQueryByronGenesisArgs = {
+  filter?: Maybe<ByronGenesisFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ByronGenesisOrder>;
+};
+
+
+export type QueryQueryByronProtocolConstsArgs = {
+  filter?: Maybe<ByronProtocolConstsFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ByronProtocolConstsOrder>;
+};
+
+
+export type QueryQueryByronSoftForkRuleArgs = {
+  filter?: Maybe<ByronSoftForkRuleFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ByronSoftForkRuleOrder>;
+};
+
+
+export type QueryQueryByronTxFeePolicyArgs = {
+  filter?: Maybe<ByronTxFeePolicyFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ByronTxFeePolicyOrder>;
+};
+
+
+export type QueryQueryBytesMetadatumArgs = {
+  filter?: Maybe<BytesMetadatumFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<BytesMetadatumOrder>;
+};
+
+
+export type QueryQueryEpochArgs = {
+  filter?: Maybe<EpochFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<EpochOrder>;
+};
+
+
+export type QueryQueryExecutionPriceArgs = {
+  filter?: Maybe<ExecutionPriceFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ExecutionPriceOrder>;
+};
+
+
+export type QueryQueryExecutionPricesArgs = {
+  filter?: Maybe<ExecutionPricesFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+
+export type QueryQueryExecutionUnitsArgs = {
+  filter?: Maybe<ExecutionUnitsFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ExecutionUnitsOrder>;
 };
 
 
@@ -1588,6 +5783,13 @@ export type QueryQueryFractionArgs = {
 };
 
 
+export type QueryQueryGenesisArgs = {
+  filter?: Maybe<GenesisFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+
 export type QueryQueryItnVerificationArgs = {
   filter?: Maybe<ItnVerificationFilter>;
   first?: Maybe<Scalars['Int']>;
@@ -1596,11 +5798,57 @@ export type QueryQueryItnVerificationArgs = {
 };
 
 
+export type QueryQueryIntegerMetadatumArgs = {
+  filter?: Maybe<IntegerMetadatumFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<IntegerMetadatumOrder>;
+};
+
+
+export type QueryQueryKeyValueMetadatumArgs = {
+  filter?: Maybe<KeyValueMetadatumFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<KeyValueMetadatumOrder>;
+};
+
+
+export type QueryQueryMetadatumArrayArgs = {
+  filter?: Maybe<MetadatumArrayFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+
+export type QueryQueryMetadatumMapArgs = {
+  filter?: Maybe<MetadatumMapFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+
 export type QueryQueryPoolContactDataArgs = {
   filter?: Maybe<PoolContactDataFilter>;
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<PoolContactDataOrder>;
+};
+
+
+export type QueryQueryProtocolParametersArgs = {
+  filter?: Maybe<ProtocolParametersFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ProtocolParametersOrder>;
+};
+
+
+export type QueryQueryRedeemerArgs = {
+  filter?: Maybe<RedeemerFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<RedeemerOrder>;
 };
 
 
@@ -1625,6 +5873,38 @@ export type QueryQueryRelayByNameMultihostArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<RelayByNameMultihostOrder>;
+};
+
+
+export type QueryQueryScriptArgs = {
+  filter?: Maybe<ScriptFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ScriptOrder>;
+};
+
+
+export type QueryQueryShelleyGenesisArgs = {
+  filter?: Maybe<ShelleyGenesisFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ShelleyGenesisOrder>;
+};
+
+
+export type QueryQueryShelleyGenesisStakingArgs = {
+  filter?: Maybe<ShelleyGenesisStakingFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ShelleyGenesisStakingOrder>;
+};
+
+
+export type QueryQuerySlotArgs = {
+  filter?: Maybe<SlotFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<SlotOrder>;
 };
 
 
@@ -1683,11 +5963,149 @@ export type QueryQueryStakePoolTransactionsArgs = {
 };
 
 
+export type QueryQueryStringMetadatumArgs = {
+  filter?: Maybe<StringMetadatumFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<StringMetadatumOrder>;
+};
+
+
 export type QueryQueryThePoolsMediaAssetsArgs = {
   filter?: Maybe<ThePoolsMediaAssetsFilter>;
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<ThePoolsMediaAssetsOrder>;
+};
+
+
+export type QueryQueryTokenArgs = {
+  filter?: Maybe<TokenFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<TokenOrder>;
+};
+
+
+export type QueryQueryTransactionArgs = {
+  filter?: Maybe<TransactionFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<TransactionOrder>;
+};
+
+
+export type QueryQueryTransactionInputArgs = {
+  filter?: Maybe<TransactionInputFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<TransactionInputOrder>;
+};
+
+
+export type QueryQueryTransactionOutputArgs = {
+  filter?: Maybe<TransactionOutputFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<TransactionOutputOrder>;
+};
+
+
+export type QueryQueryValueArgs = {
+  filter?: Maybe<ValueFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ValueOrder>;
+};
+
+
+export type QueryQueryWithdrawalArgs = {
+  filter?: Maybe<WithdrawalFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<WithdrawalOrder>;
+};
+
+export type Redeemer = {
+  __typename?: 'Redeemer';
+  executionUnits: ExecutionUnits;
+  fee: Scalars['String'];
+  index: Scalars['Int'];
+  purpose: Scalars['String'];
+  scriptHash: Scalars['String'];
+  transaction: Transaction;
+};
+
+
+export type RedeemerExecutionUnitsArgs = {
+  filter?: Maybe<ExecutionUnitsFilter>;
+};
+
+
+export type RedeemerTransactionArgs = {
+  filter?: Maybe<TransactionFilter>;
+};
+
+export type RedeemerAggregateResult = {
+  __typename?: 'RedeemerAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+  feeMax?: Maybe<Scalars['String']>;
+  feeMin?: Maybe<Scalars['String']>;
+  indexAvg?: Maybe<Scalars['Float']>;
+  indexMax?: Maybe<Scalars['Int']>;
+  indexMin?: Maybe<Scalars['Int']>;
+  indexSum?: Maybe<Scalars['Int']>;
+  purposeMax?: Maybe<Scalars['String']>;
+  purposeMin?: Maybe<Scalars['String']>;
+  scriptHashMax?: Maybe<Scalars['String']>;
+  scriptHashMin?: Maybe<Scalars['String']>;
+};
+
+export type RedeemerFilter = {
+  and?: Maybe<Array<Maybe<RedeemerFilter>>>;
+  has?: Maybe<Array<Maybe<RedeemerHasFilter>>>;
+  not?: Maybe<RedeemerFilter>;
+  or?: Maybe<Array<Maybe<RedeemerFilter>>>;
+};
+
+export enum RedeemerHasFilter {
+  ExecutionUnits = 'executionUnits',
+  Fee = 'fee',
+  Index = 'index',
+  Purpose = 'purpose',
+  ScriptHash = 'scriptHash',
+  Transaction = 'transaction'
+}
+
+export type RedeemerOrder = {
+  asc?: Maybe<RedeemerOrderable>;
+  desc?: Maybe<RedeemerOrderable>;
+  then?: Maybe<RedeemerOrder>;
+};
+
+export enum RedeemerOrderable {
+  Fee = 'fee',
+  Index = 'index',
+  Purpose = 'purpose',
+  ScriptHash = 'scriptHash'
+}
+
+export type RedeemerPatch = {
+  executionUnits?: Maybe<ExecutionUnitsRef>;
+  fee?: Maybe<Scalars['String']>;
+  index?: Maybe<Scalars['Int']>;
+  purpose?: Maybe<Scalars['String']>;
+  scriptHash?: Maybe<Scalars['String']>;
+  transaction?: Maybe<TransactionRef>;
+};
+
+export type RedeemerRef = {
+  executionUnits?: Maybe<ExecutionUnitsRef>;
+  fee?: Maybe<Scalars['String']>;
+  index?: Maybe<Scalars['Int']>;
+  purpose?: Maybe<Scalars['String']>;
+  scriptHash?: Maybe<Scalars['String']>;
+  transaction?: Maybe<TransactionRef>;
 };
 
 export type RelayByAddress = {
@@ -1838,6 +6256,72 @@ export type RelayByNameRef = {
   port?: Maybe<Scalars['Int']>;
 };
 
+export type Script = {
+  __typename?: 'Script';
+  auxiliaryDataBody: AuxiliaryDataBody;
+  hash: Scalars['String'];
+  serializedSize: Scalars['Int'];
+  type: Scalars['String'];
+};
+
+
+export type ScriptAuxiliaryDataBodyArgs = {
+  filter?: Maybe<AuxiliaryDataBodyFilter>;
+};
+
+export type ScriptAggregateResult = {
+  __typename?: 'ScriptAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+  hashMax?: Maybe<Scalars['String']>;
+  hashMin?: Maybe<Scalars['String']>;
+  serializedSizeAvg?: Maybe<Scalars['Float']>;
+  serializedSizeMax?: Maybe<Scalars['Int']>;
+  serializedSizeMin?: Maybe<Scalars['Int']>;
+  serializedSizeSum?: Maybe<Scalars['Int']>;
+  typeMax?: Maybe<Scalars['String']>;
+  typeMin?: Maybe<Scalars['String']>;
+};
+
+export type ScriptFilter = {
+  and?: Maybe<Array<Maybe<ScriptFilter>>>;
+  has?: Maybe<Array<Maybe<ScriptHasFilter>>>;
+  hash?: Maybe<StringHashFilter>;
+  not?: Maybe<ScriptFilter>;
+  or?: Maybe<Array<Maybe<ScriptFilter>>>;
+};
+
+export enum ScriptHasFilter {
+  AuxiliaryDataBody = 'auxiliaryDataBody',
+  Hash = 'hash',
+  SerializedSize = 'serializedSize',
+  Type = 'type'
+}
+
+export type ScriptOrder = {
+  asc?: Maybe<ScriptOrderable>;
+  desc?: Maybe<ScriptOrderable>;
+  then?: Maybe<ScriptOrder>;
+};
+
+export enum ScriptOrderable {
+  Hash = 'hash',
+  SerializedSize = 'serializedSize',
+  Type = 'type'
+}
+
+export type ScriptPatch = {
+  auxiliaryDataBody?: Maybe<AuxiliaryDataBodyRef>;
+  serializedSize?: Maybe<Scalars['Int']>;
+  type?: Maybe<Scalars['String']>;
+};
+
+export type ScriptRef = {
+  auxiliaryDataBody?: Maybe<AuxiliaryDataBodyRef>;
+  hash?: Maybe<Scalars['String']>;
+  serializedSize?: Maybe<Scalars['Int']>;
+  type?: Maybe<Scalars['String']>;
+};
+
 export type SearchResult = RelayByAddress | RelayByName | RelayByNameMultihost;
 
 export type SearchResultFilter = {
@@ -1858,6 +6342,281 @@ export enum SearchResultType {
   RelayByName = 'RelayByName',
   RelayByNameMultihost = 'RelayByNameMultihost'
 }
+
+export type ShelleyGenesis = {
+  __typename?: 'ShelleyGenesis';
+  activeSlotsCoeff: Scalars['Float'];
+  epochLength: Scalars['Int'];
+  genDelegs?: Maybe<Scalars['String']>;
+  initialFunds: Scalars['String'];
+  maxKESEvolutions: Scalars['Int'];
+  maxLovelaceSupply: Scalars['String'];
+  networkId: Scalars['String'];
+  networkMagic: Scalars['Int'];
+  protocolParams: ProtocolParameters;
+  securityParam: Scalars['Int'];
+  slotLength: Scalars['Int'];
+  slotsPerKESPeriod: Scalars['Int'];
+  staking: ShelleyGenesisStaking;
+  systemStart: Scalars['String'];
+  updateQuorum: Scalars['Int'];
+};
+
+
+export type ShelleyGenesisProtocolParamsArgs = {
+  filter?: Maybe<ProtocolParametersFilter>;
+};
+
+
+export type ShelleyGenesisStakingArgs = {
+  filter?: Maybe<ShelleyGenesisStakingFilter>;
+};
+
+export type ShelleyGenesisAggregateResult = {
+  __typename?: 'ShelleyGenesisAggregateResult';
+  activeSlotsCoeffAvg?: Maybe<Scalars['Float']>;
+  activeSlotsCoeffMax?: Maybe<Scalars['Float']>;
+  activeSlotsCoeffMin?: Maybe<Scalars['Float']>;
+  activeSlotsCoeffSum?: Maybe<Scalars['Float']>;
+  count?: Maybe<Scalars['Int']>;
+  epochLengthAvg?: Maybe<Scalars['Float']>;
+  epochLengthMax?: Maybe<Scalars['Int']>;
+  epochLengthMin?: Maybe<Scalars['Int']>;
+  epochLengthSum?: Maybe<Scalars['Int']>;
+  genDelegsMax?: Maybe<Scalars['String']>;
+  genDelegsMin?: Maybe<Scalars['String']>;
+  initialFundsMax?: Maybe<Scalars['String']>;
+  initialFundsMin?: Maybe<Scalars['String']>;
+  maxKESEvolutionsAvg?: Maybe<Scalars['Float']>;
+  maxKESEvolutionsMax?: Maybe<Scalars['Int']>;
+  maxKESEvolutionsMin?: Maybe<Scalars['Int']>;
+  maxKESEvolutionsSum?: Maybe<Scalars['Int']>;
+  maxLovelaceSupplyMax?: Maybe<Scalars['String']>;
+  maxLovelaceSupplyMin?: Maybe<Scalars['String']>;
+  networkIdMax?: Maybe<Scalars['String']>;
+  networkIdMin?: Maybe<Scalars['String']>;
+  networkMagicAvg?: Maybe<Scalars['Float']>;
+  networkMagicMax?: Maybe<Scalars['Int']>;
+  networkMagicMin?: Maybe<Scalars['Int']>;
+  networkMagicSum?: Maybe<Scalars['Int']>;
+  securityParamAvg?: Maybe<Scalars['Float']>;
+  securityParamMax?: Maybe<Scalars['Int']>;
+  securityParamMin?: Maybe<Scalars['Int']>;
+  securityParamSum?: Maybe<Scalars['Int']>;
+  slotLengthAvg?: Maybe<Scalars['Float']>;
+  slotLengthMax?: Maybe<Scalars['Int']>;
+  slotLengthMin?: Maybe<Scalars['Int']>;
+  slotLengthSum?: Maybe<Scalars['Int']>;
+  slotsPerKESPeriodAvg?: Maybe<Scalars['Float']>;
+  slotsPerKESPeriodMax?: Maybe<Scalars['Int']>;
+  slotsPerKESPeriodMin?: Maybe<Scalars['Int']>;
+  slotsPerKESPeriodSum?: Maybe<Scalars['Int']>;
+  systemStartMax?: Maybe<Scalars['String']>;
+  systemStartMin?: Maybe<Scalars['String']>;
+  updateQuorumAvg?: Maybe<Scalars['Float']>;
+  updateQuorumMax?: Maybe<Scalars['Int']>;
+  updateQuorumMin?: Maybe<Scalars['Int']>;
+  updateQuorumSum?: Maybe<Scalars['Int']>;
+};
+
+export type ShelleyGenesisFilter = {
+  and?: Maybe<Array<Maybe<ShelleyGenesisFilter>>>;
+  has?: Maybe<Array<Maybe<ShelleyGenesisHasFilter>>>;
+  not?: Maybe<ShelleyGenesisFilter>;
+  or?: Maybe<Array<Maybe<ShelleyGenesisFilter>>>;
+};
+
+export enum ShelleyGenesisHasFilter {
+  ActiveSlotsCoeff = 'activeSlotsCoeff',
+  EpochLength = 'epochLength',
+  GenDelegs = 'genDelegs',
+  InitialFunds = 'initialFunds',
+  MaxKesEvolutions = 'maxKESEvolutions',
+  MaxLovelaceSupply = 'maxLovelaceSupply',
+  NetworkId = 'networkId',
+  NetworkMagic = 'networkMagic',
+  ProtocolParams = 'protocolParams',
+  SecurityParam = 'securityParam',
+  SlotLength = 'slotLength',
+  SlotsPerKesPeriod = 'slotsPerKESPeriod',
+  Staking = 'staking',
+  SystemStart = 'systemStart',
+  UpdateQuorum = 'updateQuorum'
+}
+
+export type ShelleyGenesisOrder = {
+  asc?: Maybe<ShelleyGenesisOrderable>;
+  desc?: Maybe<ShelleyGenesisOrderable>;
+  then?: Maybe<ShelleyGenesisOrder>;
+};
+
+export enum ShelleyGenesisOrderable {
+  ActiveSlotsCoeff = 'activeSlotsCoeff',
+  EpochLength = 'epochLength',
+  GenDelegs = 'genDelegs',
+  InitialFunds = 'initialFunds',
+  MaxKesEvolutions = 'maxKESEvolutions',
+  MaxLovelaceSupply = 'maxLovelaceSupply',
+  NetworkId = 'networkId',
+  NetworkMagic = 'networkMagic',
+  SecurityParam = 'securityParam',
+  SlotLength = 'slotLength',
+  SlotsPerKesPeriod = 'slotsPerKESPeriod',
+  SystemStart = 'systemStart',
+  UpdateQuorum = 'updateQuorum'
+}
+
+export type ShelleyGenesisPatch = {
+  activeSlotsCoeff?: Maybe<Scalars['Float']>;
+  epochLength?: Maybe<Scalars['Int']>;
+  genDelegs?: Maybe<Scalars['String']>;
+  initialFunds?: Maybe<Scalars['String']>;
+  maxKESEvolutions?: Maybe<Scalars['Int']>;
+  maxLovelaceSupply?: Maybe<Scalars['String']>;
+  networkId?: Maybe<Scalars['String']>;
+  networkMagic?: Maybe<Scalars['Int']>;
+  protocolParams?: Maybe<ProtocolParametersRef>;
+  securityParam?: Maybe<Scalars['Int']>;
+  slotLength?: Maybe<Scalars['Int']>;
+  slotsPerKESPeriod?: Maybe<Scalars['Int']>;
+  staking?: Maybe<ShelleyGenesisStakingRef>;
+  systemStart?: Maybe<Scalars['String']>;
+  updateQuorum?: Maybe<Scalars['Int']>;
+};
+
+export type ShelleyGenesisRef = {
+  activeSlotsCoeff?: Maybe<Scalars['Float']>;
+  epochLength?: Maybe<Scalars['Int']>;
+  genDelegs?: Maybe<Scalars['String']>;
+  initialFunds?: Maybe<Scalars['String']>;
+  maxKESEvolutions?: Maybe<Scalars['Int']>;
+  maxLovelaceSupply?: Maybe<Scalars['String']>;
+  networkId?: Maybe<Scalars['String']>;
+  networkMagic?: Maybe<Scalars['Int']>;
+  protocolParams?: Maybe<ProtocolParametersRef>;
+  securityParam?: Maybe<Scalars['Int']>;
+  slotLength?: Maybe<Scalars['Int']>;
+  slotsPerKESPeriod?: Maybe<Scalars['Int']>;
+  staking?: Maybe<ShelleyGenesisStakingRef>;
+  systemStart?: Maybe<Scalars['String']>;
+  updateQuorum?: Maybe<Scalars['Int']>;
+};
+
+export type ShelleyGenesisStaking = {
+  __typename?: 'ShelleyGenesisStaking';
+  pools: Scalars['String'];
+  stake: Scalars['String'];
+};
+
+export type ShelleyGenesisStakingAggregateResult = {
+  __typename?: 'ShelleyGenesisStakingAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+  poolsMax?: Maybe<Scalars['String']>;
+  poolsMin?: Maybe<Scalars['String']>;
+  stakeMax?: Maybe<Scalars['String']>;
+  stakeMin?: Maybe<Scalars['String']>;
+};
+
+export type ShelleyGenesisStakingFilter = {
+  and?: Maybe<Array<Maybe<ShelleyGenesisStakingFilter>>>;
+  has?: Maybe<Array<Maybe<ShelleyGenesisStakingHasFilter>>>;
+  not?: Maybe<ShelleyGenesisStakingFilter>;
+  or?: Maybe<Array<Maybe<ShelleyGenesisStakingFilter>>>;
+};
+
+export enum ShelleyGenesisStakingHasFilter {
+  Pools = 'pools',
+  Stake = 'stake'
+}
+
+export type ShelleyGenesisStakingOrder = {
+  asc?: Maybe<ShelleyGenesisStakingOrderable>;
+  desc?: Maybe<ShelleyGenesisStakingOrderable>;
+  then?: Maybe<ShelleyGenesisStakingOrder>;
+};
+
+export enum ShelleyGenesisStakingOrderable {
+  Pools = 'pools',
+  Stake = 'stake'
+}
+
+export type ShelleyGenesisStakingPatch = {
+  pools?: Maybe<Scalars['String']>;
+  stake?: Maybe<Scalars['String']>;
+};
+
+export type ShelleyGenesisStakingRef = {
+  pools?: Maybe<Scalars['String']>;
+  stake?: Maybe<Scalars['String']>;
+};
+
+export type Slot = {
+  __typename?: 'Slot';
+  block?: Maybe<Block>;
+  date: Scalars['DateTime'];
+  number: Scalars['Int'];
+  slotInEpoch: Scalars['Int'];
+};
+
+
+export type SlotBlockArgs = {
+  filter?: Maybe<BlockFilter>;
+};
+
+export type SlotAggregateResult = {
+  __typename?: 'SlotAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+  dateMax?: Maybe<Scalars['DateTime']>;
+  dateMin?: Maybe<Scalars['DateTime']>;
+  numberAvg?: Maybe<Scalars['Float']>;
+  numberMax?: Maybe<Scalars['Int']>;
+  numberMin?: Maybe<Scalars['Int']>;
+  numberSum?: Maybe<Scalars['Int']>;
+  slotInEpochAvg?: Maybe<Scalars['Float']>;
+  slotInEpochMax?: Maybe<Scalars['Int']>;
+  slotInEpochMin?: Maybe<Scalars['Int']>;
+  slotInEpochSum?: Maybe<Scalars['Int']>;
+};
+
+export type SlotFilter = {
+  and?: Maybe<Array<Maybe<SlotFilter>>>;
+  has?: Maybe<Array<Maybe<SlotHasFilter>>>;
+  not?: Maybe<SlotFilter>;
+  number?: Maybe<IntFilter>;
+  or?: Maybe<Array<Maybe<SlotFilter>>>;
+};
+
+export enum SlotHasFilter {
+  Block = 'block',
+  Date = 'date',
+  Number = 'number',
+  SlotInEpoch = 'slotInEpoch'
+}
+
+export type SlotOrder = {
+  asc?: Maybe<SlotOrderable>;
+  desc?: Maybe<SlotOrderable>;
+  then?: Maybe<SlotOrder>;
+};
+
+export enum SlotOrderable {
+  Date = 'date',
+  Number = 'number',
+  SlotInEpoch = 'slotInEpoch'
+}
+
+export type SlotPatch = {
+  block?: Maybe<BlockRef>;
+  date?: Maybe<Scalars['DateTime']>;
+  slotInEpoch?: Maybe<Scalars['Int']>;
+};
+
+export type SlotRef = {
+  block?: Maybe<BlockRef>;
+  date?: Maybe<Scalars['DateTime']>;
+  number?: Maybe<Scalars['Int']>;
+  slotInEpoch?: Maybe<Scalars['Int']>;
+};
 
 export type StakePool = {
   __typename?: 'StakePool';
@@ -2433,6 +7192,51 @@ export type StringHashFilter = {
   in?: Maybe<Array<Maybe<Scalars['String']>>>;
 };
 
+export type StringMetadatum = {
+  __typename?: 'StringMetadatum';
+  value: Scalars['String'];
+  valueType: MetadatumStringType;
+};
+
+export type StringMetadatumAggregateResult = {
+  __typename?: 'StringMetadatumAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+  valueMax?: Maybe<Scalars['String']>;
+  valueMin?: Maybe<Scalars['String']>;
+};
+
+export type StringMetadatumFilter = {
+  and?: Maybe<Array<Maybe<StringMetadatumFilter>>>;
+  has?: Maybe<Array<Maybe<StringMetadatumHasFilter>>>;
+  not?: Maybe<StringMetadatumFilter>;
+  or?: Maybe<Array<Maybe<StringMetadatumFilter>>>;
+};
+
+export enum StringMetadatumHasFilter {
+  Value = 'value',
+  ValueType = 'valueType'
+}
+
+export type StringMetadatumOrder = {
+  asc?: Maybe<StringMetadatumOrderable>;
+  desc?: Maybe<StringMetadatumOrderable>;
+  then?: Maybe<StringMetadatumOrder>;
+};
+
+export enum StringMetadatumOrderable {
+  Value = 'value'
+}
+
+export type StringMetadatumPatch = {
+  value?: Maybe<Scalars['String']>;
+  valueType?: Maybe<MetadatumStringType>;
+};
+
+export type StringMetadatumRef = {
+  value?: Maybe<Scalars['String']>;
+  valueType?: Maybe<MetadatumStringType>;
+};
+
 export type StringRange = {
   max: Scalars['String'];
   min: Scalars['String'];
@@ -2516,6 +7320,780 @@ export type ThePoolsMediaAssetsRef = {
   logo_svg?: Maybe<Scalars['String']>;
 };
 
+export type Token = {
+  __typename?: 'Token';
+  asset: Asset;
+  quantity: Scalars['String'];
+  transactionOutput: TransactionOutput;
+};
+
+
+export type TokenAssetArgs = {
+  filter?: Maybe<AssetFilter>;
+};
+
+
+export type TokenTransactionOutputArgs = {
+  filter?: Maybe<TransactionOutputFilter>;
+};
+
+export type TokenAggregateResult = {
+  __typename?: 'TokenAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+  quantityMax?: Maybe<Scalars['String']>;
+  quantityMin?: Maybe<Scalars['String']>;
+};
+
+export type TokenFilter = {
+  and?: Maybe<Array<Maybe<TokenFilter>>>;
+  has?: Maybe<Array<Maybe<TokenHasFilter>>>;
+  not?: Maybe<TokenFilter>;
+  or?: Maybe<Array<Maybe<TokenFilter>>>;
+};
+
+export enum TokenHasFilter {
+  Asset = 'asset',
+  Quantity = 'quantity',
+  TransactionOutput = 'transactionOutput'
+}
+
+export type TokenOrder = {
+  asc?: Maybe<TokenOrderable>;
+  desc?: Maybe<TokenOrderable>;
+  then?: Maybe<TokenOrder>;
+};
+
+export enum TokenOrderable {
+  Quantity = 'quantity'
+}
+
+export type TokenPatch = {
+  asset?: Maybe<AssetRef>;
+  quantity?: Maybe<Scalars['String']>;
+  transactionOutput?: Maybe<TransactionOutputRef>;
+};
+
+export type TokenRef = {
+  asset?: Maybe<AssetRef>;
+  quantity?: Maybe<Scalars['String']>;
+  transactionOutput?: Maybe<TransactionOutputRef>;
+};
+
+export type Transaction = {
+  __typename?: 'Transaction';
+  auxiliaryData?: Maybe<AuxiliaryData>;
+  block: Block;
+  blockIndex: Scalars['Int'];
+  collateral?: Maybe<Array<TransactionInput>>;
+  collateralAggregate?: Maybe<TransactionInputAggregateResult>;
+  deposit: Scalars['String'];
+  fee: Scalars['String'];
+  hash: Scalars['String'];
+  inputs: Array<TransactionInput>;
+  inputsAggregate?: Maybe<TransactionInputAggregateResult>;
+  invalidBefore?: Maybe<Scalars['Int']>;
+  invalidHereafter?: Maybe<Scalars['Int']>;
+  mint?: Maybe<Array<Token>>;
+  mintAggregate?: Maybe<TokenAggregateResult>;
+  outputs: Array<TransactionOutput>;
+  outputsAggregate?: Maybe<TransactionOutputAggregateResult>;
+  redeemers?: Maybe<Array<Redeemer>>;
+  redeemersAggregate?: Maybe<RedeemerAggregateResult>;
+  size: Scalars['Int'];
+  totalOutputCoin: Scalars['String'];
+  validContract: Scalars['Boolean'];
+  withdrawals?: Maybe<Array<Withdrawal>>;
+  withdrawalsAggregate?: Maybe<WithdrawalAggregateResult>;
+};
+
+
+export type TransactionAuxiliaryDataArgs = {
+  filter?: Maybe<AuxiliaryDataFilter>;
+};
+
+
+export type TransactionBlockArgs = {
+  filter?: Maybe<BlockFilter>;
+};
+
+
+export type TransactionCollateralArgs = {
+  filter?: Maybe<TransactionInputFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<TransactionInputOrder>;
+};
+
+
+export type TransactionCollateralAggregateArgs = {
+  filter?: Maybe<TransactionInputFilter>;
+};
+
+
+export type TransactionInputsArgs = {
+  filter?: Maybe<TransactionInputFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<TransactionInputOrder>;
+};
+
+
+export type TransactionInputsAggregateArgs = {
+  filter?: Maybe<TransactionInputFilter>;
+};
+
+
+export type TransactionMintArgs = {
+  filter?: Maybe<TokenFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<TokenOrder>;
+};
+
+
+export type TransactionMintAggregateArgs = {
+  filter?: Maybe<TokenFilter>;
+};
+
+
+export type TransactionOutputsArgs = {
+  filter?: Maybe<TransactionOutputFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<TransactionOutputOrder>;
+};
+
+
+export type TransactionOutputsAggregateArgs = {
+  filter?: Maybe<TransactionOutputFilter>;
+};
+
+
+export type TransactionRedeemersArgs = {
+  filter?: Maybe<RedeemerFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<RedeemerOrder>;
+};
+
+
+export type TransactionRedeemersAggregateArgs = {
+  filter?: Maybe<RedeemerFilter>;
+};
+
+
+export type TransactionWithdrawalsArgs = {
+  filter?: Maybe<WithdrawalFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<WithdrawalOrder>;
+};
+
+
+export type TransactionWithdrawalsAggregateArgs = {
+  filter?: Maybe<WithdrawalFilter>;
+};
+
+export type TransactionAggregateResult = {
+  __typename?: 'TransactionAggregateResult';
+  blockIndexAvg?: Maybe<Scalars['Float']>;
+  blockIndexMax?: Maybe<Scalars['Int']>;
+  blockIndexMin?: Maybe<Scalars['Int']>;
+  blockIndexSum?: Maybe<Scalars['Int']>;
+  count?: Maybe<Scalars['Int']>;
+  depositMax?: Maybe<Scalars['String']>;
+  depositMin?: Maybe<Scalars['String']>;
+  feeMax?: Maybe<Scalars['String']>;
+  feeMin?: Maybe<Scalars['String']>;
+  hashMax?: Maybe<Scalars['String']>;
+  hashMin?: Maybe<Scalars['String']>;
+  invalidBeforeAvg?: Maybe<Scalars['Float']>;
+  invalidBeforeMax?: Maybe<Scalars['Int']>;
+  invalidBeforeMin?: Maybe<Scalars['Int']>;
+  invalidBeforeSum?: Maybe<Scalars['Int']>;
+  invalidHereafterAvg?: Maybe<Scalars['Float']>;
+  invalidHereafterMax?: Maybe<Scalars['Int']>;
+  invalidHereafterMin?: Maybe<Scalars['Int']>;
+  invalidHereafterSum?: Maybe<Scalars['Int']>;
+  sizeAvg?: Maybe<Scalars['Float']>;
+  sizeMax?: Maybe<Scalars['Int']>;
+  sizeMin?: Maybe<Scalars['Int']>;
+  sizeSum?: Maybe<Scalars['Int']>;
+  totalOutputCoinMax?: Maybe<Scalars['String']>;
+  totalOutputCoinMin?: Maybe<Scalars['String']>;
+};
+
+export type TransactionFilter = {
+  and?: Maybe<Array<Maybe<TransactionFilter>>>;
+  has?: Maybe<Array<Maybe<TransactionHasFilter>>>;
+  hash?: Maybe<StringHashFilter>;
+  not?: Maybe<TransactionFilter>;
+  or?: Maybe<Array<Maybe<TransactionFilter>>>;
+};
+
+export enum TransactionHasFilter {
+  AuxiliaryData = 'auxiliaryData',
+  Block = 'block',
+  BlockIndex = 'blockIndex',
+  Collateral = 'collateral',
+  Deposit = 'deposit',
+  Fee = 'fee',
+  Hash = 'hash',
+  Inputs = 'inputs',
+  InvalidBefore = 'invalidBefore',
+  InvalidHereafter = 'invalidHereafter',
+  Mint = 'mint',
+  Outputs = 'outputs',
+  Redeemers = 'redeemers',
+  Size = 'size',
+  TotalOutputCoin = 'totalOutputCoin',
+  ValidContract = 'validContract',
+  Withdrawals = 'withdrawals'
+}
+
+export type TransactionInput = {
+  __typename?: 'TransactionInput';
+  address: Scalars['String'];
+  index: Scalars['Int'];
+  redeemer?: Maybe<Redeemer>;
+  transaction: Transaction;
+  value: Value;
+};
+
+
+export type TransactionInputRedeemerArgs = {
+  filter?: Maybe<RedeemerFilter>;
+};
+
+
+export type TransactionInputTransactionArgs = {
+  filter?: Maybe<TransactionFilter>;
+};
+
+
+export type TransactionInputValueArgs = {
+  filter?: Maybe<ValueFilter>;
+};
+
+export type TransactionInputAggregateResult = {
+  __typename?: 'TransactionInputAggregateResult';
+  addressMax?: Maybe<Scalars['String']>;
+  addressMin?: Maybe<Scalars['String']>;
+  count?: Maybe<Scalars['Int']>;
+  indexAvg?: Maybe<Scalars['Float']>;
+  indexMax?: Maybe<Scalars['Int']>;
+  indexMin?: Maybe<Scalars['Int']>;
+  indexSum?: Maybe<Scalars['Int']>;
+};
+
+export type TransactionInputFilter = {
+  and?: Maybe<Array<Maybe<TransactionInputFilter>>>;
+  has?: Maybe<Array<Maybe<TransactionInputHasFilter>>>;
+  not?: Maybe<TransactionInputFilter>;
+  or?: Maybe<Array<Maybe<TransactionInputFilter>>>;
+};
+
+export enum TransactionInputHasFilter {
+  Address = 'address',
+  Index = 'index',
+  Redeemer = 'redeemer',
+  Transaction = 'transaction',
+  Value = 'value'
+}
+
+export type TransactionInputOrder = {
+  asc?: Maybe<TransactionInputOrderable>;
+  desc?: Maybe<TransactionInputOrderable>;
+  then?: Maybe<TransactionInputOrder>;
+};
+
+export enum TransactionInputOrderable {
+  Address = 'address',
+  Index = 'index'
+}
+
+export type TransactionInputPatch = {
+  address?: Maybe<Scalars['String']>;
+  index?: Maybe<Scalars['Int']>;
+  redeemer?: Maybe<RedeemerRef>;
+  transaction?: Maybe<TransactionRef>;
+  value?: Maybe<ValueRef>;
+};
+
+export type TransactionInputRef = {
+  address?: Maybe<Scalars['String']>;
+  index?: Maybe<Scalars['Int']>;
+  redeemer?: Maybe<RedeemerRef>;
+  transaction?: Maybe<TransactionRef>;
+  value?: Maybe<ValueRef>;
+};
+
+export type TransactionOrder = {
+  asc?: Maybe<TransactionOrderable>;
+  desc?: Maybe<TransactionOrderable>;
+  then?: Maybe<TransactionOrder>;
+};
+
+export enum TransactionOrderable {
+  BlockIndex = 'blockIndex',
+  Deposit = 'deposit',
+  Fee = 'fee',
+  Hash = 'hash',
+  InvalidBefore = 'invalidBefore',
+  InvalidHereafter = 'invalidHereafter',
+  Size = 'size',
+  TotalOutputCoin = 'totalOutputCoin'
+}
+
+export type TransactionOutput = {
+  __typename?: 'TransactionOutput';
+  address: Scalars['String'];
+  addressHasScript: Scalars['Boolean'];
+  index: Scalars['Int'];
+  transaction: Transaction;
+  value: Value;
+};
+
+
+export type TransactionOutputTransactionArgs = {
+  filter?: Maybe<TransactionFilter>;
+};
+
+
+export type TransactionOutputValueArgs = {
+  filter?: Maybe<ValueFilter>;
+};
+
+export type TransactionOutputAggregateResult = {
+  __typename?: 'TransactionOutputAggregateResult';
+  addressMax?: Maybe<Scalars['String']>;
+  addressMin?: Maybe<Scalars['String']>;
+  count?: Maybe<Scalars['Int']>;
+  indexAvg?: Maybe<Scalars['Float']>;
+  indexMax?: Maybe<Scalars['Int']>;
+  indexMin?: Maybe<Scalars['Int']>;
+  indexSum?: Maybe<Scalars['Int']>;
+};
+
+export type TransactionOutputFilter = {
+  and?: Maybe<Array<Maybe<TransactionOutputFilter>>>;
+  has?: Maybe<Array<Maybe<TransactionOutputHasFilter>>>;
+  not?: Maybe<TransactionOutputFilter>;
+  or?: Maybe<Array<Maybe<TransactionOutputFilter>>>;
+};
+
+export enum TransactionOutputHasFilter {
+  Address = 'address',
+  AddressHasScript = 'addressHasScript',
+  Index = 'index',
+  Transaction = 'transaction',
+  Value = 'value'
+}
+
+export type TransactionOutputOrder = {
+  asc?: Maybe<TransactionOutputOrderable>;
+  desc?: Maybe<TransactionOutputOrderable>;
+  then?: Maybe<TransactionOutputOrder>;
+};
+
+export enum TransactionOutputOrderable {
+  Address = 'address',
+  Index = 'index'
+}
+
+export type TransactionOutputPatch = {
+  address?: Maybe<Scalars['String']>;
+  addressHasScript?: Maybe<Scalars['Boolean']>;
+  index?: Maybe<Scalars['Int']>;
+  transaction?: Maybe<TransactionRef>;
+  value?: Maybe<ValueRef>;
+};
+
+export type TransactionOutputRef = {
+  address?: Maybe<Scalars['String']>;
+  addressHasScript?: Maybe<Scalars['Boolean']>;
+  index?: Maybe<Scalars['Int']>;
+  transaction?: Maybe<TransactionRef>;
+  value?: Maybe<ValueRef>;
+};
+
+export type TransactionPatch = {
+  auxiliaryData?: Maybe<AuxiliaryDataRef>;
+  block?: Maybe<BlockRef>;
+  blockIndex?: Maybe<Scalars['Int']>;
+  collateral?: Maybe<Array<TransactionInputRef>>;
+  deposit?: Maybe<Scalars['String']>;
+  fee?: Maybe<Scalars['String']>;
+  inputs?: Maybe<Array<TransactionInputRef>>;
+  invalidBefore?: Maybe<Scalars['Int']>;
+  invalidHereafter?: Maybe<Scalars['Int']>;
+  mint?: Maybe<Array<TokenRef>>;
+  outputs?: Maybe<Array<TransactionOutputRef>>;
+  redeemers?: Maybe<Array<RedeemerRef>>;
+  size?: Maybe<Scalars['Int']>;
+  totalOutputCoin?: Maybe<Scalars['String']>;
+  validContract?: Maybe<Scalars['Boolean']>;
+  withdrawals?: Maybe<Array<WithdrawalRef>>;
+};
+
+export type TransactionRef = {
+  auxiliaryData?: Maybe<AuxiliaryDataRef>;
+  block?: Maybe<BlockRef>;
+  blockIndex?: Maybe<Scalars['Int']>;
+  collateral?: Maybe<Array<TransactionInputRef>>;
+  deposit?: Maybe<Scalars['String']>;
+  fee?: Maybe<Scalars['String']>;
+  hash?: Maybe<Scalars['String']>;
+  inputs?: Maybe<Array<TransactionInputRef>>;
+  invalidBefore?: Maybe<Scalars['Int']>;
+  invalidHereafter?: Maybe<Scalars['Int']>;
+  mint?: Maybe<Array<TokenRef>>;
+  outputs?: Maybe<Array<TransactionOutputRef>>;
+  redeemers?: Maybe<Array<RedeemerRef>>;
+  size?: Maybe<Scalars['Int']>;
+  totalOutputCoin?: Maybe<Scalars['String']>;
+  validContract?: Maybe<Scalars['Boolean']>;
+  withdrawals?: Maybe<Array<WithdrawalRef>>;
+};
+
+export type UpdateActiveStakeInput = {
+  filter: ActiveStakeFilter;
+  remove?: Maybe<ActiveStakePatch>;
+  set?: Maybe<ActiveStakePatch>;
+};
+
+export type UpdateActiveStakePayload = {
+  __typename?: 'UpdateActiveStakePayload';
+  activeStake?: Maybe<Array<Maybe<ActiveStake>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type UpdateActiveStakePayloadActiveStakeArgs = {
+  filter?: Maybe<ActiveStakeFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ActiveStakeOrder>;
+};
+
+export type UpdateAdaPotsInput = {
+  filter: AdaPotsFilter;
+  remove?: Maybe<AdaPotsPatch>;
+  set?: Maybe<AdaPotsPatch>;
+};
+
+export type UpdateAdaPotsPayload = {
+  __typename?: 'UpdateAdaPotsPayload';
+  adaPots?: Maybe<Array<Maybe<AdaPots>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type UpdateAdaPotsPayloadAdaPotsArgs = {
+  filter?: Maybe<AdaPotsFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<AdaPotsOrder>;
+};
+
+export type UpdateAlonzoGenesisInput = {
+  filter: AlonzoGenesisFilter;
+  remove?: Maybe<AlonzoGenesisPatch>;
+  set?: Maybe<AlonzoGenesisPatch>;
+};
+
+export type UpdateAlonzoGenesisPayload = {
+  __typename?: 'UpdateAlonzoGenesisPayload';
+  alonzoGenesis?: Maybe<Array<Maybe<AlonzoGenesis>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type UpdateAlonzoGenesisPayloadAlonzoGenesisArgs = {
+  filter?: Maybe<AlonzoGenesisFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<AlonzoGenesisOrder>;
+};
+
+export type UpdateAssetInput = {
+  filter: AssetFilter;
+  remove?: Maybe<AssetPatch>;
+  set?: Maybe<AssetPatch>;
+};
+
+export type UpdateAssetPayload = {
+  __typename?: 'UpdateAssetPayload';
+  asset?: Maybe<Array<Maybe<Asset>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type UpdateAssetPayloadAssetArgs = {
+  filter?: Maybe<AssetFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<AssetOrder>;
+};
+
+export type UpdateAuxiliaryDataBodyInput = {
+  filter: AuxiliaryDataBodyFilter;
+  remove?: Maybe<AuxiliaryDataBodyPatch>;
+  set?: Maybe<AuxiliaryDataBodyPatch>;
+};
+
+export type UpdateAuxiliaryDataBodyPayload = {
+  __typename?: 'UpdateAuxiliaryDataBodyPayload';
+  auxiliaryDataBody?: Maybe<Array<Maybe<AuxiliaryDataBody>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type UpdateAuxiliaryDataBodyPayloadAuxiliaryDataBodyArgs = {
+  filter?: Maybe<AuxiliaryDataBodyFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+export type UpdateAuxiliaryDataInput = {
+  filter: AuxiliaryDataFilter;
+  remove?: Maybe<AuxiliaryDataPatch>;
+  set?: Maybe<AuxiliaryDataPatch>;
+};
+
+export type UpdateAuxiliaryDataPayload = {
+  __typename?: 'UpdateAuxiliaryDataPayload';
+  auxiliaryData?: Maybe<Array<Maybe<AuxiliaryData>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type UpdateAuxiliaryDataPayloadAuxiliaryDataArgs = {
+  filter?: Maybe<AuxiliaryDataFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<AuxiliaryDataOrder>;
+};
+
+export type UpdateBlockInput = {
+  filter: BlockFilter;
+  remove?: Maybe<BlockPatch>;
+  set?: Maybe<BlockPatch>;
+};
+
+export type UpdateBlockPayload = {
+  __typename?: 'UpdateBlockPayload';
+  block?: Maybe<Array<Maybe<Block>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type UpdateBlockPayloadBlockArgs = {
+  filter?: Maybe<BlockFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<BlockOrder>;
+};
+
+export type UpdateByronBlockVersionDataInput = {
+  filter: ByronBlockVersionDataFilter;
+  remove?: Maybe<ByronBlockVersionDataPatch>;
+  set?: Maybe<ByronBlockVersionDataPatch>;
+};
+
+export type UpdateByronBlockVersionDataPayload = {
+  __typename?: 'UpdateByronBlockVersionDataPayload';
+  byronBlockVersionData?: Maybe<Array<Maybe<ByronBlockVersionData>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type UpdateByronBlockVersionDataPayloadByronBlockVersionDataArgs = {
+  filter?: Maybe<ByronBlockVersionDataFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ByronBlockVersionDataOrder>;
+};
+
+export type UpdateByronGenesisInput = {
+  filter: ByronGenesisFilter;
+  remove?: Maybe<ByronGenesisPatch>;
+  set?: Maybe<ByronGenesisPatch>;
+};
+
+export type UpdateByronGenesisPayload = {
+  __typename?: 'UpdateByronGenesisPayload';
+  byronGenesis?: Maybe<Array<Maybe<ByronGenesis>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type UpdateByronGenesisPayloadByronGenesisArgs = {
+  filter?: Maybe<ByronGenesisFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ByronGenesisOrder>;
+};
+
+export type UpdateByronProtocolConstsInput = {
+  filter: ByronProtocolConstsFilter;
+  remove?: Maybe<ByronProtocolConstsPatch>;
+  set?: Maybe<ByronProtocolConstsPatch>;
+};
+
+export type UpdateByronProtocolConstsPayload = {
+  __typename?: 'UpdateByronProtocolConstsPayload';
+  byronProtocolConsts?: Maybe<Array<Maybe<ByronProtocolConsts>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type UpdateByronProtocolConstsPayloadByronProtocolConstsArgs = {
+  filter?: Maybe<ByronProtocolConstsFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ByronProtocolConstsOrder>;
+};
+
+export type UpdateByronSoftForkRuleInput = {
+  filter: ByronSoftForkRuleFilter;
+  remove?: Maybe<ByronSoftForkRulePatch>;
+  set?: Maybe<ByronSoftForkRulePatch>;
+};
+
+export type UpdateByronSoftForkRulePayload = {
+  __typename?: 'UpdateByronSoftForkRulePayload';
+  byronSoftForkRule?: Maybe<Array<Maybe<ByronSoftForkRule>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type UpdateByronSoftForkRulePayloadByronSoftForkRuleArgs = {
+  filter?: Maybe<ByronSoftForkRuleFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ByronSoftForkRuleOrder>;
+};
+
+export type UpdateByronTxFeePolicyInput = {
+  filter: ByronTxFeePolicyFilter;
+  remove?: Maybe<ByronTxFeePolicyPatch>;
+  set?: Maybe<ByronTxFeePolicyPatch>;
+};
+
+export type UpdateByronTxFeePolicyPayload = {
+  __typename?: 'UpdateByronTxFeePolicyPayload';
+  byronTxFeePolicy?: Maybe<Array<Maybe<ByronTxFeePolicy>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type UpdateByronTxFeePolicyPayloadByronTxFeePolicyArgs = {
+  filter?: Maybe<ByronTxFeePolicyFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ByronTxFeePolicyOrder>;
+};
+
+export type UpdateBytesMetadatumInput = {
+  filter: BytesMetadatumFilter;
+  remove?: Maybe<BytesMetadatumPatch>;
+  set?: Maybe<BytesMetadatumPatch>;
+};
+
+export type UpdateBytesMetadatumPayload = {
+  __typename?: 'UpdateBytesMetadatumPayload';
+  bytesMetadatum?: Maybe<Array<Maybe<BytesMetadatum>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type UpdateBytesMetadatumPayloadBytesMetadatumArgs = {
+  filter?: Maybe<BytesMetadatumFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<BytesMetadatumOrder>;
+};
+
+export type UpdateEpochInput = {
+  filter: EpochFilter;
+  remove?: Maybe<EpochPatch>;
+  set?: Maybe<EpochPatch>;
+};
+
+export type UpdateEpochPayload = {
+  __typename?: 'UpdateEpochPayload';
+  epoch?: Maybe<Array<Maybe<Epoch>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type UpdateEpochPayloadEpochArgs = {
+  filter?: Maybe<EpochFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<EpochOrder>;
+};
+
+export type UpdateExecutionPriceInput = {
+  filter: ExecutionPriceFilter;
+  remove?: Maybe<ExecutionPricePatch>;
+  set?: Maybe<ExecutionPricePatch>;
+};
+
+export type UpdateExecutionPricePayload = {
+  __typename?: 'UpdateExecutionPricePayload';
+  executionPrice?: Maybe<Array<Maybe<ExecutionPrice>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type UpdateExecutionPricePayloadExecutionPriceArgs = {
+  filter?: Maybe<ExecutionPriceFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ExecutionPriceOrder>;
+};
+
+export type UpdateExecutionPricesInput = {
+  filter: ExecutionPricesFilter;
+  remove?: Maybe<ExecutionPricesPatch>;
+  set?: Maybe<ExecutionPricesPatch>;
+};
+
+export type UpdateExecutionPricesPayload = {
+  __typename?: 'UpdateExecutionPricesPayload';
+  executionPrices?: Maybe<Array<Maybe<ExecutionPrices>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type UpdateExecutionPricesPayloadExecutionPricesArgs = {
+  filter?: Maybe<ExecutionPricesFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+export type UpdateExecutionUnitsInput = {
+  filter: ExecutionUnitsFilter;
+  remove?: Maybe<ExecutionUnitsPatch>;
+  set?: Maybe<ExecutionUnitsPatch>;
+};
+
+export type UpdateExecutionUnitsPayload = {
+  __typename?: 'UpdateExecutionUnitsPayload';
+  executionUnits?: Maybe<Array<Maybe<ExecutionUnits>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type UpdateExecutionUnitsPayloadExecutionUnitsArgs = {
+  filter?: Maybe<ExecutionUnitsFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ExecutionUnitsOrder>;
+};
+
 export type UpdateExtendedStakePoolMetadataFieldsInput = {
   filter: ExtendedStakePoolMetadataFieldsFilter;
   remove?: Maybe<ExtendedStakePoolMetadataFieldsPatch>;
@@ -2576,6 +8154,25 @@ export type UpdateFractionPayloadFractionArgs = {
   order?: Maybe<FractionOrder>;
 };
 
+export type UpdateGenesisInput = {
+  filter: GenesisFilter;
+  remove?: Maybe<GenesisPatch>;
+  set?: Maybe<GenesisPatch>;
+};
+
+export type UpdateGenesisPayload = {
+  __typename?: 'UpdateGenesisPayload';
+  genesis?: Maybe<Array<Maybe<Genesis>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type UpdateGenesisPayloadGenesisArgs = {
+  filter?: Maybe<GenesisFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
 export type UpdateItnVerificationInput = {
   filter: ItnVerificationFilter;
   remove?: Maybe<ItnVerificationPatch>;
@@ -2596,6 +8193,84 @@ export type UpdateItnVerificationPayloadITnVerificationArgs = {
   order?: Maybe<ItnVerificationOrder>;
 };
 
+export type UpdateIntegerMetadatumInput = {
+  filter: IntegerMetadatumFilter;
+  remove?: Maybe<IntegerMetadatumPatch>;
+  set?: Maybe<IntegerMetadatumPatch>;
+};
+
+export type UpdateIntegerMetadatumPayload = {
+  __typename?: 'UpdateIntegerMetadatumPayload';
+  integerMetadatum?: Maybe<Array<Maybe<IntegerMetadatum>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type UpdateIntegerMetadatumPayloadIntegerMetadatumArgs = {
+  filter?: Maybe<IntegerMetadatumFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<IntegerMetadatumOrder>;
+};
+
+export type UpdateKeyValueMetadatumInput = {
+  filter: KeyValueMetadatumFilter;
+  remove?: Maybe<KeyValueMetadatumPatch>;
+  set?: Maybe<KeyValueMetadatumPatch>;
+};
+
+export type UpdateKeyValueMetadatumPayload = {
+  __typename?: 'UpdateKeyValueMetadatumPayload';
+  keyValueMetadatum?: Maybe<Array<Maybe<KeyValueMetadatum>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type UpdateKeyValueMetadatumPayloadKeyValueMetadatumArgs = {
+  filter?: Maybe<KeyValueMetadatumFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<KeyValueMetadatumOrder>;
+};
+
+export type UpdateMetadatumArrayInput = {
+  filter: MetadatumArrayFilter;
+  remove?: Maybe<MetadatumArrayPatch>;
+  set?: Maybe<MetadatumArrayPatch>;
+};
+
+export type UpdateMetadatumArrayPayload = {
+  __typename?: 'UpdateMetadatumArrayPayload';
+  metadatumArray?: Maybe<Array<Maybe<MetadatumArray>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type UpdateMetadatumArrayPayloadMetadatumArrayArgs = {
+  filter?: Maybe<MetadatumArrayFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+export type UpdateMetadatumMapInput = {
+  filter: MetadatumMapFilter;
+  remove?: Maybe<MetadatumMapPatch>;
+  set?: Maybe<MetadatumMapPatch>;
+};
+
+export type UpdateMetadatumMapPayload = {
+  __typename?: 'UpdateMetadatumMapPayload';
+  metadatumMap?: Maybe<Array<Maybe<MetadatumMap>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type UpdateMetadatumMapPayloadMetadatumMapArgs = {
+  filter?: Maybe<MetadatumMapFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
 export type UpdatePoolContactDataInput = {
   filter: PoolContactDataFilter;
   remove?: Maybe<PoolContactDataPatch>;
@@ -2614,6 +8289,46 @@ export type UpdatePoolContactDataPayloadPoolContactDataArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<PoolContactDataOrder>;
+};
+
+export type UpdateProtocolParametersInput = {
+  filter: ProtocolParametersFilter;
+  remove?: Maybe<ProtocolParametersPatch>;
+  set?: Maybe<ProtocolParametersPatch>;
+};
+
+export type UpdateProtocolParametersPayload = {
+  __typename?: 'UpdateProtocolParametersPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  protocolParameters?: Maybe<Array<Maybe<ProtocolParameters>>>;
+};
+
+
+export type UpdateProtocolParametersPayloadProtocolParametersArgs = {
+  filter?: Maybe<ProtocolParametersFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ProtocolParametersOrder>;
+};
+
+export type UpdateRedeemerInput = {
+  filter: RedeemerFilter;
+  remove?: Maybe<RedeemerPatch>;
+  set?: Maybe<RedeemerPatch>;
+};
+
+export type UpdateRedeemerPayload = {
+  __typename?: 'UpdateRedeemerPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  redeemer?: Maybe<Array<Maybe<Redeemer>>>;
+};
+
+
+export type UpdateRedeemerPayloadRedeemerArgs = {
+  filter?: Maybe<RedeemerFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<RedeemerOrder>;
 };
 
 export type UpdateRelayByAddressInput = {
@@ -2674,6 +8389,86 @@ export type UpdateRelayByNamePayloadRelayByNameArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<RelayByNameOrder>;
+};
+
+export type UpdateScriptInput = {
+  filter: ScriptFilter;
+  remove?: Maybe<ScriptPatch>;
+  set?: Maybe<ScriptPatch>;
+};
+
+export type UpdateScriptPayload = {
+  __typename?: 'UpdateScriptPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  script?: Maybe<Array<Maybe<Script>>>;
+};
+
+
+export type UpdateScriptPayloadScriptArgs = {
+  filter?: Maybe<ScriptFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ScriptOrder>;
+};
+
+export type UpdateShelleyGenesisInput = {
+  filter: ShelleyGenesisFilter;
+  remove?: Maybe<ShelleyGenesisPatch>;
+  set?: Maybe<ShelleyGenesisPatch>;
+};
+
+export type UpdateShelleyGenesisPayload = {
+  __typename?: 'UpdateShelleyGenesisPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  shelleyGenesis?: Maybe<Array<Maybe<ShelleyGenesis>>>;
+};
+
+
+export type UpdateShelleyGenesisPayloadShelleyGenesisArgs = {
+  filter?: Maybe<ShelleyGenesisFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ShelleyGenesisOrder>;
+};
+
+export type UpdateShelleyGenesisStakingInput = {
+  filter: ShelleyGenesisStakingFilter;
+  remove?: Maybe<ShelleyGenesisStakingPatch>;
+  set?: Maybe<ShelleyGenesisStakingPatch>;
+};
+
+export type UpdateShelleyGenesisStakingPayload = {
+  __typename?: 'UpdateShelleyGenesisStakingPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  shelleyGenesisStaking?: Maybe<Array<Maybe<ShelleyGenesisStaking>>>;
+};
+
+
+export type UpdateShelleyGenesisStakingPayloadShelleyGenesisStakingArgs = {
+  filter?: Maybe<ShelleyGenesisStakingFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ShelleyGenesisStakingOrder>;
+};
+
+export type UpdateSlotInput = {
+  filter: SlotFilter;
+  remove?: Maybe<SlotPatch>;
+  set?: Maybe<SlotPatch>;
+};
+
+export type UpdateSlotPayload = {
+  __typename?: 'UpdateSlotPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  slot?: Maybe<Array<Maybe<Slot>>>;
+};
+
+
+export type UpdateSlotPayloadSlotArgs = {
+  filter?: Maybe<SlotFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<SlotOrder>;
 };
 
 export type UpdateStakePoolInput = {
@@ -2815,6 +8610,26 @@ export type UpdateStakePoolTransactionsPayloadStakePoolTransactionsArgs = {
   offset?: Maybe<Scalars['Int']>;
 };
 
+export type UpdateStringMetadatumInput = {
+  filter: StringMetadatumFilter;
+  remove?: Maybe<StringMetadatumPatch>;
+  set?: Maybe<StringMetadatumPatch>;
+};
+
+export type UpdateStringMetadatumPayload = {
+  __typename?: 'UpdateStringMetadatumPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  stringMetadatum?: Maybe<Array<Maybe<StringMetadatum>>>;
+};
+
+
+export type UpdateStringMetadatumPayloadStringMetadatumArgs = {
+  filter?: Maybe<StringMetadatumFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<StringMetadatumOrder>;
+};
+
 export type UpdateThePoolsMediaAssetsInput = {
   filter: ThePoolsMediaAssetsFilter;
   remove?: Maybe<ThePoolsMediaAssetsPatch>;
@@ -2833,6 +8648,249 @@ export type UpdateThePoolsMediaAssetsPayloadThePoolsMediaAssetsArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<ThePoolsMediaAssetsOrder>;
+};
+
+export type UpdateTokenInput = {
+  filter: TokenFilter;
+  remove?: Maybe<TokenPatch>;
+  set?: Maybe<TokenPatch>;
+};
+
+export type UpdateTokenPayload = {
+  __typename?: 'UpdateTokenPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  token?: Maybe<Array<Maybe<Token>>>;
+};
+
+
+export type UpdateTokenPayloadTokenArgs = {
+  filter?: Maybe<TokenFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<TokenOrder>;
+};
+
+export type UpdateTransactionInput = {
+  filter: TransactionFilter;
+  remove?: Maybe<TransactionPatch>;
+  set?: Maybe<TransactionPatch>;
+};
+
+export type UpdateTransactionInputInput = {
+  filter: TransactionInputFilter;
+  remove?: Maybe<TransactionInputPatch>;
+  set?: Maybe<TransactionInputPatch>;
+};
+
+export type UpdateTransactionInputPayload = {
+  __typename?: 'UpdateTransactionInputPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  transactionInput?: Maybe<Array<Maybe<TransactionInput>>>;
+};
+
+
+export type UpdateTransactionInputPayloadTransactionInputArgs = {
+  filter?: Maybe<TransactionInputFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<TransactionInputOrder>;
+};
+
+export type UpdateTransactionOutputInput = {
+  filter: TransactionOutputFilter;
+  remove?: Maybe<TransactionOutputPatch>;
+  set?: Maybe<TransactionOutputPatch>;
+};
+
+export type UpdateTransactionOutputPayload = {
+  __typename?: 'UpdateTransactionOutputPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  transactionOutput?: Maybe<Array<Maybe<TransactionOutput>>>;
+};
+
+
+export type UpdateTransactionOutputPayloadTransactionOutputArgs = {
+  filter?: Maybe<TransactionOutputFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<TransactionOutputOrder>;
+};
+
+export type UpdateTransactionPayload = {
+  __typename?: 'UpdateTransactionPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  transaction?: Maybe<Array<Maybe<Transaction>>>;
+};
+
+
+export type UpdateTransactionPayloadTransactionArgs = {
+  filter?: Maybe<TransactionFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<TransactionOrder>;
+};
+
+export type UpdateValueInput = {
+  filter: ValueFilter;
+  remove?: Maybe<ValuePatch>;
+  set?: Maybe<ValuePatch>;
+};
+
+export type UpdateValuePayload = {
+  __typename?: 'UpdateValuePayload';
+  numUids?: Maybe<Scalars['Int']>;
+  value?: Maybe<Array<Maybe<Value>>>;
+};
+
+
+export type UpdateValuePayloadValueArgs = {
+  filter?: Maybe<ValueFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ValueOrder>;
+};
+
+export type UpdateWithdrawalInput = {
+  filter: WithdrawalFilter;
+  remove?: Maybe<WithdrawalPatch>;
+  set?: Maybe<WithdrawalPatch>;
+};
+
+export type UpdateWithdrawalPayload = {
+  __typename?: 'UpdateWithdrawalPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  withdrawal?: Maybe<Array<Maybe<Withdrawal>>>;
+};
+
+
+export type UpdateWithdrawalPayloadWithdrawalArgs = {
+  filter?: Maybe<WithdrawalFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<WithdrawalOrder>;
+};
+
+export type Value = {
+  __typename?: 'Value';
+  assets?: Maybe<Array<Token>>;
+  assetsAggregate?: Maybe<TokenAggregateResult>;
+  coin: Scalars['String'];
+};
+
+
+export type ValueAssetsArgs = {
+  filter?: Maybe<TokenFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<TokenOrder>;
+};
+
+
+export type ValueAssetsAggregateArgs = {
+  filter?: Maybe<TokenFilter>;
+};
+
+export type ValueAggregateResult = {
+  __typename?: 'ValueAggregateResult';
+  coinMax?: Maybe<Scalars['String']>;
+  coinMin?: Maybe<Scalars['String']>;
+  count?: Maybe<Scalars['Int']>;
+};
+
+export type ValueFilter = {
+  and?: Maybe<Array<Maybe<ValueFilter>>>;
+  has?: Maybe<Array<Maybe<ValueHasFilter>>>;
+  not?: Maybe<ValueFilter>;
+  or?: Maybe<Array<Maybe<ValueFilter>>>;
+};
+
+export enum ValueHasFilter {
+  Assets = 'assets',
+  Coin = 'coin'
+}
+
+export type ValueOrder = {
+  asc?: Maybe<ValueOrderable>;
+  desc?: Maybe<ValueOrderable>;
+  then?: Maybe<ValueOrder>;
+};
+
+export enum ValueOrderable {
+  Coin = 'coin'
+}
+
+export type ValuePatch = {
+  assets?: Maybe<Array<TokenRef>>;
+  coin?: Maybe<Scalars['String']>;
+};
+
+export type ValueRef = {
+  assets?: Maybe<Array<TokenRef>>;
+  coin?: Maybe<Scalars['String']>;
+};
+
+export type Withdrawal = {
+  __typename?: 'Withdrawal';
+  quantity: Scalars['String'];
+  redeemer?: Maybe<Scalars['String']>;
+  rewardAccount: Scalars['String'];
+  transaction: Transaction;
+};
+
+
+export type WithdrawalTransactionArgs = {
+  filter?: Maybe<TransactionFilter>;
+};
+
+export type WithdrawalAggregateResult = {
+  __typename?: 'WithdrawalAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+  quantityMax?: Maybe<Scalars['String']>;
+  quantityMin?: Maybe<Scalars['String']>;
+  redeemerMax?: Maybe<Scalars['String']>;
+  redeemerMin?: Maybe<Scalars['String']>;
+  rewardAccountMax?: Maybe<Scalars['String']>;
+  rewardAccountMin?: Maybe<Scalars['String']>;
+};
+
+export type WithdrawalFilter = {
+  and?: Maybe<Array<Maybe<WithdrawalFilter>>>;
+  has?: Maybe<Array<Maybe<WithdrawalHasFilter>>>;
+  not?: Maybe<WithdrawalFilter>;
+  or?: Maybe<Array<Maybe<WithdrawalFilter>>>;
+};
+
+export enum WithdrawalHasFilter {
+  Quantity = 'quantity',
+  Redeemer = 'redeemer',
+  RewardAccount = 'rewardAccount',
+  Transaction = 'transaction'
+}
+
+export type WithdrawalOrder = {
+  asc?: Maybe<WithdrawalOrderable>;
+  desc?: Maybe<WithdrawalOrderable>;
+  then?: Maybe<WithdrawalOrder>;
+};
+
+export enum WithdrawalOrderable {
+  Quantity = 'quantity',
+  Redeemer = 'redeemer',
+  RewardAccount = 'rewardAccount'
+}
+
+export type WithdrawalPatch = {
+  quantity?: Maybe<Scalars['String']>;
+  redeemer?: Maybe<Scalars['String']>;
+  rewardAccount?: Maybe<Scalars['String']>;
+  transaction?: Maybe<TransactionRef>;
+};
+
+export type WithdrawalRef = {
+  quantity?: Maybe<Scalars['String']>;
+  redeemer?: Maybe<Scalars['String']>;
+  rewardAccount?: Maybe<Scalars['String']>;
+  transaction?: Maybe<TransactionRef>;
 };
 
 export type WithinFilter = {
@@ -2855,6 +8913,11 @@ export type StakePoolsQueryVariables = Exact<{
 
 
 export type StakePoolsQuery = { __typename?: 'Query', queryStakePool?: Array<{ __typename?: 'StakePool', id: string, hexId: string, status: StakePoolStatus, owners: Array<string>, cost: string, vrf: string, rewardAccount: string, pledge: string, margin: { __typename?: 'Fraction', numerator: number, denominator: number }, relays: Array<{ __typename: 'RelayByAddress', ipv4?: string | null | undefined, ipv6?: string | null | undefined, port?: number | null | undefined } | { __typename: 'RelayByName', hostname: string, port?: number | null | undefined } | { __typename: 'RelayByNameMultihost', dnsName: string }>, metrics: { __typename?: 'StakePoolMetrics', blocksCreated: number, livePledge: string, saturation: number, delegators: number, stake: { __typename?: 'StakePoolMetricsStake', live: string, active: string }, size: { __typename?: 'StakePoolMetricsSize', live: number, active: number } }, transactions: { __typename?: 'StakePoolTransactions', registration: Array<string>, retirement: Array<string> }, metadataJson?: { __typename?: 'StakePoolMetadataJson', hash: string, url: string } | null | undefined, metadata?: { __typename?: 'StakePoolMetadata', ticker: string, name: string, description: string, homepage: string, extDataUrl?: string | null | undefined, extSigUrl?: string | null | undefined, extVkey?: string | null | undefined, ext?: { __typename?: 'ExtendedStakePoolMetadata', serial: number, pool: { __typename?: 'ExtendedStakePoolMetadataFields', id: string, country?: string | null | undefined, status?: ExtendedPoolStatus | null | undefined, contact?: { __typename?: 'PoolContactData', primary: string, email?: string | null | undefined, facebook?: string | null | undefined, github?: string | null | undefined, feed?: string | null | undefined, telegram?: string | null | undefined, twitter?: string | null | undefined } | null | undefined, media_assets?: { __typename?: 'ThePoolsMediaAssets', icon_png_64x64: string, logo_png?: string | null | undefined, logo_svg?: string | null | undefined, color_fg?: string | null | undefined, color_bg?: string | null | undefined } | null | undefined, itn?: { __typename?: 'ITNVerification', owner: string, witness: string } | null | undefined } } | null | undefined } | null | undefined } | null | undefined> | null | undefined };
+
+export type TipQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type TipQuery = { __typename?: 'Query', queryBlock?: Array<{ __typename?: 'Block', hash: string, blockNo: number, slot: { __typename?: 'Slot', number: number } } | null | undefined> | null | undefined };
 
 export const AllStakePoolFieldsFragmentDoc = gql`
     fragment allStakePoolFields on StakePool {
@@ -2964,6 +9027,17 @@ export const StakePoolsDocument = gql`
   }
 }
     ${AllStakePoolFieldsFragmentDoc}`;
+export const TipDocument = gql`
+    query Tip {
+  queryBlock(order: {desc: blockNo}, first: 1) {
+    slot {
+      number
+    }
+    hash
+    blockNo
+  }
+}
+    `;
 
 export type SdkFunctionWrapper = <T>(action: (requestHeaders?:Record<string, string>) => Promise<T>, operationName: string) => Promise<T>;
 
@@ -2977,6 +9051,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     StakePools(variables: StakePoolsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<StakePoolsQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<StakePoolsQuery>(StakePoolsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'StakePools');
+    },
+    Tip(variables?: TipQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<TipQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<TipQuery>(TipDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'Tip');
     }
   };
 }

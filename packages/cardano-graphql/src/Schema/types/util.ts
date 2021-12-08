@@ -8,3 +8,5 @@ export type BigIntsAsStrings<T> = bigint extends T
   : {
       [K in keyof T]: T[K] extends (infer U)[] ? BigIntsAsStrings<U>[] : BigIntsAsStrings<T[K]>;
     };
+
+export type Json = string;
