@@ -1,15 +1,6 @@
-import {
-  Cardano,
-  InvalidStringError,
-  ProviderError,
-  ProviderFailure,
-  StakePoolSearchProvider,
-  util
-} from '@cardano-sdk/core';
-import { GraphQLClient } from 'graphql-request';
+import { Cardano, StakePoolSearchProvider, util } from '@cardano-sdk/core';
+import { createProvider } from '../util';
 import { getSdk } from '../sdk';
-
-export type GraphQLClien = GraphQLClient['options'];
 
 type Awaited<T> = T extends PromiseLike<infer U> ? U : T;
 type GraphqlStakePool = NonNullable<
@@ -63,31 +54,18 @@ const toCoreStakePool = (responseStakePool: GraphqlStakePool) => {
   };
 };
 
-export const createGraphQLStakePoolSearchProvider = (
-  url: string,
-  options?: RequestInit,
-  initSdk = getSdk
-): StakePoolSearchProvider => {
-  const graphQLClient = new GraphQLClient(url, options);
-  const sdk = initSdk(graphQLClient);
-  return {
-    async queryStakePools(fragments: string[]): Promise<Cardano.StakePool[]> {
-      const query = fragments.join(' ');
-      try {
-        const byStakePoolFields = (await sdk.StakePools({ query })).queryStakePool?.filter(util.isNotNil);
-        const byMetadataFields = await sdk.StakePoolsByMetadata({
-          omit: byStakePoolFields?.length ? byStakePoolFields?.map((sp) => sp.id) : undefined,
-          query
-        });
-        const responseStakePools = [
-          ...(byStakePoolFields || []),
-          ...(byMetadataFields.queryStakePoolMetadata || []).map((sp) => sp?.stakePool)
-        ].filter(util.isNotNil);
-        return responseStakePools.map(toCoreStakePool);
-      } catch (error) {
-        const failure = error instanceof InvalidStringError ? ProviderFailure.InvalidResponse : ProviderFailure.Unknown;
-        throw new ProviderError(failure, error);
-      }
-    }
-  };
-};
+export const createGraphQLStakePoolSearchProvider = createProvider<StakePoolSearchProvider>((sdk) => ({
+  async queryStakePools(fragments: string[]): Promise<Cardano.StakePool[]> {
+    const query = fragments.join(' ');
+    const byStakePoolFields = (await sdk.StakePools({ query })).queryStakePool?.filter(util.isNotNil);
+    const byMetadataFields = await sdk.StakePoolsByMetadata({
+      omit: byStakePoolFields?.length ? byStakePoolFields?.map((sp) => sp.id) : undefined,
+      query
+    });
+    const responseStakePools = [
+      ...(byStakePoolFields || []),
+      ...(byMetadataFields.queryStakePoolMetadata || []).map((sp) => sp?.stakePool)
+    ].filter(util.isNotNil);
+    return responseStakePools.map(toCoreStakePool);
+  }
+}));

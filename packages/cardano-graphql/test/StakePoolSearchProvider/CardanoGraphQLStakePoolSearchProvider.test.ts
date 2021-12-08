@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { ExtendedPoolStatus, StakePoolStatus, StakePoolsByMetadataQuery, StakePoolsQuery } from '../../src/sdk';
+import { ExtendedPoolStatus, Sdk, StakePoolStatus, StakePoolsByMetadataQuery, StakePoolsQuery } from '../../src/sdk';
 import { InvalidStringError, ProviderError, ProviderFailure, StakePoolSearchProvider } from '@cardano-sdk/core';
 import { createGraphQLStakePoolSearchProvider } from '../../src/StakePoolSearchProvider/CardanoGraphQLStakePoolSearchProvider';
 
@@ -10,7 +10,7 @@ describe('StakePoolSearchClient', () => {
     StakePoolsByMetadata: jest.fn()
   };
   beforeEach(() => {
-    client = createGraphQLStakePoolSearchProvider('http://someurl.com', undefined, () => sdk);
+    client = createGraphQLStakePoolSearchProvider('http://someurl.com', undefined, () => sdk as unknown as Sdk);
   });
   afterEach(() => {
     sdk.StakePools.mockReset();
