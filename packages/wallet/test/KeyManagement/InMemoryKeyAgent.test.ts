@@ -5,12 +5,14 @@ import { KeyManagement } from '../../src';
 describe('InMemoryKeyAgent', () => {
   let keyAgent: KeyManagement.InMemoryKeyAgent;
   let getPassword: jest.Mock;
+  let mnemonicWords: string[];
 
   beforeEach(async () => {
+    mnemonicWords = KeyManagement.util.generateMnemonicWords();
     getPassword = jest.fn().mockResolvedValue(Buffer.from('password'));
     keyAgent = await KeyManagement.InMemoryKeyAgent.fromBip39MnemonicWords({
       getPassword,
-      mnemonicWords: KeyManagement.util.generateMnemonicWords(),
+      mnemonicWords,
       networkId: Cardano.NetworkId.testnet
     });
   });
@@ -27,6 +29,16 @@ describe('InMemoryKeyAgent', () => {
 
   test('accountIndex', () => {
     expect(typeof keyAgent.accountIndex).toBe('number');
+  });
+
+  test('fromBip39MnemonicWords with "mnemonic2ndFactorPassphrase" results in different key', async () => {
+    const saferKeyAgent = await KeyManagement.InMemoryKeyAgent.fromBip39MnemonicWords({
+      getPassword,
+      mnemonic2ndFactorPassphrase: Buffer.from('passphrase'),
+      mnemonicWords,
+      networkId: Cardano.NetworkId.testnet
+    });
+    expect(await saferKeyAgent.exportRootPrivateKey()).not.toEqual(await keyAgent.exportRootPrivateKey());
   });
 
   describe('serializableData', () => {
