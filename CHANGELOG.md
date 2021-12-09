@@ -2,6 +2,41 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.2.0](https://github.com/input-output-hk/cardano-js-sdk/compare/0.1.8...0.2.0) (2021-12-09)
+
+
+### ⚠ BREAKING CHANGES
+
+* **cip2:** update interfaces to use core package types instead of CSL
+* **wallet:** rename KeyManagement types, improve test coverage
+* **wallet:** use emip3 key encryption, refactor KeyManager to support hw wallets (wip)
+
+### Features
+
+* **blockfrost:** wrap submitTx error in UnknownTxSubmissionError ([8244f6b](https://github.com/input-output-hk/cardano-js-sdk/commit/8244f6b814b4483e3d0c279573f3ee360e358134))
+* **core:** add Bip32PublicKey and Bip32PrivateKey types, export Witness.Signatures type ([999c33f](https://github.com/input-output-hk/cardano-js-sdk/commit/999c33f03e82f302c68ce8b1685bfc6e44e1621e))
+* **core:** add coreToCsl.tokenMap ([e864228](https://github.com/input-output-hk/cardano-js-sdk/commit/e86422822faa2d1ddf72d5eed1956b34dcdfef7f))
+* **core:** add utils for custom string types, safer pool id types ([bd430f6](https://github.com/input-output-hk/cardano-js-sdk/commit/bd430f6d1db5ff3c1f3a78317b68811eb4794b6e))
+* **core:** export TxSubmissionError type and its variants ([d562a61](https://github.com/input-output-hk/cardano-js-sdk/commit/d562a619b97ae3f8b3d5e92f2f4cb3b4bd6a73ca))
+* **util-dev:** add utils to create TxIn/TxOut/Utxo, refactor SelectionConstraints to use core types ([021087e](https://github.com/input-output-hk/cardano-js-sdk/commit/021087e7d3b0ca3de0fbc1bdc9438a6a00a4a07e))
+* **wallet:** add 'inputSelection' to initializeTx result ([15a28b3](https://github.com/input-output-hk/cardano-js-sdk/commit/15a28b3ad3f37f433c2acf43266ee0957b4a645a))
+* **wallet:** add emip3 encryption util ([7ceee7a](https://github.com/input-output-hk/cardano-js-sdk/commit/7ceee7a469905e6faf070c6dde4aa748b10b5649))
+* **wallet:** add KeyManagement.cachedGetPassword util ([0594492](https://github.com/input-output-hk/cardano-js-sdk/commit/0594492a4489ac12115a6437e5256e6c7c82dcab))
+* **wallet:** add Wallet.validateTx ([a752da3](https://github.com/input-output-hk/cardano-js-sdk/commit/a752da3af5e82c9a1fe83701925bc4db44fe10cf))
+* **wallet:** include TxSubmissionError in Wallet.transactions.outgoing.failed$ ([1c0a86d](https://github.com/input-output-hk/cardano-js-sdk/commit/1c0a86db0f425561467cd0f05d9b5ed80b90f431))
+* **wallet:** use emip3 key encryption, refactor KeyManager to support hw wallets (wip) ([961ac26](https://github.com/input-output-hk/cardano-js-sdk/commit/961ac2682c436cf894b401f7d1939e26574f9a6f))
+
+
+### Bug Fixes
+
+* **blockfrost:** ensure tx metadata number type aligns with core ([ad0eafd](https://github.com/input-output-hk/cardano-js-sdk/commit/ad0eafdeb0953f96ea201b1d0f9a10080ca2b71e))
+* change stakepool metadata extVkey field type to bech32 string ([ec523a7](https://github.com/input-output-hk/cardano-js-sdk/commit/ec523a78e62ba30c4297ccd71eb6070dbd58acc3))
+* **wallet:** subscribing after initial fetch of tip will no longer wait for new block to emit ([c00d9a7](https://github.com/input-output-hk/cardano-js-sdk/commit/c00d9a778dcef073770e9976f030ccd012a1cd8e))
+
+
+* **cip2:** update interfaces to use core package types instead of CSL ([5c66d32](https://github.com/input-output-hk/cardano-js-sdk/commit/5c66d32fdc58100a2b0807a0470342d54a3989ed))
+* **wallet:** rename KeyManagement types, improve test coverage ([2742eca](https://github.com/input-output-hk/cardano-js-sdk/commit/2742ecab0643fa1badf1e7df2dfede2617c60635))
+
 ### [0.1.8](https://github.com/input-output-hk/cardano-js-sdk/compare/0.1.7...0.1.8) (2021-11-22)
 
 
