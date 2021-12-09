@@ -23,13 +23,10 @@ export interface InMemoryKeyAgentProps {
 export interface FromBip39MnemonicWordsProps {
   networkId: Cardano.NetworkId;
   mnemonicWords: string[];
+  mnemonic2ndFactorPassphrase?: Uint8Array;
   getPassword: GetPassword;
   accountIndex?: number;
 }
-
-// eslint-disable-next-line max-len
-// See https://github.com/Emurgo/yoroi-frontend/blob/aea5c9d69bfa091dfc3957dfefa0e9beccb5331c/packages/yoroi-extension/app/api/ada/lib/cardanoCrypto/cryptoWallet.js#L70-L76
-const EMPTY_PASSWORD = Buffer.from('');
 
 const getPasswordRethrowTypedError = async (getPassword: GetPassword) => {
   try {
@@ -108,13 +105,14 @@ export class InMemoryKeyAgent extends KeyAgentBase {
     networkId,
     getPassword,
     mnemonicWords,
+    mnemonic2ndFactorPassphrase = Buffer.from(''),
     accountIndex = 0
   }: FromBip39MnemonicWordsProps): Promise<InMemoryKeyAgent> {
     const mnemonic = joinMnemonicWords(mnemonicWords);
     const validMnemonic = validateMnemonic(mnemonic);
     if (!validMnemonic) throw new errors.InvalidMnemonicError();
     const entropy = Buffer.from(mnemonicWordsToEntropy(mnemonicWords), 'hex');
-    const rootPrivateKey = CSL.Bip32PrivateKey.from_bip39_entropy(entropy, EMPTY_PASSWORD);
+    const rootPrivateKey = CSL.Bip32PrivateKey.from_bip39_entropy(entropy, mnemonic2ndFactorPassphrase);
     const password = await getPasswordRethrowTypedError(getPassword);
     const encryptedRootPrivateKey = await emip3encrypt(rootPrivateKey.as_bytes(), password);
     return new InMemoryKeyAgent({
