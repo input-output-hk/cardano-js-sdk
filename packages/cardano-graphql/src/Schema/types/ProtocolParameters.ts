@@ -5,7 +5,7 @@ import { ExecutionPrices, ExecutionUnits } from './ExUnits';
 import { Field, Float, Int, ObjectType } from 'type-graphql';
 import { Json } from './util';
 
-// Dropped 'Shelley' from name.
+// Review: dropped 'Shelley' from name.
 @ObjectType()
 export class ProtocolParameters {
   @Field(() => Float)

@@ -7,8 +7,6 @@ import { Value } from './Value';
 export class TransactionOutput {
   @Field(() => String)
   address: Cardano.Address;
-  @Field()
-  addressHasScript: boolean; // Review: what's this?
   @Field(() => Int)
   index: number;
   @Field(() => Transaction)

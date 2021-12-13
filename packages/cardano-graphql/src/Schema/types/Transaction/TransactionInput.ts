@@ -10,10 +10,8 @@ export class TransactionInput {
   address: Cardano.Address;
   @Field(() => Redeemer, { nullable: true })
   redeemer?: Redeemer;
-  // Review: what is the difference between 'transaction' and 'sourceTransaction'?
-  // Is one of them an inverse for Transaction.collateral? If so, should probably be nullable?
-  // @Field(() => Transaction)
-  // sourceTransaction: Transaction;
+  @Field(() => Transaction, { description: 'Output of' })
+  sourceTransaction: Transaction;
   @Field(() => Transaction)
   transaction: Transaction;
   @Field(() => Int)

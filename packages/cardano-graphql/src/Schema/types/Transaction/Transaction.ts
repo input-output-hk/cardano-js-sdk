@@ -45,7 +45,7 @@ export class Transaction {
   @Directive('@hasInverse(field: transaction)')
   @Field(() => [Redeemer], { nullable: true })
   redeemers?: Redeemer[];
-  // Review: not sure how we want to handle overflow on aggregates.
+  // TODO: not sure how we want to handle overflow on aggregates.
   // Got to dig deeper to implementing custom dgraph stuff,
   // maybe it's possible to have custom aggregate query implementations
   // that would return strings (bigints)

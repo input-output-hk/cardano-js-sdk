@@ -17,10 +17,8 @@ export class Block {
   @Directive('@hasInverse(field: block)')
   @Field(() => Slot)
   slot: Slot;
-  // Review: it's more intuitive to have this on 'Slot',
-  // but this design with Slot{block?} allows Block{slotLeader} field to be non-nullable
   @Field(() => StakePool)
-  slotLeader: StakePool;
+  issuer: StakePool;
   @Field(() => Epoch)
   epoch: Epoch;
   @Field(() => Int)
@@ -32,8 +30,6 @@ export class Block {
   totalOutput: Cardano.Lovelace;
   @Field(() => String)
   fees: Cardano.Lovelace;
-  @Field(() => String)
-  vrf: Cardano.VrfVkBech32;
   @Field(() => Block)
   previousBlock?: Block;
   @Field(() => Block)

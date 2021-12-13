@@ -121,7 +121,7 @@ export class ShelleyGenesis {
   @Field(() => String)
   maxLovelaceSupply: Cardano.Lovelace;
   @Field(() => String)
-  networkId: string; // Review: is this right (shouldn't it be an integer)?
+  networkId: string;
   @Field(() => Int)
   networkMagic: number;
   @Field(() => ProtocolParameters)
@@ -134,8 +134,8 @@ export class ShelleyGenesis {
   slotsPerKESPeriod: number;
   @Field(() => ShelleyGenesisStaking)
   staking: ShelleyGenesisStaking;
-  @Field(() => String)
-  systemStart: string; // Review: shouldn't this be a date/timestamp?
+  @Field(() => Date)
+  systemStart: Date;
   @Field(() => Int)
   updateQuorum: number;
 }

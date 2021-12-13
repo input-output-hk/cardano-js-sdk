@@ -1,7 +1,6 @@
 import { Block } from './Block';
 import { Directive, Field, Int, ObjectType } from 'type-graphql';
 
-// Review: not present in original cardano-graphql schema
 @ObjectType()
 export class Slot {
   @Directive('@id')

@@ -1,0 +1,31 @@
+query BlocksByHashes($hashes: [String!]!) {
+  queryBlock(filter: { hash: { in: $hashes } }) {
+    slot {
+      number
+      date
+      slotInEpoch
+    }
+    issuer {
+      id
+      vrf
+    }
+    size
+    transactionsAggregate {
+      count
+    }
+    totalOutput
+    fees
+    epoch {
+      number
+    }
+    hash
+    blockNo
+    previousBlock {
+      hash
+    }
+    nextBlock {
+      hash
+    }
+    confirmations
+  }
+}

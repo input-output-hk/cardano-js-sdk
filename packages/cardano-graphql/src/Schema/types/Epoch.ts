@@ -45,7 +45,6 @@ export class Epoch {
   nonce: Cardano.Hash32ByteBase16;
   @Field(() => ProtocolParameters)
   protocolParams: ProtocolParameters;
-  // Review: in original cardano-graphql schema it's of Date type
   @Field(() => Slot)
   startedAt: Slot;
   @Field(() => Slot)
