@@ -1,0 +1,14 @@
+query GenesisParameters {
+  queryShelleyGenesis {
+    systemStart
+    networkMagic
+    activeSlotsCoeff
+    securityParam
+    epochLength
+    slotsPerKESPeriod
+    maxKESEvolutions
+    slotLength
+    updateQuorum
+    maxLovelaceSupply
+  }
+}

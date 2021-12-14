@@ -4,10 +4,20 @@ import { BlocksByHashesQuery, Sdk } from '../../src/sdk';
 import { Cardano, ProviderFailure, WalletProvider } from '@cardano-sdk/core';
 import { createGraphQLWalletProviderFromSdk } from '../../src/WalletProvider/CardanoGraphQLWalletProvider';
 
+jest.mock('../../src/util', () => {
+  const actual = jest.requireActual('../../src/util');
+  return {
+    ...actual,
+    getExactlyOneObject: jest.fn().mockImplementation((...args) => actual.getExactlyOneObject(...args))
+  };
+});
+const { getExactlyOneObject } = jest.requireMock('../../src/util');
+
 describe('CardanoGraphQLWalletProvider', () => {
   let provider: WalletProvider;
   const sdk = {
     BlocksByHashes: jest.fn(),
+    GenesisParameters: jest.fn(),
     ProtocolParameters: jest.fn(),
     Tip: jest.fn()
   };
@@ -18,6 +28,7 @@ describe('CardanoGraphQLWalletProvider', () => {
 
   afterEach(() => {
     sdk.Tip.mockReset();
+    getExactlyOneObject.mockClear();
   });
 
   describe('currentWalletProtocolParameters', () => {
@@ -56,16 +67,49 @@ describe('CardanoGraphQLWalletProvider', () => {
       });
     });
 
-    it('throws ProviderError{NotFound} on empty response', async () => {
+    it('uses util.getExactlyOneObject to validate response', async () => {
       sdk.ProtocolParameters.mockResolvedValueOnce({});
       await expect(provider.currentWalletProtocolParameters()).rejects.toThrow(ProviderFailure.NotFound);
-      sdk.ProtocolParameters.mockResolvedValueOnce({ queryProtocolParameters: [] });
-      await expect(provider.currentWalletProtocolParameters()).rejects.toThrow(ProviderFailure.NotFound);
+      expect(getExactlyOneObject).toBeCalledTimes(1);
+    });
+  });
+
+  describe('genesisParameters', () => {
+    const genesisParams = {
+      activeSlotsCoeff: 0.05,
+      epochLength: 432_000,
+      maxKESEvolutions: 62,
+      maxLovelaceSupply: 45_000_000_000_000_000n,
+      networkMagic: 764_824_073,
+      securityParam: 2160,
+      slotLength: 1,
+      slotsPerKESPeriod: 129_600,
+      systemStart: '2017-09-23T21:44:51.000Z',
+      updateQuorum: 5
+    };
+
+    it('makes a graphql query and coerces result to core types', async () => {
+      sdk.GenesisParameters.mockResolvedValueOnce({
+        queryShelleyGenesis: [genesisParams]
+      });
+      expect(await provider.genesisParameters()).toEqual({
+        activeSlotsCoefficient: genesisParams.activeSlotsCoeff,
+        epochLength: genesisParams.epochLength,
+        maxKesEvolutions: genesisParams.maxKESEvolutions,
+        maxLovelaceSupply: BigInt(genesisParams.maxLovelaceSupply),
+        networkMagic: genesisParams.networkMagic,
+        securityParameter: genesisParams.securityParam,
+        slotLength: genesisParams.slotLength,
+        slotsPerKesPeriod: genesisParams.slotsPerKESPeriod,
+        systemStart: new Date(genesisParams.systemStart),
+        updateQuorum: genesisParams.updateQuorum
+      } as Cardano.CompactGenesis);
     });
 
-    it('throws ProviderError{InvalidResponse} if provider returns multiple protocol parameter objects', async () => {
-      sdk.ProtocolParameters.mockResolvedValueOnce({ queryProtocolParameters: [protocolParams, protocolParams] });
-      await expect(provider.currentWalletProtocolParameters()).rejects.toThrow(ProviderFailure.InvalidResponse);
+    it('uses util.getExactlyOneObject to validate response', async () => {
+      sdk.GenesisParameters.mockResolvedValueOnce({});
+      await expect(provider.genesisParameters()).rejects.toThrow(ProviderFailure.NotFound);
+      expect(getExactlyOneObject).toBeCalledTimes(1);
     });
   });
 
@@ -87,16 +131,10 @@ describe('CardanoGraphQLWalletProvider', () => {
       });
     });
 
-    it('throws ProviderError{NotFound} on empty response', async () => {
+    it('uses util.getExactlyOneObject to validate response', async () => {
       sdk.Tip.mockResolvedValueOnce({});
       await expect(provider.ledgerTip()).rejects.toThrow(ProviderFailure.NotFound);
-      sdk.Tip.mockResolvedValueOnce({ queryBlock: [] });
-      await expect(provider.ledgerTip()).rejects.toThrow(ProviderFailure.NotFound);
-    });
-
-    it('throws ProviderError{InvalidResponse} if provider returns multiple tips', async () => {
-      sdk.Tip.mockResolvedValueOnce({ queryBlock: [tip, tip] });
-      await expect(provider.ledgerTip()).rejects.toThrow(ProviderFailure.InvalidResponse);
+      expect(getExactlyOneObject).toBeCalledTimes(1);
     });
   });
 

@@ -1,16 +1,11 @@
-import { Cardano, ProviderError, ProviderFailure, WalletProvider, util } from '@cardano-sdk/core';
-import { ProviderFromSdk, createProvider } from '../util';
+import { Cardano, WalletProvider, util } from '@cardano-sdk/core';
+import { ProviderFromSdk, createProvider, getExactlyOneObject } from '../util';
 
 export const createGraphQLWalletProviderFromSdk: ProviderFromSdk<WalletProvider> = (sdk) =>
   ({
     async currentWalletProtocolParameters() {
       const { queryProtocolParameters } = await sdk.ProtocolParameters();
-      if (!queryProtocolParameters || queryProtocolParameters.length === 0)
-        throw new ProviderError(ProviderFailure.NotFound);
-      if (queryProtocolParameters.length !== 1)
-        throw new ProviderError(ProviderFailure.InvalidResponse, null, 'Expected exactly 1 protocol parameters object');
-      const [protocolParams] = queryProtocolParameters;
-      if (!protocolParams) throw new ProviderError(ProviderFailure.InvalidResponse);
+      const protocolParams = getExactlyOneObject(queryProtocolParameters, 'protocol parameters');
       return {
         coinsPerUtxoWord: protocolParams.coinsPerUtxoWord,
         maxCollateralInputs: protocolParams.maxCollateralInputs,
@@ -24,18 +19,26 @@ export const createGraphQLWalletProviderFromSdk: ProviderFromSdk<WalletProvider>
         stakeKeyDeposit: protocolParams.keyDeposit
       };
     },
+    async genesisParameters() {
+      const { queryShelleyGenesis } = await sdk.GenesisParameters();
+      const genesisParameters = getExactlyOneObject(queryShelleyGenesis, 'genesis parameters');
+      return {
+        activeSlotsCoefficient: genesisParameters.activeSlotsCoeff,
+        epochLength: genesisParameters.epochLength,
+        maxKesEvolutions: genesisParameters.maxKESEvolutions,
+        maxLovelaceSupply: BigInt(genesisParameters.maxLovelaceSupply),
+        networkMagic: genesisParameters.networkMagic,
+        securityParameter: genesisParameters.securityParam,
+        slotLength: genesisParameters.slotLength,
+        slotsPerKesPeriod: genesisParameters.slotsPerKESPeriod,
+        systemStart: new Date(genesisParameters.systemStart),
+        updateQuorum: genesisParameters.updateQuorum
+      };
+    },
     async ledgerTip() {
       const { queryBlock } = await sdk.Tip();
-      if (!queryBlock || queryBlock.length === 0) throw new ProviderError(ProviderFailure.NotFound);
-      if (queryBlock.length !== 1)
-        throw new ProviderError(ProviderFailure.InvalidResponse, null, 'Expected exactly 1 tip');
-      const [tipResponse] = queryBlock;
-      if (!tipResponse) throw new ProviderError(ProviderFailure.InvalidResponse);
-      return {
-        blockNo: tipResponse.blockNo,
-        hash: Cardano.BlockId(tipResponse.hash),
-        slot: tipResponse.slot.number
-      };
+      const tip = getExactlyOneObject(queryBlock, 'tip');
+      return { blockNo: tip.blockNo, hash: Cardano.BlockId(tip.hash), slot: tip.slot.number };
     },
     async queryBlocksByHashes(hashes) {
       const { queryBlock } = await sdk.BlocksByHashes({ hashes: hashes as unknown as string[] });

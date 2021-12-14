@@ -9397,6 +9397,11 @@ export type BlocksByHashesQueryVariables = Exact<{
 
 export type BlocksByHashesQuery = { __typename?: 'Query', queryBlock?: Array<{ __typename?: 'Block', size: number, totalOutput: string, fees: string, hash: string, blockNo: number, confirmations: number, slot: { __typename?: 'Slot', number: number, date: string, slotInEpoch: number }, issuer: { __typename?: 'StakePool', id: string, vrf: string }, transactionsAggregate?: { __typename?: 'TransactionAggregateResult', count?: number | null | undefined } | null | undefined, epoch: { __typename?: 'Epoch', number: number }, previousBlock: { __typename?: 'Block', hash: string }, nextBlock: { __typename?: 'Block', hash: string } } | null | undefined> | null | undefined };
 
+export type GenesisParametersQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GenesisParametersQuery = { __typename?: 'Query', queryShelleyGenesis?: Array<{ __typename?: 'ShelleyGenesis', systemStart: string, networkMagic: number, activeSlotsCoeff: number, securityParam: number, epochLength: number, slotsPerKESPeriod: number, maxKESEvolutions: number, slotLength: number, updateQuorum: number, maxLovelaceSupply: string } | null | undefined> | null | undefined };
+
 export type ProtocolParametersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -9547,6 +9552,22 @@ export const BlocksByHashesDocument = gql`
   }
 }
     `;
+export const GenesisParametersDocument = gql`
+    query GenesisParameters {
+  queryShelleyGenesis {
+    systemStart
+    networkMagic
+    activeSlotsCoeff
+    securityParam
+    epochLength
+    slotsPerKESPeriod
+    maxKESEvolutions
+    slotLength
+    updateQuorum
+    maxLovelaceSupply
+  }
+}
+    `;
 export const ProtocolParametersDocument = gql`
     query ProtocolParameters {
   queryProtocolParameters(first: 1) {
@@ -9606,6 +9627,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
   return {
     BlocksByHashes(variables: BlocksByHashesQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<BlocksByHashesQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<BlocksByHashesQuery>(BlocksByHashesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'BlocksByHashes');
+    },
+    GenesisParameters(variables?: GenesisParametersQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GenesisParametersQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GenesisParametersQuery>(GenesisParametersDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'GenesisParameters');
     },
     ProtocolParameters(variables?: ProtocolParametersQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ProtocolParametersQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<ProtocolParametersQuery>(ProtocolParametersDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'ProtocolParameters');
