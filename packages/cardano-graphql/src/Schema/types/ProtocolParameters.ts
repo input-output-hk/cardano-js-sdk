@@ -5,6 +5,16 @@ import { ExecutionPrices, ExecutionUnits } from './ExUnits';
 import { Field, Float, Int, ObjectType } from 'type-graphql';
 import { Json } from './util';
 
+@ObjectType()
+export class ProtocolVersion {
+  @Field(() => Int)
+  major: number;
+  @Field(() => Int)
+  minor: number;
+  @Field(() => Int, { nullable: true })
+  patch?: number;
+}
+
 // Review: dropped 'Shelley' from name.
 @ObjectType()
 export class ProtocolParameters {
@@ -52,8 +62,8 @@ export class ProtocolParameters {
   poolDeposit: number;
   @Field(() => ExecutionPrices, { nullable: true })
   executionPrices: ExecutionPrices;
-  @Field(() => String)
-  protocolVersion: Json;
+  @Field(() => ProtocolVersion)
+  protocolVersion: ProtocolVersion;
   @Field(() => Float)
   rho: number;
   @Field(() => Float)

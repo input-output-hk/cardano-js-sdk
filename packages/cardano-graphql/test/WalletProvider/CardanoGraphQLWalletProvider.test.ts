@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable max-len */
 import { BlocksByHashesQuery, Sdk } from '../../src/sdk';
 import { Cardano, ProviderFailure, WalletProvider } from '@cardano-sdk/core';
@@ -7,6 +8,7 @@ describe('CardanoGraphQLWalletProvider', () => {
   let provider: WalletProvider;
   const sdk = {
     BlocksByHashes: jest.fn(),
+    ProtocolParameters: jest.fn(),
     Tip: jest.fn()
   };
 
@@ -16,6 +18,55 @@ describe('CardanoGraphQLWalletProvider', () => {
 
   afterEach(() => {
     sdk.Tip.mockReset();
+  });
+
+  describe('currentWalletProtocolParameters', () => {
+    const protocolParams = {
+      coinsPerUtxoWord: 34_482,
+      keyDeposit: 2_000_000,
+      maxCollateralInputs: 3,
+      maxTxSize: 16_384,
+      maxValSize: 5000,
+      minFeeA: 44,
+      minFeeB: 155_381,
+      minPoolCost: 340_000_000,
+      poolDeposit: 500_000_000,
+      protocolVersion: {
+        major: 4,
+        minor: 0,
+        patch: 1
+      }
+    };
+
+    it('makes a graphql query and coerces result to core types', async () => {
+      sdk.ProtocolParameters.mockResolvedValueOnce({
+        queryProtocolParameters: [protocolParams]
+      });
+      expect(await provider.currentWalletProtocolParameters()).toEqual({
+        coinsPerUtxoWord: protocolParams.coinsPerUtxoWord,
+        maxCollateralInputs: protocolParams.maxCollateralInputs,
+        maxTxSize: protocolParams.maxTxSize,
+        maxValueSize: protocolParams.maxValSize,
+        minFeeCoefficient: protocolParams.minFeeA,
+        minFeeConstant: protocolParams.minFeeB,
+        minPoolCost: protocolParams.minPoolCost,
+        poolDeposit: protocolParams.poolDeposit,
+        protocolVersion: protocolParams.protocolVersion,
+        stakeKeyDeposit: protocolParams.keyDeposit
+      });
+    });
+
+    it('throws ProviderError{NotFound} on empty response', async () => {
+      sdk.ProtocolParameters.mockResolvedValueOnce({});
+      await expect(provider.currentWalletProtocolParameters()).rejects.toThrow(ProviderFailure.NotFound);
+      sdk.ProtocolParameters.mockResolvedValueOnce({ queryProtocolParameters: [] });
+      await expect(provider.currentWalletProtocolParameters()).rejects.toThrow(ProviderFailure.NotFound);
+    });
+
+    it('throws ProviderError{InvalidResponse} if provider returns multiple protocol parameter objects', async () => {
+      sdk.ProtocolParameters.mockResolvedValueOnce({ queryProtocolParameters: [protocolParams, protocolParams] });
+      await expect(provider.currentWalletProtocolParameters()).rejects.toThrow(ProviderFailure.InvalidResponse);
+    });
   });
 
   describe('ledgerTip', () => {

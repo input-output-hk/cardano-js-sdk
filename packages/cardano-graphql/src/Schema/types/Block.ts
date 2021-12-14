@@ -2,7 +2,7 @@
 import { Cardano } from '@cardano-sdk/core';
 import { Directive, Field, Int, ObjectType } from 'type-graphql';
 import { Epoch } from './Epoch';
-import { Json } from './util';
+import { ProtocolVersion } from './ProtocolParameters';
 import { Slot } from './Slot';
 import { StakePool } from './StakePool';
 import { Transaction } from './Transaction';
@@ -36,8 +36,8 @@ export class Block {
   nextBlock?: Block;
   @Field(() => Int)
   confirmations: number;
-  @Field(() => String)
-  nextBlockProtocolVersion: Json;
+  @Field(() => ProtocolVersion)
+  nextBlockProtocolVersion: ProtocolVersion;
   @Field(() => String)
   opCert: Cardano.Hash32ByteBase16;
 }

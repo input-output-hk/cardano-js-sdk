@@ -337,7 +337,7 @@ export type AddBlockInput = {
   hash: Scalars['String'];
   issuer: StakePoolRef;
   nextBlock: BlockRef;
-  nextBlockProtocolVersion: Scalars['String'];
+  nextBlockProtocolVersion: ProtocolVersionRef;
   opCert: Scalars['String'];
   previousBlock: BlockRef;
   size: Scalars['Int'];
@@ -796,7 +796,7 @@ export type AddProtocolParametersInput = {
   minUTxOValue: Scalars['Int'];
   nOpt: Scalars['Int'];
   poolDeposit: Scalars['Int'];
-  protocolVersion: Scalars['String'];
+  protocolVersion: ProtocolVersionRef;
   rho: Scalars['Float'];
   tau: Scalars['Float'];
 };
@@ -813,6 +813,26 @@ export type AddProtocolParametersPayloadProtocolParametersArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<ProtocolParametersOrder>;
+};
+
+export type AddProtocolVersionInput = {
+  major: Scalars['Int'];
+  minor: Scalars['Int'];
+  patch?: Maybe<Scalars['Int']>;
+};
+
+export type AddProtocolVersionPayload = {
+  __typename?: 'AddProtocolVersionPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  protocolVersion?: Maybe<Array<Maybe<ProtocolVersion>>>;
+};
+
+
+export type AddProtocolVersionPayloadProtocolVersionArgs = {
+  filter?: Maybe<ProtocolVersionFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ProtocolVersionOrder>;
 };
 
 export type AddRedeemerInput = {
@@ -1359,7 +1379,7 @@ export type Address = {
   inputs: Array<TransactionInput>;
   inputsAggregate?: Maybe<TransactionInputAggregateResult>;
   rewardAccount?: Maybe<RewardAccount>;
-  /** Balance  */
+  /** Balance */
   utxo: Array<TransactionOutput>;
   utxoAggregate?: Maybe<TransactionOutputAggregateResult>;
 };
@@ -1754,7 +1774,7 @@ export type Block = {
   hash: Scalars['String'];
   issuer: StakePool;
   nextBlock: Block;
-  nextBlockProtocolVersion: Scalars['String'];
+  nextBlockProtocolVersion: ProtocolVersion;
   opCert: Scalars['String'];
   previousBlock: Block;
   size: Scalars['Int'];
@@ -1777,6 +1797,11 @@ export type BlockIssuerArgs = {
 
 export type BlockNextBlockArgs = {
   filter?: Maybe<BlockFilter>;
+};
+
+
+export type BlockNextBlockProtocolVersionArgs = {
+  filter?: Maybe<ProtocolVersionFilter>;
 };
 
 
@@ -1817,8 +1842,6 @@ export type BlockAggregateResult = {
   feesMin?: Maybe<Scalars['String']>;
   hashMax?: Maybe<Scalars['String']>;
   hashMin?: Maybe<Scalars['String']>;
-  nextBlockProtocolVersionMax?: Maybe<Scalars['String']>;
-  nextBlockProtocolVersionMin?: Maybe<Scalars['String']>;
   opCertMax?: Maybe<Scalars['String']>;
   opCertMin?: Maybe<Scalars['String']>;
   sizeAvg?: Maybe<Scalars['Float']>;
@@ -1865,7 +1888,6 @@ export enum BlockOrderable {
   Confirmations = 'confirmations',
   Fees = 'fees',
   Hash = 'hash',
-  NextBlockProtocolVersion = 'nextBlockProtocolVersion',
   OpCert = 'opCert',
   Size = 'size',
   TotalOutput = 'totalOutput'
@@ -1878,7 +1900,7 @@ export type BlockPatch = {
   fees?: Maybe<Scalars['String']>;
   issuer?: Maybe<StakePoolRef>;
   nextBlock?: Maybe<BlockRef>;
-  nextBlockProtocolVersion?: Maybe<Scalars['String']>;
+  nextBlockProtocolVersion?: Maybe<ProtocolVersionRef>;
   opCert?: Maybe<Scalars['String']>;
   previousBlock?: Maybe<BlockRef>;
   size?: Maybe<Scalars['Int']>;
@@ -1895,7 +1917,7 @@ export type BlockRef = {
   hash?: Maybe<Scalars['String']>;
   issuer?: Maybe<StakePoolRef>;
   nextBlock?: Maybe<BlockRef>;
-  nextBlockProtocolVersion?: Maybe<Scalars['String']>;
+  nextBlockProtocolVersion?: Maybe<ProtocolVersionRef>;
   opCert?: Maybe<Scalars['String']>;
   previousBlock?: Maybe<BlockRef>;
   size?: Maybe<Scalars['Int']>;
@@ -2799,6 +2821,21 @@ export type DeleteProtocolParametersPayloadProtocolParametersArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<ProtocolParametersOrder>;
+};
+
+export type DeleteProtocolVersionPayload = {
+  __typename?: 'DeleteProtocolVersionPayload';
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+  protocolVersion?: Maybe<Array<Maybe<ProtocolVersion>>>;
+};
+
+
+export type DeleteProtocolVersionPayloadProtocolVersionArgs = {
+  filter?: Maybe<ProtocolVersionFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ProtocolVersionOrder>;
 };
 
 export type DeleteRedeemerPayload = {
@@ -4097,6 +4134,7 @@ export type Mutation = {
   addMetadatumMap?: Maybe<AddMetadatumMapPayload>;
   addPoolContactData?: Maybe<AddPoolContactDataPayload>;
   addProtocolParameters?: Maybe<AddProtocolParametersPayload>;
+  addProtocolVersion?: Maybe<AddProtocolVersionPayload>;
   addRedeemer?: Maybe<AddRedeemerPayload>;
   addRelayByAddress?: Maybe<AddRelayByAddressPayload>;
   addRelayByName?: Maybe<AddRelayByNamePayload>;
@@ -4150,6 +4188,7 @@ export type Mutation = {
   deleteMetadatumMap?: Maybe<DeleteMetadatumMapPayload>;
   deletePoolContactData?: Maybe<DeletePoolContactDataPayload>;
   deleteProtocolParameters?: Maybe<DeleteProtocolParametersPayload>;
+  deleteProtocolVersion?: Maybe<DeleteProtocolVersionPayload>;
   deleteRedeemer?: Maybe<DeleteRedeemerPayload>;
   deleteRelayByAddress?: Maybe<DeleteRelayByAddressPayload>;
   deleteRelayByName?: Maybe<DeleteRelayByNamePayload>;
@@ -4203,6 +4242,7 @@ export type Mutation = {
   updateMetadatumMap?: Maybe<UpdateMetadatumMapPayload>;
   updatePoolContactData?: Maybe<UpdatePoolContactDataPayload>;
   updateProtocolParameters?: Maybe<UpdateProtocolParametersPayload>;
+  updateProtocolVersion?: Maybe<UpdateProtocolVersionPayload>;
   updateRedeemer?: Maybe<UpdateRedeemerPayload>;
   updateRelayByAddress?: Maybe<UpdateRelayByAddressPayload>;
   updateRelayByName?: Maybe<UpdateRelayByNamePayload>;
@@ -4375,6 +4415,11 @@ export type MutationAddPoolContactDataArgs = {
 
 export type MutationAddProtocolParametersArgs = {
   input: Array<AddProtocolParametersInput>;
+};
+
+
+export type MutationAddProtocolVersionArgs = {
+  input: Array<AddProtocolVersionInput>;
 };
 
 
@@ -4648,6 +4693,11 @@ export type MutationDeleteProtocolParametersArgs = {
 };
 
 
+export type MutationDeleteProtocolVersionArgs = {
+  filter: ProtocolVersionFilter;
+};
+
+
 export type MutationDeleteRedeemerArgs = {
   filter: RedeemerFilter;
 };
@@ -4910,6 +4960,11 @@ export type MutationUpdatePoolContactDataArgs = {
 
 export type MutationUpdateProtocolParametersArgs = {
   input: UpdateProtocolParametersInput;
+};
+
+
+export type MutationUpdateProtocolVersionArgs = {
+  input: UpdateProtocolVersionInput;
 };
 
 
@@ -5185,7 +5240,7 @@ export type ProtocolParameters = {
   minUTxOValue: Scalars['Int'];
   nOpt: Scalars['Int'];
   poolDeposit: Scalars['Int'];
-  protocolVersion: Scalars['String'];
+  protocolVersion: ProtocolVersion;
   rho: Scalars['Float'];
   tau: Scalars['Float'];
 };
@@ -5203,6 +5258,11 @@ export type ProtocolParametersMaxBlockExUnitsArgs = {
 
 export type ProtocolParametersMaxTxExUnitsArgs = {
   filter?: Maybe<ExecutionUnitsFilter>;
+};
+
+
+export type ProtocolParametersProtocolVersionArgs = {
+  filter?: Maybe<ProtocolVersionFilter>;
 };
 
 export type ProtocolParametersAggregateResult = {
@@ -5280,8 +5340,6 @@ export type ProtocolParametersAggregateResult = {
   poolDepositMax?: Maybe<Scalars['Int']>;
   poolDepositMin?: Maybe<Scalars['Int']>;
   poolDepositSum?: Maybe<Scalars['Int']>;
-  protocolVersionMax?: Maybe<Scalars['String']>;
-  protocolVersionMin?: Maybe<Scalars['String']>;
   rhoAvg?: Maybe<Scalars['Float']>;
   rhoMax?: Maybe<Scalars['Float']>;
   rhoMin?: Maybe<Scalars['Float']>;
@@ -5353,7 +5411,6 @@ export enum ProtocolParametersOrderable {
   MinUTxOValue = 'minUTxOValue',
   NOpt = 'nOpt',
   PoolDeposit = 'poolDeposit',
-  ProtocolVersion = 'protocolVersion',
   Rho = 'rho',
   Tau = 'tau'
 }
@@ -5381,7 +5438,7 @@ export type ProtocolParametersPatch = {
   minUTxOValue?: Maybe<Scalars['Int']>;
   nOpt?: Maybe<Scalars['Int']>;
   poolDeposit?: Maybe<Scalars['Int']>;
-  protocolVersion?: Maybe<Scalars['String']>;
+  protocolVersion?: Maybe<ProtocolVersionRef>;
   rho?: Maybe<Scalars['Float']>;
   tau?: Maybe<Scalars['Float']>;
 };
@@ -5409,9 +5466,70 @@ export type ProtocolParametersRef = {
   minUTxOValue?: Maybe<Scalars['Int']>;
   nOpt?: Maybe<Scalars['Int']>;
   poolDeposit?: Maybe<Scalars['Int']>;
-  protocolVersion?: Maybe<Scalars['String']>;
+  protocolVersion?: Maybe<ProtocolVersionRef>;
   rho?: Maybe<Scalars['Float']>;
   tau?: Maybe<Scalars['Float']>;
+};
+
+export type ProtocolVersion = {
+  __typename?: 'ProtocolVersion';
+  major: Scalars['Int'];
+  minor: Scalars['Int'];
+  patch?: Maybe<Scalars['Int']>;
+};
+
+export type ProtocolVersionAggregateResult = {
+  __typename?: 'ProtocolVersionAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+  majorAvg?: Maybe<Scalars['Float']>;
+  majorMax?: Maybe<Scalars['Int']>;
+  majorMin?: Maybe<Scalars['Int']>;
+  majorSum?: Maybe<Scalars['Int']>;
+  minorAvg?: Maybe<Scalars['Float']>;
+  minorMax?: Maybe<Scalars['Int']>;
+  minorMin?: Maybe<Scalars['Int']>;
+  minorSum?: Maybe<Scalars['Int']>;
+  patchAvg?: Maybe<Scalars['Float']>;
+  patchMax?: Maybe<Scalars['Int']>;
+  patchMin?: Maybe<Scalars['Int']>;
+  patchSum?: Maybe<Scalars['Int']>;
+};
+
+export type ProtocolVersionFilter = {
+  and?: Maybe<Array<Maybe<ProtocolVersionFilter>>>;
+  has?: Maybe<Array<Maybe<ProtocolVersionHasFilter>>>;
+  not?: Maybe<ProtocolVersionFilter>;
+  or?: Maybe<Array<Maybe<ProtocolVersionFilter>>>;
+};
+
+export enum ProtocolVersionHasFilter {
+  Major = 'major',
+  Minor = 'minor',
+  Patch = 'patch'
+}
+
+export type ProtocolVersionOrder = {
+  asc?: Maybe<ProtocolVersionOrderable>;
+  desc?: Maybe<ProtocolVersionOrderable>;
+  then?: Maybe<ProtocolVersionOrder>;
+};
+
+export enum ProtocolVersionOrderable {
+  Major = 'major',
+  Minor = 'minor',
+  Patch = 'patch'
+}
+
+export type ProtocolVersionPatch = {
+  major?: Maybe<Scalars['Int']>;
+  minor?: Maybe<Scalars['Int']>;
+  patch?: Maybe<Scalars['Int']>;
+};
+
+export type ProtocolVersionRef = {
+  major?: Maybe<Scalars['Int']>;
+  minor?: Maybe<Scalars['Int']>;
+  patch?: Maybe<Scalars['Int']>;
 };
 
 export type Query = {
@@ -5445,6 +5563,7 @@ export type Query = {
   aggregateMetadatumMap?: Maybe<MetadatumMapAggregateResult>;
   aggregatePoolContactData?: Maybe<PoolContactDataAggregateResult>;
   aggregateProtocolParameters?: Maybe<ProtocolParametersAggregateResult>;
+  aggregateProtocolVersion?: Maybe<ProtocolVersionAggregateResult>;
   aggregateRedeemer?: Maybe<RedeemerAggregateResult>;
   aggregateRelayByAddress?: Maybe<RelayByAddressAggregateResult>;
   aggregateRelayByName?: Maybe<RelayByNameAggregateResult>;
@@ -5506,6 +5625,7 @@ export type Query = {
   queryMetadatumMap?: Maybe<Array<Maybe<MetadatumMap>>>;
   queryPoolContactData?: Maybe<Array<Maybe<PoolContactData>>>;
   queryProtocolParameters?: Maybe<Array<Maybe<ProtocolParameters>>>;
+  queryProtocolVersion?: Maybe<Array<Maybe<ProtocolVersion>>>;
   queryRedeemer?: Maybe<Array<Maybe<Redeemer>>>;
   queryRelayByAddress?: Maybe<Array<Maybe<RelayByAddress>>>;
   queryRelayByName?: Maybe<Array<Maybe<RelayByName>>>;
@@ -5675,6 +5795,11 @@ export type QueryAggregatePoolContactDataArgs = {
 
 export type QueryAggregateProtocolParametersArgs = {
   filter?: Maybe<ProtocolParametersFilter>;
+};
+
+
+export type QueryAggregateProtocolVersionArgs = {
+  filter?: Maybe<ProtocolVersionFilter>;
 };
 
 
@@ -6062,6 +6187,14 @@ export type QueryQueryProtocolParametersArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<ProtocolParametersOrder>;
+};
+
+
+export type QueryQueryProtocolVersionArgs = {
+  filter?: Maybe<ProtocolVersionFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ProtocolVersionOrder>;
 };
 
 
@@ -8629,6 +8762,26 @@ export type UpdateProtocolParametersPayloadProtocolParametersArgs = {
   order?: Maybe<ProtocolParametersOrder>;
 };
 
+export type UpdateProtocolVersionInput = {
+  filter: ProtocolVersionFilter;
+  remove?: Maybe<ProtocolVersionPatch>;
+  set?: Maybe<ProtocolVersionPatch>;
+};
+
+export type UpdateProtocolVersionPayload = {
+  __typename?: 'UpdateProtocolVersionPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  protocolVersion?: Maybe<Array<Maybe<ProtocolVersion>>>;
+};
+
+
+export type UpdateProtocolVersionPayloadProtocolVersionArgs = {
+  filter?: Maybe<ProtocolVersionFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ProtocolVersionOrder>;
+};
+
 export type UpdateRedeemerInput = {
   filter: RedeemerFilter;
   remove?: Maybe<RedeemerPatch>;
@@ -9244,6 +9397,11 @@ export type BlocksByHashesQueryVariables = Exact<{
 
 export type BlocksByHashesQuery = { __typename?: 'Query', queryBlock?: Array<{ __typename?: 'Block', size: number, totalOutput: string, fees: string, hash: string, blockNo: number, confirmations: number, slot: { __typename?: 'Slot', number: number, date: string, slotInEpoch: number }, issuer: { __typename?: 'StakePool', id: string, vrf: string }, transactionsAggregate?: { __typename?: 'TransactionAggregateResult', count?: number | null | undefined } | null | undefined, epoch: { __typename?: 'Epoch', number: number }, previousBlock: { __typename?: 'Block', hash: string }, nextBlock: { __typename?: 'Block', hash: string } } | null | undefined> | null | undefined };
 
+export type ProtocolParametersQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type ProtocolParametersQuery = { __typename?: 'Query', queryProtocolParameters?: Array<{ __typename?: 'ProtocolParameters', coinsPerUtxoWord?: number | null | undefined, maxTxSize: number, maxValSize: number, keyDeposit: number, poolDeposit: number, maxCollateralInputs?: number | null | undefined, minFeeA: number, minFeeB: number, minPoolCost: number, protocolVersion: { __typename?: 'ProtocolVersion', major: number, minor: number, patch?: number | null | undefined } } | null | undefined> | null | undefined };
+
 export type AllStakePoolFieldsFragment = { __typename?: 'StakePool', id: string, hexId: string, status: StakePoolStatus, owners: Array<string>, cost: string, vrf: string, rewardAccount: string, pledge: string, margin: { __typename?: 'Fraction', numerator: number, denominator: number }, relays: Array<{ __typename: 'RelayByAddress', ipv4?: string | null | undefined, ipv6?: string | null | undefined, port?: number | null | undefined } | { __typename: 'RelayByName', hostname: string, port?: number | null | undefined } | { __typename: 'RelayByNameMultihost', dnsName: string }>, metrics: { __typename?: 'StakePoolMetrics', blocksCreated: number, livePledge: string, saturation: number, delegators: number, stake: { __typename?: 'StakePoolMetricsStake', live: string, active: string }, size: { __typename?: 'StakePoolMetricsSize', live: number, active: number } }, transactions: { __typename?: 'StakePoolTransactions', registration: Array<string>, retirement: Array<string> }, metadataJson?: { __typename?: 'StakePoolMetadataJson', hash: string, url: string } | null | undefined, metadata?: { __typename?: 'StakePoolMetadata', ticker: string, name: string, description: string, homepage: string, extDataUrl?: string | null | undefined, extSigUrl?: string | null | undefined, extVkey?: string | null | undefined, ext?: { __typename?: 'ExtendedStakePoolMetadata', serial: number, pool: { __typename?: 'ExtendedStakePoolMetadataFields', id: string, country?: string | null | undefined, status?: ExtendedPoolStatus | null | undefined, contact?: { __typename?: 'PoolContactData', primary: string, email?: string | null | undefined, facebook?: string | null | undefined, github?: string | null | undefined, feed?: string | null | undefined, telegram?: string | null | undefined, twitter?: string | null | undefined } | null | undefined, media_assets?: { __typename?: 'ThePoolsMediaAssets', icon_png_64x64: string, logo_png?: string | null | undefined, logo_svg?: string | null | undefined, color_fg?: string | null | undefined, color_bg?: string | null | undefined } | null | undefined, itn?: { __typename?: 'ITNVerification', owner: string, witness: string } | null | undefined } } | null | undefined } | null | undefined };
 
 export type StakePoolsByMetadataQueryVariables = Exact<{
@@ -9389,6 +9547,26 @@ export const BlocksByHashesDocument = gql`
   }
 }
     `;
+export const ProtocolParametersDocument = gql`
+    query ProtocolParameters {
+  queryProtocolParameters(first: 1) {
+    coinsPerUtxoWord
+    maxTxSize
+    maxValSize
+    keyDeposit
+    poolDeposit
+    maxCollateralInputs
+    minFeeA
+    minFeeB
+    minPoolCost
+    protocolVersion {
+      major
+      minor
+      patch
+    }
+  }
+}
+    `;
 export const StakePoolsByMetadataDocument = gql`
     query StakePoolsByMetadata($query: String!, $omit: [String!] = ["NEED_THIS_BECAUSE_IN_OPERATOR_WONT_WORK_WITH_EMPTY_ARR"]) {
   queryStakePoolMetadata(
@@ -9428,6 +9606,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
   return {
     BlocksByHashes(variables: BlocksByHashesQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<BlocksByHashesQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<BlocksByHashesQuery>(BlocksByHashesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'BlocksByHashes');
+    },
+    ProtocolParameters(variables?: ProtocolParametersQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ProtocolParametersQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<ProtocolParametersQuery>(ProtocolParametersDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'ProtocolParameters');
     },
     StakePoolsByMetadata(variables: StakePoolsByMetadataQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<StakePoolsByMetadataQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<StakePoolsByMetadataQuery>(StakePoolsByMetadataDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'StakePoolsByMetadata');

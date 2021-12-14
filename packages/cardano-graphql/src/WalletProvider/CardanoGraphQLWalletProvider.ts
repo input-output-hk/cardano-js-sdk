@@ -3,6 +3,27 @@ import { ProviderFromSdk, createProvider } from '../util';
 
 export const createGraphQLWalletProviderFromSdk: ProviderFromSdk<WalletProvider> = (sdk) =>
   ({
+    async currentWalletProtocolParameters() {
+      const { queryProtocolParameters } = await sdk.ProtocolParameters();
+      if (!queryProtocolParameters || queryProtocolParameters.length === 0)
+        throw new ProviderError(ProviderFailure.NotFound);
+      if (queryProtocolParameters.length !== 1)
+        throw new ProviderError(ProviderFailure.InvalidResponse, null, 'Expected exactly 1 protocol parameters object');
+      const [protocolParams] = queryProtocolParameters;
+      if (!protocolParams) throw new ProviderError(ProviderFailure.InvalidResponse);
+      return {
+        coinsPerUtxoWord: protocolParams.coinsPerUtxoWord,
+        maxCollateralInputs: protocolParams.maxCollateralInputs,
+        maxTxSize: protocolParams.maxTxSize,
+        maxValueSize: protocolParams.maxValSize,
+        minFeeCoefficient: protocolParams.minFeeA,
+        minFeeConstant: protocolParams.minFeeB,
+        minPoolCost: protocolParams.minPoolCost,
+        poolDeposit: protocolParams.poolDeposit,
+        protocolVersion: protocolParams.protocolVersion,
+        stakeKeyDeposit: protocolParams.keyDeposit
+      };
+    },
     async ledgerTip() {
       const { queryBlock } = await sdk.Tip();
       if (!queryBlock || queryBlock.length === 0) throw new ProviderError(ProviderFailure.NotFound);

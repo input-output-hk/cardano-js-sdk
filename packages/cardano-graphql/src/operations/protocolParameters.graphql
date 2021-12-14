@@ -1,0 +1,19 @@
+query ProtocolParameters {
+  # Review: I'm wondering if there should be some sort of version or serial # to sort by
+  queryProtocolParameters(first: 1) {
+    coinsPerUtxoWord
+    maxTxSize
+    maxValSize
+    keyDeposit
+    poolDeposit
+    maxCollateralInputs
+    minFeeA
+    minFeeB
+    minPoolCost
+    protocolVersion {
+      major
+      minor
+      patch
+    }
+  }
+}
