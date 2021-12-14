@@ -57,7 +57,7 @@ export const createGraphQLWalletProviderFromSdk: ProviderFromSdk<WalletProvider>
           },
           nextBlock: Cardano.BlockId(block.nextBlock.hash),
           previousBlock: Cardano.BlockId(block.previousBlock.hash),
-          size: block.size,
+          size: Number(block.size),
           slotLeader: Cardano.PoolId(block.issuer.id),
           totalOutput: BigInt(block.totalOutput),
           txCount: block.transactionsAggregate?.count || 0,

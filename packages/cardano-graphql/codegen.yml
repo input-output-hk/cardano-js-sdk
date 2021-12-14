@@ -10,4 +10,10 @@ config:
   strictScalars: true
   scalars:
     DateTime: string
-    Int64: number
+    # Review: it actually seems to be serialized to number in response json
+    # Suggested solution:
+    # Fork (and possibly open a PR) this dependency:
+    # https://github.com/prisma-labs/graphql-request/blob/master/src/index.ts#L440
+    # Either patching, or adding an option to provide a custom JSON serializer,
+    # Where we would parse it into bigint, or likely into 'number | bigint'
+    Int64: bigint

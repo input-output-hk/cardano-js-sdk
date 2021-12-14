@@ -4,6 +4,7 @@ import { AuxiliaryData } from './AuxiliaryData';
 import { Block } from '../Block';
 import { Cardano } from '@cardano-sdk/core';
 import { Directive, Field, Int, ObjectType } from 'type-graphql';
+import { Int64 } from '../util';
 import { Redeemer } from './Redeemer';
 import { Slot } from '../Slot';
 import { Token } from './Token';
@@ -22,9 +23,9 @@ export class Transaction {
   blockIndex: number;
   @Field(() => [TransactionInput], { nullable: true })
   collateral?: TransactionInput[];
-  @Field(() => String)
+  @Field(() => Int64)
   deposit: Cardano.Lovelace;
-  @Field(() => String)
+  @Field(() => Int64)
   fee: Cardano.Lovelace;
   @Directive('@hasInverse(field: transaction)')
   @Field(() => [TransactionInput])
@@ -45,13 +46,9 @@ export class Transaction {
   @Directive('@hasInverse(field: transaction)')
   @Field(() => [Redeemer], { nullable: true })
   redeemers?: Redeemer[];
-  // TODO: not sure how we want to handle overflow on aggregates.
-  // Got to dig deeper to implementing custom dgraph stuff,
-  // maybe it's possible to have custom aggregate query implementations
-  // that would return strings (bigints)
-  @Field(() => Int)
+  @Field(() => Int64)
   size: number;
-  @Field(() => String)
+  @Field(() => Int64)
   totalOutputCoin: Cardano.Lovelace;
   @Field()
   validContract: boolean;

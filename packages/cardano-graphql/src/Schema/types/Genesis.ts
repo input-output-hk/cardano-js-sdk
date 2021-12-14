@@ -1,7 +1,7 @@
 import { Cardano } from '@cardano-sdk/core';
 import { ExecutionPrices, ExecutionUnits } from './ExUnits';
 import { Field, Float, Int, ObjectType } from 'type-graphql';
-import { Json } from './util';
+import { Int64, Json } from './util';
 import { ProtocolParameters } from './ProtocolParameters';
 
 @ObjectType()
@@ -118,7 +118,7 @@ export class ShelleyGenesis {
   initialFunds: Json;
   @Field(() => Int)
   maxKESEvolutions: number;
-  @Field(() => String)
+  @Field(() => Int64)
   maxLovelaceSupply: Cardano.Lovelace;
   @Field(() => String)
   networkId: string;

@@ -3,14 +3,15 @@
 
 import { AuxiliaryDataBody } from './AuxiliaryDataBody';
 import { Cardano } from '@cardano-sdk/core';
-import { Directive, Field, Int, ObjectType } from 'type-graphql';
+import { Directive, Field, ObjectType } from 'type-graphql';
+import { Int64 } from '../../util';
 
 @ObjectType()
 export class Script {
   @Directive('@id')
   @Field(() => String)
   hash: Cardano.Hash28ByteBase16;
-  @Field(() => Int)
+  @Field(() => Int64)
   serializedSize: number;
   @Field(() => String)
   type: string;

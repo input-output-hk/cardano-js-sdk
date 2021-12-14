@@ -2,6 +2,7 @@
 import { Cardano } from '@cardano-sdk/core';
 import { Directive, Field, Int, ObjectType } from 'type-graphql';
 import { Epoch } from './Epoch';
+import { Int64 } from './util';
 import { ProtocolVersion } from './ProtocolParameters';
 import { Slot } from './Slot';
 import { StakePool } from './StakePool';
@@ -21,14 +22,14 @@ export class Block {
   issuer: StakePool;
   @Field(() => Epoch)
   epoch: Epoch;
-  @Field(() => Int)
+  @Field(() => Int64)
   size: Cardano.BlockSize;
   @Directive('@hasInverse(field: block)')
   @Field(() => [Transaction])
   transactions: Transaction[];
-  @Field(() => String)
+  @Field(() => Int64)
   totalOutput: Cardano.Lovelace;
-  @Field(() => String)
+  @Field(() => Int64)
   fees: Cardano.Lovelace;
   @Field(() => Block)
   previousBlock?: Block;

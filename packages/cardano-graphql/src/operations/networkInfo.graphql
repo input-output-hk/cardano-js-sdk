@@ -1,0 +1,23 @@
+query NetworkInfo {
+  queryEpoch(order: { desc: number }, first: 1) {
+    number
+    startedAt {
+      date
+    }
+    # Review: what's 'live stake'? We have it as part of NetworkInfo.stake (StakeSummary)
+    activeStakeAggregate {
+      quantitySum
+    }
+  }
+  queryShelleyGenesis(first: 1) {
+    slotLength
+    epochLength
+  }
+  queryAda(first: 1) {
+    supply {
+      circulating
+      max
+      total
+    }
+  }
+}

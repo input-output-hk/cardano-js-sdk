@@ -21,13 +21,13 @@ export type Scalars = {
    * The Int64 scalar type represents a signed 64‐bit numeric non‐fractional value.
    * Int64 can represent values in range [-(2^63),(2^63 - 1)].
    */
-  Int64: number;
+  Int64: bigint;
 };
 
 export type ActiveStake = {
   __typename?: 'ActiveStake';
   epoch: Epoch;
-  quantity: Scalars['String'];
+  quantity: Scalars['Int64'];
   rewardAccount: RewardAccount;
   stakePool: StakePool;
 };
@@ -50,8 +50,10 @@ export type ActiveStakeStakePoolArgs = {
 export type ActiveStakeAggregateResult = {
   __typename?: 'ActiveStakeAggregateResult';
   count?: Maybe<Scalars['Int']>;
-  quantityMax?: Maybe<Scalars['String']>;
-  quantityMin?: Maybe<Scalars['String']>;
+  quantityAvg?: Maybe<Scalars['Float']>;
+  quantityMax?: Maybe<Scalars['Int64']>;
+  quantityMin?: Maybe<Scalars['Int64']>;
+  quantitySum?: Maybe<Scalars['Int64']>;
 };
 
 export type ActiveStakeFilter = {
@@ -80,27 +82,57 @@ export enum ActiveStakeOrderable {
 
 export type ActiveStakePatch = {
   epoch?: Maybe<EpochRef>;
-  quantity?: Maybe<Scalars['String']>;
+  quantity?: Maybe<Scalars['Int64']>;
   rewardAccount?: Maybe<RewardAccountRef>;
   stakePool?: Maybe<StakePoolRef>;
 };
 
 export type ActiveStakeRef = {
   epoch?: Maybe<EpochRef>;
-  quantity?: Maybe<Scalars['String']>;
+  quantity?: Maybe<Scalars['Int64']>;
   rewardAccount?: Maybe<RewardAccountRef>;
   stakePool?: Maybe<StakePoolRef>;
 };
 
+export type Ada = {
+  __typename?: 'Ada';
+  supply: AssetSupply;
+};
+
+
+export type AdaSupplyArgs = {
+  filter?: Maybe<AssetSupplyFilter>;
+};
+
+export type AdaAggregateResult = {
+  __typename?: 'AdaAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+};
+
+export type AdaFilter = {
+  and?: Maybe<Array<Maybe<AdaFilter>>>;
+  has?: Maybe<Array<Maybe<AdaHasFilter>>>;
+  not?: Maybe<AdaFilter>;
+  or?: Maybe<Array<Maybe<AdaFilter>>>;
+};
+
+export enum AdaHasFilter {
+  Supply = 'supply'
+}
+
+export type AdaPatch = {
+  supply?: Maybe<AssetSupplyRef>;
+};
+
 export type AdaPots = {
   __typename?: 'AdaPots';
-  deposits: Scalars['String'];
-  fees: Scalars['String'];
-  reserves: Scalars['String'];
-  rewards: Scalars['String'];
+  deposits: Scalars['Int64'];
+  fees: Scalars['Int64'];
+  reserves: Scalars['Int64'];
+  rewards: Scalars['Int64'];
   slot: Slot;
-  treasury: Scalars['String'];
-  utxo: Scalars['String'];
+  treasury: Scalars['Int64'];
+  utxo: Scalars['Int64'];
 };
 
 
@@ -111,18 +143,30 @@ export type AdaPotsSlotArgs = {
 export type AdaPotsAggregateResult = {
   __typename?: 'AdaPotsAggregateResult';
   count?: Maybe<Scalars['Int']>;
-  depositsMax?: Maybe<Scalars['String']>;
-  depositsMin?: Maybe<Scalars['String']>;
-  feesMax?: Maybe<Scalars['String']>;
-  feesMin?: Maybe<Scalars['String']>;
-  reservesMax?: Maybe<Scalars['String']>;
-  reservesMin?: Maybe<Scalars['String']>;
-  rewardsMax?: Maybe<Scalars['String']>;
-  rewardsMin?: Maybe<Scalars['String']>;
-  treasuryMax?: Maybe<Scalars['String']>;
-  treasuryMin?: Maybe<Scalars['String']>;
-  utxoMax?: Maybe<Scalars['String']>;
-  utxoMin?: Maybe<Scalars['String']>;
+  depositsAvg?: Maybe<Scalars['Float']>;
+  depositsMax?: Maybe<Scalars['Int64']>;
+  depositsMin?: Maybe<Scalars['Int64']>;
+  depositsSum?: Maybe<Scalars['Int64']>;
+  feesAvg?: Maybe<Scalars['Float']>;
+  feesMax?: Maybe<Scalars['Int64']>;
+  feesMin?: Maybe<Scalars['Int64']>;
+  feesSum?: Maybe<Scalars['Int64']>;
+  reservesAvg?: Maybe<Scalars['Float']>;
+  reservesMax?: Maybe<Scalars['Int64']>;
+  reservesMin?: Maybe<Scalars['Int64']>;
+  reservesSum?: Maybe<Scalars['Int64']>;
+  rewardsAvg?: Maybe<Scalars['Float']>;
+  rewardsMax?: Maybe<Scalars['Int64']>;
+  rewardsMin?: Maybe<Scalars['Int64']>;
+  rewardsSum?: Maybe<Scalars['Int64']>;
+  treasuryAvg?: Maybe<Scalars['Float']>;
+  treasuryMax?: Maybe<Scalars['Int64']>;
+  treasuryMin?: Maybe<Scalars['Int64']>;
+  treasurySum?: Maybe<Scalars['Int64']>;
+  utxoAvg?: Maybe<Scalars['Float']>;
+  utxoMax?: Maybe<Scalars['Int64']>;
+  utxoMin?: Maybe<Scalars['Int64']>;
+  utxoSum?: Maybe<Scalars['Int64']>;
 };
 
 export type AdaPotsFilter = {
@@ -158,28 +202,32 @@ export enum AdaPotsOrderable {
 }
 
 export type AdaPotsPatch = {
-  deposits?: Maybe<Scalars['String']>;
-  fees?: Maybe<Scalars['String']>;
-  reserves?: Maybe<Scalars['String']>;
-  rewards?: Maybe<Scalars['String']>;
+  deposits?: Maybe<Scalars['Int64']>;
+  fees?: Maybe<Scalars['Int64']>;
+  reserves?: Maybe<Scalars['Int64']>;
+  rewards?: Maybe<Scalars['Int64']>;
   slot?: Maybe<SlotRef>;
-  treasury?: Maybe<Scalars['String']>;
-  utxo?: Maybe<Scalars['String']>;
+  treasury?: Maybe<Scalars['Int64']>;
+  utxo?: Maybe<Scalars['Int64']>;
 };
 
 export type AdaPotsRef = {
-  deposits?: Maybe<Scalars['String']>;
-  fees?: Maybe<Scalars['String']>;
-  reserves?: Maybe<Scalars['String']>;
-  rewards?: Maybe<Scalars['String']>;
+  deposits?: Maybe<Scalars['Int64']>;
+  fees?: Maybe<Scalars['Int64']>;
+  reserves?: Maybe<Scalars['Int64']>;
+  rewards?: Maybe<Scalars['Int64']>;
   slot?: Maybe<SlotRef>;
-  treasury?: Maybe<Scalars['String']>;
-  utxo?: Maybe<Scalars['String']>;
+  treasury?: Maybe<Scalars['Int64']>;
+  utxo?: Maybe<Scalars['Int64']>;
+};
+
+export type AdaRef = {
+  supply?: Maybe<AssetSupplyRef>;
 };
 
 export type AddActiveStakeInput = {
   epoch: EpochRef;
-  quantity: Scalars['String'];
+  quantity: Scalars['Int64'];
   rewardAccount: RewardAccountRef;
   stakePool: StakePoolRef;
 };
@@ -198,14 +246,31 @@ export type AddActiveStakePayloadActiveStakeArgs = {
   order?: Maybe<ActiveStakeOrder>;
 };
 
+export type AddAdaInput = {
+  supply: AssetSupplyRef;
+};
+
+export type AddAdaPayload = {
+  __typename?: 'AddAdaPayload';
+  ada?: Maybe<Array<Maybe<Ada>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type AddAdaPayloadAdaArgs = {
+  filter?: Maybe<AdaFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
 export type AddAdaPotsInput = {
-  deposits: Scalars['String'];
-  fees: Scalars['String'];
-  reserves: Scalars['String'];
-  rewards: Scalars['String'];
+  deposits: Scalars['Int64'];
+  fees: Scalars['Int64'];
+  reserves: Scalars['Int64'];
+  rewards: Scalars['Int64'];
   slot: SlotRef;
-  treasury: Scalars['String'];
-  utxo: Scalars['String'];
+  treasury: Scalars['Int64'];
+  utxo: Scalars['Int64'];
 };
 
 export type AddAdaPotsPayload = {
@@ -290,6 +355,26 @@ export type AddAssetPayloadAssetArgs = {
   order?: Maybe<AssetOrder>;
 };
 
+export type AddAssetSupplyInput = {
+  circulating: Scalars['String'];
+  max: Scalars['String'];
+  total?: Maybe<Scalars['String']>;
+};
+
+export type AddAssetSupplyPayload = {
+  __typename?: 'AddAssetSupplyPayload';
+  assetSupply?: Maybe<Array<Maybe<AssetSupply>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type AddAssetSupplyPayloadAssetSupplyArgs = {
+  filter?: Maybe<AssetSupplyFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<AssetSupplyOrder>;
+};
+
 export type AddAuxiliaryDataBodyInput = {
   auxiliaryData: AuxiliaryDataRef;
   blob?: Maybe<Array<MetadatumRef>>;
@@ -333,16 +418,16 @@ export type AddBlockInput = {
   blockNo: Scalars['Int'];
   confirmations: Scalars['Int'];
   epoch: EpochRef;
-  fees: Scalars['String'];
+  fees: Scalars['Int64'];
   hash: Scalars['String'];
   issuer: StakePoolRef;
   nextBlock: BlockRef;
   nextBlockProtocolVersion: ProtocolVersionRef;
   opCert: Scalars['String'];
   previousBlock: BlockRef;
-  size: Scalars['Int'];
+  size: Scalars['Int64'];
   slot: SlotRef;
-  totalOutput: Scalars['String'];
+  totalOutput: Scalars['Int64'];
   transactions: Array<TransactionRef>;
 };
 
@@ -497,10 +582,10 @@ export type AddEpochInput = {
   adaPots: AdaPotsRef;
   blocks: Array<BlockRef>;
   endedAt: SlotRef;
-  fees: Scalars['String'];
+  fees: Scalars['Int64'];
   nonce: Scalars['String'];
   number: Scalars['Int'];
-  output: Scalars['String'];
+  output: Scalars['Int64'];
   protocolParams: ProtocolParametersRef;
   startedAt: SlotRef;
 };
@@ -837,7 +922,7 @@ export type AddProtocolVersionPayloadProtocolVersionArgs = {
 
 export type AddRedeemerInput = {
   executionUnits: ExecutionUnitsRef;
-  fee: Scalars['String'];
+  fee: Scalars['Int64'];
   index: Scalars['Int'];
   purpose: Scalars['String'];
   scriptHash: Scalars['String'];
@@ -938,7 +1023,7 @@ export type AddRewardAccountPayloadRewardAccountArgs = {
 export type AddScriptInput = {
   auxiliaryDataBody: AuxiliaryDataBodyRef;
   hash: Scalars['String'];
-  serializedSize: Scalars['Int'];
+  serializedSize: Scalars['Int64'];
   type: Scalars['String'];
 };
 
@@ -962,7 +1047,7 @@ export type AddShelleyGenesisInput = {
   genDelegs?: Maybe<Scalars['String']>;
   initialFunds: Scalars['String'];
   maxKESEvolutions: Scalars['Int'];
-  maxLovelaceSupply: Scalars['String'];
+  maxLovelaceSupply: Scalars['Int64'];
   networkId: Scalars['String'];
   networkMagic: Scalars['Int'];
   protocolParams: ProtocolParametersRef;
@@ -1258,8 +1343,8 @@ export type AddTransactionInput = {
   block: BlockRef;
   blockIndex: Scalars['Int'];
   collateral?: Maybe<Array<TransactionInputRef>>;
-  deposit: Scalars['String'];
-  fee: Scalars['String'];
+  deposit: Scalars['Int64'];
+  fee: Scalars['Int64'];
   hash: Scalars['String'];
   inputs: Array<TransactionInputRef>;
   invalidBefore?: Maybe<Scalars['Int']>;
@@ -1267,8 +1352,8 @@ export type AddTransactionInput = {
   mint?: Maybe<Array<TokenRef>>;
   outputs: Array<TransactionOutputRef>;
   redeemers?: Maybe<Array<RedeemerRef>>;
-  size: Scalars['Int'];
-  totalOutputCoin: Scalars['String'];
+  size: Scalars['Int64'];
+  totalOutputCoin: Scalars['Int64'];
   validContract: Scalars['Boolean'];
   withdrawals?: Maybe<Array<WithdrawalRef>>;
 };
@@ -1333,7 +1418,7 @@ export type AddTransactionPayloadTransactionArgs = {
 
 export type AddValueInput = {
   assets?: Maybe<Array<TokenRef>>;
-  coin: Scalars['String'];
+  coin: Scalars['Int64'];
 };
 
 export type AddValuePayload = {
@@ -1351,7 +1436,7 @@ export type AddValuePayloadValueArgs = {
 };
 
 export type AddWithdrawalInput = {
-  quantity: Scalars['String'];
+  quantity: Scalars['Int64'];
   redeemer?: Maybe<Scalars['String']>;
   rewardAccount: RewardAccountRef;
   transaction: TransactionRef;
@@ -1636,6 +1721,61 @@ export type AssetRef = {
   fingerprint?: Maybe<Scalars['String']>;
 };
 
+export type AssetSupply = {
+  __typename?: 'AssetSupply';
+  circulating: Scalars['String'];
+  max: Scalars['String'];
+  total?: Maybe<Scalars['String']>;
+};
+
+export type AssetSupplyAggregateResult = {
+  __typename?: 'AssetSupplyAggregateResult';
+  circulatingMax?: Maybe<Scalars['String']>;
+  circulatingMin?: Maybe<Scalars['String']>;
+  count?: Maybe<Scalars['Int']>;
+  maxMax?: Maybe<Scalars['String']>;
+  maxMin?: Maybe<Scalars['String']>;
+  totalMax?: Maybe<Scalars['String']>;
+  totalMin?: Maybe<Scalars['String']>;
+};
+
+export type AssetSupplyFilter = {
+  and?: Maybe<Array<Maybe<AssetSupplyFilter>>>;
+  has?: Maybe<Array<Maybe<AssetSupplyHasFilter>>>;
+  not?: Maybe<AssetSupplyFilter>;
+  or?: Maybe<Array<Maybe<AssetSupplyFilter>>>;
+};
+
+export enum AssetSupplyHasFilter {
+  Circulating = 'circulating',
+  Max = 'max',
+  Total = 'total'
+}
+
+export type AssetSupplyOrder = {
+  asc?: Maybe<AssetSupplyOrderable>;
+  desc?: Maybe<AssetSupplyOrderable>;
+  then?: Maybe<AssetSupplyOrder>;
+};
+
+export enum AssetSupplyOrderable {
+  Circulating = 'circulating',
+  Max = 'max',
+  Total = 'total'
+}
+
+export type AssetSupplyPatch = {
+  circulating?: Maybe<Scalars['String']>;
+  max?: Maybe<Scalars['String']>;
+  total?: Maybe<Scalars['String']>;
+};
+
+export type AssetSupplyRef = {
+  circulating?: Maybe<Scalars['String']>;
+  max?: Maybe<Scalars['String']>;
+  total?: Maybe<Scalars['String']>;
+};
+
 export type AuthRule = {
   and?: Maybe<Array<Maybe<AuthRule>>>;
   not?: Maybe<AuthRule>;
@@ -1770,16 +1910,16 @@ export type Block = {
   blockNo: Scalars['Int'];
   confirmations: Scalars['Int'];
   epoch: Epoch;
-  fees: Scalars['String'];
+  fees: Scalars['Int64'];
   hash: Scalars['String'];
   issuer: StakePool;
   nextBlock: Block;
   nextBlockProtocolVersion: ProtocolVersion;
   opCert: Scalars['String'];
   previousBlock: Block;
-  size: Scalars['Int'];
+  size: Scalars['Int64'];
   slot: Slot;
-  totalOutput: Scalars['String'];
+  totalOutput: Scalars['Int64'];
   transactions: Array<Transaction>;
   transactionsAggregate?: Maybe<TransactionAggregateResult>;
 };
@@ -1838,18 +1978,22 @@ export type BlockAggregateResult = {
   confirmationsMin?: Maybe<Scalars['Int']>;
   confirmationsSum?: Maybe<Scalars['Int']>;
   count?: Maybe<Scalars['Int']>;
-  feesMax?: Maybe<Scalars['String']>;
-  feesMin?: Maybe<Scalars['String']>;
+  feesAvg?: Maybe<Scalars['Float']>;
+  feesMax?: Maybe<Scalars['Int64']>;
+  feesMin?: Maybe<Scalars['Int64']>;
+  feesSum?: Maybe<Scalars['Int64']>;
   hashMax?: Maybe<Scalars['String']>;
   hashMin?: Maybe<Scalars['String']>;
   opCertMax?: Maybe<Scalars['String']>;
   opCertMin?: Maybe<Scalars['String']>;
   sizeAvg?: Maybe<Scalars['Float']>;
-  sizeMax?: Maybe<Scalars['Int']>;
-  sizeMin?: Maybe<Scalars['Int']>;
-  sizeSum?: Maybe<Scalars['Int']>;
-  totalOutputMax?: Maybe<Scalars['String']>;
-  totalOutputMin?: Maybe<Scalars['String']>;
+  sizeMax?: Maybe<Scalars['Int64']>;
+  sizeMin?: Maybe<Scalars['Int64']>;
+  sizeSum?: Maybe<Scalars['Int64']>;
+  totalOutputAvg?: Maybe<Scalars['Float']>;
+  totalOutputMax?: Maybe<Scalars['Int64']>;
+  totalOutputMin?: Maybe<Scalars['Int64']>;
+  totalOutputSum?: Maybe<Scalars['Int64']>;
 };
 
 export type BlockFilter = {
@@ -1897,15 +2041,15 @@ export type BlockPatch = {
   blockNo?: Maybe<Scalars['Int']>;
   confirmations?: Maybe<Scalars['Int']>;
   epoch?: Maybe<EpochRef>;
-  fees?: Maybe<Scalars['String']>;
+  fees?: Maybe<Scalars['Int64']>;
   issuer?: Maybe<StakePoolRef>;
   nextBlock?: Maybe<BlockRef>;
   nextBlockProtocolVersion?: Maybe<ProtocolVersionRef>;
   opCert?: Maybe<Scalars['String']>;
   previousBlock?: Maybe<BlockRef>;
-  size?: Maybe<Scalars['Int']>;
+  size?: Maybe<Scalars['Int64']>;
   slot?: Maybe<SlotRef>;
-  totalOutput?: Maybe<Scalars['String']>;
+  totalOutput?: Maybe<Scalars['Int64']>;
   transactions?: Maybe<Array<TransactionRef>>;
 };
 
@@ -1913,16 +2057,16 @@ export type BlockRef = {
   blockNo?: Maybe<Scalars['Int']>;
   confirmations?: Maybe<Scalars['Int']>;
   epoch?: Maybe<EpochRef>;
-  fees?: Maybe<Scalars['String']>;
+  fees?: Maybe<Scalars['Int64']>;
   hash?: Maybe<Scalars['String']>;
   issuer?: Maybe<StakePoolRef>;
   nextBlock?: Maybe<BlockRef>;
   nextBlockProtocolVersion?: Maybe<ProtocolVersionRef>;
   opCert?: Maybe<Scalars['String']>;
   previousBlock?: Maybe<BlockRef>;
-  size?: Maybe<Scalars['Int']>;
+  size?: Maybe<Scalars['Int64']>;
   slot?: Maybe<SlotRef>;
-  totalOutput?: Maybe<Scalars['String']>;
+  totalOutput?: Maybe<Scalars['Int64']>;
   transactions?: Maybe<Array<TransactionRef>>;
 };
 
@@ -2408,6 +2552,20 @@ export type DeleteActiveStakePayloadActiveStakeArgs = {
   order?: Maybe<ActiveStakeOrder>;
 };
 
+export type DeleteAdaPayload = {
+  __typename?: 'DeleteAdaPayload';
+  ada?: Maybe<Array<Maybe<Ada>>>;
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type DeleteAdaPayloadAdaArgs = {
+  filter?: Maybe<AdaFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
 export type DeleteAdaPotsPayload = {
   __typename?: 'DeleteAdaPotsPayload';
   adaPots?: Maybe<Array<Maybe<AdaPots>>>;
@@ -2466,6 +2624,21 @@ export type DeleteAssetPayloadAssetArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<AssetOrder>;
+};
+
+export type DeleteAssetSupplyPayload = {
+  __typename?: 'DeleteAssetSupplyPayload';
+  assetSupply?: Maybe<Array<Maybe<AssetSupply>>>;
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type DeleteAssetSupplyPayloadAssetSupplyArgs = {
+  filter?: Maybe<AssetSupplyFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<AssetSupplyOrder>;
 };
 
 export type DeleteAuxiliaryDataBodyPayload = {
@@ -3223,10 +3396,10 @@ export type Epoch = {
   blocks: Array<Block>;
   blocksAggregate?: Maybe<BlockAggregateResult>;
   endedAt: Slot;
-  fees: Scalars['String'];
+  fees: Scalars['Int64'];
   nonce: Scalars['String'];
   number: Scalars['Int'];
-  output: Scalars['String'];
+  output: Scalars['Int64'];
   protocolParams: ProtocolParameters;
   startedAt: Slot;
 };
@@ -3280,16 +3453,20 @@ export type EpochStartedAtArgs = {
 export type EpochAggregateResult = {
   __typename?: 'EpochAggregateResult';
   count?: Maybe<Scalars['Int']>;
-  feesMax?: Maybe<Scalars['String']>;
-  feesMin?: Maybe<Scalars['String']>;
+  feesAvg?: Maybe<Scalars['Float']>;
+  feesMax?: Maybe<Scalars['Int64']>;
+  feesMin?: Maybe<Scalars['Int64']>;
+  feesSum?: Maybe<Scalars['Int64']>;
   nonceMax?: Maybe<Scalars['String']>;
   nonceMin?: Maybe<Scalars['String']>;
   numberAvg?: Maybe<Scalars['Float']>;
   numberMax?: Maybe<Scalars['Int']>;
   numberMin?: Maybe<Scalars['Int']>;
   numberSum?: Maybe<Scalars['Int']>;
-  outputMax?: Maybe<Scalars['String']>;
-  outputMin?: Maybe<Scalars['String']>;
+  outputAvg?: Maybe<Scalars['Float']>;
+  outputMax?: Maybe<Scalars['Int64']>;
+  outputMin?: Maybe<Scalars['Int64']>;
+  outputSum?: Maybe<Scalars['Int64']>;
 };
 
 export type EpochFilter = {
@@ -3331,9 +3508,9 @@ export type EpochPatch = {
   adaPots?: Maybe<AdaPotsRef>;
   blocks?: Maybe<Array<BlockRef>>;
   endedAt?: Maybe<SlotRef>;
-  fees?: Maybe<Scalars['String']>;
+  fees?: Maybe<Scalars['Int64']>;
   nonce?: Maybe<Scalars['String']>;
-  output?: Maybe<Scalars['String']>;
+  output?: Maybe<Scalars['Int64']>;
   protocolParams?: Maybe<ProtocolParametersRef>;
   startedAt?: Maybe<SlotRef>;
 };
@@ -3343,10 +3520,10 @@ export type EpochRef = {
   adaPots?: Maybe<AdaPotsRef>;
   blocks?: Maybe<Array<BlockRef>>;
   endedAt?: Maybe<SlotRef>;
-  fees?: Maybe<Scalars['String']>;
+  fees?: Maybe<Scalars['Int64']>;
   nonce?: Maybe<Scalars['String']>;
   number?: Maybe<Scalars['Int']>;
-  output?: Maybe<Scalars['String']>;
+  output?: Maybe<Scalars['Int64']>;
   protocolParams?: Maybe<ProtocolParametersRef>;
   startedAt?: Maybe<SlotRef>;
 };
@@ -4106,10 +4283,12 @@ export type MultiPolygonRef = {
 export type Mutation = {
   __typename?: 'Mutation';
   addActiveStake?: Maybe<AddActiveStakePayload>;
+  addAda?: Maybe<AddAdaPayload>;
   addAdaPots?: Maybe<AddAdaPotsPayload>;
   addAddress?: Maybe<AddAddressPayload>;
   addAlonzoGenesis?: Maybe<AddAlonzoGenesisPayload>;
   addAsset?: Maybe<AddAssetPayload>;
+  addAssetSupply?: Maybe<AddAssetSupplyPayload>;
   addAuxiliaryData?: Maybe<AddAuxiliaryDataPayload>;
   addAuxiliaryDataBody?: Maybe<AddAuxiliaryDataBodyPayload>;
   addBlock?: Maybe<AddBlockPayload>;
@@ -4160,10 +4339,12 @@ export type Mutation = {
   addValue?: Maybe<AddValuePayload>;
   addWithdrawal?: Maybe<AddWithdrawalPayload>;
   deleteActiveStake?: Maybe<DeleteActiveStakePayload>;
+  deleteAda?: Maybe<DeleteAdaPayload>;
   deleteAdaPots?: Maybe<DeleteAdaPotsPayload>;
   deleteAddress?: Maybe<DeleteAddressPayload>;
   deleteAlonzoGenesis?: Maybe<DeleteAlonzoGenesisPayload>;
   deleteAsset?: Maybe<DeleteAssetPayload>;
+  deleteAssetSupply?: Maybe<DeleteAssetSupplyPayload>;
   deleteAuxiliaryData?: Maybe<DeleteAuxiliaryDataPayload>;
   deleteAuxiliaryDataBody?: Maybe<DeleteAuxiliaryDataBodyPayload>;
   deleteBlock?: Maybe<DeleteBlockPayload>;
@@ -4214,10 +4395,12 @@ export type Mutation = {
   deleteValue?: Maybe<DeleteValuePayload>;
   deleteWithdrawal?: Maybe<DeleteWithdrawalPayload>;
   updateActiveStake?: Maybe<UpdateActiveStakePayload>;
+  updateAda?: Maybe<UpdateAdaPayload>;
   updateAdaPots?: Maybe<UpdateAdaPotsPayload>;
   updateAddress?: Maybe<UpdateAddressPayload>;
   updateAlonzoGenesis?: Maybe<UpdateAlonzoGenesisPayload>;
   updateAsset?: Maybe<UpdateAssetPayload>;
+  updateAssetSupply?: Maybe<UpdateAssetSupplyPayload>;
   updateAuxiliaryData?: Maybe<UpdateAuxiliaryDataPayload>;
   updateAuxiliaryDataBody?: Maybe<UpdateAuxiliaryDataBodyPayload>;
   updateBlock?: Maybe<UpdateBlockPayload>;
@@ -4275,6 +4458,11 @@ export type MutationAddActiveStakeArgs = {
 };
 
 
+export type MutationAddAdaArgs = {
+  input: Array<AddAdaInput>;
+};
+
+
 export type MutationAddAdaPotsArgs = {
   input: Array<AddAdaPotsInput>;
 };
@@ -4292,6 +4480,11 @@ export type MutationAddAlonzoGenesisArgs = {
 
 export type MutationAddAssetArgs = {
   input: Array<AddAssetInput>;
+};
+
+
+export type MutationAddAssetSupplyArgs = {
+  input: Array<AddAssetSupplyInput>;
 };
 
 
@@ -4553,6 +4746,11 @@ export type MutationDeleteActiveStakeArgs = {
 };
 
 
+export type MutationDeleteAdaArgs = {
+  filter: AdaFilter;
+};
+
+
 export type MutationDeleteAdaPotsArgs = {
   filter: AdaPotsFilter;
 };
@@ -4570,6 +4768,11 @@ export type MutationDeleteAlonzoGenesisArgs = {
 
 export type MutationDeleteAssetArgs = {
   filter: AssetFilter;
+};
+
+
+export type MutationDeleteAssetSupplyArgs = {
+  filter: AssetSupplyFilter;
 };
 
 
@@ -4823,6 +5026,11 @@ export type MutationUpdateActiveStakeArgs = {
 };
 
 
+export type MutationUpdateAdaArgs = {
+  input: UpdateAdaInput;
+};
+
+
 export type MutationUpdateAdaPotsArgs = {
   input: UpdateAdaPotsInput;
 };
@@ -4840,6 +5048,11 @@ export type MutationUpdateAlonzoGenesisArgs = {
 
 export type MutationUpdateAssetArgs = {
   input: UpdateAssetInput;
+};
+
+
+export type MutationUpdateAssetSupplyArgs = {
+  input: UpdateAssetSupplyInput;
 };
 
 
@@ -5535,10 +5748,12 @@ export type ProtocolVersionRef = {
 export type Query = {
   __typename?: 'Query';
   aggregateActiveStake?: Maybe<ActiveStakeAggregateResult>;
+  aggregateAda?: Maybe<AdaAggregateResult>;
   aggregateAdaPots?: Maybe<AdaPotsAggregateResult>;
   aggregateAddress?: Maybe<AddressAggregateResult>;
   aggregateAlonzoGenesis?: Maybe<AlonzoGenesisAggregateResult>;
   aggregateAsset?: Maybe<AssetAggregateResult>;
+  aggregateAssetSupply?: Maybe<AssetSupplyAggregateResult>;
   aggregateAuxiliaryData?: Maybe<AuxiliaryDataAggregateResult>;
   aggregateAuxiliaryDataBody?: Maybe<AuxiliaryDataBodyAggregateResult>;
   aggregateBlock?: Maybe<BlockAggregateResult>;
@@ -5597,10 +5812,12 @@ export type Query = {
   getStakePoolMetadata?: Maybe<StakePoolMetadata>;
   getTransaction?: Maybe<Transaction>;
   queryActiveStake?: Maybe<Array<Maybe<ActiveStake>>>;
+  queryAda?: Maybe<Array<Maybe<Ada>>>;
   queryAdaPots?: Maybe<Array<Maybe<AdaPots>>>;
   queryAddress?: Maybe<Array<Maybe<Address>>>;
   queryAlonzoGenesis?: Maybe<Array<Maybe<AlonzoGenesis>>>;
   queryAsset?: Maybe<Array<Maybe<Asset>>>;
+  queryAssetSupply?: Maybe<Array<Maybe<AssetSupply>>>;
   queryAuxiliaryData?: Maybe<Array<Maybe<AuxiliaryData>>>;
   queryAuxiliaryDataBody?: Maybe<Array<Maybe<AuxiliaryDataBody>>>;
   queryBlock?: Maybe<Array<Maybe<Block>>>;
@@ -5658,6 +5875,11 @@ export type QueryAggregateActiveStakeArgs = {
 };
 
 
+export type QueryAggregateAdaArgs = {
+  filter?: Maybe<AdaFilter>;
+};
+
+
 export type QueryAggregateAdaPotsArgs = {
   filter?: Maybe<AdaPotsFilter>;
 };
@@ -5675,6 +5897,11 @@ export type QueryAggregateAlonzoGenesisArgs = {
 
 export type QueryAggregateAssetArgs = {
   filter?: Maybe<AssetFilter>;
+};
+
+
+export type QueryAggregateAssetSupplyArgs = {
+  filter?: Maybe<AssetSupplyFilter>;
 };
 
 
@@ -5971,6 +6198,13 @@ export type QueryQueryActiveStakeArgs = {
 };
 
 
+export type QueryQueryAdaArgs = {
+  filter?: Maybe<AdaFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+
 export type QueryQueryAdaPotsArgs = {
   filter?: Maybe<AdaPotsFilter>;
   first?: Maybe<Scalars['Int']>;
@@ -6000,6 +6234,14 @@ export type QueryQueryAssetArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<AssetOrder>;
+};
+
+
+export type QueryQueryAssetSupplyArgs = {
+  filter?: Maybe<AssetSupplyFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<AssetSupplyOrder>;
 };
 
 
@@ -6391,7 +6633,7 @@ export type QueryQueryWithdrawalArgs = {
 export type Redeemer = {
   __typename?: 'Redeemer';
   executionUnits: ExecutionUnits;
-  fee: Scalars['String'];
+  fee: Scalars['Int64'];
   index: Scalars['Int'];
   purpose: Scalars['String'];
   scriptHash: Scalars['String'];
@@ -6411,8 +6653,10 @@ export type RedeemerTransactionArgs = {
 export type RedeemerAggregateResult = {
   __typename?: 'RedeemerAggregateResult';
   count?: Maybe<Scalars['Int']>;
-  feeMax?: Maybe<Scalars['String']>;
-  feeMin?: Maybe<Scalars['String']>;
+  feeAvg?: Maybe<Scalars['Float']>;
+  feeMax?: Maybe<Scalars['Int64']>;
+  feeMin?: Maybe<Scalars['Int64']>;
+  feeSum?: Maybe<Scalars['Int64']>;
   indexAvg?: Maybe<Scalars['Float']>;
   indexMax?: Maybe<Scalars['Int']>;
   indexMin?: Maybe<Scalars['Int']>;
@@ -6454,7 +6698,7 @@ export enum RedeemerOrderable {
 
 export type RedeemerPatch = {
   executionUnits?: Maybe<ExecutionUnitsRef>;
-  fee?: Maybe<Scalars['String']>;
+  fee?: Maybe<Scalars['Int64']>;
   index?: Maybe<Scalars['Int']>;
   purpose?: Maybe<Scalars['String']>;
   scriptHash?: Maybe<Scalars['String']>;
@@ -6463,7 +6707,7 @@ export type RedeemerPatch = {
 
 export type RedeemerRef = {
   executionUnits?: Maybe<ExecutionUnitsRef>;
-  fee?: Maybe<Scalars['String']>;
+  fee?: Maybe<Scalars['Int64']>;
   index?: Maybe<Scalars['Int']>;
   purpose?: Maybe<Scalars['String']>;
   scriptHash?: Maybe<Scalars['String']>;
@@ -6681,7 +6925,7 @@ export type Script = {
   __typename?: 'Script';
   auxiliaryDataBody: AuxiliaryDataBody;
   hash: Scalars['String'];
-  serializedSize: Scalars['Int'];
+  serializedSize: Scalars['Int64'];
   type: Scalars['String'];
 };
 
@@ -6696,9 +6940,9 @@ export type ScriptAggregateResult = {
   hashMax?: Maybe<Scalars['String']>;
   hashMin?: Maybe<Scalars['String']>;
   serializedSizeAvg?: Maybe<Scalars['Float']>;
-  serializedSizeMax?: Maybe<Scalars['Int']>;
-  serializedSizeMin?: Maybe<Scalars['Int']>;
-  serializedSizeSum?: Maybe<Scalars['Int']>;
+  serializedSizeMax?: Maybe<Scalars['Int64']>;
+  serializedSizeMin?: Maybe<Scalars['Int64']>;
+  serializedSizeSum?: Maybe<Scalars['Int64']>;
   typeMax?: Maybe<Scalars['String']>;
   typeMin?: Maybe<Scalars['String']>;
 };
@@ -6732,14 +6976,14 @@ export enum ScriptOrderable {
 
 export type ScriptPatch = {
   auxiliaryDataBody?: Maybe<AuxiliaryDataBodyRef>;
-  serializedSize?: Maybe<Scalars['Int']>;
+  serializedSize?: Maybe<Scalars['Int64']>;
   type?: Maybe<Scalars['String']>;
 };
 
 export type ScriptRef = {
   auxiliaryDataBody?: Maybe<AuxiliaryDataBodyRef>;
   hash?: Maybe<Scalars['String']>;
-  serializedSize?: Maybe<Scalars['Int']>;
+  serializedSize?: Maybe<Scalars['Int64']>;
   type?: Maybe<Scalars['String']>;
 };
 
@@ -6771,7 +7015,7 @@ export type ShelleyGenesis = {
   genDelegs?: Maybe<Scalars['String']>;
   initialFunds: Scalars['String'];
   maxKESEvolutions: Scalars['Int'];
-  maxLovelaceSupply: Scalars['String'];
+  maxLovelaceSupply: Scalars['Int64'];
   networkId: Scalars['String'];
   networkMagic: Scalars['Int'];
   protocolParams: ProtocolParameters;
@@ -6812,8 +7056,10 @@ export type ShelleyGenesisAggregateResult = {
   maxKESEvolutionsMax?: Maybe<Scalars['Int']>;
   maxKESEvolutionsMin?: Maybe<Scalars['Int']>;
   maxKESEvolutionsSum?: Maybe<Scalars['Int']>;
-  maxLovelaceSupplyMax?: Maybe<Scalars['String']>;
-  maxLovelaceSupplyMin?: Maybe<Scalars['String']>;
+  maxLovelaceSupplyAvg?: Maybe<Scalars['Float']>;
+  maxLovelaceSupplyMax?: Maybe<Scalars['Int64']>;
+  maxLovelaceSupplyMin?: Maybe<Scalars['Int64']>;
+  maxLovelaceSupplySum?: Maybe<Scalars['Int64']>;
   networkIdMax?: Maybe<Scalars['String']>;
   networkIdMin?: Maybe<Scalars['String']>;
   networkMagicAvg?: Maybe<Scalars['Float']>;
@@ -6893,7 +7139,7 @@ export type ShelleyGenesisPatch = {
   genDelegs?: Maybe<Scalars['String']>;
   initialFunds?: Maybe<Scalars['String']>;
   maxKESEvolutions?: Maybe<Scalars['Int']>;
-  maxLovelaceSupply?: Maybe<Scalars['String']>;
+  maxLovelaceSupply?: Maybe<Scalars['Int64']>;
   networkId?: Maybe<Scalars['String']>;
   networkMagic?: Maybe<Scalars['Int']>;
   protocolParams?: Maybe<ProtocolParametersRef>;
@@ -6911,7 +7157,7 @@ export type ShelleyGenesisRef = {
   genDelegs?: Maybe<Scalars['String']>;
   initialFunds?: Maybe<Scalars['String']>;
   maxKESEvolutions?: Maybe<Scalars['Int']>;
-  maxLovelaceSupply?: Maybe<Scalars['String']>;
+  maxLovelaceSupply?: Maybe<Scalars['Int64']>;
   networkId?: Maybe<Scalars['String']>;
   networkMagic?: Maybe<Scalars['Int']>;
   protocolParams?: Maybe<ProtocolParametersRef>;
@@ -7807,8 +8053,8 @@ export type Transaction = {
   blockIndex: Scalars['Int'];
   collateral?: Maybe<Array<TransactionInput>>;
   collateralAggregate?: Maybe<TransactionInputAggregateResult>;
-  deposit: Scalars['String'];
-  fee: Scalars['String'];
+  deposit: Scalars['Int64'];
+  fee: Scalars['Int64'];
   hash: Scalars['String'];
   inputs: Array<TransactionInput>;
   inputsAggregate?: Maybe<TransactionInputAggregateResult>;
@@ -7820,8 +8066,8 @@ export type Transaction = {
   outputsAggregate?: Maybe<TransactionOutputAggregateResult>;
   redeemers?: Maybe<Array<Redeemer>>;
   redeemersAggregate?: Maybe<RedeemerAggregateResult>;
-  size: Scalars['Int'];
-  totalOutputCoin: Scalars['String'];
+  size: Scalars['Int64'];
+  totalOutputCoin: Scalars['Int64'];
   validContract: Scalars['Boolean'];
   withdrawals?: Maybe<Array<Withdrawal>>;
   withdrawalsAggregate?: Maybe<WithdrawalAggregateResult>;
@@ -7922,10 +8168,14 @@ export type TransactionAggregateResult = {
   blockIndexMin?: Maybe<Scalars['Int']>;
   blockIndexSum?: Maybe<Scalars['Int']>;
   count?: Maybe<Scalars['Int']>;
-  depositMax?: Maybe<Scalars['String']>;
-  depositMin?: Maybe<Scalars['String']>;
-  feeMax?: Maybe<Scalars['String']>;
-  feeMin?: Maybe<Scalars['String']>;
+  depositAvg?: Maybe<Scalars['Float']>;
+  depositMax?: Maybe<Scalars['Int64']>;
+  depositMin?: Maybe<Scalars['Int64']>;
+  depositSum?: Maybe<Scalars['Int64']>;
+  feeAvg?: Maybe<Scalars['Float']>;
+  feeMax?: Maybe<Scalars['Int64']>;
+  feeMin?: Maybe<Scalars['Int64']>;
+  feeSum?: Maybe<Scalars['Int64']>;
   hashMax?: Maybe<Scalars['String']>;
   hashMin?: Maybe<Scalars['String']>;
   invalidBeforeAvg?: Maybe<Scalars['Float']>;
@@ -7937,11 +8187,13 @@ export type TransactionAggregateResult = {
   invalidHereafterMin?: Maybe<Scalars['Int']>;
   invalidHereafterSum?: Maybe<Scalars['Int']>;
   sizeAvg?: Maybe<Scalars['Float']>;
-  sizeMax?: Maybe<Scalars['Int']>;
-  sizeMin?: Maybe<Scalars['Int']>;
-  sizeSum?: Maybe<Scalars['Int']>;
-  totalOutputCoinMax?: Maybe<Scalars['String']>;
-  totalOutputCoinMin?: Maybe<Scalars['String']>;
+  sizeMax?: Maybe<Scalars['Int64']>;
+  sizeMin?: Maybe<Scalars['Int64']>;
+  sizeSum?: Maybe<Scalars['Int64']>;
+  totalOutputCoinAvg?: Maybe<Scalars['Float']>;
+  totalOutputCoinMax?: Maybe<Scalars['Int64']>;
+  totalOutputCoinMin?: Maybe<Scalars['Int64']>;
+  totalOutputCoinSum?: Maybe<Scalars['Int64']>;
 };
 
 export type TransactionFilter = {
@@ -8153,16 +8405,16 @@ export type TransactionPatch = {
   block?: Maybe<BlockRef>;
   blockIndex?: Maybe<Scalars['Int']>;
   collateral?: Maybe<Array<TransactionInputRef>>;
-  deposit?: Maybe<Scalars['String']>;
-  fee?: Maybe<Scalars['String']>;
+  deposit?: Maybe<Scalars['Int64']>;
+  fee?: Maybe<Scalars['Int64']>;
   inputs?: Maybe<Array<TransactionInputRef>>;
   invalidBefore?: Maybe<Scalars['Int']>;
   invalidHereafter?: Maybe<Scalars['Int']>;
   mint?: Maybe<Array<TokenRef>>;
   outputs?: Maybe<Array<TransactionOutputRef>>;
   redeemers?: Maybe<Array<RedeemerRef>>;
-  size?: Maybe<Scalars['Int']>;
-  totalOutputCoin?: Maybe<Scalars['String']>;
+  size?: Maybe<Scalars['Int64']>;
+  totalOutputCoin?: Maybe<Scalars['Int64']>;
   validContract?: Maybe<Scalars['Boolean']>;
   withdrawals?: Maybe<Array<WithdrawalRef>>;
 };
@@ -8172,8 +8424,8 @@ export type TransactionRef = {
   block?: Maybe<BlockRef>;
   blockIndex?: Maybe<Scalars['Int']>;
   collateral?: Maybe<Array<TransactionInputRef>>;
-  deposit?: Maybe<Scalars['String']>;
-  fee?: Maybe<Scalars['String']>;
+  deposit?: Maybe<Scalars['Int64']>;
+  fee?: Maybe<Scalars['Int64']>;
   hash?: Maybe<Scalars['String']>;
   inputs?: Maybe<Array<TransactionInputRef>>;
   invalidBefore?: Maybe<Scalars['Int']>;
@@ -8181,8 +8433,8 @@ export type TransactionRef = {
   mint?: Maybe<Array<TokenRef>>;
   outputs?: Maybe<Array<TransactionOutputRef>>;
   redeemers?: Maybe<Array<RedeemerRef>>;
-  size?: Maybe<Scalars['Int']>;
-  totalOutputCoin?: Maybe<Scalars['String']>;
+  size?: Maybe<Scalars['Int64']>;
+  totalOutputCoin?: Maybe<Scalars['Int64']>;
   validContract?: Maybe<Scalars['Boolean']>;
   withdrawals?: Maybe<Array<WithdrawalRef>>;
 };
@@ -8205,6 +8457,25 @@ export type UpdateActiveStakePayloadActiveStakeArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<ActiveStakeOrder>;
+};
+
+export type UpdateAdaInput = {
+  filter: AdaFilter;
+  remove?: Maybe<AdaPatch>;
+  set?: Maybe<AdaPatch>;
+};
+
+export type UpdateAdaPayload = {
+  __typename?: 'UpdateAdaPayload';
+  ada?: Maybe<Array<Maybe<Ada>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type UpdateAdaPayloadAdaArgs = {
+  filter?: Maybe<AdaFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
 };
 
 export type UpdateAdaPotsInput = {
@@ -8285,6 +8556,26 @@ export type UpdateAssetPayloadAssetArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<AssetOrder>;
+};
+
+export type UpdateAssetSupplyInput = {
+  filter: AssetSupplyFilter;
+  remove?: Maybe<AssetSupplyPatch>;
+  set?: Maybe<AssetSupplyPatch>;
+};
+
+export type UpdateAssetSupplyPayload = {
+  __typename?: 'UpdateAssetSupplyPayload';
+  assetSupply?: Maybe<Array<Maybe<AssetSupply>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type UpdateAssetSupplyPayloadAssetSupplyArgs = {
+  filter?: Maybe<AssetSupplyFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<AssetSupplyOrder>;
 };
 
 export type UpdateAuxiliaryDataBodyInput = {
@@ -9265,7 +9556,7 @@ export type Value = {
   __typename?: 'Value';
   assets?: Maybe<Array<Token>>;
   assetsAggregate?: Maybe<TokenAggregateResult>;
-  coin: Scalars['String'];
+  coin: Scalars['Int64'];
 };
 
 
@@ -9283,8 +9574,10 @@ export type ValueAssetsAggregateArgs = {
 
 export type ValueAggregateResult = {
   __typename?: 'ValueAggregateResult';
-  coinMax?: Maybe<Scalars['String']>;
-  coinMin?: Maybe<Scalars['String']>;
+  coinAvg?: Maybe<Scalars['Float']>;
+  coinMax?: Maybe<Scalars['Int64']>;
+  coinMin?: Maybe<Scalars['Int64']>;
+  coinSum?: Maybe<Scalars['Int64']>;
   count?: Maybe<Scalars['Int']>;
 };
 
@@ -9312,17 +9605,17 @@ export enum ValueOrderable {
 
 export type ValuePatch = {
   assets?: Maybe<Array<TokenRef>>;
-  coin?: Maybe<Scalars['String']>;
+  coin?: Maybe<Scalars['Int64']>;
 };
 
 export type ValueRef = {
   assets?: Maybe<Array<TokenRef>>;
-  coin?: Maybe<Scalars['String']>;
+  coin?: Maybe<Scalars['Int64']>;
 };
 
 export type Withdrawal = {
   __typename?: 'Withdrawal';
-  quantity: Scalars['String'];
+  quantity: Scalars['Int64'];
   redeemer?: Maybe<Scalars['String']>;
   rewardAccount: RewardAccount;
   transaction: Transaction;
@@ -9341,8 +9634,10 @@ export type WithdrawalTransactionArgs = {
 export type WithdrawalAggregateResult = {
   __typename?: 'WithdrawalAggregateResult';
   count?: Maybe<Scalars['Int']>;
-  quantityMax?: Maybe<Scalars['String']>;
-  quantityMin?: Maybe<Scalars['String']>;
+  quantityAvg?: Maybe<Scalars['Float']>;
+  quantityMax?: Maybe<Scalars['Int64']>;
+  quantityMin?: Maybe<Scalars['Int64']>;
+  quantitySum?: Maybe<Scalars['Int64']>;
   redeemerMax?: Maybe<Scalars['String']>;
   redeemerMin?: Maybe<Scalars['String']>;
 };
@@ -9373,14 +9668,14 @@ export enum WithdrawalOrderable {
 }
 
 export type WithdrawalPatch = {
-  quantity?: Maybe<Scalars['String']>;
+  quantity?: Maybe<Scalars['Int64']>;
   redeemer?: Maybe<Scalars['String']>;
   rewardAccount?: Maybe<RewardAccountRef>;
   transaction?: Maybe<TransactionRef>;
 };
 
 export type WithdrawalRef = {
-  quantity?: Maybe<Scalars['String']>;
+  quantity?: Maybe<Scalars['Int64']>;
   redeemer?: Maybe<Scalars['String']>;
   rewardAccount?: Maybe<RewardAccountRef>;
   transaction?: Maybe<TransactionRef>;
@@ -9395,12 +9690,17 @@ export type BlocksByHashesQueryVariables = Exact<{
 }>;
 
 
-export type BlocksByHashesQuery = { __typename?: 'Query', queryBlock?: Array<{ __typename?: 'Block', size: number, totalOutput: string, fees: string, hash: string, blockNo: number, confirmations: number, slot: { __typename?: 'Slot', number: number, date: string, slotInEpoch: number }, issuer: { __typename?: 'StakePool', id: string, vrf: string }, transactionsAggregate?: { __typename?: 'TransactionAggregateResult', count?: number | null | undefined } | null | undefined, epoch: { __typename?: 'Epoch', number: number }, previousBlock: { __typename?: 'Block', hash: string }, nextBlock: { __typename?: 'Block', hash: string } } | null | undefined> | null | undefined };
+export type BlocksByHashesQuery = { __typename?: 'Query', queryBlock?: Array<{ __typename?: 'Block', size: bigint, totalOutput: bigint, fees: bigint, hash: string, blockNo: number, confirmations: number, slot: { __typename?: 'Slot', number: number, date: string, slotInEpoch: number }, issuer: { __typename?: 'StakePool', id: string, vrf: string }, transactionsAggregate?: { __typename?: 'TransactionAggregateResult', count?: number | null | undefined } | null | undefined, epoch: { __typename?: 'Epoch', number: number }, previousBlock: { __typename?: 'Block', hash: string }, nextBlock: { __typename?: 'Block', hash: string } } | null | undefined> | null | undefined };
 
 export type GenesisParametersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GenesisParametersQuery = { __typename?: 'Query', queryShelleyGenesis?: Array<{ __typename?: 'ShelleyGenesis', systemStart: string, networkMagic: number, activeSlotsCoeff: number, securityParam: number, epochLength: number, slotsPerKESPeriod: number, maxKESEvolutions: number, slotLength: number, updateQuorum: number, maxLovelaceSupply: string } | null | undefined> | null | undefined };
+export type GenesisParametersQuery = { __typename?: 'Query', queryShelleyGenesis?: Array<{ __typename?: 'ShelleyGenesis', systemStart: string, networkMagic: number, activeSlotsCoeff: number, securityParam: number, epochLength: number, slotsPerKESPeriod: number, maxKESEvolutions: number, slotLength: number, updateQuorum: number, maxLovelaceSupply: bigint } | null | undefined> | null | undefined };
+
+export type NetworkInfoQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type NetworkInfoQuery = { __typename?: 'Query', queryEpoch?: Array<{ __typename?: 'Epoch', number: number, startedAt: { __typename?: 'Slot', date: string }, activeStakeAggregate?: { __typename?: 'ActiveStakeAggregateResult', quantitySum?: bigint | null | undefined } | null | undefined } | null | undefined> | null | undefined, queryShelleyGenesis?: Array<{ __typename?: 'ShelleyGenesis', slotLength: number, epochLength: number } | null | undefined> | null | undefined, queryAda?: Array<{ __typename?: 'Ada', supply: { __typename?: 'AssetSupply', circulating: string, max: string, total?: string | null | undefined } } | null | undefined> | null | undefined };
 
 export type ProtocolParametersQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -9568,6 +9868,30 @@ export const GenesisParametersDocument = gql`
   }
 }
     `;
+export const NetworkInfoDocument = gql`
+    query NetworkInfo {
+  queryEpoch(order: {desc: number}, first: 1) {
+    number
+    startedAt {
+      date
+    }
+    activeStakeAggregate {
+      quantitySum
+    }
+  }
+  queryShelleyGenesis(first: 1) {
+    slotLength
+    epochLength
+  }
+  queryAda(first: 1) {
+    supply {
+      circulating
+      max
+      total
+    }
+  }
+}
+    `;
 export const ProtocolParametersDocument = gql`
     query ProtocolParameters {
   queryProtocolParameters(first: 1) {
@@ -9630,6 +9954,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     GenesisParameters(variables?: GenesisParametersQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GenesisParametersQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GenesisParametersQuery>(GenesisParametersDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'GenesisParameters');
+    },
+    NetworkInfo(variables?: NetworkInfoQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<NetworkInfoQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<NetworkInfoQuery>(NetworkInfoDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'NetworkInfo');
     },
     ProtocolParameters(variables?: ProtocolParametersQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ProtocolParametersQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<ProtocolParametersQuery>(ProtocolParametersDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'ProtocolParameters');

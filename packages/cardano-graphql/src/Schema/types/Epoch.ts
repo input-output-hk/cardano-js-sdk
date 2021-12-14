@@ -3,6 +3,7 @@ import { ActiveStake } from './ActiveStake';
 import { Block } from './Block';
 import { Cardano } from '@cardano-sdk/core';
 import { Directive, Field, Int, ObjectType } from 'type-graphql';
+import { Int64 } from './util';
 import { ProtocolParameters } from './ProtocolParameters';
 import { Slot } from './Slot';
 
@@ -10,17 +11,17 @@ import { Slot } from './Slot';
 export class AdaPots {
   @Field(() => Slot)
   slot: Slot;
-  @Field(() => String)
+  @Field(() => Int64)
   deposits: Cardano.Lovelace;
-  @Field(() => String)
+  @Field(() => Int64)
   fees: Cardano.Lovelace;
-  @Field(() => String)
+  @Field(() => Int64)
   reserves: Cardano.Lovelace;
-  @Field(() => String)
+  @Field(() => Int64)
   rewards: Cardano.Lovelace;
-  @Field(() => String)
+  @Field(() => Int64)
   treasury: Cardano.Lovelace;
-  @Field(() => String)
+  @Field(() => Int64)
   utxo: Cardano.Lovelace;
 }
 
@@ -37,10 +38,10 @@ export class Epoch {
   @Directive('@hasInverse(field: epoch)')
   @Field(() => [Block])
   blocks: Block[];
-  @Field(() => String)
+  @Field(() => Int64)
   fees: Cardano.Lovelace;
-  @Field(() => String)
-  output: string;
+  @Field(() => Int64)
+  output: Cardano.Lovelace;
   @Field(() => String)
   nonce: Cardano.Hash32ByteBase16;
   @Field(() => ProtocolParameters)

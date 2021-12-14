@@ -1,5 +1,6 @@
 import { Cardano } from '@cardano-sdk/core';
 import { Field, ObjectType } from 'type-graphql';
+import { Int64 } from '../util';
 import { Redeemer } from './Redeemer';
 import { RewardAccount } from '../Address';
 import { Transaction } from './Transaction';
@@ -8,7 +9,7 @@ import { Transaction } from './Transaction';
 export class Withdrawal {
   @Field(() => RewardAccount)
   rewardAccount: RewardAccount;
-  @Field(() => String)
+  @Field(() => Int64)
   quantity: Cardano.Lovelace;
   @Field(() => String, { nullable: true })
   redeemer?: Redeemer;

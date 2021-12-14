@@ -143,7 +143,7 @@ describe('CardanoGraphQLWalletProvider', () => {
       blockNo: 1,
       confirmations: 4,
       epoch: { number: 5 },
-      fees: '123',
+      fees: 123n,
       hash: '6804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99cad',
       issuer: {
         id: 'pool1zuevzm3xlrhmwjw87ec38mzs02tlkwec9wxpgafcaykmwg7efhh',
@@ -151,9 +151,9 @@ describe('CardanoGraphQLWalletProvider', () => {
       },
       nextBlock: { hash: '6804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99cae' },
       previousBlock: { hash: '6804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99caa' },
-      size: 6,
+      size: 6n,
       slot: { date: '2019-10-12T07:20:50.52Z', number: 2, slotInEpoch: 3 },
-      totalOutput: '700',
+      totalOutput: 700n,
       transactionsAggregate: {
         count: 3
       }
@@ -174,7 +174,7 @@ describe('CardanoGraphQLWalletProvider', () => {
         date: new Date(block.slot.date),
         epoch: block.epoch.number,
         epochSlot: block.slot.slotInEpoch,
-        fees: BigInt(block.fees),
+        fees: block.fees,
         header: {
           blockNo: block.blockNo,
           hash: block.hash,
@@ -182,9 +182,9 @@ describe('CardanoGraphQLWalletProvider', () => {
         },
         nextBlock: block.nextBlock.hash,
         previousBlock: block.previousBlock.hash,
-        size: block.size,
+        size: Number(block.size),
         slotLeader: block.issuer.id,
-        totalOutput: BigInt(block.totalOutput),
+        totalOutput: block.totalOutput,
         txCount: block.transactionsAggregate!.count,
         vrf: block.issuer.vrf
       });
