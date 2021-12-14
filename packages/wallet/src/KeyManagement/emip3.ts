@@ -26,7 +26,7 @@ export const emip3encrypt = async (data: Uint8Array, password: Uint8Array): Prom
   const key = await createPbkdf2Key(password, salt);
   const nonce = new Uint8Array(NONCE_LENGTH);
   getRandomValues(nonce);
-  const cipher = chacha.createCipher(key, nonce);
+  const cipher = chacha.createCipher(key, Buffer.from(nonce));
   cipher.setAAD(AAD, { plaintextLength: data.length });
   const head = cipher.update(data);
   const final = cipher.final();
@@ -43,8 +43,8 @@ export const emip3decrypt = async (encrypted: Uint8Array, password: Uint8Array):
   const tag = encrypted.slice(SALT_LENGTH + NONCE_LENGTH, SALT_LENGTH + NONCE_LENGTH + TAG_LENGTH);
   const data = encrypted.slice(SALT_LENGTH + NONCE_LENGTH + TAG_LENGTH);
   const key = await createPbkdf2Key(password, salt);
-  const decipher = chacha.createDecipher(key, nonce);
-  decipher.setAuthTag(tag);
+  const decipher = chacha.createDecipher(key, Buffer.from(nonce));
+  decipher.setAuthTag(Buffer.from(tag));
   decipher.setAAD(AAD);
   return Buffer.concat([decipher.update(data), decipher.final()]);
 };
