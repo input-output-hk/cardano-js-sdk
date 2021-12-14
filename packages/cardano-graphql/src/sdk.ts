@@ -26,9 +26,9 @@ export type Scalars = {
 
 export type ActiveStake = {
   __typename?: 'ActiveStake';
-  address: Scalars['String'];
   epoch: Epoch;
   quantity: Scalars['String'];
+  rewardAccount: RewardAccount;
   stakePool: StakePool;
 };
 
@@ -38,14 +38,17 @@ export type ActiveStakeEpochArgs = {
 };
 
 
+export type ActiveStakeRewardAccountArgs = {
+  filter?: Maybe<RewardAccountFilter>;
+};
+
+
 export type ActiveStakeStakePoolArgs = {
   filter?: Maybe<StakePoolFilter>;
 };
 
 export type ActiveStakeAggregateResult = {
   __typename?: 'ActiveStakeAggregateResult';
-  addressMax?: Maybe<Scalars['String']>;
-  addressMin?: Maybe<Scalars['String']>;
   count?: Maybe<Scalars['Int']>;
   quantityMax?: Maybe<Scalars['String']>;
   quantityMin?: Maybe<Scalars['String']>;
@@ -59,9 +62,9 @@ export type ActiveStakeFilter = {
 };
 
 export enum ActiveStakeHasFilter {
-  Address = 'address',
   Epoch = 'epoch',
   Quantity = 'quantity',
+  RewardAccount = 'rewardAccount',
   StakePool = 'stakePool'
 }
 
@@ -72,21 +75,20 @@ export type ActiveStakeOrder = {
 };
 
 export enum ActiveStakeOrderable {
-  Address = 'address',
   Quantity = 'quantity'
 }
 
 export type ActiveStakePatch = {
-  address?: Maybe<Scalars['String']>;
   epoch?: Maybe<EpochRef>;
   quantity?: Maybe<Scalars['String']>;
+  rewardAccount?: Maybe<RewardAccountRef>;
   stakePool?: Maybe<StakePoolRef>;
 };
 
 export type ActiveStakeRef = {
-  address?: Maybe<Scalars['String']>;
   epoch?: Maybe<EpochRef>;
   quantity?: Maybe<Scalars['String']>;
+  rewardAccount?: Maybe<RewardAccountRef>;
   stakePool?: Maybe<StakePoolRef>;
 };
 
@@ -176,9 +178,9 @@ export type AdaPotsRef = {
 };
 
 export type AddActiveStakeInput = {
-  address: Scalars['String'];
   epoch: EpochRef;
   quantity: Scalars['String'];
+  rewardAccount: RewardAccountRef;
   stakePool: StakePoolRef;
 };
 
@@ -218,6 +220,28 @@ export type AddAdaPotsPayloadAdaPotsArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<AdaPotsOrder>;
+};
+
+export type AddAddressInput = {
+  address: Scalars['String'];
+  addressType: AddressType;
+  inputs: Array<TransactionInputRef>;
+  rewardAccount?: Maybe<RewardAccountRef>;
+  utxo: Array<TransactionOutputRef>;
+};
+
+export type AddAddressPayload = {
+  __typename?: 'AddAddressPayload';
+  address?: Maybe<Array<Maybe<Address>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type AddAddressPayloadAddressArgs = {
+  filter?: Maybe<AddressFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<AddressOrder>;
 };
 
 export type AddAlonzoGenesisInput = {
@@ -871,6 +895,26 @@ export type AddRelayByNamePayloadRelayByNameArgs = {
   order?: Maybe<RelayByNameOrder>;
 };
 
+export type AddRewardAccountInput = {
+  activeStake: ActiveStakeRef;
+  address: Scalars['String'];
+  addresses: AddressRef;
+};
+
+export type AddRewardAccountPayload = {
+  __typename?: 'AddRewardAccountPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  rewardAccount?: Maybe<Array<Maybe<RewardAccount>>>;
+};
+
+
+export type AddRewardAccountPayloadRewardAccountArgs = {
+  filter?: Maybe<RewardAccountFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<RewardAccountOrder>;
+};
+
 export type AddScriptInput = {
   auxiliaryDataBody: AuxiliaryDataBodyRef;
   hash: Scalars['String'];
@@ -1210,7 +1254,7 @@ export type AddTransactionInput = {
 };
 
 export type AddTransactionInputInput = {
-  address: Scalars['String'];
+  address: AddressRef;
   index: Scalars['Int'];
   redeemer?: Maybe<RedeemerRef>;
   sourceTransaction: TransactionRef;
@@ -1233,7 +1277,7 @@ export type AddTransactionInputPayloadTransactionInputArgs = {
 };
 
 export type AddTransactionOutputInput = {
-  address: Scalars['String'];
+  address: AddressRef;
   index: Scalars['Int'];
   transaction: TransactionRef;
   value: ValueRef;
@@ -1289,7 +1333,7 @@ export type AddValuePayloadValueArgs = {
 export type AddWithdrawalInput = {
   quantity: Scalars['String'];
   redeemer?: Maybe<Scalars['String']>;
-  rewardAccount: Scalars['String'];
+  rewardAccount: RewardAccountRef;
   transaction: TransactionRef;
 };
 
@@ -1306,6 +1350,103 @@ export type AddWithdrawalPayloadWithdrawalArgs = {
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<WithdrawalOrder>;
 };
+
+export type Address = {
+  __typename?: 'Address';
+  address: Scalars['String'];
+  addressType: AddressType;
+  /** Spending history */
+  inputs: Array<TransactionInput>;
+  inputsAggregate?: Maybe<TransactionInputAggregateResult>;
+  rewardAccount?: Maybe<RewardAccount>;
+  /** Balance  */
+  utxo: Array<TransactionOutput>;
+  utxoAggregate?: Maybe<TransactionOutputAggregateResult>;
+};
+
+
+export type AddressInputsArgs = {
+  filter?: Maybe<TransactionInputFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<TransactionInputOrder>;
+};
+
+
+export type AddressInputsAggregateArgs = {
+  filter?: Maybe<TransactionInputFilter>;
+};
+
+
+export type AddressRewardAccountArgs = {
+  filter?: Maybe<RewardAccountFilter>;
+};
+
+
+export type AddressUtxoArgs = {
+  filter?: Maybe<TransactionOutputFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<TransactionOutputOrder>;
+};
+
+
+export type AddressUtxoAggregateArgs = {
+  filter?: Maybe<TransactionOutputFilter>;
+};
+
+export type AddressAggregateResult = {
+  __typename?: 'AddressAggregateResult';
+  addressMax?: Maybe<Scalars['String']>;
+  addressMin?: Maybe<Scalars['String']>;
+  count?: Maybe<Scalars['Int']>;
+};
+
+export type AddressFilter = {
+  and?: Maybe<Array<Maybe<AddressFilter>>>;
+  has?: Maybe<Array<Maybe<AddressHasFilter>>>;
+  not?: Maybe<AddressFilter>;
+  or?: Maybe<Array<Maybe<AddressFilter>>>;
+};
+
+export enum AddressHasFilter {
+  Address = 'address',
+  AddressType = 'addressType',
+  Inputs = 'inputs',
+  RewardAccount = 'rewardAccount',
+  Utxo = 'utxo'
+}
+
+export type AddressOrder = {
+  asc?: Maybe<AddressOrderable>;
+  desc?: Maybe<AddressOrderable>;
+  then?: Maybe<AddressOrder>;
+};
+
+export enum AddressOrderable {
+  Address = 'address'
+}
+
+export type AddressPatch = {
+  address?: Maybe<Scalars['String']>;
+  addressType?: Maybe<AddressType>;
+  inputs?: Maybe<Array<TransactionInputRef>>;
+  rewardAccount?: Maybe<RewardAccountRef>;
+  utxo?: Maybe<Array<TransactionOutputRef>>;
+};
+
+export type AddressRef = {
+  address?: Maybe<Scalars['String']>;
+  addressType?: Maybe<AddressType>;
+  inputs?: Maybe<Array<TransactionInputRef>>;
+  rewardAccount?: Maybe<RewardAccountRef>;
+  utxo?: Maybe<Array<TransactionOutputRef>>;
+};
+
+export enum AddressType {
+  Byron = 'byron',
+  Shelley = 'shelley'
+}
 
 export type AlonzoGenesis = {
   __typename?: 'AlonzoGenesis';
@@ -2260,6 +2401,21 @@ export type DeleteAdaPotsPayloadAdaPotsArgs = {
   order?: Maybe<AdaPotsOrder>;
 };
 
+export type DeleteAddressPayload = {
+  __typename?: 'DeleteAddressPayload';
+  address?: Maybe<Array<Maybe<Address>>>;
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type DeleteAddressPayloadAddressArgs = {
+  filter?: Maybe<AddressFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<AddressOrder>;
+};
+
 export type DeleteAlonzoGenesisPayload = {
   __typename?: 'DeleteAlonzoGenesisPayload';
   alonzoGenesis?: Maybe<Array<Maybe<AlonzoGenesis>>>;
@@ -2703,6 +2859,21 @@ export type DeleteRelayByNamePayloadRelayByNameArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<RelayByNameOrder>;
+};
+
+export type DeleteRewardAccountPayload = {
+  __typename?: 'DeleteRewardAccountPayload';
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+  rewardAccount?: Maybe<Array<Maybe<RewardAccount>>>;
+};
+
+
+export type DeleteRewardAccountPayloadRewardAccountArgs = {
+  filter?: Maybe<RewardAccountFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<RewardAccountOrder>;
 };
 
 export type DeleteScriptPayload = {
@@ -3899,6 +4070,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   addActiveStake?: Maybe<AddActiveStakePayload>;
   addAdaPots?: Maybe<AddAdaPotsPayload>;
+  addAddress?: Maybe<AddAddressPayload>;
   addAlonzoGenesis?: Maybe<AddAlonzoGenesisPayload>;
   addAsset?: Maybe<AddAssetPayload>;
   addAuxiliaryData?: Maybe<AddAuxiliaryDataPayload>;
@@ -3929,6 +4101,7 @@ export type Mutation = {
   addRelayByAddress?: Maybe<AddRelayByAddressPayload>;
   addRelayByName?: Maybe<AddRelayByNamePayload>;
   addRelayByNameMultihost?: Maybe<AddRelayByNameMultihostPayload>;
+  addRewardAccount?: Maybe<AddRewardAccountPayload>;
   addScript?: Maybe<AddScriptPayload>;
   addShelleyGenesis?: Maybe<AddShelleyGenesisPayload>;
   addShelleyGenesisStaking?: Maybe<AddShelleyGenesisStakingPayload>;
@@ -3950,6 +4123,7 @@ export type Mutation = {
   addWithdrawal?: Maybe<AddWithdrawalPayload>;
   deleteActiveStake?: Maybe<DeleteActiveStakePayload>;
   deleteAdaPots?: Maybe<DeleteAdaPotsPayload>;
+  deleteAddress?: Maybe<DeleteAddressPayload>;
   deleteAlonzoGenesis?: Maybe<DeleteAlonzoGenesisPayload>;
   deleteAsset?: Maybe<DeleteAssetPayload>;
   deleteAuxiliaryData?: Maybe<DeleteAuxiliaryDataPayload>;
@@ -3980,6 +4154,7 @@ export type Mutation = {
   deleteRelayByAddress?: Maybe<DeleteRelayByAddressPayload>;
   deleteRelayByName?: Maybe<DeleteRelayByNamePayload>;
   deleteRelayByNameMultihost?: Maybe<DeleteRelayByNameMultihostPayload>;
+  deleteRewardAccount?: Maybe<DeleteRewardAccountPayload>;
   deleteScript?: Maybe<DeleteScriptPayload>;
   deleteShelleyGenesis?: Maybe<DeleteShelleyGenesisPayload>;
   deleteShelleyGenesisStaking?: Maybe<DeleteShelleyGenesisStakingPayload>;
@@ -4001,6 +4176,7 @@ export type Mutation = {
   deleteWithdrawal?: Maybe<DeleteWithdrawalPayload>;
   updateActiveStake?: Maybe<UpdateActiveStakePayload>;
   updateAdaPots?: Maybe<UpdateAdaPotsPayload>;
+  updateAddress?: Maybe<UpdateAddressPayload>;
   updateAlonzoGenesis?: Maybe<UpdateAlonzoGenesisPayload>;
   updateAsset?: Maybe<UpdateAssetPayload>;
   updateAuxiliaryData?: Maybe<UpdateAuxiliaryDataPayload>;
@@ -4031,6 +4207,7 @@ export type Mutation = {
   updateRelayByAddress?: Maybe<UpdateRelayByAddressPayload>;
   updateRelayByName?: Maybe<UpdateRelayByNamePayload>;
   updateRelayByNameMultihost?: Maybe<UpdateRelayByNameMultihostPayload>;
+  updateRewardAccount?: Maybe<UpdateRewardAccountPayload>;
   updateScript?: Maybe<UpdateScriptPayload>;
   updateShelleyGenesis?: Maybe<UpdateShelleyGenesisPayload>;
   updateShelleyGenesisStaking?: Maybe<UpdateShelleyGenesisStakingPayload>;
@@ -4060,6 +4237,11 @@ export type MutationAddActiveStakeArgs = {
 
 export type MutationAddAdaPotsArgs = {
   input: Array<AddAdaPotsInput>;
+};
+
+
+export type MutationAddAddressArgs = {
+  input: Array<AddAddressInput>;
 };
 
 
@@ -4216,6 +4398,11 @@ export type MutationAddRelayByNameMultihostArgs = {
 };
 
 
+export type MutationAddRewardAccountArgs = {
+  input: Array<AddRewardAccountInput>;
+};
+
+
 export type MutationAddScriptArgs = {
   input: Array<AddScriptInput>;
   upsert?: Maybe<Scalars['Boolean']>;
@@ -4323,6 +4510,11 @@ export type MutationDeleteActiveStakeArgs = {
 
 export type MutationDeleteAdaPotsArgs = {
   filter: AdaPotsFilter;
+};
+
+
+export type MutationDeleteAddressArgs = {
+  filter: AddressFilter;
 };
 
 
@@ -4476,6 +4668,11 @@ export type MutationDeleteRelayByNameMultihostArgs = {
 };
 
 
+export type MutationDeleteRewardAccountArgs = {
+  filter: RewardAccountFilter;
+};
+
+
 export type MutationDeleteScriptArgs = {
   filter: ScriptFilter;
 };
@@ -4578,6 +4775,11 @@ export type MutationUpdateActiveStakeArgs = {
 
 export type MutationUpdateAdaPotsArgs = {
   input: UpdateAdaPotsInput;
+};
+
+
+export type MutationUpdateAddressArgs = {
+  input: UpdateAddressInput;
 };
 
 
@@ -4728,6 +4930,11 @@ export type MutationUpdateRelayByNameArgs = {
 
 export type MutationUpdateRelayByNameMultihostArgs = {
   input: UpdateRelayByNameMultihostInput;
+};
+
+
+export type MutationUpdateRewardAccountArgs = {
+  input: UpdateRewardAccountInput;
 };
 
 
@@ -5211,6 +5418,7 @@ export type Query = {
   __typename?: 'Query';
   aggregateActiveStake?: Maybe<ActiveStakeAggregateResult>;
   aggregateAdaPots?: Maybe<AdaPotsAggregateResult>;
+  aggregateAddress?: Maybe<AddressAggregateResult>;
   aggregateAlonzoGenesis?: Maybe<AlonzoGenesisAggregateResult>;
   aggregateAsset?: Maybe<AssetAggregateResult>;
   aggregateAuxiliaryData?: Maybe<AuxiliaryDataAggregateResult>;
@@ -5241,6 +5449,7 @@ export type Query = {
   aggregateRelayByAddress?: Maybe<RelayByAddressAggregateResult>;
   aggregateRelayByName?: Maybe<RelayByNameAggregateResult>;
   aggregateRelayByNameMultihost?: Maybe<RelayByNameMultihostAggregateResult>;
+  aggregateRewardAccount?: Maybe<RewardAccountAggregateResult>;
   aggregateScript?: Maybe<ScriptAggregateResult>;
   aggregateShelleyGenesis?: Maybe<ShelleyGenesisAggregateResult>;
   aggregateShelleyGenesisStaking?: Maybe<ShelleyGenesisStakingAggregateResult>;
@@ -5270,6 +5479,7 @@ export type Query = {
   getTransaction?: Maybe<Transaction>;
   queryActiveStake?: Maybe<Array<Maybe<ActiveStake>>>;
   queryAdaPots?: Maybe<Array<Maybe<AdaPots>>>;
+  queryAddress?: Maybe<Array<Maybe<Address>>>;
   queryAlonzoGenesis?: Maybe<Array<Maybe<AlonzoGenesis>>>;
   queryAsset?: Maybe<Array<Maybe<Asset>>>;
   queryAuxiliaryData?: Maybe<Array<Maybe<AuxiliaryData>>>;
@@ -5300,6 +5510,7 @@ export type Query = {
   queryRelayByAddress?: Maybe<Array<Maybe<RelayByAddress>>>;
   queryRelayByName?: Maybe<Array<Maybe<RelayByName>>>;
   queryRelayByNameMultihost?: Maybe<Array<Maybe<RelayByNameMultihost>>>;
+  queryRewardAccount?: Maybe<Array<Maybe<RewardAccount>>>;
   queryScript?: Maybe<Array<Maybe<Script>>>;
   queryShelleyGenesis?: Maybe<Array<Maybe<ShelleyGenesis>>>;
   queryShelleyGenesisStaking?: Maybe<Array<Maybe<ShelleyGenesisStaking>>>;
@@ -5329,6 +5540,11 @@ export type QueryAggregateActiveStakeArgs = {
 
 export type QueryAggregateAdaPotsArgs = {
   filter?: Maybe<AdaPotsFilter>;
+};
+
+
+export type QueryAggregateAddressArgs = {
+  filter?: Maybe<AddressFilter>;
 };
 
 
@@ -5482,6 +5698,11 @@ export type QueryAggregateRelayByNameMultihostArgs = {
 };
 
 
+export type QueryAggregateRewardAccountArgs = {
+  filter?: Maybe<RewardAccountFilter>;
+};
+
+
 export type QueryAggregateScriptArgs = {
   filter?: Maybe<ScriptFilter>;
 };
@@ -5630,6 +5851,14 @@ export type QueryQueryAdaPotsArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<AdaPotsOrder>;
+};
+
+
+export type QueryQueryAddressArgs = {
+  filter?: Maybe<AddressFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<AddressOrder>;
 };
 
 
@@ -5865,6 +6094,14 @@ export type QueryQueryRelayByNameMultihostArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<RelayByNameMultihostOrder>;
+};
+
+
+export type QueryQueryRewardAccountArgs = {
+  filter?: Maybe<RewardAccountFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<RewardAccountOrder>;
 };
 
 
@@ -6246,6 +6483,65 @@ export type RelayByNamePatch = {
 export type RelayByNameRef = {
   hostname?: Maybe<Scalars['String']>;
   port?: Maybe<Scalars['Int']>;
+};
+
+export type RewardAccount = {
+  __typename?: 'RewardAccount';
+  activeStake: ActiveStake;
+  address: Scalars['String'];
+  addresses: Address;
+};
+
+
+export type RewardAccountActiveStakeArgs = {
+  filter?: Maybe<ActiveStakeFilter>;
+};
+
+
+export type RewardAccountAddressesArgs = {
+  filter?: Maybe<AddressFilter>;
+};
+
+export type RewardAccountAggregateResult = {
+  __typename?: 'RewardAccountAggregateResult';
+  addressMax?: Maybe<Scalars['String']>;
+  addressMin?: Maybe<Scalars['String']>;
+  count?: Maybe<Scalars['Int']>;
+};
+
+export type RewardAccountFilter = {
+  and?: Maybe<Array<Maybe<RewardAccountFilter>>>;
+  has?: Maybe<Array<Maybe<RewardAccountHasFilter>>>;
+  not?: Maybe<RewardAccountFilter>;
+  or?: Maybe<Array<Maybe<RewardAccountFilter>>>;
+};
+
+export enum RewardAccountHasFilter {
+  ActiveStake = 'activeStake',
+  Address = 'address',
+  Addresses = 'addresses'
+}
+
+export type RewardAccountOrder = {
+  asc?: Maybe<RewardAccountOrderable>;
+  desc?: Maybe<RewardAccountOrderable>;
+  then?: Maybe<RewardAccountOrder>;
+};
+
+export enum RewardAccountOrderable {
+  Address = 'address'
+}
+
+export type RewardAccountPatch = {
+  activeStake?: Maybe<ActiveStakeRef>;
+  address?: Maybe<Scalars['String']>;
+  addresses?: Maybe<AddressRef>;
+};
+
+export type RewardAccountRef = {
+  activeStake?: Maybe<ActiveStakeRef>;
+  address?: Maybe<Scalars['String']>;
+  addresses?: Maybe<AddressRef>;
 };
 
 export type Script = {
@@ -7545,13 +7841,18 @@ export enum TransactionHasFilter {
 
 export type TransactionInput = {
   __typename?: 'TransactionInput';
-  address: Scalars['String'];
+  address: Address;
   index: Scalars['Int'];
   redeemer?: Maybe<Redeemer>;
   /** Output of */
   sourceTransaction: Transaction;
   transaction: Transaction;
   value: Value;
+};
+
+
+export type TransactionInputAddressArgs = {
+  filter?: Maybe<AddressFilter>;
 };
 
 
@@ -7576,8 +7877,6 @@ export type TransactionInputValueArgs = {
 
 export type TransactionInputAggregateResult = {
   __typename?: 'TransactionInputAggregateResult';
-  addressMax?: Maybe<Scalars['String']>;
-  addressMin?: Maybe<Scalars['String']>;
   count?: Maybe<Scalars['Int']>;
   indexAvg?: Maybe<Scalars['Float']>;
   indexMax?: Maybe<Scalars['Int']>;
@@ -7608,12 +7907,11 @@ export type TransactionInputOrder = {
 };
 
 export enum TransactionInputOrderable {
-  Address = 'address',
   Index = 'index'
 }
 
 export type TransactionInputPatch = {
-  address?: Maybe<Scalars['String']>;
+  address?: Maybe<AddressRef>;
   index?: Maybe<Scalars['Int']>;
   redeemer?: Maybe<RedeemerRef>;
   sourceTransaction?: Maybe<TransactionRef>;
@@ -7622,7 +7920,7 @@ export type TransactionInputPatch = {
 };
 
 export type TransactionInputRef = {
-  address?: Maybe<Scalars['String']>;
+  address?: Maybe<AddressRef>;
   index?: Maybe<Scalars['Int']>;
   redeemer?: Maybe<RedeemerRef>;
   sourceTransaction?: Maybe<TransactionRef>;
@@ -7649,10 +7947,15 @@ export enum TransactionOrderable {
 
 export type TransactionOutput = {
   __typename?: 'TransactionOutput';
-  address: Scalars['String'];
+  address: Address;
   index: Scalars['Int'];
   transaction: Transaction;
   value: Value;
+};
+
+
+export type TransactionOutputAddressArgs = {
+  filter?: Maybe<AddressFilter>;
 };
 
 
@@ -7667,8 +7970,6 @@ export type TransactionOutputValueArgs = {
 
 export type TransactionOutputAggregateResult = {
   __typename?: 'TransactionOutputAggregateResult';
-  addressMax?: Maybe<Scalars['String']>;
-  addressMin?: Maybe<Scalars['String']>;
   count?: Maybe<Scalars['Int']>;
   indexAvg?: Maybe<Scalars['Float']>;
   indexMax?: Maybe<Scalars['Int']>;
@@ -7697,19 +7998,18 @@ export type TransactionOutputOrder = {
 };
 
 export enum TransactionOutputOrderable {
-  Address = 'address',
   Index = 'index'
 }
 
 export type TransactionOutputPatch = {
-  address?: Maybe<Scalars['String']>;
+  address?: Maybe<AddressRef>;
   index?: Maybe<Scalars['Int']>;
   transaction?: Maybe<TransactionRef>;
   value?: Maybe<ValueRef>;
 };
 
 export type TransactionOutputRef = {
-  address?: Maybe<Scalars['String']>;
+  address?: Maybe<AddressRef>;
   index?: Maybe<Scalars['Int']>;
   transaction?: Maybe<TransactionRef>;
   value?: Maybe<ValueRef>;
@@ -7792,6 +8092,26 @@ export type UpdateAdaPotsPayloadAdaPotsArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<AdaPotsOrder>;
+};
+
+export type UpdateAddressInput = {
+  filter: AddressFilter;
+  remove?: Maybe<AddressPatch>;
+  set?: Maybe<AddressPatch>;
+};
+
+export type UpdateAddressPayload = {
+  __typename?: 'UpdateAddressPayload';
+  address?: Maybe<Array<Maybe<Address>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type UpdateAddressPayloadAddressArgs = {
+  filter?: Maybe<AddressFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<AddressOrder>;
 };
 
 export type UpdateAlonzoGenesisInput = {
@@ -8389,6 +8709,26 @@ export type UpdateRelayByNamePayloadRelayByNameArgs = {
   order?: Maybe<RelayByNameOrder>;
 };
 
+export type UpdateRewardAccountInput = {
+  filter: RewardAccountFilter;
+  remove?: Maybe<RewardAccountPatch>;
+  set?: Maybe<RewardAccountPatch>;
+};
+
+export type UpdateRewardAccountPayload = {
+  __typename?: 'UpdateRewardAccountPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  rewardAccount?: Maybe<Array<Maybe<RewardAccount>>>;
+};
+
+
+export type UpdateRewardAccountPayloadRewardAccountArgs = {
+  filter?: Maybe<RewardAccountFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<RewardAccountOrder>;
+};
+
 export type UpdateScriptInput = {
   filter: ScriptFilter;
   remove?: Maybe<ScriptPatch>;
@@ -8831,8 +9171,13 @@ export type Withdrawal = {
   __typename?: 'Withdrawal';
   quantity: Scalars['String'];
   redeemer?: Maybe<Scalars['String']>;
-  rewardAccount: Scalars['String'];
+  rewardAccount: RewardAccount;
   transaction: Transaction;
+};
+
+
+export type WithdrawalRewardAccountArgs = {
+  filter?: Maybe<RewardAccountFilter>;
 };
 
 
@@ -8847,8 +9192,6 @@ export type WithdrawalAggregateResult = {
   quantityMin?: Maybe<Scalars['String']>;
   redeemerMax?: Maybe<Scalars['String']>;
   redeemerMin?: Maybe<Scalars['String']>;
-  rewardAccountMax?: Maybe<Scalars['String']>;
-  rewardAccountMin?: Maybe<Scalars['String']>;
 };
 
 export type WithdrawalFilter = {
@@ -8873,21 +9216,20 @@ export type WithdrawalOrder = {
 
 export enum WithdrawalOrderable {
   Quantity = 'quantity',
-  Redeemer = 'redeemer',
-  RewardAccount = 'rewardAccount'
+  Redeemer = 'redeemer'
 }
 
 export type WithdrawalPatch = {
   quantity?: Maybe<Scalars['String']>;
   redeemer?: Maybe<Scalars['String']>;
-  rewardAccount?: Maybe<Scalars['String']>;
+  rewardAccount?: Maybe<RewardAccountRef>;
   transaction?: Maybe<TransactionRef>;
 };
 
 export type WithdrawalRef = {
   quantity?: Maybe<Scalars['String']>;
   redeemer?: Maybe<Scalars['String']>;
-  rewardAccount?: Maybe<Scalars['String']>;
+  rewardAccount?: Maybe<RewardAccountRef>;
   transaction?: Maybe<TransactionRef>;
 };
 
