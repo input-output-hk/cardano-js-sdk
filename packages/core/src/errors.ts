@@ -16,6 +16,8 @@ export class ProviderError extends CustomError {
 }
 
 export enum SerializationFailure {
+  InvalidType = 'INVALID_TYPE',
+  Overflow = 'OVERFLOW',
   InvalidAddress = 'INVALID_ADDRESS'
 }
 
