@@ -9,11 +9,11 @@ query NetworkInfo {
       quantitySum
     }
   }
-  queryShelleyGenesis(first: 1) {
+  queryTimeSettings(order: { desc: fromEpochNo }, first: 1) {
     slotLength
     epochLength
   }
-  queryAda(first: 1) {
+  queryAda(order: { desc: sinceBlockNo }, first: 1) {
     supply {
       circulating
       max

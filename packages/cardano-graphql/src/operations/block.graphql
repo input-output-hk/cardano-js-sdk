@@ -14,7 +14,7 @@ query BlocksByHashes($hashes: [String!]!) {
       count
     }
     totalOutput
-    fees
+    totalFees
     epoch {
       number
     }

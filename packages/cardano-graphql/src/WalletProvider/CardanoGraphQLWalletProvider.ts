@@ -4,35 +4,37 @@ import { ProviderFromSdk, createProvider, getExactlyOneObject } from '../util';
 export const createGraphQLWalletProviderFromSdk: ProviderFromSdk<WalletProvider> = (sdk) =>
   ({
     async currentWalletProtocolParameters() {
-      const { queryProtocolParameters } = await sdk.ProtocolParameters();
-      const protocolParams = getExactlyOneObject(queryProtocolParameters, 'protocol parameters');
+      const { queryProtocolParametersAlonzo } = await sdk.CurrentProtocolParameters();
+      const protocolParams = getExactlyOneObject(queryProtocolParametersAlonzo, 'protocol parameters');
       return {
         coinsPerUtxoWord: protocolParams.coinsPerUtxoWord,
         maxCollateralInputs: protocolParams.maxCollateralInputs,
         maxTxSize: protocolParams.maxTxSize,
-        maxValueSize: protocolParams.maxValSize,
-        minFeeCoefficient: protocolParams.minFeeA,
-        minFeeConstant: protocolParams.minFeeB,
+        maxValueSize: protocolParams.maxValueSize,
+        minFeeCoefficient: protocolParams.minFeeCoefficient,
+        minFeeConstant: protocolParams.minFeeConstant,
         minPoolCost: protocolParams.minPoolCost,
         poolDeposit: protocolParams.poolDeposit,
         protocolVersion: protocolParams.protocolVersion,
-        stakeKeyDeposit: protocolParams.keyDeposit
+        stakeKeyDeposit: protocolParams.stakeKeyDeposit
       };
     },
     async genesisParameters() {
-      const { queryShelleyGenesis } = await sdk.GenesisParameters();
-      const genesisParameters = getExactlyOneObject(queryShelleyGenesis, 'genesis parameters');
+      const { queryTimeSettings, queryAda, queryNetworkConstants } = await sdk.GenesisParameters();
+      const timeSettings = getExactlyOneObject(queryTimeSettings, 'time settings');
+      const ada = getExactlyOneObject(queryAda, 'ada');
+      const networkConstants = getExactlyOneObject(queryNetworkConstants, 'time settings');
       return {
-        activeSlotsCoefficient: genesisParameters.activeSlotsCoeff,
-        epochLength: genesisParameters.epochLength,
-        maxKesEvolutions: genesisParameters.maxKESEvolutions,
-        maxLovelaceSupply: BigInt(genesisParameters.maxLovelaceSupply),
-        networkMagic: genesisParameters.networkMagic,
-        securityParameter: genesisParameters.securityParam,
-        slotLength: genesisParameters.slotLength,
-        slotsPerKesPeriod: genesisParameters.slotsPerKESPeriod,
-        systemStart: new Date(genesisParameters.systemStart),
-        updateQuorum: genesisParameters.updateQuorum
+        activeSlotsCoefficient: networkConstants.activeSlotsCoefficient,
+        epochLength: timeSettings.epochLength,
+        maxKesEvolutions: networkConstants.maxKESEvolutions,
+        maxLovelaceSupply: BigInt(ada.supply.max),
+        networkMagic: networkConstants.networkMagic,
+        securityParameter: networkConstants.securityParameter,
+        slotLength: timeSettings.slotLength,
+        slotsPerKesPeriod: networkConstants.slotsPerKESPeriod,
+        systemStart: new Date(networkConstants.systemStart),
+        updateQuorum: networkConstants.updateQuorum
       };
     },
     async ledgerTip() {
@@ -49,7 +51,7 @@ export const createGraphQLWalletProviderFromSdk: ProviderFromSdk<WalletProvider>
           date: new Date(block.slot.date),
           epoch: block.epoch.number,
           epochSlot: block.slot.slotInEpoch,
-          fees: BigInt(block.fees),
+          fees: BigInt(block.totalFees),
           header: {
             blockNo: block.blockNo,
             hash: Cardano.BlockId(block.hash),

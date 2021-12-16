@@ -30,7 +30,7 @@ export class Block {
   @Field(() => Int64)
   totalOutput: Cardano.Lovelace;
   @Field(() => Int64)
-  fees: Cardano.Lovelace;
+  totalFees: Cardano.Lovelace;
   @Field(() => Block)
   previousBlock?: Block;
   @Field(() => Block)

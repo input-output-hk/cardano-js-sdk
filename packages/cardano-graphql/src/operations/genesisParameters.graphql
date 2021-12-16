@@ -1,14 +1,20 @@
 query GenesisParameters {
-  queryShelleyGenesis {
+  queryNetworkConstants(order: { desc: timestamp }, first: 1) {
     systemStart
     networkMagic
-    activeSlotsCoeff
-    securityParam
-    epochLength
+    activeSlotsCoefficient
+    securityParameter
     slotsPerKESPeriod
     maxKESEvolutions
-    slotLength
     updateQuorum
-    maxLovelaceSupply
+  }
+  queryTimeSettings(order: { desc: fromEpochNo }, first: 1) {
+    slotLength
+    epochLength
+  }
+  queryAda(order: { desc: sinceBlockNo }, first: 1) {
+    supply {
+      max
+    }
   }
 }

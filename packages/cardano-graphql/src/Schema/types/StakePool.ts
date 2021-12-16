@@ -3,6 +3,7 @@ import { BigIntsAsStrings, coinDescription, percentageDescription } from './util
 import { Cardano } from '@cardano-sdk/core';
 import { Directive, Field, Float, Int, ObjectType, createUnionType, registerEnumType } from 'type-graphql';
 import { ExtendedStakePoolMetadataFields } from './ExtendedStakePoolMetadataFields';
+import { Ratio } from './Ratio';
 
 enum StakePoolStatus {
   active = 'active',
@@ -140,14 +141,6 @@ export class StakePoolMetadata implements Cardano.StakePoolMetadata {
 }
 
 @ObjectType()
-export class Fraction implements Cardano.Fraction {
-  @Field(() => Int)
-  numerator: number;
-  @Field(() => Int)
-  denominator: number;
-}
-
-@ObjectType()
 export class StakePool implements BigIntsAsStrings<Cardano.StakePool> {
   @Directive('@search(by: [fulltext])')
   @Directive('@id')
@@ -163,8 +156,8 @@ export class StakePool implements BigIntsAsStrings<Cardano.StakePool> {
   pledge: string;
   @Field({ description: coinDescription })
   cost: string;
-  @Field(() => Fraction)
-  margin: Fraction;
+  @Field(() => Ratio)
+  margin: Ratio;
   @Field(() => StakePoolMetrics)
   metrics: BigIntsAsStrings<Cardano.StakePoolMetrics>;
   @Field(() => StakePoolTransactions)

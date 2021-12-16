@@ -1,9 +1,9 @@
 // Review: do we want to keep protocol parameter types per era?
 
-import { Cardano } from '@cardano-sdk/core';
+import { Epoch } from './Epoch';
 import { ExecutionPrices, ExecutionUnits } from './ExUnits';
-import { Field, Float, Int, ObjectType } from 'type-graphql';
-import { Json } from './util';
+import { Field, Int, ObjectType } from 'type-graphql';
+import { Ratio } from './Ratio';
 
 @ObjectType()
 export class ProtocolVersion {
@@ -15,25 +15,28 @@ export class ProtocolVersion {
   patch?: number;
 }
 
-// Review: dropped 'Shelley' from name.
 @ObjectType()
-export class ProtocolParameters {
-  @Field(() => Float)
-  a0: number;
-  @Field(() => Int, { nullable: true })
-  coinsPerUtxoWord?: number;
-  @Field(() => Int, { nullable: true })
-  collateralPercent?: number;
-  @Field(() => String, { nullable: true })
-  costModels: string; // Review: could this type be improved?
-  @Field(() => Float)
-  decentralizationParam: number;
+export class CostModelCoefficient {
+  @Field(() => String)
+  key: string;
   @Field(() => Int)
-  eMax: number;
-  @Field(() => String, { nullable: true })
-  extraEntropy?: Json;
-  @Field(() => Int)
-  keyDeposit: number;
+  coefficient: number;
+}
+
+@ObjectType()
+export class CostModel {
+  @Field(() => String)
+  language: string;
+  @Field(() => [CostModelCoefficient])
+  coefficients: CostModelCoefficient[];
+}
+
+@ObjectType()
+export class ProtocolParametersShelley {
+  @Field(() => Int, { description: 'minfee A' })
+  minFeeCoefficient: number;
+  @Field(() => Int, { description: 'minfee B' })
+  minFeeConstant: number;
   @Field(() => Int)
   maxBlockBodySize: number;
   @Field(() => Int)
@@ -41,31 +44,49 @@ export class ProtocolParameters {
   @Field(() => Int)
   maxTxSize: number;
   @Field(() => Int)
-  maxValSize: number;
-  @Field(() => ExecutionUnits, { nullable: true })
-  maxBlockExUnits?: Cardano.ExUnits;
-  @Field(() => ExecutionUnits, { nullable: true })
-  maxTxExUnits?: Cardano.ExUnits;
-  @Field(() => Int, { nullable: true })
-  maxCollateralInputs?: number;
+  stakeKeyDeposit: number;
   @Field(() => Int)
-  minFeeA: number;
+  poolDeposit: number;
+  @Field(() => Epoch, { description: 'maximum epoch' })
+  poolRetirementEpochBound: Epoch;
+  @Field(() => Int, { description: 'n_opt' })
+  desiredNumberOfPools: number;
+  @Field(() => Ratio, { description: 'pool pledge influence' })
+  poolInfluence: Ratio;
+  @Field(() => Ratio, { description: 'expansion rate' })
+  monetaryExpansion: Ratio;
+  @Field(() => Ratio, { description: 'treasury growth rate' })
+  treasuryExpansion: Ratio;
+  @Field(() => Ratio, { description: 'd. decentralization constant' })
+  decentralizationParameter: Ratio;
+  @Field(() => String, { description: 'hex-encoded, null if neutral', nullable: true })
+  extraEntropy?: string;
+  @Field(() => ProtocolVersion)
+  protocolVersion: ProtocolVersion;
+  @Field(() => Int, { description: 'to be used for order in queries' })
+  flatProtocolVersion: number;
   @Field(() => Int)
-  minFeeB: number;
+  minUtxoValue: number;
+}
+
+@ObjectType()
+export class ProtocolParametersAlonzo extends ProtocolParametersShelley {
   @Field(() => Int)
   minPoolCost: number;
   @Field(() => Int)
-  minUTxOValue: number;
+  coinsPerUtxoWord: number;
   @Field(() => Int)
-  nOpt: number;
-  @Field(() => Int)
-  poolDeposit: number;
-  @Field(() => ExecutionPrices, { nullable: true })
+  maxValueSize: number;
+  @Field(() => ExecutionPrices)
   executionPrices: ExecutionPrices;
-  @Field(() => ProtocolVersion)
-  protocolVersion: ProtocolVersion;
-  @Field(() => Float)
-  rho: number;
-  @Field(() => Float)
-  tau: number;
+  @Field(() => [CostModel])
+  costModels: CostModel[];
+  @Field(() => ExecutionUnits)
+  maxExecutionUnitsPerTransaction: ExecutionUnits;
+  @Field(() => ExecutionUnits)
+  maxExecutionUnitsPerBlock: ExecutionUnits;
+  @Field(() => Int)
+  collateralPercentage: number;
+  @Field(() => Int)
+  maxCollateralInputs: number;
 }

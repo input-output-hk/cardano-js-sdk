@@ -4,7 +4,7 @@ import { Block } from './Block';
 import { Cardano } from '@cardano-sdk/core';
 import { Directive, Field, Int, ObjectType } from 'type-graphql';
 import { Int64 } from './util';
-import { ProtocolParameters } from './ProtocolParameters';
+import { ProtocolParameters } from './ProtocolParametersUnion';
 import { Slot } from './Slot';
 
 @ObjectType()
@@ -45,7 +45,7 @@ export class Epoch {
   @Field(() => String)
   nonce: Cardano.Hash32ByteBase16;
   @Field(() => ProtocolParameters)
-  protocolParams: ProtocolParameters;
+  protocolParams: typeof ProtocolParameters;
   @Field(() => Slot)
   startedAt: Slot;
   @Field(() => Slot)

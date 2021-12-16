@@ -1,17 +1,23 @@
-import { Field, ObjectType } from 'type-graphql';
+import { Block } from './Block';
+import { Cardano } from '@cardano-sdk/core';
+import { Field, Int, ObjectType } from 'type-graphql';
 
 @ObjectType()
-export class AssetSupply {
+export class CoinSupply {
   @Field(() => String)
-  circulating: bigint;
+  circulating: Cardano.Lovelace;
   @Field(() => String)
-  max: bigint;
-  @Field(() => String, { nullable: true })
-  total?: bigint;
+  max: Cardano.Lovelace;
+  @Field(() => String)
+  total: Cardano.Lovelace;
 }
 
 @ObjectType()
 export class Ada {
-  @Field(() => AssetSupply)
-  supply: AssetSupply;
+  @Field(() => Int)
+  sinceBlockNo: number;
+  @Field(() => Block)
+  sinceBlock: Block;
+  @Field(() => CoinSupply)
+  supply: CoinSupply;
 }

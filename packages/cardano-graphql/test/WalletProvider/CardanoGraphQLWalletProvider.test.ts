@@ -17,8 +17,8 @@ describe('CardanoGraphQLWalletProvider', () => {
   let provider: WalletProvider;
   const sdk = {
     BlocksByHashes: jest.fn(),
+    CurrentProtocolParameters: jest.fn(),
     GenesisParameters: jest.fn(),
-    ProtocolParameters: jest.fn(),
     Tip: jest.fn()
   };
 
@@ -34,75 +34,81 @@ describe('CardanoGraphQLWalletProvider', () => {
   describe('currentWalletProtocolParameters', () => {
     const protocolParams = {
       coinsPerUtxoWord: 34_482,
-      keyDeposit: 2_000_000,
       maxCollateralInputs: 3,
       maxTxSize: 16_384,
-      maxValSize: 5000,
-      minFeeA: 44,
-      minFeeB: 155_381,
+      maxValueSize: 5000,
+      minFeeCoefficient: 44,
+      minFeeConstant: 155_381,
       minPoolCost: 340_000_000,
       poolDeposit: 500_000_000,
       protocolVersion: {
         major: 4,
         minor: 0,
         patch: 1
-      }
+      },
+      stakeKeyDeposit: 2_000_000
     };
 
     it('makes a graphql query and coerces result to core types', async () => {
-      sdk.ProtocolParameters.mockResolvedValueOnce({
-        queryProtocolParameters: [protocolParams]
+      sdk.CurrentProtocolParameters.mockResolvedValueOnce({
+        queryProtocolParametersAlonzo: [protocolParams]
       });
       expect(await provider.currentWalletProtocolParameters()).toEqual({
         coinsPerUtxoWord: protocolParams.coinsPerUtxoWord,
         maxCollateralInputs: protocolParams.maxCollateralInputs,
         maxTxSize: protocolParams.maxTxSize,
-        maxValueSize: protocolParams.maxValSize,
-        minFeeCoefficient: protocolParams.minFeeA,
-        minFeeConstant: protocolParams.minFeeB,
+        maxValueSize: protocolParams.maxValueSize,
+        minFeeCoefficient: protocolParams.minFeeCoefficient,
+        minFeeConstant: protocolParams.minFeeConstant,
         minPoolCost: protocolParams.minPoolCost,
         poolDeposit: protocolParams.poolDeposit,
         protocolVersion: protocolParams.protocolVersion,
-        stakeKeyDeposit: protocolParams.keyDeposit
+        stakeKeyDeposit: protocolParams.stakeKeyDeposit
       });
     });
 
     it('uses util.getExactlyOneObject to validate response', async () => {
-      sdk.ProtocolParameters.mockResolvedValueOnce({});
+      sdk.CurrentProtocolParameters.mockResolvedValueOnce({});
       await expect(provider.currentWalletProtocolParameters()).rejects.toThrow(ProviderFailure.NotFound);
       expect(getExactlyOneObject).toBeCalledTimes(1);
     });
   });
 
   describe('genesisParameters', () => {
-    const genesisParams = {
-      activeSlotsCoeff: 0.05,
-      epochLength: 432_000,
+    const networkConstants = {
+      activeSlotsCoefficient: 0.05,
       maxKESEvolutions: 62,
-      maxLovelaceSupply: 45_000_000_000_000_000n,
       networkMagic: 764_824_073,
-      securityParam: 2160,
-      slotLength: 1,
+      securityParameter: 2160,
       slotsPerKESPeriod: 129_600,
       systemStart: '2017-09-23T21:44:51.000Z',
       updateQuorum: 5
     };
+    const timeSettings = {
+      epochLength: 100_000,
+      slotLength: 1
+    };
+    const ada = {
+      supply: { max: 100_000_000n }
+    };
 
     it('makes a graphql query and coerces result to core types', async () => {
       sdk.GenesisParameters.mockResolvedValueOnce({
-        queryShelleyGenesis: [genesisParams]
+        queryAda: [ada],
+        queryNetworkConstants: [networkConstants],
+        queryTimeSettings: [timeSettings]
       });
       expect(await provider.genesisParameters()).toEqual({
-        activeSlotsCoefficient: genesisParams.activeSlotsCoeff,
-        epochLength: genesisParams.epochLength,
-        maxKesEvolutions: genesisParams.maxKESEvolutions,
-        maxLovelaceSupply: BigInt(genesisParams.maxLovelaceSupply),
-        networkMagic: genesisParams.networkMagic,
-        securityParameter: genesisParams.securityParam,
-        slotLength: genesisParams.slotLength,
-        slotsPerKesPeriod: genesisParams.slotsPerKESPeriod,
-        systemStart: new Date(genesisParams.systemStart),
-        updateQuorum: genesisParams.updateQuorum
+        activeSlotsCoefficient: networkConstants.activeSlotsCoefficient,
+        epochLength: timeSettings.epochLength,
+        maxKesEvolutions: networkConstants.maxKESEvolutions,
+        maxLovelaceSupply: BigInt(ada.supply.max),
+        networkMagic: networkConstants.networkMagic,
+        securityParameter: networkConstants.securityParameter,
+        slotLength: timeSettings.slotLength,
+        slotsPerKesPeriod: networkConstants.slotsPerKESPeriod,
+        systemStart: new Date(networkConstants.systemStart),
+        updateQuorum: networkConstants.updateQuorum
       } as Cardano.CompactGenesis);
     });
 
@@ -143,7 +149,6 @@ describe('CardanoGraphQLWalletProvider', () => {
       blockNo: 1,
       confirmations: 4,
       epoch: { number: 5 },
-      fees: 123n,
       hash: '6804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99cad',
       issuer: {
         id: 'pool1zuevzm3xlrhmwjw87ec38mzs02tlkwec9wxpgafcaykmwg7efhh',
@@ -153,6 +158,7 @@ describe('CardanoGraphQLWalletProvider', () => {
       previousBlock: { hash: '6804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99caa' },
       size: 6n,
       slot: { date: '2019-10-12T07:20:50.52Z', number: 2, slotInEpoch: 3 },
+      totalFees: 123n,
       totalOutput: 700n,
       transactionsAggregate: {
         count: 3
@@ -174,7 +180,7 @@ describe('CardanoGraphQLWalletProvider', () => {
         date: new Date(block.slot.date),
         epoch: block.epoch.number,
         epochSlot: block.slot.slotInEpoch,
-        fees: block.fees,
+        fees: block.totalFees,
         header: {
           blockNo: block.blockNo,
           hash: block.hash,
