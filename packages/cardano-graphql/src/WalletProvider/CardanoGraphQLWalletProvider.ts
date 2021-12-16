@@ -1,11 +1,11 @@
-import { Cardano, WalletProvider, util } from '@cardano-sdk/core';
+import { Cardano, ProviderError, ProviderFailure, WalletProvider, util } from '@cardano-sdk/core';
 import { ProviderFromSdk, createProvider, getExactlyOneObject } from '../util';
 
 export const createGraphQLWalletProviderFromSdk: ProviderFromSdk<WalletProvider> = (sdk) =>
   ({
     async currentWalletProtocolParameters() {
       const { queryProtocolParametersAlonzo } = await sdk.CurrentProtocolParameters();
-      const protocolParams = getExactlyOneObject(queryProtocolParametersAlonzo, 'protocol parameters');
+      const protocolParams = getExactlyOneObject(queryProtocolParametersAlonzo, 'ProtocolParametersAlonzo');
       return {
         coinsPerUtxoWord: protocolParams.coinsPerUtxoWord,
         maxCollateralInputs: protocolParams.maxCollateralInputs,
@@ -21,9 +21,9 @@ export const createGraphQLWalletProviderFromSdk: ProviderFromSdk<WalletProvider>
     },
     async genesisParameters() {
       const { queryTimeSettings, queryAda, queryNetworkConstants } = await sdk.GenesisParameters();
-      const timeSettings = getExactlyOneObject(queryTimeSettings, 'time settings');
+      const timeSettings = getExactlyOneObject(queryTimeSettings, 'TimeSettings');
       const ada = getExactlyOneObject(queryAda, 'ada');
-      const networkConstants = getExactlyOneObject(queryNetworkConstants, 'time settings');
+      const networkConstants = getExactlyOneObject(queryNetworkConstants, 'NetworkConstants');
       return {
         activeSlotsCoefficient: networkConstants.activeSlotsCoefficient,
         epochLength: timeSettings.epochLength,
@@ -41,6 +41,45 @@ export const createGraphQLWalletProviderFromSdk: ProviderFromSdk<WalletProvider>
       const { queryBlock } = await sdk.Tip();
       const tip = getExactlyOneObject(queryBlock, 'tip');
       return { blockNo: tip.blockNo, hash: Cardano.BlockId(tip.hash), slot: tip.slot.number };
+    },
+    async networkInfo() {
+      const { queryAda, queryBlock, queryTimeSettings } = await sdk.NetworkInfo();
+      const { supply } = getExactlyOneObject(queryAda, 'Ada');
+      const {
+        totalLiveStake,
+        epoch: {
+          number: currentEpochNumber,
+          startedAt: { date: epochStartedAt },
+          activeStakeAggregate
+        }
+      } = getExactlyOneObject(queryBlock, 'Block');
+      const { epochLength, slotLength } = getExactlyOneObject(queryTimeSettings, 'TimeSettings');
+      const activeStake = activeStakeAggregate?.quantitySum;
+      if (!activeStake) {
+        throw new ProviderError(
+          ProviderFailure.InvalidResponse,
+          null,
+          'No active stake on epoch. Chain sync in progress?'
+        );
+      }
+      const epochStartedAtDate = new Date(epochStartedAt);
+      const epochEndDate = new Date(epochStartedAtDate.getTime() + epochLength * slotLength * 1000);
+      return {
+        currentEpoch: {
+          end: { date: epochEndDate },
+          number: currentEpochNumber,
+          start: { date: epochStartedAtDate }
+        },
+        lovelaceSupply: {
+          circulating: BigInt(supply.circulating),
+          max: BigInt(supply.max),
+          total: BigInt(supply.total)
+        },
+        stake: {
+          active: activeStake,
+          live: totalLiveStake
+        }
+      };
     },
     async queryBlocksByHashes(hashes) {
       const { queryBlock } = await sdk.BlocksByHashes({ hashes: hashes as unknown as string[] });

@@ -24,6 +24,8 @@ export class Block {
   epoch: Epoch;
   @Field(() => Int64)
   size: Cardano.BlockSize;
+  @Field(() => Int64)
+  totalLiveStake: Cardano.Lovelace;
   @Directive('@hasInverse(field: block)')
   @Field(() => [Transaction])
   transactions: Transaction[];

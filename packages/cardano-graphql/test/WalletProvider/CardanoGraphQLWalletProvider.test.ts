@@ -19,6 +19,7 @@ describe('CardanoGraphQLWalletProvider', () => {
     BlocksByHashes: jest.fn(),
     CurrentProtocolParameters: jest.fn(),
     GenesisParameters: jest.fn(),
+    NetworkInfo: jest.fn(),
     Tip: jest.fn()
   };
 
@@ -27,7 +28,11 @@ describe('CardanoGraphQLWalletProvider', () => {
   });
 
   afterEach(() => {
+    sdk.BlocksByHashes.mockReset();
+    sdk.CurrentProtocolParameters.mockReset();
+    sdk.GenesisParameters.mockReset();
     sdk.Tip.mockReset();
+    sdk.NetworkInfo.mockReset();
     getExactlyOneObject.mockClear();
   });
 
@@ -74,6 +79,67 @@ describe('CardanoGraphQLWalletProvider', () => {
     });
   });
 
+  describe('networkInfo', () => {
+    const block = {
+      epoch: {
+        activeStakeAggregate: {
+          quantitySum: 300_000n
+        },
+        number: 123,
+        startedAt: {
+          date: '2021-12-16T16:25:03.994Z'
+        }
+      },
+      totalLiveStake: 100_000_000n
+    };
+    const timeSettings = {
+      epochLength: 60 * 60,
+      slotLength: 1
+    };
+    const ada = {
+      supply: { circulating: 10_000_000n, max: 100_000_000n, total: 20_000_000n }
+    };
+
+    it('makes a graphql query and coerces result to core types', async () => {
+      sdk.NetworkInfo.mockResolvedValueOnce({
+        queryAda: [ada],
+        queryBlock: [block],
+        queryTimeSettings: [timeSettings]
+      });
+      expect(await provider.networkInfo()).toEqual({
+        currentEpoch: {
+          end: { date: new Date('2021-12-16T17:25:03.994Z') },
+          number: block.epoch.number,
+          start: { date: new Date(block.epoch.startedAt.date) }
+        },
+        lovelaceSupply: {
+          circulating: BigInt(ada.supply.circulating),
+          max: BigInt(ada.supply.max),
+          total: BigInt(ada.supply.total)
+        },
+        stake: {
+          active: block.epoch.activeStakeAggregate.quantitySum,
+          live: block.totalLiveStake
+        }
+      });
+    });
+
+    it('throws if active stake is null', async () => {
+      sdk.NetworkInfo.mockResolvedValueOnce({
+        queryAda: [ada],
+        queryBlock: [{ ...block, epoch: { ...block.epoch, activeStakeAggregate: null } }],
+        queryTimeSettings: [timeSettings]
+      });
+      await expect(provider.networkInfo()).rejects.toThrow(ProviderFailure.InvalidResponse);
+    });
+
+    it('uses util.getExactlyOneObject to validate response', async () => {
+      sdk.NetworkInfo.mockResolvedValueOnce({});
+      await expect(provider.networkInfo()).rejects.toThrow(ProviderFailure.NotFound);
+      expect(getExactlyOneObject).toBeCalledTimes(1);
+    });
+  });
+
   describe('genesisParameters', () => {
     const networkConstants = {
       activeSlotsCoefficient: 0.05,
@@ -112,6 +178,7 @@ describe('CardanoGraphQLWalletProvider', () => {
       } as Cardano.CompactGenesis);
     });
 
+    // eslint-disable-next-line sonarjs/no-identical-functions
     it('uses util.getExactlyOneObject to validate response', async () => {
       sdk.GenesisParameters.mockResolvedValueOnce({});
       await expect(provider.genesisParameters()).rejects.toThrow(ProviderFailure.NotFound);

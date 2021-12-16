@@ -413,6 +413,7 @@ export type AddBlockInput = {
   size: Scalars['Int64'];
   slot: SlotRef;
   totalFees: Scalars['Int64'];
+  totalLiveStake: Scalars['Int64'];
   totalOutput: Scalars['Int64'];
   transactions: Array<TransactionRef>;
 };
@@ -1701,6 +1702,7 @@ export type Block = {
   size: Scalars['Int64'];
   slot: Slot;
   totalFees: Scalars['Int64'];
+  totalLiveStake: Scalars['Int64'];
   totalOutput: Scalars['Int64'];
   transactions: Array<Transaction>;
   transactionsAggregate?: Maybe<TransactionAggregateResult>;
@@ -1772,6 +1774,10 @@ export type BlockAggregateResult = {
   totalFeesMax?: Maybe<Scalars['Int64']>;
   totalFeesMin?: Maybe<Scalars['Int64']>;
   totalFeesSum?: Maybe<Scalars['Int64']>;
+  totalLiveStakeAvg?: Maybe<Scalars['Float']>;
+  totalLiveStakeMax?: Maybe<Scalars['Int64']>;
+  totalLiveStakeMin?: Maybe<Scalars['Int64']>;
+  totalLiveStakeSum?: Maybe<Scalars['Int64']>;
   totalOutputAvg?: Maybe<Scalars['Float']>;
   totalOutputMax?: Maybe<Scalars['Int64']>;
   totalOutputMin?: Maybe<Scalars['Int64']>;
@@ -1799,6 +1805,7 @@ export enum BlockHasFilter {
   Size = 'size',
   Slot = 'slot',
   TotalFees = 'totalFees',
+  TotalLiveStake = 'totalLiveStake',
   TotalOutput = 'totalOutput',
   Transactions = 'transactions'
 }
@@ -1816,6 +1823,7 @@ export enum BlockOrderable {
   OpCert = 'opCert',
   Size = 'size',
   TotalFees = 'totalFees',
+  TotalLiveStake = 'totalLiveStake',
   TotalOutput = 'totalOutput'
 }
 
@@ -1831,6 +1839,7 @@ export type BlockPatch = {
   size?: Maybe<Scalars['Int64']>;
   slot?: Maybe<SlotRef>;
   totalFees?: Maybe<Scalars['Int64']>;
+  totalLiveStake?: Maybe<Scalars['Int64']>;
   totalOutput?: Maybe<Scalars['Int64']>;
   transactions?: Maybe<Array<TransactionRef>>;
 };
@@ -1848,6 +1857,7 @@ export type BlockRef = {
   size?: Maybe<Scalars['Int64']>;
   slot?: Maybe<SlotRef>;
   totalFees?: Maybe<Scalars['Int64']>;
+  totalLiveStake?: Maybe<Scalars['Int64']>;
   totalOutput?: Maybe<Scalars['Int64']>;
   transactions?: Maybe<Array<TransactionRef>>;
 };
@@ -9054,7 +9064,7 @@ export type GenesisParametersQuery = { __typename?: 'Query', queryNetworkConstan
 export type NetworkInfoQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type NetworkInfoQuery = { __typename?: 'Query', queryEpoch?: Array<{ __typename?: 'Epoch', number: number, startedAt: { __typename?: 'Slot', date: string }, activeStakeAggregate?: { __typename?: 'ActiveStakeAggregateResult', quantitySum?: bigint | null | undefined } | null | undefined } | null | undefined> | null | undefined, queryTimeSettings?: Array<{ __typename?: 'TimeSettings', slotLength: number, epochLength: number } | null | undefined> | null | undefined, queryAda?: Array<{ __typename?: 'Ada', supply: { __typename?: 'CoinSupply', circulating: string, max: string, total: string } } | null | undefined> | null | undefined };
+export type NetworkInfoQuery = { __typename?: 'Query', queryBlock?: Array<{ __typename?: 'Block', totalLiveStake: bigint, epoch: { __typename?: 'Epoch', number: number, startedAt: { __typename?: 'Slot', date: string }, activeStakeAggregate?: { __typename?: 'ActiveStakeAggregateResult', quantitySum?: bigint | null | undefined } | null | undefined } } | null | undefined> | null | undefined, queryTimeSettings?: Array<{ __typename?: 'TimeSettings', slotLength: number, epochLength: number } | null | undefined> | null | undefined, queryAda?: Array<{ __typename?: 'Ada', supply: { __typename?: 'CoinSupply', circulating: string, max: string, total: string } } | null | undefined> | null | undefined };
 
 export type AllStakePoolFieldsFragment = { __typename?: 'StakePool', id: string, hexId: string, status: StakePoolStatus, owners: Array<string>, cost: string, vrf: string, rewardAccount: string, pledge: string, margin: { __typename?: 'Ratio', numerator: number, denominator: number }, relays: Array<{ __typename: 'RelayByAddress', ipv4?: string | null | undefined, ipv6?: string | null | undefined, port?: number | null | undefined } | { __typename: 'RelayByName', hostname: string, port?: number | null | undefined } | { __typename: 'RelayByNameMultihost', dnsName: string }>, metrics: { __typename?: 'StakePoolMetrics', blocksCreated: number, livePledge: string, saturation: number, delegators: number, stake: { __typename?: 'StakePoolMetricsStake', live: string, active: string }, size: { __typename?: 'StakePoolMetricsSize', live: number, active: number } }, transactions: { __typename?: 'StakePoolTransactions', registration: Array<string>, retirement: Array<string> }, metadataJson?: { __typename?: 'StakePoolMetadataJson', hash: string, url: string } | null | undefined, metadata?: { __typename?: 'StakePoolMetadata', ticker: string, name: string, description: string, homepage: string, extDataUrl?: string | null | undefined, extSigUrl?: string | null | undefined, extVkey?: string | null | undefined, ext?: { __typename?: 'ExtendedStakePoolMetadata', serial: number, pool: { __typename?: 'ExtendedStakePoolMetadataFields', id: string, country?: string | null | undefined, status?: ExtendedPoolStatus | null | undefined, contact?: { __typename?: 'PoolContactData', primary: string, email?: string | null | undefined, facebook?: string | null | undefined, github?: string | null | undefined, feed?: string | null | undefined, telegram?: string | null | undefined, twitter?: string | null | undefined } | null | undefined, media_assets?: { __typename?: 'ThePoolsMediaAssets', icon_png_64x64: string, logo_png?: string | null | undefined, logo_svg?: string | null | undefined, color_fg?: string | null | undefined, color_bg?: string | null | undefined } | null | undefined, itn?: { __typename?: 'ITNVerification', owner: string, witness: string } | null | undefined } } | null | undefined } | null | undefined };
 
@@ -9245,13 +9255,16 @@ export const GenesisParametersDocument = gql`
     `;
 export const NetworkInfoDocument = gql`
     query NetworkInfo {
-  queryEpoch(order: {desc: number}, first: 1) {
-    number
-    startedAt {
-      date
-    }
-    activeStakeAggregate {
-      quantitySum
+  queryBlock(order: {desc: blockNo}, first: 1) {
+    totalLiveStake
+    epoch {
+      number
+      startedAt {
+        date
+      }
+      activeStakeAggregate {
+        quantitySum
+      }
     }
   }
   queryTimeSettings(order: {desc: fromEpochNo}, first: 1) {
