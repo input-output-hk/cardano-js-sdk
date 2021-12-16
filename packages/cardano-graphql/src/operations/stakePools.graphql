@@ -1,31 +1,97 @@
+fragment certificateTransactionFields on Transaction {
+  block {
+    blockNo
+  }
+  hash
+}
+
 fragment allStakePoolFields on StakePool {
   id
   hexId
   status
-  owners
-  cost
-  margin {
-    numerator
-    denominator
+  # Review: not sure this is correct. Consider this situation:
+  # pool registration tx at blockNo:1, specifying epoch:4
+  # pool registration tx at blockNo:2, specifying epoch:3
+  # Is stake pool active at epoch 3 and then switches to new parameters at epoch 4?
+  # Current implementation will ignore the 2nd transaction, as it's ordered by epoch first.
+  # I assume we also need to order by tx index in block as there can be multiple txes for registration of the same stake pool?
+  # TODO: apply same in block.graphql
+  poolParameters(order: { desc: sinceEpoch, then: { desc: transactionBlockNo } }, first: 1) {
+    metadata {
+      ticker
+      name
+      description
+      homepage
+      extDataUrl
+      extSigUrl
+      extVkey
+      ext {
+        serial
+        pool {
+          id
+          country
+          status
+          contact {
+            primary
+            email
+            facebook
+            github
+            feed
+            telegram
+            twitter
+          }
+          media_assets {
+            icon_png_64x64
+            logo_png
+            logo_svg
+            color_fg
+            color_bg
+          }
+          itn {
+            owner
+            witness
+          }
+        }
+      }
+    }
+    owners {
+      address
+    }
+    cost
+    margin {
+      numerator
+      denominator
+    }
+    vrf
+    relays {
+      __typename
+      ... on RelayByName {
+        hostname
+        port
+      }
+      ... on RelayByAddress {
+        ipv4
+        ipv6
+        port
+      }
+      ... on RelayByNameMultihost {
+        dnsName
+      }
+    }
+    poolRegistrationCertificate {
+      transaction {
+        hash
+      }
+    }
+    rewardAccount {
+      address
+    }
+    pledge
+    metadataJson {
+      hash
+      url
+    }
   }
-  vrf
-  relays {
-    __typename
-    ... on RelayByName {
-      hostname
-      port
-    }
-    ... on RelayByAddress {
-      ipv4
-      ipv6
-      port
-    }
-    ... on RelayByNameMultihost {
-      dnsName
-    }
-  }
-  rewardAccount
-  pledge
   metrics {
     blocksCreated
     livePledge
@@ -40,49 +106,9 @@ fragment allStakePoolFields on StakePool {
     saturation
     delegators
   }
-  transactions {
-    registration
-    retirement
-  }
-  metadataJson {
-    hash
-    url
-  }
-  metadata {
-    ticker
-    name
-    description
-    homepage
-    extDataUrl
-    extSigUrl
-    extVkey
-    ext {
-      serial
-      pool {
-        id
-        country
-        status
-        contact {
-          primary
-          email
-          facebook
-          github
-          feed
-          telegram
-          twitter
-        }
-        media_assets {
-          icon_png_64x64
-          logo_png
-          logo_svg
-          color_fg
-          color_bg
-        }
-        itn {
-          owner
-          witness
-        }
-      }
+  poolRetirementCertificates {
+    transaction {
+      ...certificateTransactionFields
     }
   }
 }
@@ -99,8 +125,10 @@ query StakePoolsByMetadata(
       ]
     }
   ) {
-    stakePool {
-      ...allStakePoolFields
+    poolParameters {
+      stakePool {
+        ...allStakePoolFields
+      }
     }
   }
 }

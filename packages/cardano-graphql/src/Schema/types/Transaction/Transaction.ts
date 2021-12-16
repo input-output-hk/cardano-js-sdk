@@ -3,9 +3,12 @@
 import { AuxiliaryData } from './AuxiliaryData';
 import { Block } from '../Block';
 import { Cardano } from '@cardano-sdk/core';
+import { Certificate } from './CertificateUnion';
 import { Directive, Field, Int, ObjectType } from 'type-graphql';
 import { Int64 } from '../util';
+import { PublicKey } from '../PublicKey';
 import { Redeemer } from './Redeemer';
+import { Signature } from './Signature';
 import { Slot } from '../Slot';
 import { Token } from './Token';
 import { TransactionInput } from './TransactionInput';
@@ -20,7 +23,7 @@ export class Transaction {
   @Field(() => Block)
   block: Block;
   @Field(() => Int)
-  blockIndex: number;
+  index: number;
   @Field(() => [TransactionInput], { nullable: true })
   collateral?: TransactionInput[];
   @Field(() => Int64)
@@ -55,4 +58,14 @@ export class Transaction {
   @Directive('@hasInverse(field: transaction)')
   @Field(() => [Withdrawal], { nullable: true })
   withdrawals?: Withdrawal[];
+  @Directive('@hasInverse(field: transaction)')
+  @Field(() => [Signature])
+  signatures: Signature[];
+  @Field(() => [Certificate], { nullable: true })
+  certificates?: typeof Certificate[];
+  @Field(() => String, { nullable: true })
+  scriptIntegrityHash?: Cardano.Hash28ByteBase16;
+  @Directive('@hasInverse(field: requiredExtraSignatureInTransactions)')
+  @Field(() => [PublicKey])
+  requiredExtraSignatures?: PublicKey[];
 }

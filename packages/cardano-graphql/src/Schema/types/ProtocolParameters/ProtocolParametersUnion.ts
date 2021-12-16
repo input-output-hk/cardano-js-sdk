@@ -1,4 +1,5 @@
-import { ProtocolParametersAlonzo, ProtocolParametersShelley } from './ProtocolParameters';
+import { ProtocolParametersAlonzo } from './ProtocolParametersAlonzo';
+import { ProtocolParametersShelley } from './ProtocolParametersShelley';
 import { createUnionType } from 'type-graphql';
 
 export const ProtocolParameters = createUnionType({

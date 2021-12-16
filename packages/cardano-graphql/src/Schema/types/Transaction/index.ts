@@ -6,3 +6,4 @@ export * from './TransactionInput';
 export * from './TransactionOutput';
 export * from './AuxiliaryData';
 export * from './Transaction';
+export * from './Certificate';

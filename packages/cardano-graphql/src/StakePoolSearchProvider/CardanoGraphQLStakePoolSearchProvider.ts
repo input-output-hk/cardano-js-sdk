@@ -1,38 +1,51 @@
 import { Cardano, StakePoolSearchProvider, util } from '@cardano-sdk/core';
-import { createProvider } from '../util';
+import { createProvider, getExactlyOneObject } from '../util';
 import { getSdk } from '../sdk';
+import { sortBy } from 'lodash-es';
 
 type Awaited<T> = T extends PromiseLike<infer U> ? U : T;
 type GraphqlStakePool = NonNullable<
   NonNullable<Awaited<ReturnType<ReturnType<typeof getSdk>['StakePoolsByMetadata']>>['queryStakePoolMetadata']>[0]
->['stakePool'];
+>['poolParameters']['stakePool'];
 
-const toCoreStakePool = (responseStakePool: GraphqlStakePool) => {
+const certificateTxHash = ({ transaction: { hash } }: { transaction: { hash: string } }) => Cardano.TransactionId(hash);
+const certificateTxHashes = (certificates: Array<{ transaction: { hash: string; block: { blockNo: number } } }>) =>
+  sortBy(
+    certificates,
+    ({
+      transaction: {
+        block: { blockNo }
+      }
+    }) => blockNo
+  ).map(certificateTxHash);
+
+const toCoreStakePool = (responseStakePool: GraphqlStakePool): Cardano.StakePool => {
   const stakePool = util.replaceNullsWithUndefineds(responseStakePool);
+  const poolParameters = getExactlyOneObject(stakePool.poolParameters, 'PoolParameters');
   return {
-    ...stakePool,
-    cost: BigInt(stakePool.cost),
+    cost: BigInt(poolParameters.cost),
     hexId: Cardano.PoolIdHex(stakePool.hexId),
     id: Cardano.PoolId(stakePool.id),
-    metadata: stakePool.metadata
+    margin: poolParameters.margin,
+    metadata: poolParameters.metadata
       ? {
-          ...stakePool.metadata,
-          ext: stakePool.metadata.ext
+          ...poolParameters.metadata,
+          ext: poolParameters.metadata.ext
             ? {
-                ...stakePool.metadata.ext,
+                ...poolParameters.metadata.ext,
                 pool: {
-                  ...stakePool.metadata.ext.pool,
-                  id: Cardano.PoolIdHex(stakePool.metadata.ext.pool.id)
+                  ...poolParameters.metadata.ext.pool,
+                  id: Cardano.PoolIdHex(poolParameters.metadata.ext.pool.id)
                 }
               }
             : undefined,
-          extVkey: stakePool.metadata.extVkey ? Cardano.PoolMdVk(stakePool.metadata.extVkey) : undefined
+          extVkey: poolParameters.metadata.extVkey ? Cardano.PoolMdVk(poolParameters.metadata.extVkey) : undefined
         }
       : undefined,
-    metadataJson: stakePool.metadataJson
+    metadataJson: poolParameters.metadataJson
       ? {
-          ...stakePool.metadataJson,
-          hash: Cardano.Hash32ByteBase16(stakePool.metadataJson.hash)
+          ...poolParameters.metadataJson,
+          hash: Cardano.Hash32ByteBase16(poolParameters.metadataJson.hash)
         }
       : undefined,
     metrics: {
@@ -43,14 +56,18 @@ const toCoreStakePool = (responseStakePool: GraphqlStakePool) => {
         live: BigInt(stakePool.metrics.stake.live)
       }
     },
-    owners: stakePool.owners.map(Cardano.RewardAccount),
-    pledge: BigInt(stakePool.pledge),
-    rewardAccount: Cardano.RewardAccount(stakePool.rewardAccount),
+    owners: poolParameters.owners.map(({ address }) => Cardano.RewardAccount(address)),
+    pledge: BigInt(poolParameters.pledge),
+    relays: poolParameters.relays,
+    rewardAccount: Cardano.RewardAccount(poolParameters.rewardAccount.address),
+    status: stakePool.status,
     transactions: {
-      registration: stakePool.transactions.registration.map(Cardano.TransactionId),
-      retirement: stakePool.transactions.retirement.map(Cardano.TransactionId)
+      // TODO: current implementation will only return 1 (latest/active) registration certificate
+      // We should probably change this core type to include epoch when it takes effect
+      registration: [certificateTxHash(poolParameters.poolRegistrationCertificate)],
+      retirement: certificateTxHashes(stakePool.poolRetirementCertificates)
     },
-    vrf: Cardano.VrfVkHex(stakePool.vrf)
+    vrf: Cardano.VrfVkHex(poolParameters.vrf)
   };
 };
 
@@ -64,7 +81,7 @@ export const createGraphQLStakePoolSearchProvider = createProvider<StakePoolSear
     });
     const responseStakePools = [
       ...(byStakePoolFields || []),
-      ...(byMetadataFields.queryStakePoolMetadata || []).map((sp) => sp?.stakePool)
+      ...(byMetadataFields.queryStakePoolMetadata || []).map((sp) => sp?.poolParameters.stakePool)
     ].filter(util.isNotNil);
     return responseStakePools.map(toCoreStakePool);
   }

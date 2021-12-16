@@ -3,7 +3,7 @@ import { Cardano } from '@cardano-sdk/core';
 import { Directive, Field, Int, ObjectType } from 'type-graphql';
 import { Epoch } from './Epoch';
 import { Int64 } from './util';
-import { ProtocolVersion } from './ProtocolParameters';
+import { ProtocolVersion } from './ProtocolParameters/ProtocolVersion';
 import { Slot } from './Slot';
 import { StakePool } from './StakePool';
 import { Transaction } from './Transaction';

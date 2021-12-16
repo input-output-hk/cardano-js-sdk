@@ -1,0 +1,179 @@
+fragment metadatumValue on Metadatum {
+  __typename
+  ... on BytesMetadatum {
+    bytes
+  }
+  ... on IntegerMetadatum {
+    int
+  }
+  ... on StringMetadatum {
+    string
+  }
+}
+
+fragment metadatumMap on MetadatumMap {
+  map {
+    key
+    metadatum {
+      ...metadatumValue
+      ... on MetadatumArray {
+        ...metadatumArray
+      }
+      # Review: nested maps and arrays are currently supported up to 1 level of nesting,
+      # because it's recursive. If needed we can add support for more levels in this fragment,
+      # or we could try to use https://dgraph.io/docs/query-language/recurse-query/
+      # Same with array of arrays and array of maps
+      ... on MetadatumMap {
+        __typename
+        map {
+          key
+          metadatum {
+            ...metadatumValue
+            ... on MetadatumArray {
+              ...metadatumArray
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+fragment metadatumArray on MetadatumArray {
+  array {
+    ...metadatumValue
+    ... on MetadatumArray {
+      array {
+        ...metadatumValue
+      }
+    }
+    ... on MetadatumMap {
+      map {
+        key
+        metadatum {
+          ...metadatumValue
+        }
+      }
+    }
+  }
+}
+
+fragment protocolParameters on ProtocolParametersAlonzo {
+  stakeKeyDeposit
+  poolDeposit
+}
+
+fragment txIn on TransactionInput {
+  index
+  address {
+    address
+  }
+}
+
+fragment coreTransactionFields on Transaction {
+  inputs {
+    ...txIn
+  }
+  outputs {
+    address {
+      address
+    }
+    value {
+      coin
+      assets {
+        asset {
+          assetId
+        }
+        quantity
+      }
+    }
+    datum
+  }
+  collateral {
+    ...txIn
+  }
+  fee
+  invalidBefore
+  invalidHereafter
+  withdrawals {
+    rewardAccount {
+      address
+    }
+    quantity
+  }
+  mint {
+    asset {
+      assetId
+    }
+    quantity
+  }
+  hash
+  index
+  size
+  block {
+    blockNo
+    slot {
+      number
+    }
+    hash
+  }
+  redeemers {
+    index
+    purpose
+    scriptHash
+    executionUnits {
+      memory
+      steps
+    }
+  }
+  signatures {
+    publicKey {
+      key
+    }
+    signature
+  }
+  auxiliaryData {
+    hash
+    body {
+      blob {
+        key
+        metadatum {
+          ...metadatumValue
+          ... on MetadatumArray {
+            ...metadatumArray
+          }
+          ... on MetadatumMap {
+            ...metadatumMap
+          }
+        }
+      }
+    }
+  }
+}
+
+query TransactionsByHashes($hashes: [String!]!) {
+  queryProtocolParametersAlonzo {
+    ...protocolParameters
+  }
+  queryTransaction(filter: { hash: { in: $hashes } }) {
+    ...coreTransactionFields
+  }
+}
+
+query TransactionIdsByAddresses($addresses: [String!]!) {
+  queryProtocolParametersAlonzo {
+    ...protocolParameters
+  }
+  queryAddress(filter: { address: { in: $addresses } }) {
+    inputs {
+      transaction {
+        ...coreTransactionFields
+      }
+    }
+    utxo {
+      transaction {
+        ...coreTransactionFields
+      }
+    }
+  }
+}

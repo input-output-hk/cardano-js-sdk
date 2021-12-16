@@ -3,7 +3,7 @@ import { Epoch } from './Epoch';
 import { Field, ObjectType } from 'type-graphql';
 import { Int64 } from './util';
 import { RewardAccount } from './Address';
-import { StakePool } from './StakePool';
+import { StakePool } from './StakePool/StakePool';
 
 @ObjectType()
 export class ActiveStake {

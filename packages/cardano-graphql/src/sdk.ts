@@ -321,6 +321,7 @@ export type AddAddressInput = {
   address: Scalars['String'];
   addressType: AddressType;
   inputs: Array<TransactionInputRef>;
+  paymentPublicKey: PublicKeyRef;
   rewardAccount?: Maybe<RewardAccountRef>;
   utxo: Array<TransactionOutputRef>;
 };
@@ -363,7 +364,7 @@ export type AddAssetPayloadAssetArgs = {
 
 export type AddAuxiliaryDataBodyInput = {
   auxiliaryData: AuxiliaryDataRef;
-  blob?: Maybe<Array<MetadatumRef>>;
+  blob?: Maybe<Array<KeyValueMetadatumRef>>;
   scripts?: Maybe<Array<ScriptRef>>;
 };
 
@@ -433,8 +434,7 @@ export type AddBlockPayloadBlockArgs = {
 };
 
 export type AddBytesMetadatumInput = {
-  value: Scalars['String'];
-  valueType: MetadatumStringType;
+  bytes: Scalars['String'];
 };
 
 export type AddBytesMetadatumPayload = {
@@ -617,6 +617,27 @@ export type AddExtendedStakePoolMetadataPayloadExtendedStakePoolMetadataArgs = {
   order?: Maybe<ExtendedStakePoolMetadataOrder>;
 };
 
+export type AddGenesisKeyDelegationCertificateInput = {
+  genesisDelegateHash: Scalars['String'];
+  genesisHash: Scalars['String'];
+  transaction: TransactionRef;
+  vrfKeyHash: Scalars['String'];
+};
+
+export type AddGenesisKeyDelegationCertificatePayload = {
+  __typename?: 'AddGenesisKeyDelegationCertificatePayload';
+  genesisKeyDelegationCertificate?: Maybe<Array<Maybe<GenesisKeyDelegationCertificate>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type AddGenesisKeyDelegationCertificatePayloadGenesisKeyDelegationCertificateArgs = {
+  filter?: Maybe<GenesisKeyDelegationCertificateFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<GenesisKeyDelegationCertificateOrder>;
+};
+
 export type AddItnVerificationInput = {
   owner: Scalars['String'];
   witness: Scalars['String'];
@@ -637,7 +658,7 @@ export type AddItnVerificationPayloadITnVerificationArgs = {
 };
 
 export type AddIntegerMetadatumInput = {
-  value: Scalars['Int'];
+  int: Scalars['Int'];
 };
 
 export type AddIntegerMetadatumPayload = {
@@ -674,8 +695,7 @@ export type AddKeyValueMetadatumPayloadKeyValueMetadatumArgs = {
 };
 
 export type AddMetadatumArrayInput = {
-  value: Array<MetadatumRef>;
-  valueType: MetadatumArrayType;
+  array: Array<MetadatumRef>;
 };
 
 export type AddMetadatumArrayPayload = {
@@ -692,8 +712,7 @@ export type AddMetadatumArrayPayloadMetadatumArrayArgs = {
 };
 
 export type AddMetadatumMapInput = {
-  value: Array<KeyValueMetadatumRef>;
-  valueType: MetadatumArrayType;
+  map: Array<KeyValueMetadatumRef>;
 };
 
 export type AddMetadatumMapPayload = {
@@ -707,6 +726,27 @@ export type AddMetadatumMapPayloadMetadatumMapArgs = {
   filter?: Maybe<MetadatumMapFilter>;
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
+};
+
+export type AddMirCertificateInput = {
+  pot: Scalars['String'];
+  quantity: Scalars['Int64'];
+  rewardAccount: RewardAccountRef;
+  transaction: TransactionRef;
+};
+
+export type AddMirCertificatePayload = {
+  __typename?: 'AddMirCertificatePayload';
+  mirCertificate?: Maybe<Array<Maybe<MirCertificate>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type AddMirCertificatePayloadMirCertificateArgs = {
+  filter?: Maybe<MirCertificateFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<MirCertificateOrder>;
 };
 
 export type AddNetworkConstantsInput = {
@@ -759,6 +799,76 @@ export type AddPoolContactDataPayloadPoolContactDataArgs = {
   order?: Maybe<PoolContactDataOrder>;
 };
 
+export type AddPoolParametersInput = {
+  cost: Scalars['Int64'];
+  margin: RatioRef;
+  metadata?: Maybe<StakePoolMetadataRef>;
+  metadataJson?: Maybe<StakePoolMetadataJsonRef>;
+  owners: Array<RewardAccountRef>;
+  pledge: Scalars['Int64'];
+  poolId: Scalars['String'];
+  poolRegistrationCertificate: PoolRegistrationCertificateRef;
+  relays: Array<SearchResultRef>;
+  rewardAccount: RewardAccountRef;
+  sinceEpoch: Scalars['Int'];
+  stakePool: StakePoolRef;
+  transactionBlockNo: Scalars['Int'];
+  /** hex-encoded 32 byte vrf vkey */
+  vrf: Scalars['String'];
+};
+
+export type AddPoolParametersPayload = {
+  __typename?: 'AddPoolParametersPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  poolParameters?: Maybe<Array<Maybe<PoolParameters>>>;
+};
+
+
+export type AddPoolParametersPayloadPoolParametersArgs = {
+  filter?: Maybe<PoolParametersFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<PoolParametersOrder>;
+};
+
+export type AddPoolRegistrationCertificateInput = {
+  epoch: EpochRef;
+  poolParameters: PoolParametersRef;
+  transaction: TransactionRef;
+};
+
+export type AddPoolRegistrationCertificatePayload = {
+  __typename?: 'AddPoolRegistrationCertificatePayload';
+  numUids?: Maybe<Scalars['Int']>;
+  poolRegistrationCertificate?: Maybe<Array<Maybe<PoolRegistrationCertificate>>>;
+};
+
+
+export type AddPoolRegistrationCertificatePayloadPoolRegistrationCertificateArgs = {
+  filter?: Maybe<PoolRegistrationCertificateFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+export type AddPoolRetirementCertificateInput = {
+  epoch: EpochRef;
+  stakePool: StakePoolRef;
+  transaction: TransactionRef;
+};
+
+export type AddPoolRetirementCertificatePayload = {
+  __typename?: 'AddPoolRetirementCertificatePayload';
+  numUids?: Maybe<Scalars['Int']>;
+  poolRetirementCertificate?: Maybe<Array<Maybe<PoolRetirementCertificate>>>;
+};
+
+
+export type AddPoolRetirementCertificatePayloadPoolRetirementCertificateArgs = {
+  filter?: Maybe<PoolRetirementCertificateFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
 export type AddProtocolParametersAlonzoInput = {
   coinsPerUtxoWord: Scalars['Int'];
   collateralPercentage: Scalars['Int'];
@@ -769,8 +879,6 @@ export type AddProtocolParametersAlonzoInput = {
   executionPrices: ExecutionPricesRef;
   /** hex-encoded, null if neutral */
   extraEntropy?: Maybe<Scalars['String']>;
-  /** to be used for order in queries */
-  flatProtocolVersion: Scalars['Int'];
   maxBlockBodySize: Scalars['Int'];
   maxBlockHeaderSize: Scalars['Int'];
   maxCollateralInputs: Scalars['Int'];
@@ -813,8 +921,6 @@ export type AddProtocolParametersShelleyInput = {
   desiredNumberOfPools: Scalars['Int'];
   /** hex-encoded, null if neutral */
   extraEntropy?: Maybe<Scalars['String']>;
-  /** to be used for order in queries */
-  flatProtocolVersion: Scalars['Int'];
   maxBlockBodySize: Scalars['Int'];
   maxBlockHeaderSize: Scalars['Int'];
   maxTxSize: Scalars['Int'];
@@ -850,6 +956,7 @@ export type AddProtocolVersionInput = {
   major: Scalars['Int'];
   minor: Scalars['Int'];
   patch?: Maybe<Scalars['Int']>;
+  protocolParameters: ProtocolParametersRef;
 };
 
 export type AddProtocolVersionPayload = {
@@ -864,6 +971,31 @@ export type AddProtocolVersionPayloadProtocolVersionArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<ProtocolVersionOrder>;
+};
+
+export type AddPublicKeyInput = {
+  addresses?: Maybe<Array<AddressRef>>;
+  /** hex-encoded Ed25519 public key hash */
+  hash: Scalars['String'];
+  /** hex-encoded Ed25519 public key */
+  key: Scalars['String'];
+  requiredExtraSignatureInTransactions: Array<TransactionRef>;
+  rewardAccount?: Maybe<RewardAccountRef>;
+  signatures: Array<SignatureRef>;
+};
+
+export type AddPublicKeyPayload = {
+  __typename?: 'AddPublicKeyPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  publicKey?: Maybe<Array<Maybe<PublicKey>>>;
+};
+
+
+export type AddPublicKeyPayloadPublicKeyArgs = {
+  filter?: Maybe<PublicKeyFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<PublicKeyOrder>;
 };
 
 export type AddRatioInput = {
@@ -969,6 +1101,11 @@ export type AddRewardAccountInput = {
   activeStake: ActiveStakeRef;
   address: Scalars['String'];
   addresses: AddressRef;
+  delegationCertificates?: Maybe<Array<StakeDelegationCertificateRef>>;
+  deregistrationCertificates?: Maybe<Array<StakeKeyDeregistrationCertificateRef>>;
+  mirCertificates?: Maybe<Array<MirCertificateRef>>;
+  publicKey: PublicKeyRef;
+  registrationCertificates: Array<StakeKeyRegistrationCertificateRef>;
 };
 
 export type AddRewardAccountPayload = {
@@ -1006,6 +1143,27 @@ export type AddScriptPayloadScriptArgs = {
   order?: Maybe<ScriptOrder>;
 };
 
+export type AddSignatureInput = {
+  publicKey: PublicKeyRef;
+  /** hex-encoded Ed25519 signature */
+  signature: Scalars['String'];
+  transaction: TransactionRef;
+};
+
+export type AddSignaturePayload = {
+  __typename?: 'AddSignaturePayload';
+  numUids?: Maybe<Scalars['Int']>;
+  signature?: Maybe<Array<Maybe<Signature>>>;
+};
+
+
+export type AddSignaturePayloadSignatureArgs = {
+  filter?: Maybe<SignatureFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<SignatureOrder>;
+};
+
 export type AddSlotInput = {
   block?: Maybe<BlockRef>;
   date: Scalars['DateTime'];
@@ -1027,24 +1185,70 @@ export type AddSlotPayloadSlotArgs = {
   order?: Maybe<SlotOrder>;
 };
 
+export type AddStakeDelegationCertificateInput = {
+  epoch: EpochRef;
+  rewardAccount: RewardAccountRef;
+  stakePool: StakePoolRef;
+  transaction: TransactionRef;
+};
+
+export type AddStakeDelegationCertificatePayload = {
+  __typename?: 'AddStakeDelegationCertificatePayload';
+  numUids?: Maybe<Scalars['Int']>;
+  stakeDelegationCertificate?: Maybe<Array<Maybe<StakeDelegationCertificate>>>;
+};
+
+
+export type AddStakeDelegationCertificatePayloadStakeDelegationCertificateArgs = {
+  filter?: Maybe<StakeDelegationCertificateFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+export type AddStakeKeyDeregistrationCertificateInput = {
+  rewardAccount: RewardAccountRef;
+  transaction: TransactionRef;
+};
+
+export type AddStakeKeyDeregistrationCertificatePayload = {
+  __typename?: 'AddStakeKeyDeregistrationCertificatePayload';
+  numUids?: Maybe<Scalars['Int']>;
+  stakeKeyDeregistrationCertificate?: Maybe<Array<Maybe<StakeKeyDeregistrationCertificate>>>;
+};
+
+
+export type AddStakeKeyDeregistrationCertificatePayloadStakeKeyDeregistrationCertificateArgs = {
+  filter?: Maybe<StakeKeyDeregistrationCertificateFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+export type AddStakeKeyRegistrationCertificateInput = {
+  rewardAccount: RewardAccountRef;
+  transaction: TransactionRef;
+};
+
+export type AddStakeKeyRegistrationCertificatePayload = {
+  __typename?: 'AddStakeKeyRegistrationCertificatePayload';
+  numUids?: Maybe<Scalars['Int']>;
+  stakeKeyRegistrationCertificate?: Maybe<Array<Maybe<StakeKeyRegistrationCertificate>>>;
+};
+
+
+export type AddStakeKeyRegistrationCertificatePayloadStakeKeyRegistrationCertificateArgs = {
+  filter?: Maybe<StakeKeyRegistrationCertificateFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
 export type AddStakePoolInput = {
-  /** Coin quantity */
-  cost: Scalars['String'];
   hexId: Scalars['String'];
   id: Scalars['String'];
-  margin: RatioRef;
-  metadata?: Maybe<StakePoolMetadataRef>;
-  metadataJson?: Maybe<StakePoolMetadataJsonRef>;
   metrics: StakePoolMetricsRef;
-  owners: Array<Scalars['String']>;
-  /** Coin quantity */
-  pledge: Scalars['String'];
-  relays: Array<SearchResultRef>;
-  rewardAccount: Scalars['String'];
+  poolParameters: Array<PoolParametersRef>;
+  poolRetirementCertificates: Array<PoolRetirementCertificateRef>;
   /** active | retired | retiring */
   status: StakePoolStatus;
-  transactions: StakePoolTransactionsRef;
-  vrf: Scalars['String'];
 };
 
 export type AddStakePoolMetadataInput = {
@@ -1055,7 +1259,7 @@ export type AddStakePoolMetadataInput = {
   extVkey?: Maybe<Scalars['String']>;
   homepage: Scalars['String'];
   name: Scalars['String'];
-  stakePool: StakePoolRef;
+  poolParameters: PoolParametersRef;
   stakePoolId: Scalars['String'];
   ticker: Scalars['String'];
 };
@@ -1094,10 +1298,11 @@ export type AddStakePoolMetadataPayloadStakePoolMetadataArgs = {
 };
 
 export type AddStakePoolMetricsInput = {
+  block: BlockRef;
+  blockNo: Scalars['Int'];
   blocksCreated: Scalars['Int'];
   delegators: Scalars['Int'];
-  /** Coin quantity */
-  livePledge: Scalars['String'];
+  livePledge: Scalars['Int64'];
   saturation: Scalars['Float'];
   size: StakePoolMetricsSizeRef;
   stake: StakePoolMetricsStakeRef;
@@ -1139,10 +1344,8 @@ export type AddStakePoolMetricsSizePayloadStakePoolMetricsSizeArgs = {
 };
 
 export type AddStakePoolMetricsStakeInput = {
-  /** Coin quantity */
-  active: Scalars['String'];
-  /** Coin quantity */
-  live: Scalars['String'];
+  active: Scalars['Int64'];
+  live: Scalars['Int64'];
 };
 
 export type AddStakePoolMetricsStakePayload = {
@@ -1173,27 +1376,8 @@ export type AddStakePoolPayloadStakePoolArgs = {
   order?: Maybe<StakePoolOrder>;
 };
 
-export type AddStakePoolTransactionsInput = {
-  registration: Array<Scalars['String']>;
-  retirement: Array<Scalars['String']>;
-};
-
-export type AddStakePoolTransactionsPayload = {
-  __typename?: 'AddStakePoolTransactionsPayload';
-  numUids?: Maybe<Scalars['Int']>;
-  stakePoolTransactions?: Maybe<Array<Maybe<StakePoolTransactions>>>;
-};
-
-
-export type AddStakePoolTransactionsPayloadStakePoolTransactionsArgs = {
-  filter?: Maybe<StakePoolTransactionsFilter>;
-  first?: Maybe<Scalars['Int']>;
-  offset?: Maybe<Scalars['Int']>;
-};
-
 export type AddStringMetadatumInput = {
-  value: Scalars['String'];
-  valueType: MetadatumStringType;
+  string: Scalars['String'];
 };
 
 export type AddStringMetadatumPayload = {
@@ -1276,17 +1460,21 @@ export type AddTokenPayloadTokenArgs = {
 export type AddTransactionInput = {
   auxiliaryData?: Maybe<AuxiliaryDataRef>;
   block: BlockRef;
-  blockIndex: Scalars['Int'];
+  certificates?: Maybe<Array<CertificateRef>>;
   collateral?: Maybe<Array<TransactionInputRef>>;
   deposit: Scalars['Int64'];
   fee: Scalars['Int64'];
   hash: Scalars['String'];
+  index: Scalars['Int'];
   inputs: Array<TransactionInputRef>;
   invalidBefore?: Maybe<Scalars['Int']>;
   invalidHereafter?: Maybe<Scalars['Int']>;
   mint?: Maybe<Array<TokenRef>>;
   outputs: Array<TransactionOutputRef>;
   redeemers?: Maybe<Array<RedeemerRef>>;
+  requiredExtraSignatures: Array<PublicKeyRef>;
+  scriptIntegrityHash?: Maybe<Scalars['String']>;
+  signatures: Array<SignatureRef>;
   size: Scalars['Int64'];
   totalOutputCoin: Scalars['Int64'];
   validContract: Scalars['Boolean'];
@@ -1318,6 +1506,8 @@ export type AddTransactionInputPayloadTransactionInputArgs = {
 
 export type AddTransactionOutputInput = {
   address: AddressRef;
+  /** hex-encoded 32 byte hash */
+  datum?: Maybe<Scalars['String']>;
   index: Scalars['Int'];
   transaction: TransactionRef;
   value: ValueRef;
@@ -1398,6 +1588,7 @@ export type Address = {
   /** Spending history */
   inputs: Array<TransactionInput>;
   inputsAggregate?: Maybe<TransactionInputAggregateResult>;
+  paymentPublicKey: PublicKey;
   rewardAccount?: Maybe<RewardAccount>;
   /** Balance */
   utxo: Array<TransactionOutput>;
@@ -1415,6 +1606,11 @@ export type AddressInputsArgs = {
 
 export type AddressInputsAggregateArgs = {
   filter?: Maybe<TransactionInputFilter>;
+};
+
+
+export type AddressPaymentPublicKeyArgs = {
+  filter?: Maybe<PublicKeyFilter>;
 };
 
 
@@ -1443,6 +1639,7 @@ export type AddressAggregateResult = {
 };
 
 export type AddressFilter = {
+  address?: Maybe<StringHashFilter>;
   and?: Maybe<Array<Maybe<AddressFilter>>>;
   has?: Maybe<Array<Maybe<AddressHasFilter>>>;
   not?: Maybe<AddressFilter>;
@@ -1453,6 +1650,7 @@ export enum AddressHasFilter {
   Address = 'address',
   AddressType = 'addressType',
   Inputs = 'inputs',
+  PaymentPublicKey = 'paymentPublicKey',
   RewardAccount = 'rewardAccount',
   Utxo = 'utxo'
 }
@@ -1468,9 +1666,9 @@ export enum AddressOrderable {
 }
 
 export type AddressPatch = {
-  address?: Maybe<Scalars['String']>;
   addressType?: Maybe<AddressType>;
   inputs?: Maybe<Array<TransactionInputRef>>;
+  paymentPublicKey?: Maybe<PublicKeyRef>;
   rewardAccount?: Maybe<RewardAccountRef>;
   utxo?: Maybe<Array<TransactionOutputRef>>;
 };
@@ -1479,6 +1677,7 @@ export type AddressRef = {
   address?: Maybe<Scalars['String']>;
   addressType?: Maybe<AddressType>;
   inputs?: Maybe<Array<TransactionInputRef>>;
+  paymentPublicKey?: Maybe<PublicKeyRef>;
   rewardAccount?: Maybe<RewardAccountRef>;
   utxo?: Maybe<Array<TransactionOutputRef>>;
 };
@@ -1593,7 +1792,8 @@ export type AuxiliaryDataAggregateResult = {
 export type AuxiliaryDataBody = {
   __typename?: 'AuxiliaryDataBody';
   auxiliaryData: AuxiliaryData;
-  blob?: Maybe<Array<Metadatum>>;
+  blob?: Maybe<Array<KeyValueMetadatum>>;
+  blobAggregate?: Maybe<KeyValueMetadatumAggregateResult>;
   scripts?: Maybe<Array<Script>>;
   scriptsAggregate?: Maybe<ScriptAggregateResult>;
 };
@@ -1605,9 +1805,15 @@ export type AuxiliaryDataBodyAuxiliaryDataArgs = {
 
 
 export type AuxiliaryDataBodyBlobArgs = {
-  filter?: Maybe<MetadatumFilter>;
+  filter?: Maybe<KeyValueMetadatumFilter>;
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<KeyValueMetadatumOrder>;
+};
+
+
+export type AuxiliaryDataBodyBlobAggregateArgs = {
+  filter?: Maybe<KeyValueMetadatumFilter>;
 };
 
 
@@ -1643,13 +1849,13 @@ export enum AuxiliaryDataBodyHasFilter {
 
 export type AuxiliaryDataBodyPatch = {
   auxiliaryData?: Maybe<AuxiliaryDataRef>;
-  blob?: Maybe<Array<MetadatumRef>>;
+  blob?: Maybe<Array<KeyValueMetadatumRef>>;
   scripts?: Maybe<Array<ScriptRef>>;
 };
 
 export type AuxiliaryDataBodyRef = {
   auxiliaryData?: Maybe<AuxiliaryDataRef>;
-  blob?: Maybe<Array<MetadatumRef>>;
+  blob?: Maybe<Array<KeyValueMetadatumRef>>;
   scripts?: Maybe<Array<ScriptRef>>;
 };
 
@@ -1864,15 +2070,14 @@ export type BlockRef = {
 
 export type BytesMetadatum = {
   __typename?: 'BytesMetadatum';
-  value: Scalars['String'];
-  valueType: MetadatumStringType;
+  bytes: Scalars['String'];
 };
 
 export type BytesMetadatumAggregateResult = {
   __typename?: 'BytesMetadatumAggregateResult';
+  bytesMax?: Maybe<Scalars['String']>;
+  bytesMin?: Maybe<Scalars['String']>;
   count?: Maybe<Scalars['Int']>;
-  valueMax?: Maybe<Scalars['String']>;
-  valueMin?: Maybe<Scalars['String']>;
 };
 
 export type BytesMetadatumFilter = {
@@ -1883,8 +2088,7 @@ export type BytesMetadatumFilter = {
 };
 
 export enum BytesMetadatumHasFilter {
-  Value = 'value',
-  ValueType = 'valueType'
+  Bytes = 'bytes'
 }
 
 export type BytesMetadatumOrder = {
@@ -1894,18 +2098,49 @@ export type BytesMetadatumOrder = {
 };
 
 export enum BytesMetadatumOrderable {
-  Value = 'value'
+  Bytes = 'bytes'
 }
 
 export type BytesMetadatumPatch = {
-  value?: Maybe<Scalars['String']>;
-  valueType?: Maybe<MetadatumStringType>;
+  bytes?: Maybe<Scalars['String']>;
 };
 
 export type BytesMetadatumRef = {
-  value?: Maybe<Scalars['String']>;
-  valueType?: Maybe<MetadatumStringType>;
+  bytes?: Maybe<Scalars['String']>;
 };
+
+export type Certificate = GenesisKeyDelegationCertificate | MirCertificate | PoolRegistrationCertificate | PoolRetirementCertificate | StakeDelegationCertificate | StakeKeyDeregistrationCertificate | StakeKeyRegistrationCertificate;
+
+export type CertificateFilter = {
+  genesisKeyDelegationCertificateFilter?: Maybe<GenesisKeyDelegationCertificateFilter>;
+  memberTypes?: Maybe<Array<CertificateType>>;
+  mirCertificateFilter?: Maybe<MirCertificateFilter>;
+  poolRegistrationCertificateFilter?: Maybe<PoolRegistrationCertificateFilter>;
+  poolRetirementCertificateFilter?: Maybe<PoolRetirementCertificateFilter>;
+  stakeDelegationCertificateFilter?: Maybe<StakeDelegationCertificateFilter>;
+  stakeKeyDeregistrationCertificateFilter?: Maybe<StakeKeyDeregistrationCertificateFilter>;
+  stakeKeyRegistrationCertificateFilter?: Maybe<StakeKeyRegistrationCertificateFilter>;
+};
+
+export type CertificateRef = {
+  genesisKeyDelegationCertificateRef?: Maybe<GenesisKeyDelegationCertificateRef>;
+  mirCertificateRef?: Maybe<MirCertificateRef>;
+  poolRegistrationCertificateRef?: Maybe<PoolRegistrationCertificateRef>;
+  poolRetirementCertificateRef?: Maybe<PoolRetirementCertificateRef>;
+  stakeDelegationCertificateRef?: Maybe<StakeDelegationCertificateRef>;
+  stakeKeyDeregistrationCertificateRef?: Maybe<StakeKeyDeregistrationCertificateRef>;
+  stakeKeyRegistrationCertificateRef?: Maybe<StakeKeyRegistrationCertificateRef>;
+};
+
+export enum CertificateType {
+  GenesisKeyDelegationCertificate = 'GenesisKeyDelegationCertificate',
+  MirCertificate = 'MirCertificate',
+  PoolRegistrationCertificate = 'PoolRegistrationCertificate',
+  PoolRetirementCertificate = 'PoolRetirementCertificate',
+  StakeDelegationCertificate = 'StakeDelegationCertificate',
+  StakeKeyDeregistrationCertificate = 'StakeKeyDeregistrationCertificate',
+  StakeKeyRegistrationCertificate = 'StakeKeyRegistrationCertificate'
+}
 
 export type CoinSupply = {
   __typename?: 'CoinSupply';
@@ -2356,6 +2591,21 @@ export type DeleteExtendedStakePoolMetadataPayloadExtendedStakePoolMetadataArgs 
   order?: Maybe<ExtendedStakePoolMetadataOrder>;
 };
 
+export type DeleteGenesisKeyDelegationCertificatePayload = {
+  __typename?: 'DeleteGenesisKeyDelegationCertificatePayload';
+  genesisKeyDelegationCertificate?: Maybe<Array<Maybe<GenesisKeyDelegationCertificate>>>;
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type DeleteGenesisKeyDelegationCertificatePayloadGenesisKeyDelegationCertificateArgs = {
+  filter?: Maybe<GenesisKeyDelegationCertificateFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<GenesisKeyDelegationCertificateOrder>;
+};
+
 export type DeleteItnVerificationPayload = {
   __typename?: 'DeleteITNVerificationPayload';
   iTNVerification?: Maybe<Array<Maybe<ItnVerification>>>;
@@ -2429,6 +2679,21 @@ export type DeleteMetadatumMapPayloadMetadatumMapArgs = {
   offset?: Maybe<Scalars['Int']>;
 };
 
+export type DeleteMirCertificatePayload = {
+  __typename?: 'DeleteMirCertificatePayload';
+  mirCertificate?: Maybe<Array<Maybe<MirCertificate>>>;
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type DeleteMirCertificatePayloadMirCertificateArgs = {
+  filter?: Maybe<MirCertificateFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<MirCertificateOrder>;
+};
+
 export type DeleteNetworkConstantsPayload = {
   __typename?: 'DeleteNetworkConstantsPayload';
   msg?: Maybe<Scalars['String']>;
@@ -2457,6 +2722,49 @@ export type DeletePoolContactDataPayloadPoolContactDataArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<PoolContactDataOrder>;
+};
+
+export type DeletePoolParametersPayload = {
+  __typename?: 'DeletePoolParametersPayload';
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+  poolParameters?: Maybe<Array<Maybe<PoolParameters>>>;
+};
+
+
+export type DeletePoolParametersPayloadPoolParametersArgs = {
+  filter?: Maybe<PoolParametersFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<PoolParametersOrder>;
+};
+
+export type DeletePoolRegistrationCertificatePayload = {
+  __typename?: 'DeletePoolRegistrationCertificatePayload';
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+  poolRegistrationCertificate?: Maybe<Array<Maybe<PoolRegistrationCertificate>>>;
+};
+
+
+export type DeletePoolRegistrationCertificatePayloadPoolRegistrationCertificateArgs = {
+  filter?: Maybe<PoolRegistrationCertificateFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+export type DeletePoolRetirementCertificatePayload = {
+  __typename?: 'DeletePoolRetirementCertificatePayload';
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+  poolRetirementCertificate?: Maybe<Array<Maybe<PoolRetirementCertificate>>>;
+};
+
+
+export type DeletePoolRetirementCertificatePayloadPoolRetirementCertificateArgs = {
+  filter?: Maybe<PoolRetirementCertificateFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
 };
 
 export type DeleteProtocolParametersAlonzoPayload = {
@@ -2502,6 +2810,21 @@ export type DeleteProtocolVersionPayloadProtocolVersionArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<ProtocolVersionOrder>;
+};
+
+export type DeletePublicKeyPayload = {
+  __typename?: 'DeletePublicKeyPayload';
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+  publicKey?: Maybe<Array<Maybe<PublicKey>>>;
+};
+
+
+export type DeletePublicKeyPayloadPublicKeyArgs = {
+  filter?: Maybe<PublicKeyFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<PublicKeyOrder>;
 };
 
 export type DeleteRatioPayload = {
@@ -2609,6 +2932,21 @@ export type DeleteScriptPayloadScriptArgs = {
   order?: Maybe<ScriptOrder>;
 };
 
+export type DeleteSignaturePayload = {
+  __typename?: 'DeleteSignaturePayload';
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+  signature?: Maybe<Array<Maybe<Signature>>>;
+};
+
+
+export type DeleteSignaturePayloadSignatureArgs = {
+  filter?: Maybe<SignatureFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<SignatureOrder>;
+};
+
 export type DeleteSlotPayload = {
   __typename?: 'DeleteSlotPayload';
   msg?: Maybe<Scalars['String']>;
@@ -2622,6 +2960,48 @@ export type DeleteSlotPayloadSlotArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<SlotOrder>;
+};
+
+export type DeleteStakeDelegationCertificatePayload = {
+  __typename?: 'DeleteStakeDelegationCertificatePayload';
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+  stakeDelegationCertificate?: Maybe<Array<Maybe<StakeDelegationCertificate>>>;
+};
+
+
+export type DeleteStakeDelegationCertificatePayloadStakeDelegationCertificateArgs = {
+  filter?: Maybe<StakeDelegationCertificateFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+export type DeleteStakeKeyDeregistrationCertificatePayload = {
+  __typename?: 'DeleteStakeKeyDeregistrationCertificatePayload';
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+  stakeKeyDeregistrationCertificate?: Maybe<Array<Maybe<StakeKeyDeregistrationCertificate>>>;
+};
+
+
+export type DeleteStakeKeyDeregistrationCertificatePayloadStakeKeyDeregistrationCertificateArgs = {
+  filter?: Maybe<StakeKeyDeregistrationCertificateFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+export type DeleteStakeKeyRegistrationCertificatePayload = {
+  __typename?: 'DeleteStakeKeyRegistrationCertificatePayload';
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+  stakeKeyRegistrationCertificate?: Maybe<Array<Maybe<StakeKeyRegistrationCertificate>>>;
+};
+
+
+export type DeleteStakeKeyRegistrationCertificatePayloadStakeKeyRegistrationCertificateArgs = {
+  filter?: Maybe<StakeKeyRegistrationCertificateFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
 };
 
 export type DeleteStakePoolMetadataJsonPayload = {
@@ -2712,20 +3092,6 @@ export type DeleteStakePoolPayloadStakePoolArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<StakePoolOrder>;
-};
-
-export type DeleteStakePoolTransactionsPayload = {
-  __typename?: 'DeleteStakePoolTransactionsPayload';
-  msg?: Maybe<Scalars['String']>;
-  numUids?: Maybe<Scalars['Int']>;
-  stakePoolTransactions?: Maybe<Array<Maybe<StakePoolTransactions>>>;
-};
-
-
-export type DeleteStakePoolTransactionsPayloadStakePoolTransactionsArgs = {
-  filter?: Maybe<StakePoolTransactionsFilter>;
-  first?: Maybe<Scalars['Int']>;
-  offset?: Maybe<Scalars['Int']>;
 };
 
 export type DeleteStringMetadatumPayload = {
@@ -3295,6 +3661,70 @@ export type GenerateQueryParams = {
   query?: Maybe<Scalars['Boolean']>;
 };
 
+export type GenesisKeyDelegationCertificate = {
+  __typename?: 'GenesisKeyDelegationCertificate';
+  genesisDelegateHash: Scalars['String'];
+  genesisHash: Scalars['String'];
+  transaction: Transaction;
+  vrfKeyHash: Scalars['String'];
+};
+
+
+export type GenesisKeyDelegationCertificateTransactionArgs = {
+  filter?: Maybe<TransactionFilter>;
+};
+
+export type GenesisKeyDelegationCertificateAggregateResult = {
+  __typename?: 'GenesisKeyDelegationCertificateAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+  genesisDelegateHashMax?: Maybe<Scalars['String']>;
+  genesisDelegateHashMin?: Maybe<Scalars['String']>;
+  genesisHashMax?: Maybe<Scalars['String']>;
+  genesisHashMin?: Maybe<Scalars['String']>;
+  vrfKeyHashMax?: Maybe<Scalars['String']>;
+  vrfKeyHashMin?: Maybe<Scalars['String']>;
+};
+
+export type GenesisKeyDelegationCertificateFilter = {
+  and?: Maybe<Array<Maybe<GenesisKeyDelegationCertificateFilter>>>;
+  has?: Maybe<Array<Maybe<GenesisKeyDelegationCertificateHasFilter>>>;
+  not?: Maybe<GenesisKeyDelegationCertificateFilter>;
+  or?: Maybe<Array<Maybe<GenesisKeyDelegationCertificateFilter>>>;
+};
+
+export enum GenesisKeyDelegationCertificateHasFilter {
+  GenesisDelegateHash = 'genesisDelegateHash',
+  GenesisHash = 'genesisHash',
+  Transaction = 'transaction',
+  VrfKeyHash = 'vrfKeyHash'
+}
+
+export type GenesisKeyDelegationCertificateOrder = {
+  asc?: Maybe<GenesisKeyDelegationCertificateOrderable>;
+  desc?: Maybe<GenesisKeyDelegationCertificateOrderable>;
+  then?: Maybe<GenesisKeyDelegationCertificateOrder>;
+};
+
+export enum GenesisKeyDelegationCertificateOrderable {
+  GenesisDelegateHash = 'genesisDelegateHash',
+  GenesisHash = 'genesisHash',
+  VrfKeyHash = 'vrfKeyHash'
+}
+
+export type GenesisKeyDelegationCertificatePatch = {
+  genesisDelegateHash?: Maybe<Scalars['String']>;
+  genesisHash?: Maybe<Scalars['String']>;
+  transaction?: Maybe<TransactionRef>;
+  vrfKeyHash?: Maybe<Scalars['String']>;
+};
+
+export type GenesisKeyDelegationCertificateRef = {
+  genesisDelegateHash?: Maybe<Scalars['String']>;
+  genesisHash?: Maybe<Scalars['String']>;
+  transaction?: Maybe<TransactionRef>;
+  vrfKeyHash?: Maybe<Scalars['String']>;
+};
+
 export enum HttpMethod {
   Delete = 'DELETE',
   Get = 'GET',
@@ -3383,16 +3813,16 @@ export type IntRange = {
 
 export type IntegerMetadatum = {
   __typename?: 'IntegerMetadatum';
-  value: Scalars['Int'];
+  int: Scalars['Int'];
 };
 
 export type IntegerMetadatumAggregateResult = {
   __typename?: 'IntegerMetadatumAggregateResult';
   count?: Maybe<Scalars['Int']>;
-  valueAvg?: Maybe<Scalars['Float']>;
-  valueMax?: Maybe<Scalars['Int']>;
-  valueMin?: Maybe<Scalars['Int']>;
-  valueSum?: Maybe<Scalars['Int']>;
+  intAvg?: Maybe<Scalars['Float']>;
+  intMax?: Maybe<Scalars['Int']>;
+  intMin?: Maybe<Scalars['Int']>;
+  intSum?: Maybe<Scalars['Int']>;
 };
 
 export type IntegerMetadatumFilter = {
@@ -3403,7 +3833,7 @@ export type IntegerMetadatumFilter = {
 };
 
 export enum IntegerMetadatumHasFilter {
-  Value = 'value'
+  Int = 'int'
 }
 
 export type IntegerMetadatumOrder = {
@@ -3413,15 +3843,15 @@ export type IntegerMetadatumOrder = {
 };
 
 export enum IntegerMetadatumOrderable {
-  Value = 'value'
+  Int = 'int'
 }
 
 export type IntegerMetadatumPatch = {
-  value?: Maybe<Scalars['Int']>;
+  int?: Maybe<Scalars['Int']>;
 };
 
 export type IntegerMetadatumRef = {
-  value?: Maybe<Scalars['Int']>;
+  int?: Maybe<Scalars['Int']>;
 };
 
 export type IntersectsFilter = {
@@ -3483,12 +3913,11 @@ export type Metadatum = BytesMetadatum | IntegerMetadatum | MetadatumArray | Met
 
 export type MetadatumArray = {
   __typename?: 'MetadatumArray';
-  value: Array<Metadatum>;
-  valueType: MetadatumArrayType;
+  array: Array<Metadatum>;
 };
 
 
-export type MetadatumArrayValueArgs = {
+export type MetadatumArrayArrayArgs = {
   filter?: Maybe<MetadatumFilter>;
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
@@ -3507,24 +3936,16 @@ export type MetadatumArrayFilter = {
 };
 
 export enum MetadatumArrayHasFilter {
-  Value = 'value',
-  ValueType = 'valueType'
+  Array = 'array'
 }
 
 export type MetadatumArrayPatch = {
-  value?: Maybe<Array<MetadatumRef>>;
-  valueType?: Maybe<MetadatumArrayType>;
+  array?: Maybe<Array<MetadatumRef>>;
 };
 
 export type MetadatumArrayRef = {
-  value?: Maybe<Array<MetadatumRef>>;
-  valueType?: Maybe<MetadatumArrayType>;
+  array?: Maybe<Array<MetadatumRef>>;
 };
-
-export enum MetadatumArrayType {
-  Array = 'array',
-  Map = 'map'
-}
 
 export type MetadatumFilter = {
   bytesMetadatumFilter?: Maybe<BytesMetadatumFilter>;
@@ -3537,13 +3958,12 @@ export type MetadatumFilter = {
 
 export type MetadatumMap = {
   __typename?: 'MetadatumMap';
-  value: Array<KeyValueMetadatum>;
-  valueAggregate?: Maybe<KeyValueMetadatumAggregateResult>;
-  valueType: MetadatumArrayType;
+  map: Array<KeyValueMetadatum>;
+  mapAggregate?: Maybe<KeyValueMetadatumAggregateResult>;
 };
 
 
-export type MetadatumMapValueArgs = {
+export type MetadatumMapMapArgs = {
   filter?: Maybe<KeyValueMetadatumFilter>;
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
@@ -3551,7 +3971,7 @@ export type MetadatumMapValueArgs = {
 };
 
 
-export type MetadatumMapValueAggregateArgs = {
+export type MetadatumMapMapAggregateArgs = {
   filter?: Maybe<KeyValueMetadatumFilter>;
 };
 
@@ -3568,18 +3988,15 @@ export type MetadatumMapFilter = {
 };
 
 export enum MetadatumMapHasFilter {
-  Value = 'value',
-  ValueType = 'valueType'
+  Map = 'map'
 }
 
 export type MetadatumMapPatch = {
-  value?: Maybe<Array<KeyValueMetadatumRef>>;
-  valueType?: Maybe<MetadatumArrayType>;
+  map?: Maybe<Array<KeyValueMetadatumRef>>;
 };
 
 export type MetadatumMapRef = {
-  value?: Maybe<Array<KeyValueMetadatumRef>>;
-  valueType?: Maybe<MetadatumArrayType>;
+  map?: Maybe<Array<KeyValueMetadatumRef>>;
 };
 
 export type MetadatumRef = {
@@ -3590,11 +4007,6 @@ export type MetadatumRef = {
   stringMetadatumRef?: Maybe<StringMetadatumRef>;
 };
 
-export enum MetadatumStringType {
-  Bytes = 'bytes',
-  Other = 'other'
-}
-
 export enum MetadatumType {
   BytesMetadatum = 'BytesMetadatum',
   IntegerMetadatum = 'IntegerMetadatum',
@@ -3602,6 +4014,74 @@ export enum MetadatumType {
   MetadatumMap = 'MetadatumMap',
   StringMetadatum = 'StringMetadatum'
 }
+
+export type MirCertificate = {
+  __typename?: 'MirCertificate';
+  pot: Scalars['String'];
+  quantity: Scalars['Int64'];
+  rewardAccount: RewardAccount;
+  transaction: Transaction;
+};
+
+
+export type MirCertificateRewardAccountArgs = {
+  filter?: Maybe<RewardAccountFilter>;
+};
+
+
+export type MirCertificateTransactionArgs = {
+  filter?: Maybe<TransactionFilter>;
+};
+
+export type MirCertificateAggregateResult = {
+  __typename?: 'MirCertificateAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+  potMax?: Maybe<Scalars['String']>;
+  potMin?: Maybe<Scalars['String']>;
+  quantityAvg?: Maybe<Scalars['Float']>;
+  quantityMax?: Maybe<Scalars['Int64']>;
+  quantityMin?: Maybe<Scalars['Int64']>;
+  quantitySum?: Maybe<Scalars['Int64']>;
+};
+
+export type MirCertificateFilter = {
+  and?: Maybe<Array<Maybe<MirCertificateFilter>>>;
+  has?: Maybe<Array<Maybe<MirCertificateHasFilter>>>;
+  not?: Maybe<MirCertificateFilter>;
+  or?: Maybe<Array<Maybe<MirCertificateFilter>>>;
+};
+
+export enum MirCertificateHasFilter {
+  Pot = 'pot',
+  Quantity = 'quantity',
+  RewardAccount = 'rewardAccount',
+  Transaction = 'transaction'
+}
+
+export type MirCertificateOrder = {
+  asc?: Maybe<MirCertificateOrderable>;
+  desc?: Maybe<MirCertificateOrderable>;
+  then?: Maybe<MirCertificateOrder>;
+};
+
+export enum MirCertificateOrderable {
+  Pot = 'pot',
+  Quantity = 'quantity'
+}
+
+export type MirCertificatePatch = {
+  pot?: Maybe<Scalars['String']>;
+  quantity?: Maybe<Scalars['Int64']>;
+  rewardAccount?: Maybe<RewardAccountRef>;
+  transaction?: Maybe<TransactionRef>;
+};
+
+export type MirCertificateRef = {
+  pot?: Maybe<Scalars['String']>;
+  quantity?: Maybe<Scalars['Int64']>;
+  rewardAccount?: Maybe<RewardAccountRef>;
+  transaction?: Maybe<TransactionRef>;
+};
 
 export enum Mode {
   Batch = 'BATCH',
@@ -3636,16 +4116,22 @@ export type Mutation = {
   addExecutionUnits?: Maybe<AddExecutionUnitsPayload>;
   addExtendedStakePoolMetadata?: Maybe<AddExtendedStakePoolMetadataPayload>;
   addExtendedStakePoolMetadataFields?: Maybe<AddExtendedStakePoolMetadataFieldsPayload>;
+  addGenesisKeyDelegationCertificate?: Maybe<AddGenesisKeyDelegationCertificatePayload>;
   addITNVerification?: Maybe<AddItnVerificationPayload>;
   addIntegerMetadatum?: Maybe<AddIntegerMetadatumPayload>;
   addKeyValueMetadatum?: Maybe<AddKeyValueMetadatumPayload>;
   addMetadatumArray?: Maybe<AddMetadatumArrayPayload>;
   addMetadatumMap?: Maybe<AddMetadatumMapPayload>;
+  addMirCertificate?: Maybe<AddMirCertificatePayload>;
   addNetworkConstants?: Maybe<AddNetworkConstantsPayload>;
   addPoolContactData?: Maybe<AddPoolContactDataPayload>;
+  addPoolParameters?: Maybe<AddPoolParametersPayload>;
+  addPoolRegistrationCertificate?: Maybe<AddPoolRegistrationCertificatePayload>;
+  addPoolRetirementCertificate?: Maybe<AddPoolRetirementCertificatePayload>;
   addProtocolParametersAlonzo?: Maybe<AddProtocolParametersAlonzoPayload>;
   addProtocolParametersShelley?: Maybe<AddProtocolParametersShelleyPayload>;
   addProtocolVersion?: Maybe<AddProtocolVersionPayload>;
+  addPublicKey?: Maybe<AddPublicKeyPayload>;
   addRatio?: Maybe<AddRatioPayload>;
   addRedeemer?: Maybe<AddRedeemerPayload>;
   addRelayByAddress?: Maybe<AddRelayByAddressPayload>;
@@ -3653,14 +4139,17 @@ export type Mutation = {
   addRelayByNameMultihost?: Maybe<AddRelayByNameMultihostPayload>;
   addRewardAccount?: Maybe<AddRewardAccountPayload>;
   addScript?: Maybe<AddScriptPayload>;
+  addSignature?: Maybe<AddSignaturePayload>;
   addSlot?: Maybe<AddSlotPayload>;
+  addStakeDelegationCertificate?: Maybe<AddStakeDelegationCertificatePayload>;
+  addStakeKeyDeregistrationCertificate?: Maybe<AddStakeKeyDeregistrationCertificatePayload>;
+  addStakeKeyRegistrationCertificate?: Maybe<AddStakeKeyRegistrationCertificatePayload>;
   addStakePool?: Maybe<AddStakePoolPayload>;
   addStakePoolMetadata?: Maybe<AddStakePoolMetadataPayload>;
   addStakePoolMetadataJson?: Maybe<AddStakePoolMetadataJsonPayload>;
   addStakePoolMetrics?: Maybe<AddStakePoolMetricsPayload>;
   addStakePoolMetricsSize?: Maybe<AddStakePoolMetricsSizePayload>;
   addStakePoolMetricsStake?: Maybe<AddStakePoolMetricsStakePayload>;
-  addStakePoolTransactions?: Maybe<AddStakePoolTransactionsPayload>;
   addStringMetadatum?: Maybe<AddStringMetadatumPayload>;
   addThePoolsMediaAssets?: Maybe<AddThePoolsMediaAssetsPayload>;
   addTimeSettings?: Maybe<AddTimeSettingsPayload>;
@@ -3687,16 +4176,22 @@ export type Mutation = {
   deleteExecutionUnits?: Maybe<DeleteExecutionUnitsPayload>;
   deleteExtendedStakePoolMetadata?: Maybe<DeleteExtendedStakePoolMetadataPayload>;
   deleteExtendedStakePoolMetadataFields?: Maybe<DeleteExtendedStakePoolMetadataFieldsPayload>;
+  deleteGenesisKeyDelegationCertificate?: Maybe<DeleteGenesisKeyDelegationCertificatePayload>;
   deleteITNVerification?: Maybe<DeleteItnVerificationPayload>;
   deleteIntegerMetadatum?: Maybe<DeleteIntegerMetadatumPayload>;
   deleteKeyValueMetadatum?: Maybe<DeleteKeyValueMetadatumPayload>;
   deleteMetadatumArray?: Maybe<DeleteMetadatumArrayPayload>;
   deleteMetadatumMap?: Maybe<DeleteMetadatumMapPayload>;
+  deleteMirCertificate?: Maybe<DeleteMirCertificatePayload>;
   deleteNetworkConstants?: Maybe<DeleteNetworkConstantsPayload>;
   deletePoolContactData?: Maybe<DeletePoolContactDataPayload>;
+  deletePoolParameters?: Maybe<DeletePoolParametersPayload>;
+  deletePoolRegistrationCertificate?: Maybe<DeletePoolRegistrationCertificatePayload>;
+  deletePoolRetirementCertificate?: Maybe<DeletePoolRetirementCertificatePayload>;
   deleteProtocolParametersAlonzo?: Maybe<DeleteProtocolParametersAlonzoPayload>;
   deleteProtocolParametersShelley?: Maybe<DeleteProtocolParametersShelleyPayload>;
   deleteProtocolVersion?: Maybe<DeleteProtocolVersionPayload>;
+  deletePublicKey?: Maybe<DeletePublicKeyPayload>;
   deleteRatio?: Maybe<DeleteRatioPayload>;
   deleteRedeemer?: Maybe<DeleteRedeemerPayload>;
   deleteRelayByAddress?: Maybe<DeleteRelayByAddressPayload>;
@@ -3704,14 +4199,17 @@ export type Mutation = {
   deleteRelayByNameMultihost?: Maybe<DeleteRelayByNameMultihostPayload>;
   deleteRewardAccount?: Maybe<DeleteRewardAccountPayload>;
   deleteScript?: Maybe<DeleteScriptPayload>;
+  deleteSignature?: Maybe<DeleteSignaturePayload>;
   deleteSlot?: Maybe<DeleteSlotPayload>;
+  deleteStakeDelegationCertificate?: Maybe<DeleteStakeDelegationCertificatePayload>;
+  deleteStakeKeyDeregistrationCertificate?: Maybe<DeleteStakeKeyDeregistrationCertificatePayload>;
+  deleteStakeKeyRegistrationCertificate?: Maybe<DeleteStakeKeyRegistrationCertificatePayload>;
   deleteStakePool?: Maybe<DeleteStakePoolPayload>;
   deleteStakePoolMetadata?: Maybe<DeleteStakePoolMetadataPayload>;
   deleteStakePoolMetadataJson?: Maybe<DeleteStakePoolMetadataJsonPayload>;
   deleteStakePoolMetrics?: Maybe<DeleteStakePoolMetricsPayload>;
   deleteStakePoolMetricsSize?: Maybe<DeleteStakePoolMetricsSizePayload>;
   deleteStakePoolMetricsStake?: Maybe<DeleteStakePoolMetricsStakePayload>;
-  deleteStakePoolTransactions?: Maybe<DeleteStakePoolTransactionsPayload>;
   deleteStringMetadatum?: Maybe<DeleteStringMetadatumPayload>;
   deleteThePoolsMediaAssets?: Maybe<DeleteThePoolsMediaAssetsPayload>;
   deleteTimeSettings?: Maybe<DeleteTimeSettingsPayload>;
@@ -3738,16 +4236,22 @@ export type Mutation = {
   updateExecutionUnits?: Maybe<UpdateExecutionUnitsPayload>;
   updateExtendedStakePoolMetadata?: Maybe<UpdateExtendedStakePoolMetadataPayload>;
   updateExtendedStakePoolMetadataFields?: Maybe<UpdateExtendedStakePoolMetadataFieldsPayload>;
+  updateGenesisKeyDelegationCertificate?: Maybe<UpdateGenesisKeyDelegationCertificatePayload>;
   updateITNVerification?: Maybe<UpdateItnVerificationPayload>;
   updateIntegerMetadatum?: Maybe<UpdateIntegerMetadatumPayload>;
   updateKeyValueMetadatum?: Maybe<UpdateKeyValueMetadatumPayload>;
   updateMetadatumArray?: Maybe<UpdateMetadatumArrayPayload>;
   updateMetadatumMap?: Maybe<UpdateMetadatumMapPayload>;
+  updateMirCertificate?: Maybe<UpdateMirCertificatePayload>;
   updateNetworkConstants?: Maybe<UpdateNetworkConstantsPayload>;
   updatePoolContactData?: Maybe<UpdatePoolContactDataPayload>;
+  updatePoolParameters?: Maybe<UpdatePoolParametersPayload>;
+  updatePoolRegistrationCertificate?: Maybe<UpdatePoolRegistrationCertificatePayload>;
+  updatePoolRetirementCertificate?: Maybe<UpdatePoolRetirementCertificatePayload>;
   updateProtocolParametersAlonzo?: Maybe<UpdateProtocolParametersAlonzoPayload>;
   updateProtocolParametersShelley?: Maybe<UpdateProtocolParametersShelleyPayload>;
   updateProtocolVersion?: Maybe<UpdateProtocolVersionPayload>;
+  updatePublicKey?: Maybe<UpdatePublicKeyPayload>;
   updateRatio?: Maybe<UpdateRatioPayload>;
   updateRedeemer?: Maybe<UpdateRedeemerPayload>;
   updateRelayByAddress?: Maybe<UpdateRelayByAddressPayload>;
@@ -3755,14 +4259,17 @@ export type Mutation = {
   updateRelayByNameMultihost?: Maybe<UpdateRelayByNameMultihostPayload>;
   updateRewardAccount?: Maybe<UpdateRewardAccountPayload>;
   updateScript?: Maybe<UpdateScriptPayload>;
+  updateSignature?: Maybe<UpdateSignaturePayload>;
   updateSlot?: Maybe<UpdateSlotPayload>;
+  updateStakeDelegationCertificate?: Maybe<UpdateStakeDelegationCertificatePayload>;
+  updateStakeKeyDeregistrationCertificate?: Maybe<UpdateStakeKeyDeregistrationCertificatePayload>;
+  updateStakeKeyRegistrationCertificate?: Maybe<UpdateStakeKeyRegistrationCertificatePayload>;
   updateStakePool?: Maybe<UpdateStakePoolPayload>;
   updateStakePoolMetadata?: Maybe<UpdateStakePoolMetadataPayload>;
   updateStakePoolMetadataJson?: Maybe<UpdateStakePoolMetadataJsonPayload>;
   updateStakePoolMetrics?: Maybe<UpdateStakePoolMetricsPayload>;
   updateStakePoolMetricsSize?: Maybe<UpdateStakePoolMetricsSizePayload>;
   updateStakePoolMetricsStake?: Maybe<UpdateStakePoolMetricsStakePayload>;
-  updateStakePoolTransactions?: Maybe<UpdateStakePoolTransactionsPayload>;
   updateStringMetadatum?: Maybe<UpdateStringMetadatumPayload>;
   updateThePoolsMediaAssets?: Maybe<UpdateThePoolsMediaAssetsPayload>;
   updateTimeSettings?: Maybe<UpdateTimeSettingsPayload>;
@@ -3792,6 +4299,7 @@ export type MutationAddAdaPotsArgs = {
 
 export type MutationAddAddressArgs = {
   input: Array<AddAddressInput>;
+  upsert?: Maybe<Scalars['Boolean']>;
 };
 
 
@@ -3863,6 +4371,11 @@ export type MutationAddExtendedStakePoolMetadataFieldsArgs = {
 };
 
 
+export type MutationAddGenesisKeyDelegationCertificateArgs = {
+  input: Array<AddGenesisKeyDelegationCertificateInput>;
+};
+
+
 export type MutationAddItnVerificationArgs = {
   input: Array<AddItnVerificationInput>;
 };
@@ -3888,6 +4401,11 @@ export type MutationAddMetadatumMapArgs = {
 };
 
 
+export type MutationAddMirCertificateArgs = {
+  input: Array<AddMirCertificateInput>;
+};
+
+
 export type MutationAddNetworkConstantsArgs = {
   input: Array<AddNetworkConstantsInput>;
 };
@@ -3895,6 +4413,21 @@ export type MutationAddNetworkConstantsArgs = {
 
 export type MutationAddPoolContactDataArgs = {
   input: Array<AddPoolContactDataInput>;
+};
+
+
+export type MutationAddPoolParametersArgs = {
+  input: Array<AddPoolParametersInput>;
+};
+
+
+export type MutationAddPoolRegistrationCertificateArgs = {
+  input: Array<AddPoolRegistrationCertificateInput>;
+};
+
+
+export type MutationAddPoolRetirementCertificateArgs = {
+  input: Array<AddPoolRetirementCertificateInput>;
 };
 
 
@@ -3910,6 +4443,12 @@ export type MutationAddProtocolParametersShelleyArgs = {
 
 export type MutationAddProtocolVersionArgs = {
   input: Array<AddProtocolVersionInput>;
+};
+
+
+export type MutationAddPublicKeyArgs = {
+  input: Array<AddPublicKeyInput>;
+  upsert?: Maybe<Scalars['Boolean']>;
 };
 
 
@@ -3949,9 +4488,29 @@ export type MutationAddScriptArgs = {
 };
 
 
+export type MutationAddSignatureArgs = {
+  input: Array<AddSignatureInput>;
+};
+
+
 export type MutationAddSlotArgs = {
   input: Array<AddSlotInput>;
   upsert?: Maybe<Scalars['Boolean']>;
+};
+
+
+export type MutationAddStakeDelegationCertificateArgs = {
+  input: Array<AddStakeDelegationCertificateInput>;
+};
+
+
+export type MutationAddStakeKeyDeregistrationCertificateArgs = {
+  input: Array<AddStakeKeyDeregistrationCertificateInput>;
+};
+
+
+export type MutationAddStakeKeyRegistrationCertificateArgs = {
+  input: Array<AddStakeKeyRegistrationCertificateInput>;
 };
 
 
@@ -3963,7 +4522,6 @@ export type MutationAddStakePoolArgs = {
 
 export type MutationAddStakePoolMetadataArgs = {
   input: Array<AddStakePoolMetadataInput>;
-  upsert?: Maybe<Scalars['Boolean']>;
 };
 
 
@@ -3984,11 +4542,6 @@ export type MutationAddStakePoolMetricsSizeArgs = {
 
 export type MutationAddStakePoolMetricsStakeArgs = {
   input: Array<AddStakePoolMetricsStakeInput>;
-};
-
-
-export type MutationAddStakePoolTransactionsArgs = {
-  input: Array<AddStakePoolTransactionsInput>;
 };
 
 
@@ -4123,6 +4676,11 @@ export type MutationDeleteExtendedStakePoolMetadataFieldsArgs = {
 };
 
 
+export type MutationDeleteGenesisKeyDelegationCertificateArgs = {
+  filter: GenesisKeyDelegationCertificateFilter;
+};
+
+
 export type MutationDeleteItnVerificationArgs = {
   filter: ItnVerificationFilter;
 };
@@ -4148,6 +4706,11 @@ export type MutationDeleteMetadatumMapArgs = {
 };
 
 
+export type MutationDeleteMirCertificateArgs = {
+  filter: MirCertificateFilter;
+};
+
+
 export type MutationDeleteNetworkConstantsArgs = {
   filter: NetworkConstantsFilter;
 };
@@ -4155,6 +4718,21 @@ export type MutationDeleteNetworkConstantsArgs = {
 
 export type MutationDeletePoolContactDataArgs = {
   filter: PoolContactDataFilter;
+};
+
+
+export type MutationDeletePoolParametersArgs = {
+  filter: PoolParametersFilter;
+};
+
+
+export type MutationDeletePoolRegistrationCertificateArgs = {
+  filter: PoolRegistrationCertificateFilter;
+};
+
+
+export type MutationDeletePoolRetirementCertificateArgs = {
+  filter: PoolRetirementCertificateFilter;
 };
 
 
@@ -4170,6 +4748,11 @@ export type MutationDeleteProtocolParametersShelleyArgs = {
 
 export type MutationDeleteProtocolVersionArgs = {
   filter: ProtocolVersionFilter;
+};
+
+
+export type MutationDeletePublicKeyArgs = {
+  filter: PublicKeyFilter;
 };
 
 
@@ -4208,8 +4791,28 @@ export type MutationDeleteScriptArgs = {
 };
 
 
+export type MutationDeleteSignatureArgs = {
+  filter: SignatureFilter;
+};
+
+
 export type MutationDeleteSlotArgs = {
   filter: SlotFilter;
+};
+
+
+export type MutationDeleteStakeDelegationCertificateArgs = {
+  filter: StakeDelegationCertificateFilter;
+};
+
+
+export type MutationDeleteStakeKeyDeregistrationCertificateArgs = {
+  filter: StakeKeyDeregistrationCertificateFilter;
+};
+
+
+export type MutationDeleteStakeKeyRegistrationCertificateArgs = {
+  filter: StakeKeyRegistrationCertificateFilter;
 };
 
 
@@ -4240,11 +4843,6 @@ export type MutationDeleteStakePoolMetricsSizeArgs = {
 
 export type MutationDeleteStakePoolMetricsStakeArgs = {
   filter: StakePoolMetricsStakeFilter;
-};
-
-
-export type MutationDeleteStakePoolTransactionsArgs = {
-  filter: StakePoolTransactionsFilter;
 };
 
 
@@ -4378,6 +4976,11 @@ export type MutationUpdateExtendedStakePoolMetadataFieldsArgs = {
 };
 
 
+export type MutationUpdateGenesisKeyDelegationCertificateArgs = {
+  input: UpdateGenesisKeyDelegationCertificateInput;
+};
+
+
 export type MutationUpdateItnVerificationArgs = {
   input: UpdateItnVerificationInput;
 };
@@ -4403,6 +5006,11 @@ export type MutationUpdateMetadatumMapArgs = {
 };
 
 
+export type MutationUpdateMirCertificateArgs = {
+  input: UpdateMirCertificateInput;
+};
+
+
 export type MutationUpdateNetworkConstantsArgs = {
   input: UpdateNetworkConstantsInput;
 };
@@ -4410,6 +5018,21 @@ export type MutationUpdateNetworkConstantsArgs = {
 
 export type MutationUpdatePoolContactDataArgs = {
   input: UpdatePoolContactDataInput;
+};
+
+
+export type MutationUpdatePoolParametersArgs = {
+  input: UpdatePoolParametersInput;
+};
+
+
+export type MutationUpdatePoolRegistrationCertificateArgs = {
+  input: UpdatePoolRegistrationCertificateInput;
+};
+
+
+export type MutationUpdatePoolRetirementCertificateArgs = {
+  input: UpdatePoolRetirementCertificateInput;
 };
 
 
@@ -4425,6 +5048,11 @@ export type MutationUpdateProtocolParametersShelleyArgs = {
 
 export type MutationUpdateProtocolVersionArgs = {
   input: UpdateProtocolVersionInput;
+};
+
+
+export type MutationUpdatePublicKeyArgs = {
+  input: UpdatePublicKeyInput;
 };
 
 
@@ -4463,8 +5091,28 @@ export type MutationUpdateScriptArgs = {
 };
 
 
+export type MutationUpdateSignatureArgs = {
+  input: UpdateSignatureInput;
+};
+
+
 export type MutationUpdateSlotArgs = {
   input: UpdateSlotInput;
+};
+
+
+export type MutationUpdateStakeDelegationCertificateArgs = {
+  input: UpdateStakeDelegationCertificateInput;
+};
+
+
+export type MutationUpdateStakeKeyDeregistrationCertificateArgs = {
+  input: UpdateStakeKeyDeregistrationCertificateInput;
+};
+
+
+export type MutationUpdateStakeKeyRegistrationCertificateArgs = {
+  input: UpdateStakeKeyRegistrationCertificateInput;
 };
 
 
@@ -4495,11 +5143,6 @@ export type MutationUpdateStakePoolMetricsSizeArgs = {
 
 export type MutationUpdateStakePoolMetricsStakeArgs = {
   input: UpdateStakePoolMetricsStakeInput;
-};
-
-
-export type MutationUpdateStakePoolTransactionsArgs = {
-  input: UpdateStakePoolTransactionsInput;
 };
 
 
@@ -4783,6 +5426,280 @@ export type PoolContactDataRef = {
   twitter?: Maybe<Scalars['String']>;
 };
 
+export type PoolParameters = {
+  __typename?: 'PoolParameters';
+  cost: Scalars['Int64'];
+  margin: Ratio;
+  metadata?: Maybe<StakePoolMetadata>;
+  metadataJson?: Maybe<StakePoolMetadataJson>;
+  owners: Array<RewardAccount>;
+  ownersAggregate?: Maybe<RewardAccountAggregateResult>;
+  pledge: Scalars['Int64'];
+  poolId: Scalars['String'];
+  poolRegistrationCertificate: PoolRegistrationCertificate;
+  relays: Array<SearchResult>;
+  rewardAccount: RewardAccount;
+  sinceEpoch: Scalars['Int'];
+  stakePool: StakePool;
+  transactionBlockNo: Scalars['Int'];
+  /** hex-encoded 32 byte vrf vkey */
+  vrf: Scalars['String'];
+};
+
+
+export type PoolParametersMarginArgs = {
+  filter?: Maybe<RatioFilter>;
+};
+
+
+export type PoolParametersMetadataArgs = {
+  filter?: Maybe<StakePoolMetadataFilter>;
+};
+
+
+export type PoolParametersMetadataJsonArgs = {
+  filter?: Maybe<StakePoolMetadataJsonFilter>;
+};
+
+
+export type PoolParametersOwnersArgs = {
+  filter?: Maybe<RewardAccountFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<RewardAccountOrder>;
+};
+
+
+export type PoolParametersOwnersAggregateArgs = {
+  filter?: Maybe<RewardAccountFilter>;
+};
+
+
+export type PoolParametersPoolRegistrationCertificateArgs = {
+  filter?: Maybe<PoolRegistrationCertificateFilter>;
+};
+
+
+export type PoolParametersRelaysArgs = {
+  filter?: Maybe<SearchResultFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+
+export type PoolParametersRewardAccountArgs = {
+  filter?: Maybe<RewardAccountFilter>;
+};
+
+
+export type PoolParametersStakePoolArgs = {
+  filter?: Maybe<StakePoolFilter>;
+};
+
+export type PoolParametersAggregateResult = {
+  __typename?: 'PoolParametersAggregateResult';
+  costAvg?: Maybe<Scalars['Float']>;
+  costMax?: Maybe<Scalars['Int64']>;
+  costMin?: Maybe<Scalars['Int64']>;
+  costSum?: Maybe<Scalars['Int64']>;
+  count?: Maybe<Scalars['Int']>;
+  pledgeAvg?: Maybe<Scalars['Float']>;
+  pledgeMax?: Maybe<Scalars['Int64']>;
+  pledgeMin?: Maybe<Scalars['Int64']>;
+  pledgeSum?: Maybe<Scalars['Int64']>;
+  poolIdMax?: Maybe<Scalars['String']>;
+  poolIdMin?: Maybe<Scalars['String']>;
+  sinceEpochAvg?: Maybe<Scalars['Float']>;
+  sinceEpochMax?: Maybe<Scalars['Int']>;
+  sinceEpochMin?: Maybe<Scalars['Int']>;
+  sinceEpochSum?: Maybe<Scalars['Int']>;
+  transactionBlockNoAvg?: Maybe<Scalars['Float']>;
+  transactionBlockNoMax?: Maybe<Scalars['Int']>;
+  transactionBlockNoMin?: Maybe<Scalars['Int']>;
+  transactionBlockNoSum?: Maybe<Scalars['Int']>;
+  vrfMax?: Maybe<Scalars['String']>;
+  vrfMin?: Maybe<Scalars['String']>;
+};
+
+export type PoolParametersFilter = {
+  and?: Maybe<Array<Maybe<PoolParametersFilter>>>;
+  has?: Maybe<Array<Maybe<PoolParametersHasFilter>>>;
+  not?: Maybe<PoolParametersFilter>;
+  or?: Maybe<Array<Maybe<PoolParametersFilter>>>;
+};
+
+export enum PoolParametersHasFilter {
+  Cost = 'cost',
+  Margin = 'margin',
+  Metadata = 'metadata',
+  MetadataJson = 'metadataJson',
+  Owners = 'owners',
+  Pledge = 'pledge',
+  PoolId = 'poolId',
+  PoolRegistrationCertificate = 'poolRegistrationCertificate',
+  Relays = 'relays',
+  RewardAccount = 'rewardAccount',
+  SinceEpoch = 'sinceEpoch',
+  StakePool = 'stakePool',
+  TransactionBlockNo = 'transactionBlockNo',
+  Vrf = 'vrf'
+}
+
+export type PoolParametersOrder = {
+  asc?: Maybe<PoolParametersOrderable>;
+  desc?: Maybe<PoolParametersOrderable>;
+  then?: Maybe<PoolParametersOrder>;
+};
+
+export enum PoolParametersOrderable {
+  Cost = 'cost',
+  Pledge = 'pledge',
+  PoolId = 'poolId',
+  SinceEpoch = 'sinceEpoch',
+  TransactionBlockNo = 'transactionBlockNo',
+  Vrf = 'vrf'
+}
+
+export type PoolParametersPatch = {
+  cost?: Maybe<Scalars['Int64']>;
+  margin?: Maybe<RatioRef>;
+  metadata?: Maybe<StakePoolMetadataRef>;
+  metadataJson?: Maybe<StakePoolMetadataJsonRef>;
+  owners?: Maybe<Array<RewardAccountRef>>;
+  pledge?: Maybe<Scalars['Int64']>;
+  poolId?: Maybe<Scalars['String']>;
+  poolRegistrationCertificate?: Maybe<PoolRegistrationCertificateRef>;
+  relays?: Maybe<Array<SearchResultRef>>;
+  rewardAccount?: Maybe<RewardAccountRef>;
+  sinceEpoch?: Maybe<Scalars['Int']>;
+  stakePool?: Maybe<StakePoolRef>;
+  transactionBlockNo?: Maybe<Scalars['Int']>;
+  /** hex-encoded 32 byte vrf vkey */
+  vrf?: Maybe<Scalars['String']>;
+};
+
+export type PoolParametersRef = {
+  cost?: Maybe<Scalars['Int64']>;
+  margin?: Maybe<RatioRef>;
+  metadata?: Maybe<StakePoolMetadataRef>;
+  metadataJson?: Maybe<StakePoolMetadataJsonRef>;
+  owners?: Maybe<Array<RewardAccountRef>>;
+  pledge?: Maybe<Scalars['Int64']>;
+  poolId?: Maybe<Scalars['String']>;
+  poolRegistrationCertificate?: Maybe<PoolRegistrationCertificateRef>;
+  relays?: Maybe<Array<SearchResultRef>>;
+  rewardAccount?: Maybe<RewardAccountRef>;
+  sinceEpoch?: Maybe<Scalars['Int']>;
+  stakePool?: Maybe<StakePoolRef>;
+  transactionBlockNo?: Maybe<Scalars['Int']>;
+  /** hex-encoded 32 byte vrf vkey */
+  vrf?: Maybe<Scalars['String']>;
+};
+
+export type PoolRegistrationCertificate = {
+  __typename?: 'PoolRegistrationCertificate';
+  epoch: Epoch;
+  poolParameters: PoolParameters;
+  transaction: Transaction;
+};
+
+
+export type PoolRegistrationCertificateEpochArgs = {
+  filter?: Maybe<EpochFilter>;
+};
+
+
+export type PoolRegistrationCertificatePoolParametersArgs = {
+  filter?: Maybe<PoolParametersFilter>;
+};
+
+
+export type PoolRegistrationCertificateTransactionArgs = {
+  filter?: Maybe<TransactionFilter>;
+};
+
+export type PoolRegistrationCertificateAggregateResult = {
+  __typename?: 'PoolRegistrationCertificateAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+};
+
+export type PoolRegistrationCertificateFilter = {
+  and?: Maybe<Array<Maybe<PoolRegistrationCertificateFilter>>>;
+  has?: Maybe<Array<Maybe<PoolRegistrationCertificateHasFilter>>>;
+  not?: Maybe<PoolRegistrationCertificateFilter>;
+  or?: Maybe<Array<Maybe<PoolRegistrationCertificateFilter>>>;
+};
+
+export enum PoolRegistrationCertificateHasFilter {
+  Epoch = 'epoch',
+  PoolParameters = 'poolParameters',
+  Transaction = 'transaction'
+}
+
+export type PoolRegistrationCertificatePatch = {
+  epoch?: Maybe<EpochRef>;
+  poolParameters?: Maybe<PoolParametersRef>;
+  transaction?: Maybe<TransactionRef>;
+};
+
+export type PoolRegistrationCertificateRef = {
+  epoch?: Maybe<EpochRef>;
+  poolParameters?: Maybe<PoolParametersRef>;
+  transaction?: Maybe<TransactionRef>;
+};
+
+export type PoolRetirementCertificate = {
+  __typename?: 'PoolRetirementCertificate';
+  epoch: Epoch;
+  stakePool: StakePool;
+  transaction: Transaction;
+};
+
+
+export type PoolRetirementCertificateEpochArgs = {
+  filter?: Maybe<EpochFilter>;
+};
+
+
+export type PoolRetirementCertificateStakePoolArgs = {
+  filter?: Maybe<StakePoolFilter>;
+};
+
+
+export type PoolRetirementCertificateTransactionArgs = {
+  filter?: Maybe<TransactionFilter>;
+};
+
+export type PoolRetirementCertificateAggregateResult = {
+  __typename?: 'PoolRetirementCertificateAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+};
+
+export type PoolRetirementCertificateFilter = {
+  and?: Maybe<Array<Maybe<PoolRetirementCertificateFilter>>>;
+  has?: Maybe<Array<Maybe<PoolRetirementCertificateHasFilter>>>;
+  not?: Maybe<PoolRetirementCertificateFilter>;
+  or?: Maybe<Array<Maybe<PoolRetirementCertificateFilter>>>;
+};
+
+export enum PoolRetirementCertificateHasFilter {
+  Epoch = 'epoch',
+  StakePool = 'stakePool',
+  Transaction = 'transaction'
+}
+
+export type PoolRetirementCertificatePatch = {
+  epoch?: Maybe<EpochRef>;
+  stakePool?: Maybe<StakePoolRef>;
+  transaction?: Maybe<TransactionRef>;
+};
+
+export type PoolRetirementCertificateRef = {
+  epoch?: Maybe<EpochRef>;
+  stakePool?: Maybe<StakePoolRef>;
+  transaction?: Maybe<TransactionRef>;
+};
+
 export type ProtocolParameters = ProtocolParametersAlonzo | ProtocolParametersShelley;
 
 export type ProtocolParametersAlonzo = {
@@ -4798,8 +5715,6 @@ export type ProtocolParametersAlonzo = {
   executionPrices: ExecutionPrices;
   /** hex-encoded, null if neutral */
   extraEntropy?: Maybe<Scalars['String']>;
-  /** to be used for order in queries */
-  flatProtocolVersion: Scalars['Int'];
   maxBlockBodySize: Scalars['Int'];
   maxBlockHeaderSize: Scalars['Int'];
   maxCollateralInputs: Scalars['Int'];
@@ -4901,10 +5816,6 @@ export type ProtocolParametersAlonzoAggregateResult = {
   desiredNumberOfPoolsSum?: Maybe<Scalars['Int']>;
   extraEntropyMax?: Maybe<Scalars['String']>;
   extraEntropyMin?: Maybe<Scalars['String']>;
-  flatProtocolVersionAvg?: Maybe<Scalars['Float']>;
-  flatProtocolVersionMax?: Maybe<Scalars['Int']>;
-  flatProtocolVersionMin?: Maybe<Scalars['Int']>;
-  flatProtocolVersionSum?: Maybe<Scalars['Int']>;
   maxBlockBodySizeAvg?: Maybe<Scalars['Float']>;
   maxBlockBodySizeMax?: Maybe<Scalars['Int']>;
   maxBlockBodySizeMin?: Maybe<Scalars['Int']>;
@@ -4966,7 +5877,6 @@ export enum ProtocolParametersAlonzoHasFilter {
   DesiredNumberOfPools = 'desiredNumberOfPools',
   ExecutionPrices = 'executionPrices',
   ExtraEntropy = 'extraEntropy',
-  FlatProtocolVersion = 'flatProtocolVersion',
   MaxBlockBodySize = 'maxBlockBodySize',
   MaxBlockHeaderSize = 'maxBlockHeaderSize',
   MaxCollateralInputs = 'maxCollateralInputs',
@@ -4998,7 +5908,6 @@ export enum ProtocolParametersAlonzoOrderable {
   CollateralPercentage = 'collateralPercentage',
   DesiredNumberOfPools = 'desiredNumberOfPools',
   ExtraEntropy = 'extraEntropy',
-  FlatProtocolVersion = 'flatProtocolVersion',
   MaxBlockBodySize = 'maxBlockBodySize',
   MaxBlockHeaderSize = 'maxBlockHeaderSize',
   MaxCollateralInputs = 'maxCollateralInputs',
@@ -5022,8 +5931,6 @@ export type ProtocolParametersAlonzoPatch = {
   executionPrices?: Maybe<ExecutionPricesRef>;
   /** hex-encoded, null if neutral */
   extraEntropy?: Maybe<Scalars['String']>;
-  /** to be used for order in queries */
-  flatProtocolVersion?: Maybe<Scalars['Int']>;
   maxBlockBodySize?: Maybe<Scalars['Int']>;
   maxBlockHeaderSize?: Maybe<Scalars['Int']>;
   maxCollateralInputs?: Maybe<Scalars['Int']>;
@@ -5056,8 +5963,6 @@ export type ProtocolParametersAlonzoRef = {
   executionPrices?: Maybe<ExecutionPricesRef>;
   /** hex-encoded, null if neutral */
   extraEntropy?: Maybe<Scalars['String']>;
-  /** to be used for order in queries */
-  flatProtocolVersion?: Maybe<Scalars['Int']>;
   maxBlockBodySize?: Maybe<Scalars['Int']>;
   maxBlockHeaderSize?: Maybe<Scalars['Int']>;
   maxCollateralInputs?: Maybe<Scalars['Int']>;
@@ -5099,8 +6004,6 @@ export type ProtocolParametersShelley = {
   desiredNumberOfPools: Scalars['Int'];
   /** hex-encoded, null if neutral */
   extraEntropy?: Maybe<Scalars['String']>;
-  /** to be used for order in queries */
-  flatProtocolVersion: Scalars['Int'];
   maxBlockBodySize: Scalars['Int'];
   maxBlockHeaderSize: Scalars['Int'];
   maxTxSize: Scalars['Int'];
@@ -5161,10 +6064,6 @@ export type ProtocolParametersShelleyAggregateResult = {
   desiredNumberOfPoolsSum?: Maybe<Scalars['Int']>;
   extraEntropyMax?: Maybe<Scalars['String']>;
   extraEntropyMin?: Maybe<Scalars['String']>;
-  flatProtocolVersionAvg?: Maybe<Scalars['Float']>;
-  flatProtocolVersionMax?: Maybe<Scalars['Int']>;
-  flatProtocolVersionMin?: Maybe<Scalars['Int']>;
-  flatProtocolVersionSum?: Maybe<Scalars['Int']>;
   maxBlockBodySizeAvg?: Maybe<Scalars['Float']>;
   maxBlockBodySizeMax?: Maybe<Scalars['Int']>;
   maxBlockBodySizeMin?: Maybe<Scalars['Int']>;
@@ -5210,7 +6109,6 @@ export enum ProtocolParametersShelleyHasFilter {
   DecentralizationParameter = 'decentralizationParameter',
   DesiredNumberOfPools = 'desiredNumberOfPools',
   ExtraEntropy = 'extraEntropy',
-  FlatProtocolVersion = 'flatProtocolVersion',
   MaxBlockBodySize = 'maxBlockBodySize',
   MaxBlockHeaderSize = 'maxBlockHeaderSize',
   MaxTxSize = 'maxTxSize',
@@ -5235,7 +6133,6 @@ export type ProtocolParametersShelleyOrder = {
 export enum ProtocolParametersShelleyOrderable {
   DesiredNumberOfPools = 'desiredNumberOfPools',
   ExtraEntropy = 'extraEntropy',
-  FlatProtocolVersion = 'flatProtocolVersion',
   MaxBlockBodySize = 'maxBlockBodySize',
   MaxBlockHeaderSize = 'maxBlockHeaderSize',
   MaxTxSize = 'maxTxSize',
@@ -5252,8 +6149,6 @@ export type ProtocolParametersShelleyPatch = {
   desiredNumberOfPools?: Maybe<Scalars['Int']>;
   /** hex-encoded, null if neutral */
   extraEntropy?: Maybe<Scalars['String']>;
-  /** to be used for order in queries */
-  flatProtocolVersion?: Maybe<Scalars['Int']>;
   maxBlockBodySize?: Maybe<Scalars['Int']>;
   maxBlockHeaderSize?: Maybe<Scalars['Int']>;
   maxTxSize?: Maybe<Scalars['Int']>;
@@ -5277,8 +6172,6 @@ export type ProtocolParametersShelleyRef = {
   desiredNumberOfPools?: Maybe<Scalars['Int']>;
   /** hex-encoded, null if neutral */
   extraEntropy?: Maybe<Scalars['String']>;
-  /** to be used for order in queries */
-  flatProtocolVersion?: Maybe<Scalars['Int']>;
   maxBlockBodySize?: Maybe<Scalars['Int']>;
   maxBlockHeaderSize?: Maybe<Scalars['Int']>;
   maxTxSize?: Maybe<Scalars['Int']>;
@@ -5306,6 +6199,12 @@ export type ProtocolVersion = {
   major: Scalars['Int'];
   minor: Scalars['Int'];
   patch?: Maybe<Scalars['Int']>;
+  protocolParameters: ProtocolParameters;
+};
+
+
+export type ProtocolVersionProtocolParametersArgs = {
+  filter?: Maybe<ProtocolParametersFilter>;
 };
 
 export type ProtocolVersionAggregateResult = {
@@ -5335,7 +6234,8 @@ export type ProtocolVersionFilter = {
 export enum ProtocolVersionHasFilter {
   Major = 'major',
   Minor = 'minor',
-  Patch = 'patch'
+  Patch = 'patch',
+  ProtocolParameters = 'protocolParameters'
 }
 
 export type ProtocolVersionOrder = {
@@ -5354,12 +6254,130 @@ export type ProtocolVersionPatch = {
   major?: Maybe<Scalars['Int']>;
   minor?: Maybe<Scalars['Int']>;
   patch?: Maybe<Scalars['Int']>;
+  protocolParameters?: Maybe<ProtocolParametersRef>;
 };
 
 export type ProtocolVersionRef = {
   major?: Maybe<Scalars['Int']>;
   minor?: Maybe<Scalars['Int']>;
   patch?: Maybe<Scalars['Int']>;
+  protocolParameters?: Maybe<ProtocolParametersRef>;
+};
+
+export type PublicKey = {
+  __typename?: 'PublicKey';
+  addresses?: Maybe<Array<Address>>;
+  addressesAggregate?: Maybe<AddressAggregateResult>;
+  /** hex-encoded Ed25519 public key hash */
+  hash: Scalars['String'];
+  /** hex-encoded Ed25519 public key */
+  key: Scalars['String'];
+  requiredExtraSignatureInTransactions: Array<Transaction>;
+  requiredExtraSignatureInTransactionsAggregate?: Maybe<TransactionAggregateResult>;
+  rewardAccount?: Maybe<RewardAccount>;
+  signatures: Array<Signature>;
+  signaturesAggregate?: Maybe<SignatureAggregateResult>;
+};
+
+
+export type PublicKeyAddressesArgs = {
+  filter?: Maybe<AddressFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<AddressOrder>;
+};
+
+
+export type PublicKeyAddressesAggregateArgs = {
+  filter?: Maybe<AddressFilter>;
+};
+
+
+export type PublicKeyRequiredExtraSignatureInTransactionsArgs = {
+  filter?: Maybe<TransactionFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<TransactionOrder>;
+};
+
+
+export type PublicKeyRequiredExtraSignatureInTransactionsAggregateArgs = {
+  filter?: Maybe<TransactionFilter>;
+};
+
+
+export type PublicKeyRewardAccountArgs = {
+  filter?: Maybe<RewardAccountFilter>;
+};
+
+
+export type PublicKeySignaturesArgs = {
+  filter?: Maybe<SignatureFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<SignatureOrder>;
+};
+
+
+export type PublicKeySignaturesAggregateArgs = {
+  filter?: Maybe<SignatureFilter>;
+};
+
+export type PublicKeyAggregateResult = {
+  __typename?: 'PublicKeyAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+  hashMax?: Maybe<Scalars['String']>;
+  hashMin?: Maybe<Scalars['String']>;
+  keyMax?: Maybe<Scalars['String']>;
+  keyMin?: Maybe<Scalars['String']>;
+};
+
+export type PublicKeyFilter = {
+  and?: Maybe<Array<Maybe<PublicKeyFilter>>>;
+  has?: Maybe<Array<Maybe<PublicKeyHasFilter>>>;
+  hash?: Maybe<StringHashFilter>;
+  not?: Maybe<PublicKeyFilter>;
+  or?: Maybe<Array<Maybe<PublicKeyFilter>>>;
+};
+
+export enum PublicKeyHasFilter {
+  Addresses = 'addresses',
+  Hash = 'hash',
+  Key = 'key',
+  RequiredExtraSignatureInTransactions = 'requiredExtraSignatureInTransactions',
+  RewardAccount = 'rewardAccount',
+  Signatures = 'signatures'
+}
+
+export type PublicKeyOrder = {
+  asc?: Maybe<PublicKeyOrderable>;
+  desc?: Maybe<PublicKeyOrderable>;
+  then?: Maybe<PublicKeyOrder>;
+};
+
+export enum PublicKeyOrderable {
+  Hash = 'hash',
+  Key = 'key'
+}
+
+export type PublicKeyPatch = {
+  addresses?: Maybe<Array<AddressRef>>;
+  /** hex-encoded Ed25519 public key */
+  key?: Maybe<Scalars['String']>;
+  requiredExtraSignatureInTransactions?: Maybe<Array<TransactionRef>>;
+  rewardAccount?: Maybe<RewardAccountRef>;
+  signatures?: Maybe<Array<SignatureRef>>;
+};
+
+export type PublicKeyRef = {
+  addresses?: Maybe<Array<AddressRef>>;
+  /** hex-encoded Ed25519 public key hash */
+  hash?: Maybe<Scalars['String']>;
+  /** hex-encoded Ed25519 public key */
+  key?: Maybe<Scalars['String']>;
+  requiredExtraSignatureInTransactions?: Maybe<Array<TransactionRef>>;
+  rewardAccount?: Maybe<RewardAccountRef>;
+  signatures?: Maybe<Array<SignatureRef>>;
 };
 
 export type Query = {
@@ -5381,16 +6399,22 @@ export type Query = {
   aggregateExecutionUnits?: Maybe<ExecutionUnitsAggregateResult>;
   aggregateExtendedStakePoolMetadata?: Maybe<ExtendedStakePoolMetadataAggregateResult>;
   aggregateExtendedStakePoolMetadataFields?: Maybe<ExtendedStakePoolMetadataFieldsAggregateResult>;
+  aggregateGenesisKeyDelegationCertificate?: Maybe<GenesisKeyDelegationCertificateAggregateResult>;
   aggregateITNVerification?: Maybe<ItnVerificationAggregateResult>;
   aggregateIntegerMetadatum?: Maybe<IntegerMetadatumAggregateResult>;
   aggregateKeyValueMetadatum?: Maybe<KeyValueMetadatumAggregateResult>;
   aggregateMetadatumArray?: Maybe<MetadatumArrayAggregateResult>;
   aggregateMetadatumMap?: Maybe<MetadatumMapAggregateResult>;
+  aggregateMirCertificate?: Maybe<MirCertificateAggregateResult>;
   aggregateNetworkConstants?: Maybe<NetworkConstantsAggregateResult>;
   aggregatePoolContactData?: Maybe<PoolContactDataAggregateResult>;
+  aggregatePoolParameters?: Maybe<PoolParametersAggregateResult>;
+  aggregatePoolRegistrationCertificate?: Maybe<PoolRegistrationCertificateAggregateResult>;
+  aggregatePoolRetirementCertificate?: Maybe<PoolRetirementCertificateAggregateResult>;
   aggregateProtocolParametersAlonzo?: Maybe<ProtocolParametersAlonzoAggregateResult>;
   aggregateProtocolParametersShelley?: Maybe<ProtocolParametersShelleyAggregateResult>;
   aggregateProtocolVersion?: Maybe<ProtocolVersionAggregateResult>;
+  aggregatePublicKey?: Maybe<PublicKeyAggregateResult>;
   aggregateRatio?: Maybe<RatioAggregateResult>;
   aggregateRedeemer?: Maybe<RedeemerAggregateResult>;
   aggregateRelayByAddress?: Maybe<RelayByAddressAggregateResult>;
@@ -5398,14 +6422,17 @@ export type Query = {
   aggregateRelayByNameMultihost?: Maybe<RelayByNameMultihostAggregateResult>;
   aggregateRewardAccount?: Maybe<RewardAccountAggregateResult>;
   aggregateScript?: Maybe<ScriptAggregateResult>;
+  aggregateSignature?: Maybe<SignatureAggregateResult>;
   aggregateSlot?: Maybe<SlotAggregateResult>;
+  aggregateStakeDelegationCertificate?: Maybe<StakeDelegationCertificateAggregateResult>;
+  aggregateStakeKeyDeregistrationCertificate?: Maybe<StakeKeyDeregistrationCertificateAggregateResult>;
+  aggregateStakeKeyRegistrationCertificate?: Maybe<StakeKeyRegistrationCertificateAggregateResult>;
   aggregateStakePool?: Maybe<StakePoolAggregateResult>;
   aggregateStakePoolMetadata?: Maybe<StakePoolMetadataAggregateResult>;
   aggregateStakePoolMetadataJson?: Maybe<StakePoolMetadataJsonAggregateResult>;
   aggregateStakePoolMetrics?: Maybe<StakePoolMetricsAggregateResult>;
   aggregateStakePoolMetricsSize?: Maybe<StakePoolMetricsSizeAggregateResult>;
   aggregateStakePoolMetricsStake?: Maybe<StakePoolMetricsStakeAggregateResult>;
-  aggregateStakePoolTransactions?: Maybe<StakePoolTransactionsAggregateResult>;
   aggregateStringMetadatum?: Maybe<StringMetadatumAggregateResult>;
   aggregateThePoolsMediaAssets?: Maybe<ThePoolsMediaAssetsAggregateResult>;
   aggregateTimeSettings?: Maybe<TimeSettingsAggregateResult>;
@@ -5415,13 +6442,14 @@ export type Query = {
   aggregateTransactionOutput?: Maybe<TransactionOutputAggregateResult>;
   aggregateValue?: Maybe<ValueAggregateResult>;
   aggregateWithdrawal?: Maybe<WithdrawalAggregateResult>;
+  getAddress?: Maybe<Address>;
   getBlock?: Maybe<Block>;
   getEpoch?: Maybe<Epoch>;
   getExtendedStakePoolMetadataFields?: Maybe<ExtendedStakePoolMetadataFields>;
+  getPublicKey?: Maybe<PublicKey>;
   getScript?: Maybe<Script>;
   getSlot?: Maybe<Slot>;
   getStakePool?: Maybe<StakePool>;
-  getStakePoolMetadata?: Maybe<StakePoolMetadata>;
   getTransaction?: Maybe<Transaction>;
   queryActiveStake?: Maybe<Array<Maybe<ActiveStake>>>;
   queryAda?: Maybe<Array<Maybe<Ada>>>;
@@ -5440,16 +6468,22 @@ export type Query = {
   queryExecutionUnits?: Maybe<Array<Maybe<ExecutionUnits>>>;
   queryExtendedStakePoolMetadata?: Maybe<Array<Maybe<ExtendedStakePoolMetadata>>>;
   queryExtendedStakePoolMetadataFields?: Maybe<Array<Maybe<ExtendedStakePoolMetadataFields>>>;
+  queryGenesisKeyDelegationCertificate?: Maybe<Array<Maybe<GenesisKeyDelegationCertificate>>>;
   queryITNVerification?: Maybe<Array<Maybe<ItnVerification>>>;
   queryIntegerMetadatum?: Maybe<Array<Maybe<IntegerMetadatum>>>;
   queryKeyValueMetadatum?: Maybe<Array<Maybe<KeyValueMetadatum>>>;
   queryMetadatumArray?: Maybe<Array<Maybe<MetadatumArray>>>;
   queryMetadatumMap?: Maybe<Array<Maybe<MetadatumMap>>>;
+  queryMirCertificate?: Maybe<Array<Maybe<MirCertificate>>>;
   queryNetworkConstants?: Maybe<Array<Maybe<NetworkConstants>>>;
   queryPoolContactData?: Maybe<Array<Maybe<PoolContactData>>>;
+  queryPoolParameters?: Maybe<Array<Maybe<PoolParameters>>>;
+  queryPoolRegistrationCertificate?: Maybe<Array<Maybe<PoolRegistrationCertificate>>>;
+  queryPoolRetirementCertificate?: Maybe<Array<Maybe<PoolRetirementCertificate>>>;
   queryProtocolParametersAlonzo?: Maybe<Array<Maybe<ProtocolParametersAlonzo>>>;
   queryProtocolParametersShelley?: Maybe<Array<Maybe<ProtocolParametersShelley>>>;
   queryProtocolVersion?: Maybe<Array<Maybe<ProtocolVersion>>>;
+  queryPublicKey?: Maybe<Array<Maybe<PublicKey>>>;
   queryRatio?: Maybe<Array<Maybe<Ratio>>>;
   queryRedeemer?: Maybe<Array<Maybe<Redeemer>>>;
   queryRelayByAddress?: Maybe<Array<Maybe<RelayByAddress>>>;
@@ -5457,14 +6491,17 @@ export type Query = {
   queryRelayByNameMultihost?: Maybe<Array<Maybe<RelayByNameMultihost>>>;
   queryRewardAccount?: Maybe<Array<Maybe<RewardAccount>>>;
   queryScript?: Maybe<Array<Maybe<Script>>>;
+  querySignature?: Maybe<Array<Maybe<Signature>>>;
   querySlot?: Maybe<Array<Maybe<Slot>>>;
+  queryStakeDelegationCertificate?: Maybe<Array<Maybe<StakeDelegationCertificate>>>;
+  queryStakeKeyDeregistrationCertificate?: Maybe<Array<Maybe<StakeKeyDeregistrationCertificate>>>;
+  queryStakeKeyRegistrationCertificate?: Maybe<Array<Maybe<StakeKeyRegistrationCertificate>>>;
   queryStakePool?: Maybe<Array<Maybe<StakePool>>>;
   queryStakePoolMetadata?: Maybe<Array<Maybe<StakePoolMetadata>>>;
   queryStakePoolMetadataJson?: Maybe<Array<Maybe<StakePoolMetadataJson>>>;
   queryStakePoolMetrics?: Maybe<Array<Maybe<StakePoolMetrics>>>;
   queryStakePoolMetricsSize?: Maybe<Array<Maybe<StakePoolMetricsSize>>>;
   queryStakePoolMetricsStake?: Maybe<Array<Maybe<StakePoolMetricsStake>>>;
-  queryStakePoolTransactions?: Maybe<Array<Maybe<StakePoolTransactions>>>;
   queryStringMetadatum?: Maybe<Array<Maybe<StringMetadatum>>>;
   queryThePoolsMediaAssets?: Maybe<Array<Maybe<ThePoolsMediaAssets>>>;
   queryTimeSettings?: Maybe<Array<Maybe<TimeSettings>>>;
@@ -5562,6 +6599,11 @@ export type QueryAggregateExtendedStakePoolMetadataFieldsArgs = {
 };
 
 
+export type QueryAggregateGenesisKeyDelegationCertificateArgs = {
+  filter?: Maybe<GenesisKeyDelegationCertificateFilter>;
+};
+
+
 export type QueryAggregateItnVerificationArgs = {
   filter?: Maybe<ItnVerificationFilter>;
 };
@@ -5587,6 +6629,11 @@ export type QueryAggregateMetadatumMapArgs = {
 };
 
 
+export type QueryAggregateMirCertificateArgs = {
+  filter?: Maybe<MirCertificateFilter>;
+};
+
+
 export type QueryAggregateNetworkConstantsArgs = {
   filter?: Maybe<NetworkConstantsFilter>;
 };
@@ -5594,6 +6641,21 @@ export type QueryAggregateNetworkConstantsArgs = {
 
 export type QueryAggregatePoolContactDataArgs = {
   filter?: Maybe<PoolContactDataFilter>;
+};
+
+
+export type QueryAggregatePoolParametersArgs = {
+  filter?: Maybe<PoolParametersFilter>;
+};
+
+
+export type QueryAggregatePoolRegistrationCertificateArgs = {
+  filter?: Maybe<PoolRegistrationCertificateFilter>;
+};
+
+
+export type QueryAggregatePoolRetirementCertificateArgs = {
+  filter?: Maybe<PoolRetirementCertificateFilter>;
 };
 
 
@@ -5609,6 +6671,11 @@ export type QueryAggregateProtocolParametersShelleyArgs = {
 
 export type QueryAggregateProtocolVersionArgs = {
   filter?: Maybe<ProtocolVersionFilter>;
+};
+
+
+export type QueryAggregatePublicKeyArgs = {
+  filter?: Maybe<PublicKeyFilter>;
 };
 
 
@@ -5647,8 +6714,28 @@ export type QueryAggregateScriptArgs = {
 };
 
 
+export type QueryAggregateSignatureArgs = {
+  filter?: Maybe<SignatureFilter>;
+};
+
+
 export type QueryAggregateSlotArgs = {
   filter?: Maybe<SlotFilter>;
+};
+
+
+export type QueryAggregateStakeDelegationCertificateArgs = {
+  filter?: Maybe<StakeDelegationCertificateFilter>;
+};
+
+
+export type QueryAggregateStakeKeyDeregistrationCertificateArgs = {
+  filter?: Maybe<StakeKeyDeregistrationCertificateFilter>;
+};
+
+
+export type QueryAggregateStakeKeyRegistrationCertificateArgs = {
+  filter?: Maybe<StakeKeyRegistrationCertificateFilter>;
 };
 
 
@@ -5679,11 +6766,6 @@ export type QueryAggregateStakePoolMetricsSizeArgs = {
 
 export type QueryAggregateStakePoolMetricsStakeArgs = {
   filter?: Maybe<StakePoolMetricsStakeFilter>;
-};
-
-
-export type QueryAggregateStakePoolTransactionsArgs = {
-  filter?: Maybe<StakePoolTransactionsFilter>;
 };
 
 
@@ -5732,6 +6814,11 @@ export type QueryAggregateWithdrawalArgs = {
 };
 
 
+export type QueryGetAddressArgs = {
+  address: Scalars['String'];
+};
+
+
 export type QueryGetBlockArgs = {
   hash: Scalars['String'];
 };
@@ -5747,6 +6834,11 @@ export type QueryGetExtendedStakePoolMetadataFieldsArgs = {
 };
 
 
+export type QueryGetPublicKeyArgs = {
+  hash: Scalars['String'];
+};
+
+
 export type QueryGetScriptArgs = {
   hash: Scalars['String'];
 };
@@ -5759,11 +6851,6 @@ export type QueryGetSlotArgs = {
 
 export type QueryGetStakePoolArgs = {
   id: Scalars['String'];
-};
-
-
-export type QueryGetStakePoolMetadataArgs = {
-  stakePoolId: Scalars['String'];
 };
 
 
@@ -5906,6 +6993,14 @@ export type QueryQueryExtendedStakePoolMetadataFieldsArgs = {
 };
 
 
+export type QueryQueryGenesisKeyDelegationCertificateArgs = {
+  filter?: Maybe<GenesisKeyDelegationCertificateFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<GenesisKeyDelegationCertificateOrder>;
+};
+
+
 export type QueryQueryItnVerificationArgs = {
   filter?: Maybe<ItnVerificationFilter>;
   first?: Maybe<Scalars['Int']>;
@@ -5944,6 +7039,14 @@ export type QueryQueryMetadatumMapArgs = {
 };
 
 
+export type QueryQueryMirCertificateArgs = {
+  filter?: Maybe<MirCertificateFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<MirCertificateOrder>;
+};
+
+
 export type QueryQueryNetworkConstantsArgs = {
   filter?: Maybe<NetworkConstantsFilter>;
   first?: Maybe<Scalars['Int']>;
@@ -5957,6 +7060,28 @@ export type QueryQueryPoolContactDataArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<PoolContactDataOrder>;
+};
+
+
+export type QueryQueryPoolParametersArgs = {
+  filter?: Maybe<PoolParametersFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<PoolParametersOrder>;
+};
+
+
+export type QueryQueryPoolRegistrationCertificateArgs = {
+  filter?: Maybe<PoolRegistrationCertificateFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+
+export type QueryQueryPoolRetirementCertificateArgs = {
+  filter?: Maybe<PoolRetirementCertificateFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
 };
 
 
@@ -5981,6 +7106,14 @@ export type QueryQueryProtocolVersionArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<ProtocolVersionOrder>;
+};
+
+
+export type QueryQueryPublicKeyArgs = {
+  filter?: Maybe<PublicKeyFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<PublicKeyOrder>;
 };
 
 
@@ -6040,11 +7173,40 @@ export type QueryQueryScriptArgs = {
 };
 
 
+export type QueryQuerySignatureArgs = {
+  filter?: Maybe<SignatureFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<SignatureOrder>;
+};
+
+
 export type QueryQuerySlotArgs = {
   filter?: Maybe<SlotFilter>;
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<SlotOrder>;
+};
+
+
+export type QueryQueryStakeDelegationCertificateArgs = {
+  filter?: Maybe<StakeDelegationCertificateFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+
+export type QueryQueryStakeKeyDeregistrationCertificateArgs = {
+  filter?: Maybe<StakeKeyDeregistrationCertificateFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+
+export type QueryQueryStakeKeyRegistrationCertificateArgs = {
+  filter?: Maybe<StakeKeyRegistrationCertificateFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
 };
 
 
@@ -6093,13 +7255,6 @@ export type QueryQueryStakePoolMetricsStakeArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<StakePoolMetricsStakeOrder>;
-};
-
-
-export type QueryQueryStakePoolTransactionsArgs = {
-  filter?: Maybe<StakePoolTransactionsFilter>;
-  first?: Maybe<Scalars['Int']>;
-  offset?: Maybe<Scalars['Int']>;
 };
 
 
@@ -6463,6 +7618,15 @@ export type RewardAccount = {
   activeStake: ActiveStake;
   address: Scalars['String'];
   addresses: Address;
+  delegationCertificates?: Maybe<Array<StakeDelegationCertificate>>;
+  delegationCertificatesAggregate?: Maybe<StakeDelegationCertificateAggregateResult>;
+  deregistrationCertificates?: Maybe<Array<StakeKeyDeregistrationCertificate>>;
+  deregistrationCertificatesAggregate?: Maybe<StakeKeyDeregistrationCertificateAggregateResult>;
+  mirCertificates?: Maybe<Array<MirCertificate>>;
+  mirCertificatesAggregate?: Maybe<MirCertificateAggregateResult>;
+  publicKey: PublicKey;
+  registrationCertificates: Array<StakeKeyRegistrationCertificate>;
+  registrationCertificatesAggregate?: Maybe<StakeKeyRegistrationCertificateAggregateResult>;
 };
 
 
@@ -6473,6 +7637,60 @@ export type RewardAccountActiveStakeArgs = {
 
 export type RewardAccountAddressesArgs = {
   filter?: Maybe<AddressFilter>;
+};
+
+
+export type RewardAccountDelegationCertificatesArgs = {
+  filter?: Maybe<StakeDelegationCertificateFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+
+export type RewardAccountDelegationCertificatesAggregateArgs = {
+  filter?: Maybe<StakeDelegationCertificateFilter>;
+};
+
+
+export type RewardAccountDeregistrationCertificatesArgs = {
+  filter?: Maybe<StakeKeyDeregistrationCertificateFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+
+export type RewardAccountDeregistrationCertificatesAggregateArgs = {
+  filter?: Maybe<StakeKeyDeregistrationCertificateFilter>;
+};
+
+
+export type RewardAccountMirCertificatesArgs = {
+  filter?: Maybe<MirCertificateFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<MirCertificateOrder>;
+};
+
+
+export type RewardAccountMirCertificatesAggregateArgs = {
+  filter?: Maybe<MirCertificateFilter>;
+};
+
+
+export type RewardAccountPublicKeyArgs = {
+  filter?: Maybe<PublicKeyFilter>;
+};
+
+
+export type RewardAccountRegistrationCertificatesArgs = {
+  filter?: Maybe<StakeKeyRegistrationCertificateFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+
+export type RewardAccountRegistrationCertificatesAggregateArgs = {
+  filter?: Maybe<StakeKeyRegistrationCertificateFilter>;
 };
 
 export type RewardAccountAggregateResult = {
@@ -6492,7 +7710,12 @@ export type RewardAccountFilter = {
 export enum RewardAccountHasFilter {
   ActiveStake = 'activeStake',
   Address = 'address',
-  Addresses = 'addresses'
+  Addresses = 'addresses',
+  DelegationCertificates = 'delegationCertificates',
+  DeregistrationCertificates = 'deregistrationCertificates',
+  MirCertificates = 'mirCertificates',
+  PublicKey = 'publicKey',
+  RegistrationCertificates = 'registrationCertificates'
 }
 
 export type RewardAccountOrder = {
@@ -6509,12 +7732,22 @@ export type RewardAccountPatch = {
   activeStake?: Maybe<ActiveStakeRef>;
   address?: Maybe<Scalars['String']>;
   addresses?: Maybe<AddressRef>;
+  delegationCertificates?: Maybe<Array<StakeDelegationCertificateRef>>;
+  deregistrationCertificates?: Maybe<Array<StakeKeyDeregistrationCertificateRef>>;
+  mirCertificates?: Maybe<Array<MirCertificateRef>>;
+  publicKey?: Maybe<PublicKeyRef>;
+  registrationCertificates?: Maybe<Array<StakeKeyRegistrationCertificateRef>>;
 };
 
 export type RewardAccountRef = {
   activeStake?: Maybe<ActiveStakeRef>;
   address?: Maybe<Scalars['String']>;
   addresses?: Maybe<AddressRef>;
+  delegationCertificates?: Maybe<Array<StakeDelegationCertificateRef>>;
+  deregistrationCertificates?: Maybe<Array<StakeKeyDeregistrationCertificateRef>>;
+  mirCertificates?: Maybe<Array<MirCertificateRef>>;
+  publicKey?: Maybe<PublicKeyRef>;
+  registrationCertificates?: Maybe<Array<StakeKeyRegistrationCertificateRef>>;
 };
 
 export type Script = {
@@ -6604,6 +7837,68 @@ export enum SearchResultType {
   RelayByNameMultihost = 'RelayByNameMultihost'
 }
 
+export type Signature = {
+  __typename?: 'Signature';
+  publicKey: PublicKey;
+  /** hex-encoded Ed25519 signature */
+  signature: Scalars['String'];
+  transaction: Transaction;
+};
+
+
+export type SignaturePublicKeyArgs = {
+  filter?: Maybe<PublicKeyFilter>;
+};
+
+
+export type SignatureTransactionArgs = {
+  filter?: Maybe<TransactionFilter>;
+};
+
+export type SignatureAggregateResult = {
+  __typename?: 'SignatureAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+  signatureMax?: Maybe<Scalars['String']>;
+  signatureMin?: Maybe<Scalars['String']>;
+};
+
+export type SignatureFilter = {
+  and?: Maybe<Array<Maybe<SignatureFilter>>>;
+  has?: Maybe<Array<Maybe<SignatureHasFilter>>>;
+  not?: Maybe<SignatureFilter>;
+  or?: Maybe<Array<Maybe<SignatureFilter>>>;
+};
+
+export enum SignatureHasFilter {
+  PublicKey = 'publicKey',
+  Signature = 'signature',
+  Transaction = 'transaction'
+}
+
+export type SignatureOrder = {
+  asc?: Maybe<SignatureOrderable>;
+  desc?: Maybe<SignatureOrderable>;
+  then?: Maybe<SignatureOrder>;
+};
+
+export enum SignatureOrderable {
+  Signature = 'signature'
+}
+
+export type SignaturePatch = {
+  publicKey?: Maybe<PublicKeyRef>;
+  /** hex-encoded Ed25519 signature */
+  signature?: Maybe<Scalars['String']>;
+  transaction?: Maybe<TransactionRef>;
+};
+
+export type SignatureRef = {
+  publicKey?: Maybe<PublicKeyRef>;
+  /** hex-encoded Ed25519 signature */
+  signature?: Maybe<Scalars['String']>;
+  transaction?: Maybe<TransactionRef>;
+};
+
 export type Slot = {
   __typename?: 'Slot';
   block?: Maybe<Block>;
@@ -6672,40 +7967,164 @@ export type SlotRef = {
   slotInEpoch?: Maybe<Scalars['Int']>;
 };
 
+export type StakeDelegationCertificate = {
+  __typename?: 'StakeDelegationCertificate';
+  epoch: Epoch;
+  rewardAccount: RewardAccount;
+  stakePool: StakePool;
+  transaction: Transaction;
+};
+
+
+export type StakeDelegationCertificateEpochArgs = {
+  filter?: Maybe<EpochFilter>;
+};
+
+
+export type StakeDelegationCertificateRewardAccountArgs = {
+  filter?: Maybe<RewardAccountFilter>;
+};
+
+
+export type StakeDelegationCertificateStakePoolArgs = {
+  filter?: Maybe<StakePoolFilter>;
+};
+
+
+export type StakeDelegationCertificateTransactionArgs = {
+  filter?: Maybe<TransactionFilter>;
+};
+
+export type StakeDelegationCertificateAggregateResult = {
+  __typename?: 'StakeDelegationCertificateAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+};
+
+export type StakeDelegationCertificateFilter = {
+  and?: Maybe<Array<Maybe<StakeDelegationCertificateFilter>>>;
+  has?: Maybe<Array<Maybe<StakeDelegationCertificateHasFilter>>>;
+  not?: Maybe<StakeDelegationCertificateFilter>;
+  or?: Maybe<Array<Maybe<StakeDelegationCertificateFilter>>>;
+};
+
+export enum StakeDelegationCertificateHasFilter {
+  Epoch = 'epoch',
+  RewardAccount = 'rewardAccount',
+  StakePool = 'stakePool',
+  Transaction = 'transaction'
+}
+
+export type StakeDelegationCertificatePatch = {
+  epoch?: Maybe<EpochRef>;
+  rewardAccount?: Maybe<RewardAccountRef>;
+  stakePool?: Maybe<StakePoolRef>;
+  transaction?: Maybe<TransactionRef>;
+};
+
+export type StakeDelegationCertificateRef = {
+  epoch?: Maybe<EpochRef>;
+  rewardAccount?: Maybe<RewardAccountRef>;
+  stakePool?: Maybe<StakePoolRef>;
+  transaction?: Maybe<TransactionRef>;
+};
+
+export type StakeKeyDeregistrationCertificate = {
+  __typename?: 'StakeKeyDeregistrationCertificate';
+  rewardAccount: RewardAccount;
+  transaction: Transaction;
+};
+
+
+export type StakeKeyDeregistrationCertificateRewardAccountArgs = {
+  filter?: Maybe<RewardAccountFilter>;
+};
+
+
+export type StakeKeyDeregistrationCertificateTransactionArgs = {
+  filter?: Maybe<TransactionFilter>;
+};
+
+export type StakeKeyDeregistrationCertificateAggregateResult = {
+  __typename?: 'StakeKeyDeregistrationCertificateAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+};
+
+export type StakeKeyDeregistrationCertificateFilter = {
+  and?: Maybe<Array<Maybe<StakeKeyDeregistrationCertificateFilter>>>;
+  has?: Maybe<Array<Maybe<StakeKeyDeregistrationCertificateHasFilter>>>;
+  not?: Maybe<StakeKeyDeregistrationCertificateFilter>;
+  or?: Maybe<Array<Maybe<StakeKeyDeregistrationCertificateFilter>>>;
+};
+
+export enum StakeKeyDeregistrationCertificateHasFilter {
+  RewardAccount = 'rewardAccount',
+  Transaction = 'transaction'
+}
+
+export type StakeKeyDeregistrationCertificatePatch = {
+  rewardAccount?: Maybe<RewardAccountRef>;
+  transaction?: Maybe<TransactionRef>;
+};
+
+export type StakeKeyDeregistrationCertificateRef = {
+  rewardAccount?: Maybe<RewardAccountRef>;
+  transaction?: Maybe<TransactionRef>;
+};
+
+export type StakeKeyRegistrationCertificate = {
+  __typename?: 'StakeKeyRegistrationCertificate';
+  rewardAccount: RewardAccount;
+  transaction: Transaction;
+};
+
+
+export type StakeKeyRegistrationCertificateRewardAccountArgs = {
+  filter?: Maybe<RewardAccountFilter>;
+};
+
+
+export type StakeKeyRegistrationCertificateTransactionArgs = {
+  filter?: Maybe<TransactionFilter>;
+};
+
+export type StakeKeyRegistrationCertificateAggregateResult = {
+  __typename?: 'StakeKeyRegistrationCertificateAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+};
+
+export type StakeKeyRegistrationCertificateFilter = {
+  and?: Maybe<Array<Maybe<StakeKeyRegistrationCertificateFilter>>>;
+  has?: Maybe<Array<Maybe<StakeKeyRegistrationCertificateHasFilter>>>;
+  not?: Maybe<StakeKeyRegistrationCertificateFilter>;
+  or?: Maybe<Array<Maybe<StakeKeyRegistrationCertificateFilter>>>;
+};
+
+export enum StakeKeyRegistrationCertificateHasFilter {
+  RewardAccount = 'rewardAccount',
+  Transaction = 'transaction'
+}
+
+export type StakeKeyRegistrationCertificatePatch = {
+  rewardAccount?: Maybe<RewardAccountRef>;
+  transaction?: Maybe<TransactionRef>;
+};
+
+export type StakeKeyRegistrationCertificateRef = {
+  rewardAccount?: Maybe<RewardAccountRef>;
+  transaction?: Maybe<TransactionRef>;
+};
+
 export type StakePool = {
   __typename?: 'StakePool';
-  /** Coin quantity */
-  cost: Scalars['String'];
   hexId: Scalars['String'];
   id: Scalars['String'];
-  margin: Ratio;
-  metadata?: Maybe<StakePoolMetadata>;
-  metadataJson?: Maybe<StakePoolMetadataJson>;
   metrics: StakePoolMetrics;
-  owners: Array<Scalars['String']>;
-  /** Coin quantity */
-  pledge: Scalars['String'];
-  relays: Array<SearchResult>;
-  rewardAccount: Scalars['String'];
+  poolParameters: Array<PoolParameters>;
+  poolParametersAggregate?: Maybe<PoolParametersAggregateResult>;
+  poolRetirementCertificates: Array<PoolRetirementCertificate>;
+  poolRetirementCertificatesAggregate?: Maybe<PoolRetirementCertificateAggregateResult>;
   /** active | retired | retiring */
   status: StakePoolStatus;
-  transactions: StakePoolTransactions;
-  vrf: Scalars['String'];
-};
-
-
-export type StakePoolMarginArgs = {
-  filter?: Maybe<RatioFilter>;
-};
-
-
-export type StakePoolMetadataArgs = {
-  filter?: Maybe<StakePoolMetadataFilter>;
-};
-
-
-export type StakePoolMetadataJsonArgs = {
-  filter?: Maybe<StakePoolMetadataJsonFilter>;
 };
 
 
@@ -6714,32 +8133,37 @@ export type StakePoolMetricsArgs = {
 };
 
 
-export type StakePoolRelaysArgs = {
-  filter?: Maybe<SearchResultFilter>;
+export type StakePoolPoolParametersArgs = {
+  filter?: Maybe<PoolParametersFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<PoolParametersOrder>;
+};
+
+
+export type StakePoolPoolParametersAggregateArgs = {
+  filter?: Maybe<PoolParametersFilter>;
+};
+
+
+export type StakePoolPoolRetirementCertificatesArgs = {
+  filter?: Maybe<PoolRetirementCertificateFilter>;
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
 };
 
 
-export type StakePoolTransactionsArgs = {
-  filter?: Maybe<StakePoolTransactionsFilter>;
+export type StakePoolPoolRetirementCertificatesAggregateArgs = {
+  filter?: Maybe<PoolRetirementCertificateFilter>;
 };
 
 export type StakePoolAggregateResult = {
   __typename?: 'StakePoolAggregateResult';
-  costMax?: Maybe<Scalars['String']>;
-  costMin?: Maybe<Scalars['String']>;
   count?: Maybe<Scalars['Int']>;
   hexIdMax?: Maybe<Scalars['String']>;
   hexIdMin?: Maybe<Scalars['String']>;
   idMax?: Maybe<Scalars['String']>;
   idMin?: Maybe<Scalars['String']>;
-  pledgeMax?: Maybe<Scalars['String']>;
-  pledgeMin?: Maybe<Scalars['String']>;
-  rewardAccountMax?: Maybe<Scalars['String']>;
-  rewardAccountMin?: Maybe<Scalars['String']>;
-  vrfMax?: Maybe<Scalars['String']>;
-  vrfMin?: Maybe<Scalars['String']>;
 };
 
 export type StakePoolFilter = {
@@ -6751,20 +8175,12 @@ export type StakePoolFilter = {
 };
 
 export enum StakePoolHasFilter {
-  Cost = 'cost',
   HexId = 'hexId',
   Id = 'id',
-  Margin = 'margin',
-  Metadata = 'metadata',
-  MetadataJson = 'metadataJson',
   Metrics = 'metrics',
-  Owners = 'owners',
-  Pledge = 'pledge',
-  Relays = 'relays',
-  RewardAccount = 'rewardAccount',
-  Status = 'status',
-  Transactions = 'transactions',
-  Vrf = 'vrf'
+  PoolParameters = 'poolParameters',
+  PoolRetirementCertificates = 'poolRetirementCertificates',
+  Status = 'status'
 }
 
 export type StakePoolMetadata = {
@@ -6776,7 +8192,7 @@ export type StakePoolMetadata = {
   extVkey?: Maybe<Scalars['String']>;
   homepage: Scalars['String'];
   name: Scalars['String'];
-  stakePool: StakePool;
+  poolParameters: PoolParameters;
   stakePoolId: Scalars['String'];
   ticker: Scalars['String'];
 };
@@ -6787,8 +8203,8 @@ export type StakePoolMetadataExtArgs = {
 };
 
 
-export type StakePoolMetadataStakePoolArgs = {
-  filter?: Maybe<StakePoolFilter>;
+export type StakePoolMetadataPoolParametersArgs = {
+  filter?: Maybe<PoolParametersFilter>;
 };
 
 export type StakePoolMetadataAggregateResult = {
@@ -6830,7 +8246,7 @@ export enum StakePoolMetadataHasFilter {
   ExtVkey = 'extVkey',
   Homepage = 'homepage',
   Name = 'name',
-  StakePool = 'stakePool',
+  PoolParameters = 'poolParameters',
   StakePoolId = 'stakePoolId',
   Ticker = 'ticker'
 }
@@ -6908,7 +8324,8 @@ export type StakePoolMetadataPatch = {
   extVkey?: Maybe<Scalars['String']>;
   homepage?: Maybe<Scalars['String']>;
   name?: Maybe<Scalars['String']>;
-  stakePool?: Maybe<StakePoolRef>;
+  poolParameters?: Maybe<PoolParametersRef>;
+  stakePoolId?: Maybe<Scalars['String']>;
   ticker?: Maybe<Scalars['String']>;
 };
 
@@ -6920,20 +8337,26 @@ export type StakePoolMetadataRef = {
   extVkey?: Maybe<Scalars['String']>;
   homepage?: Maybe<Scalars['String']>;
   name?: Maybe<Scalars['String']>;
-  stakePool?: Maybe<StakePoolRef>;
+  poolParameters?: Maybe<PoolParametersRef>;
   stakePoolId?: Maybe<Scalars['String']>;
   ticker?: Maybe<Scalars['String']>;
 };
 
 export type StakePoolMetrics = {
   __typename?: 'StakePoolMetrics';
+  block: Block;
+  blockNo: Scalars['Int'];
   blocksCreated: Scalars['Int'];
   delegators: Scalars['Int'];
-  /** Coin quantity */
-  livePledge: Scalars['String'];
+  livePledge: Scalars['Int64'];
   saturation: Scalars['Float'];
   size: StakePoolMetricsSize;
   stake: StakePoolMetricsStake;
+};
+
+
+export type StakePoolMetricsBlockArgs = {
+  filter?: Maybe<BlockFilter>;
 };
 
 
@@ -6948,6 +8371,10 @@ export type StakePoolMetricsStakeArgs = {
 
 export type StakePoolMetricsAggregateResult = {
   __typename?: 'StakePoolMetricsAggregateResult';
+  blockNoAvg?: Maybe<Scalars['Float']>;
+  blockNoMax?: Maybe<Scalars['Int']>;
+  blockNoMin?: Maybe<Scalars['Int']>;
+  blockNoSum?: Maybe<Scalars['Int']>;
   blocksCreatedAvg?: Maybe<Scalars['Float']>;
   blocksCreatedMax?: Maybe<Scalars['Int']>;
   blocksCreatedMin?: Maybe<Scalars['Int']>;
@@ -6957,8 +8384,10 @@ export type StakePoolMetricsAggregateResult = {
   delegatorsMax?: Maybe<Scalars['Int']>;
   delegatorsMin?: Maybe<Scalars['Int']>;
   delegatorsSum?: Maybe<Scalars['Int']>;
-  livePledgeMax?: Maybe<Scalars['String']>;
-  livePledgeMin?: Maybe<Scalars['String']>;
+  livePledgeAvg?: Maybe<Scalars['Float']>;
+  livePledgeMax?: Maybe<Scalars['Int64']>;
+  livePledgeMin?: Maybe<Scalars['Int64']>;
+  livePledgeSum?: Maybe<Scalars['Int64']>;
   saturationAvg?: Maybe<Scalars['Float']>;
   saturationMax?: Maybe<Scalars['Float']>;
   saturationMin?: Maybe<Scalars['Float']>;
@@ -6973,6 +8402,8 @@ export type StakePoolMetricsFilter = {
 };
 
 export enum StakePoolMetricsHasFilter {
+  Block = 'block',
+  BlockNo = 'blockNo',
   BlocksCreated = 'blocksCreated',
   Delegators = 'delegators',
   LivePledge = 'livePledge',
@@ -6988,6 +8419,7 @@ export type StakePoolMetricsOrder = {
 };
 
 export enum StakePoolMetricsOrderable {
+  BlockNo = 'blockNo',
   BlocksCreated = 'blocksCreated',
   Delegators = 'delegators',
   LivePledge = 'livePledge',
@@ -6995,20 +8427,22 @@ export enum StakePoolMetricsOrderable {
 }
 
 export type StakePoolMetricsPatch = {
+  block?: Maybe<BlockRef>;
+  blockNo?: Maybe<Scalars['Int']>;
   blocksCreated?: Maybe<Scalars['Int']>;
   delegators?: Maybe<Scalars['Int']>;
-  /** Coin quantity */
-  livePledge?: Maybe<Scalars['String']>;
+  livePledge?: Maybe<Scalars['Int64']>;
   saturation?: Maybe<Scalars['Float']>;
   size?: Maybe<StakePoolMetricsSizeRef>;
   stake?: Maybe<StakePoolMetricsStakeRef>;
 };
 
 export type StakePoolMetricsRef = {
+  block?: Maybe<BlockRef>;
+  blockNo?: Maybe<Scalars['Int']>;
   blocksCreated?: Maybe<Scalars['Int']>;
   delegators?: Maybe<Scalars['Int']>;
-  /** Coin quantity */
-  livePledge?: Maybe<Scalars['String']>;
+  livePledge?: Maybe<Scalars['Int64']>;
   saturation?: Maybe<Scalars['Float']>;
   size?: Maybe<StakePoolMetricsSizeRef>;
   stake?: Maybe<StakePoolMetricsStakeRef>;
@@ -7074,19 +8508,21 @@ export type StakePoolMetricsSizeRef = {
 
 export type StakePoolMetricsStake = {
   __typename?: 'StakePoolMetricsStake';
-  /** Coin quantity */
-  active: Scalars['String'];
-  /** Coin quantity */
-  live: Scalars['String'];
+  active: Scalars['Int64'];
+  live: Scalars['Int64'];
 };
 
 export type StakePoolMetricsStakeAggregateResult = {
   __typename?: 'StakePoolMetricsStakeAggregateResult';
-  activeMax?: Maybe<Scalars['String']>;
-  activeMin?: Maybe<Scalars['String']>;
+  activeAvg?: Maybe<Scalars['Float']>;
+  activeMax?: Maybe<Scalars['Int64']>;
+  activeMin?: Maybe<Scalars['Int64']>;
+  activeSum?: Maybe<Scalars['Int64']>;
   count?: Maybe<Scalars['Int']>;
-  liveMax?: Maybe<Scalars['String']>;
-  liveMin?: Maybe<Scalars['String']>;
+  liveAvg?: Maybe<Scalars['Float']>;
+  liveMax?: Maybe<Scalars['Int64']>;
+  liveMin?: Maybe<Scalars['Int64']>;
+  liveSum?: Maybe<Scalars['Int64']>;
 };
 
 export type StakePoolMetricsStakeFilter = {
@@ -7113,17 +8549,13 @@ export enum StakePoolMetricsStakeOrderable {
 }
 
 export type StakePoolMetricsStakePatch = {
-  /** Coin quantity */
-  active?: Maybe<Scalars['String']>;
-  /** Coin quantity */
-  live?: Maybe<Scalars['String']>;
+  active?: Maybe<Scalars['Int64']>;
+  live?: Maybe<Scalars['Int64']>;
 };
 
 export type StakePoolMetricsStakeRef = {
-  /** Coin quantity */
-  active?: Maybe<Scalars['String']>;
-  /** Coin quantity */
-  live?: Maybe<Scalars['String']>;
+  active?: Maybe<Scalars['Int64']>;
+  live?: Maybe<Scalars['Int64']>;
 };
 
 export type StakePoolOrder = {
@@ -7133,91 +8565,35 @@ export type StakePoolOrder = {
 };
 
 export enum StakePoolOrderable {
-  Cost = 'cost',
   HexId = 'hexId',
-  Id = 'id',
-  Pledge = 'pledge',
-  RewardAccount = 'rewardAccount',
-  Vrf = 'vrf'
+  Id = 'id'
 }
 
 export type StakePoolPatch = {
-  /** Coin quantity */
-  cost?: Maybe<Scalars['String']>;
   hexId?: Maybe<Scalars['String']>;
-  margin?: Maybe<RatioRef>;
-  metadata?: Maybe<StakePoolMetadataRef>;
-  metadataJson?: Maybe<StakePoolMetadataJsonRef>;
   metrics?: Maybe<StakePoolMetricsRef>;
-  owners?: Maybe<Array<Scalars['String']>>;
-  /** Coin quantity */
-  pledge?: Maybe<Scalars['String']>;
-  relays?: Maybe<Array<SearchResultRef>>;
-  rewardAccount?: Maybe<Scalars['String']>;
+  poolParameters?: Maybe<Array<PoolParametersRef>>;
+  poolRetirementCertificates?: Maybe<Array<PoolRetirementCertificateRef>>;
   /** active | retired | retiring */
   status?: Maybe<StakePoolStatus>;
-  transactions?: Maybe<StakePoolTransactionsRef>;
-  vrf?: Maybe<Scalars['String']>;
 };
 
 export type StakePoolRef = {
-  /** Coin quantity */
-  cost?: Maybe<Scalars['String']>;
   hexId?: Maybe<Scalars['String']>;
   id?: Maybe<Scalars['String']>;
-  margin?: Maybe<RatioRef>;
-  metadata?: Maybe<StakePoolMetadataRef>;
-  metadataJson?: Maybe<StakePoolMetadataJsonRef>;
   metrics?: Maybe<StakePoolMetricsRef>;
-  owners?: Maybe<Array<Scalars['String']>>;
-  /** Coin quantity */
-  pledge?: Maybe<Scalars['String']>;
-  relays?: Maybe<Array<SearchResultRef>>;
-  rewardAccount?: Maybe<Scalars['String']>;
+  poolParameters?: Maybe<Array<PoolParametersRef>>;
+  poolRetirementCertificates?: Maybe<Array<PoolRetirementCertificateRef>>;
   /** active | retired | retiring */
   status?: Maybe<StakePoolStatus>;
-  transactions?: Maybe<StakePoolTransactionsRef>;
-  vrf?: Maybe<Scalars['String']>;
 };
 
 export enum StakePoolStatus {
+  Activating = 'activating',
   Active = 'active',
   Retired = 'retired',
   Retiring = 'retiring'
 }
-
-export type StakePoolTransactions = {
-  __typename?: 'StakePoolTransactions';
-  registration: Array<Scalars['String']>;
-  retirement: Array<Scalars['String']>;
-};
-
-export type StakePoolTransactionsAggregateResult = {
-  __typename?: 'StakePoolTransactionsAggregateResult';
-  count?: Maybe<Scalars['Int']>;
-};
-
-export type StakePoolTransactionsFilter = {
-  and?: Maybe<Array<Maybe<StakePoolTransactionsFilter>>>;
-  has?: Maybe<Array<Maybe<StakePoolTransactionsHasFilter>>>;
-  not?: Maybe<StakePoolTransactionsFilter>;
-  or?: Maybe<Array<Maybe<StakePoolTransactionsFilter>>>;
-};
-
-export enum StakePoolTransactionsHasFilter {
-  Registration = 'registration',
-  Retirement = 'retirement'
-}
-
-export type StakePoolTransactionsPatch = {
-  registration?: Maybe<Array<Scalars['String']>>;
-  retirement?: Maybe<Array<Scalars['String']>>;
-};
-
-export type StakePoolTransactionsRef = {
-  registration?: Maybe<Array<Scalars['String']>>;
-  retirement?: Maybe<Array<Scalars['String']>>;
-};
 
 export type StringExactFilter = {
   between?: Maybe<StringRange>;
@@ -7248,15 +8624,14 @@ export type StringHashFilter = {
 
 export type StringMetadatum = {
   __typename?: 'StringMetadatum';
-  value: Scalars['String'];
-  valueType: MetadatumStringType;
+  string: Scalars['String'];
 };
 
 export type StringMetadatumAggregateResult = {
   __typename?: 'StringMetadatumAggregateResult';
   count?: Maybe<Scalars['Int']>;
-  valueMax?: Maybe<Scalars['String']>;
-  valueMin?: Maybe<Scalars['String']>;
+  stringMax?: Maybe<Scalars['String']>;
+  stringMin?: Maybe<Scalars['String']>;
 };
 
 export type StringMetadatumFilter = {
@@ -7267,8 +8642,7 @@ export type StringMetadatumFilter = {
 };
 
 export enum StringMetadatumHasFilter {
-  Value = 'value',
-  ValueType = 'valueType'
+  String = 'string'
 }
 
 export type StringMetadatumOrder = {
@@ -7278,17 +8652,15 @@ export type StringMetadatumOrder = {
 };
 
 export enum StringMetadatumOrderable {
-  Value = 'value'
+  String = 'string'
 }
 
 export type StringMetadatumPatch = {
-  value?: Maybe<Scalars['String']>;
-  valueType?: Maybe<MetadatumStringType>;
+  string?: Maybe<Scalars['String']>;
 };
 
 export type StringMetadatumRef = {
-  value?: Maybe<Scalars['String']>;
-  valueType?: Maybe<MetadatumStringType>;
+  string?: Maybe<Scalars['String']>;
 };
 
 export type StringRange = {
@@ -7507,12 +8879,13 @@ export type Transaction = {
   __typename?: 'Transaction';
   auxiliaryData?: Maybe<AuxiliaryData>;
   block: Block;
-  blockIndex: Scalars['Int'];
+  certificates?: Maybe<Array<Certificate>>;
   collateral?: Maybe<Array<TransactionInput>>;
   collateralAggregate?: Maybe<TransactionInputAggregateResult>;
   deposit: Scalars['Int64'];
   fee: Scalars['Int64'];
   hash: Scalars['String'];
+  index: Scalars['Int'];
   inputs: Array<TransactionInput>;
   inputsAggregate?: Maybe<TransactionInputAggregateResult>;
   invalidBefore?: Maybe<Scalars['Int']>;
@@ -7523,6 +8896,11 @@ export type Transaction = {
   outputsAggregate?: Maybe<TransactionOutputAggregateResult>;
   redeemers?: Maybe<Array<Redeemer>>;
   redeemersAggregate?: Maybe<RedeemerAggregateResult>;
+  requiredExtraSignatures: Array<PublicKey>;
+  requiredExtraSignaturesAggregate?: Maybe<PublicKeyAggregateResult>;
+  scriptIntegrityHash?: Maybe<Scalars['String']>;
+  signatures: Array<Signature>;
+  signaturesAggregate?: Maybe<SignatureAggregateResult>;
   size: Scalars['Int64'];
   totalOutputCoin: Scalars['Int64'];
   validContract: Scalars['Boolean'];
@@ -7538,6 +8916,13 @@ export type TransactionAuxiliaryDataArgs = {
 
 export type TransactionBlockArgs = {
   filter?: Maybe<BlockFilter>;
+};
+
+
+export type TransactionCertificatesArgs = {
+  filter?: Maybe<CertificateFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
 };
 
 
@@ -7606,6 +8991,32 @@ export type TransactionRedeemersAggregateArgs = {
 };
 
 
+export type TransactionRequiredExtraSignaturesArgs = {
+  filter?: Maybe<PublicKeyFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<PublicKeyOrder>;
+};
+
+
+export type TransactionRequiredExtraSignaturesAggregateArgs = {
+  filter?: Maybe<PublicKeyFilter>;
+};
+
+
+export type TransactionSignaturesArgs = {
+  filter?: Maybe<SignatureFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<SignatureOrder>;
+};
+
+
+export type TransactionSignaturesAggregateArgs = {
+  filter?: Maybe<SignatureFilter>;
+};
+
+
 export type TransactionWithdrawalsArgs = {
   filter?: Maybe<WithdrawalFilter>;
   first?: Maybe<Scalars['Int']>;
@@ -7620,10 +9031,6 @@ export type TransactionWithdrawalsAggregateArgs = {
 
 export type TransactionAggregateResult = {
   __typename?: 'TransactionAggregateResult';
-  blockIndexAvg?: Maybe<Scalars['Float']>;
-  blockIndexMax?: Maybe<Scalars['Int']>;
-  blockIndexMin?: Maybe<Scalars['Int']>;
-  blockIndexSum?: Maybe<Scalars['Int']>;
   count?: Maybe<Scalars['Int']>;
   depositAvg?: Maybe<Scalars['Float']>;
   depositMax?: Maybe<Scalars['Int64']>;
@@ -7635,6 +9042,10 @@ export type TransactionAggregateResult = {
   feeSum?: Maybe<Scalars['Int64']>;
   hashMax?: Maybe<Scalars['String']>;
   hashMin?: Maybe<Scalars['String']>;
+  indexAvg?: Maybe<Scalars['Float']>;
+  indexMax?: Maybe<Scalars['Int']>;
+  indexMin?: Maybe<Scalars['Int']>;
+  indexSum?: Maybe<Scalars['Int']>;
   invalidBeforeAvg?: Maybe<Scalars['Float']>;
   invalidBeforeMax?: Maybe<Scalars['Int']>;
   invalidBeforeMin?: Maybe<Scalars['Int']>;
@@ -7643,6 +9054,8 @@ export type TransactionAggregateResult = {
   invalidHereafterMax?: Maybe<Scalars['Int']>;
   invalidHereafterMin?: Maybe<Scalars['Int']>;
   invalidHereafterSum?: Maybe<Scalars['Int']>;
+  scriptIntegrityHashMax?: Maybe<Scalars['String']>;
+  scriptIntegrityHashMin?: Maybe<Scalars['String']>;
   sizeAvg?: Maybe<Scalars['Float']>;
   sizeMax?: Maybe<Scalars['Int64']>;
   sizeMin?: Maybe<Scalars['Int64']>;
@@ -7664,17 +9077,21 @@ export type TransactionFilter = {
 export enum TransactionHasFilter {
   AuxiliaryData = 'auxiliaryData',
   Block = 'block',
-  BlockIndex = 'blockIndex',
+  Certificates = 'certificates',
   Collateral = 'collateral',
   Deposit = 'deposit',
   Fee = 'fee',
   Hash = 'hash',
+  Index = 'index',
   Inputs = 'inputs',
   InvalidBefore = 'invalidBefore',
   InvalidHereafter = 'invalidHereafter',
   Mint = 'mint',
   Outputs = 'outputs',
   Redeemers = 'redeemers',
+  RequiredExtraSignatures = 'requiredExtraSignatures',
+  ScriptIntegrityHash = 'scriptIntegrityHash',
+  Signatures = 'signatures',
   Size = 'size',
   TotalOutputCoin = 'totalOutputCoin',
   ValidContract = 'validContract',
@@ -7777,12 +9194,13 @@ export type TransactionOrder = {
 };
 
 export enum TransactionOrderable {
-  BlockIndex = 'blockIndex',
   Deposit = 'deposit',
   Fee = 'fee',
   Hash = 'hash',
+  Index = 'index',
   InvalidBefore = 'invalidBefore',
   InvalidHereafter = 'invalidHereafter',
+  ScriptIntegrityHash = 'scriptIntegrityHash',
   Size = 'size',
   TotalOutputCoin = 'totalOutputCoin'
 }
@@ -7790,6 +9208,8 @@ export enum TransactionOrderable {
 export type TransactionOutput = {
   __typename?: 'TransactionOutput';
   address: Address;
+  /** hex-encoded 32 byte hash */
+  datum?: Maybe<Scalars['String']>;
   index: Scalars['Int'];
   transaction: Transaction;
   value: Value;
@@ -7813,6 +9233,8 @@ export type TransactionOutputValueArgs = {
 export type TransactionOutputAggregateResult = {
   __typename?: 'TransactionOutputAggregateResult';
   count?: Maybe<Scalars['Int']>;
+  datumMax?: Maybe<Scalars['String']>;
+  datumMin?: Maybe<Scalars['String']>;
   indexAvg?: Maybe<Scalars['Float']>;
   indexMax?: Maybe<Scalars['Int']>;
   indexMin?: Maybe<Scalars['Int']>;
@@ -7828,6 +9250,7 @@ export type TransactionOutputFilter = {
 
 export enum TransactionOutputHasFilter {
   Address = 'address',
+  Datum = 'datum',
   Index = 'index',
   Transaction = 'transaction',
   Value = 'value'
@@ -7840,11 +9263,14 @@ export type TransactionOutputOrder = {
 };
 
 export enum TransactionOutputOrderable {
+  Datum = 'datum',
   Index = 'index'
 }
 
 export type TransactionOutputPatch = {
   address?: Maybe<AddressRef>;
+  /** hex-encoded 32 byte hash */
+  datum?: Maybe<Scalars['String']>;
   index?: Maybe<Scalars['Int']>;
   transaction?: Maybe<TransactionRef>;
   value?: Maybe<ValueRef>;
@@ -7852,6 +9278,8 @@ export type TransactionOutputPatch = {
 
 export type TransactionOutputRef = {
   address?: Maybe<AddressRef>;
+  /** hex-encoded 32 byte hash */
+  datum?: Maybe<Scalars['String']>;
   index?: Maybe<Scalars['Int']>;
   transaction?: Maybe<TransactionRef>;
   value?: Maybe<ValueRef>;
@@ -7860,16 +9288,20 @@ export type TransactionOutputRef = {
 export type TransactionPatch = {
   auxiliaryData?: Maybe<AuxiliaryDataRef>;
   block?: Maybe<BlockRef>;
-  blockIndex?: Maybe<Scalars['Int']>;
+  certificates?: Maybe<Array<CertificateRef>>;
   collateral?: Maybe<Array<TransactionInputRef>>;
   deposit?: Maybe<Scalars['Int64']>;
   fee?: Maybe<Scalars['Int64']>;
+  index?: Maybe<Scalars['Int']>;
   inputs?: Maybe<Array<TransactionInputRef>>;
   invalidBefore?: Maybe<Scalars['Int']>;
   invalidHereafter?: Maybe<Scalars['Int']>;
   mint?: Maybe<Array<TokenRef>>;
   outputs?: Maybe<Array<TransactionOutputRef>>;
   redeemers?: Maybe<Array<RedeemerRef>>;
+  requiredExtraSignatures?: Maybe<Array<PublicKeyRef>>;
+  scriptIntegrityHash?: Maybe<Scalars['String']>;
+  signatures?: Maybe<Array<SignatureRef>>;
   size?: Maybe<Scalars['Int64']>;
   totalOutputCoin?: Maybe<Scalars['Int64']>;
   validContract?: Maybe<Scalars['Boolean']>;
@@ -7879,17 +9311,21 @@ export type TransactionPatch = {
 export type TransactionRef = {
   auxiliaryData?: Maybe<AuxiliaryDataRef>;
   block?: Maybe<BlockRef>;
-  blockIndex?: Maybe<Scalars['Int']>;
+  certificates?: Maybe<Array<CertificateRef>>;
   collateral?: Maybe<Array<TransactionInputRef>>;
   deposit?: Maybe<Scalars['Int64']>;
   fee?: Maybe<Scalars['Int64']>;
   hash?: Maybe<Scalars['String']>;
+  index?: Maybe<Scalars['Int']>;
   inputs?: Maybe<Array<TransactionInputRef>>;
   invalidBefore?: Maybe<Scalars['Int']>;
   invalidHereafter?: Maybe<Scalars['Int']>;
   mint?: Maybe<Array<TokenRef>>;
   outputs?: Maybe<Array<TransactionOutputRef>>;
   redeemers?: Maybe<Array<RedeemerRef>>;
+  requiredExtraSignatures?: Maybe<Array<PublicKeyRef>>;
+  scriptIntegrityHash?: Maybe<Scalars['String']>;
+  signatures?: Maybe<Array<SignatureRef>>;
   size?: Maybe<Scalars['Int64']>;
   totalOutputCoin?: Maybe<Scalars['Int64']>;
   validContract?: Maybe<Scalars['Boolean']>;
@@ -8234,6 +9670,26 @@ export type UpdateExtendedStakePoolMetadataPayloadExtendedStakePoolMetadataArgs 
   order?: Maybe<ExtendedStakePoolMetadataOrder>;
 };
 
+export type UpdateGenesisKeyDelegationCertificateInput = {
+  filter: GenesisKeyDelegationCertificateFilter;
+  remove?: Maybe<GenesisKeyDelegationCertificatePatch>;
+  set?: Maybe<GenesisKeyDelegationCertificatePatch>;
+};
+
+export type UpdateGenesisKeyDelegationCertificatePayload = {
+  __typename?: 'UpdateGenesisKeyDelegationCertificatePayload';
+  genesisKeyDelegationCertificate?: Maybe<Array<Maybe<GenesisKeyDelegationCertificate>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type UpdateGenesisKeyDelegationCertificatePayloadGenesisKeyDelegationCertificateArgs = {
+  filter?: Maybe<GenesisKeyDelegationCertificateFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<GenesisKeyDelegationCertificateOrder>;
+};
+
 export type UpdateItnVerificationInput = {
   filter: ItnVerificationFilter;
   remove?: Maybe<ItnVerificationPatch>;
@@ -8332,6 +9788,26 @@ export type UpdateMetadatumMapPayloadMetadatumMapArgs = {
   offset?: Maybe<Scalars['Int']>;
 };
 
+export type UpdateMirCertificateInput = {
+  filter: MirCertificateFilter;
+  remove?: Maybe<MirCertificatePatch>;
+  set?: Maybe<MirCertificatePatch>;
+};
+
+export type UpdateMirCertificatePayload = {
+  __typename?: 'UpdateMirCertificatePayload';
+  mirCertificate?: Maybe<Array<Maybe<MirCertificate>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type UpdateMirCertificatePayloadMirCertificateArgs = {
+  filter?: Maybe<MirCertificateFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<MirCertificateOrder>;
+};
+
 export type UpdateNetworkConstantsInput = {
   filter: NetworkConstantsFilter;
   remove?: Maybe<NetworkConstantsPatch>;
@@ -8370,6 +9846,64 @@ export type UpdatePoolContactDataPayloadPoolContactDataArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<PoolContactDataOrder>;
+};
+
+export type UpdatePoolParametersInput = {
+  filter: PoolParametersFilter;
+  remove?: Maybe<PoolParametersPatch>;
+  set?: Maybe<PoolParametersPatch>;
+};
+
+export type UpdatePoolParametersPayload = {
+  __typename?: 'UpdatePoolParametersPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  poolParameters?: Maybe<Array<Maybe<PoolParameters>>>;
+};
+
+
+export type UpdatePoolParametersPayloadPoolParametersArgs = {
+  filter?: Maybe<PoolParametersFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<PoolParametersOrder>;
+};
+
+export type UpdatePoolRegistrationCertificateInput = {
+  filter: PoolRegistrationCertificateFilter;
+  remove?: Maybe<PoolRegistrationCertificatePatch>;
+  set?: Maybe<PoolRegistrationCertificatePatch>;
+};
+
+export type UpdatePoolRegistrationCertificatePayload = {
+  __typename?: 'UpdatePoolRegistrationCertificatePayload';
+  numUids?: Maybe<Scalars['Int']>;
+  poolRegistrationCertificate?: Maybe<Array<Maybe<PoolRegistrationCertificate>>>;
+};
+
+
+export type UpdatePoolRegistrationCertificatePayloadPoolRegistrationCertificateArgs = {
+  filter?: Maybe<PoolRegistrationCertificateFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+export type UpdatePoolRetirementCertificateInput = {
+  filter: PoolRetirementCertificateFilter;
+  remove?: Maybe<PoolRetirementCertificatePatch>;
+  set?: Maybe<PoolRetirementCertificatePatch>;
+};
+
+export type UpdatePoolRetirementCertificatePayload = {
+  __typename?: 'UpdatePoolRetirementCertificatePayload';
+  numUids?: Maybe<Scalars['Int']>;
+  poolRetirementCertificate?: Maybe<Array<Maybe<PoolRetirementCertificate>>>;
+};
+
+
+export type UpdatePoolRetirementCertificatePayloadPoolRetirementCertificateArgs = {
+  filter?: Maybe<PoolRetirementCertificateFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
 };
 
 export type UpdateProtocolParametersAlonzoInput = {
@@ -8430,6 +9964,26 @@ export type UpdateProtocolVersionPayloadProtocolVersionArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<ProtocolVersionOrder>;
+};
+
+export type UpdatePublicKeyInput = {
+  filter: PublicKeyFilter;
+  remove?: Maybe<PublicKeyPatch>;
+  set?: Maybe<PublicKeyPatch>;
+};
+
+export type UpdatePublicKeyPayload = {
+  __typename?: 'UpdatePublicKeyPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  publicKey?: Maybe<Array<Maybe<PublicKey>>>;
+};
+
+
+export type UpdatePublicKeyPayloadPublicKeyArgs = {
+  filter?: Maybe<PublicKeyFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<PublicKeyOrder>;
 };
 
 export type UpdateRatioInput = {
@@ -8572,6 +10126,26 @@ export type UpdateScriptPayloadScriptArgs = {
   order?: Maybe<ScriptOrder>;
 };
 
+export type UpdateSignatureInput = {
+  filter: SignatureFilter;
+  remove?: Maybe<SignaturePatch>;
+  set?: Maybe<SignaturePatch>;
+};
+
+export type UpdateSignaturePayload = {
+  __typename?: 'UpdateSignaturePayload';
+  numUids?: Maybe<Scalars['Int']>;
+  signature?: Maybe<Array<Maybe<Signature>>>;
+};
+
+
+export type UpdateSignaturePayloadSignatureArgs = {
+  filter?: Maybe<SignatureFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<SignatureOrder>;
+};
+
 export type UpdateSlotInput = {
   filter: SlotFilter;
   remove?: Maybe<SlotPatch>;
@@ -8590,6 +10164,63 @@ export type UpdateSlotPayloadSlotArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<SlotOrder>;
+};
+
+export type UpdateStakeDelegationCertificateInput = {
+  filter: StakeDelegationCertificateFilter;
+  remove?: Maybe<StakeDelegationCertificatePatch>;
+  set?: Maybe<StakeDelegationCertificatePatch>;
+};
+
+export type UpdateStakeDelegationCertificatePayload = {
+  __typename?: 'UpdateStakeDelegationCertificatePayload';
+  numUids?: Maybe<Scalars['Int']>;
+  stakeDelegationCertificate?: Maybe<Array<Maybe<StakeDelegationCertificate>>>;
+};
+
+
+export type UpdateStakeDelegationCertificatePayloadStakeDelegationCertificateArgs = {
+  filter?: Maybe<StakeDelegationCertificateFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+export type UpdateStakeKeyDeregistrationCertificateInput = {
+  filter: StakeKeyDeregistrationCertificateFilter;
+  remove?: Maybe<StakeKeyDeregistrationCertificatePatch>;
+  set?: Maybe<StakeKeyDeregistrationCertificatePatch>;
+};
+
+export type UpdateStakeKeyDeregistrationCertificatePayload = {
+  __typename?: 'UpdateStakeKeyDeregistrationCertificatePayload';
+  numUids?: Maybe<Scalars['Int']>;
+  stakeKeyDeregistrationCertificate?: Maybe<Array<Maybe<StakeKeyDeregistrationCertificate>>>;
+};
+
+
+export type UpdateStakeKeyDeregistrationCertificatePayloadStakeKeyDeregistrationCertificateArgs = {
+  filter?: Maybe<StakeKeyDeregistrationCertificateFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+export type UpdateStakeKeyRegistrationCertificateInput = {
+  filter: StakeKeyRegistrationCertificateFilter;
+  remove?: Maybe<StakeKeyRegistrationCertificatePatch>;
+  set?: Maybe<StakeKeyRegistrationCertificatePatch>;
+};
+
+export type UpdateStakeKeyRegistrationCertificatePayload = {
+  __typename?: 'UpdateStakeKeyRegistrationCertificatePayload';
+  numUids?: Maybe<Scalars['Int']>;
+  stakeKeyRegistrationCertificate?: Maybe<Array<Maybe<StakeKeyRegistrationCertificate>>>;
+};
+
+
+export type UpdateStakeKeyRegistrationCertificatePayloadStakeKeyRegistrationCertificateArgs = {
+  filter?: Maybe<StakeKeyRegistrationCertificateFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
 };
 
 export type UpdateStakePoolInput = {
@@ -8710,25 +10341,6 @@ export type UpdateStakePoolPayloadStakePoolArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<StakePoolOrder>;
-};
-
-export type UpdateStakePoolTransactionsInput = {
-  filter: StakePoolTransactionsFilter;
-  remove?: Maybe<StakePoolTransactionsPatch>;
-  set?: Maybe<StakePoolTransactionsPatch>;
-};
-
-export type UpdateStakePoolTransactionsPayload = {
-  __typename?: 'UpdateStakePoolTransactionsPayload';
-  numUids?: Maybe<Scalars['Int']>;
-  stakePoolTransactions?: Maybe<Array<Maybe<StakePoolTransactions>>>;
-};
-
-
-export type UpdateStakePoolTransactionsPayloadStakePoolTransactionsArgs = {
-  filter?: Maybe<StakePoolTransactionsFilter>;
-  first?: Maybe<Scalars['Int']>;
-  offset?: Maybe<Scalars['Int']>;
 };
 
 export type UpdateStringMetadatumInput = {
@@ -9049,12 +10661,12 @@ export type BlocksByHashesQueryVariables = Exact<{
 }>;
 
 
-export type BlocksByHashesQuery = { __typename?: 'Query', queryBlock?: Array<{ __typename?: 'Block', size: bigint, totalOutput: bigint, totalFees: bigint, hash: string, blockNo: number, confirmations: number, slot: { __typename?: 'Slot', number: number, date: string, slotInEpoch: number }, issuer: { __typename?: 'StakePool', id: string, vrf: string }, transactionsAggregate?: { __typename?: 'TransactionAggregateResult', count?: number | null | undefined } | null | undefined, epoch: { __typename?: 'Epoch', number: number }, previousBlock: { __typename?: 'Block', hash: string }, nextBlock: { __typename?: 'Block', hash: string } } | null | undefined> | null | undefined };
+export type BlocksByHashesQuery = { __typename?: 'Query', queryBlock?: Array<{ __typename?: 'Block', size: bigint, totalOutput: bigint, totalFees: bigint, hash: string, blockNo: number, confirmations: number, slot: { __typename?: 'Slot', number: number, date: string, slotInEpoch: number }, issuer: { __typename?: 'StakePool', id: string, poolParameters: Array<{ __typename?: 'PoolParameters', vrf: string }> }, transactionsAggregate?: { __typename?: 'TransactionAggregateResult', count?: number | null | undefined } | null | undefined, epoch: { __typename?: 'Epoch', number: number }, previousBlock: { __typename?: 'Block', hash: string }, nextBlock: { __typename?: 'Block', hash: string } } | null | undefined> | null | undefined };
 
 export type CurrentProtocolParametersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type CurrentProtocolParametersQuery = { __typename?: 'Query', queryProtocolParametersAlonzo?: Array<{ __typename?: 'ProtocolParametersAlonzo', coinsPerUtxoWord: number, maxTxSize: number, maxValueSize: number, stakeKeyDeposit: number, poolDeposit: number, maxCollateralInputs: number, minFeeCoefficient: number, minFeeConstant: number, minPoolCost: number, protocolVersion: { __typename?: 'ProtocolVersion', major: number, minor: number, patch?: number | null | undefined } } | null | undefined> | null | undefined };
+export type CurrentProtocolParametersQuery = { __typename?: 'Query', queryProtocolVersion?: Array<{ __typename?: 'ProtocolVersion', protocolParameters: { __typename?: 'ProtocolParametersAlonzo', coinsPerUtxoWord: number, maxTxSize: number, maxValueSize: number, stakeKeyDeposit: number, poolDeposit: number, maxCollateralInputs: number, minFeeCoefficient: number, minFeeConstant: number, minPoolCost: number, protocolVersion: { __typename?: 'ProtocolVersion', major: number, minor: number, patch?: number | null | undefined } } | { __typename?: 'ProtocolParametersShelley' } } | null | undefined> | null | undefined };
 
 export type GenesisParametersQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -9066,7 +10678,9 @@ export type NetworkInfoQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type NetworkInfoQuery = { __typename?: 'Query', queryBlock?: Array<{ __typename?: 'Block', totalLiveStake: bigint, epoch: { __typename?: 'Epoch', number: number, startedAt: { __typename?: 'Slot', date: string }, activeStakeAggregate?: { __typename?: 'ActiveStakeAggregateResult', quantitySum?: bigint | null | undefined } | null | undefined } } | null | undefined> | null | undefined, queryTimeSettings?: Array<{ __typename?: 'TimeSettings', slotLength: number, epochLength: number } | null | undefined> | null | undefined, queryAda?: Array<{ __typename?: 'Ada', supply: { __typename?: 'CoinSupply', circulating: string, max: string, total: string } } | null | undefined> | null | undefined };
 
-export type AllStakePoolFieldsFragment = { __typename?: 'StakePool', id: string, hexId: string, status: StakePoolStatus, owners: Array<string>, cost: string, vrf: string, rewardAccount: string, pledge: string, margin: { __typename?: 'Ratio', numerator: number, denominator: number }, relays: Array<{ __typename: 'RelayByAddress', ipv4?: string | null | undefined, ipv6?: string | null | undefined, port?: number | null | undefined } | { __typename: 'RelayByName', hostname: string, port?: number | null | undefined } | { __typename: 'RelayByNameMultihost', dnsName: string }>, metrics: { __typename?: 'StakePoolMetrics', blocksCreated: number, livePledge: string, saturation: number, delegators: number, stake: { __typename?: 'StakePoolMetricsStake', live: string, active: string }, size: { __typename?: 'StakePoolMetricsSize', live: number, active: number } }, transactions: { __typename?: 'StakePoolTransactions', registration: Array<string>, retirement: Array<string> }, metadataJson?: { __typename?: 'StakePoolMetadataJson', hash: string, url: string } | null | undefined, metadata?: { __typename?: 'StakePoolMetadata', ticker: string, name: string, description: string, homepage: string, extDataUrl?: string | null | undefined, extSigUrl?: string | null | undefined, extVkey?: string | null | undefined, ext?: { __typename?: 'ExtendedStakePoolMetadata', serial: number, pool: { __typename?: 'ExtendedStakePoolMetadataFields', id: string, country?: string | null | undefined, status?: ExtendedPoolStatus | null | undefined, contact?: { __typename?: 'PoolContactData', primary: string, email?: string | null | undefined, facebook?: string | null | undefined, github?: string | null | undefined, feed?: string | null | undefined, telegram?: string | null | undefined, twitter?: string | null | undefined } | null | undefined, media_assets?: { __typename?: 'ThePoolsMediaAssets', icon_png_64x64: string, logo_png?: string | null | undefined, logo_svg?: string | null | undefined, color_fg?: string | null | undefined, color_bg?: string | null | undefined } | null | undefined, itn?: { __typename?: 'ITNVerification', owner: string, witness: string } | null | undefined } } | null | undefined } | null | undefined };
+export type CertificateTransactionFieldsFragment = { __typename?: 'Transaction', hash: string, block: { __typename?: 'Block', blockNo: number } };
+
+export type AllStakePoolFieldsFragment = { __typename?: 'StakePool', id: string, hexId: string, status: StakePoolStatus, poolParameters: Array<{ __typename?: 'PoolParameters', cost: bigint, vrf: string, pledge: bigint, metadata?: { __typename?: 'StakePoolMetadata', ticker: string, name: string, description: string, homepage: string, extDataUrl?: string | null | undefined, extSigUrl?: string | null | undefined, extVkey?: string | null | undefined, ext?: { __typename?: 'ExtendedStakePoolMetadata', serial: number, pool: { __typename?: 'ExtendedStakePoolMetadataFields', id: string, country?: string | null | undefined, status?: ExtendedPoolStatus | null | undefined, contact?: { __typename?: 'PoolContactData', primary: string, email?: string | null | undefined, facebook?: string | null | undefined, github?: string | null | undefined, feed?: string | null | undefined, telegram?: string | null | undefined, twitter?: string | null | undefined } | null | undefined, media_assets?: { __typename?: 'ThePoolsMediaAssets', icon_png_64x64: string, logo_png?: string | null | undefined, logo_svg?: string | null | undefined, color_fg?: string | null | undefined, color_bg?: string | null | undefined } | null | undefined, itn?: { __typename?: 'ITNVerification', owner: string, witness: string } | null | undefined } } | null | undefined } | null | undefined, owners: Array<{ __typename?: 'RewardAccount', address: string }>, margin: { __typename?: 'Ratio', numerator: number, denominator: number }, relays: Array<{ __typename: 'RelayByAddress', ipv4?: string | null | undefined, ipv6?: string | null | undefined, port?: number | null | undefined } | { __typename: 'RelayByName', hostname: string, port?: number | null | undefined } | { __typename: 'RelayByNameMultihost', dnsName: string }>, poolRegistrationCertificate: { __typename?: 'PoolRegistrationCertificate', transaction: { __typename?: 'Transaction', hash: string } }, rewardAccount: { __typename?: 'RewardAccount', address: string }, metadataJson?: { __typename?: 'StakePoolMetadataJson', hash: string, url: string } | null | undefined }>, metrics: { __typename?: 'StakePoolMetrics', blocksCreated: number, livePledge: bigint, saturation: number, delegators: number, stake: { __typename?: 'StakePoolMetricsStake', live: bigint, active: bigint }, size: { __typename?: 'StakePoolMetricsSize', live: number, active: number } }, poolRetirementCertificates: Array<{ __typename?: 'PoolRetirementCertificate', transaction: { __typename?: 'Transaction', hash: string, block: { __typename?: 'Block', blockNo: number } } }> };
 
 export type StakePoolsByMetadataQueryVariables = Exact<{
   query: Scalars['String'];
@@ -9074,49 +10688,148 @@ export type StakePoolsByMetadataQueryVariables = Exact<{
 }>;
 
 
-export type StakePoolsByMetadataQuery = { __typename?: 'Query', queryStakePoolMetadata?: Array<{ __typename?: 'StakePoolMetadata', stakePool: { __typename?: 'StakePool', id: string, hexId: string, status: StakePoolStatus, owners: Array<string>, cost: string, vrf: string, rewardAccount: string, pledge: string, margin: { __typename?: 'Ratio', numerator: number, denominator: number }, relays: Array<{ __typename: 'RelayByAddress', ipv4?: string | null | undefined, ipv6?: string | null | undefined, port?: number | null | undefined } | { __typename: 'RelayByName', hostname: string, port?: number | null | undefined } | { __typename: 'RelayByNameMultihost', dnsName: string }>, metrics: { __typename?: 'StakePoolMetrics', blocksCreated: number, livePledge: string, saturation: number, delegators: number, stake: { __typename?: 'StakePoolMetricsStake', live: string, active: string }, size: { __typename?: 'StakePoolMetricsSize', live: number, active: number } }, transactions: { __typename?: 'StakePoolTransactions', registration: Array<string>, retirement: Array<string> }, metadataJson?: { __typename?: 'StakePoolMetadataJson', hash: string, url: string } | null | undefined, metadata?: { __typename?: 'StakePoolMetadata', ticker: string, name: string, description: string, homepage: string, extDataUrl?: string | null | undefined, extSigUrl?: string | null | undefined, extVkey?: string | null | undefined, ext?: { __typename?: 'ExtendedStakePoolMetadata', serial: number, pool: { __typename?: 'ExtendedStakePoolMetadataFields', id: string, country?: string | null | undefined, status?: ExtendedPoolStatus | null | undefined, contact?: { __typename?: 'PoolContactData', primary: string, email?: string | null | undefined, facebook?: string | null | undefined, github?: string | null | undefined, feed?: string | null | undefined, telegram?: string | null | undefined, twitter?: string | null | undefined } | null | undefined, media_assets?: { __typename?: 'ThePoolsMediaAssets', icon_png_64x64: string, logo_png?: string | null | undefined, logo_svg?: string | null | undefined, color_fg?: string | null | undefined, color_bg?: string | null | undefined } | null | undefined, itn?: { __typename?: 'ITNVerification', owner: string, witness: string } | null | undefined } } | null | undefined } | null | undefined } } | null | undefined> | null | undefined };
+export type StakePoolsByMetadataQuery = { __typename?: 'Query', queryStakePoolMetadata?: Array<{ __typename?: 'StakePoolMetadata', poolParameters: { __typename?: 'PoolParameters', stakePool: { __typename?: 'StakePool', id: string, hexId: string, status: StakePoolStatus, poolParameters: Array<{ __typename?: 'PoolParameters', cost: bigint, vrf: string, pledge: bigint, metadata?: { __typename?: 'StakePoolMetadata', ticker: string, name: string, description: string, homepage: string, extDataUrl?: string | null | undefined, extSigUrl?: string | null | undefined, extVkey?: string | null | undefined, ext?: { __typename?: 'ExtendedStakePoolMetadata', serial: number, pool: { __typename?: 'ExtendedStakePoolMetadataFields', id: string, country?: string | null | undefined, status?: ExtendedPoolStatus | null | undefined, contact?: { __typename?: 'PoolContactData', primary: string, email?: string | null | undefined, facebook?: string | null | undefined, github?: string | null | undefined, feed?: string | null | undefined, telegram?: string | null | undefined, twitter?: string | null | undefined } | null | undefined, media_assets?: { __typename?: 'ThePoolsMediaAssets', icon_png_64x64: string, logo_png?: string | null | undefined, logo_svg?: string | null | undefined, color_fg?: string | null | undefined, color_bg?: string | null | undefined } | null | undefined, itn?: { __typename?: 'ITNVerification', owner: string, witness: string } | null | undefined } } | null | undefined } | null | undefined, owners: Array<{ __typename?: 'RewardAccount', address: string }>, margin: { __typename?: 'Ratio', numerator: number, denominator: number }, relays: Array<{ __typename: 'RelayByAddress', ipv4?: string | null | undefined, ipv6?: string | null | undefined, port?: number | null | undefined } | { __typename: 'RelayByName', hostname: string, port?: number | null | undefined } | { __typename: 'RelayByNameMultihost', dnsName: string }>, poolRegistrationCertificate: { __typename?: 'PoolRegistrationCertificate', transaction: { __typename?: 'Transaction', hash: string } }, rewardAccount: { __typename?: 'RewardAccount', address: string }, metadataJson?: { __typename?: 'StakePoolMetadataJson', hash: string, url: string } | null | undefined }>, metrics: { __typename?: 'StakePoolMetrics', blocksCreated: number, livePledge: bigint, saturation: number, delegators: number, stake: { __typename?: 'StakePoolMetricsStake', live: bigint, active: bigint }, size: { __typename?: 'StakePoolMetricsSize', live: number, active: number } }, poolRetirementCertificates: Array<{ __typename?: 'PoolRetirementCertificate', transaction: { __typename?: 'Transaction', hash: string, block: { __typename?: 'Block', blockNo: number } } }> } } } | null | undefined> | null | undefined };
 
 export type StakePoolsQueryVariables = Exact<{
   query: Scalars['String'];
 }>;
 
 
-export type StakePoolsQuery = { __typename?: 'Query', queryStakePool?: Array<{ __typename?: 'StakePool', id: string, hexId: string, status: StakePoolStatus, owners: Array<string>, cost: string, vrf: string, rewardAccount: string, pledge: string, margin: { __typename?: 'Ratio', numerator: number, denominator: number }, relays: Array<{ __typename: 'RelayByAddress', ipv4?: string | null | undefined, ipv6?: string | null | undefined, port?: number | null | undefined } | { __typename: 'RelayByName', hostname: string, port?: number | null | undefined } | { __typename: 'RelayByNameMultihost', dnsName: string }>, metrics: { __typename?: 'StakePoolMetrics', blocksCreated: number, livePledge: string, saturation: number, delegators: number, stake: { __typename?: 'StakePoolMetricsStake', live: string, active: string }, size: { __typename?: 'StakePoolMetricsSize', live: number, active: number } }, transactions: { __typename?: 'StakePoolTransactions', registration: Array<string>, retirement: Array<string> }, metadataJson?: { __typename?: 'StakePoolMetadataJson', hash: string, url: string } | null | undefined, metadata?: { __typename?: 'StakePoolMetadata', ticker: string, name: string, description: string, homepage: string, extDataUrl?: string | null | undefined, extSigUrl?: string | null | undefined, extVkey?: string | null | undefined, ext?: { __typename?: 'ExtendedStakePoolMetadata', serial: number, pool: { __typename?: 'ExtendedStakePoolMetadataFields', id: string, country?: string | null | undefined, status?: ExtendedPoolStatus | null | undefined, contact?: { __typename?: 'PoolContactData', primary: string, email?: string | null | undefined, facebook?: string | null | undefined, github?: string | null | undefined, feed?: string | null | undefined, telegram?: string | null | undefined, twitter?: string | null | undefined } | null | undefined, media_assets?: { __typename?: 'ThePoolsMediaAssets', icon_png_64x64: string, logo_png?: string | null | undefined, logo_svg?: string | null | undefined, color_fg?: string | null | undefined, color_bg?: string | null | undefined } | null | undefined, itn?: { __typename?: 'ITNVerification', owner: string, witness: string } | null | undefined } } | null | undefined } | null | undefined } | null | undefined> | null | undefined };
+export type StakePoolsQuery = { __typename?: 'Query', queryStakePool?: Array<{ __typename?: 'StakePool', id: string, hexId: string, status: StakePoolStatus, poolParameters: Array<{ __typename?: 'PoolParameters', cost: bigint, vrf: string, pledge: bigint, metadata?: { __typename?: 'StakePoolMetadata', ticker: string, name: string, description: string, homepage: string, extDataUrl?: string | null | undefined, extSigUrl?: string | null | undefined, extVkey?: string | null | undefined, ext?: { __typename?: 'ExtendedStakePoolMetadata', serial: number, pool: { __typename?: 'ExtendedStakePoolMetadataFields', id: string, country?: string | null | undefined, status?: ExtendedPoolStatus | null | undefined, contact?: { __typename?: 'PoolContactData', primary: string, email?: string | null | undefined, facebook?: string | null | undefined, github?: string | null | undefined, feed?: string | null | undefined, telegram?: string | null | undefined, twitter?: string | null | undefined } | null | undefined, media_assets?: { __typename?: 'ThePoolsMediaAssets', icon_png_64x64: string, logo_png?: string | null | undefined, logo_svg?: string | null | undefined, color_fg?: string | null | undefined, color_bg?: string | null | undefined } | null | undefined, itn?: { __typename?: 'ITNVerification', owner: string, witness: string } | null | undefined } } | null | undefined } | null | undefined, owners: Array<{ __typename?: 'RewardAccount', address: string }>, margin: { __typename?: 'Ratio', numerator: number, denominator: number }, relays: Array<{ __typename: 'RelayByAddress', ipv4?: string | null | undefined, ipv6?: string | null | undefined, port?: number | null | undefined } | { __typename: 'RelayByName', hostname: string, port?: number | null | undefined } | { __typename: 'RelayByNameMultihost', dnsName: string }>, poolRegistrationCertificate: { __typename?: 'PoolRegistrationCertificate', transaction: { __typename?: 'Transaction', hash: string } }, rewardAccount: { __typename?: 'RewardAccount', address: string }, metadataJson?: { __typename?: 'StakePoolMetadataJson', hash: string, url: string } | null | undefined }>, metrics: { __typename?: 'StakePoolMetrics', blocksCreated: number, livePledge: bigint, saturation: number, delegators: number, stake: { __typename?: 'StakePoolMetricsStake', live: bigint, active: bigint }, size: { __typename?: 'StakePoolMetricsSize', live: number, active: number } }, poolRetirementCertificates: Array<{ __typename?: 'PoolRetirementCertificate', transaction: { __typename?: 'Transaction', hash: string, block: { __typename?: 'Block', blockNo: number } } }> } | null | undefined> | null | undefined };
 
 export type TipQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type TipQuery = { __typename?: 'Query', queryBlock?: Array<{ __typename?: 'Block', hash: string, blockNo: number, slot: { __typename?: 'Slot', number: number } } | null | undefined> | null | undefined };
 
+type MetadatumValue_BytesMetadatum_Fragment = { __typename: 'BytesMetadatum', bytes: string };
+
+type MetadatumValue_IntegerMetadatum_Fragment = { __typename: 'IntegerMetadatum', int: number };
+
+type MetadatumValue_MetadatumArray_Fragment = { __typename: 'MetadatumArray' };
+
+type MetadatumValue_MetadatumMap_Fragment = { __typename: 'MetadatumMap' };
+
+type MetadatumValue_StringMetadatum_Fragment = { __typename: 'StringMetadatum', string: string };
+
+export type MetadatumValueFragment = MetadatumValue_BytesMetadatum_Fragment | MetadatumValue_IntegerMetadatum_Fragment | MetadatumValue_MetadatumArray_Fragment | MetadatumValue_MetadatumMap_Fragment | MetadatumValue_StringMetadatum_Fragment;
+
+export type MetadatumMapFragment = { __typename?: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string } }> };
+
+export type MetadatumArrayFragment = { __typename?: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> };
+
+export type ProtocolParametersFragment = { __typename?: 'ProtocolParametersAlonzo', stakeKeyDeposit: number, poolDeposit: number };
+
+export type TxInFragment = { __typename?: 'TransactionInput', index: number, address: { __typename?: 'Address', address: string } };
+
+export type CoreTransactionFieldsFragment = { __typename?: 'Transaction', fee: bigint, invalidBefore?: number | null | undefined, invalidHereafter?: number | null | undefined, hash: string, index: number, size: bigint, inputs: Array<{ __typename?: 'TransactionInput', index: number, address: { __typename?: 'Address', address: string } }>, outputs: Array<{ __typename?: 'TransactionOutput', datum?: string | null | undefined, address: { __typename?: 'Address', address: string }, value: { __typename?: 'Value', coin: bigint, assets?: Array<{ __typename?: 'Token', quantity: string, asset: { __typename?: 'Asset', assetId: string } }> | null | undefined } }>, collateral?: Array<{ __typename?: 'TransactionInput', index: number, address: { __typename?: 'Address', address: string } }> | null | undefined, withdrawals?: Array<{ __typename?: 'Withdrawal', quantity: bigint, rewardAccount: { __typename?: 'RewardAccount', address: string } }> | null | undefined, mint?: Array<{ __typename?: 'Token', quantity: string, asset: { __typename?: 'Asset', assetId: string } }> | null | undefined, block: { __typename?: 'Block', blockNo: number, hash: string, slot: { __typename?: 'Slot', number: number } }, redeemers?: Array<{ __typename?: 'Redeemer', index: number, purpose: string, scriptHash: string, executionUnits: { __typename?: 'ExecutionUnits', memory: number, steps: number } }> | null | undefined, signatures: Array<{ __typename?: 'Signature', signature: string, publicKey: { __typename?: 'PublicKey', key: string } }>, auxiliaryData?: { __typename?: 'AuxiliaryData', hash: string, body: { __typename?: 'AuxiliaryDataBody', blob?: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string } }> | null | undefined } } | null | undefined };
+
+export type TransactionsByHashesQueryVariables = Exact<{
+  hashes: Array<Scalars['String']> | Scalars['String'];
+}>;
+
+
+export type TransactionsByHashesQuery = { __typename?: 'Query', queryProtocolParametersAlonzo?: Array<{ __typename?: 'ProtocolParametersAlonzo', stakeKeyDeposit: number, poolDeposit: number } | null | undefined> | null | undefined, queryTransaction?: Array<{ __typename?: 'Transaction', fee: bigint, invalidBefore?: number | null | undefined, invalidHereafter?: number | null | undefined, hash: string, index: number, size: bigint, inputs: Array<{ __typename?: 'TransactionInput', index: number, address: { __typename?: 'Address', address: string } }>, outputs: Array<{ __typename?: 'TransactionOutput', datum?: string | null | undefined, address: { __typename?: 'Address', address: string }, value: { __typename?: 'Value', coin: bigint, assets?: Array<{ __typename?: 'Token', quantity: string, asset: { __typename?: 'Asset', assetId: string } }> | null | undefined } }>, collateral?: Array<{ __typename?: 'TransactionInput', index: number, address: { __typename?: 'Address', address: string } }> | null | undefined, withdrawals?: Array<{ __typename?: 'Withdrawal', quantity: bigint, rewardAccount: { __typename?: 'RewardAccount', address: string } }> | null | undefined, mint?: Array<{ __typename?: 'Token', quantity: string, asset: { __typename?: 'Asset', assetId: string } }> | null | undefined, block: { __typename?: 'Block', blockNo: number, hash: string, slot: { __typename?: 'Slot', number: number } }, redeemers?: Array<{ __typename?: 'Redeemer', index: number, purpose: string, scriptHash: string, executionUnits: { __typename?: 'ExecutionUnits', memory: number, steps: number } }> | null | undefined, signatures: Array<{ __typename?: 'Signature', signature: string, publicKey: { __typename?: 'PublicKey', key: string } }>, auxiliaryData?: { __typename?: 'AuxiliaryData', hash: string, body: { __typename?: 'AuxiliaryDataBody', blob?: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string } }> | null | undefined } } | null | undefined } | null | undefined> | null | undefined };
+
+export type TransactionIdsByAddressesQueryVariables = Exact<{
+  addresses: Array<Scalars['String']> | Scalars['String'];
+}>;
+
+
+export type TransactionIdsByAddressesQuery = { __typename?: 'Query', queryProtocolParametersAlonzo?: Array<{ __typename?: 'ProtocolParametersAlonzo', stakeKeyDeposit: number, poolDeposit: number } | null | undefined> | null | undefined, queryAddress?: Array<{ __typename?: 'Address', inputs: Array<{ __typename?: 'TransactionInput', transaction: { __typename?: 'Transaction', fee: bigint, invalidBefore?: number | null | undefined, invalidHereafter?: number | null | undefined, hash: string, index: number, size: bigint, inputs: Array<{ __typename?: 'TransactionInput', index: number, address: { __typename?: 'Address', address: string } }>, outputs: Array<{ __typename?: 'TransactionOutput', datum?: string | null | undefined, address: { __typename?: 'Address', address: string }, value: { __typename?: 'Value', coin: bigint, assets?: Array<{ __typename?: 'Token', quantity: string, asset: { __typename?: 'Asset', assetId: string } }> | null | undefined } }>, collateral?: Array<{ __typename?: 'TransactionInput', index: number, address: { __typename?: 'Address', address: string } }> | null | undefined, withdrawals?: Array<{ __typename?: 'Withdrawal', quantity: bigint, rewardAccount: { __typename?: 'RewardAccount', address: string } }> | null | undefined, mint?: Array<{ __typename?: 'Token', quantity: string, asset: { __typename?: 'Asset', assetId: string } }> | null | undefined, block: { __typename?: 'Block', blockNo: number, hash: string, slot: { __typename?: 'Slot', number: number } }, redeemers?: Array<{ __typename?: 'Redeemer', index: number, purpose: string, scriptHash: string, executionUnits: { __typename?: 'ExecutionUnits', memory: number, steps: number } }> | null | undefined, signatures: Array<{ __typename?: 'Signature', signature: string, publicKey: { __typename?: 'PublicKey', key: string } }>, auxiliaryData?: { __typename?: 'AuxiliaryData', hash: string, body: { __typename?: 'AuxiliaryDataBody', blob?: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string } }> | null | undefined } } | null | undefined } }>, utxo: Array<{ __typename?: 'TransactionOutput', transaction: { __typename?: 'Transaction', fee: bigint, invalidBefore?: number | null | undefined, invalidHereafter?: number | null | undefined, hash: string, index: number, size: bigint, inputs: Array<{ __typename?: 'TransactionInput', index: number, address: { __typename?: 'Address', address: string } }>, outputs: Array<{ __typename?: 'TransactionOutput', datum?: string | null | undefined, address: { __typename?: 'Address', address: string }, value: { __typename?: 'Value', coin: bigint, assets?: Array<{ __typename?: 'Token', quantity: string, asset: { __typename?: 'Asset', assetId: string } }> | null | undefined } }>, collateral?: Array<{ __typename?: 'TransactionInput', index: number, address: { __typename?: 'Address', address: string } }> | null | undefined, withdrawals?: Array<{ __typename?: 'Withdrawal', quantity: bigint, rewardAccount: { __typename?: 'RewardAccount', address: string } }> | null | undefined, mint?: Array<{ __typename?: 'Token', quantity: string, asset: { __typename?: 'Asset', assetId: string } }> | null | undefined, block: { __typename?: 'Block', blockNo: number, hash: string, slot: { __typename?: 'Slot', number: number } }, redeemers?: Array<{ __typename?: 'Redeemer', index: number, purpose: string, scriptHash: string, executionUnits: { __typename?: 'ExecutionUnits', memory: number, steps: number } }> | null | undefined, signatures: Array<{ __typename?: 'Signature', signature: string, publicKey: { __typename?: 'PublicKey', key: string } }>, auxiliaryData?: { __typename?: 'AuxiliaryData', hash: string, body: { __typename?: 'AuxiliaryDataBody', blob?: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string } }> | null | undefined } } | null | undefined } }> } | null | undefined> | null | undefined };
+
+export const CertificateTransactionFieldsFragmentDoc = gql`
+    fragment certificateTransactionFields on Transaction {
+  block {
+    blockNo
+  }
+  hash
+}
+    `;
 export const AllStakePoolFieldsFragmentDoc = gql`
     fragment allStakePoolFields on StakePool {
   id
   hexId
   status
-  owners
-  cost
-  margin {
-    numerator
-    denominator
+  poolParameters(
+    order: {desc: sinceEpoch, then: {desc: transactionBlockNo}}
+    first: 1
+  ) {
+    metadata {
+      ticker
+      name
+      description
+      homepage
+      extDataUrl
+      extSigUrl
+      extVkey
+      ext {
+        serial
+        pool {
+          id
+          country
+          status
+          contact {
+            primary
+            email
+            facebook
+            github
+            feed
+            telegram
+            twitter
+          }
+          media_assets {
+            icon_png_64x64
+            logo_png
+            logo_svg
+            color_fg
+            color_bg
+          }
+          itn {
+            owner
+            witness
+          }
+        }
+      }
+    }
+    owners {
+      address
+    }
+    cost
+    margin {
+      numerator
+      denominator
+    }
+    vrf
+    relays {
+      __typename
+      ... on RelayByName {
+        hostname
+        port
+      }
+      ... on RelayByAddress {
+        ipv4
+        ipv6
+        port
+      }
+      ... on RelayByNameMultihost {
+        dnsName
+      }
+    }
+    poolRegistrationCertificate {
+      transaction {
+        hash
+      }
+    }
+    rewardAccount {
+      address
+    }
+    pledge
+    metadataJson {
+      hash
+      url
+    }
   }
-  vrf
-  relays {
-    __typename
-    ... on RelayByName {
-      hostname
-      port
-    }
-    ... on RelayByAddress {
-      ipv4
-      ipv6
-      port
-    }
-    ... on RelayByNameMultihost {
-      dnsName
-    }
-  }
-  rewardAccount
-  pledge
   metrics {
     blocksCreated
     livePledge
@@ -9131,53 +10844,172 @@ export const AllStakePoolFieldsFragmentDoc = gql`
     saturation
     delegators
   }
-  transactions {
-    registration
-    retirement
+  poolRetirementCertificates {
+    transaction {
+      ...certificateTransactionFields
+    }
   }
-  metadataJson {
-    hash
-    url
+}
+    ${CertificateTransactionFieldsFragmentDoc}`;
+export const ProtocolParametersFragmentDoc = gql`
+    fragment protocolParameters on ProtocolParametersAlonzo {
+  stakeKeyDeposit
+  poolDeposit
+}
+    `;
+export const TxInFragmentDoc = gql`
+    fragment txIn on TransactionInput {
+  index
+  address {
+    address
   }
-  metadata {
-    ticker
-    name
-    description
-    homepage
-    extDataUrl
-    extSigUrl
-    extVkey
-    ext {
-      serial
-      pool {
-        id
-        country
-        status
-        contact {
-          primary
-          email
-          facebook
-          github
-          feed
-          telegram
-          twitter
-        }
-        media_assets {
-          icon_png_64x64
-          logo_png
-          logo_svg
-          color_fg
-          color_bg
-        }
-        itn {
-          owner
-          witness
+}
+    `;
+export const MetadatumValueFragmentDoc = gql`
+    fragment metadatumValue on Metadatum {
+  __typename
+  ... on BytesMetadatum {
+    bytes
+  }
+  ... on IntegerMetadatum {
+    int
+  }
+  ... on StringMetadatum {
+    string
+  }
+}
+    `;
+export const MetadatumArrayFragmentDoc = gql`
+    fragment metadatumArray on MetadatumArray {
+  array {
+    ...metadatumValue
+    ... on MetadatumArray {
+      array {
+        ...metadatumValue
+      }
+    }
+    ... on MetadatumMap {
+      map {
+        key
+        metadatum {
+          ...metadatumValue
         }
       }
     }
   }
 }
-    `;
+    ${MetadatumValueFragmentDoc}`;
+export const MetadatumMapFragmentDoc = gql`
+    fragment metadatumMap on MetadatumMap {
+  map {
+    key
+    metadatum {
+      ...metadatumValue
+      ... on MetadatumArray {
+        ...metadatumArray
+      }
+      ... on MetadatumMap {
+        __typename
+        map {
+          key
+          metadatum {
+            ...metadatumValue
+            ... on MetadatumArray {
+              ...metadatumArray
+            }
+          }
+        }
+      }
+    }
+  }
+}
+    ${MetadatumValueFragmentDoc}
+${MetadatumArrayFragmentDoc}`;
+export const CoreTransactionFieldsFragmentDoc = gql`
+    fragment coreTransactionFields on Transaction {
+  inputs {
+    ...txIn
+  }
+  outputs {
+    address {
+      address
+    }
+    value {
+      coin
+      assets {
+        asset {
+          assetId
+        }
+        quantity
+      }
+    }
+    datum
+  }
+  collateral {
+    ...txIn
+  }
+  fee
+  invalidBefore
+  invalidHereafter
+  withdrawals {
+    rewardAccount {
+      address
+    }
+    quantity
+  }
+  mint {
+    asset {
+      assetId
+    }
+    quantity
+  }
+  hash
+  index
+  size
+  block {
+    blockNo
+    slot {
+      number
+    }
+    hash
+  }
+  redeemers {
+    index
+    purpose
+    scriptHash
+    executionUnits {
+      memory
+      steps
+    }
+  }
+  signatures {
+    publicKey {
+      key
+    }
+    signature
+  }
+  auxiliaryData {
+    hash
+    body {
+      blob {
+        key
+        metadatum {
+          ...metadatumValue
+          ... on MetadatumArray {
+            ...metadatumArray
+          }
+          ... on MetadatumMap {
+            ...metadatumMap
+          }
+        }
+      }
+    }
+  }
+}
+    ${TxInFragmentDoc}
+${MetadatumValueFragmentDoc}
+${MetadatumArrayFragmentDoc}
+${MetadatumMapFragmentDoc}`;
 export const BlocksByHashesDocument = gql`
     query BlocksByHashes($hashes: [String!]!) {
   queryBlock(filter: {hash: {in: $hashes}}) {
@@ -9188,7 +11020,12 @@ export const BlocksByHashesDocument = gql`
     }
     issuer {
       id
-      vrf
+      poolParameters(
+        order: {desc: sinceEpoch, then: {desc: transactionBlockNo}}
+        first: 1
+      ) {
+        vrf
+      }
     }
     size
     transactionsAggregate {
@@ -9213,20 +11050,26 @@ export const BlocksByHashesDocument = gql`
     `;
 export const CurrentProtocolParametersDocument = gql`
     query CurrentProtocolParameters {
-  queryProtocolParametersAlonzo(order: {desc: flatProtocolVersion}, first: 1) {
-    coinsPerUtxoWord
-    maxTxSize
-    maxValueSize
-    stakeKeyDeposit
-    poolDeposit
-    maxCollateralInputs
-    minFeeCoefficient
-    minFeeConstant
-    minPoolCost
-    protocolVersion {
-      major
-      minor
-      patch
+  queryProtocolVersion(
+    order: {desc: major, then: {desc: minor, then: {desc: patch}}}
+  ) {
+    protocolParameters {
+      ... on ProtocolParametersAlonzo {
+        coinsPerUtxoWord
+        maxTxSize
+        maxValueSize
+        stakeKeyDeposit
+        poolDeposit
+        maxCollateralInputs
+        minFeeCoefficient
+        minFeeConstant
+        minPoolCost
+        protocolVersion {
+          major
+          minor
+          patch
+        }
+      }
     }
   }
 }
@@ -9285,8 +11128,10 @@ export const StakePoolsByMetadataDocument = gql`
   queryStakePoolMetadata(
     filter: {and: [{or: [{name: {anyoftext: $query}}, {ticker: {anyoftext: $query}}]}, {not: {stakePoolId: {in: $omit}}}]}
   ) {
-    stakePool {
-      ...allStakePoolFields
+    poolParameters {
+      stakePool {
+        ...allStakePoolFields
+      }
     }
   }
 }
@@ -9309,6 +11154,37 @@ export const TipDocument = gql`
   }
 }
     `;
+export const TransactionsByHashesDocument = gql`
+    query TransactionsByHashes($hashes: [String!]!) {
+  queryProtocolParametersAlonzo {
+    ...protocolParameters
+  }
+  queryTransaction(filter: {hash: {in: $hashes}}) {
+    ...coreTransactionFields
+  }
+}
+    ${ProtocolParametersFragmentDoc}
+${CoreTransactionFieldsFragmentDoc}`;
+export const TransactionIdsByAddressesDocument = gql`
+    query TransactionIdsByAddresses($addresses: [String!]!) {
+  queryProtocolParametersAlonzo {
+    ...protocolParameters
+  }
+  queryAddress(filter: {address: {in: $addresses}}) {
+    inputs {
+      transaction {
+        ...coreTransactionFields
+      }
+    }
+    utxo {
+      transaction {
+        ...coreTransactionFields
+      }
+    }
+  }
+}
+    ${ProtocolParametersFragmentDoc}
+${CoreTransactionFieldsFragmentDoc}`;
 
 export type SdkFunctionWrapper = <T>(action: (requestHeaders?:Record<string, string>) => Promise<T>, operationName: string) => Promise<T>;
 
@@ -9337,6 +11213,12 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     Tip(variables?: TipQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<TipQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<TipQuery>(TipDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'Tip');
+    },
+    TransactionsByHashes(variables: TransactionsByHashesQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<TransactionsByHashesQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<TransactionsByHashesQuery>(TransactionsByHashesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'TransactionsByHashes');
+    },
+    TransactionIdsByAddresses(variables: TransactionIdsByAddressesQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<TransactionIdsByAddressesQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<TransactionIdsByAddressesQuery>(TransactionIdsByAddressesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'TransactionIdsByAddresses');
     }
   };
 }

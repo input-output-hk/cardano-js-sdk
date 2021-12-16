@@ -1,35 +1,9 @@
 // Review: do we want to keep protocol parameter types per era?
 
-import { Epoch } from './Epoch';
-import { ExecutionPrices, ExecutionUnits } from './ExUnits';
+import { Epoch } from '../Epoch';
 import { Field, Int, ObjectType } from 'type-graphql';
-import { Ratio } from './Ratio';
-
-@ObjectType()
-export class ProtocolVersion {
-  @Field(() => Int)
-  major: number;
-  @Field(() => Int)
-  minor: number;
-  @Field(() => Int, { nullable: true })
-  patch?: number;
-}
-
-@ObjectType()
-export class CostModelCoefficient {
-  @Field(() => String)
-  key: string;
-  @Field(() => Int)
-  coefficient: number;
-}
-
-@ObjectType()
-export class CostModel {
-  @Field(() => String)
-  language: string;
-  @Field(() => [CostModelCoefficient])
-  coefficients: CostModelCoefficient[];
-}
+import { ProtocolVersion } from './ProtocolVersion';
+import { Ratio } from '../Ratio';
 
 @ObjectType()
 export class ProtocolParametersShelley {
@@ -63,30 +37,6 @@ export class ProtocolParametersShelley {
   extraEntropy?: string;
   @Field(() => ProtocolVersion)
   protocolVersion: ProtocolVersion;
-  @Field(() => Int, { description: 'to be used for order in queries' })
-  flatProtocolVersion: number;
   @Field(() => Int)
   minUtxoValue: number;
-}
-
-@ObjectType()
-export class ProtocolParametersAlonzo extends ProtocolParametersShelley {
-  @Field(() => Int)
-  minPoolCost: number;
-  @Field(() => Int)
-  coinsPerUtxoWord: number;
-  @Field(() => Int)
-  maxValueSize: number;
-  @Field(() => ExecutionPrices)
-  executionPrices: ExecutionPrices;
-  @Field(() => [CostModel])
-  costModels: CostModel[];
-  @Field(() => ExecutionUnits)
-  maxExecutionUnitsPerTransaction: ExecutionUnits;
-  @Field(() => ExecutionUnits)
-  maxExecutionUnitsPerBlock: ExecutionUnits;
-  @Field(() => Int)
-  collateralPercentage: number;
-  @Field(() => Int)
-  maxCollateralInputs: number;
 }

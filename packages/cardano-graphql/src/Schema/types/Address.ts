@@ -3,7 +3,15 @@
 import { ActiveStake } from './ActiveStake';
 import { Cardano } from '@cardano-sdk/core';
 import { Directive, Field, ObjectType, registerEnumType } from 'type-graphql';
-import { TransactionInput, TransactionOutput } from './Transaction';
+import {
+  MirCertificate,
+  StakeDelegationCertificate,
+  StakeKeyDeregistrationCertificate,
+  StakeKeyRegistrationCertificate,
+  TransactionInput,
+  TransactionOutput
+} from './Transaction';
+import { PublicKey } from './PublicKey';
 
 enum AddressType {
   byron = 'byron',
@@ -22,14 +30,27 @@ export class RewardAccount {
   @Directive('@hasInverse(field: rewardAccount)')
   @Field(() => Address)
   addresses: Address[];
+  @Field(() => PublicKey)
+  publicKey: PublicKey;
+  @Field(() => [StakeKeyRegistrationCertificate])
+  registrationCertificates: StakeKeyRegistrationCertificate[];
+  @Field(() => [StakeKeyDeregistrationCertificate], { nullable: true })
+  deregistrationCertificates?: StakeKeyDeregistrationCertificate[];
+  @Field(() => [StakeDelegationCertificate], { nullable: true })
+  delegationCertificates?: StakeDelegationCertificate[];
+  @Field(() => [MirCertificate], { nullable: true })
+  mirCertificates?: MirCertificate[];
 }
 
 @ObjectType()
 export class Address {
   @Field(() => AddressType)
   addressType: AddressType;
+  @Directive('@id')
   @Field(() => String)
   address: Cardano.Address;
+  @Field(() => PublicKey)
+  paymentPublicKey: PublicKey;
   @Field(() => RewardAccount, { nullable: true })
   rewardAccount?: RewardAccount;
   @Field(() => [TransactionInput], { description: 'Spending history' })

@@ -4,7 +4,7 @@ import { Block } from './Block';
 import { Cardano } from '@cardano-sdk/core';
 import { Directive, Field, Int, ObjectType } from 'type-graphql';
 import { Int64 } from './util';
-import { ProtocolParameters } from './ProtocolParametersUnion';
+import { ProtocolParameters } from './ProtocolParameters/ProtocolParametersUnion';
 import { Slot } from './Slot';
 
 @ObjectType()

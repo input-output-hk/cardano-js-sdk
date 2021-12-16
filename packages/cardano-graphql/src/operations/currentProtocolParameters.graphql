@@ -1,18 +1,22 @@
 query CurrentProtocolParameters {
-  queryProtocolParametersAlonzo(order: { desc: flatProtocolVersion }, first: 1) {
-    coinsPerUtxoWord
-    maxTxSize
-    maxValueSize
-    stakeKeyDeposit
-    poolDeposit
-    maxCollateralInputs
-    minFeeCoefficient
-    minFeeConstant
-    minPoolCost
-    protocolVersion {
-      major
-      minor
-      patch
+  queryProtocolVersion(order: { desc: major, then: { desc: minor, then: { desc: patch } } }) {
+    protocolParameters {
+      ... on ProtocolParametersAlonzo {
+        coinsPerUtxoWord
+        maxTxSize
+        maxValueSize
+        stakeKeyDeposit
+        poolDeposit
+        maxCollateralInputs
+        minFeeCoefficient
+        minFeeConstant
+        minPoolCost
+        protocolVersion {
+          major
+          minor
+          patch
+        }
+      }
     }
   }
 }

@@ -13,6 +13,7 @@ registerEnumType(ExtendedPoolStatus, { name: 'ExtendedPoolStatus' });
 
 @ObjectType()
 export class ITNVerification implements Cardano.ITNVerification {
+  // TODO: these could possibly be relationships to objects?
   [k: string]: unknown;
   @Field()
   owner: string;
@@ -68,9 +69,9 @@ export class ExtendedStakePoolMetadataFields implements Cardano.ExtendedStakePoo
   })
   status?: Cardano.ExtendedPoolStatus;
   @Field(() => PoolContactData, { nullable: true })
-  contact?: Cardano.PoolContactData;
+  contact?: PoolContactData;
   @Field(() => ThePoolsMediaAssets, { nullable: true })
-  media_assets?: Cardano.ThePoolsMediaAssets;
+  media_assets?: ThePoolsMediaAssets;
   @Field(() => ITNVerification, { nullable: true })
-  itn?: Cardano.ITNVerification;
+  itn?: ITNVerification;
 }

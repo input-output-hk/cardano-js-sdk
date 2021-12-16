@@ -3,7 +3,6 @@ export * from './Ratio';
 export * from './Ada';
 export * from './Address';
 export * from './StakePool';
-export * from './ExtendedStakePoolMetadataFields';
 export * from './Block';
 export * from './ExUnits';
 export * from './Transaction';

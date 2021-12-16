@@ -1,13 +1,13 @@
 /* eslint-disable no-use-before-define */
-import { AnyMetadatum, Metadatum } from './Metadatum';
 import { AuxiliaryData } from './AuxiliaryData';
 import { Directive, Field, ObjectType } from 'type-graphql';
+import { KeyValueMetadatum } from './Metadatum';
 import { Script } from './Script';
 
 @ObjectType()
 export class AuxiliaryDataBody {
-  @Field(() => [Metadatum], { nullable: true })
-  blob?: AnyMetadatum[];
+  @Field(() => [KeyValueMetadatum], { nullable: true })
+  blob?: KeyValueMetadatum[];
   @Directive('@hasInverse(field: auxiliaryDataBody)')
   @Field(() => [Script], { nullable: true })
   scripts?: Script[];

@@ -26,3 +26,5 @@ export const getExactlyOneObject = <T>(objects: (T | undefined | null)[] | undef
   if (!obj) throw new ProviderError(ProviderFailure.InvalidResponse, null, objectName);
   return obj;
 };
+
+export type GetExactlyOneObject = typeof getExactlyOneObject;

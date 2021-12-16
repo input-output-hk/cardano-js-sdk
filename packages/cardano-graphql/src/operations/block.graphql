@@ -1,3 +1,4 @@
+# TODO: write e2e tests to test operations
 query BlocksByHashes($hashes: [String!]!) {
   queryBlock(filter: { hash: { in: $hashes } }) {
     slot {
@@ -7,7 +8,9 @@ query BlocksByHashes($hashes: [String!]!) {
     }
     issuer {
       id
-      vrf
+      poolParameters(order: { desc: sinceEpoch, then: { desc: transactionBlockNo } }, first: 1) {
+        vrf
+      }
     }
     size
     transactionsAggregate {
