@@ -100,6 +100,7 @@ export interface StakePoolTransactions {
 }
 
 export enum StakePoolStatus {
+  Activating = 'activating',
   Active = 'active',
   Retired = 'retired',
   Retiring = 'retiring'
