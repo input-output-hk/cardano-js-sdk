@@ -15,5 +15,5 @@ export class TransactionOutput {
   @Field(() => Value)
   value: Value;
   @Field(() => String, { description: 'hex-encoded 32 byte hash', nullable: true })
-  datum?: Cardano.Hash32ByteBase16;
+  datumHash?: Cardano.Hash32ByteBase16;
 }

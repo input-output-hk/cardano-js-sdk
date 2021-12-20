@@ -11,5 +11,8 @@ describe('CardanoGraphQLWalletProvider', () => {
     expect(typeof provider.ledgerTip).toBe('function');
     expect(typeof provider.networkInfo).toBe('function');
     expect(typeof provider.queryBlocksByHashes).toBe('function');
+    // TODO
+    // expect(typeof provider.queryTransactionsByAddresses).toBe('function');
+    // expect(typeof provider.queryTransactionsByHashes).toBe('function');
   });
 });

@@ -365,7 +365,7 @@ export type AddAssetPayloadAssetArgs = {
 export type AddAuxiliaryDataBodyInput = {
   auxiliaryData: AuxiliaryDataRef;
   blob?: Maybe<Array<KeyValueMetadatumRef>>;
-  scripts?: Maybe<Array<ScriptRef>>;
+  scripts?: Maybe<Array<AuxiliaryScriptRef>>;
 };
 
 export type AddAuxiliaryDataBodyPayload = {
@@ -401,6 +401,24 @@ export type AddAuxiliaryDataPayloadAuxiliaryDataArgs = {
   order?: Maybe<AuxiliaryDataOrder>;
 };
 
+export type AddAuxiliaryScriptInput = {
+  auxiliaryDataBody: AuxiliaryDataBodyRef;
+  script: ScriptRef;
+};
+
+export type AddAuxiliaryScriptPayload = {
+  __typename?: 'AddAuxiliaryScriptPayload';
+  auxiliaryScript?: Maybe<Array<Maybe<AuxiliaryScript>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type AddAuxiliaryScriptPayloadAuxiliaryScriptArgs = {
+  filter?: Maybe<AuxiliaryScriptFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
 export type AddBlockInput = {
   blockNo: Scalars['Int'];
   confirmations: Scalars['Int'];
@@ -431,6 +449,30 @@ export type AddBlockPayloadBlockArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<BlockOrder>;
+};
+
+export type AddBootstrapWitnessInput = {
+  /** Extra attributes carried by Byron addresses (network magic and/or HD payload) */
+  addressAttributes?: Maybe<Scalars['String']>;
+  /** An Ed25519-BIP32 chain-code for key deriviation */
+  chainCode?: Maybe<Scalars['String']>;
+  key?: Maybe<PublicKeyRef>;
+  /** hex-encoded Ed25519 signature */
+  signature: Scalars['String'];
+};
+
+export type AddBootstrapWitnessPayload = {
+  __typename?: 'AddBootstrapWitnessPayload';
+  bootstrapWitness?: Maybe<Array<Maybe<BootstrapWitness>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type AddBootstrapWitnessPayloadBootstrapWitnessArgs = {
+  filter?: Maybe<BootstrapWitnessFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<BootstrapWitnessOrder>;
 };
 
 export type AddBytesMetadatumInput = {
@@ -507,6 +549,25 @@ export type AddCostModelPayloadCostModelArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<CostModelOrder>;
+};
+
+export type AddDatumInput = {
+  datum: Scalars['String'];
+  hash: Scalars['String'];
+};
+
+export type AddDatumPayload = {
+  __typename?: 'AddDatumPayload';
+  datum?: Maybe<Array<Maybe<Datum>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type AddDatumPayloadDatumArgs = {
+  filter?: Maybe<DatumFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<DatumOrder>;
 };
 
 export type AddEpochInput = {
@@ -749,6 +810,47 @@ export type AddMirCertificatePayloadMirCertificateArgs = {
   order?: Maybe<MirCertificateOrder>;
 };
 
+export type AddNOfInput = {
+  key: Scalars['String'];
+  scripts: Array<NativeScriptRef>;
+};
+
+export type AddNOfPayload = {
+  __typename?: 'AddNOfPayload';
+  nOf?: Maybe<Array<Maybe<NOf>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type AddNOfPayloadNOfArgs = {
+  filter?: Maybe<NOfFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<NOfOrder>;
+};
+
+export type AddNativeScriptInput = {
+  all?: Maybe<Array<NativeScriptRef>>;
+  any?: Maybe<Array<NativeScriptRef>>;
+  expiresAt?: Maybe<SlotRef>;
+  nof?: Maybe<NOfRef>;
+  startsAt?: Maybe<SlotRef>;
+  vkey?: Maybe<PublicKeyRef>;
+};
+
+export type AddNativeScriptPayload = {
+  __typename?: 'AddNativeScriptPayload';
+  nativeScript?: Maybe<Array<Maybe<NativeScript>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type AddNativeScriptPayloadNativeScriptArgs = {
+  filter?: Maybe<NativeScriptFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
 export type AddNetworkConstantsInput = {
   activeSlotsCoefficient: Scalars['Float'];
   maxKESEvolutions: Scalars['Int'];
@@ -773,6 +875,29 @@ export type AddNetworkConstantsPayloadNetworkConstantsArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<NetworkConstantsOrder>;
+};
+
+export type AddPlutusScriptInput = {
+  /** Serialized plutus-core program */
+  cborHex: Scalars['String'];
+  description: Scalars['String'];
+  hash: Scalars['String'];
+  /** 'PlutusScriptV1' | 'PlutusScriptV2' */
+  type: Scalars['String'];
+};
+
+export type AddPlutusScriptPayload = {
+  __typename?: 'AddPlutusScriptPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  plutusScript?: Maybe<Array<Maybe<PlutusScript>>>;
+};
+
+
+export type AddPlutusScriptPayloadPlutusScriptArgs = {
+  filter?: Maybe<PlutusScriptFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<PlutusScriptOrder>;
 };
 
 export type AddPoolContactDataInput = {
@@ -1023,7 +1148,7 @@ export type AddRedeemerInput = {
   index: Scalars['Int'];
   purpose: Scalars['String'];
   scriptHash: Scalars['String'];
-  transaction: TransactionRef;
+  witness: WitnessRef;
 };
 
 export type AddRedeemerPayload = {
@@ -1122,32 +1247,11 @@ export type AddRewardAccountPayloadRewardAccountArgs = {
   order?: Maybe<RewardAccountOrder>;
 };
 
-export type AddScriptInput = {
-  auxiliaryDataBody: AuxiliaryDataBodyRef;
-  hash: Scalars['String'];
-  serializedSize: Scalars['Int64'];
-  type: Scalars['String'];
-};
-
-export type AddScriptPayload = {
-  __typename?: 'AddScriptPayload';
-  numUids?: Maybe<Scalars['Int']>;
-  script?: Maybe<Array<Maybe<Script>>>;
-};
-
-
-export type AddScriptPayloadScriptArgs = {
-  filter?: Maybe<ScriptFilter>;
-  first?: Maybe<Scalars['Int']>;
-  offset?: Maybe<Scalars['Int']>;
-  order?: Maybe<ScriptOrder>;
-};
-
 export type AddSignatureInput = {
   publicKey: PublicKeyRef;
   /** hex-encoded Ed25519 signature */
   signature: Scalars['String'];
-  transaction: TransactionRef;
+  witness: WitnessRef;
 };
 
 export type AddSignaturePayload = {
@@ -1467,18 +1571,17 @@ export type AddTransactionInput = {
   hash: Scalars['String'];
   index: Scalars['Int'];
   inputs: Array<TransactionInputRef>;
-  invalidBefore?: Maybe<Scalars['Int']>;
-  invalidHereafter?: Maybe<Scalars['Int']>;
+  invalidBefore?: Maybe<SlotRef>;
+  invalidHereafter?: Maybe<SlotRef>;
   mint?: Maybe<Array<TokenRef>>;
   outputs: Array<TransactionOutputRef>;
-  redeemers?: Maybe<Array<RedeemerRef>>;
   requiredExtraSignatures: Array<PublicKeyRef>;
   scriptIntegrityHash?: Maybe<Scalars['String']>;
-  signatures: Array<SignatureRef>;
   size: Scalars['Int64'];
   totalOutputCoin: Scalars['Int64'];
   validContract: Scalars['Boolean'];
   withdrawals?: Maybe<Array<WithdrawalRef>>;
+  witness: WitnessRef;
 };
 
 export type AddTransactionInputInput = {
@@ -1507,7 +1610,7 @@ export type AddTransactionInputPayloadTransactionInputArgs = {
 export type AddTransactionOutputInput = {
   address: AddressRef;
   /** hex-encoded 32 byte hash */
-  datum?: Maybe<Scalars['String']>;
+  datumHash?: Maybe<Scalars['String']>;
   index: Scalars['Int'];
   transaction: TransactionRef;
   value: ValueRef;
@@ -1579,6 +1682,48 @@ export type AddWithdrawalPayloadWithdrawalArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<WithdrawalOrder>;
+};
+
+export type AddWitnessInput = {
+  bootstrap?: Maybe<Array<BootstrapWitnessRef>>;
+  datums?: Maybe<Array<DatumRef>>;
+  redeemers?: Maybe<Array<RedeemerRef>>;
+  scripts?: Maybe<Array<WitnessScriptRef>>;
+  signatures: Array<SignatureRef>;
+  transaction: TransactionRef;
+};
+
+export type AddWitnessPayload = {
+  __typename?: 'AddWitnessPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  witness?: Maybe<Array<Maybe<Witness>>>;
+};
+
+
+export type AddWitnessPayloadWitnessArgs = {
+  filter?: Maybe<WitnessFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+export type AddWitnessScriptInput = {
+  key: Scalars['String'];
+  script: ScriptRef;
+  witness: WitnessRef;
+};
+
+export type AddWitnessScriptPayload = {
+  __typename?: 'AddWitnessScriptPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  witnessScript?: Maybe<Array<Maybe<WitnessScript>>>;
+};
+
+
+export type AddWitnessScriptPayloadWitnessScriptArgs = {
+  filter?: Maybe<WitnessScriptFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<WitnessScriptOrder>;
 };
 
 export type Address = {
@@ -1794,8 +1939,8 @@ export type AuxiliaryDataBody = {
   auxiliaryData: AuxiliaryData;
   blob?: Maybe<Array<KeyValueMetadatum>>;
   blobAggregate?: Maybe<KeyValueMetadatumAggregateResult>;
-  scripts?: Maybe<Array<Script>>;
-  scriptsAggregate?: Maybe<ScriptAggregateResult>;
+  scripts?: Maybe<Array<AuxiliaryScript>>;
+  scriptsAggregate?: Maybe<AuxiliaryScriptAggregateResult>;
 };
 
 
@@ -1818,15 +1963,14 @@ export type AuxiliaryDataBodyBlobAggregateArgs = {
 
 
 export type AuxiliaryDataBodyScriptsArgs = {
-  filter?: Maybe<ScriptFilter>;
+  filter?: Maybe<AuxiliaryScriptFilter>;
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
-  order?: Maybe<ScriptOrder>;
 };
 
 
 export type AuxiliaryDataBodyScriptsAggregateArgs = {
-  filter?: Maybe<ScriptFilter>;
+  filter?: Maybe<AuxiliaryScriptFilter>;
 };
 
 export type AuxiliaryDataBodyAggregateResult = {
@@ -1850,13 +1994,13 @@ export enum AuxiliaryDataBodyHasFilter {
 export type AuxiliaryDataBodyPatch = {
   auxiliaryData?: Maybe<AuxiliaryDataRef>;
   blob?: Maybe<Array<KeyValueMetadatumRef>>;
-  scripts?: Maybe<Array<ScriptRef>>;
+  scripts?: Maybe<Array<AuxiliaryScriptRef>>;
 };
 
 export type AuxiliaryDataBodyRef = {
   auxiliaryData?: Maybe<AuxiliaryDataRef>;
   blob?: Maybe<Array<KeyValueMetadatumRef>>;
-  scripts?: Maybe<Array<ScriptRef>>;
+  scripts?: Maybe<Array<AuxiliaryScriptRef>>;
 };
 
 export type AuxiliaryDataFilter = {
@@ -1892,6 +2036,49 @@ export type AuxiliaryDataRef = {
   body?: Maybe<AuxiliaryDataBodyRef>;
   hash?: Maybe<Scalars['String']>;
   transaction?: Maybe<TransactionRef>;
+};
+
+export type AuxiliaryScript = {
+  __typename?: 'AuxiliaryScript';
+  auxiliaryDataBody: AuxiliaryDataBody;
+  script: Script;
+};
+
+
+export type AuxiliaryScriptAuxiliaryDataBodyArgs = {
+  filter?: Maybe<AuxiliaryDataBodyFilter>;
+};
+
+
+export type AuxiliaryScriptScriptArgs = {
+  filter?: Maybe<ScriptFilter>;
+};
+
+export type AuxiliaryScriptAggregateResult = {
+  __typename?: 'AuxiliaryScriptAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+};
+
+export type AuxiliaryScriptFilter = {
+  and?: Maybe<Array<Maybe<AuxiliaryScriptFilter>>>;
+  has?: Maybe<Array<Maybe<AuxiliaryScriptHasFilter>>>;
+  not?: Maybe<AuxiliaryScriptFilter>;
+  or?: Maybe<Array<Maybe<AuxiliaryScriptFilter>>>;
+};
+
+export enum AuxiliaryScriptHasFilter {
+  AuxiliaryDataBody = 'auxiliaryDataBody',
+  Script = 'script'
+}
+
+export type AuxiliaryScriptPatch = {
+  auxiliaryDataBody?: Maybe<AuxiliaryDataBodyRef>;
+  script?: Maybe<ScriptRef>;
+};
+
+export type AuxiliaryScriptRef = {
+  auxiliaryDataBody?: Maybe<AuxiliaryDataBodyRef>;
+  script?: Maybe<ScriptRef>;
 };
 
 export type Block = {
@@ -2066,6 +2253,79 @@ export type BlockRef = {
   totalLiveStake?: Maybe<Scalars['Int64']>;
   totalOutput?: Maybe<Scalars['Int64']>;
   transactions?: Maybe<Array<TransactionRef>>;
+};
+
+export type BootstrapWitness = {
+  __typename?: 'BootstrapWitness';
+  /** Extra attributes carried by Byron addresses (network magic and/or HD payload) */
+  addressAttributes?: Maybe<Scalars['String']>;
+  /** An Ed25519-BIP32 chain-code for key deriviation */
+  chainCode?: Maybe<Scalars['String']>;
+  key?: Maybe<PublicKey>;
+  /** hex-encoded Ed25519 signature */
+  signature: Scalars['String'];
+};
+
+
+export type BootstrapWitnessKeyArgs = {
+  filter?: Maybe<PublicKeyFilter>;
+};
+
+export type BootstrapWitnessAggregateResult = {
+  __typename?: 'BootstrapWitnessAggregateResult';
+  addressAttributesMax?: Maybe<Scalars['String']>;
+  addressAttributesMin?: Maybe<Scalars['String']>;
+  chainCodeMax?: Maybe<Scalars['String']>;
+  chainCodeMin?: Maybe<Scalars['String']>;
+  count?: Maybe<Scalars['Int']>;
+  signatureMax?: Maybe<Scalars['String']>;
+  signatureMin?: Maybe<Scalars['String']>;
+};
+
+export type BootstrapWitnessFilter = {
+  and?: Maybe<Array<Maybe<BootstrapWitnessFilter>>>;
+  has?: Maybe<Array<Maybe<BootstrapWitnessHasFilter>>>;
+  not?: Maybe<BootstrapWitnessFilter>;
+  or?: Maybe<Array<Maybe<BootstrapWitnessFilter>>>;
+};
+
+export enum BootstrapWitnessHasFilter {
+  AddressAttributes = 'addressAttributes',
+  ChainCode = 'chainCode',
+  Key = 'key',
+  Signature = 'signature'
+}
+
+export type BootstrapWitnessOrder = {
+  asc?: Maybe<BootstrapWitnessOrderable>;
+  desc?: Maybe<BootstrapWitnessOrderable>;
+  then?: Maybe<BootstrapWitnessOrder>;
+};
+
+export enum BootstrapWitnessOrderable {
+  AddressAttributes = 'addressAttributes',
+  ChainCode = 'chainCode',
+  Signature = 'signature'
+}
+
+export type BootstrapWitnessPatch = {
+  /** Extra attributes carried by Byron addresses (network magic and/or HD payload) */
+  addressAttributes?: Maybe<Scalars['String']>;
+  /** An Ed25519-BIP32 chain-code for key deriviation */
+  chainCode?: Maybe<Scalars['String']>;
+  key?: Maybe<PublicKeyRef>;
+  /** hex-encoded Ed25519 signature */
+  signature?: Maybe<Scalars['String']>;
+};
+
+export type BootstrapWitnessRef = {
+  /** Extra attributes carried by Byron addresses (network magic and/or HD payload) */
+  addressAttributes?: Maybe<Scalars['String']>;
+  /** An Ed25519-BIP32 chain-code for key deriviation */
+  chainCode?: Maybe<Scalars['String']>;
+  key?: Maybe<PublicKeyRef>;
+  /** hex-encoded Ed25519 signature */
+  signature?: Maybe<Scalars['String']>;
 };
 
 export type BytesMetadatum = {
@@ -2338,6 +2598,54 @@ export type DateTimeRange = {
   min: Scalars['DateTime'];
 };
 
+export type Datum = {
+  __typename?: 'Datum';
+  datum: Scalars['String'];
+  hash: Scalars['String'];
+};
+
+export type DatumAggregateResult = {
+  __typename?: 'DatumAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+  datumMax?: Maybe<Scalars['String']>;
+  datumMin?: Maybe<Scalars['String']>;
+  hashMax?: Maybe<Scalars['String']>;
+  hashMin?: Maybe<Scalars['String']>;
+};
+
+export type DatumFilter = {
+  and?: Maybe<Array<Maybe<DatumFilter>>>;
+  has?: Maybe<Array<Maybe<DatumHasFilter>>>;
+  hash?: Maybe<StringHashFilter>;
+  not?: Maybe<DatumFilter>;
+  or?: Maybe<Array<Maybe<DatumFilter>>>;
+};
+
+export enum DatumHasFilter {
+  Datum = 'datum',
+  Hash = 'hash'
+}
+
+export type DatumOrder = {
+  asc?: Maybe<DatumOrderable>;
+  desc?: Maybe<DatumOrderable>;
+  then?: Maybe<DatumOrder>;
+};
+
+export enum DatumOrderable {
+  Datum = 'datum',
+  Hash = 'hash'
+}
+
+export type DatumPatch = {
+  datum?: Maybe<Scalars['String']>;
+};
+
+export type DatumRef = {
+  datum?: Maybe<Scalars['String']>;
+  hash?: Maybe<Scalars['String']>;
+};
+
 export type DeleteActiveStakePayload = {
   __typename?: 'DeleteActiveStakePayload';
   activeStake?: Maybe<Array<Maybe<ActiveStake>>>;
@@ -2442,6 +2750,20 @@ export type DeleteAuxiliaryDataPayloadAuxiliaryDataArgs = {
   order?: Maybe<AuxiliaryDataOrder>;
 };
 
+export type DeleteAuxiliaryScriptPayload = {
+  __typename?: 'DeleteAuxiliaryScriptPayload';
+  auxiliaryScript?: Maybe<Array<Maybe<AuxiliaryScript>>>;
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type DeleteAuxiliaryScriptPayloadAuxiliaryScriptArgs = {
+  filter?: Maybe<AuxiliaryScriptFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
 export type DeleteBlockPayload = {
   __typename?: 'DeleteBlockPayload';
   block?: Maybe<Array<Maybe<Block>>>;
@@ -2455,6 +2777,21 @@ export type DeleteBlockPayloadBlockArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<BlockOrder>;
+};
+
+export type DeleteBootstrapWitnessPayload = {
+  __typename?: 'DeleteBootstrapWitnessPayload';
+  bootstrapWitness?: Maybe<Array<Maybe<BootstrapWitness>>>;
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type DeleteBootstrapWitnessPayloadBootstrapWitnessArgs = {
+  filter?: Maybe<BootstrapWitnessFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<BootstrapWitnessOrder>;
 };
 
 export type DeleteBytesMetadatumPayload = {
@@ -2515,6 +2852,21 @@ export type DeleteCostModelPayloadCostModelArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<CostModelOrder>;
+};
+
+export type DeleteDatumPayload = {
+  __typename?: 'DeleteDatumPayload';
+  datum?: Maybe<Array<Maybe<Datum>>>;
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type DeleteDatumPayloadDatumArgs = {
+  filter?: Maybe<DatumFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<DatumOrder>;
 };
 
 export type DeleteEpochPayload = {
@@ -2694,6 +3046,35 @@ export type DeleteMirCertificatePayloadMirCertificateArgs = {
   order?: Maybe<MirCertificateOrder>;
 };
 
+export type DeleteNOfPayload = {
+  __typename?: 'DeleteNOfPayload';
+  msg?: Maybe<Scalars['String']>;
+  nOf?: Maybe<Array<Maybe<NOf>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type DeleteNOfPayloadNOfArgs = {
+  filter?: Maybe<NOfFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<NOfOrder>;
+};
+
+export type DeleteNativeScriptPayload = {
+  __typename?: 'DeleteNativeScriptPayload';
+  msg?: Maybe<Scalars['String']>;
+  nativeScript?: Maybe<Array<Maybe<NativeScript>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type DeleteNativeScriptPayloadNativeScriptArgs = {
+  filter?: Maybe<NativeScriptFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
 export type DeleteNetworkConstantsPayload = {
   __typename?: 'DeleteNetworkConstantsPayload';
   msg?: Maybe<Scalars['String']>;
@@ -2707,6 +3088,21 @@ export type DeleteNetworkConstantsPayloadNetworkConstantsArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<NetworkConstantsOrder>;
+};
+
+export type DeletePlutusScriptPayload = {
+  __typename?: 'DeletePlutusScriptPayload';
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+  plutusScript?: Maybe<Array<Maybe<PlutusScript>>>;
+};
+
+
+export type DeletePlutusScriptPayloadPlutusScriptArgs = {
+  filter?: Maybe<PlutusScriptFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<PlutusScriptOrder>;
 };
 
 export type DeletePoolContactDataPayload = {
@@ -2915,21 +3311,6 @@ export type DeleteRewardAccountPayloadRewardAccountArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<RewardAccountOrder>;
-};
-
-export type DeleteScriptPayload = {
-  __typename?: 'DeleteScriptPayload';
-  msg?: Maybe<Scalars['String']>;
-  numUids?: Maybe<Scalars['Int']>;
-  script?: Maybe<Array<Maybe<Script>>>;
-};
-
-
-export type DeleteScriptPayloadScriptArgs = {
-  filter?: Maybe<ScriptFilter>;
-  first?: Maybe<Scalars['Int']>;
-  offset?: Maybe<Scalars['Int']>;
-  order?: Maybe<ScriptOrder>;
 };
 
 export type DeleteSignaturePayload = {
@@ -3227,6 +3608,35 @@ export type DeleteWithdrawalPayloadWithdrawalArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<WithdrawalOrder>;
+};
+
+export type DeleteWitnessPayload = {
+  __typename?: 'DeleteWitnessPayload';
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+  witness?: Maybe<Array<Maybe<Witness>>>;
+};
+
+
+export type DeleteWitnessPayloadWitnessArgs = {
+  filter?: Maybe<WitnessFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+export type DeleteWitnessScriptPayload = {
+  __typename?: 'DeleteWitnessScriptPayload';
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+  witnessScript?: Maybe<Array<Maybe<WitnessScript>>>;
+};
+
+
+export type DeleteWitnessScriptPayloadWitnessScriptArgs = {
+  filter?: Maybe<WitnessScriptFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<WitnessScriptOrder>;
 };
 
 export enum DgraphIndex {
@@ -4106,11 +4516,14 @@ export type Mutation = {
   addAsset?: Maybe<AddAssetPayload>;
   addAuxiliaryData?: Maybe<AddAuxiliaryDataPayload>;
   addAuxiliaryDataBody?: Maybe<AddAuxiliaryDataBodyPayload>;
+  addAuxiliaryScript?: Maybe<AddAuxiliaryScriptPayload>;
   addBlock?: Maybe<AddBlockPayload>;
+  addBootstrapWitness?: Maybe<AddBootstrapWitnessPayload>;
   addBytesMetadatum?: Maybe<AddBytesMetadatumPayload>;
   addCoinSupply?: Maybe<AddCoinSupplyPayload>;
   addCostModel?: Maybe<AddCostModelPayload>;
   addCostModelCoefficient?: Maybe<AddCostModelCoefficientPayload>;
+  addDatum?: Maybe<AddDatumPayload>;
   addEpoch?: Maybe<AddEpochPayload>;
   addExecutionPrices?: Maybe<AddExecutionPricesPayload>;
   addExecutionUnits?: Maybe<AddExecutionUnitsPayload>;
@@ -4123,7 +4536,10 @@ export type Mutation = {
   addMetadatumArray?: Maybe<AddMetadatumArrayPayload>;
   addMetadatumMap?: Maybe<AddMetadatumMapPayload>;
   addMirCertificate?: Maybe<AddMirCertificatePayload>;
+  addNOf?: Maybe<AddNOfPayload>;
+  addNativeScript?: Maybe<AddNativeScriptPayload>;
   addNetworkConstants?: Maybe<AddNetworkConstantsPayload>;
+  addPlutusScript?: Maybe<AddPlutusScriptPayload>;
   addPoolContactData?: Maybe<AddPoolContactDataPayload>;
   addPoolParameters?: Maybe<AddPoolParametersPayload>;
   addPoolRegistrationCertificate?: Maybe<AddPoolRegistrationCertificatePayload>;
@@ -4138,7 +4554,6 @@ export type Mutation = {
   addRelayByName?: Maybe<AddRelayByNamePayload>;
   addRelayByNameMultihost?: Maybe<AddRelayByNameMultihostPayload>;
   addRewardAccount?: Maybe<AddRewardAccountPayload>;
-  addScript?: Maybe<AddScriptPayload>;
   addSignature?: Maybe<AddSignaturePayload>;
   addSlot?: Maybe<AddSlotPayload>;
   addStakeDelegationCertificate?: Maybe<AddStakeDelegationCertificatePayload>;
@@ -4159,6 +4574,8 @@ export type Mutation = {
   addTransactionOutput?: Maybe<AddTransactionOutputPayload>;
   addValue?: Maybe<AddValuePayload>;
   addWithdrawal?: Maybe<AddWithdrawalPayload>;
+  addWitness?: Maybe<AddWitnessPayload>;
+  addWitnessScript?: Maybe<AddWitnessScriptPayload>;
   deleteActiveStake?: Maybe<DeleteActiveStakePayload>;
   deleteAda?: Maybe<DeleteAdaPayload>;
   deleteAdaPots?: Maybe<DeleteAdaPotsPayload>;
@@ -4166,11 +4583,14 @@ export type Mutation = {
   deleteAsset?: Maybe<DeleteAssetPayload>;
   deleteAuxiliaryData?: Maybe<DeleteAuxiliaryDataPayload>;
   deleteAuxiliaryDataBody?: Maybe<DeleteAuxiliaryDataBodyPayload>;
+  deleteAuxiliaryScript?: Maybe<DeleteAuxiliaryScriptPayload>;
   deleteBlock?: Maybe<DeleteBlockPayload>;
+  deleteBootstrapWitness?: Maybe<DeleteBootstrapWitnessPayload>;
   deleteBytesMetadatum?: Maybe<DeleteBytesMetadatumPayload>;
   deleteCoinSupply?: Maybe<DeleteCoinSupplyPayload>;
   deleteCostModel?: Maybe<DeleteCostModelPayload>;
   deleteCostModelCoefficient?: Maybe<DeleteCostModelCoefficientPayload>;
+  deleteDatum?: Maybe<DeleteDatumPayload>;
   deleteEpoch?: Maybe<DeleteEpochPayload>;
   deleteExecutionPrices?: Maybe<DeleteExecutionPricesPayload>;
   deleteExecutionUnits?: Maybe<DeleteExecutionUnitsPayload>;
@@ -4183,7 +4603,10 @@ export type Mutation = {
   deleteMetadatumArray?: Maybe<DeleteMetadatumArrayPayload>;
   deleteMetadatumMap?: Maybe<DeleteMetadatumMapPayload>;
   deleteMirCertificate?: Maybe<DeleteMirCertificatePayload>;
+  deleteNOf?: Maybe<DeleteNOfPayload>;
+  deleteNativeScript?: Maybe<DeleteNativeScriptPayload>;
   deleteNetworkConstants?: Maybe<DeleteNetworkConstantsPayload>;
+  deletePlutusScript?: Maybe<DeletePlutusScriptPayload>;
   deletePoolContactData?: Maybe<DeletePoolContactDataPayload>;
   deletePoolParameters?: Maybe<DeletePoolParametersPayload>;
   deletePoolRegistrationCertificate?: Maybe<DeletePoolRegistrationCertificatePayload>;
@@ -4198,7 +4621,6 @@ export type Mutation = {
   deleteRelayByName?: Maybe<DeleteRelayByNamePayload>;
   deleteRelayByNameMultihost?: Maybe<DeleteRelayByNameMultihostPayload>;
   deleteRewardAccount?: Maybe<DeleteRewardAccountPayload>;
-  deleteScript?: Maybe<DeleteScriptPayload>;
   deleteSignature?: Maybe<DeleteSignaturePayload>;
   deleteSlot?: Maybe<DeleteSlotPayload>;
   deleteStakeDelegationCertificate?: Maybe<DeleteStakeDelegationCertificatePayload>;
@@ -4219,6 +4641,8 @@ export type Mutation = {
   deleteTransactionOutput?: Maybe<DeleteTransactionOutputPayload>;
   deleteValue?: Maybe<DeleteValuePayload>;
   deleteWithdrawal?: Maybe<DeleteWithdrawalPayload>;
+  deleteWitness?: Maybe<DeleteWitnessPayload>;
+  deleteWitnessScript?: Maybe<DeleteWitnessScriptPayload>;
   updateActiveStake?: Maybe<UpdateActiveStakePayload>;
   updateAda?: Maybe<UpdateAdaPayload>;
   updateAdaPots?: Maybe<UpdateAdaPotsPayload>;
@@ -4226,11 +4650,14 @@ export type Mutation = {
   updateAsset?: Maybe<UpdateAssetPayload>;
   updateAuxiliaryData?: Maybe<UpdateAuxiliaryDataPayload>;
   updateAuxiliaryDataBody?: Maybe<UpdateAuxiliaryDataBodyPayload>;
+  updateAuxiliaryScript?: Maybe<UpdateAuxiliaryScriptPayload>;
   updateBlock?: Maybe<UpdateBlockPayload>;
+  updateBootstrapWitness?: Maybe<UpdateBootstrapWitnessPayload>;
   updateBytesMetadatum?: Maybe<UpdateBytesMetadatumPayload>;
   updateCoinSupply?: Maybe<UpdateCoinSupplyPayload>;
   updateCostModel?: Maybe<UpdateCostModelPayload>;
   updateCostModelCoefficient?: Maybe<UpdateCostModelCoefficientPayload>;
+  updateDatum?: Maybe<UpdateDatumPayload>;
   updateEpoch?: Maybe<UpdateEpochPayload>;
   updateExecutionPrices?: Maybe<UpdateExecutionPricesPayload>;
   updateExecutionUnits?: Maybe<UpdateExecutionUnitsPayload>;
@@ -4243,7 +4670,10 @@ export type Mutation = {
   updateMetadatumArray?: Maybe<UpdateMetadatumArrayPayload>;
   updateMetadatumMap?: Maybe<UpdateMetadatumMapPayload>;
   updateMirCertificate?: Maybe<UpdateMirCertificatePayload>;
+  updateNOf?: Maybe<UpdateNOfPayload>;
+  updateNativeScript?: Maybe<UpdateNativeScriptPayload>;
   updateNetworkConstants?: Maybe<UpdateNetworkConstantsPayload>;
+  updatePlutusScript?: Maybe<UpdatePlutusScriptPayload>;
   updatePoolContactData?: Maybe<UpdatePoolContactDataPayload>;
   updatePoolParameters?: Maybe<UpdatePoolParametersPayload>;
   updatePoolRegistrationCertificate?: Maybe<UpdatePoolRegistrationCertificatePayload>;
@@ -4258,7 +4688,6 @@ export type Mutation = {
   updateRelayByName?: Maybe<UpdateRelayByNamePayload>;
   updateRelayByNameMultihost?: Maybe<UpdateRelayByNameMultihostPayload>;
   updateRewardAccount?: Maybe<UpdateRewardAccountPayload>;
-  updateScript?: Maybe<UpdateScriptPayload>;
   updateSignature?: Maybe<UpdateSignaturePayload>;
   updateSlot?: Maybe<UpdateSlotPayload>;
   updateStakeDelegationCertificate?: Maybe<UpdateStakeDelegationCertificatePayload>;
@@ -4279,6 +4708,8 @@ export type Mutation = {
   updateTransactionOutput?: Maybe<UpdateTransactionOutputPayload>;
   updateValue?: Maybe<UpdateValuePayload>;
   updateWithdrawal?: Maybe<UpdateWithdrawalPayload>;
+  updateWitness?: Maybe<UpdateWitnessPayload>;
+  updateWitnessScript?: Maybe<UpdateWitnessScriptPayload>;
 };
 
 
@@ -4318,9 +4749,19 @@ export type MutationAddAuxiliaryDataBodyArgs = {
 };
 
 
+export type MutationAddAuxiliaryScriptArgs = {
+  input: Array<AddAuxiliaryScriptInput>;
+};
+
+
 export type MutationAddBlockArgs = {
   input: Array<AddBlockInput>;
   upsert?: Maybe<Scalars['Boolean']>;
+};
+
+
+export type MutationAddBootstrapWitnessArgs = {
+  input: Array<AddBootstrapWitnessInput>;
 };
 
 
@@ -4341,6 +4782,12 @@ export type MutationAddCostModelArgs = {
 
 export type MutationAddCostModelCoefficientArgs = {
   input: Array<AddCostModelCoefficientInput>;
+};
+
+
+export type MutationAddDatumArgs = {
+  input: Array<AddDatumInput>;
+  upsert?: Maybe<Scalars['Boolean']>;
 };
 
 
@@ -4406,8 +4853,24 @@ export type MutationAddMirCertificateArgs = {
 };
 
 
+export type MutationAddNOfArgs = {
+  input: Array<AddNOfInput>;
+};
+
+
+export type MutationAddNativeScriptArgs = {
+  input: Array<AddNativeScriptInput>;
+};
+
+
 export type MutationAddNetworkConstantsArgs = {
   input: Array<AddNetworkConstantsInput>;
+};
+
+
+export type MutationAddPlutusScriptArgs = {
+  input: Array<AddPlutusScriptInput>;
+  upsert?: Maybe<Scalars['Boolean']>;
 };
 
 
@@ -4479,12 +4942,6 @@ export type MutationAddRelayByNameMultihostArgs = {
 
 export type MutationAddRewardAccountArgs = {
   input: Array<AddRewardAccountInput>;
-};
-
-
-export type MutationAddScriptArgs = {
-  input: Array<AddScriptInput>;
-  upsert?: Maybe<Scalars['Boolean']>;
 };
 
 
@@ -4591,6 +5048,16 @@ export type MutationAddWithdrawalArgs = {
 };
 
 
+export type MutationAddWitnessArgs = {
+  input: Array<AddWitnessInput>;
+};
+
+
+export type MutationAddWitnessScriptArgs = {
+  input: Array<AddWitnessScriptInput>;
+};
+
+
 export type MutationDeleteActiveStakeArgs = {
   filter: ActiveStakeFilter;
 };
@@ -4626,8 +5093,18 @@ export type MutationDeleteAuxiliaryDataBodyArgs = {
 };
 
 
+export type MutationDeleteAuxiliaryScriptArgs = {
+  filter: AuxiliaryScriptFilter;
+};
+
+
 export type MutationDeleteBlockArgs = {
   filter: BlockFilter;
+};
+
+
+export type MutationDeleteBootstrapWitnessArgs = {
+  filter: BootstrapWitnessFilter;
 };
 
 
@@ -4648,6 +5125,11 @@ export type MutationDeleteCostModelArgs = {
 
 export type MutationDeleteCostModelCoefficientArgs = {
   filter: CostModelCoefficientFilter;
+};
+
+
+export type MutationDeleteDatumArgs = {
+  filter: DatumFilter;
 };
 
 
@@ -4711,8 +5193,23 @@ export type MutationDeleteMirCertificateArgs = {
 };
 
 
+export type MutationDeleteNOfArgs = {
+  filter: NOfFilter;
+};
+
+
+export type MutationDeleteNativeScriptArgs = {
+  filter: NativeScriptFilter;
+};
+
+
 export type MutationDeleteNetworkConstantsArgs = {
   filter: NetworkConstantsFilter;
+};
+
+
+export type MutationDeletePlutusScriptArgs = {
+  filter: PlutusScriptFilter;
 };
 
 
@@ -4783,11 +5280,6 @@ export type MutationDeleteRelayByNameMultihostArgs = {
 
 export type MutationDeleteRewardAccountArgs = {
   filter: RewardAccountFilter;
-};
-
-
-export type MutationDeleteScriptArgs = {
-  filter: ScriptFilter;
 };
 
 
@@ -4891,6 +5383,16 @@ export type MutationDeleteWithdrawalArgs = {
 };
 
 
+export type MutationDeleteWitnessArgs = {
+  filter: WitnessFilter;
+};
+
+
+export type MutationDeleteWitnessScriptArgs = {
+  filter: WitnessScriptFilter;
+};
+
+
 export type MutationUpdateActiveStakeArgs = {
   input: UpdateActiveStakeInput;
 };
@@ -4926,8 +5428,18 @@ export type MutationUpdateAuxiliaryDataBodyArgs = {
 };
 
 
+export type MutationUpdateAuxiliaryScriptArgs = {
+  input: UpdateAuxiliaryScriptInput;
+};
+
+
 export type MutationUpdateBlockArgs = {
   input: UpdateBlockInput;
+};
+
+
+export type MutationUpdateBootstrapWitnessArgs = {
+  input: UpdateBootstrapWitnessInput;
 };
 
 
@@ -4948,6 +5460,11 @@ export type MutationUpdateCostModelArgs = {
 
 export type MutationUpdateCostModelCoefficientArgs = {
   input: UpdateCostModelCoefficientInput;
+};
+
+
+export type MutationUpdateDatumArgs = {
+  input: UpdateDatumInput;
 };
 
 
@@ -5011,8 +5528,23 @@ export type MutationUpdateMirCertificateArgs = {
 };
 
 
+export type MutationUpdateNOfArgs = {
+  input: UpdateNOfInput;
+};
+
+
+export type MutationUpdateNativeScriptArgs = {
+  input: UpdateNativeScriptInput;
+};
+
+
 export type MutationUpdateNetworkConstantsArgs = {
   input: UpdateNetworkConstantsInput;
+};
+
+
+export type MutationUpdatePlutusScriptArgs = {
+  input: UpdatePlutusScriptInput;
 };
 
 
@@ -5083,11 +5615,6 @@ export type MutationUpdateRelayByNameMultihostArgs = {
 
 export type MutationUpdateRewardAccountArgs = {
   input: UpdateRewardAccountInput;
-};
-
-
-export type MutationUpdateScriptArgs = {
-  input: UpdateScriptInput;
 };
 
 
@@ -5188,6 +5715,178 @@ export type MutationUpdateValueArgs = {
 
 export type MutationUpdateWithdrawalArgs = {
   input: UpdateWithdrawalInput;
+};
+
+
+export type MutationUpdateWitnessArgs = {
+  input: UpdateWitnessInput;
+};
+
+
+export type MutationUpdateWitnessScriptArgs = {
+  input: UpdateWitnessScriptInput;
+};
+
+export type NOf = {
+  __typename?: 'NOf';
+  key: Scalars['String'];
+  scripts: Array<NativeScript>;
+  scriptsAggregate?: Maybe<NativeScriptAggregateResult>;
+};
+
+
+export type NOfScriptsArgs = {
+  filter?: Maybe<NativeScriptFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+
+export type NOfScriptsAggregateArgs = {
+  filter?: Maybe<NativeScriptFilter>;
+};
+
+export type NOfAggregateResult = {
+  __typename?: 'NOfAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+  keyMax?: Maybe<Scalars['String']>;
+  keyMin?: Maybe<Scalars['String']>;
+};
+
+export type NOfFilter = {
+  and?: Maybe<Array<Maybe<NOfFilter>>>;
+  has?: Maybe<Array<Maybe<NOfHasFilter>>>;
+  not?: Maybe<NOfFilter>;
+  or?: Maybe<Array<Maybe<NOfFilter>>>;
+};
+
+export enum NOfHasFilter {
+  Key = 'key',
+  Scripts = 'scripts'
+}
+
+export type NOfOrder = {
+  asc?: Maybe<NOfOrderable>;
+  desc?: Maybe<NOfOrderable>;
+  then?: Maybe<NOfOrder>;
+};
+
+export enum NOfOrderable {
+  Key = 'key'
+}
+
+export type NOfPatch = {
+  key?: Maybe<Scalars['String']>;
+  scripts?: Maybe<Array<NativeScriptRef>>;
+};
+
+export type NOfRef = {
+  key?: Maybe<Scalars['String']>;
+  scripts?: Maybe<Array<NativeScriptRef>>;
+};
+
+/** Exactly one field is not null */
+export type NativeScript = {
+  __typename?: 'NativeScript';
+  all?: Maybe<Array<NativeScript>>;
+  allAggregate?: Maybe<NativeScriptAggregateResult>;
+  any?: Maybe<Array<NativeScript>>;
+  anyAggregate?: Maybe<NativeScriptAggregateResult>;
+  expiresAt?: Maybe<Slot>;
+  nof?: Maybe<NOf>;
+  startsAt?: Maybe<Slot>;
+  vkey?: Maybe<PublicKey>;
+};
+
+
+/** Exactly one field is not null */
+export type NativeScriptAllArgs = {
+  filter?: Maybe<NativeScriptFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+
+/** Exactly one field is not null */
+export type NativeScriptAllAggregateArgs = {
+  filter?: Maybe<NativeScriptFilter>;
+};
+
+
+/** Exactly one field is not null */
+export type NativeScriptAnyArgs = {
+  filter?: Maybe<NativeScriptFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+
+/** Exactly one field is not null */
+export type NativeScriptAnyAggregateArgs = {
+  filter?: Maybe<NativeScriptFilter>;
+};
+
+
+/** Exactly one field is not null */
+export type NativeScriptExpiresAtArgs = {
+  filter?: Maybe<SlotFilter>;
+};
+
+
+/** Exactly one field is not null */
+export type NativeScriptNofArgs = {
+  filter?: Maybe<NOfFilter>;
+};
+
+
+/** Exactly one field is not null */
+export type NativeScriptStartsAtArgs = {
+  filter?: Maybe<SlotFilter>;
+};
+
+
+/** Exactly one field is not null */
+export type NativeScriptVkeyArgs = {
+  filter?: Maybe<PublicKeyFilter>;
+};
+
+export type NativeScriptAggregateResult = {
+  __typename?: 'NativeScriptAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+};
+
+export type NativeScriptFilter = {
+  and?: Maybe<Array<Maybe<NativeScriptFilter>>>;
+  has?: Maybe<Array<Maybe<NativeScriptHasFilter>>>;
+  not?: Maybe<NativeScriptFilter>;
+  or?: Maybe<Array<Maybe<NativeScriptFilter>>>;
+};
+
+export enum NativeScriptHasFilter {
+  All = 'all',
+  Any = 'any',
+  ExpiresAt = 'expiresAt',
+  Nof = 'nof',
+  StartsAt = 'startsAt',
+  Vkey = 'vkey'
+}
+
+export type NativeScriptPatch = {
+  all?: Maybe<Array<NativeScriptRef>>;
+  any?: Maybe<Array<NativeScriptRef>>;
+  expiresAt?: Maybe<SlotRef>;
+  nof?: Maybe<NOfRef>;
+  startsAt?: Maybe<SlotRef>;
+  vkey?: Maybe<PublicKeyRef>;
+};
+
+export type NativeScriptRef = {
+  all?: Maybe<Array<NativeScriptRef>>;
+  any?: Maybe<Array<NativeScriptRef>>;
+  expiresAt?: Maybe<SlotRef>;
+  nof?: Maybe<NOfRef>;
+  startsAt?: Maybe<SlotRef>;
+  vkey?: Maybe<PublicKeyRef>;
 };
 
 export type NearFilter = {
@@ -5300,6 +5999,74 @@ export type NetworkConstantsRef = {
   /** same as 'systemStart' */
   timestamp?: Maybe<Scalars['Int']>;
   updateQuorum?: Maybe<Scalars['Int']>;
+};
+
+export type PlutusScript = {
+  __typename?: 'PlutusScript';
+  /** Serialized plutus-core program */
+  cborHex: Scalars['String'];
+  description: Scalars['String'];
+  hash: Scalars['String'];
+  /** 'PlutusScriptV1' | 'PlutusScriptV2' */
+  type: Scalars['String'];
+};
+
+export type PlutusScriptAggregateResult = {
+  __typename?: 'PlutusScriptAggregateResult';
+  cborHexMax?: Maybe<Scalars['String']>;
+  cborHexMin?: Maybe<Scalars['String']>;
+  count?: Maybe<Scalars['Int']>;
+  descriptionMax?: Maybe<Scalars['String']>;
+  descriptionMin?: Maybe<Scalars['String']>;
+  hashMax?: Maybe<Scalars['String']>;
+  hashMin?: Maybe<Scalars['String']>;
+  typeMax?: Maybe<Scalars['String']>;
+  typeMin?: Maybe<Scalars['String']>;
+};
+
+export type PlutusScriptFilter = {
+  and?: Maybe<Array<Maybe<PlutusScriptFilter>>>;
+  has?: Maybe<Array<Maybe<PlutusScriptHasFilter>>>;
+  hash?: Maybe<StringHashFilter>;
+  not?: Maybe<PlutusScriptFilter>;
+  or?: Maybe<Array<Maybe<PlutusScriptFilter>>>;
+};
+
+export enum PlutusScriptHasFilter {
+  CborHex = 'cborHex',
+  Description = 'description',
+  Hash = 'hash',
+  Type = 'type'
+}
+
+export type PlutusScriptOrder = {
+  asc?: Maybe<PlutusScriptOrderable>;
+  desc?: Maybe<PlutusScriptOrderable>;
+  then?: Maybe<PlutusScriptOrder>;
+};
+
+export enum PlutusScriptOrderable {
+  CborHex = 'cborHex',
+  Description = 'description',
+  Hash = 'hash',
+  Type = 'type'
+}
+
+export type PlutusScriptPatch = {
+  /** Serialized plutus-core program */
+  cborHex?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  /** 'PlutusScriptV1' | 'PlutusScriptV2' */
+  type?: Maybe<Scalars['String']>;
+};
+
+export type PlutusScriptRef = {
+  /** Serialized plutus-core program */
+  cborHex?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  hash?: Maybe<Scalars['String']>;
+  /** 'PlutusScriptV1' | 'PlutusScriptV2' */
+  type?: Maybe<Scalars['String']>;
 };
 
 export type Point = {
@@ -6389,11 +7156,14 @@ export type Query = {
   aggregateAsset?: Maybe<AssetAggregateResult>;
   aggregateAuxiliaryData?: Maybe<AuxiliaryDataAggregateResult>;
   aggregateAuxiliaryDataBody?: Maybe<AuxiliaryDataBodyAggregateResult>;
+  aggregateAuxiliaryScript?: Maybe<AuxiliaryScriptAggregateResult>;
   aggregateBlock?: Maybe<BlockAggregateResult>;
+  aggregateBootstrapWitness?: Maybe<BootstrapWitnessAggregateResult>;
   aggregateBytesMetadatum?: Maybe<BytesMetadatumAggregateResult>;
   aggregateCoinSupply?: Maybe<CoinSupplyAggregateResult>;
   aggregateCostModel?: Maybe<CostModelAggregateResult>;
   aggregateCostModelCoefficient?: Maybe<CostModelCoefficientAggregateResult>;
+  aggregateDatum?: Maybe<DatumAggregateResult>;
   aggregateEpoch?: Maybe<EpochAggregateResult>;
   aggregateExecutionPrices?: Maybe<ExecutionPricesAggregateResult>;
   aggregateExecutionUnits?: Maybe<ExecutionUnitsAggregateResult>;
@@ -6406,7 +7176,10 @@ export type Query = {
   aggregateMetadatumArray?: Maybe<MetadatumArrayAggregateResult>;
   aggregateMetadatumMap?: Maybe<MetadatumMapAggregateResult>;
   aggregateMirCertificate?: Maybe<MirCertificateAggregateResult>;
+  aggregateNOf?: Maybe<NOfAggregateResult>;
+  aggregateNativeScript?: Maybe<NativeScriptAggregateResult>;
   aggregateNetworkConstants?: Maybe<NetworkConstantsAggregateResult>;
+  aggregatePlutusScript?: Maybe<PlutusScriptAggregateResult>;
   aggregatePoolContactData?: Maybe<PoolContactDataAggregateResult>;
   aggregatePoolParameters?: Maybe<PoolParametersAggregateResult>;
   aggregatePoolRegistrationCertificate?: Maybe<PoolRegistrationCertificateAggregateResult>;
@@ -6421,7 +7194,6 @@ export type Query = {
   aggregateRelayByName?: Maybe<RelayByNameAggregateResult>;
   aggregateRelayByNameMultihost?: Maybe<RelayByNameMultihostAggregateResult>;
   aggregateRewardAccount?: Maybe<RewardAccountAggregateResult>;
-  aggregateScript?: Maybe<ScriptAggregateResult>;
   aggregateSignature?: Maybe<SignatureAggregateResult>;
   aggregateSlot?: Maybe<SlotAggregateResult>;
   aggregateStakeDelegationCertificate?: Maybe<StakeDelegationCertificateAggregateResult>;
@@ -6442,12 +7214,15 @@ export type Query = {
   aggregateTransactionOutput?: Maybe<TransactionOutputAggregateResult>;
   aggregateValue?: Maybe<ValueAggregateResult>;
   aggregateWithdrawal?: Maybe<WithdrawalAggregateResult>;
+  aggregateWitness?: Maybe<WitnessAggregateResult>;
+  aggregateWitnessScript?: Maybe<WitnessScriptAggregateResult>;
   getAddress?: Maybe<Address>;
   getBlock?: Maybe<Block>;
+  getDatum?: Maybe<Datum>;
   getEpoch?: Maybe<Epoch>;
   getExtendedStakePoolMetadataFields?: Maybe<ExtendedStakePoolMetadataFields>;
+  getPlutusScript?: Maybe<PlutusScript>;
   getPublicKey?: Maybe<PublicKey>;
-  getScript?: Maybe<Script>;
   getSlot?: Maybe<Slot>;
   getStakePool?: Maybe<StakePool>;
   getTransaction?: Maybe<Transaction>;
@@ -6458,11 +7233,14 @@ export type Query = {
   queryAsset?: Maybe<Array<Maybe<Asset>>>;
   queryAuxiliaryData?: Maybe<Array<Maybe<AuxiliaryData>>>;
   queryAuxiliaryDataBody?: Maybe<Array<Maybe<AuxiliaryDataBody>>>;
+  queryAuxiliaryScript?: Maybe<Array<Maybe<AuxiliaryScript>>>;
   queryBlock?: Maybe<Array<Maybe<Block>>>;
+  queryBootstrapWitness?: Maybe<Array<Maybe<BootstrapWitness>>>;
   queryBytesMetadatum?: Maybe<Array<Maybe<BytesMetadatum>>>;
   queryCoinSupply?: Maybe<Array<Maybe<CoinSupply>>>;
   queryCostModel?: Maybe<Array<Maybe<CostModel>>>;
   queryCostModelCoefficient?: Maybe<Array<Maybe<CostModelCoefficient>>>;
+  queryDatum?: Maybe<Array<Maybe<Datum>>>;
   queryEpoch?: Maybe<Array<Maybe<Epoch>>>;
   queryExecutionPrices?: Maybe<Array<Maybe<ExecutionPrices>>>;
   queryExecutionUnits?: Maybe<Array<Maybe<ExecutionUnits>>>;
@@ -6475,7 +7253,10 @@ export type Query = {
   queryMetadatumArray?: Maybe<Array<Maybe<MetadatumArray>>>;
   queryMetadatumMap?: Maybe<Array<Maybe<MetadatumMap>>>;
   queryMirCertificate?: Maybe<Array<Maybe<MirCertificate>>>;
+  queryNOf?: Maybe<Array<Maybe<NOf>>>;
+  queryNativeScript?: Maybe<Array<Maybe<NativeScript>>>;
   queryNetworkConstants?: Maybe<Array<Maybe<NetworkConstants>>>;
+  queryPlutusScript?: Maybe<Array<Maybe<PlutusScript>>>;
   queryPoolContactData?: Maybe<Array<Maybe<PoolContactData>>>;
   queryPoolParameters?: Maybe<Array<Maybe<PoolParameters>>>;
   queryPoolRegistrationCertificate?: Maybe<Array<Maybe<PoolRegistrationCertificate>>>;
@@ -6490,7 +7271,6 @@ export type Query = {
   queryRelayByName?: Maybe<Array<Maybe<RelayByName>>>;
   queryRelayByNameMultihost?: Maybe<Array<Maybe<RelayByNameMultihost>>>;
   queryRewardAccount?: Maybe<Array<Maybe<RewardAccount>>>;
-  queryScript?: Maybe<Array<Maybe<Script>>>;
   querySignature?: Maybe<Array<Maybe<Signature>>>;
   querySlot?: Maybe<Array<Maybe<Slot>>>;
   queryStakeDelegationCertificate?: Maybe<Array<Maybe<StakeDelegationCertificate>>>;
@@ -6511,6 +7291,8 @@ export type Query = {
   queryTransactionOutput?: Maybe<Array<Maybe<TransactionOutput>>>;
   queryValue?: Maybe<Array<Maybe<Value>>>;
   queryWithdrawal?: Maybe<Array<Maybe<Withdrawal>>>;
+  queryWitness?: Maybe<Array<Maybe<Witness>>>;
+  queryWitnessScript?: Maybe<Array<Maybe<WitnessScript>>>;
 };
 
 
@@ -6549,8 +7331,18 @@ export type QueryAggregateAuxiliaryDataBodyArgs = {
 };
 
 
+export type QueryAggregateAuxiliaryScriptArgs = {
+  filter?: Maybe<AuxiliaryScriptFilter>;
+};
+
+
 export type QueryAggregateBlockArgs = {
   filter?: Maybe<BlockFilter>;
+};
+
+
+export type QueryAggregateBootstrapWitnessArgs = {
+  filter?: Maybe<BootstrapWitnessFilter>;
 };
 
 
@@ -6571,6 +7363,11 @@ export type QueryAggregateCostModelArgs = {
 
 export type QueryAggregateCostModelCoefficientArgs = {
   filter?: Maybe<CostModelCoefficientFilter>;
+};
+
+
+export type QueryAggregateDatumArgs = {
+  filter?: Maybe<DatumFilter>;
 };
 
 
@@ -6634,8 +7431,23 @@ export type QueryAggregateMirCertificateArgs = {
 };
 
 
+export type QueryAggregateNOfArgs = {
+  filter?: Maybe<NOfFilter>;
+};
+
+
+export type QueryAggregateNativeScriptArgs = {
+  filter?: Maybe<NativeScriptFilter>;
+};
+
+
 export type QueryAggregateNetworkConstantsArgs = {
   filter?: Maybe<NetworkConstantsFilter>;
+};
+
+
+export type QueryAggregatePlutusScriptArgs = {
+  filter?: Maybe<PlutusScriptFilter>;
 };
 
 
@@ -6706,11 +7518,6 @@ export type QueryAggregateRelayByNameMultihostArgs = {
 
 export type QueryAggregateRewardAccountArgs = {
   filter?: Maybe<RewardAccountFilter>;
-};
-
-
-export type QueryAggregateScriptArgs = {
-  filter?: Maybe<ScriptFilter>;
 };
 
 
@@ -6814,12 +7621,27 @@ export type QueryAggregateWithdrawalArgs = {
 };
 
 
+export type QueryAggregateWitnessArgs = {
+  filter?: Maybe<WitnessFilter>;
+};
+
+
+export type QueryAggregateWitnessScriptArgs = {
+  filter?: Maybe<WitnessScriptFilter>;
+};
+
+
 export type QueryGetAddressArgs = {
   address: Scalars['String'];
 };
 
 
 export type QueryGetBlockArgs = {
+  hash: Scalars['String'];
+};
+
+
+export type QueryGetDatumArgs = {
   hash: Scalars['String'];
 };
 
@@ -6834,12 +7656,12 @@ export type QueryGetExtendedStakePoolMetadataFieldsArgs = {
 };
 
 
-export type QueryGetPublicKeyArgs = {
+export type QueryGetPlutusScriptArgs = {
   hash: Scalars['String'];
 };
 
 
-export type QueryGetScriptArgs = {
+export type QueryGetPublicKeyArgs = {
   hash: Scalars['String'];
 };
 
@@ -6914,11 +7736,26 @@ export type QueryQueryAuxiliaryDataBodyArgs = {
 };
 
 
+export type QueryQueryAuxiliaryScriptArgs = {
+  filter?: Maybe<AuxiliaryScriptFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+
 export type QueryQueryBlockArgs = {
   filter?: Maybe<BlockFilter>;
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<BlockOrder>;
+};
+
+
+export type QueryQueryBootstrapWitnessArgs = {
+  filter?: Maybe<BootstrapWitnessFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<BootstrapWitnessOrder>;
 };
 
 
@@ -6951,6 +7788,14 @@ export type QueryQueryCostModelCoefficientArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<CostModelCoefficientOrder>;
+};
+
+
+export type QueryQueryDatumArgs = {
+  filter?: Maybe<DatumFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<DatumOrder>;
 };
 
 
@@ -7047,11 +7892,34 @@ export type QueryQueryMirCertificateArgs = {
 };
 
 
+export type QueryQueryNOfArgs = {
+  filter?: Maybe<NOfFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<NOfOrder>;
+};
+
+
+export type QueryQueryNativeScriptArgs = {
+  filter?: Maybe<NativeScriptFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+
 export type QueryQueryNetworkConstantsArgs = {
   filter?: Maybe<NetworkConstantsFilter>;
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<NetworkConstantsOrder>;
+};
+
+
+export type QueryQueryPlutusScriptArgs = {
+  filter?: Maybe<PlutusScriptFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<PlutusScriptOrder>;
 };
 
 
@@ -7162,14 +8030,6 @@ export type QueryQueryRewardAccountArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<RewardAccountOrder>;
-};
-
-
-export type QueryQueryScriptArgs = {
-  filter?: Maybe<ScriptFilter>;
-  first?: Maybe<Scalars['Int']>;
-  offset?: Maybe<Scalars['Int']>;
-  order?: Maybe<ScriptOrder>;
 };
 
 
@@ -7329,6 +8189,21 @@ export type QueryQueryWithdrawalArgs = {
   order?: Maybe<WithdrawalOrder>;
 };
 
+
+export type QueryQueryWitnessArgs = {
+  filter?: Maybe<WitnessFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+
+export type QueryQueryWitnessScriptArgs = {
+  filter?: Maybe<WitnessScriptFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<WitnessScriptOrder>;
+};
+
 export type Ratio = {
   __typename?: 'Ratio';
   denominator: Scalars['Int'];
@@ -7388,7 +8263,7 @@ export type Redeemer = {
   index: Scalars['Int'];
   purpose: Scalars['String'];
   scriptHash: Scalars['String'];
-  transaction: Transaction;
+  witness: Witness;
 };
 
 
@@ -7397,8 +8272,8 @@ export type RedeemerExecutionUnitsArgs = {
 };
 
 
-export type RedeemerTransactionArgs = {
-  filter?: Maybe<TransactionFilter>;
+export type RedeemerWitnessArgs = {
+  filter?: Maybe<WitnessFilter>;
 };
 
 export type RedeemerAggregateResult = {
@@ -7431,7 +8306,7 @@ export enum RedeemerHasFilter {
   Index = 'index',
   Purpose = 'purpose',
   ScriptHash = 'scriptHash',
-  Transaction = 'transaction'
+  Witness = 'witness'
 }
 
 export type RedeemerOrder = {
@@ -7453,7 +8328,7 @@ export type RedeemerPatch = {
   index?: Maybe<Scalars['Int']>;
   purpose?: Maybe<Scalars['String']>;
   scriptHash?: Maybe<Scalars['String']>;
-  transaction?: Maybe<TransactionRef>;
+  witness?: Maybe<WitnessRef>;
 };
 
 export type RedeemerRef = {
@@ -7462,7 +8337,7 @@ export type RedeemerRef = {
   index?: Maybe<Scalars['Int']>;
   purpose?: Maybe<Scalars['String']>;
   scriptHash?: Maybe<Scalars['String']>;
-  transaction?: Maybe<TransactionRef>;
+  witness?: Maybe<WitnessRef>;
 };
 
 export type RelayByAddress = {
@@ -7750,71 +8625,23 @@ export type RewardAccountRef = {
   registrationCertificates?: Maybe<Array<StakeKeyRegistrationCertificateRef>>;
 };
 
-export type Script = {
-  __typename?: 'Script';
-  auxiliaryDataBody: AuxiliaryDataBody;
-  hash: Scalars['String'];
-  serializedSize: Scalars['Int64'];
-  type: Scalars['String'];
-};
-
-
-export type ScriptAuxiliaryDataBodyArgs = {
-  filter?: Maybe<AuxiliaryDataBodyFilter>;
-};
-
-export type ScriptAggregateResult = {
-  __typename?: 'ScriptAggregateResult';
-  count?: Maybe<Scalars['Int']>;
-  hashMax?: Maybe<Scalars['String']>;
-  hashMin?: Maybe<Scalars['String']>;
-  serializedSizeAvg?: Maybe<Scalars['Float']>;
-  serializedSizeMax?: Maybe<Scalars['Int64']>;
-  serializedSizeMin?: Maybe<Scalars['Int64']>;
-  serializedSizeSum?: Maybe<Scalars['Int64']>;
-  typeMax?: Maybe<Scalars['String']>;
-  typeMin?: Maybe<Scalars['String']>;
-};
+export type Script = NativeScript | PlutusScript;
 
 export type ScriptFilter = {
-  and?: Maybe<Array<Maybe<ScriptFilter>>>;
-  has?: Maybe<Array<Maybe<ScriptHasFilter>>>;
-  hash?: Maybe<StringHashFilter>;
-  not?: Maybe<ScriptFilter>;
-  or?: Maybe<Array<Maybe<ScriptFilter>>>;
-};
-
-export enum ScriptHasFilter {
-  AuxiliaryDataBody = 'auxiliaryDataBody',
-  Hash = 'hash',
-  SerializedSize = 'serializedSize',
-  Type = 'type'
-}
-
-export type ScriptOrder = {
-  asc?: Maybe<ScriptOrderable>;
-  desc?: Maybe<ScriptOrderable>;
-  then?: Maybe<ScriptOrder>;
-};
-
-export enum ScriptOrderable {
-  Hash = 'hash',
-  SerializedSize = 'serializedSize',
-  Type = 'type'
-}
-
-export type ScriptPatch = {
-  auxiliaryDataBody?: Maybe<AuxiliaryDataBodyRef>;
-  serializedSize?: Maybe<Scalars['Int64']>;
-  type?: Maybe<Scalars['String']>;
+  memberTypes?: Maybe<Array<ScriptType>>;
+  nativeScriptFilter?: Maybe<NativeScriptFilter>;
+  plutusScriptFilter?: Maybe<PlutusScriptFilter>;
 };
 
 export type ScriptRef = {
-  auxiliaryDataBody?: Maybe<AuxiliaryDataBodyRef>;
-  hash?: Maybe<Scalars['String']>;
-  serializedSize?: Maybe<Scalars['Int64']>;
-  type?: Maybe<Scalars['String']>;
+  nativeScriptRef?: Maybe<NativeScriptRef>;
+  plutusScriptRef?: Maybe<PlutusScriptRef>;
 };
+
+export enum ScriptType {
+  NativeScript = 'NativeScript',
+  PlutusScript = 'PlutusScript'
+}
 
 export type SearchResult = RelayByAddress | RelayByName | RelayByNameMultihost;
 
@@ -7842,7 +8669,7 @@ export type Signature = {
   publicKey: PublicKey;
   /** hex-encoded Ed25519 signature */
   signature: Scalars['String'];
-  transaction: Transaction;
+  witness: Witness;
 };
 
 
@@ -7851,8 +8678,8 @@ export type SignaturePublicKeyArgs = {
 };
 
 
-export type SignatureTransactionArgs = {
-  filter?: Maybe<TransactionFilter>;
+export type SignatureWitnessArgs = {
+  filter?: Maybe<WitnessFilter>;
 };
 
 export type SignatureAggregateResult = {
@@ -7872,7 +8699,7 @@ export type SignatureFilter = {
 export enum SignatureHasFilter {
   PublicKey = 'publicKey',
   Signature = 'signature',
-  Transaction = 'transaction'
+  Witness = 'witness'
 }
 
 export type SignatureOrder = {
@@ -7889,14 +8716,14 @@ export type SignaturePatch = {
   publicKey?: Maybe<PublicKeyRef>;
   /** hex-encoded Ed25519 signature */
   signature?: Maybe<Scalars['String']>;
-  transaction?: Maybe<TransactionRef>;
+  witness?: Maybe<WitnessRef>;
 };
 
 export type SignatureRef = {
   publicKey?: Maybe<PublicKeyRef>;
   /** hex-encoded Ed25519 signature */
   signature?: Maybe<Scalars['String']>;
-  transaction?: Maybe<TransactionRef>;
+  witness?: Maybe<WitnessRef>;
 };
 
 export type Slot = {
@@ -8888,24 +9715,21 @@ export type Transaction = {
   index: Scalars['Int'];
   inputs: Array<TransactionInput>;
   inputsAggregate?: Maybe<TransactionInputAggregateResult>;
-  invalidBefore?: Maybe<Scalars['Int']>;
-  invalidHereafter?: Maybe<Scalars['Int']>;
+  invalidBefore?: Maybe<Slot>;
+  invalidHereafter?: Maybe<Slot>;
   mint?: Maybe<Array<Token>>;
   mintAggregate?: Maybe<TokenAggregateResult>;
   outputs: Array<TransactionOutput>;
   outputsAggregate?: Maybe<TransactionOutputAggregateResult>;
-  redeemers?: Maybe<Array<Redeemer>>;
-  redeemersAggregate?: Maybe<RedeemerAggregateResult>;
   requiredExtraSignatures: Array<PublicKey>;
   requiredExtraSignaturesAggregate?: Maybe<PublicKeyAggregateResult>;
   scriptIntegrityHash?: Maybe<Scalars['String']>;
-  signatures: Array<Signature>;
-  signaturesAggregate?: Maybe<SignatureAggregateResult>;
   size: Scalars['Int64'];
   totalOutputCoin: Scalars['Int64'];
   validContract: Scalars['Boolean'];
   withdrawals?: Maybe<Array<Withdrawal>>;
   withdrawalsAggregate?: Maybe<WithdrawalAggregateResult>;
+  witness: Witness;
 };
 
 
@@ -8952,6 +9776,16 @@ export type TransactionInputsAggregateArgs = {
 };
 
 
+export type TransactionInvalidBeforeArgs = {
+  filter?: Maybe<SlotFilter>;
+};
+
+
+export type TransactionInvalidHereafterArgs = {
+  filter?: Maybe<SlotFilter>;
+};
+
+
 export type TransactionMintArgs = {
   filter?: Maybe<TokenFilter>;
   first?: Maybe<Scalars['Int']>;
@@ -8978,19 +9812,6 @@ export type TransactionOutputsAggregateArgs = {
 };
 
 
-export type TransactionRedeemersArgs = {
-  filter?: Maybe<RedeemerFilter>;
-  first?: Maybe<Scalars['Int']>;
-  offset?: Maybe<Scalars['Int']>;
-  order?: Maybe<RedeemerOrder>;
-};
-
-
-export type TransactionRedeemersAggregateArgs = {
-  filter?: Maybe<RedeemerFilter>;
-};
-
-
 export type TransactionRequiredExtraSignaturesArgs = {
   filter?: Maybe<PublicKeyFilter>;
   first?: Maybe<Scalars['Int']>;
@@ -9004,19 +9825,6 @@ export type TransactionRequiredExtraSignaturesAggregateArgs = {
 };
 
 
-export type TransactionSignaturesArgs = {
-  filter?: Maybe<SignatureFilter>;
-  first?: Maybe<Scalars['Int']>;
-  offset?: Maybe<Scalars['Int']>;
-  order?: Maybe<SignatureOrder>;
-};
-
-
-export type TransactionSignaturesAggregateArgs = {
-  filter?: Maybe<SignatureFilter>;
-};
-
-
 export type TransactionWithdrawalsArgs = {
   filter?: Maybe<WithdrawalFilter>;
   first?: Maybe<Scalars['Int']>;
@@ -9027,6 +9835,11 @@ export type TransactionWithdrawalsArgs = {
 
 export type TransactionWithdrawalsAggregateArgs = {
   filter?: Maybe<WithdrawalFilter>;
+};
+
+
+export type TransactionWitnessArgs = {
+  filter?: Maybe<WitnessFilter>;
 };
 
 export type TransactionAggregateResult = {
@@ -9046,14 +9859,6 @@ export type TransactionAggregateResult = {
   indexMax?: Maybe<Scalars['Int']>;
   indexMin?: Maybe<Scalars['Int']>;
   indexSum?: Maybe<Scalars['Int']>;
-  invalidBeforeAvg?: Maybe<Scalars['Float']>;
-  invalidBeforeMax?: Maybe<Scalars['Int']>;
-  invalidBeforeMin?: Maybe<Scalars['Int']>;
-  invalidBeforeSum?: Maybe<Scalars['Int']>;
-  invalidHereafterAvg?: Maybe<Scalars['Float']>;
-  invalidHereafterMax?: Maybe<Scalars['Int']>;
-  invalidHereafterMin?: Maybe<Scalars['Int']>;
-  invalidHereafterSum?: Maybe<Scalars['Int']>;
   scriptIntegrityHashMax?: Maybe<Scalars['String']>;
   scriptIntegrityHashMin?: Maybe<Scalars['String']>;
   sizeAvg?: Maybe<Scalars['Float']>;
@@ -9088,14 +9893,13 @@ export enum TransactionHasFilter {
   InvalidHereafter = 'invalidHereafter',
   Mint = 'mint',
   Outputs = 'outputs',
-  Redeemers = 'redeemers',
   RequiredExtraSignatures = 'requiredExtraSignatures',
   ScriptIntegrityHash = 'scriptIntegrityHash',
-  Signatures = 'signatures',
   Size = 'size',
   TotalOutputCoin = 'totalOutputCoin',
   ValidContract = 'validContract',
-  Withdrawals = 'withdrawals'
+  Withdrawals = 'withdrawals',
+  Witness = 'witness'
 }
 
 export type TransactionInput = {
@@ -9198,8 +10002,6 @@ export enum TransactionOrderable {
   Fee = 'fee',
   Hash = 'hash',
   Index = 'index',
-  InvalidBefore = 'invalidBefore',
-  InvalidHereafter = 'invalidHereafter',
   ScriptIntegrityHash = 'scriptIntegrityHash',
   Size = 'size',
   TotalOutputCoin = 'totalOutputCoin'
@@ -9209,7 +10011,7 @@ export type TransactionOutput = {
   __typename?: 'TransactionOutput';
   address: Address;
   /** hex-encoded 32 byte hash */
-  datum?: Maybe<Scalars['String']>;
+  datumHash?: Maybe<Scalars['String']>;
   index: Scalars['Int'];
   transaction: Transaction;
   value: Value;
@@ -9233,8 +10035,8 @@ export type TransactionOutputValueArgs = {
 export type TransactionOutputAggregateResult = {
   __typename?: 'TransactionOutputAggregateResult';
   count?: Maybe<Scalars['Int']>;
-  datumMax?: Maybe<Scalars['String']>;
-  datumMin?: Maybe<Scalars['String']>;
+  datumHashMax?: Maybe<Scalars['String']>;
+  datumHashMin?: Maybe<Scalars['String']>;
   indexAvg?: Maybe<Scalars['Float']>;
   indexMax?: Maybe<Scalars['Int']>;
   indexMin?: Maybe<Scalars['Int']>;
@@ -9250,7 +10052,7 @@ export type TransactionOutputFilter = {
 
 export enum TransactionOutputHasFilter {
   Address = 'address',
-  Datum = 'datum',
+  DatumHash = 'datumHash',
   Index = 'index',
   Transaction = 'transaction',
   Value = 'value'
@@ -9263,14 +10065,14 @@ export type TransactionOutputOrder = {
 };
 
 export enum TransactionOutputOrderable {
-  Datum = 'datum',
+  DatumHash = 'datumHash',
   Index = 'index'
 }
 
 export type TransactionOutputPatch = {
   address?: Maybe<AddressRef>;
   /** hex-encoded 32 byte hash */
-  datum?: Maybe<Scalars['String']>;
+  datumHash?: Maybe<Scalars['String']>;
   index?: Maybe<Scalars['Int']>;
   transaction?: Maybe<TransactionRef>;
   value?: Maybe<ValueRef>;
@@ -9279,7 +10081,7 @@ export type TransactionOutputPatch = {
 export type TransactionOutputRef = {
   address?: Maybe<AddressRef>;
   /** hex-encoded 32 byte hash */
-  datum?: Maybe<Scalars['String']>;
+  datumHash?: Maybe<Scalars['String']>;
   index?: Maybe<Scalars['Int']>;
   transaction?: Maybe<TransactionRef>;
   value?: Maybe<ValueRef>;
@@ -9294,18 +10096,17 @@ export type TransactionPatch = {
   fee?: Maybe<Scalars['Int64']>;
   index?: Maybe<Scalars['Int']>;
   inputs?: Maybe<Array<TransactionInputRef>>;
-  invalidBefore?: Maybe<Scalars['Int']>;
-  invalidHereafter?: Maybe<Scalars['Int']>;
+  invalidBefore?: Maybe<SlotRef>;
+  invalidHereafter?: Maybe<SlotRef>;
   mint?: Maybe<Array<TokenRef>>;
   outputs?: Maybe<Array<TransactionOutputRef>>;
-  redeemers?: Maybe<Array<RedeemerRef>>;
   requiredExtraSignatures?: Maybe<Array<PublicKeyRef>>;
   scriptIntegrityHash?: Maybe<Scalars['String']>;
-  signatures?: Maybe<Array<SignatureRef>>;
   size?: Maybe<Scalars['Int64']>;
   totalOutputCoin?: Maybe<Scalars['Int64']>;
   validContract?: Maybe<Scalars['Boolean']>;
   withdrawals?: Maybe<Array<WithdrawalRef>>;
+  witness?: Maybe<WitnessRef>;
 };
 
 export type TransactionRef = {
@@ -9318,18 +10119,17 @@ export type TransactionRef = {
   hash?: Maybe<Scalars['String']>;
   index?: Maybe<Scalars['Int']>;
   inputs?: Maybe<Array<TransactionInputRef>>;
-  invalidBefore?: Maybe<Scalars['Int']>;
-  invalidHereafter?: Maybe<Scalars['Int']>;
+  invalidBefore?: Maybe<SlotRef>;
+  invalidHereafter?: Maybe<SlotRef>;
   mint?: Maybe<Array<TokenRef>>;
   outputs?: Maybe<Array<TransactionOutputRef>>;
-  redeemers?: Maybe<Array<RedeemerRef>>;
   requiredExtraSignatures?: Maybe<Array<PublicKeyRef>>;
   scriptIntegrityHash?: Maybe<Scalars['String']>;
-  signatures?: Maybe<Array<SignatureRef>>;
   size?: Maybe<Scalars['Int64']>;
   totalOutputCoin?: Maybe<Scalars['Int64']>;
   validContract?: Maybe<Scalars['Boolean']>;
   withdrawals?: Maybe<Array<WithdrawalRef>>;
+  witness?: Maybe<WitnessRef>;
 };
 
 export type UpdateActiveStakeInput = {
@@ -9471,6 +10271,25 @@ export type UpdateAuxiliaryDataPayloadAuxiliaryDataArgs = {
   order?: Maybe<AuxiliaryDataOrder>;
 };
 
+export type UpdateAuxiliaryScriptInput = {
+  filter: AuxiliaryScriptFilter;
+  remove?: Maybe<AuxiliaryScriptPatch>;
+  set?: Maybe<AuxiliaryScriptPatch>;
+};
+
+export type UpdateAuxiliaryScriptPayload = {
+  __typename?: 'UpdateAuxiliaryScriptPayload';
+  auxiliaryScript?: Maybe<Array<Maybe<AuxiliaryScript>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type UpdateAuxiliaryScriptPayloadAuxiliaryScriptArgs = {
+  filter?: Maybe<AuxiliaryScriptFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
 export type UpdateBlockInput = {
   filter: BlockFilter;
   remove?: Maybe<BlockPatch>;
@@ -9489,6 +10308,26 @@ export type UpdateBlockPayloadBlockArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<BlockOrder>;
+};
+
+export type UpdateBootstrapWitnessInput = {
+  filter: BootstrapWitnessFilter;
+  remove?: Maybe<BootstrapWitnessPatch>;
+  set?: Maybe<BootstrapWitnessPatch>;
+};
+
+export type UpdateBootstrapWitnessPayload = {
+  __typename?: 'UpdateBootstrapWitnessPayload';
+  bootstrapWitness?: Maybe<Array<Maybe<BootstrapWitness>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type UpdateBootstrapWitnessPayloadBootstrapWitnessArgs = {
+  filter?: Maybe<BootstrapWitnessFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<BootstrapWitnessOrder>;
 };
 
 export type UpdateBytesMetadatumInput = {
@@ -9569,6 +10408,26 @@ export type UpdateCostModelPayloadCostModelArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<CostModelOrder>;
+};
+
+export type UpdateDatumInput = {
+  filter: DatumFilter;
+  remove?: Maybe<DatumPatch>;
+  set?: Maybe<DatumPatch>;
+};
+
+export type UpdateDatumPayload = {
+  __typename?: 'UpdateDatumPayload';
+  datum?: Maybe<Array<Maybe<Datum>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type UpdateDatumPayloadDatumArgs = {
+  filter?: Maybe<DatumFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<DatumOrder>;
 };
 
 export type UpdateEpochInput = {
@@ -9808,6 +10667,45 @@ export type UpdateMirCertificatePayloadMirCertificateArgs = {
   order?: Maybe<MirCertificateOrder>;
 };
 
+export type UpdateNOfInput = {
+  filter: NOfFilter;
+  remove?: Maybe<NOfPatch>;
+  set?: Maybe<NOfPatch>;
+};
+
+export type UpdateNOfPayload = {
+  __typename?: 'UpdateNOfPayload';
+  nOf?: Maybe<Array<Maybe<NOf>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type UpdateNOfPayloadNOfArgs = {
+  filter?: Maybe<NOfFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<NOfOrder>;
+};
+
+export type UpdateNativeScriptInput = {
+  filter: NativeScriptFilter;
+  remove?: Maybe<NativeScriptPatch>;
+  set?: Maybe<NativeScriptPatch>;
+};
+
+export type UpdateNativeScriptPayload = {
+  __typename?: 'UpdateNativeScriptPayload';
+  nativeScript?: Maybe<Array<Maybe<NativeScript>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type UpdateNativeScriptPayloadNativeScriptArgs = {
+  filter?: Maybe<NativeScriptFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
 export type UpdateNetworkConstantsInput = {
   filter: NetworkConstantsFilter;
   remove?: Maybe<NetworkConstantsPatch>;
@@ -9826,6 +10724,26 @@ export type UpdateNetworkConstantsPayloadNetworkConstantsArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<NetworkConstantsOrder>;
+};
+
+export type UpdatePlutusScriptInput = {
+  filter: PlutusScriptFilter;
+  remove?: Maybe<PlutusScriptPatch>;
+  set?: Maybe<PlutusScriptPatch>;
+};
+
+export type UpdatePlutusScriptPayload = {
+  __typename?: 'UpdatePlutusScriptPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  plutusScript?: Maybe<Array<Maybe<PlutusScript>>>;
+};
+
+
+export type UpdatePlutusScriptPayloadPlutusScriptArgs = {
+  filter?: Maybe<PlutusScriptFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<PlutusScriptOrder>;
 };
 
 export type UpdatePoolContactDataInput = {
@@ -10104,26 +11022,6 @@ export type UpdateRewardAccountPayloadRewardAccountArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<RewardAccountOrder>;
-};
-
-export type UpdateScriptInput = {
-  filter: ScriptFilter;
-  remove?: Maybe<ScriptPatch>;
-  set?: Maybe<ScriptPatch>;
-};
-
-export type UpdateScriptPayload = {
-  __typename?: 'UpdateScriptPayload';
-  numUids?: Maybe<Scalars['Int']>;
-  script?: Maybe<Array<Maybe<Script>>>;
-};
-
-
-export type UpdateScriptPayloadScriptArgs = {
-  filter?: Maybe<ScriptFilter>;
-  first?: Maybe<Scalars['Int']>;
-  offset?: Maybe<Scalars['Int']>;
-  order?: Maybe<ScriptOrder>;
 };
 
 export type UpdateSignatureInput = {
@@ -10523,6 +11421,45 @@ export type UpdateWithdrawalPayloadWithdrawalArgs = {
   order?: Maybe<WithdrawalOrder>;
 };
 
+export type UpdateWitnessInput = {
+  filter: WitnessFilter;
+  remove?: Maybe<WitnessPatch>;
+  set?: Maybe<WitnessPatch>;
+};
+
+export type UpdateWitnessPayload = {
+  __typename?: 'UpdateWitnessPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  witness?: Maybe<Array<Maybe<Witness>>>;
+};
+
+
+export type UpdateWitnessPayloadWitnessArgs = {
+  filter?: Maybe<WitnessFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+export type UpdateWitnessScriptInput = {
+  filter: WitnessScriptFilter;
+  remove?: Maybe<WitnessScriptPatch>;
+  set?: Maybe<WitnessScriptPatch>;
+};
+
+export type UpdateWitnessScriptPayload = {
+  __typename?: 'UpdateWitnessScriptPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  witnessScript?: Maybe<Array<Maybe<WitnessScript>>>;
+};
+
+
+export type UpdateWitnessScriptPayloadWitnessScriptArgs = {
+  filter?: Maybe<WitnessScriptFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<WitnessScriptOrder>;
+};
+
 export type Value = {
   __typename?: 'Value';
   assets?: Maybe<Array<Token>>;
@@ -10656,6 +11593,189 @@ export type WithinFilter = {
   polygon: PolygonRef;
 };
 
+export type Witness = {
+  __typename?: 'Witness';
+  bootstrap?: Maybe<Array<BootstrapWitness>>;
+  bootstrapAggregate?: Maybe<BootstrapWitnessAggregateResult>;
+  datums?: Maybe<Array<Datum>>;
+  datumsAggregate?: Maybe<DatumAggregateResult>;
+  redeemers?: Maybe<Array<Redeemer>>;
+  redeemersAggregate?: Maybe<RedeemerAggregateResult>;
+  scripts?: Maybe<Array<WitnessScript>>;
+  scriptsAggregate?: Maybe<WitnessScriptAggregateResult>;
+  signatures: Array<Signature>;
+  signaturesAggregate?: Maybe<SignatureAggregateResult>;
+  transaction: Transaction;
+};
+
+
+export type WitnessBootstrapArgs = {
+  filter?: Maybe<BootstrapWitnessFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<BootstrapWitnessOrder>;
+};
+
+
+export type WitnessBootstrapAggregateArgs = {
+  filter?: Maybe<BootstrapWitnessFilter>;
+};
+
+
+export type WitnessDatumsArgs = {
+  filter?: Maybe<DatumFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<DatumOrder>;
+};
+
+
+export type WitnessDatumsAggregateArgs = {
+  filter?: Maybe<DatumFilter>;
+};
+
+
+export type WitnessRedeemersArgs = {
+  filter?: Maybe<RedeemerFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<RedeemerOrder>;
+};
+
+
+export type WitnessRedeemersAggregateArgs = {
+  filter?: Maybe<RedeemerFilter>;
+};
+
+
+export type WitnessScriptsArgs = {
+  filter?: Maybe<WitnessScriptFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<WitnessScriptOrder>;
+};
+
+
+export type WitnessScriptsAggregateArgs = {
+  filter?: Maybe<WitnessScriptFilter>;
+};
+
+
+export type WitnessSignaturesArgs = {
+  filter?: Maybe<SignatureFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<SignatureOrder>;
+};
+
+
+export type WitnessSignaturesAggregateArgs = {
+  filter?: Maybe<SignatureFilter>;
+};
+
+
+export type WitnessTransactionArgs = {
+  filter?: Maybe<TransactionFilter>;
+};
+
+export type WitnessAggregateResult = {
+  __typename?: 'WitnessAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+};
+
+export type WitnessFilter = {
+  and?: Maybe<Array<Maybe<WitnessFilter>>>;
+  has?: Maybe<Array<Maybe<WitnessHasFilter>>>;
+  not?: Maybe<WitnessFilter>;
+  or?: Maybe<Array<Maybe<WitnessFilter>>>;
+};
+
+export enum WitnessHasFilter {
+  Bootstrap = 'bootstrap',
+  Datums = 'datums',
+  Redeemers = 'redeemers',
+  Scripts = 'scripts',
+  Signatures = 'signatures',
+  Transaction = 'transaction'
+}
+
+export type WitnessPatch = {
+  bootstrap?: Maybe<Array<BootstrapWitnessRef>>;
+  datums?: Maybe<Array<DatumRef>>;
+  redeemers?: Maybe<Array<RedeemerRef>>;
+  scripts?: Maybe<Array<WitnessScriptRef>>;
+  signatures?: Maybe<Array<SignatureRef>>;
+  transaction?: Maybe<TransactionRef>;
+};
+
+export type WitnessRef = {
+  bootstrap?: Maybe<Array<BootstrapWitnessRef>>;
+  datums?: Maybe<Array<DatumRef>>;
+  redeemers?: Maybe<Array<RedeemerRef>>;
+  scripts?: Maybe<Array<WitnessScriptRef>>;
+  signatures?: Maybe<Array<SignatureRef>>;
+  transaction?: Maybe<TransactionRef>;
+};
+
+export type WitnessScript = {
+  __typename?: 'WitnessScript';
+  key: Scalars['String'];
+  script: Script;
+  witness: Witness;
+};
+
+
+export type WitnessScriptScriptArgs = {
+  filter?: Maybe<ScriptFilter>;
+};
+
+
+export type WitnessScriptWitnessArgs = {
+  filter?: Maybe<WitnessFilter>;
+};
+
+export type WitnessScriptAggregateResult = {
+  __typename?: 'WitnessScriptAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+  keyMax?: Maybe<Scalars['String']>;
+  keyMin?: Maybe<Scalars['String']>;
+};
+
+export type WitnessScriptFilter = {
+  and?: Maybe<Array<Maybe<WitnessScriptFilter>>>;
+  has?: Maybe<Array<Maybe<WitnessScriptHasFilter>>>;
+  not?: Maybe<WitnessScriptFilter>;
+  or?: Maybe<Array<Maybe<WitnessScriptFilter>>>;
+};
+
+export enum WitnessScriptHasFilter {
+  Key = 'key',
+  Script = 'script',
+  Witness = 'witness'
+}
+
+export type WitnessScriptOrder = {
+  asc?: Maybe<WitnessScriptOrderable>;
+  desc?: Maybe<WitnessScriptOrderable>;
+  then?: Maybe<WitnessScriptOrder>;
+};
+
+export enum WitnessScriptOrderable {
+  Key = 'key'
+}
+
+export type WitnessScriptPatch = {
+  key?: Maybe<Scalars['String']>;
+  script?: Maybe<ScriptRef>;
+  witness?: Maybe<WitnessRef>;
+};
+
+export type WitnessScriptRef = {
+  key?: Maybe<Scalars['String']>;
+  script?: Maybe<ScriptRef>;
+  witness?: Maybe<WitnessRef>;
+};
+
 export type BlocksByHashesQueryVariables = Exact<{
   hashes: Array<Scalars['String']> | Scalars['String'];
 }>;
@@ -10722,21 +11842,29 @@ export type ProtocolParametersFragment = { __typename?: 'ProtocolParametersAlonz
 
 export type TxInFragment = { __typename?: 'TransactionInput', index: number, address: { __typename?: 'Address', address: string } };
 
-export type CoreTransactionFieldsFragment = { __typename?: 'Transaction', fee: bigint, invalidBefore?: number | null | undefined, invalidHereafter?: number | null | undefined, hash: string, index: number, size: bigint, inputs: Array<{ __typename?: 'TransactionInput', index: number, address: { __typename?: 'Address', address: string } }>, outputs: Array<{ __typename?: 'TransactionOutput', datum?: string | null | undefined, address: { __typename?: 'Address', address: string }, value: { __typename?: 'Value', coin: bigint, assets?: Array<{ __typename?: 'Token', quantity: string, asset: { __typename?: 'Asset', assetId: string } }> | null | undefined } }>, collateral?: Array<{ __typename?: 'TransactionInput', index: number, address: { __typename?: 'Address', address: string } }> | null | undefined, withdrawals?: Array<{ __typename?: 'Withdrawal', quantity: bigint, rewardAccount: { __typename?: 'RewardAccount', address: string } }> | null | undefined, mint?: Array<{ __typename?: 'Token', quantity: string, asset: { __typename?: 'Asset', assetId: string } }> | null | undefined, block: { __typename?: 'Block', blockNo: number, hash: string, slot: { __typename?: 'Slot', number: number } }, redeemers?: Array<{ __typename?: 'Redeemer', index: number, purpose: string, scriptHash: string, executionUnits: { __typename?: 'ExecutionUnits', memory: number, steps: number } }> | null | undefined, signatures: Array<{ __typename?: 'Signature', signature: string, publicKey: { __typename?: 'PublicKey', key: string } }>, auxiliaryData?: { __typename?: 'AuxiliaryData', hash: string, body: { __typename?: 'AuxiliaryDataBody', blob?: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string } }> | null | undefined } } | null | undefined };
+export type NonRecursiveNativeScriptFieldsFragment = { __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string, hash: string } | null | undefined };
+
+type AnyScript_NativeScript_Fragment = { __typename: 'NativeScript', any?: Array<{ __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string, hash: string } | null | undefined }> | null | undefined, all?: Array<{ __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string, hash: string } | null | undefined }> | null | undefined, nof?: { __typename?: 'NOf', key: string, scripts: Array<{ __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string, hash: string } | null | undefined }> } | null | undefined, startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string, hash: string } | null | undefined };
+
+type AnyScript_PlutusScript_Fragment = { __typename: 'PlutusScript', hash: string, type: string, description: string, cborHex: string };
+
+export type AnyScriptFragment = AnyScript_NativeScript_Fragment | AnyScript_PlutusScript_Fragment;
+
+export type CoreTransactionFieldsFragment = { __typename?: 'Transaction', fee: bigint, hash: string, index: number, size: bigint, inputs: Array<{ __typename?: 'TransactionInput', index: number, address: { __typename?: 'Address', address: string } }>, outputs: Array<{ __typename?: 'TransactionOutput', datumHash?: string | null | undefined, address: { __typename?: 'Address', address: string }, value: { __typename?: 'Value', coin: bigint, assets?: Array<{ __typename?: 'Token', quantity: string, asset: { __typename?: 'Asset', assetId: string } }> | null | undefined } }>, collateral?: Array<{ __typename?: 'TransactionInput', index: number, address: { __typename?: 'Address', address: string } }> | null | undefined, invalidBefore?: { __typename?: 'Slot', slotNo: number } | null | undefined, invalidHereafter?: { __typename?: 'Slot', slotNo: number } | null | undefined, withdrawals?: Array<{ __typename?: 'Withdrawal', quantity: bigint, rewardAccount: { __typename?: 'RewardAccount', address: string } }> | null | undefined, mint?: Array<{ __typename?: 'Token', quantity: string, asset: { __typename?: 'Asset', assetId: string } }> | null | undefined, block: { __typename?: 'Block', blockNo: number, hash: string, slot: { __typename?: 'Slot', number: number } }, witness: { __typename?: 'Witness', signatures: Array<{ __typename?: 'Signature', signature: string, publicKey: { __typename?: 'PublicKey', key: string } }>, scripts?: Array<{ __typename?: 'WitnessScript', key: string, script: { __typename: 'NativeScript', any?: Array<{ __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string, hash: string } | null | undefined }> | null | undefined, all?: Array<{ __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string, hash: string } | null | undefined }> | null | undefined, nof?: { __typename?: 'NOf', key: string, scripts: Array<{ __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string, hash: string } | null | undefined }> } | null | undefined, startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string, hash: string } | null | undefined } | { __typename: 'PlutusScript', hash: string, type: string, description: string, cborHex: string } }> | null | undefined, bootstrap?: Array<{ __typename?: 'BootstrapWitness', signature: string, chainCode?: string | null | undefined, addressAttributes?: string | null | undefined, key?: { __typename?: 'PublicKey', hash: string, key: string } | null | undefined }> | null | undefined, redeemers?: Array<{ __typename?: 'Redeemer', index: number, purpose: string, scriptHash: string, executionUnits: { __typename?: 'ExecutionUnits', memory: number, steps: number } }> | null | undefined, datums?: Array<{ __typename?: 'Datum', hash: string, datum: string }> | null | undefined }, auxiliaryData?: { __typename?: 'AuxiliaryData', hash: string, body: { __typename?: 'AuxiliaryDataBody', blob?: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string } }> | null | undefined } } | null | undefined };
 
 export type TransactionsByHashesQueryVariables = Exact<{
   hashes: Array<Scalars['String']> | Scalars['String'];
 }>;
 
 
-export type TransactionsByHashesQuery = { __typename?: 'Query', queryProtocolParametersAlonzo?: Array<{ __typename?: 'ProtocolParametersAlonzo', stakeKeyDeposit: number, poolDeposit: number } | null | undefined> | null | undefined, queryTransaction?: Array<{ __typename?: 'Transaction', fee: bigint, invalidBefore?: number | null | undefined, invalidHereafter?: number | null | undefined, hash: string, index: number, size: bigint, inputs: Array<{ __typename?: 'TransactionInput', index: number, address: { __typename?: 'Address', address: string } }>, outputs: Array<{ __typename?: 'TransactionOutput', datum?: string | null | undefined, address: { __typename?: 'Address', address: string }, value: { __typename?: 'Value', coin: bigint, assets?: Array<{ __typename?: 'Token', quantity: string, asset: { __typename?: 'Asset', assetId: string } }> | null | undefined } }>, collateral?: Array<{ __typename?: 'TransactionInput', index: number, address: { __typename?: 'Address', address: string } }> | null | undefined, withdrawals?: Array<{ __typename?: 'Withdrawal', quantity: bigint, rewardAccount: { __typename?: 'RewardAccount', address: string } }> | null | undefined, mint?: Array<{ __typename?: 'Token', quantity: string, asset: { __typename?: 'Asset', assetId: string } }> | null | undefined, block: { __typename?: 'Block', blockNo: number, hash: string, slot: { __typename?: 'Slot', number: number } }, redeemers?: Array<{ __typename?: 'Redeemer', index: number, purpose: string, scriptHash: string, executionUnits: { __typename?: 'ExecutionUnits', memory: number, steps: number } }> | null | undefined, signatures: Array<{ __typename?: 'Signature', signature: string, publicKey: { __typename?: 'PublicKey', key: string } }>, auxiliaryData?: { __typename?: 'AuxiliaryData', hash: string, body: { __typename?: 'AuxiliaryDataBody', blob?: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string } }> | null | undefined } } | null | undefined } | null | undefined> | null | undefined };
+export type TransactionsByHashesQuery = { __typename?: 'Query', queryProtocolParametersAlonzo?: Array<{ __typename?: 'ProtocolParametersAlonzo', stakeKeyDeposit: number, poolDeposit: number } | null | undefined> | null | undefined, queryTransaction?: Array<{ __typename?: 'Transaction', fee: bigint, hash: string, index: number, size: bigint, inputs: Array<{ __typename?: 'TransactionInput', index: number, address: { __typename?: 'Address', address: string } }>, outputs: Array<{ __typename?: 'TransactionOutput', datumHash?: string | null | undefined, address: { __typename?: 'Address', address: string }, value: { __typename?: 'Value', coin: bigint, assets?: Array<{ __typename?: 'Token', quantity: string, asset: { __typename?: 'Asset', assetId: string } }> | null | undefined } }>, collateral?: Array<{ __typename?: 'TransactionInput', index: number, address: { __typename?: 'Address', address: string } }> | null | undefined, invalidBefore?: { __typename?: 'Slot', slotNo: number } | null | undefined, invalidHereafter?: { __typename?: 'Slot', slotNo: number } | null | undefined, withdrawals?: Array<{ __typename?: 'Withdrawal', quantity: bigint, rewardAccount: { __typename?: 'RewardAccount', address: string } }> | null | undefined, mint?: Array<{ __typename?: 'Token', quantity: string, asset: { __typename?: 'Asset', assetId: string } }> | null | undefined, block: { __typename?: 'Block', blockNo: number, hash: string, slot: { __typename?: 'Slot', number: number } }, witness: { __typename?: 'Witness', signatures: Array<{ __typename?: 'Signature', signature: string, publicKey: { __typename?: 'PublicKey', key: string } }>, scripts?: Array<{ __typename?: 'WitnessScript', key: string, script: { __typename: 'NativeScript', any?: Array<{ __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string, hash: string } | null | undefined }> | null | undefined, all?: Array<{ __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string, hash: string } | null | undefined }> | null | undefined, nof?: { __typename?: 'NOf', key: string, scripts: Array<{ __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string, hash: string } | null | undefined }> } | null | undefined, startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string, hash: string } | null | undefined } | { __typename: 'PlutusScript', hash: string, type: string, description: string, cborHex: string } }> | null | undefined, bootstrap?: Array<{ __typename?: 'BootstrapWitness', signature: string, chainCode?: string | null | undefined, addressAttributes?: string | null | undefined, key?: { __typename?: 'PublicKey', hash: string, key: string } | null | undefined }> | null | undefined, redeemers?: Array<{ __typename?: 'Redeemer', index: number, purpose: string, scriptHash: string, executionUnits: { __typename?: 'ExecutionUnits', memory: number, steps: number } }> | null | undefined, datums?: Array<{ __typename?: 'Datum', hash: string, datum: string }> | null | undefined }, auxiliaryData?: { __typename?: 'AuxiliaryData', hash: string, body: { __typename?: 'AuxiliaryDataBody', blob?: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string } }> | null | undefined } } | null | undefined } | null | undefined> | null | undefined };
 
 export type TransactionIdsByAddressesQueryVariables = Exact<{
   addresses: Array<Scalars['String']> | Scalars['String'];
 }>;
 
 
-export type TransactionIdsByAddressesQuery = { __typename?: 'Query', queryProtocolParametersAlonzo?: Array<{ __typename?: 'ProtocolParametersAlonzo', stakeKeyDeposit: number, poolDeposit: number } | null | undefined> | null | undefined, queryAddress?: Array<{ __typename?: 'Address', inputs: Array<{ __typename?: 'TransactionInput', transaction: { __typename?: 'Transaction', fee: bigint, invalidBefore?: number | null | undefined, invalidHereafter?: number | null | undefined, hash: string, index: number, size: bigint, inputs: Array<{ __typename?: 'TransactionInput', index: number, address: { __typename?: 'Address', address: string } }>, outputs: Array<{ __typename?: 'TransactionOutput', datum?: string | null | undefined, address: { __typename?: 'Address', address: string }, value: { __typename?: 'Value', coin: bigint, assets?: Array<{ __typename?: 'Token', quantity: string, asset: { __typename?: 'Asset', assetId: string } }> | null | undefined } }>, collateral?: Array<{ __typename?: 'TransactionInput', index: number, address: { __typename?: 'Address', address: string } }> | null | undefined, withdrawals?: Array<{ __typename?: 'Withdrawal', quantity: bigint, rewardAccount: { __typename?: 'RewardAccount', address: string } }> | null | undefined, mint?: Array<{ __typename?: 'Token', quantity: string, asset: { __typename?: 'Asset', assetId: string } }> | null | undefined, block: { __typename?: 'Block', blockNo: number, hash: string, slot: { __typename?: 'Slot', number: number } }, redeemers?: Array<{ __typename?: 'Redeemer', index: number, purpose: string, scriptHash: string, executionUnits: { __typename?: 'ExecutionUnits', memory: number, steps: number } }> | null | undefined, signatures: Array<{ __typename?: 'Signature', signature: string, publicKey: { __typename?: 'PublicKey', key: string } }>, auxiliaryData?: { __typename?: 'AuxiliaryData', hash: string, body: { __typename?: 'AuxiliaryDataBody', blob?: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string } }> | null | undefined } } | null | undefined } }>, utxo: Array<{ __typename?: 'TransactionOutput', transaction: { __typename?: 'Transaction', fee: bigint, invalidBefore?: number | null | undefined, invalidHereafter?: number | null | undefined, hash: string, index: number, size: bigint, inputs: Array<{ __typename?: 'TransactionInput', index: number, address: { __typename?: 'Address', address: string } }>, outputs: Array<{ __typename?: 'TransactionOutput', datum?: string | null | undefined, address: { __typename?: 'Address', address: string }, value: { __typename?: 'Value', coin: bigint, assets?: Array<{ __typename?: 'Token', quantity: string, asset: { __typename?: 'Asset', assetId: string } }> | null | undefined } }>, collateral?: Array<{ __typename?: 'TransactionInput', index: number, address: { __typename?: 'Address', address: string } }> | null | undefined, withdrawals?: Array<{ __typename?: 'Withdrawal', quantity: bigint, rewardAccount: { __typename?: 'RewardAccount', address: string } }> | null | undefined, mint?: Array<{ __typename?: 'Token', quantity: string, asset: { __typename?: 'Asset', assetId: string } }> | null | undefined, block: { __typename?: 'Block', blockNo: number, hash: string, slot: { __typename?: 'Slot', number: number } }, redeemers?: Array<{ __typename?: 'Redeemer', index: number, purpose: string, scriptHash: string, executionUnits: { __typename?: 'ExecutionUnits', memory: number, steps: number } }> | null | undefined, signatures: Array<{ __typename?: 'Signature', signature: string, publicKey: { __typename?: 'PublicKey', key: string } }>, auxiliaryData?: { __typename?: 'AuxiliaryData', hash: string, body: { __typename?: 'AuxiliaryDataBody', blob?: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string } }> | null | undefined } } | null | undefined } }> } | null | undefined> | null | undefined };
+export type TransactionIdsByAddressesQuery = { __typename?: 'Query', queryProtocolParametersAlonzo?: Array<{ __typename?: 'ProtocolParametersAlonzo', stakeKeyDeposit: number, poolDeposit: number } | null | undefined> | null | undefined, queryAddress?: Array<{ __typename?: 'Address', inputs: Array<{ __typename?: 'TransactionInput', transaction: { __typename?: 'Transaction', fee: bigint, hash: string, index: number, size: bigint, inputs: Array<{ __typename?: 'TransactionInput', index: number, address: { __typename?: 'Address', address: string } }>, outputs: Array<{ __typename?: 'TransactionOutput', datumHash?: string | null | undefined, address: { __typename?: 'Address', address: string }, value: { __typename?: 'Value', coin: bigint, assets?: Array<{ __typename?: 'Token', quantity: string, asset: { __typename?: 'Asset', assetId: string } }> | null | undefined } }>, collateral?: Array<{ __typename?: 'TransactionInput', index: number, address: { __typename?: 'Address', address: string } }> | null | undefined, invalidBefore?: { __typename?: 'Slot', slotNo: number } | null | undefined, invalidHereafter?: { __typename?: 'Slot', slotNo: number } | null | undefined, withdrawals?: Array<{ __typename?: 'Withdrawal', quantity: bigint, rewardAccount: { __typename?: 'RewardAccount', address: string } }> | null | undefined, mint?: Array<{ __typename?: 'Token', quantity: string, asset: { __typename?: 'Asset', assetId: string } }> | null | undefined, block: { __typename?: 'Block', blockNo: number, hash: string, slot: { __typename?: 'Slot', number: number } }, witness: { __typename?: 'Witness', signatures: Array<{ __typename?: 'Signature', signature: string, publicKey: { __typename?: 'PublicKey', key: string } }>, scripts?: Array<{ __typename?: 'WitnessScript', key: string, script: { __typename: 'NativeScript', any?: Array<{ __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string, hash: string } | null | undefined }> | null | undefined, all?: Array<{ __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string, hash: string } | null | undefined }> | null | undefined, nof?: { __typename?: 'NOf', key: string, scripts: Array<{ __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string, hash: string } | null | undefined }> } | null | undefined, startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string, hash: string } | null | undefined } | { __typename: 'PlutusScript', hash: string, type: string, description: string, cborHex: string } }> | null | undefined, bootstrap?: Array<{ __typename?: 'BootstrapWitness', signature: string, chainCode?: string | null | undefined, addressAttributes?: string | null | undefined, key?: { __typename?: 'PublicKey', hash: string, key: string } | null | undefined }> | null | undefined, redeemers?: Array<{ __typename?: 'Redeemer', index: number, purpose: string, scriptHash: string, executionUnits: { __typename?: 'ExecutionUnits', memory: number, steps: number } }> | null | undefined, datums?: Array<{ __typename?: 'Datum', hash: string, datum: string }> | null | undefined }, auxiliaryData?: { __typename?: 'AuxiliaryData', hash: string, body: { __typename?: 'AuxiliaryDataBody', blob?: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string } }> | null | undefined } } | null | undefined } }>, utxo: Array<{ __typename?: 'TransactionOutput', transaction: { __typename?: 'Transaction', fee: bigint, hash: string, index: number, size: bigint, inputs: Array<{ __typename?: 'TransactionInput', index: number, address: { __typename?: 'Address', address: string } }>, outputs: Array<{ __typename?: 'TransactionOutput', datumHash?: string | null | undefined, address: { __typename?: 'Address', address: string }, value: { __typename?: 'Value', coin: bigint, assets?: Array<{ __typename?: 'Token', quantity: string, asset: { __typename?: 'Asset', assetId: string } }> | null | undefined } }>, collateral?: Array<{ __typename?: 'TransactionInput', index: number, address: { __typename?: 'Address', address: string } }> | null | undefined, invalidBefore?: { __typename?: 'Slot', slotNo: number } | null | undefined, invalidHereafter?: { __typename?: 'Slot', slotNo: number } | null | undefined, withdrawals?: Array<{ __typename?: 'Withdrawal', quantity: bigint, rewardAccount: { __typename?: 'RewardAccount', address: string } }> | null | undefined, mint?: Array<{ __typename?: 'Token', quantity: string, asset: { __typename?: 'Asset', assetId: string } }> | null | undefined, block: { __typename?: 'Block', blockNo: number, hash: string, slot: { __typename?: 'Slot', number: number } }, witness: { __typename?: 'Witness', signatures: Array<{ __typename?: 'Signature', signature: string, publicKey: { __typename?: 'PublicKey', key: string } }>, scripts?: Array<{ __typename?: 'WitnessScript', key: string, script: { __typename: 'NativeScript', any?: Array<{ __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string, hash: string } | null | undefined }> | null | undefined, all?: Array<{ __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string, hash: string } | null | undefined }> | null | undefined, nof?: { __typename?: 'NOf', key: string, scripts: Array<{ __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string, hash: string } | null | undefined }> } | null | undefined, startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string, hash: string } | null | undefined } | { __typename: 'PlutusScript', hash: string, type: string, description: string, cborHex: string } }> | null | undefined, bootstrap?: Array<{ __typename?: 'BootstrapWitness', signature: string, chainCode?: string | null | undefined, addressAttributes?: string | null | undefined, key?: { __typename?: 'PublicKey', hash: string, key: string } | null | undefined }> | null | undefined, redeemers?: Array<{ __typename?: 'Redeemer', index: number, purpose: string, scriptHash: string, executionUnits: { __typename?: 'ExecutionUnits', memory: number, steps: number } }> | null | undefined, datums?: Array<{ __typename?: 'Datum', hash: string, datum: string }> | null | undefined }, auxiliaryData?: { __typename?: 'AuxiliaryData', hash: string, body: { __typename?: 'AuxiliaryDataBody', blob?: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string } }> | null | undefined } } | null | undefined } }> } | null | undefined> | null | undefined };
 
 export const CertificateTransactionFieldsFragmentDoc = gql`
     fragment certificateTransactionFields on Transaction {
@@ -10865,6 +11993,47 @@ export const TxInFragmentDoc = gql`
   }
 }
     `;
+export const NonRecursiveNativeScriptFieldsFragmentDoc = gql`
+    fragment nonRecursiveNativeScriptFields on NativeScript {
+  __typename
+  startsAt {
+    number
+  }
+  expiresAt {
+    number
+  }
+  vkey {
+    key
+    hash
+  }
+}
+    `;
+export const AnyScriptFragmentDoc = gql`
+    fragment anyScript on Script {
+  ... on NativeScript {
+    ...nonRecursiveNativeScriptFields
+    any {
+      ...nonRecursiveNativeScriptFields
+    }
+    all {
+      ...nonRecursiveNativeScriptFields
+    }
+    nof {
+      key
+      scripts {
+        ...nonRecursiveNativeScriptFields
+      }
+    }
+  }
+  ... on PlutusScript {
+    __typename
+    hash
+    type
+    description
+    cborHex
+  }
+}
+    ${NonRecursiveNativeScriptFieldsFragmentDoc}`;
 export const MetadatumValueFragmentDoc = gql`
     fragment metadatumValue on Metadatum {
   __typename
@@ -10943,14 +12112,18 @@ export const CoreTransactionFieldsFragmentDoc = gql`
         quantity
       }
     }
-    datum
+    datumHash
   }
   collateral {
     ...txIn
   }
   fee
-  invalidBefore
-  invalidHereafter
+  invalidBefore {
+    slotNo: number
+  }
+  invalidHereafter {
+    slotNo: number
+  }
   withdrawals {
     rewardAccount {
       address
@@ -10973,20 +12146,41 @@ export const CoreTransactionFieldsFragmentDoc = gql`
     }
     hash
   }
-  redeemers {
-    index
-    purpose
-    scriptHash
-    executionUnits {
-      memory
-      steps
+  witness {
+    signatures {
+      publicKey {
+        key
+      }
+      signature
     }
-  }
-  signatures {
-    publicKey {
+    scripts {
       key
+      script {
+        ...anyScript
+      }
     }
-    signature
+    bootstrap {
+      signature
+      chainCode
+      addressAttributes
+      key {
+        hash
+        key
+      }
+    }
+    redeemers {
+      index
+      purpose
+      scriptHash
+      executionUnits {
+        memory
+        steps
+      }
+    }
+    datums {
+      hash
+      datum
+    }
   }
   auxiliaryData {
     hash
@@ -11007,6 +12201,7 @@ export const CoreTransactionFieldsFragmentDoc = gql`
   }
 }
     ${TxInFragmentDoc}
+${AnyScriptFragmentDoc}
 ${MetadatumValueFragmentDoc}
 ${MetadatumArrayFragmentDoc}
 ${MetadatumMapFragmentDoc}`;

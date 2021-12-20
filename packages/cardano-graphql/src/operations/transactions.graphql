@@ -70,6 +70,45 @@ fragment txIn on TransactionInput {
   }
 }
 
+fragment nonRecursiveNativeScriptFields on NativeScript {
+  __typename
+  startsAt {
+    number
+  }
+  expiresAt {
+    number
+  }
+  vkey {
+    key
+    hash
+  }
+}
+fragment anyScript on Script {
+  ... on NativeScript {
+    ...nonRecursiveNativeScriptFields
+    # Current implmentation does not support nested arrays
+    any {
+      ...nonRecursiveNativeScriptFields
+    }
+    all {
+      ...nonRecursiveNativeScriptFields
+    }
+    nof {
+      key
+      scripts {
+        ...nonRecursiveNativeScriptFields
+      }
+    }
+  }
+  ... on PlutusScript {
+    __typename
+    hash
+    type
+    description
+    cborHex
+  }
+}
+
 fragment coreTransactionFields on Transaction {
   inputs {
     ...txIn
@@ -87,14 +126,18 @@ fragment coreTransactionFields on Transaction {
         quantity
       }
     }
-    datum
+    datumHash
   }
   collateral {
     ...txIn
   }
   fee
-  invalidBefore
-  invalidHereafter
+  invalidBefore {
+    slotNo: number
+  }
+  invalidHereafter {
+    slotNo: number
+  }
   withdrawals {
     rewardAccount {
       address
@@ -117,20 +160,41 @@ fragment coreTransactionFields on Transaction {
     }
     hash
   }
-  redeemers {
-    index
-    purpose
-    scriptHash
-    executionUnits {
-      memory
-      steps
+  witness {
+    signatures {
+      publicKey {
+        key
+      }
+      signature
     }
-  }
-  signatures {
-    publicKey {
+    scripts {
       key
+      script {
+        ...anyScript
+      }
     }
-    signature
+    bootstrap {
+      signature
+      chainCode
+      addressAttributes
+      key {
+        hash
+        key
+      }
+    }
+    redeemers {
+      index
+      purpose
+      scriptHash
+      executionUnits {
+        memory
+        steps
+      }
+    }
+    datums {
+      hash
+      datum
+    }
   }
   auxiliaryData {
     hash

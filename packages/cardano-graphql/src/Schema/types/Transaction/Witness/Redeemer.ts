@@ -1,8 +1,8 @@
 import { Cardano } from '@cardano-sdk/core';
-import { ExecutionUnits } from '../ExUnits';
+import { ExecutionUnits } from '../../ExUnits';
 import { Field, Int, ObjectType } from 'type-graphql';
-import { Int64 } from '../util';
-import { Transaction } from './Transaction';
+import { Int64 } from '../../util';
+import { Witness } from './Witness';
 
 @ObjectType()
 export class Redeemer {
@@ -14,8 +14,8 @@ export class Redeemer {
   purpose: Cardano.Redeemer['purpose'];
   @Field(() => String)
   scriptHash: Cardano.Hash28ByteBase16;
-  @Field(() => Transaction)
-  transaction: Transaction;
+  @Field(() => Witness)
+  witness: Witness;
   @Field(() => ExecutionUnits)
   executionUnits: Cardano.ExUnits;
 }

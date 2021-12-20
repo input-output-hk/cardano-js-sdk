@@ -1,4 +1,4 @@
-export * from './Redeemer';
+export * from './Witness';
 export * from './Value';
 export * from './Token';
 export * from './Withdrawal';

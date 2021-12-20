@@ -6,7 +6,7 @@ import { TransactionOutput } from './TransactionOutput';
 export class Token {
   @Field(() => Asset)
   asset: Asset;
-  @Field(() => String)
+  @Field(() => String) // TODO: check if int64 would be sufficient and use that if it is
   quantity: bigint;
   @Field(() => TransactionOutput)
   transactionOutput: TransactionOutput;

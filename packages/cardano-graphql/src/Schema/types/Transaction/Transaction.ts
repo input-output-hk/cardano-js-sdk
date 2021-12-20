@@ -7,13 +7,12 @@ import { Certificate } from './CertificateUnion';
 import { Directive, Field, Int, ObjectType } from 'type-graphql';
 import { Int64 } from '../util';
 import { PublicKey } from '../PublicKey';
-import { Redeemer } from './Redeemer';
-import { Signature } from './Signature';
 import { Slot } from '../Slot';
 import { Token } from './Token';
 import { TransactionInput } from './TransactionInput';
 import { TransactionOutput } from './TransactionOutput';
 import { Withdrawal } from './Withdrawal';
+import { Witness } from './Witness';
 
 @ObjectType()
 export class Transaction {
@@ -36,9 +35,9 @@ export class Transaction {
   @Directive('@hasInverse(field: transaction)')
   @Field(() => [TransactionOutput])
   outputs: TransactionOutput[];
-  @Field(() => Int, { nullable: true })
+  @Field(() => Slot, { nullable: true })
   invalidBefore?: Slot;
-  @Field(() => Int, { nullable: true })
+  @Field(() => Slot, { nullable: true })
   invalidHereafter?: Slot;
   @Directive('@hasInverse(field: transaction)')
   @Field(() => AuxiliaryData, { nullable: true })
@@ -46,9 +45,6 @@ export class Transaction {
   // TODO: simplify core type to use negative qty for burn
   @Field(() => [Token], { nullable: true })
   mint?: Token[];
-  @Directive('@hasInverse(field: transaction)')
-  @Field(() => [Redeemer], { nullable: true })
-  redeemers?: Redeemer[];
   @Field(() => Int64)
   size: number;
   @Field(() => Int64)
@@ -59,8 +55,8 @@ export class Transaction {
   @Field(() => [Withdrawal], { nullable: true })
   withdrawals?: Withdrawal[];
   @Directive('@hasInverse(field: transaction)')
-  @Field(() => [Signature])
-  signatures: Signature[];
+  @Field(() => Witness)
+  witness: Witness;
   @Field(() => [Certificate], { nullable: true })
   certificates?: typeof Certificate[];
   @Field(() => String, { nullable: true })

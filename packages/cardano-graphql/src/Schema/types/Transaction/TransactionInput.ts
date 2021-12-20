@@ -1,6 +1,6 @@
 import { Address } from '../Address';
 import { Field, Int, ObjectType } from 'type-graphql';
-import { Redeemer } from './Redeemer';
+import { Redeemer } from './Witness/Redeemer';
 import { Transaction } from './Transaction';
 import { Value } from './Value';
 

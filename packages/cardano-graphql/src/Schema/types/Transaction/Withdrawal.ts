@@ -1,7 +1,7 @@
 import { Cardano } from '@cardano-sdk/core';
 import { Field, ObjectType } from 'type-graphql';
 import { Int64 } from '../util';
-import { Redeemer } from './Redeemer';
+import { Redeemer } from './Witness/Redeemer';
 import { RewardAccount } from '../Address';
 import { Transaction } from './Transaction';
 
