@@ -4,7 +4,7 @@ import { BigIntMath, Cardano, ProtocolParametersRequiredByWallet } from '../../'
  * Implementation is the same as in CSL.get_implicit_input() and CSL.get_deposit().
  */
 export const computeImplicitCoin = (
-  { stakeKeyDeposit, poolDeposit }: ProtocolParametersRequiredByWallet,
+  { stakeKeyDeposit, poolDeposit }: Pick<ProtocolParametersRequiredByWallet, 'stakeKeyDeposit' | 'poolDeposit'>,
   { certificates, withdrawals }: Pick<Cardano.TxBodyAlonzo, 'certificates' | 'withdrawals'>
 ): Cardano.ImplicitCoin => {
   const stakeKeyDepositBigint = stakeKeyDeposit && BigInt(stakeKeyDeposit);
