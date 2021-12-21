@@ -57,7 +57,7 @@ const Relay = createUnionType({
 @ObjectType()
 export class PoolParameters {
   @Field(() => Int)
-  sinceEpoch: number;
+  sinceEpochNo: number;
   @Field(() => Int)
   transactionBlockNo: number;
   @Field(() => String)

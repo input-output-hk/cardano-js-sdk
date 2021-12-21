@@ -80,7 +80,6 @@ fragment nonRecursiveNativeScriptFields on NativeScript {
   }
   vkey {
     key
-    hash
   }
 }
 fragment anyScript on Script {
@@ -102,9 +101,6 @@ fragment anyScript on Script {
   }
   ... on PlutusScript {
     __typename
-    hash
-    type
-    description
     cborHex
   }
 }
@@ -127,6 +123,61 @@ fragment coreTransactionFields on Transaction {
       }
     }
     datumHash
+  }
+  certificates {
+    __typename
+    ... on GenesisKeyDelegationCertificate {
+      genesisHash
+      genesisDelegateHash
+      vrfKeyHash
+    }
+    ... on MirCertificate {
+      rewardAccount {
+        address
+      }
+      quantity
+      pot
+    }
+    ... on PoolRegistrationCertificate {
+      epoch {
+        number
+      }
+      poolParameters {
+        ...allPoolParameterFields
+        stakePool {
+          id
+        }
+      }
+    }
+    ... on PoolRetirementCertificate {
+      epoch {
+        number
+      }
+      stakePool {
+        id
+      }
+    }
+    ... on StakeDelegationCertificate {
+      rewardAccount {
+        address
+      }
+      stakePool {
+        id
+      }
+      epoch {
+        number
+      }
+    }
+    ... on StakeKeyRegistrationCertificate {
+      rewardAccount {
+        address
+      }
+    }
+    ... on StakeKeyDeregistrationCertificate {
+      rewardAccount {
+        address
+      }
+    }
   }
   collateral {
     ...txIn

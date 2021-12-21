@@ -10,8 +10,8 @@ export class NativeScript {
   any?: NativeScript[];
   @Field(() => [NativeScript], { nullable: true })
   all?: NativeScript[];
-  @Field(() => NOf, { nullable: true })
-  nof?: NOf;
+  @Field(() => [NOf], { nullable: true })
+  nof?: [NOf];
   @Field(() => Slot, { nullable: true })
   startsAt?: Slot;
   @Field(() => Slot, { nullable: true })

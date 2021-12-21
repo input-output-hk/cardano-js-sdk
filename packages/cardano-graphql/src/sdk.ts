@@ -833,7 +833,7 @@ export type AddNativeScriptInput = {
   all?: Maybe<Array<NativeScriptRef>>;
   any?: Maybe<Array<NativeScriptRef>>;
   expiresAt?: Maybe<SlotRef>;
-  nof?: Maybe<NOfRef>;
+  nof?: Maybe<Array<NOfRef>>;
   startsAt?: Maybe<SlotRef>;
   vkey?: Maybe<PublicKeyRef>;
 };
@@ -935,7 +935,7 @@ export type AddPoolParametersInput = {
   poolRegistrationCertificate: PoolRegistrationCertificateRef;
   relays: Array<SearchResultRef>;
   rewardAccount: RewardAccountRef;
-  sinceEpoch: Scalars['Int'];
+  sinceEpochNo: Scalars['Int'];
   stakePool: StakePoolRef;
   transactionBlockNo: Scalars['Int'];
   /** hex-encoded 32 byte vrf vkey */
@@ -5793,7 +5793,8 @@ export type NativeScript = {
   any?: Maybe<Array<NativeScript>>;
   anyAggregate?: Maybe<NativeScriptAggregateResult>;
   expiresAt?: Maybe<Slot>;
-  nof?: Maybe<NOf>;
+  nof?: Maybe<Array<NOf>>;
+  nofAggregate?: Maybe<NOfAggregateResult>;
   startsAt?: Maybe<Slot>;
   vkey?: Maybe<PublicKey>;
 };
@@ -5836,6 +5837,15 @@ export type NativeScriptExpiresAtArgs = {
 /** Exactly one field is not null */
 export type NativeScriptNofArgs = {
   filter?: Maybe<NOfFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<NOfOrder>;
+};
+
+
+/** Exactly one field is not null */
+export type NativeScriptNofAggregateArgs = {
+  filter?: Maybe<NOfFilter>;
 };
 
 
@@ -5875,7 +5885,7 @@ export type NativeScriptPatch = {
   all?: Maybe<Array<NativeScriptRef>>;
   any?: Maybe<Array<NativeScriptRef>>;
   expiresAt?: Maybe<SlotRef>;
-  nof?: Maybe<NOfRef>;
+  nof?: Maybe<Array<NOfRef>>;
   startsAt?: Maybe<SlotRef>;
   vkey?: Maybe<PublicKeyRef>;
 };
@@ -5884,7 +5894,7 @@ export type NativeScriptRef = {
   all?: Maybe<Array<NativeScriptRef>>;
   any?: Maybe<Array<NativeScriptRef>>;
   expiresAt?: Maybe<SlotRef>;
-  nof?: Maybe<NOfRef>;
+  nof?: Maybe<Array<NOfRef>>;
   startsAt?: Maybe<SlotRef>;
   vkey?: Maybe<PublicKeyRef>;
 };
@@ -6206,7 +6216,7 @@ export type PoolParameters = {
   poolRegistrationCertificate: PoolRegistrationCertificate;
   relays: Array<SearchResult>;
   rewardAccount: RewardAccount;
-  sinceEpoch: Scalars['Int'];
+  sinceEpochNo: Scalars['Int'];
   stakePool: StakePool;
   transactionBlockNo: Scalars['Int'];
   /** hex-encoded 32 byte vrf vkey */
@@ -6276,10 +6286,10 @@ export type PoolParametersAggregateResult = {
   pledgeSum?: Maybe<Scalars['Int64']>;
   poolIdMax?: Maybe<Scalars['String']>;
   poolIdMin?: Maybe<Scalars['String']>;
-  sinceEpochAvg?: Maybe<Scalars['Float']>;
-  sinceEpochMax?: Maybe<Scalars['Int']>;
-  sinceEpochMin?: Maybe<Scalars['Int']>;
-  sinceEpochSum?: Maybe<Scalars['Int']>;
+  sinceEpochNoAvg?: Maybe<Scalars['Float']>;
+  sinceEpochNoMax?: Maybe<Scalars['Int']>;
+  sinceEpochNoMin?: Maybe<Scalars['Int']>;
+  sinceEpochNoSum?: Maybe<Scalars['Int']>;
   transactionBlockNoAvg?: Maybe<Scalars['Float']>;
   transactionBlockNoMax?: Maybe<Scalars['Int']>;
   transactionBlockNoMin?: Maybe<Scalars['Int']>;
@@ -6306,7 +6316,7 @@ export enum PoolParametersHasFilter {
   PoolRegistrationCertificate = 'poolRegistrationCertificate',
   Relays = 'relays',
   RewardAccount = 'rewardAccount',
-  SinceEpoch = 'sinceEpoch',
+  SinceEpochNo = 'sinceEpochNo',
   StakePool = 'stakePool',
   TransactionBlockNo = 'transactionBlockNo',
   Vrf = 'vrf'
@@ -6322,7 +6332,7 @@ export enum PoolParametersOrderable {
   Cost = 'cost',
   Pledge = 'pledge',
   PoolId = 'poolId',
-  SinceEpoch = 'sinceEpoch',
+  SinceEpochNo = 'sinceEpochNo',
   TransactionBlockNo = 'transactionBlockNo',
   Vrf = 'vrf'
 }
@@ -6338,7 +6348,7 @@ export type PoolParametersPatch = {
   poolRegistrationCertificate?: Maybe<PoolRegistrationCertificateRef>;
   relays?: Maybe<Array<SearchResultRef>>;
   rewardAccount?: Maybe<RewardAccountRef>;
-  sinceEpoch?: Maybe<Scalars['Int']>;
+  sinceEpochNo?: Maybe<Scalars['Int']>;
   stakePool?: Maybe<StakePoolRef>;
   transactionBlockNo?: Maybe<Scalars['Int']>;
   /** hex-encoded 32 byte vrf vkey */
@@ -6356,7 +6366,7 @@ export type PoolParametersRef = {
   poolRegistrationCertificate?: Maybe<PoolRegistrationCertificateRef>;
   relays?: Maybe<Array<SearchResultRef>>;
   rewardAccount?: Maybe<RewardAccountRef>;
-  sinceEpoch?: Maybe<Scalars['Int']>;
+  sinceEpochNo?: Maybe<Scalars['Int']>;
   stakePool?: Maybe<StakePoolRef>;
   transactionBlockNo?: Maybe<Scalars['Int']>;
   /** hex-encoded 32 byte vrf vkey */
@@ -11800,6 +11810,8 @@ export type NetworkInfoQuery = { __typename?: 'Query', queryBlock?: Array<{ __ty
 
 export type CertificateTransactionFieldsFragment = { __typename?: 'Transaction', hash: string, block: { __typename?: 'Block', blockNo: number } };
 
+export type AllPoolParameterFieldsFragment = { __typename?: 'PoolParameters', cost: bigint, vrf: string, pledge: bigint, metadata?: { __typename?: 'StakePoolMetadata', ticker: string, name: string, description: string, homepage: string, extDataUrl?: string | null | undefined, extSigUrl?: string | null | undefined, extVkey?: string | null | undefined, ext?: { __typename?: 'ExtendedStakePoolMetadata', serial: number, pool: { __typename?: 'ExtendedStakePoolMetadataFields', id: string, country?: string | null | undefined, status?: ExtendedPoolStatus | null | undefined, contact?: { __typename?: 'PoolContactData', primary: string, email?: string | null | undefined, facebook?: string | null | undefined, github?: string | null | undefined, feed?: string | null | undefined, telegram?: string | null | undefined, twitter?: string | null | undefined } | null | undefined, media_assets?: { __typename?: 'ThePoolsMediaAssets', icon_png_64x64: string, logo_png?: string | null | undefined, logo_svg?: string | null | undefined, color_fg?: string | null | undefined, color_bg?: string | null | undefined } | null | undefined, itn?: { __typename?: 'ITNVerification', owner: string, witness: string } | null | undefined } } | null | undefined } | null | undefined, owners: Array<{ __typename?: 'RewardAccount', address: string }>, margin: { __typename?: 'Ratio', numerator: number, denominator: number }, relays: Array<{ __typename: 'RelayByAddress', ipv4?: string | null | undefined, ipv6?: string | null | undefined, port?: number | null | undefined } | { __typename: 'RelayByName', hostname: string, port?: number | null | undefined } | { __typename: 'RelayByNameMultihost', dnsName: string }>, poolRegistrationCertificate: { __typename?: 'PoolRegistrationCertificate', transaction: { __typename?: 'Transaction', hash: string } }, rewardAccount: { __typename?: 'RewardAccount', address: string }, metadataJson?: { __typename?: 'StakePoolMetadataJson', hash: string, url: string } | null | undefined };
+
 export type AllStakePoolFieldsFragment = { __typename?: 'StakePool', id: string, hexId: string, status: StakePoolStatus, poolParameters: Array<{ __typename?: 'PoolParameters', cost: bigint, vrf: string, pledge: bigint, metadata?: { __typename?: 'StakePoolMetadata', ticker: string, name: string, description: string, homepage: string, extDataUrl?: string | null | undefined, extSigUrl?: string | null | undefined, extVkey?: string | null | undefined, ext?: { __typename?: 'ExtendedStakePoolMetadata', serial: number, pool: { __typename?: 'ExtendedStakePoolMetadataFields', id: string, country?: string | null | undefined, status?: ExtendedPoolStatus | null | undefined, contact?: { __typename?: 'PoolContactData', primary: string, email?: string | null | undefined, facebook?: string | null | undefined, github?: string | null | undefined, feed?: string | null | undefined, telegram?: string | null | undefined, twitter?: string | null | undefined } | null | undefined, media_assets?: { __typename?: 'ThePoolsMediaAssets', icon_png_64x64: string, logo_png?: string | null | undefined, logo_svg?: string | null | undefined, color_fg?: string | null | undefined, color_bg?: string | null | undefined } | null | undefined, itn?: { __typename?: 'ITNVerification', owner: string, witness: string } | null | undefined } } | null | undefined } | null | undefined, owners: Array<{ __typename?: 'RewardAccount', address: string }>, margin: { __typename?: 'Ratio', numerator: number, denominator: number }, relays: Array<{ __typename: 'RelayByAddress', ipv4?: string | null | undefined, ipv6?: string | null | undefined, port?: number | null | undefined } | { __typename: 'RelayByName', hostname: string, port?: number | null | undefined } | { __typename: 'RelayByNameMultihost', dnsName: string }>, poolRegistrationCertificate: { __typename?: 'PoolRegistrationCertificate', transaction: { __typename?: 'Transaction', hash: string } }, rewardAccount: { __typename?: 'RewardAccount', address: string }, metadataJson?: { __typename?: 'StakePoolMetadataJson', hash: string, url: string } | null | undefined }>, metrics: { __typename?: 'StakePoolMetrics', blocksCreated: number, livePledge: bigint, saturation: number, delegators: number, stake: { __typename?: 'StakePoolMetricsStake', live: bigint, active: bigint }, size: { __typename?: 'StakePoolMetricsSize', live: number, active: number } }, poolRetirementCertificates: Array<{ __typename?: 'PoolRetirementCertificate', transaction: { __typename?: 'Transaction', hash: string, block: { __typename?: 'Block', blockNo: number } } }> };
 
 export type StakePoolsByMetadataQueryVariables = Exact<{
@@ -11842,30 +11854,108 @@ export type ProtocolParametersFragment = { __typename?: 'ProtocolParametersAlonz
 
 export type TxInFragment = { __typename?: 'TransactionInput', index: number, address: { __typename?: 'Address', address: string } };
 
-export type NonRecursiveNativeScriptFieldsFragment = { __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string, hash: string } | null | undefined };
+export type NonRecursiveNativeScriptFieldsFragment = { __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string } | null | undefined };
 
-type AnyScript_NativeScript_Fragment = { __typename: 'NativeScript', any?: Array<{ __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string, hash: string } | null | undefined }> | null | undefined, all?: Array<{ __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string, hash: string } | null | undefined }> | null | undefined, nof?: { __typename?: 'NOf', key: string, scripts: Array<{ __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string, hash: string } | null | undefined }> } | null | undefined, startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string, hash: string } | null | undefined };
+type AnyScript_NativeScript_Fragment = { __typename: 'NativeScript', any?: Array<{ __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string } | null | undefined }> | null | undefined, all?: Array<{ __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string } | null | undefined }> | null | undefined, nof?: Array<{ __typename?: 'NOf', key: string, scripts: Array<{ __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string } | null | undefined }> }> | null | undefined, startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string } | null | undefined };
 
-type AnyScript_PlutusScript_Fragment = { __typename: 'PlutusScript', hash: string, type: string, description: string, cborHex: string };
+type AnyScript_PlutusScript_Fragment = { __typename: 'PlutusScript', cborHex: string };
 
 export type AnyScriptFragment = AnyScript_NativeScript_Fragment | AnyScript_PlutusScript_Fragment;
 
-export type CoreTransactionFieldsFragment = { __typename?: 'Transaction', fee: bigint, hash: string, index: number, size: bigint, inputs: Array<{ __typename?: 'TransactionInput', index: number, address: { __typename?: 'Address', address: string } }>, outputs: Array<{ __typename?: 'TransactionOutput', datumHash?: string | null | undefined, address: { __typename?: 'Address', address: string }, value: { __typename?: 'Value', coin: bigint, assets?: Array<{ __typename?: 'Token', quantity: string, asset: { __typename?: 'Asset', assetId: string } }> | null | undefined } }>, collateral?: Array<{ __typename?: 'TransactionInput', index: number, address: { __typename?: 'Address', address: string } }> | null | undefined, invalidBefore?: { __typename?: 'Slot', slotNo: number } | null | undefined, invalidHereafter?: { __typename?: 'Slot', slotNo: number } | null | undefined, withdrawals?: Array<{ __typename?: 'Withdrawal', quantity: bigint, rewardAccount: { __typename?: 'RewardAccount', address: string } }> | null | undefined, mint?: Array<{ __typename?: 'Token', quantity: string, asset: { __typename?: 'Asset', assetId: string } }> | null | undefined, block: { __typename?: 'Block', blockNo: number, hash: string, slot: { __typename?: 'Slot', number: number } }, witness: { __typename?: 'Witness', signatures: Array<{ __typename?: 'Signature', signature: string, publicKey: { __typename?: 'PublicKey', key: string } }>, scripts?: Array<{ __typename?: 'WitnessScript', key: string, script: { __typename: 'NativeScript', any?: Array<{ __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string, hash: string } | null | undefined }> | null | undefined, all?: Array<{ __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string, hash: string } | null | undefined }> | null | undefined, nof?: { __typename?: 'NOf', key: string, scripts: Array<{ __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string, hash: string } | null | undefined }> } | null | undefined, startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string, hash: string } | null | undefined } | { __typename: 'PlutusScript', hash: string, type: string, description: string, cborHex: string } }> | null | undefined, bootstrap?: Array<{ __typename?: 'BootstrapWitness', signature: string, chainCode?: string | null | undefined, addressAttributes?: string | null | undefined, key?: { __typename?: 'PublicKey', hash: string, key: string } | null | undefined }> | null | undefined, redeemers?: Array<{ __typename?: 'Redeemer', index: number, purpose: string, scriptHash: string, executionUnits: { __typename?: 'ExecutionUnits', memory: number, steps: number } }> | null | undefined, datums?: Array<{ __typename?: 'Datum', hash: string, datum: string }> | null | undefined }, auxiliaryData?: { __typename?: 'AuxiliaryData', hash: string, body: { __typename?: 'AuxiliaryDataBody', blob?: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string } }> | null | undefined } } | null | undefined };
+export type CoreTransactionFieldsFragment = { __typename?: 'Transaction', fee: bigint, hash: string, index: number, size: bigint, inputs: Array<{ __typename?: 'TransactionInput', index: number, address: { __typename?: 'Address', address: string } }>, outputs: Array<{ __typename?: 'TransactionOutput', datumHash?: string | null | undefined, address: { __typename?: 'Address', address: string }, value: { __typename?: 'Value', coin: bigint, assets?: Array<{ __typename?: 'Token', quantity: string, asset: { __typename?: 'Asset', assetId: string } }> | null | undefined } }>, certificates?: Array<{ __typename: 'GenesisKeyDelegationCertificate', genesisHash: string, genesisDelegateHash: string, vrfKeyHash: string } | { __typename: 'MirCertificate', quantity: bigint, pot: string, rewardAccount: { __typename?: 'RewardAccount', address: string } } | { __typename: 'PoolRegistrationCertificate', epoch: { __typename?: 'Epoch', number: number }, poolParameters: { __typename?: 'PoolParameters', cost: bigint, vrf: string, pledge: bigint, stakePool: { __typename?: 'StakePool', id: string }, metadata?: { __typename?: 'StakePoolMetadata', ticker: string, name: string, description: string, homepage: string, extDataUrl?: string | null | undefined, extSigUrl?: string | null | undefined, extVkey?: string | null | undefined, ext?: { __typename?: 'ExtendedStakePoolMetadata', serial: number, pool: { __typename?: 'ExtendedStakePoolMetadataFields', id: string, country?: string | null | undefined, status?: ExtendedPoolStatus | null | undefined, contact?: { __typename?: 'PoolContactData', primary: string, email?: string | null | undefined, facebook?: string | null | undefined, github?: string | null | undefined, feed?: string | null | undefined, telegram?: string | null | undefined, twitter?: string | null | undefined } | null | undefined, media_assets?: { __typename?: 'ThePoolsMediaAssets', icon_png_64x64: string, logo_png?: string | null | undefined, logo_svg?: string | null | undefined, color_fg?: string | null | undefined, color_bg?: string | null | undefined } | null | undefined, itn?: { __typename?: 'ITNVerification', owner: string, witness: string } | null | undefined } } | null | undefined } | null | undefined, owners: Array<{ __typename?: 'RewardAccount', address: string }>, margin: { __typename?: 'Ratio', numerator: number, denominator: number }, relays: Array<{ __typename: 'RelayByAddress', ipv4?: string | null | undefined, ipv6?: string | null | undefined, port?: number | null | undefined } | { __typename: 'RelayByName', hostname: string, port?: number | null | undefined } | { __typename: 'RelayByNameMultihost', dnsName: string }>, poolRegistrationCertificate: { __typename?: 'PoolRegistrationCertificate', transaction: { __typename?: 'Transaction', hash: string } }, rewardAccount: { __typename?: 'RewardAccount', address: string }, metadataJson?: { __typename?: 'StakePoolMetadataJson', hash: string, url: string } | null | undefined } } | { __typename: 'PoolRetirementCertificate', epoch: { __typename?: 'Epoch', number: number }, stakePool: { __typename?: 'StakePool', id: string } } | { __typename: 'StakeDelegationCertificate', rewardAccount: { __typename?: 'RewardAccount', address: string }, stakePool: { __typename?: 'StakePool', id: string }, epoch: { __typename?: 'Epoch', number: number } } | { __typename: 'StakeKeyDeregistrationCertificate', rewardAccount: { __typename?: 'RewardAccount', address: string } } | { __typename: 'StakeKeyRegistrationCertificate', rewardAccount: { __typename?: 'RewardAccount', address: string } }> | null | undefined, collateral?: Array<{ __typename?: 'TransactionInput', index: number, address: { __typename?: 'Address', address: string } }> | null | undefined, invalidBefore?: { __typename?: 'Slot', slotNo: number } | null | undefined, invalidHereafter?: { __typename?: 'Slot', slotNo: number } | null | undefined, withdrawals?: Array<{ __typename?: 'Withdrawal', quantity: bigint, rewardAccount: { __typename?: 'RewardAccount', address: string } }> | null | undefined, mint?: Array<{ __typename?: 'Token', quantity: string, asset: { __typename?: 'Asset', assetId: string } }> | null | undefined, block: { __typename?: 'Block', blockNo: number, hash: string, slot: { __typename?: 'Slot', number: number } }, witness: { __typename?: 'Witness', signatures: Array<{ __typename?: 'Signature', signature: string, publicKey: { __typename?: 'PublicKey', key: string } }>, scripts?: Array<{ __typename?: 'WitnessScript', key: string, script: { __typename: 'NativeScript', any?: Array<{ __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string } | null | undefined }> | null | undefined, all?: Array<{ __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string } | null | undefined }> | null | undefined, nof?: Array<{ __typename?: 'NOf', key: string, scripts: Array<{ __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string } | null | undefined }> }> | null | undefined, startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string } | null | undefined } | { __typename: 'PlutusScript', cborHex: string } }> | null | undefined, bootstrap?: Array<{ __typename?: 'BootstrapWitness', signature: string, chainCode?: string | null | undefined, addressAttributes?: string | null | undefined, key?: { __typename?: 'PublicKey', hash: string, key: string } | null | undefined }> | null | undefined, redeemers?: Array<{ __typename?: 'Redeemer', index: number, purpose: string, scriptHash: string, executionUnits: { __typename?: 'ExecutionUnits', memory: number, steps: number } }> | null | undefined, datums?: Array<{ __typename?: 'Datum', hash: string, datum: string }> | null | undefined }, auxiliaryData?: { __typename?: 'AuxiliaryData', hash: string, body: { __typename?: 'AuxiliaryDataBody', blob?: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string } }> | null | undefined } } | null | undefined };
 
 export type TransactionsByHashesQueryVariables = Exact<{
   hashes: Array<Scalars['String']> | Scalars['String'];
 }>;
 
 
-export type TransactionsByHashesQuery = { __typename?: 'Query', queryProtocolParametersAlonzo?: Array<{ __typename?: 'ProtocolParametersAlonzo', stakeKeyDeposit: number, poolDeposit: number } | null | undefined> | null | undefined, queryTransaction?: Array<{ __typename?: 'Transaction', fee: bigint, hash: string, index: number, size: bigint, inputs: Array<{ __typename?: 'TransactionInput', index: number, address: { __typename?: 'Address', address: string } }>, outputs: Array<{ __typename?: 'TransactionOutput', datumHash?: string | null | undefined, address: { __typename?: 'Address', address: string }, value: { __typename?: 'Value', coin: bigint, assets?: Array<{ __typename?: 'Token', quantity: string, asset: { __typename?: 'Asset', assetId: string } }> | null | undefined } }>, collateral?: Array<{ __typename?: 'TransactionInput', index: number, address: { __typename?: 'Address', address: string } }> | null | undefined, invalidBefore?: { __typename?: 'Slot', slotNo: number } | null | undefined, invalidHereafter?: { __typename?: 'Slot', slotNo: number } | null | undefined, withdrawals?: Array<{ __typename?: 'Withdrawal', quantity: bigint, rewardAccount: { __typename?: 'RewardAccount', address: string } }> | null | undefined, mint?: Array<{ __typename?: 'Token', quantity: string, asset: { __typename?: 'Asset', assetId: string } }> | null | undefined, block: { __typename?: 'Block', blockNo: number, hash: string, slot: { __typename?: 'Slot', number: number } }, witness: { __typename?: 'Witness', signatures: Array<{ __typename?: 'Signature', signature: string, publicKey: { __typename?: 'PublicKey', key: string } }>, scripts?: Array<{ __typename?: 'WitnessScript', key: string, script: { __typename: 'NativeScript', any?: Array<{ __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string, hash: string } | null | undefined }> | null | undefined, all?: Array<{ __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string, hash: string } | null | undefined }> | null | undefined, nof?: { __typename?: 'NOf', key: string, scripts: Array<{ __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string, hash: string } | null | undefined }> } | null | undefined, startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string, hash: string } | null | undefined } | { __typename: 'PlutusScript', hash: string, type: string, description: string, cborHex: string } }> | null | undefined, bootstrap?: Array<{ __typename?: 'BootstrapWitness', signature: string, chainCode?: string | null | undefined, addressAttributes?: string | null | undefined, key?: { __typename?: 'PublicKey', hash: string, key: string } | null | undefined }> | null | undefined, redeemers?: Array<{ __typename?: 'Redeemer', index: number, purpose: string, scriptHash: string, executionUnits: { __typename?: 'ExecutionUnits', memory: number, steps: number } }> | null | undefined, datums?: Array<{ __typename?: 'Datum', hash: string, datum: string }> | null | undefined }, auxiliaryData?: { __typename?: 'AuxiliaryData', hash: string, body: { __typename?: 'AuxiliaryDataBody', blob?: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string } }> | null | undefined } } | null | undefined } | null | undefined> | null | undefined };
+export type TransactionsByHashesQuery = { __typename?: 'Query', queryProtocolParametersAlonzo?: Array<{ __typename?: 'ProtocolParametersAlonzo', stakeKeyDeposit: number, poolDeposit: number } | null | undefined> | null | undefined, queryTransaction?: Array<{ __typename?: 'Transaction', fee: bigint, hash: string, index: number, size: bigint, inputs: Array<{ __typename?: 'TransactionInput', index: number, address: { __typename?: 'Address', address: string } }>, outputs: Array<{ __typename?: 'TransactionOutput', datumHash?: string | null | undefined, address: { __typename?: 'Address', address: string }, value: { __typename?: 'Value', coin: bigint, assets?: Array<{ __typename?: 'Token', quantity: string, asset: { __typename?: 'Asset', assetId: string } }> | null | undefined } }>, certificates?: Array<{ __typename: 'GenesisKeyDelegationCertificate', genesisHash: string, genesisDelegateHash: string, vrfKeyHash: string } | { __typename: 'MirCertificate', quantity: bigint, pot: string, rewardAccount: { __typename?: 'RewardAccount', address: string } } | { __typename: 'PoolRegistrationCertificate', epoch: { __typename?: 'Epoch', number: number }, poolParameters: { __typename?: 'PoolParameters', cost: bigint, vrf: string, pledge: bigint, stakePool: { __typename?: 'StakePool', id: string }, metadata?: { __typename?: 'StakePoolMetadata', ticker: string, name: string, description: string, homepage: string, extDataUrl?: string | null | undefined, extSigUrl?: string | null | undefined, extVkey?: string | null | undefined, ext?: { __typename?: 'ExtendedStakePoolMetadata', serial: number, pool: { __typename?: 'ExtendedStakePoolMetadataFields', id: string, country?: string | null | undefined, status?: ExtendedPoolStatus | null | undefined, contact?: { __typename?: 'PoolContactData', primary: string, email?: string | null | undefined, facebook?: string | null | undefined, github?: string | null | undefined, feed?: string | null | undefined, telegram?: string | null | undefined, twitter?: string | null | undefined } | null | undefined, media_assets?: { __typename?: 'ThePoolsMediaAssets', icon_png_64x64: string, logo_png?: string | null | undefined, logo_svg?: string | null | undefined, color_fg?: string | null | undefined, color_bg?: string | null | undefined } | null | undefined, itn?: { __typename?: 'ITNVerification', owner: string, witness: string } | null | undefined } } | null | undefined } | null | undefined, owners: Array<{ __typename?: 'RewardAccount', address: string }>, margin: { __typename?: 'Ratio', numerator: number, denominator: number }, relays: Array<{ __typename: 'RelayByAddress', ipv4?: string | null | undefined, ipv6?: string | null | undefined, port?: number | null | undefined } | { __typename: 'RelayByName', hostname: string, port?: number | null | undefined } | { __typename: 'RelayByNameMultihost', dnsName: string }>, poolRegistrationCertificate: { __typename?: 'PoolRegistrationCertificate', transaction: { __typename?: 'Transaction', hash: string } }, rewardAccount: { __typename?: 'RewardAccount', address: string }, metadataJson?: { __typename?: 'StakePoolMetadataJson', hash: string, url: string } | null | undefined } } | { __typename: 'PoolRetirementCertificate', epoch: { __typename?: 'Epoch', number: number }, stakePool: { __typename?: 'StakePool', id: string } } | { __typename: 'StakeDelegationCertificate', rewardAccount: { __typename?: 'RewardAccount', address: string }, stakePool: { __typename?: 'StakePool', id: string }, epoch: { __typename?: 'Epoch', number: number } } | { __typename: 'StakeKeyDeregistrationCertificate', rewardAccount: { __typename?: 'RewardAccount', address: string } } | { __typename: 'StakeKeyRegistrationCertificate', rewardAccount: { __typename?: 'RewardAccount', address: string } }> | null | undefined, collateral?: Array<{ __typename?: 'TransactionInput', index: number, address: { __typename?: 'Address', address: string } }> | null | undefined, invalidBefore?: { __typename?: 'Slot', slotNo: number } | null | undefined, invalidHereafter?: { __typename?: 'Slot', slotNo: number } | null | undefined, withdrawals?: Array<{ __typename?: 'Withdrawal', quantity: bigint, rewardAccount: { __typename?: 'RewardAccount', address: string } }> | null | undefined, mint?: Array<{ __typename?: 'Token', quantity: string, asset: { __typename?: 'Asset', assetId: string } }> | null | undefined, block: { __typename?: 'Block', blockNo: number, hash: string, slot: { __typename?: 'Slot', number: number } }, witness: { __typename?: 'Witness', signatures: Array<{ __typename?: 'Signature', signature: string, publicKey: { __typename?: 'PublicKey', key: string } }>, scripts?: Array<{ __typename?: 'WitnessScript', key: string, script: { __typename: 'NativeScript', any?: Array<{ __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string } | null | undefined }> | null | undefined, all?: Array<{ __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string } | null | undefined }> | null | undefined, nof?: Array<{ __typename?: 'NOf', key: string, scripts: Array<{ __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string } | null | undefined }> }> | null | undefined, startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string } | null | undefined } | { __typename: 'PlutusScript', cborHex: string } }> | null | undefined, bootstrap?: Array<{ __typename?: 'BootstrapWitness', signature: string, chainCode?: string | null | undefined, addressAttributes?: string | null | undefined, key?: { __typename?: 'PublicKey', hash: string, key: string } | null | undefined }> | null | undefined, redeemers?: Array<{ __typename?: 'Redeemer', index: number, purpose: string, scriptHash: string, executionUnits: { __typename?: 'ExecutionUnits', memory: number, steps: number } }> | null | undefined, datums?: Array<{ __typename?: 'Datum', hash: string, datum: string }> | null | undefined }, auxiliaryData?: { __typename?: 'AuxiliaryData', hash: string, body: { __typename?: 'AuxiliaryDataBody', blob?: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string } }> | null | undefined } } | null | undefined } | null | undefined> | null | undefined };
 
 export type TransactionIdsByAddressesQueryVariables = Exact<{
   addresses: Array<Scalars['String']> | Scalars['String'];
 }>;
 
 
-export type TransactionIdsByAddressesQuery = { __typename?: 'Query', queryProtocolParametersAlonzo?: Array<{ __typename?: 'ProtocolParametersAlonzo', stakeKeyDeposit: number, poolDeposit: number } | null | undefined> | null | undefined, queryAddress?: Array<{ __typename?: 'Address', inputs: Array<{ __typename?: 'TransactionInput', transaction: { __typename?: 'Transaction', fee: bigint, hash: string, index: number, size: bigint, inputs: Array<{ __typename?: 'TransactionInput', index: number, address: { __typename?: 'Address', address: string } }>, outputs: Array<{ __typename?: 'TransactionOutput', datumHash?: string | null | undefined, address: { __typename?: 'Address', address: string }, value: { __typename?: 'Value', coin: bigint, assets?: Array<{ __typename?: 'Token', quantity: string, asset: { __typename?: 'Asset', assetId: string } }> | null | undefined } }>, collateral?: Array<{ __typename?: 'TransactionInput', index: number, address: { __typename?: 'Address', address: string } }> | null | undefined, invalidBefore?: { __typename?: 'Slot', slotNo: number } | null | undefined, invalidHereafter?: { __typename?: 'Slot', slotNo: number } | null | undefined, withdrawals?: Array<{ __typename?: 'Withdrawal', quantity: bigint, rewardAccount: { __typename?: 'RewardAccount', address: string } }> | null | undefined, mint?: Array<{ __typename?: 'Token', quantity: string, asset: { __typename?: 'Asset', assetId: string } }> | null | undefined, block: { __typename?: 'Block', blockNo: number, hash: string, slot: { __typename?: 'Slot', number: number } }, witness: { __typename?: 'Witness', signatures: Array<{ __typename?: 'Signature', signature: string, publicKey: { __typename?: 'PublicKey', key: string } }>, scripts?: Array<{ __typename?: 'WitnessScript', key: string, script: { __typename: 'NativeScript', any?: Array<{ __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string, hash: string } | null | undefined }> | null | undefined, all?: Array<{ __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string, hash: string } | null | undefined }> | null | undefined, nof?: { __typename?: 'NOf', key: string, scripts: Array<{ __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string, hash: string } | null | undefined }> } | null | undefined, startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string, hash: string } | null | undefined } | { __typename: 'PlutusScript', hash: string, type: string, description: string, cborHex: string } }> | null | undefined, bootstrap?: Array<{ __typename?: 'BootstrapWitness', signature: string, chainCode?: string | null | undefined, addressAttributes?: string | null | undefined, key?: { __typename?: 'PublicKey', hash: string, key: string } | null | undefined }> | null | undefined, redeemers?: Array<{ __typename?: 'Redeemer', index: number, purpose: string, scriptHash: string, executionUnits: { __typename?: 'ExecutionUnits', memory: number, steps: number } }> | null | undefined, datums?: Array<{ __typename?: 'Datum', hash: string, datum: string }> | null | undefined }, auxiliaryData?: { __typename?: 'AuxiliaryData', hash: string, body: { __typename?: 'AuxiliaryDataBody', blob?: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string } }> | null | undefined } } | null | undefined } }>, utxo: Array<{ __typename?: 'TransactionOutput', transaction: { __typename?: 'Transaction', fee: bigint, hash: string, index: number, size: bigint, inputs: Array<{ __typename?: 'TransactionInput', index: number, address: { __typename?: 'Address', address: string } }>, outputs: Array<{ __typename?: 'TransactionOutput', datumHash?: string | null | undefined, address: { __typename?: 'Address', address: string }, value: { __typename?: 'Value', coin: bigint, assets?: Array<{ __typename?: 'Token', quantity: string, asset: { __typename?: 'Asset', assetId: string } }> | null | undefined } }>, collateral?: Array<{ __typename?: 'TransactionInput', index: number, address: { __typename?: 'Address', address: string } }> | null | undefined, invalidBefore?: { __typename?: 'Slot', slotNo: number } | null | undefined, invalidHereafter?: { __typename?: 'Slot', slotNo: number } | null | undefined, withdrawals?: Array<{ __typename?: 'Withdrawal', quantity: bigint, rewardAccount: { __typename?: 'RewardAccount', address: string } }> | null | undefined, mint?: Array<{ __typename?: 'Token', quantity: string, asset: { __typename?: 'Asset', assetId: string } }> | null | undefined, block: { __typename?: 'Block', blockNo: number, hash: string, slot: { __typename?: 'Slot', number: number } }, witness: { __typename?: 'Witness', signatures: Array<{ __typename?: 'Signature', signature: string, publicKey: { __typename?: 'PublicKey', key: string } }>, scripts?: Array<{ __typename?: 'WitnessScript', key: string, script: { __typename: 'NativeScript', any?: Array<{ __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string, hash: string } | null | undefined }> | null | undefined, all?: Array<{ __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string, hash: string } | null | undefined }> | null | undefined, nof?: { __typename?: 'NOf', key: string, scripts: Array<{ __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string, hash: string } | null | undefined }> } | null | undefined, startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string, hash: string } | null | undefined } | { __typename: 'PlutusScript', hash: string, type: string, description: string, cborHex: string } }> | null | undefined, bootstrap?: Array<{ __typename?: 'BootstrapWitness', signature: string, chainCode?: string | null | undefined, addressAttributes?: string | null | undefined, key?: { __typename?: 'PublicKey', hash: string, key: string } | null | undefined }> | null | undefined, redeemers?: Array<{ __typename?: 'Redeemer', index: number, purpose: string, scriptHash: string, executionUnits: { __typename?: 'ExecutionUnits', memory: number, steps: number } }> | null | undefined, datums?: Array<{ __typename?: 'Datum', hash: string, datum: string }> | null | undefined }, auxiliaryData?: { __typename?: 'AuxiliaryData', hash: string, body: { __typename?: 'AuxiliaryDataBody', blob?: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string } }> | null | undefined } } | null | undefined } }> } | null | undefined> | null | undefined };
+export type TransactionIdsByAddressesQuery = { __typename?: 'Query', queryProtocolParametersAlonzo?: Array<{ __typename?: 'ProtocolParametersAlonzo', stakeKeyDeposit: number, poolDeposit: number } | null | undefined> | null | undefined, queryAddress?: Array<{ __typename?: 'Address', inputs: Array<{ __typename?: 'TransactionInput', transaction: { __typename?: 'Transaction', fee: bigint, hash: string, index: number, size: bigint, inputs: Array<{ __typename?: 'TransactionInput', index: number, address: { __typename?: 'Address', address: string } }>, outputs: Array<{ __typename?: 'TransactionOutput', datumHash?: string | null | undefined, address: { __typename?: 'Address', address: string }, value: { __typename?: 'Value', coin: bigint, assets?: Array<{ __typename?: 'Token', quantity: string, asset: { __typename?: 'Asset', assetId: string } }> | null | undefined } }>, certificates?: Array<{ __typename: 'GenesisKeyDelegationCertificate', genesisHash: string, genesisDelegateHash: string, vrfKeyHash: string } | { __typename: 'MirCertificate', quantity: bigint, pot: string, rewardAccount: { __typename?: 'RewardAccount', address: string } } | { __typename: 'PoolRegistrationCertificate', epoch: { __typename?: 'Epoch', number: number }, poolParameters: { __typename?: 'PoolParameters', cost: bigint, vrf: string, pledge: bigint, stakePool: { __typename?: 'StakePool', id: string }, metadata?: { __typename?: 'StakePoolMetadata', ticker: string, name: string, description: string, homepage: string, extDataUrl?: string | null | undefined, extSigUrl?: string | null | undefined, extVkey?: string | null | undefined, ext?: { __typename?: 'ExtendedStakePoolMetadata', serial: number, pool: { __typename?: 'ExtendedStakePoolMetadataFields', id: string, country?: string | null | undefined, status?: ExtendedPoolStatus | null | undefined, contact?: { __typename?: 'PoolContactData', primary: string, email?: string | null | undefined, facebook?: string | null | undefined, github?: string | null | undefined, feed?: string | null | undefined, telegram?: string | null | undefined, twitter?: string | null | undefined } | null | undefined, media_assets?: { __typename?: 'ThePoolsMediaAssets', icon_png_64x64: string, logo_png?: string | null | undefined, logo_svg?: string | null | undefined, color_fg?: string | null | undefined, color_bg?: string | null | undefined } | null | undefined, itn?: { __typename?: 'ITNVerification', owner: string, witness: string } | null | undefined } } | null | undefined } | null | undefined, owners: Array<{ __typename?: 'RewardAccount', address: string }>, margin: { __typename?: 'Ratio', numerator: number, denominator: number }, relays: Array<{ __typename: 'RelayByAddress', ipv4?: string | null | undefined, ipv6?: string | null | undefined, port?: number | null | undefined } | { __typename: 'RelayByName', hostname: string, port?: number | null | undefined } | { __typename: 'RelayByNameMultihost', dnsName: string }>, poolRegistrationCertificate: { __typename?: 'PoolRegistrationCertificate', transaction: { __typename?: 'Transaction', hash: string } }, rewardAccount: { __typename?: 'RewardAccount', address: string }, metadataJson?: { __typename?: 'StakePoolMetadataJson', hash: string, url: string } | null | undefined } } | { __typename: 'PoolRetirementCertificate', epoch: { __typename?: 'Epoch', number: number }, stakePool: { __typename?: 'StakePool', id: string } } | { __typename: 'StakeDelegationCertificate', rewardAccount: { __typename?: 'RewardAccount', address: string }, stakePool: { __typename?: 'StakePool', id: string }, epoch: { __typename?: 'Epoch', number: number } } | { __typename: 'StakeKeyDeregistrationCertificate', rewardAccount: { __typename?: 'RewardAccount', address: string } } | { __typename: 'StakeKeyRegistrationCertificate', rewardAccount: { __typename?: 'RewardAccount', address: string } }> | null | undefined, collateral?: Array<{ __typename?: 'TransactionInput', index: number, address: { __typename?: 'Address', address: string } }> | null | undefined, invalidBefore?: { __typename?: 'Slot', slotNo: number } | null | undefined, invalidHereafter?: { __typename?: 'Slot', slotNo: number } | null | undefined, withdrawals?: Array<{ __typename?: 'Withdrawal', quantity: bigint, rewardAccount: { __typename?: 'RewardAccount', address: string } }> | null | undefined, mint?: Array<{ __typename?: 'Token', quantity: string, asset: { __typename?: 'Asset', assetId: string } }> | null | undefined, block: { __typename?: 'Block', blockNo: number, hash: string, slot: { __typename?: 'Slot', number: number } }, witness: { __typename?: 'Witness', signatures: Array<{ __typename?: 'Signature', signature: string, publicKey: { __typename?: 'PublicKey', key: string } }>, scripts?: Array<{ __typename?: 'WitnessScript', key: string, script: { __typename: 'NativeScript', any?: Array<{ __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string } | null | undefined }> | null | undefined, all?: Array<{ __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string } | null | undefined }> | null | undefined, nof?: Array<{ __typename?: 'NOf', key: string, scripts: Array<{ __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string } | null | undefined }> }> | null | undefined, startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string } | null | undefined } | { __typename: 'PlutusScript', cborHex: string } }> | null | undefined, bootstrap?: Array<{ __typename?: 'BootstrapWitness', signature: string, chainCode?: string | null | undefined, addressAttributes?: string | null | undefined, key?: { __typename?: 'PublicKey', hash: string, key: string } | null | undefined }> | null | undefined, redeemers?: Array<{ __typename?: 'Redeemer', index: number, purpose: string, scriptHash: string, executionUnits: { __typename?: 'ExecutionUnits', memory: number, steps: number } }> | null | undefined, datums?: Array<{ __typename?: 'Datum', hash: string, datum: string }> | null | undefined }, auxiliaryData?: { __typename?: 'AuxiliaryData', hash: string, body: { __typename?: 'AuxiliaryDataBody', blob?: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string } }> | null | undefined } } | null | undefined } }>, utxo: Array<{ __typename?: 'TransactionOutput', transaction: { __typename?: 'Transaction', fee: bigint, hash: string, index: number, size: bigint, inputs: Array<{ __typename?: 'TransactionInput', index: number, address: { __typename?: 'Address', address: string } }>, outputs: Array<{ __typename?: 'TransactionOutput', datumHash?: string | null | undefined, address: { __typename?: 'Address', address: string }, value: { __typename?: 'Value', coin: bigint, assets?: Array<{ __typename?: 'Token', quantity: string, asset: { __typename?: 'Asset', assetId: string } }> | null | undefined } }>, certificates?: Array<{ __typename: 'GenesisKeyDelegationCertificate', genesisHash: string, genesisDelegateHash: string, vrfKeyHash: string } | { __typename: 'MirCertificate', quantity: bigint, pot: string, rewardAccount: { __typename?: 'RewardAccount', address: string } } | { __typename: 'PoolRegistrationCertificate', epoch: { __typename?: 'Epoch', number: number }, poolParameters: { __typename?: 'PoolParameters', cost: bigint, vrf: string, pledge: bigint, stakePool: { __typename?: 'StakePool', id: string }, metadata?: { __typename?: 'StakePoolMetadata', ticker: string, name: string, description: string, homepage: string, extDataUrl?: string | null | undefined, extSigUrl?: string | null | undefined, extVkey?: string | null | undefined, ext?: { __typename?: 'ExtendedStakePoolMetadata', serial: number, pool: { __typename?: 'ExtendedStakePoolMetadataFields', id: string, country?: string | null | undefined, status?: ExtendedPoolStatus | null | undefined, contact?: { __typename?: 'PoolContactData', primary: string, email?: string | null | undefined, facebook?: string | null | undefined, github?: string | null | undefined, feed?: string | null | undefined, telegram?: string | null | undefined, twitter?: string | null | undefined } | null | undefined, media_assets?: { __typename?: 'ThePoolsMediaAssets', icon_png_64x64: string, logo_png?: string | null | undefined, logo_svg?: string | null | undefined, color_fg?: string | null | undefined, color_bg?: string | null | undefined } | null | undefined, itn?: { __typename?: 'ITNVerification', owner: string, witness: string } | null | undefined } } | null | undefined } | null | undefined, owners: Array<{ __typename?: 'RewardAccount', address: string }>, margin: { __typename?: 'Ratio', numerator: number, denominator: number }, relays: Array<{ __typename: 'RelayByAddress', ipv4?: string | null | undefined, ipv6?: string | null | undefined, port?: number | null | undefined } | { __typename: 'RelayByName', hostname: string, port?: number | null | undefined } | { __typename: 'RelayByNameMultihost', dnsName: string }>, poolRegistrationCertificate: { __typename?: 'PoolRegistrationCertificate', transaction: { __typename?: 'Transaction', hash: string } }, rewardAccount: { __typename?: 'RewardAccount', address: string }, metadataJson?: { __typename?: 'StakePoolMetadataJson', hash: string, url: string } | null | undefined } } | { __typename: 'PoolRetirementCertificate', epoch: { __typename?: 'Epoch', number: number }, stakePool: { __typename?: 'StakePool', id: string } } | { __typename: 'StakeDelegationCertificate', rewardAccount: { __typename?: 'RewardAccount', address: string }, stakePool: { __typename?: 'StakePool', id: string }, epoch: { __typename?: 'Epoch', number: number } } | { __typename: 'StakeKeyDeregistrationCertificate', rewardAccount: { __typename?: 'RewardAccount', address: string } } | { __typename: 'StakeKeyRegistrationCertificate', rewardAccount: { __typename?: 'RewardAccount', address: string } }> | null | undefined, collateral?: Array<{ __typename?: 'TransactionInput', index: number, address: { __typename?: 'Address', address: string } }> | null | undefined, invalidBefore?: { __typename?: 'Slot', slotNo: number } | null | undefined, invalidHereafter?: { __typename?: 'Slot', slotNo: number } | null | undefined, withdrawals?: Array<{ __typename?: 'Withdrawal', quantity: bigint, rewardAccount: { __typename?: 'RewardAccount', address: string } }> | null | undefined, mint?: Array<{ __typename?: 'Token', quantity: string, asset: { __typename?: 'Asset', assetId: string } }> | null | undefined, block: { __typename?: 'Block', blockNo: number, hash: string, slot: { __typename?: 'Slot', number: number } }, witness: { __typename?: 'Witness', signatures: Array<{ __typename?: 'Signature', signature: string, publicKey: { __typename?: 'PublicKey', key: string } }>, scripts?: Array<{ __typename?: 'WitnessScript', key: string, script: { __typename: 'NativeScript', any?: Array<{ __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string } | null | undefined }> | null | undefined, all?: Array<{ __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string } | null | undefined }> | null | undefined, nof?: Array<{ __typename?: 'NOf', key: string, scripts: Array<{ __typename: 'NativeScript', startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string } | null | undefined }> }> | null | undefined, startsAt?: { __typename?: 'Slot', number: number } | null | undefined, expiresAt?: { __typename?: 'Slot', number: number } | null | undefined, vkey?: { __typename?: 'PublicKey', key: string } | null | undefined } | { __typename: 'PlutusScript', cborHex: string } }> | null | undefined, bootstrap?: Array<{ __typename?: 'BootstrapWitness', signature: string, chainCode?: string | null | undefined, addressAttributes?: string | null | undefined, key?: { __typename?: 'PublicKey', hash: string, key: string } | null | undefined }> | null | undefined, redeemers?: Array<{ __typename?: 'Redeemer', index: number, purpose: string, scriptHash: string, executionUnits: { __typename?: 'ExecutionUnits', memory: number, steps: number } }> | null | undefined, datums?: Array<{ __typename?: 'Datum', hash: string, datum: string }> | null | undefined }, auxiliaryData?: { __typename?: 'AuxiliaryData', hash: string, body: { __typename?: 'AuxiliaryDataBody', blob?: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray', array: Array<{ __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap', map: Array<{ __typename?: 'KeyValueMetadatum', key: string, metadatum: { __typename: 'BytesMetadatum', bytes: string } | { __typename: 'IntegerMetadatum', int: number } | { __typename: 'MetadatumArray' } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string }> } | { __typename: 'MetadatumMap' } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string } }> } | { __typename: 'StringMetadatum', string: string } }> | null | undefined } } | null | undefined } }> } | null | undefined> | null | undefined };
 
+export const AllPoolParameterFieldsFragmentDoc = gql`
+    fragment allPoolParameterFields on PoolParameters {
+  metadata {
+    ticker
+    name
+    description
+    homepage
+    extDataUrl
+    extSigUrl
+    extVkey
+    ext {
+      serial
+      pool {
+        id
+        country
+        status
+        contact {
+          primary
+          email
+          facebook
+          github
+          feed
+          telegram
+          twitter
+        }
+        media_assets {
+          icon_png_64x64
+          logo_png
+          logo_svg
+          color_fg
+          color_bg
+        }
+        itn {
+          owner
+          witness
+        }
+      }
+    }
+  }
+  owners {
+    address
+  }
+  cost
+  margin {
+    numerator
+    denominator
+  }
+  vrf
+  relays {
+    __typename
+    ... on RelayByName {
+      hostname
+      port
+    }
+    ... on RelayByAddress {
+      ipv4
+      ipv6
+      port
+    }
+    ... on RelayByNameMultihost {
+      dnsName
+    }
+  }
+  poolRegistrationCertificate {
+    transaction {
+      hash
+    }
+  }
+  rewardAccount {
+    address
+  }
+  pledge
+  metadataJson {
+    hash
+    url
+  }
+}
+    `;
 export const CertificateTransactionFieldsFragmentDoc = gql`
     fragment certificateTransactionFields on Transaction {
   block {
@@ -11880,83 +11970,10 @@ export const AllStakePoolFieldsFragmentDoc = gql`
   hexId
   status
   poolParameters(
-    order: {desc: sinceEpoch, then: {desc: transactionBlockNo}}
+    order: {desc: sinceEpochNo, then: {desc: transactionBlockNo}}
     first: 1
   ) {
-    metadata {
-      ticker
-      name
-      description
-      homepage
-      extDataUrl
-      extSigUrl
-      extVkey
-      ext {
-        serial
-        pool {
-          id
-          country
-          status
-          contact {
-            primary
-            email
-            facebook
-            github
-            feed
-            telegram
-            twitter
-          }
-          media_assets {
-            icon_png_64x64
-            logo_png
-            logo_svg
-            color_fg
-            color_bg
-          }
-          itn {
-            owner
-            witness
-          }
-        }
-      }
-    }
-    owners {
-      address
-    }
-    cost
-    margin {
-      numerator
-      denominator
-    }
-    vrf
-    relays {
-      __typename
-      ... on RelayByName {
-        hostname
-        port
-      }
-      ... on RelayByAddress {
-        ipv4
-        ipv6
-        port
-      }
-      ... on RelayByNameMultihost {
-        dnsName
-      }
-    }
-    poolRegistrationCertificate {
-      transaction {
-        hash
-      }
-    }
-    rewardAccount {
-      address
-    }
-    pledge
-    metadataJson {
-      hash
-      url
-    }
+    ...allPoolParameterFields
   }
   metrics {
     blocksCreated
@@ -11978,7 +11995,8 @@ export const AllStakePoolFieldsFragmentDoc = gql`
     }
   }
 }
-    ${CertificateTransactionFieldsFragmentDoc}`;
+    ${AllPoolParameterFieldsFragmentDoc}
+${CertificateTransactionFieldsFragmentDoc}`;
 export const ProtocolParametersFragmentDoc = gql`
     fragment protocolParameters on ProtocolParametersAlonzo {
   stakeKeyDeposit
@@ -12004,7 +12022,6 @@ export const NonRecursiveNativeScriptFieldsFragmentDoc = gql`
   }
   vkey {
     key
-    hash
   }
 }
     `;
@@ -12027,9 +12044,6 @@ export const AnyScriptFragmentDoc = gql`
   }
   ... on PlutusScript {
     __typename
-    hash
-    type
-    description
     cborHex
   }
 }
@@ -12113,6 +12127,61 @@ export const CoreTransactionFieldsFragmentDoc = gql`
       }
     }
     datumHash
+  }
+  certificates {
+    __typename
+    ... on GenesisKeyDelegationCertificate {
+      genesisHash
+      genesisDelegateHash
+      vrfKeyHash
+    }
+    ... on MirCertificate {
+      rewardAccount {
+        address
+      }
+      quantity
+      pot
+    }
+    ... on PoolRegistrationCertificate {
+      epoch {
+        number
+      }
+      poolParameters {
+        ...allPoolParameterFields
+        stakePool {
+          id
+        }
+      }
+    }
+    ... on PoolRetirementCertificate {
+      epoch {
+        number
+      }
+      stakePool {
+        id
+      }
+    }
+    ... on StakeDelegationCertificate {
+      rewardAccount {
+        address
+      }
+      stakePool {
+        id
+      }
+      epoch {
+        number
+      }
+    }
+    ... on StakeKeyRegistrationCertificate {
+      rewardAccount {
+        address
+      }
+    }
+    ... on StakeKeyDeregistrationCertificate {
+      rewardAccount {
+        address
+      }
+    }
   }
   collateral {
     ...txIn
@@ -12201,6 +12270,7 @@ export const CoreTransactionFieldsFragmentDoc = gql`
   }
 }
     ${TxInFragmentDoc}
+${AllPoolParameterFieldsFragmentDoc}
 ${AnyScriptFragmentDoc}
 ${MetadatumValueFragmentDoc}
 ${MetadatumArrayFragmentDoc}
@@ -12216,7 +12286,7 @@ export const BlocksByHashesDocument = gql`
     issuer {
       id
       poolParameters(
-        order: {desc: sinceEpoch, then: {desc: transactionBlockNo}}
+        order: {desc: sinceEpochNo, then: {desc: transactionBlockNo}}
         first: 1
       ) {
         vrf

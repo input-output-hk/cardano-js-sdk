@@ -1,5 +1,5 @@
 import { Cardano, StakePoolSearchProvider, util } from '@cardano-sdk/core';
-import { createProvider, getExactlyOneObject } from '../util';
+import { createProvider, getExactlyOneObject, toCorePoolParameters } from '../util';
 import { getSdk } from '../sdk';
 import { sortBy } from 'lodash-es';
 
@@ -21,31 +21,28 @@ const certificateTxHashes = (certificates: Array<{ transaction: { hash: string; 
 
 const toCoreStakePool = (responseStakePool: GraphqlStakePool): Cardano.StakePool => {
   const stakePool = util.replaceNullsWithUndefineds(responseStakePool);
-  const poolParameters = getExactlyOneObject(stakePool.poolParameters, 'PoolParameters');
+  const responsePoolParameters = util.replaceNullsWithUndefineds(
+    getExactlyOneObject(responseStakePool.poolParameters, 'PoolParameters')
+  );
+  const poolParameters = toCorePoolParameters(responsePoolParameters, responseStakePool.id);
   return {
-    cost: BigInt(poolParameters.cost),
+    ...poolParameters,
     hexId: Cardano.PoolIdHex(stakePool.hexId),
-    id: Cardano.PoolId(stakePool.id),
-    margin: poolParameters.margin,
-    metadata: poolParameters.metadata
+    metadata: responsePoolParameters.metadata
       ? {
-          ...poolParameters.metadata,
-          ext: poolParameters.metadata.ext
+          ...responsePoolParameters.metadata,
+          ext: responsePoolParameters.metadata.ext
             ? {
-                ...poolParameters.metadata.ext,
+                ...responsePoolParameters.metadata.ext,
                 pool: {
-                  ...poolParameters.metadata.ext.pool,
-                  id: Cardano.PoolIdHex(poolParameters.metadata.ext.pool.id)
+                  ...responsePoolParameters.metadata.ext.pool,
+                  id: Cardano.PoolIdHex(responsePoolParameters.metadata.ext.pool.id)
                 }
               }
             : undefined,
-          extVkey: poolParameters.metadata.extVkey ? Cardano.PoolMdVk(poolParameters.metadata.extVkey) : undefined
-        }
-      : undefined,
-    metadataJson: poolParameters.metadataJson
-      ? {
-          ...poolParameters.metadataJson,
-          hash: Cardano.Hash32ByteBase16(poolParameters.metadataJson.hash)
+          extVkey: responsePoolParameters.metadata.extVkey
+            ? Cardano.PoolMdVk(responsePoolParameters.metadata.extVkey)
+            : undefined
         }
       : undefined,
     metrics: {
@@ -56,18 +53,13 @@ const toCoreStakePool = (responseStakePool: GraphqlStakePool): Cardano.StakePool
         live: BigInt(stakePool.metrics.stake.live)
       }
     },
-    owners: poolParameters.owners.map(({ address }) => Cardano.RewardAccount(address)),
-    pledge: BigInt(poolParameters.pledge),
-    relays: poolParameters.relays,
-    rewardAccount: Cardano.RewardAccount(poolParameters.rewardAccount.address),
     status: stakePool.status,
     transactions: {
       // TODO: current implementation will only return 1 (latest/active) registration certificate
       // We should probably change this core type to include epoch when it takes effect
-      registration: [certificateTxHash(poolParameters.poolRegistrationCertificate)],
+      registration: [certificateTxHash(responsePoolParameters.poolRegistrationCertificate)],
       retirement: certificateTxHashes(stakePool.poolRetirementCertificates)
-    },
-    vrf: Cardano.VrfVkHex(poolParameters.vrf)
+    }
   };
 };
 

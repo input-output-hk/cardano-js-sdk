@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { Cardano, InvalidStringError, ProviderError, ProviderFailure, ProviderUtil, util } from '@cardano-sdk/core';
 import { GraphQLClient } from 'graphql-request';
-import { InvalidStringError, ProviderError, ProviderFailure, ProviderUtil } from '@cardano-sdk/core';
-import { Sdk, getSdk } from './sdk';
+import { Sdk, StakePoolsQuery, getSdk } from './sdk';
 
 export type ProviderFromSdk<T> = (sdk: Sdk) => T;
 
@@ -28,3 +28,25 @@ export const getExactlyOneObject = <T>(objects: (T | undefined | null)[] | undef
 };
 
 export type GetExactlyOneObject = typeof getExactlyOneObject;
+
+export type GraphqlStakePool = NonNullable<NonNullable<StakePoolsQuery['queryStakePool']>[0]>;
+type ResponsePoolParameters = NonNullable<GraphqlStakePool['poolParameters'][0]>;
+export const toCorePoolParameters = (
+  poolParameters: ResponsePoolParameters,
+  poolId: string
+): Cardano.PoolParameters => ({
+  cost: BigInt(poolParameters.cost),
+  id: Cardano.PoolId(poolId),
+  margin: poolParameters.margin,
+  metadataJson: poolParameters.metadataJson
+    ? {
+        ...poolParameters.metadataJson,
+        hash: Cardano.Hash32ByteBase16(poolParameters.metadataJson.hash)
+      }
+    : undefined,
+  owners: poolParameters.owners.map(({ address }) => Cardano.RewardAccount(address)),
+  pledge: BigInt(poolParameters.pledge),
+  relays: util.replaceNullsWithUndefineds(poolParameters.relays),
+  rewardAccount: Cardano.RewardAccount(poolParameters.rewardAccount.address),
+  vrf: Cardano.VrfVkHex(poolParameters.vrf)
+});

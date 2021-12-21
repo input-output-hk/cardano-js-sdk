@@ -5,6 +5,83 @@ fragment certificateTransactionFields on Transaction {
   hash
 }
 
+fragment allPoolParameterFields on PoolParameters {
+  metadata {
+    ticker
+    name
+    description
+    homepage
+    extDataUrl
+    extSigUrl
+    extVkey
+    ext {
+      serial
+      pool {
+        id
+        country
+        status
+        contact {
+          primary
+          email
+          facebook
+          github
+          feed
+          telegram
+          twitter
+        }
+        media_assets {
+          icon_png_64x64
+          logo_png
+          logo_svg
+          color_fg
+          color_bg
+        }
+        itn {
+          owner
+          witness
+        }
+      }
+    }
+  }
+  owners {
+    address
+  }
+  cost
+  margin {
+    numerator
+    denominator
+  }
+  vrf
+  relays {
+    __typename
+    ... on RelayByName {
+      hostname
+      port
+    }
+    ... on RelayByAddress {
+      ipv4
+      ipv6
+      port
+    }
+    ... on RelayByNameMultihost {
+      dnsName
+    }
+  }
+  poolRegistrationCertificate {
+    transaction {
+      hash
+    }
+  }
+  rewardAccount {
+    address
+  }
+  pledge
+  metadataJson {
+    hash
+    url
+  }
+}
+
 fragment allStakePoolFields on StakePool {
   id
   hexId
@@ -16,81 +93,8 @@ fragment allStakePoolFields on StakePool {
   # Current implementation will ignore the 2nd transaction, as it's ordered by epoch first.
   # I assume we also need to order by tx index in block as there can be multiple txes for registration of the same stake pool?
   # TODO: apply same in block.graphql
-  poolParameters(order: { desc: sinceEpoch, then: { desc: transactionBlockNo } }, first: 1) {
-    metadata {
-      ticker
-      name
-      description
-      homepage
-      extDataUrl
-      extSigUrl
-      extVkey
-      ext {
-        serial
-        pool {
-          id
-          country
-          status
-          contact {
-            primary
-            email
-            facebook
-            github
-            feed
-            telegram
-            twitter
-          }
-          media_assets {
-            icon_png_64x64
-            logo_png
-            logo_svg
-            color_fg
-            color_bg
-          }
-          itn {
-            owner
-            witness
-          }
-        }
-      }
-    }
-    owners {
-      address
-    }
-    cost
-    margin {
-      numerator
-      denominator
-    }
-    vrf
-    relays {
-      __typename
-      ... on RelayByName {
-        hostname
-        port
-      }
-      ... on RelayByAddress {
-        ipv4
-        ipv6
-        port
-      }
-      ... on RelayByNameMultihost {
-        dnsName
-      }
-    }
-    poolRegistrationCertificate {
-      transaction {
-        hash
-      }
-    }
-    rewardAccount {
-      address
-    }
-    pledge
-    metadataJson {
-      hash
-      url
-    }
+  poolParameters(order: { desc: sinceEpochNo, then: { desc: transactionBlockNo } }, first: 1) {
+    ...allPoolParameterFields
   }
   metrics {
     blocksCreated

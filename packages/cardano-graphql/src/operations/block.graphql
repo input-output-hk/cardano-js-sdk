@@ -8,7 +8,7 @@ query BlocksByHashes($hashes: [String!]!) {
     }
     issuer {
       id
-      poolParameters(order: { desc: sinceEpoch, then: { desc: transactionBlockNo } }, first: 1) {
+      poolParameters(order: { desc: sinceEpochNo, then: { desc: transactionBlockNo } }, first: 1) {
         vrf
       }
     }
