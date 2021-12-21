@@ -294,6 +294,13 @@ describe('blockfrostWalletProvider', () => {
         }
       ]
     };
+    const protocolParametersResponse = {
+      data: {
+        key_deposit: '2000000',
+        pool_deposit: '500000000'
+      }
+    };
+    BlockFrostAPI.prototype.axiosInstance = jest.fn().mockResolvedValue(protocolParametersResponse) as any;
     BlockFrostAPI.prototype.txsUtxos = jest.fn().mockResolvedValue(txsUtxosResponse);
 
     it('without extra tx properties', async () => {
@@ -302,7 +309,6 @@ describe('blockfrostWalletProvider', () => {
         block: '356b7d7dbb696ccd12775c016941057a9dc70898d87a63fc752271bb46856940',
         block_height: 123_456,
         delegation_count: 0,
-        deposit: '5',
         fees: '182485',
         hash: '1e043f100dce12d107f679685acd2fc0610e10f72a92d412794c9773d11d8477',
         index: 1,
@@ -421,7 +427,8 @@ describe('blockfrostWalletProvider', () => {
         },
         id: Cardano.TransactionId('4123d70f66414cc921f6ffc29a899aafc7137a99a0fd453d6b200863ef5702d6'),
         implicitCoin: {
-          deposit: 5n
+          deposit: 0n,
+          input: 0n
         },
         index: 1,
         txSize: 433

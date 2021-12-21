@@ -271,6 +271,14 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
     }
   };
 
+  const currentWalletProtocolParameters: WalletProvider['currentWalletProtocolParameters'] = async () => {
+    const response = await blockfrost.axiosInstance({
+      url: `${blockfrost.apiUrl}/epochs/latest/parameters`
+    });
+
+    return BlockfrostToCore.currentWalletProtocolParameters(response.data);
+  };
+
   // eslint-disable-next-line unicorn/consistent-function-scoping
   const parseValidityInterval = (num: string | null) => Number.parseInt(num || '') || undefined;
   const fetchTransaction = async (hash: Cardano.TransactionId): Promise<Cardano.TxAlonzo> => {
@@ -279,6 +287,9 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
     );
     const response = await blockfrost.txs(hash.toString());
     const metadata = await fetchJsonMetadata(hash);
+    const protocolParameters = await currentWalletProtocolParameters();
+    const certificates = await fetchCertificates(response);
+    const withdrawals = await fetchWithdrawals(response);
     return {
       auxiliaryData: metadata
         ? {
@@ -291,7 +302,7 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
         slot: response.slot
       },
       body: {
-        certificates: await fetchCertificates(response),
+        certificates,
         collaterals,
         fee: BigInt(response.fees),
         inputs,
@@ -301,13 +312,10 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
           invalidBefore: parseValidityInterval(response.invalid_before),
           invalidHereafter: parseValidityInterval(response.invalid_hereafter)
         },
-        withdrawals: await fetchWithdrawals(response)
+        withdrawals
       },
       id: hash,
-      implicitCoin: {
-        deposit: BigInt(response.deposit)
-        // TODO: use computeImplicitCoin to compute implicit input
-      },
+      implicitCoin: Cardano.util.computeImplicitCoin(protocolParameters, { certificates, withdrawals }),
       index: response.index,
       txSize: response.size,
       witness: {
@@ -340,14 +348,6 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
     );
 
     return transactionsArray.flat(1);
-  };
-
-  const currentWalletProtocolParameters: WalletProvider['currentWalletProtocolParameters'] = async () => {
-    const response = await blockfrost.axiosInstance({
-      url: `${blockfrost.apiUrl}/epochs/latest/parameters`
-    });
-
-    return BlockfrostToCore.currentWalletProtocolParameters(response.data);
   };
 
   const accountRewards = async (
