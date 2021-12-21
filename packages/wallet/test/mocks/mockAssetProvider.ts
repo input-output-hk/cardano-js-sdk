@@ -5,7 +5,6 @@ export const asset = {
   fingerprint: Cardano.AssetFingerprint('asset1rjklcrnsdzqp65wjgrg55sy9723kw09mlgvlc3'),
   history: [
     {
-      action: Cardano.AssetProvisioning.Mint,
       quantity: 1000n,
       transactionId: Cardano.TransactionId('886206542d63b23a047864021fbfccf291d78e47c1e59bd4c75fbc67b248c5e8')
     }
