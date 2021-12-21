@@ -29,11 +29,10 @@ export const blockfrostAssetProvider = (options: Options): AssetProvider => {
   const getAssetHistory = async (assetId: Cardano.AssetId): Promise<Cardano.AssetMintOrBurn[]> =>
     fetchSequentially({
       arg: assetId.toString(),
-      request: blockfrost.assetsHistory,
+      request: blockfrost.assetsHistory.bind<BlockFrostAPI['assetsHistory']>(blockfrost),
       responseTranslator: (response): Cardano.AssetMintOrBurn[] =>
         response.map(({ action, amount, tx_hash }) => ({
-          action: action === 'minted' ? Cardano.AssetProvisioning.Mint : Cardano.AssetProvisioning.Burn,
-          quantity: BigInt(amount),
+          quantity: BigInt(amount) * (action === 'minted' ? 1n : -1n),
           transactionId: Cardano.TransactionId(tx_hash)
         }))
     });
@@ -49,7 +48,6 @@ export const blockfrostAssetProvider = (options: Options): AssetProvider => {
         response.mint_or_burn_count === 1
           ? [
               {
-                action: Cardano.AssetProvisioning.Mint,
                 quantity,
                 transactionId: Cardano.TransactionId(response.initial_mint_tx_hash)
               }
