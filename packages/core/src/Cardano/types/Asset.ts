@@ -92,15 +92,13 @@ export interface AssetMetadata {
   [key: string]: unknown;
 }
 
-export enum AssetProvisioning {
-  Mint = 'MINT',
-  Burn = 'BURN'
-}
-
 export interface AssetMintOrBurn {
   transactionId: TransactionId;
+  /**
+   * Positive = mint
+   * Negative = burn
+   */
   quantity: bigint;
-  action: AssetProvisioning;
 }
 
 export interface Asset {
