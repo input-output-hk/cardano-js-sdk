@@ -211,6 +211,10 @@ fragment coreTransactionFields on Transaction {
     }
     hash
   }
+  requiredExtraSignatures {
+    hash
+  }
+  scriptIntegrityHash
   witness {
     signatures {
       publicKey {
@@ -250,6 +254,11 @@ fragment coreTransactionFields on Transaction {
   auxiliaryData {
     hash
     body {
+      scripts {
+        script {
+          ...anyScript
+        }
+      }
       blob {
         key
         metadatum {

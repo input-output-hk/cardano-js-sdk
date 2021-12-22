@@ -1,5 +1,5 @@
 import { Cardano, StakePoolSearchProvider, util } from '@cardano-sdk/core';
-import { createProvider, getExactlyOneObject, toCorePoolParameters } from '../util';
+import { createProvider, getExactlyOneObject, graphqlPoolParametersToCore } from '../util';
 import { getSdk } from '../sdk';
 import { sortBy } from 'lodash-es';
 
@@ -24,7 +24,7 @@ const toCoreStakePool = (responseStakePool: GraphqlStakePool): Cardano.StakePool
   const responsePoolParameters = util.replaceNullsWithUndefineds(
     getExactlyOneObject(responseStakePool.poolParameters, 'PoolParameters')
   );
-  const poolParameters = toCorePoolParameters(responsePoolParameters, responseStakePool.id);
+  const poolParameters = graphqlPoolParametersToCore(responsePoolParameters, responseStakePool.id);
   return {
     ...poolParameters,
     hexId: Cardano.PoolIdHex(stakePool.hexId),

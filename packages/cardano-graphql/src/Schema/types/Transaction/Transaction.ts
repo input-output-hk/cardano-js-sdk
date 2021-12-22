@@ -42,7 +42,6 @@ export class Transaction {
   @Directive('@hasInverse(field: transaction)')
   @Field(() => AuxiliaryData, { nullable: true })
   auxiliaryData?: AuxiliaryData;
-  // TODO: simplify core type to use negative qty for burn
   @Field(() => [Token], { nullable: true })
   mint?: Token[];
   @Field(() => Int64)
@@ -62,6 +61,6 @@ export class Transaction {
   @Field(() => String, { nullable: true })
   scriptIntegrityHash?: Cardano.Hash28ByteBase16;
   @Directive('@hasInverse(field: requiredExtraSignatureInTransactions)')
-  @Field(() => [PublicKey])
+  @Field(() => [PublicKey], { nullable: true })
   requiredExtraSignatures?: PublicKey[];
 }
