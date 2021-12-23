@@ -25,7 +25,7 @@
     "lint": "eslint --ignore-path ../../.eslintignore \"**/*.ts\"",
     "lint:fix": "eslint --fix --ignore-path ../../.eslintignore \"**/*.ts\"",
     "test": "jest -c ./jest.config.js",
-    "test:e2e": "shx echo 'test:e2e' command not implemented yet",
+    "test:e2e": "jest -c ./e2e.jest.config.js",
     "coverage": "yarn test --coverage",
     "prepack": "yarn build",
     "test:debug": "DEBUG=true yarn test"
@@ -36,6 +36,8 @@
     "@graphql-codegen/typescript-graphql-request": "^4.1.6",
     "@graphql-codegen/typescript-operations": "^2.1.8",
     "@graphql-tools/utils": "^8.4.0",
+    "@types/google-protobuf": "^3.15.5",
+    "@types/protobufjs": "^6.0.0",
     "npm-run-all": "^4.1.5",
     "shx": "^0.3.3"
   },
@@ -44,9 +46,13 @@
     "@cardano-ogmios/client": "4.1.0",
     "@cardano-sdk/core": " 0.2.0",
     "class-validator": "^0.13.1",
+    "dgraph-js": "^21.3.1",
     "graphql": "^15.6.1",
     "graphql-request": "^3.5.0",
+    "grpc": "^1.24.11",
     "reflect-metadata": "^0.1.13",
+    "ts-custom-error": "^3.2.0",
+    "ts-log": "^2.2.4",
     "type-graphql": "^1.1.1"
   },
   "files": [
