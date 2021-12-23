@@ -12,7 +12,10 @@ const { graphqlPoolParametersToCore } = jest.requireMock('../../../src/util/grap
 
 type GraphqlTx = NonNullable<NonNullable<TransactionsByHashesQuery['queryTransaction']>[0]>;
 type GraphqlCertificate = NonNullable<GraphqlTx['certificates']>[0];
-type PartialCoreTx = Omit<Partial<Cardano.TxAlonzo>, 'body'> & { body: Partial<Cardano.TxBodyAlonzo> };
+type GraphqlAuxiliaryDataBody = NonNullable<GraphqlTx['auxiliaryData']>['body'];
+type GraphqlScript = NonNullable<GraphqlAuxiliaryDataBody['scripts']>[0]['script'];
+type GraphqlMetadatum = NonNullable<GraphqlAuxiliaryDataBody['blob']>[0]['metadatum'];
+type PartialCoreTx = Omit<Partial<Cardano.TxAlonzo>, 'body'> & { body?: Partial<Cardano.TxBodyAlonzo> };
 
 describe('WalletProvider/queryTransactions/graphqlTransactionsToCore', () => {
   const protocolParameters = [{ poolDeposit: 4, stakeKeyDeposit: 2 }];
@@ -122,6 +125,157 @@ describe('WalletProvider/queryTransactions/graphqlTransactionsToCore', () => {
     expect(graphqlTransactionsToCore([minimalGraphqlTx], protocolParameters, getExactlyOneObject)).toEqual([
       minimalCoreTx
     ]);
+  });
+
+  describe('auxiliaryData', () => {
+    const hash = Cardano.Hash32ByteBase16('3e33018e8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d');
+
+    describe('blob', () => {
+      const label = 'label';
+      const testMetadatumConversion = (metadatum: GraphqlMetadatum, coreMetadatum: Cardano.Metadatum) =>
+        testTxPropertiesConversion(
+          {
+            auxiliaryData: {
+              body: {
+                blob: [{ label, metadatum }]
+              },
+              hash: hash.toString()
+            }
+          },
+          {
+            auxiliaryData: {
+              body: {
+                blob: {
+                  [label]: coreMetadatum
+                },
+                scripts: undefined
+              },
+              hash
+            }
+          }
+        );
+
+      it('maps integer metadatum to core type', () => {
+        const metadatum = { __typename: 'IntegerMetadatum' as const, int: 5 };
+        testMetadatumConversion(metadatum, BigInt(metadatum.int));
+      });
+
+      it('maps string metadatum to core type', () => {
+        const metadatum = { __typename: 'StringMetadatum' as const, string: 'str' };
+        testMetadatumConversion(metadatum, metadatum.string);
+      });
+
+      it('maps bytes metadatum to core type', () => {
+        const metadatum = { __typename: 'BytesMetadatum' as const, bytes: 'abc123' };
+        testMetadatumConversion(metadatum, Buffer.from(metadatum.bytes, 'hex'));
+      });
+
+      it('maps a metadatum map to core type', () => {
+        const metadatum = {
+          __typename: 'MetadatumMap' as const,
+          map: [{ label: 'nested', metadatum: { __typename: 'StringMetadatum' as const, string: 'value' } }]
+        };
+        testMetadatumConversion(metadatum, {
+          [metadatum.map[0].label]: metadatum.map[0].metadatum.string
+        });
+      });
+
+      it('maps a metadatum array to core type', () => {
+        const metadatum = {
+          __typename: 'MetadatumArray' as const,
+          array: [{ metadatum: { __typename: 'StringMetadatum' as const, string: 'value' } }]
+        };
+        testMetadatumConversion(
+          {
+            __typename: 'MetadatumArray' as const,
+            array: [{ __typename: 'StringMetadatum' as const, string: 'value' }]
+          },
+          [metadatum.array[0].metadatum.string]
+        );
+      });
+    });
+
+    describe('scripts', () => {
+      const testScriptConversion = (graphqlScript: GraphqlScript, coreScript: Cardano.Script) =>
+        testTxPropertiesConversion(
+          {
+            auxiliaryData: {
+              body: {
+                scripts: [{ script: graphqlScript }]
+              },
+              hash: hash.toString()
+            }
+          },
+          {
+            auxiliaryData: {
+              body: {
+                blob: undefined,
+                scripts: [coreScript]
+              },
+              hash
+            }
+          }
+        );
+
+      it('maps plutus script to core type', () => {
+        const script = { __typename: 'PlutusScript' as const, cborHex: 'abc123' };
+        testScriptConversion(script, { plutus: script.cborHex });
+      });
+
+      describe('native', () => {
+        it('maps "all" to core type', () => {
+          const script = {
+            __typename: 'NativeScript' as const,
+            all: [{ __typename: 'NativeScript' as const, startsAt: { number: 123 } }]
+          };
+          testScriptConversion(script, { native: { all: [{ startsAt: script.all[0].startsAt.number }] } });
+        });
+
+        it('maps "any" to core type', () => {
+          const script = {
+            __typename: 'NativeScript' as const,
+            any: [{ __typename: 'NativeScript' as const, startsAt: { number: 123 } }]
+          };
+          testScriptConversion(script, { native: { any: [{ startsAt: script.any[0].startsAt.number }] } });
+        });
+
+        it('maps "nof" to core type', () => {
+          const script = {
+            __typename: 'NativeScript' as const,
+            nof: [{ key: 'key', scripts: [{ __typename: 'NativeScript' as const, startsAt: { number: 123 } }] }]
+          };
+          testScriptConversion(script, {
+            native: {
+              [script.nof[0].key]: [{ startsAt: script.nof[0].scripts[0].startsAt.number }]
+            }
+          });
+        });
+
+        it('maps "vkey" to core type', () => {
+          const script = {
+            __typename: 'NativeScript' as const,
+            vkey: { key: '6199186adb51974690d7247d2646097d2c62763b767b528816fb7ed3f9f55d39' }
+          };
+          testScriptConversion(script, { native: script.vkey.key });
+        });
+
+        it('maps "startsAt" to core type', () => {
+          const script = {
+            __typename: 'NativeScript' as const,
+            startsAt: { number: 123 }
+          };
+          testScriptConversion(script, { native: { startsAt: script.startsAt.number } });
+        });
+
+        it('maps "expiresAt" to core type', () => {
+          const script = {
+            __typename: 'NativeScript' as const,
+            expiresAt: { number: 123 }
+          };
+          testScriptConversion(script, { native: { expiresAt: script.expiresAt.number } });
+        });
+      });
+    });
   });
 
   describe('certificates', () => {

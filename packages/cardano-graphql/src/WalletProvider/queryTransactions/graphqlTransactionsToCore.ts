@@ -6,40 +6,36 @@ import { graphqlPoolParametersToCore } from '../../util/graphqlPoolParametersToC
 type GraphqlTransaction = NonNullable<NonNullable<TransactionsByHashesQuery['queryTransaction']>[0]>;
 type GraphqlScript = NonNullable<GraphqlTransaction['witness']['scripts']>[0]['script'];
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const scriptsToCore = (scripts: any[]): Cardano.ScriptNative[] =>
-  scripts
-    .filter(util.isNotNil)
-    // TODO: test this
-    // eslint-disable-next-line no-use-before-define
-    .map((nestedScript) => scriptToCore(nestedScript) as unknown as Cardano.ScriptNative);
+const nativeScriptToCore = (script: GraphqlScript): Cardano.ScriptNative => {
+  if (script.__typename === 'PlutusScript') throw new Error('use scriptToCore');
+  if (script.all) {
+    return { all: script.all.map(nativeScriptToCore) };
+  } else if (script.any) {
+    return { any: script.any.map(nativeScriptToCore) };
+  } else if (script.nof) {
+    return script.nof.reduce(
+      (nof, { key, scripts }) => ({ ...nof, [key]: scripts.map(nativeScriptToCore) }),
+      {} as Cardano.NativeScriptType.NOf
+    );
+  } else if (script.expiresAt) {
+    return { expiresAt: script.expiresAt.number };
+  } else if (script.startsAt) {
+    return { startsAt: script.startsAt.number };
+  } else if (script.vkey) {
+    return script.vkey.key;
+  }
+  throw new NotImplementedError('Unknown native script type');
+};
 
 const scriptToCore = (script: GraphqlScript): Cardano.Script => {
   if (script.__typename === 'NativeScript') {
-    if (script.all) {
-      return { native: { all: scriptsToCore(script.all) } };
-    } else if (script.any) {
-      return { native: { any: scriptsToCore(script.any) } };
-    } else if (script.nof) {
-      return {
-        native: script.nof.reduce(
-          (nof, { key, scripts }) => ({ ...nof, [key]: scriptsToCore(scripts) }),
-          {} as Cardano.NativeScriptType.NOf
-        )
-      };
-    } else if (script.expiresAt) {
-      return { native: { expiresAt: script.expiresAt.number } };
-    } else if (script.startsAt) {
-      return { native: { startsAt: script.startsAt.number } };
-    } else if (script.vkey) {
-      return { native: script.vkey.key };
-    }
+    return { native: nativeScriptToCore(script) };
   } else if (script.__typename === 'PlutusScript') {
     return {
       plutus: script.cborHex
     };
   }
-  throw new NotImplementedError(script.__typename);
+  throw new NotImplementedError(script);
 };
 
 const witnessScriptsToCore = (scripts: GraphqlTransaction['witness']['scripts']) =>
@@ -103,7 +99,7 @@ const metadatumToCore = (metadatum: GraphqlMetadatum): Cardano.Metadatum => {
       return (metadatum.array || []).map((md) => metadatumToCore(md as GraphqlMetadatum));
     case 'MetadatumMap':
       return (metadatum.map || {}).reduce(
-        (map, { key, metadatum: md }) => ({ ...map, [key]: metadatumToCore(md as GraphqlMetadatum) }),
+        (map, { label, metadatum: md }) => ({ ...map, [label]: metadatumToCore(md as GraphqlMetadatum) }),
         {} as Cardano.MetadatumMap
       );
     case 'StringMetadatum':
@@ -118,7 +114,7 @@ const auxiliaryDataToCore = (auxiliaryData: GraphqlTransaction['auxiliaryData'])
     ? {
         body: {
           blob: auxiliaryData.body.blob?.reduce(
-            (blob, { key, metadatum }) => ({ ...blob, [key]: metadatumToCore(metadatum) }),
+            (blob, { label, metadatum }) => ({ ...blob, [label]: metadatumToCore(metadatum) }),
             {} as Cardano.MetadatumMap
           ),
           scripts: auxiliaryScriptsToCore(auxiliaryData.body.scripts)

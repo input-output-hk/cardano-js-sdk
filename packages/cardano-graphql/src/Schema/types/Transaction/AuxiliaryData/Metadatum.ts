@@ -1,5 +1,5 @@
 /* eslint-disable no-use-before-define */
-import { Field, Int, ObjectType, createUnionType } from 'type-graphql';
+import { Directive, Field, Int, ObjectType, createUnionType } from 'type-graphql';
 import { NotImplementedError } from '@cardano-sdk/core';
 
 // Review: I think integers will be int32 or int64. We left it as bigint in core types,
@@ -12,20 +12,23 @@ class IntegerMetadatum {
 
 @ObjectType()
 export class KeyValueMetadatum {
+  @Directive('@search(by: [exact,fulltext])')
   @Field(() => String)
-  key: string;
+  label: string;
   @Field(() => Metadatum)
   metadatum: AnyMetadatum;
 }
 
 @ObjectType()
 class StringMetadatum {
+  @Directive('@search(by: [exact,fulltext])')
   @Field(() => String)
   string: string;
 }
 
 @ObjectType()
 class BytesMetadatum {
+  @Directive('@search(by: [hash])')
   @Field(() => String)
   bytes: string;
 }
