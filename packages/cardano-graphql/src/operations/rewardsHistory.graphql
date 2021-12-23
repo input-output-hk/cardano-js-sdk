@@ -1,0 +1,37 @@
+# TODO: this seems to be supported by dgraph. It would filter objects in graphql,
+# instead of filtering thhem in the client with the non-commented-out query.
+# Need to:
+# 1. it doesn't generate this function in `sdk.ts`. Figure out when exactly it fails and why and see if we can fix it.
+#    If it's too complicated we could either:
+#       a) use some regex find-replace on dgraph-generated schema before generating sdk.ts to remove the directives.
+#          @cascade seems to work though.
+#       b) don't use codegen for some queries
+# 2. write e2e tests to confirm this works the way I think it does.
+#    If it does, need to review other queries and possibly normalize schema
+#    in cases like {epoch: Epoch; epochNo: Int}
+
+# query RewardsHistory($rewardAccounts: [String!]!, $fromEpochNo: Int = 0, $toEpochNo: Int = 2147483647) {
+#   # not sure if these @cascades and @filter will work the way I think they will.
+#   # Need e2e tests to confirm. If they do, need to review other queries and possibly normalize schema
+#   # in cases like {epoch: Epoch; epochNo: Int}
+#   queryRewardAccount(filter: { address: { in: $rewardAccounts } }) @cascade {
+#     address
+#     activeStake @cascade {
+#       epoch @filter(gt(number, $fromEpochNo) AND lt(number, $toEpochNo))  {
+#         number
+#       }
+#       quantity
+#     }
+#   }
+# }
+
+query RewardsHistory($rewardAccounts: [String!]!) {
+  queryRewardAccount(filter: { address: { in: $rewardAccounts } }) {
+    activeStake {
+      epoch {
+        number
+      }
+      quantity
+    }
+  }
+}

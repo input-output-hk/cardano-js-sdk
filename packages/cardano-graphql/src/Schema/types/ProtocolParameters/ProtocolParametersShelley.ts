@@ -1,5 +1,3 @@
-// Review: do we want to keep protocol parameter types per era?
-
 import { Epoch } from '../Epoch';
 import { Field, Int, ObjectType } from 'type-graphql';
 import { ProtocolVersion } from './ProtocolVersion';

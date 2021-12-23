@@ -27,6 +27,7 @@ export type Scalars = {
 export type ActiveStake = {
   __typename?: 'ActiveStake';
   epoch: Epoch;
+  epochNo: Scalars['Int'];
   quantity: Scalars['Int64'];
   rewardAccount: RewardAccount;
   stakePool: StakePool;
@@ -50,6 +51,10 @@ export type ActiveStakeStakePoolArgs = {
 export type ActiveStakeAggregateResult = {
   __typename?: 'ActiveStakeAggregateResult';
   count?: Maybe<Scalars['Int']>;
+  epochNoAvg?: Maybe<Scalars['Float']>;
+  epochNoMax?: Maybe<Scalars['Int']>;
+  epochNoMin?: Maybe<Scalars['Int']>;
+  epochNoSum?: Maybe<Scalars['Int']>;
   quantityAvg?: Maybe<Scalars['Float']>;
   quantityMax?: Maybe<Scalars['Int64']>;
   quantityMin?: Maybe<Scalars['Int64']>;
@@ -65,6 +70,7 @@ export type ActiveStakeFilter = {
 
 export enum ActiveStakeHasFilter {
   Epoch = 'epoch',
+  EpochNo = 'epochNo',
   Quantity = 'quantity',
   RewardAccount = 'rewardAccount',
   StakePool = 'stakePool'
@@ -77,11 +83,13 @@ export type ActiveStakeOrder = {
 };
 
 export enum ActiveStakeOrderable {
+  EpochNo = 'epochNo',
   Quantity = 'quantity'
 }
 
 export type ActiveStakePatch = {
   epoch?: Maybe<EpochRef>;
+  epochNo?: Maybe<Scalars['Int']>;
   quantity?: Maybe<Scalars['Int64']>;
   rewardAccount?: Maybe<RewardAccountRef>;
   stakePool?: Maybe<StakePoolRef>;
@@ -89,6 +97,7 @@ export type ActiveStakePatch = {
 
 export type ActiveStakeRef = {
   epoch?: Maybe<EpochRef>;
+  epochNo?: Maybe<Scalars['Int']>;
   quantity?: Maybe<Scalars['Int64']>;
   rewardAccount?: Maybe<RewardAccountRef>;
   stakePool?: Maybe<StakePoolRef>;
@@ -254,6 +263,7 @@ export type AdaRef = {
 
 export type AddActiveStakeInput = {
   epoch: EpochRef;
+  epochNo: Scalars['Int'];
   quantity: Scalars['Int64'];
   rewardAccount: RewardAccountRef;
   stakePool: StakePoolRef;
@@ -1223,7 +1233,7 @@ export type AddRelayByNamePayloadRelayByNameArgs = {
 };
 
 export type AddRewardAccountInput = {
-  activeStake: ActiveStakeRef;
+  activeStake: Array<ActiveStakeRef>;
   address: Scalars['String'];
   addresses: AddressRef;
   delegationCertificates?: Maybe<Array<StakeDelegationCertificateRef>>;
@@ -4944,6 +4954,7 @@ export type MutationAddRelayByNameMultihostArgs = {
 
 export type MutationAddRewardAccountArgs = {
   input: Array<AddRewardAccountInput>;
+  upsert?: Maybe<Scalars['Boolean']>;
 };
 
 
@@ -7235,6 +7246,7 @@ export type Query = {
   getExtendedStakePoolMetadataFields?: Maybe<ExtendedStakePoolMetadataFields>;
   getPlutusScript?: Maybe<PlutusScript>;
   getPublicKey?: Maybe<PublicKey>;
+  getRewardAccount?: Maybe<RewardAccount>;
   getSlot?: Maybe<Slot>;
   getStakePool?: Maybe<StakePool>;
   getTransaction?: Maybe<Transaction>;
@@ -7675,6 +7687,11 @@ export type QueryGetPlutusScriptArgs = {
 
 export type QueryGetPublicKeyArgs = {
   hash: Scalars['String'];
+};
+
+
+export type QueryGetRewardAccountArgs = {
+  address: Scalars['String'];
 };
 
 
@@ -8502,7 +8519,8 @@ export type RelayByNameRef = {
 
 export type RewardAccount = {
   __typename?: 'RewardAccount';
-  activeStake: ActiveStake;
+  activeStake: Array<ActiveStake>;
+  activeStakeAggregate?: Maybe<ActiveStakeAggregateResult>;
   address: Scalars['String'];
   addresses: Address;
   delegationCertificates?: Maybe<Array<StakeDelegationCertificate>>;
@@ -8518,6 +8536,14 @@ export type RewardAccount = {
 
 
 export type RewardAccountActiveStakeArgs = {
+  filter?: Maybe<ActiveStakeFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<ActiveStakeOrder>;
+};
+
+
+export type RewardAccountActiveStakeAggregateArgs = {
   filter?: Maybe<ActiveStakeFilter>;
 };
 
@@ -8588,6 +8614,7 @@ export type RewardAccountAggregateResult = {
 };
 
 export type RewardAccountFilter = {
+  address?: Maybe<StringHashFilter>;
   and?: Maybe<Array<Maybe<RewardAccountFilter>>>;
   has?: Maybe<Array<Maybe<RewardAccountHasFilter>>>;
   not?: Maybe<RewardAccountFilter>;
@@ -8616,8 +8643,7 @@ export enum RewardAccountOrderable {
 }
 
 export type RewardAccountPatch = {
-  activeStake?: Maybe<ActiveStakeRef>;
-  address?: Maybe<Scalars['String']>;
+  activeStake?: Maybe<Array<ActiveStakeRef>>;
   addresses?: Maybe<AddressRef>;
   delegationCertificates?: Maybe<Array<StakeDelegationCertificateRef>>;
   deregistrationCertificates?: Maybe<Array<StakeKeyDeregistrationCertificateRef>>;
@@ -8627,7 +8653,7 @@ export type RewardAccountPatch = {
 };
 
 export type RewardAccountRef = {
-  activeStake?: Maybe<ActiveStakeRef>;
+  activeStake?: Maybe<Array<ActiveStakeRef>>;
   address?: Maybe<Scalars['String']>;
   addresses?: Maybe<AddressRef>;
   delegationCertificates?: Maybe<Array<StakeDelegationCertificateRef>>;
@@ -11823,6 +11849,13 @@ export type NetworkInfoQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type NetworkInfoQuery = { __typename?: 'Query', queryBlock?: Array<{ __typename?: 'Block', totalLiveStake: bigint, epoch: { __typename?: 'Epoch', number: number, startedAt: { __typename?: 'Slot', date: string }, activeStakeAggregate?: { __typename?: 'ActiveStakeAggregateResult', quantitySum?: bigint | null | undefined } | null | undefined } } | null | undefined> | null | undefined, queryTimeSettings?: Array<{ __typename?: 'TimeSettings', slotLength: number, epochLength: number } | null | undefined> | null | undefined, queryAda?: Array<{ __typename?: 'Ada', supply: { __typename?: 'CoinSupply', circulating: string, max: string, total: string } } | null | undefined> | null | undefined };
 
+export type RewardsHistoryQueryVariables = Exact<{
+  rewardAccounts: Array<Scalars['String']> | Scalars['String'];
+}>;
+
+
+export type RewardsHistoryQuery = { __typename?: 'Query', queryRewardAccount?: Array<{ __typename?: 'RewardAccount', activeStake: Array<{ __typename?: 'ActiveStake', quantity: bigint, epoch: { __typename?: 'Epoch', number: number } }> } | null | undefined> | null | undefined };
+
 export type CertificateTransactionFieldsFragment = { __typename?: 'Transaction', hash: string, block: { __typename?: 'Block', blockNo: number } };
 
 export type AllPoolParameterFieldsFragment = { __typename?: 'PoolParameters', cost: bigint, vrf: string, pledge: bigint, metadata?: { __typename?: 'StakePoolMetadata', ticker: string, name: string, description: string, homepage: string, extDataUrl?: string | null | undefined, extSigUrl?: string | null | undefined, extVkey?: string | null | undefined, ext?: { __typename?: 'ExtendedStakePoolMetadata', serial: number, pool: { __typename?: 'ExtendedStakePoolMetadataFields', id: string, country?: string | null | undefined, status?: ExtendedPoolStatus | null | undefined, contact?: { __typename?: 'PoolContactData', primary: string, email?: string | null | undefined, facebook?: string | null | undefined, github?: string | null | undefined, feed?: string | null | undefined, telegram?: string | null | undefined, twitter?: string | null | undefined } | null | undefined, media_assets?: { __typename?: 'ThePoolsMediaAssets', icon_png_64x64: string, logo_png?: string | null | undefined, logo_svg?: string | null | undefined, color_fg?: string | null | undefined, color_bg?: string | null | undefined } | null | undefined, itn?: { __typename?: 'ITNVerification', owner: string, witness: string } | null | undefined } } | null | undefined } | null | undefined, owners: Array<{ __typename?: 'RewardAccount', address: string }>, margin: { __typename?: 'Ratio', numerator: number, denominator: number }, relays: Array<{ __typename: 'RelayByAddress', ipv4?: string | null | undefined, ipv6?: string | null | undefined, port?: number | null | undefined } | { __typename: 'RelayByName', hostname: string, port?: number | null | undefined } | { __typename: 'RelayByNameMultihost', dnsName: string }>, poolRegistrationCertificate: { __typename?: 'PoolRegistrationCertificate', transaction: { __typename?: 'Transaction', hash: string } }, rewardAccount: { __typename?: 'RewardAccount', address: string }, metadataJson?: { __typename?: 'StakePoolMetadataJson', hash: string, url: string } | null | undefined };
@@ -12411,6 +12444,18 @@ export const NetworkInfoDocument = gql`
   }
 }
     `;
+export const RewardsHistoryDocument = gql`
+    query RewardsHistory($rewardAccounts: [String!]!) {
+  queryRewardAccount(filter: {address: {in: $rewardAccounts}}) {
+    activeStake {
+      epoch {
+        number
+      }
+      quantity
+    }
+  }
+}
+    `;
 export const StakePoolsByMetadataDocument = gql`
     query StakePoolsByMetadata($query: String!, $omit: [String!] = ["NEED_THIS_BECAUSE_IN_OPERATOR_WONT_WORK_WITH_EMPTY_ARR"]) {
   queryStakePoolMetadata(
@@ -12492,6 +12537,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     NetworkInfo(variables?: NetworkInfoQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<NetworkInfoQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<NetworkInfoQuery>(NetworkInfoDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'NetworkInfo');
+    },
+    RewardsHistory(variables: RewardsHistoryQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<RewardsHistoryQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<RewardsHistoryQuery>(RewardsHistoryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'RewardsHistory');
     },
     StakePoolsByMetadata(variables: StakePoolsByMetadataQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<StakePoolsByMetadataQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<StakePoolsByMetadataQuery>(StakePoolsByMetadataDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'StakePoolsByMetadata');

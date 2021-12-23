@@ -1,6 +1,6 @@
 import { Cardano } from '@cardano-sdk/core';
 import { Epoch } from './Epoch';
-import { Field, ObjectType } from 'type-graphql';
+import { Field, Int, ObjectType } from 'type-graphql';
 import { Int64 } from './util';
 import { RewardAccount } from './Address';
 import { StakePool } from './StakePool/StakePool';
@@ -13,6 +13,8 @@ export class ActiveStake {
   quantity: Cardano.Lovelace;
   @Field(() => Epoch)
   epoch: Epoch;
+  @Field(() => Int)
+  epochNo: number;
   @Field(() => StakePool)
   stakePool: StakePool;
 }

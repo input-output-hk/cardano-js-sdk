@@ -13,7 +13,7 @@ registerEnumType(ExtendedPoolStatus, { name: 'ExtendedPoolStatus' });
 
 @ObjectType()
 export class ITNVerification implements Cardano.ITNVerification {
-  // TODO: these could possibly be relationships to objects?
+  // these could possibly be relationships to objects?
   [k: string]: unknown;
   @Field()
   owner: string;

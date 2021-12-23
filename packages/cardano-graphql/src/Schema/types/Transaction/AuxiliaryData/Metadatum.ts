@@ -2,8 +2,6 @@
 import { Directive, Field, Int, ObjectType, createUnionType } from 'type-graphql';
 import { NotImplementedError } from '@cardano-sdk/core';
 
-// Review: I think integers will be int32 or int64. We left it as bigint in core types,
-// so have to verify and refactor either this or core type
 @ObjectType()
 class IntegerMetadatum {
   @Field(() => Int)
@@ -41,8 +39,6 @@ class MetadatumMap {
 
 @ObjectType()
 class MetadatumArray {
-  // Review: used to be of type JSON, but this type loses information,
-  // e.g. bytes are encoded to string, so given a string value we can't really infer type of this metadatum.
   @Field(() => [Metadatum])
   array: AnyMetadatum[];
 }

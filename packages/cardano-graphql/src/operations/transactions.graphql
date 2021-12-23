@@ -19,7 +19,7 @@ fragment metadatumMap on MetadatumMap {
       ... on MetadatumArray {
         ...metadatumArray
       }
-      # Review: nested maps and arrays are currently supported up to 1 level of nesting,
+      # nested maps and arrays are currently supported up to 1 level of nesting,
       # because it's recursive. If needed we can add support for more levels in this fragment,
       # or we could try to use https://dgraph.io/docs/query-language/recurse-query/
       # Same with array of arrays and array of maps

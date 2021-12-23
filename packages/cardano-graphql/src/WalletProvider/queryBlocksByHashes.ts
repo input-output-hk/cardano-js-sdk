@@ -24,7 +24,6 @@ export const queryBlocksByHashesProvider =
         slotLeader: Cardano.PoolId(block.issuer.id),
         totalOutput: BigInt(block.totalOutput),
         txCount: block.transactionsAggregate?.count || 0,
-        // TODO: test getExactlyOneObject is used here
         vrf: Cardano.VrfVkBech32(getExactlyOneObject(block.issuer.poolParameters, 'PoolParameters').vrf)
       })
     );

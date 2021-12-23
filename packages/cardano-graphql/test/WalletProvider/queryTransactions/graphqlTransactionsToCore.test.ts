@@ -1,4 +1,3 @@
-// Review: this is a big file, might be good to split this as well as graphqlTransactionsToCore.ts into multiple files
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable unicorn/consistent-function-scoping */
 /* eslint-disable max-len */

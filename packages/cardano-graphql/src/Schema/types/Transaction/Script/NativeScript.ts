@@ -3,7 +3,6 @@ import { NOf } from './nof';
 import { PublicKey } from '../../PublicKey';
 import { Slot } from '../../Slot';
 
-// Review: alternatively could create a union type
 @ObjectType({ description: 'Exactly one field is not null' })
 export class NativeScript {
   @Field(() => [NativeScript], { nullable: true })
