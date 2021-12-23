@@ -284,11 +284,12 @@ query TransactionsByHashes($hashes: [String!]!) {
   }
 }
 
-query TransactionIdsByAddresses($addresses: [String!]!) {
+query TransactionsByAddresses($addresses: [String!]!) {
   queryProtocolParametersAlonzo {
     ...protocolParameters
   }
   queryAddress(filter: { address: { in: $addresses } }) {
+    # TODO: find if this query could filter duplicate transactions
     inputs {
       transaction {
         ...coreTransactionFields

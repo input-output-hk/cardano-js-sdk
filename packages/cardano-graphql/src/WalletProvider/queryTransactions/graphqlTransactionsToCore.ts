@@ -192,7 +192,8 @@ const certificatesToCore = (certificates: GraphQlCertificates) =>
   });
 
 export const graphqlTransactionsToCore = (
-  { queryTransaction, queryProtocolParametersAlonzo }: TransactionsByHashesQuery,
+  queryTransaction: TransactionsByHashesQuery['queryTransaction'],
+  queryProtocolParametersAlonzo: TransactionsByHashesQuery['queryProtocolParametersAlonzo'],
   getExactlyOneObject: GetExactlyOneObject
 ) => {
   if (!queryTransaction) return [];
