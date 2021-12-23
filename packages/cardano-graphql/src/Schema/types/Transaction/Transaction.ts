@@ -59,6 +59,7 @@ export class Transaction {
   @Field(() => [Certificate], { nullable: true })
   certificates?: typeof Certificate[];
   @Field(() => String, { nullable: true })
+  // Review: this might be a duplicate of witness.redemeers[0].scriptHash
   scriptIntegrityHash?: Cardano.Hash28ByteBase16;
   @Directive('@hasInverse(field: requiredExtraSignatureInTransactions)')
   @Field(() => [PublicKey], { nullable: true })

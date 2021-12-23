@@ -1,3 +1,4 @@
+// Review: this is a big file, might be good to split this as well as graphqlTransactionsToCore.ts into multiple files
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable unicorn/consistent-function-scoping */
 /* eslint-disable max-len */
@@ -19,6 +20,13 @@ type PartialCoreTx = Omit<Partial<Cardano.TxAlonzo>, 'body'> & { body?: Partial<
 
 describe('WalletProvider/queryTransactions/graphqlTransactionsToCore', () => {
   const protocolParameters = [{ poolDeposit: 4, stakeKeyDeposit: 2 }];
+  const address = Cardano.Address('addr_test1vrdkagyspkmt96k6z87rnt9dzzy8mlcex7awjymm8wx434q837u24');
+  const keyHash = Cardano.Ed25519KeyHash('6199186adb51974690d7247d2646097d2c62763b767b528816fb7ed3f9f55d39');
+  const rewardAccount = Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27');
+  const publicKey = Cardano.Ed25519PublicKey('6199186adb51974690d7247d2646097d2c62763b767b528816fb7ed3f9f55d39');
+  const scriptIntegrityHash = '6199186adb51974690d7247d2646097d2c62763b767b528816fb7ed3';
+  const signature =
+    '709f937c4ce152c81f8406c03279ff5a8556a12a8657e40a578eaaa6223d2e6a2fece39733429e3ec73a6c798561b5c2d47d82224d656b1d964cfe8b5fdffe09';
 
   const minimalGraphqlTx: GraphqlTx = {
     block: {
@@ -44,6 +52,7 @@ describe('WalletProvider/queryTransactions/graphqlTransactionsToCore', () => {
           address:
             'addr_test1qra788mu4sg8kwd93ns9nfdh3k4ufxwg4xhz2r3n064tzfgxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flkns6cy45x'
         },
+        datumHash: '6804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99cac',
         value: { coin: 123_456n }
       }
     ],
@@ -51,9 +60,8 @@ describe('WalletProvider/queryTransactions/graphqlTransactionsToCore', () => {
     witness: {
       signatures: [
         {
-          publicKey: { key: '6199186adb51974690d7247d2646097d2c62763b767b528816fb7ed3f9f55d39' },
-          signature:
-            '709f937c4ce152c81f8406c03279ff5a8556a12a8657e40a578eaaa6223d2e6a2fece39733429e3ec73a6c798561b5c2d47d82224d656b1d964cfe8b5fdffe09'
+          publicKey: { key: publicKey.toString() },
+          signature
         }
       ]
     }
@@ -83,7 +91,7 @@ describe('WalletProvider/queryTransactions/graphqlTransactionsToCore', () => {
       outputs: [
         {
           address: Cardano.Address(minimalGraphqlTx.outputs[0].address.address),
-          datum: undefined,
+          datum: Cardano.Hash32ByteBase16('6804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99cac'),
           value: { assets: new Map(), coins: minimalGraphqlTx.outputs[0].value.coin }
         }
       ],
@@ -125,6 +133,176 @@ describe('WalletProvider/queryTransactions/graphqlTransactionsToCore', () => {
     expect(graphqlTransactionsToCore([minimalGraphqlTx], protocolParameters, getExactlyOneObject)).toEqual([
       minimalCoreTx
     ]);
+  });
+
+  it('maps collateral inputs to core types', () => {
+    testTxPropertiesConversion(
+      {
+        collateral: [{ address: { address: address.toString() }, index: 1 }]
+      },
+      {
+        body: {
+          collaterals: [{ address, index: 1, txId }]
+        }
+      }
+    );
+  });
+
+  it('maps "mint" to core types', () => {
+    const assetId = 'b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e';
+    testTxPropertiesConversion(
+      {
+        mint: [{ asset: { assetId }, quantity: '123' }]
+      },
+      {
+        body: {
+          mint: new Map([[Cardano.AssetId(assetId), 123n]])
+        }
+      }
+    );
+  });
+
+  it('maps "requiredExtraSignatures" to core types', () => {
+    testTxPropertiesConversion(
+      {
+        requiredExtraSignatures: [{ hash: keyHash.toString() }]
+      },
+      {
+        body: {
+          requiredExtraSignatures: [keyHash]
+        }
+      }
+    );
+  });
+
+  it('maps "scriptIntegrityHash" to core type', () => {
+    testTxPropertiesConversion(
+      { scriptIntegrityHash },
+      {
+        body: {
+          scriptIntegrityHash: Cardano.Hash28ByteBase16(scriptIntegrityHash)
+        }
+      }
+    );
+  });
+
+  it('maps "validityInterval" to core type', () => {
+    testTxPropertiesConversion(
+      { invalidBefore: { slotNo: 2 }, invalidHereafter: { slotNo: 5 } },
+      {
+        body: {
+          validityInterval: {
+            invalidBefore: 2,
+            invalidHereafter: 5
+          }
+        }
+      }
+    );
+  });
+
+  it('maps "withdrawals" to core type and affects implicit input', () => {
+    testTxPropertiesConversion(
+      { withdrawals: [{ quantity: 123n, rewardAccount: { address: rewardAccount.toString() } }] },
+      {
+        body: {
+          // TODO: rename core Withdrawal.stakeAddress to rewardAccount
+          withdrawals: [{ quantity: 123n, stakeAddress: rewardAccount }]
+        },
+        implicitCoin: {
+          input: 123n
+        }
+      }
+    );
+  });
+
+  describe('witness', () => {
+    it('maps "bootstrap" to core type', () => {
+      const bootstrap = {
+        addressAttributes: 'attr',
+        chainCode: 'chain',
+        key: { key: publicKey.toString() },
+        signature
+      };
+      testTxPropertiesConversion(
+        {
+          witness: {
+            ...minimalGraphqlTx.witness,
+            bootstrap: [bootstrap]
+          }
+        },
+        {
+          witness: {
+            ...minimalCoreTx.witness,
+            bootstrap: [
+              {
+                addressAttributes: bootstrap.addressAttributes,
+                chainCode: bootstrap.chainCode,
+                key: bootstrap.key.key,
+                signature: bootstrap.signature
+              }
+            ]
+          }
+        }
+      );
+    });
+
+    it('maps "datums" to core type', () => {
+      testTxPropertiesConversion(
+        {
+          witness: {
+            ...minimalGraphqlTx.witness,
+            datums: [{ datum: 'datum', hash: 'abc123' }]
+          }
+        },
+        {
+          witness: {
+            ...minimalCoreTx.witness,
+            datums: { abc123: 'datum' }
+          }
+        }
+      );
+    });
+
+    it('maps "redeemers" to core type', () => {
+      const redeemer = {
+        executionUnits: { memory: 1, steps: 2 },
+        index: 1,
+        purpose: 'spend' as const,
+        scriptHash: scriptIntegrityHash
+      };
+      testTxPropertiesConversion(
+        {
+          witness: {
+            ...minimalGraphqlTx.witness,
+            redeemers: [redeemer]
+          }
+        },
+        {
+          witness: {
+            ...minimalCoreTx.witness,
+            redeemers: [redeemer as any]
+          }
+        }
+      );
+    });
+
+    it('maps "scripts" to core type', () => {
+      // detailed script parsing is tested for scripts in auxiliary data
+      testTxPropertiesConversion(
+        {
+          witness: {
+            ...minimalGraphqlTx.witness,
+            scripts: [{ key: publicKey.toString(), script: { __typename: 'PlutusScript', cborHex: 'abc123' } }]
+          }
+        },
+        {
+          witness: {
+            ...minimalCoreTx.witness,
+            scripts: { [publicKey.toString()]: { plutus: 'abc123' } }
+          }
+        }
+      );
+    });
   });
 
   describe('auxiliaryData', () => {
@@ -280,7 +458,6 @@ describe('WalletProvider/queryTransactions/graphqlTransactionsToCore', () => {
 
   describe('certificates', () => {
     const poolId = Cardano.PoolId('pool1zuevzm3xlrhmwjw87ec38mzs02tlkwec9wxpgafcaykmwg7efhh');
-    const rewardAccount = Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27');
 
     const testCertificateConversion = (
       graphqlCertificate: GraphqlCertificate,

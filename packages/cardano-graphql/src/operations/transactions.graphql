@@ -233,7 +233,6 @@ fragment coreTransactionFields on Transaction {
       chainCode
       addressAttributes
       key {
-        hash
         key
       }
     }
