@@ -1,4 +1,4 @@
-import { AuthenticationError, InvalidSerializableDataError } from '../../src/KeyManagement/errors';
+import { InvalidSerializableDataError } from '../../src/KeyManagement/errors';
 import { KeyManagement } from '../../src';
 
 describe('KeyManagement/restoreKeyAgent', () => {
@@ -24,33 +24,17 @@ describe('KeyManagement/restoreKeyAgent', () => {
       await expect(KeyManagement.restoreKeyAgent(inMemoryKeyAgentData, getPassword)).resolves.not.toThrow();
     });
 
-    it('throws when attempting to restore key manager from invalid data', async () => {
-      await expect(() =>
-        KeyManagement.restoreKeyAgent(
-          {
-            ...inMemoryKeyAgentData,
-            encryptedRootPrivateKeyBytes: [...inMemoryKeyAgentData.encryptedRootPrivateKeyBytes, 0]
-          },
-          getPassword
-        )
-      ).rejects.toThrowError(
-        // Review: testing errors like is probably too specific and brittle.
-        // I think the sweet spot would be asserting 'error instanceof InvalidSerializableDataError'
-        // however I didn't find a way to do that in jest, might need to create a custom matcher for that.
-        new InvalidSerializableDataError('Expected encrypted root private key in "agentData" for InMemoryKeyAgent"')
-      );
-    });
-
     it('throws when attempting to restore key manager from valid data and no password', async () => {
       await expect(() => KeyManagement.restoreKeyAgent(inMemoryKeyAgentData)).rejects.toThrowError(
         new InvalidSerializableDataError('Expected "getPassword" in RestoreKeyAgentProps for InMemoryKeyAgent"')
       );
     });
 
-    it('throws when attempting to restore key manager from valid data and invalid password', async () => {
-      await expect(() =>
+    it('does not attempt to decrypt private key on restoration', async () => {
+      // invalid password, would throw if it attempts to decrypt
+      await expect(
         KeyManagement.restoreKeyAgent(inMemoryKeyAgentData, async () => Buffer.from('123'))
-      ).rejects.toThrowError(new AuthenticationError('Failed to decrypt root private key'));
+      ).resolves.not.toThrow();
     });
 
     it('throws when attempting to restore key manager of unsupported __typename', async () => {

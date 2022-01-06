@@ -38,14 +38,12 @@ export async function restoreKeyAgent<T extends SerializableKeyAgentData>(
       if (!getPassword) {
         throw new InvalidSerializableDataError('Expected "getPassword" in RestoreKeyAgentProps for InMemoryKeyAgent"');
       }
-      const keyAgent = new InMemoryKeyAgent({
+      return new InMemoryKeyAgent({
         accountIndex: data.accountIndex,
         encryptedRootPrivateKey: new Uint8Array(data.encryptedRootPrivateKeyBytes),
         getPassword,
         networkId: data.networkId
       });
-      await keyAgent.getExtendedAccountPublicKey(); // attempt to decrypt the key
-      return keyAgent;
     }
     default:
       throw new InvalidSerializableDataError(
