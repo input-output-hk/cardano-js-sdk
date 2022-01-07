@@ -107,6 +107,9 @@ export interface Asset {
   name: string;
   fingerprint: AssetFingerprint;
   quantity: bigint;
+  /**
+   * Sorted by slot
+   */
   history: AssetMintOrBurn[];
   metadata?: AssetMetadata;
 }
