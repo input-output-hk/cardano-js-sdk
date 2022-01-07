@@ -6,7 +6,7 @@
 // } else if (Array.isArray(metadatum)) {
 // } else if (metadatum instanceof Uint8Array) {
 // } else {
-//   // a is MetadatumMap
+//   // metadatum is MetadatumMap
 // }
 
 import * as Cardano from '.';
