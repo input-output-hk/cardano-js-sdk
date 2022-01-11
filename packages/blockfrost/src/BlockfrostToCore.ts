@@ -56,10 +56,18 @@ export const BlockfrostToCore = {
 
   // without `as OgmiosSchema.Utxo` above TS thinks the return value is (OgmiosSchema.TxIn | OgmiosSchema.TxOut)[][]
   transactionUtxos: (utxoResponse: Responses['tx_content_utxo']) => ({
-    inputs: utxoResponse.inputs.map((input) => ({
-      ...BlockfrostToCore.txIn(input),
-      address: Cardano.Address(input.address)
-    })),
+    collaterals: utxoResponse.inputs
+      .filter((input) => input.collateral)
+      .map((input) => ({
+        ...BlockfrostToCore.txIn(input),
+        address: Cardano.Address(input.address)
+      })),
+    inputs: utxoResponse.inputs
+      .filter((input) => !input.collateral)
+      .map((input) => ({
+        ...BlockfrostToCore.txIn(input),
+        address: Cardano.Address(input.address)
+      })),
     outputs: utxoResponse.outputs.map(BlockfrostToCore.txOut)
   }),
 
