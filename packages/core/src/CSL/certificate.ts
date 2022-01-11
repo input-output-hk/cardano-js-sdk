@@ -124,6 +124,7 @@ export const poolRetirement = (poolId: Cardano.PoolId, epoch: number) =>
 
 export const stakeDelegation = (rewardAccount: Cardano.RewardAccount, delegatee: Cardano.PoolId) =>
   Certificate.new_stake_delegation(
+    // TODO: add coreToCsl support for genesis pool IDs
     StakeDelegation.new(stakeAddressToCredential(rewardAccount), Ed25519KeyHash.from_bech32(delegatee.toString()))
   );
 
