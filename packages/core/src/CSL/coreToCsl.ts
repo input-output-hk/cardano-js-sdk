@@ -58,6 +58,7 @@ export const txIn = (core: Cardano.TxIn): TransactionInput =>
   TransactionInput.new(TransactionHash.from_bytes(Buffer.from(core.txId, 'hex')), core.index);
 
 export const txOut = (core: Cardano.TxOut): TransactionOutput =>
+  // TODO: add support for base 58 addresses
   TransactionOutput.new(Address.from_bech32(core.address.toString()), value(core.value));
 
 export const utxo = (core: Cardano.Utxo[]): TransactionUnspentOutput[] =>
