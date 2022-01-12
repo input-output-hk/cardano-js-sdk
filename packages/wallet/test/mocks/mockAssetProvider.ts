@@ -9,7 +9,7 @@ export const asset = {
       transactionId: Cardano.TransactionId('886206542d63b23a047864021fbfccf291d78e47c1e59bd4c75fbc67b248c5e8')
     }
   ],
-  name: 'TSLA',
+  name: Cardano.AssetName('54534c41'),
   policyId: Cardano.PolicyId('7eae28af2208be856f7a119668ae52a49b73725e326dc16579dcc373'),
   quantity: 1000n
 } as Cardano.Asset;
