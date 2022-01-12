@@ -1,6 +1,6 @@
 import { Cardano } from '@cardano-sdk/core';
-import { SingleAddressWallet, StakeKeyStatus, Wallet } from '../../src';
-import { assetProvider, keyAgentReady, poolId1, poolId2, stakePoolSearchProvider, walletProvider } from './config';
+import { SingleAddressWallet, StakeKeyStatus, Wallet } from '../../../src';
+import { assetProvider, keyAgentReady, poolId1, poolId2, stakePoolSearchProvider, walletProvider } from '../config';
 import { distinctUntilChanged, filter, firstValueFrom, map, merge, mergeMap, skip, tap, timer } from 'rxjs';
 
 const faucetAddress = Cardano.Address(
@@ -45,7 +45,7 @@ const waitForNewStakePoolIdAfterTx = (wallet: Wallet) =>
     )
   );
 
-describe('SingleAddressWallet', () => {
+describe('SingleAddressWallet/delegation', () => {
   let rewardAccount: Cardano.RewardAccount;
   let wallet: Wallet;
 

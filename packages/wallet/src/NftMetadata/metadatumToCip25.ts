@@ -2,7 +2,7 @@ import { Cardano } from '@cardano-sdk/core';
 import { CustomError } from 'ts-custom-error';
 import { ImageMediaType, MediaType, NftMetadata, NftMetadataFile, Uri } from './types';
 import { dummyLogger } from 'ts-log';
-import { omit } from 'lodash';
+import { omit } from 'lodash-es';
 
 class InvalidFileError extends CustomError {}
 
