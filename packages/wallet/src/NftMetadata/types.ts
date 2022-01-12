@@ -35,7 +35,7 @@ export interface NftMetadataFile {
   mediaType: MediaType;
   src: Uri | Uri[];
   otherProperties?: {
-    [key: string]: Cardano.Metadatum;
+    [key: string]: Cardano.Metadatum | undefined;
   };
 }
 
@@ -50,7 +50,7 @@ export interface NftMetadata {
   files?: NftMetadataFile[];
   description?: string | string[];
   otherProperties?: {
-    [key: string]: Cardano.Metadatum;
+    [key: string]: Cardano.Metadatum | undefined;
   };
 }
 

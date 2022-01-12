@@ -1,6 +1,7 @@
+import { Asset } from '../../src/types';
 import { AssetId } from '@cardano-sdk/util-dev';
 import { AssetsTrackerProps, Balance, TransactionalTracker, createAssetsTracker } from '../../src/services';
-import { Cardano } from '@cardano-sdk/core';
+import { NftMetadata } from '../../src/NftMetadata/types';
 import { createTestScheduler } from '../testScheduler';
 import { of } from 'rxjs';
 
@@ -19,10 +20,18 @@ describe('createAssetsTracker', () => {
           } as Balance
         })
       } as unknown as TransactionalTracker<Balance>;
-      const asset1 = { assetId: AssetId.TSLA, name: 'TSLA' } as Cardano.Asset;
-      const asset2 = { assetId: AssetId.PXL, name: 'PXL' } as Cardano.Asset;
-      const getAssetProvider = jest.fn().mockReturnValueOnce(of(asset1)).mockReturnValueOnce(of(asset2));
-      const target$ = createAssetsTracker({ balanceTracker } as AssetsTrackerProps, { getAssetProvider });
+      const nftMetadata = { name: 'nft' } as NftMetadata;
+      const nftMetadataService = jest
+        .fn()
+        .mockReturnValueOnce(cold('a', { a: undefined }))
+        .mockReturnValueOnce(cold('a', { a: nftMetadata }));
+      const asset1 = { assetId: AssetId.TSLA } as Asset;
+      const asset2 = { assetId: AssetId.PXL, nftMetadata } as Asset;
+      const assetService = jest.fn().mockReturnValueOnce(of(asset1)).mockReturnValueOnce(of(asset2));
+      const target$ = createAssetsTracker({ balanceTracker } as AssetsTrackerProps, {
+        assetService,
+        nftMetadataService
+      });
       expectObservable(target$).toBe('a-b-c', {
         a: {},
         b: new Map([[AssetId.TSLA, asset1]]),

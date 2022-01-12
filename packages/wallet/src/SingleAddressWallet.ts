@@ -41,6 +41,7 @@ import { Logger, dummyLogger } from 'ts-log';
 import { Observable, Subject, combineLatest, firstValueFrom, lastValueFrom, map, take } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TxInternals, computeImplicitCoin, createTransactionInternals, ensureValidityInterval } from './Transaction';
+import { createNftMetadataProvider } from './NftMetadata';
 import { isEqual } from 'lodash-es';
 
 export interface SingleAddressWalletProps {
@@ -155,6 +156,11 @@ export class SingleAddressWallet implements Wallet {
       createAssetsTracker({
         assetProvider,
         balanceTracker: this.balance,
+        nftMetadataProvider: createNftMetadataProvider(
+          walletProvider,
+          // this is not very efficient, consider storing TxAlonzo[] in transactions tracker history
+          this.transactions.history.all$.pipe(map((txs) => txs.map(({ tx }) => tx)))
+        ),
         retryBackoffConfig
       })
     );
