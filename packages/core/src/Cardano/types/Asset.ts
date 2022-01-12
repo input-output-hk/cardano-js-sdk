@@ -4,6 +4,9 @@ import { TransactionId } from './Transaction';
 
 export type AssetId = OpaqueString<'AssetId'>;
 
+/**
+ * Hex-encoded asset name
+ */
 export type AssetName = OpaqueString<'AssetName'>;
 export const AssetName = (value: string): AssetName => {
   if (value.length > 0) {
@@ -26,6 +29,9 @@ export const AssetId = (value: string): AssetId => {
   return value as unknown as AssetId;
 };
 
+/**
+ * Hex-encoded policy id
+ */
 export type PolicyId = Hash28ByteBase16<'PolicyId'>;
 export const PolicyId = (value: string): PolicyId => Hash28ByteBase16(value);
 
@@ -104,7 +110,7 @@ export interface AssetMintOrBurn {
 export interface Asset {
   assetId: AssetId;
   policyId: PolicyId;
-  name: string;
+  name: AssetName;
   fingerprint: AssetFingerprint;
   quantity: bigint;
   /**
