@@ -4,20 +4,6 @@ import { GroupedAddress } from './KeyManagement';
 import { SelectionSkeleton } from '@cardano-sdk/cip2';
 import { TxInternals } from './Transaction';
 
-export interface SerializableStatic<T, OpaqueStringT> {
-  deserialize(serialized: OpaqueStringT): T;
-}
-
-export const staticImplements =
-  <T>() =>
-  <U extends T>(constructor: U) => {
-    constructor;
-  };
-
-export interface Serializable<OpaqueStringT> {
-  serialize(): OpaqueStringT;
-}
-
 export type InitializeTxProps = {
   outputs?: Set<Cardano.TxOut>;
   certificates?: Cardano.Certificate[];

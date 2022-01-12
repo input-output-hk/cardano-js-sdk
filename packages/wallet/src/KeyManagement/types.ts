@@ -66,7 +66,6 @@ export interface SerializableInMemoryKeyAgentData extends SerializableKeyAgentDa
 
 export type SerializableKeyAgentData = SerializableInMemoryKeyAgentData;
 
-// TODO: utility to cache password for specified duration
 /**
  * @returns password used to decrypt root private key
  */
