@@ -58,7 +58,7 @@ describe('blockfrostAssetProvider', () => {
           ticker: 'nutc',
           url: 'https://www.stakenuts.com/'
         },
-        name: 'nutcoin',
+        name: Cardano.AssetName('6e7574636f696e'),
         policyId: Cardano.PolicyId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a7'),
         quantity: 12_000n
       });
@@ -108,7 +108,7 @@ describe('blockfrostAssetProvider', () => {
           ticker: 'nutc',
           url: 'https://www.stakenuts.com/'
         },
-        name: 'nutcoin',
+        name: Cardano.AssetName('6e7574636f696e'),
         policyId: Cardano.PolicyId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a7'),
         quantity: 12_000n
       });

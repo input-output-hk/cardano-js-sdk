@@ -39,7 +39,7 @@ export const blockfrostAssetProvider = (options: Options): AssetProvider => {
 
   const getAsset: AssetProvider['getAsset'] = async (assetId) => {
     const response = await blockfrost.assetsById(assetId.toString());
-    const name = Buffer.from(Asset.util.assetNameFromAssetId(assetId), 'hex').toString('utf-8');
+    const name = Asset.util.assetNameFromAssetId(assetId);
     const quantity = BigInt(response.quantity);
     return {
       assetId,
