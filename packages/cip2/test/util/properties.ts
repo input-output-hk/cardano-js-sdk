@@ -163,7 +163,7 @@ export const generateSelectionParams = (() => {
             fc
               .set(fc.oneof(...AssetId.All.map((asset) => fc.constant(asset))))
               .chain((assets) =>
-                fc.tuple(...assets.map((asset) => fc.bigUint(cslUtil.MAX_U64).map((amount) => ({ amount, asset }))))
+                fc.tuple(...assets.map((asset) => fc.bigInt(1n, cslUtil.MAX_U64).map((amount) => ({ amount, asset }))))
               )
               .map(
                 (assets) =>
@@ -171,7 +171,7 @@ export const generateSelectionParams = (() => {
               ),
             fc.constant(void 0)
           ),
-          coins: fc.bigUint(cslUtil.MAX_U64 - implicitCoin)
+          coins: fc.bigInt(1n, cslUtil.MAX_U64 - implicitCoin)
         }),
         { maxLength: 11 }
       )
