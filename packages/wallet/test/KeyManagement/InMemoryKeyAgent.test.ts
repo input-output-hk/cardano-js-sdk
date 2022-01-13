@@ -142,7 +142,6 @@ describe('InMemoryKeyAgent', () => {
     const yoroiEncryptedRootPrivateKeyHex =
       // eslint-disable-next-line max-len
       '7ec495800df33892c274b954145208c7038d22478f98d7c6843697a964ec10f49856e2c7ee7b2dbf9fa939d3b6b80caee60fa097cb1fb8bfb75271662c8d35c93aa0515f61d79d3f2e21d2dc26d144e83d6791122c45c9b6e1c941b8f71b7904efa16e68c3512e14e30f8831b397c7ddeb56242f376177721eb7d6acd7e99848cd8cf64de5f88e14a6a2e9890329c7d80d91250da96bb1343f22529d';
-    // eslint-disable-next-line unicorn/consistent-function-scoping
 
     it('can decrypt yoroi-encrypted root private key', async () => {
       const keyAgentFromEncryptedKey = new KeyManagement.InMemoryKeyAgent({
@@ -163,6 +162,67 @@ describe('InMemoryKeyAgent', () => {
       });
       const exportedPrivateKeyHex = await keyAgentFromMnemonic.exportRootPrivateKey();
       expect(exportedPrivateKeyHex).toEqual(yoroiRootPrivateKeyHex);
+    });
+  });
+
+  describe('daedelus compatibility', () => {
+    const daedelusMnemonic24 = [
+      'impulse',
+      'mom',
+      'alarm',
+      'say',
+      'comfort',
+      'ribbon',
+      'spy',
+      'almost',
+      'symptom',
+      'this',
+      'gorilla',
+      'lift',
+      'glance',
+      'enter',
+      'skill',
+      'gap',
+      'foam',
+      'tragic',
+      'easily',
+      'cause',
+      'wave',
+      'medal',
+      'parrot',
+      'copy'
+    ];
+    const daedelusStakeAddress = 'stake_test1uqxphnjjvuxwxt0jftxrn7m35sy5px0f7cwwrtkcv42ccxqw2d5xk';
+    const daedelusEncryptedRootPrivateKeyHex =
+      // eslint-disable-next-line max-len
+      '5f7644cb357ba0e255e351574aef9f6971295142b95ce04bcd94d8f54f96fb616fc1fec402578c0b1577a112bc8826faee08c3a7534af31bbe7bb5a20cbef3607ab697b1a28bd93464f233ed4df0184a0905bac41e0f594abafde45eca3ed86b7c34c6aefccad3428649e2ca86b3d93a6da602298b2853d4d556eae24edd6cce';
+
+    // fails to decrypt root private key
+    it.skip('can decrypt daedelus-encrypted root private key to produce expected stake address', async () => {
+      const keyAgentFromEncryptedKey = new KeyManagement.InMemoryKeyAgent({
+        accountIndex: 0,
+        encryptedRootPrivateKey: Buffer.from(daedelusEncryptedRootPrivateKeyHex, 'hex'),
+        getPassword: jest.fn().mockResolvedValue(Buffer.from('nMmys*X002')), // daedelus enforces min length of 10
+        networkId: Cardano.NetworkId.testnet
+      });
+      const derivedAddress = await keyAgentFromEncryptedKey.deriveAddress({
+        index: 1,
+        type: KeyManagement.AddressType.External
+      });
+      expect(derivedAddress.rewardAccount).toEqual(daedelusStakeAddress);
+    });
+
+    it('can import daedelus 24-word mnemonic to produce expected stake address', async () => {
+      const keyAgentFromMnemonic = await KeyManagement.InMemoryKeyAgent.fromBip39MnemonicWords({
+        getPassword,
+        mnemonicWords: daedelusMnemonic24,
+        networkId: Cardano.NetworkId.testnet
+      });
+      const derivedAddress = await keyAgentFromMnemonic.deriveAddress({
+        index: 1,
+        type: KeyManagement.AddressType.External
+      });
+      expect(derivedAddress.rewardAccount).toEqual(daedelusStakeAddress);
     });
   });
 });
