@@ -273,7 +273,9 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
   // eslint-disable-next-line unicorn/consistent-function-scoping
   const parseValidityInterval = (num: string | null) => Number.parseInt(num || '') || undefined;
   const fetchTransaction = async (hash: Cardano.TransactionId): Promise<Cardano.TxAlonzo> => {
-    const { inputs, outputs } = BlockfrostToCore.transactionUtxos(await blockfrost.txsUtxos(hash.toString()));
+    const { inputs, outputs, collaterals } = BlockfrostToCore.transactionUtxos(
+      await blockfrost.txsUtxos(hash.toString())
+    );
     const response = await blockfrost.txs(hash.toString());
     const metadata = await fetchJsonMetadata(hash);
     return {
@@ -289,6 +291,7 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
       },
       body: {
         certificates: await fetchCertificates(response),
+        collaterals,
         fee: BigInt(response.fees),
         inputs,
         mint: await fetchMint(response),
