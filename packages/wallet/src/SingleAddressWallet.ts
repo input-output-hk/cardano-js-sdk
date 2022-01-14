@@ -6,6 +6,8 @@ import {
   NetworkInfo,
   ProtocolParametersRequiredByWallet,
   StakePoolSearchProvider,
+  TimeSettings,
+  TimeSettingsProvider,
   WalletProvider,
   coreToCsl
 } from '@cardano-sdk/core';
@@ -56,6 +58,7 @@ export interface SingleAddressWalletDependencies {
   readonly walletProvider: WalletProvider;
   readonly stakePoolSearchProvider: StakePoolSearchProvider;
   readonly assetProvider: AssetProvider;
+  readonly timeSettingsProvider: TimeSettingsProvider;
   readonly inputSelector?: InputSelector;
   readonly logger?: Logger;
 }
@@ -80,6 +83,7 @@ export class SingleAddressWallet implements Wallet {
   addresses$: TrackerSubject<GroupedAddress[]>;
   protocolParameters$: TrackerSubject<ProtocolParametersRequiredByWallet>;
   genesisParameters$: TrackerSubject<Cardano.CompactGenesis>;
+  timeSettings$: TrackerSubject<TimeSettings[]>;
   assets$: TrackerSubject<Assets>;
   name: string;
 
@@ -98,6 +102,7 @@ export class SingleAddressWallet implements Wallet {
       stakePoolSearchProvider,
       keyAgent,
       assetProvider,
+      timeSettingsProvider,
       logger = dummyLogger,
       inputSelector = roundRobinRandomImprove()
     }: SingleAddressWalletDependencies
@@ -117,6 +122,9 @@ export class SingleAddressWallet implements Wallet {
       coldObservableProvider(walletProvider.networkInfo, retryBackoffConfig, tipBlockHeight$, isEqual)
     );
     const epoch$ = distinctEpoch(this.networkInfo$);
+    this.timeSettings$ = new TrackerSubject(
+      coldObservableProvider(timeSettingsProvider, retryBackoffConfig, epoch$, isEqual)
+    );
     this.protocolParameters$ = new TrackerSubject(
       coldObservableProvider(walletProvider.currentWalletProtocolParameters, retryBackoffConfig, epoch$, isEqual)
     );

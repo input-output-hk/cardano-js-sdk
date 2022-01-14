@@ -1,5 +1,5 @@
 import { Balance, BehaviorObservable, DelegationTracker, TransactionalTracker, TransactionsTracker } from './services';
-import { Cardano, NetworkInfo, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
+import { Cardano, NetworkInfo, ProtocolParametersRequiredByWallet, TimeSettings } from '@cardano-sdk/core';
 import { GroupedAddress } from './KeyManagement';
 import { NftMetadata } from './NftMetadata';
 import { SelectionSkeleton } from '@cardano-sdk/cip2';
@@ -43,6 +43,7 @@ export interface Wallet {
   readonly utxo: TransactionalTracker<Cardano.Utxo[]>;
   readonly transactions: TransactionsTracker;
   readonly tip$: BehaviorObservable<Cardano.Tip>;
+  readonly timeSettings$: BehaviorObservable<TimeSettings[]>;
   readonly genesisParameters$: BehaviorObservable<Cardano.CompactGenesis>;
   readonly networkInfo$: BehaviorObservable<NetworkInfo>;
   readonly protocolParameters$: BehaviorObservable<ProtocolParametersRequiredByWallet>;
