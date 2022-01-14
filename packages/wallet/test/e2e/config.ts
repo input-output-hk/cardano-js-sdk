@@ -1,7 +1,7 @@
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, testnetTimeSettings } from '@cardano-sdk/core';
 import { InMemoryKeyAgent } from '../../src/KeyManagement';
 import { blockfrostAssetProvider, blockfrostWalletProvider } from '@cardano-sdk/blockfrost';
-import { createStubStakePoolSearchProvider } from '@cardano-sdk/util-dev';
+import { createStubStakePoolSearchProvider, createStubTimeSettingsProvider } from '@cardano-sdk/util-dev';
 
 const networkId = Number.parseInt(process.env.NETWORK_ID || '');
 if (Number.isNaN(networkId)) throw new Error('NETWORK_ID not set');
@@ -41,6 +41,14 @@ export const stakePoolSearchProvider = (() => {
     return createStubStakePoolSearchProvider();
   }
   throw new Error(`STAKE_POOL_SEARCH_PROVIDER unsupported: ${stakePoolSearchProviderName}`);
+})();
+
+export const timeSettingsProvider = (() => {
+  const timeSettingsProviderName = process.env.TIME_SETTINGS_PROVIDER;
+  if (timeSettingsProviderName === 'stub_testnet') {
+    return createStubTimeSettingsProvider(testnetTimeSettings);
+  }
+  throw new Error(`TIME_SETTINGS_PROVIDER unsupported: ${timeSettingsProviderName}`);
 })();
 
 if (!process.env.POOL_ID_1) throw new Error('POOL_ID_1 not set');

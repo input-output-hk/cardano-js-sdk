@@ -1,6 +1,6 @@
 import { Cardano } from '@cardano-sdk/core';
 import { KeyManagement, SingleAddressWallet, Wallet } from '../../../src';
-import { assetProvider, keyAgentReady, stakePoolSearchProvider, walletProvider } from '../config';
+import { assetProvider, keyAgentReady, stakePoolSearchProvider, timeSettingsProvider, walletProvider } from '../config';
 import { combineLatest, filter, firstValueFrom, map } from 'rxjs';
 
 describe('SingleAddressWallet/delegation', () => {
@@ -26,6 +26,7 @@ describe('SingleAddressWallet/delegation', () => {
         assetProvider,
         keyAgent: await keyAgentReady,
         stakePoolSearchProvider,
+        timeSettingsProvider,
         walletProvider
       }
     );

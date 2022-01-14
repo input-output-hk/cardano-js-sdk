@@ -1,6 +1,6 @@
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, testnetTimeSettings } from '@cardano-sdk/core';
 import { KeyManagement, SingleAddressWallet, SingleAddressWalletProps, TransactionFailure } from '../../src';
-import { createStubStakePoolSearchProvider } from '@cardano-sdk/util-dev';
+import { createStubStakePoolSearchProvider, createStubTimeSettingsProvider } from '@cardano-sdk/util-dev';
 import { firstValueFrom } from 'rxjs';
 import { mockAssetProvider, mockWalletProvider } from '../mocks';
 
@@ -21,11 +21,13 @@ describe('integration/withdrawal', () => {
     });
     const walletProvider = mockWalletProvider();
     const stakePoolSearchProvider = createStubStakePoolSearchProvider();
+    const timeSettingsProvider = createStubTimeSettingsProvider(testnetTimeSettings);
     const assetProvider = mockAssetProvider();
     wallet = new SingleAddressWallet(walletProps, {
       assetProvider,
       keyAgent,
       stakePoolSearchProvider,
+      timeSettingsProvider,
       walletProvider
     });
   });

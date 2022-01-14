@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 import * as mocks from './mocks';
-import { AssetId, createStubStakePoolSearchProvider } from '@cardano-sdk/util-dev';
-import { Cardano } from '@cardano-sdk/core';
+import { AssetId, createStubStakePoolSearchProvider, createStubTimeSettingsProvider } from '@cardano-sdk/util-dev';
+import { Cardano, testnetTimeSettings } from '@cardano-sdk/core';
 import { KeyManagement, SingleAddressWallet } from '../src';
 import { firstValueFrom, skip } from 'rxjs';
 import { testKeyAgent } from './mocks';
@@ -20,11 +20,15 @@ describe('SingleAddressWallet', () => {
     walletProvider = mocks.mockWalletProvider();
     assetProvider = mocks.mockAssetProvider();
     const stakePoolSearchProvider = createStubStakePoolSearchProvider();
+    const timeSettingsProvider = createStubTimeSettingsProvider(testnetTimeSettings);
     keyAgent.deriveAddress = jest.fn().mockResolvedValue({
       address,
       rewardAccount
     });
-    wallet = new SingleAddressWallet({ name }, { assetProvider, keyAgent, stakePoolSearchProvider, walletProvider });
+    wallet = new SingleAddressWallet(
+      { name },
+      { assetProvider, keyAgent, stakePoolSearchProvider, timeSettingsProvider, walletProvider }
+    );
   });
 
   afterEach(() => wallet.shutdown());
@@ -83,6 +87,9 @@ describe('SingleAddressWallet', () => {
     });
     it('"assets$"', async () => {
       expect(await firstValueFrom(wallet.assets$)).toEqual(new Map([[AssetId.TSLA, mocks.asset]]));
+    });
+    it('timeSettings$', async () => {
+      expect(await firstValueFrom(wallet.timeSettings$)).toEqual(testnetTimeSettings);
     });
   });
 
