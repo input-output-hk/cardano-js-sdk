@@ -28,7 +28,7 @@ import {
 import * as certificate from './certificate';
 import { SerializationError } from '../errors';
 import { SerializationFailure } from '..';
-import { coreToCsl } from '.';
+import { coreToCsl, parseCslAddress } from '.';
 export * as certificate from './certificate';
 
 export const tokenMap = (assets: Cardano.TokenMap) => {
@@ -58,8 +58,7 @@ export const txIn = (core: Cardano.TxIn): TransactionInput =>
   TransactionInput.new(TransactionHash.from_bytes(Buffer.from(core.txId, 'hex')), core.index);
 
 export const txOut = (core: Cardano.TxOut): TransactionOutput =>
-  // TODO: add support for base 58 addresses
-  TransactionOutput.new(Address.from_bech32(core.address.toString()), value(core.value));
+  TransactionOutput.new(parseCslAddress(core.address.toString())!, value(core.value));
 
 export const utxo = (core: Cardano.Utxo[]): TransactionUnspentOutput[] =>
   core.map((item) => TransactionUnspentOutput.new(txIn(item[0]), txOut(item[1])));

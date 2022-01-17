@@ -20,6 +20,12 @@ const txOut: Cardano.TxOut = {
     coins: 10n
   }
 };
+const txOutByron = {
+  ...txOut,
+  address: Cardano.Address(
+    'DdzFFzCqrhsw3prhfMFDNFowbzUku3QmrMwarfjUbWXRisodn97R436SHc1rimp4MhPNmbdYb1aTdqtGSJixMVMi5MkArDQJ6Sc1n3Ez'
+  )
+};
 
 const coreTxBody: Cardano.TxBodyAlonzo = {
   certificates: [
@@ -50,6 +56,7 @@ describe('coreToCsl', () => {
   });
   it('txOut', () => {
     expect(coreToCsl.txOut(txOut)).toBeInstanceOf(CSL.TransactionOutput);
+    expect(coreToCsl.txOut(txOutByron)).toBeInstanceOf(CSL.TransactionOutput);
   });
   it('utxo', () => {
     expect(coreToCsl.utxo([[txIn, txOut]])[0]).toBeInstanceOf(CSL.TransactionUnspentOutput);
