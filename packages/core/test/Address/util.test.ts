@@ -1,6 +1,5 @@
 import { Address } from '../../src';
 
-/* eslint-disable max-len */
 jest.mock('../../src/CSL/parseCslAddress');
 const { parseCslAddress } = jest.requireMock('../../src/CSL/parseCslAddress');
 
