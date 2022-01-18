@@ -17,7 +17,7 @@ export declare class OpaqueString<T extends string> extends String {
 const isOneOf = <T>(target: T, options: T | T[]) =>
   (Array.isArray(options) && options.includes(target)) || target === options;
 
-const assertIsBech32WithPrefix = (
+export const assertIsBech32WithPrefix = (
   target: string,
   prefix: string | string[],
   expectedDecodedLength?: number | number[]
