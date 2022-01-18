@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>SerializableStatic | cardano-sdk</title>
+	<title>NftMetadataProvider | cardano-sdk</title>
 	<meta name="description" content="Documentation for cardano-sdk">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -58,73 +58,48 @@
 					<a href="../modules/_cardano_sdk_wallet.html">@cardano-sdk/wallet</a>
 				</li>
 				<li>
-					<a href="_cardano_sdk_wallet.SerializableStatic.html">SerializableStatic</a>
+					<a href="../modules/_cardano_sdk_wallet.NftMetadata.html">NftMetadata</a>
+				</li>
+				<li>
+					<a href="_cardano_sdk_wallet.NftMetadata.NftMetadataProvider.html">NftMetadataProvider</a>
 				</li>
 			</ul>
-			<h1>Interface SerializableStatic&lt;T, OpaqueStringT&gt;</h1>
+			<h1>Interface NftMetadataProvider</h1>
 		</div>
 	</div>
 </header>
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
-			<section class="tsd-panel tsd-type-parameters">
-				<h3>Type parameters</h3>
-				<ul class="tsd-type-parameters">
-					<li>
-						<h4>T</h4>
-					</li>
-					<li>
-						<h4>OpaqueStringT</h4>
-					</li>
-				</ul>
-			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">SerializableStatic</span>
+						<span class="target">NftMetadataProvider</span>
 					</li>
 				</ul>
 			</section>
-			<section class="tsd-panel-group tsd-index-group">
-				<h2>Index</h2>
-				<section class="tsd-panel tsd-index-panel">
-					<div class="tsd-index-content">
-						<section class="tsd-index-section ">
-							<h3>Methods</h3>
-							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_cardano_sdk_wallet.SerializableStatic.html#deserialize" class="tsd-kind-icon">deserialize</a></li>
+			<section class="tsd-panel">
+				<h3 class="tsd-before-signature">Callable</h3>
+				<ul class="tsd-signatures tsd-kind-interface tsd-parent-kind-namespace">
+					<li class="tsd-signature tsd-kind-icon">Nft<wbr>Metadata<wbr>Provider<span class="tsd-signature-symbol">(</span>asset<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Asset</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><a href="_cardano_sdk_wallet.NftMetadata.NftMetadata.html" class="tsd-signature-type" data-tsd-kind="Interface">NftMetadata</a><span class="tsd-signature-symbol">&gt;</span></li>
+				</ul>
+				<ul class="tsd-descriptions">
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/6671f7e/packages/wallet/src/NftMetadata/types.ts#L58">packages/wallet/src/NftMetadata/types.ts:58</a></li>
 							</ul>
-						</section>
-					</div>
-				</section>
-			</section>
-			<section class="tsd-panel-group tsd-member-group ">
-				<h2>Methods</h2>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
-					<a name="deserialize" class="tsd-anchor"></a>
-					<h3>deserialize</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">deserialize<span class="tsd-signature-symbol">(</span>serialized<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">OpaqueStringT</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1316d4b/packages/wallet/src/types.ts#L8">packages/wallet/src/types.ts:8</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>serialized: <span class="tsd-signature-type">OpaqueStringT</span></h5>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">T</span></h4>
-						</li>
-					</ul>
-				</section>
+						</aside>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5>asset: <span class="tsd-signature-type">Asset</span></h5>
+							</li>
+						</ul>
+						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><a href="_cardano_sdk_wallet.NftMetadata.NftMetadata.html" class="tsd-signature-type" data-tsd-kind="Interface">NftMetadata</a><span class="tsd-signature-symbol">&gt;</span></h4>
+					</li>
+				</ul>
 			</section>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
@@ -133,46 +108,47 @@
 					<li class=" ">
 						<a href="../index.html">Modules</a>
 					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/_cardano_sdk_blockfrost.html">@cardano-<wbr>sdk/blockfrost</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/_cardano_sdk_cardano_graphql.html">@cardano-<wbr>sdk/cardano-<wbr>graphql</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/_cardano_sdk_cardano_graphql_db_sync.html">@cardano-<wbr>sdk/cardano-<wbr>graphql-<wbr>db-<wbr>sync</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/_cardano_sdk_cip2.html">@cardano-<wbr>sdk/cip2</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/_cardano_sdk_cip30.html">@cardano-<wbr>sdk/cip30</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/_cardano_sdk_core.html">@cardano-<wbr>sdk/core</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/_cardano_sdk_util_dev.html">@cardano-<wbr>sdk/util-<wbr>dev</a>
-					</li>
-					<li class="current tsd-kind-module">
-						<a href="../modules/_cardano_sdk_wallet.html">@cardano-<wbr>sdk/wallet</a>
-					</li>
 				</ul>
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
+					<li class=" tsd-kind-interface tsd-parent-kind-namespace">
+						<a href="_cardano_sdk_wallet.NftMetadata.NftMetadata.html" class="tsd-kind-icon">Nft<wbr>Metadata</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-namespace">
+						<a href="_cardano_sdk_wallet.NftMetadata.NftMetadataFile.html" class="tsd-kind-icon">Nft<wbr>Metadata<wbr>File</a>
+					</li>
 				</ul>
 				<ul class="current">
-					<li class="current tsd-kind-interface tsd-parent-kind-module tsd-has-type-parameter">
-						<a href="_cardano_sdk_wallet.SerializableStatic.html" class="tsd-kind-icon">Serializable<wbr>Static</a>
-						<ul>
-							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="_cardano_sdk_wallet.SerializableStatic.html#deserialize" class="tsd-kind-icon">deserialize</a>
-							</li>
-						</ul>
+					<li class="current tsd-kind-interface tsd-parent-kind-namespace">
+						<a href="_cardano_sdk_wallet.NftMetadata.NftMetadataProvider.html" class="tsd-kind-icon">Nft<wbr>Metadata<wbr>Provider</a>
 					</li>
 				</ul>
 				<ul class="after-current">
+					<li class=" tsd-kind-type-alias tsd-parent-kind-namespace">
+						<a href="../modules/_cardano_sdk_wallet.NftMetadata.html#ImageMediaType" class="tsd-kind-icon">Image<wbr>Media<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-namespace">
+						<a href="../modules/_cardano_sdk_wallet.NftMetadata.html#MediaType" class="tsd-kind-icon">Media<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-namespace">
+						<a href="../modules/_cardano_sdk_wallet.NftMetadata.html#Uri" class="tsd-kind-icon">Uri</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-namespace">
+						<a href="../modules/_cardano_sdk_wallet.NftMetadata.html#ImageMediaType-1" class="tsd-kind-icon">Image<wbr>Media<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-namespace">
+						<a href="../modules/_cardano_sdk_wallet.NftMetadata.html#MediaType-1" class="tsd-kind-icon">Media<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-namespace">
+						<a href="../modules/_cardano_sdk_wallet.NftMetadata.html#Uri-1" class="tsd-kind-icon">Uri</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-namespace">
+						<a href="../modules/_cardano_sdk_wallet.NftMetadata.html#createNftMetadataProvider" class="tsd-kind-icon">create<wbr>Nft<wbr>Metadata<wbr>Provider</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-namespace">
+						<a href="../modules/_cardano_sdk_wallet.NftMetadata.html#metadatumToCip25" class="tsd-kind-icon">metadatum<wbr>ToCip25</a>
+					</li>
 				</ul>
 			</nav>
 		</div>
@@ -192,7 +168,6 @@
 			<ul class="tsd-legend">
 				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
 				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
