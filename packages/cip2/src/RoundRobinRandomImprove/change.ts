@@ -185,7 +185,13 @@ const coalesceChangeBundlesForMinCoinRequirement = (
     return changeBundles;
   }
 
-  let sortedBundles = orderBy(changeBundles, ({ coins }) => coins, 'desc');
+  const noZeroQuantityAssetChangeBundles = changeBundles.map(
+    ({ coins, assets }): Cardano.Value => ({
+      assets: assets ? new Map([...assets.entries()].filter(([_, quantity]) => quantity > 0n)) : undefined,
+      coins
+    })
+  );
+  let sortedBundles = orderBy(noZeroQuantityAssetChangeBundles, ({ coins }) => coins, 'desc');
   const satisfiesMinCoinRequirement = (valueQuantities: Cardano.Value) =>
     valueQuantities.coins >= computeMinimumCoinQuantity(valueQuantities.assets);
 
