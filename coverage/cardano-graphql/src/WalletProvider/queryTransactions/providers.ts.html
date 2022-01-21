@@ -3,15 +3,15 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for src/Transaction/computeImplicitCoin.ts</title>
+    <title>Code coverage report for src/WalletProvider/queryTransactions/providers.ts</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="../../prettify.css" />
-    <link rel="stylesheet" href="../../base.css" />
-    <link rel="shortcut icon" type="image/x-icon" href="../../favicon.png" />
+    <link rel="stylesheet" href="../../../prettify.css" />
+    <link rel="stylesheet" href="../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style type='text/css'>
         .coverage-summary .sorter {
-            background-image: url(../../sort-arrow-sprite.png);
+            background-image: url(../../../sort-arrow-sprite.png);
         }
     </style>
 </head>
@@ -19,34 +19,34 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../index.html">All files</a> / <a href="index.html">src/Transaction</a> computeImplicitCoin.ts</h1>
+        <h1><a href="../../../index.html">All files</a> / <a href="index.html">src/WalletProvider/queryTransactions</a> providers.ts</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>12/12</span>
+                <span class='fraction'>19/19</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">95.24% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>20/21</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>4/4</span>
+                <span class='fraction'>8/8</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>10/10</span>
+                <span class='fraction'>19/19</span>
             </div>
         
             
@@ -91,74 +91,89 @@
 <a name='L32'></a><a href='#L32'>32</a>
 <a name='L33'></a><a href='#L33'>33</a>
 <a name='L34'></a><a href='#L34'>34</a>
-<a name='L35'></a><a href='#L35'>35</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">18x</span>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">18x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { BigIntMath, Cardano, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
-import { InitializeTxProps } from '../types';
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { WalletProvider, util } from '@cardano-sdk/core';
+import { WalletProviderFnProps } from '../WalletProviderFnProps';
+import { graphqlTransactionsToCore } from './graphqlTransactionsToCore';
+import { uniqBy } from 'lodash-es';
 &nbsp;
-/**
- * Implementation is the same as in CSL.get_implicit_input() and CSL.get_deposit().
- */
-export const computeImplicitCoin = (
-  { stakeKeyDeposit, poolDeposit }: ProtocolParametersRequiredByWallet,
-  { certificates, withdrawals }: Pick&lt;InitializeTxProps, 'certificates' | 'withdrawals'&gt;
-): Cardano.ImplicitCoin =&gt; {
-  const stakeKeyDepositBigint = stakeKeyDeposit &amp;&amp; BigInt(stakeKeyDeposit);
-  const poolDepositBigint = poolDeposit &amp;&amp; BigInt(poolDeposit);
-  const deposit = BigIntMath.sum(
-    certificates?.map(
-      (cert) =&gt;
-        (cert.__typename === Cardano.CertificateType.StakeKeyRegistration &amp;&amp; stakeKeyDepositBigint) ||
-        (cert.__typename === Cardano.CertificateType.PoolRegistration &amp;&amp; <span class="branch-3 cbranch-no" title="branch not covered" >poolDepositBigint)</span> ||
-        0n
-    ) || []
-  );
-  const withdrawalsTotal = (withdrawals &amp;&amp; BigIntMath.sum(withdrawals.map(({ quantity }) =&gt; quantity))) || 0n;
-  const reclaimTotal = BigIntMath.sum(
-    certificates?.map(
-      (cert) =&gt;
-        (cert.__typename === Cardano.CertificateType.StakeKeyDeregistration &amp;&amp; stakeKeyDepositBigint) ||
-        (cert.__typename === Cardano.CertificateType.PoolRetirement &amp;&amp; poolDepositBigint) ||
-        0n
-    ) || []
-  );
-  return {
-    deposit,
-    input: withdrawalsTotal + reclaimTotal
+export const queryTransactionsByHashesProvider =
+  ({ sdk, getExactlyOneObject }: WalletProviderFnProps): WalletProvider['queryTransactionsByHashes'] =&gt;
+  async (hashes) =&gt; {
+    const { queryProtocolParametersAlonzo, queryTransaction } = await sdk.TransactionsByHashes({
+      hashes: hashes as unknown as string[]
+    });
+    return graphqlTransactionsToCore(queryTransaction, queryProtocolParametersAlonzo, getExactlyOneObject);
   };
-};
+&nbsp;
+export const queryTransactionsByAddressesProvider =
+  ({ sdk, getExactlyOneObject }: WalletProviderFnProps): WalletProvider['queryTransactionsByAddresses'] =&gt;
+  async (addresses) =&gt; {
+    const { queryAddress, queryProtocolParametersAlonzo } = await sdk.TransactionsByAddresses({
+      addresses: addresses as unknown as string[]
+    });
+    if (!queryAddress) {
+      return [];
+    }
+    return uniqBy(
+      queryAddress.filter(util.isNotNil).flatMap(({ inputs, utxo }) =&gt; [
+        ...graphqlTransactionsToCore(
+          inputs.map(({ transaction }) =&gt; transaction),
+          queryProtocolParametersAlonzo,
+          getExactlyOneObject
+        ),
+        ...graphqlTransactionsToCore(
+          utxo.map(({ transaction }) =&gt; transaction),
+          queryProtocolParametersAlonzo,
+          getExactlyOneObject
+        )
+      ]),
+      (tx) =&gt; tx.id
+    );
+  };
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -166,17 +181,17 @@ export const computeImplicitCoin = (
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Tue Jan 18 2022 17:26:50 GMT+0000 (Coordinated Universal Time)
+                at Fri Jan 21 2022 17:27:27 GMT+0000 (Coordinated Universal Time)
             </div>
         </div>
-        <script src="../../prettify.js"></script>
+        <script src="../../../prettify.js"></script>
         <script>
             window.onload = function () {
                 prettyPrint();
             };
         </script>
-        <script src="../../sorter.js"></script>
-        <script src="../../block-navigation.js"></script>
+        <script src="../../../sorter.js"></script>
+        <script src="../../../block-navigation.js"></script>
     </body>
 </html>
     
