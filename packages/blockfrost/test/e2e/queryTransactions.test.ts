@@ -26,6 +26,116 @@ describe('blockfrostWalletProvider', () => {
         txId: '2db6592c4782064295295b365c2e8ce84084fa24b1b3f5834f3c6b65268b7878'
       });
     });
+    // TODO: waiting for fix in db-sync/blockfrost
+    // it('has collaterals for failed contract', async () => {
+    //   const [tx] = await walletProvider.queryTransactionsByHashes([
+    //     Cardano.TransactionId('9298f499a4c4aeba53a984cb4df0f9a93b7d158da4c2c2d12a06530841f94cd7')
+    //   ]);
+    //   expect(tx.body.inputs!.length).toEqual(0);
+    //   expect(tx.body.outputs!.length).toEqual(0);
+    //   expect(tx.body.collaterals!.length).toEqual(1);
+    // });
+    it('has withdrawals', async () => {
+      const [tx] = await walletProvider.queryTransactionsByHashes([
+        Cardano.TransactionId('e92e3c2ce94d61449876e23ba9170ca20868ee447f13703c5fa7e888cc1701e1')
+      ]);
+      expect(tx.body.withdrawals).toEqual([
+        { quantity: 29_308_336n, stakeAddress: 'stake_test1urlhkh2pl2xt24dkgjtqrkzfv77ekqj950znqpzdsz2wuds0xlsk6' }
+      ]);
+    });
+    it('has redeemer', async () => {
+      const [tx] = await walletProvider.queryTransactionsByHashes([
+        Cardano.TransactionId('3353309c6d3f2200c4e2084f76c1f1495f00eb21ea62f29c01da2adac71e1068')
+      ]);
+      expect(tx.witness.redeemers).toEqual([
+        {
+          executionUnits: { memory: 555_670, steps: 229_163_102 },
+          index: 0,
+          purpose: 'mint',
+          scriptHash: '87c822cd8fb44f2e3bffc3eaf41c63c2301a0ac2325ee3db634bd435'
+        }
+      ]);
+    });
+    // TODO: not implemented
+    // it('has mint', async () => {
+    //   const [tx] = await walletProvider.queryTransactionsByHashes([
+    //     Cardano.TransactionId('c09d19f5ac172e35dbeb7b279d54de73f7e997e49ca812e446fa362a43b71b58')
+    //   ]);
+    //   expect(tx.body.mint!).toBeDefined();
+    // });
+    it('has StakeKeyRegistration cert', async () => {
+      const [tx] = await walletProvider.queryTransactionsByHashes([
+        Cardano.TransactionId('bcd165c882dc17a416bfef7053f0e1cfc3d715f8d7fc05a9803309f795878d9b')
+      ]);
+      expect(tx.body.certificates![0]).toEqual({
+        __typename: 'StakeKeyRegistration',
+        certIndex: 0,
+        rewardAccount: 'stake_test1upqykkjq3zhf4085s6n70w8cyp57dl87r0ezduv9rnnj2uqk5zmdv'
+      });
+    });
+    it('has StakeDelegation cert', async () => {
+      const [tx] = await walletProvider.queryTransactionsByHashes([
+        Cardano.TransactionId('bcd165c882dc17a416bfef7053f0e1cfc3d715f8d7fc05a9803309f795878d9b')
+      ]);
+      expect(tx.body.certificates![1]).toEqual({
+        __typename: 'StakeDelegation',
+        certIndex: 1,
+        delegationIndex: 1,
+        epoch: 182,
+        poolId: 'pool167u07rzwu6dr40hx2pr4vh592vxp4zen9ct2p3h84wzqzv6fkgv',
+        rewardAccount: 'stake_test1upqykkjq3zhf4085s6n70w8cyp57dl87r0ezduv9rnnj2uqk5zmdv'
+      });
+    });
+    it('has StakeKeyDereegistration cert', async () => {
+      const [tx] = await walletProvider.queryTransactionsByHashes([
+        Cardano.TransactionId('150a445f4d1f2e692791daec9c09f32d6c8c25a3f9ca6c7cf14ff8085375aaa0')
+      ]);
+      expect(tx.body.certificates![0]).toEqual({
+        __typename: 'StakeKeyDeregistration',
+        certIndex: 0,
+        rewardAccount: 'stake_test1uqe2twywhfjwt88ghas4sfgq7pp7m8wq64hlhz0vr4uhu2sj2tuzt'
+      });
+    });
+    it('has PoolRegistration cert', async () => {
+      const [tx] = await walletProvider.queryTransactionsByHashes([
+        Cardano.TransactionId('295d5e0f7ee182426eaeda8c9f1c63502c72cdf4afd6e0ee0f209adf94a614e7')
+      ]);
+      expect(tx.body.certificates![0]).toEqual({
+        __typename: 'PoolRegistration',
+        epoch: 76,
+        poolId: 'pool1y25deq9kldy9y9gfvrpw8zt05zsrfx84zjhugaxrx9ftvwdpua2',
+        poolParameters: null
+      });
+    });
+    it('has PoolRetirement cert', async () => {
+      const [tx] = await walletProvider.queryTransactionsByHashes([
+        Cardano.TransactionId('545ee7080a01aa085be01dffc073020be04ea3283b945c408c0830e9c4f8253c')
+      ]);
+      expect(tx.body.certificates![0]).toEqual({
+        __typename: 'PoolRetirement',
+        epoch: 80,
+        poolId: 'pool1ky9w02c4m4y842ygc0jyaf908wgllxv3cvpx42fd243f7uk664s'
+      });
+    });
+    it('has MoveInstantaneousRewards cert', async () => {
+      const [tx] = await walletProvider.queryTransactionsByHashes([
+        Cardano.TransactionId('24986c0cd3475419bfb44756c27a0e13a6354a4071153f76a78f9b2d1e596089')
+      ]);
+      expect(tx.body.certificates![0]).toEqual({
+        __typename: 'MoveInstantaneousRewards',
+        certIndex: 0,
+        pot: 'treasury',
+        quantity: 100_000_000n,
+        rewardAccount: 'stake_test1uq6p9hn9u53kvmh4mu98c0d4zzuekp2nkelnynct5g26lqs9yenqu'
+      });
+    });
+    // TODO: blocked by https://github.com/input-output-hk/cardano-db-sync/issues/290
+    // it('has GenesisKeyDelegation cert', async () => {
+    //   const [tx] = await walletProvider.queryTransactionsByHashes([
+    //     Cardano.TransactionId('someValue')
+    //   ]);
+    //   expect(tx.body.certificates![0]).toBeDefined()
+    // });
   });
 
   describe('queryTransactionsByAddresses', () => {

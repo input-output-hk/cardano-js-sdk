@@ -244,7 +244,7 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
   }: Responses['tx_content']): Promise<Cardano.Certificate[] | undefined> => {
     if (pool_retire_count + pool_update_count + mir_cert_count + stake_cert_count + delegation_count === 0) return;
     return [
-      ...(pool_update_count ? await fetchPoolRetireCerts(hash) : []),
+      ...(pool_retire_count ? await fetchPoolRetireCerts(hash) : []),
       ...(pool_update_count ? await fetchPoolUpdateCerts(hash) : []),
       ...(mir_cert_count ? await fetchMirCerts(hash) : []),
       ...(stake_cert_count ? await fetchStakeCerts(hash) : []),
