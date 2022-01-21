@@ -44,7 +44,7 @@ export const certificateTransactionsWithEpochs = (
 ): Observable<TxWithEpoch[]> =>
   transactionsWithCertificates(transactionsTracker.history.outgoing$, certificateTypes).pipe(
     switchMap((transactions) =>
-      blockEpochProvider(transactions.map((tx) => tx.blockHeader.blockHash)).pipe(
+      blockEpochProvider(transactions.map((tx) => tx.blockHeader.hash)).pipe(
         map((epochs) => transactions.map((tx, txIndex) => ({ epoch: epochs[txIndex], tx })))
       )
     ),

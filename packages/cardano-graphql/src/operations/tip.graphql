@@ -1,0 +1,9 @@
+query Tip {
+  queryBlock(order: { desc: blockNo }, first: 1) {
+    slot {
+      number
+    }
+    hash
+    blockNo
+  }
+}

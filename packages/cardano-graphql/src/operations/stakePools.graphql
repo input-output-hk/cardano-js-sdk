@@ -1,53 +1,11 @@
-fragment allStakePoolFields on StakePool {
-  id
-  hexId
-  status
-  owners
-  cost
-  margin {
-    numerator
-    denominator
+fragment certificateTransactionFields on Transaction {
+  block {
+    blockNo
   }
-  vrf
-  relays {
-    __typename
-    ... on RelayByName {
-      hostname
-      port
-    }
-    ... on RelayByAddress {
-      ipv4
-      ipv6
-      port
-    }
-    ... on RelayByNameMultihost {
-      dnsName
-    }
-  }
-  rewardAccount
-  pledge
-  metrics {
-    blocksCreated
-    livePledge
-    stake {
-      live
-      active
-    }
-    size {
-      live
-      active
-    }
-    saturation
-    delegators
-  }
-  transactions {
-    registration
-    retirement
-  }
-  metadataJson {
-    hash
-    url
-  }
+  hash
+}
+
+fragment allPoolParameterFields on PoolParameters {
   metadata {
     ticker
     name
@@ -85,6 +43,74 @@ fragment allStakePoolFields on StakePool {
       }
     }
   }
+  owners {
+    address
+  }
+  cost
+  margin {
+    numerator
+    denominator
+  }
+  vrf
+  relays {
+    __typename
+    ... on RelayByName {
+      hostname
+      port
+    }
+    ... on RelayByAddress {
+      ipv4
+      ipv6
+      port
+    }
+    ... on RelayByNameMultihost {
+      dnsName
+    }
+  }
+  poolRegistrationCertificate {
+    transaction {
+      hash
+    }
+  }
+  rewardAccount {
+    address
+  }
+  pledge
+  metadataJson {
+    hash
+    url
+  }
+}
+
+fragment allStakePoolFields on StakePool {
+  id
+  hexId
+  status
+  # TODO:
+  # * don't limit to first, add order by transaction index
+  # * update provider service code reflect no limit
+  poolParameters(order: { desc: sinceEpochNo, then: { desc: transactionBlockNo } }, first: 1) {
+    ...allPoolParameterFields
+  }
+  metrics {
+    blocksCreated
+    livePledge
+    stake {
+      live
+      active
+    }
+    size {
+      live
+      active
+    }
+    saturation
+    delegators
+  }
+  poolRetirementCertificates {
+    transaction {
+      ...certificateTransactionFields
+    }
+  }
 }
 
 query StakePoolsByMetadata(
@@ -99,8 +125,10 @@ query StakePoolsByMetadata(
       ]
     }
   ) {
-    stakePool {
-      ...allStakePoolFields
+    poolParameters {
+      stakePool {
+        ...allStakePoolFields
+      }
     }
   }
 }

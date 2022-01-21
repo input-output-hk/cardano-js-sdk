@@ -1,13 +1,13 @@
 import { Epoch, Hash32ByteBase16, Lovelace, PoolId, PoolParameters, RewardAccount } from '.';
 
 export enum CertificateType {
-  StakeKeyRegistration = 'StakeKeyRegistration',
-  StakeKeyDeregistration = 'StakeKeyDeregistration',
-  PoolRegistration = 'PoolRegistration',
-  PoolRetirement = 'PoolRetirement',
-  StakeDelegation = 'StakeDelegation',
-  MIR = 'MoveInstantaneousRewards',
-  GenesisKeyDelegation = 'GenesisKeyDelegation'
+  StakeKeyRegistration = 'StakeKeyRegistrationCertificate',
+  StakeKeyDeregistration = 'StakeKeyDeregistrationCertificate',
+  PoolRegistration = 'PoolRegistrationCertificate',
+  PoolRetirement = 'PoolRetirementCertificate',
+  StakeDelegation = 'StakeDelegationCertificate',
+  MIR = 'MirCertificate',
+  GenesisKeyDelegation = 'GenesisKeyDelegationCertificate'
 }
 
 export interface StakeAddressCertificate {

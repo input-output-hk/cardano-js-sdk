@@ -67,7 +67,7 @@ export const createAddressTransactionsProvider = (
         map((transactions) =>
           sortBy(
             transactions,
-            ({ blockHeader: { blockHeight } }) => blockHeight,
+            ({ blockHeader: { blockNo } }) => blockNo,
             ({ index }) => index
           ).map((tx) => {
             const direction = tx.body.inputs.some(isMyAddress(addresses))

@@ -18,6 +18,7 @@ export * from './Asset';
 export * from './AuxiliaryData';
 export * from './Key';
 export * as TxSubmissionErrors from './TxSubmissionErrors';
+export * as NativeScriptType from './NativeScriptType';
 
 export type TxSubmissionError = CustomError;
 

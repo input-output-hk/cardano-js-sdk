@@ -12,7 +12,7 @@
 import * as Cardano from '.';
 import { Script } from '@cardano-ogmios/schema';
 
-export { Script } from '@cardano-ogmios/schema';
+export { Script, ScriptNative } from '@cardano-ogmios/schema';
 
 export interface MetadatumMap {
   [k: string]: Metadatum;

@@ -1,0 +1,25 @@
+query NetworkInfo {
+  queryBlock(order: { desc: blockNo }, first: 1) {
+    totalLiveStake
+    epoch {
+      number
+      startedAt {
+        date
+      }
+      activeStakeAggregate {
+        quantitySum
+      }
+    }
+  }
+  queryTimeSettings(order: { desc: fromEpochNo }, first: 1) {
+    slotLength
+    epochLength
+  }
+  queryAda(order: { desc: sinceBlockNo }, first: 1) {
+    supply {
+      circulating
+      max
+      total
+    }
+  }
+}

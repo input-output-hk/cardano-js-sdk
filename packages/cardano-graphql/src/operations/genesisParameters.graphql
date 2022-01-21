@@ -1,0 +1,20 @@
+query GenesisParameters {
+  queryNetworkConstants(order: { desc: timestamp }, first: 1) {
+    systemStart
+    networkMagic
+    activeSlotsCoefficient
+    securityParameter
+    slotsPerKESPeriod
+    maxKESEvolutions
+    updateQuorum
+  }
+  queryTimeSettings(order: { desc: fromEpochNo }, first: 1) {
+    slotLength
+    epochLength
+  }
+  queryAda(order: { desc: sinceBlockNo }, first: 1) {
+    supply {
+      max
+    }
+  }
+}

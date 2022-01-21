@@ -1,12 +1,11 @@
-import { BigIntMath, Cardano, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
-import { InitializeTxProps } from '../types';
+import { BigIntMath, Cardano, ProtocolParametersRequiredByWallet } from '../../';
 
 /**
  * Implementation is the same as in CSL.get_implicit_input() and CSL.get_deposit().
  */
 export const computeImplicitCoin = (
-  { stakeKeyDeposit, poolDeposit }: ProtocolParametersRequiredByWallet,
-  { certificates, withdrawals }: Pick<InitializeTxProps, 'certificates' | 'withdrawals'>
+  { stakeKeyDeposit, poolDeposit }: Pick<ProtocolParametersRequiredByWallet, 'stakeKeyDeposit' | 'poolDeposit'>,
+  { certificates, withdrawals }: Pick<Cardano.TxBodyAlonzo, 'certificates' | 'withdrawals'>
 ): Cardano.ImplicitCoin => {
   const stakeKeyDepositBigint = stakeKeyDeposit && BigInt(stakeKeyDeposit);
   const poolDepositBigint = poolDeposit && BigInt(poolDeposit);

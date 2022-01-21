@@ -1,7 +1,6 @@
 import { Cardano, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
-import { InitializeTxProps, Transaction } from '../../src';
 
-describe('Transaction.computeImplicitCoin', () => {
+describe('Cardano.util.computeImplicitCoin', () => {
   it('sums registrations for deposit, withdrawals and deregistrations for input', async () => {
     const protocolParameters = { poolDeposit: 3, stakeKeyDeposit: 2 } as ProtocolParametersRequiredByWallet;
     const rewardAccount = Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27');
@@ -22,9 +21,7 @@ describe('Transaction.computeImplicitCoin', () => {
       }
     ];
     const withdrawals: Cardano.Withdrawal[] = [{ quantity: 5n, stakeAddress: rewardAccount }];
-    const txProps = { certificates, withdrawals } as InitializeTxProps;
-
-    const coin = Transaction.computeImplicitCoin(protocolParameters, txProps);
+    const coin = Cardano.util.computeImplicitCoin(protocolParameters, { certificates, withdrawals });
     expect(coin.deposit).toBe(2n + 2n);
     expect(coin.input).toBe(2n + 3n + 5n);
   });

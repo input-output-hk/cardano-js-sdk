@@ -1,7 +1,7 @@
-import { Asset, AssetProvider, Cardano, util } from '@cardano-sdk/core';
+import { Asset, AssetProvider, Cardano, ProviderUtil, util } from '@cardano-sdk/core';
 import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
 import { Options } from '@blockfrost/blockfrost-js/lib/types';
-import { fetchSequentially, withProviderErrors } from './util';
+import { fetchSequentially, toProviderError } from './util';
 
 const mapMetadata = (
   onChain: Responses['asset']['onchain_metadata'],
@@ -64,5 +64,5 @@ export const blockfrostAssetProvider = (options: Options): AssetProvider => {
     getAsset
   };
 
-  return withProviderErrors(providerFunctions);
+  return ProviderUtil.withProviderErrors(providerFunctions, toProviderError);
 };
