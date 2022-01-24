@@ -34,6 +34,17 @@ describe('RoundRobinRandomImprove', () => {
           }
         });
       });
+      it('0 token change', async () => {
+        // Regression
+        await testInputSelectionProperties({
+          createOutputs: () => [TxTestUtil.createOutput({ assets: new Map([[AssetId.TSLA, 7001n]]), coins: 1000n })],
+          createUtxo: () => [
+            TxTestUtil.createUnspentTxOutput({ assets: new Map([[AssetId.TSLA, 7001n]]), coins: 11_999_994n })
+          ],
+          getAlgorithm: roundRobinRandomImprove,
+          mockConstraints: SelectionConstraints.MOCK_NO_CONSTRAINTS
+        });
+      });
       it('Selects UTxO even when implicit input covers outputs', async () => {
         const utxo = new Set([TxTestUtil.createUnspentTxOutput({ coins: 10_000_000n })]);
         const outputs = new Set([TxTestUtil.createOutput({ coins: 1_000_000n })]);
