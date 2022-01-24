@@ -556,6 +556,18 @@ describe('blockfrostWalletProvider', () => {
     ]);
   });
 
+  test('queryBlocksByHashes, genesis delegate slot leader', async () => {
+    const slotLeader = 'ShelleyGenesis-eff1b5b26e65b791';
+    BlockFrostAPI.prototype.blocks = jest.fn().mockResolvedValue({ ...blockResponse, slot_leader: slotLeader });
+
+    const client = blockfrostWalletProvider({ isTestnet: true, projectId: apiKey });
+    const response = await client.queryBlocksByHashes([
+      Cardano.BlockId('0dbe461fb5f981c0d01615332b8666340eb1a692b3034f46bcb5f5ea4172b2ed')
+    ]);
+
+    expect(response[0].slotLeader).toBe(slotLeader);
+  });
+
   describe('rewardsHistory', () => {
     const pool_id = 'pool1pu5jlj4q9w9jlxeu370a3c9myx47md5j5m2str0naunn2q3lkdy';
     const generateRewardsResponse = (numEpochs: number, firstEpoch = 0): Responses['account_reward_content'] =>

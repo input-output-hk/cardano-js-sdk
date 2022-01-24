@@ -3,8 +3,7 @@ import { InvalidStringError } from '../..';
 import { util as addressUtil } from '../../Address';
 
 /**
- * mainnet or testnet address as bech32 string, consisting of
- * network tag, payment credential and optional stake credential
+ * mainnet or testnet address (Shelley as bech32 string, Byron as base58-encoded string)
  */
 export type Address = typesUtil.OpaqueString<'Address'>;
 

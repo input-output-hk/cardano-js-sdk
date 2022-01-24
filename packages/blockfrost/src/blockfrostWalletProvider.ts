@@ -419,7 +419,7 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
         nextBlock: response.next_block ? Cardano.BlockId(response.next_block) : undefined,
         previousBlock: response.previous_block ? Cardano.BlockId(response.previous_block) : undefined,
         size: response.size,
-        slotLeader: Cardano.PoolId(response.slot_leader),
+        slotLeader: Cardano.SlotLeader(response.slot_leader),
         totalOutput: BigInt(response.output || '0'),
         txCount: response.tx_count,
         vrf: Cardano.VrfVkBech32(response.block_vrf)

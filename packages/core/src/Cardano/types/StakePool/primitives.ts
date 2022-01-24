@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Hash28ByteBase16, OpaqueString, typedBech32, typedHex } from '../../util';
-import { InvalidStringError } from '../../..';
 
 /**
  * pool operator verification key hash as bech32 string or a genesis pool ID
@@ -8,20 +7,10 @@ import { InvalidStringError } from '../../..';
 export type PoolId = OpaqueString<'PoolId'>;
 
 /**
- * @param {string} value blake2b_224 digest of an operator verification key hash or a genesis pool ID
+ * @param {string} value blake2b_224 digest of an operator verification key hash
  * @throws InvalidStringError
  */
-export const PoolId = (value: string): PoolId => {
-  try {
-    return typedBech32(value, 'pool', 45);
-  } catch (error: unknown) {
-    // eslint-disable-next-line prettier/prettier
-    if ((/^ShelleyGenesis-[\dA-Fa-f]{16}$/).test(value)) {
-      return value as unknown as PoolId;
-    }
-    throw new InvalidStringError('Expected PoolId to be either bech32 or genesis stake pool', error);
-  }
-};
+export const PoolId = (value: string): PoolId => typedBech32(value, 'pool', 45);
 
 /**
  * pool operator verification key hash as hex string

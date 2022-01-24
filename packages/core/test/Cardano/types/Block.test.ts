@@ -1,8 +1,10 @@
-import { BlockId, VrfVkBech32, util } from '../../../src/Cardano';
+import { BlockId, SlotLeader, VrfVkBech32, util } from '../../../src/Cardano';
+import { InvalidStringError } from '../../../src';
 
 jest.mock('../../../src/Cardano/util/primitives', () => {
   const actual = jest.requireActual('../../../src/Cardano/util/primitives');
   return {
+    Hash28ByteBase16: jest.fn().mockImplementation((...args) => actual.Hash28ByteBase16(...args)),
     Hash32ByteBase16: jest.fn().mockImplementation((...args) => actual.Hash32ByteBase16(...args)),
     typedBech32: jest.fn().mockImplementation((...args) => actual.typedBech32(...args))
   };
@@ -21,5 +23,20 @@ describe('Cardano/types/Block', () => {
       'vrf_vk',
       52
     );
+  });
+
+  describe('SlotLeader()', () => {
+    it('accepts a valid PoolId and is implemented using util.typedBech32', () => {
+      expect(() => SlotLeader('pool1zuevzm3xlrhmwjw87ec38mzs02tlkwec9wxpgafcaykmwg7efhh')).not.toThrow();
+    });
+    it('accepts a valid Shelley genesis delegate', () => {
+      expect(() => SlotLeader('eff1b5b26e65b791d6f236c7c0264012bd1696759d22bdb4dd0f6f56')).not.toThrow();
+    });
+    it('accepts a valid Shelley genesis in prefix format', () => {
+      expect(() => SlotLeader('ShelleyGenesis-eff1b5b26e65b791')).not.toThrow();
+    });
+    it('throws for any other strings', () => {
+      expect(() => SlotLeader('ShelleyGenesis-eff1b5b26e65b79')).toThrowError(InvalidStringError);
+    });
   });
 });
