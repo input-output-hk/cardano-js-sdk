@@ -26,15 +26,16 @@ describe('blockfrostWalletProvider', () => {
         txId: '2db6592c4782064295295b365c2e8ce84084fa24b1b3f5834f3c6b65268b7878'
       });
     });
-    // TODO: waiting for fix in db-sync/blockfrost
-    // it('has collaterals for failed contract', async () => {
-    //   const [tx] = await walletProvider.queryTransactionsByHashes([
-    //     Cardano.TransactionId('9298f499a4c4aeba53a984cb4df0f9a93b7d158da4c2c2d12a06530841f94cd7')
-    //   ]);
-    //   expect(tx.body.inputs!.length).toEqual(0);
-    //   expect(tx.body.outputs!.length).toEqual(0);
-    //   expect(tx.body.collaterals!.length).toEqual(1);
-    // });
+    // TODO: waiting for release/deploy in db-sync/blockfrost
+    // https://github.com/input-output-hk/cardano-db-sync/issues/1019
+    it.skip('has collaterals for failed contract', async () => {
+      const [tx] = await walletProvider.queryTransactionsByHashes([
+        Cardano.TransactionId('9298f499a4c4aeba53a984cb4df0f9a93b7d158da4c2c2d12a06530841f94cd7')
+      ]);
+      expect(tx.body.inputs!.length).toEqual(0);
+      expect(tx.body.outputs!.length).toEqual(0);
+      expect(tx.body.collaterals!.length).toEqual(1);
+    });
     it('has withdrawals', async () => {
       const [tx] = await walletProvider.queryTransactionsByHashes([
         Cardano.TransactionId('e92e3c2ce94d61449876e23ba9170ca20868ee447f13703c5fa7e888cc1701e1')
@@ -57,12 +58,12 @@ describe('blockfrostWalletProvider', () => {
       ]);
     });
     // TODO: not implemented
-    // it('has mint', async () => {
-    //   const [tx] = await walletProvider.queryTransactionsByHashes([
-    //     Cardano.TransactionId('c09d19f5ac172e35dbeb7b279d54de73f7e997e49ca812e446fa362a43b71b58')
-    //   ]);
-    //   expect(tx.body.mint!).toBeDefined();
-    // });
+    it.skip('has mint', async () => {
+      const [tx] = await walletProvider.queryTransactionsByHashes([
+        Cardano.TransactionId('c09d19f5ac172e35dbeb7b279d54de73f7e997e49ca812e446fa362a43b71b58')
+      ]);
+      expect(tx.body.mint!).toBeDefined();
+    });
     it('has StakeKeyRegistration cert', async () => {
       const [tx] = await walletProvider.queryTransactionsByHashes([
         Cardano.TransactionId('bcd165c882dc17a416bfef7053f0e1cfc3d715f8d7fc05a9803309f795878d9b')
@@ -130,12 +131,10 @@ describe('blockfrostWalletProvider', () => {
       });
     });
     // TODO: blocked by https://github.com/input-output-hk/cardano-db-sync/issues/290
-    // it('has GenesisKeyDelegation cert', async () => {
-    //   const [tx] = await walletProvider.queryTransactionsByHashes([
-    //     Cardano.TransactionId('someValue')
-    //   ]);
-    //   expect(tx.body.certificates![0]).toBeDefined()
-    // });
+    it.skip('has GenesisKeyDelegation cert', async () => {
+      const [tx] = await walletProvider.queryTransactionsByHashes([Cardano.TransactionId('someValue')]);
+      expect(tx.body.certificates![0]).toBeDefined();
+    });
   });
 
   describe('queryTransactionsByAddresses', () => {
