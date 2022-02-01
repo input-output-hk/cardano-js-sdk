@@ -24,20 +24,22 @@ describe('StakePoolSearchClient', () => {
           {
             hexId: '52e22df52e90370f639c99f5c760f0cd67d7f871cd0d0764fae47cd9',
             id: 'pool12t3zmafwjqms7cuun86uwc8se4na07r3e5xswe86u37djr5f0lx',
-            metrics: {
-              blocksCreated: 123,
-              delegators: 234,
-              livePledge: 1234n,
-              saturation: 0.1,
-              size: {
-                active: 0.2,
-                live: 0.15
-              },
-              stake: {
-                active: 12_345n,
-                live: 12_344n
+            metrics: [
+              {
+                blocksCreated: 123,
+                delegators: 234,
+                livePledge: 1234n,
+                saturation: 0.1,
+                size: {
+                  active: 0.2,
+                  live: 0.15
+                },
+                stake: {
+                  active: 12_345n,
+                  live: 12_344n
+                }
               }
-            },
+            ],
             poolParameters: [
               {
                 cost: 123n,

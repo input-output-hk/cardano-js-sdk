@@ -25,6 +25,7 @@ const toCoreStakePool = (responseStakePool: GraphqlStakePool): Cardano.StakePool
     getExactlyOneObject(responseStakePool.poolParameters, 'PoolParameters')
   );
   const poolParameters = graphqlPoolParametersToCore(responsePoolParameters, responseStakePool.id);
+  const metrics = getExactlyOneObject(stakePool.metrics, 'metrics');
   return {
     ...poolParameters,
     hexId: Cardano.PoolIdHex(stakePool.hexId),
@@ -46,11 +47,11 @@ const toCoreStakePool = (responseStakePool: GraphqlStakePool): Cardano.StakePool
         }
       : undefined,
     metrics: {
-      ...stakePool.metrics!,
-      livePledge: BigInt(stakePool.metrics.livePledge),
+      ...metrics!,
+      livePledge: BigInt(metrics.livePledge),
       stake: {
-        active: BigInt(stakePool.metrics.stake.active),
-        live: BigInt(stakePool.metrics.stake.live)
+        active: BigInt(metrics.stake.active),
+        live: BigInt(metrics.stake.live)
       }
     },
     status: stakePool.status,
