@@ -68,8 +68,8 @@ export class StakePool {
     description: 'active | retired | retiring'
   })
   status: Cardano.StakePoolStatus;
-  @Field(() => StakePoolMetrics)
-  metrics: StakePoolMetrics;
+  @Field(() => [StakePoolMetrics])
+  metrics: StakePoolMetrics[];
   @Directive('@hasInverse(field: stakePool)')
   @Field(() => [PoolRetirementCertificate])
   poolRetirementCertificates: PoolRegistrationCertificate[];

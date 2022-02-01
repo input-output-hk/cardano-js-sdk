@@ -92,7 +92,7 @@ fragment allStakePoolFields on StakePool {
   poolParameters(order: { desc: sinceEpochNo, then: { desc: transactionBlockNo } }, first: 1) {
     ...allPoolParameterFields
   }
-  metrics {
+  metrics(order: {desc: blockNo}, first: 1) {
     blocksCreated
     livePledge
     stake {
