@@ -1,3 +1,5 @@
+require('./patchRequire');
+
 const Schema = require('../dist/Schema');
 const { printSchemaWithDirectives } = require('@graphql-tools/utils');
 
