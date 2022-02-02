@@ -3,6 +3,16 @@ import delay from 'delay';
 
 export const somePartialStakePools: Cardano.StakePool[] = [
   {
+    epochRewards: [
+      {
+        activeStake: 1_000_000_000_000n,
+        epoch: 123,
+        epochLength: 432_000_000,
+        memberROI: 0.000_68,
+        operatorFees: 340n + 50n,
+        totalRewards: 680n
+      }
+    ],
     hexId: Cardano.PoolIdHex('cf12a9dcaacdc09778616d60502011a88ed4542c482f2ddd08d8ac5a'),
     id: Cardano.PoolId('pool1euf2nh92ehqfw7rpd4s9qgq34z8dg4pvfqhjmhggmzk95gcd402'),
     metadata: {
@@ -13,6 +23,7 @@ export const somePartialStakePools: Cardano.StakePool[] = [
     }
   },
   {
+    epochRewards: [],
     hexId: Cardano.PoolIdHex('4a2e3b7f4a78ff1452b91329a7673c77c98ca96dece7b55c37869502'),
     id: Cardano.PoolId('pool1fghrkl620rl3g54ezv56weeuwlyce2tdannm2hphs62syf3vyyh'),
     metadata: {
