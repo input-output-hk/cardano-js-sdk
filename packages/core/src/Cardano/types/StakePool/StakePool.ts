@@ -1,4 +1,4 @@
-import { Lovelace, TransactionId } from '..';
+import { Epoch, Lovelace, TransactionId } from '..';
 import { PoolIdHex } from './primitives';
 import { PoolParameters } from './PoolParameters';
 
@@ -46,6 +46,24 @@ export enum StakePoolStatus {
   Retiring = 'retiring'
 }
 
+/**
+ * Stake pool performance per epoch, taken at epoch rollover
+ */
+export class StakePoolEpochRewards {
+  /**
+   * Epoch length in milliseconds
+   */
+  epochLength: number;
+  epoch: Epoch;
+  activeStake: Lovelace;
+  totalRewards: Lovelace;
+  operatorFees: Lovelace;
+  /**
+   * (rewards-operatorFees)/activeStake, not annualized
+   */
+  memberROI: Percent;
+}
+
 export interface StakePool extends PoolParameters {
   /**
    * Stake pool ID as a hex string
@@ -63,4 +81,9 @@ export interface StakePool extends PoolParameters {
    * Transactions provisioning the stake pool
    */
   transactions: StakePoolTransactions;
+  /**
+   * Stake pool rewards history per epoch.
+   * Sorted by epoch in ascending order.
+   */
+  epochRewards: StakePoolEpochRewards[];
 }
