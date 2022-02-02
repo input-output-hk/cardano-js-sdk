@@ -1,43 +1,43 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { Cardano, EpochRewards, WalletProvider } from '@cardano-sdk/core';
-import { RewardsHistoryQuery, Sdk } from '../../src/sdk';
+import { MemberRewardsHistoryQuery, Sdk } from '../../src/sdk';
 import { createGraphQLWalletProviderFromSdk } from '../../src/WalletProvider/CardanoGraphQLWalletProvider';
 
 describe('CardanoGraphQLWalletProvider.rewardsHistory', () => {
   let provider: WalletProvider;
   const addresses: Cardano.RewardAccount[] = [];
-  const sdk = { RewardsHistory: jest.fn() };
+  const sdk = { MemberRewardsHistory: jest.fn() };
   const rawRewards = [
     {
-      activeStake: [
+      rewards: [
         {
-          epoch: { number: 2 },
+          epochNo: 2,
           quantity: 1n
         },
         {
-          epoch: { number: 3 },
+          epochNo: 3,
           quantity: 1n
         }
       ]
     },
     {
-      activeStake: [
+      rewards: [
         {
-          epoch: { number: 1 },
+          epochNo: 1,
           quantity: 2n
         },
         {
-          epoch: { number: 2 },
+          epochNo: 2,
           quantity: 2n
         }
       ]
     }
-  ] as NonNullable<NonNullable<RewardsHistoryQuery['queryRewardAccount']>>;
+  ] as NonNullable<NonNullable<MemberRewardsHistoryQuery['queryRewardAccount']>>;
 
   beforeEach(() => (provider = createGraphQLWalletProviderFromSdk(sdk as unknown as Sdk)));
 
   it('sums rewards of all addresses per epoch', async () => {
-    sdk.RewardsHistory.mockResolvedValueOnce({
+    sdk.MemberRewardsHistory.mockResolvedValueOnce({
       queryRewardAccount: rawRewards
     });
     const rewardsHistory = await provider.rewardsHistory({
@@ -51,18 +51,22 @@ describe('CardanoGraphQLWalletProvider.rewardsHistory', () => {
   });
 
   it('filters results by provided epoch range', async () => {
-    sdk.RewardsHistory.mockResolvedValueOnce({
+    sdk.MemberRewardsHistory.mockResolvedValueOnce({
       queryRewardAccount: rawRewards
     });
-    const rewardsHistory = await provider.rewardsHistory({
-      epochs: { lowerBound: 2, upperBound: 2 },
+    await provider.rewardsHistory({
+      epochs: { lowerBound: 2, upperBound: 3 },
       stakeAddresses: addresses
     });
-    expect(rewardsHistory).toEqual([{ epoch: 2, rewards: 3n }] as EpochRewards[]);
+    expect(sdk.MemberRewardsHistory).toBeCalledWith({
+      fromEpochNo: 2,
+      rewardAccounts: addresses,
+      toEpochNo: 3
+    });
   });
 
   it('returns an empty array on undefined response', async () => {
-    sdk.RewardsHistory.mockResolvedValueOnce({});
+    sdk.MemberRewardsHistory.mockResolvedValueOnce({});
     expect(await provider.rewardsHistory({ stakeAddresses: addresses })).toEqual([]);
   });
 });
