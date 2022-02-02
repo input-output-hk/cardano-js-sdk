@@ -291,13 +291,37 @@ describe('WalletProvider/queryTransactions/graphqlTransactionsToCore', () => {
         {
           witness: {
             ...minimalGraphqlTx.witness,
-            scripts: [{ key: publicKey.toString(), script: { __typename: 'PlutusScript', cborHex: 'abc123' } }]
+            scripts: [
+              {
+                key: publicKey.toString(),
+                script: { __typename: 'PlutusScript', cborHex: 'abc123', type: 'PlutusScriptV1' }
+              }
+            ]
           }
         },
         {
           witness: {
             ...minimalCoreTx.witness,
-            scripts: { [publicKey.toString()]: { plutus: 'abc123' } }
+            scripts: { [publicKey.toString()]: { 'plutus:v1': 'abc123' } }
+          }
+        }
+      );
+      testTxPropertiesConversion(
+        {
+          witness: {
+            ...minimalGraphqlTx.witness,
+            scripts: [
+              {
+                key: publicKey.toString(),
+                script: { __typename: 'PlutusScript', cborHex: 'abc456', type: 'PlutusScriptV2' }
+              }
+            ]
+          }
+        },
+        {
+          witness: {
+            ...minimalCoreTx.witness,
+            scripts: { [publicKey.toString()]: { 'plutus:v2': 'abc456' } }
           }
         }
       );
@@ -395,8 +419,10 @@ describe('WalletProvider/queryTransactions/graphqlTransactionsToCore', () => {
         );
 
       it('maps plutus script to core type', () => {
-        const script = { __typename: 'PlutusScript' as const, cborHex: 'abc123' };
-        testScriptConversion(script, { plutus: script.cborHex });
+        const scriptV1 = { __typename: 'PlutusScript' as const, cborHex: 'abc123', type: 'PlutusScriptV1' };
+        const scriptV2 = { __typename: 'PlutusScript' as const, cborHex: 'abc456', type: 'PlutusScriptV2' };
+        testScriptConversion(scriptV1, { 'plutus:v1': scriptV1.cborHex });
+        testScriptConversion(scriptV2, { 'plutus:v2': scriptV2.cborHex });
       });
 
       describe('native', () => {
