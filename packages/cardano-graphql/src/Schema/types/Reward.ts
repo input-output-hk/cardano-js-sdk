@@ -9,6 +9,7 @@ import { StakePool } from './StakePool';
 export class Reward {
   @Field(() => RewardAccount)
   rewardAccount: RewardAccount;
+  @Directive('@search')
   @Field(() => Int)
   epochNo: Cardano.Epoch;
   @Field(() => Epoch)
@@ -18,7 +19,7 @@ export class Reward {
   @Field(() => Int64)
   quantity: Cardano.Lovelace;
   @Directive('@search(by: [exact])')
-  @Field(() => String, { description: 'poolMember | poolLeader | treasury | reserves' })
+  @Field(() => String, { description: 'member | leader | treasury | reserves' })
   source: string;
   @Field(() => StakePool, { description: "null when source is 'treasury' or 'reserves'", nullable: true })
   stakePool?: StakePool;
