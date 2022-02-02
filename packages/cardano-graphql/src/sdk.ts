@@ -581,11 +581,13 @@ export type AddDatumPayloadDatumArgs = {
 };
 
 export type AddEpochInput = {
+  activeRewards: Array<RewardRef>;
   activeStake: Array<ActiveStakeRef>;
   adaPots: AdaPotsRef;
   blocks: Array<BlockRef>;
   endedAt: SlotRef;
   fees: Scalars['Int64'];
+  liveRewards: Array<RewardRef>;
   nonce: Scalars['String'];
   number: Scalars['Int'];
   output: Scalars['Int64'];
@@ -1241,6 +1243,7 @@ export type AddRewardAccountInput = {
   mirCertificates?: Maybe<Array<MirCertificateRef>>;
   publicKey: PublicKeyRef;
   registrationCertificates: Array<StakeKeyRegistrationCertificateRef>;
+  rewards: Array<RewardRef>;
 };
 
 export type AddRewardAccountPayload = {
@@ -1255,6 +1258,31 @@ export type AddRewardAccountPayloadRewardAccountArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<RewardAccountOrder>;
+};
+
+export type AddRewardInput = {
+  epoch: EpochRef;
+  epochNo: Scalars['Int'];
+  quantity: Scalars['Int64'];
+  rewardAccount: RewardAccountRef;
+  /** poolMember | poolLeader | treasury | reserves */
+  source: Scalars['String'];
+  spendableAtEpochNo: Scalars['Int'];
+  stakePool?: Maybe<StakePoolRef>;
+};
+
+export type AddRewardPayload = {
+  __typename?: 'AddRewardPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  reward?: Maybe<Array<Maybe<Reward>>>;
+};
+
+
+export type AddRewardPayloadRewardArgs = {
+  filter?: Maybe<RewardFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<RewardOrder>;
 };
 
 export type AddSignatureInput = {
@@ -3351,6 +3379,21 @@ export type DeleteRewardAccountPayloadRewardAccountArgs = {
   order?: Maybe<RewardAccountOrder>;
 };
 
+export type DeleteRewardPayload = {
+  __typename?: 'DeleteRewardPayload';
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+  reward?: Maybe<Array<Maybe<Reward>>>;
+};
+
+
+export type DeleteRewardPayloadRewardArgs = {
+  filter?: Maybe<RewardFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<RewardOrder>;
+};
+
 export type DeleteSignaturePayload = {
   __typename?: 'DeleteSignaturePayload';
   msg?: Maybe<Scalars['String']>;
@@ -3712,6 +3755,8 @@ export enum DgraphIndex {
 
 export type Epoch = {
   __typename?: 'Epoch';
+  activeRewards: Array<Reward>;
+  activeRewardsAggregate?: Maybe<RewardAggregateResult>;
   activeStake: Array<ActiveStake>;
   activeStakeAggregate?: Maybe<ActiveStakeAggregateResult>;
   adaPots: AdaPots;
@@ -3719,11 +3764,26 @@ export type Epoch = {
   blocksAggregate?: Maybe<BlockAggregateResult>;
   endedAt: Slot;
   fees: Scalars['Int64'];
+  liveRewards: Array<Reward>;
+  liveRewardsAggregate?: Maybe<RewardAggregateResult>;
   nonce: Scalars['String'];
   number: Scalars['Int'];
   output: Scalars['Int64'];
   protocolParams: ProtocolParameters;
   startedAt: Slot;
+};
+
+
+export type EpochActiveRewardsArgs = {
+  filter?: Maybe<RewardFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<RewardOrder>;
+};
+
+
+export type EpochActiveRewardsAggregateArgs = {
+  filter?: Maybe<RewardFilter>;
 };
 
 
@@ -3760,6 +3820,19 @@ export type EpochBlocksAggregateArgs = {
 
 export type EpochEndedAtArgs = {
   filter?: Maybe<SlotFilter>;
+};
+
+
+export type EpochLiveRewardsArgs = {
+  filter?: Maybe<RewardFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<RewardOrder>;
+};
+
+
+export type EpochLiveRewardsAggregateArgs = {
+  filter?: Maybe<RewardFilter>;
 };
 
 
@@ -3800,11 +3873,13 @@ export type EpochFilter = {
 };
 
 export enum EpochHasFilter {
+  ActiveRewards = 'activeRewards',
   ActiveStake = 'activeStake',
   AdaPots = 'adaPots',
   Blocks = 'blocks',
   EndedAt = 'endedAt',
   Fees = 'fees',
+  LiveRewards = 'liveRewards',
   Nonce = 'nonce',
   Number = 'number',
   Output = 'output',
@@ -3826,11 +3901,13 @@ export enum EpochOrderable {
 }
 
 export type EpochPatch = {
+  activeRewards?: Maybe<Array<RewardRef>>;
   activeStake?: Maybe<Array<ActiveStakeRef>>;
   adaPots?: Maybe<AdaPotsRef>;
   blocks?: Maybe<Array<BlockRef>>;
   endedAt?: Maybe<SlotRef>;
   fees?: Maybe<Scalars['Int64']>;
+  liveRewards?: Maybe<Array<RewardRef>>;
   nonce?: Maybe<Scalars['String']>;
   output?: Maybe<Scalars['Int64']>;
   protocolParams?: Maybe<ProtocolParametersRef>;
@@ -3838,11 +3915,13 @@ export type EpochPatch = {
 };
 
 export type EpochRef = {
+  activeRewards?: Maybe<Array<RewardRef>>;
   activeStake?: Maybe<Array<ActiveStakeRef>>;
   adaPots?: Maybe<AdaPotsRef>;
   blocks?: Maybe<Array<BlockRef>>;
   endedAt?: Maybe<SlotRef>;
   fees?: Maybe<Scalars['Int64']>;
+  liveRewards?: Maybe<Array<RewardRef>>;
   nonce?: Maybe<Scalars['String']>;
   number?: Maybe<Scalars['Int']>;
   output?: Maybe<Scalars['Int64']>;
@@ -4607,6 +4686,7 @@ export type Mutation = {
   addRelayByAddress?: Maybe<AddRelayByAddressPayload>;
   addRelayByName?: Maybe<AddRelayByNamePayload>;
   addRelayByNameMultihost?: Maybe<AddRelayByNameMultihostPayload>;
+  addReward?: Maybe<AddRewardPayload>;
   addRewardAccount?: Maybe<AddRewardAccountPayload>;
   addSignature?: Maybe<AddSignaturePayload>;
   addSlot?: Maybe<AddSlotPayload>;
@@ -4675,6 +4755,7 @@ export type Mutation = {
   deleteRelayByAddress?: Maybe<DeleteRelayByAddressPayload>;
   deleteRelayByName?: Maybe<DeleteRelayByNamePayload>;
   deleteRelayByNameMultihost?: Maybe<DeleteRelayByNameMultihostPayload>;
+  deleteReward?: Maybe<DeleteRewardPayload>;
   deleteRewardAccount?: Maybe<DeleteRewardAccountPayload>;
   deleteSignature?: Maybe<DeleteSignaturePayload>;
   deleteSlot?: Maybe<DeleteSlotPayload>;
@@ -4743,6 +4824,7 @@ export type Mutation = {
   updateRelayByAddress?: Maybe<UpdateRelayByAddressPayload>;
   updateRelayByName?: Maybe<UpdateRelayByNamePayload>;
   updateRelayByNameMultihost?: Maybe<UpdateRelayByNameMultihostPayload>;
+  updateReward?: Maybe<UpdateRewardPayload>;
   updateRewardAccount?: Maybe<UpdateRewardAccountPayload>;
   updateSignature?: Maybe<UpdateSignaturePayload>;
   updateSlot?: Maybe<UpdateSlotPayload>;
@@ -4994,6 +5076,11 @@ export type MutationAddRelayByNameArgs = {
 
 export type MutationAddRelayByNameMultihostArgs = {
   input: Array<AddRelayByNameMultihostInput>;
+};
+
+
+export type MutationAddRewardArgs = {
+  input: Array<AddRewardInput>;
 };
 
 
@@ -5341,6 +5428,11 @@ export type MutationDeleteRelayByNameMultihostArgs = {
 };
 
 
+export type MutationDeleteRewardArgs = {
+  filter: RewardFilter;
+};
+
+
 export type MutationDeleteRewardAccountArgs = {
   filter: RewardAccountFilter;
 };
@@ -5678,6 +5770,11 @@ export type MutationUpdateRelayByNameArgs = {
 
 export type MutationUpdateRelayByNameMultihostArgs = {
   input: UpdateRelayByNameMultihostInput;
+};
+
+
+export type MutationUpdateRewardArgs = {
+  input: UpdateRewardInput;
 };
 
 
@@ -7276,6 +7373,7 @@ export type Query = {
   aggregateRelayByAddress?: Maybe<RelayByAddressAggregateResult>;
   aggregateRelayByName?: Maybe<RelayByNameAggregateResult>;
   aggregateRelayByNameMultihost?: Maybe<RelayByNameMultihostAggregateResult>;
+  aggregateReward?: Maybe<RewardAggregateResult>;
   aggregateRewardAccount?: Maybe<RewardAccountAggregateResult>;
   aggregateSignature?: Maybe<SignatureAggregateResult>;
   aggregateSlot?: Maybe<SlotAggregateResult>;
@@ -7355,6 +7453,7 @@ export type Query = {
   queryRelayByAddress?: Maybe<Array<Maybe<RelayByAddress>>>;
   queryRelayByName?: Maybe<Array<Maybe<RelayByName>>>;
   queryRelayByNameMultihost?: Maybe<Array<Maybe<RelayByNameMultihost>>>;
+  queryReward?: Maybe<Array<Maybe<Reward>>>;
   queryRewardAccount?: Maybe<Array<Maybe<RewardAccount>>>;
   querySignature?: Maybe<Array<Maybe<Signature>>>;
   querySlot?: Maybe<Array<Maybe<Slot>>>;
@@ -7599,6 +7698,11 @@ export type QueryAggregateRelayByNameArgs = {
 
 export type QueryAggregateRelayByNameMultihostArgs = {
   filter?: Maybe<RelayByNameMultihostFilter>;
+};
+
+
+export type QueryAggregateRewardArgs = {
+  filter?: Maybe<RewardFilter>;
 };
 
 
@@ -8121,6 +8225,14 @@ export type QueryQueryRelayByNameMultihostArgs = {
 };
 
 
+export type QueryQueryRewardArgs = {
+  filter?: Maybe<RewardFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<RewardOrder>;
+};
+
+
 export type QueryQueryRewardAccountArgs = {
   filter?: Maybe<RewardAccountFilter>;
   first?: Maybe<Scalars['Int']>;
@@ -8592,6 +8704,34 @@ export type RelayByNameRef = {
   port?: Maybe<Scalars['Int']>;
 };
 
+export type Reward = {
+  __typename?: 'Reward';
+  epoch: Epoch;
+  epochNo: Scalars['Int'];
+  quantity: Scalars['Int64'];
+  rewardAccount: RewardAccount;
+  /** poolMember | poolLeader | treasury | reserves */
+  source: Scalars['String'];
+  spendableAtEpochNo: Scalars['Int'];
+  /** null when source is 'treasury' or 'reserves' */
+  stakePool?: Maybe<StakePool>;
+};
+
+
+export type RewardEpochArgs = {
+  filter?: Maybe<EpochFilter>;
+};
+
+
+export type RewardRewardAccountArgs = {
+  filter?: Maybe<RewardAccountFilter>;
+};
+
+
+export type RewardStakePoolArgs = {
+  filter?: Maybe<StakePoolFilter>;
+};
+
 export type RewardAccount = {
   __typename?: 'RewardAccount';
   activeStake: Array<ActiveStake>;
@@ -8607,6 +8747,8 @@ export type RewardAccount = {
   publicKey: PublicKey;
   registrationCertificates: Array<StakeKeyRegistrationCertificate>;
   registrationCertificatesAggregate?: Maybe<StakeKeyRegistrationCertificateAggregateResult>;
+  rewards: Array<Reward>;
+  rewardsAggregate?: Maybe<RewardAggregateResult>;
 };
 
 
@@ -8681,6 +8823,19 @@ export type RewardAccountRegistrationCertificatesAggregateArgs = {
   filter?: Maybe<StakeKeyRegistrationCertificateFilter>;
 };
 
+
+export type RewardAccountRewardsArgs = {
+  filter?: Maybe<RewardFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<RewardOrder>;
+};
+
+
+export type RewardAccountRewardsAggregateArgs = {
+  filter?: Maybe<RewardFilter>;
+};
+
 export type RewardAccountAggregateResult = {
   __typename?: 'RewardAccountAggregateResult';
   addressMax?: Maybe<Scalars['String']>;
@@ -8704,7 +8859,8 @@ export enum RewardAccountHasFilter {
   DeregistrationCertificates = 'deregistrationCertificates',
   MirCertificates = 'mirCertificates',
   PublicKey = 'publicKey',
-  RegistrationCertificates = 'registrationCertificates'
+  RegistrationCertificates = 'registrationCertificates',
+  Rewards = 'rewards'
 }
 
 export type RewardAccountOrder = {
@@ -8725,6 +8881,7 @@ export type RewardAccountPatch = {
   mirCertificates?: Maybe<Array<MirCertificateRef>>;
   publicKey?: Maybe<PublicKeyRef>;
   registrationCertificates?: Maybe<Array<StakeKeyRegistrationCertificateRef>>;
+  rewards?: Maybe<Array<RewardRef>>;
 };
 
 export type RewardAccountRef = {
@@ -8736,6 +8893,78 @@ export type RewardAccountRef = {
   mirCertificates?: Maybe<Array<MirCertificateRef>>;
   publicKey?: Maybe<PublicKeyRef>;
   registrationCertificates?: Maybe<Array<StakeKeyRegistrationCertificateRef>>;
+  rewards?: Maybe<Array<RewardRef>>;
+};
+
+export type RewardAggregateResult = {
+  __typename?: 'RewardAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+  epochNoAvg?: Maybe<Scalars['Float']>;
+  epochNoMax?: Maybe<Scalars['Int']>;
+  epochNoMin?: Maybe<Scalars['Int']>;
+  epochNoSum?: Maybe<Scalars['Int']>;
+  quantityAvg?: Maybe<Scalars['Float']>;
+  quantityMax?: Maybe<Scalars['Int64']>;
+  quantityMin?: Maybe<Scalars['Int64']>;
+  quantitySum?: Maybe<Scalars['Int64']>;
+  sourceMax?: Maybe<Scalars['String']>;
+  sourceMin?: Maybe<Scalars['String']>;
+  spendableAtEpochNoAvg?: Maybe<Scalars['Float']>;
+  spendableAtEpochNoMax?: Maybe<Scalars['Int']>;
+  spendableAtEpochNoMin?: Maybe<Scalars['Int']>;
+  spendableAtEpochNoSum?: Maybe<Scalars['Int']>;
+};
+
+export type RewardFilter = {
+  and?: Maybe<Array<Maybe<RewardFilter>>>;
+  has?: Maybe<Array<Maybe<RewardHasFilter>>>;
+  not?: Maybe<RewardFilter>;
+  or?: Maybe<Array<Maybe<RewardFilter>>>;
+};
+
+export enum RewardHasFilter {
+  Epoch = 'epoch',
+  EpochNo = 'epochNo',
+  Quantity = 'quantity',
+  RewardAccount = 'rewardAccount',
+  Source = 'source',
+  SpendableAtEpochNo = 'spendableAtEpochNo',
+  StakePool = 'stakePool'
+}
+
+export type RewardOrder = {
+  asc?: Maybe<RewardOrderable>;
+  desc?: Maybe<RewardOrderable>;
+  then?: Maybe<RewardOrder>;
+};
+
+export enum RewardOrderable {
+  EpochNo = 'epochNo',
+  Quantity = 'quantity',
+  Source = 'source',
+  SpendableAtEpochNo = 'spendableAtEpochNo'
+}
+
+export type RewardPatch = {
+  epoch?: Maybe<EpochRef>;
+  epochNo?: Maybe<Scalars['Int']>;
+  quantity?: Maybe<Scalars['Int64']>;
+  rewardAccount?: Maybe<RewardAccountRef>;
+  /** poolMember | poolLeader | treasury | reserves */
+  source?: Maybe<Scalars['String']>;
+  spendableAtEpochNo?: Maybe<Scalars['Int']>;
+  stakePool?: Maybe<StakePoolRef>;
+};
+
+export type RewardRef = {
+  epoch?: Maybe<EpochRef>;
+  epochNo?: Maybe<Scalars['Int']>;
+  quantity?: Maybe<Scalars['Int64']>;
+  rewardAccount?: Maybe<RewardAccountRef>;
+  /** poolMember | poolLeader | treasury | reserves */
+  source?: Maybe<Scalars['String']>;
+  spendableAtEpochNo?: Maybe<Scalars['Int']>;
+  stakePool?: Maybe<StakePoolRef>;
 };
 
 export type Script = NativeScript | PlutusScript;
@@ -11280,6 +11509,26 @@ export type UpdateRewardAccountPayloadRewardAccountArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   order?: Maybe<RewardAccountOrder>;
+};
+
+export type UpdateRewardInput = {
+  filter: RewardFilter;
+  remove?: Maybe<RewardPatch>;
+  set?: Maybe<RewardPatch>;
+};
+
+export type UpdateRewardPayload = {
+  __typename?: 'UpdateRewardPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  reward?: Maybe<Array<Maybe<Reward>>>;
+};
+
+
+export type UpdateRewardPayloadRewardArgs = {
+  filter?: Maybe<RewardFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  order?: Maybe<RewardOrder>;
 };
 
 export type UpdateSignatureInput = {

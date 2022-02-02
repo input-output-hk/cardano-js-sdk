@@ -8,9 +8,11 @@ import {
   StakeKeyDeregistrationCertificate,
   StakeKeyRegistrationCertificate,
   TransactionInput,
-  TransactionOutput
+  TransactionOutput,
+  Withdrawal
 } from './Transaction';
 import { PublicKey } from './PublicKey';
+import { Reward } from './Reward';
 
 enum AddressType {
   byron = 'byron',
@@ -25,6 +27,7 @@ export class RewardAccount {
   @Directive('@id')
   @Field(() => String)
   address: Cardano.RewardAccount;
+  // eslint-disable-next-line sonarjs/no-duplicate-string
   @Directive('@hasInverse(field: rewardAccount)')
   @Field(() => [ActiveStake])
   activeStake: ActiveStake[];
@@ -41,6 +44,12 @@ export class RewardAccount {
   delegationCertificates?: StakeDelegationCertificate[];
   @Field(() => [MirCertificate], { nullable: true })
   mirCertificates?: MirCertificate[];
+  @Directive('@hasInverse(field: rewardAccount)')
+  @Field(() => [Reward])
+  rewards: Reward[];
+  @Directive('@hasInverse(field: rewardAccount)')
+  @Field(() => [Withdrawal])
+  withdrawals: Withdrawal[];
 }
 
 @ObjectType()
