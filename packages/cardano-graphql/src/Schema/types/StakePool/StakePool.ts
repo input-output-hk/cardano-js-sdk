@@ -3,6 +3,7 @@
 import { Block } from '../Block';
 import { Cardano } from '@cardano-sdk/core';
 import { Directive, Field, Float, Int, ObjectType, registerEnumType } from 'type-graphql';
+import { Epoch } from '../Epoch';
 import { Int64, percentageDescription } from '../util';
 import { PoolParameters } from './PoolParameters';
 import { PoolRegistrationCertificate, PoolRetirementCertificate } from '../Transaction/Certificate';
@@ -27,10 +28,9 @@ export class StakePoolMetricsStake implements Cardano.StakePoolMetricsStake {
 @ObjectType()
 export class StakePoolMetricsSize implements Cardano.StakePoolMetricsSize {
   @Field({ description: percentageDescription })
-  live: number;
+  live: Cardano.Percent;
   @Field({ description: percentageDescription })
-  // @Field()
-  active: number;
+  active: Cardano.Percent;
 }
 
 @ObjectType()
@@ -53,6 +53,24 @@ export class StakePoolMetrics implements Cardano.StakePoolMetrics {
   delegators: number;
 }
 
+@ObjectType({ description: 'Stake pool performance per epoch, taken at epoch rollover' })
+export class StakePoolEpochRewards {
+  @Field(() => Epoch)
+  epoch: Epoch;
+  @Field(() => Int)
+  epochNo: number;
+  @Field(() => Int)
+  epochLength: number;
+  @Field(() => Int64)
+  activeStake: Cardano.Lovelace;
+  @Field(() => Int64)
+  operatorFees: Cardano.Lovelace;
+  @Field(() => Int64, { description: 'Total rewards for the epoch' })
+  totalRewards: Cardano.Lovelace;
+  @Field(() => Float, { description: 'rewards/activeStake, not annualized' })
+  memberROI: Cardano.Percent;
+}
+
 @ObjectType()
 export class StakePool {
   @Directive('@search(by: [fulltext])')
@@ -73,4 +91,6 @@ export class StakePool {
   @Directive('@hasInverse(field: stakePool)')
   @Field(() => [PoolRetirementCertificate])
   poolRetirementCertificates: PoolRegistrationCertificate[];
+  @Field(() => [StakePoolEpochRewards])
+  epochRewards: StakePoolEpochRewards[];
 }

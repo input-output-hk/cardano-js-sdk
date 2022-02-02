@@ -28,6 +28,16 @@ const toCoreStakePool = (responseStakePool: GraphqlStakePool): Cardano.StakePool
   const metrics = getExactlyOneObject(stakePool.metrics, 'metrics');
   return {
     ...poolParameters,
+    epochRewards: stakePool.epochRewards.map(
+      ({ epochNo, totalRewards, memberROI, operatorFees, epochLength, activeStake }) => ({
+        activeStake,
+        epoch: epochNo,
+        epochLength,
+        memberROI,
+        operatorFees,
+        totalRewards
+      })
+    ),
     hexId: Cardano.PoolIdHex(stakePool.hexId),
     metadata: responsePoolParameters.metadata
       ? {
@@ -65,10 +75,16 @@ const toCoreStakePool = (responseStakePool: GraphqlStakePool): Cardano.StakePool
 };
 
 export const createGraphQLStakePoolSearchProvider = createProvider<StakePoolSearchProvider>((sdk) => ({
-  async queryStakePools(fragments: string[]): Promise<Cardano.StakePool[]> {
+  async queryStakePools(
+    fragments: string[],
+    { rewardsHistoryLimit: epochRewardsLimit } = {}
+  ): Promise<Cardano.StakePool[]> {
     const query = fragments.join(' ');
-    const byStakePoolFields = (await sdk.StakePools({ query })).queryStakePool?.filter(util.isNotNil);
+    const byStakePoolFields = (await sdk.StakePools({ epochRewardsLimit, query })).queryStakePool?.filter(
+      util.isNotNil
+    );
     const byMetadataFields = await sdk.StakePoolsByMetadata({
+      epochRewardsLimit,
       omit: byStakePoolFields?.length ? byStakePoolFields?.map((sp) => sp.id) : undefined,
       query
     });

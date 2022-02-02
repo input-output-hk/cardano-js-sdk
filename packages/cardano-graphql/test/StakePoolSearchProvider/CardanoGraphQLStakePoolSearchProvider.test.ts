@@ -1,6 +1,12 @@
 /* eslint-disable max-len */
 import { ExtendedPoolStatus, Sdk, StakePoolStatus, StakePoolsByMetadataQuery, StakePoolsQuery } from '../../src/sdk';
-import { InvalidStringError, ProviderError, ProviderFailure, StakePoolSearchProvider } from '@cardano-sdk/core';
+import {
+  InvalidStringError,
+  ProviderError,
+  ProviderFailure,
+  StakePoolQueryOptions,
+  StakePoolSearchProvider
+} from '@cardano-sdk/core';
 import { createGraphQLStakePoolSearchProvider } from '../../src/StakePoolSearchProvider/CardanoGraphQLStakePoolSearchProvider';
 
 describe('StakePoolSearchClient', () => {
@@ -22,6 +28,16 @@ describe('StakePoolSearchClient', () => {
       const stakePoolsQueryResponse: StakePoolsQuery = {
         queryStakePool: [
           {
+            epochRewards: [
+              {
+                activeStake: 1_000_000_000_000n,
+                epochLength: 432_000_000,
+                epochNo: 123,
+                memberROI: 0.000_68,
+                operatorFees: 340n + 50n,
+                totalRewards: 680n
+              }
+            ],
             hexId: '52e22df52e90370f639c99f5c760f0cd67d7f871cd0d0764fae47cd9',
             id: 'pool12t3zmafwjqms7cuun86uwc8se4na07r3e5xswe86u37djr5f0lx',
             metrics: [
@@ -122,6 +138,18 @@ describe('StakePoolSearchClient', () => {
       expect(response[0].status).toBe(StakePoolStatus.Active);
       expect(response[0].margin.numerator).toBe(1);
       expect(typeof response[1].metadata).toBe('object');
+      const epochRewardsResponse = stakePoolsQueryResponse.queryStakePool![0]?.epochRewards[0];
+      expect(response[0].epochRewards[0].activeStake).toEqual(epochRewardsResponse?.activeStake);
+    });
+
+    it('passes options to the query', async () => {
+      sdk.StakePools.mockResolvedValueOnce({});
+      sdk.StakePoolsByMetadata.mockResolvedValueOnce({});
+      const options: StakePoolQueryOptions = { rewardsHistoryLimit: 6 };
+      const query = 'stakepool';
+      await client.queryStakePools([query], options);
+      expect(sdk.StakePools).toBeCalledWith({ epochRewardsLimit: 6, query });
+      expect(sdk.StakePoolsByMetadata).toBeCalledWith({ epochRewardsLimit: 6, query });
     });
 
     it('wraps errors to ProviderError', async () => {

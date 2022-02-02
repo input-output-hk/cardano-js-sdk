@@ -111,11 +111,20 @@ fragment allStakePoolFields on StakePool {
       ...certificateTransactionFields
     }
   }
+  epochRewards(order: {desc: epochNo}, first: $epochRewardsLimit) {
+    epochNo
+    epochLength
+    activeStake
+    operatorFees
+    totalRewards
+    memberROI
+  }
 }
 
 query StakePoolsByMetadata(
   $query: String!
   $omit: [String!] = ["NEED_THIS_BECAUSE_IN_OPERATOR_WONT_WORK_WITH_EMPTY_ARR"]
+  $epochRewardsLimit: Int = 2147483647
 ) {
   queryStakePoolMetadata(
     filter: {
@@ -133,7 +142,7 @@ query StakePoolsByMetadata(
   }
 }
 
-query StakePools($query: String!) {
+query StakePools($query: String!, $epochRewardsLimit: Int = 2147483647) {
   queryStakePool(filter: { id: { anyoftext: $query } }) {
     ...allStakePoolFields
   }
