@@ -12,3 +12,4 @@ export * from './ProtocolParameters';
 export * from './Epoch';
 export * from './TimeSettings';
 export * from './Slot';
+export * from './Reward';

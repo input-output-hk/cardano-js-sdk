@@ -5,6 +5,7 @@ import { Cardano } from '@cardano-sdk/core';
 import { Directive, Field, Int, ObjectType } from 'type-graphql';
 import { Int64 } from './util';
 import { ProtocolParameters } from './ProtocolParameters/ProtocolParametersUnion';
+import { Reward } from './Reward';
 import { Slot } from './Slot';
 
 @ObjectType()
@@ -30,6 +31,7 @@ export class Epoch {
   @Directive('@id')
   @Field(() => Int)
   number: number;
+  // eslint-disable-next-line sonarjs/no-duplicate-string
   @Directive('@hasInverse(field: epoch)')
   @Field(() => [ActiveStake])
   activeStake: ActiveStake[];
@@ -44,6 +46,11 @@ export class Epoch {
   output: Cardano.Lovelace;
   @Field(() => String)
   nonce: Cardano.Hash32ByteBase16;
+  @Directive('@hasInverse(field: epoch)')
+  @Field(() => [Reward])
+  activeRewards: Reward[];
+  @Field(() => [Reward])
+  liveRewards: Reward[];
   @Field(() => ProtocolParameters)
   protocolParams: typeof ProtocolParameters;
   @Field(() => Slot)
