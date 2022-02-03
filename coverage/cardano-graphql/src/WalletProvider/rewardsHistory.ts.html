@@ -25,28 +25,28 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>16/16</span>
+                <span class='fraction'>14/14</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">80% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>8/10</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>8/8</span>
+                <span class='fraction'>7/7</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>15/15</span>
+                <span class='fraction'>13/13</span>
             </div>
         
             
@@ -83,10 +83,7 @@
 <a name='L24'></a><a href='#L24'>24</a>
 <a name='L25'></a><a href='#L25'>25</a>
 <a name='L26'></a><a href='#L26'>26</a>
-<a name='L27'></a><a href='#L27'>27</a>
-<a name='L28'></a><a href='#L28'>28</a>
-<a name='L29'></a><a href='#L29'>29</a>
-<a name='L30'></a><a href='#L30'>30</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">3x</span>
+<a name='L27'></a><a href='#L27'>27</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -94,24 +91,21 @@
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -122,19 +116,16 @@ import { groupBy } from 'lodash-es';
 export const rewardsHistoryProvider =
   ({ sdk }: WalletProviderFnProps): WalletProvider['rewardsHistory'] =&gt;
   async ({ stakeAddresses, epochs }) =&gt; {
-    const { queryRewardAccount } = await sdk.RewardsHistory({ rewardAccounts: stakeAddresses as unknown as string[] });
+    const { queryRewardAccount } = await sdk.MemberRewardsHistory({
+      fromEpochNo: epochs?.lowerBound,
+      rewardAccounts: stakeAddresses as unknown as string[],
+      toEpochNo: epochs?.upperBound
+    });
     const rawRewards = queryRewardAccount?.filter(util.isNotNil) || [];
     const rewardsByEpoch = groupBy(
-      rawRewards.flatMap(({ activeStake }): EpochRewards[] =&gt; {
-        const filteredActiveStake = epochs
-          ? activeStake?.filter(
-              ({ epoch }) =&gt;
-                epoch.number &gt;= (epochs.lowerBound || <span class="branch-1 cbranch-no" title="branch not covered" >Number.NEGATIVE_INFINITY)</span> &amp;&amp;
-                epoch.number &lt;= (epochs.upperBound || <span class="branch-1 cbranch-no" title="branch not covered" >Number.POSITIVE_INFINITY)</span>
-            )
-          : activeStake;
-        return filteredActiveStake.map(({ epoch: { number }, quantity }) =&gt; ({ epoch: number, rewards: quantity }));
-      }),
+      rawRewards.flatMap(({ rewards }): EpochRewards[] =&gt;
+        rewards.map(({ epochNo, quantity }) =&gt; ({ epoch: epochNo, rewards: quantity }))
+      ),
       ({ epoch }) =&gt; epoch
     );
     return Object.keys(rewardsByEpoch).map(
@@ -151,7 +142,7 @@ export const rewardsHistoryProvider =
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Thu Feb 03 2022 08:35:26 GMT+0000 (Coordinated Universal Time)
+                at Thu Feb 03 2022 14:04:22 GMT+0000 (Coordinated Universal Time)
             </div>
         </div>
         <script src="../../prettify.js"></script>

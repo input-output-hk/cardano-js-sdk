@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>EpochRange | cardano-sdk</title>
+	<title>StakePoolQueryOptions | cardano-sdk</title>
 	<meta name="description" content="Documentation for cardano-sdk">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -58,10 +58,10 @@
 					<a href="../modules/_cardano_sdk_core.html">@cardano-sdk/core</a>
 				</li>
 				<li>
-					<a href="_cardano_sdk_core.EpochRange.html">EpochRange</a>
+					<a href="_cardano_sdk_core.StakePoolQueryOptions.html">StakePoolQueryOptions</a>
 				</li>
 			</ul>
-			<h1>Interface EpochRange</h1>
+			<h1>Interface StakePoolQueryOptions</h1>
 		</div>
 	</div>
 </header>
@@ -72,7 +72,7 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">EpochRange</span>
+						<span class="target">StakePoolQueryOptions</span>
 					</li>
 				</ul>
 			</section>
@@ -83,8 +83,8 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.EpochRange.html#lowerBound" class="tsd-kind-icon">lower<wbr>Bound</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.EpochRange.html#upperBound" class="tsd-kind-icon">upper<wbr>Bound</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.StakePoolQueryOptions.html#pagination" class="tsd-kind-icon">pagination</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.StakePoolQueryOptions.html#rewardsHistoryLimit" class="tsd-kind-icon">rewards<wbr>History<wbr>Limit</a></li>
 							</ul>
 						</section>
 					</div>
@@ -93,32 +93,43 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="lowerBound" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> lower<wbr>Bound</h3>
-					<div class="tsd-signature tsd-kind-icon">lower<wbr>Bound<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<a name="pagination" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> pagination</h3>
+					<div class="tsd-signature tsd-kind-icon">pagination<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>limit<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>startAt<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/7a59de5/packages/core/src/Provider/WalletProvider/types.ts#L58">packages/core/src/Provider/WalletProvider/types.ts:58</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/7a59de5/packages/core/src/Provider/StakePoolSearchProvider/types/StakePoolSearchProvider.ts#L11">packages/core/src/Provider/StakePoolSearchProvider/types/StakePoolSearchProvider.ts:11</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>Inclusive</p>
+							<p>Will return all stake pools matching the query if not specified</p>
 						</div>
+					</div>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter">
+								<h5>limit<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></h5>
+							</li>
+							<li class="tsd-parameter">
+								<h5>start<wbr>At<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></h5>
+							</li>
+						</ul>
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="upperBound" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> upper<wbr>Bound</h3>
-					<div class="tsd-signature tsd-kind-icon">upper<wbr>Bound<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<a name="rewardsHistoryLimit" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> rewards<wbr>History<wbr>Limit</h3>
+					<div class="tsd-signature tsd-kind-icon">rewards<wbr>History<wbr>Limit<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/7a59de5/packages/core/src/Provider/WalletProvider/types.ts#L62">packages/core/src/Provider/WalletProvider/types.ts:62</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/7a59de5/packages/core/src/Provider/StakePoolSearchProvider/types/StakePoolSearchProvider.ts#L7">packages/core/src/Provider/StakePoolSearchProvider/types/StakePoolSearchProvider.ts:7</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>Inclusive</p>
+							<p>Will fetch all stake pool reward history if not specified</p>
 						</div>
 					</div>
 				</section>
@@ -185,30 +196,30 @@
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
 						<a href="_cardano_sdk_core.AssetProvider.html" class="tsd-kind-icon">Asset<wbr>Provider</a>
 					</li>
-				</ul>
-				<ul class="current">
-					<li class="current tsd-kind-interface tsd-parent-kind-module">
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
 						<a href="_cardano_sdk_core.EpochRange.html" class="tsd-kind-icon">Epoch<wbr>Range</a>
-						<ul>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_cardano_sdk_core.EpochRange.html#lowerBound" class="tsd-kind-icon">lower<wbr>Bound</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_cardano_sdk_core.EpochRange.html#upperBound" class="tsd-kind-icon">upper<wbr>Bound</a>
-							</li>
-						</ul>
 					</li>
-				</ul>
-				<ul class="after-current">
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
 						<a href="_cardano_sdk_core.EpochRewards.html" class="tsd-kind-icon">Epoch<wbr>Rewards</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
 						<a href="_cardano_sdk_core.RewardHistoryProps.html" class="tsd-kind-icon">Reward<wbr>History<wbr>Props</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
+				</ul>
+				<ul class="current">
+					<li class="current tsd-kind-interface tsd-parent-kind-module">
 						<a href="_cardano_sdk_core.StakePoolQueryOptions.html" class="tsd-kind-icon">Stake<wbr>Pool<wbr>Query<wbr>Options</a>
+						<ul>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="_cardano_sdk_core.StakePoolQueryOptions.html#pagination" class="tsd-kind-icon">pagination</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="_cardano_sdk_core.StakePoolQueryOptions.html#rewardsHistoryLimit" class="tsd-kind-icon">rewards<wbr>History<wbr>Limit</a>
+							</li>
+						</ul>
 					</li>
+				</ul>
+				<ul class="after-current">
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
 						<a href="_cardano_sdk_core.StakePoolSearchProvider.html" class="tsd-kind-icon">Stake<wbr>Pool<wbr>Search<wbr>Provider</a>
 					</li>

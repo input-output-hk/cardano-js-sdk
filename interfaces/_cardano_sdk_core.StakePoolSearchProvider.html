@@ -95,13 +95,13 @@
 					<a name="queryStakePools" class="tsd-anchor"></a>
 					<h3>query<wbr>Stake<wbr>Pools</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">query<wbr>Stake<wbr>Pools<span class="tsd-signature-symbol">(</span>fragments<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="_cardano_sdk_core.Cardano.StakePool.html" class="tsd-signature-type" data-tsd-kind="Interface">StakePool</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">query<wbr>Stake<wbr>Pools<span class="tsd-signature-symbol">(</span>fragments<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span>, options<span class="tsd-signature-symbol">?: </span><a href="_cardano_sdk_core.StakePoolQueryOptions.html" class="tsd-signature-type" data-tsd-kind="Interface">StakePoolQueryOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="_cardano_sdk_core.Cardano.StakePool.html" class="tsd-signature-type" data-tsd-kind="Interface">StakePool</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/18a0a1b/packages/core/src/Provider/StakePoolSearchProvider/types/StakePoolSearchProvider.ts#L9">packages/core/src/Provider/StakePoolSearchProvider/types/StakePoolSearchProvider.ts:9</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/7a59de5/packages/core/src/Provider/StakePoolSearchProvider/types/StakePoolSearchProvider.ts#L24">packages/core/src/Provider/StakePoolSearchProvider/types/StakePoolSearchProvider.ts:24</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -116,9 +116,15 @@
 								<li>
 									<h5>fragments: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
 								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> options: <a href="_cardano_sdk_core.StakePoolQueryOptions.html" class="tsd-signature-type" data-tsd-kind="Interface">StakePoolQueryOptions</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>query options</p>
+									</div>
+								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="_cardano_sdk_core.Cardano.StakePool.html" class="tsd-signature-type" data-tsd-kind="Interface">StakePool</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h4>
-							<p>Stake pools that match any fragment.</p>
+							<p>Stake pools that match any fragment</p>
 						</li>
 					</ul>
 				</section>
@@ -193,6 +199,9 @@
 					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
 						<a href="_cardano_sdk_core.RewardHistoryProps.html" class="tsd-kind-icon">Reward<wbr>History<wbr>Props</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="_cardano_sdk_core.StakePoolQueryOptions.html" class="tsd-kind-icon">Stake<wbr>Pool<wbr>Query<wbr>Options</a>
 					</li>
 				</ul>
 				<ul class="current">
