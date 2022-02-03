@@ -3,6 +3,7 @@ import { currentWalletProtocolParametersProvider } from '../../src/WalletProvide
 import { getExactlyOneObject } from '../../src/util';
 
 describe('CardanoGraphQLWalletProvider.currentWalletProtocolParameters', () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let sdk: any;
   const protocolParameters = {
     __typename: 'ProtocolParametersAlonzo',

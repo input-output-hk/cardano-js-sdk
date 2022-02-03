@@ -111,7 +111,7 @@ fragment allStakePoolFields on StakePool {
       ...certificateTransactionFields
     }
   }
-  epochRewards(order: {desc: epochNo}, first: $epochRewardsLimit) {
+  epochRewards(order: { desc: epochNo }, first: $epochRewardsLimit) {
     epochNo
     epochLength
     activeStake
