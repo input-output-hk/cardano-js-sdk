@@ -25,8 +25,8 @@
     "shx": "^0.3.3"
   },
   "dependencies": {
-    "@cardano-ogmios/client": "4.2.1",
-    "@cardano-ogmios/schema": "4.2.1",
+    "@cardano-ogmios/client": "5.1.0",
+    "@cardano-ogmios/schema": "5.1.0",
     "@emurgo/cardano-serialization-lib-browser": "9.1.0",
     "@emurgo/cardano-serialization-lib-nodejs": "9.1.0",
     "bech32": "^2.0.0"

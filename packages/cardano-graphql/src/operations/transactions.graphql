@@ -102,6 +102,7 @@ fragment anyScript on Script {
   ... on PlutusScript {
     __typename
     cborHex
+    type
   }
 }
 

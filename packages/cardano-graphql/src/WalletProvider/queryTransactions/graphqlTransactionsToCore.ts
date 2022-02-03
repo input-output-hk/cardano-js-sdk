@@ -32,7 +32,7 @@ const scriptToCore = (script: GraphqlScript): Cardano.Script => {
     return { native: nativeScriptToCore(script) };
   } else if (script.__typename === 'PlutusScript') {
     return {
-      plutus: script.cborHex
+      [script.type === 'PlutusScriptV1' ? ('plutus:v1' as keyof Cardano.Script) : 'plutus:v2']: script.cborHex
     };
   }
   throw new NotImplementedError(script);
