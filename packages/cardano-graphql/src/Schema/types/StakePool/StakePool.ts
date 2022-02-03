@@ -6,7 +6,7 @@ import { Directive, Field, Float, Int, ObjectType, registerEnumType } from 'type
 import { Epoch } from '../Epoch';
 import { Int64, percentageDescription } from '../util';
 import { PoolParameters } from './PoolParameters';
-import { PoolRegistrationCertificate, PoolRetirementCertificate } from '../Transaction/Certificate';
+import { PoolRetirementCertificate } from '../Transaction/Certificate';
 
 enum StakePoolStatus {
   activating = 'activating',
@@ -90,7 +90,7 @@ export class StakePool {
   metrics: StakePoolMetrics[];
   @Directive('@hasInverse(field: stakePool)')
   @Field(() => [PoolRetirementCertificate])
-  poolRetirementCertificates: PoolRegistrationCertificate[];
+  poolRetirementCertificates: PoolRetirementCertificate[];
   @Field(() => [StakePoolEpochRewards])
   epochRewards: StakePoolEpochRewards[];
 }
