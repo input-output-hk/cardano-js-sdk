@@ -69,7 +69,7 @@ describe('blockfrostWalletProvider', () => {
         Cardano.TransactionId('bcd165c882dc17a416bfef7053f0e1cfc3d715f8d7fc05a9803309f795878d9b')
       ]);
       expect(tx.body.certificates![0]).toEqual({
-        __typename: 'StakeKeyRegistration',
+        __typename: 'StakeKeyRegistrationCertificate',
         certIndex: 0,
         rewardAccount: 'stake_test1upqykkjq3zhf4085s6n70w8cyp57dl87r0ezduv9rnnj2uqk5zmdv'
       });
@@ -79,7 +79,7 @@ describe('blockfrostWalletProvider', () => {
         Cardano.TransactionId('bcd165c882dc17a416bfef7053f0e1cfc3d715f8d7fc05a9803309f795878d9b')
       ]);
       expect(tx.body.certificates![1]).toEqual({
-        __typename: 'StakeDelegation',
+        __typename: 'StakeDelegationCertificate',
         certIndex: 1,
         delegationIndex: 1,
         epoch: 182,
@@ -92,7 +92,7 @@ describe('blockfrostWalletProvider', () => {
         Cardano.TransactionId('150a445f4d1f2e692791daec9c09f32d6c8c25a3f9ca6c7cf14ff8085375aaa0')
       ]);
       expect(tx.body.certificates![0]).toEqual({
-        __typename: 'StakeKeyDeregistration',
+        __typename: 'StakeKeyDeregistrationCertificate',
         certIndex: 0,
         rewardAccount: 'stake_test1uqe2twywhfjwt88ghas4sfgq7pp7m8wq64hlhz0vr4uhu2sj2tuzt'
       });
@@ -102,7 +102,7 @@ describe('blockfrostWalletProvider', () => {
         Cardano.TransactionId('295d5e0f7ee182426eaeda8c9f1c63502c72cdf4afd6e0ee0f209adf94a614e7')
       ]);
       expect(tx.body.certificates![0]).toEqual({
-        __typename: 'PoolRegistration',
+        __typename: 'PoolRegistrationCertificate',
         epoch: 76,
         poolId: 'pool1y25deq9kldy9y9gfvrpw8zt05zsrfx84zjhugaxrx9ftvwdpua2',
         poolParameters: null
@@ -113,7 +113,7 @@ describe('blockfrostWalletProvider', () => {
         Cardano.TransactionId('545ee7080a01aa085be01dffc073020be04ea3283b945c408c0830e9c4f8253c')
       ]);
       expect(tx.body.certificates![0]).toEqual({
-        __typename: 'PoolRetirement',
+        __typename: 'PoolRetirementCertificate',
         epoch: 80,
         poolId: 'pool1ky9w02c4m4y842ygc0jyaf908wgllxv3cvpx42fd243f7uk664s'
       });
@@ -123,7 +123,7 @@ describe('blockfrostWalletProvider', () => {
         Cardano.TransactionId('24986c0cd3475419bfb44756c27a0e13a6354a4071153f76a78f9b2d1e596089')
       ]);
       expect(tx.body.certificates![0]).toEqual({
-        __typename: 'MoveInstantaneousRewards',
+        __typename: 'MirCertificate',
         certIndex: 0,
         pot: 'treasury',
         quantity: 100_000_000n,
