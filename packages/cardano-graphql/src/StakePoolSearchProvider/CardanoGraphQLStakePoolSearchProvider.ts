@@ -30,12 +30,12 @@ const toCoreStakePool = (responseStakePool: GraphqlStakePool): Cardano.StakePool
     ...poolParameters,
     epochRewards: stakePool.epochRewards.map(
       ({ epochNo, totalRewards, memberROI, operatorFees, epochLength, activeStake }) => ({
-        activeStake,
+        activeStake: BigInt(activeStake),
         epoch: epochNo,
         epochLength,
         memberROI,
-        operatorFees,
-        totalRewards
+        operatorFees: BigInt(operatorFees),
+        totalRewards: BigInt(totalRewards)
       })
     ),
     hexId: Cardano.PoolIdHex(stakePool.hexId),

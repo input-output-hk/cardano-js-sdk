@@ -13,7 +13,7 @@ export const rewardsHistoryProvider =
     const rawRewards = queryRewardAccount?.filter(util.isNotNil) || [];
     const rewardsByEpoch = groupBy(
       rawRewards.flatMap(({ rewards }): EpochRewards[] =>
-        rewards.map(({ epochNo, quantity }) => ({ epoch: epochNo, rewards: quantity }))
+        rewards.map(({ epochNo, quantity }) => ({ epoch: epochNo, rewards: BigInt(quantity) }))
       ),
       ({ epoch }) => epoch
     );

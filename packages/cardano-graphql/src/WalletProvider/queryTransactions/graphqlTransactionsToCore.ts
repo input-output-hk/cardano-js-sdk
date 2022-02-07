@@ -67,7 +67,7 @@ const outputsToCore = (outputs: GraphqlTransaction['outputs']) =>
       datum: datumHash ? Cardano.Hash32ByteBase16(datumHash) : undefined,
       value: {
         assets: new Map(assets?.map(({ asset, quantity }) => [Cardano.AssetId(asset.assetId), BigInt(quantity)])),
-        coins: coin
+        coins: BigInt(coin)
       }
     })
   );
@@ -75,7 +75,7 @@ const outputsToCore = (outputs: GraphqlTransaction['outputs']) =>
 const withdrawalsToCore = (withdrawals: GraphqlTransaction['withdrawals']) =>
   withdrawals?.map(
     (withdrawal): Cardano.Withdrawal => ({
-      quantity: withdrawal.quantity,
+      quantity: BigInt(withdrawal.quantity),
       stakeAddress: Cardano.RewardAccount(withdrawal.rewardAccount.address)
     })
   );
@@ -147,7 +147,7 @@ const certificatesToCore = (certificates: GraphQlCertificates) =>
         return {
           __typename: Cardano.CertificateType.MIR,
           pot: cert.pot as Cardano.MirCertificate['pot'],
-          quantity: cert.quantity,
+          quantity: BigInt(cert.quantity),
           rewardAccount: Cardano.RewardAccount(cert.rewardAccount.address)
         };
       case 'PoolRegistrationCertificate': {
@@ -212,7 +212,7 @@ export const graphqlTransactionsToCore = (
         body: {
           certificates,
           collaterals: tx.collateral ? inputsToCore(tx.collateral, txId) : undefined,
-          fee: tx.fee,
+          fee: BigInt(tx.fee),
           inputs: inputsToCore(tx.inputs, txId),
           mint: mintToCore(tx.mint),
           outputs: outputsToCore(tx.outputs),

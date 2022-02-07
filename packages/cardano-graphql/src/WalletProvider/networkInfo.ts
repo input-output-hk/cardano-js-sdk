@@ -37,8 +37,8 @@ export const networkInfoProvider =
         total: BigInt(supply.total)
       },
       stake: {
-        active: activeStake,
-        live: totalLiveStake
+        active: BigInt(activeStake),
+        live: BigInt(totalLiveStake)
       }
     };
   };
