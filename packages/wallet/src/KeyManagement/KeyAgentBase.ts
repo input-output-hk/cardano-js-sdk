@@ -15,6 +15,7 @@ export abstract class KeyAgentBase implements KeyAgent {
   abstract get networkId(): Cardano.NetworkId;
   abstract get accountIndex(): number;
   abstract get serializableData(): SerializableKeyAgentData;
+  abstract get knownAddresses(): GroupedAddress[];
   abstract getExtendedAccountPublicKey(): Promise<Cardano.Bip32PublicKey>;
   abstract signBlob(derivationPath: AccountKeyDerivationPath, blob: HexBlob): Promise<SignBlobResult>;
   abstract derivePublicKey(derivationPath: AccountKeyDerivationPath): Promise<Cardano.Ed25519PublicKey>;
@@ -43,7 +44,7 @@ export abstract class KeyAgentBase implements KeyAgent {
     ).to_address();
 
     const rewardAccount = CSL.RewardAddress.new(this.networkId, stakeKeyCredential).to_address();
-    return {
+    const groupedAddress = {
       accountIndex: this.accountIndex,
       address: Cardano.Address(address.to_bech32()),
       index,
@@ -51,6 +52,8 @@ export abstract class KeyAgentBase implements KeyAgent {
       rewardAccount: Cardano.RewardAccount(rewardAccount.to_bech32()),
       type
     };
+    this.knownAddresses.push(groupedAddress);
+    return groupedAddress;
   }
 
   async signTransaction({ body, hash }: TxInternals): Promise<Cardano.Signatures> {

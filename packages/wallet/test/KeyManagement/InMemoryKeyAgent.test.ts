@@ -52,6 +52,7 @@ describe('InMemoryKeyAgent', () => {
       expect(typeof serializableData.__typename).toBe('string');
       expect(typeof serializableData.accountIndex).toBe('number');
       expect(typeof serializableData.networkId).toBe('number');
+      expect(Array.isArray(serializableData.knownAddresses)).toBe(true);
       expect(serializableData.encryptedRootPrivateKeyBytes.length > 0).toBe(true);
     });
 
@@ -148,6 +149,7 @@ describe('InMemoryKeyAgent', () => {
         accountIndex: 0,
         encryptedRootPrivateKey: Buffer.from(yoroiEncryptedRootPrivateKeyHex, 'hex'),
         getPassword,
+        knownAddresses: [],
         networkId: Cardano.NetworkId.testnet
       });
       const exportedPrivateKeyHex = await keyAgentFromEncryptedKey.exportRootPrivateKey();
@@ -203,6 +205,7 @@ describe('InMemoryKeyAgent', () => {
         accountIndex: 0,
         encryptedRootPrivateKey: Buffer.from(daedelusEncryptedRootPrivateKeyHex, 'hex'),
         getPassword: jest.fn().mockResolvedValue(Buffer.from('nMmys*X002')), // daedelus enforces min length of 10
+        knownAddresses: [],
         networkId: Cardano.NetworkId.testnet
       });
       const derivedAddress = await keyAgentFromEncryptedKey.deriveAddress({

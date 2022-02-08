@@ -62,6 +62,7 @@ export interface SerializableKeyAgentDataBase {
 export interface SerializableInMemoryKeyAgentData extends SerializableKeyAgentDataBase {
   __typename: KeyAgentType.InMemory;
   encryptedRootPrivateKeyBytes: number[];
+  knownAddresses: GroupedAddress[];
 }
 
 export type SerializableKeyAgentData = SerializableInMemoryKeyAgentData;
@@ -75,6 +76,7 @@ export interface KeyAgent {
   get networkId(): Cardano.NetworkId;
   get accountIndex(): number;
   get serializableData(): SerializableKeyAgentData;
+  get knownAddresses(): GroupedAddress[];
   /**
    * @throws AuthenticationError
    */

@@ -6,6 +6,7 @@ const NETWORK_ID = Cardano.NetworkId.testnet;
 const ACCOUNT_INDEX = 1;
 
 class MockKeyAgent extends KeyManagement.KeyAgentBase {
+  #knownAddresses = [];
   get networkId(): Cardano.NetworkId {
     return NETWORK_ID;
   }
@@ -14,6 +15,9 @@ class MockKeyAgent extends KeyManagement.KeyAgentBase {
   }
   get serializableData() {
     return this.serializableDataImpl();
+  }
+  get knownAddresses(): KeyManagement.GroupedAddress[] {
+    return this.#knownAddresses;
   }
   serializableDataImpl = jest.fn();
   getExtendedAccountPublicKey = jest.fn();
@@ -53,6 +57,7 @@ describe('KeyAgentBase', () => {
     expect(address.networkId).toBe(NETWORK_ID);
     expect(address.address.startsWith('addr_test')).toBe(true);
     expect(address.rewardAccount.startsWith('stake_test')).toBe(true);
+    expect(keyAgent.knownAddresses).toHaveLength(1);
   });
 
   describe('signTransaction', () => {

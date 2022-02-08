@@ -1,3 +1,4 @@
+import { Cardano } from '@cardano-sdk/core';
 import { InvalidSerializableDataError } from '../../src/KeyManagement/errors';
 import { KeyManagement } from '../../src';
 
@@ -15,13 +16,26 @@ describe('KeyManagement/restoreKeyAgent', () => {
         66, 141, 241, 161, 163, 19, 81, 122, 125, 149, 49, 175, 149, 111, 48, 138, 254, 189, 69, 35, 135, 62, 177, 43,
         152, 95, 7, 87, 78, 204, 222, 109, 3, 239, 117
       ],
+      knownAddresses: [
+        {
+          accountIndex: 0,
+          address: Cardano.Address(
+            'addr1qx52knza2h5x090n4a5r7yraz3pwcamk9ppvuh7e26nfks7pnmhxqavtqy02zezklh27jt9r6z62sav3mugappdc7xnskxy2pn'
+          ),
+          index: 0,
+          networkId: Cardano.NetworkId.mainnet,
+          rewardAccount: Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr'),
+          type: KeyManagement.AddressType.External
+        }
+      ],
       networkId: 0
     };
     // eslint-disable-next-line unicorn/consistent-function-scoping
     const getPassword: KeyManagement.GetPassword = async () => Buffer.from('password');
 
     it('can restore key manager from valid data and password', async () => {
-      await expect(KeyManagement.restoreKeyAgent(inMemoryKeyAgentData, getPassword)).resolves.not.toThrow();
+      const keyAgent = await KeyManagement.restoreKeyAgent(inMemoryKeyAgentData, getPassword);
+      expect(keyAgent.knownAddresses).toBe(inMemoryKeyAgentData.knownAddresses);
     });
 
     it('throws when attempting to restore key manager from valid data and no password', async () => {
