@@ -76,14 +76,23 @@
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section ">
+							<h3>Interfaces</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-interface tsd-parent-kind-namespace"><a href="../interfaces/_cardano_sdk_wallet.KeyManagement.util.PartialDerivationPath.html" class="tsd-kind-icon">Partial<wbr>Derivation<wbr>Path</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
 							<h3>Functions</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="_cardano_sdk_wallet.KeyManagement.util.html#cachedGetPassword" class="tsd-kind-icon">cached<wbr>Get<wbr>Password</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="_cardano_sdk_wallet.KeyManagement.util.html#entropyToMnemonicWords" class="tsd-kind-icon">entropy<wbr>ToMnemonic<wbr>Words</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="_cardano_sdk_wallet.KeyManagement.util.html#generateMnemonicWords" class="tsd-kind-icon">generate<wbr>Mnemonic<wbr>Words</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="_cardano_sdk_wallet.KeyManagement.util.html#harden" class="tsd-kind-icon">harden</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="_cardano_sdk_wallet.KeyManagement.util.html#joinMnemonicWords" class="tsd-kind-icon">join<wbr>Mnemonic<wbr>Words</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="_cardano_sdk_wallet.KeyManagement.util.html#mnemonicToWords" class="tsd-kind-icon">mnemonic<wbr>ToWords</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="_cardano_sdk_wallet.KeyManagement.util.html#mnemonicWordsToEntropy" class="tsd-kind-icon">mnemonic<wbr>Words<wbr>ToEntropy</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="_cardano_sdk_wallet.KeyManagement.util.html#ownSignatureKeyPaths" class="tsd-kind-icon">own<wbr>Signature<wbr>Key<wbr>Paths</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="_cardano_sdk_wallet.KeyManagement.util.html#stubSignTransaction" class="tsd-kind-icon">stub<wbr>Sign<wbr>Transaction</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="_cardano_sdk_wallet.KeyManagement.util.html#validateMnemonic" class="tsd-kind-icon">validate<wbr>Mnemonic</a></li>
 							</ul>
 						</section>
@@ -92,6 +101,44 @@
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Functions</h2>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-namespace">
+					<a name="cachedGetPassword" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> cached<wbr>Get<wbr>Password</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-namespace">
+						<li class="tsd-signature tsd-kind-icon">cached<wbr>Get<wbr>Password<span class="tsd-signature-symbol">(</span>getPassword<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Uint8Array</span><span class="tsd-signature-symbol">&gt;</span>, cacheDuration<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_wallet.KeyManagement.html#GetPassword" class="tsd-signature-type" data-tsd-kind="Type alias">GetPassword</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/f3713db/packages/wallet/src/KeyManagement/util/cachedGetPassword.ts#L4">packages/wallet/src/KeyManagement/util/cachedGetPassword.ts:4</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>getPassword: <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Uint8Array</span><span class="tsd-signature-symbol">&gt;</span></h5>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter-signature">
+											<ul class="tsd-signatures tsd-kind-type-literal">
+												<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Uint8Array</span><span class="tsd-signature-symbol">&gt;</span></li>
+											</ul>
+											<ul class="tsd-descriptions">
+												<li class="tsd-description">
+													<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Uint8Array</span><span class="tsd-signature-symbol">&gt;</span></h4>
+												</li>
+											</ul>
+										</li>
+									</ul>
+								</li>
+								<li>
+									<h5>cacheDuration: <span class="tsd-signature-type">number</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="_cardano_sdk_wallet.KeyManagement.html#GetPassword" class="tsd-signature-type" data-tsd-kind="Type alias">GetPassword</a></h4>
+						</li>
+					</ul>
+				</section>
 				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-namespace">
 					<a name="entropyToMnemonicWords" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> entropy<wbr>ToMnemonic<wbr>Words</h3>
@@ -102,7 +149,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cc15f0c/packages/wallet/src/KeyManagement/util.ts#L9">packages/wallet/src/KeyManagement/util.ts:9</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/f3713db/packages/wallet/src/KeyManagement/util/bip39.ts#L9">packages/wallet/src/KeyManagement/util/bip39.ts:9</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -125,7 +172,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cc15f0c/packages/wallet/src/KeyManagement/util.ts#L7">packages/wallet/src/KeyManagement/util.ts:7</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/f3713db/packages/wallet/src/KeyManagement/util/bip39.ts#L7">packages/wallet/src/KeyManagement/util/bip39.ts:7</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -148,7 +195,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cc15f0c/packages/wallet/src/KeyManagement/util.ts#L17">packages/wallet/src/KeyManagement/util.ts:17</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/f3713db/packages/wallet/src/KeyManagement/util/key.ts#L1">packages/wallet/src/KeyManagement/util/key.ts:1</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -171,7 +218,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cc15f0c/packages/wallet/src/KeyManagement/util.ts#L8">packages/wallet/src/KeyManagement/util.ts:8</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/f3713db/packages/wallet/src/KeyManagement/util/bip39.ts#L8">packages/wallet/src/KeyManagement/util/bip39.ts:8</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -194,7 +241,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cc15f0c/packages/wallet/src/KeyManagement/util.ts#L6">packages/wallet/src/KeyManagement/util.ts:6</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/f3713db/packages/wallet/src/KeyManagement/util/bip39.ts#L6">packages/wallet/src/KeyManagement/util/bip39.ts:6</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -222,7 +269,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cc15f0c/packages/wallet/src/KeyManagement/util.ts#L10">packages/wallet/src/KeyManagement/util.ts:10</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/f3713db/packages/wallet/src/KeyManagement/util/bip39.ts#L10">packages/wallet/src/KeyManagement/util/bip39.ts:10</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -236,6 +283,64 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-namespace">
+					<a name="ownSignatureKeyPaths" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> own<wbr>Signature<wbr>Key<wbr>Paths</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-namespace">
+						<li class="tsd-signature tsd-kind-icon">own<wbr>Signature<wbr>Key<wbr>Paths<span class="tsd-signature-symbol">(</span>txBody<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TxBodyAlonzo</span>, knownAddresses<span class="tsd-signature-symbol">: </span><a href="../interfaces/_cardano_sdk_wallet.KeyManagement.GroupedAddress.html" class="tsd-signature-type" data-tsd-kind="Interface">GroupedAddress</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/_cardano_sdk_wallet.KeyManagement.util.PartialDerivationPath.html" class="tsd-signature-type" data-tsd-kind="Interface">PartialDerivationPath</a><span class="tsd-signature-symbol">[]</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/f3713db/packages/wallet/src/KeyManagement/util/ownSignatureKeyPaths.ts#L15">packages/wallet/src/KeyManagement/util/ownSignatureKeyPaths.ts:15</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Assumes that a single staking key is used for all addresses (index=0)</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>txBody: <span class="tsd-signature-type">TxBodyAlonzo</span></h5>
+								</li>
+								<li>
+									<h5>knownAddresses: <a href="../interfaces/_cardano_sdk_wallet.KeyManagement.GroupedAddress.html" class="tsd-signature-type" data-tsd-kind="Interface">GroupedAddress</a><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/_cardano_sdk_wallet.KeyManagement.util.PartialDerivationPath.html" class="tsd-signature-type" data-tsd-kind="Interface">PartialDerivationPath</a><span class="tsd-signature-symbol">[]</span></h4>
+							<p>derivation paths for keys to sign transaction with</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-namespace">
+					<a name="stubSignTransaction" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> stub<wbr>Sign<wbr>Transaction</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-namespace">
+						<li class="tsd-signature tsd-kind-icon">stub<wbr>Sign<wbr>Transaction<span class="tsd-signature-symbol">(</span>txBody<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TxBodyAlonzo</span>, knownAddresses<span class="tsd-signature-symbol">: </span><a href="../interfaces/_cardano_sdk_wallet.KeyManagement.GroupedAddress.html" class="tsd-signature-type" data-tsd-kind="Interface">GroupedAddress</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Signatures</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/f3713db/packages/wallet/src/KeyManagement/util/stubSignTransaction.ts#L8">packages/wallet/src/KeyManagement/util/stubSignTransaction.ts:8</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>txBody: <span class="tsd-signature-type">TxBodyAlonzo</span></h5>
+								</li>
+								<li>
+									<h5>knownAddresses: <a href="../interfaces/_cardano_sdk_wallet.KeyManagement.GroupedAddress.html" class="tsd-signature-type" data-tsd-kind="Interface">GroupedAddress</a><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Signatures</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-namespace">
 					<a name="validateMnemonic" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> validate<wbr>Mnemonic</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-namespace">
@@ -245,7 +350,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cc15f0c/packages/wallet/src/KeyManagement/util.ts#L15">packages/wallet/src/KeyManagement/util.ts:15</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/f3713db/packages/wallet/src/KeyManagement/util/bip39.ts#L15">packages/wallet/src/KeyManagement/util/bip39.ts:15</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -278,6 +383,12 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
+					<li class=" tsd-kind-interface tsd-parent-kind-namespace">
+						<a href="../interfaces/_cardano_sdk_wallet.KeyManagement.util.PartialDerivationPath.html" class="tsd-kind-icon">Partial<wbr>Derivation<wbr>Path</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-namespace">
+						<a href="_cardano_sdk_wallet.KeyManagement.util.html#cachedGetPassword" class="tsd-kind-icon">cached<wbr>Get<wbr>Password</a>
+					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-namespace">
 						<a href="_cardano_sdk_wallet.KeyManagement.util.html#entropyToMnemonicWords" class="tsd-kind-icon">entropy<wbr>ToMnemonic<wbr>Words</a>
 					</li>
@@ -295,6 +406,12 @@
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-namespace">
 						<a href="_cardano_sdk_wallet.KeyManagement.util.html#mnemonicWordsToEntropy" class="tsd-kind-icon">mnemonic<wbr>Words<wbr>ToEntropy</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-namespace">
+						<a href="_cardano_sdk_wallet.KeyManagement.util.html#ownSignatureKeyPaths" class="tsd-kind-icon">own<wbr>Signature<wbr>Key<wbr>Paths</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-namespace">
+						<a href="_cardano_sdk_wallet.KeyManagement.util.html#stubSignTransaction" class="tsd-kind-icon">stub<wbr>Sign<wbr>Transaction</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-namespace">
 						<a href="_cardano_sdk_wallet.KeyManagement.util.html#validateMnemonic" class="tsd-kind-icon">validate<wbr>Mnemonic</a>

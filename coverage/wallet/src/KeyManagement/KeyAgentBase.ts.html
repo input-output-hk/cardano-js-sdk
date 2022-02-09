@@ -32,7 +32,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>2/2</span>
+                <span class='fraction'>0/0</span>
             </div>
         
             
@@ -134,7 +134,8 @@
 <a name='L75'></a><a href='#L75'>75</a>
 <a name='L76'></a><a href='#L76'>76</a>
 <a name='L77'></a><a href='#L77'>77</a>
-<a name='L78'></a><a href='#L78'>78</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">18x</span>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">19x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -144,14 +145,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">18x</span>
+<span class="cline-any cline-yes">19x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">19x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">18x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">19x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -160,17 +158,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -179,6 +170,18 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -187,20 +190,19 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">14x</span>
-<span class="cline-any cline-yes">14x</span>
-<span class="cline-any cline-yes">14x</span>
-<span class="cline-any cline-yes">14x</span>
-<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">14x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -223,11 +225,13 @@
 } from './types';
 import { CSL, Cardano } from '@cardano-sdk/core';
 import { TxInternals } from '../Transaction';
+import { ownSignatureKeyPaths } from './util';
 &nbsp;
 export abstract class KeyAgentBase implements KeyAgent {
   abstract get networkId(): Cardano.NetworkId;
   abstract get accountIndex(): number;
   abstract get serializableData(): SerializableKeyAgentData;
+  abstract get knownAddresses(): GroupedAddress[];
   abstract getExtendedAccountPublicKey(): Promise&lt;Cardano.Bip32PublicKey&gt;;
   abstract signBlob(derivationPath: AccountKeyDerivationPath, blob: HexBlob): Promise&lt;SignBlobResult&gt;;
   abstract derivePublicKey(derivationPath: AccountKeyDerivationPath): Promise&lt;Cardano.Ed25519PublicKey&gt;;
@@ -256,7 +260,7 @@ export abstract class KeyAgentBase implements KeyAgent {
     ).to_address();
 &nbsp;
     const rewardAccount = CSL.RewardAddress.new(this.networkId, stakeKeyCredential).to_address();
-    return {
+    const groupedAddress = {
       accountIndex: this.accountIndex,
       address: Cardano.Address(address.to_bech32()),
       index,
@@ -264,23 +268,22 @@ export abstract class KeyAgentBase implements KeyAgent {
       rewardAccount: Cardano.RewardAccount(rewardAccount.to_bech32()),
       type
     };
+    this.knownAddresses.push(groupedAddress);
+    return groupedAddress;
   }
 &nbsp;
   async signTransaction({ body, hash }: TxInternals): Promise&lt;Cardano.Signatures&gt; {
     // Possible optimization is casting strings to OpaqueString types directly and skipping validation
     const blob = HexBlob(hash.toString());
-    const paymentVkeyWitness = await this.signBlob({ index: 0, type: KeyType.External }, blob);
-    const stakeWitnesses = await (async () =&gt; {
-      if (!body.certificates?.length) {
-        return [];
-      }
-      const { publicKey, signature } = await this.signBlob({ index: 0, type: KeyType.Stake }, blob);
-      return [[publicKey, signature] as const];
-    })();
-    return new Map&lt;Cardano.Ed25519PublicKey, Cardano.Ed25519Signature&gt;([
-      [paymentVkeyWitness.publicKey, paymentVkeyWitness.signature],
-      ...stakeWitnesses
-    ]);
+    const derivationPaths = ownSignatureKeyPaths(body, this.knownAddresses);
+    return new Map&lt;Cardano.Ed25519PublicKey, Cardano.Ed25519Signature&gt;(
+      await Promise.all(
+        derivationPaths.map(async ({ role, index }) =&gt; {
+          const { publicKey, signature } = await this.signBlob({ index, type: role }, blob);
+          return [publicKey, signature] as const;
+        })
+      )
+    );
   }
 &nbsp;
   protected async deriveCslPublicKey(derivationPath: AccountKeyDerivationPath): Promise&lt;CSL.PublicKey&gt; {
@@ -295,7 +298,7 @@ export abstract class KeyAgentBase implements KeyAgent {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Wed Feb 09 2022 14:23:11 GMT+0000 (Coordinated Universal Time)
+                at Wed Feb 09 2022 16:27:24 GMT+0000 (Coordinated Universal Time)
             </div>
         </div>
         <script src="../../prettify.js"></script>
