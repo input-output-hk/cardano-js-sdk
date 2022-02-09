@@ -38,7 +38,6 @@ describe('SingleAddressWallet', () => {
   });
 
   afterEach(() => {
-    getPassword.mockClear();
     wallet.shutdown();
   });
 
@@ -139,8 +138,8 @@ describe('SingleAddressWallet', () => {
       });
     });
 
-    // TODO
-    it.skip('initializeTx', async () => {
+    it('initializeTx', async () => {
+      getPassword.mockClear();
       const { body, hash, inputSelection } = await wallet.initializeTx(props);
       expect(body.outputs).toHaveLength(props.outputs.size + 1 /* change output */);
       expect(typeof hash).toBe('string');
