@@ -29,6 +29,9 @@ class MockKeyAgent extends KeyManagement.KeyAgentBase {
   }
 }
 
+jest.mock('../../src/KeyManagement/util/ownSignatureKeyPaths');
+const { ownSignatureKeyPaths } = jest.requireMock('../../src/KeyManagement/util/ownSignatureKeyPaths');
+
 describe('KeyAgentBase', () => {
   let keyAgent: MockKeyAgent;
 
@@ -60,51 +63,23 @@ describe('KeyAgentBase', () => {
     expect(keyAgent.knownAddresses).toHaveLength(1);
   });
 
-  describe('signTransaction', () => {
-    it('signs with payment key only for tx with no certificates', async () => {
-      const publicKey = 'publicKey';
-      const signature = 'signature';
-      keyAgent.signBlob.mockResolvedValueOnce({ publicKey, signature });
-
-      const hash = Cardano.TransactionId('8561258e210352fba2ac0488afed67b3427a27ccf1d41ec030c98a8199bc22ec');
-      const witnessSet = await keyAgent.signTransaction({
-        body: { certificates: [] } as unknown as Cardano.TxBodyAlonzo,
-        hash
-      });
-
-      expect(keyAgent.signBlob).toBeCalledTimes(1);
-      expect(keyAgent.signBlob).toBeCalledWith({ index: 0, type: KeyManagement.KeyType.External }, hash);
-      expect(witnessSet.size).toBe(1);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      expect(witnessSet.get(publicKey as any)).toBe(signature);
+  test('signTransaction', async () => {
+    ownSignatureKeyPaths.mockReturnValueOnce([
+      { index: 0, role: 0 },
+      { index: 0, role: 2 }
+    ]);
+    keyAgent.signBlob
+      .mockResolvedValueOnce({ publicKey: 'key1', signature: 'signature1' })
+      .mockResolvedValueOnce({ publicKey: 'key2', signature: 'signature2' });
+    const body = {} as unknown as Cardano.TxBodyAlonzo;
+    const witnessSet = await keyAgent.signTransaction({
+      body,
+      hash: Cardano.TransactionId('8561258e210352fba2ac0488afed67b3427a27ccf1d41ec030c98a8199bc22ec')
     });
-
-    it('signs with both payment and stake key for tx with certificates', async () => {
-      const paymentPublicKey = 'publicKey1';
-      const paymentSignature = 'signature1';
-      const stakePublicKey = 'publicKey2';
-      const stakeSignature = 'signature2';
-      keyAgent.signBlob
-        .mockResolvedValueOnce({ publicKey: paymentPublicKey, signature: paymentSignature })
-        .mockResolvedValueOnce({ publicKey: stakePublicKey, signature: stakeSignature });
-
-      const hash = Cardano.TransactionId('8561258e210352fba2ac0488afed67b3427a27ccf1d41ec030c98a8199bc22ec');
-      const witnessSet = await keyAgent.signTransaction({
-        body: {
-          certificates: [{ __typename: Cardano.CertificateType.StakeKeyRegistration }]
-        } as unknown as Cardano.TxBodyAlonzo,
-        hash
-      });
-
-      expect(keyAgent.signBlob).toBeCalledTimes(2);
-      expect(keyAgent.signBlob).toBeCalledWith({ index: 0, type: KeyManagement.KeyType.External }, hash);
-      expect(keyAgent.signBlob).toBeCalledWith({ index: 0, type: KeyManagement.KeyType.Stake }, hash);
-      expect(witnessSet.size).toBe(2);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      expect(witnessSet.get(paymentPublicKey as any)).toBe(paymentSignature);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      expect(witnessSet.get(stakePublicKey as any)).toBe(stakeSignature);
-    });
+    expect(keyAgent.signBlob).toBeCalledTimes(2);
+    expect(ownSignatureKeyPaths).toBeCalledWith(body, keyAgent.knownAddresses);
+    expect(witnessSet.size).toBe(2);
+    expect(typeof [...witnessSet.values()][0]).toBe('string');
   });
 
   test('deriveCslPublicKey', async () => {

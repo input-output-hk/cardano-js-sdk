@@ -10,6 +10,7 @@ import {
 } from './types';
 import { CSL, Cardano } from '@cardano-sdk/core';
 import { TxInternals } from '../Transaction';
+import { ownSignatureKeyPaths } from './util';
 
 export abstract class KeyAgentBase implements KeyAgent {
   abstract get networkId(): Cardano.NetworkId;
@@ -59,18 +60,15 @@ export abstract class KeyAgentBase implements KeyAgent {
   async signTransaction({ body, hash }: TxInternals): Promise<Cardano.Signatures> {
     // Possible optimization is casting strings to OpaqueString types directly and skipping validation
     const blob = HexBlob(hash.toString());
-    const paymentVkeyWitness = await this.signBlob({ index: 0, type: KeyType.External }, blob);
-    const stakeWitnesses = await (async () => {
-      if (!body.certificates?.length) {
-        return [];
-      }
-      const { publicKey, signature } = await this.signBlob({ index: 0, type: KeyType.Stake }, blob);
-      return [[publicKey, signature] as const];
-    })();
-    return new Map<Cardano.Ed25519PublicKey, Cardano.Ed25519Signature>([
-      [paymentVkeyWitness.publicKey, paymentVkeyWitness.signature],
-      ...stakeWitnesses
-    ]);
+    const derivationPaths = ownSignatureKeyPaths(body, this.knownAddresses);
+    return new Map<Cardano.Ed25519PublicKey, Cardano.Ed25519Signature>(
+      await Promise.all(
+        derivationPaths.map(async ({ role, index }) => {
+          const { publicKey, signature } = await this.signBlob({ index, type: role }, blob);
+          return [publicKey, signature] as const;
+        })
+      )
+    );
   }
 
   protected async deriveCslPublicKey(derivationPath: AccountKeyDerivationPath): Promise<CSL.PublicKey> {
