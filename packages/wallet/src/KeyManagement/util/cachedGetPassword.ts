@@ -1,5 +1,5 @@
-import { GetPassword } from './types';
-import { Milliseconds } from '..';
+import { GetPassword } from '../types';
+import { Milliseconds } from '../../services';
 
 export const cachedGetPassword = (getPassword: () => Promise<Uint8Array>, cacheDuration: Milliseconds): GetPassword => {
   let cached: Promise<Uint8Array> | null;
