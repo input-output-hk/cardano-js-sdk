@@ -1,5 +1,11 @@
 import { InvalidStringError, ProviderError, ProviderFailure } from '@cardano-sdk/core';
-import { ResponsePoolParameters, createProvider, getExactlyOneObject, graphqlPoolParametersToCore } from '../src/util';
+import {
+  ResponsePoolParameters,
+  createProvider,
+  getExactlyOneObject,
+  graphqlPoolParametersToCore,
+  jsonSerializer
+} from '../src/util';
 
 describe('util', () => {
   describe('createProvider', () => {
@@ -95,6 +101,25 @@ describe('util', () => {
         relays: gqlPoolParameters.relays,
         rewardAccount: gqlPoolParameters.rewardAccount.address,
         vrf: gqlPoolParameters.vrf
+      });
+    });
+  });
+
+  describe('jsonSerializer', () => {
+    describe('parse', () => {
+      it('parses small numbers into "number"', () => {
+        expect(jsonSerializer.parse('1234')).toBe(1234);
+      });
+      it('parses small numbers into "bigint"', () => {
+        expect(jsonSerializer.parse('9007199254740992')).toBe(9_007_199_254_740_992n);
+      });
+    });
+    describe('stringify', () => {
+      it('serializes number', () => {
+        expect(jsonSerializer.stringify(1234)).toBe('1234');
+      });
+      it('serializes bigint', () => {
+        expect(jsonSerializer.stringify(9_007_199_254_740_992n)).toBe('9007199254740992');
       });
     });
   });

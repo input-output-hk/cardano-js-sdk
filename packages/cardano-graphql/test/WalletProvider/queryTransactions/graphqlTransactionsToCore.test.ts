@@ -78,7 +78,7 @@ describe('WalletProvider/queryTransactions/graphqlTransactionsToCore', () => {
     body: {
       certificates: undefined,
       collaterals: undefined,
-      fee: minimalGraphqlTx.fee,
+      fee: BigInt(minimalGraphqlTx.fee),
       inputs: [
         {
           address: Cardano.Address(minimalGraphqlTx.inputs[0].address.address),
@@ -91,7 +91,7 @@ describe('WalletProvider/queryTransactions/graphqlTransactionsToCore', () => {
         {
           address: Cardano.Address(minimalGraphqlTx.outputs[0].address.address),
           datum: Cardano.Hash32ByteBase16('6804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99cac'),
-          value: { assets: new Map(), coins: minimalGraphqlTx.outputs[0].value.coin }
+          value: { assets: new Map(), coins: BigInt(minimalGraphqlTx.outputs[0].value.coin) }
         }
       ],
       requiredExtraSignatures: undefined,

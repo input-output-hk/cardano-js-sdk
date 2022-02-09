@@ -31,23 +31,25 @@
     "test:debug": "DEBUG=true yarn test"
   },
   "devDependencies": {
-    "@graphql-codegen/cli": "^2.2.1",
-    "@graphql-codegen/typescript": "^2.2.4",
-    "@graphql-codegen/typescript-graphql-request": "^4.1.6",
-    "@graphql-codegen/typescript-operations": "^2.1.8",
-    "@graphql-tools/utils": "^8.4.0",
+    "@graphql-codegen/cli": "~2.5.0",
+    "@graphql-codegen/typescript": "~2.4.3",
+    "@graphql-codegen/typescript-graphql-request": "~4.3.4",
+    "@graphql-codegen/typescript-operations": "~2.2.4",
+    "@graphql-tools/utils": "~8.6.1",
     "npm-run-all": "^4.1.5",
     "shx": "^0.3.3"
   },
   "dependencies": {
-    "@cardano-graphql/client-ts": "^5.1.0-beta.1",
-    "@cardano-ogmios/client": "4.1.0",
-    "@cardano-sdk/core": " 0.2.0",
+    "@cardano-graphql/client-ts": "~6.1.0",
+    "@cardano-ogmios/client": "~5.1.0",
+    "@cardano-sdk/core": "0.2.0",
     "class-validator": "^0.13.1",
-    "graphql": "^15.6.1",
-    "graphql-request": "^3.5.0",
-    "reflect-metadata": "^0.1.13",
-    "type-graphql": "^1.1.1"
+    "graphql": "~15.6.1",
+    "graphql-request": "npm:graphql-request-configurable-serializer@4.0.0",
+    "graphql-tag": "2.12.5",
+    "json-bigint": "~1.0.0",
+    "reflect-metadata": "~0.1.13",
+    "type-graphql": "~1.1.1"
   },
   "files": [
     "dist/*",
