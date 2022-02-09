@@ -11,7 +11,7 @@ import {
   WalletProvider,
   coreToCsl
 } from '@cardano-sdk/core';
-import { Assets, InitializeTxResult } from '.';
+import { Assets, InitializeTxResult, KeyManagement } from '.';
 import {
   Balance,
   BehaviorObservable,
@@ -202,8 +202,14 @@ export class SingleAddressWallet implements Wallet {
     });
     return { body, hash, inputSelection };
   }
-  async finalizeTx(tx: TxInternals, auxiliaryData?: Cardano.AuxiliaryData): Promise<Cardano.NewTxAlonzo> {
-    const signatures = await this.#keyAgent.signTransaction(tx);
+  async finalizeTx(
+    tx: TxInternals,
+    auxiliaryData?: Cardano.AuxiliaryData,
+    stubSign = false
+  ): Promise<Cardano.NewTxAlonzo> {
+    const signatures = stubSign
+      ? KeyManagement.util.stubSignTransaction(tx.body, this.#keyAgent.knownAddresses)
+      : await this.#keyAgent.signTransaction(tx);
     return {
       auxiliaryData,
       body: tx.body,
@@ -256,7 +262,8 @@ export class SingleAddressWallet implements Wallet {
                 validityInterval,
                 withdrawals: props.withdrawals
               });
-              return coreToCsl.tx(await this.finalizeTx(txInternals));
+              // TODO: add auxiliaryData support
+              return coreToCsl.tx(await this.finalizeTx(txInternals, undefined, true));
             },
             protocolParameters
           });

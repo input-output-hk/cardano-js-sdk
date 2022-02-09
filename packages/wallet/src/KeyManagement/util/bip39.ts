@@ -13,5 +13,3 @@ export const mnemonicWordsToEntropy = (mnenonic: string[]) => bip39.mnemonicToEn
  * A wrapper around the bip39 package function
  */
 export const validateMnemonic = bip39.validateMnemonic;
-
-export const harden = (num: number): number => 0x80_00_00_00 + num;

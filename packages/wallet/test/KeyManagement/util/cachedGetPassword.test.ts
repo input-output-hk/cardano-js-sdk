@@ -1,4 +1,4 @@
-import { KeyManagement } from '../../src';
+import { KeyManagement } from '../../../src';
 
 jest.useFakeTimers();
 
@@ -13,7 +13,7 @@ describe('cachedGetPassword', () => {
     getPassword = jest
       .fn()
       .mockImplementation(() => new Promise((resolve) => setTimeout(() => resolve(password), getPasswordDuration)));
-    cachedGetPassword = KeyManagement.cachedGetPassword(getPassword, cacheDuration);
+    cachedGetPassword = KeyManagement.util.cachedGetPassword(getPassword, cacheDuration);
   });
 
   it('caches password for specified duration"', async () => {

@@ -10,11 +10,13 @@ import {
 } from './types';
 import { CSL, Cardano } from '@cardano-sdk/core';
 import { TxInternals } from '../Transaction';
+import { ownSignatureKeyPaths } from './util';
 
 export abstract class KeyAgentBase implements KeyAgent {
   abstract get networkId(): Cardano.NetworkId;
   abstract get accountIndex(): number;
   abstract get serializableData(): SerializableKeyAgentData;
+  abstract get knownAddresses(): GroupedAddress[];
   abstract getExtendedAccountPublicKey(): Promise<Cardano.Bip32PublicKey>;
   abstract signBlob(derivationPath: AccountKeyDerivationPath, blob: HexBlob): Promise<SignBlobResult>;
   abstract derivePublicKey(derivationPath: AccountKeyDerivationPath): Promise<Cardano.Ed25519PublicKey>;
@@ -43,7 +45,7 @@ export abstract class KeyAgentBase implements KeyAgent {
     ).to_address();
 
     const rewardAccount = CSL.RewardAddress.new(this.networkId, stakeKeyCredential).to_address();
-    return {
+    const groupedAddress = {
       accountIndex: this.accountIndex,
       address: Cardano.Address(address.to_bech32()),
       index,
@@ -51,23 +53,22 @@ export abstract class KeyAgentBase implements KeyAgent {
       rewardAccount: Cardano.RewardAccount(rewardAccount.to_bech32()),
       type
     };
+    this.knownAddresses.push(groupedAddress);
+    return groupedAddress;
   }
 
   async signTransaction({ body, hash }: TxInternals): Promise<Cardano.Signatures> {
     // Possible optimization is casting strings to OpaqueString types directly and skipping validation
     const blob = HexBlob(hash.toString());
-    const paymentVkeyWitness = await this.signBlob({ index: 0, type: KeyType.External }, blob);
-    const stakeWitnesses = await (async () => {
-      if (!body.certificates?.length) {
-        return [];
-      }
-      const { publicKey, signature } = await this.signBlob({ index: 0, type: KeyType.Stake }, blob);
-      return [[publicKey, signature] as const];
-    })();
-    return new Map<Cardano.Ed25519PublicKey, Cardano.Ed25519Signature>([
-      [paymentVkeyWitness.publicKey, paymentVkeyWitness.signature],
-      ...stakeWitnesses
-    ]);
+    const derivationPaths = ownSignatureKeyPaths(body, this.knownAddresses);
+    return new Map<Cardano.Ed25519PublicKey, Cardano.Ed25519Signature>(
+      await Promise.all(
+        derivationPaths.map(async ({ role, index }) => {
+          const { publicKey, signature } = await this.signBlob({ index, type: role }, blob);
+          return [publicKey, signature] as const;
+        })
+      )
+    );
   }
 
   protected async deriveCslPublicKey(derivationPath: AccountKeyDerivationPath): Promise<CSL.PublicKey> {

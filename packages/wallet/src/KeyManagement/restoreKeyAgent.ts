@@ -42,6 +42,7 @@ export async function restoreKeyAgent<T extends SerializableKeyAgentData>(
         accountIndex: data.accountIndex,
         encryptedRootPrivateKey: new Uint8Array(data.encryptedRootPrivateKeyBytes),
         getPassword,
+        knownAddresses: data.knownAddresses,
         networkId: data.networkId
       });
     }

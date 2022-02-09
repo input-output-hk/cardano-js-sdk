@@ -2,6 +2,7 @@ import * as errors from './errors';
 import {
   AccountKeyDerivationPath,
   GetPassword,
+  GroupedAddress,
   HexBlob,
   KeyAgentType,
   SerializableKeyAgentData,
@@ -16,6 +17,7 @@ import { harden, joinMnemonicWords, mnemonicWordsToEntropy, validateMnemonic } f
 export interface InMemoryKeyAgentProps {
   networkId: Cardano.NetworkId;
   accountIndex: number;
+  knownAddresses: GroupedAddress[];
   encryptedRootPrivateKey: Uint8Array;
   getPassword: GetPassword;
 }
@@ -41,17 +43,29 @@ export class InMemoryKeyAgent extends KeyAgentBase {
   readonly #accountIndex: number;
   readonly #encryptedRootPrivateKey: Uint8Array;
   readonly #getPassword: GetPassword;
+  readonly #knownAddresses: GroupedAddress[];
 
-  constructor({ networkId, accountIndex, encryptedRootPrivateKey, getPassword }: InMemoryKeyAgentProps) {
+  constructor({
+    networkId,
+    accountIndex,
+    encryptedRootPrivateKey,
+    getPassword,
+    knownAddresses
+  }: InMemoryKeyAgentProps) {
     super();
     this.#accountIndex = accountIndex;
     this.#networkId = networkId;
     this.#encryptedRootPrivateKey = encryptedRootPrivateKey;
     this.#getPassword = getPassword;
+    this.#knownAddresses = knownAddresses;
   }
 
   get __typename(): KeyAgentType {
     return KeyAgentType.InMemory;
+  }
+
+  get knownAddresses(): GroupedAddress[] {
+    return this.#knownAddresses;
   }
 
   get serializableData(): SerializableKeyAgentData {
@@ -59,6 +73,7 @@ export class InMemoryKeyAgent extends KeyAgentBase {
       __typename: KeyAgentType.InMemory,
       accountIndex: this.#accountIndex,
       encryptedRootPrivateKeyBytes: [...this.#encryptedRootPrivateKey],
+      knownAddresses: this.#knownAddresses,
       networkId: this.networkId
     };
   }
@@ -119,6 +134,7 @@ export class InMemoryKeyAgent extends KeyAgentBase {
       accountIndex,
       encryptedRootPrivateKey,
       getPassword,
+      knownAddresses: [],
       networkId
     });
   }

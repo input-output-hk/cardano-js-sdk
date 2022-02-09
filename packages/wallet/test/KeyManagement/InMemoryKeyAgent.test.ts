@@ -52,6 +52,7 @@ describe('InMemoryKeyAgent', () => {
       expect(typeof serializableData.__typename).toBe('string');
       expect(typeof serializableData.accountIndex).toBe('number');
       expect(typeof serializableData.networkId).toBe('number');
+      expect(Array.isArray(serializableData.knownAddresses)).toBe(true);
       expect(serializableData.encryptedRootPrivateKeyBytes.length > 0).toBe(true);
     });
 
@@ -107,17 +108,6 @@ describe('InMemoryKeyAgent', () => {
     expect(getPassword).toBeCalledWith(true);
   });
 
-  test('signTransaction', async () => {
-    const witnessSet = await keyAgent.signTransaction({
-      body: {
-        certificates: [{ __typename: Cardano.CertificateType.StakeKeyRegistration }]
-      } as unknown as Cardano.TxBodyAlonzo,
-      hash: Cardano.TransactionId('8561258e210352fba2ac0488afed67b3427a27ccf1d41ec030c98a8199bc22ec')
-    });
-    expect(witnessSet.size).toBe(2);
-    expect(typeof [...witnessSet.values()][0]).toBe('string');
-  });
-
   describe('yoroi compatibility', () => {
     const yoroiMnemonic = [
       'glide',
@@ -148,6 +138,7 @@ describe('InMemoryKeyAgent', () => {
         accountIndex: 0,
         encryptedRootPrivateKey: Buffer.from(yoroiEncryptedRootPrivateKeyHex, 'hex'),
         getPassword,
+        knownAddresses: [],
         networkId: Cardano.NetworkId.testnet
       });
       const exportedPrivateKeyHex = await keyAgentFromEncryptedKey.exportRootPrivateKey();
@@ -203,6 +194,7 @@ describe('InMemoryKeyAgent', () => {
         accountIndex: 0,
         encryptedRootPrivateKey: Buffer.from(daedelusEncryptedRootPrivateKeyHex, 'hex'),
         getPassword: jest.fn().mockResolvedValue(Buffer.from('nMmys*X002')), // daedelus enforces min length of 10
+        knownAddresses: [],
         networkId: Cardano.NetworkId.testnet
       });
       const derivedAddress = await keyAgentFromEncryptedKey.deriveAddress({
