@@ -1,18 +1,25 @@
+/* eslint-disable unicorn/no-nested-ternary */
 import { Asset, AssetProvider, Cardano, ProviderUtil, util } from '@cardano-sdk/core';
 import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
 import { Options } from '@blockfrost/blockfrost-js/lib/types';
 import { fetchSequentially, toProviderError } from './util';
+import { omit } from 'lodash-es';
 
 const mapMetadata = (
   onChain: Responses['asset']['onchain_metadata'],
   offChain: Responses['asset']['metadata']
-): Cardano.AssetMetadata => {
+): Cardano.TokenMetadata => {
   const metadata = { ...onChain, ...offChain };
   return {
-    ...util.replaceNullsWithUndefineds(metadata),
+    ...util.replaceNullsWithUndefineds(omit(metadata, ['logo', 'image'])),
     desc: metadata.description,
     // The other type option is any[] - not sure what it means, omitting if no string.
-    image: typeof metadata.image === 'string' ? metadata.image : undefined
+    icon:
+      typeof metadata.logo === 'string'
+        ? metadata.logo
+        : typeof metadata.image === 'string'
+        ? metadata.image
+        : undefined
   };
 };
 

@@ -42,13 +42,25 @@ export const PolicyId = (value: string): PolicyId => Hash28ByteBase16(value);
 export type AssetFingerprint = OpaqueString<'AssetFingerprint'>;
 export const AssetFingerprint = (value: string): AssetFingerprint => typedBech32(value, 'asset', 32);
 
+export interface TokenMetadataSizedIcon {
+  /**
+   * Most likely one of 16, 32, 64, 96, 128
+   * icons are assumed to be square
+   */
+  size: number;
+  /**
+   * MUST be either https, ipfs, or data.  icon MUST be a browser supported image format.
+   */
+  icon: string;
+}
+
 /**
  * Either on-chain or off-chain asset metadata
  *
- * CIP-0031
+ * CIP-0035
  * https://github.com/cardano-foundation/CIPs/pull/137
  */
-export interface AssetMetadata {
+export interface TokenMetadata {
   /**
    * Asset name
    */
@@ -58,17 +70,13 @@ export interface AssetMetadata {
    */
   ticker?: string;
   /**
-   * MUST be either https, ipfs, or data.  logo MUST be a browser supported image format.
-   */
-  logo?: string;
-  /**
-   * MUST be either https, ipfs, or data.  logo MUST be a browser supported image format.
+   * MUST be either https, ipfs, or data.  icon MUST be a browser supported image format.
    */
   icon?: string;
   /**
-   * MUST be either https, ipfs, or data.  logo MUST be a browser supported image format.
+   * allows teams to provide icon in different sizes
    */
-  image?: string;
+  sizedIcons?: TokenMetadataSizedIcon[];
   /**
    * https only url that refers to metadata stored offchain.
    * The URL SHOULD use the project domain and
@@ -92,10 +100,6 @@ export interface AssetMetadata {
    * when not specified, version will default to `1.0`
    */
   version?: '1.0';
-  /**
-   * Possibly: 'logo-[size]' or 'icon-[size]' where size is one of 16, 32, 64, 96, 128
-   */
-  [key: string]: unknown;
 }
 
 export interface AssetMintOrBurn {
@@ -117,5 +121,8 @@ export interface Asset {
    * Sorted by slot
    */
   history: AssetMintOrBurn[];
-  metadata?: AssetMetadata;
+  /**
+   * CIP-0035
+   */
+  metadata?: TokenMetadata;
 }
