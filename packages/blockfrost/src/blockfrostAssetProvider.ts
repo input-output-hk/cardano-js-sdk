@@ -60,10 +60,10 @@ export const blockfrostAssetProvider = (options: Options): AssetProvider => {
               }
             ]
           : await getAssetHistory(assetId),
-      metadata: mapMetadata(response.onchain_metadata, response.metadata),
       name,
       policyId: Cardano.PolicyId(response.policy_id),
-      quantity
+      quantity,
+      tokenMetadata: mapMetadata(response.onchain_metadata, response.metadata)
     };
   };
 

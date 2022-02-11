@@ -24,7 +24,7 @@ export interface AssetInfo {
   /**
    * CIP-0035
    */
-  metadata?: TokenMetadata;
+  tokenMetadata?: TokenMetadata;
   /**
    * CIP-0025
    */
