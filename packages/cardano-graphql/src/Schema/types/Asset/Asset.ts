@@ -1,5 +1,5 @@
 import { Asset as AssetTypes, Cardano } from '@cardano-sdk/core';
-import { Directive, Field, Int, ObjectType } from 'type-graphql';
+import { Directive, Field, ObjectType } from 'type-graphql';
 import { Int64 } from '../util';
 import { NftMetadata } from './NftMetadata';
 import { Policy } from './Policy';
@@ -17,6 +17,7 @@ export class AssetMintOrBurn {
 @ObjectType()
 export class Asset {
   @Directive('@id')
+  @Directive('@search(by: [exact])')
   @Field(() => String, { description: 'concatenated PolicyId and AssetName, hex-encoded' })
   assetId: Cardano.AssetId;
   @Field(() => String, { description: 'hex-encoded' })
@@ -25,8 +26,6 @@ export class Asset {
   assetNameUTF8: string;
   @Field(() => Policy)
   policy: Policy;
-  @Field(() => Int)
-  decimals: number;
   // this value could be easily computed from history,
   // but is probably good to have for performance reasons:
   // there can be A LOT of mints/burns for an asset,

@@ -357,7 +357,6 @@ export type AddAssetInput = {
   /** hex-encoded */
   assetName: Scalars['String'];
   assetNameUTF8: Scalars['String'];
-  decimals: Scalars['Int'];
   /** Fingerprint of a native asset for human comparison. CIP-0014 */
   fingerprint: Scalars['String'];
   history: Array<AssetMintOrBurnRef>;
@@ -2053,7 +2052,6 @@ export type Asset = {
   /** hex-encoded */
   assetName: Scalars['String'];
   assetNameUTF8: Scalars['String'];
-  decimals: Scalars['Int'];
   /** Fingerprint of a native asset for human comparison. CIP-0014 */
   fingerprint: Scalars['String'];
   history: Array<AssetMintOrBurn>;
@@ -2103,10 +2101,6 @@ export type AssetAggregateResult = {
   assetNameUTF8Max?: Maybe<Scalars['String']>;
   assetNameUTF8Min?: Maybe<Scalars['String']>;
   count?: Maybe<Scalars['Int']>;
-  decimalsAvg?: Maybe<Scalars['Float']>;
-  decimalsMax?: Maybe<Scalars['Int']>;
-  decimalsMin?: Maybe<Scalars['Int']>;
-  decimalsSum?: Maybe<Scalars['Int']>;
   fingerprintMax?: Maybe<Scalars['String']>;
   fingerprintMin?: Maybe<Scalars['String']>;
   totalQuantityAvg?: Maybe<Scalars['Float']>;
@@ -2117,7 +2111,7 @@ export type AssetAggregateResult = {
 
 export type AssetFilter = {
   and?: InputMaybe<Array<InputMaybe<AssetFilter>>>;
-  assetId?: InputMaybe<StringHashFilter>;
+  assetId?: InputMaybe<StringExactFilter>;
   has?: InputMaybe<Array<InputMaybe<AssetHasFilter>>>;
   not?: InputMaybe<AssetFilter>;
   or?: InputMaybe<Array<InputMaybe<AssetFilter>>>;
@@ -2127,7 +2121,6 @@ export enum AssetHasFilter {
   AssetId = 'assetId',
   AssetName = 'assetName',
   AssetNameUtf8 = 'assetNameUTF8',
-  Decimals = 'decimals',
   Fingerprint = 'fingerprint',
   History = 'history',
   NftMetadata = 'nftMetadata',
@@ -2198,7 +2191,6 @@ export enum AssetOrderable {
   AssetId = 'assetId',
   AssetName = 'assetName',
   AssetNameUtf8 = 'assetNameUTF8',
-  Decimals = 'decimals',
   Fingerprint = 'fingerprint',
   TotalQuantity = 'totalQuantity'
 }
@@ -2207,7 +2199,6 @@ export type AssetPatch = {
   /** hex-encoded */
   assetName?: InputMaybe<Scalars['String']>;
   assetNameUTF8?: InputMaybe<Scalars['String']>;
-  decimals?: InputMaybe<Scalars['Int']>;
   /** Fingerprint of a native asset for human comparison. CIP-0014 */
   fingerprint?: InputMaybe<Scalars['String']>;
   history?: InputMaybe<Array<AssetMintOrBurnRef>>;
@@ -2223,7 +2214,6 @@ export type AssetRef = {
   /** hex-encoded */
   assetName?: InputMaybe<Scalars['String']>;
   assetNameUTF8?: InputMaybe<Scalars['String']>;
-  decimals?: InputMaybe<Scalars['Int']>;
   /** Fingerprint of a native asset for human comparison. CIP-0014 */
   fingerprint?: InputMaybe<Scalars['String']>;
   history?: InputMaybe<Array<AssetMintOrBurnRef>>;
@@ -13454,6 +13444,13 @@ export type WitnessScriptRef = {
   witness?: InputMaybe<WitnessRef>;
 };
 
+export type AssetQueryVariables = Exact<{
+  assetId: Scalars['String'];
+}>;
+
+
+export type AssetQuery = { __typename?: 'Query', queryAsset?: Array<{ __typename?: 'Asset', assetName: string, totalQuantity: number | bigint, fingerprint: string, policy: { __typename?: 'Policy', id: string }, history: Array<{ __typename?: 'AssetMintOrBurn', quantity: number | bigint, transaction: { __typename?: 'Transaction', hash: string } }>, tokenMetadata?: { __typename?: 'TokenMetadata', name: string, ticker?: string | null, icon?: string | null, url?: string | null, desc?: string | null, decimals?: number | null, ref?: string | null, version?: string | null, sizedIcons: Array<{ __typename?: 'TokenMetadataSizedIcon', size: number, icon: string }> } | null, nftMetadata?: { __typename?: 'NftMetadata', name: string, images: Array<string>, version: string, mediaType?: string | null, descriptions: Array<string>, files: Array<{ __typename?: 'NftMetadataFile', name: string, mediaType: string, src: Array<string> }> } | null } | null> | null };
+
 export type BlocksByHashesQueryVariables = Exact<{
   hashes: Array<Scalars['String']> | Scalars['String'];
 }>;
@@ -13971,6 +13968,50 @@ ${AnyScriptFragmentDoc}
 ${MetadatumValueFragmentDoc}
 ${MetadatumArrayFragmentDoc}
 ${MetadatumMapFragmentDoc}`;
+export const AssetDocument = gql`
+    query Asset($assetId: String!) {
+  queryAsset(filter: {assetId: {eq: $assetId}}, first: 1) {
+    assetName
+    policy {
+      id
+    }
+    history {
+      quantity
+      transaction {
+        hash
+      }
+    }
+    totalQuantity
+    fingerprint
+    tokenMetadata {
+      name
+      ticker
+      icon
+      url
+      desc
+      decimals
+      ref
+      version
+      sizedIcons {
+        size
+        icon
+      }
+    }
+    nftMetadata {
+      name
+      images
+      version
+      mediaType
+      files {
+        name
+        mediaType
+        src
+      }
+      descriptions
+    }
+  }
+}
+    `;
 export const BlocksByHashesDocument = gql`
     query BlocksByHashes($hashes: [String!]!) {
   queryBlock(filter: {hash: {in: $hashes}}) {
@@ -14166,6 +14207,9 @@ const defaultWrapper: SdkFunctionWrapper = (action, _operationName) => action();
 
 export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = defaultWrapper) {
   return {
+    Asset(variables: AssetQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<AssetQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<AssetQuery>(AssetDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'Asset');
+    },
     BlocksByHashes(variables: BlocksByHashesQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<BlocksByHashesQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<BlocksByHashesQuery>(BlocksByHashesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'BlocksByHashes');
     },

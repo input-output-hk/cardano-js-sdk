@@ -1,0 +1,42 @@
+query Asset($assetId: String!) {
+  queryAsset(filter: { assetId: { eq: $assetId } }, first: 1) {
+    assetName
+    policy {
+      id
+    }
+    history {
+      quantity
+      transaction {
+        hash
+      }
+    }
+    totalQuantity
+    fingerprint
+    tokenMetadata {
+      name
+      ticker
+      icon
+      url
+      desc
+      decimals
+      ref
+      version
+      sizedIcons {
+        size
+        icon
+      }
+    }
+    nftMetadata {
+      name
+      images
+      version
+      mediaType
+      files {
+        name
+        mediaType
+        src
+      }
+      descriptions
+    }
+  }
+}
