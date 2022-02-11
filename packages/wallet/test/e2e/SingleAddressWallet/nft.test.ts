@@ -1,9 +1,10 @@
+/* eslint-disable sonarjs/no-duplicate-string */
 import { Cardano } from '@cardano-sdk/core';
 import { KeyManagement, SingleAddressWallet, Wallet } from '../../../src';
 import { assetProvider, keyAgentReady, stakePoolSearchProvider, timeSettingsProvider, walletProvider } from '../config';
 import { combineLatest, filter, firstValueFrom, map } from 'rxjs';
 
-describe('SingleAddressWallet/delegation', () => {
+describe('SingleAddressWallet.assets / nft', () => {
   let wallet: Wallet;
 
   beforeAll(async () => {
@@ -52,19 +53,19 @@ describe('SingleAddressWallet/delegation', () => {
           transactionId: 'a7dbd1e9990a4bb9b3247e8ebc0e49e78f5b5a797d822fdf6918f31946c2eb32'
         }
       ],
-      metadata: { desc: undefined, image: 'ipfs://some_hash1', name: 'One' },
       name: '4e4654303031',
       nftMetadata: {
         description: undefined,
         files: undefined,
-        image: 'ipfs://some_hash1',
+        image: ['ipfs://some_hash1'],
         mediaType: undefined,
         name: 'One',
         otherProperties: undefined,
         version: '1.0'
       },
       policyId: 'd1ac67dcebc491ce17635d3d9c8775eb739325ce522f6eac733489aa',
-      quantity: 1n
+      quantity: 1n,
+      tokenMetadata: { desc: undefined, icon: 'ipfs://some_hash1', name: 'One' }
     });
     expect(nfts.find((nft) => nft.nftMetadata!.name === 'Two')).toBeDefined();
   });
@@ -76,7 +77,6 @@ describe('SingleAddressWallet/delegation', () => {
         map(([assets]) => [...assets.values()].filter((asset) => !!asset.nftMetadata))
       )
     );
-    // eslint-disable-next-line sonarjs/no-duplicate-string
     expect(nfts.find((nft) => nft.nftMetadata!.name === 'NFT with files')).toEqual({
       assetId: 'e80c05f27dec74e8c04f27bdf711dff8ae03167dda9b7760b7d92cef4e46542d66696c6573',
       fingerprint: 'asset16w7fcptllh5qfgux8hmp3wymne7xh5y65vxueh',
@@ -86,38 +86,14 @@ describe('SingleAddressWallet/delegation', () => {
           transactionId: '1841f9ff952c5ffa13a19e32e78c1dac78fecd7083965d97558ede340ecfb8f9'
         }
       ],
-      metadata: {
-        // eslint-disable-next-line sonarjs/no-duplicate-string
-        desc: 'NFT with different types of files',
-        // eslint-disable-next-line sonarjs/no-duplicate-string
-        description: 'NFT with different types of files',
-        files: [
-          {
-            mediaType: 'video/mp4',
-            name: 'some name',
-            otherProperties: undefined,
-            src: 'file://some_video_file'
-          },
-          {
-            mediaType: 'audio/mpeg',
-            name: 'some name',
-            otherProperties: undefined,
-            src: ['file://some_audio_file', 'file://another_audio_file']
-          }
-        ],
-        id: '1',
-        image: 'ipfs://somehash',
-        mediaType: 'image/png',
-        name: 'NFT with files'
-      },
       name: '4e46542d66696c6573',
       nftMetadata: {
-        description: 'NFT with different types of files',
+        description: ['NFT with different types of files'],
         files: [
           {
             mediaType: 'video/mp4',
             name: 'some name',
-            src: 'file://some_video_file'
+            src: ['file://some_video_file']
           },
           {
             mediaType: 'audio/mpeg',
@@ -125,14 +101,36 @@ describe('SingleAddressWallet/delegation', () => {
             src: ['file://some_audio_file', 'file://another_audio_file']
           }
         ],
-        image: 'ipfs://somehash',
+        image: ['ipfs://somehash'],
         mediaType: 'image/png',
         name: 'NFT with files',
         otherProperties: { id: '1' },
         version: '1.0'
       },
       policyId: 'e80c05f27dec74e8c04f27bdf711dff8ae03167dda9b7760b7d92cef',
-      quantity: 1n
+      quantity: 1n,
+      tokenMetadata: {
+        desc: 'NFT with different types of files',
+        description: 'NFT with different types of files',
+        files: [
+          {
+            mediaType: 'video/mp4',
+            name: 'some name',
+            otherProperties: undefined,
+            src: 'file://some_video_file'
+          },
+          {
+            mediaType: 'audio/mpeg',
+            name: 'some name',
+            otherProperties: undefined,
+            src: ['file://some_audio_file', 'file://another_audio_file']
+          }
+        ],
+        icon: 'ipfs://somehash',
+        id: '1',
+        mediaType: 'image/png',
+        name: 'NFT with files'
+      }
     });
   });
 });
