@@ -1,7 +1,6 @@
+import { Asset, Cardano, NetworkInfo, ProtocolParametersRequiredByWallet, TimeSettings } from '@cardano-sdk/core';
 import { Balance, BehaviorObservable, DelegationTracker, TransactionalTracker, TransactionsTracker } from './services';
-import { Cardano, NetworkInfo, ProtocolParametersRequiredByWallet, TimeSettings } from '@cardano-sdk/core';
 import { GroupedAddress } from './KeyManagement';
-import { NftMetadata } from './NftMetadata';
 import { SelectionSkeleton } from '@cardano-sdk/cip2';
 import { TxInternals } from './Transaction';
 
@@ -18,11 +17,11 @@ export interface FinalizeTxProps {
   readonly body: Cardano.TxBodyAlonzo;
 }
 
-export type Asset = Cardano.Asset & {
-  nftMetadata?: NftMetadata;
+export type AssetWithNftMetadata = Cardano.Asset & {
+  nftMetadata?: Asset.NftMetadata;
 };
 
-export type Assets = Map<Cardano.AssetId, Asset>;
+export type Assets = Map<Cardano.AssetId, AssetWithNftMetadata>;
 
 export interface MinimumCoinQuantity {
   minimumCoin: Cardano.Lovelace;

@@ -1,5 +1,5 @@
-import { AssetId } from '../../src/Cardano';
-import { createAssetId, parseAssetId } from '../../src/Asset/util';
+import { AssetId } from '../../../src/Cardano';
+import { createAssetId, parseAssetId } from '../../../src/Asset/util';
 
 describe('Asset', () => {
   describe('util', () => {

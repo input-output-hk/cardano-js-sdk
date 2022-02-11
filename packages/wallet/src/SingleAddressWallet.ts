@@ -27,6 +27,7 @@ import {
   createAssetsTracker,
   createBalanceTracker,
   createDelegationTracker,
+  createNftMetadataProvider,
   createTransactionsTracker,
   createUtxoTracker,
   distinctBlock,
@@ -43,7 +44,6 @@ import { Logger, dummyLogger } from 'ts-log';
 import { Observable, Subject, combineLatest, firstValueFrom, lastValueFrom, map, take } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TxInternals, createTransactionInternals, ensureValidityInterval } from './Transaction';
-import { createNftMetadataProvider } from './NftMetadata';
 import { isEqual } from 'lodash-es';
 
 export interface SingleAddressWalletProps {

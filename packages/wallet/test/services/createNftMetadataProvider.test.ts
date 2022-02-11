@@ -1,10 +1,14 @@
 import { Cardano } from '@cardano-sdk/core';
 import { WalletProvider } from '@cardano-sdk/blockfrost';
-import { createNftMetadataProvider } from '../../src/NftMetadata';
+import { createNftMetadataProvider } from '../../src/services';
 import { of } from 'rxjs';
 
-jest.mock('../../src/NftMetadata/metadatumToCip25');
-const { metadatumToCip25 } = jest.requireMock('../../src/NftMetadata/metadatumToCip25');
+jest.mock('@cardano-sdk/core');
+const {
+  Asset: {
+    util: { metadatumToCip25 }
+  }
+} = jest.requireMock('@cardano-sdk/core');
 
 describe('NftMetadata/createNftMetadataProvider', () => {
   const metadatum = { some: 'metadatum' };

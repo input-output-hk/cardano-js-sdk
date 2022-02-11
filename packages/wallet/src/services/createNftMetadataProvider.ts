@@ -1,8 +1,6 @@
-import { Cardano, WalletProvider } from '@cardano-sdk/core';
-import { NftMetadataProvider } from './types';
+import { Asset, Cardano, NftMetadataProvider, WalletProvider } from '@cardano-sdk/core';
 import { Observable, firstValueFrom, from, map, mergeMap, of, take } from 'rxjs';
 import { last } from 'lodash-es';
-import { metadatumToCip25 } from './metadatumToCip25';
 
 export const createNftMetadataProvider =
   (walletProvider: WalletProvider, transactions$: Observable<Cardano.TxAlonzo[]>): NftMetadataProvider =>
@@ -16,7 +14,7 @@ export const createNftMetadataProvider =
           // Use local transaction if available, otherwise fetch from WalletProvider
           localTx ? of(localTx) : from(walletProvider.queryTransactionsByHashes([latestMintTxId]).then(([tx]) => tx))
         ),
-        map(({ auxiliaryData }) => metadatumToCip25(asset, auxiliaryData?.body.blob))
+        map(({ auxiliaryData }) => Asset.util.metadatumToCip25(asset, auxiliaryData?.body.blob))
       )
     );
   };

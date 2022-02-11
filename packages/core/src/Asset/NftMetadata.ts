@@ -1,7 +1,8 @@
 /* eslint-disable wrap-regex */
-import { Cardano, InvalidStringError } from '@cardano-sdk/core';
+import { InvalidStringError } from '../errors';
+import { Metadatum, util } from '../Cardano';
 
-export type Uri = Cardano.util.OpaqueString<'Uri'>;
+export type Uri = util.OpaqueString<'Uri'>;
 export const Uri = (uri: string) => {
   if (/^[a-z]+:\/\/.+/.test(uri)) {
     return uri as unknown as Uri;
@@ -11,7 +12,7 @@ export const Uri = (uri: string) => {
   );
 };
 
-export type ImageMediaType = Cardano.util.OpaqueString<'ImageMediaType'>;
+export type ImageMediaType = util.OpaqueString<'ImageMediaType'>;
 export const ImageMediaType = (mediaType: string) => {
   if (/^image\/.+$/.test(mediaType)) {
     return mediaType as unknown as ImageMediaType;
@@ -19,7 +20,7 @@ export const ImageMediaType = (mediaType: string) => {
   throw new InvalidStringError('Expected media type to be "image/*"');
 };
 
-export type MediaType = Cardano.util.OpaqueString<'MediaType'>;
+export type MediaType = util.OpaqueString<'MediaType'>;
 export const MediaType = (mediaType: string) => {
   if (/^[a-z]+\/.+$/.test(mediaType)) {
     return mediaType as unknown as MediaType;
@@ -35,7 +36,7 @@ export interface NftMetadataFile {
   mediaType: MediaType;
   src: Uri | Uri[];
   otherProperties?: {
-    [key: string]: Cardano.Metadatum | undefined;
+    [key: string]: Metadatum | undefined;
   };
 }
 
@@ -50,10 +51,6 @@ export interface NftMetadata {
   files?: NftMetadataFile[];
   description?: string | string[];
   otherProperties?: {
-    [key: string]: Cardano.Metadatum | undefined;
+    [key: string]: Metadatum | undefined;
   };
-}
-
-export interface NftMetadataProvider {
-  (asset: Cardano.Asset): Promise<NftMetadata | undefined>;
 }
