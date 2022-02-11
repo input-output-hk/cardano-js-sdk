@@ -1,10 +1,19 @@
 import { Asset, Cardano, NftMetadataProvider, WalletProvider } from '@cardano-sdk/core';
 import { Observable, firstValueFrom, from, map, mergeMap, of, take } from 'rxjs';
+import { dummyLogger } from 'ts-log';
 import { last } from 'lodash-es';
 
 export const createNftMetadataProvider =
-  (walletProvider: WalletProvider, transactions$: Observable<Cardano.TxAlonzo[]>): NftMetadataProvider =>
-  (asset) => {
+  (
+    walletProvider: WalletProvider,
+    transactions$: Observable<Cardano.TxAlonzo[]>,
+    logger = dummyLogger
+  ): NftMetadataProvider =>
+  async (asset) => {
+    if (!asset.history) {
+      logger.warn("Can't query asset metadata: no asset.history loaded", asset);
+      return;
+    }
     const latestMintTxId = last(asset.history.filter(({ quantity }) => quantity > 0))!.transactionId;
     return firstValueFrom(
       transactions$.pipe(

@@ -1,4 +1,4 @@
-import { Cardano } from '@cardano-sdk/core';
+import { Asset as AssetTypes, Cardano } from '@cardano-sdk/core';
 import { Directive, Field, Int, ObjectType } from 'type-graphql';
 import { Int64 } from '../util';
 import { NftMetadata } from './NftMetadata';
@@ -36,10 +36,10 @@ export class Asset {
   @Field(() => String, { description: 'Fingerprint of a native asset for human comparison. CIP-0014' })
   fingerprint: Cardano.AssetFingerprint;
   @Field(() => [AssetMintOrBurn])
-  history: Cardano.AssetMintOrBurn[];
+  history: AssetTypes.AssetMintOrBurn[];
   @Directive('@hasInverse(field: asset)')
   @Field(() => TokenMetadata, { description: 'CIP-0035', nullable: true })
-  tokenMetadata?: Cardano.TokenMetadata;
+  tokenMetadata?: AssetTypes.TokenMetadata;
   @Directive('@hasInverse(field: asset)')
   @Field(() => NftMetadata, { description: 'CIP-0025', nullable: true })
   nftMetadata?: NftMetadata;

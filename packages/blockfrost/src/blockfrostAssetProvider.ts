@@ -8,7 +8,7 @@ import { omit } from 'lodash-es';
 const mapMetadata = (
   onChain: Responses['asset']['onchain_metadata'],
   offChain: Responses['asset']['metadata']
-): Cardano.TokenMetadata => {
+): Asset.TokenMetadata => {
   const metadata = { ...onChain, ...offChain };
   return {
     ...util.replaceNullsWithUndefineds(omit(metadata, ['logo', 'image'])),
@@ -33,11 +33,11 @@ const mapMetadata = (
 export const blockfrostAssetProvider = (options: Options): AssetProvider => {
   const blockfrost = new BlockFrostAPI(options);
 
-  const getAssetHistory = async (assetId: Cardano.AssetId): Promise<Cardano.AssetMintOrBurn[]> =>
+  const getAssetHistory = async (assetId: Cardano.AssetId): Promise<Asset.AssetMintOrBurn[]> =>
     fetchSequentially({
       arg: assetId.toString(),
       request: blockfrost.assetsHistory.bind<BlockFrostAPI['assetsHistory']>(blockfrost),
-      responseTranslator: (response): Cardano.AssetMintOrBurn[] =>
+      responseTranslator: (response): Asset.AssetMintOrBurn[] =>
         response.map(({ action, amount, tx_hash }) => ({
           quantity: BigInt(amount) * (action === 'minted' ? 1n : -1n),
           transactionId: Cardano.TransactionId(tx_hash)

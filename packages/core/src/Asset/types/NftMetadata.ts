@@ -1,6 +1,6 @@
 /* eslint-disable wrap-regex */
-import { InvalidStringError } from '../errors';
-import { Metadatum, util } from '../Cardano';
+import { InvalidStringError } from '../../errors';
+import { Metadatum, util } from '../../Cardano';
 
 export type Uri = util.OpaqueString<'Uri'>;
 export const Uri = (uri: string) => {

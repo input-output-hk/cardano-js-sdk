@@ -1,6 +1,5 @@
-import { Asset } from '../../Cardano';
-import { NftMetadata } from '../../Asset';
+import { AssetInfo, NftMetadata } from '../../Asset';
 
 export interface NftMetadataProvider {
-  (asset: Asset): Promise<NftMetadata | undefined>;
+  (asset: AssetInfo): Promise<NftMetadata | undefined>;
 }

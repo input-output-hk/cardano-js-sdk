@@ -17,11 +17,7 @@ export interface FinalizeTxProps {
   readonly body: Cardano.TxBodyAlonzo;
 }
 
-export type AssetWithNftMetadata = Cardano.Asset & {
-  nftMetadata?: Asset.NftMetadata;
-};
-
-export type Assets = Map<Cardano.AssetId, AssetWithNftMetadata>;
+export type Assets = Map<Cardano.AssetId, Asset.AssetInfo>;
 
 export interface MinimumCoinQuantity {
   minimumCoin: Cardano.Lovelace;

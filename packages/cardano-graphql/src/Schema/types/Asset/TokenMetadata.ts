@@ -1,5 +1,5 @@
 import { Asset } from './Asset';
-import { Cardano } from '@cardano-sdk/core';
+import { Asset as AssetTypes } from '@cardano-sdk/core';
 import { Field, Int, ObjectType } from 'type-graphql';
 
 @ObjectType()
@@ -48,7 +48,7 @@ export class TokenMetadata {
   @Field(() => String, { defaultValue: '1.0' })
   version: string;
   @Field(() => [TokenMetadataSizedIcon])
-  sizedIcons: Cardano.TokenMetadataSizedIcon[];
+  sizedIcons: AssetTypes.TokenMetadataSizedIcon[];
   @Field(() => Asset)
   asset: Asset;
 }

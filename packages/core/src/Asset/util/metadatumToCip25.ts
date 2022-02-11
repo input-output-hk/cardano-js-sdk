@@ -1,6 +1,6 @@
-import { Asset, Metadatum, MetadatumMap, util } from '../../Cardano';
+import { AssetInfo, ImageMediaType, MediaType, NftMetadata, NftMetadataFile, Uri } from '../types';
 import { CustomError } from 'ts-custom-error';
-import { ImageMediaType, MediaType, NftMetadata, NftMetadataFile, Uri } from '../NftMetadata';
+import { Metadatum, MetadatumMap, util } from '../../Cardano';
 import { dummyLogger } from 'ts-log';
 import { omit } from 'lodash-es';
 
@@ -42,7 +42,7 @@ const mapFile = (metadatum: Metadatum): NftMetadataFile => {
 /**
  * Also considers asset name encoded in utf8 within metadata valid
  */
-const getAssetMetadata = (policy: MetadatumMap, asset: Asset) =>
+const getAssetMetadata = (policy: MetadatumMap, asset: Pick<AssetInfo, 'name'>) =>
   util.metadatum.asMetadatumMap(
     policy[asset.name.toString()] || policy[Buffer.from(asset.name, 'hex').toString('utf8')]
   );
@@ -52,7 +52,7 @@ const getAssetMetadata = (policy: MetadatumMap, asset: Asset) =>
  * @returns {NftMetadata | undefined} CIP-0025 NFT metadata
  */
 export const metadatumToCip25 = (
-  asset: Asset,
+  asset: Pick<AssetInfo, 'policyId' | 'name'>,
   metadatumMap: MetadatumMap | undefined,
   logger = dummyLogger
 ): NftMetadata | undefined => {

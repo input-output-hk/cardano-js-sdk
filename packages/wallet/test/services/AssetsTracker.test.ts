@@ -1,6 +1,5 @@
 import { Asset } from '@cardano-sdk/core';
 import { AssetId } from '@cardano-sdk/util-dev';
-import { AssetWithNftMetadata } from '../../src/types';
 import { AssetsTrackerProps, Balance, TransactionalTracker, createAssetsTracker } from '../../src/services';
 import { createTestScheduler } from '../testScheduler';
 import { of } from 'rxjs';
@@ -25,8 +24,8 @@ describe('createAssetsTracker', () => {
         .fn()
         .mockReturnValueOnce(cold('a', { a: undefined }))
         .mockReturnValueOnce(cold('a', { a: nftMetadata }));
-      const asset1 = { assetId: AssetId.TSLA } as AssetWithNftMetadata;
-      const asset2 = { assetId: AssetId.PXL, nftMetadata } as AssetWithNftMetadata;
+      const asset1 = { assetId: AssetId.TSLA } as Asset.AssetInfo;
+      const asset2 = { assetId: AssetId.PXL, nftMetadata } as Asset.AssetInfo;
       const assetService = jest.fn().mockReturnValueOnce(of(asset1)).mockReturnValueOnce(of(asset2));
       const target$ = createAssetsTracker({ balanceTracker } as AssetsTrackerProps, {
         assetService,

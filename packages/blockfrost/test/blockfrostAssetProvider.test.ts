@@ -2,8 +2,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-len */
 
+import { Asset, Cardano } from '@cardano-sdk/core';
 import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
-import { Cardano } from '@cardano-sdk/core';
 import { blockfrostAssetProvider } from '../src';
 jest.mock('@blockfrost/blockfrost-js');
 
@@ -41,7 +41,7 @@ describe('blockfrostAssetProvider', () => {
         Cardano.AssetId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e')
       );
 
-      expect(response).toMatchObject<Cardano.Asset>({
+      expect(response).toMatchObject<Asset.AssetInfo>({
         assetId: Cardano.AssetId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e'),
         fingerprint: Cardano.AssetFingerprint('asset1pkpwyknlvul7az0xx8czhl60pyel45rpje4z8w'),
         history: [
@@ -87,7 +87,7 @@ describe('blockfrostAssetProvider', () => {
         Cardano.AssetId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e')
       );
 
-      expect(response).toMatchObject<Cardano.Asset>({
+      expect(response).toMatchObject<Asset.AssetInfo>({
         assetId: Cardano.AssetId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e'),
         fingerprint: Cardano.AssetFingerprint('asset1pkpwyknlvul7az0xx8czhl60pyel45rpje4z8w'),
         history: [
