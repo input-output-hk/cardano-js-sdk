@@ -12,10 +12,26 @@ const asString = (obj: unknown): string | undefined => {
   }
 };
 
+const asStringArray = (metadatum: Metadatum): string[] | undefined => {
+  if (Array.isArray(metadatum)) {
+    const result = metadatum.map(asString);
+    if (result.some((str) => typeof str === 'undefined')) {
+      return undefined;
+    }
+    return result as string[];
+  }
+  const str = asString(metadatum);
+  if (str) {
+    return [str];
+  }
+};
+
 const mapOtherProperties = (metadata: MetadatumMap, primaryProperties: string[]) => {
   const extraProperties = omit(metadata, primaryProperties);
   return Object.keys(extraProperties).length > 0 ? extraProperties : undefined;
 };
+
+const toArray = <T>(value: T | T[]): T[] => (Array.isArray(value) ? value : [value]);
 
 const mapFile = (metadatum: Metadatum): NftMetadataFile => {
   const file = util.metadatum.asMetadatumMap(metadatum);
@@ -35,7 +51,7 @@ const mapFile = (metadatum: Metadatum): NftMetadataFile => {
     mediaType: MediaType(mediaType),
     name,
     otherProperties: mapOtherProperties(file, ['mediaType', 'name', 'src']),
-    src
+    src: toArray(src)
   };
 };
 
@@ -65,7 +81,7 @@ export const metadatumToCip25 = (
   const assetMetadata = getAssetMetadata(policy, asset);
   if (!assetMetadata) return;
   const name = asString(assetMetadata.name);
-  const image = asString(assetMetadata.image);
+  const image = asStringArray(assetMetadata.image);
   if (!name || !image) {
     logger.warn('Invalid CIP-25 metadata', assetMetadata);
     return;
@@ -74,9 +90,9 @@ export const metadatumToCip25 = (
   const files = util.metadatum.asMetadatumArray(assetMetadata.files);
   try {
     return {
-      description: asString(assetMetadata.description),
+      description: asStringArray(assetMetadata.description),
       files: files ? files.map(mapFile) : undefined,
-      image: Uri(image),
+      image: image.map((img) => Uri(img)),
       mediaType: mediaType ? ImageMediaType(mediaType) : undefined,
       name,
       otherProperties: mapOtherProperties(assetMetadata, ['name', 'image', 'mediaType', 'description', 'files']),

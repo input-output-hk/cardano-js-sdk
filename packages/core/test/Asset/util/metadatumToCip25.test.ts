@@ -15,7 +15,7 @@ describe('NftMetadata/metadatumToCip25', () => {
   };
 
   const minimalConvertedMetadata = {
-    image: 'ipfs://image',
+    image: ['ipfs://image'],
     name: 'test nft',
     version: '1.0'
   };
@@ -102,7 +102,7 @@ describe('NftMetadata/metadatumToCip25', () => {
     };
     expect(metadatumToCip25(asset, metadatum)).toEqual({
       ...minimalConvertedMetadata,
-      description: 'description',
+      description: ['description'],
       mediaType: 'image/png',
       otherProperties: { extraProp: 'extra' }
     });
@@ -132,7 +132,10 @@ describe('NftMetadata/metadatumToCip25', () => {
     };
     expect(metadatumToCip25(asset, metadatum)).toEqual({
       ...minimalConvertedMetadata,
-      files: [file1, { ...omit(file2, 'extraProp'), otherProperties: { extraProp: 'extra' } }]
+      files: [
+        { ...file1, src: [file1.src] },
+        { ...omit(file2, 'extraProp'), otherProperties: { extraProp: 'extra' } }
+      ]
     });
   });
 });

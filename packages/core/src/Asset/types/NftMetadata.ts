@@ -34,7 +34,7 @@ export const MediaType = (mediaType: string) => {
 export interface NftMetadataFile {
   name: string;
   mediaType: MediaType;
-  src: Uri | Uri[];
+  src: Uri[];
   otherProperties?: {
     [key: string]: Metadatum | undefined;
   };
@@ -45,11 +45,11 @@ export interface NftMetadataFile {
  */
 export interface NftMetadata {
   name: string;
-  image: Uri | Uri[];
+  image: Uri[];
   version: string;
   mediaType?: ImageMediaType;
   files?: NftMetadataFile[];
-  description?: string | string[];
+  description?: string[];
   otherProperties?: {
     [key: string]: Metadatum | undefined;
   };

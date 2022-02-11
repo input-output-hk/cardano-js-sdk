@@ -27,6 +27,8 @@ export interface TokenMetadata {
   ticker?: string;
   /**
    * MUST be either https, ipfs, or data.  icon MUST be a browser supported image format.
+   * When implementing the parser, it is recommended to also check 'image' and 'logo'
+   * properties for backwards compatibility.
    */
   icon?: string;
   /**
