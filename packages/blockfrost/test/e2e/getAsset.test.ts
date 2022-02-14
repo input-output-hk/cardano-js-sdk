@@ -8,11 +8,11 @@ describe('blockfrostAssetProvider', () => {
     );
     expect(typeof asset.assetId).toBe('string');
     expect(typeof asset.fingerprint).toBe('string');
-    expect(asset.history.length).toBeGreaterThan(1);
-    expect(typeof asset.history[0].quantity).toBe('bigint');
-    expect(typeof asset.history[0].transactionId).toBe('string');
-    expect(typeof asset.metadata).toBe('object');
-    expect(typeof asset.metadata!.ticker).toBe('string');
+    expect(asset.history!.length).toBeGreaterThan(1);
+    expect(typeof asset.history![0].quantity).toBe('bigint');
+    expect(typeof asset.history![0].transactionId).toBe('string');
+    expect(typeof asset.tokenMetadata).toBe('object');
+    expect(typeof asset.tokenMetadata!.ticker).toBe('string');
     expect(typeof asset.name).toBe('string');
     expect(typeof asset.policyId).toBe('string');
     expect(typeof asset.quantity).toBe('bigint');

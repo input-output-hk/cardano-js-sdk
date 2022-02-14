@@ -352,11 +352,37 @@ export type AddAddressPayloadAddressArgs = {
 };
 
 export type AddAssetInput = {
+  /** concatenated PolicyId and AssetName, hex-encoded */
   assetId: Scalars['String'];
+  /** hex-encoded */
   assetName: Scalars['String'];
-  decimals: Scalars['Int'];
-  description: Scalars['String'];
+  assetNameUTF8: Scalars['String'];
+  /** Fingerprint of a native asset for human comparison. CIP-0014 */
   fingerprint: Scalars['String'];
+  history: Array<AssetMintOrBurnRef>;
+  nftMetadata?: InputMaybe<NftMetadataRef>;
+  policy: PolicyRef;
+  tokenMetadata?: InputMaybe<TokenMetadataRef>;
+  totalQuantity: Scalars['Int64'];
+};
+
+export type AddAssetMintOrBurnInput = {
+  quantity: Scalars['Int64'];
+  transaction: TransactionRef;
+};
+
+export type AddAssetMintOrBurnPayload = {
+  __typename?: 'AddAssetMintOrBurnPayload';
+  assetMintOrBurn?: Maybe<Array<Maybe<AssetMintOrBurn>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type AddAssetMintOrBurnPayloadAssetMintOrBurnArgs = {
+  filter?: InputMaybe<AssetMintOrBurnFilter>;
+  first?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order?: InputMaybe<AssetMintOrBurnOrder>;
 };
 
 export type AddAssetPayload = {
@@ -890,6 +916,50 @@ export type AddNetworkConstantsPayloadNetworkConstantsArgs = {
   order?: InputMaybe<NetworkConstantsOrder>;
 };
 
+export type AddNftMetadataFileInput = {
+  mediaType: Scalars['String'];
+  name: Scalars['String'];
+  src: Array<Scalars['String']>;
+};
+
+export type AddNftMetadataFilePayload = {
+  __typename?: 'AddNftMetadataFilePayload';
+  nftMetadataFile?: Maybe<Array<Maybe<NftMetadataFile>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type AddNftMetadataFilePayloadNftMetadataFileArgs = {
+  filter?: InputMaybe<NftMetadataFileFilter>;
+  first?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order?: InputMaybe<NftMetadataFileOrder>;
+};
+
+export type AddNftMetadataInput = {
+  asset: AssetRef;
+  descriptions: Array<Scalars['String']>;
+  files: Array<NftMetadataFileRef>;
+  images: Array<Scalars['String']>;
+  mediaType?: InputMaybe<Scalars['String']>;
+  name: Scalars['String'];
+  version: Scalars['String'];
+};
+
+export type AddNftMetadataPayload = {
+  __typename?: 'AddNftMetadataPayload';
+  nftMetadata?: Maybe<Array<Maybe<NftMetadata>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type AddNftMetadataPayloadNftMetadataArgs = {
+  filter?: InputMaybe<NftMetadataFilter>;
+  first?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order?: InputMaybe<NftMetadataOrder>;
+};
+
 export type AddPlutusScriptInput = {
   /** Serialized plutus-core program */
   cborHex: Scalars['String'];
@@ -911,6 +981,27 @@ export type AddPlutusScriptPayloadPlutusScriptArgs = {
   first?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
   order?: InputMaybe<PlutusScriptOrder>;
+};
+
+export type AddPolicyInput = {
+  assets: Array<AssetRef>;
+  id: Scalars['String'];
+  publicKey: PublicKeyRef;
+  script: ScriptRef;
+};
+
+export type AddPolicyPayload = {
+  __typename?: 'AddPolicyPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  policy?: Maybe<Array<Maybe<Policy>>>;
+};
+
+
+export type AddPolicyPayloadPolicyArgs = {
+  filter?: InputMaybe<PolicyFilter>;
+  first?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order?: InputMaybe<PolicyOrder>;
 };
 
 export type AddPoolContactDataInput = {
@@ -1117,7 +1208,8 @@ export type AddPublicKeyInput = {
   hash: Scalars['String'];
   /** hex-encoded Ed25519 public key */
   key: Scalars['String'];
-  requiredExtraSignatureInTransactions: Array<TransactionRef>;
+  policies?: InputMaybe<Array<PolicyRef>>;
+  requiredExtraSignatureInTransactions?: InputMaybe<Array<TransactionRef>>;
   rewardAccount?: InputMaybe<RewardAccountRef>;
   signatures: Array<SignatureRef>;
 };
@@ -1614,6 +1706,60 @@ export type AddTokenInput = {
   transactionOutput: TransactionOutputRef;
 };
 
+export type AddTokenMetadataInput = {
+  asset: AssetRef;
+  /** how many decimal places should the token support? For ADA, this would be 6 e.g. 1 ADA is 10^6 Lovelace */
+  decimals?: InputMaybe<Scalars['Int']>;
+  /** additional description that defines the usage of the token */
+  desc?: InputMaybe<Scalars['String']>;
+  /** MUST be either https, ipfs, or data.  icon MUST be a browser supported image format. */
+  icon?: InputMaybe<Scalars['String']>;
+  name: Scalars['String'];
+  /** https only url that holds the metadata in the onchain format. */
+  ref?: InputMaybe<Scalars['String']>;
+  sizedIcons: Array<TokenMetadataSizedIconRef>;
+  /** when present, field and overrides default ticker which is the asset name */
+  ticker?: InputMaybe<Scalars['String']>;
+  /** https only url that refers to metadata stored offchain. */
+  url?: InputMaybe<Scalars['String']>;
+  version?: InputMaybe<Scalars['String']>;
+};
+
+export type AddTokenMetadataPayload = {
+  __typename?: 'AddTokenMetadataPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  tokenMetadata?: Maybe<Array<Maybe<TokenMetadata>>>;
+};
+
+
+export type AddTokenMetadataPayloadTokenMetadataArgs = {
+  filter?: InputMaybe<TokenMetadataFilter>;
+  first?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order?: InputMaybe<TokenMetadataOrder>;
+};
+
+export type AddTokenMetadataSizedIconInput = {
+  /** https only url that refers to metadata stored offchain. */
+  icon: Scalars['String'];
+  /** Most likely one of 16, 32, 64, 96, 128 */
+  size: Scalars['Int'];
+};
+
+export type AddTokenMetadataSizedIconPayload = {
+  __typename?: 'AddTokenMetadataSizedIconPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  tokenMetadataSizedIcon?: Maybe<Array<Maybe<TokenMetadataSizedIcon>>>;
+};
+
+
+export type AddTokenMetadataSizedIconPayloadTokenMetadataSizedIconArgs = {
+  filter?: InputMaybe<TokenMetadataSizedIconFilter>;
+  first?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order?: InputMaybe<TokenMetadataSizedIconOrder>;
+};
+
 export type AddTokenPayload = {
   __typename?: 'AddTokenPayload';
   numUids?: Maybe<Scalars['Int']>;
@@ -1901,11 +2047,49 @@ export enum AddressType {
 
 export type Asset = {
   __typename?: 'Asset';
+  /** concatenated PolicyId and AssetName, hex-encoded */
   assetId: Scalars['String'];
+  /** hex-encoded */
   assetName: Scalars['String'];
-  decimals: Scalars['Int'];
-  description: Scalars['String'];
+  assetNameUTF8: Scalars['String'];
+  /** Fingerprint of a native asset for human comparison. CIP-0014 */
   fingerprint: Scalars['String'];
+  history: Array<AssetMintOrBurn>;
+  historyAggregate?: Maybe<AssetMintOrBurnAggregateResult>;
+  /** CIP-0025 */
+  nftMetadata?: Maybe<NftMetadata>;
+  policy: Policy;
+  /** CIP-0035 */
+  tokenMetadata?: Maybe<TokenMetadata>;
+  totalQuantity: Scalars['Int64'];
+};
+
+
+export type AssetHistoryArgs = {
+  filter?: InputMaybe<AssetMintOrBurnFilter>;
+  first?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order?: InputMaybe<AssetMintOrBurnOrder>;
+};
+
+
+export type AssetHistoryAggregateArgs = {
+  filter?: InputMaybe<AssetMintOrBurnFilter>;
+};
+
+
+export type AssetNftMetadataArgs = {
+  filter?: InputMaybe<NftMetadataFilter>;
+};
+
+
+export type AssetPolicyArgs = {
+  filter?: InputMaybe<PolicyFilter>;
+};
+
+
+export type AssetTokenMetadataArgs = {
+  filter?: InputMaybe<TokenMetadataFilter>;
 };
 
 export type AssetAggregateResult = {
@@ -1914,19 +2098,20 @@ export type AssetAggregateResult = {
   assetIdMin?: Maybe<Scalars['String']>;
   assetNameMax?: Maybe<Scalars['String']>;
   assetNameMin?: Maybe<Scalars['String']>;
+  assetNameUTF8Max?: Maybe<Scalars['String']>;
+  assetNameUTF8Min?: Maybe<Scalars['String']>;
   count?: Maybe<Scalars['Int']>;
-  decimalsAvg?: Maybe<Scalars['Float']>;
-  decimalsMax?: Maybe<Scalars['Int']>;
-  decimalsMin?: Maybe<Scalars['Int']>;
-  decimalsSum?: Maybe<Scalars['Int']>;
-  descriptionMax?: Maybe<Scalars['String']>;
-  descriptionMin?: Maybe<Scalars['String']>;
   fingerprintMax?: Maybe<Scalars['String']>;
   fingerprintMin?: Maybe<Scalars['String']>;
+  totalQuantityAvg?: Maybe<Scalars['Float']>;
+  totalQuantityMax?: Maybe<Scalars['Int64']>;
+  totalQuantityMin?: Maybe<Scalars['Int64']>;
+  totalQuantitySum?: Maybe<Scalars['Int64']>;
 };
 
 export type AssetFilter = {
   and?: InputMaybe<Array<InputMaybe<AssetFilter>>>;
+  assetId?: InputMaybe<StringExactFilter>;
   has?: InputMaybe<Array<InputMaybe<AssetHasFilter>>>;
   not?: InputMaybe<AssetFilter>;
   or?: InputMaybe<Array<InputMaybe<AssetFilter>>>;
@@ -1935,10 +2120,66 @@ export type AssetFilter = {
 export enum AssetHasFilter {
   AssetId = 'assetId',
   AssetName = 'assetName',
-  Decimals = 'decimals',
-  Description = 'description',
-  Fingerprint = 'fingerprint'
+  AssetNameUtf8 = 'assetNameUTF8',
+  Fingerprint = 'fingerprint',
+  History = 'history',
+  NftMetadata = 'nftMetadata',
+  Policy = 'policy',
+  TokenMetadata = 'tokenMetadata',
+  TotalQuantity = 'totalQuantity'
 }
+
+export type AssetMintOrBurn = {
+  __typename?: 'AssetMintOrBurn';
+  quantity: Scalars['Int64'];
+  transaction: Transaction;
+};
+
+
+export type AssetMintOrBurnTransactionArgs = {
+  filter?: InputMaybe<TransactionFilter>;
+};
+
+export type AssetMintOrBurnAggregateResult = {
+  __typename?: 'AssetMintOrBurnAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+  quantityAvg?: Maybe<Scalars['Float']>;
+  quantityMax?: Maybe<Scalars['Int64']>;
+  quantityMin?: Maybe<Scalars['Int64']>;
+  quantitySum?: Maybe<Scalars['Int64']>;
+};
+
+export type AssetMintOrBurnFilter = {
+  and?: InputMaybe<Array<InputMaybe<AssetMintOrBurnFilter>>>;
+  has?: InputMaybe<Array<InputMaybe<AssetMintOrBurnHasFilter>>>;
+  not?: InputMaybe<AssetMintOrBurnFilter>;
+  or?: InputMaybe<Array<InputMaybe<AssetMintOrBurnFilter>>>;
+};
+
+export enum AssetMintOrBurnHasFilter {
+  Quantity = 'quantity',
+  Transaction = 'transaction'
+}
+
+export type AssetMintOrBurnOrder = {
+  asc?: InputMaybe<AssetMintOrBurnOrderable>;
+  desc?: InputMaybe<AssetMintOrBurnOrderable>;
+  then?: InputMaybe<AssetMintOrBurnOrder>;
+};
+
+export enum AssetMintOrBurnOrderable {
+  Quantity = 'quantity'
+}
+
+export type AssetMintOrBurnPatch = {
+  quantity?: InputMaybe<Scalars['Int64']>;
+  transaction?: InputMaybe<TransactionRef>;
+};
+
+export type AssetMintOrBurnRef = {
+  quantity?: InputMaybe<Scalars['Int64']>;
+  transaction?: InputMaybe<TransactionRef>;
+};
 
 export type AssetOrder = {
   asc?: InputMaybe<AssetOrderable>;
@@ -1949,25 +2190,37 @@ export type AssetOrder = {
 export enum AssetOrderable {
   AssetId = 'assetId',
   AssetName = 'assetName',
-  Decimals = 'decimals',
-  Description = 'description',
-  Fingerprint = 'fingerprint'
+  AssetNameUtf8 = 'assetNameUTF8',
+  Fingerprint = 'fingerprint',
+  TotalQuantity = 'totalQuantity'
 }
 
 export type AssetPatch = {
-  assetId?: InputMaybe<Scalars['String']>;
+  /** hex-encoded */
   assetName?: InputMaybe<Scalars['String']>;
-  decimals?: InputMaybe<Scalars['Int']>;
-  description?: InputMaybe<Scalars['String']>;
+  assetNameUTF8?: InputMaybe<Scalars['String']>;
+  /** Fingerprint of a native asset for human comparison. CIP-0014 */
   fingerprint?: InputMaybe<Scalars['String']>;
+  history?: InputMaybe<Array<AssetMintOrBurnRef>>;
+  nftMetadata?: InputMaybe<NftMetadataRef>;
+  policy?: InputMaybe<PolicyRef>;
+  tokenMetadata?: InputMaybe<TokenMetadataRef>;
+  totalQuantity?: InputMaybe<Scalars['Int64']>;
 };
 
 export type AssetRef = {
+  /** concatenated PolicyId and AssetName, hex-encoded */
   assetId?: InputMaybe<Scalars['String']>;
+  /** hex-encoded */
   assetName?: InputMaybe<Scalars['String']>;
-  decimals?: InputMaybe<Scalars['Int']>;
-  description?: InputMaybe<Scalars['String']>;
+  assetNameUTF8?: InputMaybe<Scalars['String']>;
+  /** Fingerprint of a native asset for human comparison. CIP-0014 */
   fingerprint?: InputMaybe<Scalars['String']>;
+  history?: InputMaybe<Array<AssetMintOrBurnRef>>;
+  nftMetadata?: InputMaybe<NftMetadataRef>;
+  policy?: InputMaybe<PolicyRef>;
+  tokenMetadata?: InputMaybe<TokenMetadataRef>;
+  totalQuantity?: InputMaybe<Scalars['Int64']>;
 };
 
 export type AuthRule = {
@@ -2780,6 +3033,21 @@ export type DeleteAddressPayloadAddressArgs = {
   order?: InputMaybe<AddressOrder>;
 };
 
+export type DeleteAssetMintOrBurnPayload = {
+  __typename?: 'DeleteAssetMintOrBurnPayload';
+  assetMintOrBurn?: Maybe<Array<Maybe<AssetMintOrBurn>>>;
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type DeleteAssetMintOrBurnPayloadAssetMintOrBurnArgs = {
+  filter?: InputMaybe<AssetMintOrBurnFilter>;
+  first?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order?: InputMaybe<AssetMintOrBurnOrder>;
+};
+
 export type DeleteAssetPayload = {
   __typename?: 'DeleteAssetPayload';
   asset?: Maybe<Array<Maybe<Asset>>>;
@@ -3164,6 +3432,36 @@ export type DeleteNetworkConstantsPayloadNetworkConstantsArgs = {
   order?: InputMaybe<NetworkConstantsOrder>;
 };
 
+export type DeleteNftMetadataFilePayload = {
+  __typename?: 'DeleteNftMetadataFilePayload';
+  msg?: Maybe<Scalars['String']>;
+  nftMetadataFile?: Maybe<Array<Maybe<NftMetadataFile>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type DeleteNftMetadataFilePayloadNftMetadataFileArgs = {
+  filter?: InputMaybe<NftMetadataFileFilter>;
+  first?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order?: InputMaybe<NftMetadataFileOrder>;
+};
+
+export type DeleteNftMetadataPayload = {
+  __typename?: 'DeleteNftMetadataPayload';
+  msg?: Maybe<Scalars['String']>;
+  nftMetadata?: Maybe<Array<Maybe<NftMetadata>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type DeleteNftMetadataPayloadNftMetadataArgs = {
+  filter?: InputMaybe<NftMetadataFilter>;
+  first?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order?: InputMaybe<NftMetadataOrder>;
+};
+
 export type DeletePlutusScriptPayload = {
   __typename?: 'DeletePlutusScriptPayload';
   msg?: Maybe<Scalars['String']>;
@@ -3177,6 +3475,21 @@ export type DeletePlutusScriptPayloadPlutusScriptArgs = {
   first?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
   order?: InputMaybe<PlutusScriptOrder>;
+};
+
+export type DeletePolicyPayload = {
+  __typename?: 'DeletePolicyPayload';
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+  policy?: Maybe<Array<Maybe<Policy>>>;
+};
+
+
+export type DeletePolicyPayloadPolicyArgs = {
+  filter?: InputMaybe<PolicyFilter>;
+  first?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order?: InputMaybe<PolicyOrder>;
 };
 
 export type DeletePoolContactDataPayload = {
@@ -3622,6 +3935,36 @@ export type DeleteTimeSettingsPayloadTimeSettingsArgs = {
   first?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
   order?: InputMaybe<TimeSettingsOrder>;
+};
+
+export type DeleteTokenMetadataPayload = {
+  __typename?: 'DeleteTokenMetadataPayload';
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+  tokenMetadata?: Maybe<Array<Maybe<TokenMetadata>>>;
+};
+
+
+export type DeleteTokenMetadataPayloadTokenMetadataArgs = {
+  filter?: InputMaybe<TokenMetadataFilter>;
+  first?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order?: InputMaybe<TokenMetadataOrder>;
+};
+
+export type DeleteTokenMetadataSizedIconPayload = {
+  __typename?: 'DeleteTokenMetadataSizedIconPayload';
+  msg?: Maybe<Scalars['String']>;
+  numUids?: Maybe<Scalars['Int']>;
+  tokenMetadataSizedIcon?: Maybe<Array<Maybe<TokenMetadataSizedIcon>>>;
+};
+
+
+export type DeleteTokenMetadataSizedIconPayloadTokenMetadataSizedIconArgs = {
+  filter?: InputMaybe<TokenMetadataSizedIconFilter>;
+  first?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order?: InputMaybe<TokenMetadataSizedIconOrder>;
 };
 
 export type DeleteTokenPayload = {
@@ -4655,6 +4998,7 @@ export type Mutation = {
   addAdaPots?: Maybe<AddAdaPotsPayload>;
   addAddress?: Maybe<AddAddressPayload>;
   addAsset?: Maybe<AddAssetPayload>;
+  addAssetMintOrBurn?: Maybe<AddAssetMintOrBurnPayload>;
   addAuxiliaryData?: Maybe<AddAuxiliaryDataPayload>;
   addAuxiliaryDataBody?: Maybe<AddAuxiliaryDataBodyPayload>;
   addAuxiliaryScript?: Maybe<AddAuxiliaryScriptPayload>;
@@ -4680,7 +5024,10 @@ export type Mutation = {
   addNOf?: Maybe<AddNOfPayload>;
   addNativeScript?: Maybe<AddNativeScriptPayload>;
   addNetworkConstants?: Maybe<AddNetworkConstantsPayload>;
+  addNftMetadata?: Maybe<AddNftMetadataPayload>;
+  addNftMetadataFile?: Maybe<AddNftMetadataFilePayload>;
   addPlutusScript?: Maybe<AddPlutusScriptPayload>;
+  addPolicy?: Maybe<AddPolicyPayload>;
   addPoolContactData?: Maybe<AddPoolContactDataPayload>;
   addPoolParameters?: Maybe<AddPoolParametersPayload>;
   addPoolRegistrationCertificate?: Maybe<AddPoolRegistrationCertificatePayload>;
@@ -4712,6 +5059,8 @@ export type Mutation = {
   addThePoolsMediaAssets?: Maybe<AddThePoolsMediaAssetsPayload>;
   addTimeSettings?: Maybe<AddTimeSettingsPayload>;
   addToken?: Maybe<AddTokenPayload>;
+  addTokenMetadata?: Maybe<AddTokenMetadataPayload>;
+  addTokenMetadataSizedIcon?: Maybe<AddTokenMetadataSizedIconPayload>;
   addTransaction?: Maybe<AddTransactionPayload>;
   addTransactionInput?: Maybe<AddTransactionInputPayload>;
   addTransactionOutput?: Maybe<AddTransactionOutputPayload>;
@@ -4724,6 +5073,7 @@ export type Mutation = {
   deleteAdaPots?: Maybe<DeleteAdaPotsPayload>;
   deleteAddress?: Maybe<DeleteAddressPayload>;
   deleteAsset?: Maybe<DeleteAssetPayload>;
+  deleteAssetMintOrBurn?: Maybe<DeleteAssetMintOrBurnPayload>;
   deleteAuxiliaryData?: Maybe<DeleteAuxiliaryDataPayload>;
   deleteAuxiliaryDataBody?: Maybe<DeleteAuxiliaryDataBodyPayload>;
   deleteAuxiliaryScript?: Maybe<DeleteAuxiliaryScriptPayload>;
@@ -4749,7 +5099,10 @@ export type Mutation = {
   deleteNOf?: Maybe<DeleteNOfPayload>;
   deleteNativeScript?: Maybe<DeleteNativeScriptPayload>;
   deleteNetworkConstants?: Maybe<DeleteNetworkConstantsPayload>;
+  deleteNftMetadata?: Maybe<DeleteNftMetadataPayload>;
+  deleteNftMetadataFile?: Maybe<DeleteNftMetadataFilePayload>;
   deletePlutusScript?: Maybe<DeletePlutusScriptPayload>;
+  deletePolicy?: Maybe<DeletePolicyPayload>;
   deletePoolContactData?: Maybe<DeletePoolContactDataPayload>;
   deletePoolParameters?: Maybe<DeletePoolParametersPayload>;
   deletePoolRegistrationCertificate?: Maybe<DeletePoolRegistrationCertificatePayload>;
@@ -4781,6 +5134,8 @@ export type Mutation = {
   deleteThePoolsMediaAssets?: Maybe<DeleteThePoolsMediaAssetsPayload>;
   deleteTimeSettings?: Maybe<DeleteTimeSettingsPayload>;
   deleteToken?: Maybe<DeleteTokenPayload>;
+  deleteTokenMetadata?: Maybe<DeleteTokenMetadataPayload>;
+  deleteTokenMetadataSizedIcon?: Maybe<DeleteTokenMetadataSizedIconPayload>;
   deleteTransaction?: Maybe<DeleteTransactionPayload>;
   deleteTransactionInput?: Maybe<DeleteTransactionInputPayload>;
   deleteTransactionOutput?: Maybe<DeleteTransactionOutputPayload>;
@@ -4793,6 +5148,7 @@ export type Mutation = {
   updateAdaPots?: Maybe<UpdateAdaPotsPayload>;
   updateAddress?: Maybe<UpdateAddressPayload>;
   updateAsset?: Maybe<UpdateAssetPayload>;
+  updateAssetMintOrBurn?: Maybe<UpdateAssetMintOrBurnPayload>;
   updateAuxiliaryData?: Maybe<UpdateAuxiliaryDataPayload>;
   updateAuxiliaryDataBody?: Maybe<UpdateAuxiliaryDataBodyPayload>;
   updateAuxiliaryScript?: Maybe<UpdateAuxiliaryScriptPayload>;
@@ -4818,7 +5174,10 @@ export type Mutation = {
   updateNOf?: Maybe<UpdateNOfPayload>;
   updateNativeScript?: Maybe<UpdateNativeScriptPayload>;
   updateNetworkConstants?: Maybe<UpdateNetworkConstantsPayload>;
+  updateNftMetadata?: Maybe<UpdateNftMetadataPayload>;
+  updateNftMetadataFile?: Maybe<UpdateNftMetadataFilePayload>;
   updatePlutusScript?: Maybe<UpdatePlutusScriptPayload>;
+  updatePolicy?: Maybe<UpdatePolicyPayload>;
   updatePoolContactData?: Maybe<UpdatePoolContactDataPayload>;
   updatePoolParameters?: Maybe<UpdatePoolParametersPayload>;
   updatePoolRegistrationCertificate?: Maybe<UpdatePoolRegistrationCertificatePayload>;
@@ -4850,6 +5209,8 @@ export type Mutation = {
   updateThePoolsMediaAssets?: Maybe<UpdateThePoolsMediaAssetsPayload>;
   updateTimeSettings?: Maybe<UpdateTimeSettingsPayload>;
   updateToken?: Maybe<UpdateTokenPayload>;
+  updateTokenMetadata?: Maybe<UpdateTokenMetadataPayload>;
+  updateTokenMetadataSizedIcon?: Maybe<UpdateTokenMetadataSizedIconPayload>;
   updateTransaction?: Maybe<UpdateTransactionPayload>;
   updateTransactionInput?: Maybe<UpdateTransactionInputPayload>;
   updateTransactionOutput?: Maybe<UpdateTransactionOutputPayload>;
@@ -4883,6 +5244,12 @@ export type MutationAddAddressArgs = {
 
 export type MutationAddAssetArgs = {
   input: Array<AddAssetInput>;
+  upsert?: InputMaybe<Scalars['Boolean']>;
+};
+
+
+export type MutationAddAssetMintOrBurnArgs = {
+  input: Array<AddAssetMintOrBurnInput>;
 };
 
 
@@ -5015,8 +5382,24 @@ export type MutationAddNetworkConstantsArgs = {
 };
 
 
+export type MutationAddNftMetadataArgs = {
+  input: Array<AddNftMetadataInput>;
+};
+
+
+export type MutationAddNftMetadataFileArgs = {
+  input: Array<AddNftMetadataFileInput>;
+};
+
+
 export type MutationAddPlutusScriptArgs = {
   input: Array<AddPlutusScriptInput>;
+  upsert?: InputMaybe<Scalars['Boolean']>;
+};
+
+
+export type MutationAddPolicyArgs = {
+  input: Array<AddPolicyInput>;
   upsert?: InputMaybe<Scalars['Boolean']>;
 };
 
@@ -5180,6 +5563,16 @@ export type MutationAddTokenArgs = {
 };
 
 
+export type MutationAddTokenMetadataArgs = {
+  input: Array<AddTokenMetadataInput>;
+};
+
+
+export type MutationAddTokenMetadataSizedIconArgs = {
+  input: Array<AddTokenMetadataSizedIconInput>;
+};
+
+
 export type MutationAddTransactionArgs = {
   input: Array<AddTransactionInput>;
   upsert?: InputMaybe<Scalars['Boolean']>;
@@ -5238,6 +5631,11 @@ export type MutationDeleteAddressArgs = {
 
 export type MutationDeleteAssetArgs = {
   filter: AssetFilter;
+};
+
+
+export type MutationDeleteAssetMintOrBurnArgs = {
+  filter: AssetMintOrBurnFilter;
 };
 
 
@@ -5366,8 +5764,23 @@ export type MutationDeleteNetworkConstantsArgs = {
 };
 
 
+export type MutationDeleteNftMetadataArgs = {
+  filter: NftMetadataFilter;
+};
+
+
+export type MutationDeleteNftMetadataFileArgs = {
+  filter: NftMetadataFileFilter;
+};
+
+
 export type MutationDeletePlutusScriptArgs = {
   filter: PlutusScriptFilter;
+};
+
+
+export type MutationDeletePolicyArgs = {
+  filter: PolicyFilter;
 };
 
 
@@ -5526,6 +5939,16 @@ export type MutationDeleteTokenArgs = {
 };
 
 
+export type MutationDeleteTokenMetadataArgs = {
+  filter: TokenMetadataFilter;
+};
+
+
+export type MutationDeleteTokenMetadataSizedIconArgs = {
+  filter: TokenMetadataSizedIconFilter;
+};
+
+
 export type MutationDeleteTransactionArgs = {
   filter: TransactionFilter;
 };
@@ -5583,6 +6006,11 @@ export type MutationUpdateAddressArgs = {
 
 export type MutationUpdateAssetArgs = {
   input: UpdateAssetInput;
+};
+
+
+export type MutationUpdateAssetMintOrBurnArgs = {
+  input: UpdateAssetMintOrBurnInput;
 };
 
 
@@ -5711,8 +6139,23 @@ export type MutationUpdateNetworkConstantsArgs = {
 };
 
 
+export type MutationUpdateNftMetadataArgs = {
+  input: UpdateNftMetadataInput;
+};
+
+
+export type MutationUpdateNftMetadataFileArgs = {
+  input: UpdateNftMetadataFileInput;
+};
+
+
 export type MutationUpdatePlutusScriptArgs = {
   input: UpdatePlutusScriptInput;
+};
+
+
+export type MutationUpdatePolicyArgs = {
+  input: UpdatePolicyInput;
 };
 
 
@@ -5868,6 +6311,16 @@ export type MutationUpdateTimeSettingsArgs = {
 
 export type MutationUpdateTokenArgs = {
   input: UpdateTokenInput;
+};
+
+
+export type MutationUpdateTokenMetadataArgs = {
+  input: UpdateTokenMetadataInput;
+};
+
+
+export type MutationUpdateTokenMetadataSizedIconArgs = {
+  input: UpdateTokenMetadataSizedIconInput;
 };
 
 
@@ -6189,6 +6642,152 @@ export type NetworkConstantsRef = {
   updateQuorum?: InputMaybe<Scalars['Int']>;
 };
 
+/** CIP-0025 */
+export type NftMetadata = {
+  __typename?: 'NftMetadata';
+  asset: Asset;
+  descriptions: Array<Scalars['String']>;
+  files: Array<NftMetadataFile>;
+  filesAggregate?: Maybe<NftMetadataFileAggregateResult>;
+  images: Array<Scalars['String']>;
+  mediaType?: Maybe<Scalars['String']>;
+  name: Scalars['String'];
+  version: Scalars['String'];
+};
+
+
+/** CIP-0025 */
+export type NftMetadataAssetArgs = {
+  filter?: InputMaybe<AssetFilter>;
+};
+
+
+/** CIP-0025 */
+export type NftMetadataFilesArgs = {
+  filter?: InputMaybe<NftMetadataFileFilter>;
+  first?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order?: InputMaybe<NftMetadataFileOrder>;
+};
+
+
+/** CIP-0025 */
+export type NftMetadataFilesAggregateArgs = {
+  filter?: InputMaybe<NftMetadataFileFilter>;
+};
+
+export type NftMetadataAggregateResult = {
+  __typename?: 'NftMetadataAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+  mediaTypeMax?: Maybe<Scalars['String']>;
+  mediaTypeMin?: Maybe<Scalars['String']>;
+  nameMax?: Maybe<Scalars['String']>;
+  nameMin?: Maybe<Scalars['String']>;
+  versionMax?: Maybe<Scalars['String']>;
+  versionMin?: Maybe<Scalars['String']>;
+};
+
+export type NftMetadataFile = {
+  __typename?: 'NftMetadataFile';
+  mediaType: Scalars['String'];
+  name: Scalars['String'];
+  src: Array<Scalars['String']>;
+};
+
+export type NftMetadataFileAggregateResult = {
+  __typename?: 'NftMetadataFileAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+  mediaTypeMax?: Maybe<Scalars['String']>;
+  mediaTypeMin?: Maybe<Scalars['String']>;
+  nameMax?: Maybe<Scalars['String']>;
+  nameMin?: Maybe<Scalars['String']>;
+};
+
+export type NftMetadataFileFilter = {
+  and?: InputMaybe<Array<InputMaybe<NftMetadataFileFilter>>>;
+  has?: InputMaybe<Array<InputMaybe<NftMetadataFileHasFilter>>>;
+  not?: InputMaybe<NftMetadataFileFilter>;
+  or?: InputMaybe<Array<InputMaybe<NftMetadataFileFilter>>>;
+};
+
+export enum NftMetadataFileHasFilter {
+  MediaType = 'mediaType',
+  Name = 'name',
+  Src = 'src'
+}
+
+export type NftMetadataFileOrder = {
+  asc?: InputMaybe<NftMetadataFileOrderable>;
+  desc?: InputMaybe<NftMetadataFileOrderable>;
+  then?: InputMaybe<NftMetadataFileOrder>;
+};
+
+export enum NftMetadataFileOrderable {
+  MediaType = 'mediaType',
+  Name = 'name'
+}
+
+export type NftMetadataFilePatch = {
+  mediaType?: InputMaybe<Scalars['String']>;
+  name?: InputMaybe<Scalars['String']>;
+  src?: InputMaybe<Array<Scalars['String']>>;
+};
+
+export type NftMetadataFileRef = {
+  mediaType?: InputMaybe<Scalars['String']>;
+  name?: InputMaybe<Scalars['String']>;
+  src?: InputMaybe<Array<Scalars['String']>>;
+};
+
+export type NftMetadataFilter = {
+  and?: InputMaybe<Array<InputMaybe<NftMetadataFilter>>>;
+  has?: InputMaybe<Array<InputMaybe<NftMetadataHasFilter>>>;
+  not?: InputMaybe<NftMetadataFilter>;
+  or?: InputMaybe<Array<InputMaybe<NftMetadataFilter>>>;
+};
+
+export enum NftMetadataHasFilter {
+  Asset = 'asset',
+  Descriptions = 'descriptions',
+  Files = 'files',
+  Images = 'images',
+  MediaType = 'mediaType',
+  Name = 'name',
+  Version = 'version'
+}
+
+export type NftMetadataOrder = {
+  asc?: InputMaybe<NftMetadataOrderable>;
+  desc?: InputMaybe<NftMetadataOrderable>;
+  then?: InputMaybe<NftMetadataOrder>;
+};
+
+export enum NftMetadataOrderable {
+  MediaType = 'mediaType',
+  Name = 'name',
+  Version = 'version'
+}
+
+export type NftMetadataPatch = {
+  asset?: InputMaybe<AssetRef>;
+  descriptions?: InputMaybe<Array<Scalars['String']>>;
+  files?: InputMaybe<Array<NftMetadataFileRef>>;
+  images?: InputMaybe<Array<Scalars['String']>>;
+  mediaType?: InputMaybe<Scalars['String']>;
+  name?: InputMaybe<Scalars['String']>;
+  version?: InputMaybe<Scalars['String']>;
+};
+
+export type NftMetadataRef = {
+  asset?: InputMaybe<AssetRef>;
+  descriptions?: InputMaybe<Array<Scalars['String']>>;
+  files?: InputMaybe<Array<NftMetadataFileRef>>;
+  images?: InputMaybe<Array<Scalars['String']>>;
+  mediaType?: InputMaybe<Scalars['String']>;
+  name?: InputMaybe<Scalars['String']>;
+  version?: InputMaybe<Scalars['String']>;
+};
+
 export type PlutusScript = {
   __typename?: 'PlutusScript';
   /** Serialized plutus-core program */
@@ -6280,6 +6879,83 @@ export type PointListRef = {
 export type PointRef = {
   latitude: Scalars['Float'];
   longitude: Scalars['Float'];
+};
+
+export type Policy = {
+  __typename?: 'Policy';
+  assets: Array<Asset>;
+  assetsAggregate?: Maybe<AssetAggregateResult>;
+  id: Scalars['String'];
+  publicKey: PublicKey;
+  script: Script;
+};
+
+
+export type PolicyAssetsArgs = {
+  filter?: InputMaybe<AssetFilter>;
+  first?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order?: InputMaybe<AssetOrder>;
+};
+
+
+export type PolicyAssetsAggregateArgs = {
+  filter?: InputMaybe<AssetFilter>;
+};
+
+
+export type PolicyPublicKeyArgs = {
+  filter?: InputMaybe<PublicKeyFilter>;
+};
+
+
+export type PolicyScriptArgs = {
+  filter?: InputMaybe<ScriptFilter>;
+};
+
+export type PolicyAggregateResult = {
+  __typename?: 'PolicyAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+  idMax?: Maybe<Scalars['String']>;
+  idMin?: Maybe<Scalars['String']>;
+};
+
+export type PolicyFilter = {
+  and?: InputMaybe<Array<InputMaybe<PolicyFilter>>>;
+  has?: InputMaybe<Array<InputMaybe<PolicyHasFilter>>>;
+  id?: InputMaybe<StringHashFilter>;
+  not?: InputMaybe<PolicyFilter>;
+  or?: InputMaybe<Array<InputMaybe<PolicyFilter>>>;
+};
+
+export enum PolicyHasFilter {
+  Assets = 'assets',
+  Id = 'id',
+  PublicKey = 'publicKey',
+  Script = 'script'
+}
+
+export type PolicyOrder = {
+  asc?: InputMaybe<PolicyOrderable>;
+  desc?: InputMaybe<PolicyOrderable>;
+  then?: InputMaybe<PolicyOrder>;
+};
+
+export enum PolicyOrderable {
+  Id = 'id'
+}
+
+export type PolicyPatch = {
+  assets?: InputMaybe<Array<AssetRef>>;
+  publicKey?: InputMaybe<PublicKeyRef>;
+  script?: InputMaybe<ScriptRef>;
+};
+
+export type PolicyRef = {
+  assets?: InputMaybe<Array<AssetRef>>;
+  id?: InputMaybe<Scalars['String']>;
+  publicKey?: InputMaybe<PublicKeyRef>;
+  script?: InputMaybe<ScriptRef>;
 };
 
 export type Polygon = {
@@ -7227,7 +7903,9 @@ export type PublicKey = {
   hash: Scalars['String'];
   /** hex-encoded Ed25519 public key */
   key: Scalars['String'];
-  requiredExtraSignatureInTransactions: Array<Transaction>;
+  policies?: Maybe<Array<Policy>>;
+  policiesAggregate?: Maybe<PolicyAggregateResult>;
+  requiredExtraSignatureInTransactions?: Maybe<Array<Transaction>>;
   requiredExtraSignatureInTransactionsAggregate?: Maybe<TransactionAggregateResult>;
   rewardAccount?: Maybe<RewardAccount>;
   signatures: Array<Signature>;
@@ -7245,6 +7923,19 @@ export type PublicKeyAddressesArgs = {
 
 export type PublicKeyAddressesAggregateArgs = {
   filter?: InputMaybe<AddressFilter>;
+};
+
+
+export type PublicKeyPoliciesArgs = {
+  filter?: InputMaybe<PolicyFilter>;
+  first?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order?: InputMaybe<PolicyOrder>;
+};
+
+
+export type PublicKeyPoliciesAggregateArgs = {
+  filter?: InputMaybe<PolicyFilter>;
 };
 
 
@@ -7299,6 +7990,7 @@ export enum PublicKeyHasFilter {
   Addresses = 'addresses',
   Hash = 'hash',
   Key = 'key',
+  Policies = 'policies',
   RequiredExtraSignatureInTransactions = 'requiredExtraSignatureInTransactions',
   RewardAccount = 'rewardAccount',
   Signatures = 'signatures'
@@ -7319,6 +8011,7 @@ export type PublicKeyPatch = {
   addresses?: InputMaybe<Array<AddressRef>>;
   /** hex-encoded Ed25519 public key */
   key?: InputMaybe<Scalars['String']>;
+  policies?: InputMaybe<Array<PolicyRef>>;
   requiredExtraSignatureInTransactions?: InputMaybe<Array<TransactionRef>>;
   rewardAccount?: InputMaybe<RewardAccountRef>;
   signatures?: InputMaybe<Array<SignatureRef>>;
@@ -7330,6 +8023,7 @@ export type PublicKeyRef = {
   hash?: InputMaybe<Scalars['String']>;
   /** hex-encoded Ed25519 public key */
   key?: InputMaybe<Scalars['String']>;
+  policies?: InputMaybe<Array<PolicyRef>>;
   requiredExtraSignatureInTransactions?: InputMaybe<Array<TransactionRef>>;
   rewardAccount?: InputMaybe<RewardAccountRef>;
   signatures?: InputMaybe<Array<SignatureRef>>;
@@ -7342,6 +8036,7 @@ export type Query = {
   aggregateAdaPots?: Maybe<AdaPotsAggregateResult>;
   aggregateAddress?: Maybe<AddressAggregateResult>;
   aggregateAsset?: Maybe<AssetAggregateResult>;
+  aggregateAssetMintOrBurn?: Maybe<AssetMintOrBurnAggregateResult>;
   aggregateAuxiliaryData?: Maybe<AuxiliaryDataAggregateResult>;
   aggregateAuxiliaryDataBody?: Maybe<AuxiliaryDataBodyAggregateResult>;
   aggregateAuxiliaryScript?: Maybe<AuxiliaryScriptAggregateResult>;
@@ -7367,7 +8062,10 @@ export type Query = {
   aggregateNOf?: Maybe<NOfAggregateResult>;
   aggregateNativeScript?: Maybe<NativeScriptAggregateResult>;
   aggregateNetworkConstants?: Maybe<NetworkConstantsAggregateResult>;
+  aggregateNftMetadata?: Maybe<NftMetadataAggregateResult>;
+  aggregateNftMetadataFile?: Maybe<NftMetadataFileAggregateResult>;
   aggregatePlutusScript?: Maybe<PlutusScriptAggregateResult>;
+  aggregatePolicy?: Maybe<PolicyAggregateResult>;
   aggregatePoolContactData?: Maybe<PoolContactDataAggregateResult>;
   aggregatePoolParameters?: Maybe<PoolParametersAggregateResult>;
   aggregatePoolRegistrationCertificate?: Maybe<PoolRegistrationCertificateAggregateResult>;
@@ -7399,6 +8097,8 @@ export type Query = {
   aggregateThePoolsMediaAssets?: Maybe<ThePoolsMediaAssetsAggregateResult>;
   aggregateTimeSettings?: Maybe<TimeSettingsAggregateResult>;
   aggregateToken?: Maybe<TokenAggregateResult>;
+  aggregateTokenMetadata?: Maybe<TokenMetadataAggregateResult>;
+  aggregateTokenMetadataSizedIcon?: Maybe<TokenMetadataSizedIconAggregateResult>;
   aggregateTransaction?: Maybe<TransactionAggregateResult>;
   aggregateTransactionInput?: Maybe<TransactionInputAggregateResult>;
   aggregateTransactionOutput?: Maybe<TransactionOutputAggregateResult>;
@@ -7407,11 +8107,13 @@ export type Query = {
   aggregateWitness?: Maybe<WitnessAggregateResult>;
   aggregateWitnessScript?: Maybe<WitnessScriptAggregateResult>;
   getAddress?: Maybe<Address>;
+  getAsset?: Maybe<Asset>;
   getBlock?: Maybe<Block>;
   getDatum?: Maybe<Datum>;
   getEpoch?: Maybe<Epoch>;
   getExtendedStakePoolMetadataFields?: Maybe<ExtendedStakePoolMetadataFields>;
   getPlutusScript?: Maybe<PlutusScript>;
+  getPolicy?: Maybe<Policy>;
   getPublicKey?: Maybe<PublicKey>;
   getRewardAccount?: Maybe<RewardAccount>;
   getSlot?: Maybe<Slot>;
@@ -7422,6 +8124,7 @@ export type Query = {
   queryAdaPots?: Maybe<Array<Maybe<AdaPots>>>;
   queryAddress?: Maybe<Array<Maybe<Address>>>;
   queryAsset?: Maybe<Array<Maybe<Asset>>>;
+  queryAssetMintOrBurn?: Maybe<Array<Maybe<AssetMintOrBurn>>>;
   queryAuxiliaryData?: Maybe<Array<Maybe<AuxiliaryData>>>;
   queryAuxiliaryDataBody?: Maybe<Array<Maybe<AuxiliaryDataBody>>>;
   queryAuxiliaryScript?: Maybe<Array<Maybe<AuxiliaryScript>>>;
@@ -7447,7 +8150,10 @@ export type Query = {
   queryNOf?: Maybe<Array<Maybe<NOf>>>;
   queryNativeScript?: Maybe<Array<Maybe<NativeScript>>>;
   queryNetworkConstants?: Maybe<Array<Maybe<NetworkConstants>>>;
+  queryNftMetadata?: Maybe<Array<Maybe<NftMetadata>>>;
+  queryNftMetadataFile?: Maybe<Array<Maybe<NftMetadataFile>>>;
   queryPlutusScript?: Maybe<Array<Maybe<PlutusScript>>>;
+  queryPolicy?: Maybe<Array<Maybe<Policy>>>;
   queryPoolContactData?: Maybe<Array<Maybe<PoolContactData>>>;
   queryPoolParameters?: Maybe<Array<Maybe<PoolParameters>>>;
   queryPoolRegistrationCertificate?: Maybe<Array<Maybe<PoolRegistrationCertificate>>>;
@@ -7479,6 +8185,8 @@ export type Query = {
   queryThePoolsMediaAssets?: Maybe<Array<Maybe<ThePoolsMediaAssets>>>;
   queryTimeSettings?: Maybe<Array<Maybe<TimeSettings>>>;
   queryToken?: Maybe<Array<Maybe<Token>>>;
+  queryTokenMetadata?: Maybe<Array<Maybe<TokenMetadata>>>;
+  queryTokenMetadataSizedIcon?: Maybe<Array<Maybe<TokenMetadataSizedIcon>>>;
   queryTransaction?: Maybe<Array<Maybe<Transaction>>>;
   queryTransactionInput?: Maybe<Array<Maybe<TransactionInput>>>;
   queryTransactionOutput?: Maybe<Array<Maybe<TransactionOutput>>>;
@@ -7511,6 +8219,11 @@ export type QueryAggregateAddressArgs = {
 
 export type QueryAggregateAssetArgs = {
   filter?: InputMaybe<AssetFilter>;
+};
+
+
+export type QueryAggregateAssetMintOrBurnArgs = {
+  filter?: InputMaybe<AssetMintOrBurnFilter>;
 };
 
 
@@ -7639,8 +8352,23 @@ export type QueryAggregateNetworkConstantsArgs = {
 };
 
 
+export type QueryAggregateNftMetadataArgs = {
+  filter?: InputMaybe<NftMetadataFilter>;
+};
+
+
+export type QueryAggregateNftMetadataFileArgs = {
+  filter?: InputMaybe<NftMetadataFileFilter>;
+};
+
+
 export type QueryAggregatePlutusScriptArgs = {
   filter?: InputMaybe<PlutusScriptFilter>;
+};
+
+
+export type QueryAggregatePolicyArgs = {
+  filter?: InputMaybe<PolicyFilter>;
 };
 
 
@@ -7799,6 +8527,16 @@ export type QueryAggregateTokenArgs = {
 };
 
 
+export type QueryAggregateTokenMetadataArgs = {
+  filter?: InputMaybe<TokenMetadataFilter>;
+};
+
+
+export type QueryAggregateTokenMetadataSizedIconArgs = {
+  filter?: InputMaybe<TokenMetadataSizedIconFilter>;
+};
+
+
 export type QueryAggregateTransactionArgs = {
   filter?: InputMaybe<TransactionFilter>;
 };
@@ -7839,6 +8577,11 @@ export type QueryGetAddressArgs = {
 };
 
 
+export type QueryGetAssetArgs = {
+  assetId: Scalars['String'];
+};
+
+
 export type QueryGetBlockArgs = {
   hash: Scalars['String'];
 };
@@ -7861,6 +8604,11 @@ export type QueryGetExtendedStakePoolMetadataFieldsArgs = {
 
 export type QueryGetPlutusScriptArgs = {
   hash: Scalars['String'];
+};
+
+
+export type QueryGetPolicyArgs = {
+  id: Scalars['String'];
 };
 
 
@@ -7926,6 +8674,14 @@ export type QueryQueryAssetArgs = {
   first?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
   order?: InputMaybe<AssetOrder>;
+};
+
+
+export type QueryQueryAssetMintOrBurnArgs = {
+  filter?: InputMaybe<AssetMintOrBurnFilter>;
+  first?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order?: InputMaybe<AssetMintOrBurnOrder>;
 };
 
 
@@ -8123,11 +8879,35 @@ export type QueryQueryNetworkConstantsArgs = {
 };
 
 
+export type QueryQueryNftMetadataArgs = {
+  filter?: InputMaybe<NftMetadataFilter>;
+  first?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order?: InputMaybe<NftMetadataOrder>;
+};
+
+
+export type QueryQueryNftMetadataFileArgs = {
+  filter?: InputMaybe<NftMetadataFileFilter>;
+  first?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order?: InputMaybe<NftMetadataFileOrder>;
+};
+
+
 export type QueryQueryPlutusScriptArgs = {
   filter?: InputMaybe<PlutusScriptFilter>;
   first?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
   order?: InputMaybe<PlutusScriptOrder>;
+};
+
+
+export type QueryQueryPolicyArgs = {
+  filter?: InputMaybe<PolicyFilter>;
+  first?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order?: InputMaybe<PolicyOrder>;
 };
 
 
@@ -8371,6 +9151,22 @@ export type QueryQueryTokenArgs = {
   first?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
   order?: InputMaybe<TokenOrder>;
+};
+
+
+export type QueryQueryTokenMetadataArgs = {
+  filter?: InputMaybe<TokenMetadataFilter>;
+  first?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order?: InputMaybe<TokenMetadataOrder>;
+};
+
+
+export type QueryQueryTokenMetadataSizedIconArgs = {
+  filter?: InputMaybe<TokenMetadataSizedIconFilter>;
+  first?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order?: InputMaybe<TokenMetadataSizedIconOrder>;
 };
 
 
@@ -10195,6 +10991,203 @@ export enum TokenHasFilter {
   TransactionOutput = 'transactionOutput'
 }
 
+/** CIP-0035 */
+export type TokenMetadata = {
+  __typename?: 'TokenMetadata';
+  asset: Asset;
+  /** how many decimal places should the token support? For ADA, this would be 6 e.g. 1 ADA is 10^6 Lovelace */
+  decimals?: Maybe<Scalars['Int']>;
+  /** additional description that defines the usage of the token */
+  desc?: Maybe<Scalars['String']>;
+  /** MUST be either https, ipfs, or data.  icon MUST be a browser supported image format. */
+  icon?: Maybe<Scalars['String']>;
+  name: Scalars['String'];
+  /** https only url that holds the metadata in the onchain format. */
+  ref?: Maybe<Scalars['String']>;
+  sizedIcons: Array<TokenMetadataSizedIcon>;
+  sizedIconsAggregate?: Maybe<TokenMetadataSizedIconAggregateResult>;
+  /** when present, field and overrides default ticker which is the asset name */
+  ticker?: Maybe<Scalars['String']>;
+  /** https only url that refers to metadata stored offchain. */
+  url?: Maybe<Scalars['String']>;
+  version?: Maybe<Scalars['String']>;
+};
+
+
+/** CIP-0035 */
+export type TokenMetadataAssetArgs = {
+  filter?: InputMaybe<AssetFilter>;
+};
+
+
+/** CIP-0035 */
+export type TokenMetadataSizedIconsArgs = {
+  filter?: InputMaybe<TokenMetadataSizedIconFilter>;
+  first?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order?: InputMaybe<TokenMetadataSizedIconOrder>;
+};
+
+
+/** CIP-0035 */
+export type TokenMetadataSizedIconsAggregateArgs = {
+  filter?: InputMaybe<TokenMetadataSizedIconFilter>;
+};
+
+export type TokenMetadataAggregateResult = {
+  __typename?: 'TokenMetadataAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+  decimalsAvg?: Maybe<Scalars['Float']>;
+  decimalsMax?: Maybe<Scalars['Int']>;
+  decimalsMin?: Maybe<Scalars['Int']>;
+  decimalsSum?: Maybe<Scalars['Int']>;
+  descMax?: Maybe<Scalars['String']>;
+  descMin?: Maybe<Scalars['String']>;
+  iconMax?: Maybe<Scalars['String']>;
+  iconMin?: Maybe<Scalars['String']>;
+  nameMax?: Maybe<Scalars['String']>;
+  nameMin?: Maybe<Scalars['String']>;
+  refMax?: Maybe<Scalars['String']>;
+  refMin?: Maybe<Scalars['String']>;
+  tickerMax?: Maybe<Scalars['String']>;
+  tickerMin?: Maybe<Scalars['String']>;
+  urlMax?: Maybe<Scalars['String']>;
+  urlMin?: Maybe<Scalars['String']>;
+  versionMax?: Maybe<Scalars['String']>;
+  versionMin?: Maybe<Scalars['String']>;
+};
+
+export type TokenMetadataFilter = {
+  and?: InputMaybe<Array<InputMaybe<TokenMetadataFilter>>>;
+  has?: InputMaybe<Array<InputMaybe<TokenMetadataHasFilter>>>;
+  not?: InputMaybe<TokenMetadataFilter>;
+  or?: InputMaybe<Array<InputMaybe<TokenMetadataFilter>>>;
+};
+
+export enum TokenMetadataHasFilter {
+  Asset = 'asset',
+  Decimals = 'decimals',
+  Desc = 'desc',
+  Icon = 'icon',
+  Name = 'name',
+  Ref = 'ref',
+  SizedIcons = 'sizedIcons',
+  Ticker = 'ticker',
+  Url = 'url',
+  Version = 'version'
+}
+
+export type TokenMetadataOrder = {
+  asc?: InputMaybe<TokenMetadataOrderable>;
+  desc?: InputMaybe<TokenMetadataOrderable>;
+  then?: InputMaybe<TokenMetadataOrder>;
+};
+
+export enum TokenMetadataOrderable {
+  Decimals = 'decimals',
+  Desc = 'desc',
+  Icon = 'icon',
+  Name = 'name',
+  Ref = 'ref',
+  Ticker = 'ticker',
+  Url = 'url',
+  Version = 'version'
+}
+
+export type TokenMetadataPatch = {
+  asset?: InputMaybe<AssetRef>;
+  /** how many decimal places should the token support? For ADA, this would be 6 e.g. 1 ADA is 10^6 Lovelace */
+  decimals?: InputMaybe<Scalars['Int']>;
+  /** additional description that defines the usage of the token */
+  desc?: InputMaybe<Scalars['String']>;
+  /** MUST be either https, ipfs, or data.  icon MUST be a browser supported image format. */
+  icon?: InputMaybe<Scalars['String']>;
+  name?: InputMaybe<Scalars['String']>;
+  /** https only url that holds the metadata in the onchain format. */
+  ref?: InputMaybe<Scalars['String']>;
+  sizedIcons?: InputMaybe<Array<TokenMetadataSizedIconRef>>;
+  /** when present, field and overrides default ticker which is the asset name */
+  ticker?: InputMaybe<Scalars['String']>;
+  /** https only url that refers to metadata stored offchain. */
+  url?: InputMaybe<Scalars['String']>;
+  version?: InputMaybe<Scalars['String']>;
+};
+
+export type TokenMetadataRef = {
+  asset?: InputMaybe<AssetRef>;
+  /** how many decimal places should the token support? For ADA, this would be 6 e.g. 1 ADA is 10^6 Lovelace */
+  decimals?: InputMaybe<Scalars['Int']>;
+  /** additional description that defines the usage of the token */
+  desc?: InputMaybe<Scalars['String']>;
+  /** MUST be either https, ipfs, or data.  icon MUST be a browser supported image format. */
+  icon?: InputMaybe<Scalars['String']>;
+  name?: InputMaybe<Scalars['String']>;
+  /** https only url that holds the metadata in the onchain format. */
+  ref?: InputMaybe<Scalars['String']>;
+  sizedIcons?: InputMaybe<Array<TokenMetadataSizedIconRef>>;
+  /** when present, field and overrides default ticker which is the asset name */
+  ticker?: InputMaybe<Scalars['String']>;
+  /** https only url that refers to metadata stored offchain. */
+  url?: InputMaybe<Scalars['String']>;
+  version?: InputMaybe<Scalars['String']>;
+};
+
+export type TokenMetadataSizedIcon = {
+  __typename?: 'TokenMetadataSizedIcon';
+  /** https only url that refers to metadata stored offchain. */
+  icon: Scalars['String'];
+  /** Most likely one of 16, 32, 64, 96, 128 */
+  size: Scalars['Int'];
+};
+
+export type TokenMetadataSizedIconAggregateResult = {
+  __typename?: 'TokenMetadataSizedIconAggregateResult';
+  count?: Maybe<Scalars['Int']>;
+  iconMax?: Maybe<Scalars['String']>;
+  iconMin?: Maybe<Scalars['String']>;
+  sizeAvg?: Maybe<Scalars['Float']>;
+  sizeMax?: Maybe<Scalars['Int']>;
+  sizeMin?: Maybe<Scalars['Int']>;
+  sizeSum?: Maybe<Scalars['Int']>;
+};
+
+export type TokenMetadataSizedIconFilter = {
+  and?: InputMaybe<Array<InputMaybe<TokenMetadataSizedIconFilter>>>;
+  has?: InputMaybe<Array<InputMaybe<TokenMetadataSizedIconHasFilter>>>;
+  not?: InputMaybe<TokenMetadataSizedIconFilter>;
+  or?: InputMaybe<Array<InputMaybe<TokenMetadataSizedIconFilter>>>;
+};
+
+export enum TokenMetadataSizedIconHasFilter {
+  Icon = 'icon',
+  Size = 'size'
+}
+
+export type TokenMetadataSizedIconOrder = {
+  asc?: InputMaybe<TokenMetadataSizedIconOrderable>;
+  desc?: InputMaybe<TokenMetadataSizedIconOrderable>;
+  then?: InputMaybe<TokenMetadataSizedIconOrder>;
+};
+
+export enum TokenMetadataSizedIconOrderable {
+  Icon = 'icon',
+  Size = 'size'
+}
+
+export type TokenMetadataSizedIconPatch = {
+  /** https only url that refers to metadata stored offchain. */
+  icon?: InputMaybe<Scalars['String']>;
+  /** Most likely one of 16, 32, 64, 96, 128 */
+  size?: InputMaybe<Scalars['Int']>;
+};
+
+export type TokenMetadataSizedIconRef = {
+  /** https only url that refers to metadata stored offchain. */
+  icon?: InputMaybe<Scalars['String']>;
+  /** Most likely one of 16, 32, 64, 96, 128 */
+  size?: InputMaybe<Scalars['Int']>;
+};
+
 export type TokenOrder = {
   asc?: InputMaybe<TokenOrderable>;
   desc?: InputMaybe<TokenOrderable>;
@@ -10733,6 +11726,26 @@ export type UpdateAssetInput = {
   set?: InputMaybe<AssetPatch>;
 };
 
+export type UpdateAssetMintOrBurnInput = {
+  filter: AssetMintOrBurnFilter;
+  remove?: InputMaybe<AssetMintOrBurnPatch>;
+  set?: InputMaybe<AssetMintOrBurnPatch>;
+};
+
+export type UpdateAssetMintOrBurnPayload = {
+  __typename?: 'UpdateAssetMintOrBurnPayload';
+  assetMintOrBurn?: Maybe<Array<Maybe<AssetMintOrBurn>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type UpdateAssetMintOrBurnPayloadAssetMintOrBurnArgs = {
+  filter?: InputMaybe<AssetMintOrBurnFilter>;
+  first?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order?: InputMaybe<AssetMintOrBurnOrder>;
+};
+
 export type UpdateAssetPayload = {
   __typename?: 'UpdateAssetPayload';
   asset?: Maybe<Array<Maybe<Asset>>>;
@@ -11241,6 +12254,46 @@ export type UpdateNetworkConstantsPayloadNetworkConstantsArgs = {
   order?: InputMaybe<NetworkConstantsOrder>;
 };
 
+export type UpdateNftMetadataFileInput = {
+  filter: NftMetadataFileFilter;
+  remove?: InputMaybe<NftMetadataFilePatch>;
+  set?: InputMaybe<NftMetadataFilePatch>;
+};
+
+export type UpdateNftMetadataFilePayload = {
+  __typename?: 'UpdateNftMetadataFilePayload';
+  nftMetadataFile?: Maybe<Array<Maybe<NftMetadataFile>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type UpdateNftMetadataFilePayloadNftMetadataFileArgs = {
+  filter?: InputMaybe<NftMetadataFileFilter>;
+  first?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order?: InputMaybe<NftMetadataFileOrder>;
+};
+
+export type UpdateNftMetadataInput = {
+  filter: NftMetadataFilter;
+  remove?: InputMaybe<NftMetadataPatch>;
+  set?: InputMaybe<NftMetadataPatch>;
+};
+
+export type UpdateNftMetadataPayload = {
+  __typename?: 'UpdateNftMetadataPayload';
+  nftMetadata?: Maybe<Array<Maybe<NftMetadata>>>;
+  numUids?: Maybe<Scalars['Int']>;
+};
+
+
+export type UpdateNftMetadataPayloadNftMetadataArgs = {
+  filter?: InputMaybe<NftMetadataFilter>;
+  first?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order?: InputMaybe<NftMetadataOrder>;
+};
+
 export type UpdatePlutusScriptInput = {
   filter: PlutusScriptFilter;
   remove?: InputMaybe<PlutusScriptPatch>;
@@ -11259,6 +12312,26 @@ export type UpdatePlutusScriptPayloadPlutusScriptArgs = {
   first?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
   order?: InputMaybe<PlutusScriptOrder>;
+};
+
+export type UpdatePolicyInput = {
+  filter: PolicyFilter;
+  remove?: InputMaybe<PolicyPatch>;
+  set?: InputMaybe<PolicyPatch>;
+};
+
+export type UpdatePolicyPayload = {
+  __typename?: 'UpdatePolicyPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  policy?: Maybe<Array<Maybe<Policy>>>;
+};
+
+
+export type UpdatePolicyPayloadPolicyArgs = {
+  filter?: InputMaybe<PolicyFilter>;
+  first?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order?: InputMaybe<PolicyOrder>;
 };
 
 export type UpdatePoolContactDataInput = {
@@ -11862,6 +12935,46 @@ export type UpdateTokenInput = {
   set?: InputMaybe<TokenPatch>;
 };
 
+export type UpdateTokenMetadataInput = {
+  filter: TokenMetadataFilter;
+  remove?: InputMaybe<TokenMetadataPatch>;
+  set?: InputMaybe<TokenMetadataPatch>;
+};
+
+export type UpdateTokenMetadataPayload = {
+  __typename?: 'UpdateTokenMetadataPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  tokenMetadata?: Maybe<Array<Maybe<TokenMetadata>>>;
+};
+
+
+export type UpdateTokenMetadataPayloadTokenMetadataArgs = {
+  filter?: InputMaybe<TokenMetadataFilter>;
+  first?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order?: InputMaybe<TokenMetadataOrder>;
+};
+
+export type UpdateTokenMetadataSizedIconInput = {
+  filter: TokenMetadataSizedIconFilter;
+  remove?: InputMaybe<TokenMetadataSizedIconPatch>;
+  set?: InputMaybe<TokenMetadataSizedIconPatch>;
+};
+
+export type UpdateTokenMetadataSizedIconPayload = {
+  __typename?: 'UpdateTokenMetadataSizedIconPayload';
+  numUids?: Maybe<Scalars['Int']>;
+  tokenMetadataSizedIcon?: Maybe<Array<Maybe<TokenMetadataSizedIcon>>>;
+};
+
+
+export type UpdateTokenMetadataSizedIconPayloadTokenMetadataSizedIconArgs = {
+  filter?: InputMaybe<TokenMetadataSizedIconFilter>;
+  first?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order?: InputMaybe<TokenMetadataSizedIconOrder>;
+};
+
 export type UpdateTokenPayload = {
   __typename?: 'UpdateTokenPayload';
   numUids?: Maybe<Scalars['Int']>;
@@ -12330,6 +13443,13 @@ export type WitnessScriptRef = {
   script?: InputMaybe<ScriptRef>;
   witness?: InputMaybe<WitnessRef>;
 };
+
+export type AssetQueryVariables = Exact<{
+  assetId: Scalars['String'];
+}>;
+
+
+export type AssetQuery = { __typename?: 'Query', queryAsset?: Array<{ __typename?: 'Asset', assetName: string, totalQuantity: number | bigint, fingerprint: string, policy: { __typename?: 'Policy', id: string }, history: Array<{ __typename?: 'AssetMintOrBurn', quantity: number | bigint, transaction: { __typename?: 'Transaction', hash: string } }>, tokenMetadata?: { __typename?: 'TokenMetadata', name: string, ticker?: string | null, icon?: string | null, url?: string | null, desc?: string | null, decimals?: number | null, ref?: string | null, version?: string | null, sizedIcons: Array<{ __typename?: 'TokenMetadataSizedIcon', size: number, icon: string }> } | null, nftMetadata?: { __typename?: 'NftMetadata', name: string, images: Array<string>, version: string, mediaType?: string | null, descriptions: Array<string>, files: Array<{ __typename?: 'NftMetadataFile', name: string, mediaType: string, src: Array<string> }> } | null } | null> | null };
 
 export type BlocksByHashesQueryVariables = Exact<{
   hashes: Array<Scalars['String']> | Scalars['String'];
@@ -12848,6 +13968,50 @@ ${AnyScriptFragmentDoc}
 ${MetadatumValueFragmentDoc}
 ${MetadatumArrayFragmentDoc}
 ${MetadatumMapFragmentDoc}`;
+export const AssetDocument = gql`
+    query Asset($assetId: String!) {
+  queryAsset(filter: {assetId: {eq: $assetId}}, first: 1) {
+    assetName
+    policy {
+      id
+    }
+    history {
+      quantity
+      transaction {
+        hash
+      }
+    }
+    totalQuantity
+    fingerprint
+    tokenMetadata {
+      name
+      ticker
+      icon
+      url
+      desc
+      decimals
+      ref
+      version
+      sizedIcons {
+        size
+        icon
+      }
+    }
+    nftMetadata {
+      name
+      images
+      version
+      mediaType
+      files {
+        name
+        mediaType
+        src
+      }
+      descriptions
+    }
+  }
+}
+    `;
 export const BlocksByHashesDocument = gql`
     query BlocksByHashes($hashes: [String!]!) {
   queryBlock(filter: {hash: {in: $hashes}}) {
@@ -13043,6 +14207,9 @@ const defaultWrapper: SdkFunctionWrapper = (action, _operationName) => action();
 
 export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = defaultWrapper) {
   return {
+    Asset(variables: AssetQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<AssetQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<AssetQuery>(AssetDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'Asset');
+    },
     BlocksByHashes(variables: BlocksByHashesQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<BlocksByHashesQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<BlocksByHashesQuery>(BlocksByHashesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'BlocksByHashes');
     },

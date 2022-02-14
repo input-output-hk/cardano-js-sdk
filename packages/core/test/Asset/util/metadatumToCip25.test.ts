@@ -1,12 +1,13 @@
-import { Cardano } from '@cardano-sdk/core';
-import { metadatumToCip25 } from '../../src/NftMetadata';
+import { AssetInfo } from '../../../src/Asset';
+import { AssetName, MetadatumMap, PolicyId } from '../../../src/Cardano';
+import { metadatumToCip25 } from '../../../src/Asset/util';
 import { omit } from 'lodash';
 
 describe('NftMetadata/metadatumToCip25', () => {
   const asset = {
-    name: Cardano.AssetName('abc123'),
-    policyId: Cardano.PolicyId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a7')
-  } as Cardano.Asset;
+    name: AssetName('abc123'),
+    policyId: PolicyId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a7')
+  } as AssetInfo;
 
   const minimalMetadata = {
     image: 'ipfs://image',
@@ -14,20 +15,20 @@ describe('NftMetadata/metadatumToCip25', () => {
   };
 
   const minimalConvertedMetadata = {
-    image: 'ipfs://image',
+    image: ['ipfs://image'],
     name: 'test nft',
     version: '1.0'
   };
 
   it('returns undefined for non-cip25 metadatum', () => {
-    const metadatum: Cardano.MetadatumMap = {
+    const metadatum: MetadatumMap = {
       other: 'metadatum'
     };
     expect(metadatumToCip25(asset, metadatum)).toBeUndefined();
   });
 
   it('returns undefined for cip25 metadatum with no metadata for given policyId', () => {
-    const metadatum: Cardano.MetadatumMap = {
+    const metadatum: MetadatumMap = {
       '721': {
         other_policy_id: minimalMetadata
       }
@@ -36,7 +37,7 @@ describe('NftMetadata/metadatumToCip25', () => {
   });
 
   it('returns undefined for cip25 metadatum with no metadata for given assetId', () => {
-    const metadatum: Cardano.MetadatumMap = {
+    const metadatum: MetadatumMap = {
       '721': {
         [asset.policyId.toString()]: {
           other_asset_id: minimalMetadata
@@ -47,7 +48,7 @@ describe('NftMetadata/metadatumToCip25', () => {
   });
 
   it('converts minimal metadata', () => {
-    const metadatum: Cardano.MetadatumMap = {
+    const metadatum: MetadatumMap = {
       '721': {
         [asset.policyId.toString()]: {
           [asset.name.toString()]: minimalMetadata
@@ -61,7 +62,7 @@ describe('NftMetadata/metadatumToCip25', () => {
   // It is most likely assumed to be hex strings,
   // but people are likely to specify utf8, because it's named '<asset_name>'
   it('supports asset name as utf8 string', () => {
-    const metadatum: Cardano.MetadatumMap = {
+    const metadatum: MetadatumMap = {
       '721': {
         [asset.policyId.toString()]: {
           [Buffer.from(asset.name.toString()).toString('utf8')]: minimalMetadata
@@ -72,7 +73,7 @@ describe('NftMetadata/metadatumToCip25', () => {
   });
 
   it('converts version', () => {
-    const metadatum: Cardano.MetadatumMap = {
+    const metadatum: MetadatumMap = {
       '721': {
         [asset.policyId.toString()]: {
           [asset.name.toString()]: minimalMetadata,
@@ -87,7 +88,7 @@ describe('NftMetadata/metadatumToCip25', () => {
   });
 
   it('coverts optional properties (mediaType, description and <other properties>)', () => {
-    const metadatum: Cardano.MetadatumMap = {
+    const metadatum: MetadatumMap = {
       '721': {
         [asset.policyId.toString()]: {
           [asset.name.toString()]: {
@@ -101,7 +102,7 @@ describe('NftMetadata/metadatumToCip25', () => {
     };
     expect(metadatumToCip25(asset, metadatum)).toEqual({
       ...minimalConvertedMetadata,
-      description: 'description',
+      description: ['description'],
       mediaType: 'image/png',
       otherProperties: { extraProp: 'extra' }
     });
@@ -119,7 +120,7 @@ describe('NftMetadata/metadatumToCip25', () => {
       name: 'file2',
       src: ['https://file2.location']
     };
-    const metadatum: Cardano.MetadatumMap = {
+    const metadatum: MetadatumMap = {
       '721': {
         [asset.policyId.toString()]: {
           [asset.name.toString()]: {
@@ -131,7 +132,10 @@ describe('NftMetadata/metadatumToCip25', () => {
     };
     expect(metadatumToCip25(asset, metadatum)).toEqual({
       ...minimalConvertedMetadata,
-      files: [file1, { ...omit(file2, 'extraProp'), otherProperties: { extraProp: 'extra' } }]
+      files: [
+        { ...file1, src: [file1.src] },
+        { ...omit(file2, 'extraProp'), otherProperties: { extraProp: 'extra' } }
+      ]
     });
   });
 });

@@ -1,4 +1,4 @@
-import { Cardano } from '@cardano-sdk/core';
+import { Asset, Cardano } from '@cardano-sdk/core';
 
 export const asset = {
   assetId: Cardano.AssetId('659f2917fb63f12b33667463ee575eeac1845bbc736b9c0bbc40ba8254534c41'),
@@ -12,7 +12,7 @@ export const asset = {
   name: Cardano.AssetName('54534c41'),
   policyId: Cardano.PolicyId('7eae28af2208be856f7a119668ae52a49b73725e326dc16579dcc373'),
   quantity: 1000n
-} as Cardano.Asset;
+} as Asset.AssetInfo;
 
 export const mockAssetProvider = () => ({
   getAsset: jest.fn().mockResolvedValue(asset)
