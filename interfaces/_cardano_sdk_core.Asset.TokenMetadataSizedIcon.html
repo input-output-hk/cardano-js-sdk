@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>AssetMintOrBurn | cardano-sdk</title>
+	<title>TokenMetadataSizedIcon | cardano-sdk</title>
 	<meta name="description" content="Documentation for cardano-sdk">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -58,13 +58,13 @@
 					<a href="../modules/_cardano_sdk_core.html">@cardano-sdk/core</a>
 				</li>
 				<li>
-					<a href="../modules/_cardano_sdk_core.Cardano.html">Cardano</a>
+					<a href="../modules/_cardano_sdk_core.Asset.html">Asset</a>
 				</li>
 				<li>
-					<a href="_cardano_sdk_core.Cardano.AssetMintOrBurn.html">AssetMintOrBurn</a>
+					<a href="_cardano_sdk_core.Asset.TokenMetadataSizedIcon.html">TokenMetadataSizedIcon</a>
 				</li>
 			</ul>
-			<h1>Interface AssetMintOrBurn</h1>
+			<h1>Interface TokenMetadataSizedIcon</h1>
 		</div>
 	</div>
 </header>
@@ -75,7 +75,7 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">AssetMintOrBurn</span>
+						<span class="target">TokenMetadataSizedIcon</span>
 					</li>
 				</ul>
 			</section>
@@ -86,8 +86,8 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.Cardano.AssetMintOrBurn.html#quantity" class="tsd-kind-icon">quantity</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.Cardano.AssetMintOrBurn.html#transactionId" class="tsd-kind-icon">transaction<wbr>Id</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.Asset.TokenMetadataSizedIcon.html#icon" class="tsd-kind-icon">icon</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.Asset.TokenMetadataSizedIcon.html#size" class="tsd-kind-icon">size</a></li>
 							</ul>
 						</section>
 					</div>
@@ -96,30 +96,35 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="quantity" class="tsd-anchor"></a>
-					<h3>quantity</h3>
-					<div class="tsd-signature tsd-kind-icon">quantity<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">bigint</span></div>
+					<a name="icon" class="tsd-anchor"></a>
+					<h3>icon</h3>
+					<div class="tsd-signature tsd-kind-icon">icon<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/97d69bd/packages/core/src/Cardano/types/Asset.ts#L107">packages/core/src/Cardano/types/Asset.ts:107</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/af620d4/packages/core/src/Asset/types/TokenMetadata.ts#L10">packages/core/src/Asset/types/TokenMetadata.ts:10</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>Positive = mint
-							Negative = burn</p>
+							<p>MUST be either https, ipfs, or data.  icon MUST be a browser supported image format.</p>
 						</div>
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="transactionId" class="tsd-anchor"></a>
-					<h3>transaction<wbr>Id</h3>
-					<div class="tsd-signature tsd-kind-icon">transaction<wbr>Id<span class="tsd-signature-symbol">:</span> <a href="../modules/_cardano_sdk_core.Cardano.html#TransactionId-1" class="tsd-signature-type" data-tsd-kind="Function">TransactionId</a></div>
+					<a name="size" class="tsd-anchor"></a>
+					<h3>size</h3>
+					<div class="tsd-signature tsd-kind-icon">size<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/97d69bd/packages/core/src/Cardano/types/Asset.ts#L102">packages/core/src/Cardano/types/Asset.ts:102</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/af620d4/packages/core/src/Asset/types/TokenMetadata.ts#L6">packages/core/src/Asset/types/TokenMetadata.ts:6</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Most likely one of 16, 32, 64, 96, 128
+							icons are assumed to be square</p>
+						</div>
+					</div>
 				</section>
 			</section>
 		</div>
@@ -133,21 +138,54 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
+					<li class=" tsd-kind-interface tsd-parent-kind-namespace">
+						<a href="_cardano_sdk_core.Asset.AssetInfo.html" class="tsd-kind-icon">Asset<wbr>Info</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-namespace">
+						<a href="_cardano_sdk_core.Asset.AssetMintOrBurn.html" class="tsd-kind-icon">Asset<wbr>Mint<wbr>OrBurn</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-namespace">
+						<a href="_cardano_sdk_core.Asset.NftMetadata.html" class="tsd-kind-icon">Nft<wbr>Metadata</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-namespace">
+						<a href="_cardano_sdk_core.Asset.NftMetadataFile.html" class="tsd-kind-icon">Nft<wbr>Metadata<wbr>File</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-namespace">
+						<a href="_cardano_sdk_core.Asset.TokenMetadata.html" class="tsd-kind-icon">Token<wbr>Metadata</a>
+					</li>
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_core.Cardano.AssetMintOrBurn.html" class="tsd-kind-icon">Asset<wbr>Mint<wbr>OrBurn</a>
+						<a href="_cardano_sdk_core.Asset.TokenMetadataSizedIcon.html" class="tsd-kind-icon">Token<wbr>Metadata<wbr>Sized<wbr>Icon</a>
 						<ul>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_cardano_sdk_core.Cardano.AssetMintOrBurn.html#quantity" class="tsd-kind-icon">quantity</a>
+								<a href="_cardano_sdk_core.Asset.TokenMetadataSizedIcon.html#icon" class="tsd-kind-icon">icon</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_cardano_sdk_core.Cardano.AssetMintOrBurn.html#transactionId" class="tsd-kind-icon">transaction<wbr>Id</a>
+								<a href="_cardano_sdk_core.Asset.TokenMetadataSizedIcon.html#size" class="tsd-kind-icon">size</a>
 							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
+					<li class=" tsd-kind-type-alias tsd-parent-kind-namespace">
+						<a href="../modules/_cardano_sdk_core.Asset.html#ImageMediaType" class="tsd-kind-icon">Image<wbr>Media<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-namespace">
+						<a href="../modules/_cardano_sdk_core.Asset.html#MediaType" class="tsd-kind-icon">Media<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-namespace">
+						<a href="../modules/_cardano_sdk_core.Asset.html#Uri" class="tsd-kind-icon">Uri</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-namespace">
+						<a href="../modules/_cardano_sdk_core.Asset.html#ImageMediaType-1" class="tsd-kind-icon">Image<wbr>Media<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-namespace">
+						<a href="../modules/_cardano_sdk_core.Asset.html#MediaType-1" class="tsd-kind-icon">Media<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-namespace">
+						<a href="../modules/_cardano_sdk_core.Asset.html#Uri-1" class="tsd-kind-icon">Uri</a>
+					</li>
 				</ul>
 			</nav>
 		</div>

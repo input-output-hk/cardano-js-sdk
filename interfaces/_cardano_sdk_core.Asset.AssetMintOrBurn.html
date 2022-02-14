@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>NftMetadataProvider | cardano-sdk</title>
+	<title>AssetMintOrBurn | cardano-sdk</title>
 	<meta name="description" content="Documentation for cardano-sdk">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -55,16 +55,16 @@
 					<a href="../index.html">cardano-sdk</a>
 				</li>
 				<li>
-					<a href="../modules/_cardano_sdk_wallet.html">@cardano-sdk/wallet</a>
+					<a href="../modules/_cardano_sdk_core.html">@cardano-sdk/core</a>
 				</li>
 				<li>
-					<a href="../modules/_cardano_sdk_wallet.NftMetadata.html">NftMetadata</a>
+					<a href="../modules/_cardano_sdk_core.Asset.html">Asset</a>
 				</li>
 				<li>
-					<a href="_cardano_sdk_wallet.NftMetadata.NftMetadataProvider.html">NftMetadataProvider</a>
+					<a href="_cardano_sdk_core.Asset.AssetMintOrBurn.html">AssetMintOrBurn</a>
 				</li>
 			</ul>
-			<h1>Interface NftMetadataProvider</h1>
+			<h1>Interface AssetMintOrBurn</h1>
 		</div>
 	</div>
 </header>
@@ -75,31 +75,52 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">NftMetadataProvider</span>
+						<span class="target">AssetMintOrBurn</span>
 					</li>
 				</ul>
 			</section>
-			<section class="tsd-panel">
-				<h3 class="tsd-before-signature">Callable</h3>
-				<ul class="tsd-signatures tsd-kind-interface tsd-parent-kind-namespace">
-					<li class="tsd-signature tsd-kind-icon">Nft<wbr>Metadata<wbr>Provider<span class="tsd-signature-symbol">(</span>asset<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Asset</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><a href="_cardano_sdk_wallet.NftMetadata.NftMetadata.html" class="tsd-signature-type" data-tsd-kind="Interface">NftMetadata</a><span class="tsd-signature-symbol">&gt;</span></li>
-				</ul>
-				<ul class="tsd-descriptions">
-					<li class="tsd-description">
-						<aside class="tsd-sources">
-							<ul>
-								<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/97d69bd/packages/wallet/src/NftMetadata/types.ts#L58">packages/wallet/src/NftMetadata/types.ts:58</a></li>
+			<section class="tsd-panel-group tsd-index-group">
+				<h2>Index</h2>
+				<section class="tsd-panel tsd-index-panel">
+					<div class="tsd-index-content">
+						<section class="tsd-index-section ">
+							<h3>Properties</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.Asset.AssetMintOrBurn.html#quantity" class="tsd-kind-icon">quantity</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.Asset.AssetMintOrBurn.html#transactionId" class="tsd-kind-icon">transaction<wbr>Id</a></li>
 							</ul>
-						</aside>
-						<h4 class="tsd-parameters-title">Parameters</h4>
-						<ul class="tsd-parameters">
-							<li>
-								<h5>asset: <span class="tsd-signature-type">Asset</span></h5>
-							</li>
+						</section>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Properties</h2>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="quantity" class="tsd-anchor"></a>
+					<h3>quantity</h3>
+					<div class="tsd-signature tsd-kind-icon">quantity<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">bigint</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/af620d4/packages/core/src/Asset/types/AssetInfo.ts#L11">packages/core/src/Asset/types/AssetInfo.ts:11</a></li>
 						</ul>
-						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><a href="_cardano_sdk_wallet.NftMetadata.NftMetadata.html" class="tsd-signature-type" data-tsd-kind="Interface">NftMetadata</a><span class="tsd-signature-symbol">&gt;</span></h4>
-					</li>
-				</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Positive = mint
+							Negative = burn</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="transactionId" class="tsd-anchor"></a>
+					<h3>transaction<wbr>Id</h3>
+					<div class="tsd-signature tsd-kind-icon">transaction<wbr>Id<span class="tsd-signature-symbol">:</span> <a href="../modules/_cardano_sdk_core.Cardano.html#TransactionId-1" class="tsd-signature-type" data-tsd-kind="Function">TransactionId</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/af620d4/packages/core/src/Asset/types/AssetInfo.ts#L6">packages/core/src/Asset/types/AssetInfo.ts:6</a></li>
+						</ul>
+					</aside>
+				</section>
 			</section>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
@@ -113,41 +134,52 @@
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
 					<li class=" tsd-kind-interface tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_wallet.NftMetadata.NftMetadata.html" class="tsd-kind-icon">Nft<wbr>Metadata</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_wallet.NftMetadata.NftMetadataFile.html" class="tsd-kind-icon">Nft<wbr>Metadata<wbr>File</a>
+						<a href="_cardano_sdk_core.Asset.AssetInfo.html" class="tsd-kind-icon">Asset<wbr>Info</a>
 					</li>
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_wallet.NftMetadata.NftMetadataProvider.html" class="tsd-kind-icon">Nft<wbr>Metadata<wbr>Provider</a>
+						<a href="_cardano_sdk_core.Asset.AssetMintOrBurn.html" class="tsd-kind-icon">Asset<wbr>Mint<wbr>OrBurn</a>
+						<ul>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="_cardano_sdk_core.Asset.AssetMintOrBurn.html#quantity" class="tsd-kind-icon">quantity</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="_cardano_sdk_core.Asset.AssetMintOrBurn.html#transactionId" class="tsd-kind-icon">transaction<wbr>Id</a>
+							</li>
+						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
-					<li class=" tsd-kind-type-alias tsd-parent-kind-namespace">
-						<a href="../modules/_cardano_sdk_wallet.NftMetadata.html#ImageMediaType" class="tsd-kind-icon">Image<wbr>Media<wbr>Type</a>
+					<li class=" tsd-kind-interface tsd-parent-kind-namespace">
+						<a href="_cardano_sdk_core.Asset.NftMetadata.html" class="tsd-kind-icon">Nft<wbr>Metadata</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-namespace">
+						<a href="_cardano_sdk_core.Asset.NftMetadataFile.html" class="tsd-kind-icon">Nft<wbr>Metadata<wbr>File</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-namespace">
+						<a href="_cardano_sdk_core.Asset.TokenMetadata.html" class="tsd-kind-icon">Token<wbr>Metadata</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-namespace">
+						<a href="_cardano_sdk_core.Asset.TokenMetadataSizedIcon.html" class="tsd-kind-icon">Token<wbr>Metadata<wbr>Sized<wbr>Icon</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-parent-kind-namespace">
-						<a href="../modules/_cardano_sdk_wallet.NftMetadata.html#MediaType" class="tsd-kind-icon">Media<wbr>Type</a>
+						<a href="../modules/_cardano_sdk_core.Asset.html#ImageMediaType" class="tsd-kind-icon">Image<wbr>Media<wbr>Type</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-parent-kind-namespace">
-						<a href="../modules/_cardano_sdk_wallet.NftMetadata.html#Uri" class="tsd-kind-icon">Uri</a>
+						<a href="../modules/_cardano_sdk_core.Asset.html#MediaType" class="tsd-kind-icon">Media<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-namespace">
+						<a href="../modules/_cardano_sdk_core.Asset.html#Uri" class="tsd-kind-icon">Uri</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-namespace">
-						<a href="../modules/_cardano_sdk_wallet.NftMetadata.html#ImageMediaType-1" class="tsd-kind-icon">Image<wbr>Media<wbr>Type</a>
+						<a href="../modules/_cardano_sdk_core.Asset.html#ImageMediaType-1" class="tsd-kind-icon">Image<wbr>Media<wbr>Type</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-namespace">
-						<a href="../modules/_cardano_sdk_wallet.NftMetadata.html#MediaType-1" class="tsd-kind-icon">Media<wbr>Type</a>
+						<a href="../modules/_cardano_sdk_core.Asset.html#MediaType-1" class="tsd-kind-icon">Media<wbr>Type</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-namespace">
-						<a href="../modules/_cardano_sdk_wallet.NftMetadata.html#Uri-1" class="tsd-kind-icon">Uri</a>
-					</li>
-					<li class=" tsd-kind-function tsd-parent-kind-namespace">
-						<a href="../modules/_cardano_sdk_wallet.NftMetadata.html#createNftMetadataProvider" class="tsd-kind-icon">create<wbr>Nft<wbr>Metadata<wbr>Provider</a>
-					</li>
-					<li class=" tsd-kind-function tsd-parent-kind-namespace">
-						<a href="../modules/_cardano_sdk_wallet.NftMetadata.html#metadatumToCip25" class="tsd-kind-icon">metadatum<wbr>ToCip25</a>
+						<a href="../modules/_cardano_sdk_core.Asset.html#Uri-1" class="tsd-kind-icon">Uri</a>
 					</li>
 				</ul>
 			</nav>
@@ -168,6 +200,7 @@
 			<ul class="tsd-legend">
 				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
 				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>

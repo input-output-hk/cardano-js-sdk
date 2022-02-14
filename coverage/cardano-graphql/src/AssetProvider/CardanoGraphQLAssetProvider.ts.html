@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for src/NftMetadata/types.ts</title>
+    <title>Code coverage report for src/AssetProvider/CardanoGraphQLAssetProvider.ts</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../../prettify.css" />
     <link rel="stylesheet" href="../../base.css" />
@@ -19,34 +19,34 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../index.html">All files</a> / <a href="index.html">src/NftMetadata</a> types.ts</h1>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">src/AssetProvider</a> CardanoGraphQLAssetProvider.ts</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>16/16</span>
+                <span class='fraction'>8/8</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">50% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>6/6</span>
+                <span class='fraction'>9/18</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>3/3</span>
+                <span class='fraction'>4/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>13/13</span>
+                <span class='fraction'>7/7</span>
             </div>
         
             
@@ -106,41 +106,25 @@
 <a name='L47'></a><a href='#L47'>47</a>
 <a name='L48'></a><a href='#L48'>48</a>
 <a name='L49'></a><a href='#L49'>49</a>
-<a name='L50'></a><a href='#L50'>50</a>
-<a name='L51'></a><a href='#L51'>51</a>
-<a name='L52'></a><a href='#L52'>52</a>
-<a name='L53'></a><a href='#L53'>53</a>
-<a name='L54'></a><a href='#L54'>54</a>
-<a name='L55'></a><a href='#L55'>55</a>
-<a name='L56'></a><a href='#L56'>56</a>
-<a name='L57'></a><a href='#L57'>57</a>
-<a name='L58'></a><a href='#L58'>58</a>
-<a name='L59'></a><a href='#L59'>59</a>
-<a name='L60'></a><a href='#L60'>60</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">21x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">21x</span>
-<span class="cline-any cline-yes">10x</span>
-<span class="cline-any cline-yes">9x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">21x</span>
-<span class="cline-any cline-yes">3x</span>
+<a name='L50'></a><a href='#L50'>50</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">21x</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -171,69 +155,55 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/* eslint-disable wrap-regex */
-import { Cardano, InvalidStringError } from '@cardano-sdk/core';
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Asset, AssetProvider, Cardano, util } from '@cardano-sdk/core';
+import { createProvider, getExactlyOneObject } from '../util';
 &nbsp;
-export type Uri = Cardano.util.OpaqueString&lt;'Uri'&gt;;
-export const Uri = (uri: string) =&gt; {
-  if (/^[a-z]+:\/\/.+/.test(uri)) {
-    return uri as unknown as Uri;
+export const createGraphQLAssetProvider = createProvider&lt;AssetProvider&gt;((sdk) =&gt; ({
+  async getAsset(assetId) {
+    const { tokenMetadata, nftMetadata, fingerprint, history, assetName, policy, totalQuantity } = getExactlyOneObject(
+      (await sdk.Asset({ assetId: assetId.toString() })).queryAsset?.filter(util.isNotNil),
+      'Asset'
+    );
+    return {
+      assetId,
+      fingerprint: Cardano.AssetFingerprint(fingerprint),
+      history: history.map(({ quantity, transaction: { hash } }) =&gt; ({
+        quantity: BigInt(quantity),
+        transactionId: Cardano.TransactionId(hash)
+      })),
+      name: Cardano.AssetName(assetName),
+      nftMetadata: nftMetadata
+        ? {
+            description: nftMetadata.descriptions,
+            files: nftMetadata.files.map(({ mediaType, name, src }) =&gt; ({
+              mediaType: Asset.MediaType(mediaType),
+              name,
+              src: src.map(Asset.Uri)
+            })),
+            image: nftMetadata.images.map(Asset.Uri),
+            mediaType: nftMetadata.mediaType ? Asset.ImageMediaType(nftMetadata.mediaType) : <span class="branch-1 cbranch-no" title="branch not covered" >undefined,</span>
+            name: nftMetadata.name,
+            version: nftMetadata.version
+          }
+        : <span class="branch-1 cbranch-no" title="branch not covered" >undefined,</span>
+      policyId: Cardano.PolicyId(policy.id),
+      quantity: BigInt(totalQuantity),
+      tokenMetadata: tokenMetadata
+        ? {
+            decimals: tokenMetadata.decimals || <span class="branch-1 cbranch-no" title="branch not covered" >undefined,</span>
+            desc: tokenMetadata.desc || <span class="branch-1 cbranch-no" title="branch not covered" >undefined,</span>
+            icon: tokenMetadata.icon || <span class="branch-1 cbranch-no" title="branch not covered" >undefined,</span>
+            name: tokenMetadata.name,
+            ref: tokenMetadata.ref || <span class="branch-1 cbranch-no" title="branch not covered" >undefined,</span>
+            sizedIcons: tokenMetadata.sizedIcons,
+            ticker: tokenMetadata.ticker || <span class="branch-1 cbranch-no" title="branch not covered" >undefined,</span>
+            url: tokenMetadata.url || <span class="branch-1 cbranch-no" title="branch not covered" >undefined,</span>
+            version: tokenMetadata.version as Asset.TokenMetadata['version']
+          }
+        : <span class="branch-1 cbranch-no" title="branch not covered" >undefined</span>
+    };
   }
-  throw new InvalidStringError(
-    'Expected Uri to start with "[protocol]://", where protocol is usually "https" or "ipfs"'
-  );
-};
-&nbsp;
-export type ImageMediaType = Cardano.util.OpaqueString&lt;'ImageMediaType'&gt;;
-export const ImageMediaType = (mediaType: string) =&gt; {
-  if (/^image\/.+$/.test(mediaType)) {
-    return mediaType as unknown as ImageMediaType;
-  }
-  throw new InvalidStringError('Expected media type to be "image/*"');
-};
-&nbsp;
-export type MediaType = Cardano.util.OpaqueString&lt;'MediaType'&gt;;
-export const MediaType = (mediaType: string) =&gt; {
-  if (/^[a-z]+\/.+$/.test(mediaType)) {
-    return mediaType as unknown as MediaType;
-  }
-  throw new InvalidStringError('Expected media type to be "*/*"');
-};
-&nbsp;
-/**
- * https://cips.cardano.org/cips/cip25/
- */
-export interface NftMetadataFile {
-  name: string;
-  mediaType: MediaType;
-  src: Uri | Uri[];
-  otherProperties?: {
-    [key: string]: Cardano.Metadatum | undefined;
-  };
-}
-&nbsp;
-/**
- * https://cips.cardano.org/cips/cip25/
- */
-export interface NftMetadata {
-  name: string;
-  image: Uri | Uri[];
-  version: string;
-  mediaType?: ImageMediaType;
-  files?: NftMetadataFile[];
-  description?: string | string[];
-  otherProperties?: {
-    [key: string]: Cardano.Metadatum | undefined;
-  };
-}
-&nbsp;
-export interface NftMetadataProvider {
-  (asset: Cardano.Asset): Promise&lt;NftMetadata | undefined&gt;;
-}
+}));
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -241,7 +211,7 @@ export interface NftMetadataProvider {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Mon Feb 14 2022 09:49:02 GMT+0000 (Coordinated Universal Time)
+                at Mon Feb 14 2022 15:14:05 GMT+0000 (Coordinated Universal Time)
             </div>
         </div>
         <script src="../../prettify.js"></script>

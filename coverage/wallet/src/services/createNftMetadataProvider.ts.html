@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for src/NftMetadata/createNftMetadataProvider.ts</title>
+    <title>Code coverage report for src/services/createNftMetadataProvider.ts</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../../prettify.css" />
     <link rel="stylesheet" href="../../base.css" />
@@ -19,20 +19,20 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../index.html">All files</a> / <a href="index.html">src/NftMetadata</a> createNftMetadataProvider.ts</h1>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">src/services</a> createNftMetadataProvider.ts</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">88.89% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>14/14</span>
+                <span class='fraction'>16/18</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">80% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>2/2</span>
+                <span class='fraction'>4/5</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">86.67% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>11/11</span>
+                <span class='fraction'>13/15</span>
             </div>
         
             
@@ -79,16 +79,30 @@
 <a name='L20'></a><a href='#L20'>20</a>
 <a name='L21'></a><a href='#L21'>21</a>
 <a name='L22'></a><a href='#L22'>22</a>
-<a name='L23'></a><a href='#L23'>23</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">20x</span>
 <span class="cline-any cline-yes">20x</span>
 <span class="cline-any cline-yes">20x</span>
 <span class="cline-any cline-yes">20x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">20x</span>
 <span class="cline-any cline-yes">20x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">21x</span>
 <span class="cline-any cline-yes">40x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">40x</span>
 <span class="cline-any cline-yes">40x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -101,15 +115,22 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Cardano, WalletProvider } from '@cardano-sdk/core';
-import { NftMetadataProvider } from './types';
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Asset, Cardano, NftMetadataProvider, WalletProvider } from '@cardano-sdk/core';
 import { Observable, firstValueFrom, from, map, mergeMap, of, take } from 'rxjs';
+import { dummyLogger } from 'ts-log';
 import { last } from 'lodash-es';
-import { metadatumToCip25 } from './metadatumToCip25';
 &nbsp;
 export const createNftMetadataProvider =
-  (walletProvider: WalletProvider, transactions$: Observable&lt;Cardano.TxAlonzo[]&gt;): NftMetadataProvider =&gt;
-  (asset) =&gt; {
+  (
+    walletProvider: WalletProvider,
+    transactions$: Observable&lt;Cardano.TxAlonzo[]&gt;,
+    logger = dummyLogger
+  ): NftMetadataProvider =&gt;
+  async (asset) =&gt; {
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (!asset.history) {
+<span class="cstat-no" title="statement not covered" >      logger.warn("Can't query asset metadata: no asset.history loaded", asset);</span>
+<span class="cstat-no" title="statement not covered" >      return;</span>
+    }
     const latestMintTxId = last(asset.history.filter(({ quantity }) =&gt; quantity &gt; 0))!.transactionId;
     return firstValueFrom(
       transactions$.pipe(
@@ -119,7 +140,7 @@ export const createNftMetadataProvider =
           // Use local transaction if available, otherwise fetch from WalletProvider
           localTx ? of(localTx) : from(walletProvider.queryTransactionsByHashes([latestMintTxId]).then(([tx]) =&gt; tx))
         ),
-        map(({ auxiliaryData }) =&gt; metadatumToCip25(asset, auxiliaryData?.body.blob))
+        map(({ auxiliaryData }) =&gt; Asset.util.metadatumToCip25(asset, auxiliaryData?.body.blob))
       )
     );
   };
@@ -130,7 +151,7 @@ export const createNftMetadataProvider =
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Mon Feb 14 2022 09:49:02 GMT+0000 (Coordinated Universal Time)
+                at Mon Feb 14 2022 15:14:59 GMT+0000 (Coordinated Universal Time)
             </div>
         </div>
         <script src="../../prettify.js"></script>
