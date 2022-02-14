@@ -60,9 +60,14 @@ const { NormalModuleReplacementPlugin } = require('webpack');
     }
   },
   plugins: [
+    // install "browser" version packages of these dependencies first
     new NormalModuleReplacementPlugin(
       /@emurgo\/cardano-serialization-lib-nodejs/,
       '@emurgo/cardano-serialization-lib-browser'
+    ),
+    new NormalModuleReplacementPlugin(
+      /@emurgo\/cardano-message-signing-nodejs/,
+      '@emurgo/cardano-message-signing-browser'
     )
   ]
 }

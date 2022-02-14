@@ -33,6 +33,7 @@
   "dependencies": {
     "@cardano-sdk/cip2": " 0.2.0",
     "@cardano-sdk/core": " 0.2.0",
+    "@emurgo/cardano-message-signing-nodejs": "^1.0.1",
     "backoff-rxjs": "^6.5.7",
     "bip39": "^3.0.4",
     "chacha": "^2.1.0",
