@@ -23,6 +23,19 @@ export const assetProvider = (() => {
   return blockfrostAssetProvider({ isTestnet, projectId });
 })();
 
+const keyAgentById = (id: 'ONE' | 'TWO') => {
+  const mnemonicWords = (process.env[`MNEMONIC_WORDS_${id}`] || '').split(' ');
+  if (mnemonicWords.length === 0) throw new Error(`MNEMONIC_WORDS_${id} not set`);
+  const password = process.env.WALLET_PASSWORD;
+  if (!password) throw new Error('WALLET_PASSWORD not set');
+  return InMemoryKeyAgent.fromBip39MnemonicWords({
+    getPassword: async () => Buffer.from(password),
+    mnemonicWords,
+    networkId
+  });
+};
+export const keyAgentsReady = (() => [keyAgentById('ONE'), keyAgentById('TWO')])();
+
 export const keyAgentReady = (() => {
   const mnemonicWords = (process.env.MNEMONIC_WORDS || '').split(' ');
   if (mnemonicWords.length === 0) throw new Error('MNEMONIC_WORDS not set');
