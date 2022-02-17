@@ -46,5 +46,5 @@ export const emip3decrypt = async (encrypted: Uint8Array, password: Uint8Array):
   const decipher = chacha.createDecipher(key, Buffer.from(nonce));
   decipher.setAuthTag(Buffer.from(tag));
   decipher.setAAD(AAD);
-  return Buffer.concat([decipher.update(data), decipher.final()]);
+  return Buffer.concat([decipher.update(Buffer.from(data)), decipher.final()]);
 };
