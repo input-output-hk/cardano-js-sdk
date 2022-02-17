@@ -37,7 +37,7 @@ const keyAgentById = (id: 'ONE' | 'TWO') => {
 export const keyAgentsReady = (() => [keyAgentById('ONE'), keyAgentById('TWO')])();
 
 export const keyAgentReady = (() => {
-  const mnemonicWords = (process.env.MNEMONIC_WORDS || '').split(' ');
+  const mnemonicWords = (process.env.MNEMONIC_WORDS_ONE || '').split(' ');
   if (mnemonicWords.length === 0) throw new Error('MNEMONIC_WORDS not set');
   const password = process.env.WALLET_PASSWORD;
   if (!password) throw new Error('WALLET_PASSWORD not set');
