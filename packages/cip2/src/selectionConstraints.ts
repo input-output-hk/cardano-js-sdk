@@ -27,14 +27,18 @@ export const computeMinimumCost =
   ): EstimateTxFee =>
   async (selection) => {
     const tx = await buildTx(selection);
-    return BigInt(
-      CSL.min_fee(
-        tx,
-        CSL.LinearFee.new(
-          CSL.BigNum.from_str(minFeeCoefficient.toString()),
-          CSL.BigNum.from_str(minFeeConstant.toString())
-        )
-      ).to_str()
+    return (
+      BigInt(
+        CSL.min_fee(
+          tx,
+          CSL.LinearFee.new(
+            CSL.BigNum.from_str(minFeeCoefficient.toString()),
+            CSL.BigNum.from_str(minFeeConstant.toString())
+          )
+        ).to_str()
+        // TODO: for some reason this works unreliably for transactions with metadata.
+        // Figure out why and remove the hardcoded +lovelace
+      ) + 10_000n
     );
   };
 
