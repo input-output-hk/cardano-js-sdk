@@ -22,7 +22,7 @@
     "lint:fix": "eslint --fix --ignore-path ../../.eslintignore \"**/*.ts\"",
     "prepack": "yarn build",
     "test": "jest -c ./jest.config.js",
-    "test:e2e": "jest -c ./e2e.jest.config.js",
+    "test:e2e": "jest -c ./e2e.jest.config.js --runInBand",
     "test:debug": "DEBUG=true yarn test"
   },
   "devDependencies": {
