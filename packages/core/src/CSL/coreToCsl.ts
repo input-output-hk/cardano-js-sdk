@@ -3,9 +3,14 @@ import * as Cardano from '../Cardano';
 import {
   Address,
   Assets,
+  AuxiliaryData,
   BigNum,
   Certificates,
   Ed25519Signature,
+  GeneralTransactionMetadata,
+  Int,
+  MetadataList,
+  MetadataMap,
   MultiAsset,
   PublicKey,
   RewardAddress,
@@ -14,6 +19,7 @@ import {
   TransactionHash,
   TransactionInput,
   TransactionInputs,
+  TransactionMetadatum,
   TransactionOutput,
   TransactionOutputs,
   TransactionUnspentOutput,
@@ -22,13 +28,14 @@ import {
   Vkey,
   Vkeywitness,
   Vkeywitnesses,
-  Withdrawals
+  Withdrawals,
+  hash_auxiliary_data
 } from '@emurgo/cardano-serialization-lib-nodejs';
 
 import * as certificate from './certificate';
 import { SerializationError } from '../errors';
 import { SerializationFailure } from '..';
-import { coreToCsl, parseCslAddress } from '.';
+import { parseCslAddress } from './parseCslAddress';
 export * as certificate from './certificate';
 
 export const tokenMap = (assets: Cardano.TokenMap) => {
@@ -63,14 +70,54 @@ export const txOut = (core: Cardano.TxOut): TransactionOutput =>
 export const utxo = (core: Cardano.Utxo[]): TransactionUnspentOutput[] =>
   core.map((item) => TransactionUnspentOutput.new(txIn(item[0]), txOut(item[1])));
 
-export const txBody = ({
-  inputs,
-  outputs,
-  fee,
-  validityInterval,
-  certificates,
-  withdrawals
-}: Cardano.TxBodyAlonzo): TransactionBody => {
+export const txMetadatum = (metadatum: Cardano.Metadatum): TransactionMetadatum => {
+  switch (typeof metadatum) {
+    case 'bigint':
+      return TransactionMetadatum.new_int(Int.new(BigNum.from_str(metadatum.toString())));
+    case 'string':
+      return TransactionMetadatum.new_text(metadatum);
+    default: {
+      if (Array.isArray(metadatum)) {
+        const metadataList = MetadataList.new();
+        for (const metadataItem of metadatum) {
+          metadataList.add(txMetadatum(metadataItem));
+        }
+        return TransactionMetadatum.new_list(metadataList);
+      } else if (ArrayBuffer.isView(metadatum)) {
+        return TransactionMetadatum.new_bytes(metadatum);
+      }
+      const metadataMap = MetadataMap.new();
+      for (const [key, data] of metadatum.entries()) {
+        metadataMap.insert(txMetadatum(key), txMetadatum(data));
+      }
+      return TransactionMetadatum.new_map(metadataMap);
+    }
+  }
+};
+
+export const txMetadata = (blob: Map<bigint, Cardano.Metadatum>): GeneralTransactionMetadata => {
+  const metadata = GeneralTransactionMetadata.new();
+  for (const [key, data] of blob.entries()) {
+    metadata.insert(BigNum.from_str(key.toString()), txMetadatum(data));
+  }
+  return metadata;
+};
+
+export const txAuxiliaryData = (auxiliaryData?: Cardano.AuxiliaryData): AuxiliaryData | undefined => {
+  if (!auxiliaryData) return;
+  const result = AuxiliaryData.new();
+  // TODO: add support for auxiliaryData.scripts
+  const { blob } = auxiliaryData.body;
+  if (blob) {
+    result.set_metadata(txMetadata(blob));
+  }
+  return result;
+};
+
+export const txBody = (
+  { inputs, outputs, fee, validityInterval, certificates, withdrawals }: Cardano.TxBodyAlonzo,
+  auxiliaryData?: Cardano.AuxiliaryData
+): TransactionBody => {
   const cslInputs = TransactionInputs.new();
   for (const input of inputs) {
     cslInputs.add(txIn(input));
@@ -109,10 +156,14 @@ export const txBody = ({
     }
     cslBody.set_withdrawals(cslWithdrawals);
   }
+  const cslAuxiliaryData = txAuxiliaryData(auxiliaryData);
+  if (cslAuxiliaryData) {
+    cslBody.set_auxiliary_data_hash(hash_auxiliary_data(cslAuxiliaryData));
+  }
   return cslBody;
 };
 
-export const tx = ({ body, witness }: Cardano.NewTxAlonzo): Transaction => {
+export const tx = ({ body, witness, auxiliaryData }: Cardano.NewTxAlonzo): Transaction => {
   const witnessSet = TransactionWitnessSet.new();
   const vkeyWitnesses = Vkeywitnesses.new();
   for (const [vkey, signature] of witness.signatures.entries()) {
@@ -121,5 +172,6 @@ export const tx = ({ body, witness }: Cardano.NewTxAlonzo): Transaction => {
     vkeyWitnesses.add(vkeyWitness);
   }
   witnessSet.set_vkeys(vkeyWitnesses);
-  return Transaction.new(coreToCsl.txBody(body), witnessSet);
+  // Possible optimization: only convert auxiliary data once
+  return Transaction.new(txBody(body, auxiliaryData), witnessSet, txAuxiliaryData(auxiliaryData));
 };
