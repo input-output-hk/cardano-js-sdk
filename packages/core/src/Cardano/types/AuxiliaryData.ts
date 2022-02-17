@@ -1,27 +1,17 @@
-/* eslint-disable no-use-before-define */
-// Metadatum usage example:
-// let metadatum: Metadatum;
-// if (typeof metadatum === 'string') {
-// } else if (typeof metadatum === 'bigint') {
-// } else if (Array.isArray(metadatum)) {
-// } else if (metadatum instanceof Uint8Array) {
-// } else {
-//   // metadatum is MetadatumMap
-// }
-
 import * as Cardano from '.';
 import { Script } from '@cardano-ogmios/schema';
 
 export { Script, ScriptNative } from '@cardano-ogmios/schema';
 
-export interface MetadatumMap {
-  [k: string]: Metadatum;
-}
+// eslint-disable-next-line no-use-before-define
+export type MetadatumMap = Map<Metadatum, Metadatum>;
 
-export type Metadatum = bigint | MetadatumMap | string | Uint8Array | Array<Metadatum>;
+export type Metadatum = bigint | MetadatumMap | string | Uint8Array | Metadatum[];
+
+export type TxMetadata = Map<bigint, Metadatum>;
 
 export interface AuxiliaryDataBody {
-  blob?: MetadatumMap;
+  blob?: TxMetadata;
   scripts?: Script[];
 }
 

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Error as BlockfrostError } from '@blockfrost/blockfrost-js';
-import { InvalidStringError, ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { Cardano, InvalidStringError, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { PaginationOptions } from '@blockfrost/blockfrost-js/lib/types';
 
 export const formatBlockfrostError = (error: unknown) => {
@@ -75,18 +75,33 @@ export const fetchSequentially = async <Item, Arg, Response>(
   }
 };
 
+const tryParseBigIntKey = (key: string) => {
+  try {
+    return BigInt(key);
+  } catch {
+    return key;
+  }
+};
+
 /**
- * Recursively replaces all numbers with bigints.
+ * Recursively maps blockfrost JSON metadata to core metadata.
+ * As JSON doesn't support numeric keys,
+ * this function assumes that all metadata (and metadatum map) keys parseable by BigInt.parse are numeric.
  */
-export const replaceNumbersWithBigints = (obj: unknown): unknown => {
-  if (typeof obj === 'number') return BigInt(obj);
-  if (typeof obj !== 'object' || obj === null) return obj;
-  if (Array.isArray(obj)) {
-    return obj.map(replaceNumbersWithBigints);
+export const jsonToMetadatum = (obj: unknown): Cardano.Metadatum => {
+  switch (typeof obj) {
+    case 'number':
+      return BigInt(obj);
+    case 'string':
+    case 'bigint':
+      return obj;
+    case 'object': {
+      if (obj === null) break;
+      if (Array.isArray(obj)) {
+        return obj.map(jsonToMetadatum);
+      }
+      return new Map(Object.keys(obj).map((key) => [tryParseBigIntKey(key), jsonToMetadatum((obj as any)[key])]));
+    }
   }
-  const newObj: any = {};
-  for (const k in obj) {
-    newObj[k] = replaceNumbersWithBigints((obj as any)[k]);
-  }
-  return newObj;
+  throw new ProviderError(ProviderFailure.NotImplemented, null, `Unsupported metadatum type: ${typeof obj}`);
 };

@@ -35,9 +35,7 @@ export interface NftMetadataFile {
   name: string;
   mediaType: MediaType;
   src: Uri[];
-  otherProperties?: {
-    [key: string]: Metadatum | undefined;
-  };
+  otherProperties?: Map<string, Metadatum>;
 }
 
 /**
@@ -50,7 +48,5 @@ export interface NftMetadata {
   mediaType?: ImageMediaType;
   files?: NftMetadataFile[];
   description?: string[];
-  otherProperties?: {
-    [key: string]: Metadatum | undefined;
-  };
+  otherProperties?: Map<string, Metadatum>;
 }

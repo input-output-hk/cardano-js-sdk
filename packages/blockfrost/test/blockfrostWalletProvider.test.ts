@@ -366,20 +366,29 @@ describe('blockfrostWalletProvider', () => {
       expect(response[0]).toMatchObject({
         auxiliaryData: {
           body: {
-            blob: {
-              '1967': {
-                hash: '6bf124f217d0e5a0a8adb1dbd8540e1334280d49ab861127868339f43b3948af',
-                metadata: 'https://nut.link/metadata.json'
-              },
-              '1968': {
-                ADAUSD: [
-                  {
-                    source: 'ergoOracles',
-                    value: 3n
-                  }
-                ]
-              }
-            } as Cardano.MetadatumMap
+            blob: new Map<bigint, Cardano.Metadatum>([
+              [
+                1967n,
+                new Map([
+                  ['hash', '6bf124f217d0e5a0a8adb1dbd8540e1334280d49ab861127868339f43b3948af'],
+                  ['metadata', 'https://nut.link/metadata.json']
+                ])
+              ],
+              [
+                1968n,
+                new Map([
+                  [
+                    'ADAUSD',
+                    [
+                      new Map<Cardano.Metadatum, Cardano.Metadatum>([
+                        ['source', 'ergoOracles'],
+                        ['value', 3n]
+                      ])
+                    ]
+                  ]
+                ])
+              ]
+            ])
           }
         },
         blockHeader: {

@@ -48,8 +48,8 @@ const witnessScriptsToCore = (scripts: GraphqlTransaction['witness']['scripts'])
   );
 
 type GraphqlAuxiliaryDataBody = NonNullable<GraphqlTransaction['auxiliaryData']>['body'];
-const auxiliaryScriptsToCore = (scripts: GraphqlAuxiliaryDataBody['scripts']): Cardano.Script[] | undefined =>
-  scripts?.map(({ script }) => scriptToCore(script));
+// const auxiliaryScriptsToCore = (scripts: GraphqlAuxiliaryDataBody['scripts']): Cardano.Script[] | undefined =>
+//   scripts?.map(({ script }) => scriptToCore(script));
 
 const inputsToCore = (inputs: GraphqlTransaction['inputs'], txId: Cardano.TransactionId) =>
   inputs.map(
@@ -99,6 +99,7 @@ const metadatumToCore = (metadatum: GraphqlMetadatum): Cardano.Metadatum => {
       return (metadatum.array || []).map((md) => metadatumToCore(md as GraphqlMetadatum));
     case 'MetadatumMap':
       return (metadatum.map || {}).reduce(
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         (map, { label, metadatum: md }) => ({ ...map, [label]: metadatumToCore(md as GraphqlMetadatum) }),
         {} as Cardano.MetadatumMap
       );
@@ -109,19 +110,21 @@ const metadatumToCore = (metadatum: GraphqlMetadatum): Cardano.Metadatum => {
   }
 };
 
-const auxiliaryDataToCore = (auxiliaryData: GraphqlTransaction['auxiliaryData']): Cardano.AuxiliaryData | undefined =>
-  auxiliaryData
-    ? {
-        body: {
-          blob: auxiliaryData.body.blob?.reduce(
-            (blob, { label, metadatum }) => ({ ...blob, [label]: metadatumToCore(metadatum) }),
-            {} as Cardano.MetadatumMap
-          ),
-          scripts: auxiliaryScriptsToCore(auxiliaryData.body.scripts)
-        },
-        hash: Cardano.Hash32ByteBase16(auxiliaryData.hash)
-      }
-    : undefined;
+const auxiliaryDataToCore = (_auxiliaryData: GraphqlTransaction['auxiliaryData']): Cardano.AuxiliaryData | undefined =>
+  undefined;
+// TODO: map to updated Cardano.Metadata
+// auxiliaryData
+//   ? {
+//       body: {
+//         blob: auxiliaryData.body.blob?.reduce(
+//           (blob, { label, metadatum }) => ({ ...blob, [label]: metadatumToCore(metadatum) }),
+//           {} as Cardano.MetadatumMap
+//         ),
+//         scripts: auxiliaryScriptsToCore(auxiliaryData.body.scripts)
+//       },
+//       hash: Cardano.Hash32ByteBase16(auxiliaryData.hash)
+//     }
+//   : undefined;
 
 const datumsToCore = (datums: GraphqlTransaction['witness']['datums']) =>
   datums?.reduce(

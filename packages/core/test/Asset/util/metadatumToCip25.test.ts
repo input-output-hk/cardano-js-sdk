@@ -1,7 +1,6 @@
 import { AssetInfo } from '../../../src/Asset';
-import { AssetName, MetadatumMap, PolicyId } from '../../../src/Cardano';
+import { AssetName, Metadatum, PolicyId, TxMetadata } from '../../../src/Cardano';
 import { metadatumToCip25 } from '../../../src/Asset/util';
-import { omit } from 'lodash';
 
 describe('NftMetadata/metadatumToCip25', () => {
   const asset = {
@@ -9,10 +8,10 @@ describe('NftMetadata/metadatumToCip25', () => {
     policyId: PolicyId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a7')
   } as AssetInfo;
 
-  const minimalMetadata = {
-    image: 'ipfs://image',
-    name: 'test nft'
-  };
+  const minimalMetadata = new Map([
+    ['image', 'ipfs://image'],
+    ['name', 'test nft']
+  ]);
 
   const minimalConvertedMetadata = {
     image: ['ipfs://image'],
@@ -21,66 +20,56 @@ describe('NftMetadata/metadatumToCip25', () => {
   };
 
   it('returns undefined for non-cip25 metadatum', () => {
-    const metadatum: MetadatumMap = {
-      other: 'metadatum'
-    };
+    const metadatum: TxMetadata = new Map([[123n, 'metadatum']]);
     expect(metadatumToCip25(asset, metadatum)).toBeUndefined();
   });
 
   it('returns undefined for cip25 metadatum with no metadata for given policyId', () => {
-    const metadatum: MetadatumMap = {
-      '721': {
-        other_policy_id: minimalMetadata
-      }
-    };
-    expect(metadatumToCip25(asset, metadatum)).toBeUndefined();
+    const metadata: TxMetadata = new Map([[721n, new Map([['other_policy_id', minimalMetadata]])]]);
+    expect(metadatumToCip25(asset, metadata)).toBeUndefined();
   });
 
   it('returns undefined for cip25 metadatum with no metadata for given assetId', () => {
-    const metadatum: MetadatumMap = {
-      '721': {
-        [asset.policyId.toString()]: {
-          other_asset_id: minimalMetadata
-        }
-      }
-    };
+    const metadatum: TxMetadata = new Map([
+      [721n, new Map([[asset.policyId.toString(), new Map([['other_asset_id', minimalMetadata]])]])]
+    ]);
     expect(metadatumToCip25(asset, metadatum)).toBeUndefined();
   });
 
   it('converts minimal metadata', () => {
-    const metadatum: MetadatumMap = {
-      '721': {
-        [asset.policyId.toString()]: {
-          [asset.name.toString()]: minimalMetadata
-        }
-      }
-    };
+    const metadatum: TxMetadata = new Map([
+      [721n, new Map([[asset.policyId.toString(), new Map([[asset.name.toString(), minimalMetadata]])]])]
+    ]);
     expect(metadatumToCip25(asset, metadatum)).toEqual(minimalConvertedMetadata);
   });
 
-  // CIP-25 doesn't explicitly say anything about encoding.
-  // It is most likely assumed to be hex strings,
-  // but people are likely to specify utf8, because it's named '<asset_name>'
   it('supports asset name as utf8 string', () => {
-    const metadatum: MetadatumMap = {
-      '721': {
-        [asset.policyId.toString()]: {
-          [Buffer.from(asset.name.toString()).toString('utf8')]: minimalMetadata
-        }
-      }
-    };
+    const metadatum: TxMetadata = new Map([
+      [
+        721n,
+        new Map([
+          [asset.policyId.toString(), new Map([[Buffer.from(asset.name.toString()).toString('utf8'), minimalMetadata]])]
+        ])
+      ]
+    ]);
     expect(metadatumToCip25(asset, metadatum)).toEqual(minimalConvertedMetadata);
   });
 
   it('converts version', () => {
-    const metadatum: MetadatumMap = {
-      '721': {
-        [asset.policyId.toString()]: {
-          [asset.name.toString()]: minimalMetadata,
-          version: '2.0'
-        }
-      }
-    };
+    const metadatum: TxMetadata = new Map([
+      [
+        721n,
+        new Map([
+          [
+            asset.policyId.toString(),
+            new Map<Metadatum, Metadatum>([
+              [asset.name.toString(), minimalMetadata],
+              ['version', '2.0']
+            ])
+          ]
+        ])
+      ]
+    ]);
     expect(metadatumToCip25(asset, metadatum)).toEqual({
       ...minimalConvertedMetadata,
       version: '2.0'
@@ -88,53 +77,73 @@ describe('NftMetadata/metadatumToCip25', () => {
   });
 
   it('coverts optional properties (mediaType, description and <other properties>)', () => {
-    const metadatum: MetadatumMap = {
-      '721': {
-        [asset.policyId.toString()]: {
-          [asset.name.toString()]: {
-            ...minimalMetadata,
-            description: 'description',
-            extraProp: 'extra',
-            mediaType: 'image/png'
-          }
-        }
-      }
-    };
+    const metadatum: TxMetadata = new Map([
+      [
+        721n,
+        new Map([
+          [
+            asset.policyId.toString(),
+            new Map<Metadatum, Metadatum>([
+              [
+                asset.name.toString(),
+                new Map([
+                  ...minimalMetadata.entries(),
+                  ['description', 'description'],
+                  ['extraProp', 'extra'],
+                  ['mediaType', 'image/png']
+                ])
+              ]
+            ])
+          ]
+        ])
+      ]
+    ]);
     expect(metadatumToCip25(asset, metadatum)).toEqual({
       ...minimalConvertedMetadata,
       description: ['description'],
       mediaType: 'image/png',
-      otherProperties: { extraProp: 'extra' }
+      otherProperties: new Map([['extraProp', 'extra']])
     });
   });
 
   it('coverts files', () => {
-    const file1 = {
-      mediaType: 'image/jpg',
-      name: 'file1',
-      src: 'https://file1.location'
-    };
-    const file2 = {
-      extraProp: 'extra',
-      mediaType: 'image/png',
-      name: 'file2',
-      src: ['https://file2.location']
-    };
-    const metadatum: MetadatumMap = {
-      '721': {
-        [asset.policyId.toString()]: {
-          [asset.name.toString()]: {
-            ...minimalMetadata,
-            files: [file1, file2]
-          }
-        }
-      }
-    };
+    const file1 = new Map([
+      ['mediaType', 'image/jpg'],
+      ['name', 'file1'],
+      ['src', 'https://file1.location']
+    ]);
+    const file2 = new Map<Metadatum, Metadatum>([
+      ['extraProp', 'extra'],
+      ['mediaType', 'image/png'],
+      ['name', 'file2'],
+      ['src', ['https://file2.location']]
+    ]);
+    const metadatum: TxMetadata = new Map([
+      [
+        721n,
+        new Map([
+          [
+            asset.policyId.toString(),
+            new Map<Metadatum, Metadatum>([
+              [
+                asset.name.toString(),
+                new Map<Metadatum, Metadatum>([...minimalMetadata.entries(), ['files', [file1, file2]]])
+              ]
+            ])
+          ]
+        ])
+      ]
+    ]);
     expect(metadatumToCip25(asset, metadatum)).toEqual({
       ...minimalConvertedMetadata,
       files: [
-        { ...file1, src: [file1.src] },
-        { ...omit(file2, 'extraProp'), otherProperties: { extraProp: 'extra' } }
+        { mediaType: 'image/jpg', name: 'file1', src: ['https://file1.location'] },
+        {
+          mediaType: 'image/png',
+          name: 'file2',
+          otherProperties: new Map([['extraProp', 'extra']]),
+          src: ['https://file2.location']
+        }
       ]
     });
   });

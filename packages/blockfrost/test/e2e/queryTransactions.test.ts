@@ -7,7 +7,7 @@ describe('blockfrostWalletProvider', () => {
       const [tx] = await walletProvider.queryTransactionsByHashes([
         Cardano.TransactionId('84801fb64a9c5078c406ead24017ba0b069ef6ac6446fef8bdb8f97bade3cfa5')
       ]);
-      expect(tx.auxiliaryData!.body.blob!['9223372036854775707']).toEqual(
+      expect(tx.auxiliaryData!.body.blob!.get(9_223_372_036_854_775_707n)).toEqual(
         '9223372036854775707922337203685477570792233720368547757079223372'
       );
     });

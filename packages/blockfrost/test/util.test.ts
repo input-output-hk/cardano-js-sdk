@@ -1,5 +1,5 @@
-import { InvalidStringError, ProviderError, ProviderFailure } from '@cardano-sdk/core';
-import { fetchSequentially, formatBlockfrostError, replaceNumbersWithBigints } from '../src/util';
+import { Cardano, InvalidStringError, ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { fetchSequentially, formatBlockfrostError, jsonToMetadatum } from '../src/util';
 
 describe('util', () => {
   describe('formatBlockfrostError', () => {
@@ -11,14 +11,21 @@ describe('util', () => {
     });
   });
 
-  test('replaceNumbersWithBigints', () => {
-    expect(replaceNumbersWithBigints(1)).toBe(1n);
-    expect(replaceNumbersWithBigints('a')).toBe('a');
-    expect(replaceNumbersWithBigints(null)).toBe(null);
+  test('jsonToMetadatum', () => {
+    expect(jsonToMetadatum(1)).toBe(1n);
+    expect(jsonToMetadatum('a')).toBe('a');
+    expect(() => jsonToMetadatum(null)).toThrowError(ProviderError);
     // eslint-disable-next-line unicorn/no-useless-undefined
-    expect(replaceNumbersWithBigints(undefined)).toBe(undefined);
-    expect(replaceNumbersWithBigints(['a', 1, [2]])).toEqual(['a', 1n, [2n]]);
-    expect(replaceNumbersWithBigints({ a: 'a', b: 1, c: { d: 2 } })).toEqual({ a: 'a', b: 1n, c: { d: 2n } });
+    expect(() => jsonToMetadatum(undefined)).toThrowError(ProviderError);
+    expect(jsonToMetadatum(['a', 1, [2]])).toEqual(['a', 1n, [2n]]);
+    expect(jsonToMetadatum({ 123: '1234', a: 'a', b: 1, c: { d: 2 } })).toEqual(
+      new Map<Cardano.Metadatum, Cardano.Metadatum>([
+        [123n, '1234'],
+        ['a', 'a'],
+        ['b', 1n],
+        ['c', new Map([['d', 2n]])]
+      ])
+    );
   });
 
   test('fetchSequentially', async () => {
