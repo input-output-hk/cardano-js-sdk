@@ -12,9 +12,11 @@ export type CreateTxInternalsProps = {
   validityInterval: Cardano.ValidityInterval;
   certificates?: Cardano.Certificate[];
   withdrawals?: Cardano.Withdrawal[];
+  auxiliaryData?: Cardano.AuxiliaryData;
 };
 
 export const createTransactionInternals = async ({
+  auxiliaryData,
   changeAddress,
   withdrawals,
   certificates,
@@ -38,8 +40,10 @@ export const createTransactionInternals = async ({
     validityInterval,
     withdrawals
   };
+  const cslBody = coreToCsl.txBody(body, auxiliaryData);
+
   return {
     body,
-    hash: Cardano.TransactionId(Buffer.from(CSL.hash_transaction(coreToCsl.txBody(body)).to_bytes()).toString('hex'))
+    hash: Cardano.TransactionId(Buffer.from(CSL.hash_transaction(cslBody).to_bytes()).toString('hex'))
   };
 };

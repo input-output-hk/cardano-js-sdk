@@ -12,7 +12,7 @@ import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
 import { BlockfrostToCore, BlockfrostTransactionContent, BlockfrostUtxo } from './BlockfrostToCore';
 import { Options, PaginationOptions } from '@blockfrost/blockfrost-js/lib/types';
 import { dummyLogger } from 'ts-log';
-import { fetchSequentially, formatBlockfrostError, replaceNumbersWithBigints, toProviderError } from './util';
+import { fetchSequentially, formatBlockfrostError, jsonToMetadatum, toProviderError } from './util';
 import { flatten, groupBy } from 'lodash-es';
 
 const fetchByAddressSequentially = async <Item, Response>(props: {
@@ -252,7 +252,7 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
     ];
   };
 
-  const fetchJsonMetadata = async (txHash: Cardano.TransactionId): Promise<Cardano.MetadatumMap | null> => {
+  const fetchJsonMetadata = async (txHash: Cardano.TransactionId): Promise<Cardano.TxMetadata | null> => {
     try {
       const response = await blockfrost.txsMetadata(txHash.toString());
       return response.reduce((map, metadatum) => {
@@ -260,9 +260,9 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { json_metadata, label } = metadatum as any;
         if (!json_metadata || !label) return map;
-        map[label] = replaceNumbersWithBigints(json_metadata) as Cardano.MetadatumMap;
+        map.set(BigInt(label), jsonToMetadatum(json_metadata));
         return map;
-      }, {} as Cardano.MetadatumMap);
+      }, new Map<bigint, Cardano.Metadatum>());
     } catch (error) {
       if (formatBlockfrostError(error).status_code === 404) {
         return null;

@@ -4,7 +4,7 @@ import { KeyManagement, SingleAddressWallet, Wallet } from '../../../src';
 import { assetProvider, keyAgentReady, stakePoolSearchProvider, timeSettingsProvider, walletProvider } from '../config';
 import { combineLatest, filter, firstValueFrom, map } from 'rxjs';
 
-describe('SingleAddressWallet.assets / nft', () => {
+describe('SingleAddressWallet.assets/nft', () => {
   let wallet: Wallet;
 
   beforeAll(async () => {
@@ -60,7 +60,6 @@ describe('SingleAddressWallet.assets / nft', () => {
         image: ['ipfs://some_hash1'],
         mediaType: undefined,
         name: 'One',
-        otherProperties: undefined,
         version: '1.0'
       },
       policyId: 'd1ac67dcebc491ce17635d3d9c8775eb739325ce522f6eac733489aa',
@@ -104,7 +103,7 @@ describe('SingleAddressWallet.assets / nft', () => {
         image: ['ipfs://somehash'],
         mediaType: 'image/png',
         name: 'NFT with files',
-        otherProperties: { id: '1' },
+        otherProperties: new Map([['id', '1']]),
         version: '1.0'
       },
       policyId: 'e80c05f27dec74e8c04f27bdf711dff8ae03167dda9b7760b7d92cef',
@@ -116,13 +115,11 @@ describe('SingleAddressWallet.assets / nft', () => {
           {
             mediaType: 'video/mp4',
             name: 'some name',
-            otherProperties: undefined,
             src: 'file://some_video_file'
           },
           {
             mediaType: 'audio/mpeg',
             name: 'some name',
-            otherProperties: undefined,
             src: ['file://some_audio_file', 'file://another_audio_file']
           }
         ],

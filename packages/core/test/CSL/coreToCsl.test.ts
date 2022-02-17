@@ -1,5 +1,6 @@
 /* eslint-disable max-len */
 import { Asset, CSL, Cardano, coreToCsl } from '../../src';
+import { BigNum } from '@emurgo/cardano-serialization-lib-nodejs';
 
 const txIn: Cardano.TxIn = {
   address: Cardano.Address(
@@ -121,5 +122,58 @@ describe('coreToCsl', () => {
     const witness = cslTx.witness_set().vkeys()!.get(0)!;
     expect(Buffer.from(witness.vkey().public_key().as_bytes()).toString('hex')).toBe(vkey);
     expect(witness.signature().to_hex()).toBe(signature);
+  });
+  describe('txAuxiliaryData', () => {
+    it('returns undefined for undefined data', () => expect(coreToCsl.txAuxiliaryData()).toBeUndefined());
+
+    describe('txMetadata', () => {
+      // eslint-disable-next-line unicorn/consistent-function-scoping
+      const convertMetadatum = (metadatum: Cardano.Metadatum) => {
+        const label = 123n;
+        const auxiliaryData = coreToCsl.txAuxiliaryData({ body: { blob: new Map([[label, metadatum]]) } });
+        return auxiliaryData?.metadata()?.get(BigNum.from_str(label.toString()));
+      };
+
+      it('converts number', () => {
+        const number = 1234n;
+        const metadatum = convertMetadatum(number);
+        expect(metadatum?.as_int().as_positive()?.to_str()).toBe(number.toString());
+      });
+
+      it('converts text', () => {
+        const str = 'str';
+        const metadatum = convertMetadatum(str);
+        expect(metadatum?.as_text()).toBe(str);
+      });
+
+      it('converts list', () => {
+        const list = ['str1', 'str2'];
+        const metadatum = convertMetadatum(list);
+        const cslList = metadatum?.as_list();
+        expect(cslList?.len()).toBe(list.length);
+        expect(cslList?.get(0).as_text()).toBe(list[0]);
+        expect(cslList?.get(1).as_text()).toBe(list[1]);
+      });
+
+      test('converts bytes', () => {
+        const bytes = Buffer.from('str');
+        const metadatum = convertMetadatum(bytes);
+        expect(metadatum?.as_bytes().buffer).toEqual(bytes.buffer);
+      });
+
+      it('converts map', () => {
+        const map = new Map<Cardano.Metadatum, Cardano.Metadatum>([
+          [123n, 1234n],
+          ['key', 'value']
+        ]);
+        const metadatum = convertMetadatum(map);
+        const cslMap = metadatum?.as_map();
+        expect(cslMap?.len()).toBe(map.size);
+        expect(cslMap?.get(convertMetadatum(123n)!).as_int().as_positive()?.to_str()).toBe('1234');
+        expect(cslMap?.get(convertMetadatum('key')!).as_text()).toBe('value');
+      });
+    });
+
+    it.todo('txScripts');
   });
 });
