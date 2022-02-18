@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { Asset, CSL, Cardano, coreToCsl } from '../../src';
+import { Asset, CSL, Cardano, coreToCsl, SerializationFailure } from '../../src';
 import { BigNum } from '@emurgo/cardano-serialization-lib-nodejs';
 
 const txIn: Cardano.TxIn = {
@@ -180,17 +180,24 @@ describe('coreToCsl', () => {
 
       test('bytes too long throws error', () => {
         const bytes = Buffer.from(str65Len, 'utf8');
-        expect(() => convertMetadatum(bytes)).toThrowError('too long');
+        expect(() => convertMetadatum(bytes)).toThrow(SerializationFailure.MaxLengthLimit);
       });
 
       it('text too long throws error', () => {
-        const str = str65Len;
-        expect(() => convertMetadatum(str)).toThrowError('too long');
+        expect(() => convertMetadatum(str65Len)).toThrow(SerializationFailure.MaxLengthLimit);
       });
 
       it('bool throws error', () => {
-        const bool = true;
-        expect(() => convertMetadatum(bool)).toThrow(TypeError);
+        expect(() => convertMetadatum(true)).toThrowError(SerializationFailure.InvalidType);
+      });
+
+      it('undefined throws error', () => {
+        // eslint-disable-next-line unicorn/no-useless-undefined
+        expect(() => convertMetadatum(undefined)).toThrowError(SerializationFailure.InvalidType);
+      });
+
+      it('null throws error', () => {
+        expect(() => convertMetadatum(null)).toThrowError(SerializationFailure.InvalidType);
       });
     });
 
