@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { Asset, CSL, Cardano, coreToCsl, SerializationFailure } from '../../src';
+import { Asset, CSL, Cardano, SerializationFailure, coreToCsl } from '../../src';
 import { BigNum } from '@emurgo/cardano-serialization-lib-nodejs';
 
 const txIn: Cardano.TxIn = {
@@ -134,6 +134,9 @@ describe('coreToCsl', () => {
         return auxiliaryData?.metadata()?.get(BigNum.from_str(label.toString()));
       };
 
+      const str64Len = 'looooooooooooooooooooooooooooooooooooooooooooooooooooooooooogstr';
+      const str65Len = 'loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooogstr';
+
       it('converts number', () => {
         const number = 1234n;
         const metadatum = convertMetadatum(number);
@@ -141,13 +144,13 @@ describe('coreToCsl', () => {
       });
 
       it('converts text', () => {
-        const str = 'str';
+        const str = str64Len;
         const metadatum = convertMetadatum(str);
         expect(metadatum?.as_text()).toBe(str);
       });
 
       it('converts list', () => {
-        const list = ['str1', 'str2'];
+        const list = [str64Len, 'str2'];
         const metadatum = convertMetadatum(list);
         const cslList = metadatum?.as_list();
         expect(cslList?.len()).toBe(list.length);
@@ -156,7 +159,7 @@ describe('coreToCsl', () => {
       });
 
       test('converts bytes', () => {
-        const bytes = Buffer.from('str');
+        const bytes = Buffer.from(str64Len);
         const metadatum = convertMetadatum(bytes);
         expect(metadatum?.as_bytes().buffer).toEqual(bytes.buffer);
       });
@@ -175,8 +178,6 @@ describe('coreToCsl', () => {
         expect(cslMap?.get(convertMetadatum('key')!).as_text()).toBe('value');
         expect(cslMap?.get(convertMetadatum(key)!).as_map().get_i32(666).as_text()).toBe('cake');
       });
-
-      const str65Len = 'loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooogstr';
 
       test('bytes too long throws error', () => {
         const bytes = Buffer.from(str65Len, 'utf8');

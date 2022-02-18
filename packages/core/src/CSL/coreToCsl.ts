@@ -72,7 +72,7 @@ export const utxo = (core: Cardano.Utxo[]): TransactionUnspentOutput[] =>
 
 const check64Length = (metadatum: string | Uint8Array): void => {
   const len = typeof metadatum === 'string' ? Buffer.from(metadatum, 'utf8').length : metadatum.length;
-  if (len >= 64)
+  if (len > 64)
     throw new SerializationError(
       SerializationFailure.MaxLengthLimit,
       `Metadatum value '${metadatum}' is too long. Length is ${len}. Max length is 64 bytes`
