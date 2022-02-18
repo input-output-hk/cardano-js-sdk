@@ -70,11 +70,26 @@ export const txOut = (core: Cardano.TxOut): TransactionOutput =>
 export const utxo = (core: Cardano.Utxo[]): TransactionUnspentOutput[] =>
   core.map((item) => TransactionUnspentOutput.new(txIn(item[0]), txOut(item[1])));
 
+const check64Length = (metadatum: string | Uint8Array): void => {
+  const len = typeof metadatum === 'string' ? Buffer.from(metadatum, 'utf8').length : metadatum.length;
+  if (len >= 64)
+    throw new SerializationError(
+      SerializationFailure.MaxLengthLimit,
+      `Metadatum value '${metadatum}' is too long. Length is ${len}. Max length is 64 bytes`
+    );
+};
+
 export const txMetadatum = (metadatum: Cardano.Metadatum): TransactionMetadatum => {
+  if (metadatum === null) throw new SerializationError(SerializationFailure.InvalidType);
   switch (typeof metadatum) {
+    case 'number':
+    case 'boolean':
+    case 'undefined':
+      throw new SerializationError(SerializationFailure.InvalidType);
     case 'bigint':
       return TransactionMetadatum.new_int(Int.new(BigNum.from_str(metadatum.toString())));
     case 'string':
+      check64Length(metadatum);
       return TransactionMetadatum.new_text(metadatum);
     default: {
       if (Array.isArray(metadatum)) {
@@ -84,6 +99,7 @@ export const txMetadatum = (metadatum: Cardano.Metadatum): TransactionMetadatum 
         }
         return TransactionMetadatum.new_list(metadataList);
       } else if (ArrayBuffer.isView(metadatum)) {
+        check64Length(metadatum);
         return TransactionMetadatum.new_bytes(metadatum);
       }
       const metadataMap = MetadataMap.new();
