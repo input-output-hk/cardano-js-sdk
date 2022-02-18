@@ -127,8 +127,8 @@ describe('coreToCsl', () => {
     it('returns undefined for undefined data', () => expect(coreToCsl.txAuxiliaryData()).toBeUndefined());
 
     describe('txMetadata', () => {
-      // eslint-disable-next-line unicorn/consistent-function-scoping
-      const convertMetadatum = (metadatum: Cardano.Metadatum) => {
+      // eslint-disable-next-line unicorn/consistent-function-scoping, @typescript-eslint/no-explicit-any
+      const convertMetadatum = (metadatum: any) => {
         const label = 123n;
         const auxiliaryData = coreToCsl.txAuxiliaryData({ body: { blob: new Map([[label, metadatum]]) } });
         return auxiliaryData?.metadata()?.get(BigNum.from_str(label.toString()));
@@ -162,15 +162,35 @@ describe('coreToCsl', () => {
       });
 
       it('converts map', () => {
+        const key = new Map<Cardano.Metadatum, Cardano.Metadatum>([[567n, 'eight']]);
         const map = new Map<Cardano.Metadatum, Cardano.Metadatum>([
           [123n, 1234n],
-          ['key', 'value']
+          ['key', 'value'],
+          [key, new Map<Cardano.Metadatum, Cardano.Metadatum>([[666n, 'cake']])]
         ]);
         const metadatum = convertMetadatum(map);
         const cslMap = metadatum?.as_map();
         expect(cslMap?.len()).toBe(map.size);
         expect(cslMap?.get(convertMetadatum(123n)!).as_int().as_positive()?.to_str()).toBe('1234');
         expect(cslMap?.get(convertMetadatum('key')!).as_text()).toBe('value');
+        expect(cslMap?.get(convertMetadatum(key)!).as_map().get_i32(666).as_text()).toBe('cake');
+      });
+
+      const str65Len = 'loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooogstr';
+
+      test('bytes too long throws error', () => {
+        const bytes = Buffer.from(str65Len, 'utf8');
+        expect(() => convertMetadatum(bytes)).toThrowError('too long');
+      });
+
+      it('text too long throws error', () => {
+        const str = str65Len;
+        expect(() => convertMetadatum(str)).toThrowError('too long');
+      });
+
+      it('bool throws error', () => {
+        const bool = true;
+        expect(() => convertMetadatum(bool)).toThrow(TypeError);
       });
     });
 
