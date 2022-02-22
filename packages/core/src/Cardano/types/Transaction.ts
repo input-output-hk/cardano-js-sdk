@@ -3,7 +3,7 @@ import * as Cardano from '.';
 import { AuxiliaryData } from './AuxiliaryData';
 import { BlockBodyAlonzo } from '@cardano-ogmios/schema';
 import { Ed25519PublicKey } from './Key';
-import { Hash32ByteBase16, OpaqueString, typedHex } from '../util';
+import { Hash32ByteBase16, HexBlob, OpaqueString, typedHex } from '../util';
 import { PartialBlockHeader } from './Block';
 
 /**
@@ -16,6 +16,7 @@ export type TransactionId = Hash32ByteBase16<'TransactionId'>;
  * @throws InvalidStringError
  */
 export const TransactionId = (value: string): TransactionId => Hash32ByteBase16<'TransactionId'>(value);
+TransactionId.fromHexBlob = (value: HexBlob) => Hash32ByteBase16.fromHexBlob<TransactionId>(value);
 
 /**
  * Ed25519 signature as hex string
