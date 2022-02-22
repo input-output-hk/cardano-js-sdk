@@ -3,13 +3,12 @@ import {
   AccountKeyDerivationPath,
   GetPassword,
   GroupedAddress,
-  HexBlob,
   KeyAgentType,
   SerializableKeyAgentData,
   SignBlobResult
 } from './types';
 import { AuthenticationError } from './errors';
-import { CSL, Cardano } from '@cardano-sdk/core';
+import { CSL, Cardano, util } from '@cardano-sdk/core';
 import { KeyAgentBase } from './KeyAgentBase';
 import { emip3decrypt, emip3encrypt } from './emip3';
 import { harden, joinMnemonicWords, mnemonicWordsToEntropy, validateMnemonic } from './util';
@@ -87,21 +86,21 @@ export class InMemoryKeyAgent extends KeyAgentBase {
 
   async getExtendedAccountPublicKey(): Promise<Cardano.Bip32PublicKey> {
     const privateKey = await this.#deriveAccountPrivateKey();
-    return Cardano.Bip32PublicKey(Buffer.from(privateKey.to_public().as_bytes()).toString('hex'));
+    return Cardano.Bip32PublicKey.fromHexBlob(util.bytesToHex(privateKey.to_public().as_bytes()));
   }
 
-  async signBlob({ index, type }: AccountKeyDerivationPath, blob: HexBlob): Promise<SignBlobResult> {
+  async signBlob({ index, type }: AccountKeyDerivationPath, blob: Cardano.util.HexBlob): Promise<SignBlobResult> {
     const accountKey = await this.#deriveAccountPrivateKey();
     const signingKey = accountKey.derive(type).derive(index).to_raw_key();
     const signature = Cardano.Ed25519Signature(signingKey.sign(Buffer.from(blob, 'hex')).to_hex());
-    const publicKey = Cardano.Ed25519PublicKey(Buffer.from(signingKey.to_public().as_bytes()).toString('hex'));
+    const publicKey = Cardano.Ed25519PublicKey.fromHexBlob(util.bytesToHex(signingKey.to_public().as_bytes()));
     return { publicKey, signature };
   }
 
   async derivePublicKey({ index, type }: AccountKeyDerivationPath): Promise<Cardano.Ed25519PublicKey> {
     const accountPrivateKey = await this.#deriveAccountPrivateKey();
     const cslPublicKey = accountPrivateKey.derive(type).derive(index).to_public().to_raw_key();
-    return Cardano.Ed25519PublicKey(Buffer.from(cslPublicKey.as_bytes()).toString('hex'));
+    return Cardano.Ed25519PublicKey.fromHexBlob(util.bytesToHex(cslPublicKey.as_bytes()));
   }
 
   // To export mnemonic, get entropy by reversing this:
@@ -110,7 +109,7 @@ export class InMemoryKeyAgent extends KeyAgentBase {
   // https://github.com/Emurgo/cardano-serialization-lib/blob/f817a033ade7a2255591d7c6444fa4f9ffbcf061/rust/src/chain_crypto/derive.rs#L30-L38
   async exportRootPrivateKey(): Promise<Cardano.Bip32PrivateKey> {
     const rootPrivateKey = await this.#decryptRootPrivateKey(true);
-    return Cardano.Bip32PrivateKey(Buffer.from(rootPrivateKey.as_bytes()).toString('hex'));
+    return Cardano.Bip32PrivateKey.fromHexBlob(util.bytesToHex(rootPrivateKey.as_bytes()));
   }
 
   /**

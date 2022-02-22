@@ -1,4 +1,4 @@
-import { CSL, Cardano, coreToCsl } from '@cardano-sdk/core';
+import { CSL, Cardano, coreToCsl, util } from '@cardano-sdk/core';
 import { SelectionResult } from '@cardano-sdk/cip2';
 
 export type TxInternals = {
@@ -44,6 +44,6 @@ export const createTransactionInternals = async ({
 
   return {
     body,
-    hash: Cardano.TransactionId(Buffer.from(CSL.hash_transaction(cslBody).to_bytes()).toString('hex'))
+    hash: Cardano.TransactionId.fromHexBlob(util.bytesToHex(CSL.hash_transaction(cslBody).to_bytes()))
   };
 };
