@@ -28,14 +28,18 @@
   "devDependencies": {
     "@cardano-sdk/util-dev": " 0.2.0",
     "@cardano-sdk/ogmios": " 0.2.0",
+    "@types/node-hid": "1.3.1",
     "@types/pbkdf2": "^3.1.0",
+    "@types/w3c-web-hid": "^1.0.2",
     "@types/pouchdb": "^6.4.0",
     "envalid": "^7.3.0",
     "shx": "^0.3.3"
   },
   "dependencies": {
+    "@cardano-foundation/ledgerjs-hw-app-cardano": "4.0.0",
     "@cardano-sdk/cip2": " 0.2.0",
     "@cardano-sdk/core": " 0.2.0",
+    "@ledgerhq/hw-transport-webhid": "6.24.1",
     "@emurgo/cardano-message-signing-nodejs": "^1.0.1",
     "backoff-rxjs": "^6.5.7",
     "bip39": "^3.0.4",

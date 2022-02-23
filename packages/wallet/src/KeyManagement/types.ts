@@ -7,7 +7,8 @@ export interface SignBlobResult {
 }
 
 export enum KeyAgentType {
-  InMemory = 'InMemory'
+  InMemory = 'InMemory',
+  Ledger = 'Ledger'
 }
 
 export enum KeyType {
@@ -30,6 +31,15 @@ export enum AddressType {
    * Receipt address
    */
   External = 0
+}
+
+export enum DeviceType {
+  Ledger = 'Ledger'
+}
+
+export enum CommunicationType {
+  Web = 'web',
+  Node = 'node'
 }
 
 export interface AccountAddressDerivationPath {
@@ -62,7 +72,13 @@ export interface SerializableInMemoryKeyAgentData extends SerializableKeyAgentDa
   knownAddresses: GroupedAddress[];
 }
 
-export type SerializableKeyAgentData = SerializableInMemoryKeyAgentData;
+export interface SerializableLedgerKeyAgentData extends SerializableKeyAgentDataBase {
+  __typename: KeyAgentType.Ledger;
+  knownAddresses: GroupedAddress[];
+  extendedAccountPublicKey: Cardano.Bip32PublicKey;
+}
+
+export type SerializableKeyAgentData = SerializableInMemoryKeyAgentData | SerializableLedgerKeyAgentData;
 
 /**
  * @returns password used to decrypt root private key
