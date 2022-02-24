@@ -14,6 +14,7 @@ interface ChangeComputationArgs {
   estimateTxFee: EstimateTxFeeWithOriginalOutputs;
   computeMinimumCoinQuantity: ComputeMinimumCoinQuantity;
   tokenBundleSizeExceedsLimit: TokenBundleSizeExceedsLimit;
+  random: typeof Math.random;
 }
 
 interface ChangeComputationResult {
@@ -167,10 +168,13 @@ const computeRequestedAssetChangeBundles = (
  * Picks one UTxO from remaining set and puts it to the selected set.
  * Precondition: utxoRemaining.length > 0
  */
-const pickExtraRandomUtxo = ({ utxoRemaining, utxoSelected }: UtxoSelection): UtxoSelection => {
+const pickExtraRandomUtxo = (
+  { utxoRemaining, utxoSelected }: UtxoSelection,
+  random: typeof Math.random
+): UtxoSelection => {
   const remainingUtxoOfOnlyCoin = utxoRemaining.filter(([_, { value }]) => !value.assets);
   const pickFrom = remainingUtxoOfOnlyCoin.length > 0 ? remainingUtxoOfOnlyCoin : utxoRemaining;
-  const pickIdx = Math.floor(Math.random() * pickFrom.length);
+  const pickIdx = Math.floor(random() * pickFrom.length);
   const newUtxoSelected = [...utxoSelected, pickFrom[pickIdx]];
   const originalIdx = utxoRemaining.indexOf(pickFrom[pickIdx]);
   const newUtxoRemaining = [...utxoRemaining.slice(0, originalIdx), ...utxoRemaining.slice(originalIdx + 1)];
@@ -218,6 +222,7 @@ const computeChangeBundles = ({
   uniqueOutputAssetIDs,
   implicitCoin,
   computeMinimumCoinQuantity,
+  random,
   fee = 0n
 }: {
   utxoSelection: UtxoSelection;
@@ -226,6 +231,7 @@ const computeChangeBundles = ({
   implicitCoin: Required<Cardano.ImplicitCoin>;
   computeMinimumCoinQuantity: ComputeMinimumCoinQuantity;
   fee?: bigint;
+  random: typeof Math.random;
 }): UtxoSelection & { changeBundles: Cardano.Value[] } => {
   const requestedAssetChangeBundles = computeRequestedAssetChangeBundles(
     utxoSelection.utxoSelected,
@@ -251,8 +257,9 @@ const computeChangeBundles = ({
         fee,
         implicitCoin,
         outputValues,
+        random,
         uniqueOutputAssetIDs,
-        utxoSelection: pickExtraRandomUtxo(utxoSelection)
+        utxoSelection: pickExtraRandomUtxo(utxoSelection, random)
       });
     }
     // This is not a great error type for this, because the spec says
@@ -294,12 +301,14 @@ export const computeChangeAndAdjustForFee = async ({
   outputValues,
   uniqueOutputAssetIDs,
   implicitCoin,
+  random,
   utxoSelection
 }: ChangeComputationArgs): Promise<ChangeComputationResult> => {
   const changeInclFee = computeChangeBundles({
     computeMinimumCoinQuantity,
     implicitCoin,
     outputValues,
+    random,
     uniqueOutputAssetIDs,
     utxoSelection
   });
@@ -325,9 +334,10 @@ export const computeChangeAndAdjustForFee = async ({
       estimateTxFee,
       implicitCoin,
       outputValues,
+      random,
       tokenBundleSizeExceedsLimit,
       uniqueOutputAssetIDs,
-      utxoSelection: pickExtraRandomUtxo(changeInclFee)
+      utxoSelection: pickExtraRandomUtxo(changeInclFee, random)
     });
   }
 
@@ -336,6 +346,7 @@ export const computeChangeAndAdjustForFee = async ({
     fee,
     implicitCoin,
     outputValues,
+    random,
     uniqueOutputAssetIDs,
     utxoSelection: { utxoRemaining: changeInclFee.utxoRemaining, utxoSelected: changeInclFee.utxoSelected }
   });

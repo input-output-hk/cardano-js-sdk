@@ -66,6 +66,7 @@ export const roundRobinSelection = ({
   utxo: utxosWithValue,
   outputs: outputsWithValue,
   uniqueOutputAssetIDs,
+  random,
   implicitCoin
 }: RoundRobinRandomImproveArgs): UtxoSelection => {
   // The subset of the UTxO that has already been selected:
@@ -81,7 +82,7 @@ export const roundRobinSelection = ({
       // this token from the remaining UTxO set:
       const utxo = filterUtxo(utxoRemaining);
       if (utxo.length > 0) {
-        const inputIdx = Math.floor(Math.random() * utxo.length);
+        const inputIdx = Math.floor(random() * utxo.length);
         const input = utxo[inputIdx];
         if (improvesSelection(utxoSelected, input, minimumTarget, getTotalSelectedQuantity)) {
           utxoSelected.push(input);

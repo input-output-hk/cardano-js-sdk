@@ -8,6 +8,7 @@ export interface RoundRobinRandomImproveArgs {
   outputs: Cardano.TxOut[];
   uniqueOutputAssetIDs: Cardano.AssetId[];
   implicitCoin: Required<Cardano.ImplicitCoin>;
+  random: typeof Math.random;
 }
 
 export interface UtxoSelection {
@@ -24,7 +25,7 @@ export const preprocessArgs = (
   availableUtxo: Set<Cardano.Utxo>,
   outputSet: Set<Cardano.TxOut>,
   partialImplicitCoin: Cardano.ImplicitCoin = noImplicitCoin
-): RoundRobinRandomImproveArgs => {
+): Omit<RoundRobinRandomImproveArgs, 'random'> => {
   const outputs = [...outputSet];
   const uniqueOutputAssetIDs = uniq(outputs.flatMap(({ value: { assets } }) => [...(assets?.keys() || [])]));
   const implicitCoin: Required<Cardano.ImplicitCoin> = {
