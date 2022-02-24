@@ -1,5 +1,5 @@
 import { AssetId, AssetName, PolicyId } from '../../Cardano';
-import { CSL } from '../../CSL';
+import { CSL, util } from '../../';
 
 export const policyIdFromAssetId = (assetId: AssetId): PolicyId => PolicyId(assetId.slice(0, 56));
 export const assetNameFromAssetId = (assetId: AssetId): AssetName => AssetName(assetId.slice(56));
@@ -8,7 +8,7 @@ export const assetNameFromAssetId = (assetId: AssetId): AssetName => AssetName(a
  * @returns {string} concatenated hex-encoded policy id and asset name
  */
 export const createAssetId = (scriptHash: CSL.ScriptHash, assetName: CSL.AssetName): AssetId =>
-  AssetId(Buffer.from(scriptHash.to_bytes()).toString('hex') + Buffer.from(assetName.name()).toString('hex'));
+  AssetId(util.bytesToHex(scriptHash.to_bytes()) + util.bytesToHex(assetName.name()).toString());
 
 export const parseAssetId = (assetId: AssetId) => {
   const policyId = policyIdFromAssetId(assetId);

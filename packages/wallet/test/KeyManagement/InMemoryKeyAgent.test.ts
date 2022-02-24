@@ -83,7 +83,7 @@ describe('InMemoryKeyAgent', () => {
   test('signBlob', async () => {
     const { publicKey, signature } = await keyAgent.signBlob(
       { index: 0, type: KeyManagement.KeyType.Internal },
-      KeyManagement.HexBlob('abc123')
+      Cardano.util.HexBlob('abc123')
     );
     expect(typeof publicKey).toBe('string');
     expect(typeof signature).toBe('string');

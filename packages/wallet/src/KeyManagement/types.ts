@@ -1,9 +1,6 @@
 import { Cardano } from '@cardano-sdk/core';
 import { TxInternals } from '../Transaction';
 
-export type HexBlob = Cardano.util.OpaqueString<'HexBlob'>;
-export const HexBlob = (target: string): HexBlob => Cardano.util.typedHex(target);
-
 export interface SignBlobResult {
   publicKey: Cardano.Ed25519PublicKey;
   signature: Cardano.Ed25519Signature;
@@ -84,7 +81,7 @@ export interface KeyAgent {
   /**
    * @throws AuthenticationError
    */
-  signBlob(derivationPath: AccountKeyDerivationPath, blob: HexBlob): Promise<SignBlobResult>;
+  signBlob(derivationPath: AccountKeyDerivationPath, blob: Cardano.util.HexBlob): Promise<SignBlobResult>;
   /**
    * @throws AuthenticationError
    */

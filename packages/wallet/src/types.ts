@@ -1,5 +1,6 @@
 import { Asset, Cardano, NetworkInfo, ProtocolParametersRequiredByWallet, TimeSettings } from '@cardano-sdk/core';
 import { Balance, BehaviorObservable, DelegationTracker, TransactionalTracker, TransactionsTracker } from './services';
+import { Cip30DataSignature, Cip30SignDataRequest } from './KeyManagement/cip8';
 import { GroupedAddress } from './KeyManagement';
 import { SelectionSkeleton } from '@cardano-sdk/cip2';
 import { TxInternals } from './Transaction';
@@ -32,6 +33,8 @@ export interface InitializeTxPropsValidationResult {
 
 export type InitializeTxResult = TxInternals & { inputSelection: SelectionSkeleton };
 
+export type SignDataProps = Omit<Cip30SignDataRequest, 'keyAgent'>;
+
 export interface Wallet {
   name: string;
   readonly balance: TransactionalTracker<Balance>;
@@ -54,6 +57,10 @@ export interface Wallet {
    */
   initializeTx(props: InitializeTxProps): Promise<InitializeTxResult>;
   finalizeTx(props: TxInternals): Promise<Cardano.NewTxAlonzo>;
+  /**
+   * @throws Cip30DataSignError
+   */
+  signData(props: SignDataProps): Promise<Cip30DataSignature>;
   /**
    * @throws {Cardano.TxSubmissionError}
    */

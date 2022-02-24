@@ -11,7 +11,7 @@ import {
   WalletProvider,
   coreToCsl
 } from '@cardano-sdk/core';
-import { Assets, InitializeTxResult, KeyManagement } from '.';
+import { Assets, InitializeTxResult, KeyManagement, SignDataProps } from '.';
 import {
   Balance,
   BehaviorObservable,
@@ -33,6 +33,7 @@ import {
   distinctBlock,
   distinctEpoch
 } from './services';
+import { Cip30DataSignature, cip30signData } from './KeyManagement/cip8/cip30signData';
 import { InitializeTxProps, InitializeTxPropsValidationResult, MinimumCoinQuantity, Wallet } from './types';
 import {
   InputSelector,
@@ -232,6 +233,9 @@ export class SingleAddressWallet implements Wallet {
       });
       throw error;
     }
+  }
+  signData(props: SignDataProps): Promise<Cip30DataSignature> {
+    return cip30signData({ keyAgent: this.#keyAgent, ...props });
   }
   sync() {
     this.#tip$.sync();

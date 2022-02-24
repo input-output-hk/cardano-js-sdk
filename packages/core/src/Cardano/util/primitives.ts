@@ -53,15 +53,19 @@ export const typedBech32 = <T>(
   return target as unknown as T;
 };
 
+const assertLength = (expectedLength: number | undefined, target: string) => {
+  if (expectedLength && target.length !== expectedLength) {
+    throw new InvalidStringError(`expected length '${expectedLength}', got ${target.length}`);
+  }
+};
+
 /**
  * @param {string} target hex string to validate
  * @param {string} expectedLength expected string length, >0
  * @throws {InvalidStringError}
  */
 export const assertIsHexString = (target: string, expectedLength?: number): void => {
-  if (expectedLength && target.length !== expectedLength) {
-    throw new InvalidStringError(`expected length '${expectedLength}', got ${target.length}`);
-  }
+  assertLength(expectedLength, target);
   // eslint-disable-next-line wrap-regex
   if (!/^[\da-f]+$/i.test(target)) {
     throw new InvalidStringError('expected hex string');
@@ -79,6 +83,19 @@ export const typedHex = <T>(value: string, length?: number): T => {
   return value as any as T;
 };
 
+export type HexBlob = OpaqueString<'HexBlob'>;
+export const HexBlob = (target: string): HexBlob => typedHex(target);
+/**
+ * Cast HexBlob it into another OpaqueString type.
+ *
+ * @param {HexBlob} target hex string to convert
+ * @param {number} expectedLength optionally validate the length
+ */
+export const castHexBlob = <T>(target: HexBlob, expectedLength?: number) => {
+  assertLength(expectedLength, target.toString());
+  return target as unknown as T;
+};
+
 /**
  * 32 byte hash as hex string
  */
@@ -90,6 +107,7 @@ export type Hash32ByteBase16<T extends string = 'Hash32ByteBase16'> = OpaqueStri
  */
 export const Hash32ByteBase16 = <T extends string = 'Hash32ByteBase16'>(value: string): Hash32ByteBase16<T> =>
   typedHex<Hash32ByteBase16<T>>(value, 64);
+Hash32ByteBase16.fromHexBlob = <T>(value: HexBlob) => castHexBlob<T>(value, 64);
 
 /**
  * 28 byte hash as hex string

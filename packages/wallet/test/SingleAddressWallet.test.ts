@@ -6,6 +6,9 @@ import { KeyManagement, SingleAddressWallet } from '../src';
 import { firstValueFrom, skip } from 'rxjs';
 import { getPassword, testKeyAgent } from './mocks';
 
+jest.mock('../src/KeyManagement/cip8/cip30signData');
+const { cip30signData } = jest.requireMock('../src/KeyManagement/cip8/cip30signData');
+
 describe('SingleAddressWallet', () => {
   const name = 'Test Wallet';
   const address = mocks.utxo[0][0].address;
@@ -178,5 +181,10 @@ describe('SingleAddressWallet', () => {
     wallet.shutdown();
     wallet.sync();
     expect(walletProvider.ledgerTip).toHaveBeenCalledTimes(2);
+  });
+
+  it('signData calls cip30signData', async () => {
+    await wallet.signData({ payload: Cardano.util.HexBlob('abc123'), signWith: address });
+    expect(cip30signData).toBeCalledTimes(1);
   });
 });
