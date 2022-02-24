@@ -2,7 +2,7 @@ import { Cardano } from '@cardano-sdk/core';
 import { ComputeMinimumCoinQuantity, TokenBundleSizeExceedsLimit } from '../types';
 import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
 import { UtxoSelection, assetQuantitySelector, getCoinQuantity, toValues } from './util';
-import { orderBy } from 'lodash-es';
+import { orderBy, pick } from 'lodash-es';
 
 type EstimateTxFeeWithOriginalOutputs = (utxo: Cardano.Utxo[], change: Cardano.Value[]) => Promise<Cardano.Lovelace>;
 
@@ -222,7 +222,6 @@ const computeChangeBundles = ({
   uniqueOutputAssetIDs,
   implicitCoin,
   computeMinimumCoinQuantity,
-  random,
   fee = 0n
 }: {
   utxoSelection: UtxoSelection;
@@ -231,8 +230,7 @@ const computeChangeBundles = ({
   implicitCoin: Required<Cardano.ImplicitCoin>;
   computeMinimumCoinQuantity: ComputeMinimumCoinQuantity;
   fee?: bigint;
-  random: typeof Math.random;
-}): UtxoSelection & { changeBundles: Cardano.Value[] } => {
+}): (UtxoSelection & { changeBundles: Cardano.Value[] }) | false => {
   const requestedAssetChangeBundles = computeRequestedAssetChangeBundles(
     utxoSelection.utxoSelected,
     outputValues,
@@ -250,22 +248,7 @@ const computeChangeBundles = ({
     computeMinimumCoinQuantity
   );
   if (!changeBundles) {
-    // Coalesced all bundles to 1 and it's still less than min utxo value
-    if (utxoSelection.utxoRemaining.length > 0) {
-      return computeChangeBundles({
-        computeMinimumCoinQuantity,
-        fee,
-        implicitCoin,
-        outputValues,
-        random,
-        uniqueOutputAssetIDs,
-        utxoSelection: pickExtraRandomUtxo(utxoSelection, random)
-      });
-    }
-    // This is not a great error type for this, because the spec says
-    // "due to various restrictions that coin selection algorithms impose on themselves when selecting UTxO entries."
-    // This happens due to blockchain restriction on minimum utxo coin quantity, not due to the algorithm restriction.
-    throw new InputSelectionError(InputSelectionFailure.UtxoFullyDepleted);
+    return false;
   }
   return { changeBundles, ...utxoSelection };
 };
@@ -304,52 +287,68 @@ export const computeChangeAndAdjustForFee = async ({
   random,
   utxoSelection
 }: ChangeComputationArgs): Promise<ChangeComputationResult> => {
-  const changeInclFee = computeChangeBundles({
+  const recomputeChangeAndAdjustForFeeWithExtraUtxo = (currentUtxoSelection: UtxoSelection) => {
+    if (currentUtxoSelection.utxoRemaining.length > 0) {
+      return computeChangeAndAdjustForFee({
+        computeMinimumCoinQuantity,
+        estimateTxFee,
+        implicitCoin,
+        outputValues,
+        random,
+        tokenBundleSizeExceedsLimit,
+        uniqueOutputAssetIDs,
+        utxoSelection: pickExtraRandomUtxo(currentUtxoSelection, random)
+      });
+    }
+    // This is not a great error type for this, because the spec says
+    // "due to various restrictions that coin selection algorithms impose on themselves when selecting UTxO entries."
+    // Sometimes this happens due to blockchain restriction on minimum utxo coin quantity,
+    // not due to the algorithm restriction.
+    throw new InputSelectionError(InputSelectionFailure.UtxoFullyDepleted);
+  };
+
+  const selectionWithChangeAndFee = computeChangeBundles({
     computeMinimumCoinQuantity,
     implicitCoin,
     outputValues,
-    random,
     uniqueOutputAssetIDs,
     utxoSelection
   });
+  if (!selectionWithChangeAndFee) return recomputeChangeAndAdjustForFeeWithExtraUtxo(utxoSelection);
 
   // Calculate fee with change outputs that include fee.
   // It will cover the fee of final selection,
   // where fee is excluded from change bundles
   const fee = await estimateTxFee(
-    changeInclFee.utxoSelected,
-    validateChangeBundles(changeInclFee.changeBundles, tokenBundleSizeExceedsLimit)
+    selectionWithChangeAndFee.utxoSelected,
+    validateChangeBundles(selectionWithChangeAndFee.changeBundles, tokenBundleSizeExceedsLimit)
   );
 
   // Ensure fee quantity is covered by current selection
   const totalOutputCoin = getCoinQuantity(outputValues) + fee + implicitCoin.deposit;
-  const totalInputCoin = getCoinQuantity(toValues(changeInclFee.utxoSelected)) + implicitCoin.input;
+  const totalInputCoin = getCoinQuantity(toValues(selectionWithChangeAndFee.utxoSelected)) + implicitCoin.input;
   if (totalOutputCoin > totalInputCoin) {
-    if (changeInclFee.utxoRemaining.length === 0) {
+    if (selectionWithChangeAndFee.utxoRemaining.length === 0) {
       throw new InputSelectionError(InputSelectionFailure.UtxoBalanceInsufficient);
     }
     // Recompute change and fee with an extra selected UTxO
-    return computeChangeAndAdjustForFee({
-      computeMinimumCoinQuantity,
-      estimateTxFee,
-      implicitCoin,
-      outputValues,
-      random,
-      tokenBundleSizeExceedsLimit,
-      uniqueOutputAssetIDs,
-      utxoSelection: pickExtraRandomUtxo(changeInclFee, random)
-    });
+    return recomputeChangeAndAdjustForFeeWithExtraUtxo(selectionWithChangeAndFee);
   }
 
-  const { changeBundles, utxoSelected, utxoRemaining } = computeChangeBundles({
+  const finalSelection = computeChangeBundles({
     computeMinimumCoinQuantity,
     fee,
     implicitCoin,
     outputValues,
-    random,
     uniqueOutputAssetIDs,
-    utxoSelection: { utxoRemaining: changeInclFee.utxoRemaining, utxoSelected: changeInclFee.utxoSelected }
+    utxoSelection: pick(selectionWithChangeAndFee, ['utxoRemaining', 'utxoSelected'])
   });
+
+  if (!finalSelection) {
+    return recomputeChangeAndAdjustForFeeWithExtraUtxo(selectionWithChangeAndFee);
+  }
+
+  const { changeBundles, utxoSelected, utxoRemaining } = finalSelection;
 
   return {
     change: validateChangeBundles(changeBundles, tokenBundleSizeExceedsLimit),
