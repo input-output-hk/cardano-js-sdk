@@ -50,7 +50,6 @@ import { isEqual } from 'lodash-es';
 export interface SingleAddressWalletProps {
   readonly name: string;
   readonly polling?: PollingConfig;
-  readonly address?: GroupedAddress;
   readonly retryBackoffConfig?: RetryBackoffConfig;
 }
 
@@ -92,7 +91,6 @@ export class SingleAddressWallet implements Wallet {
     {
       name,
       polling: { interval: pollInterval = 15_000, maxInterval = 15_000 * 10 } = {},
-      address,
       retryBackoffConfig = {
         initialInterval: Math.min(pollInterval, 1000),
         maxInterval
@@ -112,7 +110,7 @@ export class SingleAddressWallet implements Wallet {
     this.#inputSelector = inputSelector;
     this.#walletProvider = walletProvider;
     this.#keyAgent = keyAgent;
-    this.addresses$ = new TrackerSubject<GroupedAddress[]>(this.#initializeAddress(address));
+    this.addresses$ = new TrackerSubject<GroupedAddress[]>(this.#initializeAddress(keyAgent.knownAddresses));
     this.name = name;
     this.#tip$ = this.tip$ = new SyncableIntervalTrackerSubject({
       pollInterval,
@@ -279,8 +277,9 @@ export class SingleAddressWallet implements Wallet {
     );
   }
 
-  #initializeAddress(existingAddress?: GroupedAddress): Observable<GroupedAddress[]> {
+  #initializeAddress(knownAddresses?: GroupedAddress[]): Observable<GroupedAddress[]> {
     return new Observable((observer) => {
+      const existingAddress = knownAddresses?.length && knownAddresses?.[0];
       if (existingAddress) {
         observer.next([existingAddress]);
         return;
