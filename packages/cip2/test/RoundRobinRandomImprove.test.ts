@@ -30,7 +30,7 @@ describe('RoundRobinRandomImprove', () => {
           mockConstraints: {
             ...SelectionConstraints.MOCK_NO_CONSTRAINTS,
             minimumCoinQuantity: 9_999_991n,
-            minimumCost: 2_000_003n
+            minimumCostCoefficient: 2_000_003n
           }
         });
       });
@@ -85,7 +85,7 @@ describe('RoundRobinRandomImprove', () => {
             getAlgorithm: roundRobinRandomImprove,
             mockConstraints: {
               ...SelectionConstraints.MOCK_NO_CONSTRAINTS,
-              minimumCost: 1n
+              minimumCostCoefficient: 1n
             }
           });
         });

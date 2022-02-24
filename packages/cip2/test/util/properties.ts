@@ -114,9 +114,10 @@ export const assertFailureProperties = ({
     ...utxoAmounts,
     { coins: BigInt(implicitCoin?.input || 0) }
   ]);
+  const maxPossibleFee = constraints.minimumCostCoefficient * BigInt(utxoAmounts.length);
   const requestedQuantities = Cardano.util.coalesceValueQuantities([
     ...outputsAmounts,
-    { coins: BigInt(implicitCoin?.deposit || 0) + constraints.minimumCost }
+    { coins: BigInt(implicitCoin?.deposit || 0) + maxPossibleFee }
   ]);
   switch (error.failure) {
     case InputSelectionFailure.UtxoBalanceInsufficient: {
@@ -220,7 +221,7 @@ export const generateSelectionParams = (() => {
         constraints: fc.record<SelectionConstraints.MockSelectionConstraints>({
           maxTokenBundleSize: fc.nat(AssetId.All.length),
           minimumCoinQuantity: fc.oneof(...[0n, 1n, 34_482n * 29n, 9_999_991n].map((n) => fc.constant(n))),
-          minimumCost: fc.oneof(...[0n, 1n, 200_000n, 2_000_003n].map((n) => fc.constant(n))),
+          minimumCostCoefficient: fc.oneof(...[0n, 1n, 200_000n, 2_000_003n].map((n) => fc.constant(n))),
           selectionLimit: fc.oneof(...[0, 1, 2, 7, 30, Number.MAX_SAFE_INTEGER].map((n) => fc.constant(n)))
         }),
         implicitCoin: fc.constant(implicitCoin),
