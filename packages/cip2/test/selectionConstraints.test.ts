@@ -50,7 +50,7 @@ describe('defaultSelectionConstraints', () => {
       protocolParameters
     });
     const result = await constraints.computeMinimumCost(selectionSkeleton);
-    expect(result).toEqual(fee + 10_000n);
+    expect(result).toEqual(fee);
     expect(buildTx).toBeCalledTimes(1);
     expect(buildTx).toBeCalledWith(selectionSkeleton);
   });
