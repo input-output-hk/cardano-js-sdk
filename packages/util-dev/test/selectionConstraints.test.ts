@@ -6,11 +6,12 @@ describe('selectionConstraints', () => {
     const constraints = mockConstraintsToConstraints({
       maxTokenBundleSize: 1,
       minimumCoinQuantity: 10n,
-      minimumCost: 20n,
+      minimumCostCoefficient: 20n,
       selectionLimit: 3
     });
     expect(constraints.computeMinimumCoinQuantity()).toBe(10n);
-    expect(await constraints.computeMinimumCost({} as any)).toBe(20n);
+    expect(await constraints.computeMinimumCost({ inputs: new Set([[]]) } as any)).toBe(20n);
+    expect(await constraints.computeMinimumCost({ inputs: new Set([[], []]) } as any)).toBe(40n);
     expect(await constraints.computeSelectionLimit({} as any)).toBe(3);
     expect(constraints.tokenBundleSizeExceedsLimit()).toBe(false);
     expect(constraints.tokenBundleSizeExceedsLimit({ size: 2 } as any)).toBe(true);

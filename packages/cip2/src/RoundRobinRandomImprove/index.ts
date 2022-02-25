@@ -5,7 +5,13 @@ import { computeChangeAndAdjustForFee } from './change';
 import { cslUtil } from '@cardano-sdk/core';
 import { roundRobinSelection } from './roundRobin';
 
-export const roundRobinRandomImprove = (): InputSelector => ({
+interface RoundRobinRandomImproveOptions {
+  random?: typeof Math.random;
+}
+
+export const roundRobinRandomImprove = ({
+  random = Math.random
+}: RoundRobinRandomImproveOptions = {}): InputSelector => ({
   select: async ({
     utxo: utxoSet,
     outputs: outputSet,
@@ -23,6 +29,7 @@ export const roundRobinRandomImprove = (): InputSelector => ({
     const roundRobinSelectionResult = roundRobinSelection({
       implicitCoin,
       outputs,
+      random,
       uniqueOutputAssetIDs,
       utxo
     });
@@ -38,6 +45,7 @@ export const roundRobinRandomImprove = (): InputSelector => ({
         }),
       implicitCoin,
       outputValues: toValues(outputs),
+      random,
       tokenBundleSizeExceedsLimit,
       uniqueOutputAssetIDs,
       utxoSelection: roundRobinSelectionResult
