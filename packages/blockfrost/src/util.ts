@@ -5,6 +5,8 @@ import { PaginationOptions } from '@blockfrost/blockfrost-js/lib/types';
 
 export const formatBlockfrostError = (error: unknown) => {
   const blockfrostError = error as BlockfrostError;
+  // eslint-disable-next-line no-console
+  console.log(`blockfrost error: ${blockfrostError}`);
   if (typeof blockfrostError === 'string') {
     throw new ProviderError(ProviderFailure.Unknown, error, blockfrostError);
   }

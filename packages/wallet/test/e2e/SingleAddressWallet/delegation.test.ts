@@ -1,8 +1,8 @@
+import { Balance, SingleAddressWallet, StakeKeyStatus, Wallet } from '../../../src';
 import { Cardano } from '@cardano-sdk/core';
-import { SingleAddressWallet, StakeKeyStatus, Wallet } from '../../../src';
 import {
   assetProvider,
-  keyAgentsReady,
+  keyAgentByIdx,
   poolId1,
   poolId2,
   stakePoolSearchProvider,
@@ -49,36 +49,34 @@ const waitForNewStakePoolIdAfterTx = (wallet: Wallet) =>
     )
   );
 
+const waitForBalanceCoins = (wallet: Wallet, expectedCoins: Cardano.Lovelace) =>
+  firstValueFrom(
+    wallet.balance.total$.pipe(
+      filter(({ coins }) => coins === expectedCoins),
+      tap(({ coins }) => expect(wallet.balance.available$.value?.coins).toBe(coins))
+    )
+  );
+
 describe('SingleAddressWallet/delegation', () => {
-  let rewardAccount: Cardano.RewardAccount;
-  let wallet: Wallet;
+  let wallet1: Wallet;
   let wallet2: Wallet;
 
-  const waitForBalanceCoins = (expectedCoins: Cardano.Lovelace) =>
-    firstValueFrom(
-      wallet.balance.total$.pipe(
-        filter(({ coins }) => coins === expectedCoins),
-        tap(({ coins }) => expect(wallet.balance.available$.value?.coins).toBe(coins))
-      )
-    );
-
   beforeAll(async () => {
-    wallet = new SingleAddressWallet(
-      { name: 'Test Wallet' },
+    wallet1 = new SingleAddressWallet(
+      { name: 'Test Wallet 1' },
       {
         assetProvider,
-        keyAgent: await keyAgentsReady[0],
+        keyAgent: await keyAgentByIdx(0),
         stakePoolSearchProvider,
         timeSettingsProvider,
         walletProvider
       }
     );
-    [{ rewardAccount }] = await firstValueFrom(wallet.addresses$);
     wallet2 = new SingleAddressWallet(
-      { name: 'Test Wallet2' },
+      { name: 'Test Wallet 2' },
       {
         assetProvider,
-        keyAgent: await keyAgentsReady[1],
+        keyAgent: await keyAgentByIdx(1),
         stakePoolSearchProvider,
         timeSettingsProvider,
         walletProvider
@@ -87,33 +85,35 @@ describe('SingleAddressWallet/delegation', () => {
   });
 
   afterAll(() => {
-    wallet.shutdown();
+    wallet1.shutdown();
     wallet2.shutdown();
   });
 
   it('has an address', async () => {
-    const addresses = await firstValueFrom(wallet.addresses$);
-    expect(addresses[0].address.startsWith('addr')).toBe(true);
+    const wallet_addresses = await firstValueFrom(wallet1.addresses$);
+    expect(wallet_addresses[0].address.startsWith('addr')).toBe(true);
+    const wallet2_addresses = await firstValueFrom(wallet2.addresses$);
+    expect(wallet2_addresses[0].address.startsWith('addr')).toBe(true);
   });
 
   it('has assets$', async () => {
-    expect(typeof (await firstValueFrom(wallet.assets$))).toBe('object');
+    expect(typeof (await firstValueFrom(wallet1.assets$))).toBe('object');
+    expect(typeof (await firstValueFrom(wallet2.assets$))).toBe('object');
   });
 
-  test('balance & transaction', async () => {
-    let sourceWallet: Wallet;
-    let destWallet: Wallet;
+  const chooseWallets = async (): Promise<[Wallet, Wallet, Balance]> => {
+    const wallet1Balance = await firstValueFrom(wallet1.balance.available$);
+    const wallet2Balance = await firstValueFrom(wallet2.balance.available$);
+    return wallet1Balance.coins > wallet2Balance.coins
+      ? [wallet1, wallet2, wallet1Balance]
+      : [wallet2, wallet1, wallet2Balance];
+  };
 
-    let initialAvailableBalance = await firstValueFrom(wallet.balance.available$);
-    const initialAvailableBalance2 = await firstValueFrom(wallet2.balance.available$);
-    if (initialAvailableBalance.coins > initialAvailableBalance2.coins) {
-      sourceWallet = wallet;
-      destWallet = wallet2;
-    } else {
-      sourceWallet = wallet2;
-      destWallet = wallet;
-      initialAvailableBalance = initialAvailableBalance2;
-    }
+  test('balance & transaction', async () => {
+    // source wallet has the highest balance to begin with
+    const [sourceWallet, destWallet, initialAvailableBalance] = await chooseWallets();
+    const [{ rewardAccount }] = await firstValueFrom(sourceWallet.addresses$);
+
     const initialTotalBalance = await firstValueFrom(sourceWallet.balance.total$);
     const stakeKeyDeposit = BigInt((await firstValueFrom(sourceWallet.protocolParameters$)).stakeKeyDeposit);
 
@@ -134,6 +134,8 @@ describe('SingleAddressWallet/delegation', () => {
       outputs: new Set([{ address: destAddresses[0].address, value: { coins: tx1OutputCoins } }])
     });
     await sourceWallet.submitTx(await sourceWallet.finalizeTx(tx1Internals));
+    // eslint-disable-next-line no-console
+    console.log('FIRST SUBMIT');
 
     const expectedCoinsAfterTx1 =
       initialTotalBalance.coins -
@@ -156,16 +158,22 @@ describe('SingleAddressWallet/delegation', () => {
           Cardano.util.coalesceValueQuantities(
             tx1Internals.body.inputs.map((txInput) => utxo.find(([txIn]) => txIn.txId === txInput.txId)![1].value)
           ).coins;
+        // sometimes FAILS like "Expected: 54507787n Received: 7848029n"
         expect(afterTx1AvailableBalance.coins).toBe(expectedCoinsWhileTxPending);
-        await waitForBalanceCoins(expectedCoinsAfterTx1);
+        await waitForBalanceCoins(sourceWallet, expectedCoinsAfterTx1);
+        // eslint-disable-next-line no-console
+        console.log('SOURCE WALLET BALANCE OK 1');
       })(),
       // Test it updates wallet.delegation after delegating to stake pool
       (async () => {
+        // sometimes FAILS where "Expected: "pool1fghrkl620rl3g54ezv56weeuwlyce2tdannm2hphs62syf3vyyh" Received: 0"
         expect(await waitForNewStakePoolIdAfterTx(sourceWallet)).toBe(poolId);
         const [newDelegatee] = await firstValueFrom(sourceWallet.delegation.rewardAccounts$);
         // nothing changes for 2 epochs
         expect(newDelegatee.delegatee?.nextEpoch).toEqual(initialDelegatee?.delegatee?.nextEpoch);
         expect(newDelegatee.delegatee?.currentEpoch).toEqual(initialDelegatee?.delegatee?.currentEpoch);
+        // eslint-disable-next-line no-console
+        console.log('DELEGATION COMPLETE');
       })(),
       // Test confirmed$
       async () => {
@@ -178,12 +186,18 @@ describe('SingleAddressWallet/delegation', () => {
       certificates: [{ __typename: Cardano.CertificateType.StakeKeyDeregistration, rewardAccount }]
     });
     await sourceWallet.submitTx(await sourceWallet.finalizeTx(tx2Internals));
+    // eslint-disable-next-line no-console
+    console.log('SECOND SUBMIT');
 
     // No longer delegating
     expect(await waitForNewStakePoolIdAfterTx(sourceWallet)).toBeUndefined();
+    // eslint-disable-next-line no-console
+    console.log('NO LONGER DELEGATING');
 
     // Deposit is returned to wallet balance
-    await waitForBalanceCoins(expectedCoinsAfterTx1 + stakeKeyDeposit - tx2Internals.body.fee);
+    await waitForBalanceCoins(sourceWallet, expectedCoinsAfterTx1 + stakeKeyDeposit - tx2Internals.body.fee);
+    // eslint-disable-next-line no-console
+    console.log('SOURCE WALLET BALANCE OK 2');
     expect((await firstValueFrom(sourceWallet.balance.total$)).deposit).toBe(0n);
   });
 });

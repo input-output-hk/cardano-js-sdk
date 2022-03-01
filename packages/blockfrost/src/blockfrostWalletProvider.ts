@@ -94,6 +94,8 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
     try {
       await blockfrost.txSubmit(signedTransaction);
     } catch (error) {
+      // eslint-disable-next-line no-console
+      console.log(error);
       throw new Cardano.TxSubmissionErrors.UnknownTxSubmissionError(error);
     }
   };
