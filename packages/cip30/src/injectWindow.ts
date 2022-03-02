@@ -22,7 +22,7 @@ export const injectWindow = (window: WindowMaybeWithCardano, wallet: Wallet, log
       'Cardano global scope exists'
     );
   }
-  window.cardano[wallet.name] = window.cardano[wallet.name] || wallet.getPublicApi(window);
+  window.cardano[wallet.name] = window.cardano[wallet.name] || wallet.getPublicApi(window.location.hostname);
   logger.debug(
     {
       module: 'injectWindow',

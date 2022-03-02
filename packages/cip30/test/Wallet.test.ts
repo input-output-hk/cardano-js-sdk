@@ -38,33 +38,33 @@ describe('Wallet', () => {
     expect(typeof wallet.name).toBe('string');
     expect(wallet.name).toBe('test-wallet');
     expect(typeof wallet.isEnabled).toBe('function');
-    const isEnabled = await wallet.isEnabled(window);
+    const isEnabled = await wallet.isEnabled(window.location.hostname);
     expect(typeof isEnabled).toBe('boolean');
     expect(isEnabled).toBe(false);
     expect(typeof wallet.enable).toBe('function');
   });
 
   test('getPublicApi', async () => {
-    const publicApi = wallet.getPublicApi(window);
+    const publicApi = wallet.getPublicApi(window.location.hostname);
     expect(publicApi.name).toEqual('test-wallet');
     expect(await publicApi.isEnabled()).toEqual(false);
   });
 
   test('enable', async () => {
     const windowStub = { ...window, location: { hostname: 'test-dapp' } };
-    expect(await wallet.isEnabled(window)).toBe(false);
-    const api = await wallet.enable(windowStub);
+    expect(await wallet.isEnabled(windowStub.location.hostname)).toBe(false);
+    const api = await wallet.enable(windowStub.location.hostname);
     expect(typeof api).toBe('object');
     const methods = Object.keys(api);
     expect(methods).toEqual(apiMethods);
-    expect(await wallet.isEnabled(windowStub)).toBe(true);
+    expect(await wallet.isEnabled(windowStub.location.hostname)).toBe(true);
   });
 
   describe('api', () => {
     let api: WalletApi;
 
     beforeAll(async () => {
-      api = await wallet.enable(window);
+      api = await wallet.enable(window.location.hostname);
     });
 
     test('getUtxos', async () => {

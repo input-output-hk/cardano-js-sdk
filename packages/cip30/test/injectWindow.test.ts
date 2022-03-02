@@ -19,8 +19,8 @@ describe('injectWindow', () => {
     expect(window.cardano[properties.name].name).toBe(properties.name);
     expect(window.cardano[properties.name].apiVersion).toBe(properties.apiVersion);
     expect(window.cardano[properties.name].icon).toBe(properties.icon);
-    expect(await window.cardano[properties.name].isEnabled()).toBe(false);
-    await window.cardano[properties.name].enable();
+    expect(await window.cardano[properties.name].isEnabled(window.location.hostname)).toBe(false);
+    await window.cardano[properties.name].enable(window.location.hostname);
     expect(await window.cardano[properties.name].isEnabled()).toBe(true);
   });
 

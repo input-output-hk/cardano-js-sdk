@@ -2,7 +2,6 @@ import { APIErrorCode, ApiError } from '../errors';
 import { Logger, dummyLogger } from 'ts-log';
 import { Storage, storage } from 'webextension-polyfill';
 import { WalletApi } from './types';
-import { WindowMaybeWithCardano } from '../injectWindow';
 
 /**
  * CIP30 API version
@@ -69,12 +68,12 @@ export class Wallet {
     this.logger = this.options.logger;
   }
 
-  public getPublicApi(window: WindowMaybeWithCardano) {
+  public getPublicApi(hostname: string) {
     return {
       apiVersion: this.apiVersion,
-      enable: this.enable.bind(this, window),
+      enable: this.enable.bind(this, hostname),
       icon: this.icon,
-      isEnabled: this.isEnabled.bind(this, window),
+      isEnabled: this.isEnabled.bind(this, hostname),
       name: this.name
     };
   }
@@ -125,9 +124,8 @@ export class Wallet {
    *
    * Errors: `ApiError`
    */
-  public async isEnabled(window: WindowMaybeWithCardano): Promise<Boolean> {
-    const appName = window.location.hostname;
-    return this.allowList.includes(appName);
+  public async isEnabled(hostname: string): Promise<Boolean> {
+    return this.allowList.includes(hostname);
   }
 
   /**
@@ -145,16 +143,14 @@ export class Wallet {
    *
    * Errors: `ApiError`
    */
-  public async enable(window: WindowMaybeWithCardano): Promise<WalletApi> {
-    const appName = window.location.hostname;
-
-    if (this.allowList.includes(appName)) {
+  public async enable(hostname: string): Promise<WalletApi> {
+    if (this.allowList.includes(hostname)) {
       this.logger.debug(
         {
           module: 'Wallet',
           walletName: this.name
         },
-        `${appName} has previously been allowed`
+        `${hostname} has previously been allowed`
       );
       return this.api;
     }
@@ -166,7 +162,7 @@ export class Wallet {
       throw new ApiError(APIErrorCode.Refused, 'wallet not authorized.');
     }
 
-    await this.allowApplication(appName);
+    await this.allowApplication(hostname);
 
     return this.api;
   }
