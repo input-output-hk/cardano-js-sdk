@@ -7,8 +7,8 @@ describe('injectWindow', () => {
   let wallet: Wallet;
   let window: ReturnType<typeof mocks.MockBrowser>;
 
-  beforeEach(() => {
-    wallet = new Wallet(properties, api, requestAccess, { persistAllowList: false });
+  beforeEach(async () => {
+    wallet = await Wallet.initialize(properties, api, requestAccess);
     window = mocks.MockBrowser.createWindow();
   });
 
@@ -43,11 +43,11 @@ describe('injectWindow', () => {
       expect(window.cardano[properties.name].apiVersion).toBe(properties.apiVersion);
       expect(window.cardano[properties.name].icon).toBe(properties.icon);
       expect(Object.keys(window.cardano[properties.name])).toEqual([
-        'enable',
-        'isEnabled',
-        'name',
         'apiVersion',
-        'icon'
+        'enable',
+        'icon',
+        'isEnabled',
+        'name'
       ]);
       expect(window.cardano['another-obj']).toBe(anotherObj);
     });

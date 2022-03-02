@@ -26,6 +26,7 @@
   },
   "devDependencies": {
     "@types/webextension-polyfill": "^0.8.0",
+    "jest-webextension-mock": "^3.7.19",
     "mock-browser": "^0.92.14",
     "shx": "^0.3.3",
     "webextension-polyfill": "^0.8.0"

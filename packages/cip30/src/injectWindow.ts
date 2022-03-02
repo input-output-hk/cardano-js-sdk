@@ -8,7 +8,7 @@ export const injectWindow = (window: WindowMaybeWithCardano, wallet: Wallet, log
     logger.debug(
       {
         module: 'injectWindow',
-        wallet: { name: wallet.name, apiVersion: wallet.apiVersion }
+        wallet: { apiVersion: wallet.apiVersion, icon: wallet.icon, name: wallet.name }
       },
       'Creating cardano global scope'
     );
@@ -17,7 +17,7 @@ export const injectWindow = (window: WindowMaybeWithCardano, wallet: Wallet, log
     logger.debug(
       {
         module: 'injectWindow',
-        wallet: { name: wallet.name, apiVersion: wallet.apiVersion }
+        wallet: { apiVersion: wallet.apiVersion, icon: wallet.icon, name: wallet.name }
       },
       'Cardano global scope exists'
     );
@@ -26,7 +26,7 @@ export const injectWindow = (window: WindowMaybeWithCardano, wallet: Wallet, log
   logger.debug(
     {
       module: 'injectWindow',
-      wallet: { name: wallet.name, version: wallet.apiVersion },
+      wallet: { apiVersion: wallet.apiVersion, icon: wallet.icon, name: wallet.name },
       windowCardano: window.cardano
     },
     'Injected'

@@ -1,5 +1,6 @@
 import { APIErrorCode, ApiError } from '../errors';
 import { Logger, dummyLogger } from 'ts-log';
+import { Storage, storage } from 'webextension-polyfill';
 import { WalletApi } from './types';
 import { WindowMaybeWithCardano } from '../injectWindow';
 
@@ -14,11 +15,13 @@ export type ApiVersion = string;
 export type WalletName = string;
 
 /**
- * A URI image (e.g. data URI base64 or other) for img src for the wallet which can be used inside of the dApp for the purpose of asking the user which wallet they would like to connect with.
+ * A URI image (e.g. data URI base64 or other) for img src for the wallet
+ * which can be used inside of the dApp for the purpose of asking the user
+ * which wallet they would like to connect with.
  */
 export type WalletIcon = string;
 
-export type WalletProperties = { name: WalletName; apiVersion: ApiVersion; icon: WalletIcon };
+export type WalletProperties = { apiVersion: ApiVersion; icon: WalletIcon; name: WalletName };
 
 /**
  * Resolve true to authorise access to the WalletAPI, or resolve false to deny.
@@ -29,14 +32,17 @@ export type RequestAccess = () => Promise<boolean>;
 
 export type WalletOptions = {
   logger?: Logger;
-  persistAllowList?: boolean;
-  storage?: Storage;
+  storage?: Storage.LocalStorageArea;
 };
 
 const defaultOptions = {
   logger: dummyLogger,
   persistAllowList: false,
-  storage: window.localStorage
+  storage: storage.local
+};
+
+type WalletStorage = {
+  allowList: string[];
 };
 
 export class Wallet {
@@ -48,51 +54,66 @@ export class Wallet {
   private logger: Logger;
   private readonly options: Required<WalletOptions>;
 
-  constructor(
+  private constructor(
     properties: WalletProperties,
     private api: WalletApi,
     private requestAccess: RequestAccess,
+    allowList: string[],
     options?: WalletOptions
   ) {
     this.options = { ...defaultOptions, ...options };
     this.name = properties.name;
     this.apiVersion = properties.apiVersion;
     this.icon = properties.icon;
-    this.allowList = this.options.persistAllowList ? this.getAllowList() : [];
+    this.allowList = allowList;
     this.logger = this.options.logger;
   }
 
   public getPublicApi(window: WindowMaybeWithCardano) {
     return {
-      enable: this.enable.bind(this, window),
-      isEnabled: this.isEnabled.bind(this, window),
-      name: this.name,
       apiVersion: this.apiVersion,
-      icon: this.icon
+      enable: this.enable.bind(this, window),
+      icon: this.icon,
+      isEnabled: this.isEnabled.bind(this, window),
+      name: this.name
     };
   }
 
-  private getAllowList(): string[] {
-    // JSON.parse(null) seems to be legit
-    return JSON.parse(this.options.storage.getItem(this.name)!) || [];
+  static async getAllowList(_storage?: Storage.LocalStorageArea): Promise<string[]> {
+    if (!_storage) return Promise.resolve([]);
+    try {
+      const persistedStorage: Record<string, WalletStorage> = await _storage.get(this.name);
+      return persistedStorage[this.name].allowList;
+    } catch {
+      return [];
+    }
   }
 
-  private allowApplication(appName: string) {
+  static async initialize(
+    properties: WalletProperties,
+    api: WalletApi,
+    requestAccess: RequestAccess,
+    options?: WalletOptions
+  ) {
+    const allowList = await this.getAllowList(options?.storage);
+
+    return new Wallet(properties, api, requestAccess, allowList, options);
+  }
+
+  private async allowApplication(appName: string) {
     this.allowList.push(appName);
 
-    if (this.options.persistAllowList) {
-      const currentList = this.getAllowList();
-      // Todo: Encrypt
-      this.options.storage?.setItem(this.name, JSON.stringify([...currentList, appName]));
-      this.logger.debug(
-        {
-          allowList: this.getAllowList(),
-          module: 'Wallet',
-          walletName: this.name
-        },
-        'Allow list persisted'
-      );
-    }
+    // Todo: Encrypt
+
+    await this.options.storage.set({ [this.name]: { allowList: [...this.allowList, appName] } });
+    this.logger.debug(
+      {
+        allowList: this.allowList,
+        module: 'Wallet',
+        walletName: this.name
+      },
+      'Allow list persisted'
+    );
   }
 
   /**
@@ -127,7 +148,7 @@ export class Wallet {
   public async enable(window: WindowMaybeWithCardano): Promise<WalletApi> {
     const appName = window.location.hostname;
 
-    if (this.options.persistAllowList && this.allowList.includes(appName)) {
+    if (this.allowList.includes(appName)) {
       this.logger.debug(
         {
           module: 'Wallet',
@@ -145,7 +166,7 @@ export class Wallet {
       throw new ApiError(APIErrorCode.Refused, 'wallet not authorized.');
     }
 
-    this.allowApplication(appName);
+    await this.allowApplication(appName);
 
     return this.api;
   }

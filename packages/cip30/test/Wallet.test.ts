@@ -8,7 +8,7 @@ import { mocks } from 'mock-browser';
 const window = mocks.MockBrowser.createWindow();
 
 // todo test persistAllowList: true when design is finalised
-const options: WalletOptions = { persistAllowList: false };
+const options: WalletOptions = {};
 
 if (process.env.DEBUG) {
   options.logger = console;
@@ -28,8 +28,8 @@ describe('Wallet', () => {
   ];
   let wallet: Wallet;
 
-  beforeEach(() => {
-    wallet = new Wallet(testWallet.properties, testWallet.api, testWallet.requestAccess, options);
+  beforeEach(async () => {
+    wallet = await Wallet.initialize(testWallet.properties, testWallet.api, testWallet.requestAccess, options);
   });
 
   test('constructed state', async () => {

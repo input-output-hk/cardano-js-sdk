@@ -6331,10 +6331,22 @@ jest-watcher@^27.5.1:
     jest-util "^27.5.1"
     string-length "^4.0.1"
 
+<<<<<<< HEAD
 jest-worker@^27.5.1:
   version "27.5.1"
   resolved "https://registry.yarnpkg.com/jest-worker/-/jest-worker-27.5.1.tgz#8d146f0900e8973b106b6f73cc1e9a8cb86f8db0"
   integrity sha512-7vuh85V5cdDofPyxn58nrPjBktZo0u9x1g8WtjQol+jZDaE+fhN+cIvTj11GndBnMnyfrUOG1sZQxCdjKh+DKg==
+=======
+jest-webextension-mock@^3.7.19:
+  version "3.7.19"
+  resolved "https://registry.yarnpkg.com/jest-webextension-mock/-/jest-webextension-mock-3.7.19.tgz#df0031aeb2255c00a62b2e932395868ed67e130b"
+  integrity sha512-W8f+ruUaRSqXMsrPuT24n6tdVIXvjDvtoCxyymR4NgtMjzdc3sg8o/0tiv3oH44msD+pmvo2wxIVo2mnEgVqng==
+
+jest-worker@^27.0.6:
+  version "27.0.6"
+  resolved "https://registry.yarnpkg.com/jest-worker/-/jest-worker-27.0.6.tgz#a5fdb1e14ad34eb228cfe162d9f729cdbfa28aed"
+  integrity sha512-qupxcj/dRuA3xHPMUd40gr2EaAurFbkwzOh7wfPaeE9id7hyjURRQoqNfHifHK3XjJU6YJJUQKILGUnwGPEOCA==
+>>>>>>> 28aeddb1 (feat(cip30): replace window.localStorage with webextension-polyfill storage)
   dependencies:
     "@types/node" "*"
     merge-stream "^2.0.0"

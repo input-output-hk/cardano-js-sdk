@@ -26,6 +26,6 @@ export const api = <WalletApi>{
   submitTx: async (_tx) => 'transactionId'
 };
 
-export const properties: WalletProperties = { name: 'test-wallet', apiVersion: '0.1.0', icon: 'imagelink' };
+export const properties: WalletProperties = { apiVersion: '0.1.0', icon: 'imagelink', name: 'test-wallet' };
 
 export const requestAccess: RequestAccess = async () => true;
