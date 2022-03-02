@@ -2,6 +2,16 @@ import { Bytes, Cbor, Paginate } from '../types';
 import { Cardano } from '@cardano-sdk/core';
 
 /**
+ * Returns the network id of the currently connected account.
+ * 0 is testnet and 1 is mainnet but other networks can possibly be returned by wallets.
+ * Those other network ID values are not governed by this document.
+ *
+ * This result will stay the same unless the connected account has changed.
+ *
+ * Errors: `ApiError`
+ */
+export type GetNetworkId = () => Promise<Cardano.NetworkId>;
+/**
  * If `amount` is `undefined`, this shall return a list of all UTxOs (unspent transaction outputs)
  * controlled by the wallet.
  *
@@ -105,6 +115,8 @@ export type SignData = (addr: Cbor, sigStructure: Cbor) => Promise<Bytes>;
 export type SubmitTx = (tx: Cbor) => Promise<string>;
 
 export interface WalletApi {
+  getNetworkId: GetNetworkId;
+
   getUtxos: GetUtxos;
 
   getBalance: GetBalance;

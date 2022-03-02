@@ -4,7 +4,8 @@ import { WalletApi } from '..';
 import { sendMessage } from './sendMessage';
 
 export const createUiWallet = (logger: Logger = dummyLogger): WalletApi => {
-  const methodNames = [
+  const methodNames: (keyof WalletApi)[] = [
+    'getNetworkId',
     'getUtxos',
     'getBalance',
     'getUsedAddresses',
@@ -14,7 +15,7 @@ export const createUiWallet = (logger: Logger = dummyLogger): WalletApi => {
     'signTx',
     'signData',
     'submitTx'
-  ] as (keyof WalletApi)[];
+  ];
   return <WalletApi>(
     (<unknown>(
       Object.fromEntries(
