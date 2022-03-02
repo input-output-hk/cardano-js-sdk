@@ -4,16 +4,21 @@ import { WalletApi } from './types';
 import { WindowMaybeWithCardano } from '../injectWindow';
 
 /**
- * CIP30 Specification version
+ * CIP30 API version
  */
-export type SpecificationVersion = string;
+export type ApiVersion = string;
 
 /**
  * Unique identifier, used to inject into the cardano namespace
  */
 export type WalletName = string;
 
-export type WalletProperties = { name: WalletName; version: SpecificationVersion };
+/**
+ * A URI image (e.g. data URI base64 or other) for img src for the wallet which can be used inside of the dApp for the purpose of asking the user which wallet they would like to connect with.
+ */
+export type WalletIcon = string;
+
+export type WalletProperties = { name: WalletName; apiVersion: ApiVersion; icon: WalletIcon };
 
 /**
  * Resolve true to authorise access to the WalletAPI, or resolve false to deny.
@@ -35,8 +40,9 @@ const defaultOptions = {
 };
 
 export class Wallet {
-  readonly version: SpecificationVersion;
+  readonly apiVersion: ApiVersion;
   readonly name: WalletName;
+  readonly icon: WalletIcon;
 
   private allowList: string[];
   private logger: Logger;
@@ -50,7 +56,8 @@ export class Wallet {
   ) {
     this.options = { ...defaultOptions, ...options };
     this.name = properties.name;
-    this.version = properties.version;
+    this.apiVersion = properties.apiVersion;
+    this.icon = properties.icon;
     this.allowList = this.options.persistAllowList ? this.getAllowList() : [];
     this.logger = this.options.logger;
   }
@@ -60,7 +67,8 @@ export class Wallet {
       enable: this.enable.bind(this, window),
       isEnabled: this.isEnabled.bind(this, window),
       name: this.name,
-      version: this.version
+      apiVersion: this.apiVersion,
+      icon: this.icon
     };
   }
 

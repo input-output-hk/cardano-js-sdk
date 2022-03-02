@@ -33,8 +33,8 @@ describe('Wallet', () => {
   });
 
   test('constructed state', async () => {
-    expect(typeof wallet.version).toBe('string');
-    expect(wallet.version).toBe('0.1.0');
+    expect(typeof wallet.apiVersion).toBe('string');
+    expect(wallet.apiVersion).toBe('0.1.0');
     expect(typeof wallet.name).toBe('string');
     expect(wallet.name).toBe('test-wallet');
     expect(typeof wallet.isEnabled).toBe('function');
