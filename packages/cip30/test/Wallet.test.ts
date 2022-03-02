@@ -7,7 +7,6 @@ import { Wallet, WalletApi, WalletOptions } from '../src/Wallet';
 import { mocks } from 'mock-browser';
 const window = mocks.MockBrowser.createWindow();
 
-// todo test persistAllowList: true when design is finalised
 const options: WalletOptions = {};
 
 if (process.env.DEBUG) {
@@ -15,9 +14,10 @@ if (process.env.DEBUG) {
 }
 
 describe('Wallet', () => {
-  const apiMethods = [
+  const apiMethods: (keyof WalletApi)[] = [
     'getBalance',
     'getChangeAddress',
+    'getNetworkId',
     'getRewardAddresses',
     'getUnusedAddresses',
     'getUsedAddresses',
@@ -65,6 +65,14 @@ describe('Wallet', () => {
 
     beforeAll(async () => {
       api = await wallet.enable(window.location.hostname);
+    });
+
+    test('getNetworkId', async () => {
+      expect(api.getNetworkId).toBeDefined();
+      expect(typeof api.getNetworkId).toBe('function');
+
+      const networkId = await api.getNetworkId();
+      expect(networkId).toEqual(0);
     });
 
     test('getUtxos', async () => {

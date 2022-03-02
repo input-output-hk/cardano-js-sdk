@@ -4,6 +4,7 @@ import { RequestAccess, WalletApi, WalletProperties } from '../src/Wallet';
 export const api = <WalletApi>{
   getBalance: async () => '100',
   getChangeAddress: async () => 'change-address',
+  getNetworkId: async () => 0,
   getRewardAddresses: async () => ['reward-address-1', 'reward-address-2'],
   getUnusedAddresses: async () => ['unused-address-1', 'unused-address-2', 'unused-address-3'],
   getUsedAddresses: async () => ['used-address-1', 'used-address-2', 'used-address-3'],
