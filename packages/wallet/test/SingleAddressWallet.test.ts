@@ -102,6 +102,9 @@ describe('SingleAddressWallet', () => {
     it('timeSettings$', async () => {
       expect(await firstValueFrom(wallet.timeSettings$)).toEqual(testnetTimeSettings);
     });
+    it('syncStatus$', async () => {
+      expect(await firstValueFrom(wallet.syncStatus$)).not.toBeUndefined();
+    });
   });
 
   describe('creating transactions', () => {

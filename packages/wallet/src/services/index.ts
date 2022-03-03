@@ -6,3 +6,4 @@ export * from './TransactionsTracker';
 export * from './AssetsTracker';
 export * from './types';
 export * from './createNftMetadataProvider';
+export * from './TrackedWalletProvider';

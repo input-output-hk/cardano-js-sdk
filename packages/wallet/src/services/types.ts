@@ -32,6 +32,7 @@ export interface PollingConfig {
    * Max timeout for exponential backoff on errors
    */
   readonly maxInterval?: Milliseconds;
+  readonly consideredOutOfSyncAfter?: Milliseconds;
 }
 
 export enum TransactionDirection {
