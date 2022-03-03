@@ -1,25 +1,35 @@
-/* eslint-disable sonarjs/no-duplicate-string */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   InMemoryAssetsStore,
   InMemoryCollectionStore,
   InMemoryDocumentStore,
   InMemoryGenesisParametersStore,
-  InMemoryOrderedCollectionStore,
+  InMemoryKeyValueStore,
+  InMemoryNetworkInfoStore,
   InMemoryProtocolParametersStore,
   InMemoryRewardAccountsStore,
+  InMemoryRewardsBalancesStore,
+  InMemoryRewardsHistoryStore,
+  InMemoryStakePoolsStore,
   InMemoryTimeSettingsStore,
   InMemoryTipStore,
   InMemoryTransactionsStore,
   InMemoryUtxoStore
 } from '../../src/persistence';
-import { firstValueFrom } from 'rxjs';
+import { Observable, firstValueFrom } from 'rxjs';
 
-describe('InMemoryStores', () => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const assertCompletesWithoutEmitting = async (observable: Observable<any>) =>
+  expect(
+    await new Promise((resolve, reject) =>
+      observable.subscribe({ complete: () => resolve(true), error: reject, next: reject })
+    )
+  ).toBe(true);
+
+describe('inMemoryStores', () => {
   describe('InMemoryDocumentStore', () => {
     it('remembers the last set document', async () => {
       const store = new InMemoryDocumentStore();
-      expect(await firstValueFrom(store.get())).toBeNull();
+      await assertCompletesWithoutEmitting(store.get());
       const doc = { a: 'b' };
       await firstValueFrom(store.set(doc));
       expect(await firstValueFrom(store.get())).toBe(doc);
@@ -27,88 +37,65 @@ describe('InMemoryStores', () => {
   });
 
   describe('InMemoryCollectionStore', () => {
-    it('remembers all unique upserted documents', async () => {
-      const doc1 = { a: 'b' };
-      const doc2 = { a: 'c' };
-      const doc3 = { a: 'd' };
-      const store = new InMemoryCollectionStore<typeof doc1>((doc) => doc.a);
-      expect(await firstValueFrom(store.get())).toEqual([]);
-      await firstValueFrom(store.upsert([doc1, doc2]));
-      expect(await firstValueFrom(store.get())).toEqual([doc1, doc2]);
-      await firstValueFrom(store.upsert([doc2, doc3]));
-      expect(await firstValueFrom(store.get())).toEqual([doc1, doc2, doc3]);
-      await firstValueFrom(store.delete([doc2]));
-      expect(await firstValueFrom(store.get())).toEqual([doc1, doc3]);
+    it('Remembers last set array object', async () => {
+      const store = new InMemoryCollectionStore();
+      await assertCompletesWithoutEmitting(store.getAll());
+      const docs = [{ a: 'b' }];
+      await firstValueFrom(store.setAll(docs));
+      expect(await firstValueFrom(store.getAll())).toBe(docs);
     });
   });
 
-  describe('InMemoryOrderedCollectionStore', () => {
-    it('remembers all unique upserted documents, sorted by result of provided fn', async () => {
-      const doc1 = { a: 'b', order: 2 };
-      const doc2 = { a: 'c', order: 1 };
-      const doc3 = { a: 'd', order: 3 };
-      const store = new InMemoryOrderedCollectionStore<typeof doc1>(
-        ({ a }) => a,
-        ({ order }) => order
+  describe('InMemoryKeyValueStore', () => {
+    let store: InMemoryKeyValueStore<string, string>;
+
+    beforeEach(() => {
+      store = new InMemoryKeyValueStore();
+    });
+
+    it('Extends InMemoryCollectionStore', () => {
+      expect(new InMemoryKeyValueStore()).toBeInstanceOf(InMemoryCollectionStore);
+    });
+
+    it('setValue inserts a new value or updates an existing value', async () => {
+      // eslint-disable-next-line unicorn/consistent-function-scoping
+      const setValueAndAssertStore = async (value: string) => {
+        const key = 'key';
+        await firstValueFrom(store.setValue(key, value));
+        const storedValues = await firstValueFrom(store.getAll());
+        expect(storedValues.length).toBe(1);
+        expect(storedValues[0]).toEqual({ key, value });
+      };
+      await setValueAndAssertStore('value1');
+      await setValueAndAssertStore('value2');
+    });
+
+    it('completes without emitting if missing a value', async () => {
+      store.setValue('key', 'value');
+      await assertCompletesWithoutEmitting(store.getValues(['other-key']));
+    });
+    it('resolves with a value per supplied key', async () => {
+      await firstValueFrom(
+        store.setAll([
+          { key: 'key1', value: 'value1' },
+          { key: 'key2', value: 'value2' },
+          { key: 'key3', value: 'value3' }
+        ])
       );
-      expect(await firstValueFrom(store.get())).toEqual([]);
-      await firstValueFrom(store.upsert([doc1, doc2]));
-      expect(await firstValueFrom(store.get())).toEqual([doc2, doc1]);
-      await firstValueFrom(store.upsert([doc2, doc3]));
-      expect(await firstValueFrom(store.get())).toEqual([doc2, doc1, doc3]);
+      expect(await firstValueFrom(store.getValues(['key1', 'key3']))).toEqual(['value1', 'value3']);
     });
   });
 
-  describe('InMemoryUtxoStore', () => {
-    const store = new InMemoryUtxoStore();
-    it('is implemented using InMemoryCollectionStore', () => expect(store).toBeInstanceOf(InMemoryCollectionStore));
-    it('documents are unique by tx id and index', async () => {
-      const doc1: any = [{ index: 0, txId: 'tx1' }];
-      const doc2: any = [{ index: 0, txId: 'tx2' }];
-      const doc3: any = [{ index: 1, txId: 'tx1' }];
-      await firstValueFrom(store.upsert([doc1, doc2, doc3, [{ ...doc1[0] }]]));
-      expect(await firstValueFrom(store.get())).toEqual([doc1, doc2, doc3]);
-    });
+  it('Specific collection stores are implemented using InMemoryCollectionStore', () => {
+    expect(new InMemoryTransactionsStore()).toBeInstanceOf(InMemoryCollectionStore);
+    expect(new InMemoryRewardAccountsStore()).toBeInstanceOf(InMemoryCollectionStore);
+    expect(new InMemoryUtxoStore()).toBeInstanceOf(InMemoryCollectionStore);
   });
 
-  describe('InMemoryRewardAccountsStore ', () => {
-    const store = new InMemoryRewardAccountsStore();
-    it('is implemented using InMemoryCollectionStore', () => expect(store).toBeInstanceOf(InMemoryCollectionStore));
-    it('documents are unique by rewardAccount', async () => {
-      const doc1: any = { rewardAccount: 'acc1' };
-      const doc2: any = { rewardAccount: 'acc2' };
-      await firstValueFrom(store.upsert([doc1, doc2, { ...doc1 }]));
-      expect(await firstValueFrom(store.get())).toEqual([doc1, doc2]);
-    });
-  });
-
-  describe('InMemoryAssetsStore', () => {
-    const store = new InMemoryAssetsStore();
-    it('is implemented using InMemoryCollectionStore', () => expect(store).toBeInstanceOf(InMemoryCollectionStore));
-    it('documents are unique by assetId', async () => {
-      const doc1: any = { assetId: 'asset1' };
-      const doc2: any = { assetId: 'asset2' };
-      await firstValueFrom(store.upsert([doc1, doc2, { ...doc1 }]));
-      expect(await firstValueFrom(store.get())).toEqual([doc1, doc2]);
-    });
-  });
-
-  describe('InMemoryTransactionsStore', () => {
-    const store = new InMemoryTransactionsStore();
-    const doc1: any = { blockHeader: { blockNo: 2 }, id: 'tx1', index: 1 };
-    const doc2: any = { blockHeader: { blockNo: 2 }, id: 'tx2', index: 0 };
-    const doc3: any = { blockHeader: { blockNo: 1 }, id: 'tx3', index: 0 };
-
-    it('is implemented using InMemoryOrderedCollectionStore', () =>
-      expect(store).toBeInstanceOf(InMemoryOrderedCollectionStore));
-    it('documents are unique by transaction id', async () => {
-      await firstValueFrom(store.upsert([doc1, doc2, { ...doc1 }]));
-      expect(await firstValueFrom(store.get())).toEqual([doc2, doc1]);
-    });
-    it('documents are sorted blockNo+index', async () => {
-      await firstValueFrom(store.upsert([doc3]));
-      expect(await firstValueFrom(store.get())).toEqual([doc3, doc2, doc1]);
-    });
+  it('Specific collection stores are implemented using InMemoryKeyValueStore', () => {
+    expect(new InMemoryRewardsHistoryStore()).toBeInstanceOf(InMemoryKeyValueStore);
+    expect(new InMemoryStakePoolsStore()).toBeInstanceOf(InMemoryKeyValueStore);
+    expect(new InMemoryRewardsBalancesStore()).toBeInstanceOf(InMemoryKeyValueStore);
   });
 
   it('Specific document stores are implemented using InMemoryDocumentStore', () => {
@@ -116,5 +103,7 @@ describe('InMemoryStores', () => {
     expect(new InMemoryProtocolParametersStore()).toBeInstanceOf(InMemoryDocumentStore);
     expect(new InMemoryGenesisParametersStore()).toBeInstanceOf(InMemoryDocumentStore);
     expect(new InMemoryTimeSettingsStore()).toBeInstanceOf(InMemoryDocumentStore);
+    expect(new InMemoryNetworkInfoStore()).toBeInstanceOf(InMemoryDocumentStore);
+    expect(new InMemoryAssetsStore()).toBeInstanceOf(InMemoryDocumentStore);
   });
 });

@@ -1,24 +1,59 @@
-import { Asset, Cardano, ProtocolParametersRequiredByWallet, TimeSettings } from '@cardano-sdk/core';
+import { Assets } from '../types';
+import {
+  Cardano,
+  EpochRewards,
+  NetworkInfo,
+  ProtocolParametersRequiredByWallet,
+  TimeSettings
+} from '@cardano-sdk/core';
 import { Delegatee } from '../services';
 import { Observable } from 'rxjs';
 
 export interface CollectionStore<T> {
-  get(): Observable<T[]>;
   /**
-   * Store the documents.
-   * Note: caller is allowed to do `upsert(x);upsert(x);`, expecting to have only 1 x stored.
-   *
-   * @param docs documents to store
+   * Get all stored documents.
+   * Either:
+   * - When have some documents stored: emits once and completes.
+   * - When no documents are stored: completes without emitting.
    */
-  upsert(docs: T[]): Observable<void>;
-  delete(docs: T[]): Observable<void>;
+  getAll(): Observable<T[]>;
+  /**
+   * Store the full set of documents.
+   * getAll() after setAll(docs) should return the same set of 'docs'.
+   * Should never throw.
+   */
+  setAll(docs: T[]): Observable<void>;
 }
 
 export type OrderedCollectionStore<T> = CollectionStore<T>;
 
 export interface DocumentStore<T> {
-  get(): Observable<T | null>;
+  /**
+   * Get the stored document.
+   * Either:
+   * - When have some document stored: emits once and completes.
+   * - When no document is stored: completes without emitting.
+   */
+  get(): Observable<T>;
+  /**
+   * Store the document. Should never throw.
+   */
   set(doc: T): Observable<void>;
+}
+
+export type KeyValueCollection<K, V> = { key: K; value: V };
+export interface KeyValueStore<K, V> extends CollectionStore<KeyValueCollection<K, V>> {
+  /**
+   * Get the stored documents by keys.
+   * Either:
+   * - When have all requested documents: emits once and completes.
+   * - When at least one document is missing: completes without emitting.
+   */
+  getValues(keys: K[]): Observable<V[]>;
+  /**
+   * Store the document. Should never throw.
+   */
+  setValue(key: K, value: V): Observable<void>;
 }
 
 export interface RewardAccountDocument {
@@ -27,20 +62,16 @@ export interface RewardAccountDocument {
   delegatee: Delegatee;
 }
 
-export interface AssetDocument {
-  assetId: Cardano.AssetId;
-  info: Asset.AssetInfo;
-}
-
 export interface WalletStores {
   tip: DocumentStore<Cardano.Tip>;
   utxo: CollectionStore<Cardano.Utxo>;
   transactions: OrderedCollectionStore<Cardano.TxAlonzo>;
-  rewardAccounts: CollectionStore<RewardAccountDocument>;
+  rewardsHistory: KeyValueStore<Cardano.RewardAccount, EpochRewards[]>;
+  rewardsBalances: KeyValueStore<Cardano.RewardAccount, Cardano.Lovelace>;
+  stakePools: KeyValueStore<Cardano.PoolId, Cardano.StakePool>;
   protocolParameters: DocumentStore<ProtocolParametersRequiredByWallet>;
   genesisParameters: DocumentStore<Cardano.CompactGenesis>;
-  timeSettings: DocumentStore<TimeSettings>;
-  assets: CollectionStore<AssetDocument>;
+  timeSettings: DocumentStore<TimeSettings[]>;
+  networkInfo: DocumentStore<NetworkInfo>;
+  assets: DocumentStore<Assets>;
 }
-
-export type GetDocId<T> = (doc: T) => string;
