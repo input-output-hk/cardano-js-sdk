@@ -4,7 +4,13 @@ import { Observable } from 'rxjs';
 
 export interface CollectionStore<T> {
   get(): Observable<T[]>;
-  upsert(docs: T[]): Observable<void>; // make sure to not write duplicates
+  /**
+   * Store the documents.
+   * Note: caller is allowed to do `upsert(x);upsert(x);`, expecting to have only 1 x stored.
+   *
+   * @param docs documents to store
+   */
+  upsert(docs: T[]): Observable<void>;
   delete(docs: T[]): Observable<void>;
 }
 

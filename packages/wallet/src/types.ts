@@ -35,6 +35,11 @@ export type InitializeTxResult = TxInternals & { inputSelection: SelectionSkelet
 
 export type SignDataProps = Omit<Cip30SignDataRequest, 'keyAgent'>;
 
+export enum SyncStatus {
+  Syncing,
+  UpToDate
+}
+
 export interface Wallet {
   name: string;
   readonly balance: TransactionalTracker<Balance>;
@@ -48,6 +53,7 @@ export interface Wallet {
   readonly protocolParameters$: BehaviorObservable<ProtocolParametersRequiredByWallet>;
   readonly addresses$: BehaviorObservable<GroupedAddress[]>;
   readonly assets$: BehaviorObservable<Assets>;
+  readonly syncStatus$: BehaviorObservable<SyncStatus>;
   /**
    * Compute minimum coin quantity for each transaction output
    */
