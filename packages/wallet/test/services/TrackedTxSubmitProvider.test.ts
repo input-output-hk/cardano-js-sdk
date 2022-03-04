@@ -23,7 +23,12 @@ describe('TrackedTxSubmitProvider', () => {
         const result = call(trackedTxSubmitProvider);
         expect(selectStats(trackedTxSubmitProvider.stats).value).toEqual({ ...CLEAN_FN_STATS, numCalls: 1 });
         await result;
-        expect(selectStats(trackedTxSubmitProvider.stats).value).toEqual({ numCalls: 1, numResponses: 1 });
+        expect(selectStats(trackedTxSubmitProvider.stats).value).toEqual({
+          didLastRequestFail: false,
+          numCalls: 1,
+          numFailures: 0,
+          numResponses: 1
+        });
         trackedTxSubmitProvider.stats.reset();
         expect(selectStats(trackedTxSubmitProvider.stats).value).toEqual(CLEAN_FN_STATS);
       };

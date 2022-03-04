@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 import { AssetId } from '@cardano-sdk/util-dev';
-import { Cardano, EpochRewards, WalletProvider } from '@cardano-sdk/core';
+import { Cardano, EpochRewards } from '@cardano-sdk/core';
 
 export const rewardAccount = Cardano.RewardAccount('stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d');
 
@@ -177,7 +177,7 @@ export const genesisParameters = {
  *
  * returns WalletProvider-compatible object
  */
-export const mockWalletProvider = (): WalletProvider => ({
+export const mockWalletProvider = () => ({
   currentWalletProtocolParameters: jest.fn().mockResolvedValue(protocolParameters),
   genesisParameters: jest.fn().mockResolvedValue(genesisParameters),
   ledgerTip: jest.fn().mockResolvedValue(ledgerTip),
@@ -197,7 +197,7 @@ export const mockWalletProvider = (): WalletProvider => ({
   queryTransactionsByAddresses: queryTransactions(),
   queryTransactionsByHashes: queryTransactions(),
   rewardsHistory: jest.fn().mockResolvedValue(rewardsHistory),
-  stakePoolStats: async () => ({
+  stakePoolStats: jest.fn().mockResolvedValue({
     qty: {
       active: 1000,
       retired: 500,
