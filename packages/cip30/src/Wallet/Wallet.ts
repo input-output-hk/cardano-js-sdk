@@ -1,6 +1,6 @@
 import { APIErrorCode, ApiError } from '../errors';
 import { Logger, dummyLogger } from 'ts-log';
-import { storage, Storage } from 'webextension-polyfill';
+import { Storage, storage } from 'webextension-polyfill';
 import { WalletApi } from './types';
 
 /**

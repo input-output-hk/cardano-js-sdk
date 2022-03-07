@@ -8,7 +8,7 @@ import { Cardano } from '@cardano-sdk/core';
  *
  * This result will stay the same unless the connected account has changed.
  *
- * @throws: `ApiError`
+ * @throws {ApiError}
  */
 export type GetNetworkId = () => Promise<Cardano.NetworkId>;
 /**
@@ -21,7 +21,7 @@ export type GetNetworkId = () => Promise<Cardano.NetworkId>;
  *
  * The results can be further paginated by `paginate` if it is not `undefined`.
  *
- * @throws: `ApiError` | `PaginateError`
+ * @throws {ApiError | PaginateError}
  */
 export type GetUtxos = (amount?: Cbor, paginate?: Paginate) => Promise<Cardano.Utxo[] | undefined>;
 
@@ -32,7 +32,7 @@ export type GetUtxos = (amount?: Cbor, paginate?: Paginate) => Promise<Cardano.U
  * and likely already maintained by the implementing wallet in a more efficient manner
  * so it has been included in the API as well.
  *
- * @throws: `ApiError`
+ * @throws {ApiError}
  */
 export type GetBalance = () => Promise<Cbor>;
 
@@ -41,14 +41,14 @@ export type GetBalance = () => Promise<Cbor>;
  *
  * The results can be further paginated by `paginate` if it is not `undefined`.
  *
- * @throws: `ApiError` | `PaginateError`
+ * @throws {ApiError | PaginateError}
  */
 export type GetUsedAddresses = (paginate?: Paginate) => Promise<Cbor[]>;
 
 /**
  * Returns a list of unused addresses controlled by the wallet.
  *
- * @throws: `ApiError`
+ * @throws {ApiError}
  */
 export type GetUnusedAddresses = () => Promise<Cbor[]>;
 
@@ -58,14 +58,14 @@ export type GetUnusedAddresses = () => Promise<Cbor[]>;
  *
  * This can be used as a generic receive address as well.
  *
- * Errors: `ApiError`
+ * @throws {ApiError}
  */
 export type GetChangeAddress = () => Promise<Cbor>;
 
 /**
  * Returns the reward addresses owned by the wallet. This can return multiple addresses e.g. CIP-0018.
  *
- * @throws: `ApiError`
+ * @throws {ApiError}
  */
 export type GetRewardAddresses = () => Promise<Cbor[]>;
 
@@ -85,7 +85,7 @@ export type GetRewardAddresses = () => Promise<Cbor[]>;
  * Only the portions of the witness set that were signed as a result of this call are
  * returned to encourage dApps to verify the contents returned by this endpoint while building the final transaction.
  *
- * @throws: `ApiError` | `TxSignError`
+ * @throws {ApiError | TxSignError}
  */
 export type SignTx = (tx: Cbor, partialSign?: Boolean) => Promise<Cbor>;
 
@@ -98,7 +98,7 @@ export type SignTx = (tx: Cbor, partialSign?: Boolean) => Promise<Cbor>;
  *
  * Please refer to the CIP-0008 spec for details on how to construct the sig structure.
  *
- * @throws: `ApiError` | `DataSignError`
+ * @throws {ApiError | DataSignError}
  */
 export type SignData = (addr: Cbor, sigStructure: Cbor) => Promise<Bytes>;
 
@@ -110,7 +110,7 @@ export type SignData = (addr: Cbor, sigStructure: Cbor) => Promise<Bytes>;
  * The wallet is free to return the `TxSendError` with code `Refused` if they do not wish to send it,
  * or `Failure` if there was an error in sending it (e.g. preliminary checks failed on signatures).
  *
- * @throws: `ApiError` | `TxSendError`
+ * @throws {ApiError | TxSendError}
  */
 export type SubmitTx = (tx: Cbor) => Promise<string>;
 
