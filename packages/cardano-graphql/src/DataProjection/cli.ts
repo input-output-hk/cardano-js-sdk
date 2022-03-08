@@ -4,8 +4,12 @@ require('../../scripts/patchRequire');
 import { Command } from 'commander';
 import { InvalidLoggerLevel } from './errors';
 import { Logger } from 'ts-log';
+import { Service } from './Service';
+import { URL } from 'url';
 import { createLogger } from 'bunyan';
+import fs from 'fs';
 import onDeath from 'death';
+import path from 'path';
 
 const clear = require('clear');
 const packageJson = require('../../package.json');
@@ -24,22 +28,39 @@ program
 program
   .command('start')
   .description('Start the service')
+  .option('--dgraph-url <dgraphUrl>', 'Dgraph URL', (url) => new URL(url))
+  .option('--ogmios-url <ogmiosUrl>', 'Ogmios URL', (url) => new URL(url))
   .option('--logger-min-severity <level>', 'Log level', (level) => {
     if (!['trace', 'debug', 'info', 'warn', 'error'].includes(level)) {
       throw new InvalidLoggerLevel(level);
     }
     return level;
   })
-  .action((options) => {
+  .action(async ({ dgraphUrl, loggerMinSeverity, ogmiosUrl }) => {
     const logger: Logger = createLogger({
-      level: options.loggerMinSeverity,
+      level: loggerMinSeverity,
       name: 'dgraph-projector'
     });
-    // Todo: Initialize and start service
-    logger.info('Started');
+    const service = new Service(
+      {
+        dgraph: {
+          address: dgraphUrl?.toString() || 'http://localhost:8080',
+          schema: fs.readFileSync(path.resolve(__dirname, '..', '..', 'dist', 'schema.graphql'), 'utf-8')
+        },
+        ogmios: {
+          connection: {
+            host: ogmiosUrl?.hostname,
+            port: ogmiosUrl?.port,
+            tls: ogmiosUrl?.protocol === 'wss'
+          }
+        }
+      },
+      logger
+    );
+    await service.initialize();
+    await service.start();
     onDeath(async () => {
-      // Todo: Shutdown service
-      logger.info('Process exiting');
+      await service.shutdown();
       process.exit(1);
     });
   });

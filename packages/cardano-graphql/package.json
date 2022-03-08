@@ -28,7 +28,8 @@
     "coverage": "yarn test --coverage",
     "prepack": "yarn build",
     "test:debug": "DEBUG=true yarn test",
-    "cli:dgraph-projector": "ts-node --transpile-only src/DataProjection/cli.ts"
+    "cli:dgraph-projector": "ts-node --transpile-only src/DataProjection/cli.ts",
+    "run:dgraph-projector": "ts-node --transpile-only src/DataProjection/run.ts"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "~2.5.0",
@@ -46,6 +47,7 @@
     "clear": "^0.1.0",
     "commander": "^9.0.0",
     "death": "^1.1.0",
+    "dgraph-js": "^21.3.1",
     "graphql": "~15.6.1",
     "graphql-request": "npm:graphql-request-configurable-serializer@4.0.0",
     "graphql-tag": "2.12.5",

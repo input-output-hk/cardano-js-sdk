@@ -14,5 +14,21 @@ services:
     volumes:
       - node-db:/db
 
+  dgraph:
+    image: dgraph/standalone:v21.03.0
+    ports:
+      - 5080:5080
+      - 6080:6080
+      - 8080:8080
+      - 9080:9080
+    volumes:
+      - dgraph:/dgraph
+
+  ratel:
+    image: dgraph/ratel:v21.03.0
+    ports:
+      - 8000:8000
+
 volumes:
+  dgraph:
   node-db:
