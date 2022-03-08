@@ -5,6 +5,7 @@ import * as testWallet from './testWallet';
 import { Cardano } from '@cardano-sdk/core';
 import { Wallet, WalletApi, WalletOptions } from '../src/Wallet';
 import { mocks } from 'mock-browser';
+import browser from 'webextension-polyfill';
 const window = mocks.MockBrowser.createWindow();
 
 const options: WalletOptions = {};
@@ -26,10 +27,13 @@ describe('Wallet', () => {
     'signTx',
     'submitTx'
   ];
+  const windowStub = { ...window, location: { hostname: 'test-dapp' } };
+
   let wallet: Wallet;
 
   beforeEach(async () => {
-    wallet = await Wallet.initialize(testWallet.properties, testWallet.api, testWallet.requestAccess, options);
+    await browser.storage.local.clear();
+    wallet = new Wallet(testWallet.properties, testWallet.api, testWallet.requestAccess, options);
   });
 
   test('constructed state', async () => {
@@ -38,20 +42,13 @@ describe('Wallet', () => {
     expect(typeof wallet.name).toBe('string');
     expect(wallet.name).toBe('test-wallet');
     expect(typeof wallet.isEnabled).toBe('function');
-    const isEnabled = await wallet.isEnabled(window.location.hostname);
+    const isEnabled = await wallet.isEnabled(windowStub.location.hostname);
     expect(typeof isEnabled).toBe('boolean');
     expect(isEnabled).toBe(false);
     expect(typeof wallet.enable).toBe('function');
   });
 
-  test('getPublicApi', async () => {
-    const publicApi = wallet.getPublicApi(window.location.hostname);
-    expect(publicApi.name).toEqual('test-wallet');
-    expect(await publicApi.isEnabled()).toEqual(false);
-  });
-
   test('enable', async () => {
-    const windowStub = { ...window, location: { hostname: 'test-dapp' } };
     expect(await wallet.isEnabled(windowStub.location.hostname)).toBe(false);
     const api = await wallet.enable(windowStub.location.hostname);
     expect(typeof api).toBe('object');
@@ -60,11 +57,23 @@ describe('Wallet', () => {
     expect(await wallet.isEnabled(windowStub.location.hostname)).toBe(true);
   });
 
+  test('prior enabling should persist', async () => {
+    await browser.storage.local.set({ myWallet: { allowList: 'test.invalid' } });
+    const persistedWallet = new Wallet(
+      { ...testWallet.properties, name: 'myWallet' },
+      testWallet.api,
+      testWallet.requestAccess,
+      options
+    );
+
+    expect(await persistedWallet.isEnabled('test.invalid')).toBe(true);
+  });
+
   describe('api', () => {
     let api: WalletApi;
 
     beforeAll(async () => {
-      api = await wallet.enable(window.location.hostname);
+      api = await wallet.enable(windowStub.location.hostname);
     });
 
     test('getNetworkId', async () => {

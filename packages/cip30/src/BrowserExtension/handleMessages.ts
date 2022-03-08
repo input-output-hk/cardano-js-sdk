@@ -1,7 +1,7 @@
-import browser from 'webextension-polyfill';
 import { Logger, dummyLogger } from 'ts-log';
 import { Message } from './types';
 import { WalletApi } from '../Wallet';
+import browser from 'webextension-polyfill';
 
 export const handleMessages = (walletApi: WalletApi, logger: Logger = dummyLogger): void => {
   browser.runtime.onMessage.addListener(async (msg: Message) => {

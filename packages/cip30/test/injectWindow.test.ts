@@ -2,13 +2,16 @@ import { Wallet } from '../src/Wallet';
 import { WindowMaybeWithCardano, injectWindow } from '../src/injectWindow';
 import { api, properties, requestAccess } from './testWallet';
 import { mocks } from 'mock-browser';
+import browser from 'webextension-polyfill';
 
 describe('injectWindow', () => {
   let wallet: Wallet;
   let window: ReturnType<typeof mocks.MockBrowser>;
 
   beforeEach(async () => {
-    wallet = await Wallet.initialize(properties, api, requestAccess);
+    await browser.storage.local.clear();
+
+    wallet = new Wallet(properties, api, requestAccess);
     window = mocks.MockBrowser.createWindow();
   });
 
@@ -21,7 +24,7 @@ describe('injectWindow', () => {
     expect(window.cardano[properties.name].icon).toBe(properties.icon);
     expect(await window.cardano[properties.name].isEnabled(window.location.hostname)).toBe(false);
     await window.cardano[properties.name].enable(window.location.hostname);
-    expect(await window.cardano[properties.name].isEnabled()).toBe(true);
+    expect(await window.cardano[properties.name].isEnabled(window.location.hostname)).toBe(true);
   });
 
   describe('existing cardano object', () => {

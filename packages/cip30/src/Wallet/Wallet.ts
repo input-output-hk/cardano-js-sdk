@@ -49,65 +49,43 @@ export class Wallet {
   readonly name: WalletName;
   readonly icon: WalletIcon;
 
-  private allowList: string[];
-  private logger: Logger;
-  private readonly options: Required<WalletOptions>;
+  #allowList: string[];
+  #logger: Logger;
+  #api: WalletApi;
+  #requestAccess: RequestAccess;
+  readonly #options: Required<WalletOptions>;
 
-  private constructor(
-    properties: WalletProperties,
-    private api: WalletApi,
-    private requestAccess: RequestAccess,
-    allowList: string[],
-    options?: WalletOptions
-  ) {
-    this.options = { ...defaultOptions, ...options };
-    this.name = properties.name;
+  constructor(properties: WalletProperties, api: WalletApi, requestAccess: RequestAccess, options?: WalletOptions) {
     this.apiVersion = properties.apiVersion;
+    this.enable = this.enable.bind(this);
     this.icon = properties.icon;
-    this.allowList = allowList;
-    this.logger = this.options.logger;
+    this.isEnabled = this.isEnabled.bind(this);
+    this.name = properties.name;
+
+    this.#api = api;
+    this.#options = { ...defaultOptions, ...options };
+    this.#logger = options?.logger || this.#options.logger;
+    this.#requestAccess = requestAccess;
   }
 
-  public getPublicApi(hostname: string) {
-    return {
-      apiVersion: this.apiVersion,
-      enable: this.enable.bind(this, hostname),
-      icon: this.icon,
-      isEnabled: this.isEnabled.bind(this, hostname),
-      name: this.name
-    };
-  }
-
-  static async getAllowList(_storage?: Storage.LocalStorageArea): Promise<string[]> {
-    if (!_storage) return Promise.resolve([]);
+  async #getAllowList(storageKey: string): Promise<string[]> {
+    if (!storageKey) return Promise.resolve([]);
     try {
-      const persistedStorage: Record<string, WalletStorage> = await _storage.get(this.name);
-      return persistedStorage[this.name].allowList;
+      const persistedStorage: Record<string, WalletStorage> = await this.#options.storage.get(storageKey);
+      return persistedStorage[storageKey].allowList;
     } catch {
       return [];
     }
   }
 
-  static async initialize(
-    properties: WalletProperties,
-    api: WalletApi,
-    requestAccess: RequestAccess,
-    options?: WalletOptions
-  ) {
-    const allowList = await this.getAllowList(options?.storage);
-
-    return new Wallet(properties, api, requestAccess, allowList, options);
-  }
-
-  private async allowApplication(appName: string) {
-    this.allowList.push(appName);
+  async #allowApplication(appName: string) {
+    this.#allowList.push(appName);
 
     // Todo: Encrypt
-
-    await this.options.storage.set({ [this.name]: { allowList: [...this.allowList, appName] } });
-    this.logger.debug(
+    await this.#options.storage.set({ [this.name]: { allowList: [...this.#allowList, appName] } });
+    this.#logger.debug(
       {
-        allowList: this.allowList,
+        allowList: this.#allowList,
         module: 'Wallet',
         walletName: this.name
       },
@@ -125,7 +103,15 @@ export class Wallet {
    * Errors: `ApiError`
    */
   public async isEnabled(hostname: string): Promise<Boolean> {
-    return this.allowList.includes(hostname);
+    try {
+      if (!this.#allowList) {
+        this.#allowList = await this.#getAllowList(this.name);
+      }
+      return this.#allowList.includes(hostname);
+    } catch (error) {
+      this.#logger.error(error);
+      throw error;
+    }
   }
 
   /**
@@ -144,28 +130,26 @@ export class Wallet {
    * Errors: `ApiError`
    */
   public async enable(hostname: string): Promise<WalletApi> {
-    if (this.allowList.includes(hostname)) {
-      this.logger.debug(
+    if (await this.isEnabled(hostname)) {
+      this.#logger.debug(
         {
           module: 'Wallet',
           walletName: this.name
         },
         `${hostname} has previously been allowed`
       );
-      return this.api;
+      return this.#api;
     }
 
     // gain authorization from wallet owner
-    const isAuthed = await this.requestAccess();
+    const isAuthed = await this.#requestAccess();
 
     if (!isAuthed) {
       throw new ApiError(APIErrorCode.Refused, 'wallet not authorized.');
     }
 
-    await this.allowApplication(hostname);
+    await this.#allowApplication(hostname);
 
-    return this.api;
+    return this.#api;
   }
 }
-
-export type WalletPublic = ReturnType<Wallet['getPublicApi']>;

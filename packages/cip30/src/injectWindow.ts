@@ -1,7 +1,7 @@
 import { Logger, dummyLogger } from 'ts-log';
-import { Wallet, WalletPublic } from './Wallet';
+import { Wallet } from './Wallet';
 
-export type WindowMaybeWithCardano = Window & { cardano?: { [k: string]: WalletPublic } };
+export type WindowMaybeWithCardano = Window & { cardano?: { [k: string]: Wallet } };
 
 export const injectWindow = (window: WindowMaybeWithCardano, wallet: Wallet, logger: Logger = dummyLogger): void => {
   if (!window.cardano) {
@@ -22,7 +22,7 @@ export const injectWindow = (window: WindowMaybeWithCardano, wallet: Wallet, log
       'Cardano global scope exists'
     );
   }
-  window.cardano[wallet.name] = window.cardano[wallet.name] || wallet.getPublicApi(window.location.hostname);
+  window.cardano[wallet.name] = window.cardano[wallet.name] || wallet;
   logger.debug(
     {
       module: 'injectWindow',
