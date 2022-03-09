@@ -90,14 +90,6 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
     };
   };
 
-  const submitTx: WalletProvider['submitTx'] = async (signedTransaction) => {
-    try {
-      await blockfrost.txSubmit(signedTransaction);
-    } catch (error) {
-      throw new Cardano.TxSubmissionErrors.UnknownTxSubmissionError(error);
-    }
-  };
-
   const utxoDelegationAndRewards: WalletProvider['utxoDelegationAndRewards'] = async (addresses, rewardAccount) => {
     const utxoResults = await Promise.all(
       addresses.map(async (address) =>
@@ -437,12 +429,8 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
     queryTransactionsByHashes,
     rewardsHistory,
     stakePoolStats,
-    submitTx,
     utxoDelegationAndRewards
   };
 
-  return {
-    ...ProviderUtil.withProviderErrors(providerFunctions, toProviderError),
-    submitTx
-  };
+  return ProviderUtil.withProviderErrors(providerFunctions, toProviderError);
 };

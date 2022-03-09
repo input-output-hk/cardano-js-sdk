@@ -7,6 +7,7 @@ import {
   poolId2,
   stakePoolSearchProvider,
   timeSettingsProvider,
+  txSubmitProvider,
   walletProvider
 } from '../config';
 import { distinctUntilChanged, filter, firstValueFrom, map, merge, mergeMap, skip, tap, timer } from 'rxjs';
@@ -73,6 +74,7 @@ describe('SingleAddressWallet/delegation', () => {
         keyAgent: await keyAgentReady,
         stakePoolSearchProvider,
         timeSettingsProvider,
+        txSubmitProvider,
         walletProvider
       }
     );

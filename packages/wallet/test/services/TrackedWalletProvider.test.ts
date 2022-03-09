@@ -1,5 +1,5 @@
 import { BehaviorSubject } from 'rxjs';
-import { CLEAN_FN_STATS, TrackedWalletProvider, WalletProviderFnStats, WalletProviderStats } from '../../src';
+import { CLEAN_FN_STATS, ProviderFnStats, TrackedWalletProvider, WalletProviderStats } from '../../src';
 import { WalletProvider } from '@cardano-sdk/core';
 import { mockWalletProvider } from '../mocks';
 
@@ -19,7 +19,7 @@ describe('TrackedWalletProvider', () => {
     const testFunctionStats =
       <T>(
         call: (walletProvider: WalletProvider) => Promise<T>,
-        selectStats: (stats: WalletProviderStats) => BehaviorSubject<WalletProviderFnStats>
+        selectStats: (stats: WalletProviderStats) => BehaviorSubject<ProviderFnStats>
         // eslint-disable-next-line unicorn/consistent-function-scoping
       ) =>
       async () => {
@@ -93,14 +93,6 @@ describe('TrackedWalletProvider', () => {
       testFunctionStats(
         (wp) => wp.rewardsHistory({ stakeAddresses: [] }),
         (stats) => stats.rewardsHistory$
-      )
-    );
-
-    test(
-      'submitTx',
-      testFunctionStats(
-        (wp) => wp.submitTx(new Uint8Array()),
-        (stats) => stats.submitTx$
       )
     );
 

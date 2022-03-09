@@ -14,12 +14,14 @@ describe('SingleAddressWallet', () => {
   const address = mocks.utxo[0][0].address;
   const rewardAccount = mocks.rewardAccount;
   let keyAgent: KeyManagement.KeyAgent;
-  let walletProvider: mocks.ProviderStub;
+  let txSubmitProvider: mocks.TxSubmitProviderStub;
+  let walletProvider: mocks.WalletProviderStub;
   let assetProvider: mocks.MockAssetProvider;
   let wallet: SingleAddressWallet;
 
   beforeEach(async () => {
     keyAgent = await testKeyAgent();
+    txSubmitProvider = mocks.mockTxSubmitProvider();
     walletProvider = mocks.mockWalletProvider();
     assetProvider = mocks.mockAssetProvider();
     const stakePoolSearchProvider = createStubStakePoolSearchProvider();
@@ -35,7 +37,7 @@ describe('SingleAddressWallet', () => {
     keyAgent.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
     wallet = new SingleAddressWallet(
       { name },
-      { assetProvider, keyAgent, stakePoolSearchProvider, timeSettingsProvider, walletProvider }
+      { assetProvider, keyAgent, stakePoolSearchProvider, timeSettingsProvider, txSubmitProvider, walletProvider }
     );
     keyAgent.knownAddresses.push(groupedAddress);
   });
@@ -170,7 +172,7 @@ describe('SingleAddressWallet', () => {
       const txPending = firstValueFrom(wallet.transactions.outgoing.pending$);
       const txInFlight = firstValueFrom(wallet.transactions.outgoing.inFlight$.pipe(skip(1)));
       await wallet.submitTx(tx);
-      expect(walletProvider.submitTx).toBeCalledTimes(1);
+      expect(txSubmitProvider.submitTx).toBeCalledTimes(1);
       expect(await txSubmitting).toBe(tx);
       expect(await txPending).toBe(tx);
       expect(await txInFlight).toEqual([tx]);

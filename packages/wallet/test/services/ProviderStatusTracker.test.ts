@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable no-multi-spaces */
-import { CLEAN_FN_STATS, SyncStatus, TrackedWalletProvider, WalletProviderFnStats } from '../../src';
+import { CLEAN_FN_STATS, ProviderFnStats, SyncStatus, TrackedWalletProvider } from '../../src';
 import { createProviderStatusTracker } from '../../src/services/ProviderStatusTracker';
 import { createTestScheduler } from '../testScheduler';
 import { mockWalletProvider } from '../mocks';
@@ -10,8 +10,8 @@ describe('syncStatus', () => {
     const walletProvider = new TrackedWalletProvider(mockWalletProvider());
     const timeout = 5000;
     createTestScheduler().run(({ cold, expectObservable }) => {
-      const getWalletProviderSyncRelevantStats = jest.fn().mockReturnValueOnce(
-        cold<WalletProviderFnStats[]>(`abcdef ${timeout}ms g`, {
+      const getProviderSyncRelevantStats = jest.fn().mockReturnValueOnce(
+        cold<ProviderFnStats[]>(`abcdef ${timeout}ms g`, {
           a: [CLEAN_FN_STATS, CLEAN_FN_STATS],                    // Initial state
           b: [{ numCalls: 1, numResponses: 0 }, CLEAN_FN_STATS],  // One provider fn called
           c: [
@@ -39,7 +39,7 @@ describe('syncStatus', () => {
       const tracker = createProviderStatusTracker(
         { walletProvider },
         { consideredOutOfSyncAfter: timeout },
-        { getWalletProviderSyncRelevantStats }
+        { getProviderSyncRelevantStats }
       );
       expectObservable(tracker, `^ ${timeout * 2}ms !`).toBe(`a---e ${timeout - 1}ms f-g`, {
         a: SyncStatus.Syncing,

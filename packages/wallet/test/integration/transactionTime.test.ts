@@ -2,7 +2,7 @@ import { Cardano, createSlotTimeCalc, testnetTimeSettings } from '@cardano-sdk/c
 import { KeyManagement, SingleAddressWallet, SingleAddressWalletProps } from '../../src';
 import { createStubStakePoolSearchProvider, createStubTimeSettingsProvider } from '@cardano-sdk/util-dev';
 import { firstValueFrom } from 'rxjs';
-import { mockAssetProvider, mockWalletProvider } from '../mocks';
+import { mockAssetProvider, mockTxSubmitProvider, mockWalletProvider } from '../mocks';
 
 const walletProps: SingleAddressWalletProps = { name: 'some-wallet' };
 const networkId = Cardano.NetworkId.mainnet;
@@ -19,6 +19,7 @@ describe('integration/transactionTime', () => {
       mnemonicWords,
       networkId
     });
+    const txSubmitProvider = mockTxSubmitProvider();
     const walletProvider = mockWalletProvider();
     const stakePoolSearchProvider = createStubStakePoolSearchProvider();
     const timeSettingsProvider = createStubTimeSettingsProvider(testnetTimeSettings);
@@ -28,6 +29,7 @@ describe('integration/transactionTime', () => {
       keyAgent,
       stakePoolSearchProvider,
       timeSettingsProvider,
+      txSubmitProvider,
       walletProvider
     });
   });

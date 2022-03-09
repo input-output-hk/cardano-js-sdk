@@ -13,13 +13,12 @@ import {
   timer
 } from 'rxjs';
 import { Milliseconds } from './types';
+import { ProviderFnStats } from './ProviderTracker';
 import { SyncStatus } from '../types';
-import { TrackedWalletProvider, WalletProviderFnStats } from './TrackedWalletProvider';
+import { TrackedWalletProvider } from './TrackedWalletProvider';
 import { TrackerSubject } from './util';
 
-const getDefaultWalletProviderSyncRelevantStats = (
-  walletProvider: TrackedWalletProvider
-): Observable<WalletProviderFnStats[]> =>
+const getDefaultProviderSyncRelevantStats = (walletProvider: TrackedWalletProvider): Observable<ProviderFnStats[]> =>
   combineLatest([
     walletProvider.stats.ledgerTip$,
     walletProvider.stats.currentWalletProtocolParameters$,
@@ -41,20 +40,18 @@ export interface ProviderStatusTrackerDependencies {
 
 export interface ProviderStatusTrackerInternals {
   /**
-   * @returns Observable of WalletProvider stats that are considered
+   * @returns Observable of Provider stats that are considered
    * when determining Wallet sync status
    */
-  getWalletProviderSyncRelevantStats?: typeof getDefaultWalletProviderSyncRelevantStats;
+  getProviderSyncRelevantStats?: typeof getDefaultProviderSyncRelevantStats;
 }
 
 export const createProviderStatusTracker = (
   { walletProvider }: ProviderStatusTrackerDependencies,
   { consideredOutOfSyncAfter }: ProviderStatusTrackerProps,
-  {
-    getWalletProviderSyncRelevantStats = getDefaultWalletProviderSyncRelevantStats
-  }: ProviderStatusTrackerInternals = {}
+  { getProviderSyncRelevantStats = getDefaultProviderSyncRelevantStats }: ProviderStatusTrackerInternals = {}
 ): TrackerSubject<SyncStatus> => {
-  const relevantStats = getWalletProviderSyncRelevantStats(walletProvider);
+  const relevantStats = getProviderSyncRelevantStats(walletProvider);
   const upToDate$ = relevantStats.pipe(
     skipWhile((allStats) => allStats.every(({ numCalls, numResponses }) => numCalls === 0 && numResponses === 0)),
     mergeMap((allStats) => (allStats.some(({ numCalls, numResponses }) => numCalls > numResponses) ? EMPTY : of(true)))

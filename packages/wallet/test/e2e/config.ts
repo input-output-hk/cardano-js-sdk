@@ -1,6 +1,6 @@
 import { Cardano, testnetTimeSettings } from '@cardano-sdk/core';
 import { InMemoryKeyAgent } from '../../src/KeyManagement';
-import { blockfrostAssetProvider, blockfrostWalletProvider } from '@cardano-sdk/blockfrost';
+import { blockfrostAssetProvider, blockfrostTxSubmitProvider, blockfrostWalletProvider } from '@cardano-sdk/blockfrost';
 import { createStubStakePoolSearchProvider, createStubTimeSettingsProvider } from '@cardano-sdk/util-dev';
 
 const networkId = Number.parseInt(process.env.NETWORK_ID || '');
@@ -21,6 +21,12 @@ export const assetProvider = (() => {
   const projectId = process.env.BLOCKFROST_API_KEY;
   if (!projectId) throw new Error('BLOCKFROST_API_KEY not set (for assetProvider)');
   return blockfrostAssetProvider({ isTestnet, projectId });
+})();
+
+export const txSubmitProvider = (() => {
+  const projectId = process.env.BLOCKFROST_API_KEY;
+  if (!projectId) throw new Error('BLOCKFROST_API_KEY not set (for txSubmitProvider)');
+  return blockfrostTxSubmitProvider({ isTestnet, projectId });
 })();
 
 export const keyAgentReady = (() => {
