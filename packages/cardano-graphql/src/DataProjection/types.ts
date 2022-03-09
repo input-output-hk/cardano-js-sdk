@@ -6,6 +6,13 @@ export type ModuleState = null | 'initializing' | 'initialized';
 export type DQL = string;
 type Variable = string;
 
+export type QueryVariables = {
+  $assetIds?: string;
+};
+export interface QueryResult<Variables> {
+  query: DQL;
+  variables?: Variables;
+}
 export interface RollBackwardContext {
   point: Ogmios.Point;
   tip: Ogmios.Tip;
@@ -25,9 +32,13 @@ export interface Upsert {
   };
 }
 
+// export interface CombinedQueryResult {}
+
+// export interface CombinedProcessingResult {}
+
 export interface BlockHandler {
   id: string;
-  query?: (ctx: RollForwardContext) => Promise<DQL>;
+  query?: (ctx: RollForwardContext) => Promise<QueryResult<QueryVariables>>;
   // process?: (ctx: RollForwardContext, queryResult?: CombinedQueryResult) => Promise<Partial<CombinedProcessingResult>>;
   process?: (ctx: RollForwardContext, queryResult?: any) => Promise<Partial<any>>;
   rollBackward: (ctx: RollBackwardContext) => Promise<Upsert>;

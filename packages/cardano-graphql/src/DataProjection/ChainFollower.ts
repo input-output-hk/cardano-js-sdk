@@ -52,8 +52,9 @@ export class ChainFollower extends RunnableModule {
         this.logger.info({ BLOCK: block }, 'Rolling forward');
         const txn = this.#dgraphClient.newTxn();
         const context = { block, txn };
-        // const query = await mergedQuery(this.#blockHandlers, context);
-        // const queryResults = await this.#dgraphClient.query(query);
+        // const { query, variables } = await mergedQuery(this.#blockHandlers, context);
+        this.logger.info('About to run merged query');
+        // const queryResults = await this.#dgraphClient.query(query, variables);
         // const preProcessingResults = await mergedPreProcessingResults(this.#blockHandlers, context, queryResults);
         const upsert = await mergedRollForwardUpsert(this.#blockHandlers, context);
         await this.#dgraphClient.writeDataFromBlock(upsert, txn);
