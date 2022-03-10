@@ -8,6 +8,7 @@ import {
   StakePoolSearchProvider,
   TimeSettings,
   TimeSettingsProvider,
+  TxSubmitProvider,
   WalletProvider,
   coreToCsl
 } from '@cardano-sdk/core';
@@ -19,6 +20,7 @@ import {
   FailedTx,
   PollingConfig,
   SyncableIntervalTrackerSubject,
+  TrackedTxSubmitProvider,
   TrackedWalletProvider,
   TrackerSubject,
   TransactionFailure,
@@ -57,6 +59,7 @@ export interface SingleAddressWalletProps {
 
 export interface SingleAddressWalletDependencies {
   readonly keyAgent: KeyAgent;
+  readonly txSubmitProvider: TxSubmitProvider;
   readonly walletProvider: WalletProvider;
   readonly stakePoolSearchProvider: StakePoolSearchProvider;
   readonly assetProvider: AssetProvider;
@@ -75,6 +78,7 @@ export class SingleAddressWallet implements Wallet {
     pending$: new Subject<Cardano.NewTxAlonzo>(),
     submitting$: new Subject<Cardano.NewTxAlonzo>()
   };
+  txSubmitProvider: TrackedTxSubmitProvider;
   walletProvider: TrackedWalletProvider;
   utxo: TransactionalTracker<Cardano.Utxo[]>;
   balance: TransactionalTracker<Balance>;
@@ -104,6 +108,7 @@ export class SingleAddressWallet implements Wallet {
       }
     }: SingleAddressWalletProps,
     {
+      txSubmitProvider,
       walletProvider,
       stakePoolSearchProvider,
       keyAgent,
@@ -115,6 +120,7 @@ export class SingleAddressWallet implements Wallet {
   ) {
     this.#logger = logger;
     this.#inputSelector = inputSelector;
+    this.txSubmitProvider = new TrackedTxSubmitProvider(txSubmitProvider);
     this.walletProvider = new TrackedWalletProvider(walletProvider);
     this.#keyAgent = keyAgent;
     this.addresses$ = new TrackerSubject<GroupedAddress[]>(this.#initializeAddress(keyAgent.knownAddresses));
@@ -233,7 +239,7 @@ export class SingleAddressWallet implements Wallet {
   async submitTx(tx: Cardano.NewTxAlonzo): Promise<void> {
     this.#newTransactions.submitting$.next(tx);
     try {
-      await this.walletProvider.submitTx(coreToCsl.tx(tx).to_bytes());
+      await this.txSubmitProvider.submitTx(coreToCsl.tx(tx).to_bytes());
       this.#newTransactions.pending$.next(tx);
     } catch (error) {
       this.#newTransactions.failedToSubmit$.next({

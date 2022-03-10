@@ -1,4 +1,3 @@
-import { Buffer } from 'buffer';
 import { Cardano, ProviderError, ProviderFailure, WalletProvider } from '@cardano-sdk/core';
 import {
   CardanoGraphQlTip,
@@ -7,7 +6,6 @@ import {
   TransactionsResponse
 } from './CardanoGraphqlToCore';
 import { GraphQLClient, gql } from 'graphql-request';
-import { TransactionSubmitResponse } from '@cardano-graphql/client-ts';
 
 /**
  * Connect to a [cardano-graphql (cardano-db-sync) service](https://github.com/input-output-hk/cardano-graphql)
@@ -207,31 +205,6 @@ export const cardanoGraphqlDbSyncProvider = (uri: string): WalletProvider => {
     };
   };
 
-  const submitTx: WalletProvider['submitTx'] = async (signedTransaction) => {
-    try {
-      const mutation = gql`
-        mutation ($transaction: String!) {
-          submitTransaction(transaction: $transaction) {
-            hash
-          }
-        }
-      `;
-
-      type Response = TransactionSubmitResponse;
-      type Variables = { transaction: string };
-
-      const response = await client.request<Response, Variables>(mutation, {
-        transaction: Buffer.from(signedTransaction).toString('hex')
-      });
-
-      if (!response.hash) {
-        throw new Error('No "hash" in graphql response');
-      }
-    } catch (error) {
-      throw new ProviderError(ProviderFailure.Unknown, error);
-    }
-  };
-
   // eslint-disable-next-line unicorn/consistent-function-scoping
   const utxoDelegationAndRewards: WalletProvider['utxoDelegationAndRewards'] = async () => {
     throw new ProviderError(ProviderFailure.NotImplemented);
@@ -360,7 +333,6 @@ export const cardanoGraphqlDbSyncProvider = (uri: string): WalletProvider => {
     queryTransactionsByHashes,
     rewardsHistory,
     stakePoolStats,
-    submitTx,
     utxoDelegationAndRewards
   };
 };

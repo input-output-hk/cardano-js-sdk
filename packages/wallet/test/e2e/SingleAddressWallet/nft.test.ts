@@ -1,7 +1,14 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { Cardano } from '@cardano-sdk/core';
 import { KeyManagement, SingleAddressWallet, Wallet } from '../../../src';
-import { assetProvider, keyAgentReady, stakePoolSearchProvider, timeSettingsProvider, walletProvider } from '../config';
+import {
+  assetProvider,
+  keyAgentReady,
+  stakePoolSearchProvider,
+  timeSettingsProvider,
+  txSubmitProvider,
+  walletProvider
+} from '../config';
 import { combineLatest, filter, firstValueFrom, map } from 'rxjs';
 
 describe('SingleAddressWallet.assets/nft', () => {
@@ -28,6 +35,7 @@ describe('SingleAddressWallet.assets/nft', () => {
         keyAgent: await keyAgentReady,
         stakePoolSearchProvider,
         timeSettingsProvider,
+        txSubmitProvider,
         walletProvider
       }
     );

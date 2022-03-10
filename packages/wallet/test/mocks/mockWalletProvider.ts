@@ -204,8 +204,7 @@ export const mockWalletProvider = (): WalletProvider => ({
       retiring: 5
     }
   }),
-  submitTx: jest.fn().mockResolvedValue(void 0),
   utxoDelegationAndRewards: jest.fn().mockResolvedValue({ delegationAndRewards, utxo })
 });
 
-export type ProviderStub = ReturnType<typeof mockWalletProvider>;
+export type WalletProviderStub = ReturnType<typeof mockWalletProvider>;

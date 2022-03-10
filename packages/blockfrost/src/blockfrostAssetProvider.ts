@@ -1,7 +1,6 @@
 /* eslint-disable unicorn/no-nested-ternary */
 import { Asset, AssetProvider, Cardano, ProviderUtil, util } from '@cardano-sdk/core';
 import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
-import { Options } from '@blockfrost/blockfrost-js/lib/types';
 import { fetchSequentially, toProviderError } from './util';
 import { omit } from 'lodash-es';
 
@@ -26,13 +25,11 @@ const mapMetadata = (
 /**
  * Connect to the [Blockfrost service](https://docs.blockfrost.io/)
  *
- * @param {Options} options BlockFrostAPI options
+ * @param {BlockFrostAPI} blockfrost BlockFrostAPI instance
  * @returns {AssetProvider} WalletProvider
  * @throws ProviderFailure
  */
-export const blockfrostAssetProvider = (options: Options): AssetProvider => {
-  const blockfrost = new BlockFrostAPI(options);
-
+export const blockfrostAssetProvider = (blockfrost: BlockFrostAPI): AssetProvider => {
   const getAssetHistory = async (assetId: Cardano.AssetId): Promise<Asset.AssetMintOrBurn[]> =>
     fetchSequentially({
       arg: assetId.toString(),

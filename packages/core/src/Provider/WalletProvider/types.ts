@@ -77,11 +77,6 @@ export interface WalletProvider {
   networkInfo: () => Promise<NetworkInfo>;
   // TODO: move stakePoolStats out to other provider type, since it's not required for wallet operation
   stakePoolStats?: () => Promise<StakePoolStats>;
-  /**
-   * @param signedTransaction signed and serialized cbor
-   * @throws {Cardano.TxSubmissionError} (see Cardano.TxSubmissionErrors)
-   */
-  submitTx: (signedTransaction: Uint8Array) => Promise<void>;
   // TODO: split utxoDelegationAndRewards this into 2 or 3 functions
   utxoDelegationAndRewards: (
     addresses: Cardano.Address[],

@@ -1,6 +1,11 @@
+import {
+  BlockFrostAPI,
+  blockfrostAssetProvider,
+  blockfrostTxSubmitProvider,
+  blockfrostWalletProvider
+} from '@cardano-sdk/blockfrost';
 import { Cardano, testnetTimeSettings } from '@cardano-sdk/core';
 import { InMemoryKeyAgent } from '../../src/KeyManagement';
-import { blockfrostAssetProvider, blockfrostWalletProvider } from '@cardano-sdk/blockfrost';
 import { createStubStakePoolSearchProvider, createStubTimeSettingsProvider } from '@cardano-sdk/util-dev';
 
 const networkId = Number.parseInt(process.env.NETWORK_ID || '');
@@ -12,7 +17,8 @@ export const walletProvider = (() => {
   if (walletProviderName === 'blockfrost') {
     const projectId = process.env.BLOCKFROST_API_KEY;
     if (!projectId) throw new Error('BLOCKFROST_API_KEY not set');
-    return blockfrostWalletProvider({ isTestnet, projectId });
+    const blockfrost = new BlockFrostAPI({ isTestnet, projectId });
+    return blockfrostWalletProvider(blockfrost);
   }
   throw new Error(`WALLET_PROVIDER unsupported: ${walletProviderName}`);
 })();
@@ -20,7 +26,15 @@ export const walletProvider = (() => {
 export const assetProvider = (() => {
   const projectId = process.env.BLOCKFROST_API_KEY;
   if (!projectId) throw new Error('BLOCKFROST_API_KEY not set (for assetProvider)');
-  return blockfrostAssetProvider({ isTestnet, projectId });
+  const blockfrost = new BlockFrostAPI({ isTestnet, projectId });
+  return blockfrostAssetProvider(blockfrost);
+})();
+
+export const txSubmitProvider = (() => {
+  const projectId = process.env.BLOCKFROST_API_KEY;
+  if (!projectId) throw new Error('BLOCKFROST_API_KEY not set (for txSubmitProvider)');
+  const blockfrost = new BlockFrostAPI({ isTestnet, projectId });
+  return blockfrostTxSubmitProvider(blockfrost);
 })();
 
 export const keyAgentReady = (() => {

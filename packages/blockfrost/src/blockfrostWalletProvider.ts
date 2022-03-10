@@ -10,7 +10,7 @@ import {
 } from '@cardano-sdk/core';
 import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
 import { BlockfrostToCore, BlockfrostTransactionContent, BlockfrostUtxo } from './BlockfrostToCore';
-import { Options, PaginationOptions } from '@blockfrost/blockfrost-js/lib/types';
+import { PaginationOptions } from '@blockfrost/blockfrost-js/lib/types';
 import { dummyLogger } from 'ts-log';
 import { fetchSequentially, formatBlockfrostError, jsonToMetadatum, toProviderError } from './util';
 import { flatten, groupBy } from 'lodash-es';
@@ -31,13 +31,11 @@ const fetchByAddressSequentially = async <Item, Response>(props: {
 /**
  * Connect to the [Blockfrost service](https://docs.blockfrost.io/)
  *
- * @param {Options} options BlockFrostAPI options
+ * @param {BlockFrostAPI} blockfrost BlockFrostAPI instance
  * @returns {WalletProvider} WalletProvider
  * @throws {ProviderFailure}
  */
-export const blockfrostWalletProvider = (options: Options, logger = dummyLogger): WalletProvider => {
-  const blockfrost = new BlockFrostAPI(options);
-
+export const blockfrostWalletProvider = (blockfrost: BlockFrostAPI, logger = dummyLogger): WalletProvider => {
   const ledgerTip: WalletProvider['ledgerTip'] = async () => {
     const block = await blockfrost.blocksLatest();
     return BlockfrostToCore.blockToTip(block);
@@ -88,14 +86,6 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
         retiring: await tallyPools('poolsRetiring')
       }
     };
-  };
-
-  const submitTx: WalletProvider['submitTx'] = async (signedTransaction) => {
-    try {
-      await blockfrost.txSubmit(signedTransaction);
-    } catch (error) {
-      throw new Cardano.TxSubmissionErrors.UnknownTxSubmissionError(error);
-    }
   };
 
   const utxoDelegationAndRewards: WalletProvider['utxoDelegationAndRewards'] = async (addresses, rewardAccount) => {
@@ -437,12 +427,8 @@ export const blockfrostWalletProvider = (options: Options, logger = dummyLogger)
     queryTransactionsByHashes,
     rewardsHistory,
     stakePoolStats,
-    submitTx,
     utxoDelegationAndRewards
   };
 
-  return {
-    ...ProviderUtil.withProviderErrors(providerFunctions, toProviderError),
-    submitTx
-  };
+  return ProviderUtil.withProviderErrors(providerFunctions, toProviderError);
 };
