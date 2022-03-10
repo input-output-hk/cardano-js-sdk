@@ -1,29 +1,24 @@
 /* eslint-disable max-len */
-import * as mocks from './mocks';
+import * as mocks from '../mocks';
 import { AssetId, createStubStakePoolSearchProvider, createStubTimeSettingsProvider } from '@cardano-sdk/util-dev';
 import { Cardano, testnetTimeSettings } from '@cardano-sdk/core';
-import { KeyManagement, SingleAddressWallet } from '../src';
+import { KeyManagement, SingleAddressWallet } from '../../src';
 import { firstValueFrom, skip } from 'rxjs';
-import { getPassword, testKeyAgent } from './mocks';
 
-jest.mock('../src/KeyManagement/cip8/cip30signData');
-const { cip30signData } = jest.requireMock('../src/KeyManagement/cip8/cip30signData');
+jest.mock('../../src/KeyManagement/cip8/cip30signData');
+const { cip30signData } = jest.requireMock('../../src/KeyManagement/cip8/cip30signData');
 
-describe('SingleAddressWallet', () => {
-  const name = 'Test Wallet';
+describe('SingleAddressWallet methods', () => {
   const address = mocks.utxo[0][0].address;
-  const rewardAccount = mocks.rewardAccount;
-  let keyAgent: KeyManagement.KeyAgent;
   let txSubmitProvider: mocks.TxSubmitProviderStub;
   let walletProvider: mocks.WalletProviderStub;
-  let assetProvider: mocks.MockAssetProvider;
   let wallet: SingleAddressWallet;
 
   beforeEach(async () => {
-    keyAgent = await testKeyAgent();
+    const keyAgent = await mocks.testKeyAgent();
     txSubmitProvider = mocks.mockTxSubmitProvider();
     walletProvider = mocks.mockWalletProvider();
-    assetProvider = mocks.mockAssetProvider();
+    const assetProvider = mocks.mockAssetProvider();
     const stakePoolSearchProvider = createStubStakePoolSearchProvider();
     const timeSettingsProvider = createStubTimeSettingsProvider(testnetTimeSettings);
     const groupedAddress: KeyManagement.GroupedAddress = {
@@ -31,12 +26,12 @@ describe('SingleAddressWallet', () => {
       address,
       index: 0,
       networkId: Cardano.NetworkId.testnet,
-      rewardAccount,
+      rewardAccount: mocks.rewardAccount,
       type: KeyManagement.AddressType.External
     };
     keyAgent.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
     wallet = new SingleAddressWallet(
-      { name },
+      { name: 'Test Wallet' },
       { assetProvider, keyAgent, stakePoolSearchProvider, timeSettingsProvider, txSubmitProvider, walletProvider }
     );
     keyAgent.knownAddresses.push(groupedAddress);
@@ -44,69 +39,6 @@ describe('SingleAddressWallet', () => {
 
   afterEach(() => {
     wallet.shutdown();
-  });
-
-  describe('has property', () => {
-    it('"name"', async () => {
-      expect(wallet.name).toBe(name);
-    });
-    it('"utxo"', async () => {
-      await firstValueFrom(wallet.utxo.available$);
-      await firstValueFrom(wallet.utxo.total$);
-      expect(wallet.utxo.available$.value).toEqual(mocks.utxo);
-      expect(wallet.utxo.total$.value).toEqual(mocks.utxo);
-    });
-    it('"balance"', async () => {
-      await firstValueFrom(wallet.balance.available$);
-      await firstValueFrom(wallet.balance.total$);
-      expect(wallet.balance.available$.value?.coins).toEqual(
-        Cardano.util.coalesceValueQuantities(mocks.utxo.map((utxo) => utxo[1].value)).coins
-      );
-      expect(wallet.balance.total$.value?.rewards).toBe(mocks.rewards);
-    });
-    it('"transactions"', async () => {
-      await firstValueFrom(wallet.transactions.history.all$);
-      expect(wallet.transactions.history.all$.value?.length).toBeGreaterThan(0);
-    });
-    it('"tip$"', async () => {
-      await firstValueFrom(wallet.tip$);
-      expect(wallet.tip$.value).toEqual(mocks.ledgerTip);
-    });
-    it('"networkInfo$"', async () => {
-      await firstValueFrom(wallet.networkInfo$);
-      expect(wallet.networkInfo$.value?.currentEpoch).toEqual(mocks.currentEpoch);
-    });
-    it('"protocolParameters$"', async () => {
-      await firstValueFrom(wallet.protocolParameters$);
-      expect(wallet.protocolParameters$.value).toEqual(mocks.protocolParameters);
-    });
-    it('"genesisParameters$"', async () => {
-      await firstValueFrom(wallet.genesisParameters$);
-      expect(wallet.genesisParameters$.value).toEqual(mocks.genesisParameters);
-    });
-    it('"delegation"', async () => {
-      const rewardsHistory = await firstValueFrom(wallet.delegation.rewardsHistory$);
-      expect(rewardsHistory.all).toEqual(mocks.rewardsHistory);
-      const rewardAccounts = await firstValueFrom(wallet.delegation.rewardAccounts$);
-      expect(rewardAccounts).toHaveLength(1);
-      expect(rewardAccounts[0].address).toBe(rewardAccount);
-      expect(rewardAccounts[0].delegatee).toBeUndefined();
-      expect(rewardAccounts[0].rewardBalance.total).toBe(mocks.rewards);
-    });
-    it('"addresses$"', async () => {
-      const addresses = await firstValueFrom(wallet.addresses$);
-      expect(addresses[0].address).toEqual(address);
-      expect(addresses[0].rewardAccount).toEqual(rewardAccount);
-    });
-    it('"assets$"', async () => {
-      expect(await firstValueFrom(wallet.assets$)).toEqual(new Map([[AssetId.TSLA, mocks.asset]]));
-    });
-    it('timeSettings$', async () => {
-      expect(await firstValueFrom(wallet.timeSettings$)).toEqual(testnetTimeSettings);
-    });
-    it('syncStatus$', async () => {
-      expect(await firstValueFrom(wallet.syncStatus$)).not.toBeUndefined();
-    });
   });
 
   describe('creating transactions', () => {
@@ -147,7 +79,7 @@ describe('SingleAddressWallet', () => {
     });
 
     it('initializeTx', async () => {
-      getPassword.mockClear();
+      mocks.getPassword.mockClear();
       const { body, hash, inputSelection } = await wallet.initializeTx(props);
       expect(body.outputs).toHaveLength(props.outputs.size + 1 /* change output */);
       expect(typeof hash).toBe('string');
@@ -155,7 +87,7 @@ describe('SingleAddressWallet', () => {
       expect(inputSelection.inputs.size).toBeGreaterThan(0);
       expect(inputSelection.fee).toBeGreaterThan(0n);
       expect(inputSelection.change.size).toBeGreaterThan(0);
-      expect(getPassword).not.toBeCalled();
+      expect(mocks.getPassword).not.toBeCalled();
     });
 
     it('finalizeTx', async () => {
