@@ -1,17 +1,14 @@
 import { BlockFrostAPI } from '@blockfrost/blockfrost-js';
 import { Cardano, TxSubmitProvider } from '@cardano-sdk/core';
-import { Options } from '@blockfrost/blockfrost-js/lib/types';
 
 /**
  * Connect to the [Blockfrost service](https://docs.blockfrost.io/)
  *
- * @param {Options} options BlockFrostAPI options
+ * @param {BlockFrostAPI} blockfrost BlockFrostAPI instance
  * @returns {TxSubmitProvider} TxSubmitProvider
  * @throws {Cardano.TxSubmissionErrors.UnknownTxSubmissionError}
  */
-export const blockfrostTxSubmitProvider = (options: Options): TxSubmitProvider => {
-  const blockfrost = new BlockFrostAPI(options);
-
+export const blockfrostTxSubmitProvider = (blockfrost: BlockFrostAPI): TxSubmitProvider => {
   const submitTx: TxSubmitProvider['submitTx'] = async (signedTransaction) => {
     try {
       await blockfrost.txSubmit(signedTransaction);

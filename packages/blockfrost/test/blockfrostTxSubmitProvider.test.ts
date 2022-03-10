@@ -13,7 +13,8 @@ describe('blockfrostTxSubmitProvider', () => {
     it('wraps error in UnknownTxSubmissionError', async () => {
       const innerError = new Error('some error');
       BlockFrostAPI.prototype.txSubmit = jest.fn().mockRejectedValue(innerError);
-      const provider = blockfrostTxSubmitProvider({ isTestnet: true, projectId: apiKey });
+      const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
+      const provider = blockfrostTxSubmitProvider(blockfrost);
       await expect(provider.submitTx(null as any)).rejects.toThrowError(
         Cardano.TxSubmissionErrors.UnknownTxSubmissionError
       );

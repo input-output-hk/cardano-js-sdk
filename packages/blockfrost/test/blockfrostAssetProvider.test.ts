@@ -36,7 +36,8 @@ describe('blockfrostAssetProvider', () => {
     test('asset with only 1 mint', async () => {
       BlockFrostAPI.prototype.assetsById = jest.fn().mockResolvedValue(mockedAssetResponse);
 
-      const client = blockfrostAssetProvider({ isTestnet: true, projectId: apiKey });
+      const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
+      const client = blockfrostAssetProvider(blockfrost);
       const response = await client.getAsset(
         Cardano.AssetId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e')
       );
@@ -82,7 +83,8 @@ describe('blockfrostAssetProvider', () => {
         }
       ] as Responses['asset_history']);
 
-      const client = blockfrostAssetProvider({ isTestnet: true, projectId: apiKey });
+      const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
+      const client = blockfrostAssetProvider(blockfrost);
       const response = await client.getAsset(
         Cardano.AssetId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e')
       );

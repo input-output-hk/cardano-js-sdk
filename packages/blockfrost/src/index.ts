@@ -3,3 +3,4 @@ export * from './blockfrostWalletProvider';
 export * from './blockfrostAssetProvider';
 export * from './blockfrostTxSubmitProvider';
 export { Options } from '@blockfrost/blockfrost-js/lib/types';
+export { BlockFrostAPI } from '@blockfrost/blockfrost-js';
