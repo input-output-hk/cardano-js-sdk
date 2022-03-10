@@ -31,8 +31,7 @@ describe('createAssetsTracker', () => {
         assetService,
         nftMetadataService
       });
-      expectObservable(target$).toBe('a-b-c', {
-        a: {},
+      expectObservable(target$).toBe('--b-c', {
         b: new Map([[AssetId.TSLA, asset1]]),
         c: new Map([
           [AssetId.TSLA, asset1],
