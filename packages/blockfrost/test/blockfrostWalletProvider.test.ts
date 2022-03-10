@@ -578,6 +578,10 @@ describe('blockfrostWalletProvider', () => {
 
   describe('rewardsHistory', () => {
     const pool_id = 'pool1pu5jlj4q9w9jlxeu370a3c9myx47md5j5m2str0naunn2q3lkdy';
+    const rewardAccounts = [
+      'stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27',
+      'stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d'
+    ].map(Cardano.RewardAccount);
     const generateRewardsResponse = (numEpochs: number, firstEpoch = 0): Responses['account_reward_content'] =>
       [...Array.from({ length: numEpochs }).keys()].map((epoch) => ({
         amount: '1000',
@@ -587,43 +591,55 @@ describe('blockfrostWalletProvider', () => {
     let client: WalletProvider;
 
     beforeEach(() => {
-      BlockFrostAPI.prototype.accountsRewards = jest
-        .fn()
-        .mockResolvedValue(generateRewardsResponse(2, 98))
-        .mockResolvedValueOnce(generateRewardsResponse(100));
       const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
       client = blockfrostWalletProvider(blockfrost);
     });
 
     test('epoch bounds & query per stake address', async () => {
+      BlockFrostAPI.prototype.accountsRewards = jest.fn().mockResolvedValue(generateRewardsResponse(2, 98));
+
       const response = await client.rewardsHistory({
         epochs: {
           lowerBound: 98,
           upperBound: 98
         },
-        stakeAddresses: [
-          'stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27',
-          'stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d'
-        ].map(Cardano.RewardAccount)
+        rewardAccounts
       });
 
       expect(BlockFrostAPI.prototype.accountsRewards).toBeCalledTimes(2);
-      expect(response).toMatchObject([{ epoch: 98, rewards: 2000n }]);
+      expect(response).toEqual(
+        new Map([
+          [rewardAccounts[0], [{ epoch: 98, rewards: 1000n }]],
+          [rewardAccounts[1], [{ epoch: 98, rewards: 1000n }]]
+        ])
+      );
     });
 
     test('pagination', async () => {
+      BlockFrostAPI.prototype.accountsRewards = jest
+        .fn()
+        .mockResolvedValueOnce(generateRewardsResponse(100))
+        .mockResolvedValueOnce(generateRewardsResponse(0));
+
       const response = await client.rewardsHistory({
         epochs: {
           lowerBound: 98
         },
-        stakeAddresses: [Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27')]
+        rewardAccounts: [rewardAccounts[0]]
       });
 
       expect(BlockFrostAPI.prototype.accountsRewards).toBeCalledTimes(2);
-      expect(response).toMatchObject([
-        { epoch: 98, rewards: 2000n },
-        { epoch: 99, rewards: 2000n }
-      ]);
+      expect(response).toEqual(
+        new Map([
+          [
+            rewardAccounts[0],
+            [
+              { epoch: 98, rewards: 1000n },
+              { epoch: 99, rewards: 1000n }
+            ]
+          ]
+        ])
+      );
     });
   });
 });

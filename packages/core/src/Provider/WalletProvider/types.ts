@@ -63,7 +63,7 @@ export interface EpochRange {
 }
 
 export interface RewardHistoryProps {
-  stakeAddresses: Cardano.RewardAccount[];
+  rewardAccounts: Cardano.RewardAccount[];
   epochs?: EpochRange;
 }
 
@@ -100,5 +100,5 @@ export interface WalletProvider {
    *
    * @returns Rewards quantity for every epoch that had any rewards in ascending order.
    */
-  rewardsHistory: (props: RewardHistoryProps) => Promise<EpochRewards[]>;
+  rewardsHistory: (props: RewardHistoryProps) => Promise<Map<Cardano.RewardAccount, EpochRewards[]>>;
 }

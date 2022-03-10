@@ -13480,7 +13480,7 @@ export type MemberRewardsHistoryQueryVariables = Exact<{
 }>;
 
 
-export type MemberRewardsHistoryQuery = { __typename?: 'Query', queryRewardAccount?: Array<{ __typename?: 'RewardAccount', rewards: Array<{ __typename?: 'Reward', epochNo: number, quantity: number | bigint }> } | null> | null };
+export type MemberRewardsHistoryQuery = { __typename?: 'Query', queryRewardAccount?: Array<{ __typename?: 'RewardAccount', address: string, rewards: Array<{ __typename?: 'Reward', epochNo: number, quantity: number | bigint }> } | null> | null };
 
 export type CertificateTransactionFieldsFragment = { __typename?: 'Transaction', hash: string, block: { __typename?: 'Block', blockNo: number } };
 
@@ -14128,6 +14128,7 @@ export const NetworkInfoDocument = gql`
 export const MemberRewardsHistoryDocument = gql`
     query MemberRewardsHistory($rewardAccounts: [String!]!, $fromEpochNo: Int = 0, $toEpochNo: Int = 2147483647) {
   queryRewardAccount(filter: {address: {in: $rewardAccounts}}) {
+    address
     rewards(
       filter: {source: {eq: "member"}, and: {epochNo: {gt: $fromEpochNo}, and: {epochNo: {lt: $toEpochNo}}}}
     ) {

@@ -1,5 +1,6 @@
+import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
+import { BlockfrostToCore, BlockfrostTransactionContent, BlockfrostUtxo } from './BlockfrostToCore';
 import {
-  BigIntMath,
   Cardano,
   EpochRange,
   EpochRewards,
@@ -8,12 +9,9 @@ import {
   ProviderUtil,
   WalletProvider
 } from '@cardano-sdk/core';
-import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
-import { BlockfrostToCore, BlockfrostTransactionContent, BlockfrostUtxo } from './BlockfrostToCore';
 import { PaginationOptions } from '@blockfrost/blockfrost-js/lib/types';
 import { dummyLogger } from 'ts-log';
 import { fetchSequentially, formatBlockfrostError, jsonToMetadatum, toProviderError } from './util';
-import { flatten, groupBy } from 'lodash-es';
 
 const fetchByAddressSequentially = async <Item, Response>(props: {
   address: Cardano.Address;
@@ -358,19 +356,15 @@ export const blockfrostWalletProvider = (blockfrost: BlockFrostAPI, logger = dum
             rewards: BigInt(amount)
           }))
       );
-      haveMorePages = rewards.length === 100 && rewards[rewards.length - 1].epoch < upperBound;
+      haveMorePages = rewards.length === batchSize && rewards[rewards.length - 1].epoch < upperBound;
       page += 1;
     }
     return result;
   };
 
-  const rewardsHistory: WalletProvider['rewardsHistory'] = async ({ stakeAddresses, epochs }) => {
-    const allAddressRewards = await Promise.all(stakeAddresses.map((address) => accountRewards(address, epochs)));
-    const accountRewardsByEpoch = groupBy(flatten(allAddressRewards), ({ epoch }) => epoch);
-    return Object.keys(accountRewardsByEpoch).map((key) => ({
-      epoch: accountRewardsByEpoch[key][0].epoch,
-      rewards: BigIntMath.sum(accountRewardsByEpoch[key].map(({ rewards }) => rewards))
-    }));
+  const rewardsHistory: WalletProvider['rewardsHistory'] = async ({ rewardAccounts, epochs }) => {
+    const allAddressRewards = await Promise.all(rewardAccounts.map((address) => accountRewards(address, epochs)));
+    return new Map(allAddressRewards.map((rewards, i) => [rewardAccounts[i], rewards]));
   };
 
   const genesisParameters: WalletProvider['genesisParameters'] = async () => {
