@@ -1,7 +1,8 @@
 import { Cardano, WalletProvider } from '@cardano-sdk/core';
+import { InMemoryUtxoStore } from '../../src/persistence';
 import { Observable } from 'rxjs';
+import { PersistentCollectionTrackerSubject, createUtxoTracker } from '../../src/services';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { SyncableIntervalTrackerSubject, createUtxoTracker } from '../../src/services';
 import { createTestScheduler } from '../testScheduler';
 import { utxo } from '../mocks';
 
@@ -12,6 +13,7 @@ describe('createUtxoTracker', () => {
   let walletProvider: WalletProvider;
 
   it('fetches utxo from WalletProvider and locks when spent in a transaction in flight', () => {
+    const store = new InMemoryUtxoStore();
     const address = utxo[0][0].address;
     createTestScheduler().run(({ cold, expectObservable }) => {
       const transactionsInFlight$ = cold('-a-b|', {
@@ -28,11 +30,12 @@ describe('createUtxoTracker', () => {
         {
           addresses$: cold('a', { a: [address] }),
           retryBackoffConfig,
+          store,
           tipBlockHeight$,
           transactionsInFlight$,
           walletProvider
         },
-        { utxoSource$: cold('a---|', { a: utxo }) as unknown as SyncableIntervalTrackerSubject<Cardano.Utxo[]> }
+        { utxoSource$: cold('a---|', { a: utxo }) as unknown as PersistentCollectionTrackerSubject<Cardano.Utxo> }
       );
       expectObservable(utxoTracker.total$).toBe('a---|', { a: utxo });
       expectObservable(utxoTracker.available$).toBe('-a-b|', {

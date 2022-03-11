@@ -25,6 +25,8 @@ describe('RewardAccounts', () => {
   const poolId1 = Cardano.PoolId('pool1zuevzm3xlrhmwjw87ec38mzs02tlkwec9wxpgafcaykmwg7efhh');
   const poolId2 = Cardano.PoolId('pool1y6chk7x7fup4ms9leesdr57r4qy9cwxuee0msan72x976a6u0nc');
 
+  test.todo('createQueryStakePoolsProvider emits stored values if they exist, updates storage when provider resolves');
+
   test('getStakePoolIdAtEpoch ', () => {
     const transactions = [
       {

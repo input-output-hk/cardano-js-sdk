@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { AssetId } from '@cardano-sdk/util-dev';
+import { AssetId, somePartialStakePools } from '@cardano-sdk/util-dev';
 import { Cardano, EpochRewards } from '@cardano-sdk/core';
 
 export const rewardAccount = Cardano.RewardAccount('stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d');
@@ -86,18 +86,23 @@ export const currentEpoch = {
 export const queryTransactionsResult: Cardano.TxAlonzo[] = [
   {
     blockHeader: {
-      slot: ledgerTip.slot - 100_000
-    },
+      blockNo: 10_100,
+      slot: ledgerTip.slot - 150_000
+    } as Cardano.PartialBlockHeader,
     body: {
       certificates: [
         {
-          __typename: Cardano.CertificateType.StakeKeyRegistration
+          __typename: Cardano.CertificateType.StakeKeyRegistration,
+          rewardAccount
         },
         {
           __typename: Cardano.CertificateType.StakeDelegation,
-          epoch: currentEpoch.number - 10
+          epoch: currentEpoch.number - 10,
+          poolId: somePartialStakePools[0].id,
+          rewardAccount
         }
       ],
+      fee: 200_000n,
       inputs: [
         {
           address: Cardano.Address(
@@ -130,7 +135,43 @@ export const queryTransactionsResult: Cardano.TxAlonzo[] = [
       validityInterval: {
         invalidHereafter: ledgerTip.slot + 1
       }
+    },
+    id: Cardano.TransactionId('12fa9af65e21b36ec4dc4cbce478e911d52585adb46f2b4fe3d6563e7ee5a61a'),
+    implicitCoin: {},
+    index: 0,
+    txSize: 100_000,
+    witness: {
+      signatures: new Map()
     }
+  },
+  {
+    blockHeader: {
+      blockNo: 10_050,
+      slot: ledgerTip.slot - 100_000
+    },
+    body: {
+      inputs: [
+        {
+          address: Cardano.Address(
+            'addr_test1qpfhhfy2qgls50r9u4yh0l7z67xpg0a5rrhkmvzcuqrd0znuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q9gw0lz'
+          ),
+          index: 0,
+          txId: Cardano.TransactionId('bb217abaca60fc0ca68c1555eca6a96d2478547818ae76ce6836133f3cc546e0')
+        }
+      ],
+      outputs: [
+        {
+          address: Cardano.Address(
+            'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g'
+          ),
+          value: { coins: 5_000_000n }
+        }
+      ],
+      validityInterval: {
+        invalidHereafter: ledgerTip.slot + 1
+      }
+    },
+    id: Cardano.TransactionId('12fa9af65e21b36ec4dc4cbce478e911d52585adb46f2b4fe3d6563e7ee5a61a')
   } as Cardano.TxAlonzo
 ];
 const queryTransactions = () => jest.fn().mockResolvedValue(queryTransactionsResult);
@@ -148,16 +189,21 @@ export const protocolParameters = {
   stakeKeyDeposit: 2_000_000
 };
 
-export const rewardsHistory: EpochRewards[] = [
-  {
-    epoch: currentEpoch.number - 3,
-    rewards: 10_000n
-  },
-  {
-    epoch: currentEpoch.number - 2,
-    rewards: 11_000n
-  }
-];
+export const rewardsHistory: Map<Cardano.RewardAccount, EpochRewards[]> = new Map([
+  [
+    rewardAccount,
+    [
+      {
+        epoch: currentEpoch.number - 3,
+        rewards: 10_000n
+      },
+      {
+        epoch: currentEpoch.number - 2,
+        rewards: 11_000n
+      }
+    ]
+  ]
+]);
 
 export const genesisParameters = {
   activeSlotsCoefficient: 0.05,
