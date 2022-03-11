@@ -1,5 +1,4 @@
-/* eslint-disable brace-style */
-import { Assets } from '../types';
+import { Assets } from '../../types';
 import {
   Cardano,
   EpochRewards,
@@ -7,64 +6,10 @@ import {
   ProtocolParametersRequiredByWallet,
   TimeSettings
 } from '@cardano-sdk/core';
-import {
-  CollectionStore,
-  DocumentStore,
-  KeyValueCollection,
-  KeyValueStore,
-  RewardAccountDocument,
-  WalletStores
-} from './types';
-import { EMPTY, Observable, of } from 'rxjs';
-
-export class InMemoryCollectionStore<T> implements CollectionStore<T> {
-  protected docs: T[] = [];
-
-  getAll(): Observable<T[]> {
-    if (this.docs.length === 0) return EMPTY;
-    return of(this.docs);
-  }
-
-  setAll(docs: T[]): Observable<void> {
-    this.docs = docs;
-    return of(void 0);
-  }
-}
-
-export class InMemoryKeyValueStore<K, V>
-  extends InMemoryCollectionStore<KeyValueCollection<K, V>>
-  implements KeyValueStore<K, V>
-{
-  getValues(keys: K[]): Observable<V[]> {
-    const result: V[] = [];
-    for (const key of keys) {
-      const value = this.docs.find((doc) => doc.key === key)?.value;
-      if (!value) return EMPTY;
-      result.push(value);
-    }
-    return of(result);
-  }
-  setValue(key: K, value: V): Observable<void> {
-    const storedDocIndex = this.docs.findIndex((doc) => doc.key === key);
-    if (storedDocIndex >= 0) {
-      this.docs.splice(storedDocIndex, 1);
-    }
-    this.docs.push({ key, value });
-    return of(void 0);
-  }
-}
-
-export class InMemoryDocumentStore<T> implements DocumentStore<T> {
-  private doc: T | null = null;
-  get(): Observable<T> {
-    if (!this.doc) return EMPTY;
-    return of(this.doc);
-  }
-  set(doc: T): Observable<void> {
-    this.doc = doc;
-    return of(void 0);
-  }
-}
+import { InMemoryCollectionStore } from './InMemoryCollectionStore';
+import { InMemoryDocumentStore } from './InMemoryDocumentStore';
+import { InMemoryKeyValueStore } from './InMemoryKeyValueStore';
+import { RewardAccountDocument, WalletStores } from '../types';
 
 export class InMemoryTipStore extends InMemoryDocumentStore<Cardano.Tip> {}
 export class InMemoryProtocolParametersStore extends InMemoryDocumentStore<ProtocolParametersRequiredByWallet> {}
