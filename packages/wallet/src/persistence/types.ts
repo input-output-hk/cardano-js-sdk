@@ -42,7 +42,8 @@ export interface DocumentStore<T> {
 }
 
 export type KeyValueCollection<K, V> = { key: K; value: V };
-export interface KeyValueStore<K, V> extends CollectionStore<KeyValueCollection<K, V>> {
+// getAll is not currently used anywhere for this type of store
+export interface KeyValueStore<K, V> extends Omit<CollectionStore<KeyValueCollection<K, V>>, 'getAll'> {
   /**
    * Get the stored documents by keys.
    * Either:

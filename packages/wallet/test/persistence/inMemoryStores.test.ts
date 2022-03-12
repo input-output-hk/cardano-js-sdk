@@ -15,15 +15,8 @@ import {
   InMemoryTransactionsStore,
   InMemoryUtxoStore
 } from '../../src/persistence';
-import { Observable, firstValueFrom } from 'rxjs';
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const assertCompletesWithoutEmitting = async (observable: Observable<any>) =>
-  expect(
-    await new Promise((resolve, reject) =>
-      observable.subscribe({ complete: () => resolve(true), error: reject, next: reject })
-    )
-  ).toBe(true);
+import { assertCompletesWithoutEmitting } from './util';
+import { firstValueFrom } from 'rxjs';
 
 describe('inMemoryStores', () => {
   describe('InMemoryDocumentStore', () => {
