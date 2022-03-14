@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Questions
+    url: https://github.com/input-output-hk/cardano-js-sdk/discussions
+    about: Please raise any questions in Discussions
