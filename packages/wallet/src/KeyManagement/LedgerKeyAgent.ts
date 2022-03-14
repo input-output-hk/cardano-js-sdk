@@ -1,7 +1,6 @@
 import { Cardano, NotImplementedError } from '@cardano-sdk/core';
 import {
   CommunicationType,
-  DeviceType,
   GroupedAddress,
   KeyAgentType,
   SerializableLedgerKeyAgentData,
@@ -13,31 +12,51 @@ import AppAda, { GetVersionResponse, utils } from '@cardano-foundation/ledgerjs-
 import TransportWebHID from '@ledgerhq/hw-transport-webhid';
 import type Transport from '@ledgerhq/hw-transport';
 
-export interface DeviceCommunicationType {
-  deviceType: DeviceType;
-  communicationType: CommunicationType;
-}
-
 export interface LedgerKeyAgentProps {
   networkId: Cardano.NetworkId;
   accountIndex: number;
   knownAddresses: GroupedAddress[];
-  deviceCommunicationType: DeviceCommunicationType;
+  extendedAccountPublicKey: Cardano.Bip32PublicKey;
+  deviceConnection?: AppAda;
+  communicationType: CommunicationType;
+}
+
+export interface CreateWithDevice {
+  communicationType: CommunicationType;
+  networkId: Cardano.NetworkId;
+  accountIndex: number;
+  knownAddresses: GroupedAddress[];
+}
+
+export interface GetXpubProps {
+  deviceConnection?: AppAda;
+  communicationType: CommunicationType;
+  accountIndex: number;
 }
 
 export class LedgerKeyAgent extends KeyAgentBase {
   readonly #networkId: Cardano.NetworkId;
   readonly #accountIndex: number;
   readonly #knownAddresses: GroupedAddress[];
-  readonly #deviceCommunicationType: DeviceCommunicationType;
-  #extendedAccountPublicKey: Cardano.Bip32PublicKey;
+  readonly #extendedAccountPublicKey: Cardano.Bip32PublicKey;
+  readonly #deviceConnection?: AppAda;
+  readonly #communicationType: CommunicationType;
 
-  constructor({ networkId, accountIndex, knownAddresses, deviceCommunicationType }: LedgerKeyAgentProps) {
+  constructor({
+    networkId,
+    accountIndex,
+    knownAddresses,
+    extendedAccountPublicKey,
+    deviceConnection,
+    communicationType
+  }: LedgerKeyAgentProps) {
     super();
     this.#accountIndex = accountIndex;
     this.#networkId = networkId;
     this.#knownAddresses = knownAddresses;
-    this.#deviceCommunicationType = deviceCommunicationType;
+    this.#extendedAccountPublicKey = extendedAccountPublicKey;
+    this.#deviceConnection = deviceConnection;
+    this.#communicationType = communicationType;
   }
 
   get networkId(): Cardano.NetworkId {
@@ -56,17 +75,15 @@ export class LedgerKeyAgent extends KeyAgentBase {
     return this.#knownAddresses;
   }
 
-  get extendedAccountPublicKey(): Cardano.Bip32PublicKey {
-    return this.#extendedAccountPublicKey;
-  }
-
   get serializableData(): SerializableLedgerKeyAgentData {
     return {
       __typename: KeyAgentType.Ledger,
+      networkId: this.networkId,
       accountIndex: this.#accountIndex,
-      extendedAccountPublicKey: this.#extendedAccountPublicKey,
       knownAddresses: this.#knownAddresses,
-      networkId: this.networkId
+      extendedAccountPublicKey: this.#extendedAccountPublicKey,
+      communicationType: this.#communicationType,
+      deviceConnection: this.#deviceConnection,
     };
   }
 
@@ -81,11 +98,8 @@ export class LedgerKeyAgent extends KeyAgentBase {
     return deviceConnection;
   }
 
-  static async establishDeviceConnection({ deviceType, communicationType }: DeviceCommunicationType): Promise<AppAda> {
+  static async establishDeviceConnection(communicationType: CommunicationType): Promise<AppAda> {
     let transport;
-    if (deviceType !== DeviceType.Ledger) {
-      throw new TransportError('Device type not supported');
-    }
     if (communicationType !== CommunicationType.Web) {
       throw new TransportError('Communication method not supported');
     }
@@ -95,7 +109,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
         throw new TransportError('Transport failed');
       }
       const isSupportedLedgerModel = transport.deviceModel.id === 'nanoS' || transport.deviceModel.id === 'nanoX';
-      if (deviceType === DeviceType.Ledger && !isSupportedLedgerModel) {
+      if (!isSupportedLedgerModel) {
         throw new TransportError('Ledger device model not supported');
       }
       return await LedgerKeyAgent.createDeviceConnection(transport);
@@ -109,49 +123,64 @@ export class LedgerKeyAgent extends KeyAgentBase {
     }
   }
 
-  static async checkDeviceConnection(
-    deviceConnection: AppAda,
-    deviceCommunicationType: DeviceCommunicationType
-  ): Promise<AppAda> {
+  static async checkDeviceConnection(communicationType: CommunicationType, deviceConnection?: AppAda): Promise<AppAda> {
     try {
-      if (!deviceConnection.transport) {
-        throw new TransportError('Missing transport');
+      if (!deviceConnection) {
+        return await LedgerKeyAgent.establishDeviceConnection(communicationType);
       }
       // Create / Check device connection with currently active transport
       return await LedgerKeyAgent.createDeviceConnection(deviceConnection.transport);
     } catch (error) {
       // Device disconnected -> re-establish connection
       if (error.name === 'DisconnectedDeviceDuringOperation') {
-        return await LedgerKeyAgent.establishDeviceConnection(deviceCommunicationType);
+        return await LedgerKeyAgent.establishDeviceConnection(communicationType);
       }
       throw error;
     }
   }
 
-  static async getAppVersion(
-    deviceConnection: AppAda,
-    deviceCommunicationType: DeviceCommunicationType
-  ): Promise<GetVersionResponse> {
-    const recoveredDeviceConnection = await LedgerKeyAgent.checkDeviceConnection(
-      deviceConnection,
-      deviceCommunicationType
-    );
-    return await recoveredDeviceConnection.getVersion();
-  }
-
-  async getExtendedAccountPublicKey(deviceConnection: AppAda): Promise<Cardano.Bip32PublicKey> {
-    const recoveredDeviceConnection = await LedgerKeyAgent.checkDeviceConnection(
-      deviceConnection,
-      this.#deviceCommunicationType
-    );
-    const derivationPath = `1852'/1815'/${this.#accountIndex}'`;
+  static async getXpub({
+    deviceConnection,
+    communicationType,
+    accountIndex
+  }: GetXpubProps): Promise<Cardano.Bip32PublicKey> {
+    const recoveredDeviceConnection = await LedgerKeyAgent.checkDeviceConnection(communicationType, deviceConnection);
+    const derivationPath = `1852'/1815'/${accountIndex}'`;
     const extendedPublicKey = await recoveredDeviceConnection.getExtendedPublicKey({
       path: utils.str_to_path(derivationPath) // BIP32Path
     });
     const xPubHex = `${extendedPublicKey.publicKeyHex}${extendedPublicKey.chainCodeHex}`;
-    const xPub = Cardano.Bip32PublicKey(xPubHex);
-    this.#extendedAccountPublicKey = xPub;
-    return xPub;
+    return Cardano.Bip32PublicKey(xPubHex);
+  }
+
+  static async getAppVersion(
+    communicationType: CommunicationType,
+    deviceConnection?: AppAda
+  ): Promise<GetVersionResponse> {
+    const recoveredDeviceConnection = await LedgerKeyAgent.checkDeviceConnection(communicationType, deviceConnection);
+    return await recoveredDeviceConnection.getVersion();
+  }
+
+  static async createWithDevice({ communicationType, networkId, accountIndex, knownAddresses }: CreateWithDevice) {
+    const deviceConnection = await LedgerKeyAgent.establishDeviceConnection(communicationType);
+    const extendedAccountPublicKey = await LedgerKeyAgent.getXpub({
+      accountIndex,
+      communicationType,
+      deviceConnection
+    });
+
+    return new LedgerKeyAgent({
+      accountIndex,
+      communicationType,
+      deviceConnection,
+      extendedAccountPublicKey,
+      knownAddresses,
+      networkId
+    });
+  }
+
+  async getExtendedAccountPublicKey(): Promise<Cardano.Bip32PublicKey> {
+    return this.#extendedAccountPublicKey;
   }
 
   async signBlob(): Promise<SignBlobResult> {
@@ -163,6 +192,6 @@ export class LedgerKeyAgent extends KeyAgentBase {
   }
 
   async exportRootPrivateKey(): Promise<Cardano.Bip32PrivateKey> {
-    throw new NotImplementedError('exportRootPrivateKey');
+    throw new NotImplementedError('Operation not supported!');
   }
 }
