@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable promise/always-return */
 /* eslint-disable brace-style */
+import { Cardano } from '@cardano-sdk/core';
 import { KeyValueCollection, KeyValueStore } from '../types';
 import { Observable, from } from 'rxjs';
 import { PouchdbStore } from './PouchdbStore';
@@ -9,7 +11,10 @@ import { sanitizePouchdbDoc } from './util';
 /**
  * PouchDB database that implements KeyValueStore by using keys as document _id
  */
-export class PouchdbKeyValueStore<K extends string, V> extends PouchdbStore<V> implements KeyValueStore<K, V> {
+export class PouchdbKeyValueStore<K extends string | Cardano.util.OpaqueString<any>, V>
+  extends PouchdbStore<V>
+  implements KeyValueStore<K, V>
+{
   /**
    * @param {string} dbName collection name
    */
@@ -25,8 +30,8 @@ export class PouchdbKeyValueStore<K extends string, V> extends PouchdbStore<V> i
           await this.clearDB();
           await this.db.bulkDocs(
             docs.map(({ key, value }) => ({
-              ...value,
-              _id: key
+              ...this.toPouchdbDoc(value),
+              _id: key.toString()
             }))
           );
         } catch (error) {
@@ -39,7 +44,7 @@ export class PouchdbKeyValueStore<K extends string, V> extends PouchdbStore<V> i
   getValues(keys: K[]): Observable<V[]> {
     return new Observable((observer) => {
       this.db
-        .bulkGet({ docs: keys.map((key) => ({ id: key })) })
+        .bulkGet({ docs: keys.map((key) => ({ id: key.toString() })) })
         .then(({ results }) => {
           const values: V[] = [];
           for (const { docs } of results) {
@@ -59,8 +64,8 @@ export class PouchdbKeyValueStore<K extends string, V> extends PouchdbStore<V> i
     return from(
       this.db
         .put({
-          _id: key,
-          ...value
+          _id: key.toString(),
+          ...this.toPouchdbDoc(value)
         })
         .catch((error) => {
           this.logger.error(`PouchdbDocumentStore(${this.dbName}): failed to set ${key}`, value, error);

@@ -6,7 +6,6 @@ import {
   ProtocolParametersRequiredByWallet,
   TimeSettings
 } from '@cardano-sdk/core';
-import { Delegatee } from '../services';
 import { Observable } from 'rxjs';
 
 export interface CollectionStore<T> {
@@ -55,12 +54,6 @@ export interface KeyValueStore<K, V> extends Omit<CollectionStore<KeyValueCollec
    * Store the document. Should never throw.
    */
   setValue(key: K, value: V): Observable<void>;
-}
-
-export interface RewardAccountDocument {
-  rewardAccount: Cardano.RewardAccount;
-  rewards: Cardano.Lovelace;
-  delegatee: Delegatee;
 }
 
 export interface WalletStores {

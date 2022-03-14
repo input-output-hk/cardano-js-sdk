@@ -45,7 +45,7 @@ export class PouchdbCollectionStore<T> extends PouchdbStore<T> implements Collec
           await this.db.bulkDocs(
             this.#computeDocId
               ? docs.map((doc) => ({
-                  ...doc,
+                  ...this.toPouchdbDoc(doc),
                   _id: this.#computeDocId!(doc)
                 }))
               : docs

@@ -6,7 +6,6 @@ import {
   InMemoryKeyValueStore,
   InMemoryNetworkInfoStore,
   InMemoryProtocolParametersStore,
-  InMemoryRewardAccountsStore,
   InMemoryRewardsBalancesStore,
   InMemoryRewardsHistoryStore,
   InMemoryStakePoolsStore,
@@ -81,7 +80,6 @@ describe('inMemoryStores', () => {
 
   it('Specific collection stores are implemented using InMemoryCollectionStore', () => {
     expect(new InMemoryTransactionsStore()).toBeInstanceOf(InMemoryCollectionStore);
-    expect(new InMemoryRewardAccountsStore()).toBeInstanceOf(InMemoryCollectionStore);
     expect(new InMemoryUtxoStore()).toBeInstanceOf(InMemoryCollectionStore);
   });
 

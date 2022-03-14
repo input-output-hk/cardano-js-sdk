@@ -5,10 +5,10 @@ import { firstValueFrom } from 'rxjs';
 import PouchDB from 'pouchdb';
 
 describe('pouchdbStores', () => {
-  const dbName = 'db';
-  type DocType = { prop: string };
-  const doc1 = { prop: '1' };
-  const doc2 = { prop: '2' };
+  const dbName = 'DbTestWallet';
+  const doc1 = { bigint: 1n, map: new Map([[1, 2]]), plain: '1' };
+  const doc2 = { bigint: 2n, map: new Map([[3, 4]]), plain: '2' };
+  type DocType = typeof doc1;
 
   afterAll(async () => {
     // delete files from the filesystem
@@ -30,7 +30,7 @@ describe('pouchdbStores', () => {
   });
 
   describe('PouchdbCollectionStore', () => {
-    const createStore = () => new PouchdbCollectionStore<DocType>(dbName, ({ prop }) => prop);
+    const createStore = () => new PouchdbCollectionStore<DocType>(dbName, ({ plain }) => plain);
     let store1: PouchdbCollectionStore<DocType>;
 
     beforeEach(async () => {

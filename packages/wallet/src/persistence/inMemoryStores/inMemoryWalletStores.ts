@@ -9,7 +9,7 @@ import {
 import { InMemoryCollectionStore } from './InMemoryCollectionStore';
 import { InMemoryDocumentStore } from './InMemoryDocumentStore';
 import { InMemoryKeyValueStore } from './InMemoryKeyValueStore';
-import { RewardAccountDocument, WalletStores } from '../types';
+import { WalletStores } from '../types';
 
 export class InMemoryTipStore extends InMemoryDocumentStore<Cardano.Tip> {}
 export class InMemoryProtocolParametersStore extends InMemoryDocumentStore<ProtocolParametersRequiredByWallet> {}
@@ -18,7 +18,6 @@ export class InMemoryTimeSettingsStore extends InMemoryDocumentStore<TimeSetting
 export class InMemoryNetworkInfoStore extends InMemoryDocumentStore<NetworkInfo> {}
 export class InMemoryAssetsStore extends InMemoryDocumentStore<Assets> {}
 
-export class InMemoryRewardAccountsStore extends InMemoryCollectionStore<RewardAccountDocument> {}
 export class InMemoryTransactionsStore extends InMemoryCollectionStore<Cardano.TxAlonzo> {}
 export class InMemoryUtxoStore extends InMemoryCollectionStore<Cardano.Utxo> {}
 

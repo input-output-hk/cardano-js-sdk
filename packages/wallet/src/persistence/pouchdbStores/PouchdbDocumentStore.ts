@@ -34,7 +34,7 @@ export class PouchdbDocumentStore<T> extends PouchdbStore<T> implements Document
         .put(
           {
             _id: this.#docId,
-            ...doc
+            ...this.toPouchdbDoc(doc)
           },
           { force: true }
         )

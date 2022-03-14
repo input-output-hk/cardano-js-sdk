@@ -1,11 +1,12 @@
 import { Logger } from 'ts-log';
+import { toPouchdbDoc } from './util';
 import PouchDB from 'pouchdb';
 
 export abstract class PouchdbStore<T> {
   protected readonly logger: Logger;
   protected readonly db: PouchDB.Database<T>;
 
-  constructor(protected dbName: string, logger: Logger) {
+  constructor(public dbName: string, logger: Logger) {
     this.logger = logger;
     this.db = new PouchDB<T>(dbName);
   }
@@ -26,5 +27,9 @@ export abstract class PouchdbStore<T> {
           } as unknown as T)
       )
     );
+  }
+
+  protected toPouchdbDoc(obj: T): T {
+    return toPouchdbDoc(obj) as T;
   }
 }
