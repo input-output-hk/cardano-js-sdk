@@ -8,6 +8,7 @@
     { "path": "../../util-dev/src" },
     { "path": "../../cip2/src" },
     { "path": "../../core/src" },
+    { "path": "../../cip30/src" },
     { "path": "../../cardano-graphql/src" },
     { "path": "../../ogmios/src" }
   ]

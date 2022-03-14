@@ -155,7 +155,10 @@ describe('Wallet', () => {
       expect(api.signData).toBeDefined();
       expect(typeof api.signData).toBe('function');
 
-      const signedData = await api.signData('addr', 'sig');
+      const signedData = await api.signData(
+        Cardano.Address('addr_test1vrfxjeunkc9xu8rpnhgkluptaq0rm8kyxh8m3q9vtcetjwshvpnsm'),
+        ''
+      );
       expect(signedData).toEqual('signedData');
     });
 

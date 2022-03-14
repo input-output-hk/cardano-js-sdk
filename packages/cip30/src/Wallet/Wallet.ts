@@ -64,7 +64,7 @@ export class Wallet {
 
     this.#api = api;
     this.#options = { ...defaultOptions, ...options };
-    this.#logger = options?.logger || this.#options.logger;
+    this.#logger = this.#options.logger;
     this.#requestAccess = requestAccess;
   }
 
@@ -73,12 +73,16 @@ export class Wallet {
     try {
       const persistedStorage: Record<string, WalletStorage> = await this.#options.storage.get(storageKey);
       return persistedStorage[storageKey].allowList;
-    } catch {
+    } catch (error) {
+      this.#logger.error(error);
       return [];
     }
   }
 
   async #allowApplication(appName: string) {
+    if (!this.#allowList) {
+      this.#allowList = await this.#getAllowList(this.name);
+    }
     this.#allowList.push(appName);
 
     // Todo: Encrypt

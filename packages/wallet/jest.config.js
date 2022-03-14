@@ -1,1 +1,4 @@
-module.exports = require('../../test/jest.config');
+module.exports = {
+  ...require('../../test/jest.config'),
+  setupFiles: ['jest-webextension-mock']
+};
