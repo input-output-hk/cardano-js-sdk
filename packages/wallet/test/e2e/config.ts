@@ -1,3 +1,4 @@
+import * as envalid from 'envalid';
 import {
   BlockFrostAPI,
   blockfrostAssetProvider,
@@ -7,6 +8,9 @@ import {
 import { Cardano, testnetTimeSettings } from '@cardano-sdk/core';
 import { InMemoryKeyAgent } from '../../src/KeyManagement';
 import { createStubStakePoolSearchProvider, createStubTimeSettingsProvider } from '@cardano-sdk/util-dev';
+import { ogmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
+
+const txSubmitOptions = ['blockfrost', 'ogmios'];
 
 const networkId = Number.parseInt(process.env.NETWORK_ID || '');
 if (Number.isNaN(networkId)) throw new Error('NETWORK_ID not set');
@@ -31,10 +35,22 @@ export const assetProvider = (() => {
 })();
 
 export const txSubmitProvider = (() => {
-  const projectId = process.env.BLOCKFROST_API_KEY;
-  if (!projectId) throw new Error('BLOCKFROST_API_KEY not set (for txSubmitProvider)');
-  const blockfrost = new BlockFrostAPI({ isTestnet, projectId });
-  return blockfrostTxSubmitProvider(blockfrost);
+  const env = envalid.cleanEnv(process.env, {
+    BLOCKFROST_API_KEY: envalid.str(),
+    OGMIOS_HOST: envalid.host(),
+    OGMIOS_PORT: envalid.port(),
+    OGMIOS_TLS: envalid.bool(),
+    TX_SUBMIT_PROVIDER: envalid.str({ choices: txSubmitOptions })
+  });
+  if (env.TX_SUBMIT_PROVIDER === 'blockfrost') {
+    const projectId = env.BLOCKFROST_API_KEY;
+    if (!projectId) throw new Error('BLOCKFROST_API_KEY not set (for txSubmitProvider)');
+    const blockfrost = new BlockFrostAPI({ isTestnet, projectId });
+    return blockfrostTxSubmitProvider(blockfrost);
+  } else if (env.TX_SUBMIT_PROVIDER === 'ogmios') {
+    return ogmiosTxSubmitProvider({ host: env.OGMIOS_HOST, port: env.OGMIOS_PORT, tls: env.OGMIOS_TLS });
+  }
+  throw new Error(`TX_SUBMIT_PROVIDER unsupported: ${env.TX_SUBMIT_PROVIDER}`);
 })();
 
 export const keyAgentReady = (() => {

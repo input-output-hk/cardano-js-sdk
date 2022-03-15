@@ -27,7 +27,9 @@
   },
   "devDependencies": {
     "@cardano-sdk/util-dev": " 0.2.0",
+    "@cardano-sdk/ogmios": " 0.2.0",
     "@types/pbkdf2": "^3.1.0",
+    "envalid": "^7.3.0",
     "shx": "^0.3.3"
   },
   "dependencies": {
