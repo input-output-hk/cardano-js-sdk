@@ -284,19 +284,20 @@ query TransactionsByHashes($hashes: [String!]!) {
   }
 }
 
-query TransactionsByAddresses($addresses: [String!]!) {
+query TransactionsByAddresses($addresses: [String!]!, $sinceBlock: Int) {
   queryProtocolParametersAlonzo {
     ...protocolParameters
   }
   queryAddress(filter: { address: { in: $addresses } }) {
     # TODO: find if this query could filter duplicate transactions
     inputs {
-      transaction {
+      transaction(filter: { blockHeight: { ge: $sinceBlock } }) {
+        # transaction {
         ...coreTransactionFields
       }
     }
     utxo {
-      transaction {
+      transaction(filter: { blockHeight: { ge: $sinceBlock } }) {
         ...coreTransactionFields
       }
     }

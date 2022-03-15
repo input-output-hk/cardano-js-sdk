@@ -21,6 +21,9 @@ export class Transaction {
   hash: Cardano.TransactionId;
   @Field(() => Block)
   block: Block;
+  @Directive('@search')
+  @Field(() => Int)
+  blockHeight: Cardano.BlockNo;
   @Field(() => Int)
   index: number;
   @Field(() => [TransactionInput], { nullable: true })

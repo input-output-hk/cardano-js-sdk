@@ -83,11 +83,12 @@ export interface WalletProvider {
     rewardAccount?: Cardano.RewardAccount
   ) => Promise<{ utxo: Cardano.Utxo[]; delegationAndRewards?: Cardano.DelegationsAndRewards }>;
   /**
-   * TODO: add an optional 'since: Slot' argument for querying transactions and utxos.
-   * When doing so we need to also consider how best we can use the volatile block range of the chain
-   * to minimise over-fetching and assist the application in handling rollback scenarios.
+   * @param {Cardano.BlockNo} sinceBlock inclusive
    */
-  queryTransactionsByAddresses: (addresses: Cardano.Address[]) => Promise<Cardano.TxAlonzo[]>;
+  queryTransactionsByAddresses: (
+    addresses: Cardano.Address[],
+    sinceBlock?: Cardano.BlockNo
+  ) => Promise<Cardano.TxAlonzo[]>;
   queryTransactionsByHashes: (hashes: Cardano.TransactionId[]) => Promise<Cardano.TxAlonzo[]>;
   /**
    * @returns an array of blocks, same length and in the same order as `hashes` argument.

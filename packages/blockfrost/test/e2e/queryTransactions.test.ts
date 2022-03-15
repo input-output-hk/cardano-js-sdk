@@ -200,5 +200,14 @@ describe('blockfrostWalletProvider', () => {
         InvalidStringError
       );
     });
+
+    it('returns transactions starting from sinceBlock param', async () => {
+      const address = Cardano.Address(
+        'addr_test1qp88yvfup4eykezr2dytygwyglfzflyn32dh83ftxkzeg4jrdz3th865e0s2cm6xuzc4xkd8desmtu3p5jfmzkazmxwsm2tk5a'
+      );
+      const transactions = await walletProvider.queryTransactionsByAddresses([address], 3_348_548);
+      expect(transactions[0].id).toBe('264ad5454078db439532e81a5918930779562601b098d6aeae556f785d35e187');
+      expect(transactions.length).toBeGreaterThanOrEqual(4);
+    });
   });
 });
