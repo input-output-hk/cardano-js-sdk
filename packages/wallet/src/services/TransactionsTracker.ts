@@ -12,6 +12,7 @@ import {
   Subject,
   combineLatest,
   concat,
+  defaultIfEmpty,
   distinctUntilChanged,
   filter,
   map,
@@ -20,6 +21,7 @@ import {
   of,
   race,
   scan,
+  share,
   startWith,
   switchMap,
   take,
@@ -27,10 +29,10 @@ import {
   tap
 } from 'rxjs';
 import { OrderedCollectionStore } from '../persistence';
-import { PersistentCollectionTrackerSubject, coldObservableProvider, distinctBlock, transactionsEquals } from './util';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TrackerSubject } from './util/TrackerSubject';
-import { sortBy } from 'lodash-es';
+import { coldObservableProvider, distinctBlock, transactionsEquals } from './util';
+import { intersectionBy, sortBy, unionBy } from 'lodash-es';
 
 export interface TransactionsTrackerProps {
   walletProvider: WalletProvider;
@@ -53,18 +55,47 @@ export const createAddressTransactionsProvider = (
   walletProvider: WalletProvider,
   addresses$: Observable<Cardano.Address[]>,
   retryBackoffConfig: RetryBackoffConfig,
-  tipBlockHeight$: Observable<number>
-): Observable<Cardano.TxAlonzo[]> =>
-  addresses$.pipe(
-    switchMap((addresses) =>
-      coldObservableProvider(
-        () => walletProvider.queryTransactionsByAddresses(addresses),
-        retryBackoffConfig,
-        tipBlockHeight$,
-        transactionsEquals
-      )
+  tipBlockHeight$: Observable<number>,
+  store: OrderedCollectionStore<Cardano.TxAlonzo>
+): Observable<Cardano.TxAlonzo[]> => {
+  const storedTransactions$ = store.getAll().pipe(share());
+  return concat(
+    storedTransactions$,
+    combineLatest([addresses$, storedTransactions$.pipe(defaultIfEmpty([] as Cardano.TxAlonzo[]))]).pipe(
+      switchMap(([addresses, storedTransactions]) => {
+        let localTransactions = [...storedTransactions];
+        return coldObservableProvider(
+          async () => {
+            // eslint-disable-next-line no-constant-condition
+            while (true) {
+              const lastStoredTransaction: Cardano.TxAlonzo | undefined =
+                localTransactions[localTransactions.length - 1];
+              const newTransactions = await walletProvider.queryTransactionsByAddresses(
+                addresses,
+                lastStoredTransaction?.blockHeader.blockNo
+              );
+              const duplicateTransactions =
+                lastStoredTransaction && intersectionBy(localTransactions, newTransactions, (tx) => tx.id);
+              if (typeof duplicateTransactions !== 'undefined' && duplicateTransactions.length === 0) {
+                // Rollback by 1 block, try again in next loop iteration
+                localTransactions = localTransactions.filter(
+                  ({ blockHeader: { blockNo } }) => blockNo < lastStoredTransaction.blockHeader.blockNo
+                );
+              } else {
+                localTransactions = unionBy(localTransactions, newTransactions, (tx) => tx.id);
+                store.setAll(localTransactions);
+                return localTransactions;
+              }
+            }
+          },
+          retryBackoffConfig,
+          tipBlockHeight$,
+          transactionsEquals
+        );
+      })
     )
   );
+};
 
 const createDirectionalTransactionsTrackerSubject = (
   transactions$: Observable<Cardano.TxAlonzo[]>,
@@ -116,9 +147,8 @@ export const createTransactionsTracker = (
     store
   }: TransactionsTrackerProps,
   {
-    transactionsSource$ = new PersistentCollectionTrackerSubject<Cardano.TxAlonzo>(
-      () => createAddressTransactionsProvider(walletProvider, addresses$, retryBackoffConfig, distinctBlock(tip$)),
-      store
+    transactionsSource$ = new TrackerSubject<Cardano.TxAlonzo[]>(
+      createAddressTransactionsProvider(walletProvider, addresses$, retryBackoffConfig, distinctBlock(tip$), store)
     )
   }: TransactionsTrackerInternals = {}
 ): TransactionsTracker => {

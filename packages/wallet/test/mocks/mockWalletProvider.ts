@@ -86,7 +86,7 @@ export const currentEpoch = {
 export const queryTransactionsResult: Cardano.TxAlonzo[] = [
   {
     blockHeader: {
-      blockNo: 10_100,
+      blockNo: 10_050,
       slot: ledgerTip.slot - 150_000
     } as Cardano.PartialBlockHeader,
     body: {
@@ -146,7 +146,7 @@ export const queryTransactionsResult: Cardano.TxAlonzo[] = [
   },
   {
     blockHeader: {
-      blockNo: 10_050,
+      blockNo: 10_100,
       slot: ledgerTip.slot - 100_000
     },
     body: {
@@ -171,7 +171,7 @@ export const queryTransactionsResult: Cardano.TxAlonzo[] = [
         invalidHereafter: ledgerTip.slot + 1
       }
     },
-    id: Cardano.TransactionId('12fa9af65e21b36ec4dc4cbce478e911d52585adb46f2b4fe3d6563e7ee5a61a')
+    id: Cardano.TransactionId('6804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99cad')
   } as Cardano.TxAlonzo
 ];
 const queryTransactions = () => jest.fn().mockResolvedValue(queryTransactionsResult);
