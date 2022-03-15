@@ -2,8 +2,8 @@
 /* eslint-disable promise/always-return */
 /* eslint-disable brace-style */
 import { Cardano } from '@cardano-sdk/core';
+import { EMPTY, Observable, from } from 'rxjs';
 import { KeyValueCollection, KeyValueStore } from '../types';
-import { Observable, from } from 'rxjs';
 import { PouchdbStore } from './PouchdbStore';
 import { dummyLogger } from 'ts-log';
 import { sanitizePouchdbDoc } from './util';
@@ -24,6 +24,7 @@ export class PouchdbKeyValueStore<K extends string | Cardano.util.OpaqueString<a
   }
 
   setAll(docs: KeyValueCollection<K, V>[]): Observable<void> {
+    if (this.destroyed) return EMPTY;
     return from(
       (async (): Promise<void> => {
         try {
@@ -42,6 +43,7 @@ export class PouchdbKeyValueStore<K extends string | Cardano.util.OpaqueString<a
   }
 
   getValues(keys: K[]): Observable<V[]> {
+    if (this.destroyed) return EMPTY;
     return new Observable((observer) => {
       this.db
         .bulkGet({ docs: keys.map((key) => ({ id: key.toString() })) })
@@ -61,6 +63,7 @@ export class PouchdbKeyValueStore<K extends string | Cardano.util.OpaqueString<a
   }
 
   setValue(key: K, value: V): Observable<void> {
+    if (this.destroyed) return EMPTY;
     return from(
       this.db
         .put({

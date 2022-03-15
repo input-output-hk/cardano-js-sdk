@@ -8,34 +8,50 @@ import {
 } from '@cardano-sdk/core';
 import { Observable } from 'rxjs';
 
-export interface CollectionStore<T> {
+export interface Destroyable {
+  destroyed: boolean;
+  /**
+   * Clear all resources used by the store.
+   *
+   * @returns {Observable} Emits undefined and completes. Completes without emitting if store is already destroyed.
+   */
+  destroy(): Observable<void>;
+}
+
+export interface CollectionStore<T> extends Destroyable {
   /**
    * Get all stored documents.
-   * Either:
+   *
+   * @returns {Observable}
    * - When have some documents stored: emits once and completes.
-   * - When no documents are stored: completes without emitting.
+   * - When no documents are stored or the store is destroyed: completes without emitting.
    */
   getAll(): Observable<T[]>;
   /**
    * Store the full set of documents.
    * getAll() after setAll(docs) should return the same set of 'docs'.
    * Should never throw.
+   *
+   * @returns {Observable} Emits undefined and completes. Completes without emitting if the store is destroyed.
    */
   setAll(docs: T[]): Observable<void>;
 }
 
 export type OrderedCollectionStore<T> = CollectionStore<T>;
 
-export interface DocumentStore<T> {
+export interface DocumentStore<T> extends Destroyable {
   /**
    * Get the stored document.
-   * Either:
+   *
+   * @returns {Observable}
    * - When have some document stored: emits once and completes.
-   * - When no document is stored: completes without emitting.
+   * - When no document is stored or the store is destroyed: completes without emitting.
    */
   get(): Observable<T>;
   /**
    * Store the document. Should never throw.
+   *
+   * @returns {Observable} Emits undefined and completes. Completes without emitting if the store is destroyed.
    */
   set(doc: T): Observable<void>;
 }
@@ -45,9 +61,10 @@ export type KeyValueCollection<K, V> = { key: K; value: V };
 export interface KeyValueStore<K, V> extends Omit<CollectionStore<KeyValueCollection<K, V>>, 'getAll'> {
   /**
    * Get the stored documents by keys.
-   * Either:
+   *
+   * @returns {Observable}
    * - When have all requested documents: emits once and completes.
-   * - When at least one document is missing: completes without emitting.
+   * - When at least one document is missing or the store is destroyed: completes without emitting.
    */
   getValues(keys: K[]): Observable<V[]>;
   /**
@@ -56,7 +73,7 @@ export interface KeyValueStore<K, V> extends Omit<CollectionStore<KeyValueCollec
   setValue(key: K, value: V): Observable<void>;
 }
 
-export interface WalletStores {
+export interface WalletStores extends Destroyable {
   tip: DocumentStore<Cardano.Tip>;
   utxo: CollectionStore<Cardano.Utxo>;
   transactions: OrderedCollectionStore<Cardano.TxAlonzo>;

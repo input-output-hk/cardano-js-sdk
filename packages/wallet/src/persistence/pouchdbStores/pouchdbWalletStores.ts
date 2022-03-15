@@ -6,6 +6,7 @@ import {
   ProtocolParametersRequiredByWallet,
   TimeSettings
 } from '@cardano-sdk/core';
+import { EMPTY, combineLatest, map } from 'rxjs';
 import { PouchdbCollectionStore } from './PouchdbCollectionStore';
 import { PouchdbDocumentStore } from './PouchdbDocumentStore';
 import { PouchdbKeyValueStore } from './PouchdbKeyValueStore';
@@ -33,6 +34,22 @@ export const createPouchdbWalletStores = (walletName: string): WalletStores => {
   const docsDbName = `${baseDbName}Docs`;
   return {
     assets: new PouchdbAssetsStore(docsDbName, 'assets'),
+    destroy() {
+      if (!this.destroyed) {
+        // since the database of document stores is shared, destroying any document store destroys all of them
+        const destroyDocumentsDb = this.tip.destroy();
+        return combineLatest([
+          destroyDocumentsDb,
+          this.transactions.destroy(),
+          this.utxo.destroy(),
+          this.rewardsHistory.destroy(),
+          this.stakePools.destroy(),
+          this.rewardsBalances.destroy()
+        ]).pipe(map(() => void 0));
+      }
+      return EMPTY;
+    },
+    destroyed: false,
     genesisParameters: new PouchdbGenesisParametersStore(docsDbName, 'genesisParameters'),
     networkInfo: new PouchdbNetworkInfoStore(docsDbName, 'networkInfo'),
     protocolParameters: new PouchdbProtocolParametersStore(docsDbName, 'protocolParameters'),

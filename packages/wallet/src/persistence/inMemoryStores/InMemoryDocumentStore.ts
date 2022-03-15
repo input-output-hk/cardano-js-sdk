@@ -1,15 +1,21 @@
 /* eslint-disable brace-style */
 import { DocumentStore } from '../types';
 import { EMPTY, Observable, of } from 'rxjs';
+import { InMemoryStore } from './InMemoryStore';
 
-export class InMemoryDocumentStore<T> implements DocumentStore<T> {
-  private doc: T | null = null;
+export class InMemoryDocumentStore<T> extends InMemoryStore implements DocumentStore<T> {
+  #doc: T | null = null;
+
   get(): Observable<T> {
-    if (!this.doc) return EMPTY;
-    return of(this.doc);
+    if (!this.#doc || this.destroyed) return EMPTY;
+    return of(this.#doc);
   }
+
   set(doc: T): Observable<void> {
-    this.doc = doc;
-    return of(void 0);
+    if (!this.destroyed) {
+      this.#doc = doc;
+      return of(void 0);
+    }
+    return EMPTY;
   }
 }

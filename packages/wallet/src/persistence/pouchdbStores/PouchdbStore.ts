@@ -1,8 +1,10 @@
+import { EMPTY, Observable, from } from 'rxjs';
 import { Logger } from 'ts-log';
 import { toPouchdbDoc } from './util';
 import PouchDB from 'pouchdb';
 
 export abstract class PouchdbStore<T> {
+  destroyed = false;
   protected readonly logger: Logger;
   protected readonly db: PouchDB.Database<T>;
 
@@ -27,6 +29,17 @@ export abstract class PouchdbStore<T> {
           } as unknown as T)
       )
     );
+  }
+
+  /**
+   * Might all destroy other stores, if the underlying pouchdb database is shared.
+   */
+  destroy(): Observable<void> {
+    if (!this.destroyed) {
+      this.destroyed = true;
+      return from(this.db.destroy());
+    }
+    return EMPTY;
   }
 
   protected toPouchdbDoc(obj: T): T {

@@ -8,6 +8,7 @@ export class InMemoryKeyValueStore<K, V>
   implements KeyValueStore<K, V>
 {
   getValues(keys: K[]): Observable<V[]> {
+    if (this.destroyed) return EMPTY;
     const result: V[] = [];
     for (const key of keys) {
       const value = this.docs.find((doc) => doc.key === key)?.value;
@@ -17,6 +18,7 @@ export class InMemoryKeyValueStore<K, V>
     return of(result);
   }
   setValue(key: K, value: V): Observable<void> {
+    if (this.destroyed) return EMPTY;
     const storedDocIndex = this.docs.findIndex((doc) => doc.key === key);
     if (storedDocIndex >= 0) {
       this.docs.splice(storedDocIndex, 1);

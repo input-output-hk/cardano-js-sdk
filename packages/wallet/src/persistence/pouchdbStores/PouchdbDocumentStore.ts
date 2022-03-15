@@ -1,6 +1,6 @@
 /* eslint-disable promise/always-return */
 import { DocumentStore } from '../types';
-import { Observable, from } from 'rxjs';
+import { EMPTY, Observable, from } from 'rxjs';
 import { PouchdbStore } from './PouchdbStore';
 import { dummyLogger } from 'ts-log';
 import { sanitizePouchdbDoc } from './util';
@@ -17,6 +17,7 @@ export class PouchdbDocumentStore<T> extends PouchdbStore<T> implements Document
   }
 
   get(): Observable<T> {
+    if (this.destroyed) return EMPTY;
     return new Observable((observer) => {
       this.db
         .get(this.#docId)
@@ -29,6 +30,7 @@ export class PouchdbDocumentStore<T> extends PouchdbStore<T> implements Document
   }
 
   set(doc: T): Observable<void> {
+    if (this.destroyed) return EMPTY;
     return from(
       this.db
         .put(

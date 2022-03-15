@@ -26,6 +26,15 @@ describe('pouchdbStores', () => {
       expect(await firstValueFrom(store2.get())).toEqual(doc1);
     });
 
+    // eslint-disable-next-line sonarjs/no-duplicate-string
+    it('destroy() disables store functions', async () => {
+      const store = new PouchdbDocumentStore<DocType>(dbName, 'docId');
+      await firstValueFrom(store.set(doc1));
+      await firstValueFrom(store.destroy());
+      await assertCompletesWithoutEmitting(store.get());
+      await assertCompletesWithoutEmitting(store.set(doc2));
+    });
+
     it.todo('set() completes without emitting on any pouchdb error');
   });
 
@@ -50,6 +59,13 @@ describe('pouchdbStores', () => {
       await firstValueFrom(store1.setAll([doc2, doc1]));
       await firstValueFrom(store1.setAll([doc2]));
       expect(await firstValueFrom(store1.getAll())).toEqual([doc2]);
+    });
+
+    it('destroy() disables store functions', async () => {
+      await firstValueFrom(store1.setAll([doc1]));
+      await firstValueFrom(store1.destroy());
+      await assertCompletesWithoutEmitting(store1.getAll());
+      await assertCompletesWithoutEmitting(store1.setAll([doc2]));
     });
 
     it.todo('setAll completes without emitting on any pouchdb error');
@@ -90,6 +106,14 @@ describe('pouchdbStores', () => {
       );
       await assertCompletesWithoutEmitting(store1.getValues([key2]));
       expect(await firstValueFrom(store1.getValues([key3, key1]))).toEqual([doc2, doc1]);
+    });
+
+    it('destroy() disables store functions', async () => {
+      await firstValueFrom(store1.setValue(key1, doc1));
+      await firstValueFrom(store1.destroy());
+      await assertCompletesWithoutEmitting(store1.getValues([key1]));
+      await assertCompletesWithoutEmitting(store1.setValue(key1, doc1));
+      await assertCompletesWithoutEmitting(store1.setAll([{ key: key2, value: doc2 }]));
     });
 
     it.todo('setAll and setValues completes without emitting on any pouchdb error');

@@ -19,22 +19,37 @@ import { firstValueFrom } from 'rxjs';
 
 describe('inMemoryStores', () => {
   describe('InMemoryDocumentStore', () => {
+    const doc = { a: 'b' };
     it('remembers the last set document', async () => {
       const store = new InMemoryDocumentStore();
       await assertCompletesWithoutEmitting(store.get());
-      const doc = { a: 'b' };
       await firstValueFrom(store.set(doc));
       expect(await firstValueFrom(store.get())).toBe(doc);
+    });
+    // eslint-disable-next-line sonarjs/no-duplicate-string
+    it('destroy() disables store functions', async () => {
+      const store = new InMemoryDocumentStore();
+      await firstValueFrom(store.set(doc));
+      await firstValueFrom(store.destroy());
+      await assertCompletesWithoutEmitting(store.get());
+      await assertCompletesWithoutEmitting(store.set(doc));
     });
   });
 
   describe('InMemoryCollectionStore', () => {
+    const docs = [{ a: 'b' }];
     it('Remembers last set array object', async () => {
       const store = new InMemoryCollectionStore();
       await assertCompletesWithoutEmitting(store.getAll());
-      const docs = [{ a: 'b' }];
       await firstValueFrom(store.setAll(docs));
       expect(await firstValueFrom(store.getAll())).toBe(docs);
+    });
+    it('destroy() disables store functions', async () => {
+      const store = new InMemoryCollectionStore();
+      await firstValueFrom(store.setAll(docs));
+      await firstValueFrom(store.destroy());
+      await assertCompletesWithoutEmitting(store.getAll());
+      await assertCompletesWithoutEmitting(store.setAll(docs));
     });
   });
 
@@ -75,6 +90,15 @@ describe('inMemoryStores', () => {
         ])
       );
       expect(await firstValueFrom(store.getValues(['key1', 'key3']))).toEqual(['value1', 'value3']);
+    });
+
+    it('destroy() disables store functions', async () => {
+      const docs = [{ key: 'key1', value: 'value1' }];
+      await firstValueFrom(store.setAll(docs));
+      await firstValueFrom(store.destroy());
+      await assertCompletesWithoutEmitting(store.setValue('key1', 'value2'));
+      await assertCompletesWithoutEmitting(store.setAll(docs));
+      await assertCompletesWithoutEmitting(store.getValues([docs[0].key]));
     });
   });
 

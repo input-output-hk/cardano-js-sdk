@@ -1,5 +1,5 @@
 import { CollectionStore } from '../types';
-import { Observable, from } from 'rxjs';
+import { EMPTY, Observable, from } from 'rxjs';
 import { PouchdbStore } from './PouchdbStore';
 import { dummyLogger } from 'ts-log';
 import { sanitizePouchdbDoc } from './util';
@@ -24,6 +24,7 @@ export class PouchdbCollectionStore<T> extends PouchdbStore<T> implements Collec
   }
 
   getAll(): Observable<T[]> {
+    if (this.destroyed) return EMPTY;
     return new Observable((observer) => {
       this.db
         .allDocs({ include_docs: true })
@@ -38,6 +39,7 @@ export class PouchdbCollectionStore<T> extends PouchdbStore<T> implements Collec
   }
 
   setAll(docs: T[]): Observable<void> {
+    if (this.destroyed) return EMPTY;
     return from(
       (async (): Promise<void> => {
         try {
