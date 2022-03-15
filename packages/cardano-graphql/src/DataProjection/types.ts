@@ -1,3 +1,4 @@
+import { Asset } from '../Schema/types';
 import { Schema as Ogmios } from '@cardano-ogmios/client';
 import dgraph from 'dgraph-js';
 
@@ -32,16 +33,68 @@ export interface Upsert {
   };
 }
 
-// export interface CombinedQueryResult {}
+export interface CombinedQueryResult {
+  data: {
+    assets: Asset[];
+  };
+}
 
-// export interface CombinedProcessingResult {}
+export interface ProcessingResult {
+  assets: Asset[];
+}
+
+export interface CombinedProcessingResult {
+  func: void | Promise<Partial<ProcessingResult>>;
+  id: string;
+}
+
+export interface ProcessParameters {
+  ctx?: RollForwardContext;
+  queryResult?: CombinedQueryResult;
+}
 
 export interface BlockHandler {
   id: string;
   query?: (ctx: RollForwardContext) => Promise<QueryResult<QueryVariables>>;
-  // process?: (ctx: RollForwardContext, queryResult?: CombinedQueryResult) => Promise<Partial<CombinedProcessingResult>>;
-  process?: (ctx: RollForwardContext, queryResult?: any) => Promise<Partial<any>>;
+  process?: (parameters: ProcessParameters) => Promise<Partial<ProcessingResult>>;
   rollBackward: (ctx: RollBackwardContext) => Promise<Upsert>;
-  // rollForward: (ctx: RollForwardContext, processingResult: CombinedProcessingResult) => Promise<Upsert>;
-  rollForward: (ctx: RollForwardContext, processingResult?: any) => Promise<Upsert>;
+  rollForward: (ctx: RollForwardContext, processingResult: CombinedProcessingResult[]) => Promise<Upsert>;
+}
+
+export interface Signature {
+  signature: string;
+  publicKey: string;
+}
+
+export interface AssetMetadata {
+  decimals: {
+    value: number;
+    anSignatures: Signature[];
+  };
+  description?: {
+    value: string;
+    anSignatures: Signature[];
+  };
+  logo?: {
+    value: string;
+    anSignatures: Signature[];
+  };
+  name?: {
+    value: string;
+    anSignatures: Signature[];
+  };
+  owner?: Signature;
+  preImage?: {
+    value: string;
+    hashFn: string;
+  };
+  subject: string;
+  ticker?: {
+    value: string;
+    anSignatures: Signature[];
+  };
+  url?: {
+    value: string;
+    anSignatures: Signature[];
+  };
 }

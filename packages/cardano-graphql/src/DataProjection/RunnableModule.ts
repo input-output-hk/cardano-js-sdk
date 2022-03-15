@@ -5,7 +5,7 @@ import { moduleLogger } from '../util';
 
 export type RunnableModuleState = ModuleState | 'starting' | 'running' | 'stopping';
 
-export class RunnableModule {
+export abstract class RunnableModule {
   public state: RunnableModuleState;
   logger: Logger;
   name: string;
@@ -32,6 +32,13 @@ export class RunnableModule {
     this.logger.info('Initialized');
   }
 
+  protected abstract initializeImpl(parameter?: any): Promise<void>;
+  async initialize(parameter?: any) {
+    this.initializeBefore();
+    await this.initializeImpl(parameter);
+    this.initializeAfter();
+  }
+
   startBefore() {
     if (this.state !== 'initialized') {
       throw new InvalidModuleState<RunnableModuleState>(this.name, 'start', 'initialized');
@@ -48,6 +55,13 @@ export class RunnableModule {
     this.logger.info('Started');
   }
 
+  protected abstract startImpl(parameter?: any): Promise<void>;
+  async start(parameter?: any) {
+    this.startBefore();
+    await this.startImpl(parameter);
+    this.startAfter();
+  }
+
   shutdownBefore() {
     if (this.state !== 'running') {
       throw new InvalidModuleState<RunnableModuleState>(this.name, 'shutdown', 'running');
@@ -62,5 +76,12 @@ export class RunnableModule {
     }
     this.state = 'initialized';
     this.logger.info('Shutdown complete...');
+  }
+
+  protected abstract shutdownImpl(): Promise<void>;
+  async shutdown() {
+    this.shutdownBefore();
+    await this.shutdownImpl();
+    this.shutdownBefore();
   }
 }

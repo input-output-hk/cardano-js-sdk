@@ -1,4 +1,4 @@
-import { BlockHandler } from './types';
+import { BlockHandler, CombinedQueryResult } from './types';
 import {
   ChainSync,
   ConnectionConfig,
@@ -9,7 +9,7 @@ import {
 import { DgraphClient } from './DgraphClient';
 import { Logger, dummyLogger } from 'ts-log';
 import { RunnableModule } from './RunnableModule';
-import { mergedRollForwardUpsert } from './util';
+import { mergedProcessingResults, mergedQuery, mergedRollForwardUpsert } from './util';
 
 export class ChainFollower extends RunnableModule {
   #blockHandlers: BlockHandler[];
@@ -22,8 +22,7 @@ export class ChainFollower extends RunnableModule {
     this.#dgraphClient = dgraphClient;
   }
 
-  public async initialize(ogmiosConnectionConfig?: ConnectionConfig) {
-    super.initializeBefore();
+  public async initializeImpl(ogmiosConnectionConfig?: ConnectionConfig) {
     const ogmiosContext = await createInteractionContext(
       this.logger.error,
       (code, reason) => {
@@ -52,27 +51,27 @@ export class ChainFollower extends RunnableModule {
         this.logger.info({ BLOCK: block }, 'Rolling forward');
         const txn = this.#dgraphClient.newTxn();
         const context = { block, txn };
-        // const { query, variables } = await mergedQuery(this.#blockHandlers, context);
+        const { query, variables } = await mergedQuery(this.#blockHandlers, context);
         this.logger.info('About to run merged query');
-        // const queryResults = await this.#dgraphClient.query(query, variables);
-        // const preProcessingResults = await mergedPreProcessingResults(this.#blockHandlers, context, queryResults);
-        const upsert = await mergedRollForwardUpsert(this.#blockHandlers, context);
+        const mergedQueryResults: CombinedQueryResult = await this.#dgraphClient.query(query, variables);
+        this.logger.info('About to process query results');
+        const processingResults = await mergedProcessingResults(this.#blockHandlers, context, mergedQueryResults);
+        this.logger.info('Query results processed. About to merge roll forward upsert');
+        const upsert = await mergedRollForwardUpsert(this.#blockHandlers, context, processingResults);
+        this.logger.info('Writting data from block');
         await this.#dgraphClient.writeDataFromBlock(upsert, txn);
+        this.logger.info('Successfully written');
         requestNext();
       }
     });
     super.initializeAfter();
   }
 
-  public async start(points: Schema.PointOrOrigin[]) {
-    super.startBefore();
+  public async startImpl(points: Schema.PointOrOrigin[]) {
     await this.#chainSyncClient.startSync(points);
-    super.startAfter();
   }
 
-  public async shutdown() {
-    super.shutdownBefore();
+  public async shutdownImpl() {
     await this.#chainSyncClient.shutdown();
-    super.shutdownAfter();
   }
 }

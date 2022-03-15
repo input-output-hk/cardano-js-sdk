@@ -10,10 +10,8 @@ import { createLogger } from 'bunyan';
 import fs from 'fs';
 import onDeath from 'death';
 import path from 'path';
-
 const clear = require('clear');
 const packageJson = require('../../package.json');
-
 clear();
 // eslint-disable-next-line no-console
 console.log('Dgraph Projector');
@@ -30,13 +28,14 @@ program
   .description('Start the service')
   .option('--dgraph-url <dgraphUrl>', 'Dgraph URL', (url) => new URL(url))
   .option('--ogmios-url <ogmiosUrl>', 'Ogmios URL', (url) => new URL(url))
+  .option('--metadata-uri <metadataUri>', 'Metadata Server URI', (url) => new URL(url))
   .option('--logger-min-severity <level>', 'Log level', (level) => {
     if (!['trace', 'debug', 'info', 'warn', 'error'].includes(level)) {
       throw new InvalidLoggerLevel(level);
     }
     return level;
   })
-  .action(async ({ dgraphUrl, loggerMinSeverity, ogmiosUrl }) => {
+  .action(async ({ dgraphUrl, loggerMinSeverity, ogmiosUrl, metadataUri }) => {
     const logger: Logger = createLogger({
       level: loggerMinSeverity,
       name: 'dgraph-projector'
@@ -46,6 +45,9 @@ program
         dgraph: {
           address: dgraphUrl?.toString() || 'http://localhost:8080',
           schema: fs.readFileSync(path.resolve(__dirname, '..', '..', 'dist', 'schema.graphql'), 'utf-8')
+        },
+        metadata: {
+          uri: metadataUri?.toString() || 'https://tokens.cardano.org'
         },
         ogmios: {
           connection: {

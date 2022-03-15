@@ -14,8 +14,7 @@ export class DgraphClient extends RunnableModule {
     this.#dgraphClient = new dgraph.DgraphClient(this.#clientStub);
   }
 
-  async initialize(schema: string): Promise<void> {
-    super.initializeBefore();
+  async initializeImpl(schema: string): Promise<void> {
     // Issuing the library operation isn't working as expected, so we're using the HTTP API instead
     const query = gql`
       mutation ($sch: String!) {
@@ -28,14 +27,15 @@ export class DgraphClient extends RunnableModule {
     `;
     await request(`${this.address}/admin`, query, { sch: schema });
     this.logger.debug('Dgraph schema set');
-    super.initializeAfter();
   }
 
-  async shutdown(): Promise<void> {
+  async shutdownImpl(): Promise<void> {
     super.shutdownBefore();
     await this.#clientStub.close();
     super.shutdownAfter();
   }
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  async startImpl(): Promise<void> {}
 
   newTxn(): dgraph.Txn {
     return this.#dgraphClient.newTxn();
@@ -53,6 +53,8 @@ export class DgraphClient extends RunnableModule {
       // Todo: Translate our Upsert type
       mu.setSetJson(upsert);
       await txn.mutate(mu);
+      const req = new dgraph.Request();
+      req.setMutationsList([mu]);
       await txn.commit();
     } catch (error) {
       if (error === dgraph.ERR_ABORTED) {
