@@ -4,10 +4,7 @@
     "baseUrl": "."
   },
   "references": [
-    { "path": "../src" },
-    { "path": "../../util-dev/src" },
-    { "path": "../../cip2/src" },
     { "path": "../../core/src" },
-    { "path": "../../ogmios/src" }
+    { "path": "../src" }
   ]
 }

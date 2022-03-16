@@ -1,0 +1,37 @@
+{
+  "name": "@cardano-sdk/ogmios",
+  "version": "0.2.0",
+  "description": "Ogmios Providers",
+  "engines": {
+    "node": "^14"
+  },
+  "main": "dist/index.js",
+  "repository": "https://github.com/input-output-hk/cardano-js-sdk/packages/ogmios",
+  "author": "Rhys Bartels-Waller",
+  "license": "MPL-2.0",
+  "scripts": {
+    "build": "tsc --build ./src",
+    "tscNoEmit": "shx echo typescript --noEmit command not implemented yet",
+    "cleanup": "shx rm -rf dist node_modules",
+    "lint": "eslint --ignore-path ../../.eslintignore \"**/*.ts\"",
+    "lint:fix": "eslint --fix --ignore-path ../../.eslintignore \"**/*.ts\"",
+    "test": "jest -c ./jest.config.js",
+    "test:e2e": "shx echo 'test:e2e' command not implemented yet",
+    "coverage": "shx echo No coverage report for this package",
+    "prepack": "yarn build"
+  },
+  "devDependencies": {
+    "get-port-please": "^2.4.3",
+    "shx": "^0.3.3",
+    "ws": "^8.5.0"
+  },
+  "dependencies": {
+    "@cardano-ogmios/client": "5.1.0"
+  },
+  "files": [
+    "dist/*",
+    "!dist/tsconfig.tsbuildinfo",
+    "LICENSE",
+    "NOTICE"
+  ]
+}
