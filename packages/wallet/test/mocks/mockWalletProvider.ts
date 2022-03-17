@@ -189,21 +189,17 @@ export const protocolParameters = {
   stakeKeyDeposit: 2_000_000
 };
 
-export const rewardsHistory: Map<Cardano.RewardAccount, EpochRewards[]> = new Map([
-  [
-    rewardAccount,
-    [
-      {
-        epoch: currentEpoch.number - 3,
-        rewards: 10_000n
-      },
-      {
-        epoch: currentEpoch.number - 2,
-        rewards: 11_000n
-      }
-    ]
-  ]
-]);
+export const epochRewards = [
+  {
+    epoch: currentEpoch.number - 3,
+    rewards: 10_000n
+  },
+  {
+    epoch: currentEpoch.number - 2,
+    rewards: 11_000n
+  }
+];
+export const rewardsHistory: Map<Cardano.RewardAccount, EpochRewards[]> = new Map([[rewardAccount, epochRewards]]);
 
 export const genesisParameters = {
   activeSlotsCoefficient: 0.05,
@@ -218,6 +214,29 @@ export const genesisParameters = {
   updateQuorum: 5
 };
 
+export const networkInfo = {
+  currentEpoch,
+  lovelaceSupply: {
+    circulating: 42_064_399_450_423_723n,
+    max: 45_000_000_000_000_000n,
+    total: 40_267_211_394_073_980n
+  },
+  stake: {
+    active: 1_060_378_314_781_343n,
+    live: 15_001_884_895_856_815n
+  }
+};
+
+export const stakePoolStats = {
+  qty: {
+    active: 1000,
+    retired: 500,
+    retiring: 5
+  }
+};
+
+export const blocksByHashes = [{ epoch: currentEpoch.number - 3 } as Cardano.Block];
+
 /**
  * Provider stub for testing
  *
@@ -227,29 +246,12 @@ export const mockWalletProvider = () => ({
   currentWalletProtocolParameters: jest.fn().mockResolvedValue(protocolParameters),
   genesisParameters: jest.fn().mockResolvedValue(genesisParameters),
   ledgerTip: jest.fn().mockResolvedValue(ledgerTip),
-  networkInfo: jest.fn().mockResolvedValue({
-    currentEpoch,
-    lovelaceSupply: {
-      circulating: 42_064_399_450_423_723n,
-      max: 45_000_000_000_000_000n,
-      total: 40_267_211_394_073_980n
-    },
-    stake: {
-      active: 1_060_378_314_781_343n,
-      live: 15_001_884_895_856_815n
-    }
-  }),
-  queryBlocksByHashes: jest.fn().mockResolvedValue([{ epoch: currentEpoch.number - 3 } as Cardano.Block]),
+  networkInfo: jest.fn().mockResolvedValue(networkInfo),
+  queryBlocksByHashes: jest.fn().mockResolvedValue(blocksByHashes),
   queryTransactionsByAddresses: queryTransactions(),
   queryTransactionsByHashes: queryTransactions(),
   rewardsHistory: jest.fn().mockResolvedValue(rewardsHistory),
-  stakePoolStats: jest.fn().mockResolvedValue({
-    qty: {
-      active: 1000,
-      retired: 500,
-      retiring: 5
-    }
-  }),
+  stakePoolStats: jest.fn().mockResolvedValue(stakePoolStats),
   utxoDelegationAndRewards: jest.fn().mockResolvedValue({ delegationAndRewards, utxo })
 });
 

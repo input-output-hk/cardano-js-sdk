@@ -1,11 +1,13 @@
+/* eslint-disable max-statements */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as mocks from '../mocks';
 import { AssetId, createStubStakePoolSearchProvider, createStubTimeSettingsProvider } from '@cardano-sdk/util-dev';
 import { Cardano, WalletProvider, testnetTimeSettings } from '@cardano-sdk/core';
 import { KeyManagement, SingleAddressWallet, SyncStatus, Wallet } from '../../src';
 import { WalletStores, createInMemoryWalletStores } from '../../src/persistence';
-import { firstValueFrom } from 'rxjs';
+import { filter, firstValueFrom } from 'rxjs';
 import { flatten } from 'lodash-es';
+import { queryTransactionsResult2 } from '../mocks';
 
 const name = 'Test Wallet';
 const address = mocks.utxo[0][0].address;
@@ -33,7 +35,6 @@ const createWallet = async (stores: WalletStores, walletProvider: WalletProvider
   );
 };
 
-// eslint-disable-next-line max-statements
 const assertWalletProperties = async (wallet: Wallet, expectedSyncStatusAfterLoad: SyncStatus) => {
   // name
   expect(wallet.name).toBe(name);
@@ -85,32 +86,37 @@ const assertWalletProperties = async (wallet: Wallet, expectedSyncStatusAfterLoa
   expect(await firstValueFrom(wallet.syncStatus$)).toBe(expectedSyncStatusAfterLoad);
 };
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-const neverResolve: any = () => new Promise(() => {});
-const neverResolvingWalletProvider: WalletProvider = {
-  currentWalletProtocolParameters: neverResolve,
-  genesisParameters: neverResolve,
-  ledgerTip: neverResolve,
-  networkInfo: neverResolve,
-  queryBlocksByHashes: neverResolve,
-  queryTransactionsByAddresses: neverResolve,
-  queryTransactionsByHashes: neverResolve,
-  rewardsHistory: neverResolve,
-  stakePoolStats: neverResolve,
-  utxoDelegationAndRewards: neverResolve
+const assertWalletProperties2 = async (wallet: Wallet) => {
+  expect(wallet.utxo.available$.value).toEqual(mocks.utxo2);
+  expect(wallet.utxo.total$.value).toEqual(mocks.utxo2);
+  expect(wallet.balance.available$.value?.coins).toEqual(
+    Cardano.util.coalesceValueQuantities(mocks.utxo2.map((utxo) => utxo[1].value)).coins
+  );
+  expect(wallet.balance.total$.value?.rewards).toBe(mocks.rewards2);
+  expect(wallet.transactions.history.all$.value?.length).toEqual(queryTransactionsResult2.length);
+  expect(wallet.tip$.value).toEqual(mocks.ledgerTip2);
+  expect(wallet.networkInfo$.value?.currentEpoch.number).toEqual(mocks.currentEpochNo2);
+  expect(wallet.protocolParameters$.value).toEqual(mocks.protocolParameters2);
+  expect(wallet.genesisParameters$.value).toEqual(mocks.genesisParameters2);
+  // delegation
+  const rewardsHistory = wallet.delegation.rewardsHistory$.value!;
+  const expectedRewards = flatten([...mocks.rewardsHistory2.values()]);
+  expect(rewardsHistory.all).toEqual(expectedRewards);
+  const rewardAccounts = await firstValueFrom(wallet.delegation.rewardAccounts$);
+  expect(rewardAccounts).toHaveLength(1);
+  expect(rewardAccounts[0].rewardBalance.total).toBe(mocks.rewards2);
 };
 
 describe('SingleAddressWallet load', () => {
-  it('loads all properties from provider, stores them and restores on subsequent load', async () => {
+  it('loads all properties from provider, stores them and restores on subsequent load, fetches new data', async () => {
     const stores = createInMemoryWalletStores();
     const wallet1 = await createWallet(stores, mocks.mockWalletProvider());
     await assertWalletProperties(wallet1, SyncStatus.UpToDate);
     wallet1.shutdown();
-    const wallet2 = await createWallet(stores, neverResolvingWalletProvider);
+    const wallet2 = await createWallet(stores, mocks.mockWalletProvider2(100));
     await assertWalletProperties(wallet2, SyncStatus.Syncing);
+    await firstValueFrom(wallet2.syncStatus$.pipe(filter((syncStatus) => syncStatus === SyncStatus.UpToDate)));
+    await assertWalletProperties2(wallet2);
     wallet2.shutdown();
   });
-
-  // This is an important test to have
-  it.todo('loads stored wallet properties, updates all wallet properties when provider resolves');
 });
