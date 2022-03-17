@@ -8,7 +8,7 @@ import {
 } from '@cardano-ogmios/client';
 import { DgraphClient } from './DgraphClient';
 import { Logger, dummyLogger } from 'ts-log';
-import { RunnableModule } from './RunnableModule';
+import { RunnableModule } from '../RunnableModule';
 import { mergedProcessingResults, mergedQuery, mergedRollBackwardUpsert, mergedRollForwardUpsert } from './util';
 
 export class ChainFollower extends RunnableModule {

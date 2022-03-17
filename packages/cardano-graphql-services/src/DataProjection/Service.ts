@@ -1,8 +1,8 @@
 import { ChainFollower } from './ChainFollower';
 import { ConnectionConfig } from '@cardano-ogmios/client';
 import { DgraphClient } from './DgraphClient';
-import { MetadataClient } from './MetadataClient';
-import { RunnableModule } from './RunnableModule';
+import { MetadataClient } from '../MetadataClient/MetadataClient';
+import { RunnableModule } from '../RunnableModule';
 import { createAssetBlockHandler } from './blockHandlers/AssetBlockHandler';
 import { dummyLogger } from 'ts-log';
 

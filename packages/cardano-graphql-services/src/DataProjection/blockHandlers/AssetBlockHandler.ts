@@ -8,7 +8,7 @@ import {
   RollBackwardContext,
   RollForwardContext
 } from '../types';
-import { MetadataClient } from '../MetadataClient';
+import { MetadataClient } from '../../MetadataClient/MetadataClient';
 import { Schema, isAlonzoBlock, isMaryBlock } from '@cardano-ogmios/client';
 import { dummyLogger } from 'ts-log';
 

@@ -7,9 +7,9 @@ export type RunnableModuleState = ModuleState | 'starting' | 'running' | 'stoppi
 
 export abstract class RunnableModule {
   public state: RunnableModuleState;
-  protected abstract initializeImpl(): Promise<void>;
-  protected abstract startImpl(): Promise<void>;
-  protected abstract shutdownImpl(): Promise<void>;
+  protected abstract initializeImpl(parameters?: any): Promise<void>;
+  protected abstract startImpl(parameters?: any): Promise<void>;
+  protected abstract shutdownImpl(parameters?: any): Promise<void>;
   logger: Logger;
   name: string;
 
@@ -19,21 +19,21 @@ export abstract class RunnableModule {
     this.name = name;
   }
 
-  async initialize() {
+  async initialize(parameters?: any) {
     this.initializeBefore();
-    await this.initializeImpl();
+    await this.initializeImpl(parameters);
     this.initializeAfter();
   }
 
-  async start() {
+  async start(parameters?: any) {
     this.startBefore();
-    await this.startImpl();
+    await this.startImpl(parameters);
     this.startAfter();
   }
 
-  async shutdown() {
+  async shutdown(parameters?: any) {
     this.shutdownBefore();
-    await this.shutdownImpl();
+    await this.shutdownImpl(parameters);
     this.shutdownAfter();
   }
 

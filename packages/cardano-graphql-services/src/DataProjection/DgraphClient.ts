@@ -1,4 +1,4 @@
-import { RunnableModule } from './RunnableModule';
+import { RunnableModule } from '../RunnableModule';
 import { Upsert } from './types';
 import { dummyLogger } from 'ts-log';
 import { gql, request } from 'graphql-request';

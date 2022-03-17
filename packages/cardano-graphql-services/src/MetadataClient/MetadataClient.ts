@@ -1,8 +1,8 @@
-import { Asset } from '../Schema/types';
+import { Asset } from '@cardano-graphql/client-ts';
 import { AssetMetadata } from './types';
-import { HostDoesNotExist } from './errors';
+import { HostDoesNotExist } from '../DataProjection/errors';
 import { Logger, dummyLogger } from 'ts-log';
-import { RunnableModule } from './RunnableModule';
+import { RunnableModule } from '../RunnableModule';
 import axios, { AxiosInstance } from 'axios';
 
 export class MetadataClient extends RunnableModule {
