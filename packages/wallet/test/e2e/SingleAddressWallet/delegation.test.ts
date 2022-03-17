@@ -88,10 +88,6 @@ describe('SingleAddressWallet/delegation', () => {
     expect(addresses[0].address.startsWith('addr')).toBe(true);
   });
 
-  it('has assets$', async () => {
-    expect(typeof (await firstValueFrom(wallet.assets$))).toBe('object');
-  });
-
   test('balance & transaction', async () => {
     const stakeKeyDeposit = BigInt((await firstValueFrom(wallet.protocolParameters$)).stakeKeyDeposit);
     const initialTotalBalance = await firstValueFrom(wallet.balance.total$);

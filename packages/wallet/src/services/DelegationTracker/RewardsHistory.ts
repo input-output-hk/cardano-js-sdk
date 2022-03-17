@@ -1,32 +1,32 @@
-import { BigIntMath, Cardano, WalletProvider, util } from '@cardano-sdk/core';
-import { Observable, distinctUntilChanged, map, of, switchMap } from 'rxjs';
+import { BigIntMath, Cardano, EpochRewards, WalletProvider, util } from '@cardano-sdk/core';
+import { KeyValueStore } from '../../persistence';
+import { Observable, concat, distinctUntilChanged, map, of, switchMap, tap } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
+import { RewardsHistory } from '../types';
 import { TxWithEpoch } from './types';
 import { coldObservableProvider } from '../util';
-import { first } from 'lodash-es';
+import { first, flatten, groupBy } from 'lodash-es';
 import { transactionHasAnyCertificate } from './transactionCertificates';
 
+const sumRewards = (arrayOfRewards: EpochRewards[]) => BigIntMath.sum(arrayOfRewards.map(({ rewards }) => rewards));
+const avgReward = (arrayOfRewards: EpochRewards[]) => sumRewards(arrayOfRewards) / BigInt(arrayOfRewards.length);
+
 export const createRewardsHistoryProvider =
+  (walletProvider: WalletProvider, retryBackoffConfig: RetryBackoffConfig) =>
   (
-    walletProvider: WalletProvider,
-    rewardAccountAddresses$: Observable<Cardano.RewardAccount[]>,
-    retryBackoffConfig: RetryBackoffConfig
-  ) =>
-  (lowerBound: Cardano.Epoch | null) =>
+    rewardAccounts: Cardano.RewardAccount[],
+    lowerBound: Cardano.Epoch | null
+  ): Observable<Map<Cardano.RewardAccount, EpochRewards[]>> =>
     lowerBound
-      ? rewardAccountAddresses$.pipe(
-          switchMap((stakeAddresses) =>
-            coldObservableProvider(
-              () =>
-                walletProvider.rewardsHistory({
-                  epochs: { lowerBound },
-                  stakeAddresses
-                }),
-              retryBackoffConfig
-            )
-          )
+      ? coldObservableProvider(
+          () =>
+            walletProvider.rewardsHistory({
+              epochs: { lowerBound },
+              rewardAccounts
+            }),
+          retryBackoffConfig
         )
-      : of([]);
+      : of(new Map());
 
 export type RewardsHistoryProvider = ReturnType<typeof createRewardsHistoryProvider>;
 
@@ -43,17 +43,48 @@ const firstDelegationEpoch$ = (transactions$: Observable<TxWithEpoch[]>) =>
 
 export const createRewardsHistoryTracker = (
   transactions$: Observable<TxWithEpoch[]>,
-  rewardsHistoryProvider: RewardsHistoryProvider
-) =>
-  firstDelegationEpoch$(transactions$).pipe(
-    switchMap((firstEpoch) => rewardsHistoryProvider(firstEpoch)),
-    map((all) => {
-      const lifetimeRewards = BigIntMath.sum(all.map(({ rewards }) => rewards));
-      return {
-        all,
-        avgReward: all.length > 0 ? lifetimeRewards / BigInt(all.length) : null,
-        lastReward: all.length > 0 ? all[all.length - 1] : null,
-        lifetimeRewards
-      };
-    })
-  );
+  rewardAccounts$: Observable<Cardano.RewardAccount[]>,
+  rewardsHistoryProvider: RewardsHistoryProvider,
+  rewardsHistoryStore: KeyValueStore<Cardano.RewardAccount, EpochRewards[]>
+): Observable<RewardsHistory> =>
+  rewardAccounts$
+    .pipe(
+      switchMap((rewardAccounts) =>
+        concat(
+          rewardsHistoryStore
+            .getValues(rewardAccounts)
+            .pipe(map((rewards) => new Map(rewardAccounts.map((rewardAccount, i) => [rewardAccount, rewards[i]])))),
+          firstDelegationEpoch$(transactions$).pipe(
+            switchMap((firstEpoch) => rewardsHistoryProvider(rewardAccounts, firstEpoch)),
+            tap((allRewards) =>
+              rewardsHistoryStore.setAll([...allRewards.entries()].map(([key, value]) => ({ key, value })))
+            )
+          )
+        )
+      )
+    )
+    .pipe(
+      map((rewardsByAccount) => {
+        const allRewards = flatten([...rewardsByAccount.values()]);
+        if (allRewards.length === 0) {
+          return {
+            all: [],
+            avgReward: null,
+            lastReward: null,
+            lifetimeRewards: 0n
+          } as RewardsHistory;
+        }
+        const rewardsByEpoch = groupBy(allRewards, ({ epoch }) => epoch);
+        const epochs = Object.keys(rewardsByEpoch)
+          .map((epoch) => Number(epoch))
+          .sort();
+        const all = epochs.map((epoch) => ({ epoch, rewards: sumRewards(rewardsByEpoch[epoch]) }));
+
+        return {
+          all,
+          avgReward: avgReward(allRewards),
+          lastReward: all[all.length - 1],
+          lifetimeRewards: sumRewards(allRewards)
+        };
+      })
+    );

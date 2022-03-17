@@ -1,5 +1,6 @@
 query MemberRewardsHistory($rewardAccounts: [String!]!, $fromEpochNo: Int = 0, $toEpochNo: Int = 2147483647) {
   queryRewardAccount(filter: { address: { in: $rewardAccounts } }) {
+    address
     rewards(filter: { source: { eq: "member" }, and: { epochNo: { gt: $fromEpochNo }, and: { epochNo: { lt: $toEpochNo } } }}) {
       epochNo
       quantity

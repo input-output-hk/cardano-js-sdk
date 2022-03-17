@@ -1,25 +1,26 @@
 import { BehaviorSubject } from 'rxjs';
 import { CLEAN_FN_STATS, ProviderFnStats, TrackedWalletProvider, WalletProviderStats } from '../../src';
 import { WalletProvider } from '@cardano-sdk/core';
-import { mockWalletProvider } from '../mocks';
+import { WalletProviderStub, mockWalletProvider } from '../mocks';
 
 describe('TrackedWalletProvider', () => {
-  let walletProvider: WalletProvider;
+  let walletProvider: WalletProviderStub;
   let trackedWalletProvider: TrackedWalletProvider;
   beforeEach(() => {
     walletProvider = mockWalletProvider();
     trackedWalletProvider = new TrackedWalletProvider(walletProvider);
   });
 
-  test('CLEAN_FN_STATS numResponses is 0', () => {
-    expect(CLEAN_FN_STATS).toEqual({ numCalls: 0, numResponses: 0 });
+  test('CLEAN_FN_STATS all stats are 0', () => {
+    expect(CLEAN_FN_STATS).toEqual({ numCalls: 0, numFailures: 0, numResponses: 0 });
   });
 
   describe('wraps underlying provider functions, tracks # of calls/responses and resets on stats.reset()', () => {
     const testFunctionStats =
       <T>(
         call: (walletProvider: WalletProvider) => Promise<T>,
-        selectStats: (stats: WalletProviderStats) => BehaviorSubject<ProviderFnStats>
+        selectStats: (stats: WalletProviderStats) => BehaviorSubject<ProviderFnStats>,
+        selectFn: (mockWalletProvider: WalletProviderStub) => jest.Mock
         // eslint-disable-next-line unicorn/consistent-function-scoping
       ) =>
       async () => {
@@ -27,7 +28,26 @@ describe('TrackedWalletProvider', () => {
         const result = call(trackedWalletProvider);
         expect(selectStats(trackedWalletProvider.stats).value).toEqual({ ...CLEAN_FN_STATS, numCalls: 1 });
         await result;
-        expect(selectStats(trackedWalletProvider.stats).value).toEqual({ numCalls: 1, numResponses: 1 });
+        const statsAfterResponse = {
+          didLastRequestFail: false,
+          numCalls: 1,
+          numFailures: 0,
+          numResponses: 1
+        };
+        expect(selectStats(trackedWalletProvider.stats).value).toEqual(statsAfterResponse);
+        selectFn(walletProvider).mockRejectedValueOnce(new Error('any error'));
+        const failure = call(trackedWalletProvider).catch(() => void 0);
+        const statsAfterFailureCall = {
+          ...statsAfterResponse,
+          numCalls: statsAfterResponse.numCalls + 1
+        };
+        expect(selectStats(trackedWalletProvider.stats).value).toEqual(statsAfterFailureCall);
+        await failure;
+        expect(selectStats(trackedWalletProvider.stats).value).toEqual({
+          ...statsAfterFailureCall,
+          didLastRequestFail: true,
+          numFailures: 1
+        });
         trackedWalletProvider.stats.reset();
         expect(selectStats(trackedWalletProvider.stats).value).toEqual(CLEAN_FN_STATS);
       };
@@ -36,7 +56,8 @@ describe('TrackedWalletProvider', () => {
       'currentWalletProtocolParameters',
       testFunctionStats(
         (wp) => wp.currentWalletProtocolParameters(),
-        (stats) => stats.currentWalletProtocolParameters$
+        (stats) => stats.currentWalletProtocolParameters$,
+        (mockWP) => mockWP.currentWalletProtocolParameters
       )
     );
 
@@ -44,7 +65,8 @@ describe('TrackedWalletProvider', () => {
       'genesisParameters',
       testFunctionStats(
         (wp) => wp.genesisParameters(),
-        (stats) => stats.genesisParameters$
+        (stats) => stats.genesisParameters$,
+        (mockWP) => mockWP.genesisParameters
       )
     );
 
@@ -52,7 +74,8 @@ describe('TrackedWalletProvider', () => {
       'ledgerTip',
       testFunctionStats(
         (wp) => wp.ledgerTip(),
-        (stats) => stats.ledgerTip$
+        (stats) => stats.ledgerTip$,
+        (mockWP) => mockWP.ledgerTip
       )
     );
 
@@ -60,7 +83,8 @@ describe('TrackedWalletProvider', () => {
       'networkInfo',
       testFunctionStats(
         (wp) => wp.networkInfo(),
-        (stats) => stats.networkInfo$
+        (stats) => stats.networkInfo$,
+        (mockWP) => mockWP.networkInfo
       )
     );
 
@@ -68,7 +92,8 @@ describe('TrackedWalletProvider', () => {
       'queryBlocksByHashes',
       testFunctionStats(
         (wp) => wp.queryBlocksByHashes([]),
-        (stats) => stats.queryBlocksByHashes$
+        (stats) => stats.queryBlocksByHashes$,
+        (mockWP) => mockWP.queryBlocksByHashes
       )
     );
 
@@ -76,7 +101,8 @@ describe('TrackedWalletProvider', () => {
       'queryTransactionsByAddresses',
       testFunctionStats(
         (wp) => wp.queryTransactionsByAddresses([]),
-        (stats) => stats.queryTransactionsByAddresses$
+        (stats) => stats.queryTransactionsByAddresses$,
+        (mockWP) => mockWP.queryTransactionsByAddresses
       )
     );
 
@@ -84,15 +110,17 @@ describe('TrackedWalletProvider', () => {
       'queryTransactionsByHashes',
       testFunctionStats(
         (wp) => wp.queryTransactionsByHashes([]),
-        (stats) => stats.queryTransactionsByHashes$
+        (stats) => stats.queryTransactionsByHashes$,
+        (mockWP) => mockWP.queryTransactionsByHashes
       )
     );
 
     test(
       'rewardsHistory',
       testFunctionStats(
-        (wp) => wp.rewardsHistory({ stakeAddresses: [] }),
-        (stats) => stats.rewardsHistory$
+        (wp) => wp.rewardsHistory({ rewardAccounts: [] }),
+        (stats) => stats.rewardsHistory$,
+        (mockWP) => mockWP.rewardsHistory
       )
     );
 
@@ -100,7 +128,8 @@ describe('TrackedWalletProvider', () => {
       'utxoDelegationAndRewards',
       testFunctionStats(
         (wp) => wp.utxoDelegationAndRewards([]),
-        (stats) => stats.utxoDelegationAndRewards$
+        (stats) => stats.utxoDelegationAndRewards$,
+        (mockWP) => mockWP.utxoDelegationAndRewards
       )
     );
 
@@ -108,7 +137,8 @@ describe('TrackedWalletProvider', () => {
       'stakePoolStats',
       testFunctionStats(
         (wp) => wp.stakePoolStats!(),
-        (stats) => stats.stakePoolStats$
+        (stats) => stats.stakePoolStats$,
+        (mockWP) => mockWP.stakePoolStats
       )
     );
   });

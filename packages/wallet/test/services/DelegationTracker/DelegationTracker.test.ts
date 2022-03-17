@@ -46,7 +46,8 @@ describe('DelegationTracker', () => {
           createStubTxWithCertificates(),
           createStubTxWithCertificates([Cardano.CertificateType.StakeKeyDeregistration])
         ];
-        const blockEpochProvider = jest.fn().mockReturnValue(cold('-a', { a: [284, 285] }));
+        const slotEpochCalc = jest.fn().mockReturnValueOnce(284).mockReturnValueOnce(285);
+        const slotEpochCalc$ = cold('-a', { a: slotEpochCalc });
         const target$ = certificateTransactionsWithEpochs(
           {
             history: {
@@ -55,7 +56,7 @@ describe('DelegationTracker', () => {
               })
             }
           } as unknown as TransactionsTracker,
-          blockEpochProvider,
+          slotEpochCalc$,
           [Cardano.CertificateType.StakeDelegation, Cardano.CertificateType.StakeKeyDeregistration]
         );
         expectObservable(target$).toBe('-a', {

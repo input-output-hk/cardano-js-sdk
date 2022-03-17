@@ -1,5 +1,6 @@
+import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
+import { BlockfrostToCore, BlockfrostTransactionContent, BlockfrostUtxo } from './BlockfrostToCore';
 import {
-  BigIntMath,
   Cardano,
   EpochRange,
   EpochRewards,
@@ -8,20 +9,25 @@ import {
   ProviderUtil,
   WalletProvider
 } from '@cardano-sdk/core';
-import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
-import { BlockfrostToCore, BlockfrostTransactionContent, BlockfrostUtxo } from './BlockfrostToCore';
 import { PaginationOptions } from '@blockfrost/blockfrost-js/lib/types';
 import { dummyLogger } from 'ts-log';
 import { fetchSequentially, formatBlockfrostError, jsonToMetadatum, toProviderError } from './util';
-import { flatten, groupBy } from 'lodash-es';
+import { orderBy } from 'lodash-es';
 
 const fetchByAddressSequentially = async <Item, Response>(props: {
   address: Cardano.Address;
   request: (address: Cardano.Address, pagination: PaginationOptions) => Promise<Response[]>;
   responseTranslator?: (address: Cardano.Address, response: Response[]) => Item[];
+  /**
+   * @returns true to indicatate that current result set should be returned
+   */
+  haveEnoughItems?: (items: Item[]) => boolean;
+  paginationOptions?: PaginationOptions;
 }): Promise<Item[]> =>
   fetchSequentially({
     arg: props.address,
+    haveEnoughItems: props.haveEnoughItems,
+    paginationOptions: props.paginationOptions,
     request: props.request,
     responseTranslator: props.responseTranslator
       ? (response, arg) => props.responseTranslator!(arg, response)
@@ -318,7 +324,10 @@ export const blockfrostWalletProvider = (blockfrost: BlockFrostAPI, logger = dum
   const queryTransactionsByHashes: WalletProvider['queryTransactionsByHashes'] = async (hashes) =>
     Promise.all(hashes.map(fetchTransaction));
 
-  const queryTransactionsByAddresses: WalletProvider['queryTransactionsByAddresses'] = async (addresses) => {
+  const queryTransactionsByAddresses: WalletProvider['queryTransactionsByAddresses'] = async (
+    addresses,
+    sinceBlock
+  ) => {
     const addressTransactions = await Promise.all(
       addresses.map(async (address) =>
         fetchByAddressSequentially<
@@ -326,18 +335,24 @@ export const blockfrostWalletProvider = (blockfrost: BlockFrostAPI, logger = dum
           BlockfrostTransactionContent
         >({
           address,
+          haveEnoughItems: sinceBlock
+            ? (transactions) =>
+                transactions.length > 0 && transactions[transactions.length - 1].block_height < sinceBlock
+            : undefined,
+          paginationOptions: { count: 5, order: 'desc' },
           request: (addr: Cardano.Address, pagination) => blockfrost.addressesTransactions(addr.toString(), pagination)
         })
       )
     );
 
-    const transactionsArray = await Promise.all(
-      addressTransactions.map((transactionArray) =>
-        queryTransactionsByHashes(transactionArray.map(({ tx_hash }) => Cardano.TransactionId(tx_hash)))
-      )
-    );
+    const allTransactions = orderBy(addressTransactions.flat(1), ['block_height', 'tx_index']);
+    const addressTransactionsSinceBlock = sinceBlock
+      ? allTransactions.filter(({ block_height }) => block_height >= sinceBlock)
+      : allTransactions;
 
-    return transactionsArray.flat(1);
+    return queryTransactionsByHashes(
+      addressTransactionsSinceBlock.map(({ tx_hash }) => Cardano.TransactionId(tx_hash))
+    );
   };
 
   const accountRewards = async (
@@ -358,19 +373,15 @@ export const blockfrostWalletProvider = (blockfrost: BlockFrostAPI, logger = dum
             rewards: BigInt(amount)
           }))
       );
-      haveMorePages = rewards.length === 100 && rewards[rewards.length - 1].epoch < upperBound;
+      haveMorePages = rewards.length === batchSize && rewards[rewards.length - 1].epoch < upperBound;
       page += 1;
     }
     return result;
   };
 
-  const rewardsHistory: WalletProvider['rewardsHistory'] = async ({ stakeAddresses, epochs }) => {
-    const allAddressRewards = await Promise.all(stakeAddresses.map((address) => accountRewards(address, epochs)));
-    const accountRewardsByEpoch = groupBy(flatten(allAddressRewards), ({ epoch }) => epoch);
-    return Object.keys(accountRewardsByEpoch).map((key) => ({
-      epoch: accountRewardsByEpoch[key][0].epoch,
-      rewards: BigIntMath.sum(accountRewardsByEpoch[key].map(({ rewards }) => rewards))
-    }));
+  const rewardsHistory: WalletProvider['rewardsHistory'] = async ({ rewardAccounts, epochs }) => {
+    const allAddressRewards = await Promise.all(rewardAccounts.map((address) => accountRewards(address, epochs)));
+    return new Map(allAddressRewards.map((rewards, i) => [rewardAccounts[i], rewards]));
   };
 
   const genesisParameters: WalletProvider['genesisParameters'] = async () => {

@@ -5,10 +5,14 @@ import { createGraphQLWalletProviderFromSdk } from '../../src/WalletProvider/Car
 
 describe('CardanoGraphQLWalletProvider.rewardsHistory', () => {
   let provider: WalletProvider;
-  const addresses: Cardano.RewardAccount[] = [];
+  const addresses: Cardano.RewardAccount[] = [
+    Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27'),
+    Cardano.RewardAccount('stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d')
+  ];
   const sdk = { MemberRewardsHistory: jest.fn() };
   const rawRewards = [
     {
+      address: addresses[0],
       rewards: [
         {
           epochNo: 2,
@@ -21,6 +25,7 @@ describe('CardanoGraphQLWalletProvider.rewardsHistory', () => {
       ]
     },
     {
+      address: addresses[1].toString(),
       rewards: [
         {
           epochNo: 1,
@@ -36,18 +41,31 @@ describe('CardanoGraphQLWalletProvider.rewardsHistory', () => {
 
   beforeEach(() => (provider = createGraphQLWalletProviderFromSdk(sdk as unknown as Sdk)));
 
-  it('sums rewards of all addresses per epoch', async () => {
+  it('groups rewards by reward account address', async () => {
     sdk.MemberRewardsHistory.mockResolvedValueOnce({
       queryRewardAccount: rawRewards
     });
     const rewardsHistory = await provider.rewardsHistory({
-      stakeAddresses: addresses
+      rewardAccounts: addresses
     });
-    expect(rewardsHistory).toEqual([
-      { epoch: 1, rewards: 2n },
-      { epoch: 2, rewards: 3n },
-      { epoch: 3, rewards: 1n }
-    ] as EpochRewards[]);
+    expect(rewardsHistory).toEqual(
+      new Map<Cardano.RewardAccount, EpochRewards[]>([
+        [
+          addresses[0],
+          [
+            { epoch: 2, rewards: 1n },
+            { epoch: 3, rewards: 1n }
+          ]
+        ],
+        [
+          addresses[1],
+          [
+            { epoch: 1, rewards: 2n },
+            { epoch: 2, rewards: 2n }
+          ]
+        ]
+      ])
+    );
   });
 
   it('filters results by provided epoch range', async () => {
@@ -56,7 +74,7 @@ describe('CardanoGraphQLWalletProvider.rewardsHistory', () => {
     });
     await provider.rewardsHistory({
       epochs: { lowerBound: 2, upperBound: 3 },
-      stakeAddresses: addresses
+      rewardAccounts: addresses
     });
     expect(sdk.MemberRewardsHistory).toBeCalledWith({
       fromEpochNo: 2,
@@ -65,8 +83,8 @@ describe('CardanoGraphQLWalletProvider.rewardsHistory', () => {
     });
   });
 
-  it('returns an empty array on undefined response', async () => {
+  it('returns an empty map on undefined response', async () => {
     sdk.MemberRewardsHistory.mockResolvedValueOnce({});
-    expect(await provider.rewardsHistory({ stakeAddresses: addresses })).toEqual([]);
+    expect(await provider.rewardsHistory({ rewardAccounts: addresses })).toEqual(new Map());
   });
 });

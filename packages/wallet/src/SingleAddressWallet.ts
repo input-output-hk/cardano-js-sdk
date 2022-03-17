@@ -18,8 +18,9 @@ import {
   BehaviorObservable,
   DelegationTracker,
   FailedTx,
+  PersistentDocumentTrackerSubject,
   PollingConfig,
-  SyncableIntervalTrackerSubject,
+  SyncableIntervalPersistentDocumentTrackerSubject,
   TrackedTxSubmitProvider,
   TrackedWalletProvider,
   TrackerSubject,
@@ -48,6 +49,7 @@ import { Logger, dummyLogger } from 'ts-log';
 import { Observable, Subject, combineLatest, firstValueFrom, lastValueFrom, map, take } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TxInternals, createTransactionInternals, ensureValidityInterval } from './Transaction';
+import { WalletStores, createInMemoryWalletStores } from './persistence';
 import { createProviderStatusTracker } from './services/ProviderStatusTracker';
 import { isEqual } from 'lodash-es';
 
@@ -65,6 +67,7 @@ export interface SingleAddressWalletDependencies {
   readonly assetProvider: AssetProvider;
   readonly timeSettingsProvider: TimeSettingsProvider;
   readonly inputSelector?: InputSelector;
+  readonly stores?: WalletStores;
   readonly logger?: Logger;
 }
 
@@ -72,7 +75,7 @@ export class SingleAddressWallet implements Wallet {
   #inputSelector: InputSelector;
   #keyAgent: KeyAgent;
   #logger: Logger;
-  #tip$: SyncableIntervalTrackerSubject<Cardano.Tip>;
+  #tip$: SyncableIntervalPersistentDocumentTrackerSubject<Cardano.Tip>;
   #newTransactions = {
     failedToSubmit$: new Subject<FailedTx>(),
     pending$: new Subject<Cardano.NewTxAlonzo>(),
@@ -115,7 +118,8 @@ export class SingleAddressWallet implements Wallet {
       assetProvider,
       timeSettingsProvider,
       logger = dummyLogger,
-      inputSelector = roundRobinRandomImprove()
+      inputSelector = roundRobinRandomImprove(),
+      stores = createInMemoryWalletStores()
     }: SingleAddressWalletDependencies
   ) {
     this.#logger = logger;
@@ -125,23 +129,28 @@ export class SingleAddressWallet implements Wallet {
     this.#keyAgent = keyAgent;
     this.addresses$ = new TrackerSubject<GroupedAddress[]>(this.#initializeAddress(keyAgent.knownAddresses));
     this.name = name;
-    this.#tip$ = this.tip$ = new SyncableIntervalTrackerSubject({
+    this.#tip$ = this.tip$ = new SyncableIntervalPersistentDocumentTrackerSubject({
       pollInterval,
-      provider$: coldObservableProvider(this.walletProvider.ledgerTip, retryBackoffConfig)
+      provider$: coldObservableProvider(this.walletProvider.ledgerTip, retryBackoffConfig),
+      store: stores.tip
     });
     const tipBlockHeight$ = distinctBlock(this.tip$);
-    this.networkInfo$ = new TrackerSubject(
-      coldObservableProvider(this.walletProvider.networkInfo, retryBackoffConfig, tipBlockHeight$, isEqual)
+    this.networkInfo$ = new PersistentDocumentTrackerSubject(
+      coldObservableProvider(this.walletProvider.networkInfo, retryBackoffConfig, tipBlockHeight$, isEqual),
+      stores.networkInfo
     );
     const epoch$ = distinctEpoch(this.networkInfo$);
-    this.timeSettings$ = new TrackerSubject(
-      coldObservableProvider(timeSettingsProvider, retryBackoffConfig, epoch$, isEqual)
+    this.timeSettings$ = new PersistentDocumentTrackerSubject(
+      coldObservableProvider(timeSettingsProvider, retryBackoffConfig, epoch$, isEqual),
+      stores.timeSettings
     );
-    this.protocolParameters$ = new TrackerSubject(
-      coldObservableProvider(this.walletProvider.currentWalletProtocolParameters, retryBackoffConfig, epoch$, isEqual)
+    this.protocolParameters$ = new PersistentDocumentTrackerSubject(
+      coldObservableProvider(this.walletProvider.currentWalletProtocolParameters, retryBackoffConfig, epoch$, isEqual),
+      stores.protocolParameters
     );
-    this.genesisParameters$ = new TrackerSubject(
-      coldObservableProvider(this.walletProvider.genesisParameters, retryBackoffConfig, epoch$, isEqual)
+    this.genesisParameters$ = new PersistentDocumentTrackerSubject(
+      coldObservableProvider(this.walletProvider.genesisParameters, retryBackoffConfig, epoch$, isEqual),
+      stores.genesisParameters
     );
 
     const addresses$ = this.addresses$.pipe(
@@ -151,12 +160,14 @@ export class SingleAddressWallet implements Wallet {
       addresses$,
       newTransactions: this.#newTransactions,
       retryBackoffConfig,
+      store: stores.transactions,
       tip$: this.tip$,
       walletProvider: this.walletProvider
     });
     this.utxo = createUtxoTracker({
       addresses$,
       retryBackoffConfig,
+      store: stores.utxo,
       tipBlockHeight$,
       transactionsInFlight$: this.transactions.outgoing.inFlight$,
       walletProvider: this.walletProvider
@@ -168,11 +179,13 @@ export class SingleAddressWallet implements Wallet {
         map((addresses) => addresses.map((groupedAddress) => groupedAddress.rewardAccount))
       ),
       stakePoolSearchProvider,
+      stores,
+      timeSettings$: this.timeSettings$,
       transactionsTracker: this.transactions,
       walletProvider: this.walletProvider
     });
     this.balance = createBalanceTracker(this.protocolParameters$, this.utxo, this.delegation);
-    this.assets$ = new TrackerSubject(
+    this.assets$ = new PersistentDocumentTrackerSubject(
       createAssetsTracker({
         assetProvider,
         balanceTracker: this.balance,
@@ -182,7 +195,8 @@ export class SingleAddressWallet implements Wallet {
           this.transactions.history.all$.pipe(map((txs) => txs.map(({ tx }) => tx)))
         ),
         retryBackoffConfig
-      })
+      }),
+      stores.assets
     );
     this.syncStatus$ = createProviderStatusTracker(
       { walletProvider: this.walletProvider },

@@ -1,9 +1,8 @@
 import { Asset, AssetProvider, Cardano, NftMetadataProvider } from '@cardano-sdk/core';
-import { Assets } from '../types';
 import { Balance, TransactionalTracker } from './types';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { coldObservableProvider } from './util';
-import { distinct, from, map, mergeMap, of, scan, startWith } from 'rxjs';
+import { distinct, from, map, mergeMap, of, scan } from 'rxjs';
 
 export const createAssetService =
   (assetProvider: AssetProvider, retryBackoffConfig: RetryBackoffConfig) => (assetId: Cardano.AssetId) =>
@@ -47,6 +46,5 @@ export const createAssetsTracker = (
     distinct(),
     mergeMap((assetId) => assetService(assetId)),
     mergeMap((asset) => nftMetadataService(asset).pipe(map((nftMetadata) => ({ ...asset, nftMetadata })))),
-    scan((assets, asset) => new Map([...assets, [asset.assetId, asset]]), new Map<Cardano.AssetId, Asset.AssetInfo>()),
-    startWith({} as Assets)
+    scan((assets, asset) => new Map([...assets, [asset.assetId, asset]]), new Map<Cardano.AssetId, Asset.AssetInfo>())
   );

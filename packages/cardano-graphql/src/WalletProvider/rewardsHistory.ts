@@ -1,26 +1,26 @@
-import { BigIntMath, EpochRewards, WalletProvider, util } from '@cardano-sdk/core';
+import { Cardano, WalletProvider, util } from '@cardano-sdk/core';
 import { WalletProviderFnProps } from './WalletProviderFnProps';
 import { groupBy } from 'lodash-es';
 
 export const rewardsHistoryProvider =
   ({ sdk }: WalletProviderFnProps): WalletProvider['rewardsHistory'] =>
-  async ({ stakeAddresses, epochs }) => {
+  async ({ rewardAccounts, epochs }) => {
     const { queryRewardAccount } = await sdk.MemberRewardsHistory({
       fromEpochNo: epochs?.lowerBound,
-      rewardAccounts: stakeAddresses as unknown as string[],
+      rewardAccounts: rewardAccounts as unknown as string[],
       toEpochNo: epochs?.upperBound
     });
     const rawRewards = queryRewardAccount?.filter(util.isNotNil) || [];
-    const rewardsByEpoch = groupBy(
-      rawRewards.flatMap(({ rewards }): EpochRewards[] =>
-        rewards.map(({ epochNo, quantity }) => ({ epoch: epochNo, rewards: BigInt(quantity) }))
+    const rewardsByAddress = groupBy(
+      rawRewards.flatMap(({ rewards, address }) =>
+        rewards.map(({ epochNo, quantity }) => ({ address, epoch: epochNo, rewards: BigInt(quantity) }))
       ),
-      ({ epoch }) => epoch
+      ({ address }) => address
     );
-    return Object.keys(rewardsByEpoch).map(
-      (epoch): EpochRewards => ({
-        epoch: Number.parseInt(epoch),
-        rewards: BigIntMath.sum(rewardsByEpoch[epoch].map(({ rewards }) => rewards))
-      })
+    return new Map(
+      Object.keys(rewardsByAddress).map((rewardAccount) => [
+        Cardano.RewardAccount(rewardAccount),
+        rewardsByAddress[rewardAccount].map(({ epoch, rewards }) => ({ epoch, rewards }))
+      ])
     );
   };

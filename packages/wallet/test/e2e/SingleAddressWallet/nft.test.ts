@@ -15,24 +15,31 @@ describe('SingleAddressWallet.assets/nft', () => {
   let wallet: Wallet;
 
   beforeAll(async () => {
+    const keyAgent = await keyAgentReady;
+    Object.defineProperty(keyAgent, 'knownAddresses', {
+      get() {
+        return [
+          {
+            accountIndex: 0,
+            address: Cardano.Address(
+              // eslint-disable-next-line max-len
+              'addr_test1qpapna8hhj2hx2q2s9mdp7995a3hgundyvvvj0v0yq68lt8e6dgndgyep9stycsnejcnu8vm7a6dtqqhmf362z7fy5ksg46rum'
+            ),
+            index: 0,
+            networkId: Cardano.NetworkId.testnet,
+            rewardAccount: Cardano.RewardAccount('stake_test1uruax5fk5zvsjc9jvgfuevf7rkdlwax4sqta5ca9p0yj2tg4cf29e'),
+            type: KeyManagement.AddressType.External
+          }
+        ];
+      }
+    });
     wallet = new SingleAddressWallet(
       {
-        address: {
-          accountIndex: 0,
-          address: Cardano.Address(
-            // eslint-disable-next-line max-len
-            'addr_test1qpapna8hhj2hx2q2s9mdp7995a3hgundyvvvj0v0yq68lt8e6dgndgyep9stycsnejcnu8vm7a6dtqqhmf362z7fy5ksg46rum'
-          ),
-          index: 0,
-          networkId: Cardano.NetworkId.testnet,
-          rewardAccount: Cardano.RewardAccount('stake_test1uruax5fk5zvsjc9jvgfuevf7rkdlwax4sqta5ca9p0yj2tg4cf29e'),
-          type: KeyManagement.AddressType.External
-        },
         name: 'Test Wallet'
       },
       {
         assetProvider,
-        keyAgent: await keyAgentReady,
+        keyAgent,
         stakePoolSearchProvider,
         timeSettingsProvider,
         txSubmitProvider,

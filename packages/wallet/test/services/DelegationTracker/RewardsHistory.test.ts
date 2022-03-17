@@ -1,34 +1,26 @@
-import { AddressType, KeyAgent } from '../../../src/KeyManagement';
 import { Cardano } from '@cardano-sdk/core';
+import { InMemoryRewardsHistoryStore } from '../../../src/persistence';
 import { RewardsHistory, createRewardsHistoryProvider, createRewardsHistoryTracker } from '../../../src/services';
 import { createStubTxWithCertificates } from './stub-tx';
 import { createTestScheduler } from '../../testScheduler';
-import { firstValueFrom, from } from 'rxjs';
-import { mockWalletProvider, rewardsHistory, testKeyAgent } from '../../mocks';
+import { firstValueFrom, of } from 'rxjs';
+import { mockWalletProvider, rewardAccount, rewardsHistory } from '../../mocks';
 
 describe('RewardsHistory', () => {
-  let keyAgent: KeyAgent;
-  beforeAll(async () => {
-    keyAgent = await testKeyAgent();
-  });
+  const rewardAccounts = [rewardAccount];
 
   test('createRewardsHistoryProvider', async () => {
-    const provider = createRewardsHistoryProvider(
-      mockWalletProvider(),
-      from(
-        keyAgent.deriveAddress({ index: 0, type: AddressType.External }).then(({ rewardAccount }) => [rewardAccount])
-      ),
-      {
-        initialInterval: 1
-      }
-    );
-    expect(await firstValueFrom(provider(1))).toBe(rewardsHistory);
+    const provider = createRewardsHistoryProvider(mockWalletProvider(), {
+      initialInterval: 1
+    });
+    expect(await firstValueFrom(provider(rewardAccounts, 1))).toBe(rewardsHistory);
   });
 
   describe('createRewardsHistoryTracker', () => {
     it('queries and maps reward history starting from first delgation epoch+3', () => {
       createTestScheduler().run(({ cold, expectObservable, flush }) => {
-        const epoch = rewardsHistory[0].epoch;
+        const accountRewardsHistory = rewardsHistory.get(rewardAccount)!;
+        const epoch = accountRewardsHistory[0].epoch;
         const getRewardsHistory = jest.fn().mockReturnValue(cold('-a', { a: rewardsHistory }));
         const target$ = createRewardsHistoryTracker(
           cold('aa', {
@@ -43,20 +35,24 @@ describe('RewardsHistory', () => {
               }
             ]
           }),
-          getRewardsHistory
+          of(rewardAccounts),
+          getRewardsHistory,
+          new InMemoryRewardsHistoryStore()
         );
         expectObservable(target$).toBe('-a', {
           a: {
-            all: rewardsHistory,
+            all: accountRewardsHistory,
             avgReward: 10_500n,
-            lastReward: rewardsHistory[1],
+            lastReward: accountRewardsHistory[1],
             lifetimeRewards: 21_000n
           } as RewardsHistory
         });
         flush();
         expect(getRewardsHistory).toBeCalledTimes(1);
-        expect(getRewardsHistory).toBeCalledWith(epoch + 3);
+        expect(getRewardsHistory).toBeCalledWith(rewardAccounts, epoch + 3);
       });
     });
+
+    it.todo('emits value from store if it exists and updates store after provider response');
   });
 });

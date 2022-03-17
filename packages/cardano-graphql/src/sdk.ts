@@ -1777,6 +1777,7 @@ export type AddTokenPayloadTokenArgs = {
 export type AddTransactionInput = {
   auxiliaryData?: InputMaybe<AuxiliaryDataRef>;
   block: BlockRef;
+  blockHeight: Scalars['Int'];
   certificates?: InputMaybe<Array<CertificateRef>>;
   collateral?: InputMaybe<Array<TransactionInputRef>>;
   deposit: Scalars['Int64'];
@@ -11214,6 +11215,7 @@ export type Transaction = {
   __typename?: 'Transaction';
   auxiliaryData?: Maybe<AuxiliaryData>;
   block: Block;
+  blockHeight: Scalars['Int'];
   certificates?: Maybe<Array<Certificate>>;
   collateral?: Maybe<Array<TransactionInput>>;
   collateralAggregate?: Maybe<TransactionInputAggregateResult>;
@@ -11352,6 +11354,10 @@ export type TransactionWitnessArgs = {
 
 export type TransactionAggregateResult = {
   __typename?: 'TransactionAggregateResult';
+  blockHeightAvg?: Maybe<Scalars['Float']>;
+  blockHeightMax?: Maybe<Scalars['Int']>;
+  blockHeightMin?: Maybe<Scalars['Int']>;
+  blockHeightSum?: Maybe<Scalars['Int']>;
   count?: Maybe<Scalars['Int']>;
   depositAvg?: Maybe<Scalars['Float']>;
   depositMax?: Maybe<Scalars['Int64']>;
@@ -11381,6 +11387,7 @@ export type TransactionAggregateResult = {
 
 export type TransactionFilter = {
   and?: InputMaybe<Array<InputMaybe<TransactionFilter>>>;
+  blockHeight?: InputMaybe<IntFilter>;
   has?: InputMaybe<Array<InputMaybe<TransactionHasFilter>>>;
   hash?: InputMaybe<StringHashFilter>;
   not?: InputMaybe<TransactionFilter>;
@@ -11390,6 +11397,7 @@ export type TransactionFilter = {
 export enum TransactionHasFilter {
   AuxiliaryData = 'auxiliaryData',
   Block = 'block',
+  BlockHeight = 'blockHeight',
   Certificates = 'certificates',
   Collateral = 'collateral',
   Deposit = 'deposit',
@@ -11506,6 +11514,7 @@ export type TransactionOrder = {
 };
 
 export enum TransactionOrderable {
+  BlockHeight = 'blockHeight',
   Deposit = 'deposit',
   Fee = 'fee',
   Hash = 'hash',
@@ -11598,6 +11607,7 @@ export type TransactionOutputRef = {
 export type TransactionPatch = {
   auxiliaryData?: InputMaybe<AuxiliaryDataRef>;
   block?: InputMaybe<BlockRef>;
+  blockHeight?: InputMaybe<Scalars['Int']>;
   certificates?: InputMaybe<Array<CertificateRef>>;
   collateral?: InputMaybe<Array<TransactionInputRef>>;
   deposit?: InputMaybe<Scalars['Int64']>;
@@ -11620,6 +11630,7 @@ export type TransactionPatch = {
 export type TransactionRef = {
   auxiliaryData?: InputMaybe<AuxiliaryDataRef>;
   block?: InputMaybe<BlockRef>;
+  blockHeight?: InputMaybe<Scalars['Int']>;
   certificates?: InputMaybe<Array<CertificateRef>>;
   collateral?: InputMaybe<Array<TransactionInputRef>>;
   deposit?: InputMaybe<Scalars['Int64']>;
@@ -13480,7 +13491,7 @@ export type MemberRewardsHistoryQueryVariables = Exact<{
 }>;
 
 
-export type MemberRewardsHistoryQuery = { __typename?: 'Query', queryRewardAccount?: Array<{ __typename?: 'RewardAccount', rewards: Array<{ __typename?: 'Reward', epochNo: number, quantity: number | bigint }> } | null> | null };
+export type MemberRewardsHistoryQuery = { __typename?: 'Query', queryRewardAccount?: Array<{ __typename?: 'RewardAccount', address: string, rewards: Array<{ __typename?: 'Reward', epochNo: number, quantity: number | bigint }> } | null> | null };
 
 export type CertificateTransactionFieldsFragment = { __typename?: 'Transaction', hash: string, block: { __typename?: 'Block', blockNo: number } };
 
@@ -13549,6 +13560,7 @@ export type TransactionsByHashesQuery = { __typename?: 'Query', queryProtocolPar
 
 export type TransactionsByAddressesQueryVariables = Exact<{
   addresses: Array<Scalars['String']> | Scalars['String'];
+  sinceBlock?: InputMaybe<Scalars['Int']>;
 }>;
 
 
@@ -14128,6 +14140,7 @@ export const NetworkInfoDocument = gql`
 export const MemberRewardsHistoryDocument = gql`
     query MemberRewardsHistory($rewardAccounts: [String!]!, $fromEpochNo: Int = 0, $toEpochNo: Int = 2147483647) {
   queryRewardAccount(filter: {address: {in: $rewardAccounts}}) {
+    address
     rewards(
       filter: {source: {eq: "member"}, and: {epochNo: {gt: $fromEpochNo}, and: {epochNo: {lt: $toEpochNo}}}}
     ) {
@@ -14180,18 +14193,18 @@ export const TransactionsByHashesDocument = gql`
     ${ProtocolParametersFragmentDoc}
 ${CoreTransactionFieldsFragmentDoc}`;
 export const TransactionsByAddressesDocument = gql`
-    query TransactionsByAddresses($addresses: [String!]!) {
+    query TransactionsByAddresses($addresses: [String!]!, $sinceBlock: Int) {
   queryProtocolParametersAlonzo {
     ...protocolParameters
   }
   queryAddress(filter: {address: {in: $addresses}}) {
     inputs {
-      transaction {
+      transaction(filter: {blockHeight: {ge: $sinceBlock}}) {
         ...coreTransactionFields
       }
     }
     utxo {
-      transaction {
+      transaction(filter: {blockHeight: {ge: $sinceBlock}}) {
         ...coreTransactionFields
       }
     }

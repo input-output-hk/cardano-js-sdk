@@ -1,19 +1,21 @@
 import { Cardano, WalletProvider } from '@cardano-sdk/core';
+import { CollectionStore } from '../persistence';
 import { Observable, combineLatest, map, switchMap } from 'rxjs';
+import { PersistentCollectionTrackerSubject, TrackerSubject, coldObservableProvider, utxoEquals } from './util';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { TrackerSubject, coldObservableProvider, utxoEquals } from './util';
 import { TransactionalTracker } from './types';
 
 export interface UtxoTrackerProps {
   walletProvider: WalletProvider;
   addresses$: Observable<Cardano.Address[]>;
+  store: CollectionStore<Cardano.Utxo>;
   transactionsInFlight$: Observable<Cardano.NewTxAlonzo[]>;
   tipBlockHeight$: Observable<number>;
   retryBackoffConfig: RetryBackoffConfig;
 }
 
 export interface UtxoTrackerInternals {
-  utxoSource$?: TrackerSubject<Cardano.Utxo[]>;
+  utxoSource$?: PersistentCollectionTrackerSubject<Cardano.Utxo>;
 }
 
 export const createUtxoProvider = (
@@ -34,10 +36,11 @@ export const createUtxoProvider = (
   );
 
 export const createUtxoTracker = (
-  { walletProvider, addresses$, transactionsInFlight$, retryBackoffConfig, tipBlockHeight$ }: UtxoTrackerProps,
+  { walletProvider, addresses$, store, transactionsInFlight$, retryBackoffConfig, tipBlockHeight$ }: UtxoTrackerProps,
   {
-    utxoSource$ = new TrackerSubject(
-      createUtxoProvider(walletProvider, addresses$, tipBlockHeight$, retryBackoffConfig)
+    utxoSource$ = new PersistentCollectionTrackerSubject<Cardano.Utxo>(
+      () => createUtxoProvider(walletProvider, addresses$, tipBlockHeight$, retryBackoffConfig),
+      store
     )
   }: UtxoTrackerInternals = {}
 ): TransactionalTracker<Cardano.Utxo[]> => {

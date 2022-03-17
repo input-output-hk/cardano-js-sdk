@@ -38,14 +38,12 @@ describe('util', () => {
       .mockResolvedValueOnce(batch2)
       .mockResolvedValueOnce(batch3);
     const arg = 'arg';
-    const result = await fetchSequentially(
-      {
-        arg,
-        request,
-        responseTranslator: (items: Array<typeof batch1[0]>, arg0) => items.map(({ a }) => ({ arg: arg0, b: a }))
-      },
-      2
-    );
+    const result = await fetchSequentially({
+      arg,
+      paginationOptions: { count: 2 },
+      request,
+      responseTranslator: (items: Array<typeof batch1[0]>, arg0) => items.map(({ a }) => ({ arg: arg0, b: a }))
+    });
     expect(result).toEqual([
       { arg, b: 1 },
       { arg, b: 2 },

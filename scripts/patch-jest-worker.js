@@ -6,7 +6,7 @@ const pathToMessageParentJs = path.join(__dirname, '../node_modules/jest-worker/
 
 const originalContents = fs.readFileSync(pathToMessageParentJs).toString();
 const patch = `try {
-  parentProcess.send([_types().PARENT_MESSAGE_CUSTOM, message]);
+  parentProcess.send([_types.PARENT_MESSAGE_CUSTOM, message]);
 } catch (error) {
   console.error('jest-worker message serialisation failed', error);
   console.dir(message, {depth: 10});
@@ -17,7 +17,7 @@ if (originalContents.includes(patch)) {
   console.log(pathToMessageParentJs, 'is already patched, nothing to do...');
 } else {
   const patchedContents = originalContents.replace(
-    'parentProcess.send([_types().PARENT_MESSAGE_CUSTOM, message]);',
+    'parentProcess.send([_types.PARENT_MESSAGE_CUSTOM, message]);',
     patch
   );
 

@@ -53,8 +53,15 @@ export const createProviderStatusTracker = (
 ): TrackerSubject<SyncStatus> => {
   const relevantStats = getProviderSyncRelevantStats(walletProvider);
   const upToDate$ = relevantStats.pipe(
-    skipWhile((allStats) => allStats.every(({ numCalls, numResponses }) => numCalls === 0 && numResponses === 0)),
-    mergeMap((allStats) => (allStats.some(({ numCalls, numResponses }) => numCalls > numResponses) ? EMPTY : of(true)))
+    skipWhile((allStats) => allStats.every(({ numCalls }) => numCalls === 0)),
+    mergeMap((allStats) =>
+      allStats.some(
+        ({ numCalls, numFailures, numResponses, didLastRequestFail }) =>
+          didLastRequestFail || numCalls > numResponses + numFailures
+      )
+        ? EMPTY
+        : of(true)
+    )
   );
   return new TrackerSubject<SyncStatus>(
     concat(

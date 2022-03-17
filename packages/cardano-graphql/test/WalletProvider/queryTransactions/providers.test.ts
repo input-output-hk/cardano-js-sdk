@@ -51,8 +51,8 @@ describe('WalletProvider/queryTransactions/providers', () => {
     it('fetches transactions from sdk and maps them to core types, filtering out duplicates', async () => {
       const tx1 = 'tx1';
       const tx2 = 'tx2';
-      const result1 = { id: 'core-tx1' };
-      const result2 = { id: 'core-tx2' };
+      const result1 = { blockHeader: { blockNo: 1 }, id: 'core-tx1' };
+      const result2 = { blockHeader: { blockNo: 2 }, id: 'core-tx2' };
       const queryAddress = [{ inputs: [{ transaction: tx1 }, { transaction: tx1 }], utxo: [{ transaction: tx2 }] }];
       const queryProtocolParametersAlonzo = 'queryProtocolParametersAlonzo';
       sdk.TransactionsByAddresses.mockReturnValueOnce({ queryAddress, queryProtocolParametersAlonzo });

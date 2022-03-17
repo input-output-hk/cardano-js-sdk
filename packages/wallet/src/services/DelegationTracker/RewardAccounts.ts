@@ -1,7 +1,8 @@
 /* eslint-disable unicorn/no-nested-ternary */
 import { BigIntMath, Cardano, StakePoolSearchProvider, WalletProvider, util } from '@cardano-sdk/core';
 import { Delegatee, RewardAccount, StakeKeyStatus } from '../types';
-import { Observable, combineLatest, distinctUntilChanged, filter, map, merge, switchMap } from 'rxjs';
+import { KeyValueStore } from '../../persistence';
+import { Observable, combineLatest, concat, distinctUntilChanged, filter, map, merge, switchMap, tap } from 'rxjs';
 import { RegAndDeregCertificateTypes } from '.';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { RewardBalance, includesAnyCertificate } from '..';
@@ -11,11 +12,24 @@ import { findLast, isEqual, uniq } from 'lodash-es';
 import { isLastStakeKeyCertOfType } from './transactionCertificates';
 
 export const createQueryStakePoolsProvider =
-  (stakePoolSearchProvider: StakePoolSearchProvider, retryBackoffConfig: RetryBackoffConfig) =>
-  (fragments: Cardano.PoolId[]) =>
-    coldObservableProvider(
-      () => stakePoolSearchProvider.queryStakePools(fragments as unknown as string[]),
-      retryBackoffConfig
+  (
+    stakePoolSearchProvider: StakePoolSearchProvider,
+    store: KeyValueStore<Cardano.PoolId, Cardano.StakePool>,
+    retryBackoffConfig: RetryBackoffConfig
+  ) =>
+  (poolIds: Cardano.PoolId[]) =>
+    merge(
+      store.getValues(poolIds),
+      coldObservableProvider(
+        () => stakePoolSearchProvider.queryStakePools(poolIds as unknown as string[]),
+        retryBackoffConfig
+      ).pipe(
+        tap((stakePools) => {
+          for (const stakePool of stakePools) {
+            store.setValue(stakePool.id, stakePool);
+          }
+        })
+      )
     );
 export type ObservableStakePoolSearchProvider = ReturnType<typeof createQueryStakePoolsProvider>;
 
@@ -48,7 +62,7 @@ export const createRewardsProvider =
     walletProvider: WalletProvider,
     retryBackoffConfig: RetryBackoffConfig
   ) =>
-  (rewardAccounts: Cardano.RewardAccount[]) =>
+  (rewardAccounts: Cardano.RewardAccount[]): Observable<bigint[]> =>
     combineLatest(
       rewardAccounts.map((rewardAccount) =>
         coldObservableProvider(
@@ -181,9 +195,22 @@ export const addressDelegatees = (
 export const addressRewards = (
   rewardAccounts: Cardano.RewardAccount[],
   transactionsInFlight$: Observable<Cardano.NewTxAlonzo[]>,
-  rewardsProvider: ObservableRewardsProvider
+  rewardsProvider: ObservableRewardsProvider,
+  balancesStore: KeyValueStore<Cardano.RewardAccount, Cardano.Lovelace>
 ): Observable<RewardBalance[]> =>
-  combineLatest([rewardsProvider(rewardAccounts), transactionsInFlight$]).pipe(
+  combineLatest([
+    concat(
+      balancesStore.getValues(rewardAccounts),
+      rewardsProvider(rewardAccounts).pipe(
+        tap((balances) => {
+          for (const [i, rewardAccount] of rewardAccounts.entries()) {
+            balancesStore.setValue(rewardAccount, balances[i]);
+          }
+        })
+      )
+    ),
+    transactionsInFlight$
+  ]).pipe(
     map(([totalRewards, transactionsInFlight]) =>
       totalRewards.map((total, i) => ({
         available:
@@ -211,12 +238,14 @@ export const createRewardAccountsTracker = ({
   stakePoolSearchProvider,
   rewardsProvider,
   epoch$,
+  balancesStore,
   transactions$,
   transactionsInFlight$
 }: {
   rewardAccountAddresses$: Observable<Cardano.RewardAccount[]>;
   stakePoolSearchProvider: ObservableStakePoolSearchProvider;
   rewardsProvider: ObservableRewardsProvider;
+  balancesStore: KeyValueStore<Cardano.RewardAccount, Cardano.Lovelace>;
   epoch$: Observable<Cardano.Epoch>;
   transactions$: Observable<TxWithEpoch[]>;
   transactionsInFlight$: Observable<Cardano.NewTxAlonzo[]>;
@@ -226,7 +255,7 @@ export const createRewardAccountsTracker = ({
       combineLatest([
         addressKeyStatuses(rewardAccounts, transactions$, transactionsInFlight$),
         addressDelegatees(rewardAccounts, transactions$, stakePoolSearchProvider, epoch$),
-        addressRewards(rewardAccounts, transactionsInFlight$, rewardsProvider)
+        addressRewards(rewardAccounts, transactionsInFlight$, rewardsProvider, balancesStore)
       ]).pipe(map(toRewardAccounts(rewardAccounts)))
     )
   );

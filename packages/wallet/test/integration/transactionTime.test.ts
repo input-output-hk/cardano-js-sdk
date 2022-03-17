@@ -41,4 +41,6 @@ describe('integration/transactionTime', () => {
     const transactionTime = slotTimeCalc(transactions[0].blockHeader.slot);
     expect(typeof transactionTime.getTime()).toBe('number');
   });
+
+  afterAll(() => wallet.shutdown());
 });
