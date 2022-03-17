@@ -4,6 +4,7 @@ import {
   Cardano,
   EpochRange,
   EpochRewards,
+  ProtocolParametersRequiredByWallet,
   ProviderError,
   ProviderFailure,
   ProviderUtil,
@@ -277,13 +278,15 @@ export const blockfrostWalletProvider = (blockfrost: BlockFrostAPI, logger = dum
 
   // eslint-disable-next-line unicorn/consistent-function-scoping
   const parseValidityInterval = (num: string | null) => Number.parseInt(num || '') || undefined;
-  const fetchTransaction = async (hash: Cardano.TransactionId): Promise<Cardano.TxAlonzo> => {
+  const fetchTransaction = async (
+    hash: Cardano.TransactionId,
+    protocolParameters: ProtocolParametersRequiredByWallet
+  ): Promise<Cardano.TxAlonzo> => {
     const { inputs, outputs, collaterals } = BlockfrostToCore.transactionUtxos(
       await blockfrost.txsUtxos(hash.toString())
     );
     const response = await blockfrost.txs(hash.toString());
     const metadata = await fetchJsonMetadata(hash);
-    const protocolParameters = await currentWalletProtocolParameters();
     const certificates = await fetchCertificates(response);
     const withdrawals = await fetchWithdrawals(response);
     return {
@@ -321,8 +324,10 @@ export const blockfrostWalletProvider = (blockfrost: BlockFrostAPI, logger = dum
     };
   };
 
-  const queryTransactionsByHashes: WalletProvider['queryTransactionsByHashes'] = async (hashes) =>
-    Promise.all(hashes.map(fetchTransaction));
+  const queryTransactionsByHashes: WalletProvider['queryTransactionsByHashes'] = async (hashes) => {
+    const protocolParameters = await currentWalletProtocolParameters();
+    return Promise.all(hashes.map((hash) => fetchTransaction(hash, protocolParameters)));
+  };
 
   const queryTransactionsByAddresses: WalletProvider['queryTransactionsByAddresses'] = async (
     addresses,
