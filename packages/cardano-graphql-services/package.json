@@ -34,7 +34,6 @@
     "shx": "^0.3.3"
   },
   "dependencies": {
-    "@cardano-ogmios/client": "~5.1.0",
     "@cardano-sdk/core": "0.2.0",
     "graphql-request": "npm:graphql-request-configurable-serializer@4.0.0",
     "reflect-metadata": "~0.1.13",
