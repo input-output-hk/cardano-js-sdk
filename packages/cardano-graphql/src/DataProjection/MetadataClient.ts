@@ -2,23 +2,22 @@ import { Asset } from '../Schema/types';
 import { AssetMetadata } from './types';
 import { HostDoesNotExist } from './errors';
 import { Logger, dummyLogger } from 'ts-log';
-import { RunnableModule, RunnableModuleState } from './RunnableModule';
+import { RunnableModule } from './RunnableModule';
 import axios, { AxiosInstance } from 'axios';
 
 export class MetadataClient extends RunnableModule {
-  private axiosClient: AxiosInstance;
-  public state: RunnableModuleState;
+  #axiosClient: AxiosInstance;
 
   constructor(private metadataServerUri: string, logger: Logger = dummyLogger) {
     super('MetadataClient', logger);
-    this.axiosClient = axios.create({
+    this.#axiosClient = axios.create({
       baseURL: this.metadataServerUri
     });
   }
 
   private async ensureMetadataServerIsAvailable(): Promise<void> {
     try {
-      await this.axiosClient.get('/metadata/healthcheck');
+      await this.#axiosClient.get('/metadata/healthcheck');
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error?.code === 'ENOTFOUND') {
@@ -32,7 +31,7 @@ export class MetadataClient extends RunnableModule {
 
   public async fetch(assetIds: Asset['assetId'][]): Promise<AssetMetadata[]> {
     try {
-      const response = await this.axiosClient.post('metadata/query', {
+      const response = await this.#axiosClient.post('metadata/query', {
         subjects: assetIds,
         properties: ['decimals', 'description', 'logo', 'name', 'ticker', 'url']
       });
@@ -48,7 +47,6 @@ export class MetadataClient extends RunnableModule {
   }
 
   public async initializeImpl() {
-    this.state = 'initializing';
     await this.ensureMetadataServerIsAvailable();
   }
 

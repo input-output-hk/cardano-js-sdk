@@ -1,4 +1,4 @@
-import { BlockHandler, CombinedQueryResult } from './types';
+import { BlockHandler, CombinedQueryResult, RollBackwardContext } from './types';
 import {
   ChainSync,
   ConnectionConfig,
@@ -9,7 +9,7 @@ import {
 import { DgraphClient } from './DgraphClient';
 import { Logger, dummyLogger } from 'ts-log';
 import { RunnableModule } from './RunnableModule';
-import { mergedProcessingResults, mergedQuery, mergedRollForwardUpsert } from './util';
+import { mergedProcessingResults, mergedQuery, mergedRollBackwardUpsert, mergedRollForwardUpsert } from './util';
 
 export class ChainFollower extends RunnableModule {
   #blockHandlers: BlockHandler[];
@@ -36,31 +36,39 @@ export class ChainFollower extends RunnableModule {
 
     this.#chainSyncClient = await createChainSyncClient(ogmiosContext, {
       rollBackward: async ({ point, tip }, requestNext) => {
+        const txn = this.#dgraphClient.newTxn();
+        // let context: RollBackwardContext;
         if (point !== 'origin') {
-          this.logger.info({ rollbackPoint: point, tip }, 'Rolling back');
-          // const deleteResult = await this.dgraphClient.deleteDataAfterSlot(point.slot);
-          this.logger.info('Deleted data');
+          // context = { point, tip } as RollBackwardContext;
         } else {
           this.logger.info('Rolling back to genesis');
           // const deleteResult = await this.dgraphClient.deleteDataAfterSlot(0);
-          this.logger.info('Deleted data');
+          // const genesisPoint = { slot: 0 };
+          // const context = { point: genesisPoint, tip };
+          // const upsert = await mergedRollBackwardUpsert(this.#blockHandlers, context);
+          // await this.#dgraphClient.deleteDataAfterSlot(upsert, txn);
         }
+        this.logger.info({ rollbackPoint: point, tip }, 'Rolling back');
+        const context = { point, tip } as RollBackwardContext;
+        const upsert = await mergedRollBackwardUpsert(this.#blockHandlers, context);
+        await this.#dgraphClient.deleteDataAfterSlot(upsert, txn);
+        this.logger.info('Deleted data');
         requestNext();
       },
       rollForward: async ({ block }, requestNext) => {
-        this.logger.info({ BLOCK: block }, 'Rolling forward');
+        this.logger.debug({ BLOCK: block }, 'Rolling forward');
         const txn = this.#dgraphClient.newTxn();
         const context = { block, txn };
         const { query, variables } = await mergedQuery(this.#blockHandlers, context);
-        this.logger.info('About to run merged query');
+        this.logger.debug('About to run merged query');
         const mergedQueryResults: CombinedQueryResult = await this.#dgraphClient.query(query, variables);
-        this.logger.info('About to process query results');
+        this.logger.debug('About to process query results');
         const processingResults = await mergedProcessingResults(this.#blockHandlers, context, mergedQueryResults);
-        this.logger.info('Query results processed. About to merge roll forward upsert');
+        this.logger.debug('Query results processed. About to merge roll forward upsert');
         const upsert = await mergedRollForwardUpsert(this.#blockHandlers, context, processingResults);
-        this.logger.info('Writting data from block');
+        this.logger.debug('Writting data from block');
         await this.#dgraphClient.writeDataFromBlock(upsert, txn);
-        this.logger.info('Successfully written');
+        this.logger.debug('Successfully written');
         requestNext();
       }
     });

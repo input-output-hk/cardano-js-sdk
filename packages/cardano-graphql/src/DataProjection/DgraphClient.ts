@@ -47,14 +47,28 @@ export class DgraphClient extends RunnableModule {
     return response.getJson();
   }
 
-  async writeDataFromBlock(upsert: Upsert, txn: dgraph.Txn) {
+  private async runDgraphTransaction(txn: dgraph.Txn, fn: Function) {
     try {
-      const mu = new dgraph.Mutation();
-      // Todo: Translate our Upsert type
-      mu.setSetJson(upsert);
-      await txn.mutate(mu);
+      await fn();
+    } catch (error) {
+      if (error === dgraph.ERR_ABORTED) {
+        // Retry or handle exception.
+      } else {
+        throw error;
+      }
+    } finally {
+      await txn.discard();
+    }
+  }
+
+  private async runUpsertBlockFromMutations(upsert: Upsert, txn: dgraph.Txn, mutations: dgraph.Mutation[]) {
+    try {
       const req = new dgraph.Request();
-      req.setMutationsList([mu]);
+      req.setMutationsList(mutations);
+      if (upsert.variables?.dql) {
+        req.setQuery(upsert.variables?.dql);
+      }
+      await txn.doRequest(req);
       await txn.commit();
     } catch (error) {
       if (error === dgraph.ERR_ABORTED) {
@@ -65,5 +79,22 @@ export class DgraphClient extends RunnableModule {
     } finally {
       await txn.discard();
     }
+  }
+
+  async writeDataFromBlock(upsert: Upsert, txn: dgraph.Txn) {
+    await this.runDgraphTransaction(txn, async () => {
+      const mu = new dgraph.Mutation();
+      // Todo: Translate our Upsert type
+      mu.setSetJson(upsert);
+      await this.runUpsertBlockFromMutations(upsert, txn, [mu]);
+    });
+  }
+
+  async deleteDataAfterSlot(upsert: Upsert, txn: dgraph.Txn) {
+    await this.runDgraphTransaction(txn, async () => {
+      const mu = new dgraph.Mutation();
+      mu.setDeleteJson(upsert.mutations);
+      await this.runUpsertBlockFromMutations(upsert, txn, [mu]);
+    });
   }
 }

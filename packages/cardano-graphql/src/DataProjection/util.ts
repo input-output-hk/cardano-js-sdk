@@ -1,24 +1,22 @@
 import {
   BlockHandler,
   CombinedProcessingResult,
+  CombinedQueryResult,
   QueryResult,
   QueryVariables,
+  RollBackwardContext,
   RollForwardContext,
   Upsert
 } from './types';
 import lodash from 'lodash-es';
-
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-const noOp = (): void => {};
-
-const noQuery = (): QueryResult<QueryVariables> => ({ query: '', variables: {} });
 
 export const mergedQuery = async (
   blockHandlers: BlockHandler[],
   ctx: RollForwardContext
 ): Promise<QueryResult<QueryVariables>> =>
   blockHandlers
-    .map((handler) => (handler.query ? handler.query(ctx) : noQuery()))
+    .filter((handler) => handler.query)
+    .map((handler) => handler.query!(ctx))
     .reduce(async (acc, curr) => {
       const currResult = await curr;
       const accResult = await acc;
@@ -31,12 +29,15 @@ export const mergedQuery = async (
 export const mergedProcessingResults = async (
   blockHandlers: BlockHandler[],
   ctx: RollForwardContext,
-  mergedQueryResults: any
+  mergedQueryResults: CombinedQueryResult
 ): Promise<CombinedProcessingResult[]> =>
-  blockHandlers.map((handler) =>
-    handler.process
-      ? { func: handler.process({ ctx, queryResult: mergedQueryResults }), id: handler.id }
-      : { func: noOp(), id: handler.id }
+  Promise.all(
+    blockHandlers
+      .filter((handler) => handler.process)
+      .map(async (handler) => ({
+        func: await handler.process!({ ctx, queryResult: mergedQueryResults }),
+        id: handler.id
+      }))
   );
 
 export const mergedRollForwardUpsert = async (
@@ -46,4 +47,9 @@ export const mergedRollForwardUpsert = async (
 ): Promise<Upsert> =>
   blockHandlers
     .map((handler) => handler.rollForward(ctx, processingResult))
+    .reduce(async (acc, curr) => lodash.merge(await acc, await curr));
+
+export const mergedRollBackwardUpsert = async (blockHandlers: BlockHandler[], ctx: RollBackwardContext) =>
+  blockHandlers
+    .map((handler) => handler.rollBackward(ctx))
     .reduce(async (acc, curr) => lodash.merge(await acc, await curr));

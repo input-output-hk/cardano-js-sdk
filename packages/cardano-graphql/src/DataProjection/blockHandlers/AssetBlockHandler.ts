@@ -45,8 +45,8 @@ export const createAssetBlockHandler = (metadataClient: MetadataClient, logger =
         const txBodyMintAssets = tx.body.mint.assets;
         if (txBodyMintAssets) {
           logger.info('Assets found');
-          query = `query getAssetsByIds($assetIds: string) {
-            assets(func: eq(assetId, $assetIds)) {
+          query = `query getAssetsByIds($assetIds: String[]) {
+            queryAsset(filter: { assetId: { in: $assetIds } }) {
               assetId,
               assetName,
               assetNameUTF8,
@@ -65,19 +65,58 @@ export const createAssetBlockHandler = (metadataClient: MetadataClient, logger =
         }
       }
     }
-    const variables = assetIdList.length > 0 ? { $assetIds: `${assetIdList}` } : {};
+    const variables = assetIdList.length > 0 ? { $assetIds: assetIdList } : {};
     return { query, variables };
   },
   rollBackward: async ({ point }: RollBackwardContext) => {
     logger.trace('rollBackward', point);
+    const query = `
+    query {
+      var queryTransaction(func: ge(number, ${point.slot})) {
+          block{
+          slot {
+              number 
+          }
+          },
+          mint: [
+          {
+              Asset AS asset {
+              assetId,
+              assetName,
+              assetNameUTF8,
+              policy,
+              totalQuantity,
+              fingerprint,
+              history,
+              tokenMetadata,
+              nftMetadata
+              }
+          }
+          ]
+      }
+    }`;
+    const deleteMutation = {
+      assetId: null,
+      assetName: null,
+      assetNameUTF8: null,
+      fingerprint: null,
+      history: null,
+      nftMetadata: null,
+      policy: null,
+      tokenMetadata: null,
+      totalQuantity: null,
+      uid: 'uid(Asset)'
+    };
     return {
-      mutations: {}
+      mutations: { ...deleteMutation },
+      variables: { defines: ['Asset'], dql: query }
     };
   },
   rollForward: async (ctx: RollForwardContext, processingResult: CombinedProcessingResult[]) => {
     logger.trace('rollForward', ctx);
     const result = processingResult.find((r) => r.id === HANDLER_ID);
     const { assets } = (await result?.func) as Partial<ProcessingResult>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const mutations: { [key: string]: any } = {};
     if (assets) mutations.set = assets;
     return {

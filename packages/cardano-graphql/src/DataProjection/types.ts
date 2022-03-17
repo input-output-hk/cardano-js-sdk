@@ -8,7 +8,8 @@ export type DQL = string;
 type Variable = string;
 
 export type QueryVariables = {
-  $assetIds?: string;
+  $assetIds?: string[];
+  $slotNo?: number;
 };
 export interface QueryResult<Variables> {
   query: DQL;
@@ -44,7 +45,7 @@ export interface ProcessingResult {
 }
 
 export interface CombinedProcessingResult {
-  func: void | Promise<Partial<ProcessingResult>>;
+  func: Partial<ProcessingResult>;
   id: string;
 }
 
