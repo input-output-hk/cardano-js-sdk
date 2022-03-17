@@ -585,10 +585,10 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@blockfrost/blockfrost-js@2.0.2":
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/@blockfrost/blockfrost-js/-/blockfrost-js-2.0.2.tgz#fbe1264c515f39cfdf33a3a3f8b7724bb8ec19f2"
-  integrity sha512-5XY5NzUHetlOu/YeMx22a0a7SxbgnB+1XkFwzdBbDV3lloCP/2vgaFjowJyXJ/QxRWRb18uCohM8OUtW4oNKNA==
+"@blockfrost/blockfrost-js@npm:blockfrost-js-ratelimited@2.0.3":
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/blockfrost-js-ratelimited/-/blockfrost-js-ratelimited-2.0.3.tgz#44569571bc4d3e73b90c8738c30e53bb1f17645f"
+  integrity sha512-616NF9cOvL4xBvJP/As4/SmcEC9xJvogL08Zm0PXTIWPzygnJ/qkVtve3otk5U61SlBiVojtf9jHsX5waibQSA==
   dependencies:
     "@blockfrost/openapi" "0.1.27"
     "@emurgo/cardano-serialization-lib-nodejs" "^8.1.0"
