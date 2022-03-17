@@ -26,6 +26,7 @@ export interface RollForwardContext {
 }
 
 export interface Upsert {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   mutations: { [k: string]: any };
   variables?: {
     defines: Variable[];

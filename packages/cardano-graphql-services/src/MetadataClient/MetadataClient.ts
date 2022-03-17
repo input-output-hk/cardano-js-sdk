@@ -32,8 +32,8 @@ export class MetadataClient extends RunnableModule {
   public async fetch(assetIds: Asset['assetId'][]): Promise<AssetMetadata[]> {
     try {
       const response = await this.#axiosClient.post('metadata/query', {
-        subjects: assetIds,
-        properties: ['decimals', 'description', 'logo', 'name', 'ticker', 'url']
+        properties: ['decimals', 'description', 'logo', 'name', 'ticker', 'url'],
+        subjects: assetIds
       });
       return response.data.subjects;
     } catch (error) {

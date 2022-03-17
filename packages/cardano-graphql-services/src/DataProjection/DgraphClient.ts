@@ -41,6 +41,7 @@ export class DgraphClient extends RunnableModule {
     return this.#dgraphClient.newTxn();
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async query(query: string, vars?: { [k: string]: any }): Promise<any> {
     const txn = this.#dgraphClient.newTxn();
     const response = await txn.queryWithVars(query, vars);

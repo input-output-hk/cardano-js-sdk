@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { InvalidModuleState } from './errors';
 import { Logger, dummyLogger } from 'ts-log';
 import { ModuleState } from './types';
