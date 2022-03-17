@@ -30,11 +30,17 @@
   "devDependencies": {
     "@cardano-sdk/util-dev": "0.2.0",
     "@graphql-tools/utils": "~8.6.1",
+    "@types/express": "^4.17.13",
+    "cbor": "^8.1.0",
+    "get-port-please": "^2.4.3",
+    "got": "^11",
     "npm-run-all": "^4.1.5",
     "shx": "^0.3.3"
   },
   "dependencies": {
     "@cardano-sdk/core": "0.2.0",
+    "body-parser": "^1.19.2",
+    "express": "^4.17.3",
     "graphql-request": "npm:graphql-request-configurable-serializer@4.0.0",
     "reflect-metadata": "~0.1.13",
     "ts-log": "^2.2.4",
