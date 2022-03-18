@@ -1,7 +1,7 @@
 import { BehaviorSubject } from 'rxjs';
-import { CLEAN_FN_STATS, ProviderFnStats, TrackedWalletProvider, WalletProviderStats } from '../../src';
+import { CLEAN_FN_STATS, ProviderFnStats, TrackedWalletProvider, WalletProviderStats } from '../../../src';
 import { WalletProvider } from '@cardano-sdk/core';
-import { WalletProviderStub, mockWalletProvider } from '../mocks';
+import { WalletProviderStub, mockWalletProvider } from '../../mocks';
 
 describe('TrackedWalletProvider', () => {
   let walletProvider: WalletProviderStub;
@@ -24,32 +24,36 @@ describe('TrackedWalletProvider', () => {
         // eslint-disable-next-line unicorn/consistent-function-scoping
       ) =>
       async () => {
-        expect(selectStats(trackedWalletProvider.stats).value).toEqual(CLEAN_FN_STATS);
+        const stats$ = selectStats(trackedWalletProvider.stats);
+        expect(stats$.value).toEqual(CLEAN_FN_STATS);
         const result = call(trackedWalletProvider);
-        expect(selectStats(trackedWalletProvider.stats).value).toEqual({ ...CLEAN_FN_STATS, numCalls: 1 });
+        expect(stats$.value).toEqual({ ...CLEAN_FN_STATS, numCalls: 1 });
         await result;
         const statsAfterResponse = {
           didLastRequestFail: false,
+          initialized: true,
           numCalls: 1,
           numFailures: 0,
           numResponses: 1
         };
-        expect(selectStats(trackedWalletProvider.stats).value).toEqual(statsAfterResponse);
+        expect(stats$.value).toEqual(statsAfterResponse);
         selectFn(walletProvider).mockRejectedValueOnce(new Error('any error'));
         const failure = call(trackedWalletProvider).catch(() => void 0);
         const statsAfterFailureCall = {
           ...statsAfterResponse,
           numCalls: statsAfterResponse.numCalls + 1
         };
-        expect(selectStats(trackedWalletProvider.stats).value).toEqual(statsAfterFailureCall);
+        expect(stats$.value).toEqual(statsAfterFailureCall);
         await failure;
-        expect(selectStats(trackedWalletProvider.stats).value).toEqual({
+        expect(stats$.value).toEqual({
           ...statsAfterFailureCall,
           didLastRequestFail: true,
           numFailures: 1
         });
         trackedWalletProvider.stats.reset();
-        expect(selectStats(trackedWalletProvider.stats).value).toEqual(CLEAN_FN_STATS);
+        expect(stats$.value).toEqual(CLEAN_FN_STATS);
+        trackedWalletProvider.setStatInitialized(stats$);
+        expect(stats$.value).toEqual({ ...CLEAN_FN_STATS, initialized: true });
       };
 
     test(

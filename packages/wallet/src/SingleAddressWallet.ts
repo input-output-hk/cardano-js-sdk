@@ -21,6 +21,8 @@ import {
   PersistentDocumentTrackerSubject,
   PollingConfig,
   SyncableIntervalPersistentDocumentTrackerSubject,
+  TrackedStakePoolSearchProvider,
+  TrackedTimeSettingsProvider,
   TrackedTxSubmitProvider,
   TrackedWalletProvider,
   TrackerSubject,
@@ -32,6 +34,7 @@ import {
   createBalanceTracker,
   createDelegationTracker,
   createNftMetadataProvider,
+  createProviderStatusTracker,
   createTransactionsTracker,
   createUtxoTracker,
   distinctBlock,
@@ -50,7 +53,6 @@ import { Observable, Subject, combineLatest, firstValueFrom, lastValueFrom, map,
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TxInternals, createTransactionInternals, ensureValidityInterval } from './Transaction';
 import { WalletStores, createInMemoryWalletStores } from './persistence';
-import { createProviderStatusTracker } from './services/ProviderStatusTracker';
 import { isEqual } from 'lodash-es';
 
 export interface SingleAddressWalletProps {
@@ -83,6 +85,8 @@ export class SingleAddressWallet implements Wallet {
   };
   txSubmitProvider: TrackedTxSubmitProvider;
   walletProvider: TrackedWalletProvider;
+  timeSettingsProvider: TrackedTimeSettingsProvider;
+  stakePoolSearchProvider: TrackedStakePoolSearchProvider;
   utxo: TransactionalTracker<Cardano.Utxo[]>;
   balance: TransactionalTracker<Balance>;
   transactions: TransactionsTracker;
@@ -126,6 +130,8 @@ export class SingleAddressWallet implements Wallet {
     this.#inputSelector = inputSelector;
     this.txSubmitProvider = new TrackedTxSubmitProvider(txSubmitProvider);
     this.walletProvider = new TrackedWalletProvider(walletProvider);
+    this.timeSettingsProvider = new TrackedTimeSettingsProvider(timeSettingsProvider);
+    this.stakePoolSearchProvider = new TrackedStakePoolSearchProvider(stakePoolSearchProvider);
     this.#keyAgent = keyAgent;
     this.addresses$ = new TrackerSubject<GroupedAddress[]>(this.#initializeAddress(keyAgent.knownAddresses));
     this.name = name;
@@ -141,7 +147,7 @@ export class SingleAddressWallet implements Wallet {
     );
     const epoch$ = distinctEpoch(this.networkInfo$);
     this.timeSettings$ = new PersistentDocumentTrackerSubject(
-      coldObservableProvider(timeSettingsProvider, retryBackoffConfig, epoch$, isEqual),
+      coldObservableProvider(this.timeSettingsProvider.getTimeSettings, retryBackoffConfig, epoch$, isEqual),
       stores.timeSettings
     );
     this.protocolParameters$ = new PersistentDocumentTrackerSubject(
@@ -178,7 +184,7 @@ export class SingleAddressWallet implements Wallet {
       rewardAccountAddresses$: this.addresses$.pipe(
         map((addresses) => addresses.map((groupedAddress) => groupedAddress.rewardAccount))
       ),
-      stakePoolSearchProvider,
+      stakePoolSearchProvider: this.stakePoolSearchProvider,
       stores,
       timeSettings$: this.timeSettings$,
       transactionsTracker: this.transactions,
@@ -199,7 +205,11 @@ export class SingleAddressWallet implements Wallet {
       stores.assets
     );
     this.syncStatus$ = createProviderStatusTracker(
-      { walletProvider: this.walletProvider },
+      {
+        stakePoolSearchProvider: this.stakePoolSearchProvider,
+        timeSettingsProvider: this.timeSettingsProvider,
+        walletProvider: this.walletProvider
+      },
       { consideredOutOfSyncAfter }
     );
   }

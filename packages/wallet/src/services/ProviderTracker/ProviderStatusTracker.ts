@@ -12,23 +12,13 @@ import {
   switchMap,
   timer
 } from 'rxjs';
-import { Milliseconds } from './types';
+import { Milliseconds } from '../types';
 import { ProviderFnStats } from './ProviderTracker';
-import { SyncStatus } from '../types';
+import { SyncStatus } from '../../types';
+import { TrackedStakePoolSearchProvider } from './TrackedStakePoolSearchProvider';
+import { TrackedTimeSettingsProvider } from './TrackedTimeSettingsProvider';
 import { TrackedWalletProvider } from './TrackedWalletProvider';
-import { TrackerSubject } from './util';
-
-const getDefaultProviderSyncRelevantStats = (walletProvider: TrackedWalletProvider): Observable<ProviderFnStats[]> =>
-  combineLatest([
-    walletProvider.stats.ledgerTip$,
-    walletProvider.stats.currentWalletProtocolParameters$,
-    walletProvider.stats.genesisParameters$,
-    walletProvider.stats.networkInfo$,
-    walletProvider.stats.queryBlocksByHashes$,
-    walletProvider.stats.queryTransactionsByAddresses$,
-    walletProvider.stats.rewardsHistory$,
-    walletProvider.stats.utxoDelegationAndRewards$
-  ]);
+import { TrackerSubject } from '../util';
 
 export interface ProviderStatusTrackerProps {
   consideredOutOfSyncAfter: Milliseconds;
@@ -36,7 +26,26 @@ export interface ProviderStatusTrackerProps {
 
 export interface ProviderStatusTrackerDependencies {
   walletProvider: TrackedWalletProvider;
+  stakePoolSearchProvider: TrackedStakePoolSearchProvider;
+  timeSettingsProvider: TrackedTimeSettingsProvider;
 }
+
+const getDefaultProviderSyncRelevantStats = ({
+  walletProvider,
+  stakePoolSearchProvider,
+  timeSettingsProvider
+}: ProviderStatusTrackerDependencies): Observable<ProviderFnStats[]> =>
+  combineLatest([
+    walletProvider.stats.ledgerTip$,
+    walletProvider.stats.currentWalletProtocolParameters$,
+    walletProvider.stats.genesisParameters$,
+    walletProvider.stats.networkInfo$,
+    walletProvider.stats.queryTransactionsByAddresses$,
+    walletProvider.stats.rewardsHistory$,
+    walletProvider.stats.utxoDelegationAndRewards$,
+    stakePoolSearchProvider.stats.queryStakePools$,
+    timeSettingsProvider.stats.getTimeSettings$
+  ]);
 
 export interface ProviderStatusTrackerInternals {
   /**
@@ -47,13 +56,13 @@ export interface ProviderStatusTrackerInternals {
 }
 
 export const createProviderStatusTracker = (
-  { walletProvider }: ProviderStatusTrackerDependencies,
+  dependencies: ProviderStatusTrackerDependencies,
   { consideredOutOfSyncAfter }: ProviderStatusTrackerProps,
   { getProviderSyncRelevantStats = getDefaultProviderSyncRelevantStats }: ProviderStatusTrackerInternals = {}
 ): TrackerSubject<SyncStatus> => {
-  const relevantStats = getProviderSyncRelevantStats(walletProvider);
+  const relevantStats = getProviderSyncRelevantStats(dependencies);
   const upToDate$ = relevantStats.pipe(
-    skipWhile((allStats) => allStats.every(({ numCalls }) => numCalls === 0)),
+    skipWhile((allStats) => allStats.some(({ initialized }) => !initialized)),
     mergeMap((allStats) =>
       allStats.some(
         ({ numCalls, numFailures, numResponses, didLastRequestFail }) =>

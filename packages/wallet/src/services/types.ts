@@ -106,6 +106,6 @@ export interface RewardAccount {
 
 export interface DelegationTracker {
   rewardsHistory$: BehaviorObservable<RewardsHistory>;
-  rewardAccounts$: Observable<RewardAccount[]>;
+  rewardAccounts$: BehaviorObservable<RewardAccount[]>;
   shutdown(): void;
 }

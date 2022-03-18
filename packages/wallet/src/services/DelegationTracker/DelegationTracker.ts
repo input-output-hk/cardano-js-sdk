@@ -17,6 +17,7 @@ import {
 } from './RewardAccounts';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { RewardsHistoryProvider, createRewardsHistoryProvider, createRewardsHistoryTracker } from './RewardsHistory';
+import { TrackedWalletProvider } from '../ProviderTracker';
 import { TrackerSubject, coldObservableProvider } from '../util';
 import { TxWithEpoch } from './types';
 import { WalletStores } from '../../persistence';
@@ -31,7 +32,7 @@ export const createBlockEpochProvider =
 export type BlockEpochProvider = ReturnType<typeof createBlockEpochProvider>;
 
 export interface DelegationTrackerProps {
-  walletProvider: WalletProvider;
+  walletProvider: TrackedWalletProvider;
   rewardAccountAddresses$: Observable<Cardano.RewardAccount[]>;
   stakePoolSearchProvider: StakePoolSearchProvider;
   timeSettings$: Observable<TimeSettings[]>;

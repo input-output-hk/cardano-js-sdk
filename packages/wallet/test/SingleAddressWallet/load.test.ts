@@ -1,13 +1,18 @@
 /* eslint-disable max-statements */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as mocks from '../mocks';
-import { AssetId, createStubStakePoolSearchProvider, createStubTimeSettingsProvider } from '@cardano-sdk/util-dev';
+import {
+  AssetId,
+  createStubStakePoolSearchProvider,
+  createStubTimeSettingsProvider,
+  somePartialStakePools
+} from '@cardano-sdk/util-dev';
 import { Cardano, WalletProvider, testnetTimeSettings } from '@cardano-sdk/core';
 import { KeyManagement, SingleAddressWallet, SyncStatus, Wallet } from '../../src';
 import { WalletStores, createInMemoryWalletStores } from '../../src/persistence';
 import { filter, firstValueFrom } from 'rxjs';
 import { flatten } from 'lodash-es';
-import { queryTransactionsResult2 } from '../mocks';
+import { queryTransactionsResult, queryTransactionsResult2 } from '../mocks';
 
 const name = 'Test Wallet';
 const address = mocks.utxo[0][0].address;
@@ -35,7 +40,12 @@ const createWallet = async (stores: WalletStores, walletProvider: WalletProvider
   );
 };
 
-const assertWalletProperties = async (wallet: Wallet, expectedSyncStatusAfterLoad: SyncStatus) => {
+const assertWalletProperties = async (
+  wallet: Wallet,
+  expectedSyncStatusAfterLoad: SyncStatus,
+  expectedDelegateeId: Cardano.PoolId | undefined,
+  expectedRewardsHistory = flatten([...mocks.rewardsHistory.values()])
+) => {
   // name
   expect(wallet.name).toBe(name);
   // utxo
@@ -67,12 +77,12 @@ const assertWalletProperties = async (wallet: Wallet, expectedSyncStatusAfterLoa
   expect(wallet.genesisParameters$.value).toEqual(mocks.genesisParameters);
   // delegation
   const rewardsHistory = await firstValueFrom(wallet.delegation.rewardsHistory$);
-  const expectedRewards = flatten([...mocks.rewardsHistory.values()]);
+  const expectedRewards = expectedRewardsHistory;
   expect(rewardsHistory.all).toEqual(expectedRewards);
   const rewardAccounts = await firstValueFrom(wallet.delegation.rewardAccounts$);
   expect(rewardAccounts).toHaveLength(1);
   expect(rewardAccounts[0].address).toBe(rewardAccount);
-  expect(rewardAccounts[0].delegatee).not.toBeUndefined();
+  expect(rewardAccounts[0].delegatee?.nextNextEpoch.id).toEqual(expectedDelegateeId);
   expect(rewardAccounts[0].rewardBalance.total).toBe(mocks.rewards);
   // addresses$
   const addresses = await firstValueFrom(wallet.addresses$);
@@ -111,12 +121,23 @@ describe('SingleAddressWallet load', () => {
   it('loads all properties from provider, stores them and restores on subsequent load, fetches new data', async () => {
     const stores = createInMemoryWalletStores();
     const wallet1 = await createWallet(stores, mocks.mockWalletProvider());
-    await assertWalletProperties(wallet1, SyncStatus.UpToDate);
+    await assertWalletProperties(wallet1, SyncStatus.UpToDate, somePartialStakePools[0].id);
     wallet1.shutdown();
     const wallet2 = await createWallet(stores, mocks.mockWalletProvider2(100));
-    await assertWalletProperties(wallet2, SyncStatus.Syncing);
+    await assertWalletProperties(wallet2, SyncStatus.Syncing, somePartialStakePools[0].id);
     await firstValueFrom(wallet2.syncStatus$.pipe(filter((syncStatus) => syncStatus === SyncStatus.UpToDate)));
     await assertWalletProperties2(wallet2);
     wallet2.shutdown();
+  });
+
+  it('syncStatus goes to UpToDate without delegation to any pool', async () => {
+    const stores = createInMemoryWalletStores();
+    const walletProvider = mocks.mockWalletProvider();
+    const txsWithNoCertificates = queryTransactionsResult.filter((tx) => !tx.body.certificates);
+    walletProvider.queryTransactionsByAddresses.mockResolvedValue(txsWithNoCertificates);
+    const wallet = await createWallet(stores, walletProvider);
+    // eslint-disable-next-line unicorn/no-useless-undefined
+    await assertWalletProperties(wallet, SyncStatus.UpToDate, undefined, []);
+    wallet.shutdown();
   });
 });

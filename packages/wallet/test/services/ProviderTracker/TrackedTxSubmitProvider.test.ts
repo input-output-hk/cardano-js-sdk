@@ -1,7 +1,7 @@
 import { BehaviorSubject } from 'rxjs';
-import { CLEAN_FN_STATS, ProviderFnStats, TrackedTxSubmitProvider, TxSubmitProviderStats } from '../../src';
+import { CLEAN_FN_STATS, ProviderFnStats, TrackedTxSubmitProvider, TxSubmitProviderStats } from '../../../src';
 import { TxSubmitProvider } from '@cardano-sdk/core';
-import { mockTxSubmitProvider } from '../mocks';
+import { mockTxSubmitProvider } from '../../mocks';
 
 describe('TrackedTxSubmitProvider', () => {
   let txSubmitProvider: TxSubmitProvider;
@@ -19,18 +19,22 @@ describe('TrackedTxSubmitProvider', () => {
         // eslint-disable-next-line unicorn/consistent-function-scoping
       ) =>
       async () => {
-        expect(selectStats(trackedTxSubmitProvider.stats).value).toEqual(CLEAN_FN_STATS);
+        const stats$ = selectStats(trackedTxSubmitProvider.stats);
+        expect(stats$.value).toEqual(CLEAN_FN_STATS);
         const result = call(trackedTxSubmitProvider);
-        expect(selectStats(trackedTxSubmitProvider.stats).value).toEqual({ ...CLEAN_FN_STATS, numCalls: 1 });
+        expect(stats$.value).toEqual({ ...CLEAN_FN_STATS, numCalls: 1 });
         await result;
-        expect(selectStats(trackedTxSubmitProvider.stats).value).toEqual({
+        expect(stats$.value).toEqual({
           didLastRequestFail: false,
+          initialized: true,
           numCalls: 1,
           numFailures: 0,
           numResponses: 1
         });
         trackedTxSubmitProvider.stats.reset();
-        expect(selectStats(trackedTxSubmitProvider.stats).value).toEqual(CLEAN_FN_STATS);
+        expect(stats$.value).toEqual(CLEAN_FN_STATS);
+        trackedTxSubmitProvider.setStatInitialized(stats$);
+        expect(stats$.value).toEqual({ ...CLEAN_FN_STATS, initialized: true });
       };
 
     test(

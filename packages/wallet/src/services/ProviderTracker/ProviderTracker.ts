@@ -4,6 +4,12 @@ export interface ProviderFnStats {
   numCalls: number;
   numResponses: number;
   numFailures: number;
+  /**
+   * Either:
+   * - at least 1 response received
+   * - was set manually (via setStatInitialized) to indicate that it won't make a request on wallet initialization
+   */
+  initialized?: boolean;
   didLastRequestFail?: boolean;
 }
 
@@ -17,10 +23,12 @@ export abstract class ProviderTracker {
     tracker.next({ ...tracker.value, numCalls: tracker.value.numCalls + 1 });
     try {
       const result = await call();
+      const numResponses = tracker.value.numResponses + 1;
       tracker.next({
         ...tracker.value,
         didLastRequestFail: false,
-        numResponses: tracker.value.numResponses + 1
+        initialized: true,
+        numResponses
       });
       return result;
     } catch (error) {
@@ -31,5 +39,12 @@ export abstract class ProviderTracker {
       });
       throw error;
     }
+  }
+
+  setStatInitialized(tracker: BehaviorSubject<ProviderFnStats>) {
+    tracker.next({
+      ...tracker.value,
+      initialized: true
+    });
   }
 }
