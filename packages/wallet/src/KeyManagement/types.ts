@@ -1,7 +1,7 @@
 import { Cardano } from '@cardano-sdk/core';
-import TransportWebHID from '@ledgerhq/hw-transport-webhid';
-import TransportNodeHid from "@ledgerhq/hw-transport-node-hid-noevents";
 import { TxInternals } from '../Transaction';
+import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents';
+import TransportWebHID from '@ledgerhq/hw-transport-webhid';
 
 export interface SignBlobResult {
   publicKey: Cardano.Ed25519PublicKey;

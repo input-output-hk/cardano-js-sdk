@@ -5,13 +5,13 @@ import {
   KeyAgentType,
   SerializableLedgerKeyAgentData,
   SignBlobResult,
-  TransportType,
+  TransportType
 } from './types';
 import { KeyAgentBase } from './KeyAgentBase';
 import { TransportError } from './errors';
 import AppAda, { GetVersionResponse, utils } from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents';
 import TransportWebHID from '@ledgerhq/hw-transport-webhid';
-import TransportNodeHid from "@ledgerhq/hw-transport-node-hid-noevents";
 import type Transport from '@ledgerhq/hw-transport';
 
 export interface LedgerKeyAgentProps {
@@ -36,9 +36,9 @@ export interface GetXpubProps {
 }
 
 export interface CreateTransportProps {
-  communicationType: CommunicationType,
-  activeTransport?: TransportType,
-  devicePath?: string,
+  communicationType: CommunicationType;
+  activeTransport?: TransportType;
+  devicePath?: string;
 }
 
 export class LedgerKeyAgent extends KeyAgentBase {
@@ -56,7 +56,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
     extendedAccountPublicKey,
     deviceConnection,
     communicationType
-  }: LedgerKeyAgentProps) { 
+  }: LedgerKeyAgentProps) {
     super();
     this.#accountIndex = accountIndex;
     this.#networkId = networkId;
@@ -85,11 +85,11 @@ export class LedgerKeyAgent extends KeyAgentBase {
   get serializableData(): SerializableLedgerKeyAgentData {
     return {
       __typename: KeyAgentType.Ledger,
-      networkId: this.networkId,
       accountIndex: this.#accountIndex,
-      knownAddresses: this.#knownAddresses,
-      extendedAccountPublicKey: this.#extendedAccountPublicKey,
       communicationType: this.#communicationType,
+      extendedAccountPublicKey: this.#extendedAccountPublicKey,
+      knownAddresses: this.#knownAddresses,
+      networkId: this.networkId
     };
   }
 
@@ -100,12 +100,14 @@ export class LedgerKeyAgent extends KeyAgentBase {
   static async createTransport({
     communicationType,
     activeTransport,
-    devicePath = '',
+    devicePath = ''
   }: CreateTransportProps): Promise<TransportType> {
     if (communicationType === CommunicationType.Node) {
       return await TransportNodeHid.open(devicePath);
     }
-    return await ((activeTransport && activeTransport instanceof TransportWebHID) ? TransportWebHID.open(activeTransport.device) : TransportWebHID.request());
+    return await (activeTransport && activeTransport instanceof TransportWebHID
+      ? TransportWebHID.open(activeTransport.device)
+      : TransportWebHID.request());
   }
 
   static async createDeviceConnection(activeTransport: Transport): Promise<AppAda> {
@@ -129,7 +131,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
       return await LedgerKeyAgent.createDeviceConnection(transport);
     } catch (error) {
       if (error.message.includes('cannot open device with path')) {
-        throw new TransportError('Connection already established', error) 
+        throw new TransportError('Connection already established', error);
       }
       // If transport is established we need to close it so we can recover device from previous session
       if (transport) {
@@ -178,11 +180,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
     return await recoveredDeviceConnection.getVersion();
   }
 
-  static async createWithDevice({
-    networkId,
-    accountIndex = 0,
-    communicationType,
-  }: CreateWithDevice) {
+  static async createWithDevice({ networkId, accountIndex = 0, communicationType }: CreateWithDevice) {
     const deviceListPaths = await LedgerKeyAgent.getHidDeviceList();
     const deviceConnection = await LedgerKeyAgent.establishDeviceConnection(communicationType, deviceListPaths[0]);
     const extendedAccountPublicKey = await LedgerKeyAgent.getXpub({

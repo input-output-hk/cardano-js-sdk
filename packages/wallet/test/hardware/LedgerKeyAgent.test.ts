@@ -1,14 +1,14 @@
 import { Cardano } from '@cardano-sdk/core';
-import { KeyManagement } from '../../src';
 import { CommunicationType, TransportType } from '../../src/KeyManagement/types';
+import { KeyManagement } from '../../src';
 import AppAda from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
 describe('LedgerKeyAgent', () => {
-  let keyAgent: KeyManagement.LedgerKeyAgent
+  let keyAgent: KeyManagement.LedgerKeyAgent;
   beforeAll(async () => {
     keyAgent = await KeyManagement.LedgerKeyAgent.createWithDevice({
-      networkId: Cardano.NetworkId.testnet,
       communicationType: CommunicationType.Node,
+      networkId: Cardano.NetworkId.testnet
     });
   });
 
@@ -35,18 +35,16 @@ describe('LedgerKeyAgent', () => {
 
   describe('device management', () => {
     let activeDeviceConnection: AppAda;
-    let activeTransport: TransportType
+    let activeTransport: TransportType;
 
     beforeAll(() => {
       if (keyAgent.deviceConnection) {
         keyAgent.deviceConnection.transport.close();
       }
     });
-    
+
     it('can establish new device connection', async () => {
-      const deviceConnection = await KeyManagement.LedgerKeyAgent.establishDeviceConnection(
-        CommunicationType.Node,
-      );
+      const deviceConnection = await KeyManagement.LedgerKeyAgent.establishDeviceConnection(CommunicationType.Node);
       activeDeviceConnection = deviceConnection;
       expect(deviceConnection).toBeDefined();
       expect(typeof deviceConnection).toBe('object');
@@ -66,9 +64,7 @@ describe('LedgerKeyAgent', () => {
         // Close active connection so we can simulate device check and instantiating new one
         activeDeviceConnection.transport.close();
       }
-      const deviceConnection = await KeyManagement.LedgerKeyAgent.checkDeviceConnection(
-        CommunicationType.Node,
-      );
+      const deviceConnection = await KeyManagement.LedgerKeyAgent.checkDeviceConnection(CommunicationType.Node);
       activeDeviceConnection = deviceConnection;
       expect(deviceConnection).toBeDefined();
       expect(typeof deviceConnection).toBe('object');
@@ -80,9 +76,9 @@ describe('LedgerKeyAgent', () => {
         activeDeviceConnection.transport.close();
       }
       const transport = await KeyManagement.LedgerKeyAgent.createTransport({
-        communicationType: CommunicationType.Node,
+        communicationType: CommunicationType.Node
       });
-      activeTransport = transport
+      activeTransport = transport;
       expect(transport).toBeDefined();
       expect(typeof transport).toBe('object');
     });
