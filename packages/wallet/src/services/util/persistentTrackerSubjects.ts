@@ -5,17 +5,17 @@ import {
   Subject,
   concat,
   defaultIfEmpty,
+  delay,
   exhaustMap,
-  interval,
   merge,
   of,
   startWith,
   switchMap,
   takeUntil,
-  tap
+  tap,
+  timeout
 } from 'rxjs';
 import { TrackerSubject } from './TrackerSubject';
-import { retryBackoff } from 'backoff-rxjs';
 
 export class PersistentCollectionTrackerSubject<T> extends TrackerSubject<T[]> {
   constructor(source: (localObjects: T[]) => Observable<T[]>, store: CollectionStore<T>) {
@@ -37,37 +37,45 @@ export class PersistentDocumentTrackerSubject<T> extends TrackerSubject<T> {
   }
 }
 
-export type RetryOperator = () => ReturnType<typeof retryBackoff>;
-
 export interface SyncableIntervalPersistentDocumentTrackerSubjectProps<T> {
   provider$: Observable<T>;
+  trigger$: Observable<unknown>;
   store: DocumentStore<T>;
   pollInterval: Milliseconds;
+  maxPollInterval: Milliseconds;
 }
 
 export interface SyncableIntervalPersistentDocumentTrackerSubjectInternals {
   externalTrigger$?: Subject<void>;
-  interval$?: Observable<unknown>;
 }
+
+const triggerOrInterval$ = (trigger$: Observable<unknown>, interval: number): Observable<unknown> =>
+  trigger$.pipe(timeout({ each: interval, with: () => concat(of(true), triggerOrInterval$(trigger$, interval)) }));
 
 // Commemorating Java ☕
 export class SyncableIntervalPersistentDocumentTrackerSubject<T> extends PersistentDocumentTrackerSubject<T> {
   #externalTrigger$ = new Subject<void>();
 
   constructor(
-    { provider$, pollInterval, store }: SyncableIntervalPersistentDocumentTrackerSubjectProps<T>,
     {
-      externalTrigger$ = new Subject(),
-      interval$ = interval(pollInterval)
-    }: SyncableIntervalPersistentDocumentTrackerSubjectInternals = {}
+      provider$,
+      pollInterval,
+      maxPollInterval,
+      store,
+      trigger$
+    }: SyncableIntervalPersistentDocumentTrackerSubjectProps<T>,
+    { externalTrigger$ = new Subject() }: SyncableIntervalPersistentDocumentTrackerSubjectInternals = {}
   ) {
     super(
       merge(
-        // Fetch at regular interval
-        interval$.pipe(
+        // Trigger fetch:
+        // - on start
+        // - after some delay once fully synced
+        triggerOrInterval$(trigger$, maxPollInterval).pipe(
+          delay(pollInterval),
           startWith(null),
           // Throttle syncing by interval, cancel ongoing request on external trigger
-          exhaustMap(() => provider$.pipe(takeUntil(externalTrigger$)))
+          exhaustMap(() => merge(provider$).pipe(takeUntil(externalTrigger$)))
         ),
         // Always immediately restart request on external trigger
         externalTrigger$.pipe(switchMap(() => provider$))

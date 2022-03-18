@@ -35,9 +35,27 @@ export type InitializeTxResult = TxInternals & { inputSelection: SelectionSkelet
 
 export type SignDataProps = Omit<Cip30SignDataRequest, 'keyAgent'>;
 
-export enum SyncStatus {
-  Syncing,
-  UpToDate
+export interface SyncStatus {
+  /**
+   * Emits:
+   * - `true` while waiting for any provider request to resolve
+   * - `false` while there are no provider requests waiting to resolve
+   */
+  isAnyRequestPending$: BehaviorObservable<boolean>;
+  /**
+   * Emits after wallet makes at least one request with each relevant provider method:
+   * - `false` on load
+   * - `true` when all provider requests resolve
+   * - `false` when some provider request(s) do not resolve for some time (determined by specific wallet implementation)
+   */
+  isUpToDate$: BehaviorObservable<boolean>;
+  /**
+   * Emits after wallet makes at least one request with each relevant provider method:
+   * - `false` on load
+   * - `true` while there are no provider requests waiting to resolve
+   * - `false` while waiting for any provider request to resolve
+   */
+  isSettled$: BehaviorObservable<boolean>;
 }
 
 export interface Wallet {
@@ -53,7 +71,7 @@ export interface Wallet {
   readonly protocolParameters$: BehaviorObservable<ProtocolParametersRequiredByWallet>;
   readonly addresses$: BehaviorObservable<GroupedAddress[]>;
   readonly assets$: BehaviorObservable<Assets>;
-  readonly syncStatus$: BehaviorObservable<SyncStatus>;
+  readonly syncStatus: SyncStatus;
   /**
    * Compute minimum coin quantity for each transaction output
    */

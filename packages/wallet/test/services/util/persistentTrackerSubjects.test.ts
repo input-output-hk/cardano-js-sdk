@@ -1,14 +1,11 @@
 import { InMemoryCollectionStore, InMemoryDocumentStore } from '../../../src/persistence';
 import { Milliseconds } from '../../../src';
-import { Observable, firstValueFrom, interval, take } from 'rxjs';
+import { Observable, firstValueFrom } from 'rxjs';
 import {
   PersistentCollectionTrackerSubject,
   SyncableIntervalPersistentDocumentTrackerSubject
 } from '../../../src/services/util';
 import { createTestScheduler } from '../../testScheduler';
-
-const testInterval = ({ pollInterval, numTriggers }: { pollInterval: number; numTriggers: number }) =>
-  interval(pollInterval).pipe(take(numTriggers));
 
 const stubObservableProvider = <T>(...calls: Observable<T>[]) => {
   let numCall = 0;
@@ -53,21 +50,25 @@ describe('PersistentCollectionTrackerSubject', () => {
 });
 
 describe('SyncableIntervalPersistentDocumentTrackerSubject', () => {
-  let pollInterval: Milliseconds; // not used, overwriting interval$
+  const pollInterval: Milliseconds = 1; // delays emission after trigger
   let store: InMemoryDocumentStore<string>;
 
   beforeEach(() => {
     store = new InMemoryDocumentStore();
   });
 
-  it('calls the provider immediately and then every [pollInterval], only emitting distinct values', () => {
+  it('calls the provider immediately and on trigger$, only emitting distinct values, with throttling', () => {
     createTestScheduler().run(({ cold, expectObservable }) => {
-      const provider$ = stubObservableProvider(cold('--a|'), cold('--b|'), cold('c|'));
-      const tracker$ = new SyncableIntervalPersistentDocumentTrackerSubject(
-        { pollInterval, provider$, store },
-        { interval$: testInterval({ numTriggers: 2, pollInterval: 5 }) }
-      );
-      expectObservable(tracker$.asObservable()).toBe('--a----b--c');
+      const trigger$ = cold('---a---bc--d|');
+      const provider$ = stubObservableProvider(cold('-x|'), cold('--a|'), cold('--b|'), cold('d|'));
+      const tracker$ = new SyncableIntervalPersistentDocumentTrackerSubject({
+        maxPollInterval: Number.MAX_VALUE,
+        pollInterval,
+        provider$,
+        store,
+        trigger$
+      });
+      expectObservable(tracker$.asObservable()).toBe('-x----a---b-d');
     });
   });
 
@@ -76,37 +77,35 @@ describe('SyncableIntervalPersistentDocumentTrackerSubject', () => {
     await firstValueFrom(store.set('x'));
     store.set = jest.fn().mockImplementation(store.set.bind(store));
     createTestScheduler().run(({ cold, expectObservable }) => {
-      const provider$ = stubObservableProvider(cold('--a|'), cold('--b|'), cold('c|'));
-      const tracker$ = new SyncableIntervalPersistentDocumentTrackerSubject(
-        { pollInterval, provider$, store },
-        { interval$: testInterval({ numTriggers: 2, pollInterval: 5 }) }
-      );
-      expectObservable(tracker$.asObservable()).toBe('x-a----b--c');
+      const trigger$ = cold('---a---b|');
+      const provider$ = stubObservableProvider(cold('-y|'), cold('--a|'), cold('--b|'));
+      const tracker$ = new SyncableIntervalPersistentDocumentTrackerSubject({
+        maxPollInterval: Number.MAX_VALUE,
+        pollInterval,
+        provider$,
+        store,
+        trigger$
+      });
+      expectObservable(tracker$.asObservable()).toBe('xy----a---b');
     });
     expect(store.set).toBeCalledTimes(3);
-    expect(await firstValueFrom(store.get())).toBe('c');
+    expect(await firstValueFrom(store.get())).toBe('b');
   });
 
-  it('doesnt wait for subscriptions to subscribe to underlying provider', () => {
-    createTestScheduler().run(({ cold, flush }) => {
-      const provider$ = cold('--a|');
-      const tracker$ = new SyncableIntervalPersistentDocumentTrackerSubject(
-        { pollInterval, provider$, store },
-        { interval$: testInterval({ numTriggers: 3, pollInterval: 5 }) }
-      );
-      flush();
-      expect(tracker$.value).toBe('a');
-    });
-  });
-
-  it('throttles interval requests to provider', () => {
-    createTestScheduler().run(({ cold, expectObservable }) => {
-      const provider$ = stubObservableProvider(cold('-----a|'), cold('-----b|'), cold('c'));
-      const tracker$ = new SyncableIntervalPersistentDocumentTrackerSubject(
-        { pollInterval, provider$, store },
-        { interval$: testInterval({ numTriggers: 3, pollInterval: 5 }) }
-      );
-      expectObservable(tracker$).toBe('-----a---------b');
+  it('times out trigger$ with maxPollInterval, then listens for trigger$ again', () => {
+    createTestScheduler().run(({ cold, hot, expectObservable }) => {
+      const trigger$ = hot('10ms a|');
+      const provider$ = stubObservableProvider(cold('-a|'), cold('-b|'), cold('-c|'));
+      const tracker$ = new SyncableIntervalPersistentDocumentTrackerSubject({
+        maxPollInterval: 6,
+        pollInterval,
+        provider$,
+        store,
+        trigger$
+      });
+      // b is emitted at t=8 (before trigger$ emits anything)
+      // c is emitted at t=12 (after trigger$ emits upon resubscribing to it)
+      expectObservable(tracker$, '^ 15ms !').toBe('-a------b---c');
     });
   });
 
@@ -114,6 +113,4 @@ describe('SyncableIntervalPersistentDocumentTrackerSubject', () => {
   it.todo('external trigger cancels an ongoing interval request and makes a new one');
   it.todo('external trigger cancels an ongoing external trigger request and makes a new one');
   it.todo('sync() calls external trigger');
-  it.todo('retries on interval requests failure with exponential backoff strategy');
-  it.todo('retries on any external trigger requests failure with exponential backoff strategy');
 });

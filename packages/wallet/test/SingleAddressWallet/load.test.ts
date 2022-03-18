@@ -8,7 +8,7 @@ import {
   somePartialStakePools
 } from '@cardano-sdk/util-dev';
 import { Cardano, WalletProvider, testnetTimeSettings } from '@cardano-sdk/core';
-import { KeyManagement, SingleAddressWallet, SyncStatus, Wallet } from '../../src';
+import { KeyManagement, SingleAddressWallet, Wallet } from '../../src';
 import { WalletStores, createInMemoryWalletStores } from '../../src/persistence';
 import { filter, firstValueFrom } from 'rxjs';
 import { flatten } from 'lodash-es';
@@ -42,7 +42,7 @@ const createWallet = async (stores: WalletStores, walletProvider: WalletProvider
 
 const assertWalletProperties = async (
   wallet: Wallet,
-  expectedSyncStatusAfterLoad: SyncStatus,
+  expectedUpToDateAfterLoad: boolean,
   expectedDelegateeId: Cardano.PoolId | undefined,
   expectedRewardsHistory = flatten([...mocks.rewardsHistory.values()])
 ) => {
@@ -93,7 +93,7 @@ const assertWalletProperties = async (
   // timeSettings$
   expect(await firstValueFrom(wallet.timeSettings$)).toEqual(testnetTimeSettings);
   // syncStatus$
-  expect(await firstValueFrom(wallet.syncStatus$)).toBe(expectedSyncStatusAfterLoad);
+  expect(await firstValueFrom(wallet.syncStatus.isUpToDate$)).toBe(expectedUpToDateAfterLoad);
 };
 
 const assertWalletProperties2 = async (wallet: Wallet) => {
@@ -121,11 +121,11 @@ describe('SingleAddressWallet load', () => {
   it('loads all properties from provider, stores them and restores on subsequent load, fetches new data', async () => {
     const stores = createInMemoryWalletStores();
     const wallet1 = await createWallet(stores, mocks.mockWalletProvider());
-    await assertWalletProperties(wallet1, SyncStatus.UpToDate, somePartialStakePools[0].id);
+    await assertWalletProperties(wallet1, true, somePartialStakePools[0].id);
     wallet1.shutdown();
     const wallet2 = await createWallet(stores, mocks.mockWalletProvider2(100));
-    await assertWalletProperties(wallet2, SyncStatus.Syncing, somePartialStakePools[0].id);
-    await firstValueFrom(wallet2.syncStatus$.pipe(filter((syncStatus) => syncStatus === SyncStatus.UpToDate)));
+    await assertWalletProperties(wallet2, false, somePartialStakePools[0].id);
+    await firstValueFrom(wallet2.syncStatus.isUpToDate$.pipe(filter((isUpToDate) => isUpToDate)));
     await assertWalletProperties2(wallet2);
     wallet2.shutdown();
   });
@@ -137,7 +137,7 @@ describe('SingleAddressWallet load', () => {
     walletProvider.queryTransactionsByAddresses.mockResolvedValue(txsWithNoCertificates);
     const wallet = await createWallet(stores, walletProvider);
     // eslint-disable-next-line unicorn/no-useless-undefined
-    await assertWalletProperties(wallet, SyncStatus.UpToDate, undefined, []);
+    await assertWalletProperties(wallet, true, undefined, []);
     wallet.shutdown();
   });
 });

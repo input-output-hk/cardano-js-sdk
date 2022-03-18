@@ -3,20 +3,24 @@ import {
   Observable,
   combineLatest,
   concat,
+  debounceTime,
   distinctUntilChanged,
+  filter,
   map,
-  merge,
   mergeMap,
   of,
+  share,
   skipWhile,
   switchMap,
+  take,
   timer
 } from 'rxjs';
 import { Milliseconds } from '../types';
 import { ProviderFnStats } from './ProviderTracker';
-import { SyncStatus } from '../../types';
+import { TrackedAssetProvider } from './TrackedAssetProvider';
 import { TrackedStakePoolSearchProvider } from './TrackedStakePoolSearchProvider';
 import { TrackedTimeSettingsProvider } from './TrackedTimeSettingsProvider';
+import { TrackedTxSubmitProvider } from './TrackedTxSubmitProvider';
 import { TrackedWalletProvider } from './TrackedWalletProvider';
 import { TrackerSubject } from '../util';
 
@@ -28,12 +32,16 @@ export interface ProviderStatusTrackerDependencies {
   walletProvider: TrackedWalletProvider;
   stakePoolSearchProvider: TrackedStakePoolSearchProvider;
   timeSettingsProvider: TrackedTimeSettingsProvider;
+  txSubmitProvider: TrackedTxSubmitProvider;
+  assetProvider: TrackedAssetProvider;
 }
 
 const getDefaultProviderSyncRelevantStats = ({
   walletProvider,
   stakePoolSearchProvider,
-  timeSettingsProvider
+  timeSettingsProvider,
+  txSubmitProvider,
+  assetProvider
 }: ProviderStatusTrackerDependencies): Observable<ProviderFnStats[]> =>
   combineLatest([
     walletProvider.stats.ledgerTip$,
@@ -43,6 +51,8 @@ const getDefaultProviderSyncRelevantStats = ({
     walletProvider.stats.queryTransactionsByAddresses$,
     walletProvider.stats.rewardsHistory$,
     walletProvider.stats.utxoDelegationAndRewards$,
+    assetProvider.stats.getAsset$,
+    txSubmitProvider.stats.submitTx$,
     stakePoolSearchProvider.stats.queryStakePools$,
     timeSettingsProvider.stats.getTimeSettings$
   ]);
@@ -59,27 +69,42 @@ export const createProviderStatusTracker = (
   dependencies: ProviderStatusTrackerDependencies,
   { consideredOutOfSyncAfter }: ProviderStatusTrackerProps,
   { getProviderSyncRelevantStats = getDefaultProviderSyncRelevantStats }: ProviderStatusTrackerInternals = {}
-): TrackerSubject<SyncStatus> => {
-  const relevantStats = getProviderSyncRelevantStats(dependencies);
-  const upToDate$ = relevantStats.pipe(
-    skipWhile((allStats) => allStats.some(({ initialized }) => !initialized)),
-    mergeMap((allStats) =>
-      allStats.some(
-        ({ numCalls, numFailures, numResponses, didLastRequestFail }) =>
-          didLastRequestFail || numCalls > numResponses + numFailures
-      )
-        ? EMPTY
-        : of(true)
+) => {
+  const relevantStats$ = getProviderSyncRelevantStats(dependencies).pipe(share());
+  const isAnyRequestPending$ = new TrackerSubject<boolean>(
+    relevantStats$.pipe(
+      debounceTime(1), // resolved requests could trigger new requests
+      map((allStats) =>
+        allStats.some(
+          ({ numCalls, numFailures, numResponses, didLastRequestFail }) =>
+            didLastRequestFail || numCalls > numResponses + numFailures
+        )
+      ),
+      distinctUntilChanged()
     )
   );
-  return new TrackerSubject<SyncStatus>(
-    concat(
-      of(SyncStatus.Syncing),
-      upToDate$.pipe(
-        switchMap(() =>
-          merge(of(SyncStatus.UpToDate), timer(consideredOutOfSyncAfter).pipe(map(() => SyncStatus.Syncing)))
-        )
-      )
-    ).pipe(distinctUntilChanged())
+  const statsReady$ = relevantStats$.pipe(
+    debounceTime(1),
+    skipWhile((allStats) => allStats.some(({ initialized }) => !initialized)),
+    take(1),
+    mergeMap(() => EMPTY)
   );
+  const isSettled$ = new TrackerSubject<boolean>(
+    concat(of(false), statsReady$, isAnyRequestPending$.pipe(map((pending) => !pending))).pipe(distinctUntilChanged())
+  );
+  const isUpToDate$ = new TrackerSubject<boolean>(
+    concat(
+      of(false),
+      isSettled$.pipe(
+        filter((isSettled) => isSettled),
+        switchMap(() => concat(of(true), timer(consideredOutOfSyncAfter).pipe(map(() => false)))),
+        distinctUntilChanged()
+      )
+    )
+  );
+  return {
+    isAnyRequestPending$,
+    isSettled$,
+    isUpToDate$
+  };
 };

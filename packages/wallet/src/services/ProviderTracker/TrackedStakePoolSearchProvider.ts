@@ -5,6 +5,10 @@ import { StakePoolSearchProvider } from '@cardano-sdk/core';
 export class StakePoolSearchProviderStats {
   readonly queryStakePools$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
 
+  shutdown() {
+    this.queryStakePools$.complete();
+  }
+
   reset() {
     this.queryStakePools$.next(CLEAN_FN_STATS);
   }

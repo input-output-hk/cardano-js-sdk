@@ -5,6 +5,10 @@ import { TimeSettingsProvider } from '@cardano-sdk/core';
 export class TimeSettingsProviderStats {
   readonly getTimeSettings$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
 
+  shutdown() {
+    this.getTimeSettings$.complete();
+  }
+
   reset() {
     this.getTimeSettings$.next(CLEAN_FN_STATS);
   }
