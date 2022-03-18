@@ -13,6 +13,27 @@ import { TransactionSubmitResponse } from '@cardano-graphql/client-ts';
 export const cardanoGraphqlDbSyncTxSubmitProvider = (uri: string): TxSubmitProvider => {
   const client = new GraphQLClient(uri);
 
+  const healthCheck: TxSubmitProvider['healthCheck'] = async () => {
+    try {
+      const query = gql`
+        query {
+          cardanoDbMeta {
+            initialized
+          }
+        }
+      `;
+
+      type Response = { cardanoDbMeta: { initialized: boolean } };
+      type Variables = { transaction: string };
+
+      const response = await client.request<Response, Variables>(query);
+
+      return !response.cardanoDbMeta.initialized ? { ok: false } : { ok: response.cardanoDbMeta.initialized };
+    } catch (error) {
+      throw new ProviderError(ProviderFailure.Unknown, error);
+    }
+  };
+
   const submitTx: TxSubmitProvider['submitTx'] = async (signedTransaction) => {
     try {
       const mutation = gql`
@@ -39,6 +60,7 @@ export const cardanoGraphqlDbSyncTxSubmitProvider = (uri: string): TxSubmitProvi
   };
 
   return {
+    healthCheck,
     submitTx
   };
 };

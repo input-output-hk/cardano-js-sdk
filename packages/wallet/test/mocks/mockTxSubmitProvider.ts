@@ -6,6 +6,7 @@ import { TxSubmitProvider } from '@cardano-sdk/core';
  * returns TxSubmitProvider-compatible object
  */
 export const mockTxSubmitProvider = (): TxSubmitProvider => ({
+  healthCheck: jest.fn().mockResolvedValue(true),
   submitTx: jest.fn().mockResolvedValue(void 0)
 });
 

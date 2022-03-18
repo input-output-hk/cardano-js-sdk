@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-len */
 import { Connection, createConnectionObject } from '@cardano-ogmios/client';
-import { TxSubmitProvider } from '@cardano-sdk/core';
+import { ProviderError, TxSubmitProvider } from '@cardano-sdk/core';
 import { createMockOgmiosServer } from './mocks/mockOgmiosServer';
 import { getPort } from 'get-port-please';
 import { ogmiosTxSubmitProvider } from '../src';
@@ -31,6 +31,52 @@ describe('ogmiosTxSubmitProvider', () => {
   beforeAll(async () => {
     connection = createConnectionObject({ port: await getPort() });
   });
+  describe('healthCheck', () => {
+    afterEach(async () => {
+      if (mockServer !== undefined) {
+        await serverClosePromise(mockServer);
+      }
+    });
+
+    it('is not ok if cannot connect', async () => {
+      provider = ogmiosTxSubmitProvider(connection);
+      const res = await provider.healthCheck();
+      expect(res).toEqual({ ok: false });
+    });
+
+    it('is ok if node is close to the network tip', async () => {
+      mockServer = createMockOgmiosServer({
+        healthCheck: { response: { networkSynchronization: 0.999, success: true } },
+        submitTx: { response: { success: true } }
+      });
+      await listenPromise(mockServer, connection.port);
+      provider = ogmiosTxSubmitProvider(connection);
+      const res = await provider.healthCheck();
+      expect(res).toEqual({ ok: true });
+    });
+
+    it('is not ok if node is not close to the network tip', async () => {
+      mockServer = createMockOgmiosServer({
+        healthCheck: { response: { networkSynchronization: 0.8, success: true } },
+        submitTx: { response: { success: true } }
+      });
+      await listenPromise(mockServer, connection.port);
+      provider = ogmiosTxSubmitProvider(connection);
+      const res = await provider.healthCheck();
+      expect(res).toEqual({ ok: false });
+    });
+
+    it('throws a typed error if caught during the service interaction', async () => {
+      mockServer = createMockOgmiosServer({
+        healthCheck: { response: { failWith: new Error('Some error'), success: false } },
+        submitTx: { response: { success: true } }
+      });
+      await listenPromise(mockServer, connection.port);
+      provider = ogmiosTxSubmitProvider(connection);
+      await expect(provider.healthCheck()).rejects.toThrowError(ProviderError);
+    });
+  });
+
   describe('submitTx', () => {
     describe('success', () => {
       beforeAll(async () => {
