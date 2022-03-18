@@ -1,3 +1,4 @@
+import { AssetMetadata } from '../MetadataClient/types';
 import {
   BlockHandler,
   CombinedProcessingResult,
@@ -9,6 +10,7 @@ import {
   Upsert
 } from './types';
 import lodash from 'lodash-es';
+import { Asset } from '@cardano-sdk/core';
 
 export const mergedQuery = async (
   blockHandlers: BlockHandler[],
@@ -53,3 +55,12 @@ export const mergedRollBackwardUpsert = async (blockHandlers: BlockHandler[], ct
   blockHandlers
     .map((handler) => handler.rollBackward(ctx))
     .reduce(async (acc, curr) => lodash.merge(await acc, await curr));
+
+export const mapMetadata = (serverAssetMetadata: AssetMetadata): Asset.TokenMetadata => ({
+  decimals: serverAssetMetadata.decimals.value,
+  desc: serverAssetMetadata.description?.value,
+  name: serverAssetMetadata.name?.value,
+  ticker: serverAssetMetadata.ticker?.value,
+  url: serverAssetMetadata.url?.value
+  // Missing fields: sizedIcons, icon
+});

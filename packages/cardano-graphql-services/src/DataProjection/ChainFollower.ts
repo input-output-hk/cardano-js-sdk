@@ -37,19 +37,8 @@ export class ChainFollower extends RunnableModule {
     this.#chainSyncClient = await createChainSyncClient(ogmiosContext, {
       rollBackward: async ({ point, tip }, requestNext) => {
         const txn = this.#dgraphClient.newTxn();
-        // let context: RollBackwardContext;
-        if (point !== 'origin') {
-          // context = { point, tip } as RollBackwardContext;
-        } else {
-          this.logger.info('Rolling back to genesis');
-          // const deleteResult = await this.dgraphClient.deleteDataAfterSlot(0);
-          // const genesisPoint = { slot: 0 };
-          // const context = { point: genesisPoint, tip };
-          // const upsert = await mergedRollBackwardUpsert(this.#blockHandlers, context);
-          // await this.#dgraphClient.deleteDataAfterSlot(upsert, txn);
-        }
         this.logger.info({ rollbackPoint: point, tip }, 'Rolling back');
-        const context = { point, tip } as RollBackwardContext;
+        const context = { point, tip };
         const upsert = await mergedRollBackwardUpsert(this.#blockHandlers, context);
         await this.#dgraphClient.deleteDataAfterSlot(upsert, txn);
         this.logger.info('Deleted data');

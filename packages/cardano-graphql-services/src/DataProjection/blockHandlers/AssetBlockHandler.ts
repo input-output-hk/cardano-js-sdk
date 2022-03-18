@@ -11,6 +11,7 @@ import {
 import { MetadataClient } from '../../MetadataClient/MetadataClient';
 import { Schema, isAlonzoBlock, isMaryBlock } from '@cardano-ogmios/client';
 import { dummyLogger } from 'ts-log';
+import { mapMetadata } from '../util';
 
 const HANDLER_ID = 'Asset';
 
@@ -19,11 +20,15 @@ export const createAssetBlockHandler = (metadataClient: MetadataClient, logger =
   process: async ({ queryResult }: ProcessParameters) => {
     const assetsToInsert = [];
     if (queryResult) {
-      for (const asset of queryResult.data.assets) {
-        logger.info('About to fetch asset metadata');
-        if (!(await metadataClient.fetch([asset.assetId]))) {
-          assetsToInsert.push(asset);
+      const { assets } = queryResult.data;
+      const assetIds = assets.map((asset) => asset.assetId);
+      logger.info('About to fetch assets metadata');
+      const metadata = await metadataClient.fetch(assetIds);
+      for (const [index, asset] of assets.entries()) {
+        if (metadata[index]) {
+          asset.tokenMetadata = mapMetadata(metadata[index]);
         }
+        assetsToInsert.push(asset);
       }
     }
     return { assets: assetsToInsert };
@@ -70,9 +75,10 @@ export const createAssetBlockHandler = (metadataClient: MetadataClient, logger =
   },
   rollBackward: async ({ point }: RollBackwardContext) => {
     logger.trace('rollBackward', point);
+    const slot = point === 'origin' ? 0 : point.slot;
     const query = `
     query {
-      var queryTransaction(func: ge(number, ${point.slot})) {
+      var queryTransaction(func: ge(number, ${slot})) {
           block{
           slot {
               number 

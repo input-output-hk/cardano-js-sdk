@@ -1,7 +1,7 @@
-import { Asset } from '@cardano-graphql/client-ts';
+import { Asset } from '@cardano-sdk/core';
 import { Schema as Ogmios } from '@cardano-ogmios/client';
-import dgraph from 'dgraph-js';
 
+import dgraph from 'dgraph-js';
 export type ModuleState = null | 'initializing' | 'initialized';
 
 export type DQL = string;
@@ -16,8 +16,8 @@ export interface QueryResult<Variables> {
   variables?: Variables;
 }
 export interface RollBackwardContext {
-  point: Ogmios.Point;
-  tip: Ogmios.Tip;
+  point: Ogmios.PointOrOrigin;
+  tip: Ogmios.TipOrOrigin;
 }
 
 export interface RollForwardContext {
@@ -37,12 +37,12 @@ export interface Upsert {
 
 export interface CombinedQueryResult {
   data: {
-    assets: Asset[];
+    assets: Asset.AssetInfo[];
   };
 }
 
 export interface ProcessingResult {
-  assets: Asset[];
+  assets: Asset.AssetInfo[];
 }
 
 export interface CombinedProcessingResult {
