@@ -1,4 +1,4 @@
 module.exports = {
   ...require('./base.jest.config'),
-  testPathIgnorePatterns: ['/e2e/']
+  testPathIgnorePatterns: ['/e2e/', '/hardware/']
 }
