@@ -5,6 +5,7 @@
     "rootDir": "."
   },
   "references": [
-    { "path": "../../core/src" }
+    { "path": "../../core/src" },
+    { "path": "../../ogmios/src" }
   ]
 }
