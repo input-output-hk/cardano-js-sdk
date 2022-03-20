@@ -1,13 +1,13 @@
 import { Logger } from 'ts-log';
 
+export const loggerMethodNames = ['debug', 'error', 'fatal', 'info', 'trace', 'warn'] as (keyof Logger)[];
+
 /**
  * Appends an object containing module metadata to each log entry
  *
  */
-export const moduleLogger = (logger: Logger, module: string): Logger => {
-  const methodNames = ['debug', 'error', 'info', 'trace', 'warn'] as (keyof Logger)[];
-  return <Logger>(<unknown>Object.fromEntries(
-    methodNames.map((method) => [
+export const moduleLogger = (logger: Logger, module: string): Logger => <Logger>(<unknown>Object.fromEntries(
+    loggerMethodNames.map((method) => [
       method,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (...optionalParams: any[]) => {
@@ -21,4 +21,3 @@ export const moduleLogger = (logger: Logger, module: string): Logger => {
       }
     ])
   ));
-};
