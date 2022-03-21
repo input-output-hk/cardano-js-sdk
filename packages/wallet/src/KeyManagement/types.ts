@@ -66,17 +66,16 @@ export type AgentSpecificData = number[] | null;
 export interface SerializableKeyAgentDataBase {
   networkId: Cardano.NetworkId;
   accountIndex: number;
+  knownAddresses: GroupedAddress[];
 }
 
 export interface SerializableInMemoryKeyAgentData extends SerializableKeyAgentDataBase {
   __typename: KeyAgentType.InMemory;
   encryptedRootPrivateKeyBytes: number[];
-  knownAddresses: GroupedAddress[];
 }
 
 export interface SerializableLedgerKeyAgentData extends SerializableKeyAgentDataBase {
   __typename: KeyAgentType.Ledger;
-  knownAddresses: GroupedAddress[];
   extendedAccountPublicKey: Cardano.Bip32PublicKey;
   communicationType: CommunicationType;
 }

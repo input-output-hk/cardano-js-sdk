@@ -1,7 +1,7 @@
 import { Cardano } from '@cardano-sdk/core';
 import { CommunicationType, TransportType } from '../../src/KeyManagement/types';
 import { KeyManagement } from '../../src';
-import AppAda from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import DeviceConnection from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
 describe('LedgerKeyAgent', () => {
   let keyAgent: KeyManagement.LedgerKeyAgent;
@@ -34,7 +34,7 @@ describe('LedgerKeyAgent', () => {
   });
 
   describe('device management', () => {
-    let activeDeviceConnection: AppAda;
+    let activeDeviceConnection: DeviceConnection;
     let activeTransport: TransportType;
 
     beforeAll(() => {

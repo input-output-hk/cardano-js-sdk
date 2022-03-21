@@ -61,7 +61,7 @@ export async function restoreKeyAgent<T extends SerializableKeyAgentData>(
     default:
       throw new InvalidSerializableDataError(
         // @ts-ignore
-        `Restoring key agent of __typename '${data.__typename}' is not implemented`
+        `Restoring key agent of __typename '${__typename}' is not implemented`
       );
   }
 }

@@ -9,7 +9,7 @@ import {
 } from './types';
 import { KeyAgentBase } from './KeyAgentBase';
 import { TransportError } from './errors';
-import AppAda, { GetVersionResponse, utils } from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import DeviceConnection, { GetVersionResponse, utils } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents';
 import TransportWebHID from '@ledgerhq/hw-transport-webhid';
 import type Transport from '@ledgerhq/hw-transport';
@@ -19,7 +19,7 @@ export interface LedgerKeyAgentProps {
   accountIndex: number;
   knownAddresses: GroupedAddress[];
   extendedAccountPublicKey: Cardano.Bip32PublicKey;
-  deviceConnection?: AppAda;
+  deviceConnection?: DeviceConnection;
   communicationType: CommunicationType;
 }
 
@@ -30,7 +30,7 @@ export interface CreateWithDevice {
 }
 
 export interface GetXpubProps {
-  deviceConnection?: AppAda;
+  deviceConnection?: DeviceConnection;
   communicationType: CommunicationType;
   accountIndex: number;
 }
@@ -47,7 +47,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
   readonly #knownAddresses: GroupedAddress[];
   readonly #extendedAccountPublicKey: Cardano.Bip32PublicKey;
   readonly #communicationType: CommunicationType;
-  readonly deviceConnection?: AppAda;
+  readonly deviceConnection?: DeviceConnection;
 
   constructor({
     networkId,
@@ -110,14 +110,17 @@ export class LedgerKeyAgent extends KeyAgentBase {
       : TransportWebHID.request());
   }
 
-  static async createDeviceConnection(activeTransport: Transport): Promise<AppAda> {
-    const deviceConnection = new AppAda(activeTransport);
+  static async createDeviceConnection(activeTransport: Transport): Promise<DeviceConnection> {
+    const deviceConnection = new DeviceConnection(activeTransport);
     // Perform app check to see if device can respond
     await deviceConnection.getVersion();
     return deviceConnection;
   }
 
-  static async establishDeviceConnection(communicationType: CommunicationType, devicePath?: string): Promise<AppAda> {
+  static async establishDeviceConnection(
+    communicationType: CommunicationType,
+    devicePath?: string
+  ): Promise<DeviceConnection> {
     let transport;
     try {
       transport = await LedgerKeyAgent.createTransport({ communicationType, devicePath });
@@ -142,7 +145,10 @@ export class LedgerKeyAgent extends KeyAgentBase {
     }
   }
 
-  static async checkDeviceConnection(communicationType: CommunicationType, deviceConnection?: AppAda): Promise<AppAda> {
+  static async checkDeviceConnection(
+    communicationType: CommunicationType,
+    deviceConnection?: DeviceConnection
+  ): Promise<DeviceConnection> {
     try {
       if (!deviceConnection) {
         return await LedgerKeyAgent.establishDeviceConnection(communicationType);
@@ -174,7 +180,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
 
   static async getAppVersion(
     communicationType: CommunicationType,
-    deviceConnection?: AppAda
+    deviceConnection?: DeviceConnection
   ): Promise<GetVersionResponse> {
     const recoveredDeviceConnection = await LedgerKeyAgent.checkDeviceConnection(communicationType, deviceConnection);
     return await recoveredDeviceConnection.getVersion();
