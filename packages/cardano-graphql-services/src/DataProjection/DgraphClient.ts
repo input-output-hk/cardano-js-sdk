@@ -1,9 +1,9 @@
 import { RunnableModule } from '../RunnableModule';
 import { Upsert } from './types';
 import { dummyLogger } from 'ts-log';
+import { exponentialBackoff } from '../util';
 import { gql, request } from 'graphql-request';
 import dgraph from 'dgraph-js';
-
 export class DgraphClient extends RunnableModule {
   #clientStub: dgraph.DgraphClientStub;
   #dgraphClient: dgraph.DgraphClient;
@@ -51,9 +51,10 @@ export class DgraphClient extends RunnableModule {
   private async runDgraphTransaction(txn: dgraph.Txn, fn: Function) {
     try {
       await fn();
+      await txn.commit();
     } catch (error) {
       if (error === dgraph.ERR_ABORTED) {
-        // Retry or handle exception.
+        await exponentialBackoff(fn());
       } else {
         throw error;
       }
@@ -63,29 +64,17 @@ export class DgraphClient extends RunnableModule {
   }
 
   private async runUpsertBlockFromMutations(upsert: Upsert, txn: dgraph.Txn, mutations: dgraph.Mutation[]) {
-    try {
-      const req = new dgraph.Request();
-      req.setMutationsList(mutations);
-      if (upsert.variables?.dql) {
-        req.setQuery(upsert.variables?.dql);
-      }
-      await txn.doRequest(req);
-      await txn.commit();
-    } catch (error) {
-      if (error === dgraph.ERR_ABORTED) {
-        // Retry or handle exception.
-      } else {
-        throw error;
-      }
-    } finally {
-      await txn.discard();
+    const req = new dgraph.Request();
+    req.setMutationsList(mutations);
+    if (upsert.variables?.dql) {
+      req.setQuery(upsert.variables?.dql);
     }
+    await txn.doRequest(req);
   }
 
   async writeDataFromBlock(upsert: Upsert, txn: dgraph.Txn) {
     await this.runDgraphTransaction(txn, async () => {
       const mu = new dgraph.Mutation();
-      // Todo: Translate our Upsert type
       mu.setSetJson(upsert);
       await this.runUpsertBlockFromMutations(upsert, txn, [mu]);
     });

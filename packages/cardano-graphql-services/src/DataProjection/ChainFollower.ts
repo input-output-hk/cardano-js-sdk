@@ -1,4 +1,4 @@
-import { BlockHandler, CombinedQueryResult, RollBackwardContext } from './types';
+import { BlockHandler, CombinedQueryResult } from './types';
 import {
   ChainSync,
   ConnectionConfig,
@@ -61,7 +61,6 @@ export class ChainFollower extends RunnableModule {
         requestNext();
       }
     });
-    super.initializeAfter();
   }
 
   public async startImpl(points: Schema.PointOrOrigin[]) {

@@ -11,9 +11,9 @@ export type QueryVariables = {
   $assetIds?: string[];
   $slotNo?: number;
 };
-export interface QueryResult<Variables> {
+export interface QueryResult {
   query: DQL;
-  variables?: Variables;
+  variables?: QueryVariables;
 }
 export interface RollBackwardContext {
   point: Ogmios.PointOrOrigin;
@@ -57,7 +57,7 @@ export interface ProcessParameters {
 
 export interface BlockHandler {
   id: string;
-  query?: (ctx: RollForwardContext) => Promise<QueryResult<QueryVariables>>;
+  query?: (ctx: RollForwardContext) => Promise<QueryResult>;
   process?: (parameters: ProcessParameters) => Promise<Partial<ProcessingResult>>;
   rollBackward: (ctx: RollBackwardContext) => Promise<Upsert>;
   rollForward: (ctx: RollForwardContext, processingResult: CombinedProcessingResult[]) => Promise<Upsert>;

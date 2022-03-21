@@ -4,14 +4,13 @@ import {
   ProcessParameters,
   ProcessingResult,
   QueryResult,
-  QueryVariables,
   RollBackwardContext,
   RollForwardContext
 } from '../types';
 import { MetadataClient } from '../../MetadataClient/MetadataClient';
 import { Schema, isAlonzoBlock, isMaryBlock } from '@cardano-ogmios/client';
 import { dummyLogger } from 'ts-log';
-import { mapMetadata } from '../util';
+import { mapMetadata } from './helpers';
 
 const HANDLER_ID = 'Asset';
 
@@ -34,7 +33,7 @@ export const createAssetBlockHandler = (metadataClient: MetadataClient, logger =
     return { assets: assetsToInsert };
   },
   // eslint-disable-next-line sonarjs/cognitive-complexity
-  query: async (ctx: RollForwardContext): Promise<QueryResult<QueryVariables>> => {
+  query: async (ctx: RollForwardContext): Promise<QueryResult> => {
     const { block } = ctx;
     let b: Schema.BlockMary | Schema.BlockAlonzo | undefined;
     if (isAlonzoBlock(block)) {
