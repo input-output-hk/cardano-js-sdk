@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { AuthenticationError, TransportError } from './errors';
 import { Cardano, NotImplementedError } from '@cardano-sdk/core';
 import {
   CommunicationType,
@@ -8,7 +9,6 @@ import {
   TransportType
 } from './types';
 import { KeyAgentBase } from './KeyAgentBase';
-import { TransportError } from './errors';
 import DeviceConnection, { GetVersionResponse, utils } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents';
 import TransportWebHID from '@ledgerhq/hw-transport-webhid';
@@ -120,13 +120,21 @@ export class LedgerKeyAgent extends KeyAgentBase {
     communicationType,
     accountIndex
   }: GetXpubProps): Promise<Cardano.Bip32PublicKey> {
-    const recoveredDeviceConnection = await LedgerKeyAgent.checkDeviceConnection(communicationType, deviceConnection);
-    const derivationPath = `1852'/1815'/${accountIndex}'`;
-    const extendedPublicKey = await recoveredDeviceConnection.getExtendedPublicKey({
-      path: utils.str_to_path(derivationPath) // BIP32Path
-    });
-    const xPubHex = `${extendedPublicKey.publicKeyHex}${extendedPublicKey.chainCodeHex}`;
-    return Cardano.Bip32PublicKey(xPubHex);
+    try {
+      const recoveredDeviceConnection = await LedgerKeyAgent.checkDeviceConnection(communicationType, deviceConnection);
+      const derivationPath = `1852'/1815'/${accountIndex}'`;
+      const extendedPublicKey = await recoveredDeviceConnection.getExtendedPublicKey({
+        path: utils.str_to_path(derivationPath) // BIP32Path
+      });
+      const xPubHex = `${extendedPublicKey.publicKeyHex}${extendedPublicKey.chainCodeHex}`;
+      return Cardano.Bip32PublicKey(xPubHex);
+    } catch (error: any) {
+      // eslint-disable-next-line unicorn/numeric-separators-style
+      if (error.code === 28169) {
+        throw new AuthenticationError('Failed to export extended account public key', error);
+      }
+      throw new TransportError('Transport failed', error);
+    }
   }
 
   static async getAppVersion(

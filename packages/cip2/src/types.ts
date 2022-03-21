@@ -99,8 +99,6 @@ export type ProtocolParametersForInputSelection = Pick<
   'coinsPerUtxoWord' | 'maxTxSize' | 'maxValueSize' | 'minFeeCoefficient' | 'minFeeConstant'
 >;
 
-export type ProtocolParametersRequiredByInputSelection = Required<
-  {
-    [k in keyof ProtocolParametersForInputSelection]: ProtocolParametersForInputSelection[k];
-  }
->;
+export type ProtocolParametersRequiredByInputSelection = Required<{
+  [k in keyof ProtocolParametersForInputSelection]: ProtocolParametersForInputSelection[k];
+}>;
