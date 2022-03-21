@@ -1,11 +1,7 @@
 import { InvalidModuleState } from '../src/errors';
 import { Logger, dummyLogger } from 'ts-log';
 import { RunnableModule } from '../src';
-<<<<<<< HEAD
 import { createStubLogger } from '@cardano-sdk/util-dev';
-=======
-import { createStubLogger } from './util/stubLogger';
->>>>>>> feat(cardano-graphql-services): add RunnableModule
 
 class SomeRunnableModule extends RunnableModule {
   constructor(logger = dummyLogger) {
@@ -26,10 +22,6 @@ class SomeRunnableModule extends RunnableModule {
 }
 
 describe('RunnableModule', () => {
-<<<<<<< HEAD
-=======
-  let loggerInfoSpy: jest.SpyInstance;
->>>>>>> feat(cardano-graphql-services): add RunnableModule
   let logger: Logger;
 
   beforeEach(() => {

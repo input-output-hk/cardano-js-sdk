@@ -4,6 +4,7 @@ import { DgraphClient } from './DgraphClient';
 import { MetadataClient } from '../MetadataClient/MetadataClient';
 import { RunnableModule } from '../RunnableModule';
 import { createAssetBlockHandler } from './blockHandlers/AssetBlockHandler';
+import { createBlockBlockHandler } from './blockHandlers/BlockBlockHandler';
 import { dummyLogger } from 'ts-log';
 
 export interface DataProjectorConfig {
@@ -30,7 +31,7 @@ export class DataProjector extends RunnableModule {
     this.#metadataClient = new MetadataClient(config.metadata.uri);
     this.#chainFollower = new ChainFollower(
       this.#dgraphClient,
-      [createAssetBlockHandler(this.#metadataClient, logger)],
+      [createAssetBlockHandler(this.#metadataClient, logger), createBlockBlockHandler(logger)],
       logger
     );
   }
@@ -42,8 +43,9 @@ export class DataProjector extends RunnableModule {
   }
 
   async startImpl() {
-    // Todo: Get most recent point to start sync from
-    await this.#chainFollower.start(['origin']);
+    const latestBlock = await this.#dgraphClient.getLastBlock();
+    const point = { hash: latestBlock.hash, slot: latestBlock.slot.number };
+    await this.#chainFollower.start([point, 'origin']);
   }
   async shutdownImpl() {
     await this.#chainFollower.shutdown();

@@ -1,5 +1,5 @@
+import { LastBlockQuery, Upsert } from './types';
 import { RunnableModule } from '../RunnableModule';
-import { Upsert } from './types';
 import { dummyLogger } from 'ts-log';
 import { exponentialBackoff } from '../util';
 import { gql, request } from 'graphql-request';
@@ -50,8 +50,7 @@ export class DgraphClient extends RunnableModule {
 
   private async runDgraphTransaction(txn: dgraph.Txn, fn: Function) {
     try {
-      await fn();
-      await txn.commit();
+      return fn();
     } catch (error) {
       if (error === dgraph.ERR_ABORTED) {
         await exponentialBackoff(fn());
@@ -70,6 +69,7 @@ export class DgraphClient extends RunnableModule {
       req.setQuery(upsert.variables?.dql);
     }
     await txn.doRequest(req);
+    await txn.commit();
   }
 
   async writeDataFromBlock(upsert: Upsert, txn: dgraph.Txn) {
@@ -86,5 +86,21 @@ export class DgraphClient extends RunnableModule {
       mu.setDeleteJson(upsert.mutations);
       await this.runUpsertBlockFromMutations(upsert, txn, [mu]);
     });
+  }
+
+  async getLastBlock() {
+    const tx = await this.#dgraphClient.newTxn({ readOnly: true });
+    return this.runDgraphTransaction(tx, async () => {
+      const query = `query {
+      queryBlock(order: {desc: blockNo}, first: 1) {
+        hash,
+        slot {
+          number
+        }
+      }
+    }`;
+      const response = await tx.query(query);
+      return response.getJson();
+    }) as Promise<LastBlockQuery>;
   }
 }

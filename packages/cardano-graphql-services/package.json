@@ -33,35 +33,18 @@
     "run:dgraph-projector": "ts-node --transpile-only src/DataProjection/run.ts"
   },
   "devDependencies": {
-<<<<<<< HEAD
     "@cardano-sdk/util-dev": "0.2.0",
     "@graphql-tools/utils": "~8.6.1",
     "npm-run-all": "^4.1.5",
     "shx": "^0.3.3"
-=======
-    "@types/bunyan": "^1.8.8",
-    "@types/death": "^1.1.2",
-    "@types/google-protobuf": "^3.15.5",
-    "dgraph-js": "^21.3.1",
-    "shx": "^0.3.3",
-    "ts-node": "^10.7.0"
->>>>>>> refactor(cardano-graphql-services): move DataProjector to cardano-graphql-services
   },
   "dependencies": {
     "@cardano-ogmios/client": "~5.1.0",
     "@cardano-sdk/core": "0.2.0",
-<<<<<<< HEAD
     "graphql-request": "npm:graphql-request-configurable-serializer@4.0.0",
     "reflect-metadata": "~0.1.13",
     "ts-log": "^2.2.4",
     "type-graphql": "~1.1.1"
-=======
-    "bunyan": "^1.8.15",
-    "clear": "^0.1.0",
-    "commander": "^9.0.0",
-    "death": "^1.1.0",
-    "ts-log": "^2.2.4"
->>>>>>> refactor(cardano-graphql-services): move DataProjector to cardano-graphql-services
   },
   "files": [
     "dist/*",

@@ -1,11 +1,18 @@
-import { Asset } from '@cardano-sdk/core';
+import { Asset } from '../Schema';
 import { Schema as Ogmios } from '@cardano-ogmios/client';
-
 import dgraph from 'dgraph-js';
+
 export type ModuleState = null | 'initializing' | 'initialized';
 
+export interface LastBlockQuery {
+  slot: {
+    number: number;
+  };
+  hash: string;
+}
+
 export type DQL = string;
-type Variable = string;
+type Variable = 'Asset' | 'Block';
 
 export type QueryVariables = {
   $assetIds?: string[];
@@ -36,13 +43,11 @@ export interface Upsert {
 }
 
 export interface CombinedQueryResult {
-  data: {
-    assets: Asset.AssetInfo[];
-  };
+  assets: Asset[];
 }
 
 export interface ProcessingResult {
-  assets: Asset.AssetInfo[];
+  assets: Asset[];
 }
 
 export interface CombinedProcessingResult {

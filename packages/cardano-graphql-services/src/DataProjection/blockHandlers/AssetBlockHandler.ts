@@ -8,9 +8,8 @@ import {
   RollForwardContext
 } from '../types';
 import { MetadataClient } from '../../MetadataClient/MetadataClient';
-import { Schema, isAlonzoBlock, isMaryBlock } from '@cardano-ogmios/client';
 import { dummyLogger } from 'ts-log';
-import { mapMetadata } from './helpers';
+import { getBlockType, mapMetadata } from './helpers';
 
 const HANDLER_ID = 'Asset';
 
@@ -19,7 +18,7 @@ export const createAssetBlockHandler = (metadataClient: MetadataClient, logger =
   process: async ({ queryResult }: ProcessParameters) => {
     const assetsToInsert = [];
     if (queryResult) {
-      const { assets } = queryResult.data;
+      const { assets } = queryResult;
       const assetIds = assets.map((asset) => asset.assetId);
       logger.info('About to fetch assets metadata');
       const metadata = await metadataClient.fetch(assetIds);
@@ -34,18 +33,12 @@ export const createAssetBlockHandler = (metadataClient: MetadataClient, logger =
   },
   // eslint-disable-next-line sonarjs/cognitive-complexity
   query: async (ctx: RollForwardContext): Promise<QueryResult> => {
-    const { block } = ctx;
-    let b: Schema.BlockMary | Schema.BlockAlonzo | undefined;
-    if (isAlonzoBlock(block)) {
-      b = block.alonzo as Schema.BlockAlonzo;
-    } else if (isMaryBlock(block)) {
-      b = block.mary as Schema.BlockMary;
-    }
+    const block = getBlockType(ctx.block);
     let query = '';
     const assetIdList: string[] = [];
-    if (b?.body !== undefined) {
+    if (block?.body !== undefined) {
       logger.info('About to read block transactions');
-      for (const tx of b.body) {
+      for (const tx of block.body) {
         const txBodyMintAssets = tx.body.mint.assets;
         if (txBodyMintAssets) {
           logger.info('Assets found');
@@ -79,24 +72,24 @@ export const createAssetBlockHandler = (metadataClient: MetadataClient, logger =
     query {
       var queryTransaction(func: ge(number, ${slot})) {
           block{
-          slot {
-              number 
-          }
+	          slot {
+	              number 
+	          }
           },
           mint: [
-          {
-              Asset AS asset {
-              assetId,
-              assetName,
-              assetNameUTF8,
-              policy,
-              totalQuantity,
-              fingerprint,
-              history,
-              tokenMetadata,
-              nftMetadata
-              }
-          }
+	          {
+	              Asset AS asset {
+	              assetId,
+	              assetName,
+	              assetNameUTF8,
+	              policy,
+	              totalQuantity,
+	              fingerprint,
+	              history,
+	              tokenMetadata,
+	              nftMetadata
+	              }
+	          }
           ]
       }
     }`;
@@ -122,8 +115,8 @@ export const createAssetBlockHandler = (metadataClient: MetadataClient, logger =
     const result = processingResult.find((r) => r.id === HANDLER_ID);
     const { assets } = (await result?.func) as Partial<ProcessingResult>;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const mutations: { [key: string]: any } = {};
-    if (assets) mutations.set = assets;
+    let mutations: { [key: string]: any } = {};
+    if (assets) mutations = assets;
     return {
       mutations
     };
