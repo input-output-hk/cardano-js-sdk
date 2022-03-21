@@ -41,13 +41,7 @@ export async function restoreKeyAgent<T extends SerializableKeyAgentData>(
       if (!getPassword) {
         throw new InvalidSerializableDataError('Expected "getPassword" in RestoreKeyAgentProps for InMemoryKeyAgent"');
       }
-      return new InMemoryKeyAgent({
-        accountIndex: data.accountIndex,
-        encryptedRootPrivateKey: new Uint8Array(data.encryptedRootPrivateKeyBytes),
-        getPassword,
-        knownAddresses: data.knownAddresses,
-        networkId: data.networkId
-      });
+      return new InMemoryKeyAgent({ ...data, getPassword });
     }
     case KeyAgentType.Ledger: {
       return new LedgerKeyAgent(data);

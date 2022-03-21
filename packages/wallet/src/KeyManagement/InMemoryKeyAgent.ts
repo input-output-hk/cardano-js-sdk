@@ -2,22 +2,17 @@ import * as errors from './errors';
 import {
   AccountKeyDerivationPath,
   GetPassword,
-  GroupedAddress,
   KeyAgentType,
-  SerializableKeyAgentData,
+  SerializableInMemoryKeyAgentData,
   SignBlobResult
 } from './types';
 import { AuthenticationError } from './errors';
 import { CSL, Cardano, util } from '@cardano-sdk/core';
 import { KeyAgentBase } from './KeyAgentBase';
+import { deriveAccountPrivateKey, joinMnemonicWords, mnemonicWordsToEntropy, validateMnemonic } from './util';
 import { emip3decrypt, emip3encrypt } from './emip3';
-import { harden, joinMnemonicWords, mnemonicWordsToEntropy, validateMnemonic } from './util';
 
-export interface InMemoryKeyAgentProps {
-  networkId: Cardano.NetworkId;
-  accountIndex: number;
-  knownAddresses: GroupedAddress[];
-  encryptedRootPrivateKey: Uint8Array;
+export interface InMemoryKeyAgentProps extends Omit<SerializableInMemoryKeyAgentData, '__typename'> {
   getPassword: GetPassword;
 }
 
@@ -38,59 +33,16 @@ const getPasswordRethrowTypedError = async (getPassword: GetPassword) => {
 };
 
 export class InMemoryKeyAgent extends KeyAgentBase {
-  readonly #networkId: Cardano.NetworkId;
-  readonly #accountIndex: number;
-  readonly #encryptedRootPrivateKey: Uint8Array;
   readonly #getPassword: GetPassword;
-  readonly #knownAddresses: GroupedAddress[];
 
-  constructor({
-    networkId,
-    accountIndex,
-    encryptedRootPrivateKey,
-    getPassword,
-    knownAddresses
-  }: InMemoryKeyAgentProps) {
-    super();
-    this.#accountIndex = accountIndex;
-    this.#networkId = networkId;
-    this.#encryptedRootPrivateKey = encryptedRootPrivateKey;
+  constructor({ getPassword, ...serializableData }: InMemoryKeyAgentProps) {
+    super({ ...serializableData, __typename: KeyAgentType.InMemory });
     this.#getPassword = getPassword;
-    this.#knownAddresses = knownAddresses;
-  }
-
-  get __typename(): KeyAgentType {
-    return KeyAgentType.InMemory;
-  }
-
-  get knownAddresses(): GroupedAddress[] {
-    return this.#knownAddresses;
-  }
-
-  get serializableData(): SerializableKeyAgentData {
-    return {
-      __typename: KeyAgentType.InMemory,
-      accountIndex: this.#accountIndex,
-      encryptedRootPrivateKeyBytes: [...this.#encryptedRootPrivateKey],
-      knownAddresses: this.#knownAddresses,
-      networkId: this.networkId
-    };
-  }
-
-  get networkId(): Cardano.NetworkId {
-    return this.#networkId;
-  }
-  get accountIndex(): number {
-    return this.#accountIndex;
-  }
-
-  async getExtendedAccountPublicKey(): Promise<Cardano.Bip32PublicKey> {
-    const privateKey = await this.#deriveAccountPrivateKey();
-    return Cardano.Bip32PublicKey.fromHexBlob(util.bytesToHex(privateKey.to_public().as_bytes()));
   }
 
   async signBlob({ index, type }: AccountKeyDerivationPath, blob: Cardano.util.HexBlob): Promise<SignBlobResult> {
-    const accountKey = await this.#deriveAccountPrivateKey();
+    const rootPrivateKey = await this.#decryptRootPrivateKey();
+    const accountKey = deriveAccountPrivateKey(rootPrivateKey, this.accountIndex);
     const signingKey = accountKey.derive(type).derive(index).to_raw_key();
     const signature = Cardano.Ed25519Signature(signingKey.sign(Buffer.from(blob, 'hex')).to_hex());
     const publicKey = Cardano.Ed25519PublicKey.fromHexBlob(util.bytesToHex(signingKey.to_public().as_bytes()));
@@ -123,25 +75,27 @@ export class InMemoryKeyAgent extends KeyAgentBase {
     const rootPrivateKey = CSL.Bip32PrivateKey.from_bip39_entropy(entropy, mnemonic2ndFactorPassphrase);
     const password = await getPasswordRethrowTypedError(getPassword);
     const encryptedRootPrivateKey = await emip3encrypt(rootPrivateKey.as_bytes(), password);
+    const extendedAccountPublicKey = Cardano.Bip32PublicKey(
+      Buffer.from(deriveAccountPrivateKey(rootPrivateKey, accountIndex).to_public().as_bytes()).toString('hex')
+    );
     return new InMemoryKeyAgent({
       accountIndex,
-      encryptedRootPrivateKey,
+      encryptedRootPrivateKeyBytes: [...encryptedRootPrivateKey],
+      extendedAccountPublicKey,
       getPassword,
       knownAddresses: [],
       networkId
     });
   }
 
-  async #deriveAccountPrivateKey() {
-    const rootPrivateKey = await this.#decryptRootPrivateKey();
-    return rootPrivateKey.derive(harden(1852)).derive(harden(1815)).derive(harden(this.accountIndex));
-  }
-
   async #decryptRootPrivateKey(noCache?: true) {
     const password = await getPasswordRethrowTypedError(() => this.#getPassword(noCache));
     let decryptedRootKeyBytes: Uint8Array;
     try {
-      decryptedRootKeyBytes = await emip3decrypt(this.#encryptedRootPrivateKey, password);
+      decryptedRootKeyBytes = await emip3decrypt(
+        new Uint8Array((this.serializableData as SerializableInMemoryKeyAgentData).encryptedRootPrivateKeyBytes),
+        password
+      );
     } catch (error) {
       throw new AuthenticationError('Failed to decrypt root private key', error);
     }

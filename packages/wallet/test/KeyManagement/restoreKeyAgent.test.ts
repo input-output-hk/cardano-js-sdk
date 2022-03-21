@@ -16,6 +16,10 @@ describe('KeyManagement/restoreKeyAgent', () => {
         66, 141, 241, 161, 163, 19, 81, 122, 125, 149, 49, 175, 149, 111, 48, 138, 254, 189, 69, 35, 135, 62, 177, 43,
         152, 95, 7, 87, 78, 204, 222, 109, 3, 239, 117
       ],
+      extendedAccountPublicKey: Cardano.Bip32PublicKey(
+        // eslint-disable-next-line max-len
+        '6199186adb51974690d7247d2646097d2c62763b767b528816fb7ed3f9f55d396199186adb51974690d7247d2646097d2c62763b767b528816fb7ed3f9f55d39'
+      ),
       knownAddresses: [
         {
           accountIndex: 0,

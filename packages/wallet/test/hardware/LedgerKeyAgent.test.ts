@@ -13,7 +13,7 @@ describe('LedgerKeyAgent', () => {
   });
 
   test('__typename', () => {
-    expect(typeof keyAgent.__typename).toBe('string');
+    expect(typeof keyAgent.serializableData.__typename).toBe('string');
   });
 
   test('networkId', () => {
@@ -28,9 +28,8 @@ describe('LedgerKeyAgent', () => {
     expect(Array.isArray(keyAgent.knownAddresses)).toBe(true);
   });
 
-  test('getExtendedAccountPublicKey', async () => {
-    const extendedAccountPublicKey = await keyAgent.getExtendedAccountPublicKey();
-    expect(typeof extendedAccountPublicKey).toBe('string');
+  test('extendedAccountPublicKey', () => {
+    expect(typeof keyAgent.extendedAccountPublicKey).toBe('string');
   });
 
   describe('device management', () => {

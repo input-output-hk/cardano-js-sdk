@@ -6,26 +6,11 @@ const NETWORK_ID = Cardano.NetworkId.testnet;
 const ACCOUNT_INDEX = 1;
 
 class MockKeyAgent extends KeyManagement.KeyAgentBase {
-  #knownAddresses = [];
-  get networkId(): Cardano.NetworkId {
-    return NETWORK_ID;
+  constructor(data: KeyManagement.SerializableInMemoryKeyAgentData) {
+    super(data);
   }
-  get accountIndex(): number {
-    return ACCOUNT_INDEX;
-  }
-  get serializableData() {
-    return this.serializableDataImpl();
-  }
-  get knownAddresses(): KeyManagement.GroupedAddress[] {
-    return this.#knownAddresses;
-  }
+
   serializableDataImpl = jest.fn();
-  getExtendedAccountPublicKey = jest.fn().mockResolvedValue(
-    Cardano.Bip32PublicKey(
-      // eslint-disable-next-line max-len
-      'fc5ab25e830b67c47d0a17411bf7fdabf711a597fb6cf04102734b0a2934ceaaa65ff5e7c52498d52c07b8ddfcd436fc2b4d2775e2984a49d0c79f65ceee4779'
-    )
-  );
   signBlob = jest.fn();
   exportRootPrivateKey = jest.fn();
   deriveCslPublicKeyPublic(derivationPath: KeyManagement.AccountKeyDerivationPath) {
@@ -40,7 +25,17 @@ describe('KeyAgentBase', () => {
   let keyAgent: MockKeyAgent;
 
   beforeAll(() => {
-    keyAgent = new MockKeyAgent();
+    keyAgent = new MockKeyAgent({
+      __typename: KeyManagement.KeyAgentType.InMemory,
+      accountIndex: ACCOUNT_INDEX,
+      encryptedRootPrivateKeyBytes: [],
+      extendedAccountPublicKey: Cardano.Bip32PublicKey(
+        // eslint-disable-next-line max-len
+        'fc5ab25e830b67c47d0a17411bf7fdabf711a597fb6cf04102734b0a2934ceaaa65ff5e7c52498d52c07b8ddfcd436fc2b4d2775e2984a49d0c79f65ceee4779'
+      ),
+      knownAddresses: [],
+      networkId: NETWORK_ID
+    });
   });
 
   afterEach(() => {

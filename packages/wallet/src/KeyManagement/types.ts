@@ -67,6 +67,7 @@ export interface SerializableKeyAgentDataBase {
   networkId: Cardano.NetworkId;
   accountIndex: number;
   knownAddresses: GroupedAddress[];
+  extendedAccountPublicKey: Cardano.Bip32PublicKey;
 }
 
 export interface SerializableInMemoryKeyAgentData extends SerializableKeyAgentDataBase {
@@ -76,7 +77,6 @@ export interface SerializableInMemoryKeyAgentData extends SerializableKeyAgentDa
 
 export interface SerializableLedgerKeyAgentData extends SerializableKeyAgentDataBase {
   __typename: KeyAgentType.Ledger;
-  extendedAccountPublicKey: Cardano.Bip32PublicKey;
   communicationType: CommunicationType;
 }
 
@@ -94,10 +94,7 @@ export interface KeyAgent {
   get accountIndex(): number;
   get serializableData(): SerializableKeyAgentData;
   get knownAddresses(): GroupedAddress[];
-  /**
-   * @throws AuthenticationError
-   */
-  getExtendedAccountPublicKey(): Promise<Cardano.Bip32PublicKey>;
+  get extendedAccountPublicKey(): Cardano.Bip32PublicKey;
   /**
    * @throws AuthenticationError
    */
