@@ -1,13 +1,15 @@
 import { Buffer } from 'buffer';
-import { Cardano, TxSubmitProvider } from '@cardano-sdk/core';
+import { Cardano, ProviderError, ProviderFailure, TxSubmitProvider } from '@cardano-sdk/core';
 import {
   ConnectionConfig,
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   TxSubmission,
   UnknownResultError,
+  createConnectionObject,
   createInteractionContext,
-  createTxSubmissionClient
+  createTxSubmissionClient,
+  getServerHealth
 } from '@cardano-ogmios/client';
 import { Logger, dummyLogger } from 'ts-log';
 
@@ -23,6 +25,17 @@ export const ogmiosTxSubmitProvider = (
   connectionConfig: ConnectionConfig,
   logger: Logger = dummyLogger
 ): TxSubmitProvider => ({
+  async healthCheck() {
+    try {
+      const serverHealth = await getServerHealth({ connection: createConnectionObject(connectionConfig) });
+      return { ok: serverHealth.networkSynchronization > 0.99 };
+    } catch (error) {
+      if (error.name === 'FetchError') {
+        return { ok: false };
+      }
+      throw new ProviderError(ProviderFailure.Unknown, error);
+    }
+  },
   submitTx: async (signedTransaction) => {
     // The Ogmios client supports opening a long-running ws connection,
     // however as the provider interface doesn't include shutdown handling,

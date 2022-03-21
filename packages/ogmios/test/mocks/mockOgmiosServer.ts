@@ -35,6 +35,13 @@ const HEALTH_RESPONSE_BODY = {
 };
 
 export interface MockOgmiosServerConfig {
+  healthCheck?: {
+    response: {
+      success: boolean;
+      failWith?: Error;
+      networkSynchronization?: number;
+    };
+  };
   submitTx: {
     response: {
       success: boolean;
@@ -47,6 +54,10 @@ export interface MockOgmiosServerConfig {
 
 export const createMockOgmiosServer = (config: MockOgmiosServerConfig): Server => {
   const server = createServer((req, res) => {
+    if (config.healthCheck?.response.success === false) {
+      res.statusCode = 500;
+      return res.end('{"error":"INTERNAL_SERVER_ERROR"}');
+    }
     res.setHeader('Content-Type', 'application/json');
 
     if (req.method !== 'GET' || req.url !== '/health') {
@@ -55,7 +66,12 @@ export const createMockOgmiosServer = (config: MockOgmiosServerConfig): Server =
       return;
     }
 
-    res.end(JSON.stringify(HEALTH_RESPONSE_BODY));
+    res.end(
+      JSON.stringify({
+        ...HEALTH_RESPONSE_BODY,
+        networkSynchronization: config.healthCheck?.response.networkSynchronization
+      })
+    );
   });
   const wss = new WebSocket.Server({
     server

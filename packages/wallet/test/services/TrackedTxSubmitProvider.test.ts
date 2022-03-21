@@ -34,6 +34,14 @@ describe('TrackedTxSubmitProvider', () => {
       };
 
     test(
+      'healthCheck',
+      testFunctionStats(
+        (provider) => provider.healthCheck(),
+        (stats) => stats.healthCheck$
+      )
+    );
+
+    test(
       'submitTx',
       testFunctionStats(
         (provider) => provider.submitTx(new Uint8Array()),
