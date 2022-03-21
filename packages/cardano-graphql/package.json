@@ -14,12 +14,8 @@
   ],
   "license": "MPL-2.0",
   "scripts": {
-    "build": "run-s build:ts build:schema",
-    "build:ts": "tsc --build ./src",
-    "build:schema": "node ./scripts/buildSchema.js",
-    "build:schema:dgraph": "node ./scripts/buildDgraphSchema.js",
-    "generate": "run-s build:ts build:schema:dgraph graphql-codegen",
-    "graphql-codegen": "graphql-codegen",
+    "build": "tsc --build ./src",
+    "generate": "graphql-codegen",
     "tscNoEmit": "shx echo typescript --noEmit command not implemented yet",
     "cleanup": "shx rm -rf dist node_modules",
     "lint": "eslint --ignore-path ../../.eslintignore \"**/*.ts\"",
@@ -35,8 +31,6 @@
     "@graphql-codegen/typescript": "~2.4.3",
     "@graphql-codegen/typescript-graphql-request": "~4.3.4",
     "@graphql-codegen/typescript-operations": "~2.2.4",
-    "@graphql-tools/utils": "~8.6.1",
-    "npm-run-all": "^4.1.5",
     "shx": "^0.3.3"
   },
   "dependencies": {
@@ -47,9 +41,7 @@
     "graphql": "~15.6.1",
     "graphql-request": "npm:graphql-request-configurable-serializer@4.0.0",
     "graphql-tag": "2.12.5",
-    "json-bigint": "~1.0.0",
-    "reflect-metadata": "~0.1.13",
-    "type-graphql": "~1.1.1"
+    "json-bigint": "~1.0.0"
   },
   "files": [
     "dist/*",
