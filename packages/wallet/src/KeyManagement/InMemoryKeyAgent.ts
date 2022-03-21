@@ -97,12 +97,6 @@ export class InMemoryKeyAgent extends KeyAgentBase {
     return { publicKey, signature };
   }
 
-  async derivePublicKey({ index, type }: AccountKeyDerivationPath): Promise<Cardano.Ed25519PublicKey> {
-    const accountPrivateKey = await this.#deriveAccountPrivateKey();
-    const cslPublicKey = accountPrivateKey.derive(type).derive(index).to_public().to_raw_key();
-    return Cardano.Ed25519PublicKey.fromHexBlob(util.bytesToHex(cslPublicKey.as_bytes()));
-  }
-
   // To export mnemonic, get entropy by reversing this:
   // rootPrivateKey = CSL.Bip32PrivateKey.from_bip39_entropy(entropy, EMPTY_PASSWORD);
   // eslint-disable-next-line max-len

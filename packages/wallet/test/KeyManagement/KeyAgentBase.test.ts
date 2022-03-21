@@ -20,9 +20,13 @@ class MockKeyAgent extends KeyManagement.KeyAgentBase {
     return this.#knownAddresses;
   }
   serializableDataImpl = jest.fn();
-  getExtendedAccountPublicKey = jest.fn();
+  getExtendedAccountPublicKey = jest.fn().mockResolvedValue(
+    Cardano.Bip32PublicKey(
+      // eslint-disable-next-line max-len
+      'fc5ab25e830b67c47d0a17411bf7fdabf711a597fb6cf04102734b0a2934ceaaa65ff5e7c52498d52c07b8ddfcd436fc2b4d2775e2984a49d0c79f65ceee4779'
+    )
+  );
   signBlob = jest.fn();
-  derivePublicKey = jest.fn();
   exportRootPrivateKey = jest.fn();
   deriveCslPublicKeyPublic(derivationPath: KeyManagement.AccountKeyDerivationPath) {
     return this.deriveCslPublicKey(derivationPath);
@@ -40,7 +44,6 @@ describe('KeyAgentBase', () => {
   });
 
   afterEach(() => {
-    keyAgent.derivePublicKey.mockReset();
     keyAgent.signBlob.mockReset();
   });
   // eslint-disable-next-line max-len
@@ -49,7 +52,7 @@ describe('KeyAgentBase', () => {
   test('deriveAddress', async () => {
     const paymentKey = 'b524f4627318819891efe52da641e05604168e508c3cc9f3e13945f21b69afa0';
     const stakeKey = '6a27d881ef58bd3816f60c05a5fbe872726e76fc239985fde9dcb9a8d7e582e8';
-    keyAgent.derivePublicKey.mockResolvedValueOnce(paymentKey).mockResolvedValueOnce(stakeKey);
+    keyAgent.derivePublicKey = jest.fn().mockResolvedValueOnce(paymentKey).mockResolvedValueOnce(stakeKey);
 
     const index = 1;
     const type = KeyManagement.AddressType.External;
@@ -82,12 +85,16 @@ describe('KeyAgentBase', () => {
     expect(typeof [...witnessSet.values()][0]).toBe('string');
   });
 
+  test('derivePublicKey', async () => {
+    const externalPublicKey = await keyAgent.derivePublicKey({ index: 1, type: KeyManagement.KeyType.External });
+    expect(typeof externalPublicKey).toBe('string');
+    const stakePublicKey = await keyAgent.derivePublicKey({ index: 1, type: KeyManagement.KeyType.Stake });
+    expect(typeof stakePublicKey).toBe('string');
+  });
+
   test('deriveCslPublicKey', async () => {
-    const publicKey = 'b524f4627318819891efe52da641e05604168e508c3cc9f3e13945f21b69afa0';
-    keyAgent.derivePublicKey.mockResolvedValueOnce(publicKey);
-    expect(await keyAgent.deriveCslPublicKeyPublic({} as KeyManagement.AccountKeyDerivationPath)).toBeInstanceOf(
+    expect(await keyAgent.deriveCslPublicKeyPublic({ index: 0, type: KeyManagement.KeyType.External })).toBeInstanceOf(
       CSL.PublicKey
     );
-    expect(keyAgent.derivePublicKey).toBeCalledTimes(1);
   });
 });

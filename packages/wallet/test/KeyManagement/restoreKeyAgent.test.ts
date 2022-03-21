@@ -50,17 +50,6 @@ describe('KeyManagement/restoreKeyAgent', () => {
         KeyManagement.restoreKeyAgent(inMemoryKeyAgentData, async () => Buffer.from('123'))
       ).resolves.not.toThrow();
     });
-
-    it('throws when attempting to restore key manager of unsupported __typename', async () => {
-      await expect(() =>
-        KeyManagement.restoreKeyAgent({
-          ...inMemoryKeyAgentData,
-          __typename: 'OTHER' as KeyManagement.KeyAgentType.InMemory
-        })
-      ).rejects.toThrowError(
-        new InvalidSerializableDataError("Restoring key agent of __typename 'OTHER' is not implemented")
-      );
-    });
   });
 
   describe('LedgerKeyAgent', () => {
@@ -91,16 +80,16 @@ describe('KeyManagement/restoreKeyAgent', () => {
       const keyAgent = await KeyManagement.restoreKeyAgent(ledgerKeyAgentData);
       expect(keyAgent.knownAddresses).toBe(ledgerKeyAgentData.knownAddresses);
     });
+  });
 
-    it('throws when attempting to restore key manager of unsupported __typename', async () => {
-      await expect(() =>
-        KeyManagement.restoreKeyAgent({
-          ...ledgerKeyAgentData,
-          __typename: 'OTHER' as KeyManagement.KeyAgentType.Ledger
-        })
-      ).rejects.toThrowError(
-        new InvalidSerializableDataError("Restoring key agent of __typename 'OTHER' is not implemented")
-      );
-    });
+  it('throws when attempting to restore key manager of unsupported __typename', async () => {
+    await expect(() =>
+      KeyManagement.restoreKeyAgent({
+        __typename: 'OTHER'
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any)
+    ).rejects.toThrowError(
+      new InvalidSerializableDataError("Restoring key agent of __typename 'OTHER' is not implemented")
+    );
   });
 });

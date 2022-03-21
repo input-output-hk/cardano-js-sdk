@@ -50,18 +50,12 @@ export async function restoreKeyAgent<T extends SerializableKeyAgentData>(
       });
     }
     case KeyAgentType.Ledger: {
-      return new LedgerKeyAgent({
-        accountIndex: data.accountIndex,
-        communicationType: data.communicationType,
-        extendedAccountPublicKey: data.extendedAccountPublicKey,
-        knownAddresses: data.knownAddresses,
-        networkId: data.networkId
-      });
+      return new LedgerKeyAgent(data);
     }
     default:
       throw new InvalidSerializableDataError(
         // @ts-ignore
-        `Restoring key agent of __typename '${__typename}' is not implemented`
+        `Restoring key agent of __typename '${data.__typename}' is not implemented`
       );
   }
 }

@@ -89,13 +89,6 @@ describe('InMemoryKeyAgent', () => {
     expect(typeof signature).toBe('string');
   });
 
-  test('derivePublicKey', async () => {
-    const externalPublicKey = await keyAgent.derivePublicKey({ index: 1, type: KeyManagement.KeyType.External });
-    expect(typeof externalPublicKey).toBe('string');
-    const stakePublicKey = await keyAgent.derivePublicKey({ index: 1, type: KeyManagement.KeyType.Stake });
-    expect(typeof stakePublicKey).toBe('string');
-  });
-
   test('deriveAddress', async () => {
     const address = await keyAgent.deriveAddress({ index: 1, type: KeyManagement.AddressType.Internal });
     expect(address).toBeDefined();

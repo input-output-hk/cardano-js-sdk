@@ -213,10 +213,6 @@ export class LedgerKeyAgent extends KeyAgentBase {
     throw new NotImplementedError('signBlob');
   }
 
-  async derivePublicKey(): Promise<Cardano.Ed25519PublicKey> {
-    throw new NotImplementedError('derivePublicKey');
-  }
-
   async exportRootPrivateKey(): Promise<Cardano.Bip32PrivateKey> {
     throw new NotImplementedError('Operation not supported!');
   }
