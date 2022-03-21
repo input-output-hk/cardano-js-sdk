@@ -32,60 +32,49 @@ describe('LedgerKeyAgent', () => {
     expect(typeof keyAgent.extendedAccountPublicKey).toBe('string');
   });
 
-  describe('device management', () => {
-    let activeDeviceConnection: DeviceConnection;
-    let activeTransport: TransportType;
-
-    beforeAll(() => {
+  describe('establish, check and re-establish device connection', () => {
+    let deviceConnection: DeviceConnection;
+    beforeAll(async () => {
       if (keyAgent.deviceConnection) {
         keyAgent.deviceConnection.transport.close();
       }
-    });
-
-    it('can establish new device connection', async () => {
-      const deviceConnection = await KeyManagement.LedgerKeyAgent.establishDeviceConnection(CommunicationType.Node);
-      activeDeviceConnection = deviceConnection;
-      expect(deviceConnection).toBeDefined();
-      expect(typeof deviceConnection).toBe('object');
+      deviceConnection = await KeyManagement.LedgerKeyAgent.establishDeviceConnection(CommunicationType.Node);
     });
 
     it('can check active device connection', async () => {
-      const deviceConnection = await KeyManagement.LedgerKeyAgent.checkDeviceConnection(
+      const activeDeviceConnection = await KeyManagement.LedgerKeyAgent.checkDeviceConnection(
         CommunicationType.Node,
-        activeDeviceConnection
+        deviceConnection
       );
-      expect(deviceConnection).toBeDefined();
-      expect(typeof deviceConnection).toBe('object');
+      expect(activeDeviceConnection).toBeDefined();
+      expect(typeof activeDeviceConnection).toBe('object');
+      activeDeviceConnection.transport.close();
     });
 
-    it('can check and re-establish device connection not established', async () => {
-      if (activeDeviceConnection) {
-        // Close active connection so we can simulate device check and instantiating new one
-        activeDeviceConnection.transport.close();
+    it('can re-establish closed device connection', async () => {
+      if (deviceConnection) {
+        deviceConnection.transport.close();
       }
-      const deviceConnection = await KeyManagement.LedgerKeyAgent.checkDeviceConnection(CommunicationType.Node);
-      activeDeviceConnection = deviceConnection;
-      expect(deviceConnection).toBeDefined();
-      expect(typeof deviceConnection).toBe('object');
+      const activeDeviceConnection = await KeyManagement.LedgerKeyAgent.checkDeviceConnection(CommunicationType.Node);
+      expect(activeDeviceConnection).toBeDefined();
+      expect(typeof activeDeviceConnection).toBe('object');
+      activeDeviceConnection.transport.close();
     });
+  });
 
-    it('can create new transport', async () => {
-      if (activeDeviceConnection) {
-        // Close active connection so we can create new one with same device
-        activeDeviceConnection.transport.close();
-      }
-      const transport = await KeyManagement.LedgerKeyAgent.createTransport({
+  describe('create device connection with transport', () => {
+    let transport: TransportType;
+    beforeAll(async () => {
+      transport = await KeyManagement.LedgerKeyAgent.createTransport({
         communicationType: CommunicationType.Node
       });
-      activeTransport = transport;
-      expect(transport).toBeDefined();
-      expect(typeof transport).toBe('object');
     });
 
     it('can create device connection with activeTransport', async () => {
-      const deviceConnection = await KeyManagement.LedgerKeyAgent.createDeviceConnection(activeTransport);
-      expect(deviceConnection).toBeDefined();
-      expect(typeof deviceConnection).toBe('object');
+      const activeDeviceConnection = await KeyManagement.LedgerKeyAgent.createDeviceConnection(transport);
+      expect(activeDeviceConnection).toBeDefined();
+      expect(typeof activeDeviceConnection).toBe('object');
+      activeDeviceConnection.transport.close();
     });
   });
 
