@@ -7,13 +7,15 @@ import {
 } from '@cardano-sdk/blockfrost';
 import { Cardano, testnetTimeSettings } from '@cardano-sdk/core';
 import { InMemoryKeyAgent } from '../../src/KeyManagement';
+import { URL } from 'url';
 import { createStubStakePoolSearchProvider, createStubTimeSettingsProvider } from '@cardano-sdk/util-dev';
 import { ogmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
+import { txSubmitHttpProvider } from '@cardano-sdk/cardano-graphql';
 
 const networkIdOptions = [0, 1];
 const stakePoolSearchProviderOptions = ['stub'];
 const timeSettingsProviderOptions = ['stub_testnet'];
-const txSubmitProviderOptions = ['blockfrost', 'ogmios'];
+const txSubmitProviderOptions = ['blockfrost', 'ogmios', 'http'];
 const walletProviderOptions = ['blockfrost'];
 
 const env = envalid.cleanEnv(process.env, {
@@ -24,13 +26,12 @@ const env = envalid.cleanEnv(process.env, {
     return words;
   })(),
   NETWORK_ID: envalid.num({ choices: networkIdOptions }),
-  OGMIOS_HOST: envalid.host(),
-  OGMIOS_PORT: envalid.port(),
-  OGMIOS_TLS: envalid.bool(),
+  OGMIOS_URL: envalid.url(),
   POOL_ID_1: envalid.str(),
   POOL_ID_2: envalid.str(),
   STAKE_POOL_SEARCH_PROVIDER: envalid.str({ choices: stakePoolSearchProviderOptions }),
   TIME_SETTINGS_PROVIDER: envalid.str({ choices: timeSettingsProviderOptions }),
+  TX_SUBMIT_HTTP_URL: envalid.url(),
   TX_SUBMIT_PROVIDER: envalid.str({ choices: txSubmitProviderOptions }),
   WALLET_PASSWORD: envalid.str(),
   WALLET_PROVIDER: envalid.str({ choices: walletProviderOptions })
@@ -51,13 +52,26 @@ export const assetProvider = (() => {
 })();
 
 export const txSubmitProvider = (() => {
-  if (env.TX_SUBMIT_PROVIDER === 'blockfrost') {
-    const blockfrost = new BlockFrostAPI({ isTestnet, projectId: env.BLOCKFROST_API_KEY });
-    return blockfrostTxSubmitProvider(blockfrost);
-  } else if (env.TX_SUBMIT_PROVIDER === 'ogmios') {
-    return ogmiosTxSubmitProvider({ host: env.OGMIOS_HOST, port: env.OGMIOS_PORT, tls: env.OGMIOS_TLS });
+  const ogmiosUrl = new URL(env.OGMIOS_URL);
+  switch (env.TX_SUBMIT_PROVIDER) {
+    case 'blockfrost': {
+      const blockfrost = new BlockFrostAPI({ isTestnet, projectId: env.BLOCKFROST_API_KEY });
+      return blockfrostTxSubmitProvider(blockfrost);
+    }
+    case 'ogmios': {
+      return ogmiosTxSubmitProvider({
+        host: ogmiosUrl.host,
+        port: ogmiosUrl.port ? Number.parseInt(ogmiosUrl.port) : undefined,
+        tls: ogmiosUrl?.protocol === 'wss'
+      });
+    }
+    case 'http': {
+      return txSubmitHttpProvider({ url: env.TX_SUBMIT_HTTP_URL });
+    }
+    default: {
+      throw new Error(`TX_SUBMIT_PROVIDER unsupported: ${env.TX_SUBMIT_PROVIDER}`);
+    }
   }
-  throw new Error(`TX_SUBMIT_PROVIDER unsupported: ${env.TX_SUBMIT_PROVIDER}`);
 })();
 
 export const keyAgentReady = (() =>
