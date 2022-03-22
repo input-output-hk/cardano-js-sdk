@@ -6,7 +6,8 @@ import { Value } from './Value';
 
 @ObjectType()
 export class TransactionInput {
-  @Field(() => Address)
+  // TODO: Probably it has to remain nullable since at first transaction there werent any address
+  @Field(() => Address, { nullable: true })
   address: Address;
   @Field(() => Redeemer, { nullable: true })
   redeemer?: Redeemer;
@@ -16,6 +17,7 @@ export class TransactionInput {
   transaction: Transaction;
   @Field(() => Int)
   index: number;
-  @Field(() => Value)
+  // TODO: Probably it has to remain nullable
+  @Field(() => Value, { nullable: true })
   value: Value;
 }

@@ -18,13 +18,19 @@ export class Block {
   @Directive('@hasInverse(field: block)')
   @Field(() => Slot)
   slot: Slot;
-  @Field(() => StakePool)
+  // TODO: nullable has to be removed once
+  // we have this information when inserting blocks
+  @Field(() => StakePool, { nullable: true })
   issuer: StakePool;
-  @Field(() => Epoch)
+  // TODO: nullable has to be removed once
+  // we have this information when inserting blocks
+  @Field(() => Epoch, { nullable: true })
   epoch: Epoch;
   @Field(() => Int64)
   size: Cardano.BlockSize;
-  @Field(() => Int64)
+  // TODO: nullable has to be removed once
+  // we have this information when inserting blocks
+  @Field(() => Int64, { nullable: true })
   totalLiveStake: Cardano.Lovelace;
   @Directive('@hasInverse(field: block)')
   @Field(() => [Transaction])
@@ -35,11 +41,17 @@ export class Block {
   totalFees: Cardano.Lovelace;
   @Field(() => Block)
   previousBlock?: Block;
-  @Field(() => Block)
+  // TODO: nullable has to be removed once
+  // we have this information when inserting blocks
+  @Field(() => Block, { nullable: true })
   nextBlock?: Block;
-  @Field(() => Int)
+  // TODO: nullable has to be removed once
+  // we have this information when inserting blocks
+  @Field(() => Int, { nullable: true })
   confirmations: number;
-  @Field(() => ProtocolVersion)
+  // TODO: nullable has to be removed once
+  // we have this information when inserting blocks
+  @Field(() => ProtocolVersion, { nullable: true })
   nextBlockProtocolVersion: ProtocolVersion;
   @Field(() => String)
   opCert: Cardano.Hash32ByteBase16;

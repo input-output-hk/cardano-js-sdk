@@ -30,9 +30,7 @@ export class DgraphClient extends RunnableModule {
   }
 
   async shutdownImpl(): Promise<void> {
-    super.shutdownBefore();
     await this.#clientStub.close();
-    super.shutdownAfter();
   }
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   async startImpl(): Promise<void> {}

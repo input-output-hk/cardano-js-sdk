@@ -9,7 +9,7 @@ import {
 } from '../types';
 import { MetadataClient } from '../../MetadataClient/MetadataClient';
 import { dummyLogger } from 'ts-log';
-import { getBlockType, mapMetadata } from './helpers';
+import { getBlockType, mapAssetMetadata } from './helpers';
 
 const HANDLER_ID = 'Asset';
 
@@ -24,7 +24,7 @@ export const createAssetBlockHandler = (metadataClient: MetadataClient, logger =
       const metadata = await metadataClient.fetch(assetIds);
       for (const [index, asset] of assets.entries()) {
         if (metadata[index]) {
-          asset.tokenMetadata = mapMetadata(metadata[index]);
+          asset.tokenMetadata = mapAssetMetadata(metadata[index]);
         }
         assetsToInsert.push(asset);
       }

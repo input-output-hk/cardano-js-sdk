@@ -28,7 +28,8 @@ export class Transaction {
   index: number;
   @Field(() => [TransactionInput], { nullable: true })
   collateral?: TransactionInput[];
-  @Field(() => Int64)
+  // TODO: nullable has to be reverted once this information can be obtained
+  @Field(() => Int64, { nullable: true })
   deposit: Cardano.Lovelace;
   @Field(() => Int64)
   fee: Cardano.Lovelace;
@@ -47,7 +48,8 @@ export class Transaction {
   auxiliaryData?: AuxiliaryData;
   @Field(() => [Token], { nullable: true })
   mint?: Token[];
-  @Field(() => Int64)
+  // TODO: nullable has to be reverted once this information can be obtained
+  @Field(() => Int64, { nullable: true })
   size: number;
   @Field(() => Int64)
   totalOutputCoin: Cardano.Lovelace;
