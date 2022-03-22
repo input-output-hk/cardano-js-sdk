@@ -179,15 +179,20 @@ export const txBody = (
   return cslBody;
 };
 
-export const tx = ({ body, witness, auxiliaryData }: Cardano.NewTxAlonzo): Transaction => {
-  const witnessSet = TransactionWitnessSet.new();
+export const witnessSet = (signatures: Cardano.Signatures): TransactionWitnessSet => {
+  const cslWitnessSet = TransactionWitnessSet.new();
   const vkeyWitnesses = Vkeywitnesses.new();
-  for (const [vkey, signature] of witness.signatures.entries()) {
+  for (const [vkey, signature] of signatures.entries()) {
     const publicKey = PublicKey.from_bytes(Buffer.from(vkey, 'hex'));
     const vkeyWitness = Vkeywitness.new(Vkey.new(publicKey), Ed25519Signature.from_hex(signature.toString()));
     vkeyWitnesses.add(vkeyWitness);
   }
-  witnessSet.set_vkeys(vkeyWitnesses);
+  cslWitnessSet.set_vkeys(vkeyWitnesses);
+  return cslWitnessSet;
+};
+
+export const tx = ({ body, witness, auxiliaryData }: Cardano.NewTxAlonzo): Transaction => {
+  const txWitnessSet = witnessSet(witness.signatures);
   // Possible optimization: only convert auxiliary data once
-  return Transaction.new(txBody(body, auxiliaryData), witnessSet, txAuxiliaryData(auxiliaryData));
+  return Transaction.new(txBody(body, auxiliaryData), txWitnessSet, txAuxiliaryData(auxiliaryData));
 };
