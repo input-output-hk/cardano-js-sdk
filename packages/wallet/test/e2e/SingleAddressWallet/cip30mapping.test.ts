@@ -1,7 +1,7 @@
 import * as CSL from '@emurgo/cardano-serialization-lib-nodejs';
-import { Cardano, parseCslAddress } from '@cardano-sdk/core';
+import { Cardano, coreToCsl, parseCslAddress } from '@cardano-sdk/core';
 import { RequestAccess, WalletApi, WalletProperties } from '@cardano-sdk/cip30';
-import { SingleAddressWallet } from '../../../src';
+import { InitializeTxResult, SingleAddressWallet } from '../../../src';
 import {
   assetProvider,
   keyAgentReady,
@@ -12,12 +12,11 @@ import {
 } from '../config'; // or wasm, or load dynamically in beforeAll
 import { createCip30WalletApiFromWallet } from '../../../src/util';
 import { firstValueFrom } from 'rxjs';
-import cbor from 'cbor';
 export const properties: WalletProperties = { apiVersion: '0.1.0', icon: 'imageLink', name: 'testWallet' };
 
 export const requestAccess: RequestAccess = async () => true;
 
-const createTxInternals = async (wallet: SingleAddressWallet) => {
+const createTxInternals = async (wallet: SingleAddressWallet): Promise<InitializeTxResult> => {
   const outputs = [
     {
       address: Cardano.Address(
@@ -61,7 +60,7 @@ describe('cip30 e2e', () => {
     wallet.shutdown();
   });
 
-  it('should correctly pull wallet balance correctly from blockfrost before starting the test', async () => {
+  it('should correctly pull wallet balance correctly from the provider before starting the test', async () => {
     await firstValueFrom(wallet.balance.total$);
     expect(wallet.balance.total$.value?.coins).toBeGreaterThanOrEqual(0n);
   });
@@ -72,8 +71,9 @@ describe('cip30 e2e', () => {
       expect(cip30NetworkId).toEqual(Number(process.env.NETWORK_ID));
     });
 
-    test.skip('api.getUtxos', async () => {
-      expect(async () => await mappedWallet.getUtxos()).not.toThrow();
+    test('api.getUtxos', async () => {
+      const utxos = await mappedWallet.getUtxos();
+      expect(() => coreToCsl.utxo(utxos!)).not.toThrow();
     });
 
     test('api.getBalance', async () => {
@@ -81,13 +81,12 @@ describe('cip30 e2e', () => {
       expect(() => CSL.Value.from_bytes(balanceCborBytes)).not.toThrow();
     });
 
-    test.skip('api.getUsedAddresses', async () => {
+    test('api.getUsedAddresses', async () => {
       const cipUsedAddressess = await mappedWallet.getUsedAddresses();
       const [{ address: walletUsedAddresses }] = await firstValueFrom(wallet.addresses$);
+      const parsedAddress = parseCslAddress(walletUsedAddresses.toString());
 
-      const encodedWallet = CSL.Address.from_bech32(cipUsedAddressess[0]);
-
-      expect(encodedWallet).toEqual(walletUsedAddresses);
+      expect(cipUsedAddressess).toEqual([Buffer.from(parsedAddress!.to_bytes()).toString('hex')]);
     });
 
     test('api.getUnusedAddresses', async () => {
@@ -98,35 +97,39 @@ describe('cip30 e2e', () => {
     test('api.getChangeAddress', async () => {
       const cipChangeAddress = await mappedWallet.getChangeAddress();
       const [{ address }] = await firstValueFrom(wallet.addresses$);
-      const parsedAddress = parseCslAddress(address as unknown as string);
-      if (!parsedAddress) {
-        throw new Error('No wallet address');
-      }
+      const parsedAddress = parseCslAddress(address.toString());
 
-      expect(cipChangeAddress).toEqual(Buffer.from(parsedAddress.to_bytes()).toString('hex'));
+      expect(cipChangeAddress).toEqual(Buffer.from(parsedAddress!.to_bytes()).toString('hex'));
     });
 
     test('api.getRewardAddresses', async () => {
       const cipRewardAddresses = await mappedWallet.getRewardAddresses();
-      const walletRewardAddresses = await wallet.addresses$.value?.filter((s) => s.rewardAccount);
+      const [{ rewardAccount }] = await firstValueFrom(wallet.addresses$);
+      const parsedAddress = parseCslAddress(rewardAccount.toString());
 
-      expect(cipRewardAddresses).toEqual(walletRewardAddresses);
+      expect(cipRewardAddresses).toEqual([Buffer.from(parsedAddress!.to_bytes()).toString('hex')]);
     });
 
-    test('api.signTx', async () => {
+    test.skip('api.signTx', async () => {
       const txInternals = await createTxInternals(wallet);
-      expect(await mappedWallet.signTx(cbor.encode(txInternals).toString('hex'))).not.toThrow();
+      const finalizedTx = await wallet.finalizeTx(txInternals);
+
+      const cslTx = coreToCsl.tx(finalizedTx).to_bytes();
+      expect(async () => mappedWallet.signTx(Buffer.from(cslTx).toString('hex'))).not.toThrow();
     });
 
     test('api.signData', async () => {
       const [{ address }] = await firstValueFrom(wallet.addresses$);
 
-      expect(await mappedWallet.signData(address, '')).not.toThrow();
+      expect(async () => await mappedWallet.signData(address, Cardano.util.HexBlob('abc123').toString())).not.toThrow();
     });
 
-    test('api.submitTx', async () => {
+    test.skip('api.submitTx', async () => {
       const txInternals = await createTxInternals(wallet);
-      expect(await mappedWallet.submitTx(cbor.encode(txInternals).toString('hex'))).not.toThrow();
+      const finalizedTx = await wallet.finalizeTx(txInternals);
+
+      const cslTx = coreToCsl.tx(finalizedTx).to_bytes();
+      expect(async () => await mappedWallet.submitTx(Buffer.from(cslTx).toString('hex'))).not.toThrow();
     });
 
     test.todo('errorStates');

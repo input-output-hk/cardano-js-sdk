@@ -49,7 +49,7 @@ export class Wallet {
   readonly name: WalletName;
   readonly icon: WalletIcon;
 
-  #allowList: string[];
+  #allowList: string[] | null;
   #logger: Logger;
   #api: WalletApi;
   #requestAccess: RequestAccess;
@@ -61,7 +61,7 @@ export class Wallet {
     this.icon = properties.icon;
     this.isEnabled = this.isEnabled.bind(this);
     this.name = properties.name;
-
+    this.#allowList = null;
     this.#api = api;
     this.#options = { ...defaultOptions, ...options };
     this.#logger = this.#options.logger;
@@ -69,32 +69,33 @@ export class Wallet {
   }
 
   async #getAllowList(storageKey: string): Promise<string[]> {
-    if (!storageKey) return Promise.resolve([]);
+    if (!storageKey) return [];
     try {
       const persistedStorage: Record<string, WalletStorage> = await this.#options.storage.get(storageKey);
-      return persistedStorage[storageKey].allowList;
+      return persistedStorage[storageKey].allowList || [];
     } catch (error) {
       this.#logger.error(error);
       return [];
     }
   }
 
-  async #allowApplication(appName: string) {
+  async #allowApplication(appName: string, persist?: boolean) {
     if (!this.#allowList) {
       this.#allowList = await this.#getAllowList(this.name);
     }
     this.#allowList.push(appName);
 
-    // Todo: Encrypt
-    await this.#options.storage.set({ [this.name]: { allowList: [...this.#allowList, appName] } });
-    this.#logger.debug(
-      {
-        allowList: this.#allowList,
-        module: 'Wallet',
-        walletName: this.name
-      },
-      'Allow list persisted'
-    );
+    if (persist) {
+      await this.#options.storage.set({ [this.name]: { allowList: [...this.#allowList, appName] } });
+      this.#logger.debug(
+        {
+          allowList: this.#allowList,
+          module: 'Wallet',
+          walletName: this.name
+        },
+        'Allow list persisted'
+      );
+    }
   }
 
   /**
@@ -133,7 +134,7 @@ export class Wallet {
    *
    * Errors: `ApiError`
    */
-  public async enable(hostname: string): Promise<WalletApi> {
+  public async enable(hostname: string, persist?: boolean): Promise<WalletApi> {
     if (await this.isEnabled(hostname)) {
       this.#logger.debug(
         {
@@ -149,10 +150,11 @@ export class Wallet {
     const isAuthed = await this.#requestAccess();
 
     if (!isAuthed) {
+      this.#logger.debug(`${hostname} not authorized to access api`);
       throw new ApiError(APIErrorCode.Refused, 'wallet not authorized.');
     }
 
-    await this.#allowApplication(hostname);
+    await this.#allowApplication(hostname, persist);
 
     return this.#api;
   }

@@ -5,7 +5,6 @@ import { Logger, dummyLogger } from 'ts-log';
 import { SingleAddressWallet } from '.';
 import { cip30signData } from './KeyManagement/cip8';
 import { firstValueFrom } from 'rxjs';
-import cbor from 'cbor';
 
 type Props = {
   keyAgent: KeyAgent;
@@ -84,6 +83,11 @@ export const createCip30WalletApiFromWallet = (wallet: SingleAddressWallet, prop
       if (amount) {
         try {
           const filterAmount = CSL.Value.from_bytes(Buffer.from(amount, 'hex'));
+          /**
+           * Getting UTxOs to meet a required amount is a complex operation, which is handled by input selection capabilities.
+           * By initializing a transaction we're able to utilise the internal configuration and algorithm to make this selection,
+           * using a wallet address to satisfy the interface only.
+           */
           const { inputSelection } = await wallet.initializeTx({
             outputs: new Set([{ address: wallet.addresses$.value![0].address, value: cslToCore.value(filterAmount) }])
           });
@@ -109,14 +113,18 @@ export const createCip30WalletApiFromWallet = (wallet: SingleAddressWallet, prop
       if (!signature) {
         throw new ApiError(400, 'could not sign data');
       }
-
-      return Promise.resolve(signature.toString());
+      return Promise.resolve(Buffer.from(signature).toString('hex'));
     },
     signTx: async (tx: Cbor, _partialSign?: Boolean): Promise<Cbor> => {
       logger.debug('signTx');
       try {
-        const signatures = await props.keyAgent.signTransaction(cbor.decode(tx));
-        return Promise.resolve(cbor.encode(signatures).toString('hex'));
+        const txDecoded = CSL.Transaction.from_bytes(Buffer.from(tx, 'hex'));
+        const coreTx = cslToCore.tx(txDecoded);
+        const witnessSet = await props.keyAgent.signTransaction({ hash: coreTx.id, body: coreTx.body });
+
+        const cslWitnessSet = coreToCsl.witnessSet(witnessSet);
+
+        return Promise.resolve(Buffer.from(cslWitnessSet.to_bytes()).toString('hex'));
       } catch (error) {
         logger.error(error);
         throw new TxSignError(1, error);

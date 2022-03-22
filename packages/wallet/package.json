@@ -52,7 +52,6 @@
     "@ledgerhq/hw-transport-webhid": "6.24.1",
     "backoff-rxjs": "^6.5.7",
     "bip39": "^3.0.4",
-    "cbor": "^8.1.0",
     "chacha": "^2.1.0",
     "delay": "^5.0.0",
     "emittery": "^0.10.0",

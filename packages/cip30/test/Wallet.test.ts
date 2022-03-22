@@ -40,7 +40,7 @@ describe('Wallet', () => {
     expect(typeof wallet.apiVersion).toBe('string');
     expect(wallet.apiVersion).toBe('0.1.0');
     expect(typeof wallet.name).toBe('string');
-    expect(wallet.name).toBe('test-wallet');
+    expect(wallet.name).toBe(testWallet.properties.name);
     expect(typeof wallet.isEnabled).toBe('function');
     const isEnabled = await wallet.isEnabled(windowStub.location.hostname);
     expect(typeof isEnabled).toBe('boolean');
@@ -50,7 +50,7 @@ describe('Wallet', () => {
 
   test('enable', async () => {
     expect(await wallet.isEnabled(windowStub.location.hostname)).toBe(false);
-    const api = await wallet.enable(windowStub.location.hostname);
+    const api = await wallet.enable(windowStub.location.hostname, true);
     expect(typeof api).toBe('object');
     const methods = Object.keys(api);
     expect(methods).toEqual(apiMethods);
@@ -58,22 +58,18 @@ describe('Wallet', () => {
   });
 
   test('prior enabling should persist', async () => {
-    await browser.storage.local.set({ myWallet: { allowList: 'test.invalid' } });
-    const persistedWallet = new Wallet(
-      { ...testWallet.properties, name: 'myWallet' },
-      testWallet.api,
-      testWallet.requestAccess,
-      options
-    );
+    const otherHostname = 'anotherHostname';
+    await browser.storage.local.set({ [testWallet.properties.name]: { allowList: [otherHostname] } });
+    const persistedWallet = new Wallet({ ...testWallet.properties }, testWallet.api, testWallet.requestAccess, options);
 
-    expect(await persistedWallet.isEnabled('test.invalid')).toBe(true);
+    expect(await persistedWallet.isEnabled(otherHostname)).toBe(true);
   });
 
   describe('api', () => {
     let api: WalletApi;
 
     beforeAll(async () => {
-      api = await wallet.enable(windowStub.location.hostname);
+      api = await wallet.enable(windowStub.location.hostname, true);
     });
 
     test('getNetworkId', async () => {

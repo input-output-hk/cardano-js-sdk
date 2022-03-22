@@ -3654,13 +3654,6 @@ caseless@~0.12.0:
   resolved "https://registry.yarnpkg.com/caseless/-/caseless-0.12.0.tgz#1b681c21ff84033c826543090689420d187151dc"
   integrity sha1-G2gcIf+EAzyCZUMJBolCDRhxUdw=
 
-cbor@^8.1.0:
-  version "8.1.0"
-  resolved "https://registry.yarnpkg.com/cbor/-/cbor-8.1.0.tgz#cfc56437e770b73417a2ecbfc9caf6b771af60d5"
-  integrity sha512-DwGjNW9omn6EwP70aXsn7FQJx5kO12tX0bZkaTjzdVFM6/7nhA4t0EENocKGx6D2Bch9PE2KzCUf5SceBdeijg==
-  dependencies:
-    nofilter "^3.1.0"
-
 chacha-native@^2.0.0:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/chacha-native/-/chacha-native-2.0.3.tgz#435259a015a46816d1bc11376bd4c09e35c4bf5f"
@@ -8650,12 +8643,22 @@ node-releases@^2.0.2:
   resolved "https://registry.yarnpkg.com/node-releases/-/node-releases-2.0.2.tgz#7139fe71e2f4f11b47d4d2986aaf8c48699e0c01"
   integrity sha512-XxYDdcQ6eKqp/YjI+tb2C5WM2LgjnZrfYg4vgQt49EK268b6gYCHsBLrK2qvJo4FmCtqmKezb0WZFK4fkrZNsg==
 
+<<<<<<< HEAD
 nofilter@^3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/nofilter/-/nofilter-3.1.0.tgz#c757ba68801d41ff930ba2ec55bab52ca184aa66"
   integrity sha512-l2NNj07e9afPnhAhvgVrCD/oy2Ai1yfLpuo3EpiO1jFTsB4sFz6oIfAfSZyQzVpkZQ9xS8ZS5g1jCBgq4Hwo0g==
 <<<<<<< HEAD
 =======
+=======
+node.extend@^2.0.0:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/node.extend/-/node.extend-2.0.2.tgz#b4404525494acc99740f3703c496b7d5182cc6cc"
+  integrity sha512-pDT4Dchl94/+kkgdwyS2PauDFjZG0Hk0IcHIB+LkW27HLDtdoeMxHTxZh39DYbPP8UflWXWj9JcdDozF+YDOpQ==
+  dependencies:
+    has "^1.0.3"
+    is "^3.2.1"
+>>>>>>> 22bd924a (feat(cip30): removed cbor and custom test environment)
 
 noop-logger@^0.1.1:
   version "0.1.1"
