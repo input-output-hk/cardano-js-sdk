@@ -113,7 +113,7 @@ describe('ogmiosTxSubmitProvider', () => {
 
         try {
           await provider.submitTx(new Uint8Array());
-        } catch (error) {
+        } catch (error: any) {
           expect(error[0].name).toBe('EraMismatchError');
         }
       });
