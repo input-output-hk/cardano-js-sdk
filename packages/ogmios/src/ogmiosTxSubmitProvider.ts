@@ -29,7 +29,8 @@ export const ogmiosTxSubmitProvider = (
     try {
       const serverHealth = await getServerHealth({ connection: createConnectionObject(connectionConfig) });
       return { ok: serverHealth.networkSynchronization > 0.99 };
-    } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
       if (error.name === 'FetchError') {
         return { ok: false };
       }
