@@ -7,19 +7,33 @@ import {
   SerializableKeyAgentData,
   SignBlobResult
 } from './types';
-import { CSL, Cardano } from '@cardano-sdk/core';
+import { CSL, Cardano, util } from '@cardano-sdk/core';
 import { STAKE_KEY_DERIVATION_PATH, ownSignatureKeyPaths } from './util';
 import { TxInternals } from '../Transaction';
 
 export abstract class KeyAgentBase implements KeyAgent {
-  abstract get networkId(): Cardano.NetworkId;
-  abstract get accountIndex(): number;
-  abstract get serializableData(): SerializableKeyAgentData;
-  abstract get knownAddresses(): GroupedAddress[];
-  abstract getExtendedAccountPublicKey(): Promise<Cardano.Bip32PublicKey>;
+  readonly #serializableData: SerializableKeyAgentData;
+  get knownAddresses(): GroupedAddress[] {
+    return this.#serializableData.knownAddresses;
+  }
+  get serializableData(): SerializableKeyAgentData {
+    return this.#serializableData;
+  }
+  get extendedAccountPublicKey(): Cardano.Bip32PublicKey {
+    return this.serializableData.extendedAccountPublicKey;
+  }
+  get networkId(): Cardano.NetworkId {
+    return this.serializableData.networkId;
+  }
+  get accountIndex(): number {
+    return this.serializableData.accountIndex;
+  }
   abstract signBlob(derivationPath: AccountKeyDerivationPath, blob: Cardano.util.HexBlob): Promise<SignBlobResult>;
-  abstract derivePublicKey(derivationPath: AccountKeyDerivationPath): Promise<Cardano.Ed25519PublicKey>;
   abstract exportRootPrivateKey(): Promise<Cardano.Bip32PrivateKey>;
+
+  constructor(serializableData: SerializableKeyAgentData) {
+    this.#serializableData = serializableData;
+  }
 
   /**
    * See https://github.com/cardano-foundation/CIPs/tree/master/CIP-1852#specification
@@ -67,8 +81,14 @@ export abstract class KeyAgentBase implements KeyAgent {
     );
   }
 
-  protected async deriveCslPublicKey(derivationPath: AccountKeyDerivationPath): Promise<CSL.PublicKey> {
-    const hexPublicKey = await this.derivePublicKey(derivationPath);
-    return CSL.PublicKey.from_bytes(Buffer.from(hexPublicKey, 'hex'));
+  async derivePublicKey(derivationPath: AccountKeyDerivationPath): Promise<Cardano.Ed25519PublicKey> {
+    const cslPublicKey = await this.deriveCslPublicKey(derivationPath);
+    return Cardano.Ed25519PublicKey.fromHexBlob(util.bytesToHex(cslPublicKey.as_bytes()));
+  }
+
+  protected async deriveCslPublicKey({ index, type }: AccountKeyDerivationPath): Promise<CSL.PublicKey> {
+    const accountPublicKeyBytes = Buffer.from(this.extendedAccountPublicKey, 'hex');
+    const accountPublicKey = CSL.Bip32PublicKey.from_bytes(accountPublicKeyBytes);
+    return accountPublicKey.derive(type).derive(index).to_raw_key();
   }
 }

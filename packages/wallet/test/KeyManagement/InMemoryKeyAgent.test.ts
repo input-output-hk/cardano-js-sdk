@@ -1,9 +1,9 @@
-import { AuthenticationError } from '../../src/KeyManagement/errors';
-import { Cardano } from '@cardano-sdk/core';
+import { CSL, Cardano } from '@cardano-sdk/core';
 import { KeyManagement } from '../../src';
+import { deriveAccountPrivateKey } from '../../src/KeyManagement/util';
 
 describe('InMemoryKeyAgent', () => {
-  let keyAgent: KeyManagement.InMemoryKeyAgent;
+  let keyAgent: KeyManagement.KeyAgent;
   let getPassword: jest.Mock;
   let mnemonicWords: string[];
 
@@ -24,7 +24,7 @@ describe('InMemoryKeyAgent', () => {
   });
 
   test('__typename', () => {
-    expect(typeof keyAgent.__typename).toBe('string');
+    expect(typeof keyAgent.serializableData.__typename).toBe('string');
   });
 
   test('accountIndex', () => {
@@ -61,23 +61,8 @@ describe('InMemoryKeyAgent', () => {
     });
   });
 
-  describe('getExtendedAccountPublicKey', () => {
-    it('resolves on sucessful decryption', async () => {
-      const extendedAccountPublicKey = await keyAgent.getExtendedAccountPublicKey();
-      expect(typeof extendedAccountPublicKey).toBe('string');
-    });
-    it('rejects on getPassword rejection', async () => {
-      getPassword.mockRejectedValueOnce(new Error('any error'));
-      await expect(() => keyAgent.getExtendedAccountPublicKey()).rejects.toThrowError(
-        new AuthenticationError('Failed to enter password')
-      );
-    });
-    it('rejects on incorrect password', async () => {
-      getPassword.mockResolvedValueOnce(Buffer.from('incorrect password'));
-      await expect(() => keyAgent.getExtendedAccountPublicKey()).rejects.toThrowError(
-        new AuthenticationError('Failed to decrypt root private key')
-      );
-    });
+  it('has extendedAccountPublicKey', () => {
+    expect(typeof keyAgent.extendedAccountPublicKey).toBe('string');
   });
 
   test('signBlob', async () => {
@@ -87,13 +72,6 @@ describe('InMemoryKeyAgent', () => {
     );
     expect(typeof publicKey).toBe('string');
     expect(typeof signature).toBe('string');
-  });
-
-  test('derivePublicKey', async () => {
-    const externalPublicKey = await keyAgent.derivePublicKey({ index: 1, type: KeyManagement.KeyType.External });
-    expect(typeof externalPublicKey).toBe('string');
-    const stakePublicKey = await keyAgent.derivePublicKey({ index: 1, type: KeyManagement.KeyType.Stake });
-    expect(typeof stakePublicKey).toBe('string');
   });
 
   test('deriveAddress', async () => {
@@ -136,7 +114,14 @@ describe('InMemoryKeyAgent', () => {
     it('can decrypt yoroi-encrypted root private key', async () => {
       const keyAgentFromEncryptedKey = new KeyManagement.InMemoryKeyAgent({
         accountIndex: 0,
-        encryptedRootPrivateKey: Buffer.from(yoroiEncryptedRootPrivateKeyHex, 'hex'),
+        encryptedRootPrivateKeyBytes: [...Buffer.from(yoroiEncryptedRootPrivateKeyHex, 'hex')],
+        extendedAccountPublicKey: Cardano.Bip32PublicKey(
+          Buffer.from(
+            deriveAccountPrivateKey(CSL.Bip32PrivateKey.from_bytes(Buffer.from(yoroiRootPrivateKeyHex, 'hex')), 0)
+              .to_public()
+              .as_bytes()
+          ).toString('hex')
+        ),
         getPassword,
         knownAddresses: [],
         networkId: Cardano.NetworkId.testnet
@@ -187,12 +172,20 @@ describe('InMemoryKeyAgent', () => {
     const daedelusEncryptedRootPrivateKeyHex =
       // eslint-disable-next-line max-len
       '5f7644cb357ba0e255e351574aef9f6971295142b95ce04bcd94d8f54f96fb616fc1fec402578c0b1577a112bc8826faee08c3a7534af31bbe7bb5a20cbef3607ab697b1a28bd93464f233ed4df0184a0905bac41e0f594abafde45eca3ed86b7c34c6aefccad3428649e2ca86b3d93a6da602298b2853d4d556eae24edd6cce';
+    const daedalusRootPrivateKeyHex = ''; // TODO;
 
     // fails to decrypt root private key
     it.skip('can decrypt daedelus-encrypted root private key to produce expected stake address', async () => {
       const keyAgentFromEncryptedKey = new KeyManagement.InMemoryKeyAgent({
         accountIndex: 0,
-        encryptedRootPrivateKey: Buffer.from(daedelusEncryptedRootPrivateKeyHex, 'hex'),
+        encryptedRootPrivateKeyBytes: [...Buffer.from(daedelusEncryptedRootPrivateKeyHex, 'hex')],
+        extendedAccountPublicKey: Cardano.Bip32PublicKey(
+          Buffer.from(
+            deriveAccountPrivateKey(CSL.Bip32PrivateKey.from_bytes(Buffer.from(daedalusRootPrivateKeyHex, 'hex')), 0)
+              .to_public()
+              .as_bytes()
+          ).toString('hex')
+        ),
         getPassword: jest.fn().mockResolvedValue(Buffer.from('nMmys*X002')), // daedelus enforces min length of 10
         knownAddresses: [],
         networkId: Cardano.NetworkId.testnet

@@ -16,6 +16,10 @@ describe('KeyManagement/restoreKeyAgent', () => {
         66, 141, 241, 161, 163, 19, 81, 122, 125, 149, 49, 175, 149, 111, 48, 138, 254, 189, 69, 35, 135, 62, 177, 43,
         152, 95, 7, 87, 78, 204, 222, 109, 3, 239, 117
       ],
+      extendedAccountPublicKey: Cardano.Bip32PublicKey(
+        // eslint-disable-next-line max-len
+        '6199186adb51974690d7247d2646097d2c62763b767b528816fb7ed3f9f55d396199186adb51974690d7247d2646097d2c62763b767b528816fb7ed3f9f55d39'
+      ),
       knownAddresses: [
         {
           accountIndex: 0,
@@ -50,13 +54,46 @@ describe('KeyManagement/restoreKeyAgent', () => {
         KeyManagement.restoreKeyAgent(inMemoryKeyAgentData, async () => Buffer.from('123'))
       ).resolves.not.toThrow();
     });
+  });
 
-    it('throws when attempting to restore key manager of unsupported __typename', async () => {
-      await expect(() =>
-        KeyManagement.restoreKeyAgent({ ...inMemoryKeyAgentData, __typename: 'OTHER' as KeyManagement.KeyAgentType })
-      ).rejects.toThrowError(
-        new InvalidSerializableDataError("Restoring key agent of __typename 'OTHER' is not implemented")
-      );
+  describe('LedgerKeyAgent', () => {
+    const ledgerKeyAgentData: KeyManagement.SerializableLedgerKeyAgentData = {
+      __typename: KeyManagement.KeyAgentType.Ledger,
+      accountIndex: 0,
+      communicationType: KeyManagement.CommunicationType.Node,
+      extendedAccountPublicKey: Cardano.Bip32PublicKey(
+        // eslint-disable-next-line max-len
+        'fc5ab25e830b67c47d0a17411bf7fdabf711a597fb6cf04102734b0a2934ceaaa65ff5e7c52498d52c07b8ddfcd436fc2b4d2775e2984a49d0c79f65ceee4779'
+      ),
+      knownAddresses: [
+        {
+          accountIndex: 0,
+          address: Cardano.Address(
+            'addr1qx52knza2h5x090n4a5r7yraz3pwcamk9ppvuh7e26nfks7pnmhxqavtqy02zezklh27jt9r6z62sav3mugappdc7xnskxy2pn'
+          ),
+          index: 0,
+          networkId: Cardano.NetworkId.mainnet,
+          rewardAccount: Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr'),
+          type: KeyManagement.AddressType.External
+        }
+      ],
+      networkId: 0
+    };
+
+    it('can restore key manager from valid data', async () => {
+      const keyAgent = await KeyManagement.restoreKeyAgent(ledgerKeyAgentData);
+      expect(keyAgent.knownAddresses).toBe(ledgerKeyAgentData.knownAddresses);
     });
+  });
+
+  it('throws when attempting to restore key manager of unsupported __typename', async () => {
+    await expect(() =>
+      KeyManagement.restoreKeyAgent({
+        __typename: 'OTHER'
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any)
+    ).rejects.toThrowError(
+      new InvalidSerializableDataError("Restoring key agent of __typename 'OTHER' is not implemented")
+    );
   });
 });

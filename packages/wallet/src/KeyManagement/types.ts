@@ -1,5 +1,7 @@
 import { Cardano } from '@cardano-sdk/core';
 import { TxInternals } from '../Transaction';
+import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents';
+import TransportWebHID from '@ledgerhq/hw-transport-webhid';
 
 export interface SignBlobResult {
   publicKey: Cardano.Ed25519PublicKey;
@@ -7,7 +9,8 @@ export interface SignBlobResult {
 }
 
 export enum KeyAgentType {
-  InMemory = 'InMemory'
+  InMemory = 'InMemory',
+  Ledger = 'Ledger'
 }
 
 export enum KeyType {
@@ -32,6 +35,15 @@ export enum AddressType {
   External = 0
 }
 
+export enum DeviceType {
+  Ledger = 'Ledger'
+}
+
+export enum CommunicationType {
+  Web = 'web',
+  Node = 'node'
+}
+
 export interface AccountAddressDerivationPath {
   type: AddressType;
   index: number;
@@ -54,15 +66,23 @@ export type AgentSpecificData = number[] | null;
 export interface SerializableKeyAgentDataBase {
   networkId: Cardano.NetworkId;
   accountIndex: number;
+  knownAddresses: GroupedAddress[];
+  extendedAccountPublicKey: Cardano.Bip32PublicKey;
 }
 
 export interface SerializableInMemoryKeyAgentData extends SerializableKeyAgentDataBase {
   __typename: KeyAgentType.InMemory;
   encryptedRootPrivateKeyBytes: number[];
-  knownAddresses: GroupedAddress[];
 }
 
-export type SerializableKeyAgentData = SerializableInMemoryKeyAgentData;
+export interface SerializableLedgerKeyAgentData extends SerializableKeyAgentDataBase {
+  __typename: KeyAgentType.Ledger;
+  communicationType: CommunicationType;
+}
+
+export type SerializableKeyAgentData = SerializableInMemoryKeyAgentData | SerializableLedgerKeyAgentData;
+
+export type TransportType = TransportWebHID | TransportNodeHid;
 
 /**
  * @returns password used to decrypt root private key
@@ -74,10 +94,7 @@ export interface KeyAgent {
   get accountIndex(): number;
   get serializableData(): SerializableKeyAgentData;
   get knownAddresses(): GroupedAddress[];
-  /**
-   * @throws AuthenticationError
-   */
-  getExtendedAccountPublicKey(): Promise<Cardano.Bip32PublicKey>;
+  get extendedAccountPublicKey(): Cardano.Bip32PublicKey;
   /**
    * @throws AuthenticationError
    */
