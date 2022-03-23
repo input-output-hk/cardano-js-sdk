@@ -22,7 +22,7 @@ export const api = <WalletApi>{
       }
     ]
   ],
-  signData: async (_addr, _sig) => 'signedData',
+  signData: async (_addr, _payload) => ({}),
   signTx: async (_tx) => 'signedTransaction',
   submitTx: async (_tx) => 'transactionId'
 };

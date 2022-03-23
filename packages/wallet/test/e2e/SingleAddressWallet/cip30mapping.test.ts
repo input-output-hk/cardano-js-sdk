@@ -1,7 +1,7 @@
 import * as CSL from '@emurgo/cardano-serialization-lib-nodejs';
 import { Cardano, coreToCsl, parseCslAddress } from '@cardano-sdk/core';
-import { RequestAccess, WalletApi, WalletProperties } from '@cardano-sdk/cip30';
 import { InitializeTxResult, SingleAddressWallet } from '../../../src';
+import { RequestAccess, WalletApi, WalletProperties } from '@cardano-sdk/cip30';
 import {
   assetProvider,
   keyAgentReady,
@@ -110,12 +110,14 @@ describe('cip30 e2e', () => {
       expect(cipRewardAddresses).toEqual([Buffer.from(parsedAddress!.to_bytes()).toString('hex')]);
     });
 
-    test.skip('api.signTx', async () => {
+    test('api.signTx', async () => {
       const txInternals = await createTxInternals(wallet);
       const finalizedTx = await wallet.finalizeTx(txInternals);
 
       const cslTx = coreToCsl.tx(finalizedTx).to_bytes();
-      expect(async () => mappedWallet.signTx(Buffer.from(cslTx).toString('hex'))).not.toThrow();
+
+      const signatures = Buffer.from(await mappedWallet.signTx(Buffer.from(cslTx).toString('hex')), 'hex');
+      expect(() => CSL.TransactionWitnessSet.from_bytes(signatures)).not.toThrow();
     });
 
     test('api.signData', async () => {
@@ -124,7 +126,7 @@ describe('cip30 e2e', () => {
       expect(async () => await mappedWallet.signData(address, Cardano.util.HexBlob('abc123').toString())).not.toThrow();
     });
 
-    test.skip('api.submitTx', async () => {
+    test('api.submitTx', async () => {
       const txInternals = await createTxInternals(wallet);
       const finalizedTx = await wallet.finalizeTx(txInternals);
 

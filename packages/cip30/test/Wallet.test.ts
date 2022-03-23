@@ -153,9 +153,9 @@ describe('Wallet', () => {
 
       const signedData = await api.signData(
         Cardano.Address('addr_test1vrfxjeunkc9xu8rpnhgkluptaq0rm8kyxh8m3q9vtcetjwshvpnsm'),
-        ''
+        Buffer.from('').toString('hex')
       );
-      expect(signedData).toEqual('signedData');
+      expect(signedData).toEqual({});
     });
 
     test('submitTx', async () => {

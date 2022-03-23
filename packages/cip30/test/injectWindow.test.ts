@@ -1,8 +1,8 @@
+import { ApiError } from '../src/errors';
 import { Wallet } from '../src/Wallet';
 import { WindowMaybeWithCardano, injectWindow } from '../src/injectWindow';
 import { api, properties, requestAccess } from './testWallet';
 import { mocks } from 'mock-browser';
-import { ApiError } from '../src/errors';
 import browser from 'webextension-polyfill';
 
 describe('injectWindow', () => {
