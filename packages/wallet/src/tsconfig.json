@@ -4,8 +4,5 @@
     "outDir": "../dist/",
     "rootDir": "."
   },
-  "references": [
-    { "path": "../../cip2/src" },
-    { "path": "../../core/src" }
-  ]
+  "references": [{ "path": "../../cip2/src" }, { "path": "../../cip30/src" }, { "path": "../../core/src" }]
 }

@@ -13,19 +13,11 @@ import {
   SigStructure
 } from '@emurgo/cardano-message-signing-nodejs';
 import { Cardano, parseCslAddress, util } from '@cardano-sdk/core';
-import { CoseKeyCborHex, CoseSign1CborHex } from './types';
+import { Cip30DataSignature } from '@cardano-sdk/cip30';
 import { CoseLabel } from './util';
 import { CustomError } from 'ts-custom-error';
 import { KeyAgent, KeyType } from '../types';
 import { STAKE_KEY_DERIVATION_PATH } from '../util';
-
-/**
- * DataSignature type as described in CIP-0030.
- */
-export interface Cip30DataSignature {
-  key: CoseKeyCborHex;
-  signature: CoseSign1CborHex;
-}
 
 export interface Cip30SignDataRequest {
   keyAgent: KeyAgent;
