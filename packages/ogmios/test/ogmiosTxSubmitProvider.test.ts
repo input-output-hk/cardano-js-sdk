@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-len */
+import { Cardano, ProviderError, TxSubmitProvider } from '@cardano-sdk/core';
 import { Connection, createConnectionObject } from '@cardano-ogmios/client';
-import { ProviderError, TxSubmitProvider } from '@cardano-sdk/core';
 import { createMockOgmiosServer } from './mocks/mockOgmiosServer';
-import { getPort } from 'get-port-please';
+import { getRandomPort } from 'get-port-please';
 import { ogmiosTxSubmitProvider } from '../src';
 import http from 'http';
 
@@ -29,7 +29,7 @@ describe('ogmiosTxSubmitProvider', () => {
   let provider: TxSubmitProvider;
 
   beforeAll(async () => {
-    connection = createConnectionObject({ port: await getPort() });
+    connection = createConnectionObject({ port: await getRandomPort() });
   });
   describe('healthCheck', () => {
     afterEach(async () => {
@@ -100,7 +100,7 @@ describe('ogmiosTxSubmitProvider', () => {
     });
 
     describe('failure', () => {
-      afterAll(async () => {
+      afterEach(async () => {
         await serverClosePromise(mockServer);
       });
 
@@ -110,12 +110,9 @@ describe('ogmiosTxSubmitProvider', () => {
         });
         await listenPromise(mockServer, connection.port);
         provider = ogmiosTxSubmitProvider(connection);
-
-        try {
-          await provider.submitTx(new Uint8Array());
-        } catch (error: any) {
-          expect(error[0].name).toBe('EraMismatchError');
-        }
+        await expect(provider.submitTx(new Uint8Array())).rejects.toThrowError(
+          Cardano.TxSubmissionErrors.EraMismatchError
+        );
       });
     });
   });

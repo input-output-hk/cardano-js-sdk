@@ -5,7 +5,6 @@ import {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   TxSubmission,
-  UnknownResultError,
   createConnectionObject,
   createInteractionContext,
   createTxSubmissionClient,
@@ -56,13 +55,7 @@ export const ogmiosTxSubmitProvider = (
       const txHex = Buffer.from(signedTransaction).toString('hex');
       return await txSubmissionClient.submitTx(txHex);
     } catch (error) {
-      // Ogmios throws an array of domain errors, or a single catch-all if the request is malformed.
-      // There's currently no utility to invert this logic to ensure other non-UnknownResultErrors are
-      // also re-thrown as the UnknownTxSubmissionError, but it's a minor issue we can improve on.
-      if (error instanceof UnknownResultError) {
-        throw new Cardano.TxSubmissionErrors.UnknownTxSubmissionError(error);
-      }
-      throw error;
+      throw Cardano.util.asTxSubmissionError(error) || new Cardano.TxSubmissionErrors.UnknownTxSubmissionError(error);
     }
   }
 });
