@@ -108,8 +108,8 @@ const createDirectionalTransactionsTrackerSubject = (
 ): TrackerSubject<DirectionalTransaction[]> => {
   const isMyAddress =
     (addresses: Cardano.Address[]) =>
-    ({ address }: { address: Cardano.Address }) =>
-      addresses.includes(address);
+    ({ address }: { address?: Cardano.Address }) =>
+      addresses.includes(address!);
   return new TrackerSubject(
     combineLatest([transactions$, addresses$]).pipe(
       map(([transactions, addresses]) =>

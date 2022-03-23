@@ -4,7 +4,7 @@ import { Value } from './Value';
 export interface TxIn {
   txId: TransactionId;
   index: number;
-  address: Address;
+  address?: Address;
 }
 
 export interface TxOut {
