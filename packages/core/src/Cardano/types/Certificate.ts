@@ -35,11 +35,16 @@ export interface StakeDelegationCertificate {
   epoch: Epoch;
 }
 
+export enum MirCertificatePot {
+  Reserves = 'reserve',
+  Treasury = 'treasury'
+}
+
 export interface MirCertificate {
   __typename: CertificateType.MIR;
   rewardAccount: RewardAccount;
   quantity: Lovelace;
-  pot: 'reserve' | 'treasury';
+  pot: MirCertificatePot;
 }
 
 export interface GenesisKeyDelegationCertificate {
