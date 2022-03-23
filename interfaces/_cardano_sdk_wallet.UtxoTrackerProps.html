@@ -85,6 +85,7 @@
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_wallet.UtxoTrackerProps.html#addresses_" class="tsd-kind-icon">addresses$</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_wallet.UtxoTrackerProps.html#retryBackoffConfig" class="tsd-kind-icon">retry<wbr>Backoff<wbr>Config</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_wallet.UtxoTrackerProps.html#store" class="tsd-kind-icon">store</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_wallet.UtxoTrackerProps.html#tipBlockHeight_" class="tsd-kind-icon">tip<wbr>Block<wbr>Height$</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_wallet.UtxoTrackerProps.html#transactionsInFlight_" class="tsd-kind-icon">transactions<wbr>InFlight$</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_wallet.UtxoTrackerProps.html#walletProvider" class="tsd-kind-icon">wallet<wbr>Provider</a></li>
@@ -101,7 +102,7 @@
 					<div class="tsd-signature tsd-kind-icon">addresses$<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Address</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d2ac77b/packages/wallet/src/services/UtxoTracker.ts#L9">packages/wallet/src/services/UtxoTracker.ts:9</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/0daef90/packages/wallet/src/services/UtxoTracker.ts#L10">packages/wallet/src/services/UtxoTracker.ts:10</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -111,7 +112,17 @@
 					<div class="tsd-signature tsd-kind-icon">retry<wbr>Backoff<wbr>Config<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">RetryBackoffConfig</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d2ac77b/packages/wallet/src/services/UtxoTracker.ts#L12">packages/wallet/src/services/UtxoTracker.ts:12</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/0daef90/packages/wallet/src/services/UtxoTracker.ts#L14">packages/wallet/src/services/UtxoTracker.ts:14</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="store" class="tsd-anchor"></a>
+					<h3>store</h3>
+					<div class="tsd-signature tsd-kind-icon">store<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">CollectionStore</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Utxo</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/0daef90/packages/wallet/src/services/UtxoTracker.ts#L11">packages/wallet/src/services/UtxoTracker.ts:11</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -121,7 +132,7 @@
 					<div class="tsd-signature tsd-kind-icon">tip<wbr>Block<wbr>Height$<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d2ac77b/packages/wallet/src/services/UtxoTracker.ts#L11">packages/wallet/src/services/UtxoTracker.ts:11</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/0daef90/packages/wallet/src/services/UtxoTracker.ts#L13">packages/wallet/src/services/UtxoTracker.ts:13</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -131,7 +142,7 @@
 					<div class="tsd-signature tsd-kind-icon">transactions<wbr>InFlight$<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">NewTxAlonzo</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d2ac77b/packages/wallet/src/services/UtxoTracker.ts#L10">packages/wallet/src/services/UtxoTracker.ts:10</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/0daef90/packages/wallet/src/services/UtxoTracker.ts#L12">packages/wallet/src/services/UtxoTracker.ts:12</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -141,7 +152,7 @@
 					<div class="tsd-signature tsd-kind-icon">wallet<wbr>Provider<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">WalletProvider</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d2ac77b/packages/wallet/src/services/UtxoTracker.ts#L8">packages/wallet/src/services/UtxoTracker.ts:8</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/0daef90/packages/wallet/src/services/UtxoTracker.ts#L9">packages/wallet/src/services/UtxoTracker.ts:9</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -163,6 +174,9 @@
 						<a href="../modules/_cardano_sdk_cardano_graphql_db_sync.html">@cardano-<wbr>sdk/cardano-<wbr>graphql-<wbr>db-<wbr>sync</a>
 					</li>
 					<li class=" tsd-kind-module">
+						<a href="../modules/_cardano_sdk_cardano_graphql_services.html">@cardano-<wbr>sdk/cardano-<wbr>graphql-<wbr>services</a>
+					</li>
+					<li class=" tsd-kind-module">
 						<a href="../modules/_cardano_sdk_cip2.html">@cardano-<wbr>sdk/cip2</a>
 					</li>
 					<li class=" tsd-kind-module">
@@ -179,6 +193,17 @@
 					</li>
 					<li class="current tsd-kind-module">
 						<a href="../modules/_cardano_sdk_wallet.html">@cardano-<wbr>sdk/wallet</a>
+						<ul>
+							<li class=" tsd-kind-namespace tsd-parent-kind-module">
+								<a href="../modules/_cardano_sdk_wallet.KeyManagement.html">Key<wbr>Management</a>
+							</li>
+							<li class=" tsd-kind-namespace tsd-parent-kind-module">
+								<a href="../modules/_cardano_sdk_wallet.Transaction.html">Transaction</a>
+							</li>
+							<li class=" tsd-kind-namespace tsd-parent-kind-module">
+								<a href="../modules/_cardano_sdk_wallet.util.html">util</a>
+							</li>
+						</ul>
 					</li>
 				</ul>
 			</nav>
@@ -194,6 +219,9 @@
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
 								<a href="_cardano_sdk_wallet.UtxoTrackerProps.html#retryBackoffConfig" class="tsd-kind-icon">retry<wbr>Backoff<wbr>Config</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="_cardano_sdk_wallet.UtxoTrackerProps.html#store" class="tsd-kind-icon">store</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
 								<a href="_cardano_sdk_wallet.UtxoTrackerProps.html#tipBlockHeight_" class="tsd-kind-icon">tip<wbr>Block<wbr>Height$</a>

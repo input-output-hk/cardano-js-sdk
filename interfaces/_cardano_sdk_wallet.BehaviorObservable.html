@@ -134,7 +134,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from Observable.operator</p>
 						<ul>
-							<li>Defined in packages/wallet/node_modules/rxjs/dist/types/internal/Observable.d.ts:22</li>
+							<li>Defined in packages/wallet/node_modules/rxjs/dist/types/internal/Observable.d.ts:19</li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -152,7 +152,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from Observable.source</p>
 						<ul>
-							<li>Defined in packages/wallet/node_modules/rxjs/dist/types/internal/Observable.d.ts:18</li>
+							<li>Defined in packages/wallet/node_modules/rxjs/dist/types/internal/Observable.d.ts:15</li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -176,7 +176,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d2ac77b/packages/wallet/src/services/util/TrackerSubject.ts#L4">packages/wallet/src/services/util/TrackerSubject.ts:4</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/0daef90/packages/wallet/src/services/util/TrackerSubject.ts#L4">packages/wallet/src/services/util/TrackerSubject.ts:4</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">T</span></h4>
@@ -198,7 +198,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from Observable.forEach</p>
 								<ul>
-									<li>Defined in packages/wallet/node_modules/rxjs/dist/types/internal/Observable.d.ts:101</li>
+									<li>Defined in packages/wallet/node_modules/rxjs/dist/types/internal/Observable.d.ts:98</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -212,34 +212,33 @@
 									this situation, look into adding something like {@link timeout}, {@link take},
 								{@link takeWhile}, or {@link takeUntil} amongst others.</p>
 								<a href="#example" id="example" style="color: inherit; text-decoration: none;">
-									<h3>Example:</h3>
+									<h2>Example</h2>
 								</a>
-								<pre><code class="language-ts"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">interval</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;rxjs&#039;</span><span style="color: #000000">;</span>
-<span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">take</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;rxjs/operators&#039;</span><span style="color: #000000">;</span>
+								<pre><code class="language-ts"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">interval</span><span style="color: #000000">, </span><span style="color: #001080">take</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;rxjs&#039;</span><span style="color: #000000">;</span>
 
 <span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">source$</span><span style="color: #000000"> = </span><span style="color: #795E26">interval</span><span style="color: #000000">(</span><span style="color: #098658">1000</span><span style="color: #000000">).</span><span style="color: #795E26">pipe</span><span style="color: #000000">(</span><span style="color: #795E26">take</span><span style="color: #000000">(</span><span style="color: #098658">4</span><span style="color: #000000">));</span>
 
 <span style="color: #0000FF">async</span><span style="color: #000000"> </span><span style="color: #0000FF">function</span><span style="color: #000000"> </span><span style="color: #795E26">getTotal</span><span style="color: #000000">() {</span>
-<span style="color: #000000">   </span><span style="color: #0000FF">let</span><span style="color: #000000"> </span><span style="color: #001080">total</span><span style="color: #000000"> = </span><span style="color: #098658">0</span><span style="color: #000000">;</span>
+<span style="color: #000000">  </span><span style="color: #0000FF">let</span><span style="color: #000000"> </span><span style="color: #001080">total</span><span style="color: #000000"> = </span><span style="color: #098658">0</span><span style="color: #000000">;</span>
 
-<span style="color: #000000">   </span><span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #001080">source$</span><span style="color: #000000">.</span><span style="color: #795E26">forEach</span><span style="color: #000000">(</span><span style="color: #001080">value</span><span style="color: #000000"> </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
-<span style="color: #000000">     </span><span style="color: #001080">total</span><span style="color: #000000"> += </span><span style="color: #001080">value</span><span style="color: #000000">;</span>
-<span style="color: #000000">     </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;observable -&gt; &#039;</span><span style="color: #000000">, </span><span style="color: #001080">value</span><span style="color: #000000">);</span>
-<span style="color: #000000">   });</span>
+<span style="color: #000000">  </span><span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #001080">source$</span><span style="color: #000000">.</span><span style="color: #795E26">forEach</span><span style="color: #000000">(</span><span style="color: #001080">value</span><span style="color: #000000"> </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #000000">    </span><span style="color: #001080">total</span><span style="color: #000000"> += </span><span style="color: #001080">value</span><span style="color: #000000">;</span>
+<span style="color: #000000">    </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;observable -&gt; &#039;</span><span style="color: #000000"> + </span><span style="color: #001080">value</span><span style="color: #000000">);</span>
+<span style="color: #000000">  });</span>
 
-<span style="color: #000000">   </span><span style="color: #AF00DB">return</span><span style="color: #000000"> </span><span style="color: #001080">total</span><span style="color: #000000">;</span>
+<span style="color: #000000">  </span><span style="color: #AF00DB">return</span><span style="color: #000000"> </span><span style="color: #001080">total</span><span style="color: #000000">;</span>
 <span style="color: #000000">}</span>
 
 <span style="color: #795E26">getTotal</span><span style="color: #000000">().</span><span style="color: #795E26">then</span><span style="color: #000000">(</span>
-<span style="color: #000000">   </span><span style="color: #001080">total</span><span style="color: #000000"> </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;Total:&#039;</span><span style="color: #000000">, </span><span style="color: #001080">total</span><span style="color: #000000">)</span>
-<span style="color: #000000">)</span>
+<span style="color: #000000">  </span><span style="color: #001080">total</span><span style="color: #000000"> </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;Total: &#039;</span><span style="color: #000000"> + </span><span style="color: #001080">total</span><span style="color: #000000">)</span>
+<span style="color: #000000">);</span>
 
 <span style="color: #008000">// Expected:</span>
-<span style="color: #008000">// &quot;observable -&gt; 0&quot;</span>
-<span style="color: #008000">// &quot;observable -&gt; 1&quot;</span>
-<span style="color: #008000">// &quot;observable -&gt; 2&quot;</span>
-<span style="color: #008000">// &quot;observable -&gt; 3&quot;</span>
-<span style="color: #008000">// &quot;Total: 6&quot;</span>
+<span style="color: #008000">// &#039;observable -&gt; 0&#039;</span>
+<span style="color: #008000">// &#039;observable -&gt; 1&#039;</span>
+<span style="color: #008000">// &#039;observable -&gt; 2&#039;</span>
+<span style="color: #008000">// &#039;observable -&gt; 3&#039;</span>
+<span style="color: #008000">// &#039;Total: 6&#039;</span>
 </code></pre>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -277,7 +276,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from Observable.forEach</p>
 								<ul>
-									<li>Defined in packages/wallet/node_modules/rxjs/dist/types/internal/Observable.d.ts:113</li>
+									<li>Defined in packages/wallet/node_modules/rxjs/dist/types/internal/Observable.d.ts:110</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -341,7 +340,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from Observable.lift</p>
 								<ul>
-									<li>Defined in packages/wallet/node_modules/rxjs/dist/types/internal/Observable.d.ts:52</li>
+									<li>Defined in packages/wallet/node_modules/rxjs/dist/types/internal/Observable.d.ts:49</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -402,7 +401,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from Observable.pipe</p>
 								<ul>
-									<li>Defined in packages/wallet/node_modules/rxjs/dist/types/internal/Observable.d.ts:114</li>
+									<li>Defined in packages/wallet/node_modules/rxjs/dist/types/internal/Observable.d.ts:111</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -411,7 +410,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from Observable.pipe</p>
 								<ul>
-									<li>Defined in packages/wallet/node_modules/rxjs/dist/types/internal/Observable.d.ts:115</li>
+									<li>Defined in packages/wallet/node_modules/rxjs/dist/types/internal/Observable.d.ts:112</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -432,7 +431,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from Observable.pipe</p>
 								<ul>
-									<li>Defined in packages/wallet/node_modules/rxjs/dist/types/internal/Observable.d.ts:116</li>
+									<li>Defined in packages/wallet/node_modules/rxjs/dist/types/internal/Observable.d.ts:113</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -459,7 +458,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from Observable.pipe</p>
 								<ul>
-									<li>Defined in packages/wallet/node_modules/rxjs/dist/types/internal/Observable.d.ts:117</li>
+									<li>Defined in packages/wallet/node_modules/rxjs/dist/types/internal/Observable.d.ts:114</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -492,7 +491,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from Observable.pipe</p>
 								<ul>
-									<li>Defined in packages/wallet/node_modules/rxjs/dist/types/internal/Observable.d.ts:118</li>
+									<li>Defined in packages/wallet/node_modules/rxjs/dist/types/internal/Observable.d.ts:115</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -531,7 +530,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from Observable.pipe</p>
 								<ul>
-									<li>Defined in packages/wallet/node_modules/rxjs/dist/types/internal/Observable.d.ts:119</li>
+									<li>Defined in packages/wallet/node_modules/rxjs/dist/types/internal/Observable.d.ts:116</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -576,7 +575,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from Observable.pipe</p>
 								<ul>
-									<li>Defined in packages/wallet/node_modules/rxjs/dist/types/internal/Observable.d.ts:120</li>
+									<li>Defined in packages/wallet/node_modules/rxjs/dist/types/internal/Observable.d.ts:117</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -627,7 +626,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from Observable.pipe</p>
 								<ul>
-									<li>Defined in packages/wallet/node_modules/rxjs/dist/types/internal/Observable.d.ts:121</li>
+									<li>Defined in packages/wallet/node_modules/rxjs/dist/types/internal/Observable.d.ts:118</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -684,7 +683,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from Observable.pipe</p>
 								<ul>
-									<li>Defined in packages/wallet/node_modules/rxjs/dist/types/internal/Observable.d.ts:122</li>
+									<li>Defined in packages/wallet/node_modules/rxjs/dist/types/internal/Observable.d.ts:119</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -747,7 +746,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from Observable.pipe</p>
 								<ul>
-									<li>Defined in packages/wallet/node_modules/rxjs/dist/types/internal/Observable.d.ts:123</li>
+									<li>Defined in packages/wallet/node_modules/rxjs/dist/types/internal/Observable.d.ts:120</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -816,7 +815,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from Observable.pipe</p>
 								<ul>
-									<li>Defined in packages/wallet/node_modules/rxjs/dist/types/internal/Observable.d.ts:124</li>
+									<li>Defined in packages/wallet/node_modules/rxjs/dist/types/internal/Observable.d.ts:121</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -899,7 +898,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from Observable.subscribe</p>
 								<ul>
-									<li>Defined in packages/wallet/node_modules/rxjs/dist/types/internal/Observable.d.ts:53</li>
+									<li>Defined in packages/wallet/node_modules/rxjs/dist/types/internal/Observable.d.ts:50</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -914,7 +913,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from Observable.subscribe</p>
 								<ul>
-									<li>Defined in packages/wallet/node_modules/rxjs/dist/types/internal/Observable.d.ts:54</li>
+									<li>Defined in packages/wallet/node_modules/rxjs/dist/types/internal/Observable.d.ts:51</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -947,7 +946,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from Observable.subscribe</p>
 								<ul>
-									<li>Defined in packages/wallet/node_modules/rxjs/dist/types/internal/Observable.d.ts:56</li>
+									<li>Defined in packages/wallet/node_modules/rxjs/dist/types/internal/Observable.d.ts:53</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -986,7 +985,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from Observable.toPromise</p>
 								<ul>
-									<li>Defined in packages/wallet/node_modules/rxjs/dist/types/internal/Observable.d.ts:126</li>
+									<li>Defined in packages/wallet/node_modules/rxjs/dist/types/internal/Observable.d.ts:123</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1002,7 +1001,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from Observable.toPromise</p>
 								<ul>
-									<li>Defined in packages/wallet/node_modules/rxjs/dist/types/internal/Observable.d.ts:128</li>
+									<li>Defined in packages/wallet/node_modules/rxjs/dist/types/internal/Observable.d.ts:125</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1024,7 +1023,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from Observable.toPromise</p>
 								<ul>
-									<li>Defined in packages/wallet/node_modules/rxjs/dist/types/internal/Observable.d.ts:130</li>
+									<li>Defined in packages/wallet/node_modules/rxjs/dist/types/internal/Observable.d.ts:127</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1062,6 +1061,9 @@
 						<a href="../modules/_cardano_sdk_cardano_graphql_db_sync.html">@cardano-<wbr>sdk/cardano-<wbr>graphql-<wbr>db-<wbr>sync</a>
 					</li>
 					<li class=" tsd-kind-module">
+						<a href="../modules/_cardano_sdk_cardano_graphql_services.html">@cardano-<wbr>sdk/cardano-<wbr>graphql-<wbr>services</a>
+					</li>
+					<li class=" tsd-kind-module">
 						<a href="../modules/_cardano_sdk_cip2.html">@cardano-<wbr>sdk/cip2</a>
 					</li>
 					<li class=" tsd-kind-module">
@@ -1078,6 +1080,17 @@
 					</li>
 					<li class="current tsd-kind-module">
 						<a href="../modules/_cardano_sdk_wallet.html">@cardano-<wbr>sdk/wallet</a>
+						<ul>
+							<li class=" tsd-kind-namespace tsd-parent-kind-module">
+								<a href="../modules/_cardano_sdk_wallet.KeyManagement.html">Key<wbr>Management</a>
+							</li>
+							<li class=" tsd-kind-namespace tsd-parent-kind-module">
+								<a href="../modules/_cardano_sdk_wallet.Transaction.html">Transaction</a>
+							</li>
+							<li class=" tsd-kind-namespace tsd-parent-kind-module">
+								<a href="../modules/_cardano_sdk_wallet.util.html">util</a>
+							</li>
+						</ul>
 					</li>
 				</ul>
 			</nav>

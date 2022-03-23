@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>ProviderTrackerSubjectInternals | cardano-sdk</title>
+	<title>Provider | cardano-sdk</title>
 	<meta name="description" content="Documentation for cardano-sdk">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -55,13 +55,13 @@
 					<a href="../index.html">cardano-sdk</a>
 				</li>
 				<li>
-					<a href="../modules/_cardano_sdk_wallet.html">@cardano-sdk/wallet</a>
+					<a href="../modules/_cardano_sdk_core.html">@cardano-sdk/core</a>
 				</li>
 				<li>
-					<a href="_cardano_sdk_wallet.ProviderTrackerSubjectInternals.html">ProviderTrackerSubjectInternals</a>
+					<a href="_cardano_sdk_core.Provider.html">Provider</a>
 				</li>
 			</ul>
-			<h1>Interface ProviderTrackerSubjectInternals</h1>
+			<h1>Interface Provider</h1>
 		</div>
 	</div>
 </header>
@@ -72,7 +72,12 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">ProviderTrackerSubjectInternals</span>
+						<span class="target">Provider</span>
+						<ul class="tsd-hierarchy">
+							<li>
+								<a href="_cardano_sdk_core.TxSubmitProvider.html" class="tsd-signature-type" data-tsd-kind="Interface">TxSubmitProvider</a>
+							</li>
+						</ul>
 					</li>
 				</ul>
 			</section>
@@ -81,36 +86,32 @@
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section ">
-							<h3>Properties</h3>
+							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_wallet.ProviderTrackerSubjectInternals.html#externalTrigger_" class="tsd-kind-icon">external<wbr>Trigger$</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_wallet.ProviderTrackerSubjectInternals.html#interval_" class="tsd-kind-icon">interval$</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_cardano_sdk_core.Provider.html#healthCheck" class="tsd-kind-icon">health<wbr>Check</a></li>
 							</ul>
 						</section>
 					</div>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
-				<h2>Properties</h2>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="externalTrigger_" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> external<wbr>Trigger$</h3>
-					<div class="tsd-signature tsd-kind-icon">external<wbr>Trigger$<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Subject</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d2ac77b/packages/wallet/src/services/util/SyncableIntervalTrackerSubject.ts#L14">packages/wallet/src/services/util/SyncableIntervalTrackerSubject.ts:14</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="interval_" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> interval$</h3>
-					<div class="tsd-signature tsd-kind-icon">interval$<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">&gt;</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d2ac77b/packages/wallet/src/services/util/SyncableIntervalTrackerSubject.ts#L15">packages/wallet/src/services/util/SyncableIntervalTrackerSubject.ts:15</a></li>
-						</ul>
-					</aside>
+				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+					<a name="healthCheck" class="tsd-anchor"></a>
+					<h3>health<wbr>Check</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+						<li class="tsd-signature tsd-kind-icon">health<wbr>Check<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">{ </span>ok<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/0daef90/packages/core/src/Provider/Provider.ts#L2">packages/core/src/Provider/Provider.ts:2</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">{ </span>ok<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
 				</section>
 			</section>
 		</div>
@@ -130,13 +131,45 @@
 						<a href="../modules/_cardano_sdk_cardano_graphql_db_sync.html">@cardano-<wbr>sdk/cardano-<wbr>graphql-<wbr>db-<wbr>sync</a>
 					</li>
 					<li class=" tsd-kind-module">
+						<a href="../modules/_cardano_sdk_cardano_graphql_services.html">@cardano-<wbr>sdk/cardano-<wbr>graphql-<wbr>services</a>
+					</li>
+					<li class=" tsd-kind-module">
 						<a href="../modules/_cardano_sdk_cip2.html">@cardano-<wbr>sdk/cip2</a>
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="../modules/_cardano_sdk_cip30.html">@cardano-<wbr>sdk/cip30</a>
 					</li>
-					<li class=" tsd-kind-module">
+					<li class="current tsd-kind-module">
 						<a href="../modules/_cardano_sdk_core.html">@cardano-<wbr>sdk/core</a>
+						<ul>
+							<li class=" tsd-kind-namespace tsd-parent-kind-module">
+								<a href="../modules/_cardano_sdk_core.Address.html">Address</a>
+							</li>
+							<li class=" tsd-kind-namespace tsd-parent-kind-module">
+								<a href="../modules/_cardano_sdk_core.Asset.html">Asset</a>
+							</li>
+							<li class=" tsd-kind-namespace tsd-parent-kind-module tsd-is-external">
+								<a href="../modules/_cardano_sdk_core.CSL.html">CSL</a>
+							</li>
+							<li class=" tsd-kind-namespace tsd-parent-kind-module">
+								<a href="../modules/_cardano_sdk_core.Cardano.html">Cardano</a>
+							</li>
+							<li class=" tsd-kind-namespace tsd-parent-kind-module">
+								<a href="../modules/_cardano_sdk_core.ProviderUtil.html">Provider<wbr>Util</a>
+							</li>
+							<li class=" tsd-kind-namespace tsd-parent-kind-module">
+								<a href="../modules/_cardano_sdk_core.coreToCsl.html">core<wbr>ToCsl</a>
+							</li>
+							<li class=" tsd-kind-namespace tsd-parent-kind-module">
+								<a href="../modules/_cardano_sdk_core.cslToCore.html">csl<wbr>ToCore</a>
+							</li>
+							<li class=" tsd-kind-namespace tsd-parent-kind-module">
+								<a href="../modules/_cardano_sdk_core.cslUtil.html">csl<wbr>Util</a>
+							</li>
+							<li class=" tsd-kind-namespace tsd-parent-kind-module">
+								<a href="../modules/_cardano_sdk_core.util.html">util</a>
+							</li>
+						</ul>
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="../modules/_cardano_sdk_ogmios.html">@cardano-<wbr>sdk/ogmios</a>
@@ -144,7 +177,7 @@
 					<li class=" tsd-kind-module">
 						<a href="../modules/_cardano_sdk_util_dev.html">@cardano-<wbr>sdk/util-<wbr>dev</a>
 					</li>
-					<li class="current tsd-kind-module">
+					<li class=" tsd-kind-module">
 						<a href="../modules/_cardano_sdk_wallet.html">@cardano-<wbr>sdk/wallet</a>
 					</li>
 				</ul>
@@ -154,13 +187,10 @@
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface tsd-parent-kind-module">
-						<a href="_cardano_sdk_wallet.ProviderTrackerSubjectInternals.html" class="tsd-kind-icon">Provider<wbr>Tracker<wbr>Subject<wbr>Internals</a>
+						<a href="_cardano_sdk_core.Provider.html" class="tsd-kind-icon">Provider</a>
 						<ul>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_cardano_sdk_wallet.ProviderTrackerSubjectInternals.html#externalTrigger_" class="tsd-kind-icon">external<wbr>Trigger$</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_cardano_sdk_wallet.ProviderTrackerSubjectInternals.html#interval_" class="tsd-kind-icon">interval$</a>
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
+								<a href="_cardano_sdk_core.Provider.html#healthCheck" class="tsd-kind-icon">health<wbr>Check</a>
 							</li>
 						</ul>
 					</li>
@@ -185,7 +215,7 @@
 			<ul class="tsd-legend">
 				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
 				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
-				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
