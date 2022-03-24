@@ -85,7 +85,7 @@ export const txSubmitProvider = (async () => {
     case 'ogmios': {
       logger.debug('TxSubmitProvider:ogmios - Initializing');
       const connectionConfig = {
-        host: ogmiosUrl.host,
+        host: ogmiosUrl.hostname,
         port: ogmiosUrl.port ? Number.parseInt(ogmiosUrl.port) : undefined,
         tls: ogmiosUrl?.protocol === 'wss'
       };
