@@ -35,12 +35,19 @@
   "devDependencies": {
     "@cardano-sdk/util-dev": "0.2.0",
     "@graphql-tools/utils": "~8.6.1",
+    "@types/bunyan": "^1.8.8",
+    "@types/death": "^1.1.2",
+    "@types/google-protobuf": "^3.15.5",
     "npm-run-all": "^4.1.5",
     "shx": "^0.3.3"
   },
   "dependencies": {
     "@cardano-ogmios/client": "~5.1.0",
     "@cardano-sdk/core": "0.2.0",
+    "bunyan": "^1.8.15",
+    "death": "^1.1.0",
+    "dgraph-js": "^21.3.1",
+    "dotenv": "^16.0.0",
     "graphql-request": "npm:graphql-request-configurable-serializer@4.0.0",
     "reflect-metadata": "~0.1.13",
     "ts-log": "^2.2.4",

@@ -1,16 +1,21 @@
-import { LastBlockQuery, Upsert } from './types';
 import { RunnableModule } from '../RunnableModule';
+import { Upsert, LastBlockQuery } from './types';
 import { dummyLogger } from 'ts-log';
 import { exponentialBackoff } from '../util';
 import { gql, request } from 'graphql-request';
 import dgraph from 'dgraph-js';
+
+export interface DgraphClientAddresses {
+  grpc: string;
+  http: string;
+}
 export class DgraphClient extends RunnableModule {
   #clientStub: dgraph.DgraphClientStub;
   #dgraphClient: dgraph.DgraphClient;
 
-  constructor(public address: string, logger = dummyLogger) {
+  constructor(public addresses: DgraphClientAddresses, logger = dummyLogger) {
     super('DgraphClient', logger);
-    this.#clientStub = new dgraph.DgraphClientStub(address);
+    this.#clientStub = new dgraph.DgraphClientStub(addresses.grpc);
     this.#dgraphClient = new dgraph.DgraphClient(this.#clientStub);
   }
 
@@ -25,7 +30,7 @@ export class DgraphClient extends RunnableModule {
         }
       }
     `;
-    await request(`${this.address}/admin`, query, { sch: schema });
+    await request(`${this.addresses.http}/admin`, query, { sch: schema });
     this.logger.debug('Dgraph schema set');
   }
 
@@ -48,7 +53,9 @@ export class DgraphClient extends RunnableModule {
 
   private async runDgraphTransaction(txn: dgraph.Txn, fn: Function) {
     try {
-      return fn();
+      // eslint-disable-next-line sonarjs/prefer-immediate-return
+      const rsp = await fn();
+      return rsp;
     } catch (error) {
       if (error === dgraph.ERR_ABORTED) {
         await exponentialBackoff(fn());
@@ -70,10 +77,24 @@ export class DgraphClient extends RunnableModule {
     await txn.commit();
   }
 
+  private async runLastBlockQuery(tx: dgraph.Txn) {
+    const query = `{
+      latestBlock(func: type(Block), orderdesc: blockNo, first: 1) {
+        hash,
+        slot {
+          number
+        }
+      }
+    }`;
+    const response = await tx.query(query);
+    await tx.commit();
+    return response.getJson() as LastBlockQuery;
+  }
+
   async writeDataFromBlock(upsert: Upsert, txn: dgraph.Txn) {
     await this.runDgraphTransaction(txn, async () => {
       const mu = new dgraph.Mutation();
-      mu.setSetJson(upsert);
+      mu.setSetJson(upsert.mutations);
       await this.runUpsertBlockFromMutations(upsert, txn, [mu]);
     });
   }
@@ -87,18 +108,20 @@ export class DgraphClient extends RunnableModule {
   }
 
   async getLastBlock() {
-    const tx = await this.#dgraphClient.newTxn({ readOnly: true });
-    return this.runDgraphTransaction(tx, async () => {
-      const query = `query {
-      queryBlock(order: {desc: blockNo}, first: 1) {
-        hash,
-        slot {
-          number
-        }
+    const tx = await this.#dgraphClient.newTxn();
+    try {
+      return await this.runLastBlockQuery(tx);
+    } catch (error) {
+      if (error === dgraph.ERR_ABORTED) {
+        return await exponentialBackoff(this.runLastBlockQuery(tx));
+      } else if (
+        // FIXME: when running a zero percentage synched instance this error is thrown
+        error?.code !== 2
+      ) {
+        throw error;
       }
-    }`;
-      const response = await tx.query(query);
-      return response.getJson();
-    }) as Promise<LastBlockQuery>;
+    } finally {
+      await tx.discard();
+    }
   }
 }

@@ -1,7 +1,8 @@
-import { Asset, ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { Asset } from '../Schema';
 import { AssetMetadata } from './types';
 import { HostDoesNotExist } from '../errors';
 import { Logger, dummyLogger } from 'ts-log';
+import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { RunnableModule } from '../RunnableModule';
 import axios, { AxiosInstance } from 'axios';
 
@@ -17,19 +18,20 @@ export class MetadataClient extends RunnableModule {
 
   private async ensureMetadataServerIsAvailable(): Promise<void> {
     try {
-      await this.#axiosClient.get('/metadata/healthcheck');
+      await this.#axiosClient.get('metadata/healthcheck');
     } catch (error) {
+      // FIXME: sometimes it throws ECONNRESET
       if (axios.isAxiosError(error)) {
         if (error?.code === 'ENOTFOUND') {
           throw new HostDoesNotExist('metadata server');
-        } else if (error.response?.status !== 404) {
+        } else if (error.response?.status !== 404 && error.code !== 'ETIMEDOUT') {
           throw new ProviderError(ProviderFailure.Unknown);
         }
       } else throw new ProviderError(ProviderFailure.Unknown);
     }
   }
 
-  public async fetch(assetIds: Asset.AssetInfo['assetId'][]): Promise<AssetMetadata[]> {
+  public async fetch(assetIds: Asset['assetId'][]): Promise<AssetMetadata[]> {
     try {
       const response = await this.#axiosClient.post('metadata/query', {
         properties: ['decimals', 'description', 'logo', 'name', 'ticker', 'url'],

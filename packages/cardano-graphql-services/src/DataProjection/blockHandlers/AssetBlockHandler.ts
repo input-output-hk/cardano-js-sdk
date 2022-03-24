@@ -8,8 +8,9 @@ import {
   RollForwardContext
 } from '../types';
 import { MetadataClient } from '../../MetadataClient/MetadataClient';
+import { Schema, isAlonzoBlock, isMaryBlock } from '@cardano-ogmios/client';
 import { dummyLogger } from 'ts-log';
-import { getBlockType, mapAssetMetadata } from './helpers';
+import { mapAssetMetadata } from './helpers';
 
 const HANDLER_ID = 'Asset';
 
@@ -33,12 +34,18 @@ export const createAssetBlockHandler = (metadataClient: MetadataClient, logger =
   },
   // eslint-disable-next-line sonarjs/cognitive-complexity
   query: async (ctx: RollForwardContext): Promise<QueryResult> => {
-    const block = getBlockType(ctx.block);
+    const { block } = ctx;
+    let b: Schema.BlockAlonzo | Schema.BlockMary | undefined;
+    if (isAlonzoBlock(block)) {
+      b = block.alonzo as Schema.BlockAlonzo;
+    } else if (isMaryBlock(block)) {
+      b = block.mary as Schema.BlockMary;
+    }
     let query = '';
     const assetIdList: string[] = [];
-    if (block?.body !== undefined) {
+    if (b?.body !== undefined) {
       logger.info('About to read block transactions');
-      for (const tx of block.body) {
+      for (const tx of b.body) {
         const txBodyMintAssets = tx.body.mint.assets;
         if (txBodyMintAssets) {
           logger.info('Assets found');

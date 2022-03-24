@@ -1,9 +1,9 @@
 import { ChainFollower } from './ChainFollower';
-import { ConnectionConfig } from '@cardano-ogmios/client';
-import { DgraphClient } from './DgraphClient';
+import { ConnectionConfig, Schema } from '@cardano-ogmios/client';
+import { DgraphClient, DgraphClientAddresses } from './DgraphClient';
 import { MetadataClient } from '../MetadataClient/MetadataClient';
 import { RunnableModule } from '../RunnableModule';
-import { createAssetBlockHandler } from './blockHandlers/AssetBlockHandler';
+// import { createAssetBlockHandler } from './blockHandlers/AssetBlockHandler';
 import { createBlockBlockHandler } from './blockHandlers/BlockBlockHandler';
 import { dummyLogger } from 'ts-log';
 
@@ -12,7 +12,7 @@ export interface DataProjectorConfig {
     connection?: ConnectionConfig;
   };
   dgraph: {
-    address: string;
+    addresses: DgraphClientAddresses;
     schema: string;
   };
   metadata: {
@@ -27,11 +27,14 @@ export class DataProjector extends RunnableModule {
 
   constructor(public config: DataProjectorConfig, logger = dummyLogger) {
     super('DataProjector', logger);
-    this.#dgraphClient = new DgraphClient(config.dgraph.address, logger);
+    this.#dgraphClient = new DgraphClient(config.dgraph.addresses, logger);
     this.#metadataClient = new MetadataClient(config.metadata.uri);
     this.#chainFollower = new ChainFollower(
       this.#dgraphClient,
-      [createAssetBlockHandler(this.#metadataClient, logger), createBlockBlockHandler(logger)],
+      [
+        // createAssetBlockHandler(this.#metadataClient, logger),
+        createBlockBlockHandler(logger)
+      ],
       logger
     );
   }
@@ -43,9 +46,16 @@ export class DataProjector extends RunnableModule {
   }
 
   async startImpl() {
-    const latestBlock = await this.#dgraphClient.getLastBlock();
-    const point = { hash: latestBlock.hash, slot: latestBlock.slot.number };
-    await this.#chainFollower.start([point, 'origin']);
+    this.logger.info('About to get last block');
+    const response = await this.#dgraphClient.getLastBlock();
+    const startingPoints: [string | Schema.Point] = ['origin'];
+    if (response !== undefined && response?.latestBlock.length > 0) {
+      this.logger.info('Previous synched point detected');
+      const latestBlock = response.latestBlock[0];
+      const point = { hash: latestBlock.hash, slot: latestBlock.slot.number };
+      startingPoints.unshift(point);
+    }
+    await this.#chainFollower.start(startingPoints);
   }
   async shutdownImpl() {
     await this.#chainFollower.shutdown();

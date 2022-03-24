@@ -1,5 +1,6 @@
 /* eslint-disable func-style */
 import { MissingConfig } from './DataProjection/errors';
+import { config } from 'dotenv';
 
 export type Config = {
   metadataServerUri: string;
@@ -15,6 +16,7 @@ function filterAndTypecastEnvs(env: any) {
 }
 
 export function getConfig(): Config {
+  config();
   const { metadataServerUri, retryLimit } = filterAndTypecastEnvs(process.env);
   if (!metadataServerUri) {
     throw new MissingConfig('METADATA_SERVER_URI env not set');

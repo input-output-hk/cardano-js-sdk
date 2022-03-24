@@ -7,7 +7,8 @@ const EXPONENTIAL_BACKOFF_STARTING = 1000;
 
 const sleep = (time: number) => new Promise((resolve) => setTimeout(resolve, time));
 
-export const exponentialBackoff = async (callback: Function) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const exponentialBackoff = async (callback: Promise<any>) => {
   console.error('Starting exponential backoff');
   let shouldContinue = true;
   let round = 0;
@@ -30,5 +31,5 @@ export const exponentialBackoff = async (callback: Function) => {
       }
     }
   }
-  return { result, success: !!result };
+  return result;
 };

@@ -6,7 +6,8 @@ export class Slot {
   @Directive('@id')
   @Field(() => Int)
   number: number;
-  @Field(() => Int)
+  // TODO: nullable to be reverted when this info is obtained in DataProjector
+  @Field(() => Int, { nullable: true })
   slotInEpoch: number;
   @Field()
   date: Date;

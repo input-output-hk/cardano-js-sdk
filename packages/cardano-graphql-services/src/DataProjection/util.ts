@@ -4,8 +4,7 @@ import {
   CombinedQueryResult,
   QueryResult,
   RollBackwardContext,
-  RollForwardContext,
-  Upsert
+  RollForwardContext
 } from './types';
 import lodash from 'lodash-es';
 
@@ -20,7 +19,7 @@ export const mergedQuery = async (blockHandlers: BlockHandler[], ctx: RollForwar
         query: currResult.query + accResult.query,
         variables: { ...currResult.variables, ...accResult.variables }
       };
-    });
+    }, Promise.resolve({ query: '' }) as Promise<QueryResult>);
 
 export const mergedProcessingResults = async (
   blockHandlers: BlockHandler[],
@@ -40,12 +39,12 @@ export const mergedRollForwardUpsert = async (
   blockHandlers: BlockHandler[],
   ctx: RollForwardContext,
   processingResult: CombinedProcessingResult[]
-): Promise<Upsert> =>
+) =>
   blockHandlers
     .map((handler) => handler.rollForward(ctx, processingResult))
-    .reduce(async (acc, curr) => lodash.merge(await acc, await curr));
+    .reduce(async (acc, curr) => lodash.merge(await acc, await curr), Promise.resolve({ mutations: {} }));
 
 export const mergedRollBackwardUpsert = async (blockHandlers: BlockHandler[], ctx: RollBackwardContext) =>
   blockHandlers
     .map((handler) => handler.rollBackward(ctx))
-    .reduce(async (acc, curr) => lodash.merge(await acc, await curr));
+    .reduce(async (acc, curr) => lodash.merge(await acc, await curr), Promise.resolve({ mutations: {} }));

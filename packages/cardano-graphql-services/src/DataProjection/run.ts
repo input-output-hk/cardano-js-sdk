@@ -1,7 +1,7 @@
 /* eslint-disable import/imports-first */
 require('../../scripts/patchRequire');
+import { DataProjector } from './Service';
 import { Logger } from 'ts-log';
-import { Service } from './Service';
 import { createLogger } from 'bunyan';
 import { getConfig } from '../config';
 import fs from 'fs';
@@ -15,15 +15,16 @@ void (async () => {
     level: 'debug',
     name: 'dgraph-projector'
   });
-  const service = new Service(
+  const service = new DataProjector(
     {
       dgraph: {
-        address: 'http://localhost:8080',
+        addresses: { grpc: 'localhost:9080', http: 'http://localhost:8080' },
         schema: fs.readFileSync(path.resolve(__dirname, '..', '..', 'dist', 'schema.graphql'), 'utf-8')
       },
       metadata: {
         uri: metadataServerUri
-      }
+      },
+      ogmios: { connection: { host: 'localhost', port: 1338 } }
     },
     logger
   );

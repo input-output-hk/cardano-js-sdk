@@ -31,7 +31,8 @@ export class Transaction {
   // TODO: nullable has to be reverted once this information can be obtained
   @Field(() => Int64, { nullable: true })
   deposit: Cardano.Lovelace;
-  @Field(() => Int64)
+  // TODO: nullable has to be reverted once this information can be obtained
+  @Field(() => Int64, { nullable: true })
   fee: Cardano.Lovelace;
   @Directive('@hasInverse(field: transaction)')
   @Field(() => [TransactionInput])

@@ -1,14 +1,11 @@
 import { Asset } from '../Schema';
-import { Schema as Ogmios } from '@cardano-ogmios/client';
+import { Schema as Ogmios, Schema } from '@cardano-ogmios/client';
 import dgraph from 'dgraph-js';
 
 export type ModuleState = null | 'initializing' | 'initialized';
 
 export interface LastBlockQuery {
-  slot: {
-    number: number;
-  };
-  hash: string;
+  lastBlock: [Schema.Point];
 }
 
 export type DQL = string;

@@ -2,9 +2,9 @@
 /* eslint-disable import/imports-first */
 require('../../scripts/patchRequire');
 import { Command } from 'commander';
+import { DataProjector } from './Service';
 import { InvalidLoggerLevel } from './errors';
 import { Logger } from 'ts-log';
-import { Service } from './Service';
 import { URL } from 'url';
 import { createLogger } from 'bunyan';
 import fs from 'fs';
@@ -26,7 +26,8 @@ program
 program
   .command('start')
   .description('Start the service')
-  .option('--dgraph-url <dgraphUrl>', 'Dgraph URL', (url) => new URL(url))
+  .option('--dgraph-http-url <dgraphHttpUrl>', 'Dgraph URL', (url) => new URL(url))
+  .option('--dgraph-grpc-url <dgraphGrpcUrl>', 'Dgraph URL', (url) => new URL(url))
   .option('--ogmios-url <ogmiosUrl>', 'Ogmios URL', (url) => new URL(url))
   .option('--metadata-uri <metadataUri>', 'Metadata Server URI', (url) => new URL(url))
   .option('--logger-min-severity <level>', 'Log level', (level) => {
@@ -35,15 +36,18 @@ program
     }
     return level;
   })
-  .action(async ({ dgraphUrl, loggerMinSeverity, ogmiosUrl, metadataUri }) => {
+  .action(async ({ dgraphGrpcUrl, dgraphHttpUrl, loggerMinSeverity, ogmiosUrl, metadataUri }) => {
     const logger: Logger = createLogger({
       level: loggerMinSeverity,
       name: 'dgraph-projector'
     });
-    const service = new Service(
+    const service = new DataProjector(
       {
         dgraph: {
-          address: dgraphUrl?.toString() || 'http://localhost:8080',
+          addresses: {
+            grpc: dgraphGrpcUrl?.toString() || 'localhost:9080',
+            http: dgraphHttpUrl?.toString() || 'http://localhost:8080'
+          },
           schema: fs.readFileSync(path.resolve(__dirname, '..', '..', 'dist', 'schema.graphql'), 'utf-8')
         },
         metadata: {
