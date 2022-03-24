@@ -26,13 +26,13 @@ describe('SingleAddressWallet/pouchdbWalletStores', () => {
     new SingleAddressWallet(
       { name: walletName },
       {
-        assetProvider,
+        assetProvider: await assetProvider,
         keyAgent: await keyAgentReady,
         stakePoolSearchProvider,
         stores,
         timeSettingsProvider,
-        txSubmitProvider,
-        walletProvider
+        txSubmitProvider: await txSubmitProvider,
+        walletProvider: await walletProvider
       }
     );
 

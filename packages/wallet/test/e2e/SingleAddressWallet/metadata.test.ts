@@ -18,12 +18,12 @@ describe('SingleAddressWallet/metadata', () => {
     wallet = new SingleAddressWallet(
       { name: 'Test Wallet' },
       {
-        assetProvider,
+        assetProvider: await assetProvider,
         keyAgent: await keyAgentReady,
         stakePoolSearchProvider,
         timeSettingsProvider,
-        txSubmitProvider,
-        walletProvider
+        txSubmitProvider: await txSubmitProvider,
+        walletProvider: await walletProvider
       }
     );
     ownAddress = (await firstValueFrom(wallet.addresses$))[0].address;
