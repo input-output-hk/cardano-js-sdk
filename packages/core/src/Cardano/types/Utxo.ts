@@ -4,6 +4,10 @@ import { Value } from './Value';
 export interface TxIn {
   txId: TransactionId;
   index: number;
+  /**
+   * Might or might not be present based on source.
+   * Not present in serialized tx.
+   */
   address?: Address;
 }
 

@@ -32,7 +32,11 @@ export interface StakeDelegationCertificate {
   __typename: CertificateType.StakeDelegation;
   rewardAccount: RewardAccount;
   poolId: PoolId;
-  epoch: Epoch;
+  /**
+   * Might or might not be present based on source.
+   * Not present in serialized tx.
+   */
+  epoch?: Epoch;
 }
 
 export enum MirCertificatePot {
