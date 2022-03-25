@@ -92,6 +92,12 @@ const stakeDeregistration = (certificate: CSL.StakeDeregistration): Cardano.Stak
   rewardAccount: Cardano.RewardAccount(Buffer.from(certificate.to_bytes()).toString())
 });
 
+const stakeDelegation = (certificate: CSL.StakeDelegation): Cardano.StakeDelegationCertificate => ({
+  __typename: Cardano.CertificateType.StakeDelegation,
+  poolId: Cardano.PoolId(certificate.pool_keyhash().toString()), // TODO: is this correct??
+  rewardAccount: Cardano.RewardAccount(Buffer.from(certificate.to_bytes()).toString())
+});
+
 const createCardanoRelays = (relays: CSL.Relays): Cardano.Relay[] => {
   const result: Cardano.Relay[] = [];
   for (let i = 0; i < relays.len(); i++) {
@@ -199,7 +205,8 @@ export const txCertificates = (certificates: CSL.Certificates): Cardano.Certific
         result.push(stakeDeregistration(cslCertificate.as_stake_deregistration()!));
         break;
       case CSL.CertificateKind.StakeDelegation.toString():
-        throw new Error('not yet implemented');
+        result.push(stakeDelegation(cslCertificate.as_stake_delegation()!));
+        break;
       case CSL.CertificateKind.PoolRegistration.toString():
         result.push(poolRegistration(cslCertificate.as_pool_registration()!));
         break;
@@ -294,7 +301,7 @@ export const txRedeemers = (redeemers: CSL.Redeemers): Cardano.Redeemer[] => {
 
     /**
      * CSL.RedeemerTagKind = Spend, Mint, Cert, Reward
-     * TODO: check this prior to production
+     * should we modify Cardano.Redeemer.purpose to match or just map reward to withdrawal ??
      */
     const redeemerTagKind = reedeemer.tag().kind();
 
