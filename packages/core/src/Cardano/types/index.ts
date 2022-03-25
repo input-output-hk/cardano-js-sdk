@@ -1,5 +1,4 @@
 import * as Ogmios from '@cardano-ogmios/schema';
-import { CustomError } from 'ts-custom-error';
 import { util } from '../../util';
 
 export { Epoch, Slot, ExUnits } from '@cardano-ogmios/schema';
@@ -17,10 +16,8 @@ export * from './Block';
 export * from './Asset';
 export * from './AuxiliaryData';
 export * from './Key';
-export * as TxSubmissionErrors from './TxSubmissionErrors';
+export * from './TxSubmissionErrors';
 export * as NativeScriptType from './NativeScriptType';
-
-export type TxSubmissionError = CustomError;
 
 export type ProtocolParametersAlonzo = util.OptionalUndefined<
   util.RecursivelyReplaceNullWithUndefined<Ogmios.ProtocolParametersAlonzo>

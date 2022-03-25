@@ -27,6 +27,7 @@
     "test:debug": "DEBUG=true yarn test"
   },
   "devDependencies": {
+    "@cardano-sdk/cardano-graphql-services": "0.2.0",
     "@graphql-codegen/cli": "~2.5.0",
     "@graphql-codegen/typescript": "~2.4.3",
     "@graphql-codegen/typescript-graphql-request": "~4.3.4",
@@ -39,10 +40,12 @@
     "@cardano-ogmios/client": "~5.1.0",
     "@cardano-sdk/core": "0.2.0",
     "class-validator": "^0.13.1",
+    "got": "^11",
     "graphql": "~15.6.1",
     "graphql-request": "npm:graphql-request-configurable-serializer@4.0.0",
     "graphql-tag": "2.12.5",
-    "json-bigint": "~1.0.0"
+    "json-bigint": "~1.0.0",
+    "serialize-error": "^8"
   },
   "files": [
     "dist/*",

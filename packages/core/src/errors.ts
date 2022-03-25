@@ -4,7 +4,8 @@ export enum ProviderFailure {
   NotFound = 'NOT_FOUND',
   Unknown = 'UNKNOWN',
   InvalidResponse = 'INVALID_RESPONSE',
-  NotImplemented = 'NOT_IMPLEMENTED'
+  NotImplemented = 'NOT_IMPLEMENTED',
+  Unhealthy = 'UNHEALTHY'
 }
 
 const formatMessage = (reason: string, detail?: string) => reason + (detail ? ` (${detail})` : '');

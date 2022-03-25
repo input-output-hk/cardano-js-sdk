@@ -6,6 +6,7 @@
   "references": [
     { "path": "../src" },
     { "path": "../../core/src" },
+    { "path": "../../ogmios/test" },
     { "path": "../../util-dev/src" }
   ]
 }

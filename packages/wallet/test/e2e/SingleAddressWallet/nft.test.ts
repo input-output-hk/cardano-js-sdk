@@ -38,12 +38,12 @@ describe('SingleAddressWallet.assets/nft', () => {
         name: 'Test Wallet'
       },
       {
-        assetProvider,
+        assetProvider: await assetProvider,
         keyAgent,
         stakePoolSearchProvider,
         timeSettingsProvider,
-        txSubmitProvider,
-        walletProvider
+        txSubmitProvider: await txSubmitProvider,
+        walletProvider: await walletProvider
       }
     );
   });
