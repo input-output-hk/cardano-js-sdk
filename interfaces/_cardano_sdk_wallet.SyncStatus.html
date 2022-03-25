@@ -61,48 +61,96 @@
 					<a href="_cardano_sdk_wallet.SyncStatus.html">SyncStatus</a>
 				</li>
 			</ul>
-			<h1>Enumeration SyncStatus</h1>
+			<h1>Interface SyncStatus</h1>
 		</div>
 	</div>
 </header>
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-hierarchy">
+				<h3>Hierarchy</h3>
+				<ul class="tsd-hierarchy">
+					<li>
+						<span class="target">SyncStatus</span>
+					</li>
+				</ul>
+			</section>
 			<section class="tsd-panel-group tsd-index-group">
 				<h2>Index</h2>
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section ">
-							<h3>Enumeration members</h3>
+							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="_cardano_sdk_wallet.SyncStatus.html#Syncing" class="tsd-kind-icon">Syncing</a></li>
-								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="_cardano_sdk_wallet.SyncStatus.html#UpToDate" class="tsd-kind-icon">Up<wbr>ToDate</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_wallet.SyncStatus.html#isAnyRequestPending_" class="tsd-kind-icon">is<wbr>Any<wbr>Request<wbr>Pending$</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_wallet.SyncStatus.html#isSettled_" class="tsd-kind-icon">is<wbr>Settled$</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_wallet.SyncStatus.html#isUpToDate_" class="tsd-kind-icon">is<wbr>UpTo<wbr>Date$</a></li>
 							</ul>
 						</section>
 					</div>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
-				<h2>Enumeration members</h2>
-				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
-					<a name="Syncing" class="tsd-anchor"></a>
-					<h3>Syncing</h3>
-					<div class="tsd-signature tsd-kind-icon">Syncing<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 0</span></div>
+				<h2>Properties</h2>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="isAnyRequestPending_" class="tsd-anchor"></a>
+					<h3>is<wbr>Any<wbr>Request<wbr>Pending$</h3>
+					<div class="tsd-signature tsd-kind-icon">is<wbr>Any<wbr>Request<wbr>Pending$<span class="tsd-signature-symbol">:</span> <a href="_cardano_sdk_wallet.BehaviorObservable.html" class="tsd-signature-type" data-tsd-kind="Interface">BehaviorObservable</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/630feb9/packages/wallet/src/types.ts#L39">packages/wallet/src/types.ts:39</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/6246367/packages/wallet/src/types.ts#L44">packages/wallet/src/types.ts:44</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Emits:</p>
+							<ul>
+								<li><code>true</code> while waiting for any provider request to resolve</li>
+								<li><code>false</code> while there are no provider requests waiting to resolve</li>
+							</ul>
+						</div>
+					</div>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
-					<a name="UpToDate" class="tsd-anchor"></a>
-					<h3>Up<wbr>ToDate</h3>
-					<div class="tsd-signature tsd-kind-icon">Up<wbr>ToDate<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 1</span></div>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="isSettled_" class="tsd-anchor"></a>
+					<h3>is<wbr>Settled$</h3>
+					<div class="tsd-signature tsd-kind-icon">is<wbr>Settled$<span class="tsd-signature-symbol">:</span> <a href="_cardano_sdk_wallet.BehaviorObservable.html" class="tsd-signature-type" data-tsd-kind="Interface">BehaviorObservable</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/630feb9/packages/wallet/src/types.ts#L40">packages/wallet/src/types.ts:40</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/6246367/packages/wallet/src/types.ts#L58">packages/wallet/src/types.ts:58</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Emits after wallet makes at least one request with each relevant provider method:</p>
+							<ul>
+								<li><code>false</code> on load</li>
+								<li><code>true</code> while there are no provider requests waiting to resolve</li>
+								<li><code>false</code> while waiting for any provider request to resolve</li>
+							</ul>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="isUpToDate_" class="tsd-anchor"></a>
+					<h3>is<wbr>UpTo<wbr>Date$</h3>
+					<div class="tsd-signature tsd-kind-icon">is<wbr>UpTo<wbr>Date$<span class="tsd-signature-symbol">:</span> <a href="_cardano_sdk_wallet.BehaviorObservable.html" class="tsd-signature-type" data-tsd-kind="Interface">BehaviorObservable</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/6246367/packages/wallet/src/types.ts#L51">packages/wallet/src/types.ts:51</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Emits after wallet makes at least one request with each relevant provider method:</p>
+							<ul>
+								<li><code>false</code> on load</li>
+								<li><code>true</code> when all provider requests resolve</li>
+								<li><code>false</code> when some provider request(s) do not resolve for some time (determined by specific wallet implementation)</li>
+							</ul>
+						</div>
+					</div>
 				</section>
 			</section>
 		</div>
@@ -159,14 +207,17 @@
 				<ul class="before-current">
 				</ul>
 				<ul class="current">
-					<li class="current tsd-kind-enum tsd-parent-kind-module">
+					<li class="current tsd-kind-interface tsd-parent-kind-module">
 						<a href="_cardano_sdk_wallet.SyncStatus.html" class="tsd-kind-icon">Sync<wbr>Status</a>
 						<ul>
-							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
-								<a href="_cardano_sdk_wallet.SyncStatus.html#Syncing" class="tsd-kind-icon">Syncing</a>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="_cardano_sdk_wallet.SyncStatus.html#isAnyRequestPending_" class="tsd-kind-icon">is<wbr>Any<wbr>Request<wbr>Pending$</a>
 							</li>
-							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
-								<a href="_cardano_sdk_wallet.SyncStatus.html#UpToDate" class="tsd-kind-icon">Up<wbr>ToDate</a>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="_cardano_sdk_wallet.SyncStatus.html#isSettled_" class="tsd-kind-icon">is<wbr>Settled$</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="_cardano_sdk_wallet.SyncStatus.html#isUpToDate_" class="tsd-kind-icon">is<wbr>UpTo<wbr>Date$</a>
 							</li>
 						</ul>
 					</li>
@@ -191,6 +242,7 @@
 			<ul class="tsd-legend">
 				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
 				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
