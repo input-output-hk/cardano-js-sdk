@@ -1,15 +1,19 @@
-import { HttpServer, RunnableModule } from '../../src';
+import { HttpServer, HttpServerConfig, RunnableModule } from '../../src';
 import { getRandomPort } from 'get-port-please';
 import express from 'express';
 import got from 'got';
 import net from 'net';
+import waitOn from 'wait-on';
 const bodyParser = require('body-parser');
 
+const APPLICATION_JSON = 'application/json';
+const onHttpServer = (url: string) => waitOn({ resources: [url], validateStatus: (statusCode) => statusCode === 404 });
+
 class SomeHttpServer extends HttpServer {
-  private constructor(config: net.ListenOptions, router: express.Router) {
-    super({ listen: config, name: 'SomeHttpServer', router });
+  private constructor(config: HttpServerConfig, router: express.Router) {
+    super({ ...config, name: 'SomeHttpServer' }, { router });
   }
-  static create(config: net.ListenOptions) {
+  static create(config: HttpServerConfig) {
     const router = express.Router();
     router.use(bodyParser.json());
     router.get('/health', (_req, res) => {
@@ -26,14 +30,14 @@ describe('HttpServer', () => {
 
   it('Is a runnable module', async () => {
     port = await getRandomPort();
-    httpServer = SomeHttpServer.create({ host: 'localhost', port });
+    httpServer = SomeHttpServer.create({ listen: { host: 'localhost', port } });
     expect(httpServer).toBeInstanceOf(RunnableModule);
   });
 
   beforeEach(async () => {
     port = await getRandomPort();
     apiUrlBase = `http://localhost:${port}`;
-    httpServer = SomeHttpServer.create({ host: 'localhost', port });
+    httpServer = SomeHttpServer.create({ listen: { host: 'localhost', port } });
   });
 
   describe('initialize', () => {
@@ -102,6 +106,7 @@ describe('HttpServer', () => {
     beforeEach(async () => {
       await httpServer.initialize();
       await httpServer.start();
+      await onHttpServer(apiUrlBase);
     });
 
     afterEach(async () => {

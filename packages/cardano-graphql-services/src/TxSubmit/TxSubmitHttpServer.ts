@@ -1,18 +1,16 @@
 import { Cardano, ProviderError, ProviderFailure, TxSubmitProvider } from '@cardano-sdk/core';
 import { ErrorObject, serializeError } from 'serialize-error';
-import { HttpServer } from '../Http';
+import { HttpServer, HttpServerConfig } from '../Http';
 import { Logger, dummyLogger } from 'ts-log';
 import bodyParser, { Options } from 'body-parser';
 import express, { Router } from 'express';
-import net from 'net';
 
 export interface TxSubmitServerDependencies {
   txSubmitProvider: TxSubmitProvider;
   logger?: Logger;
 }
 
-export interface TxSubmitHttpServerConfig {
-  listen: net.ListenOptions;
+export interface TxSubmitHttpServerConfig extends HttpServerConfig {
   bodyParser?: {
     limit?: Options['limit'];
   };
@@ -21,9 +19,13 @@ export interface TxSubmitHttpServerConfig {
 export class TxSubmitHttpServer extends HttpServer {
   #txSubmitProvider: TxSubmitProvider;
 
-  private constructor(config: TxSubmitHttpServerConfig, router: Router, dependencies: TxSubmitServerDependencies) {
-    super({ listen: config.listen, name: 'TxSubmitServer', router }, dependencies.logger);
-    this.#txSubmitProvider = dependencies.txSubmitProvider;
+  private constructor(
+    config: TxSubmitHttpServerConfig,
+    router: Router,
+    { logger = dummyLogger, txSubmitProvider }: TxSubmitServerDependencies
+  ) {
+    super({ ...config, name: 'TxSubmitServer' }, { logger, router });
+    this.#txSubmitProvider = txSubmitProvider;
   }
   static create(
     config: TxSubmitHttpServerConfig,
