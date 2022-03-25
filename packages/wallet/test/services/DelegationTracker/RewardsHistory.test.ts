@@ -1,6 +1,12 @@
 import { Cardano } from '@cardano-sdk/core';
 import { InMemoryRewardsHistoryStore } from '../../../src/persistence';
-import { RewardsHistory, createRewardsHistoryProvider, createRewardsHistoryTracker } from '../../../src/services';
+import {
+  RewardsHistory,
+  RewardsHistoryProvider,
+  TrackedWalletProvider,
+  createRewardsHistoryProvider,
+  createRewardsHistoryTracker
+} from '../../../src/services';
 import { createStubTxWithCertificates } from './stub-tx';
 import { createTestScheduler } from '../../testScheduler';
 import { firstValueFrom, of } from 'rxjs';
@@ -9,11 +15,25 @@ import { mockWalletProvider, rewardAccount, rewardsHistory } from '../../mocks';
 describe('RewardsHistory', () => {
   const rewardAccounts = [rewardAccount];
 
-  test('createRewardsHistoryProvider', async () => {
-    const provider = createRewardsHistoryProvider(mockWalletProvider(), {
-      initialInterval: 1
+  describe('createRewardsHistoryProvider', () => {
+    let walletProvider: TrackedWalletProvider;
+    let provider: RewardsHistoryProvider;
+
+    beforeEach(() => {
+      walletProvider = new TrackedWalletProvider(mockWalletProvider());
+      provider = createRewardsHistoryProvider(walletProvider, {
+        initialInterval: 1
+      });
     });
-    expect(await firstValueFrom(provider(rewardAccounts, 1))).toBe(rewardsHistory);
+
+    it('when lower bound is specified: queries underlying provider', async () => {
+      expect(await firstValueFrom(provider(rewardAccounts, 1))).toBe(rewardsHistory);
+    });
+
+    it('when lower bound is not specified: sets rewardsHistory as initialized and returns empty array', async () => {
+      expect(await firstValueFrom(provider(rewardAccounts, null))).toEqual(new Map());
+      expect(walletProvider.stats.rewardsHistory$.value.initialized).toBe(true);
+    });
   });
 
   describe('createRewardsHistoryTracker', () => {

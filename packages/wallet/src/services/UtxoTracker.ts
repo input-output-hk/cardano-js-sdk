@@ -63,9 +63,6 @@ export const createUtxoTracker = (
       utxoSource$.complete();
       available$.complete();
     },
-    // Currently querying ALL utxo. In the future this will not be utxoSource$,
-    // as the initial utxo set will be loaded from storage.
-    // Same pattern in TransactionsTracker.
     total$: utxoSource$
   };
 };

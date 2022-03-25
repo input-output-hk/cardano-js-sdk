@@ -161,10 +161,7 @@ export const createDelegateeTracker = (
       const stakePoolIds = [lastEpoch + 1, lastEpoch + 2, lastEpoch + 3].map(getStakePoolIdAtEpoch(transactions));
       return stakePoolSearchProvider(uniq(stakePoolIds.filter(util.isNotNil))).pipe(
         map((stakePools) => stakePoolIds.map((poolId) => stakePools.find((pool) => pool.id === poolId) || undefined)),
-        map(([currentEpoch, nextEpoch, nextNextEpoch]) => {
-          if (!nextNextEpoch) return;
-          return { currentEpoch, nextEpoch, nextNextEpoch };
-        })
+        map(([currentEpoch, nextEpoch, nextNextEpoch]) => ({ currentEpoch, nextEpoch, nextNextEpoch }))
       );
     }),
     distinctUntilChanged((a, b) => isEqual(a, b))

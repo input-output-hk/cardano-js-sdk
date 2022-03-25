@@ -43,6 +43,6 @@ export abstract class PouchdbStore<T> {
   }
 
   protected toPouchdbDoc(obj: T): T {
-    return toPouchdbDoc(obj) as T;
+    return toPouchdbDoc(obj, false) as T;
   }
 }

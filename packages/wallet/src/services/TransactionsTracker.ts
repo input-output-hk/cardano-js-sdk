@@ -14,6 +14,7 @@ import {
   concat,
   defaultIfEmpty,
   distinctUntilChanged,
+  exhaustMap,
   filter,
   map,
   merge,
@@ -90,7 +91,11 @@ export const createAddressTransactionsProvider = (
           },
           retryBackoffConfig,
           tipBlockHeight$,
-          transactionsEquals
+          transactionsEquals,
+          // Do not re-fetch transactions twice on load when tipBlockHeight$ loads from storage first
+          // It should also help when using poor internet connection.
+          // Caveat is that local transactions might get out of date...
+          exhaustMap
         );
       })
     )

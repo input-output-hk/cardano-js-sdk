@@ -1,4 +1,4 @@
-import { AddressType, GroupedAddress, KeyAgent } from './KeyManagement';
+import { AddressType, GroupedAddress, KeyAgent, util as keyManagementUtil } from './KeyManagement';
 import {
   AssetProvider,
   BigIntMath,
@@ -12,7 +12,16 @@ import {
   WalletProvider,
   coreToCsl
 } from '@cardano-sdk/core';
-import { Assets, InitializeTxResult, KeyManagement, SignDataProps, SyncStatus } from '.';
+import {
+  Assets,
+  InitializeTxProps,
+  InitializeTxPropsValidationResult,
+  InitializeTxResult,
+  MinimumCoinQuantity,
+  SignDataProps,
+  SyncStatus,
+  Wallet
+} from './types';
 import {
   Balance,
   BehaviorObservable,
@@ -21,6 +30,9 @@ import {
   PersistentDocumentTrackerSubject,
   PollingConfig,
   SyncableIntervalPersistentDocumentTrackerSubject,
+  TrackedAssetProvider,
+  TrackedStakePoolSearchProvider,
+  TrackedTimeSettingsProvider,
   TrackedTxSubmitProvider,
   TrackedWalletProvider,
   TrackerSubject,
@@ -32,13 +44,13 @@ import {
   createBalanceTracker,
   createDelegationTracker,
   createNftMetadataProvider,
+  createProviderStatusTracker,
   createTransactionsTracker,
   createUtxoTracker,
   distinctBlock,
   distinctEpoch
 } from './services';
 import { Cip30DataSignature, cip30signData } from './KeyManagement/cip8';
-import { InitializeTxProps, InitializeTxPropsValidationResult, MinimumCoinQuantity, Wallet } from './types';
 import {
   InputSelector,
   computeMinimumCoinQuantity,
@@ -46,11 +58,10 @@ import {
   roundRobinRandomImprove
 } from '@cardano-sdk/cip2';
 import { Logger, dummyLogger } from 'ts-log';
-import { Observable, Subject, combineLatest, firstValueFrom, lastValueFrom, map, take } from 'rxjs';
+import { Observable, Subject, combineLatest, filter, firstValueFrom, lastValueFrom, map, take } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TxInternals, createTransactionInternals, ensureValidityInterval } from './Transaction';
 import { WalletStores, createInMemoryWalletStores } from './persistence';
-import { createProviderStatusTracker } from './services/ProviderStatusTracker';
 import { isEqual } from 'lodash-es';
 
 export interface SingleAddressWalletProps {
@@ -83,6 +94,9 @@ export class SingleAddressWallet implements Wallet {
   };
   txSubmitProvider: TrackedTxSubmitProvider;
   walletProvider: TrackedWalletProvider;
+  timeSettingsProvider: TrackedTimeSettingsProvider;
+  stakePoolSearchProvider: TrackedStakePoolSearchProvider;
+  assetProvider: TrackedAssetProvider;
   utxo: TransactionalTracker<Cardano.Utxo[]>;
   balance: TransactionalTracker<Balance>;
   transactions: TransactionsTracker;
@@ -94,16 +108,16 @@ export class SingleAddressWallet implements Wallet {
   genesisParameters$: TrackerSubject<Cardano.CompactGenesis>;
   timeSettings$: TrackerSubject<TimeSettings[]>;
   assets$: TrackerSubject<Assets>;
-  syncStatus$: TrackerSubject<SyncStatus>;
+  syncStatus: SyncStatus;
   name: string;
 
   constructor(
     {
       name,
       polling: {
-        interval: pollInterval = 15_000,
-        maxInterval = pollInterval * 10,
-        consideredOutOfSyncAfter = pollInterval * 2
+        interval: pollInterval = 5000,
+        maxInterval = pollInterval * 20,
+        consideredOutOfSyncAfter = 1000 * 60 * 3
       } = {},
       retryBackoffConfig = {
         initialInterval: Math.min(pollInterval, 1000),
@@ -126,13 +140,28 @@ export class SingleAddressWallet implements Wallet {
     this.#inputSelector = inputSelector;
     this.txSubmitProvider = new TrackedTxSubmitProvider(txSubmitProvider);
     this.walletProvider = new TrackedWalletProvider(walletProvider);
+    this.timeSettingsProvider = new TrackedTimeSettingsProvider(timeSettingsProvider);
+    this.stakePoolSearchProvider = new TrackedStakePoolSearchProvider(stakePoolSearchProvider);
+    this.assetProvider = new TrackedAssetProvider(assetProvider);
+    this.syncStatus = createProviderStatusTracker(
+      {
+        assetProvider: this.assetProvider,
+        stakePoolSearchProvider: this.stakePoolSearchProvider,
+        timeSettingsProvider: this.timeSettingsProvider,
+        txSubmitProvider: this.txSubmitProvider,
+        walletProvider: this.walletProvider
+      },
+      { consideredOutOfSyncAfter }
+    );
     this.#keyAgent = keyAgent;
     this.addresses$ = new TrackerSubject<GroupedAddress[]>(this.#initializeAddress(keyAgent.knownAddresses));
     this.name = name;
     this.#tip$ = this.tip$ = new SyncableIntervalPersistentDocumentTrackerSubject({
+      maxPollInterval: maxInterval,
       pollInterval,
       provider$: coldObservableProvider(this.walletProvider.ledgerTip, retryBackoffConfig),
-      store: stores.tip
+      store: stores.tip,
+      trigger$: this.syncStatus.isSettled$.pipe(filter((isSettled) => isSettled))
     });
     const tipBlockHeight$ = distinctBlock(this.tip$);
     this.networkInfo$ = new PersistentDocumentTrackerSubject(
@@ -141,7 +170,7 @@ export class SingleAddressWallet implements Wallet {
     );
     const epoch$ = distinctEpoch(this.networkInfo$);
     this.timeSettings$ = new PersistentDocumentTrackerSubject(
-      coldObservableProvider(timeSettingsProvider, retryBackoffConfig, epoch$, isEqual),
+      coldObservableProvider(this.timeSettingsProvider.getTimeSettings, retryBackoffConfig, epoch$, isEqual),
       stores.timeSettings
     );
     this.protocolParameters$ = new PersistentDocumentTrackerSubject(
@@ -178,7 +207,7 @@ export class SingleAddressWallet implements Wallet {
       rewardAccountAddresses$: this.addresses$.pipe(
         map((addresses) => addresses.map((groupedAddress) => groupedAddress.rewardAccount))
       ),
-      stakePoolSearchProvider,
+      stakePoolSearchProvider: this.stakePoolSearchProvider,
       stores,
       timeSettings$: this.timeSettings$,
       transactionsTracker: this.transactions,
@@ -187,7 +216,7 @@ export class SingleAddressWallet implements Wallet {
     this.balance = createBalanceTracker(this.protocolParameters$, this.utxo, this.delegation);
     this.assets$ = new PersistentDocumentTrackerSubject(
       createAssetsTracker({
-        assetProvider,
+        assetProvider: this.assetProvider,
         balanceTracker: this.balance,
         nftMetadataProvider: createNftMetadataProvider(
           this.walletProvider,
@@ -197,10 +226,6 @@ export class SingleAddressWallet implements Wallet {
         retryBackoffConfig
       }),
       stores.assets
-    );
-    this.syncStatus$ = createProviderStatusTracker(
-      { walletProvider: this.walletProvider },
-      { consideredOutOfSyncAfter }
     );
   }
 
@@ -240,7 +265,7 @@ export class SingleAddressWallet implements Wallet {
     stubSign = false
   ): Promise<Cardano.NewTxAlonzo> {
     const signatures = stubSign
-      ? KeyManagement.util.stubSignTransaction(tx.body, this.#keyAgent.knownAddresses)
+      ? keyManagementUtil.stubSignTransaction(tx.body, this.#keyAgent.knownAddresses)
       : await this.#keyAgent.signTransaction(tx);
     return {
       auxiliaryData,
@@ -279,7 +304,11 @@ export class SingleAddressWallet implements Wallet {
     this.genesisParameters$.complete();
     this.#tip$.complete();
     this.addresses$.complete();
-    this.syncStatus$.complete();
+    this.assetProvider.stats.shutdown();
+    this.walletProvider.stats.shutdown();
+    this.txSubmitProvider.stats.shutdown();
+    this.timeSettingsProvider.stats.shutdown();
+    this.stakePoolSearchProvider.stats.shutdown();
   }
 
   #prepareTx(props: InitializeTxProps) {

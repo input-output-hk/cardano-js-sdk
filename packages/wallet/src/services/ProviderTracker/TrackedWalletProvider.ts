@@ -14,6 +14,19 @@ export class WalletProviderStats {
   readonly utxoDelegationAndRewards$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
   readonly stakePoolStats$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
 
+  shutdown() {
+    this.currentWalletProtocolParameters$.complete();
+    this.genesisParameters$.complete();
+    this.ledgerTip$.complete();
+    this.networkInfo$.complete();
+    this.queryBlocksByHashes$.complete();
+    this.queryTransactionsByAddresses$.complete();
+    this.queryTransactionsByHashes$.complete();
+    this.rewardsHistory$.complete();
+    this.utxoDelegationAndRewards$.complete();
+    this.stakePoolStats$.complete();
+  }
+
   reset() {
     this.currentWalletProtocolParameters$.next(CLEAN_FN_STATS);
     this.genesisParameters$.next(CLEAN_FN_STATS);
@@ -26,6 +39,8 @@ export class WalletProviderStats {
     this.utxoDelegationAndRewards$.next(CLEAN_FN_STATS);
     this.stakePoolStats$.next(CLEAN_FN_STATS);
   }
+  // Consider shutdown() completing all subjects:
+  // might be needed in Wallet.shutdown() to not leak all stats subjects
 }
 
 /**

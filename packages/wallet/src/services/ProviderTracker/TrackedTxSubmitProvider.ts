@@ -2,13 +2,20 @@ import { BehaviorSubject } from 'rxjs';
 import { CLEAN_FN_STATS, ProviderFnStats, ProviderTracker } from './ProviderTracker';
 import { TxSubmitProvider } from '@cardano-sdk/core';
 
+export const CLEAN_TX_SUBMIT_STATS: ProviderFnStats = { ...CLEAN_FN_STATS, initialized: true };
+
 export class TxSubmitProviderStats {
-  readonly healthCheck$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
-  readonly submitTx$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
+  readonly healthCheck$ = new BehaviorSubject<ProviderFnStats>(CLEAN_TX_SUBMIT_STATS);
+  readonly submitTx$ = new BehaviorSubject<ProviderFnStats>(CLEAN_TX_SUBMIT_STATS);
+
+  shutdown() {
+    this.submitTx$.complete();
+    this.healthCheck$.complete();
+  }
 
   reset() {
-    this.healthCheck$.next(CLEAN_FN_STATS);
-    this.submitTx$.next(CLEAN_FN_STATS);
+    this.healthCheck$.next(CLEAN_TX_SUBMIT_STATS);
+    this.submitTx$.next(CLEAN_TX_SUBMIT_STATS);
   }
 }
 

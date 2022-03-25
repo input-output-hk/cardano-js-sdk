@@ -82,7 +82,7 @@ export interface Delegatee {
    */
   currentEpoch?: Cardano.StakePool;
   nextEpoch?: Cardano.StakePool;
-  nextNextEpoch: Cardano.StakePool;
+  nextNextEpoch?: Cardano.StakePool;
 }
 
 export enum StakeKeyStatus {
@@ -106,6 +106,6 @@ export interface RewardAccount {
 
 export interface DelegationTracker {
   rewardsHistory$: BehaviorObservable<RewardsHistory>;
-  rewardAccounts$: Observable<RewardAccount[]>;
+  rewardAccounts$: BehaviorObservable<RewardAccount[]>;
   shutdown(): void;
 }
