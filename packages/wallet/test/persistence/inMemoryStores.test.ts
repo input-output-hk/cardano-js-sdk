@@ -61,7 +61,11 @@ describe('inMemoryStores', () => {
     });
 
     it('Extends InMemoryCollectionStore', () => {
-      expect(new InMemoryKeyValueStore()).toBeInstanceOf(InMemoryCollectionStore);
+      expect(store).toBeInstanceOf(InMemoryCollectionStore);
+    });
+
+    it('getValues([]) completes without emittting', async () => {
+      await assertCompletesWithoutEmitting(store.getValues([]));
     });
 
     it('setValue inserts a new value or updates an existing value', async () => {

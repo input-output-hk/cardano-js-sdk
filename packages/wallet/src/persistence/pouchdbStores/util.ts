@@ -10,7 +10,7 @@ const PLAIN_TYPES = new Set(['boolean', 'number', 'string']);
 
 // Pouchdb doesn't know how to store bigint and Map
 // toPouchdbDoc/fromPouchdbDoc converts to/from plain json objects
-export const toPouchdbDoc = (obj: unknown): unknown => {
+export const toPouchdbDoc = (obj: unknown, isNestedObj: boolean): unknown => {
   if (PLAIN_TYPES.has(typeof obj)) return obj;
   if (typeof obj === 'undefined') {
     return {
@@ -20,18 +20,25 @@ export const toPouchdbDoc = (obj: unknown): unknown => {
   if (typeof obj === 'object') {
     if (obj === null) return null;
     if (Array.isArray(obj)) {
-      return obj.map(toPouchdbDoc);
+      const value = obj.map((item) => toPouchdbDoc(item, true));
+      if (isNestedObj) {
+        return value;
+      }
+      return {
+        __type: 'Array',
+        value
+      };
     }
     if (obj instanceof Map) {
       return {
         __type: 'Map',
-        value: [...obj.entries()].map(([key, value]) => [toPouchdbDoc(key), toPouchdbDoc(value)])
+        value: [...obj.entries()].map(([key, value]) => [toPouchdbDoc(key, true), toPouchdbDoc(value, true)])
       };
     }
     return transform(
       obj,
       (result, value, key) => {
-        result[key] = toPouchdbDoc(value);
+        result[key] = toPouchdbDoc(value, true);
         return result;
       },
       {} as Record<string | number | symbol, unknown>
@@ -53,7 +60,9 @@ export const fromPouchdbDoc = (doc: unknown): unknown => {
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const docAsAny = doc as any;
+    if (docAsAny.__type === 'undefined') return undefined;
     if (docAsAny.__type === 'bigint') return BigInt(docAsAny.value);
+    if (docAsAny.__type === 'Array') return docAsAny.value.map(fromPouchdbDoc);
     if (docAsAny.__type === 'Map')
       return new Map(docAsAny.value.map((keyValues: unknown[]) => keyValues.map(fromPouchdbDoc)));
     return transform(

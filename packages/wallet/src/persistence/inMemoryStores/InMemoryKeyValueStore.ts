@@ -8,7 +8,7 @@ export class InMemoryKeyValueStore<K, V>
   implements KeyValueStore<K, V>
 {
   getValues(keys: K[]): Observable<V[]> {
-    if (this.destroyed) return EMPTY;
+    if (this.destroyed || keys.length === 0) return EMPTY;
     const result: V[] = [];
     for (const key of keys) {
       const value = this.docs.find((doc) => doc.key === key)?.value;

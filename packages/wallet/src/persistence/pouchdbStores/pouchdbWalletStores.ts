@@ -57,7 +57,7 @@ export const createPouchdbWalletStores = (walletName: string): WalletStores => {
     rewardsHistory: new PouchdbRewardsHistoryStore(`${baseDbName}RewardsHistory`),
     stakePools: new PouchdbStakePoolsStore(`${baseDbName}StakePools`),
     timeSettings: new PouchdbTimeSettingsStore(docsDbName, 'timeSettings'),
-    tip: new PouchdbTipStore(baseDbName, 'tip'),
+    tip: new PouchdbTipStore(docsDbName, 'tip'),
     transactions: new PouchdbTransactionsStore(`${baseDbName}Transactions`, ({ blockHeader: { blockNo }, index }) =>
       /**
        * Multiplied by 100k to distinguish between blockNo=1,index=0 and blockNo=0,index=1
