@@ -50,7 +50,8 @@ import {
   distinctBlock,
   distinctEpoch
 } from './services';
-import { Cip30DataSignature, cip30signData } from './KeyManagement/cip8';
+import { Cip30DataSignature } from '@cardano-sdk/cip30';
+import { cip30signData } from './KeyManagement/cip8';
 import {
   InputSelector,
   computeMinimumCoinQuantity,

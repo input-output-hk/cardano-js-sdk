@@ -5,10 +5,13 @@ import {
   Cip30DataSignature,
   Paginate,
   TxSignError,
+  TxSignErrorCode,
   WalletApi,
   handleMessages
 } from '@cardano-sdk/cip30';
+import { AuthenticationError } from './KeyManagement/errors';
 import { CSL, Cardano, coreToCsl, cslToCore, util } from '@cardano-sdk/core';
+import { InputSelectionError } from '@cardano-sdk/cip2';
 import { KeyAgent } from './KeyManagement';
 import { Logger, dummyLogger } from 'ts-log';
 import { SingleAddressWallet } from '.';
@@ -46,7 +49,10 @@ export const createCip30WalletApiFromWallet = (wallet: SingleAddressWallet, prop
         }
       } catch (error) {
         logger.error(error);
-        throw new ApiError(500, error);
+        if (error instanceof ApiError) {
+          throw error;
+        }
+        throw new ApiError(500, 'Nope');
       }
     },
     getNetworkId: async (): Promise<number> => {
@@ -65,7 +71,10 @@ export const createCip30WalletApiFromWallet = (wallet: SingleAddressWallet, prop
         }
       } catch (error) {
         logger.error(error);
-        throw new ApiError(500, error);
+        if (error instanceof ApiError) {
+          throw error;
+        }
+        throw new ApiError(500, 'Nope');
       }
     },
     getUnusedAddresses: async (): Promise<Cbor[]> => {
@@ -103,7 +112,8 @@ export const createCip30WalletApiFromWallet = (wallet: SingleAddressWallet, prop
           utxos = [...inputSelection.inputs];
         } catch (error) {
           logger.debug(error);
-          throw new ApiError(400, error);
+          const message = error instanceof InputSelectionError ? error.message : 'Nope';
+          throw new ApiError(400, message);
         }
       } else if (paginate) {
         utxos = utxos.slice(paginate.page * paginate.limit, paginate.page * paginate.limit + paginate.limit);
@@ -134,7 +144,9 @@ export const createCip30WalletApiFromWallet = (wallet: SingleAddressWallet, prop
         return Promise.resolve(Buffer.from(cslWitnessSet.to_bytes()).toString('hex'));
       } catch (error) {
         logger.error(error);
-        throw new TxSignError(1, error);
+        // TODO: handle ProofGeneration errors?
+        const message = error instanceof AuthenticationError ? error.message : 'Nope';
+        throw new TxSignError(TxSignErrorCode.UserDeclined, message);
       }
     },
     submitTx: async (tx: Cbor): Promise<string> => {
