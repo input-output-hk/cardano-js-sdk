@@ -13,6 +13,7 @@ import onDeath from 'death';
 const envSpecs = {
   API_URL: envalid.url({ default: 'http://localhost:3000' }),
   LOGGER_MIN_SEVERITY: envalid.str({ choices: loggerMethodNames as string[], default: 'info' }),
+  METRICS_ENABLED: envalid.bool({ default: false }),
   OGMIOS_URL: envalid.url({ default: 'ws://localhost:1337' })
 };
 
@@ -30,7 +31,10 @@ void (async () => {
     tls: ogmiosUrl?.protocol === 'wss'
   });
   const server = TxSubmitHttpServer.create(
-    { listen: { host: apiUrl.hostname, port: Number.parseInt(apiUrl.port) } },
+    {
+      listen: { host: apiUrl.hostname, port: Number.parseInt(apiUrl.port) },
+      metrics: { enabled: env.METRICS_ENABLED }
+    },
     { logger, txSubmitProvider }
   );
   await server.initialize();

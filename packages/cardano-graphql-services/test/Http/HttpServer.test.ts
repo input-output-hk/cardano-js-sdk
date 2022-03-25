@@ -37,11 +37,11 @@ describe('HttpServer', () => {
   beforeEach(async () => {
     port = await getRandomPort();
     apiUrlBase = `http://localhost:${port}`;
-    httpServer = SomeHttpServer.create({ listen: { host: 'localhost', port } });
   });
 
   describe('initialize', () => {
     it('initializes the express application', async () => {
+      httpServer = SomeHttpServer.create({ listen: { host: 'localhost', port } });
       expect(httpServer.app).not.toBeDefined();
       await httpServer.initialize();
       expect(httpServer.app).toBeDefined();
@@ -50,6 +50,7 @@ describe('HttpServer', () => {
 
   describe('start', () => {
     beforeEach(async () => {
+      httpServer = SomeHttpServer.create({ listen: { host: 'localhost', port } });
       await httpServer.initialize();
     });
 
@@ -71,6 +72,7 @@ describe('HttpServer', () => {
 
   describe('shutdown', () => {
     beforeEach(async () => {
+      httpServer = SomeHttpServer.create({ listen: { host: 'localhost', port } });
       await httpServer.initialize();
       await httpServer.start();
     });
@@ -86,7 +88,9 @@ describe('HttpServer', () => {
   });
 
   describe('restarting', () => {
+    // eslint-disable-next-line sonarjs/no-identical-functions
     beforeEach(async () => {
+      httpServer = SomeHttpServer.create({ listen: { host: 'localhost', port } });
       await httpServer.initialize();
       await httpServer.start();
     });
@@ -102,8 +106,55 @@ describe('HttpServer', () => {
     });
   });
 
+  describe('metrics', () => {
+    afterEach(async () => {
+      await httpServer.shutdown();
+    });
+
+    it('is disabled by default', async () => {
+      httpServer = SomeHttpServer.create({ listen: { host: 'localhost', port } });
+      await httpServer.initialize();
+      await httpServer.start();
+      await onHttpServer(apiUrlBase);
+      const res2 = await got(`${apiUrlBase}/metrics`, {
+        headers: { 'Content-Type': APPLICATION_JSON },
+        throwHttpErrors: false
+      });
+      expect(res2.statusCode).toBe(404);
+    });
+
+    it('can expose Prometheus metrics, at /metrics by default', async () => {
+      httpServer = SomeHttpServer.create({ listen: { port }, metrics: { enabled: true } });
+      await httpServer.initialize();
+      await httpServer.start();
+      await onHttpServer(apiUrlBase);
+      const res = await got(`${apiUrlBase}/metrics`, {
+        headers: { 'Content-Type': APPLICATION_JSON }
+      });
+      expect(res.statusCode).toBe(200);
+      expect(typeof res.body).toBe('string');
+    });
+
+    it('Prometheus metrics can be configured with prom-client options', async () => {
+      const metricsPath = '/metrics-custom';
+      httpServer = SomeHttpServer.create({
+        listen: { port },
+        metrics: { enabled: true, options: { metricsPath } }
+      });
+      await httpServer.initialize();
+      await httpServer.start();
+      await onHttpServer(apiUrlBase);
+      const res = await got(`${apiUrlBase}${metricsPath}`, {
+        headers: { 'Content-Type': APPLICATION_JSON }
+      });
+      expect(res.statusCode).toBe(200);
+      expect(typeof res.body).toBe('string');
+    });
+  });
+
   describe('HTTP API', () => {
     beforeEach(async () => {
+      httpServer = SomeHttpServer.create({ listen: { host: 'localhost', port } });
       await httpServer.initialize();
       await httpServer.start();
       await onHttpServer(apiUrlBase);

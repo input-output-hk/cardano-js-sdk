@@ -2,10 +2,16 @@ import { Logger, dummyLogger } from 'ts-log';
 import { RunnableModule } from '../RunnableModule';
 import { listenPromise, serverClosePromise } from '../util';
 import express from 'express';
+import expressPromBundle from 'express-prom-bundle';
 import http from 'http';
 import net from 'net';
+import promClient from 'prom-client';
 
 export type HttpServerConfig = {
+  metrics?: {
+    enabled: boolean;
+    options?: expressPromBundle.Opts;
+  };
   name?: string;
   listen: net.ListenOptions;
 };
@@ -27,6 +33,16 @@ export abstract class HttpServer extends RunnableModule {
 
   protected async initializeImpl(): Promise<void> {
     this.app = express();
+    if (this.config.metrics?.enabled) {
+      this.app.use(
+        expressPromBundle({
+          includeMethod: true,
+          promRegistry: new promClient.Registry(),
+          ...this.config.metrics.options
+        })
+      );
+      this.logger.info(`Prometheus metrics configured at ${this.config.metrics.options?.metricsPath || '/metrics'}`);
+    }
     this.app.use(this.router);
   }
 
