@@ -6,7 +6,7 @@ import { of } from 'rxjs';
 
 describe('createAssetsTracker', () => {
   it('fetches asset info for every asset in total balance', () => {
-    createTestScheduler().run(({ cold, expectObservable }) => {
+    createTestScheduler().run(({ cold, expectObservable, flush }) => {
       const balanceTracker = {
         total$: cold('a-b-c', {
           a: {} as Balance,
@@ -27,7 +27,11 @@ describe('createAssetsTracker', () => {
       const asset1 = { assetId: AssetId.TSLA } as Asset.AssetInfo;
       const asset2 = { assetId: AssetId.PXL, nftMetadata } as Asset.AssetInfo;
       const assetService = jest.fn().mockReturnValueOnce(of(asset1)).mockReturnValueOnce(of(asset2));
-      const target$ = createAssetsTracker({ balanceTracker } as AssetsTrackerProps, {
+      const assetProvider = {
+        setStatInitialized: jest.fn(),
+        stats: {}
+      };
+      const target$ = createAssetsTracker({ assetProvider, balanceTracker } as unknown as AssetsTrackerProps, {
         assetService,
         nftMetadataService
       });
@@ -38,6 +42,8 @@ describe('createAssetsTracker', () => {
           [AssetId.PXL, asset2]
         ])
       });
+      flush();
+      expect(assetProvider.setStatInitialized).toBeCalledTimes(1); // only when there are no assets
     });
   });
 });
