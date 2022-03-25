@@ -141,9 +141,13 @@ export const blockfrostWalletProvider = (blockfrost: BlockFrostAPI, logger = dum
         purpose: ((): Cardano.Redeemer['purpose'] => {
           switch (purpose) {
             case 'cert':
-              return 'certificate';
+              return Cardano.RedeemerPurpose.certificate;
             case 'reward':
-              return 'withdrawal';
+              return Cardano.RedeemerPurpose.withdrawal;
+            case 'mint':
+              return Cardano.RedeemerPurpose.mint;
+            case 'spend':
+              return Cardano.RedeemerPurpose.spend;
             default:
               return purpose;
           }
@@ -202,7 +206,7 @@ export const blockfrostWalletProvider = (blockfrost: BlockFrostAPI, logger = dum
     return response.map(({ address, amount, cert_index, pot }) => ({
       __typename: Cardano.CertificateType.MIR,
       certIndex: cert_index,
-      pot,
+      pot: pot === 'reserve' ? Cardano.MirCertificatePot.Reserves : Cardano.MirCertificatePot.Treasury,
       quantity: BigInt(amount),
       rewardAccount: Cardano.RewardAccount(address)
     }));
