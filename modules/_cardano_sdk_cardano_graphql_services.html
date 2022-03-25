@@ -72,12 +72,22 @@
 						<section class="tsd-index-section ">
 							<h3>Classes</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-class tsd-parent-kind-module"><a href="../classes/_cardano_sdk_cardano_graphql_services.HttpServer.html" class="tsd-kind-icon">Http<wbr>Server</a></li>
 								<li class="tsd-kind-class tsd-parent-kind-module"><a href="../classes/_cardano_sdk_cardano_graphql_services.RunnableModule.html" class="tsd-kind-icon">Runnable<wbr>Module</a></li>
+								<li class="tsd-kind-class tsd-parent-kind-module"><a href="../classes/_cardano_sdk_cardano_graphql_services.TxSubmitHttpServer.html" class="tsd-kind-icon">Tx<wbr>Submit<wbr>Http<wbr>Server</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Interfaces</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/_cardano_sdk_cardano_graphql_services.TxSubmitHttpServerConfig.html" class="tsd-kind-icon">Tx<wbr>Submit<wbr>Http<wbr>Server<wbr>Config</a></li>
+								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/_cardano_sdk_cardano_graphql_services.TxSubmitServerDependencies.html" class="tsd-kind-icon">Tx<wbr>Submit<wbr>Server<wbr>Dependencies</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Type aliases</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-type-alias tsd-parent-kind-module"><a href="_cardano_sdk_cardano_graphql_services.html#HttpServerConfig" class="tsd-kind-icon">Http<wbr>Server<wbr>Config</a></li>
 								<li class="tsd-kind-type-alias tsd-parent-kind-module"><a href="_cardano_sdk_cardano_graphql_services.html#RunnableModuleState" class="tsd-kind-icon">Runnable<wbr>Module<wbr>State</a></li>
 							</ul>
 						</section>
@@ -87,12 +97,36 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Type aliases</h2>
 				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-module">
+					<a name="HttpServerConfig" class="tsd-anchor"></a>
+					<h3>Http<wbr>Server<wbr>Config</h3>
+					<div class="tsd-signature tsd-kind-icon">Http<wbr>Server<wbr>Config<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>listen<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">net.ListenOptions</span><span class="tsd-signature-symbol">; </span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>router<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">express.Router</span><span class="tsd-signature-symbol"> }</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/630feb9/packages/cardano-graphql-services/src/Http/HttpServer.ts#L8">packages/cardano-graphql-services/src/Http/HttpServer.ts:8</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter">
+								<h5>listen<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">net.ListenOptions</span></h5>
+							</li>
+							<li class="tsd-parameter">
+								<h5>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
+							</li>
+							<li class="tsd-parameter">
+								<h5>router<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">express.Router</span></h5>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-module">
 					<a name="RunnableModuleState" class="tsd-anchor"></a>
 					<h3>Runnable<wbr>Module<wbr>State</h3>
 					<div class="tsd-signature tsd-kind-icon">Runnable<wbr>Module<wbr>State<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">ModuleState</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;starting&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;running&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;stopping&quot;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/0daef90/packages/cardano-graphql-services/src/RunnableModule.ts#L6">packages/cardano-graphql-services/src/RunnableModule.ts:6</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/630feb9/packages/cardano-graphql-services/src/RunnableModule.ts#L6">packages/cardano-graphql-services/src/RunnableModule.ts:6</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -139,7 +173,22 @@
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
 					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="../classes/_cardano_sdk_cardano_graphql_services.HttpServer.html" class="tsd-kind-icon">Http<wbr>Server</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
 						<a href="../classes/_cardano_sdk_cardano_graphql_services.RunnableModule.html" class="tsd-kind-icon">Runnable<wbr>Module</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="../classes/_cardano_sdk_cardano_graphql_services.TxSubmitHttpServer.html" class="tsd-kind-icon">Tx<wbr>Submit<wbr>Http<wbr>Server</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="../interfaces/_cardano_sdk_cardano_graphql_services.TxSubmitHttpServerConfig.html" class="tsd-kind-icon">Tx<wbr>Submit<wbr>Http<wbr>Server<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="../interfaces/_cardano_sdk_cardano_graphql_services.TxSubmitServerDependencies.html" class="tsd-kind-icon">Tx<wbr>Submit<wbr>Server<wbr>Dependencies</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+						<a href="_cardano_sdk_cardano_graphql_services.html#HttpServerConfig" class="tsd-kind-icon">Http<wbr>Server<wbr>Config</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
 						<a href="_cardano_sdk_cardano_graphql_services.html#RunnableModuleState" class="tsd-kind-icon">Runnable<wbr>Module<wbr>State</a>
