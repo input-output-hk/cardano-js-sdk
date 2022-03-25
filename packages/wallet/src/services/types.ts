@@ -82,7 +82,7 @@ export interface Delegatee {
    */
   currentEpoch?: Cardano.StakePool;
   nextEpoch?: Cardano.StakePool;
-  nextNextEpoch: Cardano.StakePool;
+  nextNextEpoch?: Cardano.StakePool;
 }
 
 export enum StakeKeyStatus {
