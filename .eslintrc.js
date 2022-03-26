@@ -19,6 +19,7 @@ module.exports = {
     "jsdoc/require-param": 0,
     "jsdoc/require-returns": 0,
     "no-unused-vars": 0,
+    "spaced-comment": 0,
     "linebreak-style": [
       2,
       "unix"

@@ -1,4 +1,4 @@
-import * as types from './types';
+import { Block } from './types';
 import { Field, ObjectType, Query, Resolver, buildSchema } from 'type-graphql';
 import { GraphQLSchema } from 'graphql';
 
@@ -17,7 +17,8 @@ export class NothingResolver {
 
 export const build = async (): Promise<GraphQLSchema> => {
   const schema = await buildSchema({
-    orphanedTypes: Object.values(types),
+    // Resolves any referenced objects automatically
+    orphanedTypes: [Block],
     resolvers: [NothingResolver]
   });
   const config = schema.toConfig();

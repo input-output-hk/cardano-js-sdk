@@ -12,8 +12,10 @@ export class Reward {
   @Directive('@search')
   @Field(() => Int)
   epochNo: Cardano.Epoch;
+  /// #if Epoch
   @Field(() => Epoch)
   epoch: Epoch;
+  /// #endif
   @Field(() => Int)
   spendableAtEpochNo: Cardano.Epoch;
   @Field(() => Int64)

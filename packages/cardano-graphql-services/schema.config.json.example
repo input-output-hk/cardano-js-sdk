@@ -1,0 +1,20 @@
+{
+  "Block": {
+    "nextBlock": false,
+    "opCert": false,
+    "size": false,
+    "totalFees": false,
+    "totalLiveStake": false,
+    "totalOutput": false,
+    "epochNo": false
+  },
+  "Certificate": false,
+  "Epoch": false,
+  "ProtocolVersion": false,
+  "Slot": {
+    "slotInEpoch": false
+  },
+  "StakePool": false,
+  "Transaction": false
+}
+

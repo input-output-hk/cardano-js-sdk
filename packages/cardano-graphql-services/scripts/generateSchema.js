@@ -1,6 +1,6 @@
 require('./patchRequire');
 
-const Schema = require('../dist/Schema');
+const Schema = require('../dist/SchemaGen');
 const { printSchemaWithDirectives } = require('@graphql-tools/utils');
 
 module.exports = async () => {

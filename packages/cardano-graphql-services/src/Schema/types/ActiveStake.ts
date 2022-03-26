@@ -11,10 +11,12 @@ export class ActiveStake {
   rewardAccount: RewardAccount;
   @Field(() => Int64)
   quantity: Cardano.Lovelace;
+  /// #if Epoch
   @Field(() => Epoch)
   epoch: Epoch;
+  /// #endif
   @Field(() => Int)
-  epochNo: number;
+  epochNo: Cardano.Epoch;
   @Field(() => StakePool)
   stakePool: StakePool;
 }

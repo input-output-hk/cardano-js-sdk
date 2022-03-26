@@ -15,54 +15,66 @@ export class Block {
   hash: Cardano.BlockId;
   @Field(() => Int)
   blockNo: Cardano.BlockNo;
+  /// #if Slot
   @Directive('@hasInverse(field: block)')
   @Field(() => Slot)
   slot: Slot;
-  // TODO: nullable has to be removed once
-  // we have this information when inserting blocks
-  @Field(() => StakePool, { nullable: true })
+  /// #endif
+  @Field(() => Int)
+  slotNo: Cardano.Slot;
+  /// #if StakePool
+  @Field(() => StakePool)
   issuer: StakePool;
-  // TODO: nullable has to be removed once
-  // we have this information when inserting blocks
-  @Field(() => Epoch, { nullable: true })
+  /// #endif
+  /// #if Epoch
+  @Field(() => Epoch)
   epoch: Epoch;
-  // TODO: nullable has to be removed once
-  // we have this information when inserting blocks
-  @Field(() => Int64, { nullable: true })
+  /// #endif
+  /// #if Block.epochNo
+  // Need to implement and query TimeSettings to compute this
+  @Field(() => Int)
+  epochNo: Cardano.Epoch;
+  /// #endif
+  /// #if Block.size
+  @Field(() => Int64)
   size: Cardano.BlockSize;
-  // TODO: nullable has to be removed once
-  // we have this information when inserting blocks
-  @Field(() => Int64, { nullable: true })
+  /// #endif
+  /// #if Block.totalLiveStake
+  @Field(() => Int64)
   totalLiveStake: Cardano.Lovelace;
+  /// #endif
+  /// #if Transaction
   @Directive('@hasInverse(field: block)')
-  // TODO: nullable has to be removed once
-  // we have this information when inserting blocks
-  @Field(() => [Transaction], { nullable: true })
+  @Field(() => [Transaction])
   transactions: Transaction[];
-  // TODO: nullable has to be removed once
-  // we have this information when inserting blocks
-  @Field(() => Int64, { nullable: true })
+  /// #endif
+  /// #if Block.totalOutput
+  @Field(() => Int64)
   totalOutput: Cardano.Lovelace;
-  // TODO: nullable has to be removed once
-  // we have this information when inserting blocks
-  @Field(() => Int64, { nullable: true })
+  /// #endif
+  /// #if Block.totalFees
+  @Field(() => Int64)
   totalFees: Cardano.Lovelace;
-  @Field(() => Block)
+  /// #endif
+  @Field(() => Block, { nullable: true })
   previousBlock?: Block;
-  // TODO: nullable has to be removed once
-  // we have this information when inserting blocks
+  /// #if Block.nextBlock
   @Field(() => Block, { nullable: true })
   nextBlock?: Block;
-  // TODO: nullable has to be removed once
-  // we have this information when inserting blocks
-  @Field(() => Int, { nullable: true })
-  confirmations: number;
-  // TODO: nullable has to be removed once
-  // we have this information when inserting blocks
+  /// #endif
+
+  // Review: confirmations are really just block on top
+  // resolve this, you can just query tip
+
+  /// #if ProtocolVersion
   @Field(() => ProtocolVersion, { nullable: true })
   nextBlockProtocolVersion: ProtocolVersion;
-  // TODO: nullable has to be removed once
-  // we have this information when inserting blocks
-  @Field(() => String, { nullable: true })
+  /// #endif
+
+  /// #if Block.opCert
+  @Field(() => String)
+  // Review: I'm not sure this is useful to track in db.
+  // If it is, then we should probably convert this to object, as ogmios provides it.
   opCert: Cardano.Hash32ByteBase16;
+  /// #endif
 }

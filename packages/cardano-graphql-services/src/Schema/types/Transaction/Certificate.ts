@@ -1,6 +1,6 @@
 import { Cardano } from '@cardano-sdk/core';
 import { Epoch } from '../Epoch';
-import { Field, ObjectType } from 'type-graphql';
+import { Field, Int, ObjectType } from 'type-graphql';
 import { Int64 } from '../util';
 import { PoolParameters } from '../StakePool';
 import { RewardAccount } from '../Address';
@@ -30,8 +30,12 @@ export class PoolRegistrationCertificate {
   __typename: Cardano.CertificateType.PoolRegistration;
   @Field(() => PoolParameters)
   poolParameters: PoolParameters;
+  /// #if Epoch
   @Field(() => Epoch)
   epoch: Epoch;
+  /// #endif
+  @Field(() => Int)
+  epochNo: Cardano.Epoch;
   @Field(() => Transaction)
   transaction: Transaction;
 }
@@ -41,8 +45,12 @@ export class PoolRetirementCertificate {
   __typename: Cardano.CertificateType.PoolRetirement;
   @Field(() => StakePool)
   stakePool: StakePool;
+  /// #if Epoch
   @Field(() => Epoch)
   epoch: Epoch;
+  /// #endif
+  @Field(() => Int)
+  epochNo: Cardano.Epoch;
   @Field(() => Transaction)
   transaction: Transaction;
 }
@@ -54,8 +62,12 @@ export class StakeDelegationCertificate {
   rewardAccount: RewardAccount;
   @Field(() => StakePool)
   stakePool: StakePool;
+  /// #if Epoch
   @Field(() => Epoch)
   epoch: Epoch;
+  /// #endif
+  @Field(() => Int)
+  epochNo: Cardano.Epoch;
   @Field(() => Transaction)
   transaction: Transaction;
 }

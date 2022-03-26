@@ -62,8 +62,10 @@ export class Transaction {
   @Directive('@hasInverse(field: transaction)')
   @Field(() => Witness)
   witness: Witness;
+  /// #if Certificate
   @Field(() => [Certificate], { nullable: true })
   certificates?: typeof Certificate[];
+  /// #endif
   @Field(() => String, { nullable: true })
   scriptIntegrityHash?: Cardano.Hash28ByteBase16;
   @Directive('@hasInverse(field: requiredExtraSignatureInTransactions)')

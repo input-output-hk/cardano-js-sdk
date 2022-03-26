@@ -19,8 +19,12 @@ export class ProtocolParametersShelley {
   stakeKeyDeposit: number;
   @Field(() => Int)
   poolDeposit: number;
+  /// #if Epoch
   @Field(() => Epoch, { description: 'maximum epoch' })
   poolRetirementEpochBound: Epoch;
+  /// #endif
+  @Field(() => Int, { description: 'maximum epoch no' })
+  poolRetirementEpochBoundNo: number;
   @Field(() => Int, { description: 'n_opt' })
   desiredNumberOfPools: number;
   @Field(() => Ratio, { description: 'pool pledge influence' })

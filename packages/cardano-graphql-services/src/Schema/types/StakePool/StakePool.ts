@@ -55,10 +55,12 @@ export class StakePoolMetrics implements Cardano.StakePoolMetrics {
 
 @ObjectType({ description: 'Stake pool performance per epoch, taken at epoch rollover' })
 export class StakePoolEpochRewards {
+  /// #if Epoch
   @Field(() => Epoch)
   epoch: Epoch;
+  /// #endif
   @Field(() => Int)
-  epochNo: number;
+  epochNo: Cardano.Epoch;
   @Field(() => Int)
   epochLength: number;
   @Field(() => Int64)

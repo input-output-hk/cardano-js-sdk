@@ -6,13 +6,11 @@ import {
   MirCertificate,
   StakeDelegationCertificate,
   StakeKeyDeregistrationCertificate,
-  StakeKeyRegistrationCertificate,
-  TransactionInput,
-  TransactionOutput,
-  Withdrawal
-} from './Transaction';
+  StakeKeyRegistrationCertificate
+} from './Transaction/Certificate';
 import { PublicKey } from './PublicKey';
 import { Reward } from './Reward';
+import { TransactionInput, TransactionOutput, Withdrawal } from './Transaction';
 
 enum AddressType {
   byron = 'byron',
