@@ -14,7 +14,8 @@ export const txRequiredExtraSignatures = (
   return requiredSignatures;
 };
 
-export const txWithdrawals = (withdrawals: CSL.Withdrawals): Cardano.Withdrawal[] | undefined => {
+export const txWithdrawals = (withdrawals?: CSL.Withdrawals): Cardano.Withdrawal[] | undefined => {
+  if (!withdrawals) return;
   const result: Cardano.Withdrawal[] = [];
   const keys = withdrawals.keys();
   for (let i = 0; i < keys.len(); i++) {
@@ -191,7 +192,8 @@ const genesisKeyDelegaation = (certificate: CSL.GenesisKeyDelegation): Cardano.G
   vrfKeyHash: Cardano.util.Hash32ByteBase16(Buffer.from(certificate.vrf_keyhash().to_bytes()).toString())
 });
 
-export const txCertificates = (certificates: CSL.Certificates): Cardano.Certificate[] => {
+export const txCertificates = (certificates?: CSL.Certificates): Cardano.Certificate[] | undefined => {
+  if (!certificates) return;
   const result: Cardano.Certificate[] = [];
   for (let i = 0; i < certificates.len(); i++) {
     const cslCertificate = certificates.get(i);
@@ -225,7 +227,8 @@ export const txCertificates = (certificates: CSL.Certificates): Cardano.Certific
   return result;
 };
 
-export const txTokenMap = (assets: CSL.Mint): Cardano.TokenMap => {
+export const txTokenMap = (assets?: CSL.Mint): Cardano.TokenMap | undefined => {
+  if (!assets) return;
   const assetMap: Cardano.TokenMap = new Map();
   const keys = assets.keys();
   for (let i = 0; i < keys.len(); i++) {
@@ -243,41 +246,28 @@ export const txTokenMap = (assets: CSL.Mint): Cardano.TokenMap => {
   return assetMap;
 };
 
-export const txBody = (body: CSL.TransactionBody): Cardano.TxBodyAlonzo => {
-  const {
-    inputs,
-    outputs,
-    fee,
-    validity_start_interval,
-    collateral,
-    withdrawals,
-    certs,
-    required_signers,
-    multiassets,
-    script_data_hash
-  } = body;
+export const txBody = (body: () => CSL.TransactionBody): Cardano.TxBodyAlonzo => {
+  const { script_data_hash } = body();
 
-  const cslCollateral = collateral();
-  const cslWithdrawals = withdrawals();
-  const cslMultiAssets = multiassets();
-  const cslCertificates = certs();
+  const cslCollaterals = body().collateral();
 
   return {
-    certificates: cslCertificates && txCertificates(cslCertificates),
-    collaterals: cslCollateral && txInputs(cslCollateral),
-    fee: BigInt(fee().to_str()),
-    inputs: txInputs(inputs()),
-    mint: cslMultiAssets && txTokenMap(cslMultiAssets),
-    outputs: txOutputs(outputs()),
-    requiredExtraSignatures: txRequiredExtraSignatures(required_signers()),
+    certificates: txCertificates(body().certs()),
+    collaterals: cslCollaterals && txInputs(cslCollaterals),
+    fee: BigInt(body().fee().to_str()),
+    inputs: txInputs(body().inputs()),
+    mint: txTokenMap(body().multiassets()),
+    outputs: txOutputs(body().outputs()),
+    requiredExtraSignatures: txRequiredExtraSignatures(body().required_signers()),
     scriptIntegrityHash:
       script_data_hash && Cardano.util.Hash28ByteBase16(Buffer.from(script_data_hash()!.to_bytes()).toString()),
-    validityInterval: validity_start_interval,
-    withdrawals: cslWithdrawals && txWithdrawals(cslWithdrawals)
+    validityInterval: body().validity_start_interval,
+    withdrawals: txWithdrawals(body().withdrawals())
   };
 };
 
-export const txBootstrap = (bootstraps: CSL.BootstrapWitnesses): BootstrapWitness[] => {
+export const txBootstrap = (bootstraps?: CSL.BootstrapWitnesses): BootstrapWitness[] | undefined => {
+  if (!bootstraps) return;
   const result: BootstrapWitness[] = [];
   for (let i = 0; i < bootstraps.len(); i++) {
     const bootstrap = bootstraps.get(i);
@@ -291,7 +281,8 @@ export const txBootstrap = (bootstraps: CSL.BootstrapWitnesses): BootstrapWitnes
   return result;
 };
 
-export const txRedeemers = (redeemers: CSL.Redeemers): Cardano.Redeemer[] => {
+export const txRedeemers = (redeemers?: CSL.Redeemers): Cardano.Redeemer[] | undefined => {
+  if (!redeemers) return;
   const result: Cardano.Redeemer[] = [];
   for (let j = 0; j < redeemers.len(); j++) {
     const reedeemer = redeemers.get(j);
@@ -315,16 +306,15 @@ export const txRedeemers = (redeemers: CSL.Redeemers): Cardano.Redeemer[] => {
   return result;
 };
 
-const txWitnessSet = (witnessSet: CSL.TransactionWitnessSet): Cardano.Witness => {
-  const { vkeys, bootstraps, redeemers } = witnessSet;
-  const cslVkeys = vkeys();
-  const cslRedeemers = redeemers();
-  const cslBootstraps = bootstraps();
+export const txWitnessSet = (witnessSet: CSL.TransactionWitnessSet): Cardano.Witness => {
+  const vkeys: CSL.Vkeywitnesses | undefined = witnessSet.vkeys()!;
+  const redeemers: CSL.Redeemers | undefined = witnessSet.redeemers();
+  const bootstraps: CSL.BootstrapWitnesses | undefined = witnessSet.bootstraps();
 
   const txSignatures: Cardano.Signatures = new Map();
-  if (cslVkeys) {
-    for (let i = 0; i < cslVkeys!.len(); i++) {
-      const witness = cslVkeys.get(i);
+  if (vkeys) {
+    for (let i = 0; i < vkeys!.len(); i++) {
+      const witness = vkeys.get(i);
       txSignatures.set(
         Cardano.Ed25519PublicKey(witness.vkey().public_key().to_bech32()),
         Cardano.Ed25519Signature(witness.signature().to_bech32())
@@ -334,9 +324,9 @@ const txWitnessSet = (witnessSet: CSL.TransactionWitnessSet): Cardano.Witness =>
 
   return {
     // TODO: add support for scripts
-    bootstrap: cslBootstraps && txBootstrap(cslBootstraps),
+    bootstrap: txBootstrap(bootstraps),
     // TODO: implement datums
-    redeemers: cslRedeemers && txRedeemers(cslRedeemers),
+    redeemers: txRedeemers(redeemers),
     signatures: txSignatures
   };
 };
@@ -375,7 +365,8 @@ const txMetaDatum = (transactionMetadatum: CSL.TransactionMetadatum): Cardano.Me
   }
 };
 
-const txMetadata = (auxiliaryMetadata: CSL.GeneralTransactionMetadata): Cardano.TxMetadata => {
+export const txMetadata = (auxiliaryMetadata?: CSL.GeneralTransactionMetadata): Cardano.TxMetadata | undefined => {
+  if (!auxiliaryMetadata) return;
   const auxiliaryMetadataMap: Cardano.TxMetadata = new Map();
 
   for (let i = 0; i < auxiliaryMetadata.len(); i++) {
@@ -387,14 +378,13 @@ const txMetadata = (auxiliaryMetadata: CSL.GeneralTransactionMetadata): Cardano.
   return auxiliaryMetadataMap;
 };
 
-export const txAuxiliaryData = (auxiliaryData: CSL.AuxiliaryData): Cardano.AuxiliaryData => {
+export const txAuxiliaryData = (auxiliaryData?: CSL.AuxiliaryData): Cardano.AuxiliaryData | undefined => {
+  if (!auxiliaryData) return;
   // TODO: create hash
   const auxiliaryMetadata = auxiliaryData.metadata();
   return {
     body: {
-      ...(auxiliaryMetadata && {
-        blob: txMetadata(auxiliaryMetadata)
-      })
+      blob: txMetadata(auxiliaryMetadata)
     }
   };
 };
@@ -405,10 +395,12 @@ export const newTx = (_input: CSL.Transaction): Cardano.NewTxAlonzo => {
   );
   const auxiliary_data = _input.auxiliary_data();
 
+  const witnessSet = _input.witness_set();
+
   return {
-    body: txBody(_input.body()),
+    auxiliaryData: txAuxiliaryData(auxiliary_data),
+    body: txBody(_input.body),
     id: transactionHash,
-    witness: txWitnessSet(_input.witness_set()),
-    ...(auxiliary_data && { auxiliaryData: txAuxiliaryData(auxiliary_data) })
+    witness: txWitnessSet(witnessSet)
   };
 };
