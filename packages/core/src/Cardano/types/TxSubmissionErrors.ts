@@ -22,6 +22,7 @@ export const TxSubmissionErrors = {
   ExpiredUtxoError: TxSubmission.errors.ExpiredUtxo.Error,
   ExtraDataMismatchError: TxSubmission.errors.ExtraDataMismatch.Error,
   ExtraRedeemersError: TxSubmission.errors.ExtraRedeemers.Error,
+  ExtraScriptWitnessesError: TxSubmission.errors.ExtraScriptWitnesses.Error,
   FeeTooSmallError: TxSubmission.errors.FeeTooSmall.Error,
   InsufficientFundsForMirError: TxSubmission.errors.InsufficientFundsForMir.Error,
   InsufficientGenesisSignaturesError: TxSubmission.errors.InsufficientGenesisSignatures.Error,
