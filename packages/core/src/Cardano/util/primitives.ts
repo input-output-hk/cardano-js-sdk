@@ -67,7 +67,7 @@ const assertLength = (expectedLength: number | undefined, target: string) => {
 export const assertIsHexString = (target: string, expectedLength?: number): void => {
   assertLength(expectedLength, target);
   // eslint-disable-next-line wrap-regex
-  if (!/^[\da-f]+$/i.test(target)) {
+  if (target.length > 0 && !/^[\da-f]+$/i.test(target)) {
     throw new InvalidStringError('expected hex string');
   }
 };
