@@ -51,7 +51,6 @@ import {
   distinctEpoch
 } from './services';
 import { Cip30DataSignature } from '@cardano-sdk/cip30';
-import { cip30signData } from './KeyManagement/cip8';
 import {
   InputSelector,
   computeMinimumCoinQuantity,
@@ -63,6 +62,7 @@ import { Observable, Subject, combineLatest, filter, firstValueFrom, lastValueFr
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TxInternals, createTransactionInternals, ensureValidityInterval } from './Transaction';
 import { WalletStores, createInMemoryWalletStores } from './persistence';
+import { cip30signData } from './KeyManagement/cip8';
 import { isEqual } from 'lodash-es';
 
 export interface SingleAddressWalletProps {
