@@ -1,8 +1,4 @@
-import {
-  BlockHandler,
-  //  CombinedQueryResult,
-  CombinedProcessingResult
-} from './types';
+import { BlockHandler, CombinedQueryResult } from './types';
 import {
   ChainSync,
   ConnectionConfig,
@@ -13,12 +9,7 @@ import {
 import { DgraphClient } from './DgraphClient';
 import { Logger, dummyLogger } from 'ts-log';
 import { RunnableModule } from '../RunnableModule';
-import {
-  // mergedProcessingResults,
-  // mergedQuery,
-  mergedRollBackwardUpsert,
-  mergedRollForwardUpsert
-} from './util';
+import { mergedProcessingResults, mergedQuery, mergedRollBackwardUpsert, mergedRollForwardUpsert } from './util';
 
 export class ChainFollower extends RunnableModule {
   #blockHandlers: BlockHandler[];
@@ -57,13 +48,15 @@ export class ChainFollower extends RunnableModule {
         this.logger.debug({ BLOCK: block }, 'Rolling forward');
         const txn = this.#dgraphClient.newTxn();
         const context = { block, txn };
-        // const { query, variables } = await mergedQuery(this.#blockHandlers, context);
-        this.logger.debug('About to run merged query');
-        // const mergedQueryResults: CombinedQueryResult = await this.#dgraphClient.query(query, variables);
-        this.logger.debug('About to process query results');
-        // const processingResults = await mergedProcessingResults(this.#blockHandlers, context, mergedQueryResults);
-        this.logger.debug('Query results processed. About to merge roll forward upsert');
-        const processingResults = [{ func: { assets: [] }, id: 'id' }] as CombinedProcessingResult[];
+        const { query, variables } = await mergedQuery(this.#blockHandlers, context);
+        let processingResults;
+        if (query.length > 0) {
+          this.logger.debug('About to run merged query');
+          const mergedQueryResults: CombinedQueryResult = await this.#dgraphClient.query(query, variables);
+          this.logger.debug('About to process query results');
+          processingResults = await mergedProcessingResults(this.#blockHandlers, context, mergedQueryResults);
+          this.logger.debug('Query results processed. About to merge roll forward upsert');
+        }
         const upsert = await mergedRollForwardUpsert(this.#blockHandlers, context, processingResults);
         this.logger.debug('Writting data from block');
         await this.#dgraphClient.writeDataFromBlock(upsert, txn);

@@ -10,10 +10,13 @@ export class Policy {
   @Field(() => String)
   id: Cardano.PolicyId;
   @Directive('@hasInverse(field: policy)')
-  @Field(() => [Asset])
-  assets: Asset[];
-  @Field(() => Script)
-  script: Cardano.Script;
-  @Field(() => PublicKey)
-  publicKey: PublicKey;
+  // TODO: revert nullable
+  @Field(() => [Asset], { nullable: true })
+  assets?: Asset[];
+  // TODO: revert nullable
+  @Field(() => Script, { nullable: true })
+  script?: Cardano.Script;
+  // TODO: revert nullable
+  @Field(() => PublicKey, { nullable: true })
+  publicKey?: PublicKey;
 }

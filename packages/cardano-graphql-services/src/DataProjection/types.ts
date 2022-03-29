@@ -5,11 +5,18 @@ import dgraph from 'dgraph-js';
 export type ModuleState = null | 'initializing' | 'initialized';
 
 export interface LastBlockQuery {
-  lastBlock: [Schema.Point];
+  lastestBlock: [
+    {
+      'Block.hash': Schema.DigestBlake2BBlockHeader;
+      'Block.slot': {
+        number: Schema.Slot;
+      };
+    }
+  ];
 }
 
 export type DQL = string;
-type Variable = 'Asset' | 'Block';
+type Variable = 'asset' | 'block';
 
 export type QueryVariables = {
   $assetIds?: string[];
@@ -29,6 +36,9 @@ export interface RollForwardContext {
   block: Ogmios.Block;
 }
 
+export interface AssetResult {
+  'Asset.assetId': Asset['assetId'];
+}
 export interface Upsert {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   mutations: { [k: string]: any };
@@ -40,7 +50,7 @@ export interface Upsert {
 }
 
 export interface CombinedQueryResult {
-  assets: Asset[];
+  assets: AssetResult[];
 }
 
 export interface ProcessingResult {
@@ -52,15 +62,10 @@ export interface CombinedProcessingResult {
   id: string;
 }
 
-export interface ProcessParameters {
-  ctx?: RollForwardContext;
-  queryResult?: CombinedQueryResult;
-}
-
 export interface BlockHandler {
   id: string;
   query?: (ctx: RollForwardContext) => Promise<QueryResult>;
-  process?: (parameters: ProcessParameters) => Promise<Partial<ProcessingResult>>;
+  process?: (ctx: RollForwardContext, queryResult: CombinedQueryResult) => Promise<Partial<ProcessingResult>>;
   rollBackward: (ctx: RollBackwardContext) => Promise<Upsert>;
-  rollForward: (ctx: RollForwardContext, processingResult: CombinedProcessingResult[]) => Promise<Upsert>;
+  rollForward: (ctx: RollForwardContext, processingResult?: CombinedProcessingResult[]) => Promise<Upsert>;
 }

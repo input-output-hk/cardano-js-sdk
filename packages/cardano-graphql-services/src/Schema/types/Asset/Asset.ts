@@ -32,10 +32,12 @@ export class Asset {
   // and it is a very relevant piece of data
   @Field(() => Int64)
   totalQuantity: number;
-  @Field(() => String, { description: 'Fingerprint of a native asset for human comparison. CIP-0014' })
-  fingerprint: Cardano.AssetFingerprint;
-  @Field(() => [AssetMintOrBurn])
-  history: AssetTypes.AssetMintOrBurn[];
+  // TODO: revert nullable when data gets available
+  @Field(() => String, { description: 'Fingerprint of a native asset for human comparison. CIP-0014', nullable: true })
+  fingerprint?: Cardano.AssetFingerprint;
+  // TODO: revert nullable when data gets available
+  @Field(() => [AssetMintOrBurn], { nullable: true })
+  history?: AssetTypes.AssetMintOrBurn[];
   @Directive('@hasInverse(field: asset)')
   @Field(() => TokenMetadata, { description: 'CIP-0035', nullable: true })
   tokenMetadata?: AssetTypes.TokenMetadata;

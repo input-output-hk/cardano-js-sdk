@@ -4,7 +4,8 @@ import {
   CombinedQueryResult,
   QueryResult,
   RollBackwardContext,
-  RollForwardContext
+  RollForwardContext,
+  Upsert
 } from './types';
 import lodash from 'lodash-es';
 
@@ -30,7 +31,7 @@ export const mergedProcessingResults = async (
     blockHandlers
       .filter((handler) => handler.process)
       .map(async (handler) => ({
-        func: await handler.process!({ ctx, queryResult: mergedQueryResults }),
+        func: await handler.process!(ctx, mergedQueryResults),
         id: handler.id
       }))
   );
@@ -38,8 +39,8 @@ export const mergedProcessingResults = async (
 export const mergedRollForwardUpsert = async (
   blockHandlers: BlockHandler[],
   ctx: RollForwardContext,
-  processingResult: CombinedProcessingResult[]
-) =>
+  processingResult?: CombinedProcessingResult[]
+): Promise<Upsert> =>
   blockHandlers
     .map((handler) => handler.rollForward(ctx, processingResult))
     .reduce(async (acc, curr) => lodash.merge(await acc, await curr), Promise.resolve({ mutations: {} }));

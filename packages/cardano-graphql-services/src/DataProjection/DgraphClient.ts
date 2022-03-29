@@ -1,9 +1,14 @@
+import { LastBlockQuery, Upsert } from './types';
 import { RunnableModule } from '../RunnableModule';
-import { Upsert, LastBlockQuery } from './types';
 import { dummyLogger } from 'ts-log';
 import { exponentialBackoff } from '../util';
 import { gql, request } from 'graphql-request';
 import dgraph from 'dgraph-js';
+
+// eslint-disable-next-line no-extend-native
+BigInt.prototype.toJSON = function () {
+  return this.toString();
+};
 
 export interface DgraphClientAddresses {
   grpc: string;
@@ -48,7 +53,7 @@ export class DgraphClient extends RunnableModule {
   async query(query: string, vars?: { [k: string]: any }): Promise<any> {
     const txn = this.#dgraphClient.newTxn();
     const response = await txn.queryWithVars(query, vars);
-    return response.getJson();
+    return response?.getJson();
   }
 
   private async runDgraphTransaction(txn: dgraph.Txn, fn: Function) {
@@ -79,9 +84,9 @@ export class DgraphClient extends RunnableModule {
 
   private async runLastBlockQuery(tx: dgraph.Txn) {
     const query = `{
-      latestBlock(func: type(Block), orderdesc: blockNo, first: 1) {
-        hash,
-        slot {
+      latestBlock(func: type(Block), orderdesc: Block.blockNo, first: 1) {
+        Block.hash,
+        Block.slot {
           number
         }
       }
@@ -110,16 +115,12 @@ export class DgraphClient extends RunnableModule {
   async getLastBlock() {
     const tx = await this.#dgraphClient.newTxn();
     try {
-      return await this.runLastBlockQuery(tx);
+      return (await this.runLastBlockQuery(tx)) as LastBlockQuery;
     } catch (error) {
       if (error === dgraph.ERR_ABORTED) {
         return await exponentialBackoff(this.runLastBlockQuery(tx));
-      } else if (
-        // FIXME: when running a zero percentage synched instance this error is thrown
-        error?.code !== 2
-      ) {
-        throw error;
       }
+      throw error;
     } finally {
       await tx.discard();
     }
