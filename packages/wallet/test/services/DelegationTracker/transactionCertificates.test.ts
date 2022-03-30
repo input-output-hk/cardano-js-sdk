@@ -44,11 +44,12 @@ describe('transactionCertificates', () => {
 
   test('isLastStakeKeyCertOfType', () => {
     const rewardAccount = Cardano.RewardAccount('stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d');
+    const stakeKeyHash = Cardano.Ed25519KeyHash.fromRewardAccount(rewardAccount);
     const certificates = [
       [
         {
           __typename: Cardano.CertificateType.StakeKeyRegistration,
-          rewardAccount
+          stakeKeyHash
         } as Cardano.Certificate,
         { __typename: Cardano.CertificateType.StakeDelegation } as Cardano.Certificate
       ],

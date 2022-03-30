@@ -1,38 +1,32 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import { CSL, Cardano, SerializationError, coreToCsl, cslToCore } from '../../src';
-import { metadataJson, ownerRewardAccount, poolId, poolParameters, rewardAccount, stakeKey, vrf } from './testData';
+import { CSL, Cardano, coreToCsl, cslToCore } from '../../src';
+import { metadataJson, ownerRewardAccount, poolId, poolParameters, rewardAccount, stakeKeyHash, vrf } from './testData';
 
 describe('certificates', () => {
   describe('coreToCsl.certificate', () => {
-    it('throws SerializationError with invalid stake key', () => {
-      expect(() => coreToCsl.certificate.stakeKeyRegistration(poolId as unknown as Cardano.RewardAccount)).toThrowError(
-        SerializationError
-      );
-    });
-
     it('stakeKeyRegistration', () =>
       expect(
         CSL.RewardAddress.new(
           1,
-          coreToCsl.certificate.stakeKeyRegistration(stakeKey).as_stake_registration()!.stake_credential()
+          coreToCsl.certificate.stakeKeyRegistration(stakeKeyHash).as_stake_registration()!.stake_credential()
         )
           ?.to_address()
           .to_bech32()
-      ).toBe(stakeKey));
+      ).toBe(rewardAccount));
 
     it('stakeKeyDeregistration', () =>
       expect(
         CSL.RewardAddress.new(
           1,
-          coreToCsl.certificate.stakeKeyDeregistration(stakeKey).as_stake_deregistration()!.stake_credential()
+          coreToCsl.certificate.stakeKeyDeregistration(stakeKeyHash).as_stake_deregistration()!.stake_credential()
         )
           ?.to_address()
           .to_bech32()
-      ).toBe(stakeKey));
+      ).toBe(rewardAccount));
 
     it('stakeDelegation', () => {
-      const delegation = coreToCsl.certificate.stakeDelegation(stakeKey, poolId).as_stake_delegation()!;
-      expect(CSL.RewardAddress.new(1, delegation.stake_credential()).to_address().to_bech32()).toBe(stakeKey);
+      const delegation = coreToCsl.certificate.stakeDelegation(stakeKeyHash, poolId).as_stake_delegation()!;
+      expect(CSL.RewardAddress.new(1, delegation.stake_credential()).to_address().to_bech32()).toBe(rewardAccount);
       expect(delegation.pool_keyhash().to_bech32('pool')).toBe(poolId);
     });
 
@@ -68,11 +62,44 @@ describe('certificates', () => {
   });
 
   describe('cslToCore.certificate', () => {
+    it('stakeKeyRegistration', () => {
+      const cert = cslToCore.certificate.createCertificate(
+        coreToCsl.certificate.stakeKeyRegistration(stakeKeyHash)
+      ) as Cardano.StakeAddressCertificate;
+      expect(cert.__typename).toBe(Cardano.CertificateType.StakeKeyRegistration);
+      expect(cert.stakeKeyHash).toBe(stakeKeyHash);
+    });
+
+    it('stakeKeyDeregistration', () => {
+      const cert = cslToCore.certificate.createCertificate(
+        coreToCsl.certificate.stakeKeyDeregistration(stakeKeyHash)
+      ) as Cardano.StakeAddressCertificate;
+      expect(cert.__typename).toBe(Cardano.CertificateType.StakeKeyDeregistration);
+      expect(cert.stakeKeyHash).toBe(stakeKeyHash);
+    });
+
+    it('stakeDelegation', () => {
+      const cert = cslToCore.certificate.createCertificate(
+        coreToCsl.certificate.stakeDelegation(stakeKeyHash, poolId)
+      ) as Cardano.StakeDelegationCertificate;
+      expect(cert.stakeKeyHash).toBe(stakeKeyHash);
+      expect(cert.poolId).toBe(poolId);
+      expect(cert.epoch).toBeUndefined();
+    });
+
     it('poolRegistration', () => {
       const cert = cslToCore.certificate.createCertificate(
         coreToCsl.certificate.poolRegistration(poolParameters)
       ) as Cardano.PoolRegistrationCertificate;
       expect(cert.poolParameters).toEqual(poolParameters);
+    });
+
+    it('poolRetirement', () => {
+      const cert = cslToCore.certificate.createCertificate(
+        coreToCsl.certificate.poolRetirement(poolId, 1000)
+      ) as Cardano.PoolRetirementCertificate;
+      expect(cert.poolId).toEqual(poolId);
+      expect(cert.epoch).toEqual(1000);
     });
   });
 });

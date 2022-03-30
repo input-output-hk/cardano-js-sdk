@@ -1,10 +1,11 @@
 import { Cardano } from '../../src';
+import { Ed25519KeyHash } from '../../src/Cardano';
 
-export const stakeKey = Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr');
+export const rewardAccount = Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr');
+export const stakeKeyHash = Ed25519KeyHash.fromRewardAccount(rewardAccount);
 export const poolId = Cardano.PoolId('pool1mpgg03jxj52qwxvvy7cmj58a96vl9pvxcqqvuw0kumheygxmn34');
 export const ownerRewardAccount = Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr');
 export const vrf = Cardano.VrfVkHex('8dd154228946bd12967c12bedb1cb6038b78f8b84a1760b1a788fa72a4af3db0');
-export const rewardAccount = stakeKey;
 export const metadataJson = {
   hash: Cardano.Hash32ByteBase16('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5'),
   url: 'https://example.com'

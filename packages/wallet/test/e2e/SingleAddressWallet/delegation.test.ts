@@ -33,12 +33,18 @@ const createDelegationCertificates = ({
 }: WalletStateSnapshot) => {
   // swap poolId if it's already delegating to one of the pools
   const poolId = delegateeBefore1stTx?.nextNextEpoch?.id === poolId2 ? poolId1 : poolId2;
+  const stakeKeyHash = Cardano.Ed25519KeyHash.fromRewardAccount(rewardAccount);
   return {
     certificates: [
       ...(isStakeKeyRegistered
         ? []
-        : ([{ __typename: Cardano.CertificateType.StakeKeyRegistration, rewardAccount }] as Cardano.Certificate[])),
-      { __typename: Cardano.CertificateType.StakeDelegation, epoch, poolId, rewardAccount }
+        : ([
+            {
+              __typename: Cardano.CertificateType.StakeKeyRegistration,
+              stakeKeyHash
+            }
+          ] as Cardano.Certificate[])),
+      { __typename: Cardano.CertificateType.StakeDelegation, epoch, poolId, stakeKeyHash }
     ] as Cardano.Certificate[],
     poolId
   };
@@ -175,7 +181,12 @@ describe('SingleAddressWallet/delegation', () => {
 
     // Make a 2nd tx with key deregistration
     const tx2Internals = await sourceWallet.initializeTx({
-      certificates: [{ __typename: Cardano.CertificateType.StakeKeyDeregistration, rewardAccount }]
+      certificates: [
+        {
+          __typename: Cardano.CertificateType.StakeKeyDeregistration,
+          stakeKeyHash: Cardano.Ed25519KeyHash.fromRewardAccount(rewardAccount)
+        }
+      ]
     });
     await sourceWallet.submitTx(await sourceWallet.finalizeTx(tx2Internals));
     await waitForTx(sourceWallet, tx2Internals);

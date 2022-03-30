@@ -2,18 +2,24 @@ import { CSL, Cardano, NotImplementedError, SerializationError, SerializationFai
 
 const stakeRegistration = (certificate: CSL.StakeRegistration): Cardano.StakeAddressCertificate => ({
   __typename: Cardano.CertificateType.StakeKeyRegistration,
-  rewardAccount: Cardano.RewardAccount(Buffer.from(certificate.to_bytes()).toString())
+  stakeKeyHash: Cardano.Ed25519KeyHash(
+    Buffer.from(certificate.stake_credential().to_keyhash()!.to_bytes()).toString('hex')
+  )
 });
 
 const stakeDeregistration = (certificate: CSL.StakeDeregistration): Cardano.StakeAddressCertificate => ({
   __typename: Cardano.CertificateType.StakeKeyDeregistration,
-  rewardAccount: Cardano.RewardAccount(Buffer.from(certificate.to_bytes()).toString())
+  stakeKeyHash: Cardano.Ed25519KeyHash(
+    Buffer.from(certificate.stake_credential().to_keyhash()!.to_bytes()).toString('hex')
+  )
 });
 
 const stakeDelegation = (certificate: CSL.StakeDelegation): Cardano.StakeDelegationCertificate => ({
   __typename: Cardano.CertificateType.StakeDelegation,
-  poolId: Cardano.PoolId(certificate.pool_keyhash().to_bech32('pool')), // TODO: is this correct??
-  rewardAccount: Cardano.RewardAccount(Buffer.from(certificate.to_bytes()).toString())
+  poolId: Cardano.PoolId(certificate.pool_keyhash().to_bech32('pool')),
+  stakeKeyHash: Cardano.Ed25519KeyHash(
+    Buffer.from(certificate.stake_credential().to_keyhash()!.to_bytes()).toString('hex')
+  )
 });
 
 const createCardanoRelays = (relays: CSL.Relays): Cardano.Relay[] => {
@@ -96,7 +102,7 @@ export const poolRegistration = (certificate: CSL.PoolRegistration): Cardano.Poo
 const poolRetirement = (certificate: CSL.PoolRetirement): Cardano.PoolRetirementCertificate => ({
   __typename: Cardano.CertificateType.PoolRetirement,
   epoch: certificate.epoch(),
-  poolId: Cardano.PoolId(certificate.pool_keyhash().toString())
+  poolId: Cardano.PoolId(certificate.pool_keyhash().to_bech32('pool'))
 });
 
 const genesisKeyDelegaation = (certificate: CSL.GenesisKeyDelegation): Cardano.GenesisKeyDelegationCertificate => ({

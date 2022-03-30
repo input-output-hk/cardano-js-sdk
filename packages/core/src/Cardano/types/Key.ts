@@ -1,4 +1,6 @@
-import { Hash32ByteBase16, HexBlob, OpaqueString, castHexBlob, typedHex } from '../util';
+import { CSL } from '../../CSL';
+import { Hash28ByteBase16, HexBlob, OpaqueString, castHexBlob, typedHex } from '../util';
+import { RewardAccount } from './RewardAccount';
 
 /**
  * BIP32 public key as hex string
@@ -27,7 +29,16 @@ export const Ed25519PublicKey = (value: string): Ed25519PublicKey => typedHex(va
 Ed25519PublicKey.fromHexBlob = (value: HexBlob) => castHexBlob<Ed25519PublicKey>(value, 64);
 
 /**
- * 32 byte ED25519 key hash as hex string
+ * 28 byte ED25519 key hash as hex string
  */
 export type Ed25519KeyHash = OpaqueString<'Ed25519KeyHash'>;
-export const Ed25519KeyHash = (value: string): Ed25519KeyHash => Hash32ByteBase16(value);
+export const Ed25519KeyHash = (value: string): Ed25519KeyHash => Hash28ByteBase16(value);
+Ed25519KeyHash.fromRewardAccount = (rewardAccount: RewardAccount): Ed25519KeyHash =>
+  Ed25519KeyHash(
+    Buffer.from(
+      CSL.RewardAddress.from_address(CSL.Address.from_bech32(rewardAccount.toString()))!
+        .payment_cred()!
+        .to_keyhash()!
+        .to_bytes()
+    ).toString('hex')
+  );

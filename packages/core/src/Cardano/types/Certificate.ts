@@ -1,3 +1,4 @@
+import { Cardano } from '../..';
 import { Epoch, Hash32ByteBase16, Lovelace, PoolId, PoolParameters, RewardAccount } from '.';
 
 export enum CertificateType {
@@ -12,7 +13,7 @@ export enum CertificateType {
 
 export interface StakeAddressCertificate {
   __typename: CertificateType.StakeKeyRegistration | CertificateType.StakeKeyDeregistration;
-  rewardAccount: RewardAccount;
+  stakeKeyHash: Cardano.Ed25519KeyHash;
 }
 
 export interface PoolRegistrationCertificate {
@@ -29,7 +30,7 @@ export interface PoolRetirementCertificate {
 
 export interface StakeDelegationCertificate {
   __typename: CertificateType.StakeDelegation;
-  rewardAccount: RewardAccount;
+  stakeKeyHash: Cardano.Ed25519KeyHash;
   poolId: PoolId;
   /**
    * Might or might not be present based on source.

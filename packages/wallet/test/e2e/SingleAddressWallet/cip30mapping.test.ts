@@ -22,7 +22,7 @@ const createTxInternals = async (wallet: SingleAddressWallet): Promise<Initializ
       address: Cardano.Address(
         'addr_test1qpu5vlrf4xkxv2qpwngf6cjhtw542ayty80v8dyr49rf5ewvxwdrt70qlcpeeagscasafhffqsxy36t90ldv06wqrk2qum8x5w'
       ),
-      value: { coins: 11_111_111n }
+      value: { coins: 1_111_111n }
     }
   ];
   const txProps = {
@@ -31,7 +31,7 @@ const createTxInternals = async (wallet: SingleAddressWallet): Promise<Initializ
   return await wallet.initializeTx(txProps);
 };
 
-describe('cip30 e2e', () => {
+describe.skip('cip30 e2e', () => {
   let wallet: SingleAddressWallet;
   let mappedWallet: WalletApi;
 

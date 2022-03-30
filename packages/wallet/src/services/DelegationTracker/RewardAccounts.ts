@@ -119,8 +119,9 @@ const getAccountsKeyStatus =
 const accountCertificateTransactions = (
   transactions$: Observable<TxWithEpoch[]>,
   rewardAccount: Cardano.RewardAccount
-) =>
-  transactions$.pipe(
+) => {
+  const stakeKeyHash = Cardano.Ed25519KeyHash.fromRewardAccount(rewardAccount);
+  return transactions$.pipe(
     map((transactions) =>
       transactions
         .map(({ tx, epoch }) => ({
@@ -128,13 +129,14 @@ const accountCertificateTransactions = (
             .filter((cert): cert is Cardano.StakeDelegationCertificate | Cardano.StakeAddressCertificate =>
               [...RegAndDeregCertificateTypes, Cardano.CertificateType.StakeDelegation].includes(cert.__typename)
             )
-            .filter((cert) => cert.rewardAccount === rewardAccount),
+            .filter((cert) => cert.stakeKeyHash === stakeKeyHash),
           epoch
         }))
         .filter(({ certificates }) => certificates.length > 0)
     ),
     distinctUntilChanged((a, b) => isEqual(a, b))
   );
+};
 
 type ObservableType<O> = O extends Observable<infer T> ? T : unknown;
 type TransactionsCertificates = ObservableType<ReturnType<typeof accountCertificateTransactions>>;

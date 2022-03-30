@@ -219,7 +219,7 @@ export const blockfrostWalletProvider = (blockfrost: BlockFrostAPI, logger = dum
         ? Cardano.CertificateType.StakeKeyRegistration
         : Cardano.CertificateType.StakeKeyDeregistration,
       certIndex: cert_index,
-      rewardAccount: Cardano.RewardAccount(address)
+      stakeKeyHash: Cardano.Ed25519KeyHash.fromRewardAccount(Cardano.RewardAccount(address))
     }));
   };
 
@@ -231,7 +231,7 @@ export const blockfrostWalletProvider = (blockfrost: BlockFrostAPI, logger = dum
       delegationIndex: index,
       epoch: active_epoch,
       poolId: Cardano.PoolId(pool_id),
-      rewardAccount: Cardano.RewardAccount(address)
+      stakeKeyHash: Cardano.Ed25519KeyHash.fromRewardAccount(Cardano.RewardAccount(address))
     }));
   };
 
