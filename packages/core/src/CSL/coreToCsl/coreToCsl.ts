@@ -85,6 +85,7 @@ const check64Length = (metadatum: string | Uint8Array): void => {
     );
 };
 
+// eslint-disable-next-line complexity
 export const txMetadatum = (metadatum: Cardano.Metadatum): TransactionMetadatum => {
   if (metadatum === null) throw new SerializationError(SerializationFailure.InvalidType);
   switch (typeof metadatum) {
@@ -92,8 +93,13 @@ export const txMetadatum = (metadatum: Cardano.Metadatum): TransactionMetadatum 
     case 'boolean':
     case 'undefined':
       throw new SerializationError(SerializationFailure.InvalidType);
-    case 'bigint':
-      return TransactionMetadatum.new_int(Int.new(BigNum.from_str(metadatum.toString())));
+    case 'bigint': {
+      const cslInt =
+        metadatum >= 0
+          ? Int.new(BigNum.from_str(metadatum.toString()))
+          : Int.new_negative(BigNum.from_str((metadatum * -1n).toString()));
+      return TransactionMetadatum.new_int(cslInt);
+    }
     case 'string':
       check64Length(metadatum);
       return TransactionMetadatum.new_text(metadatum);

@@ -31,7 +31,11 @@ describe('cslToCore', () => {
     expect(cslToCore.txMint(coreToCsl.txMint(mintTokenMap))).toEqual(mintTokenMap);
   });
 
-  it.todo('txAuxiliaryData');
+  describe('txAuxiliaryData', () => {
+    // mostly covered by newTx - could just remove this
+    it.todo('txMetadata');
+    it.todo('txScripts');
+  });
 
   it('txBody', () => {
     expect(cslToCore.txBody(coreToCsl.txBody(txBody))).toEqual(txBody);
@@ -40,7 +44,4 @@ describe('cslToCore', () => {
   it('newTx', () => {
     expect(cslToCore.newTx(coreToCsl.tx(tx))).toEqual(tx);
   });
-
-  it.todo('txScripts');
-  it.todo('txRequiredExtraSignatures');
 });

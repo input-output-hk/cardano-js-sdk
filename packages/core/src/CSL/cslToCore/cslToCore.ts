@@ -205,34 +205,35 @@ export const txWitnessSet = (witnessSet: CSL.TransactionWitnessSet): Cardano.Wit
   };
 };
 
-const txMetaDatum = (transactionMetadatum: CSL.TransactionMetadatum): Cardano.Metadatum => {
-  const metadatumKind = CSL.TransactionMetadatumKind[transactionMetadatum.kind()];
-  switch (metadatumKind) {
-    case CSL.TransactionMetadatumKind.Bytes.toString():
-      return transactionMetadatum.as_text();
-    case CSL.TransactionMetadatumKind.Int.toString(): {
-      const int = transactionMetadatum.as_int().as_i32()!;
-      return BigInt(int);
+const txMetadatum = (transactionMetadatum: CSL.TransactionMetadatum): Cardano.Metadatum => {
+  switch (transactionMetadatum.kind()) {
+    case CSL.TransactionMetadatumKind.Bytes:
+      return transactionMetadatum.as_bytes();
+    case CSL.TransactionMetadatumKind.Int: {
+      const int = transactionMetadatum.as_int()!;
+      if (int.is_positive()) return BigInt(int.as_positive()!.to_str());
+      return BigInt(int.as_negative()!.to_str()) * -1n;
     }
-    case CSL.TransactionMetadatumKind.MetadataList.toString(): {
+    case CSL.TransactionMetadatumKind.MetadataList: {
       const list = transactionMetadatum.as_list();
       const metaDatumList: Cardano.Metadatum[] = [];
       for (let j = 0; j < list.len(); j++) {
         const listItem = list.get(j);
-        metaDatumList.push(txMetaDatum(listItem));
+        metaDatumList.push(txMetadatum(listItem));
       }
       return metaDatumList;
     }
-    case CSL.TransactionMetadatumKind.MetadataMap.toString(): {
+    case CSL.TransactionMetadatumKind.MetadataMap: {
       const txMap = transactionMetadatum.as_map();
-      const metdatumMap = new Map();
+      const metdatumMap = new Map<Cardano.Metadatum, Cardano.Metadatum>();
       for (let i = 0; i < txMap.keys().len(); i++) {
-        const metadaatumItem = txMap.keys().get(i);
-        metdatumMap.set(metadaatumItem, metadaatumItem);
+        const mapKey = txMap.keys().get(i);
+        const mapValue = txMap.get(mapKey);
+        metdatumMap.set(txMetadatum(mapKey), txMetadatum(mapValue));
       }
       return metdatumMap;
     }
-    case CSL.TransactionMetadatumKind.Text.toString():
+    case CSL.TransactionMetadatumKind.Text:
       return transactionMetadatum.as_text();
     default:
       throw new SerializationError(SerializationFailure.InvalidType);
@@ -242,11 +243,12 @@ const txMetaDatum = (transactionMetadatum: CSL.TransactionMetadatum): Cardano.Me
 export const txMetadata = (auxiliaryMetadata?: CSL.GeneralTransactionMetadata): Cardano.TxMetadata | undefined => {
   if (!auxiliaryMetadata) return;
   const auxiliaryMetadataMap: Cardano.TxMetadata = new Map();
-
-  for (let i = 0; i < auxiliaryMetadata.len(); i++) {
-    const transactionMetadatum = auxiliaryMetadata.get(CSL.BigNum.from_str(i.toString()));
+  const metadataKeys = auxiliaryMetadata.keys();
+  for (let i = 0; i < metadataKeys.len(); i++) {
+    const key = metadataKeys.get(i);
+    const transactionMetadatum = auxiliaryMetadata.get(key);
     if (transactionMetadatum) {
-      auxiliaryMetadataMap.set(BigInt(i), txMetaDatum(transactionMetadatum));
+      auxiliaryMetadataMap.set(BigInt(key.to_str()), txMetadatum(transactionMetadatum));
     }
   }
   return auxiliaryMetadataMap;

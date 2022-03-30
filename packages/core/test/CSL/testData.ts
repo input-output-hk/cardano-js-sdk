@@ -95,8 +95,26 @@ export const signature =
   // eslint-disable-next-line max-len
   'bdea87fca1b4b4df8a9b8fb4183c0fab2f8261eb6c5e4bc42c800bb9c8918755bdea87fca1b4b4df8a9b8fb4183c0fab2f8261eb6c5e4bc42c800bb9c8918755';
 export const tx: Cardano.NewTxAlonzo = {
+  auxiliaryData: {
+    body: {
+      blob: new Map<bigint, Cardano.Metadatum>([
+        [1n, 1234n],
+        [2n, 'str'],
+        [3n, [1234n, 'str']],
+        [4n, new Uint8Array(Buffer.from('bytes'))],
+        [
+          5n,
+          new Map<Cardano.Metadatum, Cardano.Metadatum>([
+            ['strkey', 123n],
+            [['listkey'], 'strvalue']
+          ])
+        ],
+        [6n, -7n]
+      ])
+    }
+  },
   body: txBody,
-  id: Cardano.TransactionId('9fb01a725d69fcc196e2ed75ede19537cf2f0294493742f9a53baff79d2d7db5'),
+  id: Cardano.TransactionId('e3a443363eb6ee3d67c5e75ec10b931603787581a948d68fa3b2cd3ff2e0d2ad'),
   witness: {
     signatures: new Map([[Cardano.Ed25519PublicKey(vkey), Cardano.Ed25519Signature(signature)]])
   }
