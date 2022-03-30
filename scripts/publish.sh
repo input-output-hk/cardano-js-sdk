@@ -3,7 +3,7 @@
 set -euo pipefail
 
 npm publish --cwd ./packages/blockfrost && \
-npm publish --cwd ./packages/cardano-graphql && \
+npm publish --cwd ./packages/cardano-services-client && \
 npm publish --cwd ./packages/cip2 && \
 npm publish --cwd ./packages/cip30 && \
 npm publish --cwd ./packages/core && \

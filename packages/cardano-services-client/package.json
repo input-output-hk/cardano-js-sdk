@@ -1,16 +1,15 @@
 {
-  "name": "@cardano-sdk/cardano-graphql",
+  "name": "@cardano-sdk/cardano-services-client",
   "version": "0.2.0",
-  "description": "Cardano GraphQL Providers",
+  "description": "Cardano Services Client",
   "engines": {
     "node": "^14"
   },
   "main": "dist/index.js",
-  "repository": "https://github.com/input-output-hk/cardano-js-sdk/packages/cardano-graphql",
-  "author": "Martynas Kazlauskas <martynas.kazlauskas@iohk.io>",
+  "repository": "https://github.com/input-output-hk/cardano-js-sdk/packages/cardano-services-client",
   "contributors": [
     "Rhys Bartels-Waller <rhys.bartelswaller@iohk.io> (https://iohk.io)",
-    "James Sweetland"
+    "Martynas Kazlauskas <martynas.kazlauskas@iohk.io> (https://iohk.io)"
   ],
   "license": "MPL-2.0",
   "scripts": {
@@ -27,23 +26,15 @@
     "test:debug": "DEBUG=true yarn test"
   },
   "devDependencies": {
-    "@cardano-sdk/cardano-graphql-services": "0.2.0",
-    "@graphql-codegen/cli": "~2.5.0",
-    "@graphql-codegen/typescript": "~2.4.3",
-    "@graphql-codegen/typescript-graphql-request": "~4.3.4",
-    "@graphql-codegen/typescript-operations": "~2.2.4",
+    "@cardano-sdk/cardano-services-client": "0.2.0",
     "@types/validator": "^13.7.1",
     "shx": "^0.3.3"
   },
   "dependencies": {
-    "@cardano-graphql/client-ts": "~6.1.0",
     "@cardano-ogmios/client": "~5.1.0",
     "@cardano-sdk/core": "0.2.0",
     "class-validator": "^0.13.1",
     "got": "^11",
-    "graphql": "~15.6.1",
-    "graphql-request": "npm:graphql-request-configurable-serializer@4.0.0",
-    "graphql-tag": "2.12.5",
     "json-bigint": "~1.0.0",
     "serialize-error": "^8"
   },

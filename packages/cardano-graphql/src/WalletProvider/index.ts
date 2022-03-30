@@ -1,1 +1,0 @@
-export { createGraphQLWalletProvider } from './CardanoGraphQLWalletProvider';
