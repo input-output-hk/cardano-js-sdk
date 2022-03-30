@@ -1,6 +1,8 @@
 import { Logger, dummyLogger } from 'ts-log';
+import { ProviderError } from '@cardano-sdk/core';
 import { RunnableModule } from '../RunnableModule';
 import { listenPromise, serverClosePromise } from '../util';
+import bodyParser from 'body-parser';
 import express from 'express';
 import expressPromBundle from 'express-prom-bundle';
 import http from 'http';
@@ -17,21 +19,35 @@ export type HttpServerConfig = {
 };
 
 export interface HttpServerDependencies {
+  healthCheck: () => Promise<{ ok: boolean }>;
   router: express.Router;
   logger?: Logger;
 }
 
 export abstract class HttpServer extends RunnableModule {
   public app: express.Application;
-  public router: express.Router;
   public server: http.Server;
+  #dependencies: HttpServerDependencies;
 
-  protected constructor(public config: HttpServerConfig, { logger = dummyLogger, router }: HttpServerDependencies) {
+  protected constructor(public config: HttpServerConfig, { logger = dummyLogger, ...rest }: HttpServerDependencies) {
     super(config.name || 'HttpServer', logger);
-    this.router = router;
+    this.#dependencies = { logger, ...rest };
   }
 
   protected async initializeImpl(): Promise<void> {
+    this.#dependencies.router.use(bodyParser.json());
+    this.#dependencies.router.get('/health', async (req, res) => {
+      this.logger.debug('/health', { ip: req.ip });
+      let body: { ok: boolean } | Error['message'];
+      try {
+        body = await this.#dependencies.healthCheck();
+      } catch (error) {
+        this.logger.error(error);
+        body = error instanceof ProviderError ? error.message : 'Unknown error';
+        res.statusCode = 500;
+      }
+      res.send(body);
+    });
     this.app = express();
     if (this.config.metrics?.enabled) {
       this.app.use(
@@ -43,7 +59,8 @@ export abstract class HttpServer extends RunnableModule {
       );
       this.logger.info(`Prometheus metrics configured at ${this.config.metrics.options?.metricsPath || '/metrics'}`);
     }
-    this.app.use(this.router);
+
+    this.app.use(this.#dependencies.router);
   }
 
   protected async startImpl(): Promise<void> {

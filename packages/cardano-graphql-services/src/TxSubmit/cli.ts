@@ -51,6 +51,10 @@ program
       });
       const server = TxSubmitHttpServer.create(
         {
+          logger,
+          txSubmitProvider
+        },
+        {
           listen: {
             host: apiUrl.hostname,
             port: Number.parseInt(apiUrl.port)
@@ -58,10 +62,6 @@ program
           metrics: {
             enabled: metricsEnabled
           }
-        },
-        {
-          logger,
-          txSubmitProvider
         }
       );
       await server.initialize();

@@ -1,13 +1,13 @@
 import { Cardano, ProviderError, ProviderFailure, TxSubmitProvider } from '@cardano-sdk/core';
 import { ErrorObject, serializeError } from 'serialize-error';
-import { HttpServer, HttpServerConfig } from '../Http';
+import { HttpServer, HttpServerConfig, HttpServerDependencies } from '../Http';
 import { Logger, dummyLogger } from 'ts-log';
 import bodyParser, { Options } from 'body-parser';
-import express, { Router } from 'express';
+import express from 'express';
 
 export interface TxSubmitServerDependencies {
-  txSubmitProvider: TxSubmitProvider;
   logger?: Logger;
+  txSubmitProvider: TxSubmitProvider;
 }
 
 export interface TxSubmitHttpServerConfig extends HttpServerConfig {
@@ -20,31 +20,20 @@ export class TxSubmitHttpServer extends HttpServer {
   #txSubmitProvider: TxSubmitProvider;
 
   private constructor(
-    config: TxSubmitHttpServerConfig,
-    router: Router,
-    { logger = dummyLogger, txSubmitProvider }: TxSubmitServerDependencies
+    { txSubmitProvider }: TxSubmitServerDependencies,
+    httpServerDependencies: HttpServerDependencies,
+    { listen, metrics }: TxSubmitHttpServerConfig
   ) {
-    super({ ...config, name: 'TxSubmitServer' }, { logger, router });
+    super({ listen, metrics, name: 'TxSubmitServer' }, httpServerDependencies);
     this.#txSubmitProvider = txSubmitProvider;
   }
   static create(
-    config: TxSubmitHttpServerConfig,
-    { txSubmitProvider, logger = dummyLogger }: TxSubmitServerDependencies
+    { txSubmitProvider, logger = dummyLogger }: TxSubmitServerDependencies,
+    config: TxSubmitHttpServerConfig
   ) {
     const router = express.Router();
     router.use(bodyParser.raw({ limit: config.bodyParser?.limit || '500kB', type: 'application/cbor' }));
-    router.get('/health', async (req, res) => {
-      logger.debug('/health', { ip: req.ip });
-      let body: { ok: boolean } | Error['message'];
-      try {
-        body = await txSubmitProvider.healthCheck();
-      } catch (error) {
-        logger.error(error);
-        body = error instanceof ProviderError ? error.message : 'Unknown error';
-        res.statusCode = 500;
-      }
-      res.send(body);
-    });
+
     router.post('/submit', async (req, res) => {
       if (req.header('Content-Type') !== 'application/cbor') {
         res.statusCode = 400;
@@ -69,7 +58,11 @@ export class TxSubmitHttpServer extends HttpServer {
       }
       res.send(body);
     });
-    return new TxSubmitHttpServer(config, router, { logger, txSubmitProvider });
+    return new TxSubmitHttpServer(
+      { logger, txSubmitProvider },
+      { healthCheck: () => txSubmitProvider.healthCheck(), logger, router },
+      config
+    );
   }
 
   async initializeImpl(): Promise<void> {

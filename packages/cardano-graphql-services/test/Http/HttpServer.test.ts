@@ -1,25 +1,23 @@
-import { HttpServer, HttpServerConfig, RunnableModule } from '../../src';
+import { HttpServer, HttpServerConfig, HttpServerDependencies, RunnableModule } from '../../src';
 import { getRandomPort } from 'get-port-please';
 import express from 'express';
 import got from 'got';
 import net from 'net';
 import waitOn from 'wait-on';
-const bodyParser = require('body-parser');
 
 const APPLICATION_JSON = 'application/json';
 const onHttpServer = (url: string) => waitOn({ resources: [url], validateStatus: (statusCode) => statusCode === 404 });
 
 class SomeHttpServer extends HttpServer {
-  private constructor(config: HttpServerConfig, router: express.Router) {
-    super({ ...config, name: 'SomeHttpServer' }, { router });
+  private constructor(config: HttpServerConfig, dependencies: HttpServerDependencies) {
+    super({ ...config, name: 'SomeHttpServer' }, dependencies);
   }
   static create(config: HttpServerConfig) {
     const router = express.Router();
-    router.use(bodyParser.json());
-    router.get('/health', (_req, res) => {
-      res.send({ ok: true });
+    return new SomeHttpServer(config, {
+      healthCheck: () => Promise.resolve({ ok: true }),
+      router
     });
-    return new SomeHttpServer(config, router);
   }
 }
 

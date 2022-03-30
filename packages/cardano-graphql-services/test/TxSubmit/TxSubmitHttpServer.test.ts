@@ -31,7 +31,7 @@ describe('TxSubmitHttpServer', () => {
   describe('unhealthy TxSubmitProvider', () => {
     beforeAll(async () => {
       txSubmitProvider = { healthCheck: jest.fn(() => Promise.resolve({ ok: false })), submitTx: jest.fn() };
-      txSubmitHttpServer = TxSubmitHttpServer.create(config, { txSubmitProvider });
+      txSubmitHttpServer = TxSubmitHttpServer.create({ txSubmitProvider }, config);
     });
 
     it('throws during initialization if the TxSubmitProvider is unhealthy', async () => {
@@ -53,7 +53,7 @@ describe('TxSubmitHttpServer', () => {
     beforeAll(async () => {
       isOk = () => true;
       txSubmitProvider = { healthCheck: jest.fn(() => Promise.resolve({ ok: isOk() })), submitTx: doSubmitTx };
-      txSubmitHttpServer = TxSubmitHttpServer.create(config, { txSubmitProvider });
+      txSubmitHttpServer = TxSubmitHttpServer.create({ txSubmitProvider }, config);
       await expect(await txSubmitHttpServer.initialize()).resolves;
       await expect(txSubmitHttpServer.start()).resolves;
       expect(await serverHealth()).toEqual({ ok: true });
@@ -88,7 +88,7 @@ describe('TxSubmitHttpServer', () => {
   describe('healthy and successful submission', () => {
     beforeAll(async () => {
       txSubmitProvider = { healthCheck: jest.fn(() => Promise.resolve({ ok: true })), submitTx: jest.fn() };
-      txSubmitHttpServer = TxSubmitHttpServer.create(config, { txSubmitProvider });
+      txSubmitHttpServer = TxSubmitHttpServer.create({ txSubmitProvider }, config);
       await txSubmitHttpServer.initialize();
       await txSubmitHttpServer.start();
     });
@@ -146,7 +146,7 @@ describe('TxSubmitHttpServer', () => {
           healthCheck: jest.fn(() => Promise.resolve({ ok: true })),
           submitTx: jest.fn(() => Promise.reject(stubErrors))
         };
-        txSubmitHttpServer = TxSubmitHttpServer.create(config, { txSubmitProvider });
+        txSubmitHttpServer = TxSubmitHttpServer.create({ txSubmitProvider }, config);
         await txSubmitHttpServer.initialize();
         await txSubmitHttpServer.start();
         try {

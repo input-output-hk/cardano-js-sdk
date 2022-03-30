@@ -31,11 +31,11 @@ void (async () => {
     tls: ogmiosUrl?.protocol === 'wss'
   });
   const server = TxSubmitHttpServer.create(
+    { logger, txSubmitProvider },
     {
       listen: { host: apiUrl.hostname, port: Number.parseInt(apiUrl.port) },
       metrics: { enabled: env.METRICS_ENABLED }
-    },
-    { logger, txSubmitProvider }
+    }
   );
   await server.initialize();
   await server.start();
