@@ -19,13 +19,11 @@ A suite of TypeScript packages suitable for both Node.js and browser-based devel
 - [@cardano-sdk/cip30](./packages/cip30)
 - [@cardano-sdk/wallet](./packages/wallet)
 - [@cardano-sdk/util-dev](./packages/util-dev)
+- [@cardano-sdk/cardano-services](./packages/cardano-services)
+- [@cardano-sdk/cardano-services-client](./packages/cardano-services-client)
 
-### Cardano Provider Implementations
-
-- [@cardano-sdk/cardano-graphql](packages/cardano-graphql)
+### External Provider Implementations
 - [@cardano-sdk/blockfrost](packages/blockfrost)
-
-:information_source: Looking to use a Cardano service not listed here? [Let us know!]
 
 ### Webpack
 
