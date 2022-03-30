@@ -77,7 +77,7 @@ export abstract class HttpServer extends RunnableModule {
     this.app.use(this.#dependencies.router);
   }
 
-  protected sendJSON(res: express.Response, obj: unknown) {
+  protected static sendJSON(res: express.Response, obj: unknown) {
     res.header(CONTENT_TYPE, APPLICATION_JSON);
     res.send(JSON.stringify(util.toSerializableObject(obj)));
   }
