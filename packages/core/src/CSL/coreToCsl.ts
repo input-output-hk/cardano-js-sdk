@@ -2,6 +2,7 @@ import * as Asset from '../Asset';
 import * as Cardano from '../Cardano';
 import {
   Address,
+  AssetName,
   Assets,
   AuxiliaryData,
   BigNum,
@@ -11,9 +12,12 @@ import {
   Int,
   MetadataList,
   MetadataMap,
+  Mint,
+  MintAssets,
   MultiAsset,
   PublicKey,
   RewardAddress,
+  ScriptHash,
   Transaction,
   TransactionBody,
   TransactionHash,
@@ -119,6 +123,30 @@ export const txMetadata = (blob: Map<bigint, Cardano.Metadatum>): GeneralTransac
   return metadata;
 };
 
+export const txMint = (mint: Cardano.TokenMap) => {
+  const cslMint = Mint.new();
+  const mintMap = new Map<Cardano.PolicyId, [ScriptHash, MintAssets]>();
+  for (const [assetId, quantity] of mint.entries()) {
+    const policyId = Asset.util.policyIdFromAssetId(assetId);
+    const assetName = Asset.util.assetNameFromAssetId(assetId);
+    let [scriptHash, mintAssets] = mintMap.get(policyId) || [];
+    if (!scriptHash || !mintAssets) {
+      scriptHash = ScriptHash.from_bytes(Buffer.from(policyId, 'hex'));
+      mintAssets = MintAssets.new();
+      mintMap.set(policyId, [scriptHash, mintAssets]);
+    }
+    const intQuantity =
+      quantity >= 0n
+        ? Int.new(BigNum.from_str(quantity.toString()))
+        : Int.new_negative(BigNum.from_str((quantity * -1n).toString()));
+    mintAssets.insert(AssetName.new(Buffer.from(assetName, 'hex')), intQuantity);
+  }
+  for (const [scriptHash, mintAssets] of mintMap.values()) {
+    cslMint.insert(scriptHash, mintAssets);
+  }
+  return cslMint;
+};
+
 export const txAuxiliaryData = (auxiliaryData?: Cardano.AuxiliaryData): AuxiliaryData | undefined => {
   if (!auxiliaryData) return;
   const result = AuxiliaryData.new();
@@ -131,7 +159,7 @@ export const txAuxiliaryData = (auxiliaryData?: Cardano.AuxiliaryData): Auxiliar
 };
 
 export const txBody = (
-  { inputs, outputs, fee, validityInterval, certificates, withdrawals }: Cardano.TxBodyAlonzo,
+  { inputs, outputs, fee, validityInterval, certificates, withdrawals, mint }: Cardano.TxBodyAlonzo,
   auxiliaryData?: Cardano.AuxiliaryData
 ): TransactionBody => {
   const cslInputs = TransactionInputs.new();
@@ -150,6 +178,9 @@ export const txBody = (
   );
   if (validityInterval.invalidBefore) {
     cslBody.set_validity_start_interval(validityInterval.invalidBefore);
+  }
+  if (mint) {
+    cslBody.set_mint(txMint(mint));
   }
   if (certificates?.length) {
     const certs = Certificates.new();
