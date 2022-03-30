@@ -7,6 +7,8 @@ import {
   AuxiliaryData,
   BigNum,
   Certificates,
+  Ed25519KeyHash,
+  Ed25519KeyHashes,
   Ed25519Signature,
   GeneralTransactionMetadata,
   Int,
@@ -17,6 +19,7 @@ import {
   MultiAsset,
   PublicKey,
   RewardAddress,
+  ScriptDataHash,
   ScriptHash,
   Transaction,
   TransactionBody,
@@ -157,20 +160,56 @@ export const txAuxiliaryData = (auxiliaryData?: Cardano.AuxiliaryData): Auxiliar
   return result;
 };
 
-export const txBody = (
-  { inputs, outputs, fee, validityInterval, certificates, withdrawals, mint }: Cardano.TxBodyAlonzo,
-  auxiliaryData?: Cardano.AuxiliaryData
-): TransactionBody => {
+const txInputs = (coreInputs: Cardano.TxIn[]) => {
   const cslInputs = TransactionInputs.new();
-  for (const input of inputs) {
+  for (const input of coreInputs) {
     cslInputs.add(txIn(input));
   }
+  return cslInputs;
+};
+
+const keyHashes = (coreHashes: Cardano.Ed25519KeyHash[]) => {
+  const cslKeyHashes = Ed25519KeyHashes.new();
+  for (const signature of coreHashes) {
+    cslKeyHashes.add(Ed25519KeyHash.from_bytes(Buffer.from(signature, 'hex')));
+  }
+  return cslKeyHashes;
+};
+
+const txWithdrawals = (coreWithdrawals: Cardano.Withdrawal[]) => {
+  const cslWithdrawals = Withdrawals.new();
+  for (const { stakeAddress, quantity } of coreWithdrawals) {
+    const cslAddress = RewardAddress.from_address(Address.from_bech32(stakeAddress.toString()));
+    if (!cslAddress) {
+      throw new SerializationError(SerializationFailure.InvalidAddress, `Invalid withdrawal address: ${stakeAddress}`);
+    }
+    cslWithdrawals.insert(cslAddress, BigNum.from_str(quantity.toString()));
+  }
+  return cslWithdrawals;
+};
+
+// eslint-disable-next-line complexity
+export const txBody = (
+  {
+    inputs,
+    outputs,
+    fee,
+    validityInterval,
+    certificates,
+    withdrawals,
+    mint,
+    collaterals,
+    requiredExtraSignatures,
+    scriptIntegrityHash
+  }: Cardano.TxBodyAlonzo,
+  auxiliaryData?: Cardano.AuxiliaryData
+): TransactionBody => {
   const cslOutputs = TransactionOutputs.new();
   for (const output of outputs) {
     cslOutputs.add(txOut(output));
   }
   const cslBody = TransactionBody.new(
-    cslInputs,
+    txInputs(inputs),
     cslOutputs,
     BigNum.from_str(fee.toString()),
     validityInterval.invalidHereafter
@@ -181,6 +220,15 @@ export const txBody = (
   if (mint) {
     cslBody.set_mint(txMint(mint));
   }
+  if (collaterals) {
+    cslBody.set_collateral(txInputs(collaterals));
+  }
+  if (requiredExtraSignatures?.length) {
+    cslBody.set_required_signers(keyHashes(requiredExtraSignatures));
+  }
+  if (scriptIntegrityHash) {
+    cslBody.set_script_data_hash(ScriptDataHash.from_bytes(Buffer.from(scriptIntegrityHash, 'hex')));
+  }
   if (certificates?.length) {
     const certs = Certificates.new();
     for (const cert of certificates) {
@@ -189,18 +237,7 @@ export const txBody = (
     cslBody.set_certs(certs);
   }
   if (withdrawals?.length) {
-    const cslWithdrawals = Withdrawals.new();
-    for (const { stakeAddress, quantity } of withdrawals) {
-      const cslAddress = RewardAddress.from_address(Address.from_bech32(stakeAddress.toString()));
-      if (!cslAddress) {
-        throw new SerializationError(
-          SerializationFailure.InvalidAddress,
-          `Invalid withdrawal address: ${stakeAddress}`
-        );
-      }
-      cslWithdrawals.insert(cslAddress, BigNum.from_str(quantity.toString()));
-    }
-    cslBody.set_withdrawals(cslWithdrawals);
+    cslBody.set_withdrawals(txWithdrawals(withdrawals));
   }
   const cslAuxiliaryData = txAuxiliaryData(auxiliaryData);
   if (cslAuxiliaryData) {

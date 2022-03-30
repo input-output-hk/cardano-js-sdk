@@ -40,4 +40,7 @@ describe('cslToCore', () => {
   test.skip('newTx', () => {
     expect(cslToCore.newTx(coreToCsl.tx(tx))).toEqual(tx);
   });
+
+  it.todo('txScripts');
+  it.todo('txRequiredExtraSignatures');
 });

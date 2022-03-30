@@ -71,10 +71,13 @@ export const txBody: Cardano.TxBodyAlonzo = {
       poolId: Cardano.PoolId('pool1y6chk7x7fup4ms9leesdr57r4qy9cwxuee0msan72x976a6u0nc')
     }
   ],
+  collaterals: [{ ...txIn, index: txIn.index + 1 }],
   fee: 10n,
   inputs: [txInWithAddress],
   mint: mintTokenMap,
   outputs: [txOut],
+  requiredExtraSignatures: [Cardano.Ed25519KeyHash('6199186adb51974690d7247d2646097d2c62763b16fb7ed3f9f55d39')],
+  scriptIntegrityHash: Cardano.Hash32ByteBase16('6199186adb51974690d7247d2646097d2c62763b16fb7ed3f9f55d38abc123de'),
   validityInterval: {
     invalidBefore: 100,
     invalidHereafter: 1000

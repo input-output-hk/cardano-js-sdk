@@ -63,12 +63,17 @@ describe('coreToCsl', () => {
     expect(cslBody.withdrawals()?.get(cslBody.withdrawals()!.keys().get(0)!)?.to_str()).toBe(
       txBody.withdrawals![0].quantity.toString()
     );
+
     const mint = cslBody.multiassets()!;
     const scriptHashes = mint.keys();
     const mintAssets1 = mint.get(scriptHashes.get(0))!;
     const mintAssets2 = mint.get(scriptHashes.get(1))!;
     expect(mintAssets1.get(mintAssets1.keys().get(0))!.as_positive()!.to_str()).toBe('20');
     expect(mintAssets2.get(mintAssets2.keys().get(0))!.as_negative()!.to_str()).toBe('50');
+
+    expect(cslBody.collateral()!.len()).toBe(1);
+    expect(cslBody.required_signers()!.len()).toBe(1);
+    expect(cslBody.script_data_hash()).toBeTruthy();
   });
   it('tx', () => {
     const cslTx = coreToCsl.tx(tx);

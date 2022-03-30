@@ -43,7 +43,7 @@ export interface TxBodyAlonzo {
   withdrawals?: Withdrawal[];
   certificates?: Cardano.Certificate[];
   mint?: Cardano.TokenMap;
-  scriptIntegrityHash?: Cardano.Hash28ByteBase16;
+  scriptIntegrityHash?: Cardano.Hash32ByteBase16;
   requiredExtraSignatures?: Cardano.Ed25519KeyHash[];
 }
 

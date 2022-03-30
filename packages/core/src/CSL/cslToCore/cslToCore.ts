@@ -119,8 +119,7 @@ export const txMint = (assets?: CSL.Mint): Cardano.TokenMap | undefined => {
 };
 
 export const txBody = (body: CSL.TransactionBody): Cardano.TxBodyAlonzo => {
-  const { script_data_hash } = body;
-
+  const cslScriptDataHash = body.script_data_hash();
   const cslCollaterals = body.collateral();
 
   return {
@@ -132,7 +131,7 @@ export const txBody = (body: CSL.TransactionBody): Cardano.TxBodyAlonzo => {
     outputs: txOutputs(body.outputs()),
     requiredExtraSignatures: txRequiredExtraSignatures(body.required_signers()),
     scriptIntegrityHash:
-      script_data_hash && Cardano.util.Hash28ByteBase16(Buffer.from(script_data_hash()!.to_bytes()).toString()),
+      cslScriptDataHash && Cardano.util.Hash28ByteBase16(Buffer.from(cslScriptDataHash.to_bytes()).toString('hex')),
     validityInterval: {
       invalidBefore: body.validity_start_interval(),
       invalidHereafter: body.ttl()
