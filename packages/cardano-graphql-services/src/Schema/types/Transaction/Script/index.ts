@@ -1,1 +1,0 @@
-export { Script } from './Script';
