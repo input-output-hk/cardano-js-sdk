@@ -25,8 +25,8 @@ import {
   UnitInterval,
   VRFKeyHash
 } from '@emurgo/cardano-serialization-lib-nodejs';
-import { Cardano, NotImplementedError, SerializationError, SerializationFailure } from '..';
-import { CertificateType } from '../Cardano';
+import { Cardano, NotImplementedError, SerializationError, SerializationFailure } from '../..';
+import { CertificateType } from '../../Cardano';
 
 export const stakeAddressToCredential = (rewardAccount: Cardano.RewardAccount) => {
   try {

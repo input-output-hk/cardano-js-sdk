@@ -1,51 +1,8 @@
+/* eslint-disable sonarjs/no-duplicate-string */
 import { CSL, Cardano, SerializationError, coreToCsl, cslToCore } from '../../src';
+import { metadataJson, ownerRewardAccount, poolId, poolParameters, rewardAccount, stakeKey, vrf } from './testData';
 
 describe('certificates', () => {
-  let stakeKey: Cardano.RewardAccount;
-  let poolId: Cardano.PoolId;
-
-  beforeAll(async () => {
-    stakeKey = Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr');
-    poolId = Cardano.PoolId('pool1mpgg03jxj52qwxvvy7cmj58a96vl9pvxcqqvuw0kumheygxmn34');
-  });
-
-  describe('cslToCore.certificate', () => {
-    it('poolRegistration', () => {
-      const owner = Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr');
-      const vrf = Cardano.VrfVkHex('8dd154228946bd12967c12bedb1cb6038b78f8b84a1760b1a788fa72a4af3db0');
-      const rewardAccount = stakeKey;
-      const metadataJson = {
-        hash: Cardano.Hash32ByteBase16('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5'),
-        url: 'https://example.com'
-      };
-
-      const poolRegistrationCertificate = coreToCsl.certificate.poolRegistration({
-        cost: 1000n,
-        id: poolId,
-        margin: { denominator: 5, numerator: 1 },
-        metadataJson,
-        owners: [owner],
-        pledge: 10_000n,
-        relays: [
-          { __typename: 'RelayByName', hostname: 'example.com', port: 5000 },
-          {
-            __typename: 'RelayByAddress',
-            ipv4: '127.0.0.1',
-            port: 6000
-          },
-          { __typename: 'RelayByNameMultihost', dnsName: 'example.com' }
-        ],
-        rewardAccount,
-        vrf
-      });
-
-      const cslCertificates = new CSL.Certificates();
-      cslCertificates.add(poolRegistrationCertificate);
-
-      expect(cslToCore.txCertificates(cslCertificates)).not.toThrow();
-    });
-  });
-
   describe('coreToCsl.certificate', () => {
     it('throws SerializationError with invalid stake key', () => {
       expect(() => coreToCsl.certificate.stakeKeyRegistration(poolId as unknown as Cardano.RewardAccount)).toThrowError(
@@ -80,35 +37,7 @@ describe('certificates', () => {
     });
 
     it('poolRegistration', () => {
-      const owner = Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr');
-      const vrf = Cardano.VrfVkHex('8dd154228946bd12967c12bedb1cb6038b78f8b84a1760b1a788fa72a4af3db0');
-      const rewardAccount = stakeKey;
-      const metadataJson = {
-        hash: Cardano.Hash32ByteBase16('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5'),
-        url: 'https://example.com'
-      };
-      const params = coreToCsl.certificate
-        .poolRegistration({
-          cost: 1000n,
-          id: poolId,
-          margin: { denominator: 5, numerator: 1 },
-          metadataJson,
-          owners: [owner],
-          pledge: 10_000n,
-          relays: [
-            { __typename: 'RelayByName', hostname: 'example.com', port: 5000 },
-            {
-              __typename: 'RelayByAddress',
-              ipv4: '127.0.0.1',
-              port: 6000
-            },
-            { __typename: 'RelayByNameMultihost', dnsName: 'example.com' }
-          ],
-          rewardAccount,
-          vrf
-        })
-        .as_pool_registration()!
-        .pool_params();
+      const params = coreToCsl.certificate.poolRegistration(poolParameters).as_pool_registration()!.pool_params();
       expect(params.cost().to_str()).toBe('1000');
       expect(params.pledge().to_str()).toBe('10000');
       const margin = params.margin();
@@ -120,7 +49,7 @@ describe('certificates', () => {
         CSL.RewardAddress.new(1, CSL.StakeCredential.from_keyhash(owners.get(0)))
           .to_address()
           .to_bech32()
-      ).toBe(owner);
+      ).toBe(ownerRewardAccount);
       expect(params.operator().to_bech32('pool')).toBe(poolId);
       const relays = params.relays();
       expect(relays.len()).toBe(3);
@@ -135,6 +64,15 @@ describe('certificates', () => {
       const retirement = coreToCsl.certificate.poolRetirement(poolId, 1000).as_pool_retirement()!;
       expect(retirement.pool_keyhash().to_bech32('pool')).toEqual(poolId);
       expect(retirement.epoch()).toEqual(1000);
+    });
+  });
+
+  describe('cslToCore.certificate', () => {
+    it('poolRegistration', () => {
+      const cert = cslToCore.certificate.createCertificate(
+        coreToCsl.certificate.poolRegistration(poolParameters)
+      ) as Cardano.PoolRegistrationCertificate;
+      expect(cert.poolParameters).toEqual(poolParameters);
     });
   });
 });

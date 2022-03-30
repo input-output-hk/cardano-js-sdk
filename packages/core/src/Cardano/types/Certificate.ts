@@ -17,8 +17,7 @@ export interface StakeAddressCertificate {
 
 export interface PoolRegistrationCertificate {
   __typename: CertificateType.PoolRegistration;
-  poolId: PoolId;
-  epoch: Epoch;
+  epoch?: Epoch;
   poolParameters: PoolParameters;
 }
 

@@ -1,5 +1,5 @@
-import * as Asset from '../Asset';
-import * as Cardano from '../Cardano';
+import * as Asset from '../../Asset';
+import * as Cardano from '../../Cardano';
 import {
   Address,
   AssetName,
@@ -37,10 +37,9 @@ import {
 } from '@emurgo/cardano-serialization-lib-nodejs';
 
 import * as certificate from './certificate';
-import { SerializationError } from '../errors';
-import { SerializationFailure } from '..';
-import { parseCslAddress } from './parseCslAddress';
-export * as certificate from './certificate';
+import { SerializationError } from '../../errors';
+import { SerializationFailure } from '../..';
+import { parseCslAddress } from '../parseCslAddress';
 
 export const tokenMap = (assets: Cardano.TokenMap) => {
   const multiasset = MultiAsset.new();

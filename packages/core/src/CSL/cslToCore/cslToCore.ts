@@ -1,6 +1,8 @@
-import { Asset, CSL, Cardano, SerializationFailure, util } from '..';
+import { Asset, CSL, Cardano, SerializationFailure, util } from '../..';
 import { BootstrapWitness } from '@cardano-ogmios/schema';
-import { SerializationError } from '../errors';
+import { SerializationError } from '../../errors';
+import { createCertificate } from './certificate';
+
 export const txRequiredExtraSignatures = (
   signatures: CSL.Ed25519KeyHashes | undefined
 ): Cardano.Ed25519KeyHash[] | undefined => {
@@ -83,186 +85,59 @@ export const txInputs = (inputs: CSL.TransactionInputs, address?: Cardano.Addres
   return result;
 };
 
-const stakeRegistration = (certificate: CSL.StakeRegistration): Cardano.StakeAddressCertificate => ({
-  __typename: Cardano.CertificateType.StakeKeyRegistration,
-  rewardAccount: Cardano.RewardAccount(Buffer.from(certificate.to_bytes()).toString())
-});
-
-const stakeDeregistration = (certificate: CSL.StakeDeregistration): Cardano.StakeAddressCertificate => ({
-  __typename: Cardano.CertificateType.StakeKeyDeregistration,
-  rewardAccount: Cardano.RewardAccount(Buffer.from(certificate.to_bytes()).toString())
-});
-
-const stakeDelegation = (certificate: CSL.StakeDelegation): Cardano.StakeDelegationCertificate => ({
-  __typename: Cardano.CertificateType.StakeDelegation,
-  poolId: Cardano.PoolId(certificate.pool_keyhash().toString()), // TODO: is this correct??
-  rewardAccount: Cardano.RewardAccount(Buffer.from(certificate.to_bytes()).toString())
-});
-
-const createCardanoRelays = (relays: CSL.Relays): Cardano.Relay[] => {
-  const result: Cardano.Relay[] = [];
-  for (let i = 0; i < relays.len(); i++) {
-    const relay = relays.get(i);
-    const relayByAddress = relay.as_single_host_addr();
-    const relayByName = relay.as_single_host_name();
-    const relayByNameMultihost = relay.as_multi_host_name();
-
-    if (relayByAddress) {
-      // RelayByAddress
-      result.push({
-        __typename: 'RelayByAddress',
-        ipv4: relayByAddress.ipv4()?.ip().toString(),
-        ipv6: relayByAddress.ipv6()?.ip().toString(),
-        port: relayByAddress.port()
-      });
-    }
-    if (relayByName) {
-      // RelayByName
-      result.push({
-        __typename: 'RelayByName',
-        hostname: relayByName.dns_name().record(),
-        port: relayByName.port()
-      });
-    }
-    if (relayByNameMultihost) {
-      // RelayByNameMultihost
-      result.push({
-        __typename: 'RelayByNameMultihost',
-        dnsName: relayByNameMultihost.dns_name().record()
-      });
-    }
-  }
-  return result;
-};
-
-const createCardanoOwners = (owners: CSL.Ed25519KeyHashes): Cardano.RewardAccount[] => {
-  const result: Cardano.RewardAccount[] = [];
-  for (let i = 0; i < owners.len(); i++) {
-    const owner = owners.get(i);
-    result.push(Cardano.RewardAccount(Buffer.from(owner.to_bytes()).toString()));
-  }
-  return result;
-};
-
-const jsonMetadata = (poolMetadata?: CSL.PoolMetadata): Cardano.PoolMetadataJson | undefined => {
-  if (!poolMetadata) return;
-  return {
-    hash: Cardano.util.Hash32ByteBase16(poolMetadata.pool_metadata_hash().to_bytes().toString()),
-    url: poolMetadata.url().url()
-  };
-};
-
-const poolRegistration = (certificate: CSL.PoolRegistration): Cardano.PoolRegistrationCertificate => {
-  const { reward_account, pledge, cost, margin, operator, pool_metadata, pool_owners, relays, vrf_keyhash } =
-    certificate.pool_params();
-
-  return {
-    __typename: Cardano.CertificateType.PoolRegistration,
-    epoch: null,
-    poolId: Cardano.PoolId(Buffer.from(operator().to_bytes()).toString()), // TODO: make optional
-    poolParameters: {
-      cost: BigInt(cost.toString()),
-      id: Cardano.PoolId(Buffer.from(operator().to_bytes()).toString()),
-      margin: {
-        denominator: Number(margin().denominator().to_str()),
-        numerator: Number(margin().numerator().to_str())
-      },
-      metadataJson: jsonMetadata(pool_metadata()),
-      owners: createCardanoOwners(pool_owners()),
-      pledge: BigInt(pledge.toString()),
-      relays: createCardanoRelays(relays()),
-      rewardAccount: Cardano.RewardAccount(reward_account().to_address().to_bech32()),
-      vrf: Cardano.VrfVkHex(Buffer.from(vrf_keyhash().to_bytes()).toString())
-    }
-  } as unknown as Cardano.PoolRegistrationCertificate; // TODO: this is because epoch not provided
-};
-
-const poolRetirement = (certificate: CSL.PoolRetirement): Cardano.PoolRetirementCertificate => ({
-  __typename: Cardano.CertificateType.PoolRetirement,
-  epoch: certificate.epoch(),
-  poolId: Cardano.PoolId(certificate.pool_keyhash().toString())
-});
-
-const genesisKeyDelegaation = (certificate: CSL.GenesisKeyDelegation): Cardano.GenesisKeyDelegationCertificate => ({
-  __typename: Cardano.CertificateType.GenesisKeyDelegation,
-  genesisDelegateHash: Cardano.util.Hash32ByteBase16(
-    Buffer.from(certificate.genesis_delegate_hash().to_bytes()).toString()
-  ),
-  genesisHash: Cardano.util.Hash32ByteBase16(Buffer.from(certificate.genesishash().to_bytes()).toString()),
-  vrfKeyHash: Cardano.util.Hash32ByteBase16(Buffer.from(certificate.vrf_keyhash().to_bytes()).toString())
-});
-
 export const txCertificates = (certificates?: CSL.Certificates): Cardano.Certificate[] | undefined => {
   if (!certificates) return;
   const result: Cardano.Certificate[] = [];
   for (let i = 0; i < certificates.len(); i++) {
     const cslCertificate = certificates.get(i);
-    const certificateKind = CSL.CertificateKind[cslCertificate.kind()];
-
-    switch (certificateKind) {
-      case CSL.CertificateKind.StakeRegistration.toString():
-        result.push(stakeRegistration(cslCertificate.as_stake_registration()!));
-        break;
-      case CSL.CertificateKind.StakeDeregistration.toString():
-        result.push(stakeDeregistration(cslCertificate.as_stake_deregistration()!));
-        break;
-      case CSL.CertificateKind.StakeDelegation.toString():
-        result.push(stakeDelegation(cslCertificate.as_stake_delegation()!));
-        break;
-      case CSL.CertificateKind.PoolRegistration.toString():
-        result.push(poolRegistration(cslCertificate.as_pool_registration()!));
-        break;
-      case CSL.CertificateKind.PoolRetirement.toString():
-        result.push(poolRetirement(cslCertificate.as_pool_retirement()!));
-        break;
-      case CSL.CertificateKind.GenesisKeyDelegation.toString():
-        result.push(genesisKeyDelegaation(cslCertificate.as_genesis_key_delegation()!));
-        break;
-      case CSL.CertificateKind.MoveInstantaneousRewardsCert.toString():
-        throw new Error('not yet implemented'); // TODO: support this certificate type
-      default:
-        throw new SerializationError(SerializationFailure.InvalidType);
-    }
+    result.push(createCertificate(cslCertificate));
   }
   return result;
 };
 
-export const txTokenMap = (assets?: CSL.Mint): Cardano.TokenMap | undefined => {
+export const txMint = (assets?: CSL.Mint): Cardano.TokenMap | undefined => {
   if (!assets) return;
   const assetMap: Cardano.TokenMap = new Map();
   const keys = assets.keys();
   for (let i = 0; i < keys.len(); i++) {
-    const mintAssets = assets.get(keys.get(i));
+    const scriptHash = keys.get(i);
+    const mintAssets = assets.get(scriptHash);
     if (!mintAssets) continue;
     const mintKeys = mintAssets.keys();
     for (let k = 0; k < mintKeys.len(); k++) {
       const assetName = mintKeys.get(k);
-      const assetValue = mintAssets.get(assetName);
-      const assetId = Cardano.AssetId(assetName.toString());
-      if (!assetValue) continue;
-      assetMap.set(assetId, BigInt(assetValue.toString()));
+      const assetValueInt = mintAssets.get(assetName);
+      const assetId = Asset.util.createAssetId(scriptHash, assetName);
+      if (!assetValueInt) continue;
+      const quantity = assetValueInt.is_positive()
+        ? BigInt(assetValueInt.as_positive()!.to_str())
+        : BigInt(assetValueInt.as_negative()!.to_str()) * -1n;
+      assetMap.set(assetId, quantity);
     }
   }
   return assetMap;
 };
 
-export const txBody = (body: () => CSL.TransactionBody): Cardano.TxBodyAlonzo => {
-  const { script_data_hash } = body();
+export const txBody = (body: CSL.TransactionBody): Cardano.TxBodyAlonzo => {
+  const { script_data_hash } = body;
 
-  const cslCollaterals = body().collateral();
+  const cslCollaterals = body.collateral();
 
   return {
-    certificates: txCertificates(body().certs()),
+    certificates: txCertificates(body.certs()),
     collaterals: cslCollaterals && txInputs(cslCollaterals),
-    fee: BigInt(body().fee().to_str()),
-    inputs: txInputs(body().inputs()),
-    mint: txTokenMap(body().multiassets()),
-    outputs: txOutputs(body().outputs()),
-    requiredExtraSignatures: txRequiredExtraSignatures(body().required_signers()),
+    fee: BigInt(body.fee().to_str()),
+    inputs: txInputs(body.inputs()),
+    mint: txMint(body.multiassets()),
+    outputs: txOutputs(body.outputs()),
+    requiredExtraSignatures: txRequiredExtraSignatures(body.required_signers()),
     scriptIntegrityHash:
       script_data_hash && Cardano.util.Hash28ByteBase16(Buffer.from(script_data_hash()!.to_bytes()).toString()),
-    validityInterval: body().validity_start_interval,
-    withdrawals: txWithdrawals(body().withdrawals())
+    validityInterval: {
+      invalidBefore: body.validity_start_interval(),
+      invalidHereafter: body.ttl()
+    },
+    withdrawals: txWithdrawals(body.withdrawals())
   };
 };
 
@@ -389,17 +264,17 @@ export const txAuxiliaryData = (auxiliaryData?: CSL.AuxiliaryData): Cardano.Auxi
   };
 };
 
-export const newTx = (_input: CSL.Transaction): Cardano.NewTxAlonzo => {
+export const newTx = (cslTx: CSL.Transaction): Cardano.NewTxAlonzo => {
   const transactionHash = Cardano.TransactionId.fromHexBlob(
-    util.bytesToHex(CSL.hash_transaction(_input.body()).to_bytes())
+    util.bytesToHex(CSL.hash_transaction(cslTx.body()).to_bytes())
   );
-  const auxiliary_data = _input.auxiliary_data();
+  const auxiliary_data = cslTx.auxiliary_data();
 
-  const witnessSet = _input.witness_set();
+  const witnessSet = cslTx.witness_set();
 
   return {
     auxiliaryData: txAuxiliaryData(auxiliary_data),
-    body: txBody(_input.body),
+    body: txBody(cslTx.body()),
     id: transactionHash,
     witness: txWitnessSet(witnessSet)
   };
