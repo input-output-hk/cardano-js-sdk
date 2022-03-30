@@ -23,7 +23,7 @@ export const txWithdrawals = (withdrawals?: CSL.Withdrawals): Cardano.Withdrawal
   for (let i = 0; i < keys.len(); i++) {
     const key = keys.get(i);
     const value = withdrawals.get(key);
-    const rewardAccount = Cardano.RewardAccount(key.to_address().toString());
+    const rewardAccount = Cardano.RewardAccount(key.to_address().to_bech32());
     result.push({ quantity: BigInt(value!.to_str()), stakeAddress: rewardAccount });
   }
   return result;
@@ -131,7 +131,7 @@ export const txBody = (body: CSL.TransactionBody): Cardano.TxBodyAlonzo => {
     outputs: txOutputs(body.outputs()),
     requiredExtraSignatures: txRequiredExtraSignatures(body.required_signers()),
     scriptIntegrityHash:
-      cslScriptDataHash && Cardano.util.Hash28ByteBase16(Buffer.from(cslScriptDataHash.to_bytes()).toString('hex')),
+      cslScriptDataHash && Cardano.util.Hash32ByteBase16(Buffer.from(cslScriptDataHash.to_bytes()).toString('hex')),
     validityInterval: {
       invalidBefore: body.validity_start_interval(),
       invalidHereafter: body.ttl()
@@ -190,8 +190,8 @@ export const txWitnessSet = (witnessSet: CSL.TransactionWitnessSet): Cardano.Wit
     for (let i = 0; i < vkeys!.len(); i++) {
       const witness = vkeys.get(i);
       txSignatures.set(
-        Cardano.Ed25519PublicKey(witness.vkey().public_key().to_bech32()),
-        Cardano.Ed25519Signature(witness.signature().to_bech32())
+        Cardano.Ed25519PublicKey(Buffer.from(witness.vkey().public_key().as_bytes()).toString('hex')),
+        Cardano.Ed25519Signature(witness.signature().to_hex())
       );
     }
   }

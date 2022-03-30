@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 import { Asset, CSL, Cardano, SerializationFailure, coreToCsl } from '../../src';
 import { BigNum } from '@emurgo/cardano-serialization-lib-nodejs';
-import { signature, tx, txBody, txInWithAddress, txOut, valueCoinOnly, valueWithAssets, vkey } from './testData';
+import { signature, tx, txBody, txIn, txOut, valueCoinOnly, valueWithAssets, vkey } from './testData';
 
 const txOutByron = {
   ...txOut,
@@ -12,14 +12,14 @@ const txOutByron = {
 
 describe('coreToCsl', () => {
   it('txIn', () => {
-    expect(coreToCsl.txIn(txInWithAddress)).toBeInstanceOf(CSL.TransactionInput);
+    expect(coreToCsl.txIn(txIn)).toBeInstanceOf(CSL.TransactionInput);
   });
   it('txOut', () => {
     expect(coreToCsl.txOut(txOut)).toBeInstanceOf(CSL.TransactionOutput);
     expect(coreToCsl.txOut(txOutByron)).toBeInstanceOf(CSL.TransactionOutput);
   });
   it('utxo', () => {
-    expect(coreToCsl.utxo([[txInWithAddress, txOut]])[0]).toBeInstanceOf(CSL.TransactionUnspentOutput);
+    expect(coreToCsl.utxo([[txIn, txOut]])[0]).toBeInstanceOf(CSL.TransactionUnspentOutput);
   });
   describe('value', () => {
     it('coin only', () => {

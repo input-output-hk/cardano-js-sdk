@@ -33,11 +33,11 @@ describe('cslToCore', () => {
 
   it.todo('txAuxiliaryData');
 
-  test.skip('txBody', () => {
+  it('txBody', () => {
     expect(cslToCore.txBody(coreToCsl.txBody(txBody))).toEqual(txBody);
   });
 
-  test.skip('newTx', () => {
+  it('newTx', () => {
     expect(cslToCore.newTx(coreToCsl.tx(tx))).toEqual(tx);
   });
 

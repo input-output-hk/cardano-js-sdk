@@ -73,7 +73,7 @@ export const txBody: Cardano.TxBodyAlonzo = {
   ],
   collaterals: [{ ...txIn, index: txIn.index + 1 }],
   fee: 10n,
-  inputs: [txInWithAddress],
+  inputs: [txIn],
   mint: mintTokenMap,
   outputs: [txOut],
   requiredExtraSignatures: [Cardano.Ed25519KeyHash('6199186adb51974690d7247d2646097d2c62763b16fb7ed3f9f55d39')],
@@ -96,7 +96,7 @@ export const signature =
   'bdea87fca1b4b4df8a9b8fb4183c0fab2f8261eb6c5e4bc42c800bb9c8918755bdea87fca1b4b4df8a9b8fb4183c0fab2f8261eb6c5e4bc42c800bb9c8918755';
 export const tx: Cardano.NewTxAlonzo = {
   body: txBody,
-  id: Cardano.TransactionId('886206542d63b23a047864021fbfccf291d78e47c1e59bd4c75fbc67b248c5e8'),
+  id: Cardano.TransactionId('9fb01a725d69fcc196e2ed75ede19537cf2f0294493742f9a53baff79d2d7db5'),
   witness: {
     signatures: new Map([[Cardano.Ed25519PublicKey(vkey), Cardano.Ed25519Signature(signature)]])
   }
