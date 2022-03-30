@@ -44,6 +44,8 @@ const env = envalid.cleanEnv(process.env, {
   WALLET_PROVIDER: envalid.str({ choices: walletProviderOptions })
 });
 const isTestnet = env.NETWORK_ID === 0;
+const networkId = Number.parseInt(process.env.NETWORK_ID || '');
+if (Number.isNaN(networkId)) throw new Error('NETWORK_ID not set');
 
 const logger = createLogger({
   level: env.LOGGER_MIN_SEVERITY as LogLevel,
@@ -111,12 +113,20 @@ export const txSubmitProvider = (async () => {
   }
 })();
 
-export const keyAgentReady = (() =>
-  InMemoryKeyAgent.fromBip39MnemonicWords({
-    getPassword: async () => Buffer.from(env.WALLET_PASSWORD),
-    mnemonicWords: env.MNEMONIC_WORDS,
-    networkId: env.NETWORK_ID
-  }))();
+export const keyAgentByIdx = (accountIndex: number) => {
+  const mnemonicWords = (process.env.MNEMONIC_WORDS || '').split(' ');
+  if (mnemonicWords.length === 0) throw new Error('MNEMONIC_WORDS not set');
+  const password = process.env.WALLET_PASSWORD;
+  if (!password) throw new Error('WALLET_PASSWORD not set');
+  return InMemoryKeyAgent.fromBip39MnemonicWords({
+    accountIndex,
+    getPassword: async () => Buffer.from(password),
+    mnemonicWords,
+    networkId
+  });
+};
+
+export const keyAgentReady = (() => keyAgentByIdx(0))();
 
 export const stakePoolSearchProvider = (() => {
   if (env.STAKE_POOL_SEARCH_PROVIDER === 'stub') {

@@ -4,7 +4,7 @@ import { TX_TIMEOUT, firstValueFromTimed, waitForWalletStateSettle } from '../..
 import { TxInternals } from '../../../src/Transaction';
 import {
   assetProvider,
-  keyAgentReady,
+  keyAgentByIdx,
   poolId1,
   poolId2,
   stakePoolSearchProvider,
@@ -13,10 +13,6 @@ import {
   walletProvider
 } from '../config';
 import { combineLatest, filter, firstValueFrom } from 'rxjs';
-
-const faucetAddress = Cardano.Address(
-  'addr_test1qqr585tvlc7ylnqvz8pyqwauzrdu0mxag3m7q56grgmgu7sxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flknswgndm3'
-);
 
 const getWalletStateSnapshot = (wallet: Wallet) => {
   const [rewardAccount] = wallet.delegation.rewardAccounts$.value!;
@@ -61,36 +57,66 @@ const waitForTx = async (wallet: Wallet, { hash }: TxInternals) => {
   await waitForWalletStateSettle(wallet);
 };
 
-describe('SingleAddressWallet/delegation', () => {
-  let rewardAccount: Cardano.RewardAccount;
+const getWallet = async (idx: number) =>
+  new SingleAddressWallet(
+    { name: `Test Wallet ${idx}` },
+    {
+      assetProvider: await assetProvider,
+      keyAgent: await keyAgentByIdx(idx),
+      stakePoolSearchProvider,
+      timeSettingsProvider,
+      txSubmitProvider: await txSubmitProvider,
+      walletProvider: await walletProvider
+    }
+  );
+
+describe('SingleAddressWallet', () => {
   let wallet: Wallet;
 
   beforeAll(async () => {
-    wallet = new SingleAddressWallet(
-      { name: 'Test Wallet' },
-      {
-        assetProvider: await assetProvider,
-        keyAgent: await keyAgentReady,
-        stakePoolSearchProvider,
-        timeSettingsProvider,
-        txSubmitProvider: await txSubmitProvider,
-        walletProvider: await walletProvider
-      }
-    );
+    wallet = await getWallet(0);
     await waitForWalletStateSettle(wallet);
-    [{ rewardAccount }] = await firstValueFrom(wallet.addresses$);
   });
 
-  afterAll(() => wallet.shutdown());
+  afterAll(() => {
+    wallet.shutdown();
+  });
 
   it('has an address', async () => {
     expect(wallet.addresses$.value![0].address.startsWith('addr')).toBe(true);
   });
+});
+
+describe('SingleAddressWallet/delegation', () => {
+  let wallet1: Wallet;
+  let wallet2: Wallet;
+
+  beforeAll(async () => {
+    jest.setTimeout(180_000);
+    wallet1 = await getWallet(0);
+    wallet2 = await getWallet(1);
+    await Promise.all([waitForWalletStateSettle(wallet1), waitForWalletStateSettle(wallet2)]);
+  });
+
+  afterAll(() => {
+    wallet1.shutdown();
+    wallet2.shutdown();
+  });
+
+  const chooseWallets = async (): Promise<[Wallet, Wallet]> => {
+    const wallet1Balance = await firstValueFrom(wallet1.balance.available$);
+    const wallet2Balance = await firstValueFrom(wallet2.balance.available$);
+    return wallet1Balance.coins > wallet2Balance.coins ? [wallet1, wallet2] : [wallet2, wallet1];
+  };
 
   // eslint-disable-next-line max-statements
   test('balance & transaction', async () => {
-    const stakeKeyDeposit = BigInt(wallet.protocolParameters$.value!.stakeKeyDeposit);
-    const initialState = getWalletStateSnapshot(wallet);
+    // source wallet has the highest balance to begin with
+    const [sourceWallet, destWallet] = await chooseWallets();
+    const [{ rewardAccount }] = await firstValueFrom(sourceWallet.addresses$);
+
+    const stakeKeyDeposit = BigInt(sourceWallet.protocolParameters$.value!.stakeKeyDeposit);
+    const initialState = getWalletStateSnapshot(sourceWallet);
     expect(initialState.balance.total.coins).toBeGreaterThan(0n);
     expect(initialState.balance.total.coins).toBe(initialState.balance.available.coins);
     const tx1OutputCoins = 1_000_000n;
@@ -100,20 +126,21 @@ describe('SingleAddressWallet/delegation', () => {
     expect(initialState.balance.available.deposit).toBe(initialDeposit);
 
     // Make a 1st tx with key registration (if not already registered) and stake delegation
-    // Also send some coin to faucet
-    const tx1Internals = await wallet.initializeTx({
+    // Also send some coin to another wallet
+    const destAddresses = (await firstValueFrom(destWallet.addresses$))[0].address;
+    const tx1Internals = await sourceWallet.initializeTx({
       certificates,
-      outputs: new Set([{ address: faucetAddress, value: { coins: tx1OutputCoins } }])
+      outputs: new Set([{ address: destAddresses, value: { coins: tx1OutputCoins } }])
     });
-    await wallet.submitTx(await wallet.finalizeTx(tx1Internals));
+    await sourceWallet.submitTx(await sourceWallet.finalizeTx(tx1Internals));
 
     // Test it locks available balance after tx is submitted
     await firstValueFromTimed(
-      wallet.transactions.outgoing.inFlight$.pipe(filter((inFlight) => inFlight.length === 1)),
+      sourceWallet.transactions.outgoing.inFlight$.pipe(filter((inFlight) => inFlight.length === 1)),
       'No tx in flight'
     );
 
-    const tx1PendingState = getWalletStateSnapshot(wallet);
+    const tx1PendingState = getWalletStateSnapshot(sourceWallet);
     expect(tx1PendingState.balance.total).toEqual(initialState.balance.total);
     const expectedCoinsWhileTxPending =
       initialState.balance.total.coins -
@@ -125,8 +152,8 @@ describe('SingleAddressWallet/delegation', () => {
     // TODO: this sometimes fails with 1_000_000n available which is probably just 1 utxo
     expect(tx1PendingState.balance.available.coins).toBe(expectedCoinsWhileTxPending);
 
-    await waitForTx(wallet, tx1Internals);
-    const tx1ConfirmedState = getWalletStateSnapshot(wallet);
+    await waitForTx(sourceWallet, tx1Internals);
+    const tx1ConfirmedState = getWalletStateSnapshot(sourceWallet);
 
     // Updates total and available balance after tx is confirmed
     const expectedCoinsAfterTx1 =
@@ -147,12 +174,12 @@ describe('SingleAddressWallet/delegation', () => {
     );
 
     // Make a 2nd tx with key deregistration
-    const tx2Internals = await wallet.initializeTx({
+    const tx2Internals = await sourceWallet.initializeTx({
       certificates: [{ __typename: Cardano.CertificateType.StakeKeyDeregistration, rewardAccount }]
     });
-    await wallet.submitTx(await wallet.finalizeTx(tx2Internals));
-    await waitForTx(wallet, tx2Internals);
-    const tx2ConfirmedState = getWalletStateSnapshot(wallet);
+    await sourceWallet.submitTx(await sourceWallet.finalizeTx(tx2Internals));
+    await waitForTx(sourceWallet, tx2Internals);
+    const tx2ConfirmedState = getWalletStateSnapshot(sourceWallet);
 
     // No longer delegating
     expect(tx2ConfirmedState.rewardAccount.delegatee?.nextNextEpoch?.id).toBeUndefined();
