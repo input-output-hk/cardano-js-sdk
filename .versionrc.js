@@ -12,10 +12,6 @@ const packageMap = [
     type: 'json'
   },
   {
-    filename: 'packages/cardano-graphql-db-sync/package.json',
-    type: 'json'
-  },
-  {
     filename: 'packages/cip2/package.json',
     type: 'json'
   },
