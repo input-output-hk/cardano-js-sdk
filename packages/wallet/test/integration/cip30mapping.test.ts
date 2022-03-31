@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { CSL, Cardano, coreToCsl } from '@cardano-sdk/core';
-import { InitializeTxProps, SingleAddressWallet, cip30 } from '../../src';
-import { WalletApi, createUiWallet } from '@cardano-sdk/cip30';
+import { InitializeTxProps, KeyManagement, SingleAddressWallet, cip30 } from '../../src';
+import { TxSignError, WalletApi, createUiWallet } from '@cardano-sdk/cip30';
 import { createWallet } from './util';
 import { firstValueFrom } from 'rxjs';
 import { networkId } from '../mocks';
@@ -9,7 +9,18 @@ import { waitForWalletStateSettle } from '../util';
 
 describe('cip30', () => {
   let wallet: SingleAddressWallet;
-  let mappedWallet: WalletApi;
+
+  const simpleTxProps: InitializeTxProps = {
+    outputs: new Set([
+      {
+        address: Cardano.Address(
+          // eslint-disable-next-line max-len
+          'addr_test1qpu5vlrf4xkxv2qpwngf6cjhtw542ayty80v8dyr49rf5ewvxwdrt70qlcpeeagscasafhffqsxy36t90ldv06wqrk2qum8x5w'
+        ),
+        value: { coins: 1_111_111n }
+      }
+    ])
+  };
 
   beforeAll(async () => {
     // CREATE A WALLET
@@ -21,17 +32,7 @@ describe('cip30', () => {
   });
 
   describe('createWalletApi', () => {
-    const simpleTxProps: InitializeTxProps = {
-      outputs: new Set([
-        {
-          address: Cardano.Address(
-            // eslint-disable-next-line max-len
-            'addr_test1qpu5vlrf4xkxv2qpwngf6cjhtw542ayty80v8dyr49rf5ewvxwdrt70qlcpeeagscasafhffqsxy36t90ldv06wqrk2qum8x5w'
-          ),
-          value: { coins: 1_111_111n }
-        }
-      ])
-    };
+    let mappedWallet: WalletApi;
 
     beforeAll(async () => {
       mappedWallet = cip30.createWalletApi(wallet);
@@ -122,6 +123,16 @@ describe('cip30', () => {
       const uiWallet = createUiWallet();
       const utxos = await uiWallet.getUtxos();
       expect(() => coreToCsl.utxo(utxos!)).not.toThrow();
+    });
+
+    it('rejects on error', async () => {
+      const txInternals = await wallet.initializeTx(simpleTxProps);
+      const finalizedTx = await wallet.finalizeTx(txInternals);
+      const hexTxBody = Buffer.from(coreToCsl.tx(finalizedTx).body().to_bytes()).toString('hex');
+
+      wallet.keyAgent.signTransaction = jest.fn().mockRejectedValueOnce(new KeyManagement.errors.AuthenticationError());
+      const uiWallet = createUiWallet();
+      await expect(() => uiWallet.signTx(hexTxBody)).rejects.toThrowError(TxSignError);
     });
   });
 });
