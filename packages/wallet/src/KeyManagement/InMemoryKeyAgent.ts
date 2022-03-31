@@ -11,6 +11,8 @@ import { CSL, Cardano, util } from '@cardano-sdk/core';
 import { KeyAgentBase } from './KeyAgentBase';
 import { deriveAccountPrivateKey, joinMnemonicWords, mnemonicWordsToEntropy, validateMnemonic } from './util';
 import { emip3decrypt, emip3encrypt } from './emip3';
+import { ownSignatureKeyPaths } from './util';
+import { TxInternals } from '../Transaction';
 
 export interface InMemoryKeyAgentProps extends Omit<SerializableInMemoryKeyAgentData, '__typename'> {
   getPassword: GetPassword;
@@ -86,6 +88,20 @@ export class InMemoryKeyAgent extends KeyAgentBase {
       knownAddresses: [],
       networkId
     });
+  }
+
+  async signTransaction({ body, hash }: TxInternals): Promise<Cardano.Signatures> {
+    // Possible optimization is casting strings to OpaqueString types directly and skipping validation
+    const blob = Cardano.util.HexBlob(hash.toString());
+    const derivationPaths = ownSignatureKeyPaths(body, this.knownAddresses);
+    return new Map<Cardano.Ed25519PublicKey, Cardano.Ed25519Signature>(
+      await Promise.all(
+        derivationPaths.map(async ({ role, index }) => {
+          const { publicKey, signature } = await this.signBlob({ index, type: role }, blob);
+          return [publicKey, signature] as const;
+        })
+      )
+    );
   }
 
   async #decryptRootPrivateKey(noCache?: true) {

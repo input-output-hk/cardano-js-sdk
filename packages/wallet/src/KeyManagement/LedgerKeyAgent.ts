@@ -1,18 +1,25 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AuthenticationError, TransportError } from './errors';
-import { Cardano, NotImplementedError } from '@cardano-sdk/core';
+import { Cardano, NotImplementedError, CSL, coreToCsl } from '@cardano-sdk/core';
 import {
   CommunicationType,
   KeyAgentType,
   SerializableLedgerKeyAgentData,
   SignBlobResult,
-  TransportType
+  TransportType,
+  KeyType,
 } from './types';
 import { KeyAgentBase } from './KeyAgentBase';
-import DeviceConnection, { GetVersionResponse, utils } from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import DeviceConnection, {
+  GetVersionResponse,
+  utils,
+  HARDENED,
+} from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents';
 import TransportWebHID from '@ledgerhq/hw-transport-webhid';
 import type Transport from '@ledgerhq/hw-transport';
+import { txToLedger, STAKE_KEY_DERIVATION_PATH } from './util';
+import { TxInternals } from '../Transaction'
 
 export interface LedgerKeyAgentProps extends Omit<SerializableLedgerKeyAgentData, '__typename'> {
   deviceConnection?: DeviceConnection;
@@ -162,6 +169,66 @@ export class LedgerKeyAgent extends KeyAgentBase {
       knownAddresses: [],
       networkId
     });
+  }
+
+  async signTransaction(txInternals: TxInternals): Promise<Cardano.Signatures> {
+    try {
+      const cslTxBody = coreToCsl.txBody(txInternals.body);
+      const cslWitnessSet = CSL.TransactionWitnessSet.new();
+      const cslTransaction = CSL.Transaction.new(cslTxBody, cslWitnessSet);
+
+      const stakeKeyHash = await this.derivePublicKey(STAKE_KEY_DERIVATION_PATH);
+      const paymentKeyHash = await this.derivePublicKey({
+        index: this.serializableData.accountIndex,
+        type: KeyType.Internal,
+      });
+      const keys = {
+        payment: {
+          hash: paymentKeyHash,
+          path: [HARDENED + 1852, HARDENED + 1815, HARDENED + this.serializableData.accountIndex, KeyType.Internal, 0],
+        },
+        stake: {
+          hash: stakeKeyHash,
+          path: [HARDENED + 1852, HARDENED + 1815, HARDENED + this.serializableData.accountIndex, KeyType.Stake, 0],
+        },
+      };
+
+      const accountAddress = this.knownAddresses[0].address;
+      const addrHex = utils.buf_to_hex(utils.bech32_decodeAddress(accountAddress.toString()))
+
+      const ledgerTxData = await txToLedger({
+        tx: cslTransaction,
+        networkId: this.serializableData.networkId,
+        keys,
+        addressHex: addrHex,
+        index: this.serializableData.accountIndex,
+      });
+
+      // @ts-ignore
+      const deviceConnection = await LedgerKeyAgent.checkDeviceConnection(this.serializableData.communicationType, this.deviceConnection);
+      const result = await deviceConnection.signTransaction(ledgerTxData);
+
+      return new Map<Cardano.Ed25519PublicKey, Cardano.Ed25519Signature>(
+        await Promise.all(
+          result.witnesses.map(async (witness) => {
+            const publicKey = await this.derivePublicKey({
+              index: HARDENED - witness.path[2],
+              type: witness.path[3],
+            });
+            const signature = Cardano.Ed25519Signature(
+              witness.witnessSignatureHex
+            );
+            return [publicKey, signature] as const;
+          })
+        )
+      );
+    } catch (error: any) {
+      // eslint-disable-next-line unicorn/numeric-separators-style
+      if (error.code === 28169) {
+        throw new AuthenticationError('Transaction signing aborted', error);
+      }
+      throw new TransportError('Transport failed', error);
+    }
   }
 
   async signBlob(): Promise<SignBlobResult> {
