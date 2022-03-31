@@ -1,0 +1,47 @@
+{
+  "name": "@cardano-sdk/cardano-services-client",
+  "version": "0.2.0",
+  "description": "Cardano Services Client",
+  "engines": {
+    "node": "^14"
+  },
+  "main": "dist/index.js",
+  "repository": "https://github.com/input-output-hk/cardano-js-sdk/packages/cardano-services-client",
+  "contributors": [
+    "Rhys Bartels-Waller <rhys.bartelswaller@iohk.io> (https://iohk.io)",
+    "Martynas Kazlauskas <martynas.kazlauskas@iohk.io> (https://iohk.io)"
+  ],
+  "license": "MPL-2.0",
+  "scripts": {
+    "build": "tsc --build ./src",
+    "generate": "graphql-codegen",
+    "tscNoEmit": "shx echo typescript --noEmit command not implemented yet",
+    "cleanup": "shx rm -rf dist node_modules",
+    "lint": "eslint --ignore-path ../../.eslintignore \"**/*.ts\"",
+    "lint:fix": "eslint --fix --ignore-path ../../.eslintignore \"**/*.ts\"",
+    "test": "jest -c ./jest.config.js",
+    "test:e2e": "shx echo 'test:e2e' command not implemented yet",
+    "coverage": "yarn test --coverage",
+    "prepack": "yarn build",
+    "test:debug": "DEBUG=true yarn test"
+  },
+  "devDependencies": {
+    "@cardano-sdk/cardano-services-client": "0.2.0",
+    "@types/validator": "^13.7.1",
+    "shx": "^0.3.3"
+  },
+  "dependencies": {
+    "@cardano-ogmios/client": "~5.1.0",
+    "@cardano-sdk/core": "0.2.0",
+    "class-validator": "^0.13.1",
+    "got": "^11",
+    "json-bigint": "~1.0.0",
+    "serialize-error": "^8"
+  },
+  "files": [
+    "dist/*",
+    "!dist/tsconfig.tsbuildinfo",
+    "LICENSE",
+    "NOTICE"
+  ]
+}

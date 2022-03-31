@@ -8,11 +8,11 @@ const packageMap = [
     type: 'json'
   },
   {
-    filename: 'packages/cardano-graphql/package.json',
+    filename: 'packages/cardano-services/package.json',
     type: 'json'
   },
   {
-    filename: 'packages/cardano-graphql-db-sync/package.json',
+    filename: 'packages/cardano-services-client/package.json',
     type: 'json'
   },
   {
