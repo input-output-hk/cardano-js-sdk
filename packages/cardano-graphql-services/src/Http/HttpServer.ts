@@ -1,5 +1,5 @@
+import { HealthCheckResponse, ProviderError } from '@cardano-sdk/core';
 import { Logger, dummyLogger } from 'ts-log';
-import { ProviderError } from '@cardano-sdk/core';
 import { RunnableModule } from '../RunnableModule';
 import { listenPromise, serverClosePromise } from '../util';
 import bodyParser from 'body-parser';
@@ -19,7 +19,7 @@ export type HttpServerConfig = {
 };
 
 export interface HttpServerDependencies {
-  healthCheck: () => Promise<{ ok: boolean }>;
+  healthCheck: () => Promise<HealthCheckResponse>;
   router: express.Router;
   logger?: Logger;
 }
@@ -38,7 +38,7 @@ export abstract class HttpServer extends RunnableModule {
     this.#dependencies.router.use(bodyParser.json());
     this.#dependencies.router.get('/health', async (req, res) => {
       this.logger.debug('/health', { ip: req.ip });
-      let body: { ok: boolean } | Error['message'];
+      let body: HealthCheckResponse | Error['message'];
       try {
         body = await this.#dependencies.healthCheck();
       } catch (error) {
