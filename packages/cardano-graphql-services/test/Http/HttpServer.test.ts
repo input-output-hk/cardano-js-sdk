@@ -1,21 +1,23 @@
-import { HttpServer, RunnableModule } from '../../src';
+import { HttpServer, HttpServerConfig, HttpServerDependencies, RunnableModule } from '../../src';
 import { getRandomPort } from 'get-port-please';
 import express from 'express';
 import got from 'got';
 import net from 'net';
-const bodyParser = require('body-parser');
+import waitOn from 'wait-on';
+
+const APPLICATION_JSON = 'application/json';
+const onHttpServer = (url: string) => waitOn({ resources: [url], validateStatus: (statusCode) => statusCode === 404 });
 
 class SomeHttpServer extends HttpServer {
-  private constructor(config: net.ListenOptions, router: express.Router) {
-    super({ listen: config, name: 'SomeHttpServer', router });
+  private constructor(config: HttpServerConfig, dependencies: HttpServerDependencies) {
+    super({ ...config, name: 'SomeHttpServer' }, dependencies);
   }
-  static create(config: net.ListenOptions) {
+  static create(config: HttpServerConfig) {
     const router = express.Router();
-    router.use(bodyParser.json());
-    router.get('/health', (_req, res) => {
-      res.send({ ok: true });
+    return new SomeHttpServer(config, {
+      healthCheck: () => Promise.resolve({ ok: true }),
+      router
     });
-    return new SomeHttpServer(config, router);
   }
 }
 
@@ -26,18 +28,18 @@ describe('HttpServer', () => {
 
   it('Is a runnable module', async () => {
     port = await getRandomPort();
-    httpServer = SomeHttpServer.create({ host: 'localhost', port });
+    httpServer = SomeHttpServer.create({ listen: { host: 'localhost', port } });
     expect(httpServer).toBeInstanceOf(RunnableModule);
   });
 
   beforeEach(async () => {
     port = await getRandomPort();
     apiUrlBase = `http://localhost:${port}`;
-    httpServer = SomeHttpServer.create({ host: 'localhost', port });
   });
 
   describe('initialize', () => {
     it('initializes the express application', async () => {
+      httpServer = SomeHttpServer.create({ listen: { host: 'localhost', port } });
       expect(httpServer.app).not.toBeDefined();
       await httpServer.initialize();
       expect(httpServer.app).toBeDefined();
@@ -46,6 +48,7 @@ describe('HttpServer', () => {
 
   describe('start', () => {
     beforeEach(async () => {
+      httpServer = SomeHttpServer.create({ listen: { host: 'localhost', port } });
       await httpServer.initialize();
     });
 
@@ -67,6 +70,7 @@ describe('HttpServer', () => {
 
   describe('shutdown', () => {
     beforeEach(async () => {
+      httpServer = SomeHttpServer.create({ listen: { host: 'localhost', port } });
       await httpServer.initialize();
       await httpServer.start();
     });
@@ -82,7 +86,9 @@ describe('HttpServer', () => {
   });
 
   describe('restarting', () => {
+    // eslint-disable-next-line sonarjs/no-identical-functions
     beforeEach(async () => {
+      httpServer = SomeHttpServer.create({ listen: { host: 'localhost', port } });
       await httpServer.initialize();
       await httpServer.start();
     });
@@ -98,10 +104,58 @@ describe('HttpServer', () => {
     });
   });
 
-  describe('HTTP API', () => {
-    beforeEach(async () => {
+  describe('metrics', () => {
+    afterEach(async () => {
+      await httpServer.shutdown();
+    });
+
+    it('is disabled by default', async () => {
+      httpServer = SomeHttpServer.create({ listen: { host: 'localhost', port } });
       await httpServer.initialize();
       await httpServer.start();
+      await onHttpServer(apiUrlBase);
+      const res2 = await got(`${apiUrlBase}/metrics`, {
+        headers: { 'Content-Type': APPLICATION_JSON },
+        throwHttpErrors: false
+      });
+      expect(res2.statusCode).toBe(404);
+    });
+
+    it('can expose Prometheus metrics, at /metrics by default', async () => {
+      httpServer = SomeHttpServer.create({ listen: { port }, metrics: { enabled: true } });
+      await httpServer.initialize();
+      await httpServer.start();
+      await onHttpServer(apiUrlBase);
+      const res = await got(`${apiUrlBase}/metrics`, {
+        headers: { 'Content-Type': APPLICATION_JSON }
+      });
+      expect(res.statusCode).toBe(200);
+      expect(typeof res.body).toBe('string');
+    });
+
+    it('Prometheus metrics can be configured with prom-client options', async () => {
+      const metricsPath = '/metrics-custom';
+      httpServer = SomeHttpServer.create({
+        listen: { port },
+        metrics: { enabled: true, options: { metricsPath } }
+      });
+      await httpServer.initialize();
+      await httpServer.start();
+      await onHttpServer(apiUrlBase);
+      const res = await got(`${apiUrlBase}${metricsPath}`, {
+        headers: { 'Content-Type': APPLICATION_JSON }
+      });
+      expect(res.statusCode).toBe(200);
+      expect(typeof res.body).toBe('string');
+    });
+  });
+
+  describe('HTTP API', () => {
+    beforeEach(async () => {
+      httpServer = SomeHttpServer.create({ listen: { host: 'localhost', port } });
+      await httpServer.initialize();
+      await httpServer.start();
+      await onHttpServer(apiUrlBase);
     });
 
     afterEach(async () => {

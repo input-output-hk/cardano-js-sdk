@@ -23,6 +23,7 @@ program
   .command('start-server')
   .description('Start the HTTP server')
   .option('--api-url <apiUrl>', 'Server URL', (url) => new URL(url))
+  .option('--metrics-enabled <metricsEnabled>', 'Enable Prometheus Metrics', false)
   .option('--ogmios-url <ogmiosUrl>', 'Ogmios URL', (url) => new URL(url))
   .option('--logger-min-severity <level>', 'Log level', (level) => {
     if (!loggerMethodNames.includes(level)) {
@@ -31,7 +32,17 @@ program
     return level;
   })
   .action(
-    async ({ apiUrl, loggerMinSeverity, ogmiosUrl }: { apiUrl: URL; loggerMinSeverity: string; ogmiosUrl: URL }) => {
+    async ({
+      apiUrl,
+      loggerMinSeverity,
+      metricsEnabled,
+      ogmiosUrl
+    }: {
+      apiUrl: URL;
+      loggerMinSeverity: string;
+      metricsEnabled: boolean;
+      ogmiosUrl: URL;
+    }) => {
       const logger = createLogger({ level: loggerMinSeverity as LogLevel, name: 'tx-submit-http-server' });
       const txSubmitProvider = ogmiosTxSubmitProvider({
         host: ogmiosUrl?.hostname,
@@ -40,14 +51,17 @@ program
       });
       const server = TxSubmitHttpServer.create(
         {
+          logger,
+          txSubmitProvider
+        },
+        {
           listen: {
             host: apiUrl.hostname,
             port: Number.parseInt(apiUrl.port)
+          },
+          metrics: {
+            enabled: metricsEnabled
           }
-        },
-        {
-          logger,
-          txSubmitProvider
         }
       );
       await server.initialize();
