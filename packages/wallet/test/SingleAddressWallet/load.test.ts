@@ -46,6 +46,7 @@ const assertWalletProperties = async (
   expectedDelegateeId: Cardano.PoolId | undefined,
   expectedRewardsHistory = flatten([...mocks.rewardsHistory.values()])
 ) => {
+  expect(wallet.keyAgent).toBeTruthy();
   // name
   expect(wallet.name).toBe(name);
   // utxo

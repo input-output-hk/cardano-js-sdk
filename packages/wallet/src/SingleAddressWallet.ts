@@ -85,7 +85,6 @@ export interface SingleAddressWalletDependencies {
 
 export class SingleAddressWallet implements Wallet {
   #inputSelector: InputSelector;
-  #keyAgent: KeyAgent;
   #logger: Logger;
   #tip$: SyncableIntervalPersistentDocumentTrackerSubject<Cardano.Tip>;
   #newTransactions = {
@@ -93,24 +92,25 @@ export class SingleAddressWallet implements Wallet {
     pending$: new Subject<Cardano.NewTxAlonzo>(),
     submitting$: new Subject<Cardano.NewTxAlonzo>()
   };
-  txSubmitProvider: TrackedTxSubmitProvider;
-  walletProvider: TrackedWalletProvider;
-  timeSettingsProvider: TrackedTimeSettingsProvider;
-  stakePoolSearchProvider: TrackedStakePoolSearchProvider;
-  assetProvider: TrackedAssetProvider;
-  utxo: TransactionalTracker<Cardano.Utxo[]>;
-  balance: TransactionalTracker<Balance>;
-  transactions: TransactionsTracker;
-  delegation: DelegationTracker;
-  tip$: BehaviorObservable<Cardano.Tip>;
-  networkInfo$: TrackerSubject<NetworkInfo>;
-  addresses$: TrackerSubject<GroupedAddress[]>;
-  protocolParameters$: TrackerSubject<ProtocolParametersRequiredByWallet>;
-  genesisParameters$: TrackerSubject<Cardano.CompactGenesis>;
-  timeSettings$: TrackerSubject<TimeSettings[]>;
-  assets$: TrackerSubject<Assets>;
-  syncStatus: SyncStatus;
-  name: string;
+  readonly keyAgent: KeyAgent;
+  readonly txSubmitProvider: TrackedTxSubmitProvider;
+  readonly walletProvider: TrackedWalletProvider;
+  readonly timeSettingsProvider: TrackedTimeSettingsProvider;
+  readonly stakePoolSearchProvider: TrackedStakePoolSearchProvider;
+  readonly assetProvider: TrackedAssetProvider;
+  readonly utxo: TransactionalTracker<Cardano.Utxo[]>;
+  readonly balance: TransactionalTracker<Balance>;
+  readonly transactions: TransactionsTracker;
+  readonly delegation: DelegationTracker;
+  readonly tip$: BehaviorObservable<Cardano.Tip>;
+  readonly networkInfo$: TrackerSubject<NetworkInfo>;
+  readonly addresses$: TrackerSubject<GroupedAddress[]>;
+  readonly protocolParameters$: TrackerSubject<ProtocolParametersRequiredByWallet>;
+  readonly genesisParameters$: TrackerSubject<Cardano.CompactGenesis>;
+  readonly timeSettings$: TrackerSubject<TimeSettings[]>;
+  readonly assets$: TrackerSubject<Assets>;
+  readonly syncStatus: SyncStatus;
+  readonly name: string;
 
   constructor(
     {
@@ -154,7 +154,7 @@ export class SingleAddressWallet implements Wallet {
       },
       { consideredOutOfSyncAfter }
     );
-    this.#keyAgent = keyAgent;
+    this.keyAgent = keyAgent;
     this.addresses$ = new TrackerSubject<GroupedAddress[]>(this.#initializeAddress(keyAgent.knownAddresses));
     this.name = name;
     this.#tip$ = this.tip$ = new SyncableIntervalPersistentDocumentTrackerSubject({
@@ -266,8 +266,8 @@ export class SingleAddressWallet implements Wallet {
     stubSign = false
   ): Promise<Cardano.NewTxAlonzo> {
     const signatures = stubSign
-      ? keyManagementUtil.stubSignTransaction(tx.body, this.#keyAgent.knownAddresses)
-      : await this.#keyAgent.signTransaction(tx);
+      ? keyManagementUtil.stubSignTransaction(tx.body, this.keyAgent.knownAddresses)
+      : await this.keyAgent.signTransaction(tx);
     return {
       auxiliaryData,
       body: tx.body,
@@ -291,7 +291,7 @@ export class SingleAddressWallet implements Wallet {
     }
   }
   signData(props: SignDataProps): Promise<Cip30DataSignature> {
-    return cip30signData({ keyAgent: this.#keyAgent, ...props });
+    return cip30signData({ keyAgent: this.keyAgent, ...props });
   }
   sync() {
     this.#tip$.sync();
@@ -347,7 +347,7 @@ export class SingleAddressWallet implements Wallet {
         observer.next([existingAddress]);
         return;
       }
-      this.#keyAgent
+      this.keyAgent
         .deriveAddress({
           index: 0,
           type: AddressType.External

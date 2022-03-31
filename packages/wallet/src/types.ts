@@ -3,6 +3,7 @@ import { Balance, BehaviorObservable, DelegationTracker, TransactionalTracker, T
 import { Cip30DataSignature } from '@cardano-sdk/cip30';
 import { Cip30SignDataRequest } from './KeyManagement/cip8';
 import { GroupedAddress } from './KeyManagement';
+import { KeyManagement } from '.';
 import { SelectionSkeleton } from '@cardano-sdk/cip2';
 import { TxInternals } from './Transaction';
 
@@ -61,6 +62,7 @@ export interface SyncStatus {
 
 export interface Wallet {
   name: string;
+  readonly keyAgent: KeyManagement.KeyAgent;
   readonly balance: TransactionalTracker<Balance>;
   readonly delegation: DelegationTracker;
   readonly utxo: TransactionalTracker<Cardano.Utxo[]>;
