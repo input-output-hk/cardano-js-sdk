@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>EpochRewards | cardano-sdk</title>
+	<title>HttpServerDependencies | cardano-sdk</title>
 	<meta name="description" content="Documentation for cardano-sdk">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -55,13 +55,13 @@
 					<a href="../index.html">cardano-sdk</a>
 				</li>
 				<li>
-					<a href="../modules/_cardano_sdk_core.html">@cardano-sdk/core</a>
+					<a href="../modules/_cardano_sdk_cardano_graphql_services.html">@cardano-sdk/cardano-graphql-services</a>
 				</li>
 				<li>
-					<a href="_cardano_sdk_core.EpochRewards.html">EpochRewards</a>
+					<a href="_cardano_sdk_cardano_graphql_services.HttpServerDependencies.html">HttpServerDependencies</a>
 				</li>
 			</ul>
-			<h1>Interface EpochRewards</h1>
+			<h1>Interface HttpServerDependencies</h1>
 		</div>
 	</div>
 </header>
@@ -72,7 +72,7 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">EpochRewards</span>
+						<span class="target">HttpServerDependencies</span>
 					</li>
 				</ul>
 			</section>
@@ -83,8 +83,14 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.EpochRewards.html#epoch" class="tsd-kind-icon">epoch</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.EpochRewards.html#rewards" class="tsd-kind-icon">rewards</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_cardano_graphql_services.HttpServerDependencies.html#logger" class="tsd-kind-icon">logger</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_cardano_graphql_services.HttpServerDependencies.html#router" class="tsd-kind-icon">router</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Methods</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_cardano_sdk_cardano_graphql_services.HttpServerDependencies.html#healthCheck" class="tsd-kind-icon">health<wbr>Check</a></li>
 							</ul>
 						</section>
 					</div>
@@ -93,24 +99,44 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="epoch" class="tsd-anchor"></a>
-					<h3>epoch</h3>
-					<div class="tsd-signature tsd-kind-icon">epoch<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<a name="logger" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> logger</h3>
+					<div class="tsd-signature tsd-kind-icon">logger<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Logger</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1530111/packages/core/src/Provider/WalletProvider/types.ts#L71">packages/core/src/Provider/WalletProvider/types.ts:71</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1530111/packages/cardano-graphql-services/src/Http/HttpServer.ts#L24">packages/cardano-graphql-services/src/Http/HttpServer.ts:24</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="rewards" class="tsd-anchor"></a>
-					<h3>rewards</h3>
-					<div class="tsd-signature tsd-kind-icon">rewards<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">bigint</span></div>
+					<a name="router" class="tsd-anchor"></a>
+					<h3>router</h3>
+					<div class="tsd-signature tsd-kind-icon">router<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Router</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1530111/packages/core/src/Provider/WalletProvider/types.ts#L72">packages/core/src/Provider/WalletProvider/types.ts:72</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1530111/packages/cardano-graphql-services/src/Http/HttpServer.ts#L23">packages/cardano-graphql-services/src/Http/HttpServer.ts:23</a></li>
 						</ul>
 					</aside>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+					<a name="healthCheck" class="tsd-anchor"></a>
+					<h3>health<wbr>Check</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+						<li class="tsd-signature tsd-kind-icon">health<wbr>Check<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">HealthCheckResponse</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1530111/packages/cardano-graphql-services/src/Http/HttpServer.ts#L22">packages/cardano-graphql-services/src/Http/HttpServer.ts:22</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">HealthCheckResponse</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
 				</section>
 			</section>
 		</div>
@@ -129,7 +155,7 @@
 					<li class=" tsd-kind-module">
 						<a href="../modules/_cardano_sdk_cardano_graphql_db_sync.html">@cardano-<wbr>sdk/cardano-<wbr>graphql-<wbr>db-<wbr>sync</a>
 					</li>
-					<li class=" tsd-kind-module">
+					<li class="current tsd-kind-module">
 						<a href="../modules/_cardano_sdk_cardano_graphql_services.html">@cardano-<wbr>sdk/cardano-<wbr>graphql-<wbr>services</a>
 					</li>
 					<li class=" tsd-kind-module">
@@ -138,37 +164,8 @@
 					<li class=" tsd-kind-module">
 						<a href="../modules/_cardano_sdk_cip30.html">@cardano-<wbr>sdk/cip30</a>
 					</li>
-					<li class="current tsd-kind-module">
+					<li class=" tsd-kind-module">
 						<a href="../modules/_cardano_sdk_core.html">@cardano-<wbr>sdk/core</a>
-						<ul>
-							<li class=" tsd-kind-namespace tsd-parent-kind-module">
-								<a href="../modules/_cardano_sdk_core.Address.html">Address</a>
-							</li>
-							<li class=" tsd-kind-namespace tsd-parent-kind-module">
-								<a href="../modules/_cardano_sdk_core.Asset.html">Asset</a>
-							</li>
-							<li class=" tsd-kind-namespace tsd-parent-kind-module tsd-is-external">
-								<a href="../modules/_cardano_sdk_core.CSL.html">CSL</a>
-							</li>
-							<li class=" tsd-kind-namespace tsd-parent-kind-module">
-								<a href="../modules/_cardano_sdk_core.Cardano.html">Cardano</a>
-							</li>
-							<li class=" tsd-kind-namespace tsd-parent-kind-module">
-								<a href="../modules/_cardano_sdk_core.ProviderUtil.html">Provider<wbr>Util</a>
-							</li>
-							<li class=" tsd-kind-namespace tsd-parent-kind-module">
-								<a href="../modules/_cardano_sdk_core.coreToCsl.html">core<wbr>ToCsl</a>
-							</li>
-							<li class=" tsd-kind-namespace tsd-parent-kind-module">
-								<a href="../modules/_cardano_sdk_core.cslToCore.html">csl<wbr>ToCore</a>
-							</li>
-							<li class=" tsd-kind-namespace tsd-parent-kind-module">
-								<a href="../modules/_cardano_sdk_core.cslUtil.html">csl<wbr>Util</a>
-							</li>
-							<li class=" tsd-kind-namespace tsd-parent-kind-module">
-								<a href="../modules/_cardano_sdk_core.util.html">util</a>
-							</li>
-						</ul>
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="../modules/_cardano_sdk_ogmios.html">@cardano-<wbr>sdk/ogmios</a>
@@ -183,21 +180,45 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="../classes/_cardano_sdk_cardano_graphql_services.HttpServer.html" class="tsd-kind-icon">Http<wbr>Server</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="../classes/_cardano_sdk_cardano_graphql_services.RunnableModule.html" class="tsd-kind-icon">Runnable<wbr>Module</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="../classes/_cardano_sdk_cardano_graphql_services.TxSubmitHttpServer.html" class="tsd-kind-icon">Tx<wbr>Submit<wbr>Http<wbr>Server</a>
+					</li>
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface tsd-parent-kind-module">
-						<a href="_cardano_sdk_core.EpochRewards.html" class="tsd-kind-icon">Epoch<wbr>Rewards</a>
+						<a href="_cardano_sdk_cardano_graphql_services.HttpServerDependencies.html" class="tsd-kind-icon">Http<wbr>Server<wbr>Dependencies</a>
 						<ul>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_cardano_sdk_core.EpochRewards.html#epoch" class="tsd-kind-icon">epoch</a>
+								<a href="_cardano_sdk_cardano_graphql_services.HttpServerDependencies.html#logger" class="tsd-kind-icon">logger</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_cardano_sdk_core.EpochRewards.html#rewards" class="tsd-kind-icon">rewards</a>
+								<a href="_cardano_sdk_cardano_graphql_services.HttpServerDependencies.html#router" class="tsd-kind-icon">router</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
+								<a href="_cardano_sdk_cardano_graphql_services.HttpServerDependencies.html#healthCheck" class="tsd-kind-icon">health<wbr>Check</a>
 							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="_cardano_sdk_cardano_graphql_services.TxSubmitHttpServerConfig.html" class="tsd-kind-icon">Tx<wbr>Submit<wbr>Http<wbr>Server<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="_cardano_sdk_cardano_graphql_services.TxSubmitServerDependencies.html" class="tsd-kind-icon">Tx<wbr>Submit<wbr>Server<wbr>Dependencies</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+						<a href="../modules/_cardano_sdk_cardano_graphql_services.html#HttpServerConfig" class="tsd-kind-icon">Http<wbr>Server<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+						<a href="../modules/_cardano_sdk_cardano_graphql_services.html#RunnableModuleState" class="tsd-kind-icon">Runnable<wbr>Module<wbr>State</a>
+					</li>
 				</ul>
 			</nav>
 		</div>
@@ -218,6 +239,7 @@
 				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
 				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
 				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>

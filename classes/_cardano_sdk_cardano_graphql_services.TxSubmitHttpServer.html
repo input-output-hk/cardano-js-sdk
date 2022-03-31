@@ -94,6 +94,7 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-private"><a href="_cardano_sdk_cardano_graphql_services.TxSubmitHttpServer.html#_dependencies" class="tsd-kind-icon">#dependencies</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_cardano_sdk_cardano_graphql_services.TxSubmitHttpServer.html#_txSubmitProvider" class="tsd-kind-icon">#tx<wbr>Submit<wbr>Provider</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="_cardano_sdk_cardano_graphql_services.TxSubmitHttpServer.html#app" class="tsd-kind-icon">app</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="_cardano_sdk_cardano_graphql_services.TxSubmitHttpServer.html#config" class="tsd-kind-icon">config</a></li>
@@ -130,26 +131,26 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagPrivate">Private</span> constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite tsd-is-private">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>TxSubmit<wbr>Http<wbr>Server<span class="tsd-signature-symbol">(</span>config<span class="tsd-signature-symbol">: </span><a href="../interfaces/_cardano_sdk_cardano_graphql_services.TxSubmitHttpServerConfig.html" class="tsd-signature-type" data-tsd-kind="Interface">TxSubmitHttpServerConfig</a>, router<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Router</span>, dependencies<span class="tsd-signature-symbol">: </span><a href="../interfaces/_cardano_sdk_cardano_graphql_services.TxSubmitServerDependencies.html" class="tsd-signature-type" data-tsd-kind="Interface">TxSubmitServerDependencies</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_cardano_graphql_services.TxSubmitHttpServer.html" class="tsd-signature-type" data-tsd-kind="Class">TxSubmitHttpServer</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>TxSubmit<wbr>Http<wbr>Server<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><a href="../interfaces/_cardano_sdk_cardano_graphql_services.TxSubmitServerDependencies.html" class="tsd-signature-type" data-tsd-kind="Interface">TxSubmitServerDependencies</a>, httpServerDependencies<span class="tsd-signature-symbol">: </span><a href="../interfaces/_cardano_sdk_cardano_graphql_services.HttpServerDependencies.html" class="tsd-signature-type" data-tsd-kind="Interface">HttpServerDependencies</a>, __namedParameters<span class="tsd-signature-symbol">: </span><a href="../interfaces/_cardano_sdk_cardano_graphql_services.TxSubmitHttpServerConfig.html" class="tsd-signature-type" data-tsd-kind="Interface">TxSubmitHttpServerConfig</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_cardano_graphql_services.TxSubmitHttpServer.html" class="tsd-signature-type" data-tsd-kind="Class">TxSubmitHttpServer</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Overrides <a href="_cardano_sdk_cardano_graphql_services.HttpServer.html">HttpServer</a>.<a href="_cardano_sdk_cardano_graphql_services.HttpServer.html#constructor">constructor</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/bd14e38/packages/cardano-graphql-services/src/TxSubmit/TxSubmitHttpServer.ts#L24">packages/cardano-graphql-services/src/TxSubmit/TxSubmitHttpServer.ts:24</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1530111/packages/cardano-graphql-services/src/TxSubmit/TxSubmitHttpServer.ts#L22">packages/cardano-graphql-services/src/TxSubmit/TxSubmitHttpServer.ts:22</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>config: <a href="../interfaces/_cardano_sdk_cardano_graphql_services.TxSubmitHttpServerConfig.html" class="tsd-signature-type" data-tsd-kind="Interface">TxSubmitHttpServerConfig</a></h5>
+									<h5>__namedParameters: <a href="../interfaces/_cardano_sdk_cardano_graphql_services.TxSubmitServerDependencies.html" class="tsd-signature-type" data-tsd-kind="Interface">TxSubmitServerDependencies</a></h5>
 								</li>
 								<li>
-									<h5>router: <span class="tsd-signature-type">Router</span></h5>
+									<h5>httpServerDependencies: <a href="../interfaces/_cardano_sdk_cardano_graphql_services.HttpServerDependencies.html" class="tsd-signature-type" data-tsd-kind="Interface">HttpServerDependencies</a></h5>
 								</li>
 								<li>
-									<h5>dependencies: <a href="../interfaces/_cardano_sdk_cardano_graphql_services.TxSubmitServerDependencies.html" class="tsd-signature-type" data-tsd-kind="Interface">TxSubmitServerDependencies</a></h5>
+									<h5>__namedParameters: <a href="../interfaces/_cardano_sdk_cardano_graphql_services.TxSubmitHttpServerConfig.html" class="tsd-signature-type" data-tsd-kind="Interface">TxSubmitHttpServerConfig</a></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="_cardano_sdk_cardano_graphql_services.TxSubmitHttpServer.html" class="tsd-signature-type" data-tsd-kind="Class">TxSubmitHttpServer</a></h4>
@@ -159,13 +160,24 @@
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-private">
+					<a name="_dependencies" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> #dependencies</h3>
+					<div class="tsd-signature tsd-kind-icon">#dependencies<span class="tsd-signature-symbol">:</span> <a href="../interfaces/_cardano_sdk_cardano_graphql_services.HttpServerDependencies.html" class="tsd-signature-type" data-tsd-kind="Interface">HttpServerDependencies</a></div>
+					<aside class="tsd-sources">
+						<p>Inherited from <a href="_cardano_sdk_cardano_graphql_services.HttpServer.html">HttpServer</a>.<a href="_cardano_sdk_cardano_graphql_services.HttpServer.html#_dependencies">#dependencies</a></p>
+						<ul>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1530111/packages/cardano-graphql-services/src/Http/HttpServer.ts#L30">packages/cardano-graphql-services/src/Http/HttpServer.ts:30</a></li>
+						</ul>
+					</aside>
+				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
 					<a name="_txSubmitProvider" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagPrivate">Private</span> #tx<wbr>Submit<wbr>Provider</h3>
 					<div class="tsd-signature tsd-kind-icon">#tx<wbr>Submit<wbr>Provider<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">TxSubmitProvider</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/bd14e38/packages/cardano-graphql-services/src/TxSubmit/TxSubmitHttpServer.ts#L22">packages/cardano-graphql-services/src/TxSubmit/TxSubmitHttpServer.ts:22</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1530111/packages/cardano-graphql-services/src/TxSubmit/TxSubmitHttpServer.ts#L20">packages/cardano-graphql-services/src/TxSubmit/TxSubmitHttpServer.ts:20</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -176,7 +188,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="_cardano_sdk_cardano_graphql_services.HttpServer.html">HttpServer</a>.<a href="_cardano_sdk_cardano_graphql_services.HttpServer.html#app">app</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/bd14e38/packages/cardano-graphql-services/src/Http/HttpServer.ts#L15">packages/cardano-graphql-services/src/Http/HttpServer.ts:15</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1530111/packages/cardano-graphql-services/src/Http/HttpServer.ts#L28">packages/cardano-graphql-services/src/Http/HttpServer.ts:28</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -195,7 +207,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="_cardano_sdk_cardano_graphql_services.HttpServer.html">HttpServer</a>.<a href="_cardano_sdk_cardano_graphql_services.HttpServer.html#logger">logger</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/bd14e38/packages/cardano-graphql-services/src/RunnableModule.ts#L13">packages/cardano-graphql-services/src/RunnableModule.ts:13</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1530111/packages/cardano-graphql-services/src/RunnableModule.ts#L13">packages/cardano-graphql-services/src/RunnableModule.ts:13</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -206,7 +218,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="_cardano_sdk_cardano_graphql_services.HttpServer.html">HttpServer</a>.<a href="_cardano_sdk_cardano_graphql_services.HttpServer.html#name">name</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/bd14e38/packages/cardano-graphql-services/src/RunnableModule.ts#L14">packages/cardano-graphql-services/src/RunnableModule.ts:14</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1530111/packages/cardano-graphql-services/src/RunnableModule.ts#L14">packages/cardano-graphql-services/src/RunnableModule.ts:14</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -217,7 +229,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="_cardano_sdk_cardano_graphql_services.HttpServer.html">HttpServer</a>.<a href="_cardano_sdk_cardano_graphql_services.HttpServer.html#server">server</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/bd14e38/packages/cardano-graphql-services/src/Http/HttpServer.ts#L16">packages/cardano-graphql-services/src/Http/HttpServer.ts:16</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1530111/packages/cardano-graphql-services/src/Http/HttpServer.ts#L29">packages/cardano-graphql-services/src/Http/HttpServer.ts:29</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -228,7 +240,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="_cardano_sdk_cardano_graphql_services.HttpServer.html">HttpServer</a>.<a href="_cardano_sdk_cardano_graphql_services.HttpServer.html#state">state</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/bd14e38/packages/cardano-graphql-services/src/RunnableModule.ts#L9">packages/cardano-graphql-services/src/RunnableModule.ts:9</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1530111/packages/cardano-graphql-services/src/RunnableModule.ts#L9">packages/cardano-graphql-services/src/RunnableModule.ts:9</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -246,7 +258,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_cardano_sdk_cardano_graphql_services.HttpServer.html">HttpServer</a>.<a href="_cardano_sdk_cardano_graphql_services.HttpServer.html#initialize">initialize</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/bd14e38/packages/cardano-graphql-services/src/RunnableModule.ts#L22">packages/cardano-graphql-services/src/RunnableModule.ts:22</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1530111/packages/cardano-graphql-services/src/RunnableModule.ts#L22">packages/cardano-graphql-services/src/RunnableModule.ts:22</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -264,7 +276,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_cardano_sdk_cardano_graphql_services.HttpServer.html">HttpServer</a>.<a href="_cardano_sdk_cardano_graphql_services.HttpServer.html#initializeAfter">initializeAfter</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/bd14e38/packages/cardano-graphql-services/src/RunnableModule.ts#L48">packages/cardano-graphql-services/src/RunnableModule.ts:48</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1530111/packages/cardano-graphql-services/src/RunnableModule.ts#L48">packages/cardano-graphql-services/src/RunnableModule.ts:48</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -282,7 +294,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_cardano_sdk_cardano_graphql_services.HttpServer.html">HttpServer</a>.<a href="_cardano_sdk_cardano_graphql_services.HttpServer.html#initializeBefore">initializeBefore</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/bd14e38/packages/cardano-graphql-services/src/RunnableModule.ts#L40">packages/cardano-graphql-services/src/RunnableModule.ts:40</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1530111/packages/cardano-graphql-services/src/RunnableModule.ts#L40">packages/cardano-graphql-services/src/RunnableModule.ts:40</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -300,7 +312,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="_cardano_sdk_cardano_graphql_services.HttpServer.html">HttpServer</a>.<a href="_cardano_sdk_cardano_graphql_services.HttpServer.html#initializeImpl">initializeImpl</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/bd14e38/packages/cardano-graphql-services/src/TxSubmit/TxSubmitHttpServer.ts#L73">packages/cardano-graphql-services/src/TxSubmit/TxSubmitHttpServer.ts:73</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1530111/packages/cardano-graphql-services/src/TxSubmit/TxSubmitHttpServer.ts#L68">packages/cardano-graphql-services/src/TxSubmit/TxSubmitHttpServer.ts:68</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -318,7 +330,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_cardano_sdk_cardano_graphql_services.HttpServer.html">HttpServer</a>.<a href="_cardano_sdk_cardano_graphql_services.HttpServer.html#shutdown">shutdown</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/bd14e38/packages/cardano-graphql-services/src/RunnableModule.ts#L34">packages/cardano-graphql-services/src/RunnableModule.ts:34</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1530111/packages/cardano-graphql-services/src/RunnableModule.ts#L34">packages/cardano-graphql-services/src/RunnableModule.ts:34</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -336,7 +348,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_cardano_sdk_cardano_graphql_services.HttpServer.html">HttpServer</a>.<a href="_cardano_sdk_cardano_graphql_services.HttpServer.html#shutdownAfter">shutdownAfter</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/bd14e38/packages/cardano-graphql-services/src/RunnableModule.ts#L80">packages/cardano-graphql-services/src/RunnableModule.ts:80</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1530111/packages/cardano-graphql-services/src/RunnableModule.ts#L80">packages/cardano-graphql-services/src/RunnableModule.ts:80</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -354,7 +366,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_cardano_sdk_cardano_graphql_services.HttpServer.html">HttpServer</a>.<a href="_cardano_sdk_cardano_graphql_services.HttpServer.html#shutdownBefore">shutdownBefore</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/bd14e38/packages/cardano-graphql-services/src/RunnableModule.ts#L72">packages/cardano-graphql-services/src/RunnableModule.ts:72</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1530111/packages/cardano-graphql-services/src/RunnableModule.ts#L72">packages/cardano-graphql-services/src/RunnableModule.ts:72</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -372,7 +384,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_cardano_sdk_cardano_graphql_services.HttpServer.html">HttpServer</a>.<a href="_cardano_sdk_cardano_graphql_services.HttpServer.html#shutdownImpl">shutdownImpl</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/bd14e38/packages/cardano-graphql-services/src/Http/HttpServer.ts#L31">packages/cardano-graphql-services/src/Http/HttpServer.ts:31</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1530111/packages/cardano-graphql-services/src/Http/HttpServer.ts#L70">packages/cardano-graphql-services/src/Http/HttpServer.ts:70</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -390,7 +402,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_cardano_sdk_cardano_graphql_services.HttpServer.html">HttpServer</a>.<a href="_cardano_sdk_cardano_graphql_services.HttpServer.html#start">start</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/bd14e38/packages/cardano-graphql-services/src/RunnableModule.ts#L28">packages/cardano-graphql-services/src/RunnableModule.ts:28</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1530111/packages/cardano-graphql-services/src/RunnableModule.ts#L28">packages/cardano-graphql-services/src/RunnableModule.ts:28</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -408,7 +420,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_cardano_sdk_cardano_graphql_services.HttpServer.html">HttpServer</a>.<a href="_cardano_sdk_cardano_graphql_services.HttpServer.html#startAfter">startAfter</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/bd14e38/packages/cardano-graphql-services/src/RunnableModule.ts#L64">packages/cardano-graphql-services/src/RunnableModule.ts:64</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1530111/packages/cardano-graphql-services/src/RunnableModule.ts#L64">packages/cardano-graphql-services/src/RunnableModule.ts:64</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -426,7 +438,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_cardano_sdk_cardano_graphql_services.HttpServer.html">HttpServer</a>.<a href="_cardano_sdk_cardano_graphql_services.HttpServer.html#startBefore">startBefore</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/bd14e38/packages/cardano-graphql-services/src/RunnableModule.ts#L56">packages/cardano-graphql-services/src/RunnableModule.ts:56</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1530111/packages/cardano-graphql-services/src/RunnableModule.ts#L56">packages/cardano-graphql-services/src/RunnableModule.ts:56</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -444,7 +456,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_cardano_sdk_cardano_graphql_services.HttpServer.html">HttpServer</a>.<a href="_cardano_sdk_cardano_graphql_services.HttpServer.html#startImpl">startImpl</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/bd14e38/packages/cardano-graphql-services/src/Http/HttpServer.ts#L27">packages/cardano-graphql-services/src/Http/HttpServer.ts:27</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1530111/packages/cardano-graphql-services/src/Http/HttpServer.ts#L66">packages/cardano-graphql-services/src/Http/HttpServer.ts:66</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -455,22 +467,22 @@
 					<a name="create" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagStatic">Static</span> create</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-static">
-						<li class="tsd-signature tsd-kind-icon">create<span class="tsd-signature-symbol">(</span>config<span class="tsd-signature-symbol">: </span><a href="../interfaces/_cardano_sdk_cardano_graphql_services.TxSubmitHttpServerConfig.html" class="tsd-signature-type" data-tsd-kind="Interface">TxSubmitHttpServerConfig</a>, __namedParameters<span class="tsd-signature-symbol">: </span><a href="../interfaces/_cardano_sdk_cardano_graphql_services.TxSubmitServerDependencies.html" class="tsd-signature-type" data-tsd-kind="Interface">TxSubmitServerDependencies</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_cardano_graphql_services.TxSubmitHttpServer.html" class="tsd-signature-type" data-tsd-kind="Class">TxSubmitHttpServer</a></li>
+						<li class="tsd-signature tsd-kind-icon">create<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><a href="../interfaces/_cardano_sdk_cardano_graphql_services.TxSubmitServerDependencies.html" class="tsd-signature-type" data-tsd-kind="Interface">TxSubmitServerDependencies</a>, config<span class="tsd-signature-symbol">: </span><a href="../interfaces/_cardano_sdk_cardano_graphql_services.TxSubmitHttpServerConfig.html" class="tsd-signature-type" data-tsd-kind="Interface">TxSubmitHttpServerConfig</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_cardano_graphql_services.TxSubmitHttpServer.html" class="tsd-signature-type" data-tsd-kind="Class">TxSubmitHttpServer</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/bd14e38/packages/cardano-graphql-services/src/TxSubmit/TxSubmitHttpServer.ts#L28">packages/cardano-graphql-services/src/TxSubmit/TxSubmitHttpServer.ts:28</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1530111/packages/cardano-graphql-services/src/TxSubmit/TxSubmitHttpServer.ts#L30">packages/cardano-graphql-services/src/TxSubmit/TxSubmitHttpServer.ts:30</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>config: <a href="../interfaces/_cardano_sdk_cardano_graphql_services.TxSubmitHttpServerConfig.html" class="tsd-signature-type" data-tsd-kind="Interface">TxSubmitHttpServerConfig</a></h5>
+									<h5>__namedParameters: <a href="../interfaces/_cardano_sdk_cardano_graphql_services.TxSubmitServerDependencies.html" class="tsd-signature-type" data-tsd-kind="Interface">TxSubmitServerDependencies</a></h5>
 								</li>
 								<li>
-									<h5>__namedParameters: <a href="../interfaces/_cardano_sdk_cardano_graphql_services.TxSubmitServerDependencies.html" class="tsd-signature-type" data-tsd-kind="Interface">TxSubmitServerDependencies</a></h5>
+									<h5>config: <a href="../interfaces/_cardano_sdk_cardano_graphql_services.TxSubmitHttpServerConfig.html" class="tsd-signature-type" data-tsd-kind="Interface">TxSubmitHttpServerConfig</a></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="_cardano_sdk_cardano_graphql_services.TxSubmitHttpServer.html" class="tsd-signature-type" data-tsd-kind="Class">TxSubmitHttpServer</a></h4>
@@ -532,6 +544,9 @@
 						<ul>
 							<li class=" tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite tsd-is-private">
 								<a href="_cardano_sdk_cardano_graphql_services.TxSubmitHttpServer.html#constructor" class="tsd-kind-icon">constructor</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-private">
+								<a href="_cardano_sdk_cardano_graphql_services.TxSubmitHttpServer.html#_dependencies" class="tsd-kind-icon">#dependencies</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
 								<a href="_cardano_sdk_cardano_graphql_services.TxSubmitHttpServer.html#_txSubmitProvider" class="tsd-kind-icon">#tx<wbr>Submit<wbr>Provider</a>
@@ -597,6 +612,9 @@
 					</li>
 				</ul>
 				<ul class="after-current">
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="../interfaces/_cardano_sdk_cardano_graphql_services.HttpServerDependencies.html" class="tsd-kind-icon">Http<wbr>Server<wbr>Dependencies</a>
+					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
 						<a href="../interfaces/_cardano_sdk_cardano_graphql_services.TxSubmitHttpServerConfig.html" class="tsd-kind-icon">Tx<wbr>Submit<wbr>Http<wbr>Server<wbr>Config</a>
 					</li>

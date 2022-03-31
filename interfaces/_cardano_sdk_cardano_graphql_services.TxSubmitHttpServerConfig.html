@@ -72,7 +72,12 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">TxSubmitHttpServerConfig</span>
+						<a href="../modules/_cardano_sdk_cardano_graphql_services.html#HttpServerConfig" class="tsd-signature-type" data-tsd-kind="Type alias">HttpServerConfig</a>
+						<ul class="tsd-hierarchy">
+							<li>
+								<span class="target">TxSubmitHttpServerConfig</span>
+							</li>
+						</ul>
 					</li>
 				</ul>
 			</section>
@@ -84,7 +89,9 @@
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_cardano_graphql_services.TxSubmitHttpServerConfig.html#bodyParser" class="tsd-kind-icon">body<wbr>Parser</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_cardano_graphql_services.TxSubmitHttpServerConfig.html#listen" class="tsd-kind-icon">listen</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="_cardano_sdk_cardano_graphql_services.TxSubmitHttpServerConfig.html#listen" class="tsd-kind-icon">listen</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="_cardano_sdk_cardano_graphql_services.TxSubmitHttpServerConfig.html#metrics" class="tsd-kind-icon">metrics</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="_cardano_sdk_cardano_graphql_services.TxSubmitHttpServerConfig.html#name" class="tsd-kind-icon">name</a></li>
 							</ul>
 						</section>
 					</div>
@@ -98,7 +105,7 @@
 					<div class="tsd-signature tsd-kind-icon">body<wbr>Parser<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>limit<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/bd14e38/packages/cardano-graphql-services/src/TxSubmit/TxSubmitHttpServer.ts#L16">packages/cardano-graphql-services/src/TxSubmit/TxSubmitHttpServer.ts:16</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1530111/packages/cardano-graphql-services/src/TxSubmit/TxSubmitHttpServer.ts#L14">packages/cardano-graphql-services/src/TxSubmit/TxSubmitHttpServer.ts:14</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -110,13 +117,47 @@
 						</ul>
 					</div>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
 					<a name="listen" class="tsd-anchor"></a>
 					<h3>listen</h3>
 					<div class="tsd-signature tsd-kind-icon">listen<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">ListenOptions</span></div>
 					<aside class="tsd-sources">
+						<p>Inherited from HttpServerConfig.listen</p>
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/bd14e38/packages/cardano-graphql-services/src/TxSubmit/TxSubmitHttpServer.ts#L15">packages/cardano-graphql-services/src/TxSubmit/TxSubmitHttpServer.ts:15</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1530111/packages/cardano-graphql-services/src/Http/HttpServer.ts#L18">packages/cardano-graphql-services/src/Http/HttpServer.ts:18</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
+					<a name="metrics" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> metrics</h3>
+					<div class="tsd-signature tsd-kind-icon">metrics<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>enabled<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>options<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Opts</span><span class="tsd-signature-symbol"> }</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from HttpServerConfig.metrics</p>
+						<ul>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1530111/packages/cardano-graphql-services/src/Http/HttpServer.ts#L13">packages/cardano-graphql-services/src/Http/HttpServer.ts:13</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter">
+								<h5>enabled<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></h5>
+							</li>
+							<li class="tsd-parameter">
+								<h5><span class="tsd-flag ts-flagOptional">Optional</span> options<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Opts</span></h5>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
+					<a name="name" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> name</h3>
+					<div class="tsd-signature tsd-kind-icon">name<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from HttpServerConfig.name</p>
+						<ul>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1530111/packages/cardano-graphql-services/src/Http/HttpServer.ts#L17">packages/cardano-graphql-services/src/Http/HttpServer.ts:17</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -171,6 +212,9 @@
 					<li class=" tsd-kind-class tsd-parent-kind-module">
 						<a href="../classes/_cardano_sdk_cardano_graphql_services.TxSubmitHttpServer.html" class="tsd-kind-icon">Tx<wbr>Submit<wbr>Http<wbr>Server</a>
 					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="_cardano_sdk_cardano_graphql_services.HttpServerDependencies.html" class="tsd-kind-icon">Http<wbr>Server<wbr>Dependencies</a>
+					</li>
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface tsd-parent-kind-module">
@@ -179,8 +223,14 @@
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
 								<a href="_cardano_sdk_cardano_graphql_services.TxSubmitHttpServerConfig.html#bodyParser" class="tsd-kind-icon">body<wbr>Parser</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
+							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
 								<a href="_cardano_sdk_cardano_graphql_services.TxSubmitHttpServerConfig.html#listen" class="tsd-kind-icon">listen</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
+								<a href="_cardano_sdk_cardano_graphql_services.TxSubmitHttpServerConfig.html#metrics" class="tsd-kind-icon">metrics</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
+								<a href="_cardano_sdk_cardano_graphql_services.TxSubmitHttpServerConfig.html#name" class="tsd-kind-icon">name</a>
 							</li>
 						</ul>
 					</li>
