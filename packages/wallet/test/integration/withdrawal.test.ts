@@ -1,37 +1,13 @@
-import { Cardano, testnetTimeSettings } from '@cardano-sdk/core';
-import { KeyManagement, SingleAddressWallet, SingleAddressWalletProps, TransactionFailure } from '../../src';
-import { createStubStakePoolSearchProvider, createStubTimeSettingsProvider } from '@cardano-sdk/util-dev';
+import { Cardano } from '@cardano-sdk/core';
+import { SingleAddressWallet, TransactionFailure } from '../../src';
+import { createWallet } from './util';
 import { firstValueFrom } from 'rxjs';
-import { mockAssetProvider, mockTxSubmitProvider, mockWalletProvider } from '../mocks';
-
-const walletProps: SingleAddressWalletProps = { name: 'some-wallet' };
-const networkId = Cardano.NetworkId.mainnet;
-const mnemonicWords = KeyManagement.util.generateMnemonicWords();
-const getPassword = async () => Buffer.from('your_password');
 
 describe('integration/withdrawal', () => {
-  let keyAgent: KeyManagement.KeyAgent;
   let wallet: SingleAddressWallet;
 
   beforeAll(async () => {
-    keyAgent = await KeyManagement.InMemoryKeyAgent.fromBip39MnemonicWords({
-      getPassword,
-      mnemonicWords,
-      networkId
-    });
-    const txSubmitProvider = mockTxSubmitProvider();
-    const walletProvider = mockWalletProvider();
-    const stakePoolSearchProvider = createStubStakePoolSearchProvider();
-    const timeSettingsProvider = createStubTimeSettingsProvider(testnetTimeSettings);
-    const assetProvider = mockAssetProvider();
-    wallet = new SingleAddressWallet(walletProps, {
-      assetProvider,
-      keyAgent,
-      stakePoolSearchProvider,
-      timeSettingsProvider,
-      txSubmitProvider,
-      walletProvider
-    });
+    wallet = await createWallet();
   });
 
   it('has balance', async () => {
@@ -46,7 +22,12 @@ describe('integration/withdrawal', () => {
 
     const rewardAccount = (await firstValueFrom(wallet.addresses$))[0].rewardAccount;
     const txInternals = await wallet.initializeTx({
-      certificates: [{ __typename: Cardano.CertificateType.StakeKeyDeregistration, rewardAccount }],
+      certificates: [
+        {
+          __typename: Cardano.CertificateType.StakeKeyDeregistration,
+          stakeKeyHash: Cardano.Ed25519KeyHash.fromRewardAccount(rewardAccount)
+        }
+      ],
       outputs: new Set(), // In a real transaction you would probably want to have some outputs
       withdrawals: [{ quantity: availableRewards, stakeAddress: rewardAccount }]
     });

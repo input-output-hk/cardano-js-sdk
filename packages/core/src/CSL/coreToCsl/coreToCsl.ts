@@ -1,19 +1,26 @@
-import * as Asset from '../Asset';
-import * as Cardano from '../Cardano';
+import * as Asset from '../../Asset';
+import * as Cardano from '../../Cardano';
 import {
   Address,
+  AssetName,
   Assets,
   AuxiliaryData,
   BigNum,
   Certificates,
+  Ed25519KeyHash,
+  Ed25519KeyHashes,
   Ed25519Signature,
   GeneralTransactionMetadata,
   Int,
   MetadataList,
   MetadataMap,
+  Mint,
+  MintAssets,
   MultiAsset,
   PublicKey,
   RewardAddress,
+  ScriptDataHash,
+  ScriptHash,
   Transaction,
   TransactionBody,
   TransactionHash,
@@ -33,10 +40,9 @@ import {
 } from '@emurgo/cardano-serialization-lib-nodejs';
 
 import * as certificate from './certificate';
-import { SerializationError } from '../errors';
-import { SerializationFailure } from '..';
-import { parseCslAddress } from './parseCslAddress';
-export * as certificate from './certificate';
+import { SerializationError } from '../../errors';
+import { SerializationFailure } from '../..';
+import { parseCslAddress } from '../parseCslAddress';
 
 export const tokenMap = (assets: Cardano.TokenMap) => {
   const multiasset = MultiAsset.new();
@@ -79,6 +85,7 @@ const check64Length = (metadatum: string | Uint8Array): void => {
     );
 };
 
+// eslint-disable-next-line complexity
 export const txMetadatum = (metadatum: Cardano.Metadatum): TransactionMetadatum => {
   if (metadatum === null) throw new SerializationError(SerializationFailure.InvalidType);
   switch (typeof metadatum) {
@@ -86,8 +93,13 @@ export const txMetadatum = (metadatum: Cardano.Metadatum): TransactionMetadatum 
     case 'boolean':
     case 'undefined':
       throw new SerializationError(SerializationFailure.InvalidType);
-    case 'bigint':
-      return TransactionMetadatum.new_int(Int.new(BigNum.from_str(metadatum.toString())));
+    case 'bigint': {
+      const cslInt =
+        metadatum >= 0
+          ? Int.new(BigNum.from_str(metadatum.toString()))
+          : Int.new_negative(BigNum.from_str((metadatum * -1n).toString()));
+      return TransactionMetadatum.new_int(cslInt);
+    }
     case 'string':
       check64Length(metadatum);
       return TransactionMetadatum.new_text(metadatum);
@@ -119,6 +131,30 @@ export const txMetadata = (blob: Map<bigint, Cardano.Metadatum>): GeneralTransac
   return metadata;
 };
 
+export const txMint = (mint: Cardano.TokenMap) => {
+  const cslMint = Mint.new();
+  const mintMap = new Map<Cardano.PolicyId, [ScriptHash, MintAssets]>();
+  for (const [assetId, quantity] of mint.entries()) {
+    const policyId = Asset.util.policyIdFromAssetId(assetId);
+    const assetName = Asset.util.assetNameFromAssetId(assetId);
+    let [scriptHash, mintAssets] = mintMap.get(policyId) || [];
+    if (!scriptHash || !mintAssets) {
+      scriptHash = ScriptHash.from_bytes(Buffer.from(policyId, 'hex'));
+      mintAssets = MintAssets.new();
+      mintMap.set(policyId, [scriptHash, mintAssets]);
+    }
+    const intQuantity =
+      quantity >= 0n
+        ? Int.new(BigNum.from_str(quantity.toString()))
+        : Int.new_negative(BigNum.from_str((quantity * -1n).toString()));
+    mintAssets.insert(AssetName.new(Buffer.from(assetName, 'hex')), intQuantity);
+  }
+  for (const [scriptHash, mintAssets] of mintMap.values()) {
+    cslMint.insert(scriptHash, mintAssets);
+  }
+  return cslMint;
+};
+
 export const txAuxiliaryData = (auxiliaryData?: Cardano.AuxiliaryData): AuxiliaryData | undefined => {
   if (!auxiliaryData) return;
   const result = AuxiliaryData.new();
@@ -130,26 +166,74 @@ export const txAuxiliaryData = (auxiliaryData?: Cardano.AuxiliaryData): Auxiliar
   return result;
 };
 
-export const txBody = (
-  { inputs, outputs, fee, validityInterval, certificates, withdrawals }: Cardano.TxBodyAlonzo,
-  auxiliaryData?: Cardano.AuxiliaryData
-): TransactionBody => {
+const txInputs = (coreInputs: Cardano.TxIn[]) => {
   const cslInputs = TransactionInputs.new();
-  for (const input of inputs) {
+  for (const input of coreInputs) {
     cslInputs.add(txIn(input));
   }
+  return cslInputs;
+};
+
+const keyHashes = (coreHashes: Cardano.Ed25519KeyHash[]) => {
+  const cslKeyHashes = Ed25519KeyHashes.new();
+  for (const signature of coreHashes) {
+    cslKeyHashes.add(Ed25519KeyHash.from_bytes(Buffer.from(signature, 'hex')));
+  }
+  return cslKeyHashes;
+};
+
+const txWithdrawals = (coreWithdrawals: Cardano.Withdrawal[]) => {
+  const cslWithdrawals = Withdrawals.new();
+  for (const { stakeAddress, quantity } of coreWithdrawals) {
+    const cslAddress = RewardAddress.from_address(Address.from_bech32(stakeAddress.toString()));
+    if (!cslAddress) {
+      throw new SerializationError(SerializationFailure.InvalidAddress, `Invalid withdrawal address: ${stakeAddress}`);
+    }
+    cslWithdrawals.insert(cslAddress, BigNum.from_str(quantity.toString()));
+  }
+  return cslWithdrawals;
+};
+
+// eslint-disable-next-line complexity
+export const txBody = (
+  {
+    inputs,
+    outputs,
+    fee,
+    validityInterval,
+    certificates,
+    withdrawals,
+    mint,
+    collaterals,
+    requiredExtraSignatures,
+    scriptIntegrityHash
+  }: Cardano.TxBodyAlonzo,
+  auxiliaryData?: Cardano.AuxiliaryData
+): TransactionBody => {
   const cslOutputs = TransactionOutputs.new();
   for (const output of outputs) {
     cslOutputs.add(txOut(output));
   }
   const cslBody = TransactionBody.new(
-    cslInputs,
+    txInputs(inputs),
     cslOutputs,
     BigNum.from_str(fee.toString()),
     validityInterval.invalidHereafter
   );
   if (validityInterval.invalidBefore) {
     cslBody.set_validity_start_interval(validityInterval.invalidBefore);
+  }
+  if (mint) {
+    cslBody.set_mint(txMint(mint));
+  }
+  if (collaterals) {
+    cslBody.set_collateral(txInputs(collaterals));
+  }
+  if (requiredExtraSignatures?.length) {
+    cslBody.set_required_signers(keyHashes(requiredExtraSignatures));
+  }
+  if (scriptIntegrityHash) {
+    cslBody.set_script_data_hash(ScriptDataHash.from_bytes(Buffer.from(scriptIntegrityHash, 'hex')));
   }
   if (certificates?.length) {
     const certs = Certificates.new();
@@ -159,18 +243,7 @@ export const txBody = (
     cslBody.set_certs(certs);
   }
   if (withdrawals?.length) {
-    const cslWithdrawals = Withdrawals.new();
-    for (const { stakeAddress, quantity } of withdrawals) {
-      const cslAddress = RewardAddress.from_address(Address.from_bech32(stakeAddress.toString()));
-      if (!cslAddress) {
-        throw new SerializationError(
-          SerializationFailure.InvalidAddress,
-          `Invalid withdrawal address: ${stakeAddress}`
-        );
-      }
-      cslWithdrawals.insert(cslAddress, BigNum.from_str(quantity.toString()));
-    }
-    cslBody.set_withdrawals(cslWithdrawals);
+    cslBody.set_withdrawals(txWithdrawals(withdrawals));
   }
   const cslAuxiliaryData = txAuxiliaryData(auxiliaryData);
   if (cslAuxiliaryData) {
@@ -179,15 +252,20 @@ export const txBody = (
   return cslBody;
 };
 
-export const tx = ({ body, witness, auxiliaryData }: Cardano.NewTxAlonzo): Transaction => {
-  const witnessSet = TransactionWitnessSet.new();
+export const witnessSet = (signatures: Cardano.Signatures): TransactionWitnessSet => {
+  const cslWitnessSet = TransactionWitnessSet.new();
   const vkeyWitnesses = Vkeywitnesses.new();
-  for (const [vkey, signature] of witness.signatures.entries()) {
+  for (const [vkey, signature] of signatures.entries()) {
     const publicKey = PublicKey.from_bytes(Buffer.from(vkey, 'hex'));
     const vkeyWitness = Vkeywitness.new(Vkey.new(publicKey), Ed25519Signature.from_hex(signature.toString()));
     vkeyWitnesses.add(vkeyWitness);
   }
-  witnessSet.set_vkeys(vkeyWitnesses);
+  cslWitnessSet.set_vkeys(vkeyWitnesses);
+  return cslWitnessSet;
+};
+
+export const tx = ({ body, witness, auxiliaryData }: Cardano.NewTxAlonzo): Transaction => {
+  const txWitnessSet = witnessSet(witness.signatures);
   // Possible optimization: only convert auxiliary data once
-  return Transaction.new(txBody(body, auxiliaryData), witnessSet, txAuxiliaryData(auxiliaryData));
+  return Transaction.new(txBody(body, auxiliaryData), txWitnessSet, txAuxiliaryData(auxiliaryData));
 };

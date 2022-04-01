@@ -18,6 +18,7 @@ import {
   RewardAddress,
   SingleHostAddr,
   SingleHostName,
+  StakeCredential,
   StakeDelegation,
   StakeDeregistration,
   StakeRegistration,
@@ -25,32 +26,22 @@ import {
   UnitInterval,
   VRFKeyHash
 } from '@emurgo/cardano-serialization-lib-nodejs';
-import { Cardano, NotImplementedError, SerializationError, SerializationFailure } from '..';
-import { CertificateType } from '../Cardano';
+import { Cardano, NotImplementedError } from '../..';
+import { CertificateType } from '../../Cardano';
 
-export const stakeAddressToCredential = (rewardAccount: Cardano.RewardAccount) => {
-  try {
-    const rewardAddress = RewardAddress.from_address(Address.from_bech32(rewardAccount.toString()));
-    if (!rewardAddress)
-      throw new SerializationError(
-        SerializationFailure.InvalidAddress,
-        `Invalid reward account address: ${rewardAccount}`
-      );
-    return rewardAddress.payment_cred();
-  } catch (error) {
-    throw new SerializationError(
-      SerializationFailure.InvalidAddress,
-      `Invalid reward account address: ${rewardAccount}`,
-      error
-    );
-  }
-};
+export const stakeKeyRegistration = (stakeKeyHash: Cardano.Ed25519KeyHash) =>
+  Certificate.new_stake_registration(
+    StakeRegistration.new(
+      StakeCredential.from_keyhash(Ed25519KeyHash.from_bytes(Buffer.from(stakeKeyHash.toString(), 'hex')))
+    )
+  );
 
-export const stakeKeyRegistration = (rewardAccount: Cardano.RewardAccount) =>
-  Certificate.new_stake_registration(StakeRegistration.new(stakeAddressToCredential(rewardAccount)));
-
-export const stakeKeyDeregistration = (rewardAccount: Cardano.RewardAccount) =>
-  Certificate.new_stake_deregistration(StakeDeregistration.new(stakeAddressToCredential(rewardAccount)));
+export const stakeKeyDeregistration = (stakeKeyHash: Cardano.Ed25519KeyHash) =>
+  Certificate.new_stake_deregistration(
+    StakeDeregistration.new(
+      StakeCredential.from_keyhash(Ed25519KeyHash.from_bytes(Buffer.from(stakeKeyHash.toString(), 'hex')))
+    )
+  );
 
 const createCslRelays = (relays: Cardano.Relay[]) => {
   const cslRelays = Relays.new();
@@ -122,10 +113,13 @@ export const poolRegistration = ({
 export const poolRetirement = (poolId: Cardano.PoolId, epoch: number) =>
   Certificate.new_pool_retirement(PoolRetirement.new(Ed25519KeyHash.from_bech32(poolId.toString()), epoch));
 
-export const stakeDelegation = (rewardAccount: Cardano.RewardAccount, delegatee: Cardano.PoolId) =>
+export const stakeDelegation = (stakeKeyHash: Cardano.Ed25519KeyHash, delegatee: Cardano.PoolId) =>
   Certificate.new_stake_delegation(
     // TODO: add coreToCsl support for genesis pool IDs
-    StakeDelegation.new(stakeAddressToCredential(rewardAccount), Ed25519KeyHash.from_bech32(delegatee.toString()))
+    StakeDelegation.new(
+      StakeCredential.from_keyhash(Ed25519KeyHash.from_bytes(Buffer.from(stakeKeyHash.toString(), 'hex'))),
+      Ed25519KeyHash.from_bech32(delegatee.toString())
+    )
   );
 
 export const create = (certificate: Cardano.Certificate) => {
@@ -135,11 +129,11 @@ export const create = (certificate: Cardano.Certificate) => {
     case CertificateType.PoolRetirement:
       return poolRetirement(certificate.poolId, certificate.epoch);
     case CertificateType.StakeDelegation:
-      return stakeDelegation(certificate.rewardAccount, certificate.poolId);
+      return stakeDelegation(certificate.stakeKeyHash, certificate.poolId);
     case CertificateType.StakeKeyDeregistration:
-      return stakeKeyDeregistration(certificate.rewardAccount);
+      return stakeKeyDeregistration(certificate.stakeKeyHash);
     case CertificateType.StakeKeyRegistration:
-      return stakeKeyRegistration(certificate.rewardAccount);
+      return stakeKeyRegistration(certificate.stakeKeyHash);
     default:
       throw new NotImplementedError(`certificate.create ${certificate.__typename}`);
   }

@@ -1,5 +1,6 @@
 export * from './errors';
 export * from './Wallet';
 export * from './types';
-export * from './BrowserExtension';
+export * from './WebExtension';
 export * from './injectWindow';
+export * from './types';

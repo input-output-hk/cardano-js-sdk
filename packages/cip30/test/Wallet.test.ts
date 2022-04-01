@@ -3,68 +3,69 @@
 
 import * as testWallet from './testWallet';
 import { Cardano } from '@cardano-sdk/core';
-import { Wallet, WalletApi, WalletOptions } from '../src/Wallet';
+import { Wallet, WalletApi, WalletMethodNames, WalletOptions } from '../src/Wallet';
 import { mocks } from 'mock-browser';
+import browser from 'webextension-polyfill';
 const window = mocks.MockBrowser.createWindow();
 
-// todo test persistAllowList: true when design is finalised
-const options: WalletOptions = { persistAllowList: false };
+const options: WalletOptions = {};
 
 if (process.env.DEBUG) {
   options.logger = console;
 }
 
 describe('Wallet', () => {
-  const apiMethods = [
-    'getBalance',
-    'getChangeAddress',
-    'getRewardAddresses',
-    'getUnusedAddresses',
-    'getUsedAddresses',
-    'getUtxos',
-    'signData',
-    'signTx',
-    'submitTx'
-  ];
+  const windowStub = { ...window, location: { hostname: 'test-dapp' } };
+
   let wallet: Wallet;
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    await browser.storage.local.clear();
     wallet = new Wallet(testWallet.properties, testWallet.api, testWallet.requestAccess, options);
   });
 
   test('constructed state', async () => {
-    expect(typeof wallet.version).toBe('string');
-    expect(wallet.version).toBe('0.1.0');
+    expect(typeof wallet.apiVersion).toBe('string');
+    expect(wallet.apiVersion).toBe('0.1.0');
     expect(typeof wallet.name).toBe('string');
-    expect(wallet.name).toBe('test-wallet');
+    expect(wallet.name).toBe(testWallet.properties.name);
     expect(typeof wallet.isEnabled).toBe('function');
-    const isEnabled = await wallet.isEnabled(window);
+    const isEnabled = await wallet.isEnabled(windowStub.location.hostname);
     expect(typeof isEnabled).toBe('boolean');
     expect(isEnabled).toBe(false);
     expect(typeof wallet.enable).toBe('function');
   });
 
-  test('getPublicApi', async () => {
-    const publicApi = wallet.getPublicApi(window);
-    expect(publicApi.name).toEqual('test-wallet');
-    expect(await publicApi.isEnabled()).toEqual(false);
+  test('enable', async () => {
+    expect(await wallet.isEnabled(windowStub.location.hostname)).toBe(false);
+    const api = await wallet.enable(windowStub.location.hostname, true);
+    expect(typeof api).toBe('object');
+    const methods = new Set(Object.keys(api));
+    expect(methods).toEqual(new Set(WalletMethodNames));
+    expect(await wallet.isEnabled(windowStub.location.hostname)).toBe(true);
   });
 
-  test('enable', async () => {
-    const windowStub = { ...window, location: { hostname: 'test-dapp' } };
-    expect(await wallet.isEnabled(window)).toBe(false);
-    const api = await wallet.enable(windowStub);
-    expect(typeof api).toBe('object');
-    const methods = Object.keys(api);
-    expect(methods).toEqual(apiMethods);
-    expect(await wallet.isEnabled(windowStub)).toBe(true);
+  test('prior enabling should persist', async () => {
+    const otherHostname = 'anotherHostname';
+    await browser.storage.local.set({ [testWallet.properties.name]: { allowList: [otherHostname] } });
+    const persistedWallet = new Wallet({ ...testWallet.properties }, testWallet.api, testWallet.requestAccess, options);
+
+    expect(await persistedWallet.isEnabled(otherHostname)).toBe(true);
   });
 
   describe('api', () => {
     let api: WalletApi;
 
     beforeAll(async () => {
-      api = await wallet.enable(window);
+      api = await wallet.enable(windowStub.location.hostname, true);
+    });
+
+    test('getNetworkId', async () => {
+      expect(api.getNetworkId).toBeDefined();
+      expect(typeof api.getNetworkId).toBe('function');
+
+      const networkId = await api.getNetworkId();
+      expect(networkId).toEqual(0);
     });
 
     test('getUtxos', async () => {
@@ -138,8 +139,11 @@ describe('Wallet', () => {
       expect(api.signData).toBeDefined();
       expect(typeof api.signData).toBe('function');
 
-      const signedData = await api.signData('addr', 'sig');
-      expect(signedData).toEqual('signedData');
+      const signedData = await api.signData(
+        Cardano.Address('addr_test1vrfxjeunkc9xu8rpnhgkluptaq0rm8kyxh8m3q9vtcetjwshvpnsm'),
+        Buffer.from('').toString('hex')
+      );
+      expect(signedData).toEqual({});
     });
 
     test('submitTx', async () => {

@@ -1,9 +1,10 @@
 import { Cardano } from '@cardano-sdk/core';
-import { RequestAccess, WalletApi } from '../src/Wallet';
+import { RequestAccess, WalletApi, WalletProperties } from '../src/Wallet';
 
 export const api = <WalletApi>{
   getBalance: async () => '100',
   getChangeAddress: async () => 'change-address',
+  getNetworkId: async () => 0,
   getRewardAddresses: async () => ['reward-address-1', 'reward-address-2'],
   getUnusedAddresses: async () => ['unused-address-1', 'unused-address-2', 'unused-address-3'],
   getUsedAddresses: async () => ['used-address-1', 'used-address-2', 'used-address-3'],
@@ -21,11 +22,11 @@ export const api = <WalletApi>{
       }
     ]
   ],
-  signData: async (_addr, _sig) => 'signedData',
+  signData: async (_addr, _payload) => ({}),
   signTx: async (_tx) => 'signedTransaction',
   submitTx: async (_tx) => 'transactionId'
 };
 
-export const properties = { name: 'test-wallet', version: '0.1.0' };
+export const properties: WalletProperties = { apiVersion: '0.1.0', icon: 'imagelink', name: 'testWallet' };
 
 export const requestAccess: RequestAccess = async () => true;

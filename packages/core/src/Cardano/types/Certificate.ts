@@ -1,3 +1,4 @@
+import { Cardano } from '../..';
 import { Epoch, Hash32ByteBase16, Lovelace, PoolId, PoolParameters, RewardAccount } from '.';
 
 export enum CertificateType {
@@ -12,13 +13,12 @@ export enum CertificateType {
 
 export interface StakeAddressCertificate {
   __typename: CertificateType.StakeKeyRegistration | CertificateType.StakeKeyDeregistration;
-  rewardAccount: RewardAccount;
+  stakeKeyHash: Cardano.Ed25519KeyHash;
 }
 
 export interface PoolRegistrationCertificate {
   __typename: CertificateType.PoolRegistration;
-  poolId: PoolId;
-  epoch: Epoch;
+  epoch?: Epoch;
   poolParameters: PoolParameters;
 }
 
@@ -30,16 +30,25 @@ export interface PoolRetirementCertificate {
 
 export interface StakeDelegationCertificate {
   __typename: CertificateType.StakeDelegation;
-  rewardAccount: RewardAccount;
+  stakeKeyHash: Cardano.Ed25519KeyHash;
   poolId: PoolId;
-  epoch: Epoch;
+  /**
+   * Might or might not be present based on source.
+   * Not present in serialized tx.
+   */
+  epoch?: Epoch;
+}
+
+export enum MirCertificatePot {
+  Reserves = 'reserve',
+  Treasury = 'treasury'
 }
 
 export interface MirCertificate {
   __typename: CertificateType.MIR;
   rewardAccount: RewardAccount;
   quantity: Lovelace;
-  pot: 'reserve' | 'treasury';
+  pot: MirCertificatePot;
 }
 
 export interface GenesisKeyDelegationCertificate {

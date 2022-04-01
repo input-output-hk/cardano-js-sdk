@@ -16,7 +16,7 @@ import { queryTransactionsResult, queryTransactionsResult2 } from '../mocks';
 import { waitForWalletStateSettle } from '../util';
 
 const name = 'Test Wallet';
-const address = mocks.utxo[0][0].address;
+const address = mocks.utxo[0][0].address!;
 const rewardAccount = mocks.rewardAccount;
 
 const createWallet = async (stores: WalletStores, walletProvider: WalletProvider) => {
@@ -46,6 +46,7 @@ const assertWalletProperties = async (
   expectedDelegateeId: Cardano.PoolId | undefined,
   expectedRewardsHistory = flatten([...mocks.rewardsHistory.values()])
 ) => {
+  expect(wallet.keyAgent).toBeTruthy();
   // name
   expect(wallet.name).toBe(name);
   // utxo

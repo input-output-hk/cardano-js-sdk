@@ -1,14 +1,18 @@
+import { ApiError } from '../src/errors';
 import { Wallet } from '../src/Wallet';
 import { WindowMaybeWithCardano, injectWindow } from '../src/injectWindow';
 import { api, properties, requestAccess } from './testWallet';
 import { mocks } from 'mock-browser';
+import browser from 'webextension-polyfill';
 
 describe('injectWindow', () => {
   let wallet: Wallet;
   let window: ReturnType<typeof mocks.MockBrowser>;
 
-  beforeEach(() => {
-    wallet = new Wallet(properties, api, requestAccess, { persistAllowList: false });
+  beforeEach(async () => {
+    await browser.storage.local.clear();
+
+    wallet = new Wallet(properties, api, requestAccess);
     window = mocks.MockBrowser.createWindow();
   });
 
@@ -17,9 +21,66 @@ describe('injectWindow', () => {
     injectWindow(window, wallet);
     expect(window.cardano).toBeDefined();
     expect(window.cardano[properties.name].name).toBe(properties.name);
-    expect(await window.cardano[properties.name].isEnabled()).toBe(false);
-    await window.cardano[properties.name].enable();
-    expect(await window.cardano[properties.name].isEnabled()).toBe(true);
+    expect(window.cardano[properties.name].apiVersion).toBe(properties.apiVersion);
+    expect(window.cardano[properties.name].icon).toBe(properties.icon);
+    expect(await window.cardano[properties.name].isEnabled(window.location.hostname)).toBe(false);
+    await window.cardano[properties.name].enable(window.location.hostname);
+    expect(await window.cardano[properties.name].isEnabled(window.location.hostname)).toBe(true);
+  });
+
+  describe('whitelisting with 2 dapps', () => {
+    const firstHostname = 'hostname1';
+    const secondHostname = 'hostname2';
+    beforeEach(async () => {
+      await browser.storage.local.clear();
+    });
+
+    test('Both allowed but not remembered', async () => {
+      injectWindow(window, wallet);
+
+      await window.cardano[properties.name].enable(firstHostname);
+      await window.cardano[properties.name].enable(secondHostname);
+
+      expect(await window.cardano[properties.name].isEnabled(firstHostname)).toBe(true);
+      expect(await window.cardano[properties.name].isEnabled(secondHostname)).toBe(true);
+
+      window = mocks.MockBrowser.createWindow();
+      // re-inject window
+      const newWallet = new Wallet(properties, api, requestAccess);
+      injectWindow(window, newWallet);
+
+      expect(await window.cardano[properties.name].isEnabled(firstHostname)).toBe(false);
+      expect(await window.cardano[properties.name].isEnabled(secondHostname)).toBe(false);
+    });
+
+    test('Both allowed, one remembered', async () => {
+      injectWindow(window, wallet);
+
+      await window.cardano[properties.name].enable(firstHostname, true);
+      await window.cardano[properties.name].enable(secondHostname);
+
+      expect(await window.cardano[properties.name].isEnabled(firstHostname)).toBe(true);
+      expect(await window.cardano[properties.name].isEnabled(secondHostname)).toBe(true);
+
+      window = mocks.MockBrowser.createWindow();
+      // re-inject window
+      const newWallet = new Wallet(properties, api, requestAccess);
+      injectWindow(window, newWallet);
+
+      expect(await window.cardano[properties.name].isEnabled(firstHostname)).toBe(true);
+      expect(await window.cardano[properties.name].isEnabled(secondHostname)).toBe(false);
+    });
+
+    test('One allowed, one disallowed', async () => {
+      const allowAccess = jest.fn().mockReturnValueOnce(true).mockReturnValueOnce(false);
+      const nextWallet = new Wallet(properties, api, allowAccess);
+
+      injectWindow(window, nextWallet);
+
+      await window.cardano[properties.name].enable(firstHostname);
+      await expect(window.cardano[properties.name].enable(secondHostname)).rejects.toThrow(ApiError);
+      expect(await window.cardano[properties.name].isEnabled(firstHostname)).toBe(true);
+    });
   });
 
   describe('existing cardano object', () => {
@@ -38,7 +99,15 @@ describe('injectWindow', () => {
       expect(window.cardano).toBeDefined();
       injectWindow(window, wallet);
       expect(window.cardano[properties.name].name).toBe(properties.name);
-      expect(Object.keys(window.cardano[properties.name])).toEqual(['enable', 'isEnabled', 'name', 'version']);
+      expect(window.cardano[properties.name].apiVersion).toBe(properties.apiVersion);
+      expect(window.cardano[properties.name].icon).toBe(properties.icon);
+      expect(Object.keys(window.cardano[properties.name])).toEqual([
+        'apiVersion',
+        'enable',
+        'icon',
+        'isEnabled',
+        'name'
+      ]);
       expect(window.cardano['another-obj']).toBe(anotherObj);
     });
   });

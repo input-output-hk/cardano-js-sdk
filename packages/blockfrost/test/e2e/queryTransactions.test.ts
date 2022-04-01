@@ -71,7 +71,9 @@ describe('blockfrostWalletProvider', () => {
       expect(tx.body.certificates![0]).toEqual({
         __typename: 'StakeKeyRegistrationCertificate',
         certIndex: 0,
-        rewardAccount: 'stake_test1upqykkjq3zhf4085s6n70w8cyp57dl87r0ezduv9rnnj2uqk5zmdv'
+        stakeKeyHash: Cardano.Ed25519KeyHash.fromRewardAccount(
+          Cardano.RewardAccount('stake_test1upqykkjq3zhf4085s6n70w8cyp57dl87r0ezduv9rnnj2uqk5zmdv')
+        )
       });
     });
     it('has StakeDelegation cert', async () => {
@@ -84,20 +86,24 @@ describe('blockfrostWalletProvider', () => {
         delegationIndex: 1,
         epoch: 182,
         poolId: 'pool167u07rzwu6dr40hx2pr4vh592vxp4zen9ct2p3h84wzqzv6fkgv',
-        rewardAccount: 'stake_test1upqykkjq3zhf4085s6n70w8cyp57dl87r0ezduv9rnnj2uqk5zmdv'
+        stakeKeyHash: Cardano.Ed25519KeyHash.fromRewardAccount(
+          Cardano.RewardAccount('stake_test1upqykkjq3zhf4085s6n70w8cyp57dl87r0ezduv9rnnj2uqk5zmdv')
+        )
       });
     });
-    it('has StakeKeyDereegistration cert', async () => {
+    it('has StakeKeyDeregistration cert', async () => {
       const [tx] = await walletProvider.queryTransactionsByHashes([
         Cardano.TransactionId('150a445f4d1f2e692791daec9c09f32d6c8c25a3f9ca6c7cf14ff8085375aaa0')
       ]);
       expect(tx.body.certificates![0]).toEqual({
         __typename: 'StakeKeyDeregistrationCertificate',
         certIndex: 0,
-        rewardAccount: 'stake_test1uqe2twywhfjwt88ghas4sfgq7pp7m8wq64hlhz0vr4uhu2sj2tuzt'
+        stakeKeyHash: Cardano.Ed25519KeyHash.fromRewardAccount(
+          Cardano.RewardAccount('stake_test1uqe2twywhfjwt88ghas4sfgq7pp7m8wq64hlhz0vr4uhu2sj2tuzt')
+        )
       });
     });
-    it('has PoolRegistration cert', async () => {
+    it('PoolRegistration poolParameters are not implemented (null)', async () => {
       const [tx] = await walletProvider.queryTransactionsByHashes([
         Cardano.TransactionId('295d5e0f7ee182426eaeda8c9f1c63502c72cdf4afd6e0ee0f209adf94a614e7')
       ]);

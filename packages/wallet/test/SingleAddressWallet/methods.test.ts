@@ -9,7 +9,7 @@ jest.mock('../../src/KeyManagement/cip8/cip30signData');
 const { cip30signData } = jest.requireMock('../../src/KeyManagement/cip8/cip30signData');
 
 describe('SingleAddressWallet methods', () => {
-  const address = mocks.utxo[0][0].address;
+  const address = mocks.utxo[0][0].address!;
   let txSubmitProvider: mocks.TxSubmitProviderStub;
   let walletProvider: mocks.WalletProviderStub;
   let wallet: SingleAddressWallet;

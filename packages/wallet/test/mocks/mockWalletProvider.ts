@@ -3,6 +3,7 @@ import { AssetId, somePartialStakePools } from '@cardano-sdk/util-dev';
 import { Cardano, EpochRewards } from '@cardano-sdk/core';
 
 export const rewardAccount = Cardano.RewardAccount('stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d');
+export const stakeKeyHash = Cardano.Ed25519KeyHash.fromRewardAccount(rewardAccount);
 
 export const utxo: Cardano.Utxo[] = [
   [
@@ -93,13 +94,13 @@ export const queryTransactionsResult: Cardano.TxAlonzo[] = [
       certificates: [
         {
           __typename: Cardano.CertificateType.StakeKeyRegistration,
-          rewardAccount
+          stakeKeyHash
         },
         {
           __typename: Cardano.CertificateType.StakeDelegation,
           epoch: currentEpoch.number - 10,
           poolId: somePartialStakePools[0].id,
-          rewardAccount
+          stakeKeyHash
         }
       ],
       fee: 200_000n,

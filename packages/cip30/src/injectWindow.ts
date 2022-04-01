@@ -1,14 +1,14 @@
 import { Logger, dummyLogger } from 'ts-log';
-import { Wallet, WalletPublic } from './Wallet';
+import { Wallet } from './Wallet';
 
-export type WindowMaybeWithCardano = Window & { cardano?: { [k: string]: WalletPublic } };
+export type WindowMaybeWithCardano = Window & { cardano?: { [k: string]: Wallet } };
 
 export const injectWindow = (window: WindowMaybeWithCardano, wallet: Wallet, logger: Logger = dummyLogger): void => {
   if (!window.cardano) {
     logger.debug(
       {
         module: 'injectWindow',
-        wallet: { name: wallet.name, version: wallet.version }
+        wallet: { apiVersion: wallet.apiVersion, icon: wallet.icon, name: wallet.name }
       },
       'Creating cardano global scope'
     );
@@ -17,16 +17,16 @@ export const injectWindow = (window: WindowMaybeWithCardano, wallet: Wallet, log
     logger.debug(
       {
         module: 'injectWindow',
-        wallet: { name: wallet.name, version: wallet.version }
+        wallet: { apiVersion: wallet.apiVersion, icon: wallet.icon, name: wallet.name }
       },
       'Cardano global scope exists'
     );
   }
-  window.cardano[wallet.name] = window.cardano[wallet.name] || wallet.getPublicApi(window);
+  window.cardano[wallet.name] = window.cardano[wallet.name] || wallet;
   logger.debug(
     {
       module: 'injectWindow',
-      wallet: { name: wallet.name, version: wallet.version },
+      wallet: { apiVersion: wallet.apiVersion, icon: wallet.icon, name: wallet.name },
       windowCardano: window.cardano
     },
     'Injected'

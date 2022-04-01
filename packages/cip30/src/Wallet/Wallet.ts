@@ -1,19 +1,26 @@
 import { APIErrorCode, ApiError } from '../errors';
 import { Logger, dummyLogger } from 'ts-log';
+import { Storage, storage } from 'webextension-polyfill';
 import { WalletApi } from './types';
-import { WindowMaybeWithCardano } from '../injectWindow';
 
 /**
- * CIP30 Specification version
+ * CIP30 API version
  */
-export type SpecificationVersion = string;
+export type ApiVersion = string;
 
 /**
  * Unique identifier, used to inject into the cardano namespace
  */
 export type WalletName = string;
 
-export type WalletProperties = { name: WalletName; version: SpecificationVersion };
+/**
+ * A URI image (e.g. data URI base64 or other) for img src for the wallet
+ * which can be used inside of the dApp for the purpose of asking the user
+ * which wallet they would like to connect with.
+ */
+export type WalletIcon = string;
+
+export type WalletProperties = { apiVersion: ApiVersion; icon: WalletIcon; name: WalletName };
 
 /**
  * Resolve true to authorise access to the WalletAPI, or resolve false to deny.
@@ -24,61 +31,65 @@ export type RequestAccess = () => Promise<boolean>;
 
 export type WalletOptions = {
   logger?: Logger;
-  persistAllowList?: boolean;
-  storage?: Storage;
+  storage?: Storage.LocalStorageArea;
 };
 
 const defaultOptions = {
   logger: dummyLogger,
   persistAllowList: false,
-  storage: window.localStorage
+  storage: storage.local
+};
+
+type WalletStorage = {
+  allowList: string[];
 };
 
 export class Wallet {
-  readonly version: SpecificationVersion;
+  readonly apiVersion: ApiVersion;
   readonly name: WalletName;
+  readonly icon: WalletIcon;
 
-  private allowList: string[];
-  private logger: Logger;
-  private readonly options: Required<WalletOptions>;
+  #allowList: string[] | null;
+  #logger: Logger;
+  #api: WalletApi;
+  #requestAccess: RequestAccess;
+  readonly #options: Required<WalletOptions>;
 
-  constructor(
-    properties: WalletProperties,
-    private api: WalletApi,
-    private requestAccess: RequestAccess,
-    options?: WalletOptions
-  ) {
-    this.options = { ...defaultOptions, ...options };
+  constructor(properties: WalletProperties, api: WalletApi, requestAccess: RequestAccess, options?: WalletOptions) {
+    this.apiVersion = properties.apiVersion;
+    this.enable = this.enable.bind(this);
+    this.icon = properties.icon;
+    this.isEnabled = this.isEnabled.bind(this);
     this.name = properties.name;
-    this.version = properties.version;
-    this.allowList = this.options.persistAllowList ? this.getAllowList() : [];
-    this.logger = this.options.logger;
+    this.#allowList = null;
+    this.#api = api;
+    this.#options = { ...defaultOptions, ...options };
+    this.#logger = this.#options.logger;
+    this.#requestAccess = requestAccess;
   }
 
-  public getPublicApi(window: WindowMaybeWithCardano) {
-    return {
-      enable: this.enable.bind(this, window),
-      isEnabled: this.isEnabled.bind(this, window),
-      name: this.name,
-      version: this.version
-    };
+  async #getAllowList(storageKey: string): Promise<string[]> {
+    if (!storageKey) return [];
+    try {
+      const persistedStorage: Record<string, WalletStorage> = await this.#options.storage.get(storageKey);
+      return persistedStorage[storageKey].allowList || [];
+    } catch (error) {
+      this.#logger.error(error);
+      return [];
+    }
   }
 
-  private getAllowList(): string[] {
-    // JSON.parse(null) seems to be legit
-    return JSON.parse(this.options.storage.getItem(this.name)!) || [];
-  }
+  async #allowApplication(appName: string, persist?: boolean) {
+    if (!this.#allowList) {
+      this.#allowList = await this.#getAllowList(this.name);
+    }
+    this.#allowList.push(appName);
 
-  private allowApplication(appName: string) {
-    this.allowList.push(appName);
-
-    if (this.options.persistAllowList) {
-      const currentList = this.getAllowList();
-      // Todo: Encrypt
-      this.options.storage?.setItem(this.name, JSON.stringify([...currentList, appName]));
-      this.logger.debug(
+    if (persist) {
+      await this.#options.storage.set({ [this.name]: { allowList: [...this.#allowList, appName] } });
+      this.#logger.debug(
         {
-          allowList: this.getAllowList(),
+          allowList: this.#allowList,
           module: 'Wallet',
           walletName: this.name
         },
@@ -96,9 +107,16 @@ export class Wallet {
    *
    * Errors: `ApiError`
    */
-  public async isEnabled(window: WindowMaybeWithCardano): Promise<Boolean> {
-    const appName = window.location.hostname;
-    return this.allowList.includes(appName);
+  public async isEnabled(hostname: string): Promise<Boolean> {
+    try {
+      if (!this.#allowList) {
+        this.#allowList = await this.#getAllowList(this.name);
+      }
+      return this.#allowList.includes(hostname);
+    } catch (error) {
+      this.#logger.error(error);
+      throw error;
+    }
   }
 
   /**
@@ -116,31 +134,41 @@ export class Wallet {
    *
    * Errors: `ApiError`
    */
-  public async enable(window: WindowMaybeWithCardano): Promise<WalletApi> {
-    const appName = window.location.hostname;
-
-    if (this.options.persistAllowList && this.allowList.includes(appName)) {
-      this.logger.debug(
+  public async enable(hostname: string, persist?: boolean): Promise<WalletApi> {
+    if (await this.isEnabled(hostname)) {
+      this.#logger.debug(
         {
           module: 'Wallet',
           walletName: this.name
         },
-        `${appName} has previously been allowed`
+        `${hostname} has previously been allowed`
       );
-      return this.api;
+      return this.#api;
     }
 
     // gain authorization from wallet owner
-    const isAuthed = await this.requestAccess();
+    const isAuthed = await this.#requestAccess();
 
     if (!isAuthed) {
+      this.#logger.debug(`${hostname} not authorized to access api`);
       throw new ApiError(APIErrorCode.Refused, 'wallet not authorized.');
     }
 
-    this.allowApplication(appName);
+    await this.#allowApplication(hostname, persist);
 
-    return this.api;
+    return this.#api;
   }
 }
 
-export type WalletPublic = ReturnType<Wallet['getPublicApi']>;
+export const WalletMethodNames: (keyof WalletApi)[] = [
+  'getNetworkId',
+  'getUtxos',
+  'getBalance',
+  'getUsedAddresses',
+  'getUnusedAddresses',
+  'getChangeAddress',
+  'getRewardAddresses',
+  'signTx',
+  'signData',
+  'submitTx'
+];

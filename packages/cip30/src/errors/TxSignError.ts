@@ -5,7 +5,7 @@ import { CustomError } from 'ts-custom-error';
  * unable to sign the transaction (e.g. not having some of the private keys)
  * - UserDeclined - User declined to sign the transaction
  */
-enum TxSignErrorCode {
+export enum TxSignErrorCode {
   ProofGeneration = 1,
   UserDeclined = 2
 }

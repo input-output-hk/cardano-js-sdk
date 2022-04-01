@@ -1,6 +1,16 @@
-import { Bytes, Cbor, Paginate } from '../types';
+import { Bytes, Cbor, Cip30DataSignature, Paginate } from '../types';
 import { Cardano } from '@cardano-sdk/core';
 
+/**
+ * Returns the network id of the currently connected account.
+ * 0 is testnet and 1 is mainnet but other networks can possibly be returned by wallets.
+ * Those other network ID values are not governed by this document.
+ *
+ * This result will stay the same unless the connected account has changed.
+ *
+ * @throws ApiError
+ */
+export type GetNetworkId = () => Promise<Cardano.NetworkId>;
 /**
  * If `amount` is `undefined`, this shall return a list of all UTxOs (unspent transaction outputs)
  * controlled by the wallet.
@@ -11,7 +21,8 @@ import { Cardano } from '@cardano-sdk/core';
  *
  * The results can be further paginated by `paginate` if it is not `undefined`.
  *
- * Errors: `ApiError` | `PaginateError`
+ * @throws ApiError
+ * @throws PaginateError
  */
 export type GetUtxos = (amount?: Cbor, paginate?: Paginate) => Promise<Cardano.Utxo[] | undefined>;
 
@@ -22,7 +33,7 @@ export type GetUtxos = (amount?: Cbor, paginate?: Paginate) => Promise<Cardano.U
  * and likely already maintained by the implementing wallet in a more efficient manner
  * so it has been included in the API as well.
  *
- * Errors: `ApiError`
+ * @throws ApiError
  */
 export type GetBalance = () => Promise<Cbor>;
 
@@ -31,14 +42,15 @@ export type GetBalance = () => Promise<Cbor>;
  *
  * The results can be further paginated by `paginate` if it is not `undefined`.
  *
- * Errors: `ApiError` | `PaginateError`
+ * @throws ApiError
+ * @throws PaginateError
  */
 export type GetUsedAddresses = (paginate?: Paginate) => Promise<Cbor[]>;
 
 /**
  * Returns a list of unused addresses controlled by the wallet.
  *
- * Errors: `ApiError`
+ * @throws ApiError
  */
 export type GetUnusedAddresses = () => Promise<Cbor[]>;
 
@@ -48,14 +60,14 @@ export type GetUnusedAddresses = () => Promise<Cbor[]>;
  *
  * This can be used as a generic receive address as well.
  *
- * Errors: `ApiError`
+ * @throws ApiError
  */
 export type GetChangeAddress = () => Promise<Cbor>;
 
 /**
  * Returns the reward addresses owned by the wallet. This can return multiple addresses e.g. CIP-0018.
  *
- * Errors: `ApiError`
+ * @throws ApiError
  */
 export type GetRewardAddresses = () => Promise<Cbor[]>;
 
@@ -75,7 +87,8 @@ export type GetRewardAddresses = () => Promise<Cbor[]>;
  * Only the portions of the witness set that were signed as a result of this call are
  * returned to encourage dApps to verify the contents returned by this endpoint while building the final transaction.
  *
- * Errors: `ApiError` | `TxSignError`
+ * @throws ApiError
+ * @throws TxSignError
  */
 export type SignTx = (tx: Cbor, partialSign?: Boolean) => Promise<Cbor>;
 
@@ -88,9 +101,10 @@ export type SignTx = (tx: Cbor, partialSign?: Boolean) => Promise<Cbor>;
  *
  * Please refer to the CIP-0008 spec for details on how to construct the sig structure.
  *
- * Errors: `ApiError` | `DataSignError`
+ * @throws ApiError
+ * @throws DataSignError
  */
-export type SignData = (addr: Cbor, sigStructure: Cbor) => Promise<Bytes>;
+export type SignData = (addr: Cardano.Address, payload: Bytes) => Promise<Cip30DataSignature>;
 
 /**
  * As wallets should already have this ability, we allow dApps to request that a transaction be sent through it.
@@ -100,11 +114,14 @@ export type SignData = (addr: Cbor, sigStructure: Cbor) => Promise<Bytes>;
  * The wallet is free to return the `TxSendError` with code `Refused` if they do not wish to send it,
  * or `Failure` if there was an error in sending it (e.g. preliminary checks failed on signatures).
  *
- * Errors: `ApiError` | `TxSendError`
+ * @throws ApiError
+ * @throws TxSendError
  */
 export type SubmitTx = (tx: Cbor) => Promise<string>;
 
 export interface WalletApi {
+  getNetworkId: GetNetworkId;
+
   getUtxos: GetUtxos;
 
   getBalance: GetBalance;

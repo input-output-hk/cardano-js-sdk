@@ -26,12 +26,13 @@ export const isLastStakeKeyCertOfType = (
   certType: Cardano.CertificateType.StakeKeyRegistration | Cardano.CertificateType.StakeKeyDeregistration,
   rewardAccount?: Cardano.RewardAccount
 ) => {
+  const stakeKeyHash = rewardAccount ? Cardano.Ed25519KeyHash.fromRewardAccount(rewardAccount) : null;
   const lastRegOrDereg = last(
     transactionsCertificates
       .map((certificates) => {
         const allStakeKeyCertificates = stakeKeyCertficates(certificates);
-        const addressStakeKeyCertificates = rewardAccount
-          ? allStakeKeyCertificates.filter(({ rewardAccount: address }) => rewardAccount === address)
+        const addressStakeKeyCertificates = stakeKeyHash
+          ? allStakeKeyCertificates.filter(({ stakeKeyHash: certStakeKeyHash }) => stakeKeyHash === certStakeKeyHash)
           : allStakeKeyCertificates;
         return last(addressStakeKeyCertificates);
       })

@@ -51,8 +51,8 @@ describe('Cardano.util/primitives', () => {
   });
 
   describe('typedHex', () => {
-    it('throws when asserting an empty string', () => {
-      expect(() => typedHex('')).toThrowError(InvalidStringError);
+    it('does not throw when asserting an empty string', () => {
+      expect(() => typedHex('')).not.toThrow();
     });
 
     it('does not throw when asserting a valid hex string', () => {
@@ -72,8 +72,8 @@ describe('Cardano.util/primitives', () => {
   });
 
   describe('HexBlob', () => {
-    it('throws when asserting an empty string', () => {
-      expect(() => HexBlob('')).toThrowError(InvalidStringError);
+    it('allows an empty string', () => {
+      expect(() => HexBlob('')).not.toThrow();
     });
 
     it('does not throw when asserting a valid hex string', () => {

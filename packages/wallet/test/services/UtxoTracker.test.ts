@@ -28,7 +28,7 @@ describe('createUtxoTracker', () => {
       });
       const utxoTracker = createUtxoTracker(
         {
-          addresses$: cold('a', { a: [address] }),
+          addresses$: cold('a', { a: [address!] }),
           retryBackoffConfig,
           store,
           tipBlockHeight$,

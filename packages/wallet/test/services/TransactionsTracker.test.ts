@@ -22,7 +22,7 @@ describe('TransactionsTracker', () => {
     let walletProvider: WalletProviderStub;
     const tip$ = of(300);
     const retryBackoffConfig = { initialInterval: 1 }; // not relevant
-    const addresses = [queryTransactionsResult[0].body.inputs[0].address];
+    const addresses = [queryTransactionsResult[0].body.inputs[0].address!];
 
     beforeEach(() => {
       walletProvider = mockWalletProvider();
@@ -106,7 +106,7 @@ describe('TransactionsTracker', () => {
     let walletProvider: WalletProvider;
     let store: OrderedCollectionStore<Cardano.TxAlonzo>;
     const myAddress = queryTransactionsResult[0].body.inputs[0].address;
-    const addresses$ = of([myAddress]);
+    const addresses$ = of([myAddress!]);
 
     beforeEach(() => {
       store = new InMemoryTransactionsStore();

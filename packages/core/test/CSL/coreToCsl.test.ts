@@ -1,54 +1,13 @@
 /* eslint-disable max-len */
 import { Asset, CSL, Cardano, SerializationFailure, coreToCsl } from '../../src';
 import { BigNum } from '@emurgo/cardano-serialization-lib-nodejs';
+import { signature, tx, txBody, txIn, txOut, valueCoinOnly, valueWithAssets, vkey } from './testData';
 
-const txIn: Cardano.TxIn = {
-  address: Cardano.Address(
-    'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
-  ),
-  index: 0,
-  txId: Cardano.TransactionId('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5')
-};
-const txOut: Cardano.TxOut = {
-  address: Cardano.Address(
-    'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
-  ),
-  value: {
-    assets: new Map([
-      [Cardano.AssetId('2a286ad895d091f2b3d168a6091ad2627d30a72761a5bc36eef00740'), 20n],
-      [Cardano.AssetId('659f2917fb63f12b33667463ee575eeac1845bbc736b9c0bbc40ba8254534c41'), 50n]
-    ]),
-    coins: 10n
-  }
-};
 const txOutByron = {
   ...txOut,
   address: Cardano.Address(
     'DdzFFzCqrhsw3prhfMFDNFowbzUku3QmrMwarfjUbWXRisodn97R436SHc1rimp4MhPNmbdYb1aTdqtGSJixMVMi5MkArDQJ6Sc1n3Ez'
   )
-};
-
-const coreTxBody: Cardano.TxBodyAlonzo = {
-  certificates: [
-    {
-      __typename: Cardano.CertificateType.PoolRetirement,
-      epoch: 500,
-      poolId: Cardano.PoolId('pool1y6chk7x7fup4ms9leesdr57r4qy9cwxuee0msan72x976a6u0nc')
-    }
-  ],
-  fee: 10n,
-  inputs: [txIn],
-  outputs: [txOut],
-  validityInterval: {
-    invalidBefore: 100,
-    invalidHereafter: 1000
-  },
-  withdrawals: [
-    {
-      quantity: 5n,
-      stakeAddress: Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27')
-    }
-  ]
 };
 
 describe('coreToCsl', () => {
@@ -64,17 +23,16 @@ describe('coreToCsl', () => {
   });
   describe('value', () => {
     it('coin only', () => {
-      const quantities = { coins: 100_000n };
-      const value = coreToCsl.value(quantities);
-      expect(value.coin().to_str()).toEqual(quantities.coins.toString());
+      const value = coreToCsl.value(valueCoinOnly);
+      expect(value.coin().to_str()).toEqual(valueCoinOnly.coins.toString());
       expect(value.multiasset()).toBeUndefined();
     });
     it('coin with assets', () => {
-      const value = coreToCsl.value(txOut.value);
-      expect(value.coin().to_str()).toEqual(txOut.value.coins.toString());
+      const value = coreToCsl.value(valueWithAssets);
+      expect(value.coin().to_str()).toEqual(valueWithAssets.coins.toString());
       const multiasset = value.multiasset()!;
       expect(multiasset.len()).toBe(2);
-      for (const [assetId, expectedAssetQuantity] of txOut.value.assets!.entries()) {
+      for (const [assetId, expectedAssetQuantity] of valueWithAssets.assets!.entries()) {
         const { scriptHash, assetName } = Asset.util.parseAssetId(assetId);
         const assetQuantity = BigInt(multiasset.get(scriptHash)!.get(assetName)!.to_str());
         expect(assetQuantity).toBe(expectedAssetQuantity);
@@ -93,31 +51,32 @@ describe('coreToCsl', () => {
     }
   });
   it('txBody', () => {
-    const cslBody = coreToCsl.txBody(coreTxBody);
+    const cslBody = coreToCsl.txBody(txBody);
     expect(cslBody.certs()?.get(0).as_pool_retirement()?.epoch()).toBe(500);
-    expect(cslBody.fee().to_str()).toBe(coreTxBody.fee.toString());
+    expect(cslBody.fee().to_str()).toBe(txBody.fee.toString());
     expect(Buffer.from(cslBody.inputs().get(0).transaction_id().to_bytes()).toString('hex')).toBe(
-      coreTxBody.inputs[0].txId
+      txBody.inputs[0].txId
     );
-    expect(cslBody.outputs().get(0).amount().coin().to_str()).toBe(coreTxBody.outputs[0].value.coins.toString());
-    expect(cslBody.validity_start_interval()).toBe(coreTxBody.validityInterval.invalidBefore);
-    expect(cslBody.ttl()).toBe(coreTxBody.validityInterval.invalidHereafter);
+    expect(cslBody.outputs().get(0).amount().coin().to_str()).toBe(txBody.outputs[0].value.coins.toString());
+    expect(cslBody.validity_start_interval()).toBe(txBody.validityInterval.invalidBefore);
+    expect(cslBody.ttl()).toBe(txBody.validityInterval.invalidHereafter);
     expect(cslBody.withdrawals()?.get(cslBody.withdrawals()!.keys().get(0)!)?.to_str()).toBe(
-      coreTxBody.withdrawals![0].quantity.toString()
+      txBody.withdrawals![0].quantity.toString()
     );
+
+    const mint = cslBody.multiassets()!;
+    const scriptHashes = mint.keys();
+    const mintAssets1 = mint.get(scriptHashes.get(0))!;
+    const mintAssets2 = mint.get(scriptHashes.get(1))!;
+    expect(mintAssets1.get(mintAssets1.keys().get(0))!.as_positive()!.to_str()).toBe('20');
+    expect(mintAssets2.get(mintAssets2.keys().get(0))!.as_negative()!.to_str()).toBe('50');
+
+    expect(cslBody.collateral()!.len()).toBe(1);
+    expect(cslBody.required_signers()!.len()).toBe(1);
+    expect(cslBody.script_data_hash()).toBeTruthy();
   });
   it('tx', () => {
-    const vkey = '6199186adb51974690d7247d2646097d2c62763b767b528816fb7ed3f9f55d39';
-    const signature =
-      'bdea87fca1b4b4df8a9b8fb4183c0fab2f8261eb6c5e4bc42c800bb9c8918755bdea87fca1b4b4df8a9b8fb4183c0fab2f8261eb6c5e4bc42c800bb9c8918755';
-    const coreTx: Cardano.NewTxAlonzo = {
-      body: coreTxBody,
-      id: Cardano.TransactionId('886206542d63b23a047864021fbfccf291d78e47c1e59bd4c75fbc67b248c5e8'),
-      witness: {
-        signatures: new Map([[Cardano.Ed25519PublicKey(vkey), Cardano.Ed25519Signature(signature)]])
-      }
-    };
-    const cslTx = coreToCsl.tx(coreTx);
+    const cslTx = coreToCsl.tx(tx);
     expect(cslTx.body()).toBeInstanceOf(CSL.TransactionBody);
     const witness = cslTx.witness_set().vkeys()!.get(0)!;
     expect(Buffer.from(witness.vkey().public_key().as_bytes()).toString('hex')).toBe(vkey);

@@ -1,43 +1,47 @@
-import { AssetId, CslTestUtil } from '@cardano-sdk/util-dev';
-import { CSL, Cardano, coreToCsl, cslToCore } from '@cardano-sdk/core';
+import { coreToCsl, cslToCore } from '../../src';
+import { mintTokenMap, tx, txBody, txIn, txInWithAddress, txOut, valueCoinOnly, valueWithAssets } from './testData';
 
 describe('cslToCore', () => {
   describe('value', () => {
     it('coin only', () => {
-      const coins = 100_000n;
-      const value = CSL.Value.new(CSL.BigNum.from_str(coins.toString()));
-      const quantities = cslToCore.value(value);
-      expect(quantities.coins).toEqual(coins);
-      expect(quantities.assets).toBeUndefined();
+      expect(cslToCore.value(coreToCsl.value(valueCoinOnly))).toEqual(valueCoinOnly);
     });
-    it('coin with assets', () => {
-      const coins = 100_000n;
-      const assets = new Map([
-        [AssetId.TSLA, 100n],
-        [AssetId.PXL, 200n]
-      ]);
-      const value = coreToCsl.value({ assets, coins });
-      const quantities = cslToCore.value(value);
-      expect(quantities.coins).toEqual(coins);
-      expect(quantities.assets).toEqual(assets);
+    it('csltOCore coin with assets', () => {
+      expect(cslToCore.value(coreToCsl.value(valueWithAssets))).toEqual(valueWithAssets);
     });
   });
 
-  it('txIn', () => {
-    const cslInput = CslTestUtil.createTxInput();
-    const address = Cardano.Address('addr_test1vrdkagyspkmt96k6z87rnt9dzzy8mlcex7awjymm8wx434q837u24');
-    const txIn = cslToCore.txIn(cslInput, address);
-    expect(typeof txIn.index).toBe('number');
-    expect(typeof txIn.txId).toBe('string');
-    expect(txIn.address).toBe(address);
+  describe('txIn', () => {
+    it('converts an input', () => {
+      expect(cslToCore.txIn(coreToCsl.txIn(txIn))).toEqual(txIn);
+    });
+    it('doesnt serialize address', () => {
+      expect(cslToCore.txIn(coreToCsl.txIn(txInWithAddress))).toEqual({
+        ...txInWithAddress,
+        address: undefined
+      });
+    });
   });
 
   it('txOut', () => {
-    const value = { coins: 100_000n };
-    const cslOutput = CslTestUtil.createOutput(value);
-    const txOut = cslToCore.txOut(cslOutput);
-    expect(typeof txOut.address).toBe('string');
-    expect(txOut.value).toEqual(value);
-    expect(txOut.datum).toBeUndefined();
+    expect(cslToCore.txOut(coreToCsl.txOut(txOut))).toEqual(txOut);
+  });
+
+  it('txMint', () => {
+    expect(cslToCore.txMint(coreToCsl.txMint(mintTokenMap))).toEqual(mintTokenMap);
+  });
+
+  describe('txAuxiliaryData', () => {
+    // mostly covered by newTx - could just remove this
+    it.todo('txMetadata');
+    it.todo('txScripts');
+  });
+
+  it('txBody', () => {
+    expect(cslToCore.txBody(coreToCsl.txBody(txBody))).toEqual(txBody);
+  });
+
+  it('newTx', () => {
+    expect(cslToCore.newTx(coreToCsl.tx(tx))).toEqual(tx);
   });
 });

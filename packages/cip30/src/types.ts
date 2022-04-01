@@ -1,3 +1,5 @@
+import { Cardano } from '@cardano-sdk/core';
+
 /**
  * A hex-encoded string of the corresponding bytes.
  */
@@ -16,3 +18,15 @@ Limits results to {limit} each page, and uses a 0-indexing {page}
 to refer to which of those pages of {limit} items each.
  */
 export type Paginate = { page: number; limit: number };
+
+/**
+ * DataSignature type as described in CIP-0030.
+ */
+
+type CoseSign1CborHex = Cardano.util.HexBlob;
+type CoseKeyCborHex = Cardano.util.HexBlob;
+
+export interface Cip30DataSignature {
+  key: CoseKeyCborHex;
+  signature: CoseSign1CborHex;
+}
