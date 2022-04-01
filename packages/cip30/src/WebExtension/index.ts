@@ -1,2 +1,2 @@
-export * from './handleMessages';
+export { handleMessages } from './handleMessages';
 export * from './webExtensionWalletClient';
