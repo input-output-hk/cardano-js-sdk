@@ -1,10 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { APIErrorCode, ApiError, DataSignError, PaginateError, TxSendError, TxSignError } from '../errors';
 import { Logger, dummyLogger } from 'ts-log';
 import { WalletApi } from '../Wallet';
 import browser from 'webextension-polyfill';
 
-export const handleMessages = (walletName: string, walletApi: WalletApi, logger: Logger = dummyLogger) => {
-  const listener = async (msg: unknown) => {
+const cip30errorTypes = [ApiError, DataSignError, PaginateError, TxSendError, TxSignError];
+
+export const createListener =
+  (walletName: string, walletApi: WalletApi, logger: Logger = dummyLogger) =>
+  // eslint-disable-next-line complexity
+  async (msg: unknown) => {
     logger.debug('new message received: ', msg);
 
     if (
@@ -23,8 +28,20 @@ export const handleMessages = (walletName: string, walletApi: WalletApi, logger:
       return;
     }
 
-    return (walletApi as any)[method](...args);
+    try {
+      return await (walletApi as any)[method](...args);
+    } catch (error) {
+      if (cip30errorTypes.some((ErrorType) => error instanceof ErrorType)) {
+        throw error;
+      }
+      logger.error('Unexpected error', error);
+      const message = (typeof error === 'object' && error && (error as any).message) || 'Internal error';
+      throw new ApiError(APIErrorCode.InternalError, message);
+    }
   };
+
+export const handleMessages = (walletName: string, walletApi: WalletApi, logger: Logger = dummyLogger) => {
+  const listener = createListener(walletName, walletApi, logger);
   browser.runtime.onMessage.addListener(listener);
   return () => browser.runtime.onMessage.removeListener(listener);
 };
