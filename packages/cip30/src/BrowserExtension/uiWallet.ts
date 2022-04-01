@@ -1,6 +1,6 @@
 import { Logger, dummyLogger } from 'ts-log';
 import { Message } from './types';
-import { WalletApi } from '..';
+import { WalletApi, WalletMethodNames } from '../Wallet';
 import { createMessenger } from './sendMessage';
 
 export interface CreateUiWalletProps {
@@ -12,23 +12,11 @@ export const createUiWallet = (
   walletName: string,
   { logger = dummyLogger, walletExtensionId }: CreateUiWalletProps = {}
 ): WalletApi => {
-  const methodNames: (keyof WalletApi)[] = [
-    'getNetworkId',
-    'getUtxos',
-    'getBalance',
-    'getUsedAddresses',
-    'getUnusedAddresses',
-    'getChangeAddress',
-    'getRewardAddresses',
-    'signTx',
-    'signData',
-    'submitTx'
-  ];
   const sendMessage = createMessenger({ extensionId: walletExtensionId, logger });
   return <WalletApi>(
     (<unknown>(
       Object.fromEntries(
-        methodNames.map((method) => [
+        WalletMethodNames.map((method) => [
           method,
           (...args: Message['arguments']) => sendMessage({ arguments: args, method, walletName })
         ])

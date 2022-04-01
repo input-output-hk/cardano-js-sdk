@@ -3,7 +3,7 @@
 
 import * as testWallet from './testWallet';
 import { Cardano } from '@cardano-sdk/core';
-import { Wallet, WalletApi, WalletOptions } from '../src/Wallet';
+import { Wallet, WalletApi, WalletMethodNames, WalletOptions } from '../src/Wallet';
 import { mocks } from 'mock-browser';
 import browser from 'webextension-polyfill';
 const window = mocks.MockBrowser.createWindow();
@@ -15,18 +15,6 @@ if (process.env.DEBUG) {
 }
 
 describe('Wallet', () => {
-  const apiMethods: (keyof WalletApi)[] = [
-    'getBalance',
-    'getChangeAddress',
-    'getNetworkId',
-    'getRewardAddresses',
-    'getUnusedAddresses',
-    'getUsedAddresses',
-    'getUtxos',
-    'signData',
-    'signTx',
-    'submitTx'
-  ];
   const windowStub = { ...window, location: { hostname: 'test-dapp' } };
 
   let wallet: Wallet;
@@ -52,8 +40,8 @@ describe('Wallet', () => {
     expect(await wallet.isEnabled(windowStub.location.hostname)).toBe(false);
     const api = await wallet.enable(windowStub.location.hostname, true);
     expect(typeof api).toBe('object');
-    const methods = Object.keys(api);
-    expect(methods).toEqual(apiMethods);
+    const methods = new Set(Object.keys(api));
+    expect(methods).toEqual(new Set(WalletMethodNames));
     expect(await wallet.isEnabled(windowStub.location.hostname)).toBe(true);
   });
 

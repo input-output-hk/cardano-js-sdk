@@ -159,3 +159,16 @@ export class Wallet {
     return this.#api;
   }
 }
+
+export const WalletMethodNames: (keyof WalletApi)[] = [
+  'getNetworkId',
+  'getUtxos',
+  'getBalance',
+  'getUsedAddresses',
+  'getUnusedAddresses',
+  'getChangeAddress',
+  'getRewardAddresses',
+  'signTx',
+  'signData',
+  'submitTx'
+];
