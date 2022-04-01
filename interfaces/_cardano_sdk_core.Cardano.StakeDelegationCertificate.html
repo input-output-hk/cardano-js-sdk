@@ -89,7 +89,7 @@
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.Cardano.StakeDelegationCertificate.html#__typename" class="tsd-kind-icon">__typename</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.Cardano.StakeDelegationCertificate.html#epoch" class="tsd-kind-icon">epoch</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.Cardano.StakeDelegationCertificate.html#poolId" class="tsd-kind-icon">pool<wbr>Id</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.Cardano.StakeDelegationCertificate.html#rewardAccount" class="tsd-kind-icon">reward<wbr>Account</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.Cardano.StakeDelegationCertificate.html#stakeKeyHash" class="tsd-kind-icon">stake<wbr>Key<wbr>Hash</a></li>
 							</ul>
 						</section>
 					</div>
@@ -103,19 +103,25 @@
 					<div class="tsd-signature tsd-kind-icon">__typename<span class="tsd-signature-symbol">:</span> <a href="../enums/_cardano_sdk_core.Cardano.CertificateType.html#StakeDelegation" class="tsd-signature-type" data-tsd-kind="Enumeration member">StakeDelegation</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/872dc75/packages/core/src/Cardano/types/Certificate.ts#L32">packages/core/src/Cardano/types/Certificate.ts:32</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/8a36fdd/packages/core/src/Cardano/types/Certificate.ts#L32">packages/core/src/Cardano/types/Certificate.ts:32</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="epoch" class="tsd-anchor"></a>
-					<h3>epoch</h3>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> epoch</h3>
 					<div class="tsd-signature tsd-kind-icon">epoch<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/872dc75/packages/core/src/Cardano/types/Certificate.ts#L35">packages/core/src/Cardano/types/Certificate.ts:35</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/8a36fdd/packages/core/src/Cardano/types/Certificate.ts#L39">packages/core/src/Cardano/types/Certificate.ts:39</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Might or might not be present based on source.
+							Not present in serialized tx.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="poolId" class="tsd-anchor"></a>
@@ -123,17 +129,17 @@
 					<div class="tsd-signature tsd-kind-icon">pool<wbr>Id<span class="tsd-signature-symbol">:</span> <a href="../modules/_cardano_sdk_core.Cardano.html#PoolId-1" class="tsd-signature-type" data-tsd-kind="Function">PoolId</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/872dc75/packages/core/src/Cardano/types/Certificate.ts#L34">packages/core/src/Cardano/types/Certificate.ts:34</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/8a36fdd/packages/core/src/Cardano/types/Certificate.ts#L34">packages/core/src/Cardano/types/Certificate.ts:34</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="rewardAccount" class="tsd-anchor"></a>
-					<h3>reward<wbr>Account</h3>
-					<div class="tsd-signature tsd-kind-icon">reward<wbr>Account<span class="tsd-signature-symbol">:</span> <a href="../modules/_cardano_sdk_core.Cardano.html#RewardAccount-1" class="tsd-signature-type" data-tsd-kind="Function">RewardAccount</a></div>
+					<a name="stakeKeyHash" class="tsd-anchor"></a>
+					<h3>stake<wbr>Key<wbr>Hash</h3>
+					<div class="tsd-signature tsd-kind-icon">stake<wbr>Key<wbr>Hash<span class="tsd-signature-symbol">:</span> <a href="../modules/_cardano_sdk_core.Cardano.html#Ed25519KeyHash-2" class="tsd-signature-type" data-tsd-kind="Variable">Ed25519KeyHash</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/872dc75/packages/core/src/Cardano/types/Certificate.ts#L33">packages/core/src/Cardano/types/Certificate.ts:33</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/8a36fdd/packages/core/src/Cardano/types/Certificate.ts#L33">packages/core/src/Cardano/types/Certificate.ts:33</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -164,7 +170,7 @@
 								<a href="_cardano_sdk_core.Cardano.StakeDelegationCertificate.html#poolId" class="tsd-kind-icon">pool<wbr>Id</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_cardano_sdk_core.Cardano.StakeDelegationCertificate.html#rewardAccount" class="tsd-kind-icon">reward<wbr>Account</a>
+								<a href="_cardano_sdk_core.Cardano.StakeDelegationCertificate.html#stakeKeyHash" class="tsd-kind-icon">stake<wbr>Key<wbr>Hash</a>
 							</li>
 						</ul>
 					</li>

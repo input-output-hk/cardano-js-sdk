@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Cip30DataSignature | cardano-sdk</title>
+	<title>Ed25519KeyHash | cardano-sdk</title>
 	<meta name="description" content="Documentation for cardano-sdk">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -55,75 +55,59 @@
 					<a href="../index.html">cardano-sdk</a>
 				</li>
 				<li>
-					<a href="../modules/_cardano_sdk_wallet.html">@cardano-sdk/wallet</a>
+					<a href="_cardano_sdk_core.html">@cardano-sdk/core</a>
 				</li>
 				<li>
-					<a href="../modules/_cardano_sdk_wallet.KeyManagement.html">KeyManagement</a>
+					<a href="_cardano_sdk_core.Cardano.html">Cardano</a>
 				</li>
 				<li>
-					<a href="../modules/_cardano_sdk_wallet.KeyManagement.cip8.html">cip8</a>
-				</li>
-				<li>
-					<a href="_cardano_sdk_wallet.KeyManagement.cip8.Cip30DataSignature.html">Cip30DataSignature</a>
+					<a href="_cardano_sdk_core.Cardano.Ed25519KeyHash.html">Ed25519KeyHash</a>
 				</li>
 			</ul>
-			<h1>Interface Cip30DataSignature</h1>
+			<h1>Namespace Ed25519KeyHash</h1>
 		</div>
 	</div>
 </header>
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
-			<section class="tsd-panel tsd-comment">
-				<div class="tsd-comment tsd-typography">
-					<div class="lead">
-						<p>DataSignature type as described in CIP-0030.</p>
-					</div>
-				</div>
-			</section>
-			<section class="tsd-panel tsd-hierarchy">
-				<h3>Hierarchy</h3>
-				<ul class="tsd-hierarchy">
-					<li>
-						<span class="target">Cip30DataSignature</span>
-					</li>
-				</ul>
-			</section>
 			<section class="tsd-panel-group tsd-index-group">
 				<h2>Index</h2>
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section ">
-							<h3>Properties</h3>
+							<h3>Functions</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_wallet.KeyManagement.cip8.Cip30DataSignature.html#key" class="tsd-kind-icon">key</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_wallet.KeyManagement.cip8.Cip30DataSignature.html#signature" class="tsd-kind-icon">signature</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="_cardano_sdk_core.Cardano.Ed25519KeyHash.html#fromRewardAccount" class="tsd-kind-icon">from<wbr>Reward<wbr>Account</a></li>
 							</ul>
 						</section>
 					</div>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
-				<h2>Properties</h2>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="key" class="tsd-anchor"></a>
-					<h3>key</h3>
-					<div class="tsd-signature tsd-kind-icon">key<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">HexBlob</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/872dc75/packages/wallet/src/KeyManagement/cip8/cip30signData.ts#L26">packages/wallet/src/KeyManagement/cip8/cip30signData.ts:26</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="signature" class="tsd-anchor"></a>
-					<h3>signature</h3>
-					<div class="tsd-signature tsd-kind-icon">signature<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">HexBlob</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/872dc75/packages/wallet/src/KeyManagement/cip8/cip30signData.ts#L27">packages/wallet/src/KeyManagement/cip8/cip30signData.ts:27</a></li>
-						</ul>
-					</aside>
+				<h2>Functions</h2>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-namespace">
+					<a name="fromRewardAccount" class="tsd-anchor"></a>
+					<h3>from<wbr>Reward<wbr>Account</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-namespace">
+						<li class="tsd-signature tsd-kind-icon">from<wbr>Reward<wbr>Account<span class="tsd-signature-symbol">(</span>rewardAccount<span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_core.Cardano.html#RewardAccount-1" class="tsd-signature-type" data-tsd-kind="Function">RewardAccount</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_core.Cardano.html#Ed25519KeyHash-2" class="tsd-signature-type" data-tsd-kind="Variable">Ed25519KeyHash</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/8a36fdd/packages/core/src/Cardano/types/Key.ts#L36">packages/core/src/Cardano/types/Key.ts:36</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>rewardAccount: <a href="_cardano_sdk_core.Cardano.html#RewardAccount-1" class="tsd-signature-type" data-tsd-kind="Function">RewardAccount</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="_cardano_sdk_core.Cardano.html#Ed25519KeyHash-2" class="tsd-signature-type" data-tsd-kind="Variable">Ed25519KeyHash</a></h4>
+						</li>
+					</ul>
 				</section>
 			</section>
 		</div>
@@ -137,32 +121,8 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
-					<li class=" tsd-kind-enum tsd-parent-kind-namespace">
-						<a href="../enums/_cardano_sdk_wallet.KeyManagement.cip8.Cip30DataSignErrorCode.html" class="tsd-kind-icon">Cip30<wbr>Data<wbr>Sign<wbr>Error<wbr>Code</a>
-					</li>
-					<li class=" tsd-kind-class tsd-parent-kind-namespace">
-						<a href="../classes/_cardano_sdk_wallet.KeyManagement.cip8.Cip30DataSignError.html" class="tsd-kind-icon">Cip30<wbr>Data<wbr>Sign<wbr>Error</a>
-					</li>
-				</ul>
-				<ul class="current">
-					<li class="current tsd-kind-interface tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_wallet.KeyManagement.cip8.Cip30DataSignature.html" class="tsd-kind-icon">Cip30<wbr>Data<wbr>Signature</a>
-						<ul>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_cardano_sdk_wallet.KeyManagement.cip8.Cip30DataSignature.html#key" class="tsd-kind-icon">key</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_cardano_sdk_wallet.KeyManagement.cip8.Cip30DataSignature.html#signature" class="tsd-kind-icon">signature</a>
-							</li>
-						</ul>
-					</li>
-				</ul>
-				<ul class="after-current">
-					<li class=" tsd-kind-interface tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_wallet.KeyManagement.cip8.Cip30SignDataRequest.html" class="tsd-kind-icon">Cip30<wbr>Sign<wbr>Data<wbr>Request</a>
-					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-namespace">
-						<a href="../modules/_cardano_sdk_wallet.KeyManagement.cip8.html#cip30signData" class="tsd-kind-icon">cip30sign<wbr>Data</a>
+						<a href="_cardano_sdk_core.Cardano.Ed25519KeyHash.html#fromRewardAccount" class="tsd-kind-icon">from<wbr>Reward<wbr>Account</a>
 					</li>
 				</ul>
 			</nav>
@@ -183,7 +143,6 @@
 			<ul class="tsd-legend">
 				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
 				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
-				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
