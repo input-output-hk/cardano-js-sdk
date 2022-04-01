@@ -1,18 +1,18 @@
-import { Logger, dummyLogger } from 'ts-log';
 import { Message } from './types';
 import { WalletApi, WalletMethodNames } from '../Wallet';
 import { createMessenger } from './sendMessage';
+import { dummyLogger } from 'ts-log';
 
-export interface CreateUiWalletProps {
-  walletExtensionId?: string;
-  logger?: Logger;
+export interface WebExtensionClientProps {
+  walletName: string;
+  walletExtensionId: string;
 }
 
-export const createUiWallet = (
-  walletName: string,
-  { logger = dummyLogger, walletExtensionId }: CreateUiWalletProps = {}
+export const createWebExtensionWalletClient = (
+  { walletName, walletExtensionId }: WebExtensionClientProps,
+  logger = dummyLogger
 ): WalletApi => {
-  const sendMessage = createMessenger({ extensionId: walletExtensionId, logger });
+  const sendMessage = createMessenger(walletExtensionId, logger);
   return <WalletApi>(
     (<unknown>(
       Object.fromEntries(

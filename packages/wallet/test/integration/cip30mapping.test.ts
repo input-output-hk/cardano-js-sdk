@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { CSL, Cardano, coreToCsl } from '@cardano-sdk/core';
 import { InitializeTxProps, KeyManagement, SingleAddressWallet, cip30 } from '../../src';
-import { TxSignError, WalletApi, createUiWallet } from '@cardano-sdk/cip30';
+import { TxSignError, WalletApi, createWebExtensionWalletClient } from '@cardano-sdk/cip30';
 import { createWallet } from './util';
 import { firstValueFrom } from 'rxjs';
 import { networkId } from '../mocks';
@@ -112,7 +112,7 @@ describe('cip30', () => {
       let onMessageHandler: any;
       const chromeRuntime = (global as any).chrome.runtime;
       chromeRuntime.onMessage.addListener.mockImplementation((handler: any) => (onMessageHandler = handler));
-      chromeRuntime.sendMessage.mockImplementation((message: any, callback: any) =>
+      chromeRuntime.sendMessage.mockImplementation((_: any, message: any, callback: any) =>
         onMessageHandler(message, null, callback)
       );
       cleanup = cip30.initialize(wallet);
@@ -120,8 +120,8 @@ describe('cip30', () => {
     afterAll(() => cleanup());
 
     it('works using browser runtime messages', async () => {
-      const uiWallet = createUiWallet(wallet.name);
-      const utxos = await uiWallet.getUtxos();
+      const api = createWebExtensionWalletClient({ walletExtensionId: 'someid', walletName: wallet.name });
+      const utxos = await api.getUtxos();
       expect(() => coreToCsl.utxo(utxos!)).not.toThrow();
     });
 
@@ -131,8 +131,8 @@ describe('cip30', () => {
       const hexTxBody = Buffer.from(coreToCsl.tx(finalizedTx).body().to_bytes()).toString('hex');
 
       wallet.keyAgent.signTransaction = jest.fn().mockRejectedValueOnce(new KeyManagement.errors.AuthenticationError());
-      const uiWallet = createUiWallet(wallet.name);
-      await expect(() => uiWallet.signTx(hexTxBody)).rejects.toThrowError(TxSignError);
+      const api = createWebExtensionWalletClient({ walletExtensionId: 'someid', walletName: wallet.name });
+      await expect(() => api.signTx(hexTxBody)).rejects.toThrowError(TxSignError);
     });
   });
 });
