@@ -120,7 +120,7 @@ describe('cip30', () => {
     afterAll(() => cleanup());
 
     it('works using browser runtime messages', async () => {
-      const uiWallet = createUiWallet();
+      const uiWallet = createUiWallet(wallet.name);
       const utxos = await uiWallet.getUtxos();
       expect(() => coreToCsl.utxo(utxos!)).not.toThrow();
     });
@@ -131,7 +131,7 @@ describe('cip30', () => {
       const hexTxBody = Buffer.from(coreToCsl.tx(finalizedTx).body().to_bytes()).toString('hex');
 
       wallet.keyAgent.signTransaction = jest.fn().mockRejectedValueOnce(new KeyManagement.errors.AuthenticationError());
-      const uiWallet = createUiWallet();
+      const uiWallet = createUiWallet(wallet.name);
       await expect(() => uiWallet.signTx(hexTxBody)).rejects.toThrowError(TxSignError);
     });
   });

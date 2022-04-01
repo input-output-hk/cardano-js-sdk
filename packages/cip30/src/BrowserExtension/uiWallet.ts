@@ -8,7 +8,10 @@ export interface CreateUiWalletProps {
   logger?: Logger;
 }
 
-export const createUiWallet = ({ logger = dummyLogger, walletExtensionId }: CreateUiWalletProps = {}): WalletApi => {
+export const createUiWallet = (
+  walletName: string,
+  { logger = dummyLogger, walletExtensionId }: CreateUiWalletProps = {}
+): WalletApi => {
   const methodNames: (keyof WalletApi)[] = [
     'getNetworkId',
     'getUtxos',
@@ -27,7 +30,7 @@ export const createUiWallet = ({ logger = dummyLogger, walletExtensionId }: Crea
       Object.fromEntries(
         methodNames.map((method) => [
           method,
-          (...args: Message['arguments']) => sendMessage({ arguments: args, method })
+          (...args: Message['arguments']) => sendMessage({ arguments: args, method, walletName })
         ])
       )
     ))

@@ -170,5 +170,5 @@ export const createWalletApi = (
  */
 export const initialize = (wallet: SingleAddressWallet, { logger = dummyLogger }: Cip30WalletDependencies = {}) => {
   const walletApi = createWalletApi(wallet, { logger });
-  return handleMessages(walletApi, logger);
+  return handleMessages(wallet.name, walletApi, logger);
 };
