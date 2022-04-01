@@ -190,9 +190,8 @@ export const blockfrostWalletProvider = (blockfrost: BlockFrostAPI, logger = dum
 
   const fetchPoolUpdateCerts = async (hash: string): Promise<Cardano.PoolRegistrationCertificate[]> => {
     const response = await blockfrost.txsPoolUpdates(hash);
-    return response.map(({ pool_id, active_epoch }) => ({
+    return response.map(({ pool_id }) => ({
       __typename: Cardano.CertificateType.PoolRegistration,
-      epoch: active_epoch,
       poolId: Cardano.PoolId(pool_id),
       poolParameters: ((): Cardano.PoolParameters => {
         logger.warn('Omitting poolParameters for certificate in tx', hash);
@@ -225,11 +224,8 @@ export const blockfrostWalletProvider = (blockfrost: BlockFrostAPI, logger = dum
 
   const fetchDelegationCerts = async (hash: string): Promise<Cardano.StakeDelegationCertificate[]> => {
     const response = await blockfrost.txsDelegations(hash);
-    return response.map(({ cert_index, index, address, active_epoch, pool_id }) => ({
+    return response.map(({ address, pool_id }) => ({
       __typename: Cardano.CertificateType.StakeDelegation,
-      certIndex: cert_index,
-      delegationIndex: index,
-      epoch: active_epoch,
       poolId: Cardano.PoolId(pool_id),
       stakeKeyHash: Cardano.Ed25519KeyHash.fromRewardAccount(Cardano.RewardAccount(address))
     }));
