@@ -13,7 +13,9 @@ import {
 import { PaginationOptions } from '@blockfrost/blockfrost-js/lib/types';
 import { dummyLogger } from 'ts-log';
 import { fetchSequentially, formatBlockfrostError, jsonToMetadatum, toProviderError } from './util';
-import { orderBy } from 'lodash-es';
+import { omit, orderBy } from 'lodash-es';
+
+type WithCertIndex<T> = T & { cert_index: number };
 
 const fetchByAddressSequentially = async <Item, Response>(props: {
   address: Cardano.Address;
@@ -175,19 +177,21 @@ export const blockfrostWalletProvider = (blockfrost: BlockFrostAPI, logger = dum
     logger.warn(`Skipped fetching asset mint/burn for tx "${hash}": not implemented for Blockfrost provider`);
   };
 
-  const fetchPoolRetireCerts = async (hash: string): Promise<Cardano.PoolRetirementCertificate[]> => {
+  const fetchPoolRetireCerts = async (hash: string): Promise<WithCertIndex<Cardano.PoolRetirementCertificate>[]> => {
     const response = await blockfrost.txsPoolRetires(hash);
-    return response.map(({ pool_id, retiring_epoch }) => ({
+    return response.map(({ pool_id, retiring_epoch, cert_index }) => ({
       __typename: Cardano.CertificateType.PoolRetirement,
+      cert_index,
       epoch: retiring_epoch,
       poolId: Cardano.PoolId(pool_id)
     }));
   };
 
-  const fetchPoolUpdateCerts = async (hash: string): Promise<Cardano.PoolRegistrationCertificate[]> => {
+  const fetchPoolUpdateCerts = async (hash: string): Promise<WithCertIndex<Cardano.PoolRegistrationCertificate>[]> => {
     const response = await blockfrost.txsPoolUpdates(hash);
-    return response.map(({ pool_id }) => ({
+    return response.map(({ pool_id, cert_index }) => ({
       __typename: Cardano.CertificateType.PoolRegistration,
+      cert_index,
       poolId: Cardano.PoolId(pool_id),
       poolParameters: ((): Cardano.PoolParameters => {
         logger.warn('Omitting poolParameters for certificate in tx', hash);
@@ -196,32 +200,33 @@ export const blockfrostWalletProvider = (blockfrost: BlockFrostAPI, logger = dum
     }));
   };
 
-  const fetchMirCerts = async (hash: string): Promise<Cardano.MirCertificate[]> => {
+  const fetchMirCerts = async (hash: string): Promise<WithCertIndex<Cardano.MirCertificate>[]> => {
     const response = await blockfrost.txsMirs(hash);
     return response.map(({ address, amount, cert_index, pot }) => ({
       __typename: Cardano.CertificateType.MIR,
-      certIndex: cert_index,
+      cert_index,
       pot: pot === 'reserve' ? Cardano.MirCertificatePot.Reserves : Cardano.MirCertificatePot.Treasury,
       quantity: BigInt(amount),
       rewardAccount: Cardano.RewardAccount(address)
     }));
   };
 
-  const fetchStakeCerts = async (hash: string): Promise<Cardano.StakeAddressCertificate[]> => {
+  const fetchStakeCerts = async (hash: string): Promise<WithCertIndex<Cardano.StakeAddressCertificate>[]> => {
     const response = await blockfrost.txsStakes(hash);
     return response.map(({ address, cert_index, registration }) => ({
       __typename: registration
         ? Cardano.CertificateType.StakeKeyRegistration
         : Cardano.CertificateType.StakeKeyDeregistration,
-      certIndex: cert_index,
+      cert_index,
       stakeKeyHash: Cardano.Ed25519KeyHash.fromRewardAccount(Cardano.RewardAccount(address))
     }));
   };
 
-  const fetchDelegationCerts = async (hash: string): Promise<Cardano.StakeDelegationCertificate[]> => {
+  const fetchDelegationCerts = async (hash: string): Promise<WithCertIndex<Cardano.StakeDelegationCertificate>[]> => {
     const response = await blockfrost.txsDelegations(hash);
-    return response.map(({ address, pool_id }) => ({
+    return response.map(({ address, pool_id, cert_index }) => ({
       __typename: Cardano.CertificateType.StakeDelegation,
+      cert_index,
       poolId: Cardano.PoolId(pool_id),
       stakeKeyHash: Cardano.Ed25519KeyHash.fromRewardAccount(Cardano.RewardAccount(address))
     }));
@@ -236,13 +241,16 @@ export const blockfrostWalletProvider = (blockfrost: BlockFrostAPI, logger = dum
     hash
   }: Responses['tx_content']): Promise<Cardano.Certificate[] | undefined> => {
     if (pool_retire_count + pool_update_count + mir_cert_count + stake_cert_count + delegation_count === 0) return;
-    return [
-      ...(pool_retire_count ? await fetchPoolRetireCerts(hash) : []),
-      ...(pool_update_count ? await fetchPoolUpdateCerts(hash) : []),
-      ...(mir_cert_count ? await fetchMirCerts(hash) : []),
-      ...(stake_cert_count ? await fetchStakeCerts(hash) : []),
-      ...(delegation_count ? await fetchDelegationCerts(hash) : [])
-    ];
+    return orderBy(
+      [
+        ...(pool_retire_count ? await fetchPoolRetireCerts(hash) : []),
+        ...(pool_update_count ? await fetchPoolUpdateCerts(hash) : []),
+        ...(mir_cert_count ? await fetchMirCerts(hash) : []),
+        ...(stake_cert_count ? await fetchStakeCerts(hash) : []),
+        ...(delegation_count ? await fetchDelegationCerts(hash) : [])
+      ],
+      (cert) => cert.cert_index
+    ).map((cert) => omit(cert, 'cert_index') as Cardano.Certificate);
   };
 
   const fetchJsonMetadata = async (txHash: Cardano.TransactionId): Promise<Cardano.TxMetadata | null> => {

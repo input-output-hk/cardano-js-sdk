@@ -70,7 +70,6 @@ describe('blockfrostWalletProvider', () => {
       ]);
       expect(tx.body.certificates![0]).toEqual({
         __typename: 'StakeKeyRegistrationCertificate',
-        certIndex: 0,
         stakeKeyHash: Cardano.Ed25519KeyHash.fromRewardAccount(
           Cardano.RewardAccount('stake_test1upqykkjq3zhf4085s6n70w8cyp57dl87r0ezduv9rnnj2uqk5zmdv')
         )
@@ -82,9 +81,6 @@ describe('blockfrostWalletProvider', () => {
       ]);
       expect(tx.body.certificates![1]).toEqual({
         __typename: 'StakeDelegationCertificate',
-        certIndex: 1,
-        delegationIndex: 1,
-        epoch: 182,
         poolId: 'pool167u07rzwu6dr40hx2pr4vh592vxp4zen9ct2p3h84wzqzv6fkgv',
         stakeKeyHash: Cardano.Ed25519KeyHash.fromRewardAccount(
           Cardano.RewardAccount('stake_test1upqykkjq3zhf4085s6n70w8cyp57dl87r0ezduv9rnnj2uqk5zmdv')
@@ -97,7 +93,6 @@ describe('blockfrostWalletProvider', () => {
       ]);
       expect(tx.body.certificates![0]).toEqual({
         __typename: 'StakeKeyDeregistrationCertificate',
-        certIndex: 0,
         stakeKeyHash: Cardano.Ed25519KeyHash.fromRewardAccount(
           Cardano.RewardAccount('stake_test1uqe2twywhfjwt88ghas4sfgq7pp7m8wq64hlhz0vr4uhu2sj2tuzt')
         )
@@ -107,9 +102,8 @@ describe('blockfrostWalletProvider', () => {
       const [tx] = await walletProvider.transactionsByHashes([
         Cardano.TransactionId('295d5e0f7ee182426eaeda8c9f1c63502c72cdf4afd6e0ee0f209adf94a614e7')
       ]);
-      expect(tx.body.certificates![0]).toEqual({
+      expect(tx.body.certificates![2]).toEqual({
         __typename: 'PoolRegistrationCertificate',
-        epoch: 76,
         poolId: 'pool1y25deq9kldy9y9gfvrpw8zt05zsrfx84zjhugaxrx9ftvwdpua2',
         poolParameters: null
       });
@@ -130,7 +124,6 @@ describe('blockfrostWalletProvider', () => {
       ]);
       expect(tx.body.certificates![0]).toEqual({
         __typename: 'MirCertificate',
-        certIndex: 0,
         pot: 'treasury',
         quantity: 100_000_000n,
         rewardAccount: 'stake_test1uq6p9hn9u53kvmh4mu98c0d4zzuekp2nkelnynct5g26lqs9yenqu'
