@@ -138,7 +138,7 @@ describe('blockfrostWalletProvider', () => {
     });
   });
 
-  describe('utxoDelegationAndRewards', () => {
+  describe('utxoByAddresses', () => {
     test('used addresses', async () => {
       BlockFrostAPI.prototype.addressesUtxos = jest
         .fn()
@@ -146,6 +146,78 @@ describe('blockfrostWalletProvider', () => {
         .mockResolvedValueOnce(generateUtxoResponseMock(100))
         .mockResolvedValueOnce(generateUtxoResponseMock(0));
 
+      const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
+      const client = blockfrostWalletProvider(blockfrost);
+      const response = await client.utxoByAddresses(
+        [
+          'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
+        ].map(Cardano.Address)
+      );
+
+      expect(response).toBeTruthy();
+      expect(response[0]).toHaveLength(2);
+      expect(response[0][0]).toMatchObject<Cardano.TxIn>({
+        address: Cardano.Address(
+          'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
+        ),
+        index: 0,
+        txId: Cardano.TransactionId('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5')
+      });
+      expect(response[0][1]).toMatchObject<Cardano.TxOut>({
+        address: Cardano.Address(
+          'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
+        ),
+        value: {
+          assets: new Map([
+            [Cardano.AssetId('b01fb3b8c3dd6b3705a5dc8bcd5a70759f70ad5d97a72005caeac3c652657675746f31333237'), 1n]
+          ]),
+          coins: 50_928_877n
+        }
+      });
+
+      expect(response[1]).toHaveLength(2);
+      expect(response[1][0]).toMatchObject<Cardano.TxIn>({
+        address: Cardano.Address(
+          'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
+        ),
+        index: 1,
+        txId: Cardano.TransactionId('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5')
+      });
+      expect(response[1][1]).toMatchObject<Cardano.TxOut>({
+        address: Cardano.Address(
+          'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
+        ),
+        value: {
+          assets: new Map([
+            [Cardano.AssetId('b01fb3b8c3dd6b3705a5dc8bcd5a70759f70ad5d97a72005caeac3c652657675746f31333237'), 2n]
+          ]),
+          coins: 50_928_878n
+        }
+      });
+    });
+
+    test('unused addresses', async () => {
+      const notFoundBody = {
+        error: 'Not Found',
+        message: 'The requested component has not been found.',
+        status_code: 404
+      };
+      BlockFrostAPI.prototype.addressesUtxos = jest.fn().mockRejectedValue(notFoundBody);
+
+      const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
+      const client = blockfrostWalletProvider(blockfrost);
+      const response = await client.utxoByAddresses(
+        [
+          'addr_test1qz44wna7xvs8n2ukxw0qat3vktymndgk8nerey6mlxr97s47n48hk78hcuyku03lj7qplmfqscm87j9wv3amxqaur2hs055pjt'
+        ].map(Cardano.Address)
+      );
+      expect(response).toBeTruthy();
+      expect(response.length).toBe(0);
+    });
+  });
+
+  describe('rewardAccountBalance', () => {
+    test('used reward account', async () => {
       const accountsMockResponse = {
         active: true,
         active_epoch: 81,
@@ -162,78 +234,27 @@ describe('blockfrostWalletProvider', () => {
 
       const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
       const client = blockfrostWalletProvider(blockfrost);
-      const response = await client.utxoDelegationAndRewards(
-        [
-          'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
-        ].map(Cardano.Address),
+      const response = await client.rewardAccountBalance(
         Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27')
       );
 
-      expect(response.utxo).toBeTruthy();
-      expect(response.utxo[0]).toHaveLength(2);
-      expect(response.utxo[0][0]).toMatchObject<Cardano.TxIn>({
-        address: Cardano.Address(
-          'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
-        ),
-        index: 0,
-        txId: Cardano.TransactionId('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5')
-      });
-      expect(response.utxo[0][1]).toMatchObject<Cardano.TxOut>({
-        address: Cardano.Address(
-          'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
-        ),
-        value: {
-          assets: new Map([
-            [Cardano.AssetId('b01fb3b8c3dd6b3705a5dc8bcd5a70759f70ad5d97a72005caeac3c652657675746f31333237'), 1n]
-          ]),
-          coins: 50_928_877n
-        }
-      });
-
-      expect(response.utxo[1]).toHaveLength(2);
-      expect(response.utxo[1][0]).toMatchObject<Cardano.TxIn>({
-        address: Cardano.Address(
-          'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
-        ),
-        index: 1,
-        txId: Cardano.TransactionId('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5')
-      });
-      expect(response.utxo[1][1]).toMatchObject<Cardano.TxOut>({
-        address: Cardano.Address(
-          'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
-        ),
-        value: {
-          assets: new Map([
-            [Cardano.AssetId('b01fb3b8c3dd6b3705a5dc8bcd5a70759f70ad5d97a72005caeac3c652657675746f31333237'), 2n]
-          ]),
-          coins: 50_928_878n
-        }
-      });
-
-      expect(response.delegationAndRewards?.delegate).toEqual(accountsMockResponse.pool_id);
-      expect(response.delegationAndRewards?.rewards?.toString()).toEqual(accountsMockResponse.withdrawable_amount);
+      expect(response).toEqual(BigInt(accountsMockResponse.withdrawable_amount));
     });
 
-    test('unused addresses', async () => {
+    test('unused reward account', async () => {
       const notFoundBody = {
         error: 'Not Found',
         message: 'The requested component has not been found.',
         status_code: 404
       };
-      BlockFrostAPI.prototype.addressesUtxos = jest.fn().mockRejectedValue(notFoundBody);
       BlockFrostAPI.prototype.accounts = jest.fn().mockRejectedValue(notFoundBody);
 
       const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
       const client = blockfrostWalletProvider(blockfrost);
-      const response = await client.utxoDelegationAndRewards(
-        [
-          'addr_test1qz44wna7xvs8n2ukxw0qat3vktymndgk8nerey6mlxr97s47n48hk78hcuyku03lj7qplmfqscm87j9wv3amxqaur2hs055pjt'
-        ].map(Cardano.Address),
+      const response = await client.rewardAccountBalance(
         Cardano.RewardAccount('stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d')
       );
-      expect(response.utxo).toBeTruthy();
-      expect(response.utxo.length).toBe(0);
-      expect(response.delegationAndRewards).toBeUndefined();
+      expect(response).toEqual(0n);
     });
   });
 

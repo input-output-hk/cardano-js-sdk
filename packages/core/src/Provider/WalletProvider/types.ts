@@ -75,12 +75,11 @@ export interface EpochRewards {
 export interface WalletProvider {
   ledgerTip: () => Promise<Cardano.Tip>;
   networkInfo: () => Promise<NetworkInfo>;
-  // TODO: move stakePoolStats out to other provider type, since it's not required for wallet operation
+  // TODO: when implementing db-sync provider,
+  // move stakePoolStats out to other provider type, since it's not required for wallet operation.
+  // Perhaps generalize StakePoolSearchProvider?
   stakePoolStats?: () => Promise<StakePoolStats>;
-  utxoDelegationAndRewards: (
-    addresses: Cardano.Address[],
-    rewardAccount?: Cardano.RewardAccount
-  ) => Promise<{ utxo: Cardano.Utxo[]; delegationAndRewards?: Cardano.DelegationsAndRewards }>;
+  utxoByAddresses: (addresses: Cardano.Address[]) => Promise<Cardano.Utxo[]>;
   /**
    * @param {Cardano.BlockNo} sinceBlock inclusive
    */
@@ -98,4 +97,5 @@ export interface WalletProvider {
    * @returns Rewards quantity for every epoch that had any rewards in ascending order.
    */
   rewardsHistory: (props: RewardHistoryProps) => Promise<Map<Cardano.RewardAccount, EpochRewards[]>>;
+  rewardAccountBalance: (rewardAccount: Cardano.RewardAccount) => Promise<Cardano.Lovelace>;
 }

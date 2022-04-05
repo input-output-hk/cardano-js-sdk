@@ -95,7 +95,7 @@ export const blockfrostWalletProvider = (blockfrost: BlockFrostAPI, logger = dum
     };
   };
 
-  const utxoDelegationAndRewards: WalletProvider['utxoDelegationAndRewards'] = async (addresses, rewardAccount) => {
+  const utxoByAddresses: WalletProvider['utxoByAddresses'] = async (addresses) => {
     const utxoResults = await Promise.all(
       addresses.map(async (address) =>
         fetchByAddressSequentially<Cardano.Utxo, BlockfrostUtxo>({
@@ -106,23 +106,19 @@ export const blockfrostWalletProvider = (blockfrost: BlockFrostAPI, logger = dum
         })
       )
     );
-    const utxo = utxoResults.flat(1);
-    if (rewardAccount !== undefined) {
-      try {
-        const accountResponse = await blockfrost.accounts(rewardAccount.toString());
-        const delegationAndRewards = {
-          delegate: accountResponse.pool_id ? Cardano.PoolId(accountResponse.pool_id) : undefined,
-          rewards: BigInt(accountResponse.withdrawable_amount)
-        };
-        return { delegationAndRewards, utxo };
-      } catch (error) {
-        if (formatBlockfrostError(error).status_code === 404) {
-          return { utxo };
-        }
-        throw error;
+    return utxoResults.flat(1);
+  };
+
+  const rewards: WalletProvider['rewardAccountBalance'] = async (rewardAccount: Cardano.RewardAccount) => {
+    try {
+      const accountResponse = await blockfrost.accounts(rewardAccount.toString());
+      return BigInt(accountResponse.withdrawable_amount);
+    } catch (error) {
+      if (formatBlockfrostError(error).status_code === 404) {
+        return 0n;
       }
+      throw error;
     }
-    return { utxo };
   };
 
   const fetchRedeemers = async ({
@@ -364,16 +360,16 @@ export const blockfrostWalletProvider = (blockfrost: BlockFrostAPI, logger = dum
     let page = 1;
     let haveMorePages = true;
     while (haveMorePages) {
-      const rewards = await blockfrost.accountsRewards(stakeAddress.toString(), { count: batchSize, page });
+      const rewardsPage = await blockfrost.accountsRewards(stakeAddress.toString(), { count: batchSize, page });
       result.push(
-        ...rewards
+        ...rewardsPage
           .filter(({ epoch }) => lowerBound <= epoch && epoch <= upperBound)
           .map(({ epoch, amount }) => ({
             epoch,
             rewards: BigInt(amount)
           }))
       );
-      haveMorePages = rewards.length === batchSize && rewards[rewards.length - 1].epoch < upperBound;
+      haveMorePages = rewardsPage.length === batchSize && rewardsPage[rewardsPage.length - 1].epoch < upperBound;
       page += 1;
     }
     return result;
@@ -381,7 +377,7 @@ export const blockfrostWalletProvider = (blockfrost: BlockFrostAPI, logger = dum
 
   const rewardsHistory: WalletProvider['rewardsHistory'] = async ({ rewardAccounts, epochs }) => {
     const allAddressRewards = await Promise.all(rewardAccounts.map((address) => accountRewards(address, epochs)));
-    return new Map(allAddressRewards.map((rewards, i) => [rewardAccounts[i], rewards]));
+    return new Map(allAddressRewards.map((epochRewards, i) => [rewardAccounts[i], epochRewards]));
   };
 
   const genesisParameters: WalletProvider['genesisParameters'] = async () => {
@@ -434,11 +430,12 @@ export const blockfrostWalletProvider = (blockfrost: BlockFrostAPI, logger = dum
     genesisParameters,
     ledgerTip,
     networkInfo,
+    rewardAccountBalance: rewards,
     rewardsHistory,
     stakePoolStats,
     transactionsByAddresses,
     transactionsByHashes,
-    utxoDelegationAndRewards
+    utxoByAddresses
   };
 
   return ProviderUtil.withProviderErrors(providerFunctions, toProviderError);

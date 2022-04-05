@@ -11,7 +11,8 @@ export class WalletProviderStats {
   readonly transactionsByAddresses$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
   readonly transactionsByHashes$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
   readonly rewardsHistory$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
-  readonly utxoDelegationAndRewards$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
+  readonly utxoByAddresses$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
+  readonly rewardAccountBalance$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
   readonly stakePoolStats$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
 
   shutdown() {
@@ -23,7 +24,8 @@ export class WalletProviderStats {
     this.transactionsByAddresses$.complete();
     this.transactionsByHashes$.complete();
     this.rewardsHistory$.complete();
-    this.utxoDelegationAndRewards$.complete();
+    this.utxoByAddresses$.complete();
+    this.rewardAccountBalance$.complete();
     this.stakePoolStats$.complete();
   }
 
@@ -36,7 +38,8 @@ export class WalletProviderStats {
     this.transactionsByAddresses$.next(CLEAN_FN_STATS);
     this.transactionsByHashes$.next(CLEAN_FN_STATS);
     this.rewardsHistory$.next(CLEAN_FN_STATS);
-    this.utxoDelegationAndRewards$.next(CLEAN_FN_STATS);
+    this.utxoByAddresses$.next(CLEAN_FN_STATS);
+    this.rewardAccountBalance$.next(CLEAN_FN_STATS);
     this.stakePoolStats$.next(CLEAN_FN_STATS);
   }
   // Consider shutdown() completing all subjects:
@@ -51,7 +54,8 @@ export class TrackedWalletProvider extends ProviderTracker implements WalletProv
   readonly stakePoolStats: WalletProvider['stakePoolStats'];
   readonly ledgerTip: WalletProvider['ledgerTip'];
   readonly networkInfo: WalletProvider['networkInfo'];
-  readonly utxoDelegationAndRewards: WalletProvider['utxoDelegationAndRewards'];
+  readonly utxoByAddresses: WalletProvider['utxoByAddresses'];
+  readonly rewardAccountBalance: WalletProvider['rewardAccountBalance'];
   readonly transactionsByAddresses: WalletProvider['transactionsByAddresses'];
   readonly transactionsByHashes: WalletProvider['transactionsByHashes'];
   readonly blocksByHashes: WalletProvider['blocksByHashes'];
@@ -69,11 +73,10 @@ export class TrackedWalletProvider extends ProviderTracker implements WalletProv
         : undefined;
     this.ledgerTip = () => this.trackedCall(walletProvider.ledgerTip, this.stats.ledgerTip$);
     this.networkInfo = () => this.trackedCall(walletProvider.networkInfo, this.stats.networkInfo$);
-    this.utxoDelegationAndRewards = (addresses, rewardAccount) =>
-      this.trackedCall(
-        () => walletProvider.utxoDelegationAndRewards(addresses, rewardAccount),
-        this.stats.utxoDelegationAndRewards$
-      );
+    this.utxoByAddresses = (addresses) =>
+      this.trackedCall(() => walletProvider.utxoByAddresses(addresses), this.stats.utxoByAddresses$);
+    this.rewardAccountBalance = (rewardAccount) =>
+      this.trackedCall(() => walletProvider.rewardAccountBalance(rewardAccount), this.stats.rewardAccountBalance$);
     this.transactionsByAddresses = (addresses) =>
       this.trackedCall(() => walletProvider.transactionsByAddresses(addresses), this.stats.transactionsByAddresses$);
     this.transactionsByHashes = (hashes) =>

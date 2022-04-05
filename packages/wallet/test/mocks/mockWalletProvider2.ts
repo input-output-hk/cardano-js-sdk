@@ -11,7 +11,7 @@ import {
   protocolParameters,
   queryTransactionsResult,
   rewardAccount,
-  rewards,
+  rewardAccountBalance,
   stakePoolStats,
   utxo
 } from './mockWalletProvider';
@@ -72,8 +72,8 @@ export const stakePoolStats2 = {
 
 export const utxo2 = utxo.slice(1);
 export const delegate2 = 'pool167u07rzwu6dr40hx2pr4vh592vxp4zen9ct2p3h84wzqzv6fkgv';
-export const rewards2 = rewards + 1n;
-export const delegationAndRewards2 = { delegate: delegate2, rewards: rewards2 };
+export const rewardAccountBalance2 = rewardAccountBalance + 1n;
+export const delegationAndRewards2 = { delegate: delegate2, rewards: rewardAccountBalance2 };
 
 /**
  * A different provider stub for testing, supports delay to simulate network requests.
@@ -90,10 +90,11 @@ export const mockWalletProvider2 = (delayMs: number) => {
     genesisParameters: delayedJestFn(genesisParameters2),
     ledgerTip: delayedJestFn(ledgerTip2),
     networkInfo: delayedJestFn(networkInfo2),
+    rewardAccountBalance: delayedJestFn(rewardAccountBalance2),
     rewardsHistory: delayedJestFn(rewardsHistory2),
     stakePoolStats: delayedJestFn(stakePoolStats2),
     transactionsByAddresses: delayedJestFn(queryTransactionsResult2),
     transactionsByHashes: delayedJestFn(queryTransactionsResult2),
-    utxoDelegationAndRewards: delayedJestFn({ delegationAndRewards: delegationAndRewards2, utxo: utxo2 })
+    utxoByAddresses: delayedJestFn(utxo2)
   };
 };

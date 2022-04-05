@@ -16,7 +16,7 @@ export const utxo: Cardano.Utxo[] = [
     },
     {
       address: Cardano.Address(
-        'addr_test1qzs0umu0s2ammmpw0hea0w2crtcymdjvvlqngpgqy76gpfnuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qp3y3vz'
+        'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g'
       ),
       value: {
         assets: new Map([
@@ -55,7 +55,7 @@ export const utxo: Cardano.Utxo[] = [
     },
     {
       address: Cardano.Address(
-        'addr_test1qqydn46r6mhge0kfpqmt36m6q43knzsd9ga32n96m89px3nuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qypp3m9'
+        'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g'
       ),
       value: {
         coins: 9_825_963n
@@ -64,9 +64,7 @@ export const utxo: Cardano.Utxo[] = [
   ]
 ];
 
-export const delegate = 'pool185g59xpqzt7gf0ljr8v8f3akl95qnmardf2f8auwr3ffx7atjj5';
-export const rewards = 33_333n;
-export const delegationAndRewards = { delegate, rewards };
+export const rewardAccountBalance = 33_333n;
 
 export const ledgerTip = {
   blockNo: 1_111_111,
@@ -248,11 +246,12 @@ export const mockWalletProvider = () => ({
   genesisParameters: jest.fn().mockResolvedValue(genesisParameters),
   ledgerTip: jest.fn().mockResolvedValue(ledgerTip),
   networkInfo: jest.fn().mockResolvedValue(networkInfo),
+  rewardAccountBalance: jest.fn().mockResolvedValue(rewardAccountBalance),
   rewardsHistory: jest.fn().mockResolvedValue(rewardsHistory),
   stakePoolStats: jest.fn().mockResolvedValue(stakePoolStats),
   transactionsByAddresses: queryTransactions(),
   transactionsByHashes: queryTransactions(),
-  utxoDelegationAndRewards: jest.fn().mockResolvedValue({ delegationAndRewards, utxo })
+  utxoByAddresses: jest.fn().mockResolvedValue(utxo)
 });
 
 export type WalletProviderStub = ReturnType<typeof mockWalletProvider>;

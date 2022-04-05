@@ -60,7 +60,7 @@ const assertWalletProperties = async (
   expect(wallet.balance.available$.value?.coins).toEqual(
     Cardano.util.coalesceValueQuantities(mocks.utxo.map((utxo) => utxo[1].value)).coins
   );
-  expect(wallet.balance.total$.value?.rewards).toBe(mocks.rewards);
+  expect(wallet.balance.total$.value?.rewards).toBe(mocks.rewardAccountBalance);
   // transactions
   await firstValueFrom(wallet.transactions.history.all$);
   expect(wallet.transactions.history.all$.value?.length).toBeGreaterThan(0);
@@ -84,7 +84,7 @@ const assertWalletProperties = async (
   expect(rewardAccounts).toHaveLength(1);
   expect(rewardAccounts[0].address).toBe(rewardAccount);
   expect(rewardAccounts[0].delegatee?.nextNextEpoch?.id).toEqual(expectedDelegateeId);
-  expect(rewardAccounts[0].rewardBalance.total).toBe(mocks.rewards);
+  expect(rewardAccounts[0].rewardBalance.total).toBe(mocks.rewardAccountBalance);
   // addresses$
   const addresses = await firstValueFrom(wallet.addresses$);
   expect(addresses[0].address).toEqual(address);
@@ -103,7 +103,7 @@ const assertWalletProperties2 = async (wallet: Wallet) => {
   expect(wallet.balance.available$.value?.coins).toEqual(
     Cardano.util.coalesceValueQuantities(mocks.utxo2.map((utxo) => utxo[1].value)).coins
   );
-  expect(wallet.balance.total$.value?.rewards).toBe(mocks.rewards2);
+  expect(wallet.balance.total$.value?.rewards).toBe(mocks.rewardAccountBalance2);
   expect(wallet.transactions.history.all$.value?.length).toEqual(queryTransactionsResult2.length);
   expect(wallet.tip$.value).toEqual(mocks.ledgerTip2);
   expect(wallet.networkInfo$.value?.currentEpoch.number).toEqual(mocks.currentEpochNo2);
@@ -115,7 +115,7 @@ const assertWalletProperties2 = async (wallet: Wallet) => {
   expect(rewardsHistory.all).toEqual(expectedRewards);
   const rewardAccounts = await firstValueFrom(wallet.delegation.rewardAccounts$);
   expect(rewardAccounts).toHaveLength(1);
-  expect(rewardAccounts[0].rewardBalance.total).toBe(mocks.rewards2);
+  expect(rewardAccounts[0].rewardBalance.total).toBe(mocks.rewardAccountBalance2);
 };
 
 describe('SingleAddressWallet load', () => {
