@@ -324,15 +324,12 @@ export const blockfrostWalletProvider = (blockfrost: BlockFrostAPI, logger = dum
     };
   };
 
-  const queryTransactionsByHashes: WalletProvider['queryTransactionsByHashes'] = async (hashes) => {
+  const transactionsByHashes: WalletProvider['transactionsByHashes'] = async (hashes) => {
     const protocolParameters = await currentWalletProtocolParameters();
     return Promise.all(hashes.map((hash) => fetchTransaction(hash, protocolParameters)));
   };
 
-  const queryTransactionsByAddresses: WalletProvider['queryTransactionsByAddresses'] = async (
-    addresses,
-    sinceBlock
-  ) => {
+  const transactionsByAddresses: WalletProvider['transactionsByAddresses'] = async (addresses, sinceBlock) => {
     const addressTransactions = await Promise.all(
       addresses.map(async (address) =>
         fetchByAddressSequentially<
@@ -355,9 +352,7 @@ export const blockfrostWalletProvider = (blockfrost: BlockFrostAPI, logger = dum
       ? allTransactions.filter(({ block_height }) => block_height >= sinceBlock)
       : allTransactions;
 
-    return queryTransactionsByHashes(
-      addressTransactionsSinceBlock.map(({ tx_hash }) => Cardano.TransactionId(tx_hash))
-    );
+    return transactionsByHashes(addressTransactionsSinceBlock.map(({ tx_hash }) => Cardano.TransactionId(tx_hash)));
   };
 
   const accountRewards = async (
@@ -405,7 +400,7 @@ export const blockfrostWalletProvider = (blockfrost: BlockFrostAPI, logger = dum
     };
   };
 
-  const queryBlocksByHashes: WalletProvider['queryBlocksByHashes'] = async (hashes) => {
+  const blocksByHashes: WalletProvider['blocksByHashes'] = async (hashes) => {
     const responses = await Promise.all(hashes.map((hash) => blockfrost.blocks(hash.toString())));
     return responses.map((response) => {
       if (!response.epoch || !response.epoch_slot || !response.height || !response.slot || !response.block_vrf) {
@@ -434,15 +429,15 @@ export const blockfrostWalletProvider = (blockfrost: BlockFrostAPI, logger = dum
   };
 
   const providerFunctions: WalletProvider = {
+    blocksByHashes,
     currentWalletProtocolParameters,
     genesisParameters,
     ledgerTip,
     networkInfo,
-    queryBlocksByHashes,
-    queryTransactionsByAddresses,
-    queryTransactionsByHashes,
     rewardsHistory,
     stakePoolStats,
+    transactionsByAddresses,
+    transactionsByHashes,
     utxoDelegationAndRewards
   };
 

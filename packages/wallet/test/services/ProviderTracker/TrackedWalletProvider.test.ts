@@ -93,29 +93,29 @@ describe('TrackedWalletProvider', () => {
     );
 
     test(
-      'queryBlocksByHashes',
+      'blocksByHashes',
       testFunctionStats(
-        (wp) => wp.queryBlocksByHashes([]),
-        (stats) => stats.queryBlocksByHashes$,
-        (mockWP) => mockWP.queryBlocksByHashes
+        (wp) => wp.blocksByHashes([]),
+        (stats) => stats.blocksByHashes$,
+        (mockWP) => mockWP.blocksByHashes
       )
     );
 
     test(
-      'queryTransactionsByAddresses',
+      'transactionsByAddresses',
       testFunctionStats(
-        (wp) => wp.queryTransactionsByAddresses([]),
-        (stats) => stats.queryTransactionsByAddresses$,
-        (mockWP) => mockWP.queryTransactionsByAddresses
+        (wp) => wp.transactionsByAddresses([]),
+        (stats) => stats.transactionsByAddresses$,
+        (mockWP) => mockWP.transactionsByAddresses
       )
     );
 
     test(
-      'queryTransactionsByHashes',
+      'transactionsByHashes',
       testFunctionStats(
-        (wp) => wp.queryTransactionsByHashes([]),
-        (stats) => stats.queryTransactionsByHashes$,
-        (mockWP) => mockWP.queryTransactionsByHashes
+        (wp) => wp.transactionsByHashes([]),
+        (stats) => stats.transactionsByHashes$,
+        (mockWP) => mockWP.transactionsByHashes
       )
     );
 

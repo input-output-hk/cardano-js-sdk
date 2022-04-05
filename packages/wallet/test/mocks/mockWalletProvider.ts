@@ -243,15 +243,15 @@ export const blocksByHashes = [{ epoch: currentEpoch.number - 3 } as Cardano.Blo
  * returns WalletProvider-compatible object
  */
 export const mockWalletProvider = () => ({
+  blocksByHashes: jest.fn().mockResolvedValue(blocksByHashes),
   currentWalletProtocolParameters: jest.fn().mockResolvedValue(protocolParameters),
   genesisParameters: jest.fn().mockResolvedValue(genesisParameters),
   ledgerTip: jest.fn().mockResolvedValue(ledgerTip),
   networkInfo: jest.fn().mockResolvedValue(networkInfo),
-  queryBlocksByHashes: jest.fn().mockResolvedValue(blocksByHashes),
-  queryTransactionsByAddresses: queryTransactions(),
-  queryTransactionsByHashes: queryTransactions(),
   rewardsHistory: jest.fn().mockResolvedValue(rewardsHistory),
   stakePoolStats: jest.fn().mockResolvedValue(stakePoolStats),
+  transactionsByAddresses: queryTransactions(),
+  transactionsByHashes: queryTransactions(),
   utxoDelegationAndRewards: jest.fn().mockResolvedValue({ delegationAndRewards, utxo })
 });
 

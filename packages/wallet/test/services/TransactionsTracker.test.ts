@@ -45,7 +45,7 @@ describe('TransactionsTracker', () => {
 
     it('emits existing transactions from store, then transactions resolved by WalletProvider', async () => {
       await firstValueFrom(store.setAll([queryTransactionsResult[0]]));
-      walletProvider.queryTransactionsByAddresses = jest
+      walletProvider.transactionsByAddresses = jest
         .fn()
         .mockImplementation(() => delay(50).then(() => queryTransactionsResult));
       const provider$ = createAddressTransactionsProvider(
@@ -60,8 +60,8 @@ describe('TransactionsTracker', () => {
         queryTransactionsResult
       ]);
       expect(store.setAll).toBeCalledTimes(2);
-      expect(walletProvider.queryTransactionsByAddresses).toBeCalledTimes(1);
-      expect(walletProvider.queryTransactionsByAddresses).toBeCalledWith(
+      expect(walletProvider.transactionsByAddresses).toBeCalledTimes(1);
+      expect(walletProvider.transactionsByAddresses).toBeCalledWith(
         addresses,
         queryTransactionsResult[0].blockHeader.blockNo
       );
@@ -69,7 +69,7 @@ describe('TransactionsTracker', () => {
 
     it('queries WalletProvider again with sinceBlock from a previous transaction on rollback', async () => {
       await firstValueFrom(store.setAll(queryTransactionsResult));
-      walletProvider.queryTransactionsByAddresses = jest
+      walletProvider.transactionsByAddresses = jest
         .fn()
         .mockImplementationOnce(() => delay(50).then(() => []))
         .mockImplementationOnce(() => delay(50).then(() => [queryTransactionsResult[0]]));
@@ -85,13 +85,13 @@ describe('TransactionsTracker', () => {
         [queryTransactionsResult[0]]
       ]);
       expect(store.setAll).toBeCalledTimes(2);
-      expect(walletProvider.queryTransactionsByAddresses).toBeCalledTimes(2);
-      expect(walletProvider.queryTransactionsByAddresses).nthCalledWith(
+      expect(walletProvider.transactionsByAddresses).toBeCalledTimes(2);
+      expect(walletProvider.transactionsByAddresses).nthCalledWith(
         1,
         addresses,
         queryTransactionsResult[1].blockHeader.blockNo
       );
-      expect(walletProvider.queryTransactionsByAddresses).nthCalledWith(
+      expect(walletProvider.transactionsByAddresses).nthCalledWith(
         2,
         addresses,
         queryTransactionsResult[0].blockHeader.blockNo

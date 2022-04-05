@@ -85,15 +85,15 @@ export const mockWalletProvider2 = (delayMs: number) => {
     jest.fn().mockImplementation(() => delay(delayMs).then(() => resolvedValue));
 
   return {
+    blocksByHashes: delayedJestFn(blocksByHashes),
     currentWalletProtocolParameters: delayedJestFn(protocolParameters2),
     genesisParameters: delayedJestFn(genesisParameters2),
     ledgerTip: delayedJestFn(ledgerTip2),
     networkInfo: delayedJestFn(networkInfo2),
-    queryBlocksByHashes: delayedJestFn(blocksByHashes),
-    queryTransactionsByAddresses: delayedJestFn(queryTransactionsResult2),
-    queryTransactionsByHashes: delayedJestFn(queryTransactionsResult2),
     rewardsHistory: delayedJestFn(rewardsHistory2),
     stakePoolStats: delayedJestFn(stakePoolStats2),
+    transactionsByAddresses: delayedJestFn(queryTransactionsResult2),
+    transactionsByHashes: delayedJestFn(queryTransactionsResult2),
     utxoDelegationAndRewards: delayedJestFn({ delegationAndRewards: delegationAndRewards2, utxo: utxo2 })
   };
 };

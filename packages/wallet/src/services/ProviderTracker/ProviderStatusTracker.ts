@@ -48,7 +48,7 @@ const getDefaultProviderSyncRelevantStats = ({
     walletProvider.stats.currentWalletProtocolParameters$,
     walletProvider.stats.genesisParameters$,
     walletProvider.stats.networkInfo$,
-    walletProvider.stats.queryTransactionsByAddresses$,
+    walletProvider.stats.transactionsByAddresses$,
     walletProvider.stats.rewardsHistory$,
     walletProvider.stats.utxoDelegationAndRewards$,
     assetProvider.stats.getAsset$,

@@ -135,7 +135,7 @@ describe('SingleAddressWallet load', () => {
     const stores = createInMemoryWalletStores();
     const walletProvider = mocks.mockWalletProvider();
     const txsWithNoCertificates = queryTransactionsResult.filter((tx) => !tx.body.certificates);
-    walletProvider.queryTransactionsByAddresses.mockResolvedValue(txsWithNoCertificates);
+    walletProvider.transactionsByAddresses.mockResolvedValue(txsWithNoCertificates);
     const wallet = await createWallet(stores, walletProvider);
     // eslint-disable-next-line unicorn/no-useless-undefined
     await assertWalletProperties(wallet, undefined, []);

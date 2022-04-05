@@ -237,9 +237,9 @@ describe('blockfrostWalletProvider', () => {
     });
   });
 
-  test.todo('queryTransactionsByAddresses (same implementation as querying by hashes)');
+  test.todo('transactionsByAddresses (same implementation as querying by hashes)');
 
-  describe('queryTransactionsByHashes', () => {
+  describe('transactionsByHashes', () => {
     const txsUtxosResponse = {
       hash: '4123d70f66414cc921f6ffc29a899aafc7137a99a0fd453d6b200863ef5702d6',
       inputs: [
@@ -352,7 +352,7 @@ describe('blockfrostWalletProvider', () => {
       BlockFrostAPI.prototype.txsMetadata = jest.fn().mockResolvedValue(mockedMetadataResponse);
       const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
       const client = blockfrostWalletProvider(blockfrost);
-      const response = await client.queryTransactionsByHashes(
+      const response = await client.transactionsByHashes(
         ['4123d70f66414cc921f6ffc29a899aafc7137a99a0fd453d6b200863ef5702d6'].map(Cardano.TransactionId)
       );
 
@@ -531,12 +531,12 @@ describe('blockfrostWalletProvider', () => {
     });
   });
 
-  test('queryBlocksByHashes', async () => {
+  test('blocksByHashes', async () => {
     BlockFrostAPI.prototype.blocks = jest.fn().mockResolvedValue(blockResponse);
 
     const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
     const client = blockfrostWalletProvider(blockfrost);
-    const response = await client.queryBlocksByHashes([
+    const response = await client.blocksByHashes([
       Cardano.BlockId('0dbe461fb5f981c0d01615332b8666340eb1a692b3034f46bcb5f5ea4172b2ed')
     ]);
 
@@ -563,13 +563,13 @@ describe('blockfrostWalletProvider', () => {
     ]);
   });
 
-  test('queryBlocksByHashes, genesis delegate slot leader', async () => {
+  test('blocksByHashes, genesis delegate slot leader', async () => {
     const slotLeader = 'ShelleyGenesis-eff1b5b26e65b791';
     BlockFrostAPI.prototype.blocks = jest.fn().mockResolvedValue({ ...blockResponse, slot_leader: slotLeader });
 
     const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
     const client = blockfrostWalletProvider(blockfrost);
-    const response = await client.queryBlocksByHashes([
+    const response = await client.blocksByHashes([
       Cardano.BlockId('0dbe461fb5f981c0d01615332b8666340eb1a692b3034f46bcb5f5ea4172b2ed')
     ]);
 

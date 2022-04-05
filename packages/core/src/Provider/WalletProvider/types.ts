@@ -77,7 +77,6 @@ export interface WalletProvider {
   networkInfo: () => Promise<NetworkInfo>;
   // TODO: move stakePoolStats out to other provider type, since it's not required for wallet operation
   stakePoolStats?: () => Promise<StakePoolStats>;
-  // TODO: split utxoDelegationAndRewards this into 2 or 3 functions
   utxoDelegationAndRewards: (
     addresses: Cardano.Address[],
     rewardAccount?: Cardano.RewardAccount
@@ -85,15 +84,12 @@ export interface WalletProvider {
   /**
    * @param {Cardano.BlockNo} sinceBlock inclusive
    */
-  queryTransactionsByAddresses: (
-    addresses: Cardano.Address[],
-    sinceBlock?: Cardano.BlockNo
-  ) => Promise<Cardano.TxAlonzo[]>;
-  queryTransactionsByHashes: (hashes: Cardano.TransactionId[]) => Promise<Cardano.TxAlonzo[]>;
+  transactionsByAddresses: (addresses: Cardano.Address[], sinceBlock?: Cardano.BlockNo) => Promise<Cardano.TxAlonzo[]>;
+  transactionsByHashes: (hashes: Cardano.TransactionId[]) => Promise<Cardano.TxAlonzo[]>;
   /**
    * @returns an array of blocks, same length and in the same order as `hashes` argument.
    */
-  queryBlocksByHashes: (hashes: Cardano.BlockId[]) => Promise<Cardano.Block[]>;
+  blocksByHashes: (hashes: Cardano.BlockId[]) => Promise<Cardano.Block[]>;
   currentWalletProtocolParameters: () => Promise<ProtocolParametersRequiredByWallet>;
   genesisParameters: () => Promise<Cardano.CompactGenesis>;
   /**
