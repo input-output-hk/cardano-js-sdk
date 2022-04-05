@@ -14,7 +14,7 @@ import { URL } from 'url';
 import { createConnectionObject } from '@cardano-ogmios/client';
 import { createStubStakePoolSearchProvider, createStubTimeSettingsProvider } from '@cardano-sdk/util-dev';
 import { ogmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
-import { txSubmitHttpProvider } from '@cardano-sdk/cardano-graphql';
+import { txSubmitHttpProvider } from '@cardano-sdk/cardano-services-client';
 import waitOn from 'wait-on';
 
 const loggerMethodNames = ['debug', 'error', 'fatal', 'info', 'trace', 'warn'] as (keyof Logger)[];
