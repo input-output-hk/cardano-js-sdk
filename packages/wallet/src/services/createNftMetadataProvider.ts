@@ -21,7 +21,7 @@ export const createNftMetadataProvider =
         map((transactions) => transactions.find((tx) => tx.id === latestMintTxId)),
         mergeMap((localTx) =>
           // Use local transaction if available, otherwise fetch from WalletProvider
-          localTx ? of(localTx) : from(walletProvider.queryTransactionsByHashes([latestMintTxId]).then(([tx]) => tx))
+          localTx ? of(localTx) : from(walletProvider.transactionsByHashes([latestMintTxId]).then(([tx]) => tx))
         ),
         map(({ auxiliaryData }) => Asset.util.metadatumToCip25(asset, auxiliaryData?.body.blob))
       )

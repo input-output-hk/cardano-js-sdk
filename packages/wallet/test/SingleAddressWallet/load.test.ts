@@ -42,7 +42,7 @@ const createWallet = async (stores: WalletStores, walletProvider: WalletProvider
 };
 
 const assertWalletProperties = async (
-  wallet: Wallet,
+  wallet: SingleAddressWallet,
   expectedDelegateeId: Cardano.PoolId | undefined,
   expectedRewardsHistory = flatten([...mocks.rewardsHistory.values()])
 ) => {
@@ -93,6 +93,8 @@ const assertWalletProperties = async (
   expect(await firstValueFrom(wallet.assets$)).toEqual(new Map([[AssetId.TSLA, mocks.asset]]));
   // timeSettings$
   expect(await firstValueFrom(wallet.timeSettings$)).toEqual(testnetTimeSettings);
+  // inputAddressResolver
+  expect(typeof wallet.inputAddressResolver).toBe('function');
 };
 
 const assertWalletProperties2 = async (wallet: Wallet) => {

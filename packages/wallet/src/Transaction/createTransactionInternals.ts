@@ -3,7 +3,7 @@ import { SelectionResult } from '@cardano-sdk/cip2';
 
 export type TxInternals = {
   hash: Cardano.TransactionId;
-  body: Cardano.TxBodyAlonzo;
+  body: Cardano.NewTxBodyAlonzo;
 };
 
 export type CreateTxInternalsProps = {

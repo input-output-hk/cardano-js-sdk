@@ -63,7 +63,7 @@ export const txOut: Cardano.TxOut = {
   value: valueWithAssets
 };
 
-export const txBody: Cardano.TxBodyAlonzo = {
+export const txBody: Cardano.NewTxBodyAlonzo = {
   certificates: [
     {
       __typename: Cardano.CertificateType.PoolRetirement,

@@ -98,7 +98,6 @@ export const queryTransactionsResult: Cardano.TxAlonzo[] = [
         },
         {
           __typename: Cardano.CertificateType.StakeDelegation,
-          epoch: currentEpoch.number - 10,
           poolId: somePartialStakePools[0].id,
           stakeKeyHash
         }

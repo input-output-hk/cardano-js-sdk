@@ -52,9 +52,9 @@ export class TrackedWalletProvider extends ProviderTracker implements WalletProv
   readonly ledgerTip: WalletProvider['ledgerTip'];
   readonly networkInfo: WalletProvider['networkInfo'];
   readonly utxoDelegationAndRewards: WalletProvider['utxoDelegationAndRewards'];
-  readonly queryTransactionsByAddresses: WalletProvider['queryTransactionsByAddresses'];
-  readonly queryTransactionsByHashes: WalletProvider['queryTransactionsByHashes'];
-  readonly queryBlocksByHashes: WalletProvider['queryBlocksByHashes'];
+  readonly transactionsByAddresses: WalletProvider['transactionsByAddresses'];
+  readonly transactionsByHashes: WalletProvider['transactionsByHashes'];
+  readonly blocksByHashes: WalletProvider['blocksByHashes'];
   readonly currentWalletProtocolParameters: WalletProvider['currentWalletProtocolParameters'];
   readonly genesisParameters: WalletProvider['genesisParameters'];
   readonly rewardsHistory: WalletProvider['rewardsHistory'];
@@ -74,15 +74,15 @@ export class TrackedWalletProvider extends ProviderTracker implements WalletProv
         () => walletProvider.utxoDelegationAndRewards(addresses, rewardAccount),
         this.stats.utxoDelegationAndRewards$
       );
-    this.queryTransactionsByAddresses = (addresses) =>
+    this.transactionsByAddresses = (addresses) =>
       this.trackedCall(
-        () => walletProvider.queryTransactionsByAddresses(addresses),
+        () => walletProvider.transactionsByAddresses(addresses),
         this.stats.queryTransactionsByAddresses$
       );
-    this.queryTransactionsByHashes = (hashes) =>
-      this.trackedCall(() => walletProvider.queryTransactionsByHashes(hashes), this.stats.queryTransactionsByHashes$);
-    this.queryBlocksByHashes = (hashes) =>
-      this.trackedCall(() => walletProvider.queryBlocksByHashes(hashes), this.stats.queryBlocksByHashes$);
+    this.transactionsByHashes = (hashes) =>
+      this.trackedCall(() => walletProvider.transactionsByHashes(hashes), this.stats.queryTransactionsByHashes$);
+    this.blocksByHashes = (hashes) =>
+      this.trackedCall(() => walletProvider.blocksByHashes(hashes), this.stats.queryBlocksByHashes$);
     this.currentWalletProtocolParameters = () =>
       this.trackedCall(walletProvider.currentWalletProtocolParameters, this.stats.currentWalletProtocolParameters$);
     this.genesisParameters = () => this.trackedCall(walletProvider.genesisParameters, this.stats.genesisParameters$);

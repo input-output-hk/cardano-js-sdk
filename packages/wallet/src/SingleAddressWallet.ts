@@ -1,4 +1,10 @@
-import { AddressType, GroupedAddress, KeyAgent, util as keyManagementUtil } from './KeyManagement';
+import {
+  AddressType,
+  GroupedAddress,
+  InputAddressResolver,
+  KeyAgent,
+  util as keyManagementUtil
+} from './KeyManagement';
 import {
   AssetProvider,
   BigIntMath,
@@ -48,7 +54,8 @@ import {
   createTransactionsTracker,
   createUtxoTracker,
   distinctBlock,
-  distinctEpoch
+  distinctEpoch,
+  txInEquals
 } from './services';
 import { Cip30DataSignature } from '@cardano-sdk/cip30';
 import {
@@ -111,6 +118,7 @@ export class SingleAddressWallet implements Wallet {
   readonly assets$: TrackerSubject<Assets>;
   readonly syncStatus: SyncStatus;
   readonly name: string;
+  readonly inputAddressResolver: InputAddressResolver;
 
   constructor(
     {
@@ -228,6 +236,8 @@ export class SingleAddressWallet implements Wallet {
       }),
       stores.assets
     );
+    this.inputAddressResolver = (input) =>
+      this.utxo.available$.value?.find(([txIn]) => txInEquals(txIn, input))?.[1].address || null;
   }
 
   async validateInitializeTxProps(props: InitializeTxProps): Promise<InitializeTxPropsValidationResult> {
@@ -266,8 +276,10 @@ export class SingleAddressWallet implements Wallet {
     stubSign = false
   ): Promise<Cardano.NewTxAlonzo> {
     const signatures = stubSign
-      ? keyManagementUtil.stubSignTransaction(tx.body, this.keyAgent.knownAddresses)
-      : await this.keyAgent.signTransaction(tx);
+      ? keyManagementUtil.stubSignTransaction(tx.body, this.keyAgent.knownAddresses, this.inputAddressResolver)
+      : await this.keyAgent.signTransaction(tx, {
+          inputAddressResolver: this.inputAddressResolver
+        });
     return {
       auxiliaryData,
       body: tx.body,

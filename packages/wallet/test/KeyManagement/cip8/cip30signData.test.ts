@@ -1,5 +1,5 @@
 import { Address, Ed25519Signature, PublicKey } from '@emurgo/cardano-serialization-lib-nodejs';
-import { AddressType, KeyAgent, KeyType } from '../../../src/KeyManagement';
+import { AddressType, KeyAgent, KeyRole } from '../../../src/KeyManagement';
 import { COSEKey, COSESign1, SigStructure } from '@emurgo/cardano-message-signing-nodejs';
 import { Cardano, util } from '@cardano-sdk/core';
 import { CoseLabel } from '../../../src/KeyManagement/cip8/util';
@@ -54,7 +54,7 @@ describe('cip30signData', () => {
     expect(publicKeyHex).toEqual(
       await keyAgent.derivePublicKey({
         index: addressDerivationPath.index,
-        type: addressDerivationPath.type as number
+        role: addressDerivationPath.type as number
       })
     );
   });
@@ -68,7 +68,7 @@ describe('cip30signData', () => {
     expect(publicKeyHex).toEqual(
       await keyAgent.derivePublicKey({
         index: 0,
-        type: KeyType.Stake
+        role: KeyRole.Stake
       })
     );
   });

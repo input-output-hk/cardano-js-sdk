@@ -1,27 +1,29 @@
+import { AccountKeyDerivationPath, GroupedAddress, InputAddressResolver, KeyRole } from '../types';
 import { Cardano, util } from '@cardano-sdk/core';
-import { GroupedAddress, KeyType } from '../types';
 import { uniq } from 'lodash-es';
-
-export interface PartialDerivationPath {
-  role: KeyType;
-  index: number;
-}
 
 /**
  * Assumes that a single staking key is used for all addresses (index=0)
  *
- * @returns {PartialDerivationPath[]} derivation paths for keys to sign transaction with
+ * @returns {AccountKeyDerivationPath[]} derivation paths for keys to sign transaction with
  */
 export const ownSignatureKeyPaths = (
-  txBody: Cardano.TxBodyAlonzo,
-  knownAddresses: GroupedAddress[]
-): PartialDerivationPath[] => {
+  txBody: Cardano.NewTxBodyAlonzo,
+  knownAddresses: GroupedAddress[],
+  resolveInputAddress: InputAddressResolver
+): AccountKeyDerivationPath[] => {
   const paymentKeyPaths = uniq(
-    txBody.inputs.map((input) => knownAddresses.find(({ address }) => address === input.address)).filter(util.isNotNil)
+    txBody.inputs
+      .map((input) => {
+        const ownAddress = resolveInputAddress(input);
+        if (!ownAddress) return null;
+        return knownAddresses.find(({ address }) => address === ownAddress);
+      })
+      .filter(util.isNotNil)
   ).map(({ type, index }) => ({ index, role: Number(type) }));
   const isStakingKeySignatureRequired = txBody.certificates?.length;
   if (isStakingKeySignatureRequired) {
-    return [...paymentKeyPaths, { index: 0, role: KeyType.Stake }];
+    return [...paymentKeyPaths, { index: 0, role: KeyRole.Stake }];
   }
   return paymentKeyPaths;
 };

@@ -13,14 +13,14 @@ export enum KeyAgentType {
   Ledger = 'Ledger'
 }
 
-export enum KeyType {
+export enum KeyRole {
   External = 0,
   Internal = 1,
   Stake = 2
 }
 
 export interface AccountKeyDerivationPath {
-  type: KeyType;
+  role: KeyRole;
   index: number;
 }
 /** Internal = change address & External = receipt address */
@@ -89,6 +89,13 @@ export type TransportType = TransportWebHID | TransportNodeHid;
  */
 export type GetPassword = (noCache?: true) => Promise<Uint8Array>;
 
+export type InputAddressResolver = (txIn: Cardano.NewTxIn) => Cardano.Address | null;
+
+export interface SignTransactionOptions {
+  inputAddressResolver: InputAddressResolver;
+  additionalKeyPaths?: AccountKeyDerivationPath[];
+}
+
 export interface KeyAgent {
   get networkId(): Cardano.NetworkId;
   get accountIndex(): number;
@@ -102,7 +109,7 @@ export interface KeyAgent {
   /**
    * @throws AuthenticationError
    */
-  signTransaction(txInternals: TxInternals): Promise<Cardano.Signatures>;
+  signTransaction(txInternals: TxInternals, options: SignTransactionOptions): Promise<Cardano.Signatures>;
   /**
    * @throws AuthenticationError
    */

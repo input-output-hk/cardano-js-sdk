@@ -47,6 +47,11 @@ export interface TxBodyAlonzo {
   requiredExtraSignatures?: Cardano.Ed25519KeyHash[];
 }
 
+export interface NewTxBodyAlonzo extends Omit<TxBodyAlonzo, 'inputs' | 'collaterals'> {
+  inputs: Cardano.NewTxIn[];
+  collaterals?: Cardano.NewTxIn[];
+}
+
 /**
  * Implicit coin quantities used in the transaction
  */
@@ -81,15 +86,18 @@ export type Witness = Omit<Partial<BlockBodyAlonzo['witness']>, 'redeemers' | 's
   redeemers?: Redeemer[];
   signatures: Signatures;
 };
-export interface TxAlonzo {
+
+export interface NewTxAlonzo<TBody extends NewTxBodyAlonzo = NewTxBodyAlonzo> {
   id: TransactionId;
+  body: TBody;
+  witness: Witness;
+  auxiliaryData?: AuxiliaryData;
+}
+
+export interface TxAlonzo extends NewTxAlonzo<TxBodyAlonzo> {
   index: number;
   blockHeader: PartialBlockHeader;
   body: TxBodyAlonzo;
   implicitCoin: ImplicitCoin;
   txSize: number;
-  witness: Witness;
-  auxiliaryData?: AuxiliaryData;
 }
-
-export type NewTxAlonzo = Omit<TxAlonzo, 'blockHeader' | 'implicitCoin' | 'txSize' | 'index'>;
