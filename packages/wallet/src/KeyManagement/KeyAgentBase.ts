@@ -6,12 +6,11 @@ import {
   KeyRole,
   SerializableKeyAgentData,
   SignBlobResult,
-  SignTransactionOptions
+  SignTransactionOptions,
 } from './types';
 import { CSL, Cardano, util } from '@cardano-sdk/core';
-import { STAKE_KEY_DERIVATION_PATH, ownSignatureKeyPaths } from './util';
+import { STAKE_KEY_DERIVATION_PATH } from './util';
 import { TxInternals } from '../Transaction';
-import { uniqBy } from 'lodash-es';
 
 export abstract class KeyAgentBase implements KeyAgent {
   readonly #serializableData: SerializableKeyAgentData;
@@ -33,6 +32,7 @@ export abstract class KeyAgentBase implements KeyAgent {
   }
   abstract signBlob(derivationPath: AccountKeyDerivationPath, blob: Cardano.util.HexBlob): Promise<SignBlobResult>;
   abstract exportRootPrivateKey(): Promise<Cardano.Bip32PrivateKey>;
+  abstract signTransaction(txInternals: TxInternals, signTransactionOptions: SignTransactionOptions): Promise<Cardano.Signatures>;
 
   constructor(serializableData: SerializableKeyAgentData) {
     this.#serializableData = serializableData;
@@ -68,28 +68,6 @@ export abstract class KeyAgentBase implements KeyAgent {
     };
     this.knownAddresses.push(groupedAddress);
     return groupedAddress;
-  }
-
-  async signTransaction(
-    { body, hash }: TxInternals,
-    { inputAddressResolver, additionalKeyPaths = [] }: SignTransactionOptions
-  ): Promise<Cardano.Signatures> {
-    // Possible optimization is casting strings to OpaqueString types directly and skipping validation
-    const blob = Cardano.util.HexBlob(hash.toString());
-    const derivationPaths = ownSignatureKeyPaths(body, this.knownAddresses, inputAddressResolver);
-    const keyPaths = uniqBy([...derivationPaths, ...additionalKeyPaths], ({ role, index }) => `${role}.${index}`);
-    // TODO:
-    // if (keyPaths.length === 0) {
-    //   throw new ProofGenerationError();
-    // }
-    return new Map<Cardano.Ed25519PublicKey, Cardano.Ed25519Signature>(
-      await Promise.all(
-        keyPaths.map(async ({ role, index }) => {
-          const { publicKey, signature } = await this.signBlob({ index, role }, blob);
-          return [publicKey, signature] as const;
-        })
-      )
-    );
   }
 
   async derivePublicKey(derivationPath: AccountKeyDerivationPath): Promise<Cardano.Ed25519PublicKey> {

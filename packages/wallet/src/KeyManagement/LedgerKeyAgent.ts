@@ -7,7 +7,7 @@ import {
   SerializableLedgerKeyAgentData,
   SignBlobResult,
   TransportType,
-  KeyType,
+  KeyRole,
 } from './types';
 import { KeyAgentBase } from './KeyAgentBase';
 import DeviceConnection, {
@@ -180,16 +180,16 @@ export class LedgerKeyAgent extends KeyAgentBase {
       const stakeKeyHash = await this.derivePublicKey(STAKE_KEY_DERIVATION_PATH);
       const paymentKeyHash = await this.derivePublicKey({
         index: this.serializableData.accountIndex,
-        type: KeyType.Internal,
+        role: KeyRole.Internal,
       });
       const keys = {
         payment: {
           hash: paymentKeyHash,
-          path: [HARDENED + 1852, HARDENED + 1815, HARDENED + this.serializableData.accountIndex, KeyType.Internal, 0],
+          path: [HARDENED + 1852, HARDENED + 1815, HARDENED + this.serializableData.accountIndex, KeyRole.Internal, 0],
         },
         stake: {
           hash: stakeKeyHash,
-          path: [HARDENED + 1852, HARDENED + 1815, HARDENED + this.serializableData.accountIndex, KeyType.Stake, 0],
+          path: [HARDENED + 1852, HARDENED + 1815, HARDENED + this.serializableData.accountIndex, KeyRole.Stake, 0],
         },
       };
 
@@ -213,7 +213,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
           result.witnesses.map(async (witness) => {
             const publicKey = await this.derivePublicKey({
               index: HARDENED - witness.path[2],
-              type: witness.path[3],
+              role: witness.path[3],
             });
             const signature = Cardano.Ed25519Signature(
               witness.witnessSignatureHex
