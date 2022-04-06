@@ -1,0 +1,363 @@
+-- Dumping blocks 1646557,1912426,1654555,1655520,1668437
+ALTER TABLE public.tx ADD COLUMN invalid_before word64type NULL;
+ALTER TABLE public.tx ADD COLUMN invalid_hereafter word64type NULL;
+ALTER TABLE public.block DISABLE TRIGGER ALL;
+COPY public.block (id, hash, epoch_no, slot_no, epoch_slot_no, block_no, previous_id, slot_leader_id, size, "time", tx_count, proto_major, proto_minor, vrf_key, op_cert, op_cert_counter) FROM stdin WITH CSV;
+1646588,\x453bfdba83ef327dccd5a56afc951240de0cc5b90690b4c713703c5a660e0e7c,76,2602920,140520,1646557,1646587,1597169,706,2020-08-09 11:22:16,1,2,0,vrf_vk15nyl9g8sa4jkyjqm0jf9qm6n9ageea8z4duzssvkqz5ssrjfs7ksqhx8dk,\xb46ad3470639a86e20dfdb8dcb2b87978353155accb95f9116b8fb0542307b3a,0
+1654586,\x469cc6fbcc186de6b12c392ad0cc84a20c4d4774c1f9c3cfd80745de00856f4b,76,2763220,300820,1654555,1654585,1597169,737,2020-08-11 07:53:56,1,2,0,vrf_vk15nyl9g8sa4jkyjqm0jf9qm6n9ageea8z4duzssvkqz5ssrjfs7ksqhx8dk,\xb46ad3470639a86e20dfdb8dcb2b87978353155accb95f9116b8fb0542307b3a,0
+1655551,\xf50946a4f5c57797e2f319b7c3d94ecf691011456f67c2db8ad1a3d1d73611ed,76,2782520,320120,1655520,1655550,1597168,713,2020-08-11 13:15:36,1,2,0,vrf_vk1l2x858jk7q9prv0krjmdpn84p3q4tvvgnmdld54a7706s9e3qa4sfehcg8,\xae14dca2beb9a048df25f7bb1d6f4985ef0e4ed1b783a27e4171e0204442b03e,0
+1668468,\xffc306d5b0c53b2ba3829c84f10f73289926933c3d9df33e9d721dab15331844,77,3041540,147140,1668437,1668467,1597164,728,2020-08-14 13:12:36,1,2,0,vrf_vk1576pm8ypccff6tj9w6rnpphzqep5gf8zqwl5k0rmkzfdva34ynnqrk086n,\x6330dd04a06d755d7ac32eb44f9aa5ee67c389efdc22b9846e6025f2bd4b277d,0
+1912457,\x1c87c4191424d3a3825f7717f327749f08ba5c1a95ca4dffd46b15db518b6876,88,8063200,416800,1912426,1912456,1597164,781,2020-10-11 16:06:56,1,2,0,vrf_vk1576pm8ypccff6tj9w6rnpphzqep5gf8zqwl5k0rmkzfdva34ynnqrk086n,\xb01e783e9f80a4c27ceb46d4b00f483ec57cfb315e1c111b87aad5e80f3c770f,2
+\.
+-- Dumping transactions
+ALTER TABLE public.tx DISABLE TRIGGER ALL;
+COPY public.tx (id, hash, block_id, block_index, out_sum, fee, deposit, size, invalid_before, invalid_hereafter, valid_contract, script_size) FROM stdin WITH CSV;
+20405,\x0d3c928318f489a93b2ceba60f1998594f3626e4018ad19adf0a9615164b5469,1646588,0,487464117,186401,500000000,705,,2603080,t,0
+20540,\x8fd14baca91c674fafae59701b7dc0eda1266202ec8445bad3244bd8669a7fb5,1654586,0,999502622402,197929,500000000,736,,2764200,t,0
+20562,\x071b93a1a134389c22a1dc43fe747e43d23088448fed2b5ab22564cc0cb8bbc5,1655551,0,199806239,193761,500000000,712,,2882180,t,0
+20842,\x047ee144d7adc5f10a107bf13eab570833bf2fb8bb6b016d030739a4cc585aa7,1668468,0,495463149,187369,500000000,727,,3041800,t,0
+56575,\x3d4cd09885d39673125c3a15f8acb45d92fde137f9effe7a5131f6cc7241d960,1912457,0,10306556787917,205145,0,780,,8064171,t,0
+\.
+-- Dumping transaction inputs
+ALTER TABLE public.tx_in DISABLE TRIGGER ALL;
+COPY public.tx_in (id, tx_in_id, tx_out_id, tx_out_index, redeemer_id) FROM stdin WITH CSV;
+36405,20842,20833,0,
+36042,20540,20539,0,
+36070,20562,20561,0,
+35880,20405,20401,0,
+367592,56575,39637,0,
+367591,56575,39611,0,
+367590,56575,39645,0,
+367589,56575,39613,0,
+\.
+-- Dumping transaction inputs references where spent outputs were defined
+COPY public.tx (id, hash, block_id, block_index, out_sum, fee, deposit, size, invalid_before, invalid_hereafter, valid_contract, script_size) FROM stdin WITH CSV;
+20833,\xdac93af4538c4b398af17a4e4b78754847d6f11cbda69db3d4cbd3fec3830c4c,1667501,0,995650518,172761,2000000,361,,3022200,t,0
+20539,\x3b7baa225dece899c2e191e2dd0873c6ed7221f2163f0a7c45d72b51177639ee,1654585,0,1000002820331,179669,2000000,365,,2764180,t,0
+20561,\xaf4345a8fc3644b622e10c74bc14930426a80ad81da99c01c806c8d6e4d54306,1655503,0,799474237,175665,0,261,,2880900,t,0
+20401,\x6397e70eb2b9be495d20906115f7104ef3c5c21d7e76055de8fb3a191df13dcc,1646402,0,987650518,172761,2000000,260,,2599320,t,0
+39637,\xe995de5e7435e6bbf82b3335033ee8eb0b2f7d0126165b9761816c23439d0860,1855238,0,49962856732945,174565,0,297,,6866971,t,0
+39611,\xbd3b2f61a2a02cfd9fefc14ecdc145a47ade346591c2564c3f501f1b27b2b889,1854971,0,10006556993062,181429,0,403,,6861489,t,0
+39645,\x57b675b69a5498c284995b40d7af246331bc5a69c34fd7c6ade3fe55b451ee2e,1855339,0,49862856558380,174565,0,297,,6869142,t,0
+39613,\x54b36d578df7b8c4e2f8f0479731c3e9918f007cb6fb8e23f639a83e0fa05427,1854975,0,50062856907510,174565,0,297,,6861600,t,0
+\.
+ALTER TABLE public.tx_out DISABLE TRIGGER ALL;
+-- Dumping spent outputs
+COPY public.tx_out (id, tx_id, index, address, address_raw, address_has_script, payment_cred, stake_address_id, value, data_hash) FROM stdin WITH CSV;
+50363,20833,0,addr_test1qq6x2cplwqxwm3run3v8cq0r6t94rja68mmdq5385tzcxx6v2nmmhcnf2rham73tl8mflal77wzy0rz89tgksxtk4yfssm6lws,\x003465603f700cedc47c9c587c01e3d2cb51cbba3ef6d05227a2c5831b4c54f7bbe26950efddfa2bf9f69ff7fef384478c472ad1681976a913,f,\x3465603f700cedc47c9c587c01e3d2cb51cbba3ef6d05227a2c5831b,125,995650518,
+49068,20539,0,addr_test1qr4m502gr9hnaxac5mxjln22jwavf7pcjmh9sw7fujdvgvj9ef6afquphwg7tj4mmm548m3t50hxfyygjuu222kx96eshcathg,\x00ebba3d48196f3e9bb8a6cd2fcd4a93bac4f83896ee583bc9e49ac43245ca75d48381bb91e5cabbdee953ee2ba3ee6490889738a52ac62eb3,f,\xebba3d48196f3e9bb8a6cd2fcd4a93bac4f83896ee583bc9e49ac432,132,1000002820331,
+49856,20561,0,addr_test1qzdpevw9zx43zdagm9mvglum2ss98n8ez0ve463v7tpa6pyve070zq0eyc5gczf4x4vxczm7qqv500aj2epd58ntr0rsg2gjpw,\x009a1cb1c511ab1137a8d976c47f9b542053ccf913d99aea2cf2c3dd048ccbfcf101f926288c093535586c0b7e001947bfb25642da1e6b1bc7,f,\x9a1cb1c511ab1137a8d976c47f9b542053ccf913d99aea2cf2c3dd04,120,700000000,
+45659,20401,0,addr_test1qrrgh4kuq2tlgcpawpta7e7t6dacelhkwh9wm0wzxdx2alv2fa9cu9sfmxem2d2jyzdukjh43dxh84elp9y64da67zvsasy6xs,\x00c68bd6dc0297f4603d7057df67cbd37b8cfef675caedbdc2334caefd8a4f4b8e1609d9b3b53552209bcb4af58b4d73d73f0949aab7baf099,f,\xc68bd6dc0297f4603d7057df67cbd37b8cfef675caedbdc2334caefd,107,987650518,
+223176,39637,0,addr_test1qr4m502gr9hnaxac5mxjln22jwavf7pcjmh9sw7fujdvgvj9ef6afquphwg7tj4mmm548m3t50hxfyygjuu222kx96eshcathg,\x00ebba3d48196f3e9bb8a6cd2fcd4a93bac4f83896ee583bc9e49ac43245ca75d48381bb91e5cabbdee953ee2ba3ee6490889738a52ac62eb3,f,\xebba3d48196f3e9bb8a6cd2fcd4a93bac4f83896ee583bc9e49ac432,132,100000000000,
+219997,39611,0,addr_test1qr4m502gr9hnaxac5mxjln22jwavf7pcjmh9sw7fujdvgvj9ef6afquphwg7tj4mmm548m3t50hxfyygjuu222kx96eshcathg,\x00ebba3d48196f3e9bb8a6cd2fcd4a93bac4f83896ee583bc9e49ac43245ca75d48381bb91e5cabbdee953ee2ba3ee6490889738a52ac62eb3,f,\xebba3d48196f3e9bb8a6cd2fcd4a93bac4f83896ee583bc9e49ac432,132,10006556993062,
+224085,39645,0,addr_test1qr4m502gr9hnaxac5mxjln22jwavf7pcjmh9sw7fujdvgvj9ef6afquphwg7tj4mmm548m3t50hxfyygjuu222kx96eshcathg,\x00ebba3d48196f3e9bb8a6cd2fcd4a93bac4f83896ee583bc9e49ac43245ca75d48381bb91e5cabbdee953ee2ba3ee6490889738a52ac62eb3,f,\xebba3d48196f3e9bb8a6cd2fcd4a93bac4f83896ee583bc9e49ac432,132,100000000000,
+219999,39613,0,addr_test1qr4m502gr9hnaxac5mxjln22jwavf7pcjmh9sw7fujdvgvj9ef6afquphwg7tj4mmm548m3t50hxfyygjuu222kx96eshcathg,\x00ebba3d48196f3e9bb8a6cd2fcd4a93bac4f83896ee583bc9e49ac43245ca75d48381bb91e5cabbdee953ee2ba3ee6490889738a52ac62eb3,f,\xebba3d48196f3e9bb8a6cd2fcd4a93bac4f83896ee583bc9e49ac432,132,100000000000,
+\.
+-- Dumping transactions outputs
+COPY public.tx_out (id, tx_id, index, address, address_raw, address_has_script, payment_cred, stake_address_id, value, data_hash) FROM stdin WITH CSV;
+50377,20842,0,addr_test1qq6x2cplwqxwm3run3v8cq0r6t94rja68mmdq5385tzcxx6v2nmmhcnf2rham73tl8mflal77wzy0rz89tgksxtk4yfssm6lws,\x003465603f700cedc47c9c587c01e3d2cb51cbba3ef6d05227a2c5831b4c54f7bbe26950efddfa2bf9f69ff7fef384478c472ad1681976a913,f,\x3465603f700cedc47c9c587c01e3d2cb51cbba3ef6d05227a2c5831b,125,495463149,
+49069,20540,0,addr_test1qr4m502gr9hnaxac5mxjln22jwavf7pcjmh9sw7fujdvgvj9ef6afquphwg7tj4mmm548m3t50hxfyygjuu222kx96eshcathg,\x00ebba3d48196f3e9bb8a6cd2fcd4a93bac4f83896ee583bc9e49ac43245ca75d48381bb91e5cabbdee953ee2ba3ee6490889738a52ac62eb3,f,\xebba3d48196f3e9bb8a6cd2fcd4a93bac4f83896ee583bc9e49ac432,132,999502622402,
+49858,20562,0,addr_test1qzdpevw9zx43zdagm9mvglum2ss98n8ez0ve463v7tpa6pyve070zq0eyc5gczf4x4vxczm7qqv500aj2epd58ntr0rsg2gjpw,\x009a1cb1c511ab1137a8d976c47f9b542053ccf913d99aea2cf2c3dd048ccbfcf101f926288c093535586c0b7e001947bfb25642da1e6b1bc7,f,\x9a1cb1c511ab1137a8d976c47f9b542053ccf913d99aea2cf2c3dd04,120,199806239,
+45666,20405,0,addr_test1qrrgh4kuq2tlgcpawpta7e7t6dacelhkwh9wm0wzxdx2alv2fa9cu9sfmxem2d2jyzdukjh43dxh84elp9y64da67zvsasy6xs,\x00c68bd6dc0297f4603d7057df67cbd37b8cfef675caedbdc2334caefd8a4f4b8e1609d9b3b53552209bcb4af58b4d73d73f0949aab7baf099,f,\xc68bd6dc0297f4603d7057df67cbd37b8cfef675caedbdc2334caefd,107,487464117,
+449355,56575,0,addr_test1qr4m502gr9hnaxac5mxjln22jwavf7pcjmh9sw7fujdvgvj9ef6afquphwg7tj4mmm548m3t50hxfyygjuu222kx96eshcathg,\x00ebba3d48196f3e9bb8a6cd2fcd4a93bac4f83896ee583bc9e49ac43245ca75d48381bb91e5cabbdee953ee2ba3ee6490889738a52ac62eb3,f,\xebba3d48196f3e9bb8a6cd2fcd4a93bac4f83896ee583bc9e49ac432,132,10306556787917,
+\.
+-- Dumping transactions withdrawals
+ALTER TABLE public.withdrawal DISABLE TRIGGER ALL;
+COPY public.withdrawal (id, addr_id, amount, redeemer_id, tx_id) FROM stdin WITH CSV;
+\.
+-- Dumping Block transaction withdrawals stake addresses
+ALTER TABLE public.stake_address DISABLE TRIGGER ALL;
+COPY public.stake_address (id, hash_raw, view, script_hash, registered_tx_id) FROM stdin WITH CSV;
+\.
+-- Dumping Block transactions stake_registrations
+ALTER TABLE public.stake_registration DISABLE TRIGGER ALL;
+COPY public.stake_registration (id, addr_id, cert_index, epoch_no, tx_id) FROM stdin WITH CSV;
+\.
+-- Dumping Block transactions stake_registrations stake addresses
+ALTER TABLE public.stake_address DISABLE TRIGGER ALL;
+COPY public.stake_address (id, hash_raw, view, script_hash, registered_tx_id) FROM stdin WITH CSV;
+\.
+-- Dumping Block rewards
+ALTER TABLE public.reward DISABLE TRIGGER ALL;
+COPY public.reward (id, addr_id, type, amount, earned_epoch, spendable_epoch,  pool_id) FROM stdin WITH CSV;
+1,81,refund,500000000,76,76,10
+2,54,refund,500000000,76,76,6
+197,9778,leader,1430658273,86,88,136
+198,9799,member,117559634,86,88,110
+199,808,member,8609187236,86,88,79
+200,9752,leader,2630705910,86,88,129
+201,9800,member,88169656,86,88,110
+202,9754,leader,2307636763,86,88,132
+203,9775,leader,1384508007,86,88,135
+204,705,leader,12726342180,86,88,67
+205,663,member,51687,86,88,24
+206,9762,leader,1569109074,86,88,131
+207,128,member,112303368,86,88,15
+208,767,leader,13355346842,86,88,69
+209,9790,leader,1430658273,86,88,140
+210,199,leader,12014458348,86,88,24
+211,332,member,102758,86,88,15
+212,327,member,10142,86,88,24
+213,9670,leader,13975982278,86,88,109
+214,132,leader,2052802636,86,88,15
+215,9753,leader,2723011380,86,88,130
+216,181,member,111587,86,88,15
+217,92,member,111529,86,88,15
+218,9650,leader,13003186308,86,88,107
+219,820,leader,4750911467,86,88,82
+220,466,leader,479320258,86,88,41
+221,334,member,111817,86,88,15
+222,684,leader,17536983498,86,88,63
+223,9787,leader,1522958807,86,88,139
+224,29,member,111515,86,88,15
+225,9770,leader,1753710141,86,88,134
+226,904,member,810,86,88,24
+227,809,leader,4496097088,86,88,79
+228,176,member,335236,86,88,15
+229,963,leader,643137242,86,88,106
+230,9656,leader,14063423151,86,88,115
+231,9673,leader,9877806351,86,88,110
+232,335,member,111817,86,88,15
+233,687,leader,12449193339,86,88,64
+234,9646,leader,1799859539,86,88,104
+235,392,member,111542,86,88,15
+236,9802,member,283436671,86,88,110
+237,962,member,12082718481,86,88,106
+238,9809,member,587799283,86,88,110
+239,772,leader,12829189642,86,88,70
+240,9694,leader,4380271502,86,88,114
+241,892,member,180503,86,88,67
+242,9739,leader,8437362092,86,88,120
+243,9801,member,39186320,86,88,110
+244,207,leader,28597360478,86,88,26
+245,40,member,103398,86,88,24
+246,9820,leader,138378811,86,88,142
+247,9755,leader,2584553174,86,88,133
+248,135,member,10064785767,86,88,15
+249,203,leader,12972222047,86,88,25
+250,9698,leader,12930979494,86,88,116
+251,9781,leader,1384508006,86,88,137
+252,9757,leader,1661409609,86,88,127
+253,9803,member,1410718669,86,88,110
+254,9745,leader,4149730887,86,88,123
+255,436,member,1013138,86,88,41
+256,9784,leader,1430658273,86,88,138
+257,9744,leader,4472487733,86,88,122
+258,9659,member,1688850744,86,88,41
+259,607,member,292988,86,88,24
+260,10155,refund,500000000,88,88,226
+\.
+-- Dumping Block rewards stake_addresses
+ALTER TABLE public.stake_address DISABLE TRIGGER ALL;
+COPY public.stake_address (id, hash_raw, view, script_hash, registered_tx_id) FROM stdin WITH CSV;
+54,\xe062a4aae36508b058fd6eb35e8610a086394be3b4ae3b40819d10f3a4,stake_test1up32f2hrv5ytqk8ad6e4apss5zrrjjlrkjhrksypn5g08fqrqf9gr,,20237
+29,\xe081a5be343bc973e1bd4d31dacf592393c214b1539c8ca640374a41df,stake_test1uzq6t03580yh8cdaf5ca4n6eywfuy9932wwgefjqxa9yrhc7hdelx,,20139
+40,\xe0cf43834ec530fad85b8dd1f5630aabe9cfcee7c56d3f67f3fac28acb,stake_test1ur858q6wc5c04kzm3hgl2cc2405ulnh8c4kn7elnltpg4jcag92hz,,20160
+81,\xe04f1606da213feae8ddd434a7a3467ca48f25deac14ecf7adadbe3238,stake_test1up83vpk6yyl746xa6s620g6x0jjg7fw74s2weaad4klrywqg2nh3w,,20333
+92,\xe05d89d916442b2529ed4512c52793ff2e269aa4d1b882f5720804e772,stake_test1upwcnkgkgs4j220dg5fv2funluhzdx4y6xug9atjpqzwwusduzvqg,,20356
+128,\xe02224d7d9feda60954e46f06afc7690feb851294c23ac79a27a9be4f4,stake_test1uq3zf47elmdxp92wgmcx4lrkjrlts5fffs36c7dz02d7faqye6l9j,,20495
+135,\xe0d97992eb5e8971675f43592036b03651a53744d9ec792f140ee4f018,stake_test1urvhnyhtt6yhze6lgdvjqd4sxeg62d6ym8k8jtc5pmj0qxqhdxuu6,,20551
+132,\xe045ca75d48381bb91e5cabbdee953ee2ba3ee6490889738a52ac62eb3,stake_test1upzu5aw5swqmhy09e2aaa62nac468mnyjzyfww999trzavccrj7pw,,20538
+176,\xe08b3309a2d04cb1588c7f451e9158575e1cb557f5d16425547a28865d,stake_test1uz9nxzdz6pxtzkyv0az3ay2c2a0ped2h7hgkgf250g5gvhgd67anf,,20899
+181,\xe05d830f1317604cea4e839eed7bc33cc153d4f92469b8efe49dc03391,stake_test1upwcxrcnzasye6jwsw0w677r8nq4848ey35m3mlynhqr8ygch2tca,,20912
+199,\xe02b734081fb1e0ab339bf414632c2206203883cd608fde2528f357052,stake_test1uq4hxsyplv0q4veehaq5vvkzyp3q8zpu6cy0mcjj3u6hq5s2fs6nz,,20979
+203,\xe0dba6c6ad17f79ff2bd99bc627e3d4f868e7d57243c8357a27a18748b,stake_test1urd6d34dzlmelu4anx7xyl3af7rgul2hys7gx4az0gv8fzcnlj0jj,,20980
+207,\xe0cae416d676aecb4286f4237293895c33e2bcd60473af5330931010f4,stake_test1ur9wg9kkw6hvks5x7s3h9yuftse790xkq3e675esjvgppaq3efkxy,,20981
+327,\xe0350d3f3387c568d2fb218a8db3525bdbc333562ea8f0d26fcd8e189c,stake_test1uq6s60enslzk35hmyx9gmv6jt0duxv6k9650p5n0ek8p38qytz4c6,,21259
+392,\xe0a379428201a6de4a7ac04e151abb52e8d059aa1c568298a2da669e38,stake_test1uz3hjs5zqxndujn6cp8p2x4m2t5dqkd2r3tg9x9zmfnfuwqklaxny,,21436
+332,\xe03412de65e523666ef5df0a7c3db510b99b0553b67f324f0ba215af82,stake_test1uq6p9hn9u53kvmh4mu98c0d4zzuekp2nkelnynct5g26lqs9yenqu,,21344
+334,\xe07821cc41d016e17e2f6e37a8c1ba8a3caaaf52d44b80a557b4cc4d98,stake_test1upuzrnzp6qtwzl30dcm63sd63g724t6j639cpf2hknxymxqnt30fu,,21346
+466,\xe0742810c52b58b7e1cb05f89491d2ad9505991c3c979c89fe3921a182,stake_test1up6zsyx99dvt0cwtqhuffywj4k2stxgu8jteez078ys6rqsljcsmg,,22085
+436,\xe0f21064f30b198d498bcfc4e332ebc299dd33282c292f3944af340b9d,stake_test1urepqe8npvvc6jvtelzwxvhtc2va6veg9s5j7w2y4u6qh8gkprx9r,,21899
+663,\xe0170a1d7112c2bf5e2d395e41a01855e8e0d8692d4c35d5a7bca0a380,stake_test1uqts58t3ztpt7h3d890yrgqc2h5wpkrf94xrt4d8hjs28qqasjpk7,,22537
+607,\xe0ff7b5d41fa8cb555b6449601d84967bd9b0245a3c530044d8094ee36,stake_test1urlhkh2pl2xt24dkgjtqrkzfv77ekqj950znqpzdsz2wuds0xlsk6,,22276
+705,\xe013cf55d175ea848b87deb3e914febd7e028e2bf6534475d52fb9c3d0,stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27,,22722
+684,\xe07da6c468a09a11b21c31f60cb4d37cb7d0271e6e03606390992e777f,stake_test1up76d3rg5zdprvsux8mqedxn0jmaqfc7dcpkqcusnyh8wlc5u4eq9,,22656
+687,\xe09e4281ae12957bf19702a9ee6c1aef31b88ad20bc53ca304931aa088,stake_test1uz0y9qdwz22hhuvhq257umq6aucm3zkjp0znegcyjvd2pzqaq9vx4,,22660
+767,\xe0233896202d01cf4e0e13266d1cfcb0345cd4311f8f9e25564ba0642a,stake_test1uq3n393q95qu7nswzvnx688ukq69e4p3r78euf2kfwsxg2sygp0rv,,22915
+808,\xe00638c740475aedc3cc92095114ef3b23c84e625e2b01fdf9cabe0764,stake_test1uqrr336qgadwms7vjgy4z9808v3usnnztc4srl0ee2lqweqcutflf,,22992
+809,\xe08a7c127b32494367570f453c36e1ab52ac61cbe7379c938842ab6d0e,stake_test1uz98cynmxfy5xe6hpazncdhp4df2ccwtuumeeyugg24k6rscfwyt6,,22996
+772,\xe0bf7f22341496f905821edd63e982f7d211710c82dcd9972dbcca2d8a,stake_test1uzlh7g35zjt0jpvzrmwk86vz7lfpzugvstwdn9edhn9zmzs5x5fqt,,22939
+820,\xe06c4f8f743e18bfb667c7d24259ed0d202a6143fe9908d8d743e368cd,stake_test1upkylrm58cvtldn8clfyyk0dp5sz5c2rl6vs3kxhg03k3nghe7040,,23049
+904,\xe083ab1ac717254e26538f93fdf4a0437b9205eeb440668718fb5f7a8b,stake_test1uzp6kxk8zuj5ufjn37flma9qgdaeyp0wk3qxdpccld0h4zcudvkgy,,23674
+892,\xe0c3892366f174a76af9252f78368f5747d3055ab3568ea3b6bf40b01e,stake_test1urpcjgmx7962w6hey5hhsd502araxp26kdtgagakhaqtq8s8ke268,,23492
+963,\xe08f2105bd4c68ea4d1d5b92c3a708d07a36e3910c7982109153ebc2ac,stake_test1uz8jzpdaf35w5ngatwfv8fcg6pardcu3p3ucyyy3204u9tqe24m6p,,24009
+9646,\xe0a12a07fbe255f96371f247dfd52cc214a4b7d9dc845de77b6eabdbc7,stake_test1uzsj5plmuf2ljcm37fral4fvcg22fd7emjz9memmd64ah3ctldjuu,,33193
+9656,\xe090a2e9f17182fb3eb6e9a2c0f226da0f8d4eabad53b49fe8b7eff832,stake_test1uzg29603wxp0k04kax3vpu3xmg8c6n4t44fmf8lgklhlsvseau9p7,,33327
+9650,\xe06a14eab200c6c679ef13df7b883807420ca68686f77e5cba177a9451,stake_test1up4pf64jqrrvv700z00hhzpcqapqef5xsmmhuh96zaafg5g9q8rk3,,33270
+962,\xe0af9f1456bbe671e72878554120413e408f479b01d4dc812f85b9d98c,stake_test1uzhe79zkh0n8reeg0p25zgzp8eqg73umq82deqf0skuanrqy2kvsm,,24008
+9673,\xe09c5135659504fd01366b17b47aca29ed6585044ad5bfa0d0deb6addb,stake_test1uzw9zdt9j5z06qfkdvtmg7k298kktpgyft2mlgxsm6m2mkce8a73z,,33362
+9670,\xe03aef5c6d45a8dde4e4698c17aef2d83c97b2b79e5d06a754ec88ed18,stake_test1uqaw7hrdgk5dme8ydxxp0thjmq7f0v4hnewsdf65ajyw6xqm3n6sn,,33358
+9694,\xe0c0ee09b08c9bf54a7555bf85e022f0d114ff07412fa17cd7e5d797fa,stake_test1urqwuzds3jdl2jn42klctcpz7rg3flc8gyh6zlxhuhte07sluprrn,,33829
+9698,\xe0dd5c9c5c98dbc01857ea2598801763cfd9f086094cd9e0d5b0a4975f,stake_test1urw4e8zunrduqxzhagje3qqhv08anuyxp9xdncx4kzjfwhcaq6keu,,33962
+9739,\xe0c66eec51f16d317aa8cb90fc518664ff2d22d2a9347a543d3bd15573,stake_test1urrxamz379knz74gewg0c5vxvnlj6gkj4y6854pa80g42ucvd27mh,,36376
+9659,\xe0fb48b1d6e1b8a42d6b8207fa94987e57625ca140e721c7879b018c80,stake_test1ura53vwkuxu2gtttsgrl49yc0etkyh9pgrnjr3u8nvqceqqzx8gwx,,33337
+9744,\xe0f4595d08b5d058332636703810484d7dec5b35f2fe63ad79a521be11,stake_test1ur69jhggkhg9svexxecrsyzgf477cke47tlx8tte55smuygeuzq4r,,36381
+9745,\xe0ef6e2f45198471f45bc314dec3da23d98e1e407596298f0c49f00dd2,stake_test1urhkut69rxz8razmcv2das76y0vcu8jqwktznrcvf8cqm5szcxy8l,,36382
+9757,\xe0e564cf80f9741b4f98413605b703a6e89e69789825a0e0f341b5a06b,stake_test1urjkfnuql96pknucgymqtdcr5m5fu6tcnqj6pc8ngx66q6cg5gyrv,,36397
+9752,\xe008b275b4c0050add2e41115535048810951f35c513f11ffff0cd4e51,stake_test1uqytyad5cqzs4hfwgyg42dgy3qgf28e4c5flz8ll7rx5u5g85455f,,36391
+9799,\xe00535e57d3b6c01d7546aefeba028eff26b2226e84c92d1d70455d09c,stake_test1uqznteta8dkqr465dth7hgpgalexkg3xapxf95whq32ap8qlngcr4,,36784
+9800,\xe00c59598f8ff201a5b0f92a667362bb0127fdd45e7632b9c36446e33b,stake_test1uqx9jkv03leqrfdsly4xvumzhvqj0lw5temr9wwrv3rwxwcsjtv4e,,36785
+9801,\xe0c85d758e183a32cd8a52be96ab4f69207ab559beead0e26f265f3cf1,stake_test1ury96avwrqar9nv222lfd260dys84d2ehm4dpcn0ye0neug6kpmjm,,36786
+9762,\xe01f1bb70fbdb51976af24042061c90412522f4a2c991e104686c2649d,stake_test1uq03hdc0hk63ja40yszzqcwfqsf9yt629jv3uyzxsmpxf8g4axnlt,,36405
+9802,\xe0ab39d873f94208c30f81992e74ac05020ad5e92dc11ccd4d091d39a2,stake_test1uz4nnkrnl9pq3sc0sxvjua9vq5pq440f9hq3en2dpywnngsmv770n,,36787
+9755,\xe0d6d4b108fc49fad5eefb973c2882b08d6d4ff7e1e641ccdcf39bce2d,stake_test1urtdfvggl3yl440wlwtnc2yzkzxk6nlhu8nyrnxu7wduutggmjhuq,,36394
+9803,\xe0eefb7c791e4f96531416237b95a845ecc2576fab14a8313ef3ab858b,stake_test1urh0klrere8ev5c5zc3hh9dgghkvy4m04v22svf77w4ctzcc6eep9,,36788
+9770,\xe083393b9367d7b305043b8ad03bb3ff32c3e323d7231d66cf2ca3ebb1,stake_test1uzpnjwunvltmxpgy8w9dqwanluev8cer6u336ek09j37hvg5jec6u,,36413
+9809,\xe0b5811090c7cf1f91d4366d0bfd620749b30fb1a8e40ebda40653ccc3,stake_test1uz6czyyscl83lyw5xekshltzqaymxra34rjqa0dyqefuescmakug8,,36799
+9775,\xe00de30851faf8b537acad29e24985b33d4f024ad7bf18f4867f379094,stake_test1uqx7xzz3ltut2dav4557yjv9kv757qj267l33ayx0umep9qftxa9n,,36420
+9778,\xe000fb5defe47920718340b0b361e47bcb11c8a875d37d3b4f3dceb4f3,stake_test1uqq0kh00u3ujquvrgzctxc0y0093rj9gwhfh6w608h8tfucpgy6ss,,36426
+9781,\xe0decf608d6b577de48bec7b897fa47cd2b885ecd89bc28b192e50b9e0,stake_test1ur0v7cydddthmeyta3acjlay0nft3p0vmzdu9zce9egtncqnaw29l,,36429
+9784,\xe0f3d10131114a3a6b6553ceee493d22f96fd680ed16c6928c36d1f3bb,stake_test1ureazqf3z99r56m9208wujfaytukl45qa5tvdy5vxmgl8wcne0n3h,,36432
+9787,\xe080ff96796162fb044aabee44205bceda4ba35fc2b1db0bae6b1ba512,stake_test1uzq0l9nev930kpz240hyggzmemdyhg6lc2cakzawdvd62yswppj9d,,36435
+9753,\xe047e489ec2871329dad7c69109375dce4d133ee03ffa52c1c149d4261,stake_test1upr7fz0v9pcn98dd0353pym4mnjdzvlwq0l62tquzjw5ycg97arhs,,36392
+9754,\xe00d9374246088d326242ee4ace00ecb2f05e3aba9a48bc3ffe726155b,stake_test1uqxexapyvzydxf3y9mj2ecqwevhstcat4xjghslluunp2kcpxkdjg,,36393
+9790,\xe0265fea5eb40972b99ff1b9f0fe4865a7fdd1def6279a8bc5bf7df2f8,stake_test1uqn9l6j7ksyh9wvl7xulpljgvknlm5w77cne4z79ha7l97q7njqda,,36438
+9820,\xe0d1d496624d68ffb828c4cca1d90a14f9b5b7667be90d6b3e062f83e7,stake_test1urgaf9nzf450lwpgcnx2rkg2znumtdmx005s66e7qchc8ecnjkkr2,,36813
+335,\xe09cd7cd070bbcc65f75b460a3f4462e3445f11a7f2f1a49825a10f88d,stake_test1uzwd0ng8pw7vvhm4k3s28azx9c6ytug60uh35jvztgg03rge58jf8,,21346
+10155,\xe06dc45695d809a0c24f8db6b4d0f19231d5d64a764115758094c33e9f,stake_test1upkug454mqy6psj03kmtf583jgcat4j2weq32avqjnpna8cajk4m5,,40932
+\.
+-- Dumping Block rewards pool_hashes
+ALTER TABLE public.pool_hash DISABLE TRIGGER ALL;
+COPY public.pool_hash (id, hash_raw, view) FROM stdin WITH CSV;
+6,\x5685f37bca393c683cf03e428280312c6c4ea485188672a2a0b3195c,pool126zlx7728y7xs08s8epg9qp393kyafy9rzr89g4qkvv4cv93zem
+10,\xd5b1ac5ab8feee85749675ec4dcc4a206d4a938cb3d665c43ad8dcfa,pool16kc6ck4clmhg2aykwhkymnz2ypk54yuvk0txt3p6mrw05hrsj3a
+79,\x1550b7131ac583b89e32cdecd1fe9ef16994cc1ff8e4fd3b24e29842,pool1z4gtwyc6ckpm383jehkdrl57795efnqllrj06weyu2vyy0jtas8
+67,\x26b17b78de4f035dc0bfce60d1d3c3a8085c38dcce5fb8767e518bed,pool1y6chk7x7fup4ms9leesdr57r4qy9cwxuee0msan72x976a6u0nc
+41,\xdee29fb6fa93013e6cbbb58ec7f52811b88c82ba7ff72f1f42754eaf,pool1mm3fldh6jvqnum9mkk8v0afgzxugeq460lmj786zw4827u3wsn4
+15,\x961d329fba1807eef89db767ba405aec0c5426501c6b1df20f5c0995,pool1jcwn98a6rqr7a7yakanm5sz6asx9gfjsr343mus0tsye23wmg70
+25,\x98da83a67e48ccc067883a60799467a3db7d146c4ad27f2c9b7d4e15,pool1nrdg8fn7frxvqeug8fs8n9r850dh69rvftf87tym048p2mn7s8t
+26,\x8f49108228169c7c766d5db245ed834ac8c32b0ec7f06c7a3e70e50d,pool13ay3pq3gz6w8candtkeytmvrftyvx2cwclcxc737wrjs6d3f84p
+24,\x48f2c367cfe81cac6687c3f7c26613edfe73cd329402aa5cf493bb61,pool1frevxe70aqw2ce58c0muyesnahl88nfjjsp25h85jwakzgd2g2l
+69,\x302f5b7e8814ebd67b898abe6ec2963ae09432e48dff31a1e9684a70,pool1xqh4kl5gzn4av7uf32lxas5k8tsfgvhy3hlnrg0fdp98q42jswr
+82,\x684a1d99b7ff023acb9855196bc43071880e517fdb3fb0f0bb122ee8,pool1dp9pmxdhlupr4juc25vkh3pswxyqu5tlmvlmpu9mzghwshz2n0w
+64,\x1de2faf5ef9fd15e0de6f9550f85af668b7f4b90d5b6914c937aeab6,pool1rh304a00nlg4ur0xl92slpd0v69h7jus6kmfznyn0t4tve0mhh7
+70,\xbff073c7bf4826c08020fe592ac8d23c64f359fae32ae20bad1e7f8f,pool1hlc883alfqnvpqpqlevj4jxj83j0xk06uv4wyzadrelc76cu9dg
+63,\x1de3c4b4616bea1d73ce6349c5f3727f3283056c800fa6bfd5e0c86e,pool1rh3ufdrpd04p6u7wvdyutumj0uegxptvsq86d074uryxuwdrjms
+106,\x9eb76bb591d689dd06304c77c0df7871df76e768577e26af10d32b0c,pool1n6mkhdv366ya6p3sf3muphmcw80hdemg2alzdtcs6v4scdwe86k
+107,\x104c360fe4225eccc0648e983a7c2b4c9ee5665e66314cd1d9ff38c3,pool1zpxrvrlyyf0vesry36vr5lptfj0w2ej7vcc5e5weluuvxgme9m7
+109,\xb4f130dddb67a77a1d6fd9a83445075a8c7cf4f63dbe7196c851b465,pool1kncnphwmv7nh58t0mx5rg3g8t2x8ea8k8kl8r9kg2x6x2nhssup
+114,\xcdbcb63eb8c6e9bba1f519402a870649fe9dd29fe99f6d7b930c6768,pool1ek7tv04ccm5mhg04r9qz4pcxf8lfm55lax0k67unp3nksukvfuy
+116,\x9f36c4c67b76a8cea05a1684f8feaa64711f4c0053fe039978b203af,pool1numvf3nmw65vagz6z6z03l42v3c37nqq20lq8xtckgp67zzl7px
+122,\xe6ea21567bc3bf75b1523034f6e571c1f1c33a2f07f2c855670f0f5c,pool1um4zz4nmcwlhtv2jxq60det3c8cuxw30qlevs4t8pu84ct2tf9a
+123,\xdc27de163b122622dc64176236656c6b9622f96f3d2eea74f89414ae,pool1msnau93mzgnz9hryza3rvetvdwtz97t085hw5a8cjs22udvculr
+131,\x4a742fbd2320e54487e9eae174eed5aa5ddab3060d03f347396acf56,pool1ff6zl0fryrj5fplfatshfmk44fwa4vcxp5plx3eedt84vjfyrh7
+134,\xe719bff348b2c54fa2391215abbc8cabfe302f64a78bdc1a8683090b,pool1uuvmlu6gktz5lg3ezg26h0yv40lrqtmy579acx5xsvyskypq02u
+135,\xa5cd145014e5d0d0f9982158cda8ab3d3abe62dd5276bb3eb0e9ada1,pool15hx3g5q5uhgdp7vcy9vvm29t85atucka2fmtk04saxk6z6644e3
+136,\xa8ca3d91fa285eae431cb7fa76d08ba1701a93e27f8dbee613bebe0f,pool14r9rmy069p02uscukla8d5yt59cp4ylz07xmaesnh6lq7dy6rfe
+137,\x08cf84aa6e785b7d76bd70032979e2a27e2f7abc2227521a60d358bd,pool1pr8cf2nw0pdh6a4awqpjj70z5flz774uygn4yxnq6dvt627h8jx
+138,\x6d30efe6d19654d4741b248998206af5169760595f6aef7c2cb5903b,pool1d5cwlek3je2dgaqmyjyesgr275tfwczeta4w7lpvkkgrkffflz8
+139,\x911ee6f54a0fc92ee8c92d9c95275bce36497a3543d41a3b4cb2d4ee,pool1jy0wda22plyja6xf9kwf2f6mecmyj734g02p5w6vkt2wulkn5z2
+140,\x06a56cd230142e77c68051f8031325cc7da1bfbc98150c8276bd4b8c,pool1q6jke53szsh8035q28uqxye9e376r0aunq2seqnkh49ccnp09k3
+115,\xd0c94502e24095349ccc813e0e9ff304b4680a9b347006095960fb51,pool16ry52qhzgz2nf8xvsylqa8lnqj6xsz5mx3cqvz2evra4zp7mwp5
+129,\xbf1a28c14171516e7fc0395d8791bf981751f81e4b4703872a1c3c2a,pool1hudz3s2pw9gkul7q89wc0ydlnqt4r7q7fdrs8pe2rs7z5fvj7m6
+142,\xc9972ec8c4bdceeb36c56f6be69d16cf3f3640cf55657b892e9a21fb,pool1extjajxyhh8wkdk9da47d8gkeulnvsx024jhhzfwngslkyyu4x3
+104,\xf10f77411d5fa75f9732a3efc8559ac8ffa3f2bef9bbf6f1580f94a3,pool17y8hwsgat7n4l9ej50hus4v6erl68u47lxaldu2cp722xg77seg
+127,\x0b08b536ba3afe21fbd826fb92bee897a3d1e575a7849b2e6c4659ab,pool1pvyt2d468tlzr77cymae90hgj73aret457zfktnvgev6kmx5nk3
+130,\x7abff97b3eebf7b3421264acc5375f08797d605a014cec4570b426f9,pool102llj7e7a0mmxssjvjkv2d6lppuh6cz6q9xwc3tsksn0jqwz9eh
+132,\x3e366fd0ef05a5e3afe48b585847bc52b3cc79c9328d10de3e2c6389,pool18cmxl580qkj78tly3dv9s3au22euc7wfx2x3ph37933cjskfqq7
+133,\xa80e598773e5abe17d81e71315a516c0bed33ab167369b8a349bbbd9,pool14q89npmnuk47zlvpuuf3tfgkczldxw43vumfhz35nwaajvd4faw
+226,\x6164cd95325ced2ff12d5455877f5d7b5880602729641179c3f35843,pool1v9jvm9fjtnkjlufd232cwl6a0dvgqcp899jpz7wr7dvyxeqyczh
+110,\x92a00fa42728b5c0d187de9d91c7587822a7a7382cd9529241c85c96,pool1j2sqlfp89z6up5v8m6wer36c0q320fec9nv49yjpepwfvmg33af
+120,\x3299895e62b13de5a5a52f4bb5726db5fb38928c8d2c21ff8d78517d,pool1x2vcjhnzky77tfd99a9m2undkhan3y5v35kzrlud0pgh6nsdw0z
+\.
+-- Dumping transactions deregistrations
+ALTER TABLE public.stake_deregistration DISABLE TRIGGER ALL;
+COPY public.stake_deregistration (id, addr_id, cert_index, epoch_no, tx_id, redeemer_id) FROM stdin WITH CSV;
+\.
+-- Dumping Block transaction deregistrations stake addresses
+ALTER TABLE public.stake_address DISABLE TRIGGER ALL;
+COPY public.stake_address (id, hash_raw, view, script_hash, registered_tx_id) FROM stdin WITH CSV;
+\.
+-- Dumping transactions delegations
+ALTER TABLE public.delegation DISABLE TRIGGER ALL;
+COPY public.delegation (id, addr_id, cert_index, pool_hash_id, active_epoch_no, tx_id, slot_no, redeemer_id) FROM stdin WITH CSV;
+43,125,1,20,79,20842,3041540,
+36,132,1,15,78,20540,2763220,
+38,120,1,16,78,20562,2782520,
+32,107,1,14,78,20405,2602920,
+\.
+-- Dumping Block delegations pool_hashes
+ALTER TABLE public.pool_hash DISABLE TRIGGER ALL;
+COPY public.pool_hash (id, hash_raw, view) FROM stdin WITH CSV;
+14,\x5ee7591bf30eaa4f5dce70b4a676eb02d5be8012d188f04fe3beffb0,pool1tmn4jxlnp64y7hwwwz62vahtqt2maqqj6xy0qnlrhmlmq3u8q0e
+20,\x5d99282bbb4840380bb98c075498ed1983aee18a4a0925b9b44d93f1,pool1tkvjs2amfpqrszae3sr4fx8drxp6acv2fgyjtwd5fkflzguqp96
+16,\xff5b4952dd7734f07e4905dea64fa230fb75f7b2d603d154d9ff1d43,pool1lad5j5kawu60qljfqh02vnazxrahtaaj6cpaz4xeluw5xf023cg
+\.
+-- Dumping Block transaction delegations stake addresses
+ALTER TABLE public.stake_address DISABLE TRIGGER ALL;
+COPY public.stake_address (id, hash_raw, view, script_hash, registered_tx_id) FROM stdin WITH CSV;
+107,\xe08a4f4b8e1609d9b3b53552209bcb4af58b4d73d73f0949aab7baf099,stake_test1uz9y7juwzcyanva4x4fzpx7tft6ckntn6ulsjjd2k7a0pxgldmzp5,,20399
+125,\xe04c54f7bbe26950efddfa2bf9f69ff7fef384478c472ad1681976a913,stake_test1upx9faamuf54pm7alg4lna5l7ll08pz833rj45tgr9m2jyceasqjt,,20468
+120,\xe08ccbfcf101f926288c093535586c0b7e001947bfb25642da1e6b1bc7,stake_test1uzxvhl83q8ujv2yvpy6n2krvpdlqqx28h7e9vsk6re43h3c3kufy6,,20455
+\.
+-- Dumping ma_tx_out
+ALTER TABLE public.ma_tx_out DISABLE TRIGGER ALL;
+COPY public.ma_tx_out (id, quantity, tx_out_id, ident) FROM stdin WITH CSV;
+\.
+-- Dumping multi_asset
+ALTER TABLE public.multi_asset DISABLE TRIGGER ALL;
+COPY public.multi_asset (id, policy, name, fingerprint) FROM stdin WITH CSV;
+\.
+-- Dumping pool update's pool_hash
+ALTER TABLE public.pool_hash DISABLE TRIGGER ALL;
+COPY public.pool_hash (id, hash_raw, view) FROM stdin WITH CSV;
+\.
+-- Dumping pool registration's pool metadata
+ALTER TABLE public.pool_metadata_ref DISABLE TRIGGER ALL;
+COPY public.pool_metadata_ref (id, pool_id, url, hash, registered_tx_id) FROM stdin WITH CSV;
+13,15,https://clio.one/metadata/clio1_testnet.json,\x47530ba97c12e2ac40462e9c86eeb07ea555877d2a1f9d74b6ff8471839267d8,20540
+12,14,https://git.io/JJ1dz,\xcc019105f084aef2a956b2f7f2c0bf4e747bf7696705312c244620089429df6f,20405
+14,16,https://git.io/JJyYy,\x2412f77be9b650eff7b015455d15cea355e1782dda2e7d7b1cb34943eefac348,20562
+18,20,https://git.io/JJ7wm,\x4d89054c2962215694a7122dfe41bc728d3ec248f80ea9a2e0d493057d7d2338,20842
+\.
+-- Dumping addresses of pool owners
+ALTER TABLE public.stake_address DISABLE TRIGGER ALL;
+COPY public.stake_address (id, hash_raw, view, script_hash, registered_tx_id) FROM stdin WITH CSV;
+\.
+-- Dumping owners of pool registrations
+ALTER TABLE public.pool_owner DISABLE TRIGGER ALL;
+COPY public.pool_owner (id, addr_id, pool_hash_id, registered_tx_id) FROM stdin WITH CSV;
+21,125,20,20842
+16,132,15,20540
+17,120,16,20562
+15,107,14,20405
+318,132,15,56575
+\.
+-- Dumping pool registrations
+ALTER TABLE public.pool_update DISABLE TRIGGER ALL;
+COPY public.pool_update (id, hash_id, cert_index, vrf_key_hash, pledge, reward_addr, active_epoch_no, meta_id, margin, fixed_cost, registered_tx_id) FROM stdin WITH CSV;
+20,20,0,\xc062fabfeb7a68c61c34532e6f441b999c6a5a30b409d24c93174f047d4d935a,100000000,\xe04c54f7bbe26950efddfa2bf9f69ff7fef384478c472ad1681976a913,79,18,0.027,340000000,20842
+15,15,0,\x0a164c03ef34f26ffda7242b36db0a57ab7b23e230ea8802e50695f1f664de42,1000000000000,\xe045ca75d48381bb91e5cabbdee953ee2ba3ee6490889738a52ac62eb3,78,13,0.05,340000000,20540
+16,16,0,\x474a6d2a44b51add62d8f2fd8fe80abc722bf84478479b617ad05b39aaa84971,70000000000,\xe08ccbfcf101f926288c093535586c0b7e001947bfb25642da1e6b1bc7,78,14,0.04,4321000000,20562
+14,14,0,\x83a817519ec34d3c637db8f9d46fcf6f7f9e826093d1b9a8158c89da4b47a801,500000000,\xe08a4f4b8e1609d9b3b53552209bcb4af58b4d73d73f0949aab7baf099,78,12,0.0001,400000000,20405
+309,15,0,\x0a164c03ef34f26ffda7242b36db0a57ab7b23e230ea8802e50695f1f664de42,1010000000000,\xe045ca75d48381bb91e5cabbdee953ee2ba3ee6490889738a52ac62eb3,91,13,0.05,340000000,56575
+\.
+-- Dumping pool hashes of pool retirements
+ALTER TABLE public.pool_hash DISABLE TRIGGER ALL;
+COPY public.pool_hash (id, hash_raw, view) FROM stdin WITH CSV;
+\.
+-- Dumping pool retirements
+ALTER TABLE public.pool_retire DISABLE TRIGGER ALL;
+COPY public.pool_retire (id, hash_id, cert_index, announced_tx_id, retiring_epoch) FROM stdin WITH CSV;
+\.
+-- Dumping epoch params
+ALTER TABLE public.epoch_param DISABLE TRIGGER ALL;
+COPY public.epoch_param (id,epoch_no,min_fee_a,min_fee_b,max_block_size,max_tx_size,max_bh_size,key_deposit,pool_deposit,max_epoch,
+optimal_pool_count,influence,monetary_expand_rate,treasury_growth_rate, decentralisation,entropy,protocol_major,protocol_minor,min_utxo_value,
+min_pool_cost,nonce,coins_per_utxo_word,cost_model_id,price_mem,price_step,max_tx_ex_mem,max_tx_ex_steps,max_block_ex_mem,max_block_ex_steps,max_val_size,
+collateral_percent,max_collateral_inputs,block_id) FROM stdin WITH CSV;
+3,76,44,155381,65536,16384,1100,2000000,500000000,18,150,0.3,0.003,0.2,1,,2,0,1000000,340000000,\xb55e900eb39c19836b2bd5b2d0da0041fc4aa2ba2844dde871583083d20602f6,,,,,,,,,,,,1639853
+4,77,44,155381,65536,16384,1100,2000000,500000000,18,150,0.3,0.003,0.2,1,,2,0,1000000,340000000,\xa1deefe442ea92a9ceab9174dd1ee795da1355f005f1316a28aad0a0d2dca38d,,,,,,,,,,,,1661141
+15,88,44,155381,65536,16384,1100,2000000,500000000,18,150,0.3,0.003,0.2,0.7,,2,0,1000000,340000000,\x7ddc22c99ca2a516b72788cf08319436ec561ae066c49e5bd86e3af335b4b1b2,,,,,,,,,,,,1892608
+\.
+-- Dumping transactions metadata
+ALTER TABLE public.tx_metadata DISABLE TRIGGER ALL;
+COPY public.tx_metadata (id, key, json, bytes, tx_id) FROM stdin WITH CSV;
+-- Dumping pool offline metadata
+ALTER TABLE public.pool_offline_data DISABLE TRIGGER ALL;
+COPY public.pool_offline_data (id, pool_id, ticker_name, hash, json, bytes, pmr_id) FROM stdin WITH CSV;
+3,15,CLIO1,\x47530ba97c12e2ac40462e9c86eeb07ea555877d2a1f9d74b6ff8471839267d8,"{""name"": ""CLIO1"", ""ticker"": ""CLIO1"", ""homepage"": ""https://clio.one"", ""description"": ""What's past is prologue""}",\x7b0a2020226e616d65223a2022434c494f31222c0a2020227469636b6572223a2022434c494f31222c0a2020226465736372697074696f6e223a202257686174277320706173742069732070726f6c6f677565222c0a202022686f6d6570616765223a202268747470733a2f2f636c696f2e6f6e65222c0a202022657874656e646564223a202268747470733a2f2f636c696f2e6f6e652f6d657461646174612f636c696f315f49544e5f7769746e6573732e6a736f6e220a7d0a,13
+1,14,AMS,\xcc019105f084aef2a956b2f7f2c0bf4e747bf7696705312c244620089429df6f,"{""name"": ""THE AMSTERDAM NODE"", ""ticker"": ""AMS"", ""homepage"": ""https://twitter.com/A92Syed"", ""description"": ""Our Amsterdam Node""}",\x7b0a226e616d65223a202254484520414d5354455244414d204e4f4445222c0a226465736372697074696f6e223a20224f757220416d7374657264616d204e6f6465222c0a227469636b6572223a2022414d53222c0a22686f6d6570616765223a202268747470733a2f2f747769747465722e636f6d2f41393253796564220a7d0a,12
+4,16,TEST,\x2412f77be9b650eff7b015455d15cea355e1782dda2e7d7b1cb34943eefac348,"{""name"": ""TestPool"", ""ticker"": ""TEST"", ""homepage"": ""https://teststakepool.com"", ""description"": ""The pool that tests all the pools""}",\x7b0a226e616d65223a202254657374506f6f6c222c0a226465736372697074696f6e223a202254686520706f6f6c207468617420746573747320616c6c2074686520706f6f6c73222c0a227469636b6572223a202254455354222c0a22686f6d6570616765223a202268747470733a2f2f746573747374616b65706f6f6c2e636f6d220a7d,14
+5,20,BANDA,\x4d89054c2962215694a7122dfe41bc728d3ec248f80ea9a2e0d493057d7d2338,"{""name"": ""banderini-devtest-a"", ""ticker"": ""BANDA"", ""homepage"": ""http://www.banderini.net"", ""description"": ""Pool a of the banderini devtest staking pools""}",\x7b0a20202020226e616d65223a202262616e646572696e692d646576746573742d61222c0a20202020226465736372697074696f6e223a2022506f6f6c2061206f66207468652062616e646572696e692064657674657374207374616b696e6720706f6f6c73222c0a20202020227469636b6572223a202242414e4441222c0a2020202022686f6d6570616765223a2022687474703a2f2f7777772e62616e646572696e692e6e6574220a7d,18

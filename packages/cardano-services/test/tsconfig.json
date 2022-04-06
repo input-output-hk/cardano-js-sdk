@@ -3,6 +3,7 @@
   "compilerOptions": {
     "baseUrl": "."
   },
+  "rootDir": ".",
   "references": [
     { "path": "../src" },
     { "path": "../../core/src" },

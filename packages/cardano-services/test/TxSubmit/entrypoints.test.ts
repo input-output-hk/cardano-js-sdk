@@ -3,7 +3,7 @@ import { Connection, ConnectionConfig, createConnectionObject } from '@cardano-o
 import { createMockOgmiosServer } from '@cardano-sdk/ogmios/test/mocks/mockOgmiosServer';
 import { getRandomPort } from 'get-port-please';
 import { listenPromise, serverClosePromise } from '../../src/util';
-import { serverReady } from './util';
+import { serverReady } from '../util';
 import got from 'got';
 import http from 'http';
 import path from 'path';

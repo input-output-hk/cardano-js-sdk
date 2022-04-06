@@ -28,7 +28,7 @@ class SomeHttpServer extends HttpServer {
     });
   }
   publicSendJSON(res: express.Response, obj: unknown) {
-    this.sendJSON(res, obj);
+    HttpServer.sendJSON(res, obj);
   }
 }
 
