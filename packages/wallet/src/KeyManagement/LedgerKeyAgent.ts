@@ -1,25 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AuthenticationError, TransportError } from './errors';
-import { Cardano, NotImplementedError, CSL, coreToCsl } from '@cardano-sdk/core';
+import { Cardano, NotImplementedError, coreToCsl } from '@cardano-sdk/core';
 import {
   CommunicationType,
   KeyAgentType,
   SerializableLedgerKeyAgentData,
   SignBlobResult,
-  TransportType,
-  KeyRole,
+  SignTransactionOptions,
+  TransportType
 } from './types';
 import { KeyAgentBase } from './KeyAgentBase';
-import DeviceConnection, {
-  GetVersionResponse,
-  utils,
-  HARDENED,
-} from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import { TxInternals } from '../Transaction';
+import { txToLedger } from './util';
+import DeviceConnection, { GetVersionResponse, HARDENED, utils } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents';
 import TransportWebHID from '@ledgerhq/hw-transport-webhid';
 import type Transport from '@ledgerhq/hw-transport';
-import { txToLedger, STAKE_KEY_DERIVATION_PATH } from './util';
-import { TxInternals } from '../Transaction'
 
 export interface LedgerKeyAgentProps extends Omit<SerializableLedgerKeyAgentData, '__typename'> {
   deviceConnection?: DeviceConnection;
@@ -43,38 +39,67 @@ export interface CreateTransportProps {
   devicePath?: string;
 }
 
+const transportTypedError = (error?: any) =>
+  new AuthenticationError('Transport failed', new TransportError('Transport failed', error));
+
 export class LedgerKeyAgent extends KeyAgentBase {
   readonly deviceConnection?: DeviceConnection;
+  readonly #communicationType: CommunicationType;
 
   constructor({ deviceConnection, ...serializableData }: LedgerKeyAgentProps) {
     super({ ...serializableData, __typename: KeyAgentType.Ledger });
     this.deviceConnection = deviceConnection;
+    this.#communicationType = serializableData.communicationType;
   }
 
+  /**
+   * @throws TransportError
+   */
   static async getHidDeviceList(): Promise<string[]> {
-    return await TransportNodeHid.list();
+    try {
+      return await TransportNodeHid.list();
+    } catch (error) {
+      throw new TransportError('Cannot fetch device list', error);
+    }
   }
 
+  /**
+   * @throws TransportError
+   */
   static async createTransport({
     communicationType,
     activeTransport,
     devicePath = ''
   }: CreateTransportProps): Promise<TransportType> {
-    if (communicationType === CommunicationType.Node) {
-      return await TransportNodeHid.open(devicePath);
+    try {
+      if (communicationType === CommunicationType.Node) {
+        return await TransportNodeHid.open(devicePath);
+      }
+      return await (activeTransport && activeTransport instanceof TransportWebHID
+        ? TransportWebHID.open(activeTransport.device)
+        : TransportWebHID.request());
+    } catch (error) {
+      throw new TransportError('Creating transport failed', error);
     }
-    return await (activeTransport && activeTransport instanceof TransportWebHID
-      ? TransportWebHID.open(activeTransport.device)
-      : TransportWebHID.request());
   }
 
+  /**
+   * @throws TransportError
+   */
   static async createDeviceConnection(activeTransport: Transport): Promise<DeviceConnection> {
-    const deviceConnection = new DeviceConnection(activeTransport);
-    // Perform app check to see if device can respond
-    await deviceConnection.getVersion();
-    return deviceConnection;
+    try {
+      const deviceConnection = new DeviceConnection(activeTransport);
+      // Perform app check to see if device can respond
+      await deviceConnection.getVersion();
+      return deviceConnection;
+    } catch (error) {
+      throw new TransportError('Cannot communicate with Ledger Cardano App', error);
+    }
   }
 
+  /**
+   * @throws TransportError
+   */
   static async establishDeviceConnection(
     communicationType: CommunicationType,
     devicePath?: string
@@ -83,7 +108,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
     try {
       transport = await LedgerKeyAgent.createTransport({ communicationType, devicePath });
       if (!transport || !transport.deviceModel) {
-        throw new TransportError('Transport failed');
+        throw new TransportError('Missing transport');
       }
       const isSupportedLedgerModel = transport.deviceModel.id === 'nanoS' || transport.deviceModel.id === 'nanoX';
       if (!isSupportedLedgerModel) {
@@ -91,7 +116,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
       }
       return await LedgerKeyAgent.createDeviceConnection(transport);
     } catch (error: any) {
-      if (error.message.includes('cannot open device with path')) {
+      if (error.innerError.message.includes('cannot open device with path')) {
         throw new TransportError('Connection already established', error);
       }
       // If transport is established we need to close it so we can recover device from previous session
@@ -99,10 +124,13 @@ export class LedgerKeyAgent extends KeyAgentBase {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         transport.close();
       }
-      throw error;
+      throw new TransportError('Establishing device connection failed', error);
     }
   }
 
+  /**
+   * @throws TransportError
+   */
   static async checkDeviceConnection(
     communicationType: CommunicationType,
     deviceConnection?: DeviceConnection
@@ -122,6 +150,9 @@ export class LedgerKeyAgent extends KeyAgentBase {
     }
   }
 
+  /**
+   * @throws AuthenticationError
+   */
   static async getXpub({
     deviceConnection,
     communicationType,
@@ -136,14 +167,16 @@ export class LedgerKeyAgent extends KeyAgentBase {
       const xPubHex = `${extendedPublicKey.publicKeyHex}${extendedPublicKey.chainCodeHex}`;
       return Cardano.Bip32PublicKey(xPubHex);
     } catch (error: any) {
-      // eslint-disable-next-line unicorn/numeric-separators-style
-      if (error.code === 28169) {
+      if (error.code === 28_169) {
         throw new AuthenticationError('Failed to export extended account public key', error);
       }
-      throw new TransportError('Transport failed', error);
+      throw transportTypedError(error);
     }
   }
 
+  /**
+   * @throws TransportError
+   */
   static async getAppVersion(
     communicationType: CommunicationType,
     deviceConnection?: DeviceConnection
@@ -152,6 +185,10 @@ export class LedgerKeyAgent extends KeyAgentBase {
     return await recoveredDeviceConnection.getVersion();
   }
 
+  /**
+   * @throws AuthenticationError
+   * @throws TransportError
+   */
   static async createWithDevice({ networkId, accountIndex = 0, communicationType }: CreateWithDevice) {
     const deviceListPaths = await LedgerKeyAgent.getHidDeviceList();
     const deviceConnection = await LedgerKeyAgent.establishDeviceConnection(communicationType, deviceListPaths[0]);
@@ -171,41 +208,23 @@ export class LedgerKeyAgent extends KeyAgentBase {
     });
   }
 
-  async signTransaction(txInternals: TxInternals): Promise<Cardano.Signatures> {
+  async signTransaction(
+    { body }: TxInternals,
+    { inputAddressResolver }: SignTransactionOptions
+  ): Promise<Cardano.Signatures> {
     try {
-      const cslTxBody = coreToCsl.txBody(txInternals.body);
-      const cslWitnessSet = CSL.TransactionWitnessSet.new();
-      const cslTransaction = CSL.Transaction.new(cslTxBody, cslWitnessSet);
-
-      const stakeKeyHash = await this.derivePublicKey(STAKE_KEY_DERIVATION_PATH);
-      const paymentKeyHash = await this.derivePublicKey({
-        index: this.serializableData.accountIndex,
-        role: KeyRole.Internal,
-      });
-      const keys = {
-        payment: {
-          hash: paymentKeyHash,
-          path: [HARDENED + 1852, HARDENED + 1815, HARDENED + this.serializableData.accountIndex, KeyRole.Internal, 0],
-        },
-        stake: {
-          hash: stakeKeyHash,
-          path: [HARDENED + 1852, HARDENED + 1815, HARDENED + this.serializableData.accountIndex, KeyRole.Stake, 0],
-        },
-      };
-
-      const accountAddress = this.knownAddresses[0].address;
-      const addrHex = utils.buf_to_hex(utils.bech32_decodeAddress(accountAddress.toString()))
-
+      const cslTxBody = coreToCsl.txBody(body);
       const ledgerTxData = await txToLedger({
-        tx: cslTransaction,
-        networkId: this.serializableData.networkId,
-        keys,
-        addressHex: addrHex,
-        index: this.serializableData.accountIndex,
+        accountIndex: this.accountIndex,
+        cslTxBody,
+        inputAddressResolver,
+        knownAddresses: this.knownAddresses,
+        networkId: this.networkId
       });
-
-      // @ts-ignore
-      const deviceConnection = await LedgerKeyAgent.checkDeviceConnection(this.serializableData.communicationType, this.deviceConnection);
+      const deviceConnection = await LedgerKeyAgent.checkDeviceConnection(
+        this.#communicationType,
+        this.deviceConnection
+      );
       const result = await deviceConnection.signTransaction(ledgerTxData);
 
       return new Map<Cardano.Ed25519PublicKey, Cardano.Ed25519Signature>(
@@ -213,21 +232,18 @@ export class LedgerKeyAgent extends KeyAgentBase {
           result.witnesses.map(async (witness) => {
             const publicKey = await this.derivePublicKey({
               index: HARDENED - witness.path[2],
-              role: witness.path[3],
+              role: witness.path[3]
             });
-            const signature = Cardano.Ed25519Signature(
-              witness.witnessSignatureHex
-            );
+            const signature = Cardano.Ed25519Signature(witness.witnessSignatureHex);
             return [publicKey, signature] as const;
           })
         )
       );
     } catch (error: any) {
-      // eslint-disable-next-line unicorn/numeric-separators-style
-      if (error.code === 28169) {
+      if (error.code === 28_169) {
         throw new AuthenticationError('Transaction signing aborted', error);
       }
-      throw new TransportError('Transport failed', error);
+      throw transportTypedError(error);
     }
   }
 

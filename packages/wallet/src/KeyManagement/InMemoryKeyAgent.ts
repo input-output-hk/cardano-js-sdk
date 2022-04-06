@@ -10,10 +10,15 @@ import {
 import { AuthenticationError } from './errors';
 import { CSL, Cardano, util } from '@cardano-sdk/core';
 import { KeyAgentBase } from './KeyAgentBase';
-import { deriveAccountPrivateKey, joinMnemonicWords, mnemonicWordsToEntropy, validateMnemonic } from './util';
-import { emip3decrypt, emip3encrypt } from './emip3';
-import { ownSignatureKeyPaths } from './util';
 import { TxInternals } from '../Transaction';
+import {
+  deriveAccountPrivateKey,
+  joinMnemonicWords,
+  mnemonicWordsToEntropy,
+  ownSignatureKeyPaths,
+  validateMnemonic
+} from './util';
+import { emip3decrypt, emip3encrypt } from './emip3';
 import { uniqBy } from 'lodash-es';
 
 export interface InMemoryKeyAgentProps extends Omit<SerializableInMemoryKeyAgentData, '__typename'> {

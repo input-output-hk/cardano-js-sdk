@@ -2,7 +2,7 @@ import { CustomError } from 'ts-custom-error';
 
 const formatMessage = (detail?: string) => {
   const messageDetail = detail ? `: ${detail}` : '';
-  return `Hardware date mapping failure${messageDetail}`;
+  return `Hardware data mapping failure${messageDetail}`;
 };
 
 export class HwMappingError extends CustomError {
