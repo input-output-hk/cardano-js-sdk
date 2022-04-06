@@ -18,7 +18,6 @@ export interface StakeAddressCertificate {
 
 export interface PoolRegistrationCertificate {
   __typename: CertificateType.PoolRegistration;
-  epoch?: Epoch;
   poolParameters: PoolParameters;
 }
 
@@ -32,11 +31,6 @@ export interface StakeDelegationCertificate {
   __typename: CertificateType.StakeDelegation;
   stakeKeyHash: Cardano.Ed25519KeyHash;
   poolId: PoolId;
-  /**
-   * Might or might not be present based on source.
-   * Not present in serialized tx.
-   */
-  epoch?: Epoch;
 }
 
 export enum MirCertificatePot {

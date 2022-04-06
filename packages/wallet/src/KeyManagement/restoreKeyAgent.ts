@@ -12,6 +12,7 @@ import { InMemoryKeyAgent } from './InMemoryKeyAgent';
 import { InvalidSerializableDataError } from './errors';
 import { LedgerKeyAgent } from './LedgerKeyAgent';
 
+// TODO: use this type as 2nd parameter of restoreKeyAgent
 export interface RestoreInMemoryKeyAgentProps {
   /**
    * Required for InMemoryKeyAgent

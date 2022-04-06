@@ -27,7 +27,7 @@ export const createUtxoProvider = (
   addresses$.pipe(
     switchMap((addresses) =>
       coldObservableProvider(
-        () => walletProvider.utxoDelegationAndRewards(addresses).then(({ utxo }) => utxo),
+        () => walletProvider.utxoByAddresses(addresses),
         retryBackoffConfig,
         tipBlockHeight$,
         utxoEquals

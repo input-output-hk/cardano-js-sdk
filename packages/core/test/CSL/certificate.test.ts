@@ -84,7 +84,6 @@ describe('certificates', () => {
       ) as Cardano.StakeDelegationCertificate;
       expect(cert.stakeKeyHash).toBe(stakeKeyHash);
       expect(cert.poolId).toBe(poolId);
-      expect(cert.epoch).toBeUndefined();
     });
 
     it('poolRegistration', () => {

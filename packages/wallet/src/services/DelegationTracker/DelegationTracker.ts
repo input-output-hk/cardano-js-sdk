@@ -25,7 +25,7 @@ import { transactionsWithCertificates } from './transactionCertificates';
 
 export const createBlockEpochProvider =
   (walletProvider: WalletProvider, retryBackoffConfig: RetryBackoffConfig) => (blockHashes: Cardano.BlockId[]) =>
-    coldObservableProvider(() => walletProvider.queryBlocksByHashes(blockHashes), retryBackoffConfig).pipe(
+    coldObservableProvider(() => walletProvider.blocksByHashes(blockHashes), retryBackoffConfig).pipe(
       map((blocks) => blocks.map(({ epoch }) => epoch))
     );
 

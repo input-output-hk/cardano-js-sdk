@@ -14,5 +14,7 @@ export const txEquals = (a: Cardano.TxAlonzo, b: Cardano.TxAlonzo) => a.id === b
 
 export const transactionsEquals = (a: Cardano.TxAlonzo[], b: Cardano.TxAlonzo[]) => arrayEquals(a, b, txEquals);
 
+export const txInEquals = (a: Cardano.NewTxIn, b: Cardano.NewTxIn) => a.txId === b.txId && a.index === b.index;
+
 export const utxoEquals = (a: Cardano.Utxo[], b: Cardano.Utxo[]) =>
-  arrayEquals(a, b, ([aTxIn], [bTxIn]) => aTxIn.txId === bTxIn.txId && aTxIn.index === bTxIn.index);
+  arrayEquals(a, b, ([aTxIn], [bTxIn]) => txInEquals(aTxIn, bTxIn));

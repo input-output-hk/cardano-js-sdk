@@ -40,7 +40,7 @@ export class InMemoryKeyAgent extends KeyAgentBase {
     this.#getPassword = getPassword;
   }
 
-  async signBlob({ index, type }: AccountKeyDerivationPath, blob: Cardano.util.HexBlob): Promise<SignBlobResult> {
+  async signBlob({ index, role: type }: AccountKeyDerivationPath, blob: Cardano.util.HexBlob): Promise<SignBlobResult> {
     const rootPrivateKey = await this.#decryptRootPrivateKey();
     const accountKey = deriveAccountPrivateKey(rootPrivateKey, this.accountIndex);
     const signingKey = accountKey.derive(type).derive(index).to_raw_key();

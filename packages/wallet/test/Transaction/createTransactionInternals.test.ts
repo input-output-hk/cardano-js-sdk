@@ -56,7 +56,7 @@ describe('Transaction.createTransactionInternals', () => {
     const txInternals = await createSimpleTransactionInternals();
     expect(txInternals.body.outputs).toHaveLength(2);
     expect(typeof txInternals.body.fee).toBe('bigint');
-    expect(typeof txInternals.body.inputs[0].address).toBe('string');
+    expect(typeof txInternals.body.inputs[0].txId).toBe('string');
     expect(typeof txInternals.hash).toBe('string');
   });
 });

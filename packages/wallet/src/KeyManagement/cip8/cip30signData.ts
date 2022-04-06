@@ -16,7 +16,7 @@ import { Cardano, parseCslAddress, util } from '@cardano-sdk/core';
 import { Cip30DataSignature } from '@cardano-sdk/cip30';
 import { CoseLabel } from './util';
 import { CustomError } from 'ts-custom-error';
-import { KeyAgent, KeyType } from '../types';
+import { KeyAgent, KeyRole } from '../types';
 import { STAKE_KEY_DERIVATION_PATH } from '../util';
 
 export interface Cip30SignDataRequest {
@@ -58,7 +58,7 @@ const getDerivationPath = (signWith: Cardano.Address | Cardano.RewardAccount, ke
   if (!knownAddress) {
     throw new Cip30DataSignError(Cip30DataSignErrorCode.ProofGeneration, 'Unknown address');
   }
-  return { index: knownAddress.index, type: knownAddress.type as number as KeyType };
+  return { index: knownAddress.index, role: knownAddress.type as number as KeyRole };
 };
 
 const createSigStructureHeaders = (addressBytes: Uint8Array) => {

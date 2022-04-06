@@ -134,10 +134,13 @@ export const createWalletApi = (
       const txDecoded = CSL.TransactionBody.from_bytes(Buffer.from(tx, 'hex'));
       const hash = Cardano.TransactionId(Buffer.from(CSL.hash_transaction(txDecoded).to_bytes()).toString('hex'));
       const coreTx = cslToCore.txBody(txDecoded);
-      const witnessSet = await wallet.keyAgent.signTransaction({
-        body: coreTx,
-        hash
-      });
+      const witnessSet = await wallet.keyAgent.signTransaction(
+        {
+          body: coreTx,
+          hash
+        },
+        { inputAddressResolver: wallet.inputAddressResolver }
+      );
 
       const cslWitnessSet = coreToCsl.witnessSet(witnessSet);
 

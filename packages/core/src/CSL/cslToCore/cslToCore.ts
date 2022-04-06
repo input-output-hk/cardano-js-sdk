@@ -54,8 +54,7 @@ export const value = (cslValue: CSL.Value): Cardano.Value => {
   return result;
 };
 
-export const txIn = (input: CSL.TransactionInput, address?: Cardano.Address): Cardano.TxIn => ({
-  address,
+export const txIn = (input: CSL.TransactionInput): Cardano.NewTxIn => ({
   index: input.index(),
   txId: Cardano.TransactionId.fromHexBlob(util.bytesToHex(input.transaction_id().to_bytes()))
 });
@@ -77,10 +76,10 @@ export const txOutputs = (outputs: CSL.TransactionOutputs): Cardano.TxOut[] => {
   return result;
 };
 
-export const txInputs = (inputs: CSL.TransactionInputs, address?: Cardano.Address): Cardano.TxIn[] => {
-  const result: Cardano.TxIn[] = [];
+export const txInputs = (inputs: CSL.TransactionInputs): Cardano.NewTxIn[] => {
+  const result: Cardano.NewTxIn[] = [];
   for (let i = 0; i < inputs.len(); i++) {
-    result.push(txIn(inputs.get(i), address));
+    result.push(txIn(inputs.get(i)));
   }
   return result;
 };
@@ -118,7 +117,7 @@ export const txMint = (assets?: CSL.Mint): Cardano.TokenMap | undefined => {
   return assetMap;
 };
 
-export const txBody = (body: CSL.TransactionBody): Cardano.TxBodyAlonzo => {
+export const txBody = (body: CSL.TransactionBody): Cardano.NewTxBodyAlonzo => {
   const cslScriptDataHash = body.script_data_hash();
   const cslCollaterals = body.collateral();
 

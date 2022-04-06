@@ -67,7 +67,7 @@ export const value = ({ coins, assets }: Cardano.Value): Value => {
   return result;
 };
 
-export const txIn = (core: Cardano.TxIn): TransactionInput =>
+export const txIn = (core: Cardano.NewTxIn): TransactionInput =>
   TransactionInput.new(TransactionHash.from_bytes(Buffer.from(core.txId, 'hex')), core.index);
 
 export const txOut = (core: Cardano.TxOut): TransactionOutput =>
@@ -166,7 +166,7 @@ export const txAuxiliaryData = (auxiliaryData?: Cardano.AuxiliaryData): Auxiliar
   return result;
 };
 
-const txInputs = (coreInputs: Cardano.TxIn[]) => {
+const txInputs = (coreInputs: Cardano.NewTxIn[]) => {
   const cslInputs = TransactionInputs.new();
   for (const input of coreInputs) {
     cslInputs.add(txIn(input));
@@ -207,7 +207,7 @@ export const txBody = (
     collaterals,
     requiredExtraSignatures,
     scriptIntegrityHash
-  }: Cardano.TxBodyAlonzo,
+  }: Cardano.NewTxBodyAlonzo,
   auxiliaryData?: Cardano.AuxiliaryData
 ): TransactionBody => {
   const cslOutputs = TransactionOutputs.new();

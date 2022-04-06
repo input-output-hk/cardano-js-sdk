@@ -70,25 +70,30 @@ describe('KeyAgentBase', () => {
       .mockResolvedValueOnce({ publicKey: 'key1', signature: 'signature1' })
       .mockResolvedValueOnce({ publicKey: 'key2', signature: 'signature2' });
     const body = {} as unknown as Cardano.TxBodyAlonzo;
-    const witnessSet = await keyAgent.signTransaction({
-      body,
-      hash: Cardano.TransactionId('8561258e210352fba2ac0488afed67b3427a27ccf1d41ec030c98a8199bc22ec')
-    });
+    const inputAddressResolver = {} as KeyManagement.InputAddressResolver;
+    const options = { inputAddressResolver } as KeyManagement.SignTransactionOptions;
+    const witnessSet = await keyAgent.signTransaction(
+      {
+        body,
+        hash: Cardano.TransactionId('8561258e210352fba2ac0488afed67b3427a27ccf1d41ec030c98a8199bc22ec')
+      },
+      options
+    );
     expect(keyAgent.signBlob).toBeCalledTimes(2);
-    expect(ownSignatureKeyPaths).toBeCalledWith(body, keyAgent.knownAddresses);
+    expect(ownSignatureKeyPaths).toBeCalledWith(body, keyAgent.knownAddresses, inputAddressResolver);
     expect(witnessSet.size).toBe(2);
     expect(typeof [...witnessSet.values()][0]).toBe('string');
   });
 
   test('derivePublicKey', async () => {
-    const externalPublicKey = await keyAgent.derivePublicKey({ index: 1, type: KeyManagement.KeyType.External });
+    const externalPublicKey = await keyAgent.derivePublicKey({ index: 1, role: KeyManagement.KeyRole.External });
     expect(typeof externalPublicKey).toBe('string');
-    const stakePublicKey = await keyAgent.derivePublicKey({ index: 1, type: KeyManagement.KeyType.Stake });
+    const stakePublicKey = await keyAgent.derivePublicKey({ index: 1, role: KeyManagement.KeyRole.Stake });
     expect(typeof stakePublicKey).toBe('string');
   });
 
   test('deriveCslPublicKey', async () => {
-    expect(await keyAgent.deriveCslPublicKeyPublic({ index: 0, type: KeyManagement.KeyType.External })).toBeInstanceOf(
+    expect(await keyAgent.deriveCslPublicKeyPublic({ index: 0, role: KeyManagement.KeyRole.External })).toBeInstanceOf(
       CSL.PublicKey
     );
   });

@@ -76,23 +76,6 @@ const getWallet = async (idx: number) =>
     }
   );
 
-describe('SingleAddressWallet', () => {
-  let wallet: Wallet;
-
-  beforeAll(async () => {
-    wallet = await getWallet(0);
-    await waitForWalletStateSettle(wallet);
-  });
-
-  afterAll(() => {
-    wallet.shutdown();
-  });
-
-  it('has an address', async () => {
-    expect(wallet.addresses$.value![0].address.startsWith('addr')).toBe(true);
-  });
-});
-
 describe('SingleAddressWallet/delegation', () => {
   let wallet1: Wallet;
   let wallet2: Wallet;

@@ -23,7 +23,7 @@ describe('createUtxoTracker', () => {
             body: {
               inputs: [utxo[0][0]]
             }
-          } as Cardano.NewTxAlonzo
+          } as unknown as Cardano.NewTxAlonzo
         ]
       });
       const utxoTracker = createUtxoTracker(

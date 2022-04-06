@@ -1,4 +1,4 @@
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano } from '../../../src';
 
 describe('Cardano.util.metadatum', () => {
   describe('asMetadatumMap', () => {

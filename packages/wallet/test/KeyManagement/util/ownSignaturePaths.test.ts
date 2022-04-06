@@ -1,10 +1,5 @@
-import { AddressType, GroupedAddress, KeyType, util } from '../../../src/KeyManagement';
+import { AddressType, GroupedAddress, KeyRole, util } from '../../../src/KeyManagement';
 import { Cardano } from '@cardano-sdk/core';
-
-const createAddressInput = (address: Cardano.Address) =>
-  ({
-    address
-  } as Cardano.TxIn);
 
 const createGroupedAddress = (address: Cardano.Address, type: AddressType, index: number): GroupedAddress =>
   ({
@@ -23,23 +18,28 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
     );
     const txBody = {
       certificates: [{ __typename: Cardano.CertificateType.StakeKeyRegistration }],
-      inputs: [address1, address2, address1].map(createAddressInput)
-    } as Cardano.TxBodyAlonzo;
+      inputs: [{}, {}, {}]
+    } as Cardano.NewTxBodyAlonzo;
     const knownAddresses = [address1, address2].map((address, index) =>
       createGroupedAddress(address, AddressType.External, index)
     );
-    expect(util.ownSignatureKeyPaths(txBody, knownAddresses)).toEqual([
+    const resolveInput = jest
+      .fn()
+      .mockReturnValueOnce(address1)
+      .mockReturnValueOnce(address2)
+      .mockReturnValueOnce(address1);
+    expect(util.ownSignatureKeyPaths(txBody, knownAddresses, resolveInput)).toEqual([
       {
         index: 0,
-        role: KeyType.External
+        role: KeyRole.External
       },
       {
         index: 1,
-        role: KeyType.External
+        role: KeyRole.External
       },
       {
         index: 0,
-        role: KeyType.Stake
+        role: KeyRole.Stake
       }
     ]);
   });

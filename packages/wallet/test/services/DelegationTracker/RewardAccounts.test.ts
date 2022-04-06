@@ -139,14 +139,14 @@ describe('RewardAccounts', () => {
       coldObservableProviderMock
         .mockReturnValueOnce(
           cold('a-b-c', {
-            a: {},
-            b: { delegationAndRewards: { rewards: 5n } },
-            c: { delegationAndRewards: { rewards: 5n } }
+            a: 0n,
+            b: 5n,
+            c: 5n
           })
         )
         .mockReturnValueOnce(
           cold('-a', {
-            a: { delegationAndRewards: { rewards: 3n } }
+            a: 3n
           })
         );
       const target$ = createRewardsProvider(

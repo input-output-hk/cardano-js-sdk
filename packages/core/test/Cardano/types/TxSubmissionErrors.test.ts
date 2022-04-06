@@ -1,6 +1,6 @@
 import { Cardano } from '../../../src';
 import { TxSubmission } from '@cardano-ogmios/client';
-import { TxSubmissionErrors } from '../../../dist/Cardano';
+import { TxSubmissionErrors } from '../../../src/Cardano';
 
 describe('Cardano/types/TxSuubmissionErrors', () => {
   test('TxSubmissionError can be narrowed down with "instanceof"', () => {

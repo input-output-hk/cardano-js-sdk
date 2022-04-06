@@ -71,7 +71,7 @@ export const createAddressTransactionsProvider = (
             while (true) {
               const lastStoredTransaction: Cardano.TxAlonzo | undefined =
                 localTransactions[localTransactions.length - 1];
-              const newTransactions = await walletProvider.queryTransactionsByAddresses(
+              const newTransactions = await walletProvider.transactionsByAddresses(
                 addresses,
                 lastStoredTransaction?.blockHeader.blockNo
               );

@@ -4,6 +4,8 @@ import { AssetId, createStubStakePoolSearchProvider, createStubTimeSettingsProvi
 import { Cardano, testnetTimeSettings } from '@cardano-sdk/core';
 import { KeyManagement, SingleAddressWallet } from '../../src';
 import { firstValueFrom, skip } from 'rxjs';
+import { utxo } from '../mocks';
+import { waitForWalletStateSettle } from '../util';
 
 jest.mock('../../src/KeyManagement/cip8/cip30signData');
 const { cip30signData } = jest.requireMock('../../src/KeyManagement/cip8/cip30signData');
@@ -35,6 +37,7 @@ describe('SingleAddressWallet methods', () => {
       { assetProvider, keyAgent, stakePoolSearchProvider, timeSettingsProvider, txSubmitProvider, walletProvider }
     );
     keyAgent.knownAddresses.push(groupedAddress);
+    await waitForWalletStateSettle(wallet);
   });
 
   afterEach(() => {
@@ -60,6 +63,7 @@ describe('SingleAddressWallet methods', () => {
       }
     ];
     const props = {
+      inputs: new Set<Cardano.TxIn>([utxo[1][0]]),
       outputs: new Set<Cardano.TxOut>(outputs)
     };
 

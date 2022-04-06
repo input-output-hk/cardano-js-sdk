@@ -16,7 +16,6 @@ describe('Cardano.util.computeImplicitCoin', () => {
       },
       {
         __typename: Cardano.CertificateType.StakeDelegation,
-        epoch: 500,
         poolId: Cardano.PoolId('pool1zuevzm3xlrhmwjw87ec38mzs02tlkwec9wxpgafcaykmwg7efhh'),
         stakeKeyHash
       }

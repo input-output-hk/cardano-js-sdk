@@ -21,16 +21,16 @@ describe('NftMetadata/createNftMetadataProvider', () => {
 
   it('queries tx and returns nft metadata', async () => {
     const walletProvider = {
-      queryTransactionsByHashes: jest.fn().mockResolvedValueOnce([{ auxiliaryData: { body: { blob: metadatum } } }])
+      transactionsByHashes: jest.fn().mockResolvedValueOnce([{ auxiliaryData: { body: { blob: metadatum } } }])
     } as unknown as WalletProvider;
     const provider = createNftMetadataProvider(walletProvider, of([]));
     expect(await provider(asset)).toBe(assetMetadata);
     expect(metadatumToCip25).toBeCalledWith(asset, metadatum);
-    expect(walletProvider.queryTransactionsByHashes).toBeCalledWith([transactionId]);
+    expect(walletProvider.transactionsByHashes).toBeCalledWith([transactionId]);
   });
 
   it('doesnt query wallet provider if there is a local tx', async () => {
-    // will throw if walletProvider.queryTransactionsByHashes is called
+    // will throw if walletProvider.transactionsByHashes is called
     const walletProvider = undefined as unknown as WalletProvider;
     const provider = createNftMetadataProvider(
       walletProvider,

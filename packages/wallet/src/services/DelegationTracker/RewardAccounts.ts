@@ -62,17 +62,14 @@ export const createRewardsProvider =
     walletProvider: WalletProvider,
     retryBackoffConfig: RetryBackoffConfig
   ) =>
-  (rewardAccounts: Cardano.RewardAccount[]): Observable<bigint[]> =>
+  (rewardAccounts: Cardano.RewardAccount[]): Observable<Cardano.Lovelace[]> =>
     combineLatest(
       rewardAccounts.map((rewardAccount) =>
         coldObservableProvider(
-          () => walletProvider.utxoDelegationAndRewards([], rewardAccount),
+          () => walletProvider.rewardAccountBalance(rewardAccount),
           retryBackoffConfig,
           fetchRewardsTrigger$(epoch$, txConfirmed$, rewardAccount)
-        ).pipe(
-          map(({ delegationAndRewards }) => delegationAndRewards?.rewards || 0n),
-          distinctUntilChanged()
-        )
+        ).pipe(distinctUntilChanged())
       )
     );
 export type ObservableRewardsProvider = ReturnType<typeof createRewardsProvider>;

@@ -75,25 +75,20 @@ export interface EpochRewards {
 export interface WalletProvider {
   ledgerTip: () => Promise<Cardano.Tip>;
   networkInfo: () => Promise<NetworkInfo>;
-  // TODO: move stakePoolStats out to other provider type, since it's not required for wallet operation
+  // TODO: when implementing db-sync provider,
+  // move stakePoolStats out to other provider type, since it's not required for wallet operation.
+  // Perhaps generalize StakePoolSearchProvider?
   stakePoolStats?: () => Promise<StakePoolStats>;
-  // TODO: split utxoDelegationAndRewards this into 2 or 3 functions
-  utxoDelegationAndRewards: (
-    addresses: Cardano.Address[],
-    rewardAccount?: Cardano.RewardAccount
-  ) => Promise<{ utxo: Cardano.Utxo[]; delegationAndRewards?: Cardano.DelegationsAndRewards }>;
+  utxoByAddresses: (addresses: Cardano.Address[]) => Promise<Cardano.Utxo[]>;
   /**
    * @param {Cardano.BlockNo} sinceBlock inclusive
    */
-  queryTransactionsByAddresses: (
-    addresses: Cardano.Address[],
-    sinceBlock?: Cardano.BlockNo
-  ) => Promise<Cardano.TxAlonzo[]>;
-  queryTransactionsByHashes: (hashes: Cardano.TransactionId[]) => Promise<Cardano.TxAlonzo[]>;
+  transactionsByAddresses: (addresses: Cardano.Address[], sinceBlock?: Cardano.BlockNo) => Promise<Cardano.TxAlonzo[]>;
+  transactionsByHashes: (hashes: Cardano.TransactionId[]) => Promise<Cardano.TxAlonzo[]>;
   /**
    * @returns an array of blocks, same length and in the same order as `hashes` argument.
    */
-  queryBlocksByHashes: (hashes: Cardano.BlockId[]) => Promise<Cardano.Block[]>;
+  blocksByHashes: (hashes: Cardano.BlockId[]) => Promise<Cardano.Block[]>;
   currentWalletProtocolParameters: () => Promise<ProtocolParametersRequiredByWallet>;
   genesisParameters: () => Promise<Cardano.CompactGenesis>;
   /**
@@ -102,4 +97,5 @@ export interface WalletProvider {
    * @returns Rewards quantity for every epoch that had any rewards in ascending order.
    */
   rewardsHistory: (props: RewardHistoryProps) => Promise<Map<Cardano.RewardAccount, EpochRewards[]>>;
+  rewardAccountBalance: (rewardAccount: Cardano.RewardAccount) => Promise<Cardano.Lovelace>;
 }
