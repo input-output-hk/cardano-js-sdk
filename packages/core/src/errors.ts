@@ -5,13 +5,15 @@ export enum ProviderFailure {
   Unknown = 'UNKNOWN',
   InvalidResponse = 'INVALID_RESPONSE',
   NotImplemented = 'NOT_IMPLEMENTED',
-  Unhealthy = 'UNHEALTHY'
+  Unhealthy = 'UNHEALTHY',
+  ConnectionFailure = 'CONNECTION_FAILURE',
+  BadRequest = 'BAD_REQUEST'
 }
 
 const formatMessage = (reason: string, detail?: string) => reason + (detail ? ` (${detail})` : '');
 
-export class ProviderError extends CustomError {
-  constructor(public reason: ProviderFailure, public innerError?: unknown, public detail?: string) {
+export class ProviderError<InnerError = unknown> extends CustomError {
+  constructor(public reason: ProviderFailure, public innerError?: InnerError, public detail?: string) {
     super(formatMessage(reason, detail));
   }
 }

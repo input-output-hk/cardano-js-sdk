@@ -1,7 +1,9 @@
+import { CustomError } from 'ts-custom-error';
+import { GetErrorPrototype } from '../../src/util/misc';
 import { util } from '../../src';
 
-const serializeAndDeserialize = (obj: unknown) =>
-  util.fromSerializableObject(JSON.parse(JSON.stringify(util.toSerializableObject(obj))));
+const serializeAndDeserialize = (obj: unknown, getErrorPrototype?: GetErrorPrototype) =>
+  util.fromSerializableObject(JSON.parse(JSON.stringify(util.toSerializableObject(obj))), getErrorPrototype);
 
 describe('serializableObject', () => {
   it('supports plain types', () => {
@@ -32,9 +34,18 @@ describe('serializableObject', () => {
     const obj = {
       bigint: 123n,
       buffer: Buffer.from('data'),
+      date: new Date(),
+      error: new Error('error obj'),
       map: new Map([['key', 'value']]),
       undefined
     };
     expect(serializeAndDeserialize(obj)).toEqual(obj);
+  });
+
+  it('supports custom error types', () => {
+    const err = new CustomError('msg');
+    const deserialized = serializeAndDeserialize(err, () => CustomError.prototype);
+    expect(deserialized).toEqual(err);
+    expect(deserialized).toBeInstanceOf(CustomError);
   });
 });
