@@ -5,7 +5,9 @@ export enum ProviderFailure {
   Unknown = 'UNKNOWN',
   InvalidResponse = 'INVALID_RESPONSE',
   NotImplemented = 'NOT_IMPLEMENTED',
-  Unhealthy = 'UNHEALTHY'
+  Unhealthy = 'UNHEALTHY',
+  ConnectionFailure = 'CONNECTION_FAILURE',
+  BadRequest = 'BAD_REQUEST'
 }
 
 const formatMessage = (reason: string, detail?: string) => reason + (detail ? ` (${detail})` : '');
