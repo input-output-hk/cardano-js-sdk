@@ -22,7 +22,7 @@ export const blockfrostTxSubmitProvider = (blockfrost: BlockFrostAPI): TxSubmitP
     try {
       await blockfrost.txSubmit(signedTransaction);
     } catch (error) {
-      throw new Cardano.TxSubmissionErrors.UnknownTxSubmissionError(error);
+      throw new Cardano.UnknownTxSubmissionError(error);
     }
   };
 
