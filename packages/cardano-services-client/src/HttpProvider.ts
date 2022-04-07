@@ -58,7 +58,7 @@ export const createHttpProvider = <T extends object>({
             ...gotOptions,
             isStream: false,
             json: { args },
-            parseJson: (obj) => util.fromSerializableObject(JSON.parse(obj)),
+            parseJson: (obj) => util.fromSerializableObject(JSON.parse(obj), () => ProviderError.prototype),
             resolveBodyOnly: false,
             responseType: 'json',
             stringifyJson: (obj) => JSON.stringify(util.toSerializableObject(obj)),
@@ -68,8 +68,9 @@ export const createHttpProvider = <T extends object>({
         } catch (error) {
           if (error instanceof RequestError) {
             if (error instanceof HTTPError) {
-              if (mapError) return mapError(error.response.body, method);
-              throw new ProviderError(ProviderFailure.Unknown, error.response.body);
+              const typedError = util.fromSerializableObject(error.response.body, () => ProviderError.prototype);
+              if (mapError) return mapError(typedError, method);
+              throw new ProviderError(ProviderFailure.Unknown, typedError);
             }
             if (mapError) return mapError(null, method);
             if (['ENOTFOUND', 'ECONNREFUSED'].includes(error.code)) {
