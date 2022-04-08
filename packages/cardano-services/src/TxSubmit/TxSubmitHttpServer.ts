@@ -2,18 +2,13 @@ import { Cardano, ProviderError, ProviderFailure, TxSubmitProvider } from '@card
 import { ErrorObject, serializeError } from 'serialize-error';
 import { HttpServer, HttpServerConfig, HttpServerDependencies } from '../Http';
 import { Logger, dummyLogger } from 'ts-log';
-import bodyParser, { Options } from 'body-parser';
+import { providerHandler } from '../util';
+import bodyParser from 'body-parser';
 import express from 'express';
 
 export interface TxSubmitServerDependencies {
   logger?: Logger;
   txSubmitProvider: TxSubmitProvider;
-}
-
-export interface TxSubmitHttpServerConfig extends HttpServerConfig {
-  bodyParser?: {
-    limit?: Options['limit'];
-  };
 }
 
 export class TxSubmitHttpServer extends HttpServer {
@@ -22,42 +17,38 @@ export class TxSubmitHttpServer extends HttpServer {
   private constructor(
     { txSubmitProvider }: TxSubmitServerDependencies,
     httpServerDependencies: HttpServerDependencies,
-    { listen, metrics }: TxSubmitHttpServerConfig
+    { listen, metrics }: HttpServerConfig
   ) {
     super({ listen, metrics, name: 'TxSubmitServer' }, httpServerDependencies);
     this.#txSubmitProvider = txSubmitProvider;
   }
-  static create(
-    { txSubmitProvider, logger = dummyLogger }: TxSubmitServerDependencies,
-    config: TxSubmitHttpServerConfig
-  ) {
+  static create({ txSubmitProvider, logger = dummyLogger }: TxSubmitServerDependencies, config: HttpServerConfig) {
     const router = express.Router();
-    router.use(bodyParser.raw({ limit: config.bodyParser?.limit || '500kB', type: 'application/cbor' }));
+    router.use(bodyParser.raw());
 
-    router.post('/submit', async (req, res) => {
-      if (req.header('Content-Type') !== 'application/cbor') {
-        res.statusCode = 400;
-        return res.send('Must use application/cbor Content-Type header');
-      }
-      logger.debug('/submit', { ip: req.ip });
-      let body: Error['message'] | undefined;
-      try {
-        await txSubmitProvider.submitTx(new Uint8Array(req.body));
-        body = undefined;
-      } catch (error) {
-        if (!(await txSubmitProvider.healthCheck()).ok) {
-          res.statusCode = 503;
-          body = JSON.stringify(serializeError(new ProviderError(ProviderFailure.Unhealthy, error)));
-        } else {
-          res.statusCode = Cardano.util.asTxSubmissionError(error) ? 400 : 500;
-          body = JSON.stringify(
-            Array.isArray(error) ? error.map<ErrorObject>((e) => serializeError(e)) : serializeError(error)
-          );
+    router.post(
+      '/submit',
+      providerHandler<Uint8Array>(async ([tx], req, res) => {
+        logger.debug('/submit', { ip: req.ip });
+        let body: Error['message'] | undefined;
+        try {
+          await txSubmitProvider.submitTx(tx);
+          body = undefined;
+        } catch (error) {
+          if (!(await txSubmitProvider.healthCheck()).ok) {
+            res.statusCode = 503;
+            body = JSON.stringify(serializeError(new ProviderError(ProviderFailure.Unhealthy, error)));
+          } else {
+            res.statusCode = Cardano.util.asTxSubmissionError(error) ? 400 : 500;
+            body = JSON.stringify(
+              Array.isArray(error) ? error.map<ErrorObject>((e) => serializeError(e)) : serializeError(error)
+            );
+          }
+          logger.error(body);
         }
-        logger.error(body);
-      }
-      res.send(body);
-    });
+        res.send(body);
+      })
+    );
     return new TxSubmitHttpServer(
       { logger, txSubmitProvider },
       { healthCheck: () => txSubmitProvider.healthCheck(), logger, router },

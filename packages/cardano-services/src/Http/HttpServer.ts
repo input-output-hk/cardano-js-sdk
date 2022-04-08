@@ -2,7 +2,7 @@ import { HealthCheckResponse, ProviderError, util } from '@cardano-sdk/core';
 import { Logger, dummyLogger } from 'ts-log';
 import { RunnableModule } from '../RunnableModule';
 import { listenPromise, serverClosePromise } from '../util';
-import bodyParser from 'body-parser';
+import bodyParser, { Options } from 'body-parser';
 import express from 'express';
 import expressPromBundle from 'express-prom-bundle';
 import http from 'http';
@@ -16,6 +16,9 @@ export type HttpServerConfig = {
   metrics?: {
     enabled: boolean;
     options?: expressPromBundle.Opts;
+  };
+  bodyParser?: {
+    limit?: Options['limit'];
   };
   name?: string;
   listen: net.ListenOptions;
@@ -41,7 +44,10 @@ export abstract class HttpServer extends RunnableModule {
     this.app = express();
     // must use this before router
     this.app.use(
-      bodyParser.json({ reviver: (key, value) => (key === '' ? util.fromSerializableObject(value) : value) })
+      bodyParser.json({
+        limit: this.config.bodyParser?.limit || '500kB',
+        reviver: (key, value) => (key === '' ? util.fromSerializableObject(value) : value)
+      })
     );
 
     if (this.config.metrics?.enabled) {
