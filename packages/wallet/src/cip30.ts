@@ -3,7 +3,11 @@ import {
   Bytes,
   Cbor,
   Cip30DataSignature,
+  DataSignError,
+  DataSignErrorCode,
   Paginate,
+  TxSendError,
+  TxSendErrorCode,
   TxSignError,
   TxSignErrorCode,
   WalletApi
@@ -21,8 +25,42 @@ export type Cip30WalletDependencies = {
   logger?: Logger;
 };
 
+export enum Cip30ConfirmationCallbackType {
+  SignData = 'sign_data',
+  SignTx = 'sign_tx',
+  SubmitTx = 'submit_tx'
+}
+
+type SignDataCallbackParams = {
+  type: Cip30ConfirmationCallbackType.SignData;
+  data: {
+    addr: Cardano.Address;
+    payload: Cardano.util.HexBlob;
+  };
+};
+
+type SignTxCallbackParams = {
+  type: Cip30ConfirmationCallbackType.SignTx;
+  data: Cardano.NewTxBodyAlonzo;
+};
+
+type SubmitTxCallbackParams = {
+  type: Cip30ConfirmationCallbackType.SubmitTx;
+  data: Cardano.NewTxAlonzo;
+};
+
+export type CallbackConfirmation = (
+  args: SignDataCallbackParams | SignTxCallbackParams | SubmitTxCallbackParams
+) => Promise<boolean>;
+
+const mapCallbackFailure = (err: unknown, logger?: Logger) => {
+  logger?.error(err);
+  return false;
+};
+
 export const createWalletApi = (
   wallet: SingleAddressWallet,
+  confirmationCallback: CallbackConfirmation,
   { logger = dummyLogger }: Cip30WalletDependencies = {}
 ): WalletApi => ({
   getBalance: async (): Promise<Cbor> => {
@@ -122,46 +160,79 @@ export const createWalletApi = (
   },
   signData: async (addr: Cardano.Address, payload: Bytes): Promise<Cip30DataSignature> => {
     logger.debug('signData');
-    return cip30signData({
-      keyAgent: wallet.keyAgent,
-      payload: Cardano.util.HexBlob(payload),
-      signWith: addr
-    });
+    const hexBlobPayload = Cardano.util.HexBlob(payload);
+
+    const shouldProceed = await confirmationCallback({
+      data: {
+        addr,
+        payload: hexBlobPayload
+      },
+      type: Cip30ConfirmationCallbackType.SignData
+    }).catch((error) => mapCallbackFailure(error, logger));
+
+    if (shouldProceed) {
+      return cip30signData({
+        keyAgent: wallet.keyAgent,
+        payload: hexBlobPayload,
+        signWith: addr
+      });
+    }
+    logger.debug('sign data declined');
+    throw new DataSignError(DataSignErrorCode.UserDeclined, 'user declined signing');
   },
   signTx: async (tx: Cbor, _partialSign?: Boolean): Promise<Cbor> => {
     logger.debug('signTx');
-    try {
-      const txDecoded = CSL.TransactionBody.from_bytes(Buffer.from(tx, 'hex'));
-      const hash = Cardano.TransactionId(Buffer.from(CSL.hash_transaction(txDecoded).to_bytes()).toString('hex'));
-      const coreTx = cslToCore.txBody(txDecoded);
-      const witnessSet = await wallet.keyAgent.signTransaction(
-        {
-          body: coreTx,
-          hash
-        },
-        { inputAddressResolver: wallet.inputAddressResolver }
-      );
 
-      const cslWitnessSet = coreToCsl.witnessSet(witnessSet);
+    const txDecoded = CSL.TransactionBody.from_bytes(Buffer.from(tx, 'hex'));
+    const hash = Cardano.TransactionId(Buffer.from(CSL.hash_transaction(txDecoded).to_bytes()).toString('hex'));
+    const coreTx = cslToCore.txBody(txDecoded);
+    const shouldProceed = await confirmationCallback({
+      data: coreTx,
+      type: Cip30ConfirmationCallbackType.SignTx
+    }).catch((error) => mapCallbackFailure(error, logger));
+    if (shouldProceed) {
+      try {
+        const witnessSet = await wallet.keyAgent.signTransaction(
+          {
+            body: coreTx,
+            hash
+          },
+          { inputAddressResolver: wallet.inputAddressResolver }
+        );
 
-      return Promise.resolve(Buffer.from(cslWitnessSet.to_bytes()).toString('hex'));
-    } catch (error) {
-      logger.error(error);
-      // TODO: handle ProofGeneration errors?
-      const message = error instanceof AuthenticationError ? error.message : 'Nope';
-      throw new TxSignError(TxSignErrorCode.UserDeclined, message);
+        const cslWitnessSet = coreToCsl.witnessSet(witnessSet);
+
+        return Promise.resolve(Buffer.from(cslWitnessSet.to_bytes()).toString('hex'));
+      } catch (error) {
+        logger.error(error);
+        // TODO: handle ProofGeneration errors?
+        const message = error instanceof AuthenticationError ? error.message : 'Nope';
+        throw new TxSignError(TxSignErrorCode.UserDeclined, message);
+      }
+    } else {
+      throw new TxSignError(TxSignErrorCode.UserDeclined, 'user declined signing tx');
     }
   },
   submitTx: async (tx: Cbor): Promise<string> => {
     logger.debug('submitting tx');
-    try {
-      const txDecoded = CSL.Transaction.from_bytes(Buffer.from(tx, 'hex'));
-      const txData: Cardano.NewTxAlonzo = cslToCore.newTx(txDecoded);
-      await wallet.submitTx(txData);
-      return Promise.resolve(txData.id.toString());
-    } catch (error) {
-      logger.error(error);
-      throw error;
+    const txDecoded = CSL.Transaction.from_bytes(Buffer.from(tx, 'hex'));
+    const txData: Cardano.NewTxAlonzo = cslToCore.newTx(txDecoded);
+    const shouldProceed = await confirmationCallback({
+      data: txData,
+      type: Cip30ConfirmationCallbackType.SubmitTx
+    }).catch((error) => mapCallbackFailure(error, logger));
+
+    if (shouldProceed) {
+      try {
+        await wallet.submitTx(txData);
+        return txData.id.toString();
+      } catch (error) {
+        logger.error(error);
+        throw error;
+      }
+    } else {
+      logger.debug('transaction refused');
+      throw new TxSendError(TxSendErrorCode.Refused, 'transaction refused');
     }
   }
 });
@@ -171,7 +242,11 @@ export const createWalletApi = (
  *
  * @returns {Function} unregisters browser runtime event listeners
  */
-export const initialize = (wallet: SingleAddressWallet, { logger = dummyLogger }: Cip30WalletDependencies = {}) => {
-  const walletApi = createWalletApi(wallet, { logger });
+export const initialize = (
+  wallet: SingleAddressWallet,
+  confirmationCallback: CallbackConfirmation,
+  { logger = dummyLogger }: Cip30WalletDependencies = {}
+) => {
+  const walletApi = createWalletApi(wallet, confirmationCallback, { logger });
   return handleMessages(wallet.name, walletApi, logger);
 };
