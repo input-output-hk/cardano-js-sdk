@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { CSL, Cardano, coreToCsl } from '@cardano-sdk/core';
 import { InitializeTxProps, KeyManagement, SingleAddressWallet, cip30 } from '../../src';
-import { TxSignError, WalletApi, createWebExtensionWalletClient } from '@cardano-sdk/cip30';
+import { TxSignError, WalletApi } from '@cardano-sdk/cip30';
 import { createWallet } from './util';
+import { createWebExtensionWalletClient } from '@cardano-sdk/cip30/dist/WebExtension';
 import { firstValueFrom } from 'rxjs';
 import { networkId } from '../mocks';
 import { waitForWalletStateSettle } from '../util';

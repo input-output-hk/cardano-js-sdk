@@ -6,8 +6,7 @@ import {
   Paginate,
   TxSignError,
   TxSignErrorCode,
-  WalletApi,
-  handleMessages
+  WalletApi
 } from '@cardano-sdk/cip30';
 import { AuthenticationError } from './KeyManagement/errors';
 import { CSL, Cardano, coreToCsl, cslToCore } from '@cardano-sdk/core';
@@ -16,6 +15,7 @@ import { Logger, dummyLogger } from 'ts-log';
 import { SingleAddressWallet } from '.';
 import { cip30signData } from './KeyManagement/cip8';
 import { firstValueFrom } from 'rxjs';
+import { handleMessages } from '@cardano-sdk/cip30/dist/WebExtension';
 
 export type Cip30WalletDependencies = {
   logger?: Logger;
