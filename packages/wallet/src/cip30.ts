@@ -31,7 +31,7 @@ export enum Cip30ConfirmationCallbackType {
   SubmitTx = 'submit_tx'
 }
 
-type SignDataCallbackParams = {
+export type SignDataCallbackParams = {
   type: Cip30ConfirmationCallbackType.SignData;
   data: {
     addr: Cardano.Address;
@@ -39,12 +39,12 @@ type SignDataCallbackParams = {
   };
 };
 
-type SignTxCallbackParams = {
+export type SignTxCallbackParams = {
   type: Cip30ConfirmationCallbackType.SignTx;
   data: Cardano.NewTxBodyAlonzo;
 };
 
-type SubmitTxCallbackParams = {
+export type SubmitTxCallbackParams = {
   type: Cip30ConfirmationCallbackType.SubmitTx;
   data: Cardano.NewTxAlonzo;
 };
