@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Cip6MetadataFields | cardano-sdk</title>
+	<title>Cip30ConfirmationCallbackType | cardano-sdk</title>
 	<meta name="description" content="Documentation for cardano-sdk">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -55,101 +55,68 @@
 					<a href="../index.html">cardano-sdk</a>
 				</li>
 				<li>
-					<a href="../modules/_cardano_sdk_core.html">@cardano-sdk/core</a>
+					<a href="../modules/_cardano_sdk_wallet.html">@cardano-sdk/wallet</a>
 				</li>
 				<li>
-					<a href="../modules/_cardano_sdk_core.Cardano.html">Cardano</a>
+					<a href="../modules/_cardano_sdk_wallet.cip30.html">cip30</a>
 				</li>
 				<li>
-					<a href="_cardano_sdk_core.Cardano.Cip6MetadataFields.html">Cip6MetadataFields</a>
+					<a href="_cardano_sdk_wallet.cip30.Cip30ConfirmationCallbackType.html">Cip30ConfirmationCallbackType</a>
 				</li>
 			</ul>
-			<h1>Interface Cip6MetadataFields</h1>
+			<h1>Enumeration Cip30ConfirmationCallbackType</h1>
 		</div>
 	</div>
 </header>
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
-			<section class="tsd-panel tsd-comment">
-				<div class="tsd-comment tsd-typography">
-					<div class="lead">
-						<p><a href="https://github.com/cardano-foundation/CIPs/blob/master/CIP-0006/CIP-0006.md#on-chain-referenced-main-metadata-file">https://github.com/cardano-foundation/CIPs/blob/master/CIP-0006/CIP-0006.md#on-chain-referenced-main-metadata-file</a></p>
-					</div>
-				</div>
-			</section>
-			<section class="tsd-panel tsd-hierarchy">
-				<h3>Hierarchy</h3>
-				<ul class="tsd-hierarchy">
-					<li>
-						<span class="target">Cip6MetadataFields</span>
-					</li>
-				</ul>
-			</section>
 			<section class="tsd-panel-group tsd-index-group">
 				<h2>Index</h2>
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section ">
-							<h3>Properties</h3>
+							<h3>Enumeration members</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.Cardano.Cip6MetadataFields.html#extDataUrl" class="tsd-kind-icon">ext<wbr>Data<wbr>Url</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.Cardano.Cip6MetadataFields.html#extSigUrl" class="tsd-kind-icon">ext<wbr>Sig<wbr>Url</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_core.Cardano.Cip6MetadataFields.html#extVkey" class="tsd-kind-icon">ext<wbr>Vkey</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="_cardano_sdk_wallet.cip30.Cip30ConfirmationCallbackType.html#SignData" class="tsd-kind-icon">Sign<wbr>Data</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="_cardano_sdk_wallet.cip30.Cip30ConfirmationCallbackType.html#SignTx" class="tsd-kind-icon">Sign<wbr>Tx</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="_cardano_sdk_wallet.cip30.Cip30ConfirmationCallbackType.html#SubmitTx" class="tsd-kind-icon">Submit<wbr>Tx</a></li>
 							</ul>
 						</section>
 					</div>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
-				<h2>Properties</h2>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="extDataUrl" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> ext<wbr>Data<wbr>Url</h3>
-					<div class="tsd-signature tsd-kind-icon">ext<wbr>Data<wbr>Url<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+				<h2>Enumeration members</h2>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
+					<a name="SignData" class="tsd-anchor"></a>
+					<h3>Sign<wbr>Data</h3>
+					<div class="tsd-signature tsd-kind-icon">Sign<wbr>Data<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = &quot;sign_data&quot;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/6499b1b/packages/core/src/Cardano/types/StakePool/PoolParameters.ts#L32">packages/core/src/Cardano/types/StakePool/PoolParameters.ts:32</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/6499b1b/packages/wallet/src/cip30.ts#L29">packages/wallet/src/cip30.ts:29</a></li>
 						</ul>
 					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>A URL for extended metadata
-							128 Characters Maximum, must be a valid URL</p>
-						</div>
-					</div>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="extSigUrl" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> ext<wbr>Sig<wbr>Url</h3>
-					<div class="tsd-signature tsd-kind-icon">ext<wbr>Sig<wbr>Url<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
+					<a name="SignTx" class="tsd-anchor"></a>
+					<h3>Sign<wbr>Tx</h3>
+					<div class="tsd-signature tsd-kind-icon">Sign<wbr>Tx<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = &quot;sign_tx&quot;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/6499b1b/packages/core/src/Cardano/types/StakePool/PoolParameters.ts#L37">packages/core/src/Cardano/types/StakePool/PoolParameters.ts:37</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/6499b1b/packages/wallet/src/cip30.ts#L30">packages/wallet/src/cip30.ts:30</a></li>
 						</ul>
 					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>A URL with the extended metadata signature
-							128 Characters Maximum, must be a valid URL</p>
-						</div>
-					</div>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="extVkey" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> ext<wbr>Vkey</h3>
-					<div class="tsd-signature tsd-kind-icon">ext<wbr>Vkey<span class="tsd-signature-symbol">:</span> <a href="../modules/_cardano_sdk_core.Cardano.html#PoolMdVk-1" class="tsd-signature-type" data-tsd-kind="Function">PoolMdVk</a></div>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
+					<a name="SubmitTx" class="tsd-anchor"></a>
+					<h3>Submit<wbr>Tx</h3>
+					<div class="tsd-signature tsd-kind-icon">Submit<wbr>Tx<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = &quot;submit_tx&quot;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/6499b1b/packages/core/src/Cardano/types/StakePool/PoolParameters.ts#L42">packages/core/src/Cardano/types/StakePool/PoolParameters.ts:42</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/6499b1b/packages/wallet/src/cip30.ts#L31">packages/wallet/src/cip30.ts:31</a></li>
 						</ul>
 					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>the public Key for verification
-							optional, 68 Characters</p>
-						</div>
-					</div>
 				</section>
 			</section>
 		</div>
@@ -165,22 +132,43 @@
 				<ul class="before-current">
 				</ul>
 				<ul class="current">
-					<li class="current tsd-kind-interface tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_core.Cardano.Cip6MetadataFields.html" class="tsd-kind-icon">Cip6<wbr>Metadata<wbr>Fields</a>
+					<li class="current tsd-kind-enum tsd-parent-kind-namespace">
+						<a href="_cardano_sdk_wallet.cip30.Cip30ConfirmationCallbackType.html" class="tsd-kind-icon">Cip30<wbr>Confirmation<wbr>Callback<wbr>Type</a>
 						<ul>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_cardano_sdk_core.Cardano.Cip6MetadataFields.html#extDataUrl" class="tsd-kind-icon">ext<wbr>Data<wbr>Url</a>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="_cardano_sdk_wallet.cip30.Cip30ConfirmationCallbackType.html#SignData" class="tsd-kind-icon">Sign<wbr>Data</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_cardano_sdk_core.Cardano.Cip6MetadataFields.html#extSigUrl" class="tsd-kind-icon">ext<wbr>Sig<wbr>Url</a>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="_cardano_sdk_wallet.cip30.Cip30ConfirmationCallbackType.html#SignTx" class="tsd-kind-icon">Sign<wbr>Tx</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_cardano_sdk_core.Cardano.Cip6MetadataFields.html#extVkey" class="tsd-kind-icon">ext<wbr>Vkey</a>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="_cardano_sdk_wallet.cip30.Cip30ConfirmationCallbackType.html#SubmitTx" class="tsd-kind-icon">Submit<wbr>Tx</a>
 							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
+					<li class=" tsd-kind-type-alias tsd-parent-kind-namespace">
+						<a href="../modules/_cardano_sdk_wallet.cip30.html#CallbackConfirmation" class="tsd-kind-icon">Callback<wbr>Confirmation</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-namespace">
+						<a href="../modules/_cardano_sdk_wallet.cip30.html#Cip30WalletDependencies" class="tsd-kind-icon">Cip30<wbr>Wallet<wbr>Dependencies</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-namespace">
+						<a href="../modules/_cardano_sdk_wallet.cip30.html#SignDataCallbackParams" class="tsd-kind-icon">Sign<wbr>Data<wbr>Callback<wbr>Params</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-namespace">
+						<a href="../modules/_cardano_sdk_wallet.cip30.html#SignTxCallbackParams" class="tsd-kind-icon">Sign<wbr>TxCallback<wbr>Params</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-namespace">
+						<a href="../modules/_cardano_sdk_wallet.cip30.html#SubmitTxCallbackParams" class="tsd-kind-icon">Submit<wbr>TxCallback<wbr>Params</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-namespace">
+						<a href="../modules/_cardano_sdk_wallet.cip30.html#createWalletApi" class="tsd-kind-icon">create<wbr>Wallet<wbr>Api</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-namespace">
+						<a href="../modules/_cardano_sdk_wallet.cip30.html#initialize" class="tsd-kind-icon">initialize</a>
+					</li>
 				</ul>
 			</nav>
 		</div>
@@ -200,7 +188,6 @@
 			<ul class="tsd-legend">
 				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
 				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
-				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
