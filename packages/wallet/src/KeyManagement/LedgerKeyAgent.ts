@@ -25,6 +25,7 @@ export interface CreateWithDevice {
   networkId: Cardano.NetworkId;
   accountIndex?: number;
   communicationType: CommunicationType;
+  deviceConnection?: DeviceConnection | null;
 }
 
 export interface GetXpubProps {
@@ -189,19 +190,27 @@ export class LedgerKeyAgent extends KeyAgentBase {
    * @throws AuthenticationError
    * @throws TransportError
    */
-  static async createWithDevice({ networkId, accountIndex = 0, communicationType }: CreateWithDevice) {
+  static async createWithDevice({
+    networkId,
+    accountIndex = 0,
+    communicationType,
+    deviceConnection
+  }: CreateWithDevice) {
     const deviceListPaths = await LedgerKeyAgent.getHidDeviceList();
-    const deviceConnection = await LedgerKeyAgent.establishDeviceConnection(communicationType, deviceListPaths[0]);
+    // Re-use device connection if you want to create a key agent with new / additional account(s) and pass accountIndex
+    const activeDeviceConnection = await (deviceConnection
+      ? LedgerKeyAgent.checkDeviceConnection(communicationType, deviceConnection)
+      : LedgerKeyAgent.establishDeviceConnection(communicationType, deviceListPaths[0]));
     const extendedAccountPublicKey = await LedgerKeyAgent.getXpub({
       accountIndex,
       communicationType,
-      deviceConnection
+      deviceConnection: activeDeviceConnection
     });
 
     return new LedgerKeyAgent({
       accountIndex,
       communicationType,
-      deviceConnection,
+      deviceConnection: activeDeviceConnection,
       extendedAccountPublicKey,
       knownAddresses: [],
       networkId

@@ -1,3 +1,5 @@
+// Based on Nami implementation
+// https://github.com/Berry-Pool/nami-wallet/blob/39fb256af9547f801f57a673a5f02d0c7cef42c2/src/api/util.js#L636
 /* eslint-disable sonarjs/cognitive-complexity,  max-depth, max-statements, complexity */
 import {
   AddressType,
@@ -256,7 +258,7 @@ const prepareLedgerCertificates = (
             type: StakeCredentialParamsType.KEY_PATH
           }
         };
-      } else if (credential && credentialScriptHash) {
+      } else if (credentialScriptHash) {
         const scriptHash = Buffer.from(credentialScriptHash.to_bytes()).toString('hex');
         certificate.params = {
           stakeCredential: {
@@ -264,7 +266,9 @@ const prepareLedgerCertificates = (
             type: StakeCredentialParamsType.SCRIPT_HASH
           }
         };
-      } else if (delegationPoolKeyHash) {
+      }
+      // Always apply pool key hash to cert type STAKE_DELEGATION
+      if (delegationPoolKeyHash) {
         certificate.params = {
           ...certificate.params,
           poolKeyHashHex: Buffer.from(delegationPoolKeyHash.to_bytes()).toString('hex')
