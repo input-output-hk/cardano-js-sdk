@@ -2,6 +2,7 @@ import { ApiError } from '../src/errors';
 import { Wallet } from '../src/Wallet';
 import { WindowMaybeWithCardano, injectWindow } from '../src/injectWindow';
 import { api, properties, requestAccess } from './testWallet';
+import { dummyLogger } from 'ts-log';
 import { mocks } from 'mock-browser';
 import browser from 'webextension-polyfill';
 
@@ -9,10 +10,15 @@ describe('injectWindow', () => {
   let wallet: Wallet;
   let window: ReturnType<typeof mocks.MockBrowser>;
 
+  const options = {
+    logger: dummyLogger,
+    storage: browser.storage.local
+  };
+
   beforeEach(async () => {
     await browser.storage.local.clear();
 
-    wallet = new Wallet(properties, api, requestAccess);
+    wallet = new Wallet(properties, api, requestAccess, options);
     window = mocks.MockBrowser.createWindow();
   });
 
@@ -46,7 +52,7 @@ describe('injectWindow', () => {
 
       window = mocks.MockBrowser.createWindow();
       // re-inject window
-      const newWallet = new Wallet(properties, api, requestAccess);
+      const newWallet = new Wallet(properties, api, requestAccess, options);
       injectWindow(window, newWallet);
 
       expect(await window.cardano[properties.name].isEnabled(firstHostname)).toBe(false);
@@ -64,7 +70,7 @@ describe('injectWindow', () => {
 
       window = mocks.MockBrowser.createWindow();
       // re-inject window
-      const newWallet = new Wallet(properties, api, requestAccess);
+      const newWallet = new Wallet(properties, api, requestAccess, options);
       injectWindow(window, newWallet);
 
       expect(await window.cardano[properties.name].isEnabled(firstHostname)).toBe(true);
@@ -73,7 +79,7 @@ describe('injectWindow', () => {
 
     test('One allowed, one disallowed', async () => {
       const allowAccess = jest.fn().mockReturnValueOnce(true).mockReturnValueOnce(false);
-      const nextWallet = new Wallet(properties, api, allowAccess);
+      const nextWallet = new Wallet(properties, api, allowAccess, options);
 
       injectWindow(window, nextWallet);
 

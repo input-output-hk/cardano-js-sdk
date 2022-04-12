@@ -1,12 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, sonarjs/no-duplicate-string */
+import { Browser } from 'webextension-polyfill';
 import { CSL, Cardano, coreToCsl } from '@cardano-sdk/core';
-import { DataSignError, TxSendError, TxSignError, WalletApi } from '@cardano-sdk/cip30';
+import { DataSignError, TxSendError, TxSignError, WalletApi, createWebExtensionWalletClient } from '@cardano-sdk/cip30';
 import { InitializeTxProps, InitializeTxResult, KeyManagement, SingleAddressWallet, cip30 } from '../../src';
 import { createWallet } from './util';
-import { createWebExtensionWalletClient } from '@cardano-sdk/cip30/dist/WebExtension';
 import { firstValueFrom } from 'rxjs';
 import { networkId } from '../mocks';
 import { waitForWalletStateSettle } from '../util';
+
+declare const browser: Browser;
 
 describe('cip30', () => {
   let wallet: SingleAddressWallet;
@@ -116,8 +118,8 @@ describe('cip30', () => {
       chromeRuntime.sendMessage.mockImplementation((_: any, message: any, callback: any) =>
         onMessageHandler(message, null, callback)
       );
-      cip30.initialize(wallet, confirmationCallback);
-      api = createWebExtensionWalletClient({ walletExtensionId: 'someid', walletName: wallet.name });
+      cip30.initialize(wallet, confirmationCallback, browser.runtime);
+      api = createWebExtensionWalletClient({ walletExtensionId: 'someid', walletName: wallet.name }, browser.runtime);
     });
 
     describe('signData', () => {
@@ -206,12 +208,15 @@ describe('cip30', () => {
       chromeRuntime.sendMessage.mockImplementation((_: any, message: any, callback: any) =>
         onMessageHandler(message, null, callback)
       );
-      cleanup = cip30.initialize(wallet, () => Promise.resolve(true));
+      cleanup = cip30.initialize(wallet, () => Promise.resolve(true), browser.runtime);
     });
     afterAll(() => cleanup());
 
     it('works using browser runtime messages', async () => {
-      const api = createWebExtensionWalletClient({ walletExtensionId: 'someid', walletName: wallet.name });
+      const api = createWebExtensionWalletClient(
+        { walletExtensionId: 'someid', walletName: wallet.name },
+        browser.runtime
+      );
       const utxos = await api.getUtxos();
       expect(() => coreToCsl.utxo(utxos!)).not.toThrow();
     });
@@ -222,7 +227,10 @@ describe('cip30', () => {
       const hexTxBody = Buffer.from(coreToCsl.tx(finalizedTx).body().to_bytes()).toString('hex');
 
       wallet.keyAgent.signTransaction = jest.fn().mockRejectedValueOnce(new KeyManagement.errors.AuthenticationError());
-      const api = createWebExtensionWalletClient({ walletExtensionId: 'someid', walletName: wallet.name });
+      const api = createWebExtensionWalletClient(
+        { walletExtensionId: 'someid', walletName: wallet.name },
+        browser.runtime
+      );
       await expect(api.signTx(hexTxBody)).rejects.toThrowError(TxSignError);
     });
   });

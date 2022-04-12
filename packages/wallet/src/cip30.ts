@@ -10,16 +10,17 @@ import {
   TxSendErrorCode,
   TxSignError,
   TxSignErrorCode,
-  WalletApi
+  WalletApi,
+  handleMessages
 } from '@cardano-sdk/cip30';
 import { AuthenticationError } from './KeyManagement/errors';
 import { CSL, Cardano, coreToCsl, cslToCore } from '@cardano-sdk/core';
 import { InputSelectionError } from '@cardano-sdk/cip2';
 import { Logger, dummyLogger } from 'ts-log';
+import { Runtime } from 'webextension-polyfill';
 import { SingleAddressWallet } from '.';
 import { cip30signData } from './KeyManagement/cip8';
 import { firstValueFrom } from 'rxjs';
-import { handleMessages } from '@cardano-sdk/cip30/dist/WebExtension';
 
 export type Cip30WalletDependencies = {
   logger?: Logger;
@@ -245,8 +246,9 @@ export const createWalletApi = (
 export const initialize = (
   wallet: SingleAddressWallet,
   confirmationCallback: CallbackConfirmation,
+  runtime: Runtime.Static,
   { logger = dummyLogger }: Cip30WalletDependencies = {}
 ) => {
   const walletApi = createWalletApi(wallet, confirmationCallback, { logger });
-  return handleMessages(wallet.name, walletApi, logger);
+  return handleMessages(wallet.name, walletApi, logger, runtime);
 };

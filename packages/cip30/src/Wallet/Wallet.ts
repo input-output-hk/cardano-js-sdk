@@ -1,6 +1,6 @@
 import { APIErrorCode, ApiError } from '../errors';
 import { Logger, dummyLogger } from 'ts-log';
-import { Storage, storage } from 'webextension-polyfill';
+import { Storage } from 'webextension-polyfill';
 import { WalletApi } from './types';
 
 /**
@@ -31,13 +31,11 @@ export type RequestAccess = () => Promise<boolean>;
 
 export type WalletOptions = {
   logger?: Logger;
-  storage?: Storage.LocalStorageArea;
+  storage: Storage.LocalStorageArea;
 };
 
 const defaultOptions = {
-  logger: dummyLogger,
-  persistAllowList: false,
-  storage: storage.local
+  logger: dummyLogger
 };
 
 type WalletStorage = {
@@ -55,7 +53,7 @@ export class Wallet {
   #requestAccess: RequestAccess;
   readonly #options: Required<WalletOptions>;
 
-  constructor(properties: WalletProperties, api: WalletApi, requestAccess: RequestAccess, options?: WalletOptions) {
+  constructor(properties: WalletProperties, api: WalletApi, requestAccess: RequestAccess, options: WalletOptions) {
     this.apiVersion = properties.apiVersion;
     this.enable = this.enable.bind(this);
     this.icon = properties.icon;

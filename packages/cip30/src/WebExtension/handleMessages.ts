@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { APIErrorCode, ApiError, DataSignError, PaginateError, TxSendError, TxSignError } from '../errors';
 import { Logger, dummyLogger } from 'ts-log';
+import { Runtime } from 'webextension-polyfill';
 import { WalletApi } from '../Wallet';
-import browser from 'webextension-polyfill';
 
 const cip30errorTypes = [ApiError, DataSignError, PaginateError, TxSendError, TxSignError];
 
@@ -40,8 +40,13 @@ export const createListener =
     }
   };
 
-export const handleMessages = (walletName: string, walletApi: WalletApi, logger: Logger = dummyLogger) => {
+export const handleMessages = (
+  walletName: string,
+  walletApi: WalletApi,
+  logger: Logger = dummyLogger,
+  runtime: Runtime.Static
+) => {
   const listener = createListener(walletName, walletApi, logger);
-  browser.runtime.onMessage.addListener(listener);
-  return () => browser.runtime.onMessage.removeListener(listener);
+  runtime.onMessage.addListener(listener);
+  return () => runtime.onMessage.removeListener(listener);
 };

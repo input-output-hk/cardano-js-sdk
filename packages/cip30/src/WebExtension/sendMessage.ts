@@ -1,14 +1,14 @@
 import { Message } from './types';
+import { Runtime } from 'webextension-polyfill';
 import { WalletApi } from '../Wallet';
 import { dummyLogger } from 'ts-log';
-import browser from 'webextension-polyfill';
 
 export const createMessenger =
-  (extensionId: string, logger = dummyLogger) =>
+  (extensionId: string, runtime: Runtime.Static, logger = dummyLogger) =>
   async (msg: Message): Promise<WalletApi[keyof WalletApi]> => {
     logger.debug('sendMessage', msg);
     try {
-      return browser.runtime.sendMessage(extensionId, msg);
+      return runtime.sendMessage(extensionId, msg);
     } catch (error) {
       logger.error('sendMessage', error);
       throw error;

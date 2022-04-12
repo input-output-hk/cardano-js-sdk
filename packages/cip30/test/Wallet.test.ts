@@ -4,11 +4,15 @@
 import * as testWallet from './testWallet';
 import { Cardano } from '@cardano-sdk/core';
 import { Wallet, WalletApi, WalletMethodNames, WalletOptions } from '../src/Wallet';
+import { dummyLogger } from 'ts-log';
 import { mocks } from 'mock-browser';
 import browser from 'webextension-polyfill';
 const window = mocks.MockBrowser.createWindow();
 
-const options: WalletOptions = {};
+const options: Required<WalletOptions> = {
+  logger: dummyLogger,
+  storage: browser.storage.local
+};
 
 if (process.env.DEBUG) {
   options.logger = console;
