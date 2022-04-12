@@ -7,7 +7,7 @@ import {
   blockfrostWalletProvider
 } from '@cardano-sdk/blockfrost';
 import { Cardano, testnetTimeSettings } from '@cardano-sdk/core';
-import { InMemoryKeyAgent } from '../../src/KeyManagement';
+import { CommunicationType, InMemoryKeyAgent, LedgerKeyAgent } from '../../src/KeyManagement';
 import { LogLevel, createLogger } from 'bunyan';
 import { Logger } from 'ts-log';
 import { URL } from 'url';
@@ -15,6 +15,7 @@ import { createConnectionObject } from '@cardano-ogmios/client';
 import { createStubStakePoolSearchProvider, createStubTimeSettingsProvider } from '@cardano-sdk/util-dev';
 import { ogmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
 import { txSubmitHttpProvider } from '@cardano-sdk/cardano-services-client';
+import DeviceConnection from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import waitOn from 'wait-on';
 
 const loggerMethodNames = ['debug', 'error', 'fatal', 'info', 'trace', 'warn'] as (keyof Logger)[];
@@ -113,17 +114,35 @@ export const txSubmitProvider = (async () => {
   }
 })();
 
-export const keyAgentByIdx = (accountIndex: number) => {
-  const mnemonicWords = (process.env.MNEMONIC_WORDS || '').split(' ');
-  if (mnemonicWords.length === 0) throw new Error('MNEMONIC_WORDS not set');
-  const password = process.env.WALLET_PASSWORD;
-  if (!password) throw new Error('WALLET_PASSWORD not set');
-  return InMemoryKeyAgent.fromBip39MnemonicWords({
-    accountIndex,
-    getPassword: async () => Buffer.from(password),
-    mnemonicWords,
-    networkId
-  });
+let deviceConnection: DeviceConnection | null | undefined;
+export const keyAgentByIdx = async (accountIndex: number) => {
+  switch (process.env.KEY_AGENT) {
+    case 'Ledger': {
+      const ledgerKeyAgent = await LedgerKeyAgent.createWithDevice({
+        accountIndex,
+        communicationType: CommunicationType.Node,
+        deviceConnection,
+        networkId
+      });
+      deviceConnection = ledgerKeyAgent.deviceConnection;
+      return ledgerKeyAgent;
+    }
+    case 'InMemory': {
+      const mnemonicWords = (process.env.MNEMONIC_WORDS || '').split(' ');
+      if (mnemonicWords.length === 0) throw new Error('MNEMONIC_WORDS not set');
+      const password = process.env.WALLET_PASSWORD;
+      if (!password) throw new Error('WALLET_PASSWORD not set');
+      return await InMemoryKeyAgent.fromBip39MnemonicWords({
+        accountIndex,
+        getPassword: async () => Buffer.from(password),
+        mnemonicWords,
+        networkId
+      });
+    }
+    default: {
+      throw new Error(`KEY_AGENT unsupported: ${process.env.KEY_AGENT}`);
+    }
+  }
 };
 
 export const keyAgentReady = (() => keyAgentByIdx(0))();

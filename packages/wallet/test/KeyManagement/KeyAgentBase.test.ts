@@ -13,13 +13,11 @@ class MockKeyAgent extends KeyManagement.KeyAgentBase {
   serializableDataImpl = jest.fn();
   signBlob = jest.fn();
   exportRootPrivateKey = jest.fn();
+  signTransaction = jest.fn();
   deriveCslPublicKeyPublic(derivationPath: KeyManagement.AccountKeyDerivationPath) {
     return this.deriveCslPublicKey(derivationPath);
   }
 }
-
-jest.mock('../../src/KeyManagement/util/ownSignatureKeyPaths');
-const { ownSignatureKeyPaths } = jest.requireMock('../../src/KeyManagement/util/ownSignatureKeyPaths');
 
 describe('KeyAgentBase', () => {
   let keyAgent: MockKeyAgent;
@@ -38,9 +36,6 @@ describe('KeyAgentBase', () => {
     });
   });
 
-  afterEach(() => {
-    keyAgent.signBlob.mockReset();
-  });
   // eslint-disable-next-line max-len
   // extpubkey:  return '781ad7d97e043e3790e6a94111e2e65b5a5e584a3e542f4655f7794f80d2a081ee571e58e8982b6a549d9090df6d86b6bb2afc69a226eee44ac7f3e3e1da9a14';
 
@@ -59,30 +54,6 @@ describe('KeyAgentBase', () => {
     expect(address.address.startsWith('addr_test')).toBe(true);
     expect(address.rewardAccount.startsWith('stake_test')).toBe(true);
     expect(keyAgent.knownAddresses).toHaveLength(1);
-  });
-
-  test('signTransaction', async () => {
-    ownSignatureKeyPaths.mockReturnValueOnce([
-      { index: 0, role: 0 },
-      { index: 0, role: 2 }
-    ]);
-    keyAgent.signBlob
-      .mockResolvedValueOnce({ publicKey: 'key1', signature: 'signature1' })
-      .mockResolvedValueOnce({ publicKey: 'key2', signature: 'signature2' });
-    const body = {} as unknown as Cardano.TxBodyAlonzo;
-    const inputAddressResolver = {} as KeyManagement.InputAddressResolver;
-    const options = { inputAddressResolver } as KeyManagement.SignTransactionOptions;
-    const witnessSet = await keyAgent.signTransaction(
-      {
-        body,
-        hash: Cardano.TransactionId('8561258e210352fba2ac0488afed67b3427a27ccf1d41ec030c98a8199bc22ec')
-      },
-      options
-    );
-    expect(keyAgent.signBlob).toBeCalledTimes(2);
-    expect(ownSignatureKeyPaths).toBeCalledWith(body, keyAgent.knownAddresses, inputAddressResolver);
-    expect(witnessSet.size).toBe(2);
-    expect(typeof [...witnessSet.values()][0]).toBe('string');
   });
 
   test('derivePublicKey', async () => {

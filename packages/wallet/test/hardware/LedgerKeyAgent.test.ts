@@ -1,15 +1,41 @@
-import { Cardano } from '@cardano-sdk/core';
+import * as mocks from '../mocks';
+import { AssetId, createStubStakePoolSearchProvider, createStubTimeSettingsProvider } from '@cardano-sdk/util-dev';
+import { Cardano, testnetTimeSettings } from '@cardano-sdk/core';
 import { CommunicationType, TransportType } from '../../src/KeyManagement/types';
-import { KeyManagement } from '../../src';
+import { KeyManagement, SingleAddressWallet } from '../../src';
 import DeviceConnection from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
 describe('LedgerKeyAgent', () => {
   let keyAgent: KeyManagement.LedgerKeyAgent;
+  const address = mocks.utxo[0][0].address;
+  let txSubmitProvider: mocks.TxSubmitProviderStub;
+  let walletProvider: mocks.WalletProviderStub;
+  let wallet: SingleAddressWallet;
+
   beforeAll(async () => {
     keyAgent = await KeyManagement.LedgerKeyAgent.createWithDevice({
       communicationType: CommunicationType.Node,
       networkId: Cardano.NetworkId.testnet
     });
+    txSubmitProvider = mocks.mockTxSubmitProvider();
+    walletProvider = mocks.mockWalletProvider();
+    const assetProvider = mocks.mockAssetProvider();
+    const stakePoolSearchProvider = createStubStakePoolSearchProvider();
+    const timeSettingsProvider = createStubTimeSettingsProvider(testnetTimeSettings);
+    const groupedAddress: KeyManagement.GroupedAddress = {
+      accountIndex: 0,
+      address,
+      index: 0,
+      networkId: Cardano.NetworkId.testnet,
+      rewardAccount: mocks.rewardAccount,
+      type: KeyManagement.AddressType.External
+    };
+    keyAgent.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
+    wallet = new SingleAddressWallet(
+      { name: 'HW Wallet' },
+      { assetProvider, keyAgent, stakePoolSearchProvider, timeSettingsProvider, txSubmitProvider, walletProvider }
+    );
+    keyAgent.knownAddresses.push(groupedAddress);
   });
 
   test('__typename', () => {
@@ -30,6 +56,35 @@ describe('LedgerKeyAgent', () => {
 
   test('extendedAccountPublicKey', () => {
     expect(typeof keyAgent.extendedAccountPublicKey).toBe('string');
+  });
+
+  test('sign and submit tx', async () => {
+    const outputs = [
+      {
+        address: Cardano.Address(
+          'addr_test1qpu5vlrf4xkxv2qpwngf6cjhtw542ayty80v8dyr49rf5ewvxwdrt70qlcpeeagscasafhffqsxy36t90ldv06wqrk2qum8x5w'
+        ),
+        value: { coins: 11_111_111n }
+      },
+      {
+        address: Cardano.Address(
+          'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
+        ),
+        value: {
+          assets: new Map([[AssetId.TSLA, 6n]]),
+          coins: 5n
+        }
+      }
+    ];
+    const props = {
+      outputs: new Set<Cardano.TxOut>(outputs)
+    };
+    const txInternals = await wallet.initializeTx(props);
+    const tx = await wallet.finalizeTx(txInternals);
+    expect(tx.body).toBe(txInternals.body);
+    expect(tx.id).toBe(txInternals.hash);
+    expect(tx.witness.signatures.size).toBe(1);
+    await expect(wallet.submitTx(tx)).resolves.not.toThrow();
   });
 
   describe('establish, check and re-establish device connection', () => {

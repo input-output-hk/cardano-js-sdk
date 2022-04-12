@@ -2,6 +2,9 @@ import { CSL, Cardano } from '@cardano-sdk/core';
 import { KeyManagement } from '../../src';
 import { deriveAccountPrivateKey } from '../../src/KeyManagement/util';
 
+jest.mock('../../src/KeyManagement/util/ownSignatureKeyPaths');
+const { ownSignatureKeyPaths } = jest.requireMock('../../src/KeyManagement/util/ownSignatureKeyPaths');
+
 describe('InMemoryKeyAgent', () => {
   let keyAgent: KeyManagement.KeyAgent;
   let getPassword: jest.Mock;
@@ -72,6 +75,26 @@ describe('InMemoryKeyAgent', () => {
     );
     expect(typeof publicKey).toBe('string');
     expect(typeof signature).toBe('string');
+  });
+
+  test('signTransaction', async () => {
+    ownSignatureKeyPaths.mockReturnValueOnce([
+      { index: 0, role: 0 },
+      { index: 0, role: 2 }
+    ]);
+    const body = {} as unknown as Cardano.TxBodyAlonzo;
+    const inputAddressResolver = {} as KeyManagement.InputAddressResolver;
+    const options = { inputAddressResolver } as KeyManagement.SignTransactionOptions;
+    const witnessSet = await keyAgent.signTransaction(
+      {
+        body,
+        hash: Cardano.TransactionId('8561258e210352fba2ac0488afed67b3427a27ccf1d41ec030c98a8199bc22ec')
+      },
+      options
+    );
+    expect(ownSignatureKeyPaths).toBeCalledWith(body, keyAgent.knownAddresses, inputAddressResolver);
+    expect(witnessSet.size).toBe(2);
+    expect(typeof [...witnessSet.values()][0]).toBe('string');
   });
 
   test('deriveAddress', async () => {
