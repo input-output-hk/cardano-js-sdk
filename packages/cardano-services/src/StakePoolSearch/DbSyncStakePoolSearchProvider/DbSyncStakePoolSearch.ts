@@ -27,6 +27,7 @@ import Queries, {
   addSentenceToQuery,
   buildOrQueryFromClauses,
   findLastEpoch,
+  getIdentifierFullJoinClause,
   getIdentifierWhereClause,
   getStatusWhereClause,
   poolsByPledgeMetSubqueries,
@@ -152,14 +153,14 @@ export class DbSyncStakePoolSearchProvider implements StakePoolSearchProvider {
       params.push(..._params);
     }
     if (filters?.status) {
-      const statusResult = this.buildPoolsByStatusQuery(filters.status);
-      subQueries.push(statusResult);
+      const statusQuery = this.buildPoolsByStatusQuery(filters.status);
+      subQueries.push(statusQuery);
     }
     if (filters?.pledgeMet !== undefined) {
-      const pledgeMetResult = this.buildPoolsByPledgeMetQuery(filters.pledgeMet);
-      subQueries.push(...pledgeMetResult);
+      const pledgeMetQuery = this.buildPoolsByPledgeMetQuery(filters.pledgeMet);
+      subQueries.push(...pledgeMetQuery);
     }
-    if (filters?.identifier || filters?.pledgeMet !== undefined)
+    if (filters?.status || filters?.pledgeMet !== undefined)
       subQueries.unshift({ id: { name: 'current_epoch' }, query: findLastEpoch });
     if (subQueries.length > 0) {
       query =
@@ -180,11 +181,7 @@ export class DbSyncStakePoolSearchProvider implements StakePoolSearchProvider {
       query = WITH_CLAUSE + SELECT_CLAUSE + JOIN_CLAUSE;
       whereClause.push(WHERE_CLAUSE(filters.pledgeMet));
       if (filters.identifier) {
-        query = addSentenceToQuery(
-          query,
-          `${Queries.IDENTIFIER_QUERY.JOIN_CLAUSE.POOL_UPDATE} 
-            ${Queries.IDENTIFIER_QUERY.JOIN_CLAUSE.OFFLINE_METADATA}`
-        );
+        query = addSentenceToQuery(query, `${getIdentifierFullJoinClause()}`);
         const { where, params: identifierParams } = getIdentifierWhereClause(filters.identifier);
         whereClause.push(where);
         params.push(...identifierParams);
@@ -218,7 +215,7 @@ export class DbSyncStakePoolSearchProvider implements StakePoolSearchProvider {
       const { where, params: identifierParams } = getIdentifierWhereClause(filters.identifier);
       query = `
         ${Queries.IDENTIFIER_QUERY.SELECT_CLAUSE}
-        ${Queries.IDENTIFIER_QUERY.JOIN_CLAUSE}
+        ${getIdentifierFullJoinClause()}
         WHERE ${where}
         `;
       params.push(...identifierParams);

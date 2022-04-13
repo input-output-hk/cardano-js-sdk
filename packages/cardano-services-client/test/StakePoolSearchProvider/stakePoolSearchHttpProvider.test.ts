@@ -15,6 +15,6 @@ describe('stakePoolSearchHttpProvider', () => {
   test('queryStakePools doesnt throw', async () => {
     got.post = jest.fn().mockReturnValue({ json: jest.fn().mockResolvedValue([]) });
     const provider = stakePoolSearchHttpProvider(url);
-    await expect(provider.queryStakePools([])).resolves.toEqual([]);
+    await expect(provider.queryStakePools()).resolves.toEqual([]);
   });
 });

@@ -36,10 +36,10 @@ SELECT
 FROM pool_relay
 WHERE update_id = ANY($1)
 `;
-
+// TODO: probably this should be filtered by registration tx_id = last_update.registration_tx_id
 export const findPoolsOwners = `
 SELECT 
-  stake.view AS address,
+  DISTINCT stake.view AS address,
   owner.pool_hash_id AS hash_id
 FROM pool_owner owner
 JOIN stake_address stake
@@ -245,6 +245,10 @@ export const IDENTIFIER_QUERY = {
   FROM pool_hash ph 
   `
 };
+
+export const getIdentifierFullJoinClause = () => `
+${IDENTIFIER_QUERY.JOIN_CLAUSE.POOL_UPDATE} 
+${IDENTIFIER_QUERY.JOIN_CLAUSE.OFFLINE_METADATA}`;
 
 export const findPoolsData = `
 SELECT 
