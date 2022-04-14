@@ -79,6 +79,8 @@
 							<h3>Functions</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="_cardano_sdk_core.Address.util.html#isAddress" class="tsd-kind-icon">is<wbr>Address</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="_cardano_sdk_core.Address.util.html#isAddressWithin" class="tsd-kind-icon">is<wbr>Address<wbr>Within</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="_cardano_sdk_core.Address.util.html#isOutgoing" class="tsd-kind-icon">is<wbr>Outgoing</a></li>
 							</ul>
 						</section>
 					</div>
@@ -96,7 +98,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/b467b20/packages/core/src/Address/util.ts#L6">packages/core/src/Address/util.ts:6</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/c108a97/packages/core/src/Address/util.ts#L7">packages/core/src/Address/util.ts:7</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -108,6 +110,89 @@
 							<ul class="tsd-parameters">
 								<li>
 									<h5>input: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-namespace">
+					<a name="isAddressWithin" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> is<wbr>Address<wbr>Within</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-namespace">
+						<li class="tsd-signature tsd-kind-icon">is<wbr>Address<wbr>Within<span class="tsd-signature-symbol">(</span>addresses<span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_core.Cardano.html#Address-1" class="tsd-signature-type" data-tsd-kind="Function">Address</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>address<span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_core.Cardano.html#Address-1" class="tsd-signature-type" data-tsd-kind="Function">Address</a><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/c108a97/packages/core/src/Address/util.ts#L12">packages/core/src/Address/util.ts:12</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Checks that an object containing an address (e.g., output, input) is within a set of provided addresses</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>addresses: <a href="_cardano_sdk_core.Cardano.html#Address-1" class="tsd-signature-type" data-tsd-kind="Function">Address</a><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>address<span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_core.Cardano.html#Address-1" class="tsd-signature-type" data-tsd-kind="Function">Address</a><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">boolean</span></h4>
+							<ul class="tsd-parameters">
+								<li class="tsd-parameter-signature">
+									<ul class="tsd-signatures tsd-kind-type-literal">
+										<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>address<span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_core.Cardano.html#Address-1" class="tsd-signature-type" data-tsd-kind="Function">Address</a><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+									</ul>
+									<ul class="tsd-descriptions">
+										<li class="tsd-description">
+											<h4 class="tsd-parameters-title">Parameters</h4>
+											<ul class="tsd-parameters">
+												<li>
+													<h5>__namedParameters: <span class="tsd-signature-symbol">{ </span>address<span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_core.Cardano.html#Address-1" class="tsd-signature-type" data-tsd-kind="Function">Address</a><span class="tsd-signature-symbol"> }</span></h5>
+													<ul class="tsd-parameters">
+														<li class="tsd-parameter">
+															<h5>address<span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_core.Cardano.html#Address-1" class="tsd-signature-type" data-tsd-kind="Function">Address</a></h5>
+														</li>
+													</ul>
+												</li>
+											</ul>
+											<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+										</li>
+									</ul>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-namespace">
+					<a name="isOutgoing" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> is<wbr>Outgoing</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-namespace">
+						<li class="tsd-signature tsd-kind-icon">is<wbr>Outgoing<span class="tsd-signature-symbol">(</span>tx<span class="tsd-signature-symbol">: </span><a href="../interfaces/_cardano_sdk_core.Cardano.TxAlonzo.html" class="tsd-signature-type" data-tsd-kind="Interface">TxAlonzo</a>, ownAddresses<span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_core.Cardano.html#Address-1" class="tsd-signature-type" data-tsd-kind="Function">Address</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/c108a97/packages/core/src/Address/util.ts#L21">packages/core/src/Address/util.ts:21</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Receives a transaction and a set of addresses to check if the transaction is outgoing,
+									i.e., some of the addresses are included in the transaction inputs</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>tx: <a href="../interfaces/_cardano_sdk_core.Cardano.TxAlonzo.html" class="tsd-signature-type" data-tsd-kind="Interface">TxAlonzo</a></h5>
+								</li>
+								<li>
+									<h5>ownAddresses: <a href="_cardano_sdk_core.Cardano.html#Address-1" class="tsd-signature-type" data-tsd-kind="Function">Address</a><span class="tsd-signature-symbol">[]</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
@@ -128,6 +213,12 @@
 				<ul class="before-current">
 					<li class=" tsd-kind-function tsd-parent-kind-namespace">
 						<a href="_cardano_sdk_core.Address.util.html#isAddress" class="tsd-kind-icon">is<wbr>Address</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-namespace">
+						<a href="_cardano_sdk_core.Address.util.html#isAddressWithin" class="tsd-kind-icon">is<wbr>Address<wbr>Within</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-namespace">
+						<a href="_cardano_sdk_core.Address.util.html#isOutgoing" class="tsd-kind-icon">is<wbr>Outgoing</a>
 					</li>
 				</ul>
 			</nav>
