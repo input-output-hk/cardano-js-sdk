@@ -1,6 +1,6 @@
 import { Balance, DelegationTracker, StakeKeyStatus, TransactionalObservables, TransactionalTracker } from './types';
 import { BigIntMath, Cardano, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
-import { Observable, combineLatest, distinctUntilChanged, map, share } from 'rxjs';
+import { Observable, combineLatest, distinctUntilChanged, map } from 'rxjs';
 import { TrackerSubject, deepEquals } from './util';
 
 const mapToBalances = map<[Cardano.Utxo[], Cardano.Lovelace, Cardano.Lovelace], Balance>(
@@ -59,8 +59,7 @@ export const createBalanceTracker = (
         }
       )
     ),
-    distinctUntilChanged(deepEquals),
-    share()
+    distinctUntilChanged(deepEquals)
   );
   const available$ = new TrackerSubject<Balance>(
     combineLatest([

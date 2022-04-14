@@ -4,8 +4,8 @@ import { KeyManagement, SingleAddressWallet, Wallet } from '../../../src';
 import {
   assetProvider,
   keyAgentReady,
+  networkInfoProvider,
   stakePoolSearchProvider,
-  timeSettingsProvider,
   txSubmitProvider,
   walletProvider
 } from '../config';
@@ -40,8 +40,8 @@ describe('SingleAddressWallet.assets/nft', () => {
       {
         assetProvider: await assetProvider,
         keyAgent,
+        networkInfoProvider: await networkInfoProvider,
         stakePoolSearchProvider,
-        timeSettingsProvider,
         txSubmitProvider: await txSubmitProvider,
         walletProvider: await walletProvider
       }

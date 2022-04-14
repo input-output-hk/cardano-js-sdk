@@ -1,4 +1,4 @@
-import { Asset, Cardano, NetworkInfo, ProtocolParametersRequiredByWallet, TimeSettings } from '@cardano-sdk/core';
+import { Asset, Cardano, EpochInfo, NetworkInfo, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
 import {
   Balance,
   BehaviorObservable,
@@ -76,9 +76,9 @@ export interface Wallet {
   readonly utxo: TransactionalTracker<Cardano.Utxo[]>;
   readonly transactions: TransactionsTracker;
   readonly tip$: BehaviorObservable<Cardano.Tip>;
-  readonly timeSettings$: BehaviorObservable<TimeSettings[]>;
   readonly genesisParameters$: BehaviorObservable<Cardano.CompactGenesis>;
   readonly networkInfo$: BehaviorObservable<NetworkInfo>;
+  readonly currentEpoch$: BehaviorObservable<EpochInfo>;
   readonly protocolParameters$: BehaviorObservable<ProtocolParametersRequiredByWallet>;
   readonly addresses$: BehaviorObservable<GroupedAddress[]>;
   readonly assets$: BehaviorObservable<Assets>;

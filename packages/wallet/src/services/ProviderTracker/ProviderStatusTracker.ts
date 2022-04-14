@@ -18,8 +18,8 @@ import {
 import { Milliseconds } from '../types';
 import { ProviderFnStats } from './ProviderTracker';
 import { TrackedAssetProvider } from './TrackedAssetProvider';
+import { TrackedNetworkInfoProvider } from './TrackedNetworkInfoProvider';
 import { TrackedStakePoolSearchProvider } from './TrackedStakePoolSearchProvider';
-import { TrackedTimeSettingsProvider } from './TrackedTimeSettingsProvider';
 import { TrackedTxSubmitProvider } from './TrackedTxSubmitProvider';
 import { TrackedWalletProvider } from './TrackedWalletProvider';
 import { TrackerSubject } from '../util';
@@ -31,7 +31,7 @@ export interface ProviderStatusTrackerProps {
 export interface ProviderStatusTrackerDependencies {
   walletProvider: TrackedWalletProvider;
   stakePoolSearchProvider: TrackedStakePoolSearchProvider;
-  timeSettingsProvider: TrackedTimeSettingsProvider;
+  networkInfoProvider: TrackedNetworkInfoProvider;
   txSubmitProvider: TrackedTxSubmitProvider;
   assetProvider: TrackedAssetProvider;
 }
@@ -39,7 +39,7 @@ export interface ProviderStatusTrackerDependencies {
 const getDefaultProviderSyncRelevantStats = ({
   walletProvider,
   stakePoolSearchProvider,
-  timeSettingsProvider,
+  networkInfoProvider,
   txSubmitProvider,
   assetProvider
 }: ProviderStatusTrackerDependencies): Observable<ProviderFnStats[]> =>
@@ -47,7 +47,6 @@ const getDefaultProviderSyncRelevantStats = ({
     walletProvider.stats.ledgerTip$,
     walletProvider.stats.currentWalletProtocolParameters$,
     walletProvider.stats.genesisParameters$,
-    walletProvider.stats.networkInfo$,
     walletProvider.stats.transactionsByAddresses$,
     walletProvider.stats.rewardsHistory$,
     walletProvider.stats.utxoByAddresses$,
@@ -55,7 +54,7 @@ const getDefaultProviderSyncRelevantStats = ({
     assetProvider.stats.getAsset$,
     txSubmitProvider.stats.submitTx$,
     stakePoolSearchProvider.stats.queryStakePools$,
-    timeSettingsProvider.stats.getTimeSettings$
+    networkInfoProvider.stats.networkInfo$
   ]);
 
 export interface ProviderStatusTrackerInternals {

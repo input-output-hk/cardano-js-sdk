@@ -1,5 +1,6 @@
 import { Cardano, NetworkInfo } from '@cardano-sdk/core';
 import { Observable, distinctUntilChanged, map } from 'rxjs';
+import { timeSettingsEquals } from './equals';
 
 export const distinctBlock = (tip$: Observable<Cardano.Tip>) =>
   tip$.pipe(
@@ -7,8 +8,8 @@ export const distinctBlock = (tip$: Observable<Cardano.Tip>) =>
     distinctUntilChanged()
   );
 
-export const distinctEpoch = (networkInfo$: Observable<NetworkInfo>) =>
+export const distinctTimeSettings = (networkInfo$: Observable<NetworkInfo>) =>
   networkInfo$.pipe(
-    map(({ currentEpoch: { number } }) => number),
-    distinctUntilChanged()
+    map(({ network: { timeSettings } }) => timeSettings),
+    distinctUntilChanged(timeSettingsEquals)
   );

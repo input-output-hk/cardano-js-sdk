@@ -1,11 +1,5 @@
 import { Assets } from '../../types';
-import {
-  Cardano,
-  EpochRewards,
-  NetworkInfo,
-  ProtocolParametersRequiredByWallet,
-  TimeSettings
-} from '@cardano-sdk/core';
+import { Cardano, EpochRewards, NetworkInfo, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
 import { EMPTY, combineLatest, map } from 'rxjs';
 import { PouchdbCollectionStore } from './PouchdbCollectionStore';
 import { PouchdbDocumentStore } from './PouchdbDocumentStore';
@@ -15,7 +9,6 @@ import { WalletStores } from '../types';
 export class PouchdbTipStore extends PouchdbDocumentStore<Cardano.Tip> {}
 export class PouchdbProtocolParametersStore extends PouchdbDocumentStore<ProtocolParametersRequiredByWallet> {}
 export class PouchdbGenesisParametersStore extends PouchdbDocumentStore<Cardano.CompactGenesis> {}
-export class PouchdbTimeSettingsStore extends PouchdbDocumentStore<TimeSettings[]> {}
 export class PouchdbNetworkInfoStore extends PouchdbDocumentStore<NetworkInfo> {}
 export class PouchdbAssetsStore extends PouchdbDocumentStore<Assets> {}
 
@@ -56,7 +49,6 @@ export const createPouchdbWalletStores = (walletName: string): WalletStores => {
     rewardsBalances: new PouchdbRewardsBalancesStore(`${baseDbName}RewardsBalances`),
     rewardsHistory: new PouchdbRewardsHistoryStore(`${baseDbName}RewardsHistory`),
     stakePools: new PouchdbStakePoolsStore(`${baseDbName}StakePools`),
-    timeSettings: new PouchdbTimeSettingsStore(docsDbName, 'timeSettings'),
     tip: new PouchdbTipStore(docsDbName, 'tip'),
     transactions: new PouchdbTransactionsStore(`${baseDbName}Transactions`, ({ blockHeader: { blockNo }, index }) =>
       /**

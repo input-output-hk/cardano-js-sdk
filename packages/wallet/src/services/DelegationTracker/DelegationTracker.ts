@@ -7,7 +7,7 @@ import {
   createSlotEpochCalc
 } from '@cardano-sdk/core';
 import { DelegationTracker, TransactionsTracker } from '../types';
-import { Observable, combineLatest, map, share } from 'rxjs';
+import { Observable, combineLatest, map } from 'rxjs';
 import {
   ObservableRewardsProvider,
   ObservableStakePoolSearchProvider,
@@ -59,8 +59,7 @@ export const certificateTransactionsWithEpochs = (
   ]).pipe(
     map(([transactions, slotEpochCalc]) =>
       transactions.map((tx) => ({ epoch: slotEpochCalc(tx.blockHeader.slot), tx }))
-    ),
-    share()
+    )
   );
 
 export const createDelegationTracker = ({

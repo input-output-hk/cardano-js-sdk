@@ -50,31 +50,6 @@ export const blockfrostWalletProvider = (blockfrost: BlockFrostAPI, logger = dum
     return BlockfrostToCore.blockToTip(block);
   };
 
-  const networkInfo: WalletProvider['networkInfo'] = async () => {
-    const currentEpoch = await blockfrost.epochsLatest();
-    const { stake, supply } = await blockfrost.network();
-    return {
-      currentEpoch: {
-        end: {
-          date: new Date(currentEpoch.end_time * 1000)
-        },
-        number: currentEpoch.epoch,
-        start: {
-          date: new Date(currentEpoch.start_time * 1000)
-        }
-      },
-      lovelaceSupply: {
-        circulating: BigInt(supply.circulating),
-        max: BigInt(supply.max),
-        total: BigInt(supply.total)
-      },
-      stake: {
-        active: BigInt(stake.active),
-        live: BigInt(stake.live)
-      }
-    };
-  };
-
   const stakePoolStats: WalletProvider['stakePoolStats'] = async () => {
     const tallyPools = async (
       query: 'pools' | 'poolsRetired' | 'poolsRetiring',
@@ -437,7 +412,6 @@ export const blockfrostWalletProvider = (blockfrost: BlockFrostAPI, logger = dum
     currentWalletProtocolParameters,
     genesisParameters,
     ledgerTip,
-    networkInfo,
     rewardAccountBalance: rewards,
     rewardsHistory,
     stakePoolStats,

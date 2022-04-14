@@ -1,14 +1,15 @@
+/* eslint-disable max-statements */
 import { Cardano } from '@cardano-sdk/core';
-import { SingleAddressWallet, StakeKeyStatus, Wallet } from '../../../src';
+import { SingleAddressWallet, StakeKeyStatus, Wallet, txInEquals } from '../../../src';
 import { TX_TIMEOUT, firstValueFromTimed, waitForWalletStateSettle } from '../../util';
 import { TxInternals } from '../../../src/Transaction';
 import {
   assetProvider,
   keyAgentByIdx,
+  networkInfoProvider,
   poolId1,
   poolId2,
   stakePoolSearchProvider,
-  timeSettingsProvider,
   txSubmitProvider,
   walletProvider
 } from '../config';
@@ -18,7 +19,7 @@ const getWalletStateSnapshot = (wallet: Wallet) => {
   const [rewardAccount] = wallet.delegation.rewardAccounts$.value!;
   return {
     balance: { available: wallet.balance.available$.value!, total: wallet.balance.total$.value! },
-    epoch: wallet.networkInfo$.value!.currentEpoch.number,
+    epoch: wallet.currentEpoch$.value!.epochNo,
     isStakeKeyRegistered: rewardAccount.keyStatus === StakeKeyStatus.Registered,
     rewardAccount,
     utxo: { available: wallet.utxo.total$.value!, total: wallet.utxo.available$.value! }
@@ -69,8 +70,8 @@ const getWallet = async (idx: number) =>
     {
       assetProvider: await assetProvider,
       keyAgent: await keyAgentByIdx(idx),
+      networkInfoProvider: await networkInfoProvider,
       stakePoolSearchProvider,
-      timeSettingsProvider,
       txSubmitProvider: await txSubmitProvider,
       walletProvider: await walletProvider
     }
@@ -97,6 +98,11 @@ describe('SingleAddressWallet/delegation', () => {
     const wallet2Balance = await firstValueFrom(wallet2.balance.available$);
     return wallet1Balance.coins > wallet2Balance.coins ? [wallet1, wallet2] : [wallet2, wallet1];
   };
+
+  test('delegation preconditions', () => {
+    expect(wallet1.addresses$.value![0].rewardAccount).toBeTruthy();
+    expect(wallet1.currentEpoch$.value!.epochNo).toBeGreaterThan(0);
+  });
 
   // eslint-disable-next-line max-statements
   test('balance & transaction', async () => {
@@ -135,10 +141,9 @@ describe('SingleAddressWallet/delegation', () => {
       initialState.balance.total.coins -
       Cardano.util.coalesceValueQuantities(
         tx1Internals.body.inputs.map(
-          (txInput) => initialState.utxo.total.find(([txIn]) => txIn.txId === txInput.txId)![1].value
+          (txInput) => initialState.utxo.total.find(([txIn]) => txInEquals(txIn, txInput))![1].value
         )
       ).coins;
-    // TODO: this sometimes fails with 1_000_000n available which is probably just 1 utxo
     expect(tx1PendingState.balance.available.coins).toBe(expectedCoinsWhileTxPending);
 
     await waitForTx(sourceWallet, tx1Internals);

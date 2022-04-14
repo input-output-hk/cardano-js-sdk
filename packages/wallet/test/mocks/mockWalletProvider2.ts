@@ -1,13 +1,11 @@
+/* eslint-disable jsdoc/require-returns-type */
 import { Cardano, EpochRewards } from '@cardano-sdk/core';
 import {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  WalletProviderStub,
   blocksByHashes,
+  currentEpoch,
   epochRewards,
   genesisParameters,
   ledgerTip,
-  networkInfo,
   protocolParameters,
   queryTransactionsResult,
   rewardAccount,
@@ -32,14 +30,7 @@ export const ledgerTip2 = {
   blockNo: ledgerTip.blockNo + 1
 };
 
-export const currentEpochNo2 = networkInfo.currentEpoch.number + 1;
-export const networkInfo2 = {
-  ...networkInfo,
-  currentEpoch: {
-    ...networkInfo.currentEpoch,
-    number: currentEpochNo2
-  }
-};
+export const currentEpochNo2 = currentEpoch.number + 1;
 
 export const queryTransactionsResult2 = [
   ...queryTransactionsResult,
@@ -78,7 +69,7 @@ export const delegationAndRewards2 = { delegate: delegate2, rewards: rewardAccou
 /**
  * A different provider stub for testing, supports delay to simulate network requests.
  *
- * @returns {WalletProviderStub} that returns data that is slightly different to mockWalletProvider.
+ * @returns WalletProvider that returns data that is slightly different to mockWalletProvider.
  */
 export const mockWalletProvider2 = (delayMs: number) => {
   const delayedJestFn = <T>(resolvedValue: T) =>
@@ -89,7 +80,6 @@ export const mockWalletProvider2 = (delayMs: number) => {
     currentWalletProtocolParameters: delayedJestFn(protocolParameters2),
     genesisParameters: delayedJestFn(genesisParameters2),
     ledgerTip: delayedJestFn(ledgerTip2),
-    networkInfo: delayedJestFn(networkInfo2),
     rewardAccountBalance: delayedJestFn(rewardAccountBalance2),
     rewardsHistory: delayedJestFn(rewardsHistory2),
     stakePoolStats: delayedJestFn(stakePoolStats2),

@@ -1,17 +1,19 @@
+/* eslint-disable no-console */
 import * as envalid from 'envalid';
 import {
   BlockFrostAPI,
   blockfrostAssetProvider,
+  blockfrostNetworkInfoProvider,
   blockfrostTxSubmitProvider,
   blockfrostWalletProvider
 } from '@cardano-sdk/blockfrost';
-import { Cardano, testnetTimeSettings } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
 import { CommunicationType, InMemoryKeyAgent, LedgerKeyAgent } from '../../src/KeyManagement';
 import { LogLevel, createLogger } from 'bunyan';
 import { Logger } from 'ts-log';
 import { URL } from 'url';
 import { createConnectionObject } from '@cardano-ogmios/client';
-import { createStubStakePoolSearchProvider, createStubTimeSettingsProvider } from '@cardano-sdk/util-dev';
+import { createStubStakePoolSearchProvider } from '@cardano-sdk/util-dev';
 import { memoize } from 'lodash-es';
 import { ogmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
 import { txSubmitHttpProvider } from '@cardano-sdk/cardano-services-client';
@@ -21,12 +23,16 @@ import waitOn from 'wait-on';
 const loggerMethodNames = ['debug', 'error', 'fatal', 'info', 'trace', 'warn'] as (keyof Logger)[];
 const networkIdOptions = [0, 1];
 const stakePoolSearchProviderOptions = ['stub'];
-const timeSettingsProviderOptions = ['stub_testnet'];
+const networkInfoProviderOptions = ['blockfrost'];
 const txSubmitProviderOptions = ['blockfrost', 'ogmios', 'http'];
 const walletProviderOptions = ['blockfrost'];
+const assetProviderOptions = ['blockfrost'];
+const keyAgentOptions = ['InMemory', 'Ledger'];
 
 const env = envalid.cleanEnv(process.env, {
+  ASSET_PROVIDER: envalid.str({ choices: assetProviderOptions }),
   BLOCKFROST_API_KEY: envalid.str(),
+  KEY_AGENT: envalid.str({ choices: keyAgentOptions }),
   LOGGER_MIN_SEVERITY: envalid.str({ choices: loggerMethodNames as string[], default: 'info' }),
   MNEMONIC_WORDS: envalid.makeValidator<string[]>((input) => {
     const words = input.split(' ');
@@ -34,11 +40,11 @@ const env = envalid.cleanEnv(process.env, {
     return words;
   })(),
   NETWORK_ID: envalid.num({ choices: networkIdOptions }),
+  NETWORK_INFO_PROVIDER: envalid.str({ choices: networkInfoProviderOptions }),
   OGMIOS_URL: envalid.url(),
   POOL_ID_1: envalid.str(),
   POOL_ID_2: envalid.str(),
   STAKE_POOL_SEARCH_PROVIDER: envalid.str({ choices: stakePoolSearchProviderOptions }),
-  TIME_SETTINGS_PROVIDER: envalid.str({ choices: timeSettingsProviderOptions }),
   TX_SUBMIT_HTTP_URL: envalid.url(),
   TX_SUBMIT_PROVIDER: envalid.str({ choices: txSubmitProviderOptions }),
   WALLET_PASSWORD: envalid.str(),
@@ -53,37 +59,41 @@ const logger = createLogger({
   name: 'wallet e2e tests'
 });
 
-const waitOnBlockfrost = (blockfrost: BlockFrostAPI) =>
-  waitOn({ resources: [blockfrost.apiUrl], validateStatus: (status) => status === 403 });
+// Sharing a single BlockFrostAPI object ensures rate limiting is shared across all blockfrost providers
+const blockfrostApi = [
+  env.WALLET_PASSWORD,
+  env.TX_SUBMIT_PROVIDER,
+  env.ASSET_PROVIDER,
+  env.NETWORK_INFO_PROVIDER
+].includes('blockfrost')
+  ? (async () => {
+      logger.debug('WalletProvider:blockfrost - Initializing');
+      const blockfrost = new BlockFrostAPI({ isTestnet, projectId: env.BLOCKFROST_API_KEY });
+      await waitOn({ resources: [blockfrost.apiUrl], validateStatus: (status) => status === 403 });
+      logger.debug('WalletProvider:blockfrost - Responding');
+      return blockfrost;
+    })()
+  : null;
 
 export const walletProvider = (async () => {
   if (env.WALLET_PROVIDER === 'blockfrost') {
-    logger.debug('WalletProvider:blockfrost - Initializing');
-    const blockfrost = new BlockFrostAPI({ isTestnet, projectId: env.BLOCKFROST_API_KEY });
-    await waitOnBlockfrost(blockfrost);
-    logger.debug('WalletProvider:blockfrost - Responding');
-    return blockfrostWalletProvider(blockfrost);
+    return blockfrostWalletProvider(await blockfrostApi!);
   }
   throw new Error(`WALLET_PROVIDER unsupported: ${env.WALLET_PROVIDER}`);
 })();
 
 export const assetProvider = (async () => {
-  const blockfrost = new BlockFrostAPI({ isTestnet, projectId: env.BLOCKFROST_API_KEY });
-  logger.debug('AssetProvider:blockfrost - Initializing');
-  await waitOnBlockfrost(blockfrost);
-  logger.debug('AssetProvider:blockfrost - Responding');
-  return blockfrostAssetProvider(blockfrost);
+  if (env.ASSET_PROVIDER === 'blockfrost') {
+    return blockfrostAssetProvider(await blockfrostApi!);
+  }
+  throw new Error(`NETWORK_INFO_PROVIDER unsupported: ${env.NETWORK_INFO_PROVIDER}`);
 })();
 
 export const txSubmitProvider = (async () => {
   const ogmiosUrl = new URL(env.OGMIOS_URL);
   switch (env.TX_SUBMIT_PROVIDER) {
     case 'blockfrost': {
-      logger.debug('TxSubmitProvider:blockfrost - Initializing');
-      const blockfrost = new BlockFrostAPI({ isTestnet, projectId: env.BLOCKFROST_API_KEY });
-      await waitOnBlockfrost(blockfrost);
-      logger.debug('TxSubmitProvider:blockfrost - Responding');
-      return blockfrostTxSubmitProvider(blockfrost);
+      return blockfrostTxSubmitProvider(await blockfrostApi!);
     }
     case 'ogmios': {
       logger.debug('TxSubmitProvider:ogmios - Initializing');
@@ -103,7 +113,7 @@ export const txSubmitProvider = (async () => {
     }
     case 'http': {
       logger.debug('TxSubmitProvider:http - Initializing');
-      const provider = await txSubmitHttpProvider({ url: env.TX_SUBMIT_HTTP_URL });
+      const provider = txSubmitHttpProvider(env.TX_SUBMIT_HTTP_URL);
       await waitOn({ resources: [`${env.TX_SUBMIT_HTTP_URL}/health`] });
       logger.debug('TxSubmitProvider:http - Responding');
       return provider;
@@ -116,7 +126,7 @@ export const txSubmitProvider = (async () => {
 
 let deviceConnection: DeviceConnection | null | undefined;
 export const keyAgentByIdx = memoize(async (accountIndex: number) => {
-  switch (process.env.KEY_AGENT) {
+  switch (env.KEY_AGENT) {
     case 'Ledger': {
       const ledgerKeyAgent = await LedgerKeyAgent.createWithDevice({
         accountIndex,
@@ -154,11 +164,11 @@ export const stakePoolSearchProvider = (() => {
   throw new Error(`STAKE_POOL_SEARCH_PROVIDER unsupported: ${env.STAKE_POOL_SEARCH_PROVIDER}`);
 })();
 
-export const timeSettingsProvider = (() => {
-  if (env.TIME_SETTINGS_PROVIDER === 'stub_testnet') {
-    return createStubTimeSettingsProvider(testnetTimeSettings);
+export const networkInfoProvider = (async () => {
+  if (env.NETWORK_INFO_PROVIDER === 'blockfrost') {
+    return blockfrostNetworkInfoProvider(await blockfrostApi!);
   }
-  throw new Error(`TIME_SETTINGS_PROVIDER unsupported: ${env.TIME_SETTINGS_PROVIDER}`);
+  throw new Error(`NETWORK_INFO_PROVIDER unsupported: ${env.NETWORK_INFO_PROVIDER}`);
 })();
 
 export const poolId1 = Cardano.PoolId(env.POOL_ID_1);

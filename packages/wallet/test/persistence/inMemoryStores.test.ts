@@ -9,7 +9,6 @@ import {
   InMemoryRewardsBalancesStore,
   InMemoryRewardsHistoryStore,
   InMemoryStakePoolsStore,
-  InMemoryTimeSettingsStore,
   InMemoryTipStore,
   InMemoryTransactionsStore,
   InMemoryUtxoStore
@@ -121,7 +120,6 @@ describe('inMemoryStores', () => {
     expect(new InMemoryTipStore()).toBeInstanceOf(InMemoryDocumentStore);
     expect(new InMemoryProtocolParametersStore()).toBeInstanceOf(InMemoryDocumentStore);
     expect(new InMemoryGenesisParametersStore()).toBeInstanceOf(InMemoryDocumentStore);
-    expect(new InMemoryTimeSettingsStore()).toBeInstanceOf(InMemoryDocumentStore);
     expect(new InMemoryNetworkInfoStore()).toBeInstanceOf(InMemoryDocumentStore);
     expect(new InMemoryAssetsStore()).toBeInstanceOf(InMemoryDocumentStore);
   });

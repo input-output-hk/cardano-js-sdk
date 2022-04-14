@@ -1,11 +1,5 @@
 import { Assets } from '../../types';
-import {
-  Cardano,
-  EpochRewards,
-  NetworkInfo,
-  ProtocolParametersRequiredByWallet,
-  TimeSettings
-} from '@cardano-sdk/core';
+import { Cardano, EpochRewards, NetworkInfo, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
 import { EMPTY, combineLatest, map } from 'rxjs';
 import { InMemoryCollectionStore } from './InMemoryCollectionStore';
 import { InMemoryDocumentStore } from './InMemoryDocumentStore';
@@ -15,7 +9,6 @@ import { WalletStores } from '../types';
 export class InMemoryTipStore extends InMemoryDocumentStore<Cardano.Tip> {}
 export class InMemoryProtocolParametersStore extends InMemoryDocumentStore<ProtocolParametersRequiredByWallet> {}
 export class InMemoryGenesisParametersStore extends InMemoryDocumentStore<Cardano.CompactGenesis> {}
-export class InMemoryTimeSettingsStore extends InMemoryDocumentStore<TimeSettings[]> {}
 export class InMemoryNetworkInfoStore extends InMemoryDocumentStore<NetworkInfo> {}
 export class InMemoryAssetsStore extends InMemoryDocumentStore<Assets> {}
 
@@ -39,7 +32,6 @@ export const createInMemoryWalletStores = (): WalletStores => ({
         this.rewardsBalances.destroy(),
         this.rewardsHistory.destroy(),
         this.stakePools.destroy(),
-        this.timeSettings.destroy(),
         this.tip.destroy(),
         this.transactions.destroy(),
         this.utxo.destroy()
@@ -54,7 +46,6 @@ export const createInMemoryWalletStores = (): WalletStores => ({
   rewardsBalances: new InMemoryRewardsBalancesStore(),
   rewardsHistory: new InMemoryRewardsHistoryStore(),
   stakePools: new InMemoryStakePoolsStore(),
-  timeSettings: new InMemoryTimeSettingsStore(),
   tip: new InMemoryTipStore(),
   transactions: new InMemoryTransactionsStore(),
   utxo: new InMemoryUtxoStore()

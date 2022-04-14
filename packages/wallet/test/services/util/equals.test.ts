@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, TimeSettings } from '@cardano-sdk/core';
 import {
   arrayEquals,
   deepEquals,
   shallowArrayEquals,
   strictEquals,
+  timeSettingsEquals,
   transactionsEquals,
   txEquals,
   utxoEquals
@@ -56,5 +57,10 @@ describe('equals', () => {
     expect(utxoEquals([[{ index: 0, txId: 'tx1' }]] as any, [[{ index: 0, txId: 'tx1' }]] as any)).toBe(true);
     expect(utxoEquals([[{ index: 0, txId: 'tx2' }]] as any, [[{ index: 0, txId: 'tx1' }]] as any)).toBe(false);
     expect(utxoEquals([[{ index: 1, txId: 'tx1' }]] as any, [[{ index: 0, txId: 'tx1' }]] as any)).toBe(false);
+  });
+
+  test('timeSettingsEquals compares fromSlotNo', () => {
+    expect(timeSettingsEquals([{ fromSlotNo: 1 } as TimeSettings], [{ fromSlotNo: 1 } as TimeSettings])).toBe(true);
+    expect(timeSettingsEquals([{ fromSlotNo: 1 } as TimeSettings], [{ fromSlotNo: 2 } as TimeSettings])).toBe(false);
   });
 });

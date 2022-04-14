@@ -1,18 +1,19 @@
 /* eslint-disable max-statements */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as mocks from '../mocks';
-import {
-  AssetId,
-  createStubStakePoolSearchProvider,
-  createStubTimeSettingsProvider,
-  somePartialStakePools
-} from '@cardano-sdk/util-dev';
+import { AssetId, createStubStakePoolSearchProvider, somePartialStakePools } from '@cardano-sdk/util-dev';
 import { Cardano, WalletProvider, testnetTimeSettings } from '@cardano-sdk/core';
 import { KeyManagement, SingleAddressWallet, Wallet } from '../../src';
 import { WalletStores, createInMemoryWalletStores } from '../../src/persistence';
+import {
+  currentEpoch,
+  mockNetworkInfoProvider,
+  networkInfo,
+  queryTransactionsResult,
+  queryTransactionsResult2
+} from '../mocks';
 import { firstValueFrom } from 'rxjs';
 import { flatten } from 'lodash-es';
-import { queryTransactionsResult, queryTransactionsResult2 } from '../mocks';
 import { waitForWalletStateSettle } from '../util';
 
 const name = 'Test Wallet';
@@ -24,7 +25,7 @@ const createWallet = async (stores: WalletStores, walletProvider: WalletProvider
   const txSubmitProvider = mocks.mockTxSubmitProvider();
   const assetProvider = mocks.mockAssetProvider();
   const stakePoolSearchProvider = createStubStakePoolSearchProvider();
-  const timeSettingsProvider = createStubTimeSettingsProvider(testnetTimeSettings);
+  const networkInfoProvider = mockNetworkInfoProvider();
   const groupedAddress: KeyManagement.GroupedAddress = {
     accountIndex: 0,
     address,
@@ -37,7 +38,7 @@ const createWallet = async (stores: WalletStores, walletProvider: WalletProvider
   keyAgent.knownAddresses.push(groupedAddress);
   return new SingleAddressWallet(
     { name },
-    { assetProvider, keyAgent, stakePoolSearchProvider, stores, timeSettingsProvider, txSubmitProvider, walletProvider }
+    { assetProvider, keyAgent, networkInfoProvider, stakePoolSearchProvider, stores, txSubmitProvider, walletProvider }
   );
 };
 
@@ -67,9 +68,8 @@ const assertWalletProperties = async (
   // tip$
   await firstValueFrom(wallet.tip$);
   expect(wallet.tip$.value).toEqual(mocks.ledgerTip);
-  // networkInfo$
-  await firstValueFrom(wallet.networkInfo$);
-  expect(wallet.networkInfo$.value?.currentEpoch).toEqual(mocks.currentEpoch);
+  // currentEpoch$
+  expect(wallet.currentEpoch$.value?.epochNo).toEqual(currentEpoch.number);
   // protocolParameters$
   await firstValueFrom(wallet.protocolParameters$);
   expect(wallet.protocolParameters$.value).toEqual(mocks.protocolParameters);
@@ -91,8 +91,8 @@ const assertWalletProperties = async (
   expect(addresses[0].rewardAccount).toEqual(rewardAccount);
   // assets$
   expect(await firstValueFrom(wallet.assets$)).toEqual(new Map([[AssetId.TSLA, mocks.asset]]));
-  // timeSettings$
-  expect(await firstValueFrom(wallet.timeSettings$)).toEqual(testnetTimeSettings);
+  // networkInfo$
+  expect(await firstValueFrom(wallet.networkInfo$)).toEqual(networkInfo);
   // inputAddressResolver
   expect(typeof wallet.util).toBe('object');
 };
@@ -106,7 +106,8 @@ const assertWalletProperties2 = async (wallet: Wallet) => {
   expect(wallet.balance.total$.value?.rewards).toBe(mocks.rewardAccountBalance2);
   expect(wallet.transactions.history.all$.value?.length).toEqual(queryTransactionsResult2.length);
   expect(wallet.tip$.value).toEqual(mocks.ledgerTip2);
-  expect(wallet.networkInfo$.value?.currentEpoch.number).toEqual(mocks.currentEpochNo2);
+  expect(wallet.networkInfo$.value?.network.timeSettings).toEqual(testnetTimeSettings);
+  expect(wallet.currentEpoch$.value?.epochNo).toEqual(currentEpoch.number);
   expect(wallet.protocolParameters$.value).toEqual(mocks.protocolParameters2);
   expect(wallet.genesisParameters$.value).toEqual(mocks.genesisParameters2);
   // delegation
