@@ -70,6 +70,7 @@ const fromSerializableObjectUnknown = (obj: unknown, getErrorPrototype: GetError
     if (docAsAny.__type === 'undefined') return undefined;
     if (docAsAny.__type === 'bigint') return BigInt(docAsAny.value);
     if (docAsAny.__type === 'Buffer') return Buffer.from(docAsAny.value, 'hex');
+    if (docAsAny.__type === 'Date') return new Date(docAsAny.value);
     if (docAsAny.__type === 'Map')
       return new Map(
         docAsAny.value.map((keyValues: unknown[]) =>
