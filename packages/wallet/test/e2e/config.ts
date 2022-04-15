@@ -145,7 +145,14 @@ export const keyAgentByIdx = async (accountIndex: number) => {
   }
 };
 
-export const keyAgentReady = (() => keyAgentByIdx(0))();
+export const keyAgentReady = (() => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const keyAgent = keyAgentByIdx(0) as any;
+  if (process.env.KEY_AGENT === 'Ledger' && keyAgent.deviceConnection) {
+    deviceConnection = keyAgent.deviceConnection;
+  }
+  return keyAgent;
+})();
 
 export const stakePoolSearchProvider = (() => {
   if (env.STAKE_POOL_SEARCH_PROVIDER === 'stub') {

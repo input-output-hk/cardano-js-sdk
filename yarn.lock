@@ -352,15 +352,16 @@
   resolved "https://registry.yarnpkg.com/@blockfrost/openapi/-/openapi-0.1.27.tgz#98b00ee1218c734d62e723639c39db62f27ffe4d"
   integrity sha512-lCGFPZ5D87lwhwP6nowJsVsJEaSFSAi87ORIF3RSakohilZRCgxOA5j5xFDA4mccUnfy1vbTc+CaQ8TKOQPaDA==
 
-"@cardano-foundation/ledgerjs-hw-app-cardano@4.0.0":
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/@cardano-foundation/ledgerjs-hw-app-cardano/-/ledgerjs-hw-app-cardano-4.0.0.tgz#d4532b23e2ccd652f94a469106933aad821a65e7"
-  integrity sha512-t2sNABSTJ6j/bWlUwS7Hxx+bkMbVH44UVjS9/lWOgTojeBh9M0xBxx1vwaS9KNb/YWqD0qYbOahCE+htAO1I1A==
+"@cardano-foundation/ledgerjs-hw-app-cardano@5.0.0":
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/@cardano-foundation/ledgerjs-hw-app-cardano/-/ledgerjs-hw-app-cardano-5.0.0.tgz#38d929abe7946a418d6c9788895a3114e6f7e293"
+  integrity sha512-7hGGG1WqDnNCizg//UGBljDyM3qT9/MFdfH8vrnR3M1EQ34PzKgkqWlrQe245EwzHEpvOb7d7hjWvtrK8psNdQ==
   dependencies:
     "@ledgerhq/hw-transport" "^5.12.0"
     "@types/ledgerhq__hw-transport" "^4.21.3"
     base-x "^3.0.5"
     bech32 "^1.1.4"
+    blake2 "^4.0.2"
     int64-buffer "^1.0.1"
 
 "@cardano-graphql/client-ts@^5.1.0-beta.1":
@@ -2151,6 +2152,13 @@ bl@^4.0.3:
     buffer "^5.5.0"
     inherits "^2.0.4"
     readable-stream "^3.4.0"
+
+blake2@^4.0.2:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/blake2/-/blake2-4.1.1.tgz#0c23524776ebbf76b3ffecb6fa73422a33f20526"
+  integrity sha512-HUmkY0MUDUVgejJVNrpNKAva8C4IWD/Rd862sdexoSibu86b6iu0gO0/RjovO2lM5+w6JqjIEmkuAgGhfHlnJw==
+  dependencies:
+    nan "^2.15.0"
 
 blake2b-wasm@^1.1.0:
   version "1.1.7"
@@ -5842,7 +5850,7 @@ mv@~2:
     ncp "~2.0.0"
     rimraf "~2.4.0"
 
-nan@^2.14.0, nan@^2.4.0:
+nan@^2.14.0, nan@^2.15.0, nan@^2.4.0:
   version "2.15.0"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.15.0.tgz#3f34a473ff18e15c1b5626b62903b5ad6e665fee"
   integrity sha512-8ZtvEnA2c5aYCZYd1cvgdnU6cqwixRoYg70xPLWUws5ORTa/lnw+u4amixRS/Ac5U5mQVgp9pnlSUnbNWFaWZQ==
