@@ -10,6 +10,69 @@ export const findLastEpoch = `
  LIMIT 1
 `;
 
+export const findPoolEpochRewards = `
+with epochs as (
+	select 
+		"no"
+	from epoch 
+	order by id desc
+),
+epoch_pool_rewards as (
+select 
+		e."no" as epoch_no,
+		coalesce(sum(es.amount),0) as total_amount
+	from epochs e
+	left join epoch_stake es on
+		es.epoch_no  = e."no" and 
+		es.pool_id = 1
+	group by e."no", es.pool_id
+	order by e."no" desc
+),
+total_stake_per_epoch as (
+select 
+	coalesce(sum(tx_out.value),0) as active_stake,
+	e."no" as epoch_no
+from  epochs e
+left join delegation d on 
+	d.active_epoch_no <= e."no" and 
+	d.pool_hash_id = $1
+left join tx_out on
+	d.addr_id = tx_out.stake_address_id
+LEFT JOIN tx_in ON 
+    tx_out.tx_id = tx_in.tx_out_id AND 
+    tx_out.index::smallint = tx_in.tx_out_index::smallint
+  LEFT JOIN tx as tx_in_tx ON 
+    tx_in_tx.id = tx_in.tx_in_id AND
+      tx_in_tx.valid_contract = TRUE
+  JOIN tx AS tx_out_tx ON
+    tx_out_tx.id = tx_out.tx_id AND
+      tx_out_tx.valid_contract = true
+ left join stake_deregistration sd on
+ 	sd.addr_id = d.addr_id and sd.epoch_no >= d.active_epoch_no
+  WHERE 
+    tx_in_tx.id IS null and sd.id is null
+  group by e."no"
+)
+select 
+	epr.epoch_no,
+	epr.total_amount as total_rewards,
+	(epr.total_amount * pu.margin) as operator_fees,
+	total_stake.active_stake,
+	(epr.total_amount - (epr.total_amount * pu.margin)/total_stake.active_stake) as member_roi
+from epoch_pool_rewards epr
+join total_stake_per_epoch total_stake on 
+	epr.epoch_no = total_stake.epoch_no
+JOIN pool_update pu
+        ON pu.id = (
+          SELECT id
+          FROM pool_update pu2
+          WHERE pu2.hash_id = 1 
+          	and pu2.active_epoch_no <= epr.epoch_no
+          ORDER BY id DESC
+          LIMIT 1
+        )
+`;
+
 export const findPools = `
 SELECT 
   ph.id,
@@ -374,6 +437,7 @@ const Queries = {
   POOLS_WITH_PLEDGE_MET,
   STATUS_QUERY,
   findLastEpoch,
+  findPoolEpochRewards,
   findPools,
   findPoolsData,
   findPoolsOwners,
