@@ -284,7 +284,7 @@ export const getIdentifierWhereClause = (
     Partial<Pick<Cardano.PoolParameters, 'id'> & Pick<Cardano.StakePoolMetadata, 'name' | 'ticker'>>
   >
 ) => {
-  const condition = ` ${identifier.condition} ` || ' or ';
+  const condition = ` ${identifier._condition} ` || ' or ';
   const names = [];
   const tickers = [];
   const ids = [];

@@ -6,7 +6,7 @@ export interface MultipleChoiceSearchFilter<T> {
   /**
    * Defaults to 'or'
    */
-  condition?: FilterCondition;
+  _condition?: FilterCondition;
   values: T[];
 }
 
