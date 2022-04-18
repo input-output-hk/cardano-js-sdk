@@ -1,14 +1,14 @@
 import { Cardano, WalletProvider } from '@cardano-sdk/core';
-import { CollectionStore } from '../persistence';
-import { Observable, combineLatest, map, switchMap } from 'rxjs';
+import { NEVER, Observable, combineLatest, concat, map, of, switchMap } from 'rxjs';
 import { PersistentCollectionTrackerSubject, TrackerSubject, coldObservableProvider, utxoEquals } from './util';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { TransactionalTracker } from './types';
+import { UtxoTracker } from './types';
+import { WalletStores } from '../persistence';
 
 export interface UtxoTrackerProps {
   walletProvider: WalletProvider;
   addresses$: Observable<Cardano.Address[]>;
-  store: CollectionStore<Cardano.Utxo>;
+  stores: Pick<WalletStores, 'utxo' | 'unspendableUtxo'>;
   transactionsInFlight$: Observable<Cardano.NewTxAlonzo[]>;
   tipBlockHeight$: Observable<number>;
   retryBackoffConfig: RetryBackoffConfig;
@@ -16,6 +16,7 @@ export interface UtxoTrackerProps {
 
 export interface UtxoTrackerInternals {
   utxoSource$?: PersistentCollectionTrackerSubject<Cardano.Utxo>;
+  unspendableUtxoSource$?: PersistentCollectionTrackerSubject<Cardano.Utxo>;
 }
 
 export const createUtxoProvider = (
@@ -36,33 +37,44 @@ export const createUtxoProvider = (
   );
 
 export const createUtxoTracker = (
-  { walletProvider, addresses$, store, transactionsInFlight$, retryBackoffConfig, tipBlockHeight$ }: UtxoTrackerProps,
+  { walletProvider, addresses$, stores, transactionsInFlight$, retryBackoffConfig, tipBlockHeight$ }: UtxoTrackerProps,
   {
     utxoSource$ = new PersistentCollectionTrackerSubject<Cardano.Utxo>(
       () => createUtxoProvider(walletProvider, addresses$, tipBlockHeight$, retryBackoffConfig),
-      store
+      stores.utxo
+    ),
+    unspendableUtxoSource$ = new PersistentCollectionTrackerSubject(
+      (stored) => (stored.length > 0 ? NEVER : concat(of([]), NEVER)),
+      stores.unspendableUtxo
     )
   }: UtxoTrackerInternals = {}
-): TransactionalTracker<Cardano.Utxo[]> => {
+): UtxoTracker => {
   const available$ = new TrackerSubject<Cardano.Utxo[]>(
-    combineLatest([utxoSource$, transactionsInFlight$]).pipe(
-      // filter to utxo that are not included in in-flight transactions
-      map(([utxo, transactionsInFlight]) =>
+    combineLatest([utxoSource$, transactionsInFlight$, unspendableUtxoSource$]).pipe(
+      // filter to utxo that are not included in in-flight transactions or unspendable
+      map(([utxo, transactionsInFlight, unspendableUtxo]) =>
         utxo.filter(
           ([utxoTxIn]) =>
             !transactionsInFlight.some(({ body: { inputs } }) =>
               inputs.some((input) => input.txId === utxoTxIn.txId && input.index === utxoTxIn.index)
+            ) &&
+            !unspendableUtxo.some(
+              ([unspendable]) => unspendable.txId === utxoTxIn.txId && unspendable.index === utxoTxIn.index
             )
         )
       )
     )
   );
+
   return {
     available$,
+    setUnspendable: unspendableUtxoSource$.next.bind(unspendableUtxoSource$),
     shutdown: () => {
       utxoSource$.complete();
       available$.complete();
+      unspendableUtxoSource$.complete();
     },
-    total$: utxoSource$
+    total$: utxoSource$,
+    unspendable$: unspendableUtxoSource$
   };
 };

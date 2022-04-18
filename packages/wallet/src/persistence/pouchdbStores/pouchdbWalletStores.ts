@@ -35,6 +35,7 @@ export const createPouchdbWalletStores = (walletName: string): WalletStores => {
           destroyDocumentsDb,
           this.transactions.destroy(),
           this.utxo.destroy(),
+          this.unspendableUtxo.destroy(),
           this.rewardsHistory.destroy(),
           this.stakePools.destroy(),
           this.rewardsBalances.destroy()
@@ -57,6 +58,7 @@ export const createPouchdbWalletStores = (walletName: string): WalletStores => {
        */
       (blockNo * 100_000 + index).toString()
     ),
+    unspendableUtxo: new PouchdbUtxoStore(`${baseDbName}UnspendableUtxo`),
     utxo: new PouchdbUtxoStore(`${baseDbName}Utxo`)
   };
 };

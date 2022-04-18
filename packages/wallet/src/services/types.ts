@@ -18,10 +18,15 @@ export interface Balance extends Cardano.Value {
 export interface TransactionalObservables<T> {
   total$: BehaviorObservable<T>;
   available$: BehaviorObservable<T>;
+  unspendable$: BehaviorObservable<T>;
 }
 
 export interface TransactionalTracker<T> extends TransactionalObservables<T> {
   shutdown(): void;
+}
+
+export interface UtxoTracker extends TransactionalTracker<Cardano.Utxo[]> {
+  setUnspendable(utxo: Cardano.Utxo[]): void;
 }
 
 export type Milliseconds = number;

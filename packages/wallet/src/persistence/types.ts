@@ -70,6 +70,7 @@ export interface KeyValueStore<K, V> extends Omit<CollectionStore<KeyValueCollec
 export interface WalletStores extends Destroyable {
   tip: DocumentStore<Cardano.Tip>;
   utxo: CollectionStore<Cardano.Utxo>;
+  unspendableUtxo: CollectionStore<Cardano.Utxo>;
   transactions: OrderedCollectionStore<Cardano.TxAlonzo>;
   rewardsHistory: KeyValueStore<Cardano.RewardAccount, EpochRewards[]>;
   rewardsBalances: KeyValueStore<Cardano.RewardAccount, Cardano.Lovelace>;
