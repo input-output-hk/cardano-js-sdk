@@ -49,9 +49,9 @@ export const createStubStakePoolSearchProvider = (
     return stakePools.filter(({ id, metadata }) =>
       filterValues.some(
         (value) =>
-          (value.id && id === value.id) ||
-          (value.name && metadata?.name === value.name) ||
-          (value.ticker && metadata?.ticker === value.ticker)
+          (value.id && id.includes(value.id as unknown as string)) ||
+          (value.name && metadata?.name.includes(value.name)) ||
+          (value.ticker && metadata?.ticker.includes(value.ticker))
       )
     );
   }

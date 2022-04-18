@@ -1,4 +1,4 @@
-import { StakePoolSearchProvider } from '@cardano-sdk/core';
+import { Cardano, StakePoolSearchProvider } from '@cardano-sdk/core';
 import { createStubStakePoolSearchProvider } from '../src/createStubStakePoolSearchProvider';
 
 describe('createStubStakePoolSearchProvider', () => {
@@ -13,19 +13,25 @@ describe('createStubStakePoolSearchProvider', () => {
       ] as any);
     });
     it('matches by id', async () => {
-      const stakePools = await provider.queryStakePools(['d-to-matc']);
+      const stakePools = await provider.queryStakePools({
+        filters: { identifier: { values: [{ id: 'd-to-matc' as unknown as Cardano.PoolId }] } }
+      });
       expect(stakePools).toHaveLength(1);
       expect(stakePools[0].id).toBe(ID_TO_MATCH);
     });
 
     it('matches by name', async () => {
-      const stakePools = await provider.queryStakePools(['ool1']);
+      const stakePools = await provider.queryStakePools({
+        filters: { identifier: { values: [{ name: 'ool1' }] } }
+      });
       expect(stakePools).toHaveLength(1);
       expect(stakePools[0].id).toBe(ID_TO_MATCH);
     });
 
     it('matches by ticker', async () => {
-      const stakePools = await provider.queryStakePools(['TIC']);
+      const stakePools = await provider.queryStakePools({
+        filters: { identifier: { values: [{ ticker: 'TIC' }] } }
+      });
       expect(stakePools).toHaveLength(1);
       expect(stakePools[0].id).toBe(ID_TO_MATCH);
     });
