@@ -45,7 +45,7 @@ describe('TrackedStakePoolSearchProvider', () => {
     test(
       'queryStakePools',
       testFunctionStats(
-        (provider) => provider.queryStakePools([]),
+        (provider) => provider.queryStakePools({}),
         (stats) => stats.queryStakePools$
       )
     );
