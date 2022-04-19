@@ -125,6 +125,22 @@ describe('StakePoolSearchHttpServer', () => {
           expect(responseWithPagination.stakePools.length).toEqual(2);
           expect(response.stakePools[0]).not.toEqual(responseWithPagination.stakePools[0]);
         });
+        it('should paginate rewards response', async () => {
+          const req = { pagination: { limit: 1, startAt: 1 } };
+          const reqWithRewardsPagination = { pagination: { limit: 1, startAt: 1 }, rewardsHistoryLimit: 0 };
+          const response = await doServerRequest(req);
+          const responseWithPagination = await doServerRequest(reqWithRewardsPagination);
+          expect(response.stakePools[0].epochRewards.length).toEqual(1);
+          expect(responseWithPagination.stakePools[0].epochRewards.length).toEqual(0);
+        });
+        it('should paginate rewards response with or condition', async () => {
+          const req = { filters: { _condition: 'or' }, pagination: { limit: 1, startAt: 1 } };
+          const reqWithRewardsPagination = { pagination: { limit: 1, startAt: 1 }, rewardsHistoryLimit: 0 };
+          const response = await doServerRequest(req);
+          const responseWithPagination = await doServerRequest(reqWithRewardsPagination);
+          expect(response.stakePools[0].epochRewards.length).toEqual(1);
+          expect(responseWithPagination.stakePools[0].epochRewards.length).toEqual(0);
+        });
       });
 
       describe('search pools by identifier filter', () => {

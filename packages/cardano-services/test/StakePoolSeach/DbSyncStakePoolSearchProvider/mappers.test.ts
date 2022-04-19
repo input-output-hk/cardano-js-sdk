@@ -1,7 +1,7 @@
 import { Cardano } from '@cardano-sdk/core';
 import {
   mapAddressOwner,
-  //   mapEpochReward,
+  mapEpochReward,
   mapPoolData,
   mapPoolRegistration,
   mapPoolRetirement,
@@ -70,6 +70,14 @@ describe('mappers', () => {
     update_id,
     vrf_key_hash: Buffer.from(vrfKeyHash, 'hex')
   };
+  const epochRewardModel = {
+    active_stake: '10000000',
+    epoch_length: 10_000_000,
+    epoch_no: 2,
+    member_roi: 0.000_000_05,
+    operator_fees: '233333333',
+    total_rewards: '99999'
+  };
   it('mapPoolRetirement', () => {
     expect(mapPoolRetirement(poolRetirementModel)).toEqual({
       hashId: poolRetirementModel.hash_id,
@@ -84,9 +92,6 @@ describe('mappers', () => {
       transactionId: Cardano.TransactionId(txHash)
     });
   });
-  //   it('mapEpochReward', async () => {
-  //     expect(mapEpochReward()).toBe(200);
-  //   });
   it('mapRelay', () => {
     expect(mapRelay(poolRelayByName)).toEqual({
       relay: { __typename: 'RelayByName', hostname: poolRelayByName.hostname, port: poolRelayByName.port },
@@ -101,7 +106,7 @@ describe('mappers', () => {
       updateId: update_id
     });
   });
-  it('mapPoolData', async () => {
+  it('mapPoolData', () => {
     expect(mapPoolData(poolDataModel)).toEqual({
       cost: BigInt(poolDataModel.fixed_cost),
       hashId: poolDataModel.hash_id,
@@ -119,16 +124,30 @@ describe('mappers', () => {
       vrfKeyHash: Cardano.VrfVkHex(vrfKeyHash)
     });
   });
-  it('mapPoolUpdate', async () => {
+  it('mapPoolUpdate', () => {
     expect(mapPoolUpdate(poolUpdateModel)).toEqual({
       id: poolUpdateModel.id,
       updateId: poolUpdateModel.update_id
     });
   });
-  it('mapAddressOwner', async () => {
+  it('mapAddressOwner', () => {
     expect(mapAddressOwner(addressOwnerModel)).toEqual({
       address: Cardano.RewardAccount(addressOwnerModel.address),
       hashId: addressOwnerModel.hash_id
+    });
+  });
+  it('mapEpochReward', () => {
+    const poolHashId = 1;
+    expect(mapEpochReward(epochRewardModel, poolHashId)).toEqual({
+      epochRewardModel: {
+        activeStake: BigInt(epochRewardModel.active_stake),
+        epoch: epochRewardModel.epoch_no,
+        epochLength: epochRewardModel.epoch_length,
+        memberROI: epochRewardModel.member_roi,
+        operatorFees: BigInt(epochRewardModel.operator_fees),
+        totalRewards: BigInt(epochRewardModel.total_rewards)
+      },
+      hashId: poolHashId
     });
   });
   describe('toCoreStakePool', () => {
@@ -166,7 +185,8 @@ describe('mappers', () => {
           poolOwners,
           poolRegistrations,
           poolRelays,
-          poolRetirements
+          poolRetirements,
+          poolRewards: []
         })
       ).toStrictEqual([stakePool]);
     });
@@ -178,7 +198,8 @@ describe('mappers', () => {
           poolOwners,
           poolRegistrations,
           poolRelays,
-          poolRetirements
+          poolRetirements,
+          poolRewards: []
         })
       ).toStrictEqual([{ ...stakePool, status: Cardano.StakePoolStatus.Retired }]);
     });
@@ -193,7 +214,8 @@ describe('mappers', () => {
           poolOwners,
           poolRegistrations,
           poolRelays,
-          poolRetirements: _retirements
+          poolRetirements: _retirements,
+          poolRewards: []
         })
       ).toEqual([
         {
@@ -217,7 +239,8 @@ describe('mappers', () => {
           poolOwners,
           poolRegistrations,
           poolRelays,
-          poolRetirements: _retirements
+          poolRetirements: _retirements,
+          poolRewards: []
         })
       ).toEqual([
         {

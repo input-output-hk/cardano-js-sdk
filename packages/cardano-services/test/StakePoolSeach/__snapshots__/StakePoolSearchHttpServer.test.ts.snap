@@ -8,7 +8,25 @@ Object {
         "__type": "bigint",
         "value": "340000000",
       },
-      "epochRewards": Array [],
+      "epochRewards": Array [
+        Object {
+          "activeStake": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "epoch": 175,
+          "epochLength": 431949000,
+          "memberROI": 0,
+          "operatorFees": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "totalRewards": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      ],
       "hexId": "961d329fba1807eef89db767ba405aec0c5426501c6b1df20f5c0995",
       "id": "pool1jcwn98a6rqr7a7yakanm5sz6asx9gfjsr343mus0tsye23wmg70",
       "margin": Object {
@@ -57,7 +75,25 @@ Object {
         "__type": "bigint",
         "value": "340000000",
       },
-      "epochRewards": Array [],
+      "epochRewards": Array [
+        Object {
+          "activeStake": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "epoch": 175,
+          "epochLength": 431949000,
+          "memberROI": 0,
+          "operatorFees": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "totalRewards": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      ],
       "hexId": "961d329fba1807eef89db767ba405aec0c5426501c6b1df20f5c0995",
       "id": "pool1jcwn98a6rqr7a7yakanm5sz6asx9gfjsr343mus0tsye23wmg70",
       "margin": Object {
@@ -99,7 +135,25 @@ Object {
         "__type": "bigint",
         "value": "4321000000",
       },
-      "epochRewards": Array [],
+      "epochRewards": Array [
+        Object {
+          "activeStake": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "epoch": 175,
+          "epochLength": 431949000,
+          "memberROI": 0,
+          "operatorFees": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "totalRewards": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      ],
       "hexId": "ff5b4952dd7734f07e4905dea64fa230fb75f7b2d603d154d9ff1d43",
       "id": "pool1lad5j5kawu60qljfqh02vnazxrahtaaj6cpaz4xeluw5xf023cg",
       "margin": Object {
@@ -140,7 +194,25 @@ Object {
         "__type": "bigint",
         "value": "400000000",
       },
-      "epochRewards": Array [],
+      "epochRewards": Array [
+        Object {
+          "activeStake": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "epoch": 175,
+          "epochLength": 431949000,
+          "memberROI": 0,
+          "operatorFees": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "totalRewards": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      ],
       "hexId": "5ee7591bf30eaa4f5dce70b4a676eb02d5be8012d188f04fe3beffb0",
       "id": "pool1tmn4jxlnp64y7hwwwz62vahtqt2maqqj6xy0qnlrhmlmq3u8q0e",
       "margin": Object {
@@ -181,7 +253,25 @@ Object {
         "__type": "bigint",
         "value": "340000000",
       },
-      "epochRewards": Array [],
+      "epochRewards": Array [
+        Object {
+          "activeStake": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "epoch": 175,
+          "epochLength": 431949000,
+          "memberROI": 0,
+          "operatorFees": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "totalRewards": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      ],
       "hexId": "5d99282bbb4840380bb98c075498ed1983aee18a4a0925b9b44d93f1",
       "id": "pool1tkvjs2amfpqrszae3sr4fx8drxp6acv2fgyjtwd5fkflzguqp96",
       "margin": Object {
@@ -221,137 +311,7 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchHttpServer healthy state /search search pools by pledge met search by pledge met on false 1`] = `
-Object {
-  "stakePools": Array [
-    Object {
-      "cost": Object {
-        "__type": "bigint",
-        "value": "345000000",
-      },
-      "epochRewards": Array [],
-      "hexId": "331e12b25988de55f70a56ee89c10f38f69dd006eb50894d3304702a",
-      "id": "pool1xv0p9vje3r09tac22mhgnsg08rmfm5qxadggjnfnq3cz52apdew",
-      "margin": Object {
-        "denominator": 100,
-        "numerator": 1,
-      },
-      "metadata": Object {
-        "description": "Testnet Only",
-        "homepage": "https://git.io/JWPBE",
-        "name": "July 2021",
-        "ticker": "JUL21",
-      },
-      "metadataJson": Object {
-        "hash": "d1b06cb907d081513e506471ce960934f859049808023d7176870e302a7c9989",
-        "url": "https://git.io/JWP02",
-      },
-      "metrics": Object {},
-      "owners": Array [
-        "stake_test1uq60lxlxsn9zd5h0acu6dyl7q5wnjwaep4t8x4lxh00t9jqjg39tv",
-      ],
-      "pledge": Object {
-        "__type": "bigint",
-        "value": "10000000000",
-      },
-      "relays": Array [],
-      "rewardAccount": "stake_test1uq60lxlxsn9zd5h0acu6dyl7q5wnjwaep4t8x4lxh00t9jqjg39tv",
-      "status": "retiring",
-      "transactions": Object {
-        "registration": Array [
-          "19251f57476d7af2777252270413c01383d9503110a68b4fde1a239c119c4f5d",
-        ],
-        "retirement": Array [
-          "face165bd7aa8d0d661cf1ceaa4e35d7611be3b1c7997da378c547aa2464a4fd",
-        ],
-      },
-      "vrf": "4ca2ca84f4a9696942f1c36345575dbdecc352eff37ec747b2349e48a9a182e8",
-    },
-    Object {
-      "cost": Object {
-        "__type": "bigint",
-        "value": "400000000",
-      },
-      "epochRewards": Array [],
-      "hexId": "5ee7591bf30eaa4f5dce70b4a676eb02d5be8012d188f04fe3beffb0",
-      "id": "pool1tmn4jxlnp64y7hwwwz62vahtqt2maqqj6xy0qnlrhmlmq3u8q0e",
-      "margin": Object {
-        "denominator": 10000,
-        "numerator": 1,
-      },
-      "metadata": Object {
-        "description": "Our Amsterdam Node",
-        "homepage": "https://twitter.com/A92Syed",
-        "name": "THE AMSTERDAM NODE",
-        "ticker": "AMS",
-      },
-      "metadataJson": Object {
-        "hash": "cc019105f084aef2a956b2f7f2c0bf4e747bf7696705312c244620089429df6f",
-        "url": "https://git.io/JJ1dz",
-      },
-      "metrics": Object {},
-      "owners": Array [
-        "stake_test1uz9y7juwzcyanva4x4fzpx7tft6ckntn6ulsjjd2k7a0pxgldmzp5",
-      ],
-      "pledge": Object {
-        "__type": "bigint",
-        "value": "500000000",
-      },
-      "relays": Array [],
-      "rewardAccount": "stake_test1uz9y7juwzcyanva4x4fzpx7tft6ckntn6ulsjjd2k7a0pxgldmzp5",
-      "status": "active",
-      "transactions": Object {
-        "registration": Array [
-          "0d3c928318f489a93b2ceba60f1998594f3626e4018ad19adf0a9615164b5469",
-        ],
-        "retirement": Array [],
-      },
-      "vrf": "83a817519ec34d3c637db8f9d46fcf6f7f9e826093d1b9a8158c89da4b47a801",
-    },
-    Object {
-      "cost": Object {
-        "__type": "bigint",
-        "value": "4321000000",
-      },
-      "epochRewards": Array [],
-      "hexId": "ff5b4952dd7734f07e4905dea64fa230fb75f7b2d603d154d9ff1d43",
-      "id": "pool1lad5j5kawu60qljfqh02vnazxrahtaaj6cpaz4xeluw5xf023cg",
-      "margin": Object {
-        "denominator": 25,
-        "numerator": 1,
-      },
-      "metadata": Object {
-        "description": "The pool that tests all the pools",
-        "homepage": "https://teststakepool.com",
-        "name": "TestPool",
-        "ticker": "TEST",
-      },
-      "metadataJson": Object {
-        "hash": "2412f77be9b650eff7b015455d15cea355e1782dda2e7d7b1cb34943eefac348",
-        "url": "https://git.io/JJyYy",
-      },
-      "metrics": Object {},
-      "owners": Array [
-        "stake_test1uzxvhl83q8ujv2yvpy6n2krvpdlqqx28h7e9vsk6re43h3c3kufy6",
-      ],
-      "pledge": Object {
-        "__type": "bigint",
-        "value": "70000000000",
-      },
-      "relays": Array [],
-      "rewardAccount": "stake_test1uzxvhl83q8ujv2yvpy6n2krvpdlqqx28h7e9vsk6re43h3c3kufy6",
-      "status": "active",
-      "transactions": Object {
-        "registration": Array [
-          "071b93a1a134389c22a1dc43fe747e43d23088448fed2b5ab22564cc0cb8bbc5",
-        ],
-        "retirement": Array [],
-      },
-      "vrf": "474a6d2a44b51add62d8f2fd8fe80abc722bf84478479b617ad05b39aaa84971",
-    },
-  ],
-}
-`;
+exports[`StakePoolSearchHttpServer healthy state /search search pools by pledge met search by pledge met on false 1`] = `Array []`;
 
 exports[`StakePoolSearchHttpServer healthy state /search search pools by status search by activating status 1`] = `
 Object {
@@ -367,7 +327,25 @@ Object {
         "__type": "bigint",
         "value": "340000000",
       },
-      "epochRewards": Array [],
+      "epochRewards": Array [
+        Object {
+          "activeStake": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "epoch": 175,
+          "epochLength": 431949000,
+          "memberROI": 0,
+          "operatorFees": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "totalRewards": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      ],
       "hexId": "5685f37bca393c683cf03e428280312c6c4ea485188672a2a0b3195c",
       "id": "pool126zlx7728y7xs08s8epg9qp393kyafy9rzr89g4qkvv4cv93zem",
       "margin": Object {
@@ -402,7 +380,25 @@ Object {
         "__type": "bigint",
         "value": "340000000",
       },
-      "epochRewards": Array [],
+      "epochRewards": Array [
+        Object {
+          "activeStake": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "epoch": 175,
+          "epochLength": 431949000,
+          "memberROI": 0,
+          "operatorFees": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "totalRewards": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      ],
       "hexId": "961d329fba1807eef89db767ba405aec0c5426501c6b1df20f5c0995",
       "id": "pool1jcwn98a6rqr7a7yakanm5sz6asx9gfjsr343mus0tsye23wmg70",
       "margin": Object {
@@ -444,7 +440,25 @@ Object {
         "__type": "bigint",
         "value": "4321000000",
       },
-      "epochRewards": Array [],
+      "epochRewards": Array [
+        Object {
+          "activeStake": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "epoch": 175,
+          "epochLength": 431949000,
+          "memberROI": 0,
+          "operatorFees": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "totalRewards": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      ],
       "hexId": "ff5b4952dd7734f07e4905dea64fa230fb75f7b2d603d154d9ff1d43",
       "id": "pool1lad5j5kawu60qljfqh02vnazxrahtaaj6cpaz4xeluw5xf023cg",
       "margin": Object {
@@ -485,7 +499,25 @@ Object {
         "__type": "bigint",
         "value": "400000000",
       },
-      "epochRewards": Array [],
+      "epochRewards": Array [
+        Object {
+          "activeStake": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "epoch": 175,
+          "epochLength": 431949000,
+          "memberROI": 0,
+          "operatorFees": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "totalRewards": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      ],
       "hexId": "5ee7591bf30eaa4f5dce70b4a676eb02d5be8012d188f04fe3beffb0",
       "id": "pool1tmn4jxlnp64y7hwwwz62vahtqt2maqqj6xy0qnlrhmlmq3u8q0e",
       "margin": Object {
@@ -526,7 +558,25 @@ Object {
         "__type": "bigint",
         "value": "340000000",
       },
-      "epochRewards": Array [],
+      "epochRewards": Array [
+        Object {
+          "activeStake": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "epoch": 175,
+          "epochLength": 431949000,
+          "memberROI": 0,
+          "operatorFees": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "totalRewards": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      ],
       "hexId": "d1da50fd3ffb523d6c324140a5902c56f5d7dcd5e5107b27b53e9aeb",
       "id": "pool168d9plflldfr6mpjg9q2typv2m6a0hx4u5g8kfa486dwkke2uj7",
       "margin": Object {
@@ -570,7 +620,25 @@ Object {
         "__type": "bigint",
         "value": "340000000",
       },
-      "epochRewards": Array [],
+      "epochRewards": Array [
+        Object {
+          "activeStake": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "epoch": 175,
+          "epochLength": 431949000,
+          "memberROI": 0,
+          "operatorFees": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "totalRewards": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      ],
       "hexId": "5d99282bbb4840380bb98c075498ed1983aee18a4a0925b9b44d93f1",
       "id": "pool1tkvjs2amfpqrszae3sr4fx8drxp6acv2fgyjtwd5fkflzguqp96",
       "margin": Object {
@@ -618,7 +686,25 @@ Object {
         "__type": "bigint",
         "value": "400000000",
       },
-      "epochRewards": Array [],
+      "epochRewards": Array [
+        Object {
+          "activeStake": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "epoch": 175,
+          "epochLength": 431949000,
+          "memberROI": 0,
+          "operatorFees": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "totalRewards": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      ],
       "hexId": "22a8dc80b6fb4852150960c2e3896fa0a03498f514afc474c33152b6",
       "id": "pool1y25deq9kldy9y9gfvrpw8zt05zsrfx84zjhugaxrx9ftvwdpua2",
       "margin": Object {
@@ -662,7 +748,25 @@ Object {
         "__type": "bigint",
         "value": "345000000",
       },
-      "epochRewards": Array [],
+      "epochRewards": Array [
+        Object {
+          "activeStake": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "epoch": 175,
+          "epochLength": 431949000,
+          "memberROI": 0,
+          "operatorFees": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "totalRewards": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      ],
       "hexId": "331e12b25988de55f70a56ee89c10f38f69dd006eb50894d3304702a",
       "id": "pool1xv0p9vje3r09tac22mhgnsg08rmfm5qxadggjnfnq3cz52apdew",
       "margin": Object {

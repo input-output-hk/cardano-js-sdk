@@ -149,7 +149,7 @@ export const poolsByPledgeMetSubqueries: readonly SubQuery[] = [
     sa.hash_raw = pu.reward_addr 
     JOIN delegation d2 ON
       d2.addr_id = sa.id AND
-      (d2.active_epoch_no <= (SELECT "no" FROM current_epoch)) AND
+      (d2.active_epoch_no = (SELECT "no" FROM current_epoch)) AND
       d2.pool_hash_id = ph.id`
   },
   {
