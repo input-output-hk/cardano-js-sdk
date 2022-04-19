@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import * as envalid from 'envalid';
 import {
   BlockFrostAPI,
@@ -13,6 +12,7 @@ import { Logger } from 'ts-log';
 import { URL } from 'url';
 import { createConnectionObject } from '@cardano-ogmios/client';
 import { createStubStakePoolSearchProvider, createStubTimeSettingsProvider } from '@cardano-sdk/util-dev';
+import { memoize } from 'lodash-es';
 import { ogmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
 import { txSubmitHttpProvider } from '@cardano-sdk/cardano-services-client';
 import DeviceConnection from '@cardano-foundation/ledgerjs-hw-app-cardano';
@@ -115,7 +115,7 @@ export const txSubmitProvider = (async () => {
 })();
 
 let deviceConnection: DeviceConnection | null | undefined;
-export const keyAgentByIdx = async (accountIndex: number) => {
+export const keyAgentByIdx = memoize(async (accountIndex: number) => {
   switch (process.env.KEY_AGENT) {
     case 'Ledger': {
       const ledgerKeyAgent = await LedgerKeyAgent.createWithDevice({
@@ -143,16 +143,9 @@ export const keyAgentByIdx = async (accountIndex: number) => {
       throw new Error(`KEY_AGENT unsupported: ${process.env.KEY_AGENT}`);
     }
   }
-};
+});
 
-export const keyAgentReady = (() => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const keyAgent = keyAgentByIdx(0) as any;
-  if (process.env.KEY_AGENT === 'Ledger' && keyAgent.deviceConnection) {
-    deviceConnection = keyAgent.deviceConnection;
-  }
-  return keyAgent;
-})();
+export const keyAgentReady = (() => keyAgentByIdx(0))();
 
 export const stakePoolSearchProvider = (() => {
   if (env.STAKE_POOL_SEARCH_PROVIDER === 'stub') {
