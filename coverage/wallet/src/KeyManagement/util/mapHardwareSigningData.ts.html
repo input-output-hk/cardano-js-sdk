@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">5.85% </span>
+                <span class="strong">5.8% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>14/239</span>
+                <span class='fraction'>14/241</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/90</span>
+                <span class='fraction'>0/92</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">5.88% </span>
+                <span class="strong">5.82% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>13/221</span>
+                <span class='fraction'>13/223</span>
             </div>
         
             
@@ -625,15 +625,12 @@
 <a name='L560'></a><a href='#L560'>560</a>
 <a name='L561'></a><a href='#L561'>561</a>
 <a name='L562'></a><a href='#L562'>562</a>
-<a name='L563'></a><a href='#L563'>563</a>
-<a name='L564'></a><a href='#L564'>564</a>
-<a name='L565'></a><a href='#L565'>565</a>
-<a name='L566'></a><a href='#L566'>566</a>
-<a name='L567'></a><a href='#L567'>567</a>
-<a name='L568'></a><a href='#L568'>568</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L563'></a><a href='#L563'>563</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">29x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -665,16 +662,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">29x</span>
 <span class="cline-any cline-yes">29x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -815,6 +802,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1207,6 +1197,7 @@ import {
   Certificate,
   CertificateType,
   HARDENED,
+  KeyPathStakeCredentialParams,
   PoolKey,
   PoolKeyType,
   PoolOwner,
@@ -1215,6 +1206,7 @@ import {
   PoolRewardAccountType,
   Relay,
   RelayType,
+  ScriptStakeCredentialParams,
   SignTransactionRequest,
   StakeCredentialParamsType,
   Token,
@@ -1249,16 +1241,6 @@ export interface LedgerCertificates {
 export interface LedgerMintBundle {
   mintAssetsGroup: AssetGroup[] | null;
   additionalWitnessPaths: BIP32Path[];
-}
-&nbsp;
-export interface KeyStakeCredentialParams {
-  type: StakeCredentialParamsType.KEY_PATH;
-  keyPath: BIP32Path;
-}
-&nbsp;
-export interface ScriptStakeCredentialParams {
-  type: StakeCredentialParamsType.SCRIPT_HASH;
-  scriptHash: string;
 }
 &nbsp;
 const sortTokensCanonically = <span class="fstat-no" title="function not covered" >(t</span>okens: Token[]) =&gt; {
@@ -1381,8 +1363,11 @@ const prepareLedgerOutputs = <span class="fstat-no" title="function not covered"
           },
           type: TxOutputDestinationType.THIRD_PARTY
         };
+    const outputDataHash = <span class="cstat-no" title="statement not covered" >output.data_hash();</span>
+    const datumHashHex = <span class="cstat-no" title="statement not covered" >outputDataHash ? Buffer.from(outputDataHash.to_bytes()).toString('hex') : null;</span>
     const outputRes = <span class="cstat-no" title="statement not covered" >{</span>
       amount: output.amount().coin().to_str(),
+      datumHashHex,
       destination,
       tokenBundle
     };
@@ -1415,10 +1400,10 @@ const prepareLedgerCertificates = <span class="fstat-no" title="function not cov
           }
         };
       } else <span class="cstat-no" title="statement not covered" ><span class="missing-if-branch" title="if path not taken" >I</span>if (credential &amp;&amp; credentialScriptHash) {</span>
-        const scriptHash = <span class="cstat-no" title="statement not covered" >Buffer.from(credentialScriptHash.to_bytes()).toString('hex');</span>
+        const scriptHashHex = <span class="cstat-no" title="statement not covered" >Buffer.from(credentialScriptHash.to_bytes()).toString('hex');</span>
 <span class="cstat-no" title="statement not covered" >        certificate.params = {</span>
           stakeCredential: {
-            scriptHash,
+            scriptHashHex,
             type: StakeCredentialParamsType.SCRIPT_HASH
           }
         };
@@ -1436,10 +1421,10 @@ const prepareLedgerCertificates = <span class="fstat-no" title="function not cov
           }
         };
       } else <span class="cstat-no" title="statement not covered" ><span class="missing-if-branch" title="if path not taken" >I</span>if (credential &amp;&amp; credentialScriptHash) {</span>
-        const scriptHash = <span class="cstat-no" title="statement not covered" >Buffer.from(credentialScriptHash.to_bytes()).toString('hex');</span>
+        const scriptHashHex = <span class="cstat-no" title="statement not covered" >Buffer.from(credentialScriptHash.to_bytes()).toString('hex');</span>
 <span class="cstat-no" title="statement not covered" >        certificate.params = {</span>
           stakeCredential: {
-            scriptHash,
+            scriptHashHex,
             type: StakeCredentialParamsType.SCRIPT_HASH
           }
         };
@@ -1458,10 +1443,10 @@ const prepareLedgerCertificates = <span class="fstat-no" title="function not cov
           }
         };
       } else <span class="cstat-no" title="statement not covered" ><span class="missing-if-branch" title="if path not taken" >I</span>if (credentialScriptHash) {</span>
-        const scriptHash = <span class="cstat-no" title="statement not covered" >Buffer.from(credentialScriptHash.to_bytes()).toString('hex');</span>
+        const scriptHashHex = <span class="cstat-no" title="statement not covered" >Buffer.from(credentialScriptHash.to_bytes()).toString('hex');</span>
 <span class="cstat-no" title="statement not covered" >        certificate.params = {</span>
           stakeCredential: {
-            scriptHash,
+            scriptHashHex,
             type: StakeCredentialParamsType.SCRIPT_HASH
           }
         };
@@ -1613,14 +1598,14 @@ const prepareLedgerWithdrawals = <span class="fstat-no" title="function not cove
     const paymentCredentials = <span class="cstat-no" title="statement not covered" >rewardAddress.payment_cred();</span>
     const paymentCredentialsScriptHash = <span class="cstat-no" title="statement not covered" >paymentCredentials.to_scripthash();</span>
 <span class="cstat-no" title="statement not covered" >    if (rewardAddress.payment_cred().kind() === 0) {</span>
-      const stakeCredential: KeyStakeCredentialParams = <span class="cstat-no" title="statement not covered" >{</span>
+      const stakeCredential: KeyPathStakeCredentialParams = <span class="cstat-no" title="statement not covered" >{</span>
         keyPath: rewardAccountKeyPath,
         type: StakeCredentialParamsType.KEY_PATH
       };
 <span class="cstat-no" title="statement not covered" >      withdrawal.stakeCredential = stakeCredential;</span>
     } else <span class="cstat-no" title="statement not covered" ><span class="missing-if-branch" title="if path not taken" >I</span>if (paymentCredentialsScriptHash) {</span>
       const stakeCredential: ScriptStakeCredentialParams = <span class="cstat-no" title="statement not covered" >{</span>
-        scriptHash: Buffer.from(paymentCredentialsScriptHash.to_bytes()).toString('hex'),
+        scriptHashHex: Buffer.from(paymentCredentialsScriptHash.to_bytes()).toString('hex'),
         type: StakeCredentialParamsType.SCRIPT_HASH
       };
 <span class="cstat-no" title="statement not covered" >      withdrawal.stakeCredential = stakeCredential;</span>
@@ -1771,7 +1756,7 @@ export const txToLedger = <span class="fstat-no" title="function not covered" >a
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at Thu Apr 14 2022 06:01:07 GMT+0000 (Coordinated Universal Time)
+                at Tue Apr 19 2022 08:57:45 GMT+0000 (Coordinated Universal Time)
             </div>
         <script src="../../../prettify.js"></script>
         <script>
