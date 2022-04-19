@@ -2,7 +2,8 @@
 import { Cardano, MultipleChoiceSearchFilter, StakePoolQueryOptions, StakePoolSearchProvider } from '@cardano-sdk/core';
 import {
   EpochModel,
-  // EpochRewardModel,
+  EpochReward,
+  EpochRewardModel,
   OwnerAddressModel,
   PoolDataModel,
   PoolRegistrationModel,
@@ -15,7 +16,7 @@ import { Logger, dummyLogger } from 'ts-log';
 import { Pool, QueryResult } from 'pg';
 import {
   mapAddressOwner,
-  // mapEpochReward,
+  mapEpochReward,
   mapPoolData,
   mapPoolRegistration,
   mapPoolRetirement,
@@ -65,34 +66,16 @@ export class DbSyncStakePoolSearchProvider implements StakePoolSearchProvider {
     const result: QueryResult<OwnerAddressModel> = await this.#db.query(Queries.findPoolsOwners, [hashesIds]);
     return result.rows.length > 0 ? result.rows.map(mapAddressOwner) : [];
   }
-  // private async queryPoolRewards(hashesIds: number[], limit?: number) {
-  //   const params: [number[] | number] = [hashesIds];
-  //   if (limit) params.push(limit);
-  //   // TODO: fetch necessary data to build Cardano.StakePoolEpochRewards
-  //   const result: QueryResult<EpochRewardModel> = await this.#db.query(
-  //     `
-  //     WITH pool_epoch_reward as (
-  //       SELECT
-  //         COUNT(r.amount) as total_rewards,
-  //         pool_id,
-  //         r.spendable_epoch as epoch
-  //       FROM reward r
-  //       WHERE pool_id IN $1
-  //       GROUP BY pool_id, spendable_epoch
-  //       ORDER BY spendable_epoch DESC
-  //       ${limit ? 'LIMIT = $2' : ''}
-  //     )
-  //     SELECT
-  //       per.*,
-  //       epoch.blk_count
-  //     FROM pool_epoch_reward per
-  //     JOIN epoch
-  //       ON epoch."no" = per.epoch;
-  //   `,
-  //     params
-  //   );
-  //   return result.rows.length > 0 ? result.rows.map(mapEpochReward) : [];
-  // }
+  private async queryPoolRewards(hashesIds: number[], limit?: number) {
+    return Promise.all(
+      hashesIds.map(async (hashId) => {
+        const result: QueryResult<EpochRewardModel> = await this.#db.query(Queries.findPoolEpochRewards(limit), [
+          hashId
+        ]);
+        return result.rows.length > 0 ? mapEpochReward(result.rows[0], hashId) : undefined;
+      })
+    );
+  }
   private async queryPoolData(updatesIds: number[]) {
     this.#logger.debug('About to query pool data');
     const result: QueryResult<PoolDataModel> = await this.#db.query(Queries.findPoolsData, [updatesIds]);
@@ -174,6 +157,7 @@ export class DbSyncStakePoolSearchProvider implements StakePoolSearchProvider {
   }
   private async buildAndQuery(filters: StakePoolQueryOptions['filters']) {
     let query = Queries.findPools;
+    let groupByClause = ' GROUP BY ph.id, pu.id ORDER BY ph.id DESC';
     const params = [];
     const whereClause = [];
     if (filters?.pledgeMet !== undefined) {
@@ -202,6 +186,7 @@ export class DbSyncStakePoolSearchProvider implements StakePoolSearchProvider {
         );
         whereClause.push(getStatusWhereClause(filters.status, { activeEpoch: 'ph.active_epoch_no' }));
       }
+      groupByClause = ' GROUP BY ph.id, ph.update_id ORDER BY ph.id DESC';
     } else if (filters?.status) {
       query = `${Queries.STATUS_QUERY.WITH_CLAUSE} ${Queries.STATUS_QUERY.SELECT_CLAUSE}`;
       whereClause.push(getStatusWhereClause(filters.status));
@@ -221,6 +206,7 @@ export class DbSyncStakePoolSearchProvider implements StakePoolSearchProvider {
       params.push(...identifierParams);
     }
     if (whereClause.length > 0) query = addSentenceToQuery(query, ` WHERE ${whereClause.join(' AND ')}`);
+    query = addSentenceToQuery(query, groupByClause);
     return { params, query };
   }
   public async queryStakePools(options?: StakePoolQueryOptions): Promise<Cardano.StakePool[]> {
@@ -233,23 +219,24 @@ export class DbSyncStakePoolSearchProvider implements StakePoolSearchProvider {
     const hashesIds = poolUpdates.map(({ id }) => id);
     this.#logger.debug(`${hashesIds.length} pools found`);
     const updatesIds = poolUpdates.map(({ updateId }) => updateId);
-    const [poolDatas, poolRelays, poolOwners, poolRegistrations, poolRetirements, lastEpoch] = await Promise.all([
-      this.queryPoolData(updatesIds),
-      this.queryPoolRelays(updatesIds),
-      this.queryPoolOwners(hashesIds),
-      this.queryRegistrations(hashesIds),
-      this.queryRetirements(hashesIds),
-      this.getLastEpoch()
-    ]);
-    // const rewards = await this.queryPoolRewards(hashesIds, options?.rewardsHistoryLimit);
-
+    const [poolDatas, poolRelays, poolOwners, poolRegistrations, poolRetirements, poolRewards, lastEpoch] =
+      await Promise.all([
+        this.queryPoolData(updatesIds),
+        this.queryPoolRelays(updatesIds),
+        this.queryPoolOwners(hashesIds),
+        this.queryRegistrations(hashesIds),
+        this.queryRetirements(hashesIds),
+        this.queryPoolRewards(hashesIds, options?.rewardsHistoryLimit),
+        this.getLastEpoch()
+      ]);
     return toCoreStakePool({
       lastEpoch,
       poolDatas,
       poolOwners,
       poolRegistrations,
       poolRelays,
-      poolRetirements
+      poolRetirements,
+      poolRewards: poolRewards.filter((pr) => !!pr) as EpochReward[]
     });
   }
 }

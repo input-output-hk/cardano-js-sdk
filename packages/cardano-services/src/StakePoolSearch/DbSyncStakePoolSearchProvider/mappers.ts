@@ -1,5 +1,6 @@
 import { Cardano } from '@cardano-sdk/core';
 import {
+  EpochReward,
   EpochRewardModel,
   OwnerAddressModel,
   PoolData,
@@ -37,6 +38,7 @@ interface ToCoreStakePoolInput {
   poolRegistrations: PoolRegistration[];
   poolRelays: PoolRelay[];
   poolRetirements: PoolRetirement[];
+  poolRewards: EpochReward[];
   lastEpoch: number;
 }
 
@@ -46,6 +48,7 @@ export const toCoreStakePool = ({
   poolRegistrations,
   poolRelays,
   poolRetirements,
+  poolRewards,
   lastEpoch
 }: ToCoreStakePoolInput): Cardano.StakePool[] =>
   poolDatas.map((poolData) => {
@@ -53,7 +56,7 @@ export const toCoreStakePool = ({
     const retirements = poolRetirements.filter((r) => r.hashId === poolData.hashId);
     const toReturn: Cardano.StakePool = {
       cost: poolData.cost,
-      epochRewards: [],
+      epochRewards: poolRewards.filter((r) => r.hashId === poolData.hashId).map((reward) => reward.epochReward),
       hexId: poolData.hexId,
       id: poolData.id,
       margin: poolData.margin,
@@ -132,11 +135,16 @@ export const mapRelay = (relayModel: RelayModel): PoolRelay => {
   return { relay, updateId: relayModel.update_id };
 };
 
-export const mapEpochReward = (epochRewardModel: EpochRewardModel) => ({
-  // TODO: build Cardano.StakePoolEpochRewards
-  epoch: epochRewardModel.epoch,
-  poolId: epochRewardModel.pool_id,
-  totalRewards: epochRewardModel.total_rewards
+export const mapEpochReward = (epochRewardModel: EpochRewardModel, hashId: number): EpochReward => ({
+  epochReward: {
+    activeStake: BigInt(epochRewardModel.active_stake),
+    epoch: epochRewardModel.epoch_no,
+    epochLength: epochRewardModel.epoch_length,
+    memberROI: epochRewardModel.member_roi,
+    operatorFees: BigInt(epochRewardModel.operator_fees),
+    totalRewards: BigInt(epochRewardModel.total_rewards)
+  },
+  hashId
 });
 
 export const mapAddressOwner = (ownerAddressModel: OwnerAddressModel): PoolOwner => ({

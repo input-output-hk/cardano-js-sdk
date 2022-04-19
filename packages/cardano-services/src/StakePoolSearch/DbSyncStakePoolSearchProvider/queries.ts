@@ -10,67 +10,58 @@ export const findLastEpoch = `
  LIMIT 1
 `;
 
-export const findPoolEpochRewards = `
-with epochs as (
-	select 
-		"no"
-	from epoch 
-	order by id desc
-),
-epoch_pool_rewards as (
-select 
-		e."no" as epoch_no,
-		coalesce(sum(es.amount),0) as total_amount
-	from epochs e
-	left join epoch_stake es on
-		es.epoch_no  = e."no" and 
-		es.pool_id = 1
-	group by e."no", es.pool_id
-	order by e."no" desc
+export const findPoolEpochRewards = (limit?: number) => `
+WITH epochs AS (
+	SELECT 
+		"no",
+		(extract(epoch from (end_time - start_time)) * 1000) as epoch_length
+	FROM epoch 
+	ORDER BY id DESC
+  ${limit !== undefined ? `LIMIT ${limit}` : ''}
 ),
 total_stake_per_epoch as (
-select 
-	coalesce(sum(tx_out.value),0) as active_stake,
-	e."no" as epoch_no
-from  epochs e
-left join delegation d on 
-	d.active_epoch_no <= e."no" and 
-	d.pool_hash_id = $1
-left join tx_out on
-	d.addr_id = tx_out.stake_address_id
-LEFT JOIN tx_in ON 
-    tx_out.tx_id = tx_in.tx_out_id AND 
-    tx_out.index::smallint = tx_in.tx_out_index::smallint
-  LEFT JOIN tx as tx_in_tx ON 
-    tx_in_tx.id = tx_in.tx_in_id AND
-      tx_in_tx.valid_contract = TRUE
-  JOIN tx AS tx_out_tx ON
-    tx_out_tx.id = tx_out.tx_id AND
-      tx_out_tx.valid_contract = true
- left join stake_deregistration sd on
- 	sd.addr_id = d.addr_id and sd.epoch_no >= d.active_epoch_no
-  WHERE 
-    tx_in_tx.id IS null and sd.id is null
+  SELECT 
+      e."no" as epoch_no,
+      sum(es.amount) as active_stake
+    from epochs e
+    left join epoch_stake es on
+      es.epoch_no  = e."no" and 
+      es.pool_id = $1
+    group by e."no"
+  ),
+  total_rewards_per_epoch as (
+  select 
+    sum(r.amount) as total_amount,
+    e."no" as epoch_no
+  from  epochs e
+  left join reward r on
+    r.earned_epoch = e."no" and 
+    r.pool_id = $1
   group by e."no"
-)
-select 
-	epr.epoch_no,
-	epr.total_amount as total_rewards,
-	(epr.total_amount * pu.margin) as operator_fees,
-	total_stake.active_stake,
-	(epr.total_amount - (epr.total_amount * pu.margin)/total_stake.active_stake) as member_roi
-from epoch_pool_rewards epr
-join total_stake_per_epoch total_stake on 
-	epr.epoch_no = total_stake.epoch_no
-JOIN pool_update pu
-        ON pu.id = (
-          SELECT id
-          FROM pool_update pu2
-          WHERE pu2.hash_id = 1 
-          	and pu2.active_epoch_no <= epr.epoch_no
-          ORDER BY id DESC
-          LIMIT 1
-        )
+  )
+  select 
+    r_e.epoch_no,
+    e.epoch_length,
+    COALESCE(r_e.total_amount,0) as total_rewards,
+    COALESCE (r_e.total_amount * pu.margin + pu.fixed_cost,0) as operator_fees,
+    COALESCE(total_stake.active_stake,0) as active_stake,
+    COALESCE((r_e.total_amount - ((r_e.total_amount * pu.margin) + pu.fixed_cost))
+      /total_stake.active_stake, 0) AS member_roi
+  from total_rewards_per_epoch r_e
+  join epochs e on 
+    e."no" = r_e.epoch_no
+  left join total_stake_per_epoch total_stake on 
+    r_e.epoch_no = total_stake.epoch_no
+  JOIN pool_update pu
+    ON pu.id = (
+      SELECT id
+      FROM pool_update pu2
+      WHERE pu2.hash_id = $1 
+        and pu2.active_epoch_no <= r_e.epoch_no
+      ORDER BY id DESC
+      LIMIT 1
+    )
+   order by r_e.epoch_no desc
 `;
 
 export const findPools = `
@@ -99,6 +90,7 @@ SELECT
 FROM pool_relay
 WHERE update_id = ANY($1)
 `;
+
 // TODO: probably this should be filtered by registration tx_id = last_update.registration_tx_id
 export const findPoolsOwners = `
 SELECT 
@@ -429,6 +421,7 @@ export const buildOrQueryFromClauses = (clauses: SubQuery[]) => {
     (${primarySubQueries.map((subQuery) => `SELECT id, update_id FROM ${subQuery.id.name}`).join(' UNION ')})
     AS pools
     GROUP BY id,update_id
+    ORDER BY id DESC
     `;
 };
 

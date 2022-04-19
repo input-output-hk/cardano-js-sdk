@@ -52,11 +52,19 @@ export interface RelayModel {
 export interface EpochModel {
   no: number;
 }
+
+export interface EpochReward {
+  hashId: number;
+  epochReward: Cardano.StakePoolEpochRewards;
+}
+
 export interface EpochRewardModel {
+  epoch_no: number;
+  epoch_length: number;
+  operator_fees: string;
+  active_stake: string;
+  member_roi: number;
   total_rewards: string;
-  pool_id: string;
-  epoch: number;
-  blk_count: number;
 }
 
 export interface OwnerAddressModel {
