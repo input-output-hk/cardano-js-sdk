@@ -8,6 +8,7 @@ import {
   Certificate,
   CertificateType,
   HARDENED,
+  KeyPathStakeCredentialParams,
   PoolKey,
   PoolKeyType,
   PoolOwner,
@@ -16,6 +17,7 @@ import {
   PoolRewardAccountType,
   Relay,
   RelayType,
+  ScriptStakeCredentialParams,
   SignTransactionRequest,
   StakeCredentialParamsType,
   Token,
@@ -50,16 +52,6 @@ export interface LedgerCertificates {
 export interface LedgerMintBundle {
   mintAssetsGroup: AssetGroup[] | null;
   additionalWitnessPaths: BIP32Path[];
-}
-
-export interface KeyStakeCredentialParams {
-  type: StakeCredentialParamsType.KEY_PATH;
-  keyPath: BIP32Path;
-}
-
-export interface ScriptStakeCredentialParams {
-  type: StakeCredentialParamsType.SCRIPT_HASH;
-  scriptHash: string;
 }
 
 const sortTokensCanonically = (tokens: Token[]) => {
@@ -182,8 +174,11 @@ const prepareLedgerOutputs = (
           },
           type: TxOutputDestinationType.THIRD_PARTY
         };
+    const outputDataHash = output.data_hash();
+    const datumHashHex = outputDataHash ? Buffer.from(outputDataHash.to_bytes()).toString('hex') : null;
     const outputRes = {
       amount: output.amount().coin().to_str(),
+      datumHashHex,
       destination,
       tokenBundle
     };
@@ -216,10 +211,10 @@ const prepareLedgerCertificates = (
           }
         };
       } else if (credential && credentialScriptHash) {
-        const scriptHash = Buffer.from(credentialScriptHash.to_bytes()).toString('hex');
+        const scriptHashHex = Buffer.from(credentialScriptHash.to_bytes()).toString('hex');
         certificate.params = {
           stakeCredential: {
-            scriptHash,
+            scriptHashHex,
             type: StakeCredentialParamsType.SCRIPT_HASH
           }
         };
@@ -237,10 +232,10 @@ const prepareLedgerCertificates = (
           }
         };
       } else if (credential && credentialScriptHash) {
-        const scriptHash = Buffer.from(credentialScriptHash.to_bytes()).toString('hex');
+        const scriptHashHex = Buffer.from(credentialScriptHash.to_bytes()).toString('hex');
         certificate.params = {
           stakeCredential: {
-            scriptHash,
+            scriptHashHex,
             type: StakeCredentialParamsType.SCRIPT_HASH
           }
         };
@@ -259,10 +254,10 @@ const prepareLedgerCertificates = (
           }
         };
       } else if (credentialScriptHash) {
-        const scriptHash = Buffer.from(credentialScriptHash.to_bytes()).toString('hex');
+        const scriptHashHex = Buffer.from(credentialScriptHash.to_bytes()).toString('hex');
         certificate.params = {
           stakeCredential: {
-            scriptHash,
+            scriptHashHex,
             type: StakeCredentialParamsType.SCRIPT_HASH
           }
         };
@@ -414,14 +409,14 @@ const prepareLedgerWithdrawals = (withdrawals: CSL.Withdrawals, rewardAccountKey
     const paymentCredentials = rewardAddress.payment_cred();
     const paymentCredentialsScriptHash = paymentCredentials.to_scripthash();
     if (rewardAddress.payment_cred().kind() === 0) {
-      const stakeCredential: KeyStakeCredentialParams = {
+      const stakeCredential: KeyPathStakeCredentialParams = {
         keyPath: rewardAccountKeyPath,
         type: StakeCredentialParamsType.KEY_PATH
       };
       withdrawal.stakeCredential = stakeCredential;
     } else if (paymentCredentialsScriptHash) {
       const stakeCredential: ScriptStakeCredentialParams = {
-        scriptHash: Buffer.from(paymentCredentialsScriptHash.to_bytes()).toString('hex'),
+        scriptHashHex: Buffer.from(paymentCredentialsScriptHash.to_bytes()).toString('hex'),
         type: StakeCredentialParamsType.SCRIPT_HASH
       };
       withdrawal.stakeCredential = stakeCredential;
