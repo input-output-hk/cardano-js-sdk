@@ -1,16 +1,23 @@
 /* eslint-disable sonarjs/no-nested-template-literals */
-import { Cardano, MultipleChoiceSearchFilter, StakePoolQueryOptions, StakePoolSearchProvider } from '@cardano-sdk/core';
+import {
+  Cardano,
+  MultipleChoiceSearchFilter,
+  StakePoolQueryOptions,
+  StakePoolSearchProvider,
+  util
+} from '@cardano-sdk/core';
 import {
   EpochModel,
-  EpochReward,
   EpochRewardModel,
   OwnerAddressModel,
   PoolDataModel,
+  PoolMetricsModel,
   PoolRegistrationModel,
   PoolRetirementModel,
   PoolUpdateModel,
   RelayModel,
-  SubQuery
+  SubQuery,
+  TotalAdaModel
 } from './types';
 import { Logger, dummyLogger } from 'ts-log';
 import { Pool, QueryResult } from 'pg';
@@ -18,6 +25,7 @@ import {
   mapAddressOwner,
   mapEpochReward,
   mapPoolData,
+  mapPoolMetrics,
   mapPoolRegistration,
   mapPoolRetirement,
   mapPoolUpdate,
@@ -61,9 +69,9 @@ export class DbSyncStakePoolSearchProvider implements StakePoolSearchProvider {
     const result: QueryResult<RelayModel> = await this.#db.query(Queries.findPoolsRelays, [updatesIds]);
     return result.rows.length > 0 ? result.rows.map(mapRelay) : [];
   }
-  private async queryPoolOwners(hashesIds: number[]) {
+  private async queryPoolOwners(updatesIds: number[]) {
     this.#logger.debug('About to query pool owners');
-    const result: QueryResult<OwnerAddressModel> = await this.#db.query(Queries.findPoolsOwners, [hashesIds]);
+    const result: QueryResult<OwnerAddressModel> = await this.#db.query(Queries.findPoolsOwners, [updatesIds]);
     return result.rows.length > 0 ? result.rows.map(mapAddressOwner) : [];
   }
   private async queryPoolRewards(hashesIds: number[], limit?: number) {
@@ -86,6 +94,14 @@ export class DbSyncStakePoolSearchProvider implements StakePoolSearchProvider {
     const queryWithPagination = withPagination(query, options?.pagination);
     const result: QueryResult<PoolUpdateModel> = await this.#db.query(queryWithPagination, params);
     return result.rows.length > 0 ? result.rows.map(mapPoolUpdate) : [];
+  }
+  private async queryPoolMetrics(hashesIds: number[], totalAdaAmount: string) {
+    this.#logger.debug('About to query pool data');
+    const result: QueryResult<PoolMetricsModel> = await this.#db.query(Queries.findPoolsMetrics, [
+      hashesIds,
+      totalAdaAmount
+    ]);
+    return result.rows.length > 0 ? result.rows.map(mapPoolMetrics) : [];
   }
   private buildPoolsByIdentifierQuery(
     identifier: MultipleChoiceSearchFilter<
@@ -125,6 +141,11 @@ export class DbSyncStakePoolSearchProvider implements StakePoolSearchProvider {
     this.#logger.debug('About to query last epoch');
     const result: QueryResult<EpochModel> = await this.#db.query(Queries.findLastEpoch);
     return result.rows[0].no;
+  }
+  private async getTotalAmountOfAda() {
+    this.#logger.debug('About to get total amount of ada');
+    const result: QueryResult<TotalAdaModel> = await this.#db.query(Queries.findTotalAda);
+    return result.rows[0].total_ada;
   }
   private async buildOrQuery(filters: StakePoolQueryOptions['filters']) {
     const subQueries: SubQuery[] = [];
@@ -219,7 +240,8 @@ export class DbSyncStakePoolSearchProvider implements StakePoolSearchProvider {
     const hashesIds = poolUpdates.map(({ id }) => id);
     this.#logger.debug(`${hashesIds.length} pools found`);
     const updatesIds = poolUpdates.map(({ updateId }) => updateId);
-    const [poolDatas, poolRelays, poolOwners, poolRegistrations, poolRetirements, poolRewards, lastEpoch] =
+    const totalAdaAmount = await this.getTotalAmountOfAda();
+    const [poolDatas, poolRelays, poolOwners, poolRegistrations, poolRetirements, poolRewards, lastEpoch, poolMetrics] =
       await Promise.all([
         this.queryPoolData(updatesIds),
         this.queryPoolRelays(updatesIds),
@@ -227,16 +249,18 @@ export class DbSyncStakePoolSearchProvider implements StakePoolSearchProvider {
         this.queryRegistrations(hashesIds),
         this.queryRetirements(hashesIds),
         this.queryPoolRewards(hashesIds, options?.rewardsHistoryLimit),
-        this.getLastEpoch()
+        this.getLastEpoch(),
+        this.queryPoolMetrics(hashesIds, totalAdaAmount)
       ]);
     return toCoreStakePool({
       lastEpoch,
       poolDatas,
+      poolMetrics,
       poolOwners,
       poolRegistrations,
       poolRelays,
       poolRetirements,
-      poolRewards: poolRewards.filter((pr) => !!pr) as EpochReward[]
+      poolRewards: poolRewards.filter(util.isNotNil)
     });
   }
 }

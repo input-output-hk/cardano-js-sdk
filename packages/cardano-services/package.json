@@ -16,7 +16,8 @@
   ],
   "license": "MPL-2.0",
   "scripts": {
-    "build": "tsc --build ./src",
+    "build": "tsc --build ./src && yarn copy-openApi",
+    "copy-openApi": "cp ./src/StakePoolSearch/openApi.json ./dist/StakePoolSearch/openApi.json && cp ./src/TxSubmit/openApi.json ./dist/TxSubmit/openApi.json",
     "tscNoEmit": "shx echo typescript --noEmit command not implemented yet",
     "cleanup": "shx rm -rf dist node_modules",
     "lint": "eslint --ignore-path ../../.eslintignore \"**/*.ts\"",
@@ -59,6 +60,7 @@
     "dotenv": "^16.0.0",
     "envalid": "^7.3.0",
     "express": "^4.17.3",
+    "express-openapi-validator": "^4.13.7",
     "express-prom-bundle": "^6.4.1",
     "fraction.js": "^4.2.0",
     "pg": "^8.7.3",

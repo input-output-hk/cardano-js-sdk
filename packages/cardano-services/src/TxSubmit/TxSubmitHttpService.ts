@@ -1,3 +1,4 @@
+import * as OpenApiValidator from 'express-openapi-validator';
 import { Cardano, ProviderError, ProviderFailure, TxSubmitProvider } from '@cardano-sdk/core';
 import { HttpServer, HttpService } from '../Http';
 import { Logger, dummyLogger } from 'ts-log';
@@ -5,6 +6,7 @@ import { ServiceNames } from '../Program';
 import { providerHandler } from '../util';
 import bodyParser from 'body-parser';
 import express from 'express';
+import path from 'path';
 
 export interface TxSubmitHttpServiceDependencies {
   logger?: Logger;
@@ -32,6 +34,15 @@ export class TxSubmitHttpService extends HttpService {
       throw new ProviderError(ProviderFailure.Unhealthy);
     }
     router.use(bodyParser.raw());
+    const apiSpec = path.join(__dirname, 'openApi.json');
+    router.use(
+      OpenApiValidator.middleware({
+        apiSpec,
+        ignoreUndocumented: true, // otherwhise /metrics endpoint should be included in spec
+        validateRequests: true,
+        validateResponses: true
+      })
+    );
     router.post(
       '/submit',
       providerHandler<[Uint8Array], void>(async ([tx], _, res) => {

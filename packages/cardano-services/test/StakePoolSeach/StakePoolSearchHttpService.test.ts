@@ -8,7 +8,7 @@ import { getPort } from 'get-port-please';
 import { stakePoolSearchHttpProvider } from '@cardano-sdk/cardano-services-client';
 import got from 'got';
 
-const BAD_REQUEST_STRING = 'Response code 400 (Bad Request)';
+const UNSUPPORTED_MEDIA_STRING = 'Response code 415 (Unsupported Media Type)';
 const APPLICATION_CBOR = 'application/cbor';
 const APPLICATION_JSON = 'application/json';
 
@@ -43,13 +43,6 @@ describe('StakePoolSearchHttpService', () => {
   afterEach(async () => {
     jest.resetAllMocks();
   });
-
-  const getStatusResponse = async (arg: unknown) => {
-    const response = await got.post(`${apiUrlBase}/search`, {
-      json: { args: [arg] }
-    });
-    return response.statusCode;
-  };
 
   const doServerRequest = (arg: unknown) =>
     got
@@ -93,15 +86,15 @@ describe('StakePoolSearchHttpService', () => {
         ).toEqual(200);
       });
 
-      it('returns a 400 coded response if the wrong content type header is used', async () => {
+      it('returns a 415 coded response if the wrong content type header is used', async () => {
         try {
           await got.post(`${apiUrlBase}/search`, {
             headers: { 'Content-Type': APPLICATION_CBOR }
           });
           throw new Error('fail');
         } catch (error: any) {
-          expect(error.response.statusCode).toBe(400);
-          expect(error.message).toBe(BAD_REQUEST_STRING);
+          expect(error.response.statusCode).toBe(415);
+          expect(error.message).toBe(UNSUPPORTED_MEDIA_STRING);
         }
       });
 
@@ -126,8 +119,6 @@ describe('StakePoolSearchHttpService', () => {
           const response = await provider.queryStakePools(options);
           expect(response).toHaveLength(2);
         });
-
-        it.todo('all response stakepool field types match core types');
       });
 
       describe('pagination', () => {
@@ -318,171 +309,161 @@ describe('StakePoolSearchHttpService', () => {
             ]
           }
         };
-        // TODO: the status code is only being checked in the following tests in order to just validate query errors.
-        // As an improve, the stake pools response could be validated too.
         describe('identifier & status filters', () => {
           it('active with or condition', async () => {
-            expect(
-              await getStatusResponse(addStatusFilter(setFilterCondition(req, 'or'), Cardano.StakePoolStatus.Active))
-            ).toEqual(200);
+            const response = await doServerRequest(
+              addStatusFilter(setFilterCondition(req, 'or'), Cardano.StakePoolStatus.Active)
+            );
+            expect(response).toMatchSnapshot();
           });
           it('active with and condition', async () => {
-            expect(await getStatusResponse(addStatusFilter(req, Cardano.StakePoolStatus.Active))).toEqual(200);
+            const response = await doServerRequest(addStatusFilter(req, Cardano.StakePoolStatus.Active));
+            expect(response).toMatchSnapshot();
           });
           it('activating with or condition', async () => {
-            expect(
-              await getStatusResponse(
-                addStatusFilter(setFilterCondition(req, 'or'), Cardano.StakePoolStatus.Activating)
-              )
-            ).toEqual(200);
+            const response = await doServerRequest(
+              addStatusFilter(setFilterCondition(req, 'or'), Cardano.StakePoolStatus.Activating)
+            );
+            expect(response).toMatchSnapshot();
           });
           it('activating with and condition', async () => {
-            expect(await getStatusResponse(addStatusFilter(req, Cardano.StakePoolStatus.Activating))).toEqual(200);
+            const response = await doServerRequest(addStatusFilter(req, Cardano.StakePoolStatus.Activating));
+            expect(response).toMatchSnapshot();
           });
           it('retired with or condition', async () => {
-            expect(
-              await getStatusResponse(addStatusFilter(setFilterCondition(req, 'or'), Cardano.StakePoolStatus.Retired))
-            ).toEqual(200);
+            const response = await doServerRequest(
+              addStatusFilter(setFilterCondition(req, 'or'), Cardano.StakePoolStatus.Retired)
+            );
+            expect(response).toMatchSnapshot();
           });
           it('retired with and condition', async () => {
-            expect(await getStatusResponse(addStatusFilter(req, Cardano.StakePoolStatus.Retired))).toEqual(200);
+            const response = await doServerRequest(addStatusFilter(req, Cardano.StakePoolStatus.Retired));
+            expect(response).toMatchSnapshot();
           });
           it('retiring with or condition', async () => {
-            expect(
-              await getStatusResponse(addStatusFilter(setFilterCondition(req, 'or'), Cardano.StakePoolStatus.Retiring))
-            ).toEqual(200);
+            const response = await doServerRequest(
+              addStatusFilter(setFilterCondition(req, 'or'), Cardano.StakePoolStatus.Retiring)
+            );
+            expect(response).toMatchSnapshot();
           });
           it('retiring with and condition', async () => {
-            expect(await getStatusResponse(addStatusFilter(req, Cardano.StakePoolStatus.Retiring))).toEqual(200);
+            const response = await doServerRequest(addStatusFilter(req, Cardano.StakePoolStatus.Retiring));
+            expect(response).toMatchSnapshot();
           });
         });
         describe('identifier & status  & pledgeMet filters', () => {
           it('pledgeMet true, active,  or condition', async () => {
-            expect(
-              await getStatusResponse(
-                addPledgeMetFilter(addStatusFilter(setFilterCondition(req, 'or'), Cardano.StakePoolStatus.Active), true)
-              )
-            ).toEqual(200);
+            const response = await doServerRequest(
+              addPledgeMetFilter(addStatusFilter(setFilterCondition(req, 'or'), Cardano.StakePoolStatus.Active), true)
+            );
+            expect(response).toMatchSnapshot();
           });
           it('pledgeMet false, active,  or condition', async () => {
-            expect(
-              await getStatusResponse(
-                addPledgeMetFilter(
-                  addStatusFilter(setFilterCondition(req, 'or'), Cardano.StakePoolStatus.Active),
-                  false
-                )
-              )
-            ).toEqual(200);
+            const response = await doServerRequest(
+              addPledgeMetFilter(addStatusFilter(setFilterCondition(req, 'or'), Cardano.StakePoolStatus.Active), false)
+            );
+            expect(response).toMatchSnapshot();
           });
           it('pledgeMet true, status active, and condition', async () => {
-            expect(
-              await getStatusResponse(addPledgeMetFilter(addStatusFilter(req, Cardano.StakePoolStatus.Active), true))
-            ).toEqual(200);
+            const response = await doServerRequest(
+              addPledgeMetFilter(addStatusFilter(req, Cardano.StakePoolStatus.Active), true)
+            );
+            expect(response).toMatchSnapshot();
           });
           it('pledgeMet false, status active, and condition', async () => {
-            expect(
-              await getStatusResponse(addPledgeMetFilter(addStatusFilter(req, Cardano.StakePoolStatus.Active), false))
-            ).toEqual(200);
+            const response = await doServerRequest(
+              addPledgeMetFilter(addStatusFilter(req, Cardano.StakePoolStatus.Active), false)
+            );
+            expect(response).toMatchSnapshot();
           });
           it('pledgeMet true, status activating, or condition', async () => {
-            expect(
-              await getStatusResponse(
-                addPledgeMetFilter(
-                  addStatusFilter(setFilterCondition(req, 'or'), Cardano.StakePoolStatus.Activating),
-                  true
-                )
+            const response = await doServerRequest(
+              addPledgeMetFilter(
+                addStatusFilter(setFilterCondition(req, 'or'), Cardano.StakePoolStatus.Activating),
+                true
               )
-            ).toEqual(200);
+            );
+            expect(response).toMatchSnapshot();
           });
           it('pledgeMet false, status activating, or condition', async () => {
-            expect(
-              await getStatusResponse(
-                addPledgeMetFilter(
-                  addStatusFilter(setFilterCondition(req, 'or'), Cardano.StakePoolStatus.Activating),
-                  false
-                )
+            const response = await doServerRequest(
+              addPledgeMetFilter(
+                addStatusFilter(setFilterCondition(req, 'or'), Cardano.StakePoolStatus.Activating),
+                false
               )
-            ).toEqual(200);
+            );
+            expect(response).toMatchSnapshot();
           });
           it('pledgeMet true, status activating, and condition', async () => {
-            expect(
-              await getStatusResponse(
-                addPledgeMetFilter(addStatusFilter(req, Cardano.StakePoolStatus.Activating), true)
-              )
-            ).toEqual(200);
+            const response = await doServerRequest(
+              addPledgeMetFilter(addStatusFilter(req, Cardano.StakePoolStatus.Activating), true)
+            );
+            expect(response).toMatchSnapshot();
           });
           it('pledgeMet false, status activating, and condition', async () => {
-            expect(
-              await getStatusResponse(
-                addPledgeMetFilter(addStatusFilter(req, Cardano.StakePoolStatus.Activating), false)
-              )
-            ).toEqual(200);
+            const response = await doServerRequest(
+              addPledgeMetFilter(addStatusFilter(req, Cardano.StakePoolStatus.Activating), false)
+            );
+            expect(response).toMatchSnapshot();
           });
           it('pledgeMet true, status retired, or condition', async () => {
-            expect(
-              await getStatusResponse(
-                addPledgeMetFilter(
-                  addStatusFilter(setFilterCondition(req, 'or'), Cardano.StakePoolStatus.Retired),
-                  true
-                )
-              )
-            ).toEqual(200);
+            const response = await doServerRequest(
+              addPledgeMetFilter(addStatusFilter(setFilterCondition(req, 'or'), Cardano.StakePoolStatus.Retired), true)
+            );
+            expect(response).toMatchSnapshot();
           });
           it('pledgeMet false, status retired, or condition', async () => {
-            expect(
-              await getStatusResponse(
-                addPledgeMetFilter(
-                  addStatusFilter(setFilterCondition(req, 'or'), Cardano.StakePoolStatus.Retired),
-                  false
-                )
-              )
-            ).toEqual(200);
+            const response = await doServerRequest(
+              addPledgeMetFilter(addStatusFilter(setFilterCondition(req, 'or'), Cardano.StakePoolStatus.Retired), false)
+            );
+            expect(response).toMatchSnapshot();
           });
           it('pledgeMet true, status retired, and condition', async () => {
-            expect(
-              await getStatusResponse(addPledgeMetFilter(addStatusFilter(req, Cardano.StakePoolStatus.Retired), true))
-            ).toEqual(200);
+            const response = await doServerRequest(
+              addPledgeMetFilter(addStatusFilter(req, Cardano.StakePoolStatus.Retired), true)
+            );
+            expect(response).toMatchSnapshot();
           });
           it('pledgeMet false, status retired, and condition', async () => {
-            expect(
-              await getStatusResponse(addPledgeMetFilter(addStatusFilter(req, Cardano.StakePoolStatus.Retired), false))
-            ).toEqual(200);
+            const response = await doServerRequest(
+              addPledgeMetFilter(addStatusFilter(req, Cardano.StakePoolStatus.Retired), false)
+            );
+            expect(response).toMatchSnapshot();
           });
           it('pledgeMet true, status retiring, or condition', async () => {
-            expect(
-              await getStatusResponse(
-                addPledgeMetFilter(
-                  addStatusFilter(setFilterCondition(req, 'or'), Cardano.StakePoolStatus.Retiring),
-                  true
-                )
-              )
-            ).toEqual(200);
+            const response = await doServerRequest(
+              addPledgeMetFilter(addStatusFilter(setFilterCondition(req, 'or'), Cardano.StakePoolStatus.Retiring), true)
+            );
+            expect(response).toMatchSnapshot();
           });
           it('pledgeMet false, status retiring, or condition', async () => {
-            expect(
-              await getStatusResponse(
-                addPledgeMetFilter(
-                  addStatusFilter(setFilterCondition(req, 'or'), Cardano.StakePoolStatus.Retiring),
-                  false
-                )
+            const response = await doServerRequest(
+              addPledgeMetFilter(
+                addStatusFilter(setFilterCondition(req, 'or'), Cardano.StakePoolStatus.Retiring),
+                false
               )
-            ).toEqual(200);
+            );
+            expect(response).toMatchSnapshot();
           });
           it('pledgeMet true, status retiring, and condition', async () => {
-            expect(
-              await getStatusResponse(addPledgeMetFilter(addStatusFilter(req, Cardano.StakePoolStatus.Retiring), true))
-            ).toEqual(200);
+            const response = await doServerRequest(
+              addPledgeMetFilter(addStatusFilter(req, Cardano.StakePoolStatus.Retiring), true)
+            );
+            expect(response).toMatchSnapshot();
           });
           it('pledgeMet false, status retiring, and condition', async () => {
-            expect(
-              await getStatusResponse(addPledgeMetFilter(addStatusFilter(req, Cardano.StakePoolStatus.Retiring), false))
-            ).toEqual(200);
+            const response = await doServerRequest(
+              addPledgeMetFilter(addStatusFilter(req, Cardano.StakePoolStatus.Retiring), false)
+            );
+            expect(response).toMatchSnapshot();
           });
           it('pledgeMet, multiple status, or condition', async () => {
-            expect(await getStatusResponse(reqWithMultipleFilters)).toEqual(200);
+            const response = await doServerRequest(reqWithMultipleFilters);
+            expect(response).toMatchSnapshot();
           });
           it('pledgeMet, multiple status, and condition', async () => {
-            expect(await getStatusResponse(setFilterCondition(reqWithMultipleFilters, 'and'))).toEqual(200);
+            const response = await doServerRequest(setFilterCondition(reqWithMultipleFilters, 'and'));
+            expect(response).toMatchSnapshot();
           });
         });
       });
