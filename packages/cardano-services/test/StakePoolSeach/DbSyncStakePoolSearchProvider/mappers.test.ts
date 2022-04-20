@@ -139,7 +139,7 @@ describe('mappers', () => {
   it('mapEpochReward', () => {
     const poolHashId = 1;
     expect(mapEpochReward(epochRewardModel, poolHashId)).toEqual({
-      epochRewardModel: {
+      epochReward: {
         activeStake: BigInt(epochRewardModel.active_stake),
         epoch: epochRewardModel.epoch_no,
         epochLength: epochRewardModel.epoch_length,

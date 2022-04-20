@@ -21,10 +21,6 @@ export interface StakePoolSearchServerConfig extends HttpServerConfig {
   };
 }
 
-export interface StakePoolSearchResponse {
-  stakePools: Cardano.StakePool[];
-}
-
 export class StakePoolSearchHttpServer extends HttpServer {
   private constructor(config: StakePoolSearchServerConfig, httpServerDependencies: HttpServerDependencies) {
     super({ listen: config.listen, name: 'StakePoolSearchServer' }, httpServerDependencies);
@@ -37,17 +33,17 @@ export class StakePoolSearchHttpServer extends HttpServer {
     router.use(bodyParser.json({ limit: config.bodyParser?.limit || '500kB', type: 'application/json' }));
     router.post(
       '/search',
+      // TODO: update providerHandler to set body type on res based on provider method type that comes in generic param
       providerHandler<StakePoolQueryOptions>(async ([stakePoolOptions], req, res) => {
         logger.debug('/search', { ip: req.ip });
-        let body: Error['message'] | StakePoolSearchResponse;
+        let body: Error['message'] | Cardano.StakePool[];
         const { valid, errors } = isValidStakePoolOptions(stakePoolOptions);
         if (!valid) {
           res.statusCode = 400;
           body = JSON.stringify(errors);
         } else {
           try {
-            const response = await stakePoolSearchProvider.queryStakePools(stakePoolOptions);
-            body = { stakePools: response };
+            body = await stakePoolSearchProvider.queryStakePools(stakePoolOptions);
           } catch (error) {
             res.statusCode = 500;
             body = JSON.stringify(

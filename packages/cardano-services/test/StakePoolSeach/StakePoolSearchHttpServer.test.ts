@@ -1,15 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-len */
 // import { Cardano, ProviderError, ProviderFailure } from '@cardano-sdk/core';
-import { Cardano, StakePoolQueryOptions } from '@cardano-sdk/core';
-import {
-  DbSyncStakePoolSearchProvider,
-  StakePoolSearchHttpServer,
-  StakePoolSearchResponse,
-  StakePoolSearchServerConfig
-} from '../../src';
+import { Cardano, StakePoolQueryOptions, StakePoolSearchProvider } from '@cardano-sdk/core';
+import { DbSyncStakePoolSearchProvider, StakePoolSearchHttpServer, StakePoolSearchServerConfig } from '../../src';
 import { Pool } from 'pg';
 import { getPort } from 'get-port-please';
+import { stakePoolSearchHttpProvider } from '@cardano-sdk/cardano-services-client';
 import got from 'got';
 
 const BAD_REQUEST_STRING = 'Response code 400 (Bad Request)';
@@ -58,7 +54,7 @@ describe('StakePoolSearchHttpServer', () => {
       .post(`${apiUrlBase}/search`, {
         json: { args: [arg] }
       })
-      .json() as Promise<StakePoolSearchResponse>;
+      .json() as Promise<Cardano.StakePool[]>;
 
   describe('healthy state', () => {
     beforeAll(async () => {
@@ -106,40 +102,64 @@ describe('StakePoolSearchHttpServer', () => {
         }
       });
 
+      describe('with StakePoolSearchHttpProvider', () => {
+        let provider: StakePoolSearchProvider;
+        beforeEach(() => {
+          provider = stakePoolSearchHttpProvider(apiUrlBase);
+        });
+
+        it('response conforms to core types', async () => {
+          const options: StakePoolQueryOptions = {
+            filters: {
+              identifier: {
+                _condition: 'or',
+                values: [
+                  { name: 'banderini' },
+                  { id: Cardano.PoolId('pool1jcwn98a6rqr7a7yakanm5sz6asx9gfjsr343mus0tsye23wmg70') }
+                ]
+              }
+            }
+          };
+          const response = await provider.queryStakePools(options);
+          expect(response).toHaveLength(2);
+          // TODO: assert types of properties of a stake pool
+        });
+      });
+
       describe('pagination', () => {
         it('should paginate response', async () => {
           const req = {};
           const reqWithPagination = { pagination: { limit: 2, startAt: 1 } };
           const response = await doServerRequest(req);
           const responseWithPagination = await doServerRequest(reqWithPagination);
-          expect(response.stakePools.length).toEqual(8);
-          expect(responseWithPagination.stakePools.length).toEqual(2);
-          expect(response.stakePools[0]).not.toEqual(responseWithPagination.stakePools[0]);
+          expect(response.length).toEqual(8);
+          expect(responseWithPagination.length).toEqual(2);
+          expect(response[0]).not.toEqual(responseWithPagination[0]);
         });
         it('should paginate response with or condition', async () => {
           const req = { filters: { _condition: 'or' } };
           const reqWithPagination = { ...req, pagination: { limit: 2, startAt: 1 } };
           const response = await doServerRequest(req);
           const responseWithPagination = await doServerRequest(reqWithPagination);
-          expect(response.stakePools.length).toEqual(8);
-          expect(responseWithPagination.stakePools.length).toEqual(2);
-          expect(response.stakePools[0]).not.toEqual(responseWithPagination.stakePools[0]);
+          expect(response.length).toEqual(8);
+          expect(responseWithPagination.length).toEqual(2);
+          expect(response[0]).not.toEqual(responseWithPagination[0]);
         });
         it('should paginate rewards response', async () => {
           const req = { pagination: { limit: 1, startAt: 1 } };
           const reqWithRewardsPagination = { pagination: { limit: 1, startAt: 1 }, rewardsHistoryLimit: 0 };
           const response = await doServerRequest(req);
           const responseWithPagination = await doServerRequest(reqWithRewardsPagination);
-          expect(response.stakePools[0].epochRewards.length).toEqual(1);
-          expect(responseWithPagination.stakePools[0].epochRewards.length).toEqual(0);
+          expect(response[0].epochRewards.length).toEqual(1);
+          expect(responseWithPagination[0].epochRewards.length).toEqual(0);
         });
         it('should paginate rewards response with or condition', async () => {
           const req = { filters: { _condition: 'or' }, pagination: { limit: 1, startAt: 1 } };
           const reqWithRewardsPagination = { pagination: { limit: 1, startAt: 1 }, rewardsHistoryLimit: 0 };
           const response = await doServerRequest(req);
           const responseWithPagination = await doServerRequest(reqWithRewardsPagination);
-          expect(response.stakePools[0].epochRewards.length).toEqual(1);
-          expect(responseWithPagination.stakePools[0].epochRewards.length).toEqual(0);
+          expect(response[0].epochRewards.length).toEqual(1);
+          expect(responseWithPagination[0].epochRewards.length).toEqual(0);
         });
       });
 
@@ -192,7 +212,7 @@ describe('StakePoolSearchHttpServer', () => {
             }
           };
           const response = await doServerRequest(req);
-          expect(response).toEqual({ stakePools: [] });
+          expect(response).toEqual([]);
         });
       });
       describe('search pools by status', () => {
