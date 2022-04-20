@@ -1,5 +1,12 @@
 import { Asset, Cardano, NetworkInfo, ProtocolParametersRequiredByWallet, TimeSettings } from '@cardano-sdk/core';
-import { Balance, BehaviorObservable, DelegationTracker, TransactionalTracker, TransactionsTracker } from './services';
+import {
+  Balance,
+  BehaviorObservable,
+  DelegationTracker,
+  TransactionalTracker,
+  TransactionsTracker,
+  WalletUtil
+} from './services';
 import { Cip30DataSignature } from '@cardano-sdk/cip30';
 import { Cip30SignDataRequest } from './KeyManagement/cip8';
 import { GroupedAddress } from './KeyManagement';
@@ -23,11 +30,12 @@ export interface FinalizeTxProps {
 
 export type Assets = Map<Cardano.AssetId, Asset.AssetInfo>;
 
-export interface MinimumCoinQuantity {
+export interface OutputValidation {
   minimumCoin: Cardano.Lovelace;
   coinMissing: Cardano.Lovelace;
+  tokenBundleSizeExceedsLimit: boolean;
 }
-export type MinimumCoinQuantityPerOutput = Map<Cardano.TxOut, MinimumCoinQuantity>;
+export type MinimumCoinQuantityPerOutput = Map<Cardano.TxOut, OutputValidation>;
 
 export interface InitializeTxPropsValidationResult {
   minimumCoinQuantities: MinimumCoinQuantityPerOutput;
@@ -75,10 +83,7 @@ export interface Wallet {
   readonly addresses$: BehaviorObservable<GroupedAddress[]>;
   readonly assets$: BehaviorObservable<Assets>;
   readonly syncStatus: SyncStatus;
-  /**
-   * Compute minimum coin quantity for each transaction output
-   */
-  validateInitializeTxProps(props: InitializeTxProps): Promise<InitializeTxPropsValidationResult>;
+  readonly util: WalletUtil;
   /**
    * @throws InputSelectionError
    */

@@ -83,7 +83,7 @@ describe('InMemoryKeyAgent', () => {
       { index: 0, role: 2 }
     ]);
     const body = {} as unknown as Cardano.TxBodyAlonzo;
-    const inputAddressResolver = {} as KeyManagement.InputAddressResolver;
+    const inputAddressResolver = {} as KeyManagement.ResolveInputAddress;
     const options = { inputAddressResolver } as KeyManagement.SignTransactionOptions;
     const witnessSet = await keyAgent.signTransaction(
       {

@@ -198,7 +198,7 @@ export const createWalletApi = (
             body: coreTx,
             hash
           },
-          { inputAddressResolver: wallet.inputAddressResolver }
+          { inputAddressResolver: wallet.util.resolveInputAddress }
         );
 
         const cslWitnessSet = coreToCsl.witnessSet(witnessSet);

@@ -94,7 +94,7 @@ const assertWalletProperties = async (
   // timeSettings$
   expect(await firstValueFrom(wallet.timeSettings$)).toEqual(testnetTimeSettings);
   // inputAddressResolver
-  expect(typeof wallet.inputAddressResolver).toBe('function');
+  expect(typeof wallet.util).toBe('object');
 };
 
 const assertWalletProperties2 = async (wallet: Wallet) => {

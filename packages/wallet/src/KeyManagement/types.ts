@@ -89,10 +89,14 @@ export type TransportType = TransportWebHID | TransportNodeHid;
  */
 export type GetPassword = (noCache?: true) => Promise<Uint8Array>;
 
-export type InputAddressResolver = (txIn: Cardano.NewTxIn) => Cardano.Address | null;
+/**
+ * @param txIn transaction input to resolve address from
+ * @returns input owner address
+ */
+export type ResolveInputAddress = (txIn: Cardano.NewTxIn) => Cardano.Address | null;
 
 export interface SignTransactionOptions {
-  inputAddressResolver: InputAddressResolver;
+  inputAddressResolver: ResolveInputAddress;
   additionalKeyPaths?: AccountKeyDerivationPath[];
 }
 

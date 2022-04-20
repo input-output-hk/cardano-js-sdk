@@ -1,13 +1,6 @@
-import {
-  AddressType,
-  GroupedAddress,
-  InputAddressResolver,
-  KeyAgent,
-  util as keyManagementUtil
-} from './KeyManagement';
+import { AddressType, GroupedAddress, KeyAgent, util as keyManagementUtil } from './KeyManagement';
 import {
   AssetProvider,
-  BigIntMath,
   Cardano,
   NetworkInfo,
   ProtocolParametersRequiredByWallet,
@@ -18,16 +11,7 @@ import {
   WalletProvider,
   coreToCsl
 } from '@cardano-sdk/core';
-import {
-  Assets,
-  InitializeTxProps,
-  InitializeTxPropsValidationResult,
-  InitializeTxResult,
-  MinimumCoinQuantity,
-  SignDataProps,
-  SyncStatus,
-  Wallet
-} from './types';
+import { Assets, InitializeTxProps, InitializeTxResult, SignDataProps, SyncStatus, Wallet } from './types';
 import {
   Balance,
   BehaviorObservable,
@@ -45,6 +29,7 @@ import {
   TransactionFailure,
   TransactionalTracker,
   TransactionsTracker,
+  WalletUtil,
   coldObservableProvider,
   createAssetsTracker,
   createBalanceTracker,
@@ -53,19 +38,14 @@ import {
   createProviderStatusTracker,
   createTransactionsTracker,
   createUtxoTracker,
+  createWalletUtil,
   distinctBlock,
-  distinctEpoch,
-  txInEquals
+  distinctEpoch
 } from './services';
 import { Cip30DataSignature } from '@cardano-sdk/cip30';
-import {
-  InputSelector,
-  computeMinimumCoinQuantity,
-  defaultSelectionConstraints,
-  roundRobinRandomImprove
-} from '@cardano-sdk/cip2';
+import { InputSelector, defaultSelectionConstraints, roundRobinRandomImprove } from '@cardano-sdk/cip2';
 import { Logger, dummyLogger } from 'ts-log';
-import { Observable, Subject, combineLatest, filter, firstValueFrom, lastValueFrom, map, take } from 'rxjs';
+import { Observable, Subject, combineLatest, filter, lastValueFrom, map, take } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TxInternals, createTransactionInternals, ensureValidityInterval } from './Transaction';
 import { WalletStores, createInMemoryWalletStores } from './persistence';
@@ -118,7 +98,7 @@ export class SingleAddressWallet implements Wallet {
   readonly assets$: TrackerSubject<Assets>;
   readonly syncStatus: SyncStatus;
   readonly name: string;
-  readonly inputAddressResolver: InputAddressResolver;
+  readonly util: WalletUtil;
 
   constructor(
     {
@@ -236,22 +216,9 @@ export class SingleAddressWallet implements Wallet {
       }),
       stores.assets
     );
-    this.inputAddressResolver = (input) =>
-      this.utxo.available$.value?.find(([txIn]) => txInEquals(txIn, input))?.[1].address || null;
+    this.util = createWalletUtil(this);
   }
 
-  async validateInitializeTxProps(props: InitializeTxProps): Promise<InitializeTxPropsValidationResult> {
-    const { coinsPerUtxoWord } = await firstValueFrom(this.protocolParameters$);
-    const minimumCoinQuantities = new Map<Cardano.TxOut, MinimumCoinQuantity>();
-    for (const output of props.outputs || []) {
-      const minimumCoin = BigInt(computeMinimumCoinQuantity(coinsPerUtxoWord)(output.value.assets));
-      minimumCoinQuantities.set(output, {
-        coinMissing: BigIntMath.max([minimumCoin - output.value.coins, 0n])!,
-        minimumCoin
-      });
-    }
-    return { minimumCoinQuantities };
-  }
   async initializeTx(props: InitializeTxProps): Promise<InitializeTxResult> {
     const { constraints, utxo, implicitCoin, validityInterval, changeAddress } = await this.#prepareTx(props);
     const { selection: inputSelection } = await this.#inputSelector.select({
@@ -276,9 +243,9 @@ export class SingleAddressWallet implements Wallet {
     stubSign = false
   ): Promise<Cardano.NewTxAlonzo> {
     const signatures = stubSign
-      ? keyManagementUtil.stubSignTransaction(tx.body, this.keyAgent.knownAddresses, this.inputAddressResolver)
+      ? keyManagementUtil.stubSignTransaction(tx.body, this.keyAgent.knownAddresses, this.util.resolveInputAddress)
       : await this.keyAgent.signTransaction(tx, {
-          inputAddressResolver: this.inputAddressResolver
+          inputAddressResolver: this.util.resolveInputAddress
         });
     return {
       auxiliaryData,
