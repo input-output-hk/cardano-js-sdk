@@ -67,7 +67,7 @@ const getTxSize = (tx: CSL.Transaction) => tx.to_bytes().length;
  * that adjust selection based on selection limit. RRRI implementation uses this after selecting all the inputs
  * and throws MaximumInputCountExceeded if the constraint returns a limit higher than number of selected utxo.
  *
- * @returns {ComputeSelectionLimit} constraint that returns txSize <= maxTxSize ? utxo[].length : utxo[].length+1
+ * @returns {ComputeSelectionLimit} constraint that returns txSize <= maxTxSize ? utxo[].length : utxo[].length-1
  */
 export const computeSelectionLimit =
   (maxTxSize: ProtocolParametersRequiredByInputSelection['maxTxSize'], buildTx: BuildTx): ComputeSelectionLimit =>
@@ -77,7 +77,7 @@ export const computeSelectionLimit =
     if (txSize <= maxTxSize) {
       return selectionSkeleton.inputs.size;
     }
-    return selectionSkeleton.inputs.size + 1;
+    return selectionSkeleton.inputs.size - 1;
   };
 
 export const defaultSelectionConstraints = ({

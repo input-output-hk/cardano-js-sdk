@@ -90,7 +90,7 @@ describe('defaultSelectionConstraints', () => {
         protocolParameters
       });
       expect(await constraints.computeSelectionLimit({ inputs: new Set([1, 2]) as any } as SelectionSkeleton)).toEqual(
-        3
+        1
       );
     });
   });
