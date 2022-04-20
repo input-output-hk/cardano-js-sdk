@@ -77,9 +77,14 @@ export abstract class HttpServer extends RunnableModule {
     this.app.use(this.#dependencies.router);
   }
 
-  protected static sendJSON(res: express.Response, obj: unknown) {
+  protected static sendJSON<ResponseBody>(
+    res: express.Response<ResponseBody | ProviderError>,
+    obj: ResponseBody | ProviderError,
+    statusCode = 200
+  ) {
+    res.statusCode = statusCode;
     res.header(CONTENT_TYPE, APPLICATION_JSON);
-    res.send(JSON.stringify(util.toSerializableObject(obj)));
+    res.send(util.toSerializableObject(obj) as ResponseBody);
   }
 
   protected async startImpl(): Promise<void> {

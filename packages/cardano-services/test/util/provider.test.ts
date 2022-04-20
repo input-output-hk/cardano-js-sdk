@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { dummyLogger } from 'ts-log';
 import { providerHandler } from '../../src/util';
 
 describe('util/provider', () => {
@@ -10,7 +11,7 @@ describe('util/provider', () => {
       const req = { body: { args: ['arg'] } };
       const res = { send: jest.fn(), status: jest.fn() };
       const next = {} as any;
-      providerHandler<string>(handler)(req as any, res as any, next);
+      providerHandler<string, any>(handler, dummyLogger)(req as any, res as any, next);
       expect(handler).toBeCalledTimes(1);
       expect(handler).toBeCalledWith(['arg'], req, res, next);
       expect(res.send).not.toBeCalled();
@@ -25,7 +26,7 @@ describe('util/provider', () => {
         status: jest.fn().mockImplementation(() => res)
       };
       const next = {} as any;
-      providerHandler<string>(handler)(req as any, res as any, next);
+      providerHandler<string, any>(handler, dummyLogger)(req as any, res as any, next);
       expect(handler).not.toBeCalled();
       expect(res.status).toBeCalledTimes(1);
       expect(res.status).toBeCalledWith(400);

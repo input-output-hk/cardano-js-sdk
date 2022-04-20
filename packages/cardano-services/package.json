@@ -66,7 +66,6 @@
     "pg": "^8.7.3",
     "prom-client": "^14.0.1",
     "reflect-metadata": "~0.1.13",
-    "serialize-error": "^8",
     "ts-log": "^2.2.4"
   },
   "files": [

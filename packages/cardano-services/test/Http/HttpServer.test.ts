@@ -86,7 +86,7 @@ describe('HttpServer', () => {
       const res = {
         header: jest.fn(),
         send: jest.fn().mockImplementation((json) => {
-          expect(util.fromSerializableObject(JSON.parse(json))).toEqual(obj);
+          expect(util.fromSerializableObject(json)).toEqual(obj);
         })
       };
       httpServer.publicSendJSON(res as unknown as express.Response, obj);

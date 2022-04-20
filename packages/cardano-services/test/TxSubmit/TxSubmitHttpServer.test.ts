@@ -3,6 +3,7 @@
 import { APPLICATION_JSON, CONTENT_TYPE, HttpServerConfig, TxSubmitHttpServer } from '../../src';
 import { Cardano, ProviderError, ProviderFailure, TxSubmitProvider, util } from '@cardano-sdk/core';
 import { getPort } from 'get-port-please';
+import { txSubmitHttpProvider } from '@cardano-sdk/cardano-services-client';
 import cbor from 'cbor';
 import got from 'got';
 
@@ -79,10 +80,10 @@ describe('TxSubmitHttpServer', () => {
         throw new Error('fail');
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
-        const body = JSON.parse(error.response.body);
+        const parsedError = util.fromSerializableObject<ProviderError>(JSON.parse(error.response.body));
         expect(error.response.statusCode).toBe(503);
-        expect(body.name).toBe('ProviderError');
-        expect(body.reason).toBe('UNHEALTHY');
+        expect(parsedError.name).toBe('ProviderError');
+        expect(parsedError.reason).toBe('UNHEALTHY');
       }
     });
   });
@@ -155,9 +156,9 @@ describe('TxSubmitHttpServer', () => {
 
   describe('healthy but failing submission', () => {
     describe('/submit', () => {
-      // eslint-disable-next-line max-len
-      it('returns a 400 coded response with detail in the body to a transaction containing a domain violation', async () => {
-        const stubErrors = [new Cardano.TxSubmissionErrors.BadInputsError({ badInputs: [] })];
+      const stubErrors = [new Cardano.TxSubmissionErrors.BadInputsError({ badInputs: [] })];
+
+      beforeAll(async () => {
         txSubmitProvider = {
           healthCheck: jest.fn(() => Promise.resolve({ ok: true })),
           submitTx: jest.fn(() => Promise.reject(stubErrors))
@@ -165,18 +166,42 @@ describe('TxSubmitHttpServer', () => {
         txSubmitHttpServer = TxSubmitHttpServer.create({ txSubmitProvider }, config);
         await txSubmitHttpServer.initialize();
         await txSubmitHttpServer.start();
+      });
+
+      afterAll(async () => {
+        await txSubmitHttpServer.shutdown();
+      });
+
+      it('rehydrates errors when used with TxSubmitHttpProvider', async () => {
+        expect.assertions(2);
+        const clientProvider = txSubmitHttpProvider(apiUrlBase);
+        try {
+          await clientProvider.submitTx(new Uint8Array());
+        } catch (error) {
+          if (error instanceof ProviderError) {
+            const innerError = error.innerError as Cardano.TxSubmissionError;
+            expect(innerError).toBeInstanceOf(Cardano.TxSubmissionErrors.BadInputsError);
+            expect(innerError.message).toBe(stubErrors[0].message);
+          }
+        }
+      });
+
+      // eslint-disable-next-line max-len
+      it('returns a 400 coded response with detail in the body to a transaction containing a domain violation', async () => {
+        expect.assertions(3);
         try {
           await got.post(`${apiUrlBase}/submit`, {
             body: serializeProviderArg(Buffer.from(new Uint8Array())),
             headers: { [CONTENT_TYPE]: APPLICATION_JSON }
           });
-          throw new Error('fail');
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
           expect(error.response.statusCode).toBe(400);
-          expect(JSON.parse(error.response.body)[0].name).toEqual(stubErrors[0].name);
+          const parsedError = util.fromSerializableObject<ProviderError<typeof stubErrors[0]>>(
+            JSON.parse(error.response.body)
+          );
+          expect(parsedError.innerError!.name).toEqual(stubErrors[0].name);
           expect(txSubmitProvider.submitTx).toHaveBeenCalledTimes(1);
-          await txSubmitHttpServer.shutdown();
         }
       });
     });

@@ -108,7 +108,7 @@ describe('StakePoolSearchHttpServer', () => {
           provider = stakePoolSearchHttpProvider(apiUrlBase);
         });
 
-        it('response conforms to core types', async () => {
+        it('response is an array of stake pools', async () => {
           const options: StakePoolQueryOptions = {
             filters: {
               identifier: {
@@ -122,8 +122,9 @@ describe('StakePoolSearchHttpServer', () => {
           };
           const response = await provider.queryStakePools(options);
           expect(response).toHaveLength(2);
-          // TODO: assert types of properties of a stake pool
         });
+
+        it.todo('all response stakepool field types match core types');
       });
 
       describe('pagination', () => {
