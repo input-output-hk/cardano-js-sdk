@@ -1,14 +1,5 @@
-/* eslint-disable no-multi-spaces */
-/* eslint-disable space-in-parens */
-/* eslint-disable prettier/prettier */
 import { Cardano, WalletProvider } from '@cardano-sdk/core';
-import {
-  FailedTx,
-  TransactionDirection,
-  TransactionFailure,
-  createAddressTransactionsProvider,
-  createTransactionsTracker
-} from '../../src';
+import { FailedTx, TransactionFailure, createAddressTransactionsProvider, createTransactionsTracker } from '../../src';
 import { InMemoryTransactionsStore, OrderedCollectionStore } from '../../src/persistence';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { WalletProviderStub, mockWalletProvider, queryTransactionsResult } from '../mocks';
@@ -161,16 +152,8 @@ describe('TransactionsTracker', () => {
         });
         expectObservable(transactionsTracker.history.all$).toBe('a-bc|', {
           a: [],
-          b: [
-            {
-              direction: TransactionDirection.Incoming,
-              tx: incomingTx
-            }
-          ],
-          c: [
-            { direction: TransactionDirection.Outgoing, tx: outgoingTx },
-            { direction: TransactionDirection.Incoming, tx: incomingTx }
-          ]
+          b: [incomingTx],
+          c: [outgoingTx, incomingTx]
         });
       });
     });

@@ -211,11 +211,7 @@ export class SingleAddressWallet implements Wallet {
       createAssetsTracker({
         assetProvider: this.assetProvider,
         balanceTracker: this.balance,
-        nftMetadataProvider: createNftMetadataProvider(
-          this.walletProvider,
-          // this is not very efficient, consider storing TxAlonzo[] in transactions tracker history
-          this.transactions.history.all$.pipe(map((txs) => txs.map(({ tx }) => tx)))
-        ),
+        nftMetadataProvider: createNftMetadataProvider(this.walletProvider, this.transactions.history.all$),
         retryBackoffConfig
       }),
       stores.assets
