@@ -1,0 +1,59 @@
+{
+  "name": "@cardano-sdk/web-extension",
+  "version": "0.2.0",
+  "description": "Web extension wallet utilities",
+  "engines": {
+    "node": "^14"
+  },
+  "main": "dist/index.js",
+  "repository": "https://github.com/input-output-hk/cardano-js-sdk/packages/web-extension",
+  "contributors": [
+    "Rhys Bartels-Waller <rhys.bartelswaller@iohk.io> (https://iohk.io)",
+    "Martynas Kazlauskas <martynas.kazlauskas@iohk.io> (https://iohk.io)"
+  ],
+  "license": "MPL-2.0",
+  "scripts": {
+    "build": "tsc --build ./src",
+    "tscNoEmit": "shx echo typescript --noEmit command not implemented yet",
+    "cleanup": "shx rm -rf dist node_modules",
+    "lint": "eslint --ignore-path ../../.eslintignore \"**/*.ts\"",
+    "lint:fix": "eslint --fix --ignore-path ../../.eslintignore \"**/*.ts\"",
+    "test": "jest -c ./jest.config.js",
+    "test:e2e:build": "webpack -c e2e/webpack.config.js",
+    "test:e2e:run": "wdio run e2e/wdio.conf.ts",
+    "test:e2e": "run-s test:e2e:build test:e2e:run",
+    "coverage": "yarn test --coverage",
+    "prepack": "yarn build",
+    "test:debug": "DEBUG=true yarn test"
+  },
+  "devDependencies": {
+    "@types/webextension-polyfill": "^0.8.0",
+    "@wdio/cli": "^7.19.5",
+    "@wdio/local-runner": "^7.19.5",
+    "@wdio/mocha-framework": "^7.19.5",
+    "@wdio/spec-reporter": "^7.19.5",
+    "chromedriver": "^100.0.0",
+    "copy-webpack-plugin": "^10.2.4",
+    "expect-webdriverio": "^3.2.1",
+    "jest-webextension-mock": "^3.7.19",
+    "mock-browser": "^0.92.14",
+    "shx": "^0.3.3",
+    "ts-loader": "^9.2.8",
+    "wdio-chromedriver-service": "^7.3.2",
+    "webpack": "^5.72.0",
+    "webpack-cli": "^4.9.2"
+  },
+  "dependencies": {
+    "@cardano-sdk/cip30": " 0.2.0",
+    "@cardano-sdk/core": " 0.2.0",
+    "@cardano-sdk/wallet": " 0.2.0",
+    "ts-log": "^2.2.3",
+    "webextension-polyfill": "^0.8.0"
+  },
+  "files": [
+    "dist/*",
+    "!dist/tsconfig.tsbuildinfo",
+    "LICENSE",
+    "NOTICE"
+  ]
+}

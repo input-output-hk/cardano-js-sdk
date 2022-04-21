@@ -1,0 +1,18 @@
+{
+  "extends": "../../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../dist/",
+    "rootDir": "."
+  },
+  "references": [
+    {
+      "path": "../../core/src"
+    },
+    {
+      "path": "../../cip30/src"
+    },
+    {
+      "path": "../../wallet/src"
+    }
+  ]
+}

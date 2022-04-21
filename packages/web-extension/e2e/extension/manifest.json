@@ -1,0 +1,19 @@
+{
+  "name": "test",
+  "description": "For @cardano-sdk/web-extension e2e tests",
+  "version": "1.0",
+  "manifest_version": 3,
+  "content_scripts": [
+    {
+      "run_at": "document_idle",
+      "all_frames": true,
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+        "contentScript.js"
+      ]
+    }
+  ]
+}

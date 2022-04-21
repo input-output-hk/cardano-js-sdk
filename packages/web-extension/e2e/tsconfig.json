@@ -1,0 +1,27 @@
+{
+  "extends": "../../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "types": [
+      "node",
+      "webdriverio/async",
+      "@wdio/mocha-framework",
+      "expect-webdriverio"
+    ],
+    "target": "es2019"
+  },
+  "references": [
+    {
+      "path": "../src"
+    },
+    {
+      "path": "../../core/src"
+    },
+    {
+      "path": "../../cip30/src"
+    },
+    {
+      "path": "../../wallet/src"
+    }
+  ]
+}
