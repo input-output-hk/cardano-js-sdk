@@ -42,11 +42,16 @@ export const createStubStakePoolSearchProvider = (
   stakePools: Cardano.StakePool[] = somePartialStakePools,
   delayMs?: number
 ): StakePoolSearchProvider => ({
-  queryStakePools: async (fragments) => {
+  queryStakePools: async (options) => {
     if (delayMs) await delay(delayMs);
+    const identifierFilters = options?.filters?.identifier;
+    const filterValues = identifierFilters ? identifierFilters.values : [];
     return stakePools.filter(({ id, metadata }) =>
-      fragments.some(
-        (fragment) => id.includes(fragment) || metadata?.name.includes(fragment) || metadata?.ticker.includes(fragment)
+      filterValues.some(
+        (value) =>
+          (value.id && id.includes(value.id.toString())) ||
+          (value.name && metadata?.name.includes(value.name)) ||
+          (value.ticker && metadata?.ticker.includes(value.ticker))
       )
     );
   }

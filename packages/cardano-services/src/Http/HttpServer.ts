@@ -1,18 +1,24 @@
-import { HealthCheckResponse, ProviderError } from '@cardano-sdk/core';
+import { HealthCheckResponse, ProviderError, util } from '@cardano-sdk/core';
 import { Logger, dummyLogger } from 'ts-log';
 import { RunnableModule } from '../RunnableModule';
 import { listenPromise, serverClosePromise } from '../util';
-import bodyParser from 'body-parser';
+import bodyParser, { Options } from 'body-parser';
 import express from 'express';
 import expressPromBundle from 'express-prom-bundle';
 import http from 'http';
 import net from 'net';
 import promClient from 'prom-client';
 
+export const CONTENT_TYPE = 'Content-Type';
+export const APPLICATION_JSON = 'application/json';
+
 export type HttpServerConfig = {
   metrics?: {
     enabled: boolean;
     options?: expressPromBundle.Opts;
+  };
+  bodyParser?: {
+    limit?: Options['limit'];
   };
   name?: string;
   listen: net.ListenOptions;
@@ -35,7 +41,26 @@ export abstract class HttpServer extends RunnableModule {
   }
 
   protected async initializeImpl(): Promise<void> {
-    this.#dependencies.router.use(bodyParser.json());
+    this.app = express();
+    // must use this before router
+    this.app.use(
+      bodyParser.json({
+        limit: this.config.bodyParser?.limit || '500kB',
+        reviver: (key, value) => (key === '' ? util.fromSerializableObject(value) : value)
+      })
+    );
+
+    if (this.config.metrics?.enabled) {
+      this.app.use(
+        expressPromBundle({
+          includeMethod: true,
+          promRegistry: new promClient.Registry(),
+          ...this.config.metrics.options
+        })
+      );
+      this.logger.info(`Prometheus metrics configured at ${this.config.metrics.options?.metricsPath || '/metrics'}`);
+    }
+
     this.#dependencies.router.get('/health', async (req, res) => {
       this.logger.debug('/health', { ip: req.ip });
       let body: HealthCheckResponse | Error['message'];
@@ -48,19 +73,18 @@ export abstract class HttpServer extends RunnableModule {
       }
       res.send(body);
     });
-    this.app = express();
-    if (this.config.metrics?.enabled) {
-      this.app.use(
-        expressPromBundle({
-          includeMethod: true,
-          promRegistry: new promClient.Registry(),
-          ...this.config.metrics.options
-        })
-      );
-      this.logger.info(`Prometheus metrics configured at ${this.config.metrics.options?.metricsPath || '/metrics'}`);
-    }
 
     this.app.use(this.#dependencies.router);
+  }
+
+  protected static sendJSON<ResponseBody>(
+    res: express.Response<ResponseBody | ProviderError>,
+    obj: ResponseBody | ProviderError,
+    statusCode = 200
+  ) {
+    res.statusCode = statusCode;
+    res.header(CONTENT_TYPE, APPLICATION_JSON);
+    res.send(util.toSerializableObject(obj) as ResponseBody);
   }
 
   protected async startImpl(): Promise<void> {

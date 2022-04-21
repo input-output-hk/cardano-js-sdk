@@ -63,7 +63,6 @@ export const TxSubmissionErrors = {
   TxTooLargeError: TxSubmission.errors.TxTooLarge.Error,
   UnknownGenesisKeyError: TxSubmission.errors.UnknownGenesisKey.Error,
   UnknownOrIncompleteWithdrawalsError: TxSubmission.errors.UnknownOrIncompleteWithdrawals.Error,
-  UnknownTxSubmissionError,
   UnspendableDatumsError: TxSubmission.errors.UnspendableDatums.Error,
   UnspendableScriptInputsError: TxSubmission.errors.UnspendableScriptInputs.Error,
   UpdateWrongEpochError: TxSubmission.errors.UpdateWrongEpoch.Error,
@@ -76,4 +75,4 @@ export const TxSubmissionErrors = {
 
 type TxSubmissionErrorName = keyof typeof TxSubmissionErrors;
 type TxSubmissionErrorClass = typeof TxSubmissionErrors[TxSubmissionErrorName];
-export type TxSubmissionError = InstanceType<TxSubmissionErrorClass>;
+export type TxSubmissionError = InstanceType<TxSubmissionErrorClass> | UnknownTxSubmissionError;

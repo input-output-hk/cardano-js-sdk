@@ -28,6 +28,8 @@
   "devDependencies": {
     "@cardano-sdk/cardano-services-client": "0.2.0",
     "@types/validator": "^13.7.1",
+    "express": "^4.17.3",
+    "get-port-please": "^2.4.3",
     "shx": "^0.3.3"
   },
   "dependencies": {
@@ -35,8 +37,7 @@
     "@cardano-sdk/core": "0.2.0",
     "class-validator": "^0.13.1",
     "got": "^11",
-    "json-bigint": "~1.0.0",
-    "serialize-error": "^8"
+    "json-bigint": "~1.0.0"
   },
   "files": [
     "dist/*",

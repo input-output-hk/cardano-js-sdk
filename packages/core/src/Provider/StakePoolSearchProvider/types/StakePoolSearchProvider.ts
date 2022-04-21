@@ -1,6 +1,33 @@
 import { Cardano } from '../../..';
 
+type FilterCondition = 'and' | 'or';
+
+export interface MultipleChoiceSearchFilter<T> {
+  /**
+   * Defaults to 'or'
+   */
+  _condition?: FilterCondition;
+  values: T[];
+}
+
 export interface StakePoolQueryOptions {
+  /**
+   * Will fetch all stake pools if not specified
+   */
+  filters?: {
+    /**
+     * Defaults to 'and'
+     */
+    _condition?: FilterCondition;
+    /**
+     * Will return results for partial matches
+     */
+    identifier?: MultipleChoiceSearchFilter<
+      Partial<Pick<Cardano.PoolParameters, 'id'> & Pick<Cardano.StakePoolMetadata, 'name' | 'ticker'>>
+    >;
+    pledgeMet?: boolean;
+    status?: Cardano.StakePoolStatus[];
+  };
   /**
    * Will fetch all stake pool reward history if not specified
    */
@@ -16,10 +43,9 @@ export interface StakePoolQueryOptions {
 
 export interface StakePoolSearchProvider {
   /**
-   * @param {string[]} query an array of partial pool data: bech32 ID, name, ticker
    * @param {StakePoolQueryOptions} options query options
-   * @returns Stake pools that match any fragment
+   * @returns Stake pools
    * @throws ProviderError
    */
-  queryStakePools: (fragments: string[], options?: StakePoolQueryOptions) => Promise<Cardano.StakePool[]>;
+  queryStakePools: (options?: StakePoolQueryOptions) => Promise<Cardano.StakePool[]>;
 }

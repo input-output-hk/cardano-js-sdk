@@ -1,28 +1,39 @@
-import { HttpServer, HttpServerConfig, HttpServerDependencies, RunnableModule } from '../../src';
+import {
+  APPLICATION_JSON,
+  CONTENT_TYPE,
+  HttpServer,
+  HttpServerConfig,
+  HttpServerDependencies,
+  RunnableModule
+} from '../../src';
 import { getRandomPort } from 'get-port-please';
+import { util } from '@cardano-sdk/core';
 import express from 'express';
 import got from 'got';
 import net from 'net';
 import waitOn from 'wait-on';
 
-const APPLICATION_JSON = 'application/json';
 const onHttpServer = (url: string) => waitOn({ resources: [url], validateStatus: (statusCode) => statusCode === 404 });
 
 class SomeHttpServer extends HttpServer {
   private constructor(config: HttpServerConfig, dependencies: HttpServerDependencies) {
     super({ ...config, name: 'SomeHttpServer' }, dependencies);
   }
-  static create(config: HttpServerConfig) {
+  static create(config: HttpServerConfig, initialize?: (router: express.Router) => void) {
     const router = express.Router();
+    if (initialize) initialize(router);
     return new SomeHttpServer(config, {
       healthCheck: () => Promise.resolve({ ok: true }),
       router
     });
   }
+  publicSendJSON(res: express.Response, obj: unknown) {
+    HttpServer.sendJSON(res, obj);
+  }
 }
 
 describe('HttpServer', () => {
-  let httpServer: HttpServer;
+  let httpServer: SomeHttpServer;
   let port: number;
   let apiUrlBase: string;
 
@@ -43,6 +54,44 @@ describe('HttpServer', () => {
       expect(httpServer.app).not.toBeDefined();
       await httpServer.initialize();
       expect(httpServer.app).toBeDefined();
+    });
+
+    it('uses core serializableObject with body parser', async () => {
+      const expectedBody = {
+        bigint: 123n
+      };
+      httpServer = SomeHttpServer.create({ listen: { host: 'localhost', port } }, (router) => {
+        router.post('/echo', (req, res) => {
+          expect(req.body).toEqual(expectedBody);
+          res.send();
+        });
+      });
+      await httpServer.initialize();
+      await httpServer.start();
+      await onHttpServer(apiUrlBase);
+      await got.post(`${apiUrlBase}/echo`, {
+        body: JSON.stringify(util.toSerializableObject(expectedBody)),
+        headers: { [CONTENT_TYPE]: APPLICATION_JSON }
+      });
+      await httpServer.shutdown();
+    });
+  });
+
+  describe('sendJSON', () => {
+    it('sets content-type and transforms the object using toSerializableObj', () => {
+      httpServer = SomeHttpServer.create({ listen: { host: 'localhost', port } });
+      const obj = {
+        bigint: 123n
+      };
+      const res = {
+        header: jest.fn(),
+        send: jest.fn().mockImplementation((json) => {
+          expect(util.fromSerializableObject(json)).toEqual(obj);
+        })
+      };
+      httpServer.publicSendJSON(res as unknown as express.Response, obj);
+      expect(res.send).toBeCalledTimes(1);
+      expect(res.header).toBeCalledTimes(1);
     });
   });
 
@@ -115,7 +164,7 @@ describe('HttpServer', () => {
       await httpServer.start();
       await onHttpServer(apiUrlBase);
       const res2 = await got(`${apiUrlBase}/metrics`, {
-        headers: { 'Content-Type': APPLICATION_JSON },
+        headers: { [CONTENT_TYPE]: APPLICATION_JSON },
         throwHttpErrors: false
       });
       expect(res2.statusCode).toBe(404);
@@ -127,7 +176,7 @@ describe('HttpServer', () => {
       await httpServer.start();
       await onHttpServer(apiUrlBase);
       const res = await got(`${apiUrlBase}/metrics`, {
-        headers: { 'Content-Type': APPLICATION_JSON }
+        headers: { [CONTENT_TYPE]: APPLICATION_JSON }
       });
       expect(res.statusCode).toBe(200);
       expect(typeof res.body).toBe('string');
@@ -143,7 +192,7 @@ describe('HttpServer', () => {
       await httpServer.start();
       await onHttpServer(apiUrlBase);
       const res = await got(`${apiUrlBase}${metricsPath}`, {
-        headers: { 'Content-Type': APPLICATION_JSON }
+        headers: { [CONTENT_TYPE]: APPLICATION_JSON }
       });
       expect(res.statusCode).toBe(200);
       expect(typeof res.body).toBe('string');
@@ -164,7 +213,7 @@ describe('HttpServer', () => {
 
     it('health', async () => {
       const res = await got(`${apiUrlBase}/health`, {
-        headers: { 'Content-Type': 'application/json' }
+        headers: { [CONTENT_TYPE]: 'application/json' }
       });
       expect(res.statusCode).toBe(200);
       expect(JSON.parse(res.body)).toEqual({ ok: true });

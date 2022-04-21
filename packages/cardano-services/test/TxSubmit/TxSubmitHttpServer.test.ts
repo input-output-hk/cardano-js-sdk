@@ -1,22 +1,23 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-len */
-import { Cardano, ProviderError, ProviderFailure, TxSubmitProvider } from '@cardano-sdk/core';
-import { TxSubmitHttpServer, TxSubmitHttpServerConfig } from '../../src';
+import { APPLICATION_JSON, CONTENT_TYPE, HttpServerConfig, TxSubmitHttpServer } from '../../src';
+import { Cardano, ProviderError, ProviderFailure, TxSubmitProvider, util } from '@cardano-sdk/core';
 import { getPort } from 'get-port-please';
+import { txSubmitHttpProvider } from '@cardano-sdk/cardano-services-client';
 import cbor from 'cbor';
 import got from 'got';
 
-const tx = cbor.encode('#####');
+const serializeProviderArg = (arg: unknown) => JSON.stringify({ args: [util.toSerializableObject(arg)] });
+const bodyTx = serializeProviderArg(cbor.encode('#####'));
 const BAD_REQUEST_STRING = 'Response code 400 (Bad Request)';
 const APPLICATION_CBOR = 'application/cbor';
-const APPLICATION_JSON = 'application/json';
 
 describe('TxSubmitHttpServer', () => {
   let txSubmitProvider: TxSubmitProvider;
   let txSubmitHttpServer: TxSubmitHttpServer;
   let port: number;
   let apiUrlBase: string;
-  let config: TxSubmitHttpServerConfig;
+  let config: HttpServerConfig;
 
   beforeAll(async () => {
     port = await getPort();
@@ -25,12 +26,15 @@ describe('TxSubmitHttpServer', () => {
   });
 
   afterEach(async () => {
-    jest.resetAllMocks();
+    jest.clearAllMocks();
   });
 
   describe('unhealthy TxSubmitProvider', () => {
     beforeAll(async () => {
-      txSubmitProvider = { healthCheck: jest.fn(() => Promise.resolve({ ok: false })), submitTx: jest.fn() };
+      txSubmitProvider = {
+        healthCheck: jest.fn(() => Promise.resolve({ ok: false })),
+        submitTx: jest.fn()
+      };
       txSubmitHttpServer = TxSubmitHttpServer.create({ txSubmitProvider }, config);
     });
 
@@ -41,21 +45,20 @@ describe('TxSubmitHttpServer', () => {
 
   describe('healthy TxSubmitProvider on startup, unhealthy at request time', () => {
     let isOk: () => boolean;
-    let doSubmitTx: (tx: Uint8Array) => Promise<void>;
     // eslint-disable-next-line unicorn/consistent-function-scoping
     const serverHealth = async () => {
       const response = await got(`${apiUrlBase}/health`, {
-        headers: { 'Content-Type': APPLICATION_JSON }
+        headers: { [CONTENT_TYPE]: APPLICATION_JSON }
       });
       return JSON.parse(response.body);
     };
 
     beforeAll(async () => {
       isOk = () => true;
-      txSubmitProvider = { healthCheck: jest.fn(() => Promise.resolve({ ok: isOk() })), submitTx: doSubmitTx };
+      txSubmitProvider = { healthCheck: jest.fn(() => Promise.resolve({ ok: isOk() })), submitTx: jest.fn() };
       txSubmitHttpServer = TxSubmitHttpServer.create({ txSubmitProvider }, config);
-      await expect(await txSubmitHttpServer.initialize()).resolves;
-      await expect(txSubmitHttpServer.start()).resolves;
+      await txSubmitHttpServer.initialize();
+      await txSubmitHttpServer.start();
       expect(await serverHealth()).toEqual({ ok: true });
     });
 
@@ -66,21 +69,21 @@ describe('TxSubmitHttpServer', () => {
     it('returns a ProviderError of failure type Unhealthy if the TxSubmitProvider is unhealthy when submitting', async () => {
       // Flip to unhealthy state
       isOk = () => false;
-      doSubmitTx = () => Promise.reject();
+      (txSubmitProvider.submitTx as jest.Mock).mockRejectedValueOnce(void 0);
       expect(await serverHealth()).toEqual({ ok: false });
 
       try {
         await got.post(`${apiUrlBase}/submit`, {
-          body: Buffer.from(new Uint8Array()).toString(),
-          headers: { 'Content-Type': APPLICATION_CBOR }
+          body: serializeProviderArg(Buffer.from(new Uint8Array())),
+          headers: { [CONTENT_TYPE]: APPLICATION_JSON }
         });
         throw new Error('fail');
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
-        const body = JSON.parse(error.response.body);
+        const parsedError = util.fromSerializableObject<ProviderError>(JSON.parse(error.response.body));
         expect(error.response.statusCode).toBe(503);
-        expect(body.name).toBe('ProviderError');
-        expect(body.reason).toBe('UNHEALTHY');
+        expect(parsedError.name).toBe('ProviderError');
+        expect(parsedError.reason).toBe('UNHEALTHY');
       }
     });
   });
@@ -100,7 +103,7 @@ describe('TxSubmitHttpServer', () => {
     describe('/health', () => {
       it('forwards the txSubmitProvider health response', async () => {
         const res = await got(`${apiUrlBase}/health`, {
-          headers: { 'Content-Type': APPLICATION_JSON }
+          headers: { [CONTENT_TYPE]: APPLICATION_JSON }
         });
         expect(res.statusCode).toBe(200);
         expect(JSON.parse(res.body)).toEqual({ ok: true });
@@ -108,13 +111,27 @@ describe('TxSubmitHttpServer', () => {
     });
 
     describe('/submit', () => {
+      it('calls underlying TxSubmitProvider with a valid argument', async () => {
+        (txSubmitProvider.submitTx as jest.Mock).mockImplementation(async (tx) => {
+          expect(ArrayBuffer.isView(tx)).toBe(true);
+        });
+        expect(
+          (
+            await got.post(`${apiUrlBase}/submit`, {
+              body: bodyTx,
+              headers: { [CONTENT_TYPE]: APPLICATION_JSON }
+            })
+          ).statusCode
+        ).toEqual(200);
+        expect(txSubmitProvider.submitTx).toHaveBeenCalledTimes(1);
+      });
+
       it('returns a 200 coded response with a well formed HTTP request', async () => {
         expect(
           (
             await got.post(`${apiUrlBase}/submit`, {
-              body: tx,
-              headers: { 'Content-Type': APPLICATION_CBOR },
-              method: 'post'
+              body: bodyTx,
+              headers: { [CONTENT_TYPE]: APPLICATION_JSON }
             })
           ).statusCode
         ).toEqual(200);
@@ -124,8 +141,8 @@ describe('TxSubmitHttpServer', () => {
       it('returns a 400 coded response if the wrong content type header is used', async () => {
         try {
           await got.post(`${apiUrlBase}/submit`, {
-            body: tx,
-            headers: { 'Content-Type': APPLICATION_JSON }
+            body: bodyTx,
+            headers: { [CONTENT_TYPE]: APPLICATION_CBOR }
           });
           throw new Error('fail');
         } catch (error: any) {
@@ -139,9 +156,9 @@ describe('TxSubmitHttpServer', () => {
 
   describe('healthy but failing submission', () => {
     describe('/submit', () => {
-      // eslint-disable-next-line max-len
-      it('returns a 400 coded response with detail in the body to a transaction containing a domain violation', async () => {
-        const stubErrors = [new Cardano.TxSubmissionErrors.BadInputsError({ badInputs: [] })];
+      const stubErrors = [new Cardano.TxSubmissionErrors.BadInputsError({ badInputs: [] })];
+
+      beforeAll(async () => {
         txSubmitProvider = {
           healthCheck: jest.fn(() => Promise.resolve({ ok: true })),
           submitTx: jest.fn(() => Promise.reject(stubErrors))
@@ -149,18 +166,42 @@ describe('TxSubmitHttpServer', () => {
         txSubmitHttpServer = TxSubmitHttpServer.create({ txSubmitProvider }, config);
         await txSubmitHttpServer.initialize();
         await txSubmitHttpServer.start();
+      });
+
+      afterAll(async () => {
+        await txSubmitHttpServer.shutdown();
+      });
+
+      it('rehydrates errors when used with TxSubmitHttpProvider', async () => {
+        expect.assertions(2);
+        const clientProvider = txSubmitHttpProvider(apiUrlBase);
+        try {
+          await clientProvider.submitTx(new Uint8Array());
+        } catch (error) {
+          if (error instanceof ProviderError) {
+            const innerError = error.innerError as Cardano.TxSubmissionError;
+            expect(innerError).toBeInstanceOf(Cardano.TxSubmissionErrors.BadInputsError);
+            expect(innerError.message).toBe(stubErrors[0].message);
+          }
+        }
+      });
+
+      // eslint-disable-next-line max-len
+      it('returns a 400 coded response with detail in the body to a transaction containing a domain violation', async () => {
+        expect.assertions(3);
         try {
           await got.post(`${apiUrlBase}/submit`, {
-            body: Buffer.from(new Uint8Array()).toString(),
-            headers: { 'Content-Type': APPLICATION_CBOR }
+            body: serializeProviderArg(Buffer.from(new Uint8Array())),
+            headers: { [CONTENT_TYPE]: APPLICATION_JSON }
           });
-          throw new Error('fail');
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
           expect(error.response.statusCode).toBe(400);
-          expect(JSON.parse(error.response.body)[0].name).toEqual(stubErrors[0].name);
+          const parsedError = util.fromSerializableObject<ProviderError<typeof stubErrors[0]>>(
+            JSON.parse(error.response.body)
+          );
+          expect(parsedError.innerError!.name).toEqual(stubErrors[0].name);
           expect(txSubmitProvider.submitTx).toHaveBeenCalledTimes(1);
-          await txSubmitHttpServer.shutdown();
         }
       });
     });

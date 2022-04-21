@@ -29,6 +29,7 @@
     "@cardano-ogmios/schema": "5.1.0",
     "@emurgo/cardano-serialization-lib-browser": "9.1.0",
     "@emurgo/cardano-serialization-lib-nodejs": "9.1.0",
+    "serialize-error": "^8",
     "bech32": "^2.0.0"
   },
   "files": [

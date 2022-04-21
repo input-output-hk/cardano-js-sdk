@@ -21,7 +21,10 @@ export const createQueryStakePoolsProvider =
     merge(
       store.getValues(poolIds),
       coldObservableProvider(
-        () => stakePoolSearchProvider.queryStakePools(poolIds as unknown as string[]),
+        () =>
+          stakePoolSearchProvider.queryStakePools({
+            filters: { identifier: { values: poolIds.map((poolId) => ({ id: poolId })) } }
+          }),
         retryBackoffConfig
       ).pipe(
         tap((stakePools) => {

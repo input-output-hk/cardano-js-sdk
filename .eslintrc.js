@@ -27,6 +27,7 @@ module.exports = {
       "patterns": ["@cardano-sdk/*/src/*"]
     }],
     "new-cap": 0,
+    'jsdoc/require-returns-type': 0,
     "no-unused-expressions": 0,
     "no-useless-constructor": 0,
     "quotes": ["error", "single", { "avoidEscape": true }],
