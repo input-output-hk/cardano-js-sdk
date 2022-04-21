@@ -117,6 +117,7 @@
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="_cardano_sdk_core.Cardano.util.OpaqueString.html#_iterator_" class="tsd-kind-icon">[iterator]</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="_cardano_sdk_core.Cardano.util.OpaqueString.html#anchor" class="tsd-kind-icon">anchor</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="_cardano_sdk_core.Cardano.util.OpaqueString.html#at" class="tsd-kind-icon">at</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="_cardano_sdk_core.Cardano.util.OpaqueString.html#big" class="tsd-kind-icon">big</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="_cardano_sdk_core.Cardano.util.OpaqueString.html#blink" class="tsd-kind-icon">blink</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="_cardano_sdk_core.Cardano.util.OpaqueString.html#bold" class="tsd-kind-icon">bold</a></li>
@@ -141,6 +142,7 @@
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="_cardano_sdk_core.Cardano.util.OpaqueString.html#padStart" class="tsd-kind-icon">pad<wbr>Start</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="_cardano_sdk_core.Cardano.util.OpaqueString.html#repeat" class="tsd-kind-icon">repeat</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="_cardano_sdk_core.Cardano.util.OpaqueString.html#replace" class="tsd-kind-icon">replace</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="_cardano_sdk_core.Cardano.util.OpaqueString.html#replaceAll" class="tsd-kind-icon">replace<wbr>All</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="_cardano_sdk_core.Cardano.util.OpaqueString.html#search" class="tsd-kind-icon">search</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="_cardano_sdk_core.Cardano.util.OpaqueString.html#slice" class="tsd-kind-icon">slice</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="_cardano_sdk_core.Cardano.util.OpaqueString.html#small" class="tsd-kind-icon">small</a></li>
@@ -211,7 +213,7 @@
 					<div class="tsd-signature tsd-kind-icon">__opaque<wbr>String<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">T</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/a34bf6d/packages/core/src/Cardano/util/primitives.ts#L9">packages/core/src/Cardano/util/primitives.ts:9</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/0290354/packages/core/src/Cardano/util/primitives.ts#L9">packages/core/src/Cardano/util/primitives.ts:9</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -248,7 +250,7 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from String.__@iterator@8128</p>
+								<p>Inherited from String.__@iterator@9962</p>
 								<ul>
 									<li>Defined in node_modules/typescript/lib/lib.es2015.iterable.d.ts:240</li>
 								</ul>
@@ -295,6 +297,38 @@
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="at" class="tsd-anchor"></a>
+					<h3>at</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">at<span class="tsd-signature-symbol">(</span>index<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from String.at</p>
+								<ul>
+									<li>Defined in node_modules/typescript/lib/lib.es2022.string.d.ts:26</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns a new String consisting of the single UTF-16 code unit located at the specified index.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>index: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The zero-based index of the desired code unit. A negative index will count back from the last item.</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -1450,6 +1484,95 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="replaceAll" class="tsd-anchor"></a>
+					<h3>replace<wbr>All</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">replace<wbr>All<span class="tsd-signature-symbol">(</span>searchValue<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">RegExp</span>, replaceValue<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+						<li class="tsd-signature tsd-kind-icon">replace<wbr>All<span class="tsd-signature-symbol">(</span>searchValue<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">RegExp</span>, replacer<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>substring<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, <span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from String.replaceAll</p>
+								<ul>
+									<li>Defined in node_modules/typescript/lib/lib.es2021.string.d.ts:27</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Replace all instances of a substring in a string, using a regular expression or search string.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>searchValue: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">RegExp</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>A string to search for.</p>
+									</div>
+								</li>
+								<li>
+									<h5>replaceValue: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>A string containing the text to replace for every successful match of searchValue in this string.</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+						</li>
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from String.replaceAll</p>
+								<ul>
+									<li>Defined in node_modules/typescript/lib/lib.es2021.string.d.ts:34</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Replace all instances of a substring in a string, using a regular expression or search string.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>searchValue: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">RegExp</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>A string to search for.</p>
+									</div>
+								</li>
+								<li>
+									<h5>replacer: <span class="tsd-signature-symbol">(</span>substring<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, <span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>A function that returns the replacement text.</p>
+									</div>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter-signature">
+											<ul class="tsd-signatures tsd-kind-type-literal tsd-is-external">
+												<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>substring<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, <span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+											</ul>
+											<ul class="tsd-descriptions">
+												<li class="tsd-description">
+													<h4 class="tsd-parameters-title">Parameters</h4>
+													<ul class="tsd-parameters">
+														<li>
+															<h5>substring: <span class="tsd-signature-type">string</span></h5>
+														</li>
+														<li>
+															<h5><span class="tsd-flag ts-flagRest">Rest</span> <span class="tsd-signature-symbol">...</span>args: <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></h5>
+														</li>
+													</ul>
+													<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+												</li>
+											</ul>
+										</li>
+									</ul>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
 					<a name="search" class="tsd-anchor"></a>
 					<h3>search</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
@@ -1983,7 +2106,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides String.toString</p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/a34bf6d/packages/core/src/Cardano/util/primitives.ts#L14">packages/core/src/Cardano/util/primitives.ts:14</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/0290354/packages/core/src/Cardano/util/primitives.ts#L14">packages/core/src/Cardano/util/primitives.ts:14</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2361,6 +2484,9 @@
 								<a href="_cardano_sdk_core.Cardano.util.OpaqueString.html#anchor" class="tsd-kind-icon">anchor</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="_cardano_sdk_core.Cardano.util.OpaqueString.html#at" class="tsd-kind-icon">at</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
 								<a href="_cardano_sdk_core.Cardano.util.OpaqueString.html#big" class="tsd-kind-icon">big</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
@@ -2431,6 +2557,9 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
 								<a href="_cardano_sdk_core.Cardano.util.OpaqueString.html#replace" class="tsd-kind-icon">replace</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="_cardano_sdk_core.Cardano.util.OpaqueString.html#replaceAll" class="tsd-kind-icon">replace<wbr>All</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
 								<a href="_cardano_sdk_core.Cardano.util.OpaqueString.html#search" class="tsd-kind-icon">search</a>
@@ -2574,6 +2703,7 @@
 				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
 				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
 				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>

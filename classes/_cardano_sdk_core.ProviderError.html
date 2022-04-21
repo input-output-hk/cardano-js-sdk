@@ -61,13 +61,21 @@
 					<a href="_cardano_sdk_core.ProviderError.html">ProviderError</a>
 				</li>
 			</ul>
-			<h1>Class ProviderError</h1>
+			<h1>Class ProviderError&lt;InnerError&gt;</h1>
 		</div>
 	</div>
 </header>
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-type-parameters">
+				<h3>Type parameters</h3>
+				<ul class="tsd-type-parameters">
+					<li>
+						<h4>InnerError = <span class="tsd-signature-type">unknown</span></h4>
+					</li>
+				</ul>
+			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
@@ -88,12 +96,13 @@
 						<section class="tsd-index-section ">
 							<h3>Constructors</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite"><a href="_cardano_sdk_core.ProviderError.html#constructor" class="tsd-kind-icon">constructor</a></li>
+								<li class="tsd-kind-constructor tsd-parent-kind-class tsd-has-type-parameter tsd-is-overwrite"><a href="_cardano_sdk_core.ProviderError.html#constructor" class="tsd-kind-icon">constructor</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="_cardano_sdk_core.ProviderError.html#cause" class="tsd-kind-icon">cause</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_cardano_sdk_core.ProviderError.html#detail" class="tsd-kind-icon">detail</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_cardano_sdk_core.ProviderError.html#innerError" class="tsd-kind-icon">inner<wbr>Error</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="_cardano_sdk_core.ProviderError.html#message" class="tsd-kind-icon">message</a></li>
@@ -115,39 +124,56 @@
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Constructors</h2>
-				<section class="tsd-panel tsd-member tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite">
+				<section class="tsd-panel tsd-member tsd-kind-constructor tsd-parent-kind-class tsd-has-type-parameter tsd-is-overwrite">
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
-					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Provider<wbr>Error<span class="tsd-signature-symbol">(</span>reason<span class="tsd-signature-symbol">: </span><a href="../enums/_cardano_sdk_core.ProviderFailure.html" class="tsd-signature-type" data-tsd-kind="Enumeration">ProviderFailure</a>, innerError<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">unknown</span>, detail<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_core.ProviderError.html" class="tsd-signature-type" data-tsd-kind="Class">ProviderError</a></li>
+					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class tsd-has-type-parameter tsd-is-overwrite">
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Provider<wbr>Error&lt;InnerError&gt;<span class="tsd-signature-symbol">(</span>reason<span class="tsd-signature-symbol">: </span><a href="../enums/_cardano_sdk_core.ProviderFailure.html" class="tsd-signature-type" data-tsd-kind="Enumeration">ProviderFailure</a>, innerError<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">InnerError</span>, detail<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_core.ProviderError.html" class="tsd-signature-type" data-tsd-kind="Class">ProviderError</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">InnerError</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Overrides CustomError.constructor</p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/a34bf6d/packages/core/src/errors.ts#L14">packages/core/src/errors.ts:14</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/0290354/packages/core/src/errors.ts#L16">packages/core/src/errors.ts:16</a></li>
 								</ul>
 							</aside>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>InnerError = <span class="tsd-signature-type">unknown</span></h4>
+								</li>
+							</ul>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>reason: <a href="../enums/_cardano_sdk_core.ProviderFailure.html" class="tsd-signature-type" data-tsd-kind="Enumeration">ProviderFailure</a></h5>
 								</li>
 								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> innerError: <span class="tsd-signature-type">unknown</span></h5>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> innerError: <span class="tsd-signature-type">InnerError</span></h5>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> detail: <span class="tsd-signature-type">string</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="_cardano_sdk_core.ProviderError.html" class="tsd-signature-type" data-tsd-kind="Class">ProviderError</a></h4>
+							<h4 class="tsd-returns-title">Returns <a href="_cardano_sdk_core.ProviderError.html" class="tsd-signature-type" data-tsd-kind="Class">ProviderError</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">InnerError</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="cause" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> cause</h3>
+					<div class="tsd-signature tsd-kind-icon">cause<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Error</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from CustomError.cause</p>
+						<ul>
+							<li>Defined in node_modules/typescript/lib/lib.es2022.error.d.ts:26</li>
+						</ul>
+					</aside>
+				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 					<a name="detail" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagOptional">Optional</span> detail</h3>
@@ -158,7 +184,7 @@
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 					<a name="innerError" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagOptional">Optional</span> inner<wbr>Error</h3>
-					<div class="tsd-signature tsd-kind-icon">inner<wbr>Error<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">unknown</span></div>
+					<div class="tsd-signature tsd-kind-icon">inner<wbr>Error<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">InnerError</span></div>
 					<aside class="tsd-sources">
 					</aside>
 				</section>
@@ -329,11 +355,14 @@
 				<ul class="before-current">
 				</ul>
 				<ul class="current">
-					<li class="current tsd-kind-class tsd-parent-kind-module">
+					<li class="current tsd-kind-class tsd-parent-kind-module tsd-has-type-parameter">
 						<a href="_cardano_sdk_core.ProviderError.html" class="tsd-kind-icon">Provider<wbr>Error</a>
 						<ul>
-							<li class=" tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite">
+							<li class=" tsd-kind-constructor tsd-parent-kind-class tsd-has-type-parameter tsd-is-overwrite">
 								<a href="_cardano_sdk_core.ProviderError.html#constructor" class="tsd-kind-icon">constructor</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="_cardano_sdk_core.ProviderError.html#cause" class="tsd-kind-icon">cause</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="_cardano_sdk_core.ProviderError.html#detail" class="tsd-kind-icon">detail</a>
@@ -381,11 +410,11 @@
 				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
 				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
 				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
 				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
-				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
 				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
 			</ul>
 			<ul class="tsd-legend">

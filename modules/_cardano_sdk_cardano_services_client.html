@@ -72,12 +72,28 @@
 						<section class="tsd-index-section ">
 							<h3>Interfaces</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-interface tsd-parent-kind-module tsd-has-type-parameter"><a href="../interfaces/_cardano_sdk_cardano_services_client.HttpProviderConfig.html" class="tsd-kind-icon">Http<wbr>Provider<wbr>Config</a></li>
 								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/_cardano_sdk_cardano_services_client.TxSubmitProvider.html" class="tsd-kind-icon">Tx<wbr>Submit<wbr>Provider</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Type aliases</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-type-alias tsd-parent-kind-module tsd-has-type-parameter"><a href="_cardano_sdk_cardano_services_client.html#HttpProviderConfigPaths" class="tsd-kind-icon">Http<wbr>Provider<wbr>Config<wbr>Paths</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Variables</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-variable tsd-parent-kind-module"><a href="_cardano_sdk_cardano_services_client.html#defaultStakePoolSearchProviderPaths" class="tsd-kind-icon">default<wbr>Stake<wbr>Pool<wbr>Search<wbr>Provider<wbr>Paths</a></li>
+								<li class="tsd-kind-variable tsd-parent-kind-module"><a href="_cardano_sdk_cardano_services_client.html#defaultTxSubmitProviderPaths" class="tsd-kind-icon">default<wbr>TxSubmit<wbr>Provider<wbr>Paths</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Functions</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter"><a href="_cardano_sdk_cardano_services_client.html#createHttpProvider" class="tsd-kind-icon">create<wbr>Http<wbr>Provider</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_cardano_sdk_cardano_services_client.html#stakePoolSearchHttpProvider" class="tsd-kind-icon">stake<wbr>Pool<wbr>Search<wbr>Http<wbr>Provider</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_cardano_sdk_cardano_services_client.html#txSubmitHttpProvider" class="tsd-kind-icon">tx<wbr>Submit<wbr>Http<wbr>Provider</a></li>
 							</ul>
 						</section>
@@ -85,18 +101,138 @@
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Type aliases</h2>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-module tsd-has-type-parameter">
+					<a name="HttpProviderConfigPaths" class="tsd-anchor"></a>
+					<h3>Http<wbr>Provider<wbr>Config<wbr>Paths</h3>
+					<div class="tsd-signature tsd-kind-icon">Http<wbr>Provider<wbr>Config<wbr>Paths&lt;T&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{</span><span class="tsd-signature-symbol">[ </span><span class="tsd-signature-type">methodName</span><span class="tsd-signature-symbol"> in </span><span class="tsd-signature-symbol">keyof </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/0290354/packages/cardano-services-client/src/HttpProvider.ts#L5">packages/cardano-services-client/src/HttpProvider.ts:5</a></li>
+						</ul>
+					</aside>
+					<h4 class="tsd-type-parameters-title">Type parameters</h4>
+					<ul class="tsd-type-parameters">
+						<li>
+							<h4>T</h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Variables</h2>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-module">
+					<a name="defaultStakePoolSearchProviderPaths" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> default<wbr>Stake<wbr>Pool<wbr>Search<wbr>Provider<wbr>Paths</h3>
+					<div class="tsd-signature tsd-kind-icon">default<wbr>Stake<wbr>Pool<wbr>Search<wbr>Provider<wbr>Paths<span class="tsd-signature-symbol">:</span> <a href="_cardano_sdk_cardano_services_client.html#HttpProviderConfigPaths" class="tsd-signature-type" data-tsd-kind="Type alias">HttpProviderConfigPaths</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">StakePoolSearchProvider</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/0290354/packages/cardano-services-client/src/StakePoolSearchProvider/stakePoolSearchHttpProvider.ts#L4">packages/cardano-services-client/src/StakePoolSearchProvider/stakePoolSearchHttpProvider.ts:4</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-module">
+					<a name="defaultTxSubmitProviderPaths" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> default<wbr>TxSubmit<wbr>Provider<wbr>Paths</h3>
+					<div class="tsd-signature tsd-kind-icon">default<wbr>TxSubmit<wbr>Provider<wbr>Paths<span class="tsd-signature-symbol">:</span> <a href="_cardano_sdk_cardano_services_client.html#HttpProviderConfigPaths" class="tsd-signature-type" data-tsd-kind="Type alias">HttpProviderConfigPaths</a><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_cardano_sdk_cardano_services_client.TxSubmitProvider.html" class="tsd-signature-type" data-tsd-kind="Interface">TxSubmitProvider</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/0290354/packages/cardano-services-client/src/TxSubmitProvider/txSubmitHttpProvider.ts#L5">packages/cardano-services-client/src/TxSubmitProvider/txSubmitHttpProvider.ts:5</a></li>
+						</ul>
+					</aside>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Functions</h2>
-				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
-					<a name="txSubmitHttpProvider" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagConst">Const</span> tx<wbr>Submit<wbr>Http<wbr>Provider</h3>
-					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">tx<wbr>Submit<wbr>Http<wbr>Provider<span class="tsd-signature-symbol">(</span>connectionConfig<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>url<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/_cardano_sdk_cardano_services_client.TxSubmitProvider.html" class="tsd-signature-type" data-tsd-kind="Interface">TxSubmitProvider</a></li>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
+					<a name="createHttpProvider" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> create<wbr>Http<wbr>Provider</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
+						<li class="tsd-signature tsd-kind-icon">create<wbr>Http<wbr>Provider&lt;T&gt;<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><a href="../interfaces/_cardano_sdk_cardano_services_client.HttpProviderConfig.html" class="tsd-signature-type" data-tsd-kind="Interface">HttpProviderConfig</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/a34bf6d/packages/cardano-services-client/src/TxSubmitProvider/txSubmitHttpProvider.ts#L22">packages/cardano-services-client/src/TxSubmitProvider/txSubmitHttpProvider.ts:22</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/0290354/packages/cardano-services-client/src/HttpProvider.ts#L42">packages/cardano-services-client/src/HttpProvider.ts:42</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Creates a HTTP client for specified provider type, following some conventions:</p>
+									<ul>
+										<li>All methods use POST requests</li>
+										<li>Arguments are serialized using core toSerializableObject and sent as JSON {args: unknown[]} in request body</li>
+										<li>Server is expected to use the following core utils:<ul>
+												<li>fromSerializableObject after deserializing args</li>
+												<li>toSerializableObject before serializing response body</li>
+											</ul>
+										</li>
+									</ul>
+								</div>
+							</div>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>T<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span></h4>
+								</li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>__namedParameters: <a href="../interfaces/_cardano_sdk_cardano_services_client.HttpProviderConfig.html" class="tsd-signature-type" data-tsd-kind="Interface">HttpProviderConfig</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">T</span></h4>
+							<p>provider that fetches data over http</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="stakePoolSearchHttpProvider" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> stake<wbr>Pool<wbr>Search<wbr>Http<wbr>Provider</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">stake<wbr>Pool<wbr>Search<wbr>Http<wbr>Provider<span class="tsd-signature-symbol">(</span>baseUrl<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, paths<span class="tsd-signature-symbol">?: </span><a href="_cardano_sdk_cardano_services_client.html#HttpProviderConfigPaths" class="tsd-signature-type" data-tsd-kind="Type alias">HttpProviderConfigPaths</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">StakePoolSearchProvider</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">StakePoolSearchProvider</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/0290354/packages/cardano-services-client/src/StakePoolSearchProvider/stakePoolSearchHttpProvider.ts#L13">packages/cardano-services-client/src/StakePoolSearchProvider/stakePoolSearchHttpProvider.ts:13</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Connect to a StakePoolSearchHttpServer instance</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>baseUrl: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>server root url, w/o trailing /</p>
+									</div>
+								</li>
+								<li>
+									<h5>paths: <a href="_cardano_sdk_cardano_services_client.html#HttpProviderConfigPaths" class="tsd-signature-type" data-tsd-kind="Type alias">HttpProviderConfigPaths</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">StakePoolSearchProvider</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">StakePoolSearchProvider</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="txSubmitHttpProvider" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> tx<wbr>Submit<wbr>Http<wbr>Provider</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">tx<wbr>Submit<wbr>Http<wbr>Provider<span class="tsd-signature-symbol">(</span>baseUrl<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, paths<span class="tsd-signature-symbol">?: </span><a href="_cardano_sdk_cardano_services_client.html#HttpProviderConfigPaths" class="tsd-signature-type" data-tsd-kind="Type alias">HttpProviderConfigPaths</a><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_cardano_sdk_cardano_services_client.TxSubmitProvider.html" class="tsd-signature-type" data-tsd-kind="Interface">TxSubmitProvider</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/_cardano_sdk_cardano_services_client.TxSubmitProvider.html" class="tsd-signature-type" data-tsd-kind="Interface">TxSubmitProvider</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/0290354/packages/cardano-services-client/src/TxSubmitProvider/txSubmitHttpProvider.ts#L32">packages/cardano-services-client/src/TxSubmitProvider/txSubmitHttpProvider.ts:32</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -105,22 +241,21 @@
 								</div>
 								<dl class="tsd-comment-tags">
 									<dt>throws</dt>
-									<dd><p>{Cardano.TxSubmissionErrors}</p>
+									<dd><p>{ProviderError} if reason === ProviderFailure.BadRequest then
+										innerError is set to either one of Cardano.TxSubmissionErrors or Cardano.UnknownTxSubmissionError</p>
 									</dd>
 								</dl>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>connectionConfig: <span class="tsd-signature-symbol">{ </span>url<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span></h5>
+									<h5>baseUrl: <span class="tsd-signature-type">string</span></h5>
 									<div class="tsd-comment tsd-typography">
-										<p>Service connection configuration</p>
+										<p>server root url, w/o trailing /</p>
 									</div>
-									<ul class="tsd-parameters">
-										<li class="tsd-parameter">
-											<h5>url<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
-										</li>
-									</ul>
+								</li>
+								<li>
+									<h5>paths: <a href="_cardano_sdk_cardano_services_client.html#HttpProviderConfigPaths" class="tsd-signature-type" data-tsd-kind="Type alias">HttpProviderConfigPaths</a><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_cardano_sdk_cardano_services_client.TxSubmitProvider.html" class="tsd-signature-type" data-tsd-kind="Interface">TxSubmitProvider</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="../interfaces/_cardano_sdk_cardano_services_client.TxSubmitProvider.html" class="tsd-signature-type" data-tsd-kind="Interface">TxSubmitProvider</a></h4>
@@ -167,8 +302,26 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
+					<li class=" tsd-kind-interface tsd-parent-kind-module tsd-has-type-parameter">
+						<a href="../interfaces/_cardano_sdk_cardano_services_client.HttpProviderConfig.html" class="tsd-kind-icon">Http<wbr>Provider<wbr>Config</a>
+					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
 						<a href="../interfaces/_cardano_sdk_cardano_services_client.TxSubmitProvider.html" class="tsd-kind-icon">Tx<wbr>Submit<wbr>Provider</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module tsd-has-type-parameter">
+						<a href="_cardano_sdk_cardano_services_client.html#HttpProviderConfigPaths" class="tsd-kind-icon">Http<wbr>Provider<wbr>Config<wbr>Paths</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-module">
+						<a href="_cardano_sdk_cardano_services_client.html#defaultStakePoolSearchProviderPaths" class="tsd-kind-icon">default<wbr>Stake<wbr>Pool<wbr>Search<wbr>Provider<wbr>Paths</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-module">
+						<a href="_cardano_sdk_cardano_services_client.html#defaultTxSubmitProviderPaths" class="tsd-kind-icon">default<wbr>TxSubmit<wbr>Provider<wbr>Paths</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
+						<a href="_cardano_sdk_cardano_services_client.html#createHttpProvider" class="tsd-kind-icon">create<wbr>Http<wbr>Provider</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="_cardano_sdk_cardano_services_client.html#stakePoolSearchHttpProvider" class="tsd-kind-icon">stake<wbr>Pool<wbr>Search<wbr>Http<wbr>Provider</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module">
 						<a href="_cardano_sdk_cardano_services_client.html#txSubmitHttpProvider" class="tsd-kind-icon">tx<wbr>Submit<wbr>Http<wbr>Provider</a>
@@ -188,6 +341,7 @@
 				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
 				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
 				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
