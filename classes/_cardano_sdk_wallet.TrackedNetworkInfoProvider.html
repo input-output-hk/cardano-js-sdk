@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>TrackedTimeSettingsProvider | cardano-sdk</title>
+	<title>TrackedNetworkInfoProvider | cardano-sdk</title>
 	<meta name="description" content="Documentation for cardano-sdk">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -58,10 +58,10 @@
 					<a href="../modules/_cardano_sdk_wallet.html">@cardano-sdk/wallet</a>
 				</li>
 				<li>
-					<a href="_cardano_sdk_wallet.TrackedTimeSettingsProvider.html">TrackedTimeSettingsProvider</a>
+					<a href="_cardano_sdk_wallet.TrackedNetworkInfoProvider.html">TrackedNetworkInfoProvider</a>
 				</li>
 			</ul>
-			<h1>Class TrackedTimeSettingsProvider</h1>
+			<h1>Class TrackedNetworkInfoProvider</h1>
 		</div>
 	</div>
 </header>
@@ -71,7 +71,7 @@
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>Wraps a TimeSettingsProvider, tracking # of calls of each function</p>
+						<p>Wraps a NetworkInfoProvider, tracking # of calls of each function</p>
 					</div>
 				</div>
 			</section>
@@ -82,7 +82,7 @@
 						<a href="_cardano_sdk_wallet.ProviderTracker.html" class="tsd-signature-type" data-tsd-kind="Class">ProviderTracker</a>
 						<ul class="tsd-hierarchy">
 							<li>
-								<span class="target">TrackedTimeSettingsProvider</span>
+								<span class="target">TrackedNetworkInfoProvider</span>
 							</li>
 						</ul>
 					</li>
@@ -91,7 +91,7 @@
 			<section class="tsd-panel">
 				<h3>Implements</h3>
 				<ul class="tsd-hierarchy">
-					<li><span class="tsd-signature-type">TimeSettingsProvider</span></li>
+					<li><span class="tsd-signature-type">NetworkInfoProvider</span></li>
 				</ul>
 			</section>
 			<section class="tsd-panel-group tsd-index-group">
@@ -101,21 +101,21 @@
 						<section class="tsd-index-section ">
 							<h3>Constructors</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite"><a href="_cardano_sdk_wallet.TrackedTimeSettingsProvider.html#constructor" class="tsd-kind-icon">constructor</a></li>
+								<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite"><a href="_cardano_sdk_wallet.TrackedNetworkInfoProvider.html#constructor" class="tsd-kind-icon">constructor</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_cardano_sdk_wallet.TrackedTimeSettingsProvider.html#getTimeSettings" class="tsd-kind-icon">get<wbr>Time<wbr>Settings</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_cardano_sdk_wallet.TrackedTimeSettingsProvider.html#stats" class="tsd-kind-icon">stats</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_cardano_sdk_wallet.TrackedNetworkInfoProvider.html#networkInfo" class="tsd-kind-icon">network<wbr>Info</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_cardano_sdk_wallet.TrackedNetworkInfoProvider.html#stats" class="tsd-kind-icon">stats</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section tsd-is-inherited">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_cardano_sdk_wallet.TrackedTimeSettingsProvider.html#setStatInitialized" class="tsd-kind-icon">set<wbr>Stat<wbr>Initialized</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-protected"><a href="_cardano_sdk_wallet.TrackedTimeSettingsProvider.html#trackedCall" class="tsd-kind-icon">tracked<wbr>Call</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_cardano_sdk_wallet.TrackedNetworkInfoProvider.html#setStatInitialized" class="tsd-kind-icon">set<wbr>Stat<wbr>Initialized</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-protected"><a href="_cardano_sdk_wallet.TrackedNetworkInfoProvider.html#trackedCall" class="tsd-kind-icon">tracked<wbr>Call</a></li>
 							</ul>
 						</section>
 					</div>
@@ -127,23 +127,23 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Tracked<wbr>Time<wbr>Settings<wbr>Provider<span class="tsd-signature-symbol">(</span>timeSettingsProvider<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TimeSettingsProvider</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_wallet.TrackedTimeSettingsProvider.html" class="tsd-signature-type" data-tsd-kind="Class">TrackedTimeSettingsProvider</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Tracked<wbr>Network<wbr>Info<wbr>Provider<span class="tsd-signature-symbol">(</span>networkInfoProvider<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">NetworkInfoProvider</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_wallet.TrackedNetworkInfoProvider.html" class="tsd-signature-type" data-tsd-kind="Class">TrackedNetworkInfoProvider</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Overrides <a href="_cardano_sdk_wallet.ProviderTracker.html">ProviderTracker</a>.<a href="_cardano_sdk_wallet.ProviderTracker.html#constructor">constructor</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/4f001f8/packages/wallet/src/services/ProviderTracker/TrackedTimeSettingsProvider.ts#L24">packages/wallet/src/services/ProviderTracker/TrackedTimeSettingsProvider.ts:24</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d1e9d14/packages/wallet/src/services/ProviderTracker/TrackedNetworkInfoProvider.ts#L24">packages/wallet/src/services/ProviderTracker/TrackedNetworkInfoProvider.ts:24</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>timeSettingsProvider: <span class="tsd-signature-type">TimeSettingsProvider</span></h5>
+									<h5>networkInfoProvider: <span class="tsd-signature-type">NetworkInfoProvider</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="_cardano_sdk_wallet.TrackedTimeSettingsProvider.html" class="tsd-signature-type" data-tsd-kind="Class">TrackedTimeSettingsProvider</a></h4>
+							<h4 class="tsd-returns-title">Returns <a href="_cardano_sdk_wallet.TrackedNetworkInfoProvider.html" class="tsd-signature-type" data-tsd-kind="Class">TrackedNetworkInfoProvider</a></h4>
 						</li>
 					</ul>
 				</section>
@@ -151,13 +151,13 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
-					<a name="getTimeSettings" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagReadonly">Readonly</span> get<wbr>Time<wbr>Settings</h3>
-					<div class="tsd-signature tsd-kind-icon">get<wbr>Time<wbr>Settings<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TimeSettings</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<a name="networkInfo" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagReadonly">Readonly</span> network<wbr>Info</h3>
+					<div class="tsd-signature tsd-kind-icon">network<wbr>Info<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">NetworkInfo</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
-						<p>Implementation of TimeSettingsProvider.getTimeSettings</p>
+						<p>Implementation of NetworkInfoProvider.networkInfo</p>
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/4f001f8/packages/wallet/src/services/ProviderTracker/TrackedTimeSettingsProvider.ts#L22">packages/wallet/src/services/ProviderTracker/TrackedTimeSettingsProvider.ts:22</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d1e9d14/packages/wallet/src/services/ProviderTracker/TrackedNetworkInfoProvider.ts#L22">packages/wallet/src/services/ProviderTracker/TrackedNetworkInfoProvider.ts:22</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -165,11 +165,11 @@
 						<ul class="tsd-parameters">
 							<li class="tsd-parameter-signature">
 								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-class">
-									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TimeSettings</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></li>
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">NetworkInfo</span><span class="tsd-signature-symbol">&gt;</span></li>
 								</ul>
 								<ul class="tsd-descriptions">
 									<li class="tsd-description">
-										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TimeSettings</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h4>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">NetworkInfo</span><span class="tsd-signature-symbol">&gt;</span></h4>
 									</li>
 								</ul>
 							</li>
@@ -179,10 +179,10 @@
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 					<a name="stats" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagReadonly">Readonly</span> stats</h3>
-					<div class="tsd-signature tsd-kind-icon">stats<span class="tsd-signature-symbol">:</span> <a href="_cardano_sdk_wallet.TimeSettingsProviderStats.html" class="tsd-signature-type" data-tsd-kind="Class">TimeSettingsProviderStats</a><span class="tsd-signature-symbol"> = ...</span></div>
+					<div class="tsd-signature tsd-kind-icon">stats<span class="tsd-signature-symbol">:</span> <a href="_cardano_sdk_wallet.NetworkInfoProviderStats.html" class="tsd-signature-type" data-tsd-kind="Class">NetworkInfoProviderStats</a><span class="tsd-signature-symbol"> = ...</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/4f001f8/packages/wallet/src/services/ProviderTracker/TrackedTimeSettingsProvider.ts#L21">packages/wallet/src/services/ProviderTracker/TrackedTimeSettingsProvider.ts:21</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d1e9d14/packages/wallet/src/services/ProviderTracker/TrackedNetworkInfoProvider.ts#L21">packages/wallet/src/services/ProviderTracker/TrackedNetworkInfoProvider.ts:21</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -200,7 +200,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_cardano_sdk_wallet.ProviderTracker.html">ProviderTracker</a>.<a href="_cardano_sdk_wallet.ProviderTracker.html#setStatInitialized">setStatInitialized</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/4f001f8/packages/wallet/src/services/ProviderTracker/ProviderTracker.ts#L44">packages/wallet/src/services/ProviderTracker/ProviderTracker.ts:44</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d1e9d14/packages/wallet/src/services/ProviderTracker/ProviderTracker.ts#L44">packages/wallet/src/services/ProviderTracker/ProviderTracker.ts:44</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -224,7 +224,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_cardano_sdk_wallet.ProviderTracker.html">ProviderTracker</a>.<a href="_cardano_sdk_wallet.ProviderTracker.html#trackedCall">trackedCall</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/4f001f8/packages/wallet/src/services/ProviderTracker/ProviderTracker.ts#L22">packages/wallet/src/services/ProviderTracker/ProviderTracker.ts:22</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d1e9d14/packages/wallet/src/services/ProviderTracker/ProviderTracker.ts#L22">packages/wallet/src/services/ProviderTracker/ProviderTracker.ts:22</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -300,22 +300,22 @@
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-class tsd-parent-kind-module">
-						<a href="_cardano_sdk_wallet.TrackedTimeSettingsProvider.html" class="tsd-kind-icon">Tracked<wbr>Time<wbr>Settings<wbr>Provider</a>
+						<a href="_cardano_sdk_wallet.TrackedNetworkInfoProvider.html" class="tsd-kind-icon">Tracked<wbr>Network<wbr>Info<wbr>Provider</a>
 						<ul>
 							<li class=" tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite">
-								<a href="_cardano_sdk_wallet.TrackedTimeSettingsProvider.html#constructor" class="tsd-kind-icon">constructor</a>
+								<a href="_cardano_sdk_wallet.TrackedNetworkInfoProvider.html#constructor" class="tsd-kind-icon">constructor</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
-								<a href="_cardano_sdk_wallet.TrackedTimeSettingsProvider.html#getTimeSettings" class="tsd-kind-icon">get<wbr>Time<wbr>Settings</a>
+								<a href="_cardano_sdk_wallet.TrackedNetworkInfoProvider.html#networkInfo" class="tsd-kind-icon">network<wbr>Info</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
-								<a href="_cardano_sdk_wallet.TrackedTimeSettingsProvider.html#stats" class="tsd-kind-icon">stats</a>
+								<a href="_cardano_sdk_wallet.TrackedNetworkInfoProvider.html#stats" class="tsd-kind-icon">stats</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
-								<a href="_cardano_sdk_wallet.TrackedTimeSettingsProvider.html#setStatInitialized" class="tsd-kind-icon">set<wbr>Stat<wbr>Initialized</a>
+								<a href="_cardano_sdk_wallet.TrackedNetworkInfoProvider.html#setStatInitialized" class="tsd-kind-icon">set<wbr>Stat<wbr>Initialized</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-protected">
-								<a href="_cardano_sdk_wallet.TrackedTimeSettingsProvider.html#trackedCall" class="tsd-kind-icon">tracked<wbr>Call</a>
+								<a href="_cardano_sdk_wallet.TrackedNetworkInfoProvider.html#trackedCall" class="tsd-kind-icon">tracked<wbr>Call</a>
 							</li>
 						</ul>
 					</li>

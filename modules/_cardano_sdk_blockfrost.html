@@ -91,6 +91,7 @@
 							<h3>Functions</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_cardano_sdk_blockfrost.html#blockfrostAssetProvider" class="tsd-kind-icon">blockfrost<wbr>Asset<wbr>Provider</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_cardano_sdk_blockfrost.html#blockfrostNetworkInfoProvider" class="tsd-kind-icon">blockfrost<wbr>Network<wbr>Info<wbr>Provider</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_cardano_sdk_blockfrost.html#blockfrostTxSubmitProvider" class="tsd-kind-icon">blockfrost<wbr>TxSubmit<wbr>Provider</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_cardano_sdk_blockfrost.html#blockfrostWalletProvider" class="tsd-kind-icon">blockfrost<wbr>Wallet<wbr>Provider</a></li>
 							</ul>
@@ -123,7 +124,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/4f001f8/packages/blockfrost/src/blockfrostAssetProvider.ts#L32">packages/blockfrost/src/blockfrostAssetProvider.ts:32</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d1e9d14/packages/blockfrost/src/blockfrostAssetProvider.ts#L32">packages/blockfrost/src/blockfrostAssetProvider.ts:32</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -151,6 +152,43 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="blockfrostNetworkInfoProvider" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> blockfrost<wbr>Network<wbr>Info<wbr>Provider</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">blockfrost<wbr>Network<wbr>Info<wbr>Provider<span class="tsd-signature-symbol">(</span>blockfrost<span class="tsd-signature-symbol">: </span><a href="../classes/_cardano_sdk_blockfrost.BlockFrostAPI.html" class="tsd-signature-type" data-tsd-kind="Class">BlockFrostAPI</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">NetworkInfoProvider</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d1e9d14/packages/blockfrost/src/blockfrostNetworkInfoProvider.ts#L11">packages/blockfrost/src/blockfrostNetworkInfoProvider.ts:11</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Connect to the <a href="https://docs.blockfrost.io/">Blockfrost service</a></p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>throws</dt>
+									<dd><p>{ProviderError}</p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>blockfrost: <a href="../classes/_cardano_sdk_blockfrost.BlockFrostAPI.html" class="tsd-signature-type" data-tsd-kind="Class">BlockFrostAPI</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>BlockFrostAPI instance</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">NetworkInfoProvider</span></h4>
+							<p>NetworkInfoProvider</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
 					<a name="blockfrostTxSubmitProvider" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> blockfrost<wbr>TxSubmit<wbr>Provider</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
@@ -160,7 +198,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/4f001f8/packages/blockfrost/src/blockfrostTxSubmitProvider.ts#L11">packages/blockfrost/src/blockfrostTxSubmitProvider.ts:11</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d1e9d14/packages/blockfrost/src/blockfrostTxSubmitProvider.ts#L11">packages/blockfrost/src/blockfrostTxSubmitProvider.ts:11</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -197,7 +235,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/4f001f8/packages/blockfrost/src/blockfrostWalletProvider.ts#L47">packages/blockfrost/src/blockfrostWalletProvider.ts:47</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/d1e9d14/packages/blockfrost/src/blockfrostWalletProvider.ts#L47">packages/blockfrost/src/blockfrostWalletProvider.ts:47</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -277,6 +315,9 @@
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module">
 						<a href="_cardano_sdk_blockfrost.html#blockfrostAssetProvider" class="tsd-kind-icon">blockfrost<wbr>Asset<wbr>Provider</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="_cardano_sdk_blockfrost.html#blockfrostNetworkInfoProvider" class="tsd-kind-icon">blockfrost<wbr>Network<wbr>Info<wbr>Provider</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module">
 						<a href="_cardano_sdk_blockfrost.html#blockfrostTxSubmitProvider" class="tsd-kind-icon">blockfrost<wbr>TxSubmit<wbr>Provider</a>
