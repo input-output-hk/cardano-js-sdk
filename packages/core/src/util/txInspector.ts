@@ -17,11 +17,17 @@ type TxInspector<T extends Inspectors> = (tx: TxAlonzo) => {
   [k in keyof T]: ReturnType<T[k]>;
 };
 
-// Inspectors result types
+// Inspection result types
 export type SendReceiveValueInspection = Value;
 export type DelegationInspection = StakeDelegationCertificate[];
 export type StakeKeyRegistrationInspection = StakeAddressCertificate[];
 export type WithdrawalInspection = Lovelace;
+
+// Inspector types
+export type SendReceiveValueInspector = (ownAddresses: Address[]) => Inspector<SendReceiveValueInspection>;
+export type DelegationInspector = Inspector<DelegationInspection>;
+export type StakeKeyRegistrationInspector = Inspector<StakeKeyRegistrationInspection>;
+export type WithdrawalInspector = Inspector<WithdrawalInspection>;
 
 /**
  * Inspects a transaction for value (coins + assets) sent by the provided addresses.
@@ -29,13 +35,11 @@ export type WithdrawalInspection = Lovelace;
  * @param {Address[]} ownAddresses own wallet's addresses
  * @returns {Value} total value sent
  */
-export const valueSentInspector =
-  (ownAddresses: Address[]): Inspector<Value> =>
-  (tx: TxAlonzo): SendReceiveValueInspection => {
-    if (!isOutgoing(tx, ownAddresses)) return { coins: 0n };
-    const sentOutputs = tx.body.outputs.filter((out) => !isAddressWithin(ownAddresses)(out));
-    return coalesceValueQuantities(sentOutputs.map((output) => output.value));
-  };
+export const valueSentInspector: SendReceiveValueInspector = (ownAddresses: Address[]) => (tx: TxAlonzo) => {
+  if (!isOutgoing(tx, ownAddresses)) return { coins: 0n };
+  const sentOutputs = tx.body.outputs.filter((out) => !isAddressWithin(ownAddresses)(out));
+  return coalesceValueQuantities(sentOutputs.map((output) => output.value));
+};
 
 /**
  * Inspects a transaction for value (coins + assets) received by the provided addresses.
@@ -43,13 +47,11 @@ export const valueSentInspector =
  * @param {Address[]} ownAddresses own wallet's addresses
  * @returns {Value} total value received
  */
-export const valueReceivedInspector =
-  (ownAddresses: Address[]): Inspector<Value> =>
-  (tx: TxAlonzo): SendReceiveValueInspection => {
-    if (isOutgoing(tx, ownAddresses)) return { coins: 0n };
-    const receivedOutputs = tx.body.outputs.filter((out) => isAddressWithin(ownAddresses)(out));
-    return coalesceValueQuantities(receivedOutputs.map((output) => output.value));
-  };
+export const valueReceivedInspector: SendReceiveValueInspector = (ownAddresses: Address[]) => (tx: TxAlonzo) => {
+  if (isOutgoing(tx, ownAddresses)) return { coins: 0n };
+  const receivedOutputs = tx.body.outputs.filter((out) => isAddressWithin(ownAddresses)(out));
+  return coalesceValueQuantities(receivedOutputs.map((output) => output.value));
+};
 
 /**
  * Inspects a transaction for a stake delegation certificate.
@@ -57,7 +59,7 @@ export const valueReceivedInspector =
  * @param {TxAlonzo} tx transaction to inspect
  * @returns {DelegationInspection} array of delegation certificates
  */
-export const delegationInspector: Inspector<DelegationInspection> = (tx: TxAlonzo) =>
+export const delegationInspector: DelegationInspector = (tx: TxAlonzo) =>
   (tx.body.certificates?.filter(
     (cert) => cert.__typename === CertificateType.StakeDelegation
   ) as StakeDelegationCertificate[]) ?? [];
@@ -68,7 +70,7 @@ export const delegationInspector: Inspector<DelegationInspection> = (tx: TxAlonz
  * @param {TxAlonzo} tx transaction to inspect
  * @returns {StakeKeyRegistrationInspection} array of stake key registration certificates
  */
-export const stakeKeyRegistrationInspector: Inspector<StakeKeyRegistrationInspection> = (tx: TxAlonzo) =>
+export const stakeKeyRegistrationInspector: StakeKeyRegistrationInspector = (tx: TxAlonzo) =>
   (tx.body.certificates?.filter(
     (cert) => cert.__typename === CertificateType.StakeKeyRegistration
   ) as StakeAddressCertificate[]) ?? [];
@@ -79,7 +81,7 @@ export const stakeKeyRegistrationInspector: Inspector<StakeKeyRegistrationInspec
  * @param {TxAlonzo} tx transaction to inspect
  * @returns {StakeKeyRegistrationInspection} array of stake key deregistration certificates
  */
-export const stakeKeyDeregistrationInspector: Inspector<StakeKeyRegistrationInspection> = (tx: TxAlonzo) =>
+export const stakeKeyDeregistrationInspector: StakeKeyRegistrationInspector = (tx: TxAlonzo) =>
   (tx.body.certificates?.filter(
     (cert) => cert.__typename === CertificateType.StakeKeyDeregistration
   ) as StakeAddressCertificate[]) ?? [];
@@ -90,7 +92,7 @@ export const stakeKeyDeregistrationInspector: Inspector<StakeKeyRegistrationInsp
  * @param {TxAlonzo} tx transaction to inspect
  * @returns {WithdrawalInspection} accumulated withdrawal quantities
  */
-export const withdrawalInspector: Inspector<WithdrawalInspection> = (tx: TxAlonzo) =>
+export const withdrawalInspector: WithdrawalInspector = (tx: TxAlonzo) =>
   tx.body.withdrawals?.length ? BigIntMath.sum(tx.body.withdrawals.map(({ quantity }) => quantity)) : 0n;
 
 /**
