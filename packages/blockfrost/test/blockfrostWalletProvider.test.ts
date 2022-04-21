@@ -2,7 +2,7 @@
 /* eslint-disable max-len */
 
 import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
-import { Cardano, NetworkInfo, StakePoolStats, WalletProvider } from '@cardano-sdk/core';
+import { Cardano, StakePoolStats, WalletProvider } from '@cardano-sdk/core';
 import { blockfrostWalletProvider } from '../src';
 jest.mock('@blockfrost/blockfrost-js');
 
@@ -47,62 +47,6 @@ const blockResponse = {
 
 describe('blockfrostWalletProvider', () => {
   const apiKey = 'someapikey';
-
-  test('networkInfo', async () => {
-    const mockedEpochsLatestResponse = {
-      active_stake: '1060378314781343',
-      block_count: 9593,
-      end_time: 1_632_687_616,
-      epoch: 158,
-      fees: '4426764732',
-      first_block_time: 1_632_255_656,
-      last_block_time: 1_632_571_205,
-      output: '10876219159738237',
-      start_time: 1_632_255_616,
-      tx_count: 20_736
-    } as Responses['epoch_content'];
-
-    const mockedNetworkResponse = {
-      stake: {
-        active: '1060378314781343',
-        live: '15001884895856815'
-      },
-      supply: {
-        circulating: '42064399450423723',
-        locked: '6161981104458',
-        max: '45000000000000000',
-        total: '40267211394073980'
-      }
-    } as Responses['network'];
-
-    BlockFrostAPI.prototype.epochsLatest = jest.fn().mockResolvedValue(mockedEpochsLatestResponse);
-    BlockFrostAPI.prototype.network = jest.fn().mockResolvedValue(mockedNetworkResponse);
-
-    const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
-    const client = blockfrostWalletProvider(blockfrost);
-    const response = await client.networkInfo();
-
-    expect(response).toMatchObject<NetworkInfo>({
-      currentEpoch: {
-        end: {
-          date: new Date('2021-09-26T20:20:16.000Z')
-        },
-        number: 158,
-        start: {
-          date: new Date('2021-09-21T20:20:16.000Z')
-        }
-      },
-      lovelaceSupply: {
-        circulating: 42_064_399_450_423_723n,
-        max: 45_000_000_000_000_000n,
-        total: 40_267_211_394_073_980n
-      },
-      stake: {
-        active: 1_060_378_314_781_343n,
-        live: 15_001_884_895_856_815n
-      }
-    });
-  });
 
   test('stakePoolStats', async () => {
     // Simulate batch fetching

@@ -1,4 +1,4 @@
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, TimeSettings } from '@cardano-sdk/core';
 import { isEqual } from 'lodash-es';
 
 export const strictEquals = <T>(a: T, b: T) => a === b;
@@ -18,3 +18,6 @@ export const txInEquals = (a: Cardano.NewTxIn, b: Cardano.NewTxIn) => a.txId ===
 
 export const utxoEquals = (a: Cardano.Utxo[], b: Cardano.Utxo[]) =>
   arrayEquals(a, b, ([aTxIn], [bTxIn]) => txInEquals(aTxIn, bTxIn));
+
+export const timeSettingsEquals = (a: TimeSettings[], b: TimeSettings[]) =>
+  arrayEquals(a, b, (ts1, ts2) => ts1.fromSlotNo === ts2.fromSlotNo);

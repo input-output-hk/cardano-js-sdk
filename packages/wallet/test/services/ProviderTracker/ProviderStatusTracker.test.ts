@@ -4,16 +4,15 @@ import {
   CLEAN_FN_STATS,
   ProviderFnStats,
   TrackedAssetProvider,
+  TrackedNetworkInfoProvider,
   TrackedStakePoolSearchProvider,
-  TrackedTimeSettingsProvider,
   TrackedTxSubmitProvider,
   TrackedWalletProvider,
   createProviderStatusTracker
 } from '../../../src';
-import { createStubStakePoolSearchProvider, createStubTimeSettingsProvider } from '@cardano-sdk/util-dev';
+import { createStubStakePoolSearchProvider } from '@cardano-sdk/util-dev';
 import { createTestScheduler } from '../../testScheduler';
-import { mockAssetProvider, mockTxSubmitProvider, mockWalletProvider } from '../../mocks';
-import { testnetTimeSettings } from '@cardano-sdk/core';
+import { mockAssetProvider, mockNetworkInfoProvider, mockTxSubmitProvider, mockWalletProvider } from '../../mocks';
 
 const providerFnStats = {
   a: [CLEAN_FN_STATS, CLEAN_FN_STATS], // Initial state
@@ -57,7 +56,7 @@ const providerFnStats = {
 describe('createProviderStatusTracker', () => {
   let walletProvider: TrackedWalletProvider;
   let stakePoolSearchProvider: TrackedStakePoolSearchProvider;
-  let timeSettingsProvider: TrackedTimeSettingsProvider;
+  let networkInfoProvider: TrackedNetworkInfoProvider;
   let txSubmitProvider: TrackedTxSubmitProvider;
   let assetProvider: TrackedAssetProvider;
 
@@ -66,7 +65,7 @@ describe('createProviderStatusTracker', () => {
   beforeEach(() => {
     walletProvider = new TrackedWalletProvider(mockWalletProvider());
     stakePoolSearchProvider = new TrackedStakePoolSearchProvider(createStubStakePoolSearchProvider());
-    timeSettingsProvider = new TrackedTimeSettingsProvider(createStubTimeSettingsProvider(testnetTimeSettings));
+    networkInfoProvider = new TrackedNetworkInfoProvider(mockNetworkInfoProvider());
     txSubmitProvider = new TrackedTxSubmitProvider(mockTxSubmitProvider());
     assetProvider = new TrackedAssetProvider(mockAssetProvider());
   });
@@ -77,7 +76,7 @@ describe('createProviderStatusTracker', () => {
         .fn()
         .mockReturnValueOnce(cold<ProviderFnStats[]>('ab-c-d-e-f-g-h-i', providerFnStats));
       const tracker = createProviderStatusTracker(
-        { assetProvider, stakePoolSearchProvider, timeSettingsProvider, txSubmitProvider, walletProvider },
+        { assetProvider, networkInfoProvider, stakePoolSearchProvider, txSubmitProvider, walletProvider },
         { consideredOutOfSyncAfter: timeout },
         { getProviderSyncRelevantStats }
       );
@@ -100,7 +99,7 @@ describe('createProviderStatusTracker', () => {
         .fn()
         .mockReturnValueOnce(cold<ProviderFnStats[]>('-a-b-c-d-e-f-g-h-i', providerFnStats));
       const tracker = createProviderStatusTracker(
-        { assetProvider, stakePoolSearchProvider, timeSettingsProvider, txSubmitProvider, walletProvider },
+        { assetProvider, networkInfoProvider, stakePoolSearchProvider, txSubmitProvider, walletProvider },
         { consideredOutOfSyncAfter: timeout },
         { getProviderSyncRelevantStats }
       );
@@ -120,7 +119,7 @@ describe('createProviderStatusTracker', () => {
         .fn()
         .mockReturnValueOnce(cold<ProviderFnStats[]>(`-a-b-c-d-e-f ${timeout}ms g-h-i`, providerFnStats));
       const tracker = createProviderStatusTracker(
-        { assetProvider, stakePoolSearchProvider, timeSettingsProvider, txSubmitProvider, walletProvider },
+        { assetProvider, networkInfoProvider, stakePoolSearchProvider, txSubmitProvider, walletProvider },
         { consideredOutOfSyncAfter: timeout },
         { getProviderSyncRelevantStats }
       );

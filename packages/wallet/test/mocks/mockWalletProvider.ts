@@ -73,13 +73,7 @@ export const ledgerTip = {
 };
 
 export const currentEpoch = {
-  end: {
-    date: new Date(1_632_687_616)
-  },
-  number: 158,
-  start: {
-    date: new Date(1_632_255_616)
-  }
+  number: 157
 };
 
 export const queryTransactionsResult: Cardano.TxAlonzo[] = [
@@ -212,19 +206,6 @@ export const genesisParameters = {
   updateQuorum: 5
 };
 
-export const networkInfo = {
-  currentEpoch,
-  lovelaceSupply: {
-    circulating: 42_064_399_450_423_723n,
-    max: 45_000_000_000_000_000n,
-    total: 40_267_211_394_073_980n
-  },
-  stake: {
-    active: 1_060_378_314_781_343n,
-    live: 15_001_884_895_856_815n
-  }
-};
-
 export const stakePoolStats = {
   qty: {
     active: 1000,
@@ -245,7 +226,6 @@ export const mockWalletProvider = () => ({
   currentWalletProtocolParameters: jest.fn().mockResolvedValue(protocolParameters),
   genesisParameters: jest.fn().mockResolvedValue(genesisParameters),
   ledgerTip: jest.fn().mockResolvedValue(ledgerTip),
-  networkInfo: jest.fn().mockResolvedValue(networkInfo),
   rewardAccountBalance: jest.fn().mockResolvedValue(rewardAccountBalance),
   rewardsHistory: jest.fn().mockResolvedValue(rewardsHistory),
   stakePoolStats: jest.fn().mockResolvedValue(stakePoolStats),

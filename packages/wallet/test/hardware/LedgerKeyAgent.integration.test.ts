@@ -1,23 +1,23 @@
-import { Cardano, testnetTimeSettings } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
 import { CommunicationType, KeyAgent, LedgerKeyAgent, restoreKeyAgent } from '../../src/KeyManagement';
 import { SingleAddressWallet, Wallet } from '../../src';
-import { createStubStakePoolSearchProvider, createStubTimeSettingsProvider } from '@cardano-sdk/util-dev';
+import { createStubStakePoolSearchProvider } from '@cardano-sdk/util-dev';
 import { firstValueFrom } from 'rxjs';
-import { mockAssetProvider, mockTxSubmitProvider, mockWalletProvider } from '../mocks';
+import { mockAssetProvider, mockNetworkInfoProvider, mockTxSubmitProvider, mockWalletProvider } from '../mocks';
 
 const createWallet = (keyAgent: KeyAgent) => {
   const txSubmitProvider = mockTxSubmitProvider();
   const walletProvider = mockWalletProvider();
   const stakePoolSearchProvider = createStubStakePoolSearchProvider();
-  const timeSettingsProvider = createStubTimeSettingsProvider(testnetTimeSettings);
+  const networkInfoProvider = mockNetworkInfoProvider();
   const assetProvider = mockAssetProvider();
   return new SingleAddressWallet(
     { name: 'Wallet1' },
     {
       assetProvider,
       keyAgent,
+      networkInfoProvider,
       stakePoolSearchProvider,
-      timeSettingsProvider,
       txSubmitProvider,
       walletProvider
     }

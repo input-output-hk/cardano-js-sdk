@@ -1,8 +1,15 @@
+/* eslint-disable unicorn/consistent-function-scoping */
+/* eslint-disable sonarjs/no-duplicate-string */
 import {
+  Cardano,
+  EpochInfo,
   SlotEpochCalc,
+  SlotEpochInfoCalc,
   SlotTimeCalc,
+  TimeSettings,
   TimeSettingsError,
   createSlotEpochCalc,
+  createSlotEpochInfoCalc,
   createSlotTimeCalc,
   testnetTimeSettings
 } from '../../src';
@@ -68,6 +75,79 @@ describe('slotCalc utils', () => {
     it('throws with invalid TimeSettings', () => {
       const slotEpochCalc = createSlotEpochCalc([{ ...testnetTimeSettings[0], fromSlotNo: 5 }]);
       expect(() => slotEpochCalc(4)).toThrowError(TimeSettingsError);
+    });
+  });
+
+  describe('slotEpochInfoCalc ', () => {
+    describe('testnet', () => {
+      const slotEpochInfoCalc: SlotEpochInfoCalc = createSlotEpochInfoCalc(testnetTimeSettings);
+      const byronTimeSettings = {
+        ...testnetTimeSettings[0],
+        firstEpoch: 0
+      };
+      const shelleyTimeSettings = {
+        ...testnetTimeSettings[1],
+        firstEpoch: 74
+      };
+
+      const assertNthEpochInfoValid = (
+        expectedEpochNo: Cardano.Epoch,
+        { epochNo, firstSlot, lastSlot }: EpochInfo,
+        epochTimeSettings: TimeSettings & { firstEpoch: number }
+      ) => {
+        expect(epochNo).toEqual(expectedEpochNo);
+        const relativeEpoch = expectedEpochNo - epochTimeSettings.firstEpoch;
+        expect(firstSlot).toEqual({
+          date: new Date(
+            epochTimeSettings.fromSlotDate.getTime() +
+              epochTimeSettings.epochLength * epochTimeSettings.slotLength * relativeEpoch
+          ),
+          slot: epochTimeSettings.fromSlotNo + epochTimeSettings.epochLength * relativeEpoch
+        });
+        expect(lastSlot).toEqual({
+          date: new Date(
+            epochTimeSettings.fromSlotDate.getTime() +
+              epochTimeSettings.epochLength * epochTimeSettings.slotLength * (relativeEpoch + 1) -
+              epochTimeSettings.slotLength
+          ),
+          slot: epochTimeSettings.fromSlotNo + epochTimeSettings.epochLength * (relativeEpoch + 1) - 1
+        });
+      };
+
+      it('correctly computes epoch info of the 1st block', () => {
+        assertNthEpochInfoValid(0, slotEpochInfoCalc(1031), byronTimeSettings);
+      });
+
+      it('correctly computes epoch info of the genesis block', () => {
+        assertNthEpochInfoValid(0, slotEpochInfoCalc(0), byronTimeSettings);
+      });
+
+      it('correctly computes epoch info of some Byron block', () => {
+        assertNthEpochInfoValid(55, slotEpochInfoCalc(1_209_592), byronTimeSettings);
+      });
+
+      it('correctly computes epoch info of the last Byron block', () => {
+        assertNthEpochInfoValid(73, slotEpochInfoCalc(1_598_399), byronTimeSettings);
+      });
+
+      it('correctly computes epoch info of the 1st Shelley block', () => {
+        assertNthEpochInfoValid(74, slotEpochInfoCalc(1_598_400), shelleyTimeSettings);
+      });
+
+      it('correctly computes epoch info of the 2nd Shelley block', () => {
+        assertNthEpochInfoValid(74, slotEpochInfoCalc(1_598_420), shelleyTimeSettings);
+      });
+
+      it('correctly computes epoch of info some Shelley block', () => {
+        assertNthEpochInfoValid(88, slotEpochInfoCalc(8_078_371), shelleyTimeSettings);
+      });
+
+      it('throws with invalid slot', () => expect(() => slotEpochInfoCalc(-1)).toThrowError(TimeSettingsError));
+    });
+
+    it('throws with invalid TimeSettings', () => {
+      const slotEpochInfoCalc = createSlotEpochInfoCalc([{ ...testnetTimeSettings[0], fromSlotNo: 5 }]);
+      expect(() => slotEpochInfoCalc(4)).toThrowError(TimeSettingsError);
     });
   });
 });

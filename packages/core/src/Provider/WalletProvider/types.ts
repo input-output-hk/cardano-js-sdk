@@ -16,39 +16,12 @@ export type ProtocolParametersRequiredByWallet = Required<
   >
 >;
 
-export type AssetSupply = {
-  circulating: Cardano.Lovelace;
-  max: Cardano.Lovelace;
-  total: Cardano.Lovelace;
-};
-
-export type StakeSummary = {
-  active: Cardano.Lovelace;
-  live: Cardano.Lovelace;
-};
-
 export type StakePoolStats = {
   qty: {
     active: number;
     retired: number;
     retiring: number;
   };
-};
-
-export type NetworkInfo = {
-  currentEpoch: {
-    number: Cardano.Epoch;
-    start: {
-      /** Local date */
-      date: Date;
-    };
-    end: {
-      /** Local date */
-      date: Date;
-    };
-  };
-  lovelaceSupply: AssetSupply;
-  stake: StakeSummary;
 };
 
 export interface EpochRange {
@@ -74,7 +47,6 @@ export interface EpochRewards {
 
 export interface WalletProvider {
   ledgerTip: () => Promise<Cardano.Tip>;
-  networkInfo: () => Promise<NetworkInfo>;
   // TODO: when implementing db-sync provider,
   // move stakePoolStats out to other provider type, since it's not required for wallet operation.
   // Perhaps generalize StakePoolSearchProvider?

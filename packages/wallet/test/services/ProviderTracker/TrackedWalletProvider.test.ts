@@ -84,15 +84,6 @@ describe('TrackedWalletProvider', () => {
     );
 
     test(
-      'networkInfo',
-      testFunctionStats(
-        (wp) => wp.networkInfo(),
-        (stats) => stats.networkInfo$,
-        (mockWP) => mockWP.networkInfo
-      )
-    );
-
-    test(
       'blocksByHashes',
       testFunctionStats(
         (wp) => wp.blocksByHashes([]),

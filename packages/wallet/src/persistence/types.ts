@@ -1,11 +1,5 @@
 import { Assets } from '../types';
-import {
-  Cardano,
-  EpochRewards,
-  NetworkInfo,
-  ProtocolParametersRequiredByWallet,
-  TimeSettings
-} from '@cardano-sdk/core';
+import { Cardano, EpochRewards, NetworkInfo, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
 import { Observable } from 'rxjs';
 
 export interface Destroyable {
@@ -82,7 +76,6 @@ export interface WalletStores extends Destroyable {
   stakePools: KeyValueStore<Cardano.PoolId, Cardano.StakePool>;
   protocolParameters: DocumentStore<ProtocolParametersRequiredByWallet>;
   genesisParameters: DocumentStore<Cardano.CompactGenesis>;
-  timeSettings: DocumentStore<TimeSettings[]>;
   networkInfo: DocumentStore<NetworkInfo>;
   assets: DocumentStore<Assets>;
 }

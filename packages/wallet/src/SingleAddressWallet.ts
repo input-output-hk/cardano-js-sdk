@@ -2,11 +2,11 @@ import { AddressType, GroupedAddress, KeyAgent, util as keyManagementUtil } from
 import {
   AssetProvider,
   Cardano,
+  EpochInfo,
   NetworkInfo,
+  NetworkInfoProvider,
   ProtocolParametersRequiredByWallet,
   StakePoolSearchProvider,
-  TimeSettings,
-  TimeSettingsProvider,
   TxSubmitProvider,
   WalletProvider,
   coreToCsl
@@ -21,8 +21,8 @@ import {
   PollingConfig,
   SyncableIntervalPersistentDocumentTrackerSubject,
   TrackedAssetProvider,
+  TrackedNetworkInfoProvider,
   TrackedStakePoolSearchProvider,
-  TrackedTimeSettingsProvider,
   TrackedTxSubmitProvider,
   TrackedWalletProvider,
   TrackerSubject,
@@ -39,8 +39,10 @@ import {
   createTransactionsTracker,
   createUtxoTracker,
   createWalletUtil,
+  currentEpochTracker,
+  deepEquals,
   distinctBlock,
-  distinctEpoch
+  distinctTimeSettings
 } from './services';
 import { Cip30DataSignature } from '@cardano-sdk/cip30';
 import { InputSelector, defaultSelectionConstraints, roundRobinRandomImprove } from '@cardano-sdk/cip2';
@@ -64,7 +66,7 @@ export interface SingleAddressWalletDependencies {
   readonly walletProvider: WalletProvider;
   readonly stakePoolSearchProvider: StakePoolSearchProvider;
   readonly assetProvider: AssetProvider;
-  readonly timeSettingsProvider: TimeSettingsProvider;
+  readonly networkInfoProvider: NetworkInfoProvider;
   readonly inputSelector?: InputSelector;
   readonly stores?: WalletStores;
   readonly logger?: Logger;
@@ -80,9 +82,10 @@ export class SingleAddressWallet implements Wallet {
     submitting$: new Subject<Cardano.NewTxAlonzo>()
   };
   readonly keyAgent: KeyAgent;
+  readonly currentEpoch$: BehaviorObservable<EpochInfo>;
   readonly txSubmitProvider: TrackedTxSubmitProvider;
   readonly walletProvider: TrackedWalletProvider;
-  readonly timeSettingsProvider: TrackedTimeSettingsProvider;
+  readonly networkInfoProvider: TrackedNetworkInfoProvider;
   readonly stakePoolSearchProvider: TrackedStakePoolSearchProvider;
   readonly assetProvider: TrackedAssetProvider;
   readonly utxo: TransactionalTracker<Cardano.Utxo[]>;
@@ -94,7 +97,6 @@ export class SingleAddressWallet implements Wallet {
   readonly addresses$: TrackerSubject<GroupedAddress[]>;
   readonly protocolParameters$: TrackerSubject<ProtocolParametersRequiredByWallet>;
   readonly genesisParameters$: TrackerSubject<Cardano.CompactGenesis>;
-  readonly timeSettings$: TrackerSubject<TimeSettings[]>;
   readonly assets$: TrackerSubject<Assets>;
   readonly syncStatus: SyncStatus;
   readonly name: string;
@@ -119,7 +121,7 @@ export class SingleAddressWallet implements Wallet {
       stakePoolSearchProvider,
       keyAgent,
       assetProvider,
-      timeSettingsProvider,
+      networkInfoProvider,
       logger = dummyLogger,
       inputSelector = roundRobinRandomImprove(),
       stores = createInMemoryWalletStores()
@@ -129,14 +131,14 @@ export class SingleAddressWallet implements Wallet {
     this.#inputSelector = inputSelector;
     this.txSubmitProvider = new TrackedTxSubmitProvider(txSubmitProvider);
     this.walletProvider = new TrackedWalletProvider(walletProvider);
-    this.timeSettingsProvider = new TrackedTimeSettingsProvider(timeSettingsProvider);
+    this.networkInfoProvider = new TrackedNetworkInfoProvider(networkInfoProvider);
     this.stakePoolSearchProvider = new TrackedStakePoolSearchProvider(stakePoolSearchProvider);
     this.assetProvider = new TrackedAssetProvider(assetProvider);
     this.syncStatus = createProviderStatusTracker(
       {
         assetProvider: this.assetProvider,
+        networkInfoProvider: this.networkInfoProvider,
         stakePoolSearchProvider: this.stakePoolSearchProvider,
-        timeSettingsProvider: this.timeSettingsProvider,
         txSubmitProvider: this.txSubmitProvider,
         walletProvider: this.walletProvider
       },
@@ -154,14 +156,15 @@ export class SingleAddressWallet implements Wallet {
     });
     const tipBlockHeight$ = distinctBlock(this.tip$);
     this.networkInfo$ = new PersistentDocumentTrackerSubject(
-      coldObservableProvider(this.walletProvider.networkInfo, retryBackoffConfig, tipBlockHeight$, isEqual),
+      // TODO: it only really needs to be fetched once per epoch,
+      // so we should replace the trigger from tipBlockHeight$ to epoch$.
+      // This is a little complicated since there is a circular dependency.
+      // Some logic is needed to initiate a fetch if epoch is not available in store already.
+      coldObservableProvider(this.networkInfoProvider.networkInfo, retryBackoffConfig, tipBlockHeight$, deepEquals),
       stores.networkInfo
     );
-    const epoch$ = distinctEpoch(this.networkInfo$);
-    this.timeSettings$ = new PersistentDocumentTrackerSubject(
-      coldObservableProvider(this.timeSettingsProvider.getTimeSettings, retryBackoffConfig, epoch$, isEqual),
-      stores.timeSettings
-    );
+    this.currentEpoch$ = currentEpochTracker(this.tip$, this.networkInfo$);
+    const epoch$ = this.currentEpoch$.pipe(map((epoch) => epoch.epochNo));
     this.protocolParameters$ = new PersistentDocumentTrackerSubject(
       coldObservableProvider(this.walletProvider.currentWalletProtocolParameters, retryBackoffConfig, epoch$, isEqual),
       stores.protocolParameters
@@ -190,6 +193,7 @@ export class SingleAddressWallet implements Wallet {
       transactionsInFlight$: this.transactions.outgoing.inFlight$,
       walletProvider: this.walletProvider
     });
+    const timeSettings$ = distinctTimeSettings(this.networkInfo$);
     this.delegation = createDelegationTracker({
       epoch$,
       retryBackoffConfig,
@@ -198,7 +202,7 @@ export class SingleAddressWallet implements Wallet {
       ),
       stakePoolSearchProvider: this.stakePoolSearchProvider,
       stores,
-      timeSettings$: this.timeSettings$,
+      timeSettings$,
       transactionsTracker: this.transactions,
       walletProvider: this.walletProvider
     });
@@ -287,7 +291,7 @@ export class SingleAddressWallet implements Wallet {
     this.assetProvider.stats.shutdown();
     this.walletProvider.stats.shutdown();
     this.txSubmitProvider.stats.shutdown();
-    this.timeSettingsProvider.stats.shutdown();
+    this.networkInfoProvider.stats.shutdown();
     this.stakePoolSearchProvider.stats.shutdown();
   }
 

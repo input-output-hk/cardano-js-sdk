@@ -21,6 +21,17 @@ export interface TimeSettings {
   epochLength: number;
 }
 
+export interface SlotDate {
+  slot: Slot;
+  date: Date;
+}
+
+export interface EpochInfo {
+  epochNo: Epoch;
+  firstSlot: SlotDate;
+  lastSlot: SlotDate;
+}
+
 export class TimeSettingsError extends CustomError {}
 
 /**
@@ -31,17 +42,10 @@ export const testnetTimeSettings: TimeSettings[] = [
   { epochLength: 432_000, fromSlotDate: new Date(1_595_964_016_000), fromSlotNo: 1_598_400, slotLength: 1000 }
 ];
 
-/**
- * @returns {SlotEpochCalc} function that computes epoch # given a slot #
- */
-export const createSlotEpochCalc = (timeSettings: TimeSettings[]) => {
+const createSlotEpochCalcImpl = (timeSettings: TimeSettings[]) => {
   const timeSettingsAsc = orderBy(timeSettings, ({ fromSlotNo }) => fromSlotNo);
 
-  /**
-   * @throws TimeSettingsError
-   * @returns {Epoch} epoch of the slot
-   */
-  return (slotNo: Slot): Epoch => {
+  return (slotNo: Slot) => {
     const relevantTimeSettingsAsc = orderBy(
       timeSettingsAsc.filter(({ fromSlotNo }) => fromSlotNo <= slotNo),
       ({ fromSlotNo }) => fromSlotNo
@@ -49,16 +53,30 @@ export const createSlotEpochCalc = (timeSettings: TimeSettings[]) => {
     if (relevantTimeSettingsAsc.length === 0) {
       throw new TimeSettingsError(`No TimeSettings for slot ${slotNo} found`);
     }
-    let epoch = 0;
+    let epochNo = 0;
+    let currentTimeSettings: TimeSettings;
     for (let i = 0; i < relevantTimeSettingsAsc.length; i++) {
-      const currentTimeSettings = relevantTimeSettingsAsc[i];
+      currentTimeSettings = relevantTimeSettingsAsc[i];
       const nextTimeSettings: TimeSettings | undefined = relevantTimeSettingsAsc[i + 1];
-      epoch += Math.floor(
+      epochNo += Math.floor(
         ((nextTimeSettings?.fromSlotNo || slotNo) - currentTimeSettings.fromSlotNo) / currentTimeSettings.epochLength
       );
     }
-    return epoch;
+    return { epochNo, epochTimeSettings: currentTimeSettings! };
   };
+};
+
+/**
+ * @returns {SlotEpochCalc} function that computes epoch # given a slot #
+ */
+export const createSlotEpochCalc = (timeSettings: TimeSettings[]) => {
+  const calc = createSlotEpochCalcImpl(timeSettings);
+
+  /**
+   * @throws TimeSettingsError
+   * @returns {Epoch} epoch of the slot
+   */
+  return (slotNo: Slot): Epoch => calc(slotNo).epochNo;
 };
 
 /**
@@ -84,6 +102,36 @@ export const createSlotTimeCalc = (timeSettings: TimeSettings[]) => {
 };
 
 /**
+ * @returns {SlotEpochInfoCalc} function that computes epoch of the slot and it's first/last slots
+ */
+export const createSlotEpochInfoCalc = (timeSettings: TimeSettings[]) => {
+  const slotTimeCalc = createSlotTimeCalc(timeSettings);
+  const epochCalc = createSlotEpochCalcImpl(timeSettings);
+  /**
+   * @throws TimeSettingsError
+   * @returns {EpochInfo} epoch of the slot and it's first/last slots
+   */
+  return (slot: Slot): EpochInfo => {
+    const { epochNo, epochTimeSettings } = epochCalc(slot);
+    const firstSlot =
+      epochTimeSettings.fromSlotNo +
+      Math.floor((slot - epochTimeSettings.fromSlotNo) / epochTimeSettings.epochLength) * epochTimeSettings.epochLength;
+    const lastSlot = firstSlot + epochTimeSettings.epochLength - 1;
+    return {
+      epochNo,
+      firstSlot: {
+        date: slotTimeCalc(firstSlot),
+        slot: firstSlot
+      },
+      lastSlot: {
+        date: slotTimeCalc(lastSlot),
+        slot: lastSlot
+      }
+    };
+  };
+};
+
+/**
  * @throws TimeSettingsError
  * @returns {Date} date of the slot
  */
@@ -94,3 +142,9 @@ export type SlotTimeCalc = ReturnType<typeof createSlotTimeCalc>;
  * @returns {Epoch} epoch of the slot
  */
 export type SlotEpochCalc = ReturnType<typeof createSlotEpochCalc>;
+
+/**
+ * @throws TimeSettingsError
+ * @returns {EpochInfo} epoch of the slot and it's first/last slots
+ */
+export type SlotEpochInfoCalc = ReturnType<typeof createSlotEpochInfoCalc>;

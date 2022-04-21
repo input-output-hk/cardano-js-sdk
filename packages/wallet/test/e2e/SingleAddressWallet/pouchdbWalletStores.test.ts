@@ -3,8 +3,8 @@ import { WalletStores, createPouchdbWalletStores } from '../../../src/persistenc
 import {
   assetProvider,
   keyAgentReady,
+  networkInfoProvider,
   stakePoolSearchProvider,
-  timeSettingsProvider,
   txSubmitProvider,
   walletProvider
 } from '../config';
@@ -26,9 +26,9 @@ describe('SingleAddressWallet/pouchdbWalletStores', () => {
       {
         assetProvider: await assetProvider,
         keyAgent: await keyAgentReady,
+        networkInfoProvider: await networkInfoProvider,
         stakePoolSearchProvider,
         stores,
-        timeSettingsProvider,
         txSubmitProvider: await txSubmitProvider,
         walletProvider: await walletProvider
       }

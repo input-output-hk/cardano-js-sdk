@@ -1,10 +1,10 @@
 /* eslint-disable max-len */
 import * as mocks from '../mocks';
-import { AssetId, createStubStakePoolSearchProvider, createStubTimeSettingsProvider } from '@cardano-sdk/util-dev';
-import { Cardano, testnetTimeSettings } from '@cardano-sdk/core';
+import { AssetId, createStubStakePoolSearchProvider } from '@cardano-sdk/util-dev';
+import { Cardano } from '@cardano-sdk/core';
 import { KeyManagement, SingleAddressWallet } from '../../src';
 import { firstValueFrom, skip } from 'rxjs';
-import { utxo } from '../mocks';
+import { mockNetworkInfoProvider, utxo } from '../mocks';
 import { waitForWalletStateSettle } from '../util';
 
 jest.mock('../../src/KeyManagement/cip8/cip30signData');
@@ -40,7 +40,7 @@ describe('SingleAddressWallet methods', () => {
     walletProvider = mocks.mockWalletProvider();
     const assetProvider = mocks.mockAssetProvider();
     const stakePoolSearchProvider = createStubStakePoolSearchProvider();
-    const timeSettingsProvider = createStubTimeSettingsProvider(testnetTimeSettings);
+    const networkInfoProvider = mockNetworkInfoProvider();
     const groupedAddress: KeyManagement.GroupedAddress = {
       accountIndex: 0,
       address,
@@ -52,7 +52,7 @@ describe('SingleAddressWallet methods', () => {
     keyAgent.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
     wallet = new SingleAddressWallet(
       { name: 'Test Wallet' },
-      { assetProvider, keyAgent, stakePoolSearchProvider, timeSettingsProvider, txSubmitProvider, walletProvider }
+      { assetProvider, keyAgent, networkInfoProvider, stakePoolSearchProvider, txSubmitProvider, walletProvider }
     );
     keyAgent.knownAddresses.push(groupedAddress);
     await waitForWalletStateSettle(wallet);
