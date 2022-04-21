@@ -1,5 +1,5 @@
 import { Cardano } from '@cardano-sdk/core';
-import { GroupedAddress, InputAddressResolver } from '../../../src/KeyManagement';
+import { GroupedAddress, ResolveInputAddress } from '../../../src/KeyManagement';
 import { stubSignTransaction } from '../../../src/KeyManagement/util';
 
 jest.mock('../../../src/KeyManagement/util/ownSignatureKeyPaths');
@@ -7,7 +7,7 @@ const { ownSignatureKeyPaths } = jest.requireMock('../../../src/KeyManagement/ut
 
 describe('KeyManagement.util.stubSignTransaction', () => {
   it('returns as many signatures as number of keys returned by ownSignaturePaths', () => {
-    const inputAddressResolver = {} as InputAddressResolver; // not called
+    const inputAddressResolver = {} as ResolveInputAddress; // not called
     const txBody = {} as Cardano.TxBodyAlonzo;
     const knownAddresses = [{} as GroupedAddress];
     ownSignatureKeyPaths.mockReturnValueOnce([{}]).mockReturnValueOnce([{}, {}]);

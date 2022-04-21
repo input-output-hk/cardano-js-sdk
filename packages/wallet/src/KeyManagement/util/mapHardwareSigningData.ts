@@ -32,7 +32,7 @@ import {
   utils
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { CSL, Cardano, cslToCore, util } from '@cardano-sdk/core';
-import { GroupedAddress, InputAddressResolver } from '../types';
+import { GroupedAddress, ResolveInputAddress } from '../types';
 import { HwMappingError } from '../errors';
 import { concat, uniq } from 'lodash-es';
 
@@ -40,7 +40,7 @@ export interface TxToLedgerProps {
   cslTxBody: CSL.TransactionBody;
   networkId: Cardano.NetworkId;
   accountIndex: number;
-  inputAddressResolver: InputAddressResolver;
+  inputAddressResolver: ResolveInputAddress;
   knownAddresses: GroupedAddress[];
 }
 
@@ -88,7 +88,7 @@ const bytesToIp = (bytes?: Uint8Array) => {
 
 const prepareLedgerInputs = (
   inputs: CSL.TransactionInputs,
-  inputAddressResolver: InputAddressResolver,
+  inputAddressResolver: ResolveInputAddress,
   knownAddresses: GroupedAddress[]
 ): TxInput[] => {
   const ledgerInputs = [];

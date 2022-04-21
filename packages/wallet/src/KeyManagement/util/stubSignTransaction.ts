@@ -1,5 +1,5 @@
 import { Cardano } from '@cardano-sdk/core';
-import { GroupedAddress, InputAddressResolver } from '../types';
+import { GroupedAddress, ResolveInputAddress } from '../types';
 import { ownSignatureKeyPaths } from './ownSignatureKeyPaths';
 
 const randomHexChar = () => Math.floor(Math.random() * 16).toString(16);
@@ -8,7 +8,7 @@ const randomPublicKey = () => Cardano.Ed25519PublicKey(Array.from({ length: 64 }
 export const stubSignTransaction = (
   txBody: Cardano.NewTxBodyAlonzo,
   knownAddresses: GroupedAddress[],
-  inputAddressResolver: InputAddressResolver
+  inputAddressResolver: ResolveInputAddress
 ): Cardano.Signatures =>
   new Map(
     ownSignatureKeyPaths(txBody, knownAddresses, inputAddressResolver).map(() => [
