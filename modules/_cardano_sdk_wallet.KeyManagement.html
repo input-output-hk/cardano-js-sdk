@@ -124,7 +124,7 @@
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-type-alias tsd-parent-kind-namespace"><a href="_cardano_sdk_wallet.KeyManagement.html#AgentSpecificData" class="tsd-kind-icon">Agent<wbr>Specific<wbr>Data</a></li>
 								<li class="tsd-kind-type-alias tsd-parent-kind-namespace"><a href="_cardano_sdk_wallet.KeyManagement.html#GetPassword" class="tsd-kind-icon">Get<wbr>Password</a></li>
-								<li class="tsd-kind-type-alias tsd-parent-kind-namespace"><a href="_cardano_sdk_wallet.KeyManagement.html#InputAddressResolver" class="tsd-kind-icon">Input<wbr>Address<wbr>Resolver</a></li>
+								<li class="tsd-kind-type-alias tsd-parent-kind-namespace"><a href="_cardano_sdk_wallet.KeyManagement.html#ResolveInputAddress" class="tsd-kind-icon">Resolve<wbr>Input<wbr>Address</a></li>
 								<li class="tsd-kind-type-alias tsd-parent-kind-namespace"><a href="_cardano_sdk_wallet.KeyManagement.html#SerializableKeyAgentData" class="tsd-kind-icon">Serializable<wbr>Key<wbr>Agent<wbr>Data</a></li>
 								<li class="tsd-kind-type-alias tsd-parent-kind-namespace"><a href="_cardano_sdk_wallet.KeyManagement.html#TransportType" class="tsd-kind-icon">Transport<wbr>Type</a></li>
 							</ul>
@@ -149,7 +149,7 @@
 					<div class="tsd-signature tsd-kind-icon">Agent<wbr>Specific<wbr>Data<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/0290354/packages/wallet/src/KeyManagement/types.ts#L64">packages/wallet/src/KeyManagement/types.ts:64</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/4f001f8/packages/wallet/src/KeyManagement/types.ts#L64">packages/wallet/src/KeyManagement/types.ts:64</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -164,7 +164,7 @@
 					<div class="tsd-signature tsd-kind-icon">Get<wbr>Password<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>noCache<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">true</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Uint8Array</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/0290354/packages/wallet/src/KeyManagement/types.ts#L90">packages/wallet/src/KeyManagement/types.ts:90</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/4f001f8/packages/wallet/src/KeyManagement/types.ts#L90">packages/wallet/src/KeyManagement/types.ts:90</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -191,12 +191,12 @@
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-namespace">
-					<a name="InputAddressResolver" class="tsd-anchor"></a>
-					<h3>Input<wbr>Address<wbr>Resolver</h3>
-					<div class="tsd-signature tsd-kind-icon">Input<wbr>Address<wbr>Resolver<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>txIn<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Cardano.NewTxIn</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Cardano.Address</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></div>
+					<a name="ResolveInputAddress" class="tsd-anchor"></a>
+					<h3>Resolve<wbr>Input<wbr>Address</h3>
+					<div class="tsd-signature tsd-kind-icon">Resolve<wbr>Input<wbr>Address<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>txIn<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Cardano.NewTxIn</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Cardano.Address</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/0290354/packages/wallet/src/KeyManagement/types.ts#L92">packages/wallet/src/KeyManagement/types.ts:92</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/4f001f8/packages/wallet/src/KeyManagement/types.ts#L96">packages/wallet/src/KeyManagement/types.ts:96</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -212,9 +212,15 @@
 										<ul class="tsd-parameters">
 											<li>
 												<h5>txIn: <span class="tsd-signature-type">Cardano.NewTxIn</span></h5>
+												<div class="tsd-comment tsd-typography">
+													<div class="lead">
+														<p>transaction input to resolve address from</p>
+													</div>
+												</div>
 											</li>
 										</ul>
 										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Cardano.Address</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></h4>
+										<p>input owner address</p>
 									</li>
 								</ul>
 							</li>
@@ -227,7 +233,7 @@
 					<div class="tsd-signature tsd-kind-icon">Serializable<wbr>Key<wbr>Agent<wbr>Data<span class="tsd-signature-symbol">:</span> <a href="../interfaces/_cardano_sdk_wallet.KeyManagement.SerializableInMemoryKeyAgentData.html" class="tsd-signature-type" data-tsd-kind="Interface">SerializableInMemoryKeyAgentData</a><span class="tsd-signature-symbol"> | </span><a href="../interfaces/_cardano_sdk_wallet.KeyManagement.SerializableLedgerKeyAgentData.html" class="tsd-signature-type" data-tsd-kind="Interface">SerializableLedgerKeyAgentData</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/0290354/packages/wallet/src/KeyManagement/types.ts#L83">packages/wallet/src/KeyManagement/types.ts:83</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/4f001f8/packages/wallet/src/KeyManagement/types.ts#L83">packages/wallet/src/KeyManagement/types.ts:83</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -237,7 +243,7 @@
 					<div class="tsd-signature tsd-kind-icon">Transport<wbr>Type<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">TransportWebHID</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">TransportNodeHid</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/0290354/packages/wallet/src/KeyManagement/types.ts#L85">packages/wallet/src/KeyManagement/types.ts:85</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/4f001f8/packages/wallet/src/KeyManagement/types.ts#L85">packages/wallet/src/KeyManagement/types.ts:85</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -254,7 +260,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/0290354/packages/wallet/src/KeyManagement/emip3.ts#L12">packages/wallet/src/KeyManagement/emip3.ts:12</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/4f001f8/packages/wallet/src/KeyManagement/emip3.ts#L12">packages/wallet/src/KeyManagement/emip3.ts:12</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -280,7 +286,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/0290354/packages/wallet/src/KeyManagement/emip3.ts#L40">packages/wallet/src/KeyManagement/emip3.ts:40</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/4f001f8/packages/wallet/src/KeyManagement/emip3.ts#L40">packages/wallet/src/KeyManagement/emip3.ts:40</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -311,7 +317,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/0290354/packages/wallet/src/KeyManagement/emip3.ts#L23">packages/wallet/src/KeyManagement/emip3.ts:23</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/4f001f8/packages/wallet/src/KeyManagement/emip3.ts#L23">packages/wallet/src/KeyManagement/emip3.ts:23</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -344,7 +350,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/0290354/packages/wallet/src/KeyManagement/restoreKeyAgent.ts#L23">packages/wallet/src/KeyManagement/restoreKeyAgent.ts:23</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/4f001f8/packages/wallet/src/KeyManagement/restoreKeyAgent.ts#L23">packages/wallet/src/KeyManagement/restoreKeyAgent.ts:23</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -361,7 +367,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/0290354/packages/wallet/src/KeyManagement/restoreKeyAgent.ts#L24">packages/wallet/src/KeyManagement/restoreKeyAgent.ts:24</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/4f001f8/packages/wallet/src/KeyManagement/restoreKeyAgent.ts#L24">packages/wallet/src/KeyManagement/restoreKeyAgent.ts:24</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -378,7 +384,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/0290354/packages/wallet/src/KeyManagement/restoreKeyAgent.ts#L25">packages/wallet/src/KeyManagement/restoreKeyAgent.ts:25</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/4f001f8/packages/wallet/src/KeyManagement/restoreKeyAgent.ts#L25">packages/wallet/src/KeyManagement/restoreKeyAgent.ts:25</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -482,7 +488,7 @@
 						<a href="_cardano_sdk_wallet.KeyManagement.html#GetPassword" class="tsd-kind-icon">Get<wbr>Password</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_wallet.KeyManagement.html#InputAddressResolver" class="tsd-kind-icon">Input<wbr>Address<wbr>Resolver</a>
+						<a href="_cardano_sdk_wallet.KeyManagement.html#ResolveInputAddress" class="tsd-kind-icon">Resolve<wbr>Input<wbr>Address</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-parent-kind-namespace">
 						<a href="_cardano_sdk_wallet.KeyManagement.html#SerializableKeyAgentData" class="tsd-kind-icon">Serializable<wbr>Key<wbr>Agent<wbr>Data</a>
