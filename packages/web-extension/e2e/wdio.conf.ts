@@ -10,7 +10,7 @@ export const config: Options.Testrunner = {
     }
   },
   bail: 0,
-  baseUrl: 'http://localhost:3000',
+  baseUrl: 'http://localhost:4567',
   capabilities: [
     {
       acceptInsecureCerts: true,
@@ -33,6 +33,7 @@ export const config: Options.Testrunner = {
   connectionRetryCount: 3,
   connectionRetryTimeout: 120_000,
   exclude: [],
+  filesToWatch: [path.join(__dirname, 'dist')],
   framework: 'mocha',
   logLevel: 'info',
   maxInstances: 1,
@@ -41,7 +42,15 @@ export const config: Options.Testrunner = {
     ui: 'bdd'
   },
   reporters: ['spec'],
-  services: ['chromedriver'],
+  services: [
+    [
+      'static-server',
+      {
+        folders: [{ mount: '/', path: path.join(__dirname, 'dapp/build') }]
+      }
+    ],
+    'chromedriver'
+  ],
   specs: ['./e2e/specs/**/*.spec.ts'],
   waitforTimeout: 10_000
 };

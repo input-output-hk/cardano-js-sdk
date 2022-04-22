@@ -1,12 +1,22 @@
 const CopyPlugin = require('copy-webpack-plugin');
+const { DefinePlugin, NormalModuleReplacementPlugin, ProvidePlugin, IgnorePlugin } = require('webpack');
 const path = require('path');
 
 const distDir = path.join(__dirname, 'dist');
 
+// this is insecure, as it builds in your system's env variables. use webpack-dotenv or similar instead.
+require('dotenv').config({ path: path.join(__dirname, '.env') });
+
 module.exports = {
-  devtool: 'cheap-module-source-map',
+  devtool: 'inline-source-map',
   entry: {
-    contentScript: path.join(__dirname, 'extension/contentScript.ts')
+    background: path.join(__dirname, 'extension/background.ts'),
+    contentScript: path.join(__dirname, 'extension/contentScript.ts'),
+    injectedScript: path.join(__dirname, 'extension/injectedScript.ts'),
+    ui: path.join(__dirname, 'extension/ui.ts')
+  },
+  experiments: {
+    syncWebAssembly: true
   },
   mode: 'development',
   module: {
@@ -33,11 +43,45 @@ module.exports = {
     path: distDir
   },
   plugins: [
+    new DefinePlugin({
+      'process.env': JSON.stringify(process.env)
+    }),
+    new NormalModuleReplacementPlugin(
+      /@emurgo\/cardano-serialization-lib-nodejs/,
+      '@emurgo/cardano-serialization-lib-asmjs'
+    ),
+    new NormalModuleReplacementPlugin(
+      /@emurgo\/cardano-message-signing-nodejs/,
+      '@emurgo/cardano-message-signing-asmjs'
+    ),
+    new ProvidePlugin({
+      Buffer: ['buffer', 'Buffer'],
+      process: 'process/browser'
+    }),
+    new IgnorePlugin({
+      contextRegExp: /bip39\/src\/wordlists$/,
+      resourceRegExp: /^\.\/(?!english)/
+    }),
     new CopyPlugin({
-      patterns: [{ from: path.join(__dirname, 'extension/manifest.json'), to: distDir }]
+      patterns: [
+        { from: path.join(__dirname, 'extension/manifest.json'), to: distDir },
+        { from: path.join(__dirname, 'extension/ui.html'), to: distDir }
+      ]
     })
   ],
   resolve: {
-    extensions: ['.ts']
+    extensions: ['.ts', '.js'],
+    fallback: {
+      buffer: require.resolve('buffer/'),
+      events: require.resolve('events/'),
+      fs: false,
+      os: false,
+      path: false,
+      stream: require.resolve('readable-stream'),
+      util: require.resolve('util/')
+    }
+  },
+  watchOptions: {
+    ignored: ['**/node_modules', distDir]
   }
 };

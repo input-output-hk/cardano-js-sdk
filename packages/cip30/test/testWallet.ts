@@ -1,5 +1,6 @@
 import { Cardano } from '@cardano-sdk/core';
-import { RequestAccess, WalletApi, WalletProperties } from '../src/Wallet';
+import { RemoteAuthenticator } from '../src';
+import { WalletApi, WalletProperties } from '../src/WalletApi';
 
 export const api = <WalletApi>{
   getBalance: async () => '100',
@@ -27,6 +28,12 @@ export const api = <WalletApi>{
   submitTx: async (_tx) => 'transactionId'
 };
 
-export const properties: WalletProperties = { icon: 'imagelink', name: 'testWallet' };
+export const properties: WalletProperties = { icon: 'imagelink', walletName: 'testWallet' };
 
-export const requestAccess: RequestAccess = async () => true;
+export const stubAuthenticator = () => {
+  let isEnabled = false;
+  return {
+    haveAccess: async () => isEnabled,
+    requestAccess: async () => (isEnabled = true)
+  } as RemoteAuthenticator;
+};

@@ -5,6 +5,11 @@
     "rootDir": "."
   },
   "references": [
-    { "path": "../../core/src" }
+    {
+      "path": "../../core/src"
+    },
+    {
+      "path": "../../web-extension/src"
+    }
   ]
 }

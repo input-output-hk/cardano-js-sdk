@@ -1,0 +1,28 @@
+/* eslint-disable no-use-before-define */
+import { UserPromptService, userPromptServiceChannel } from './util';
+import { exposePromiseApi } from '@cardano-sdk/web-extension';
+import { runtime } from 'webextension-polyfill';
+
+const api: UserPromptService = {
+  allowOrigin(origin) {
+    const container = document.querySelector<HTMLDivElement>('#requestAccess')!;
+    container.style.display = 'block';
+    document.querySelector<HTMLSpanElement>('#requestAccessOrigin')!.textContent = origin;
+    const btnGrant = document.querySelector<HTMLButtonElement>('#requestAccessGrant')!;
+    const btnDeny = document.querySelector<HTMLButtonElement>('#requestAccessDeny')!;
+    return new Promise((resolve) => {
+      const done = async (grant: boolean) => {
+        btnGrant.removeEventListener('click', grantListener);
+        btnDeny.removeEventListener('click', denyListener);
+        container.style.display = 'none';
+        resolve(grant);
+      };
+      const grantListener = () => done(true);
+      const denyListener = () => done(false);
+      btnGrant.addEventListener('click', grantListener);
+      btnDeny.addEventListener('click', denyListener);
+    });
+  }
+};
+
+exposePromiseApi<UserPromptService>({ api, channel: userPromptServiceChannel }, { logger: console, runtime });
