@@ -14,6 +14,7 @@ export class InMemoryAssetsStore extends InMemoryDocumentStore<Assets> {}
 
 export class InMemoryTransactionsStore extends InMemoryCollectionStore<Cardano.TxAlonzo> {}
 export class InMemoryUtxoStore extends InMemoryCollectionStore<Cardano.Utxo> {}
+export class InMemoryUnspendableUtxoStore extends InMemoryCollectionStore<Cardano.Utxo> {}
 
 export class InMemoryRewardsHistoryStore extends InMemoryKeyValueStore<Cardano.RewardAccount, EpochRewards[]> {}
 export class InMemoryStakePoolsStore extends InMemoryKeyValueStore<Cardano.PoolId, Cardano.StakePool> {}
@@ -29,6 +30,7 @@ export const createInMemoryWalletStores = (): WalletStores => ({
         this.genesisParameters.destroy(),
         this.networkInfo.destroy(),
         this.protocolParameters.destroy(),
+        this.unspendableUtxo.destroy(),
         this.rewardsBalances.destroy(),
         this.rewardsHistory.destroy(),
         this.stakePools.destroy(),
@@ -48,5 +50,6 @@ export const createInMemoryWalletStores = (): WalletStores => ({
   stakePools: new InMemoryStakePoolsStore(),
   tip: new InMemoryTipStore(),
   transactions: new InMemoryTransactionsStore(),
+  unspendableUtxo: new InMemoryUnspendableUtxoStore(),
   utxo: new InMemoryUtxoStore()
 });

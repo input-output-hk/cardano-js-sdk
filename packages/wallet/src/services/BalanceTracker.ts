@@ -73,12 +73,24 @@ export const createBalanceTracker = (
       mapToBalances
     )
   );
+
+  const unspendable$ = new TrackerSubject<Balance>(
+    utxoTracker.unspendable$.pipe(
+      map((utxo) => ({
+        ...Cardano.util.coalesceValueQuantities(utxo.map(([_, txOut]) => txOut.value)),
+        deposit: 0n,
+        rewards: 0n
+      }))
+    )
+  );
+
   return {
     available$,
     shutdown() {
       available$.complete();
       total$.complete();
     },
-    total$
+    total$,
+    unspendable$
   };
 };

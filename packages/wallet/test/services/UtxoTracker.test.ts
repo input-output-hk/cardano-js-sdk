@@ -30,18 +30,98 @@ describe('createUtxoTracker', () => {
         {
           addresses$: cold('a', { a: [address!] }),
           retryBackoffConfig,
-          store,
+          stores: {
+            unspendableUtxo: store,
+            utxo: store
+          },
           tipBlockHeight$,
           transactionsInFlight$,
           walletProvider
         },
-        { utxoSource$: cold('a---|', { a: utxo }) as unknown as PersistentCollectionTrackerSubject<Cardano.Utxo> }
+        {
+          unspendableUtxoSource$: new PersistentCollectionTrackerSubject<Cardano.Utxo>(
+            () =>
+              cold('a---|', {
+                a: []
+              }),
+            store
+          ),
+          utxoSource$: cold('a---|', { a: utxo }) as unknown as PersistentCollectionTrackerSubject<Cardano.Utxo>
+        }
       );
       expectObservable(utxoTracker.total$).toBe('a---|', { a: utxo });
+      expectObservable(utxoTracker.unspendable$).toBe('a---|', { a: [] });
       expectObservable(utxoTracker.available$).toBe('-a-b|', {
         a: utxo,
         b: utxo.slice(1)
       });
+    });
+  });
+
+  it('fetches utxo from WalletProvider and locks unspendable ones', () => {
+    const store = new InMemoryUtxoStore();
+    const address = utxo[0][0].address;
+    createTestScheduler().run(({ cold, expectObservable }) => {
+      const transactionsInFlight$ = cold('-a--|', { a: [] });
+      const utxoTracker = createUtxoTracker(
+        {
+          addresses$: cold('a', { a: [address!] }),
+          retryBackoffConfig,
+          stores: {
+            unspendableUtxo: store,
+            utxo: store
+          },
+          tipBlockHeight$,
+          transactionsInFlight$,
+          walletProvider
+        },
+        {
+          unspendableUtxoSource$: new PersistentCollectionTrackerSubject<Cardano.Utxo>(
+            () =>
+              cold('-a-b|', {
+                a: [],
+                b: [utxo[0]]
+              }),
+            store
+          ),
+          utxoSource$: cold('a---|', { a: utxo }) as unknown as PersistentCollectionTrackerSubject<Cardano.Utxo>
+        }
+      );
+      expectObservable(utxoTracker.total$).toBe('a---|', { a: utxo });
+      expectObservable(utxoTracker.unspendable$).toBe('-a-b|', { a: [], b: [utxo[0]] });
+      expectObservable(utxoTracker.available$).toBe('-a-b|', {
+        a: utxo,
+        b: utxo.slice(1)
+      });
+    });
+  });
+
+  it('sets unspendable utxos and locks them', () => {
+    const store = new InMemoryUtxoStore();
+    const address = utxo[0][0].address;
+    createTestScheduler().run(({ cold, expectObservable }) => {
+      const transactionsInFlight$ = cold('-a--|', { a: [] });
+      const utxoTracker = createUtxoTracker(
+        {
+          addresses$: cold('a', { a: [address!] }),
+          retryBackoffConfig,
+          stores: {
+            unspendableUtxo: store,
+            utxo: store
+          },
+          tipBlockHeight$,
+          transactionsInFlight$,
+          walletProvider
+        },
+        {
+          utxoSource$: cold('a---|', { a: utxo }) as unknown as PersistentCollectionTrackerSubject<Cardano.Utxo>
+        }
+      );
+      utxoTracker.setUnspendable(utxo.slice(1));
+
+      expectObservable(utxoTracker.total$).toBe('a---|', { a: utxo });
+      expectObservable(utxoTracker.unspendable$).toBe('a', { a: utxo.slice(1) });
+      expectObservable(utxoTracker.available$).toBe('-a', { a: [utxo[0]] });
     });
   });
 });

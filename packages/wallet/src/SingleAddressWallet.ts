@@ -188,7 +188,7 @@ export class SingleAddressWallet implements Wallet {
     this.utxo = createUtxoTracker({
       addresses$,
       retryBackoffConfig,
-      store: stores.utxo,
+      stores,
       tipBlockHeight$,
       transactionsInFlight$: this.transactions.outgoing.inFlight$,
       walletProvider: this.walletProvider

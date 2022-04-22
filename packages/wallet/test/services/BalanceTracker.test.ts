@@ -5,7 +5,7 @@
 import { BehaviorObservable, DelegationTracker, RewardAccount, StakeKeyStatus, createBalanceTracker } from '../../src/services';
 import { Cardano, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
 import { createTestScheduler } from '../testScheduler';
-import { utxo } from '../mocks';
+import { utxo, utxo2 } from '../mocks';
 
 describe('createBalanceTracker', () => {
   it('combines data from rewardsTracker & utxoTracker', () => {
@@ -13,6 +13,7 @@ describe('createBalanceTracker', () => {
       const protocolParameters$ = hot( 'a------', { a: { stakeKeyDeposit: 2 } as ProtocolParametersRequiredByWallet });
       const utxoAvailable = hot(       '--a-b--', { a: utxo, b: utxo.slice(1) }) as unknown as BehaviorObservable<Cardano.Utxo[]>;
       const utxoTotal = hot(           '-a-----', { a: utxo }) as unknown as BehaviorObservable<Cardano.Utxo[]>;
+      const utxoUnspendable = hot(     '-a-----', { a: utxo2 }) as unknown as BehaviorObservable<Cardano.Utxo[]>;
       const rewardAccounts$ = hot(     'a--b-cd', {
         a: [],
         b: [{ keyStatus: StakeKeyStatus.Registered, rewardBalance: { available: 0n, total: 0n } }],
@@ -21,7 +22,7 @@ describe('createBalanceTracker', () => {
       }) as unknown as BehaviorObservable<RewardAccount[]>;
       const balanceTracker = createBalanceTracker(
         protocolParameters$,
-        { available$: utxoAvailable, total$: utxoTotal },
+        { available$: utxoAvailable, total$: utxoTotal, unspendable$: utxoUnspendable },
         { rewardAccounts$ } as unknown as DelegationTracker
       );
       expectObservable(balanceTracker.total$).toBe('-a-b-c', {
@@ -35,6 +36,9 @@ describe('createBalanceTracker', () => {
         c: { ...Cardano.util.coalesceValueQuantities(utxo.slice(1).map((u) => u[1].value)), deposit: 2n, rewards: 0n },
         d: { ...Cardano.util.coalesceValueQuantities(utxo.slice(1).map((u) => u[1].value)), deposit: 2n, rewards: 5n },
         e: { ...Cardano.util.coalesceValueQuantities(utxo.slice(1).map((u) => u[1].value)), deposit: 0n, rewards: 5n }
+      });
+      expectObservable(balanceTracker.unspendable$).toBe('-a------', {
+        a: { ...Cardano.util.coalesceValueQuantities(utxo2.map((u) => u[1].value)), deposit: 0n, rewards: 0n }
       });
     });
   });
