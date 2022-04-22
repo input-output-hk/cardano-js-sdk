@@ -25,28 +25,28 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>18/18</span>
+                <span class='fraction'>21/21</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">90.9% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>4/4</span>
+                <span class='fraction'>10/11</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>10/10</span>
+                <span class='fraction'>12/12</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>15/15</span>
+                <span class='fraction'>18/18</span>
             </div>
         
             
@@ -131,10 +131,23 @@
 <a name='L66'></a><a href='#L66'>66</a>
 <a name='L67'></a><a href='#L67'>67</a>
 <a name='L68'></a><a href='#L68'>68</a>
-<a name='L69'></a><a href='#L69'>69</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">29x</span>
+<span class="cline-any cline-yes">29x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">29x</span>
-<span class="cline-any cline-yes">29x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -176,40 +189,51 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">18x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">24x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">71x</span>
+<span class="cline-any cline-yes">20x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">27x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">80x</span>
 <span class="cline-any cline-yes">19x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">20x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">18x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">18x</span>
 <span class="cline-any cline-yes">18x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Cardano, WalletProvider } from '@cardano-sdk/core';
-import { CollectionStore } from '../persistence';
-import { Observable, combineLatest, map, switchMap } from 'rxjs';
+import { NEVER, Observable, combineLatest, concat, map, of, switchMap } from 'rxjs';
 import { PersistentCollectionTrackerSubject, TrackerSubject, coldObservableProvider, utxoEquals } from './util';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { TransactionalTracker } from './types';
+import { UtxoTracker } from './types';
+import { WalletStores } from '../persistence';
 &nbsp;
 export interface UtxoTrackerProps {
   walletProvider: WalletProvider;
   addresses$: Observable&lt;Cardano.Address[]&gt;;
-  store: CollectionStore&lt;Cardano.Utxo&gt;;
+  stores: Pick&lt;WalletStores, 'utxo' | 'unspendableUtxo'&gt;;
   transactionsInFlight$: Observable&lt;Cardano.NewTxAlonzo[]&gt;;
   tipBlockHeight$: Observable&lt;number&gt;;
   retryBackoffConfig: RetryBackoffConfig;
@@ -217,6 +241,7 @@ export interface UtxoTrackerProps {
 &nbsp;
 export interface UtxoTrackerInternals {
   utxoSource$?: PersistentCollectionTrackerSubject&lt;Cardano.Utxo&gt;;
+  unspendableUtxoSource$?: PersistentCollectionTrackerSubject&lt;Cardano.Utxo&gt;;
 }
 &nbsp;
 export const createUtxoProvider = (
@@ -237,34 +262,45 @@ export const createUtxoProvider = (
   );
 &nbsp;
 export const createUtxoTracker = (
-  { walletProvider, addresses$, store, transactionsInFlight$, retryBackoffConfig, tipBlockHeight$ }: UtxoTrackerProps,
+  { walletProvider, addresses$, stores, transactionsInFlight$, retryBackoffConfig, tipBlockHeight$ }: UtxoTrackerProps,
   {
     utxoSource$ = new PersistentCollectionTrackerSubject&lt;Cardano.Utxo&gt;(
       () =&gt; createUtxoProvider(walletProvider, addresses$, tipBlockHeight$, retryBackoffConfig),
-      store
+      stores.utxo
+    ),
+    unspendableUtxoSource$ = new PersistentCollectionTrackerSubject(
+      (stored) =&gt; (stored.length &gt; 0 ? <span class="branch-0 cbranch-no" title="branch not covered" >NEVER </span>: concat(of([]), NEVER)),
+      stores.unspendableUtxo
     )
   }: UtxoTrackerInternals = {}
-): TransactionalTracker&lt;Cardano.Utxo[]&gt; =&gt; {
+): UtxoTracker =&gt; {
   const available$ = new TrackerSubject&lt;Cardano.Utxo[]&gt;(
-    combineLatest([utxoSource$, transactionsInFlight$]).pipe(
-      // filter to utxo that are not included in in-flight transactions
-      map(([utxo, transactionsInFlight]) =&gt;
+    combineLatest([utxoSource$, transactionsInFlight$, unspendableUtxoSource$]).pipe(
+      // filter to utxo that are not included in in-flight transactions or unspendable
+      map(([utxo, transactionsInFlight, unspendableUtxo]) =&gt;
         utxo.filter(
           ([utxoTxIn]) =&gt;
             !transactionsInFlight.some(({ body: { inputs } }) =&gt;
               inputs.some((input) =&gt; input.txId === utxoTxIn.txId &amp;&amp; input.index === utxoTxIn.index)
+            ) &amp;&amp;
+            !unspendableUtxo.some(
+              ([unspendable]) =&gt; unspendable.txId === utxoTxIn.txId &amp;&amp; unspendable.index === utxoTxIn.index
             )
         )
       )
     )
   );
+&nbsp;
   return {
     available$,
+    setUnspendable: unspendableUtxoSource$.next.bind(unspendableUtxoSource$),
     shutdown: () =&gt; {
       utxoSource$.complete();
       available$.complete();
+      unspendableUtxoSource$.complete();
     },
-    total$: utxoSource$
+    total$: utxoSource$,
+    unspendable$: unspendableUtxoSource$
   };
 };
 &nbsp;</pre></td></tr></table></pre>
@@ -274,7 +310,7 @@ export const createUtxoTracker = (
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at Thu Apr 21 2022 06:42:34 GMT+0000 (Coordinated Universal Time)
+                at Fri Apr 22 2022 10:24:41 GMT+0000 (Coordinated Universal Time)
             </div>
         <script src="../../prettify.js"></script>
         <script>
