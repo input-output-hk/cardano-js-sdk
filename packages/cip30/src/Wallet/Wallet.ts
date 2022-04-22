@@ -20,7 +20,7 @@ export type WalletName = string;
  */
 export type WalletIcon = string;
 
-export type WalletProperties = { apiVersion: ApiVersion; icon: WalletIcon; name: WalletName };
+export type WalletProperties = { icon: WalletIcon; name: WalletName };
 
 /**
  * Resolve true to authorise access to the WalletAPI, or resolve false to deny.
@@ -43,7 +43,7 @@ type WalletStorage = {
 };
 
 export class Wallet {
-  readonly apiVersion: ApiVersion;
+  readonly apiVersion: ApiVersion = '0.1.0';
   readonly name: WalletName;
   readonly icon: WalletIcon;
 
@@ -54,7 +54,6 @@ export class Wallet {
   readonly #options: Required<WalletOptions>;
 
   constructor(properties: WalletProperties, api: WalletApi, requestAccess: RequestAccess, options: WalletOptions) {
-    this.apiVersion = properties.apiVersion;
     this.enable = this.enable.bind(this);
     this.icon = properties.icon;
     this.isEnabled = this.isEnabled.bind(this);

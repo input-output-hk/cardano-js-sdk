@@ -27,7 +27,7 @@ describe('injectWindow', () => {
     injectWindow(window, wallet);
     expect(window.cardano).toBeDefined();
     expect(window.cardano[properties.name].name).toBe(properties.name);
-    expect(window.cardano[properties.name].apiVersion).toBe(properties.apiVersion);
+    expect(typeof window.cardano[properties.name].apiVersion).toBe('string');
     expect(window.cardano[properties.name].icon).toBe(properties.icon);
     expect(await window.cardano[properties.name].isEnabled(window.location.hostname)).toBe(false);
     await window.cardano[properties.name].enable(window.location.hostname);
@@ -105,7 +105,7 @@ describe('injectWindow', () => {
       expect(window.cardano).toBeDefined();
       injectWindow(window, wallet);
       expect(window.cardano[properties.name].name).toBe(properties.name);
-      expect(window.cardano[properties.name].apiVersion).toBe(properties.apiVersion);
+      expect(typeof window.cardano[properties.name].apiVersion).toBe('string');
       expect(window.cardano[properties.name].icon).toBe(properties.icon);
       expect(Object.keys(window.cardano[properties.name])).toEqual([
         'apiVersion',
