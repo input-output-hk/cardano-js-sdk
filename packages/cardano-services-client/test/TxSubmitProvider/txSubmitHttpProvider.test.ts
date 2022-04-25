@@ -2,7 +2,7 @@ import { Cardano, ProviderError, ProviderFailure, util } from '@cardano-sdk/core
 import { txSubmitHttpProvider } from '../../src';
 import got, { HTTPError, Response } from 'got';
 
-const url = 'http://some-hostname:3000';
+const url = 'http://some-hostname:3000/tx-submit';
 
 describe('txSubmitHttpProvider', () => {
   describe('healthCheck', () => {

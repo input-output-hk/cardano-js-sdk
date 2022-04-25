@@ -1,7 +1,7 @@
 import { stakePoolSearchHttpProvider } from '../../src';
 import got from 'got';
 
-const url = 'http://some-hostname:3000';
+const url = 'http://some-hostname:3000/stake-pool-search';
 
 describe('stakePoolSearchHttpProvider', () => {
   beforeAll(() => {
