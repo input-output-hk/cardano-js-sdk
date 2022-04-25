@@ -13,7 +13,7 @@ describe('entrypoints', () => {
 
   beforeEach(async () => {
     apiPort = await getRandomPort();
-    apiUrlBase = `http://localhost:${apiPort}`;
+    apiUrlBase = `http://localhost:${apiPort}/stake-pool-search`;
   });
   afterEach(() => {
     if (proc !== undefined) proc.kill();

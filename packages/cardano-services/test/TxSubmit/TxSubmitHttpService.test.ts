@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-len */
-import { APPLICATION_JSON, CONTENT_TYPE, HttpServerConfig, TxSubmitHttpServer } from '../../src';
+import { APPLICATION_JSON, CONTENT_TYPE, HttpServer, HttpServerConfig, TxSubmitHttpService } from '../../src';
 import { Cardano, ProviderError, ProviderFailure, TxSubmitProvider, util } from '@cardano-sdk/core';
 import { getPort } from 'get-port-please';
 import { txSubmitHttpProvider } from '@cardano-sdk/cardano-services-client';
@@ -12,16 +12,16 @@ const bodyTx = serializeProviderArg(cbor.encode('#####'));
 const BAD_REQUEST_STRING = 'Response code 400 (Bad Request)';
 const APPLICATION_CBOR = 'application/cbor';
 
-describe('TxSubmitHttpServer', () => {
+describe('TxSubmitHttpService', () => {
   let txSubmitProvider: TxSubmitProvider;
-  let txSubmitHttpServer: TxSubmitHttpServer;
+  let httpServer: HttpServer;
   let port: number;
   let apiUrlBase: string;
   let config: HttpServerConfig;
 
   beforeAll(async () => {
     port = await getPort();
-    apiUrlBase = `http://localhost:${port}`;
+    apiUrlBase = `http://localhost:${port}/tx-submit`;
     config = { listen: { port } };
   });
 
@@ -35,11 +35,12 @@ describe('TxSubmitHttpServer', () => {
         healthCheck: jest.fn(() => Promise.resolve({ ok: false })),
         submitTx: jest.fn()
       };
-      txSubmitHttpServer = TxSubmitHttpServer.create({ txSubmitProvider }, config);
     });
 
     it('throws during initialization if the TxSubmitProvider is unhealthy', async () => {
-      await expect(txSubmitHttpServer.initialize()).rejects.toThrow(new ProviderError(ProviderFailure.Unhealthy));
+      await expect(() => TxSubmitHttpService.create({ txSubmitProvider })).rejects.toThrow(
+        new ProviderError(ProviderFailure.Unhealthy)
+      );
     });
   });
 
@@ -56,14 +57,14 @@ describe('TxSubmitHttpServer', () => {
     beforeAll(async () => {
       isOk = () => true;
       txSubmitProvider = { healthCheck: jest.fn(() => Promise.resolve({ ok: isOk() })), submitTx: jest.fn() };
-      txSubmitHttpServer = TxSubmitHttpServer.create({ txSubmitProvider }, config);
-      await txSubmitHttpServer.initialize();
-      await txSubmitHttpServer.start();
+      httpServer = new HttpServer(config, { services: [await TxSubmitHttpService.create({ txSubmitProvider })] });
+      await httpServer.initialize();
+      await httpServer.start();
       expect(await serverHealth()).toEqual({ ok: true });
     });
 
     afterAll(async () => {
-      await txSubmitHttpServer.shutdown();
+      await httpServer.shutdown();
     });
 
     it('returns a ProviderError of failure type Unhealthy if the TxSubmitProvider is unhealthy when submitting', async () => {
@@ -91,13 +92,13 @@ describe('TxSubmitHttpServer', () => {
   describe('healthy and successful submission', () => {
     beforeAll(async () => {
       txSubmitProvider = { healthCheck: jest.fn(() => Promise.resolve({ ok: true })), submitTx: jest.fn() };
-      txSubmitHttpServer = TxSubmitHttpServer.create({ txSubmitProvider }, config);
-      await txSubmitHttpServer.initialize();
-      await txSubmitHttpServer.start();
+      httpServer = new HttpServer(config, { services: [await TxSubmitHttpService.create({ txSubmitProvider })] });
+      await httpServer.initialize();
+      await httpServer.start();
     });
 
     afterAll(async () => {
-      await txSubmitHttpServer.shutdown();
+      await httpServer.shutdown();
     });
 
     describe('/health', () => {
@@ -163,13 +164,13 @@ describe('TxSubmitHttpServer', () => {
           healthCheck: jest.fn(() => Promise.resolve({ ok: true })),
           submitTx: jest.fn(() => Promise.reject(stubErrors))
         };
-        txSubmitHttpServer = TxSubmitHttpServer.create({ txSubmitProvider }, config);
-        await txSubmitHttpServer.initialize();
-        await txSubmitHttpServer.start();
+        httpServer = new HttpServer(config, { services: [await TxSubmitHttpService.create({ txSubmitProvider })] });
+        await httpServer.initialize();
+        await httpServer.start();
       });
 
       afterAll(async () => {
-        await txSubmitHttpServer.shutdown();
+        await httpServer.shutdown();
       });
 
       it('rehydrates errors when used with TxSubmitHttpProvider', async () => {

@@ -1,11 +1,5 @@
-import {
-  APPLICATION_JSON,
-  CONTENT_TYPE,
-  HttpServer,
-  HttpServerConfig,
-  HttpServerDependencies,
-  RunnableModule
-} from '../../src';
+import { APPLICATION_JSON, CONTENT_TYPE, HttpServer, HttpService, RunnableModule } from '../../src';
+import { dummyLogger } from 'ts-log';
 import { getRandomPort } from 'get-port-please';
 import { util } from '@cardano-sdk/core';
 import express from 'express';
@@ -15,31 +9,34 @@ import waitOn from 'wait-on';
 
 const onHttpServer = (url: string) => waitOn({ resources: [url], validateStatus: (statusCode) => statusCode === 404 });
 
-class SomeHttpServer extends HttpServer {
-  private constructor(config: HttpServerConfig, dependencies: HttpServerDependencies) {
-    super({ ...config, name: 'SomeHttpServer' }, dependencies);
+class SomeHttpService extends HttpService {
+  private constructor(router: express.Router, logger = dummyLogger) {
+    super('some-http-service', router, logger);
   }
-  static create(config: HttpServerConfig, initialize?: (router: express.Router) => void) {
+
+  async healthCheck() {
+    return Promise.resolve({ ok: true });
+  }
+
+  static create(logger = dummyLogger, assertReq?: (req: express.Request) => void) {
     const router = express.Router();
-    if (initialize) initialize(router);
-    return new SomeHttpServer(config, {
-      healthCheck: () => Promise.resolve({ ok: true }),
-      router
+    router.post('/echo', (req, res) => {
+      logger.debug(req.body);
+      assertReq!(req);
+      res.send(JSON.stringify(req.body));
     });
-  }
-  publicSendJSON(res: express.Response, obj: unknown) {
-    HttpServer.sendJSON(res, obj);
+    return new SomeHttpService(router, logger);
   }
 }
 
 describe('HttpServer', () => {
-  let httpServer: SomeHttpServer;
+  let httpServer: HttpServer;
   let port: number;
   let apiUrlBase: string;
 
   it('Is a runnable module', async () => {
     port = await getRandomPort();
-    httpServer = SomeHttpServer.create({ listen: { host: 'localhost', port } });
+    httpServer = new HttpServer({ listen: { host: 'localhost', port } }, { services: [SomeHttpService.create()] });
     expect(httpServer).toBeInstanceOf(RunnableModule);
   });
 
@@ -50,7 +47,7 @@ describe('HttpServer', () => {
 
   describe('initialize', () => {
     it('initializes the express application', async () => {
-      httpServer = SomeHttpServer.create({ listen: { host: 'localhost', port } });
+      httpServer = new HttpServer({ listen: { host: 'localhost', port } }, { services: [SomeHttpService.create()] });
       expect(httpServer.app).not.toBeDefined();
       await httpServer.initialize();
       expect(httpServer.app).toBeDefined();
@@ -60,16 +57,18 @@ describe('HttpServer', () => {
       const expectedBody = {
         bigint: 123n
       };
-      httpServer = SomeHttpServer.create({ listen: { host: 'localhost', port } }, (router) => {
-        router.post('/echo', (req, res) => {
-          expect(req.body).toEqual(expectedBody);
-          res.send();
-        });
-      });
+      httpServer = new HttpServer(
+        { listen: { host: 'localhost', port } },
+        {
+          services: [
+            SomeHttpService.create(dummyLogger, (req: express.Request) => expect(req.body).toEqual(expectedBody))
+          ]
+        }
+      );
       await httpServer.initialize();
       await httpServer.start();
       await onHttpServer(apiUrlBase);
-      await got.post(`${apiUrlBase}/echo`, {
+      await got.post(`${apiUrlBase}/some-http-service/echo`, {
         body: JSON.stringify(util.toSerializableObject(expectedBody)),
         headers: { [CONTENT_TYPE]: APPLICATION_JSON }
       });
@@ -79,7 +78,6 @@ describe('HttpServer', () => {
 
   describe('sendJSON', () => {
     it('sets content-type and transforms the object using toSerializableObj', () => {
-      httpServer = SomeHttpServer.create({ listen: { host: 'localhost', port } });
       const obj = {
         bigint: 123n
       };
@@ -89,7 +87,7 @@ describe('HttpServer', () => {
           expect(util.fromSerializableObject(json)).toEqual(obj);
         })
       };
-      httpServer.publicSendJSON(res as unknown as express.Response, obj);
+      HttpServer.sendJSON(res as unknown as express.Response, obj);
       expect(res.send).toBeCalledTimes(1);
       expect(res.header).toBeCalledTimes(1);
     });
@@ -97,7 +95,7 @@ describe('HttpServer', () => {
 
   describe('start', () => {
     beforeEach(async () => {
-      httpServer = SomeHttpServer.create({ listen: { host: 'localhost', port } });
+      httpServer = new HttpServer({ listen: { host: 'localhost', port } }, { services: [SomeHttpService.create()] });
       await httpServer.initialize();
     });
 
@@ -119,7 +117,7 @@ describe('HttpServer', () => {
 
   describe('shutdown', () => {
     beforeEach(async () => {
-      httpServer = SomeHttpServer.create({ listen: { host: 'localhost', port } });
+      httpServer = new HttpServer({ listen: { host: 'localhost', port } }, { services: [SomeHttpService.create()] });
       await httpServer.initialize();
       await httpServer.start();
     });
@@ -137,7 +135,7 @@ describe('HttpServer', () => {
   describe('restarting', () => {
     // eslint-disable-next-line sonarjs/no-identical-functions
     beforeEach(async () => {
-      httpServer = SomeHttpServer.create({ listen: { host: 'localhost', port } });
+      httpServer = new HttpServer({ listen: { host: 'localhost', port } }, { services: [SomeHttpService.create()] });
       await httpServer.initialize();
       await httpServer.start();
     });
@@ -159,11 +157,11 @@ describe('HttpServer', () => {
     });
 
     it('is disabled by default', async () => {
-      httpServer = SomeHttpServer.create({ listen: { host: 'localhost', port } });
+      httpServer = new HttpServer({ listen: { host: 'localhost', port } }, { services: [SomeHttpService.create()] });
       await httpServer.initialize();
       await httpServer.start();
       await onHttpServer(apiUrlBase);
-      const res2 = await got(`${apiUrlBase}/metrics`, {
+      const res2 = await got(`${apiUrlBase}/some-http-service/metrics`, {
         headers: { [CONTENT_TYPE]: APPLICATION_JSON },
         throwHttpErrors: false
       });
@@ -171,7 +169,10 @@ describe('HttpServer', () => {
     });
 
     it('can expose Prometheus metrics, at /metrics by default', async () => {
-      httpServer = SomeHttpServer.create({ listen: { port }, metrics: { enabled: true } });
+      httpServer = new HttpServer(
+        { listen: { host: 'localhost', port }, metrics: { enabled: true } },
+        { services: [SomeHttpService.create()] }
+      );
       await httpServer.initialize();
       await httpServer.start();
       await onHttpServer(apiUrlBase);
@@ -184,10 +185,10 @@ describe('HttpServer', () => {
 
     it('Prometheus metrics can be configured with prom-client options', async () => {
       const metricsPath = '/metrics-custom';
-      httpServer = SomeHttpServer.create({
-        listen: { port },
-        metrics: { enabled: true, options: { metricsPath } }
-      });
+      httpServer = new HttpServer(
+        { listen: { port }, metrics: { enabled: true, options: { metricsPath } } },
+        { services: [SomeHttpService.create()] }
+      );
       await httpServer.initialize();
       await httpServer.start();
       await onHttpServer(apiUrlBase);
@@ -201,7 +202,7 @@ describe('HttpServer', () => {
 
   describe('HTTP API', () => {
     beforeEach(async () => {
-      httpServer = SomeHttpServer.create({ listen: { host: 'localhost', port } });
+      httpServer = new HttpServer({ listen: { host: 'localhost', port } }, { services: [SomeHttpService.create()] });
       await httpServer.initialize();
       await httpServer.start();
       await onHttpServer(apiUrlBase);
@@ -212,7 +213,7 @@ describe('HttpServer', () => {
     });
 
     it('health', async () => {
-      const res = await got(`${apiUrlBase}/health`, {
+      const res = await got(`${apiUrlBase}/some-http-service/health`, {
         headers: { [CONTENT_TYPE]: 'application/json' }
       });
       expect(res.statusCode).toBe(200);

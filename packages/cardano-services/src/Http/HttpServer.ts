@@ -1,5 +1,6 @@
-import { HealthCheckResponse, ProviderError, util } from '@cardano-sdk/core';
+import { HttpService } from './HttpService';
 import { Logger, dummyLogger } from 'ts-log';
+import { ProviderError, util } from '@cardano-sdk/core';
 import { RunnableModule } from '../RunnableModule';
 import { listenPromise, serverClosePromise } from '../util';
 import bodyParser, { Options } from 'body-parser';
@@ -25,59 +26,46 @@ export type HttpServerConfig = {
 };
 
 export interface HttpServerDependencies {
-  healthCheck: () => Promise<HealthCheckResponse>;
-  router: express.Router;
+  services: HttpService[];
   logger?: Logger;
 }
 
-export abstract class HttpServer extends RunnableModule {
+export class HttpServer extends RunnableModule {
   public app: express.Application;
   public server: http.Server;
+  #config: HttpServerConfig;
   #dependencies: HttpServerDependencies;
 
-  protected constructor(public config: HttpServerConfig, { logger = dummyLogger, ...rest }: HttpServerDependencies) {
+  constructor(config: HttpServerConfig, { logger = dummyLogger, ...rest }: HttpServerDependencies) {
     super(config.name || 'HttpServer', logger);
+    this.#config = config;
     this.#dependencies = { logger, ...rest };
   }
 
-  protected async initializeImpl(): Promise<void> {
+  async initializeImpl(): Promise<void> {
     this.app = express();
-    // must use this before router
     this.app.use(
       bodyParser.json({
-        limit: this.config.bodyParser?.limit || '500kB',
+        limit: this.#config?.bodyParser?.limit || '500kB',
         reviver: (key, value) => (key === '' ? util.fromSerializableObject(value) : value)
       })
     );
-
-    if (this.config.metrics?.enabled) {
+    if (this.#config?.metrics?.enabled) {
       this.app.use(
         expressPromBundle({
           includeMethod: true,
           promRegistry: new promClient.Registry(),
-          ...this.config.metrics.options
+          ...this.#config.metrics.options
         })
       );
-      this.logger.info(`Prometheus metrics configured at ${this.config.metrics.options?.metricsPath || '/metrics'}`);
+      this.logger.info(`Prometheus metrics configured at ${this.#config.metrics.options?.metricsPath || '/metrics'}`);
     }
-
-    this.#dependencies.router.get('/health', async (req, res) => {
-      this.logger.debug('/health', { ip: req.ip });
-      let body: HealthCheckResponse | Error['message'];
-      try {
-        body = await this.#dependencies.healthCheck();
-      } catch (error) {
-        this.logger.error(error);
-        body = error instanceof ProviderError ? error.message : 'Unknown error';
-        res.statusCode = 500;
-      }
-      res.send(body);
-    });
-
-    this.app.use(this.#dependencies.router);
+    for (const service of this.#dependencies.services) {
+      this.app.use(`/${service.slug}`, service.router);
+    }
   }
 
-  protected static sendJSON<ResponseBody>(
+  static sendJSON<ResponseBody>(
     res: express.Response<ResponseBody | ProviderError>,
     obj: ResponseBody | ProviderError,
     statusCode = 200
@@ -87,11 +75,11 @@ export abstract class HttpServer extends RunnableModule {
     res.send(util.toSerializableObject(obj) as ResponseBody);
   }
 
-  protected async startImpl(): Promise<void> {
-    this.server = await listenPromise(this.app, this.config.listen);
+  async startImpl(): Promise<void> {
+    this.server = await listenPromise(this.app, this.#config.listen);
   }
 
-  protected shutdownImpl(): Promise<void> {
+  shutdownImpl(): Promise<void> {
     return serverClosePromise(this.server);
   }
 }

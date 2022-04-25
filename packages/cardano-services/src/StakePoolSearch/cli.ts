@@ -3,10 +3,11 @@
 require('../../scripts/patchRequire');
 import { Command } from 'commander';
 import { DbSyncStakePoolSearchProvider } from './DbSyncStakePoolSearchProvider';
+import { HttpServer } from '../Http';
 import { InvalidLoggerLevel } from '../errors';
 import { LogLevel, createLogger } from 'bunyan';
 import { Pool } from 'pg';
-import { StakePoolSearchHttpServer } from './StakePoolSearchHttpServer';
+import { StakePoolSearchHttpService } from './StakePoolSearchHttpService';
 import { URL } from 'url';
 import { loggerMethodNames } from '../util';
 import onDeath from 'death';
@@ -48,11 +49,8 @@ program
       const logger = createLogger({ level: loggerMinSeverity as LogLevel, name: 'stake-pool-search-http-server' });
       const dbPool = new Pool({ connectionString: dbConnectionString });
       const stakePoolSearchProvider = new DbSyncStakePoolSearchProvider(dbPool, logger);
-      const server = StakePoolSearchHttpServer.create(
-        {
-          logger,
-          stakePoolSearchProvider
-        },
+      const stakePoolSearchHttpService = StakePoolSearchHttpService.create({ logger, stakePoolSearchProvider });
+      const server = new HttpServer(
         {
           listen: {
             host: apiUrl.hostname,
@@ -60,8 +58,10 @@ program
           },
           metrics: {
             enabled: metricsEnabled
-          }
-        }
+          },
+          name: 'StakePoolHttpServer'
+        },
+        { services: [stakePoolSearchHttpService] }
       );
       await server.initialize();
       await server.start();

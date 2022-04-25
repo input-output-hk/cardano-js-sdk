@@ -1,2 +1,2 @@
 export * from './DbSyncStakePoolSearchProvider';
-export * from './StakePoolSearchHttpServer';
+export * from './StakePoolSearchHttpService';
