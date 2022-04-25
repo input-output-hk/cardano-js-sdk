@@ -44,7 +44,7 @@ describe('Address', () => {
       });
     });
 
-    describe('isOutgoing', () => {
+    describe('inputsWithAddresses', () => {
       beforeAll(() => parseCslAddressSpy.mockRestore());
       const tx = {
         body: {
@@ -58,12 +58,18 @@ describe('Address', () => {
         }
       } as Cardano.TxAlonzo;
 
-      it('returns true if any of the addresses are in some of the transaction inputs', () => {
-        expect(Address.util.isOutgoing(tx, addresses)).toBe(true);
+      it('returns the transaction inputs that contain any of the addresses', () => {
+        expect(Address.util.inputsWithAddresses(tx, addresses)).toEqual([
+          {
+            address: addresses[0],
+            index: 0,
+            txId: Cardano.TransactionId('bb217abaca60fc0ca68c1555eca6a96d2478547818ae76ce6836133f3cc546e0')
+          }
+        ]);
       });
 
-      it('returns false if none of the addresses are in the transaction inputs', () => {
-        expect(Address.util.isOutgoing(tx, [addresses[1]])).toBe(false);
+      it('returns an empty array if none of the addresses are in the transaction inputs', () => {
+        expect(Address.util.inputsWithAddresses(tx, [addresses[1]])).toEqual([]);
       });
     });
   });

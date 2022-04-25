@@ -18,8 +18,11 @@ import { AssetId } from '@cardano-sdk/util-dev';
 import {
   createTxInspector,
   delegationInspector,
+  sentInspector,
   stakeKeyDeregistrationInspector,
   stakeKeyRegistrationInspector,
+  totalAddressInputsValueInspector,
+  totalAddressOutputsValueInspector,
   valueReceivedInspector,
   valueSentInspector,
   withdrawalInspector
@@ -32,19 +35,21 @@ describe('txInspector', () => {
   const receivingAddress = Address(
     'addr_test1qpfhhfy2qgls50r9u4yh0l7z67xpg0a5rrhkmvzcuqrd0znuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q9gw0lz'
   );
+  const rewardAccount = RewardAccount('stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d');
+  const stakeKeyHash = Ed25519KeyHash.fromRewardAccount(rewardAccount);
 
   const delegationCert: StakeDelegationCertificate = {
     __typename: CertificateType.StakeDelegation,
     poolId: PoolId('pool1euf2nh92ehqfw7rpd4s9qgq34z8dg4pvfqhjmhggmzk95gcd402'),
-    stakeKeyHash: Ed25519KeyHash('6199186adb51974690d7247d2646097d2c62763b767b528816fb7ed5')
+    stakeKeyHash
   };
   const keyRegistrationCert: StakeAddressCertificate = {
     __typename: CertificateType.StakeKeyRegistration,
-    stakeKeyHash: Ed25519KeyHash('6199186adb51974690d7247d2646097d2c62763b767b528816fb7ed5')
+    stakeKeyHash
   };
   const keyDeregistrationCert: StakeAddressCertificate = {
     __typename: CertificateType.StakeKeyDeregistration,
-    stakeKeyHash: Ed25519KeyHash('6199186adb51974690d7247d2646097d2c62763b767b528816fb7ed5')
+    stakeKeyHash
   };
   const withdrawals: Withdrawal[] = [
     {
@@ -55,6 +60,34 @@ describe('txInspector', () => {
       quantity: 7_000_000n,
       stakeAddress: RewardAccount('stake_test1upqykkjq3zhf4085s6n70w8cyp57dl87r0ezduv9rnnj2uqk5zmdv')
     }
+  ];
+
+  const historicalTxs: TxAlonzo[] = [
+    {
+      body: {
+        outputs: [
+          {
+            value: {
+              assets: new Map([[AssetId.TSLA, 5n]]),
+              coins: 4_500_000n
+            }
+          },
+          {
+            value: {
+              assets: new Map([[AssetId.PXL, 15n]]),
+              coins: 5_000_000n
+            }
+          },
+          {
+            value: {
+              assets: new Map([[AssetId.TSLA, 25n]]),
+              coins: 2_000_000n
+            }
+          }
+        ]
+      },
+      id: TransactionId('bb217abaca60fc0ca68c1555eca6a96d2478547818ae76ce6836133f3cc546e0')
+    } as unknown as TxAlonzo
   ];
 
   const buildMockTx = (
@@ -113,41 +146,132 @@ describe('txInspector', () => {
       index: 0
     } as TxAlonzo);
 
-  describe('sent and received value inspectors', () => {
-    test('an outgoing transaction produces an inspection containing total sent coins and not received coins', () => {
+  describe('transaction sent inspector', () => {
+    test('a transaction with inputs with provided addresses produces an inspection containing those inputs', () => {
       const tx = buildMockTx();
       const inspectTx = createTxInspector({
-        valueReceived: valueReceivedInspector([sendingAddress]),
-        valueSent: valueSentInspector([sendingAddress])
+        sent: sentInspector({ addresses: [sendingAddress] })
       });
       const txProperties = inspectTx(tx);
 
-      expect(txProperties.valueSent.coins).toEqual(9_000_000n);
-      expect(txProperties.valueSent.assets).toEqual(
-        new Map([
-          [AssetId.PXL, 9n],
-          [AssetId.TSLA, 4n]
-        ])
-      );
-      expect(txProperties.valueReceived).toEqual({ coins: 0n });
+      expect(txProperties.sent.inputs).toEqual(tx.body.inputs);
+      expect(txProperties.sent.certificates).toEqual([]);
     });
 
-    test('an incoming transaction produces an inspection containing total received coins and not sent coins', () => {
-      const tx = buildMockTx();
+    test(
+      'a transaction with certificates including the reward account' +
+        ' produces an inspection containing those certificates',
+      () => {
+        const tx = buildMockTx({ certificates: [delegationCert, keyRegistrationCert] });
+        const inspectTx = createTxInspector({
+          sent: sentInspector({ rewardAccounts: [rewardAccount] })
+        });
+        const txProperties = inspectTx(tx);
+
+        expect(txProperties.sent.inputs).toEqual([]);
+        expect(txProperties.sent.certificates).toEqual([delegationCert, keyRegistrationCert]);
+      }
+    );
+
+    test(
+      'a transaction with certificates including the reward account' +
+        ' and inputs cointaining provided addresses' +
+        ' produces an inspection containing those certificates and inputs',
+      () => {
+        const tx = buildMockTx({ certificates: [delegationCert, keyRegistrationCert] });
+        const inspectTx = createTxInspector({
+          sent: sentInspector({ addresses: [sendingAddress], rewardAccounts: [rewardAccount] })
+        });
+        const txProperties = inspectTx(tx);
+
+        expect(txProperties.sent.inputs).toEqual(tx.body.inputs);
+        expect(txProperties.sent.certificates).toEqual([delegationCert, keyRegistrationCert]);
+      }
+    );
+  });
+
+  describe('total address inputs and outputs value inspector', () => {
+    test('adds total input and outputs values for an address', () => {
+      const tx = buildMockTx({
+        inputs: [
+          {
+            address: sendingAddress,
+            index: 0,
+            txId: TransactionId('bb217abaca60fc0ca68c1555eca6a96d2478547818ae76ce6836133f3cc546e0')
+          },
+          {
+            address: sendingAddress,
+            index: 1,
+            txId: TransactionId('bb217abaca60fc0ca68c1555eca6a96d2478547818ae76ce6836133f3cc546e0')
+          },
+          {
+            address: receivingAddress,
+            index: 2,
+            txId: TransactionId('bb217abaca60fc0ca68c1555eca6a96d2478547818ae76ce6836133f3cc546e0')
+          }
+        ]
+      });
       const inspectTx = createTxInspector({
-        valueReceived: valueReceivedInspector([receivingAddress]),
-        valueSent: valueSentInspector([receivingAddress])
+        totalInputsValue: totalAddressInputsValueInspector([sendingAddress], () => historicalTxs),
+        totalOutputsValue: totalAddressOutputsValueInspector([receivingAddress])
+      });
+      const txProperties = inspectTx(tx);
+      expect(txProperties.totalInputsValue).toEqual({
+        assets: new Map([
+          [AssetId.TSLA, 5n],
+          [AssetId.PXL, 15n]
+        ]),
+        coins: 9_500_000n
+      });
+      expect(txProperties.totalOutputsValue).toEqual({
+        assets: new Map([
+          [AssetId.TSLA, 4n],
+          [AssetId.PXL, 9n]
+        ]),
+        coins: 9_000_000n
+      });
+    });
+  });
+
+  describe('value sent and received inspectors', () => {
+    test('a transaction produces an inspection containing total net value sent and received', () => {
+      const tx = buildMockTx({
+        inputs: [
+          {
+            address: sendingAddress,
+            index: 0,
+            txId: TransactionId('bb217abaca60fc0ca68c1555eca6a96d2478547818ae76ce6836133f3cc546e0')
+          },
+          {
+            address: sendingAddress,
+            index: 1,
+            txId: TransactionId('bb217abaca60fc0ca68c1555eca6a96d2478547818ae76ce6836133f3cc546e0')
+          },
+          {
+            address: receivingAddress,
+            index: 2,
+            txId: TransactionId('bb217abaca60fc0ca68c1555eca6a96d2478547818ae76ce6836133f3cc546e0')
+          }
+        ]
+      });
+
+      const inspectTx = createTxInspector({
+        valueReceived: valueReceivedInspector([receivingAddress], () => historicalTxs),
+        valueSent: valueSentInspector([sendingAddress], () => historicalTxs)
       });
       const txProperties = inspectTx(tx);
 
-      expect(txProperties.valueSent).toEqual({ coins: 0n });
-      expect(txProperties.valueReceived.coins).toEqual(9_000_000n);
-      expect(txProperties.valueReceived.assets).toEqual(
-        new Map([
-          [AssetId.PXL, 9n],
-          [AssetId.TSLA, 4n]
-        ])
-      );
+      expect(txProperties.valueSent).toEqual({
+        assets: new Map([
+          [AssetId.TSLA, 5n],
+          [AssetId.PXL, 14n]
+        ]),
+        coins: 7_500_000n
+      });
+      expect(txProperties.valueReceived).toEqual({
+        assets: new Map([[AssetId.PXL, 9n]]),
+        coins: 7_000_000n
+      });
     });
   });
 

@@ -1,4 +1,4 @@
-import { Address, TxAlonzo } from '../Cardano';
+import { Address, TxAlonzo, TxIn } from '../Cardano';
 import { parseCslAddress } from '../CSL';
 
 /**
@@ -15,8 +15,10 @@ export const isAddressWithin =
     addresses.includes(address!);
 
 /**
- * Receives a transaction and a set of addresses to check if the transaction is outgoing,
- * i.e., some of the addresses are included in the transaction inputs
+ * Receives a transaction and a set of addresses to check if
+ * some of them are included in the transaction inputs
+ *
+ * @returns {TxIn[]} array of inputs that contain any of the addresses
  */
-export const isOutgoing = (tx: TxAlonzo, ownAddresses: Address[]): boolean =>
-  tx.body.inputs.some(isAddressWithin(ownAddresses));
+export const inputsWithAddresses = (tx: TxAlonzo, ownAddresses: Address[]): TxIn[] =>
+  tx.body.inputs.filter(isAddressWithin(ownAddresses));

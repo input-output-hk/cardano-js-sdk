@@ -10,6 +10,10 @@ export const BigIntMath = {
     }
     return max;
   },
+  subtract(arr: bigint[]): bigint {
+    if (arr.length === 0) return 0n;
+    return arr.reduce((result, num) => result - num);
+  },
   sum(arr: bigint[]): bigint {
     return arr.reduce((result, num) => result + num, 0n);
   }
