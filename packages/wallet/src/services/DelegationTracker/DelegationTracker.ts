@@ -53,10 +53,7 @@ export const certificateTransactionsWithEpochs = (
   slotEpochCalc$: Observable<SlotEpochCalc>,
   certificateTypes: Cardano.CertificateType[]
 ): Observable<TxWithEpoch[]> =>
-  combineLatest([
-    transactionsWithCertificates(transactionsTracker.history.outgoing$, certificateTypes),
-    slotEpochCalc$
-  ]).pipe(
+  combineLatest([transactionsWithCertificates(transactionsTracker.history$, certificateTypes), slotEpochCalc$]).pipe(
     map(([transactions, slotEpochCalc]) =>
       transactions.map((tx) => ({ epoch: slotEpochCalc(tx.blockHeader.slot), tx }))
     )

@@ -54,7 +54,7 @@ const createDelegationCertificates = ({
 const waitForTx = async (wallet: Wallet, { hash }: TxInternals) => {
   await firstValueFromTimed(
     combineLatest([
-      wallet.transactions.history.all$.pipe(filter((txs) => txs.some(({ tx: { id } }) => id === hash))),
+      wallet.transactions.history$.pipe(filter((txs) => txs.some(({ tx: { id } }) => id === hash))),
       // test that confirmed$ works
       wallet.transactions.outgoing.confirmed$.pipe(filter(({ id }) => id === hash))
     ]),
