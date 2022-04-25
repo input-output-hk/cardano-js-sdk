@@ -40,16 +40,6 @@ export interface PollingConfig {
   readonly consideredOutOfSyncAfter?: Milliseconds;
 }
 
-export enum TransactionDirection {
-  Incoming = 'Incoming',
-  Outgoing = 'Outgoing'
-}
-
-export interface DirectionalTransaction {
-  tx: Cardano.TxAlonzo;
-  direction: TransactionDirection;
-}
-
 export interface FailedTx {
   tx: Cardano.NewTxAlonzo;
   reason: TransactionFailure;
@@ -58,7 +48,7 @@ export interface FailedTx {
 
 export interface TransactionsTracker {
   readonly history: {
-    all$: BehaviorObservable<DirectionalTransaction[]>;
+    all$: BehaviorObservable<Cardano.TxAlonzo[]>;
     outgoing$: BehaviorObservable<Cardano.TxAlonzo[]>;
     incoming$: BehaviorObservable<Cardano.TxAlonzo[]>;
   };

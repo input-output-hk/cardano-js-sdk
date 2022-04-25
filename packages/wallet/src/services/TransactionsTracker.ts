@@ -1,11 +1,11 @@
-import { Cardano, WalletProvider } from '@cardano-sdk/core';
 import {
-  DirectionalTransaction,
-  FailedTx,
-  TransactionDirection,
-  TransactionFailure,
-  TransactionsTracker
-} from './types';
+  Cardano,
+  SendReceiveValueInspector,
+  WalletProvider,
+  createTxInspector,
+  valueReceivedInspector,
+  valueSentInspector
+} from '@cardano-sdk/core';
 import {
   EMPTY,
   Observable,
@@ -29,6 +29,7 @@ import {
   takeUntil,
   tap
 } from 'rxjs';
+import { FailedTx, TransactionFailure, TransactionsTracker } from './types';
 import { OrderedCollectionStore } from '../persistence';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TrackerSubject } from './util/TrackerSubject';
@@ -102,31 +103,20 @@ export const createAddressTransactionsProvider = (
   );
 };
 
-const createDirectionalTransactionsTrackerSubject = (
-  transactions$: Observable<Cardano.TxAlonzo[]>,
-  addresses$: Observable<Cardano.Address[]>
-): TrackerSubject<DirectionalTransaction[]> => {
-  const isMyAddress =
-    (addresses: Cardano.Address[]) =>
-    ({ address }: { address?: Cardano.Address }) =>
-      addresses.includes(address!);
-  return new TrackerSubject(
-    combineLatest([transactions$, addresses$]).pipe(
-      map(([transactions, addresses]) =>
+const createHistoricalTransactionsTrackerSubject = (
+  transactions$: Observable<Cardano.TxAlonzo[]>
+): TrackerSubject<Cardano.TxAlonzo[]> =>
+  new TrackerSubject(
+    transactions$.pipe(
+      map((transactions) =>
         sortBy(
           transactions,
           ({ blockHeader: { blockNo } }) => blockNo,
           ({ index }) => index
-        ).map((tx) => {
-          const direction = tx.body.inputs.some(isMyAddress(addresses))
-            ? TransactionDirection.Outgoing
-            : TransactionDirection.Incoming;
-          return { direction, tx };
-        })
+        )
       )
     )
   );
-};
 
 const newTransactions$ = (transactions$: Observable<Cardano.TxAlonzo[]>) =>
   transactions$.pipe(
@@ -157,17 +147,23 @@ export const createTransactionsTracker = (
     )
   }: TransactionsTrackerInternals = {}
 ): TransactionsTracker => {
-  const directionalTransactions$ = createDirectionalTransactionsTrackerSubject(transactionsSource$, addresses$);
-  const providerTransactionsByDirection$ = (direction: TransactionDirection) =>
-    directionalTransactions$.pipe(
-      map((transactions) => transactions.filter((tx) => tx.direction === direction).map(({ tx }) => tx)),
+  const historicalTransactions$ = createHistoricalTransactionsTrackerSubject(transactionsSource$);
+  const providerTransactionsByDirection$ = (inspector: SendReceiveValueInspector) =>
+    combineLatest([historicalTransactions$, addresses$]).pipe(
+      map(([transactions, addresses]) => {
+        const inspectTx = createTxInspector({
+          value: inspector(addresses)
+        });
+        return transactions.filter((tx) => inspectTx(tx).value.coins > 0n);
+      }),
       distinctUntilChanged(transactionsEquals)
     );
+
   const incomingTransactionHistory$ = new TrackerSubject<Cardano.TxAlonzo[]>(
-    providerTransactionsByDirection$(TransactionDirection.Incoming)
+    providerTransactionsByDirection$(valueReceivedInspector)
   );
   const outgoingTransactionHistory$ = new TrackerSubject<Cardano.TxAlonzo[]>(
-    providerTransactionsByDirection$(TransactionDirection.Outgoing)
+    providerTransactionsByDirection$(valueSentInspector)
   );
 
   const txConfirmed$ = (tx: Cardano.NewTxAlonzo) =>
@@ -231,7 +227,7 @@ export const createTransactionsTracker = (
 
   return {
     history: {
-      all$: directionalTransactions$,
+      all$: historicalTransactions$,
       incoming$: incomingTransactionHistory$,
       outgoing$: outgoingTransactionHistory$
     },
@@ -244,7 +240,6 @@ export const createTransactionsTracker = (
       submitting$
     },
     shutdown: () => {
-      directionalTransactions$.complete();
       inFlight$.complete();
       confirmedSubscription.unsubscribe();
       confirmed$.complete();

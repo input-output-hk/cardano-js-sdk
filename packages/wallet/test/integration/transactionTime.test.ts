@@ -11,7 +11,7 @@ describe('integration/transactionTime', () => {
   });
 
   it('provides utils necessary for computing transaction time', async () => {
-    const transactions = await firstValueFrom(wallet.transactions.history.incoming$);
+    const transactions = await firstValueFrom(wallet.transactions.history.all$);
     const {
       network: { timeSettings }
     } = await firstValueFrom(wallet.networkInfo$);
