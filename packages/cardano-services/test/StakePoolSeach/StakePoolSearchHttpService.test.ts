@@ -2,7 +2,7 @@
 /* eslint-disable max-len */
 // import { Cardano, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { Cardano, StakePoolQueryOptions, StakePoolSearchProvider } from '@cardano-sdk/core';
-import { DbSyncStakePoolSearchProvider, StakePoolSearchHttpServer, StakePoolSearchServerConfig } from '../../src';
+import { DbSyncStakePoolSearchProvider, HttpServer, HttpServerConfig, StakePoolSearchHttpService } from '../../src';
 import { Pool } from 'pg';
 import { getPort } from 'get-port-please';
 import { stakePoolSearchHttpProvider } from '@cardano-sdk/cardano-services-client';
@@ -24,16 +24,18 @@ const addPledgeMetFilter = (options: StakePoolQueryOptions, pledgeMet: boolean):
   filters: { ...options.filters, pledgeMet }
 });
 
-describe('StakePoolSearchHttpServer', () => {
+describe('StakePoolSearchHttpService', () => {
   let dbConnection: Pool;
+  let httpServer: HttpServer;
   let stakePoolSearchProvider: DbSyncStakePoolSearchProvider;
-  let stakePoolSearchHttpServer: StakePoolSearchHttpServer;
+  let service: StakePoolSearchHttpService;
   let port: number;
   let apiUrlBase: string;
-  let config: StakePoolSearchServerConfig;
+  let config: HttpServerConfig;
+
   beforeAll(async () => {
     port = await getPort();
-    apiUrlBase = `http://localhost:${port}`;
+    apiUrlBase = `http://localhost:${port}/stake-pool-search`;
     config = { listen: { port } };
     dbConnection = new Pool({ connectionString: process.env.DB_CONNECTION_STRING });
   });
@@ -59,14 +61,15 @@ describe('StakePoolSearchHttpServer', () => {
   describe('healthy state', () => {
     beforeAll(async () => {
       stakePoolSearchProvider = new DbSyncStakePoolSearchProvider(dbConnection);
-      stakePoolSearchHttpServer = StakePoolSearchHttpServer.create({ stakePoolSearchProvider }, config);
-      await stakePoolSearchHttpServer.initialize();
-      await stakePoolSearchHttpServer.start();
+      service = StakePoolSearchHttpService.create({ stakePoolSearchProvider });
+      httpServer = new HttpServer(config, { services: [service] });
+      await httpServer.initialize();
+      await httpServer.start();
     });
 
     afterAll(async () => {
       await dbConnection.end();
-      await stakePoolSearchHttpServer.shutdown();
+      await httpServer.shutdown();
     });
 
     describe('/health', () => {

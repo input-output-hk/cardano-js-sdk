@@ -2,9 +2,10 @@
 /* eslint-disable import/imports-first */
 require('../../scripts/patchRequire');
 import { Command } from 'commander';
+import { HttpServer } from '../Http';
 import { InvalidLoggerLevel } from '../errors';
 import { LogLevel, createLogger } from 'bunyan';
-import { TxSubmitHttpServer } from './TxSubmitHttpServer';
+import { TxSubmitHttpService } from './';
 import { URL } from 'url';
 import { loggerMethodNames } from '../util';
 import { ogmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
@@ -49,11 +50,8 @@ program
         port: ogmiosUrl ? Number.parseInt(ogmiosUrl.port) : undefined,
         tls: ogmiosUrl?.protocol === 'wss'
       });
-      const server = TxSubmitHttpServer.create(
-        {
-          logger,
-          txSubmitProvider
-        },
+      const txSubmitHttpService = await TxSubmitHttpService.create({ logger, txSubmitProvider });
+      const server = new HttpServer(
         {
           listen: {
             host: apiUrl.hostname,
@@ -61,8 +59,10 @@ program
           },
           metrics: {
             enabled: metricsEnabled
-          }
-        }
+          },
+          name: 'TxSubmitHttpServer'
+        },
+        { services: [txSubmitHttpService] }
       );
       await server.initialize();
       await server.start();

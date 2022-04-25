@@ -1,1 +1,1 @@
-export * from './TxSubmitHttpServer';
+export * from './TxSubmitHttpService';

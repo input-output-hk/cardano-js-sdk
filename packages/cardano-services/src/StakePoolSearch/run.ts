@@ -2,10 +2,11 @@
 require('../../scripts/patchRequire');
 import * as envalid from 'envalid';
 import { DbSyncStakePoolSearchProvider } from './DbSyncStakePoolSearchProvider';
+import { HttpServer } from '../Http';
 import { LogLevel, createLogger } from 'bunyan';
 import { Logger } from 'ts-log';
 import { Pool } from 'pg';
-import { StakePoolSearchHttpServer } from './StakePoolSearchHttpServer';
+import { StakePoolSearchHttpService } from './StakePoolSearchHttpService';
 import { URL } from 'url';
 import { config } from 'dotenv';
 import { loggerMethodNames } from '../util';
@@ -30,9 +31,16 @@ void (async () => {
   try {
     dbPool = new Pool({ connectionString });
     const stakePoolSearchProvider = new DbSyncStakePoolSearchProvider(dbPool, logger);
-    const server = StakePoolSearchHttpServer.create(
-      { logger, stakePoolSearchProvider },
-      { listen: { host: apiUrl.hostname, port: Number.parseInt(apiUrl.port) } }
+    const stakePoolSearchHttpService = StakePoolSearchHttpService.create({ logger, stakePoolSearchProvider });
+    const server = new HttpServer(
+      {
+        listen: {
+          host: apiUrl.hostname,
+          port: Number.parseInt(apiUrl.port)
+        },
+        name: 'StakePoolHttpServer'
+      },
+      { services: [stakePoolSearchHttpService] }
     );
     await server.initialize();
     await server.start();

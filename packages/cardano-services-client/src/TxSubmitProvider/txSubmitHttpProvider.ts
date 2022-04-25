@@ -22,7 +22,7 @@ const toTxSubmissionError = (error: any): Cardano.TxSubmissionError | null => {
 };
 
 /**
- * Connect to a TxSubmitHttpServer instance
+ * Connect to a Cardano Services HttpServer instance with the service available
  *
  * @param {string} baseUrl server root url, w/o trailing /
  * @returns {TxSubmitProvider} TxSubmitProvider

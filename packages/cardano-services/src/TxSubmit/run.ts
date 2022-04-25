@@ -1,9 +1,10 @@
 /* eslint-disable import/imports-first */
 require('../../scripts/patchRequire');
 import * as envalid from 'envalid';
+import { HttpServer } from '../Http';
 import { LogLevel, createLogger } from 'bunyan';
 import { Logger } from 'ts-log';
-import { TxSubmitHttpServer } from '../TxSubmit';
+import { TxSubmitHttpService } from './';
 import { URL } from 'url';
 import { loggerMethodNames } from '../util';
 import { ogmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
@@ -30,12 +31,19 @@ void (async () => {
     port: ogmiosUrl ? Number.parseInt(ogmiosUrl.port) : undefined,
     tls: ogmiosUrl?.protocol === 'wss'
   });
-  const server = TxSubmitHttpServer.create(
-    { logger, txSubmitProvider },
+  const txSubmitHttpService = await TxSubmitHttpService.create({ logger, txSubmitProvider });
+  const server = new HttpServer(
     {
-      listen: { host: apiUrl.hostname, port: Number.parseInt(apiUrl.port) },
-      metrics: { enabled: env.METRICS_ENABLED }
-    }
+      listen: {
+        host: apiUrl.hostname,
+        port: Number.parseInt(apiUrl.port)
+      },
+      metrics: {
+        enabled: env.METRICS_ENABLED
+      },
+      name: 'TxSubmitHttpServer'
+    },
+    { services: [txSubmitHttpService] }
   );
   await server.initialize();
   await server.start();
