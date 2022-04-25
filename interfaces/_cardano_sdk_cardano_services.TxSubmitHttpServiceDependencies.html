@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>StakePoolSearchServerConfig | cardano-sdk</title>
+	<title>TxSubmitHttpServiceDependencies | cardano-sdk</title>
 	<meta name="description" content="Documentation for cardano-sdk">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -58,10 +58,10 @@
 					<a href="../modules/_cardano_sdk_cardano_services.html">@cardano-sdk/cardano-services</a>
 				</li>
 				<li>
-					<a href="_cardano_sdk_cardano_services.StakePoolSearchServerConfig.html">StakePoolSearchServerConfig</a>
+					<a href="_cardano_sdk_cardano_services.TxSubmitHttpServiceDependencies.html">TxSubmitHttpServiceDependencies</a>
 				</li>
 			</ul>
-			<h1>Interface StakePoolSearchServerConfig</h1>
+			<h1>Interface TxSubmitHttpServiceDependencies</h1>
 		</div>
 	</div>
 </header>
@@ -72,12 +72,7 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<a href="../modules/_cardano_sdk_cardano_services.html#HttpServerConfig" class="tsd-signature-type" data-tsd-kind="Type alias">HttpServerConfig</a>
-						<ul class="tsd-hierarchy">
-							<li>
-								<span class="target">StakePoolSearchServerConfig</span>
-							</li>
-						</ul>
+						<span class="target">TxSubmitHttpServiceDependencies</span>
 					</li>
 				</ul>
 			</section>
@@ -88,10 +83,8 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-overwrite"><a href="_cardano_sdk_cardano_services.StakePoolSearchServerConfig.html#bodyParser" class="tsd-kind-icon">body<wbr>Parser</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-overwrite"><a href="_cardano_sdk_cardano_services.StakePoolSearchServerConfig.html#listen" class="tsd-kind-icon">listen</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="_cardano_sdk_cardano_services.StakePoolSearchServerConfig.html#metrics" class="tsd-kind-icon">metrics</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="_cardano_sdk_cardano_services.StakePoolSearchServerConfig.html#name" class="tsd-kind-icon">name</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_cardano_services.TxSubmitHttpServiceDependencies.html#logger" class="tsd-kind-icon">logger</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_cardano_services.TxSubmitHttpServiceDependencies.html#txSubmitProvider" class="tsd-kind-icon">tx<wbr>Submit<wbr>Provider</a></li>
 							</ul>
 						</section>
 					</div>
@@ -99,66 +92,23 @@
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-overwrite">
-					<a name="bodyParser" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> body<wbr>Parser</h3>
-					<div class="tsd-signature tsd-kind-icon">body<wbr>Parser<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>limit<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> }</span></div>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="logger" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> logger</h3>
+					<div class="tsd-signature tsd-kind-icon">logger<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Logger</span></div>
 					<aside class="tsd-sources">
-						<p>Overrides HttpServerConfig.bodyParser</p>
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/0d1c710/packages/cardano-services/src/StakePoolSearch/StakePoolSearchHttpServer.ts#L18">packages/cardano-services/src/StakePoolSearch/StakePoolSearchHttpServer.ts:18</a></li>
-						</ul>
-					</aside>
-					<div class="tsd-type-declaration">
-						<h4>Type declaration</h4>
-						<ul class="tsd-parameters">
-							<li class="tsd-parameter">
-								<h5><span class="tsd-flag ts-flagOptional">Optional</span> limit<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span></h5>
-							</li>
-						</ul>
-					</div>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-overwrite">
-					<a name="listen" class="tsd-anchor"></a>
-					<h3>listen</h3>
-					<div class="tsd-signature tsd-kind-icon">listen<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">ListenOptions</span></div>
-					<aside class="tsd-sources">
-						<p>Overrides HttpServerConfig.listen</p>
-						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/0d1c710/packages/cardano-services/src/StakePoolSearch/StakePoolSearchHttpServer.ts#L17">packages/cardano-services/src/StakePoolSearch/StakePoolSearchHttpServer.ts:17</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1408ffd/packages/cardano-services/src/TxSubmit/TxSubmitHttpService.ts#L9">packages/cardano-services/src/TxSubmit/TxSubmitHttpService.ts:9</a></li>
 						</ul>
 					</aside>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
-					<a name="metrics" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> metrics</h3>
-					<div class="tsd-signature tsd-kind-icon">metrics<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>enabled<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>options<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Opts</span><span class="tsd-signature-symbol"> }</span></div>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="txSubmitProvider" class="tsd-anchor"></a>
+					<h3>tx<wbr>Submit<wbr>Provider</h3>
+					<div class="tsd-signature tsd-kind-icon">tx<wbr>Submit<wbr>Provider<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">TxSubmitProvider</span></div>
 					<aside class="tsd-sources">
-						<p>Inherited from HttpServerConfig.metrics</p>
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/0d1c710/packages/cardano-services/src/Http/HttpServer.ts#L16">packages/cardano-services/src/Http/HttpServer.ts:16</a></li>
-						</ul>
-					</aside>
-					<div class="tsd-type-declaration">
-						<h4>Type declaration</h4>
-						<ul class="tsd-parameters">
-							<li class="tsd-parameter">
-								<h5>enabled<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></h5>
-							</li>
-							<li class="tsd-parameter">
-								<h5><span class="tsd-flag ts-flagOptional">Optional</span> options<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Opts</span></h5>
-							</li>
-						</ul>
-					</div>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
-					<a name="name" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> name</h3>
-					<div class="tsd-signature tsd-kind-icon">name<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
-					<aside class="tsd-sources">
-						<p>Inherited from HttpServerConfig.name</p>
-						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/0d1c710/packages/cardano-services/src/Http/HttpServer.ts#L23">packages/cardano-services/src/Http/HttpServer.ts:23</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1408ffd/packages/cardano-services/src/TxSubmit/TxSubmitHttpService.ts#L10">packages/cardano-services/src/TxSubmit/TxSubmitHttpService.ts:10</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -208,13 +158,16 @@
 						<a href="../classes/_cardano_sdk_cardano_services.HttpServer.html" class="tsd-kind-icon">Http<wbr>Server</a>
 					</li>
 					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="../classes/_cardano_sdk_cardano_services.HttpService.html" class="tsd-kind-icon">Http<wbr>Service</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
 						<a href="../classes/_cardano_sdk_cardano_services.RunnableModule.html" class="tsd-kind-icon">Runnable<wbr>Module</a>
 					</li>
 					<li class=" tsd-kind-class tsd-parent-kind-module">
-						<a href="../classes/_cardano_sdk_cardano_services.StakePoolSearchHttpServer.html" class="tsd-kind-icon">Stake<wbr>Pool<wbr>Search<wbr>Http<wbr>Server</a>
+						<a href="../classes/_cardano_sdk_cardano_services.StakePoolSearchHttpService.html" class="tsd-kind-icon">Stake<wbr>Pool<wbr>Search<wbr>Http<wbr>Service</a>
 					</li>
 					<li class=" tsd-kind-class tsd-parent-kind-module">
-						<a href="../classes/_cardano_sdk_cardano_services.TxSubmitHttpServer.html" class="tsd-kind-icon">Tx<wbr>Submit<wbr>Http<wbr>Server</a>
+						<a href="../classes/_cardano_sdk_cardano_services.TxSubmitHttpService.html" class="tsd-kind-icon">Tx<wbr>Submit<wbr>Http<wbr>Service</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
 						<a href="_cardano_sdk_cardano_services.EpochModel.html" class="tsd-kind-icon">Epoch<wbr>Model</a>
@@ -264,36 +217,27 @@
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
 						<a href="_cardano_sdk_cardano_services.RelayModel.html" class="tsd-kind-icon">Relay<wbr>Model</a>
 					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="_cardano_sdk_cardano_services.StakePoolSearchServiceDependencies.html" class="tsd-kind-icon">Stake<wbr>Pool<wbr>Search<wbr>Service<wbr>Dependencies</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="_cardano_sdk_cardano_services.SubQuery.html" class="tsd-kind-icon">Sub<wbr>Query</a>
+					</li>
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface tsd-parent-kind-module">
-						<a href="_cardano_sdk_cardano_services.StakePoolSearchServerConfig.html" class="tsd-kind-icon">Stake<wbr>Pool<wbr>Search<wbr>Server<wbr>Config</a>
+						<a href="_cardano_sdk_cardano_services.TxSubmitHttpServiceDependencies.html" class="tsd-kind-icon">Tx<wbr>Submit<wbr>Http<wbr>Service<wbr>Dependencies</a>
 						<ul>
-							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-overwrite">
-								<a href="_cardano_sdk_cardano_services.StakePoolSearchServerConfig.html#bodyParser" class="tsd-kind-icon">body<wbr>Parser</a>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="_cardano_sdk_cardano_services.TxSubmitHttpServiceDependencies.html#logger" class="tsd-kind-icon">logger</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-overwrite">
-								<a href="_cardano_sdk_cardano_services.StakePoolSearchServerConfig.html#listen" class="tsd-kind-icon">listen</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
-								<a href="_cardano_sdk_cardano_services.StakePoolSearchServerConfig.html#metrics" class="tsd-kind-icon">metrics</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
-								<a href="_cardano_sdk_cardano_services.StakePoolSearchServerConfig.html#name" class="tsd-kind-icon">name</a>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="_cardano_sdk_cardano_services.TxSubmitHttpServiceDependencies.html#txSubmitProvider" class="tsd-kind-icon">tx<wbr>Submit<wbr>Provider</a>
 							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="_cardano_sdk_cardano_services.StakePoolSearchServerDependencies.html" class="tsd-kind-icon">Stake<wbr>Pool<wbr>Search<wbr>Server<wbr>Dependencies</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="_cardano_sdk_cardano_services.SubQuery.html" class="tsd-kind-icon">Sub<wbr>Query</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="_cardano_sdk_cardano_services.TxSubmitServerDependencies.html" class="tsd-kind-icon">Tx<wbr>Submit<wbr>Server<wbr>Dependencies</a>
-					</li>
 					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
 						<a href="../modules/_cardano_sdk_cardano_services.html#HttpServerConfig" class="tsd-kind-icon">Http<wbr>Server<wbr>Config</a>
 					</li>
