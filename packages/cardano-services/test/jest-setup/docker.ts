@@ -8,9 +8,21 @@ const CONTAINER_NAME = 'cardano-test';
 
 export const removePostgresContainer = async (): Promise<void> => {
   const docker = new Docker();
-  const container = await docker.getContainer(CONTAINER_NAME);
-  await container.stop();
-  await container.remove({ v: true });
+  try {
+    const container = await docker.getContainer(CONTAINER_NAME);
+    try {
+      await container.stop();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      // 304 = container already stopped
+      if (error.statusCode !== 304) throw error;
+    }
+    await container.remove({ v: true });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    // 404 = container not found
+    if (error.statusCode !== 404) throw error;
+  }
 };
 
 interface DatabaseConfig {
@@ -55,7 +67,7 @@ export const setupPostgresContainer = async (user: string, password: string, por
   const docker = new Docker();
   const needsToPull = !(await imageExists(docker, CONTAINER_IMAGE));
   if (needsToPull) await pullImageAsync(docker, CONTAINER_IMAGE);
-
+  await removePostgresContainer();
   const container = await docker.createContainer({
     Env: [`POSTGRES_PASSWORD=${password}`, `POSTGRES_USER=${user}`],
     HostConfig: {
