@@ -50,11 +50,9 @@ describe('DelegationTracker', () => {
         const slotEpochCalc$ = cold('-a', { a: slotEpochCalc });
         const target$ = certificateTransactionsWithEpochs(
           {
-            history: {
-              outgoing$: cold('a--a', {
-                a: transactions
-              })
-            }
+            history$: cold('a--a', {
+              a: transactions
+            })
           } as unknown as TransactionsTracker,
           slotEpochCalc$,
           [Cardano.CertificateType.StakeDelegation, Cardano.CertificateType.StakeKeyDeregistration]

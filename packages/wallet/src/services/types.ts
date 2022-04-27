@@ -47,11 +47,7 @@ export interface FailedTx {
 }
 
 export interface TransactionsTracker {
-  readonly history: {
-    all$: BehaviorObservable<Cardano.TxAlonzo[]>;
-    outgoing$: BehaviorObservable<Cardano.TxAlonzo[]>;
-    incoming$: BehaviorObservable<Cardano.TxAlonzo[]>;
-  };
+  readonly history$: BehaviorObservable<Cardano.TxAlonzo[]>;
   readonly outgoing: {
     readonly inFlight$: BehaviorObservable<Cardano.NewTxAlonzo[]>;
     readonly submitting$: Observable<Cardano.NewTxAlonzo>;
@@ -59,7 +55,6 @@ export interface TransactionsTracker {
     readonly failed$: Observable<FailedTx>;
     readonly confirmed$: Observable<Cardano.NewTxAlonzo>;
   };
-  readonly incoming$: Observable<Cardano.TxAlonzo>;
   shutdown(): void;
 }
 

@@ -28,4 +28,7 @@ describe('Cardano.util.coalesceValueQuantities', () => {
       coins: 170n
     });
   });
+  it('returns 0 coins on empty array', () => {
+    expect(Cardano.util.coalesceValueQuantities([])).toEqual({ coins: 0n });
+  });
 });

@@ -1,15 +1,21 @@
 import {
   Address,
+  Certificate,
   CertificateType,
+  Ed25519KeyHash,
   Lovelace,
+  RewardAccount,
   StakeAddressCertificate,
   StakeDelegationCertificate,
+  TokenMap,
   TxAlonzo,
+  TxIn,
   Value
 } from '../Cardano';
 import { BigIntMath } from './BigIntMath';
-import { coalesceValueQuantities } from '../Cardano/util';
-import { isAddressWithin, isOutgoing } from '../Address/util';
+import { coalesceValueQuantities, resolveInputValue, subtractValueQuantities } from '../Cardano/util';
+import { inputsWithAddresses, isAddressWithin } from '../Address/util';
+import { removeNegativesFromTokenMap } from '../Asset/util';
 
 type Inspector<Inspection> = (tx: TxAlonzo) => Inspection;
 type Inspectors = { [k: string]: Inspector<unknown> };
@@ -22,35 +28,123 @@ export type SendReceiveValueInspection = Value;
 export type DelegationInspection = StakeDelegationCertificate[];
 export type StakeKeyRegistrationInspection = StakeAddressCertificate[];
 export type WithdrawalInspection = Lovelace;
+export interface SentInspection {
+  inputs: TxIn[];
+  certificates: Certificate[];
+}
 
 // Inspector types
+interface SentInspectorArgs {
+  addresses?: Address[];
+  rewardAccounts?: RewardAccount[];
+}
+export type SentInspector = (args: SentInspectorArgs) => Inspector<SentInspection>;
+export type TotalAddressInputsValueInspector = (
+  ownAddresses: Address[],
+  getHistoricalTxs: () => TxAlonzo[]
+) => Inspector<SendReceiveValueInspection>;
 export type SendReceiveValueInspector = (ownAddresses: Address[]) => Inspector<SendReceiveValueInspection>;
 export type DelegationInspector = Inspector<DelegationInspection>;
 export type StakeKeyRegistrationInspector = Inspector<StakeKeyRegistrationInspection>;
 export type WithdrawalInspector = Inspector<WithdrawalInspection>;
 
 /**
- * Inspects a transaction for value (coins + assets) sent by the provided addresses.
+ * Inspects a transaction for values (coins + assets) in inputs
+ * containing any of the provided addresses.
  *
  * @param {Address[]} ownAddresses own wallet's addresses
- * @returns {Value} total value sent
+ * @param {() => TxAlonzo[]} getHistoricalTxs wallet's historical transactions
+ * @returns {Value} total value in inputs
  */
-export const valueSentInspector: SendReceiveValueInspector = (ownAddresses: Address[]) => (tx: TxAlonzo) => {
-  if (!isOutgoing(tx, ownAddresses)) return { coins: 0n };
-  const sentOutputs = tx.body.outputs.filter((out) => !isAddressWithin(ownAddresses)(out));
-  return coalesceValueQuantities(sentOutputs.map((output) => output.value));
+export const totalAddressInputsValueInspector: TotalAddressInputsValueInspector =
+  (ownAddresses, getHistoricalTxs) => (tx) => {
+    const receivedInputs = tx.body.inputs.filter((input) => isAddressWithin(ownAddresses)(input));
+    const receivedInputsValues = receivedInputs
+      .map((input) => resolveInputValue(input, getHistoricalTxs()))
+      .filter((value): value is Value => !!value);
+
+    return coalesceValueQuantities(receivedInputsValues);
+  };
+
+/**
+ * Inspects a transaction for values (coins + assets) in outputs
+ * containing any of the provided addresses.
+ *
+ * @param {Address[]} ownAddresses own wallet's addresses
+ * @returns {Value} total value in outputs
+ */
+export const totalAddressOutputsValueInspector: SendReceiveValueInspector = (ownAddresses) => (tx) => {
+  const receivedOutputs = tx.body.outputs.filter((out) => isAddressWithin(ownAddresses)(out));
+  return coalesceValueQuantities(receivedOutputs.map((output) => output.value));
 };
 
 /**
- * Inspects a transaction for value (coins + assets) received by the provided addresses.
+ * Inspects a transaction to see if any of the addresses provided are included in a transaction input
+ * or if any of the rewards accounts are included in a certificate
+ *
+ * @param {SentInspectorArgs} args array of addresses and/or reward accounts
+ * @returns {SentInspection} certificates and inputs that include the addresses or reward accounts
+ */
+export const sentInspector: SentInspector =
+  ({ addresses, rewardAccounts }) =>
+  (tx: TxAlonzo) => {
+    const inputs = addresses?.length ? inputsWithAddresses(tx, addresses) : [];
+
+    const stakeKeyHashes = rewardAccounts?.map((account) => Ed25519KeyHash.fromRewardAccount(account));
+    const stakeKeyCerts =
+      stakeKeyHashes && tx.body.certificates
+        ? tx.body.certificates.filter((cert) => 'stakeKeyHash' in cert && stakeKeyHashes.includes(cert.stakeKeyHash))
+        : [];
+    const rewardAccountCerts =
+      rewardAccounts && tx.body.certificates
+        ? tx.body.certificates?.filter(
+            (cert) =>
+              ('rewardAccount' in cert && rewardAccounts.includes(cert.rewardAccount)) ||
+              ('poolParameters' in cert && rewardAccounts.includes(cert.poolParameters.rewardAccount))
+          )
+        : [];
+    const certificates = [...stakeKeyCerts, ...rewardAccountCerts];
+
+    return { certificates, inputs };
+  };
+
+/**
+ * Inspects a transaction for net value (coins + assets) sent by the provided addresses.
  *
  * @param {Address[]} ownAddresses own wallet's addresses
- * @returns {Value} total value received
+ * @returns {Value} net value sent
  */
-export const valueReceivedInspector: SendReceiveValueInspector = (ownAddresses: Address[]) => (tx: TxAlonzo) => {
-  if (isOutgoing(tx, ownAddresses)) return { coins: 0n };
-  const receivedOutputs = tx.body.outputs.filter((out) => isAddressWithin(ownAddresses)(out));
-  return coalesceValueQuantities(receivedOutputs.map((output) => output.value));
+export const valueSentInspector: TotalAddressInputsValueInspector = (ownAddresses, historicalTxs) => (tx) => {
+  let assets: TokenMap = new Map();
+  if (sentInspector({ addresses: ownAddresses })(tx).inputs.length === 0) return { coins: 0n };
+  const totalOutputValue = totalAddressOutputsValueInspector(ownAddresses)(tx);
+  const totalInputValue = totalAddressInputsValueInspector(ownAddresses, historicalTxs)(tx);
+  const diff = subtractValueQuantities([totalInputValue, totalOutputValue]);
+
+  if (diff.assets) assets = removeNegativesFromTokenMap(diff.assets);
+  return {
+    assets: assets.size > 0 ? assets : undefined,
+    coins: diff.coins < 0n ? 0n : diff.coins
+  };
+};
+
+/**
+ * Inspects a transaction for net value (coins + assets) received by the provided addresses.
+ *
+ * @param {Address[]} ownAddresses own wallet's addresses
+ * @returns {Value} net value received
+ */
+export const valueReceivedInspector: TotalAddressInputsValueInspector = (ownAddresses, historicalTxs) => (tx) => {
+  let assets: TokenMap = new Map();
+  const totalOutputValue = totalAddressOutputsValueInspector(ownAddresses)(tx);
+  const totalInputValue = totalAddressInputsValueInspector(ownAddresses, historicalTxs)(tx);
+  const diff = subtractValueQuantities([totalOutputValue, totalInputValue]);
+
+  if (diff.assets) assets = removeNegativesFromTokenMap(diff.assets);
+  return {
+    assets: assets.size > 0 ? assets : undefined,
+    coins: diff.coins < 0n ? 0n : diff.coins
+  };
 };
 
 /**

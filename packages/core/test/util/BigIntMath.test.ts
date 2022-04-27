@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/no-duplicate-string */
 import { BigIntMath } from '../../src/util/BigIntMath';
 
 describe('BigIntMath', () => {
@@ -12,5 +13,10 @@ describe('BigIntMath', () => {
   describe('max', () => {
     test('empty array', () => expect(BigIntMath.max([])).toBeNull());
     test('non-empty array', () => expect(BigIntMath.max([-2n, -1n, 0n])).toBe(0n));
+  });
+  describe('subtract', () => {
+    test('empty array', () => expect(BigIntMath.subtract([])).toBe(0n));
+    test('non-empty array', () => expect(BigIntMath.subtract([4n, 3n])).toBe(1n));
+    test('negative result', () => expect(BigIntMath.subtract([4n, 3n, 4n])).toBe(-3n));
   });
 });

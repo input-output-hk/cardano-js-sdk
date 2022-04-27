@@ -63,8 +63,8 @@ const assertWalletProperties = async (
   );
   expect(wallet.balance.total$.value?.rewards).toBe(mocks.rewardAccountBalance);
   // transactions
-  await firstValueFrom(wallet.transactions.history.all$);
-  expect(wallet.transactions.history.all$.value?.length).toBeGreaterThan(0);
+  await firstValueFrom(wallet.transactions.history$);
+  expect(wallet.transactions.history$.value?.length).toBeGreaterThan(0);
   // tip$
   await firstValueFrom(wallet.tip$);
   expect(wallet.tip$.value).toEqual(mocks.ledgerTip);
@@ -104,7 +104,7 @@ const assertWalletProperties2 = async (wallet: Wallet) => {
     Cardano.util.coalesceValueQuantities(mocks.utxo2.map((utxo) => utxo[1].value)).coins
   );
   expect(wallet.balance.total$.value?.rewards).toBe(mocks.rewardAccountBalance2);
-  expect(wallet.transactions.history.all$.value?.length).toEqual(queryTransactionsResult2.length);
+  expect(wallet.transactions.history$.value?.length).toEqual(queryTransactionsResult2.length);
   expect(wallet.tip$.value).toEqual(mocks.ledgerTip2);
   expect(wallet.networkInfo$.value?.network.timeSettings).toEqual(testnetTimeSettings);
   expect(wallet.currentEpoch$.value?.epochNo).toEqual(currentEpoch.number);

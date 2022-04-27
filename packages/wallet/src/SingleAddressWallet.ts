@@ -211,7 +211,7 @@ export class SingleAddressWallet implements Wallet {
       createAssetsTracker({
         assetProvider: this.assetProvider,
         balanceTracker: this.balance,
-        nftMetadataProvider: createNftMetadataProvider(this.walletProvider, this.transactions.history.all$),
+        nftMetadataProvider: createNftMetadataProvider(this.walletProvider, this.transactions.history$),
         retryBackoffConfig
       }),
       stores.assets

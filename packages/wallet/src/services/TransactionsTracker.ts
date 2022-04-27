@@ -1,11 +1,4 @@
-import {
-  Cardano,
-  SendReceiveValueInspector,
-  WalletProvider,
-  createTxInspector,
-  valueReceivedInspector,
-  valueSentInspector
-} from '@cardano-sdk/core';
+import { Cardano, WalletProvider } from '@cardano-sdk/core';
 import {
   EMPTY,
   Observable,
@@ -13,7 +6,6 @@ import {
   combineLatest,
   concat,
   defaultIfEmpty,
-  distinctUntilChanged,
   exhaustMap,
   filter,
   map,
@@ -148,26 +140,8 @@ export const createTransactionsTracker = (
   }: TransactionsTrackerInternals = {}
 ): TransactionsTracker => {
   const historicalTransactions$ = createHistoricalTransactionsTrackerSubject(transactionsSource$);
-  const providerTransactionsByDirection$ = (inspector: SendReceiveValueInspector) =>
-    combineLatest([historicalTransactions$, addresses$]).pipe(
-      map(([transactions, addresses]) => {
-        const inspectTx = createTxInspector({
-          value: inspector(addresses)
-        });
-        return transactions.filter((tx) => inspectTx(tx).value.coins > 0n);
-      }),
-      distinctUntilChanged(transactionsEquals)
-    );
-
-  const incomingTransactionHistory$ = new TrackerSubject<Cardano.TxAlonzo[]>(
-    providerTransactionsByDirection$(valueReceivedInspector)
-  );
-  const outgoingTransactionHistory$ = new TrackerSubject<Cardano.TxAlonzo[]>(
-    providerTransactionsByDirection$(valueSentInspector)
-  );
-
   const txConfirmed$ = (tx: Cardano.NewTxAlonzo) =>
-    newTransactions$(outgoingTransactionHistory$).pipe(
+    newTransactions$(historicalTransactions$).pipe(
       filter((historyTx) => historyTx.id === tx.id),
       take(1),
       map(() => tx)
@@ -226,12 +200,7 @@ export const createTransactionsTracker = (
     .subscribe(confirmed$);
 
   return {
-    history: {
-      all$: historicalTransactions$,
-      incoming$: incomingTransactionHistory$,
-      outgoing$: outgoingTransactionHistory$
-    },
-    incoming$: newTransactions$(incomingTransactionHistory$),
+    history$: historicalTransactions$,
     outgoing: {
       confirmed$,
       failed$,

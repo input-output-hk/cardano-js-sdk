@@ -44,7 +44,7 @@ describe('SingleAddressWallet/metadata', () => {
     const outgoingTx = await wallet.finalizeTx(txInternals, auxiliaryData);
     await wallet.submitTx(outgoingTx);
     const loadedTx = await firstValueFrom(
-      wallet.transactions.history.outgoing$.pipe(
+      wallet.transactions.history$.pipe(
         map((txs) => txs.find((tx) => tx.id === outgoingTx.id)),
         filter(util.isNotNil)
       )

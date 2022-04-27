@@ -134,7 +134,6 @@ describe('TransactionsTracker', () => {
             transactionsSource$
           }
         );
-        expectObservable(transactionsTracker.incoming$).toBe('--a-|', { a: incomingTx });
         expectObservable(transactionsTracker.outgoing.submitting$).toBe('-a--|', { a: outgoingTx });
         expectObservable(transactionsTracker.outgoing.pending$).toBe('--a-|', { a: outgoingTx });
         expectObservable(transactionsTracker.outgoing.confirmed$, confirmedSubscription).toBe('---a|', {
@@ -142,15 +141,7 @@ describe('TransactionsTracker', () => {
         });
         expectObservable(transactionsTracker.outgoing.inFlight$).toBe('ab-c|', { a: [], b: [outgoingTx], c: [] });
         expectObservable(transactionsTracker.outgoing.failed$).toBe('----|');
-        expectObservable(transactionsTracker.history.incoming$).toBe('a-b-|', {
-          a: [],
-          b: [incomingTx]
-        });
-        expectObservable(transactionsTracker.history.outgoing$).toBe('a--b|', {
-          a: [],
-          b: [outgoingTx]
-        });
-        expectObservable(transactionsTracker.history.all$).toBe('a-bc|', {
+        expectObservable(transactionsTracker.history$).toBe('a-bc|', {
           a: [],
           b: [incomingTx],
           c: [outgoingTx, incomingTx]
