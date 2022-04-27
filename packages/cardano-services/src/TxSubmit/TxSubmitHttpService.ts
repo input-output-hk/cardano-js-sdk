@@ -1,6 +1,7 @@
 import { Cardano, ProviderError, ProviderFailure, TxSubmitProvider } from '@cardano-sdk/core';
 import { HttpServer, HttpService } from '../Http';
 import { Logger, dummyLogger } from 'ts-log';
+import { ServiceNames } from '../Program';
 import { providerHandler } from '../util';
 import bodyParser from 'body-parser';
 import express from 'express';
@@ -17,7 +18,7 @@ export class TxSubmitHttpService extends HttpService {
     { logger = dummyLogger, txSubmitProvider }: TxSubmitHttpServiceDependencies,
     router: express.Router
   ) {
-    super('tx-submit', router, logger);
+    super(ServiceNames.TxSubmit, router, logger);
     this.#txSubmitProvider = txSubmitProvider;
   }
 
