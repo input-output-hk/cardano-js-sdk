@@ -62,6 +62,7 @@ export class HttpServer extends RunnableModule {
     }
     for (const service of this.#dependencies.services) {
       this.app.use(`/${service.slug}`, service.router);
+      this.logger.debug(`Using /${service.slug}`);
     }
   }
 

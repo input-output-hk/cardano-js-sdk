@@ -2,6 +2,7 @@ import { Cardano, ProviderError, ProviderFailure, StakePoolQueryOptions } from '
 import { DbSyncStakePoolSearchProvider } from './DbSyncStakePoolSearchProvider';
 import { HttpServer, HttpService } from '../Http';
 import { Logger, dummyLogger } from 'ts-log';
+import { ServiceNames } from '../Program';
 import { isValidStakePoolOptions } from './validators';
 import { providerHandler } from '../util';
 import express from 'express';
@@ -13,7 +14,7 @@ export interface StakePoolSearchServiceDependencies {
 
 export class StakePoolSearchHttpService extends HttpService {
   private constructor({ logger = dummyLogger }: StakePoolSearchServiceDependencies, router: express.Router) {
-    super('stake-pool-search', router, logger);
+    super(ServiceNames.StakePoolSearch, router, logger);
   }
 
   async healthCheck() {

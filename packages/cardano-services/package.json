@@ -26,14 +26,12 @@
     "coverage": "yarn test --coverage",
     "prepack": "yarn build",
     "test:debug": "DEBUG=true yarn test",
-    "run:tx-submit": "ts-node --transpile-only src/TxSubmit/run.ts",
-    "cli:tx-submit": "ts-node --transpile-only src/TxSubmit/cli.ts",
-    "run:stake-pool-search": "ts-node --transpile-only src/StakePoolSearch/run.ts",
-    "cli:stake-pool-search": "ts-node --transpile-only src/StakePoolSearch/cli.ts"
+    "run:http-server": "ts-node --transpile-only src/run.ts",
+    "cli": "ts-node --transpile-only src/cli.ts"
   },
   "devDependencies": {
-    "@cardano-sdk/util-dev": "0.2.0",
     "@cardano-sdk/cardano-services-client": "0.2.0",
+    "@cardano-sdk/util-dev": "0.2.0",
     "@types/dockerode": "^3.3.8",
     "@types/express": "^4.17.13",
     "@types/express-prometheus-middleware": "^1.2.1",
