@@ -111,3 +111,21 @@ export const jsonToMetadatum = (obj: unknown): Cardano.Metadatum => {
   }
   throw new ProviderError(ProviderFailure.NotImplemented, null, `Unsupported metadatum type: ${typeof obj}`);
 };
+
+/**
+ * Maps txs metadata from blockfrost into to a TxMetadata
+ *
+ * @returns {Cardano.TxMetadata} map with bigint as key and Metadatum as value
+ */
+export const blockfrostMetadataToTxMetadata = (
+  metadata: {
+    label: string;
+    json_metadata: unknown;
+  }[]
+): Cardano.TxMetadata =>
+  metadata.reduce((map, metadatum) => {
+    const { json_metadata, label } = metadatum;
+    if (!json_metadata || !label) return map;
+    map.set(BigInt(label), jsonToMetadatum(json_metadata));
+    return map;
+  }, new Map<bigint, Cardano.Metadatum>());

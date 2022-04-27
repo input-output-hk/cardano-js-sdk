@@ -17,16 +17,17 @@ export interface AssetInfo {
   name: AssetName;
   fingerprint: AssetFingerprint;
   quantity: bigint;
+  mintOrBurnCount: number;
   /**
    * Sorted by slot
    */
   history?: AssetMintOrBurn[];
   /**
-   * CIP-0035
+   * CIP-0035. `undefined` if not loaded, `null` if no metadata found
    */
-  tokenMetadata?: TokenMetadata;
+  tokenMetadata?: TokenMetadata | null;
   /**
-   * CIP-0025
+   * CIP-0025. `undefined` if not loaded, `null` if no metadata found
    */
-  nftMetadata?: NftMetadata;
+  nftMetadata?: NftMetadata | null;
 }

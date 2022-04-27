@@ -4,5 +4,4 @@ export * from './WalletProvider';
 export * from './AssetProvider';
 export * from './NetworkInfoProvider';
 export * from './TxSubmitProvider';
-export * from './NftMetadataProvider';
 export * as ProviderUtil from './providerUtil';

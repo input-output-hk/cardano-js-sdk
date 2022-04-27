@@ -68,6 +68,7 @@ describe('SingleAddressWallet.assets/nft', () => {
           transactionId: 'a7dbd1e9990a4bb9b3247e8ebc0e49e78f5b5a797d822fdf6918f31946c2eb32'
         }
       ],
+      mintOrBurnCount: 1,
       name: '4e4654303031',
       nftMetadata: {
         description: undefined,
@@ -100,6 +101,7 @@ describe('SingleAddressWallet.assets/nft', () => {
           transactionId: '1841f9ff952c5ffa13a19e32e78c1dac78fecd7083965d97558ede340ecfb8f9'
         }
       ],
+      mintOrBurnCount: 1,
       name: '4e46542d66696c6573',
       nftMetadata: {
         description: ['NFT with different types of files'],

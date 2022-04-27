@@ -11,8 +11,8 @@ import {
   WalletProvider
 } from '@cardano-sdk/core';
 import { PaginationOptions } from '@blockfrost/blockfrost-js/lib/types';
+import { blockfrostMetadataToTxMetadata, fetchSequentially, formatBlockfrostError, toProviderError } from './util';
 import { dummyLogger } from 'ts-log';
-import { fetchSequentially, formatBlockfrostError, jsonToMetadatum, toProviderError } from './util';
 import { omit, orderBy } from 'lodash-es';
 
 type WithCertIndex<T> = T & { cert_index: number };
@@ -231,14 +231,9 @@ export const blockfrostWalletProvider = (blockfrost: BlockFrostAPI, logger = dum
   const fetchJsonMetadata = async (txHash: Cardano.TransactionId): Promise<Cardano.TxMetadata | null> => {
     try {
       const response = await blockfrost.txsMetadata(txHash.toString());
-      return response.reduce((map, metadatum) => {
-        // Not sure if types are correct, missing 'label', but it's present in docs
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { json_metadata, label } = metadatum as any;
-        if (!json_metadata || !label) return map;
-        map.set(BigInt(label), jsonToMetadatum(json_metadata));
-        return map;
-      }, new Map<bigint, Cardano.Metadatum>());
+      // Not sure if types are correct, missing 'label', but it's present in docs
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return blockfrostMetadataToTxMetadata(response as any);
     } catch (error) {
       if (formatBlockfrostError(error).status_code === 404) {
         return null;

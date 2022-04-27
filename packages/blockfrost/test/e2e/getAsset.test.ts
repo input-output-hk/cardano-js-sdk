@@ -4,7 +4,8 @@ import { assetProvider } from './config';
 describe('blockfrostAssetProvider', () => {
   test('getAsset', async () => {
     const asset = await assetProvider.getAsset(
-      Cardano.AssetId('6b8d07d69639e9413dd637a1a815a7323c69c86abbafb66dbfdb1aa7')
+      Cardano.AssetId('6b8d07d69639e9413dd637a1a815a7323c69c86abbafb66dbfdb1aa7'),
+      { history: true, nftMetadata: true, tokenMetadata: true }
     );
     expect(typeof asset.assetId).toBe('string');
     expect(typeof asset.fingerprint).toBe('string');
