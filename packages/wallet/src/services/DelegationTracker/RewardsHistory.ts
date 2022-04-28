@@ -1,4 +1,11 @@
-import { BigIntMath, Cardano, EpochRewards, util } from '@cardano-sdk/core';
+import {
+  BigIntMath,
+  Cardano,
+  EpochRewards,
+  createTxInspector,
+  signedCertificatesInspector,
+  util
+} from '@cardano-sdk/core';
 import { KeyValueStore } from '../../persistence';
 import { Observable, concat, distinctUntilChanged, map, of, switchMap, tap } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
@@ -7,7 +14,6 @@ import { TrackedWalletProvider } from '../ProviderTracker';
 import { TxWithEpoch } from './types';
 import { coldObservableProvider } from '../util';
 import { first, flatten, groupBy } from 'lodash-es';
-import { transactionHasAnyCertificate } from './transactionCertificates';
 
 const sumRewards = (arrayOfRewards: EpochRewards[]) => BigIntMath.sum(arrayOfRewards.map(({ rewards }) => rewards));
 const avgReward = (arrayOfRewards: EpochRewards[]) => sumRewards(arrayOfRewards) / BigInt(arrayOfRewards.length);
@@ -34,11 +40,16 @@ export const createRewardsHistoryProvider =
 
 export type RewardsHistoryProvider = ReturnType<typeof createRewardsHistoryProvider>;
 
-const firstDelegationEpoch$ = (transactions$: Observable<TxWithEpoch[]>) =>
+const firstDelegationEpoch$ = (transactions$: Observable<TxWithEpoch[]>, rewardAccounts: Cardano.RewardAccount[]) =>
   transactions$.pipe(
     map((transactions) =>
       first(
-        transactions.filter(({ tx }) => transactionHasAnyCertificate(tx, [Cardano.CertificateType.StakeDelegation]))
+        transactions.filter(({ tx }) => {
+          const inspectTx = createTxInspector({
+            signedCertificates: signedCertificatesInspector(rewardAccounts, [Cardano.CertificateType.StakeDelegation])
+          });
+          return inspectTx(tx).signedCertificates.length > 0;
+        })
       )
     ),
     map((tx) => (util.isNotNil(tx) ? tx.epoch + 3 : null)),
@@ -58,7 +69,7 @@ export const createRewardsHistoryTracker = (
           rewardsHistoryStore
             .getValues(rewardAccounts)
             .pipe(map((rewards) => new Map(rewardAccounts.map((rewardAccount, i) => [rewardAccount, rewards[i]])))),
-          firstDelegationEpoch$(transactions$).pipe(
+          firstDelegationEpoch$(transactions$, rewardAccounts).pipe(
             switchMap((firstEpoch) => rewardsHistoryProvider(rewardAccounts, firstEpoch)),
             tap((allRewards) =>
               rewardsHistoryStore.setAll([...allRewards.entries()].map(([key, value]) => ({ key, value })))

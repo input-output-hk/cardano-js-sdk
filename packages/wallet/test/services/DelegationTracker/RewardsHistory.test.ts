@@ -47,11 +47,58 @@ describe('RewardsHistory', () => {
             a: [
               {
                 epoch: 0,
-                tx: createStubTxWithCertificates([Cardano.CertificateType.StakeKeyDeregistration])
+                tx: createStubTxWithCertificates([
+                  { __typename: Cardano.CertificateType.StakeKeyDeregistration } as Cardano.Certificate
+                ])
               },
               {
                 epoch,
-                tx: createStubTxWithCertificates([Cardano.CertificateType.StakeDelegation])
+                tx: createStubTxWithCertificates(
+                  [{ __typename: Cardano.CertificateType.StakeDelegation } as Cardano.Certificate],
+                  { stakeKeyHash: Cardano.Ed25519KeyHash.fromRewardAccount(rewardAccount) }
+                )
+              }
+            ]
+          }),
+          of(rewardAccounts),
+          getRewardsHistory,
+          new InMemoryRewardsHistoryStore()
+        );
+        expectObservable(target$).toBe('-a', {
+          a: {
+            all: accountRewardsHistory,
+            avgReward: 10_500n,
+            lastReward: accountRewardsHistory[1],
+            lifetimeRewards: 21_000n
+          } as RewardsHistory
+        });
+        flush();
+        expect(getRewardsHistory).toBeCalledTimes(1);
+        expect(getRewardsHistory).toBeCalledWith(rewardAccounts, epoch + 3);
+      });
+    });
+
+    it('considers only first delegation signed by the reward account', () => {
+      createTestScheduler().run(({ cold, expectObservable, flush }) => {
+        const accountRewardsHistory = rewardsHistory.get(rewardAccount)!;
+        const epoch = accountRewardsHistory[0].epoch;
+        const getRewardsHistory = jest.fn().mockReturnValue(cold('-a', { a: rewardsHistory }));
+        const target$ = createRewardsHistoryTracker(
+          cold('aa', {
+            a: [
+              {
+                epoch: 0,
+                tx: createStubTxWithCertificates(
+                  [{ __typename: Cardano.CertificateType.StakeDelegation } as Cardano.Certificate],
+                  { stakeKeyHash: '' }
+                )
+              },
+              {
+                epoch,
+                tx: createStubTxWithCertificates(
+                  [{ __typename: Cardano.CertificateType.StakeDelegation } as Cardano.Certificate],
+                  { stakeKeyHash: Cardano.Ed25519KeyHash.fromRewardAccount(rewardAccount) }
+                )
               }
             ]
           }),
