@@ -6,11 +6,13 @@ import {
   KeyAgentType,
   SerializableInMemoryKeyAgentData,
   SerializableKeyAgentData,
-  SerializableLedgerKeyAgentData
+  SerializableLedgerKeyAgentData,
+  SerializableTrezorKeyAgentData
 } from './types';
 import { InMemoryKeyAgent } from './InMemoryKeyAgent';
 import { InvalidSerializableDataError } from './errors';
 import { LedgerKeyAgent } from './LedgerKeyAgent';
+import { TrezorKeyAgent } from './TrezorKeyAgent';
 
 // TODO: use this type as 2nd parameter of restoreKeyAgent
 export interface RestoreInMemoryKeyAgentProps {
@@ -23,6 +25,7 @@ export interface RestoreInMemoryKeyAgentProps {
 export function restoreKeyAgent(data: SerializableInMemoryKeyAgentData, getPassword: GetPassword): Promise<KeyAgent>;
 export function restoreKeyAgent(data: SerializableKeyAgentData, getPassword?: GetPassword): Promise<KeyAgent>;
 export function restoreKeyAgent(data: SerializableLedgerKeyAgentData): Promise<KeyAgent>;
+export function restoreKeyAgent(data: SerializableTrezorKeyAgentData): Promise<KeyAgent>;
 /**
  * Restore key agent from serializable data
  *
@@ -46,6 +49,9 @@ export async function restoreKeyAgent<T extends SerializableKeyAgentData>(
     }
     case KeyAgentType.Ledger: {
       return new LedgerKeyAgent(data);
+    }
+    case KeyAgentType.Trezor: {
+      return new TrezorKeyAgent(data);
     }
     default:
       throw new InvalidSerializableDataError(

@@ -61,6 +61,7 @@
     "pbkdf2": "^3.1.2",
     "pouchdb": "^7.2.2",
     "rxjs": "^7.4.0",
+    "trezor-connect": "8.2.8-extended",
     "ts-custom-error": "^3.2.0",
     "ts-log": "^2.2.3"
   },

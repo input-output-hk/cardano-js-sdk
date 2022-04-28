@@ -10,7 +10,8 @@ export interface SignBlobResult {
 
 export enum KeyAgentType {
   InMemory = 'InMemory',
-  Ledger = 'Ledger'
+  Ledger = 'Ledger',
+  Trezor = 'Trezor'
 }
 
 export enum KeyRole {
@@ -58,6 +59,16 @@ export interface GroupedAddress {
   rewardAccount: Cardano.RewardAccount;
 }
 
+export interface TrezorConfig {
+  communicationType: CommunicationType;
+  silentMode?: boolean;
+  lazyLoad?: boolean;
+  manifest: {
+    email: string;
+    appUrl: string;
+  };
+}
+
 /**
  * number[] is used by InMemoryKeyAgent
  */
@@ -80,9 +91,17 @@ export interface SerializableLedgerKeyAgentData extends SerializableKeyAgentData
   communicationType: CommunicationType;
 }
 
-export type SerializableKeyAgentData = SerializableInMemoryKeyAgentData | SerializableLedgerKeyAgentData;
+export interface SerializableTrezorKeyAgentData extends SerializableKeyAgentDataBase {
+  __typename: KeyAgentType.Trezor;
+  trezorConfig: TrezorConfig;
+}
 
-export type TransportType = TransportWebHID | TransportNodeHid;
+export type SerializableKeyAgentData =
+  | SerializableInMemoryKeyAgentData
+  | SerializableLedgerKeyAgentData
+  | SerializableTrezorKeyAgentData;
+
+export type LedgerTransportType = TransportWebHID | TransportNodeHid;
 
 /**
  * @returns password used to decrypt root private key
