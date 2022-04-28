@@ -16,8 +16,7 @@
   ],
   "license": "MPL-2.0",
   "scripts": {
-    "build": "tsc --build ./src && yarn copy-openApi",
-    "copy-openApi": "cp ./src/StakePoolSearch/openApi.json ./dist/StakePoolSearch/openApi.json && cp ./src/TxSubmit/openApi.json ./dist/TxSubmit/openApi.json",
+    "build": "tsc --build ./src && bash ./copy-openApi.sh",
     "tscNoEmit": "shx echo typescript --noEmit command not implemented yet",
     "cleanup": "shx rm -rf dist node_modules",
     "lint": "eslint --ignore-path ../../.eslintignore \"**/*.ts\"",
