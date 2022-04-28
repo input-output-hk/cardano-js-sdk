@@ -3,7 +3,7 @@ import { Milliseconds } from '../../services';
 
 export const cachedGetPassword = (getPassword: () => Promise<Uint8Array>, cacheDuration: Milliseconds): GetPassword => {
   let cached: Promise<Uint8Array> | null;
-  let timeout: NodeJS.Timeout | null;
+  let timeout: number | null;
   return (noCache) => {
     if (noCache || !cached) {
       cached = getPassword()
