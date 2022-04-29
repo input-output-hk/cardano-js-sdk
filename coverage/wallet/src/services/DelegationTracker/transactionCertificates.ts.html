@@ -25,21 +25,21 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>30/30</span>
+                <span class='fraction'>28/28</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">90% </span>
+                <span class="strong">87.5% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>9/10</span>
+                <span class='fraction'>7/8</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>11/11</span>
+                <span class='fraction'>10/10</span>
             </div>
         
             
@@ -114,7 +114,10 @@
 <a name='L49'></a><a href='#L49'>49</a>
 <a name='L50'></a><a href='#L50'>50</a>
 <a name='L51'></a><a href='#L51'>51</a>
-<a name='L52'></a><a href='#L52'>52</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">28x</span>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">28x</span>
 <span class="cline-any cline-yes">28x</span>
 <span class="cline-any cline-yes">28x</span>
 <span class="cline-any cline-yes">28x</span>
@@ -125,17 +128,12 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">28x</span>
-<span class="cline-any cline-yes">82x</span>
-<span class="cline-any cline-yes">117x</span>
+<span class="cline-any cline-yes">76x</span>
+<span class="cline-any cline-yes">105x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">28x</span>
-<span class="cline-any cline-yes">161x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">28x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">141x</span>
+<span class="cline-any cline-yes">36x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">28x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -146,11 +144,11 @@
 <span class="cline-any cline-yes">152x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">81x</span>
-<span class="cline-any cline-yes">81x</span>
-<span class="cline-any cline-yes">39x</span>
+<span class="cline-any cline-yes">75x</span>
+<span class="cline-any cline-yes">75x</span>
+<span class="cline-any cline-yes">33x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">81x</span>
+<span class="cline-any cline-yes">75x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -161,12 +159,20 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">19x</span>
-<span class="cline-any cline-yes">119x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">20x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">61x</span>
+<span class="cline-any cline-yes">127x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Cardano, util } from '@cardano-sdk/core';
-import { Observable, distinctUntilChanged, map } from 'rxjs';
+<span class="cline-any cline-yes">127x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Cardano, createTxInspector, signedCertificatesInspector, util } from '@cardano-sdk/core';
+import { Observable, combineLatest, distinctUntilChanged, map } from 'rxjs';
 import { last } from 'lodash-es';
 import { transactionsEquals } from '../util/equals';
 &nbsp;
@@ -182,11 +188,6 @@ export const stakeKeyCertficates = (certificates?: Cardano.Certificate[]) =&gt;
 &nbsp;
 export const includesAnyCertificate = (haystack: Cardano.Certificate[], needle: Cardano.CertificateType[]) =&gt;
   haystack.some(({ __typename }) =&gt; needle.includes(__typename)) || false;
-&nbsp;
-export const transactionHasAnyCertificate = (
-  { body: { certificates } }: Cardano.TxAlonzo,
-  certificateTypes: Cardano.CertificateType[]
-) =&gt; includesAnyCertificate(certificates || [], certificateTypes);
 &nbsp;
 export const isLastStakeKeyCertOfType = (
   transactionsCertificates: Cardano.Certificate[][],
@@ -210,10 +211,18 @@ export const isLastStakeKeyCertOfType = (
 &nbsp;
 export const transactionsWithCertificates = (
   transactions$: Observable&lt;Cardano.TxAlonzo[]&gt;,
+  rewardAccounts$: Observable&lt;Cardano.RewardAccount[]&gt;,
   certificateTypes: Cardano.CertificateType[]
 ) =&gt;
-  transactions$.pipe(
-    map((transactions) =&gt; transactions.filter((tx) =&gt; transactionHasAnyCertificate(tx, certificateTypes))),
+  combineLatest([transactions$, rewardAccounts$]).pipe(
+    map(([transactions, rewardAccounts]) =&gt;
+      transactions.filter((tx) =&gt; {
+        const inspectTx = createTxInspector({
+          signedCertificates: signedCertificatesInspector(rewardAccounts, certificateTypes)
+        });
+        return inspectTx(tx).signedCertificates.length &gt; 0;
+      })
+    ),
     distinctUntilChanged(transactionsEquals)
   );
 &nbsp;</pre></td></tr></table></pre>
@@ -223,7 +232,7 @@ export const transactionsWithCertificates = (
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at Fri Apr 29 2022 07:05:35 GMT+0000 (Coordinated Universal Time)
+                at Fri Apr 29 2022 08:12:42 GMT+0000 (Coordinated Universal Time)
             </div>
         <script src="../../../prettify.js"></script>
         <script>
