@@ -37,23 +37,45 @@ describe('DelegationTracker', () => {
   describe('certificateTransactionsWithEpochs', () => {
     it('emits outgoing transactions containing given certificate types, retries on error', () => {
       createTestScheduler().run(({ cold, expectObservable }) => {
+        const rewardAccount = Cardano.RewardAccount('stake_test1upqykkjq3zhf4085s6n70w8cyp57dl87r0ezduv9rnnj2uqk5zmdv');
         const transactions = [
-          createStubTxWithCertificates([Cardano.CertificateType.StakeKeyRegistration]),
           createStubTxWithCertificates([
-            Cardano.CertificateType.PoolRetirement,
-            Cardano.CertificateType.StakeDelegation
+            {
+              __typename: Cardano.CertificateType.StakeKeyRegistration,
+              stakeKeyHash: Cardano.Ed25519KeyHash.fromRewardAccount(rewardAccount)
+            }
+          ]),
+          createStubTxWithCertificates([
+            {
+              __typename: Cardano.CertificateType.PoolRetirement
+            } as Cardano.Certificate,
+            {
+              __typename: Cardano.CertificateType.StakeDelegation,
+              stakeKeyHash: Cardano.Ed25519KeyHash.fromRewardAccount(rewardAccount)
+            } as Cardano.Certificate
           ]),
           createStubTxWithCertificates(),
-          createStubTxWithCertificates([Cardano.CertificateType.StakeKeyDeregistration])
+          createStubTxWithCertificates([
+            {
+              __typename: Cardano.CertificateType.StakeKeyDeregistration,
+              stakeKeyHash: Cardano.Ed25519KeyHash.fromRewardAccount(rewardAccount)
+            }
+          ])
         ];
+
         const slotEpochCalc = jest.fn().mockReturnValueOnce(284).mockReturnValueOnce(285);
         const slotEpochCalc$ = cold('-a', { a: slotEpochCalc });
+
+        const rewardAccounts$ = cold('a', {
+          a: [rewardAccount]
+        });
         const target$ = certificateTransactionsWithEpochs(
           {
             history$: cold('a--a', {
               a: transactions
             })
           } as unknown as TransactionsTracker,
+          rewardAccounts$,
           slotEpochCalc$,
           [Cardano.CertificateType.StakeDelegation, Cardano.CertificateType.StakeKeyDeregistration]
         );
@@ -62,6 +84,43 @@ describe('DelegationTracker', () => {
             { epoch: 284, tx: transactions[1] },
             { epoch: 285, tx: transactions[3] }
           ]
+        });
+      });
+    });
+    it('does not emit outgoing transactions with certificates not signed by the reward accounts', () => {
+      createTestScheduler().run(({ cold, expectObservable }) => {
+        const rewardAccount = Cardano.RewardAccount('stake_test1upqykkjq3zhf4085s6n70w8cyp57dl87r0ezduv9rnnj2uqk5zmdv');
+        const transactions = [
+          createStubTxWithCertificates([
+            { __typename: Cardano.CertificateType.StakeKeyRegistration } as Cardano.Certificate
+          ]),
+          createStubTxWithCertificates([
+            { __typename: Cardano.CertificateType.PoolRetirement } as Cardano.Certificate,
+            { __typename: Cardano.CertificateType.StakeDelegation } as Cardano.Certificate
+          ]),
+          createStubTxWithCertificates(),
+          createStubTxWithCertificates([
+            { __typename: Cardano.CertificateType.StakeKeyDeregistration } as Cardano.Certificate
+          ])
+        ];
+        const slotEpochCalc = jest.fn().mockReturnValueOnce(284).mockReturnValueOnce(285);
+        const slotEpochCalc$ = cold('-a', { a: slotEpochCalc });
+
+        const rewardAccounts$ = cold('a', {
+          a: [rewardAccount]
+        });
+        const target$ = certificateTransactionsWithEpochs(
+          {
+            history$: cold('a--a', {
+              a: transactions
+            })
+          } as unknown as TransactionsTracker,
+          rewardAccounts$,
+          slotEpochCalc$,
+          [Cardano.CertificateType.StakeDelegation, Cardano.CertificateType.StakeKeyDeregistration]
+        );
+        expectObservable(target$).toBe('-a', {
+          a: []
         });
       });
     });

@@ -1,5 +1,5 @@
-import { Cardano, util } from '@cardano-sdk/core';
-import { Observable, distinctUntilChanged, map } from 'rxjs';
+import { Cardano, createTxInspector, signedCertificatesInspector, util } from '@cardano-sdk/core';
+import { Observable, combineLatest, distinctUntilChanged, map } from 'rxjs';
 import { last } from 'lodash-es';
 import { transactionsEquals } from '../util/equals';
 
@@ -15,11 +15,6 @@ export const stakeKeyCertficates = (certificates?: Cardano.Certificate[]) =>
 
 export const includesAnyCertificate = (haystack: Cardano.Certificate[], needle: Cardano.CertificateType[]) =>
   haystack.some(({ __typename }) => needle.includes(__typename)) || false;
-
-export const transactionHasAnyCertificate = (
-  { body: { certificates } }: Cardano.TxAlonzo,
-  certificateTypes: Cardano.CertificateType[]
-) => includesAnyCertificate(certificates || [], certificateTypes);
 
 export const isLastStakeKeyCertOfType = (
   transactionsCertificates: Cardano.Certificate[][],
@@ -43,9 +38,17 @@ export const isLastStakeKeyCertOfType = (
 
 export const transactionsWithCertificates = (
   transactions$: Observable<Cardano.TxAlonzo[]>,
+  rewardAccounts$: Observable<Cardano.RewardAccount[]>,
   certificateTypes: Cardano.CertificateType[]
 ) =>
-  transactions$.pipe(
-    map((transactions) => transactions.filter((tx) => transactionHasAnyCertificate(tx, certificateTypes))),
+  combineLatest([transactions$, rewardAccounts$]).pipe(
+    map(([transactions, rewardAccounts]) =>
+      transactions.filter((tx) => {
+        const inspectTx = createTxInspector({
+          signedCertificates: signedCertificatesInspector(rewardAccounts, certificateTypes)
+        });
+        return inspectTx(tx).signedCertificates.length > 0;
+      })
+    ),
     distinctUntilChanged(transactionsEquals)
   );

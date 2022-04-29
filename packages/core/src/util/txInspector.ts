@@ -32,6 +32,7 @@ export interface SentInspection {
   inputs: TxIn[];
   certificates: Certificate[];
 }
+export type SignedCertificatesInspection = Certificate[];
 
 // Inspector types
 interface SentInspectorArgs {
@@ -47,6 +48,10 @@ export type SendReceiveValueInspector = (ownAddresses: Address[]) => Inspector<S
 export type DelegationInspector = Inspector<DelegationInspection>;
 export type StakeKeyRegistrationInspector = Inspector<StakeKeyRegistrationInspection>;
 export type WithdrawalInspector = Inspector<WithdrawalInspection>;
+export type SignedCertificatesInspector = (
+  rewardAccounts: RewardAccount[],
+  certificateTypes?: CertificateType[]
+) => Inspector<SignedCertificatesInspection>;
 
 /**
  * Inspects a transaction for values (coins + assets) in inputs
@@ -79,6 +84,29 @@ export const totalAddressOutputsValueInspector: SendReceiveValueInspector = (own
 };
 
 /**
+ * Inspects a transaction for certificates signed with the reward accounts provided.
+ * Is possible to specify the types of certificates to be taken into account
+ *
+ * @param {RewardAccount[]} rewardAccounts array of reward accounts that might have signed certificates
+ * @param {CertificateType[]} [certificateTypes] certificates of these types will be checked. All if not provided
+ */
+export const signedCertificatesInspector: SignedCertificatesInspector =
+  (rewardAccounts: RewardAccount[], certificateTypes?: CertificateType[]) => (tx: TxAlonzo) => {
+    if (!tx.body.certificates || tx.body.certificates.length === 0) return [];
+    const stakeKeyHashes = rewardAccounts?.map((account) => Ed25519KeyHash.fromRewardAccount(account));
+    const certificates = certificateTypes
+      ? tx.body.certificates?.filter((certificate) => certificateTypes.includes(certificate.__typename))
+      : tx.body.certificates;
+
+    return certificates.filter((certificate) => {
+      if ('stakeKeyHash' in certificate) return stakeKeyHashes.includes(certificate.stakeKeyHash);
+      if ('rewardAccount' in certificate) return rewardAccounts.includes(certificate.rewardAccount);
+      if ('poolParameters' in certificate) return rewardAccounts.includes(certificate.poolParameters.rewardAccount);
+      return false;
+    });
+  };
+
+/**
  * Inspects a transaction to see if any of the addresses provided are included in a transaction input
  * or if any of the rewards accounts are included in a certificate
  *
@@ -87,26 +115,10 @@ export const totalAddressOutputsValueInspector: SendReceiveValueInspector = (own
  */
 export const sentInspector: SentInspector =
   ({ addresses, rewardAccounts }) =>
-  (tx: TxAlonzo) => {
-    const inputs = addresses?.length ? inputsWithAddresses(tx, addresses) : [];
-
-    const stakeKeyHashes = rewardAccounts?.map((account) => Ed25519KeyHash.fromRewardAccount(account));
-    const stakeKeyCerts =
-      stakeKeyHashes && tx.body.certificates
-        ? tx.body.certificates.filter((cert) => 'stakeKeyHash' in cert && stakeKeyHashes.includes(cert.stakeKeyHash))
-        : [];
-    const rewardAccountCerts =
-      rewardAccounts && tx.body.certificates
-        ? tx.body.certificates?.filter(
-            (cert) =>
-              ('rewardAccount' in cert && rewardAccounts.includes(cert.rewardAccount)) ||
-              ('poolParameters' in cert && rewardAccounts.includes(cert.poolParameters.rewardAccount))
-          )
-        : [];
-    const certificates = [...stakeKeyCerts, ...rewardAccountCerts];
-
-    return { certificates, inputs };
-  };
+  (tx: TxAlonzo) => ({
+    certificates: rewardAccounts?.length ? signedCertificatesInspector(rewardAccounts)(tx) : [],
+    inputs: addresses?.length ? inputsWithAddresses(tx, addresses) : []
+  });
 
 /**
  * Inspects a transaction for net value (coins + assets) sent by the provided addresses.

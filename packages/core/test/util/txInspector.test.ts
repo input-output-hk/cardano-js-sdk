@@ -19,6 +19,7 @@ import {
   createTxInspector,
   delegationInspector,
   sentInspector,
+  signedCertificatesInspector,
   stakeKeyDeregistrationInspector,
   stakeKeyRegistrationInspector,
   totalAddressInputsValueInspector,
@@ -365,5 +366,43 @@ describe('txInspector', () => {
       const txProperties = inspectTx(tx);
       expect(txProperties.totalWithdrawals).toEqual(0n);
     });
+  });
+
+  describe('certificates signed inspector', () => {
+    test(
+      'a transaction with certificates signed with any of the provided reward accounts' +
+        ' produces an inspection containing those certificates',
+      () => {
+        const tx = buildMockTx({ certificates: [delegationCert, keyRegistrationCert] });
+        const inspectTx = createTxInspector({ signedCertificates: signedCertificatesInspector([rewardAccount]) });
+        const txProperties = inspectTx(tx);
+        expect(txProperties.signedCertificates).toEqual([delegationCert, keyRegistrationCert]);
+      }
+    );
+
+    test(
+      'a transaction with some certificates signed with any of the provided reward accounts' +
+        ' and some signed with other produces an inspection containing only the former',
+      () => {
+        const otherCert = { ...delegationCert, stakeKeyHash: '' as unknown as Ed25519KeyHash };
+        const tx = buildMockTx({ certificates: [delegationCert, otherCert] });
+        const inspectTx = createTxInspector({ signedCertificates: signedCertificatesInspector([rewardAccount]) });
+        const txProperties = inspectTx(tx);
+        expect(txProperties.signedCertificates).toEqual([delegationCert]);
+      }
+    );
+
+    test(
+      'a transaction with certificates signed with any of the provided reward accounts' +
+        ' produces an inspection containing only the certificates of the provided types',
+      () => {
+        const tx = buildMockTx({ certificates: [delegationCert, keyRegistrationCert] });
+        const inspectTx = createTxInspector({
+          signedCertificates: signedCertificatesInspector([rewardAccount], [CertificateType.StakeKeyRegistration])
+        });
+        const txProperties = inspectTx(tx);
+        expect(txProperties.signedCertificates).toEqual([keyRegistrationCert]);
+      }
+    );
   });
 });

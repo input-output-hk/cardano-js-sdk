@@ -50,10 +50,14 @@ export interface DelegationTrackerProps {
 
 export const certificateTransactionsWithEpochs = (
   transactionsTracker: TransactionsTracker,
+  rewardAccountAddresses$: Observable<Cardano.RewardAccount[]>,
   slotEpochCalc$: Observable<SlotEpochCalc>,
   certificateTypes: Cardano.CertificateType[]
 ): Observable<TxWithEpoch[]> =>
-  combineLatest([transactionsWithCertificates(transactionsTracker.history$, certificateTypes), slotEpochCalc$]).pipe(
+  combineLatest([
+    transactionsWithCertificates(transactionsTracker.history$, rewardAccountAddresses$, certificateTypes),
+    slotEpochCalc$
+  ]).pipe(
     map(([transactions, slotEpochCalc]) =>
       transactions.map((tx) => ({ epoch: slotEpochCalc(tx.blockHeader.slot), tx }))
     )
@@ -84,11 +88,16 @@ export const createDelegationTracker = ({
     slotEpochCalc$ = timeSettings$.pipe(map((timeSettings) => createSlotEpochCalc(timeSettings)))
   } = {}
 }: DelegationTrackerProps): DelegationTracker => {
-  const transactions$ = certificateTransactionsWithEpochs(transactionsTracker, slotEpochCalc$, [
-    Cardano.CertificateType.StakeDelegation,
-    Cardano.CertificateType.StakeKeyRegistration,
-    Cardano.CertificateType.StakeKeyDeregistration
-  ]);
+  const transactions$ = certificateTransactionsWithEpochs(
+    transactionsTracker,
+    rewardAccountAddresses$,
+    slotEpochCalc$,
+    [
+      Cardano.CertificateType.StakeDelegation,
+      Cardano.CertificateType.StakeKeyRegistration,
+      Cardano.CertificateType.StakeKeyDeregistration
+    ]
+  );
   const rewardsHistory$ = new TrackerSubject(
     createRewardsHistoryTracker(transactions$, rewardAccountAddresses$, rewardsHistoryProvider, stores.rewardsHistory)
   );
