@@ -95,13 +95,13 @@
 					<a name="getAsset" class="tsd-anchor"></a>
 					<h3>get<wbr>Asset</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Asset<span class="tsd-signature-symbol">(</span>id<span class="tsd-signature-symbol">: </span><a href="../modules/_cardano_sdk_core.Cardano.html#AssetId-1" class="tsd-signature-type" data-tsd-kind="Function">AssetId</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="_cardano_sdk_core.Asset.AssetInfo.html" class="tsd-signature-type" data-tsd-kind="Interface">AssetInfo</a><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Asset<span class="tsd-signature-symbol">(</span>id<span class="tsd-signature-symbol">: </span><a href="../modules/_cardano_sdk_core.Cardano.html#AssetId-1" class="tsd-signature-type" data-tsd-kind="Function">AssetId</a>, extraData<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">AssetExtraData</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="_cardano_sdk_core.Asset.AssetInfo.html" class="tsd-signature-type" data-tsd-kind="Interface">AssetInfo</a><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/2c0f4d7/packages/core/src/Provider/AssetProvider/types.ts#L8">packages/core/src/Provider/AssetProvider/types.ts:8</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/b50c741/packages/core/src/Provider/AssetProvider/types.ts#L14">packages/core/src/Provider/AssetProvider/types.ts:14</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -118,6 +118,9 @@
 									<div class="tsd-comment tsd-typography">
 										<p>asset ID (concatenated hex values of policyId + assetName)</p>
 									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> extraData: <span class="tsd-signature-type">AssetExtraData</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="_cardano_sdk_core.Asset.AssetInfo.html" class="tsd-signature-type" data-tsd-kind="Interface">AssetInfo</a><span class="tsd-signature-symbol">&gt;</span></h4>
