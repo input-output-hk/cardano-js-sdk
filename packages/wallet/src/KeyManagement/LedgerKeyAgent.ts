@@ -111,9 +111,12 @@ export class LedgerKeyAgent extends KeyAgentBase {
       if (!transport || !transport.deviceModel) {
         throw new TransportError('Missing transport');
       }
-      const isSupportedLedgerModel = transport.deviceModel.id === 'nanoS' || transport.deviceModel.id === 'nanoX';
+      const isSupportedLedgerModel =
+        transport.deviceModel.id === 'nanoS' ||
+        transport.deviceModel.id === 'nanoX' ||
+        transport.deviceModel.id === 'nanoSP';
       if (!isSupportedLedgerModel) {
-        throw new TransportError('Ledger device model not supported');
+        throw new TransportError(`Ledger device model: "${transport.deviceModel.id}" is not supported`);
       }
       return await LedgerKeyAgent.createDeviceConnection(transport);
     } catch (error: any) {
