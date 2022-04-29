@@ -20,10 +20,6 @@ describe('createAssetsTracker', () => {
         })
       } as unknown as TransactionalTracker<Balance>;
       const nftMetadata = { name: 'nft' } as Asset.NftMetadata;
-      const nftMetadataService = jest
-        .fn()
-        .mockReturnValueOnce(cold('a', { a: undefined }))
-        .mockReturnValueOnce(cold('a', { a: nftMetadata }));
       const asset1 = { assetId: AssetId.TSLA } as Asset.AssetInfo;
       const asset2 = { assetId: AssetId.PXL, nftMetadata } as Asset.AssetInfo;
       const assetService = jest.fn().mockReturnValueOnce(of(asset1)).mockReturnValueOnce(of(asset2));
@@ -32,8 +28,7 @@ describe('createAssetsTracker', () => {
         stats: {}
       };
       const target$ = createAssetsTracker({ assetProvider, balanceTracker } as unknown as AssetsTrackerProps, {
-        assetService,
-        nftMetadataService
+        assetService
       });
       expectObservable(target$).toBe('--b-c', {
         b: new Map([[AssetId.TSLA, asset1]]),

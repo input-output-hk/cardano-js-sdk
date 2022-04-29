@@ -1,5 +1,5 @@
 import { Cardano, InvalidStringError, ProviderError, ProviderFailure } from '@cardano-sdk/core';
-import { fetchSequentially, formatBlockfrostError, jsonToMetadatum } from '../src/util';
+import { blockfrostMetadataToTxMetadata, fetchSequentially, formatBlockfrostError, jsonToMetadatum } from '../src/util';
 
 describe('util', () => {
   describe('formatBlockfrostError', () => {
@@ -52,5 +52,54 @@ describe('util', () => {
       { arg, b: 5 }
     ]);
     expect(request).toBeCalledTimes(3);
+  });
+
+  describe('blockfrostMetadataToTxMetadata', () => {
+    it('converts a blockfrost metadata array into a TxMetadata map', () => {
+      const metadata = [
+        {
+          json_metadata: { test: 'value' },
+          label: '1'
+        },
+        {
+          json_metadata: {
+            b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a7: {
+              '6e7574636f696e': {
+                image: ['ipfs://image'],
+                name: 'test nft',
+                version: '1.0'
+              }
+            }
+          },
+          label: '721'
+        }
+      ];
+      expect(blockfrostMetadataToTxMetadata(metadata)).toEqual<Cardano.TxMetadata>(
+        new Map([
+          [1n, new Map([['test', 'value']])],
+          [
+            721n,
+            new Map<Cardano.Metadatum, Cardano.Metadatum>([
+              [
+                'b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a7',
+                new Map([
+                  [
+                    '6e7574636f696e',
+                    new Map<Cardano.Metadatum, Cardano.Metadatum>([
+                      ['image', ['ipfs://image']],
+                      ['name', 'test nft'],
+                      ['version', '1.0']
+                    ])
+                  ]
+                ])
+              ]
+            ])
+          ]
+        ])
+      );
+    });
+    it('returns an empty map if metadata array provided is empty', () => {
+      expect(blockfrostMetadataToTxMetadata([])).toEqual(new Map());
+    });
   });
 });

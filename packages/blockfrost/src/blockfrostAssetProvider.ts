@@ -1,14 +1,15 @@
 /* eslint-disable unicorn/no-nested-ternary */
 import { Asset, AssetProvider, Cardano, ProviderUtil, util } from '@cardano-sdk/core';
 import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
-import { fetchSequentially, toProviderError } from './util';
+import { blockfrostMetadataToTxMetadata, fetchSequentially, toProviderError } from './util';
 import { omit } from 'lodash-es';
 
 const mapMetadata = (
   onChain: Responses['asset']['onchain_metadata'],
   offChain: Responses['asset']['metadata']
-): Asset.TokenMetadata => {
+): Asset.TokenMetadata | null => {
   const metadata = { ...onChain, ...offChain };
+  if (Object.values(metadata).every((value) => value === undefined || value === null)) return null;
   return {
     ...util.replaceNullsWithUndefineds(omit(metadata, ['logo', 'image'])),
     desc: metadata.description,
@@ -41,26 +42,64 @@ export const blockfrostAssetProvider = (blockfrost: BlockFrostAPI): AssetProvide
         }))
     });
 
-  const getAsset: AssetProvider['getAsset'] = async (assetId) => {
+  const getLastMintedTx = async (assetId: Cardano.AssetId): Promise<Responses['asset_history'][number] | undefined> => {
+    const [lastMintedTx] = await fetchSequentially({
+      arg: assetId.toString(),
+      haveEnoughItems: (items: Responses['asset_history']): boolean => items.length > 0,
+      paginationOptions: { order: 'desc' },
+      request: blockfrost.assetsHistory.bind<BlockFrostAPI['assetsHistory']>(blockfrost),
+      responseTranslator: (response): Responses['asset_history'] => response.filter((tx) => tx.action === 'minted')
+    });
+
+    if (!lastMintedTx) return undefined;
+    return lastMintedTx;
+  };
+
+  const getNftMetadata = async (
+    asset: Pick<Asset.AssetInfo, 'name' | 'policyId'>,
+    lastMintedTxHash: string
+  ): Promise<Asset.NftMetadata | null> => {
+    const metadata = await blockfrost.txsMetadata(lastMintedTxHash);
+    // Not sure if types are correct, missing 'label', but it's present in docs
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const metadatumMap = blockfrostMetadataToTxMetadata(metadata as any);
+    return Asset.util.metadatumToCip25(asset, metadatumMap, console) ?? null;
+  };
+
+  const getAsset: AssetProvider['getAsset'] = async (assetId, extraData) => {
     const response = await blockfrost.assetsById(assetId.toString());
     const name = Asset.util.assetNameFromAssetId(assetId);
+    const policyId = Cardano.PolicyId(response.policy_id);
     const quantity = BigInt(response.quantity);
+    const history = async () =>
+      response.mint_or_burn_count === 1
+        ? [
+            {
+              quantity,
+              transactionId: Cardano.TransactionId(response.initial_mint_tx_hash)
+            }
+          ]
+        : await getAssetHistory(assetId);
+
+    const nftMetadata = async () => {
+      let lastMintedTxHash: string = response.initial_mint_tx_hash;
+      if (response.mint_or_burn_count > 1) {
+        const lastMintedTx = await getLastMintedTx(assetId);
+        if (lastMintedTx) lastMintedTxHash = lastMintedTx.tx_hash;
+      }
+      return getNftMetadata({ name, policyId }, lastMintedTxHash);
+    };
+
     return {
       assetId,
       fingerprint: Cardano.AssetFingerprint(response.fingerprint),
-      history:
-        response.mint_or_burn_count === 1
-          ? [
-              {
-                quantity,
-                transactionId: Cardano.TransactionId(response.initial_mint_tx_hash)
-              }
-            ]
-          : await getAssetHistory(assetId),
+      history: extraData?.history ? await history() : undefined,
+      mintOrBurnCount: response.mint_or_burn_count,
       name,
-      policyId: Cardano.PolicyId(response.policy_id),
+      nftMetadata: extraData?.nftMetadata ? await nftMetadata() : undefined,
+      policyId,
       quantity,
-      tokenMetadata: mapMetadata(response.onchain_metadata, response.metadata)
+      tokenMetadata: extraData?.tokenMetadata ? mapMetadata(response.onchain_metadata, response.metadata) : undefined
     };
   };
 
