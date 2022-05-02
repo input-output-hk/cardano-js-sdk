@@ -86,6 +86,42 @@ describe('KeyManagement/restoreKeyAgent', () => {
     });
   });
 
+  describe('TrezorKeyAgent', () => {
+    const trezorKeyAgentData: KeyManagement.SerializableTrezorKeyAgentData = {
+      __typename: KeyManagement.KeyAgentType.Trezor,
+      accountIndex: 0,
+      extendedAccountPublicKey: Cardano.Bip32PublicKey(
+        // eslint-disable-next-line max-len
+        'fc5ab25e830b67c47d0a17411bf7fdabf711a597fb6cf04102734b0a2934ceaaa65ff5e7c52498d52c07b8ddfcd436fc2b4d2775e2984a49d0c79f65ceee4779'
+      ),
+      knownAddresses: [
+        {
+          accountIndex: 0,
+          address: Cardano.Address(
+            'addr1qx52knza2h5x090n4a5r7yraz3pwcamk9ppvuh7e26nfks7pnmhxqavtqy02zezklh27jt9r6z62sav3mugappdc7xnskxy2pn'
+          ),
+          index: 0,
+          networkId: Cardano.NetworkId.mainnet,
+          rewardAccount: Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr'),
+          type: KeyManagement.AddressType.External
+        }
+      ],
+      networkId: 0,
+      trezorConfig: {
+        communicationType: KeyManagement.CommunicationType.Node,
+        manifest: {
+          appUrl: 'https://your.application.com',
+          email: 'email@developer.com'
+        }
+      }
+    };
+
+    it('can restore key manager from valid data', async () => {
+      const keyAgent = await KeyManagement.restoreKeyAgent(trezorKeyAgentData);
+      expect(keyAgent.knownAddresses).toBe(trezorKeyAgentData.knownAddresses);
+    });
+  });
+
   it('throws when attempting to restore key manager of unsupported __typename', async () => {
     await expect(() =>
       KeyManagement.restoreKeyAgent({

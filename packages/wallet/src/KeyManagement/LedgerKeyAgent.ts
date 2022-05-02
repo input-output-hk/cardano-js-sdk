@@ -4,47 +4,47 @@ import { Cardano, NotImplementedError, coreToCsl } from '@cardano-sdk/core';
 import {
   CommunicationType,
   KeyAgentType,
+  LedgerTransportType,
   SerializableLedgerKeyAgentData,
   SignBlobResult,
-  SignTransactionOptions,
-  TransportType
+  SignTransactionOptions
 } from './types';
 import { KeyAgentBase } from './KeyAgentBase';
 import { TxInternals } from '../Transaction';
 import { txToLedger } from './util';
-import DeviceConnection, { GetVersionResponse, HARDENED, utils } from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import LedgerConnection, { GetVersionResponse, HARDENED, utils } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents';
 import TransportWebHID from '@ledgerhq/hw-transport-webhid';
-import type Transport from '@ledgerhq/hw-transport';
+import type LedgerTransport from '@ledgerhq/hw-transport';
 
 export interface LedgerKeyAgentProps extends Omit<SerializableLedgerKeyAgentData, '__typename'> {
-  deviceConnection?: DeviceConnection;
+  deviceConnection?: LedgerConnection;
 }
 
-export interface CreateWithDevice {
+export interface CreateLedgerKeyAgentProps {
   networkId: Cardano.NetworkId;
   accountIndex?: number;
   communicationType: CommunicationType;
-  deviceConnection?: DeviceConnection | null;
+  deviceConnection?: LedgerConnection | null;
 }
 
-export interface GetXpubProps {
-  deviceConnection?: DeviceConnection;
+export interface GetLedgerXpubProps {
+  deviceConnection?: LedgerConnection;
   communicationType: CommunicationType;
   accountIndex: number;
 }
 
-export interface CreateTransportProps {
+export interface CreateLedgerTransportProps {
   communicationType: CommunicationType;
-  activeTransport?: TransportType;
+  activeTransport?: LedgerTransportType;
   devicePath?: string;
 }
 
 const transportTypedError = (error?: any) =>
-  new AuthenticationError('Transport failed', new TransportError('Transport failed', error));
+  new AuthenticationError('Ledger transport failed', new TransportError('Ledger transport failed', error));
 
 export class LedgerKeyAgent extends KeyAgentBase {
-  readonly deviceConnection?: DeviceConnection;
+  readonly deviceConnection?: LedgerConnection;
   readonly #communicationType: CommunicationType;
 
   constructor({ deviceConnection, ...serializableData }: LedgerKeyAgentProps) {
@@ -71,7 +71,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
     communicationType,
     activeTransport,
     devicePath = ''
-  }: CreateTransportProps): Promise<TransportType> {
+  }: CreateLedgerTransportProps): Promise<LedgerTransportType> {
     try {
       if (communicationType === CommunicationType.Node) {
         return await TransportNodeHid.open(devicePath);
@@ -87,9 +87,9 @@ export class LedgerKeyAgent extends KeyAgentBase {
   /**
    * @throws TransportError
    */
-  static async createDeviceConnection(activeTransport: Transport): Promise<DeviceConnection> {
+  static async createDeviceConnection(activeTransport: LedgerTransport): Promise<LedgerConnection> {
     try {
-      const deviceConnection = new DeviceConnection(activeTransport);
+      const deviceConnection = new LedgerConnection(activeTransport);
       // Perform app check to see if device can respond
       await deviceConnection.getVersion();
       return deviceConnection;
@@ -104,7 +104,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
   static async establishDeviceConnection(
     communicationType: CommunicationType,
     devicePath?: string
-  ): Promise<DeviceConnection> {
+  ): Promise<LedgerConnection> {
     let transport;
     try {
       transport = await LedgerKeyAgent.createTransport({ communicationType, devicePath });
@@ -137,8 +137,8 @@ export class LedgerKeyAgent extends KeyAgentBase {
    */
   static async checkDeviceConnection(
     communicationType: CommunicationType,
-    deviceConnection?: DeviceConnection
-  ): Promise<DeviceConnection> {
+    deviceConnection?: LedgerConnection
+  ): Promise<LedgerConnection> {
     try {
       if (!deviceConnection) {
         return await LedgerKeyAgent.establishDeviceConnection(communicationType);
@@ -161,7 +161,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
     deviceConnection,
     communicationType,
     accountIndex
-  }: GetXpubProps): Promise<Cardano.Bip32PublicKey> {
+  }: GetLedgerXpubProps): Promise<Cardano.Bip32PublicKey> {
     try {
       const recoveredDeviceConnection = await LedgerKeyAgent.checkDeviceConnection(communicationType, deviceConnection);
       const derivationPath = `1852'/1815'/${accountIndex}'`;
@@ -183,7 +183,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
    */
   static async getAppVersion(
     communicationType: CommunicationType,
-    deviceConnection?: DeviceConnection
+    deviceConnection?: LedgerConnection
   ): Promise<GetVersionResponse> {
     const recoveredDeviceConnection = await LedgerKeyAgent.checkDeviceConnection(communicationType, deviceConnection);
     return await recoveredDeviceConnection.getVersion();
@@ -198,7 +198,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
     accountIndex = 0,
     communicationType,
     deviceConnection
-  }: CreateWithDevice) {
+  }: CreateLedgerKeyAgentProps) {
     const deviceListPaths = await LedgerKeyAgent.getHidDeviceList();
     // Re-use device connection if you want to create a key agent with new / additional account(s) and pass accountIndex
     const activeDeviceConnection = await (deviceConnection
