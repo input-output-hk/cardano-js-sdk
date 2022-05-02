@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>KeyAgentBase | cardano-sdk</title>
+	<title>TrezorKeyAgent | cardano-sdk</title>
 	<meta name="description" content="Documentation for cardano-sdk">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -61,10 +61,10 @@
 					<a href="../modules/_cardano_sdk_wallet.KeyManagement.html">KeyManagement</a>
 				</li>
 				<li>
-					<a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html">KeyAgentBase</a>
+					<a href="_cardano_sdk_wallet.KeyManagement.TrezorKeyAgent.html">TrezorKeyAgent</a>
 				</li>
 			</ul>
-			<h1>Class KeyAgentBase</h1>
+			<h1>Class TrezorKeyAgent</h1>
 		</div>
 	</div>
 </header>
@@ -75,25 +75,13 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">KeyAgentBase</span>
+						<a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html" class="tsd-signature-type" data-tsd-kind="Class">KeyAgentBase</a>
 						<ul class="tsd-hierarchy">
 							<li>
-								<a href="_cardano_sdk_wallet.KeyManagement.LedgerKeyAgent.html" class="tsd-signature-type" data-tsd-kind="Class">LedgerKeyAgent</a>
-							</li>
-							<li>
-								<a href="_cardano_sdk_wallet.KeyManagement.TrezorKeyAgent.html" class="tsd-signature-type" data-tsd-kind="Class">TrezorKeyAgent</a>
-							</li>
-							<li>
-								<a href="_cardano_sdk_wallet.KeyManagement.InMemoryKeyAgent.html" class="tsd-signature-type" data-tsd-kind="Class">InMemoryKeyAgent</a>
+								<span class="target">TrezorKeyAgent</span>
 							</li>
 						</ul>
 					</li>
-				</ul>
-			</section>
-			<section class="tsd-panel">
-				<h3>Implements</h3>
-				<ul class="tsd-hierarchy">
-					<li><a href="../interfaces/_cardano_sdk_wallet.KeyManagement.KeyAgent.html" class="tsd-signature-type" data-tsd-kind="Interface">KeyAgent</a></li>
 				</ul>
 			</section>
 			<section class="tsd-panel-group tsd-index-group">
@@ -103,34 +91,39 @@
 						<section class="tsd-index-section ">
 							<h3>Constructors</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html#constructor" class="tsd-kind-icon">constructor</a></li>
+								<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite"><a href="_cardano_sdk_wallet.KeyManagement.TrezorKeyAgent.html#constructor" class="tsd-kind-icon">constructor</a></li>
 							</ul>
 						</section>
-						<section class="tsd-index-section tsd-is-private tsd-is-private-protected">
+						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html#_serializableData" class="tsd-kind-icon">#serializable<wbr>Data</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-private"><a href="_cardano_sdk_wallet.KeyManagement.TrezorKeyAgent.html#_serializableData" class="tsd-kind-icon">#serializable<wbr>Data</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_cardano_sdk_wallet.KeyManagement.TrezorKeyAgent.html#isTrezorInitialized" class="tsd-kind-icon">is<wbr>Trezor<wbr>Initialized</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Accessors</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html#accountIndex" class="tsd-kind-icon">account<wbr>Index</a></li>
-								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html#extendedAccountPublicKey" class="tsd-kind-icon">extended<wbr>Account<wbr>Public<wbr>Key</a></li>
-								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html#knownAddresses" class="tsd-kind-icon">known<wbr>Addresses</a></li>
-								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html#networkId" class="tsd-kind-icon">network<wbr>Id</a></li>
-								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html#serializableData" class="tsd-kind-icon">serializable<wbr>Data</a></li>
+								<li class="tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited"><a href="_cardano_sdk_wallet.KeyManagement.TrezorKeyAgent.html#accountIndex" class="tsd-kind-icon">account<wbr>Index</a></li>
+								<li class="tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited"><a href="_cardano_sdk_wallet.KeyManagement.TrezorKeyAgent.html#extendedAccountPublicKey" class="tsd-kind-icon">extended<wbr>Account<wbr>Public<wbr>Key</a></li>
+								<li class="tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited"><a href="_cardano_sdk_wallet.KeyManagement.TrezorKeyAgent.html#knownAddresses" class="tsd-kind-icon">known<wbr>Addresses</a></li>
+								<li class="tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited"><a href="_cardano_sdk_wallet.KeyManagement.TrezorKeyAgent.html#networkId" class="tsd-kind-icon">network<wbr>Id</a></li>
+								<li class="tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited"><a href="_cardano_sdk_wallet.KeyManagement.TrezorKeyAgent.html#serializableData" class="tsd-kind-icon">serializable<wbr>Data</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html#deriveAddress" class="tsd-kind-icon">derive<wbr>Address</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html#deriveCslPublicKey" class="tsd-kind-icon">derive<wbr>Csl<wbr>Public<wbr>Key</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html#derivePublicKey" class="tsd-kind-icon">derive<wbr>Public<wbr>Key</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html#exportRootPrivateKey" class="tsd-kind-icon">export<wbr>Root<wbr>Private<wbr>Key</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html#signBlob" class="tsd-kind-icon">sign<wbr>Blob</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html#signTransaction" class="tsd-kind-icon">sign<wbr>Transaction</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_cardano_sdk_wallet.KeyManagement.TrezorKeyAgent.html#deriveAddress" class="tsd-kind-icon">derive<wbr>Address</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-protected"><a href="_cardano_sdk_wallet.KeyManagement.TrezorKeyAgent.html#deriveCslPublicKey" class="tsd-kind-icon">derive<wbr>Csl<wbr>Public<wbr>Key</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_cardano_sdk_wallet.KeyManagement.TrezorKeyAgent.html#derivePublicKey" class="tsd-kind-icon">derive<wbr>Public<wbr>Key</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="_cardano_sdk_wallet.KeyManagement.TrezorKeyAgent.html#exportRootPrivateKey" class="tsd-kind-icon">export<wbr>Root<wbr>Private<wbr>Key</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="_cardano_sdk_wallet.KeyManagement.TrezorKeyAgent.html#signBlob" class="tsd-kind-icon">sign<wbr>Blob</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="_cardano_sdk_wallet.KeyManagement.TrezorKeyAgent.html#signTransaction" class="tsd-kind-icon">sign<wbr>Transaction</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="_cardano_sdk_wallet.KeyManagement.TrezorKeyAgent.html#checkDeviceConnection" class="tsd-kind-icon">check<wbr>Device<wbr>Connection</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="_cardano_sdk_wallet.KeyManagement.TrezorKeyAgent.html#createWithDevice" class="tsd-kind-icon">create<wbr>With<wbr>Device</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="_cardano_sdk_wallet.KeyManagement.TrezorKeyAgent.html#getXpub" class="tsd-kind-icon">get<wbr>Xpub</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="_cardano_sdk_wallet.KeyManagement.TrezorKeyAgent.html#initializeTrezorTransport" class="tsd-kind-icon">initialize<wbr>Trezor<wbr>Transport</a></li>
 							</ul>
 						</section>
 					</div>
@@ -138,49 +131,61 @@
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Constructors</h2>
-				<section class="tsd-panel tsd-member tsd-kind-constructor tsd-parent-kind-class">
+				<section class="tsd-panel tsd-member tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite">
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
-					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Key<wbr>Agent<wbr>Base<span class="tsd-signature-symbol">(</span>serializableData<span class="tsd-signature-symbol">: </span><a href="../modules/_cardano_sdk_wallet.KeyManagement.html#SerializableKeyAgentData" class="tsd-signature-type" data-tsd-kind="Type alias">SerializableKeyAgentData</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html" class="tsd-signature-type" data-tsd-kind="Class">KeyAgentBase</a></li>
+					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite">
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Trezor<wbr>Key<wbr>Agent<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TrezorKeyAgentProps</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_wallet.KeyManagement.TrezorKeyAgent.html" class="tsd-signature-type" data-tsd-kind="Class">TrezorKeyAgent</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
+								<p>Overrides <a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html">KeyAgentBase</a>.<a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html#constructor">constructor</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/ed9616c/packages/wallet/src/KeyManagement/KeyAgentBase.ts#L40">packages/wallet/src/KeyManagement/KeyAgentBase.ts:40</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/ed9616c/packages/wallet/src/KeyManagement/TrezorKeyAgent.ts#L27">packages/wallet/src/KeyManagement/TrezorKeyAgent.ts:27</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>serializableData: <a href="../modules/_cardano_sdk_wallet.KeyManagement.html#SerializableKeyAgentData" class="tsd-signature-type" data-tsd-kind="Type alias">SerializableKeyAgentData</a></h5>
+									<h5>__namedParameters: <span class="tsd-signature-type">TrezorKeyAgentProps</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html" class="tsd-signature-type" data-tsd-kind="Class">KeyAgentBase</a></h4>
+							<h4 class="tsd-returns-title">Returns <a href="_cardano_sdk_wallet.KeyManagement.TrezorKeyAgent.html" class="tsd-signature-type" data-tsd-kind="Class">TrezorKeyAgent</a></h4>
 						</li>
 					</ul>
 				</section>
 			</section>
-			<section class="tsd-panel-group tsd-member-group tsd-is-private tsd-is-private-protected">
+			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-private">
 					<a name="_serializableData" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagPrivate">Private</span> <span class="tsd-flag ts-flagReadonly">Readonly</span> #serializable<wbr>Data</h3>
 					<div class="tsd-signature tsd-kind-icon">#serializable<wbr>Data<span class="tsd-signature-symbol">:</span> <a href="../modules/_cardano_sdk_wallet.KeyManagement.html#SerializableKeyAgentData" class="tsd-signature-type" data-tsd-kind="Type alias">SerializableKeyAgentData</a></div>
 					<aside class="tsd-sources">
+						<p>Inherited from <a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html">KeyAgentBase</a>.<a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html#_serializableData">#serializableData</a></p>
 						<ul>
 							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/ed9616c/packages/wallet/src/KeyManagement/KeyAgentBase.ts#L16">packages/wallet/src/KeyManagement/KeyAgentBase.ts:16</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="isTrezorInitialized" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagReadonly">Readonly</span> is<wbr>Trezor<wbr>Initialized</h3>
+					<div class="tsd-signature tsd-kind-icon">is<wbr>Trezor<wbr>Initialized<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/ed9616c/packages/wallet/src/KeyManagement/TrezorKeyAgent.ts#L26">packages/wallet/src/KeyManagement/TrezorKeyAgent.ts:26</a></li>
 						</ul>
 					</aside>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Accessors</h2>
-				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class">
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
 					<a name="accountIndex" class="tsd-anchor"></a>
 					<h3>account<wbr>Index</h3>
-					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class">
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
 						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> accountIndex<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
@@ -194,10 +199,10 @@
 						</li>
 					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class">
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
 					<a name="extendedAccountPublicKey" class="tsd-anchor"></a>
 					<h3>extended<wbr>Account<wbr>Public<wbr>Key</h3>
-					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class">
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
 						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> extendedAccountPublicKey<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Bip32PublicKey</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
@@ -211,10 +216,10 @@
 						</li>
 					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class">
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
 					<a name="knownAddresses" class="tsd-anchor"></a>
 					<h3>known<wbr>Addresses</h3>
-					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class">
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
 						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> knownAddresses<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/_cardano_sdk_wallet.KeyManagement.GroupedAddress.html" class="tsd-signature-type" data-tsd-kind="Interface">GroupedAddress</a><span class="tsd-signature-symbol">[]</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
@@ -228,10 +233,10 @@
 						</li>
 					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class">
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
 					<a name="networkId" class="tsd-anchor"></a>
 					<h3>network<wbr>Id</h3>
-					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class">
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
 						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> networkId<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">NetworkId</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
@@ -245,10 +250,10 @@
 						</li>
 					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class">
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
 					<a name="serializableData" class="tsd-anchor"></a>
 					<h3>serializable<wbr>Data</h3>
-					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class">
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
 						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> serializableData<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../modules/_cardano_sdk_wallet.KeyManagement.html#SerializableKeyAgentData" class="tsd-signature-type" data-tsd-kind="Type alias">SerializableKeyAgentData</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
@@ -265,16 +270,16 @@
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Methods</h2>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
 					<a name="deriveAddress" class="tsd-anchor"></a>
 					<h3>derive<wbr>Address</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
 						<li class="tsd-signature tsd-kind-icon">derive<wbr>Address<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><a href="../interfaces/_cardano_sdk_wallet.KeyManagement.AccountAddressDerivationPath.html" class="tsd-signature-type" data-tsd-kind="Interface">AccountAddressDerivationPath</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_cardano_sdk_wallet.KeyManagement.GroupedAddress.html" class="tsd-signature-type" data-tsd-kind="Interface">GroupedAddress</a><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.KeyManagement.KeyAgent.html">KeyAgent</a>.<a href="../interfaces/_cardano_sdk_wallet.KeyManagement.KeyAgent.html#deriveAddress">deriveAddress</a></p>
+								<p>Inherited from <a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html">KeyAgentBase</a>.<a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html#deriveAddress">deriveAddress</a></p>
 								<ul>
 									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/ed9616c/packages/wallet/src/KeyManagement/KeyAgentBase.ts#L47">packages/wallet/src/KeyManagement/KeyAgentBase.ts:47</a></li>
 								</ul>
@@ -294,15 +299,16 @@
 						</li>
 					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-protected">
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-protected">
 					<a name="deriveCslPublicKey" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagProtected">Protected</span> derive<wbr>Csl<wbr>Public<wbr>Key</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-protected">
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-protected">
 						<li class="tsd-signature tsd-kind-icon">derive<wbr>Csl<wbr>Public<wbr>Key<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><a href="../interfaces/_cardano_sdk_wallet.KeyManagement.AccountKeyDerivationPath.html" class="tsd-signature-type" data-tsd-kind="Interface">AccountKeyDerivationPath</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">PublicKey</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
+								<p>Inherited from <a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html">KeyAgentBase</a>.<a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html#deriveCslPublicKey">deriveCslPublicKey</a></p>
 								<ul>
 									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/ed9616c/packages/wallet/src/KeyManagement/KeyAgentBase.ts#L81">packages/wallet/src/KeyManagement/KeyAgentBase.ts:81</a></li>
 								</ul>
@@ -317,16 +323,16 @@
 						</li>
 					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
 					<a name="derivePublicKey" class="tsd-anchor"></a>
 					<h3>derive<wbr>Public<wbr>Key</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
 						<li class="tsd-signature tsd-kind-icon">derive<wbr>Public<wbr>Key<span class="tsd-signature-symbol">(</span>derivationPath<span class="tsd-signature-symbol">: </span><a href="../interfaces/_cardano_sdk_wallet.KeyManagement.AccountKeyDerivationPath.html" class="tsd-signature-type" data-tsd-kind="Interface">AccountKeyDerivationPath</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Ed25519PublicKey</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.KeyManagement.KeyAgent.html">KeyAgent</a>.<a href="../interfaces/_cardano_sdk_wallet.KeyManagement.KeyAgent.html#derivePublicKey">derivePublicKey</a></p>
+								<p>Inherited from <a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html">KeyAgentBase</a>.<a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html#derivePublicKey">derivePublicKey</a></p>
 								<ul>
 									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/ed9616c/packages/wallet/src/KeyManagement/KeyAgentBase.ts#L76">packages/wallet/src/KeyManagement/KeyAgentBase.ts:76</a></li>
 								</ul>
@@ -341,75 +347,171 @@
 						</li>
 					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
 					<a name="exportRootPrivateKey" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagAbstract">Abstract</span> export<wbr>Root<wbr>Private<wbr>Key</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+					<h3>export<wbr>Root<wbr>Private<wbr>Key</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
 						<li class="tsd-signature tsd-kind-icon">export<wbr>Root<wbr>Private<wbr>Key<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Bip32PrivateKey</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.KeyManagement.KeyAgent.html">KeyAgent</a>.<a href="../interfaces/_cardano_sdk_wallet.KeyManagement.KeyAgent.html#exportRootPrivateKey">exportRootPrivateKey</a></p>
+								<p>Overrides <a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html">KeyAgentBase</a>.<a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html#exportRootPrivateKey">exportRootPrivateKey</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/ed9616c/packages/wallet/src/KeyManagement/KeyAgentBase.ts#L34">packages/wallet/src/KeyManagement/KeyAgentBase.ts:34</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/ed9616c/packages/wallet/src/KeyManagement/TrezorKeyAgent.ts#L131">packages/wallet/src/KeyManagement/TrezorKeyAgent.ts:131</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Bip32PrivateKey</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
 					<a name="signBlob" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagAbstract">Abstract</span> sign<wbr>Blob</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">sign<wbr>Blob<span class="tsd-signature-symbol">(</span>derivationPath<span class="tsd-signature-symbol">: </span><a href="../interfaces/_cardano_sdk_wallet.KeyManagement.AccountKeyDerivationPath.html" class="tsd-signature-type" data-tsd-kind="Interface">AccountKeyDerivationPath</a>, blob<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">HexBlob</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_cardano_sdk_wallet.KeyManagement.SignBlobResult.html" class="tsd-signature-type" data-tsd-kind="Interface">SignBlobResult</a><span class="tsd-signature-symbol">&gt;</span></li>
+					<h3>sign<wbr>Blob</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+						<li class="tsd-signature tsd-kind-icon">sign<wbr>Blob<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_cardano_sdk_wallet.KeyManagement.SignBlobResult.html" class="tsd-signature-type" data-tsd-kind="Interface">SignBlobResult</a><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.KeyManagement.KeyAgent.html">KeyAgent</a>.<a href="../interfaces/_cardano_sdk_wallet.KeyManagement.KeyAgent.html#signBlob">signBlob</a></p>
+								<p>Overrides <a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html">KeyAgentBase</a>.<a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html#signBlob">signBlob</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/ed9616c/packages/wallet/src/KeyManagement/KeyAgentBase.ts#L33">packages/wallet/src/KeyManagement/KeyAgentBase.ts:33</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/ed9616c/packages/wallet/src/KeyManagement/TrezorKeyAgent.ts#L127">packages/wallet/src/KeyManagement/TrezorKeyAgent.ts:127</a></li>
 								</ul>
 							</aside>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>derivationPath: <a href="../interfaces/_cardano_sdk_wallet.KeyManagement.AccountKeyDerivationPath.html" class="tsd-signature-type" data-tsd-kind="Interface">AccountKeyDerivationPath</a></h5>
-								</li>
-								<li>
-									<h5>blob: <span class="tsd-signature-type">HexBlob</span></h5>
-								</li>
-							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_cardano_sdk_wallet.KeyManagement.SignBlobResult.html" class="tsd-signature-type" data-tsd-kind="Interface">SignBlobResult</a><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
 					<a name="signTransaction" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagAbstract">Abstract</span> sign<wbr>Transaction</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">sign<wbr>Transaction<span class="tsd-signature-symbol">(</span>txInternals<span class="tsd-signature-symbol">: </span><a href="../modules/_cardano_sdk_wallet.Transaction.html#TxInternals" class="tsd-signature-type" data-tsd-kind="Type alias">TxInternals</a>, signTransactionOptions<span class="tsd-signature-symbol">: </span><a href="../interfaces/_cardano_sdk_wallet.KeyManagement.SignTransactionOptions.html" class="tsd-signature-type" data-tsd-kind="Interface">SignTransactionOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Signatures</span><span class="tsd-signature-symbol">&gt;</span></li>
+					<h3>sign<wbr>Transaction</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+						<li class="tsd-signature tsd-kind-icon">sign<wbr>Transaction<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Signatures</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.KeyManagement.KeyAgent.html">KeyAgent</a>.<a href="../interfaces/_cardano_sdk_wallet.KeyManagement.KeyAgent.html#signTransaction">signTransaction</a></p>
+								<p>Overrides <a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html">KeyAgentBase</a>.<a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html#signTransaction">signTransaction</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/ed9616c/packages/wallet/src/KeyManagement/KeyAgentBase.ts#L35">packages/wallet/src/KeyManagement/KeyAgentBase.ts:35</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/ed9616c/packages/wallet/src/KeyManagement/TrezorKeyAgent.ts#L119">packages/wallet/src/KeyManagement/TrezorKeyAgent.ts:119</a></li>
 								</ul>
 							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Signatures</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-static">
+					<a name="checkDeviceConnection" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> check<wbr>Device<wbr>Connection</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-static">
+						<li class="tsd-signature tsd-kind-icon">check<wbr>Device<wbr>Connection<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Features</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/ed9616c/packages/wallet/src/KeyManagement/TrezorKeyAgent.ts#L66">packages/wallet/src/KeyManagement/TrezorKeyAgent.ts:66</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<dl class="tsd-comment-tags">
+									<dt>throws</dt>
+									<dd><p>AuthenticationError</p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Features</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-static">
+					<a name="createWithDevice" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> create<wbr>With<wbr>Device</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-static">
+						<li class="tsd-signature tsd-kind-icon">create<wbr>With<wbr>Device<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">CreateTrezorKeyAgentProps</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="_cardano_sdk_wallet.KeyManagement.TrezorKeyAgent.html" class="tsd-signature-type" data-tsd-kind="Class">TrezorKeyAgent</a><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/ed9616c/packages/wallet/src/KeyManagement/TrezorKeyAgent.ts#L104">packages/wallet/src/KeyManagement/TrezorKeyAgent.ts:104</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<dl class="tsd-comment-tags">
+									<dt>throws</dt>
+									<dd><p>AuthenticationError</p>
+									</dd>
+								</dl>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>txInternals: <a href="../modules/_cardano_sdk_wallet.Transaction.html#TxInternals" class="tsd-signature-type" data-tsd-kind="Type alias">TxInternals</a></h5>
-								</li>
-								<li>
-									<h5>signTransactionOptions: <a href="../interfaces/_cardano_sdk_wallet.KeyManagement.SignTransactionOptions.html" class="tsd-signature-type" data-tsd-kind="Interface">SignTransactionOptions</a></h5>
+									<h5>__namedParameters: <span class="tsd-signature-type">CreateTrezorKeyAgentProps</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Signatures</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="_cardano_sdk_wallet.KeyManagement.TrezorKeyAgent.html" class="tsd-signature-type" data-tsd-kind="Class">TrezorKeyAgent</a><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-static">
+					<a name="getXpub" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> get<wbr>Xpub</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-static">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Xpub<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">GetTrezorXpubProps</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Bip32PublicKey</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/ed9616c/packages/wallet/src/KeyManagement/TrezorKeyAgent.ts#L84">packages/wallet/src/KeyManagement/TrezorKeyAgent.ts:84</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<dl class="tsd-comment-tags">
+									<dt>throws</dt>
+									<dd><p>AuthenticationError</p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>__namedParameters: <span class="tsd-signature-type">GetTrezorXpubProps</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Bip32PublicKey</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-static">
+					<a name="initializeTrezorTransport" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> initialize<wbr>Trezor<wbr>Transport</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-static">
+						<li class="tsd-signature tsd-kind-icon">initialize<wbr>Trezor<wbr>Transport<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><a href="../interfaces/_cardano_sdk_wallet.KeyManagement.TrezorConfig.html" class="tsd-signature-type" data-tsd-kind="Interface">TrezorConfig</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/ed9616c/packages/wallet/src/KeyManagement/TrezorKeyAgent.ts#L37">packages/wallet/src/KeyManagement/TrezorKeyAgent.ts:37</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<dl class="tsd-comment-tags">
+									<dt>throws</dt>
+									<dd><p>AuthenticationError</p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>__namedParameters: <a href="../interfaces/_cardano_sdk_wallet.KeyManagement.TrezorConfig.html" class="tsd-signature-type" data-tsd-kind="Interface">TrezorConfig</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -443,60 +545,75 @@
 					<li class=" tsd-kind-class tsd-parent-kind-namespace">
 						<a href="_cardano_sdk_wallet.KeyManagement.InMemoryKeyAgent.html" class="tsd-kind-icon">In<wbr>Memory<wbr>Key<wbr>Agent</a>
 					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-namespace">
+						<a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html" class="tsd-kind-icon">Key<wbr>Agent<wbr>Base</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-namespace">
+						<a href="_cardano_sdk_wallet.KeyManagement.LedgerKeyAgent.html" class="tsd-kind-icon">Ledger<wbr>Key<wbr>Agent</a>
+					</li>
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-class tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html" class="tsd-kind-icon">Key<wbr>Agent<wbr>Base</a>
+						<a href="_cardano_sdk_wallet.KeyManagement.TrezorKeyAgent.html" class="tsd-kind-icon">Trezor<wbr>Key<wbr>Agent</a>
 						<ul>
-							<li class=" tsd-kind-constructor tsd-parent-kind-class">
-								<a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html#constructor" class="tsd-kind-icon">constructor</a>
+							<li class=" tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite">
+								<a href="_cardano_sdk_wallet.KeyManagement.TrezorKeyAgent.html#constructor" class="tsd-kind-icon">constructor</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
-								<a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html#_serializableData" class="tsd-kind-icon">#serializable<wbr>Data</a>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-private">
+								<a href="_cardano_sdk_wallet.KeyManagement.TrezorKeyAgent.html#_serializableData" class="tsd-kind-icon">#serializable<wbr>Data</a>
 							</li>
-							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
-								<a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html#accountIndex" class="tsd-kind-icon">account<wbr>Index</a>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_cardano_sdk_wallet.KeyManagement.TrezorKeyAgent.html#isTrezorInitialized" class="tsd-kind-icon">is<wbr>Trezor<wbr>Initialized</a>
 							</li>
-							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
-								<a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html#extendedAccountPublicKey" class="tsd-kind-icon">extended<wbr>Account<wbr>Public<wbr>Key</a>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+								<a href="_cardano_sdk_wallet.KeyManagement.TrezorKeyAgent.html#accountIndex" class="tsd-kind-icon">account<wbr>Index</a>
 							</li>
-							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
-								<a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html#knownAddresses" class="tsd-kind-icon">known<wbr>Addresses</a>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+								<a href="_cardano_sdk_wallet.KeyManagement.TrezorKeyAgent.html#extendedAccountPublicKey" class="tsd-kind-icon">extended<wbr>Account<wbr>Public<wbr>Key</a>
 							</li>
-							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
-								<a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html#networkId" class="tsd-kind-icon">network<wbr>Id</a>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+								<a href="_cardano_sdk_wallet.KeyManagement.TrezorKeyAgent.html#knownAddresses" class="tsd-kind-icon">known<wbr>Addresses</a>
 							</li>
-							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
-								<a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html#serializableData" class="tsd-kind-icon">serializable<wbr>Data</a>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+								<a href="_cardano_sdk_wallet.KeyManagement.TrezorKeyAgent.html#networkId" class="tsd-kind-icon">network<wbr>Id</a>
 							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html#deriveAddress" class="tsd-kind-icon">derive<wbr>Address</a>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class tsd-is-inherited">
+								<a href="_cardano_sdk_wallet.KeyManagement.TrezorKeyAgent.html#serializableData" class="tsd-kind-icon">serializable<wbr>Data</a>
 							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-protected">
-								<a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html#deriveCslPublicKey" class="tsd-kind-icon">derive<wbr>Csl<wbr>Public<wbr>Key</a>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="_cardano_sdk_wallet.KeyManagement.TrezorKeyAgent.html#deriveAddress" class="tsd-kind-icon">derive<wbr>Address</a>
 							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html#derivePublicKey" class="tsd-kind-icon">derive<wbr>Public<wbr>Key</a>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-protected">
+								<a href="_cardano_sdk_wallet.KeyManagement.TrezorKeyAgent.html#deriveCslPublicKey" class="tsd-kind-icon">derive<wbr>Csl<wbr>Public<wbr>Key</a>
 							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html#exportRootPrivateKey" class="tsd-kind-icon">export<wbr>Root<wbr>Private<wbr>Key</a>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="_cardano_sdk_wallet.KeyManagement.TrezorKeyAgent.html#derivePublicKey" class="tsd-kind-icon">derive<wbr>Public<wbr>Key</a>
 							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html#signBlob" class="tsd-kind-icon">sign<wbr>Blob</a>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+								<a href="_cardano_sdk_wallet.KeyManagement.TrezorKeyAgent.html#exportRootPrivateKey" class="tsd-kind-icon">export<wbr>Root<wbr>Private<wbr>Key</a>
 							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_cardano_sdk_wallet.KeyManagement.KeyAgentBase.html#signTransaction" class="tsd-kind-icon">sign<wbr>Transaction</a>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+								<a href="_cardano_sdk_wallet.KeyManagement.TrezorKeyAgent.html#signBlob" class="tsd-kind-icon">sign<wbr>Blob</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+								<a href="_cardano_sdk_wallet.KeyManagement.TrezorKeyAgent.html#signTransaction" class="tsd-kind-icon">sign<wbr>Transaction</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static">
+								<a href="_cardano_sdk_wallet.KeyManagement.TrezorKeyAgent.html#checkDeviceConnection" class="tsd-kind-icon">check<wbr>Device<wbr>Connection</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static">
+								<a href="_cardano_sdk_wallet.KeyManagement.TrezorKeyAgent.html#createWithDevice" class="tsd-kind-icon">create<wbr>With<wbr>Device</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static">
+								<a href="_cardano_sdk_wallet.KeyManagement.TrezorKeyAgent.html#getXpub" class="tsd-kind-icon">get<wbr>Xpub</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static">
+								<a href="_cardano_sdk_wallet.KeyManagement.TrezorKeyAgent.html#initializeTrezorTransport" class="tsd-kind-icon">initialize<wbr>Trezor<wbr>Transport</a>
 							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
-					<li class=" tsd-kind-class tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_wallet.KeyManagement.LedgerKeyAgent.html" class="tsd-kind-icon">Ledger<wbr>Key<wbr>Agent</a>
-					</li>
-					<li class=" tsd-kind-class tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_wallet.KeyManagement.TrezorKeyAgent.html" class="tsd-kind-icon">Trezor<wbr>Key<wbr>Agent</a>
-					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-namespace">
 						<a href="../interfaces/_cardano_sdk_wallet.KeyManagement.AccountAddressDerivationPath.html" class="tsd-kind-icon">Account<wbr>Address<wbr>Derivation<wbr>Path</a>
 					</li>
@@ -587,6 +704,7 @@
 				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
 				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
 				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
 				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
 			</ul>
 			<ul class="tsd-legend">
@@ -597,10 +715,10 @@
 				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
 			</ul>
 			<ul class="tsd-legend">
-				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected method</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
 			</ul>
 			<ul class="tsd-legend">
-				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
 			</ul>
 		</div>
 	</div>
