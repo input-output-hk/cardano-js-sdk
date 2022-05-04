@@ -264,6 +264,9 @@ export const txAuxiliaryData = (auxiliaryData?: CSL.AuxiliaryData): Cardano.Auxi
   };
 };
 
+export const utxo = (cslUtxos: CSL.TransactionUnspentOutput[]) =>
+  cslUtxos.map((cslUtxo) => [txIn(cslUtxo.input()), txOut(cslUtxo.output())]);
+
 export const newTx = (cslTx: CSL.Transaction): Cardano.NewTxAlonzo => {
   const transactionHash = Cardano.TransactionId.fromHexBlob(
     util.bytesToHex(CSL.hash_transaction(cslTx.body()).to_bytes())
