@@ -128,7 +128,7 @@ export const createWalletApi = (
       return [address.toString()];
     }
   },
-  getUtxos: async (amount?: Cbor, paginate?: Paginate): Promise<Cardano.Utxo[] | undefined> => {
+  getUtxos: async (amount?: Cbor, paginate?: Paginate): Promise<Cbor[] | undefined> => {
     let utxos = await firstValueFrom(wallet.utxo.available$);
 
     if (amount) {
@@ -155,7 +155,7 @@ export const createWalletApi = (
       utxos = utxos.slice(paginate.page * paginate.limit, paginate.page * paginate.limit + paginate.limit);
     }
 
-    return Promise.resolve(utxos);
+    return Promise.resolve(coreToCsl.utxo(utxos).map(utxo => Buffer.from(utxo.to_bytes()).toString('hex')));
   },
   signData: async (addr: Cardano.Address, payload: Bytes): Promise<Cip30DataSignature> => {
     logger.debug('signData');

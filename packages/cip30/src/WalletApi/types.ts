@@ -54,7 +54,7 @@ export type GetNetworkId = () => Promise<Cardano.NetworkId>;
  * @throws ApiError
  * @throws PaginateError
  */
-export type GetUtxos = (amount?: Cbor, paginate?: Paginate) => Promise<Cardano.Utxo[] | undefined>;
+export type GetUtxos = (amount?: Cbor, paginate?: Paginate) => Promise<Cbor[] | undefined>;
 
 /**
  * Returns the total balance available of the wallet.

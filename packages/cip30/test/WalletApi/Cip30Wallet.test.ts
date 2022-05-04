@@ -70,19 +70,8 @@ describe('Wallet', () => {
       expect(api.getUtxos).toBeDefined();
       expect(typeof api.getUtxos).toBe('function');
 
-      const uxtos = await api.getUtxos();
-      expect(uxtos).toEqual([
-        [
-          { index: 0, txId: Cardano.TransactionId('886206542d63b23a047864021fbfccf291d78e47c1e59bd4c75fbc67b248c5e8') },
-          {
-            address: Cardano.Address(
-              // eslint-disable-next-line max-len
-              'addr_test1qra788mu4sg8kwd93ns9nfdh3k4ufxwg4xhz2r3n064tzfgxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flkns6cy45x'
-            ),
-            value: { assets: {}, coins: 100n }
-          }
-        ]
-      ]);
+      const utxos = await api.getUtxos();
+      expect(typeof utxos![0]).toBe('string');
     });
 
     test('getBalance', async () => {

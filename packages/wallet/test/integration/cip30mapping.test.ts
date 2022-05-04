@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, sonarjs/no-duplicate-string */
-import { CSL, Cardano, coreToCsl } from '@cardano-sdk/core';
+import { CSL, Cardano, coreToCsl, cslToCore } from '@cardano-sdk/core';
 import { DataSignError, TxSendError, TxSignError, WalletApi } from '@cardano-sdk/cip30';
 import { InitializeTxProps, InitializeTxResult, SingleAddressWallet, cip30 } from '../../src';
 import { createWallet } from './util';
@@ -44,7 +44,9 @@ describe('cip30', () => {
 
     test('api.getUtxos', async () => {
       const utxos = await api.getUtxos();
-      expect(() => coreToCsl.utxo(utxos!)).not.toThrow();
+      expect(() =>
+        cslToCore.utxo(utxos!.map((utxo) => CSL.TransactionUnspentOutput.from_bytes(Buffer.from(utxo, 'hex'))))
+      ).not.toThrow();
     });
 
     test('api.getBalance', async () => {
