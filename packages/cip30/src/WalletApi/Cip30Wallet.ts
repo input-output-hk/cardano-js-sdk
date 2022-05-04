@@ -92,6 +92,7 @@ export class Cip30Wallet {
 export const WalletApiMethodNames: (keyof WalletApi)[] = [
   'getNetworkId',
   'getUtxos',
+  'getCollateral',
   'getBalance',
   'getUsedAddresses',
   'getUnusedAddresses',

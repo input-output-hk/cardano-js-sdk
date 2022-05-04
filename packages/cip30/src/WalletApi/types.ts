@@ -57,6 +57,15 @@ export type GetNetworkId = () => Promise<Cardano.NetworkId>;
 export type GetUtxos = (amount?: Cbor, paginate?: Paginate) => Promise<Cbor[] | undefined>;
 
 /**
+ * @returns a list of one or more UTxOs (unspent transaction outputs) controlled by the wallet
+ * that are required to reach AT LEAST the combined ADA value target specified in amount
+ * AND the best suitable to be used as collateral inputs
+ * for transactions with plutus script inputs (pure ADA-only UTxOs).
+ * @throws ApiError
+ */
+export type GetCollateral = (params: { amount: Cbor }) => Promise<Cbor[] | null>;
+
+/**
  * Returns the total balance available of the wallet.
  *
  * This is the same as summing the results of `api.getUtxos()`, but it is both useful to dApps
@@ -155,6 +164,8 @@ export interface WalletApi {
   getUtxos: GetUtxos;
 
   getBalance: GetBalance;
+
+  getCollateral: GetCollateral;
 
   getUsedAddresses: GetUsedAddresses;
 

@@ -1,10 +1,11 @@
 import { Cardano, coreToCsl } from '@cardano-sdk/core';
+import { Cip30DataSignature, WalletApi, WalletProperties } from '../src/WalletApi';
 import { RemoteAuthenticator } from '../src';
-import { WalletApi, WalletProperties } from '../src/WalletApi';
 
 export const api = <WalletApi>{
   getBalance: async () => '100',
   getChangeAddress: async () => 'change-address',
+  getCollateral: async () => null,
   getNetworkId: async () => 0,
   getRewardAddresses: async () => ['reward-address-1', 'reward-address-2'],
   getUnusedAddresses: async () => ['unused-address-1', 'unused-address-2', 'unused-address-3'],
@@ -28,7 +29,7 @@ export const api = <WalletApi>{
         ]
       ])
       .map((utxo) => Buffer.from(utxo.to_bytes()).toString('hex')),
-  signData: async (_addr, _payload) => ({}),
+  signData: async (_addr, _payload) => ({} as Cip30DataSignature),
   signTx: async (_tx) => 'signedTransaction',
   submitTx: async (_tx) => 'transactionId'
 };

@@ -91,6 +91,10 @@ export const createWalletApi = (
       throw new ApiError(500, 'Nope');
     }
   },
+  getCollateral: async () => {
+    logger.warn('getCollateral is not implemented');
+    return null;
+  },
   getNetworkId: async (): Promise<number> => {
     logger.debug('getting networkId');
     return Promise.resolve(wallet.keyAgent.networkId);
@@ -155,7 +159,7 @@ export const createWalletApi = (
       utxos = utxos.slice(paginate.page * paginate.limit, paginate.page * paginate.limit + paginate.limit);
     }
 
-    return Promise.resolve(coreToCsl.utxo(utxos).map(utxo => Buffer.from(utxo.to_bytes()).toString('hex')));
+    return Promise.resolve(coreToCsl.utxo(utxos).map((utxo) => Buffer.from(utxo.to_bytes()).toString('hex')));
   },
   signData: async (addr: Cardano.Address, payload: Bytes): Promise<Cip30DataSignature> => {
     logger.debug('signData');
