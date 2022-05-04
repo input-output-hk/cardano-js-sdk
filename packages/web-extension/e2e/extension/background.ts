@@ -5,18 +5,10 @@ import {
   createPersistentAuthenticatorStorage,
   initializeBackgroundScript
 } from '@cardano-sdk/cip30';
-import { SingleAddressWallet, cip30, storage as walletStorage } from '@cardano-sdk/wallet';
 import { Tabs, runtime, storage, tabs } from 'webextension-polyfill';
 import { UserPromptService, userPromptServiceChannel, walletName } from './util';
-import {
-  assetProvider,
-  keyAgentReady,
-  networkInfoProvider,
-  stakePoolSearchProvider,
-  txSubmitProvider,
-  walletProvider
-} from './config';
 import { consumeRemotePromiseApi } from '@cardano-sdk/web-extension';
+import { stubWalletApi } from './stubWalletApi';
 
 const waitForTabLoad = (tab: Tabs.Tab) =>
   new Promise<void>((resolve) => {
@@ -52,23 +44,25 @@ const requestAccess: RequestAccess = async (origin) => {
   await ensureUiIsOpenAndLoaded();
   return await userPromptService.allowOrigin(origin);
 };
-const confirmationCallback: cip30.CallbackConfirmation = async () => true;
 
 void (async () => {
-  const wallet = new SingleAddressWallet(
-    { name: walletName },
-    {
-      assetProvider: await assetProvider,
-      keyAgent: await keyAgentReady,
-      logger,
-      networkInfoProvider: await networkInfoProvider,
-      stakePoolSearchProvider: await stakePoolSearchProvider,
-      stores: walletStorage.createPouchdbWalletStores(walletName),
-      txSubmitProvider: await txSubmitProvider,
-      walletProvider: await walletProvider
-    }
-  );
-  const walletApi = cip30.createWalletApi(wallet, confirmationCallback, { logger });
+  // TODO: test with real wallet once blockfrost load issue is resolved
+  // const confirmationCallback: cip30.CallbackConfirmation = async () => true;
+  // const wallet = new SingleAddressWallet(
+  //   { name: walletName },
+  //   {
+  //     assetProvider: await assetProvider,
+  //     keyAgent: await keyAgentReady,
+  //     logger,
+  //     networkInfoProvider: await networkInfoProvider,
+  //     stakePoolSearchProvider: await stakePoolSearchProvider,
+  //     stores: walletStorage.createPouchdbWalletStores(walletName),
+  //     txSubmitProvider: await txSubmitProvider,
+  //     walletProvider: await walletProvider
+  //   }
+  // );
+  // const walletApi = cip30.createWalletApi(wallet, confirmationCallback, { logger });
+  const walletApi = stubWalletApi;
   const authenticatorStorage = createPersistentAuthenticatorStorage(`${walletName}Origins`, storage.local);
   const authenticator = await PersistentAuthenticator.create(
     { requestAccess },
