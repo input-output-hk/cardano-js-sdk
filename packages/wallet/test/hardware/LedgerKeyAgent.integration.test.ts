@@ -1,6 +1,6 @@
 import { Cardano } from '@cardano-sdk/core';
 import { CommunicationType, KeyAgent, LedgerKeyAgent, restoreKeyAgent } from '../../src/KeyManagement';
-import { SingleAddressWallet, Wallet } from '../../src';
+import { ObservableWallet, SingleAddressWallet } from '../../src';
 import { createStubStakePoolSearchProvider } from '@cardano-sdk/util-dev';
 import { firstValueFrom } from 'rxjs';
 import { mockAssetProvider, mockNetworkInfoProvider, mockTxSubmitProvider, mockWalletProvider } from '../mocks';
@@ -24,7 +24,7 @@ const createWallet = (keyAgent: KeyAgent) => {
   );
 };
 
-const getAddress = async (wallet: Wallet) => (await firstValueFrom(wallet.addresses$))[0].address;
+const getAddress = async (wallet: ObservableWallet) => (await firstValueFrom(wallet.addresses$))[0].address;
 
 describe('LedgerKeyAgent+SingleAddressWallet', () => {
   test('creating and restoring LedgerKeyAgent wallet', async () => {

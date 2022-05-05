@@ -11,7 +11,7 @@ import {
   WalletProvider,
   coreToCsl
 } from '@cardano-sdk/core';
-import { Assets, InitializeTxProps, InitializeTxResult, SignDataProps, SyncStatus, Wallet } from './types';
+import { Assets, InitializeTxProps, InitializeTxResult, ObservableWallet, SignDataProps, SyncStatus } from './types';
 import {
   Balance,
   BehaviorObservable,
@@ -71,7 +71,7 @@ export interface SingleAddressWalletDependencies {
   readonly logger?: Logger;
 }
 
-export class SingleAddressWallet implements Wallet {
+export class SingleAddressWallet implements ObservableWallet {
   #inputSelector: InputSelector;
   #logger: Logger;
   #tip$: SyncableIntervalPersistentDocumentTrackerSubject<Cardano.Tip>;

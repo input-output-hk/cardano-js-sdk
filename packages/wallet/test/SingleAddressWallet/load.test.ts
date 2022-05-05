@@ -3,7 +3,7 @@
 import * as mocks from '../mocks';
 import { AssetId, createStubStakePoolSearchProvider, somePartialStakePools } from '@cardano-sdk/util-dev';
 import { Cardano, WalletProvider, testnetTimeSettings } from '@cardano-sdk/core';
-import { KeyManagement, SingleAddressWallet, Wallet } from '../../src';
+import { KeyManagement, ObservableWallet, SingleAddressWallet } from '../../src';
 import { WalletStores, createInMemoryWalletStores } from '../../src/persistence';
 import {
   currentEpoch,
@@ -97,7 +97,7 @@ const assertWalletProperties = async (
   expect(typeof wallet.util).toBe('object');
 };
 
-const assertWalletProperties2 = async (wallet: Wallet) => {
+const assertWalletProperties2 = async (wallet: ObservableWallet) => {
   expect(wallet.utxo.available$.value).toEqual(mocks.utxo2);
   expect(wallet.utxo.total$.value).toEqual(mocks.utxo2);
   expect(wallet.balance.available$.value?.coins).toEqual(

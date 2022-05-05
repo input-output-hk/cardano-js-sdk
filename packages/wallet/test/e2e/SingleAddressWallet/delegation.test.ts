@@ -1,6 +1,6 @@
 /* eslint-disable max-statements */
 import { Cardano } from '@cardano-sdk/core';
-import { SingleAddressWallet, StakeKeyStatus, Wallet, txInEquals } from '../../../src';
+import { ObservableWallet, SingleAddressWallet, StakeKeyStatus, txInEquals } from '../../../src';
 import { TX_TIMEOUT, firstValueFromTimed, waitForWalletStateSettle } from '../../util';
 import { TxInternals } from '../../../src/Transaction';
 import {
@@ -15,7 +15,7 @@ import {
 } from '../config';
 import { combineLatest, filter, firstValueFrom } from 'rxjs';
 
-const getWalletStateSnapshot = (wallet: Wallet) => {
+const getWalletStateSnapshot = (wallet: ObservableWallet) => {
   const [rewardAccount] = wallet.delegation.rewardAccounts$.value!;
   return {
     balance: { available: wallet.balance.available$.value!, total: wallet.balance.total$.value! },
@@ -51,7 +51,7 @@ const createDelegationCertificates = ({
   };
 };
 
-const waitForTx = async (wallet: Wallet, { hash }: TxInternals) => {
+const waitForTx = async (wallet: ObservableWallet, { hash }: TxInternals) => {
   await firstValueFromTimed(
     combineLatest([
       wallet.transactions.history$.pipe(filter((txs) => txs.some(({ id }) => id === hash))),
@@ -78,8 +78,8 @@ const getWallet = async (idx: number) =>
   );
 
 describe('SingleAddressWallet/delegation', () => {
-  let wallet1: Wallet;
-  let wallet2: Wallet;
+  let wallet1: ObservableWallet;
+  let wallet2: ObservableWallet;
 
   beforeAll(async () => {
     jest.setTimeout(180_000);
@@ -93,7 +93,7 @@ describe('SingleAddressWallet/delegation', () => {
     wallet2.shutdown();
   });
 
-  const chooseWallets = async (): Promise<[Wallet, Wallet]> => {
+  const chooseWallets = async (): Promise<[ObservableWallet, ObservableWallet]> => {
     const wallet1Balance = await firstValueFrom(wallet1.balance.available$);
     const wallet2Balance = await firstValueFrom(wallet2.balance.available$);
     return wallet1Balance.coins > wallet2Balance.coins ? [wallet1, wallet2] : [wallet2, wallet1];
