@@ -1,6 +1,11 @@
 // tested in web-extension/e2e tests
 import { ApiError, DataSignError, PaginateError, TxSendError, TxSignError } from '../errors';
-import { MessengerDependencies, consumeRemotePromiseApi } from '@cardano-sdk/web-extension';
+import {
+  MessengerDependencies,
+  RemoteApiProperties,
+  RemoteApiProperty,
+  consumeRemoteApi
+} from '@cardano-sdk/web-extension';
 import { WalletApi, WalletApiMethodNames } from '.';
 import { util } from '@cardano-sdk/core';
 import { walletApiChannel } from './util';
@@ -18,7 +23,13 @@ export const consumeRemoteWalletApi = (
   { walletName }: ConsumeRemoteWalletApiProps,
   dependencies: MessengerDependencies
 ): WalletApi =>
-  consumeRemotePromiseApi(
-    { channel: walletApiChannel(walletName), getErrorPrototype, validMethodNames: WalletApiMethodNames },
+  consumeRemoteApi(
+    {
+      baseChannel: walletApiChannel(walletName),
+      getErrorPrototype,
+      properties: Object.fromEntries(
+        WalletApiMethodNames.map((prop) => [prop, RemoteApiProperty.MethodReturningPromise])
+      ) as RemoteApiProperties<WalletApi>
+    },
     dependencies
   );

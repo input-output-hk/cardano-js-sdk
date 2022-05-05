@@ -1,5 +1,10 @@
 // tested in web-extension/e2e tests
-import { MessengerDependencies, consumeRemotePromiseApi } from '@cardano-sdk/web-extension';
+import {
+  MessengerDependencies,
+  RemoteApiProperties,
+  RemoteApiProperty,
+  consumeRemoteApi
+} from '@cardano-sdk/web-extension';
 import { RemoteAuthenticator, RemoteAuthenticatorMethod } from './types';
 import { authenticatorChannel } from './util';
 
@@ -17,7 +22,12 @@ export const consumeRemoteAuthenticatorApi = (
   { walletName }: RemoteAuthenticatorApiProps,
   dependencies: MessengerDependencies
 ) =>
-  consumeRemotePromiseApi<RemoteAuthenticator>(
-    { channel: authenticatorChannel(walletName), validMethodNames: RemoteAuthenticatorMethodNames },
+  consumeRemoteApi<RemoteAuthenticator>(
+    {
+      baseChannel: authenticatorChannel(walletName),
+      properties: Object.fromEntries(
+        RemoteAuthenticatorMethodNames.map((prop) => [prop, RemoteApiProperty.MethodReturningPromise])
+      ) as RemoteApiProperties<RemoteAuthenticator>
+    },
     dependencies
   );

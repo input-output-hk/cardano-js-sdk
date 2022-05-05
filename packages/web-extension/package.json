@@ -31,16 +31,17 @@
     "test:debug": "DEBUG=true yarn test"
   },
   "devDependencies": {
+    "@cardano-sdk/cip30": " 0.2.0",
+    "@cardano-sdk/wallet": " 0.2.0",
     "@emurgo/cardano-message-signing-asmjs": "^1.0.1",
     "@emurgo/cardano-serialization-lib-asmjs": "^9.1.0",
+    "@types/uuid": "^8.3.4",
     "@types/webextension-polyfill": "^0.8.0",
     "@wdio/cli": "^7.19.5",
     "@wdio/local-runner": "^7.19.5",
     "@wdio/mocha-framework": "^7.19.5",
     "@wdio/spec-reporter": "^7.19.5",
     "@wdio/static-server-service": "^7.19.5",
-    "@cardano-sdk/cip30": " 0.2.0",
-    "@cardano-sdk/wallet": " 0.2.0",
     "chromedriver": "^100.0.0",
     "copy-webpack-plugin": "^10.2.4",
     "dotenv": "^16.0.0",
@@ -59,6 +60,7 @@
     "@cardano-sdk/core": " 0.2.0",
     "rxjs": "^7.4.0",
     "ts-log": "^2.2.3",
+    "uuid": "^8.3.2",
     "webextension-polyfill": "^0.8.0"
   },
   "files": [

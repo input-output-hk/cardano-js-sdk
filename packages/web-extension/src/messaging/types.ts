@@ -62,36 +62,46 @@ export interface MessengerOptions {
   /**
    * Only used in non-background process for now
    */
-  clientName?: string;
-  /**
-   * Only used in non-background process for now
-   */
   reconnectConfig?: ReconnectConfig;
 }
 
-export interface ExposePromiseApiProps<API extends object> extends MessengerOptions {
-  channel: ChannelName;
+export interface ExposeApiProps<API extends object> extends MessengerOptions {
+  baseChannel: ChannelName;
   api: API;
-  transformRequest?: TransformRequest;
-  validateRequest?: ValidateRequest;
+  methodRequestOptions?: {
+    transform?: TransformRequest;
+    validate?: ValidateRequest;
+  };
 }
 
 export interface BindRequestHandlerOptions<Response> {
-  channelName: ChannelName;
   handler: (request: MethodRequest, sender?: Runtime.MessageSender) => Promise<Response>;
 }
 
 export interface PortMessage<Data = unknown> {
   data: Data;
-  port: MessengerPort;
+  port: Pick<MessengerPort, 'sender' | 'postMessage'>;
 }
 
-export interface ConsumeRemotePromiseApiOptions<T> extends MessengerOptions {
-  validMethodNames: Array<keyof T>;
+export enum RemoteApiProperty {
+  MethodReturningPromise
+  // TODO
+  // eslint-disable-next-line @typescript-eslint/no-shadow
+  // Observable
+}
+
+export type RemoteApiProperties<T> = {
+  [key in keyof T]: RemoteApiProperty | RemoteApiProperties<T[key]>;
+};
+
+export interface ConsumeRemoteApiOptions<T> extends MessengerOptions {
+  baseChannel: ChannelName;
+  properties: RemoteApiProperties<T>;
   getErrorPrototype?: util.GetErrorPrototype;
 }
 
 export interface Messenger {
+  channel: ChannelName;
   postMessage(message: unknown): Observable<void>;
   message$: Observable<PortMessage>;
 }

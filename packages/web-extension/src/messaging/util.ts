@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AnyMessage, MethodRequest, MethodRequestMessage, MethodResponseMessage } from './types';
 import { Runtime } from 'webextension-polyfill';
+import { v4 as uuidv4 } from 'uuid';
 
 export const isRequest = (message: any): message is MethodRequest =>
   typeof message === 'object' && message !== null && Array.isArray(message.args) && typeof message.method === 'string';
@@ -23,4 +24,4 @@ export const senderOrigin = (sender?: Runtime.MessageSender): string | null => {
   }
 };
 
-export const newMessageId = () => crypto.randomUUID();
+export const newMessageId = uuidv4;

@@ -1,6 +1,6 @@
 // tested in web-extension/e2e tests
 import { AuthenticatorApi } from './types';
-import { MessengerDependencies, exposePromiseApi, senderOrigin } from '@cardano-sdk/web-extension';
+import { MessengerDependencies, exposeApi, senderOrigin } from '@cardano-sdk/web-extension';
 import { authenticatorChannel } from './util';
 
 export interface ExposeAuthenticatorApiOptions {
@@ -15,14 +15,16 @@ export const exposeAuthenticatorApi = (
   { walletName }: ExposeAuthenticatorApiOptions,
   dependencies: BackgroundAuthenticatorDependencies
 ) =>
-  exposePromiseApi(
+  exposeApi(
     {
       api: dependencies.authenticator,
-      channel: authenticatorChannel(walletName),
-      transformRequest: ({ method }, sender) => ({
-        args: [senderOrigin(sender)],
-        method
-      })
+      baseChannel: authenticatorChannel(walletName),
+      methodRequestOptions: {
+        transform: ({ method }, sender) => ({
+          args: [senderOrigin(sender)],
+          method
+        })
+      }
     },
     dependencies
   );

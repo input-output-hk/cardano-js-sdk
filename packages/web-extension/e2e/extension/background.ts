@@ -5,9 +5,9 @@ import {
   createPersistentAuthenticatorStorage,
   initializeBackgroundScript
 } from '@cardano-sdk/cip30';
+import { RemoteApiProperty, consumeRemoteApi } from '@cardano-sdk/web-extension';
 import { Tabs, runtime, storage, tabs } from 'webextension-polyfill';
 import { UserPromptService, userPromptServiceChannel, walletName } from './util';
-import { consumeRemotePromiseApi } from '@cardano-sdk/web-extension';
 import { stubWalletApi } from './stubWalletApi';
 
 const waitForTabLoad = (tab: Tabs.Tab) =>
@@ -33,10 +33,12 @@ const ensureUiIsOpenAndLoaded = async () => {
 };
 
 const logger = console;
-const userPromptService = consumeRemotePromiseApi<UserPromptService>(
+const userPromptService = consumeRemoteApi<UserPromptService>(
   {
-    channel: userPromptServiceChannel,
-    validMethodNames: ['allowOrigin']
+    baseChannel: userPromptServiceChannel,
+    properties: {
+      allowOrigin: RemoteApiProperty.MethodReturningPromise
+    }
   },
   { logger, runtime }
 );

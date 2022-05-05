@@ -71,6 +71,7 @@ export interface BackgroundMessengerApiDependencies {
 }
 
 export const generalizeBackgroundMessenger = (channel: ChannelName, messenger: BackgroundMessenger): Messenger => ({
+  channel,
   message$: messenger.getChannel(channel).message$,
   postMessage: (message) => {
     const { ports } = messenger.getChannel(channel);

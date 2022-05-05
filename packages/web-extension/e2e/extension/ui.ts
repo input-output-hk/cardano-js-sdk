@@ -1,6 +1,6 @@
 /* eslint-disable no-use-before-define */
 import { UserPromptService, userPromptServiceChannel } from './util';
-import { exposePromiseApi } from '@cardano-sdk/web-extension';
+import { exposeApi } from '@cardano-sdk/web-extension';
 import { runtime } from 'webextension-polyfill';
 
 const api: UserPromptService = {
@@ -25,4 +25,4 @@ const api: UserPromptService = {
   }
 };
 
-exposePromiseApi<UserPromptService>({ api, channel: userPromptServiceChannel }, { logger: console, runtime });
+exposeApi<UserPromptService>({ api, baseChannel: userPromptServiceChannel }, { logger: console, runtime });

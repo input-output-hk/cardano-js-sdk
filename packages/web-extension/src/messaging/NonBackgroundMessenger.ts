@@ -5,8 +5,7 @@ import { MessengerDependencies, MessengerPort, PortMessage, ReconnectConfig } fr
 import { util } from '@cardano-sdk/core';
 
 export interface NonBackgroundMessengerOptions {
-  channel: string;
-  clientName?: string;
+  baseChannel: string;
   reconnectConfig?: ReconnectConfig;
 }
 
@@ -16,13 +15,13 @@ export interface NonBackgroundMessengerOptions {
  */
 export const createNonBackgroundMessenger = (
   {
-    channel,
-    clientName = 'NonBackgroundMessenger',
+    baseChannel: channel,
     reconnectConfig: { initialDelay, maxDelay } = { initialDelay: 10, maxDelay: 1000 }
   }: NonBackgroundMessengerOptions,
   { logger, runtime }: MessengerDependencies
 ) => {
-  let reconnectTimeout: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let reconnectTimeout: any;
   let delay = initialDelay;
   let isDestroyed = false;
   const port$ = new BehaviorSubject<MessengerPort | null | 'destroyed'>(null);
@@ -42,12 +41,12 @@ export const createNonBackgroundMessenger = (
     reconnectTimeout = setTimeout(connect, delay);
   };
   const onMessage = (data: unknown, port: MessengerPort) => {
-    logger.debug(`[${clientName}(${channel})] receive message`, data, port);
+    logger.debug(`[NonBackgroundMessenger(${channel})] receive message`, data, port);
     delay = initialDelay;
     message$.next({ data, port });
   };
   const onDisconnect = (port: MessengerPort) => {
-    logger.debug(`[${clientName}(${channel})] disconnected`, port);
+    logger.debug(`[NonBackgroundMessenger(${channel})] disconnected`, port);
     port!.onMessage.removeListener(onMessage);
     port!.onDisconnect.removeListener(onDisconnect);
     port$.next(isDestroyed ? 'destroyed' : null);
@@ -69,7 +68,7 @@ export const createNonBackgroundMessenger = (
         port?.disconnect();
       }
       clearTimeout(reconnectTimeout);
-      logger.warn(`[${clientName}(${channel})] destroyed`);
+      logger.warn(`[NonBackgroundMessenger(${channel})] destroyed`);
     },
     message$,
     /**
