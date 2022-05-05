@@ -1,4 +1,4 @@
-import { Cardano, WalletProvider } from '@cardano-sdk/core';
+import { Cardano, UtxoProvider } from '@cardano-sdk/core';
 import { InMemoryUtxoStore } from '../../src/persistence';
 import { Observable } from 'rxjs';
 import { PersistentCollectionTrackerSubject, createUtxoTracker } from '../../src/services';
@@ -10,7 +10,7 @@ describe('createUtxoTracker', () => {
   // these variables are not relevant for this test, overwriting rewardsSource$
   let retryBackoffConfig: RetryBackoffConfig;
   let tipBlockHeight$: Observable<number>;
-  let walletProvider: WalletProvider;
+  let utxoProvider: UtxoProvider;
 
   it('fetches utxo from WalletProvider and locks when spent in a transaction in flight', () => {
     const store = new InMemoryUtxoStore();
@@ -36,7 +36,7 @@ describe('createUtxoTracker', () => {
           },
           tipBlockHeight$,
           transactionsInFlight$,
-          walletProvider
+          utxoProvider
         },
         {
           unspendableUtxoSource$: new PersistentCollectionTrackerSubject<Cardano.Utxo>(
@@ -73,7 +73,7 @@ describe('createUtxoTracker', () => {
           },
           tipBlockHeight$,
           transactionsInFlight$,
-          walletProvider
+          utxoProvider
         },
         {
           unspendableUtxoSource$: new PersistentCollectionTrackerSubject<Cardano.Utxo>(
@@ -111,7 +111,7 @@ describe('createUtxoTracker', () => {
           },
           tipBlockHeight$,
           transactionsInFlight$,
-          walletProvider
+          utxoProvider
         },
         {
           utxoSource$: cold('a---|', { a: utxo }) as unknown as PersistentCollectionTrackerSubject<Cardano.Utxo>

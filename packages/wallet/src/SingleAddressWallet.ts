@@ -8,6 +8,7 @@ import {
   ProtocolParametersRequiredByWallet,
   StakePoolSearchProvider,
   TxSubmitProvider,
+  UtxoProvider,
   WalletProvider,
   coreToCsl
 } from '@cardano-sdk/core';
@@ -56,6 +57,7 @@ import { InputSelector, defaultSelectionConstraints, roundRobinRandomImprove } f
 import { Logger, dummyLogger } from 'ts-log';
 import { Observable, Subject, combineLatest, filter, lastValueFrom, map, take } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
+import { TrackedUtxoProvider } from './services/ProviderTracker/TrackedUtxoProvider';
 import { TxInternals, createTransactionInternals, ensureValidityInterval } from './Transaction';
 import { WalletStores, createInMemoryWalletStores } from './persistence';
 import { isEqual } from 'lodash-es';
@@ -73,6 +75,7 @@ export interface SingleAddressWalletDependencies {
   readonly stakePoolSearchProvider: StakePoolSearchProvider;
   readonly assetProvider: AssetProvider;
   readonly networkInfoProvider: NetworkInfoProvider;
+  readonly utxoProvider: UtxoProvider;
   readonly inputSelector?: InputSelector;
   readonly stores?: WalletStores;
   readonly logger?: Logger;
@@ -91,6 +94,7 @@ export class SingleAddressWallet implements ObservableWallet {
   readonly currentEpoch$: BehaviorObservable<EpochInfo>;
   readonly txSubmitProvider: TrackedTxSubmitProvider;
   readonly walletProvider: TrackedWalletProvider;
+  readonly utxoProvider: TrackedUtxoProvider;
   readonly networkInfoProvider: TrackedNetworkInfoProvider;
   readonly stakePoolSearchProvider: TrackedStakePoolSearchProvider;
   readonly assetProvider: TrackedAssetProvider;
@@ -128,6 +132,7 @@ export class SingleAddressWallet implements ObservableWallet {
       keyAgent,
       assetProvider,
       networkInfoProvider,
+      utxoProvider,
       logger = dummyLogger,
       inputSelector = roundRobinRandomImprove(),
       stores = createInMemoryWalletStores()
@@ -137,6 +142,7 @@ export class SingleAddressWallet implements ObservableWallet {
     this.#inputSelector = inputSelector;
     this.txSubmitProvider = new TrackedTxSubmitProvider(txSubmitProvider);
     this.walletProvider = new TrackedWalletProvider(walletProvider);
+    this.utxoProvider = new TrackedUtxoProvider(utxoProvider);
     this.networkInfoProvider = new TrackedNetworkInfoProvider(networkInfoProvider);
     this.stakePoolSearchProvider = new TrackedStakePoolSearchProvider(stakePoolSearchProvider);
     this.assetProvider = new TrackedAssetProvider(assetProvider);
@@ -146,6 +152,7 @@ export class SingleAddressWallet implements ObservableWallet {
         networkInfoProvider: this.networkInfoProvider,
         stakePoolSearchProvider: this.stakePoolSearchProvider,
         txSubmitProvider: this.txSubmitProvider,
+        utxoProvider: this.utxoProvider,
         walletProvider: this.walletProvider
       },
       { consideredOutOfSyncAfter }
@@ -197,7 +204,7 @@ export class SingleAddressWallet implements ObservableWallet {
       stores,
       tipBlockHeight$,
       transactionsInFlight$: this.transactions.outgoing.inFlight$,
-      walletProvider: this.walletProvider
+      utxoProvider: this.utxoProvider
     });
     const timeSettings$ = distinctTimeSettings(this.networkInfo$);
     this.delegation = createDelegationTracker({

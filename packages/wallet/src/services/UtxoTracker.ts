@@ -1,4 +1,4 @@
-import { Cardano, WalletProvider } from '@cardano-sdk/core';
+import { Cardano, UtxoProvider } from '@cardano-sdk/core';
 import { NEVER, Observable, combineLatest, concat, map, of, switchMap } from 'rxjs';
 import { PersistentCollectionTrackerSubject, TrackerSubject, coldObservableProvider, utxoEquals } from './util';
 import { RetryBackoffConfig } from 'backoff-rxjs';
@@ -6,7 +6,7 @@ import { UtxoTracker } from './types';
 import { WalletStores } from '../persistence';
 
 export interface UtxoTrackerProps {
-  walletProvider: WalletProvider;
+  utxoProvider: UtxoProvider;
   addresses$: Observable<Cardano.Address[]>;
   stores: Pick<WalletStores, 'utxo' | 'unspendableUtxo'>;
   transactionsInFlight$: Observable<Cardano.NewTxAlonzo[]>;
@@ -20,7 +20,7 @@ export interface UtxoTrackerInternals {
 }
 
 export const createUtxoProvider = (
-  walletProvider: WalletProvider,
+  utxoProvider: UtxoProvider,
   addresses$: Observable<Cardano.Address[]>,
   tipBlockHeight$: Observable<number>,
   retryBackoffConfig: RetryBackoffConfig
@@ -28,7 +28,7 @@ export const createUtxoProvider = (
   addresses$.pipe(
     switchMap((addresses) =>
       coldObservableProvider(
-        () => walletProvider.utxoByAddresses(addresses),
+        () => utxoProvider.utxoByAddresses(addresses),
         retryBackoffConfig,
         tipBlockHeight$,
         utxoEquals
@@ -37,10 +37,10 @@ export const createUtxoProvider = (
   );
 
 export const createUtxoTracker = (
-  { walletProvider, addresses$, stores, transactionsInFlight$, retryBackoffConfig, tipBlockHeight$ }: UtxoTrackerProps,
+  { utxoProvider, addresses$, stores, transactionsInFlight$, retryBackoffConfig, tipBlockHeight$ }: UtxoTrackerProps,
   {
     utxoSource$ = new PersistentCollectionTrackerSubject<Cardano.Utxo>(
-      () => createUtxoProvider(walletProvider, addresses$, tipBlockHeight$, retryBackoffConfig),
+      () => createUtxoProvider(utxoProvider, addresses$, tipBlockHeight$, retryBackoffConfig),
       stores.utxo
     ),
     unspendableUtxoSource$ = new PersistentCollectionTrackerSubject(

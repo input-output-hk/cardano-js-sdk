@@ -10,7 +10,6 @@ export class WalletProviderStats {
   readonly transactionsByAddresses$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
   readonly transactionsByHashes$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
   readonly rewardsHistory$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
-  readonly utxoByAddresses$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
   readonly rewardAccountBalance$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
   readonly stakePoolStats$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
 
@@ -22,7 +21,6 @@ export class WalletProviderStats {
     this.transactionsByAddresses$.complete();
     this.transactionsByHashes$.complete();
     this.rewardsHistory$.complete();
-    this.utxoByAddresses$.complete();
     this.rewardAccountBalance$.complete();
     this.stakePoolStats$.complete();
   }
@@ -35,7 +33,6 @@ export class WalletProviderStats {
     this.transactionsByAddresses$.next(CLEAN_FN_STATS);
     this.transactionsByHashes$.next(CLEAN_FN_STATS);
     this.rewardsHistory$.next(CLEAN_FN_STATS);
-    this.utxoByAddresses$.next(CLEAN_FN_STATS);
     this.rewardAccountBalance$.next(CLEAN_FN_STATS);
     this.stakePoolStats$.next(CLEAN_FN_STATS);
   }
@@ -50,7 +47,6 @@ export class TrackedWalletProvider extends ProviderTracker implements WalletProv
   readonly stats = new WalletProviderStats();
   readonly stakePoolStats: WalletProvider['stakePoolStats'];
   readonly ledgerTip: WalletProvider['ledgerTip'];
-  readonly utxoByAddresses: WalletProvider['utxoByAddresses'];
   readonly rewardAccountBalance: WalletProvider['rewardAccountBalance'];
   readonly transactionsByAddresses: WalletProvider['transactionsByAddresses'];
   readonly transactionsByHashes: WalletProvider['transactionsByHashes'];
@@ -68,8 +64,6 @@ export class TrackedWalletProvider extends ProviderTracker implements WalletProv
         ? () => this.trackedCall(walletProvider.stakePoolStats!, this.stats.stakePoolStats$)
         : undefined;
     this.ledgerTip = () => this.trackedCall(walletProvider.ledgerTip, this.stats.ledgerTip$);
-    this.utxoByAddresses = (addresses) =>
-      this.trackedCall(() => walletProvider.utxoByAddresses(addresses), this.stats.utxoByAddresses$);
     this.rewardAccountBalance = (rewardAccount) =>
       this.trackedCall(() => walletProvider.rewardAccountBalance(rewardAccount), this.stats.rewardAccountBalance$);
     this.transactionsByAddresses = (addresses) =>
