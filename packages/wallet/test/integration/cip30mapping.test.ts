@@ -1,17 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, sonarjs/no-duplicate-string */
-import { Browser } from 'webextension-polyfill';
-import { CSL, Cardano, coreToCsl } from '@cardano-sdk/core';
-import { DataSignError, TxSendError, TxSignError, WalletApi, createWebExtensionWalletClient } from '@cardano-sdk/cip30';
-import { InitializeTxProps, InitializeTxResult, KeyManagement, SingleAddressWallet, cip30 } from '../../src';
+import { CSL, Cardano, coreToCsl, cslToCore } from '@cardano-sdk/core';
+import { DataSignError, TxSendError, TxSignError, WalletApi } from '@cardano-sdk/cip30';
+import { InitializeTxProps, InitializeTxResult, SingleAddressWallet, cip30 } from '../../src';
 import { createWallet } from './util';
 import { firstValueFrom } from 'rxjs';
 import { networkId } from '../mocks';
 import { waitForWalletStateSettle } from '../util';
 
-declare const browser: Browser;
-
 describe('cip30', () => {
   let wallet: SingleAddressWallet;
+  let api: WalletApi;
+  let confirmationCallback: jest.Mock;
 
   const simpleTxProps: InitializeTxProps = {
     outputs: new Set([
@@ -28,6 +27,9 @@ describe('cip30', () => {
   beforeAll(async () => {
     // CREATE A WALLET
     wallet = await createWallet();
+    confirmationCallback = jest.fn().mockResolvedValue(true);
+    api = cip30.createWalletApi(wallet, confirmationCallback);
+    await waitForWalletStateSettle(wallet);
   });
 
   afterAll(() => {
@@ -35,47 +37,42 @@ describe('cip30', () => {
   });
 
   describe('createWalletApi', () => {
-    let mappedWallet: WalletApi;
-
-    beforeAll(async () => {
-      mappedWallet = cip30.createWalletApi(wallet, () => Promise.resolve(true));
-      await waitForWalletStateSettle(wallet);
-    });
-
     test('api.getNetworkId', async () => {
-      const cip30NetworkId = await mappedWallet.getNetworkId();
+      const cip30NetworkId = await api.getNetworkId();
       expect(cip30NetworkId).toEqual(networkId);
     });
 
     test('api.getUtxos', async () => {
-      const utxos = await mappedWallet.getUtxos();
-      expect(() => coreToCsl.utxo(utxos!)).not.toThrow();
+      const utxos = await api.getUtxos();
+      expect(() =>
+        cslToCore.utxo(utxos!.map((utxo) => CSL.TransactionUnspentOutput.from_bytes(Buffer.from(utxo, 'hex'))))
+      ).not.toThrow();
     });
 
     test('api.getBalance', async () => {
-      const balanceCborBytes = Buffer.from(await mappedWallet.getBalance(), 'hex');
+      const balanceCborBytes = Buffer.from(await api.getBalance(), 'hex');
       expect(() => CSL.Value.from_bytes(balanceCborBytes)).not.toThrow();
     });
 
     test('api.getUsedAddresses', async () => {
-      const cipUsedAddressess = await mappedWallet.getUsedAddresses();
+      const cipUsedAddressess = await api.getUsedAddresses();
       const [{ address: walletAddress }] = await firstValueFrom(wallet.addresses$);
       expect(cipUsedAddressess).toEqual([walletAddress]);
     });
 
     test('api.getUnusedAddresses', async () => {
-      const cipUsedAddressess = await mappedWallet.getUnusedAddresses();
+      const cipUsedAddressess = await api.getUnusedAddresses();
       expect(cipUsedAddressess).toEqual([]);
     });
 
     test('api.getChangeAddress', async () => {
-      const cipChangeAddress = await mappedWallet.getChangeAddress();
+      const cipChangeAddress = await api.getChangeAddress();
       const [{ address: walletAddress }] = await firstValueFrom(wallet.addresses$);
       expect(cipChangeAddress).toEqual(walletAddress);
     });
 
     test('api.getRewardAddresses', async () => {
-      const cipRewardAddresses = await mappedWallet.getRewardAddresses();
+      const cipRewardAddresses = await api.getRewardAddresses();
       const [{ rewardAccount: walletRewardAccount }] = await firstValueFrom(wallet.addresses$);
       expect(cipRewardAddresses).toEqual([walletRewardAccount]);
     });
@@ -85,14 +82,14 @@ describe('cip30', () => {
       const finalizedTx = await wallet.finalizeTx(txInternals);
       const hexTxBody = Buffer.from(coreToCsl.tx(finalizedTx).body().to_bytes()).toString('hex');
 
-      const cip30witnessSet = await mappedWallet.signTx(hexTxBody);
+      const cip30witnessSet = await api.signTx(hexTxBody);
       const signatures = Buffer.from(cip30witnessSet, 'hex');
       expect(() => CSL.TransactionWitnessSet.from_bytes(signatures)).not.toThrow();
     });
 
     test('api.signData', async () => {
       const [{ address }] = await firstValueFrom(wallet.addresses$);
-      const cip30dataSignature = await mappedWallet.signData(address, Cardano.util.HexBlob('abc123').toString());
+      const cip30dataSignature = await api.signData(address, Cardano.util.HexBlob('abc123').toString());
       expect(typeof cip30dataSignature.key).toBe('string');
       expect(typeof cip30dataSignature.signature).toBe('string');
     });
@@ -102,26 +99,13 @@ describe('cip30', () => {
       const finalizedTx = await wallet.finalizeTx(txInternals);
 
       const cslTx = coreToCsl.tx(finalizedTx).to_bytes();
-      await expect(mappedWallet.submitTx(Buffer.from(cslTx).toString('hex'))).resolves.not.toThrow();
+      await expect(api.submitTx(Buffer.from(cslTx).toString('hex'))).resolves.not.toThrow();
     });
 
     test.todo('errorStates');
   });
 
   describe('confirmation callbacks', () => {
-    let api: WalletApi;
-    const confirmationCallback: jest.Mock = jest.fn();
-    beforeAll(() => {
-      let onMessageHandler: any;
-      const chromeRuntime = (global as any).chrome.runtime;
-      chromeRuntime.onMessage.addListener.mockImplementation((handler: any) => (onMessageHandler = handler));
-      chromeRuntime.sendMessage.mockImplementation((_: any, message: any, callback: any) =>
-        onMessageHandler(message, null, callback)
-      );
-      cip30.initialize(wallet, confirmationCallback, browser.runtime);
-      api = createWebExtensionWalletClient({ walletExtensionId: 'someid', walletName: wallet.name }, browser.runtime);
-    });
-
     describe('signData', () => {
       const payload = 'abc123';
 
@@ -195,43 +179,6 @@ describe('cip30', () => {
         confirmationCallback.mockRejectedValue(1);
         await expect(api.submitTx(cslTx)).rejects.toThrowError(TxSendError);
       });
-    });
-  });
-
-  // almost as good as running in browser
-  describe('initialize', () => {
-    let cleanup: Function;
-    beforeAll(() => {
-      let onMessageHandler: any;
-      const chromeRuntime = (global as any).chrome.runtime;
-      chromeRuntime.onMessage.addListener.mockImplementation((handler: any) => (onMessageHandler = handler));
-      chromeRuntime.sendMessage.mockImplementation((_: any, message: any, callback: any) =>
-        onMessageHandler(message, null, callback)
-      );
-      cleanup = cip30.initialize(wallet, () => Promise.resolve(true), browser.runtime);
-    });
-    afterAll(() => cleanup());
-
-    it('works using browser runtime messages', async () => {
-      const api = createWebExtensionWalletClient(
-        { walletExtensionId: 'someid', walletName: wallet.name },
-        browser.runtime
-      );
-      const utxos = await api.getUtxos();
-      expect(() => coreToCsl.utxo(utxos!)).not.toThrow();
-    });
-
-    it('rejects on error', async () => {
-      const txInternals = await wallet.initializeTx(simpleTxProps);
-      const finalizedTx = await wallet.finalizeTx(txInternals);
-      const hexTxBody = Buffer.from(coreToCsl.tx(finalizedTx).body().to_bytes()).toString('hex');
-
-      wallet.keyAgent.signTransaction = jest.fn().mockRejectedValueOnce(new KeyManagement.errors.AuthenticationError());
-      const api = createWebExtensionWalletClient(
-        { walletExtensionId: 'someid', walletName: wallet.name },
-        browser.runtime
-      );
-      await expect(api.signTx(hexTxBody)).rejects.toThrowError(TxSignError);
     });
   });
 });

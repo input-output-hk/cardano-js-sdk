@@ -1,3 +1,5 @@
 .eslintrc.js
 *.d.ts
 *jest.config.js
+node_modules
+dist

@@ -1,9 +1,9 @@
+/* eslint-disable sonarjs/cognitive-complexity */
 import { serializeError } from 'serialize-error';
 import { transform } from 'lodash-es';
 
 const PLAIN_TYPES = new Set(['boolean', 'number', 'string']);
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
 export const toSerializableObject = (obj: unknown): unknown => {
   if (PLAIN_TYPES.has(typeof obj)) return obj;
   if (typeof obj === 'undefined') {
@@ -57,7 +57,6 @@ export const toSerializableObject = (obj: unknown): unknown => {
 
 export type GetErrorPrototype = (err: unknown) => typeof Error.prototype;
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
 const fromSerializableObjectUnknown = (obj: unknown, getErrorPrototype: GetErrorPrototype): unknown => {
   if (PLAIN_TYPES.has(typeof obj)) return obj;
   if (typeof obj === 'object') {

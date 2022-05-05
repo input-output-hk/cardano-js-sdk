@@ -1,5 +1,5 @@
 import { BigIntMath, Cardano, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
-import { OutputValidation, Wallet } from '../types';
+import { ObservableWallet, OutputValidation } from '../types';
 import { ResolveInputAddress } from '../KeyManagement';
 import { computeMinimumCoinQuantity, tokenBundleSizeExceedsLimit } from '@cardano-sdk/cip2';
 import { firstValueFrom } from 'rxjs';
@@ -8,7 +8,7 @@ import { txInEquals } from './util';
 /**
  * @returns common wallet utility functions that are aware of wallet state and computes useful things
  */
-export const createWalletUtil = (wallet: Wallet) => {
+export const createWalletUtil = (wallet: ObservableWallet) => {
   const validateOutput = async (
     output: Cardano.TxOut,
     protocolParameters?: Pick<ProtocolParametersRequiredByWallet, 'coinsPerUtxoWord' | 'maxValueSize'>

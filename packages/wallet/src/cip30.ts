@@ -10,14 +10,12 @@ import {
   TxSendErrorCode,
   TxSignError,
   TxSignErrorCode,
-  WalletApi,
-  handleMessages
+  WalletApi
 } from '@cardano-sdk/cip30';
 import { AuthenticationError } from './KeyManagement/errors';
 import { CSL, Cardano, coreToCsl, cslToCore } from '@cardano-sdk/core';
 import { InputSelectionError } from '@cardano-sdk/cip2';
 import { Logger, dummyLogger } from 'ts-log';
-import { Runtime } from 'webextension-polyfill';
 import { SingleAddressWallet } from '.';
 import { cip30signData } from './KeyManagement/cip8';
 import { firstValueFrom } from 'rxjs';
@@ -93,6 +91,10 @@ export const createWalletApi = (
       throw new ApiError(500, 'Nope');
     }
   },
+  getCollateral: async () => {
+    logger.warn('getCollateral is not implemented');
+    return null;
+  },
   getNetworkId: async (): Promise<number> => {
     logger.debug('getting networkId');
     return Promise.resolve(wallet.keyAgent.networkId);
@@ -130,7 +132,7 @@ export const createWalletApi = (
       return [address.toString()];
     }
   },
-  getUtxos: async (amount?: Cbor, paginate?: Paginate): Promise<Cardano.Utxo[] | undefined> => {
+  getUtxos: async (amount?: Cbor, paginate?: Paginate): Promise<Cbor[] | undefined> => {
     let utxos = await firstValueFrom(wallet.utxo.available$);
 
     if (amount) {
@@ -157,7 +159,7 @@ export const createWalletApi = (
       utxos = utxos.slice(paginate.page * paginate.limit, paginate.page * paginate.limit + paginate.limit);
     }
 
-    return Promise.resolve(utxos);
+    return Promise.resolve(coreToCsl.utxo(utxos).map((utxo) => Buffer.from(utxo.to_bytes()).toString('hex')));
   },
   signData: async (addr: Cardano.Address, payload: Bytes): Promise<Cip30DataSignature> => {
     logger.debug('signData');
@@ -237,18 +239,3 @@ export const createWalletApi = (
     }
   }
 });
-
-/**
- * Hook up the wallet to handle CIP30 browser runtime messages
- *
- * @returns {Function} unregisters browser runtime event listeners
- */
-export const initialize = (
-  wallet: SingleAddressWallet,
-  confirmationCallback: CallbackConfirmation,
-  runtime: Runtime.Static,
-  { logger = dummyLogger }: Cip30WalletDependencies = {}
-) => {
-  const walletApi = createWalletApi(wallet, confirmationCallback, { logger });
-  return handleMessages(wallet.name, walletApi, logger, runtime);
-};

@@ -24,6 +24,10 @@ const packageMap = [
     type: 'json'
   },
   {
+    filename: 'packages/web-extension/package.json',
+    type: 'json'
+  },
+  {
     filename: 'packages/core/package.json',
     type: 'json'
   },

@@ -68,7 +68,7 @@ export interface SyncStatus {
   isSettled$: BehaviorObservable<boolean>;
 }
 
-export interface Wallet {
+export interface ObservableWallet {
   name: string;
   readonly keyAgent: KeyManagement.KeyAgent;
   readonly balance: TransactionalTracker<Balance>;

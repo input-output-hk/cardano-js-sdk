@@ -1,4 +1,4 @@
-import { coreToCsl, cslToCore } from '../../src';
+import { Cardano, coreToCsl, cslToCore } from '../../src';
 import { mintTokenMap, tx, txBody, txIn, txInWithAddress, txOut, valueCoinOnly, valueWithAssets } from './testData';
 
 describe('cslToCore', () => {
@@ -25,6 +25,11 @@ describe('cslToCore', () => {
 
   it('txOut', () => {
     expect(cslToCore.txOut(coreToCsl.txOut(txOut))).toEqual(txOut);
+  });
+
+  it('utxo', () => {
+    const utxo: Cardano.Utxo[] = [[txIn as Cardano.TxIn, txOut]];
+    expect(cslToCore.utxo(coreToCsl.utxo(utxo))).toEqual(utxo);
   });
 
   it('txMint', () => {

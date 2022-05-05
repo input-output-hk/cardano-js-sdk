@@ -1,6 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { Cardano } from '@cardano-sdk/core';
-import { KeyManagement, SingleAddressWallet, Wallet } from '../../../src';
+import { KeyManagement, ObservableWallet, SingleAddressWallet } from '../../../src';
 import {
   assetProvider,
   keyAgentReady,
@@ -12,7 +12,7 @@ import {
 import { combineLatest, filter, firstValueFrom, map } from 'rxjs';
 
 describe('SingleAddressWallet.assets/nft', () => {
-  let wallet: Wallet;
+  let wallet: ObservableWallet;
 
   beforeAll(async () => {
     const keyAgent = await keyAgentReady;
