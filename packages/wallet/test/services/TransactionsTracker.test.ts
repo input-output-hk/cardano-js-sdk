@@ -4,7 +4,7 @@ import { InMemoryTransactionsStore, OrderedCollectionStore } from '../../src/per
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { WalletProviderStub, mockWalletProvider, queryTransactionsResult } from '../mocks';
 import { bufferCount, firstValueFrom, of } from 'rxjs';
-import { createTestScheduler } from '../testScheduler';
+import { createTestScheduler } from '@cardano-sdk/util-dev';
 import delay from 'delay';
 
 describe('TransactionsTracker', () => {

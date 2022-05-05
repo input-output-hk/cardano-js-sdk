@@ -3,7 +3,8 @@ import { Milliseconds } from '../../services';
 
 export const cachedGetPassword = (getPassword: () => Promise<Uint8Array>, cacheDuration: Milliseconds): GetPassword => {
   let cached: Promise<Uint8Array> | null;
-  let timeout: number | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let timeout: any;
   return (noCache) => {
     if (noCache || !cached) {
       cached = getPassword()

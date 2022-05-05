@@ -3,7 +3,7 @@ import { InMemoryUtxoStore } from '../../src/persistence';
 import { Observable } from 'rxjs';
 import { PersistentCollectionTrackerSubject, createUtxoTracker } from '../../src/services';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { createTestScheduler } from '../testScheduler';
+import { createTestScheduler } from '@cardano-sdk/util-dev';
 import { utxo } from '../mocks';
 
 describe('createUtxoTracker', () => {

@@ -5,7 +5,7 @@ import {
   PersistentCollectionTrackerSubject,
   SyncableIntervalPersistentDocumentTrackerSubject
 } from '../../../src/services/util';
-import { createTestScheduler } from '../../testScheduler';
+import { createTestScheduler } from '@cardano-sdk/util-dev';
 
 const stubObservableProvider = <T>(...calls: Observable<T>[]) => {
   let numCall = 0;

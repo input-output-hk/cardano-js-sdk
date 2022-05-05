@@ -1,5 +1,5 @@
 import { TrackerSubject } from '../../../src/services/util';
-import { createTestScheduler } from '../../testScheduler';
+import { createTestScheduler } from '@cardano-sdk/util-dev';
 
 const testUnsubscribeOnCloseAction = (action: (subject: TrackerSubject<string>) => void) => {
   createTestScheduler().run(({ cold, expectSubscriptions }) => {

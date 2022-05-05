@@ -4,7 +4,7 @@
 /* eslint-disable space-in-parens */
 import { BehaviorObservable, DelegationTracker, RewardAccount, StakeKeyStatus, createBalanceTracker } from '../../src/services';
 import { Cardano, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
-import { createTestScheduler } from '../testScheduler';
+import { createTestScheduler } from '@cardano-sdk/util-dev';
 import { utxo, utxo2 } from '../mocks';
 
 describe('createBalanceTracker', () => {

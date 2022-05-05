@@ -8,7 +8,7 @@ import {
   createRewardsHistoryTracker
 } from '../../../src/services';
 import { createStubTxWithCertificates } from './stub-tx';
-import { createTestScheduler } from '../../testScheduler';
+import { createTestScheduler } from '@cardano-sdk/util-dev';
 import { firstValueFrom, of } from 'rxjs';
 import { mockWalletProvider, rewardAccount, rewardsHistory } from '../../mocks';
 

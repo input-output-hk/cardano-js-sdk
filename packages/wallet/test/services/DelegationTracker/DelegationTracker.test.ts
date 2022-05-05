@@ -3,7 +3,7 @@ import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TransactionsTracker } from '../../../src/services';
 import { certificateTransactionsWithEpochs, createBlockEpochProvider } from '../../../src/services/DelegationTracker';
 import { createStubTxWithCertificates } from './stub-tx';
-import { createTestScheduler } from '../../testScheduler';
+import { createTestScheduler } from '@cardano-sdk/util-dev';
 
 jest.mock('../../../src/services/util/coldObservableProvider', () => ({ coldObservableProvider: jest.fn() }));
 const coldObservableProviderMock: jest.Mock = jest.requireMock(

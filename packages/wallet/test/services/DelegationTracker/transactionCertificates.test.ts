@@ -1,5 +1,5 @@
 import { Cardano } from '@cardano-sdk/core';
-import { createTestScheduler } from '../../testScheduler';
+import { createTestScheduler } from '@cardano-sdk/util-dev';
 import { isLastStakeKeyCertOfType, stakeKeyCertficates, transactionsWithCertificates } from '../../../src';
 
 describe('transactionCertificates', () => {
