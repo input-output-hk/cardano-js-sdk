@@ -10,6 +10,12 @@ export const assetNameFromAssetId = (assetId: AssetId): AssetName => AssetName(a
 export const createAssetId = (scriptHash: CSL.ScriptHash, assetName: CSL.AssetName): AssetId =>
   AssetId(util.bytesToHex(scriptHash.to_bytes()) + util.bytesToHex(assetName.name()).toString());
 
+/**
+ * @returns {AssetId} concatenated policy id and asset name
+ */
+export const assetIdFromPolicyAndName = (policyId: PolicyId, assetName: AssetName): AssetId =>
+  AssetId(policyId.toString() + assetName.toString());
+
 export const parseAssetId = (assetId: AssetId) => {
   const policyId = policyIdFromAssetId(assetId);
   const assetName = assetNameFromAssetId(assetId);
