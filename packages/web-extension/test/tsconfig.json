@@ -11,6 +11,9 @@
       "path": "../../core/src"
     },
     {
+      "path": "../../util-dev/src"
+    },
+    {
       "path": "../../cip30/src"
     },
     {

@@ -7,6 +7,9 @@
   "references": [
     {
       "path": "../../core/src"
+    },
+    {
+      "path": "../../wallet/src"
     }
   ]
 }

@@ -1,7 +1,7 @@
 // only tested in ../e2e tests
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Logger } from 'ts-log';
-import { MethodRequest, MethodResponseMessage } from './types';
+import { MethodRequest, ResponseMessage } from './types';
 import { isRequestMessage } from './util';
 
 export type AnyApi = any;
@@ -23,7 +23,7 @@ export const runContentScriptMessageProxy = (apis: AnyApi[], logger: Logger) => 
     const apiFunction = apis.find((api: any) => typeof api[data.request.method] === 'function')?.[data.request.method];
     if (!apiFunction) return;
 
-    const responseMessage: MethodResponseMessage = {
+    const responseMessage: ResponseMessage = {
       messageId: data.messageId,
       response: await apiFunction(data.request.args)
     };

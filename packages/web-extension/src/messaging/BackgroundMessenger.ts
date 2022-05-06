@@ -2,6 +2,7 @@
 import { ChannelName, Messenger, MessengerDependencies, MessengerPort, PortMessage } from './types';
 import { Logger } from 'ts-log';
 import { Subject, of } from 'rxjs';
+import { deriveChannelName } from './util';
 
 interface Channel {
   message$: Subject<PortMessage>;
@@ -72,6 +73,12 @@ export interface BackgroundMessengerApiDependencies {
 
 export const generalizeBackgroundMessenger = (channel: ChannelName, messenger: BackgroundMessenger): Messenger => ({
   channel,
+  deriveChannel(path) {
+    return generalizeBackgroundMessenger(deriveChannelName(channel, path), messenger);
+  },
+  destroy() {
+    messenger.destroy();
+  },
   message$: messenger.getChannel(channel).message$,
   postMessage: (message) => {
     const { ports } = messenger.getChannel(channel);

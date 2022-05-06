@@ -4,19 +4,27 @@ import { Logger } from 'ts-log';
 import { Observable } from 'rxjs';
 import { util } from '@cardano-sdk/core';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type MethodRequest<Method extends string = string, Args = unknown[]> = { method: Method; args: Args };
 
 export interface AnyMessage extends Object {
   messageId: string;
 }
 
-export interface MethodRequestMessage extends AnyMessage {
+export interface RequestMessage extends AnyMessage {
   request: MethodRequest;
 }
 
-export interface MethodResponseMessage<T = unknown> extends AnyMessage {
+export interface ResponseMessage<T = unknown> extends AnyMessage {
   response: T;
+}
+
+export interface SubscriptionMessage extends AnyMessage {
+  subscribe: boolean;
+  error?: Error;
+}
+
+export interface EmitMessage extends AnyMessage {
+  emit: unknown;
 }
 
 export type SendMethodRequestMessage = <Response = unknown>(msg: MethodRequest) => Promise<Response>;
@@ -66,7 +74,6 @@ export interface MessengerOptions {
 }
 
 export interface ExposeApiProps<API extends object> extends MessengerOptions {
-  baseChannel: ChannelName;
   api: API;
   methodRequestOptions?: {
     transform?: TransformRequest;
@@ -84,10 +91,9 @@ export interface PortMessage<Data = unknown> {
 }
 
 export enum RemoteApiProperty {
-  MethodReturningPromise
-  // TODO
+  MethodReturningPromise,
   // eslint-disable-next-line @typescript-eslint/no-shadow
-  // Observable
+  Observable
 }
 
 export type RemoteApiProperties<T> = {
@@ -95,7 +101,6 @@ export type RemoteApiProperties<T> = {
 };
 
 export interface ConsumeRemoteApiOptions<T> extends MessengerOptions {
-  baseChannel: ChannelName;
   properties: RemoteApiProperties<T>;
   getErrorPrototype?: util.GetErrorPrototype;
 }
@@ -104,6 +109,8 @@ export interface Messenger {
   channel: ChannelName;
   postMessage(message: unknown): Observable<void>;
   message$: Observable<PortMessage>;
+  deriveChannel(path: string): Messenger;
+  destroy(): void;
 }
 
 export interface MessengerApiDependencies {
