@@ -380,10 +380,10 @@ export const poolsByPledgeMetSubqueries: readonly SubQuery[] = [
     SELECT 
       ph.id,
       ph.view,
-      pu.id as update_id,
+      pu.id AS update_id,
       pu.active_epoch_no,
       pu.pledge,
-      sa.id as stake_address_id
+      sa.id AS stake_address_id
     FROM pool_hash ph 
     JOIN pool_update pu
       ON pu.id = (
@@ -394,11 +394,20 @@ export const poolsByPledgeMetSubqueries: readonly SubQuery[] = [
         LIMIT 1
       ) 
     JOIN stake_address sa ON
-    sa.hash_raw = pu.reward_addr 
-    JOIN delegation d2 ON
-      d2.addr_id = sa.id AND
-      (d2.active_epoch_no = (SELECT "no" FROM current_epoch)) AND
-      d2.pool_hash_id = ph.id`
+      sa.hash_raw = pu.reward_addr 
+    JOIN delegation d1 on
+      sa.id = d1.addr_id 
+    WHERE NOT EXISTS
+      (SELECT TRUE
+        FROM delegation d2
+        WHERE d2.addr_id=d1.addr_id 
+          AND d2.tx_id>d1.tx_id)
+    AND NOT EXISTS
+      (SELECT TRUE
+        FROM stake_deregistration
+        WHERE stake_deregistration.addr_id=d1.addr_id
+          AND stake_deregistration.tx_id>d1.tx_id)
+    `
   },
   {
     id: { name: 'pool_owner_rewards' },
