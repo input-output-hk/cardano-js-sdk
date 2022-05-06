@@ -324,15 +324,16 @@ FROM pool_relay
 WHERE update_id = ANY($1)
 `;
 
-// TODO: probably this should be filtered by registration tx_id = last_update.registration_tx_id
 export const findPoolsOwners = `
 SELECT 
-  DISTINCT stake.view AS address,
+  stake.view AS address,
   owner.pool_hash_id AS hash_id
 FROM pool_owner owner
+JOIN pool_update 
+    ON pool_update.registered_tx_id = owner.registered_tx_id
 JOIN stake_address stake
   ON stake.id = owner.addr_id
-WHERE owner.pool_hash_id = ANY($1)
+WHERE pool_update.id = ANY($1)
 `;
 
 export const findPoolsRegistrations = `

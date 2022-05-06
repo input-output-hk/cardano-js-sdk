@@ -245,7 +245,7 @@ export class DbSyncStakePoolSearchProvider implements StakePoolSearchProvider {
       await Promise.all([
         this.queryPoolData(updatesIds),
         this.queryPoolRelays(updatesIds),
-        this.queryPoolOwners(hashesIds),
+        this.queryPoolOwners(updatesIds),
         this.queryRegistrations(hashesIds),
         this.queryRetirements(hashesIds),
         this.queryPoolRewards(hashesIds, options?.rewardsHistoryLimit),
