@@ -247,54 +247,68 @@ export const findPoolEpochRewards = (limit?: number) => `
 WITH epochs AS (
 	SELECT 
 		"no",
-		(extract(epoch from (end_time - start_time)) * 1000) as epoch_length
+		(extract(epoch FROM (end_time - start_time)) * 1000) AS epoch_length
 	FROM epoch 
 	ORDER BY id DESC
   ${limit !== undefined ? `LIMIT ${limit}` : ''}
 ),
-total_stake_per_epoch as (
+total_stake_per_epoch AS (
   SELECT 
-      e."no" as epoch_no,
-      sum(es.amount) as active_stake
-    from epochs e
-    left join epoch_stake es on
+      e."no" AS epoch_no,
+      sum(es.amount) AS active_stake
+    FROM epochs e
+    LEFT JOIN epoch_stake es on
       es.epoch_no  = e."no" and 
       es.pool_id = $1
-    group by e."no"
+    GROUP BY e."no"
   ),
-  total_rewards_per_epoch as (
-  select 
-    sum(r.amount) as total_amount,
-    e."no" as epoch_no
-  from  epochs e
-  left join reward r on
+  total_rewards_per_epoch AS (
+  SELECT 
+    sum(r.amount) AS total_amount,
+    e."no" AS epoch_no
+  FROM  epochs e
+  LEFT JOIN reward r on
     r.earned_epoch = e."no" and 
     r.pool_id = $1
-  group by e."no"
+  GROUP BY e."no"
   )
-  select 
-    r_e.epoch_no,
+  SELECT 
+    rewards.epoch_no,
     e.epoch_length,
-    COALESCE(r_e.total_amount,0) as total_rewards,
-    COALESCE (r_e.total_amount * pu.margin + pu.fixed_cost,0) as operator_fees,
-    COALESCE(total_stake.active_stake,0) as active_stake,
-    COALESCE((r_e.total_amount - ((r_e.total_amount * pu.margin) + pu.fixed_cost))
-      /total_stake.active_stake, 0) AS member_roi
-  from total_rewards_per_epoch r_e
-  join epochs e on 
-    e."no" = r_e.epoch_no
-  left join total_stake_per_epoch total_stake on 
-    r_e.epoch_no = total_stake.epoch_no
-  JOIN pool_update pu
-    ON pu.id = (
+    COALESCE(rewards.total_amount,0) AS total_rewards,
+    CASE
+    WHEN update.fixed_cost >= rewards.total_amount
+    THEN rewards.total_amount
+    ELSE (
+      COALESCE (FLOOR((rewards.total_amount-update.fixed_cost) * update.margin) + update.fixed_cost,0)
+    )
+    END AS operator_fees,
+    COALESCE(total_stake.active_stake,0) AS active_stake,
+    CASE
+    WHEN update.fixed_cost >= rewards.total_amount
+    THEN (
+      COALESCE((rewards.total_amount - (rewards.total_amount + update.fixed_cost))
+      /total_stake.active_stake, 0)
+    )
+    ELSE (
+      COALESCE((rewards.total_amount - (((rewards.total_amount-update.fixed_cost) * update.margin) + update.fixed_cost))
+      /total_stake.active_stake, 0)
+    ) END AS member_roi
+  FROM total_rewards_per_epoch rewards
+  JOIN epochs e on 
+    e."no" = rewards.epoch_no
+  LEFT JOIN total_stake_per_epoch total_stake on 
+    rewards.epoch_no = total_stake.epoch_no
+  JOIN pool_update update
+    ON update.id = (
       SELECT id
       FROM pool_update pu2
       WHERE pu2.hash_id = $1 
-        and pu2.active_epoch_no <= r_e.epoch_no
+        and pu2.active_epoch_no <= rewards.epoch_no
       ORDER BY id DESC
       LIMIT 1
     )
-   order by r_e.epoch_no desc
+   order by rewards.epoch_no desc
 `;
 
 export const findPools = `
