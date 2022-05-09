@@ -36,7 +36,7 @@ import Queries, {
   withPagination
 } from './queries';
 
-export class SearchStakePoolBuilder {
+export class StakePoolSearchBuilder {
   #db: Pool;
   #logger: Logger;
   constructor(db: Pool, logger = dummyLogger) {
@@ -81,8 +81,8 @@ export class SearchStakePoolBuilder {
     return result.rows.length > 0 ? result.rows.map(mapPoolData) : [];
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public async queryPoolHashes(query: string, options?: StakePoolQueryOptions, params: any[] = []) {
-    const queryWithPagination = withPagination(query, options?.pagination);
+  public async queryPoolHashes(query: string, params: any[] = [], pagination?: StakePoolQueryOptions['pagination']) {
+    const queryWithPagination = withPagination(query, pagination);
     const result: QueryResult<PoolUpdateModel> = await this.#db.query(queryWithPagination, params);
     return result.rows.length > 0 ? result.rows.map(mapPoolUpdate) : [];
   }
@@ -138,7 +138,7 @@ export class SearchStakePoolBuilder {
     const result: QueryResult<TotalAdaModel> = await this.#db.query(Queries.findTotalAda);
     return result.rows[0].total_ada;
   }
-  public async buildOrQuery(filters: StakePoolQueryOptions['filters']) {
+  public buildOrQuery(filters: StakePoolQueryOptions['filters']) {
     const subQueries: SubQuery[] = [];
     const params = [];
     let query = Queries.findPools;
@@ -167,7 +167,7 @@ export class SearchStakePoolBuilder {
     }
     return { params, query };
   }
-  public async buildAndQuery(filters: StakePoolQueryOptions['filters']) {
+  public buildAndQuery(filters: StakePoolQueryOptions['filters']) {
     let query = Queries.findPools;
     let groupByClause = ' GROUP BY ph.id, pu.id ORDER BY ph.id DESC';
     const params = [];

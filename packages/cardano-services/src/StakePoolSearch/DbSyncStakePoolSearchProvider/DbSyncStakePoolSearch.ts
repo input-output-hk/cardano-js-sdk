@@ -3,26 +3,26 @@ import { Cardano, StakePoolQueryOptions, StakePoolSearchProvider, util } from '@
 import { DbSyncProvider } from '../../DbSyncProvider';
 import { Logger, dummyLogger } from 'ts-log';
 import { Pool } from 'pg';
-import { SearchStakePoolBuilder } from './SearchStakePoolBuilder';
+import { StakePoolSearchBuilder } from './StakePoolSearchBuilder';
 import { toCoreStakePool } from './mappers';
 
 export class DbSyncStakePoolSearchProvider extends DbSyncProvider implements StakePoolSearchProvider {
-  #builder: SearchStakePoolBuilder;
+  #builder: StakePoolSearchBuilder;
   #logger: Logger;
 
-  constructor(db: Pool, builder: SearchStakePoolBuilder, logger = dummyLogger) {
+  constructor(db: Pool, logger = dummyLogger) {
     super(db);
-    this.#builder = builder;
+    this.#builder = new StakePoolSearchBuilder(db, logger);
     this.#logger = logger;
   }
 
   public async queryStakePools(options?: StakePoolQueryOptions): Promise<Cardano.StakePool[]> {
     const { params, query } =
       options?.filters?._condition === 'or'
-        ? await this.#builder.buildOrQuery(options?.filters)
-        : await this.#builder.buildAndQuery(options?.filters);
+        ? this.#builder.buildOrQuery(options?.filters)
+        : this.#builder.buildAndQuery(options?.filters);
     this.#logger.debug('About to query pool hashes');
-    const poolUpdates = await this.#builder.queryPoolHashes(query, options, params);
+    const poolUpdates = await this.#builder.queryPoolHashes(query, params, options?.pagination);
     const hashesIds = poolUpdates.map(({ id }) => id);
     this.#logger.debug(`${hashesIds.length} pools found`);
     const updatesIds = poolUpdates.map(({ updateId }) => updateId);
