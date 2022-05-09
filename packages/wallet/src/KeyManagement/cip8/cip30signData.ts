@@ -1,4 +1,4 @@
-import { AccountKeyDerivationPath } from '..';
+import { AccountKeyDerivationPath, KeyAgent, KeyRole } from '../types';
 import {
   AlgorithmId,
   CBORValue,
@@ -13,11 +13,20 @@ import {
   SigStructure
 } from '@emurgo/cardano-message-signing-nodejs';
 import { Cardano, parseCslAddress, util } from '@cardano-sdk/core';
-import { Cip30DataSignature } from '@cardano-sdk/cip30';
 import { CoseLabel } from './util';
 import { CustomError } from 'ts-custom-error';
-import { KeyAgent, KeyRole } from '../types';
 import { STAKE_KEY_DERIVATION_PATH } from '../util';
+
+type CoseSign1CborHex = Cardano.util.HexBlob;
+type CoseKeyCborHex = Cardano.util.HexBlob;
+
+/**
+ * DataSignature type as described in CIP-0030.
+ */
+export interface Cip30DataSignature {
+  key: CoseKeyCborHex;
+  signature: CoseSign1CborHex;
+}
 
 export interface Cip30SignDataRequest {
   keyAgent: KeyAgent;
