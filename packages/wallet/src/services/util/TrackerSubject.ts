@@ -19,15 +19,19 @@ export class TrackerSubject<T> extends ReplaySubject<T> implements BehaviorObser
     super.next(value);
   }
   complete() {
-    this.#sourceSubscription$.unsubscribe();
+    this.#sourceUnsubscribe();
     super.complete();
   }
   error(err: unknown) {
-    this.#sourceSubscription$.unsubscribe();
+    this.#sourceUnsubscribe();
     super.error(err);
   }
   unsubscribe() {
-    this.#sourceSubscription$.unsubscribe();
+    this.#sourceUnsubscribe();
     super.unsubscribe();
+  }
+  #sourceUnsubscribe() {
+    // can be undefined if source observable completes immediatelly upon subscription in constructor
+    if (this.#sourceSubscription$) this.#sourceSubscription$.unsubscribe();
   }
 }

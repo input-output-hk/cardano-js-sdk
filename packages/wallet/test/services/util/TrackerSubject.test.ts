@@ -1,5 +1,6 @@
 import { TrackerSubject } from '../../../src/services/util';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
+import { lastValueFrom, of } from 'rxjs';
 
 const testUnsubscribeOnCloseAction = (action: (subject: TrackerSubject<string>) => void) => {
   createTestScheduler().run(({ cold, expectSubscriptions }) => {
@@ -11,6 +12,12 @@ const testUnsubscribeOnCloseAction = (action: (subject: TrackerSubject<string>) 
 };
 
 describe('TrackerSubject', () => {
+  it('does not throw if source immediatelly completes', async () => {
+    const subject$ = new TrackerSubject(of(true));
+    await lastValueFrom(subject$);
+    expect(subject$.value).toBe(true);
+  });
+
   it('value is null by default', () => {
     createTestScheduler().run(({ cold, expectObservable, flush }) => {
       const source$ = cold('|');
