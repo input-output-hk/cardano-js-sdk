@@ -55,7 +55,6 @@ export interface TransactionsTracker {
     readonly failed$: Observable<FailedTx>;
     readonly confirmed$: Observable<Cardano.NewTxAlonzo>;
   };
-  shutdown(): void;
 }
 
 export interface RewardsHistory {
@@ -97,5 +96,4 @@ export interface RewardAccount {
 export interface DelegationTracker {
   rewardsHistory$: BehaviorObservable<RewardsHistory>;
   rewardAccounts$: BehaviorObservable<RewardAccount[]>;
-  shutdown(): void;
 }

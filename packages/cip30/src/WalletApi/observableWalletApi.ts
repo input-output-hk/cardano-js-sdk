@@ -92,7 +92,7 @@ export const observableWalletApi = (
   },
   getNetworkId: async (): Promise<number> => {
     logger.debug('getting networkId');
-    return Promise.resolve(wallet.keyAgent.networkId);
+    return wallet.getNetworkId();
   },
   getRewardAddresses: async (): Promise<Cbor[]> => {
     logger.debug('getting reward addresses');
@@ -189,15 +189,14 @@ export const observableWalletApi = (
     }).catch((error) => mapCallbackFailure(error, logger));
     if (shouldProceed) {
       try {
-        const witnessSet = await wallet.keyAgent.signTransaction(
-          {
-            body: coreTx,
-            hash
-          },
-          { inputAddressResolver: wallet.util.resolveInputAddress }
-        );
+        const {
+          witness: { signatures }
+        } = await wallet.finalizeTx({
+          body: coreTx,
+          hash
+        });
 
-        const cslWitnessSet = coreToCsl.witnessSet(witnessSet);
+        const cslWitnessSet = coreToCsl.witnessSet(signatures);
 
         return Promise.resolve(Buffer.from(cslWitnessSet.to_bytes()).toString('hex'));
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

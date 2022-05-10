@@ -11,7 +11,15 @@ import {
   WalletProvider,
   coreToCsl
 } from '@cardano-sdk/core';
-import { Assets, InitializeTxProps, InitializeTxResult, ObservableWallet, SignDataProps, SyncStatus } from './types';
+import {
+  Assets,
+  InitializeTxProps,
+  InitializeTxResult,
+  ObservableWallet,
+  Shutdown,
+  SignDataProps,
+  SyncStatus
+} from './types';
 import {
   Balance,
   BehaviorObservable,
@@ -88,8 +96,8 @@ export class SingleAddressWallet implements ObservableWallet {
   readonly assetProvider: TrackedAssetProvider;
   readonly utxo: TransactionalTracker<Cardano.Utxo[]>;
   readonly balance: TransactionalTracker<Balance>;
-  readonly transactions: TransactionsTracker;
-  readonly delegation: DelegationTracker;
+  readonly transactions: TransactionsTracker & Shutdown;
+  readonly delegation: DelegationTracker & Shutdown;
   readonly tip$: BehaviorObservable<Cardano.Tip>;
   readonly networkInfo$: TrackerSubject<NetworkInfo>;
   readonly addresses$: TrackerSubject<GroupedAddress[]>;
@@ -214,6 +222,14 @@ export class SingleAddressWallet implements ObservableWallet {
       stores.assets
     );
     this.util = createWalletUtil(this);
+  }
+
+  async getNetworkId(): Promise<Cardano.NetworkId> {
+    return this.keyAgent.networkId;
+  }
+
+  async getName(): Promise<string> {
+    return this.name;
   }
 
   async initializeTx(props: InitializeTxProps): Promise<InitializeTxResult> {
