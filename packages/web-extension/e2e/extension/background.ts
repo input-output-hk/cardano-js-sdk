@@ -1,13 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
+  AdaPriceService,
+  UserPromptService,
+  adaPriceProperties,
+  adaPriceServiceChannel,
+  userPromptServiceChannel,
+  walletName
+} from './util';
+import {
   PersistentAuthenticator,
   RequestAccess,
   createPersistentAuthenticatorStorage,
   initializeBackgroundScript
 } from '@cardano-sdk/cip30';
-import { RemoteApiPropertyType, consumeRemoteApi } from '@cardano-sdk/web-extension';
+import { RemoteApiPropertyType, consumeRemoteApi, exposeApi } from '@cardano-sdk/web-extension';
 import { Tabs, runtime, storage, tabs } from 'webextension-polyfill';
-import { UserPromptService, userPromptServiceChannel, walletName } from './util';
+import { of } from 'rxjs';
 import { stubWalletApi } from './stubWalletApi';
 
 const waitForTabLoad = (tab: Tabs.Tab) =>
@@ -47,6 +55,19 @@ const requestAccess: RequestAccess = async (origin) => {
   return await userPromptService.allowOrigin(origin);
 };
 
+// Export any additional services to be shared by UIs
+const priceService: AdaPriceService = {
+  adaUsd$: of(2.99)
+};
+exposeApi(
+  {
+    api: priceService,
+    baseChannel: adaPriceServiceChannel,
+    properties: adaPriceProperties
+  },
+  { logger, runtime }
+);
+
 void (async () => {
   // TODO: test with real wallet once blockfrost load issue is resolved
   // const confirmationCallback: cip30.CallbackConfirmation = async () => true;
@@ -63,6 +84,7 @@ void (async () => {
   //     walletProvider: await walletProvider
   //   }
   // );
+  // exposeObservableWallet({ wallet, walletName }, { logger, runtime });
   // const walletApi = cip30.createWalletApi(wallet, confirmationCallback, { logger });
   const walletApi = stubWalletApi;
   const authenticatorStorage = createPersistentAuthenticatorStorage(`${walletName}Origins`, storage.local);
@@ -70,6 +92,6 @@ void (async () => {
     { requestAccess },
     { logger, storage: authenticatorStorage }
   );
-  await authenticator.clear();
+  await authenticator.clear(); // needed for e2e tests
   initializeBackgroundScript({ walletName }, { authenticator, logger, runtime, walletApi });
 })();
