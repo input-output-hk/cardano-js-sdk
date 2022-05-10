@@ -3,7 +3,7 @@ import { ApiError, DataSignError, PaginateError, TxSendError, TxSignError } from
 import {
   MessengerDependencies,
   RemoteApiProperties,
-  RemoteApiProperty,
+  RemoteApiPropertyType,
   consumeRemoteApi
 } from '@cardano-sdk/web-extension';
 import { WalletApi, WalletApiMethodNames } from '.';
@@ -28,7 +28,7 @@ export const consumeRemoteWalletApi = (
       baseChannel: walletApiChannel(walletName),
       getErrorPrototype,
       properties: Object.fromEntries(
-        WalletApiMethodNames.map((prop) => [prop, RemoteApiProperty.MethodReturningPromise])
+        WalletApiMethodNames.map((prop) => [prop, RemoteApiPropertyType.MethodReturningPromise])
       ) as RemoteApiProperties<WalletApi>
     },
     dependencies

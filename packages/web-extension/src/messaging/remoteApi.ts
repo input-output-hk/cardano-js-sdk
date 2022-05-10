@@ -1,4 +1,3 @@
-// only tested in ../e2e tests
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   BindRequestHandlerOptions,
@@ -8,7 +7,9 @@ import {
   Messenger,
   MessengerApiDependencies,
   MethodRequest,
-  RemoteApiProperty,
+  MethodRequestOptions,
+  RemoteApiMethod,
+  RemoteApiPropertyType,
   RequestMessage,
   ResponseMessage,
   SubscriptionMessage
@@ -27,12 +28,12 @@ import {
   tap,
   timeout
 } from 'rxjs';
+import { NotImplementedError, util } from '@cardano-sdk/core';
 // Review: this import doesn't feel right - might make sense to hoist this to a shared util package.
 // However I'm planning to export a utility to `exposeObservableWallet`
 // from web-extension package, so this is ok in terms of dependency tree
 import { TrackerSubject } from '@cardano-sdk/wallet';
 import { isEmitMessage, isRequestMessage, isResponseMessage, isSubscriptionMessage, newMessageId } from './util';
-import { util } from '@cardano-sdk/core';
 
 export interface Shutdown {
   // Review: Name of this method is imposed by ObservableWallet
@@ -61,6 +62,41 @@ const throwIfObservableChannelDoesntExist = ({ postMessage, message$ }: Messenge
   ).pipe(mergeMap(() => EMPTY));
 };
 
+const consumeMethod =
+  (
+    {
+      propName,
+      getErrorPrototype
+    }: { propName: string; getErrorPrototype?: util.GetErrorPrototype; options?: MethodRequestOptions },
+    { messenger: { message$, postMessage } }: MessengerApiDependencies
+  ) =>
+  async (...args: unknown[]) => {
+    const requestMessage: RequestMessage = {
+      messageId: newMessageId(),
+      request: {
+        args: args.map(util.toSerializableObject),
+        method: propName
+      }
+    };
+
+    const result = await firstValueFrom(
+      merge(
+        postMessage(requestMessage).pipe(mergeMap(() => EMPTY)),
+        message$.pipe(
+          map(({ data }) => data),
+          filter(isResponseMessage),
+          filter(({ messageId }) => messageId === requestMessage.messageId),
+          map(({ response }) => util.fromSerializableObject(response, getErrorPrototype))
+        )
+      )
+    );
+
+    if (result instanceof Error) {
+      throw result;
+    }
+    return result;
+  };
+
 /**
  * Creates a proxy to a remote api object
  *
@@ -68,11 +104,11 @@ const throwIfObservableChannelDoesntExist = ({ postMessage, message$ }: Messenge
  */
 export const consumeMessengerRemoteApi = <T extends object>(
   { properties, getErrorPrototype }: ConsumeRemoteApiOptions<T>,
-  { logger, messenger: { message$, postMessage, deriveChannel: derive, destroy } }: MessengerApiDependencies
+  { logger, messenger }: MessengerApiDependencies
 ): T & Shutdown =>
   new Proxy<T & Shutdown>(
     {
-      shutdown: destroy
+      shutdown: messenger.destroy
     } as T & Shutdown,
     {
       get(target, prop) {
@@ -80,39 +116,24 @@ export const consumeMessengerRemoteApi = <T extends object>(
         const propMetadata = properties[prop as keyof T];
         const propName = prop.toString();
         if (typeof propMetadata === 'object') {
-          return consumeMessengerRemoteApi(
-            { getErrorPrototype, properties: propMetadata },
-            { logger, messenger: derive(propName) }
-          );
-        } else if (propMetadata === RemoteApiProperty.MethodReturningPromise) {
-          return async (...args: unknown[]) => {
-            const requestMessage: RequestMessage = {
-              messageId: newMessageId(),
-              request: {
-                args: args.map(util.toSerializableObject),
-                method: propName
-              }
-            };
-
-            const result = await firstValueFrom(
-              merge(
-                postMessage(requestMessage).pipe(mergeMap(() => EMPTY)),
-                message$.pipe(
-                  map(({ data }) => data),
-                  filter(isResponseMessage),
-                  filter(({ messageId }) => messageId === requestMessage.messageId),
-                  map(({ response }) => util.fromSerializableObject(response, getErrorPrototype))
-                )
-              )
-            );
-
-            if (result instanceof Error) {
-              throw result;
+          if ('propType' in propMetadata) {
+            if (propMetadata.propType === RemoteApiPropertyType.MethodReturningPromise) {
+              return consumeMethod(
+                { getErrorPrototype, options: propMetadata.requestOptions, propName },
+                { logger, messenger }
+              );
             }
-            return result;
-          };
-        } else if (propMetadata === RemoteApiProperty.Observable) {
-          const observableMessenger = derive(propName);
+            throw new NotImplementedError('Only MethodReturningPromise prop type can be specified as object');
+          } else {
+            return consumeMessengerRemoteApi(
+              { getErrorPrototype, properties: propMetadata as any },
+              { logger, messenger: messenger.deriveChannel(propName) }
+            );
+          }
+        } else if (propMetadata === RemoteApiPropertyType.MethodReturningPromise) {
+          return consumeMethod({ getErrorPrototype, propName }, { logger, messenger });
+        } else if (propMetadata === RemoteApiPropertyType.Observable) {
+          const observableMessenger = messenger.deriveChannel(propName);
           const messageData$ = observableMessenger.message$.pipe(map(({ data }) => data));
           const unsubscribe$ = messageData$.pipe(
             filter(isSubscriptionMessage),
@@ -161,7 +182,7 @@ export const bindMessengerRequestHandler = <Response>(
   });
 
 export const bindNestedObjChannels = <API extends object>(
-  { api, methodRequestOptions }: ExposeApiProps<API>,
+  { api, properties }: ExposeApiProps<API>,
   { messenger, logger }: MessengerApiDependencies
 ) => {
   const subscriptions = Object.keys(api)
@@ -169,10 +190,7 @@ export const bindNestedObjChannels = <API extends object>(
     .map((prop) =>
       // eslint-disable-next-line no-use-before-define
       exposeMessengerApi(
-        {
-          api: (api as any)[prop],
-          methodRequestOptions
-        },
+        { api: (api as any)[prop], properties: (properties as any)[prop] },
         { logger, messenger: messenger.deriveChannel(prop) }
       )
     );
@@ -185,9 +203,15 @@ export const bindNestedObjChannels = <API extends object>(
   };
 };
 
-export const bindObservableChannels = <API extends object>(api: API, { messenger }: MessengerApiDependencies) => {
+export const bindObservableChannels = <API extends object>(
+  { api, properties }: ExposeApiProps<API>,
+  { messenger }: MessengerApiDependencies
+) => {
   const subscriptions = Object.keys(api)
-    .filter((method) => isObservable((api as any)[method]))
+    .filter(
+      (method) =>
+        properties[method as keyof API] === RemoteApiPropertyType.Observable && isObservable(api[method as keyof API])
+    )
     .map((observableProperty) => {
       const observable$ = new TrackerSubject((api as any)[observableProperty] as Observable<unknown>);
       const observableMessenger = messenger.deriveChannel(observableProperty);
@@ -224,6 +248,9 @@ export const bindObservableChannels = <API extends object>(api: API, { messenger
   };
 };
 
+const isRemoteApiMethod = (prop: unknown): prop is RemoteApiMethod =>
+  typeof prop === 'object' && prop !== null && 'propType' in prop;
+
 /**
  * Bind an API object to handle messages from other parts of the extension.
  * This can only used once per channelName per process.
@@ -234,20 +261,26 @@ export const bindObservableChannels = <API extends object>(api: API, { messenger
  * In addition to errors thrown by the underlying API, methods can throw TypeError
  */
 export const exposeMessengerApi = <API extends object>(
-  {
-    api,
-    methodRequestOptions: { validate = async () => void 0, transform = (request: MethodRequest) => request } = {}
-  }: ExposeApiProps<API>,
+  { api, properties }: ExposeApiProps<API>,
   dependencies: MessengerApiDependencies
 ) => {
-  const observableChannelsSubscription = bindObservableChannels(api, dependencies);
-  const nestedObjChannelsSubscription = bindNestedObjChannels(
-    { api, methodRequestOptions: { transform, validate } },
-    dependencies
-  );
+  const observableChannelsSubscription = bindObservableChannels({ api, properties }, dependencies);
+  const nestedObjChannelsSubscription = bindNestedObjChannels({ api, properties }, dependencies);
   const methodHandlerSubscription = bindMessengerRequestHandler(
     {
       handler: async (originalRequest, sender) => {
+        const property = properties[originalRequest.method as keyof API];
+        if (
+          typeof property === 'undefined' ||
+          (property !== RemoteApiPropertyType.MethodReturningPromise &&
+            isRemoteApiMethod(property) &&
+            property.propType !== RemoteApiPropertyType.MethodReturningPromise)
+        ) {
+          throw new Error(`Attempted to call a method that was not explicitly exposed: ${originalRequest.method}`);
+        }
+        const { validate = async () => void 0, transform = (req) => req } = isRemoteApiMethod(property)
+          ? property.requestOptions
+          : ({} as MethodRequestOptions);
         await validate(originalRequest, sender);
         const { args, method } = transform(originalRequest, sender);
         const apiTarget: unknown = method in api && (api as any)[method];

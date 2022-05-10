@@ -66,21 +66,6 @@ export interface ReconnectConfig {
   maxDelay: number;
 }
 
-export interface MessengerOptions {
-  /**
-   * Only used in non-background process for now
-   */
-  reconnectConfig?: ReconnectConfig;
-}
-
-export interface ExposeApiProps<API extends object> extends MessengerOptions {
-  api: API;
-  methodRequestOptions?: {
-    transform?: TransformRequest;
-    validate?: ValidateRequest;
-  };
-}
-
 export interface BindRequestHandlerOptions<Response> {
   handler: (request: MethodRequest, sender?: Runtime.MessageSender) => Promise<Response>;
 }
@@ -90,17 +75,34 @@ export interface PortMessage<Data = unknown> {
   port: Pick<MessengerPort, 'sender' | 'postMessage'>;
 }
 
-export enum RemoteApiProperty {
+export enum RemoteApiPropertyType {
   MethodReturningPromise,
   // eslint-disable-next-line @typescript-eslint/no-shadow
   Observable
 }
 
+export interface MethodRequestOptions {
+  transform?: TransformRequest;
+  validate?: ValidateRequest;
+}
+
+export interface RemoteApiMethod {
+  propType: RemoteApiPropertyType.MethodReturningPromise;
+  requestOptions: MethodRequestOptions;
+}
+
+export type RemoteApiProperty = RemoteApiPropertyType | RemoteApiMethod;
+
 export type RemoteApiProperties<T> = {
-  [key in keyof T]: RemoteApiProperty | RemoteApiProperties<T[key]>;
+  [key in keyof T]: RemoteApiProperty | Omit<RemoteApiProperties<T[key]>, 'propType' | 'requestOptions'>;
 };
 
-export interface ConsumeRemoteApiOptions<T> extends MessengerOptions {
+export interface ExposeApiProps<API extends object> {
+  api: API;
+  properties: RemoteApiProperties<API>;
+}
+
+export interface ConsumeRemoteApiOptions<T> {
   properties: RemoteApiProperties<T>;
   getErrorPrototype?: util.GetErrorPrototype;
 }

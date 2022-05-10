@@ -1,6 +1,6 @@
 /* eslint-disable no-use-before-define */
+import { RemoteApiPropertyType, exposeApi } from '@cardano-sdk/web-extension';
 import { UserPromptService, userPromptServiceChannel } from './util';
-import { exposeApi } from '@cardano-sdk/web-extension';
 import { runtime } from 'webextension-polyfill';
 
 const api: UserPromptService = {
@@ -25,4 +25,11 @@ const api: UserPromptService = {
   }
 };
 
-exposeApi<UserPromptService>({ api, baseChannel: userPromptServiceChannel }, { logger: console, runtime });
+exposeApi<UserPromptService>(
+  {
+    api,
+    baseChannel: userPromptServiceChannel,
+    properties: { allowOrigin: RemoteApiPropertyType.MethodReturningPromise }
+  },
+  { logger: console, runtime }
+);

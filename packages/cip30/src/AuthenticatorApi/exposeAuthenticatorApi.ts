@@ -1,6 +1,14 @@
 // tested in web-extension/e2e tests
-import { AuthenticatorApi } from './types';
-import { MessengerDependencies, exposeApi, senderOrigin } from '@cardano-sdk/web-extension';
+import { AuthenticatorApi, RemoteAuthenticator } from './types';
+import {
+  MessengerDependencies,
+  RemoteApiMethod,
+  RemoteApiProperties,
+  RemoteApiPropertyType,
+  exposeApi,
+  senderOrigin
+} from '@cardano-sdk/web-extension';
+import { RemoteAuthenticatorMethodNames } from './consumeRemoteAuthenticatorApi ';
 import { authenticatorChannel } from './util';
 
 export interface ExposeAuthenticatorApiOptions {
@@ -19,12 +27,20 @@ export const exposeAuthenticatorApi = (
     {
       api: dependencies.authenticator,
       baseChannel: authenticatorChannel(walletName),
-      methodRequestOptions: {
-        transform: ({ method }, sender) => ({
-          args: [senderOrigin(sender)],
-          method
-        })
-      }
+      properties: Object.fromEntries(
+        RemoteAuthenticatorMethodNames.map((prop) => [
+          prop,
+          {
+            propType: RemoteApiPropertyType.MethodReturningPromise,
+            requestOptions: {
+              transform: ({ method }, sender) => ({
+                args: [senderOrigin(sender)],
+                method
+              })
+            }
+          } as RemoteApiMethod
+        ])
+      ) as RemoteApiProperties<RemoteAuthenticator>
     },
     dependencies
   );

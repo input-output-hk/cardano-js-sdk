@@ -5,7 +5,7 @@ import {
   createPersistentAuthenticatorStorage,
   initializeBackgroundScript
 } from '@cardano-sdk/cip30';
-import { RemoteApiProperty, consumeRemoteApi } from '@cardano-sdk/web-extension';
+import { RemoteApiPropertyType, consumeRemoteApi } from '@cardano-sdk/web-extension';
 import { Tabs, runtime, storage, tabs } from 'webextension-polyfill';
 import { UserPromptService, userPromptServiceChannel, walletName } from './util';
 import { stubWalletApi } from './stubWalletApi';
@@ -37,7 +37,7 @@ const userPromptService = consumeRemoteApi<UserPromptService>(
   {
     baseChannel: userPromptServiceChannel,
     properties: {
-      allowOrigin: RemoteApiProperty.MethodReturningPromise
+      allowOrigin: RemoteApiPropertyType.MethodReturningPromise
     }
   },
   { logger, runtime }
