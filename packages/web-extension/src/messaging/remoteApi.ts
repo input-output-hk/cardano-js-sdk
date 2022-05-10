@@ -68,8 +68,8 @@ const throwIfObservableChannelDoesntExist = ({ postMessage, message$ }: Messenge
  */
 export const consumeMessengerRemoteApi = <T extends object>(
   { properties, getErrorPrototype }: ConsumeRemoteApiOptions<T>,
-  { messenger: { message$, postMessage, deriveChannel: derive, destroy } }: MessengerApiDependencies
-) =>
+  { logger, messenger: { message$, postMessage, deriveChannel: derive, destroy } }: MessengerApiDependencies
+): T & Shutdown =>
   new Proxy<T & Shutdown>(
     {
       shutdown: destroy
@@ -77,9 +77,14 @@ export const consumeMessengerRemoteApi = <T extends object>(
     {
       get(target, prop) {
         if (prop in target) return (target as any)[prop];
-        const propType = properties[prop as keyof T];
+        const propMetadata = properties[prop as keyof T];
         const propName = prop.toString();
-        if (propType === RemoteApiProperty.MethodReturningPromise) {
+        if (typeof propMetadata === 'object') {
+          return consumeMessengerRemoteApi(
+            { getErrorPrototype, properties: propMetadata },
+            { logger, messenger: derive(propName) }
+          );
+        } else if (propMetadata === RemoteApiProperty.MethodReturningPromise) {
           return async (...args: unknown[]) => {
             const requestMessage: RequestMessage = {
               messageId: newMessageId(),
@@ -106,7 +111,7 @@ export const consumeMessengerRemoteApi = <T extends object>(
             }
             return result;
           };
-        } else if (propType === RemoteApiProperty.Observable) {
+        } else if (propMetadata === RemoteApiProperty.Observable) {
           const observableMessenger = derive(propName);
           const messageData$ = observableMessenger.message$.pipe(map(({ data }) => data));
           const unsubscribe$ = messageData$.pipe(
@@ -154,6 +159,31 @@ export const bindMessengerRequestHandler = <Response>(
     // TODO: can this throw if port is closed?
     port.postMessage(responseMessage);
   });
+
+export const bindNestedObjChannels = <API extends object>(
+  { api, methodRequestOptions }: ExposeApiProps<API>,
+  { messenger, logger }: MessengerApiDependencies
+) => {
+  const subscriptions = Object.keys(api)
+    .filter((prop) => typeof (api as any)[prop] === 'object' && !isObservable((api as any)[prop]))
+    .map((prop) =>
+      // eslint-disable-next-line no-use-before-define
+      exposeMessengerApi(
+        {
+          api: (api as any)[prop],
+          methodRequestOptions
+        },
+        { logger, messenger: messenger.deriveChannel(prop) }
+      )
+    );
+  return {
+    unsubscribe: () => {
+      for (const subscription of subscriptions) {
+        subscription.unsubscribe();
+      }
+    }
+  };
+};
 
 export const bindObservableChannels = <API extends object>(api: API, { messenger }: MessengerApiDependencies) => {
   const subscriptions = Object.keys(api)
@@ -211,6 +241,10 @@ export const exposeMessengerApi = <API extends object>(
   dependencies: MessengerApiDependencies
 ) => {
   const observableChannelsSubscription = bindObservableChannels(api, dependencies);
+  const nestedObjChannelsSubscription = bindNestedObjChannels(
+    { api, methodRequestOptions: { transform, validate } },
+    dependencies
+  );
   const methodHandlerSubscription = bindMessengerRequestHandler(
     {
       handler: async (originalRequest, sender) => {
@@ -227,6 +261,7 @@ export const exposeMessengerApi = <API extends object>(
   );
   return {
     unsubscribe: () => {
+      nestedObjChannelsSubscription.unsubscribe();
       observableChannelsSubscription.unsubscribe();
       methodHandlerSubscription.unsubscribe();
     }

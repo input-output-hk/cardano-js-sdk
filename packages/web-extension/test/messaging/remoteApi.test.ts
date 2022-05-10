@@ -51,10 +51,14 @@ const createMessenger = (channel: ChannelName, isHost: boolean): Messenger => {
   };
 };
 
-const setUp = (someNumbers$: Observable<bigint> = of(0n)) => {
+const setUp = (someNumbers$: Observable<bigint> = of(0n), nestedSomeNumbers$ = of(0n)) => {
   const baseChannel = 'base-channel';
   const api = {
     addOne: async (arg: bigint) => arg + 1n,
+    nested: {
+      nestedAddOne: async (arg: bigint) => arg + 1n,
+      nestedSomeNumbers$
+    },
     someNumbers$
   };
   const hostSubscription = exposeMessengerApi(
@@ -86,6 +90,10 @@ const setUp = (someNumbers$: Observable<bigint> = of(0n)) => {
     {
       properties: {
         addOne: RemoteApiProperty.MethodReturningPromise,
+        nested: {
+          nestedAddOne: RemoteApiProperty.MethodReturningPromise,
+          nestedSomeNumbers$: RemoteApiProperty.Observable
+        },
         someNumbers$: RemoteApiProperty.Observable
       }
     },
@@ -103,90 +111,121 @@ const setUp = (someNumbers$: Observable<bigint> = of(0n)) => {
 type SUT = ReturnType<typeof setUp>;
 
 describe('remoteApi', () => {
-  describe('methods returning promise', () => {
-    let sut: SUT;
+  let sut: SUT;
 
+  afterEach(() => {
+    sut.cleanup();
+    createSubjects.cache.clear!();
+  });
+
+  it('invalid properties are undefined', () => {
+    sut = setUp();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect((sut.consumer as any).addTwo).toBeUndefined();
+  });
+
+  describe('methods returning promise', () => {
     beforeEach(() => {
       sut = setUp();
     });
-    afterEach(() => sut.cleanup());
-    it('invalid properties are undefined', () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      expect((sut.consumer as any).addTwo).toBeUndefined();
+
+    it('nested property | calls remote method and resolves result', async () => {
+      expect(await sut.consumer.nested.nestedAddOne(2n)).toBe(3n);
     });
-    it('calls remote method and resolves result', async () => {
-      expect(await sut.consumer.addOne(2n)).toBe(3n);
-    });
-    describe('methodRequestOptions', () => {
-      // see beforeAll for setup
-      test('transform', async () => {
-        expect(await sut.consumer.addOne(1n)).toBe(3n);
+
+    describe('top-level property', () => {
+      it('calls remote method and resolves result', async () => {
+        expect(await sut.consumer.addOne(2n)).toBe(3n);
       });
-      test('validate', async () => {
-        await expect(() => sut.consumer.addOne(0n)).rejects.toThrowError();
+
+      describe('methodRequestOptions', () => {
+        // see beforeAll for setup
+        test('transform', async () => {
+          expect(await sut.consumer.addOne(1n)).toBe(3n);
+        });
+
+        test('validate', async () => {
+          await expect(() => sut.consumer.addOne(0n)).rejects.toThrowError();
+        });
       });
     });
   });
 
   describe('observables', () => {
-    let source$: Subject<bigint>;
-    let sut: SUT;
+    let someNumbersSource$: Subject<bigint>;
+    let nestedSomeNumbersSource$: Subject<bigint>;
 
     beforeEach(() => {
-      source$ = new Subject();
-      sut = setUp(source$);
-    });
-    afterEach(() => {
-      createSubjects.cache.clear!();
-      sut.cleanup();
+      someNumbersSource$ = new Subject();
+      nestedSomeNumbersSource$ = new Subject();
+      sut = setUp(someNumbersSource$, nestedSomeNumbersSource$);
     });
 
-    describe('mirrors source emissions and completion', () => {
-      it('values emitted after subscription', (done) => {
-        const emitted = firstValueFrom(sut.consumer.someNumbers$.pipe(toArray()));
-        setTimeout(async () => {
-          source$.next(0n);
-          source$.next(1n);
-          source$.complete();
-          expect(await emitted).toEqual([0n, 1n]);
-          done();
-        }, 1);
-      });
-      it('replays 1 last value emitted before subscription', (done) => {
-        source$.next(-1n);
-        source$.next(0n);
-        setTimeout(() => {
+    afterEach(() => {
+      someNumbersSource$.complete();
+      nestedSomeNumbersSource$.complete();
+    });
+
+    describe('top level property', () => {
+      describe('mirrors source emissions and completion', () => {
+        it('values emitted after subscription', (done) => {
           const emitted = firstValueFrom(sut.consumer.someNumbers$.pipe(toArray()));
           setTimeout(async () => {
-            source$.next(1n);
-            source$.complete();
+            someNumbersSource$.next(0n);
+            someNumbersSource$.next(1n);
+            someNumbersSource$.complete();
             expect(await emitted).toEqual([0n, 1n]);
             done();
           }, 1);
-        }, 1);
+        });
+
+        it('replays 1 last value emitted before subscription', (done) => {
+          someNumbersSource$.next(-1n);
+          someNumbersSource$.next(0n);
+          setTimeout(() => {
+            const emitted = firstValueFrom(sut.consumer.someNumbers$.pipe(toArray()));
+            setTimeout(async () => {
+              someNumbersSource$.next(1n);
+              someNumbersSource$.complete();
+              expect(await emitted).toEqual([0n, 1n]);
+              done();
+            }, 1);
+          }, 1);
+        });
+      });
+
+      describe('mirrors source errors', () => {
+        const subscribeAndAssertError = (done: Function) => {
+          sut.consumer.someNumbers$.subscribe({
+            error: (err) => {
+              expect(err instanceof Error).toBe(true);
+              expect(err.message).toBe('err');
+              done();
+            }
+          });
+        };
+
+        it('when thrown after subscription', (done) => {
+          subscribeAndAssertError(done);
+          someNumbersSource$.error(new Error('err'));
+        });
+
+        it('when thrown before subscription', (done) => {
+          someNumbersSource$.error(new Error('err'));
+          subscribeAndAssertError(done);
+        });
       });
     });
 
-    describe('mirrors source errors', () => {
-      const subscribeAndAssertError = (done: Function) => {
-        sut.consumer.someNumbers$.subscribe({
-          error: (err) => {
-            expect(err instanceof Error).toBe(true);
-            expect(err.message).toBe('err');
-            done();
-          }
-        });
-      };
-
-      it('when thrown after subscription', (done) => {
-        subscribeAndAssertError(done);
-        source$.error(new Error('err'));
-      });
-
-      it('when thrown before subscription', (done) => {
-        source$.error(new Error('err'));
-        subscribeAndAssertError(done);
-      });
+    it('nested property | mirrors source emissions and completion for values emitted after subscription', (done) => {
+      const emitted = firstValueFrom(sut.consumer.nested.nestedSomeNumbers$.pipe(toArray()));
+      setTimeout(async () => {
+        nestedSomeNumbersSource$.next(0n);
+        nestedSomeNumbersSource$.next(1n);
+        nestedSomeNumbersSource$.complete();
+        expect(await emitted).toEqual([0n, 1n]);
+        done();
+      }, 1);
     });
   });
 });
