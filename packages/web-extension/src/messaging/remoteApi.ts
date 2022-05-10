@@ -29,19 +29,8 @@ import {
   timeout
 } from 'rxjs';
 import { NotImplementedError, util } from '@cardano-sdk/core';
-// Review: this import doesn't feel right - might make sense to hoist this to a shared util package.
-// However I'm planning to export a utility to `exposeObservableWallet`
-// from web-extension package, so this is ok in terms of dependency tree
-import { TrackerSubject } from '@cardano-sdk/wallet';
+import { Shutdown, TrackerSubject } from '@cardano-sdk/wallet';
 import { isEmitMessage, isRequestMessage, isResponseMessage, isSubscriptionMessage, newMessageId } from './util';
-
-export interface Shutdown {
-  // Review: Name of this method is imposed by ObservableWallet
-  // for easier implementation to reuse the same method name
-  // to disconnect the observable channels.
-  // Might be a good idea to hoist this interface somewhere and use it as base for ObservableWallet interface.
-  shutdown: () => void;
-}
 
 const SUBSCRIPTION_TIMEOUT = 3000;
 const throwIfObservableChannelDoesntExist = ({ postMessage, message$ }: Messenger) => {
