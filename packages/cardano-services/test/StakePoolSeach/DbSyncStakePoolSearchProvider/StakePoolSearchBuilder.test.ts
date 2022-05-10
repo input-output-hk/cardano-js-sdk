@@ -3,13 +3,8 @@ import { Pool } from 'pg';
 import { StakePoolSearchBuilder } from '../../../src';
 
 describe('StakePoolSearchBuilder', () => {
-  let dbConnection: Pool;
-  let builder: StakePoolSearchBuilder;
-
-  beforeAll(async () => {
-    dbConnection = new Pool({ connectionString: process.env.DB_CONNECTION_STRING });
-    builder = new StakePoolSearchBuilder(dbConnection);
-  });
+  const dbConnection = new Pool({ connectionString: process.env.DB_CONNECTION_STRING });
+  const builder = new StakePoolSearchBuilder(dbConnection);
 
   afterAll(async () => {
     await dbConnection.end();
@@ -86,25 +81,79 @@ describe('StakePoolSearchBuilder', () => {
     });
   });
   describe('buildPoolsByStatusQuery', () => {
+    const buildPoolsByStatusQuerySpy = jest.spyOn(builder, 'buildPoolsByStatusQuery');
+    afterEach(() => jest.clearAllMocks());
+    afterAll(() => buildPoolsByStatusQuerySpy.mockRestore());
+
     it('activating', async () => {
-      const poolsByStatusQuery = await builder.buildPoolsByStatusQuery([Cardano.StakePoolStatus.Activating]);
+      const activatingStatus = [Cardano.StakePoolStatus.Activating];
+      const poolsByStatusQuery = builder.buildPoolsByStatusQuery(activatingStatus);
+
+      const _filters: StakePoolQueryOptions['filters'] = {
+        status: activatingStatus
+      };
+      const builtQuery = builder.buildOrQuery(_filters);
+      const poolHashes = await builder.queryPoolHashes(builtQuery.query, builtQuery.params);
+      expect(buildPoolsByStatusQuerySpy).toHaveBeenCalledTimes(2);
+      expect(buildPoolsByStatusQuerySpy).toHaveReturnedWith(poolsByStatusQuery);
       expect(poolsByStatusQuery).toMatchSnapshot();
+      expect(poolHashes).toMatchSnapshot();
     });
     it('active', async () => {
-      const poolsByStatusQuery = await builder.buildPoolsByStatusQuery([Cardano.StakePoolStatus.Active]);
+      const activeStatus = [Cardano.StakePoolStatus.Active];
+      const poolsByStatusQuery = builder.buildPoolsByStatusQuery(activeStatus);
+
+      const _filters: StakePoolQueryOptions['filters'] = {
+        status: activeStatus
+      };
+      const builtQuery = builder.buildOrQuery(_filters);
+      const poolHashes = await builder.queryPoolHashes(builtQuery.query, builtQuery.params);
+      expect(buildPoolsByStatusQuerySpy).toHaveBeenCalledTimes(2);
+      expect(buildPoolsByStatusQuerySpy).toHaveReturnedWith(poolsByStatusQuery);
       expect(poolsByStatusQuery).toMatchSnapshot();
+      expect(poolHashes).toMatchSnapshot();
     });
     it('retiring', async () => {
-      const poolsByStatusQuery = await builder.buildPoolsByStatusQuery([Cardano.StakePoolStatus.Retiring]);
+      const retiringStatus = [Cardano.StakePoolStatus.Retiring];
+      const poolsByStatusQuery = builder.buildPoolsByStatusQuery(retiringStatus);
+
+      const _filters: StakePoolQueryOptions['filters'] = {
+        status: retiringStatus
+      };
+      const builtQuery = builder.buildOrQuery(_filters);
+      const poolHashes = await builder.queryPoolHashes(builtQuery.query, builtQuery.params);
+      expect(buildPoolsByStatusQuerySpy).toHaveBeenCalledTimes(2);
+      expect(buildPoolsByStatusQuerySpy).toHaveReturnedWith(poolsByStatusQuery);
       expect(poolsByStatusQuery).toMatchSnapshot();
+      expect(poolHashes).toMatchSnapshot();
     });
     it('retired', async () => {
-      const poolsByStatusQuery = await builder.buildPoolsByStatusQuery([Cardano.StakePoolStatus.Retired]);
+      const retiredStatus = [Cardano.StakePoolStatus.Retired];
+      const poolsByStatusQuery = builder.buildPoolsByStatusQuery(retiredStatus);
+
+      const _filters: StakePoolQueryOptions['filters'] = {
+        status: retiredStatus
+      };
+      const builtQuery = builder.buildOrQuery(_filters);
+      const poolHashes = await builder.queryPoolHashes(builtQuery.query, builtQuery.params);
+      expect(buildPoolsByStatusQuerySpy).toHaveBeenCalledTimes(2);
+      expect(buildPoolsByStatusQuerySpy).toHaveReturnedWith(poolsByStatusQuery);
       expect(poolsByStatusQuery).toMatchSnapshot();
+      expect(poolHashes).toMatchSnapshot();
     });
     it('active,activating,retiring,retired', async () => {
-      const poolsByStatusQuery = await builder.buildPoolsByStatusQuery(Object.values(Cardano.StakePoolStatus));
+      const poolStatus = Object.values(Cardano.StakePoolStatus);
+      const poolsByStatusQuery = builder.buildPoolsByStatusQuery(poolStatus);
+
+      const _filters: StakePoolQueryOptions['filters'] = {
+        status: poolStatus
+      };
+      const builtQuery = builder.buildOrQuery(_filters);
+      const poolHashes = await builder.queryPoolHashes(builtQuery.query, builtQuery.params);
+      expect(buildPoolsByStatusQuerySpy).toHaveBeenCalledTimes(2);
+      expect(buildPoolsByStatusQuerySpy).toHaveReturnedWith(poolsByStatusQuery);
       expect(poolsByStatusQuery).toMatchSnapshot();
+      expect(poolHashes).toMatchSnapshot();
     });
   });
   describe('buildPoolsByPledgeMetQuery', () => {

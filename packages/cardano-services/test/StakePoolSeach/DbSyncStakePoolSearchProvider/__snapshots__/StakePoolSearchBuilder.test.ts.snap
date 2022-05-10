@@ -706,6 +706,8 @@ Object {
 }
 `;
 
+exports[`StakePoolSearchBuilder buildPoolsByStatusQuery activating 2`] = `Array []`;
+
 exports[`StakePoolSearchBuilder buildPoolsByStatusQuery active 1`] = `
 Object {
   "id": Object {
@@ -739,6 +741,35 @@ Object {
           AND COALESCE(pr.retiring_epoch,0) < pu.active_epoch_no))
     ",
 }
+`;
+
+exports[`StakePoolSearchBuilder buildPoolsByStatusQuery active 2`] = `
+Array [
+  Object {
+    "id": "2055",
+    "updateId": "2068",
+  },
+  Object {
+    "id": "20",
+    "updateId": "20",
+  },
+  Object {
+    "id": "16",
+    "updateId": "16",
+  },
+  Object {
+    "id": "15",
+    "updateId": "309",
+  },
+  Object {
+    "id": "14",
+    "updateId": "14",
+  },
+  Object {
+    "id": "6",
+    "updateId": "6",
+  },
+]
 `;
 
 exports[`StakePoolSearchBuilder buildPoolsByStatusQuery active,activating,retiring,retired 1`] = `
@@ -779,6 +810,43 @@ Object {
 }
 `;
 
+exports[`StakePoolSearchBuilder buildPoolsByStatusQuery active,activating,retiring,retired 2`] = `
+Array [
+  Object {
+    "id": "2056",
+    "updateId": "2885",
+  },
+  Object {
+    "id": "2055",
+    "updateId": "2068",
+  },
+  Object {
+    "id": "20",
+    "updateId": "20",
+  },
+  Object {
+    "id": "16",
+    "updateId": "16",
+  },
+  Object {
+    "id": "15",
+    "updateId": "309",
+  },
+  Object {
+    "id": "14",
+    "updateId": "14",
+  },
+  Object {
+    "id": "6",
+    "updateId": "6",
+  },
+  Object {
+    "id": "1",
+    "updateId": "1",
+  },
+]
+`;
+
 exports[`StakePoolSearchBuilder buildPoolsByStatusQuery retired 1`] = `
 Object {
   "id": Object {
@@ -814,6 +882,15 @@ Object {
 }
 `;
 
+exports[`StakePoolSearchBuilder buildPoolsByStatusQuery retired 2`] = `
+Array [
+  Object {
+    "id": "1",
+    "updateId": "1",
+  },
+]
+`;
+
 exports[`StakePoolSearchBuilder buildPoolsByStatusQuery retiring 1`] = `
 Object {
   "id": Object {
@@ -847,6 +924,15 @@ Object {
           AND COALESCE(pr.retiring_epoch,0) > pu.active_epoch_no))
     ",
 }
+`;
+
+exports[`StakePoolSearchBuilder buildPoolsByStatusQuery retiring 2`] = `
+Array [
+  Object {
+    "id": "2056",
+    "updateId": "2885",
+  },
+]
 `;
 
 exports[`StakePoolSearchBuilder getLastEpoch getLastEpoch 1`] = `175`;
