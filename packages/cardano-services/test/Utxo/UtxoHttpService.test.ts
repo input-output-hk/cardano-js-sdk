@@ -51,7 +51,7 @@ describe('UtxoHttpService', () => {
 
     describe('/health', () => {
       it('/health response should be true', async () => {
-        const res = await got(`${apiUrlBase}/health`, {
+        const res = await got.post(`${apiUrlBase}/health`, {
           headers: { 'Content-Type': APPLICATION_JSON }
         });
         expect(res.statusCode).toBe(200);

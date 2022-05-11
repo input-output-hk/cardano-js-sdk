@@ -9,7 +9,7 @@ export abstract class HttpService {
   protected constructor(slug: string, router: express.Router, logger = dummyLogger) {
     this.router = router;
     this.slug = slug;
-    this.router.get('/health', async (req, res) => {
+    this.router.post('/health', async (req, res) => {
       logger.debug('/health', { ip: req.ip });
       let body: HealthCheckResponse | Error['message'];
       try {
