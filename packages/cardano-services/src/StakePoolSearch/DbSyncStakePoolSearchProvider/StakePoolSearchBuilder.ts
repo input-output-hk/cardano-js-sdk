@@ -158,12 +158,7 @@ export class StakePoolSearchBuilder {
     if (filters?.status || filters?.pledgeMet !== undefined)
       subQueries.unshift({ id: { name: 'current_epoch' }, query: findLastEpoch });
     if (subQueries.length > 0) {
-      query =
-        subQueries.length > 1
-          ? buildOrQueryFromClauses(subQueries)
-          : `${subQueries.length > 1 ? `WITH (${subQueries.find((sq) => !sq.id.isPrimary)})` : ''} ${
-              subQueries[0].query
-            } `;
+      query = subQueries.length > 1 ? buildOrQueryFromClauses(subQueries) : subQueries[0].query;
     }
     return { params, query };
   }

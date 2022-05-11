@@ -22,7 +22,7 @@
     "cleanup": "shx rm -rf dist node_modules",
     "lint": "eslint --ignore-path ../../.eslintignore \"**/*.ts\"",
     "lint:fix": "eslint --fix --ignore-path ../../.eslintignore \"**/*.ts\"",
-    "test": "jest -c ./jest.config.js",
+    "test": "jest -c ./jest.config.js -t stakepool",
     "test:e2e": "shx echo 'test:e2e' command not implemented yet",
     "coverage": "yarn test --coverage",
     "prepack": "yarn build",
