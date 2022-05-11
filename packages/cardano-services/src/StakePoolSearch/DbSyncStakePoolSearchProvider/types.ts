@@ -132,3 +132,7 @@ export interface PoolMetrics {
   hashId: number;
   metrics: Cardano.StakePoolMetrics;
 }
+
+export interface TotalCountModel {
+  total_count: number;
+}

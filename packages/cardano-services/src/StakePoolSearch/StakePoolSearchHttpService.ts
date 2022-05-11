@@ -1,8 +1,8 @@
 import * as OpenApiValidator from 'express-openapi-validator';
-import { Cardano, ProviderError, ProviderFailure, StakePoolQueryOptions } from '@cardano-sdk/core';
 import { DbSyncStakePoolSearchProvider } from './DbSyncStakePoolSearchProvider';
 import { HttpServer, HttpService } from '../Http';
 import { Logger, dummyLogger } from 'ts-log';
+import { ProviderError, ProviderFailure, StakePoolQueryOptions, StakePoolSearchResults } from '@cardano-sdk/core';
 import { ServiceNames } from '../Program';
 import { providerHandler } from '../util';
 import express from 'express';
@@ -36,7 +36,7 @@ export class StakePoolSearchHttpService extends HttpService {
     // Add initial healthCheck of the provider when implemented
     router.post(
       '/search',
-      providerHandler<[StakePoolQueryOptions], Cardano.StakePool[]>(async ([stakePoolOptions], _, res) => {
+      providerHandler<[StakePoolQueryOptions], StakePoolSearchResults>(async ([stakePoolOptions], _, res) => {
         try {
           return HttpServer.sendJSON(res, await stakePoolSearchProvider.queryStakePools(stakePoolOptions));
         } catch (error) {

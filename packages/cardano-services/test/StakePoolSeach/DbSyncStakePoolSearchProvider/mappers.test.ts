@@ -208,7 +208,7 @@ describe('mappers', () => {
       },
       vrf: poolDatas[0].vrfKeyHash
     };
-
+    const totalCount = 1;
     it('toCoreStakePool with retiring status', () => {
       expect(
         toCoreStakePool({
@@ -219,9 +219,10 @@ describe('mappers', () => {
           poolRegistrations,
           poolRelays,
           poolRetirements,
-          poolRewards
+          poolRewards,
+          totalCount
         })
-      ).toStrictEqual([stakePool]);
+      ).toStrictEqual({ pageResults: [stakePool], totalResultCount: totalCount });
     });
     it('toCoreStakePool with retired status', () => {
       expect(
@@ -233,9 +234,13 @@ describe('mappers', () => {
           poolRegistrations,
           poolRelays,
           poolRetirements,
-          poolRewards
+          poolRewards,
+          totalCount
         })
-      ).toStrictEqual([{ ...stakePool, status: Cardano.StakePoolStatus.Retired }]);
+      ).toStrictEqual({
+        pageResults: [{ ...stakePool, status: Cardano.StakePoolStatus.Retired }],
+        totalResultCount: totalCount
+      });
     });
     it('toCoreStakePool with activating status', () => {
       const _retirements = [
@@ -250,18 +255,22 @@ describe('mappers', () => {
           poolRegistrations,
           poolRelays,
           poolRetirements: _retirements,
-          poolRewards
+          poolRewards,
+          totalCount
         })
-      ).toEqual([
-        {
-          ...stakePool,
-          status: Cardano.StakePoolStatus.Activating,
-          transactions: {
-            registration: poolRegistrations.map((r) => r.transactionId),
-            retirement: _retirements.map((r) => r.transactionId)
+      ).toEqual({
+        pageResults: [
+          {
+            ...stakePool,
+            status: Cardano.StakePoolStatus.Activating,
+            transactions: {
+              registration: poolRegistrations.map((r) => r.transactionId),
+              retirement: _retirements.map((r) => r.transactionId)
+            }
           }
-        }
-      ]);
+        ],
+        totalResultCount: totalCount
+      });
     });
     it('toCoreStakePool with active status', () => {
       const _retirements = [
@@ -276,18 +285,22 @@ describe('mappers', () => {
           poolRegistrations,
           poolRelays,
           poolRetirements: _retirements,
-          poolRewards
+          poolRewards,
+          totalCount
         })
-      ).toEqual([
-        {
-          ...stakePool,
-          status: Cardano.StakePoolStatus.Active,
-          transactions: {
-            registration: poolRegistrations.map((r) => r.transactionId),
-            retirement: _retirements.map((r) => r.transactionId)
+      ).toEqual({
+        pageResults: [
+          {
+            ...stakePool,
+            status: Cardano.StakePoolStatus.Active,
+            transactions: {
+              registration: poolRegistrations.map((r) => r.transactionId),
+              retirement: _retirements.map((r) => r.transactionId)
+            }
           }
-        }
-      ]);
+        ],
+        totalResultCount: totalCount
+      });
     });
   });
 });
