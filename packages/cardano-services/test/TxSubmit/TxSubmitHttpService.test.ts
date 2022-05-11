@@ -9,7 +9,7 @@ import got from 'got';
 
 const serializeProviderArg = (arg: unknown) => JSON.stringify({ args: [util.toSerializableObject(arg)] });
 const bodyTx = serializeProviderArg(cbor.encode('#####'));
-const BAD_REQUEST_STRING = 'Response code 400 (Bad Request)';
+const UNSUPPORTED_MEDIA_STRING = 'Response code 415 (Unsupported Media Type)';
 const APPLICATION_CBOR = 'application/cbor';
 
 describe('TxSubmitHttpService', () => {
@@ -139,7 +139,7 @@ describe('TxSubmitHttpService', () => {
         expect(txSubmitProvider.submitTx).toHaveBeenCalledTimes(1);
       });
 
-      it('returns a 400 coded response if the wrong content type header is used', async () => {
+      it('returns a 415 coded response if the wrong content type header is used', async () => {
         try {
           await got.post(`${apiUrlBase}/submit`, {
             body: bodyTx,
@@ -147,8 +147,8 @@ describe('TxSubmitHttpService', () => {
           });
           throw new Error('fail');
         } catch (error: any) {
-          expect(error.response.statusCode).toBe(400);
-          expect(error.message).toBe(BAD_REQUEST_STRING);
+          expect(error.response.statusCode).toBe(415);
+          expect(error.message).toBe(UNSUPPORTED_MEDIA_STRING);
           expect(txSubmitProvider.submitTx).toHaveBeenCalledTimes(0);
         }
       });
@@ -178,7 +178,7 @@ describe('TxSubmitHttpService', () => {
         const clientProvider = txSubmitHttpProvider(apiUrlBase);
         try {
           await clientProvider.submitTx(new Uint8Array());
-        } catch (error) {
+        } catch (error: any) {
           if (error instanceof ProviderError) {
             const innerError = error.innerError as Cardano.TxSubmissionError;
             expect(innerError).toBeInstanceOf(Cardano.TxSubmissionErrors.BadInputsError);

@@ -1,0 +1,77 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Tx Submit",
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/tx-submit/submit": {
+      "post": {
+        "summary": "submits given transaction",
+        "operationId": "submitTx",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/txsubmit_submit_body"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "success operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "TypifiedValue": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          },
+          "__type": {
+            "type": "string"
+          }
+        }
+      },
+      "txsubmit_submit_body": {
+        "type": "object",
+        "properties": {
+          "args": {
+            "type": "array",
+            "items": {
+              "$ref":"#/components/schemas/TypifiedValue"
+            }
+          }
+        }
+      }
+    }
+  }
+}

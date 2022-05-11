@@ -5,6 +5,8 @@ import {
   OwnerAddressModel,
   PoolData,
   PoolDataModel,
+  PoolMetrics,
+  PoolMetricsModel,
   PoolOwner,
   PoolRegistration,
   PoolRegistrationModel,
@@ -40,6 +42,7 @@ interface ToCoreStakePoolInput {
   poolRetirements: PoolRetirement[];
   poolRewards: EpochReward[];
   lastEpoch: number;
+  poolMetrics: PoolMetrics[];
 }
 
 export const toCoreStakePool = ({
@@ -49,7 +52,8 @@ export const toCoreStakePool = ({
   poolRelays,
   poolRetirements,
   poolRewards,
-  lastEpoch
+  lastEpoch,
+  poolMetrics
 }: ToCoreStakePoolInput): Cardano.StakePool[] =>
   poolDatas.map((poolData) => {
     const registrations = poolRegistrations.filter((r) => r.hashId === poolData.hashId);
@@ -60,7 +64,8 @@ export const toCoreStakePool = ({
       hexId: poolData.hexId,
       id: poolData.id,
       margin: poolData.margin,
-      metrics: {} as Cardano.StakePoolMetrics, // TODO: fetch metrics
+      metrics:
+        poolMetrics.find((metrics) => metrics.hashId === poolData.hashId)?.metrics || ({} as Cardano.StakePoolMetrics),
       owners: poolOwners.filter((o) => o.hashId === poolData.hashId).map((o) => o.address),
       pledge: poolData.pledge,
       relays: poolRelays.filter((r) => r.updateId === poolData.updateId).map((r) => r.relay),
@@ -162,4 +167,22 @@ export const mapPoolRetirement = (poolRetirementModel: PoolRetirementModel): Poo
   hashId: poolRetirementModel.hash_id,
   retiringEpoch: poolRetirementModel.retiring_epoch,
   transactionId: Cardano.TransactionId(toHexString(poolRetirementModel.tx_hash))
+});
+
+export const mapPoolMetrics = (poolMetricsModel: PoolMetricsModel): PoolMetrics => ({
+  hashId: poolMetricsModel.pool_hash_id,
+  metrics: {
+    blocksCreated: poolMetricsModel.blocks_created,
+    delegators: poolMetricsModel.delegators,
+    livePledge: BigInt(poolMetricsModel.live_pledge),
+    saturation: poolMetricsModel.saturation,
+    size: {
+      active: poolMetricsModel.active_stake_percentage,
+      live: poolMetricsModel.live_stake_percentage
+    },
+    stake: {
+      active: BigInt(poolMetricsModel.active_stake),
+      live: BigInt(poolMetricsModel.live_stake)
+    }
+  }
 });

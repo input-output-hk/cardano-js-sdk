@@ -41,7 +41,6 @@ export class HttpServer extends RunnableModule {
     this.#config = config;
     this.#dependencies = { logger, ...rest };
   }
-
   async initializeImpl(): Promise<void> {
     this.app = express();
     this.app.use(
@@ -64,6 +63,13 @@ export class HttpServer extends RunnableModule {
       this.app.use(`/${service.slug}`, service.router);
       this.logger.debug(`Using /${service.slug}`);
     }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    this.app.use((err: any, _req: express.Request, res: express.Response, _n: express.NextFunction) => {
+      res.status(err.status || 500).json({
+        errors: err.errors || [],
+        message: err.message || 'Unkown Error'
+      });
+    });
   }
 
   static sendJSON<ResponseBody>(

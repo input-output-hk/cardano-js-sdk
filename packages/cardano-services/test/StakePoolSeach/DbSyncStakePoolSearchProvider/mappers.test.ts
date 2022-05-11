@@ -3,6 +3,7 @@ import {
   mapAddressOwner,
   mapEpochReward,
   mapPoolData,
+  mapPoolMetrics,
   mapPoolRegistration,
   mapPoolRetirement,
   mapPoolUpdate,
@@ -78,6 +79,17 @@ describe('mappers', () => {
     operator_fees: '233333333',
     total_rewards: '99999'
   };
+  const poolMetricsModel = {
+    active_stake: '1000000',
+    active_stake_percentage: 0.5,
+    blocks_created: 20,
+    delegators: 88,
+    live_pledge: '99999',
+    live_stake: '100000000',
+    live_stake_percentage: 0.5,
+    pool_hash_id: hash_id,
+    saturation: 0.000_000_8
+  };
   it('mapPoolRetirement', () => {
     expect(mapPoolRetirement(poolRetirementModel)).toEqual({
       hashId: poolRetirementModel.hash_id,
@@ -137,8 +149,7 @@ describe('mappers', () => {
     });
   });
   it('mapEpochReward', () => {
-    const poolHashId = 1;
-    expect(mapEpochReward(epochRewardModel, poolHashId)).toEqual({
+    expect(mapEpochReward(epochRewardModel, hash_id)).toEqual({
       epochReward: {
         activeStake: BigInt(epochRewardModel.active_stake),
         epoch: epochRewardModel.epoch_no,
@@ -147,7 +158,26 @@ describe('mappers', () => {
         operatorFees: BigInt(epochRewardModel.operator_fees),
         totalRewards: BigInt(epochRewardModel.total_rewards)
       },
-      hashId: poolHashId
+      hashId: hash_id
+    });
+  });
+  it('mapPoolMetrics', () => {
+    expect(mapPoolMetrics(poolMetricsModel)).toEqual({
+      hashId: poolMetricsModel.pool_hash_id,
+      metrics: {
+        blocksCreated: poolMetricsModel.blocks_created,
+        delegators: poolMetricsModel.delegators,
+        livePledge: BigInt(poolMetricsModel.live_pledge),
+        saturation: poolMetricsModel.saturation,
+        size: {
+          active: poolMetricsModel.active_stake_percentage,
+          live: poolMetricsModel.live_stake_percentage
+        },
+        stake: {
+          active: BigInt(poolMetricsModel.active_stake),
+          live: BigInt(poolMetricsModel.live_stake)
+        }
+      }
     });
   });
   describe('toCoreStakePool', () => {
@@ -156,15 +186,17 @@ describe('mappers', () => {
     const poolRegistrations = [mapPoolRegistration(poolRegistrationModel)];
     const poolRelays = [mapRelay(poolRelayByAddress)];
     const poolRetirements = [mapPoolRetirement(poolRetirementModel)];
+    const poolRewards = [mapEpochReward(epochRewardModel, hash_id)];
+    const poolMetrics = [mapPoolMetrics(poolMetricsModel)];
     const stakePool = {
       cost: poolDatas[0].cost,
-      epochRewards: [],
+      epochRewards: poolRewards.map((r) => r.epochReward),
       hexId: poolDatas[0].hexId,
       id: poolDatas[0].id,
       margin: { denominator: 10_000, numerator: 1 },
       metadata: poolDatas[0].metadata,
       metadataJson: poolDatas[0].metadataJson,
-      metrics: {} as Cardano.StakePoolMetrics,
+      metrics: poolMetrics[0].metrics,
       owners: poolOwners.map((o) => o.address),
       pledge: poolDatas[0].pledge,
       relays: poolRelays.map((r) => r.relay),
@@ -182,11 +214,12 @@ describe('mappers', () => {
         toCoreStakePool({
           lastEpoch: poolRetirementModel.retiring_epoch - 1,
           poolDatas,
+          poolMetrics,
           poolOwners,
           poolRegistrations,
           poolRelays,
           poolRetirements,
-          poolRewards: []
+          poolRewards
         })
       ).toStrictEqual([stakePool]);
     });
@@ -195,11 +228,12 @@ describe('mappers', () => {
         toCoreStakePool({
           lastEpoch: poolRetirementModel.retiring_epoch + 1,
           poolDatas,
+          poolMetrics,
           poolOwners,
           poolRegistrations,
           poolRelays,
           poolRetirements,
-          poolRewards: []
+          poolRewards
         })
       ).toStrictEqual([{ ...stakePool, status: Cardano.StakePoolStatus.Retired }]);
     });
@@ -211,11 +245,12 @@ describe('mappers', () => {
         toCoreStakePool({
           lastEpoch: poolRegistrationModel.active_epoch_no - 1,
           poolDatas,
+          poolMetrics,
           poolOwners,
           poolRegistrations,
           poolRelays,
           poolRetirements: _retirements,
-          poolRewards: []
+          poolRewards
         })
       ).toEqual([
         {
@@ -236,11 +271,12 @@ describe('mappers', () => {
         toCoreStakePool({
           lastEpoch: poolRegistrationModel.active_epoch_no,
           poolDatas,
+          poolMetrics,
           poolOwners,
           poolRegistrations,
           poolRelays,
           poolRetirements: _retirements,
-          poolRewards: []
+          poolRewards
         })
       ).toEqual([
         {

@@ -9,7 +9,6 @@ export interface PoolUpdate {
   updateId: number;
 }
 
-// TODO: define the rest of models
 export interface PoolData {
   hashId: number;
   hexId: Cardano.PoolIdHex;
@@ -111,4 +110,25 @@ export interface PoolRegistration extends PoolTransaction {
 export interface SubQuery {
   id: { name: string; isPrimary?: boolean };
   query: string;
+}
+
+export interface TotalAdaModel {
+  total_ada: string;
+}
+
+export interface PoolMetricsModel {
+  blocks_created: number;
+  delegators: number;
+  active_stake: string;
+  live_stake: string;
+  live_pledge: string;
+  saturation: number;
+  active_stake_percentage: number;
+  live_stake_percentage: number;
+  pool_hash_id: number;
+}
+
+export interface PoolMetrics {
+  hashId: number;
+  metrics: Cardano.StakePoolMetrics;
 }
