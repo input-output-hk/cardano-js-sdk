@@ -7,3 +7,4 @@ export * from './TxWorker';
 export * from './Utxo';
 export * from './ChainHistory';
 export * as errors from './errors';
+export * from './Rewards';

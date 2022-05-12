@@ -1,0 +1,23 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`RewardsBuilder getAccountBalance returns 0 balance 1`] = `
+Object {
+  "balance": "0",
+}
+`;
+
+exports[`RewardsBuilder getAccountBalance returns AccountBalanceModel 1`] = `
+Object {
+  "balance": "48642468465",
+}
+`;
+
+exports[`RewardsBuilder getRewardsHistory returns RewardEpochModel when there is epochs field 1`] = `Array []`;
+
+exports[`RewardsBuilder getRewardsHistory returns RewardEpochModel when there is no epochs field 1`] = `Array []`;
+
+exports[`RewardsBuilder getRewardsHistory returns RewardEpochModel when there is no epochs field and empty accounts 1`] = `Array []`;
+
+exports[`RewardsBuilder getRewardsHistory returns RewardEpochModel when there is partially epochs field with lowerBound 1`] = `Array []`;
+
+exports[`RewardsBuilder getRewardsHistory returns RewardEpochModel when there is partially epochs field with upperBound 1`] = `Array []`;

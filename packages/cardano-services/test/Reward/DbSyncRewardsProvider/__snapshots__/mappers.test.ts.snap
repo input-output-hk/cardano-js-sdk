@@ -1,0 +1,35 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DbSyncRewardProvider mappers rewardsToCore empty rewards returns core types 1`] = `Map {}`;
+
+exports[`DbSyncRewardProvider mappers rewardsToCore returns core types 1`] = `
+Map {
+  "stake_test1uzxvhl83q8ujv2yvpy6n2krvpdlqqx28h7e9vsk6re43h3c3kufy6" => Array [
+    Object {
+      "epoch": 10,
+      "rewards": 10000000n,
+    },
+  ],
+}
+`;
+
+exports[`DbSyncRewardProvider mappers rewardsToCore returns core types indexed by address 1`] = `
+Map {
+  "stake_test1uzxvhl83q8ujv2yvpy6n2krvpdlqqx28h7e9vsk6re43h3c3kufy6" => Array [
+    Object {
+      "epoch": 10,
+      "rewards": 10000000n,
+    },
+    Object {
+      "epoch": 11,
+      "rewards": 20000000n,
+    },
+  ],
+  "stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27" => Array [
+    Object {
+      "epoch": 15,
+      "rewards": 30000000n,
+    },
+  ],
+}
+`;
