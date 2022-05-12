@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>2/2</span>
+                <span class='fraction'>3/3</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>2/2</span>
+                <span class='fraction'>3/3</span>
             </div>
         
             
@@ -175,15 +175,16 @@
 <a name='L110'></a><a href='#L110'>110</a>
 <a name='L111'></a><a href='#L111'>111</a>
 <a name='L112'></a><a href='#L112'>112</a>
-<a name='L113'></a><a href='#L113'>113</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -262,6 +263,23 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -293,19 +311,27 @@ import { Logger } from 'ts-log';
 import { Observable } from 'rxjs';
 import { util } from '@cardano-sdk/core';
 &nbsp;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type MethodRequest&lt;Method extends string = string, Args = unknown[]&gt; = { method: Method; args: Args };
 &nbsp;
 export interface AnyMessage extends Object {
   messageId: string;
 }
 &nbsp;
-export interface MethodRequestMessage extends AnyMessage {
+export interface RequestMessage extends AnyMessage {
   request: MethodRequest;
 }
 &nbsp;
-export interface MethodResponseMessage&lt;T = unknown&gt; extends AnyMessage {
+export interface ResponseMessage&lt;T = unknown&gt; extends AnyMessage {
   response: T;
+}
+&nbsp;
+export interface SubscriptionMessage extends AnyMessage {
+  subscribe: boolean;
+  error?: Error;
+}
+&nbsp;
+export interface EmitMessage extends AnyMessage {
+  emit: unknown;
 }
 &nbsp;
 export type SendMethodRequestMessage = &lt;Response = unknown&gt;(msg: MethodRequest) =&gt; Promise&lt;Response&gt;;
@@ -347,22 +373,6 @@ export interface ReconnectConfig {
   maxDelay: number;
 }
 &nbsp;
-export interface MessengerOptions {
-  /**
-   * Only used in non-background process for now
-   */
-  reconnectConfig?: ReconnectConfig;
-}
-&nbsp;
-export interface ExposeApiProps&lt;API extends object&gt; extends MessengerOptions {
-  baseChannel: ChannelName;
-  api: API;
-  methodRequestOptions?: {
-    transform?: TransformRequest;
-    validate?: ValidateRequest;
-  };
-}
-&nbsp;
 export interface BindRequestHandlerOptions&lt;Response&gt; {
   handler: (request: MethodRequest, sender?: Runtime.MessageSender) =&gt; Promise&lt;Response&gt;;
 }
@@ -372,19 +382,34 @@ export interface PortMessage&lt;Data = unknown&gt; {
   port: Pick&lt;MessengerPort, 'sender' | 'postMessage'&gt;;
 }
 &nbsp;
-export enum RemoteApiProperty {
-  MethodReturningPromise
-  // TODO
+export enum RemoteApiPropertyType {
+  MethodReturningPromise,
   // eslint-disable-next-line @typescript-eslint/no-shadow
-  // Observable
+  Observable
 }
 &nbsp;
+export interface MethodRequestOptions {
+  transform?: TransformRequest;
+  validate?: ValidateRequest;
+}
+&nbsp;
+export interface RemoteApiMethod {
+  propType: RemoteApiPropertyType.MethodReturningPromise;
+  requestOptions: MethodRequestOptions;
+}
+&nbsp;
+export type RemoteApiProperty = RemoteApiPropertyType | RemoteApiMethod;
+&nbsp;
 export type RemoteApiProperties&lt;T&gt; = {
-  [key in keyof T]: RemoteApiProperty | RemoteApiProperties&lt;T[key]&gt;;
+  [key in keyof T]: RemoteApiProperty | Omit&lt;RemoteApiProperties&lt;T[key]&gt;, 'propType' | 'requestOptions'&gt;;
 };
 &nbsp;
-export interface ConsumeRemoteApiOptions&lt;T&gt; extends MessengerOptions {
-  baseChannel: ChannelName;
+export interface ExposeApiProps&lt;API extends object&gt; {
+  api: API;
+  properties: RemoteApiProperties&lt;API&gt;;
+}
+&nbsp;
+export interface ConsumeRemoteApiOptions&lt;T&gt; {
   properties: RemoteApiProperties&lt;T&gt;;
   getErrorPrototype?: util.GetErrorPrototype;
 }
@@ -393,6 +418,8 @@ export interface Messenger {
   channel: ChannelName;
   postMessage(message: unknown): Observable&lt;void&gt;;
   message$: Observable&lt;PortMessage&gt;;
+  deriveChannel(path: string): Messenger;
+  destroy(): void;
 }
 &nbsp;
 export interface MessengerApiDependencies {
@@ -406,7 +433,7 @@ export interface MessengerApiDependencies {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at Wed May 11 2022 14:15:33 GMT+0000 (Coordinated Universal Time)
+                at Thu May 12 2022 04:21:22 GMT+0000 (Coordinated Universal Time)
             </div>
         <script src="../../prettify.js"></script>
         <script>

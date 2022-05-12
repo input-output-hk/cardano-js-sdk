@@ -135,7 +135,12 @@
 <a name='L70'></a><a href='#L70'>70</a>
 <a name='L71'></a><a href='#L71'>71</a>
 <a name='L72'></a><a href='#L72'>72</a>
-<a name='L73'></a><a href='#L73'>73</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">2x</span>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
@@ -148,6 +153,8 @@
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
@@ -156,6 +163,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -208,7 +218,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { BackgroundMessenger, createBackgroundMessenger, generalizeBackgroundMessenger } from './BackgroundMessenger';
-import { ConsumeRemoteApiOptions, ExposeApiProps, MessengerDependencies } from './types';
+import { ChannelName, ConsumeRemoteApiOptions, ExposeApiProps, MessengerDependencies } from './types';
 import { consumeMessengerRemoteApi, exposeMessengerApi } from './remoteApi';
 import { createNonBackgroundMessenger } from './NonBackgroundMessenger';
 &nbsp;
@@ -220,6 +230,8 @@ export * from './types';
 export * from './util';
 export * from './injectedRuntime';
 &nbsp;
+export type BaseChannel = { baseChannel: ChannelName };
+&nbsp;
 const isInBackgroundProcess = typeof window === 'undefined';
 &nbsp;
 const getBackgroundMessenger = (() =&gt; {
@@ -227,7 +239,10 @@ const getBackgroundMessenger = (() =&gt; {
   return <span class="fstat-no" title="function not covered" >(d</span>ependencies: MessengerDependencies) =&gt; (<span class="cstat-no" title="statement not covered" >backgroundMessenger ||= createBackgroundMessenger(dependencies));</span>
 })();
 &nbsp;
-const _backgroundExposeApi = <span class="fstat-no" title="function not covered" >&lt;T extends object&gt;(p</span>rops: ExposeApiProps&lt;T&gt;, dependencies: MessengerDependencies) =&gt; {
+const _backgroundExposeApi = <span class="fstat-no" title="function not covered" >&lt;T extends object&gt;(</span>
+  props: ExposeApiProps&lt;T&gt; &amp; BaseChannel,
+  dependencies: MessengerDependencies
+) =&gt; {
   const messenger = <span class="cstat-no" title="statement not covered" >generalizeBackgroundMessenger(props.baseChannel, getBackgroundMessenger(dependencies));</span>
 <span class="cstat-no" title="statement not covered" >  return exposeMessengerApi(props, {</span>
     messenger,
@@ -238,7 +253,7 @@ const _backgroundExposeApi = <span class="fstat-no" title="function not covered"
 export type ExposeApi = typeof _backgroundExposeApi;
 &nbsp;
 const _nonBackgroundExposeApi: ExposeApi = <span class="fstat-no" title="function not covered" >&lt;T extends object&gt;(</span>
-  props: ExposeApiProps&lt;T&gt;,
+  props: ExposeApiProps&lt;T&gt; &amp; BaseChannel,
   dependencies: MessengerDependencies
 ) =&gt;
 <span class="cstat-no" title="statement not covered" >  exposeMessengerApi(props, {</span>
@@ -247,7 +262,7 @@ const _nonBackgroundExposeApi: ExposeApi = <span class="fstat-no" title="functio
   });
 &nbsp;
 const _nonBackgroundConsumeRemoteApi = <span class="fstat-no" title="function not covered" >&lt;T extends object&gt;(</span>
-  props: ConsumeRemoteApiOptions&lt;T&gt;,
+  props: ConsumeRemoteApiOptions&lt;T&gt; &amp; BaseChannel,
   dependencies: MessengerDependencies
 ) =&gt;
 <span class="cstat-no" title="statement not covered" >  consumeMessengerRemoteApi(props, {</span>
@@ -258,7 +273,7 @@ const _nonBackgroundConsumeRemoteApi = <span class="fstat-no" title="function no
 export type ConsumeApi = typeof _nonBackgroundConsumeRemoteApi;
 &nbsp;
 const _backgroundConsumeRemoteApi: ConsumeApi = <span class="fstat-no" title="function not covered" >&lt;T extends object&gt;(</span>
-  props: ConsumeRemoteApiOptions&lt;T&gt;,
+  props: ConsumeRemoteApiOptions&lt;T&gt; &amp; BaseChannel,
   dependencies: MessengerDependencies
 ) =&gt; {
   const messenger = <span class="cstat-no" title="statement not covered" >generalizeBackgroundMessenger(props.baseChannel, getBackgroundMessenger(dependencies));</span>
@@ -286,7 +301,7 @@ export const consumeRemoteApi: ConsumeApi = isInBackgroundProcess
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at Wed May 11 2022 14:15:33 GMT+0000 (Coordinated Universal Time)
+                at Thu May 12 2022 04:21:22 GMT+0000 (Coordinated Universal Time)
             </div>
         <script src="../../prettify.js"></script>
         <script>
