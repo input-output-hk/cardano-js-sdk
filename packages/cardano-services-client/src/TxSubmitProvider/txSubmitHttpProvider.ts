@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Cardano, ProviderError, ProviderFailure, TxSubmitProvider } from '@cardano-sdk/core';
 import { HttpProviderConfigPaths, createHttpProvider } from '../HttpProvider';
+import { mapHealthCheckError } from '../mapHealthCheckError';
 
 export const defaultTxSubmitProviderPaths: HttpProviderConfigPaths<TxSubmitProvider> = {
   healthCheck: '/health',
@@ -35,10 +36,7 @@ export const txSubmitHttpProvider = (baseUrl: string, paths = defaultTxSubmitPro
     mapError: (error: any, method) => {
       switch (method) {
         case 'healthCheck': {
-          if (!error) {
-            return { ok: false };
-          }
-          break;
+          return mapHealthCheckError(error);
         }
         case 'submitTx': {
           if (typeof error === 'object' && typeof error.innerError === 'object') {
