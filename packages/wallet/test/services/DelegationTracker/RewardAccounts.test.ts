@@ -13,7 +13,7 @@ import {
   getStakePoolIdAtEpoch
 } from '../../../src/services';
 import { TxWithEpoch } from '../../../src/services/DelegationTracker/types';
-import { createTestScheduler } from '../../testScheduler';
+import { createTestScheduler } from '@cardano-sdk/util-dev';
 import { currentEpoch } from '../../mocks';
 
 jest.mock('../../../src/services/util/coldObservableProvider', () => ({ coldObservableProvider: jest.fn() }));

@@ -1,5 +1,5 @@
 import { BackgroundMessenger, createBackgroundMessenger, generalizeBackgroundMessenger } from './BackgroundMessenger';
-import { ConsumeRemoteApiOptions, ExposeApiProps, MessengerDependencies } from './types';
+import { ChannelName, ConsumeRemoteApiOptions, ExposeApiProps, MessengerDependencies } from './types';
 import { consumeMessengerRemoteApi, exposeMessengerApi } from './remoteApi';
 import { createNonBackgroundMessenger } from './NonBackgroundMessenger';
 
@@ -11,6 +11,8 @@ export * from './types';
 export * from './util';
 export * from './injectedRuntime';
 
+export type BaseChannel = { baseChannel: ChannelName };
+
 const isInBackgroundProcess = typeof window === 'undefined';
 
 const getBackgroundMessenger = (() => {
@@ -18,7 +20,10 @@ const getBackgroundMessenger = (() => {
   return (dependencies: MessengerDependencies) => (backgroundMessenger ||= createBackgroundMessenger(dependencies));
 })();
 
-const _backgroundExposeApi = <T extends object>(props: ExposeApiProps<T>, dependencies: MessengerDependencies) => {
+const _backgroundExposeApi = <T extends object>(
+  props: ExposeApiProps<T> & BaseChannel,
+  dependencies: MessengerDependencies
+) => {
   const messenger = generalizeBackgroundMessenger(props.baseChannel, getBackgroundMessenger(dependencies));
   return exposeMessengerApi(props, {
     messenger,
@@ -29,7 +34,7 @@ const _backgroundExposeApi = <T extends object>(props: ExposeApiProps<T>, depend
 export type ExposeApi = typeof _backgroundExposeApi;
 
 const _nonBackgroundExposeApi: ExposeApi = <T extends object>(
-  props: ExposeApiProps<T>,
+  props: ExposeApiProps<T> & BaseChannel,
   dependencies: MessengerDependencies
 ) =>
   exposeMessengerApi(props, {
@@ -38,7 +43,7 @@ const _nonBackgroundExposeApi: ExposeApi = <T extends object>(
   });
 
 const _nonBackgroundConsumeRemoteApi = <T extends object>(
-  props: ConsumeRemoteApiOptions<T>,
+  props: ConsumeRemoteApiOptions<T> & BaseChannel,
   dependencies: MessengerDependencies
 ) =>
   consumeMessengerRemoteApi(props, {
@@ -49,7 +54,7 @@ const _nonBackgroundConsumeRemoteApi = <T extends object>(
 export type ConsumeApi = typeof _nonBackgroundConsumeRemoteApi;
 
 const _backgroundConsumeRemoteApi: ConsumeApi = <T extends object>(
-  props: ConsumeRemoteApiOptions<T>,
+  props: ConsumeRemoteApiOptions<T> & BaseChannel,
   dependencies: MessengerDependencies
 ) => {
   const messenger = generalizeBackgroundMessenger(props.baseChannel, getBackgroundMessenger(dependencies));

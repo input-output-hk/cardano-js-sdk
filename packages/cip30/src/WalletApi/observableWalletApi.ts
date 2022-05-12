@@ -1,23 +1,18 @@
+// tested in packages/wallet/test/integration/cip30mapping.test.ts
 import {
   ApiError,
-  Bytes,
-  Cbor,
-  Cip30DataSignature,
   DataSignError,
   DataSignErrorCode,
-  Paginate,
   TxSendError,
   TxSendErrorCode,
   TxSignError,
-  TxSignErrorCode,
-  WalletApi
-} from '@cardano-sdk/cip30';
-import { AuthenticationError } from './KeyManagement/errors';
+  TxSignErrorCode
+} from '../errors';
+import { Bytes, Cbor, Paginate, WalletApi } from './types';
 import { CSL, Cardano, coreToCsl, cslToCore } from '@cardano-sdk/core';
 import { InputSelectionError } from '@cardano-sdk/cip2';
+import { KeyManagement, ObservableWallet } from '@cardano-sdk/wallet';
 import { Logger, dummyLogger } from 'ts-log';
-import { SingleAddressWallet } from '.';
-import { cip30signData } from './KeyManagement/cip8';
 import { firstValueFrom } from 'rxjs';
 
 export type Cip30WalletDependencies = {
@@ -57,8 +52,8 @@ const mapCallbackFailure = (err: unknown, logger?: Logger) => {
   return false;
 };
 
-export const createWalletApi = (
-  wallet: SingleAddressWallet,
+export const observableWalletApi = (
+  wallet: ObservableWallet,
   confirmationCallback: CallbackConfirmation,
   { logger = dummyLogger }: Cip30WalletDependencies = {}
 ): WalletApi => ({
@@ -97,7 +92,7 @@ export const createWalletApi = (
   },
   getNetworkId: async (): Promise<number> => {
     logger.debug('getting networkId');
-    return Promise.resolve(wallet.keyAgent.networkId);
+    return wallet.getNetworkId();
   },
   getRewardAddresses: async (): Promise<Cbor[]> => {
     logger.debug('getting reward addresses');
@@ -161,7 +156,7 @@ export const createWalletApi = (
 
     return Promise.resolve(coreToCsl.utxo(utxos).map((utxo) => Buffer.from(utxo.to_bytes()).toString('hex')));
   },
-  signData: async (addr: Cardano.Address, payload: Bytes): Promise<Cip30DataSignature> => {
+  signData: async (addr: Cardano.Address, payload: Bytes): Promise<KeyManagement.cip8.Cip30DataSignature> => {
     logger.debug('signData');
     const hexBlobPayload = Cardano.util.HexBlob(payload);
 
@@ -174,8 +169,7 @@ export const createWalletApi = (
     }).catch((error) => mapCallbackFailure(error, logger));
 
     if (shouldProceed) {
-      return cip30signData({
-        keyAgent: wallet.keyAgent,
+      return wallet.signData({
         payload: hexBlobPayload,
         signWith: addr
       });
@@ -195,21 +189,21 @@ export const createWalletApi = (
     }).catch((error) => mapCallbackFailure(error, logger));
     if (shouldProceed) {
       try {
-        const witnessSet = await wallet.keyAgent.signTransaction(
-          {
-            body: coreTx,
-            hash
-          },
-          { inputAddressResolver: wallet.util.resolveInputAddress }
-        );
+        const {
+          witness: { signatures }
+        } = await wallet.finalizeTx({
+          body: coreTx,
+          hash
+        });
 
-        const cslWitnessSet = coreToCsl.witnessSet(witnessSet);
+        const cslWitnessSet = coreToCsl.witnessSet(signatures);
 
         return Promise.resolve(Buffer.from(cslWitnessSet.to_bytes()).toString('hex'));
-      } catch (error) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (error: any) {
         logger.error(error);
         // TODO: handle ProofGeneration errors?
-        const message = error instanceof AuthenticationError ? error.message : 'Nope';
+        const message = (typeof error === 'object' && error.message) || 'Nope';
         throw new TxSignError(TxSignErrorCode.UserDeclined, message);
       }
     } else {

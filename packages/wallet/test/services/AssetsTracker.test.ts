@@ -1,7 +1,6 @@
 import { Asset } from '@cardano-sdk/core';
-import { AssetId } from '@cardano-sdk/util-dev';
+import { AssetId, createTestScheduler } from '@cardano-sdk/util-dev';
 import { AssetsTrackerProps, Balance, TransactionalTracker, createAssetsTracker } from '../../src/services';
-import { createTestScheduler } from '../testScheduler';
 import { of } from 'rxjs';
 
 describe('createAssetsTracker', () => {

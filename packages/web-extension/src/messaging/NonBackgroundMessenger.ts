@@ -1,7 +1,8 @@
 // only tested in ../e2e tests
 /* eslint-disable no-use-before-define */
 import { BehaviorSubject, Observable, Subject, debounceTime, filter, first, map, takeWhile, tap } from 'rxjs';
-import { MessengerDependencies, MessengerPort, PortMessage, ReconnectConfig } from './types';
+import { Messenger, MessengerDependencies, MessengerPort, PortMessage, ReconnectConfig } from './types';
+import { deriveChannelName } from './util';
 import { util } from '@cardano-sdk/core';
 
 export interface NonBackgroundMessengerOptions {
@@ -19,7 +20,7 @@ export const createNonBackgroundMessenger = (
     reconnectConfig: { initialDelay, maxDelay } = { initialDelay: 10, maxDelay: 1000 }
   }: NonBackgroundMessengerOptions,
   { logger, runtime }: MessengerDependencies
-) => {
+): Messenger => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let reconnectTimeout: any;
   let delay = initialDelay;
@@ -59,8 +60,20 @@ export const createNonBackgroundMessenger = (
       filter(util.isNotNil),
       takeWhile((port): port is MessengerPort => typeof port !== 'string')
     );
+  const derivedMessengers = new Set<Messenger>();
   return {
     channel,
+    deriveChannel(path) {
+      const messenger = createNonBackgroundMessenger(
+        {
+          baseChannel: deriveChannelName(channel, path),
+          reconnectConfig: { initialDelay, maxDelay }
+        },
+        { logger, runtime }
+      );
+      derivedMessengers.add(messenger);
+      return messenger;
+    },
     destroy() {
       isDestroyed = true;
       const port = port$.value;
@@ -68,6 +81,10 @@ export const createNonBackgroundMessenger = (
         port?.disconnect();
       }
       clearTimeout(reconnectTimeout);
+      for (const messenger of derivedMessengers.values()) {
+        messenger.destroy();
+        derivedMessengers.delete(messenger);
+      }
       logger.warn(`[NonBackgroundMessenger(${channel})] destroyed`);
     },
     message$,

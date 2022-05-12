@@ -4,19 +4,27 @@ import { Logger } from 'ts-log';
 import { Observable } from 'rxjs';
 import { util } from '@cardano-sdk/core';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type MethodRequest<Method extends string = string, Args = unknown[]> = { method: Method; args: Args };
 
 export interface AnyMessage extends Object {
   messageId: string;
 }
 
-export interface MethodRequestMessage extends AnyMessage {
+export interface RequestMessage extends AnyMessage {
   request: MethodRequest;
 }
 
-export interface MethodResponseMessage<T = unknown> extends AnyMessage {
+export interface ResponseMessage<T = unknown> extends AnyMessage {
   response: T;
+}
+
+export interface SubscriptionMessage extends AnyMessage {
+  subscribe: boolean;
+  error?: Error;
+}
+
+export interface EmitMessage extends AnyMessage {
+  emit: unknown;
 }
 
 export type SendMethodRequestMessage = <Response = unknown>(msg: MethodRequest) => Promise<Response>;
@@ -58,22 +66,6 @@ export interface ReconnectConfig {
   maxDelay: number;
 }
 
-export interface MessengerOptions {
-  /**
-   * Only used in non-background process for now
-   */
-  reconnectConfig?: ReconnectConfig;
-}
-
-export interface ExposeApiProps<API extends object> extends MessengerOptions {
-  baseChannel: ChannelName;
-  api: API;
-  methodRequestOptions?: {
-    transform?: TransformRequest;
-    validate?: ValidateRequest;
-  };
-}
-
 export interface BindRequestHandlerOptions<Response> {
   handler: (request: MethodRequest, sender?: Runtime.MessageSender) => Promise<Response>;
 }
@@ -83,19 +75,34 @@ export interface PortMessage<Data = unknown> {
   port: Pick<MessengerPort, 'sender' | 'postMessage'>;
 }
 
-export enum RemoteApiProperty {
-  MethodReturningPromise
-  // TODO
+export enum RemoteApiPropertyType {
+  MethodReturningPromise,
   // eslint-disable-next-line @typescript-eslint/no-shadow
-  // Observable
+  Observable
 }
 
+export interface MethodRequestOptions {
+  transform?: TransformRequest;
+  validate?: ValidateRequest;
+}
+
+export interface RemoteApiMethod {
+  propType: RemoteApiPropertyType.MethodReturningPromise;
+  requestOptions: MethodRequestOptions;
+}
+
+export type RemoteApiProperty = RemoteApiPropertyType | RemoteApiMethod;
+
 export type RemoteApiProperties<T> = {
-  [key in keyof T]: RemoteApiProperty | RemoteApiProperties<T[key]>;
+  [key in keyof T]: RemoteApiProperty | Omit<RemoteApiProperties<T[key]>, 'propType' | 'requestOptions'>;
 };
 
-export interface ConsumeRemoteApiOptions<T> extends MessengerOptions {
-  baseChannel: ChannelName;
+export interface ExposeApiProps<API extends object> {
+  api: API;
+  properties: RemoteApiProperties<API>;
+}
+
+export interface ConsumeRemoteApiOptions<T> {
   properties: RemoteApiProperties<T>;
   getErrorPrototype?: util.GetErrorPrototype;
 }
@@ -104,6 +111,8 @@ export interface Messenger {
   channel: ChannelName;
   postMessage(message: unknown): Observable<void>;
   message$: Observable<PortMessage>;
+  deriveChannel(path: string): Messenger;
+  destroy(): void;
 }
 
 export interface MessengerApiDependencies {

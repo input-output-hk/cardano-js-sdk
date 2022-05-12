@@ -1,5 +1,5 @@
 import { Cardano, NetworkInfo, testnetTimeSettings } from '@cardano-sdk/core';
-import { createTestScheduler } from '../../testScheduler';
+import { createTestScheduler } from '@cardano-sdk/util-dev';
 import { distinctBlock, distinctTimeSettings } from '../../../src/services/util';
 
 describe('trigger', () => {

@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "@cardano-sdk/core": " 0.2.0",
+    "rxjs": "^7.4.0",
     "delay": "^5.0.0"
   },
   "files": [

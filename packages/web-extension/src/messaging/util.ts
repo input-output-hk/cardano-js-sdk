@@ -1,5 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { AnyMessage, MethodRequest, MethodRequestMessage, MethodResponseMessage } from './types';
+import {
+  AnyMessage,
+  ChannelName,
+  EmitMessage,
+  MethodRequest,
+  RequestMessage,
+  ResponseMessage,
+  SubscriptionMessage
+} from './types';
 import { Runtime } from 'webextension-polyfill';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -9,11 +17,17 @@ export const isRequest = (message: any): message is MethodRequest =>
 const looksLikeMessage = (message: any): message is AnyMessage & Record<string, unknown> =>
   typeof message === 'object' && message !== null && typeof message.messageId === 'string';
 
-export const isRequestMessage = (message: any): message is MethodRequestMessage =>
+export const isRequestMessage = (message: any): message is RequestMessage =>
   looksLikeMessage(message) && isRequest(message.request);
 
-export const isResponseMessage = (message: any): message is MethodResponseMessage =>
+export const isResponseMessage = (message: any): message is ResponseMessage =>
   looksLikeMessage(message) && message.hasOwnProperty('response');
+
+export const isSubscriptionMessage = (message: any): message is SubscriptionMessage =>
+  looksLikeMessage(message) && typeof message.subscribe === 'boolean';
+
+export const isEmitMessage = (message: any): message is EmitMessage =>
+  looksLikeMessage(message) && message.hasOwnProperty('emit');
 
 export const senderOrigin = (sender?: Runtime.MessageSender): string | null => {
   try {
@@ -25,3 +39,5 @@ export const senderOrigin = (sender?: Runtime.MessageSender): string | null => {
 };
 
 export const newMessageId = uuidv4;
+
+export const deriveChannelName = (channel: ChannelName, path: string): ChannelName => `${channel}-${path}`;

@@ -10,8 +10,7 @@ import {
   TrackedWalletProvider,
   createProviderStatusTracker
 } from '../../../src';
-import { createStubStakePoolSearchProvider } from '@cardano-sdk/util-dev';
-import { createTestScheduler } from '../../testScheduler';
+import { createStubStakePoolSearchProvider, createTestScheduler  } from '@cardano-sdk/util-dev';
 import { mockAssetProvider, mockNetworkInfoProvider, mockTxSubmitProvider, mockWalletProvider } from '../../mocks';
 
 const providerFnStats = {

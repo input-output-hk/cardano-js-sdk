@@ -25,6 +25,7 @@
     "test:debug": "DEBUG=true yarn test"
   },
   "devDependencies": {
+    "@cardano-sdk/wallet": " 0.2.0",
     "@types/webextension-polyfill": "^0.8.0",
     "jest-webextension-mock": "^3.7.19",
     "mock-browser": "^0.92.14",

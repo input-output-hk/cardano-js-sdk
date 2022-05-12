@@ -24,6 +24,7 @@ import {
 import { FailedTx, TransactionFailure, TransactionsTracker } from './types';
 import { OrderedCollectionStore } from '../persistence';
 import { RetryBackoffConfig } from 'backoff-rxjs';
+import { Shutdown } from '../types';
 import { TrackerSubject } from './util/TrackerSubject';
 import { coldObservableProvider, distinctBlock, transactionsEquals } from './util';
 import { intersectionBy, sortBy, unionBy } from 'lodash-es';
@@ -138,7 +139,7 @@ export const createTransactionsTracker = (
       createAddressTransactionsProvider(walletProvider, addresses$, retryBackoffConfig, distinctBlock(tip$), store)
     )
   }: TransactionsTrackerInternals = {}
-): TransactionsTracker => {
+): TransactionsTracker & Shutdown => {
   const historicalTransactions$ = createHistoricalTransactionsTrackerSubject(transactionsSource$);
   const txConfirmed$ = (tx: Cardano.NewTxAlonzo) =>
     newTransactions$(historicalTransactions$).pipe(

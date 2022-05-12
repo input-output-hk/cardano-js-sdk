@@ -3,14 +3,11 @@ import {
   Balance,
   BehaviorObservable,
   DelegationTracker,
-  TransactionalTracker,
-  TransactionsTracker,
-  WalletUtil
+  TransactionalObservables,
+  TransactionsTracker
 } from './services';
-import { Cip30DataSignature } from '@cardano-sdk/cip30';
-import { Cip30SignDataRequest } from './KeyManagement/cip8';
+import { Cip30DataSignature, Cip30SignDataRequest } from './KeyManagement/cip8';
 import { GroupedAddress } from './KeyManagement';
-import { KeyManagement } from '.';
 import { SelectionSkeleton } from '@cardano-sdk/cip2';
 import { TxInternals } from './Transaction';
 
@@ -68,12 +65,14 @@ export interface SyncStatus {
   isSettled$: BehaviorObservable<boolean>;
 }
 
+export interface Shutdown {
+  shutdown(): void;
+}
+
 export interface ObservableWallet {
-  name: string;
-  readonly keyAgent: KeyManagement.KeyAgent;
-  readonly balance: TransactionalTracker<Balance>;
+  readonly balance: TransactionalObservables<Balance>;
   readonly delegation: DelegationTracker;
-  readonly utxo: TransactionalTracker<Cardano.Utxo[]>;
+  readonly utxo: TransactionalObservables<Cardano.Utxo[]>;
   readonly transactions: TransactionsTracker;
   readonly tip$: BehaviorObservable<Cardano.Tip>;
   readonly genesisParameters$: BehaviorObservable<Cardano.CompactGenesis>;
@@ -83,7 +82,9 @@ export interface ObservableWallet {
   readonly addresses$: BehaviorObservable<GroupedAddress[]>;
   readonly assets$: BehaviorObservable<Assets>;
   readonly syncStatus: SyncStatus;
-  readonly util: WalletUtil;
+
+  getNetworkId(): Promise<Cardano.NetworkId>;
+  getName(): Promise<string>;
   /**
    * @throws InputSelectionError
    */
@@ -97,6 +98,5 @@ export interface ObservableWallet {
    * @throws {Cardano.TxSubmissionError}
    */
   submitTx(tx: Cardano.NewTxAlonzo): Promise<void>;
-  sync(): void;
   shutdown(): void;
 }

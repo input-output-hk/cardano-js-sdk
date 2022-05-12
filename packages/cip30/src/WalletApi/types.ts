@@ -1,4 +1,5 @@
 import { Cardano } from '@cardano-sdk/core';
+import { KeyManagement } from '@cardano-sdk/wallet';
 
 /**
  * A hex-encoded string of the corresponding bytes.
@@ -13,23 +14,11 @@ export type Bytes = string;
 export type Cbor = string;
 
 /**
- *  Used to specify optional pagination for some API calls.
-Limits results to {limit} each page, and uses a 0-indexing {page}
-to refer to which of those pages of {limit} items each.
+ * Used to specify optional pagination for some API calls.
+ * Limits results to {limit} each page, and uses a 0-indexing {page}
+ * to refer to which of those pages of {limit} items each.
  */
 export type Paginate = { page: number; limit: number };
-
-/**
- * DataSignature type as described in CIP-0030.
- */
-
-type CoseSign1CborHex = Cardano.util.HexBlob;
-type CoseKeyCborHex = Cardano.util.HexBlob;
-
-export interface Cip30DataSignature {
-  key: CoseKeyCborHex;
-  signature: CoseSign1CborHex;
-}
 
 /**
  * Returns the network id of the currently connected account.
@@ -143,7 +132,7 @@ export type SignTx = (tx: Cbor, partialSign?: Boolean) => Promise<Cbor>;
  * @throws ApiError
  * @throws DataSignError
  */
-export type SignData = (addr: Cardano.Address, payload: Bytes) => Promise<Cip30DataSignature>;
+export type SignData = (addr: Cardano.Address, payload: Bytes) => Promise<KeyManagement.cip8.Cip30DataSignature>;
 
 /**
  * As wallets should already have this ability, we allow dApps to request that a transaction be sent through it.

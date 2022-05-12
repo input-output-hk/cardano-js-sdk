@@ -1,6 +1,12 @@
 /* eslint-disable no-use-before-define */
-import { UserPromptService, userPromptServiceChannel } from './util';
-import { exposeApi } from '@cardano-sdk/web-extension';
+import {
+  AdaPriceService,
+  UserPromptService,
+  adaPriceProperties,
+  adaPriceServiceChannel,
+  userPromptServiceChannel
+} from './util';
+import { RemoteApiPropertyType, consumeRemoteApi, exposeApi } from '@cardano-sdk/web-extension';
 import { runtime } from 'webextension-polyfill';
 
 const api: UserPromptService = {
@@ -25,4 +31,27 @@ const api: UserPromptService = {
   }
 };
 
-exposeApi<UserPromptService>({ api, baseChannel: userPromptServiceChannel }, { logger: console, runtime });
+const logger = console;
+exposeApi<UserPromptService>(
+  {
+    api,
+    baseChannel: userPromptServiceChannel,
+    properties: { allowOrigin: RemoteApiPropertyType.MethodReturningPromise }
+  },
+  { logger, runtime }
+);
+
+// Consume background services
+
+const priceService = consumeRemoteApi<AdaPriceService>(
+  {
+    baseChannel: adaPriceServiceChannel,
+    properties: adaPriceProperties
+  },
+  { logger, runtime }
+);
+
+priceService.adaUsd$.subscribe((price) => (document.querySelector('#adaPrice')!.textContent = price.toFixed(2)));
+
+// To use observable wallet from UI:
+// const wallet = consumeObservableWallet({ walletName }, { logger, runtime });

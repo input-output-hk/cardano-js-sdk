@@ -11,7 +11,15 @@ import {
   WalletProvider,
   coreToCsl
 } from '@cardano-sdk/core';
-import { Assets, InitializeTxProps, InitializeTxResult, ObservableWallet, SignDataProps, SyncStatus } from './types';
+import {
+  Assets,
+  InitializeTxProps,
+  InitializeTxResult,
+  ObservableWallet,
+  Shutdown,
+  SignDataProps,
+  SyncStatus
+} from './types';
 import {
   Balance,
   BehaviorObservable,
@@ -43,14 +51,13 @@ import {
   distinctBlock,
   distinctTimeSettings
 } from './services';
-import { Cip30DataSignature } from '@cardano-sdk/cip30';
+import { Cip30DataSignature, cip30signData } from './KeyManagement/cip8';
 import { InputSelector, defaultSelectionConstraints, roundRobinRandomImprove } from '@cardano-sdk/cip2';
 import { Logger, dummyLogger } from 'ts-log';
 import { Observable, Subject, combineLatest, filter, lastValueFrom, map, take } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TxInternals, createTransactionInternals, ensureValidityInterval } from './Transaction';
 import { WalletStores, createInMemoryWalletStores } from './persistence';
-import { cip30signData } from './KeyManagement/cip8';
 import { isEqual } from 'lodash-es';
 
 export interface SingleAddressWalletProps {
@@ -89,8 +96,8 @@ export class SingleAddressWallet implements ObservableWallet {
   readonly assetProvider: TrackedAssetProvider;
   readonly utxo: TransactionalTracker<Cardano.Utxo[]>;
   readonly balance: TransactionalTracker<Balance>;
-  readonly transactions: TransactionsTracker;
-  readonly delegation: DelegationTracker;
+  readonly transactions: TransactionsTracker & Shutdown;
+  readonly delegation: DelegationTracker & Shutdown;
   readonly tip$: BehaviorObservable<Cardano.Tip>;
   readonly networkInfo$: TrackerSubject<NetworkInfo>;
   readonly addresses$: TrackerSubject<GroupedAddress[]>;
@@ -215,6 +222,14 @@ export class SingleAddressWallet implements ObservableWallet {
       stores.assets
     );
     this.util = createWalletUtil(this);
+  }
+
+  async getNetworkId(): Promise<Cardano.NetworkId> {
+    return this.keyAgent.networkId;
+  }
+
+  async getName(): Promise<string> {
+    return this.name;
   }
 
   async initializeTx(props: InitializeTxProps): Promise<InitializeTxResult> {

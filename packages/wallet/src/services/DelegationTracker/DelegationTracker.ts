@@ -17,6 +17,7 @@ import {
 } from './RewardAccounts';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { RewardsHistoryProvider, createRewardsHistoryProvider, createRewardsHistoryTracker } from './RewardsHistory';
+import { Shutdown } from '../../types';
 import { TrackedWalletProvider } from '../ProviderTracker';
 import { TrackerSubject, coldObservableProvider } from '../util';
 import { TxWithEpoch } from './types';
@@ -87,7 +88,7 @@ export const createDelegationTracker = ({
     ),
     slotEpochCalc$ = timeSettings$.pipe(map((timeSettings) => createSlotEpochCalc(timeSettings)))
   } = {}
-}: DelegationTrackerProps): DelegationTracker => {
+}: DelegationTrackerProps): DelegationTracker & Shutdown => {
   const transactions$ = certificateTransactionsWithEpochs(
     transactionsTracker,
     rewardAccountAddresses$,
