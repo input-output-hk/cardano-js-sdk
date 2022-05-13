@@ -180,19 +180,25 @@ describe('StakePoolSearchBuilder', () => {
     });
   });
   describe('buildOrQuery', () => {
-    it('buildOrQuery & queryPoolHashes', async () => {
+    it('buildOrQuery, queryPoolHashes & queryTotalCount', async () => {
       const builtQuery = builder.buildOrQuery(filters);
-      const poolHashes = await builder.queryPoolHashes(builtQuery.query, builtQuery.params);
+      const { query, params } = builtQuery;
+      const poolHashes = await builder.queryPoolHashes(query, params);
+      const totalCount = await builder.queryTotalCount(query, params);
       expect(builtQuery).toMatchSnapshot();
       expect(poolHashes).toMatchSnapshot();
+      expect(totalCount).toMatchSnapshot();
     });
   });
   describe('buildAndQuery', () => {
-    it('buildAndQuery & queryPoolHashes', async () => {
+    it('buildAndQuery, queryPoolHashes & queryTotalCount', async () => {
       const builtQuery = builder.buildAndQuery(filters);
-      const poolHashes = await builder.queryPoolHashes(builtQuery.query, builtQuery.params);
+      const { query, params } = builtQuery;
+      const poolHashes = await builder.queryPoolHashes(query, params);
+      const totalCount = await builder.queryTotalCount(query, params);
       expect(builtQuery).toMatchSnapshot();
       expect(poolHashes).toMatchSnapshot();
+      expect(totalCount).toMatchSnapshot();
     });
   });
 });

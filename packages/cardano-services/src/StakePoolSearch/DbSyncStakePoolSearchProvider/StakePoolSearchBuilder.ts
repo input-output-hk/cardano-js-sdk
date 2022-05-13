@@ -11,7 +11,8 @@ import {
   PoolUpdateModel,
   RelayModel,
   SubQuery,
-  TotalAdaModel
+  TotalAdaModel,
+  TotalCountModel
 } from './types';
 import { Logger, dummyLogger } from 'ts-log';
 import { Pool, QueryResult } from 'pg';
@@ -32,6 +33,7 @@ import Queries, {
   getIdentifierFullJoinClause,
   getIdentifierWhereClause,
   getStatusWhereClause,
+  getTotalCountQueryFromQuery,
   poolsByPledgeMetSubqueries,
   withPagination
 } from './queries';
@@ -158,12 +160,7 @@ export class StakePoolSearchBuilder {
     if (filters?.status || filters?.pledgeMet !== undefined)
       subQueries.unshift({ id: { name: 'current_epoch' }, query: findLastEpoch });
     if (subQueries.length > 0) {
-      query =
-        subQueries.length > 1
-          ? buildOrQueryFromClauses(subQueries)
-          : `${subQueries.length > 1 ? `WITH (${subQueries.find((sq) => !sq.id.isPrimary)})` : ''} ${
-              subQueries[0].query
-            } `;
+      query = subQueries.length > 1 ? buildOrQueryFromClauses(subQueries) : subQueries[0].query;
     }
     return { params, query };
   }
@@ -220,5 +217,11 @@ export class StakePoolSearchBuilder {
     if (whereClause.length > 0) query = addSentenceToQuery(query, ` WHERE ${whereClause.join(' AND ')}`);
     query = addSentenceToQuery(query, groupByClause);
     return { params, query };
+  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public async queryTotalCount(query: string, _params: any[]) {
+    this.#logger.debug('About to get total count of pools');
+    const result: QueryResult<TotalCountModel> = await this.#db.query(getTotalCountQueryFromQuery(query), _params);
+    return result.rows[0].total_count;
   }
 }

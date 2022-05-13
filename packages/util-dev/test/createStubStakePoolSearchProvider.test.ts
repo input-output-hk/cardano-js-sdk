@@ -16,24 +16,27 @@ describe('createStubStakePoolSearchProvider', () => {
       const stakePools = await provider.queryStakePools({
         filters: { identifier: { values: [{ id: 'd-to-matc' as unknown as Cardano.PoolId }] } }
       });
-      expect(stakePools).toHaveLength(1);
-      expect(stakePools[0].id).toBe(ID_TO_MATCH);
+      expect(stakePools.pageResults).toHaveLength(1);
+      expect(stakePools.totalResultCount).toEqual(1);
+      expect(stakePools.pageResults[0].id).toBe(ID_TO_MATCH);
     });
 
     it('matches by name', async () => {
       const stakePools = await provider.queryStakePools({
         filters: { identifier: { values: [{ name: 'ool1' }] } }
       });
-      expect(stakePools).toHaveLength(1);
-      expect(stakePools[0].id).toBe(ID_TO_MATCH);
+      expect(stakePools.pageResults).toHaveLength(1);
+      expect(stakePools.totalResultCount).toEqual(1);
+      expect(stakePools.pageResults[0].id).toBe(ID_TO_MATCH);
     });
 
     it('matches by ticker', async () => {
       const stakePools = await provider.queryStakePools({
         filters: { identifier: { values: [{ ticker: 'TIC' }] } }
       });
-      expect(stakePools).toHaveLength(1);
-      expect(stakePools[0].id).toBe(ID_TO_MATCH);
+      expect(stakePools.pageResults).toHaveLength(1);
+      expect(stakePools.totalResultCount).toEqual(1);
+      expect(stakePools.pageResults[0].id).toBe(ID_TO_MATCH);
     });
   });
 });

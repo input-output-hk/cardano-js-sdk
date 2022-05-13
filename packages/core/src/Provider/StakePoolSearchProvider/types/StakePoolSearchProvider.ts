@@ -41,11 +41,16 @@ export interface StakePoolQueryOptions {
   };
 }
 
+export interface StakePoolSearchResults {
+  pageResults: Cardano.StakePool[];
+  totalResultCount: number;
+}
+
 export interface StakePoolSearchProvider {
   /**
    * @param {StakePoolQueryOptions} options query options
    * @returns Stake pools
    * @throws ProviderError
    */
-  queryStakePools: (options?: StakePoolQueryOptions) => Promise<Cardano.StakePool[]>;
+  queryStakePools: (options?: StakePoolQueryOptions) => Promise<StakePoolSearchResults>;
 }

@@ -1,4 +1,4 @@
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, StakePoolSearchResults } from '@cardano-sdk/core';
 import {
   EpochReward,
   EpochRewardModel,
@@ -43,6 +43,7 @@ interface ToCoreStakePoolInput {
   poolRewards: EpochReward[];
   lastEpoch: number;
   poolMetrics: PoolMetrics[];
+  totalCount: number;
 }
 
 export const toCoreStakePool = ({
@@ -53,9 +54,10 @@ export const toCoreStakePool = ({
   poolRetirements,
   poolRewards,
   lastEpoch,
-  poolMetrics
-}: ToCoreStakePoolInput): Cardano.StakePool[] =>
-  poolDatas.map((poolData) => {
+  poolMetrics,
+  totalCount
+}: ToCoreStakePoolInput): StakePoolSearchResults => ({
+  pageResults: poolDatas.map((poolData) => {
     const registrations = poolRegistrations.filter((r) => r.hashId === poolData.hashId);
     const retirements = poolRetirements.filter((r) => r.hashId === poolData.hashId);
     const toReturn: Cardano.StakePool = {
@@ -80,7 +82,9 @@ export const toCoreStakePool = ({
     if (poolData.metadata) toReturn.metadata = poolData.metadata;
     if (poolData.metadataJson) toReturn.metadataJson = poolData.metadataJson;
     return toReturn;
-  });
+  }),
+  totalResultCount: Number(totalCount)
+});
 
 export const mapPoolUpdate = (poolUpdateModel: PoolUpdateModel): PoolUpdate => ({
   id: poolUpdateModel.id,

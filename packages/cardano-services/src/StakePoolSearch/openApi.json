@@ -29,10 +29,19 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/SearchStakePoolResponse"
+                  "type": "object",
+                  "properties": {
+                    "pageResults": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/SearchStakePool"
+                      }
+                    },
+                    "totalResultCount": {
+                      "type": "number"
+                    }
                   }
+                  
                 }
               }
             }
@@ -76,7 +85,7 @@
           }
         }
       },
-      "SearchStakePoolResponse": {
+      "SearchStakePool": {
         "required": ["cost", "id", "margin", "owners", "pledge", "relays", "vrf"],
         "type": "object",
         "properties": {
@@ -96,7 +105,7 @@
             "$ref": "#/components/schemas/Fraction"
           },
           "metadataJson": {
-            "$ref": "#/components/schemas/SearchStakePoolResponse_metadataJson"
+            "$ref": "#/components/schemas/MetadataJson"
           },
           "relays": {
             "type": "array",
@@ -328,7 +337,7 @@
           }
         }
       },
-      "SearchStakePoolResponse_metadataJson": {
+      "MetadataJson": {
         "type": "object",
         "properties": {
           "hash": {
