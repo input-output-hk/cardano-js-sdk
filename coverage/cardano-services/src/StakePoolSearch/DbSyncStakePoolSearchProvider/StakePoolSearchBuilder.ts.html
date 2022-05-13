@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">99% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>99/100</span>
-            </div>
-        
-            
-            <div class='fl pad1y space-right2'>
-                <span class="strong">92.1% </span>
-                <span class="quiet">Branches</span>
-                <span class='fraction'>35/38</span>
+                <span class='fraction'>102/102</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">94.44% </span>
-                <span class="quiet">Functions</span>
-                <span class='fraction'>17/18</span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>34/36</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">98.98% </span>
+                <span class="strong">100% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>18/18</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>98/99</span>
+                <span class='fraction'>101/101</span>
             </div>
         
             
@@ -287,12 +287,28 @@
 <a name='L222'></a><a href='#L222'>222</a>
 <a name='L223'></a><a href='#L223'>223</a>
 <a name='L224'></a><a href='#L224'>224</a>
-<a name='L225'></a><a href='#L225'>225</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L225'></a><a href='#L225'>225</a>
+<a name='L226'></a><a href='#L226'>226</a>
+<a name='L227'></a><a href='#L227'>227</a>
+<a name='L228'></a><a href='#L228'>228</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -304,17 +320,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">8x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -449,11 +454,6 @@
 <span class="cline-any cline-yes">30x</span>
 <span class="cline-any cline-yes">27x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">30x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -511,6 +511,12 @@
 <span class="cline-any cline-yes">29x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">54x</span>
+<span class="cline-any cline-yes">54x</span>
+<span class="cline-any cline-yes">54x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/* eslint-disable sonarjs/no-nested-template-literals */
 import { Cardano, MultipleChoiceSearchFilter, StakePoolQueryOptions } from '@cardano-sdk/core';
 import {
@@ -524,7 +530,8 @@ import {
   PoolUpdateModel,
   RelayModel,
   SubQuery,
-  TotalAdaModel
+  TotalAdaModel,
+  TotalCountModel
 } from './types';
 import { Logger, dummyLogger } from 'ts-log';
 import { Pool, QueryResult } from 'pg';
@@ -545,6 +552,7 @@ import Queries, {
   getIdentifierFullJoinClause,
   getIdentifierWhereClause,
   getStatusWhereClause,
+  getTotalCountQueryFromQuery,
   poolsByPledgeMetSubqueries,
   withPagination
 } from './queries';
@@ -671,12 +679,7 @@ export class StakePoolSearchBuilder {
     if (filters?.status || filters?.pledgeMet !== undefined)
       subQueries.unshift({ id: { name: 'current_epoch' }, query: findLastEpoch });
     if (subQueries.length &gt; 0) {
-      query =
-        subQueries.length &gt; 1
-          ? buildOrQueryFromClauses(subQueries)
-          : `${subQueries.length &gt; 1 ? <span class="branch-0 cbranch-no" title="branch not covered" >`WITH (${subQueries.find(<span class="fstat-no" title="function not covered" >(s</span>q) =&gt; <span class="cstat-no" title="statement not covered" >!sq.id.isPrimary)</span>})` </span>: ''} ${
-              subQueries[0].query
-            } `;
+      query = subQueries.length &gt; 1 ? buildOrQueryFromClauses(subQueries) : subQueries[0].query;
     }
     return { params, query };
   }
@@ -734,6 +737,12 @@ export class StakePoolSearchBuilder {
     query = addSentenceToQuery(query, groupByClause);
     return { params, query };
   }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public async queryTotalCount(query: string, _params: any[]) {
+    this.#logger.debug('About to get total count of pools');
+    const result: QueryResult&lt;TotalCountModel&gt; = await this.#db.query(getTotalCountQueryFromQuery(query), _params);
+    return result.rows[0].total_count;
+  }
 }
 &nbsp;</pre></td></tr></table></pre>
 
@@ -742,7 +751,7 @@ export class StakePoolSearchBuilder {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at Thu May 12 2022 09:04:02 GMT+0000 (Coordinated Universal Time)
+                at Fri May 13 2022 13:59:57 GMT+0000 (Coordinated Universal Time)
             </div>
         <script src="../../../prettify.js"></script>
         <script>

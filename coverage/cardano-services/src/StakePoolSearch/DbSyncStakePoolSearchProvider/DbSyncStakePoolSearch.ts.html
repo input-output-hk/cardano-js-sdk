@@ -115,11 +115,22 @@
 <a name='L50'></a><a href='#L50'>50</a>
 <a name='L51'></a><a href='#L51'>51</a>
 <a name='L52'></a><a href='#L52'>52</a>
-<a name='L53'></a><a href='#L53'>53</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">8x</span>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -145,7 +156,6 @@
 <span class="cline-any cline-yes">163x</span>
 <span class="cline-any cline-yes">52x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">52x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -156,6 +166,18 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">52x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">52x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -168,10 +190,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/* eslint-disable sonarjs/no-nested-template-literals */
-import { Cardano, StakePoolQueryOptions, StakePoolSearchProvider, util } from '@cardano-sdk/core';
 import { DbSyncProvider } from '../../DbSyncProvider';
 import { Logger, dummyLogger } from 'ts-log';
 import { Pool } from 'pg';
+import { StakePoolQueryOptions, StakePoolSearchProvider, StakePoolSearchResults, util } from '@cardano-sdk/core';
 import { StakePoolSearchBuilder } from './StakePoolSearchBuilder';
 import { toCoreStakePool } from './mappers';
 &nbsp;
@@ -185,7 +207,7 @@ export class DbSyncStakePoolSearchProvider extends DbSyncProvider implements Sta
     this.#logger = logger;
   }
 &nbsp;
-  public async queryStakePools(options?: StakePoolQueryOptions): Promise&lt;Cardano.StakePool[]&gt; {
+  public async queryStakePools(options?: StakePoolQueryOptions): Promise&lt;StakePoolSearchResults&gt; {
     const { params, query } =
       options?.filters?._condition === 'or'
         ? this.#builder.buildOrQuery(options?.filters)
@@ -196,17 +218,27 @@ export class DbSyncStakePoolSearchProvider extends DbSyncProvider implements Sta
     this.#logger.debug(`${hashesIds.length} pools found`);
     const updatesIds = poolUpdates.map(({ updateId }) =&gt; updateId);
     const totalAdaAmount = await this.#builder.getTotalAmountOfAda();
-    const [poolDatas, poolRelays, poolOwners, poolRegistrations, poolRetirements, poolRewards, lastEpoch, poolMetrics] =
-      await Promise.all([
-        this.#builder.queryPoolData(updatesIds),
-        this.#builder.queryPoolRelays(updatesIds),
-        this.#builder.queryPoolOwners(updatesIds),
-        this.#builder.queryRegistrations(hashesIds),
-        this.#builder.queryRetirements(hashesIds),
-        this.#builder.queryPoolRewards(hashesIds, options?.rewardsHistoryLimit),
-        this.#builder.getLastEpoch(),
-        this.#builder.queryPoolMetrics(hashesIds, totalAdaAmount)
-      ]);
+    const [
+      poolDatas,
+      poolRelays,
+      poolOwners,
+      poolRegistrations,
+      poolRetirements,
+      poolRewards,
+      lastEpoch,
+      poolMetrics,
+      totalCount
+    ] = await Promise.all([
+      this.#builder.queryPoolData(updatesIds),
+      this.#builder.queryPoolRelays(updatesIds),
+      this.#builder.queryPoolOwners(updatesIds),
+      this.#builder.queryRegistrations(hashesIds),
+      this.#builder.queryRetirements(hashesIds),
+      this.#builder.queryPoolRewards(hashesIds, options?.rewardsHistoryLimit),
+      this.#builder.getLastEpoch(),
+      this.#builder.queryPoolMetrics(hashesIds, totalAdaAmount),
+      this.#builder.queryTotalCount(query, params)
+    ]);
     return toCoreStakePool({
       lastEpoch,
       poolDatas,
@@ -215,7 +247,8 @@ export class DbSyncStakePoolSearchProvider extends DbSyncProvider implements Sta
       poolRegistrations,
       poolRelays,
       poolRetirements,
-      poolRewards: poolRewards.filter(util.isNotNil)
+      poolRewards: poolRewards.filter(util.isNotNil),
+      totalCount
     });
   }
 }
@@ -226,7 +259,7 @@ export class DbSyncStakePoolSearchProvider extends DbSyncProvider implements Sta
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at Thu May 12 2022 09:04:02 GMT+0000 (Coordinated Universal Time)
+                at Fri May 13 2022 13:59:57 GMT+0000 (Coordinated Universal Time)
             </div>
         <script src="../../../prettify.js"></script>
         <script>
