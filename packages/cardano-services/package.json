@@ -32,7 +32,6 @@
   },
   "devDependencies": {
     "@babel/preset-typescript": "^7.17.12",
-    "@cardano-sdk/cardano-services-client": "0.2.0",
     "@cardano-sdk/util-dev": "0.2.0",
     "@types/bunyan": "^1.8.8",
     "@types/death": "^1.1.2",
