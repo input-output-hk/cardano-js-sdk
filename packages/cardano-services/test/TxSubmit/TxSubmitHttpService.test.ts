@@ -4,12 +4,12 @@ import { APPLICATION_JSON, CONTENT_TYPE, HttpServer, HttpServerConfig, TxSubmitH
 import { Cardano, ProviderError, ProviderFailure, TxSubmitProvider, util } from '@cardano-sdk/core';
 import { getPort } from 'get-port-please';
 import { txSubmitHttpProvider } from '@cardano-sdk/cardano-services-client';
+import axios from 'axios';
 import cbor from 'cbor';
-import got from 'got';
 
 const serializeProviderArg = (arg: unknown) => JSON.stringify({ args: [util.toSerializableObject(arg)] });
 const bodyTx = serializeProviderArg(cbor.encode('#####'));
-const UNSUPPORTED_MEDIA_STRING = 'Response code 415 (Unsupported Media Type)';
+const UNSUPPORTED_MEDIA_STRING = 'Request failed with status code 415';
 const APPLICATION_CBOR = 'application/cbor';
 
 describe('TxSubmitHttpService', () => {
@@ -48,10 +48,10 @@ describe('TxSubmitHttpService', () => {
     let isOk: () => boolean;
     // eslint-disable-next-line unicorn/consistent-function-scoping
     const serverHealth = async () => {
-      const response = await got(`${apiUrlBase}/health`, {
+      const response = await axios.get(`${apiUrlBase}/health`, {
         headers: { [CONTENT_TYPE]: APPLICATION_JSON }
       });
-      return JSON.parse(response.body);
+      return response.data;
     };
 
     beforeAll(async () => {
@@ -74,15 +74,14 @@ describe('TxSubmitHttpService', () => {
       expect(await serverHealth()).toEqual({ ok: false });
 
       try {
-        await got.post(`${apiUrlBase}/submit`, {
-          body: serializeProviderArg(Buffer.from(new Uint8Array())),
+        await axios.post(`${apiUrlBase}/submit`, serializeProviderArg(Buffer.from(new Uint8Array())), {
           headers: { [CONTENT_TYPE]: APPLICATION_JSON }
         });
         throw new Error('fail');
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
-        const parsedError = util.fromSerializableObject<ProviderError>(JSON.parse(error.response.body));
-        expect(error.response.statusCode).toBe(503);
+        const parsedError = util.fromSerializableObject<ProviderError>(error.response.data);
+        expect(error.response.status).toBe(503);
         expect(parsedError.name).toBe('ProviderError');
         expect(parsedError.reason).toBe('UNHEALTHY');
       }
@@ -103,11 +102,11 @@ describe('TxSubmitHttpService', () => {
 
     describe('/health', () => {
       it('forwards the txSubmitProvider health response', async () => {
-        const res = await got(`${apiUrlBase}/health`, {
+        const res = await axios.get(`${apiUrlBase}/health`, {
           headers: { [CONTENT_TYPE]: APPLICATION_JSON }
         });
-        expect(res.statusCode).toBe(200);
-        expect(JSON.parse(res.body)).toEqual({ ok: true });
+        expect(res.status).toBe(200);
+        expect(res.data).toEqual({ ok: true });
       });
     });
 
@@ -118,11 +117,10 @@ describe('TxSubmitHttpService', () => {
         });
         expect(
           (
-            await got.post(`${apiUrlBase}/submit`, {
-              body: bodyTx,
+            await axios.post(`${apiUrlBase}/submit`, bodyTx, {
               headers: { [CONTENT_TYPE]: APPLICATION_JSON }
             })
-          ).statusCode
+          ).status
         ).toEqual(200);
         expect(txSubmitProvider.submitTx).toHaveBeenCalledTimes(1);
       });
@@ -130,24 +128,22 @@ describe('TxSubmitHttpService', () => {
       it('returns a 200 coded response with a well formed HTTP request', async () => {
         expect(
           (
-            await got.post(`${apiUrlBase}/submit`, {
-              body: bodyTx,
+            await axios.post(`${apiUrlBase}/submit`, bodyTx, {
               headers: { [CONTENT_TYPE]: APPLICATION_JSON }
             })
-          ).statusCode
+          ).status
         ).toEqual(200);
         expect(txSubmitProvider.submitTx).toHaveBeenCalledTimes(1);
       });
 
       it('returns a 415 coded response if the wrong content type header is used', async () => {
         try {
-          await got.post(`${apiUrlBase}/submit`, {
-            body: bodyTx,
+          await axios.post(`${apiUrlBase}/submit`, bodyTx, {
             headers: { [CONTENT_TYPE]: APPLICATION_CBOR }
           });
           throw new Error('fail');
         } catch (error: any) {
-          expect(error.response.statusCode).toBe(415);
+          expect(error.response.status).toBe(415);
           expect(error.message).toBe(UNSUPPORTED_MEDIA_STRING);
           expect(txSubmitProvider.submitTx).toHaveBeenCalledTimes(0);
         }
@@ -191,16 +187,13 @@ describe('TxSubmitHttpService', () => {
       it('returns a 400 coded response with detail in the body to a transaction containing a domain violation', async () => {
         expect.assertions(3);
         try {
-          await got.post(`${apiUrlBase}/submit`, {
-            body: serializeProviderArg(Buffer.from(new Uint8Array())),
+          await axios.post(`${apiUrlBase}/submit`, serializeProviderArg(Buffer.from(new Uint8Array())), {
             headers: { [CONTENT_TYPE]: APPLICATION_JSON }
           });
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
-          expect(error.response.statusCode).toBe(400);
-          const parsedError = util.fromSerializableObject<ProviderError<typeof stubErrors[0]>>(
-            JSON.parse(error.response.body)
-          );
+          expect(error.response.status).toBe(400);
+          const parsedError = util.fromSerializableObject<ProviderError<typeof stubErrors[0]>>(error.response.data);
           expect(parsedError.innerError!.name).toEqual(stubErrors[0].name);
           expect(txSubmitProvider.submitTx).toHaveBeenCalledTimes(1);
         }

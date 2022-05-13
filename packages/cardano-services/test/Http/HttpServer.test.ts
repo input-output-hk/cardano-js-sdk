@@ -2,8 +2,8 @@ import { APPLICATION_JSON, CONTENT_TYPE, HttpServer, HttpService, RunnableModule
 import { dummyLogger } from 'ts-log';
 import { getRandomPort } from 'get-port-please';
 import { util } from '@cardano-sdk/core';
+import axios from 'axios';
 import express from 'express';
-import got from 'got';
 import net from 'net';
 import waitOn from 'wait-on';
 
@@ -23,7 +23,7 @@ class SomeHttpService extends HttpService {
     router.post('/echo', (req, res) => {
       logger.debug(req.body);
       assertReq!(req);
-      res.send(JSON.stringify(req.body));
+      HttpServer.sendJSON(res, req.body);
     });
     return new SomeHttpService(router, logger);
   }
@@ -54,9 +54,7 @@ describe('HttpServer', () => {
     });
 
     it('uses core serializableObject with body parser', async () => {
-      const expectedBody = {
-        bigint: 123n
-      };
+      const expectedBody = { bigint: 123n };
       httpServer = new HttpServer(
         { listen: { host: 'localhost', port } },
         {
@@ -68,10 +66,11 @@ describe('HttpServer', () => {
       await httpServer.initialize();
       await httpServer.start();
       await onHttpServer(apiUrlBase);
-      await got.post(`${apiUrlBase}/some-http-service/echo`, {
-        body: JSON.stringify(util.toSerializableObject(expectedBody)),
-        headers: { [CONTENT_TYPE]: APPLICATION_JSON }
-      });
+      await axios.post(
+        `${apiUrlBase}/some-http-service/echo`,
+        JSON.stringify(util.toSerializableObject(expectedBody)),
+        { headers: { [CONTENT_TYPE]: APPLICATION_JSON } }
+      );
       await httpServer.shutdown();
     });
   });
@@ -161,11 +160,11 @@ describe('HttpServer', () => {
       await httpServer.initialize();
       await httpServer.start();
       await onHttpServer(apiUrlBase);
-      const res2 = await got(`${apiUrlBase}/some-http-service/metrics`, {
+      const res2 = await axios.get(`${apiUrlBase}/some-http-service/metrics`, {
         headers: { [CONTENT_TYPE]: APPLICATION_JSON },
-        throwHttpErrors: false
+        validateStatus: null
       });
-      expect(res2.statusCode).toBe(404);
+      expect(res2.status).toBe(404);
     });
 
     it('can expose Prometheus metrics, at /metrics by default', async () => {
@@ -176,11 +175,11 @@ describe('HttpServer', () => {
       await httpServer.initialize();
       await httpServer.start();
       await onHttpServer(apiUrlBase);
-      const res = await got(`${apiUrlBase}/metrics`, {
+      const res = await axios.get(`${apiUrlBase}/metrics`, {
         headers: { [CONTENT_TYPE]: APPLICATION_JSON }
       });
-      expect(res.statusCode).toBe(200);
-      expect(typeof res.body).toBe('string');
+      expect(res.status).toBe(200);
+      expect(typeof res.data).toBe('string');
     });
 
     it('Prometheus metrics can be configured with prom-client options', async () => {
@@ -192,11 +191,11 @@ describe('HttpServer', () => {
       await httpServer.initialize();
       await httpServer.start();
       await onHttpServer(apiUrlBase);
-      const res = await got(`${apiUrlBase}${metricsPath}`, {
+      const res = await axios.get(`${apiUrlBase}${metricsPath}`, {
         headers: { [CONTENT_TYPE]: APPLICATION_JSON }
       });
-      expect(res.statusCode).toBe(200);
-      expect(typeof res.body).toBe('string');
+      expect(res.status).toBe(200);
+      expect(typeof res.data).toBe('string');
     });
   });
 
@@ -213,11 +212,11 @@ describe('HttpServer', () => {
     });
 
     it('health', async () => {
-      const res = await got(`${apiUrlBase}/some-http-service/health`, {
+      const res = await axios.get(`${apiUrlBase}/some-http-service/health`, {
         headers: { [CONTENT_TYPE]: 'application/json' }
       });
-      expect(res.statusCode).toBe(200);
-      expect(JSON.parse(res.body)).toEqual({ ok: true });
+      expect(res.status).toBe(200);
+      expect(res.data).toEqual({ ok: true });
     });
   });
 });

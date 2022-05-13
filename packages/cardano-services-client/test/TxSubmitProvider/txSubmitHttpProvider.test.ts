@@ -1,8 +1,18 @@
 import { Cardano, ProviderError, ProviderFailure, util } from '@cardano-sdk/core';
 import { txSubmitHttpProvider } from '../../src';
-import got, { HTTPError, Response } from 'got';
+import MockAdapter from 'axios-mock-adapter';
+import axios, { AxiosError, AxiosResponse } from 'axios';
 
 const url = 'http://some-hostname:3000/tx-submit';
+
+const axiosError = (bodyError = new Error('error')) => {
+  const response = {
+    data: util.toSerializableObject(new ProviderError(ProviderFailure.BadRequest, bodyError))
+  } as AxiosResponse;
+  const error = new AxiosError(undefined, undefined, undefined, undefined, response);
+  Object.defineProperty(error, 'response', { value: response });
+  return error;
+};
 
 describe('txSubmitHttpProvider', () => {
   describe('healthCheck', () => {
@@ -10,73 +20,75 @@ describe('txSubmitHttpProvider', () => {
       const provider = txSubmitHttpProvider(url);
       await expect(provider.healthCheck()).resolves.toEqual({ ok: false });
     });
-    describe('mocked', () => {
-      beforeAll(() => {
-        jest.mock('got');
-      });
+  });
+  describe('mocked', () => {
+    let axiosMock: MockAdapter;
+    beforeAll(() => {
+      axiosMock = new MockAdapter(axios);
+    });
 
-      afterAll(() => {
-        jest.unmock('got');
-      });
+    afterEach(() => {
+      axiosMock.reset();
+    });
 
+    afterAll(() => {
+      axiosMock.restore();
+    });
+
+    describe('healthCheck', () => {
       it('is ok if 200 response body is { ok: true }', async () => {
-        got.post = jest.fn().mockReturnValue({ json: jest.fn().mockResolvedValue({ ok: true }) });
+        axiosMock.onPost().replyOnce(200, { ok: true });
         const provider = txSubmitHttpProvider(url);
         await expect(provider.healthCheck()).resolves.toEqual({ ok: true });
       });
 
       it('is not ok if 200 response body is { ok: false }', async () => {
-        got.post = jest.fn().mockReturnValue({ json: jest.fn().mockResolvedValue({ ok: false }) });
+        axiosMock.onPost().replyOnce(200, { ok: false });
         const provider = txSubmitHttpProvider(url);
         await expect(provider.healthCheck()).resolves.toEqual({ ok: false });
       });
     });
-  });
 
-  describe('submitTx', () => {
-    it('resolves if successful', async () => {
-      got.post = jest.fn().mockReturnValue({ json: jest.fn().mockResolvedValue('') });
-      const provider = txSubmitHttpProvider(url);
-      await expect(provider.submitTx(new Uint8Array())).resolves.not.toThrow();
-    });
+    describe('submitTx', () => {
+      it('resolves if successful', async () => {
+        axiosMock.onPost().replyOnce(200, '');
+        const provider = txSubmitHttpProvider(url);
+        await expect(provider.submitTx(new Uint8Array())).resolves.not.toThrow();
+      });
 
-    describe('errors', () => {
-      const testError = (bodyError: Error, providerErrorType: unknown) => async () => {
-        const response = {
-          body: util.toSerializableObject(new ProviderError(ProviderFailure.BadRequest, bodyError))
-        } as Response;
-        const httpError = new HTTPError(response);
-        Object.defineProperty(httpError, 'response', { value: response });
-        try {
-          got.post = jest.fn().mockReturnValue({
-            json: jest.fn().mockRejectedValue(httpError)
-          });
-          const provider = txSubmitHttpProvider(url);
-          await provider.submitTx(new Uint8Array());
-          throw new Error('Expected to throw');
-        } catch (error) {
-          if (error instanceof ProviderError) {
-            expect(error.reason).toBe(ProviderFailure.BadRequest);
-            const innerError = error.innerError as Cardano.TxSubmissionError;
-            expect(innerError).toBeInstanceOf(providerErrorType);
-          } else {
-            throw new TypeError('Expected ProviderError');
+      describe('errors', () => {
+        const testError = (bodyError: Error, providerErrorType: unknown) => async () => {
+          try {
+            axiosMock.onPost().replyOnce(() => {
+              throw axiosError(bodyError);
+            });
+            const provider = txSubmitHttpProvider(url);
+            await provider.submitTx(new Uint8Array());
+            throw new Error('Expected to throw');
+          } catch (error) {
+            if (error instanceof ProviderError) {
+              expect(error.reason).toBe(ProviderFailure.BadRequest);
+              const innerError = error.innerError as Cardano.TxSubmissionError;
+              expect(innerError).toBeInstanceOf(providerErrorType);
+            } else {
+              throw new TypeError('Expected ProviderError');
+            }
           }
-        }
-      };
+        };
 
-      it(
-        'rehydrates errors',
-        testError(
-          new Cardano.TxSubmissionErrors.BadInputsError({ badInputs: [] }),
-          Cardano.TxSubmissionErrors.BadInputsError
-        )
-      );
+        it(
+          'rehydrates errors',
+          testError(
+            new Cardano.TxSubmissionErrors.BadInputsError({ badInputs: [] }),
+            Cardano.TxSubmissionErrors.BadInputsError
+          )
+        );
 
-      it(
-        'maps unrecognized errors to UnknownTxSubmissionError',
-        testError(new Error('Unknown error'), Cardano.UnknownTxSubmissionError)
-      );
+        it(
+          'maps unrecognized errors to UnknownTxSubmissionError',
+          testError(new Error('Unknown error'), Cardano.UnknownTxSubmissionError)
+        );
+      });
     });
   });
 });

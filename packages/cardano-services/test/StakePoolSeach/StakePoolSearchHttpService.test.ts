@@ -6,9 +6,9 @@ import { DbSyncStakePoolSearchProvider, HttpServer, HttpServerConfig, StakePoolS
 import { Pool } from 'pg';
 import { getPort } from 'get-port-please';
 import { stakePoolSearchHttpProvider } from '@cardano-sdk/cardano-services-client';
-import got from 'got';
+import axios from 'axios';
 
-const UNSUPPORTED_MEDIA_STRING = 'Response code 415 (Unsupported Media Type)';
+const UNSUPPORTED_MEDIA_STRING = 'Request failed with status code 415';
 const APPLICATION_CBOR = 'application/cbor';
 const APPLICATION_JSON = 'application/json';
 
@@ -44,12 +44,8 @@ describe('StakePoolSearchHttpService', () => {
     jest.resetAllMocks();
   });
 
-  const doServerRequest = (arg: unknown) =>
-    got
-      .post(`${apiUrlBase}/search`, {
-        json: { args: [arg] }
-      })
-      .json() as Promise<StakePoolSearchResults>;
+  const doServerRequest = async (arg: unknown): Promise<StakePoolSearchResults> =>
+    (await axios.post(`${apiUrlBase}/search`, { args: [arg] })).data;
 
   describe('healthy state', () => {
     beforeAll(async () => {
@@ -67,33 +63,25 @@ describe('StakePoolSearchHttpService', () => {
 
     describe('/health', () => {
       it('forwards the stakePoolSearchProvider health response', async () => {
-        const res = await got(`${apiUrlBase}/health`, {
+        const res = await axios.get(`${apiUrlBase}/health`, {
           headers: { 'Content-Type': APPLICATION_JSON }
         });
-        expect(res.statusCode).toBe(200);
-        expect(JSON.parse(res.body)).toEqual({ ok: true });
+        expect(res.status).toBe(200);
+        expect(res.data).toEqual({ ok: true });
       });
     });
 
     describe('/search', () => {
       it('returns a 200 coded response with a well formed HTTP request', async () => {
-        expect(
-          (
-            await got.post(`${apiUrlBase}/search`, {
-              json: { args: [] }
-            })
-          ).statusCode
-        ).toEqual(200);
+        expect((await axios.post(`${apiUrlBase}/search`, { args: [] })).status).toEqual(200);
       });
 
       it('returns a 415 coded response if the wrong content type header is used', async () => {
         try {
-          await got.post(`${apiUrlBase}/search`, {
-            headers: { 'Content-Type': APPLICATION_CBOR }
-          });
+          await axios.post(`${apiUrlBase}/search`, undefined, { headers: { 'Content-Type': APPLICATION_CBOR } });
           throw new Error('fail');
         } catch (error: any) {
-          expect(error.response.statusCode).toBe(415);
+          expect(error.response.status).toBe(415);
           expect(error.message).toBe(UNSUPPORTED_MEDIA_STRING);
         }
       });
@@ -264,11 +252,11 @@ describe('StakePoolSearchHttpService', () => {
             }
           };
           const responseWithAndCondition = await doServerRequest(req);
-          const responseWithOrCondition = await got.post(`${apiUrlBase}/search`, {
-            json: { args: [setFilterCondition(req, 'or')] }
+          const responseWithOrCondition = await axios.post(`${apiUrlBase}/search`, {
+            args: [setFilterCondition(req, 'or')]
           });
-          expect(responseWithOrCondition.statusCode).toEqual(200);
-          expect(JSON.parse(responseWithOrCondition.body)).toEqual(responseWithAndCondition);
+          expect(responseWithOrCondition.status).toEqual(200);
+          expect(responseWithOrCondition.data).toEqual(responseWithAndCondition);
         });
         // FIXME: throws 500 error when running after previous test
         //        if running by itself or with previous test skipped doesn't throw and fails because of equality

@@ -1,19 +1,24 @@
 import { stakePoolSearchHttpProvider } from '../../src';
-import got from 'got';
+import MockAdapter from 'axios-mock-adapter';
+import axios from 'axios';
 
 const url = 'http://some-hostname:3000/stake-pool-search';
 
 describe('stakePoolSearchHttpProvider', () => {
+  let axiosMock: MockAdapter;
   beforeAll(() => {
-    jest.mock('got');
+    axiosMock = new MockAdapter(axios);
+  });
+
+  afterEach(() => {
+    axiosMock.reset();
   });
 
   afterAll(() => {
-    jest.unmock('got');
+    axiosMock.restore();
   });
-
   test('queryStakePools doesnt throw', async () => {
-    got.post = jest.fn().mockReturnValue({ json: jest.fn().mockResolvedValue([]) });
+    axiosMock.onPost().replyOnce(200, []);
     const provider = stakePoolSearchHttpProvider(url);
     await expect(provider.queryStakePools()).resolves.toEqual([]);
   });

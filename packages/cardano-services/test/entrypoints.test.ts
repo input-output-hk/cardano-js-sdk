@@ -6,7 +6,7 @@ import { ServiceNames } from '../src';
 import { createHealthyMockOgmiosServer, createUnhealthyMockOgmiosServer, ogmiosServerReady, serverReady } from './util';
 import { getRandomPort } from 'get-port-please';
 import { listenPromise, serverClosePromise } from '../src/util';
-import got from 'got';
+import axios from 'axios';
 import http from 'http';
 import path from 'path';
 
@@ -15,9 +15,9 @@ const exePath = (name: 'cli' | 'run') => path.join(__dirname, '..', 'dist', `${n
 const assertServiceHealthy = async (apiUrl: string, serviceName: ServiceNames) => {
   await serverReady(apiUrl);
   const headers = { 'Content-Type': 'application/json' };
-  const res = await got(`${apiUrl}/${serviceName}/health`, { headers });
-  expect(res.statusCode).toBe(200);
-  expect(JSON.parse(res.body)).toEqual({ ok: true });
+  const res = await axios.get(`${apiUrl}/${serviceName}/health`, { headers });
+  expect(res.status).toBe(200);
+  expect(res.data).toEqual({ ok: true });
 };
 
 describe('entrypoints', () => {

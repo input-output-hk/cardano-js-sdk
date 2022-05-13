@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ProviderError, ProviderFailure, util } from '@cardano-sdk/core';
-import got, { HTTPError, Options, OptionsOfJSONResponseBody, RequestError } from 'got';
+import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 
 export type HttpProviderConfigPaths<T> = { [methodName in keyof T]: string };
 
@@ -15,9 +15,9 @@ export interface HttpProviderConfig<T> {
    */
   paths: HttpProviderConfigPaths<T>;
   /**
-   * Additional request options passed to got
+   * Additional request options passed to axios
    */
-  gotOptions?: Options;
+  axiosOptions?: AxiosRequestConfig;
   /**
    * Custom error handling: Either:
    * - interpret error as valid response by mapping it to response type and returning it
@@ -41,7 +41,7 @@ export interface HttpProviderConfig<T> {
  */
 export const createHttpProvider = <T extends object>({
   baseUrl,
-  gotOptions,
+  axiosOptions,
   mapError,
   paths
 }: HttpProviderConfig<T>): T =>
@@ -54,26 +54,33 @@ export const createHttpProvider = <T extends object>({
         throw new ProviderError(ProviderFailure.NotImplemented, `HttpProvider missing path for '${prop.toString()}'`);
       return async (...args: any[]) => {
         try {
-          const req: OptionsOfJSONResponseBody = {
-            ...gotOptions,
-            isStream: false,
-            json: { args },
-            parseJson: (obj) => util.fromSerializableObject(JSON.parse(obj), () => ProviderError.prototype),
-            resolveBodyOnly: false,
+          const req: AxiosRequestConfig = {
+            ...axiosOptions,
+            baseURL: baseUrl,
+            data: { args },
+            method: 'post',
             responseType: 'json',
-            stringifyJson: (obj) => JSON.stringify(util.toSerializableObject(obj)),
-            url: baseUrl + path
+            url: path
           };
-          return (await got.post(req).json()) || undefined;
+          const axiosInstance = axios.create(req);
+          axiosInstance.interceptors.request.use((value) => {
+            if (value.data) value.data = util.toSerializableObject(value.data);
+            return value;
+          });
+          axiosInstance.interceptors.response.use((value) => ({
+            ...value,
+            data: util.fromSerializableObject(value.data, () => ProviderError.prototype)
+          }));
+          return (await axiosInstance.request(req)).data || undefined;
         } catch (error) {
-          if (error instanceof RequestError) {
-            if (error instanceof HTTPError) {
-              const typedError = util.fromSerializableObject(error.response.body, () => ProviderError.prototype);
+          if (error instanceof AxiosError) {
+            if (error.response) {
+              const typedError = util.fromSerializableObject(error.response.data, () => ProviderError.prototype);
               if (mapError) return mapError(typedError, method);
               throw new ProviderError(ProviderFailure.Unknown, typedError);
             }
             if (mapError) return mapError(null, method);
-            if (['ENOTFOUND', 'ECONNREFUSED'].includes(error.code)) {
+            if (error.code && ['ENOTFOUND', 'ECONNREFUSED'].includes(error.code)) {
               throw new ProviderError(ProviderFailure.ConnectionFailure, error, error.code);
             }
           }
