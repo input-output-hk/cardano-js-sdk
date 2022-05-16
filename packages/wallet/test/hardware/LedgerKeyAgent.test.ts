@@ -70,7 +70,7 @@ describe('LedgerKeyAgent', () => {
     expect(typeof keyAgent.extendedAccountPublicKey).toBe('string');
   });
 
-  test('sign and submit tx', async () => {
+  test('sign tx', async () => {
     const outputs = [
       {
         address: Cardano.Address(
@@ -91,12 +91,19 @@ describe('LedgerKeyAgent', () => {
     const props = {
       outputs: new Set<Cardano.TxOut>(outputs)
     };
+
     const txInternals = await wallet.initializeTx(props);
-    const tx = await wallet.finalizeTx(txInternals);
-    expect(tx.body).toBe(txInternals.body);
-    expect(tx.id).toBe(txInternals.hash);
-    expect(tx.witness.signatures.size).toBe(1);
-    await expect(wallet.submitTx(tx)).resolves.not.toThrow();
+    const signatures = await keyAgent.signTransaction(
+      {
+        body: txInternals.body,
+        hash: txInternals.hash
+      },
+      {
+        inputAddressResolver: wallet.util.resolveInputAddress,
+        protocolMagic: 1_097_911_063
+      }
+    );
+    expect(signatures.size).toBe(1);
   });
 
   describe('establish, check and re-establish device connection', () => {

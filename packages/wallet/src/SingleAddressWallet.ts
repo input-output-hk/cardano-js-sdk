@@ -25,6 +25,7 @@ import {
   TrackedStakePoolProvider,
   TrackedTxSubmitProvider,
   TrackedWalletProvider,
+  TrackerSubject,
   TransactionFailure,
   TransactionalTracker,
   TransactionsTracker,
@@ -358,5 +359,22 @@ export class SingleAddressWallet implements ObservableWallet {
         })
       )
     );
+  }
+
+  #initializeAddress(knownAddresses?: GroupedAddress[]): Observable<GroupedAddress[]> {
+    return new Observable((observer) => {
+      const existingAddress = knownAddresses?.length && knownAddresses?.[0];
+      if (existingAddress) {
+        observer.next([existingAddress]);
+        return;
+      }
+      this.keyAgent
+        .deriveAddress({
+          index: 0,
+          type: AddressType.External
+        })
+        .then((newAddress) => observer.next([newAddress]))
+        .catch(observer.error);
+    });
   }
 }

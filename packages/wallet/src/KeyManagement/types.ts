@@ -46,6 +46,8 @@ export enum CommunicationType {
   Node = 'node'
 }
 
+export type BIP32Path = Array<number>;
+
 export interface AccountAddressDerivationPath {
   type: AddressType;
   index: number;
@@ -120,6 +122,10 @@ export interface SignTransactionOptions {
   additionalKeyPaths?: AccountKeyDerivationPath[];
 }
 
+export interface SignHardwareTransactionOptions extends SignTransactionOptions {
+  protocolMagic: Cardano.NetworkMagic;
+}
+
 export interface KeyAgent {
   get networkId(): Cardano.NetworkId;
   get accountIndex(): number;
@@ -133,7 +139,10 @@ export interface KeyAgent {
   /**
    * @throws AuthenticationError
    */
-  signTransaction(txInternals: TxInternals, options: SignTransactionOptions): Promise<Cardano.Signatures>;
+  signTransaction(
+    txInternals: TxInternals,
+    options: SignTransactionOptions | SignHardwareTransactionOptions
+  ): Promise<Cardano.Signatures>;
   /**
    * @throws AuthenticationError
    */

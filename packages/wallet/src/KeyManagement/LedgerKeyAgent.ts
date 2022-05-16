@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AuthenticationError, TransportError } from './errors';
 import { Cardano, NotImplementedError, coreToCsl } from '@cardano-sdk/core';
+import { CardanoKeyConst, Cip1852PathLevelIndexes, txToLedger } from './util';
 import {
   CommunicationType,
   KeyAgentType,
@@ -164,7 +165,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
   }: GetLedgerXpubProps): Promise<Cardano.Bip32PublicKey> {
     try {
       const recoveredDeviceConnection = await LedgerKeyAgent.checkDeviceConnection(communicationType, deviceConnection);
-      const derivationPath = `1852'/1815'/${accountIndex}'`;
+      const derivationPath = `${CardanoKeyConst.PURPOSE}'/${CardanoKeyConst.COIN_TYPE}'/${accountIndex}'`;
       const extendedPublicKey = await recoveredDeviceConnection.getExtendedPublicKey({
         path: utils.str_to_path(derivationPath) // BIP32Path
       });
@@ -231,7 +232,8 @@ export class LedgerKeyAgent extends KeyAgentBase {
         cslTxBody,
         inputAddressResolver,
         knownAddresses: this.knownAddresses,
-        networkId: this.networkId
+        networkId: this.networkId,
+        protocolMagic
       });
       const deviceConnection = await LedgerKeyAgent.checkDeviceConnection(
         this.#communicationType,
@@ -243,8 +245,8 @@ export class LedgerKeyAgent extends KeyAgentBase {
         await Promise.all(
           result.witnesses.map(async (witness) => {
             const publicKey = await this.derivePublicKey({
-              index: witness.path[4],
-              role: witness.path[3]
+              index: witness.path[Cip1852PathLevelIndexes.INDEX],
+              role: witness.path[Cip1852PathLevelIndexes.ROLE]
             });
             const signature = Cardano.Ed25519Signature(witness.witnessSignatureHex);
             return [publicKey, signature] as const;

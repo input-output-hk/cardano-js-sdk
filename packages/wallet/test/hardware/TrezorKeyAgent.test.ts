@@ -1,10 +1,14 @@
 import * as mocks from '../mocks';
+import { AssetId, createStubStakePoolSearchProvider } from '@cardano-sdk/util-dev';
 import { Cardano } from '@cardano-sdk/core';
 import { CommunicationType } from '../../src/KeyManagement/types';
-import { KeyManagement } from '../../src';
+import { KeyManagement, SingleAddressWallet } from '../../src';
 
 describe('TrezorKeyAgent', () => {
   let keyAgent: KeyManagement.TrezorKeyAgent;
+  let txSubmitProvider: mocks.TxSubmitProviderStub;
+  let walletProvider: mocks.WalletProviderStub;
+  let wallet: SingleAddressWallet;
 
   beforeAll(async () => {
     keyAgent = await KeyManagement.TrezorKeyAgent.createWithDevice({
@@ -27,6 +31,15 @@ describe('TrezorKeyAgent', () => {
     };
     keyAgent.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
     keyAgent.knownAddresses.push(groupedAddress);
+    txSubmitProvider = mocks.mockTxSubmitProvider();
+    walletProvider = mocks.mockWalletProvider();
+    const assetProvider = mocks.mockAssetProvider();
+    const stakePoolSearchProvider = createStubStakePoolSearchProvider();
+    const networkInfoProvider = mocks.mockNetworkInfoProvider();
+    wallet = new SingleAddressWallet(
+      { name: 'Trezor Wallet' },
+      { assetProvider, keyAgent, networkInfoProvider, stakePoolSearchProvider, txSubmitProvider, walletProvider }
+    );
   });
 
   test('__typename', () => {
@@ -47,6 +60,41 @@ describe('TrezorKeyAgent', () => {
 
   test('extendedAccountPublicKey', () => {
     expect(typeof keyAgent.extendedAccountPublicKey).toBe('string');
+  });
+
+  test('sign tx', async () => {
+    const outputs = [
+      {
+        address: Cardano.Address(
+          'addr_test1qpu5vlrf4xkxv2qpwngf6cjhtw542ayty80v8dyr49rf5ewvxwdrt70qlcpeeagscasafhffqsxy36t90ldv06wqrk2qum8x5w'
+        ),
+        value: { coins: 11_111_111n }
+      },
+      {
+        address: Cardano.Address(
+          'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
+        ),
+        value: {
+          assets: new Map([[AssetId.TSLA, 6n]]),
+          coins: 5n
+        }
+      }
+    ];
+    const props = {
+      outputs: new Set<Cardano.TxOut>(outputs)
+    };
+    const txInternals = await wallet.initializeTx(props);
+    const signatures = await keyAgent.signTransaction(
+      {
+        body: txInternals.body,
+        hash: txInternals.hash
+      },
+      {
+        inputAddressResolver: wallet.util.resolveInputAddress,
+        protocolMagic: 1_097_911_063
+      }
+    );
+    expect(signatures.size).toBe(1);
   });
 
   describe('serializableData', () => {

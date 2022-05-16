@@ -1,5 +1,6 @@
 import { AccountKeyDerivationPath, KeyRole } from '../types';
 import { CSL } from '@cardano-sdk/core';
+import { CardanoKeyConst } from '.';
 
 export const harden = (num: number): number => 0x80_00_00_00 + num;
 
@@ -9,4 +10,7 @@ export const STAKE_KEY_DERIVATION_PATH: AccountKeyDerivationPath = {
 };
 
 export const deriveAccountPrivateKey = (rootPrivateKey: CSL.Bip32PrivateKey, accountIndex: number) =>
-  rootPrivateKey.derive(harden(1852)).derive(harden(1815)).derive(harden(accountIndex));
+  rootPrivateKey
+    .derive(harden(CardanoKeyConst.PURPOSE))
+    .derive(harden(CardanoKeyConst.COIN_TYPE))
+    .derive(harden(accountIndex));

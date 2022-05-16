@@ -1,8 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AuthenticationError, TransportError } from './errors';
-import { Cardano, NotImplementedError } from '@cardano-sdk/core';
-import { CommunicationType, KeyAgentType, SerializableTrezorKeyAgentData, SignBlobResult, TrezorConfig } from './types';
+import { Cardano, NotImplementedError, coreToCsl } from '@cardano-sdk/core';
+import { CardanoKeyConst, txToTrezor } from './util';
+import {
+  CommunicationType,
+  KeyAgentType,
+  SerializableTrezorKeyAgentData,
+  SignBlobResult,
+  SignHardwareTransactionOptions,
+  TrezorConfig
+} from './types';
 import { KeyAgentBase } from './KeyAgentBase';
+import { TxInternals } from '../Transaction';
 import TrezorConnect, { Features } from 'trezor-connect';
 
 export interface TrezorKeyAgentProps extends Omit<SerializableTrezorKeyAgentData, '__typename'> {
@@ -84,7 +93,7 @@ export class TrezorKeyAgent extends KeyAgentBase {
   static async getXpub({ accountIndex }: GetTrezorXpubProps): Promise<Cardano.Bip32PublicKey> {
     try {
       await TrezorKeyAgent.checkDeviceConnection();
-      const derivationPath = `m/1852'/1815'/${accountIndex}'`;
+      const derivationPath = `m/${CardanoKeyConst.PURPOSE}'/${CardanoKeyConst.COIN_TYPE}'/${accountIndex}'`;
       const extendedPublicKey = await TrezorConnect.cardanoGetPublicKey({
         path: derivationPath,
         showOnTrezor: true
@@ -116,12 +125,43 @@ export class TrezorKeyAgent extends KeyAgentBase {
     });
   }
 
-  async signTransaction(): Promise<Cardano.Signatures> {
-    // TODO: change this once signing is implemented
-    // eslint-disable-next-line max-len
-    // Example on how to check and prevent device method calls until initialize. Especially while agent is restored from serialized data
-    await this.isTrezorInitialized;
-    throw new NotImplementedError('signTransaction');
+  async signTransaction(
+    { body }: TxInternals,
+    { inputAddressResolver, protocolMagic }: SignHardwareTransactionOptions
+  ): Promise<Cardano.Signatures> {
+    try {
+      await this.isTrezorInitialized;
+      const cslTxBody = coreToCsl.txBody(body);
+      const trezorTxData = await txToTrezor({
+        accountIndex: this.accountIndex,
+        cslTxBody,
+        inputAddressResolver,
+        knownAddresses: this.knownAddresses,
+        networkId: this.networkId,
+        protocolMagic
+      });
+
+      const result = await TrezorConnect.cardanoSignTransaction(trezorTxData);
+      if (!result.success) {
+        throw new TransportError('Failed to export extended account public key', result.payload);
+      }
+
+      const signedData = result.payload;
+      return new Map<Cardano.Ed25519PublicKey, Cardano.Ed25519Signature>(
+        await Promise.all(
+          signedData.witnesses.map(async (witness) => {
+            const publicKey = Cardano.Ed25519PublicKey(witness.pubKey);
+            const signature = Cardano.Ed25519Signature(witness.signature);
+            return [publicKey, signature] as const;
+          })
+        )
+      );
+    } catch (error: any) {
+      if (error.innerError.code === 'Failure_ActionCancelled') {
+        throw new AuthenticationError('Transaction signing aborted', error);
+      }
+      throw transportTypedError(error);
+    }
   }
 
   async signBlob(): Promise<SignBlobResult> {
