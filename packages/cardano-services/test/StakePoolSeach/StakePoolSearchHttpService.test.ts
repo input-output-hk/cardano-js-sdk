@@ -508,12 +508,12 @@ describe('StakePoolSearchHttpService', () => {
           expect(response).toMatchSnapshot();
         });
 
-        it('sort by cost desc order', async () => {
+        it('sort by total_cost desc order', async () => {
           const response = await doServerRequest(setSortCondition({}, 'desc', 'total_cost'));
           expect(response).toMatchSnapshot();
         });
 
-        it('sort by cost asc order', async () => {
+        it('sort by total_cost asc order', async () => {
           const response = await doServerRequest(setSortCondition({}, 'asc', 'total_cost'));
           expect(response).toMatchSnapshot();
         });
@@ -540,16 +540,19 @@ describe('StakePoolSearchHttpService', () => {
         });
 
         it('sort asc by name with applied pagination, with change sort criteria on next page', async () => {
-          const responsePage1 = await doServerRequest(setSortCondition(setPagination({}, 0, 5), 'asc', 'name'));
+          const firstPageResponse = await doServerRequest(setSortCondition(setPagination({}, 0, 5), 'asc', 'name'));
 
-          const responsePage2 = await doServerRequest(setSortCondition(setPagination({}, 5, 5), 'asc', 'name'));
-          const firstPageIds = responsePage1.map((item) => item.id);
-          const secondPageIds = new Set(responsePage2.map((item) => item.id));
+          const secondPageResponse = await doServerRequest(
+            setSortCondition(setPagination({}, 5, 5), 'asc', 'total_cost')
+          );
+          const firstPageIds = firstPageResponse.pageResults.map(({ id }) => id);
 
-          const hasDuplicatedIdsBetweenPages = firstPageIds.some((id) => secondPageIds.has(id));
+          const hasDuplicatedIdsBetweenPages = firstPageIds.some((id) =>
+            secondPageResponse.pageResults.map((stake) => stake.id).includes(id)
+          );
 
-          expect(responsePage1).toMatchSnapshot();
-          expect(responsePage2).toMatchSnapshot();
+          expect(firstPageResponse).toMatchSnapshot();
+          expect(secondPageResponse).toMatchSnapshot();
           expect(hasDuplicatedIdsBetweenPages).toBe(false);
         });
 
