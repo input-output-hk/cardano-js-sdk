@@ -576,7 +576,9 @@ SELECT
   pu.vrf_key_hash,
   metadata.url AS metadata_url, 
   metadata.hash AS metadata_hash,
-  pod.json AS offline_data
+  pod.json AS offline_data,
+  pod.json -> 'name' AS name,
+  pu.fixed_cost + pu.margin as cost
 FROM pool_update pu
 JOIN pool_hash ph ON 
   ph.id = pu.hash_id
@@ -656,6 +658,16 @@ export const getStatusWhereClause = (
 
 export const withPagination = (query: string, pagination?: StakePoolQueryOptions['pagination']) => {
   if (pagination) return `${query} OFFSET ${pagination.startAt} LIMIT ${pagination.limit}`;
+  return query;
+};
+
+const defaultSort: StakePoolQueryOptions['sort'] = {
+  order: 'asc',
+  value: 'name'
+};
+
+export const withSort = (query: string, sort: StakePoolQueryOptions['sort'] = defaultSort) => {
+  if (sort?.order && sort.value) return `${query} ORDER BY ${sort.value} ${sort.order}`;
   return query;
 };
 

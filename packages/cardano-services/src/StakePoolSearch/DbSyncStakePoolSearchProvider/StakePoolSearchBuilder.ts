@@ -33,7 +33,8 @@ import Queries, {
   getIdentifierWhereClause,
   getStatusWhereClause,
   poolsByPledgeMetSubqueries,
-  withPagination
+  withPagination,
+  withSort
 } from './queries';
 
 export class StakePoolSearchBuilder {
@@ -75,9 +76,10 @@ export class StakePoolSearchBuilder {
       })
     );
   }
-  public async queryPoolData(updatesIds: number[]) {
+  public async queryPoolData(updatesIds: number[], sort: StakePoolQueryOptions['sort']) {
     this.#logger.debug('About to query pool data');
-    const result: QueryResult<PoolDataModel> = await this.#db.query(Queries.findPoolsData, [updatesIds]);
+    const queryWithSort = withSort(Queries.findPoolsData, sort);
+    const result: QueryResult<PoolDataModel> = await this.#db.query(queryWithSort, [updatesIds]);
     return result.rows.length > 0 ? result.rows.map(mapPoolData) : [];
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -29,7 +29,7 @@ export class DbSyncStakePoolSearchProvider extends DbSyncProvider implements Sta
     const totalAdaAmount = await this.#builder.getTotalAmountOfAda();
     const [poolDatas, poolRelays, poolOwners, poolRegistrations, poolRetirements, poolRewards, lastEpoch, poolMetrics] =
       await Promise.all([
-        this.#builder.queryPoolData(updatesIds),
+        this.#builder.queryPoolData(updatesIds, options?.sort),
         this.#builder.queryPoolRelays(updatesIds),
         this.#builder.queryPoolOwners(updatesIds),
         this.#builder.queryRegistrations(hashesIds),
