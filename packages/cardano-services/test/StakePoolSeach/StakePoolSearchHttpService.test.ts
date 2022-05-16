@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-len */
 // import { Cardano, ProviderError, ProviderFailure } from '@cardano-sdk/core';
-import { Cardano, StakePoolQueryOptions, StakePoolSearchProvider } from '@cardano-sdk/core';
+import { Cardano, StakePoolQueryOptions, StakePoolSearchProvider, StakePoolSearchResults } from '@cardano-sdk/core';
 import { DbSyncStakePoolSearchProvider, HttpServer, HttpServerConfig, StakePoolSearchHttpService } from '../../src';
 import { Pool } from 'pg';
 import { getPort } from 'get-port-please';
@@ -64,7 +64,7 @@ describe('StakePoolSearchHttpService', () => {
       .post(`${apiUrlBase}/search`, {
         json: { args: [arg] }
       })
-      .json() as Promise<Cardano.StakePool[]>;
+      .json() as Promise<StakePoolSearchResults>;
 
   describe('healthy state', () => {
     beforeAll(async () => {
@@ -132,7 +132,8 @@ describe('StakePoolSearchHttpService', () => {
             }
           };
           const response = await provider.queryStakePools(options);
-          expect(response).toHaveLength(2);
+          expect(response.pageResults).toHaveLength(2);
+          expect(response.totalResultCount).toEqual(2);
         });
       });
 
@@ -142,34 +143,34 @@ describe('StakePoolSearchHttpService', () => {
           const reqWithPagination = { pagination: { limit: 2, startAt: 1 } };
           const response = await doServerRequest(req);
           const responseWithPagination = await doServerRequest(reqWithPagination);
-          expect(response.length).toEqual(8);
-          expect(responseWithPagination.length).toEqual(2);
-          expect(response[0]).not.toEqual(responseWithPagination[0]);
+          expect(response.pageResults.length).toEqual(8);
+          expect(responseWithPagination.pageResults.length).toEqual(2);
+          expect(response.pageResults[0]).not.toEqual(responseWithPagination.pageResults[0]);
         });
         it('should paginate response with or condition', async () => {
           const req = { filters: { _condition: 'or' } };
           const reqWithPagination = { ...req, pagination: { limit: 2, startAt: 2 } };
           const response = await doServerRequest(req);
           const responseWithPagination = await doServerRequest(reqWithPagination);
-          expect(response.length).toEqual(8);
-          expect(responseWithPagination.length).toEqual(2);
-          expect(response[0]).not.toEqual(responseWithPagination[0]);
+          expect(response.pageResults.length).toEqual(8);
+          expect(responseWithPagination.pageResults.length).toEqual(2);
+          expect(response.pageResults[0]).not.toEqual(responseWithPagination.pageResults[0]);
         });
         it('should paginate rewards response', async () => {
           const req = { pagination: { limit: 1, startAt: 1 } };
           const reqWithRewardsPagination = { pagination: { limit: 1, startAt: 1 }, rewardsHistoryLimit: 0 };
           const response = await doServerRequest(req);
           const responseWithPagination = await doServerRequest(reqWithRewardsPagination);
-          expect(response[0].epochRewards.length).toEqual(1);
-          expect(responseWithPagination[0].epochRewards.length).toEqual(0);
+          expect(response.pageResults[0].epochRewards.length).toEqual(1);
+          expect(responseWithPagination.pageResults[0].epochRewards.length).toEqual(0);
         });
         it('should paginate rewards response with or condition', async () => {
           const req = { filters: { _condition: 'or' }, pagination: { limit: 1, startAt: 1 } };
           const reqWithRewardsPagination = { pagination: { limit: 1, startAt: 1 }, rewardsHistoryLimit: 0 };
           const response = await doServerRequest(req);
           const responseWithPagination = await doServerRequest(reqWithRewardsPagination);
-          expect(response[0].epochRewards.length).toEqual(1);
-          expect(responseWithPagination[0].epochRewards.length).toEqual(0);
+          expect(response.pageResults[0].epochRewards.length).toEqual(1);
+          expect(responseWithPagination.pageResults[0].epochRewards.length).toEqual(0);
         });
       });
 
@@ -222,7 +223,7 @@ describe('StakePoolSearchHttpService', () => {
             }
           };
           const response = await doServerRequest(req);
-          expect(response).toEqual([]);
+          expect(response.pageResults).toEqual([]);
         });
       });
       describe('search pools by status', () => {

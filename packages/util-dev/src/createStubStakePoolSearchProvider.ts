@@ -46,7 +46,7 @@ export const createStubStakePoolSearchProvider = (
     if (delayMs) await delay(delayMs);
     const identifierFilters = options?.filters?.identifier;
     const filterValues = identifierFilters ? identifierFilters.values : [];
-    return stakePools.filter(({ id, metadata }) =>
+    const pageResults = stakePools.filter(({ id, metadata }) =>
       filterValues.some(
         (value) =>
           (value.id && id.includes(value.id.toString())) ||
@@ -54,5 +54,9 @@ export const createStubStakePoolSearchProvider = (
           (value.ticker && metadata?.ticker.includes(value.ticker))
       )
     );
+    return {
+      pageResults,
+      totalResultCount: pageResults.length
+    };
   }
 });

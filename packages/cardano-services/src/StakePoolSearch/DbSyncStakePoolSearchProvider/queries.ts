@@ -692,6 +692,12 @@ export const buildOrQueryFromClauses = (clauses: SubQuery[]) => {
     `;
 };
 
+export const getTotalCountQueryFromQuery = (query: string) => `
+SELECT 
+  COUNT(1) AS total_count
+FROM (${query}) as query
+`;
+
 const Queries = {
   IDENTIFIER_QUERY,
   POOLS_WITH_PLEDGE_MET,

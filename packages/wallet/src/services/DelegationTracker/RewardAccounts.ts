@@ -22,13 +22,15 @@ export const createQueryStakePoolsProvider =
       store.getValues(poolIds),
       coldObservableProvider(
         () =>
-          stakePoolSearchProvider.queryStakePools({
-            filters: { identifier: { values: poolIds.map((poolId) => ({ id: poolId })) } }
-          }),
+          stakePoolSearchProvider
+            .queryStakePools({
+              filters: { identifier: { values: poolIds.map((poolId) => ({ id: poolId })) } }
+            })
+            .then(({ pageResults }) => pageResults),
         retryBackoffConfig
       ).pipe(
-        tap((stakePools) => {
-          for (const stakePool of stakePools) {
+        tap((pageResults) => {
+          for (const stakePool of pageResults) {
             store.setValue(stakePool.id, stakePool);
           }
         })
