@@ -11,9 +11,24 @@ import got from 'got';
 const UNSUPPORTED_MEDIA_STRING = 'Response code 415 (Unsupported Media Type)';
 const APPLICATION_CBOR = 'application/cbor';
 const APPLICATION_JSON = 'application/json';
+const STAKE_POOL_NAME = 'THE AMSTERDAM NODE';
 
 const setFilterCondition = (options: StakePoolQueryOptions, condition: 'and' | 'or'): StakePoolQueryOptions => ({
   filters: { ...options.filters, _condition: condition }
+});
+
+const setSortCondition = (
+  options: StakePoolQueryOptions,
+  order: 'asc' | 'desc',
+  field: 'name' | 'total_cost' | 'saturation'
+): StakePoolQueryOptions => ({
+  ...options,
+  sort: { ...options.sort, field, order }
+});
+
+const setPagination = (options: StakePoolQueryOptions, startAt: number, limit: number): StakePoolQueryOptions => ({
+  ...options,
+  pagination: { ...options.pagination, limit, startAt }
 });
 
 const addStatusFilter = (options: StakePoolQueryOptions, status: Cardano.StakePoolStatus): StakePoolQueryOptions => ({
@@ -133,7 +148,7 @@ describe('StakePoolSearchHttpService', () => {
         });
         it('should paginate response with or condition', async () => {
           const req = { filters: { _condition: 'or' } };
-          const reqWithPagination = { ...req, pagination: { limit: 2, startAt: 1 } };
+          const reqWithPagination = { ...req, pagination: { limit: 2, startAt: 2 } };
           const response = await doServerRequest(req);
           const responseWithPagination = await doServerRequest(reqWithPagination);
           expect(response.length).toEqual(8);
@@ -166,7 +181,7 @@ describe('StakePoolSearchHttpService', () => {
               identifier: {
                 _condition: 'or',
                 values: [
-                  { name: 'THE AMSTERDAM NODE' },
+                  { name: STAKE_POOL_NAME },
                   { name: 'banderini' },
                   { ticker: 'TEST' },
                   { id: '98a6rqr7a7yakanm5sz6asx9gfjsr343mus0tsye23wmg70' as unknown as Cardano.PoolId }
@@ -289,7 +304,7 @@ describe('StakePoolSearchHttpService', () => {
             identifier: {
               _condition: 'or',
               values: [
-                { name: 'THE AMSTERDAM NODE' },
+                { name: STAKE_POOL_NAME },
                 { name: 'banderini' },
                 { ticker: 'TEST' },
                 { id: Cardano.PoolId('pool1jcwn98a6rqr7a7yakanm5sz6asx9gfjsr343mus0tsye23wmg70') }
@@ -465,6 +480,84 @@ describe('StakePoolSearchHttpService', () => {
             const response = await doServerRequest(setFilterCondition(reqWithMultipleFilters, 'and'));
             expect(response).toMatchSnapshot();
           });
+        });
+      });
+
+      describe('stake pools sort', () => {
+        const filterArgs: StakePoolQueryOptions = {
+          filters: {
+            identifier: {
+              _condition: 'or',
+              values: [
+                { ticker: 'TEST' },
+                { name: STAKE_POOL_NAME },
+                { id: Cardano.PoolId('pool1jcwn98a6rqr7a7yakanm5sz6asx9gfjsr343mus0tsye23wmg70') }
+              ]
+            }
+          }
+        };
+
+        it('sort by name desc order', async () => {
+          const response = await doServerRequest(setSortCondition({}, 'desc', 'name'));
+          expect(response).toMatchSnapshot();
+        });
+
+        it('sort by name asc order', async () => {
+          const response = await doServerRequest(setSortCondition({}, 'asc', 'name'));
+          expect(response).toMatchSnapshot();
+        });
+
+        it('sort by cost desc order', async () => {
+          const response = await doServerRequest(setSortCondition({}, 'desc', 'total_cost'));
+          expect(response).toMatchSnapshot();
+        });
+
+        it('sort by cost asc order', async () => {
+          const response = await doServerRequest(setSortCondition({}, 'asc', 'total_cost'));
+          expect(response).toMatchSnapshot();
+        });
+
+        it('if sort not provided defaults by name asc order', async () => {
+          const response = await doServerRequest({});
+          expect(response).toMatchSnapshot();
+        });
+
+        it('sort with applied filters', async () => {
+          const response = await doServerRequest(
+            setSortCondition(setFilterCondition(filterArgs, 'or'), 'desc', 'name')
+          );
+          expect(response).toMatchSnapshot();
+        });
+
+        it('sort asc by total_cost with applied pagination', async () => {
+          const responsePage1 = await doServerRequest(setSortCondition(setPagination({}, 0, 3), 'asc', 'total_cost'));
+
+          const responsePage2 = await doServerRequest(setSortCondition(setPagination({}, 3, 3), 'asc', 'total_cost'));
+
+          expect(responsePage1).toMatchSnapshot();
+          expect(responsePage2).toMatchSnapshot();
+        });
+
+        it('sort asc by name with applied pagination, with change sort criteria on next page', async () => {
+          const responsePage1 = await doServerRequest(setSortCondition(setPagination({}, 0, 5), 'asc', 'name'));
+
+          const responsePage2 = await doServerRequest(setSortCondition(setPagination({}, 5, 5), 'asc', 'name'));
+          const firstPageIds = responsePage1.map((item) => item.id);
+          const secondPageIds = new Set(responsePage2.map((item) => item.id));
+
+          const hasDuplicatedIdsBetweenPages = firstPageIds.some((id) => secondPageIds.has(id));
+
+          expect(responsePage1).toMatchSnapshot();
+          expect(responsePage2).toMatchSnapshot();
+          expect(hasDuplicatedIdsBetweenPages).toBe(false);
+        });
+
+        it('sort asc by name with applied pagination and filters', async () => {
+          const responsePage = await doServerRequest(
+            setSortCondition(setPagination(setFilterCondition(filterArgs, 'or'), 0, 5), 'asc', 'name')
+          );
+
+          expect(responsePage).toMatchSnapshot();
         });
       });
     });

@@ -76,7 +76,7 @@ export class StakePoolSearchBuilder {
       })
     );
   }
-  public async queryPoolData(updatesIds: number[], sort: StakePoolQueryOptions['sort']) {
+  public async queryPoolData(updatesIds: number[], sort?: StakePoolQueryOptions['sort']) {
     this.#logger.debug('About to query pool data');
     const queryWithSort = withSort(Queries.findPoolsData, sort);
     const result: QueryResult<PoolDataModel> = await this.#db.query(queryWithSort, [updatesIds]);

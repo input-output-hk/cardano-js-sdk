@@ -578,7 +578,7 @@ SELECT
   metadata.hash AS metadata_hash,
   pod.json AS offline_data,
   pod.json -> 'name' AS name,
-  pu.fixed_cost + pu.margin as cost
+  ((pu.fixed_cost * pu.margin) + pu.fixed_cost) as total_cost
 FROM pool_update pu
 JOIN pool_hash ph ON 
   ph.id = pu.hash_id
@@ -661,15 +661,13 @@ export const withPagination = (query: string, pagination?: StakePoolQueryOptions
   return query;
 };
 
-const defaultSort: StakePoolQueryOptions['sort'] = {
-  order: 'asc',
-  value: 'name'
+export const defaultSort: StakePoolQueryOptions['sort'] = {
+  field: 'name',
+  order: 'asc'
 };
 
-export const withSort = (query: string, sort: StakePoolQueryOptions['sort'] = defaultSort) => {
-  if (sort?.order && sort.value) return `${query} ORDER BY ${sort.value} ${sort.order}`;
-  return query;
-};
+export const withSort = (query: string, sort: StakePoolQueryOptions['sort'] = defaultSort) =>
+  `${query} ORDER BY ${sort.field} ${sort.order}`;
 
 export const addSentenceToQuery = (query: string, sentence: string) => query + sentence;
 

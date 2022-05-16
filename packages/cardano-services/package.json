@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/cardano-services",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Cardano GraphQL Services",
   "engines": {
     "node": "^14"
@@ -28,6 +28,7 @@
     "prepack": "yarn build",
     "test:debug": "DEBUG=true yarn test",
     "run:http-server": "ts-node --transpile-only src/run.ts",
+    "run:http-server:debug": "node -r ts-node/register --inspect=0.0.0.0:9229 src/run.ts",
     "cli": "ts-node --transpile-only src/cli.ts"
   },
   "devDependencies": {

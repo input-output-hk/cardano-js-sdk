@@ -3,7 +3,7 @@ import { Cardano } from '../../..';
 type FilterCondition = 'and' | 'or';
 
 type SortOrder = 'asc' | 'desc';
-type SortValue = 'name' | 'apy' | 'saturation' | 'cost';
+type SortField = 'name' | 'saturation' | 'total_cost';
 
 export interface MultipleChoiceSearchFilter<T> {
   /**
@@ -19,7 +19,7 @@ export interface StakePoolQueryOptions {
    */
   sort?: {
     order: SortOrder;
-    value: SortValue;
+    field: SortField;
   };
   /**
    * Will fetch all stake pools if not specified
