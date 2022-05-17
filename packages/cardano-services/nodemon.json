@@ -2,7 +2,7 @@
   "watch": [
     "src"
   ],
-  "ext": "ts,graphql",
+  "ext": "ts",
   "ignore": [
     "src/**/__tests__/*"
   ],

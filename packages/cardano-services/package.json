@@ -28,7 +28,7 @@
     "prepack": "yarn build",
     "test:debug": "DEBUG=true yarn test",
     "run:http-server": "ts-node --transpile-only src/run.ts",
-    "run:http-server:debug": "npx nodemon --legacy-watch",
+    "run:http-server:debug": "npx nodemon --exec 'node -r ts-node/register --inspect=0.0.0.0:9229 src/run.ts'",
     "cli": "ts-node --transpile-only src/cli.ts"
   },
   "devDependencies": {
