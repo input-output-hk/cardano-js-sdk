@@ -24,6 +24,10 @@ export class TxSubmitHttpService extends HttpService {
     this.#txSubmitProvider = txSubmitProvider;
   }
 
+  async close(): Promise<void> {
+    await this.#txSubmitProvider.close?.();
+  }
+
   async healthCheck() {
     return this.#txSubmitProvider.healthCheck();
   }
