@@ -4,6 +4,7 @@ import { LogLevel, createLogger } from 'bunyan';
 import { MissingProgramOption, UnknownServiceName } from './errors';
 import { Pool } from 'pg';
 import { ProgramOptionDescriptions } from './ProgramOptionDescriptions';
+import { RabbitMqTxSubmitProvider } from '@cardano-sdk/rabbitmq';
 import { ServiceNames } from './ServiceNames';
 import { TxSubmitHttpService } from '../TxSubmit';
 import { ogmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
@@ -16,6 +17,8 @@ export interface ProgramArgs {
     loggerMinSeverity?: LogLevel;
     metricsEnabled?: boolean;
     ogmiosUrl?: URL;
+    rabbitmqUrl?: URL;
+    useQueue?: boolean;
   };
 }
 
@@ -45,11 +48,14 @@ export const loadHttpServer = async (args: ProgramArgs): Promise<HttpServer> => 
         services.push(
           await TxSubmitHttpService.create({
             logger,
-            txSubmitProvider: ogmiosTxSubmitProvider({
-              host: args.options?.ogmiosUrl?.hostname,
-              port: args.options?.ogmiosUrl ? Number.parseInt(args.options.ogmiosUrl.port) : undefined,
-              tls: args.options?.ogmiosUrl?.protocol === 'wss'
-            })
+            txSubmitProvider:
+              args.options?.useQueue && args.options?.rabbitmqUrl
+                ? new RabbitMqTxSubmitProvider(args.options.rabbitmqUrl)
+                : ogmiosTxSubmitProvider({
+                    host: args.options?.ogmiosUrl?.hostname,
+                    port: args.options?.ogmiosUrl ? Number.parseInt(args.options.ogmiosUrl.port) : undefined,
+                    tls: args.options?.ogmiosUrl?.protocol === 'wss'
+                  })
           })
         );
         break;

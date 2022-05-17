@@ -2,7 +2,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { ChildProcess, fork } from 'child_process';
 import { Connection, ConnectionConfig, createConnectionObject } from '@cardano-ogmios/client';
-import { ServiceNames } from '../src';
+import { RABBITMQ_URL_DEFAULT, ServiceNames } from '../src';
 import { createHealthyMockOgmiosServer, createUnhealthyMockOgmiosServer, ogmiosServerReady, serverReady } from './util';
 import { getRandomPort } from 'get-port-please';
 import { listenPromise, serverClosePromise } from '../src/util';
@@ -141,6 +141,7 @@ describe('entrypoints', () => {
           });
         });
       });
+
       describe('specifying an Ogmios-dependent service without providing the Ogmios URL', () => {
         beforeEach(async () => {
           ogmiosServer = createHealthyMockOgmiosServer();
@@ -178,6 +179,70 @@ describe('entrypoints', () => {
         });
       });
     });
+
+    describe('with RabbitMQ and explicit URL', () => {
+      it('cli:start-server', async () => {
+        proc = fork(
+          exePath('cli'),
+          [
+            'start-server',
+            '--api-url',
+            apiUrl,
+            '--logger-min-severity',
+            'error',
+            '--use-queue',
+            '--rabbitmq-url',
+            RABBITMQ_URL_DEFAULT,
+            ServiceNames.TxSubmit
+          ],
+          {
+            stdio: 'pipe'
+          }
+        );
+        await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit);
+      });
+
+      it('run', async () => {
+        proc = fork(exePath('run'), {
+          env: {
+            API_URL: apiUrl,
+            LOGGER_MIN_SEVERITY: 'error',
+            RABBITMQ_URL: RABBITMQ_URL_DEFAULT,
+            SERVICE_NAMES: ServiceNames.TxSubmit,
+            USE_QUEUE: 'true'
+          },
+          stdio: 'pipe'
+        });
+        await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit);
+      });
+    });
+
+    describe('with RabbitMQ and default URL', () => {
+      it('cli:start-server', async () => {
+        proc = fork(
+          exePath('cli'),
+          ['start-server', '--api-url', apiUrl, '--logger-min-severity', 'error', '--use-queue', ServiceNames.TxSubmit],
+          {
+            stdio: 'pipe'
+          }
+        );
+        await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit);
+      });
+
+      it('run', async () => {
+        proc = fork(exePath('run'), {
+          env: {
+            API_URL: apiUrl,
+            LOGGER_MIN_SEVERITY: 'error',
+            SERVICE_NAMES: ServiceNames.TxSubmit,
+            USE_QUEUE: 'true'
+          },
+          stdio: 'pipe'
+        });
+        await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit);
+      });
+    });
+
     describe('with unhealthy internal providers', () => {
       let spy: jest.Mock;
       beforeEach(async () => {

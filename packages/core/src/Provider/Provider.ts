@@ -3,6 +3,7 @@ export type HealthCheckResponse = {
 };
 
 export interface Provider {
+  close?(): Promise<void>;
   /**
    * @throws ProviderError
    */

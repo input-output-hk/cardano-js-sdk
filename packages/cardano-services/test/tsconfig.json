@@ -8,7 +8,7 @@
     { "path": "../src" },
     { "path": "../../core/src" },
     { "path": "../../ogmios/test" },
+    { "path": "../../rabbitmq/test" },
     { "path": "../../util-dev/src" }
   ]
 }
-

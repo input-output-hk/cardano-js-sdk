@@ -86,7 +86,9 @@ export class HttpServer extends RunnableModule {
     this.server = await listenPromise(this.app, this.#config.listen);
   }
 
-  shutdownImpl(): Promise<void> {
+  async shutdownImpl(): Promise<void> {
+    for (const service of this.#dependencies.services) await service.close();
+
     return serverClosePromise(this.server);
   }
 }

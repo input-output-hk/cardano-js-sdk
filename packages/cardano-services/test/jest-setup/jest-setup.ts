@@ -1,5 +1,6 @@
 import { parse } from 'pg-connection-string';
 import { setupPostgresContainer } from './docker';
+import { setupRabbitMQContainer } from '@cardano-sdk/rabbitmq/test/jest-setup/docker';
 import dotenv from 'dotenv';
 import path from 'path';
 
@@ -16,4 +17,5 @@ module.exports = async () => {
     password ? password : 'mysecretpassword',
     port ? port : '5432'
   );
+  await setupRabbitMQContainer();
 };

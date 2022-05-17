@@ -1,0 +1,9 @@
+{
+  "extends": "../../../tsconfig.json",
+  "compilerOptions": {
+    "noUnusedLocals": false,
+    "outDir": "../dist/",
+    "rootDir": "."
+  },
+  "references": [{ "path": "../../core/src" }]
+}

@@ -23,5 +23,9 @@ export abstract class HttpService {
     });
   }
 
+  async close(): Promise<void> {
+    return Promise.resolve();
+  }
+
   protected abstract healthCheck(): Promise<HealthCheckResponse>;
 }
