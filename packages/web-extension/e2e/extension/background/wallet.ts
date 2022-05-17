@@ -2,7 +2,7 @@ import { SingleAddressWallet, storage } from '@cardano-sdk/wallet';
 import {
   assetProvider,
   networkInfoProvider,
-  stakePoolSearchProvider,
+  stakePoolProvider,
   txSubmitProvider,
   utxoProvider,
   walletProvider
@@ -21,7 +21,7 @@ export const walletReady = (async () => {
       keyAgent,
       logger,
       networkInfoProvider: await networkInfoProvider,
-      stakePoolSearchProvider: await stakePoolSearchProvider,
+      stakePoolProvider: await stakePoolProvider,
       stores: storage.createPouchdbWalletStores(walletName, { logger }),
       txSubmitProvider: await txSubmitProvider,
       utxoProvider: await utxoProvider,

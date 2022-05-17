@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-len */
-import { Cardano, StakePoolQueryOptions, StakePoolSearchProvider, StakePoolSearchResults } from '@cardano-sdk/core';
-import { DbSyncStakePoolSearchProvider, HttpServer, HttpServerConfig, StakePoolSearchHttpService } from '../../src';
+
+import { Cardano, StakePoolProvider, StakePoolQueryOptions, StakePoolSearchResults } from '@cardano-sdk/core';
+import { DbSyncStakePoolProvider, HttpServer, HttpServerConfig, StakePoolHttpService } from '../../src';
 import { Pool } from 'pg';
 import { doServerRequest } from '../util';
 import { getPort } from 'get-port-please';
-import { stakePoolSearchHttpProvider } from '@cardano-sdk/cardano-services-client';
+import { stakePoolHttpProvider } from '@cardano-sdk/cardano-services-client';
 import axios from 'axios';
 
 const UNSUPPORTED_MEDIA_STRING = 'Request failed with status code 415';
@@ -39,11 +40,11 @@ const addPledgeMetFilter = (options: StakePoolQueryOptions, pledgeMet: boolean):
   filters: { ...options.filters, pledgeMet }
 });
 
-describe('StakePoolSearchHttpService', () => {
+describe('StakePoolHttpService', () => {
   let dbConnection: Pool;
   let httpServer: HttpServer;
-  let stakePoolSearchProvider: DbSyncStakePoolSearchProvider;
-  let service: StakePoolSearchHttpService;
+  let stakePoolProvider: DbSyncStakePoolProvider;
+  let service: StakePoolHttpService;
   let port: number;
   let apiUrlBase: string;
   let config: HttpServerConfig;
@@ -51,7 +52,7 @@ describe('StakePoolSearchHttpService', () => {
 
   beforeAll(async () => {
     port = await getPort();
-    apiUrlBase = `http://localhost:${port}/stake-pool-search`;
+    apiUrlBase = `http://localhost:${port}/stake-pool`;
     config = { listen: { port } };
     dbConnection = new Pool({ connectionString: process.env.DB_CONNECTION_STRING });
     doStakePoolRequest = doServerRequest(apiUrlBase);
@@ -63,8 +64,8 @@ describe('StakePoolSearchHttpService', () => {
 
   describe('healthy state', () => {
     beforeAll(async () => {
-      stakePoolSearchProvider = new DbSyncStakePoolSearchProvider(dbConnection);
-      service = StakePoolSearchHttpService.create({ stakePoolSearchProvider });
+      stakePoolProvider = new DbSyncStakePoolProvider(dbConnection);
+      service = StakePoolHttpService.create({ stakePoolProvider });
       httpServer = new HttpServer(config, { services: [service] });
       await httpServer.initialize();
       await httpServer.start();
@@ -76,7 +77,7 @@ describe('StakePoolSearchHttpService', () => {
     });
 
     describe('/health', () => {
-      it('forwards the stakePoolSearchProvider health response', async () => {
+      it('forwards the stakePoolProvider health response', async () => {
         const res = await axios.post(`${apiUrlBase}/health`, {
           headers: { 'Content-Type': APPLICATION_JSON }
         });
@@ -101,10 +102,10 @@ describe('StakePoolSearchHttpService', () => {
         }
       });
 
-      describe('with StakePoolSearchHttpProvider', () => {
-        let provider: StakePoolSearchProvider;
+      describe('with StakePoolHttpProvider', () => {
+        let provider: StakePoolProvider;
         beforeEach(() => {
-          provider = stakePoolSearchHttpProvider(apiUrlBase);
+          provider = stakePoolHttpProvider(apiUrlBase);
         });
 
         it('response is an array of stake pools', async () => {

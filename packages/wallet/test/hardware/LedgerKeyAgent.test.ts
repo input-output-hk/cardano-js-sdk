@@ -1,5 +1,5 @@
 import * as mocks from '../mocks';
-import { AssetId, createStubStakePoolSearchProvider } from '@cardano-sdk/util-dev';
+import { AssetId, createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { Cardano } from '@cardano-sdk/core';
 import { CommunicationType, LedgerTransportType } from '../../src/KeyManagement/types';
 import { KeyManagement, SingleAddressWallet } from '../../src';
@@ -20,7 +20,7 @@ describe('LedgerKeyAgent', () => {
     txSubmitProvider = mocks.mockTxSubmitProvider();
     walletProvider = mocks.mockWalletProvider();
     const assetProvider = mocks.mockAssetProvider();
-    const stakePoolSearchProvider = createStubStakePoolSearchProvider();
+    const stakePoolProvider = createStubStakePoolProvider();
     const networkInfoProvider = mocks.mockNetworkInfoProvider();
     const groupedAddress: KeyManagement.GroupedAddress = {
       accountIndex: 0,
@@ -33,7 +33,7 @@ describe('LedgerKeyAgent', () => {
     keyAgent.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
     wallet = new SingleAddressWallet(
       { name: 'HW Wallet' },
-      { assetProvider, keyAgent, networkInfoProvider, stakePoolSearchProvider, txSubmitProvider, walletProvider }
+      { assetProvider, keyAgent, networkInfoProvider, stakePoolProvider, txSubmitProvider, walletProvider }
     );
     keyAgent.knownAddresses.push(groupedAddress);
   });

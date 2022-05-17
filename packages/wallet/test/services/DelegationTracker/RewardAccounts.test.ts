@@ -173,9 +173,9 @@ describe('RewardAccounts', () => {
         const epoch = currentEpoch.number;
         const epoch$ = cold('-a', { a: epoch });
         const stakePoolQueryResult = [{ id: poolId1 }, { id: poolId2 }];
-        const stakePoolSearchProvider = jest.fn().mockReturnValue(cold('-a', { a: stakePoolQueryResult }));
+        const stakePoolProvider = jest.fn().mockReturnValue(cold('-a', { a: stakePoolQueryResult }));
         const target$ = createDelegateeTracker(
-          stakePoolSearchProvider,
+          stakePoolProvider,
           epoch$,
           cold('a', {
             a: [
@@ -209,8 +209,8 @@ describe('RewardAccounts', () => {
           }
         });
         flush();
-        expect(stakePoolSearchProvider).toBeCalledTimes(1);
-        expect(stakePoolSearchProvider).toBeCalledWith([poolId1, poolId2]);
+        expect(stakePoolProvider).toBeCalledTimes(1);
+        expect(stakePoolProvider).toBeCalledWith([poolId1, poolId2]);
       });
     });
   });

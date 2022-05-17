@@ -4,7 +4,7 @@ import {
   assetProvider,
   keyAgentReady,
   networkInfoProvider,
-  stakePoolSearchProvider,
+  stakePoolProvider,
   txSubmitProvider,
   walletProvider
 } from '../config';
@@ -21,7 +21,7 @@ describe('SingleAddressWallet/metadata', () => {
         assetProvider: await assetProvider,
         keyAgent: await keyAgentReady,
         networkInfoProvider: await networkInfoProvider,
-        stakePoolSearchProvider,
+        stakePoolProvider,
         txSubmitProvider: await txSubmitProvider,
         walletProvider: await walletProvider
       }

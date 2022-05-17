@@ -1,12 +1,12 @@
-import { Cardano, StakePoolSearchProvider } from '@cardano-sdk/core';
-import { createStubStakePoolSearchProvider } from '../src/createStubStakePoolSearchProvider';
+import { Cardano, StakePoolProvider } from '@cardano-sdk/core';
+import { createStubStakePoolProvider } from '../src/createStubStakePoolProvider';
 
-describe('createStubStakePoolSearchProvider', () => {
+describe('createStubStakePoolProvider', () => {
   describe('queryStakePools', () => {
     const ID_TO_MATCH = 'id-to-match';
-    let provider: StakePoolSearchProvider;
+    let provider: StakePoolProvider;
     beforeEach(() => {
-      provider = createStubStakePoolSearchProvider([
+      provider = createStubStakePoolProvider([
         { id: ID_TO_MATCH, metadata: { name: 'pool1', ticker: 'TICKR' } },
         { id: 'other-id' }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

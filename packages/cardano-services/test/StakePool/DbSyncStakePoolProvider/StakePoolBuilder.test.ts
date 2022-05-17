@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Cardano, StakePoolQueryOptions } from '@cardano-sdk/core';
 import { Pool } from 'pg';
-import { StakePoolSearchBuilder } from '../../../src';
+import { StakePoolBuilder } from '../../../src';
 
-describe('StakePoolSearchBuilder', () => {
+describe('StakePoolBuilder', () => {
   const dbConnection = new Pool({ connectionString: process.env.DB_CONNECTION_STRING });
-  const builder = new StakePoolSearchBuilder(dbConnection);
+  const builder = new StakePoolBuilder(dbConnection);
 
   afterAll(async () => {
     await dbConnection.end();

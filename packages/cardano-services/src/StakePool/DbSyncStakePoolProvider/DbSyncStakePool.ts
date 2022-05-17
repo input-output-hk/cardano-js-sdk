@@ -2,17 +2,17 @@
 import { DbSyncProvider } from '../../DbSyncProvider';
 import { Logger, dummyLogger } from 'ts-log';
 import { Pool } from 'pg';
-import { StakePoolQueryOptions, StakePoolSearchProvider, StakePoolSearchResults, util } from '@cardano-sdk/core';
-import { StakePoolSearchBuilder } from './StakePoolSearchBuilder';
+import { StakePoolBuilder } from './StakePoolBuilder';
+import { StakePoolProvider, StakePoolQueryOptions, StakePoolSearchResults, util } from '@cardano-sdk/core';
 import { toCoreStakePool } from './mappers';
 
-export class DbSyncStakePoolSearchProvider extends DbSyncProvider implements StakePoolSearchProvider {
-  #builder: StakePoolSearchBuilder;
+export class DbSyncStakePoolProvider extends DbSyncProvider implements StakePoolProvider {
+  #builder: StakePoolBuilder;
   #logger: Logger;
 
   constructor(db: Pool, logger = dummyLogger) {
     super(db);
-    this.#builder = new StakePoolSearchBuilder(db, logger);
+    this.#builder = new StakePoolBuilder(db, logger);
     this.#logger = logger;
   }
 

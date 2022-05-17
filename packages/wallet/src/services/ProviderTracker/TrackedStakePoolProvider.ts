@@ -1,8 +1,8 @@
 import { BehaviorSubject } from 'rxjs';
 import { CLEAN_FN_STATS, ProviderFnStats, ProviderTracker } from './ProviderTracker';
-import { StakePoolSearchProvider } from '@cardano-sdk/core';
+import { StakePoolProvider } from '@cardano-sdk/core';
 
-export class StakePoolSearchProviderStats {
+export class StakePoolProviderStats {
   readonly queryStakePools$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
 
   shutdown() {
@@ -15,13 +15,13 @@ export class StakePoolSearchProviderStats {
 }
 
 /**
- * Wraps a StakePoolSearchProvider, tracking # of calls of each function
+ * Wraps a StakePoolProvider, tracking # of calls of each function
  */
-export class TrackedStakePoolSearchProvider extends ProviderTracker implements StakePoolSearchProvider {
-  readonly stats = new StakePoolSearchProviderStats();
-  readonly queryStakePools: StakePoolSearchProvider['queryStakePools'];
+export class TrackedStakePoolProvider extends ProviderTracker implements StakePoolProvider {
+  readonly stats = new StakePoolProviderStats();
+  readonly queryStakePools: StakePoolProvider['queryStakePools'];
 
-  constructor(queryStakePoolsProvider: StakePoolSearchProvider) {
+  constructor(queryStakePoolsProvider: StakePoolProvider) {
     super();
     queryStakePoolsProvider = queryStakePoolsProvider;
 

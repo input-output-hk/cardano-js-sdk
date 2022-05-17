@@ -80,10 +80,10 @@ describe('entrypoints', () => {
             'error',
             '--ogmios-url',
             ogmiosConnection.address.webSocket,
-            ServiceNames.StakePoolSearch,
+            ServiceNames.StakePool,
             ServiceNames.TxSubmit
           ]);
-          await assertServiceHealthy(apiUrl, ServiceNames.StakePoolSearch);
+          await assertServiceHealthy(apiUrl, ServiceNames.StakePool);
           await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit);
         });
 
@@ -94,10 +94,10 @@ describe('entrypoints', () => {
               DB_CONNECTION_STRING: dbConnectionString,
               LOGGER_MIN_SEVERITY: 'error',
               OGMIOS_URL: ogmiosConnection.address.webSocket,
-              SERVICE_NAMES: `${ServiceNames.StakePoolSearch},${ServiceNames.TxSubmit}`
+              SERVICE_NAMES: `${ServiceNames.StakePool},${ServiceNames.TxSubmit}`
             }
           });
-          await assertServiceHealthy(apiUrl, ServiceNames.StakePoolSearch);
+          await assertServiceHealthy(apiUrl, ServiceNames.StakePool);
           await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit);
         });
       });
@@ -111,7 +111,7 @@ describe('entrypoints', () => {
         it('cli:start-server exits with code 0', (done) => {
           proc = fork(
             exePath('cli'),
-            ['start-server', '--api-url', apiUrl, '--logger-min-severity', 'error', ServiceNames.StakePoolSearch],
+            ['start-server', '--api-url', apiUrl, '--logger-min-severity', 'error', ServiceNames.StakePool],
             {
               stdio: 'pipe'
             }
@@ -129,7 +129,7 @@ describe('entrypoints', () => {
             env: {
               API_URL: apiUrl,
               LOGGER_MIN_SEVERITY: 'error',
-              SERVICE_NAMES: ServiceNames.StakePoolSearch
+              SERVICE_NAMES: ServiceNames.StakePool
             },
             stdio: 'pipe'
           });
@@ -268,7 +268,7 @@ describe('entrypoints', () => {
               'error',
               '--ogmios-url',
               ogmiosConnection.address.webSocket,
-              ServiceNames.StakePoolSearch,
+              ServiceNames.StakePool,
               ServiceNames.TxSubmit
             ],
             {
@@ -292,7 +292,7 @@ describe('entrypoints', () => {
               DB_CONNECTION_STRING: dbConnectionString,
               LOGGER_MIN_SEVERITY: 'error',
               OGMIOS_URL: ogmiosConnection.address.webSocket,
-              SERVICE_NAMES: `${ServiceNames.StakePoolSearch},${ServiceNames.TxSubmit}`
+              SERVICE_NAMES: `${ServiceNames.StakePool},${ServiceNames.TxSubmit}`
             },
             stdio: 'pipe'
           });

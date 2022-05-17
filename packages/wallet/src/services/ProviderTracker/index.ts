@@ -1,6 +1,6 @@
 export * from './ProviderTracker';
 export * from './TrackedTxSubmitProvider';
-export * from './TrackedStakePoolSearchProvider';
+export * from './TrackedStakePoolProvider';
 export * from './TrackedNetworkInfoProvider';
 export * from './TrackedWalletProvider';
 export * from './TrackedAssetProvider';

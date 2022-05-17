@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`StakePoolSearchHttpService healthy state /search search pools by identifier filter and condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by identifier filter and condition 1`] = `
 Object {
   "pageResults": Array [
     Object {
@@ -90,7 +90,7 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchHttpService healthy state /search search pools by identifier filter or condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by identifier filter or condition 1`] = `
 Object {
   "pageResults": Array [
     Object {
@@ -423,7 +423,7 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet false, active,  or condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet false, active,  or condition 1`] = `
 Object {
   "pageResults": Array [
     Object {
@@ -998,14 +998,14 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet false, status activating, and condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet false, status activating, and condition 1`] = `
 Object {
   "pageResults": Array [],
   "totalResultCount": 0,
 }
 `;
 
-exports[`StakePoolSearchHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet false, status activating, or condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet false, status activating, or condition 1`] = `
 Object {
   "pageResults": Array [
     Object {
@@ -1484,7 +1484,7 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet false, status active, and condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet false, status active, and condition 1`] = `
 Object {
   "pageResults": Array [
     Object {
@@ -1654,14 +1654,14 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet false, status retired, and condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet false, status retired, and condition 1`] = `
 Object {
   "pageResults": Array [],
   "totalResultCount": 0,
 }
 `;
 
-exports[`StakePoolSearchHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet false, status retired, or condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet false, status retired, or condition 1`] = `
 Object {
   "pageResults": Array [
     Object {
@@ -2154,14 +2154,14 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet false, status retiring, and condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet false, status retiring, and condition 1`] = `
 Object {
   "pageResults": Array [],
   "totalResultCount": 0,
 }
 `;
 
-exports[`StakePoolSearchHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet false, status retiring, or condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet false, status retiring, or condition 1`] = `
 Object {
   "pageResults": Array [
     Object {
@@ -2577,7 +2577,7 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet true, active,  or condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet true, active,  or condition 1`] = `
 Object {
   "pageResults": Array [
     Object {
@@ -3069,14 +3069,14 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet true, status activating, and condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet true, status activating, and condition 1`] = `
 Object {
   "pageResults": Array [],
   "totalResultCount": 0,
 }
 `;
 
-exports[`StakePoolSearchHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet true, status activating, or condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet true, status activating, or condition 1`] = `
 Object {
   "pageResults": Array [
     Object {
@@ -3631,7 +3631,7 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet true, status active, and condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet true, status active, and condition 1`] = `
 Object {
   "pageResults": Array [
     Object {
@@ -3802,14 +3802,14 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet true, status retired, and condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet true, status retired, and condition 1`] = `
 Object {
   "pageResults": Array [],
   "totalResultCount": 0,
 }
 `;
 
-exports[`StakePoolSearchHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet true, status retired, or condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet true, status retired, or condition 1`] = `
 Object {
   "pageResults": Array [
     Object {
@@ -4378,14 +4378,14 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet true, status retiring, and condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet true, status retiring, and condition 1`] = `
 Object {
   "pageResults": Array [],
   "totalResultCount": 0,
 }
 `;
 
-exports[`StakePoolSearchHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet true, status retiring, or condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet true, status retiring, or condition 1`] = `
 Object {
   "pageResults": Array [
     Object {
@@ -4960,7 +4960,7 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet, multiple status, and condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet, multiple status, and condition 1`] = `
 Object {
   "pageResults": Array [
     Object {
@@ -5293,7 +5293,7 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet, multiple status, or condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet, multiple status, or condition 1`] = `
 Object {
   "pageResults": Array [
     Object {
@@ -6008,14 +6008,14 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchHttpService healthy state /search search pools by multiple filters identifier & status filters activating with and condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status filters activating with and condition 1`] = `
 Object {
   "pageResults": Array [],
   "totalResultCount": 0,
 }
 `;
 
-exports[`StakePoolSearchHttpService healthy state /search search pools by multiple filters identifier & status filters activating with or condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status filters activating with or condition 1`] = `
 Object {
   "pageResults": Array [
     Object {
@@ -6411,7 +6411,7 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchHttpService healthy state /search search pools by multiple filters identifier & status filters active with and condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status filters active with and condition 1`] = `
 Object {
   "pageResults": Array [
     Object {
@@ -6744,7 +6744,7 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchHttpService healthy state /search search pools by multiple filters identifier & status filters active with or condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status filters active with or condition 1`] = `
 Object {
   "pageResults": Array [
     Object {
@@ -7236,14 +7236,14 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchHttpService healthy state /search search pools by multiple filters identifier & status filters retired with and condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status filters retired with and condition 1`] = `
 Object {
   "pageResults": Array [],
   "totalResultCount": 0,
 }
 `;
 
-exports[`StakePoolSearchHttpService healthy state /search search pools by multiple filters identifier & status filters retired with or condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status filters retired with or condition 1`] = `
 Object {
   "pageResults": Array [
     Object {
@@ -7653,14 +7653,14 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchHttpService healthy state /search search pools by multiple filters identifier & status filters retiring with and condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status filters retiring with and condition 1`] = `
 Object {
   "pageResults": Array [],
   "totalResultCount": 0,
 }
 `;
 
-exports[`StakePoolSearchHttpService healthy state /search search pools by multiple filters identifier & status filters retiring with or condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status filters retiring with or condition 1`] = `
 Object {
   "pageResults": Array [
     Object {
@@ -8076,7 +8076,7 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchHttpService healthy state /search search pools by pledge met search by pledge met on false 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by pledge met search by pledge met on false 1`] = `
 Object {
   "pageResults": Array [
     Object {
@@ -8329,7 +8329,7 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchHttpService healthy state /search search pools by status search by activating status 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by status search by activating status 1`] = `
 Object {
   "pageResults": Array [
     Object {
@@ -8400,7 +8400,7 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchHttpService healthy state /search search pools by status search by active status 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by status search by active status 1`] = `
 Object {
   "pageResults": Array [
     Object {
@@ -8892,7 +8892,7 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchHttpService healthy state /search search pools by status search by retired status 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by status search by retired status 1`] = `
 Object {
   "pageResults": Array [
     Object {
@@ -8977,7 +8977,7 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchHttpService healthy state /search search pools by status search by retiring status 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by status search by retiring status 1`] = `
 Object {
   "pageResults": Array [
     Object {
@@ -9068,7 +9068,7 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchHttpService healthy state /search stake pools sort if sort not provided, defaults to order by name and then by poolId asc 1`] = `
+exports[`StakePoolHttpService healthy state /search stake pools sort if sort not provided, defaults to order by name and then by poolId asc 1`] = `
 Object {
   "pageResults": Array [
     Object {
@@ -9783,7 +9783,7 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchHttpService healthy state /search stake pools sort sort asc by name with applied pagination 1`] = `
+exports[`StakePoolHttpService healthy state /search stake pools sort sort asc by name with applied pagination 1`] = `
 Object {
   "pageResults": Array [
     Object {
@@ -10040,7 +10040,7 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchHttpService healthy state /search stake pools sort sort asc by name with applied pagination 2`] = `
+exports[`StakePoolHttpService healthy state /search stake pools sort sort asc by name with applied pagination 2`] = `
 Object {
   "pageResults": Array [
     Object {
@@ -10273,7 +10273,7 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchHttpService healthy state /search stake pools sort sort asc by name with applied pagination and filters 1`] = `
+exports[`StakePoolHttpService healthy state /search stake pools sort sort asc by name with applied pagination and filters 1`] = `
 Object {
   "pageResults": Array [
     Object {
@@ -10525,7 +10525,7 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchHttpService healthy state /search stake pools sort sort asc by name with applied pagination, with change sort order on next page 1`] = `
+exports[`StakePoolHttpService healthy state /search stake pools sort sort asc by name with applied pagination, with change sort order on next page 1`] = `
 Object {
   "pageResults": Array [
     Object {
@@ -10926,7 +10926,7 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchHttpService healthy state /search stake pools sort sort asc by name with applied pagination, with change sort order on next page 2`] = `
+exports[`StakePoolHttpService healthy state /search stake pools sort sort asc by name with applied pagination, with change sort order on next page 2`] = `
 Object {
   "pageResults": Array [
     Object {
@@ -11248,7 +11248,7 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchHttpService healthy state /search stake pools sort sort by name asc order 1`] = `
+exports[`StakePoolHttpService healthy state /search stake pools sort sort by name asc order 1`] = `
 Object {
   "pageResults": Array [
     Object {
@@ -11963,7 +11963,7 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchHttpService healthy state /search stake pools sort sort by name desc order 1`] = `
+exports[`StakePoolHttpService healthy state /search stake pools sort sort by name desc order 1`] = `
 Object {
   "pageResults": Array [
     Object {
@@ -12678,7 +12678,7 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchHttpService healthy state /search stake pools sort sort with applied filters 1`] = `
+exports[`StakePoolHttpService healthy state /search stake pools sort sort with applied filters 1`] = `
 Object {
   "pageResults": Array [
     Object {

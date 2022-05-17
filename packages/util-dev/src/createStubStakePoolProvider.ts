@@ -1,4 +1,4 @@
-import { Cardano, StakePoolSearchProvider } from '@cardano-sdk/core';
+import { Cardano, StakePoolProvider } from '@cardano-sdk/core';
 import delay from 'delay';
 
 export const somePartialStakePools: Cardano.StakePool[] = [
@@ -38,10 +38,10 @@ export const somePartialStakePools: Cardano.StakePool[] = [
 /**
  * Good source for testnet pools: https://testnet.adatools.io/pools
  */
-export const createStubStakePoolSearchProvider = (
+export const createStubStakePoolProvider = (
   stakePools: Cardano.StakePool[] = somePartialStakePools,
   delayMs?: number
-): StakePoolSearchProvider => ({
+): StakePoolProvider => ({
   queryStakePools: async (options) => {
     if (delayMs) await delay(delayMs);
     const identifierFilters = options?.filters?.identifier;

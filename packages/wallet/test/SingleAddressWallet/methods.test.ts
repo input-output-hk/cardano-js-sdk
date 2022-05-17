@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 import * as mocks from '../mocks';
-import { AssetId, createStubStakePoolSearchProvider } from '@cardano-sdk/util-dev';
+import { AssetId, createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { Cardano } from '@cardano-sdk/core';
 import { KeyManagement, SingleAddressWallet } from '../../src';
 import { firstValueFrom, skip } from 'rxjs';
@@ -49,7 +49,7 @@ describe('SingleAddressWallet methods', () => {
     walletProvider = mocks.mockWalletProvider();
     utxoProvider = mocks.mockUtxoProvider();
     const assetProvider = mocks.mockAssetProvider();
-    const stakePoolSearchProvider = createStubStakePoolSearchProvider();
+    const stakePoolProvider = createStubStakePoolProvider();
     const networkInfoProvider = mockNetworkInfoProvider();
     keyAgent.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
     wallet = new SingleAddressWallet(
@@ -58,7 +58,7 @@ describe('SingleAddressWallet methods', () => {
         assetProvider,
         keyAgent,
         networkInfoProvider,
-        stakePoolSearchProvider,
+        stakePoolProvider,
         txSubmitProvider,
         utxoProvider,
         walletProvider

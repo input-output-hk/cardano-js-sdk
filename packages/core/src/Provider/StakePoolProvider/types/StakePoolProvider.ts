@@ -55,7 +55,7 @@ export interface StakePoolSearchResults {
   totalResultCount: number;
 }
 
-export interface StakePoolSearchProvider {
+export interface StakePoolProvider {
   /**
    * @param {StakePoolQueryOptions} options query options
    * @returns Stake pools

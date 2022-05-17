@@ -9,7 +9,7 @@ import {
   networkInfoProvider,
   poolId1,
   poolId2,
-  stakePoolSearchProvider,
+  stakePoolProvider,
   txSubmitProvider,
   walletProvider
 } from '../config';
@@ -71,7 +71,7 @@ const getWallet = async (idx: number) =>
       assetProvider: await assetProvider,
       keyAgent: await keyAgentByIdx(idx),
       networkInfoProvider: await networkInfoProvider,
-      stakePoolSearchProvider,
+      stakePoolProvider,
       txSubmitProvider: await txSubmitProvider,
       walletProvider: await walletProvider
     }

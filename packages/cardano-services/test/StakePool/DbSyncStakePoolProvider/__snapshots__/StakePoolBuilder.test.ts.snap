@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`StakePoolSearchBuilder buildAndQuery buildAndQuery, queryPoolHashes & queryTotalCount 1`] = `
+exports[`StakePoolBuilder buildAndQuery buildAndQuery, queryPoolHashes & queryTotalCount 1`] = `
 Object {
   "params": Array [
     "%(CL)%",
@@ -137,9 +137,9 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchBuilder buildAndQuery buildAndQuery, queryPoolHashes & queryTotalCount 2`] = `"1"`;
+exports[`StakePoolBuilder buildAndQuery buildAndQuery, queryPoolHashes & queryTotalCount 2`] = `"1"`;
 
-exports[`StakePoolSearchBuilder buildOrQuery buildOrQuery, queryPoolHashes & queryTotalCount 1`] = `
+exports[`StakePoolBuilder buildOrQuery buildOrQuery, queryPoolHashes & queryTotalCount 1`] = `
 Object {
   "params": Array [
     "%(CL)%",
@@ -307,9 +307,9 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchBuilder buildOrQuery buildOrQuery, queryPoolHashes & queryTotalCount 2`] = `"9"`;
+exports[`StakePoolBuilder buildOrQuery buildOrQuery, queryPoolHashes & queryTotalCount 2`] = `"9"`;
 
-exports[`StakePoolSearchBuilder buildPoolsByIdentifierQuery buildPoolsByIdentifierQuery 1`] = `
+exports[`StakePoolBuilder buildPoolsByIdentifierQuery buildPoolsByIdentifierQuery 1`] = `
 Object {
   "id": Object {
     "isPrimary": true,
@@ -345,7 +345,7 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchBuilder buildPoolsByPledgeMetQuery pledgeMet false 1`] = `
+exports[`StakePoolBuilder buildPoolsByPledgeMetQuery pledgeMet false 1`] = `
 Array [
   Object {
     "id": Object {
@@ -487,7 +487,7 @@ Array [
 ]
 `;
 
-exports[`StakePoolSearchBuilder buildPoolsByPledgeMetQuery pledgeMet true 1`] = `
+exports[`StakePoolBuilder buildPoolsByPledgeMetQuery pledgeMet true 1`] = `
 Array [
   Object {
     "id": Object {
@@ -629,7 +629,7 @@ Array [
 ]
 `;
 
-exports[`StakePoolSearchBuilder buildPoolsByStatusQuery activating 1`] = `
+exports[`StakePoolBuilder buildPoolsByStatusQuery activating 1`] = `
 Object {
   "id": Object {
     "isPrimary": true,
@@ -664,7 +664,7 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchBuilder buildPoolsByStatusQuery active 1`] = `
+exports[`StakePoolBuilder buildPoolsByStatusQuery active 1`] = `
 Object {
   "id": Object {
     "isPrimary": true,
@@ -699,7 +699,7 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchBuilder buildPoolsByStatusQuery active,activating,retiring,retired 1`] = `
+exports[`StakePoolBuilder buildPoolsByStatusQuery active,activating,retiring,retired 1`] = `
 Object {
   "id": Object {
     "isPrimary": true,
@@ -737,7 +737,7 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchBuilder buildPoolsByStatusQuery retired 1`] = `
+exports[`StakePoolBuilder buildPoolsByStatusQuery retired 1`] = `
 Object {
   "id": Object {
     "isPrimary": true,
@@ -772,7 +772,7 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchBuilder buildPoolsByStatusQuery retiring 1`] = `
+exports[`StakePoolBuilder buildPoolsByStatusQuery retiring 1`] = `
 Object {
   "id": Object {
     "isPrimary": true,
@@ -807,11 +807,11 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchBuilder getLastEpoch getLastEpoch 1`] = `175`;
+exports[`StakePoolBuilder getLastEpoch getLastEpoch 1`] = `175`;
 
-exports[`StakePoolSearchBuilder getTotalAmountOfAda getTotalAmountOfAda 1`] = `"69154425288708824"`;
+exports[`StakePoolBuilder getTotalAmountOfAda getTotalAmountOfAda 1`] = `"69154425288708824"`;
 
-exports[`StakePoolSearchBuilder queryPoolData queryPoolData 1`] = `
+exports[`StakePoolBuilder queryPoolData queryPoolData 1`] = `
 Array [
   Object {
     "cost": 340000000n,
@@ -848,7 +848,7 @@ Array [
 ]
 `;
 
-exports[`StakePoolSearchBuilder queryPoolMetrics queryPoolMetrics 1`] = `
+exports[`StakePoolBuilder queryPoolMetrics queryPoolMetrics 1`] = `
 Array [
   Object {
     "blocksCreated": "0",
@@ -867,13 +867,13 @@ Array [
 ]
 `;
 
-exports[`StakePoolSearchBuilder queryPoolOwners queryPoolOwners 1`] = `
+exports[`StakePoolBuilder queryPoolOwners queryPoolOwners 1`] = `
 Array [
   "stake_test1urryfvusd49ej55gvf3cxtje4pqmtcdswwqxw37g6uclhnsqj7d5w",
 ]
 `;
 
-exports[`StakePoolSearchBuilder queryPoolRewards queryPoolRewards 1`] = `
+exports[`StakePoolBuilder queryPoolRewards queryPoolRewards 1`] = `
 Array [
   Object {
     "activeStake": 0n,
@@ -888,7 +888,7 @@ Array [
 ]
 `;
 
-exports[`StakePoolSearchBuilder queryRegistrations queryRegistrations 1`] = `
+exports[`StakePoolBuilder queryRegistrations queryRegistrations 1`] = `
 Array [
   Object {
     "activeEpochNo": "76",
@@ -897,7 +897,7 @@ Array [
 ]
 `;
 
-exports[`StakePoolSearchBuilder queryRetirements queryRetirements 1`] = `
+exports[`StakePoolBuilder queryRetirements queryRetirements 1`] = `
 Array [
   Object {
     "retiringEpoch": 78,

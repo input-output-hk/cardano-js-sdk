@@ -6,7 +6,7 @@ import {
   NetworkInfo,
   NetworkInfoProvider,
   ProtocolParametersRequiredByWallet,
-  StakePoolSearchProvider,
+  StakePoolProvider,
   TxSubmitProvider,
   UtxoProvider,
   WalletProvider,
@@ -31,7 +31,7 @@ import {
   SyncableIntervalPersistentDocumentTrackerSubject,
   TrackedAssetProvider,
   TrackedNetworkInfoProvider,
-  TrackedStakePoolSearchProvider,
+  TrackedStakePoolProvider,
   TrackedTxSubmitProvider,
   TrackedWalletProvider,
   TrackerSubject,
@@ -86,7 +86,7 @@ export interface SingleAddressWalletDependencies {
   readonly keyAgent: AsyncKeyAgent;
   readonly txSubmitProvider: TxSubmitProvider;
   readonly walletProvider: WalletProvider;
-  readonly stakePoolSearchProvider: StakePoolSearchProvider;
+  readonly stakePoolProvider: StakePoolProvider;
   readonly assetProvider: AssetProvider;
   readonly networkInfoProvider: NetworkInfoProvider;
   readonly utxoProvider: UtxoProvider;
@@ -110,7 +110,7 @@ export class SingleAddressWallet implements ObservableWallet {
   readonly walletProvider: TrackedWalletProvider;
   readonly utxoProvider: TrackedUtxoProvider;
   readonly networkInfoProvider: TrackedNetworkInfoProvider;
-  readonly stakePoolSearchProvider: TrackedStakePoolSearchProvider;
+  readonly stakePoolProvider: TrackedStakePoolProvider;
   readonly assetProvider: TrackedAssetProvider;
   readonly utxo: TransactionalTracker<Cardano.Utxo[]>;
   readonly balance: TransactionalTracker<Balance>;
@@ -142,7 +142,7 @@ export class SingleAddressWallet implements ObservableWallet {
     {
       txSubmitProvider,
       walletProvider,
-      stakePoolSearchProvider,
+      stakePoolProvider,
       keyAgent,
       assetProvider,
       networkInfoProvider,
@@ -158,13 +158,13 @@ export class SingleAddressWallet implements ObservableWallet {
     this.walletProvider = new TrackedWalletProvider(walletProvider);
     this.utxoProvider = new TrackedUtxoProvider(utxoProvider);
     this.networkInfoProvider = new TrackedNetworkInfoProvider(networkInfoProvider);
-    this.stakePoolSearchProvider = new TrackedStakePoolSearchProvider(stakePoolSearchProvider);
+    this.stakePoolProvider = new TrackedStakePoolProvider(stakePoolProvider);
     this.assetProvider = new TrackedAssetProvider(assetProvider);
     this.syncStatus = createProviderStatusTracker(
       {
         assetProvider: this.assetProvider,
         networkInfoProvider: this.networkInfoProvider,
-        stakePoolSearchProvider: this.stakePoolSearchProvider,
+        stakePoolProvider: this.stakePoolProvider,
         txSubmitProvider: this.txSubmitProvider,
         utxoProvider: this.utxoProvider,
         walletProvider: this.walletProvider
@@ -245,7 +245,7 @@ export class SingleAddressWallet implements ObservableWallet {
       rewardAccountAddresses$: this.addresses$.pipe(
         map((addresses) => addresses.map((groupedAddress) => groupedAddress.rewardAccount))
       ),
-      stakePoolSearchProvider: this.stakePoolSearchProvider,
+      stakePoolProvider: this.stakePoolProvider,
       stores,
       timeSettings$,
       transactionsTracker: this.transactions,
@@ -337,7 +337,7 @@ export class SingleAddressWallet implements ObservableWallet {
     this.walletProvider.stats.shutdown();
     this.txSubmitProvider.stats.shutdown();
     this.networkInfoProvider.stats.shutdown();
-    this.stakePoolSearchProvider.stats.shutdown();
+    this.stakePoolProvider.stats.shutdown();
   }
 
   #prepareTx(props: InitializeTxProps) {

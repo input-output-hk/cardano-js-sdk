@@ -39,7 +39,7 @@ import Queries, {
   withSort
 } from './queries';
 
-export class StakePoolSearchBuilder {
+export class StakePoolBuilder {
   #db: Pool;
   #logger: Logger;
   constructor(db: Pool, logger = dummyLogger) {
