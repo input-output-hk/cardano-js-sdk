@@ -35,7 +35,8 @@ import Queries, {
   getStatusWhereClause,
   getTotalCountQueryFromQuery,
   poolsByPledgeMetSubqueries,
-  withPagination
+  withPagination,
+  withSort
 } from './queries';
 
 export class StakePoolSearchBuilder {
@@ -77,15 +78,18 @@ export class StakePoolSearchBuilder {
       })
     );
   }
-  public async queryPoolData(updatesIds: number[]) {
+  public async queryPoolData(updatesIds: number[], options?: StakePoolQueryOptions) {
     this.#logger.debug('About to query pool data');
-    const result: QueryResult<PoolDataModel> = await this.#db.query(Queries.findPoolsData, [updatesIds]);
+    const queryWithSortAndPagination = withPagination(
+      withSort(Queries.findPoolsData, options?.sort),
+      options?.pagination
+    );
+    const result: QueryResult<PoolDataModel> = await this.#db.query(queryWithSortAndPagination, [updatesIds]);
     return result.rows.length > 0 ? result.rows.map(mapPoolData) : [];
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public async queryPoolHashes(query: string, params: any[] = [], pagination?: StakePoolQueryOptions['pagination']) {
-    const queryWithPagination = withPagination(query, pagination);
-    const result: QueryResult<PoolUpdateModel> = await this.#db.query(queryWithPagination, params);
+  public async queryPoolHashes(query: string, params: any[] = []) {
+    const result: QueryResult<PoolUpdateModel> = await this.#db.query(query, params);
     return result.rows.length > 0 ? result.rows.map(mapPoolUpdate) : [];
   }
   public async queryPoolMetrics(hashesIds: number[], totalAdaAmount: string) {

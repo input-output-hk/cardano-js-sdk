@@ -11,9 +11,24 @@ import got from 'got';
 const UNSUPPORTED_MEDIA_STRING = 'Response code 415 (Unsupported Media Type)';
 const APPLICATION_CBOR = 'application/cbor';
 const APPLICATION_JSON = 'application/json';
+const STAKE_POOL_NAME = 'THE AMSTERDAM NODE';
 
 const setFilterCondition = (options: StakePoolQueryOptions, condition: 'and' | 'or'): StakePoolQueryOptions => ({
   filters: { ...options.filters, _condition: condition }
+});
+
+const setSortCondition = (
+  options: StakePoolQueryOptions,
+  order: 'asc' | 'desc',
+  field: 'name'
+): StakePoolQueryOptions => ({
+  ...options,
+  sort: { ...options.sort, field, order }
+});
+
+const setPagination = (options: StakePoolQueryOptions, startAt: number, limit: number): StakePoolQueryOptions => ({
+  ...options,
+  pagination: { ...options.pagination, limit, startAt }
 });
 
 const addStatusFilter = (options: StakePoolQueryOptions, status: Cardano.StakePoolStatus): StakePoolQueryOptions => ({
@@ -167,7 +182,7 @@ describe('StakePoolSearchHttpService', () => {
               identifier: {
                 _condition: 'or',
                 values: [
-                  { name: 'THE AMSTERDAM NODE' },
+                  { name: STAKE_POOL_NAME },
                   { name: 'banderini' },
                   { ticker: 'TEST' },
                   { id: '98a6rqr7a7yakanm5sz6asx9gfjsr343mus0tsye23wmg70' as unknown as Cardano.PoolId }
@@ -290,7 +305,7 @@ describe('StakePoolSearchHttpService', () => {
             identifier: {
               _condition: 'or',
               values: [
-                { name: 'THE AMSTERDAM NODE' },
+                { name: STAKE_POOL_NAME },
                 { name: 'banderini' },
                 { ticker: 'TEST' },
                 { id: Cardano.PoolId('pool1jcwn98a6rqr7a7yakanm5sz6asx9gfjsr343mus0tsye23wmg70') }
@@ -466,6 +481,123 @@ describe('StakePoolSearchHttpService', () => {
             const response = await doServerRequest(setFilterCondition(reqWithMultipleFilters, 'and'));
             expect(response).toMatchSnapshot();
           });
+        });
+      });
+
+      describe('stake pools sort', () => {
+        const filterArgs: StakePoolQueryOptions = {
+          filters: {
+            identifier: {
+              _condition: 'or',
+              values: [
+                { ticker: 'TEST' },
+                { name: STAKE_POOL_NAME },
+                { id: Cardano.PoolId('pool1jcwn98a6rqr7a7yakanm5sz6asx9gfjsr343mus0tsye23wmg70') }
+              ]
+            }
+          }
+        };
+
+        const sortByNameThenByPoolId = function (poolA: Cardano.StakePool, poolB: Cardano.StakePool) {
+          if ((poolA.metadata?.name || poolA.id) > (poolB.metadata?.name || poolB.id)) {
+            return 1;
+          } else if ((poolA.metadata?.name || poolA.id) < (poolB.metadata?.name || poolB.id)) {
+            return -1;
+          }
+          return 0;
+        };
+
+        it('sort by name desc order', async () => {
+          const response = await doServerRequest(setSortCondition({}, 'desc', 'name'));
+          expect(response).toMatchSnapshot();
+        });
+
+        it('sort by name asc order', async () => {
+          const response = await doServerRequest(setSortCondition({}, 'asc', 'name'));
+          expect(response).toMatchSnapshot();
+        });
+
+        it('if sort not provided, defaults to order by name and then by poolId asc', async () => {
+          const response = await doServerRequest({});
+
+          const resultSortedCopy = [...response.pageResults].sort(sortByNameThenByPoolId);
+
+          expect(response.pageResults).toEqual(resultSortedCopy);
+          expect(response).toMatchSnapshot();
+        });
+
+        it('positions stake pools with no name registered after named pools, sorted by poolId', async () => {
+          const fistNoMetadataPoolId = Cardano.PoolId('pool126zlx7728y7xs08s8epg9qp393kyafy9rzr89g4qkvv4cv93zem');
+          const secondNoMetadataPoolId = Cardano.PoolId('pool1y25deq9kldy9y9gfvrpw8zt05zsrfx84zjhugaxrx9ftvwdpua2');
+          const firstNamedPoolId = Cardano.PoolId('pool1jcwn98a6rqr7a7yakanm5sz6asx9gfjsr343mus0tsye23wmg70');
+          const secondNamedPoolId = Cardano.PoolId('pool168d9plflldfr6mpjg9q2typv2m6a0hx4u5g8kfa486dwkke2uj7');
+
+          const stakePoolIdsSorted = [
+            firstNamedPoolId,
+            secondNamedPoolId,
+            fistNoMetadataPoolId,
+            secondNoMetadataPoolId
+          ];
+
+          const reqOptions: StakePoolQueryOptions = {
+            filters: {
+              identifier: {
+                _condition: 'or',
+                values: [
+                  { id: secondNoMetadataPoolId },
+                  { id: secondNamedPoolId },
+                  { id: fistNoMetadataPoolId },
+                  { id: firstNamedPoolId }
+                ]
+              }
+            }
+          };
+
+          const { pageResults } = await doServerRequest(reqOptions);
+
+          expect(pageResults.length).toEqual(4);
+          expect(pageResults[0].metadata?.name).toEqual('CLIO1');
+          expect(pageResults[pageResults.length - 1].metadata?.name).toBeUndefined();
+          expect(pageResults.map(({ id }) => id)).toEqual(stakePoolIdsSorted);
+        });
+
+        it('sort with applied filters', async () => {
+          const response = await doServerRequest(
+            setSortCondition(setFilterCondition(filterArgs, 'or'), 'desc', 'name')
+          );
+          expect(response).toMatchSnapshot();
+        });
+
+        it('sort asc by name with applied pagination', async () => {
+          const firstPageResultSet = await doServerRequest(setSortCondition(setPagination({}, 0, 3), 'asc', 'name'));
+
+          const secondPageResultSet = await doServerRequest(setSortCondition(setPagination({}, 3, 3), 'asc', 'name'));
+
+          expect(firstPageResultSet).toMatchSnapshot();
+          expect(secondPageResultSet).toMatchSnapshot();
+        });
+
+        it('sort asc by name with applied pagination, with change sort order on next page', async () => {
+          const firstPageResponse = await doServerRequest(setSortCondition(setPagination({}, 0, 5), 'asc', 'name'));
+
+          const secondPageResponse = await doServerRequest(setSortCondition(setPagination({}, 5, 5), 'asc', 'name'));
+          const firstPageIds = firstPageResponse.pageResults.map(({ id }) => id);
+
+          const hasDuplicatedIdsBetweenPages = firstPageIds.some((id) =>
+            secondPageResponse.pageResults.map((stake) => stake.id).includes(id)
+          );
+
+          expect(firstPageResponse).toMatchSnapshot();
+          expect(secondPageResponse).toMatchSnapshot();
+          expect(hasDuplicatedIdsBetweenPages).toBe(false);
+        });
+
+        it('sort asc by name with applied pagination and filters', async () => {
+          const responsePage = await doServerRequest(
+            setSortCondition(setPagination(setFilterCondition(filterArgs, 'or'), 0, 5), 'asc', 'name')
+          );
+
+          expect(responsePage).toMatchSnapshot();
         });
       });
     });
