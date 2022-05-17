@@ -4,13 +4,13 @@ require('../scripts/patchRequire');
 import {
   API_URL_DEFAULT,
   OGMIOS_URL_DEFAULT,
+  ProgramArgs,
   ProgramOptionDescriptions,
   ServiceNames,
   loadHttpServer
 } from './Program';
 import { Command } from 'commander';
 import { InvalidLoggerLevel } from './errors';
-import { LogLevel } from 'bunyan';
 import { URL } from 'url';
 import { loggerMethodNames } from './util';
 import onDeath from 'death';
@@ -51,41 +51,16 @@ program
     },
     'info'
   )
-  .action(
-    async (
-      serviceNames: ServiceNames[],
-      {
-        apiUrl,
-        dbConnectionString,
-        loggerMinSeverity,
-        metricsEnabled,
-        ogmiosUrl
-      }: {
-        apiUrl: URL;
-        dbConnectionString?: string;
-        loggerMinSeverity: LogLevel;
-        metricsEnabled: boolean;
-        ogmiosUrl?: URL;
-      }
-    ) => {
-      const server = await loadHttpServer({
-        apiUrl: apiUrl || API_URL_DEFAULT,
-        options: {
-          dbConnectionString,
-          loggerMinSeverity,
-          metricsEnabled,
-          ogmiosUrl
-        },
-        serviceNames
-      });
-      await server.initialize();
-      await server.start();
-      onDeath(async () => {
-        await server.shutdown();
-        process.exit(1);
-      });
-    }
-  );
+  .action(async (serviceNames: ServiceNames[], options: { apiUrl: URL } & NonNullable<ProgramArgs['options']>) => {
+    const { apiUrl, ...rest } = options;
+    const server = await loadHttpServer({ apiUrl: apiUrl || API_URL_DEFAULT, options: rest, serviceNames });
+    await server.initialize();
+    await server.start();
+    onDeath(async () => {
+      await server.shutdown();
+      process.exit(1);
+    });
+  });
 
 if (process.argv.slice(2).length === 0) {
   program.outputHelp();
