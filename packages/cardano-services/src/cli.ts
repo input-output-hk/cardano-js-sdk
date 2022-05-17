@@ -6,6 +6,7 @@ import {
   OGMIOS_URL_DEFAULT,
   ProgramArgs,
   ProgramOptionDescriptions,
+  RABBITMQ_URL_DEFAULT,
   ServiceNames,
   loadHttpServer
 } from './Program';
@@ -40,6 +41,13 @@ program
     (url) => new URL(url),
     new URL(OGMIOS_URL_DEFAULT)
   )
+  .option(
+    '--rabbitmq-url <rabbitMQUrl>',
+    ProgramOptionDescriptions.RabbitMQUrl,
+    (url) => new URL(url),
+    new URL(RABBITMQ_URL_DEFAULT)
+  )
+  .option('--use-queue', ProgramOptionDescriptions.UseQueue, () => true, false)
   .option(
     '--logger-min-severity <level>',
     ProgramOptionDescriptions.LoggerMinSeverity,

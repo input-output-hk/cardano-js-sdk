@@ -2,7 +2,7 @@
 /* eslint-disable import/imports-first */
 require('../scripts/patchRequire');
 import * as envalid from 'envalid';
-import { API_URL_DEFAULT, OGMIOS_URL_DEFAULT, ServiceNames, loadHttpServer } from './Program';
+import { API_URL_DEFAULT, OGMIOS_URL_DEFAULT, RABBITMQ_URL_DEFAULT, ServiceNames, loadHttpServer } from './Program';
 import { LogLevel } from 'bunyan';
 import { URL } from 'url';
 import { config } from 'dotenv';
@@ -14,7 +14,9 @@ const envSpecs = {
   DB_CONNECTION_STRING: envalid.str({ default: undefined }),
   LOGGER_MIN_SEVERITY: envalid.str({ choices: loggerMethodNames as string[], default: 'info' }),
   OGMIOS_URL: envalid.url({ default: OGMIOS_URL_DEFAULT }),
-  SERVICE_NAMES: envalid.str({ example: Object.values(ServiceNames).toString() })
+  RABBITMQ_URL: envalid.url({ default: RABBITMQ_URL_DEFAULT }),
+  SERVICE_NAMES: envalid.str({ example: Object.values(ServiceNames).toString() }),
+  USE_QUEUE: envalid.bool({ default: false })
 };
 
 void (async () => {
@@ -22,6 +24,7 @@ void (async () => {
   const env = envalid.cleanEnv(process.env, envSpecs);
   const apiUrl = new URL(env.API_URL);
   const ogmiosUrl = new URL(env.OGMIOS_URL);
+  const rabbitmqUrl = new URL(env.RABBITMQ_URL);
   const dbConnectionString = env.DB_CONNECTION_STRING ? new URL(env.DB_CONNECTION_STRING).toString() : undefined;
   const serviceNames = env.SERVICE_NAMES.split(',') as ServiceNames[];
 
@@ -31,7 +34,9 @@ void (async () => {
       options: {
         dbConnectionString,
         loggerMinSeverity: env.LOGGER_MIN_SEVERITY as LogLevel,
-        ogmiosUrl
+        ogmiosUrl,
+        rabbitmqUrl,
+        useQueue: env.USE_QUEUE
       },
       serviceNames
     });
