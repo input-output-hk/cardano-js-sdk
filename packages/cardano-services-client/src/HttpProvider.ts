@@ -3,6 +3,8 @@ import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
 import axios, { AxiosRequestConfig } from 'axios';
 
+const isEmptyResponse = (response: any) => response === '';
+
 export type HttpProviderConfigPaths<T> = { [methodName in keyof T]: string };
 
 export interface HttpProviderConfig<T> {
@@ -72,7 +74,8 @@ export const createHttpProvider = <T extends object>({
             ...value,
             data: fromSerializableObject(value.data, { getErrorPrototype: () => ProviderError.prototype })
           }));
-          return (await axiosInstance.request(req)).data || undefined;
+          const response = (await axiosInstance.request(req)).data;
+          return !isEmptyResponse(response) ? response : undefined;
         } catch (error) {
           if (axios.isAxiosError(error)) {
             if (error.response) {
