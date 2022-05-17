@@ -577,8 +577,7 @@ SELECT
   metadata.url AS metadata_url, 
   metadata.hash AS metadata_hash,
   pod.json AS offline_data,
-  pod.json -> 'name' AS name,
-  ((pu.fixed_cost * pu.margin) + pu.fixed_cost) as total_cost
+  pod.json -> 'name' AS name
 FROM pool_update pu
 JOIN pool_hash ph ON 
   ph.id = pu.hash_id
@@ -657,7 +656,7 @@ export const getStatusWhereClause = (
 };
 
 export const withPagination = (query: string, pagination?: StakePoolQueryOptions['pagination']) => {
-  if (pagination) return `${query} OFFSET ${pagination.startAt} LIMIT ${pagination.limit}`;
+  if (pagination) return `${query} LIMIT ${pagination.limit} OFFSET ${pagination.startAt} `;
   return query;
 };
 

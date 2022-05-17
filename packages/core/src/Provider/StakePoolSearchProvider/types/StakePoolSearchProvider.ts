@@ -3,7 +3,7 @@ import { Cardano } from '../../..';
 type FilterCondition = 'and' | 'or';
 
 type SortOrder = 'asc' | 'desc';
-type SortField = 'name' | 'saturation' | 'total_cost';
+type SortField = 'name';
 
 export interface MultipleChoiceSearchFilter<T> {
   /**

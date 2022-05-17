@@ -1,0 +1,10 @@
+{
+  "watch": [
+    "src"
+  ],
+  "ext": "ts,graphql",
+  "ignore": [
+    "src/**/__tests__/*"
+  ],
+  "exec": "node -r ts-node/register --inspect=0.0.0.0:9229 src/run.ts"
+}

@@ -22,7 +22,7 @@ export class DbSyncStakePoolSearchProvider extends DbSyncProvider implements Sta
         ? this.#builder.buildOrQuery(options?.filters)
         : this.#builder.buildAndQuery(options?.filters);
     this.#logger.debug('About to query pool hashes');
-    const poolUpdates = await this.#builder.queryPoolHashes(query, params, options?.pagination);
+    const poolUpdates = await this.#builder.queryPoolHashes(query, params);
     const hashesIds = poolUpdates.map(({ id }) => id);
     this.#logger.debug(`${hashesIds.length} pools found`);
     const updatesIds = poolUpdates.map(({ updateId }) => updateId);
@@ -38,7 +38,7 @@ export class DbSyncStakePoolSearchProvider extends DbSyncProvider implements Sta
       poolMetrics,
       totalCount
     ] = await Promise.all([
-      this.#builder.queryPoolData(updatesIds, options?.sort),
+      this.#builder.queryPoolData(updatesIds, options),
       this.#builder.queryPoolRelays(updatesIds),
       this.#builder.queryPoolOwners(updatesIds),
       this.#builder.queryRegistrations(hashesIds),

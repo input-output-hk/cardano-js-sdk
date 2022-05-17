@@ -20,7 +20,7 @@ const setFilterCondition = (options: StakePoolQueryOptions, condition: 'and' | '
 const setSortCondition = (
   options: StakePoolQueryOptions,
   order: 'asc' | 'desc',
-  field: 'name' | 'total_cost' | 'saturation'
+  field: 'name'
 ): StakePoolQueryOptions => ({
   ...options,
   sort: { ...options.sort, field, order }
@@ -508,16 +508,6 @@ describe('StakePoolSearchHttpService', () => {
           expect(response).toMatchSnapshot();
         });
 
-        it('sort by total_cost desc order', async () => {
-          const response = await doServerRequest(setSortCondition({}, 'desc', 'total_cost'));
-          expect(response).toMatchSnapshot();
-        });
-
-        it('sort by total_cost asc order', async () => {
-          const response = await doServerRequest(setSortCondition({}, 'asc', 'total_cost'));
-          expect(response).toMatchSnapshot();
-        });
-
         it('if sort not provided defaults by name asc order', async () => {
           const response = await doServerRequest({});
           expect(response).toMatchSnapshot();
@@ -530,21 +520,19 @@ describe('StakePoolSearchHttpService', () => {
           expect(response).toMatchSnapshot();
         });
 
-        it('sort asc by total_cost with applied pagination', async () => {
-          const responsePage1 = await doServerRequest(setSortCondition(setPagination({}, 0, 3), 'asc', 'total_cost'));
+        it('sort asc by name with applied pagination', async () => {
+          const firstPageResultSet = await doServerRequest(setSortCondition(setPagination({}, 0, 3), 'asc', 'name'));
 
-          const responsePage2 = await doServerRequest(setSortCondition(setPagination({}, 3, 3), 'asc', 'total_cost'));
+          const secondPageResultSet = await doServerRequest(setSortCondition(setPagination({}, 3, 3), 'asc', 'name'));
 
-          expect(responsePage1).toMatchSnapshot();
-          expect(responsePage2).toMatchSnapshot();
+          expect(firstPageResultSet).toMatchSnapshot();
+          expect(secondPageResultSet).toMatchSnapshot();
         });
 
-        it('sort asc by name with applied pagination, with change sort criteria on next page', async () => {
+        it('sort asc by name with applied pagination, with change sort order on next page', async () => {
           const firstPageResponse = await doServerRequest(setSortCondition(setPagination({}, 0, 5), 'asc', 'name'));
 
-          const secondPageResponse = await doServerRequest(
-            setSortCondition(setPagination({}, 5, 5), 'asc', 'total_cost')
-          );
+          const secondPageResponse = await doServerRequest(setSortCondition(setPagination({}, 5, 5), 'asc', 'name'));
           const firstPageIds = firstPageResponse.pageResults.map(({ id }) => id);
 
           const hasDuplicatedIdsBetweenPages = firstPageIds.some((id) =>
