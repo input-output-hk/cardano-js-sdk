@@ -1,11 +1,5 @@
-import { Cip30Wallet, WalletProperties, consumeRemoteWalletApi } from '../WalletApi';
+import { Cip30Wallet } from './WalletApi';
 import { Logger, dummyLogger } from 'ts-log';
-import { MessengerDependencies, injectedRuntime } from '@cardano-sdk/web-extension';
-import { consumeRemoteAuthenticatorApi } from '../AuthenticatorApi';
-
-export interface InitializeInjectedDependencies {
-  logger: Logger;
-}
 
 export type WindowMaybeWithCardano = Window & { cardano?: { [k: string]: Cip30Wallet } };
 
@@ -41,18 +35,4 @@ export const injectGlobal = (
     },
     'Injected'
   );
-};
-
-// tested in web-extension/e2e tests
-export const initializeInjectedScript = (props: WalletProperties, { logger }: InitializeInjectedDependencies) => {
-  const dependencies: MessengerDependencies = {
-    logger,
-    runtime: injectedRuntime
-  };
-
-  const authenticator = consumeRemoteAuthenticatorApi(props, dependencies);
-  const walletApi = consumeRemoteWalletApi(props, dependencies);
-  const wallet = new Cip30Wallet(props, { api: walletApi, authenticator });
-
-  injectGlobal(window, wallet);
 };

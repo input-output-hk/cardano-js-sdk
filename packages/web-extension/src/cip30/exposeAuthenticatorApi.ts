@@ -1,5 +1,4 @@
-// tested in web-extension/e2e tests
-import { AuthenticatorApi, RemoteAuthenticator } from './types';
+import { AuthenticatorApi, RemoteAuthenticator } from '@cardano-sdk/cip30';
 import {
   MessengerDependencies,
   RemoteApiMethod,
@@ -7,9 +6,8 @@ import {
   RemoteApiPropertyType,
   exposeApi,
   senderOrigin
-} from '@cardano-sdk/web-extension';
+} from '../messaging';
 import { RemoteAuthenticatorMethodNames } from './consumeRemoteAuthenticatorApi ';
-import { authenticatorChannel } from './util';
 
 export interface ExposeAuthenticatorApiOptions {
   walletName: string;
@@ -19,6 +17,9 @@ export interface BackgroundAuthenticatorDependencies extends MessengerDependenci
   authenticator: AuthenticatorApi;
 }
 
+export const authenticatorChannel = (walletName: string) => `authenticator-${walletName}`;
+
+// tested in e2e tests
 export const exposeAuthenticatorApi = (
   { walletName }: ExposeAuthenticatorApiOptions,
   dependencies: BackgroundAuthenticatorDependencies

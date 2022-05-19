@@ -1,4 +1,4 @@
-import { initializeInjectedScript } from '@cardano-sdk/cip30';
+import { cip30 } from '@cardano-sdk/web-extension';
 import { walletName } from './util';
 
-initializeInjectedScript({ icon: '', walletName }, { logger: console });
+cip30.initializeInjectedScript({ icon: '', walletName }, { logger: console });

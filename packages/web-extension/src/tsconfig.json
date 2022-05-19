@@ -10,6 +10,9 @@
     },
     {
       "path": "../../wallet/src"
+    },
+    {
+      "path": "../../cip30/src"
     }
   ]
 }

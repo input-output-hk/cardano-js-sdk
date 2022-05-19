@@ -31,7 +31,6 @@
     "test:debug": "DEBUG=true yarn test"
   },
   "devDependencies": {
-    "@cardano-sdk/cip30": " 0.2.0",
     "@cardano-sdk/wallet": " 0.2.0",
     "@cardano-sdk/util-dev": " 0.2.0",
     "@emurgo/cardano-message-signing-asmjs": "^1.0.1",
@@ -60,6 +59,7 @@
   },
   "dependencies": {
     "@cardano-sdk/core": " 0.2.0",
+    "@cardano-sdk/cip30": " 0.2.0",
     "lodash-es": "^4.17.21",
     "rxjs": "^7.4.0",
     "ts-log": "^2.2.3",

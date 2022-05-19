@@ -1,8 +1,8 @@
-// tested in web-extension/e2e tests
-import { AuthenticatorApi, exposeAuthenticatorApi } from '../AuthenticatorApi';
+import { AuthenticatorApi, WalletApi, WalletName } from '@cardano-sdk/cip30';
 import { Logger } from 'ts-log';
 import { Runtime } from 'webextension-polyfill';
-import { WalletApi, WalletName, exposeWalletApi } from '../WalletApi';
+import { exposeAuthenticatorApi } from './exposeAuthenticatorApi';
+import { exposeWalletApi } from './exposeWalletApi';
 
 export interface InitializeBackgroundScriptProps {
   walletName: WalletName;
@@ -15,6 +15,7 @@ export interface InitializeBackgroundScriptDependencies {
   walletApi: WalletApi;
 }
 
+// tested in e2e tests
 export const initializeBackgroundScript = (
   props: InitializeBackgroundScriptProps,
   dependencies: InitializeBackgroundScriptDependencies
