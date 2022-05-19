@@ -1,6 +1,7 @@
-import { AssetId, SelectionConstraints, TxTestUtil } from '@cardano-sdk/util-dev';
+import { AssetId, TxTestUtil } from '@cardano-sdk/util-dev';
 import { InputSelectionError, InputSelectionFailure } from '../src/InputSelectionError';
 import {
+  SelectionConstraints,
   assertFailureProperties,
   assertInputSelectionProperties,
   generateSelectionParams,

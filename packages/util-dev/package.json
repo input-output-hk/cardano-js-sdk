@@ -21,9 +21,6 @@
     "prepack": "yarn build",
     "test:debug": "DEBUG=true yarn test"
   },
-  "devDependencies": {
-    "@cardano-sdk/cip2": " 0.2.0"
-  },
   "dependencies": {
     "@cardano-sdk/core": " 0.2.0",
     "rxjs": "^7.4.0",

@@ -1,4 +1,5 @@
-import { AssetId, SelectionConstraints } from '@cardano-sdk/util-dev';
+import * as SelectionConstraints from './selectionConstraints';
+import { AssetId } from '@cardano-sdk/util-dev';
 import { Cardano, cslUtil } from '@cardano-sdk/core';
 import { InputSelectionError, InputSelectionFailure } from '../../src/InputSelectionError';
 import { SelectionResult } from '../../src/types';
