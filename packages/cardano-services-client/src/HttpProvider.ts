@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ProviderError, ProviderFailure, util } from '@cardano-sdk/core';
-import axios, { AxiosError, AxiosRequestConfig } from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 
 export type HttpProviderConfigPaths<T> = { [methodName in keyof T]: string };
 
@@ -73,7 +73,7 @@ export const createHttpProvider = <T extends object>({
           }));
           return (await axiosInstance.request(req)).data || undefined;
         } catch (error) {
-          if (error instanceof AxiosError) {
+          if (axios.isAxiosError(error)) {
             if (error.response) {
               const typedError = util.fromSerializableObject(error.response.data, () => ProviderError.prototype);
               if (mapError) return mapError(typedError, method);
