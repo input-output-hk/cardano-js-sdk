@@ -34,7 +34,7 @@ describe('createHttpServer', () => {
   let baseUrl: string;
 
   const createTxSubmitProviderClient = (
-    config: Pick<HttpProviderConfig<TestProvider>, 'gotOptions' | 'mapError'> = {}
+    config: Pick<HttpProviderConfig<TestProvider>, 'axiosOptions' | 'mapError'> = {}
   ) =>
     createHttpProvider<TestProvider>({
       baseUrl,
@@ -85,8 +85,8 @@ describe('createHttpServer', () => {
     });
   });
 
-  it('passes through got options', async () => {
-    const provider = createTxSubmitProviderClient({ gotOptions: { headers: { 'custom-header': 'header-value' } } });
+  it('passes through axios options', async () => {
+    const provider = createTxSubmitProviderClient({ axiosOptions: { headers: { 'custom-header': 'header-value' } } });
     const closeServer = await createStubHttpProviderServer(port, stubProviderPaths.noArgsEmptyReturn, (req, res) => {
       expect(req.headers['custom-header']).toBe('header-value');
       res.send();
