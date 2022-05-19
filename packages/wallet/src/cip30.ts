@@ -1,18 +1,23 @@
-// tested in packages/wallet/test/integration/cip30mapping.test.ts
 import {
   ApiError,
+  Bytes,
+  Cbor,
+  Cip30DataSignature,
   DataSignError,
   DataSignErrorCode,
+  Paginate,
   TxSendError,
   TxSendErrorCode,
   TxSignError,
-  TxSignErrorCode
-} from '../errors';
-import { Bytes, Cbor, Paginate, WalletApi } from './types';
+  TxSignErrorCode,
+  WalletApi
+} from '@cardano-sdk/cip30';
+import { AuthenticationError } from './KeyManagement/errors';
 import { CSL, Cardano, coreToCsl, cslToCore } from '@cardano-sdk/core';
 import { InputSelectionError } from '@cardano-sdk/cip2';
-import { KeyManagement, ObservableWallet } from '@cardano-sdk/wallet';
 import { Logger, dummyLogger } from 'ts-log';
+import { SingleAddressWallet } from '.';
+import { cip30signData } from './KeyManagement/cip8';
 import { firstValueFrom } from 'rxjs';
 
 export type Cip30WalletDependencies = {
@@ -52,8 +57,8 @@ const mapCallbackFailure = (err: unknown, logger?: Logger) => {
   return false;
 };
 
-export const observableWalletApi = (
-  wallet: ObservableWallet,
+export const createWalletApi = (
+  wallet: SingleAddressWallet,
   confirmationCallback: CallbackConfirmation,
   { logger = dummyLogger }: Cip30WalletDependencies = {}
 ): WalletApi => ({
@@ -156,7 +161,7 @@ export const observableWalletApi = (
 
     return Promise.resolve(coreToCsl.utxo(utxos).map((utxo) => Buffer.from(utxo.to_bytes()).toString('hex')));
   },
-  signData: async (addr: Cardano.Address, payload: Bytes): Promise<KeyManagement.cip8.Cip30DataSignature> => {
+  signData: async (addr: Cardano.Address, payload: Bytes): Promise<Cip30DataSignature> => {
     logger.debug('signData');
     const hexBlobPayload = Cardano.util.HexBlob(payload);
 
@@ -169,7 +174,8 @@ export const observableWalletApi = (
     }).catch((error) => mapCallbackFailure(error, logger));
 
     if (shouldProceed) {
-      return wallet.signData({
+      return cip30signData({
+        keyAgent: wallet.keyAgent,
         payload: hexBlobPayload,
         signWith: addr
       });
@@ -199,11 +205,10 @@ export const observableWalletApi = (
         const cslWitnessSet = coreToCsl.witnessSet(signatures);
 
         return Promise.resolve(Buffer.from(cslWitnessSet.to_bytes()).toString('hex'));
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (error: any) {
+      } catch (error) {
         logger.error(error);
         // TODO: handle ProofGeneration errors?
-        const message = (typeof error === 'object' && error.message) || 'Nope';
+        const message = error instanceof AuthenticationError ? error.message : 'Nope';
         throw new TxSignError(TxSignErrorCode.UserDeclined, message);
       }
     } else {

@@ -6,7 +6,8 @@ import {
   TransactionalObservables,
   TransactionsTracker
 } from './services';
-import { Cip30DataSignature, Cip30SignDataRequest } from './KeyManagement/cip8';
+import { Cip30DataSignature } from '@cardano-sdk/cip30';
+import { Cip30SignDataRequest } from './KeyManagement/cip8';
 import { GroupedAddress } from './KeyManagement';
 import { SelectionSkeleton } from '@cardano-sdk/cip2';
 import { TxInternals } from './Transaction';

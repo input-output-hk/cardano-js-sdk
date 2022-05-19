@@ -65,6 +65,7 @@ exposeApi(
 
 void (async () => {
   // TODO: test with real wallet once blockfrost load issue is resolved
+  // `cip30` here comes from 'wallet' package
   // const confirmationCallback: cip30.CallbackConfirmation = async () => true;
   // const wallet = new SingleAddressWallet(
   //   { name: walletName },

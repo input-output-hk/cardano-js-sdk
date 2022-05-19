@@ -1,6 +1,5 @@
 import { Cardano, coreToCsl } from '@cardano-sdk/core';
-import { KeyManagement } from '@cardano-sdk/wallet';
-import { WalletApi } from '@cardano-sdk/cip30';
+import { Cip30DataSignature, WalletApi } from '@cardano-sdk/cip30';
 
 const mapUtxos = (utxos: Cardano.Utxo[]) =>
   coreToCsl.utxo(utxos).map((utxo) => Buffer.from(utxo.to_bytes()).toString('hex'));
@@ -53,7 +52,7 @@ export const stubWalletApi: WalletApi = {
     ({
       key: 'key',
       signature: 'signature'
-    } as unknown as KeyManagement.cip8.Cip30DataSignature),
+    } as unknown as Cip30DataSignature),
   signTx: async (_tx) => 'signedTransaction',
   submitTx: async (_tx) => 'transactionId'
 };

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, sonarjs/no-duplicate-string */
 import { CSL, Cardano, coreToCsl, cslToCore } from '@cardano-sdk/core';
-import { DataSignError, TxSendError, TxSignError, WalletApi, observableWalletApi } from '@cardano-sdk/cip30';
-import { InitializeTxProps, InitializeTxResult, SingleAddressWallet } from '../../src';
+import { DataSignError, TxSendError, TxSignError, WalletApi } from '@cardano-sdk/cip30';
+import { InitializeTxProps, InitializeTxResult, SingleAddressWallet, cip30 } from '../../src';
 import { createWallet } from './util';
 import { firstValueFrom } from 'rxjs';
 import { networkId } from '../mocks';
@@ -28,7 +28,7 @@ describe('cip30', () => {
     // CREATE A WALLET
     wallet = await createWallet();
     confirmationCallback = jest.fn().mockResolvedValue(true);
-    api = observableWalletApi(wallet, confirmationCallback);
+    api = cip30.createWalletApi(wallet, confirmationCallback);
     await waitForWalletStateSettle(wallet);
   });
 
