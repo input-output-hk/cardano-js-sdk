@@ -1,6 +1,6 @@
 /* eslint-disable unicorn/no-nested-ternary */
 import { BigIntMath, isNotNil } from '@cardano-sdk/util';
-import { Cardano, StakePoolProvider, WalletProvider } from '@cardano-sdk/core';
+import { Cardano, RewardsProvider, StakePoolProvider } from '@cardano-sdk/core';
 import { Delegatee, RewardAccount, StakeKeyStatus } from '../types';
 import { KeyValueStore } from '../../persistence';
 import { Observable, combineLatest, concat, distinctUntilChanged, filter, map, merge, switchMap, tap } from 'rxjs';
@@ -65,14 +65,14 @@ export const createRewardsProvider =
   (
     epoch$: Observable<Cardano.Epoch>,
     txConfirmed$: Observable<Cardano.NewTxAlonzo>,
-    walletProvider: WalletProvider,
+    rewardsProvider: RewardsProvider,
     retryBackoffConfig: RetryBackoffConfig
   ) =>
   (rewardAccounts: Cardano.RewardAccount[]): Observable<Cardano.Lovelace[]> =>
     combineLatest(
       rewardAccounts.map((rewardAccount) =>
         coldObservableProvider(
-          () => walletProvider.rewardAccountBalance(rewardAccount),
+          () => rewardsProvider.rewardAccountBalance(rewardAccount),
           retryBackoffConfig,
           fetchRewardsTrigger$(epoch$, txConfirmed$, rewardAccount),
           isEqual

@@ -52,3 +52,17 @@ export const genesisParameters = {
   systemStart: new Date(1_506_203_091_000),
   updateQuorum: 5
 };
+
+export const rewardsHistory2 = new Map<Cardano.RewardAccount, EpochRewards[]>([
+  [
+    rewardAccount,
+    [
+      {
+        epoch: currentEpoch.number - 4,
+        rewards: 10_000n
+      },
+      ...epochRewards
+    ]
+  ]
+]);
+export const rewardAccountBalance2 = rewardAccountBalance + 1n;

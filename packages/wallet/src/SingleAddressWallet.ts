@@ -7,6 +7,7 @@ import {
   NetworkInfo,
   NetworkInfoProvider,
   ProtocolParametersRequiredByWallet,
+  RewardsProvider,
   StakePoolProvider,
   TxSubmitProvider,
   UtxoProvider,
@@ -24,6 +25,7 @@ import {
   TrackedAssetProvider,
   TrackedChainHistoryProvider,
   TrackedNetworkInfoProvider,
+  TrackedRewardsProvider,
   TrackedStakePoolProvider,
   TrackedTxSubmitProvider,
   TrackedWalletProvider,
@@ -85,6 +87,7 @@ export interface SingleAddressWalletDependencies {
   readonly networkInfoProvider: NetworkInfoProvider;
   readonly utxoProvider: UtxoProvider;
   readonly chainHistoryProvider: ChainHistoryProvider;
+  readonly rewardsProvider: RewardsProvider;
   readonly inputSelector?: InputSelector;
   readonly stores?: WalletStores;
   readonly logger?: Logger;
@@ -121,6 +124,7 @@ export class SingleAddressWallet implements ObservableWallet {
   readonly syncStatus: SyncStatus;
   readonly name: string;
   readonly util: WalletUtil;
+  readonly rewardsProvider: TrackedRewardsProvider;
 
   constructor(
     {
@@ -144,6 +148,7 @@ export class SingleAddressWallet implements ObservableWallet {
       networkInfoProvider,
       utxoProvider,
       chainHistoryProvider,
+      rewardsProvider,
       logger = dummyLogger,
       inputSelector = roundRobinRandomImprove(),
       stores = createInMemoryWalletStores()
@@ -158,11 +163,13 @@ export class SingleAddressWallet implements ObservableWallet {
     this.stakePoolProvider = new TrackedStakePoolProvider(stakePoolProvider);
     this.assetProvider = new TrackedAssetProvider(assetProvider);
     this.chainHistoryProvider = new TrackedChainHistoryProvider(chainHistoryProvider);
+    this.rewardsProvider = new TrackedRewardsProvider(rewardsProvider);
     this.syncStatus = createProviderStatusTracker(
       {
         assetProvider: this.assetProvider,
         chainHistoryProvider: this.chainHistoryProvider,
         networkInfoProvider: this.networkInfoProvider,
+        rewardsProvider: this.rewardsProvider,
         stakePoolProvider: this.stakePoolProvider,
         txSubmitProvider: this.txSubmitProvider,
         utxoProvider: this.utxoProvider,
@@ -244,11 +251,11 @@ export class SingleAddressWallet implements ObservableWallet {
       rewardAccountAddresses$: this.addresses$.pipe(
         map((addresses) => addresses.map((groupedAddress) => groupedAddress.rewardAccount))
       ),
+      rewardsTracker: this.rewardsProvider,
       stakePoolProvider: this.stakePoolProvider,
       stores,
       timeSettings$,
-      transactionsTracker: this.transactions,
-      walletProvider: this.walletProvider
+      transactionsTracker: this.transactions
     });
     this.balance = createBalanceTracker(this.protocolParameters$, this.utxo, this.delegation);
     this.assets$ = new PersistentDocumentTrackerSubject(

@@ -4,7 +4,7 @@ import { AssetId, createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { Cardano } from '@cardano-sdk/core';
 import { KeyManagement, SingleAddressWallet } from '../../src';
 import { firstValueFrom, skip } from 'rxjs';
-import { mockChainHistoryProvider, mockNetworkInfoProvider, utxo } from '../mocks';
+import { mockChainHistoryProvider, mockNetworkInfoProvider, mockRewardsProvider, utxo } from '../mocks';
 import { waitForWalletStateSettle } from '../util';
 
 jest.mock('../../src/KeyManagement/cip8/cip30signData');
@@ -36,6 +36,14 @@ describe('SingleAddressWallet methods', () => {
   let utxoProvider: mocks.UtxoProviderStub;
 
   beforeEach(async () => {
+    txSubmitProvider = mocks.mockTxSubmitProvider();
+    walletProvider = mocks.mockWalletProvider();
+    utxoProvider = mocks.mockUtxoProvider();
+    const assetProvider = mocks.mockAssetProvider();
+    const stakePoolProvider = createStubStakePoolProvider();
+    const networkInfoProvider = mockNetworkInfoProvider();
+    const rewardsProvider = mockRewardsProvider();
+    const chainHistoryProvider = mockChainHistoryProvider();
     const groupedAddress: KeyManagement.GroupedAddress = {
       accountIndex: 0,
       address,
@@ -45,13 +53,6 @@ describe('SingleAddressWallet methods', () => {
       type: KeyManagement.AddressType.External
     };
     const keyAgent = await mocks.testAsyncKeyAgent([groupedAddress]);
-    txSubmitProvider = mocks.mockTxSubmitProvider();
-    walletProvider = mocks.mockWalletProvider();
-    utxoProvider = mocks.mockUtxoProvider();
-    const assetProvider = mocks.mockAssetProvider();
-    const stakePoolProvider = createStubStakePoolProvider();
-    const networkInfoProvider = mockNetworkInfoProvider();
-    const chainHistoryProvider = mockChainHistoryProvider();
     keyAgent.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
     wallet = new SingleAddressWallet(
       { name: 'Test Wallet' },
@@ -60,6 +61,7 @@ describe('SingleAddressWallet methods', () => {
         chainHistoryProvider,
         keyAgent,
         networkInfoProvider,
+        rewardsProvider,
         stakePoolProvider,
         txSubmitProvider,
         utxoProvider,

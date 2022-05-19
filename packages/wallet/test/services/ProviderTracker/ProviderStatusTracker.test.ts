@@ -6,6 +6,7 @@ import {
   TrackedAssetProvider,
   TrackedChainHistoryProvider,
   TrackedNetworkInfoProvider,
+  TrackedRewardsProvider,
   TrackedStakePoolProvider,
   TrackedTxSubmitProvider,
   TrackedUtxoProvider,
@@ -17,6 +18,7 @@ import {
   mockAssetProvider,
   mockChainHistoryProvider,
   mockNetworkInfoProvider,
+  mockRewardsProvider,
   mockTxSubmitProvider,
   mockUtxoProvider,
   mockWalletProvider
@@ -69,6 +71,7 @@ describe('createProviderStatusTracker', () => {
   let assetProvider: TrackedAssetProvider;
   let utxoProvider: TrackedUtxoProvider;
   let chainHistoryProvider: TrackedChainHistoryProvider;
+  let rewardsProvider: TrackedRewardsProvider;
 
   const timeout = 5000;
 
@@ -80,6 +83,7 @@ describe('createProviderStatusTracker', () => {
     txSubmitProvider = new TrackedTxSubmitProvider(mockTxSubmitProvider());
     assetProvider = new TrackedAssetProvider(mockAssetProvider());
     chainHistoryProvider = new TrackedChainHistoryProvider(mockChainHistoryProvider());
+    rewardsProvider = new TrackedRewardsProvider(mockRewardsProvider());
   });
 
   it('isAnyRequestPending$: true if there are any reqs in flight, false when all resolved', () => {
@@ -92,6 +96,7 @@ describe('createProviderStatusTracker', () => {
           assetProvider,
           chainHistoryProvider,
           networkInfoProvider,
+          rewardsProvider,
           stakePoolProvider,
           txSubmitProvider,
           utxoProvider,
@@ -123,6 +128,7 @@ describe('createProviderStatusTracker', () => {
           assetProvider,
           chainHistoryProvider,
           networkInfoProvider,
+          rewardsProvider,
           stakePoolProvider,
           txSubmitProvider,
           utxoProvider,
@@ -151,6 +157,7 @@ describe('createProviderStatusTracker', () => {
           assetProvider,
           chainHistoryProvider,
           networkInfoProvider,
+          rewardsProvider,
           stakePoolProvider,
           txSubmitProvider,
           utxoProvider,
@@ -179,6 +186,7 @@ describe('createProviderStatusTracker', () => {
           assetProvider,
           chainHistoryProvider,
           networkInfoProvider,
+          rewardsProvider,
           stakePoolProvider,
           txSubmitProvider,
           utxoProvider,

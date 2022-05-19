@@ -4,7 +4,7 @@ import { KeyValueStore } from '../../persistence';
 import { Observable, concat, distinctUntilChanged, map, of, switchMap, tap } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { RewardsHistory } from '../types';
-import { TrackedWalletProvider } from '../ProviderTracker';
+import { TrackedRewardsProvider } from '../ProviderTracker';
 import { TxWithEpoch } from './types';
 import { coldObservableProvider } from '../util';
 import { first, flatten, groupBy } from 'lodash-es';
@@ -13,7 +13,7 @@ const sumRewards = (arrayOfRewards: EpochRewards[]) => BigIntMath.sum(arrayOfRew
 const avgReward = (arrayOfRewards: EpochRewards[]) => sumRewards(arrayOfRewards) / BigInt(arrayOfRewards.length);
 
 export const createRewardsHistoryProvider =
-  (walletProvider: TrackedWalletProvider, retryBackoffConfig: RetryBackoffConfig) =>
+  (rewardsProvider: TrackedRewardsProvider, retryBackoffConfig: RetryBackoffConfig) =>
   (
     rewardAccounts: Cardano.RewardAccount[],
     lowerBound: Cardano.Epoch | null
@@ -21,14 +21,14 @@ export const createRewardsHistoryProvider =
     if (lowerBound) {
       return coldObservableProvider(
         () =>
-          walletProvider.rewardsHistory({
+          rewardsProvider.rewardsHistory({
             epochs: { lowerBound },
             rewardAccounts
           }),
         retryBackoffConfig
       );
     }
-    walletProvider.setStatInitialized(walletProvider.stats.rewardsHistory$);
+    rewardsProvider.setStatInitialized(rewardsProvider.stats.rewardsHistory$);
     return of(new Map());
   };
 

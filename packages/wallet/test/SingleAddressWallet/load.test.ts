@@ -2,7 +2,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as mocks from '../mocks';
 import { AssetId, createStubStakePoolProvider, somePartialStakePools } from '@cardano-sdk/util-dev';
-import { Cardano, ChainHistoryProvider, UtxoProvider, WalletProvider, testnetTimeSettings } from '@cardano-sdk/core';
+import {
+  Cardano,
+  ChainHistoryProvider,
+  RewardsProvider,
+  UtxoProvider,
+  WalletProvider,
+  testnetTimeSettings
+} from '@cardano-sdk/core';
 import { KeyManagement, ObservableWallet, SingleAddressWallet } from '../../src';
 import { WalletStores, createInMemoryWalletStores } from '../../src/persistence';
 import {
@@ -20,12 +27,19 @@ const name = 'Test Wallet';
 const address = mocks.utxo[0][0].address!;
 const rewardAccount = mocks.rewardAccount;
 
-const createWallet = async (
-  stores: WalletStores,
-  walletProvider: WalletProvider,
-  utxoProvider: UtxoProvider,
-  chainHistoryProvider: ChainHistoryProvider = mocks.mockChainHistoryProvider()
-) => {
+interface Providers {
+  walletProvider: WalletProvider;
+  rewardsProvider: RewardsProvider;
+  utxoProvider: UtxoProvider;
+  chainHistoryProvider: ChainHistoryProvider;
+}
+
+const createWallet = async (stores: WalletStores, providers: Providers) => {
+  const { rewardsProvider, utxoProvider, walletProvider, chainHistoryProvider } = providers;
+  const txSubmitProvider = mocks.mockTxSubmitProvider();
+  const assetProvider = mocks.mockAssetProvider();
+  const stakePoolProvider = createStubStakePoolProvider();
+  const networkInfoProvider = mockNetworkInfoProvider();
   const groupedAddress: KeyManagement.GroupedAddress = {
     accountIndex: 0,
     address,
@@ -36,10 +50,6 @@ const createWallet = async (
   };
   const keyAgent = await mocks.testAsyncKeyAgent([groupedAddress]);
   keyAgent.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
-  const txSubmitProvider = mocks.mockTxSubmitProvider();
-  const assetProvider = mocks.mockAssetProvider();
-  const stakePoolProvider = createStubStakePoolProvider();
-  const networkInfoProvider = mockNetworkInfoProvider();
   return new SingleAddressWallet(
     { name },
     {
@@ -47,6 +57,7 @@ const createWallet = async (
       chainHistoryProvider,
       keyAgent,
       networkInfoProvider,
+      rewardsProvider,
       stakePoolProvider,
       stores,
       txSubmitProvider,
@@ -136,15 +147,20 @@ const assertWalletProperties2 = async (wallet: ObservableWallet) => {
 describe('SingleAddressWallet load', () => {
   it('loads all properties from provider, stores them and restores on subsequent load, fetches new data', async () => {
     const stores = createInMemoryWalletStores();
-    const wallet1 = await createWallet(stores, mocks.mockWalletProvider(), mocks.mockUtxoProvider());
+    const wallet1 = await createWallet(stores, {
+      chainHistoryProvider: mocks.mockChainHistoryProvider(),
+      rewardsProvider: mocks.mockRewardsProvider(),
+      utxoProvider: mocks.mockUtxoProvider(),
+      walletProvider: mocks.mockWalletProvider()
+    });
     await assertWalletProperties(wallet1, somePartialStakePools[0].id);
     wallet1.shutdown();
-    const wallet2 = await createWallet(
-      stores,
-      mocks.mockWalletProvider2(100),
-      mocks.mockUtxoProvider2(100),
-      mocks.mockChainHistoryProvider2(100)
-    );
+    const wallet2 = await createWallet(stores, {
+      chainHistoryProvider: mocks.mockChainHistoryProvider2(100),
+      rewardsProvider: mocks.mockRewardsProvider2(100),
+      utxoProvider: mocks.mockUtxoProvider2(100),
+      walletProvider: mocks.mockWalletProvider2(100)
+    });
     await assertWalletProperties(wallet2, somePartialStakePools[0].id);
     await waitForWalletStateSettle(wallet2);
     await assertWalletProperties2(wallet2);
@@ -154,10 +170,12 @@ describe('SingleAddressWallet load', () => {
   it('syncStatus settles without delegation to any pool', async () => {
     const stores = createInMemoryWalletStores();
     const walletProvider = mocks.mockWalletProvider();
+    const rewardsProvider = mocks.mockRewardsProvider();
     const chainHistoryProvider = mocks.mockChainHistoryProvider();
+    const utxoProvider = mocks.mockUtxoProvider();
     const txsWithNoCertificates = queryTransactionsResult.filter((tx) => !tx.body.certificates);
     chainHistoryProvider.transactionsByAddresses.mockResolvedValue(txsWithNoCertificates);
-    const wallet = await createWallet(stores, walletProvider, mocks.mockUtxoProvider(), chainHistoryProvider);
+    const wallet = await createWallet(stores, { chainHistoryProvider, rewardsProvider, utxoProvider, walletProvider });
     // eslint-disable-next-line unicorn/no-useless-undefined
     await assertWalletProperties(wallet, undefined, []);
     await waitForWalletStateSettle(wallet);
