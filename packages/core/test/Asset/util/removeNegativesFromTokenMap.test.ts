@@ -1,5 +1,5 @@
-import { Asset } from '@cardano-sdk/core';
-import { AssetId } from '@cardano-sdk/util-dev';
+import * as AssetId from '../../AssetId';
+import { Asset } from '../../../src';
 
 describe('Asset', () => {
   describe('util', () => {

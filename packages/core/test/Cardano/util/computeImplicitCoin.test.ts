@@ -1,4 +1,4 @@
-import { Cardano, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
+import { Cardano, ProtocolParametersRequiredByWallet } from '../../../src';
 
 describe('Cardano.util.computeImplicitCoin', () => {
   it('sums registrations for deposit, withdrawals and deregistrations for input', async () => {
