@@ -26,7 +26,6 @@
     "test:debug": "DEBUG=true yarn test"
   },
   "devDependencies": {
-    "@cardano-sdk/cardano-services-client": "0.2.0",
     "@types/validator": "^13.7.1",
     "express": "^4.17.3",
     "get-port-please": "^2.4.3",
