@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Cardano, StakePoolQueryOptions } from '@cardano-sdk/core';
 import { Pool } from 'pg';
 import { StakePoolSearchBuilder } from '../../../src';
@@ -26,19 +27,25 @@ describe('StakePoolSearchBuilder', () => {
 
   describe('queryRetirements', () => {
     it('queryRetirements', async () => {
-      const retirements = await builder.queryRetirements([1, 2, 3]);
+      const retirements = (await builder.queryRetirements([1, 2, 3])).map((r) => {
+        const { hashId, ...rest } = r;
+        return rest;
+      });
       expect(retirements).toMatchSnapshot();
     });
   });
   describe('queryRegistrations', () => {
     it('queryRegistrations', async () => {
-      const registrations = await builder.queryRegistrations([1, 2, 3]);
+      const registrations = (await builder.queryRegistrations([1, 2, 3])).map((r) => {
+        const { hashId, ...rest } = r;
+        return rest;
+      });
       expect(registrations).toMatchSnapshot();
     });
   });
   describe('queryPoolRewards', () => {
     it('queryPoolRewards', async () => {
-      const epochRewards = await builder.queryPoolRewards([1, 2, 3]);
+      const epochRewards = (await builder.queryPoolRewards([1, 2, 3])).map((eR) => eR?.epochReward);
       expect(epochRewards).toMatchSnapshot();
     });
   });
@@ -51,20 +58,23 @@ describe('StakePoolSearchBuilder', () => {
   });
   describe('queryPoolOwners', () => {
     it('queryPoolOwners', async () => {
-      const owners = await builder.queryPoolOwners([1, 2, 3]);
-      expect(owners).toMatchSnapshot();
+      const ownersAddresses = (await builder.queryPoolOwners([1, 2, 3])).map((o) => o.address);
+      expect(ownersAddresses).toMatchSnapshot();
     });
   });
   describe('queryPoolMetrics', () => {
     it('queryPoolMetrics', async () => {
       const totalAda = '42021479194505231';
-      const metrics = await builder.queryPoolMetrics([1, 2, 3], totalAda);
+      const metrics = (await builder.queryPoolMetrics([1, 2, 3], totalAda)).map((m) => m.metrics);
       expect(metrics).toMatchSnapshot();
     });
   });
   describe('queryPoolData', () => {
     it('queryPoolData', async () => {
-      const poolDatas = await builder.queryPoolData([1, 6]);
+      const poolDatas = (await builder.queryPoolData([1, 6])).map((qR) => {
+        const { hashId, updateId, ...poolData } = qR;
+        return poolData;
+      });
       expect(poolDatas).toMatchSnapshot();
     });
   });
@@ -97,7 +107,7 @@ describe('StakePoolSearchBuilder', () => {
       expect(buildPoolsByStatusQuerySpy).toHaveBeenCalledTimes(2);
       expect(buildPoolsByStatusQuerySpy).toHaveReturnedWith(poolsByStatusQuery);
       expect(poolsByStatusQuery).toMatchSnapshot();
-      expect(poolHashes).toMatchSnapshot();
+      expect(poolHashes).toHaveLength(1);
     });
     it('active', async () => {
       const activeStatus = [Cardano.StakePoolStatus.Active];
@@ -111,7 +121,7 @@ describe('StakePoolSearchBuilder', () => {
       expect(buildPoolsByStatusQuerySpy).toHaveBeenCalledTimes(2);
       expect(buildPoolsByStatusQuerySpy).toHaveReturnedWith(poolsByStatusQuery);
       expect(poolsByStatusQuery).toMatchSnapshot();
-      expect(poolHashes).toMatchSnapshot();
+      expect(poolHashes).toHaveLength(6);
     });
     it('retiring', async () => {
       const retiringStatus = [Cardano.StakePoolStatus.Retiring];
@@ -125,7 +135,7 @@ describe('StakePoolSearchBuilder', () => {
       expect(buildPoolsByStatusQuerySpy).toHaveBeenCalledTimes(2);
       expect(buildPoolsByStatusQuerySpy).toHaveReturnedWith(poolsByStatusQuery);
       expect(poolsByStatusQuery).toMatchSnapshot();
-      expect(poolHashes).toMatchSnapshot();
+      expect(poolHashes).toHaveLength(1);
     });
     it('retired', async () => {
       const retiredStatus = [Cardano.StakePoolStatus.Retired];
@@ -139,7 +149,7 @@ describe('StakePoolSearchBuilder', () => {
       expect(buildPoolsByStatusQuerySpy).toHaveBeenCalledTimes(2);
       expect(buildPoolsByStatusQuerySpy).toHaveReturnedWith(poolsByStatusQuery);
       expect(poolsByStatusQuery).toMatchSnapshot();
-      expect(poolHashes).toMatchSnapshot();
+      expect(poolHashes).toHaveLength(1);
     });
     it('active,activating,retiring,retired', async () => {
       const poolStatus = Object.values(Cardano.StakePoolStatus);
@@ -153,7 +163,7 @@ describe('StakePoolSearchBuilder', () => {
       expect(buildPoolsByStatusQuerySpy).toHaveBeenCalledTimes(2);
       expect(buildPoolsByStatusQuerySpy).toHaveReturnedWith(poolsByStatusQuery);
       expect(poolsByStatusQuery).toMatchSnapshot();
-      expect(poolHashes).toMatchSnapshot();
+      expect(poolHashes).toHaveLength(9);
     });
   });
   describe('buildPoolsByPledgeMetQuery', () => {
@@ -186,7 +196,7 @@ describe('StakePoolSearchBuilder', () => {
       const poolHashes = await builder.queryPoolHashes(query, params);
       const totalCount = await builder.queryTotalCount(query, params);
       expect(builtQuery).toMatchSnapshot();
-      expect(poolHashes).toMatchSnapshot();
+      expect(poolHashes).toHaveLength(9);
       expect(totalCount).toMatchSnapshot();
     });
   });
@@ -197,7 +207,7 @@ describe('StakePoolSearchBuilder', () => {
       const poolHashes = await builder.queryPoolHashes(query, params);
       const totalCount = await builder.queryTotalCount(query, params);
       expect(builtQuery).toMatchSnapshot();
-      expect(poolHashes).toMatchSnapshot();
+      expect(poolHashes).toHaveLength(1);
       expect(totalCount).toMatchSnapshot();
     });
   });
