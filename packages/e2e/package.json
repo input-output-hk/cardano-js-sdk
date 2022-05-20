@@ -47,6 +47,7 @@
     "@cardano-sdk/util": "0.3.0",
     "@cardano-sdk/util-rxjs": "0.3.0",
     "@cardano-sdk/wallet": "0.3.0",
+    "@cardano-sdk/blockfrost": "0.3.0",
     "bunyan": "^1.8.15",
     "cardano-wallet-js": "^1.4.0",
     "dotenv": "^16.0.1",

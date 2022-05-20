@@ -43,6 +43,7 @@
   "dependencies": {
     "@cardano-ogmios/client": "4.1.0",
     "@cardano-sdk/util": "0.3.0",
+    "@cardano-sdk/core": "0.3.0",
     "chalk": "^4.1.1",
     "clear": "^0.1.0",
     "cli-progress": "^3.9.0",

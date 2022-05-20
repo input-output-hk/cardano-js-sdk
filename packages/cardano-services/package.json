@@ -95,7 +95,8 @@
     "prom-client": "^14.0.1",
     "reflect-metadata": "~0.1.13",
     "ts-log": "^2.2.4",
-    "node-cache": "^5.1.2"
+    "node-cache": "^5.1.2",
+    "clear": "0.1.0"
   },
   "files": [
     "dist/*",
