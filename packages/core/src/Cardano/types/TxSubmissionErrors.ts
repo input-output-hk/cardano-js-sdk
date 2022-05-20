@@ -1,3 +1,4 @@
+import '@cardano-ogmios/schema';
 import { CustomError } from 'ts-custom-error';
 import { TxSubmission } from '@cardano-ogmios/client';
 

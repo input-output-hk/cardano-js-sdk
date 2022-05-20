@@ -1,3 +1,4 @@
+import 'jest';
 import { Logger } from 'ts-log';
 
 export const createStubLogger = (): Logger => ({
