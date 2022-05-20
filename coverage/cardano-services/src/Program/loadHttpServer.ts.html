@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">92.3% </span>
+                <span class="strong">92.59% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>24/26</span>
+                <span class='fraction'>25/27</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">57.14% </span>
+                <span class="strong">54.54% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>4/7</span>
+                <span class='fraction'>6/11</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">92% </span>
+                <span class="strong">92.3% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>23/25</span>
+                <span class='fraction'>24/26</span>
             </div>
         
             
@@ -133,7 +133,13 @@
 <a name='L68'></a><a href='#L68'>68</a>
 <a name='L69'></a><a href='#L69'>69</a>
 <a name='L70'></a><a href='#L70'>70</a>
-<a name='L71'></a><a href='#L71'>71</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">8x</span>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-yes">8x</span>
@@ -142,6 +148,9 @@
 <span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -187,6 +196,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -209,6 +221,7 @@ import { LogLevel, createLogger } from 'bunyan';
 import { MissingProgramOption, UnknownServiceName } from './errors';
 import { Pool } from 'pg';
 import { ProgramOptionDescriptions } from './ProgramOptionDescriptions';
+import { RabbitMqTxSubmitProvider } from '@cardano-sdk/rabbitmq';
 import { ServiceNames } from './ServiceNames';
 import { TxSubmitHttpService } from '../TxSubmit';
 import { ogmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
@@ -221,6 +234,8 @@ export interface ProgramArgs {
     loggerMinSeverity?: LogLevel;
     metricsEnabled?: boolean;
     ogmiosUrl?: URL;
+    rabbitmqUrl?: URL;
+    useQueue?: boolean;
   };
 }
 &nbsp;
@@ -250,11 +265,14 @@ export const loadHttpServer = async (args: ProgramArgs): Promise&lt;HttpServer&g
         services.push(
           await TxSubmitHttpService.create({
             logger,
-            txSubmitProvider: ogmiosTxSubmitProvider({
-              host: args.options?.ogmiosUrl?.hostname,
-              port: args.options?.ogmiosUrl ? Number.parseInt(args.options.ogmiosUrl.port) : <span class="branch-1 cbranch-no" title="branch not covered" >undefined,</span>
-              tls: args.options?.ogmiosUrl?.protocol === 'wss'
-            })
+            txSubmitProvider:
+              args.options?.useQueue &amp;&amp; <span class="branch-1 cbranch-no" title="branch not covered" >args.options?.rabbitmqUrl</span>
+                ? <span class="branch-0 cbranch-no" title="branch not covered" >new RabbitMqTxSubmitProvider(args.options.rabbitmqUrl)</span>
+                : ogmiosTxSubmitProvider({
+                    host: args.options?.ogmiosUrl?.hostname,
+                    port: args.options?.ogmiosUrl ? Number.parseInt(args.options.ogmiosUrl.port) : <span class="branch-1 cbranch-no" title="branch not covered" >undefined,</span>
+                    tls: args.options?.ogmiosUrl?.protocol === 'wss'
+                  })
           })
         );
         break;
@@ -280,7 +298,7 @@ export const loadHttpServer = async (args: ProgramArgs): Promise&lt;HttpServer&g
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at Fri May 13 2022 13:59:57 GMT+0000 (Coordinated Universal Time)
+                at Fri May 20 2022 10:24:33 GMT+0000 (Coordinated Universal Time)
             </div>
         <script src="../../prettify.js"></script>
         <script>

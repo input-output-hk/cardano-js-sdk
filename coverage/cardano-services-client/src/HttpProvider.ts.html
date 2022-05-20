@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">92.85% </span>
+                <span class="strong">93.93% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>26/28</span>
+                <span class='fraction'>31/33</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>8/8</span>
+                <span class='fraction'>11/11</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">95.65% </span>
+                <span class="strong">92.59% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>22/23</span>
+                <span class='fraction'>25/27</span>
             </div>
         
             
@@ -147,7 +147,14 @@
 <a name='L82'></a><a href='#L82'>82</a>
 <a name='L83'></a><a href='#L83'>83</a>
 <a name='L84'></a><a href='#L84'>84</a>
-<a name='L85'></a><a href='#L85'>85</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -207,11 +214,18 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">15x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -233,7 +247,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ProviderError, ProviderFailure, util } from '@cardano-sdk/core';
-import got, { HTTPError, Options, OptionsOfJSONResponseBody, RequestError } from 'got';
+import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 &nbsp;
 export type HttpProviderConfigPaths&lt;T&gt; = { [methodName in keyof T]: string };
 &nbsp;
@@ -248,9 +262,9 @@ export interface HttpProviderConfig&lt;T&gt; {
    */
   paths: HttpProviderConfigPaths&lt;T&gt;;
   /**
-   * Additional request options passed to got
+   * Additional request options passed to axios
    */
-  gotOptions?: Options;
+  axiosOptions?: AxiosRequestConfig;
   /**
    * Custom error handling: Either:
    * - interpret error as valid response by mapping it to response type and returning it
@@ -274,7 +288,7 @@ export interface HttpProviderConfig&lt;T&gt; {
  */
 export const createHttpProvider = &lt;T extends object&gt;({
   baseUrl,
-  gotOptions,
+  axiosOptions,
   mapError,
   paths
 }: HttpProviderConfig&lt;T&gt;): T =&gt;
@@ -287,26 +301,33 @@ export const createHttpProvider = &lt;T extends object&gt;({
         throw new ProviderError(ProviderFailure.NotImplemented, `HttpProvider missing path for '${prop.toString()}'`);
       return async (...args: any[]) =&gt; {
         try {
-          const req: OptionsOfJSONResponseBody = {
-            ...gotOptions,
-            isStream: false,
-            json: { args },
-            parseJson: (obj) =&gt; util.fromSerializableObject(JSON.parse(obj), <span class="fstat-no" title="function not covered" >() =</span>&gt; <span class="cstat-no" title="statement not covered" >ProviderError.prototype)</span>,
-            resolveBodyOnly: false,
+          const req: AxiosRequestConfig = {
+            ...axiosOptions,
+            baseURL: baseUrl,
+            data: { args },
+            method: 'post',
             responseType: 'json',
-            stringifyJson: (obj) =&gt; JSON.stringify(util.toSerializableObject(obj)),
-            url: baseUrl + path
+            url: path
           };
-          return (await got.post(req).json()) || undefined;
+          const axiosInstance = axios.create(req);
+          axiosInstance.interceptors.request.use((value) =&gt; {
+            if (value.data) value.data = util.toSerializableObject(value.data);
+            return value;
+          });
+          axiosInstance.interceptors.response.use((value) =&gt; ({
+            ...value,
+            data: util.fromSerializableObject(value.data, <span class="fstat-no" title="function not covered" >() =</span>&gt; <span class="cstat-no" title="statement not covered" >ProviderError.prototype)</span>
+          }));
+          return (await axiosInstance.request(req)).data || undefined;
         } catch (error) {
-          if (error instanceof RequestError) {
-            if (error instanceof HTTPError) {
-              const typedError = util.fromSerializableObject(error.response.body, () =&gt; ProviderError.prototype);
+          if (error instanceof AxiosError) {
+            if (error.response) {
+              const typedError = util.fromSerializableObject(error.response.data, () =&gt; ProviderError.prototype);
               if (mapError) return mapError(typedError, method);
               throw new ProviderError(ProviderFailure.Unknown, typedError);
             }
             if (mapError) return mapError(null, method);
-            if (['ENOTFOUND', 'ECONNREFUSED'].includes(error.code)) {
+            if (error.code &amp;&amp; ['ENOTFOUND', 'ECONNREFUSED'].includes(error.code)) {
               throw new ProviderError(ProviderFailure.ConnectionFailure, error, error.code);
             }
           }
@@ -322,7 +343,7 @@ export const createHttpProvider = &lt;T extends object&gt;({
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at Fri May 13 2022 13:58:57 GMT+0000 (Coordinated Universal Time)
+                at Fri May 20 2022 10:23:02 GMT+0000 (Coordinated Universal Time)
             </div>
         <script src="../prettify.js"></script>
         <script>
