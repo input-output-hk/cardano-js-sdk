@@ -7,12 +7,6 @@
   "references": [
     {
       "path": "../../core/src"
-    },
-    {
-      "path": "../../web-extension/src"
-    },
-    {
-      "path": "../../wallet/src"
     }
   ]
 }

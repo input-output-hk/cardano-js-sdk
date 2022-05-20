@@ -1,6 +1,4 @@
-// tested in web-extension/e2e tests
-import { APIErrorCode, ApiError } from '../errors';
-import { AuthenticatorApi } from '../AuthenticatorApi';
+import { APIErrorCode, ApiError, AuthenticatorApi, WalletApi, WalletApiMethodNames } from '@cardano-sdk/cip30';
 import {
   MessengerDependencies,
   RemoteApiMethod,
@@ -8,9 +6,7 @@ import {
   RemoteApiPropertyType,
   exposeApi,
   senderOrigin
-} from '@cardano-sdk/web-extension';
-import { WalletApi } from '.';
-import { WalletApiMethodNames } from './Cip30Wallet';
+} from '../messaging';
 import { walletApiChannel } from './util';
 
 export interface BackgroundWalletApiOptions {
@@ -22,6 +18,7 @@ export interface BackgroundWalletDependencies extends MessengerDependencies {
   walletApi: WalletApi;
 }
 
+// tested in e2e tests
 export const exposeWalletApi = (
   { walletName }: BackgroundWalletApiOptions,
   dependencies: BackgroundWalletDependencies

@@ -9,6 +9,9 @@
       "path": "../../cip2/src"
     },
     {
+      "path": "../../cip30/src"
+    },
+    {
       "path": "../../core/src"
     }
   ]

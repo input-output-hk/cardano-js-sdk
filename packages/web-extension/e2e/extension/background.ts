@@ -7,13 +7,8 @@ import {
   userPromptServiceChannel,
   walletName
 } from './util';
-import {
-  PersistentAuthenticator,
-  RequestAccess,
-  createPersistentAuthenticatorStorage,
-  initializeBackgroundScript
-} from '@cardano-sdk/cip30';
-import { RemoteApiPropertyType, consumeRemoteApi, exposeApi } from '@cardano-sdk/web-extension';
+import { PersistentAuthenticator, RequestAccess, createPersistentAuthenticatorStorage } from '@cardano-sdk/cip30';
+import { RemoteApiPropertyType, cip30, consumeRemoteApi, exposeApi } from '@cardano-sdk/web-extension';
 import { Tabs, runtime, storage, tabs } from 'webextension-polyfill';
 import { of } from 'rxjs';
 import { stubWalletApi } from './stubWalletApi';
@@ -70,6 +65,7 @@ exposeApi(
 
 void (async () => {
   // TODO: test with real wallet once blockfrost load issue is resolved
+  // `cip30` here comes from 'wallet' package
   // const confirmationCallback: cip30.CallbackConfirmation = async () => true;
   // const wallet = new SingleAddressWallet(
   //   { name: walletName },
@@ -93,5 +89,5 @@ void (async () => {
     { logger, storage: authenticatorStorage }
   );
   await authenticator.clear(); // needed for e2e tests
-  initializeBackgroundScript({ walletName }, { authenticator, logger, runtime, walletApi });
+  cip30.initializeBackgroundScript({ walletName }, { authenticator, logger, runtime, walletApi });
 })();

@@ -1,8 +1,8 @@
-import { initializeContentScript } from '@cardano-sdk/cip30';
+import { cip30 } from '@cardano-sdk/web-extension';
 import { runtime } from 'webextension-polyfill';
 import { walletName } from './util';
 
-initializeContentScript(
+cip30.initializeContentScript(
   { injectedScriptSrc: runtime.getURL('injectedScript.js'), walletName },
   { logger: console, runtime }
 );

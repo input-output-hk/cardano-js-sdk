@@ -1,13 +1,13 @@
-// tested in web-extension/e2e tests
-import { MessengerDependencies, runContentScriptMessageProxy } from '@cardano-sdk/web-extension';
-import { consumeRemoteAuthenticatorApi } from '../AuthenticatorApi';
-import { consumeRemoteWalletApi } from '../WalletApi';
+import { MessengerDependencies, runContentScriptMessageProxy } from '../messaging';
+import { consumeRemoteAuthenticatorApi } from './consumeRemoteAuthenticatorApi ';
+import { consumeRemoteWalletApi } from './consumeRemoteWalletApi';
 
 export interface InitializeContentScriptProps {
   walletName: string;
   injectedScriptSrc: string;
 }
 
+// tested in e2e tests
 export const initializeContentScript = (
   { injectedScriptSrc, walletName }: InitializeContentScriptProps,
   dependencies: MessengerDependencies

@@ -1,4 +1,4 @@
 export * from './errors';
 export * from './WalletApi';
 export * from './AuthenticatorApi';
-export * from './WebExtensionEntrypoints';
+export * from './injectGlobal';

@@ -1,11 +1,5 @@
-// tested in web-extension/e2e tests
-import {
-  MessengerDependencies,
-  RemoteApiProperties,
-  RemoteApiPropertyType,
-  consumeRemoteApi
-} from '@cardano-sdk/web-extension';
-import { RemoteAuthenticator, RemoteAuthenticatorMethod } from './types';
+import { MessengerDependencies, RemoteApiProperties, RemoteApiPropertyType, consumeRemoteApi } from '../messaging';
+import { RemoteAuthenticator, RemoteAuthenticatorMethod } from '@cardano-sdk/cip30';
 import { authenticatorChannel } from './util';
 
 export const RemoteAuthenticatorMethodNames: Array<RemoteAuthenticatorMethod> = [
@@ -18,6 +12,7 @@ export interface RemoteAuthenticatorApiProps {
   walletName: string;
 }
 
+// tested in e2e tests
 export const consumeRemoteAuthenticatorApi = (
   { walletName }: RemoteAuthenticatorApiProps,
   dependencies: MessengerDependencies

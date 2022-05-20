@@ -1,7 +1,7 @@
-import { ApiError } from '../../src/errors';
-import { Cip30Wallet } from '../../src/WalletApi';
-import { RemoteAuthenticator, WindowMaybeWithCardano, injectGlobal } from '../../src';
-import { api, properties, stubAuthenticator } from '../testWallet';
+import { ApiError } from '../src/errors';
+import { Cip30Wallet } from '../src/WalletApi';
+import { RemoteAuthenticator, WindowMaybeWithCardano, injectGlobal } from '../src';
+import { api, properties, stubAuthenticator } from './testWallet';
 import { dummyLogger } from 'ts-log';
 import { mocks } from 'mock-browser';
 

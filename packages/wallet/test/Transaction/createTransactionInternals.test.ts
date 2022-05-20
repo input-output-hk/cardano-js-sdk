@@ -1,6 +1,6 @@
 import { Cardano, WalletProvider } from '@cardano-sdk/core';
 import { CreateTxInternalsProps, createTransactionInternals } from '../../src/Transaction';
-import { SelectionConstraints } from '@cardano-sdk/util-dev';
+import { SelectionConstraints } from '../../../cip2/test/util';
 import { SelectionSkeleton, roundRobinRandomImprove } from '@cardano-sdk/cip2';
 import { mockWalletProvider, utxo } from '../mocks';
 

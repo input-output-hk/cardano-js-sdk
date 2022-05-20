@@ -1,3 +1,4 @@
+import * as AssetId from '../AssetId';
 import {
   Address,
   BlockId,
@@ -14,7 +15,6 @@ import {
   TxOut,
   Withdrawal
 } from '../../src/Cardano';
-import { AssetId } from '@cardano-sdk/util-dev';
 import {
   createTxInspector,
   delegationInspector,

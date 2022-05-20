@@ -1,7 +1,7 @@
+import * as SelectionConstraints from './selectionConstraints';
 import { Cardano } from '@cardano-sdk/core';
 import { InputSelectionError, InputSelectionFailure } from '../../src/InputSelectionError';
 import { InputSelector } from '../../src/types';
-import { SelectionConstraints } from '@cardano-sdk/util-dev';
 import { assertInputSelectionProperties } from './properties';
 
 export interface InputSelectionPropertiesTestParams {

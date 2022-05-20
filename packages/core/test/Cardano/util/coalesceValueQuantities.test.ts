@@ -1,5 +1,5 @@
-import { AssetId } from '@cardano-sdk/util-dev';
-import { Cardano } from '@cardano-sdk/core';
+import * as AssetId from '../../AssetId';
+import { Cardano } from '../../../src';
 
 describe('Cardano.util.coalesceValueQuantities', () => {
   it('coin only', () => {
