@@ -1,6 +1,8 @@
 import { Cardano } from '../../..';
 
 type FilterCondition = 'and' | 'or';
+type SortOrder = 'asc' | 'desc';
+type SortField = 'name';
 
 export interface MultipleChoiceSearchFilter<T> {
   /**
@@ -11,6 +13,13 @@ export interface MultipleChoiceSearchFilter<T> {
 }
 
 export interface StakePoolQueryOptions {
+  /**
+   * Will return all stake pools sorted by name ascending if not specified
+   */
+  sort?: {
+    order: SortOrder;
+    field: SortField;
+  };
   /**
    * Will fetch all stake pools if not specified
    */
