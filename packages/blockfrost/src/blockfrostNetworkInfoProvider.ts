@@ -1,5 +1,5 @@
 import { BlockFrostAPI } from '@blockfrost/blockfrost-js';
-import { NetworkInfoProvider, ProviderError, ProviderFailure, testnetTimeSettings } from '@cardano-sdk/core';
+import { Cardano, NetworkInfoProvider, ProviderError, ProviderFailure, testnetTimeSettings } from '@cardano-sdk/core';
 
 /**
  * Connect to the [Blockfrost service](https://docs.blockfrost.io/)
@@ -21,6 +21,7 @@ export const blockfrostNetworkInfoProvider = (blockfrost: BlockFrostAPI): Networ
         total: BigInt(supply.total)
       },
       network: {
+        id: Cardano.NetworkId.testnet,
         magic: 1_097_911_063,
         timeSettings: testnetTimeSettings
       },

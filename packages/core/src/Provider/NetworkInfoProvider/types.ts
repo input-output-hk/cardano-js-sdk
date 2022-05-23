@@ -13,6 +13,7 @@ export type StakeSummary = {
 
 export type NetworkInfo = {
   network: {
+    id: Cardano.NetworkId;
     magic: Cardano.NetworkMagic;
     timeSettings: TimeSettings[];
   };

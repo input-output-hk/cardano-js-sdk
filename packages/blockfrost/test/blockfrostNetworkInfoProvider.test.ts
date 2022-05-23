@@ -1,5 +1,5 @@
 import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
-import { NetworkInfo, testnetTimeSettings } from '@cardano-sdk/core';
+import { Cardano, NetworkInfo, testnetTimeSettings } from '@cardano-sdk/core';
 import { blockfrostNetworkInfoProvider } from '../src';
 jest.mock('@blockfrost/blockfrost-js');
 
@@ -34,6 +34,7 @@ describe('blockfrostNetworkInfoProvider', () => {
         total: 40_267_211_394_073_980n
       },
       network: {
+        id: Cardano.NetworkId.testnet,
         magic: 1_097_911_063,
         timeSettings: testnetTimeSettings
       },
