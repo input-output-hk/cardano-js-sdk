@@ -12,7 +12,7 @@ import {
 import { KeyAgentBase } from './KeyAgentBase';
 import { TxInternals } from '../Transaction';
 import { txToLedger } from './util';
-import LedgerConnection, { GetVersionResponse, HARDENED, utils } from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import LedgerConnection, { GetVersionResponse, utils } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents';
 import TransportWebHID from '@ledgerhq/hw-transport-webhid';
 import type LedgerTransport from '@ledgerhq/hw-transport';
@@ -243,7 +243,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
         await Promise.all(
           result.witnesses.map(async (witness) => {
             const publicKey = await this.derivePublicKey({
-              index: HARDENED - witness.path[2],
+              index: witness.path[4],
               role: witness.path[3]
             });
             const signature = Cardano.Ed25519Signature(witness.witnessSignatureHex);
