@@ -22,4 +22,5 @@ WHERE NOT EXISTS
   tx_out.index = tx_in.tx_out_index
 WHERE tx_outer.id = tx_out.id
   ) AND address = ANY($1)
+ORDER BY tx_outer.id, ma_tx_out.id ASC
 `;

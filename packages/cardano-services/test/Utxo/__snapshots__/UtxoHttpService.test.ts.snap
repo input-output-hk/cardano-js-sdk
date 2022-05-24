@@ -12,8 +12,8 @@ Array [
       "address": "addr_test1qretqkqqvc4dax3482tpjdazrfl8exey274m3mzch3dv8lu476aeq3kd8q8splpsswcfmv4y370e8r76rc8lnnhte49qqyjmtc",
       "value": Object {
         "assets": Map {
-          "8615849a049172dcd729fc3185032b266ceeba4dc21a0e61e713ebf85445535432" => 1n,
           "4eecf4013e2ab14ec8e500fafeafbdf2bd060254d76c9629a65b7f7054455354" => 1n,
+          "8615849a049172dcd729fc3185032b266ceeba4dc21a0e61e713ebf85445535432" => 1n,
         },
         "coins": 2200000n,
       },
@@ -52,19 +52,6 @@ Array [
   ],
   Array [
     Object {
-      "address": "addr_test1qpcnmvyjmxmsm75f747u566gw7ewz4mesdw7yl278uf9r3f5l7d7dpx2ymfwlm3e56flupga8yamjr2kwdt7dw77ktyqqtx2r7",
-      "index": 0,
-      "txId": "19251f57476d7af2777252270413c01383d9503110a68b4fde1a239c119c4f5d",
-    },
-    Object {
-      "address": "addr_test1qpcnmvyjmxmsm75f747u566gw7ewz4mesdw7yl278uf9r3f5l7d7dpx2ymfwlm3e56flupga8yamjr2kwdt7dw77ktyqqtx2r7",
-      "value": Object {
-        "coins": 1497246388n,
-      },
-    },
-  ],
-  Array [
-    Object {
       "address": "addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp",
       "index": 0,
       "txId": "a62624fdc47e8b774ddff11a9a56cae5fa9b072975af87bf0a0583fca0e345f4",
@@ -76,28 +63,24 @@ Array [
       },
     },
   ],
+  Array [
+    Object {
+      "address": "addr_test1qpcnmvyjmxmsm75f747u566gw7ewz4mesdw7yl278uf9r3f5l7d7dpx2ymfwlm3e56flupga8yamjr2kwdt7dw77ktyqqtx2r7",
+      "index": 0,
+      "txId": "19251f57476d7af2777252270413c01383d9503110a68b4fde1a239c119c4f5d",
+    },
+    Object {
+      "address": "addr_test1qpcnmvyjmxmsm75f747u566gw7ewz4mesdw7yl278uf9r3f5l7d7dpx2ymfwlm3e56flupga8yamjr2kwdt7dw77ktyqqtx2r7",
+      "value": Object {
+        "coins": 1497246388n,
+      },
+    },
+  ],
 ]
 `;
 
 exports[`UtxoHttpService healthy state /utxo-by-addresses returns UTxOs containing multiple assets 1`] = `
 Array [
-  Array [
-    Object {
-      "address": "addr_test1qrcj98ukemwfuwc72ad95yydnx83qch6s7plr8rg44nxv53fumt3ljeck26752eajzyavd8my3cp8cx3x2c538lx7h5swm4j4n",
-      "index": 1,
-      "txId": "573b137128145227be0f46da6408d8890ab265d238fc638f690950724eab0473",
-    },
-    Object {
-      "address": "addr_test1qrcj98ukemwfuwc72ad95yydnx83qch6s7plr8rg44nxv53fumt3ljeck26752eajzyavd8my3cp8cx3x2c538lx7h5swm4j4n",
-      "value": Object {
-        "assets": Map {
-          "8615849a049172dcd729fc3185032b266ceeba4dc21a0e61e713ebf85445535432" => 998762n,
-          "4eecf4013e2ab14ec8e500fafeafbdf2bd060254d76c9629a65b7f7054455354" => 998762n,
-        },
-        "coins": 100233833966n,
-      },
-    },
-  ],
   Array [
     Object {
       "address": "addr_test1qretqkqqvc4dax3482tpjdazrfl8exey274m3mzch3dv8lu476aeq3kd8q8splpsswcfmv4y370e8r76rc8lnnhte49qqyjmtc",
@@ -108,10 +91,27 @@ Array [
       "address": "addr_test1qretqkqqvc4dax3482tpjdazrfl8exey274m3mzch3dv8lu476aeq3kd8q8splpsswcfmv4y370e8r76rc8lnnhte49qqyjmtc",
       "value": Object {
         "assets": Map {
-          "8615849a049172dcd729fc3185032b266ceeba4dc21a0e61e713ebf85445535432" => 1n,
           "4eecf4013e2ab14ec8e500fafeafbdf2bd060254d76c9629a65b7f7054455354" => 1n,
+          "8615849a049172dcd729fc3185032b266ceeba4dc21a0e61e713ebf85445535432" => 1n,
         },
         "coins": 2200000n,
+      },
+    },
+  ],
+  Array [
+    Object {
+      "address": "addr_test1qrcj98ukemwfuwc72ad95yydnx83qch6s7plr8rg44nxv53fumt3ljeck26752eajzyavd8my3cp8cx3x2c538lx7h5swm4j4n",
+      "index": 1,
+      "txId": "573b137128145227be0f46da6408d8890ab265d238fc638f690950724eab0473",
+    },
+    Object {
+      "address": "addr_test1qrcj98ukemwfuwc72ad95yydnx83qch6s7plr8rg44nxv53fumt3ljeck26752eajzyavd8my3cp8cx3x2c538lx7h5swm4j4n",
+      "value": Object {
+        "assets": Map {
+          "4eecf4013e2ab14ec8e500fafeafbdf2bd060254d76c9629a65b7f7054455354" => 998762n,
+          "8615849a049172dcd729fc3185032b266ceeba4dc21a0e61e713ebf85445535432" => 998762n,
+        },
+        "coins": 100233833966n,
       },
     },
   ],
