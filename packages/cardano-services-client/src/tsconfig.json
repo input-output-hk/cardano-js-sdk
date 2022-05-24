@@ -5,7 +5,6 @@
     "rootDir": "."
   },
   "references": [
-    { "path": "../../cardano-services/src" },
     { "path": "../../core/src" }
   ]
 }

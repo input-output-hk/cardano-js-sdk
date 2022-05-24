@@ -4,20 +4,10 @@
     "baseUrl": "."
   },
   "references": [
-    {
-      "path": "../src"
-    },
-    {
-      "path": "../../core/src"
-    },
-    {
-      "path": "../../util-dev/src"
-    },
-    {
-      "path": "../../cip30/src"
-    },
-    {
-      "path": "../../wallet/src"
-    }
+    { "path": "../../cip30/src" },
+    { "path": "../../core/src" },
+    { "path": "../../util-dev/src" },
+    { "path": "../../wallet/src" },
+    { "path": "../src" }
   ]
 }
