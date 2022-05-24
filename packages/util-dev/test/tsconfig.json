@@ -5,7 +5,6 @@
   },
   "references": [
     { "path": "../src" },
-    { "path": "../../core/src" },
-    { "path": "../../cip2/src" }
+    { "path": "../../core/src" }
   ]
 }
