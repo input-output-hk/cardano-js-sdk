@@ -1,0 +1,168 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "UTxO",
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/utxo/utxo-by-addresses": {
+      "post": {
+        "summary": "UTxO search",
+        "operationId": "utxoSearch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/utxo_search_body"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "success operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UtxoSearchRequest"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "TypifiedValue": {
+        "required": ["value"],
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        }
+      },
+      "UtxoSearchRequest": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Utxo"
+        }
+      },
+      "Address": {
+        "type": "string",
+        "example": "addr_test1qpu5vlrf4xkxv2qpwngf6cjhtw542ayty80v8dyr49rf5ewvxwdrt70qlcpeeagscasafhffqsxy36t90ldv06wqrk2qum8x5w"
+      },
+      "Value": {
+        "required": ["coins"],
+        "type": "object",
+        "properties": {
+          "coins": {
+            "$ref": "#/components/schemas/TypifiedValue"
+          },
+          "assets": {
+            "type": "object"
+          }
+        }
+      },
+      "TxIn": {
+        "required": ["address", "index", "txId"],
+        "type": "object",
+        "properties": {
+          "address": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "txId": {
+            "type": "string",
+            "description": "transaction hash as hex string"
+          },
+          "index": {
+            "type": "number"
+          }
+        },
+        "example": [
+          {
+            "address": "addr_test1qpu5vlrf4xkxv2qpwngf6cjhtw542ayty80v8dyr49rf5ewvxwdrt70qlcpeeagscasafhffqsxy36t90ldv06wqrk2qum8x5w",
+            "txId": "0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5",
+            "index": 2
+          }
+        ]
+      },
+      "TxOut": {
+        "required": ["address", "value"],
+        "type": "object",
+        "properties": {
+          "address": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "value": {
+            "$ref": "#/components/schemas/Value"
+          },
+          "datum": {
+            "type": "string"
+          }
+        },
+        "example": [
+          {
+            "address": "addr_test1qpu5vlrf4xkxv2qpwngf6cjhtw542ayty80v8dyr49rf5ewvxwdrt70qlcpeeagscasafhffqsxy36t90ldv06wqrk2qum8x5w",
+            "value": {
+              "coins": {
+                "value": "1113490289"
+              },
+              "assets": {
+                "5ee467ea4ef07b6f41d88d26ea4c872db6f47ddf27c0d7d3745462a84552474f": {
+                  "value": 12399942
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Utxo": {
+        "type": "array",
+        "items": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/TxOut"
+            },
+            {
+              "$ref": "#/components/schemas/TxIn"
+            }
+          ]
+        }
+      },
+      "utxo_search_body": {
+        "required": ["args"],
+        "type": "object",
+        "properties": {
+          "args": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "array",
+              "items":{
+                "$ref": "#/components/schemas/Address"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -4,6 +4,7 @@ import {
   mockAssetProvider,
   mockNetworkInfoProvider,
   mockTxSubmitProvider,
+  mockUtxoProvider,
   mockWalletProvider,
   testKeyAgent
 } from '../mocks';
@@ -15,6 +16,7 @@ export const createWallet = async () => {
   const stakePoolSearchProvider = createStubStakePoolSearchProvider();
   const networkInfoProvider = mockNetworkInfoProvider();
   const assetProvider = mockAssetProvider();
+  const utxoProvider = mockUtxoProvider();
   return new SingleAddressWallet(
     { name: 'Test Wallet' },
     {
@@ -23,6 +25,7 @@ export const createWallet = async () => {
       networkInfoProvider,
       stakePoolSearchProvider,
       txSubmitProvider,
+      utxoProvider,
       walletProvider
     }
   );

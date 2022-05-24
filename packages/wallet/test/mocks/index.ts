@@ -4,3 +4,4 @@ export * from './mockTxSubmitProvider';
 export * from './testKeyAgent';
 export * from './mockAssetProvider';
 export * from './mockNetworkInfoProvider';
+export * from './mockUtxoProvider';

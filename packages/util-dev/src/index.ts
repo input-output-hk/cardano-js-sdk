@@ -5,3 +5,4 @@ export * from './util';
 export * from './createStubStakePoolSearchProvider';
 export * from './stubLogger';
 export * from './testScheduler';
+export * from './createStubUtxoProvider';

@@ -51,7 +51,6 @@ export interface WalletProvider {
   // move stakePoolStats out to other provider type, since it's not required for wallet operation.
   // Perhaps generalize StakePoolSearchProvider?
   stakePoolStats?: () => Promise<StakePoolStats>;
-  utxoByAddresses: (addresses: Cardano.Address[]) => Promise<Cardano.Utxo[]>;
   /**
    * @param {Cardano.BlockNo} sinceBlock inclusive
    */

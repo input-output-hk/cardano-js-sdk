@@ -78,7 +78,7 @@ describe('StakePoolSearchHttpService', () => {
 
     describe('/health', () => {
       it('forwards the stakePoolSearchProvider health response', async () => {
-        const res = await axios.get(`${apiUrlBase}/health`, {
+        const res = await axios.post(`${apiUrlBase}/health`, {
           headers: { 'Content-Type': APPLICATION_JSON }
         });
         expect(res.status).toBe(200);

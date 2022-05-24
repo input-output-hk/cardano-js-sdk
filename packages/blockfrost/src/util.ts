@@ -129,3 +129,23 @@ export const blockfrostMetadataToTxMetadata = (
     map.set(BigInt(label), jsonToMetadatum(json_metadata));
     return map;
   }, new Map<bigint, Cardano.Metadatum>());
+
+export const fetchByAddressSequentially = async <Item, Response>(props: {
+  address: Cardano.Address;
+  request: (address: Cardano.Address, pagination: PaginationOptions) => Promise<Response[]>;
+  responseTranslator?: (address: Cardano.Address, response: Response[]) => Item[];
+  /**
+   * @returns true to indicatate that current result set should be returned
+   */
+  haveEnoughItems?: (items: Item[]) => boolean;
+  paginationOptions?: PaginationOptions;
+}): Promise<Item[]> =>
+  fetchSequentially({
+    arg: props.address,
+    haveEnoughItems: props.haveEnoughItems,
+    paginationOptions: props.paginationOptions,
+    request: props.request,
+    responseTranslator: props.responseTranslator
+      ? (response, arg) => props.responseTranslator!(arg, response)
+      : undefined
+  });

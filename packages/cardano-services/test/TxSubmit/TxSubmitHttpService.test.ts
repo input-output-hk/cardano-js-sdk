@@ -48,7 +48,7 @@ describe('TxSubmitHttpService', () => {
     let isOk: () => boolean;
     // eslint-disable-next-line unicorn/consistent-function-scoping
     const serverHealth = async () => {
-      const response = await axios.get(`${apiUrlBase}/health`, {
+      const response = await axios.post(`${apiUrlBase}/health`, {
         headers: { [CONTENT_TYPE]: APPLICATION_JSON }
       });
       return response.data;
@@ -102,7 +102,7 @@ describe('TxSubmitHttpService', () => {
 
     describe('/health', () => {
       it('forwards the txSubmitProvider health response', async () => {
-        const res = await axios.get(`${apiUrlBase}/health`, {
+        const res = await axios.post(`${apiUrlBase}/health`, {
           headers: { [CONTENT_TYPE]: APPLICATION_JSON }
         });
         expect(res.status).toBe(200);

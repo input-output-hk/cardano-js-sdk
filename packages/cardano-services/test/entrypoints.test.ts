@@ -15,7 +15,7 @@ const exePath = (name: 'cli' | 'run') => path.join(__dirname, '..', 'dist', `${n
 const assertServiceHealthy = async (apiUrl: string, serviceName: ServiceNames) => {
   await serverReady(apiUrl);
   const headers = { 'Content-Type': 'application/json' };
-  const res = await axios.get(`${apiUrl}/${serviceName}/health`, { headers });
+  const res = await axios.post(`${apiUrl}/${serviceName}/health`, { headers });
   expect(res.status).toBe(200);
   expect(res.data).toEqual({ ok: true });
 };

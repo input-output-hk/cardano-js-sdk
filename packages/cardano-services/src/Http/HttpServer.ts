@@ -1,6 +1,6 @@
 import { HttpService } from './HttpService';
 import { Logger, dummyLogger } from 'ts-log';
-import { ProviderError, util } from '@cardano-sdk/core';
+import { ProviderError, ProviderFailure, util } from '@cardano-sdk/core';
 import { RunnableModule } from '../RunnableModule';
 import { listenPromise, serverClosePromise } from '../util';
 import bodyParser, { Options } from 'body-parser';
@@ -65,10 +65,7 @@ export class HttpServer extends RunnableModule {
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.app.use((err: any, _req: express.Request, res: express.Response, _n: express.NextFunction) => {
-      res.status(err.status || 500).json({
-        errors: err.errors || [],
-        message: err.message || 'Unkown Error'
-      });
+      HttpServer.sendJSON(res, new ProviderError(ProviderFailure.Unhealthy, err), err.status || 500);
     });
   }
 

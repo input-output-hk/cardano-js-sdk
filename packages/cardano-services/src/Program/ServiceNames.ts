@@ -4,5 +4,6 @@
  */
 export enum ServiceNames {
   StakePoolSearch = 'stake-pool-search',
-  TxSubmit = 'tx-submit'
+  TxSubmit = 'tx-submit',
+  Utxo = 'utxo'
 }

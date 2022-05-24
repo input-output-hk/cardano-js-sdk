@@ -212,7 +212,7 @@ describe('HttpServer', () => {
     });
 
     it('health', async () => {
-      const res = await axios.get(`${apiUrlBase}/some-http-service/health`, {
+      const res = await axios.post(`${apiUrlBase}/some-http-service/health`, {
         headers: { [CONTENT_TYPE]: 'application/json' }
       });
       expect(res.status).toBe(200);

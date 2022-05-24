@@ -1,5 +1,5 @@
 import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
-import { BlockfrostToCore, BlockfrostTransactionContent, BlockfrostUtxo } from './BlockfrostToCore';
+import { BlockfrostToCore, BlockfrostTransactionContent } from './BlockfrostToCore';
 import {
   Cardano,
   EpochRange,
@@ -70,20 +70,6 @@ export const blockfrostWalletProvider = (blockfrost: BlockFrostAPI, logger = dum
         retiring: await tallyPools('poolsRetiring')
       }
     };
-  };
-
-  const utxoByAddresses: WalletProvider['utxoByAddresses'] = async (addresses) => {
-    const utxoResults = await Promise.all(
-      addresses.map(async (address) =>
-        fetchByAddressSequentially<Cardano.Utxo, BlockfrostUtxo>({
-          address,
-          request: (addr: Cardano.Address, pagination) => blockfrost.addressesUtxos(addr.toString(), pagination),
-          responseTranslator: (addr: Cardano.Address, response: Responses['address_utxo_content']) =>
-            BlockfrostToCore.addressUtxoContent(addr.toString(), response)
-        })
-      )
-    );
-    return utxoResults.flat(1);
   };
 
   const rewards: WalletProvider['rewardAccountBalance'] = async (rewardAccount: Cardano.RewardAccount) => {
@@ -411,8 +397,7 @@ export const blockfrostWalletProvider = (blockfrost: BlockFrostAPI, logger = dum
     rewardsHistory,
     stakePoolStats,
     transactionsByAddresses,
-    transactionsByHashes,
-    utxoByAddresses
+    transactionsByHashes
   };
 
   return ProviderUtil.withProviderErrors(providerFunctions, toProviderError);
