@@ -50,6 +50,7 @@ module.exports = {
       /@emurgo\/cardano-serialization-lib-nodejs/,
       '@emurgo/cardano-serialization-lib-asmjs'
     ),
+    new NormalModuleReplacementPlugin(/blake2b$/, 'blake2b-no-wasm'),
     new NormalModuleReplacementPlugin(
       /@emurgo\/cardano-message-signing-nodejs/,
       '@emurgo/cardano-message-signing-asmjs'

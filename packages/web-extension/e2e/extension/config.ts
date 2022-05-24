@@ -12,6 +12,7 @@ import { KeyManagement } from '@cardano-sdk/wallet';
 import { Logger } from 'ts-log';
 import { createStubStakePoolSearchProvider } from '@cardano-sdk/util-dev';
 import { memoize } from 'lodash-es';
+import axiosFetchAdapter from '@vespaiach/axios-fetch-adapter';
 
 const loggerMethodNames = ['debug', 'error', 'fatal', 'info', 'trace', 'warn'] as (keyof Logger)[];
 const networkIdOptions = [0, 1];
@@ -57,7 +58,12 @@ const blockfrostApi = [
 ].includes('blockfrost')
   ? (async () => {
       logger.debug('WalletProvider:blockfrost - Initializing');
-      const blockfrost = new BlockFrostAPI({ isTestnet, projectId: env.BLOCKFROST_API_KEY });
+      const blockfrost = new BlockFrostAPI({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        adapter: axiosFetchAdapter as any, // type mismatch: adapter uses axios 0.26, while blockfrost-js uses 0.21
+        isTestnet,
+        projectId: env.BLOCKFROST_API_KEY
+      });
       logger.debug('WalletProvider:blockfrost - Responding');
       return blockfrost;
     })()

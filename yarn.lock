@@ -2064,6 +2064,11 @@
   resolved "https://registry.yarnpkg.com/@ungap/promise-all-settled/-/promise-all-settled-1.1.2.tgz#aa58042711d6e3275dd37dc597e5d31e8c290a44"
   integrity sha512-sL/cEvJWAnClXw0wHk85/2L0G6Sj8UB0Ctc1TEMbKSsmpRosqhwj9gWgFRZSrBr2f9tiXISwNhCPmlfqUqyb9Q==
 
+"@vespaiach/axios-fetch-adapter@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@vespaiach/axios-fetch-adapter/-/axios-fetch-adapter-0.3.0.tgz#abbd23478260a317165d0c52297306af9d39bb24"
+  integrity sha512-X3U9VANu+8R4Wu/77bAUiUSqgeTelDFZeJcGZDe63DiFcPI6onjrMWrG3py/N4Qf8qCU3YLq+wO2d8V6ftYcaw==
+
 "@wdio/cli@^7.19.5":
   version "7.19.5"
   resolved "https://registry.yarnpkg.com/@wdio/cli/-/cli-7.19.5.tgz#864809960ab6026d67aa070f79f0aea962db53e0"
@@ -3063,6 +3068,13 @@ blake2@^4.0.2:
   integrity sha512-HUmkY0MUDUVgejJVNrpNKAva8C4IWD/Rd862sdexoSibu86b6iu0gO0/RjovO2lM5+w6JqjIEmkuAgGhfHlnJw==
   dependencies:
     nan "^2.15.0"
+
+blake2b-no-wasm@2.1.4:
+  version "2.1.4"
+  resolved "https://registry.yarnpkg.com/blake2b-no-wasm/-/blake2b-no-wasm-2.1.4.tgz#6bf50513a5992d891f56f0399320d4102fd8b91d"
+  integrity sha512-FgIm7QzTWW149jBZuLG3cbl3HOs1MXI4HsCAN6PxdTdHS0ansh5qMt5R2hCh+2sGZxny87dKsLGEsDDOkCureA==
+  dependencies:
+    nanoassert "^2.0.0"
 
 blake2b-wasm@^1.1.0:
   version "1.1.7"
@@ -7855,6 +7867,11 @@ nanoassert@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/nanoassert/-/nanoassert-1.1.0.tgz#4f3152e09540fde28c76f44b19bbcd1d5a42478d"
   integrity sha1-TzFS4JVA/eKMdvRLGbvNHVpCR40=
+
+nanoassert@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/nanoassert/-/nanoassert-2.0.0.tgz#a05f86de6c7a51618038a620f88878ed1e490c09"
+  integrity sha512-7vO7n28+aYO4J+8w96AzhmU8G+Y/xpPDJz/se19ICsqj/momRbb9mh9ZUtkoJ5X3nTnPdhEJyc0qnM6yAsHBaA==
 
 nanoid@3.3.1:
   version "3.3.1"
