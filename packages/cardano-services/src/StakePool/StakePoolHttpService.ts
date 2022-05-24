@@ -40,6 +40,13 @@ export class StakePoolHttpService extends HttpService {
         logger
       )
     );
+    router.post(
+      '/stats',
+      providerHandler(stakePoolProvider.stakePoolStats.bind(stakePoolProvider))(
+        HttpService.routeHandler(logger),
+        logger
+      )
+    );
     return new StakePoolHttpService({ logger, stakePoolProvider }, router);
   }
 }

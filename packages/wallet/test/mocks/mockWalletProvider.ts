@@ -206,14 +206,6 @@ export const genesisParameters = {
   updateQuorum: 5
 };
 
-export const stakePoolStats = {
-  qty: {
-    active: 1000,
-    retired: 500,
-    retiring: 5
-  }
-};
-
 export const blocksByHashes = [{ epoch: currentEpoch.number - 3 } as Cardano.Block];
 
 /**
@@ -228,7 +220,6 @@ export const mockWalletProvider = () => ({
   ledgerTip: jest.fn().mockResolvedValue(ledgerTip),
   rewardAccountBalance: jest.fn().mockResolvedValue(rewardAccountBalance),
   rewardsHistory: jest.fn().mockResolvedValue(rewardsHistory),
-  stakePoolStats: jest.fn().mockResolvedValue(stakePoolStats),
   transactionsByAddresses: queryTransactions(),
   transactionsByHashes: queryTransactions(),
   utxoByAddresses: jest.fn().mockResolvedValue(utxo)

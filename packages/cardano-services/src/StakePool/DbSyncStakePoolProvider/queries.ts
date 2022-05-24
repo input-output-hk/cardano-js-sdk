@@ -697,12 +697,68 @@ SELECT
 FROM (${query}) as query
 `;
 
+export const findPoolStats = `
+WITH current_epoch AS (
+	SELECT max(epoch_no) AS epoch_no 
+	FROM block
+),
+last_pool_update AS (
+	SELECT 
+		pool_update.hash_id,
+		pool_update.registered_tx_id,
+		pool_update.active_epoch_no
+	FROM pool_update 
+	JOIN (
+		SELECT hash_id, max(registered_tx_id) AS tx_id
+		FROM pool_update
+		WHERE active_epoch_no <= (SELECT epoch_no FROM current_epoch)
+		GROUP BY hash_id
+	) AS last_update ON pool_update.hash_id = last_update.hash_id 
+	AND pool_update.registered_tx_id = last_update.tx_id
+),
+last_pool_retire AS (
+	SELECT 
+		pool_retire.hash_id, 
+		max(pool_retire.announced_tx_id) AS announced_tx_id, 
+		pool_retire.retiring_epoch FROM pool_retire 
+	JOIN (
+		SELECT hash_id, max(retiring_epoch) AS epoch
+		FROM pool_retire
+		GROUP BY hash_id
+	) AS last_retired ON pool_retire.hash_id = last_retired.hash_id 
+	AND pool_retire.retiring_epoch = last_retired.epoch
+	GROUP BY pool_retire.hash_id, pool_retire.retiring_epoch
+)
+SELECT 
+	count(
+		CASE WHEN pool_retire.hash_id IS NULL
+			OR (
+				pool_update.active_epoch_no > pool_retire.retiring_epoch
+				AND pool_retire.retiring_epoch <= (SELECT epoch_no FROM current_epoch)
+			) THEN 1 ELSE NULL END) AS active,
+	count(
+		CASE WHEN pool_retire.hash_id IS NOT NULL
+			AND (
+				pool_update.active_epoch_no <= pool_retire.retiring_epoch
+				AND pool_retire.retiring_epoch <= (SELECT epoch_no FROM current_epoch)
+			) THEN 1 ELSE NULL END) AS retired,
+	count(
+		CASE WHEN pool_retire.hash_id IS NOT NULL
+			AND (
+				pool_update.active_epoch_no <= pool_retire.retiring_epoch
+				AND pool_retire.retiring_epoch > (SELECT epoch_no FROM current_epoch)
+			) THEN 1 ELSE NULL END) AS retiring
+FROM last_pool_update AS pool_update 
+LEFT JOIN last_pool_retire AS pool_retire 
+	ON pool_update.hash_id = pool_retire.hash_id`;
+
 const Queries = {
   IDENTIFIER_QUERY,
   POOLS_WITH_PLEDGE_MET,
   STATUS_QUERY,
   findLastEpoch,
   findPoolEpochRewards,
+  findPoolStats,
   findPools,
   findPoolsData,
   findPoolsMetrics,

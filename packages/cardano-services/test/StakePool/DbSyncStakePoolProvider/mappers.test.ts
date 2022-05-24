@@ -1,4 +1,4 @@
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, StakePoolStats } from '@cardano-sdk/core';
 import {
   mapAddressOwner,
   mapEpochReward,
@@ -6,6 +6,7 @@ import {
   mapPoolMetrics,
   mapPoolRegistration,
   mapPoolRetirement,
+  mapPoolStats,
   mapPoolUpdate,
   mapRelay,
   toCoreStakePool
@@ -301,6 +302,11 @@ describe('mappers', () => {
         ],
         totalResultCount: totalCount
       });
+    });
+  });
+  it('mapPoolStats', () => {
+    expect(mapPoolStats({ active: '20', retired: '0', retiring: '1' })).toEqual<StakePoolStats>({
+      qty: { active: 20, retired: 0, retiring: 1 }
     });
   });
 });

@@ -12929,3 +12929,13 @@ Object {
   "totalResultCount": 3,
 }
 `;
+
+exports[`StakePoolHttpService healthy state /stats server and snapshot testing has active, retired and retiring stake pools count 1`] = `
+Object {
+  "qty": Object {
+    "active": 7,
+    "retired": 2,
+    "retiring": 0,
+  },
+}
+`;

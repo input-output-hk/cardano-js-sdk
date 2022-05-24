@@ -55,6 +55,14 @@ export interface StakePoolSearchResults {
   totalResultCount: number;
 }
 
+export interface StakePoolStats {
+  qty: {
+    active: number;
+    retired: number;
+    retiring: number;
+  };
+}
+
 export interface StakePoolProvider {
   /**
    * @param {StakePoolQueryOptions} options query options
@@ -62,4 +70,8 @@ export interface StakePoolProvider {
    * @throws ProviderError
    */
   queryStakePools: (options?: StakePoolQueryOptions) => Promise<StakePoolSearchResults>;
+  /**
+   * @returns {StakePoolStats} Stake pool stats
+   */
+  stakePoolStats: () => Promise<StakePoolStats>;
 }

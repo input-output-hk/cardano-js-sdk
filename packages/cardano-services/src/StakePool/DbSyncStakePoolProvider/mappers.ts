@@ -1,4 +1,4 @@
-import { Cardano, StakePoolSearchResults } from '@cardano-sdk/core';
+import { Cardano, StakePoolSearchResults, StakePoolStats } from '@cardano-sdk/core';
 import {
   EpochReward,
   EpochRewardModel,
@@ -15,7 +15,8 @@ import {
   PoolRetirementModel,
   PoolUpdate,
   PoolUpdateModel,
-  RelayModel
+  RelayModel,
+  StakePoolStatsModel
 } from './types';
 import Fraction from 'fraction.js';
 
@@ -189,4 +190,8 @@ export const mapPoolMetrics = (poolMetricsModel: PoolMetricsModel): PoolMetrics 
       live: BigInt(poolMetricsModel.live_stake)
     }
   }
+});
+
+export const mapPoolStats = (poolStats: StakePoolStatsModel): StakePoolStats => ({
+  qty: { active: Number(poolStats.active), retired: Number(poolStats.retired), retiring: Number(poolStats.retiring) }
 });

@@ -44,5 +44,13 @@ describe('TrackedStakePoolProvider', () => {
         (stats) => stats.queryStakePools$
       )
     );
+
+    test(
+      'stakePoolStats',
+      testFunctionStats(
+        (provider) => provider.stakePoolStats(),
+        (stats) => stats.stakePoolStats$
+      )
+    );
   });
 });

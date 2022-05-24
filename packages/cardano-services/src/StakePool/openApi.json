@@ -41,8 +41,29 @@
                       "type": "number"
                     }
                   }
-                  
                 }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid request"
+          }
+        }
+      }
+    },
+    "/stake-pool/stats": {
+      "post": {
+        "summary": "stake pool stats",
+        "operationId": "stakePoolStats",
+        "requestBody": {
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/StakePoolStats_body" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "Stake pool stats fetched",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/StakePoolStats" }
               }
             }
           },
@@ -55,6 +76,23 @@
   },
   "components": {
     "schemas": {
+      "StakePoolStats": {
+        "type": "object",
+        "properties": {
+          "qty": {
+            "type": "object",
+            "properties": {
+              "active": { "type": "number" },
+              "retired": { "type": "number" },
+              "retiring": { "type": "number" }
+            }
+          }
+        }
+      },
+      "StakePoolStats_body": {
+        "type": "object",
+        "properties": { "args": { "type": "array" } }
+      },
       "SearchStakePoolRequest": {
         "type": "object",
         "properties": {

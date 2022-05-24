@@ -136,3 +136,9 @@ export interface PoolMetrics {
 export interface TotalCountModel {
   total_count: number;
 }
+
+export interface StakePoolStatsModel {
+  active: string;
+  retired: string;
+  retiring: string;
+}

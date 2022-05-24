@@ -1,7 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-len */
-
-import { Cardano, StakePoolProvider, StakePoolQueryOptions, StakePoolSearchResults } from '@cardano-sdk/core';
+import {
+  Cardano,
+  StakePoolProvider,
+  StakePoolQueryOptions,
+  StakePoolSearchResults,
+  StakePoolStats
+} from '@cardano-sdk/core';
 import { DbSyncStakePoolProvider, HttpServer, HttpServerConfig, StakePoolHttpService } from '../../src';
 import { Pool } from 'pg';
 import { doServerRequest } from '../util';
@@ -655,6 +660,45 @@ describe('StakePoolHttpService', () => {
           ]);
 
           expect(responsePage).toMatchSnapshot();
+        });
+      });
+    });
+
+    describe('/stats', () => {
+      const url = '/stats';
+      it('returns a 200 coded response with a well formed HTTP request', async () => {
+        expect((await axios.post(`${apiUrlBase}${url}`, { args: [] })).status).toEqual(200);
+      });
+
+      it('returns a 415 coded response if the wrong content type header is used', async () => {
+        try {
+          await axios.post(`${apiUrlBase}${url}`, { args: [] }, { headers: { 'Content-Type': APPLICATION_CBOR } });
+          throw new Error('fail');
+        } catch (error: any) {
+          expect(error.response.status).toBe(415);
+          expect(error.message).toBe(UNSUPPORTED_MEDIA_STRING);
+        }
+      });
+
+      describe('with StakePoolHttpProvider', () => {
+        let provider: StakePoolProvider;
+        beforeEach(() => {
+          provider = stakePoolHttpProvider(apiUrlBase);
+        });
+
+        it('response is an object with stake pool stats', async () => {
+          const response = await provider.stakePoolStats();
+          expect(response.qty.active).toBe(7);
+          expect(response.qty.retired).toBe(2);
+          expect(response.qty.retiring).toBe(0);
+        });
+      });
+
+      describe('server and snapshot testing', () => {
+        it('has active, retired and retiring stake pools count', async () => {
+          const response = await doStakePoolRequest<[], StakePoolStats>(url, []);
+          expect(response.qty).toBeDefined();
+          expect(response).toMatchSnapshot();
         });
       });
     });

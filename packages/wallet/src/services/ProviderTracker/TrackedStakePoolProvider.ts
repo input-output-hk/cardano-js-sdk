@@ -4,13 +4,16 @@ import { StakePoolProvider } from '@cardano-sdk/core';
 
 export class StakePoolProviderStats {
   readonly queryStakePools$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
+  readonly stakePoolStats$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
 
   shutdown() {
     this.queryStakePools$.complete();
+    this.stakePoolStats$.complete();
   }
 
   reset() {
     this.queryStakePools$.next(CLEAN_FN_STATS);
+    this.stakePoolStats$.next(CLEAN_FN_STATS);
   }
 }
 
@@ -20,6 +23,7 @@ export class StakePoolProviderStats {
 export class TrackedStakePoolProvider extends ProviderTracker implements StakePoolProvider {
   readonly stats = new StakePoolProviderStats();
   readonly queryStakePools: StakePoolProvider['queryStakePools'];
+  readonly stakePoolStats: StakePoolProvider['stakePoolStats'];
 
   constructor(queryStakePoolsProvider: StakePoolProvider) {
     super();
@@ -27,5 +31,8 @@ export class TrackedStakePoolProvider extends ProviderTracker implements StakePo
 
     this.queryStakePools = (fragments) =>
       this.trackedCall(() => queryStakePoolsProvider.queryStakePools(fragments), this.stats.queryStakePools$);
+
+    this.stakePoolStats = () =>
+      this.trackedCall(() => queryStakePoolsProvider.stakePoolStats(), this.stats.stakePoolStats$);
   }
 }

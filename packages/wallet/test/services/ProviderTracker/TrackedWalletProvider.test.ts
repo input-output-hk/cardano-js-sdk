@@ -127,14 +127,5 @@ describe('TrackedWalletProvider', () => {
         (mockWP) => mockWP.rewardAccountBalance
       )
     );
-
-    test(
-      'stakePoolStats',
-      testFunctionStats(
-        (wp) => wp.stakePoolStats!(),
-        (stats) => stats.stakePoolStats$,
-        (mockWP) => mockWP.stakePoolStats
-      )
-    );
   });
 });

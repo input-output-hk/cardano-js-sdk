@@ -58,5 +58,15 @@ export const createStubStakePoolProvider = (
       pageResults,
       totalResultCount: pageResults.length
     };
+  },
+  stakePoolStats: async () => {
+    if (delayMs) await delay(delayMs);
+    return {
+      qty: {
+        active: stakePools.filter((pool) => pool.status === Cardano.StakePoolStatus.Active).length,
+        retired: stakePools.filter((pool) => pool.status === Cardano.StakePoolStatus.Retired).length,
+        retiring: stakePools.filter((pool) => pool.status === Cardano.StakePoolStatus.Retiring).length
+      }
+    };
   }
 });

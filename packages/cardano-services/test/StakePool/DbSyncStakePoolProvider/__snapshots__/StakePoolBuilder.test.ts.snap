@@ -888,6 +888,16 @@ Array [
 ]
 `;
 
+exports[`StakePoolBuilder queryPoolStats returns active, retired and retiring pools count 1`] = `
+Object {
+  "qty": Object {
+    "active": 7,
+    "retired": 2,
+    "retiring": 0,
+  },
+}
+`;
+
 exports[`StakePoolBuilder queryRegistrations queryRegistrations 1`] = `
 Array [
   Object {

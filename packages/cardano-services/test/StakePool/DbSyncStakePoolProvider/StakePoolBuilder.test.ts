@@ -211,4 +211,11 @@ describe('StakePoolBuilder', () => {
       expect(totalCount).toMatchSnapshot();
     });
   });
+  describe('queryPoolStats', () => {
+    it('returns active, retired and retiring pools count', async () => {
+      const result = await builder.queryPoolStats();
+      expect(result.qty).toBeDefined();
+      expect(result).toMatchSnapshot();
+    });
+  });
 });

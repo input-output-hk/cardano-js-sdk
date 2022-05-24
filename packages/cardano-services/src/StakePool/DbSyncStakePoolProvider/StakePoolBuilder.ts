@@ -1,5 +1,12 @@
 /* eslint-disable sonarjs/no-nested-template-literals */
-import { Cardano, MultipleChoiceSearchFilter, StakePoolQueryOptions } from '@cardano-sdk/core';
+import {
+  Cardano,
+  MultipleChoiceSearchFilter,
+  ProviderError,
+  ProviderFailure,
+  StakePoolQueryOptions,
+  StakePoolStats
+} from '@cardano-sdk/core';
 import {
   EpochModel,
   EpochRewardModel,
@@ -10,6 +17,7 @@ import {
   PoolRetirementModel,
   PoolUpdateModel,
   RelayModel,
+  StakePoolStatsModel,
   SubQuery,
   TotalAdaModel,
   TotalCountModel
@@ -23,6 +31,7 @@ import {
   mapPoolMetrics,
   mapPoolRegistration,
   mapPoolRetirement,
+  mapPoolStats,
   mapPoolUpdate,
   mapRelay
 } from './mappers';
@@ -30,6 +39,7 @@ import Queries, {
   addSentenceToQuery,
   buildOrQueryFromClauses,
   findLastEpoch,
+  findPoolStats,
   getIdentifierFullJoinClause,
   getIdentifierWhereClause,
   getStatusWhereClause,
@@ -227,5 +237,13 @@ export class StakePoolBuilder {
     this.#logger.debug('About to get total count of pools');
     const result: QueryResult<TotalCountModel> = await this.#db.query(getTotalCountQueryFromQuery(query), _params);
     return result.rows[0].total_count;
+  }
+
+  public async queryPoolStats(): Promise<StakePoolStats> {
+    this.#logger.debug('About to get pool stats');
+    const result: QueryResult<StakePoolStatsModel> = await this.#db.query(findPoolStats);
+    const poolStats = result.rows[0];
+    if (!poolStats) throw new ProviderError(ProviderFailure.Unknown, null, "Couldn't fetch pool stats");
+    return mapPoolStats(poolStats);
   }
 }

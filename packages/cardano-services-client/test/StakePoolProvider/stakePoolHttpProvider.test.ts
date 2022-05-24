@@ -22,4 +22,10 @@ describe('stakePoolHttpProvider', () => {
     const provider = stakePoolHttpProvider(url);
     await expect(provider.queryStakePools()).resolves.toEqual([]);
   });
+
+  test('stakePoolStats doesnt throw', async () => {
+    axiosMock.onPost().replyOnce(200, {});
+    const provider = stakePoolHttpProvider(url);
+    await expect(provider.stakePoolStats()).resolves.toEqual({});
+  });
 });
