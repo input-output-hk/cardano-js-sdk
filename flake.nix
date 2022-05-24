@@ -145,6 +145,11 @@
       };
     })
     // {
+      defaultPackage.x86_64-linux = self.packages.x86_64-linux."@cardano-sdk/cardano-services";
+      apps.x86_64-linux.default = {
+        type = "app";
+        program = "${self.defaultPackage.x86_64-linux}/bin/cli";
+      };
       devShell.x86_64-linux = pkgs.mkShell {
         nativeBuildInputs = with pkgs.nodejs-14_x.pkgs; [yarn self.packages.x86_64-linux.cardano-sdk.dependencies.typescript pkgs.nodejs-14_x];
       };
