@@ -96,7 +96,7 @@
                     cat << EOF > $out/bin/cli
                     ${pkgs.nodejs-14_x}/bin/node "$out/dist/cli.js"
                     EOF
-                    
+
                     chmod +x "$out/bin/cli"
                   ''
                 ];
@@ -105,6 +105,18 @@
         };
 
       inject = {
+        "express-prom-bundle"."6.4.1" = [
+          ["prom-client" "14.0.1"]
+        ];
+        "@cardano-sdk/core"."0.2.0" = [
+          ["lodash" "4.17.21"]
+        ];
+        "express-openapi-validator"."4.13.7" = [
+          ["express" "4.17.3"]
+        ];
+        "isomorphic-ws"."4.0.1" = [
+          ["ws" "8.5.0"]
+        ];
         "@cardano-sdk/util-dev"."0.2.0" = [
           ["jest" "27.5.1"]
           ["@types/jest" "26.0.24"]
@@ -125,6 +137,7 @@
           ["@cardano-sdk/rabbitmq" "0.2.0"]
           ["@cardano-sdk/core" "0.2.0"]
           ["@types/node" "14.18.12"]
+          ["clear" "0.1.0"]
         ];
       };
 
