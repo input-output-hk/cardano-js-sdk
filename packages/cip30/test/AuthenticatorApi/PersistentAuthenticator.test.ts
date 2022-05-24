@@ -22,7 +22,7 @@ describe('PersistentAuthenticator', () => {
   beforeEach(async () => {
     storage = createStubStorage();
     requestAccess = jest.fn();
-    authenticator = await PersistentAuthenticator.create({ requestAccess }, { logger, storage });
+    authenticator = new PersistentAuthenticator({ requestAccess }, { logger, storage });
   });
 
   describe('requestAccess', () => {

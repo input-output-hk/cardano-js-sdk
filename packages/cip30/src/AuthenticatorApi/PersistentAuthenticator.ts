@@ -15,41 +15,32 @@ export class PersistentAuthenticator implements AuthenticatorApi {
   readonly #requestAccess: RequestAccess;
   readonly #storage: PersistentAuthenticatorStorage;
   readonly #logger: Logger;
-  #origins: Origin[];
-
-  private constructor(
-    requestAccess: RequestAccess,
-    origins: Origin[],
-    storage: PersistentAuthenticatorStorage,
-    logger: Logger
-  ) {
-    this.#requestAccess = requestAccess;
-    this.#storage = storage;
-    this.#logger = logger;
-    this.#origins = origins;
-  }
+  #originsReady: Promise<Origin[]>;
 
   /**
    * Create a new PersistentAuhenticator
    *
    * @throws underlying storage error if it fails to get() during creation of the authenticator
    */
-  static async create(
+  public constructor(
     { requestAccess }: PersistentAuhenticatorOptions,
     { logger, storage }: PersistentAuthenticatorDependencies
   ) {
-    const origins = await storage.get();
-    return new PersistentAuthenticator(requestAccess, origins, storage, logger);
+    this.#requestAccess = requestAccess;
+    this.#storage = storage;
+    this.#logger = logger;
+    this.#originsReady = storage.get();
   }
 
   async requestAccess(origin: Origin) {
-    if (this.#origins.includes(origin)) {
+    const origins = await this.#originsReady;
+    if (origins.includes(origin)) {
       return true;
     }
     try {
       const accessGranted = await this.#requestAccess(origin);
       if (accessGranted) {
-        const newOrigins = [...this.#origins, origin];
+        const newOrigins = [...origins, origin];
         if (await this.#store(newOrigins)) {
           this.#logger.info('[Authenticator] added', origin);
           return true;
@@ -62,9 +53,10 @@ export class PersistentAuthenticator implements AuthenticatorApi {
   }
 
   async revokeAccess(origin: Origin) {
-    const idx = this.#origins.indexOf(origin);
+    const origins = await this.#originsReady;
+    const idx = origins.indexOf(origin);
     if (idx >= 0) {
-      const newOrigins = [...this.#origins.slice(0, idx), ...this.#origins.slice(idx + 1)];
+      const newOrigins = [...origins.slice(0, idx), ...origins.slice(idx + 1)];
       if (await this.#store(newOrigins)) {
         this.#logger.info('[Authenticator] revoked access for', origin);
         return true;
@@ -77,7 +69,8 @@ export class PersistentAuthenticator implements AuthenticatorApi {
 
   async haveAccess(origin: Origin) {
     if (!origin) return false;
-    return this.#origins.includes(origin);
+    const origins = await this.#originsReady;
+    return origins.includes(origin);
   }
 
   async clear() {
@@ -87,7 +80,7 @@ export class PersistentAuthenticator implements AuthenticatorApi {
   async #store(origins: Origin[]) {
     try {
       await this.#storage.set(origins);
-      this.#origins = origins;
+      this.#originsReady = Promise.resolve(origins);
       return true;
     } catch (error) {
       this.#logger.error('[Authenticator] storage.set failed', error);
