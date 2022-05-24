@@ -16,8 +16,7 @@ import { AuthenticationError } from './KeyManagement/errors';
 import { CSL, Cardano, coreToCsl, cslToCore } from '@cardano-sdk/core';
 import { InputSelectionError } from '@cardano-sdk/cip2';
 import { Logger, dummyLogger } from 'ts-log';
-import { SingleAddressWallet } from '.';
-import { cip30signData } from './KeyManagement/cip8';
+import { ObservableWallet } from './types';
 import { firstValueFrom } from 'rxjs';
 
 export type Cip30WalletDependencies = {
@@ -58,13 +57,14 @@ const mapCallbackFailure = (err: unknown, logger?: Logger) => {
 };
 
 export const createWalletApi = (
-  wallet: SingleAddressWallet,
+  walletReady: Promise<ObservableWallet>,
   confirmationCallback: CallbackConfirmation,
   { logger = dummyLogger }: Cip30WalletDependencies = {}
 ): WalletApi => ({
   getBalance: async (): Promise<Cbor> => {
     logger.debug('getting balance');
     try {
+      const wallet = await walletReady;
       const value = await firstValueFrom(wallet.balance.available$);
       return Buffer.from(coreToCsl.value(value).to_bytes()).toString('hex');
     } catch (error) {
@@ -75,6 +75,7 @@ export const createWalletApi = (
   getChangeAddress: async (): Promise<Cbor> => {
     logger.debug('getting changeAddress');
     try {
+      const wallet = await walletReady;
       const [{ address }] = await firstValueFrom(wallet.addresses$);
 
       if (!address) {
@@ -97,11 +98,13 @@ export const createWalletApi = (
   },
   getNetworkId: async (): Promise<number> => {
     logger.debug('getting networkId');
+    const wallet = await walletReady;
     return wallet.getNetworkId();
   },
   getRewardAddresses: async (): Promise<Cbor[]> => {
     logger.debug('getting reward addresses');
     try {
+      const wallet = await walletReady;
       const [{ rewardAccount }] = await firstValueFrom(wallet.addresses$);
 
       if (!rewardAccount) {
@@ -124,6 +127,7 @@ export const createWalletApi = (
   getUsedAddresses: async (_paginate?: Paginate): Promise<Cbor[]> => {
     logger.debug('getting changeAddress');
 
+    const wallet = await walletReady;
     const [{ address }] = await firstValueFrom(wallet.addresses$);
 
     if (!address) {
@@ -133,6 +137,7 @@ export const createWalletApi = (
     }
   },
   getUtxos: async (amount?: Cbor, paginate?: Paginate): Promise<Cbor[] | undefined> => {
+    const wallet = await walletReady;
     let utxos = await firstValueFrom(wallet.utxo.available$);
 
     if (amount) {
@@ -174,8 +179,8 @@ export const createWalletApi = (
     }).catch((error) => mapCallbackFailure(error, logger));
 
     if (shouldProceed) {
-      return cip30signData({
-        keyAgent: wallet.keyAgent,
+      const wallet = await walletReady;
+      return wallet.signData({
         payload: hexBlobPayload,
         signWith: addr
       });
@@ -194,6 +199,7 @@ export const createWalletApi = (
       type: Cip30ConfirmationCallbackType.SignTx
     }).catch((error) => mapCallbackFailure(error, logger));
     if (shouldProceed) {
+      const wallet = await walletReady;
       try {
         const {
           witness: { signatures }
@@ -226,6 +232,7 @@ export const createWalletApi = (
 
     if (shouldProceed) {
       try {
+        const wallet = await walletReady;
         await wallet.submitTx(txData);
         return txData.id.toString();
       } catch (error) {
