@@ -62,12 +62,15 @@ const setUp = (someNumbers$: Observable<bigint> = of(0n), nestedSomeNumbers$ = o
       addOneNoZero: addOne,
       nestedSomeNumbers$
     },
+    nestedNonExposed: {
+      nestedNonExposed$: of(true)
+    },
     nonExposedMethod: jest.fn(async () => true),
     nonExposedObservable$: throwError(() => new Error('Shouldnt be called')),
     someNumbers$
   };
   type FullApi = typeof api;
-  type ExposedApi = Omit<FullApi, 'nonExposedMethod' | 'nonExposedObservable$'>;
+  type ExposedApi = Omit<FullApi, 'nonExposedMethod' | 'nonExposedObservable$' | 'nestedNonExposed'>;
   const properties: RemoteApiProperties<ExposedApi> = {
     addOne: RemoteApiPropertyType.MethodReturningPromise,
     addOneTransformedToAddTwo: {
@@ -108,6 +111,9 @@ const setUp = (someNumbers$: Observable<bigint> = of(0n), nestedSomeNumbers$ = o
     {
       properties: {
         ...properties,
+        nestedNonExposed: {
+          nestedNonExposed$: RemoteApiPropertyType.Observable
+        },
         nonExposedMethod: RemoteApiPropertyType.MethodReturningPromise,
         nonExposedObservable$: RemoteApiPropertyType.Observable
       }

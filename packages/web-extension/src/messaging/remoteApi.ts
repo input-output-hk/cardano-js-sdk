@@ -170,19 +170,25 @@ export const bindMessengerRequestHandler = <Response>(
     port.postMessage(responseMessage);
   });
 
+const isRemoteApiMethod = (prop: unknown): prop is RemoteApiMethod =>
+  typeof prop === 'object' && prop !== null && 'propType' in prop;
+
 export const bindNestedObjChannels = <API extends object>(
   { api, properties }: ExposeApiProps<API>,
   { messenger, logger }: MessengerApiDependencies
 ) => {
-  const subscriptions = Object.keys(api)
-    .filter((prop) => typeof (api as any)[prop] === 'object' && !isObservable((api as any)[prop]))
-    .map((prop) =>
+  const subscriptions = Object.entries(properties)
+    .filter(([_, type]) => typeof type === 'object' && !isRemoteApiMethod(type))
+    .map(([prop]) => {
+      if (typeof (api as any)[prop] !== 'object' || isObservable((api as any)[prop])) {
+        throw new NotImplementedError(`Trying to expose non-implemented nested object ${prop}`);
+      }
       // eslint-disable-next-line no-use-before-define
-      exposeMessengerApi(
+      return exposeMessengerApi(
         { api: (api as any)[prop], properties: (properties as any)[prop] },
         { logger, messenger: messenger.deriveChannel(prop) }
-      )
-    );
+      );
+    });
   return {
     unsubscribe: () => {
       for (const subscription of subscriptions) {
@@ -196,12 +202,12 @@ export const bindObservableChannels = <API extends object>(
   { api, properties }: ExposeApiProps<API>,
   { messenger }: MessengerApiDependencies
 ) => {
-  const subscriptions = Object.keys(api)
-    .filter(
-      (method) =>
-        properties[method as keyof API] === RemoteApiPropertyType.Observable && isObservable(api[method as keyof API])
-    )
-    .map((observableProperty) => {
+  const subscriptions = Object.entries(properties)
+    .filter(([, propType]) => propType === RemoteApiPropertyType.Observable)
+    .map(([observableProperty]) => {
+      if (!isObservable(api[observableProperty as keyof API])) {
+        throw new NotImplementedError(`Trying to expose non-implemented observable ${observableProperty}`);
+      }
       const observable$ = new TrackerSubject((api as any)[observableProperty] as Observable<unknown>);
       const observableMessenger = messenger.deriveChannel(observableProperty);
       const ackSubscription = observableMessenger.message$.subscribe(({ data, port }) => {
@@ -236,9 +242,6 @@ export const bindObservableChannels = <API extends object>(
     }
   };
 };
-
-const isRemoteApiMethod = (prop: unknown): prop is RemoteApiMethod =>
-  typeof prop === 'object' && prop !== null && 'propType' in prop;
 
 /**
  * Bind an API object to handle messages from other parts of the extension.
