@@ -6,6 +6,7 @@
   "rootDir": ".",
   "references": [
     { "path": "../src" },
+    { "path": "../../cardano-services-client/src" },
     { "path": "../../core/src" },
     { "path": "../../ogmios/test" },
     { "path": "../../rabbitmq/test" },
