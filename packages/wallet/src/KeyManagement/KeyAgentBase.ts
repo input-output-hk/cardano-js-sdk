@@ -45,6 +45,8 @@ export abstract class KeyAgentBase implements KeyAgent {
    * See https://github.com/cardano-foundation/CIPs/tree/master/CIP-1852#specification
    */
   async deriveAddress({ index, type }: AccountAddressDerivationPath): Promise<GroupedAddress> {
+    const knownAddress = this.knownAddresses.find((addr) => addr.type === type && addr.index === index);
+    if (knownAddress) return knownAddress;
     const derivedPublicPaymentKey = await this.deriveCslPublicKey({
       index,
       role: type as unknown as KeyRole
