@@ -21,11 +21,6 @@ const address = mocks.utxo[0][0].address!;
 const rewardAccount = mocks.rewardAccount;
 
 const createWallet = async (stores: WalletStores, walletProvider: WalletProvider, utxoProvider: UtxoProvider) => {
-  const keyAgent = await mocks.testKeyAgent();
-  const txSubmitProvider = mocks.mockTxSubmitProvider();
-  const assetProvider = mocks.mockAssetProvider();
-  const stakePoolSearchProvider = createStubStakePoolSearchProvider();
-  const networkInfoProvider = mockNetworkInfoProvider();
   const groupedAddress: KeyManagement.GroupedAddress = {
     accountIndex: 0,
     address,
@@ -34,8 +29,12 @@ const createWallet = async (stores: WalletStores, walletProvider: WalletProvider
     rewardAccount,
     type: KeyManagement.AddressType.External
   };
+  const keyAgent = await mocks.testAsyncKeyAgent([groupedAddress]);
   keyAgent.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
-  keyAgent.knownAddresses.push(groupedAddress);
+  const txSubmitProvider = mocks.mockTxSubmitProvider();
+  const assetProvider = mocks.mockAssetProvider();
+  const stakePoolSearchProvider = createStubStakePoolSearchProvider();
+  const networkInfoProvider = mockNetworkInfoProvider();
   return new SingleAddressWallet(
     { name },
     {

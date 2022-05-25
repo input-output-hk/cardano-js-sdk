@@ -36,13 +36,6 @@ describe('SingleAddressWallet methods', () => {
   let utxoProvider: mocks.UtxoProviderStub;
 
   beforeEach(async () => {
-    const keyAgent = await mocks.testKeyAgent();
-    txSubmitProvider = mocks.mockTxSubmitProvider();
-    walletProvider = mocks.mockWalletProvider();
-    utxoProvider = mocks.mockUtxoProvider();
-    const assetProvider = mocks.mockAssetProvider();
-    const stakePoolSearchProvider = createStubStakePoolSearchProvider();
-    const networkInfoProvider = mockNetworkInfoProvider();
     const groupedAddress: KeyManagement.GroupedAddress = {
       accountIndex: 0,
       address,
@@ -51,6 +44,13 @@ describe('SingleAddressWallet methods', () => {
       rewardAccount: mocks.rewardAccount,
       type: KeyManagement.AddressType.External
     };
+    const keyAgent = await mocks.testAsyncKeyAgent([groupedAddress]);
+    txSubmitProvider = mocks.mockTxSubmitProvider();
+    walletProvider = mocks.mockWalletProvider();
+    utxoProvider = mocks.mockUtxoProvider();
+    const assetProvider = mocks.mockAssetProvider();
+    const stakePoolSearchProvider = createStubStakePoolSearchProvider();
+    const networkInfoProvider = mockNetworkInfoProvider();
     keyAgent.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
     wallet = new SingleAddressWallet(
       { name: 'Test Wallet' },
@@ -64,7 +64,6 @@ describe('SingleAddressWallet methods', () => {
         walletProvider
       }
     );
-    keyAgent.knownAddresses.push(groupedAddress);
     await waitForWalletStateSettle(wallet);
   });
 

@@ -1,18 +1,23 @@
 import { Cardano } from '@cardano-sdk/core';
 import { KeyManagement } from '../../../src';
-import { createAsyncKeyAgent } from '../../../src/KeyManagement/util/createAsyncKeyAgent';
+import { firstValueFrom } from 'rxjs';
 
-describe('createAsyncKeyAgent', () => {
-  it('maps KeyAgent to AsyncKeyAgent', async () => {
+describe('createAsyncKeyAgent maps KeyAgent to AsyncKeyAgent', () => {
+  let keyAgent: KeyManagement.KeyAgent;
+  let asyncKeyAgent: KeyManagement.AsyncKeyAgent;
+  const addressDerivationPath = { index: 0, type: 0 };
+
+  beforeEach(async () => {
     const mnemonicWords = KeyManagement.util.generateMnemonicWords();
     const getPassword = jest.fn().mockResolvedValue(Buffer.from('password'));
-    const keyAgent = await KeyManagement.InMemoryKeyAgent.fromBip39MnemonicWords({
+    keyAgent = await KeyManagement.InMemoryKeyAgent.fromBip39MnemonicWords({
       getPassword,
       mnemonicWords,
       networkId: Cardano.NetworkId.testnet
     });
-    const asyncKeyAgent = createAsyncKeyAgent(keyAgent);
-    const addressDerivationPath = { index: 0, type: 0 };
+    asyncKeyAgent = KeyManagement.util.createAsyncKeyAgent(keyAgent);
+  });
+  it('deriveAddress/signBlob/signTransaction are unchanged', async () => {
     await expect(asyncKeyAgent.deriveAddress(addressDerivationPath)).resolves.toEqual(
       await keyAgent.deriveAddress(addressDerivationPath)
     );
@@ -29,6 +34,10 @@ describe('createAsyncKeyAgent', () => {
     await expect(asyncKeyAgent.signTransaction(txInternals, options)).resolves.toEqual(
       await keyAgent.signTransaction(txInternals, options)
     );
-    await expect(asyncKeyAgent.getKnownAddresses()).resolves.toEqual(keyAgent.knownAddresses);
+  });
+  it('knownAddresses$ is emits initial addresses and after new address derivation', async () => {
+    await expect(firstValueFrom(asyncKeyAgent.knownAddresses$)).resolves.toEqual(keyAgent.knownAddresses);
+    await asyncKeyAgent.deriveAddress(addressDerivationPath);
+    await expect(firstValueFrom(asyncKeyAgent.knownAddresses$)).resolves.toEqual(keyAgent.knownAddresses);
   });
 });
