@@ -8,7 +8,7 @@ export const networkInfo = {
     total: 40_267_211_394_073_980n
   },
   network: {
-    magic: 123,
+    magic: 1_097_911_063,
     timeSettings: testnetTimeSettings
   },
   stake: {

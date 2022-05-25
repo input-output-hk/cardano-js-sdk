@@ -13,7 +13,7 @@ import {
   WalletApi
 } from '@cardano-sdk/cip30';
 import { AuthenticationError } from './KeyManagement/errors';
-import { CSL, Cardano, coreToCsl, cslToCore } from '@cardano-sdk/core';
+import { CSL, Cardano, NotImplementedError, coreToCsl, cslToCore } from '@cardano-sdk/core';
 import { InputSelectionError } from '@cardano-sdk/cip2';
 import { Logger, dummyLogger } from 'ts-log';
 import { ObservableWallet } from './types';
@@ -56,6 +56,12 @@ const mapCallbackFailure = (err: unknown, logger?: Logger) => {
   return false;
 };
 
+const magicToNetworkId = (networkMagic: number) => {
+  if (networkMagic === 764_824_073) return Cardano.NetworkId.mainnet;
+  if (networkMagic === 1_097_911_063) return Cardano.NetworkId.testnet;
+  throw new NotImplementedError(`Unsupported network magic ${networkMagic}`);
+};
+
 export const createWalletApi = (
   walletReady: Promise<ObservableWallet>,
   confirmationCallback: CallbackConfirmation,
@@ -96,10 +102,12 @@ export const createWalletApi = (
     logger.warn('getCollateral is not implemented');
     return null;
   },
-  getNetworkId: async (): Promise<number> => {
+  getNetworkId: async (): Promise<Cardano.NetworkId> => {
     logger.debug('getting networkId');
     const wallet = await walletReady;
-    return wallet.getNetworkId();
+    const networkInfo = await firstValueFrom(wallet.networkInfo$);
+    // TODO: use networkInfo.network.id instead of magicToNetworkId
+    return magicToNetworkId(networkInfo.network.magic);
   },
   getRewardAddresses: async (): Promise<Cbor[]> => {
     logger.debug('getting reward addresses');

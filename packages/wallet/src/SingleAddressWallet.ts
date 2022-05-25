@@ -232,10 +232,6 @@ export class SingleAddressWallet implements ObservableWallet {
     this.util = createWalletUtil(this);
   }
 
-  async getNetworkId(): Promise<Cardano.NetworkId> {
-    return this.keyAgent.networkId;
-  }
-
   async getName(): Promise<string> {
     return this.name;
   }

@@ -84,7 +84,6 @@ export interface ObservableWallet {
   readonly assets$: BehaviorObservable<Assets>;
   readonly syncStatus: SyncStatus;
 
-  getNetworkId(): Promise<Cardano.NetworkId>;
   getName(): Promise<string>;
   /**
    * @throws InputSelectionError

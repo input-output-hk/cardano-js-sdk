@@ -21,7 +21,6 @@ export const observableWalletProperties: RemoteApiProperties<ExposedObservableWa
   finalizeTx: RemoteApiPropertyType.MethodReturningPromise,
   genesisParameters$: RemoteApiPropertyType.Observable,
   getName: RemoteApiPropertyType.MethodReturningPromise,
-  getNetworkId: RemoteApiPropertyType.MethodReturningPromise,
   initializeTx: RemoteApiPropertyType.MethodReturningPromise,
   networkInfo$: RemoteApiPropertyType.Observable,
   protocolParameters$: RemoteApiPropertyType.Observable,
