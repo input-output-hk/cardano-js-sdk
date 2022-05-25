@@ -146,3 +146,7 @@ export interface KeyAgent {
    */
   exportRootPrivateKey(): Promise<Cardano.Bip32PrivateKey>;
 }
+
+export type AsyncKeyAgent = Pick<KeyAgent, 'deriveAddress' | 'signBlob' | 'signTransaction'> & {
+  getKnownAddresses(): Promise<GroupedAddress[]>;
+};
