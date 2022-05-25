@@ -61,10 +61,6 @@ export interface SyncStatus {
   isSettled$: BehaviorObservable<boolean>;
 }
 
-export interface Shutdown {
-  shutdown(): void;
-}
-
 export interface ObservableWallet {
   readonly balance: TransactionalObservables<Balance>;
   readonly delegation: DelegationTracker;
