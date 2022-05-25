@@ -4,12 +4,12 @@ import { DbSyncUtxoProvider, HttpServer, HttpServerConfig, UtxoHttpService } fro
 import { Pool } from 'pg';
 import { getPort } from 'get-port-please';
 import { utxoHttpProvider } from '@cardano-sdk/cardano-services-client';
-import got from 'got';
+import axios from 'axios';
 
 const APPLICATION_JSON = 'application/json';
 const APPLICATION_CBOR = 'application/cbor';
-const UNSUPPORTED_MEDIA_STRING = 'Response code 415 (Unsupported Media Type)';
-const BAD_REQUEST_STRING = 'Response code 400 (Bad Request)';
+const UNSUPPORTED_MEDIA_STRING = 'Request failed with status code 415';
+const BAD_REQUEST_STRING = 'Request failed with status code 400';
 
 const toCardanoAddresses = (addresses: string[]) => addresses.map((a) => Cardano.Address(a));
 
@@ -51,11 +51,11 @@ describe('UtxoHttpService', () => {
 
     describe('/health', () => {
       it('/health response should be true', async () => {
-        const res = await got.post(`${apiUrlBase}/health`, {
+        const res = await axios.post(`${apiUrlBase}/health`, undefined, {
           headers: { 'Content-Type': APPLICATION_JSON }
         });
-        expect(res.statusCode).toBe(200);
-        expect(JSON.parse(res.body)).toEqual({ ok: true });
+        expect(res.status).toBe(200);
+        expect(res.data).toEqual({ ok: true });
       });
       it('with utxoProvider', async () => {
         const response = await provider.healthCheck();
@@ -65,32 +65,30 @@ describe('UtxoHttpService', () => {
     describe('/utxo-by-addresses', () => {
       it('returns a 415 coded response if the wrong content type header is used', async () => {
         try {
-          await got.post(`${apiUrlBase}/utxo-by-addresses`, {
-            headers: { 'Content-Type': APPLICATION_CBOR }
-          });
+          await axios.post(
+            `${apiUrlBase}/utxo-by-addresses`,
+            { args: [[]] },
+            { headers: { 'Content-Type': APPLICATION_CBOR } }
+          );
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
-          expect(error.response.statusCode).toBe(415);
+          expect(error.response.status).toBe(415);
           expect(error.message).toBe(UNSUPPORTED_MEDIA_STRING);
         }
       });
       it('returns 400 coded respons if the request is bad formed', async () => {
         try {
-          await got.post(`${apiUrlBase}/utxo-by-addresses`, {
-            json: { addresses: ['asd'] }
-          });
+          await axios.post(`${apiUrlBase}/utxo-by-addresses`, { args: [{ addresses: ['asd'] }] });
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
-          expect(error.response.statusCode).toBe(400);
+          expect(error.response.status).toBe(400);
           expect(error.message).toBe(BAD_REQUEST_STRING);
         }
       });
       it('valid request should pass OpenApi schema validations', async () => {
         const req = ['asd'];
-        const res = await got.post(`${apiUrlBase}/utxo-by-addresses`, {
-          json: { args: [req] }
-        });
-        expect(res.statusCode).toEqual(200);
+        const res = await axios.post(`${apiUrlBase}/utxo-by-addresses`, { args: [req] });
+        expect(res.status).toEqual(200);
       });
       it('return UTxOs for a single address', async () => {
         const res = await utxoProvider.utxoByAddresses([
