@@ -1,0 +1,30 @@
+{
+  "name": "@cardano-sdk/util",
+  "version": "0.2.0",
+  "description": "General, not cardano-specific utils",
+  "engines": {
+    "node": "^14"
+  },
+  "main": "dist/index.js",
+  "repository": "https://github.com/input-output-hk/cardano-js-sdk/packages/util",
+  "author": "Mircea Hasegan <mircea.hasegan@iohk.io>",
+  "license": "MPL-2.0",
+  "scripts": {
+    "build": "tsc --build ./src",
+    "tscNoEmit": "shx echo typescript --noEmit command not implemented yet",
+    "cleanup": "shx rm -rf dist node_modules",
+    "lint": "eslint --ignore-path ../../.eslintignore \"**/*.ts\"",
+    "lint:fix": "eslint --fix --ignore-path ../../.eslintignore \"**/*.ts\"",
+    "test": "jest -c ./jest.config.js",
+    "test:e2e": "shx echo 'test:e2e' command not implemented yet",
+    "coverage": "yarn test --coverage",
+    "prepack": "yarn build",
+    "test:debug": "DEBUG=true yarn test"
+  },
+  "files": [
+    "dist/*",
+    "!dist/tsconfig.tsbuildinfo",
+    "LICENSE",
+    "NOTICE"
+  ]
+}

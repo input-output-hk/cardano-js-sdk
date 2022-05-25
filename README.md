@@ -20,6 +20,7 @@ A suite of TypeScript packages suitable for both Node.js and browser-based devel
 - [@cardano-sdk/web-extension](./packages/web-extension)
 - [@cardano-sdk/wallet](./packages/wallet)
 - [@cardano-sdk/util-rxjs](./packages/util-rxjs)
+- [@cardano-sdk/util](./packages/util)
 - [@cardano-sdk/util-dev](./packages/util-dev)
 - [@cardano-sdk/cardano-services](./packages/cardano-services)
 - [@cardano-sdk/cardano-services-client](./packages/cardano-services-client)
