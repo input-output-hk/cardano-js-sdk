@@ -11,7 +11,7 @@
   "license": "MPL-2.0",
   "scripts": {
     "build": "tsc --build ./src",
-    "coverage": "yarn test --coverage",
+    "coverage": "yarn test --coverage --collectCoverageFrom=src/**/*.ts",
     "tscNoEmit": "shx echo typescript --noEmit command not implemented yet",
     "cleanup": "shx rm -rf dist node_modules",
     "lint": "eslint --ignore-path ../../.eslintignore \"**/*.ts\"",
