@@ -54,15 +54,15 @@ export const createNonBackgroundMessenger = (
     if (!isDestroyed) reconnect();
   };
   connect();
-  const portReady = () =>
-    port$.pipe(
-      debounceTime(10), // TODO: how long until onDisconnect() is called when the other end doesn't exist?
-      filter(util.isNotNil),
-      takeWhile((port): port is MessengerPort => typeof port !== 'string')
-    );
+  const connect$ = port$.pipe(
+    debounceTime(10), // TODO: how long until onDisconnect() is called when the other end doesn't exist?
+    filter(util.isNotNil),
+    takeWhile((port): port is MessengerPort => typeof port !== 'string')
+  );
   const derivedMessengers = new Set<Messenger>();
   return {
     channel,
+    connect$,
     deriveChannel(path) {
       const messenger = createNonBackgroundMessenger(
         {
@@ -85,6 +85,7 @@ export const createNonBackgroundMessenger = (
         messenger.destroy();
         derivedMessengers.delete(messenger);
       }
+      port$.complete();
       logger.warn(`[NonBackgroundMessenger(${channel})] destroyed`);
     },
     message$,
@@ -92,7 +93,7 @@ export const createNonBackgroundMessenger = (
      * @throws RxJS EmptyError if client is destroyed
      */
     postMessage(message: unknown): Observable<void> {
-      return portReady().pipe(
+      return connect$.pipe(
         first(),
         // TODO: find if this can throw
         tap((port) => port.postMessage(message)),

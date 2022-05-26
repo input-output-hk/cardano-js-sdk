@@ -7,16 +7,22 @@ import {
   MessengerApiDependencies,
   MethodRequest,
   MethodRequestOptions,
+  ObservableCompletionMessage,
   RemoteApiMethod,
   RemoteApiPropertyType,
   RequestMessage,
-  ResponseMessage,
-  SubscriptionMessage
+  ResponseMessage
 } from './types';
 import { EMPTY, Observable, filter, firstValueFrom, isObservable, map, merge, mergeMap, takeUntil, tap } from 'rxjs';
 import { NotImplementedError, util } from '@cardano-sdk/core';
 import { Shutdown, TrackerSubject } from '@cardano-sdk/wallet';
-import { isEmitMessage, isRequestMessage, isResponseMessage, isSubscriptionMessage, newMessageId } from './util';
+import {
+  isEmitMessage,
+  isObservableCompletionMessage,
+  isRequestMessage,
+  isResponseMessage,
+  newMessageId
+} from './util';
 
 const consumeMethod =
   (
@@ -90,22 +96,18 @@ export const consumeMessengerRemoteApi = <T extends object>(
           const observableMessenger = messenger.deriveChannel(propName);
           const messageData$ = observableMessenger.message$.pipe(map(({ data }) => data));
           const unsubscribe$ = messageData$.pipe(
-            filter(isSubscriptionMessage),
+            filter(isObservableCompletionMessage),
             filter(({ subscribe }) => !subscribe),
             tap(({ error }) => {
               if (error) throw error;
             })
           );
-          return merge(
-            observableMessenger.postMessage({
-              messageId: newMessageId(),
-              subscribe: true
-            } as SubscriptionMessage),
-            messageData$.pipe(
+          return messageData$
+            .pipe(
               filter(isEmitMessage),
               map(({ emit }) => emit)
             )
-          ).pipe(takeUntil(unsubscribe$));
+            .pipe(takeUntil(unsubscribe$));
         }
       },
       has(_, p) {
@@ -178,12 +180,12 @@ export const bindObservableChannels = <API extends object>(
       }
       const observable$ = new TrackerSubject((api as any)[observableProperty] as Observable<unknown>);
       const observableMessenger = messenger.deriveChannel(observableProperty);
-      const ackSubscription = observableMessenger.message$.subscribe(({ data, port }) => {
-        if (isSubscriptionMessage(data) && data.subscribe && observable$.value !== null) {
+      const connectSubscription = observableMessenger.connect$.subscribe((port) => {
+        if (observable$.value !== null) {
           port.postMessage({ emit: observable$.value, messageId: newMessageId() } as EmitMessage);
         }
       });
-      const broadcastMessage = (message: Partial<SubscriptionMessage | EmitMessage>) =>
+      const broadcastMessage = (message: Partial<ObservableCompletionMessage | EmitMessage>) =>
         observableMessenger
           .postMessage({
             messageId: newMessageId(),
@@ -196,7 +198,7 @@ export const bindObservableChannels = <API extends object>(
         next: (emit: unknown) => broadcastMessage({ emit })
       });
       return () => {
-        ackSubscription.unsubscribe();
+        connectSubscription.unsubscribe();
         observableSubscription.unsubscribe();
         observable$.complete();
       };

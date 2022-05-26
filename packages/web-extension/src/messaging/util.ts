@@ -4,9 +4,9 @@ import {
   ChannelName,
   EmitMessage,
   MethodRequest,
+  ObservableCompletionMessage,
   RequestMessage,
-  ResponseMessage,
-  SubscriptionMessage
+  ResponseMessage
 } from './types';
 import { Runtime } from 'webextension-polyfill';
 import { v4 as uuidv4 } from 'uuid';
@@ -23,7 +23,7 @@ export const isRequestMessage = (message: any): message is RequestMessage =>
 export const isResponseMessage = (message: any): message is ResponseMessage =>
   looksLikeMessage(message) && message.hasOwnProperty('response');
 
-export const isSubscriptionMessage = (message: any): message is SubscriptionMessage =>
+export const isObservableCompletionMessage = (message: any): message is ObservableCompletionMessage =>
   looksLikeMessage(message) && typeof message.subscribe === 'boolean';
 
 export const isEmitMessage = (message: any): message is EmitMessage =>

@@ -1,12 +1,12 @@
 // only tested in ../e2e tests
+import { BehaviorSubject, Subject, bufferCount, filter, from, map, mergeMap, tap } from 'rxjs';
 import { ChannelName, Messenger, MessengerDependencies, MessengerPort, PortMessage } from './types';
 import { Logger } from 'ts-log';
-import { Subject, of } from 'rxjs';
 import { deriveChannelName } from './util';
 
 interface Channel {
   message$: Subject<PortMessage>;
-  ports: Set<MessengerPort>;
+  ports$: BehaviorSubject<Set<MessengerPort>>;
   hasMethodRequestHandler?: boolean;
 }
 
@@ -22,7 +22,7 @@ export const createBackgroundMessenger = ({ logger, runtime }: MessengerDependen
   const getChannel = (channelName: ChannelName) => {
     let channel = channels.get(channelName);
     if (!channel) {
-      channels.set(channelName, (channel = { message$: new Subject(), ports: new Set() }));
+      channels.set(channelName, (channel = { message$: new Subject(), ports$: new BehaviorSubject(new Set()) }));
     }
     return channel;
   };
@@ -34,15 +34,19 @@ export const createBackgroundMessenger = ({ logger, runtime }: MessengerDependen
   const onPortDisconnected = (port: MessengerPort) => {
     port.onMessage.removeListener(onPortMessage);
     port.onDisconnect.removeListener(onPortDisconnected);
-    const { ports } = channels.get(port.name)!;
-    ports.delete(port);
+    const { ports$ } = channels.get(port.name)!;
+    const newPorts = new Set(ports$.value);
+    newPorts.delete(port);
+    ports$.next(newPorts);
     logger.debug('[BackgroundMessenger] Port disconnected', port);
   };
   const onConnect = (port: MessengerPort) => {
-    const { ports } = getChannel(port.name);
-    ports.add(port);
+    const { ports$ } = getChannel(port.name);
+    const newPorts = new Set(ports$.value);
+    newPorts.add(port);
     port.onMessage.addListener(onPortMessage);
     port.onDisconnect.addListener(onPortDisconnected);
+    ports$.next(newPorts);
     logger.debug('[BackgroundMessenger] Port connected', port);
   };
   runtime.onConnect.addListener(onConnect);
@@ -51,9 +55,9 @@ export const createBackgroundMessenger = ({ logger, runtime }: MessengerDependen
      * Disconnect all existing ports and stop listening for new ones.
      */
     destroy() {
-      for (const { message$, ports } of channels.values()) {
+      for (const { message$, ports$ } of channels.values()) {
         message$.complete();
-        for (const port of ports) {
+        for (const port of ports$.value) {
           port.disconnect();
         }
       }
@@ -73,6 +77,13 @@ export interface BackgroundMessengerApiDependencies {
 
 export const generalizeBackgroundMessenger = (channel: ChannelName, messenger: BackgroundMessenger): Messenger => ({
   channel,
+  connect$: messenger.getChannel(channel).ports$.pipe(
+    bufferCount(2, 1),
+    mergeMap(([portsBefore, ports]) => {
+      const diff = [...ports].filter((port) => !portsBefore.has(port));
+      return from(diff);
+    })
+  ),
   deriveChannel(path) {
     return generalizeBackgroundMessenger(deriveChannelName(channel, path), messenger);
   },
@@ -81,8 +92,15 @@ export const generalizeBackgroundMessenger = (channel: ChannelName, messenger: B
   },
   message$: messenger.getChannel(channel).message$,
   postMessage: (message) => {
-    const { ports } = messenger.getChannel(channel);
-    for (const port of ports) port.postMessage(message);
-    return of(void 0);
+    const { ports$ } = messenger.getChannel(channel);
+    return ports$.pipe(
+      // wait for at least 1 port to be connected
+      // to be able to post messages even before the other end comes alive
+      filter((ports) => ports.size > 0),
+      tap((ports) => {
+        for (const port of ports) port.postMessage(message);
+      }),
+      map(() => void 0)
+    );
   }
 });

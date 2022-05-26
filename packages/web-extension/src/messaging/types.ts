@@ -18,8 +18,8 @@ export interface ResponseMessage<T = unknown> extends AnyMessage {
   response: T;
 }
 
-export interface SubscriptionMessage extends AnyMessage {
-  subscribe: boolean;
+export interface ObservableCompletionMessage extends AnyMessage {
+  subscribe: false;
   error?: Error;
 }
 
@@ -70,9 +70,11 @@ export interface BindRequestHandlerOptions<Response> {
   handler: (request: MethodRequest, sender?: Runtime.MessageSender) => Promise<Response>;
 }
 
+export type MinimalPort = Pick<MessengerPort, 'sender' | 'postMessage'>;
+
 export interface PortMessage<Data = unknown> {
   data: Data;
-  port: Pick<MessengerPort, 'sender' | 'postMessage'>;
+  port: MinimalPort;
 }
 
 export enum RemoteApiPropertyType {
@@ -109,6 +111,7 @@ export interface ConsumeRemoteApiOptions<T> {
 
 export interface Messenger {
   channel: ChannelName;
+  connect$: Observable<MinimalPort>;
   postMessage(message: unknown): Observable<void>;
   message$: Observable<PortMessage>;
   deriveChannel(path: string): Messenger;

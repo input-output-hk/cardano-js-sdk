@@ -2,6 +2,7 @@
 import {
   ChannelName,
   Messenger,
+  MinimalPort,
   PortMessage,
   RemoteApiProperties,
   RemoteApiPropertyType,
@@ -20,7 +21,9 @@ const createSubjects = memoize((_channelName: ChannelName) => ({
   hostMessage$: new Subject()
 }));
 
-const createMessenger = (channel: ChannelName, isHost: boolean): Messenger => {
+type TestMessenger = Messenger & { connect(): void };
+
+const createMessenger = (channel: ChannelName, isHost: boolean): TestMessenger => {
   const subjects = createSubjects(channel);
   const [local$, remote$] = isHost
     ? [subjects.hostMessage$, subjects.consumerMessage$]
@@ -30,9 +33,22 @@ const createMessenger = (channel: ChannelName, isHost: boolean): Messenger => {
       tap(() => remote$.next(message)),
       map(() => void 0)
     );
-  const derivedMessengers: Messenger[] = [];
+  const derivedMessengers: TestMessenger[] = [];
+  const connect$ = new Subject<MinimalPort>();
   return {
     channel,
+    connect() {
+      // needed to test observable emission on connect
+      connect$.next({
+        postMessage(message) {
+          postMessage(message).subscribe();
+        }
+      });
+      for (const derivedMessenger of derivedMessengers) {
+        derivedMessenger.connect();
+      }
+    },
+    connect$,
     deriveChannel(path) {
       const messenger = createMessenger(deriveChannelName(channel, path), isHost);
       derivedMessengers.push(messenger);
@@ -41,9 +57,10 @@ const createMessenger = (channel: ChannelName, isHost: boolean): Messenger => {
     destroy() {
       for (const messenger of derivedMessengers) {
         messenger.destroy();
-        local$.complete();
-        remote$.complete();
       }
+      local$.complete();
+      remote$.complete();
+      connect$.complete();
     },
     message$: local$.pipe(
       map((data): PortMessage => ({ data, port: { postMessage: (message) => postMessage(message).subscribe() } }))
@@ -97,6 +114,7 @@ const setUp = (someNumbers$: Observable<bigint> = of(0n), nestedSomeNumbers$ = o
     },
     someNumbers$: RemoteApiPropertyType.Observable
   };
+  const hostMessenger = createMessenger(baseChannel, true);
   const hostSubscription = exposeMessengerApi(
     {
       api,
@@ -104,7 +122,7 @@ const setUp = (someNumbers$: Observable<bigint> = of(0n), nestedSomeNumbers$ = o
     },
     {
       logger,
-      messenger: createMessenger(baseChannel, true)
+      messenger: hostMessenger
     }
   );
   const consumer = consumeMessengerRemoteApi<FullApi>(
@@ -127,7 +145,8 @@ const setUp = (someNumbers$: Observable<bigint> = of(0n), nestedSomeNumbers$ = o
       hostSubscription.unsubscribe();
       consumer.shutdown();
     },
-    consumer
+    consumer,
+    hostMessenger
   };
 };
 
@@ -220,6 +239,7 @@ describe('remoteApi', () => {
           someNumbersSource$.next(0n);
           setTimeout(() => {
             const emitted = firstValueFrom(sut.consumer.someNumbers$.pipe(toArray()));
+            sut.hostMessenger.connect();
             setTimeout(async () => {
               someNumbersSource$.next(1n);
               someNumbersSource$.complete();
