@@ -1,8 +1,6 @@
+import { BAD_CONNECTION_URL, GOOD_CONNECTION_URL } from './utils';
 import { ProviderError, TxSubmitProvider } from '@cardano-sdk/core';
 import { RabbitMqTxSubmitProvider } from '../src';
-
-const BAD_CONNECTION_URL = new URL('amqp://localhost:1234');
-const GOOD_CONNECTION_URL = new URL('amqp://localhost');
 
 describe('RabbitMqTxSubmitProvider', () => {
   let provider: TxSubmitProvider;

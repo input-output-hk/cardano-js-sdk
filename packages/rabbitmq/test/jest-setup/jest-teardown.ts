@@ -1,3 +1,5 @@
 import { removeRabbitMQContainer } from './docker';
 
-export default removeRabbitMQContainer;
+const removeContainer = () => removeRabbitMQContainer();
+
+export default removeContainer;
