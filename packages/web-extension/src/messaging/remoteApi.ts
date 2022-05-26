@@ -4,7 +4,6 @@ import {
   ConsumeRemoteApiOptions,
   EmitMessage,
   ExposeApiProps,
-  Messenger,
   MessengerApiDependencies,
   MethodRequest,
   MethodRequestOptions,
@@ -14,42 +13,10 @@ import {
   ResponseMessage,
   SubscriptionMessage
 } from './types';
-import {
-  EMPTY,
-  Observable,
-  filter,
-  firstValueFrom,
-  isObservable,
-  map,
-  merge,
-  mergeMap,
-  take,
-  takeUntil,
-  tap,
-  timeout
-} from 'rxjs';
+import { EMPTY, Observable, filter, firstValueFrom, isObservable, map, merge, mergeMap, takeUntil, tap } from 'rxjs';
 import { NotImplementedError, util } from '@cardano-sdk/core';
 import { Shutdown, TrackerSubject } from '@cardano-sdk/wallet';
 import { isEmitMessage, isRequestMessage, isResponseMessage, isSubscriptionMessage, newMessageId } from './util';
-
-const SUBSCRIPTION_TIMEOUT = 3000;
-const throwIfObservableChannelDoesntExist = ({ postMessage, message$ }: Messenger) => {
-  const subscriptionMessageId = newMessageId();
-  return merge(
-    postMessage({
-      messageId: subscriptionMessageId,
-      subscribe: true
-    } as SubscriptionMessage),
-    // timeout if the other end didn't acknowledge the subscription with a ResponseMessage
-    message$.pipe(
-      map(({ data }) => data),
-      filter(isResponseMessage),
-      filter(({ messageId }) => messageId === subscriptionMessageId),
-      timeout({ first: SUBSCRIPTION_TIMEOUT }),
-      take(1)
-    )
-  ).pipe(mergeMap(() => EMPTY));
-};
 
 const consumeMethod =
   (
@@ -88,8 +55,6 @@ const consumeMethod =
 
 /**
  * Creates a proxy to a remote api object
- *
- * @throws Observable subscriptions might error with rxjs TimeoutError if the remote observable doesnt exist
  */
 export const consumeMessengerRemoteApi = <T extends object>(
   { properties, getErrorPrototype }: ConsumeRemoteApiOptions<T>,
@@ -132,7 +97,10 @@ export const consumeMessengerRemoteApi = <T extends object>(
             })
           );
           return merge(
-            throwIfObservableChannelDoesntExist(observableMessenger),
+            observableMessenger.postMessage({
+              messageId: newMessageId(),
+              subscribe: true
+            } as SubscriptionMessage),
             messageData$.pipe(
               filter(isEmitMessage),
               map(({ emit }) => emit)
@@ -211,11 +179,8 @@ export const bindObservableChannels = <API extends object>(
       const observable$ = new TrackerSubject((api as any)[observableProperty] as Observable<unknown>);
       const observableMessenger = messenger.deriveChannel(observableProperty);
       const ackSubscription = observableMessenger.message$.subscribe(({ data, port }) => {
-        if (isSubscriptionMessage(data) && data.subscribe) {
-          port.postMessage({ messageId: data.messageId, response: true } as ResponseMessage);
-          if (observable$.value !== null) {
-            port.postMessage({ emit: observable$.value, messageId: newMessageId() } as EmitMessage);
-          }
+        if (isSubscriptionMessage(data) && data.subscribe && observable$.value !== null) {
+          port.postMessage({ emit: observable$.value, messageId: newMessageId() } as EmitMessage);
         }
       });
       const broadcastMessage = (message: Partial<SubscriptionMessage | EmitMessage>) =>
