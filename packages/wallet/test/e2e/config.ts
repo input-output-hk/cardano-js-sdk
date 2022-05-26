@@ -8,7 +8,7 @@ import {
   blockfrostWalletProvider
 } from '@cardano-sdk/blockfrost';
 import { Cardano } from '@cardano-sdk/core';
-import { CommunicationType, InMemoryKeyAgent, LedgerKeyAgent, TrezorKeyAgent } from '../../src/KeyManagement';
+import { CommunicationType, InMemoryKeyAgent, KeyAgent, LedgerKeyAgent, TrezorKeyAgent } from '../../src/KeyManagement';
 import { LogLevel, createLogger } from 'bunyan';
 import { Logger } from 'ts-log';
 import { URL } from 'url';
@@ -181,7 +181,7 @@ export const stakePoolProvider = (() => {
   if (env.STAKE_POOL_PROVIDER === 'stub') {
     return createStubStakePoolProvider();
   }
-  throw new Error(`STAKE_POOL_SEARCH_PROVIDER unsupported: ${env.STAKE_POOL_SEARCH_PROVIDER}`);
+  throw new Error(`STAKE_POOL_PROVIDER unsupported: ${env.STAKE_POOL_PROVIDER}`);
 })();
 
 export const networkInfoProvider = (async () => {

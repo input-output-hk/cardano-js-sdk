@@ -1,9 +1,15 @@
 import { Cardano } from '@cardano-sdk/core';
-import { CommunicationType, KeyAgent, LedgerKeyAgent, restoreKeyAgent } from '../../src/KeyManagement';
+import { CommunicationType, KeyAgent, LedgerKeyAgent, restoreKeyAgent, util } from '../../src/KeyManagement';
 import { ObservableWallet, SingleAddressWallet } from '../../src';
 import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { firstValueFrom } from 'rxjs';
-import { mockAssetProvider, mockNetworkInfoProvider, mockTxSubmitProvider, mockWalletProvider } from '../mocks';
+import {
+  mockAssetProvider,
+  mockNetworkInfoProvider,
+  mockTxSubmitProvider,
+  mockUtxoProvider,
+  mockWalletProvider
+} from '../mocks';
 
 const createWallet = (keyAgent: KeyAgent) => {
   const txSubmitProvider = mockTxSubmitProvider();
@@ -11,14 +17,17 @@ const createWallet = (keyAgent: KeyAgent) => {
   const stakePoolProvider = createStubStakePoolProvider();
   const networkInfoProvider = mockNetworkInfoProvider();
   const assetProvider = mockAssetProvider();
+  const utxoProvider = mockUtxoProvider();
+  const asyncKeyAgent = util.createAsyncKeyAgent(keyAgent);
   return new SingleAddressWallet(
     { name: 'Wallet1' },
     {
       assetProvider,
-      keyAgent,
+      keyAgent: asyncKeyAgent,
       networkInfoProvider,
       stakePoolProvider,
       txSubmitProvider,
+      utxoProvider,
       walletProvider
     }
   );

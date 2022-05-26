@@ -1,5 +1,5 @@
 import * as mocks from '../mocks';
-import { AssetId, createStubStakePoolSearchProvider } from '@cardano-sdk/util-dev';
+import { AssetId, createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { Cardano } from '@cardano-sdk/core';
 import { CommunicationType } from '../../src/KeyManagement/types';
 import { KeyManagement, SingleAddressWallet } from '../../src';
@@ -9,17 +9,18 @@ describe('TrezorKeyAgent', () => {
   let txSubmitProvider: mocks.TxSubmitProviderStub;
   let walletProvider: mocks.WalletProviderStub;
   let wallet: SingleAddressWallet;
+  const trezorConfig = {
+    communicationType: CommunicationType.Node,
+    manifest: {
+      appUrl: 'https://your.application.com',
+      email: 'email@developer.com'
+    }
+  };
 
   beforeAll(async () => {
     keyAgent = await KeyManagement.TrezorKeyAgent.createWithDevice({
       networkId: Cardano.NetworkId.testnet,
-      trezorConfig: {
-        communicationType: CommunicationType.Node,
-        manifest: {
-          appUrl: 'https://your.application.com',
-          email: 'email@developer.com'
-        }
-      }
+      trezorConfig
     });
     const groupedAddress: KeyManagement.GroupedAddress = {
       accountIndex: 0,
@@ -34,12 +35,33 @@ describe('TrezorKeyAgent', () => {
     txSubmitProvider = mocks.mockTxSubmitProvider();
     walletProvider = mocks.mockWalletProvider();
     const assetProvider = mocks.mockAssetProvider();
-    const stakePoolSearchProvider = createStubStakePoolSearchProvider();
+    const stakePoolProvider = createStubStakePoolProvider();
     const networkInfoProvider = mocks.mockNetworkInfoProvider();
+    const utxoProvider = mocks.mockUtxoProvider();
+    const asyncKeyAgent = KeyManagement.util.createAsyncKeyAgent(keyAgent);
     wallet = new SingleAddressWallet(
       { name: 'Trezor Wallet' },
-      { assetProvider, keyAgent, networkInfoProvider, stakePoolSearchProvider, txSubmitProvider, walletProvider }
+      {
+        assetProvider,
+        keyAgent: asyncKeyAgent,
+        networkInfoProvider,
+        stakePoolProvider,
+        txSubmitProvider,
+        utxoProvider,
+        walletProvider
+      }
     );
+  });
+
+  it('can be created with any account index', async () => {
+    const trezorKeyAgentWithRandomIndex = await KeyManagement.TrezorKeyAgent.createWithDevice({
+      accountIndex: 5,
+      networkId: Cardano.NetworkId.testnet,
+      trezorConfig
+    });
+    expect(trezorKeyAgentWithRandomIndex).toBeInstanceOf(KeyManagement.TrezorKeyAgent);
+    expect(trezorKeyAgentWithRandomIndex.accountIndex).toEqual(5);
+    expect(trezorKeyAgentWithRandomIndex.extendedAccountPublicKey).not.toEqual(keyAgent.extendedAccountPublicKey);
   });
 
   test('__typename', () => {
