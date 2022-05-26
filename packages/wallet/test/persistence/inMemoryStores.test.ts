@@ -1,4 +1,5 @@
 import {
+  InMemoryAddressesStore,
   InMemoryAssetsStore,
   InMemoryCollectionStore,
   InMemoryDocumentStore,
@@ -122,5 +123,6 @@ describe('inMemoryStores', () => {
     expect(new InMemoryGenesisParametersStore()).toBeInstanceOf(InMemoryDocumentStore);
     expect(new InMemoryNetworkInfoStore()).toBeInstanceOf(InMemoryDocumentStore);
     expect(new InMemoryAssetsStore()).toBeInstanceOf(InMemoryDocumentStore);
+    expect(new InMemoryAddressesStore()).toBeInstanceOf(InMemoryDocumentStore);
   });
 });

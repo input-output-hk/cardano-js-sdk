@@ -1,6 +1,7 @@
 import { Assets } from '../../types';
 import { Cardano, EpochRewards, NetworkInfo, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
 import { EMPTY, combineLatest, map } from 'rxjs';
+import { GroupedAddress } from '../../KeyManagement';
 import { PouchdbCollectionStore } from './PouchdbCollectionStore';
 import { PouchdbDocumentStore } from './PouchdbDocumentStore';
 import { PouchdbKeyValueStore } from './PouchdbKeyValueStore';
@@ -11,6 +12,7 @@ export class PouchdbProtocolParametersStore extends PouchdbDocumentStore<Protoco
 export class PouchdbGenesisParametersStore extends PouchdbDocumentStore<Cardano.CompactGenesis> {}
 export class PouchdbNetworkInfoStore extends PouchdbDocumentStore<NetworkInfo> {}
 export class PouchdbAssetsStore extends PouchdbDocumentStore<Assets> {}
+export class PouchdbAddressesStore extends PouchdbDocumentStore<GroupedAddress[]> {}
 
 export class PouchdbTransactionsStore extends PouchdbCollectionStore<Cardano.TxAlonzo> {}
 export class PouchdbUtxoStore extends PouchdbCollectionStore<Cardano.Utxo> {}
@@ -26,6 +28,7 @@ export const createPouchdbWalletStores = (walletName: string): WalletStores => {
   const baseDbName = walletName.replace(/[^\da-z]/gi, '');
   const docsDbName = `${baseDbName}Docs`;
   return {
+    addresses: new PouchdbAddressesStore(docsDbName, 'addresses'),
     assets: new PouchdbAssetsStore(docsDbName, 'assets'),
     destroy() {
       if (!this.destroyed) {

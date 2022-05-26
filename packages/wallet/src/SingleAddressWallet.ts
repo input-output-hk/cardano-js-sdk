@@ -56,7 +56,7 @@ import { Cip30DataSignature } from '@cardano-sdk/cip30';
 import { InputSelector, defaultSelectionConstraints, roundRobinRandomImprove } from '@cardano-sdk/cip2';
 import { Logger, dummyLogger } from 'ts-log';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { Subject, combineLatest, filter, firstValueFrom, lastValueFrom, map, take, tap } from 'rxjs';
+import { Subject, combineLatest, concat, filter, firstValueFrom, lastValueFrom, map, take, tap } from 'rxjs';
 import { TrackedUtxoProvider } from './services/ProviderTracker/TrackedUtxoProvider';
 import { TxInternals, createTransactionInternals, ensureValidityInterval } from './Transaction';
 import { WalletStores, createInMemoryWalletStores } from './persistence';
@@ -160,16 +160,20 @@ export class SingleAddressWallet implements ObservableWallet {
     );
     this.keyAgent = keyAgent;
     this.addresses$ = new TrackerSubject<GroupedAddress[]>(
-      keyAgent.knownAddresses$.pipe(
-        tap(
-          // derive an address if none available
-          (addresses) =>
-            addresses.length === 0 &&
-            void keyAgent
-              .deriveAddress({ index: 0, type: AddressType.External })
-              .catch(() => logger.error('SingleAddressWallet failed to derive address'))
-        ),
-        filter((addresses) => addresses.length > 0)
+      concat(
+        stores.addresses.get(),
+        keyAgent.knownAddresses$.pipe(
+          tap(
+            // derive an address if none available
+            (addresses) =>
+              addresses.length === 0 &&
+              void keyAgent
+                .deriveAddress({ index: 0, type: AddressType.External })
+                .catch(() => logger.error('SingleAddressWallet failed to derive address'))
+          ),
+          filter((addresses) => addresses.length > 0),
+          tap(stores.addresses.set.bind(stores.addresses))
+        )
       )
     );
     this.name = name;
