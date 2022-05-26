@@ -105,3 +105,12 @@ export const createMockOgmiosServer = (config: MockOgmiosServerConfig): Server =
   });
   return server;
 };
+
+export const listenPromise = (server: Server, port: number, hostname?: string): Promise<Server> =>
+  new Promise((resolve, reject) => {
+    server.listen(port, hostname, () => resolve(server));
+    server.on('error', reject);
+  });
+
+export const serverClosePromise = (server: Server): Promise<void> =>
+  new Promise((resolve, reject) => server.close((error) => (error ? reject(error) : resolve())));
