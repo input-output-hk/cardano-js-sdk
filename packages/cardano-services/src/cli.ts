@@ -3,8 +3,8 @@
 require('../scripts/patchRequire');
 import {
   API_URL_DEFAULT,
+  HttpServerOptions,
   OGMIOS_URL_DEFAULT,
-  ProgramArgs,
   ProgramOptionDescriptions,
   RABBITMQ_URL_DEFAULT,
   ServiceNames,
@@ -59,7 +59,7 @@ program
     },
     'info'
   )
-  .action(async (serviceNames: ServiceNames[], options: { apiUrl: URL } & NonNullable<ProgramArgs['options']>) => {
+  .action(async (serviceNames: ServiceNames[], options: { apiUrl: URL } & HttpServerOptions) => {
     const { apiUrl, ...rest } = options;
     const server = await loadHttpServer({ apiUrl: apiUrl || API_URL_DEFAULT, options: rest, serviceNames });
     await server.initialize();
