@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ProviderError, ProviderFailure, util } from '@cardano-sdk/core';
+import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
 import axios, { AxiosRequestConfig } from 'axios';
 
 export type HttpProviderConfigPaths<T> = { [methodName in keyof T]: string };
@@ -64,18 +65,18 @@ export const createHttpProvider = <T extends object>({
           };
           const axiosInstance = axios.create(req);
           axiosInstance.interceptors.request.use((value) => {
-            if (value.data) value.data = util.toSerializableObject(value.data);
+            if (value.data) value.data = toSerializableObject(value.data);
             return value;
           });
           axiosInstance.interceptors.response.use((value) => ({
             ...value,
-            data: util.fromSerializableObject(value.data, { getErrorPrototype: () => ProviderError.prototype })
+            data: fromSerializableObject(value.data, { getErrorPrototype: () => ProviderError.prototype })
           }));
           return (await axiosInstance.request(req)).data || undefined;
         } catch (error) {
           if (axios.isAxiosError(error)) {
             if (error.response) {
-              const typedError = util.fromSerializableObject(error.response.data, {
+              const typedError = fromSerializableObject(error.response.data, {
                 getErrorPrototype: () => ProviderError.prototype
               });
               if (mapError) return mapError(typedError, method);

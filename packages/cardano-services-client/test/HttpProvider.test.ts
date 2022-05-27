@@ -2,7 +2,9 @@
 /* eslint-disable sonarjs/cognitive-complexity */
 /* eslint-disable sonarjs/no-duplicate-string */
 import { HttpProviderConfig, createHttpProvider } from '../src';
-import { ProviderError, ProviderFailure, util } from '@cardano-sdk/core';
+import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
+
 import { Server } from 'http';
 import { getPort } from 'get-port-please';
 import express, { RequestHandler } from 'express';
@@ -75,8 +77,8 @@ describe('createHttpServer', () => {
         port,
         stubProviderPaths.complexArgsAndReturn,
         (req, res) => {
-          expect(util.fromSerializableObject(req.body.args)).toEqual([arg1, arg2]);
-          res.send(util.toSerializableObject(expectedResponse));
+          expect(fromSerializableObject(req.body.args)).toEqual([arg1, arg2]);
+          res.send(toSerializableObject(expectedResponse));
         }
       );
       const response = await provider.complexArgsAndReturn(arg1, arg2);

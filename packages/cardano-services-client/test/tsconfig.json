@@ -3,9 +3,5 @@
   "compilerOptions": {
     "baseUrl": "."
   },
-  "references": [
-    { "path": "../src" },
-    { "path": "../../core/src" }
-  ]
+  "references": [{ "path": "../src" }, { "path": "../../core/src" }, { "path": "../../util/src" }]
 }
-

@@ -1,13 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-len */
 import { APPLICATION_JSON, CONTENT_TYPE, HttpServer, HttpServerConfig, TxSubmitHttpService } from '../../src';
-import { Cardano, ProviderError, ProviderFailure, TxSubmitProvider, util } from '@cardano-sdk/core';
+import { Cardano, ProviderError, ProviderFailure, TxSubmitProvider } from '@cardano-sdk/core';
+import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
+
 import { getPort } from 'get-port-please';
 import { txSubmitHttpProvider } from '@cardano-sdk/cardano-services-client';
 import axios from 'axios';
 import cbor from 'cbor';
 
-const serializeProviderArg = (arg: unknown) => JSON.stringify({ args: [util.toSerializableObject(arg)] });
+const serializeProviderArg = (arg: unknown) => JSON.stringify({ args: [toSerializableObject(arg)] });
 const bodyTx = serializeProviderArg(cbor.encode('#####'));
 const UNSUPPORTED_MEDIA_STRING = 'Request failed with status code 415';
 const APPLICATION_CBOR = 'application/cbor';
@@ -80,7 +82,7 @@ describe('TxSubmitHttpService', () => {
         throw new Error('fail');
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
-        const parsedError = util.fromSerializableObject<ProviderError>(error.response.data);
+        const parsedError = fromSerializableObject<ProviderError>(error.response.data);
         expect(error.response.status).toBe(503);
         expect(parsedError.name).toBe('ProviderError');
         expect(parsedError.reason).toBe('UNHEALTHY');
@@ -193,7 +195,7 @@ describe('TxSubmitHttpService', () => {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
           expect(error.response.status).toBe(400);
-          const parsedError = util.fromSerializableObject<ProviderError<typeof stubErrors[0]>>(error.response.data);
+          const parsedError = fromSerializableObject<ProviderError<typeof stubErrors[0]>>(error.response.data);
           expect(parsedError.innerError!.name).toEqual(stubErrors[0].name);
           expect(txSubmitProvider.submitTx).toHaveBeenCalledTimes(1);
         }

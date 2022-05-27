@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Events, Runtime } from 'webextension-polyfill';
+import { GetErrorPrototype } from '@cardano-sdk/util';
 import { Logger } from 'ts-log';
 import { Observable } from 'rxjs';
-import { util } from '@cardano-sdk/core';
 
 export type MethodRequest<Method extends string = string, Args = unknown[]> = { method: Method; args: Args };
 
@@ -106,7 +106,7 @@ export interface ExposeApiProps<API extends object> {
 
 export interface ConsumeRemoteApiOptions<T> {
   properties: RemoteApiProperties<T>;
-  getErrorPrototype?: util.GetErrorPrototype;
+  getErrorPrototype?: GetErrorPrototype;
 }
 
 export interface Messenger {

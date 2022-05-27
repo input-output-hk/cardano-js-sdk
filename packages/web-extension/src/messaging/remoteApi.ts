@@ -14,8 +14,8 @@ import {
   ResponseMessage
 } from './types';
 import { EMPTY, Observable, filter, firstValueFrom, isObservable, map, merge, mergeMap, takeUntil, tap } from 'rxjs';
-import { NotImplementedError, util } from '@cardano-sdk/core';
-import { Shutdown } from '@cardano-sdk/util';
+import { GetErrorPrototype, Shutdown, fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
+import { NotImplementedError } from '@cardano-sdk/core';
 import { TrackerSubject } from '@cardano-sdk/util-rxjs';
 import {
   isEmitMessage,
@@ -30,14 +30,14 @@ const consumeMethod =
     {
       propName,
       getErrorPrototype
-    }: { propName: string; getErrorPrototype?: util.GetErrorPrototype; options?: MethodRequestOptions },
+    }: { propName: string; getErrorPrototype?: GetErrorPrototype; options?: MethodRequestOptions },
     { messenger: { message$, postMessage } }: MessengerApiDependencies
   ) =>
   async (...args: unknown[]) => {
     const requestMessage: RequestMessage = {
       messageId: newMessageId(),
       request: {
-        args: args.map((arg) => util.toSerializableObject(arg)),
+        args: args.map((arg) => toSerializableObject(arg)),
         method: propName
       }
     };
@@ -46,7 +46,7 @@ const consumeMethod =
       merge(
         postMessage(requestMessage).pipe(mergeMap(() => EMPTY)),
         message$.pipe(
-          map(({ data }) => util.fromSerializableObject(data, { getErrorPrototype })),
+          map(({ data }) => fromSerializableObject(data, { getErrorPrototype })),
           filter(isResponseMessage),
           filter(({ messageId }) => messageId === requestMessage.messageId),
           map(({ response }) => response)
@@ -95,7 +95,7 @@ export const consumeMessengerRemoteApi = <T extends object>(
           return consumeMethod({ getErrorPrototype, propName }, { logger, messenger });
         } else if (propMetadata === RemoteApiPropertyType.Observable) {
           const observableMessenger = messenger.deriveChannel(propName);
-          const messageData$ = observableMessenger.message$.pipe(map(({ data }) => util.fromSerializableObject(data)));
+          const messageData$ = observableMessenger.message$.pipe(map(({ data }) => fromSerializableObject(data)));
           const unsubscribe$ = messageData$.pipe(
             filter(isObservableCompletionMessage),
             filter(({ subscribe }) => !subscribe),
@@ -125,7 +125,7 @@ export const bindMessengerRequestHandler = <Response>(
     if (!isRequestMessage(data)) return;
     let response: Response | Error;
     try {
-      const request = util.fromSerializableObject<MethodRequest>(data.request);
+      const request = fromSerializableObject<MethodRequest>(data.request);
       response = await handler(request, port.sender);
     } catch (error) {
       logger.debug('[MessengerRequestHandler] Error processing message', data, error);
@@ -134,7 +134,7 @@ export const bindMessengerRequestHandler = <Response>(
 
     const responseMessage: ResponseMessage = {
       messageId: data.messageId,
-      response: util.toSerializableObject(response)
+      response: toSerializableObject(response)
     };
 
     // TODO: can this throw if port is closed?
@@ -183,16 +183,14 @@ export const bindObservableChannels = <API extends object>(
       const observableMessenger = messenger.deriveChannel(observableProperty);
       const connectSubscription = observableMessenger.connect$.subscribe((port) => {
         if (observable$.value !== null) {
-          port.postMessage(
-            util.toSerializableObject({ emit: observable$.value, messageId: newMessageId() } as EmitMessage)
-          );
+          port.postMessage(toSerializableObject({ emit: observable$.value, messageId: newMessageId() } as EmitMessage));
         }
       });
       const broadcastMessage = (message: Partial<ObservableCompletionMessage | EmitMessage>) =>
         observableMessenger
           .postMessage({
             messageId: newMessageId(),
-            ...(util.toSerializableObject(message) as object)
+            ...(toSerializableObject(message) as object)
           })
           .subscribe();
       const observableSubscription = observable$.subscribe({

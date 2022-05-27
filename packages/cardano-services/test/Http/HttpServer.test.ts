@@ -1,7 +1,7 @@
 import { APPLICATION_JSON, CONTENT_TYPE, HttpServer, HttpService, RunnableModule } from '../../src';
 import { dummyLogger } from 'ts-log';
+import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
 import { getRandomPort } from 'get-port-please';
-import { util } from '@cardano-sdk/core';
 import axios from 'axios';
 import express from 'express';
 import net from 'net';
@@ -66,11 +66,9 @@ describe('HttpServer', () => {
       await httpServer.initialize();
       await httpServer.start();
       await onHttpServer(apiUrlBase);
-      await axios.post(
-        `${apiUrlBase}/some-http-service/echo`,
-        JSON.stringify(util.toSerializableObject(expectedBody)),
-        { headers: { [CONTENT_TYPE]: APPLICATION_JSON } }
-      );
+      await axios.post(`${apiUrlBase}/some-http-service/echo`, JSON.stringify(toSerializableObject(expectedBody)), {
+        headers: { [CONTENT_TYPE]: APPLICATION_JSON }
+      });
       await httpServer.shutdown();
     });
   });
@@ -83,7 +81,7 @@ describe('HttpServer', () => {
       const res = {
         header: jest.fn(),
         send: jest.fn().mockImplementation((json) => {
-          expect(util.fromSerializableObject(json)).toEqual(obj);
+          expect(fromSerializableObject(json)).toEqual(obj);
         })
       };
       HttpServer.sendJSON(res as unknown as express.Response, obj);

@@ -21,6 +21,13 @@
     "prepack": "yarn build",
     "test:debug": "DEBUG=true yarn test"
   },
+  "devDependencies": {
+    "ts-custom-error": "^3.2.0"
+  },
+  "dependencies": {
+    "serialize-error": "^8",
+    "lodash-es": "^4.17.21"
+  },
   "files": [
     "dist/*",
     "!dist/tsconfig.tsbuildinfo",

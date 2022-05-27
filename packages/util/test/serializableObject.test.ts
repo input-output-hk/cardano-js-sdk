@@ -1,9 +1,8 @@
 import { CustomError } from 'ts-custom-error';
-import { FromSerializableObjectOptions } from '../../src/util/misc';
-import { util } from '../../src';
+import { FromSerializableObjectOptions, fromSerializableObject, toSerializableObject } from '../src';
 
 const serializeAndDeserialize = (obj: unknown, deserializeOptions?: FromSerializableObjectOptions) =>
-  util.fromSerializableObject(JSON.parse(JSON.stringify(util.toSerializableObject(obj))), deserializeOptions);
+  fromSerializableObject(JSON.parse(JSON.stringify(toSerializableObject(obj))), deserializeOptions);
 
 describe('serializableObject', () => {
   it('supports plain types', () => {
@@ -52,9 +51,9 @@ describe('serializableObject', () => {
   it('supports custom transformation discriminator key', () => {
     const customKeyOption = { transformationTypeKey: 'discriminator' };
     const obj = { bigint: 1n };
-    const serializedObj = util.toSerializableObject(obj, customKeyOption);
-    expect(util.fromSerializableObject(serializedObj)).not.toEqual(obj);
-    expect(util.fromSerializableObject(serializedObj, customKeyOption)).toEqual(obj);
+    const serializedObj = toSerializableObject(obj, customKeyOption);
+    expect(fromSerializableObject(serializedObj)).not.toEqual(obj);
+    expect(fromSerializableObject(serializedObj, customKeyOption)).toEqual(obj);
   });
 
   it('supports object key transformation', () => {
@@ -63,7 +62,7 @@ describe('serializableObject', () => {
       b: 'valb'
     };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const serializableObj: any = util.toSerializableObject(obj, {
+    const serializableObj: any = toSerializableObject(obj, {
       serializeKey(key) {
         if (key === '__a') return 'key__a';
         return key;
@@ -74,7 +73,7 @@ describe('serializableObject', () => {
       key__a: obj.__a
     });
     expect(
-      util.fromSerializableObject(obj, {
+      fromSerializableObject(obj, {
         deserializeKey(key) {
           if (key === 'key__a') return '__a';
           return key;
