@@ -11,10 +11,11 @@ export const serverReady = (apiUrl: string, statusCodeMatch = 404): Promise<void
 
 export const ogmiosServerReady = (connection: Connection): Promise<void> => serverReady(connection.address.http, 405);
 
-export const createHealthyMockOgmiosServer = () =>
+export const createHealthyMockOgmiosServer = (submitTxHook?: () => void) =>
   createMockOgmiosServer({
     healthCheck: { response: { networkSynchronization: 0.999, success: true } },
-    submitTx: { response: { success: true } }
+    submitTx: { response: { success: true } },
+    submitTxHook
   });
 
 export const createUnhealthyMockOgmiosServer = () =>

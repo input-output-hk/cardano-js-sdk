@@ -3,7 +3,7 @@ import { Cardano, HealthCheckResponse, ProviderError, ProviderFailure, TxSubmitP
 import { Channel, Connection, connect } from 'amqplib';
 import { Logger, dummyLogger } from 'ts-log';
 
-const queue = 'tx-submit';
+export const TX_SUBMISSION_QUEUE = 'cardano-tx-submit';
 
 /**
  * Connect to a [RabbitMQ](https://www.rabbitmq.com/) instance
@@ -57,7 +57,7 @@ export class RabbitMqTxSubmitProvider implements TxSubmitProvider {
     this.#queueWasCreated = true;
 
     try {
-      await this.#channel!.assertQueue(queue);
+      await this.#channel!.assertQueue(TX_SUBMISSION_QUEUE);
     } catch (error) {
       await this.close();
       throw new ProviderError(ProviderFailure.ConnectionFailure, error);
@@ -68,6 +68,13 @@ export class RabbitMqTxSubmitProvider implements TxSubmitProvider {
    * Closes the connection to RabbitMQ and (for interl purposes) it resets the state as well
    */
   async close() {
+    try {
+      await this.#channel?.close();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      this.#logger.error({ error: error.name, module: 'rabbitmqTxSubmitProvider' }, error.message);
+    }
+
     try {
       await this.#connection?.close();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -106,7 +113,7 @@ export class RabbitMqTxSubmitProvider implements TxSubmitProvider {
   async submitTx(signedTransaction: Uint8Array) {
     try {
       await this.#ensureQueue();
-      this.#channel!.sendToQueue(queue, Buffer.from(signedTransaction));
+      this.#channel!.sendToQueue(TX_SUBMISSION_QUEUE, Buffer.from(signedTransaction));
     } catch (error) {
       throw Cardano.util.asTxSubmissionError(error) || new Cardano.UnknownTxSubmissionError(error);
     }

@@ -11,7 +11,7 @@
   "license": "MPL-2.0",
   "scripts": {
     "build": "tsc --build ./src",
-    "coverage": "yarn test --coverage",
+    "coverage": "yarn test --coverage --collectCoverageFrom=src/**/*.ts",
     "tscNoEmit": "shx echo typescript --noEmit command not implemented yet",
     "cleanup": "shx rm -rf dist node_modules",
     "lint": "eslint --ignore-path ../../.eslintignore \"**/*.ts\"",
@@ -21,12 +21,16 @@
     "prepack": "yarn build"
   },
   "devDependencies": {
-    "@types/amqplib": "0.8.2",
+    "@cardano-sdk/ogmios": "0.2.0",
+    "@types/amqplib": "^0.8.2",
+    "get-port-please": "^2.4.3",
     "shx": "^0.3.3",
     "ws": "^8.5.0"
   },
   "dependencies": {
-    "amqplib": "0.9.0"
+    "@cardano-sdk/core": "0.2.0",
+    "amqplib": "^0.9.0",
+    "ts-log": "^2.2.4"
   },
   "files": [
     "dist/*",

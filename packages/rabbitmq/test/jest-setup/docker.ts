@@ -5,11 +5,11 @@ import Docker from 'dockerode';
 const CONTAINER_IMAGE = 'rabbitmq:3.8-alpine';
 const CONTAINER_NAME = 'cardano-rabbitmq-test';
 
-export const removeRabbitMQContainer = async () => {
+export const removeRabbitMQContainer = async (containerName = CONTAINER_NAME) => {
   const docker = new Docker();
 
   try {
-    const container = docker.getContainer(CONTAINER_NAME);
+    const container = docker.getContainer(containerName);
 
     try {
       await container.stop();
@@ -26,17 +26,17 @@ export const removeRabbitMQContainer = async () => {
   }
 };
 
-export const setupRabbitMQContainer = async () => {
+export const setupRabbitMQContainer = async (containerName = CONTAINER_NAME, port = 5672) => {
   const docker = new Docker();
   const needsToPull = !(await imageExists(docker, CONTAINER_IMAGE));
 
   if (needsToPull) await pullImageAsync(docker, CONTAINER_IMAGE);
-  await removeRabbitMQContainer();
+  await removeRabbitMQContainer(containerName);
 
   const container = await docker.createContainer({
-    HostConfig: { PortBindings: { '5672/tcp': [{ HostPort: '5672/tcp' }] } },
+    HostConfig: { PortBindings: { '5672/tcp': [{ HostPort: `${port}` }] } },
     Image: CONTAINER_IMAGE,
-    name: CONTAINER_NAME
+    name: containerName
   });
   await container.start();
 
@@ -46,7 +46,9 @@ export const setupRabbitMQContainer = async () => {
     // eslint-disable-next-line no-constant-condition
     while (true)
       try {
-        await connect('amqp://localhost');
+        // eslint-disable-next-line @typescript-eslint/no-shadow
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        await connect(`amqp://localhost:${port}`);
         return resolve();
         // eslint-disable-next-line no-empty
       } catch {}

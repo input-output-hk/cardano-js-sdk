@@ -2,26 +2,10 @@
 /* eslint-disable max-len */
 import { Cardano, ProviderError, TxSubmitProvider } from '@cardano-sdk/core';
 import { Connection, createConnectionObject } from '@cardano-ogmios/client';
-import { createMockOgmiosServer } from './mocks/mockOgmiosServer';
+import { createMockOgmiosServer, listenPromise, serverClosePromise } from './mocks/mockOgmiosServer';
 import { getRandomPort } from 'get-port-please';
 import { ogmiosTxSubmitProvider } from '../src';
 import http from 'http';
-
-const listenPromise = (server: http.Server, port: number, hostname?: string): Promise<http.Server> =>
-  new Promise((resolve, reject) => {
-    server.listen(port, hostname, () => resolve(server));
-    server.on('error', reject);
-  });
-
-const serverClosePromise = (server: http.Server): Promise<void> =>
-  new Promise((resolve, reject) => {
-    server.close((error) => {
-      if (error !== undefined) {
-        reject(error);
-      }
-      resolve();
-    });
-  });
 
 describe('ogmiosTxSubmitProvider', () => {
   let mockServer: http.Server;

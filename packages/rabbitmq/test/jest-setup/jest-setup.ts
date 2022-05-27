@@ -1,3 +1,5 @@
 import { setupRabbitMQContainer } from './docker';
 
-export default setupRabbitMQContainer;
+const setupContainer = () => setupRabbitMQContainer();
+
+export default setupContainer;

@@ -1,9 +1,11 @@
-export enum ProgramOptionDescriptions {
+import { CommonOptionDescriptions } from '../ProgramsCommon';
+
+enum HttpServerOptionDescriptions {
   ApiUrl = 'API URL',
   DbConnection = 'DB Connection',
-  LoggerMinSeverity = 'Log level',
   MetricsEnabled = 'Enable Prometheus Metrics',
-  OgmiosUrl = 'Ogmios URL',
-  RabbitMQUrl = 'RabbitMQ URL',
   UseQueue = 'Enables RabbitMQ'
 }
+
+export type ProgramOptionDescriptions = CommonOptionDescriptions | HttpServerOptionDescriptions;
+export const ProgramOptionDescriptions = { ...CommonOptionDescriptions, ...HttpServerOptionDescriptions };

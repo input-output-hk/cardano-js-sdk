@@ -50,6 +50,7 @@ export interface MockOgmiosServerConfig {
       };
     };
   };
+  submitTxHook?: (data?: Uint8Array) => void;
 }
 
 export const createMockOgmiosServer = (config: MockOgmiosServerConfig): Server => {
@@ -77,8 +78,8 @@ export const createMockOgmiosServer = (config: MockOgmiosServerConfig): Server =
     server
   });
   wss.on('connection', (ws) => {
-    ws.on('message', (data) => {
-      const { methodname, mirror } = JSON.parse(data as string);
+    ws.on('message', async (data) => {
+      const { args, methodname, mirror } = JSON.parse(data as string);
       if (methodname === 'SubmitTx') {
         let result: SubmitSuccess | SubmitFail;
         if (config.submitTx.response.success) {
@@ -88,6 +89,7 @@ export const createMockOgmiosServer = (config: MockOgmiosServerConfig): Server =
         } else {
           throw new Error('Unknown mock response');
         }
+        if (config.submitTxHook) await config.submitTxHook(Uint8Array.from(Buffer.from(args.bytes, 'hex')));
         ws.send(
           JSON.stringify({
             methodname: 'SubmitTx',
@@ -103,3 +105,12 @@ export const createMockOgmiosServer = (config: MockOgmiosServerConfig): Server =
   });
   return server;
 };
+
+export const listenPromise = (server: Server, port: number, hostname?: string): Promise<Server> =>
+  new Promise((resolve, reject) => {
+    server.listen(port, hostname, () => resolve(server));
+    server.on('error', reject);
+  });
+
+export const serverClosePromise = (server: Server): Promise<void> =>
+  new Promise((resolve, reject) => server.close((error) => (error ? reject(error) : resolve())));

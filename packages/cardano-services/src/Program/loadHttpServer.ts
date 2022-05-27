@@ -1,27 +1,26 @@
-/* eslint-disable sonarjs/cognitive-complexity */
+import { CommonProgramOptions } from '../ProgramsCommon';
 import { DbSyncStakePoolSearchProvider, StakePoolSearchHttpService } from '../StakePoolSearch';
 import { DbSyncUtxoProvider, UtxoHttpService } from '../Utxo';
 import { HttpServer, HttpServerConfig, HttpService } from '../Http';
-import { LogLevel, createLogger } from 'bunyan';
 import { MissingProgramOption, UnknownServiceName } from './errors';
 import { Pool } from 'pg';
 import { ProgramOptionDescriptions } from './ProgramOptionDescriptions';
 import { RabbitMqTxSubmitProvider } from '@cardano-sdk/rabbitmq';
 import { ServiceNames } from './ServiceNames';
 import { TxSubmitHttpService } from '../TxSubmit';
-import { ogmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
+import { createLogger } from 'bunyan';
+import { ogmiosTxSubmitProvider, urlToConnectionConfig } from '@cardano-sdk/ogmios';
+
+export interface HttpServerOptions extends CommonProgramOptions {
+  dbConnectionString?: string;
+  metricsEnabled?: boolean;
+  useQueue?: boolean;
+}
 
 export interface ProgramArgs {
   apiUrl: URL;
   serviceNames: (ServiceNames.StakePoolSearch | ServiceNames.TxSubmit | ServiceNames.Utxo)[];
-  options?: {
-    dbConnectionString?: string;
-    loggerMinSeverity?: LogLevel;
-    metricsEnabled?: boolean;
-    ogmiosUrl?: URL;
-    rabbitmqUrl?: URL;
-    useQueue?: boolean;
-  };
+  options?: HttpServerOptions;
 }
 
 export const loadHttpServer = async (args: ProgramArgs): Promise<HttpServer> => {
@@ -53,11 +52,7 @@ export const loadHttpServer = async (args: ProgramArgs): Promise<HttpServer> => 
             txSubmitProvider:
               args.options?.useQueue && args.options?.rabbitmqUrl
                 ? new RabbitMqTxSubmitProvider(args.options.rabbitmqUrl)
-                : ogmiosTxSubmitProvider({
-                    host: args.options?.ogmiosUrl?.hostname,
-                    port: args.options?.ogmiosUrl ? Number.parseInt(args.options.ogmiosUrl.port) : undefined,
-                    tls: args.options?.ogmiosUrl?.protocol === 'wss'
-                  })
+                : ogmiosTxSubmitProvider(urlToConnectionConfig(args.options?.ogmiosUrl))
           })
         );
         break;
