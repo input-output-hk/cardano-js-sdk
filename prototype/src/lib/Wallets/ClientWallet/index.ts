@@ -1,1 +1,0 @@
-export { ClientWallet } from './ClientWallet'
