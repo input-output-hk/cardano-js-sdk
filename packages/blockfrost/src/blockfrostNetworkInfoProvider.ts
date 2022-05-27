@@ -21,7 +21,7 @@ export const blockfrostNetworkInfoProvider = (blockfrost: BlockFrostAPI): Networ
         total: BigInt(supply.total)
       },
       network: {
-        magic: 42,
+        magic: 1_097_911_063,
         timeSettings: testnetTimeSettings
       },
       stake: {
