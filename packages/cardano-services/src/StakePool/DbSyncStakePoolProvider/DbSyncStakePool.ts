@@ -3,13 +3,8 @@ import { DbSyncProvider } from '../../DbSyncProvider';
 import { Logger, dummyLogger } from 'ts-log';
 import { Pool } from 'pg';
 import { StakePoolBuilder } from './StakePoolBuilder';
-import {
-  StakePoolProvider,
-  StakePoolQueryOptions,
-  StakePoolSearchResults,
-  StakePoolStats,
-  util
-} from '@cardano-sdk/core';
+import { StakePoolProvider, StakePoolQueryOptions, StakePoolSearchResults, StakePoolStats } from '@cardano-sdk/core';
+import { isNotNil } from '@cardano-sdk/util';
 import { toCoreStakePool } from './mappers';
 
 export class DbSyncStakePoolProvider extends DbSyncProvider implements StakePoolProvider {
@@ -62,7 +57,7 @@ export class DbSyncStakePoolProvider extends DbSyncProvider implements StakePool
       poolRegistrations,
       poolRelays,
       poolRetirements,
-      poolRewards: poolRewards.filter(util.isNotNil),
+      poolRewards: poolRewards.filter(isNotNil),
       totalCount
     });
   }

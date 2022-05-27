@@ -1,6 +1,6 @@
 /* eslint-disable unicorn/no-nested-ternary */
-import { BigIntMath } from '@cardano-sdk/util';
-import { Cardano, StakePoolProvider, WalletProvider, util } from '@cardano-sdk/core';
+import { BigIntMath, isNotNil } from '@cardano-sdk/util';
+import { Cardano, StakePoolProvider, WalletProvider } from '@cardano-sdk/core';
 import { Delegatee, RewardAccount, StakeKeyStatus } from '../types';
 import { KeyValueStore } from '../../persistence';
 import { Observable, combineLatest, concat, distinctUntilChanged, filter, map, merge, switchMap, tap } from 'rxjs';
@@ -165,7 +165,7 @@ export const createDelegateeTracker = (
   combineLatest([certificates$, epoch$]).pipe(
     switchMap(([transactions, lastEpoch]) => {
       const stakePoolIds = [lastEpoch + 1, lastEpoch + 2, lastEpoch + 3].map(getStakePoolIdAtEpoch(transactions));
-      return stakePoolProvider(uniq(stakePoolIds.filter(util.isNotNil))).pipe(
+      return stakePoolProvider(uniq(stakePoolIds.filter(isNotNil))).pipe(
         map((stakePools) => stakePoolIds.map((poolId) => stakePools.find((pool) => pool.id === poolId) || undefined)),
         map(([currentEpoch, nextEpoch, nextNextEpoch]) => ({ currentEpoch, nextEpoch, nextNextEpoch }))
       );

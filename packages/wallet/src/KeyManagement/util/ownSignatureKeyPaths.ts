@@ -1,5 +1,6 @@
 import { AccountKeyDerivationPath, GroupedAddress, KeyRole, ResolveInputAddress } from '../types';
-import { Cardano, util } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
+import { isNotNil } from '@cardano-sdk/util';
 import { uniq } from 'lodash-es';
 
 /**
@@ -19,7 +20,7 @@ export const ownSignatureKeyPaths = (
         if (!ownAddress) return null;
         return knownAddresses.find(({ address }) => address === ownAddress);
       })
-      .filter(util.isNotNil)
+      .filter(isNotNil)
   ).map(({ type, index }) => ({ index, role: Number(type) }));
   const isStakingKeySignatureRequired = txBody.certificates?.length;
   if (isStakingKeySignatureRequired) {

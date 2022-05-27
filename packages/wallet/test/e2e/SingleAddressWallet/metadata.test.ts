@@ -1,4 +1,4 @@
-import { Cardano, util } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
 import { SingleAddressWallet } from '../../../src';
 import {
   assetProvider,
@@ -9,6 +9,7 @@ import {
   walletProvider
 } from '../config';
 import { filter, firstValueFrom, map } from 'rxjs';
+import { isNotNil } from '@cardano-sdk/util';
 
 describe('SingleAddressWallet/metadata', () => {
   let wallet: SingleAddressWallet;
@@ -46,7 +47,7 @@ describe('SingleAddressWallet/metadata', () => {
     const loadedTx = await firstValueFrom(
       wallet.transactions.history$.pipe(
         map((txs) => txs.find((tx) => tx.id === outgoingTx.id)),
-        filter(util.isNotNil)
+        filter(isNotNil)
       )
     );
     expect(loadedTx.auxiliaryData).toEqual(auxiliaryData);

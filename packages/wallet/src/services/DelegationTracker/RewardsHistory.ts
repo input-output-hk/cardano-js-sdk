@@ -1,5 +1,5 @@
-import { BigIntMath } from '@cardano-sdk/util';
-import { Cardano, EpochRewards, createTxInspector, signedCertificatesInspector, util } from '@cardano-sdk/core';
+import { BigIntMath, isNotNil } from '@cardano-sdk/util';
+import { Cardano, EpochRewards, createTxInspector, signedCertificatesInspector } from '@cardano-sdk/core';
 import { KeyValueStore } from '../../persistence';
 import { Observable, concat, distinctUntilChanged, map, of, switchMap, tap } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
@@ -46,7 +46,7 @@ const firstDelegationEpoch$ = (transactions$: Observable<TxWithEpoch[]>, rewardA
         })
       )
     ),
-    map((tx) => (util.isNotNil(tx) ? tx.epoch + 3 : null)),
+    map((tx) => (isNotNil(tx) ? tx.epoch + 3 : null)),
     distinctUntilChanged()
   );
 

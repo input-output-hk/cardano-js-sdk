@@ -1,5 +1,6 @@
-import { Cardano, createTxInspector, signedCertificatesInspector, util } from '@cardano-sdk/core';
+import { Cardano, createTxInspector, signedCertificatesInspector } from '@cardano-sdk/core';
 import { Observable, combineLatest, distinctUntilChanged, map } from 'rxjs';
+import { isNotNil } from '@cardano-sdk/util';
 import { last } from 'lodash-es';
 import { transactionsEquals } from '../util/equals';
 
@@ -31,7 +32,7 @@ export const isLastStakeKeyCertOfType = (
           : allStakeKeyCertificates;
         return last(addressStakeKeyCertificates);
       })
-      .filter(util.isNotNil)
+      .filter(isNotNil)
   );
   return lastRegOrDereg?.__typename === certType;
 };
