@@ -12,7 +12,7 @@ import {
   TxIn,
   Value
 } from '../Cardano';
-import { BigIntMath } from './BigIntMath';
+import { BigIntMath } from '@cardano-sdk/util';
 import { coalesceValueQuantities, resolveInputValue, subtractValueQuantities } from '../Cardano/util';
 import { inputsWithAddresses, isAddressWithin } from '../Address/util';
 import { removeNegativesFromTokenMap } from '../Asset/util';

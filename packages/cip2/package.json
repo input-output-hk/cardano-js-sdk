@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "@cardano-sdk/core": " 0.2.0",
+    "@cardano-sdk/util": "0.2.0",
     "lodash-es": "^4.17.21",
     "ts-custom-error": "^3.2.0"
   },

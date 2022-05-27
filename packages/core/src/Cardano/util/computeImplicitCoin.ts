@@ -1,4 +1,5 @@
-import { BigIntMath, Cardano, ProtocolParametersRequiredByWallet } from '../../';
+import { BigIntMath } from '@cardano-sdk/util';
+import { Cardano, ProtocolParametersRequiredByWallet } from '../../';
 
 /**
  * Implementation is the same as in CSL.get_implicit_input() and CSL.get_deposit().

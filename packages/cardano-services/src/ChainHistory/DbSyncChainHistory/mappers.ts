@@ -1,4 +1,5 @@
-import { Asset, BigIntMath, Cardano, ProtocolParametersRequiredByWallet, ProviderUtil } from '@cardano-sdk/core';
+import { Asset, Cardano, ProtocolParametersRequiredByWallet, ProviderUtil } from '@cardano-sdk/core';
+import { BigIntMath } from '@cardano-sdk/util';
 import {
   BlockModel,
   BlockOutputModel,

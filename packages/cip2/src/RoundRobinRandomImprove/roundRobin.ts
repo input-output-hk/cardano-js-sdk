@@ -1,4 +1,5 @@
-import { BigIntMath, Cardano } from '@cardano-sdk/core';
+import { BigIntMath } from '@cardano-sdk/util';
+import { Cardano } from '@cardano-sdk/core';
 import { RoundRobinRandomImproveArgs, UtxoSelection, assetQuantitySelector, getCoinQuantity, toValues } from './util';
 
 const improvesSelection = (

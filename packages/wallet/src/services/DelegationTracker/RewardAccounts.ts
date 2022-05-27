@@ -1,5 +1,6 @@
 /* eslint-disable unicorn/no-nested-ternary */
-import { BigIntMath, Cardano, StakePoolProvider, WalletProvider, util } from '@cardano-sdk/core';
+import { BigIntMath } from '@cardano-sdk/util';
+import { Cardano, StakePoolProvider, WalletProvider, util } from '@cardano-sdk/core';
 import { Delegatee, RewardAccount, StakeKeyStatus } from '../types';
 import { KeyValueStore } from '../../persistence';
 import { Observable, combineLatest, concat, distinctUntilChanged, filter, map, merge, switchMap, tap } from 'rxjs';

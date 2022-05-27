@@ -1,11 +1,5 @@
-import {
-  BigIntMath,
-  Cardano,
-  EpochRewards,
-  createTxInspector,
-  signedCertificatesInspector,
-  util
-} from '@cardano-sdk/core';
+import { BigIntMath } from '@cardano-sdk/util';
+import { Cardano, EpochRewards, createTxInspector, signedCertificatesInspector, util } from '@cardano-sdk/core';
 import { KeyValueStore } from '../../persistence';
 import { Observable, concat, distinctUntilChanged, map, of, switchMap, tap } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
