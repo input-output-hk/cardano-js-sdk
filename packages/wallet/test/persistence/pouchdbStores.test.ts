@@ -6,8 +6,8 @@ import PouchDB from 'pouchdb';
 
 describe('pouchdbStores', () => {
   const dbName = 'DbTestWallet';
-  const doc1 = { bigint: 1n, map: new Map([[1, 2]]), plain: '1' };
-  const doc2 = { bigint: 2n, map: new Map([[3, 4]]), plain: '2' };
+  const doc1 = { __unsupportedKey: '1', bigint: 1n, map: new Map([[1, 2]]) };
+  const doc2 = { __unsupportedKey: '2', bigint: 2n, map: new Map([[3, 4]]) };
   type DocType = typeof doc1;
 
   afterAll(async () => {
@@ -39,7 +39,7 @@ describe('pouchdbStores', () => {
   });
 
   describe('PouchdbCollectionStore', () => {
-    const createStore = () => new PouchdbCollectionStore<DocType>(dbName, ({ plain }) => plain);
+    const createStore = () => new PouchdbCollectionStore<DocType>(dbName, ({ __unsupportedKey }) => __unsupportedKey);
     let store1: PouchdbCollectionStore<DocType>;
 
     beforeEach(async () => {
