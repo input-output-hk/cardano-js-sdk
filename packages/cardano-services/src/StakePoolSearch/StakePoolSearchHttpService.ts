@@ -2,7 +2,7 @@ import * as OpenApiValidator from 'express-openapi-validator';
 import { DbSyncStakePoolSearchProvider } from './DbSyncStakePoolSearchProvider';
 import { HttpServer, HttpService } from '../Http';
 import { Logger, dummyLogger } from 'ts-log';
-import { ProviderError, ProviderFailure, StakePoolQueryOptions, StakePoolSearchResults } from '@cardano-sdk/core';
+import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { ServiceNames } from '../Program';
 import { providerHandler } from '../util';
 import express from 'express';
@@ -36,14 +36,17 @@ export class StakePoolSearchHttpService extends HttpService {
     // Add initial healthCheck of the provider when implemented
     router.post(
       '/search',
-      providerHandler<[StakePoolQueryOptions], StakePoolSearchResults>(async ([stakePoolOptions], _, res) => {
-        try {
-          return HttpServer.sendJSON(res, await stakePoolSearchProvider.queryStakePools(stakePoolOptions));
-        } catch (error) {
-          logger.error(error);
-          return HttpServer.sendJSON(res, new ProviderError(ProviderFailure.Unhealthy, error), 500);
-        }
-      }, logger)
+      providerHandler(stakePoolSearchProvider.queryStakePools.bind(stakePoolSearchProvider))(
+        async (args, _r, res, _n, handler) => {
+          try {
+            return HttpServer.sendJSON(res, await handler(...args));
+          } catch (error) {
+            logger.error(error);
+            return HttpServer.sendJSON(res, new ProviderError(ProviderFailure.Unhealthy, error), 500);
+          }
+        },
+        logger
+      )
     );
     return new StakePoolSearchHttpService({ logger, stakePoolSearchProvider }, router);
   }

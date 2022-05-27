@@ -1,0 +1,408 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Chain History",
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/chain-history/blocks/by-hashes": {
+      "post": {
+        "summary": "block history by hashes",
+        "operationId": "blocksByHashes",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChainHistoryBlocksBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "block history fetched",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ChainHistoryBlocksResponse" }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chain-history/txs/by-hashes": {
+      "post": {
+        "summary": "transaction history by hashes",
+        "operationId": "transactionsByHashes",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChainHistoryTxByHashesBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "transaction history fetched",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ChainHistoryTxResponse" }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chain-history/txs/by-addresses": {
+      "post": {
+        "summary": "transaction history by addresses",
+        "operationId": "transactionsByAddresses",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChainHistoryTxByAddressesBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "transaction history fetched",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ChainHistoryTxResponse" }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BigInt": {
+        "required": ["value", "__type"],
+        "type": "object",
+        "properties": {
+          "value": { "type": "string" },
+          "__type": { "type": "string", "enum": ["bigint"] }
+        }
+      },
+      "Date": {
+        "required": ["value", "__type"],
+        "type": "object",
+        "properties": {
+          "value": { "type": "number" },
+          "__type": { "type": "string", "enum": ["Date"] }
+        }
+      },
+      "Undefined": {
+        "required": ["__type"],
+        "type": "object",
+        "properties": {
+          "__type": { "type": "string", "enum": ["undefined"] }
+        }
+      },
+      "Map": {
+        "required": ["value", "__type"],
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "array",
+            "items": { "type": "array" }
+          },
+          "__type": { "type": "string", "enum": ["Map"] }
+        }
+      },
+      "BlockHash": {
+        "type": "string",
+        "example": "4a5bac013f3fa6aed94e49806b8f0f51c5d69979dd200af0767b0eb25f761242"
+      },
+      "BlockHeader": {
+        "type": "object",
+        "properties": {
+          "blockNo": { "type": "integer" },
+          "hash": { "$ref": "#/components/schemas/BlockHash" },
+          "slot": { "type": "integer" }
+        }
+      },
+      "Block": {
+        "type": "object",
+        "properties": {
+          "confirmations": { "type": "number" },
+          "date": { "$ref": "#/components/schemas/Date" },
+          "epoch": { "type": "integer" },
+          "epochSlot": { "type": "integer" },
+          "fees": { "$ref": "#/components/schemas/BigInt" },
+          "header": { "$ref": "#/components/schemas/BlockHeader" },
+          "nextBlock": {
+            "anyOf": [{ "$ref": "#/components/schemas/Undefined" }, { "$ref": "#/components/schemas/BlockHash" }]
+          },
+          "previousBlock": {
+            "anyOf": [{ "$ref": "#/components/schemas/Undefined" }, { "$ref": "#/components/schemas/BlockHash" }]
+          },
+          "size": { "type": "integer" },
+          "slotLeader": { "type": "string" },
+          "totalOutput": { "$ref": "#/components/schemas/BigInt" },
+          "txCount": { "type": "number" },
+          "vrf": { "type": "string" }
+        }
+      },
+      "Address": {
+        "type": "string",
+        "example": "addr_test1qpu5vlrf4xkxv2qpwngf6cjhtw542ayty80v8dyr49rf5ewvxwdrt70qlcpeeagscasafhffqsxy36t90ldv06wqrk2qum8x5w"
+      },
+      "StakeAddress": {
+        "type": "string",
+        "example": "stake_test1uqrw9tjymlm8wrwq7jk68n6v7fs9qz8z0tkdkve26dylmfc2ux2hj"
+      },
+      "TxHash": {
+        "type": "string",
+        "example": "f54a7f632eb0d936820ed9332d2316e12435e286ad700e825371a625d95e44e6"
+      },
+      "AuxiliaryDataBody": {
+        "type": "object",
+        "properties": {
+          "blob": { "anyOf": [{ "$ref": "#/components/schemas/Map" }, { "$ref": "#/components/schemas/Undefined" }] },
+          "scripts": {
+            "anyOf": [{ "type": "array", "items": { "type": "object" } }, { "$ref": "#/components/schemas/Undefined" }]
+          }
+        }
+      },
+      "AuxiliaryData": {
+        "type": "object",
+        "properties": {
+          "hash": { "type": "string" },
+          "body": { "$ref": "#/components/schemas/AuxiliaryDataBody" }
+        }
+      },
+      "ImplicitCoin": {
+        "type": "object",
+        "properties": {
+          "input": { "$ref": "#/components/schemas/BigInt" },
+          "deposit": { "$ref": "#/components/schemas/BigInt" }
+        }
+      },
+      "Redeemer": {
+        "type": "object",
+        "properties": {
+          "executionUnits": {
+            "type": "object",
+            "properties": {
+              "memory": { "type": "integer" },
+              "steps": { "type": "integer" }
+            }
+          },
+          "index": { "type": "integer" },
+          "purpose": { "type": "string", "enum": ["spend", "mint", "certificate", "withdrawal"] },
+          "scriptHash": { "type": "string" }
+        }
+      },
+      "Witness": {
+        "type": "object",
+        "properties": {
+          "bootstrap": {
+            "anyOf": [{ "$ref": "#/components/schemas/Undefined" }, { "type": "array", "items": { "type": "object" } }]
+          },
+          "datums": { "anyOf": [{ "$ref": "#/components/schemas/Undefined" }, { "type": "object" }] },
+          "redeemers": {
+            "anyOf": [
+              { "$ref": "#/components/schemas/Undefined" },
+              { "type": "array", "items": { "$ref": "#/components/schemas/Redeemer" } }
+            ]
+          },
+          "scripts": { "anyOf": [{ "$ref": "#/components/schemas/Undefined" }, { "type": "object" }] },
+          "signatures": { "type": "object" }
+        }
+      },
+      "TokenMap": { "type": "object" },
+      "Value": {
+        "required": ["coins"],
+        "type": "object",
+        "properties": {
+          "coins": { "$ref": "#/components/schemas/BigInt" },
+          "assets": { "$ref": "#/components/schemas/TokenMap" }
+        }
+      },
+      "Certificate": {
+        "type": "object",
+        "properties": {
+          "__typename": { "type": "string" }
+        }
+      },
+      "TxInput": {
+        "type": "object",
+        "properties": {
+          "address": { "$ref": "#/components/schemas/Address" },
+          "index": { "type": "integer" },
+          "txId": { "$ref": "#/components/schemas/TxHash" }
+        }
+      },
+      "TxOutput": {
+        "type": "object",
+        "properties": {
+          "address": { "$ref": "#/components/schemas/Address" },
+          "index": { "type": "integer" },
+          "txId": { "$ref": "#/components/schemas/TxHash" },
+          "value": { "$ref": "#/components/schemas/Value" },
+          "datum": { "anyOf": [{ "$ref": "#/components/schemas/Undefined" }, { "type": "string" }] }
+        }
+      },
+      "Withdrawal": {
+        "type": "object",
+        "properties": {
+          "quantity": { "$ref": "#/components/schemas/BigInt" },
+          "stakeAddress": { "$ref": "#/components/schemas/StakeAddress" }
+        }
+      },
+      "ValidityInterval": {
+        "type": "object",
+        "properties": {
+          "invalidBefore": { "anyOf": [{ "$ref": "#/components/schemas/Undefined" }, { "type": "number" }] },
+          "invalidHereafter": { "anyOf": [{ "$ref": "#/components/schemas/Undefined" }, { "type": "number" }] }
+        }
+      },
+      "TransactionBody": {
+        "type": "object",
+        "properties": {
+          "certificates": {
+            "anyOf": [
+              { "type": "array", "items": { "$ref": "#/components/schemas/Certificate" } },
+              { "$ref": "#/components/schemas/Undefined" }
+            ]
+          },
+          "collaterals": {
+            "anyOf": [
+              { "type": "array", "items": { "$ref": "#/components/schemas/TxInput" } },
+              { "$ref": "#/components/schemas/Undefined" }
+            ]
+          },
+          "fee": { "$ref": "#/components/schemas/BigInt" },
+          "inputs": { "type": "array", "items": { "$ref": "#/components/schemas/TxInput" } },
+          "mint": {
+            "anyOf": [{ "$ref": "#/components/schemas/TokenMap" }, { "$ref": "#/components/schemas/Undefined" }]
+          },
+          "outputs": { "type": "array", "items": { "$ref": "#/components/schemas/TxOutput" } },
+          "validityInterval": { "$ref": "#/components/schemas/ValidityInterval" },
+          "withdrawals": {
+            "anyOf": [
+              { "type": "array", "items": { "$ref": "#/components/schemas/Withdrawal" } },
+              { "$ref": "#/components/schemas/Undefined" }
+            ]
+          }
+        }
+      },
+      "Transaction": {
+        "type": "object",
+        "properties": {
+          "auxiliaryData": {
+            "anyOf": [{ "$ref": "#/components/schemas/AuxiliaryData" }, { "$ref": "#/components/schemas/Undefined" }]
+          },
+          "blockHeader": { "$ref": "#/components/schemas/BlockHeader" },
+          "body": { "$ref": "#/components/schemas/TransactionBody" },
+          "id": { "$ref": "#/components/schemas/TxHash" },
+          "implicitCoin": { "$ref": "#/components/schemas/ImplicitCoin" },
+          "index": { "type": "integer" },
+          "txSize": { "type": "integer" },
+          "witness": { "$ref": "#/components/schemas/Witness" }
+        }
+      },
+      "ChainHistoryBlocksBody": {
+        "required": ["args"],
+        "type": "object",
+        "properties": {
+          "args": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": { "$ref": "#/components/schemas/BlockHash" }
+            }
+          }
+        }
+      },
+      "ChainHistoryBlocksResponse": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Block"
+        }
+      },
+      "ChainHistoryTxByHashesBody": {
+        "required": ["args"],
+        "type": "object",
+        "properties": {
+          "args": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": { "$ref": "#/components/schemas/TxHash" }
+            }
+          }
+        }
+      },
+      "ChainHistoryTxByAddressesBody": {
+        "required": ["args"],
+        "type": "object",
+        "properties": {
+          "args": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["addresses"],
+              "properties": {
+                "addresses": { "type": "array", "items": { "$ref": "#/components/schemas/Address" } },
+                "sinceBlock": { "type": "number" }
+              }
+            }
+          }
+        }
+      },
+      "ChainHistoryTxResponse": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Transaction"
+        }
+      }
+    }
+  }
+}

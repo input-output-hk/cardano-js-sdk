@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-len */
-// import { Cardano, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { Cardano, StakePoolQueryOptions, StakePoolSearchProvider, StakePoolSearchResults } from '@cardano-sdk/core';
 import { DbSyncStakePoolSearchProvider, HttpServer, HttpServerConfig, StakePoolSearchHttpService } from '../../src';
 import { Pool } from 'pg';
+import { doServerRequest } from '../util';
 import { getPort } from 'get-port-please';
 import { stakePoolSearchHttpProvider } from '@cardano-sdk/cardano-services-client';
 import axios from 'axios';
@@ -47,20 +47,19 @@ describe('StakePoolSearchHttpService', () => {
   let port: number;
   let apiUrlBase: string;
   let config: HttpServerConfig;
+  let doStakePoolRequest: ReturnType<typeof doServerRequest>;
 
   beforeAll(async () => {
     port = await getPort();
     apiUrlBase = `http://localhost:${port}/stake-pool-search`;
     config = { listen: { port } };
     dbConnection = new Pool({ connectionString: process.env.DB_CONNECTION_STRING });
+    doStakePoolRequest = doServerRequest(apiUrlBase);
   });
 
   afterEach(async () => {
     jest.resetAllMocks();
   });
-
-  const doServerRequest = async (arg: unknown): Promise<StakePoolSearchResults> =>
-    (await axios.post(`${apiUrlBase}/search`, { args: [arg] })).data;
 
   describe('healthy state', () => {
     beforeAll(async () => {
@@ -87,13 +86,14 @@ describe('StakePoolSearchHttpService', () => {
     });
 
     describe('/search', () => {
+      const url = '/search';
       it('returns a 200 coded response with a well formed HTTP request', async () => {
-        expect((await axios.post(`${apiUrlBase}/search`, { args: [] })).status).toEqual(200);
+        expect((await axios.post(`${apiUrlBase}${url}`, { args: [] })).status).toEqual(200);
       });
 
       it('returns a 415 coded response if the wrong content type header is used', async () => {
         try {
-          await axios.post(`${apiUrlBase}/search`, undefined, { headers: { 'Content-Type': APPLICATION_CBOR } });
+          await axios.post(`${apiUrlBase}${url}`, undefined, { headers: { 'Content-Type': APPLICATION_CBOR } });
           throw new Error('fail');
         } catch (error: any) {
           expect(error.response.status).toBe(415);
@@ -127,36 +127,48 @@ describe('StakePoolSearchHttpService', () => {
 
       describe('pagination', () => {
         it('should paginate response', async () => {
-          const req = {};
-          const reqWithPagination = { pagination: { limit: 2, startAt: 1 } };
-          const response = await doServerRequest(req);
-          const responseWithPagination = await doServerRequest(reqWithPagination);
-          expect(response.pageResults.length).toEqual(8);
+          const req: StakePoolQueryOptions = {};
+          const reqWithPagination: StakePoolQueryOptions = { pagination: { limit: 2, startAt: 1 } };
+          const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [req]);
+          const responseWithPagination = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(
+            url,
+            [reqWithPagination]
+          );
+          expect(response.pageResults.length).toEqual(9);
           expect(responseWithPagination.pageResults.length).toEqual(2);
           expect(response.pageResults[0]).not.toEqual(responseWithPagination.pageResults[0]);
         });
         it('should paginate response with or condition', async () => {
-          const req = { filters: { _condition: 'or' } };
-          const reqWithPagination = { ...req, pagination: { limit: 2, startAt: 1 } };
-          const response = await doServerRequest(req);
-          const responseWithPagination = await doServerRequest(reqWithPagination);
-          expect(response.pageResults.length).toEqual(8);
+          const req: StakePoolQueryOptions = { filters: { _condition: 'or' } };
+          const reqWithPagination: StakePoolQueryOptions = { ...req, pagination: { limit: 2, startAt: 1 } };
+          const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [req]);
+          const responseWithPagination = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(
+            url,
+            [reqWithPagination]
+          );
+          expect(response.pageResults.length).toEqual(9);
           expect(responseWithPagination.pageResults.length).toEqual(2);
           expect(response.pageResults[0]).not.toEqual(responseWithPagination.pageResults[0]);
         });
         it('should paginate rewards response', async () => {
           const req = { pagination: { limit: 1, startAt: 1 } };
           const reqWithRewardsPagination = { pagination: { limit: 1, startAt: 1 }, rewardsHistoryLimit: 0 };
-          const response = await doServerRequest(req);
-          const responseWithPagination = await doServerRequest(reqWithRewardsPagination);
+          const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [req]);
+          const responseWithPagination = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(
+            url,
+            [reqWithRewardsPagination]
+          );
           expect(response.pageResults[0].epochRewards.length).toEqual(1);
           expect(responseWithPagination.pageResults[0].epochRewards.length).toEqual(0);
         });
         it('should paginate rewards response with or condition', async () => {
-          const req = { filters: { _condition: 'or' }, pagination: { limit: 1, startAt: 1 } };
+          const req: StakePoolQueryOptions = { filters: { _condition: 'or' }, pagination: { limit: 1, startAt: 1 } };
           const reqWithRewardsPagination = { pagination: { limit: 1, startAt: 1 }, rewardsHistoryLimit: 0 };
-          const response = await doServerRequest(req);
-          const responseWithPagination = await doServerRequest(reqWithRewardsPagination);
+          const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [req]);
+          const responseWithPagination = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(
+            url,
+            [reqWithRewardsPagination]
+          );
           expect(response.pageResults[0].epochRewards.length).toEqual(1);
           expect(responseWithPagination.pageResults[0].epochRewards.length).toEqual(0);
         });
@@ -178,8 +190,14 @@ describe('StakePoolSearchHttpService', () => {
               }
             }
           };
-          const responseWithOrCondition = await doServerRequest(setFilterCondition(req, 'or'));
-          const responseWithAndCondition = await doServerRequest(req);
+          const responseWithOrCondition = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(
+            url,
+            [setFilterCondition(req, 'or')]
+          );
+          const responseWithAndCondition = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(
+            url,
+            [req]
+          );
           expect(responseWithOrCondition).toMatchSnapshot();
           expect(responseWithAndCondition).toEqual(responseWithOrCondition);
         });
@@ -196,8 +214,14 @@ describe('StakePoolSearchHttpService', () => {
               }
             }
           };
-          const responseWithOrCondition = await doServerRequest(setFilterCondition(req, 'or'));
-          const responseWithAndCondition = await doServerRequest(req);
+          const responseWithOrCondition = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(
+            url,
+            [setFilterCondition(req, 'or')]
+          );
+          const responseWithAndCondition = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(
+            url,
+            [req]
+          );
           expect(responseWithOrCondition).toMatchSnapshot();
           expect(responseWithAndCondition).toEqual(responseWithAndCondition);
         });
@@ -210,7 +234,7 @@ describe('StakePoolSearchHttpService', () => {
               }
             }
           };
-          const response = await doServerRequest(req);
+          const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [req]);
           expect(response.pageResults).toEqual([]);
         });
       });
@@ -221,8 +245,11 @@ describe('StakePoolSearchHttpService', () => {
               status: [Cardano.StakePoolStatus.Active]
             }
           };
-          const responseWithOrCondition = await doServerRequest(setFilterCondition(req, 'or'));
-          const response = await doServerRequest(req);
+          const responseWithOrCondition = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(
+            url,
+            [setFilterCondition(req, 'or')]
+          );
+          const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [req]);
           expect(responseWithOrCondition).toMatchSnapshot();
           expect(response).toEqual(responseWithOrCondition);
         });
@@ -233,7 +260,7 @@ describe('StakePoolSearchHttpService', () => {
               status: [Cardano.StakePoolStatus.Activating]
             }
           };
-          const response = await doServerRequest(req);
+          const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [req]);
           expect(response).toMatchSnapshot();
         });
         it('search by retired status', async () => {
@@ -242,8 +269,11 @@ describe('StakePoolSearchHttpService', () => {
               status: [Cardano.StakePoolStatus.Retired]
             }
           };
-          const responseWithOrCondition = await doServerRequest(setFilterCondition(req, 'or'));
-          const response = await doServerRequest(req);
+          const responseWithOrCondition = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(
+            url,
+            [setFilterCondition(req, 'or')]
+          );
+          const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [req]);
           expect(responseWithOrCondition).toMatchSnapshot();
           expect(response).toEqual(responseWithOrCondition);
         });
@@ -253,8 +283,11 @@ describe('StakePoolSearchHttpService', () => {
               status: [Cardano.StakePoolStatus.Retiring]
             }
           };
-          const responseWithOrCondition = await doServerRequest(setFilterCondition(req, 'or'));
-          const response = await doServerRequest(req);
+          const responseWithOrCondition = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(
+            url,
+            [setFilterCondition(req, 'or')]
+          );
+          const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [req]);
           expect(responseWithOrCondition).toMatchSnapshot();
           expect(response).toEqual(responseWithOrCondition);
         });
@@ -266,8 +299,11 @@ describe('StakePoolSearchHttpService', () => {
               pledgeMet: true
             }
           };
-          const responseWithAndCondition = await doServerRequest(req);
-          const responseWithOrCondition = await axios.post(`${apiUrlBase}/search`, {
+          const responseWithAndCondition = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(
+            url,
+            [req]
+          );
+          const responseWithOrCondition = await axios.post(`${apiUrlBase}${url}`, {
             args: [setFilterCondition(req, 'or')]
           });
           expect(responseWithOrCondition.status).toEqual(200);
@@ -281,9 +317,15 @@ describe('StakePoolSearchHttpService', () => {
               pledgeMet: false
             }
           };
-          const responseWithOrCondition = await doServerRequest(setFilterCondition(req, 'or'));
+          const responseWithOrCondition = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(
+            url,
+            [setFilterCondition(req, 'or')]
+          );
           expect(responseWithOrCondition).toMatchSnapshot();
-          const responseWithAndCondition = await doServerRequest(req);
+          const responseWithAndCondition = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(
+            url,
+            [req]
+          );
           expect(responseWithAndCondition).toEqual(responseWithAndCondition);
         });
       });
@@ -315,158 +357,170 @@ describe('StakePoolSearchHttpService', () => {
         };
         describe('identifier & status filters', () => {
           it('active with or condition', async () => {
-            const response = await doServerRequest(
+            const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
               addStatusFilter(setFilterCondition(req, 'or'), Cardano.StakePoolStatus.Active)
-            );
+            ]);
             expect(response).toMatchSnapshot();
           });
           it('active with and condition', async () => {
-            const response = await doServerRequest(addStatusFilter(req, Cardano.StakePoolStatus.Active));
+            const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
+              addStatusFilter(req, Cardano.StakePoolStatus.Active)
+            ]);
             expect(response).toMatchSnapshot();
           });
           it('activating with or condition', async () => {
-            const response = await doServerRequest(
+            const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
               addStatusFilter(setFilterCondition(req, 'or'), Cardano.StakePoolStatus.Activating)
-            );
+            ]);
             expect(response).toMatchSnapshot();
           });
           it('activating with and condition', async () => {
-            const response = await doServerRequest(addStatusFilter(req, Cardano.StakePoolStatus.Activating));
+            const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
+              addStatusFilter(req, Cardano.StakePoolStatus.Activating)
+            ]);
             expect(response).toMatchSnapshot();
           });
           it('retired with or condition', async () => {
-            const response = await doServerRequest(
+            const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
               addStatusFilter(setFilterCondition(req, 'or'), Cardano.StakePoolStatus.Retired)
-            );
+            ]);
             expect(response).toMatchSnapshot();
           });
           it('retired with and condition', async () => {
-            const response = await doServerRequest(addStatusFilter(req, Cardano.StakePoolStatus.Retired));
+            const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
+              addStatusFilter(req, Cardano.StakePoolStatus.Retired)
+            ]);
             expect(response).toMatchSnapshot();
           });
           it('retiring with or condition', async () => {
-            const response = await doServerRequest(
+            const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
               addStatusFilter(setFilterCondition(req, 'or'), Cardano.StakePoolStatus.Retiring)
-            );
+            ]);
             expect(response).toMatchSnapshot();
           });
           it('retiring with and condition', async () => {
-            const response = await doServerRequest(addStatusFilter(req, Cardano.StakePoolStatus.Retiring));
+            const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
+              addStatusFilter(req, Cardano.StakePoolStatus.Retiring)
+            ]);
             expect(response).toMatchSnapshot();
           });
         });
         describe('identifier & status  & pledgeMet filters', () => {
           it('pledgeMet true, active,  or condition', async () => {
-            const response = await doServerRequest(
+            const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
               addPledgeMetFilter(addStatusFilter(setFilterCondition(req, 'or'), Cardano.StakePoolStatus.Active), true)
-            );
+            ]);
             expect(response).toMatchSnapshot();
           });
           it('pledgeMet false, active,  or condition', async () => {
-            const response = await doServerRequest(
+            const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
               addPledgeMetFilter(addStatusFilter(setFilterCondition(req, 'or'), Cardano.StakePoolStatus.Active), false)
-            );
+            ]);
             expect(response).toMatchSnapshot();
           });
           it('pledgeMet true, status active, and condition', async () => {
-            const response = await doServerRequest(
+            const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
               addPledgeMetFilter(addStatusFilter(req, Cardano.StakePoolStatus.Active), true)
-            );
+            ]);
             expect(response).toMatchSnapshot();
           });
           it('pledgeMet false, status active, and condition', async () => {
-            const response = await doServerRequest(
+            const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
               addPledgeMetFilter(addStatusFilter(req, Cardano.StakePoolStatus.Active), false)
-            );
+            ]);
             expect(response).toMatchSnapshot();
           });
           it('pledgeMet true, status activating, or condition', async () => {
-            const response = await doServerRequest(
+            const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
               addPledgeMetFilter(
                 addStatusFilter(setFilterCondition(req, 'or'), Cardano.StakePoolStatus.Activating),
                 true
               )
-            );
+            ]);
             expect(response).toMatchSnapshot();
           });
           it('pledgeMet false, status activating, or condition', async () => {
-            const response = await doServerRequest(
+            const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
               addPledgeMetFilter(
                 addStatusFilter(setFilterCondition(req, 'or'), Cardano.StakePoolStatus.Activating),
                 false
               )
-            );
+            ]);
             expect(response).toMatchSnapshot();
           });
           it('pledgeMet true, status activating, and condition', async () => {
-            const response = await doServerRequest(
+            const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
               addPledgeMetFilter(addStatusFilter(req, Cardano.StakePoolStatus.Activating), true)
-            );
+            ]);
             expect(response).toMatchSnapshot();
           });
           it('pledgeMet false, status activating, and condition', async () => {
-            const response = await doServerRequest(
+            const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
               addPledgeMetFilter(addStatusFilter(req, Cardano.StakePoolStatus.Activating), false)
-            );
+            ]);
             expect(response).toMatchSnapshot();
           });
           it('pledgeMet true, status retired, or condition', async () => {
-            const response = await doServerRequest(
+            const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
               addPledgeMetFilter(addStatusFilter(setFilterCondition(req, 'or'), Cardano.StakePoolStatus.Retired), true)
-            );
+            ]);
             expect(response).toMatchSnapshot();
           });
           it('pledgeMet false, status retired, or condition', async () => {
-            const response = await doServerRequest(
+            const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
               addPledgeMetFilter(addStatusFilter(setFilterCondition(req, 'or'), Cardano.StakePoolStatus.Retired), false)
-            );
+            ]);
             expect(response).toMatchSnapshot();
           });
           it('pledgeMet true, status retired, and condition', async () => {
-            const response = await doServerRequest(
+            const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
               addPledgeMetFilter(addStatusFilter(req, Cardano.StakePoolStatus.Retired), true)
-            );
+            ]);
             expect(response).toMatchSnapshot();
           });
           it('pledgeMet false, status retired, and condition', async () => {
-            const response = await doServerRequest(
+            const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
               addPledgeMetFilter(addStatusFilter(req, Cardano.StakePoolStatus.Retired), false)
-            );
+            ]);
             expect(response).toMatchSnapshot();
           });
           it('pledgeMet true, status retiring, or condition', async () => {
-            const response = await doServerRequest(
+            const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
               addPledgeMetFilter(addStatusFilter(setFilterCondition(req, 'or'), Cardano.StakePoolStatus.Retiring), true)
-            );
+            ]);
             expect(response).toMatchSnapshot();
           });
           it('pledgeMet false, status retiring, or condition', async () => {
-            const response = await doServerRequest(
+            const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
               addPledgeMetFilter(
                 addStatusFilter(setFilterCondition(req, 'or'), Cardano.StakePoolStatus.Retiring),
                 false
               )
-            );
+            ]);
             expect(response).toMatchSnapshot();
           });
           it('pledgeMet true, status retiring, and condition', async () => {
-            const response = await doServerRequest(
+            const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
               addPledgeMetFilter(addStatusFilter(req, Cardano.StakePoolStatus.Retiring), true)
-            );
+            ]);
             expect(response).toMatchSnapshot();
           });
           it('pledgeMet false, status retiring, and condition', async () => {
-            const response = await doServerRequest(
+            const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
               addPledgeMetFilter(addStatusFilter(req, Cardano.StakePoolStatus.Retiring), false)
-            );
+            ]);
             expect(response).toMatchSnapshot();
           });
           it('pledgeMet, multiple status, or condition', async () => {
-            const response = await doServerRequest(reqWithMultipleFilters);
+            const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
+              reqWithMultipleFilters
+            ]);
             expect(response).toMatchSnapshot();
           });
           it('pledgeMet, multiple status, and condition', async () => {
-            const response = await doServerRequest(setFilterCondition(reqWithMultipleFilters, 'and'));
+            const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
+              setFilterCondition(reqWithMultipleFilters, 'and')
+            ]);
             expect(response).toMatchSnapshot();
           });
         });
@@ -496,17 +550,21 @@ describe('StakePoolSearchHttpService', () => {
         };
 
         it('sort by name desc order', async () => {
-          const response = await doServerRequest(setSortCondition({}, 'desc', 'name'));
+          const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
+            setSortCondition({}, 'desc', 'name')
+          ]);
           expect(response).toMatchSnapshot();
         });
 
         it('sort by name asc order', async () => {
-          const response = await doServerRequest(setSortCondition({}, 'asc', 'name'));
+          const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
+            setSortCondition({}, 'asc', 'name')
+          ]);
           expect(response).toMatchSnapshot();
         });
 
         it('if sort not provided, defaults to order by name and then by poolId asc', async () => {
-          const response = await doServerRequest({});
+          const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [{}]);
 
           const resultSortedCopy = [...response.pageResults].sort(sortByNameThenByPoolId);
 
@@ -541,7 +599,9 @@ describe('StakePoolSearchHttpService', () => {
             }
           };
 
-          const { pageResults } = await doServerRequest(reqOptions);
+          const { pageResults } = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
+            reqOptions
+          ]);
 
           expect(pageResults.length).toEqual(4);
           expect(pageResults[0].metadata?.name).toEqual('CLIO1');
@@ -550,25 +610,33 @@ describe('StakePoolSearchHttpService', () => {
         });
 
         it('sort with applied filters', async () => {
-          const response = await doServerRequest(
+          const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
             setSortCondition(setFilterCondition(filterArgs, 'or'), 'desc', 'name')
-          );
+          ]);
           expect(response).toMatchSnapshot();
         });
 
         it('sort asc by name with applied pagination', async () => {
-          const firstPageResultSet = await doServerRequest(setSortCondition(setPagination({}, 0, 3), 'asc', 'name'));
+          const firstPageResultSet = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
+            setSortCondition(setPagination({}, 0, 3), 'asc', 'name')
+          ]);
 
-          const secondPageResultSet = await doServerRequest(setSortCondition(setPagination({}, 3, 3), 'asc', 'name'));
+          const secondPageResultSet = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
+            setSortCondition(setPagination({}, 3, 3), 'asc', 'name')
+          ]);
 
           expect(firstPageResultSet).toMatchSnapshot();
           expect(secondPageResultSet).toMatchSnapshot();
         });
 
         it('sort asc by name with applied pagination, with change sort order on next page', async () => {
-          const firstPageResponse = await doServerRequest(setSortCondition(setPagination({}, 0, 5), 'asc', 'name'));
+          const firstPageResponse = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
+            setSortCondition(setPagination({}, 0, 5), 'asc', 'name')
+          ]);
 
-          const secondPageResponse = await doServerRequest(setSortCondition(setPagination({}, 5, 5), 'asc', 'name'));
+          const secondPageResponse = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
+            setSortCondition(setPagination({}, 5, 5), 'asc', 'name')
+          ]);
           const firstPageIds = firstPageResponse.pageResults.map(({ id }) => id);
 
           const hasDuplicatedIdsBetweenPages = firstPageIds.some((id) =>
@@ -581,9 +649,9 @@ describe('StakePoolSearchHttpService', () => {
         });
 
         it('sort asc by name with applied pagination and filters', async () => {
-          const responsePage = await doServerRequest(
+          const responsePage = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
             setSortCondition(setPagination(setFilterCondition(filterArgs, 'or'), 0, 5), 'asc', 'name')
-          );
+          ]);
 
           expect(responsePage).toMatchSnapshot();
         });

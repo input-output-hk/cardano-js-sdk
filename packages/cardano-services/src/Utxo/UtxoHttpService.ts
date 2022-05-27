@@ -1,7 +1,6 @@
 import * as OpenApiValidator from 'express-openapi-validator';
-import { Cardano, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { DbSyncUtxoProvider } from './DbSyncUtxoProvider';
-import { HttpServer, HttpService } from '../Http';
+import { HttpService } from '../Http';
 import { Logger, dummyLogger } from 'ts-log';
 import { ServiceNames } from '../Program';
 import { providerHandler } from '../util';
@@ -38,14 +37,7 @@ export class UtxoHttpService extends HttpService {
     );
     router.post(
       '/utxo-by-addresses',
-      providerHandler<[Cardano.Address[]], Cardano.Utxo[]>(async ([addresses], _, res) => {
-        try {
-          return HttpServer.sendJSON(res, await utxoProvider.utxoByAddresses(addresses));
-        } catch (error) {
-          logger.error(error);
-          return HttpServer.sendJSON(res, new ProviderError(ProviderFailure.Unhealthy, error), 500);
-        }
-      }, logger)
+      providerHandler(utxoProvider.utxoByAddresses.bind(utxoProvider))(HttpService.routeHandler(logger), logger)
     );
     return new UtxoHttpService({ logger, utxoProvider }, router);
   }
