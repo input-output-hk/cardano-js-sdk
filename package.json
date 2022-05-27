@@ -29,8 +29,8 @@
     "bump-version": "npx standard-version"
   },
   "lint-staged": {
-    "*(apps/**/*.{js,ts}|packages/!(*golden-test-generator)/**/*.{js,ts})": [
-      "yarn lint",
+    "packages/!(*golden-test-generator)/**/*.{js,ts}": [
+      "eslint",
       "yarn tscNoEmit"
     ]
   },
