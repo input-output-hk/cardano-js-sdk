@@ -69,13 +69,15 @@ export const createHttpProvider = <T extends object>({
           });
           axiosInstance.interceptors.response.use((value) => ({
             ...value,
-            data: util.fromSerializableObject(value.data, () => ProviderError.prototype)
+            data: util.fromSerializableObject(value.data, { getErrorPrototype: () => ProviderError.prototype })
           }));
           return (await axiosInstance.request(req)).data || undefined;
         } catch (error) {
           if (axios.isAxiosError(error)) {
             if (error.response) {
-              const typedError = util.fromSerializableObject(error.response.data, () => ProviderError.prototype);
+              const typedError = util.fromSerializableObject(error.response.data, {
+                getErrorPrototype: () => ProviderError.prototype
+              });
               if (mapError) return mapError(typedError, method);
               throw new ProviderError(ProviderFailure.Unknown, typedError);
             }

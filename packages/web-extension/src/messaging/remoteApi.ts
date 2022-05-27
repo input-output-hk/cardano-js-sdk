@@ -36,7 +36,7 @@ const consumeMethod =
     const requestMessage: RequestMessage = {
       messageId: newMessageId(),
       request: {
-        args: args.map(util.toSerializableObject),
+        args: args.map((arg) => util.toSerializableObject(arg)),
         method: propName
       }
     };
@@ -45,10 +45,10 @@ const consumeMethod =
       merge(
         postMessage(requestMessage).pipe(mergeMap(() => EMPTY)),
         message$.pipe(
-          map(({ data }) => data),
+          map(({ data }) => util.fromSerializableObject(data, { getErrorPrototype })),
           filter(isResponseMessage),
           filter(({ messageId }) => messageId === requestMessage.messageId),
-          map(({ response }) => util.fromSerializableObject(response, getErrorPrototype))
+          map(({ response }) => response)
         )
       )
     );
@@ -94,7 +94,7 @@ export const consumeMessengerRemoteApi = <T extends object>(
           return consumeMethod({ getErrorPrototype, propName }, { logger, messenger });
         } else if (propMetadata === RemoteApiPropertyType.Observable) {
           const observableMessenger = messenger.deriveChannel(propName);
-          const messageData$ = observableMessenger.message$.pipe(map(({ data }) => data));
+          const messageData$ = observableMessenger.message$.pipe(map(({ data }) => util.fromSerializableObject(data)));
           const unsubscribe$ = messageData$.pipe(
             filter(isObservableCompletionMessage),
             filter(({ subscribe }) => !subscribe),
@@ -182,14 +182,16 @@ export const bindObservableChannels = <API extends object>(
       const observableMessenger = messenger.deriveChannel(observableProperty);
       const connectSubscription = observableMessenger.connect$.subscribe((port) => {
         if (observable$.value !== null) {
-          port.postMessage({ emit: observable$.value, messageId: newMessageId() } as EmitMessage);
+          port.postMessage(
+            util.toSerializableObject({ emit: observable$.value, messageId: newMessageId() } as EmitMessage)
+          );
         }
       });
       const broadcastMessage = (message: Partial<ObservableCompletionMessage | EmitMessage>) =>
         observableMessenger
           .postMessage({
             messageId: newMessageId(),
-            ...message
+            ...(util.toSerializableObject(message) as object)
           })
           .subscribe();
       const observableSubscription = observable$.subscribe({
