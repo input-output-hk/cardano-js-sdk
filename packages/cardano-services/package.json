@@ -28,6 +28,8 @@
     "test:debug": "DEBUG=true yarn test",
     "run:http-server": "ts-node --transpile-only src/run.ts",
     "run:http-server:debug": "npx nodemon --legacy-watch --exec 'node -r ts-node/register --inspect=0.0.0.0:9229 src/run.ts'",
+    "run:tx-worker": "ts-node --transpile-only src/startWorker.ts",
+    "run:tx-worker:debug": "npx nodemon --legacy-watch --exec 'node -r ts-node/register --inspect=0.0.0.0:9229 src/startWorker.ts'",
     "cli": "ts-node --transpile-only src/cli.ts"
   },
   "devDependencies": {
