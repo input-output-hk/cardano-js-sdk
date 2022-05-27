@@ -7,14 +7,17 @@ type PouchdbDoc = {
   [k in PouchdbDocMetadata]: unknown;
 };
 
-const TRANSFORMED_KEY_PREFIX = 'KEY$';
+const transformationTypeKey = 'transformed_type_';
+const TRANSFORMED_KEY_PREFIX = 'transformed_key_';
+
 const serializeOptions: util.ToSerializableObjectOptions = {
   serializeKey: (key) => {
     if (key.startsWith('_')) {
       return `${TRANSFORMED_KEY_PREFIX}${key}`;
     }
     return key;
-  }
+  },
+  transformationTypeKey
 };
 const deserializeOptions: util.FromSerializableObjectOptions = {
   deserializeKey: (key) => {
@@ -22,7 +25,8 @@ const deserializeOptions: util.FromSerializableObjectOptions = {
       return key.slice(TRANSFORMED_KEY_PREFIX.length);
     }
     return key;
-  }
+  },
+  transformationTypeKey
 };
 
 // Pouchdb doesn't know how to store bigint and Map
@@ -31,7 +35,7 @@ export const toPouchdbDoc = <T>(obj: T): unknown => {
   if (Array.isArray(obj)) {
     const value = obj.map((item) => util.toSerializableObject(item, serializeOptions));
     return {
-      __type: 'Array',
+      [transformationTypeKey]: 'Array',
       value
     };
   }
@@ -42,7 +46,7 @@ export const fromPouchdbDoc = <T>(doc: unknown): T => {
   if (typeof doc === 'object') {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const docAsAny = doc as any;
-    if (docAsAny.__type === 'Array')
+    if (docAsAny[transformationTypeKey] === 'Array')
       return docAsAny.value.map((val: unknown) => util.fromSerializableObject(val, deserializeOptions));
   }
   return util.fromSerializableObject(doc, deserializeOptions);

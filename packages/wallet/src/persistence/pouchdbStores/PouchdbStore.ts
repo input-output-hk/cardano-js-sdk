@@ -53,20 +53,20 @@ export abstract class PouchdbStore<T> {
 
   protected forcePut(docId: string, doc: T) {
     if (this.destroyed) return EMPTY;
+    const serializableDoc = this.toPouchdbDoc(doc);
     return from(
-      (async () =>
-        this.db
-          .put(
-            {
-              _id: docId,
-              _rev: await this.#getRev(docId),
-              ...this.toPouchdbDoc(doc)
-            },
-            { force: true }
-          )
+      (async () => {
+        const pouchdbDoc = {
+          _id: docId,
+          _rev: await this.#getRev(docId),
+          ...serializableDoc
+        };
+        return this.db
+          .put(pouchdbDoc, { force: true })
           .catch((error) =>
-            this.logger.error(`PouchdbStore(${this.dbName}): failed to forcePut`, doc, error)
-          ) as Promise<void>)()
+            this.logger.error(`PouchdbStore(${this.dbName}): failed to forcePut`, pouchdbDoc, error)
+          ) as Promise<void>;
+      })()
     );
   }
 }
