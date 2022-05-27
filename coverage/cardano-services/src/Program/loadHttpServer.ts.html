@@ -30,9 +30,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">46.15% </span>
+                <span class="strong">45.45% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>6/13</span>
+                <span class='fraction'>5/11</span>
             </div>
         
             
@@ -149,12 +149,7 @@
 <a name='L84'></a><a href='#L84'>84</a>
 <a name='L85'></a><a href='#L85'>85</a>
 <a name='L86'></a><a href='#L86'>86</a>
-<a name='L87'></a><a href='#L87'>87</a>
-<a name='L88'></a><a href='#L88'>88</a>
-<a name='L89'></a><a href='#L89'>89</a>
-<a name='L90'></a><a href='#L90'>90</a>
-<a name='L91'></a><a href='#L91'>91</a>
-<a name='L92'></a><a href='#L92'>92</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L87'></a><a href='#L87'>87</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-yes">10x</span>
@@ -166,7 +161,6 @@
 <span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-yes">10x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -212,10 +206,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -245,30 +235,29 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/* eslint-disable sonarjs/cognitive-complexity */
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { CommonProgramOptions } from '../ProgramsCommon';
 import { DbSyncStakePoolSearchProvider, StakePoolSearchHttpService } from '../StakePoolSearch';
 import { DbSyncUtxoProvider, UtxoHttpService } from '../Utxo';
 import { HttpServer, HttpServerConfig, HttpService } from '../Http';
-import { LogLevel, createLogger } from 'bunyan';
 import { MissingProgramOption, UnknownServiceName } from './errors';
 import { Pool } from 'pg';
 import { ProgramOptionDescriptions } from './ProgramOptionDescriptions';
 import { RabbitMqTxSubmitProvider } from '@cardano-sdk/rabbitmq';
 import { ServiceNames } from './ServiceNames';
 import { TxSubmitHttpService } from '../TxSubmit';
-import { ogmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
+import { createLogger } from 'bunyan';
+import { ogmiosTxSubmitProvider, urlToConnectionConfig } from '@cardano-sdk/ogmios';
+&nbsp;
+export interface HttpServerOptions extends CommonProgramOptions {
+  dbConnectionString?: string;
+  metricsEnabled?: boolean;
+  useQueue?: boolean;
+}
 &nbsp;
 export interface ProgramArgs {
   apiUrl: URL;
   serviceNames: (ServiceNames.StakePoolSearch | ServiceNames.TxSubmit | ServiceNames.Utxo)[];
-  options?: {
-    dbConnectionString?: string;
-    loggerMinSeverity?: LogLevel;
-    metricsEnabled?: boolean;
-    ogmiosUrl?: URL;
-    rabbitmqUrl?: URL;
-    useQueue?: boolean;
-  };
+  options?: HttpServerOptions;
 }
 &nbsp;
 export const loadHttpServer = async (args: ProgramArgs): Promise&lt;HttpServer&gt; =&gt; {
@@ -300,11 +289,7 @@ export const loadHttpServer = async (args: ProgramArgs): Promise&lt;HttpServer&g
             txSubmitProvider:
               args.options?.useQueue &amp;&amp; <span class="branch-1 cbranch-no" title="branch not covered" >args.options?.rabbitmqUrl</span>
                 ? <span class="branch-0 cbranch-no" title="branch not covered" >new RabbitMqTxSubmitProvider(args.options.rabbitmqUrl)</span>
-                : ogmiosTxSubmitProvider({
-                    host: args.options?.ogmiosUrl?.hostname,
-                    port: args.options?.ogmiosUrl ? Number.parseInt(args.options.ogmiosUrl.port) : <span class="branch-1 cbranch-no" title="branch not covered" >undefined,</span>
-                    tls: args.options?.ogmiosUrl?.protocol === 'wss'
-                  })
+                : ogmiosTxSubmitProvider(urlToConnectionConfig(args.options?.ogmiosUrl))
           })
         );
         break;
@@ -343,7 +328,7 @@ export const loadHttpServer = async (args: ProgramArgs): Promise&lt;HttpServer&g
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at Wed May 25 2022 08:26:37 GMT+0000 (Coordinated Universal Time)
+                at Fri May 27 2022 15:27:25 GMT+0000 (Coordinated Universal Time)
             </div>
         <script src="../../prettify.js"></script>
         <script>
