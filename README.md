@@ -82,23 +82,19 @@ A Yarn Workspace maintaining a single version across all packages.
 
 #### System Requirements
 
-- Docker `17.12.0`+
-- Docker Compose
+- [nvm](https://github.com/nvm-sh/nvm)
+- [yarn](https://classic.yarnpkg.com/lang/en/docs/install)
 
 #### Install and Build
 
 ```console
+nvm install && \
+nvm use && \
 yarn install && \
 yarn build
 ```
 
 #### Run Tests
-
-```console
-yarn testnet:up
-```
-
-_In another terminal_
 
 ```console
 yarn test
@@ -114,6 +110,7 @@ yarn test:debug
 
 ```console
 yarn lint
+yarn lint --fix
 ```
 
 ### Cleanup

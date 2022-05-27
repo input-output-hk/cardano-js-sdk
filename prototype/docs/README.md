@@ -1,1 +1,0 @@
-- [Development references](development_references.md)
