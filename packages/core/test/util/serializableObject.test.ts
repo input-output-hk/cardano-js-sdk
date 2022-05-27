@@ -49,6 +49,14 @@ describe('serializableObject', () => {
     expect(deserialized).toBeInstanceOf(CustomError);
   });
 
+  it('supports custom transformation discriminator key', () => {
+    const customKeyOption = { transformationTypeKey: 'discriminator' };
+    const obj = { bigint: 1n };
+    const serializedObj = util.toSerializableObject(obj, customKeyOption);
+    expect(util.fromSerializableObject(serializedObj)).not.toEqual(obj);
+    expect(util.fromSerializableObject(serializedObj, customKeyOption)).toEqual(obj);
+  });
+
   it('supports object key transformation', () => {
     const obj = {
       __a: 'val__a',

@@ -9,22 +9,26 @@ export type TransformKey = (key: string) => string;
 export type GetErrorPrototype = (err: unknown) => typeof Error.prototype;
 
 export interface ToSerializableObjectOptions {
+  transformationTypeKey?: string;
   serializeKey?: TransformKey;
 }
 
 export interface FromSerializableObjectOptions {
+  transformationTypeKey?: string;
   deserializeKey?: TransformKey;
   getErrorPrototype?: GetErrorPrototype;
 }
 
 const defaultGetErrorPrototype: GetErrorPrototype = () => Error.prototype;
 const defaultTransformKey: TransformKey = (key) => key;
+const defaultTransformationTypeKey = '__type';
 
-export const toSerializableObject = (obj: unknown, options?: ToSerializableObjectOptions): unknown => {
+export const toSerializableObject = (obj: unknown, options: ToSerializableObjectOptions = {}): unknown => {
   if (PLAIN_TYPES.has(typeof obj)) return obj;
+  const { transformationTypeKey = defaultTransformationTypeKey, serializeKey = defaultTransformKey } = options;
   if (typeof obj === 'undefined') {
     return {
-      __type: 'undefined'
+      [transformationTypeKey]: 'undefined'
     };
   }
   if (typeof obj === 'object') {
@@ -35,34 +39,33 @@ export const toSerializableObject = (obj: unknown, options?: ToSerializableObjec
     if (ArrayBuffer.isView(obj)) {
       const arr = new Uint8Array(obj.buffer, obj.byteOffset, obj.byteLength / Uint8Array.BYTES_PER_ELEMENT);
       const value = Buffer.from(arr).toString('hex');
-      return { __type: 'Buffer', value };
+      return { [transformationTypeKey]: 'Buffer', value };
     }
     if (obj instanceof Error) {
       return {
-        __type: 'Error',
+        [transformationTypeKey]: 'Error',
         value: serializeError(obj)
       };
     }
     if (obj instanceof Date) {
       return {
-        __type: 'Date',
+        [transformationTypeKey]: 'Date',
         value: obj.getTime()
       };
     }
     if (obj instanceof Map) {
       return {
-        __type: 'Map',
+        [transformationTypeKey]: 'Map',
         value: [...obj.entries()].map(([key, value]) => [
           toSerializableObject(key, options),
           toSerializableObject(value, options)
         ])
       };
     }
-    const transformKey = options?.serializeKey || defaultTransformKey;
     return transform(
       obj,
       (result, value, key) => {
-        result[transformKey(key)] = toSerializableObject(value, options);
+        result[serializeKey(key)] = toSerializableObject(value, options);
         return result;
       },
       {} as Record<string | number | symbol, unknown>
@@ -70,42 +73,54 @@ export const toSerializableObject = (obj: unknown, options?: ToSerializableObjec
   }
   if (typeof obj === 'bigint')
     return {
-      __type: 'bigint',
+      [transformationTypeKey]: 'bigint',
       value: obj.toString()
     };
 };
 
-const fromSerializableObjectUnknown = (obj: unknown, options?: FromSerializableObjectOptions): unknown => {
+const fromSerializableObjectUnknown = (obj: unknown, options: FromSerializableObjectOptions = {}): unknown => {
   if (PLAIN_TYPES.has(typeof obj)) return obj;
   if (typeof obj === 'object') {
     if (obj === null) return null;
     if (Array.isArray(obj)) {
       return obj.map((item) => fromSerializableObjectUnknown(item, options));
     }
+    const {
+      transformationTypeKey = defaultTransformationTypeKey,
+      deserializeKey = defaultTransformKey,
+      getErrorPrototype = defaultGetErrorPrototype
+    } = options;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const docAsAny = obj as any;
-    if (docAsAny.__type === 'undefined') return undefined;
-    if (docAsAny.__type === 'bigint') return BigInt(docAsAny.value);
-    if (docAsAny.__type === 'Buffer') return Buffer.from(docAsAny.value, 'hex');
-    if (docAsAny.__type === 'Date') return new Date(docAsAny.value);
-    if (docAsAny.__type === 'Map')
-      return new Map(
-        docAsAny.value.map((keyValues: unknown[]) => keyValues.map((kv) => fromSerializableObjectUnknown(kv, options)))
-      );
-    if (docAsAny.__type === 'Error') {
-      const error = fromSerializableObjectUnknown(docAsAny.value, options);
-      const getErrorPrototype = options?.getErrorPrototype || defaultGetErrorPrototype;
-      return Object.setPrototypeOf(error, getErrorPrototype(error));
+    switch (docAsAny[transformationTypeKey]) {
+      case 'undefined':
+        return undefined;
+      case 'bigint':
+        return BigInt(docAsAny.value);
+      case 'Buffer':
+        return Buffer.from(docAsAny.value, 'hex');
+      case 'Date':
+        return new Date(docAsAny.value);
+      case 'Map':
+        return new Map(
+          docAsAny.value.map((keyValues: unknown[]) =>
+            keyValues.map((kv) => fromSerializableObjectUnknown(kv, options))
+          )
+        );
+      case 'Error': {
+        const error = fromSerializableObjectUnknown(docAsAny.value, options);
+        return Object.setPrototypeOf(error, getErrorPrototype(error));
+      }
+      default:
+        return transform(
+          obj,
+          (result, value, key) => {
+            result[deserializeKey(key)] = fromSerializableObjectUnknown(value, options);
+            return result;
+          },
+          {} as Record<string | number | symbol, unknown>
+        );
     }
-    const transformKey = options?.deserializeKey || defaultTransformKey;
-    return transform(
-      obj,
-      (result, value, key) => {
-        result[transformKey(key)] = fromSerializableObjectUnknown(value, options);
-        return result;
-      },
-      {} as Record<string | number | symbol, unknown>
-    );
   }
 };
 
