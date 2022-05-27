@@ -2,6 +2,7 @@ import { Assets } from '../../types';
 import { Cardano, EpochRewards, NetworkInfo, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
 import { EMPTY, combineLatest, map } from 'rxjs';
 import { GroupedAddress } from '../../KeyManagement';
+import { Logger } from 'ts-log';
 import { PouchdbCollectionStore } from './PouchdbCollectionStore';
 import { PouchdbDocumentStore } from './PouchdbDocumentStore';
 import { PouchdbKeyValueStore } from './PouchdbKeyValueStore';
@@ -21,15 +22,22 @@ export class PouchdbRewardsHistoryStore extends PouchdbKeyValueStore<Cardano.Rew
 export class PouchdbStakePoolsStore extends PouchdbKeyValueStore<Cardano.PoolId, Cardano.StakePool> {}
 export class PouchdbRewardsBalancesStore extends PouchdbKeyValueStore<Cardano.RewardAccount, Cardano.Lovelace> {}
 
+export interface CreatePouchdbWalletStoresDependencies {
+  logger?: Logger;
+}
+
 /**
  * @param {string} walletName used to derive underlying db names
  */
-export const createPouchdbWalletStores = (walletName: string): WalletStores => {
+export const createPouchdbWalletStores = (
+  walletName: string,
+  { logger }: CreatePouchdbWalletStoresDependencies = {}
+): WalletStores => {
   const baseDbName = walletName.replace(/[^\da-z]/gi, '');
   const docsDbName = `${baseDbName}Docs`;
   return {
-    addresses: new PouchdbAddressesStore(docsDbName, 'addresses'),
-    assets: new PouchdbAssetsStore(docsDbName, 'assets'),
+    addresses: new PouchdbAddressesStore(docsDbName, 'addresses', logger),
+    assets: new PouchdbAssetsStore(docsDbName, 'assets', logger),
     destroy() {
       if (!this.destroyed) {
         // since the database of document stores is shared, destroying any document store destroys all of them
@@ -47,21 +55,24 @@ export const createPouchdbWalletStores = (walletName: string): WalletStores => {
       return EMPTY;
     },
     destroyed: false,
-    genesisParameters: new PouchdbGenesisParametersStore(docsDbName, 'genesisParameters'),
-    networkInfo: new PouchdbNetworkInfoStore(docsDbName, 'networkInfo'),
-    protocolParameters: new PouchdbProtocolParametersStore(docsDbName, 'protocolParameters'),
-    rewardsBalances: new PouchdbRewardsBalancesStore(`${baseDbName}RewardsBalances`),
-    rewardsHistory: new PouchdbRewardsHistoryStore(`${baseDbName}RewardsHistory`),
-    stakePools: new PouchdbStakePoolsStore(`${baseDbName}StakePools`),
-    tip: new PouchdbTipStore(docsDbName, 'tip'),
-    transactions: new PouchdbTransactionsStore(`${baseDbName}Transactions`, ({ blockHeader: { blockNo }, index }) =>
-      /**
-       * Multiplied by 100k to distinguish between blockNo=1,index=0 and blockNo=0,index=1
-       * Assuming there can never be more >=100k transactions in a block
-       */
-      (blockNo * 100_000 + index).toString()
+    genesisParameters: new PouchdbGenesisParametersStore(docsDbName, 'genesisParameters', logger),
+    networkInfo: new PouchdbNetworkInfoStore(docsDbName, 'networkInfo', logger),
+    protocolParameters: new PouchdbProtocolParametersStore(docsDbName, 'protocolParameters', logger),
+    rewardsBalances: new PouchdbRewardsBalancesStore(`${baseDbName}RewardsBalances`, logger),
+    rewardsHistory: new PouchdbRewardsHistoryStore(`${baseDbName}RewardsHistory`, logger),
+    stakePools: new PouchdbStakePoolsStore(`${baseDbName}StakePools`, logger),
+    tip: new PouchdbTipStore(docsDbName, 'tip', logger),
+    transactions: new PouchdbTransactionsStore(
+      `${baseDbName}Transactions`,
+      ({ blockHeader: { blockNo }, index }) =>
+        /**
+         * Multiplied by 100k to distinguish between blockNo=1,index=0 and blockNo=0,index=1
+         * Assuming there can never be more >=100k transactions in a block
+         */
+        (blockNo * 100_000 + index).toString(),
+      logger
     ),
-    unspendableUtxo: new PouchdbUtxoStore(`${baseDbName}UnspendableUtxo`),
-    utxo: new PouchdbUtxoStore(`${baseDbName}Utxo`)
+    unspendableUtxo: new PouchdbUtxoStore(`${baseDbName}UnspendableUtxo`, undefined, logger),
+    utxo: new PouchdbUtxoStore(`${baseDbName}Utxo`, undefined, logger)
   };
 };
