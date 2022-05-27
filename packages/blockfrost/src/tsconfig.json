@@ -4,5 +4,8 @@
     "outDir": "../dist/",
     "rootDir": "."
   },
-  "references": [{ "path": "../../core/src" }]
+  "references": [
+    { "path": "../../util/src" },
+    { "path": "../../core/src" }
+  ]
 }

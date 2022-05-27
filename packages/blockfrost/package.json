@@ -26,7 +26,8 @@
   },
   "dependencies": {
     "@blockfrost/blockfrost-js": "npm:blockfrost-js-ratelimited@2.0.4",
-    "@cardano-sdk/core": " 0.2.0"
+    "@cardano-sdk/core": " 0.2.0",
+    "@cardano-sdk/util": "0.2.0"
   },
   "files": [
     "dist/*",

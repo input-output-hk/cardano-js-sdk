@@ -1,5 +1,7 @@
 /* eslint-disable unicorn/no-nested-ternary */
-import { Asset, AssetProvider, Cardano, ProviderUtil, util } from '@cardano-sdk/core';
+import { Asset, AssetProvider, Cardano, ProviderUtil } from '@cardano-sdk/core';
+import { replaceNullsWithUndefineds } from '@cardano-sdk/util';
+
 import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
 import { blockfrostMetadataToTxMetadata, fetchSequentially, toProviderError } from './util';
 import { omit } from 'lodash-es';
@@ -11,7 +13,7 @@ const mapMetadata = (
   const metadata = { ...onChain, ...offChain };
   if (Object.values(metadata).every((value) => value === undefined || value === null)) return null;
   return {
-    ...util.replaceNullsWithUndefineds(omit(metadata, ['logo', 'image'])),
+    ...replaceNullsWithUndefineds(omit(metadata, ['logo', 'image'])),
     desc: metadata.description,
     // The other type option is any[] - not sure what it means, omitting if no string.
     icon:

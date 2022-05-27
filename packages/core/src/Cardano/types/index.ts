@@ -1,5 +1,5 @@
 import * as Ogmios from '@cardano-ogmios/schema';
-import { util } from '../../util';
+import { OptionalUndefined, RecursivelyReplaceNullWithUndefined } from '@cardano-sdk/util';
 
 export { Epoch, Slot, ExUnits } from '@cardano-ogmios/schema';
 export { Hash32ByteBase16, Hash28ByteBase16 } from '../util';
@@ -19,9 +19,7 @@ export * from './Key';
 export * from './TxSubmissionErrors';
 export * as NativeScriptType from './NativeScriptType';
 
-export type ProtocolParametersAlonzo = util.OptionalUndefined<
-  util.RecursivelyReplaceNullWithUndefined<Ogmios.ProtocolParametersAlonzo>
+export type ProtocolParametersAlonzo = OptionalUndefined<
+  RecursivelyReplaceNullWithUndefined<Ogmios.ProtocolParametersAlonzo>
 >;
-export type ValidityInterval = util.OptionalUndefined<
-  util.RecursivelyReplaceNullWithUndefined<Ogmios.ValidityInterval>
->;
+export type ValidityInterval = OptionalUndefined<RecursivelyReplaceNullWithUndefined<Ogmios.ValidityInterval>>;
