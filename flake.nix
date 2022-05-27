@@ -94,7 +94,7 @@
                   ''
                     mkdir -p $out/bin
                     cat << EOF > $out/bin/cli
-                    ${pkgs.nodejs-14_x}/bin/node "$out/dist/cli.js"
+                    ${pkgs.nodejs-14_x}/bin/node "$out/dist/cli.js" \$@
                     EOF
 
                     chmod +x "$out/bin/cli"
