@@ -45,4 +45,28 @@ export abstract class PouchdbStore<T> {
   protected toPouchdbDoc(obj: T): T {
     return toPouchdbDoc(obj) as T;
   }
+
+  async #getRev(docId: string) {
+    const existingDoc = await this.db.get(docId).catch(() => void 0);
+    return existingDoc?._rev;
+  }
+
+  protected forcePut(docId: string, doc: T) {
+    if (this.destroyed) return EMPTY;
+    return from(
+      (async () =>
+        this.db
+          .put(
+            {
+              _id: docId,
+              _rev: await this.#getRev(docId),
+              ...this.toPouchdbDoc(doc)
+            },
+            { force: true }
+          )
+          .catch((error) =>
+            this.logger.error(`PouchdbStore(${this.dbName}): failed to forcePut`, doc, error)
+          ) as Promise<void>)()
+    );
+  }
 }

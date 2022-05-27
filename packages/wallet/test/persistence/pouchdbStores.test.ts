@@ -26,6 +26,13 @@ describe('pouchdbStores', () => {
       expect(await firstValueFrom(store2.get())).toEqual(doc1);
     });
 
+    it('set updates existing document', async () => {
+      const store1 = new PouchdbDocumentStore<DocType>(dbName, 'docId');
+      await firstValueFrom(store1.set(doc1));
+      await firstValueFrom(store1.set(doc2));
+      expect(await firstValueFrom(store1.get())).toEqual(doc2);
+    });
+
     // eslint-disable-next-line sonarjs/no-duplicate-string
     it('destroy() disables store functions', async () => {
       const store = new PouchdbDocumentStore<DocType>(dbName, 'docId');
@@ -88,6 +95,12 @@ describe('pouchdbStores', () => {
 
       const store2 = createStore();
       expect(await firstValueFrom(store2.getValues([key1]))).toEqual([doc1]);
+    });
+
+    it('setValue updates existing document', async () => {
+      await firstValueFrom(store1.setValue(key1, doc1));
+      await firstValueFrom(store1.setValue(key1, doc2));
+      expect(await firstValueFrom(store1.getValues([key1]))).toEqual([doc2]);
     });
 
     it('getValue completes without emitting when document is not present', async () => {
