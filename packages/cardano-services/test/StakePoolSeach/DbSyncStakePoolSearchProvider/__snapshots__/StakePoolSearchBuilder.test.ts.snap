@@ -140,8 +140,8 @@ Object {
 exports[`StakePoolSearchBuilder buildAndQuery buildAndQuery, queryPoolHashes & queryTotalCount 2`] = `
 Array [
   Object {
-    "id": "15",
-    "updateId": "309",
+    "id": "16",
+    "updateId": "310",
   },
 ]
 `;
@@ -319,28 +319,32 @@ Object {
 exports[`StakePoolSearchBuilder buildOrQuery buildOrQuery, queryPoolHashes & queryTotalCount 2`] = `
 Array [
   Object {
+    "id": "3018",
+    "updateId": "3087",
+  },
+  Object {
+    "id": "2057",
+    "updateId": "2903",
+  },
+  Object {
     "id": "2056",
-    "updateId": "2885",
+    "updateId": "2069",
   },
   Object {
-    "id": "2055",
-    "updateId": "2068",
+    "id": "21",
+    "updateId": "21",
   },
   Object {
-    "id": "20",
-    "updateId": "20",
+    "id": "17",
+    "updateId": "17",
   },
   Object {
     "id": "16",
-    "updateId": "16",
+    "updateId": "310",
   },
   Object {
     "id": "15",
-    "updateId": "309",
-  },
-  Object {
-    "id": "14",
-    "updateId": "14",
+    "updateId": "15",
   },
   Object {
     "id": "6",
@@ -353,7 +357,7 @@ Array [
 ]
 `;
 
-exports[`StakePoolSearchBuilder buildOrQuery buildOrQuery, queryPoolHashes & queryTotalCount 3`] = `"8"`;
+exports[`StakePoolSearchBuilder buildOrQuery buildOrQuery, queryPoolHashes & queryTotalCount 3`] = `"9"`;
 
 exports[`StakePoolSearchBuilder buildPoolsByIdentifierQuery buildPoolsByIdentifierQuery 1`] = `
 Object {
@@ -710,7 +714,14 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchBuilder buildPoolsByStatusQuery activating 2`] = `Array []`;
+exports[`StakePoolSearchBuilder buildPoolsByStatusQuery activating 2`] = `
+Array [
+  Object {
+    "id": "3018",
+    "updateId": "3087",
+  },
+]
+`;
 
 exports[`StakePoolSearchBuilder buildPoolsByStatusQuery active 1`] = `
 Object {
@@ -750,24 +761,24 @@ Object {
 exports[`StakePoolSearchBuilder buildPoolsByStatusQuery active 2`] = `
 Array [
   Object {
-    "id": "2055",
-    "updateId": "2068",
+    "id": "2056",
+    "updateId": "2069",
   },
   Object {
-    "id": "20",
-    "updateId": "20",
+    "id": "21",
+    "updateId": "21",
+  },
+  Object {
+    "id": "17",
+    "updateId": "17",
   },
   Object {
     "id": "16",
-    "updateId": "16",
+    "updateId": "310",
   },
   Object {
     "id": "15",
-    "updateId": "309",
-  },
-  Object {
-    "id": "14",
-    "updateId": "14",
+    "updateId": "15",
   },
   Object {
     "id": "6",
@@ -817,28 +828,32 @@ Object {
 exports[`StakePoolSearchBuilder buildPoolsByStatusQuery active,activating,retiring,retired 2`] = `
 Array [
   Object {
+    "id": "3018",
+    "updateId": "3087",
+  },
+  Object {
+    "id": "2057",
+    "updateId": "2903",
+  },
+  Object {
     "id": "2056",
-    "updateId": "2885",
+    "updateId": "2069",
   },
   Object {
-    "id": "2055",
-    "updateId": "2068",
+    "id": "21",
+    "updateId": "21",
   },
   Object {
-    "id": "20",
-    "updateId": "20",
+    "id": "17",
+    "updateId": "17",
   },
   Object {
     "id": "16",
-    "updateId": "16",
+    "updateId": "310",
   },
   Object {
     "id": "15",
-    "updateId": "309",
-  },
-  Object {
-    "id": "14",
-    "updateId": "14",
+    "updateId": "15",
   },
   Object {
     "id": "6",
@@ -933,15 +948,15 @@ Object {
 exports[`StakePoolSearchBuilder buildPoolsByStatusQuery retiring 2`] = `
 Array [
   Object {
-    "id": "2056",
-    "updateId": "2885",
+    "id": "2057",
+    "updateId": "2903",
   },
 ]
 `;
 
 exports[`StakePoolSearchBuilder getLastEpoch getLastEpoch 1`] = `175`;
 
-exports[`StakePoolSearchBuilder getTotalAmountOfAda getTotalAmountOfAda 1`] = `"42021479194505231"`;
+exports[`StakePoolSearchBuilder getTotalAmountOfAda getTotalAmountOfAda 1`] = `"69154425288708824"`;
 
 exports[`StakePoolSearchBuilder queryPoolData queryPoolData 1`] = `
 Array [

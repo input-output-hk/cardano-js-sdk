@@ -1,18 +1,10 @@
-import { Cardano, ProviderError, ProviderFailure, util } from '@cardano-sdk/core';
+import { Cardano, ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { axiosError } from '../util';
 import { txSubmitHttpProvider } from '../../src';
 import MockAdapter from 'axios-mock-adapter';
-import axios, { AxiosError, AxiosResponse } from 'axios';
+import axios from 'axios';
 
 const url = 'http://some-hostname:3000/tx-submit';
-
-const axiosError = (bodyError = new Error('error')) => {
-  const response = {
-    data: util.toSerializableObject(new ProviderError(ProviderFailure.BadRequest, bodyError))
-  } as AxiosResponse;
-  const error = new AxiosError(undefined, undefined, undefined, undefined, response);
-  Object.defineProperty(error, 'response', { value: response });
-  return error;
-};
 
 describe('txSubmitHttpProvider', () => {
   describe('healthCheck', () => {

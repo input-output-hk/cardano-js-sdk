@@ -8,12 +8,13 @@ describe('util/provider', () => {
       const handler = jest.fn().mockImplementation((args) => {
         expect(args[0]).toBe('arg');
       });
+      const fn = jest.fn();
       const req = { body: { args: ['arg'] } };
       const res = { send: jest.fn(), status: jest.fn() };
       const next = {} as any;
-      providerHandler<string, any>(handler, dummyLogger)(req as any, res as any, next);
+      providerHandler(fn)(handler, dummyLogger)(req as any, res as any, next);
       expect(handler).toBeCalledTimes(1);
-      expect(handler).toBeCalledWith(['arg'], req, res, next);
+      expect(handler).toBeCalledWith(['arg'], req, res, next, fn);
       expect(res.send).not.toBeCalled();
       expect(res.status).not.toBeCalled();
     });
@@ -26,7 +27,7 @@ describe('util/provider', () => {
         status: jest.fn().mockImplementation(() => res)
       };
       const next = {} as any;
-      providerHandler<string, any>(handler, dummyLogger)(req as any, res as any, next);
+      providerHandler(jest.fn())(handler, dummyLogger)(req as any, res as any, next);
       expect(handler).not.toBeCalled();
       expect(res.status).toBeCalledTimes(1);
       expect(res.status).toBeCalledWith(400);

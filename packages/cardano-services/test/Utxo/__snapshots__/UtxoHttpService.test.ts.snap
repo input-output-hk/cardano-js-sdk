@@ -54,6 +54,19 @@ Array [
     Object {
       "address": "addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp",
       "index": 0,
+      "txId": "3567fd86159bc223531373f8c8fcdb6c2b07f69d4f0b4bc3e7a684a6a6ee7685",
+    },
+    Object {
+      "address": "addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp",
+      "value": Object {
+        "coins": 143478127n,
+      },
+    },
+  ],
+  Array [
+    Object {
+      "address": "addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp",
+      "index": 0,
       "txId": "a62624fdc47e8b774ddff11a9a56cae5fa9b072975af87bf0a0583fca0e345f4",
     },
     Object {
@@ -73,6 +86,32 @@ Array [
       "address": "addr_test1qpcnmvyjmxmsm75f747u566gw7ewz4mesdw7yl278uf9r3f5l7d7dpx2ymfwlm3e56flupga8yamjr2kwdt7dw77ktyqqtx2r7",
       "value": Object {
         "coins": 1497246388n,
+      },
+    },
+  ],
+  Array [
+    Object {
+      "address": "addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp",
+      "index": 0,
+      "txId": "545c4656544054045f5a4db0e962f6b09fc6d98b0303d42f3f006e3d920d3720",
+    },
+    Object {
+      "address": "addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp",
+      "value": Object {
+        "coins": 9219323111n,
+      },
+    },
+  ],
+  Array [
+    Object {
+      "address": "addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp",
+      "index": 0,
+      "txId": "3d2278e9cef71c79720a11bc3e08acbbd5f2175f7015d358c867fc9b419ae0b2",
+    },
+    Object {
+      "address": "addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp",
+      "value": Object {
+        "coins": 1477211770n,
       },
     },
   ],

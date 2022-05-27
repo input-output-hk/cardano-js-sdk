@@ -1,0 +1,394 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ChainHistoryBuilder queryCertificatesByHashes query certificates by tx hashes 1`] = `
+Map {
+  "face165bd7aa8d0d661cf1ceaa4e35d7611be3b1c7997da378c547aa2464a4fd" => Array [
+    Object {
+      "__typename": "PoolRetirementCertificate",
+      "epoch": 179,
+      "poolId": "pool1xv0p9vje3r09tac22mhgnsg08rmfm5qxadggjnfnq3cz52apdew",
+    },
+  ],
+  "295d5e0f7ee182426eaeda8c9f1c63502c72cdf4afd6e0ee0f209adf94a614e7" => Array [
+    Object {
+      "__typename": "StakeKeyRegistrationCertificate",
+      "stakeKeyHash": "c644b3906d4b9952886263832e59a841b5e1b073806747c8d731fbce",
+    },
+    Object {
+      "__typename": "StakeKeyRegistrationCertificate",
+      "stakeKeyHash": "8ebe40911f3ae2e6c1fe43dc647566ae1d8701d4d018a1d2a333124b",
+    },
+    Object {
+      "__typename": "PoolRegistrationCertificate",
+      "poolParameters": null,
+    },
+    Object {
+      "__typename": "StakeDelegationCertificate",
+      "poolId": "pool1y25deq9kldy9y9gfvrpw8zt05zsrfx84zjhugaxrx9ftvwdpua2",
+      "stakeKeyHash": "c644b3906d4b9952886263832e59a841b5e1b073806747c8d731fbce",
+    },
+  ],
+  "19251f57476d7af2777252270413c01383d9503110a68b4fde1a239c119c4f5d" => Array [
+    Object {
+      "__typename": "PoolRegistrationCertificate",
+      "poolParameters": null,
+    },
+    Object {
+      "__typename": "StakeDelegationCertificate",
+      "poolId": "pool1xv0p9vje3r09tac22mhgnsg08rmfm5qxadggjnfnq3cz52apdew",
+      "stakeKeyHash": "34ff9be684ca26d2efee39a693fe051d393bb90d567357e6bbdeb2c8",
+    },
+  ],
+  "24986c0cd3475419bfb44756c27a0e13a6354a4071153f76a78f9b2d1e596089" => Array [
+    Object {
+      "__typename": "MirCertificate",
+      "pot": "treasury",
+      "quantity": 100000000n,
+      "rewardAccount": "stake_test1uzwd0ng8pw7vvhm4k3s28azx9c6ytug60uh35jvztgg03rge58jf8",
+    },
+    Object {
+      "__typename": "MirCertificate",
+      "pot": "treasury",
+      "quantity": 100000000n,
+      "rewardAccount": "stake_test1uq6p9hn9u53kvmh4mu98c0d4zzuekp2nkelnynct5g26lqs9yenqu",
+    },
+    Object {
+      "__typename": "MirCertificate",
+      "pot": "treasury",
+      "quantity": 100000000n,
+      "rewardAccount": "stake_test1upuzrnzp6qtwzl30dcm63sd63g724t6j639cpf2hknxymxqnt30fu",
+    },
+  ],
+  "68f21b8c6a8ae2c09839a00c908ba79bc81ffde240720f72589f842619915085" => Array [
+    Object {
+      "__typename": "StakeKeyDeregistrationCertificate",
+      "stakeKeyHash": "7c2fc08df5cb1e296b3b07d296731502296a381915869a047fb70c7b",
+    },
+  ],
+}
+`;
+
+exports[`ChainHistoryBuilder queryMultiAssetsByTxOut query multi assets by tx output 1`] = `
+Map {
+  "5396853" => Map {
+    "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf391652243484f43" => 10000000n,
+    "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf39165224d494e54" => 5000000000n,
+    "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf3916522524245525259" => 1000000000n,
+    "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf3916522534245525259" => 2000000000n,
+    "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf391652256414e494c" => 15000000n,
+  },
+  "5396911" => Map {
+    "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf3916522534245525259" => 10000000n,
+  },
+  "5396912" => Map {
+    "22be35160908d953c25b30d1ad59876cbf073a8b31ef7a4f77468355414141" => 4208n,
+    "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf39165224d494e54" => 1914111968n,
+    "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf3916522524245525259" => 1000000000n,
+    "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf3916522534245525259" => 1990000000n,
+    "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf391652256414e494c" => 15000000n,
+    "cd9d85fe5c8a1684c42ae0082e7e912fb7a7cca0900c5a3915eb1c3442454e59" => 2819431n,
+    "d311d3488cc4fef19d05634adce8534977a3bc6fc18136ad65df1d4f6c71202e01" => 100000000n,
+    "d311d3488cc4fef19d05634adce8534977a3bc6fc18136ad65df1d4f6c712038" => 172696733n,
+  },
+}
+`;
+
+exports[`ChainHistoryBuilder queryProtocolParams query protocol parameters from last epoch 1`] = `
+Object {
+  "coinsPerUtxoWord": NaN,
+  "maxCollateralInputs": 1,
+  "maxTxSize": 16384,
+  "maxValueSize": 1000,
+  "minFeeCoefficient": 44,
+  "minFeeConstant": 155381,
+  "minPoolCost": 340000000,
+  "poolDeposit": 500000000,
+  "protocolVersion": Object {
+    "major": 6,
+    "minor": 0,
+  },
+  "stakeKeyDeposit": 2000000,
+}
+`;
+
+exports[`ChainHistoryBuilder queryRedeemersByHashes query transaction redeemers by tx hashes 1`] = `
+Map {
+  "5acd6efb1b66299f1c5a2c4221af4bcaa4ba9929e8e6aa0e3f48707fa1796fc3" => Array [
+    Object {
+      "executionUnits": Object {
+        "memory": 4837876,
+        "steps": 1615750737,
+      },
+      "index": 0,
+      "purpose": "spend",
+      "scriptHash": "9f244c64c6ca8e495f4d0ac48f106a1dbdf20b0821d598ebbcd1c57d",
+    },
+  ],
+  "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e" => Array [
+    Object {
+      "executionUnits": Object {
+        "memory": 4195651,
+        "steps": 1591910324,
+      },
+      "index": 0,
+      "purpose": "spend",
+      "scriptHash": "64de10aac4aad00a1a25079498378587c8d92825f17223dcf4fad59c",
+    },
+    Object {
+      "executionUnits": Object {
+        "memory": 88558,
+        "steps": 46839629,
+      },
+      "index": 1,
+      "purpose": "spend",
+      "scriptHash": "6e4664e3f6acc48e849eacf4e3607ee6ae2758d6d8b80fa9d8fdd761",
+    },
+    Object {
+      "executionUnits": Object {
+        "memory": 88558,
+        "steps": 46839629,
+      },
+      "index": 3,
+      "purpose": "spend",
+      "scriptHash": "6e4664e3f6acc48e849eacf4e3607ee6ae2758d6d8b80fa9d8fdd761",
+    },
+    Object {
+      "executionUnits": Object {
+        "memory": 88558,
+        "steps": 46839629,
+      },
+      "index": 5,
+      "purpose": "spend",
+      "scriptHash": "6e4664e3f6acc48e849eacf4e3607ee6ae2758d6d8b80fa9d8fdd761",
+    },
+    Object {
+      "executionUnits": Object {
+        "memory": 106622,
+        "steps": 55720739,
+      },
+      "index": 0,
+      "purpose": "mint",
+      "scriptHash": "22c3b86a5b88a78b5de52f4aed2831d1483b3b7681f1ee2569538130",
+    },
+  ],
+}
+`;
+
+exports[`ChainHistoryBuilder queryTransactionInputsByHashes query transaction inputs by tx hashes 1`] = `
+Array [
+  Object {
+    "address": "addr_test1qr74u5d3d07x53pq37acghulu7wvjt794s53xp2fz343drhx2aghqc4747n2yhu0dht5xz0t5j6n0fju3rs8mfj83tzqly49jr",
+    "index": 0,
+    "txId": "952dfa431223fd671c5e9e048e016f70fcebd9e41fcb726969415ff692736eeb",
+  },
+  Object {
+    "address": "addr_test1qpvl4gf5r5h5w4yjrf58rt8slltem9tqfge36zqhsz5kgc8f2tc4ydn4zz9p0eymajqa4vj87he7yz6ssmh9x9h685hst9rgvk",
+    "index": 0,
+    "txId": "cefd2fcf657e5e5d6c35975f4e052f427819391b153ebb16ad8aa107ba5a3819",
+  },
+]
+`;
+
+exports[`ChainHistoryBuilder queryTransactionInputsByHashes with collateral true query transaction collateral inputs by tx hashes 1`] = `
+Array [
+  Object {
+    "address": "addr_test1vpmwgcd7xuqr60ej3qnlfeyy5qhaudhmnmxey6str7v4rrcd3t2q4",
+    "index": 0,
+    "txId": "5acd6efb1b66299f1c5a2c4221af4bcaa4ba9929e8e6aa0e3f48707fa1796fc3",
+  },
+  Object {
+    "address": "addr_test1qqemvcq8wdt9cv0sxsghv497zjsjzyzkekpw4vlvea44kdgy720vc4ggn5u4y39cc2wctg2u6sgackadnl78lxqq3m9q47wq8e",
+    "index": 0,
+    "txId": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
+  },
+]
+`;
+
+exports[`ChainHistoryBuilder queryTransactionOutputsByHashes query transaction outputs by tx hashes 1`] = `
+Array [
+  Object {
+    "address": "addr_test1qr74u5d3d07x53pq37acghulu7wvjt794s53xp2fz343drhx2aghqc4747n2yhu0dht5xz0t5j6n0fju3rs8mfj83tzqly49jr",
+    "datum": undefined,
+    "index": 0,
+    "txId": "952dfa431223fd671c5e9e048e016f70fcebd9e41fcb726969415ff692736eeb",
+    "value": Object {
+      "assets": undefined,
+      "coins": 5528822746696n,
+    },
+  },
+  Object {
+    "address": "addr_test1qzmpmxyl7prdf0pazt0futtrg6k9drcay3ednatxqm5ky854nqdumcu3xny9qu5sk9m0wm0ypyty84kxj0gwd9seppfqzs9z2n",
+    "datum": undefined,
+    "index": 1,
+    "txId": "952dfa431223fd671c5e9e048e016f70fcebd9e41fcb726969415ff692736eeb",
+    "value": Object {
+      "assets": Map {
+        "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf391652243484f43" => 10000000n,
+        "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf39165224d494e54" => 5000000000n,
+        "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf3916522524245525259" => 1000000000n,
+        "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf3916522534245525259" => 2000000000n,
+        "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf391652256414e494c" => 15000000n,
+      },
+      "coins": 1000000000n,
+    },
+  },
+  Object {
+    "address": "addr_test1wrsexavz37208qda7mwwu4k7hcpg26cz0ce86f5e9kul3hqzlh22t",
+    "datum": "c5dfa8c3cbd5a959829618a7b46e163078cb3f1b39f152514d0c3686d553529a",
+    "index": 0,
+    "txId": "cefd2fcf657e5e5d6c35975f4e052f427819391b153ebb16ad8aa107ba5a3819",
+    "value": Object {
+      "assets": Map {
+        "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf3916522534245525259" => 10000000n,
+      },
+      "coins": 7420514n,
+    },
+  },
+  Object {
+    "address": "addr_test1qpvl4gf5r5h5w4yjrf58rt8slltem9tqfge36zqhsz5kgc8f2tc4ydn4zz9p0eymajqa4vj87he7yz6ssmh9x9h685hst9rgvk",
+    "datum": undefined,
+    "index": 1,
+    "txId": "cefd2fcf657e5e5d6c35975f4e052f427819391b153ebb16ad8aa107ba5a3819",
+    "value": Object {
+      "assets": Map {
+        "22be35160908d953c25b30d1ad59876cbf073a8b31ef7a4f77468355414141" => 4208n,
+        "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf39165224d494e54" => 1914111968n,
+        "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf3916522524245525259" => 1000000000n,
+        "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf3916522534245525259" => 1990000000n,
+        "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf391652256414e494c" => 15000000n,
+        "cd9d85fe5c8a1684c42ae0082e7e912fb7a7cca0900c5a3915eb1c3442454e59" => 2819431n,
+        "d311d3488cc4fef19d05634adce8534977a3bc6fc18136ad65df1d4f6c71202e01" => 100000000n,
+        "d311d3488cc4fef19d05634adce8534977a3bc6fc18136ad65df1d4f6c712038" => 172696733n,
+      },
+      "coins": 850065083n,
+    },
+  },
+]
+`;
+
+exports[`ChainHistoryBuilder queryTxMetadataByHashes query transaction metadata by tx hashes 1`] = `
+Map {
+  "545c4656544054045f5a4db0e962f6b09fc6d98b0303d42f3f006e3d920d3720" => Map {
+    1968n => Map {
+      "ADABTC" => Array [
+        Map {
+          "value" => "0.00002692",
+          "source" => "coinGecko",
+        },
+      ],
+      "ADAEUR" => Array [
+        Map {
+          "value" => "1.18",
+          "source" => "coinGecko",
+        },
+      ],
+      "ADAJPY" => Array [
+        Map {
+          "value" => "151.53",
+          "source" => "coinGecko",
+        },
+      ],
+      "ADAUSD" => Array [
+        Map {
+          "value" => "1.33",
+          "source" => "coinGecko",
+        },
+      ],
+      "BTCDIFF" => Array [
+        Map {
+          "value" => "24195286980613.62",
+          "source" => "trezor",
+        },
+      ],
+    },
+  },
+  "3d2278e9cef71c79720a11bc3e08acbbd5f2175f7015d358c867fc9b419ae0b2" => Map {
+    1968n => Map {
+      "LQADA" => Array [
+        Map {
+          "value" => "0.00006725",
+          "source" => "muesliswap",
+        },
+      ],
+      "ADABTC" => Array [
+        Map {
+          "value" => "0.00002789",
+          "source" => "coinGecko",
+        },
+      ],
+      "ADAEUR" => Array [
+        Map {
+          "value" => "0.934303",
+          "source" => "coinGecko",
+        },
+      ],
+      "ADAJPY" => Array [
+        Map {
+          "value" => "119.97",
+          "source" => "coinGecko",
+        },
+      ],
+      "ADAUSD" => Array [
+        Map {
+          "value" => "1.04",
+          "source" => "coinGecko",
+        },
+      ],
+      "WMTADA" => Array [
+        Map {
+          "value" => "7.95e-7",
+          "source" => "muesliswap",
+        },
+      ],
+      "BTCDIFF" => Array [
+        Map {
+          "value" => "26643185256535.46",
+          "source" => "trezor",
+        },
+      ],
+      "HoskyADA" => Array [
+        Map {
+          "value" => "5.9e-8",
+          "source" => "muesliswap",
+        },
+      ],
+      "SpacecoinsADA" => Array [
+        Map {
+          "value" => "0.00955",
+          "source" => "muesliswap",
+        },
+      ],
+    },
+  },
+}
+`;
+
+exports[`ChainHistoryBuilder queryTxMintByHashes query transaction mint by tx hashes 1`] = `
+Map {
+  "952dfa431223fd671c5e9e048e016f70fcebd9e41fcb726969415ff692736eeb" => Map {
+    "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf391652243484f43" => 10000000n,
+    "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf39165224d494e54" => 5000000000n,
+    "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf3916522524245525259" => 1000000000n,
+    "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf3916522534245525259" => 2000000000n,
+    "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf391652256414e494c" => 15000000n,
+  },
+  "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e" => Map {
+    "22c3b86a5b88a78b5de52f4aed2831d1483b3b7681f1ee2569538130f32324c10a93fe1962cf7470543932cc064482c3495fe3de7502f9edd84ca114" => 15355454n,
+  },
+}
+`;
+
+exports[`ChainHistoryBuilder queryWithdrawalsByHashes query transaction withdrawals by tx hashes 1`] = `
+Map {
+  "cb66e0f5778718f8bfcfd043712f37d9993f4703b254a7a4d954d34225fe2f99" => Array [
+    Object {
+      "quantity": 1409612n,
+      "stakeAddress": "stake_test1uqvszkuv7gwzcfshrm37ywcxuqhh7mqx95ey3cm3cx8s76c7w97f8",
+    },
+    Object {
+      "quantity": 229082n,
+      "stakeAddress": "stake_test1urpklgzqsh9yqz8pkyuxcw9dlszpe5flnxjtl55epla6ftqktdyfz",
+    },
+  ],
+}
+`;

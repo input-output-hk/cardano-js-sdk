@@ -1,3 +1,6 @@
+/* eslint-disable complexity */
+/* eslint-disable sonarjs/cognitive-complexity */
+import { ChainHistoryHttpService, DbSyncChainHistoryProvider } from '../ChainHistory';
 import { CommonProgramOptions } from '../ProgramsCommon';
 import { DbSyncStakePoolSearchProvider, StakePoolSearchHttpService } from '../StakePoolSearch';
 import { DbSyncUtxoProvider, UtxoHttpService } from '../Utxo';
@@ -19,7 +22,12 @@ export interface HttpServerOptions extends CommonProgramOptions {
 
 export interface ProgramArgs {
   apiUrl: URL;
-  serviceNames: (ServiceNames.StakePoolSearch | ServiceNames.TxSubmit | ServiceNames.Utxo)[];
+  serviceNames: (
+    | ServiceNames.StakePoolSearch
+    | ServiceNames.TxSubmit
+    | ServiceNames.ChainHistory
+    | ServiceNames.Utxo
+  )[];
   options?: HttpServerOptions;
 }
 
@@ -30,18 +38,18 @@ export const loadHttpServer = async (args: ProgramArgs): Promise<HttpServer> => 
     name: 'http-server'
   });
 
+  const db = args.options?.dbConnectionString
+    ? new Pool({ connectionString: args.options.dbConnectionString })
+    : undefined;
+
   for (const serviceName of args.serviceNames) {
     switch (serviceName) {
       case ServiceNames.StakePoolSearch:
-        if (args.options?.dbConnectionString === undefined)
-          throw new MissingProgramOption(ServiceNames.StakePoolSearch, ProgramOptionDescriptions.DbConnection);
+        if (!db) throw new MissingProgramOption(ServiceNames.StakePoolSearch, ProgramOptionDescriptions.DbConnection);
         services.push(
           StakePoolSearchHttpService.create({
             logger,
-            stakePoolSearchProvider: new DbSyncStakePoolSearchProvider(
-              new Pool({ connectionString: args.options.dbConnectionString }),
-              logger
-            )
+            stakePoolSearchProvider: new DbSyncStakePoolSearchProvider(db, logger)
           })
         );
         break;
@@ -56,16 +64,21 @@ export const loadHttpServer = async (args: ProgramArgs): Promise<HttpServer> => 
           })
         );
         break;
+      case ServiceNames.ChainHistory:
+        if (!db) throw new MissingProgramOption(ServiceNames.ChainHistory, ProgramOptionDescriptions.DbConnection);
+        services.push(
+          await ChainHistoryHttpService.create({
+            chainHistoryProvider: new DbSyncChainHistoryProvider(db, logger),
+            logger
+          })
+        );
+        break;
       case ServiceNames.Utxo:
-        if (args.options?.dbConnectionString === undefined)
-          throw new MissingProgramOption(ServiceNames.Utxo, ProgramOptionDescriptions.DbConnection);
+        if (!db) throw new MissingProgramOption(ServiceNames.Utxo, ProgramOptionDescriptions.DbConnection);
         services.push(
           await UtxoHttpService.create({
             logger,
-            utxoProvider: new DbSyncUtxoProvider(
-              new Pool({ connectionString: args.options.dbConnectionString }),
-              logger
-            )
+            utxoProvider: new DbSyncUtxoProvider(db, logger)
           })
         );
         break;

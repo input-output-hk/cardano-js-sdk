@@ -1,5 +1,7 @@
-import { HealthCheckResponse, ProviderError } from '@cardano-sdk/core';
-import { dummyLogger } from 'ts-log';
+import { HealthCheckResponse, ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { HttpServer } from './HttpServer';
+import { Logger, dummyLogger } from 'ts-log';
+import { ProviderHandler } from '../util';
 import express from 'express';
 
 export abstract class HttpService {
@@ -28,4 +30,15 @@ export abstract class HttpService {
   }
 
   protected abstract healthCheck(): Promise<HealthCheckResponse>;
+
+  static routeHandler(logger: Logger): ProviderHandler {
+    return async (args, _r, res, _n, handler) => {
+      try {
+        return HttpServer.sendJSON(res, await handler(...args));
+      } catch (error) {
+        logger.error(error);
+        return HttpServer.sendJSON(res, new ProviderError(ProviderFailure.Unhealthy, error), 500);
+      }
+    };
+  }
 }

@@ -1,6 +1,7 @@
 import { Connection, createConnectionObject } from '@cardano-ogmios/client';
 import { createMockOgmiosServer } from '@cardano-sdk/ogmios/test/mocks/mockOgmiosServer';
 import { getRandomPort } from 'get-port-please';
+import axios, { AxiosRequestConfig } from 'axios';
 import waitOn from 'wait-on';
 
 export const serverReady = (apiUrl: string, statusCodeMatch = 404): Promise<void> =>
@@ -25,3 +26,8 @@ export const createUnhealthyMockOgmiosServer = () =>
   });
 
 export const createConnectionObjectWithRandomPort = async () => createConnectionObject({ port: await getRandomPort() });
+
+export const doServerRequest =
+  (apiBaseUrl: string) =>
+  async <Args, Response>(url: string, args: Args, extraOptions: AxiosRequestConfig = {}) =>
+    (await axios.post(`${apiBaseUrl}${url}`, { args }, extraOptions)).data as Promise<Response>;
