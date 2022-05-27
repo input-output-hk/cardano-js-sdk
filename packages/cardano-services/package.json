@@ -44,7 +44,7 @@
     "cbor": "^8.1.0",
     "dockerode": "^3.3.1",
     "dockerode-utils": "^0.0.7",
-    "get-port-please": "^2.4.3",
+    "get-port-please": "^2.5.0",
     "npm-run-all": "^4.1.5",
     "shx": "^0.3.3",
     "wait-on": "^6.0.1"
