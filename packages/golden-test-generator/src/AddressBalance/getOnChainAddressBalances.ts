@@ -1,23 +1,11 @@
 /* eslint-disable complexity */
-import {
-  ChainSync,
-  ConnectionConfig,
-  Schema,
-  StateQuery,
-  createChainSyncClient,
-  createInteractionContext,
-  isAllegraBlock,
-  isAlonzoBlock,
-  isMaryBlock,
-  isShelleyBlock
-} from '@cardano-ogmios/client';
 import { GeneratorMetadata } from '../Content';
 import { Logger, dummyLogger } from 'ts-log';
+import { Ogmios } from '@cardano-sdk/ogmios';
 import { applyValue } from './applyValue';
-import { isByronStandardBlock } from '../util';
 
 export type AddressBalances = {
-  [address: string]: Schema.Value;
+  [address: string]: Ogmios.Schema.Value;
 };
 
 export type AddressBalancesResponse = GeneratorMetadata & {
@@ -29,15 +17,15 @@ export const getOnChainAddressBalances = (
   atBlocks: number[],
   options: {
     logger?: Logger;
-    ogmiosConnectionConfig: ConnectionConfig;
+    ogmiosConnectionConfig: Ogmios.ConnectionConfig;
     onBlock?: (slot: number) => void;
   }
 ): Promise<AddressBalancesResponse> => {
   const logger = options?.logger ?? dummyLogger;
   const trackedAddressBalances: AddressBalances = Object.fromEntries(
-    addresses.map((address) => [address, { assets: {}, coins: 0 }])
+    addresses.map((address) => [address, { assets: {}, coins: 0n }])
   );
-  const trackedTxs: ({ id: Schema.Hash16 } & Schema.Tx)[] = [];
+  const trackedTxs: { id: Ogmios.Schema.TxId, inputs: Ogmios.Schema.TxIn[], outputs: Ogmios.Schema.TxOut[] }[] = [];
   // eslint-disable-next-line sonarjs/cognitive-complexity
   return new Promise(async (resolve, reject) => {
     let currentBlock: number;
@@ -48,16 +36,16 @@ export const getOnChainAddressBalances = (
       balances: {},
       metadata: {
         cardano: {
-          compactGenesis: await StateQuery.genesisConfig(
-            await createInteractionContext(reject, logger.info, { connection: options.ogmiosConnectionConfig })
+          compactGenesis: await Ogmios.StateQuery.genesisConfig(
+            await Ogmios.createInteractionContext(reject, logger.info, { connection: options.ogmiosConnectionConfig })
           ),
-          intersection: undefined as unknown as ChainSync.Intersection
+          intersection: undefined as unknown as Ogmios.ChainSync.Intersection
         }
       }
     };
     try {
-      const syncClient = await createChainSyncClient(
-        await createInteractionContext(reject, logger.info, { connection: options.ogmiosConnectionConfig }),
+      const syncClient = await Ogmios.createChainSyncClient(
+        await Ogmios.createInteractionContext(reject, logger.info, { connection: options.ogmiosConnectionConfig }),
         {
           rollBackward: async (_res, requestNext) => {
             requestNext();
@@ -66,31 +54,34 @@ export const getOnChainAddressBalances = (
           rollForward: async ({ block }, requestNext) => {
             if (draining) return;
             let b:
-              | Schema.StandardBlock
-              | Schema.BlockShelley
-              | Schema.BlockAllegra
-              | Schema.BlockMary
-              | Schema.BlockAlonzo;
+              | Ogmios.Schema.BlockByron
+              | Ogmios.Schema.StandardBlock
+              | Ogmios.Schema.BlockShelley
+              | Ogmios.Schema.BlockAllegra
+              | Ogmios.Schema.BlockMary
+              | Ogmios.Schema.BlockAlonzo;
             let blockBody:
-              | Schema.StandardBlock['body']['txPayload']
-              | Schema.BlockShelley['body']
-              | Schema.BlockAllegra['body']
-              | Schema.BlockMary['body']
-              | Schema.BlockAlonzo['body'];
-            if (isByronStandardBlock(block)) {
-              b = block.byron as Schema.StandardBlock;
+              | Ogmios.Schema.StandardBlock['body']['txPayload']
+              | Ogmios.Schema.BlockShelley['body']
+              | Ogmios.Schema.BlockAllegra['body']
+              | Ogmios.Schema.BlockMary['body']
+              | Ogmios.Schema.BlockAlonzo['body'];
+            if (Ogmios.isByronStandardBlock(block)) {
+              b = block.byron as Ogmios.Schema.StandardBlock;
               blockBody = b.body.txPayload;
-            } else if (isShelleyBlock(block)) {
-              b = block.shelley as Schema.BlockShelley;
+            } else if (Ogmios.isShelleyBlock(block)) {
+              b = block.shelley as Ogmios.Schema.BlockShelley;
               blockBody = b.body;
-            } else if (isAllegraBlock(block)) {
-              b = block.allegra as Schema.BlockAllegra;
+            } else if (Ogmios.isAllegraBlock(block)) {
+              b = block.allegra as Ogmios.Schema.BlockAllegra;
               blockBody = b.body;
-            } else if (isMaryBlock(block)) {
-              b = block.mary as Schema.BlockMary;
+            } else if (Ogmios.isMaryBlock(block)) {
+              b = block.mary as Ogmios.Schema.BlockMary;
               blockBody = b.body;
-            } else if (isAlonzoBlock(block)) {
-              b = block.alonzo as Schema.BlockAlonzo;
+            } else if (Ogmios.isAlonzoBlock(block)) {
+              b = block.alonzo as Ogmios.Schema.BlockAlonzo;
+            } else if (Ogmios.isByronEpochBoundaryBlock(block)) {
+              b = block.byron as Ogmios.Schema.BlockByron;
             } else {
               throw new Error('No support for block');
             }
@@ -99,28 +90,34 @@ export const getOnChainAddressBalances = (
               if (options?.onBlock !== undefined) {
                 options.onBlock(currentBlock);
               }
-              for (const tx of blockBody!) {
-                for (const output of tx.body.outputs) {
-                  if (trackedAddressBalances[output.address] !== undefined) {
-                    const addressBalance = { ...trackedAddressBalances[output.address] };
-                    trackedTxs.push({ id: tx.id, inputs: tx.body.inputs, outputs: tx.body.outputs });
-                    trackedAddressBalances[output.address] = applyValue(addressBalance, output.value);
+              if (blockBody) {
+                for (const tx of blockBody!) {
+                  for (const output of tx.body.outputs) {
+                    if (trackedAddressBalances[output.address] !== undefined) {
+                      const addressBalance = { ...trackedAddressBalances[output.address] };
+                      trackedTxs.push({ id: tx.id, inputs: tx.body.inputs, outputs: tx.body.outputs });
+                      trackedAddressBalances[output.address] = applyValue(addressBalance, output.value);
+                    }
+                  }
+                  for (const input of tx.body.inputs) {
+                    const trackedInput = trackedTxs.find((t) => t.id === input.txId)?.outputs[input.index];
+                    if (trackedInput !== undefined && trackedAddressBalances[trackedInput?.address] !== undefined) {
+                      const addressBalance = { ...trackedAddressBalances[trackedInput.address] };
+                      trackedAddressBalances[trackedInput.address] = applyValue(
+                        addressBalance,
+                        trackedInput.value,
+                        true
+                      );
+                    }
                   }
                 }
-                for (const input of tx.body.inputs) {
-                  const trackedInput = trackedTxs.find((t) => t.id === input.txId)?.outputs[input.index];
-                  if (trackedInput !== undefined && trackedAddressBalances[trackedInput?.address] !== undefined) {
-                    const addressBalance = { ...trackedAddressBalances[trackedInput.address] };
-                    trackedAddressBalances[trackedInput.address] = applyValue(addressBalance, trackedInput.value, true);
+                if (atBlocks.includes(currentBlock)) {
+                  response.balances[currentBlock] = { ...trackedAddressBalances };
+                  if (atBlocks[atBlocks.length - 1] === currentBlock) {
+                    draining = true;
+                    await syncClient.shutdown();
+                    return resolve(response);
                   }
-                }
-              }
-              if (atBlocks.includes(currentBlock)) {
-                response.balances[currentBlock] = { ...trackedAddressBalances };
-                if (atBlocks[atBlocks.length - 1] === currentBlock) {
-                  draining = true;
-                  await syncClient.shutdown();
-                  return resolve(response);
                 }
               }
             }

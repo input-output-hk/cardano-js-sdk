@@ -1,8 +1,7 @@
 import { CACHE_TTL_DEFAULT } from '../../src/InMemoryCache';
-import { Connection } from '@cardano-sdk/ogmios';
 import { EPOCH_POLL_INTERVAL_DEFAULT } from '../../src/NetworkInfo';
-import { HttpServer } from '../../src';
-import { MissingProgramOption, ProgramOptionDescriptions, ServiceNames, loadHttpServer } from '../../src/Program';
+import { HttpServer, MissingProgramOption, ProgramOptionDescriptions, ServiceNames, loadHttpServer } from '../../src';
+import { Ogmios } from '@cardano-sdk/ogmios';
 import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { URL } from 'url';
 import {
@@ -22,7 +21,7 @@ describe('loadHttpServer', () => {
   let cacheTtl: number;
   let epochPollInterval: number;
   let httpServer: HttpServer;
-  let ogmiosConnection: Connection;
+  let ogmiosConnection: Ogmios.Connection;
   let ogmiosServer: http.Server;
 
   beforeEach(async () => {

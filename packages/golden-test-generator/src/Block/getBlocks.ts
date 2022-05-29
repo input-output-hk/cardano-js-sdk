@@ -1,35 +1,22 @@
 /* eslint-disable sonarjs/cognitive-complexity */
-import {
-  ChainSync,
-  ConnectionConfig,
-  Schema,
-  StateQuery,
-  createChainSyncClient,
-  createInteractionContext,
-  isAllegraBlock,
-  isAlonzoBlock,
-  isMaryBlock,
-  isShelleyBlock
-} from '@cardano-ogmios/client';
 import { GeneratorMetadata } from '../Content';
 import { Logger, dummyLogger } from 'ts-log';
-
-import { isByronStandardBlock } from '../util';
+import { Ogmios } from '@cardano-sdk/ogmios';
 
 export type GetBlocksResponse = GeneratorMetadata & {
-  blocks: { [blockHeight: string]: Schema.Block };
+  blocks: { [blockHeight: string]: Ogmios.Schema.Block };
 };
 
 export const getBlocks = async (
   blockHeights: number[],
   options: {
     logger?: Logger;
-    ogmiosConnectionConfig: ConnectionConfig;
+    ogmiosConnectionConfig: Ogmios.ConnectionConfig;
     onBlock?: (slot: number) => void;
   }
 ): Promise<GetBlocksResponse> => {
   const logger = options?.logger ?? dummyLogger;
-  const requestedBlocks: { [blockHeight: string]: Schema.Block } = {};
+  const requestedBlocks: { [blockHeight: string]: Ogmios.Schema.Block } = {};
   return new Promise(async (resolve, reject) => {
     let currentBlock: number;
     // Required to ensure existing messages in the pipe are not processed after the completion condition is met
@@ -38,38 +25,42 @@ export const getBlocks = async (
       blocks: {},
       metadata: {
         cardano: {
-          compactGenesis: await StateQuery.genesisConfig(
-            await createInteractionContext(reject, logger.info, { connection: options.ogmiosConnectionConfig })
+          compactGenesis: await Ogmios.StateQuery.genesisConfig(
+            await Ogmios.createInteractionContext(reject, logger.info, { connection: options.ogmiosConnectionConfig })
           ),
-          intersection: undefined as unknown as ChainSync.Intersection
+          intersection: undefined as unknown as Ogmios.ChainSync.Intersection
         }
       }
     };
     try {
-      const syncClient = await createChainSyncClient(
-        await createInteractionContext(reject, logger.info, { connection: options.ogmiosConnectionConfig }),
+      const syncClient = await Ogmios.createChainSyncClient(
+        await Ogmios.createInteractionContext(reject, logger.info, { connection: options.ogmiosConnectionConfig }),
         {
           rollBackward: async (_res, requestNext) => {
             requestNext();
           },
+          // eslint-disable-next-line complexity
           rollForward: async ({ block }, requestNext) => {
             if (draining) return;
             let b:
-              | Schema.StandardBlock
-              | Schema.BlockShelley
-              | Schema.BlockAllegra
-              | Schema.BlockMary
-              | Schema.BlockAlonzo;
-            if (isByronStandardBlock(block)) {
-              b = block.byron as Schema.StandardBlock;
-            } else if (isShelleyBlock(block)) {
-              b = block.shelley as Schema.BlockShelley;
-            } else if (isAllegraBlock(block)) {
-              b = block.allegra as Schema.BlockAllegra;
-            } else if (isMaryBlock(block)) {
-              b = block.mary as Schema.BlockMary;
-            } else if (isAlonzoBlock(block)) {
-              b = block.alonzo as Schema.BlockAlonzo;
+              | Ogmios.Schema.BlockByron
+              | Ogmios.Schema.StandardBlock
+              | Ogmios.Schema.BlockShelley
+              | Ogmios.Schema.BlockAllegra
+              | Ogmios.Schema.BlockMary
+              | Ogmios.Schema.BlockAlonzo;
+            if (Ogmios.isByronStandardBlock(block)) {
+              b = block.byron as Ogmios.Schema.StandardBlock;
+            } else if (Ogmios.isShelleyBlock(block)) {
+              b = block.shelley as Ogmios.Schema.BlockShelley;
+            } else if (Ogmios.isAllegraBlock(block)) {
+              b = block.allegra as Ogmios.Schema.BlockAllegra;
+            } else if (Ogmios.isMaryBlock(block)) {
+              b = block.mary as Ogmios.Schema.BlockMary;
+            } else if (Ogmios.isAlonzoBlock(block)) {
+              b = block.alonzo as Ogmios.Schema.BlockAlonzo;
+            } else if (Ogmios.isByronEpochBoundaryBlock(block)) {
+              b = block.byron as Ogmios.Schema.BlockByron;
             } else {
               throw new Error('No support for block');
             }

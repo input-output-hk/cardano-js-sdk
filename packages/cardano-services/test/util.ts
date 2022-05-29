@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Connection, createConnectionObject } from '@cardano-sdk/ogmios';
+import { Ogmios } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { createMockOgmiosServer } from '@cardano-sdk/ogmios/test/mocks/mockOgmiosServer';
 import { getRandomPort } from 'get-port-please';
@@ -15,7 +15,8 @@ export const serverReady = (apiUrl: string, statusCodeMatch = 404): Promise<void
     validateStatus: (status: number) => status === statusCodeMatch
   });
 
-export const ogmiosServerReady = (connection: Connection): Promise<void> => serverReady(connection.address.http, 405);
+export const ogmiosServerReady = (connection: Ogmios.Connection): Promise<void> =>
+  serverReady(connection.address.http, 405);
 
 export const createHealthyMockOgmiosServer = (submitTxHook?: () => void) =>
   createMockOgmiosServer({
@@ -32,7 +33,8 @@ export const createUnhealthyMockOgmiosServer = () =>
     submitTx: { response: { success: false } }
   });
 
-export const createConnectionObjectWithRandomPort = async () => createConnectionObject({ port: await getRandomPort() });
+export const createConnectionObjectWithRandomPort = async () =>
+  Ogmios.createConnectionObject({ port: await getRandomPort() });
 
 export const doServerRequest =
   (apiBaseUrl: string) =>
