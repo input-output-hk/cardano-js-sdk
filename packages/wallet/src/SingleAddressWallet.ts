@@ -51,7 +51,8 @@ import {
   deepEquals,
   distinctBlock,
   distinctTimeSettings,
-  groupedAddressesEquals
+  groupedAddressesEquals,
+  tipEquals
 } from './services';
 import { Cip30DataSignature } from '@cardano-sdk/cip30';
 import { InputSelector, defaultSelectionConstraints, roundRobinRandomImprove } from '@cardano-sdk/cip2';
@@ -191,6 +192,7 @@ export class SingleAddressWallet implements ObservableWallet {
     );
     this.name = name;
     this.#tip$ = this.tip$ = new SyncableIntervalPersistentDocumentTrackerSubject({
+      equals: tipEquals,
       maxPollInterval: maxInterval,
       pollInterval,
       provider$: coldObservableProvider(this.walletProvider.ledgerTip, retryBackoffConfig),

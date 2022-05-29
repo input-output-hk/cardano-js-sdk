@@ -1,4 +1,4 @@
-import { Cardano, TimeSettings } from '@cardano-sdk/core';
+import { Cardano, EpochInfo, TimeSettings } from '@cardano-sdk/core';
 import { GroupedAddress } from '../../KeyManagement';
 import { isEqual } from 'lodash-es';
 
@@ -10,6 +10,8 @@ export const arrayEquals = <T>(arrayA: T[], arrayB: T[], itemEquals: (a: T, b: T
   arrayA.length === arrayB.length && arrayA.every((a) => arrayB.some((b) => itemEquals(a, b)));
 
 export const shallowArrayEquals = <T>(a: T[], b: T[]) => arrayEquals(a, b, strictEquals);
+
+export const tipEquals = (a: Cardano.Tip, b: Cardano.Tip) => a.hash === b.hash;
 
 export const txEquals = (a: Cardano.TxAlonzo, b: Cardano.TxAlonzo) => a.id === b.id;
 
@@ -27,3 +29,5 @@ const groupedAddressEquals = (a: GroupedAddress, b: GroupedAddress) => a.address
 
 export const groupedAddressesEquals = (a: GroupedAddress[], b: GroupedAddress[]) =>
   arrayEquals(a, b, groupedAddressEquals);
+
+export const epochInfoEquals = (a: EpochInfo, b: EpochInfo) => a.epochNo === b.epochNo;

@@ -73,7 +73,8 @@ export const createRewardsProvider =
         coldObservableProvider(
           () => walletProvider.rewardAccountBalance(rewardAccount),
           retryBackoffConfig,
-          fetchRewardsTrigger$(epoch$, txConfirmed$, rewardAccount)
+          fetchRewardsTrigger$(epoch$, txConfirmed$, rewardAccount),
+          isEqual
         ).pipe(distinctUntilChanged())
       )
     );
