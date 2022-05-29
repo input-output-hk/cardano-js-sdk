@@ -1,4 +1,4 @@
-import { ChainSync, Schema as Cardano } from '@cardano-ogmios/client';
+import { Schema as Cardano, ChainSync } from '@cardano-ogmios/client';
 import { Commit } from 'git-last-commit';
 import { getLastCommitPromise } from './util';
 const packageJson = require('../package.json');

@@ -1,18 +1,18 @@
 /* eslint-disable sonarjs/cognitive-complexity */
-import { Logger, dummyLogger } from 'ts-log';
 import {
+  ChainSync,
   ConnectionConfig,
+  Schema,
+  StateQuery,
   createChainSyncClient,
   createInteractionContext,
-  StateQuery,
   isAllegraBlock,
   isAlonzoBlock,
-  isShelleyBlock,
   isMaryBlock,
-  Schema,
-  ChainSync
+  isShelleyBlock
 } from '@cardano-ogmios/client';
 import { GeneratorMetadata } from '../Content';
+import { Logger, dummyLogger } from 'ts-log';
 
 import { isByronStandardBlock } from '../util';
 

@@ -1,15 +1,15 @@
 #!/usr/bin/env node
-
-import chalk from 'chalk';
+/* eslint-disable no-console */
+import { AddressBalancesResponse, getOnChainAddressBalances } from './AddressBalance';
 import { Command } from 'commander';
+import { GetBlocksResponse, getBlocks } from './Block';
+import { Options, SingleBar } from 'cli-progress';
+import { ensureDir, writeFile } from 'fs-extra';
+import { prepareContent } from './Content';
+import JSONBig from 'json-bigint';
+import chalk from 'chalk';
 import hash from 'object-hash';
 import path from 'node:path';
-import { SingleBar, Options } from 'cli-progress';
-import { ensureDir, writeFile } from 'fs-extra';
-import JSONBig from 'json-bigint';
-import { AddressBalancesResponse, getOnChainAddressBalances } from './AddressBalance';
-import { getBlocks, GetBlocksResponse } from './Block';
-import { prepareContent } from './Content';
 
 const clear = require('clear');
 const packageJson = require('../package.json');
