@@ -45,12 +45,10 @@ export class PouchdbCollectionStore<T> extends PouchdbStore<T> implements Collec
         try {
           await this.clearDB();
           await this.db.bulkDocs(
-            this.#computeDocId
-              ? docs.map((doc) => ({
-                  ...this.toPouchdbDoc(doc),
-                  _id: this.#computeDocId!(doc)
-                }))
-              : docs
+            docs.map((doc) => ({
+              ...this.toPouchdbDoc(doc),
+              _id: this.#computeDocId?.(doc)
+            }))
           );
         } catch (error) {
           this.logger.error(`PouchdbCollectionStore(${this.dbName}): failed to setAll`, docs, error);
