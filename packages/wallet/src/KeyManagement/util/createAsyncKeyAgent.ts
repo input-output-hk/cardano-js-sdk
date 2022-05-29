@@ -5,8 +5,11 @@ export const createAsyncKeyAgent = (keyAgent: KeyAgent): AsyncKeyAgent => {
   const knownAddresses$ = new BehaviorSubject(keyAgent.knownAddresses);
   return {
     async deriveAddress(derivationPath) {
+      const numAddresses = keyAgent.knownAddresses.length;
       const address = await keyAgent.deriveAddress(derivationPath);
-      knownAddresses$.next(keyAgent.knownAddresses);
+      if (keyAgent.knownAddresses.length > numAddresses) {
+        knownAddresses$.next(keyAgent.knownAddresses);
+      }
       return address;
     },
     knownAddresses$,

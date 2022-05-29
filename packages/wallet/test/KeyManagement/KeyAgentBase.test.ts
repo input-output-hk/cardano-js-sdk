@@ -43,6 +43,7 @@ describe('KeyAgentBase', () => {
     const paymentKey = 'b524f4627318819891efe52da641e05604168e508c3cc9f3e13945f21b69afa0';
     const stakeKey = '6a27d881ef58bd3816f60c05a5fbe872726e76fc239985fde9dcb9a8d7e582e8';
     keyAgent.derivePublicKey = jest.fn().mockResolvedValueOnce(paymentKey).mockResolvedValueOnce(stakeKey);
+    const initialAddresses = keyAgent.knownAddresses;
 
     const index = 1;
     const type = KeyManagement.AddressType.External;
@@ -54,6 +55,9 @@ describe('KeyAgentBase', () => {
     expect(address.address.startsWith('addr_test')).toBe(true);
     expect(address.rewardAccount.startsWith('stake_test')).toBe(true);
     expect(keyAgent.knownAddresses).toHaveLength(1);
+    // creates a new array obj
+    expect(keyAgent.knownAddresses).not.toBe(initialAddresses);
+
     const sameAddress = await keyAgent.deriveAddress({ index, type });
     expect(sameAddress.address).toEqual(address.address);
     expect(keyAgent.knownAddresses.length).toEqual(1);

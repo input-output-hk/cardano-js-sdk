@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Cardano, TimeSettings } from '@cardano-sdk/core';
+import { GroupedAddress } from '../../../src/KeyManagement';
 import {
   arrayEquals,
   deepEquals,
+  groupedAddressesEquals,
   shallowArrayEquals,
   strictEquals,
   timeSettingsEquals,
@@ -62,5 +64,12 @@ describe('equals', () => {
   test('timeSettingsEquals compares fromSlotNo', () => {
     expect(timeSettingsEquals([{ fromSlotNo: 1 } as TimeSettings], [{ fromSlotNo: 1 } as TimeSettings])).toBe(true);
     expect(timeSettingsEquals([{ fromSlotNo: 1 } as TimeSettings], [{ fromSlotNo: 2 } as TimeSettings])).toBe(false);
+  });
+
+  test('groupedAddressesEquals compares address', () => {
+    const addresses1 = [{ address: 'a' as unknown as Cardano.Address } as GroupedAddress];
+    const addresses2 = [{ address: 'b' as unknown as Cardano.Address } as GroupedAddress];
+    expect(groupedAddressesEquals(addresses1, [...addresses1.map((addr) => ({ ...addr }))])).toBe(true);
+    expect(groupedAddressesEquals(addresses1, addresses2)).toBe(false);
   });
 });

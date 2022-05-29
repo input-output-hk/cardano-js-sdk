@@ -50,13 +50,25 @@ import {
   currentEpochTracker,
   deepEquals,
   distinctBlock,
-  distinctTimeSettings
+  distinctTimeSettings,
+  groupedAddressesEquals
 } from './services';
 import { Cip30DataSignature } from '@cardano-sdk/cip30';
 import { InputSelector, defaultSelectionConstraints, roundRobinRandomImprove } from '@cardano-sdk/cip2';
 import { Logger, dummyLogger } from 'ts-log';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { Subject, combineLatest, concat, filter, firstValueFrom, lastValueFrom, map, take, tap } from 'rxjs';
+import {
+  Subject,
+  combineLatest,
+  concat,
+  distinctUntilChanged,
+  filter,
+  firstValueFrom,
+  lastValueFrom,
+  map,
+  take,
+  tap
+} from 'rxjs';
 import { TrackedUtxoProvider } from './services/ProviderTracker/TrackedUtxoProvider';
 import { TxInternals, createTransactionInternals, ensureValidityInterval } from './Transaction';
 import { WalletStores, createInMemoryWalletStores } from './persistence';
@@ -163,6 +175,7 @@ export class SingleAddressWallet implements ObservableWallet {
       concat(
         stores.addresses.get(),
         keyAgent.knownAddresses$.pipe(
+          distinctUntilChanged(groupedAddressesEquals),
           tap(
             // derive an address if none available
             (addresses) =>

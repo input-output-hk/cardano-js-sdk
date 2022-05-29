@@ -18,6 +18,9 @@ export abstract class KeyAgentBase implements KeyAgent {
   get knownAddresses(): GroupedAddress[] {
     return this.#serializableData.knownAddresses;
   }
+  set knownAddresses(addresses: GroupedAddress[]) {
+    this.#serializableData.knownAddresses = addresses;
+  }
   get serializableData(): SerializableKeyAgentData {
     return this.#serializableData;
   }
@@ -71,7 +74,7 @@ export abstract class KeyAgentBase implements KeyAgent {
       rewardAccount: Cardano.RewardAccount(rewardAccount.to_bech32()),
       type
     };
-    this.knownAddresses.push(groupedAddress);
+    this.knownAddresses = [...this.knownAddresses, groupedAddress];
     return groupedAddress;
   }
 

@@ -1,4 +1,5 @@
 import { Cardano, TimeSettings } from '@cardano-sdk/core';
+import { GroupedAddress } from '../../KeyManagement';
 import { isEqual } from 'lodash-es';
 
 export const strictEquals = <T>(a: T, b: T) => a === b;
@@ -21,3 +22,8 @@ export const utxoEquals = (a: Cardano.Utxo[], b: Cardano.Utxo[]) =>
 
 export const timeSettingsEquals = (a: TimeSettings[], b: TimeSettings[]) =>
   arrayEquals(a, b, (ts1, ts2) => ts1.fromSlotNo === ts2.fromSlotNo);
+
+const groupedAddressEquals = (a: GroupedAddress, b: GroupedAddress) => a.address === b.address;
+
+export const groupedAddressesEquals = (a: GroupedAddress[], b: GroupedAddress[]) =>
+  arrayEquals(a, b, groupedAddressEquals);
