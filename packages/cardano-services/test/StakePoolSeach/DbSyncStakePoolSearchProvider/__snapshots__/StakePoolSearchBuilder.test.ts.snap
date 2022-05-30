@@ -137,16 +137,7 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchBuilder buildAndQuery buildAndQuery, queryPoolHashes & queryTotalCount 2`] = `
-Array [
-  Object {
-    "id": "16",
-    "updateId": "310",
-  },
-]
-`;
-
-exports[`StakePoolSearchBuilder buildAndQuery buildAndQuery, queryPoolHashes & queryTotalCount 3`] = `"1"`;
+exports[`StakePoolSearchBuilder buildAndQuery buildAndQuery, queryPoolHashes & queryTotalCount 2`] = `"1"`;
 
 exports[`StakePoolSearchBuilder buildOrQuery buildOrQuery, queryPoolHashes & queryTotalCount 1`] = `
 Object {
@@ -316,48 +307,7 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchBuilder buildOrQuery buildOrQuery, queryPoolHashes & queryTotalCount 2`] = `
-Array [
-  Object {
-    "id": "3018",
-    "updateId": "3087",
-  },
-  Object {
-    "id": "2057",
-    "updateId": "2903",
-  },
-  Object {
-    "id": "2056",
-    "updateId": "2069",
-  },
-  Object {
-    "id": "21",
-    "updateId": "21",
-  },
-  Object {
-    "id": "17",
-    "updateId": "17",
-  },
-  Object {
-    "id": "16",
-    "updateId": "310",
-  },
-  Object {
-    "id": "15",
-    "updateId": "15",
-  },
-  Object {
-    "id": "6",
-    "updateId": "6",
-  },
-  Object {
-    "id": "1",
-    "updateId": "1",
-  },
-]
-`;
-
-exports[`StakePoolSearchBuilder buildOrQuery buildOrQuery, queryPoolHashes & queryTotalCount 3`] = `"9"`;
+exports[`StakePoolSearchBuilder buildOrQuery buildOrQuery, queryPoolHashes & queryTotalCount 2`] = `"9"`;
 
 exports[`StakePoolSearchBuilder buildPoolsByIdentifierQuery buildPoolsByIdentifierQuery 1`] = `
 Object {
@@ -714,15 +664,6 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchBuilder buildPoolsByStatusQuery activating 2`] = `
-Array [
-  Object {
-    "id": "3018",
-    "updateId": "3087",
-  },
-]
-`;
-
 exports[`StakePoolSearchBuilder buildPoolsByStatusQuery active 1`] = `
 Object {
   "id": Object {
@@ -756,35 +697,6 @@ Object {
           AND COALESCE(pr.retiring_epoch,0) < pu.active_epoch_no))
     ",
 }
-`;
-
-exports[`StakePoolSearchBuilder buildPoolsByStatusQuery active 2`] = `
-Array [
-  Object {
-    "id": "2056",
-    "updateId": "2069",
-  },
-  Object {
-    "id": "21",
-    "updateId": "21",
-  },
-  Object {
-    "id": "17",
-    "updateId": "17",
-  },
-  Object {
-    "id": "16",
-    "updateId": "310",
-  },
-  Object {
-    "id": "15",
-    "updateId": "15",
-  },
-  Object {
-    "id": "6",
-    "updateId": "6",
-  },
-]
 `;
 
 exports[`StakePoolSearchBuilder buildPoolsByStatusQuery active,activating,retiring,retired 1`] = `
@@ -825,47 +737,6 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchBuilder buildPoolsByStatusQuery active,activating,retiring,retired 2`] = `
-Array [
-  Object {
-    "id": "3018",
-    "updateId": "3087",
-  },
-  Object {
-    "id": "2057",
-    "updateId": "2903",
-  },
-  Object {
-    "id": "2056",
-    "updateId": "2069",
-  },
-  Object {
-    "id": "21",
-    "updateId": "21",
-  },
-  Object {
-    "id": "17",
-    "updateId": "17",
-  },
-  Object {
-    "id": "16",
-    "updateId": "310",
-  },
-  Object {
-    "id": "15",
-    "updateId": "15",
-  },
-  Object {
-    "id": "6",
-    "updateId": "6",
-  },
-  Object {
-    "id": "1",
-    "updateId": "1",
-  },
-]
-`;
-
 exports[`StakePoolSearchBuilder buildPoolsByStatusQuery retired 1`] = `
 Object {
   "id": Object {
@@ -899,15 +770,6 @@ Object {
           AND COALESCE(pr.retiring_epoch,0) > pu.active_epoch_no))
     ",
 }
-`;
-
-exports[`StakePoolSearchBuilder buildPoolsByStatusQuery retired 2`] = `
-Array [
-  Object {
-    "id": "1",
-    "updateId": "1",
-  },
-]
 `;
 
 exports[`StakePoolSearchBuilder buildPoolsByStatusQuery retiring 1`] = `
@@ -945,15 +807,6 @@ Object {
 }
 `;
 
-exports[`StakePoolSearchBuilder buildPoolsByStatusQuery retiring 2`] = `
-Array [
-  Object {
-    "id": "2057",
-    "updateId": "2903",
-  },
-]
-`;
-
 exports[`StakePoolSearchBuilder getLastEpoch getLastEpoch 1`] = `175`;
 
 exports[`StakePoolSearchBuilder getTotalAmountOfAda getTotalAmountOfAda 1`] = `"69154425288708824"`;
@@ -962,7 +815,6 @@ exports[`StakePoolSearchBuilder queryPoolData queryPoolData 1`] = `
 Array [
   Object {
     "cost": 340000000n,
-    "hashId": "6",
     "hexId": "5685f37bca393c683cf03e428280312c6c4ea485188672a2a0b3195c",
     "id": "pool126zlx7728y7xs08s8epg9qp393kyafy9rzr89g4qkvv4cv93zem",
     "margin": Object {
@@ -975,12 +827,10 @@ Array [
     },
     "pledge": 10000000n,
     "rewardAccount": "stake_test1up32f2hrv5ytqk8ad6e4apss5zrrjjlrkjhrksypn5g08fqrqf9gr",
-    "updateId": "6",
     "vrfKeyHash": "3409a1bebeaa47e6d99e0748a99f65dee60b7f7e9a64dc865d52b4fb445b98ab",
   },
   Object {
     "cost": 400000000n,
-    "hashId": "1",
     "hexId": "22a8dc80b6fb4852150960c2e3896fa0a03498f514afc474c33152b6",
     "id": "pool1y25deq9kldy9y9gfvrpw8zt05zsrfx84zjhugaxrx9ftvwdpua2",
     "margin": Object {
@@ -993,7 +843,6 @@ Array [
     },
     "pledge": 1000000000000n,
     "rewardAccount": "stake_test1uz8tusy3ruaw9ekplepacer4v6hpmpcp6ngp3gwj5ve3yjchsqqxn",
-    "updateId": "1",
     "vrfKeyHash": "43a78f2b4811cdb2e52c13b6ad6a1732a9fb44d3d64adeb1fc2b4867116881b8",
   },
 ]
@@ -1002,20 +851,17 @@ Array [
 exports[`StakePoolSearchBuilder queryPoolMetrics queryPoolMetrics 1`] = `
 Array [
   Object {
-    "hashId": "1",
-    "metrics": Object {
-      "blocksCreated": "0",
-      "delegators": "1",
-      "livePledge": 999999828559n,
-      "saturation": "0.01189867476975633141",
-      "size": Object {
-        "active": "0.0000000000000000000000000000",
-        "live": "1.00000000000000000000",
-      },
-      "stake": Object {
-        "active": 0n,
-        "live": 999999828559n,
-      },
+    "blocksCreated": "0",
+    "delegators": "1",
+    "livePledge": 999999828559n,
+    "saturation": "0.01189867476975633141",
+    "size": Object {
+      "active": "0.0000000000000000000000000000",
+      "live": "1.00000000000000000000",
+    },
+    "stake": Object {
+      "active": 0n,
+      "live": 999999828559n,
     },
   },
 ]
@@ -1023,25 +869,19 @@ Array [
 
 exports[`StakePoolSearchBuilder queryPoolOwners queryPoolOwners 1`] = `
 Array [
-  Object {
-    "address": "stake_test1urryfvusd49ej55gvf3cxtje4pqmtcdswwqxw37g6uclhnsqj7d5w",
-    "hashId": "1",
-  },
+  "stake_test1urryfvusd49ej55gvf3cxtje4pqmtcdswwqxw37g6uclhnsqj7d5w",
 ]
 `;
 
 exports[`StakePoolSearchBuilder queryPoolRewards queryPoolRewards 1`] = `
 Array [
   Object {
-    "epochReward": Object {
-      "activeStake": 0n,
-      "epoch": 175,
-      "epochLength": 431949000,
-      "memberROI": 0,
-      "operatorFees": 0n,
-      "totalRewards": 0n,
-    },
-    "hashId": 1,
+    "activeStake": 0n,
+    "epoch": 175,
+    "epochLength": 431949000,
+    "memberROI": 0,
+    "operatorFees": 0n,
+    "totalRewards": 0n,
   },
   undefined,
   undefined,
@@ -1052,7 +892,6 @@ exports[`StakePoolSearchBuilder queryRegistrations queryRegistrations 1`] = `
 Array [
   Object {
     "activeEpochNo": "76",
-    "hashId": "1",
     "transactionId": "295d5e0f7ee182426eaeda8c9f1c63502c72cdf4afd6e0ee0f209adf94a614e7",
   },
 ]
@@ -1061,7 +900,6 @@ Array [
 exports[`StakePoolSearchBuilder queryRetirements queryRetirements 1`] = `
 Array [
   Object {
-    "hashId": "1",
     "retiringEpoch": 78,
     "transactionId": "c27b294bb3dfbdfeda19b7f0254b23f91e3a48a2111c52dd99da6f1c8c3ff74f",
   },
