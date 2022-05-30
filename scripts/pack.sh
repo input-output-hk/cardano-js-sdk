@@ -12,5 +12,6 @@ npm pack --cwd ./packages/core && \
 npm pack --cwd ./packages/golden-test-generator && \
 npm pack --cwd ./packages/ogmios && \
 npm pack --cwd ./packages/rabbitmq && \
+npm pack --cwd ./packages/util-rxjs && \
 npm pack --cwd ./packages/util-dev && \
 npm pack --cwd ./packages/wallet
