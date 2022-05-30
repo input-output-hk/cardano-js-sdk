@@ -18,6 +18,9 @@ export abstract class KeyAgentBase implements KeyAgent {
   get knownAddresses(): GroupedAddress[] {
     return this.#serializableData.knownAddresses;
   }
+  set knownAddresses(addresses: GroupedAddress[]) {
+    this.#serializableData.knownAddresses = addresses;
+  }
   get serializableData(): SerializableKeyAgentData {
     return this.#serializableData;
   }
@@ -45,6 +48,8 @@ export abstract class KeyAgentBase implements KeyAgent {
    * See https://github.com/cardano-foundation/CIPs/tree/master/CIP-1852#specification
    */
   async deriveAddress({ index, type }: AccountAddressDerivationPath): Promise<GroupedAddress> {
+    const knownAddress = this.knownAddresses.find((addr) => addr.type === type && addr.index === index);
+    if (knownAddress) return knownAddress;
     const derivedPublicPaymentKey = await this.deriveCslPublicKey({
       index,
       role: type as unknown as KeyRole
@@ -69,7 +74,7 @@ export abstract class KeyAgentBase implements KeyAgent {
       rewardAccount: Cardano.RewardAccount(rewardAccount.to_bech32()),
       type
     };
-    this.knownAddresses.push(groupedAddress);
+    this.knownAddresses = [...this.knownAddresses, groupedAddress];
     return groupedAddress;
   }
 

@@ -25,7 +25,7 @@ export const runContentScriptMessageProxy = (apis: AnyApi[], logger: Logger) => 
 
     const responseMessage: ResponseMessage = {
       messageId: data.messageId,
-      response: await apiFunction(data.request.args)
+      response: await apiFunction(...data.request.args)
     };
 
     window.postMessage(responseMessage, source.origin);

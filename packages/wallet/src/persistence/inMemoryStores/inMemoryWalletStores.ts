@@ -1,6 +1,7 @@
 import { Assets } from '../../types';
 import { Cardano, EpochRewards, NetworkInfo, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
 import { EMPTY, combineLatest, map } from 'rxjs';
+import { GroupedAddress } from '../../KeyManagement';
 import { InMemoryCollectionStore } from './InMemoryCollectionStore';
 import { InMemoryDocumentStore } from './InMemoryDocumentStore';
 import { InMemoryKeyValueStore } from './InMemoryKeyValueStore';
@@ -11,6 +12,7 @@ export class InMemoryProtocolParametersStore extends InMemoryDocumentStore<Proto
 export class InMemoryGenesisParametersStore extends InMemoryDocumentStore<Cardano.CompactGenesis> {}
 export class InMemoryNetworkInfoStore extends InMemoryDocumentStore<NetworkInfo> {}
 export class InMemoryAssetsStore extends InMemoryDocumentStore<Assets> {}
+export class InMemoryAddressesStore extends InMemoryDocumentStore<GroupedAddress[]> {}
 
 export class InMemoryTransactionsStore extends InMemoryCollectionStore<Cardano.TxAlonzo> {}
 export class InMemoryUtxoStore extends InMemoryCollectionStore<Cardano.Utxo> {}
@@ -21,11 +23,13 @@ export class InMemoryStakePoolsStore extends InMemoryKeyValueStore<Cardano.PoolI
 export class InMemoryRewardsBalancesStore extends InMemoryKeyValueStore<Cardano.RewardAccount, Cardano.Lovelace> {}
 
 export const createInMemoryWalletStores = (): WalletStores => ({
+  addresses: new InMemoryAddressesStore(),
   assets: new InMemoryAssetsStore(),
   destroy() {
     if (!this.destroyed) {
       this.destroyed = true;
       return combineLatest([
+        this.addresses.destroy(),
         this.assets.destroy(),
         this.genesisParameters.destroy(),
         this.networkInfo.destroy(),

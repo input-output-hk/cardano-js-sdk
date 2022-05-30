@@ -1,12 +1,22 @@
 /* eslint-disable no-use-before-define */
 import {
-  AdaPriceService,
+  BackgroundServices,
   UserPromptService,
   adaPriceProperties,
   adaPriceServiceChannel,
-  userPromptServiceChannel
+  logger,
+  userPromptServiceChannel,
+  walletName
 } from './util';
-import { RemoteApiPropertyType, consumeRemoteApi, exposeApi } from '@cardano-sdk/web-extension';
+import { Cardano } from '@cardano-sdk/core';
+import { KeyManagement } from '@cardano-sdk/wallet';
+import {
+  RemoteApiPropertyType,
+  consumeObservableWallet,
+  consumeRemoteApi,
+  exposeApi,
+  exposeKeyAgent
+} from '@cardano-sdk/web-extension';
 import { runtime } from 'webextension-polyfill';
 
 const api: UserPromptService = {
@@ -31,7 +41,6 @@ const api: UserPromptService = {
   }
 };
 
-const logger = console;
 exposeApi<UserPromptService>(
   {
     api,
@@ -42,16 +51,37 @@ exposeApi<UserPromptService>(
 );
 
 // Consume background services
-
-const priceService = consumeRemoteApi<AdaPriceService>(
+const backgroundServices = consumeRemoteApi<BackgroundServices>(
   {
     baseChannel: adaPriceServiceChannel,
     properties: adaPriceProperties
   },
   { logger, runtime }
 );
+backgroundServices.adaUsd$.subscribe((price) => (document.querySelector('#adaPrice')!.textContent = price.toFixed(2)));
+document
+  .querySelector<HTMLButtonElement>('#clearAllowList')!
+  .addEventListener('click', backgroundServices.clearAllowList);
 
-priceService.adaUsd$.subscribe((price) => (document.querySelector('#adaPrice')!.textContent = price.toFixed(2)));
+// Use observable wallet from UI:
+const wallet = consumeObservableWallet({ walletName }, { logger, runtime });
+wallet.addresses$.subscribe(([{ address }]) => (document.querySelector('#address')!.textContent = address.toString()));
+wallet.balance.available$.subscribe(
+  ({ coins }) => (document.querySelector('#balance')!.textContent = coins.toString())
+);
 
-// To use observable wallet from UI:
-// const wallet = consumeObservableWallet({ walletName }, { logger, runtime });
+document.querySelector('#createLedgerKeyAgent')!.addEventListener('click', async () => {
+  // restoreKeyAgent or create a new one and expose it
+  exposeKeyAgent(
+    {
+      keyAgent: KeyManagement.util.createAsyncKeyAgent(
+        await KeyManagement.LedgerKeyAgent.createWithDevice({
+          communicationType: KeyManagement.CommunicationType.Web,
+          networkId: Cardano.NetworkId.testnet
+        })
+      ),
+      walletName
+    },
+    { logger, runtime }
+  );
+});

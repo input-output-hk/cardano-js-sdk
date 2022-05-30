@@ -10,7 +10,7 @@ require('dotenv').config({ path: path.join(__dirname, '.env') });
 module.exports = {
   devtool: 'inline-source-map',
   entry: {
-    background: path.join(__dirname, 'extension/background.ts'),
+    background: path.join(__dirname, 'extension/background/index.ts'),
     contentScript: path.join(__dirname, 'extension/contentScript.ts'),
     injectedScript: path.join(__dirname, 'extension/injectedScript.ts'),
     ui: path.join(__dirname, 'extension/ui.ts')
@@ -50,6 +50,7 @@ module.exports = {
       /@emurgo\/cardano-serialization-lib-nodejs/,
       '@emurgo/cardano-serialization-lib-asmjs'
     ),
+    new NormalModuleReplacementPlugin(/blake2b$/, 'blake2b-no-wasm'),
     new NormalModuleReplacementPlugin(
       /@emurgo\/cardano-message-signing-nodejs/,
       '@emurgo/cardano-message-signing-asmjs'

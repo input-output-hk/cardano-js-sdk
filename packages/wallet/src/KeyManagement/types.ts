@@ -1,4 +1,5 @@
 import { Cardano } from '@cardano-sdk/core';
+import { Observable } from 'rxjs';
 import { TxInternals } from '../Transaction';
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents';
 import TransportWebHID from '@ledgerhq/hw-transport-webhid';
@@ -146,3 +147,7 @@ export interface KeyAgent {
    */
   exportRootPrivateKey(): Promise<Cardano.Bip32PrivateKey>;
 }
+
+export type AsyncKeyAgent = Pick<KeyAgent, 'deriveAddress' | 'signBlob' | 'signTransaction'> & {
+  knownAddresses$: Observable<GroupedAddress[]>;
+};

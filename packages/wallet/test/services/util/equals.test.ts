@@ -1,11 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Cardano, TimeSettings } from '@cardano-sdk/core';
+import { Cardano, EpochInfo, TimeSettings } from '@cardano-sdk/core';
+import { GroupedAddress } from '../../../src/KeyManagement';
 import {
   arrayEquals,
   deepEquals,
+  epochInfoEquals,
+  groupedAddressesEquals,
   shallowArrayEquals,
   strictEquals,
   timeSettingsEquals,
+  tipEquals,
   transactionsEquals,
   txEquals,
   utxoEquals
@@ -62,5 +66,26 @@ describe('equals', () => {
   test('timeSettingsEquals compares fromSlotNo', () => {
     expect(timeSettingsEquals([{ fromSlotNo: 1 } as TimeSettings], [{ fromSlotNo: 1 } as TimeSettings])).toBe(true);
     expect(timeSettingsEquals([{ fromSlotNo: 1 } as TimeSettings], [{ fromSlotNo: 2 } as TimeSettings])).toBe(false);
+  });
+
+  test('groupedAddressesEquals compares address', () => {
+    const addresses1 = [{ address: 'a' as unknown as Cardano.Address } as GroupedAddress];
+    const addresses2 = [{ address: 'b' as unknown as Cardano.Address } as GroupedAddress];
+    expect(groupedAddressesEquals(addresses1, [...addresses1.map((addr) => ({ ...addr }))])).toBe(true);
+    expect(groupedAddressesEquals(addresses1, addresses2)).toBe(false);
+  });
+
+  test('tipEquals compares hash', () => {
+    const tip1 = { hash: 'hash1' } as unknown as Cardano.Tip;
+    const tip2 = { hash: 'hash2' } as unknown as Cardano.Tip;
+    expect(tipEquals(tip1, { ...tip1 })).toBe(true);
+    expect(tipEquals(tip1, tip2)).toBe(false);
+  });
+
+  test('epochInfoEquals compares epochNo', () => {
+    const info1 = { epochNo: 1 } as unknown as EpochInfo;
+    const info2 = { epochNo: 2 } as unknown as EpochInfo;
+    expect(epochInfoEquals(info1, { ...info1 })).toBe(true);
+    expect(epochInfoEquals(info1, info2)).toBe(false);
   });
 });

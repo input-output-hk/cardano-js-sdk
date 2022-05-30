@@ -1,6 +1,6 @@
 /* eslint-disable promise/always-return */
 import { DocumentStore } from '../types';
-import { EMPTY, Observable, from } from 'rxjs';
+import { EMPTY, Observable } from 'rxjs';
 import { PouchdbStore } from './PouchdbStore';
 import { dummyLogger } from 'ts-log';
 import { sanitizePouchdbDoc } from './util';
@@ -11,6 +11,11 @@ import { sanitizePouchdbDoc } from './util';
 export class PouchdbDocumentStore<T> extends PouchdbStore<T> implements DocumentStore<T> {
   readonly #docId: string;
 
+  /**
+   * @param dbName PouchDB database name
+   * @param docId unique document id within the db
+   * @param logger will silently swallow the errors if not set
+   */
   constructor(dbName: string, docId: string, logger = dummyLogger) {
     super(dbName, logger);
     this.#docId = docId;
@@ -30,19 +35,6 @@ export class PouchdbDocumentStore<T> extends PouchdbStore<T> implements Document
   }
 
   set(doc: T): Observable<void> {
-    if (this.destroyed) return EMPTY;
-    return from(
-      this.db
-        .put(
-          {
-            _id: this.#docId,
-            ...this.toPouchdbDoc(doc)
-          },
-          { force: true }
-        )
-        .catch((error) =>
-          this.logger.error(`PouchdbDocumentStore(${this.#docId}): failed to set`, doc, error)
-        ) as Promise<void>
-    );
+    return this.forcePut(this.#docId, doc);
   }
 }

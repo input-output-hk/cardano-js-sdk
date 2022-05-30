@@ -5,13 +5,13 @@ import {
   blockfrostAssetProvider,
   blockfrostNetworkInfoProvider,
   blockfrostTxSubmitProvider,
+  blockfrostUtxoProvider,
   blockfrostWalletProvider
 } from '@cardano-sdk/blockfrost';
 import { Cardano } from '@cardano-sdk/core';
-import { KeyManagement } from '@cardano-sdk/wallet';
 import { Logger } from 'ts-log';
 import { createStubStakePoolSearchProvider } from '@cardano-sdk/util-dev';
-import { memoize } from 'lodash-es';
+import axiosFetchAdapter from '@vespaiach/axios-fetch-adapter';
 
 const loggerMethodNames = ['debug', 'error', 'fatal', 'info', 'trace', 'warn'] as (keyof Logger)[];
 const networkIdOptions = [0, 1];
@@ -20,6 +20,7 @@ const networkInfoProviderOptions = ['blockfrost'];
 const txSubmitProviderOptions = ['blockfrost'];
 const walletProviderOptions = ['blockfrost'];
 const assetProviderOptions = ['blockfrost'];
+const utxoProviderOptions = ['blockfrost'];
 const keyAgentOptions = ['InMemory'];
 
 const env = envalid.cleanEnv(process.env, {
@@ -39,6 +40,7 @@ const env = envalid.cleanEnv(process.env, {
   STAKE_POOL_SEARCH_PROVIDER: envalid.str({ choices: stakePoolSearchProviderOptions }),
   TX_SUBMIT_HTTP_URL: envalid.url(),
   TX_SUBMIT_PROVIDER: envalid.str({ choices: txSubmitProviderOptions }),
+  UTXO_PROVIDER: envalid.str({ choices: utxoProviderOptions }),
   WALLET_PASSWORD: envalid.str(),
   WALLET_PROVIDER: envalid.str({ choices: walletProviderOptions })
 });
@@ -57,7 +59,12 @@ const blockfrostApi = [
 ].includes('blockfrost')
   ? (async () => {
       logger.debug('WalletProvider:blockfrost - Initializing');
-      const blockfrost = new BlockFrostAPI({ isTestnet, projectId: env.BLOCKFROST_API_KEY });
+      const blockfrost = new BlockFrostAPI({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        adapter: axiosFetchAdapter as any, // type mismatch: adapter uses axios 0.26, while blockfrost-js uses 0.21
+        isTestnet,
+        projectId: env.BLOCKFROST_API_KEY
+      });
       logger.debug('WalletProvider:blockfrost - Responding');
       return blockfrost;
     })()
@@ -68,6 +75,13 @@ export const walletProvider = (async () => {
     return blockfrostWalletProvider(await blockfrostApi!);
   }
   throw new Error(`WALLET_PROVIDER unsupported: ${env.WALLET_PROVIDER}`);
+})();
+
+export const utxoProvider = (async () => {
+  if (env.UTXO_PROVIDER === 'blockfrost') {
+    return blockfrostUtxoProvider(await blockfrostApi!);
+  }
+  throw new Error(`WALLET_PROVIDER unsupported: ${env.UTXO_PROVIDER}`);
 })();
 
 export const assetProvider = (async () => {
@@ -87,28 +101,6 @@ export const txSubmitProvider = (async () => {
     }
   }
 })();
-
-export const keyAgentByIdx = memoize(async (accountIndex: number) => {
-  switch (env.KEY_AGENT) {
-    case 'InMemory': {
-      const mnemonicWords = (process.env.MNEMONIC_WORDS || '').split(' ');
-      if (mnemonicWords.length === 0) throw new Error('MNEMONIC_WORDS not set');
-      const password = process.env.WALLET_PASSWORD;
-      if (!password) throw new Error('WALLET_PASSWORD not set');
-      return await KeyManagement.InMemoryKeyAgent.fromBip39MnemonicWords({
-        accountIndex,
-        getPassword: async () => Buffer.from(password),
-        mnemonicWords,
-        networkId
-      });
-    }
-    default: {
-      throw new Error(`KEY_AGENT unsupported: ${process.env.KEY_AGENT}`);
-    }
-  }
-});
-
-export const keyAgentReady = (() => keyAgentByIdx(0))();
 
 export const stakePoolSearchProvider = (async () => {
   if (env.STAKE_POOL_SEARCH_PROVIDER === 'stub') {

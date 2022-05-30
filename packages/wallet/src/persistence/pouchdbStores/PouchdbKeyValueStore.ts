@@ -16,7 +16,8 @@ export class PouchdbKeyValueStore<K extends string | Cardano.util.OpaqueString<a
   implements KeyValueStore<K, V>
 {
   /**
-   * @param {string} dbName collection name
+   * @param dbName collection name
+   * @param logger will silently swallow the errors if not set
    */
   constructor(dbName: string, logger = dummyLogger) {
     // Using a db per collection
@@ -63,16 +64,6 @@ export class PouchdbKeyValueStore<K extends string | Cardano.util.OpaqueString<a
   }
 
   setValue(key: K, value: V): Observable<void> {
-    if (this.destroyed) return EMPTY;
-    return from(
-      this.db
-        .put({
-          _id: key.toString(),
-          ...this.toPouchdbDoc(value)
-        })
-        .catch((error) => {
-          this.logger.error(`PouchdbDocumentStore(${this.dbName}): failed to set ${key}`, value, error);
-        }) as Promise<void>
-    );
+    return this.forcePut(key.toString(), value);
   }
 }

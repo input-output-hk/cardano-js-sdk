@@ -1,23 +1,27 @@
 import { Address, Ed25519Signature, PublicKey } from '@emurgo/cardano-serialization-lib-nodejs';
-import { AddressType, KeyAgent, KeyRole } from '../../../src/KeyManagement';
+import { AddressType, AsyncKeyAgent, GroupedAddress, KeyAgent, KeyRole } from '../../../src/KeyManagement';
 import { COSEKey, COSESign1, SigStructure } from '@emurgo/cardano-message-signing-nodejs';
 import { Cardano, util } from '@cardano-sdk/core';
 import { CoseLabel } from '../../../src/KeyManagement/cip8/util';
 import { cip30signData } from '../../../src/KeyManagement/cip8';
-import { testKeyAgent } from '../../mocks';
+import { testAsyncKeyAgent, testKeyAgent } from '../../mocks';
 
 describe('cip30signData', () => {
   const addressDerivationPath = { index: 0, type: AddressType.External };
   let keyAgent: KeyAgent;
+  let asyncKeyAgent: AsyncKeyAgent;
+  let address: GroupedAddress;
 
   beforeAll(async () => {
-    keyAgent = await testKeyAgent();
-    await keyAgent.deriveAddress(addressDerivationPath);
+    const keyAgentReady = testKeyAgent();
+    keyAgent = await keyAgentReady;
+    asyncKeyAgent = await testAsyncKeyAgent(undefined, keyAgentReady);
+    address = await asyncKeyAgent.deriveAddress(addressDerivationPath);
   });
 
   const signAndDecode = async (signWith: Cardano.Address | Cardano.RewardAccount) => {
     const dataSignature = await cip30signData({
-      keyAgent,
+      keyAgent: asyncKeyAgent,
       payload: Cardano.util.HexBlob('abc123'),
       signWith
     });
@@ -46,7 +50,7 @@ describe('cip30signData', () => {
   };
 
   it('supports sign with payment address', async () => {
-    const signWith = keyAgent.knownAddresses[0].address;
+    const signWith = address.address;
     const { signedData, publicKeyHex } = await signAndDecode(signWith);
 
     testAddressHeader(signedData, signWith);
@@ -60,7 +64,7 @@ describe('cip30signData', () => {
   });
 
   it('supports signing with reward account', async () => {
-    const signWith = keyAgent.knownAddresses[0].rewardAccount;
+    const signWith = address.rewardAccount;
     const { signedData, publicKeyHex } = await signAndDecode(signWith);
 
     testAddressHeader(signedData, signWith);
@@ -74,7 +78,7 @@ describe('cip30signData', () => {
   });
 
   it('signature can be verified', async () => {
-    const signWith = keyAgent.knownAddresses[0].address;
+    const signWith = address.address;
     const { coseSign1, publicKey, signedData } = await signAndDecode(signWith);
     const signedDataBytes = signedData.to_bytes();
     const signatureBytes = coseSign1.signature();

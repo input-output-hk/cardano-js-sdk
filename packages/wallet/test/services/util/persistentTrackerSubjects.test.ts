@@ -78,7 +78,7 @@ describe('SyncableIntervalPersistentDocumentTrackerSubject', () => {
     store.set = jest.fn().mockImplementation(store.set.bind(store));
     createTestScheduler().run(({ cold, expectObservable }) => {
       const trigger$ = cold('---a---b|');
-      const provider$ = stubObservableProvider(cold('-y|'), cold('--a|'), cold('--b|'));
+      const provider$ = stubObservableProvider(cold('-y|'), cold('--a|'), cold('-ab|'));
       const tracker$ = new SyncableIntervalPersistentDocumentTrackerSubject({
         maxPollInterval: Number.MAX_VALUE,
         pollInterval,

@@ -6,11 +6,11 @@ import {
   mockTxSubmitProvider,
   mockUtxoProvider,
   mockWalletProvider,
-  testKeyAgent
+  testAsyncKeyAgent
 } from '../mocks';
 
 export const createWallet = async () => {
-  const keyAgent = await testKeyAgent();
+  const keyAgent = await testAsyncKeyAgent();
   const txSubmitProvider = mockTxSubmitProvider();
   const walletProvider = mockWalletProvider();
   const stakePoolSearchProvider = createStubStakePoolSearchProvider();

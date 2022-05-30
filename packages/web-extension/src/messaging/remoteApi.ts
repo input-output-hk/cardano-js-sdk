@@ -4,52 +4,25 @@ import {
   ConsumeRemoteApiOptions,
   EmitMessage,
   ExposeApiProps,
-  Messenger,
   MessengerApiDependencies,
   MethodRequest,
   MethodRequestOptions,
+  ObservableCompletionMessage,
   RemoteApiMethod,
   RemoteApiPropertyType,
   RequestMessage,
-  ResponseMessage,
-  SubscriptionMessage
+  ResponseMessage
 } from './types';
-import {
-  EMPTY,
-  Observable,
-  filter,
-  firstValueFrom,
-  isObservable,
-  map,
-  merge,
-  mergeMap,
-  take,
-  takeUntil,
-  tap,
-  timeout
-} from 'rxjs';
+import { EMPTY, Observable, filter, firstValueFrom, isObservable, map, merge, mergeMap, takeUntil, tap } from 'rxjs';
 import { NotImplementedError, util } from '@cardano-sdk/core';
 import { Shutdown, TrackerSubject } from '@cardano-sdk/wallet';
-import { isEmitMessage, isRequestMessage, isResponseMessage, isSubscriptionMessage, newMessageId } from './util';
-
-const SUBSCRIPTION_TIMEOUT = 3000;
-const throwIfObservableChannelDoesntExist = ({ postMessage, message$ }: Messenger) => {
-  const subscriptionMessageId = newMessageId();
-  return merge(
-    postMessage({
-      messageId: subscriptionMessageId,
-      subscribe: true
-    } as SubscriptionMessage),
-    // timeout if the other end didn't acknowledge the subscription with a ResponseMessage
-    message$.pipe(
-      map(({ data }) => data),
-      filter(isResponseMessage),
-      filter(({ messageId }) => messageId === subscriptionMessageId),
-      timeout({ first: SUBSCRIPTION_TIMEOUT }),
-      take(1)
-    )
-  ).pipe(mergeMap(() => EMPTY));
-};
+import {
+  isEmitMessage,
+  isObservableCompletionMessage,
+  isRequestMessage,
+  isResponseMessage,
+  newMessageId
+} from './util';
 
 const consumeMethod =
   (
@@ -63,7 +36,7 @@ const consumeMethod =
     const requestMessage: RequestMessage = {
       messageId: newMessageId(),
       request: {
-        args: args.map(util.toSerializableObject),
+        args: args.map((arg) => util.toSerializableObject(arg)),
         method: propName
       }
     };
@@ -72,10 +45,10 @@ const consumeMethod =
       merge(
         postMessage(requestMessage).pipe(mergeMap(() => EMPTY)),
         message$.pipe(
-          map(({ data }) => data),
+          map(({ data }) => util.fromSerializableObject(data, { getErrorPrototype })),
           filter(isResponseMessage),
           filter(({ messageId }) => messageId === requestMessage.messageId),
-          map(({ response }) => util.fromSerializableObject(response, getErrorPrototype))
+          map(({ response }) => response)
         )
       )
     );
@@ -88,8 +61,6 @@ const consumeMethod =
 
 /**
  * Creates a proxy to a remote api object
- *
- * @throws Observable subscriptions might error with rxjs TimeoutError if the remote observable doesnt exist
  */
 export const consumeMessengerRemoteApi = <T extends object>(
   { properties, getErrorPrototype }: ConsumeRemoteApiOptions<T>,
@@ -123,21 +94,20 @@ export const consumeMessengerRemoteApi = <T extends object>(
           return consumeMethod({ getErrorPrototype, propName }, { logger, messenger });
         } else if (propMetadata === RemoteApiPropertyType.Observable) {
           const observableMessenger = messenger.deriveChannel(propName);
-          const messageData$ = observableMessenger.message$.pipe(map(({ data }) => data));
+          const messageData$ = observableMessenger.message$.pipe(map(({ data }) => util.fromSerializableObject(data)));
           const unsubscribe$ = messageData$.pipe(
-            filter(isSubscriptionMessage),
+            filter(isObservableCompletionMessage),
             filter(({ subscribe }) => !subscribe),
             tap(({ error }) => {
               if (error) throw error;
             })
           );
-          return merge(
-            throwIfObservableChannelDoesntExist(observableMessenger),
-            messageData$.pipe(
+          return messageData$
+            .pipe(
               filter(isEmitMessage),
               map(({ emit }) => emit)
             )
-          ).pipe(takeUntil(unsubscribe$));
+            .pipe(takeUntil(unsubscribe$));
         }
       },
       has(_, p) {
@@ -170,19 +140,25 @@ export const bindMessengerRequestHandler = <Response>(
     port.postMessage(responseMessage);
   });
 
+const isRemoteApiMethod = (prop: unknown): prop is RemoteApiMethod =>
+  typeof prop === 'object' && prop !== null && 'propType' in prop;
+
 export const bindNestedObjChannels = <API extends object>(
   { api, properties }: ExposeApiProps<API>,
   { messenger, logger }: MessengerApiDependencies
 ) => {
-  const subscriptions = Object.keys(api)
-    .filter((prop) => typeof (api as any)[prop] === 'object' && !isObservable((api as any)[prop]))
-    .map((prop) =>
+  const subscriptions = Object.entries(properties)
+    .filter(([_, type]) => typeof type === 'object' && !isRemoteApiMethod(type))
+    .map(([prop]) => {
+      if (typeof (api as any)[prop] !== 'object' || isObservable((api as any)[prop])) {
+        throw new NotImplementedError(`Trying to expose non-implemented nested object ${prop}`);
+      }
       // eslint-disable-next-line no-use-before-define
-      exposeMessengerApi(
+      return exposeMessengerApi(
         { api: (api as any)[prop], properties: (properties as any)[prop] },
         { logger, messenger: messenger.deriveChannel(prop) }
-      )
-    );
+      );
+    });
   return {
     unsubscribe: () => {
       for (const subscription of subscriptions) {
@@ -196,27 +172,26 @@ export const bindObservableChannels = <API extends object>(
   { api, properties }: ExposeApiProps<API>,
   { messenger }: MessengerApiDependencies
 ) => {
-  const subscriptions = Object.keys(api)
-    .filter(
-      (method) =>
-        properties[method as keyof API] === RemoteApiPropertyType.Observable && isObservable(api[method as keyof API])
-    )
-    .map((observableProperty) => {
+  const subscriptions = Object.entries(properties)
+    .filter(([, propType]) => propType === RemoteApiPropertyType.Observable)
+    .map(([observableProperty]) => {
+      if (!isObservable(api[observableProperty as keyof API])) {
+        throw new NotImplementedError(`Trying to expose non-implemented observable ${observableProperty}`);
+      }
       const observable$ = new TrackerSubject((api as any)[observableProperty] as Observable<unknown>);
       const observableMessenger = messenger.deriveChannel(observableProperty);
-      const ackSubscription = observableMessenger.message$.subscribe(({ data, port }) => {
-        if (isSubscriptionMessage(data) && data.subscribe) {
-          port.postMessage({ messageId: data.messageId, response: true } as ResponseMessage);
-          if (observable$.value !== null) {
-            port.postMessage({ emit: observable$.value, messageId: newMessageId() } as EmitMessage);
-          }
+      const connectSubscription = observableMessenger.connect$.subscribe((port) => {
+        if (observable$.value !== null) {
+          port.postMessage(
+            util.toSerializableObject({ emit: observable$.value, messageId: newMessageId() } as EmitMessage)
+          );
         }
       });
-      const broadcastMessage = (message: Partial<SubscriptionMessage | EmitMessage>) =>
+      const broadcastMessage = (message: Partial<ObservableCompletionMessage | EmitMessage>) =>
         observableMessenger
           .postMessage({
             messageId: newMessageId(),
-            ...message
+            ...(util.toSerializableObject(message) as object)
           })
           .subscribe();
       const observableSubscription = observable$.subscribe({
@@ -225,7 +200,7 @@ export const bindObservableChannels = <API extends object>(
         next: (emit: unknown) => broadcastMessage({ emit })
       });
       return () => {
-        ackSubscription.unsubscribe();
+        connectSubscription.unsubscribe();
         observableSubscription.unsubscribe();
         observable$.complete();
       };
@@ -236,9 +211,6 @@ export const bindObservableChannels = <API extends object>(
     }
   };
 };
-
-const isRemoteApiMethod = (prop: unknown): prop is RemoteApiMethod =>
-  typeof prop === 'object' && prop !== null && 'propType' in prop;
 
 /**
  * Bind an API object to handle messages from other parts of the extension.

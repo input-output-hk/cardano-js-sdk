@@ -1,4 +1,4 @@
-import { AddressType, GroupedAddress, KeyAgent, util as keyManagementUtil } from './KeyManagement';
+import { AddressType, AsyncKeyAgent, GroupedAddress, util as keyManagementUtil } from './KeyManagement';
 import {
   AssetProvider,
   Cardano,
@@ -50,13 +50,26 @@ import {
   currentEpochTracker,
   deepEquals,
   distinctBlock,
-  distinctTimeSettings
+  distinctTimeSettings,
+  groupedAddressesEquals,
+  tipEquals
 } from './services';
 import { Cip30DataSignature } from '@cardano-sdk/cip30';
 import { InputSelector, defaultSelectionConstraints, roundRobinRandomImprove } from '@cardano-sdk/cip2';
 import { Logger, dummyLogger } from 'ts-log';
-import { Observable, Subject, combineLatest, filter, lastValueFrom, map, take } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
+import {
+  Subject,
+  combineLatest,
+  concat,
+  distinctUntilChanged,
+  filter,
+  firstValueFrom,
+  lastValueFrom,
+  map,
+  take,
+  tap
+} from 'rxjs';
 import { TrackedUtxoProvider } from './services/ProviderTracker/TrackedUtxoProvider';
 import { TxInternals, createTransactionInternals, ensureValidityInterval } from './Transaction';
 import { WalletStores, createInMemoryWalletStores } from './persistence';
@@ -70,7 +83,7 @@ export interface SingleAddressWalletProps {
 }
 
 export interface SingleAddressWalletDependencies {
-  readonly keyAgent: KeyAgent;
+  readonly keyAgent: AsyncKeyAgent;
   readonly txSubmitProvider: TxSubmitProvider;
   readonly walletProvider: WalletProvider;
   readonly stakePoolSearchProvider: StakePoolSearchProvider;
@@ -91,7 +104,7 @@ export class SingleAddressWallet implements ObservableWallet {
     pending$: new Subject<Cardano.NewTxAlonzo>(),
     submitting$: new Subject<Cardano.NewTxAlonzo>()
   };
-  readonly keyAgent: KeyAgent;
+  readonly keyAgent: AsyncKeyAgent;
   readonly currentEpoch$: BehaviorObservable<EpochInfo>;
   readonly txSubmitProvider: TrackedTxSubmitProvider;
   readonly walletProvider: TrackedWalletProvider;
@@ -159,9 +172,27 @@ export class SingleAddressWallet implements ObservableWallet {
       { consideredOutOfSyncAfter }
     );
     this.keyAgent = keyAgent;
-    this.addresses$ = new TrackerSubject<GroupedAddress[]>(this.#initializeAddress(keyAgent.knownAddresses));
+    this.addresses$ = new TrackerSubject<GroupedAddress[]>(
+      concat(
+        stores.addresses.get(),
+        keyAgent.knownAddresses$.pipe(
+          distinctUntilChanged(groupedAddressesEquals),
+          tap(
+            // derive an address if none available
+            (addresses) =>
+              addresses.length === 0 &&
+              void keyAgent
+                .deriveAddress({ index: 0, type: AddressType.External })
+                .catch(() => logger.error('SingleAddressWallet failed to derive address'))
+          ),
+          filter((addresses) => addresses.length > 0),
+          tap(stores.addresses.set.bind(stores.addresses))
+        )
+      )
+    );
     this.name = name;
     this.#tip$ = this.tip$ = new SyncableIntervalPersistentDocumentTrackerSubject({
+      equals: tipEquals,
       maxPollInterval: maxInterval,
       pollInterval,
       provider$: coldObservableProvider(this.walletProvider.ledgerTip, retryBackoffConfig),
@@ -232,10 +263,6 @@ export class SingleAddressWallet implements ObservableWallet {
     this.util = createWalletUtil(this);
   }
 
-  async getNetworkId(): Promise<Cardano.NetworkId> {
-    return this.keyAgent.networkId;
-  }
-
   async getName(): Promise<string> {
     return this.name;
   }
@@ -263,8 +290,9 @@ export class SingleAddressWallet implements ObservableWallet {
     auxiliaryData?: Cardano.AuxiliaryData,
     stubSign = false
   ): Promise<Cardano.NewTxAlonzo> {
+    const addresses = await firstValueFrom(this.addresses$);
     const signatures = stubSign
-      ? keyManagementUtil.stubSignTransaction(tx.body, this.keyAgent.knownAddresses, this.util.resolveInputAddress)
+      ? keyManagementUtil.stubSignTransaction(tx.body, addresses, this.util.resolveInputAddress)
       : await this.keyAgent.signTransaction(tx, {
           inputAddressResolver: this.util.resolveInputAddress
         });
@@ -338,22 +366,5 @@ export class SingleAddressWallet implements ObservableWallet {
         })
       )
     );
-  }
-
-  #initializeAddress(knownAddresses?: GroupedAddress[]): Observable<GroupedAddress[]> {
-    return new Observable((observer) => {
-      const existingAddress = knownAddresses?.length && knownAddresses?.[0];
-      if (existingAddress) {
-        observer.next([existingAddress]);
-        return;
-      }
-      this.keyAgent
-        .deriveAddress({
-          index: 0,
-          type: AddressType.External
-        })
-        .then((newAddress) => observer.next([newAddress]))
-        .catch(observer.error);
-    });
   }
 }

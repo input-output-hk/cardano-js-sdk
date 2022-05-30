@@ -16,10 +16,14 @@ export interface UserPromptService {
   allowOrigin(origin: Origin): Promise<boolean>;
 }
 
-export interface AdaPriceService {
+export interface BackgroundServices {
   adaUsd$: Observable<number>;
+  clearAllowList(): Promise<void>;
 }
 
-export const adaPriceProperties: RemoteApiProperties<AdaPriceService> = {
-  adaUsd$: RemoteApiPropertyType.Observable
+export const adaPriceProperties: RemoteApiProperties<BackgroundServices> = {
+  adaUsd$: RemoteApiPropertyType.Observable,
+  clearAllowList: RemoteApiPropertyType.MethodReturningPromise
 };
+
+export const logger = console;

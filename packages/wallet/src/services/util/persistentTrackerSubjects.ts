@@ -6,6 +6,7 @@ import {
   concat,
   defaultIfEmpty,
   delay,
+  distinctUntilChanged,
   exhaustMap,
   merge,
   of,
@@ -16,6 +17,7 @@ import {
   timeout
 } from 'rxjs';
 import { TrackerSubject } from './TrackerSubject';
+import { isEqual } from 'lodash-es';
 
 export class PersistentCollectionTrackerSubject<T> extends TrackerSubject<T[]> {
   readonly store: CollectionStore<T>;
@@ -47,6 +49,7 @@ export interface SyncableIntervalPersistentDocumentTrackerSubjectProps<T> {
   provider$: Observable<T>;
   trigger$: Observable<unknown>;
   store: DocumentStore<T>;
+  equals?: (t1: T, t2: T) => boolean;
   pollInterval: Milliseconds;
   maxPollInterval: Milliseconds;
 }
@@ -68,6 +71,7 @@ export class SyncableIntervalPersistentDocumentTrackerSubject<T> extends Persist
       pollInterval,
       maxPollInterval,
       store,
+      equals = isEqual,
       trigger$
     }: SyncableIntervalPersistentDocumentTrackerSubjectProps<T>,
     { externalTrigger$ = new Subject() }: SyncableIntervalPersistentDocumentTrackerSubjectInternals = {}
@@ -81,7 +85,8 @@ export class SyncableIntervalPersistentDocumentTrackerSubject<T> extends Persist
           delay(pollInterval),
           startWith(null),
           // Throttle syncing by interval, cancel ongoing request on external trigger
-          exhaustMap(() => merge(provider$).pipe(takeUntil(externalTrigger$)))
+          exhaustMap(() => merge(provider$).pipe(takeUntil(externalTrigger$))),
+          distinctUntilChanged(equals)
         ),
         // Always immediately restart request on external trigger
         externalTrigger$.pipe(switchMap(() => provider$))

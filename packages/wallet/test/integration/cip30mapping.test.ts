@@ -28,7 +28,7 @@ describe('cip30', () => {
     // CREATE A WALLET
     wallet = await createWallet();
     confirmationCallback = jest.fn().mockResolvedValue(true);
-    api = cip30.createWalletApi(wallet, confirmationCallback);
+    api = cip30.createWalletApi(Promise.resolve(wallet), confirmationCallback);
     await waitForWalletStateSettle(wallet);
   });
 
@@ -111,21 +111,17 @@ describe('cip30', () => {
 
       test('resolves true', async () => {
         confirmationCallback.mockResolvedValueOnce(true);
-        await expect(api.signData(wallet.keyAgent.knownAddresses[0].address, payload)).resolves.not.toThrow();
+        await expect(api.signData(wallet.addresses$.value![0].address, payload)).resolves.not.toThrow();
       });
 
       test('resolves false', async () => {
         confirmationCallback.mockResolvedValueOnce(false);
-        await expect(api.signData(wallet.keyAgent.knownAddresses[0].address, payload)).rejects.toThrowError(
-          DataSignError
-        );
+        await expect(api.signData(wallet.addresses$.value![0].address, payload)).rejects.toThrowError(DataSignError);
       });
 
       test('rejects', async () => {
         confirmationCallback.mockRejectedValue(1);
-        await expect(api.signData(wallet.keyAgent.knownAddresses[0].address, payload)).rejects.toThrowError(
-          DataSignError
-        );
+        await expect(api.signData(wallet.addresses$.value![0].address, payload)).rejects.toThrowError(DataSignError);
       });
     });
 

@@ -1,14 +1,14 @@
 import {
   EmitMessage,
   MethodRequest,
+  ObservableCompletionMessage,
   RequestMessage,
   ResponseMessage,
-  SubscriptionMessage,
   isEmitMessage,
+  isObservableCompletionMessage,
   isRequest,
   isRequestMessage,
   isResponseMessage,
-  isSubscriptionMessage,
   newMessageId,
   senderOrigin
 } from '../../src';
@@ -45,15 +45,16 @@ describe('messaging/util', () => {
       expect(isResponseMessage({ response: true })).toBe(false);
     });
   });
-  describe('isSubscriptionMessage', () => {
+  describe('isObservableCompletionMessage', () => {
     it('returns true for objects matching SubscriptionMessage type', () => {
-      expect(isSubscriptionMessage({ messageId: 'messageId', subscribe: false } as SubscriptionMessage)).toBe(true);
-      expect(isSubscriptionMessage({ messageId: 'messageId', subscribe: true } as SubscriptionMessage)).toBe(true);
+      expect(
+        isObservableCompletionMessage({ messageId: 'messageId', subscribe: false } as ObservableCompletionMessage)
+      ).toBe(true);
     });
     it('returns false for objects not matching SubscriptionMessage type', () => {
-      expect(isSubscriptionMessage(null)).toBe(false);
-      expect(isSubscriptionMessage({ messageId: 'messageId' })).toBe(false);
-      expect(isSubscriptionMessage({ subscribe: true })).toBe(false);
+      expect(isObservableCompletionMessage(null)).toBe(false);
+      expect(isObservableCompletionMessage({ messageId: 'messageId' })).toBe(false);
+      expect(isObservableCompletionMessage({ subscribe: true })).toBe(false);
     });
   });
   describe('isEmitMessage', () => {

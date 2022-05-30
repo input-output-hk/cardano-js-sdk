@@ -56,9 +56,9 @@ export class LedgerKeyAgent extends KeyAgentBase {
   /**
    * @throws TransportError
    */
-  static async getHidDeviceList(): Promise<string[]> {
+  static async getHidDeviceList(communicationType: CommunicationType): Promise<string[]> {
     try {
-      return await TransportNodeHid.list();
+      return communicationType === CommunicationType.Node ? TransportNodeHid.list() : TransportWebHID.list();
     } catch (error) {
       throw new TransportError('Cannot fetch device list', error);
     }
@@ -199,7 +199,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
     communicationType,
     deviceConnection
   }: CreateLedgerKeyAgentProps) {
-    const deviceListPaths = await LedgerKeyAgent.getHidDeviceList();
+    const deviceListPaths = await LedgerKeyAgent.getHidDeviceList(communicationType);
     // Re-use device connection if you want to create a key agent with new / additional account(s) and pass accountIndex
     const activeDeviceConnection = await (deviceConnection
       ? LedgerKeyAgent.checkDeviceConnection(communicationType, deviceConnection)
