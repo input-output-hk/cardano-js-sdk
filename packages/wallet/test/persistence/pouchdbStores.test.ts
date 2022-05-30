@@ -1,6 +1,7 @@
 /* eslint-disable unicorn/consistent-function-scoping */
 import { PouchdbCollectionStore, PouchdbDocumentStore, PouchdbKeyValueStore } from '../../src/persistence';
 import { assertCompletesWithoutEmitting } from './util';
+import { dummyLogger } from 'ts-log';
 import { firstValueFrom } from 'rxjs';
 import PouchDB from 'pouchdb';
 
@@ -46,7 +47,8 @@ describe('pouchdbStores', () => {
   });
 
   describe('PouchdbCollectionStore', () => {
-    const createStore = () => new PouchdbCollectionStore<DocType>(dbName, ({ __unsupportedKey }) => __unsupportedKey);
+    const createStore = () =>
+      new PouchdbCollectionStore<DocType>(dbName, dummyLogger, ({ __unsupportedKey }) => __unsupportedKey);
     let store1: PouchdbCollectionStore<DocType>;
 
     beforeEach(async () => {

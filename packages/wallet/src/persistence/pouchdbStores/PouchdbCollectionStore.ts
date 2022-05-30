@@ -14,10 +14,11 @@ export class PouchdbCollectionStore<T> extends PouchdbStore<T> implements Collec
   readonly #computeDocId: ComputePouchdbDocId<T> | undefined;
 
   /**
-   * @param {string} dbName collection name
-   * @param {ComputePouchdbDocId} computeDocId used for document sort order
+   * @param dbName collection name
+   * @param logger logger
+   * @param computeDocId used for document sort order
    */
-  constructor(dbName: string, computeDocId?: ComputePouchdbDocId<T>, logger = dummyLogger) {
+  constructor(dbName: string, logger = dummyLogger, computeDocId?: ComputePouchdbDocId<T>) {
     // Using a db per collection
     super(dbName, logger);
     this.#computeDocId = computeDocId;
