@@ -78,6 +78,7 @@
 						<section class="tsd-index-section ">
 							<h3>Functions</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="_cardano_sdk_core.Asset.util.html#assetIdFromPolicyAndName" class="tsd-kind-icon">asset<wbr>IdFrom<wbr>Policy<wbr>And<wbr>Name</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="_cardano_sdk_core.Asset.util.html#assetNameFromAssetId" class="tsd-kind-icon">asset<wbr>Name<wbr>From<wbr>Asset<wbr>Id</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="_cardano_sdk_core.Asset.util.html#coalesceTokenMaps" class="tsd-kind-icon">coalesce<wbr>Token<wbr>Maps</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-namespace"><a href="_cardano_sdk_core.Asset.util.html#createAssetId" class="tsd-kind-icon">create<wbr>Asset<wbr>Id</a></li>
@@ -94,6 +95,33 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Functions</h2>
 				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-namespace">
+					<a name="assetIdFromPolicyAndName" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> asset<wbr>IdFrom<wbr>Policy<wbr>And<wbr>Name</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-namespace">
+						<li class="tsd-signature tsd-kind-icon">asset<wbr>IdFrom<wbr>Policy<wbr>And<wbr>Name<span class="tsd-signature-symbol">(</span>policyId<span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_core.Cardano.html#PolicyId-1" class="tsd-signature-type" data-tsd-kind="Function">PolicyId</a>, assetName<span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_core.Cardano.html#AssetName-1" class="tsd-signature-type" data-tsd-kind="Function">AssetName</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_core.Cardano.html#AssetId-1" class="tsd-signature-type" data-tsd-kind="Function">AssetId</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/8c87403/packages/core/src/Asset/util/assetId.ts#L16">packages/core/src/Asset/util/assetId.ts:16</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>policyId: <a href="_cardano_sdk_core.Cardano.html#PolicyId-1" class="tsd-signature-type" data-tsd-kind="Function">PolicyId</a></h5>
+								</li>
+								<li>
+									<h5>assetName: <a href="_cardano_sdk_core.Cardano.html#AssetName-1" class="tsd-signature-type" data-tsd-kind="Function">AssetName</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="_cardano_sdk_core.Cardano.html#AssetId-1" class="tsd-signature-type" data-tsd-kind="Function">AssetId</a></h4>
+							<p>concatenated policy id and asset name</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-namespace">
 					<a name="assetNameFromAssetId" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> asset<wbr>Name<wbr>From<wbr>Asset<wbr>Id</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-namespace">
@@ -103,7 +131,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cb95232/packages/core/src/Asset/util/assetId.ts#L5">packages/core/src/Asset/util/assetId.ts:5</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/8c87403/packages/core/src/Asset/util/assetId.ts#L5">packages/core/src/Asset/util/assetId.ts:5</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -126,7 +154,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cb95232/packages/core/src/Asset/util/coalesceTokenMaps.ts#L7">packages/core/src/Asset/util/coalesceTokenMaps.ts:7</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/8c87403/packages/core/src/Asset/util/coalesceTokenMaps.ts#L7">packages/core/src/Asset/util/coalesceTokenMaps.ts:7</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -154,7 +182,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cb95232/packages/core/src/Asset/util/assetId.ts#L10">packages/core/src/Asset/util/assetId.ts:10</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/8c87403/packages/core/src/Asset/util/assetId.ts#L10">packages/core/src/Asset/util/assetId.ts:10</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -181,7 +209,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cb95232/packages/core/src/Asset/util/metadatumToCip25.ts#L78">packages/core/src/Asset/util/metadatumToCip25.ts:78</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/8c87403/packages/core/src/Asset/util/metadatumToCip25.ts#L78">packages/core/src/Asset/util/metadatumToCip25.ts:78</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -211,7 +239,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cb95232/packages/core/src/Asset/util/assetId.ts#L13">packages/core/src/Asset/util/assetId.ts:13</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/8c87403/packages/core/src/Asset/util/assetId.ts#L19">packages/core/src/Asset/util/assetId.ts:19</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -242,7 +270,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cb95232/packages/core/src/Asset/util/assetId.ts#L4">packages/core/src/Asset/util/assetId.ts:4</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/8c87403/packages/core/src/Asset/util/assetId.ts#L4">packages/core/src/Asset/util/assetId.ts:4</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -265,7 +293,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cb95232/packages/core/src/Asset/util/removeNegativesFromTokenMap.ts#L10">packages/core/src/Asset/util/removeNegativesFromTokenMap.ts:10</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/8c87403/packages/core/src/Asset/util/removeNegativesFromTokenMap.ts#L10">packages/core/src/Asset/util/removeNegativesFromTokenMap.ts:10</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -298,7 +326,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cb95232/packages/core/src/Asset/util/subtractTokenMaps.ts#L7">packages/core/src/Asset/util/subtractTokenMaps.ts:7</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/8c87403/packages/core/src/Asset/util/subtractTokenMaps.ts#L7">packages/core/src/Asset/util/subtractTokenMaps.ts:7</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -395,6 +423,9 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
+					<li class=" tsd-kind-function tsd-parent-kind-namespace">
+						<a href="_cardano_sdk_core.Asset.util.html#assetIdFromPolicyAndName" class="tsd-kind-icon">asset<wbr>IdFrom<wbr>Policy<wbr>And<wbr>Name</a>
+					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-namespace">
 						<a href="_cardano_sdk_core.Asset.util.html#assetNameFromAssetId" class="tsd-kind-icon">asset<wbr>Name<wbr>From<wbr>Asset<wbr>Id</a>
 					</li>
