@@ -25,10 +25,7 @@ export class TrackedAssetProvider extends ProviderTracker implements AssetProvid
     super();
     assetProvider = assetProvider;
 
-    this.getAsset = (assetId) =>
-      this.trackedCall(
-        () => assetProvider.getAsset(assetId, { history: true, nftMetadata: true, tokenMetadata: true }),
-        this.stats.getAsset$
-      );
+    this.getAsset = (assetId, extraData) =>
+      this.trackedCall(() => assetProvider.getAsset(assetId, extraData), this.stats.getAsset$);
   }
 }
