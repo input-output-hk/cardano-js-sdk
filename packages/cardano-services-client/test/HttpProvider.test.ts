@@ -60,8 +60,8 @@ describe('createHttpServer', () => {
         res.send();
       });
       const response = await provider.noArgsEmptyReturn();
-      expect(response).toBe(undefined);
       await closeServer();
+      expect(response).toBe(undefined);
     });
   });
 
@@ -80,8 +80,8 @@ describe('createHttpServer', () => {
         }
       );
       const response = await provider.complexArgsAndReturn(arg1, arg2);
-      expect(response).toEqual(expectedResponse);
       await closeServer();
+      expect(response).toEqual(expectedResponse);
     });
   });
 
