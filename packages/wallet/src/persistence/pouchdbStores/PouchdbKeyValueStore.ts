@@ -16,7 +16,8 @@ export class PouchdbKeyValueStore<K extends string | Cardano.util.OpaqueString<a
   implements KeyValueStore<K, V>
 {
   /**
-   * @param {string} dbName collection name
+   * @param dbName collection name
+   * @param logger will silently swallow the errors if not set
    */
   constructor(dbName: string, logger = dummyLogger) {
     // Using a db per collection

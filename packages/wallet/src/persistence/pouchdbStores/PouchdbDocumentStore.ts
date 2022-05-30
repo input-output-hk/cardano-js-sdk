@@ -11,6 +11,11 @@ import { sanitizePouchdbDoc } from './util';
 export class PouchdbDocumentStore<T> extends PouchdbStore<T> implements DocumentStore<T> {
   readonly #docId: string;
 
+  /**
+   * @param dbName PouchDB database name
+   * @param docId unique document id within the db
+   * @param logger will silently swallow the errors if not set
+   */
   constructor(dbName: string, docId: string, logger = dummyLogger) {
     super(dbName, logger);
     this.#docId = docId;

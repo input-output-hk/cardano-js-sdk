@@ -1,10 +1,15 @@
 import { CollectionStore } from '../types';
 import { EMPTY, Observable, from } from 'rxjs';
+import { Logger, dummyLogger } from 'ts-log';
 import { PouchdbStore } from './PouchdbStore';
-import { dummyLogger } from 'ts-log';
 import { sanitizePouchdbDoc } from './util';
 
 export type ComputePouchdbDocId<T> = (doc: T) => string;
+
+export interface PouchdbCollectionStoreProps<T> {
+  dbName: string;
+  computeDocId?: ComputePouchdbDocId<T>;
+}
 
 /**
  * PouchDB database that implements CollectionStore.
@@ -14,11 +19,12 @@ export class PouchdbCollectionStore<T> extends PouchdbStore<T> implements Collec
   readonly #computeDocId: ComputePouchdbDocId<T> | undefined;
 
   /**
-   * @param dbName collection name
-   * @param logger logger
-   * @param computeDocId used for document sort order
+   * @param props store properties
+   * @param props.dbName PouchDB database name
+   * @param props.computeDocId used for document sort order
+   * @param logger will silently swallow the errors if not set
    */
-  constructor(dbName: string, logger = dummyLogger, computeDocId?: ComputePouchdbDocId<T>) {
+  constructor({ dbName, computeDocId }: PouchdbCollectionStoreProps<T>, logger: Logger = dummyLogger) {
     // Using a db per collection
     super(dbName, logger);
     this.#computeDocId = computeDocId;

@@ -18,6 +18,7 @@ module.exports = {
   "rules": {
     "jsdoc/require-param": 0,
     "jsdoc/require-returns": 0,
+    "jsdoc/require-param-type": 0,
     "no-unused-vars": 0,
     "linebreak-style": [
       2,

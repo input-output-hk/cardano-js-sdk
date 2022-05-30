@@ -63,16 +63,18 @@ export const createPouchdbWalletStores = (
     stakePools: new PouchdbStakePoolsStore(`${baseDbName}StakePools`, logger),
     tip: new PouchdbTipStore(docsDbName, 'tip', logger),
     transactions: new PouchdbTransactionsStore(
-      `${baseDbName}Transactions`,
-      logger,
-      ({ blockHeader: { blockNo }, index }) =>
-        /**
-         * Multiplied by 100k to distinguish between blockNo=1,index=0 and blockNo=0,index=1
-         * Assuming there can never be more >=100k transactions in a block
-         */
-        (blockNo * 100_000 + index).toString()
+      {
+        computeDocId: ({ blockHeader: { blockNo }, index }) =>
+          /**
+           * Multiplied by 100k to distinguish between blockNo=1,index=0 and blockNo=0,index=1
+           * Assuming there can never be more >=100k transactions in a block
+           */
+          (blockNo * 100_000 + index).toString(),
+        dbName: `${baseDbName}Transactions`
+      },
+      logger
     ),
-    unspendableUtxo: new PouchdbUtxoStore(`${baseDbName}UnspendableUtxo`, logger),
-    utxo: new PouchdbUtxoStore(`${baseDbName}Utxo`, logger)
+    unspendableUtxo: new PouchdbUtxoStore({ dbName: `${baseDbName}UnspendableUtxo` }, logger),
+    utxo: new PouchdbUtxoStore({ dbName: `${baseDbName}Utxo` }, logger)
   };
 };
