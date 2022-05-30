@@ -1,7 +1,7 @@
 import * as mocks from '../mocks';
 import { AssetId, createStubStakePoolSearchProvider } from '@cardano-sdk/util-dev';
 import { Cardano } from '@cardano-sdk/core';
-import { CommunicationType, TransportType } from '../../src/KeyManagement/types';
+import { CommunicationType, LedgerTransportType } from '../../src/KeyManagement/types';
 import { KeyManagement, SingleAddressWallet } from '../../src';
 import DeviceConnection from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
@@ -36,6 +36,18 @@ describe('LedgerKeyAgent', () => {
       { assetProvider, keyAgent, networkInfoProvider, stakePoolSearchProvider, txSubmitProvider, walletProvider }
     );
     keyAgent.knownAddresses.push(groupedAddress);
+  });
+
+  it('can be created with any account index', async () => {
+    const ledgerKeyAgentWithRandomIndex = await KeyManagement.LedgerKeyAgent.createWithDevice({
+      accountIndex: 5,
+      communicationType: CommunicationType.Node,
+      deviceConnection: keyAgent.deviceConnection,
+      networkId: Cardano.NetworkId.testnet
+    });
+    expect(ledgerKeyAgentWithRandomIndex).toBeInstanceOf(KeyManagement.LedgerKeyAgent);
+    expect(ledgerKeyAgentWithRandomIndex.accountIndex).toEqual(5);
+    expect(ledgerKeyAgentWithRandomIndex.extendedAccountPublicKey).not.toEqual(keyAgent.extendedAccountPublicKey);
   });
 
   test('__typename', () => {
@@ -118,7 +130,7 @@ describe('LedgerKeyAgent', () => {
   });
 
   describe('create device connection with transport', () => {
-    let transport: TransportType;
+    let transport: LedgerTransportType;
     beforeAll(async () => {
       transport = await KeyManagement.LedgerKeyAgent.createTransport({
         communicationType: CommunicationType.Node
