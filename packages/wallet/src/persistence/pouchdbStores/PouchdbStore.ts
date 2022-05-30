@@ -5,6 +5,7 @@ import PouchDB from 'pouchdb';
 
 export abstract class PouchdbStore<T> {
   destroyed = false;
+  protected idle: Promise<void> = Promise.resolve();
   protected readonly logger: Logger;
   protected readonly db: PouchDB.Database<T>;
 
@@ -55,18 +56,21 @@ export abstract class PouchdbStore<T> {
     if (this.destroyed) return EMPTY;
     const serializableDoc = this.toPouchdbDoc(doc);
     return from(
-      (async () => {
-        const pouchdbDoc = {
-          _id: docId,
-          _rev: await this.#getRev(docId),
-          ...serializableDoc
-        };
-        return this.db
-          .put(pouchdbDoc, { force: true })
-          .catch((error) =>
-            this.logger.error(`PouchdbStore(${this.dbName}): failed to forcePut`, pouchdbDoc, error)
-          ) as Promise<void>;
-      })()
+      (this.idle = this.idle
+        .then(async () => {
+          const pouchdbDoc = {
+            _id: docId,
+            _rev: await this.#getRev(docId),
+            ...serializableDoc
+          };
+          // eslint-disable-next-line promise/always-return
+          try {
+            await this.db.put(pouchdbDoc, { force: true });
+          } catch (error) {
+            this.logger.error(`PouchdbStore(${this.dbName}): failed to forcePut`, pouchdbDoc, error);
+          }
+        })
+        .catch(() => void 0))
     );
   }
 }

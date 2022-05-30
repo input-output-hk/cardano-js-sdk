@@ -1,7 +1,7 @@
 /* eslint-disable unicorn/consistent-function-scoping */
 import { PouchdbCollectionStore, PouchdbDocumentStore, PouchdbKeyValueStore } from '../../src/persistence';
 import { assertCompletesWithoutEmitting } from './util';
-import { firstValueFrom } from 'rxjs';
+import { combineLatest, firstValueFrom, mergeMap, timer } from 'rxjs';
 import PouchDB from 'pouchdb';
 
 describe('pouchdbStores', () => {
@@ -31,6 +31,12 @@ describe('pouchdbStores', () => {
       await firstValueFrom(store1.set(doc1));
       await firstValueFrom(store1.set(doc2));
       expect(await firstValueFrom(store1.get())).toEqual(doc2);
+    });
+
+    it('simultaneous set() calls are resolved in series - last value is always persisted', async () => {
+      const store = new PouchdbDocumentStore<DocType>(dbName, 'docId');
+      await firstValueFrom(combineLatest([store.set(doc1), timer(1).pipe(mergeMap(() => store.set(doc2)))]));
+      expect(await firstValueFrom(store.get())).toEqual(doc2);
     });
 
     // eslint-disable-next-line sonarjs/no-duplicate-string
@@ -72,6 +78,13 @@ describe('pouchdbStores', () => {
     it('setAll overwrites the entire collection', async () => {
       await firstValueFrom(store1.setAll([doc2, doc1]));
       await firstValueFrom(store1.setAll([doc2]));
+      expect(await firstValueFrom(store1.getAll())).toEqual([doc2]);
+    });
+
+    it('simultaneous setAll() calls are resolved in series - last value is always persisted', async () => {
+      await firstValueFrom(
+        combineLatest([store1.setAll([doc1]), timer(1).pipe(mergeMap(() => store1.setAll([doc2])))])
+      );
       expect(await firstValueFrom(store1.getAll())).toEqual([doc2]);
     });
 
@@ -126,6 +139,13 @@ describe('pouchdbStores', () => {
       );
       await assertCompletesWithoutEmitting(store1.getValues([key2]));
       expect(await firstValueFrom(store1.getValues([key3, key1]))).toEqual([doc2, doc1]);
+    });
+
+    it('simultaneous setValue() calls are resolved in series - last value is always persisted', async () => {
+      await firstValueFrom(
+        combineLatest([store1.setValue(key1, doc1), timer(1).pipe(mergeMap(() => store1.setValue(key1, doc2)))])
+      );
+      expect(await firstValueFrom(store1.getValues([key1]))).toEqual([doc2]);
     });
 
     it('destroy() disables store functions', async () => {

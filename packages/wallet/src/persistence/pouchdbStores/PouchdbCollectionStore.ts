@@ -1,3 +1,4 @@
+/* eslint-disable promise/always-return */
 import { CollectionStore } from '../types';
 import { EMPTY, Observable, from } from 'rxjs';
 import { Logger, dummyLogger } from 'ts-log';
@@ -37,7 +38,6 @@ export class PouchdbCollectionStore<T> extends PouchdbStore<T> implements Collec
         .allDocs({ include_docs: true })
         .then((result) => {
           const docs = result.rows.map(({ doc }) => sanitizePouchdbDoc(doc!));
-          // eslint-disable-next-line promise/always-return
           if (docs.length > 0) observer.next(docs);
           observer.complete();
         })
@@ -48,7 +48,7 @@ export class PouchdbCollectionStore<T> extends PouchdbStore<T> implements Collec
   setAll(docs: T[]): Observable<void> {
     if (this.destroyed) return EMPTY;
     return from(
-      (async (): Promise<void> => {
+      (this.idle = this.idle.then(async (): Promise<void> => {
         try {
           await this.clearDB();
           await this.db.bulkDocs(
@@ -60,7 +60,7 @@ export class PouchdbCollectionStore<T> extends PouchdbStore<T> implements Collec
         } catch (error) {
           this.logger.error(`PouchdbCollectionStore(${this.dbName}): failed to setAll`, docs, error);
         }
-      })()
+      }))
     );
   }
 }
