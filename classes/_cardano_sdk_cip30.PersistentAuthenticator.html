@@ -86,17 +86,17 @@
 				<h2>Index</h2>
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
-						<section class="tsd-index-section tsd-is-private tsd-is-private-protected">
+						<section class="tsd-index-section ">
 							<h3>Constructors</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-private"><a href="_cardano_sdk_cip30.PersistentAuthenticator.html#constructor" class="tsd-kind-icon">constructor</a></li>
+								<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="_cardano_sdk_cip30.PersistentAuthenticator.html#constructor" class="tsd-kind-icon">constructor</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section tsd-is-private tsd-is-private-protected">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_cardano_sdk_cip30.PersistentAuthenticator.html#_logger" class="tsd-kind-icon">#logger</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_cardano_sdk_cip30.PersistentAuthenticator.html#_origins" class="tsd-kind-icon">#origins</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_cardano_sdk_cip30.PersistentAuthenticator.html#_originsReady" class="tsd-kind-icon">#origins<wbr>Ready</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_cardano_sdk_cip30.PersistentAuthenticator.html#_requestAccess" class="tsd-kind-icon">#request<wbr>Access</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_cardano_sdk_cip30.PersistentAuthenticator.html#_storage" class="tsd-kind-icon">#storage</a></li>
 							</ul>
@@ -109,40 +109,43 @@
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_cardano_sdk_cip30.PersistentAuthenticator.html#haveAccess" class="tsd-kind-icon">have<wbr>Access</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_cardano_sdk_cip30.PersistentAuthenticator.html#requestAccess" class="tsd-kind-icon">request<wbr>Access</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_cardano_sdk_cip30.PersistentAuthenticator.html#revokeAccess" class="tsd-kind-icon">revoke<wbr>Access</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="_cardano_sdk_cip30.PersistentAuthenticator.html#create" class="tsd-kind-icon">create</a></li>
 							</ul>
 						</section>
 					</div>
 				</section>
 			</section>
-			<section class="tsd-panel-group tsd-member-group tsd-is-private tsd-is-private-protected">
+			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Constructors</h2>
-				<section class="tsd-panel tsd-member tsd-kind-constructor tsd-parent-kind-class tsd-is-private">
+				<section class="tsd-panel tsd-member tsd-kind-constructor tsd-parent-kind-class">
 					<a name="constructor" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagPrivate">Private</span> constructor</h3>
-					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class tsd-is-private">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Persistent<wbr>Authenticator<span class="tsd-signature-symbol">(</span>requestAccess<span class="tsd-signature-symbol">: </span><a href="../modules/_cardano_sdk_cip30.html#RequestAccess" class="tsd-signature-type" data-tsd-kind="Type alias">RequestAccess</a>, origins<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span>, storage<span class="tsd-signature-symbol">: </span><a href="../modules/_cardano_sdk_cip30.html#PersistentAuthenticatorStorage" class="tsd-signature-type" data-tsd-kind="Type alias">PersistentAuthenticatorStorage</a>, logger<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Logger</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_cip30.PersistentAuthenticator.html" class="tsd-signature-type" data-tsd-kind="Class">PersistentAuthenticator</a></li>
+					<h3>constructor</h3>
+					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Persistent<wbr>Authenticator<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><a href="../interfaces/_cardano_sdk_cip30.PersistentAuhenticatorOptions.html" class="tsd-signature-type" data-tsd-kind="Interface">PersistentAuhenticatorOptions</a>, __namedParameters<span class="tsd-signature-symbol">: </span><a href="../interfaces/_cardano_sdk_cip30.PersistentAuthenticatorDependencies.html" class="tsd-signature-type" data-tsd-kind="Interface">PersistentAuthenticatorDependencies</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_cip30.PersistentAuthenticator.html" class="tsd-signature-type" data-tsd-kind="Class">PersistentAuthenticator</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/606f89e/packages/cip30/src/AuthenticatorApi/PersistentAuthenticator.ts#L20">packages/cip30/src/AuthenticatorApi/PersistentAuthenticator.ts:20</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cba8871/packages/cip30/src/AuthenticatorApi/PersistentAuthenticator.ts#L25">packages/cip30/src/AuthenticatorApi/PersistentAuthenticator.ts:25</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Create a new PersistentAuhenticator</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>throws</dt>
+									<dd><p>underlying storage error if it fails to get() during creation of the authenticator</p>
+									</dd>
+								</dl>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>requestAccess: <a href="../modules/_cardano_sdk_cip30.html#RequestAccess" class="tsd-signature-type" data-tsd-kind="Type alias">RequestAccess</a></h5>
+									<h5>__namedParameters: <a href="../interfaces/_cardano_sdk_cip30.PersistentAuhenticatorOptions.html" class="tsd-signature-type" data-tsd-kind="Interface">PersistentAuhenticatorOptions</a></h5>
 								</li>
 								<li>
-									<h5>origins: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
-								</li>
-								<li>
-									<h5>storage: <a href="../modules/_cardano_sdk_cip30.html#PersistentAuthenticatorStorage" class="tsd-signature-type" data-tsd-kind="Type alias">PersistentAuthenticatorStorage</a></h5>
-								</li>
-								<li>
-									<h5>logger: <span class="tsd-signature-type">Logger</span></h5>
+									<h5>__namedParameters: <a href="../interfaces/_cardano_sdk_cip30.PersistentAuthenticatorDependencies.html" class="tsd-signature-type" data-tsd-kind="Interface">PersistentAuthenticatorDependencies</a></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="_cardano_sdk_cip30.PersistentAuthenticator.html" class="tsd-signature-type" data-tsd-kind="Class">PersistentAuthenticator</a></h4>
@@ -158,17 +161,17 @@
 					<div class="tsd-signature tsd-kind-icon">#logger<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Logger</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/606f89e/packages/cip30/src/AuthenticatorApi/PersistentAuthenticator.ts#L17">packages/cip30/src/AuthenticatorApi/PersistentAuthenticator.ts:17</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cba8871/packages/cip30/src/AuthenticatorApi/PersistentAuthenticator.ts#L17">packages/cip30/src/AuthenticatorApi/PersistentAuthenticator.ts:17</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
-					<a name="_origins" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagPrivate">Private</span> #origins</h3>
-					<div class="tsd-signature tsd-kind-icon">#origins<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></div>
+					<a name="_originsReady" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> #origins<wbr>Ready</h3>
+					<div class="tsd-signature tsd-kind-icon">#origins<wbr>Ready<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/606f89e/packages/cip30/src/AuthenticatorApi/PersistentAuthenticator.ts#L18">packages/cip30/src/AuthenticatorApi/PersistentAuthenticator.ts:18</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cba8871/packages/cip30/src/AuthenticatorApi/PersistentAuthenticator.ts#L18">packages/cip30/src/AuthenticatorApi/PersistentAuthenticator.ts:18</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -178,7 +181,7 @@
 					<div class="tsd-signature tsd-kind-icon">#request<wbr>Access<span class="tsd-signature-symbol">:</span> <a href="../modules/_cardano_sdk_cip30.html#RequestAccess" class="tsd-signature-type" data-tsd-kind="Type alias">RequestAccess</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/606f89e/packages/cip30/src/AuthenticatorApi/PersistentAuthenticator.ts#L15">packages/cip30/src/AuthenticatorApi/PersistentAuthenticator.ts:15</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cba8871/packages/cip30/src/AuthenticatorApi/PersistentAuthenticator.ts#L15">packages/cip30/src/AuthenticatorApi/PersistentAuthenticator.ts:15</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -188,7 +191,7 @@
 					<div class="tsd-signature tsd-kind-icon">#storage<span class="tsd-signature-symbol">:</span> <a href="../modules/_cardano_sdk_cip30.html#PersistentAuthenticatorStorage" class="tsd-signature-type" data-tsd-kind="Type alias">PersistentAuthenticatorStorage</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/606f89e/packages/cip30/src/AuthenticatorApi/PersistentAuthenticator.ts#L16">packages/cip30/src/AuthenticatorApi/PersistentAuthenticator.ts:16</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cba8871/packages/cip30/src/AuthenticatorApi/PersistentAuthenticator.ts#L16">packages/cip30/src/AuthenticatorApi/PersistentAuthenticator.ts:16</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -205,7 +208,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/606f89e/packages/cip30/src/AuthenticatorApi/PersistentAuthenticator.ts#L87">packages/cip30/src/AuthenticatorApi/PersistentAuthenticator.ts:87</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cba8871/packages/cip30/src/AuthenticatorApi/PersistentAuthenticator.ts#L80">packages/cip30/src/AuthenticatorApi/PersistentAuthenticator.ts:80</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -228,7 +231,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/606f89e/packages/cip30/src/AuthenticatorApi/PersistentAuthenticator.ts#L83">packages/cip30/src/AuthenticatorApi/PersistentAuthenticator.ts:83</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cba8871/packages/cip30/src/AuthenticatorApi/PersistentAuthenticator.ts#L76">packages/cip30/src/AuthenticatorApi/PersistentAuthenticator.ts:76</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -246,7 +249,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of AuthenticatorApi.haveAccess</p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/606f89e/packages/cip30/src/AuthenticatorApi/PersistentAuthenticator.ts#L78">packages/cip30/src/AuthenticatorApi/PersistentAuthenticator.ts:78</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cba8871/packages/cip30/src/AuthenticatorApi/PersistentAuthenticator.ts#L70">packages/cip30/src/AuthenticatorApi/PersistentAuthenticator.ts:70</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -270,7 +273,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of AuthenticatorApi.requestAccess</p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/606f89e/packages/cip30/src/AuthenticatorApi/PersistentAuthenticator.ts#L45">packages/cip30/src/AuthenticatorApi/PersistentAuthenticator.ts:45</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cba8871/packages/cip30/src/AuthenticatorApi/PersistentAuthenticator.ts#L35">packages/cip30/src/AuthenticatorApi/PersistentAuthenticator.ts:35</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -294,7 +297,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of AuthenticatorApi.revokeAccess</p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/606f89e/packages/cip30/src/AuthenticatorApi/PersistentAuthenticator.ts#L64">packages/cip30/src/AuthenticatorApi/PersistentAuthenticator.ts:64</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cba8871/packages/cip30/src/AuthenticatorApi/PersistentAuthenticator.ts#L55">packages/cip30/src/AuthenticatorApi/PersistentAuthenticator.ts:55</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -304,42 +307,6 @@
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-static">
-					<a name="create" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagStatic">Static</span> create</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-static">
-						<li class="tsd-signature tsd-kind-icon">create<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><a href="../interfaces/_cardano_sdk_cip30.PersistentAuhenticatorOptions.html" class="tsd-signature-type" data-tsd-kind="Interface">PersistentAuhenticatorOptions</a>, __namedParameters<span class="tsd-signature-symbol">: </span><a href="../interfaces/_cardano_sdk_cip30.PersistentAuthenticatorDependencies.html" class="tsd-signature-type" data-tsd-kind="Interface">PersistentAuthenticatorDependencies</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="_cardano_sdk_cip30.PersistentAuthenticator.html" class="tsd-signature-type" data-tsd-kind="Class">PersistentAuthenticator</a><span class="tsd-signature-symbol">&gt;</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/606f89e/packages/cip30/src/AuthenticatorApi/PersistentAuthenticator.ts#L37">packages/cip30/src/AuthenticatorApi/PersistentAuthenticator.ts:37</a></li>
-								</ul>
-							</aside>
-							<div class="tsd-comment tsd-typography">
-								<div class="lead">
-									<p>Create a new PersistentAuhenticator</p>
-								</div>
-								<dl class="tsd-comment-tags">
-									<dt>throws</dt>
-									<dd><p>underlying storage error if it fails to get() during creation of the authenticator</p>
-									</dd>
-								</dl>
-							</div>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>__namedParameters: <a href="../interfaces/_cardano_sdk_cip30.PersistentAuhenticatorOptions.html" class="tsd-signature-type" data-tsd-kind="Interface">PersistentAuhenticatorOptions</a></h5>
-								</li>
-								<li>
-									<h5>__namedParameters: <a href="../interfaces/_cardano_sdk_cip30.PersistentAuthenticatorDependencies.html" class="tsd-signature-type" data-tsd-kind="Interface">PersistentAuthenticatorDependencies</a></h5>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="_cardano_sdk_cip30.PersistentAuthenticator.html" class="tsd-signature-type" data-tsd-kind="Class">PersistentAuthenticator</a><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -393,14 +360,14 @@
 					<li class="current tsd-kind-class tsd-parent-kind-module">
 						<a href="_cardano_sdk_cip30.PersistentAuthenticator.html" class="tsd-kind-icon">Persistent<wbr>Authenticator</a>
 						<ul>
-							<li class=" tsd-kind-constructor tsd-parent-kind-class tsd-is-private">
+							<li class=" tsd-kind-constructor tsd-parent-kind-class">
 								<a href="_cardano_sdk_cip30.PersistentAuthenticator.html#constructor" class="tsd-kind-icon">constructor</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
 								<a href="_cardano_sdk_cip30.PersistentAuthenticator.html#_logger" class="tsd-kind-icon">#logger</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
-								<a href="_cardano_sdk_cip30.PersistentAuthenticator.html#_origins" class="tsd-kind-icon">#origins</a>
+								<a href="_cardano_sdk_cip30.PersistentAuthenticator.html#_originsReady" class="tsd-kind-icon">#origins<wbr>Ready</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
 								<a href="_cardano_sdk_cip30.PersistentAuthenticator.html#_requestAccess" class="tsd-kind-icon">#request<wbr>Access</a>
@@ -422,9 +389,6 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_cardano_sdk_cip30.PersistentAuthenticator.html#revokeAccess" class="tsd-kind-icon">revoke<wbr>Access</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static">
-								<a href="_cardano_sdk_cip30.PersistentAuthenticator.html#create" class="tsd-kind-icon">create</a>
 							</li>
 						</ul>
 					</li>
@@ -450,6 +414,7 @@
 			<ul class="tsd-legend">
 				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
 				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
 				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
 			</ul>
 			<ul class="tsd-legend">
@@ -462,9 +427,6 @@
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
 			</ul>
 		</div>
 	</div>

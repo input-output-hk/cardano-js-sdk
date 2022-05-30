@@ -32,7 +32,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/22</span>
+                <span class='fraction'>0/24</span>
             </div>
         
             
@@ -333,9 +333,9 @@
 <a name='L268'></a><a href='#L268'>268</a>
 <a name='L269'></a><a href='#L269'>269</a>
 <a name='L270'></a><a href='#L270'>270</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">28x</span>
-<span class="cline-any cline-yes">28x</span>
-<span class="cline-any cline-yes">28x</span>
+<span class="cline-any cline-yes">29x</span>
+<span class="cline-any cline-yes">29x</span>
+<span class="cline-any cline-yes">29x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -343,20 +343,12 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">28x</span>
+<span class="cline-any cline-yes">29x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">28x</span>
-<span class="cline-any cline-yes">28x</span>
-<span class="cline-any cline-yes">28x</span>
-<span class="cline-any cline-yes">28x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">29x</span>
+<span class="cline-any cline-yes">29x</span>
+<span class="cline-any cline-yes">29x</span>
+<span class="cline-any cline-yes">29x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -374,10 +366,18 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">28x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">29x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">28x</span>
+<span class="cline-any cline-yes">29x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -659,9 +659,9 @@ export class LedgerKeyAgent extends KeyAgentBase {
   /**
    * @throws TransportError
    */
-<span class="fstat-no" title="function not covered" >  static </span>async getHidDeviceList(): Promise&lt;string[]&gt; {
+<span class="fstat-no" title="function not covered" >  static </span>async getHidDeviceList(communicationType: CommunicationType): Promise&lt;string[]&gt; {
 <span class="cstat-no" title="statement not covered" >    try {</span>
-<span class="cstat-no" title="statement not covered" >      return await TransportNodeHid.list();</span>
+<span class="cstat-no" title="statement not covered" >      return communicationType === CommunicationType.Node ? TransportNodeHid.list() : TransportWebHID.list();</span>
     } catch (error) {
 <span class="cstat-no" title="statement not covered" >      throw new TransportError('Cannot fetch device list', error);</span>
     }
@@ -802,7 +802,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
     communicationType,
     deviceConnection
   }: CreateLedgerKeyAgentProps) {
-    const deviceListPaths = <span class="cstat-no" title="statement not covered" >await LedgerKeyAgent.getHidDeviceList();</span>
+    const deviceListPaths = <span class="cstat-no" title="statement not covered" >await LedgerKeyAgent.getHidDeviceList(communicationType);</span>
     // Re-use device connection if you want to create a key agent with new / additional account(s) and pass accountIndex
     const activeDeviceConnection = <span class="cstat-no" title="statement not covered" >await (deviceConnection</span>
       ? LedgerKeyAgent.checkDeviceConnection(communicationType, deviceConnection)
@@ -877,7 +877,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at Mon May 30 2022 12:45:18 GMT+0000 (Coordinated Universal Time)
+                at Mon May 30 2022 14:06:03 GMT+0000 (Coordinated Universal Time)
             </div>
         <script src="../../prettify.js"></script>
         <script>

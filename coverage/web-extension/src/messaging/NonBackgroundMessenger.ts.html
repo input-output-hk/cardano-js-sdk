@@ -39,7 +39,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/12</span>
+                <span class='fraction'>0/11</span>
             </div>
         
             
@@ -168,7 +168,8 @@
 <a name='L103'></a><a href='#L103'>103</a>
 <a name='L104'></a><a href='#L104'>104</a>
 <a name='L105'></a><a href='#L105'>105</a>
-<a name='L106'></a><a href='#L106'>106</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -225,7 +226,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -234,6 +234,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -255,6 +256,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -329,15 +331,15 @@ export const createNonBackgroundMessenger = <span class="fstat-no" title="functi
 <span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!isDestroyed) <span class="cstat-no" title="statement not covered" >reconnect();</span></span>
   };
 <span class="cstat-no" title="statement not covered" >  connect();</span>
-  const portReady = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >() =</span>&gt;</span>
-<span class="cstat-no" title="statement not covered" >    port$.pipe(</span>
-      debounceTime(10), // TODO: how long until onDisconnect() is called when the other end doesn't exist?
-      filter(util.isNotNil),
-      takeWhile(<span class="fstat-no" title="function not covered" >(p</span>ort): port is MessengerPort =&gt; <span class="cstat-no" title="statement not covered" >typeof port !== 'string')</span>
-    );
+  const connect$ = <span class="cstat-no" title="statement not covered" >port$.pipe(</span>
+    debounceTime(10), // TODO: how long until onDisconnect() is called when the other end doesn't exist?
+    filter(util.isNotNil),
+    takeWhile(<span class="fstat-no" title="function not covered" >(p</span>ort): port is MessengerPort =&gt; <span class="cstat-no" title="statement not covered" >typeof port !== 'string')</span>
+  );
   const derivedMessengers = <span class="cstat-no" title="statement not covered" >new Set&lt;Messenger&gt;();</span>
 <span class="cstat-no" title="statement not covered" >  return {</span>
     channel,
+    connect$,
 <span class="fstat-no" title="function not covered" >    deriveChannel(</span>path) {
       const messenger = <span class="cstat-no" title="statement not covered" >createNonBackgroundMessenger(</span>
         {
@@ -360,6 +362,7 @@ export const createNonBackgroundMessenger = <span class="fstat-no" title="functi
 <span class="cstat-no" title="statement not covered" >        messenger.destroy();</span>
 <span class="cstat-no" title="statement not covered" >        derivedMessengers.delete(messenger);</span>
       }
+<span class="cstat-no" title="statement not covered" >      port$.complete();</span>
 <span class="cstat-no" title="statement not covered" >      logger.warn(`[NonBackgroundMessenger(${channel})] destroyed`);</span>
     },
     message$,
@@ -367,7 +370,7 @@ export const createNonBackgroundMessenger = <span class="fstat-no" title="functi
      * @throws RxJS EmptyError if client is destroyed
      */
 <span class="fstat-no" title="function not covered" >    postMessage(</span>message: unknown): Observable&lt;void&gt; {
-<span class="cstat-no" title="statement not covered" >      return portReady().pipe(</span>
+<span class="cstat-no" title="statement not covered" >      return connect$.pipe(</span>
         first(),
         // TODO: find if this can throw
         tap(<span class="fstat-no" title="function not covered" >(p</span>ort) =&gt; <span class="cstat-no" title="statement not covered" >port.postMessage(message))</span>,
@@ -385,7 +388,7 @@ export type NonBackgroundMessenger = ReturnType&lt;typeof createNonBackgroundMes
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at Mon May 30 2022 12:48:50 GMT+0000 (Coordinated Universal Time)
+                at Mon May 30 2022 14:09:33 GMT+0000 (Coordinated Universal Time)
             </div>
         <script src="../../prettify.js"></script>
         <script>

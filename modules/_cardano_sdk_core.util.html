@@ -73,11 +73,19 @@
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section ">
+							<h3>Interfaces</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-interface tsd-parent-kind-namespace"><a href="../interfaces/_cardano_sdk_core.util.FromSerializableObjectOptions.html" class="tsd-kind-icon">From<wbr>Serializable<wbr>Object<wbr>Options</a></li>
+								<li class="tsd-kind-interface tsd-parent-kind-namespace"><a href="../interfaces/_cardano_sdk_core.util.ToSerializableObjectOptions.html" class="tsd-kind-icon">To<wbr>Serializable<wbr>Object<wbr>Options</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
 							<h3>Type aliases</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-type-alias tsd-parent-kind-namespace"><a href="_cardano_sdk_core.util.html#GetErrorPrototype" class="tsd-kind-icon">Get<wbr>Error<wbr>Prototype</a></li>
 								<li class="tsd-kind-type-alias tsd-parent-kind-namespace tsd-has-type-parameter"><a href="_cardano_sdk_core.util.html#OptionalUndefined" class="tsd-kind-icon">Optional<wbr>Undefined</a></li>
 								<li class="tsd-kind-type-alias tsd-parent-kind-namespace tsd-has-type-parameter"><a href="_cardano_sdk_core.util.html#RecursivelyReplaceNullWithUndefined" class="tsd-kind-icon">Recursively<wbr>Replace<wbr>Null<wbr>With<wbr>Undefined</a></li>
+								<li class="tsd-kind-type-alias tsd-parent-kind-namespace"><a href="_cardano_sdk_core.util.html#TransformKey" class="tsd-kind-icon">Transform<wbr>Key</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
@@ -101,7 +109,7 @@
 					<div class="tsd-signature tsd-kind-icon">Get<wbr>Error<wbr>Prototype<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>err<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-symbol">typeof </span><span class="tsd-signature-type">Error.prototype</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/606f89e/packages/core/src/util/misc/serializableObject.ts#L58">packages/core/src/util/misc/serializableObject.ts:58</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cba8871/packages/core/src/util/misc/serializableObject.ts#L9">packages/core/src/util/misc/serializableObject.ts:9</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -132,7 +140,7 @@
 					<div class="tsd-signature tsd-kind-icon">Optional<wbr>Undefined&lt;T&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Optional</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">Required</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/606f89e/packages/core/src/util/misc/replaceNullsToUndefineds.ts#L18">packages/core/src/util/misc/replaceNullsToUndefineds.ts:18</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cba8871/packages/core/src/util/misc/replaceNullsToUndefineds.ts#L18">packages/core/src/util/misc/replaceNullsToUndefineds.ts:18</a></li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -148,7 +156,7 @@
 					<div class="tsd-signature tsd-kind-icon">Recursively<wbr>Replace<wbr>Null<wbr>With<wbr>Undefined&lt;T&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">T</span><span class="tsd-signature-symbol"> extends </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> ? </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> : </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol"> extends </span><span class="tsd-signature-type">Date</span><span class="tsd-signature-symbol"> ? </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol"> : </span><span class="tsd-signature-symbol">{</span><span class="tsd-signature-symbol">[ </span><span class="tsd-signature-type">K</span><span class="tsd-signature-symbol"> in </span><span class="tsd-signature-symbol">keyof </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">K</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol"> extends </span><span class="tsd-signature-symbol">infer </span> U<span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> ? </span><a href="_cardano_sdk_core.util.html#RecursivelyReplaceNullWithUndefined" class="tsd-signature-type" data-tsd-kind="Type alias">RecursivelyReplaceNullWithUndefined</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">U</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> : </span><a href="_cardano_sdk_core.util.html#RecursivelyReplaceNullWithUndefined" class="tsd-signature-type" data-tsd-kind="Type alias">RecursivelyReplaceNullWithUndefined</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">K</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/606f89e/packages/core/src/util/misc/replaceNullsToUndefineds.ts#L23">packages/core/src/util/misc/replaceNullsToUndefineds.ts:23</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cba8871/packages/core/src/util/misc/replaceNullsToUndefineds.ts#L23">packages/core/src/util/misc/replaceNullsToUndefineds.ts:23</a></li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -157,6 +165,37 @@
 							<h4>T</h4>
 						</li>
 					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-namespace">
+					<a name="TransformKey" class="tsd-anchor"></a>
+					<h3>Transform<wbr>Key</h3>
+					<div class="tsd-signature tsd-kind-icon">Transform<wbr>Key<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>key<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cba8871/packages/core/src/util/misc/serializableObject.ts#L8">packages/core/src/util/misc/serializableObject.ts:8</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-signature">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-type-alias">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>key<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5>key: <span class="tsd-signature-type">string</span></h5>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
@@ -171,7 +210,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/606f89e/packages/core/src/util/misc/bytesToHex.ts#L3">packages/core/src/util/misc/bytesToHex.ts:3</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cba8871/packages/core/src/util/misc/bytesToHex.ts#L3">packages/core/src/util/misc/bytesToHex.ts:3</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -188,13 +227,13 @@
 					<a name="fromSerializableObject" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> from<wbr>Serializable<wbr>Object</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-namespace tsd-has-type-parameter">
-						<li class="tsd-signature tsd-kind-icon">from<wbr>Serializable<wbr>Object&lt;T&gt;<span class="tsd-signature-symbol">(</span>serializableObject<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span>, getErrorPrototype<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">(</span>_err<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Error</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span></li>
+						<li class="tsd-signature tsd-kind-icon">from<wbr>Serializable<wbr>Object&lt;T&gt;<span class="tsd-signature-symbol">(</span>serializableObject<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span>, options<span class="tsd-signature-symbol">?: </span><a href="../interfaces/_cardano_sdk_core.util.FromSerializableObjectOptions.html" class="tsd-signature-type" data-tsd-kind="Interface">FromSerializableObjectOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/606f89e/packages/core/src/util/misc/serializableObject.ts#L94">packages/core/src/util/misc/serializableObject.ts:94</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cba8871/packages/core/src/util/misc/serializableObject.ts#L127">packages/core/src/util/misc/serializableObject.ts:127</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -209,25 +248,7 @@
 									<h5>serializableObject: <span class="tsd-signature-type">unknown</span></h5>
 								</li>
 								<li>
-									<h5>getErrorPrototype: <span class="tsd-signature-symbol">(</span>_err<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Error</span><span class="tsd-signature-symbol"> = ...</span></h5>
-									<ul class="tsd-parameters">
-										<li class="tsd-parameter-signature">
-											<ul class="tsd-signatures tsd-kind-type-literal">
-												<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>_err<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Error</span></li>
-											</ul>
-											<ul class="tsd-descriptions">
-												<li class="tsd-description">
-													<h4 class="tsd-parameters-title">Parameters</h4>
-													<ul class="tsd-parameters">
-														<li>
-															<h5>_err: <span class="tsd-signature-type">unknown</span></h5>
-														</li>
-													</ul>
-													<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Error</span></h4>
-												</li>
-											</ul>
-										</li>
-									</ul>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> options: <a href="../interfaces/_cardano_sdk_core.util.FromSerializableObjectOptions.html" class="tsd-signature-type" data-tsd-kind="Interface">FromSerializableObjectOptions</a></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">T</span></h4>
@@ -244,7 +265,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/606f89e/packages/core/src/util/misc/isNotNil.ts#L1">packages/core/src/util/misc/isNotNil.ts:1</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cba8871/packages/core/src/util/misc/isNotNil.ts#L1">packages/core/src/util/misc/isNotNil.ts:1</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -273,7 +294,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/606f89e/packages/core/src/util/misc/replaceNullsToUndefineds.ts#L37">packages/core/src/util/misc/replaceNullsToUndefineds.ts:37</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cba8871/packages/core/src/util/misc/replaceNullsToUndefineds.ts#L37">packages/core/src/util/misc/replaceNullsToUndefineds.ts:37</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -302,19 +323,22 @@
 					<a name="toSerializableObject" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> to<wbr>Serializable<wbr>Object</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-namespace">
-						<li class="tsd-signature tsd-kind-icon">to<wbr>Serializable<wbr>Object<span class="tsd-signature-symbol">(</span>obj<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span></li>
+						<li class="tsd-signature tsd-kind-icon">to<wbr>Serializable<wbr>Object<span class="tsd-signature-symbol">(</span>obj<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span>, options<span class="tsd-signature-symbol">?: </span><a href="../interfaces/_cardano_sdk_core.util.ToSerializableObjectOptions.html" class="tsd-signature-type" data-tsd-kind="Interface">ToSerializableObjectOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/606f89e/packages/core/src/util/misc/serializableObject.ts#L7">packages/core/src/util/misc/serializableObject.ts:7</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cba8871/packages/core/src/util/misc/serializableObject.ts#L26">packages/core/src/util/misc/serializableObject.ts:26</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>obj: <span class="tsd-signature-type">unknown</span></h5>
+								</li>
+								<li>
+									<h5>options: <a href="../interfaces/_cardano_sdk_core.util.ToSerializableObjectOptions.html" class="tsd-signature-type" data-tsd-kind="Interface">ToSerializableObjectOptions</a><span class="tsd-signature-symbol"> = {}</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">unknown</span></h4>
@@ -395,6 +419,12 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
+					<li class=" tsd-kind-interface tsd-parent-kind-namespace">
+						<a href="../interfaces/_cardano_sdk_core.util.FromSerializableObjectOptions.html" class="tsd-kind-icon">From<wbr>Serializable<wbr>Object<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-namespace">
+						<a href="../interfaces/_cardano_sdk_core.util.ToSerializableObjectOptions.html" class="tsd-kind-icon">To<wbr>Serializable<wbr>Object<wbr>Options</a>
+					</li>
 					<li class=" tsd-kind-type-alias tsd-parent-kind-namespace">
 						<a href="_cardano_sdk_core.util.html#GetErrorPrototype" class="tsd-kind-icon">Get<wbr>Error<wbr>Prototype</a>
 					</li>
@@ -403,6 +433,9 @@
 					</li>
 					<li class=" tsd-kind-type-alias tsd-parent-kind-namespace tsd-has-type-parameter">
 						<a href="_cardano_sdk_core.util.html#RecursivelyReplaceNullWithUndefined" class="tsd-kind-icon">Recursively<wbr>Replace<wbr>Null<wbr>With<wbr>Undefined</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-namespace">
+						<a href="_cardano_sdk_core.util.html#TransformKey" class="tsd-kind-icon">Transform<wbr>Key</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-namespace">
 						<a href="_cardano_sdk_core.util.html#bytesToHex" class="tsd-kind-icon">bytes<wbr>ToHex</a>

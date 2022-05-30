@@ -137,8 +137,10 @@
 						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-private"><a href="_cardano_sdk_wallet.storage.PouchdbCollectionStore.html#_getRev" class="tsd-kind-icon">#get<wbr>Rev</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_cardano_sdk_wallet.storage.PouchdbCollectionStore.html#clearDB" class="tsd-kind-icon">clearDB</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_cardano_sdk_wallet.storage.PouchdbCollectionStore.html#destroy" class="tsd-kind-icon">destroy</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-protected"><a href="_cardano_sdk_wallet.storage.PouchdbCollectionStore.html#forcePut" class="tsd-kind-icon">force<wbr>Put</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_cardano_sdk_wallet.storage.PouchdbCollectionStore.html#getAll" class="tsd-kind-icon">get<wbr>All</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_cardano_sdk_wallet.storage.PouchdbCollectionStore.html#setAll" class="tsd-kind-icon">set<wbr>All</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-protected"><a href="_cardano_sdk_wallet.storage.PouchdbCollectionStore.html#toPouchdbDoc" class="tsd-kind-icon">to<wbr>Pouchdb<wbr>Doc</a></li>
@@ -153,14 +155,14 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class tsd-has-type-parameter tsd-is-overwrite">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Pouchdb<wbr>Collection<wbr>Store&lt;T&gt;<span class="tsd-signature-symbol">(</span>dbName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, computeDocId<span class="tsd-signature-symbol">?: </span><a href="../modules/_cardano_sdk_wallet.storage.html#ComputePouchdbDocId" class="tsd-signature-type" data-tsd-kind="Type alias">ComputePouchdbDocId</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span>, logger<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Logger</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_wallet.storage.PouchdbCollectionStore.html" class="tsd-signature-type" data-tsd-kind="Class">PouchdbCollectionStore</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Pouchdb<wbr>Collection<wbr>Store&lt;T&gt;<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><a href="../interfaces/_cardano_sdk_wallet.storage.PouchdbCollectionStoreProps.html" class="tsd-signature-type" data-tsd-kind="Interface">PouchdbCollectionStoreProps</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span>, logger<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Logger</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_wallet.storage.PouchdbCollectionStore.html" class="tsd-signature-type" data-tsd-kind="Class">PouchdbCollectionStore</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Overrides PouchdbStore&lt;T&gt;.constructor</p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/606f89e/packages/wallet/src/persistence/pouchdbStores/PouchdbCollectionStore.ts#L20">packages/wallet/src/persistence/pouchdbStores/PouchdbCollectionStore.ts:20</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cba8871/packages/wallet/src/persistence/pouchdbStores/PouchdbCollectionStore.ts#L27">packages/wallet/src/persistence/pouchdbStores/PouchdbCollectionStore.ts:27</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -172,23 +174,15 @@
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>dbName: <span class="tsd-signature-type">string</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<div class="lead">
-											<p>collection name</p>
-										</div>
-									</div>
-								</li>
-								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> computeDocId: <a href="../modules/_cardano_sdk_wallet.storage.html#ComputePouchdbDocId" class="tsd-signature-type" data-tsd-kind="Type alias">ComputePouchdbDocId</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<div class="lead">
-											<p>used for document sort order</p>
-										</div>
-									</div>
+									<h5>__namedParameters: <a href="../interfaces/_cardano_sdk_wallet.storage.PouchdbCollectionStoreProps.html" class="tsd-signature-type" data-tsd-kind="Interface">PouchdbCollectionStoreProps</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h5>
 								</li>
 								<li>
 									<h5>logger: <span class="tsd-signature-type">Logger</span><span class="tsd-signature-symbol"> = ...</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<div class="lead">
+											<p>will silently swallow the errors if not set</p>
+										</div>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="_cardano_sdk_wallet.storage.PouchdbCollectionStore.html" class="tsd-signature-type" data-tsd-kind="Class">PouchdbCollectionStore</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -204,7 +198,7 @@
 					<div class="tsd-signature tsd-kind-icon">#compute<wbr>Doc<wbr>Id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><a href="../modules/_cardano_sdk_wallet.storage.html#ComputePouchdbDocId" class="tsd-signature-type" data-tsd-kind="Type alias">ComputePouchdbDocId</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/606f89e/packages/wallet/src/persistence/pouchdbStores/PouchdbCollectionStore.ts#L14">packages/wallet/src/persistence/pouchdbStores/PouchdbCollectionStore.ts:14</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cba8871/packages/wallet/src/persistence/pouchdbStores/PouchdbCollectionStore.ts#L19">packages/wallet/src/persistence/pouchdbStores/PouchdbCollectionStore.ts:19</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -215,7 +209,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from PouchdbStore.db</p>
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/606f89e/packages/wallet/src/persistence/pouchdbStores/PouchdbStore.ts#L9">packages/wallet/src/persistence/pouchdbStores/PouchdbStore.ts:9</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cba8871/packages/wallet/src/persistence/pouchdbStores/PouchdbStore.ts#L9">packages/wallet/src/persistence/pouchdbStores/PouchdbStore.ts:9</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -235,7 +229,7 @@
 						<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.storage.CollectionStore.html">CollectionStore</a>.<a href="../interfaces/_cardano_sdk_wallet.storage.CollectionStore.html#destroyed">destroyed</a></p>
 						<p>Inherited from PouchdbStore.destroyed</p>
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/606f89e/packages/wallet/src/persistence/pouchdbStores/PouchdbStore.ts#L7">packages/wallet/src/persistence/pouchdbStores/PouchdbStore.ts:7</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cba8871/packages/wallet/src/persistence/pouchdbStores/PouchdbStore.ts#L7">packages/wallet/src/persistence/pouchdbStores/PouchdbStore.ts:7</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -246,13 +240,37 @@
 					<aside class="tsd-sources">
 						<p>Inherited from PouchdbStore.logger</p>
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/606f89e/packages/wallet/src/persistence/pouchdbStores/PouchdbStore.ts#L8">packages/wallet/src/persistence/pouchdbStores/PouchdbStore.ts:8</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cba8871/packages/wallet/src/persistence/pouchdbStores/PouchdbStore.ts#L8">packages/wallet/src/persistence/pouchdbStores/PouchdbStore.ts:8</a></li>
 						</ul>
 					</aside>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-private">
+					<a name="_getRev" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> #get<wbr>Rev</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-private">
+						<li class="tsd-signature tsd-kind-icon">#get<wbr>Rev<span class="tsd-signature-symbol">(</span>docId<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from PouchdbStore.#getRev</p>
+								<ul>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cba8871/packages/wallet/src/persistence/pouchdbStores/PouchdbStore.ts#L49">packages/wallet/src/persistence/pouchdbStores/PouchdbStore.ts:49</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>docId: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
 					<a name="clearDB" class="tsd-anchor"></a>
 					<h3>clearDB</h3>
@@ -264,7 +282,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from PouchdbStore.clearDB</p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/606f89e/packages/wallet/src/persistence/pouchdbStores/PouchdbStore.ts#L20">packages/wallet/src/persistence/pouchdbStores/PouchdbStore.ts:20</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cba8871/packages/wallet/src/persistence/pouchdbStores/PouchdbStore.ts#L20">packages/wallet/src/persistence/pouchdbStores/PouchdbStore.ts:20</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -289,7 +307,7 @@
 								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.storage.CollectionStore.html">CollectionStore</a>.<a href="../interfaces/_cardano_sdk_wallet.storage.CollectionStore.html#destroy">destroy</a></p>
 								<p>Inherited from PouchdbStore.destroy</p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/606f89e/packages/wallet/src/persistence/pouchdbStores/PouchdbStore.ts#L37">packages/wallet/src/persistence/pouchdbStores/PouchdbStore.ts:37</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cba8871/packages/wallet/src/persistence/pouchdbStores/PouchdbStore.ts#L37">packages/wallet/src/persistence/pouchdbStores/PouchdbStore.ts:37</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -297,6 +315,33 @@
 									<p>Might all destroy other stores, if the underlying pouchdb database is shared.</p>
 								</div>
 							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-protected">
+					<a name="forcePut" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagProtected">Protected</span> force<wbr>Put</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-protected">
+						<li class="tsd-signature tsd-kind-icon">force<wbr>Put<span class="tsd-signature-symbol">(</span>docId<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, doc<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from PouchdbStore.forcePut</p>
+								<ul>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cba8871/packages/wallet/src/persistence/pouchdbStores/PouchdbStore.ts#L54">packages/wallet/src/persistence/pouchdbStores/PouchdbStore.ts:54</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>docId: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>doc: <span class="tsd-signature-type">T</span></h5>
+								</li>
+							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
@@ -312,7 +357,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.storage.CollectionStore.html">CollectionStore</a>.<a href="../interfaces/_cardano_sdk_wallet.storage.CollectionStore.html#getAll">getAll</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/606f89e/packages/wallet/src/persistence/pouchdbStores/PouchdbCollectionStore.ts#L26">packages/wallet/src/persistence/pouchdbStores/PouchdbCollectionStore.ts:26</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cba8871/packages/wallet/src/persistence/pouchdbStores/PouchdbCollectionStore.ts#L33">packages/wallet/src/persistence/pouchdbStores/PouchdbCollectionStore.ts:33</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -335,7 +380,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/_cardano_sdk_wallet.storage.CollectionStore.html">CollectionStore</a>.<a href="../interfaces/_cardano_sdk_wallet.storage.CollectionStore.html#setAll">setAll</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/606f89e/packages/wallet/src/persistence/pouchdbStores/PouchdbCollectionStore.ts#L41">packages/wallet/src/persistence/pouchdbStores/PouchdbCollectionStore.ts:41</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cba8871/packages/wallet/src/persistence/pouchdbStores/PouchdbCollectionStore.ts#L48">packages/wallet/src/persistence/pouchdbStores/PouchdbCollectionStore.ts:48</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -366,7 +411,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from PouchdbStore.toPouchdbDoc</p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/606f89e/packages/wallet/src/persistence/pouchdbStores/PouchdbStore.ts#L45">packages/wallet/src/persistence/pouchdbStores/PouchdbStore.ts:45</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/cba8871/packages/wallet/src/persistence/pouchdbStores/PouchdbStore.ts#L45">packages/wallet/src/persistence/pouchdbStores/PouchdbStore.ts:45</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -438,51 +483,6 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
-					<li class=" tsd-kind-class tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_wallet.storage.InMemoryAssetsStore.html" class="tsd-kind-icon">In<wbr>Memory<wbr>Assets<wbr>Store</a>
-					</li>
-					<li class=" tsd-kind-class tsd-parent-kind-namespace tsd-has-type-parameter">
-						<a href="_cardano_sdk_wallet.storage.InMemoryCollectionStore.html" class="tsd-kind-icon">In<wbr>Memory<wbr>Collection<wbr>Store</a>
-					</li>
-					<li class=" tsd-kind-class tsd-parent-kind-namespace tsd-has-type-parameter">
-						<a href="_cardano_sdk_wallet.storage.InMemoryDocumentStore.html" class="tsd-kind-icon">In<wbr>Memory<wbr>Document<wbr>Store</a>
-					</li>
-					<li class=" tsd-kind-class tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_wallet.storage.InMemoryGenesisParametersStore.html" class="tsd-kind-icon">In<wbr>Memory<wbr>Genesis<wbr>Parameters<wbr>Store</a>
-					</li>
-					<li class=" tsd-kind-class tsd-parent-kind-namespace tsd-has-type-parameter">
-						<a href="_cardano_sdk_wallet.storage.InMemoryKeyValueStore.html" class="tsd-kind-icon">In<wbr>Memory<wbr>Key<wbr>Value<wbr>Store</a>
-					</li>
-					<li class=" tsd-kind-class tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_wallet.storage.InMemoryNetworkInfoStore.html" class="tsd-kind-icon">In<wbr>Memory<wbr>Network<wbr>Info<wbr>Store</a>
-					</li>
-					<li class=" tsd-kind-class tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_wallet.storage.InMemoryProtocolParametersStore.html" class="tsd-kind-icon">In<wbr>Memory<wbr>Protocol<wbr>Parameters<wbr>Store</a>
-					</li>
-					<li class=" tsd-kind-class tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_wallet.storage.InMemoryRewardsBalancesStore.html" class="tsd-kind-icon">In<wbr>Memory<wbr>Rewards<wbr>Balances<wbr>Store</a>
-					</li>
-					<li class=" tsd-kind-class tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_wallet.storage.InMemoryRewardsHistoryStore.html" class="tsd-kind-icon">In<wbr>Memory<wbr>Rewards<wbr>History<wbr>Store</a>
-					</li>
-					<li class=" tsd-kind-class tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_wallet.storage.InMemoryStakePoolsStore.html" class="tsd-kind-icon">In<wbr>Memory<wbr>Stake<wbr>Pools<wbr>Store</a>
-					</li>
-					<li class=" tsd-kind-class tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_wallet.storage.InMemoryTipStore.html" class="tsd-kind-icon">In<wbr>Memory<wbr>Tip<wbr>Store</a>
-					</li>
-					<li class=" tsd-kind-class tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_wallet.storage.InMemoryTransactionsStore.html" class="tsd-kind-icon">In<wbr>Memory<wbr>Transactions<wbr>Store</a>
-					</li>
-					<li class=" tsd-kind-class tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_wallet.storage.InMemoryUnspendableUtxoStore.html" class="tsd-kind-icon">In<wbr>Memory<wbr>Unspendable<wbr>Utxo<wbr>Store</a>
-					</li>
-					<li class=" tsd-kind-class tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_wallet.storage.InMemoryUtxoStore.html" class="tsd-kind-icon">In<wbr>Memory<wbr>Utxo<wbr>Store</a>
-					</li>
-					<li class=" tsd-kind-class tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_wallet.storage.PouchdbAssetsStore.html" class="tsd-kind-icon">Pouchdb<wbr>Assets<wbr>Store</a>
-					</li>
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-class tsd-parent-kind-namespace tsd-has-type-parameter">
@@ -506,11 +506,17 @@
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-protected">
 								<a href="_cardano_sdk_wallet.storage.PouchdbCollectionStore.html#logger" class="tsd-kind-icon">logger</a>
 							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-private">
+								<a href="_cardano_sdk_wallet.storage.PouchdbCollectionStore.html#_getRev" class="tsd-kind-icon">#get<wbr>Rev</a>
+							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
 								<a href="_cardano_sdk_wallet.storage.PouchdbCollectionStore.html#clearDB" class="tsd-kind-icon">clearDB</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
 								<a href="_cardano_sdk_wallet.storage.PouchdbCollectionStore.html#destroy" class="tsd-kind-icon">destroy</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-protected">
+								<a href="_cardano_sdk_wallet.storage.PouchdbCollectionStore.html#forcePut" class="tsd-kind-icon">force<wbr>Put</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_cardano_sdk_wallet.storage.PouchdbCollectionStore.html#getAll" class="tsd-kind-icon">get<wbr>All</a>
@@ -525,69 +531,6 @@
 					</li>
 				</ul>
 				<ul class="after-current">
-					<li class=" tsd-kind-class tsd-parent-kind-namespace tsd-has-type-parameter">
-						<a href="_cardano_sdk_wallet.storage.PouchdbDocumentStore.html" class="tsd-kind-icon">Pouchdb<wbr>Document<wbr>Store</a>
-					</li>
-					<li class=" tsd-kind-class tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_wallet.storage.PouchdbGenesisParametersStore.html" class="tsd-kind-icon">Pouchdb<wbr>Genesis<wbr>Parameters<wbr>Store</a>
-					</li>
-					<li class=" tsd-kind-class tsd-parent-kind-namespace tsd-has-type-parameter">
-						<a href="_cardano_sdk_wallet.storage.PouchdbKeyValueStore.html" class="tsd-kind-icon">Pouchdb<wbr>Key<wbr>Value<wbr>Store</a>
-					</li>
-					<li class=" tsd-kind-class tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_wallet.storage.PouchdbNetworkInfoStore.html" class="tsd-kind-icon">Pouchdb<wbr>Network<wbr>Info<wbr>Store</a>
-					</li>
-					<li class=" tsd-kind-class tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_wallet.storage.PouchdbProtocolParametersStore.html" class="tsd-kind-icon">Pouchdb<wbr>Protocol<wbr>Parameters<wbr>Store</a>
-					</li>
-					<li class=" tsd-kind-class tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_wallet.storage.PouchdbRewardsBalancesStore.html" class="tsd-kind-icon">Pouchdb<wbr>Rewards<wbr>Balances<wbr>Store</a>
-					</li>
-					<li class=" tsd-kind-class tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_wallet.storage.PouchdbRewardsHistoryStore.html" class="tsd-kind-icon">Pouchdb<wbr>Rewards<wbr>History<wbr>Store</a>
-					</li>
-					<li class=" tsd-kind-class tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_wallet.storage.PouchdbStakePoolsStore.html" class="tsd-kind-icon">Pouchdb<wbr>Stake<wbr>Pools<wbr>Store</a>
-					</li>
-					<li class=" tsd-kind-class tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_wallet.storage.PouchdbTipStore.html" class="tsd-kind-icon">Pouchdb<wbr>Tip<wbr>Store</a>
-					</li>
-					<li class=" tsd-kind-class tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_wallet.storage.PouchdbTransactionsStore.html" class="tsd-kind-icon">Pouchdb<wbr>Transactions<wbr>Store</a>
-					</li>
-					<li class=" tsd-kind-class tsd-parent-kind-namespace">
-						<a href="_cardano_sdk_wallet.storage.PouchdbUtxoStore.html" class="tsd-kind-icon">Pouchdb<wbr>Utxo<wbr>Store</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-namespace tsd-has-type-parameter">
-						<a href="../interfaces/_cardano_sdk_wallet.storage.CollectionStore.html" class="tsd-kind-icon">Collection<wbr>Store</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-namespace">
-						<a href="../interfaces/_cardano_sdk_wallet.storage.Destroyable.html" class="tsd-kind-icon">Destroyable</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-namespace tsd-has-type-parameter">
-						<a href="../interfaces/_cardano_sdk_wallet.storage.DocumentStore.html" class="tsd-kind-icon">Document<wbr>Store</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-namespace tsd-has-type-parameter">
-						<a href="../interfaces/_cardano_sdk_wallet.storage.KeyValueStore.html" class="tsd-kind-icon">Key<wbr>Value<wbr>Store</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-namespace">
-						<a href="../interfaces/_cardano_sdk_wallet.storage.WalletStores.html" class="tsd-kind-icon">Wallet<wbr>Stores</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-parent-kind-namespace tsd-has-type-parameter">
-						<a href="../modules/_cardano_sdk_wallet.storage.html#ComputePouchdbDocId" class="tsd-kind-icon">Compute<wbr>Pouchdb<wbr>Doc<wbr>Id</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-parent-kind-namespace tsd-has-type-parameter">
-						<a href="../modules/_cardano_sdk_wallet.storage.html#KeyValueCollection" class="tsd-kind-icon">Key<wbr>Value<wbr>Collection</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-parent-kind-namespace tsd-has-type-parameter">
-						<a href="../modules/_cardano_sdk_wallet.storage.html#OrderedCollectionStore" class="tsd-kind-icon">Ordered<wbr>Collection<wbr>Store</a>
-					</li>
-					<li class=" tsd-kind-function tsd-parent-kind-namespace">
-						<a href="../modules/_cardano_sdk_wallet.storage.html#createInMemoryWalletStores" class="tsd-kind-icon">create<wbr>InMemory<wbr>Wallet<wbr>Stores</a>
-					</li>
-					<li class=" tsd-kind-function tsd-parent-kind-namespace">
-						<a href="../modules/_cardano_sdk_wallet.storage.html#createPouchdbWalletStores" class="tsd-kind-icon">create<wbr>Pouchdb<wbr>Wallet<wbr>Stores</a>
-					</li>
 				</ul>
 			</nav>
 		</div>
