@@ -7,6 +7,7 @@ import {
   networkInfoProvider,
   stakePoolProvider,
   txSubmitProvider,
+  utxoProvider,
   walletProvider
 } from '../config';
 import { combineLatest, filter, firstValueFrom, map } from 'rxjs';
@@ -43,6 +44,7 @@ describe('SingleAddressWallet.assets/nft', () => {
         networkInfoProvider: await networkInfoProvider,
         stakePoolProvider,
         txSubmitProvider: await txSubmitProvider,
+        utxoProvider: await utxoProvider,
         walletProvider: await walletProvider
       }
     );

@@ -11,6 +11,7 @@ import {
   poolId2,
   stakePoolProvider,
   txSubmitProvider,
+  utxoProvider,
   walletProvider
 } from '../config';
 import { combineLatest, filter, firstValueFrom } from 'rxjs';
@@ -73,6 +74,7 @@ const getWallet = async (idx: number) =>
       networkInfoProvider: await networkInfoProvider,
       stakePoolProvider,
       txSubmitProvider: await txSubmitProvider,
+      utxoProvider: await utxoProvider,
       walletProvider: await walletProvider
     }
   );

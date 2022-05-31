@@ -6,6 +6,7 @@ import {
   networkInfoProvider,
   stakePoolProvider,
   txSubmitProvider,
+  utxoProvider,
   walletProvider
 } from '../config';
 import { filter, firstValueFrom, map } from 'rxjs';
@@ -24,6 +25,7 @@ describe('SingleAddressWallet/metadata', () => {
         networkInfoProvider: await networkInfoProvider,
         stakePoolProvider,
         txSubmitProvider: await txSubmitProvider,
+        utxoProvider: await utxoProvider,
         walletProvider: await walletProvider
       }
     );
