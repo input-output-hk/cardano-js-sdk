@@ -7,6 +7,7 @@
   "references": [
     { "path": "../../cip30/src" },
     { "path": "../../core/src" },
-    { "path": "../../wallet/src" }
+    { "path": "../../wallet/src" },
+    { "path": "../../util-rxjs/src" }
   ]
 }

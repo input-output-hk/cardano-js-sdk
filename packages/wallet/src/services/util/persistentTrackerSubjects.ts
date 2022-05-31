@@ -16,7 +16,7 @@ import {
   tap,
   timeout
 } from 'rxjs';
-import { TrackerSubject } from './TrackerSubject';
+import { TrackerSubject } from '@cardano-sdk/util-rxjs';
 import { isEqual } from 'lodash-es';
 
 export class PersistentCollectionTrackerSubject<T> extends TrackerSubject<T[]> {

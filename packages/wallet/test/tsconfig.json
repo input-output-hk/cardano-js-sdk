@@ -11,6 +11,9 @@
       "path": "../src"
     },
     {
+      "path": "../../util-rxjs/src"
+    },
+    {
       "path": "../../util-dev/src"
     },
     {

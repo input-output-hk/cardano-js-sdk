@@ -1,4 +1,4 @@
-import { BehaviorObservable } from './util';
+import { BehaviorObservable } from '@cardano-sdk/util-rxjs';
 import { Cardano, EpochRewards } from '@cardano-sdk/core';
 import { Observable } from 'rxjs';
 

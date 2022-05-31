@@ -62,6 +62,7 @@
   "dependencies": {
     "@cardano-sdk/cip30": "0.2.0",
     "@cardano-sdk/core": "0.2.0",
+    "@cardano-sdk/util-rxjs": "0.2.0",
     "lodash-es": "^4.17.21",
     "rxjs": "^7.4.0",
     "ts-log": "^2.2.3",

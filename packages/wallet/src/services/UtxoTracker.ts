@@ -1,7 +1,8 @@
 import { Cardano, UtxoProvider } from '@cardano-sdk/core';
 import { NEVER, Observable, combineLatest, concat, map, of, switchMap } from 'rxjs';
-import { PersistentCollectionTrackerSubject, TrackerSubject, coldObservableProvider, utxoEquals } from './util';
+import { PersistentCollectionTrackerSubject, coldObservableProvider, utxoEquals } from './util';
 import { RetryBackoffConfig } from 'backoff-rxjs';
+import { TrackerSubject } from '@cardano-sdk/util-rxjs';
 import { UtxoTracker } from './types';
 import { WalletStores } from '../persistence';
 

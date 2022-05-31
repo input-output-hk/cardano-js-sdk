@@ -25,7 +25,7 @@ import { FailedTx, TransactionFailure, TransactionsTracker } from './types';
 import { OrderedCollectionStore } from '../persistence';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { Shutdown } from '../types';
-import { TrackerSubject } from './util/TrackerSubject';
+import { TrackerSubject } from '@cardano-sdk/util-rxjs';
 import { coldObservableProvider, distinctBlock, transactionsEquals } from './util';
 import { intersectionBy, sortBy, unionBy } from 'lodash-es';
 

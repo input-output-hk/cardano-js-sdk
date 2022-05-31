@@ -24,6 +24,10 @@
   "dependencies": {
     "rxjs": "^7.4.0"
   },
+  "devDependencies": {
+    "@cardano-sdk/util-dev": "0.2.0",
+    "rxjs": "^7.4.0"
+  },
   "files": [
     "dist/*",
     "!dist/tsconfig.tsbuildinfo",

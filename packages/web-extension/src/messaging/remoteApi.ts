@@ -15,7 +15,8 @@ import {
 } from './types';
 import { EMPTY, Observable, filter, firstValueFrom, isObservable, map, merge, mergeMap, takeUntil, tap } from 'rxjs';
 import { NotImplementedError, util } from '@cardano-sdk/core';
-import { Shutdown, TrackerSubject } from '@cardano-sdk/wallet';
+import { Shutdown } from '@cardano-sdk/wallet';
+import { TrackerSubject } from '@cardano-sdk/util-rxjs';
 import {
   isEmitMessage,
   isObservableCompletionMessage,
