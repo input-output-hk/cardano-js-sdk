@@ -31,10 +31,11 @@ import {
   Withdrawal,
   utils
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import { CSL, Cardano, cslToCore, util } from '@cardano-sdk/core';
+import { CSL, Cardano, cslToCore } from '@cardano-sdk/core';
 import { GroupedAddress, ResolveInputAddress } from '../types';
 import { HwMappingError } from '../errors';
 import { concat, uniq } from 'lodash-es';
+import { isNotNil } from '@cardano-sdk/util';
 
 export interface TxToLedgerProps {
   cslTxBody: CSL.TransactionBody;
@@ -528,7 +529,7 @@ export const txToLedger = async ({
   const cslMint = cslTxBody.multiassets();
   let ledgerMintBundle = null;
   if (cslMint) {
-    const paymentKeyPaths = uniq(ledgerInputs.map((ledgerInput) => ledgerInput.path).filter(util.isNotNil));
+    const paymentKeyPaths = uniq(ledgerInputs.map((ledgerInput) => ledgerInput.path).filter(isNotNil));
     ledgerMintBundle = prepareLedgerMintBundle(cslMint, paymentKeyPaths, rewardAccountKeyPath);
   }
   const additionalWitnessPaths = ledgerMintBundle?.additionalWitnessPaths || [];

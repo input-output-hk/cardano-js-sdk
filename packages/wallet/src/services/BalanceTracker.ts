@@ -1,7 +1,10 @@
 import { Balance, DelegationTracker, StakeKeyStatus, TransactionalObservables, TransactionalTracker } from './types';
-import { BigIntMath, Cardano, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
+import { BigIntMath } from '@cardano-sdk/util';
+import { Cardano, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
+
 import { Observable, combineLatest, distinctUntilChanged, map } from 'rxjs';
-import { TrackerSubject, deepEquals } from './util';
+import { TrackerSubject } from '@cardano-sdk/util-rxjs';
+import { deepEquals } from './util';
 
 const mapToBalances = map<[Cardano.Utxo[], Cardano.Lovelace, Cardano.Lovelace], Balance>(
   ([utxo, rewards, deposit]) => ({

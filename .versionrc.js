@@ -44,6 +44,14 @@ const packageMap = [
     type: 'json'
   },
   {
+    filename: 'packages/util-rxjs/package.json',
+    type: 'json'
+  },
+  {
+    filename: 'packages/util/package.json',
+    type: 'json'
+  },
+  {
     filename: 'packages/util-dev/package.json',
     type: 'json'
   },

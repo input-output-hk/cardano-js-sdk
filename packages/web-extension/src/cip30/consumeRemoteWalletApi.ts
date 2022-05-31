@@ -7,13 +7,13 @@ import {
   WalletApi,
   WalletApiMethodNames
 } from '@cardano-sdk/cip30';
+import { GetErrorPrototype } from '@cardano-sdk/util';
 import { MessengerDependencies, RemoteApiProperties, RemoteApiPropertyType, consumeRemoteApi } from '../messaging';
-import { util } from '@cardano-sdk/core';
 import { walletApiChannel } from './util';
 
 const cip30errorTypes = [ApiError, DataSignError, PaginateError, TxSendError, TxSignError];
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const getErrorPrototype: util.GetErrorPrototype = (err: any) =>
+const getErrorPrototype: GetErrorPrototype = (err: any) =>
   cip30errorTypes.find((ErrorType) => ErrorType.prototype.name === err.name)?.prototype || Error.prototype;
 
 export interface ConsumeRemoteWalletApiProps {

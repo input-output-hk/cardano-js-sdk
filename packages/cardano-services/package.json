@@ -53,6 +53,7 @@
     "@cardano-sdk/core": "0.2.0",
     "@cardano-sdk/ogmios": "0.2.0",
     "@cardano-sdk/rabbitmq": "0.2.0",
+    "@cardano-sdk/util": "0.2.0",
     "@types/bunyan": "^1.8.8",
     "@types/death": "^1.1.2",
     "@types/wait-on": "^5.3.1",

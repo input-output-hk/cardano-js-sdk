@@ -17,11 +17,12 @@ import {
 } from './RewardAccounts';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { RewardsHistoryProvider, createRewardsHistoryProvider, createRewardsHistoryTracker } from './RewardsHistory';
-import { Shutdown } from '../../types';
+import { Shutdown } from '@cardano-sdk/util';
 import { TrackedWalletProvider } from '../ProviderTracker';
-import { TrackerSubject, coldObservableProvider } from '../util';
+import { TrackerSubject } from '@cardano-sdk/util-rxjs';
 import { TxWithEpoch } from './types';
 import { WalletStores } from '../../persistence';
+import { coldObservableProvider } from '../util';
 import { transactionsWithCertificates } from './transactionCertificates';
 
 export const createBlockEpochProvider =

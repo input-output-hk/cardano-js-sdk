@@ -23,7 +23,7 @@ import { TrackedStakePoolProvider } from './TrackedStakePoolProvider';
 import { TrackedTxSubmitProvider } from './TrackedTxSubmitProvider';
 import { TrackedUtxoProvider } from './TrackedUtxoProvider';
 import { TrackedWalletProvider } from './TrackedWalletProvider';
-import { TrackerSubject } from '../util';
+import { TrackerSubject } from '@cardano-sdk/util-rxjs';
 
 export interface ProviderStatusTrackerProps {
   consideredOutOfSyncAfter: Milliseconds;

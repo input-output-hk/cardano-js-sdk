@@ -12,18 +12,9 @@ import {
   WalletProvider,
   coreToCsl
 } from '@cardano-sdk/core';
-import {
-  Assets,
-  InitializeTxProps,
-  InitializeTxResult,
-  ObservableWallet,
-  Shutdown,
-  SignDataProps,
-  SyncStatus
-} from './types';
+import { Assets, InitializeTxProps, InitializeTxResult, ObservableWallet, SignDataProps, SyncStatus } from './types';
 import {
   Balance,
-  BehaviorObservable,
   DelegationTracker,
   FailedTx,
   PersistentDocumentTrackerSubject,
@@ -34,7 +25,6 @@ import {
   TrackedStakePoolProvider,
   TrackedTxSubmitProvider,
   TrackedWalletProvider,
-  TrackerSubject,
   TransactionFailure,
   TransactionalTracker,
   TransactionsTracker,
@@ -54,10 +44,12 @@ import {
   groupedAddressesEquals,
   tipEquals
 } from './services';
+import { BehaviorObservable, TrackerSubject } from '@cardano-sdk/util-rxjs';
 import { Cip30DataSignature } from '@cardano-sdk/cip30';
 import { InputSelector, defaultSelectionConstraints, roundRobinRandomImprove } from '@cardano-sdk/cip2';
 import { Logger, dummyLogger } from 'ts-log';
 import { RetryBackoffConfig } from 'backoff-rxjs';
+import { Shutdown } from '@cardano-sdk/util';
 import {
   Subject,
   combineLatest,

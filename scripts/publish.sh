@@ -12,5 +12,7 @@ npm publish --cwd ./packages/core && \
 npm publish --cwd ./packages/golden-test-generator && \
 npm publish --cwd ./packages/ogmios && \
 npm publish --cwd ./packages/rabbitmq && \
+npm publish --cwd ./packages/util-rxjs && \
+npm publish --cwd ./packages/util && \
 npm publish --cwd ./packages/util-dev && \
 npm publish --cwd ./packages/wallet

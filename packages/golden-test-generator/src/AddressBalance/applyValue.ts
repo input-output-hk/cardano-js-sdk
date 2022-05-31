@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
+import { BigIntMath } from '@cardano-sdk/util';
 import { Schema } from '@cardano-ogmios/client';
-import { BigIntMath } from '@cardano-sdk/core';
+
 
 const throwIfNegative = (value: bigint | number): void => {
   if (value < 0) {

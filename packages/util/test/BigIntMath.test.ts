@@ -1,5 +1,5 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import { BigIntMath } from '../../src/util/BigIntMath';
+import { BigIntMath } from '../src/BigIntMath';
 
 describe('BigIntMath', () => {
   describe('abs', () => {

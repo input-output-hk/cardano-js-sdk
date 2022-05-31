@@ -1,4 +1,5 @@
-import { BigIntMath, Cardano, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
+import { BigIntMath } from '@cardano-sdk/util';
+import { Cardano, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
 import { ObservableWallet, OutputValidation } from '../types';
 import { ResolveInputAddress } from '../KeyManagement';
 import { computeMinimumCoinQuantity, tokenBundleSizeExceedsLimit } from '@cardano-sdk/cip2';

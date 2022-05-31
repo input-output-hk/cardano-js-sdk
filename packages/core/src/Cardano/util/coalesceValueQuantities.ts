@@ -1,4 +1,5 @@
-import { Asset, BigIntMath } from '../..';
+import { Asset } from '../..';
+import { BigIntMath } from '@cardano-sdk/util';
 import { Value } from '../types';
 
 /**

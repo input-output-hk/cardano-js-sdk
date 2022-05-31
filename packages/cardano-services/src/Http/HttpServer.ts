@@ -1,7 +1,8 @@
 import { HttpService } from './HttpService';
 import { Logger, dummyLogger } from 'ts-log';
-import { ProviderError, ProviderFailure, util } from '@cardano-sdk/core';
+import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { RunnableModule } from '../RunnableModule';
+import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
 import { listenPromise, serverClosePromise } from '../util';
 import bodyParser, { Options } from 'body-parser';
 import express from 'express';
@@ -46,7 +47,7 @@ export class HttpServer extends RunnableModule {
     this.app.use(
       bodyParser.json({
         limit: this.#config?.bodyParser?.limit || '500kB',
-        reviver: (key, value) => (key === '' ? util.fromSerializableObject(value) : value)
+        reviver: (key, value) => (key === '' ? fromSerializableObject(value) : value)
       })
     );
     if (this.#config?.metrics?.enabled) {
@@ -76,7 +77,7 @@ export class HttpServer extends RunnableModule {
   ) {
     res.statusCode = statusCode;
     res.header(CONTENT_TYPE, APPLICATION_JSON);
-    res.send(util.toSerializableObject(obj) as ResponseBody);
+    res.send(toSerializableObject(obj) as ResponseBody);
   }
 
   async startImpl(): Promise<void> {

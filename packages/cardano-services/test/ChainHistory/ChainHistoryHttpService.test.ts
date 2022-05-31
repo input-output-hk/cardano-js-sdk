@@ -7,13 +7,13 @@ import {
   ChainHistoryProvider,
   ProviderError,
   ProviderFailure,
-  TransactionsByAddressesArgs,
-  util
+  TransactionsByAddressesArgs
 } from '@cardano-sdk/core';
 import { ChainHistoryHttpService, DbSyncChainHistoryProvider, HttpServer, HttpServerConfig } from '../../src';
 import { Pool } from 'pg';
 import { chainHistoryHttpProvider } from '@cardano-sdk/cardano-services-client';
 import { doServerRequest } from '../util';
+import { fromSerializableObject } from '@cardano-sdk/util';
 import { getPort } from 'get-port-please';
 import axios from 'axios';
 
@@ -189,7 +189,7 @@ describe('ChainHistoryHttpService', () => {
             Cardano.TransactionId('cefd2fcf657e5e5d6c35975f4e052f427819391b153ebb16ad8aa107ba5a3819')
           ];
           const response = await doChainHistoryRequest<[Cardano.TransactionId[]], Cardano.TxAlonzo[]>(url, [hashes]);
-          const tx: Cardano.TxAlonzo = util.fromSerializableObject(response[0]);
+          const tx: Cardano.TxAlonzo = fromSerializableObject(response[0]);
           expect(response.length).toEqual(1);
           expect(tx.body.outputs[0].value.assets?.size).toBeGreaterThan(0);
           expect(response).toMatchSnapshot();
@@ -200,7 +200,7 @@ describe('ChainHistoryHttpService', () => {
             Cardano.TransactionId('952dfa431223fd671c5e9e048e016f70fcebd9e41fcb726969415ff692736eeb')
           ];
           const response = await doChainHistoryRequest<[Cardano.TransactionId[]], Cardano.TxAlonzo[]>(url, [hashes]);
-          const tx: Cardano.TxAlonzo = util.fromSerializableObject(response[0]);
+          const tx: Cardano.TxAlonzo = fromSerializableObject(response[0]);
           expect(response.length).toEqual(1);
           expect(response).toMatchSnapshot();
           expect(tx.body.mint?.size).toBeGreaterThan(0);
@@ -211,7 +211,7 @@ describe('ChainHistoryHttpService', () => {
             Cardano.TransactionId('cb66e0f5778718f8bfcfd043712f37d9993f4703b254a7a4d954d34225fe2f99')
           ];
           const response = await doChainHistoryRequest<[Cardano.TransactionId[]], Cardano.TxAlonzo[]>(url, [hashes]);
-          const tx: Cardano.TxAlonzo = util.fromSerializableObject(response[0]);
+          const tx: Cardano.TxAlonzo = fromSerializableObject(response[0]);
           expect(response.length).toEqual(1);
           expect(response).toMatchSnapshot();
           expect(tx.body.withdrawals?.length).toBeGreaterThan(0);
@@ -222,7 +222,7 @@ describe('ChainHistoryHttpService', () => {
             Cardano.TransactionId('24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e')
           ];
           const response = await doChainHistoryRequest<[Cardano.TransactionId[]], Cardano.TxAlonzo[]>(url, [hashes]);
-          const tx: Cardano.TxAlonzo = util.fromSerializableObject(response[0]);
+          const tx: Cardano.TxAlonzo = fromSerializableObject(response[0]);
           expect(response.length).toEqual(1);
           expect(response).toMatchSnapshot();
           expect(tx.witness.redeemers?.length).toBeGreaterThan(0);
@@ -233,7 +233,7 @@ describe('ChainHistoryHttpService', () => {
             Cardano.TransactionId('3d2278e9cef71c79720a11bc3e08acbbd5f2175f7015d358c867fc9b419ae0b2')
           ];
           const response = await doChainHistoryRequest<[Cardano.TransactionId[]], Cardano.TxAlonzo[]>(url, [hashes]);
-          const tx: Cardano.TxAlonzo = util.fromSerializableObject(response[0]);
+          const tx: Cardano.TxAlonzo = fromSerializableObject(response[0]);
           expect(response.length).toEqual(1);
           expect(response).toMatchSnapshot();
           expect(tx.auxiliaryData).toBeDefined();
@@ -244,7 +244,7 @@ describe('ChainHistoryHttpService', () => {
             Cardano.TransactionId('5acd6efb1b66299f1c5a2c4221af4bcaa4ba9929e8e6aa0e3f48707fa1796fc3')
           ];
           const response = await doChainHistoryRequest<[Cardano.TransactionId[]], Cardano.TxAlonzo[]>(url, [hashes]);
-          const tx: Cardano.TxAlonzo = util.fromSerializableObject(response[0]);
+          const tx: Cardano.TxAlonzo = fromSerializableObject(response[0]);
           expect(response.length).toEqual(1);
           expect(response).toMatchSnapshot();
           expect(tx.body.collaterals?.length).toBeGreaterThan(0);
@@ -256,8 +256,8 @@ describe('ChainHistoryHttpService', () => {
             Cardano.TransactionId('19251f57476d7af2777252270413c01383d9503110a68b4fde1a239c119c4f5d')
           ];
           const response = await doChainHistoryRequest<[Cardano.TransactionId[]], Cardano.TxAlonzo[]>(url, [hashes]);
-          const tx1: Cardano.TxAlonzo = util.fromSerializableObject(response[0]);
-          const tx2: Cardano.TxAlonzo = util.fromSerializableObject(response[1]);
+          const tx1: Cardano.TxAlonzo = fromSerializableObject(response[0]);
+          const tx2: Cardano.TxAlonzo = fromSerializableObject(response[1]);
           expect(response.length).toEqual(2);
           expect(response).toMatchSnapshot();
           expect(tx1.body.certificates?.length).toBeGreaterThan(0);

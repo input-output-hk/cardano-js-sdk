@@ -3,7 +3,7 @@
 import { BehaviorSubject, Observable, Subject, debounceTime, filter, first, map, takeWhile, tap } from 'rxjs';
 import { Messenger, MessengerDependencies, MessengerPort, PortMessage, ReconnectConfig } from './types';
 import { deriveChannelName } from './util';
-import { util } from '@cardano-sdk/core';
+import { isNotNil } from '@cardano-sdk/util';
 
 export interface NonBackgroundMessengerOptions {
   baseChannel: string;
@@ -56,7 +56,7 @@ export const createNonBackgroundMessenger = (
   connect();
   const connect$ = port$.pipe(
     debounceTime(10), // TODO: how long until onDisconnect() is called when the other end doesn't exist?
-    filter(util.isNotNil),
+    filter(isNotNil),
     takeWhile((port): port is MessengerPort => typeof port !== 'string')
   );
   const derivedMessengers = new Set<Messenger>();

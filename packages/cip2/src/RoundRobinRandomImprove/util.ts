@@ -1,5 +1,6 @@
 /* eslint-disable func-style */
-import { BigIntMath, Cardano } from '@cardano-sdk/core';
+import { BigIntMath } from '@cardano-sdk/util';
+import { Cardano } from '@cardano-sdk/core';
 import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
 import { uniq } from 'lodash-es';
 
