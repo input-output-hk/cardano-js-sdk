@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>TrackedStakePoolSearchProvider | cardano-sdk</title>
+	<title>TrackedStakePoolProvider | cardano-sdk</title>
 	<meta name="description" content="Documentation for cardano-sdk">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -58,10 +58,10 @@
 					<a href="../modules/_cardano_sdk_wallet.html">@cardano-sdk/wallet</a>
 				</li>
 				<li>
-					<a href="_cardano_sdk_wallet.TrackedStakePoolSearchProvider.html">TrackedStakePoolSearchProvider</a>
+					<a href="_cardano_sdk_wallet.TrackedStakePoolProvider.html">TrackedStakePoolProvider</a>
 				</li>
 			</ul>
-			<h1>Class TrackedStakePoolSearchProvider</h1>
+			<h1>Class TrackedStakePoolProvider</h1>
 		</div>
 	</div>
 </header>
@@ -71,7 +71,7 @@
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>Wraps a StakePoolSearchProvider, tracking # of calls of each function</p>
+						<p>Wraps a StakePoolProvider, tracking # of calls of each function</p>
 					</div>
 				</div>
 			</section>
@@ -82,7 +82,7 @@
 						<a href="_cardano_sdk_wallet.ProviderTracker.html" class="tsd-signature-type" data-tsd-kind="Class">ProviderTracker</a>
 						<ul class="tsd-hierarchy">
 							<li>
-								<span class="target">TrackedStakePoolSearchProvider</span>
+								<span class="target">TrackedStakePoolProvider</span>
 							</li>
 						</ul>
 					</li>
@@ -91,7 +91,7 @@
 			<section class="tsd-panel">
 				<h3>Implements</h3>
 				<ul class="tsd-hierarchy">
-					<li><span class="tsd-signature-type">StakePoolSearchProvider</span></li>
+					<li><span class="tsd-signature-type">StakePoolProvider</span></li>
 				</ul>
 			</section>
 			<section class="tsd-panel-group tsd-index-group">
@@ -101,21 +101,22 @@
 						<section class="tsd-index-section ">
 							<h3>Constructors</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite"><a href="_cardano_sdk_wallet.TrackedStakePoolSearchProvider.html#constructor" class="tsd-kind-icon">constructor</a></li>
+								<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite"><a href="_cardano_sdk_wallet.TrackedStakePoolProvider.html#constructor" class="tsd-kind-icon">constructor</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_cardano_sdk_wallet.TrackedStakePoolSearchProvider.html#queryStakePools" class="tsd-kind-icon">query<wbr>Stake<wbr>Pools</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_cardano_sdk_wallet.TrackedStakePoolSearchProvider.html#stats" class="tsd-kind-icon">stats</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_cardano_sdk_wallet.TrackedStakePoolProvider.html#queryStakePools" class="tsd-kind-icon">query<wbr>Stake<wbr>Pools</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_cardano_sdk_wallet.TrackedStakePoolProvider.html#stakePoolStats" class="tsd-kind-icon">stake<wbr>Pool<wbr>Stats</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_cardano_sdk_wallet.TrackedStakePoolProvider.html#stats" class="tsd-kind-icon">stats</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section tsd-is-inherited">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_cardano_sdk_wallet.TrackedStakePoolSearchProvider.html#setStatInitialized" class="tsd-kind-icon">set<wbr>Stat<wbr>Initialized</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-protected"><a href="_cardano_sdk_wallet.TrackedStakePoolSearchProvider.html#trackedCall" class="tsd-kind-icon">tracked<wbr>Call</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_cardano_sdk_wallet.TrackedStakePoolProvider.html#setStatInitialized" class="tsd-kind-icon">set<wbr>Stat<wbr>Initialized</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-protected"><a href="_cardano_sdk_wallet.TrackedStakePoolProvider.html#trackedCall" class="tsd-kind-icon">tracked<wbr>Call</a></li>
 							</ul>
 						</section>
 					</div>
@@ -127,23 +128,23 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Tracked<wbr>Stake<wbr>Pool<wbr>Search<wbr>Provider<span class="tsd-signature-symbol">(</span>queryStakePoolsProvider<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">StakePoolSearchProvider</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_wallet.TrackedStakePoolSearchProvider.html" class="tsd-signature-type" data-tsd-kind="Class">TrackedStakePoolSearchProvider</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Tracked<wbr>Stake<wbr>Pool<wbr>Provider<span class="tsd-signature-symbol">(</span>queryStakePoolsProvider<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">StakePoolProvider</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_wallet.TrackedStakePoolProvider.html" class="tsd-signature-type" data-tsd-kind="Class">TrackedStakePoolProvider</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Overrides <a href="_cardano_sdk_wallet.ProviderTracker.html">ProviderTracker</a>.<a href="_cardano_sdk_wallet.ProviderTracker.html#constructor">constructor</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1e8a9d7/packages/wallet/src/services/ProviderTracker/TrackedStakePoolSearchProvider.ts#L24">packages/wallet/src/services/ProviderTracker/TrackedStakePoolSearchProvider.ts:24</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/c7e9537/packages/wallet/src/services/ProviderTracker/TrackedStakePoolProvider.ts#L28">packages/wallet/src/services/ProviderTracker/TrackedStakePoolProvider.ts:28</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>queryStakePoolsProvider: <span class="tsd-signature-type">StakePoolSearchProvider</span></h5>
+									<h5>queryStakePoolsProvider: <span class="tsd-signature-type">StakePoolProvider</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="_cardano_sdk_wallet.TrackedStakePoolSearchProvider.html" class="tsd-signature-type" data-tsd-kind="Class">TrackedStakePoolSearchProvider</a></h4>
+							<h4 class="tsd-returns-title">Returns <a href="_cardano_sdk_wallet.TrackedStakePoolProvider.html" class="tsd-signature-type" data-tsd-kind="Class">TrackedStakePoolProvider</a></h4>
 						</li>
 					</ul>
 				</section>
@@ -155,9 +156,9 @@
 					<h3><span class="tsd-flag ts-flagReadonly">Readonly</span> query<wbr>Stake<wbr>Pools</h3>
 					<div class="tsd-signature tsd-kind-icon">query<wbr>Stake<wbr>Pools<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>options<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">StakePoolQueryOptions</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">StakePoolSearchResults</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
-						<p>Implementation of StakePoolSearchProvider.queryStakePools</p>
+						<p>Implementation of StakePoolProvider.queryStakePools</p>
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1e8a9d7/packages/wallet/src/services/ProviderTracker/TrackedStakePoolSearchProvider.ts#L22">packages/wallet/src/services/ProviderTracker/TrackedStakePoolSearchProvider.ts:22</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/c7e9537/packages/wallet/src/services/ProviderTracker/TrackedStakePoolProvider.ts#L25">packages/wallet/src/services/ProviderTracker/TrackedStakePoolProvider.ts:25</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -183,12 +184,38 @@
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="stakePoolStats" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagReadonly">Readonly</span> stake<wbr>Pool<wbr>Stats</h3>
+					<div class="tsd-signature tsd-kind-icon">stake<wbr>Pool<wbr>Stats<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">StakePoolStats</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<aside class="tsd-sources">
+						<p>Implementation of StakePoolProvider.stakePoolStats</p>
+						<ul>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/c7e9537/packages/wallet/src/services/ProviderTracker/TrackedStakePoolProvider.ts#L26">packages/wallet/src/services/ProviderTracker/TrackedStakePoolProvider.ts:26</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-signature">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-class">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">StakePoolStats</span><span class="tsd-signature-symbol">&gt;</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">StakePoolStats</span><span class="tsd-signature-symbol">&gt;</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 					<a name="stats" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagReadonly">Readonly</span> stats</h3>
-					<div class="tsd-signature tsd-kind-icon">stats<span class="tsd-signature-symbol">:</span> <a href="_cardano_sdk_wallet.StakePoolSearchProviderStats.html" class="tsd-signature-type" data-tsd-kind="Class">StakePoolSearchProviderStats</a><span class="tsd-signature-symbol"> = ...</span></div>
+					<div class="tsd-signature tsd-kind-icon">stats<span class="tsd-signature-symbol">:</span> <a href="_cardano_sdk_wallet.StakePoolProviderStats.html" class="tsd-signature-type" data-tsd-kind="Class">StakePoolProviderStats</a><span class="tsd-signature-symbol"> = ...</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1e8a9d7/packages/wallet/src/services/ProviderTracker/TrackedStakePoolSearchProvider.ts#L21">packages/wallet/src/services/ProviderTracker/TrackedStakePoolSearchProvider.ts:21</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/c7e9537/packages/wallet/src/services/ProviderTracker/TrackedStakePoolProvider.ts#L24">packages/wallet/src/services/ProviderTracker/TrackedStakePoolProvider.ts:24</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -206,7 +233,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_cardano_sdk_wallet.ProviderTracker.html">ProviderTracker</a>.<a href="_cardano_sdk_wallet.ProviderTracker.html#setStatInitialized">setStatInitialized</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1e8a9d7/packages/wallet/src/services/ProviderTracker/ProviderTracker.ts#L44">packages/wallet/src/services/ProviderTracker/ProviderTracker.ts:44</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/c7e9537/packages/wallet/src/services/ProviderTracker/ProviderTracker.ts#L44">packages/wallet/src/services/ProviderTracker/ProviderTracker.ts:44</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -230,7 +257,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_cardano_sdk_wallet.ProviderTracker.html">ProviderTracker</a>.<a href="_cardano_sdk_wallet.ProviderTracker.html#trackedCall">trackedCall</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1e8a9d7/packages/wallet/src/services/ProviderTracker/ProviderTracker.ts#L22">packages/wallet/src/services/ProviderTracker/ProviderTracker.ts:22</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/c7e9537/packages/wallet/src/services/ProviderTracker/ProviderTracker.ts#L22">packages/wallet/src/services/ProviderTracker/ProviderTracker.ts:22</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -326,22 +353,25 @@
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-class tsd-parent-kind-module">
-						<a href="_cardano_sdk_wallet.TrackedStakePoolSearchProvider.html" class="tsd-kind-icon">Tracked<wbr>Stake<wbr>Pool<wbr>Search<wbr>Provider</a>
+						<a href="_cardano_sdk_wallet.TrackedStakePoolProvider.html" class="tsd-kind-icon">Tracked<wbr>Stake<wbr>Pool<wbr>Provider</a>
 						<ul>
 							<li class=" tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite">
-								<a href="_cardano_sdk_wallet.TrackedStakePoolSearchProvider.html#constructor" class="tsd-kind-icon">constructor</a>
+								<a href="_cardano_sdk_wallet.TrackedStakePoolProvider.html#constructor" class="tsd-kind-icon">constructor</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
-								<a href="_cardano_sdk_wallet.TrackedStakePoolSearchProvider.html#queryStakePools" class="tsd-kind-icon">query<wbr>Stake<wbr>Pools</a>
+								<a href="_cardano_sdk_wallet.TrackedStakePoolProvider.html#queryStakePools" class="tsd-kind-icon">query<wbr>Stake<wbr>Pools</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
-								<a href="_cardano_sdk_wallet.TrackedStakePoolSearchProvider.html#stats" class="tsd-kind-icon">stats</a>
+								<a href="_cardano_sdk_wallet.TrackedStakePoolProvider.html#stakePoolStats" class="tsd-kind-icon">stake<wbr>Pool<wbr>Stats</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_cardano_sdk_wallet.TrackedStakePoolProvider.html#stats" class="tsd-kind-icon">stats</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
-								<a href="_cardano_sdk_wallet.TrackedStakePoolSearchProvider.html#setStatInitialized" class="tsd-kind-icon">set<wbr>Stat<wbr>Initialized</a>
+								<a href="_cardano_sdk_wallet.TrackedStakePoolProvider.html#setStatInitialized" class="tsd-kind-icon">set<wbr>Stat<wbr>Initialized</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited tsd-is-protected">
-								<a href="_cardano_sdk_wallet.TrackedStakePoolSearchProvider.html#trackedCall" class="tsd-kind-icon">tracked<wbr>Call</a>
+								<a href="_cardano_sdk_wallet.TrackedStakePoolProvider.html#trackedCall" class="tsd-kind-icon">tracked<wbr>Call</a>
 							</li>
 						</ul>
 					</li>

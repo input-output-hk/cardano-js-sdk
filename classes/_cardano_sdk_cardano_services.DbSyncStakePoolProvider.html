@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>DbSyncStakePoolSearchProvider | cardano-sdk</title>
+	<title>DbSyncStakePoolProvider | cardano-sdk</title>
 	<meta name="description" content="Documentation for cardano-sdk">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -58,10 +58,10 @@
 					<a href="../modules/_cardano_sdk_cardano_services.html">@cardano-sdk/cardano-services</a>
 				</li>
 				<li>
-					<a href="_cardano_sdk_cardano_services.DbSyncStakePoolSearchProvider.html">DbSyncStakePoolSearchProvider</a>
+					<a href="_cardano_sdk_cardano_services.DbSyncStakePoolProvider.html">DbSyncStakePoolProvider</a>
 				</li>
 			</ul>
-			<h1>Class DbSyncStakePoolSearchProvider</h1>
+			<h1>Class DbSyncStakePoolProvider</h1>
 		</div>
 	</div>
 </header>
@@ -75,7 +75,7 @@
 						<span class="tsd-signature-type">DbSyncProvider</span>
 						<ul class="tsd-hierarchy">
 							<li>
-								<span class="target">DbSyncStakePoolSearchProvider</span>
+								<span class="target">DbSyncStakePoolProvider</span>
 							</li>
 						</ul>
 					</li>
@@ -84,7 +84,7 @@
 			<section class="tsd-panel">
 				<h3>Implements</h3>
 				<ul class="tsd-hierarchy">
-					<li><span class="tsd-signature-type">StakePoolSearchProvider</span></li>
+					<li><span class="tsd-signature-type">StakePoolProvider</span></li>
 				</ul>
 			</section>
 			<section class="tsd-panel-group tsd-index-group">
@@ -94,22 +94,23 @@
 						<section class="tsd-index-section ">
 							<h3>Constructors</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite"><a href="_cardano_sdk_cardano_services.DbSyncStakePoolSearchProvider.html#constructor" class="tsd-kind-icon">constructor</a></li>
+								<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite"><a href="_cardano_sdk_cardano_services.DbSyncStakePoolProvider.html#constructor" class="tsd-kind-icon">constructor</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_cardano_sdk_cardano_services.DbSyncStakePoolSearchProvider.html#_builder" class="tsd-kind-icon">#builder</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_cardano_sdk_cardano_services.DbSyncStakePoolSearchProvider.html#_logger" class="tsd-kind-icon">#logger</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="_cardano_sdk_cardano_services.DbSyncStakePoolSearchProvider.html#db" class="tsd-kind-icon">db</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_cardano_sdk_cardano_services.DbSyncStakePoolProvider.html#_builder" class="tsd-kind-icon">#builder</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_cardano_sdk_cardano_services.DbSyncStakePoolProvider.html#_logger" class="tsd-kind-icon">#logger</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="_cardano_sdk_cardano_services.DbSyncStakePoolProvider.html#db" class="tsd-kind-icon">db</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_cardano_sdk_cardano_services.DbSyncStakePoolSearchProvider.html#healthCheck" class="tsd-kind-icon">health<wbr>Check</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_cardano_sdk_cardano_services.DbSyncStakePoolSearchProvider.html#queryStakePools" class="tsd-kind-icon">query<wbr>Stake<wbr>Pools</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_cardano_sdk_cardano_services.DbSyncStakePoolProvider.html#healthCheck" class="tsd-kind-icon">health<wbr>Check</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_cardano_sdk_cardano_services.DbSyncStakePoolProvider.html#queryStakePools" class="tsd-kind-icon">query<wbr>Stake<wbr>Pools</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_cardano_sdk_cardano_services.DbSyncStakePoolProvider.html#stakePoolStats" class="tsd-kind-icon">stake<wbr>Pool<wbr>Stats</a></li>
 							</ul>
 						</section>
 					</div>
@@ -121,14 +122,14 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>DbSync<wbr>Stake<wbr>Pool<wbr>Search<wbr>Provider<span class="tsd-signature-symbol">(</span>db<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Pool</span>, logger<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Logger</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_cardano_services.DbSyncStakePoolSearchProvider.html" class="tsd-signature-type" data-tsd-kind="Class">DbSyncStakePoolSearchProvider</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>DbSync<wbr>Stake<wbr>Pool<wbr>Provider<span class="tsd-signature-symbol">(</span>db<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Pool</span>, logger<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Logger</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_cardano_services.DbSyncStakePoolProvider.html" class="tsd-signature-type" data-tsd-kind="Class">DbSyncStakePoolProvider</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Overrides DbSyncProvider.constructor</p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1e8a9d7/packages/cardano-services/src/StakePoolSearch/DbSyncStakePoolSearchProvider/DbSyncStakePoolSearch.ts#L13">packages/cardano-services/src/StakePoolSearch/DbSyncStakePoolSearchProvider/DbSyncStakePoolSearch.ts:13</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/c7e9537/packages/cardano-services/src/StakePool/DbSyncStakePoolProvider/DbSyncStakePool.ts#L19">packages/cardano-services/src/StakePool/DbSyncStakePoolProvider/DbSyncStakePool.ts:19</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -140,7 +141,7 @@
 									<h5>logger: <span class="tsd-signature-type">Logger</span><span class="tsd-signature-symbol"> = ...</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="_cardano_sdk_cardano_services.DbSyncStakePoolSearchProvider.html" class="tsd-signature-type" data-tsd-kind="Class">DbSyncStakePoolSearchProvider</a></h4>
+							<h4 class="tsd-returns-title">Returns <a href="_cardano_sdk_cardano_services.DbSyncStakePoolProvider.html" class="tsd-signature-type" data-tsd-kind="Class">DbSyncStakePoolProvider</a></h4>
 						</li>
 					</ul>
 				</section>
@@ -150,10 +151,10 @@
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
 					<a name="_builder" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagPrivate">Private</span> #builder</h3>
-					<div class="tsd-signature tsd-kind-icon">#builder<span class="tsd-signature-symbol">:</span> <a href="_cardano_sdk_cardano_services.StakePoolSearchBuilder.html" class="tsd-signature-type" data-tsd-kind="Class">StakePoolSearchBuilder</a></div>
+					<div class="tsd-signature tsd-kind-icon">#builder<span class="tsd-signature-symbol">:</span> <a href="_cardano_sdk_cardano_services.StakePoolBuilder.html" class="tsd-signature-type" data-tsd-kind="Class">StakePoolBuilder</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1e8a9d7/packages/cardano-services/src/StakePoolSearch/DbSyncStakePoolSearchProvider/DbSyncStakePoolSearch.ts#L10">packages/cardano-services/src/StakePoolSearch/DbSyncStakePoolSearchProvider/DbSyncStakePoolSearch.ts:10</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/c7e9537/packages/cardano-services/src/StakePool/DbSyncStakePoolProvider/DbSyncStakePool.ts#L16">packages/cardano-services/src/StakePool/DbSyncStakePoolProvider/DbSyncStakePool.ts:16</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -163,7 +164,7 @@
 					<div class="tsd-signature tsd-kind-icon">#logger<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Logger</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1e8a9d7/packages/cardano-services/src/StakePoolSearch/DbSyncStakePoolSearchProvider/DbSyncStakePoolSearch.ts#L11">packages/cardano-services/src/StakePoolSearch/DbSyncStakePoolSearchProvider/DbSyncStakePoolSearch.ts:11</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/c7e9537/packages/cardano-services/src/StakePool/DbSyncStakePoolProvider/DbSyncStakePool.ts#L17">packages/cardano-services/src/StakePool/DbSyncStakePoolProvider/DbSyncStakePool.ts:17</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -174,7 +175,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from DbSyncProvider.db</p>
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1e8a9d7/packages/cardano-services/src/DbSyncProvider.ts#L7">packages/cardano-services/src/DbSyncProvider.ts:7</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/c7e9537/packages/cardano-services/src/DbSyncProvider.ts#L7">packages/cardano-services/src/DbSyncProvider.ts:7</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -192,7 +193,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from DbSyncProvider.healthCheck</p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1e8a9d7/packages/cardano-services/src/DbSyncProvider.ts#L13">packages/cardano-services/src/DbSyncProvider.ts:13</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/c7e9537/packages/cardano-services/src/DbSyncProvider.ts#L13">packages/cardano-services/src/DbSyncProvider.ts:13</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">HealthCheckResponse</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -208,9 +209,9 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Implementation of StakePoolSearchProvider.queryStakePools</p>
+								<p>Implementation of StakePoolProvider.queryStakePools</p>
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1e8a9d7/packages/cardano-services/src/StakePoolSearch/DbSyncStakePoolSearchProvider/DbSyncStakePoolSearch.ts#L19">packages/cardano-services/src/StakePoolSearch/DbSyncStakePoolSearchProvider/DbSyncStakePoolSearch.ts:19</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/c7e9537/packages/cardano-services/src/StakePool/DbSyncStakePoolProvider/DbSyncStakePool.ts#L25">packages/cardano-services/src/StakePool/DbSyncStakePoolProvider/DbSyncStakePool.ts:25</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -220,6 +221,24 @@
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">StakePoolSearchResults</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="stakePoolStats" class="tsd-anchor"></a>
+					<h3>stake<wbr>Pool<wbr>Stats</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">stake<wbr>Pool<wbr>Stats<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">StakePoolStats</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of StakePoolProvider.stakePoolStats</p>
+								<ul>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/c7e9537/packages/cardano-services/src/StakePool/DbSyncStakePoolProvider/DbSyncStakePool.ts#L70">packages/cardano-services/src/StakePool/DbSyncStakePoolProvider/DbSyncStakePool.ts:70</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">StakePoolStats</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -276,25 +295,28 @@
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-class tsd-parent-kind-module">
-						<a href="_cardano_sdk_cardano_services.DbSyncStakePoolSearchProvider.html" class="tsd-kind-icon">Db<wbr>Sync<wbr>Stake<wbr>Pool<wbr>Search<wbr>Provider</a>
+						<a href="_cardano_sdk_cardano_services.DbSyncStakePoolProvider.html" class="tsd-kind-icon">Db<wbr>Sync<wbr>Stake<wbr>Pool<wbr>Provider</a>
 						<ul>
 							<li class=" tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite">
-								<a href="_cardano_sdk_cardano_services.DbSyncStakePoolSearchProvider.html#constructor" class="tsd-kind-icon">constructor</a>
+								<a href="_cardano_sdk_cardano_services.DbSyncStakePoolProvider.html#constructor" class="tsd-kind-icon">constructor</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
-								<a href="_cardano_sdk_cardano_services.DbSyncStakePoolSearchProvider.html#_builder" class="tsd-kind-icon">#builder</a>
+								<a href="_cardano_sdk_cardano_services.DbSyncStakePoolProvider.html#_builder" class="tsd-kind-icon">#builder</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
-								<a href="_cardano_sdk_cardano_services.DbSyncStakePoolSearchProvider.html#_logger" class="tsd-kind-icon">#logger</a>
+								<a href="_cardano_sdk_cardano_services.DbSyncStakePoolProvider.html#_logger" class="tsd-kind-icon">#logger</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
-								<a href="_cardano_sdk_cardano_services.DbSyncStakePoolSearchProvider.html#db" class="tsd-kind-icon">db</a>
+								<a href="_cardano_sdk_cardano_services.DbSyncStakePoolProvider.html#db" class="tsd-kind-icon">db</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
-								<a href="_cardano_sdk_cardano_services.DbSyncStakePoolSearchProvider.html#healthCheck" class="tsd-kind-icon">health<wbr>Check</a>
+								<a href="_cardano_sdk_cardano_services.DbSyncStakePoolProvider.html#healthCheck" class="tsd-kind-icon">health<wbr>Check</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_cardano_sdk_cardano_services.DbSyncStakePoolSearchProvider.html#queryStakePools" class="tsd-kind-icon">query<wbr>Stake<wbr>Pools</a>
+								<a href="_cardano_sdk_cardano_services.DbSyncStakePoolProvider.html#queryStakePools" class="tsd-kind-icon">query<wbr>Stake<wbr>Pools</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_cardano_sdk_cardano_services.DbSyncStakePoolProvider.html#stakePoolStats" class="tsd-kind-icon">stake<wbr>Pool<wbr>Stats</a>
 							</li>
 						</ul>
 					</li>

@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>StakePoolSearchProviderStats | cardano-sdk</title>
+	<title>StakePoolProviderStats | cardano-sdk</title>
 	<meta name="description" content="Documentation for cardano-sdk">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -58,10 +58,10 @@
 					<a href="../modules/_cardano_sdk_wallet.html">@cardano-sdk/wallet</a>
 				</li>
 				<li>
-					<a href="_cardano_sdk_wallet.StakePoolSearchProviderStats.html">StakePoolSearchProviderStats</a>
+					<a href="_cardano_sdk_wallet.StakePoolProviderStats.html">StakePoolProviderStats</a>
 				</li>
 			</ul>
-			<h1>Class StakePoolSearchProviderStats</h1>
+			<h1>Class StakePoolProviderStats</h1>
 		</div>
 	</div>
 </header>
@@ -72,7 +72,7 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">StakePoolSearchProviderStats</span>
+						<span class="target">StakePoolProviderStats</span>
 					</li>
 				</ul>
 			</section>
@@ -83,20 +83,21 @@
 						<section class="tsd-index-section ">
 							<h3>Constructors</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="_cardano_sdk_wallet.StakePoolSearchProviderStats.html#constructor" class="tsd-kind-icon">constructor</a></li>
+								<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="_cardano_sdk_wallet.StakePoolProviderStats.html#constructor" class="tsd-kind-icon">constructor</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_cardano_sdk_wallet.StakePoolSearchProviderStats.html#queryStakePools_" class="tsd-kind-icon">query<wbr>Stake<wbr>Pools$</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_cardano_sdk_wallet.StakePoolProviderStats.html#queryStakePools_" class="tsd-kind-icon">query<wbr>Stake<wbr>Pools$</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_cardano_sdk_wallet.StakePoolProviderStats.html#stakePoolStats_" class="tsd-kind-icon">stake<wbr>Pool<wbr>Stats$</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_cardano_sdk_wallet.StakePoolSearchProviderStats.html#reset" class="tsd-kind-icon">reset</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_cardano_sdk_wallet.StakePoolSearchProviderStats.html#shutdown" class="tsd-kind-icon">shutdown</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_cardano_sdk_wallet.StakePoolProviderStats.html#reset" class="tsd-kind-icon">reset</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_cardano_sdk_wallet.StakePoolProviderStats.html#shutdown" class="tsd-kind-icon">shutdown</a></li>
 							</ul>
 						</section>
 					</div>
@@ -108,13 +109,13 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Stake<wbr>Pool<wbr>Search<wbr>Provider<wbr>Stats<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_wallet.StakePoolSearchProviderStats.html" class="tsd-signature-type" data-tsd-kind="Class">StakePoolSearchProviderStats</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Stake<wbr>Pool<wbr>Provider<wbr>Stats<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_wallet.StakePoolProviderStats.html" class="tsd-signature-type" data-tsd-kind="Class">StakePoolProviderStats</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 							</aside>
-							<h4 class="tsd-returns-title">Returns <a href="_cardano_sdk_wallet.StakePoolSearchProviderStats.html" class="tsd-signature-type" data-tsd-kind="Class">StakePoolSearchProviderStats</a></h4>
+							<h4 class="tsd-returns-title">Returns <a href="_cardano_sdk_wallet.StakePoolProviderStats.html" class="tsd-signature-type" data-tsd-kind="Class">StakePoolProviderStats</a></h4>
 						</li>
 					</ul>
 				</section>
@@ -127,7 +128,17 @@
 					<div class="tsd-signature tsd-kind-icon">query<wbr>Stake<wbr>Pools$<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">BehaviorSubject</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_cardano_sdk_wallet.ProviderFnStats.html" class="tsd-signature-type" data-tsd-kind="Interface">ProviderFnStats</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1e8a9d7/packages/wallet/src/services/ProviderTracker/TrackedStakePoolSearchProvider.ts#L6">packages/wallet/src/services/ProviderTracker/TrackedStakePoolSearchProvider.ts:6</a></li>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/c7e9537/packages/wallet/src/services/ProviderTracker/TrackedStakePoolProvider.ts#L6">packages/wallet/src/services/ProviderTracker/TrackedStakePoolProvider.ts:6</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="stakePoolStats_" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagReadonly">Readonly</span> stake<wbr>Pool<wbr>Stats$</h3>
+					<div class="tsd-signature tsd-kind-icon">stake<wbr>Pool<wbr>Stats$<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">BehaviorSubject</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_cardano_sdk_wallet.ProviderFnStats.html" class="tsd-signature-type" data-tsd-kind="Interface">ProviderFnStats</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/c7e9537/packages/wallet/src/services/ProviderTracker/TrackedStakePoolProvider.ts#L7">packages/wallet/src/services/ProviderTracker/TrackedStakePoolProvider.ts:7</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -144,7 +155,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1e8a9d7/packages/wallet/src/services/ProviderTracker/TrackedStakePoolSearchProvider.ts#L12">packages/wallet/src/services/ProviderTracker/TrackedStakePoolSearchProvider.ts:12</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/c7e9537/packages/wallet/src/services/ProviderTracker/TrackedStakePoolProvider.ts#L14">packages/wallet/src/services/ProviderTracker/TrackedStakePoolProvider.ts:14</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -161,7 +172,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1e8a9d7/packages/wallet/src/services/ProviderTracker/TrackedStakePoolSearchProvider.ts#L8">packages/wallet/src/services/ProviderTracker/TrackedStakePoolSearchProvider.ts:8</a></li>
+									<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/c7e9537/packages/wallet/src/services/ProviderTracker/TrackedStakePoolProvider.ts#L9">packages/wallet/src/services/ProviderTracker/TrackedStakePoolProvider.ts:9</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -230,19 +241,22 @@
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-class tsd-parent-kind-module">
-						<a href="_cardano_sdk_wallet.StakePoolSearchProviderStats.html" class="tsd-kind-icon">Stake<wbr>Pool<wbr>Search<wbr>Provider<wbr>Stats</a>
+						<a href="_cardano_sdk_wallet.StakePoolProviderStats.html" class="tsd-kind-icon">Stake<wbr>Pool<wbr>Provider<wbr>Stats</a>
 						<ul>
 							<li class=" tsd-kind-constructor tsd-parent-kind-class">
-								<a href="_cardano_sdk_wallet.StakePoolSearchProviderStats.html#constructor" class="tsd-kind-icon">constructor</a>
+								<a href="_cardano_sdk_wallet.StakePoolProviderStats.html#constructor" class="tsd-kind-icon">constructor</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
-								<a href="_cardano_sdk_wallet.StakePoolSearchProviderStats.html#queryStakePools_" class="tsd-kind-icon">query<wbr>Stake<wbr>Pools$</a>
+								<a href="_cardano_sdk_wallet.StakePoolProviderStats.html#queryStakePools_" class="tsd-kind-icon">query<wbr>Stake<wbr>Pools$</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_cardano_sdk_wallet.StakePoolProviderStats.html#stakePoolStats_" class="tsd-kind-icon">stake<wbr>Pool<wbr>Stats$</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_cardano_sdk_wallet.StakePoolSearchProviderStats.html#reset" class="tsd-kind-icon">reset</a>
+								<a href="_cardano_sdk_wallet.StakePoolProviderStats.html#reset" class="tsd-kind-icon">reset</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_cardano_sdk_wallet.StakePoolSearchProviderStats.html#shutdown" class="tsd-kind-icon">shutdown</a>
+								<a href="_cardano_sdk_wallet.StakePoolProviderStats.html#shutdown" class="tsd-kind-icon">shutdown</a>
 							</li>
 						</ul>
 					</li>

@@ -3,15 +3,15 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for src/StakePoolSearch/DbSyncStakePoolSearchProvider/DbSyncStakePoolSearch.ts</title>
+    <title>Code coverage report for src/StakePool/StakePoolHttpService.ts</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="../../../prettify.css" />
-    <link rel="stylesheet" href="../../../base.css" />
-    <link rel="shortcut icon" type="image/x-icon" href="../../../favicon.png" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style type='text/css'>
         .coverage-summary .sorter {
-            background-image: url(../../../sort-arrow-sprite.png);
+            background-image: url(../../sort-arrow-sprite.png);
         }
     </style>
 </head>
@@ -19,34 +19,34 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../../index.html">All files</a> / <a href="index.html">src/StakePoolSearch/DbSyncStakePoolSearchProvider</a> DbSyncStakePoolSearch.ts</h1>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">src/StakePool</a> StakePoolHttpService.ts</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>22/22</span>
+                <span class='fraction'>16/16</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">50% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>3/3</span>
+                <span class='fraction'>1/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>4/4</span>
+                <span class='fraction'>3/3</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>20/20</span>
+                <span class='fraction'>16/16</span>
             </div>
         
             
@@ -115,46 +115,33 @@
 <a name='L50'></a><a href='#L50'>50</a>
 <a name='L51'></a><a href='#L51'>51</a>
 <a name='L52'></a><a href='#L52'>52</a>
-<a name='L53'></a><a href='#L53'>53</a>
-<a name='L54'></a><a href='#L54'>54</a>
-<a name='L55'></a><a href='#L55'>55</a>
-<a name='L56'></a><a href='#L56'>56</a>
-<a name='L57'></a><a href='#L57'>57</a>
-<a name='L58'></a><a href='#L58'>58</a>
-<a name='L59'></a><a href='#L59'>59</a>
-<a name='L60'></a><a href='#L60'>60</a>
-<a name='L61'></a><a href='#L61'>61</a>
-<a name='L62'></a><a href='#L62'>62</a>
-<a name='L63'></a><a href='#L63'>63</a>
-<a name='L64'></a><a href='#L64'>64</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">12x</span>
-<span class="cline-any cline-yes">12x</span>
+<a name='L53'></a><a href='#L53'>53</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">12x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">62x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">62x</span>
-<span class="cline-any cline-yes">62x</span>
-<span class="cline-any cline-yes">290x</span>
-<span class="cline-any cline-yes">62x</span>
-<span class="cline-any cline-yes">290x</span>
-<span class="cline-any cline-yes">62x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -163,93 +150,73 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">62x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">62x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/* eslint-disable sonarjs/no-nested-template-literals */
-import { DbSyncProvider } from '../../DbSyncProvider';
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import * as OpenApiValidator from 'express-openapi-validator';
+import { DbSyncStakePoolProvider } from './DbSyncStakePoolProvider';
+import { HttpService } from '../Http';
 import { Logger, dummyLogger } from 'ts-log';
-import { Pool } from 'pg';
-import { StakePoolQueryOptions, StakePoolSearchProvider, StakePoolSearchResults, util } from '@cardano-sdk/core';
-import { StakePoolSearchBuilder } from './StakePoolSearchBuilder';
-import { toCoreStakePool } from './mappers';
+import { ServiceNames } from '../Program';
+import { providerHandler } from '../util';
+import express from 'express';
+import path from 'path';
 &nbsp;
-export class DbSyncStakePoolSearchProvider extends DbSyncProvider implements StakePoolSearchProvider {
-  #builder: StakePoolSearchBuilder;
-  #logger: Logger;
+export interface StakePoolServiceDependencies {
+  logger?: Logger;
+  stakePoolProvider: DbSyncStakePoolProvider;
+}
 &nbsp;
-  constructor(db: Pool, logger = dummyLogger) {
-    super(db);
-    this.#builder = new StakePoolSearchBuilder(db, logger);
-    this.#logger = logger;
+export class StakePoolHttpService extends HttpService {
+  private constructor({ logger = <span class="branch-0 cbranch-no" title="branch not covered" >dummyLogger </span>}: StakePoolServiceDependencies, router: express.Router) {
+    super(ServiceNames.StakePool, router, logger);
   }
 &nbsp;
-  public async queryStakePools(options?: StakePoolQueryOptions): Promise&lt;StakePoolSearchResults&gt; {
-    const { params, query } =
-      options?.filters?._condition === 'or'
-        ? this.#builder.buildOrQuery(options?.filters)
-        : this.#builder.buildAndQuery(options?.filters);
-    this.#logger.debug('About to query pool hashes');
-    const poolUpdates = await this.#builder.queryPoolHashes(query, params);
-    const hashesIds = poolUpdates.map(({ id }) =&gt; id);
-    this.#logger.debug(`${hashesIds.length} pools found`);
-    const updatesIds = poolUpdates.map(({ updateId }) =&gt; updateId);
-    const totalAdaAmount = await this.#builder.getTotalAmountOfAda();
-    const [
-      poolDatas,
-      poolRelays,
-      poolOwners,
-      poolRegistrations,
-      poolRetirements,
-      poolRewards,
-      lastEpoch,
-      poolMetrics,
-      totalCount
-    ] = await Promise.all([
-      this.#builder.queryPoolData(updatesIds, options),
-      this.#builder.queryPoolRelays(updatesIds),
-      this.#builder.queryPoolOwners(updatesIds),
-      this.#builder.queryRegistrations(hashesIds),
-      this.#builder.queryRetirements(hashesIds),
-      this.#builder.queryPoolRewards(hashesIds, options?.rewardsHistoryLimit),
-      this.#builder.getLastEpoch(),
-      this.#builder.queryPoolMetrics(hashesIds, totalAdaAmount),
-      this.#builder.queryTotalCount(query, params)
-    ]);
-    return toCoreStakePool({
-      lastEpoch,
-      poolDatas,
-      poolMetrics,
-      poolOwners,
-      poolRegistrations,
-      poolRelays,
-      poolRetirements,
-      poolRewards: poolRewards.filter(util.isNotNil),
-      totalCount
-    });
+  async healthCheck() {
+    return Promise.resolve({ ok: true });
+  }
+&nbsp;
+  static create({ logger = dummyLogger, stakePoolProvider }: StakePoolServiceDependencies) {
+    const router = express.Router();
+    const apiSpec = path.join(__dirname, 'openApi.json');
+    router.use(
+      OpenApiValidator.middleware({
+        apiSpec,
+        ignoreUndocumented: true, // otherwhise /metrics endpoint should be included in spec
+        validateRequests: true,
+        validateResponses: true
+      })
+    );
+    // Add initial healthCheck of the provider when implemented
+    router.post(
+      '/search',
+      providerHandler(stakePoolProvider.queryStakePools.bind(stakePoolProvider))(
+        HttpService.routeHandler(logger),
+        logger
+      )
+    );
+    router.post(
+      '/stats',
+      providerHandler(stakePoolProvider.stakePoolStats.bind(stakePoolProvider))(
+        HttpService.routeHandler(logger),
+        logger
+      )
+    );
+    return new StakePoolHttpService({ logger, stakePoolProvider }, router);
   }
 }
 &nbsp;</pre></td></tr></table></pre>
@@ -259,16 +226,16 @@ export class DbSyncStakePoolSearchProvider extends DbSyncProvider implements Sta
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at Tue May 31 2022 06:07:22 GMT+0000 (Coordinated Universal Time)
+                at Tue May 31 2022 06:48:57 GMT+0000 (Coordinated Universal Time)
             </div>
-        <script src="../../../prettify.js"></script>
+        <script src="../../prettify.js"></script>
         <script>
             window.onload = function () {
                 prettyPrint();
             };
         </script>
-        <script src="../../../sorter.js"></script>
-        <script src="../../../block-navigation.js"></script>
+        <script src="../../sorter.js"></script>
+        <script src="../../block-navigation.js"></script>
     </body>
 </html>
     
