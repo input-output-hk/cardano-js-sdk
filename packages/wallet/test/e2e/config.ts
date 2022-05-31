@@ -5,6 +5,7 @@ import {
   blockfrostAssetProvider,
   blockfrostNetworkInfoProvider,
   blockfrostTxSubmitProvider,
+  blockfrostUtxoProvider,
   blockfrostWalletProvider
 } from '@cardano-sdk/blockfrost';
 import { Cardano } from '@cardano-sdk/core';
@@ -26,6 +27,7 @@ const networkIdOptions = [0, 1];
 const stakePoolProviderOptions = ['stub'];
 const networkInfoProviderOptions = ['blockfrost'];
 const txSubmitProviderOptions = ['blockfrost', 'ogmios', 'http'];
+const utxoProviderOptions = ['blockfrost'];
 const walletProviderOptions = ['blockfrost'];
 const assetProviderOptions = ['blockfrost'];
 const keyAgentOptions = ['InMemory', 'Ledger'];
@@ -48,6 +50,7 @@ const env = envalid.cleanEnv(process.env, {
   STAKE_POOL_PROVIDER: envalid.str({ choices: stakePoolProviderOptions }),
   TX_SUBMIT_HTTP_URL: envalid.url(),
   TX_SUBMIT_PROVIDER: envalid.str({ choices: txSubmitProviderOptions }),
+  UTXO_PROVIDER: envalid.str({ choices: utxoProviderOptions }),
   WALLET_PASSWORD: envalid.str(),
   WALLET_PROVIDER: envalid.str({ choices: walletProviderOptions })
 });
@@ -174,6 +177,13 @@ export const networkInfoProvider = (async () => {
     return blockfrostNetworkInfoProvider(await blockfrostApi!);
   }
   throw new Error(`NETWORK_INFO_PROVIDER unsupported: ${env.NETWORK_INFO_PROVIDER}`);
+})();
+
+export const utxoProvider = (async () => {
+  if (env.UTXO_PROVIDER === 'blockfrost') {
+    return blockfrostUtxoProvider(await blockfrostApi!);
+  }
+  throw new Error(`UTXO_PROVIDER unsupported: ${env.UTXO_PROVIDER}`);
 })();
 
 export const poolId1 = Cardano.PoolId(env.POOL_ID_1);

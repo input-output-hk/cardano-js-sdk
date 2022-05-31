@@ -6,6 +6,7 @@ import {
   networkInfoProvider,
   stakePoolProvider,
   txSubmitProvider,
+  utxoProvider,
   walletProvider
 } from '../config';
 import { filter, firstValueFrom } from 'rxjs';
@@ -30,6 +31,7 @@ describe('SingleAddressWallet/pouchdbWalletStores', () => {
         stakePoolProvider,
         stores,
         txSubmitProvider: await txSubmitProvider,
+        utxoProvider: await utxoProvider,
         walletProvider: await walletProvider
       }
     );
