@@ -39,6 +39,7 @@ describe('TrezorKeyAgent+SingleAddressWallet', () => {
   test('creating and restoring TrezorKeyAgent wallet', async () => {
     const freshKeyAgent = await TrezorKeyAgent.createWithDevice({
       networkId: Cardano.NetworkId.testnet,
+      protocolMagic: 1_097_911_063,
       trezorConfig: {
         communicationType: CommunicationType.Node,
         manifest: {

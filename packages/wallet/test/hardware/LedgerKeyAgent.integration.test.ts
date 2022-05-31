@@ -39,7 +39,8 @@ describe('LedgerKeyAgent+SingleAddressWallet', () => {
   test('creating and restoring LedgerKeyAgent wallet', async () => {
     const freshKeyAgent = await LedgerKeyAgent.createWithDevice({
       communicationType: CommunicationType.Node,
-      networkId: Cardano.NetworkId.testnet
+      networkId: Cardano.NetworkId.testnet,
+      protocolMagic: 1_097_911_063
     });
     const freshWallet = createWallet(freshKeyAgent);
     const restoredKeyAgent = await restoreKeyAgent(freshKeyAgent.serializableData);

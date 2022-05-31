@@ -92,11 +92,13 @@ export interface SerializableInMemoryKeyAgentData extends SerializableKeyAgentDa
 export interface SerializableLedgerKeyAgentData extends SerializableKeyAgentDataBase {
   __typename: KeyAgentType.Ledger;
   communicationType: CommunicationType;
+  protocolMagic: Cardano.NetworkMagic;
 }
 
 export interface SerializableTrezorKeyAgentData extends SerializableKeyAgentDataBase {
   __typename: KeyAgentType.Trezor;
   trezorConfig: TrezorConfig;
+  protocolMagic: Cardano.NetworkMagic;
 }
 
 export type SerializableKeyAgentData =
@@ -122,10 +124,6 @@ export interface SignTransactionOptions {
   additionalKeyPaths?: AccountKeyDerivationPath[];
 }
 
-export interface SignHardwareTransactionOptions extends SignTransactionOptions {
-  protocolMagic: Cardano.NetworkMagic;
-}
-
 export interface KeyAgent {
   get networkId(): Cardano.NetworkId;
   get accountIndex(): number;
@@ -139,10 +137,7 @@ export interface KeyAgent {
   /**
    * @throws AuthenticationError
    */
-  signTransaction(
-    txInternals: TxInternals,
-    options: SignTransactionOptions | SignHardwareTransactionOptions
-  ): Promise<Cardano.Signatures>;
+  signTransaction(txInternals: TxInternals, options: SignTransactionOptions): Promise<Cardano.Signatures>;
   /**
    * @throws AuthenticationError
    */

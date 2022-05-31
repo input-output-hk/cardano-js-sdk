@@ -12,7 +12,6 @@ import {
 } from './types';
 import { KeyAgentBase } from './KeyAgentBase';
 import { TxInternals } from '../Transaction';
-import { txToLedger } from './util';
 import LedgerConnection, { GetVersionResponse, utils } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents';
 import TransportWebHID from '@ledgerhq/hw-transport-webhid';
@@ -24,6 +23,7 @@ export interface LedgerKeyAgentProps extends Omit<SerializableLedgerKeyAgentData
 
 export interface CreateLedgerKeyAgentProps {
   networkId: Cardano.NetworkId;
+  protocolMagic: Cardano.NetworkMagic;
   accountIndex?: number;
   communicationType: CommunicationType;
   deviceConnection?: LedgerConnection | null;
@@ -47,11 +47,13 @@ const transportTypedError = (error?: any) =>
 export class LedgerKeyAgent extends KeyAgentBase {
   readonly deviceConnection?: LedgerConnection;
   readonly #communicationType: CommunicationType;
+  readonly #protocolMagic: Cardano.NetworkMagic;
 
   constructor({ deviceConnection, ...serializableData }: LedgerKeyAgentProps) {
     super({ ...serializableData, __typename: KeyAgentType.Ledger });
     this.deviceConnection = deviceConnection;
     this.#communicationType = serializableData.communicationType;
+    this.#protocolMagic = serializableData.protocolMagic;
   }
 
   /**
@@ -196,6 +198,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
    */
   static async createWithDevice({
     networkId,
+    protocolMagic,
     accountIndex = 0,
     communicationType,
     deviceConnection
@@ -217,7 +220,8 @@ export class LedgerKeyAgent extends KeyAgentBase {
       deviceConnection: activeDeviceConnection,
       extendedAccountPublicKey,
       knownAddresses: [],
-      networkId
+      networkId,
+      protocolMagic
     });
   }
 
@@ -233,7 +237,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
         inputAddressResolver,
         knownAddresses: this.knownAddresses,
         networkId: this.networkId,
-        protocolMagic
+        protocolMagic: this.#protocolMagic
       });
       const deviceConnection = await LedgerKeyAgent.checkDeviceConnection(
         this.#communicationType,

@@ -15,7 +15,8 @@ describe('LedgerKeyAgent', () => {
   beforeAll(async () => {
     keyAgent = await KeyManagement.LedgerKeyAgent.createWithDevice({
       communicationType: CommunicationType.Node,
-      networkId: Cardano.NetworkId.testnet
+      networkId: Cardano.NetworkId.testnet,
+      protocolMagic: 1_097_911_063
     });
     txSubmitProvider = mocks.mockTxSubmitProvider();
     walletProvider = mocks.mockWalletProvider();
@@ -110,8 +111,7 @@ describe('LedgerKeyAgent', () => {
         hash: txInternals.hash
       },
       {
-        inputAddressResolver: wallet.util.resolveInputAddress,
-        protocolMagic: 1_097_911_063
+        inputAddressResolver: wallet.util.resolveInputAddress
       }
     );
     expect(signatures.size).toBe(1);
@@ -177,6 +177,7 @@ describe('LedgerKeyAgent', () => {
       expect(Array.isArray(serializableData.knownAddresses)).toBe(true);
       expect(typeof serializableData.extendedAccountPublicKey).toBe('string');
       expect(typeof serializableData.communicationType).toBe('string');
+      expect(typeof serializableData.protocolMagic).toBe('number');
     });
 
     it('is serializable', () => {

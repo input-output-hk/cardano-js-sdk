@@ -77,7 +77,8 @@ describe('KeyManagement/restoreKeyAgent', () => {
           type: KeyManagement.AddressType.External
         }
       ],
-      networkId: 0
+      networkId: 0,
+      protocolMagic: 1_097_911_063
     };
 
     it('can restore key manager from valid data', async () => {
@@ -107,6 +108,7 @@ describe('KeyManagement/restoreKeyAgent', () => {
         }
       ],
       networkId: 0,
+      protocolMagic: 1_097_911_063,
       trezorConfig: {
         communicationType: KeyManagement.CommunicationType.Node,
         manifest: {

@@ -6,7 +6,6 @@ import {
   KeyRole,
   SerializableKeyAgentData,
   SignBlobResult,
-  SignHardwareTransactionOptions,
   SignTransactionOptions
 } from './types';
 import { CSL, Cardano, util } from '@cardano-sdk/core';
@@ -38,7 +37,7 @@ export abstract class KeyAgentBase implements KeyAgent {
   abstract exportRootPrivateKey(): Promise<Cardano.Bip32PrivateKey>;
   abstract signTransaction(
     txInternals: TxInternals,
-    signTransactionOptions: SignTransactionOptions | SignHardwareTransactionOptions
+    signTransactionOptions: SignTransactionOptions
   ): Promise<Cardano.Signatures>;
 
   constructor(serializableData: SerializableKeyAgentData) {

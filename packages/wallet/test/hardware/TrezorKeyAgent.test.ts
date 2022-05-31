@@ -20,6 +20,7 @@ describe('TrezorKeyAgent', () => {
   beforeAll(async () => {
     keyAgent = await KeyManagement.TrezorKeyAgent.createWithDevice({
       networkId: Cardano.NetworkId.testnet,
+      protocolMagic: 1_097_911_063,
       trezorConfig
     });
     const groupedAddress: KeyManagement.GroupedAddress = {
@@ -57,6 +58,7 @@ describe('TrezorKeyAgent', () => {
     const trezorKeyAgentWithRandomIndex = await KeyManagement.TrezorKeyAgent.createWithDevice({
       accountIndex: 5,
       networkId: Cardano.NetworkId.testnet,
+      protocolMagic: 1_097_911_063,
       trezorConfig
     });
     expect(trezorKeyAgentWithRandomIndex).toBeInstanceOf(KeyManagement.TrezorKeyAgent);
@@ -112,8 +114,7 @@ describe('TrezorKeyAgent', () => {
         hash: txInternals.hash
       },
       {
-        inputAddressResolver: wallet.util.resolveInputAddress,
-        protocolMagic: 1_097_911_063
+        inputAddressResolver: wallet.util.resolveInputAddress
       }
     );
     expect(signatures.size).toBe(1);
@@ -132,6 +133,7 @@ describe('TrezorKeyAgent', () => {
       expect(typeof serializableData.networkId).toBe('number');
       expect(typeof serializableData.extendedAccountPublicKey).toBe('string');
       expect(Array.isArray(serializableData.knownAddresses)).toBe(true);
+      expect(typeof serializableData.protocolMagic).toBe('number');
     });
 
     it('is serializable', () => {

@@ -4,7 +4,7 @@
 import * as ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import * as trezor from 'trezor-connect';
 import { BIP32Path, GroupedAddress, ResolveInputAddress } from '../types';
-import { CSL, Cardano, cslToCore, util } from '@cardano-sdk/core';
+import { CSL, Cardano, cslToCore } from '@cardano-sdk/core';
 import { CardanoKeyConst, harden } from '../util';
 import { HwMappingError } from '../errors';
 import { concat, uniq } from 'lodash-es';
@@ -982,7 +982,7 @@ export const txToTrezor = async ({
   const cslMint = cslTxBody.multiassets();
   let trezorMintBundle = null;
   if (cslMint) {
-    const paymentKeyPaths = uniq(trezorInputs.map((trezorInput) => trezorInput.path).filter(util.isNotNil));
+    const paymentKeyPaths = uniq(trezorInputs.map((trezorInput) => trezorInput.path).filter(isNotNil));
     trezorMintBundle = prepareTrezorMintBundle(cslMint, paymentKeyPaths, rewardAccountKeyPath);
   }
 

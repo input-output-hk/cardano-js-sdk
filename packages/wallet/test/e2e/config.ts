@@ -137,7 +137,8 @@ export const keyAgentByIdx = memoize(async (accountIndex: number) =>
             accountIndex,
             communicationType: CommunicationType.Node,
             deviceConnection,
-            networkId
+            networkId,
+            protocolMagic: 1_097_911_063
           });
           deviceConnection = ledgerKeyAgent.deviceConnection;
           return ledgerKeyAgent;
@@ -146,6 +147,7 @@ export const keyAgentByIdx = memoize(async (accountIndex: number) =>
           return await TrezorKeyAgent.createWithDevice({
             accountIndex,
             networkId,
+            protocolMagic: 1_097_911_063,
             trezorConfig: {
               communicationType: CommunicationType.Node,
               manifest: {
@@ -153,8 +155,8 @@ export const keyAgentByIdx = memoize(async (accountIndex: number) =>
                 email: 'email@developer.com'
               }
             }
-         });
-	}
+          });
+        }
         case 'InMemory': {
           const mnemonicWords = (process.env.MNEMONIC_WORDS || '').split(' ');
           if (mnemonicWords.length === 0) throw new Error('MNEMONIC_WORDS not set');
