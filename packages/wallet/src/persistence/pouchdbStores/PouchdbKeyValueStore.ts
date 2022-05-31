@@ -27,7 +27,7 @@ export class PouchdbKeyValueStore<K extends string | Cardano.util.OpaqueString<a
   setAll(docs: KeyValueCollection<K, V>[]): Observable<void> {
     if (this.destroyed) return EMPTY;
     return from(
-      (async (): Promise<void> => {
+      (this.idle = this.idle.then(async (): Promise<void> => {
         try {
           await this.clearDB();
           await this.db.bulkDocs(
@@ -39,7 +39,7 @@ export class PouchdbKeyValueStore<K extends string | Cardano.util.OpaqueString<a
         } catch (error) {
           this.logger.error(`PouchdbDocumentStore(${this.dbName}): failed to setAll`, docs, error);
         }
-      })()
+      }))
     );
   }
 
