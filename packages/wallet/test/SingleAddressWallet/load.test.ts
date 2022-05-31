@@ -1,7 +1,7 @@
 /* eslint-disable max-statements */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as mocks from '../mocks';
-import { AssetId, createStubStakePoolSearchProvider, somePartialStakePools } from '@cardano-sdk/util-dev';
+import { AssetId, createStubStakePoolProvider, somePartialStakePools } from '@cardano-sdk/util-dev';
 import { Cardano, UtxoProvider, WalletProvider, testnetTimeSettings } from '@cardano-sdk/core';
 import { KeyManagement, ObservableWallet, SingleAddressWallet } from '../../src';
 import { WalletStores, createInMemoryWalletStores } from '../../src/persistence';
@@ -33,7 +33,7 @@ const createWallet = async (stores: WalletStores, walletProvider: WalletProvider
   keyAgent.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
   const txSubmitProvider = mocks.mockTxSubmitProvider();
   const assetProvider = mocks.mockAssetProvider();
-  const stakePoolSearchProvider = createStubStakePoolSearchProvider();
+  const stakePoolProvider = createStubStakePoolProvider();
   const networkInfoProvider = mockNetworkInfoProvider();
   return new SingleAddressWallet(
     { name },
@@ -41,7 +41,7 @@ const createWallet = async (stores: WalletStores, walletProvider: WalletProvider
       assetProvider,
       keyAgent,
       networkInfoProvider,
-      stakePoolSearchProvider,
+      stakePoolProvider,
       stores,
       txSubmitProvider,
       utxoProvider,

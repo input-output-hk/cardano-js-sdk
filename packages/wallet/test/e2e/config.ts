@@ -14,7 +14,7 @@ import { Logger } from 'ts-log';
 import { URL } from 'url';
 import { createAsyncKeyAgent } from '../../src/KeyManagement/util';
 import { createConnectionObject } from '@cardano-ogmios/client';
-import { createStubStakePoolSearchProvider } from '@cardano-sdk/util-dev';
+import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { memoize } from 'lodash-es';
 import { ogmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
 import { txSubmitHttpProvider } from '@cardano-sdk/cardano-services-client';
@@ -23,7 +23,7 @@ import waitOn from 'wait-on';
 
 const loggerMethodNames = ['debug', 'error', 'fatal', 'info', 'trace', 'warn'] as (keyof Logger)[];
 const networkIdOptions = [0, 1];
-const stakePoolSearchProviderOptions = ['stub'];
+const stakePoolProviderOptions = ['stub'];
 const networkInfoProviderOptions = ['blockfrost'];
 const txSubmitProviderOptions = ['blockfrost', 'ogmios', 'http'];
 const walletProviderOptions = ['blockfrost'];
@@ -45,7 +45,7 @@ const env = envalid.cleanEnv(process.env, {
   OGMIOS_URL: envalid.url(),
   POOL_ID_1: envalid.str(),
   POOL_ID_2: envalid.str(),
-  STAKE_POOL_SEARCH_PROVIDER: envalid.str({ choices: stakePoolSearchProviderOptions }),
+  STAKE_POOL_PROVIDER: envalid.str({ choices: stakePoolProviderOptions }),
   TX_SUBMIT_HTTP_URL: envalid.url(),
   TX_SUBMIT_PROVIDER: envalid.str({ choices: txSubmitProviderOptions }),
   WALLET_PASSWORD: envalid.str(),
@@ -162,11 +162,11 @@ export const keyAgentByIdx = memoize(async (accountIndex: number) =>
 
 export const keyAgentReady = (() => keyAgentByIdx(0))();
 
-export const stakePoolSearchProvider = (() => {
-  if (env.STAKE_POOL_SEARCH_PROVIDER === 'stub') {
-    return createStubStakePoolSearchProvider();
+export const stakePoolProvider = (() => {
+  if (env.STAKE_POOL_PROVIDER === 'stub') {
+    return createStubStakePoolProvider();
   }
-  throw new Error(`STAKE_POOL_SEARCH_PROVIDER unsupported: ${env.STAKE_POOL_SEARCH_PROVIDER}`);
+  throw new Error(`STAKE_POOL_PROVIDER unsupported: ${env.STAKE_POOL_PROVIDER}`);
 })();
 
 export const networkInfoProvider = (async () => {

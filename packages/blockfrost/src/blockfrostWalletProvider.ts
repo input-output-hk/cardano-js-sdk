@@ -50,28 +50,6 @@ export const blockfrostWalletProvider = (blockfrost: BlockFrostAPI, logger = dum
     return BlockfrostToCore.blockToTip(block);
   };
 
-  const stakePoolStats: WalletProvider['stakePoolStats'] = async () => {
-    const tallyPools = async (
-      query: 'pools' | 'poolsRetired' | 'poolsRetiring',
-      count = 0,
-      page = 1
-    ): Promise<number> => {
-      const result = await blockfrost[query]({ page });
-      const newCount = count + result.length;
-      if (result.length === 100) {
-        return tallyPools(query, newCount, page + 1);
-      }
-      return newCount;
-    };
-    return {
-      qty: {
-        active: await tallyPools('pools'),
-        retired: await tallyPools('poolsRetired'),
-        retiring: await tallyPools('poolsRetiring')
-      }
-    };
-  };
-
   const rewards: WalletProvider['rewardAccountBalance'] = async (rewardAccount: Cardano.RewardAccount) => {
     try {
       const accountResponse = await blockfrost.accounts(rewardAccount.toString());
@@ -395,7 +373,6 @@ export const blockfrostWalletProvider = (blockfrost: BlockFrostAPI, logger = dum
     ledgerTip,
     rewardAccountBalance: rewards,
     rewardsHistory,
-    stakePoolStats,
     transactionsByAddresses,
     transactionsByHashes
   };

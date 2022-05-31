@@ -2,13 +2,10 @@
 /* eslint-disable max-len */
 
 import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
-import { Cardano, StakePoolStats, WalletProvider } from '@cardano-sdk/core';
+import { Cardano, WalletProvider } from '@cardano-sdk/core';
 import { blockfrostWalletProvider } from '../src';
 
 jest.mock('@blockfrost/blockfrost-js');
-
-const generatePoolsResponseMock = (qty: number) =>
-  [...Array.from({ length: qty }).keys()].map((num) => String(Math.random() * num)) as Responses['pool_list'];
 
 const blockResponse = {
   block_vrf: 'vrf_vk19j362pkr4t9y0m3qxgmrv0365vd7c4ze03ny4jh84q8agjy4ep4s99zvg8',
@@ -30,40 +27,6 @@ const blockResponse = {
 
 describe('blockfrostWalletProvider', () => {
   const apiKey = 'someapikey';
-
-  test('stakePoolStats', async () => {
-    // Simulate batch fetching
-    BlockFrostAPI.prototype.pools = jest
-      .fn()
-      .mockReturnValueOnce(generatePoolsResponseMock(100))
-      .mockReturnValueOnce(generatePoolsResponseMock(100))
-      .mockReturnValueOnce(generatePoolsResponseMock(100))
-      .mockReturnValueOnce(generatePoolsResponseMock(100))
-      .mockReturnValueOnce(generatePoolsResponseMock(89));
-
-    BlockFrostAPI.prototype.poolsRetired = jest
-      .fn()
-      .mockReturnValueOnce(generatePoolsResponseMock(100))
-      .mockReturnValueOnce(generatePoolsResponseMock(100))
-      .mockReturnValueOnce(generatePoolsResponseMock(36));
-
-    BlockFrostAPI.prototype.poolsRetiring = jest
-      .fn()
-      .mockReturnValueOnce(generatePoolsResponseMock(100))
-      .mockReturnValueOnce(generatePoolsResponseMock(77));
-
-    const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
-    const client = blockfrostWalletProvider(blockfrost);
-    const response = await client.stakePoolStats!();
-
-    expect(response).toMatchObject<StakePoolStats>({
-      qty: {
-        active: 489,
-        retired: 236,
-        retiring: 177
-      }
-    });
-  });
 
   describe('rewardAccountBalance', () => {
     test('used reward account', async () => {

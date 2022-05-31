@@ -4,7 +4,7 @@ import {
   assetProvider,
   keyAgentReady,
   networkInfoProvider,
-  stakePoolSearchProvider,
+  stakePoolProvider,
   txSubmitProvider,
   walletProvider
 } from '../config';
@@ -27,7 +27,7 @@ describe('SingleAddressWallet/pouchdbWalletStores', () => {
         assetProvider: await assetProvider,
         keyAgent: await keyAgentReady,
         networkInfoProvider: await networkInfoProvider,
-        stakePoolSearchProvider,
+        stakePoolProvider,
         stores,
         txSubmitProvider: await txSubmitProvider,
         walletProvider: await walletProvider

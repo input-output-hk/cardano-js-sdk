@@ -2,7 +2,7 @@
 /* eslint-disable sonarjs/cognitive-complexity */
 import { ChainHistoryHttpService, DbSyncChainHistoryProvider } from '../ChainHistory';
 import { CommonProgramOptions } from '../ProgramsCommon';
-import { DbSyncStakePoolSearchProvider, StakePoolSearchHttpService } from '../StakePoolSearch';
+import { DbSyncStakePoolProvider, StakePoolHttpService } from '../StakePool';
 import { DbSyncUtxoProvider, UtxoHttpService } from '../Utxo';
 import { HttpServer, HttpServerConfig, HttpService } from '../Http';
 import { MissingProgramOption, UnknownServiceName } from './errors';
@@ -22,12 +22,7 @@ export interface HttpServerOptions extends CommonProgramOptions {
 
 export interface ProgramArgs {
   apiUrl: URL;
-  serviceNames: (
-    | ServiceNames.StakePoolSearch
-    | ServiceNames.TxSubmit
-    | ServiceNames.ChainHistory
-    | ServiceNames.Utxo
-  )[];
+  serviceNames: (ServiceNames.StakePool | ServiceNames.TxSubmit | ServiceNames.ChainHistory | ServiceNames.Utxo)[];
   options?: HttpServerOptions;
 }
 
@@ -44,12 +39,12 @@ export const loadHttpServer = async (args: ProgramArgs): Promise<HttpServer> => 
 
   for (const serviceName of args.serviceNames) {
     switch (serviceName) {
-      case ServiceNames.StakePoolSearch:
-        if (!db) throw new MissingProgramOption(ServiceNames.StakePoolSearch, ProgramOptionDescriptions.DbConnection);
+      case ServiceNames.StakePool:
+        if (!db) throw new MissingProgramOption(ServiceNames.StakePool, ProgramOptionDescriptions.DbConnection);
         services.push(
-          StakePoolSearchHttpService.create({
+          StakePoolHttpService.create({
             logger,
-            stakePoolSearchProvider: new DbSyncStakePoolSearchProvider(db, logger)
+            stakePoolProvider: new DbSyncStakePoolProvider(db, logger)
           })
         );
         break;

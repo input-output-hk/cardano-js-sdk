@@ -9,9 +9,7 @@ import {
   protocolParameters,
   queryTransactionsResult,
   rewardAccount,
-  rewardAccountBalance,
-  stakePoolStats,
-  utxo
+  rewardAccountBalance
 } from './mockWalletProvider';
 import delay from 'delay';
 
@@ -53,15 +51,6 @@ rewardsHistory2.set(rewardAccount, [
   ...epochRewards
 ]);
 
-export const stakePoolStats2 = {
-  ...stakePoolStats,
-  qty: {
-    ...stakePoolStats.qty,
-    active: stakePoolStats.qty.active + 1
-  }
-};
-
-export const utxo2 = utxo.slice(1);
 export const delegate2 = 'pool167u07rzwu6dr40hx2pr4vh592vxp4zen9ct2p3h84wzqzv6fkgv';
 export const rewardAccountBalance2 = rewardAccountBalance + 1n;
 export const delegationAndRewards2 = { delegate: delegate2, rewards: rewardAccountBalance2 };
@@ -82,9 +71,7 @@ export const mockWalletProvider2 = (delayMs: number) => {
     ledgerTip: delayedJestFn(ledgerTip2),
     rewardAccountBalance: delayedJestFn(rewardAccountBalance2),
     rewardsHistory: delayedJestFn(rewardsHistory2),
-    stakePoolStats: delayedJestFn(stakePoolStats2),
     transactionsByAddresses: delayedJestFn(queryTransactionsResult2),
-    transactionsByHashes: delayedJestFn(queryTransactionsResult2),
-    utxoByAddresses: delayedJestFn(utxo2)
+    transactionsByHashes: delayedJestFn(queryTransactionsResult2)
   };
 };

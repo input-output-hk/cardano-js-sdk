@@ -19,7 +19,7 @@ import { Milliseconds } from '../types';
 import { ProviderFnStats } from './ProviderTracker';
 import { TrackedAssetProvider } from './TrackedAssetProvider';
 import { TrackedNetworkInfoProvider } from './TrackedNetworkInfoProvider';
-import { TrackedStakePoolSearchProvider } from './TrackedStakePoolSearchProvider';
+import { TrackedStakePoolProvider } from './TrackedStakePoolProvider';
 import { TrackedTxSubmitProvider } from './TrackedTxSubmitProvider';
 import { TrackedUtxoProvider } from './TrackedUtxoProvider';
 import { TrackedWalletProvider } from './TrackedWalletProvider';
@@ -31,7 +31,7 @@ export interface ProviderStatusTrackerProps {
 
 export interface ProviderStatusTrackerDependencies {
   walletProvider: TrackedWalletProvider;
-  stakePoolSearchProvider: TrackedStakePoolSearchProvider;
+  stakePoolProvider: TrackedStakePoolProvider;
   networkInfoProvider: TrackedNetworkInfoProvider;
   txSubmitProvider: TrackedTxSubmitProvider;
   assetProvider: TrackedAssetProvider;
@@ -40,7 +40,7 @@ export interface ProviderStatusTrackerDependencies {
 
 const getDefaultProviderSyncRelevantStats = ({
   walletProvider,
-  stakePoolSearchProvider,
+  stakePoolProvider,
   networkInfoProvider,
   txSubmitProvider,
   assetProvider,
@@ -55,7 +55,7 @@ const getDefaultProviderSyncRelevantStats = ({
     walletProvider.stats.rewardAccountBalance$,
     assetProvider.stats.getAsset$,
     txSubmitProvider.stats.submitTx$,
-    stakePoolSearchProvider.stats.queryStakePools$,
+    stakePoolProvider.stats.queryStakePools$,
     networkInfoProvider.stats.networkInfo$,
     utxoProvider.stats.utxoByAddresses$
   ]);

@@ -11,7 +11,6 @@ export class WalletProviderStats {
   readonly transactionsByHashes$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
   readonly rewardsHistory$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
   readonly rewardAccountBalance$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
-  readonly stakePoolStats$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
 
   shutdown() {
     this.currentWalletProtocolParameters$.complete();
@@ -22,7 +21,6 @@ export class WalletProviderStats {
     this.transactionsByHashes$.complete();
     this.rewardsHistory$.complete();
     this.rewardAccountBalance$.complete();
-    this.stakePoolStats$.complete();
   }
 
   reset() {
@@ -34,7 +32,6 @@ export class WalletProviderStats {
     this.transactionsByHashes$.next(CLEAN_FN_STATS);
     this.rewardsHistory$.next(CLEAN_FN_STATS);
     this.rewardAccountBalance$.next(CLEAN_FN_STATS);
-    this.stakePoolStats$.next(CLEAN_FN_STATS);
   }
   // Consider shutdown() completing all subjects:
   // might be needed in Wallet.shutdown() to not leak all stats subjects
@@ -45,7 +42,6 @@ export class WalletProviderStats {
  */
 export class TrackedWalletProvider extends ProviderTracker implements WalletProvider {
   readonly stats = new WalletProviderStats();
-  readonly stakePoolStats: WalletProvider['stakePoolStats'];
   readonly ledgerTip: WalletProvider['ledgerTip'];
   readonly rewardAccountBalance: WalletProvider['rewardAccountBalance'];
   readonly transactionsByAddresses: WalletProvider['transactionsByAddresses'];
@@ -59,10 +55,6 @@ export class TrackedWalletProvider extends ProviderTracker implements WalletProv
     super();
     walletProvider = walletProvider;
 
-    this.stakePoolStats =
-      typeof walletProvider.stakePoolStats !== 'undefined'
-        ? () => this.trackedCall(walletProvider.stakePoolStats!, this.stats.stakePoolStats$)
-        : undefined;
     this.ledgerTip = () => this.trackedCall(walletProvider.ledgerTip, this.stats.ledgerTip$);
     this.rewardAccountBalance = (rewardAccount) =>
       this.trackedCall(() => walletProvider.rewardAccountBalance(rewardAccount), this.stats.rewardAccountBalance$);

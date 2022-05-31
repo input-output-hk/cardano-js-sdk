@@ -3,7 +3,7 @@ import { CLEAN_FN_STATS, ProviderFnStats, TrackedUtxoProvider, UtxoProviderStats
 import { Cardano, UtxoProvider } from '@cardano-sdk/core';
 import { createStubUtxoProvider } from '@cardano-sdk/util-dev';
 
-describe('TrackedStakePoolSearchProvider', () => {
+describe('TrackedStakePoolProvider', () => {
   let utxoProvider: UtxoProvider;
   let trackedUtxoProvider: TrackedUtxoProvider;
   beforeEach(() => {

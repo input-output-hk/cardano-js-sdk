@@ -1,7 +1,7 @@
 import {
   Cardano,
   SlotEpochCalc,
-  StakePoolSearchProvider,
+  StakePoolProvider,
   TimeSettings,
   WalletProvider,
   createSlotEpochCalc
@@ -10,7 +10,7 @@ import { DelegationTracker, TransactionsTracker } from '../types';
 import { Observable, combineLatest, map } from 'rxjs';
 import {
   ObservableRewardsProvider,
-  ObservableStakePoolSearchProvider,
+  ObservableStakePoolProvider,
   createQueryStakePoolsProvider,
   createRewardAccountsTracker,
   createRewardsProvider
@@ -35,14 +35,14 @@ export type BlockEpochProvider = ReturnType<typeof createBlockEpochProvider>;
 export interface DelegationTrackerProps {
   walletProvider: TrackedWalletProvider;
   rewardAccountAddresses$: Observable<Cardano.RewardAccount[]>;
-  stakePoolSearchProvider: StakePoolSearchProvider;
+  stakePoolProvider: StakePoolProvider;
   timeSettings$: Observable<TimeSettings[]>;
   epoch$: Observable<Cardano.Epoch>;
   transactionsTracker: TransactionsTracker;
   retryBackoffConfig: RetryBackoffConfig;
   stores: WalletStores;
   internals?: {
-    queryStakePoolsProvider?: ObservableStakePoolSearchProvider;
+    queryStakePoolsProvider?: ObservableStakePoolProvider;
     rewardsProvider?: ObservableRewardsProvider;
     rewardsHistoryProvider?: RewardsHistoryProvider;
     slotEpochCalc$?: Observable<SlotEpochCalc>;
@@ -71,14 +71,10 @@ export const createDelegationTracker = ({
   retryBackoffConfig,
   transactionsTracker,
   timeSettings$,
-  stakePoolSearchProvider,
+  stakePoolProvider,
   stores,
   internals: {
-    queryStakePoolsProvider = createQueryStakePoolsProvider(
-      stakePoolSearchProvider,
-      stores.stakePools,
-      retryBackoffConfig
-    ),
+    queryStakePoolsProvider = createQueryStakePoolsProvider(stakePoolProvider, stores.stakePools, retryBackoffConfig),
     rewardsHistoryProvider = createRewardsHistoryProvider(walletProvider, retryBackoffConfig),
     rewardsProvider = createRewardsProvider(
       epoch$,
@@ -108,7 +104,7 @@ export const createDelegationTracker = ({
       epoch$,
       rewardAccountAddresses$,
       rewardsProvider,
-      stakePoolSearchProvider: queryStakePoolsProvider,
+      stakePoolProvider: queryStakePoolsProvider,
       transactions$,
       transactionsInFlight$: transactionsTracker.outgoing.inFlight$
     })

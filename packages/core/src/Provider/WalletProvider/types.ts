@@ -16,14 +16,6 @@ export type ProtocolParametersRequiredByWallet = Required<
   >
 >;
 
-export type StakePoolStats = {
-  qty: {
-    active: number;
-    retired: number;
-    retiring: number;
-  };
-};
-
 export interface EpochRange {
   /**
    * Inclusive
@@ -47,10 +39,6 @@ export interface EpochRewards {
 
 export interface WalletProvider {
   ledgerTip: () => Promise<Cardano.Tip>;
-  // TODO: when implementing db-sync provider,
-  // move stakePoolStats out to other provider type, since it's not required for wallet operation.
-  // Perhaps generalize StakePoolSearchProvider?
-  stakePoolStats?: () => Promise<StakePoolStats>;
   /**
    * @param {Cardano.BlockNo} sinceBlock inclusive
    */

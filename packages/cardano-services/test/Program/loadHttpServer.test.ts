@@ -43,7 +43,7 @@ describe('loadHttpServer', () => {
           dbConnectionString,
           ogmiosUrl: new URL(ogmiosConnection.address.webSocket)
         },
-        serviceNames: [ServiceNames.StakePoolSearch, ServiceNames.TxSubmit]
+        serviceNames: [ServiceNames.StakePool, ServiceNames.TxSubmit]
       });
       expect(httpServer).toBeInstanceOf(HttpServer);
     });
@@ -52,7 +52,7 @@ describe('loadHttpServer', () => {
         async () =>
           await loadHttpServer({
             apiUrl,
-            serviceNames: [ServiceNames.StakePoolSearch]
+            serviceNames: [ServiceNames.StakePool]
           })
       ).rejects.toThrow(MissingProgramOption);
     });
@@ -77,7 +77,7 @@ describe('loadHttpServer', () => {
               dbConnectionString,
               ogmiosUrl: new URL(ogmiosConnection.address.webSocket)
             },
-            serviceNames: [ServiceNames.StakePoolSearch, ServiceNames.TxSubmit]
+            serviceNames: [ServiceNames.StakePool, ServiceNames.TxSubmit]
           })
       ).rejects.toThrow(new ProviderError(ProviderFailure.Unhealthy));
     });

@@ -3,7 +3,7 @@
  *
  */
 export enum ServiceNames {
-  StakePoolSearch = 'stake-pool-search',
+  StakePool = 'stake-pool',
   TxSubmit = 'tx-submit',
   Utxo = 'utxo',
   ChainHistory = 'chain-history'

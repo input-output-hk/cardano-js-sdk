@@ -10,12 +10,12 @@ import {
 } from '@cardano-sdk/blockfrost';
 import { Cardano } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
-import { createStubStakePoolSearchProvider } from '@cardano-sdk/util-dev';
+import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import axiosFetchAdapter from '@vespaiach/axios-fetch-adapter';
 
 const loggerMethodNames = ['debug', 'error', 'fatal', 'info', 'trace', 'warn'] as (keyof Logger)[];
 const networkIdOptions = [0, 1];
-const stakePoolSearchProviderOptions = ['stub'];
+const stakePoolProviderOptions = ['stub'];
 const networkInfoProviderOptions = ['blockfrost'];
 const txSubmitProviderOptions = ['blockfrost'];
 const walletProviderOptions = ['blockfrost'];
@@ -37,7 +37,7 @@ const env = envalid.cleanEnv(process.env, {
   NETWORK_INFO_PROVIDER: envalid.str({ choices: networkInfoProviderOptions }),
   POOL_ID_1: envalid.str(),
   POOL_ID_2: envalid.str(),
-  STAKE_POOL_SEARCH_PROVIDER: envalid.str({ choices: stakePoolSearchProviderOptions }),
+  STAKE_POOL_PROVIDER: envalid.str({ choices: stakePoolProviderOptions }),
   TX_SUBMIT_HTTP_URL: envalid.url(),
   TX_SUBMIT_PROVIDER: envalid.str({ choices: txSubmitProviderOptions }),
   UTXO_PROVIDER: envalid.str({ choices: utxoProviderOptions }),
@@ -102,11 +102,11 @@ export const txSubmitProvider = (async () => {
   }
 })();
 
-export const stakePoolSearchProvider = (async () => {
-  if (env.STAKE_POOL_SEARCH_PROVIDER === 'stub') {
-    return createStubStakePoolSearchProvider();
+export const stakePoolProvider = (async () => {
+  if (env.STAKE_POOL_PROVIDER === 'stub') {
+    return createStubStakePoolProvider();
   }
-  throw new Error(`STAKE_POOL_SEARCH_PROVIDER unsupported: ${env.STAKE_POOL_SEARCH_PROVIDER}`);
+  throw new Error(`STAKE_POOL_PROVIDER unsupported: ${env.STAKE_POOL_PROVIDER}`);
 })();
 
 export const networkInfoProvider = (async () => {

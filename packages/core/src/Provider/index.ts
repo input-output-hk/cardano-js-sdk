@@ -1,5 +1,5 @@
 export * from './Provider';
-export * from './StakePoolSearchProvider';
+export * from './StakePoolProvider';
 export * from './WalletProvider';
 export * from './AssetProvider';
 export * from './NetworkInfoProvider';
