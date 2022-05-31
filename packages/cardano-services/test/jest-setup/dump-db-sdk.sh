@@ -12,14 +12,22 @@
 #
 # To run this file, grab a mainnet db-sync postgres db and execute
 #
-# $ bash dump_blocks.sh
+# $ bash dump_db-sdk.sh
 #
 # A resulting file like `fixture_data.sql` can then be either importer or compressed `tar` to be used
 # in our e2e tests
+# 
+# Usage with passing db password:
+#
+# PGPASSWORD=your_db_pass ./dump-db-sdk.sh
+#
+# Make sure to replace 'DB' value with your local db credentials to establish connection from the script
+
+DB="-U cardano -h 127.0.0.1 -p 5438 -d cardanodbsync"
 
 OUT_FILE='./testnet-fixture-data.sql'
 TAR_FILE='./testnet-fixture-data.tar'
-DB="-U cardano -h 127.0.0.1 -p 5438 -d cardanodbsync"
+
 
 # Block Ids. Ideally we need to export them in batches of 3 as when we skip Epoch Boundary Blocks checking 3 blocks 
 # before the one we are interested, so, if you are willing to fetch a block, please state B-2, B-1, B
@@ -304,6 +312,18 @@ echo "-- Dumping epochs" >> $OUT_FILE;
 echo "ALTER TABLE public.epoch DISABLE TRIGGER ALL;" >> $OUT_FILE;
 echo 'COPY public.epoch (id, out_sum, fees, tx_count, blk_count, no, start_time, end_time) FROM stdin WITH CSV;' >> $OUT_FILE;
 psql -c "\copy (SELECT * from epoch WHERE no IN ($SELECT_BLOCK_EPOCH)) to STDOUT WITH CSV" $DB >> $OUT_FILE;
+echo "\." >> $OUT_FILE;
+
+echo "-- Dumping epoch_stakes" >> $OUT_FILE;
+echo "ALTER TABLE public.epoch_stake DISABLE TRIGGER ALL;" >> $OUT_FILE;
+echo 'COPY public.epoch_stake (id, addr_id, pool_id, amount, epoch_no) FROM stdin WITH CSV;' >> $OUT_FILE;
+psql -c "\copy (SELECT * from epoch_stake WHERE epoch_no IN ($SELECT_BLOCK_EPOCH)) to STDOUT WITH CSV" $DB >> $OUT_FILE;
+echo "\." >> $OUT_FILE;
+
+echo "-- Dumping ada_pots" >> $OUT_FILE;
+echo "ALTER TABLE public.ada_pots DISABLE TRIGGER ALL;" >> $OUT_FILE;
+echo 'COPY public.ada_pots (id, slot_no, epoch_no, treasury, reserves, rewards, utxo, deposits, fees, block_id) FROM stdin WITH CSV;' >> $OUT_FILE;
+psql -c "\copy (SELECT * from ada_pots WHERE epoch_no IN ($SELECT_BLOCK_EPOCH)) to STDOUT WITH CSV" $DB >> $OUT_FILE;
 echo "\." >> $OUT_FILE;
 
 echo "-- Dumping slot leaders" >> $OUT_FILE;

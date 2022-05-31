@@ -107,7 +107,7 @@ describe('StakePoolBuilder', () => {
       expect(buildPoolsByStatusQuerySpy).toHaveBeenCalledTimes(2);
       expect(buildPoolsByStatusQuerySpy).toHaveReturnedWith(poolsByStatusQuery);
       expect(poolsByStatusQuery).toMatchSnapshot();
-      expect(poolHashes).toHaveLength(1);
+      expect(poolHashes).toHaveLength(0);
     });
     it('active', async () => {
       const activeStatus = [Cardano.StakePoolStatus.Active];
@@ -121,7 +121,7 @@ describe('StakePoolBuilder', () => {
       expect(buildPoolsByStatusQuerySpy).toHaveBeenCalledTimes(2);
       expect(buildPoolsByStatusQuerySpy).toHaveReturnedWith(poolsByStatusQuery);
       expect(poolsByStatusQuery).toMatchSnapshot();
-      expect(poolHashes).toHaveLength(6);
+      expect(poolHashes).toHaveLength(7);
     });
     it('retiring', async () => {
       const retiringStatus = [Cardano.StakePoolStatus.Retiring];
@@ -135,7 +135,7 @@ describe('StakePoolBuilder', () => {
       expect(buildPoolsByStatusQuerySpy).toHaveBeenCalledTimes(2);
       expect(buildPoolsByStatusQuerySpy).toHaveReturnedWith(poolsByStatusQuery);
       expect(poolsByStatusQuery).toMatchSnapshot();
-      expect(poolHashes).toHaveLength(1);
+      expect(poolHashes).toHaveLength(0);
     });
     it('retired', async () => {
       const retiredStatus = [Cardano.StakePoolStatus.Retired];
@@ -149,7 +149,7 @@ describe('StakePoolBuilder', () => {
       expect(buildPoolsByStatusQuerySpy).toHaveBeenCalledTimes(2);
       expect(buildPoolsByStatusQuerySpy).toHaveReturnedWith(poolsByStatusQuery);
       expect(poolsByStatusQuery).toMatchSnapshot();
-      expect(poolHashes).toHaveLength(1);
+      expect(poolHashes).toHaveLength(2);
     });
     it('active,activating,retiring,retired', async () => {
       const poolStatus = Object.values(Cardano.StakePoolStatus);

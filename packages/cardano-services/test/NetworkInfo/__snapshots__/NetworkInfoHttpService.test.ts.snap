@@ -5,7 +5,7 @@ Object {
   "lovelaceSupply": Object {
     "circulating": 69163989759711432n,
     "max": 45000000000000000n,
-    "total": 45000000000000000n,
+    "total": 40342337171803411n,
   },
   "network": Object {
     "id": 0,
