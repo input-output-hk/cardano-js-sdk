@@ -1,4 +1,4 @@
-import { Cardano, WalletProvider } from '@cardano-sdk/core';
+import { Cardano, ChainHistoryProvider } from '@cardano-sdk/core';
 import {
   EMPTY,
   Observable,
@@ -30,7 +30,7 @@ import { coldObservableProvider, distinctBlock, transactionsEquals } from './uti
 import { intersectionBy, sortBy, unionBy } from 'lodash-es';
 
 export interface TransactionsTrackerProps {
-  walletProvider: WalletProvider;
+  chainHistoryProvider: ChainHistoryProvider;
   addresses$: Observable<Cardano.Address[]>;
   tip$: Observable<Cardano.Tip>;
   retryBackoffConfig: RetryBackoffConfig;
@@ -47,7 +47,7 @@ export interface TransactionsTrackerInternals {
 }
 
 export const createAddressTransactionsProvider = (
-  walletProvider: WalletProvider,
+  chainHistoryProvider: ChainHistoryProvider,
   addresses$: Observable<Cardano.Address[]>,
   retryBackoffConfig: RetryBackoffConfig,
   tipBlockHeight$: Observable<number>,
@@ -65,10 +65,10 @@ export const createAddressTransactionsProvider = (
             while (true) {
               const lastStoredTransaction: Cardano.TxAlonzo | undefined =
                 localTransactions[localTransactions.length - 1];
-              const newTransactions = await walletProvider.transactionsByAddresses(
+              const newTransactions = await chainHistoryProvider.transactionsByAddresses({
                 addresses,
-                lastStoredTransaction?.blockHeader.blockNo
-              );
+                sinceBlock: lastStoredTransaction?.blockHeader.blockNo
+              });
               const duplicateTransactions =
                 lastStoredTransaction && intersectionBy(localTransactions, newTransactions, (tx) => tx.id);
               if (typeof duplicateTransactions !== 'undefined' && duplicateTransactions.length === 0) {
@@ -128,7 +128,7 @@ const newTransactions$ = (transactions$: Observable<Cardano.TxAlonzo[]>) =>
 export const createTransactionsTracker = (
   {
     tip$,
-    walletProvider,
+    chainHistoryProvider,
     addresses$,
     newTransactions: { submitting$, pending$, failedToSubmit$ },
     retryBackoffConfig,
@@ -136,7 +136,13 @@ export const createTransactionsTracker = (
   }: TransactionsTrackerProps,
   {
     transactionsSource$ = new TrackerSubject<Cardano.TxAlonzo[]>(
-      createAddressTransactionsProvider(walletProvider, addresses$, retryBackoffConfig, distinctBlock(tip$), store)
+      createAddressTransactionsProvider(
+        chainHistoryProvider,
+        addresses$,
+        retryBackoffConfig,
+        distinctBlock(tip$),
+        store
+      )
     )
   }: TransactionsTrackerInternals = {}
 ): TransactionsTracker & Shutdown => {

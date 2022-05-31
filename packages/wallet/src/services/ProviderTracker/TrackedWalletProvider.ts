@@ -6,9 +6,6 @@ export class WalletProviderStats {
   readonly currentWalletProtocolParameters$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
   readonly genesisParameters$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
   readonly ledgerTip$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
-  readonly blocksByHashes$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
-  readonly transactionsByAddresses$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
-  readonly transactionsByHashes$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
   readonly rewardsHistory$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
   readonly rewardAccountBalance$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
 
@@ -16,9 +13,6 @@ export class WalletProviderStats {
     this.currentWalletProtocolParameters$.complete();
     this.genesisParameters$.complete();
     this.ledgerTip$.complete();
-    this.blocksByHashes$.complete();
-    this.transactionsByAddresses$.complete();
-    this.transactionsByHashes$.complete();
     this.rewardsHistory$.complete();
     this.rewardAccountBalance$.complete();
   }
@@ -27,9 +21,6 @@ export class WalletProviderStats {
     this.currentWalletProtocolParameters$.next(CLEAN_FN_STATS);
     this.genesisParameters$.next(CLEAN_FN_STATS);
     this.ledgerTip$.next(CLEAN_FN_STATS);
-    this.blocksByHashes$.next(CLEAN_FN_STATS);
-    this.transactionsByAddresses$.next(CLEAN_FN_STATS);
-    this.transactionsByHashes$.next(CLEAN_FN_STATS);
     this.rewardsHistory$.next(CLEAN_FN_STATS);
     this.rewardAccountBalance$.next(CLEAN_FN_STATS);
   }
@@ -44,9 +35,6 @@ export class TrackedWalletProvider extends ProviderTracker implements WalletProv
   readonly stats = new WalletProviderStats();
   readonly ledgerTip: WalletProvider['ledgerTip'];
   readonly rewardAccountBalance: WalletProvider['rewardAccountBalance'];
-  readonly transactionsByAddresses: WalletProvider['transactionsByAddresses'];
-  readonly transactionsByHashes: WalletProvider['transactionsByHashes'];
-  readonly blocksByHashes: WalletProvider['blocksByHashes'];
   readonly currentWalletProtocolParameters: WalletProvider['currentWalletProtocolParameters'];
   readonly genesisParameters: WalletProvider['genesisParameters'];
   readonly rewardsHistory: WalletProvider['rewardsHistory'];
@@ -58,12 +46,6 @@ export class TrackedWalletProvider extends ProviderTracker implements WalletProv
     this.ledgerTip = () => this.trackedCall(walletProvider.ledgerTip, this.stats.ledgerTip$);
     this.rewardAccountBalance = (rewardAccount) =>
       this.trackedCall(() => walletProvider.rewardAccountBalance(rewardAccount), this.stats.rewardAccountBalance$);
-    this.transactionsByAddresses = (addresses) =>
-      this.trackedCall(() => walletProvider.transactionsByAddresses(addresses), this.stats.transactionsByAddresses$);
-    this.transactionsByHashes = (hashes) =>
-      this.trackedCall(() => walletProvider.transactionsByHashes(hashes), this.stats.transactionsByHashes$);
-    this.blocksByHashes = (hashes) =>
-      this.trackedCall(() => walletProvider.blocksByHashes(hashes), this.stats.blocksByHashes$);
     this.currentWalletProtocolParameters = () =>
       this.trackedCall(walletProvider.currentWalletProtocolParameters, this.stats.currentWalletProtocolParameters$);
     this.genesisParameters = () => this.trackedCall(walletProvider.genesisParameters, this.stats.genesisParameters$);

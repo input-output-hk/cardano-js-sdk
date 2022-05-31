@@ -2,6 +2,7 @@ import { AddressType, AsyncKeyAgent, GroupedAddress, util as keyManagementUtil }
 import {
   AssetProvider,
   Cardano,
+  ChainHistoryProvider,
   EpochInfo,
   NetworkInfo,
   NetworkInfoProvider,
@@ -21,6 +22,7 @@ import {
   PollingConfig,
   SyncableIntervalPersistentDocumentTrackerSubject,
   TrackedAssetProvider,
+  TrackedChainHistoryProvider,
   TrackedNetworkInfoProvider,
   TrackedStakePoolProvider,
   TrackedTxSubmitProvider,
@@ -82,6 +84,7 @@ export interface SingleAddressWalletDependencies {
   readonly assetProvider: AssetProvider;
   readonly networkInfoProvider: NetworkInfoProvider;
   readonly utxoProvider: UtxoProvider;
+  readonly chainHistoryProvider: ChainHistoryProvider;
   readonly inputSelector?: InputSelector;
   readonly stores?: WalletStores;
   readonly logger?: Logger;
@@ -104,6 +107,7 @@ export class SingleAddressWallet implements ObservableWallet {
   readonly networkInfoProvider: TrackedNetworkInfoProvider;
   readonly stakePoolProvider: TrackedStakePoolProvider;
   readonly assetProvider: TrackedAssetProvider;
+  readonly chainHistoryProvider: TrackedChainHistoryProvider;
   readonly utxo: TransactionalTracker<Cardano.Utxo[]>;
   readonly balance: TransactionalTracker<Balance>;
   readonly transactions: TransactionsTracker & Shutdown;
@@ -139,6 +143,7 @@ export class SingleAddressWallet implements ObservableWallet {
       assetProvider,
       networkInfoProvider,
       utxoProvider,
+      chainHistoryProvider,
       logger = dummyLogger,
       inputSelector = roundRobinRandomImprove(),
       stores = createInMemoryWalletStores()
@@ -152,9 +157,11 @@ export class SingleAddressWallet implements ObservableWallet {
     this.networkInfoProvider = new TrackedNetworkInfoProvider(networkInfoProvider);
     this.stakePoolProvider = new TrackedStakePoolProvider(stakePoolProvider);
     this.assetProvider = new TrackedAssetProvider(assetProvider);
+    this.chainHistoryProvider = new TrackedChainHistoryProvider(chainHistoryProvider);
     this.syncStatus = createProviderStatusTracker(
       {
         assetProvider: this.assetProvider,
+        chainHistoryProvider: this.chainHistoryProvider,
         networkInfoProvider: this.networkInfoProvider,
         stakePoolProvider: this.stakePoolProvider,
         txSubmitProvider: this.txSubmitProvider,
@@ -216,11 +223,11 @@ export class SingleAddressWallet implements ObservableWallet {
     );
     this.transactions = createTransactionsTracker({
       addresses$,
+      chainHistoryProvider: this.chainHistoryProvider,
       newTransactions: this.#newTransactions,
       retryBackoffConfig,
       store: stores.transactions,
-      tip$: this.tip$,
-      walletProvider: this.walletProvider
+      tip$: this.tip$
     });
     this.utxo = createUtxoTracker({
       addresses$,
@@ -331,6 +338,7 @@ export class SingleAddressWallet implements ObservableWallet {
     this.networkInfoProvider.stats.shutdown();
     this.stakePoolProvider.stats.shutdown();
     this.utxoProvider.stats.shutdown();
+    this.chainHistoryProvider.stats.shutdown();
     this.keyAgent.shutdown();
     this.currentEpoch$.complete();
     this.delegation.shutdown();

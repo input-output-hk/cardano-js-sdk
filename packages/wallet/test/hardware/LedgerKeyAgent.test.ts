@@ -24,6 +24,7 @@ describe('LedgerKeyAgent', () => {
     const stakePoolProvider = createStubStakePoolProvider();
     const networkInfoProvider = mocks.mockNetworkInfoProvider();
     const utxoProvider = mocks.mockUtxoProvider();
+    const chainHistoryProvider = mocks.mockChainHistoryProvider();
     const groupedAddress: KeyManagement.GroupedAddress = {
       accountIndex: 0,
       address,
@@ -39,6 +40,7 @@ describe('LedgerKeyAgent', () => {
       { name: 'HW Wallet' },
       {
         assetProvider,
+        chainHistoryProvider,
         keyAgent: asyncKeyAgent,
         networkInfoProvider,
         stakePoolProvider,

@@ -3,6 +3,7 @@ import { Cardano } from '@cardano-sdk/core';
 import { KeyManagement, ObservableWallet, SingleAddressWallet } from '../../../src';
 import {
   assetProvider,
+  chainHistoryProvider,
   keyAgentReady,
   networkInfoProvider,
   stakePoolProvider,
@@ -40,6 +41,7 @@ describe('SingleAddressWallet.assets/nft', () => {
       },
       {
         assetProvider: await assetProvider,
+        chainHistoryProvider: await chainHistoryProvider,
         keyAgent,
         networkInfoProvider: await networkInfoProvider,
         stakePoolProvider,

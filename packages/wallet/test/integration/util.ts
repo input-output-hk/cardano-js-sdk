@@ -2,6 +2,7 @@ import { SingleAddressWallet } from '../../src';
 import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import {
   mockAssetProvider,
+  mockChainHistoryProvider,
   mockNetworkInfoProvider,
   mockTxSubmitProvider,
   mockUtxoProvider,
@@ -17,10 +18,12 @@ export const createWallet = async () => {
   const networkInfoProvider = mockNetworkInfoProvider();
   const assetProvider = mockAssetProvider();
   const utxoProvider = mockUtxoProvider();
+  const chainHistoryProvider = mockChainHistoryProvider();
   return new SingleAddressWallet(
     { name: 'Test Wallet' },
     {
       assetProvider,
+      chainHistoryProvider,
       keyAgent,
       networkInfoProvider,
       stakePoolProvider,

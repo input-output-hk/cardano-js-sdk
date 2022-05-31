@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as mocks from '../mocks';
 import { AssetId, createStubStakePoolProvider, somePartialStakePools } from '@cardano-sdk/util-dev';
-import { Cardano, UtxoProvider, WalletProvider, testnetTimeSettings } from '@cardano-sdk/core';
+import { Cardano, ChainHistoryProvider, UtxoProvider, WalletProvider, testnetTimeSettings } from '@cardano-sdk/core';
 import { KeyManagement, ObservableWallet, SingleAddressWallet } from '../../src';
 import { WalletStores, createInMemoryWalletStores } from '../../src/persistence';
 import {
@@ -20,7 +20,12 @@ const name = 'Test Wallet';
 const address = mocks.utxo[0][0].address!;
 const rewardAccount = mocks.rewardAccount;
 
-const createWallet = async (stores: WalletStores, walletProvider: WalletProvider, utxoProvider: UtxoProvider) => {
+const createWallet = async (
+  stores: WalletStores,
+  walletProvider: WalletProvider,
+  utxoProvider: UtxoProvider,
+  chainHistoryProvider: ChainHistoryProvider = mocks.mockChainHistoryProvider()
+) => {
   const groupedAddress: KeyManagement.GroupedAddress = {
     accountIndex: 0,
     address,
@@ -39,6 +44,7 @@ const createWallet = async (stores: WalletStores, walletProvider: WalletProvider
     { name },
     {
       assetProvider,
+      chainHistoryProvider,
       keyAgent,
       networkInfoProvider,
       stakePoolProvider,
@@ -133,7 +139,12 @@ describe('SingleAddressWallet load', () => {
     const wallet1 = await createWallet(stores, mocks.mockWalletProvider(), mocks.mockUtxoProvider());
     await assertWalletProperties(wallet1, somePartialStakePools[0].id);
     wallet1.shutdown();
-    const wallet2 = await createWallet(stores, mocks.mockWalletProvider2(100), mocks.mockUtxoProvider2(100));
+    const wallet2 = await createWallet(
+      stores,
+      mocks.mockWalletProvider2(100),
+      mocks.mockUtxoProvider2(100),
+      mocks.mockChainHistoryProvider2(100)
+    );
     await assertWalletProperties(wallet2, somePartialStakePools[0].id);
     await waitForWalletStateSettle(wallet2);
     await assertWalletProperties2(wallet2);
@@ -143,9 +154,10 @@ describe('SingleAddressWallet load', () => {
   it('syncStatus settles without delegation to any pool', async () => {
     const stores = createInMemoryWalletStores();
     const walletProvider = mocks.mockWalletProvider();
+    const chainHistoryProvider = mocks.mockChainHistoryProvider();
     const txsWithNoCertificates = queryTransactionsResult.filter((tx) => !tx.body.certificates);
-    walletProvider.transactionsByAddresses.mockResolvedValue(txsWithNoCertificates);
-    const wallet = await createWallet(stores, walletProvider, mocks.mockUtxoProvider());
+    chainHistoryProvider.transactionsByAddresses.mockResolvedValue(txsWithNoCertificates);
+    const wallet = await createWallet(stores, walletProvider, mocks.mockUtxoProvider(), chainHistoryProvider);
     // eslint-disable-next-line unicorn/no-useless-undefined
     await assertWalletProperties(wallet, undefined, []);
     await waitForWalletStateSettle(wallet);

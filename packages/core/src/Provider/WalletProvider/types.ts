@@ -39,15 +39,6 @@ export interface EpochRewards {
 
 export interface WalletProvider {
   ledgerTip: () => Promise<Cardano.Tip>;
-  /**
-   * @param {Cardano.BlockNo} sinceBlock inclusive
-   */
-  transactionsByAddresses: (addresses: Cardano.Address[], sinceBlock?: Cardano.BlockNo) => Promise<Cardano.TxAlonzo[]>;
-  transactionsByHashes: (hashes: Cardano.TransactionId[]) => Promise<Cardano.TxAlonzo[]>;
-  /**
-   * @returns an array of blocks, same length and in the same order as `hashes` argument.
-   */
-  blocksByHashes: (hashes: Cardano.BlockId[]) => Promise<Cardano.Block[]>;
   currentWalletProtocolParameters: () => Promise<ProtocolParametersRequiredByWallet>;
   genesisParameters: () => Promise<Cardano.CompactGenesis>;
   /**
