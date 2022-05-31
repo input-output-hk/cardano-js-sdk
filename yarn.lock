@@ -446,7 +446,7 @@
   resolved "https://registry.yarnpkg.com/@cardano-ogmios/schema/-/schema-5.2.0.tgz#2877c552cbec7c26245a26dd75bcf2fe9aee21aa"
   integrity sha512-4Ouhy3wrG/Qxi8VPig6UJZ13LRm4aCuy7kyiEHmAll83TCEnMTJwjdIOJIfhv7OO62dWsYi1LjgkK+FWy9yvKg==
 
-"@cardano-sdk/cardano-graphql@ 0.2.0":
+"@cardano-sdk/cardano-graphql@0.2.0":
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/@cardano-sdk/cardano-graphql/-/cardano-graphql-0.2.0.tgz#bcc9bbf66cc4b5866ca47b73087044efa2b5e2f2"
   integrity sha512-4IioxUFGQpAiod1KPV0bFGdts0Zguj4qdUDZCm7VlLvZZA6q1b6BumC2Ka6hh/I20fj4Rupw1KZ35J5gyn3/gQ==
