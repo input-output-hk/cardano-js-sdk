@@ -40,4 +40,14 @@ describe('createAsyncKeyAgent maps KeyAgent to AsyncKeyAgent', () => {
     await asyncKeyAgent.deriveAddress(addressDerivationPath);
     await expect(firstValueFrom(asyncKeyAgent.knownAddresses$)).resolves.toEqual(keyAgent.knownAddresses);
   });
+  it('stops emitting addresses$ after shutdown', (done) => {
+    asyncKeyAgent.shutdown();
+    asyncKeyAgent.knownAddresses$.subscribe({
+      complete: done,
+      next: () => {
+        throw new Error('Should not emit');
+      }
+    });
+    void asyncKeyAgent.deriveAddress(addressDerivationPath);
+  });
 });

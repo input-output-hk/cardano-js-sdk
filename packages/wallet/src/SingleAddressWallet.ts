@@ -97,7 +97,7 @@ export class SingleAddressWallet implements ObservableWallet {
     submitting$: new Subject<Cardano.NewTxAlonzo>()
   };
   readonly keyAgent: AsyncKeyAgent;
-  readonly currentEpoch$: BehaviorObservable<EpochInfo>;
+  readonly currentEpoch$: TrackerSubject<EpochInfo>;
   readonly txSubmitProvider: TrackedTxSubmitProvider;
   readonly walletProvider: TrackedWalletProvider;
   readonly utxoProvider: TrackedUtxoProvider;
@@ -330,6 +330,15 @@ export class SingleAddressWallet implements ObservableWallet {
     this.txSubmitProvider.stats.shutdown();
     this.networkInfoProvider.stats.shutdown();
     this.stakePoolProvider.stats.shutdown();
+    this.utxoProvider.stats.shutdown();
+    this.keyAgent.shutdown();
+    this.currentEpoch$.complete();
+    this.delegation.shutdown();
+    this.assets$.complete();
+    this.syncStatus.shutdown();
+    this.#newTransactions.failedToSubmit$.complete();
+    this.#newTransactions.pending$.complete();
+    this.#newTransactions.submitting$.complete();
   }
 
   #prepareTx(props: InitializeTxProps) {

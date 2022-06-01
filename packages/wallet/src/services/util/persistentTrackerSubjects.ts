@@ -8,6 +8,7 @@ import {
   delay,
   distinctUntilChanged,
   exhaustMap,
+  finalize,
   merge,
   of,
   startWith,
@@ -90,7 +91,7 @@ export class SyncableIntervalPersistentDocumentTrackerSubject<T> extends Persist
         ),
         // Always immediately restart request on external trigger
         externalTrigger$.pipe(switchMap(() => provider$))
-      ),
+      ).pipe(finalize(() => this.#externalTrigger$.complete())),
       store
     );
     this.#externalTrigger$ = externalTrigger$;
