@@ -46,6 +46,8 @@ export enum CommunicationType {
   Node = 'node'
 }
 
+export type BIP32Path = Array<number>;
+
 export interface AccountAddressDerivationPath {
   type: AddressType;
   index: number;
@@ -90,11 +92,13 @@ export interface SerializableInMemoryKeyAgentData extends SerializableKeyAgentDa
 export interface SerializableLedgerKeyAgentData extends SerializableKeyAgentDataBase {
   __typename: KeyAgentType.Ledger;
   communicationType: CommunicationType;
+  protocolMagic: Cardano.NetworkMagic;
 }
 
 export interface SerializableTrezorKeyAgentData extends SerializableKeyAgentDataBase {
   __typename: KeyAgentType.Trezor;
   trezorConfig: TrezorConfig;
+  protocolMagic: Cardano.NetworkMagic;
 }
 
 export type SerializableKeyAgentData =

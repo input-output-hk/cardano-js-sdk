@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import * as envalid from 'envalid';
 import {
   BlockFrostAPI,
@@ -9,7 +8,7 @@ import {
   blockfrostWalletProvider
 } from '@cardano-sdk/blockfrost';
 import { Cardano } from '@cardano-sdk/core';
-import { CommunicationType, InMemoryKeyAgent, KeyAgent, LedgerKeyAgent } from '../../src/KeyManagement';
+import { CommunicationType, InMemoryKeyAgent, KeyAgent, LedgerKeyAgent, TrezorKeyAgent } from '../../src/KeyManagement';
 import { LogLevel, createLogger } from 'bunyan';
 import { Logger } from 'ts-log';
 import { URL } from 'url';
@@ -30,7 +29,7 @@ const txSubmitProviderOptions = ['blockfrost', 'ogmios', 'http'];
 const utxoProviderOptions = ['blockfrost'];
 const walletProviderOptions = ['blockfrost'];
 const assetProviderOptions = ['blockfrost'];
-const keyAgentOptions = ['InMemory', 'Ledger'];
+const keyAgentOptions = ['InMemory', 'Ledger', 'Trezor'];
 
 const env = envalid.cleanEnv(process.env, {
   ASSET_PROVIDER: envalid.str({ choices: assetProviderOptions }),
@@ -138,10 +137,25 @@ export const keyAgentByIdx = memoize(async (accountIndex: number) =>
             accountIndex,
             communicationType: CommunicationType.Node,
             deviceConnection,
-            networkId
+            networkId,
+            protocolMagic: 1_097_911_063
           });
           deviceConnection = ledgerKeyAgent.deviceConnection;
           return ledgerKeyAgent;
+        }
+        case 'Trezor': {
+          return await TrezorKeyAgent.createWithDevice({
+            accountIndex,
+            networkId,
+            protocolMagic: 1_097_911_063,
+            trezorConfig: {
+              communicationType: CommunicationType.Node,
+              manifest: {
+                appUrl: 'https://your.application.com',
+                email: 'email@developer.com'
+              }
+            }
+          });
         }
         case 'InMemory': {
           const mnemonicWords = (process.env.MNEMONIC_WORDS || '').split(' ');
