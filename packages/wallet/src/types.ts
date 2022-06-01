@@ -81,7 +81,7 @@ export interface ObservableWallet {
    * @throws InputSelectionError
    */
   initializeTx(props: InitializeTxProps): Promise<InitializeTxResult>;
-  finalizeTx(props: TxInternals): Promise<Cardano.NewTxAlonzo>;
+  finalizeTx(props: TxInternals, auxiliaryData?: Cardano.AuxiliaryData): Promise<Cardano.NewTxAlonzo>;
   /**
    * @throws Cip30DataSignError
    */
