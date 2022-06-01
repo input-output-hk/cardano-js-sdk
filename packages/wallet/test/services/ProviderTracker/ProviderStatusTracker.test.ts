@@ -175,7 +175,15 @@ describe('createProviderStatusTracker', () => {
         .fn()
         .mockReturnValueOnce(cold<ProviderFnStats[]>(`-a-b-c-d-e-f ${timeout}ms g-h-i`, providerFnStats));
       const tracker = createProviderStatusTracker(
-        { assetProvider, networkInfoProvider, stakePoolProvider, txSubmitProvider, utxoProvider, walletProvider },
+        {
+          assetProvider,
+          chainHistoryProvider,
+          networkInfoProvider,
+          stakePoolProvider,
+          txSubmitProvider,
+          utxoProvider,
+          walletProvider
+        },
         { consideredOutOfSyncAfter: timeout },
         { getProviderSyncRelevantStats }
       );

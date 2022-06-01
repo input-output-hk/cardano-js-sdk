@@ -55,10 +55,11 @@ const logger = console;
 
 // Sharing a single BlockFrostAPI object ensures rate limiting is shared across all blockfrost providers
 const blockfrostApi = [
-  env.WALLET_PASSWORD,
+  env.WALLET_PROVIDER,
   env.TX_SUBMIT_PROVIDER,
   env.ASSET_PROVIDER,
   env.NETWORK_INFO_PROVIDER,
+  env.UTXO_PROVIDER,
   env.CHAIN_HISTORY_PROVIDER
 ].includes('blockfrost')
   ? (async () => {
