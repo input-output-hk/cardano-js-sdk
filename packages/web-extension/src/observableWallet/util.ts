@@ -1,11 +1,9 @@
 import { ObservableWallet } from '@cardano-sdk/wallet';
 import { RemoteApiProperties, RemoteApiPropertyType } from '../messaging';
 
-export type ExposedObservableWalletProperties = Omit<ObservableWallet, 'shutdown'>;
-
 export const observableWalletChannel = (walletName: string) => `${walletName}$`;
 
-export const observableWalletProperties: RemoteApiProperties<ExposedObservableWalletProperties> = {
+export const observableWalletProperties: RemoteApiProperties<ObservableWallet> = {
   addresses$: RemoteApiPropertyType.Observable,
   assets$: RemoteApiPropertyType.Observable,
   balance: {

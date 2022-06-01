@@ -95,8 +95,12 @@ export interface RemoteApiMethod {
 
 export type RemoteApiProperty = RemoteApiPropertyType | RemoteApiMethod;
 
+export type ExposableRemoteApi<T> = Omit<T, 'shutdown'>;
+
 export type RemoteApiProperties<T> = {
-  [key in keyof T]: RemoteApiProperty | Omit<RemoteApiProperties<T[key]>, 'propType' | 'requestOptions'>;
+  [key in keyof ExposableRemoteApi<T>]:
+    | RemoteApiProperty
+    | Omit<RemoteApiProperties<T[key]>, 'propType' | 'requestOptions'>;
 };
 
 export interface ExposeApiProps<API extends object> {

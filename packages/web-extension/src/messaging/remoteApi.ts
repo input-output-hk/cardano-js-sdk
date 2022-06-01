@@ -3,6 +3,7 @@ import {
   BindRequestHandlerOptions,
   ConsumeRemoteApiOptions,
   EmitMessage,
+  ExposableRemoteApi,
   ExposeApiProps,
   MessengerApiDependencies,
   MethodRequest,
@@ -74,7 +75,7 @@ export const consumeMessengerRemoteApi = <T extends object>(
     {
       get(target, prop) {
         if (prop in target) return (target as any)[prop];
-        const propMetadata = properties[prop as keyof T];
+        const propMetadata = properties[prop as keyof ExposableRemoteApi<T>];
         const propName = prop.toString();
         if (typeof propMetadata === 'object') {
           if ('propType' in propMetadata) {
@@ -229,7 +230,7 @@ export const exposeMessengerApi = <API extends object>(
   const methodHandlerSubscription = bindMessengerRequestHandler(
     {
       handler: async (originalRequest, sender) => {
-        const property = properties[originalRequest.method as keyof API];
+        const property = properties[originalRequest.method as keyof ExposableRemoteApi<API>];
         if (
           typeof property === 'undefined' ||
           (property !== RemoteApiPropertyType.MethodReturningPromise &&
