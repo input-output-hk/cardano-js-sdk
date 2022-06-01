@@ -5,6 +5,7 @@ import { Cip30DataSignature } from '@cardano-sdk/cip30';
 import { Cip30SignDataRequest } from './KeyManagement/cip8';
 import { GroupedAddress } from './KeyManagement';
 import { SelectionSkeleton } from '@cardano-sdk/cip2';
+import { Shutdown } from '@cardano-sdk/util';
 import { TxInternals } from './Transaction';
 
 export type InitializeTxProps = {
@@ -38,7 +39,7 @@ export type InitializeTxResult = TxInternals & { inputSelection: SelectionSkelet
 
 export type SignDataProps = Omit<Cip30SignDataRequest, 'keyAgent'>;
 
-export interface SyncStatus {
+export interface SyncStatus extends Shutdown {
   /**
    * Emits:
    * - `true` while waiting for any provider request to resolve

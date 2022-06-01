@@ -1,5 +1,6 @@
 import { Cardano } from '@cardano-sdk/core';
 import { Observable } from 'rxjs';
+import { Shutdown } from '@cardano-sdk/util';
 import { TxInternals } from '../Transaction';
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents';
 import TransportWebHID from '@ledgerhq/hw-transport-webhid';
@@ -150,4 +151,4 @@ export interface KeyAgent {
 
 export type AsyncKeyAgent = Pick<KeyAgent, 'deriveAddress' | 'signBlob' | 'signTransaction'> & {
   knownAddresses$: Observable<GroupedAddress[]>;
-};
+} & Shutdown;

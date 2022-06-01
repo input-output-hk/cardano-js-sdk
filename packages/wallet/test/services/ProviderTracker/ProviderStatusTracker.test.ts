@@ -140,4 +140,21 @@ describe('createProviderStatusTracker', () => {
       });
     });
   });
+
+  it('shutdown() completes all observables', () => {
+    createTestScheduler().run(({ cold, expectObservable }) => {
+      const getProviderSyncRelevantStats = jest
+        .fn()
+        .mockReturnValueOnce(cold<ProviderFnStats[]>(`-a-b-c-d-e-f ${timeout}ms g-h-i`, providerFnStats));
+      const tracker = createProviderStatusTracker(
+        { assetProvider, networkInfoProvider, stakePoolProvider, txSubmitProvider, utxoProvider, walletProvider },
+        { consideredOutOfSyncAfter: timeout },
+        { getProviderSyncRelevantStats }
+      );
+      tracker.shutdown();
+      expectObservable(tracker.isUpToDate$).toBe('(a|)', { a: false });
+      expectObservable(tracker.isSettled$).toBe('(a|)', { a: false });
+      expectObservable(tracker.isAnyRequestPending$).toBe('|');
+    });
+  });
 });

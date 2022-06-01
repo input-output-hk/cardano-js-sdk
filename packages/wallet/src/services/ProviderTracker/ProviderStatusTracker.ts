@@ -108,6 +108,11 @@ export const createProviderStatusTracker = (
   return {
     isAnyRequestPending$,
     isSettled$,
-    isUpToDate$
+    isUpToDate$,
+    shutdown() {
+      isAnyRequestPending$.complete();
+      isSettled$.complete();
+      isUpToDate$.complete();
+    }
   };
 };

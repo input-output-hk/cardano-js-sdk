@@ -13,6 +13,9 @@ export const createAsyncKeyAgent = (keyAgent: KeyAgent): AsyncKeyAgent => {
       return address;
     },
     knownAddresses$,
+    shutdown() {
+      knownAddresses$.complete();
+    },
     signBlob: keyAgent.signBlob.bind(keyAgent),
     signTransaction: keyAgent.signTransaction.bind(keyAgent)
   };
