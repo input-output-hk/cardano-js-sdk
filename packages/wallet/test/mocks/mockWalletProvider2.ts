@@ -1,16 +1,14 @@
 /* eslint-disable jsdoc/require-returns-type */
 import { Cardano, EpochRewards } from '@cardano-sdk/core';
 import {
-  blocksByHashes,
   currentEpoch,
   epochRewards,
   genesisParameters,
   ledgerTip,
   protocolParameters,
-  queryTransactionsResult,
   rewardAccount,
   rewardAccountBalance
-} from './mockWalletProvider';
+} from './mockData';
 import delay from 'delay';
 
 export const protocolParameters2 = {
@@ -29,18 +27,6 @@ export const ledgerTip2 = {
 };
 
 export const currentEpochNo2 = currentEpoch.number + 1;
-
-export const queryTransactionsResult2 = [
-  ...queryTransactionsResult,
-  {
-    ...queryTransactionsResult[1],
-    blockHeader: {
-      blockNo: 10_150,
-      slot: ledgerTip.slot - 50_000
-    },
-    id: Cardano.TransactionId('6804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99caa')
-  }
-];
 
 export const rewardsHistory2 = new Map<Cardano.RewardAccount, EpochRewards[]>();
 rewardsHistory2.set(rewardAccount, [
@@ -65,13 +51,10 @@ export const mockWalletProvider2 = (delayMs: number) => {
     jest.fn().mockImplementation(() => delay(delayMs).then(() => resolvedValue));
 
   return {
-    blocksByHashes: delayedJestFn(blocksByHashes),
     currentWalletProtocolParameters: delayedJestFn(protocolParameters2),
     genesisParameters: delayedJestFn(genesisParameters2),
     ledgerTip: delayedJestFn(ledgerTip2),
     rewardAccountBalance: delayedJestFn(rewardAccountBalance2),
-    rewardsHistory: delayedJestFn(rewardsHistory2),
-    transactionsByAddresses: delayedJestFn(queryTransactionsResult2),
-    transactionsByHashes: delayedJestFn(queryTransactionsResult2)
+    rewardsHistory: delayedJestFn(rewardsHistory2)
   };
 };

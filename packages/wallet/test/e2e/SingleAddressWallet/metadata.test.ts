@@ -2,6 +2,7 @@ import { Cardano } from '@cardano-sdk/core';
 import { SingleAddressWallet } from '../../../src';
 import {
   assetProvider,
+  chainHistoryProvider,
   keyAgentReady,
   networkInfoProvider,
   stakePoolProvider,
@@ -21,6 +22,7 @@ describe('SingleAddressWallet/metadata', () => {
       { name: 'Test Wallet' },
       {
         assetProvider: await assetProvider,
+        chainHistoryProvider: await chainHistoryProvider,
         keyAgent: await keyAgentReady,
         networkInfoProvider: await networkInfoProvider,
         stakePoolProvider,

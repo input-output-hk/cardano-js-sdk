@@ -4,7 +4,7 @@ import { AssetId, createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { Cardano } from '@cardano-sdk/core';
 import { KeyManagement, SingleAddressWallet } from '../../src';
 import { firstValueFrom, skip } from 'rxjs';
-import { mockNetworkInfoProvider, utxo } from '../mocks';
+import { mockChainHistoryProvider, mockNetworkInfoProvider, utxo } from '../mocks';
 import { waitForWalletStateSettle } from '../util';
 
 jest.mock('../../src/KeyManagement/cip8/cip30signData');
@@ -51,11 +51,13 @@ describe('SingleAddressWallet methods', () => {
     const assetProvider = mocks.mockAssetProvider();
     const stakePoolProvider = createStubStakePoolProvider();
     const networkInfoProvider = mockNetworkInfoProvider();
+    const chainHistoryProvider = mockChainHistoryProvider();
     keyAgent.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
     wallet = new SingleAddressWallet(
       { name: 'Test Wallet' },
       {
         assetProvider,
+        chainHistoryProvider,
         keyAgent,
         networkInfoProvider,
         stakePoolProvider,

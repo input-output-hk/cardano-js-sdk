@@ -84,33 +84,6 @@ describe('TrackedWalletProvider', () => {
     );
 
     test(
-      'blocksByHashes',
-      testFunctionStats(
-        (wp) => wp.blocksByHashes([]),
-        (stats) => stats.blocksByHashes$,
-        (mockWP) => mockWP.blocksByHashes
-      )
-    );
-
-    test(
-      'transactionsByAddresses',
-      testFunctionStats(
-        (wp) => wp.transactionsByAddresses([]),
-        (stats) => stats.transactionsByAddresses$,
-        (mockWP) => mockWP.transactionsByAddresses
-      )
-    );
-
-    test(
-      'transactionsByHashes',
-      testFunctionStats(
-        (wp) => wp.transactionsByHashes([]),
-        (stats) => stats.transactionsByHashes$,
-        (mockWP) => mockWP.transactionsByHashes
-      )
-    );
-
-    test(
       'rewardsHistory',
       testFunctionStats(
         (wp) => wp.rewardsHistory({ rewardAccounts: [] }),

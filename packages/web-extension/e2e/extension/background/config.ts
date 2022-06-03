@@ -3,6 +3,7 @@ import * as envalid from 'envalid';
 import {
   BlockFrostAPI,
   blockfrostAssetProvider,
+  blockfrostChainHistoryProvider,
   blockfrostNetworkInfoProvider,
   blockfrostTxSubmitProvider,
   blockfrostUtxoProvider,
@@ -22,10 +23,12 @@ const walletProviderOptions = ['blockfrost'];
 const assetProviderOptions = ['blockfrost'];
 const utxoProviderOptions = ['blockfrost'];
 const keyAgentOptions = ['InMemory'];
+const chainHistoryProviderOptions = ['blockfrost'];
 
 const env = envalid.cleanEnv(process.env, {
   ASSET_PROVIDER: envalid.str({ choices: assetProviderOptions }),
   BLOCKFROST_API_KEY: envalid.str(),
+  CHAIN_HISTORY_PROVIDER: envalid.str({ choices: chainHistoryProviderOptions }),
   KEY_AGENT: envalid.str({ choices: keyAgentOptions }),
   LOGGER_MIN_SEVERITY: envalid.str({ choices: loggerMethodNames as string[], default: 'info' }),
   MNEMONIC_WORDS: envalid.makeValidator<string[]>((input) => {
@@ -52,10 +55,12 @@ const logger = console;
 
 // Sharing a single BlockFrostAPI object ensures rate limiting is shared across all blockfrost providers
 const blockfrostApi = [
-  env.WALLET_PASSWORD,
+  env.WALLET_PROVIDER,
   env.TX_SUBMIT_PROVIDER,
   env.ASSET_PROVIDER,
-  env.NETWORK_INFO_PROVIDER
+  env.NETWORK_INFO_PROVIDER,
+  env.UTXO_PROVIDER,
+  env.CHAIN_HISTORY_PROVIDER
 ].includes('blockfrost')
   ? (async () => {
       logger.debug('WalletProvider:blockfrost - Initializing');
@@ -81,14 +86,14 @@ export const utxoProvider = (async () => {
   if (env.UTXO_PROVIDER === 'blockfrost') {
     return blockfrostUtxoProvider(await blockfrostApi!);
   }
-  throw new Error(`WALLET_PROVIDER unsupported: ${env.UTXO_PROVIDER}`);
+  throw new Error(`UTXO_PROVIDER unsupported: ${env.UTXO_PROVIDER}`);
 })();
 
 export const assetProvider = (async () => {
   if (env.ASSET_PROVIDER === 'blockfrost') {
     return blockfrostAssetProvider(await blockfrostApi!);
   }
-  throw new Error(`NETWORK_INFO_PROVIDER unsupported: ${env.NETWORK_INFO_PROVIDER}`);
+  throw new Error(`ASSET_PROVIDER unsupported: ${env.ASSET_PROVIDER}`);
 })();
 
 export const txSubmitProvider = (async () => {
@@ -114,6 +119,13 @@ export const networkInfoProvider = (async () => {
     return blockfrostNetworkInfoProvider(await blockfrostApi!);
   }
   throw new Error(`NETWORK_INFO_PROVIDER unsupported: ${env.NETWORK_INFO_PROVIDER}`);
+})();
+
+export const chainHistoryProvider = (async () => {
+  if (env.CHAIN_HISTORY_PROVIDER === 'blockfrost') {
+    return blockfrostChainHistoryProvider(await blockfrostApi!);
+  }
+  throw new Error(`CHAIN_HISTORY_PROVIDER unsupported: ${env.CHAIN_HISTORY_PROVIDER}`);
 })();
 
 export const poolId1 = Cardano.PoolId(env.POOL_ID_1);

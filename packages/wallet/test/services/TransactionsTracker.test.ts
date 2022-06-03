@@ -1,8 +1,8 @@
-import { Cardano, WalletProvider } from '@cardano-sdk/core';
+import { Cardano, ChainHistoryProvider } from '@cardano-sdk/core';
+import { ChainHistoryProviderStub, mockChainHistoryProvider, queryTransactionsResult } from '../mocks';
 import { FailedTx, TransactionFailure, createAddressTransactionsProvider, createTransactionsTracker } from '../../src';
 import { InMemoryTransactionsStore, OrderedCollectionStore } from '../../src/persistence';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { WalletProviderStub, mockWalletProvider, queryTransactionsResult } from '../mocks';
 import { bufferCount, firstValueFrom, of } from 'rxjs';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
 import delay from 'delay';
@@ -10,20 +10,20 @@ import delay from 'delay';
 describe('TransactionsTracker', () => {
   describe('createAddressTransactionsProvider', () => {
     let store: InMemoryTransactionsStore;
-    let walletProvider: WalletProviderStub;
+    let chainHistoryProvider: ChainHistoryProviderStub;
     const tip$ = of(300);
     const retryBackoffConfig = { initialInterval: 1 }; // not relevant
     const addresses = [queryTransactionsResult[0].body.inputs[0].address!];
 
     beforeEach(() => {
-      walletProvider = mockWalletProvider();
+      chainHistoryProvider = mockChainHistoryProvider();
       store = new InMemoryTransactionsStore();
       store.setAll = jest.fn().mockImplementation(store.setAll.bind(store));
     });
 
-    it('if store is empty, stores and emits transactions resolved by WalletProvider', async () => {
+    it('if store is empty, stores and emits transactions resolved by ChainHistoryProvider', async () => {
       const provider$ = createAddressTransactionsProvider(
-        walletProvider,
+        chainHistoryProvider,
         of(addresses),
         retryBackoffConfig,
         tip$,
@@ -34,13 +34,13 @@ describe('TransactionsTracker', () => {
       expect(store.setAll).toBeCalledWith(queryTransactionsResult);
     });
 
-    it('emits existing transactions from store, then transactions resolved by WalletProvider', async () => {
+    it('emits existing transactions from store, then transactions resolved by ChainHistoryProvider', async () => {
       await firstValueFrom(store.setAll([queryTransactionsResult[0]]));
-      walletProvider.transactionsByAddresses = jest
+      chainHistoryProvider.transactionsByAddresses = jest
         .fn()
         .mockImplementation(() => delay(50).then(() => queryTransactionsResult));
       const provider$ = createAddressTransactionsProvider(
-        walletProvider,
+        chainHistoryProvider,
         of(addresses),
         retryBackoffConfig,
         tip$,
@@ -51,21 +51,21 @@ describe('TransactionsTracker', () => {
         queryTransactionsResult
       ]);
       expect(store.setAll).toBeCalledTimes(2);
-      expect(walletProvider.transactionsByAddresses).toBeCalledTimes(1);
-      expect(walletProvider.transactionsByAddresses).toBeCalledWith(
+      expect(chainHistoryProvider.transactionsByAddresses).toBeCalledTimes(1);
+      expect(chainHistoryProvider.transactionsByAddresses).toBeCalledWith({
         addresses,
-        queryTransactionsResult[0].blockHeader.blockNo
-      );
+        sinceBlock: queryTransactionsResult[0].blockHeader.blockNo
+      });
     });
 
-    it('queries WalletProvider again with sinceBlock from a previous transaction on rollback', async () => {
+    it('queries ChainHistoryProvider again with sinceBlock from a previous transaction on rollback', async () => {
       await firstValueFrom(store.setAll(queryTransactionsResult));
-      walletProvider.transactionsByAddresses = jest
+      chainHistoryProvider.transactionsByAddresses = jest
         .fn()
         .mockImplementationOnce(() => delay(50).then(() => []))
         .mockImplementationOnce(() => delay(50).then(() => [queryTransactionsResult[0]]));
       const provider$ = createAddressTransactionsProvider(
-        walletProvider,
+        chainHistoryProvider,
         of(addresses),
         retryBackoffConfig,
         tip$,
@@ -76,17 +76,15 @@ describe('TransactionsTracker', () => {
         [queryTransactionsResult[0]]
       ]);
       expect(store.setAll).toBeCalledTimes(2);
-      expect(walletProvider.transactionsByAddresses).toBeCalledTimes(2);
-      expect(walletProvider.transactionsByAddresses).nthCalledWith(
-        1,
+      expect(chainHistoryProvider.transactionsByAddresses).toBeCalledTimes(2);
+      expect(chainHistoryProvider.transactionsByAddresses).nthCalledWith(1, {
         addresses,
-        queryTransactionsResult[1].blockHeader.blockNo
-      );
-      expect(walletProvider.transactionsByAddresses).nthCalledWith(
-        2,
+        sinceBlock: queryTransactionsResult[1].blockHeader.blockNo
+      });
+      expect(chainHistoryProvider.transactionsByAddresses).nthCalledWith(2, {
         addresses,
-        queryTransactionsResult[0].blockHeader.blockNo
-      );
+        sinceBlock: queryTransactionsResult[0].blockHeader.blockNo
+      });
     });
   });
 
@@ -94,7 +92,7 @@ describe('TransactionsTracker', () => {
     // these variables are not relevant for tests, because
     // they're using mock transactionsSource$
     let retryBackoffConfig: RetryBackoffConfig;
-    let walletProvider: WalletProvider;
+    let chainHistoryProvider: ChainHistoryProvider;
     let store: OrderedCollectionStore<Cardano.TxAlonzo>;
     const myAddress = queryTransactionsResult[0].body.inputs[0].address;
     const addresses$ = of([myAddress!]);
@@ -120,6 +118,7 @@ describe('TransactionsTracker', () => {
         const transactionsTracker = createTransactionsTracker(
           {
             addresses$,
+            chainHistoryProvider,
             newTransactions: {
               failedToSubmit$,
               pending$,
@@ -127,8 +126,7 @@ describe('TransactionsTracker', () => {
             },
             retryBackoffConfig,
             store,
-            tip$,
-            walletProvider
+            tip$
           },
           {
             transactionsSource$
@@ -162,6 +160,7 @@ describe('TransactionsTracker', () => {
         const transactionsTracker = createTransactionsTracker(
           {
             addresses$,
+            chainHistoryProvider,
             newTransactions: {
               failedToSubmit$,
               pending$,
@@ -169,8 +168,7 @@ describe('TransactionsTracker', () => {
             },
             retryBackoffConfig,
             store,
-            tip$,
-            walletProvider
+            tip$
           },
           {
             transactionsSource$
@@ -203,6 +201,7 @@ describe('TransactionsTracker', () => {
         const transactionsTracker = createTransactionsTracker(
           {
             addresses$,
+            chainHistoryProvider,
             newTransactions: {
               failedToSubmit$,
               pending$,
@@ -210,8 +209,7 @@ describe('TransactionsTracker', () => {
             },
             retryBackoffConfig,
             store,
-            tip$,
-            walletProvider
+            tip$
           },
           {
             transactionsSource$

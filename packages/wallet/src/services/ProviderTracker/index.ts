@@ -6,3 +6,4 @@ export * from './TrackedWalletProvider';
 export * from './TrackedAssetProvider';
 export * from './ProviderStatusTracker';
 export * from './TrackedUtxoProvider';
+export * from './TrackedChainHistoryProvider';

@@ -2,6 +2,7 @@ import { SingleAddressWallet } from '../../../src';
 import { WalletStores, createPouchdbWalletStores } from '../../../src/persistence';
 import {
   assetProvider,
+  chainHistoryProvider,
   keyAgentReady,
   networkInfoProvider,
   stakePoolProvider,
@@ -26,6 +27,7 @@ describe('SingleAddressWallet/pouchdbWalletStores', () => {
       { name: walletName },
       {
         assetProvider: await assetProvider,
+        chainHistoryProvider: await chainHistoryProvider,
         keyAgent: await keyAgentReady,
         networkInfoProvider: await networkInfoProvider,
         stakePoolProvider,

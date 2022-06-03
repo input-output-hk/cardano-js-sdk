@@ -5,6 +5,7 @@ import { TX_TIMEOUT, firstValueFromTimed, waitForWalletStateSettle } from '../..
 import { TxInternals } from '../../../src/Transaction';
 import {
   assetProvider,
+  chainHistoryProvider,
   keyAgentByIdx,
   networkInfoProvider,
   poolId1,
@@ -70,6 +71,7 @@ const getWallet = async (idx: number) =>
     { name: `Test Wallet ${idx}` },
     {
       assetProvider: await assetProvider,
+      chainHistoryProvider: await chainHistoryProvider,
       keyAgent: await keyAgentByIdx(idx),
       networkInfoProvider: await networkInfoProvider,
       stakePoolProvider,

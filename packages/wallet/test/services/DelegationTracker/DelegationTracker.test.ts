@@ -1,4 +1,4 @@
-import { Cardano, WalletProvider } from '@cardano-sdk/core';
+import { Cardano, ChainHistoryProvider } from '@cardano-sdk/core';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TransactionsTracker } from '../../../src/services';
 import { certificateTransactionsWithEpochs, createBlockEpochProvider } from '../../../src/services/DelegationTracker';
@@ -19,13 +19,13 @@ describe('DelegationTracker', () => {
           b: [{ epoch: 100 }, { epoch: 101 }]
         })
       );
-      const walletProvider = null as unknown as WalletProvider; // not used in this test
+      const chainHistoryProvider = null as unknown as ChainHistoryProvider; // not used in this test
       const config = null as unknown as RetryBackoffConfig; // not used in this test
       const hashes = [
         '0dbe461fb5f981c0d01615332b8666340eb1a692b3034f46bcb5f5ea4172b2ed',
         'a0805ae8e52318f0e499be7f85d3f1d5c7dddeacdca0dab9e9d9a8ae6c49a22c'
       ].map(Cardano.BlockId);
-      expectObservable(createBlockEpochProvider(walletProvider, config)(hashes)).toBe('a-b', {
+      expectObservable(createBlockEpochProvider(chainHistoryProvider, config)(hashes)).toBe('a-b', {
         a: [100],
         b: [100, 101]
       });
