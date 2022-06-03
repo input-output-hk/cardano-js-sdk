@@ -25,6 +25,10 @@ export abstract class HttpService {
     });
   }
 
+  async start(): Promise<void> {
+    return Promise.resolve();
+  }
+
   async close(): Promise<void> {
     return Promise.resolve();
   }

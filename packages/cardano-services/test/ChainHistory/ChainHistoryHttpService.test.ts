@@ -2,13 +2,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable max-len */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-  Cardano,
-  ChainHistoryProvider,
-  ProviderError,
-  ProviderFailure,
-  TransactionsByAddressesArgs
-} from '@cardano-sdk/core';
+import { Cardano, ChainHistoryProvider, TransactionsByAddressesArgs } from '@cardano-sdk/core';
 import { ChainHistoryHttpService, DbSyncChainHistoryProvider, HttpServer, HttpServerConfig } from '../../src';
 import { Pool } from 'pg';
 import { chainHistoryHttpProvider } from '@cardano-sdk/cardano-services-client';
@@ -41,20 +35,6 @@ describe('ChainHistoryHttpService', () => {
 
   afterEach(async () => {
     jest.resetAllMocks();
-  });
-
-  describe('unhealthy ChainHistoryProvider', () => {
-    beforeAll(async () => {
-      chainHistoryProvider = {
-        healthCheck: jest.fn(() => Promise.resolve({ ok: false }))
-      } as unknown as DbSyncChainHistoryProvider;
-    });
-
-    it('throws during initialization if the ChainHistoryProvider is unhealthy', async () => {
-      await expect(() => ChainHistoryHttpService.create({ chainHistoryProvider })).rejects.toThrow(
-        new ProviderError(ProviderFailure.Unhealthy)
-      );
-    });
   });
 
   describe('healthy state', () => {

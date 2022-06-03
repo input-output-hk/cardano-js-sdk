@@ -1,8 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Connection, createConnectionObject } from '@cardano-ogmios/client';
+import { Pool } from 'pg';
 import { createMockOgmiosServer } from '@cardano-sdk/ogmios/test/mocks/mockOgmiosServer';
 import { getRandomPort } from 'get-port-please';
 import axios, { AxiosRequestConfig } from 'axios';
 import waitOn from 'wait-on';
+
+type WrappedAsyncTestFunction = (db: Pool) => Promise<any>;
+type AsyncTestFunction = () => Promise<any>;
 
 export const serverReady = (apiUrl: string, statusCodeMatch = 404): Promise<void> =>
   waitOn({
@@ -31,3 +36,30 @@ export const doServerRequest =
   (apiBaseUrl: string) =>
   async <Args, Response>(url: string, args: Args, extraOptions: AxiosRequestConfig = {}) =>
     (await axios.post(`${apiBaseUrl}${url}`, { args }, extraOptions)).data as Promise<Response>;
+
+export const ingestDbData = async (db: Pool, tableName: string, columns: string[], values: any[]) => {
+  const columnsPlaceholder = columns.toString();
+  const valuesPlaceholder = Array.from({ length: values.length }, (_, i) => `$${i + 1}`).toString();
+  const sqlString = `INSERT INTO ${tableName} (${columnsPlaceholder}) VALUES (${valuesPlaceholder});`;
+
+  await db.query(sqlString, values);
+};
+
+export const deleteDbData = async (db: Pool, tableName: string, field: string, value: any) => {
+  const sqlString = `DELETE FROM ${tableName} WHERE ${field} = ${value};`;
+
+  await db.query(sqlString);
+};
+
+/**
+ * Wraps integration test within a transaction and once test has finished, rollback is executed
+ * Guarantee that db state remains clean after data ingestion needed for specific test cases
+ */
+export const wrapWithTransaction =
+  (testFunction: WrappedAsyncTestFunction, db: Pool): AsyncTestFunction =>
+  async () => {
+    await db.query('START TRANSACTION');
+    return Promise.resolve(testFunction(db).then(() => db.query('ROLLBACK')));
+  };
+
+export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));

@@ -1,5 +1,5 @@
 import * as OpenApiValidator from 'express-openapi-validator';
-import { ChainHistoryProvider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { ChainHistoryProvider } from '@cardano-sdk/core';
 import { DbSyncChainHistoryProvider } from './DbSyncChainHistory/DbSyncChainHistoryProvider';
 import { HttpService } from '../Http';
 import { Logger, dummyLogger } from 'ts-log';
@@ -29,9 +29,7 @@ export class ChainHistoryHttpService extends HttpService {
 
   static async create({ logger = dummyLogger, chainHistoryProvider }: ChainHistoryHttpServiceDependencies) {
     const router = express.Router();
-    if (!(await chainHistoryProvider.healthCheck()).ok) {
-      throw new ProviderError(ProviderFailure.Unhealthy);
-    }
+
     const apiSpec = path.join(__dirname, 'openApi.json');
     router.use(
       OpenApiValidator.middleware({

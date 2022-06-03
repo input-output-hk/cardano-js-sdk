@@ -30,6 +30,7 @@ describe('entrypoints', () => {
     apiPort = await getRandomPort();
     apiUrl = `http://localhost:${apiPort}`;
   });
+
   afterEach(() => {
     if (proc !== undefined) proc.kill();
   });
@@ -52,12 +53,14 @@ describe('entrypoints', () => {
     let ogmiosPort: ConnectionConfig['port'];
     let ogmiosConnection: Connection;
     let cardanoNodeConfigPath: string;
+    let dbQueriesCacheTtl: string;
 
     beforeAll(async () => {
       ogmiosPort = await getRandomPort();
       ogmiosConnection = createConnectionObject({ port: ogmiosPort });
       dbConnectionString = process.env.DB_CONNECTION_STRING!;
       cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
+      dbQueriesCacheTtl = process.env.DB_QUERIES_CACHE_TTL!;
     });
 
     describe('with healthy internal providers', () => {
@@ -85,6 +88,8 @@ describe('entrypoints', () => {
             ogmiosConnection.address.webSocket,
             '--cardano-node-config-path',
             cardanoNodeConfigPath,
+            '--db-queries-cache-ttl',
+            dbQueriesCacheTtl,
             ServiceNames.StakePool,
             ServiceNames.TxSubmit,
             ServiceNames.NetworkInfo,
@@ -102,6 +107,7 @@ describe('entrypoints', () => {
               API_URL: apiUrl,
               CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
               DB_CONNECTION_STRING: dbConnectionString,
+              DB_QUERIES_CACHE_TTL: dbQueriesCacheTtl,
               LOGGER_MIN_SEVERITY: 'error',
               OGMIOS_URL: ogmiosConnection.address.webSocket,
               SERVICE_NAMES: `${ServiceNames.StakePool},${ServiceNames.TxSubmit},${ServiceNames.NetworkInfo},${ServiceNames.Utxo}`
@@ -121,6 +127,7 @@ describe('entrypoints', () => {
         });
 
         it('cli:start-server stake-pool exits with code 0', (done) => {
+          expect.assertions(2);
           proc = fork(
             exePath('cli'),
             ['start-server', '--api-url', apiUrl, '--logger-min-severity', 'error', ServiceNames.StakePool],
@@ -137,6 +144,7 @@ describe('entrypoints', () => {
         });
 
         it('cli:start-server network-info exits with code 0', (done) => {
+          expect.assertions(2);
           proc = fork(
             exePath('cli'),
             [
@@ -161,7 +169,37 @@ describe('entrypoints', () => {
           });
         });
 
+        it('cli:start-server network-info exits with code 1 when cache TTL is out of range', (done) => {
+          expect.assertions(2);
+          const cacheTtlOutOfRange = '3000';
+          proc = fork(
+            exePath('cli'),
+            [
+              'start-server',
+              '--api-url',
+              apiUrl,
+              '--logger-min-severity',
+              'error',
+              '--cardano-node-config-path',
+              cardanoNodeConfigPath,
+              '--db-queries-cache-ttl',
+              cacheTtlOutOfRange,
+              ServiceNames.NetworkInfo
+            ],
+            {
+              stdio: 'pipe'
+            }
+          );
+          proc.stderr!.on('data', spy);
+          proc.on('exit', (code) => {
+            expect(code).toBe(0);
+            expect(spy).toHaveBeenCalled();
+            done();
+          });
+        });
+
         it('cli:start-server utxo exits with code 0', (done) => {
+          expect.assertions(2);
           proc = fork(
             exePath('cli'),
             [
@@ -187,6 +225,7 @@ describe('entrypoints', () => {
         });
 
         it('run stake-pool exits with code 0', (done) => {
+          expect.assertions(2);
           proc = fork(exePath('run'), {
             env: {
               API_URL: apiUrl,
@@ -204,6 +243,7 @@ describe('entrypoints', () => {
         });
 
         it('run network-info exits with code 0', (done) => {
+          expect.assertions(2);
           proc = fork(exePath('run'), {
             env: {
               API_URL: apiUrl,
@@ -220,7 +260,28 @@ describe('entrypoints', () => {
           });
         });
 
+        it('run network-info exits with code 1 when cache TTL is out of range', (done) => {
+          expect.assertions(2);
+          const cacheTtlOutOfRange = '3000';
+          proc = fork(exePath('run'), {
+            env: {
+              API_URL: apiUrl,
+              DB_QUERIES_CACHE_TTL: cacheTtlOutOfRange,
+              LOGGER_MIN_SEVERITY: 'error',
+              SERVICE_NAMES: ServiceNames.NetworkInfo
+            },
+            stdio: 'pipe'
+          });
+          proc.stderr!.on('data', spy);
+          proc.on('exit', (code) => {
+            expect(code).toBe(1);
+            expect(spy).toHaveBeenCalled();
+            done();
+          });
+        });
+
         it('run utxo exits with code 0', (done) => {
+          expect.assertions(2);
           proc = fork(exePath('run'), {
             env: {
               API_URL: apiUrl,
@@ -245,6 +306,7 @@ describe('entrypoints', () => {
         });
 
         it('cli:start-server network-info exits with code 0', (done) => {
+          expect.assertions(2);
           proc = fork(
             exePath('cli'),
             [
@@ -270,6 +332,7 @@ describe('entrypoints', () => {
         });
 
         it('run network-info exits with code 0', (done) => {
+          expect.assertions(2);
           proc = fork(exePath('run'), {
             env: {
               API_URL: apiUrl,
@@ -401,6 +464,7 @@ describe('entrypoints', () => {
       });
 
       it('cli:start-server exits with code 0', (done) => {
+        expect.assertions(2);
         ogmiosServer.listen(ogmiosConnection.port, () => {
           proc = fork(
             exePath('cli'),
@@ -431,6 +495,7 @@ describe('entrypoints', () => {
       });
 
       it('run exits with code 0', (done) => {
+        expect.assertions(2);
         ogmiosServer.listen(ogmiosConnection.port, () => {
           proc = fork(exePath('run'), {
             env: {
@@ -464,6 +529,7 @@ describe('entrypoints', () => {
       });
 
       it('cli:start-server exits with code 0', (done) => {
+        expect.assertions(2);
         ogmiosServer.listen(ogmiosConnection.port, () => {
           proc = fork(
             exePath('cli'),
@@ -492,6 +558,7 @@ describe('entrypoints', () => {
       });
 
       it('run exits with code 0', (done) => {
+        expect.assertions(2);
         ogmiosServer.listen(ogmiosConnection.port, () => {
           proc = fork(exePath('run'), {
             env: {

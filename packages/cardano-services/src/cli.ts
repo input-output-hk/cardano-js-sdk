@@ -8,8 +8,10 @@ import {
   ServiceNames,
   loadHttpServer
 } from './Program';
+import { CACHE_TTL_DEFAULT } from './InMemoryCache';
 import { Command } from 'commander';
 import { CommonOptionDescriptions } from './ProgramsCommon';
+import { DB_POLL_INTERVAL_DEFAULT } from './NetworkInfo';
 import { InvalidLoggerLevel } from './errors';
 import {
   PARALLEL_MODE_DEFAULT,
@@ -21,6 +23,7 @@ import {
   loadTxWorker
 } from './TxWorker';
 import { URL } from 'url';
+import { cacheTtlValidator } from './util/validators';
 import { loggerMethodNames } from './util';
 import clear from 'clear';
 import fs from 'fs';
@@ -76,6 +79,18 @@ commonOptions(
     new URL(url).toString()
   )
   .option('--cardano-node-config-path <cardanoNodeConfigPath>', ProgramOptionDescriptions.CardanoNodeConfigPath)
+  .option(
+    '--db-queries-cache-ttl <dbQueriesCacheTtl>',
+    ProgramOptionDescriptions.DbQueriesCacheTtl,
+    cacheTtlValidator,
+    CACHE_TTL_DEFAULT
+  )
+  .option(
+    '--db-poll-interval <dbPollInterval>',
+    ProgramOptionDescriptions.DbPollInterval,
+    (interval) => Number.parseInt(interval, 10),
+    DB_POLL_INTERVAL_DEFAULT
+  )
   .option('--use-queue', ProgramOptionDescriptions.UseQueue, () => true, false)
   .action(async (serviceNames: ServiceNames[], options: { apiUrl: URL } & HttpServerOptions) => {
     const { apiUrl, ...rest } = options;
@@ -130,6 +145,5 @@ if (process.argv.slice(2).length === 0) {
   program.parseAsync(process.argv).catch((error) => {
     // eslint-disable-next-line no-console
     console.error(error);
-    process.exit(0);
   });
 }

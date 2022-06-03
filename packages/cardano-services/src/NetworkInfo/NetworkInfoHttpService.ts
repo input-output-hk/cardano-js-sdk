@@ -29,6 +29,7 @@ export class NetworkInfoHttpService extends HttpService {
 
   static create({ logger = dummyLogger, networkInfoProvider }: NetworkInfoServiceDependencies) {
     const router = express.Router();
+
     const apiSpec = path.join(__dirname, 'openApi.json');
     router.use(
       OpenApiValidator.middleware({
@@ -46,5 +47,13 @@ export class NetworkInfoHttpService extends HttpService {
       )
     );
     return new NetworkInfoHttpService({ logger, networkInfoProvider }, router);
+  }
+
+  async start(): Promise<void> {
+    await this.#networkInfoProvider.start();
+  }
+
+  async close(): Promise<void> {
+    await this.#networkInfoProvider.close();
   }
 }

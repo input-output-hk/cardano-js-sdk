@@ -7,6 +7,7 @@ import { DbSyncRewardsProvider, RewardsHttpService } from '../Rewards';
 import { DbSyncStakePoolProvider, StakePoolHttpService } from '../StakePool';
 import { DbSyncUtxoProvider, UtxoHttpService } from '../Utxo';
 import { HttpServer, HttpServerConfig, HttpService } from '../Http';
+import { InMemoryCache } from '../InMemoryCache';
 import { MissingProgramOption, UnknownServiceName } from './errors';
 import { ProgramOptionDescriptions } from './ProgramOptionDescriptions';
 import { RabbitMqTxSubmitProvider } from '@cardano-sdk/rabbitmq';
@@ -18,6 +19,8 @@ import pg from 'pg';
 
 export interface HttpServerOptions extends CommonProgramOptions {
   dbConnectionString?: string;
+  dbQueriesCacheTtl: number;
+  dbPollInterval: number;
   cardanoNodeConfigPath?: string;
   metricsEnabled?: boolean;
   useQueue?: boolean;
@@ -36,7 +39,7 @@ export interface ProgramArgs {
   options?: HttpServerOptions;
 }
 
-const serviceMapFactory = (args: ProgramArgs, logger: Logger, db?: pg.Pool) => ({
+const serviceMapFactory = (args: ProgramArgs, logger: Logger, cache: InMemoryCache, db?: pg.Pool) => ({
   [ServiceNames.StakePool]: async () => {
     if (!db) throw new MissingProgramOption(ServiceNames.StakePool, ProgramOptionDescriptions.DbConnection);
     return await StakePoolHttpService.create({
@@ -67,7 +70,10 @@ const serviceMapFactory = (args: ProgramArgs, logger: Logger, db?: pg.Pool) => (
 
     return await NetworkInfoHttpService.create({
       logger,
-      networkInfoProvider: new DbSyncNetworkInfoProvider(args.options?.cardanoNodeConfigPath, db, logger)
+      networkInfoProvider: new DbSyncNetworkInfoProvider(
+        { cardanoNodeConfigPath: args.options?.cardanoNodeConfigPath, dbPollInterval: args.options?.dbPollInterval },
+        { cache, db, logger }
+      )
     });
   },
   [ServiceNames.TxSubmit]: async () =>
@@ -98,7 +104,9 @@ export const loadHttpServer = async (args: ProgramArgs): Promise<HttpServer> => 
     ? new pg.Pool({ connectionString: args.options.dbConnectionString })
     : undefined;
 
-  const serviceMap = serviceMapFactory(args, logger, db);
+  const cache = new InMemoryCache(args.options?.dbQueriesCacheTtl);
+
+  const serviceMap = serviceMapFactory(args, logger, cache, db);
 
   for (const serviceName of args.serviceNames) {
     if (serviceMap[serviceName]) {
