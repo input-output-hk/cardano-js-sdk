@@ -73,6 +73,7 @@ commonOptions(
   .option('--db-connection-string <dbConnectionString>', ProgramOptionDescriptions.DbConnection, (url) =>
     new URL(url).toString()
   )
+  .option('--cardano-node-config-path <cardanoNodeConfigPath>', ProgramOptionDescriptions.CardanoNodeConfigPath)
   .option('--use-queue', ProgramOptionDescriptions.UseQueue, () => true, false)
   .action(async (serviceNames: ServiceNames[], options: { apiUrl: URL } & HttpServerOptions) => {
     const { apiUrl, ...rest } = options;

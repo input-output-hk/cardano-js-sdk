@@ -11,6 +11,7 @@ import onDeath from 'death';
 
 const envSpecs = {
   API_URL: envalid.url({ default: API_URL_DEFAULT }),
+  CARDANO_NODE_CONFIG_PATH: envalid.str({ default: undefined }),
   DB_CONNECTION_STRING: envalid.str({ default: undefined }),
   LOGGER_MIN_SEVERITY: envalid.str({ choices: loggerMethodNames as string[], default: 'info' }),
   OGMIOS_URL: envalid.url({ default: OGMIOS_URL_DEFAULT }),
@@ -25,6 +26,7 @@ void (async () => {
   const apiUrl = new URL(env.API_URL);
   const ogmiosUrl = new URL(env.OGMIOS_URL);
   const rabbitmqUrl = new URL(env.RABBITMQ_URL);
+  const cardanoNodeConfigPath = env.CARDANO_NODE_CONFIG_PATH;
   const dbConnectionString = env.DB_CONNECTION_STRING ? new URL(env.DB_CONNECTION_STRING).toString() : undefined;
   const serviceNames = env.SERVICE_NAMES.split(',') as ServiceNames[];
 
@@ -32,6 +34,7 @@ void (async () => {
     const server = await loadHttpServer({
       apiUrl,
       options: {
+        cardanoNodeConfigPath,
         dbConnectionString,
         loggerMinSeverity: env.LOGGER_MIN_SEVERITY as LogLevel,
         ogmiosUrl,

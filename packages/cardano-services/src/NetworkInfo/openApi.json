@@ -1,0 +1,179 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Network Info",
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/network-info/network": {
+      "post": {
+        "summary": "fetch network info",
+        "description": "Fetch Network Info",
+        "operationId": "networkInfo",
+        "requestBody": {
+          "content": {
+            "application/json": {}
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "network info fetched",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NetworkInfoResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid request"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Network": {
+        "required": [
+          "id",
+          "magic",
+          "timeSettings"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "example": 1
+          },
+          "magic": {
+            "type": "number",
+            "example": 24
+          },
+          "timeSettings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TimeSettings"
+            }
+          }
+        }
+      },
+      "Stake": {
+        "required": [
+          "active",
+          "live"
+        ],
+        "type": "object",
+        "properties": {
+          "live": {
+            "$ref": "#/components/schemas/BigInt"
+          },
+          "active": {
+            "$ref": "#/components/schemas/BigInt"
+          }
+        }
+      },
+      "LovelaceSupply": {
+        "required": [
+          "circulating",
+          "max",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "circulating": {
+            "$ref": "#/components/schemas/BigInt"
+          },
+          "max": {
+            "$ref": "#/components/schemas/BigInt"
+          },
+          "total": {
+            "$ref": "#/components/schemas/BigInt"
+          }
+        }
+      },
+      "TimeSettings": {
+        "required": [
+          "epochLength",
+          "fromSlotDate",
+          "fromSlotNo",
+          "slotLength"
+        ],
+        "type": "object",
+        "properties": {
+          "epochLength": {
+            "type": "number",
+            "example": 21600
+          },
+          "fromSlotDate": {
+            "$ref": "#/components/schemas/Date"
+          },
+          "fromSlotNo": {
+            "type": "number",
+            "example": 1200
+          },
+          "slotLength": {
+            "type": "number",
+            "example": 1000
+          }
+        }
+      },
+      "Date": {
+        "required": [
+          "__type",
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "number"
+          },
+          "__type": {
+            "type": "string",
+            "enum": [
+              "Date"
+            ]
+          }
+        }
+      },
+      "BigInt": {
+        "required": [
+          "__type",
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "example": "112233445566778899"
+          },
+          "__type": {
+            "type": "string",
+            "enum": [
+              "bigint"
+            ]
+          }
+        }
+      },
+      "NetworkInfoResponse": {
+        "type": "object",
+        "properties": {
+          "network": {
+            "$ref": "#/components/schemas/Network"
+          },
+          "stake": {
+            "$ref": "#/components/schemas/Stake"
+          },
+          "lovelaceSupply": {
+            "$ref": "#/components/schemas/LovelaceSupply"
+          }
+        }
+      }
+    }
+  }
+}

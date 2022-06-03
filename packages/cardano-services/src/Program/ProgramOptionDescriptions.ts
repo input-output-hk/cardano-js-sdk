@@ -4,7 +4,10 @@ enum HttpServerOptionDescriptions {
   ApiUrl = 'API URL',
   DbConnection = 'DB Connection',
   MetricsEnabled = 'Enable Prometheus Metrics',
-  UseQueue = 'Enables RabbitMQ'
+  OgmiosUrl = 'Ogmios URL',
+  RabbitMQUrl = 'RabbitMQ URL',
+  UseQueue = 'Enables RabbitMQ',
+  CardanoNodeConfigPath = 'Cardano node config path'
 }
 
 export type ProgramOptionDescriptions = CommonOptionDescriptions | HttpServerOptionDescriptions;
