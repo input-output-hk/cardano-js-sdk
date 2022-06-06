@@ -77,7 +77,8 @@ document.querySelector('#createLedgerKeyAgent')!.addEventListener('click', async
       keyAgent: KeyManagement.util.createAsyncKeyAgent(
         await KeyManagement.LedgerKeyAgent.createWithDevice({
           communicationType: KeyManagement.CommunicationType.Web,
-          networkId: Cardano.NetworkId.testnet
+          networkId: Cardano.NetworkId.testnet,
+          protocolMagic: 1_097_911_063
         })
       ),
       walletName
