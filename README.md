@@ -87,6 +87,13 @@ A Yarn Workspace maintaining a single version across all packages.
 - [nvm](https://github.com/nvm-sh/nvm)
 - [yarn](https://classic.yarnpkg.com/lang/en/docs/install)
 
+#### Clone
+``` console
+git clone \
+  --recurse-submodules \
+  https://github.com/input-output-hk/cardano-js-sdk.git \
+  && cd cardano-js-sdk
+```
 #### Install and Build
 
 ```console
