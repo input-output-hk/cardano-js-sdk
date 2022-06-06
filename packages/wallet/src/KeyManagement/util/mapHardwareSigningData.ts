@@ -103,16 +103,16 @@ const checkIsChangeAddress = (knownAddresses: GroupedAddress[], outputAddress: B
   };
 };
 
-const prepareTrezorInputs = (
+const prepareTrezorInputs = async (
   inputs: CSL.TransactionInputs,
   inputAddressResolver: ResolveInputAddress,
   knownAddresses: GroupedAddress[]
-): trezor.CardanoInput[] => {
+): Promise<trezor.CardanoInput[]> => {
   const trezorInputs = [];
   for (let i = 0; i < inputs.len(); i++) {
     const input = inputs.get(i);
     const coreInput = cslToCore.txIn(input);
-    const paymentAddress = inputAddressResolver(coreInput);
+    const paymentAddress = await inputAddressResolver(coreInput);
 
     let trezorInput = {
       prev_hash: Buffer.from(input.transaction_id().to_bytes()).toString('hex'),
@@ -419,16 +419,16 @@ const prepareTrezorMintBundle = (
   };
 };
 
-const prepareLedgerInputs = (
+const prepareLedgerInputs = async (
   inputs: CSL.TransactionInputs,
   inputAddressResolver: ResolveInputAddress,
   knownAddresses: GroupedAddress[]
-): ledger.TxInput[] => {
+): Promise<ledger.TxInput[]> => {
   const ledgerInputs = [];
   for (let i = 0; i < inputs.len(); i++) {
     const input = inputs.get(i);
     const coreInput = cslToCore.txIn(input);
-    const paymentAddress = inputAddressResolver(coreInput);
+    const paymentAddress = await inputAddressResolver(coreInput);
 
     let paymentKeyPath = null;
     if (paymentAddress) {
@@ -844,7 +844,7 @@ export const txToLedger = async ({
   ];
 
   // TX - Inputs
-  const ledgerInputs = prepareLedgerInputs(cslTxBody.inputs(), inputAddressResolver, knownAddresses);
+  const ledgerInputs = await prepareLedgerInputs(cslTxBody.inputs(), inputAddressResolver, knownAddresses);
 
   // TX - Outputs
   const ledgerOutputs = prepareLedgerOutputs(cslTxBody.outputs(), accountIndex, knownAddresses);
@@ -936,7 +936,7 @@ export const txToTrezor = async ({
   ];
 
   // TX - Inputs
-  const trezorInputs = prepareTrezorInputs(cslTxBody.inputs(), inputAddressResolver, knownAddresses);
+  const trezorInputs = await prepareTrezorInputs(cslTxBody.inputs(), inputAddressResolver, knownAddresses);
 
   // TX - Outputs
   const trezorOutputs = prepareTrezorOutputs(cslTxBody.outputs(), accountIndex, knownAddresses);

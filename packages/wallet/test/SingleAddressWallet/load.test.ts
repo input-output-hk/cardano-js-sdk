@@ -65,20 +65,20 @@ const assertWalletProperties = async (
   // name
   expect(wallet.name).toBe(name);
   // utxo
-  await firstValueFrom(wallet.utxo.available$);
-  await firstValueFrom(wallet.utxo.total$);
-  expect(wallet.utxo.available$.value).toEqual(mocks.utxo);
-  expect(wallet.utxo.total$.value).toEqual(mocks.utxo);
+  const utxoAvailable = await firstValueFrom(wallet.utxo.available$);
+  const utxoTotal = await firstValueFrom(wallet.utxo.total$);
+  expect(utxoAvailable).toEqual(mocks.utxo);
+  expect(utxoTotal).toEqual(mocks.utxo);
   // balance
-  await firstValueFrom(wallet.balance.available$);
-  await firstValueFrom(wallet.balance.total$);
-  expect(wallet.balance.available$.value?.coins).toEqual(
+  const balanceAvailable = await firstValueFrom(wallet.balance.available$);
+  const balanceTotal = await firstValueFrom(wallet.balance.total$);
+  expect(balanceAvailable?.coins).toEqual(
     Cardano.util.coalesceValueQuantities(mocks.utxo.map((utxo) => utxo[1].value)).coins
   );
-  expect(wallet.balance.total$.value?.rewards).toBe(mocks.rewardAccountBalance);
+  expect(balanceTotal?.rewards).toBe(mocks.rewardAccountBalance);
   // transactions
-  await firstValueFrom(wallet.transactions.history$);
-  expect(wallet.transactions.history$.value?.length).toBeGreaterThan(0);
+  const transactionsHistory = await firstValueFrom(wallet.transactions.history$);
+  expect(transactionsHistory?.length).toBeGreaterThan(0);
   // tip$
   await firstValueFrom(wallet.tip$);
   expect(wallet.tip$.value).toEqual(mocks.ledgerTip);
@@ -112,20 +112,25 @@ const assertWalletProperties = async (
 };
 
 const assertWalletProperties2 = async (wallet: ObservableWallet) => {
-  expect(wallet.utxo.available$.value).toEqual(mocks.utxo2);
-  expect(wallet.utxo.total$.value).toEqual(mocks.utxo2);
-  expect(wallet.balance.available$.value?.coins).toEqual(
+  expect(await firstValueFrom(wallet.utxo.available$)).toEqual(mocks.utxo2);
+  expect(await firstValueFrom(wallet.utxo.total$)).toEqual(mocks.utxo2);
+  expect((await firstValueFrom(wallet.balance.available$))?.coins).toEqual(
     Cardano.util.coalesceValueQuantities(mocks.utxo2.map((utxo) => utxo[1].value)).coins
   );
-  expect(wallet.balance.total$.value?.rewards).toBe(mocks.rewardAccountBalance2);
-  expect(wallet.transactions.history$.value?.length).toEqual(queryTransactionsResult2.length);
-  expect(wallet.tip$.value).toEqual(mocks.ledgerTip2);
-  expect(wallet.networkInfo$.value?.network.timeSettings).toEqual(testnetTimeSettings);
-  expect(wallet.currentEpoch$.value?.epochNo).toEqual(currentEpoch.number);
-  expect(wallet.protocolParameters$.value).toEqual(mocks.protocolParameters2);
-  expect(wallet.genesisParameters$.value).toEqual(mocks.genesisParameters2);
+  expect((await firstValueFrom(wallet.balance.total$))?.rewards).toBe(mocks.rewardAccountBalance2);
+  expect((await firstValueFrom(wallet.transactions.history$))?.length).toEqual(queryTransactionsResult2.length);
+  const walletTip = await firstValueFrom(wallet.tip$);
+  expect(walletTip).toEqual(mocks.ledgerTip2);
+  const walletNetworkInfo = await firstValueFrom(wallet.networkInfo$);
+  expect(walletNetworkInfo.network.timeSettings).toEqual(testnetTimeSettings);
+  const walletCurrentEpoch = await firstValueFrom(wallet.currentEpoch$);
+  expect(walletCurrentEpoch.epochNo).toEqual(currentEpoch.number);
+  const walletProtocolParameters = await firstValueFrom(wallet.protocolParameters$);
+  expect(walletProtocolParameters).toEqual(mocks.protocolParameters2);
+  const walletGenesisParameters = await firstValueFrom(wallet.genesisParameters$);
+  expect(walletGenesisParameters).toEqual(mocks.genesisParameters2);
   // delegation
-  const rewardsHistory = wallet.delegation.rewardsHistory$.value!;
+  const rewardsHistory = await firstValueFrom(wallet.delegation.rewardsHistory$)!;
   const expectedRewards = flatten([...mocks.rewardsHistory2.values()]);
   expect(rewardsHistory.all).toEqual(expectedRewards);
   const rewardAccounts = await firstValueFrom(wallet.delegation.rewardAccounts$);

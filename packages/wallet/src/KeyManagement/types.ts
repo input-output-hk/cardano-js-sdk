@@ -118,7 +118,7 @@ export type GetPassword = (noCache?: true) => Promise<Uint8Array>;
  * @param txIn transaction input to resolve address from
  * @returns input owner address
  */
-export type ResolveInputAddress = (txIn: Cardano.NewTxIn) => Cardano.Address | null;
+export type ResolveInputAddress = (txIn: Cardano.NewTxIn) => Promise<Cardano.Address | null>;
 
 export interface SignTransactionOptions {
   inputAddressResolver: ResolveInputAddress;

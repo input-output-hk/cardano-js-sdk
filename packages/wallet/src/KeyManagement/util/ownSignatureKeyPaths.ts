@@ -8,20 +8,23 @@ import { uniq } from 'lodash-es';
  *
  * @returns {AccountKeyDerivationPath[]} derivation paths for keys to sign transaction with
  */
-export const ownSignatureKeyPaths = (
+export const ownSignatureKeyPaths = async (
   txBody: Cardano.NewTxBodyAlonzo,
   knownAddresses: GroupedAddress[],
   resolveInputAddress: ResolveInputAddress
-): AccountKeyDerivationPath[] => {
+): Promise<AccountKeyDerivationPath[]> => {
   const paymentKeyPaths = uniq(
-    txBody.inputs
-      .map((input) => {
-        const ownAddress = resolveInputAddress(input);
-        if (!ownAddress) return null;
-        return knownAddresses.find(({ address }) => address === ownAddress);
-      })
-      .filter(isNotNil)
+    (
+      await Promise.all(
+        txBody.inputs.map(async (input) => {
+          const ownAddress = await resolveInputAddress(input);
+          if (!ownAddress) return null;
+          return knownAddresses.find(({ address }) => address === ownAddress);
+        })
+      )
+    ).filter(isNotNil)
   ).map(({ type, index }) => ({ index, role: Number(type) }));
+
   const isStakingKeySignatureRequired = txBody.certificates?.length;
   if (isStakingKeySignatureRequired) {
     return [...paymentKeyPaths, { index: 0, role: KeyRole.Stake }];

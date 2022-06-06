@@ -158,8 +158,9 @@ export const createWalletApi = (
          * algorithm to make this selection, using a wallet address to
          * satisfy the interface only.
          */
+        const addresses = await firstValueFrom(wallet.addresses$);
         const { inputSelection } = await wallet.initializeTx({
-          outputs: new Set([{ address: wallet.addresses$.value![0].address, value: cslToCore.value(filterAmount) }])
+          outputs: new Set([{ address: addresses[0].address, value: cslToCore.value(filterAmount) }])
         });
 
         utxos = [...inputSelection.inputs];
