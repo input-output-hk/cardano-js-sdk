@@ -11,30 +11,26 @@ import {
   utxoProvider,
   walletProvider
 } from '../config';
-import { combineLatest, filter, firstValueFrom, map } from 'rxjs';
+import { combineLatest, filter, firstValueFrom, map, of } from 'rxjs';
 
 describe('SingleAddressWallet.assets/nft', () => {
   let wallet: ObservableWallet;
 
   beforeAll(async () => {
     const keyAgent = await keyAgentReady;
-    Object.defineProperty(keyAgent, 'knownAddresses', {
-      get() {
-        return [
-          {
-            accountIndex: 0,
-            address: Cardano.Address(
-              // eslint-disable-next-line max-len
-              'addr_test1qpapna8hhj2hx2q2s9mdp7995a3hgundyvvvj0v0yq68lt8e6dgndgyep9stycsnejcnu8vm7a6dtqqhmf362z7fy5ksg46rum'
-            ),
-            index: 0,
-            networkId: Cardano.NetworkId.testnet,
-            rewardAccount: Cardano.RewardAccount('stake_test1uruax5fk5zvsjc9jvgfuevf7rkdlwax4sqta5ca9p0yj2tg4cf29e'),
-            type: KeyManagement.AddressType.External
-          }
-        ];
+    keyAgent.knownAddresses$ = of([
+      {
+        accountIndex: 0,
+        address: Cardano.Address(
+          // eslint-disable-next-line max-len
+          'addr_test1qpapna8hhj2hx2q2s9mdp7995a3hgundyvvvj0v0yq68lt8e6dgndgyep9stycsnejcnu8vm7a6dtqqhmf362z7fy5ksg46rum'
+        ),
+        index: 0,
+        networkId: Cardano.NetworkId.testnet,
+        rewardAccount: Cardano.RewardAccount('stake_test1uruax5fk5zvsjc9jvgfuevf7rkdlwax4sqta5ca9p0yj2tg4cf29e'),
+        type: KeyManagement.AddressType.External
       }
-    });
+    ]);
     wallet = new SingleAddressWallet(
       {
         name: 'Test Wallet'
@@ -66,12 +62,7 @@ describe('SingleAddressWallet.assets/nft', () => {
     expect(nfts.find((nft) => nft.nftMetadata!.name === 'One')).toEqual({
       assetId: 'd1ac67dcebc491ce17635d3d9c8775eb739325ce522f6eac733489aa4e4654303031',
       fingerprint: 'asset15wsawsn72dw07m33fqp42suze636mv2k4agxvs',
-      history: [
-        {
-          quantity: 1n,
-          transactionId: 'a7dbd1e9990a4bb9b3247e8ebc0e49e78f5b5a797d822fdf6918f31946c2eb32'
-        }
-      ],
+      history: undefined,
       mintOrBurnCount: 1,
       name: '4e4654303031',
       nftMetadata: {
@@ -82,6 +73,7 @@ describe('SingleAddressWallet.assets/nft', () => {
         name: 'One',
         version: '1.0'
       },
+      otherProperties: undefined,
       policyId: 'd1ac67dcebc491ce17635d3d9c8775eb739325ce522f6eac733489aa',
       quantity: 1n,
       tokenMetadata: { desc: undefined, icon: 'ipfs://some_hash1', name: 'One' }
@@ -99,12 +91,7 @@ describe('SingleAddressWallet.assets/nft', () => {
     expect(nfts.find((nft) => nft.nftMetadata!.name === 'NFT with files')).toEqual({
       assetId: 'e80c05f27dec74e8c04f27bdf711dff8ae03167dda9b7760b7d92cef4e46542d66696c6573',
       fingerprint: 'asset16w7fcptllh5qfgux8hmp3wymne7xh5y65vxueh',
-      history: [
-        {
-          quantity: 1n,
-          transactionId: '1841f9ff952c5ffa13a19e32e78c1dac78fecd7083965d97558ede340ecfb8f9'
-        }
-      ],
+      history: undefined,
       mintOrBurnCount: 1,
       name: '4e46542d66696c6573',
       nftMetadata: {
@@ -127,6 +114,7 @@ describe('SingleAddressWallet.assets/nft', () => {
         otherProperties: new Map([['id', '1']]),
         version: '1.0'
       },
+      otherProperties: undefined,
       policyId: 'e80c05f27dec74e8c04f27bdf711dff8ae03167dda9b7760b7d92cef',
       quantity: 1n,
       tokenMetadata: {
