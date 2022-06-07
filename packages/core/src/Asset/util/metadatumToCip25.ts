@@ -1,8 +1,8 @@
 import { AssetInfo, ImageMediaType, MediaType, NftMetadata, NftMetadataFile, Uri } from '../types';
 import { CustomError } from 'ts-custom-error';
 import { Metadatum, MetadatumMap, util } from '../../Cardano';
-import { difference } from 'lodash-es';
 import { dummyLogger } from 'ts-log';
+import difference from 'lodash/difference';
 
 class InvalidFileError extends CustomError {}
 

@@ -1,5 +1,5 @@
 import { Cardano } from '../..';
-import { sum } from 'lodash-es';
+import sum from 'lodash/sum';
 
 const MILLISECONDS_PER_DAY = 1000 * 60 * 60 * 24;
 

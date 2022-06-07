@@ -1,6 +1,6 @@
 import { CardanoNetworkMagic, Epoch, Slot } from '../Cardano';
 import { CustomError } from 'ts-custom-error';
-import { orderBy } from 'lodash-es';
+import orderBy from 'lodash/orderBy';
 
 export interface TimeSettings {
   /**

@@ -12,7 +12,7 @@ import {
 } from '../../src/messaging';
 import { Observable, Subject, firstValueFrom, map, of, tap, throwError, timer, toArray } from 'rxjs';
 import { dummyLogger } from 'ts-log';
-import { memoize } from 'lodash-es';
+import memoize from 'lodash/memoize';
 
 const logger = dummyLogger;
 

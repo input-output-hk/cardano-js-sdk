@@ -7,7 +7,9 @@ import { RewardsHistory } from '../types';
 import { TrackedRewardsProvider } from '../ProviderTracker';
 import { TxWithEpoch } from './types';
 import { coldObservableProvider } from '../util';
-import { first, flatten, groupBy } from 'lodash-es';
+import first from 'lodash/first';
+import flatten from 'lodash/flatten';
+import groupBy from 'lodash/groupBy';
 
 const sumRewards = (arrayOfRewards: EpochRewards[]) => BigIntMath.sum(arrayOfRewards.map(({ rewards }) => rewards));
 const avgReward = (arrayOfRewards: EpochRewards[]) => sumRewards(arrayOfRewards) / BigInt(arrayOfRewards.length);

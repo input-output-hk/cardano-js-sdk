@@ -19,7 +19,7 @@ import {
   validateMnemonic
 } from './util';
 import { emip3decrypt, emip3encrypt } from './emip3';
-import { uniqBy } from 'lodash-es';
+import uniqBy from 'lodash/uniqBy';
 
 export interface InMemoryKeyAgentProps extends Omit<SerializableInMemoryKeyAgentData, '__typename'> {
   getPassword: GetPassword;

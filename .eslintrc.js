@@ -53,6 +53,7 @@ module.exports = {
     "template-tag-spacing": 0,
     "no-magic-numbers": 0,
     'promise/avoid-new': 0,
+    "no-restricted-imports": ["error", { "paths": ["lodash"] }],
     'consistent-return': 0, // typescript checks return types
     "camelcase": 0,
     "no-shadow": "off", // eslint compains about TS enums hence disable here and enable @typescript-eslint/no-shadow

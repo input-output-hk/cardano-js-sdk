@@ -17,10 +17,10 @@ import { URL } from 'url';
 import { createAsyncKeyAgent } from '../../src/KeyManagement/util';
 import { createConnectionObject } from '@cardano-ogmios/client';
 import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
-import { memoize } from 'lodash-es';
 import { ogmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
 import { txSubmitHttpProvider } from '@cardano-sdk/cardano-services-client';
 import DeviceConnection from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import memoize from 'lodash/memoize';
 import waitOn from 'wait-on';
 
 const loggerMethodNames = ['debug', 'error', 'fatal', 'info', 'trace', 'warn'] as (keyof Logger)[];

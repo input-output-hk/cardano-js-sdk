@@ -1,6 +1,4 @@
 #!/usr/bin/env node
-/* eslint-disable import/imports-first */
-require('../scripts/patchRequire');
 import * as envalid from 'envalid';
 import { LogLevel } from 'bunyan';
 import {

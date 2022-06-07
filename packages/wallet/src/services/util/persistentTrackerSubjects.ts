@@ -18,7 +18,7 @@ import {
   timeout
 } from 'rxjs';
 import { TrackerSubject } from '@cardano-sdk/util-rxjs';
-import { isEqual } from 'lodash-es';
+import isEqual from 'lodash/isEqual';
 
 export class PersistentCollectionTrackerSubject<T> extends TrackerSubject<T[]> {
   readonly store: CollectionStore<T>;

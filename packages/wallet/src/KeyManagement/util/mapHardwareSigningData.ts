@@ -7,8 +7,9 @@ import { BIP32Path, GroupedAddress, ResolveInputAddress } from '../types';
 import { CSL, Cardano, cslToCore } from '@cardano-sdk/core';
 import { CardanoKeyConst, harden } from '../util';
 import { HwMappingError } from '../errors';
-import { concat, uniq } from 'lodash-es';
 import { isNotNil } from '@cardano-sdk/util';
+import concat from 'lodash/concat';
+import uniq from 'lodash/uniq';
 
 export interface TxToLedgerProps {
   cslTxBody: CSL.TransactionBody;

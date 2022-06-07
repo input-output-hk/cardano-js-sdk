@@ -1,7 +1,7 @@
 /* eslint-disable complexity */
 /* eslint-disable sonarjs/cognitive-complexity */
 import { serializeError } from 'serialize-error';
-import { transform } from 'lodash-es';
+import transform from 'lodash/transform';
 
 const PLAIN_TYPES = new Set(['boolean', 'number', 'string']);
 

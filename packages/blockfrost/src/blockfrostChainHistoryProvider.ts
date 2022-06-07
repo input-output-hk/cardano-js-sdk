@@ -9,7 +9,8 @@ import {
 } from '@cardano-sdk/core';
 import { blockfrostMetadataToTxMetadata, fetchByAddressSequentially, formatBlockfrostError } from './util';
 import { dummyLogger } from 'ts-log';
-import { omit, orderBy } from 'lodash-es';
+import omit from 'lodash/omit';
+import orderBy from 'lodash/orderBy';
 
 type WithCertIndex<T> = T & { cert_index: number };
 

@@ -1,6 +1,4 @@
 #!/usr/bin/env node
-/* eslint-disable import/imports-first */
-require('../scripts/patchRequire');
 import * as envalid from 'envalid';
 import { API_URL_DEFAULT, OGMIOS_URL_DEFAULT, RABBITMQ_URL_DEFAULT, ServiceNames, loadHttpServer } from './Program';
 import { LogLevel } from 'bunyan';

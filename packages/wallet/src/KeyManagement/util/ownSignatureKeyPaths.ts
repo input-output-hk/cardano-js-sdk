@@ -1,7 +1,7 @@
 import { AccountKeyDerivationPath, GroupedAddress, KeyRole, ResolveInputAddress } from '../types';
 import { Cardano } from '@cardano-sdk/core';
 import { isNotNil } from '@cardano-sdk/util';
-import { uniq } from 'lodash-es';
+import uniq from 'lodash/uniq';
 
 /**
  * Assumes that a single staking key is used for all addresses (index=0)

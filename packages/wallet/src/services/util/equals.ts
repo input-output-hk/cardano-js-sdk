@@ -1,6 +1,6 @@
 import { Cardano, EpochInfo, TimeSettings } from '@cardano-sdk/core';
 import { GroupedAddress } from '../../KeyManagement';
-import { isEqual } from 'lodash-es';
+import isEqual from 'lodash/isEqual';
 
 export const strictEquals = <T>(a: T, b: T) => a === b;
 

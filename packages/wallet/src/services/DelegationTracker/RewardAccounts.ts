@@ -9,8 +9,10 @@ import { RetryBackoffConfig } from 'backoff-rxjs';
 import { RewardBalance, includesAnyCertificate } from '..';
 import { TxWithEpoch } from './types';
 import { coldObservableProvider, deepEquals, shallowArrayEquals } from '../util';
-import { findLast, isEqual, uniq } from 'lodash-es';
 import { isLastStakeKeyCertOfType } from './transactionCertificates';
+import findLast from 'lodash/findLast';
+import isEqual from 'lodash/isEqual';
+import uniq from 'lodash/uniq';
 
 export const createQueryStakePoolsProvider =
   (

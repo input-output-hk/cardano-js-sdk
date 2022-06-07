@@ -7,7 +7,8 @@ import { Logger, dummyLogger } from 'ts-log';
 import { Pool, QueryResult } from 'pg';
 import { hexStringToBuffer } from '../../util';
 import { mapBlock, mapTxAlonzo, mapTxIn, mapTxOut } from './mappers';
-import { orderBy, uniq } from 'lodash-es';
+import orderBy from 'lodash/orderBy';
+import uniq from 'lodash/uniq';
 
 export class DbSyncChainHistoryProvider extends DbSyncProvider implements ChainHistoryProvider {
   #builder: ChainHistoryBuilder;

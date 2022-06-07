@@ -1,6 +1,4 @@
 #!/usr/bin/env node
-/* eslint-disable import/imports-first */
-require('../scripts/patchRequire');
 import {
   API_URL_DEFAULT,
   HttpServerOptions,

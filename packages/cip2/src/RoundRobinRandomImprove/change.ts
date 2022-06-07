@@ -2,7 +2,8 @@ import { Cardano } from '@cardano-sdk/core';
 import { ComputeMinimumCoinQuantity, TokenBundleSizeExceedsLimit } from '../types';
 import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
 import { UtxoSelection, assetQuantitySelector, getCoinQuantity, toValues } from './util';
-import { orderBy, pick } from 'lodash-es';
+import orderBy from 'lodash/orderBy';
+import pick from 'lodash/pick';
 
 type EstimateTxFeeWithOriginalOutputs = (utxo: Cardano.Utxo[], change: Cardano.Value[]) => Promise<Cardano.Lovelace>;
 

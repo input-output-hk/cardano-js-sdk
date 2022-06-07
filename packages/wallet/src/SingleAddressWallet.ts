@@ -70,7 +70,7 @@ import { TrackedUtxoProvider } from './services/ProviderTracker/TrackedUtxoProvi
 import { TxInternals, createTransactionInternals, ensureValidityInterval } from './Transaction';
 import { WalletStores, createInMemoryWalletStores } from './persistence';
 import { cip30signData } from './KeyManagement/cip8';
-import { isEqual } from 'lodash-es';
+import isEqual from 'lodash/isEqual';
 
 export interface SingleAddressWalletProps {
   readonly name: string;

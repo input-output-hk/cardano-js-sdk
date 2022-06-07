@@ -20,8 +20,8 @@ import {
   queryTransactionsResult2
 } from '../mocks';
 import { firstValueFrom } from 'rxjs';
-import { flatten } from 'lodash-es';
 import { waitForWalletStateSettle } from '../util';
+import flatten from 'lodash/flatten';
 
 const name = 'Test Wallet';
 const address = mocks.utxo[0][0].address!;

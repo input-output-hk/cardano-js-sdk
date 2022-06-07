@@ -2,7 +2,7 @@
 import { BigIntMath } from '@cardano-sdk/util';
 import { Cardano } from '@cardano-sdk/core';
 import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
-import { uniq } from 'lodash-es';
+import uniq from 'lodash/uniq';
 
 export interface RoundRobinRandomImproveArgs {
   utxo: Cardano.Utxo[];

@@ -27,7 +27,9 @@ import { RetryBackoffConfig } from 'backoff-rxjs';
 import { Shutdown } from '@cardano-sdk/util';
 import { TrackerSubject } from '@cardano-sdk/util-rxjs';
 import { coldObservableProvider, distinctBlock, transactionsEquals } from './util';
-import { intersectionBy, sortBy, unionBy } from 'lodash-es';
+import intersectionBy from 'lodash/intersectionBy';
+import sortBy from 'lodash/sortBy';
+import unionBy from 'lodash/unionBy';
 
 export interface TransactionsTrackerProps {
   chainHistoryProvider: ChainHistoryProvider;

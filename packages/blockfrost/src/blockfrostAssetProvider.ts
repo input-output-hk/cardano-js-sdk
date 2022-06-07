@@ -4,7 +4,7 @@ import { replaceNullsWithUndefineds } from '@cardano-sdk/util';
 
 import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
 import { blockfrostMetadataToTxMetadata, fetchSequentially, toProviderError } from './util';
-import { omit } from 'lodash-es';
+import omit from 'lodash/omit';
 
 const mapMetadata = (
   onChain: Responses['asset']['onchain_metadata'],

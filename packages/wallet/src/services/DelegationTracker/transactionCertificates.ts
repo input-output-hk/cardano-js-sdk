@@ -1,8 +1,8 @@
 import { Cardano, createTxInspector, signedCertificatesInspector } from '@cardano-sdk/core';
 import { Observable, combineLatest, distinctUntilChanged, map } from 'rxjs';
 import { isNotNil } from '@cardano-sdk/util';
-import { last } from 'lodash-es';
 import { transactionsEquals } from '../util/equals';
+import last from 'lodash/last';
 
 export const RegAndDeregCertificateTypes = [
   Cardano.CertificateType.StakeKeyRegistration,
