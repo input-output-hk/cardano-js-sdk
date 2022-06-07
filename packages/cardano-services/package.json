@@ -25,6 +25,7 @@
     "test:e2e": "shx echo 'test:e2e' command not implemented yet",
     "coverage": "yarn test --coverage",
     "prepack": "yarn build",
+    "pretest": "yarn build",
     "test:debug": "DEBUG=true yarn test",
     "run:http-server": "ts-node --transpile-only src/run.ts",
     "run:http-server:debug": "npx nodemon --legacy-watch --exec 'node -r ts-node/register --inspect=0.0.0.0:9229 src/run.ts'",
@@ -72,7 +73,8 @@
     "pg": "^8.7.3",
     "prom-client": "^14.0.1",
     "reflect-metadata": "~0.1.13",
-    "ts-log": "^2.2.4"
+    "ts-log": "^2.2.4",
+    "json-bigint": "^1.0.0"
   },
   "files": [
     "dist/*",

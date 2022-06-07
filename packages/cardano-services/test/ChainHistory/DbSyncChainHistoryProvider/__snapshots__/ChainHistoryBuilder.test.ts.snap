@@ -70,17 +70,14 @@ Map {
 
 exports[`ChainHistoryBuilder queryMultiAssetsByTxOut query multi assets by tx output 1`] = `
 Map {
-  "5396853" => Map {
+  "5129550" => Map {
     "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf391652243484f43" => 10000000n,
     "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf39165224d494e54" => 5000000000n,
     "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf3916522524245525259" => 1000000000n,
-    "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf3916522534245525259" => 2000000000n,
+    "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf3916522534245525259" => 1828882901n,
     "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf391652256414e494c" => 15000000n,
   },
-  "5396911" => Map {
-    "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf3916522534245525259" => 10000000n,
-  },
-  "5396912" => Map {
+  "5129575" => Map {
     "22be35160908d953c25b30d1ad59876cbf073a8b31ef7a4f77468355414141" => 4208n,
     "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf39165224d494e54" => 1914111968n,
     "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf3916522524245525259" => 1000000000n,
@@ -90,15 +87,22 @@ Map {
     "d311d3488cc4fef19d05634adce8534977a3bc6fc18136ad65df1d4f6c71202e01" => 100000000n,
     "d311d3488cc4fef19d05634adce8534977a3bc6fc18136ad65df1d4f6c712038" => 172696733n,
   },
+  "5129595" => Map {
+    "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf391652243484f43" => 10000000n,
+    "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf39165224d494e54" => 4865509476n,
+    "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf3916522524245525259" => 1000000000n,
+    "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf3916522534245525259" => 2000000000n,
+    "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf391652256414e494c" => 15000000n,
+  },
 }
 `;
 
 exports[`ChainHistoryBuilder queryProtocolParams query protocol parameters from last epoch 1`] = `
 Object {
   "coinsPerUtxoWord": NaN,
-  "maxCollateralInputs": 1,
+  "maxCollateralInputs": 3,
   "maxTxSize": 16384,
-  "maxValueSize": 1000,
+  "maxValueSize": 5000,
   "minFeeCoefficient": 44,
   "minFeeConstant": 155381,
   "minPoolCost": 340000000,

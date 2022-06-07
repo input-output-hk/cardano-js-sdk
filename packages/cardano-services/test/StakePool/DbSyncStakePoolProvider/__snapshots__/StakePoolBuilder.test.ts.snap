@@ -807,7 +807,7 @@ Object {
 }
 `;
 
-exports[`StakePoolBuilder getLastEpoch getLastEpoch 1`] = `175`;
+exports[`StakePoolBuilder getLastEpoch getLastEpoch 1`] = `183`;
 
 exports[`StakePoolBuilder getTotalAmountOfAda getTotalAmountOfAda 1`] = `"69154425288708824"`;
 
@@ -877,8 +877,8 @@ exports[`StakePoolBuilder queryPoolRewards queryPoolRewards 1`] = `
 Array [
   Object {
     "activeStake": 0n,
-    "epoch": 175,
-    "epochLength": 431949000,
+    "epoch": 183,
+    "epochLength": 431910000,
     "memberROI": 0,
     "operatorFees": 0n,
     "totalRewards": 0n,

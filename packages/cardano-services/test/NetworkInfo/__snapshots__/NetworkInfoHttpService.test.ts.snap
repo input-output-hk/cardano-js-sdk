@@ -1,0 +1,33 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`NetworkInfoHttpService healthy state /network with NetworkInfoHttpProvider response is an object of network info 1`] = `
+Object {
+  "lovelaceSupply": Object {
+    "circulating": 69163989759711432n,
+    "max": 45000000000000000n,
+    "total": 40342337171803411n,
+  },
+  "network": Object {
+    "id": 0,
+    "magic": 1097911063,
+    "timeSettings": Array [
+      Object {
+        "epochLength": 21600,
+        "fromSlotDate": 2019-07-24T20:20:16.000Z,
+        "fromSlotNo": 0,
+        "slotLength": 20000,
+      },
+      Object {
+        "epochLength": 432000,
+        "fromSlotDate": 2020-07-28T19:20:16.000Z,
+        "fromSlotNo": 1598400,
+        "slotLength": 1000,
+      },
+    ],
+  },
+  "stake": Object {
+    "active": 14977960053990832n,
+    "live": 69154425288708824n,
+  },
+}
+`;

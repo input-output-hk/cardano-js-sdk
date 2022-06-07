@@ -1,5 +1,6 @@
 /* eslint-disable sonarjs/no-identical-functions */
 /* eslint-disable sonarjs/no-duplicate-string */
+/* eslint-disable max-len */
 import { ChildProcess, fork } from 'child_process';
 import { Connection, ConnectionConfig, createConnectionObject } from '@cardano-ogmios/client';
 import { RABBITMQ_URL_DEFAULT, ServiceNames } from '../src';
@@ -50,11 +51,13 @@ describe('entrypoints', () => {
     let ogmiosServer: http.Server;
     let ogmiosPort: ConnectionConfig['port'];
     let ogmiosConnection: Connection;
+    let cardanoNodeConfigPath: string;
 
     beforeAll(async () => {
-      dbConnectionString = 'postgresql://dbuser:secretpassword@database.server.com:3211/mydb';
       ogmiosPort = await getRandomPort();
       ogmiosConnection = createConnectionObject({ port: ogmiosPort });
+      dbConnectionString = process.env.DB_CONNECTION_STRING!;
+      cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
     });
 
     describe('with healthy internal providers', () => {
@@ -69,7 +72,7 @@ describe('entrypoints', () => {
           await serverClosePromise(ogmiosServer);
         });
 
-        it('cli:start-server exposes a HTTP server at the configured URL', async () => {
+        it('cli:start-server exposes a HTTP server at the configured URL with all services attached', async () => {
           proc = fork(exePath('cli'), [
             'start-server',
             '--api-url',
@@ -80,25 +83,34 @@ describe('entrypoints', () => {
             'error',
             '--ogmios-url',
             ogmiosConnection.address.webSocket,
+            '--cardano-node-config-path',
+            cardanoNodeConfigPath,
             ServiceNames.StakePool,
-            ServiceNames.TxSubmit
+            ServiceNames.TxSubmit,
+            ServiceNames.NetworkInfo,
+            ServiceNames.Utxo
           ]);
           await assertServiceHealthy(apiUrl, ServiceNames.StakePool);
           await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit);
+          await assertServiceHealthy(apiUrl, ServiceNames.NetworkInfo);
+          await assertServiceHealthy(apiUrl, ServiceNames.Utxo);
         });
 
-        it('run', async () => {
+        it('run exposes a HTTP server at the configured URL with all services attached', async () => {
           proc = fork(exePath('run'), {
             env: {
               API_URL: apiUrl,
+              CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
               DB_CONNECTION_STRING: dbConnectionString,
               LOGGER_MIN_SEVERITY: 'error',
               OGMIOS_URL: ogmiosConnection.address.webSocket,
-              SERVICE_NAMES: `${ServiceNames.StakePool},${ServiceNames.TxSubmit}`
+              SERVICE_NAMES: `${ServiceNames.StakePool},${ServiceNames.TxSubmit},${ServiceNames.NetworkInfo},${ServiceNames.Utxo}`
             }
           });
           await assertServiceHealthy(apiUrl, ServiceNames.StakePool);
           await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit);
+          await assertServiceHealthy(apiUrl, ServiceNames.NetworkInfo);
+          await assertServiceHealthy(apiUrl, ServiceNames.Utxo);
         });
       });
 
@@ -108,7 +120,7 @@ describe('entrypoints', () => {
           spy = jest.fn();
         });
 
-        it('cli:start-server exits with code 0', (done) => {
+        it('cli:start-server stake-pool exits with code 0', (done) => {
           proc = fork(
             exePath('cli'),
             ['start-server', '--api-url', apiUrl, '--logger-min-severity', 'error', ServiceNames.StakePool],
@@ -124,12 +136,146 @@ describe('entrypoints', () => {
           });
         });
 
-        it('run exits with code 0', (done) => {
+        it('cli:start-server network-info exits with code 0', (done) => {
+          proc = fork(
+            exePath('cli'),
+            [
+              'start-server',
+              '--api-url',
+              apiUrl,
+              '--logger-min-severity',
+              'error',
+              '--cardano-node-config-path',
+              cardanoNodeConfigPath,
+              ServiceNames.NetworkInfo
+            ],
+            {
+              stdio: 'pipe'
+            }
+          );
+          proc.stderr!.on('data', spy);
+          proc.on('exit', (code) => {
+            expect(code).toBe(0);
+            expect(spy).toHaveBeenCalled();
+            done();
+          });
+        });
+
+        it('cli:start-server utxo exits with code 0', (done) => {
+          proc = fork(
+            exePath('cli'),
+            [
+              'start-server',
+              '--api-url',
+              apiUrl,
+              '--logger-min-severity',
+              'error',
+              '--cardano-node-config-path',
+              cardanoNodeConfigPath,
+              ServiceNames.Utxo
+            ],
+            {
+              stdio: 'pipe'
+            }
+          );
+          proc.stderr!.on('data', spy);
+          proc.on('exit', (code) => {
+            expect(code).toBe(0);
+            expect(spy).toHaveBeenCalled();
+            done();
+          });
+        });
+
+        it('run stake-pool exits with code 0', (done) => {
           proc = fork(exePath('run'), {
             env: {
               API_URL: apiUrl,
               LOGGER_MIN_SEVERITY: 'error',
               SERVICE_NAMES: ServiceNames.StakePool
+            },
+            stdio: 'pipe'
+          });
+          proc.stderr!.on('data', spy);
+          proc.on('exit', (code) => {
+            expect(code).toBe(0);
+            expect(spy).toHaveBeenCalled();
+            done();
+          });
+        });
+
+        it('run network-info exits with code 0', (done) => {
+          proc = fork(exePath('run'), {
+            env: {
+              API_URL: apiUrl,
+              LOGGER_MIN_SEVERITY: 'error',
+              SERVICE_NAMES: ServiceNames.NetworkInfo
+            },
+            stdio: 'pipe'
+          });
+          proc.stderr!.on('data', spy);
+          proc.on('exit', (code) => {
+            expect(code).toBe(0);
+            expect(spy).toHaveBeenCalled();
+            done();
+          });
+        });
+
+        it('run utxo exits with code 0', (done) => {
+          proc = fork(exePath('run'), {
+            env: {
+              API_URL: apiUrl,
+              LOGGER_MIN_SEVERITY: 'error',
+              SERVICE_NAMES: ServiceNames.Utxo
+            },
+            stdio: 'pipe'
+          });
+          proc.stderr!.on('data', spy);
+          proc.on('exit', (code) => {
+            expect(code).toBe(0);
+            expect(spy).toHaveBeenCalled();
+            done();
+          });
+        });
+      });
+
+      describe('specifying a Cardano-Configurations-dependent service without providing the node config path', () => {
+        let spy: jest.Mock;
+        beforeEach(async () => {
+          spy = jest.fn();
+        });
+
+        it('cli:start-server network-info exits with code 0', (done) => {
+          proc = fork(
+            exePath('cli'),
+            [
+              'start-server',
+              '--api-url',
+              apiUrl,
+              '--db-connection-string',
+              dbConnectionString,
+              '--logger-min-severity',
+              'error',
+              ServiceNames.NetworkInfo
+            ],
+            {
+              stdio: 'pipe'
+            }
+          );
+          proc.stderr!.on('data', spy);
+          proc.on('exit', (code) => {
+            expect(code).toBe(0);
+            expect(spy).toHaveBeenCalled();
+            done();
+          });
+        });
+
+        it('run network-info exits with code 0', (done) => {
+          proc = fork(exePath('run'), {
+            env: {
+              API_URL: apiUrl,
+              DB_CONNECTION_STRING: dbConnectionString,
+              LOGGER_MIN_SEVERITY: 'error',
+              SERVICE_NAMES: ServiceNames.NetworkInfo
             },
             stdio: 'pipe'
           });

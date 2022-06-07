@@ -4,3 +4,4 @@ export * from './TxSubmitProvider';
 export * from './StakePoolProvider';
 export * from './UtxoProvider';
 export * from './ChainHistoryProvider';
+export * from './NetworkInfoProvider';

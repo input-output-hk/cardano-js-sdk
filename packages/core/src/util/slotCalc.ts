@@ -1,5 +1,5 @@
+import { CardanoNetworkMagic, Epoch, Slot } from '../Cardano';
 import { CustomError } from 'ts-custom-error';
-import { Epoch, Slot } from '../Cardano';
 import { orderBy } from 'lodash-es';
 
 export interface TimeSettings {
@@ -35,12 +35,24 @@ export interface EpochInfo {
 export class TimeSettingsError extends CustomError {}
 
 /**
- * Were valid at 2022-01-14
+ * Were valid at 2022-05-28
  */
+export const mainnetTimeSettings: TimeSettings[] = [
+  { epochLength: 21_600, fromSlotDate: new Date(1_506_192_291_000), fromSlotNo: 0, slotLength: 20_000 },
+  { epochLength: 432_000, fromSlotDate: new Date(1_596_059_091_000), fromSlotNo: 4_492_800, slotLength: 1000 }
+];
+
 export const testnetTimeSettings: TimeSettings[] = [
   { epochLength: 21_600, fromSlotDate: new Date(1_563_999_616_000), fromSlotNo: 0, slotLength: 20_000 },
   { epochLength: 432_000, fromSlotDate: new Date(1_595_964_016_000), fromSlotNo: 1_598_400, slotLength: 1000 }
 ];
+
+export type TimeSettingsMap = { [key in CardanoNetworkMagic]: TimeSettings[] };
+
+export const timeSettingsConfig: TimeSettingsMap = {
+  [CardanoNetworkMagic.Mainnet]: mainnetTimeSettings,
+  [CardanoNetworkMagic.Testnet]: testnetTimeSettings
+};
 
 const createSlotEpochCalcImpl = (timeSettings: TimeSettings[]) => {
   const timeSettingsAsc = orderBy(timeSettings, ({ fromSlotNo }) => fromSlotNo);

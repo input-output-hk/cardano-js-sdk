@@ -83,7 +83,7 @@ describe('ChainHistoryBuilder', () => {
 
   describe('queryMultiAssetsByTxOut', () => {
     test('query multi assets by tx output', async () => {
-      const result = await builder.queryMultiAssetsByTxOut([5_396_853n, 5_396_911n, 5_396_912n]);
+      const result = await builder.queryMultiAssetsByTxOut([5_129_575n, 5_129_595n, 5_129_550n]);
       expect(result.size).toEqual(3);
       expect(result).toMatchSnapshot();
     });
