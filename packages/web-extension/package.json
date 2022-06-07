@@ -5,7 +5,14 @@
   "engines": {
     "node": "^14"
   },
-  "main": "dist/index.js",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    }
+  },
   "repository": "https://github.com/input-output-hk/cardano-js-sdk/packages/web-extension",
   "contributors": [
     "Rhys Bartels-Waller <rhys.bartelswaller@iohk.io> (https://iohk.io)",
@@ -13,14 +20,19 @@
   ],
   "license": "MPL-2.0",
   "scripts": {
-    "build": "tsc --build ./src",
+    "build:esm": "tsc -p src/tsconfig.json --outDir ./dist/esm --module es2020",
+    "build:cjs": "tsc --build src",
+    "build": "run-s build:cjs build:esm module-fixup",
+    "module-fixup": "shx cp ../../build/cjs-package.json ./dist/cjs/package.json && cp ../../build/esm-package.json ./dist/esm/package.json",
     "tscNoEmit": "shx echo typescript --noEmit command not implemented yet",
-    "cleanup": "shx rm -rf dist node_modules",
+    "cleanup:dist": "shx rm -rf dist",
+    "cleanup:nm": "shx rm -rf node_modules",
+    "cleanup": "run-s cleanup:dist cleanup:nm",
     "lint": "eslint --ignore-path ../../.eslintignore \"**/*.ts\"",
     "lint:fix": "eslint --fix --ignore-path ../../.eslintignore \"**/*.ts\"",
     "test": "jest -c ./jest.config.js",
     "test:e2e:build": "webpack -c e2e/webpack.config.js",
-    "test:e2e:run": "wdio run e2e/wdio.conf.ts",
+    "test:e2e:run": "wdio run e2e/wdio.conf.js",
     "test:e2e": "run-s test:e2e:build test:e2e:run",
     "test:e2e:watch:build": "yarn test:e2e:build --watch",
     "test:e2e:watch:run": "yarn test:e2e:run --watch",
@@ -31,6 +43,9 @@
     "test:debug": "DEBUG=true yarn test"
   },
   "devDependencies": {
+    "@babel/core": "^7.18.2",
+    "@babel/preset-env": "^7.18.2",
+    "@babel/preset-typescript": "^7.17.12",
     "@cardano-sdk/util-dev": "0.2.0",
     "@cardano-sdk/wallet": "0.2.0",
     "@emurgo/cardano-message-signing-asmjs": "^1.0.1",
@@ -44,6 +59,7 @@
     "@wdio/mocha-framework": "^7.19.5",
     "@wdio/spec-reporter": "^7.19.5",
     "@wdio/static-server-service": "^7.19.5",
+    "babel-loader": "^8.2.5",
     "blake2b-no-wasm": "2.1.4",
     "chromedriver": "^100.0.0",
     "copy-webpack-plugin": "^10.2.4",
@@ -53,7 +69,6 @@
     "mock-browser": "^0.92.14",
     "readable-stream": "^3.6.0",
     "shx": "^0.3.3",
-    "ts-loader": "^9.2.8",
     "util": "^0.12.4",
     "wdio-chromedriver-service": "^7.3.2",
     "webpack": "^5.72.0",
@@ -62,8 +77,8 @@
   "dependencies": {
     "@cardano-sdk/cip30": "0.2.0",
     "@cardano-sdk/core": "0.2.0",
-    "@cardano-sdk/util-rxjs": "0.2.0",
     "@cardano-sdk/util": "0.2.0",
+    "@cardano-sdk/util-rxjs": "0.2.0",
     "lodash-es": "^4.17.21",
     "rxjs": "^7.4.0",
     "ts-log": "^2.2.3",

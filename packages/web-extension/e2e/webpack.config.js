@@ -24,14 +24,15 @@ module.exports = {
     rules: [
       {
         exclude: /node_modules/,
-        test: /\.ts$/,
+        resolve: {
+          fullySpecified: false
+        },
+        test: /\.(js|ts)$/,
         use: [
           {
-            loader: 'ts-loader',
+            loader: 'babel-loader',
             options: {
-              compilerOptions: {
-                outDir: distDir
-              }
+              presets: ['@babel/preset-env', '@babel/preset-typescript']
             }
           }
         ]
@@ -43,6 +44,14 @@ module.exports = {
     path: distDir
   },
   plugins: [
+    new NormalModuleReplacementPlugin(/@cardano-sdk/, (resource) => {
+      const base = resource.context.replace(path.join(__dirname, '../../'));
+      const level = base.match(/\//g).length + 2;
+      const prefix = Array.from({ length: level }).join('../');
+      // eslint-disable-next-line prefer-template
+      const newPath = resource.request.replace(/@cardano-sdk\//, prefix) + '/src';
+      resource.request = newPath;
+    }),
     new DefinePlugin({
       'process.env': JSON.stringify(process.env)
     }),

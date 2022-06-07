@@ -28,51 +28,13 @@ A suite of TypeScript packages suitable for both Node.js and browser-based devel
 ### External Provider Implementations
 - [@cardano-sdk/blockfrost](packages/blockfrost)
 
-### Webpack
+### Supported Environments
 
-You may use the following config when bundling this SDK with Webpack:
+Packages are distributed as both CommonJS and ESM modules.
 
-```js
-const { IgnorePlugin, ProvidePlugin } = require('webpack');
-{
-  plugins: [
-    // see https://www.npmjs.com/package/bip39 README
-    new IgnorePlugin(/^\.\/wordlists\/(?!english)/, /bip39\/src$/),
-  ],
-  experiments: {
-    // Requires code splitting to work.
-    // Must dynamically `import()` a chunk that imports '@cardano-sdk/*'.
-    syncWebAssembly: true
-  }
-}
-```
-
-Additionally, for browser builds:
-
-```js
-const { NormalModuleReplacementPlugin } = require('webpack');
-{
-  resolve: {
-    fallback: {
-      // Node.js polyfills. May want to install as explicit dependencies.
-      stream: require.resolve('readable-stream'),
-      buffer: require.resolve('buffer'),
-    }
-  },
-  plugins: [
-    // install "browser" version packages of these dependencies first
-    new NormalModuleReplacementPlugin(
-      /@emurgo\/cardano-serialization-lib-nodejs/,
-      '@emurgo/cardano-serialization-lib-browser'
-    ),
-    new NormalModuleReplacementPlugin(
-      /@emurgo\/cardano-message-signing-nodejs/,
-      '@emurgo/cardano-message-signing-browser'
-    )
-  ]
-}
-
-```
+- Node.js >=14.15.0 <15.0.0
+  - using with `type="module"` requires `--experimental-specifier-resolution=node` flag
+- Browser via bundlers (see [example webpack config](./packages/web-extension/e2e/webpack.config.js))
 
 ### Testing
 

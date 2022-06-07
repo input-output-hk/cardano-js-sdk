@@ -1,14 +1,24 @@
 {
   "extends": "../../../tsconfig.json",
   "compilerOptions": {
-    "outDir": "../dist/",
+    "outDir": "../dist/cjs",
     "rootDir": "."
   },
   "references": [
-    { "path": "../../cip2/src" },
-    { "path": "../../cip30/src" },
-    { "path": "../../core/src" },
-    { "path": "../../util-rxjs/src" },
-    { "path": "../../util/src" }
+    {
+      "path": "../../cip2/src"
+    },
+    {
+      "path": "../../cip30/src"
+    },
+    {
+      "path": "../../core/src"
+    },
+    {
+      "path": "../../util-rxjs/src"
+    },
+    {
+      "path": "../../util/src"
+    }
   ]
 }

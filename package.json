@@ -14,6 +14,7 @@
     "predocs": "yarn build",
     "docs": "typedoc --packages . && yarn workspaces run coverage && node collectCoverage.mjs",
     "cleanup": "yarn workspaces run cleanup && shx rm -rf node_modules",
+    "cleanup:dist": "yarn workspaces run cleanup:dist",
     "lint": "yarn workspaces run lint --max-warnings 0",
     "lint:fix": "yarn workspaces run lint:fix --max-warnings 0",
     "tscNoEmit": "yarn workspaces run tscNoEmit",

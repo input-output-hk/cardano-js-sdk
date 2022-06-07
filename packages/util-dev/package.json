@@ -5,14 +5,26 @@
   "engines": {
     "node": "^14"
   },
-  "main": "dist/index.js",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    }
+  },
   "repository": "https://github.com/input-output-hk/cardano-js-sdk/packages/util-dev",
   "author": "Martynas Kazlauskas <martynas.kazlauskas@iohk.io>",
   "license": "MPL-2.0",
   "scripts": {
-    "build": "tsc --build ./src",
+    "build:esm": "tsc -p src/tsconfig.json --outDir ./dist/esm --module es2020",
+    "build:cjs": "tsc --build src",
+    "build": "run-s build:cjs build:esm module-fixup",
+    "module-fixup": "shx cp ../../build/cjs-package.json ./dist/cjs/package.json && cp ../../build/esm-package.json ./dist/esm/package.json",
     "tscNoEmit": "shx echo typescript --noEmit command not implemented yet",
-    "cleanup": "shx rm -rf dist node_modules",
+    "cleanup:dist": "shx rm -rf dist",
+    "cleanup:nm": "shx rm -rf node_modules",
+    "cleanup": "run-s cleanup:dist cleanup:nm",
     "lint": "eslint --ignore-path ../../.eslintignore \"**/*.ts\"",
     "lint:fix": "eslint --fix --ignore-path ../../.eslintignore \"**/*.ts\"",
     "test": "jest -c ./jest.config.js",

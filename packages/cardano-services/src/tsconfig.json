@@ -1,13 +1,21 @@
 {
   "extends": "../../../tsconfig.json",
   "compilerOptions": {
-    "outDir": "../dist/",
+    "outDir": "../dist/cjs",
     "rootDir": "."
   },
   "references": [
-    { "path": "../../core/src" },
-    { "path": "../../ogmios/src" },
-    { "path": "../../rabbitmq/src" },
-    { "path": "../../util/src" }
+    {
+      "path": "../../core/src"
+    },
+    {
+      "path": "../../ogmios/src"
+    },
+    {
+      "path": "../../rabbitmq/src"
+    },
+    {
+      "path": "../../util/src"
+    }
   ]
 }

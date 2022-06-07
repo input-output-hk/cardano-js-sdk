@@ -4,6 +4,7 @@
     "module": "commonjs",
     "target": "es2020",
     "esModuleInterop": true,
+    "moduleResolution": "node",
     "declaration": true,
     "declarationMap": true,
     "noEmitOnError": true,
