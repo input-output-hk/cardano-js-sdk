@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Awaited } from '../types';
+import { Awaited } from '@cardano-sdk/util';
 import { Logger } from 'ts-log';
 import { ProviderError } from '@cardano-sdk/core';
 import express from 'express';
