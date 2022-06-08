@@ -31,7 +31,7 @@ describe('coreToCsl', () => {
       const value = coreToCsl.value(valueWithAssets);
       expect(value.coin().to_str()).toEqual(valueWithAssets.coins.toString());
       const multiasset = value.multiasset()!;
-      expect(multiasset.len()).toBe(2);
+      expect(multiasset.len()).toBe(3);
       for (const [assetId, expectedAssetQuantity] of valueWithAssets.assets!.entries()) {
         const { scriptHash, assetName } = Asset.util.parseAssetId(assetId);
         const assetQuantity = BigInt(multiasset.get(scriptHash)!.get(assetName)!.to_str());
@@ -40,15 +40,18 @@ describe('coreToCsl', () => {
       expect(value).toBeInstanceOf(CSL.Value);
     });
   });
-  it('tokenMap', () => {
-    const multiasset = coreToCsl.tokenMap(txOut.value.assets!);
-    expect(multiasset).toBeInstanceOf(CSL.MultiAsset);
-    expect(multiasset.len()).toBe(2);
-    for (const [assetId, expectedAssetQuantity] of txOut.value.assets!.entries()) {
-      const { scriptHash, assetName } = Asset.util.parseAssetId(assetId);
-      const assetQuantity = BigInt(multiasset.get(scriptHash)!.get(assetName)!.to_str());
-      expect(assetQuantity).toBe(expectedAssetQuantity);
-    }
+  describe('tokenMap', () => {
+    it('inserts a single multiasset per asset policy', () => {
+      const multiasset = coreToCsl.tokenMap(txOut.value.assets!);
+      expect(multiasset).toBeInstanceOf(CSL.MultiAsset);
+      const scriptHashes = multiasset.keys();
+      expect(scriptHashes.len()).toBe(3);
+      for (const [assetId, expectedAssetQuantity] of txOut.value.assets!.entries()) {
+        const { scriptHash, assetName } = Asset.util.parseAssetId(assetId);
+        const assetQuantity = BigInt(multiasset.get(scriptHash)!.get(assetName)!.to_str());
+        expect(assetQuantity).toBe(expectedAssetQuantity);
+      }
+    });
   });
   it('txBody', () => {
     const cslBody = coreToCsl.txBody(txBody);

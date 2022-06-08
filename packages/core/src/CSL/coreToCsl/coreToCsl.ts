@@ -44,14 +44,28 @@ import { SerializationError } from '../../errors';
 import { SerializationFailure } from '../..';
 import { parseCslAddress } from '../parseCslAddress';
 
-export const tokenMap = (assets: Cardano.TokenMap) => {
+export const tokenMap = (map: Cardano.TokenMap) => {
   const multiasset = MultiAsset.new();
-  for (const assetId of assets.keys()) {
-    const { scriptHash, assetName } = Asset.util.parseAssetId(assetId);
-    const assetsObj = Assets.new();
-    const amount = BigNum.from_str(assets.get(assetId)!.toString());
-    assetsObj.insert(assetName, amount);
-    multiasset.insert(scriptHash, assetsObj);
+  const policyMap: Map<string, { assetsMap: Map<AssetName, BigNum>; scriptHash: ScriptHash }> = new Map();
+
+  for (const assetId of map.keys()) {
+    const { assetName, scriptHash } = Asset.util.parseAssetId(assetId);
+    const policyId = Asset.util.policyIdFromAssetId(assetId).toString();
+    const amount = BigNum.from_str(map.get(assetId)!.toString());
+    if (!policyMap.has(policyId)) {
+      policyMap.set(policyId, { assetsMap: new Map([[assetName, amount]]), scriptHash });
+    } else {
+      const { assetsMap } = policyMap.get(policyId)!;
+      policyMap.set(policyId, { assetsMap: assetsMap.set(assetName, amount), scriptHash });
+    }
+  }
+
+  for (const { assetsMap, scriptHash } of policyMap.values()) {
+    const assets = Assets.new();
+    for (const [assetName, amount] of assetsMap.entries()) {
+      assets.insert(assetName, amount);
+    }
+    multiasset.insert(scriptHash, assets);
   }
   return multiasset;
 };
