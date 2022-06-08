@@ -32,7 +32,9 @@ export const poolParameters: Cardano.PoolParameters = {
 
 export const mintTokenMap = new Map([
   [Cardano.AssetId('2a286ad895d091f2b3d168a6091ad2627d30a72761a5bc36eef00740'), 20n],
-  [Cardano.AssetId('659f2917fb63f12b33667463ee575eeac1845bbc736b9c0bbc40ba8254534c41'), -50n]
+  [Cardano.AssetId('659f2917fb63f12b33667463ee575eeac1845bbc736b9c0bbc40ba8254534c41'), -50n],
+  [Cardano.AssetId('7eae28af2208be856f7a119668ae52a49b73725e326dc16579dcc373'), 40n],
+  [Cardano.AssetId('7eae28af2208be856f7a119668ae52a49b73725e326dc16579dcc373504154415445'), 30n]
 ]);
 
 export const valueCoinOnly = { coins: 100_000n };
@@ -116,7 +118,7 @@ export const tx: Cardano.NewTxAlonzo = {
     }
   },
   body: txBody,
-  id: Cardano.TransactionId('6108081a4c302b22548ac0d3651e43802341c7729791c4f5243fcc6e7c2e8635'),
+  id: Cardano.TransactionId('de9d33f66cffff721673219b19470aec81d96bc9253182369e41eec58389a448'),
   witness: {
     signatures: new Map([[Cardano.Ed25519PublicKey(vkey), Cardano.Ed25519Signature(signature)]])
   }
