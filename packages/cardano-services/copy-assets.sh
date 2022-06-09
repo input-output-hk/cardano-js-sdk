@@ -9,6 +9,7 @@ cp ./src/TxSubmit/openApi.json ./dist/cjs/TxSubmit/openApi.json
 cp ./src/Utxo/openApi.json ./dist/cjs/Utxo/openApi.json
 cp ./src/ChainHistory/openApi.json ./dist/cjs/ChainHistory/openApi.json
 cp ./src/NetworkInfo/openApi.json ./dist/cjs/NetworkInfo/openApi.json
+cp ./src/Rewards/openApi.json ./dist/cjs/Rewards/openApi.json
 
 # TODO: uncomment when ESM builds are enabled for this package
 # cp ./src/StakePool/openApi.json ./dist/esm/StakePool/openApi.json
@@ -16,5 +17,6 @@ cp ./src/NetworkInfo/openApi.json ./dist/cjs/NetworkInfo/openApi.json
 # cp ./src/Utxo/openApi.json ./dist/esm/Utxo/openApi.json
 # cp ./src/ChainHistory/openApi.json ./dist/esm/ChainHistory/openApi.json
 # cp ./src/NetworkInfo/openApi.json ./dist/esm/NetworkInfo/openApi.json
+# cp ./src/Rewards/openApi.json ./dist/esm/Rewards/openApi.json
 
 # cp ./package.json ./dist/esm/original-package.json
