@@ -23,10 +23,9 @@
   ],
   "license": "MPL-2.0",
   "scripts": {
-    "build:esm": "tsc -p src/tsconfig.json --outDir ./dist/esm --module es2020",
     "build:cjs": "tsc --build src",
-    "build": "run-s build:cjs build:esm module-fixup",
-    "module-fixup": "shx cp ../../build/cjs-package.json ./dist/cjs/package.json && cp ../../build/esm-package.json ./dist/esm/package.json",
+    "build:copy-assets": "bash ./copy-assets.sh",
+    "build": "run-s build:cjs build:copy-assets",
     "tscNoEmit": "shx echo typescript --noEmit command not implemented yet",
     "cleanup:dist": "shx rm -rf dist",
     "cleanup:nm": "shx rm -rf node_modules",

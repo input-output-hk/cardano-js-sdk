@@ -25,8 +25,10 @@ import { loggerMethodNames } from './util';
 import clear from 'clear';
 import fs from 'fs';
 import onDeath from 'death';
+import path from 'path';
 
-const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+const packageJsonPath = path.join(__dirname, 'original-package.json');
+const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 
 clear();
 // eslint-disable-next-line no-console
