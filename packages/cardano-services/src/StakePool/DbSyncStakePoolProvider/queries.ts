@@ -686,7 +686,7 @@ export const withPagination = (query: string, pagination?: StakePoolQueryOptions
 
 const orderBy = (query: string, sort: OrderByOptions[]) =>
   sort && sort.length > 0
-    ? `${query} ORDER BY ${sort.map(({ field, order }) => `${field} ${order}`).join(', ')}`
+    ? `${query} ORDER BY ${sort.map(({ field, order }) => `${field} ${order} NULLS LAST`).join(', ')}`
     : query;
 
 export const addSentenceToQuery = (query: string, sentence: string) => query + sentence;
@@ -773,14 +773,18 @@ FROM last_pool_update AS pool_update
 LEFT JOIN last_pool_retire AS pool_retire 
 	ON pool_update.hash_id = pool_retire.hash_id`;
 
+const sortFieldMapping: Record<string, string> = {
+  name: "lower((pod.json -> 'name')::TEXT)"
+};
+
 export const withSort = (query: string, sort?: StakePoolQueryOptions['sort'], defaultSort?: OrderByOptions[]) => {
   if (!sort?.field && defaultSort) {
-    const defaultMappedSort = defaultSort.map((s) => ({ field: s.field, order: s.order }));
+    const defaultMappedSort = defaultSort.map((s) => ({ field: sortFieldMapping[s.field] || s.field, order: s.order }));
     return orderBy(query, defaultMappedSort);
   }
   if (!sort?.field) return query;
   const sortType = getStakePoolSortType(sort.field);
-  const mappedSort = { field: sort.field, order: sort.order };
+  const mappedSort = { field: sortFieldMapping[sort.field] || sort.field, order: sort.order };
   switch (sortType) {
     case 'data':
       return orderBy(query, [mappedSort, { field: 'pool_id', order: 'asc' }]);

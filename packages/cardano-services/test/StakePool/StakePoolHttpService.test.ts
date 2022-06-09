@@ -546,12 +546,12 @@ describe('StakePoolHttpService', () => {
           }
         };
         const sortByNameThenByPoolId = function (poolA: Cardano.StakePool, poolB: Cardano.StakePool) {
-          if ((poolA.metadata?.name || poolA.id) > (poolB.metadata?.name || poolB.id)) {
-            return 1;
-          } else if ((poolA.metadata?.name || poolA.id) < (poolB.metadata?.name || poolB.id)) {
-            return -1;
+          if (poolA.metadata?.name && !poolB.metadata?.name) return -1;
+          if (!poolA.metadata?.name && poolB.metadata?.name) return 1;
+          if (poolA.metadata?.name && poolB.metadata?.name) {
+            return poolA.metadata.name.toLowerCase() > poolB.metadata.name.toLowerCase() ? 1 : -1;
           }
-          return 0;
+          return poolA.id > poolB.id ? 1 : -1;
         };
 
         describe('sort by name', () => {
@@ -611,6 +611,23 @@ describe('StakePoolHttpService', () => {
 
               expect(pageResults.length).toEqual(4);
               expect(pageResults[0].metadata?.name).toEqual('CLIO1');
+              expect(pageResults[pageResults.length - 1].metadata?.name).toBeUndefined();
+              expect(pageResults.map(({ id }) => id)).toEqual(stakePoolIdsSorted);
+            });
+
+            it('with name descending', async () => {
+              const stakePoolIdsSorted = [
+                secondNamedPoolId,
+                firstNamedPoolId,
+                fistNoMetadataPoolId,
+                secondNoMetadataPoolId
+              ];
+              const { pageResults } = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
+                { ...reqOptions, sort: { field: 'name', order: 'desc' } }
+              ]);
+
+              expect(pageResults.length).toEqual(4);
+              expect(pageResults[0].metadata?.name).toEqual('Farts');
               expect(pageResults[pageResults.length - 1].metadata?.name).toBeUndefined();
               expect(pageResults.map(({ id }) => id)).toEqual(stakePoolIdsSorted);
             });
