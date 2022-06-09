@@ -8,13 +8,13 @@ import { DbSyncStakePoolProvider, StakePoolHttpService } from '../StakePool';
 import { DbSyncUtxoProvider, UtxoHttpService } from '../Utxo';
 import { HttpServer, HttpServerConfig, HttpService } from '../Http';
 import { MissingProgramOption, UnknownServiceName } from './errors';
-import { Pool } from 'pg';
 import { ProgramOptionDescriptions } from './ProgramOptionDescriptions';
 import { RabbitMqTxSubmitProvider } from '@cardano-sdk/rabbitmq';
 import { ServiceNames } from './ServiceNames';
 import { TxSubmitHttpService } from '../TxSubmit';
 import { ogmiosTxSubmitProvider, urlToConnectionConfig } from '@cardano-sdk/ogmios';
 import Logger, { createLogger } from 'bunyan';
+import pg from 'pg';
 
 export interface HttpServerOptions extends CommonProgramOptions {
   dbConnectionString?: string;
@@ -36,7 +36,7 @@ export interface ProgramArgs {
   options?: HttpServerOptions;
 }
 
-const serviceMapFactory = (args: ProgramArgs, logger: Logger, db?: Pool) => ({
+const serviceMapFactory = (args: ProgramArgs, logger: Logger, db?: pg.Pool) => ({
   [ServiceNames.StakePool]: async () => {
     if (!db) throw new MissingProgramOption(ServiceNames.StakePool, ProgramOptionDescriptions.DbConnection);
     return await StakePoolHttpService.create({
@@ -95,7 +95,7 @@ export const loadHttpServer = async (args: ProgramArgs): Promise<HttpServer> => 
   });
 
   const db = args.options?.dbConnectionString
-    ? new Pool({ connectionString: args.options.dbConnectionString })
+    ? new pg.Pool({ connectionString: args.options.dbConnectionString })
     : undefined;
 
   const serviceMap = serviceMapFactory(args, logger, db);

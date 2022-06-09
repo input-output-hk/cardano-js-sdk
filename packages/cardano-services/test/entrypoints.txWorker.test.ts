@@ -1,5 +1,5 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import { BAD_CONNECTION_URL, enqueueFakeTx, removeAllMessagesFromQueue } from '@cardano-sdk/rabbitmq/test/utils';
+import { BAD_CONNECTION_URL, enqueueFakeTx, removeAllMessagesFromQueue } from '../../rabbitmq/test/utils';
 import { ChildProcess, fork } from 'child_process';
 import { createConnectionObject } from '@cardano-ogmios/client';
 import { createHealthyMockOgmiosServer, ogmiosServerReady } from './util';
@@ -8,7 +8,7 @@ import { listenPromise, serverClosePromise } from '../src/util';
 import http from 'http';
 import path from 'path';
 
-const exePath = (name: 'cli' | 'startWorker') => path.join(__dirname, '..', 'dist', `${name}.js`);
+const exePath = (name: 'cli' | 'startWorker') => path.join(__dirname, '..', 'dist', 'cjs', `${name}.js`);
 
 describe('tx-worker entrypoints', () => {
   let commonArgs: string[];

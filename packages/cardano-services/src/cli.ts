@@ -22,9 +22,11 @@ import {
 } from './TxWorker';
 import { URL } from 'url';
 import { loggerMethodNames } from './util';
+import clear from 'clear';
+import fs from 'fs';
 import onDeath from 'death';
-const clear = require('clear');
-const packageJson = require('../package.json');
+
+const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
 
 clear();
 // eslint-disable-next-line no-console

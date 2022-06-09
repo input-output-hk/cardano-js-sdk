@@ -11,7 +11,7 @@ import axios from 'axios';
 import http from 'http';
 import path from 'path';
 
-const exePath = (name: 'cli' | 'run') => path.join(__dirname, '..', 'dist', `${name}.js`);
+const exePath = (name: 'cli' | 'run') => path.join(__dirname, '..', 'dist', 'cjs', `${name}.js`);
 
 const assertServiceHealthy = async (apiUrl: string, serviceName: ServiceNames) => {
   await serverReady(apiUrl);
