@@ -1,4 +1,3 @@
-import { BehaviorObservable } from '@cardano-sdk/util-rxjs';
 import { Cardano, EpochRewards } from '@cardano-sdk/core';
 import { Observable } from 'rxjs';
 
@@ -16,9 +15,9 @@ export interface Balance extends Cardano.Value {
 }
 
 export interface TransactionalObservables<T> {
-  total$: BehaviorObservable<T>;
-  available$: BehaviorObservable<T>;
-  unspendable$: BehaviorObservable<T>;
+  total$: Observable<T>;
+  available$: Observable<T>;
+  unspendable$: Observable<T>;
 }
 
 export interface TransactionalTracker<T> extends TransactionalObservables<T> {
@@ -47,9 +46,9 @@ export interface FailedTx {
 }
 
 export interface TransactionsTracker {
-  readonly history$: BehaviorObservable<Cardano.TxAlonzo[]>;
+  readonly history$: Observable<Cardano.TxAlonzo[]>;
   readonly outgoing: {
-    readonly inFlight$: BehaviorObservable<Cardano.NewTxAlonzo[]>;
+    readonly inFlight$: Observable<Cardano.NewTxAlonzo[]>;
     readonly submitting$: Observable<Cardano.NewTxAlonzo>;
     readonly pending$: Observable<Cardano.NewTxAlonzo>;
     readonly failed$: Observable<FailedTx>;
@@ -94,6 +93,6 @@ export interface RewardAccount {
 }
 
 export interface DelegationTracker {
-  rewardsHistory$: BehaviorObservable<RewardsHistory>;
-  rewardAccounts$: BehaviorObservable<RewardAccount[]>;
+  rewardsHistory$: Observable<RewardsHistory>;
+  rewardAccounts$: Observable<RewardAccount[]>;
 }

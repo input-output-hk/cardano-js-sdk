@@ -103,7 +103,7 @@ export class InMemoryKeyAgent extends KeyAgentBase {
   ): Promise<Cardano.Signatures> {
     // Possible optimization is casting strings to OpaqueString types directly and skipping validation
     const blob = Cardano.util.HexBlob(hash.toString());
-    const derivationPaths = ownSignatureKeyPaths(body, this.knownAddresses, inputAddressResolver);
+    const derivationPaths = await ownSignatureKeyPaths(body, this.knownAddresses, inputAddressResolver);
     const keyPaths = uniqBy([...derivationPaths, ...additionalKeyPaths], ({ role, index }) => `${role}.${index}`);
     // TODO:
     // if (keyPaths.length === 0) {

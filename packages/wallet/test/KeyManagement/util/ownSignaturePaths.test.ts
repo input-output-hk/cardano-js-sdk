@@ -9,7 +9,7 @@ const createGroupedAddress = (address: Cardano.Address, type: AddressType, index
   } as GroupedAddress);
 
 describe('KeyManagement.util.ownSignaturePaths', () => {
-  it('returns distinct derivation paths required to sign the transaction', () => {
+  it('returns distinct derivation paths required to sign the transaction', async () => {
     const address1 = Cardano.Address(
       'addr_test1qra788mu4sg8kwd93ns9nfdh3k4ufxwg4xhz2r3n064tzfgxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flkns6cy45x'
     );
@@ -28,7 +28,7 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
       .mockReturnValueOnce(address1)
       .mockReturnValueOnce(address2)
       .mockReturnValueOnce(address1);
-    expect(util.ownSignatureKeyPaths(txBody, knownAddresses, resolveInput)).toEqual([
+    expect(await util.ownSignatureKeyPaths(txBody, knownAddresses, resolveInput)).toEqual([
       {
         index: 0,
         role: KeyRole.External

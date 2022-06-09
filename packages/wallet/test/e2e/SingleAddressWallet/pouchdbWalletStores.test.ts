@@ -46,7 +46,7 @@ describe('SingleAddressWallet/pouchdbWalletStores', () => {
     await delay(1000);
     // loading reward accounts involves loading many other pieces (transactions, stake pools etc.)
     const wallet1RewardAccounts = await firstValueFrom(wallet1.delegation.rewardAccounts$);
-    const wallet1RewardsHistory = wallet1.delegation.rewardsHistory$.value;
+    const wallet1RewardsHistory = await firstValueFrom(wallet1.delegation.rewardsHistory$);
     wallet1.shutdown();
     // create a new wallet, with new stores sharing the underlying database
     const wallet2 = await createWallet(createPouchdbWalletStores(walletName));
@@ -55,7 +55,7 @@ describe('SingleAddressWallet/pouchdbWalletStores', () => {
     expect(await firstValueFrom(wallet1.delegation.rewardAccounts$)).toEqual(wallet1RewardAccounts);
     // if it's still syncing and reward accounts matched wallet1, it means it has loaded from storage.
     // technically a race condition too...
-    expect(wallet2.syncStatus.isSettled$.value).toBe(false);
+    expect(await firstValueFrom(wallet2.syncStatus.isSettled$)).toBe(false);
     // will time out if it's not syncing after load.
     await waitForWalletStateSettle(wallet2);
     // assert that it's updating wallet properties after fetching new data from the provider (at least the tip)

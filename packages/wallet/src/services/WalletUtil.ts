@@ -22,8 +22,10 @@ export const createWalletUtil = (wallet: ObservableWallet) => {
       tokenBundleSizeExceedsLimit: tokenBundleSizeExceedsLimit(maxValueSize)(output.value.assets)
     };
   };
-  const resolveInputAddress: ResolveInputAddress = (input: Cardano.NewTxIn) =>
-    wallet.utxo.available$.value?.find(([txIn]) => txInEquals(txIn, input))?.[1].address || null;
+  const resolveInputAddress: ResolveInputAddress = async (input: Cardano.NewTxIn) => {
+    const utxoAvailable = await firstValueFrom(wallet.utxo.available$);
+    return utxoAvailable?.find(([txIn]) => txInEquals(txIn, input))?.[1].address || null;
+  };
 
   return {
     resolveInputAddress,
