@@ -7,5 +7,6 @@ export enum ServiceNames {
   NetworkInfo = 'network-info',
   TxSubmit = 'tx-submit',
   Utxo = 'utxo',
-  ChainHistory = 'chain-history'
+  ChainHistory = 'chain-history',
+  Rewards = 'rewards'
 }

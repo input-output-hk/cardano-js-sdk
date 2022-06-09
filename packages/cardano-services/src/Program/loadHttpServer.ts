@@ -3,6 +3,7 @@
 import { ChainHistoryHttpService, DbSyncChainHistoryProvider } from '../ChainHistory';
 import { CommonProgramOptions } from '../ProgramsCommon';
 import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../NetworkInfo';
+import { DbSyncRewardsProvider, RewardsHttpService } from '../Rewards';
 import { DbSyncStakePoolProvider, StakePoolHttpService } from '../StakePool';
 import { DbSyncUtxoProvider, UtxoHttpService } from '../Utxo';
 import { HttpServer, HttpServerConfig, HttpService } from '../Http';
@@ -30,6 +31,7 @@ export interface ProgramArgs {
     | ServiceNames.ChainHistory
     | ServiceNames.Utxo
     | ServiceNames.NetworkInfo
+    | ServiceNames.Rewards
   )[];
   options?: HttpServerOptions;
 }
@@ -75,7 +77,14 @@ const serviceMapFactory = (args: ProgramArgs, logger: Logger, db?: Pool) => ({
         args.options?.useQueue && args.options?.rabbitmqUrl
           ? new RabbitMqTxSubmitProvider(args.options.rabbitmqUrl)
           : ogmiosTxSubmitProvider(urlToConnectionConfig(args.options?.ogmiosUrl))
-    })
+    }),
+  [ServiceNames.Rewards]: async () => {
+    if (!db) throw new MissingProgramOption(ServiceNames.Rewards, ProgramOptionDescriptions.DbConnection);
+    return await RewardsHttpService.create({
+      logger,
+      rewardsProvider: new DbSyncRewardsProvider(db, logger)
+    });
+  }
 });
 
 export const loadHttpServer = async (args: ProgramArgs): Promise<HttpServer> => {

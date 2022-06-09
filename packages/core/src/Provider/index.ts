@@ -3,6 +3,7 @@ export * from './StakePoolProvider';
 export * from './WalletProvider';
 export * from './AssetProvider';
 export * from './NetworkInfoProvider';
+export * from './RewardsProvider';
 export * from './TxSubmitProvider';
 export * as ProviderUtil from './providerUtil';
 export * from './UtxoProvider';

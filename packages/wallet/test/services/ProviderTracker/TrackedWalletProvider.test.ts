@@ -1,7 +1,7 @@
 import { BehaviorSubject } from 'rxjs';
 import { CLEAN_FN_STATS, ProviderFnStats, TrackedWalletProvider, WalletProviderStats } from '../../../src';
 import { WalletProvider } from '@cardano-sdk/core';
-import { WalletProviderStub, mockWalletProvider, rewardAccount } from '../../mocks';
+import { WalletProviderStub, mockWalletProvider } from '../../mocks';
 
 describe('TrackedWalletProvider', () => {
   let walletProvider: WalletProviderStub;
@@ -80,24 +80,6 @@ describe('TrackedWalletProvider', () => {
         (wp) => wp.ledgerTip(),
         (stats) => stats.ledgerTip$,
         (mockWP) => mockWP.ledgerTip
-      )
-    );
-
-    test(
-      'rewardsHistory',
-      testFunctionStats(
-        (wp) => wp.rewardsHistory({ rewardAccounts: [] }),
-        (stats) => stats.rewardsHistory$,
-        (mockWP) => mockWP.rewardsHistory
-      )
-    );
-
-    test(
-      'rewards',
-      testFunctionStats(
-        (wp) => wp.rewardAccountBalance(rewardAccount),
-        (stats) => stats.rewardAccountBalance$,
-        (mockWP) => mockWP.rewardAccountBalance
       )
     );
   });

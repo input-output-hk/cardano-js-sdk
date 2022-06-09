@@ -5,6 +5,7 @@ import {
   blockfrostAssetProvider,
   blockfrostChainHistoryProvider,
   blockfrostNetworkInfoProvider,
+  blockfrostRewardsProvider,
   blockfrostTxSubmitProvider,
   blockfrostUtxoProvider,
   blockfrostWalletProvider
@@ -22,6 +23,7 @@ const txSubmitProviderOptions = ['blockfrost'];
 const walletProviderOptions = ['blockfrost'];
 const assetProviderOptions = ['blockfrost'];
 const utxoProviderOptions = ['blockfrost'];
+const rewardsProviderOptions = ['blockfrost'];
 const keyAgentOptions = ['InMemory'];
 const chainHistoryProviderOptions = ['blockfrost'];
 
@@ -40,6 +42,7 @@ const env = envalid.cleanEnv(process.env, {
   NETWORK_INFO_PROVIDER: envalid.str({ choices: networkInfoProviderOptions }),
   POOL_ID_1: envalid.str(),
   POOL_ID_2: envalid.str(),
+  REWARDS_PROVIDER: envalid.str({ choices: rewardsProviderOptions }),
   STAKE_POOL_PROVIDER: envalid.str({ choices: stakePoolProviderOptions }),
   TX_SUBMIT_HTTP_URL: envalid.url(),
   TX_SUBMIT_PROVIDER: envalid.str({ choices: txSubmitProviderOptions }),
@@ -105,6 +108,13 @@ export const txSubmitProvider = (async () => {
       throw new Error(`TX_SUBMIT_PROVIDER unsupported: ${env.TX_SUBMIT_PROVIDER}`);
     }
   }
+})();
+
+export const rewardsProvider = (async () => {
+  if (env.REWARDS_PROVIDER === 'blockfrost') {
+    return blockfrostRewardsProvider(await blockfrostApi!);
+  }
+  throw new Error(`REWARDS_PROVIDER unsupported: ${env.REWARDS_PROVIDER}`);
 })();
 
 export const stakePoolProvider = (async () => {

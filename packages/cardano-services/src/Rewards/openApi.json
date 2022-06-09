@@ -1,0 +1,162 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Rewards",
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/rewards/account-balance": {
+      "post": {
+        "summary": "Rewards balance search",
+        "operationId": "balanceSearch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BalanceSearchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Rewards balance of given account",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BigInt"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid request"
+          }
+        }
+      }
+    },
+    "/rewards/history": {
+      "post": {
+        "summary": "Rewards history search",
+        "operationId": "rewardsHistorySearch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HistorySearchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Rewards per epoch fetched",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistorySearchResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid request"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BigInt": {
+        "required": ["value", "__type"],
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          },
+          "__type": {
+            "type": "string",
+            "enum": ["bigint"]
+          }
+        }
+      },
+      "Map": {
+        "required": ["value", "__type"],
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "array"
+          },
+          "__type": {
+            "type": "string",
+            "enum": ["Map"]
+          }
+        }
+      },
+      "HistorySearchRequest": {
+        "type": "object",
+        "required": ["args"],
+        "properties": {
+          "args": {
+            "type": "array",
+            "maxLength": 1,
+            "minLength": 1,
+            "items": {
+              "$ref": "#/components/schemas/RewardHistoryProps"
+            }
+          }
+        }
+      },
+      "HistorySearchResponse": {
+        "$ref": "#/components/schemas/Map"
+      },
+      "BalanceSearchRequest": {
+        "type": "object",
+        "required": ["args"],
+        "properties": {
+          "args": {
+            "type": "array",
+            "maxLength": 1,
+            "minLength": 1,
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "RewardHistoryProps": {
+        "type": "object",
+        "required": ["rewardAccounts"],
+        "properties": {
+          "rewardAccounts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "epochs": {
+            "$ref": "#/components/schemas/EpochRange"
+          }
+        }
+      },
+      "EpochRange": {
+        "type": "object",
+        "properties": {
+          "lowerBound": {
+            "type": "number"
+          },
+          "upperBound": {
+            "type": "number"
+          }
+        }
+      }
+    }
+  }
+}

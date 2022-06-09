@@ -18,7 +18,7 @@ import {
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { RewardsHistoryProvider, createRewardsHistoryProvider, createRewardsHistoryTracker } from './RewardsHistory';
 import { Shutdown } from '@cardano-sdk/util';
-import { TrackedWalletProvider } from '../ProviderTracker';
+import { TrackedRewardsProvider } from '../ProviderTracker';
 import { TrackerSubject } from '@cardano-sdk/util-rxjs';
 import { TxWithEpoch } from './types';
 import { WalletStores } from '../../persistence';
@@ -35,7 +35,7 @@ export const createBlockEpochProvider =
 export type BlockEpochProvider = ReturnType<typeof createBlockEpochProvider>;
 
 export interface DelegationTrackerProps {
-  walletProvider: TrackedWalletProvider;
+  rewardsTracker: TrackedRewardsProvider;
   rewardAccountAddresses$: Observable<Cardano.RewardAccount[]>;
   stakePoolProvider: StakePoolProvider;
   timeSettings$: Observable<TimeSettings[]>;
@@ -69,7 +69,7 @@ export const certificateTransactionsWithEpochs = (
 export const createDelegationTracker = ({
   rewardAccountAddresses$,
   epoch$,
-  walletProvider,
+  rewardsTracker,
   retryBackoffConfig,
   transactionsTracker,
   timeSettings$,
@@ -77,11 +77,11 @@ export const createDelegationTracker = ({
   stores,
   internals: {
     queryStakePoolsProvider = createQueryStakePoolsProvider(stakePoolProvider, stores.stakePools, retryBackoffConfig),
-    rewardsHistoryProvider = createRewardsHistoryProvider(walletProvider, retryBackoffConfig),
+    rewardsHistoryProvider = createRewardsHistoryProvider(rewardsTracker, retryBackoffConfig),
     rewardsProvider = createRewardsProvider(
       epoch$,
       transactionsTracker.outgoing.confirmed$,
-      walletProvider,
+      rewardsTracker,
       retryBackoffConfig
     ),
     slotEpochCalc$ = timeSettings$.pipe(map((timeSettings) => createSlotEpochCalc(timeSettings)))

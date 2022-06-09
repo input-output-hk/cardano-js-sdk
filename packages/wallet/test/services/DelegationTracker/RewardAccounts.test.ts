@@ -1,7 +1,7 @@
 /* eslint-disable space-in-parens */
 /* eslint-disable no-multi-spaces */
 /* eslint-disable prettier/prettier */
-import { Cardano, WalletProvider } from '@cardano-sdk/core';
+import { Cardano, RewardsProvider } from '@cardano-sdk/core';
 import { EMPTY, Observable } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import {
@@ -131,7 +131,7 @@ describe('RewardAccounts', () => {
   });
 
   test('createRewardsProvider', () => {
-    const walletProvider = null as unknown as WalletProvider; // not used in this test
+    const rewardsProvider = null as unknown as RewardsProvider; // not used in this test
     const config = null as unknown as RetryBackoffConfig; // not used in this test
     const epoch$ = null as unknown as Observable<Cardano.Epoch>; // not used in this test
     const txConfirmed$ = EMPTY as Observable<Cardano.NewTxAlonzo>;
@@ -152,7 +152,7 @@ describe('RewardAccounts', () => {
       const target$ = createRewardsProvider(
         epoch$,
         txConfirmed$,
-        walletProvider,
+        rewardsProvider,
         config
       )([
         'stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27',

@@ -20,6 +20,7 @@ import { ProviderFnStats } from './ProviderTracker';
 import { TrackedAssetProvider } from './TrackedAssetProvider';
 import { TrackedChainHistoryProvider } from './TrackedChainHistoryProvider';
 import { TrackedNetworkInfoProvider } from './TrackedNetworkInfoProvider';
+import { TrackedRewardsProvider } from './TrackedRewardsProvider';
 import { TrackedStakePoolProvider } from './TrackedStakePoolProvider';
 import { TrackedTxSubmitProvider } from './TrackedTxSubmitProvider';
 import { TrackedUtxoProvider } from './TrackedUtxoProvider';
@@ -38,6 +39,7 @@ export interface ProviderStatusTrackerDependencies {
   assetProvider: TrackedAssetProvider;
   utxoProvider: TrackedUtxoProvider;
   chainHistoryProvider: TrackedChainHistoryProvider;
+  rewardsProvider: TrackedRewardsProvider;
 }
 
 const getDefaultProviderSyncRelevantStats = ({
@@ -47,20 +49,21 @@ const getDefaultProviderSyncRelevantStats = ({
   txSubmitProvider,
   assetProvider,
   utxoProvider,
-  chainHistoryProvider
+  chainHistoryProvider,
+  rewardsProvider
 }: ProviderStatusTrackerDependencies): Observable<ProviderFnStats[]> =>
   combineLatest([
     walletProvider.stats.ledgerTip$,
     walletProvider.stats.currentWalletProtocolParameters$,
     walletProvider.stats.genesisParameters$,
-    walletProvider.stats.rewardsHistory$,
-    walletProvider.stats.rewardAccountBalance$,
     assetProvider.stats.getAsset$,
     txSubmitProvider.stats.submitTx$,
     stakePoolProvider.stats.queryStakePools$,
     networkInfoProvider.stats.networkInfo$,
     utxoProvider.stats.utxoByAddresses$,
-    chainHistoryProvider.stats.transactionsByAddresses$
+    chainHistoryProvider.stats.transactionsByAddresses$,
+    rewardsProvider.stats.rewardsHistory$,
+    rewardsProvider.stats.rewardAccountBalance$
   ]);
 
 export interface ProviderStatusTrackerInternals {

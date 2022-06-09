@@ -4,6 +4,7 @@ import {
   blockfrostAssetProvider,
   blockfrostChainHistoryProvider,
   blockfrostNetworkInfoProvider,
+  blockfrostRewardsProvider,
   blockfrostTxSubmitProvider,
   blockfrostUtxoProvider,
   blockfrostWalletProvider
@@ -32,6 +33,7 @@ const walletProviderOptions = ['blockfrost'];
 const assetProviderOptions = ['blockfrost'];
 const keyAgentOptions = ['InMemory', 'Ledger', 'Trezor'];
 const chainHistoryProviderOptions = ['blockfrost'];
+const rewardsProviderOptions = ['blockfrost'];
 
 const env = envalid.cleanEnv(process.env, {
   ASSET_PROVIDER: envalid.str({ choices: assetProviderOptions }),
@@ -49,6 +51,7 @@ const env = envalid.cleanEnv(process.env, {
   OGMIOS_URL: envalid.url(),
   POOL_ID_1: envalid.str(),
   POOL_ID_2: envalid.str(),
+  REWARDS_PROVIDER: envalid.str({ choices: rewardsProviderOptions }),
   STAKE_POOL_PROVIDER: envalid.str({ choices: stakePoolProviderOptions }),
   TX_SUBMIT_HTTP_URL: envalid.url(),
   TX_SUBMIT_PROVIDER: envalid.str({ choices: txSubmitProviderOptions }),
@@ -214,3 +217,10 @@ export const chainHistoryProvider = (async () => {
 
 export const poolId1 = Cardano.PoolId(env.POOL_ID_1);
 export const poolId2 = Cardano.PoolId(env.POOL_ID_2);
+
+export const rewardsProvider = (async () => {
+  if (env.REWARDS_PROVIDER === 'blockfrost') {
+    return blockfrostRewardsProvider(await blockfrostApi!);
+  }
+  throw new Error(`REWARDS_PROVIDER unsupported: ${env.REWARDS_PROVIDER}`);
+})();

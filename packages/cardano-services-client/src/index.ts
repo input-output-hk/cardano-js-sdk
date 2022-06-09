@@ -5,3 +5,4 @@ export * from './StakePoolProvider';
 export * from './UtxoProvider';
 export * from './ChainHistoryProvider';
 export * from './NetworkInfoProvider';
+export * from './RewardsProvider';
