@@ -63,19 +63,80 @@ describe('StakePoolBuilder', () => {
     });
   });
   describe('queryPoolMetrics', () => {
-    it('queryPoolMetrics', async () => {
-      const totalAda = '42021479194505231';
-      const metrics = (await builder.queryPoolMetrics([1, 2, 3], totalAda)).map((m) => m.metrics);
-      expect(metrics).toMatchSnapshot();
+    const totalAda = '42021479194505231';
+    describe('sort', () => {
+      it('by default sort', async () => {
+        const metrics = (await builder.queryPoolMetrics([14, 15, 20], totalAda)).map((m) => m.metrics);
+        expect(metrics).toHaveLength(3);
+        expect(metrics).toMatchSnapshot();
+      });
+      it('by saturation', async () => {
+        const metrics = (
+          await builder.queryPoolMetrics([14, 15, 20], totalAda, { sort: { field: 'saturation', order: 'asc' } })
+        ).map((m) => m.metrics);
+        expect(metrics).toHaveLength(3);
+        expect(metrics).toMatchSnapshot();
+      });
+    });
+    describe('pagination', () => {
+      it('with limit', async () => {
+        const metrics = (
+          await builder.queryPoolMetrics([14, 15, 20], totalAda, { pagination: { limit: 2, startAt: 0 } })
+        ).map((m) => m.metrics);
+        expect(metrics).toHaveLength(2);
+        expect(metrics).toMatchSnapshot();
+      });
+      it('with startAt', async () => {
+        const metrics = (
+          await builder.queryPoolMetrics([14, 15, 20], totalAda, { pagination: { limit: 3, startAt: 1 } })
+        ).map((m) => m.metrics);
+        expect(metrics).toHaveLength(2);
+        expect(metrics).toMatchSnapshot();
+      });
     });
   });
   describe('queryPoolData', () => {
-    it('queryPoolData', async () => {
-      const poolDatas = (await builder.queryPoolData([1, 6])).map((qR) => {
-        const { hashId, updateId, ...poolData } = qR;
-        return poolData;
+    describe('sort', () => {
+      it('by default sort', async () => {
+        const pools = (await builder.queryPoolData([1, 6, 14, 15, 20])).map((qR) => {
+          const { hashId, updateId, ...poolData } = qR;
+          return poolData;
+        });
+        expect(pools).toHaveLength(5);
+        expect(pools).toMatchSnapshot();
       });
-      expect(poolDatas).toMatchSnapshot();
+      it('by name desc', async () => {
+        const pools = (await builder.queryPoolData([14, 15, 20], { sort: { field: 'name', order: 'desc' } })).map(
+          (qR) => {
+            const { hashId: _1, updateId: _2, ...poolData } = qR;
+            return poolData;
+          }
+        );
+        expect(pools).toHaveLength(3);
+        expect(pools).toMatchSnapshot();
+      });
+    });
+    describe('pagination', () => {
+      it('with limit', async () => {
+        const pools = (await builder.queryPoolData([1, 6, 14, 15, 20], { pagination: { limit: 3, startAt: 0 } })).map(
+          (qR) => {
+            const { hashId, updateId, ...poolData } = qR;
+            return poolData;
+          }
+        );
+        expect(pools).toHaveLength(3);
+        expect(pools).toMatchSnapshot();
+      });
+      it('with startAt', async () => {
+        const pools = (await builder.queryPoolData([1, 6, 14, 15, 20], { pagination: { limit: 5, startAt: 2 } })).map(
+          (qR) => {
+            const { hashId, updateId, ...poolData } = qR;
+            return poolData;
+          }
+        );
+        expect(pools).toHaveLength(3);
+        expect(pools).toMatchSnapshot();
+      });
     });
   });
   describe('getTotalAmountOfAda', () => {

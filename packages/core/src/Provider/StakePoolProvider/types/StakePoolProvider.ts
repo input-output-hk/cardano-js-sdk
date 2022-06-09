@@ -1,8 +1,13 @@
 import { Cardano } from '../../..';
+import { PoolDataSortFields, PoolMetricsSortFields } from '../util';
 
 type FilterCondition = 'and' | 'or';
 type SortOrder = 'asc' | 'desc';
-type SortField = 'name';
+export type SortField = typeof PoolDataSortFields[number] | typeof PoolMetricsSortFields[number];
+interface StakePoolSortOptions {
+  order: SortOrder;
+  field: SortField;
+}
 
 export interface MultipleChoiceSearchFilter<T> {
   /**
@@ -16,10 +21,7 @@ export interface StakePoolQueryOptions {
   /**
    * Will return all stake pools sorted by name ascending if not specified
    */
-  sort?: {
-    order: SortOrder;
-    field: SortField;
-  };
+  sort?: StakePoolSortOptions;
   /**
    * Will fetch all stake pools if not specified
    */
