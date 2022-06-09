@@ -1,6 +1,6 @@
 import { parse } from 'pg-connection-string';
 import { setupPostgresContainer } from './docker';
-import { setupRabbitMQContainer } from '@cardano-sdk/rabbitmq/test/jest-setup/docker';
+import { setupRabbitMQContainer } from '../../../rabbitmq/test/jest-setup/docker';
 import dotenv from 'dotenv';
 import path from 'path';
 
