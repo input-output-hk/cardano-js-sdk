@@ -126,7 +126,7 @@ describe('entrypoints', () => {
           spy = jest.fn();
         });
 
-        it('cli:start-server stake-pool exits with code 0', (done) => {
+        it('cli:start-server stake-pool exits with code 1', (done) => {
           expect.assertions(2);
           proc = fork(
             exePath('cli'),
@@ -137,13 +137,13 @@ describe('entrypoints', () => {
           );
           proc.stderr!.on('data', spy);
           proc.on('exit', (code) => {
-            expect(code).toBe(0);
+            expect(code).toBe(1);
             expect(spy).toHaveBeenCalled();
             done();
           });
         });
 
-        it('cli:start-server network-info exits with code 0', (done) => {
+        it('cli:start-server network-info exits with code 1', (done) => {
           expect.assertions(2);
           proc = fork(
             exePath('cli'),
@@ -163,7 +163,7 @@ describe('entrypoints', () => {
           );
           proc.stderr!.on('data', spy);
           proc.on('exit', (code) => {
-            expect(code).toBe(0);
+            expect(code).toBe(1);
             expect(spy).toHaveBeenCalled();
             done();
           });
@@ -192,13 +192,13 @@ describe('entrypoints', () => {
           );
           proc.stderr!.on('data', spy);
           proc.on('exit', (code) => {
-            expect(code).toBe(0);
+            expect(code).toBe(1);
             expect(spy).toHaveBeenCalled();
             done();
           });
         });
 
-        it('cli:start-server utxo exits with code 0', (done) => {
+        it('cli:start-server utxo exits with code 1', (done) => {
           expect.assertions(2);
           proc = fork(
             exePath('cli'),
@@ -218,13 +218,13 @@ describe('entrypoints', () => {
           );
           proc.stderr!.on('data', spy);
           proc.on('exit', (code) => {
-            expect(code).toBe(0);
+            expect(code).toBe(1);
             expect(spy).toHaveBeenCalled();
             done();
           });
         });
 
-        it('run stake-pool exits with code 0', (done) => {
+        it('run stake-pool exits with code 1', (done) => {
           expect.assertions(2);
           proc = fork(exePath('run'), {
             env: {
@@ -236,13 +236,13 @@ describe('entrypoints', () => {
           });
           proc.stderr!.on('data', spy);
           proc.on('exit', (code) => {
-            expect(code).toBe(0);
+            expect(code).toBe(1);
             expect(spy).toHaveBeenCalled();
             done();
           });
         });
 
-        it('run network-info exits with code 0', (done) => {
+        it('run network-info exits with code 1', (done) => {
           expect.assertions(2);
           proc = fork(exePath('run'), {
             env: {
@@ -254,7 +254,7 @@ describe('entrypoints', () => {
           });
           proc.stderr!.on('data', spy);
           proc.on('exit', (code) => {
-            expect(code).toBe(0);
+            expect(code).toBe(1);
             expect(spy).toHaveBeenCalled();
             done();
           });
@@ -280,7 +280,7 @@ describe('entrypoints', () => {
           });
         });
 
-        it('run utxo exits with code 0', (done) => {
+        it('run utxo exits with code 1', (done) => {
           expect.assertions(2);
           proc = fork(exePath('run'), {
             env: {
@@ -292,7 +292,7 @@ describe('entrypoints', () => {
           });
           proc.stderr!.on('data', spy);
           proc.on('exit', (code) => {
-            expect(code).toBe(0);
+            expect(code).toBe(1);
             expect(spy).toHaveBeenCalled();
             done();
           });
@@ -305,7 +305,7 @@ describe('entrypoints', () => {
           spy = jest.fn();
         });
 
-        it('cli:start-server network-info exits with code 0', (done) => {
+        it('cli:start-server network-info exits with code 1', (done) => {
           expect.assertions(2);
           proc = fork(
             exePath('cli'),
@@ -325,13 +325,13 @@ describe('entrypoints', () => {
           );
           proc.stderr!.on('data', spy);
           proc.on('exit', (code) => {
-            expect(code).toBe(0);
+            expect(code).toBe(1);
             expect(spy).toHaveBeenCalled();
             done();
           });
         });
 
-        it('run network-info exits with code 0', (done) => {
+        it('run network-info exits with code 1', (done) => {
           expect.assertions(2);
           proc = fork(exePath('run'), {
             env: {
@@ -344,7 +344,7 @@ describe('entrypoints', () => {
           });
           proc.stderr!.on('data', spy);
           proc.on('exit', (code) => {
-            expect(code).toBe(0);
+            expect(code).toBe(1);
             expect(spy).toHaveBeenCalled();
             done();
           });
@@ -463,7 +463,7 @@ describe('entrypoints', () => {
         await serverClosePromise(ogmiosServer);
       });
 
-      it('cli:start-server exits with code 0', (done) => {
+      it('cli:start-server exits with code 1', (done) => {
         expect.assertions(2);
         ogmiosServer.listen(ogmiosConnection.port, () => {
           proc = fork(
@@ -487,14 +487,14 @@ describe('entrypoints', () => {
           );
           proc.stderr!.on('data', spy);
           proc.on('exit', (code) => {
-            expect(code).toBe(0);
+            expect(code).toBe(1);
             expect(spy).toHaveBeenCalled();
             done();
           });
         });
       });
 
-      it('run exits with code 0', (done) => {
+      it('run exits with code 1', (done) => {
         expect.assertions(2);
         ogmiosServer.listen(ogmiosConnection.port, () => {
           proc = fork(exePath('run'), {
@@ -509,7 +509,7 @@ describe('entrypoints', () => {
           });
           proc.stderr!.on('data', spy);
           proc.on('exit', (code) => {
-            expect(code).toBe(0);
+            expect(code).toBe(1);
             expect(spy).toHaveBeenCalled();
             done();
           });
@@ -528,7 +528,7 @@ describe('entrypoints', () => {
         await serverClosePromise(ogmiosServer);
       });
 
-      it('cli:start-server exits with code 0', (done) => {
+      it('cli:start-server exits with code 1', (done) => {
         expect.assertions(2);
         ogmiosServer.listen(ogmiosConnection.port, () => {
           proc = fork(
@@ -550,14 +550,14 @@ describe('entrypoints', () => {
           );
           proc.stderr!.on('data', spy);
           proc.on('exit', (code) => {
-            expect(code).toBe(0);
+            expect(code).toBe(1);
             expect(spy).toHaveBeenCalled();
             done();
           });
         });
       });
 
-      it('run exits with code 0', (done) => {
+      it('run exits with code 1', (done) => {
         expect.assertions(2);
         ogmiosServer.listen(ogmiosConnection.port, () => {
           proc = fork(exePath('run'), {
@@ -571,7 +571,7 @@ describe('entrypoints', () => {
           });
           proc.stderr!.on('data', spy);
           proc.on('exit', (code) => {
-            expect(code).toBe(0);
+            expect(code).toBe(1);
             expect(spy).toHaveBeenCalled();
             done();
           });

@@ -145,5 +145,6 @@ if (process.argv.slice(2).length === 0) {
   program.parseAsync(process.argv).catch((error) => {
     // eslint-disable-next-line no-console
     console.error(error);
+    process.exit(1);
   });
 }
