@@ -1,7 +1,7 @@
 /* eslint-disable max-statements */
 import { Awaited } from '@cardano-sdk/util';
 import { Cardano } from '@cardano-sdk/core';
-import { ObservableWallet, SingleAddressWallet, StakeKeyStatus, txInEquals } from '../../../src';
+import { ObservableWallet, SingleAddressWallet, StakeKeyStatus } from '../../../src';
 import { TX_TIMEOUT, firstValueFromTimed, waitForWalletStateSettle } from '../../util';
 import { TxInternals } from '../../../src/Transaction';
 import {
@@ -151,26 +151,19 @@ describe('SingleAddressWallet/delegation', () => {
     );
 
     const tx1PendingState = await getWalletStateSnapshot(sourceWallet);
-    expect(tx1PendingState.balance.total).toEqual(initialState.balance.total);
-    const expectedCoinsWhileTxPending =
-      initialState.balance.total.coins -
-      Cardano.util.coalesceValueQuantities(
-        tx1Internals.body.inputs.map(
-          (txInput) => initialState.utxo.total.find(([txIn]) => txInEquals(txIn, txInput))![1].value
-        )
-      ).coins;
-    expect(tx1PendingState.balance.available.coins).toBe(expectedCoinsWhileTxPending);
+
+    // Updates total and available balance right after tx is submitted
+    const expectedCoinsAfterTx1 = initialState.balance.total.coins - tx1OutputCoins - tx1Internals.body.fee;
+    expect(tx1PendingState.balance.total.coins).toEqual(expectedCoinsAfterTx1);
+    expect(tx1PendingState.balance.available.coins).toEqual(expectedCoinsAfterTx1);
 
     await waitForTx(sourceWallet, tx1Internals);
     const tx1ConfirmedState = await getWalletStateSnapshot(sourceWallet);
 
     // Updates total and available balance after tx is confirmed
-    const expectedCoinsAfterTx1 =
-      initialState.balance.total.coins -
-      tx1OutputCoins -
-      tx1Internals.body.fee -
-      (initialState.isStakeKeyRegistered ? 0n : stakeKeyDeposit);
-    expect(tx1ConfirmedState.balance.total.coins).toBe(expectedCoinsAfterTx1);
+    expect(tx1ConfirmedState.balance.total.coins).toBe(
+      expectedCoinsAfterTx1 - (initialState.isStakeKeyRegistered ? 0n : stakeKeyDeposit)
+    );
     expect(tx1ConfirmedState.balance.total).toEqual(tx1ConfirmedState.balance.available);
 
     expect(tx1ConfirmedState.rewardAccount.delegatee?.nextNextEpoch!.id).toEqual(poolId);

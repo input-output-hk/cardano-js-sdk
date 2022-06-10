@@ -16,6 +16,9 @@ export interface Balance extends Cardano.Value {
 
 export interface TransactionalObservables<T> {
   total$: Observable<T>;
+  /**
+   * total - unspendable - deposit
+   */
   available$: Observable<T>;
   unspendable$: Observable<T>;
 }

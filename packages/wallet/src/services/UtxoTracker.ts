@@ -1,8 +1,7 @@
 import { Cardano, UtxoProvider } from '@cardano-sdk/core';
 import { NEVER, Observable, combineLatest, concat, map, of, switchMap } from 'rxjs';
-import { PersistentCollectionTrackerSubject, coldObservableProvider, utxoEquals } from './util';
+import { PersistentCollectionTrackerSubject, coldObservableProvider, txInEquals, utxoEquals } from './util';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { TrackerSubject } from '@cardano-sdk/util-rxjs';
 import { UtxoTracker } from './types';
 import { WalletStores } from '../persistence';
 
@@ -50,20 +49,34 @@ export const createUtxoTracker = (
     )
   }: UtxoTrackerInternals = {}
 ): UtxoTracker => {
-  const available$ = new TrackerSubject<Cardano.Utxo[]>(
-    combineLatest([utxoSource$, transactionsInFlight$, unspendableUtxoSource$]).pipe(
-      // filter to utxo that are not included in in-flight transactions or unspendable
-      map(([utxo, transactionsInFlight, unspendableUtxo]) =>
-        utxo.filter(
-          ([utxoTxIn]) =>
-            !transactionsInFlight.some(({ body: { inputs } }) =>
-              inputs.some((input) => input.txId === utxoTxIn.txId && input.index === utxoTxIn.index)
-            ) &&
-            !unspendableUtxo.some(
-              ([unspendable]) => unspendable.txId === utxoTxIn.txId && unspendable.index === utxoTxIn.index
-            )
-        )
+  const total$ = combineLatest([utxoSource$, transactionsInFlight$, addresses$]).pipe(
+    map(([onChainUtxo, transactionsInFlight, ownAddresses]) => [
+      ...onChainUtxo.filter(
+        ([utxoTxIn]) =>
+          !transactionsInFlight.some(({ body: { inputs } }) =>
+            inputs.some((input) => input.txId === utxoTxIn.txId && input.index === utxoTxIn.index)
+          )
+      ),
+      ...transactionsInFlight.flatMap((tx) =>
+        tx.body.outputs
+          .filter(({ address }) => ownAddresses.includes(address))
+          .map(
+            (txOut): Cardano.Utxo => [
+              {
+                address: txOut.address, // not necessarily correct in multi-address wallet
+                index: tx.body.outputs.indexOf(txOut),
+                txId: tx.id
+              },
+              txOut
+            ]
+          )
       )
+    ])
+  );
+  const available$ = combineLatest([total$, unspendableUtxoSource$]).pipe(
+    // filter to utxo that are not included in in-flight transactions or unspendable
+    map(([utxo, unspendableUtxo]) =>
+      utxo.filter(([utxoTxIn]) => !unspendableUtxo.some(([unspendable]) => txInEquals(utxoTxIn, unspendable)))
     )
   );
 
@@ -72,10 +85,9 @@ export const createUtxoTracker = (
     setUnspendable: unspendableUtxoSource$.next.bind(unspendableUtxoSource$),
     shutdown: () => {
       utxoSource$.complete();
-      available$.complete();
       unspendableUtxoSource$.complete();
     },
-    total$: utxoSource$,
+    total$,
     unspendable$: unspendableUtxoSource$
   };
 };
