@@ -14,6 +14,8 @@ class MockKeyAgent extends KeyManagement.KeyAgentBase {
   signBlob = jest.fn();
   exportRootPrivateKey = jest.fn();
   signTransaction = jest.fn();
+  signVotingMetadata = jest.fn();
+  exportExtendedKeyPair = jest.fn();
   deriveCslPublicKeyPublic(derivationPath: KeyManagement.AccountKeyDerivationPath) {
     return this.deriveCslPublicKey(derivationPath);
   }
@@ -48,6 +50,7 @@ describe('KeyAgentBase', () => {
     const index = 1;
     const type = KeyManagement.AddressType.External;
     const address = await keyAgent.deriveAddress({ index, type });
+
     expect(address.index).toBe(index);
     expect(address.type).toBe(type);
     expect(address.accountIndex).toBe(ACCOUNT_INDEX);

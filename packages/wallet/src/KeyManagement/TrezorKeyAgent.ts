@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AuthenticationError, TransportError } from './errors';
 import { Cardano, NotImplementedError, coreToCsl } from '@cardano-sdk/core';
-import { CardanoKeyConst, txToTrezor } from './util';
 import {
+  CardanoKeyConst,
   CommunicationType,
   KeyAgentDependencies,
   KeyAgentType,
@@ -12,6 +12,7 @@ import {
 } from './types';
 import { KeyAgentBase } from './KeyAgentBase';
 import { TxInternals } from '../Transaction';
+import { txToTrezor } from './util';
 import TrezorConnect, { Features } from 'trezor-connect';
 
 export interface TrezorKeyAgentProps extends Omit<SerializableTrezorKeyAgentData, '__typename'> {
@@ -119,9 +120,7 @@ export class TrezorKeyAgent extends KeyAgentBase {
     dependencies: KeyAgentDependencies
   ) {
     const isTrezorInitialized = await TrezorKeyAgent.initializeTrezorTransport(trezorConfig);
-    const extendedAccountPublicKey = await TrezorKeyAgent.getXpub({
-      accountIndex
-    });
+    const extendedAccountPublicKey = await TrezorKeyAgent.getXpub({ accountIndex });
     return new TrezorKeyAgent(
       {
         accountIndex,

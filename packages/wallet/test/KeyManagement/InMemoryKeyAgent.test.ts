@@ -6,7 +6,7 @@ jest.mock('../../src/KeyManagement/util/ownSignatureKeyPaths');
 const { ownSignatureKeyPaths } = jest.requireMock('../../src/KeyManagement/util/ownSignatureKeyPaths');
 
 describe('InMemoryKeyAgent', () => {
-  let keyAgent: KeyManagement.KeyAgent;
+  let keyAgent: KeyManagement.InMemoryKeyAgent;
   let getPassword: jest.Mock;
   let inputResolver: jest.Mocked<InputResolver>;
   let mnemonicWords: string[];
@@ -100,6 +100,12 @@ describe('InMemoryKeyAgent', () => {
     expect(typeof [...witnessSet.values()][0]).toBe('string');
   });
 
+  test('exportKeyPair', async () => {
+    const { skey, vkey } = await keyAgent.exportExtendedKeyPair([1852, 1815, 0, 0, 0]);
+    expect(typeof skey).toBe('string');
+    expect(typeof vkey).toBe('string');
+  });
+
   test('deriveAddress', async () => {
     const address = await keyAgent.deriveAddress({ index: 1, type: KeyManagement.AddressType.Internal });
     expect(address).toBeDefined();
@@ -144,7 +150,10 @@ describe('InMemoryKeyAgent', () => {
           encryptedRootPrivateKeyBytes: [...Buffer.from(yoroiEncryptedRootPrivateKeyHex, 'hex')],
           extendedAccountPublicKey: Cardano.Bip32PublicKey(
             Buffer.from(
-              deriveAccountPrivateKey(CSL.Bip32PrivateKey.from_bytes(Buffer.from(yoroiRootPrivateKeyHex, 'hex')), 0)
+              deriveAccountPrivateKey({
+                accountIndex: 0,
+                rootPrivateKey: CSL.Bip32PrivateKey.from_bytes(Buffer.from(yoroiRootPrivateKeyHex, 'hex'))
+              })
                 .to_public()
                 .as_bytes()
             ).toString('hex')
@@ -214,7 +223,10 @@ describe('InMemoryKeyAgent', () => {
           encryptedRootPrivateKeyBytes: [...Buffer.from(daedelusEncryptedRootPrivateKeyHex, 'hex')],
           extendedAccountPublicKey: Cardano.Bip32PublicKey(
             Buffer.from(
-              deriveAccountPrivateKey(CSL.Bip32PrivateKey.from_bytes(Buffer.from(daedalusRootPrivateKeyHex, 'hex')), 0)
+              deriveAccountPrivateKey({
+                accountIndex: 0,
+                rootPrivateKey: CSL.Bip32PrivateKey.from_bytes(Buffer.from(daedalusRootPrivateKeyHex, 'hex'))
+              })
                 .to_public()
                 .as_bytes()
             ).toString('hex')
