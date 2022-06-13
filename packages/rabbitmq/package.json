@@ -27,6 +27,7 @@
     "cleanup": "run-s cleanup:dist cleanup:nm",
     "lint": "eslint --ignore-path ../../.eslintignore \"**/*.ts\"",
     "lint:fix": "eslint --fix --ignore-path ../../.eslintignore \"**/*.ts\"",
+    "coverage": "yarn test --coverage",
     "test": "jest -c ./jest.config.js",
     "test:e2e": "shx echo 'test:e2e' command not implemented yet",
     "prepack": "yarn build"
