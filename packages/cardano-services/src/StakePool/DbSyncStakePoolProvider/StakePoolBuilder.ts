@@ -82,7 +82,7 @@ export class StakePoolBuilder {
     return Promise.all(
       hashesIds.map(async (hashId) => {
         const result: QueryResult<EpochRewardModel> = await this.#db.query(Queries.findPoolEpochRewards(limit), [
-          hashId
+          [hashId]
         ]);
         return result.rows.length > 0 ? mapEpochReward(result.rows[0], hashId) : undefined;
       })

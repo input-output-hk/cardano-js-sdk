@@ -876,9 +876,9 @@ Array [
 exports[`StakePoolBuilder queryPoolRewards queryPoolRewards 1`] = `
 Array [
   Object {
-    "activeStake": 0n,
-    "epoch": 183,
-    "epochLength": 431910000,
+    "activeStake": 1004862928388n,
+    "epoch": 77,
+    "epochLength": 431980000,
     "memberROI": 0,
     "operatorFees": 0n,
     "totalRewards": 0n,

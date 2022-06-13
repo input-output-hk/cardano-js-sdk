@@ -1008,10 +1008,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "0",
+            "value": "497443657",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 77,
+          "epochLength": 431980000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -2099,10 +2099,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "0",
+            "value": "1004862928388",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 77,
+          "epochLength": 431980000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -3097,10 +3097,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "0",
+            "value": "497443657",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 77,
+          "epochLength": 431980000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -3596,10 +3596,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "0",
+            "value": "497443657",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 77,
+          "epochLength": 431980000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -4349,10 +4349,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "0",
+            "value": "497443657",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 77,
+          "epochLength": 431980000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -4424,10 +4424,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "0",
+            "value": "1004862928388",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 77,
+          "epochLength": 431980000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -4925,10 +4925,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "0",
+            "value": "497443657",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 77,
+          "epochLength": 431980000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -5914,10 +5914,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "0",
+            "value": "497443657",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 77,
+          "epochLength": 431980000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -5989,10 +5989,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "0",
+            "value": "1004862928388",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 77,
+          "epochLength": 431980000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -7237,10 +7237,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "0",
+            "value": "497443657",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 77,
+          "epochLength": 431980000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -7735,10 +7735,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "0",
+            "value": "1004862928388",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 77,
+          "epochLength": 431980000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -8910,10 +8910,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "0",
+            "value": "497443657",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 77,
+          "epochLength": 431980000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -9076,10 +9076,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "0",
+            "value": "1004862928388",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 77,
+          "epochLength": 431980000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -9741,10 +9741,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "0",
+            "value": "497443657",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 77,
+          "epochLength": 431980000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -9816,10 +9816,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "0",
+            "value": "1004862928388",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 77,
+          "epochLength": 431980000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -11242,10 +11242,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "0",
+            "value": "497443657",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 77,
+          "epochLength": 431980000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -11317,10 +11317,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "0",
+            "value": "1004862928388",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 77,
+          "epochLength": 431980000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -11975,10 +11975,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "0",
+            "value": "497443657",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 77,
+          "epochLength": 431980000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -12050,10 +12050,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "0",
+            "value": "1004862928388",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 77,
+          "epochLength": 431980000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -12135,10 +12135,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "0",
+            "value": "497443657",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 77,
+          "epochLength": 431980000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -12210,10 +12210,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "0",
+            "value": "1004862928388",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 77,
+          "epochLength": 431980000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
