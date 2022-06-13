@@ -18,6 +18,8 @@ jobs:
           node-version: 14.17
 
       - name: 🔨 Build Docs
+        env:
+          NODE_OPTIONS: "--max-old-space-size=8192"
         run: |
           yarn install --frozen-lockfile --non-interactive --logevel=error
           yarn docs
