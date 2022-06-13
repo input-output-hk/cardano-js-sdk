@@ -8,16 +8,62 @@ Object {
 
 exports[`RewardsBuilder getAccountBalance returns AccountBalanceModel 1`] = `
 Object {
-  "balance": "48642468465",
+  "balance": "97675046319",
 }
 `;
 
 exports[`RewardsBuilder getRewardsHistory returns RewardEpochModel when there is epochs field 1`] = `Array []`;
 
-exports[`RewardsBuilder getRewardsHistory returns RewardEpochModel when there is no epochs field 1`] = `Array []`;
+exports[`RewardsBuilder getRewardsHistory returns RewardEpochModel when there is no epochs field 1`] = `
+Array [
+  Object {
+    "address": "stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27",
+    "epoch": "169",
+    "quantity": "9225614904",
+  },
+  Object {
+    "address": "stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27",
+    "epoch": "88",
+    "quantity": "10994270921",
+  },
+  Object {
+    "address": "stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27",
+    "epoch": "85",
+    "quantity": "12597745314",
+  },
+  Object {
+    "address": "stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27",
+    "epoch": "161",
+    "quantity": "16214946715",
+  },
+]
+`;
 
 exports[`RewardsBuilder getRewardsHistory returns RewardEpochModel when there is no epochs field and empty accounts 1`] = `Array []`;
 
-exports[`RewardsBuilder getRewardsHistory returns RewardEpochModel when there is partially epochs field with lowerBound 1`] = `Array []`;
+exports[`RewardsBuilder getRewardsHistory returns RewardEpochModel when there is partially epochs field with lowerBound 1`] = `
+Array [
+  Object {
+    "address": "stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27",
+    "epoch": "169",
+    "quantity": "9225614904",
+  },
+  Object {
+    "address": "stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27",
+    "epoch": "88",
+    "quantity": "10994270921",
+  },
+  Object {
+    "address": "stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27",
+    "epoch": "85",
+    "quantity": "12597745314",
+  },
+  Object {
+    "address": "stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27",
+    "epoch": "161",
+    "quantity": "16214946715",
+  },
+]
+`;
 
 exports[`RewardsBuilder getRewardsHistory returns RewardEpochModel when there is partially epochs field with upperBound 1`] = `Array []`;

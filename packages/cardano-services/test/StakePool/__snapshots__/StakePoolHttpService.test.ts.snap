@@ -11504,6 +11504,2246 @@ Object {
 }
 `;
 
+exports[`StakePoolHttpService healthy state /search stake pools sort sort by cost and margin asc order 1`] = `
+Object {
+  "pageResults": Array [
+    Object {
+      "cost": Object {
+        "__type": "bigint",
+        "value": "340000000",
+      },
+      "epochRewards": Array [
+        Object {
+          "activeStake": Object {
+            "__type": "bigint",
+            "value": "10021869680",
+          },
+          "epoch": 205,
+          "epochLength": 431850000,
+          "memberROI": 0,
+          "operatorFees": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "totalRewards": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      ],
+      "hexId": "7c40ba1d2537e03f10bd98a3f9901ac06f535d441d4031af11a6bed1",
+      "id": "pool103qt58f9xlsr7y9anz3lnyq6cph4xh2yr4qrrtc356ldzz6ktqz",
+      "margin": Object {
+        "denominator": 100,
+        "numerator": 1,
+      },
+      "metadata": Object {
+        "description": "advanced staking",
+        "homepage": "https://nedscave.io",
+        "name": "NEDSCAVE.IO",
+        "ticker": "NEDST",
+      },
+      "metadataJson": Object {
+        "hash": "12c0b00572e2450932b531d1efb88a4bbffda986257ed847e6fd2f9fa5bc90cd",
+        "url": "https://nedscave.io/nedstmeta.json",
+      },
+      "metrics": Object {
+        "apy": 0,
+        "blocksCreated": "0",
+        "delegators": "0",
+        "livePledge": Object {
+          "__type": "bigint",
+          "value": "1099603790",
+        },
+        "saturation": "0.000072460063435455560399",
+        "size": Object {
+          "active": "1.00000000000000000000",
+          "live": "0.0000000000000000000000000000",
+        },
+        "stake": Object {
+          "active": Object {
+            "__type": "bigint",
+            "value": "10021869680",
+          },
+          "live": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      },
+      "owners": Array [
+        "stake_test1upmtm6pqzrnhn0u0w786x6j4c5nn4h8966k7c6axl9e342gdmxnla",
+      ],
+      "pledge": Object {
+        "__type": "bigint",
+        "value": "10000000",
+      },
+      "relays": Array [],
+      "rewardAccount": "stake_test1upmtm6pqzrnhn0u0w786x6j4c5nn4h8966k7c6axl9e342gdmxnla",
+      "status": "active",
+      "transactions": Object {
+        "registration": Array [
+          "aa9073d5bfb1aefdd33a6aeea37688c777de64220e8f7c373ed9651740a1d1ac",
+        ],
+        "retirement": Array [],
+      },
+      "vrf": "6cce40bd7f16a63ea418c03b07a31f1616b1e9a94bde9cfa3aa6cf6cff2dc3af",
+    },
+    Object {
+      "cost": Object {
+        "__type": "bigint",
+        "value": "340000000",
+      },
+      "epochRewards": Array [
+        Object {
+          "activeStake": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "epoch": 205,
+          "epochLength": 431850000,
+          "memberROI": 0,
+          "operatorFees": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "totalRewards": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      ],
+      "hexId": "d1da50fd3ffb523d6c324140a5902c56f5d7dcd5e5107b27b53e9aeb",
+      "id": "pool168d9plflldfr6mpjg9q2typv2m6a0hx4u5g8kfa486dwkke2uj7",
+      "margin": Object {
+        "denominator": 100,
+        "numerator": 1,
+      },
+      "metadata": Object {
+        "description": "Big Dragon Farts",
+        "homepage": "https://example.com",
+        "name": "Farts",
+        "ticker": "TINY",
+      },
+      "metadataJson": Object {
+        "hash": "1de0ed2cce9713054dbe8de942da9ebbe43d75534e4922ddb230ca0f268e203c",
+        "url": "https://tinyurl.com/biggerfarts",
+      },
+      "metrics": Object {
+        "apy": 0,
+        "blocksCreated": "0",
+        "delegators": "1",
+        "livePledge": Object {
+          "__type": "bigint",
+          "value": "1988240000",
+        },
+        "saturation": "0.000003593840299390875820",
+        "size": Object {
+          "active": "0.0000000000000000000000000000",
+          "live": "1.00000000000000000000",
+        },
+        "stake": Object {
+          "active": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "live": Object {
+            "__type": "bigint",
+            "value": "497060000",
+          },
+        },
+      },
+      "owners": Array [
+        "stake_test1uq83dgu9a6el4fwld3gkd8p75mceecf0sqwd56qv7qzcatczwezeg",
+      ],
+      "pledge": Object {
+        "__type": "bigint",
+        "value": "400000000",
+      },
+      "relays": Array [],
+      "rewardAccount": "stake_test1uq83dgu9a6el4fwld3gkd8p75mceecf0sqwd56qv7qzcatczwezeg",
+      "status": "active",
+      "transactions": Object {
+        "registration": Array [
+          "790665c0eb88f4a182c54393ca5178e53f2726223c8ade82a2b9fae52e2cb7bd",
+          "9a9b18842f679422127cbff3e65d76d3aea114a346f3c8209698e011764e0401",
+          "1725047a83924a285904c8879ebe7cf2a47fd0e20887272cc39b0f6ed4819a9c",
+          "bbef847054cc18a1fb7f37b073b2bc669ba4c3150bf1f8c9b49c0ca2af37c4ba",
+        ],
+        "retirement": Array [],
+      },
+      "vrf": "788e09e86e30ab83af34f1d976281014df86b3776cf3037329fb8605f27bac44",
+    },
+    Object {
+      "cost": Object {
+        "__type": "bigint",
+        "value": "340000000",
+      },
+      "epochRewards": Array [
+        Object {
+          "activeStake": Object {
+            "__type": "bigint",
+            "value": "2986376991",
+          },
+          "epoch": 205,
+          "epochLength": 431850000,
+          "memberROI": 0,
+          "operatorFees": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "totalRewards": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      ],
+      "hexId": "5d99282bbb4840380bb98c075498ed1983aee18a4a0925b9b44d93f1",
+      "id": "pool1tkvjs2amfpqrszae3sr4fx8drxp6acv2fgyjtwd5fkflzguqp96",
+      "margin": Object {
+        "denominator": 1000,
+        "numerator": 27,
+      },
+      "metadata": Object {
+        "description": "Pool a of the banderini devtest staking pools",
+        "homepage": "http://www.banderini.net",
+        "name": "banderini-devtest-a",
+        "ticker": "BANDA",
+      },
+      "metadataJson": Object {
+        "hash": "4d89054c2962215694a7122dfe41bc728d3ec248f80ea9a2e0d493057d7d2338",
+        "url": "https://git.io/JJ7wm",
+      },
+      "metrics": Object {
+        "apy": 0,
+        "blocksCreated": "0",
+        "delegators": "1",
+        "livePledge": Object {
+          "__type": "bigint",
+          "value": "495463149",
+        },
+        "saturation": "0.000025174380177782901422",
+        "size": Object {
+          "active": "0.85770077629124006825",
+          "live": "0.14229922370875993175",
+        },
+        "stake": Object {
+          "active": Object {
+            "__type": "bigint",
+            "value": "2986376991",
+          },
+          "live": Object {
+            "__type": "bigint",
+            "value": "495463149",
+          },
+        },
+      },
+      "owners": Array [
+        "stake_test1upx9faamuf54pm7alg4lna5l7ll08pz833rj45tgr9m2jyceasqjt",
+      ],
+      "pledge": Object {
+        "__type": "bigint",
+        "value": "100000000",
+      },
+      "relays": Array [],
+      "rewardAccount": "stake_test1upx9faamuf54pm7alg4lna5l7ll08pz833rj45tgr9m2jyceasqjt",
+      "status": "active",
+      "transactions": Object {
+        "registration": Array [
+          "047ee144d7adc5f10a107bf13eab570833bf2fb8bb6b016d030739a4cc585aa7",
+        ],
+        "retirement": Array [],
+      },
+      "vrf": "c062fabfeb7a68c61c34532e6f441b999c6a5a30b409d24c93174f047d4d935a",
+    },
+    Object {
+      "cost": Object {
+        "__type": "bigint",
+        "value": "340000000",
+      },
+      "epochRewards": Array [
+        Object {
+          "activeStake": Object {
+            "__type": "bigint",
+            "value": "50153400814617",
+          },
+          "epoch": 205,
+          "epochLength": 431850000,
+          "memberROI": 0,
+          "operatorFees": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "totalRewards": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      ],
+      "hexId": "961d329fba1807eef89db767ba405aec0c5426501c6b1df20f5c0995",
+      "id": "pool1jcwn98a6rqr7a7yakanm5sz6asx9gfjsr343mus0tsye23wmg70",
+      "margin": Object {
+        "denominator": 20,
+        "numerator": 1,
+      },
+      "metadata": Object {
+        "description": "What's past is prologue",
+        "homepage": "https://clio.one",
+        "name": "CLIO1",
+        "ticker": "CLIO1",
+      },
+      "metadataJson": Object {
+        "hash": "47530ba97c12e2ac40462e9c86eeb07ea555877d2a1f9d74b6ff8471839267d8",
+        "url": "https://clio.one/metadata/clio1_testnet.json",
+      },
+      "metrics": Object {
+        "apy": 0.00138353507261546,
+        "blocksCreated": "0",
+        "delegators": "1",
+        "livePledge": Object {
+          "__type": "bigint",
+          "value": "22619409160966",
+        },
+        "saturation": "0.44441653976190532194",
+        "size": Object {
+          "active": "0.81594358500154092038",
+          "live": "0.18405641499845907962",
+        },
+        "stake": Object {
+          "active": Object {
+            "__type": "bigint",
+            "value": "50153400814617",
+          },
+          "live": Object {
+            "__type": "bigint",
+            "value": "11313349750647",
+          },
+        },
+      },
+      "owners": Array [
+        "stake_test1upzu5aw5swqmhy09e2aaa62nac468mnyjzyfww999trzavccrj7pw",
+      ],
+      "pledge": Object {
+        "__type": "bigint",
+        "value": "1010000000000",
+      },
+      "relays": Array [],
+      "rewardAccount": "stake_test1upzu5aw5swqmhy09e2aaa62nac468mnyjzyfww999trzavccrj7pw",
+      "status": "active",
+      "transactions": Object {
+        "registration": Array [
+          "3d4cd09885d39673125c3a15f8acb45d92fde137f9effe7a5131f6cc7241d960",
+          "8fd14baca91c674fafae59701b7dc0eda1266202ec8445bad3244bd8669a7fb5",
+        ],
+        "retirement": Array [],
+      },
+      "vrf": "0a164c03ef34f26ffda7242b36db0a57ab7b23e230ea8802e50695f1f664de42",
+    },
+    Object {
+      "cost": Object {
+        "__type": "bigint",
+        "value": "340000000",
+      },
+      "epochRewards": Array [
+        Object {
+          "activeStake": Object {
+            "__type": "bigint",
+            "value": "497443657",
+          },
+          "epoch": 77,
+          "epochLength": 431980000,
+          "memberROI": 0,
+          "operatorFees": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "totalRewards": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      ],
+      "hexId": "5685f37bca393c683cf03e428280312c6c4ea485188672a2a0b3195c",
+      "id": "pool126zlx7728y7xs08s8epg9qp393kyafy9rzr89g4qkvv4cv93zem",
+      "margin": Object {
+        "denominator": 40,
+        "numerator": 3,
+      },
+      "metadataJson": Object {
+        "hash": "7feb5bf22fc8c57be71a4b24f68381a7d1051e94290164530da6f7d5682a0024",
+        "url": "https://visionstaking.ch/poolmeta.json",
+      },
+      "metrics": Object {
+        "apy": 0,
+        "blocksCreated": "0",
+        "delegators": "1",
+        "livePledge": Object {
+          "__type": "bigint",
+          "value": "997623150",
+        },
+        "saturation": "0.000007213009053384437728",
+        "size": Object {
+          "active": "0.0000000000000000000000000000",
+          "live": "1.00000000000000000000",
+        },
+        "stake": Object {
+          "active": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "live": Object {
+            "__type": "bigint",
+            "value": "997623150",
+          },
+        },
+      },
+      "owners": Array [
+        "stake_test1up32f2hrv5ytqk8ad6e4apss5zrrjjlrkjhrksypn5g08fqrqf9gr",
+      ],
+      "pledge": Object {
+        "__type": "bigint",
+        "value": "10000000",
+      },
+      "relays": Array [],
+      "rewardAccount": "stake_test1up32f2hrv5ytqk8ad6e4apss5zrrjjlrkjhrksypn5g08fqrqf9gr",
+      "status": "active",
+      "transactions": Object {
+        "registration": Array [
+          "78925fad4cce75a22a675ed5e175ecfd40baf7ac51c487c5cdb0fde9a02afa64",
+        ],
+        "retirement": Array [],
+      },
+      "vrf": "3409a1bebeaa47e6d99e0748a99f65dee60b7f7e9a64dc865d52b4fb445b98ab",
+    },
+    Object {
+      "cost": Object {
+        "__type": "bigint",
+        "value": "345000000",
+      },
+      "epochRewards": Array [
+        Object {
+          "activeStake": Object {
+            "__type": "bigint",
+            "value": "321928331851",
+          },
+          "epoch": 205,
+          "epochLength": 431850000,
+          "memberROI": 0,
+          "operatorFees": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "totalRewards": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      ],
+      "hexId": "331e12b25988de55f70a56ee89c10f38f69dd006eb50894d3304702a",
+      "id": "pool1xv0p9vje3r09tac22mhgnsg08rmfm5qxadggjnfnq3cz52apdew",
+      "margin": Object {
+        "denominator": 100,
+        "numerator": 1,
+      },
+      "metadata": Object {
+        "description": "Testnet Only",
+        "homepage": "https://git.io/JWPBE",
+        "name": "July 2021",
+        "ticker": "JUL21",
+      },
+      "metadataJson": Object {
+        "hash": "d1b06cb907d081513e506471ce960934f859049808023d7176870e302a7c9989",
+        "url": "https://git.io/JWP02",
+      },
+      "metrics": Object {
+        "apy": 0,
+        "blocksCreated": "0",
+        "delegators": "1",
+        "livePledge": Object {
+          "__type": "bigint",
+          "value": "2080157396",
+        },
+        "saturation": "0.00234264428036982225",
+        "size": Object {
+          "active": "0.99357992933816544990",
+          "live": "0.00642007066183455010",
+        },
+        "stake": Object {
+          "active": Object {
+            "__type": "bigint",
+            "value": "321928331851",
+          },
+          "live": Object {
+            "__type": "bigint",
+            "value": "2080157396",
+          },
+        },
+      },
+      "owners": Array [
+        "stake_test1uq60lxlxsn9zd5h0acu6dyl7q5wnjwaep4t8x4lxh00t9jqjg39tv",
+      ],
+      "pledge": Object {
+        "__type": "bigint",
+        "value": "10000000000",
+      },
+      "relays": Array [],
+      "rewardAccount": "stake_test1uq60lxlxsn9zd5h0acu6dyl7q5wnjwaep4t8x4lxh00t9jqjg39tv",
+      "status": "retired",
+      "transactions": Object {
+        "registration": Array [
+          "19251f57476d7af2777252270413c01383d9503110a68b4fde1a239c119c4f5d",
+        ],
+        "retirement": Array [
+          "face165bd7aa8d0d661cf1ceaa4e35d7611be3b1c7997da378c547aa2464a4fd",
+        ],
+      },
+      "vrf": "4ca2ca84f4a9696942f1c36345575dbdecc352eff37ec747b2349e48a9a182e8",
+    },
+    Object {
+      "cost": Object {
+        "__type": "bigint",
+        "value": "400000000",
+      },
+      "epochRewards": Array [
+        Object {
+          "activeStake": Object {
+            "__type": "bigint",
+            "value": "2499703578",
+          },
+          "epoch": 205,
+          "epochLength": 431850000,
+          "memberROI": 0,
+          "operatorFees": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "totalRewards": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      ],
+      "hexId": "5ee7591bf30eaa4f5dce70b4a676eb02d5be8012d188f04fe3beffb0",
+      "id": "pool1tmn4jxlnp64y7hwwwz62vahtqt2maqqj6xy0qnlrhmlmq3u8q0e",
+      "margin": Object {
+        "denominator": 10000,
+        "numerator": 1,
+      },
+      "metadata": Object {
+        "description": "Our Amsterdam Node",
+        "homepage": "https://twitter.com/A92Syed",
+        "name": "THE AMSTERDAM NODE",
+        "ticker": "AMS",
+      },
+      "metadataJson": Object {
+        "hash": "cc019105f084aef2a956b2f7f2c0bf4e747bf7696705312c244620089429df6f",
+        "url": "https://git.io/JJ1dz",
+      },
+      "metrics": Object {
+        "apy": 0,
+        "blocksCreated": "0",
+        "delegators": "1",
+        "livePledge": Object {
+          "__type": "bigint",
+          "value": "487464117",
+        },
+        "saturation": "0.000021597802364562733731",
+        "size": Object {
+          "active": "0.83681394324934275242",
+          "live": "0.16318605675065724758",
+        },
+        "stake": Object {
+          "active": Object {
+            "__type": "bigint",
+            "value": "2499703578",
+          },
+          "live": Object {
+            "__type": "bigint",
+            "value": "487464117",
+          },
+        },
+      },
+      "owners": Array [
+        "stake_test1uz9y7juwzcyanva4x4fzpx7tft6ckntn6ulsjjd2k7a0pxgldmzp5",
+      ],
+      "pledge": Object {
+        "__type": "bigint",
+        "value": "500000000",
+      },
+      "relays": Array [],
+      "rewardAccount": "stake_test1uz9y7juwzcyanva4x4fzpx7tft6ckntn6ulsjjd2k7a0pxgldmzp5",
+      "status": "active",
+      "transactions": Object {
+        "registration": Array [
+          "0d3c928318f489a93b2ceba60f1998594f3626e4018ad19adf0a9615164b5469",
+        ],
+        "retirement": Array [],
+      },
+      "vrf": "83a817519ec34d3c637db8f9d46fcf6f7f9e826093d1b9a8158c89da4b47a801",
+    },
+    Object {
+      "cost": Object {
+        "__type": "bigint",
+        "value": "400000000",
+      },
+      "epochRewards": Array [
+        Object {
+          "activeStake": Object {
+            "__type": "bigint",
+            "value": "1004862928388",
+          },
+          "epoch": 77,
+          "epochLength": 431980000,
+          "memberROI": 0,
+          "operatorFees": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "totalRewards": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      ],
+      "hexId": "22a8dc80b6fb4852150960c2e3896fa0a03498f514afc474c33152b6",
+      "id": "pool1y25deq9kldy9y9gfvrpw8zt05zsrfx84zjhugaxrx9ftvwdpua2",
+      "margin": Object {
+        "denominator": 100,
+        "numerator": 7,
+      },
+      "metadataJson": Object {
+        "hash": "67b52f96eb40fcc18fa9cd8b9d7dd620811756f1029411d105de2eaf79655fa4",
+        "url": "https://explorer.cardano-testnet.iohkdev.io/p/1.json",
+      },
+      "metrics": Object {
+        "apy": 0,
+        "blocksCreated": "0",
+        "delegators": "1",
+        "livePledge": Object {
+          "__type": "bigint",
+          "value": "999999828559",
+        },
+        "saturation": "0.00723019290077516005",
+        "size": Object {
+          "active": "0.0000000000000000000000000000",
+          "live": "1.00000000000000000000",
+        },
+        "stake": Object {
+          "active": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "live": Object {
+            "__type": "bigint",
+            "value": "999999828559",
+          },
+        },
+      },
+      "owners": Array [
+        "stake_test1urryfvusd49ej55gvf3cxtje4pqmtcdswwqxw37g6uclhnsqj7d5w",
+      ],
+      "pledge": Object {
+        "__type": "bigint",
+        "value": "1000000000000",
+      },
+      "relays": Array [],
+      "rewardAccount": "stake_test1uz8tusy3ruaw9ekplepacer4v6hpmpcp6ngp3gwj5ve3yjchsqqxn",
+      "status": "retired",
+      "transactions": Object {
+        "registration": Array [
+          "295d5e0f7ee182426eaeda8c9f1c63502c72cdf4afd6e0ee0f209adf94a614e7",
+        ],
+        "retirement": Array [
+          "c27b294bb3dfbdfeda19b7f0254b23f91e3a48a2111c52dd99da6f1c8c3ff74f",
+        ],
+      },
+      "vrf": "43a78f2b4811cdb2e52c13b6ad6a1732a9fb44d3d64adeb1fc2b4867116881b8",
+    },
+    Object {
+      "cost": Object {
+        "__type": "bigint",
+        "value": "4321000000",
+      },
+      "epochRewards": Array [
+        Object {
+          "activeStake": Object {
+            "__type": "bigint",
+            "value": "1335568619",
+          },
+          "epoch": 205,
+          "epochLength": 431850000,
+          "memberROI": 0,
+          "operatorFees": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "totalRewards": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      ],
+      "hexId": "ff5b4952dd7734f07e4905dea64fa230fb75f7b2d603d154d9ff1d43",
+      "id": "pool1lad5j5kawu60qljfqh02vnazxrahtaaj6cpaz4xeluw5xf023cg",
+      "margin": Object {
+        "denominator": 25,
+        "numerator": 1,
+      },
+      "metadata": Object {
+        "description": "The pool that tests all the pools",
+        "homepage": "https://teststakepool.com",
+        "name": "TestPool",
+        "ticker": "TEST",
+      },
+      "metadataJson": Object {
+        "hash": "2412f77be9b650eff7b015455d15cea355e1782dda2e7d7b1cb34943eefac348",
+        "url": "https://git.io/JJyYy",
+      },
+      "metrics": Object {
+        "apy": 0,
+        "blocksCreated": "0",
+        "delegators": "1",
+        "livePledge": Object {
+          "__type": "bigint",
+          "value": "199806239",
+        },
+        "saturation": "0.000011101058301516805716",
+        "size": Object {
+          "active": "0.86986484899181539157",
+          "live": "0.13013515100818460843",
+        },
+        "stake": Object {
+          "active": Object {
+            "__type": "bigint",
+            "value": "1335568619",
+          },
+          "live": Object {
+            "__type": "bigint",
+            "value": "199806239",
+          },
+        },
+      },
+      "owners": Array [
+        "stake_test1uzxvhl83q8ujv2yvpy6n2krvpdlqqx28h7e9vsk6re43h3c3kufy6",
+      ],
+      "pledge": Object {
+        "__type": "bigint",
+        "value": "70000000000",
+      },
+      "relays": Array [],
+      "rewardAccount": "stake_test1uzxvhl83q8ujv2yvpy6n2krvpdlqqx28h7e9vsk6re43h3c3kufy6",
+      "status": "active",
+      "transactions": Object {
+        "registration": Array [
+          "071b93a1a134389c22a1dc43fe747e43d23088448fed2b5ab22564cc0cb8bbc5",
+        ],
+        "retirement": Array [],
+      },
+      "vrf": "474a6d2a44b51add62d8f2fd8fe80abc722bf84478479b617ad05b39aaa84971",
+    },
+  ],
+  "totalResultCount": 9,
+}
+`;
+
+exports[`StakePoolHttpService healthy state /search stake pools sort sort by cost and margin desc order 1`] = `
+Object {
+  "pageResults": Array [
+    Object {
+      "cost": Object {
+        "__type": "bigint",
+        "value": "4321000000",
+      },
+      "epochRewards": Array [
+        Object {
+          "activeStake": Object {
+            "__type": "bigint",
+            "value": "1335568619",
+          },
+          "epoch": 205,
+          "epochLength": 431850000,
+          "memberROI": 0,
+          "operatorFees": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "totalRewards": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      ],
+      "hexId": "ff5b4952dd7734f07e4905dea64fa230fb75f7b2d603d154d9ff1d43",
+      "id": "pool1lad5j5kawu60qljfqh02vnazxrahtaaj6cpaz4xeluw5xf023cg",
+      "margin": Object {
+        "denominator": 25,
+        "numerator": 1,
+      },
+      "metadata": Object {
+        "description": "The pool that tests all the pools",
+        "homepage": "https://teststakepool.com",
+        "name": "TestPool",
+        "ticker": "TEST",
+      },
+      "metadataJson": Object {
+        "hash": "2412f77be9b650eff7b015455d15cea355e1782dda2e7d7b1cb34943eefac348",
+        "url": "https://git.io/JJyYy",
+      },
+      "metrics": Object {
+        "apy": 0,
+        "blocksCreated": "0",
+        "delegators": "1",
+        "livePledge": Object {
+          "__type": "bigint",
+          "value": "199806239",
+        },
+        "saturation": "0.000011101058301516805716",
+        "size": Object {
+          "active": "0.86986484899181539157",
+          "live": "0.13013515100818460843",
+        },
+        "stake": Object {
+          "active": Object {
+            "__type": "bigint",
+            "value": "1335568619",
+          },
+          "live": Object {
+            "__type": "bigint",
+            "value": "199806239",
+          },
+        },
+      },
+      "owners": Array [
+        "stake_test1uzxvhl83q8ujv2yvpy6n2krvpdlqqx28h7e9vsk6re43h3c3kufy6",
+      ],
+      "pledge": Object {
+        "__type": "bigint",
+        "value": "70000000000",
+      },
+      "relays": Array [],
+      "rewardAccount": "stake_test1uzxvhl83q8ujv2yvpy6n2krvpdlqqx28h7e9vsk6re43h3c3kufy6",
+      "status": "active",
+      "transactions": Object {
+        "registration": Array [
+          "071b93a1a134389c22a1dc43fe747e43d23088448fed2b5ab22564cc0cb8bbc5",
+        ],
+        "retirement": Array [],
+      },
+      "vrf": "474a6d2a44b51add62d8f2fd8fe80abc722bf84478479b617ad05b39aaa84971",
+    },
+    Object {
+      "cost": Object {
+        "__type": "bigint",
+        "value": "400000000",
+      },
+      "epochRewards": Array [
+        Object {
+          "activeStake": Object {
+            "__type": "bigint",
+            "value": "1004862928388",
+          },
+          "epoch": 77,
+          "epochLength": 431980000,
+          "memberROI": 0,
+          "operatorFees": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "totalRewards": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      ],
+      "hexId": "22a8dc80b6fb4852150960c2e3896fa0a03498f514afc474c33152b6",
+      "id": "pool1y25deq9kldy9y9gfvrpw8zt05zsrfx84zjhugaxrx9ftvwdpua2",
+      "margin": Object {
+        "denominator": 100,
+        "numerator": 7,
+      },
+      "metadataJson": Object {
+        "hash": "67b52f96eb40fcc18fa9cd8b9d7dd620811756f1029411d105de2eaf79655fa4",
+        "url": "https://explorer.cardano-testnet.iohkdev.io/p/1.json",
+      },
+      "metrics": Object {
+        "apy": 0,
+        "blocksCreated": "0",
+        "delegators": "1",
+        "livePledge": Object {
+          "__type": "bigint",
+          "value": "999999828559",
+        },
+        "saturation": "0.00723019290077516005",
+        "size": Object {
+          "active": "0.0000000000000000000000000000",
+          "live": "1.00000000000000000000",
+        },
+        "stake": Object {
+          "active": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "live": Object {
+            "__type": "bigint",
+            "value": "999999828559",
+          },
+        },
+      },
+      "owners": Array [
+        "stake_test1urryfvusd49ej55gvf3cxtje4pqmtcdswwqxw37g6uclhnsqj7d5w",
+      ],
+      "pledge": Object {
+        "__type": "bigint",
+        "value": "1000000000000",
+      },
+      "relays": Array [],
+      "rewardAccount": "stake_test1uz8tusy3ruaw9ekplepacer4v6hpmpcp6ngp3gwj5ve3yjchsqqxn",
+      "status": "retired",
+      "transactions": Object {
+        "registration": Array [
+          "295d5e0f7ee182426eaeda8c9f1c63502c72cdf4afd6e0ee0f209adf94a614e7",
+        ],
+        "retirement": Array [
+          "c27b294bb3dfbdfeda19b7f0254b23f91e3a48a2111c52dd99da6f1c8c3ff74f",
+        ],
+      },
+      "vrf": "43a78f2b4811cdb2e52c13b6ad6a1732a9fb44d3d64adeb1fc2b4867116881b8",
+    },
+    Object {
+      "cost": Object {
+        "__type": "bigint",
+        "value": "400000000",
+      },
+      "epochRewards": Array [
+        Object {
+          "activeStake": Object {
+            "__type": "bigint",
+            "value": "2499703578",
+          },
+          "epoch": 205,
+          "epochLength": 431850000,
+          "memberROI": 0,
+          "operatorFees": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "totalRewards": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      ],
+      "hexId": "5ee7591bf30eaa4f5dce70b4a676eb02d5be8012d188f04fe3beffb0",
+      "id": "pool1tmn4jxlnp64y7hwwwz62vahtqt2maqqj6xy0qnlrhmlmq3u8q0e",
+      "margin": Object {
+        "denominator": 10000,
+        "numerator": 1,
+      },
+      "metadata": Object {
+        "description": "Our Amsterdam Node",
+        "homepage": "https://twitter.com/A92Syed",
+        "name": "THE AMSTERDAM NODE",
+        "ticker": "AMS",
+      },
+      "metadataJson": Object {
+        "hash": "cc019105f084aef2a956b2f7f2c0bf4e747bf7696705312c244620089429df6f",
+        "url": "https://git.io/JJ1dz",
+      },
+      "metrics": Object {
+        "apy": 0,
+        "blocksCreated": "0",
+        "delegators": "1",
+        "livePledge": Object {
+          "__type": "bigint",
+          "value": "487464117",
+        },
+        "saturation": "0.000021597802364562733731",
+        "size": Object {
+          "active": "0.83681394324934275242",
+          "live": "0.16318605675065724758",
+        },
+        "stake": Object {
+          "active": Object {
+            "__type": "bigint",
+            "value": "2499703578",
+          },
+          "live": Object {
+            "__type": "bigint",
+            "value": "487464117",
+          },
+        },
+      },
+      "owners": Array [
+        "stake_test1uz9y7juwzcyanva4x4fzpx7tft6ckntn6ulsjjd2k7a0pxgldmzp5",
+      ],
+      "pledge": Object {
+        "__type": "bigint",
+        "value": "500000000",
+      },
+      "relays": Array [],
+      "rewardAccount": "stake_test1uz9y7juwzcyanva4x4fzpx7tft6ckntn6ulsjjd2k7a0pxgldmzp5",
+      "status": "active",
+      "transactions": Object {
+        "registration": Array [
+          "0d3c928318f489a93b2ceba60f1998594f3626e4018ad19adf0a9615164b5469",
+        ],
+        "retirement": Array [],
+      },
+      "vrf": "83a817519ec34d3c637db8f9d46fcf6f7f9e826093d1b9a8158c89da4b47a801",
+    },
+    Object {
+      "cost": Object {
+        "__type": "bigint",
+        "value": "345000000",
+      },
+      "epochRewards": Array [
+        Object {
+          "activeStake": Object {
+            "__type": "bigint",
+            "value": "321928331851",
+          },
+          "epoch": 205,
+          "epochLength": 431850000,
+          "memberROI": 0,
+          "operatorFees": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "totalRewards": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      ],
+      "hexId": "331e12b25988de55f70a56ee89c10f38f69dd006eb50894d3304702a",
+      "id": "pool1xv0p9vje3r09tac22mhgnsg08rmfm5qxadggjnfnq3cz52apdew",
+      "margin": Object {
+        "denominator": 100,
+        "numerator": 1,
+      },
+      "metadata": Object {
+        "description": "Testnet Only",
+        "homepage": "https://git.io/JWPBE",
+        "name": "July 2021",
+        "ticker": "JUL21",
+      },
+      "metadataJson": Object {
+        "hash": "d1b06cb907d081513e506471ce960934f859049808023d7176870e302a7c9989",
+        "url": "https://git.io/JWP02",
+      },
+      "metrics": Object {
+        "apy": 0,
+        "blocksCreated": "0",
+        "delegators": "1",
+        "livePledge": Object {
+          "__type": "bigint",
+          "value": "2080157396",
+        },
+        "saturation": "0.00234264428036982225",
+        "size": Object {
+          "active": "0.99357992933816544990",
+          "live": "0.00642007066183455010",
+        },
+        "stake": Object {
+          "active": Object {
+            "__type": "bigint",
+            "value": "321928331851",
+          },
+          "live": Object {
+            "__type": "bigint",
+            "value": "2080157396",
+          },
+        },
+      },
+      "owners": Array [
+        "stake_test1uq60lxlxsn9zd5h0acu6dyl7q5wnjwaep4t8x4lxh00t9jqjg39tv",
+      ],
+      "pledge": Object {
+        "__type": "bigint",
+        "value": "10000000000",
+      },
+      "relays": Array [],
+      "rewardAccount": "stake_test1uq60lxlxsn9zd5h0acu6dyl7q5wnjwaep4t8x4lxh00t9jqjg39tv",
+      "status": "retired",
+      "transactions": Object {
+        "registration": Array [
+          "19251f57476d7af2777252270413c01383d9503110a68b4fde1a239c119c4f5d",
+        ],
+        "retirement": Array [
+          "face165bd7aa8d0d661cf1ceaa4e35d7611be3b1c7997da378c547aa2464a4fd",
+        ],
+      },
+      "vrf": "4ca2ca84f4a9696942f1c36345575dbdecc352eff37ec747b2349e48a9a182e8",
+    },
+    Object {
+      "cost": Object {
+        "__type": "bigint",
+        "value": "340000000",
+      },
+      "epochRewards": Array [
+        Object {
+          "activeStake": Object {
+            "__type": "bigint",
+            "value": "497443657",
+          },
+          "epoch": 77,
+          "epochLength": 431980000,
+          "memberROI": 0,
+          "operatorFees": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "totalRewards": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      ],
+      "hexId": "5685f37bca393c683cf03e428280312c6c4ea485188672a2a0b3195c",
+      "id": "pool126zlx7728y7xs08s8epg9qp393kyafy9rzr89g4qkvv4cv93zem",
+      "margin": Object {
+        "denominator": 40,
+        "numerator": 3,
+      },
+      "metadataJson": Object {
+        "hash": "7feb5bf22fc8c57be71a4b24f68381a7d1051e94290164530da6f7d5682a0024",
+        "url": "https://visionstaking.ch/poolmeta.json",
+      },
+      "metrics": Object {
+        "apy": 0,
+        "blocksCreated": "0",
+        "delegators": "1",
+        "livePledge": Object {
+          "__type": "bigint",
+          "value": "997623150",
+        },
+        "saturation": "0.000007213009053384437728",
+        "size": Object {
+          "active": "0.0000000000000000000000000000",
+          "live": "1.00000000000000000000",
+        },
+        "stake": Object {
+          "active": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "live": Object {
+            "__type": "bigint",
+            "value": "997623150",
+          },
+        },
+      },
+      "owners": Array [
+        "stake_test1up32f2hrv5ytqk8ad6e4apss5zrrjjlrkjhrksypn5g08fqrqf9gr",
+      ],
+      "pledge": Object {
+        "__type": "bigint",
+        "value": "10000000",
+      },
+      "relays": Array [],
+      "rewardAccount": "stake_test1up32f2hrv5ytqk8ad6e4apss5zrrjjlrkjhrksypn5g08fqrqf9gr",
+      "status": "active",
+      "transactions": Object {
+        "registration": Array [
+          "78925fad4cce75a22a675ed5e175ecfd40baf7ac51c487c5cdb0fde9a02afa64",
+        ],
+        "retirement": Array [],
+      },
+      "vrf": "3409a1bebeaa47e6d99e0748a99f65dee60b7f7e9a64dc865d52b4fb445b98ab",
+    },
+    Object {
+      "cost": Object {
+        "__type": "bigint",
+        "value": "340000000",
+      },
+      "epochRewards": Array [
+        Object {
+          "activeStake": Object {
+            "__type": "bigint",
+            "value": "50153400814617",
+          },
+          "epoch": 205,
+          "epochLength": 431850000,
+          "memberROI": 0,
+          "operatorFees": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "totalRewards": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      ],
+      "hexId": "961d329fba1807eef89db767ba405aec0c5426501c6b1df20f5c0995",
+      "id": "pool1jcwn98a6rqr7a7yakanm5sz6asx9gfjsr343mus0tsye23wmg70",
+      "margin": Object {
+        "denominator": 20,
+        "numerator": 1,
+      },
+      "metadata": Object {
+        "description": "What's past is prologue",
+        "homepage": "https://clio.one",
+        "name": "CLIO1",
+        "ticker": "CLIO1",
+      },
+      "metadataJson": Object {
+        "hash": "47530ba97c12e2ac40462e9c86eeb07ea555877d2a1f9d74b6ff8471839267d8",
+        "url": "https://clio.one/metadata/clio1_testnet.json",
+      },
+      "metrics": Object {
+        "apy": 0.00138353507261546,
+        "blocksCreated": "0",
+        "delegators": "1",
+        "livePledge": Object {
+          "__type": "bigint",
+          "value": "22619409160966",
+        },
+        "saturation": "0.44441653976190532194",
+        "size": Object {
+          "active": "0.81594358500154092038",
+          "live": "0.18405641499845907962",
+        },
+        "stake": Object {
+          "active": Object {
+            "__type": "bigint",
+            "value": "50153400814617",
+          },
+          "live": Object {
+            "__type": "bigint",
+            "value": "11313349750647",
+          },
+        },
+      },
+      "owners": Array [
+        "stake_test1upzu5aw5swqmhy09e2aaa62nac468mnyjzyfww999trzavccrj7pw",
+      ],
+      "pledge": Object {
+        "__type": "bigint",
+        "value": "1010000000000",
+      },
+      "relays": Array [],
+      "rewardAccount": "stake_test1upzu5aw5swqmhy09e2aaa62nac468mnyjzyfww999trzavccrj7pw",
+      "status": "active",
+      "transactions": Object {
+        "registration": Array [
+          "3d4cd09885d39673125c3a15f8acb45d92fde137f9effe7a5131f6cc7241d960",
+          "8fd14baca91c674fafae59701b7dc0eda1266202ec8445bad3244bd8669a7fb5",
+        ],
+        "retirement": Array [],
+      },
+      "vrf": "0a164c03ef34f26ffda7242b36db0a57ab7b23e230ea8802e50695f1f664de42",
+    },
+    Object {
+      "cost": Object {
+        "__type": "bigint",
+        "value": "340000000",
+      },
+      "epochRewards": Array [
+        Object {
+          "activeStake": Object {
+            "__type": "bigint",
+            "value": "2986376991",
+          },
+          "epoch": 205,
+          "epochLength": 431850000,
+          "memberROI": 0,
+          "operatorFees": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "totalRewards": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      ],
+      "hexId": "5d99282bbb4840380bb98c075498ed1983aee18a4a0925b9b44d93f1",
+      "id": "pool1tkvjs2amfpqrszae3sr4fx8drxp6acv2fgyjtwd5fkflzguqp96",
+      "margin": Object {
+        "denominator": 1000,
+        "numerator": 27,
+      },
+      "metadata": Object {
+        "description": "Pool a of the banderini devtest staking pools",
+        "homepage": "http://www.banderini.net",
+        "name": "banderini-devtest-a",
+        "ticker": "BANDA",
+      },
+      "metadataJson": Object {
+        "hash": "4d89054c2962215694a7122dfe41bc728d3ec248f80ea9a2e0d493057d7d2338",
+        "url": "https://git.io/JJ7wm",
+      },
+      "metrics": Object {
+        "apy": 0,
+        "blocksCreated": "0",
+        "delegators": "1",
+        "livePledge": Object {
+          "__type": "bigint",
+          "value": "495463149",
+        },
+        "saturation": "0.000025174380177782901422",
+        "size": Object {
+          "active": "0.85770077629124006825",
+          "live": "0.14229922370875993175",
+        },
+        "stake": Object {
+          "active": Object {
+            "__type": "bigint",
+            "value": "2986376991",
+          },
+          "live": Object {
+            "__type": "bigint",
+            "value": "495463149",
+          },
+        },
+      },
+      "owners": Array [
+        "stake_test1upx9faamuf54pm7alg4lna5l7ll08pz833rj45tgr9m2jyceasqjt",
+      ],
+      "pledge": Object {
+        "__type": "bigint",
+        "value": "100000000",
+      },
+      "relays": Array [],
+      "rewardAccount": "stake_test1upx9faamuf54pm7alg4lna5l7ll08pz833rj45tgr9m2jyceasqjt",
+      "status": "active",
+      "transactions": Object {
+        "registration": Array [
+          "047ee144d7adc5f10a107bf13eab570833bf2fb8bb6b016d030739a4cc585aa7",
+        ],
+        "retirement": Array [],
+      },
+      "vrf": "c062fabfeb7a68c61c34532e6f441b999c6a5a30b409d24c93174f047d4d935a",
+    },
+    Object {
+      "cost": Object {
+        "__type": "bigint",
+        "value": "340000000",
+      },
+      "epochRewards": Array [
+        Object {
+          "activeStake": Object {
+            "__type": "bigint",
+            "value": "10021869680",
+          },
+          "epoch": 205,
+          "epochLength": 431850000,
+          "memberROI": 0,
+          "operatorFees": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "totalRewards": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      ],
+      "hexId": "7c40ba1d2537e03f10bd98a3f9901ac06f535d441d4031af11a6bed1",
+      "id": "pool103qt58f9xlsr7y9anz3lnyq6cph4xh2yr4qrrtc356ldzz6ktqz",
+      "margin": Object {
+        "denominator": 100,
+        "numerator": 1,
+      },
+      "metadata": Object {
+        "description": "advanced staking",
+        "homepage": "https://nedscave.io",
+        "name": "NEDSCAVE.IO",
+        "ticker": "NEDST",
+      },
+      "metadataJson": Object {
+        "hash": "12c0b00572e2450932b531d1efb88a4bbffda986257ed847e6fd2f9fa5bc90cd",
+        "url": "https://nedscave.io/nedstmeta.json",
+      },
+      "metrics": Object {
+        "apy": 0,
+        "blocksCreated": "0",
+        "delegators": "0",
+        "livePledge": Object {
+          "__type": "bigint",
+          "value": "1099603790",
+        },
+        "saturation": "0.000072460063435455560399",
+        "size": Object {
+          "active": "1.00000000000000000000",
+          "live": "0.0000000000000000000000000000",
+        },
+        "stake": Object {
+          "active": Object {
+            "__type": "bigint",
+            "value": "10021869680",
+          },
+          "live": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      },
+      "owners": Array [
+        "stake_test1upmtm6pqzrnhn0u0w786x6j4c5nn4h8966k7c6axl9e342gdmxnla",
+      ],
+      "pledge": Object {
+        "__type": "bigint",
+        "value": "10000000",
+      },
+      "relays": Array [],
+      "rewardAccount": "stake_test1upmtm6pqzrnhn0u0w786x6j4c5nn4h8966k7c6axl9e342gdmxnla",
+      "status": "active",
+      "transactions": Object {
+        "registration": Array [
+          "aa9073d5bfb1aefdd33a6aeea37688c777de64220e8f7c373ed9651740a1d1ac",
+        ],
+        "retirement": Array [],
+      },
+      "vrf": "6cce40bd7f16a63ea418c03b07a31f1616b1e9a94bde9cfa3aa6cf6cff2dc3af",
+    },
+    Object {
+      "cost": Object {
+        "__type": "bigint",
+        "value": "340000000",
+      },
+      "epochRewards": Array [
+        Object {
+          "activeStake": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "epoch": 205,
+          "epochLength": 431850000,
+          "memberROI": 0,
+          "operatorFees": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "totalRewards": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      ],
+      "hexId": "d1da50fd3ffb523d6c324140a5902c56f5d7dcd5e5107b27b53e9aeb",
+      "id": "pool168d9plflldfr6mpjg9q2typv2m6a0hx4u5g8kfa486dwkke2uj7",
+      "margin": Object {
+        "denominator": 100,
+        "numerator": 1,
+      },
+      "metadata": Object {
+        "description": "Big Dragon Farts",
+        "homepage": "https://example.com",
+        "name": "Farts",
+        "ticker": "TINY",
+      },
+      "metadataJson": Object {
+        "hash": "1de0ed2cce9713054dbe8de942da9ebbe43d75534e4922ddb230ca0f268e203c",
+        "url": "https://tinyurl.com/biggerfarts",
+      },
+      "metrics": Object {
+        "apy": 0,
+        "blocksCreated": "0",
+        "delegators": "1",
+        "livePledge": Object {
+          "__type": "bigint",
+          "value": "1988240000",
+        },
+        "saturation": "0.000003593840299390875820",
+        "size": Object {
+          "active": "0.0000000000000000000000000000",
+          "live": "1.00000000000000000000",
+        },
+        "stake": Object {
+          "active": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "live": Object {
+            "__type": "bigint",
+            "value": "497060000",
+          },
+        },
+      },
+      "owners": Array [
+        "stake_test1uq83dgu9a6el4fwld3gkd8p75mceecf0sqwd56qv7qzcatczwezeg",
+      ],
+      "pledge": Object {
+        "__type": "bigint",
+        "value": "400000000",
+      },
+      "relays": Array [],
+      "rewardAccount": "stake_test1uq83dgu9a6el4fwld3gkd8p75mceecf0sqwd56qv7qzcatczwezeg",
+      "status": "active",
+      "transactions": Object {
+        "registration": Array [
+          "790665c0eb88f4a182c54393ca5178e53f2726223c8ade82a2b9fae52e2cb7bd",
+          "9a9b18842f679422127cbff3e65d76d3aea114a346f3c8209698e011764e0401",
+          "1725047a83924a285904c8879ebe7cf2a47fd0e20887272cc39b0f6ed4819a9c",
+          "bbef847054cc18a1fb7f37b073b2bc669ba4c3150bf1f8c9b49c0ca2af37c4ba",
+        ],
+        "retirement": Array [],
+      },
+      "vrf": "788e09e86e30ab83af34f1d976281014df86b3776cf3037329fb8605f27bac44",
+    },
+  ],
+  "totalResultCount": 9,
+}
+`;
+
+exports[`StakePoolHttpService healthy state /search stake pools sort sort by cost and margin with applied filters 1`] = `
+Object {
+  "pageResults": Array [
+    Object {
+      "cost": Object {
+        "__type": "bigint",
+        "value": "340000000",
+      },
+      "epochRewards": Array [
+        Object {
+          "activeStake": Object {
+            "__type": "bigint",
+            "value": "50153400814617",
+          },
+          "epoch": 205,
+          "epochLength": 431850000,
+          "memberROI": 0,
+          "operatorFees": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "totalRewards": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      ],
+      "hexId": "961d329fba1807eef89db767ba405aec0c5426501c6b1df20f5c0995",
+      "id": "pool1jcwn98a6rqr7a7yakanm5sz6asx9gfjsr343mus0tsye23wmg70",
+      "margin": Object {
+        "denominator": 20,
+        "numerator": 1,
+      },
+      "metadata": Object {
+        "description": "What's past is prologue",
+        "homepage": "https://clio.one",
+        "name": "CLIO1",
+        "ticker": "CLIO1",
+      },
+      "metadataJson": Object {
+        "hash": "47530ba97c12e2ac40462e9c86eeb07ea555877d2a1f9d74b6ff8471839267d8",
+        "url": "https://clio.one/metadata/clio1_testnet.json",
+      },
+      "metrics": Object {
+        "apy": 0.00138353507261546,
+        "blocksCreated": "0",
+        "delegators": "1",
+        "livePledge": Object {
+          "__type": "bigint",
+          "value": "22619409160966",
+        },
+        "saturation": "0.44441653976190532194",
+        "size": Object {
+          "active": "0.81594358500154092038",
+          "live": "0.18405641499845907962",
+        },
+        "stake": Object {
+          "active": Object {
+            "__type": "bigint",
+            "value": "50153400814617",
+          },
+          "live": Object {
+            "__type": "bigint",
+            "value": "11313349750647",
+          },
+        },
+      },
+      "owners": Array [
+        "stake_test1upzu5aw5swqmhy09e2aaa62nac468mnyjzyfww999trzavccrj7pw",
+      ],
+      "pledge": Object {
+        "__type": "bigint",
+        "value": "1010000000000",
+      },
+      "relays": Array [],
+      "rewardAccount": "stake_test1upzu5aw5swqmhy09e2aaa62nac468mnyjzyfww999trzavccrj7pw",
+      "status": "active",
+      "transactions": Object {
+        "registration": Array [
+          "3d4cd09885d39673125c3a15f8acb45d92fde137f9effe7a5131f6cc7241d960",
+          "8fd14baca91c674fafae59701b7dc0eda1266202ec8445bad3244bd8669a7fb5",
+        ],
+        "retirement": Array [],
+      },
+      "vrf": "0a164c03ef34f26ffda7242b36db0a57ab7b23e230ea8802e50695f1f664de42",
+    },
+    Object {
+      "cost": Object {
+        "__type": "bigint",
+        "value": "400000000",
+      },
+      "epochRewards": Array [
+        Object {
+          "activeStake": Object {
+            "__type": "bigint",
+            "value": "2499703578",
+          },
+          "epoch": 205,
+          "epochLength": 431850000,
+          "memberROI": 0,
+          "operatorFees": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "totalRewards": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      ],
+      "hexId": "5ee7591bf30eaa4f5dce70b4a676eb02d5be8012d188f04fe3beffb0",
+      "id": "pool1tmn4jxlnp64y7hwwwz62vahtqt2maqqj6xy0qnlrhmlmq3u8q0e",
+      "margin": Object {
+        "denominator": 10000,
+        "numerator": 1,
+      },
+      "metadata": Object {
+        "description": "Our Amsterdam Node",
+        "homepage": "https://twitter.com/A92Syed",
+        "name": "THE AMSTERDAM NODE",
+        "ticker": "AMS",
+      },
+      "metadataJson": Object {
+        "hash": "cc019105f084aef2a956b2f7f2c0bf4e747bf7696705312c244620089429df6f",
+        "url": "https://git.io/JJ1dz",
+      },
+      "metrics": Object {
+        "apy": 0,
+        "blocksCreated": "0",
+        "delegators": "1",
+        "livePledge": Object {
+          "__type": "bigint",
+          "value": "487464117",
+        },
+        "saturation": "0.000021597802364562733731",
+        "size": Object {
+          "active": "0.83681394324934275242",
+          "live": "0.16318605675065724758",
+        },
+        "stake": Object {
+          "active": Object {
+            "__type": "bigint",
+            "value": "2499703578",
+          },
+          "live": Object {
+            "__type": "bigint",
+            "value": "487464117",
+          },
+        },
+      },
+      "owners": Array [
+        "stake_test1uz9y7juwzcyanva4x4fzpx7tft6ckntn6ulsjjd2k7a0pxgldmzp5",
+      ],
+      "pledge": Object {
+        "__type": "bigint",
+        "value": "500000000",
+      },
+      "relays": Array [],
+      "rewardAccount": "stake_test1uz9y7juwzcyanva4x4fzpx7tft6ckntn6ulsjjd2k7a0pxgldmzp5",
+      "status": "active",
+      "transactions": Object {
+        "registration": Array [
+          "0d3c928318f489a93b2ceba60f1998594f3626e4018ad19adf0a9615164b5469",
+        ],
+        "retirement": Array [],
+      },
+      "vrf": "83a817519ec34d3c637db8f9d46fcf6f7f9e826093d1b9a8158c89da4b47a801",
+    },
+    Object {
+      "cost": Object {
+        "__type": "bigint",
+        "value": "4321000000",
+      },
+      "epochRewards": Array [
+        Object {
+          "activeStake": Object {
+            "__type": "bigint",
+            "value": "1335568619",
+          },
+          "epoch": 205,
+          "epochLength": 431850000,
+          "memberROI": 0,
+          "operatorFees": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "totalRewards": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      ],
+      "hexId": "ff5b4952dd7734f07e4905dea64fa230fb75f7b2d603d154d9ff1d43",
+      "id": "pool1lad5j5kawu60qljfqh02vnazxrahtaaj6cpaz4xeluw5xf023cg",
+      "margin": Object {
+        "denominator": 25,
+        "numerator": 1,
+      },
+      "metadata": Object {
+        "description": "The pool that tests all the pools",
+        "homepage": "https://teststakepool.com",
+        "name": "TestPool",
+        "ticker": "TEST",
+      },
+      "metadataJson": Object {
+        "hash": "2412f77be9b650eff7b015455d15cea355e1782dda2e7d7b1cb34943eefac348",
+        "url": "https://git.io/JJyYy",
+      },
+      "metrics": Object {
+        "apy": 0,
+        "blocksCreated": "0",
+        "delegators": "1",
+        "livePledge": Object {
+          "__type": "bigint",
+          "value": "199806239",
+        },
+        "saturation": "0.000011101058301516805716",
+        "size": Object {
+          "active": "0.86986484899181539157",
+          "live": "0.13013515100818460843",
+        },
+        "stake": Object {
+          "active": Object {
+            "__type": "bigint",
+            "value": "1335568619",
+          },
+          "live": Object {
+            "__type": "bigint",
+            "value": "199806239",
+          },
+        },
+      },
+      "owners": Array [
+        "stake_test1uzxvhl83q8ujv2yvpy6n2krvpdlqqx28h7e9vsk6re43h3c3kufy6",
+      ],
+      "pledge": Object {
+        "__type": "bigint",
+        "value": "70000000000",
+      },
+      "relays": Array [],
+      "rewardAccount": "stake_test1uzxvhl83q8ujv2yvpy6n2krvpdlqqx28h7e9vsk6re43h3c3kufy6",
+      "status": "active",
+      "transactions": Object {
+        "registration": Array [
+          "071b93a1a134389c22a1dc43fe747e43d23088448fed2b5ab22564cc0cb8bbc5",
+        ],
+        "retirement": Array [],
+      },
+      "vrf": "474a6d2a44b51add62d8f2fd8fe80abc722bf84478479b617ad05b39aaa84971",
+    },
+  ],
+  "totalResultCount": 3,
+}
+`;
+
+exports[`StakePoolHttpService healthy state /search stake pools sort sort by cost and margin with applied pagination 1`] = `
+Object {
+  "pageResults": Array [
+    Object {
+      "cost": Object {
+        "__type": "bigint",
+        "value": "4321000000",
+      },
+      "epochRewards": Array [
+        Object {
+          "activeStake": Object {
+            "__type": "bigint",
+            "value": "1335568619",
+          },
+          "epoch": 205,
+          "epochLength": 431850000,
+          "memberROI": 0,
+          "operatorFees": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "totalRewards": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      ],
+      "hexId": "ff5b4952dd7734f07e4905dea64fa230fb75f7b2d603d154d9ff1d43",
+      "id": "pool1lad5j5kawu60qljfqh02vnazxrahtaaj6cpaz4xeluw5xf023cg",
+      "margin": Object {
+        "denominator": 25,
+        "numerator": 1,
+      },
+      "metadata": Object {
+        "description": "The pool that tests all the pools",
+        "homepage": "https://teststakepool.com",
+        "name": "TestPool",
+        "ticker": "TEST",
+      },
+      "metadataJson": Object {
+        "hash": "2412f77be9b650eff7b015455d15cea355e1782dda2e7d7b1cb34943eefac348",
+        "url": "https://git.io/JJyYy",
+      },
+      "metrics": Object {
+        "apy": 0,
+        "blocksCreated": "0",
+        "delegators": "1",
+        "livePledge": Object {
+          "__type": "bigint",
+          "value": "199806239",
+        },
+        "saturation": "0.000011101058301516805716",
+        "size": Object {
+          "active": "0.86986484899181539157",
+          "live": "0.13013515100818460843",
+        },
+        "stake": Object {
+          "active": Object {
+            "__type": "bigint",
+            "value": "1335568619",
+          },
+          "live": Object {
+            "__type": "bigint",
+            "value": "199806239",
+          },
+        },
+      },
+      "owners": Array [
+        "stake_test1uzxvhl83q8ujv2yvpy6n2krvpdlqqx28h7e9vsk6re43h3c3kufy6",
+      ],
+      "pledge": Object {
+        "__type": "bigint",
+        "value": "70000000000",
+      },
+      "relays": Array [],
+      "rewardAccount": "stake_test1uzxvhl83q8ujv2yvpy6n2krvpdlqqx28h7e9vsk6re43h3c3kufy6",
+      "status": "active",
+      "transactions": Object {
+        "registration": Array [
+          "071b93a1a134389c22a1dc43fe747e43d23088448fed2b5ab22564cc0cb8bbc5",
+        ],
+        "retirement": Array [],
+      },
+      "vrf": "474a6d2a44b51add62d8f2fd8fe80abc722bf84478479b617ad05b39aaa84971",
+    },
+    Object {
+      "cost": Object {
+        "__type": "bigint",
+        "value": "400000000",
+      },
+      "epochRewards": Array [
+        Object {
+          "activeStake": Object {
+            "__type": "bigint",
+            "value": "1004862928388",
+          },
+          "epoch": 77,
+          "epochLength": 431980000,
+          "memberROI": 0,
+          "operatorFees": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "totalRewards": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      ],
+      "hexId": "22a8dc80b6fb4852150960c2e3896fa0a03498f514afc474c33152b6",
+      "id": "pool1y25deq9kldy9y9gfvrpw8zt05zsrfx84zjhugaxrx9ftvwdpua2",
+      "margin": Object {
+        "denominator": 100,
+        "numerator": 7,
+      },
+      "metadataJson": Object {
+        "hash": "67b52f96eb40fcc18fa9cd8b9d7dd620811756f1029411d105de2eaf79655fa4",
+        "url": "https://explorer.cardano-testnet.iohkdev.io/p/1.json",
+      },
+      "metrics": Object {
+        "apy": 0,
+        "blocksCreated": "0",
+        "delegators": "1",
+        "livePledge": Object {
+          "__type": "bigint",
+          "value": "999999828559",
+        },
+        "saturation": "0.00723019290077516005",
+        "size": Object {
+          "active": "0.0000000000000000000000000000",
+          "live": "1.00000000000000000000",
+        },
+        "stake": Object {
+          "active": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "live": Object {
+            "__type": "bigint",
+            "value": "999999828559",
+          },
+        },
+      },
+      "owners": Array [
+        "stake_test1urryfvusd49ej55gvf3cxtje4pqmtcdswwqxw37g6uclhnsqj7d5w",
+      ],
+      "pledge": Object {
+        "__type": "bigint",
+        "value": "1000000000000",
+      },
+      "relays": Array [],
+      "rewardAccount": "stake_test1uz8tusy3ruaw9ekplepacer4v6hpmpcp6ngp3gwj5ve3yjchsqqxn",
+      "status": "retired",
+      "transactions": Object {
+        "registration": Array [
+          "295d5e0f7ee182426eaeda8c9f1c63502c72cdf4afd6e0ee0f209adf94a614e7",
+        ],
+        "retirement": Array [
+          "c27b294bb3dfbdfeda19b7f0254b23f91e3a48a2111c52dd99da6f1c8c3ff74f",
+        ],
+      },
+      "vrf": "43a78f2b4811cdb2e52c13b6ad6a1732a9fb44d3d64adeb1fc2b4867116881b8",
+    },
+    Object {
+      "cost": Object {
+        "__type": "bigint",
+        "value": "400000000",
+      },
+      "epochRewards": Array [
+        Object {
+          "activeStake": Object {
+            "__type": "bigint",
+            "value": "2499703578",
+          },
+          "epoch": 205,
+          "epochLength": 431850000,
+          "memberROI": 0,
+          "operatorFees": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "totalRewards": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      ],
+      "hexId": "5ee7591bf30eaa4f5dce70b4a676eb02d5be8012d188f04fe3beffb0",
+      "id": "pool1tmn4jxlnp64y7hwwwz62vahtqt2maqqj6xy0qnlrhmlmq3u8q0e",
+      "margin": Object {
+        "denominator": 10000,
+        "numerator": 1,
+      },
+      "metadata": Object {
+        "description": "Our Amsterdam Node",
+        "homepage": "https://twitter.com/A92Syed",
+        "name": "THE AMSTERDAM NODE",
+        "ticker": "AMS",
+      },
+      "metadataJson": Object {
+        "hash": "cc019105f084aef2a956b2f7f2c0bf4e747bf7696705312c244620089429df6f",
+        "url": "https://git.io/JJ1dz",
+      },
+      "metrics": Object {
+        "apy": 0,
+        "blocksCreated": "0",
+        "delegators": "1",
+        "livePledge": Object {
+          "__type": "bigint",
+          "value": "487464117",
+        },
+        "saturation": "0.000021597802364562733731",
+        "size": Object {
+          "active": "0.83681394324934275242",
+          "live": "0.16318605675065724758",
+        },
+        "stake": Object {
+          "active": Object {
+            "__type": "bigint",
+            "value": "2499703578",
+          },
+          "live": Object {
+            "__type": "bigint",
+            "value": "487464117",
+          },
+        },
+      },
+      "owners": Array [
+        "stake_test1uz9y7juwzcyanva4x4fzpx7tft6ckntn6ulsjjd2k7a0pxgldmzp5",
+      ],
+      "pledge": Object {
+        "__type": "bigint",
+        "value": "500000000",
+      },
+      "relays": Array [],
+      "rewardAccount": "stake_test1uz9y7juwzcyanva4x4fzpx7tft6ckntn6ulsjjd2k7a0pxgldmzp5",
+      "status": "active",
+      "transactions": Object {
+        "registration": Array [
+          "0d3c928318f489a93b2ceba60f1998594f3626e4018ad19adf0a9615164b5469",
+        ],
+        "retirement": Array [],
+      },
+      "vrf": "83a817519ec34d3c637db8f9d46fcf6f7f9e826093d1b9a8158c89da4b47a801",
+    },
+  ],
+  "totalResultCount": 9,
+}
+`;
+
+exports[`StakePoolHttpService healthy state /search stake pools sort sort by cost and margin with applied pagination 2`] = `
+Object {
+  "pageResults": Array [
+    Object {
+      "cost": Object {
+        "__type": "bigint",
+        "value": "345000000",
+      },
+      "epochRewards": Array [
+        Object {
+          "activeStake": Object {
+            "__type": "bigint",
+            "value": "321928331851",
+          },
+          "epoch": 205,
+          "epochLength": 431850000,
+          "memberROI": 0,
+          "operatorFees": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "totalRewards": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      ],
+      "hexId": "331e12b25988de55f70a56ee89c10f38f69dd006eb50894d3304702a",
+      "id": "pool1xv0p9vje3r09tac22mhgnsg08rmfm5qxadggjnfnq3cz52apdew",
+      "margin": Object {
+        "denominator": 100,
+        "numerator": 1,
+      },
+      "metadata": Object {
+        "description": "Testnet Only",
+        "homepage": "https://git.io/JWPBE",
+        "name": "July 2021",
+        "ticker": "JUL21",
+      },
+      "metadataJson": Object {
+        "hash": "d1b06cb907d081513e506471ce960934f859049808023d7176870e302a7c9989",
+        "url": "https://git.io/JWP02",
+      },
+      "metrics": Object {
+        "apy": 0,
+        "blocksCreated": "0",
+        "delegators": "1",
+        "livePledge": Object {
+          "__type": "bigint",
+          "value": "2080157396",
+        },
+        "saturation": "0.00234264428036982225",
+        "size": Object {
+          "active": "0.99357992933816544990",
+          "live": "0.00642007066183455010",
+        },
+        "stake": Object {
+          "active": Object {
+            "__type": "bigint",
+            "value": "321928331851",
+          },
+          "live": Object {
+            "__type": "bigint",
+            "value": "2080157396",
+          },
+        },
+      },
+      "owners": Array [
+        "stake_test1uq60lxlxsn9zd5h0acu6dyl7q5wnjwaep4t8x4lxh00t9jqjg39tv",
+      ],
+      "pledge": Object {
+        "__type": "bigint",
+        "value": "10000000000",
+      },
+      "relays": Array [],
+      "rewardAccount": "stake_test1uq60lxlxsn9zd5h0acu6dyl7q5wnjwaep4t8x4lxh00t9jqjg39tv",
+      "status": "retired",
+      "transactions": Object {
+        "registration": Array [
+          "19251f57476d7af2777252270413c01383d9503110a68b4fde1a239c119c4f5d",
+        ],
+        "retirement": Array [
+          "face165bd7aa8d0d661cf1ceaa4e35d7611be3b1c7997da378c547aa2464a4fd",
+        ],
+      },
+      "vrf": "4ca2ca84f4a9696942f1c36345575dbdecc352eff37ec747b2349e48a9a182e8",
+    },
+    Object {
+      "cost": Object {
+        "__type": "bigint",
+        "value": "340000000",
+      },
+      "epochRewards": Array [
+        Object {
+          "activeStake": Object {
+            "__type": "bigint",
+            "value": "497443657",
+          },
+          "epoch": 77,
+          "epochLength": 431980000,
+          "memberROI": 0,
+          "operatorFees": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "totalRewards": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      ],
+      "hexId": "5685f37bca393c683cf03e428280312c6c4ea485188672a2a0b3195c",
+      "id": "pool126zlx7728y7xs08s8epg9qp393kyafy9rzr89g4qkvv4cv93zem",
+      "margin": Object {
+        "denominator": 40,
+        "numerator": 3,
+      },
+      "metadataJson": Object {
+        "hash": "7feb5bf22fc8c57be71a4b24f68381a7d1051e94290164530da6f7d5682a0024",
+        "url": "https://visionstaking.ch/poolmeta.json",
+      },
+      "metrics": Object {
+        "apy": 0,
+        "blocksCreated": "0",
+        "delegators": "1",
+        "livePledge": Object {
+          "__type": "bigint",
+          "value": "997623150",
+        },
+        "saturation": "0.000007213009053384437728",
+        "size": Object {
+          "active": "0.0000000000000000000000000000",
+          "live": "1.00000000000000000000",
+        },
+        "stake": Object {
+          "active": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "live": Object {
+            "__type": "bigint",
+            "value": "997623150",
+          },
+        },
+      },
+      "owners": Array [
+        "stake_test1up32f2hrv5ytqk8ad6e4apss5zrrjjlrkjhrksypn5g08fqrqf9gr",
+      ],
+      "pledge": Object {
+        "__type": "bigint",
+        "value": "10000000",
+      },
+      "relays": Array [],
+      "rewardAccount": "stake_test1up32f2hrv5ytqk8ad6e4apss5zrrjjlrkjhrksypn5g08fqrqf9gr",
+      "status": "active",
+      "transactions": Object {
+        "registration": Array [
+          "78925fad4cce75a22a675ed5e175ecfd40baf7ac51c487c5cdb0fde9a02afa64",
+        ],
+        "retirement": Array [],
+      },
+      "vrf": "3409a1bebeaa47e6d99e0748a99f65dee60b7f7e9a64dc865d52b4fb445b98ab",
+    },
+    Object {
+      "cost": Object {
+        "__type": "bigint",
+        "value": "340000000",
+      },
+      "epochRewards": Array [
+        Object {
+          "activeStake": Object {
+            "__type": "bigint",
+            "value": "50153400814617",
+          },
+          "epoch": 205,
+          "epochLength": 431850000,
+          "memberROI": 0,
+          "operatorFees": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "totalRewards": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      ],
+      "hexId": "961d329fba1807eef89db767ba405aec0c5426501c6b1df20f5c0995",
+      "id": "pool1jcwn98a6rqr7a7yakanm5sz6asx9gfjsr343mus0tsye23wmg70",
+      "margin": Object {
+        "denominator": 20,
+        "numerator": 1,
+      },
+      "metadata": Object {
+        "description": "What's past is prologue",
+        "homepage": "https://clio.one",
+        "name": "CLIO1",
+        "ticker": "CLIO1",
+      },
+      "metadataJson": Object {
+        "hash": "47530ba97c12e2ac40462e9c86eeb07ea555877d2a1f9d74b6ff8471839267d8",
+        "url": "https://clio.one/metadata/clio1_testnet.json",
+      },
+      "metrics": Object {
+        "apy": 0.00138353507261546,
+        "blocksCreated": "0",
+        "delegators": "1",
+        "livePledge": Object {
+          "__type": "bigint",
+          "value": "22619409160966",
+        },
+        "saturation": "0.44441653976190532194",
+        "size": Object {
+          "active": "0.81594358500154092038",
+          "live": "0.18405641499845907962",
+        },
+        "stake": Object {
+          "active": Object {
+            "__type": "bigint",
+            "value": "50153400814617",
+          },
+          "live": Object {
+            "__type": "bigint",
+            "value": "11313349750647",
+          },
+        },
+      },
+      "owners": Array [
+        "stake_test1upzu5aw5swqmhy09e2aaa62nac468mnyjzyfww999trzavccrj7pw",
+      ],
+      "pledge": Object {
+        "__type": "bigint",
+        "value": "1010000000000",
+      },
+      "relays": Array [],
+      "rewardAccount": "stake_test1upzu5aw5swqmhy09e2aaa62nac468mnyjzyfww999trzavccrj7pw",
+      "status": "active",
+      "transactions": Object {
+        "registration": Array [
+          "3d4cd09885d39673125c3a15f8acb45d92fde137f9effe7a5131f6cc7241d960",
+          "8fd14baca91c674fafae59701b7dc0eda1266202ec8445bad3244bd8669a7fb5",
+        ],
+        "retirement": Array [],
+      },
+      "vrf": "0a164c03ef34f26ffda7242b36db0a57ab7b23e230ea8802e50695f1f664de42",
+    },
+  ],
+  "totalResultCount": 9,
+}
+`;
+
 exports[`StakePoolHttpService healthy state /search stake pools sort sort by name asc order 1`] = `
 Object {
   "pageResults": Array [

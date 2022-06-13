@@ -813,27 +813,36 @@ FROM last_pool_update AS pool_update
 LEFT JOIN last_pool_retire AS pool_retire 
 	ON pool_update.hash_id = pool_retire.hash_id`;
 
-const sortFieldMapping: Record<string, string> = {
-  name: "lower((pod.json -> 'name')::TEXT)"
+const sortFieldMapping: Record<string, { field: string; secondary?: string[] }> = {
+  cost: { field: 'fixed_cost', secondary: ['margin'] },
+  name: { field: "lower((pod.json -> 'name')::TEXT)" }
+};
+
+const mapSort = (sort: OrderByOptions | undefined) => {
+  if (!sort) return [];
+  const mapping = sortFieldMapping[sort.field];
+  if (!mapping) return [{ field: sort.field, order: sort.order }];
+  const secondarySorts = mapping.secondary?.map((field) => ({ field, order: sort.order })) ?? [];
+  return [{ field: mapping.field, order: sort.order }, ...secondarySorts];
 };
 
 export const withSort = (query: string, sort?: StakePoolQueryOptions['sort'], defaultSort?: OrderByOptions[]) => {
   if (!sort?.field && defaultSort) {
-    const defaultMappedSort = defaultSort.map((s) => ({ field: sortFieldMapping[s.field] || s.field, order: s.order }));
+    const defaultMappedSort = defaultSort.flatMap(mapSort);
     return orderBy(query, defaultMappedSort);
   }
   if (!sort?.field) return query;
   const sortType = getStakePoolSortType(sort.field);
-  const mappedSort = { field: sortFieldMapping[sort.field] || sort.field, order: sort.order };
+  const mappedSort = mapSort(sort);
   switch (sortType) {
     case 'data':
-      return orderBy(query, [mappedSort, { field: 'pool_id', order: 'asc' }]);
+      return orderBy(query, [...mappedSort, { field: 'pool_id', order: 'asc' }]);
     case 'metrics':
-      return orderBy(query, [mappedSort, { field: 'id', order: 'asc' }]);
+      return orderBy(query, [...mappedSort, { field: 'id', order: 'asc' }]);
     case 'apy':
-      return orderBy(query, [mappedSort, { field: 'hash_id', order: 'asc' }]);
+      return orderBy(query, [...mappedSort, { field: 'hash_id', order: 'asc' }]);
     default:
-      return orderBy(query, [mappedSort]);
+      return orderBy(query, [...mappedSort]);
   }
 };
 

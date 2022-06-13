@@ -768,6 +768,37 @@ describe('StakePoolHttpService', () => {
             expect(secondPageResultSet).toMatchSnapshot();
           });
         });
+
+        describe('sort by cost and margin', () => {
+          it('desc order', async () => {
+            const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
+              setSortCondition({}, 'desc', 'cost')
+            ]);
+            expect(response).toMatchSnapshot();
+          });
+          it('asc order', async () => {
+            const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
+              setSortCondition({}, 'asc', 'cost')
+            ]);
+            expect(response).toMatchSnapshot();
+          });
+          it('with applied filters', async () => {
+            const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
+              setSortCondition(setFilterCondition(filterArgs, 'or'), 'asc', 'cost')
+            ]);
+            expect(response).toMatchSnapshot();
+          });
+          it('with applied pagination', async () => {
+            const firstPageResultSet = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
+              setSortCondition(setPagination({}, 0, 3), 'desc', 'cost')
+            ]);
+            const secondPageResultSet = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
+              setSortCondition(setPagination({}, 3, 3), 'desc', 'cost')
+            ]);
+            expect(firstPageResultSet).toMatchSnapshot();
+            expect(secondPageResultSet).toMatchSnapshot();
+          });
+        });
       });
     });
 

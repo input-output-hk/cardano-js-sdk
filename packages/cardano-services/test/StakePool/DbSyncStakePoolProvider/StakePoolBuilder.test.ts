@@ -99,7 +99,7 @@ describe('StakePoolBuilder', () => {
   });
   describe('queryPoolData', () => {
     describe('sort', () => {
-      it('by default sort', async () => {
+      it('by default sort (name asc)', async () => {
         const pools = (await builder.queryPoolData([1, 6, 14, 15, 20])).map((qR) => {
           const { hashId, updateId, ...poolData } = qR;
           return poolData;
@@ -109,6 +109,26 @@ describe('StakePoolBuilder', () => {
       });
       it('by name desc', async () => {
         const pools = (await builder.queryPoolData([14, 15, 20], { sort: { field: 'name', order: 'desc' } })).map(
+          (qR) => {
+            const { hashId: _1, updateId: _2, ...poolData } = qR;
+            return poolData;
+          }
+        );
+        expect(pools).toHaveLength(3);
+        expect(pools).toMatchSnapshot();
+      });
+      it('by real-world cost considering fixed cost and margin when specifying sort by cost desc', async () => {
+        const pools = (await builder.queryPoolData([14, 15, 20], { sort: { field: 'cost', order: 'desc' } })).map(
+          (qR) => {
+            const { hashId: _1, updateId: _2, ...poolData } = qR;
+            return poolData;
+          }
+        );
+        expect(pools).toHaveLength(3);
+        expect(pools).toMatchSnapshot();
+      });
+      it('by real-world cost considering fixed cost and margin when specifying sort by cost asc', async () => {
+        const pools = (await builder.queryPoolData([14, 15, 20], { sort: { field: 'cost', order: 'asc' } })).map(
           (qR) => {
             const { hashId: _1, updateId: _2, ...poolData } = qR;
             return poolData;
