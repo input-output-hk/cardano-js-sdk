@@ -149,7 +149,7 @@ export const mapEpochReward = (epochRewardModel: EpochRewardModel, hashId: numbe
   epochReward: {
     activeStake: BigInt(epochRewardModel.active_stake),
     epoch: epochRewardModel.epoch_no,
-    epochLength: epochRewardModel.epoch_length,
+    epochLength: Number(epochRewardModel.epoch_length),
     memberROI: epochRewardModel.member_roi,
     operatorFees: BigInt(epochRewardModel.operator_fees),
     totalRewards: BigInt(epochRewardModel.total_rewards)

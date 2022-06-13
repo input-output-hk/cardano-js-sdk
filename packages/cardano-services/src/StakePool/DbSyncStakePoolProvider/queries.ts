@@ -277,7 +277,7 @@ pool_stake_per_epoch AS (
 epoch_rewards AS (
 	SELECT 
 		epochs.epoch_no,
-		epochs.epoch_length,
+		epochs.epoch_length::TEXT,
 		stake.hash_id,
 		COALESCE(rewards.total_amount, 0) AS total_rewards,
 		COALESCE(stake.active_stake, 0) AS active_stake,		
