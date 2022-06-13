@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Cardano, StakePoolQueryOptions } from '@cardano-sdk/core';
 import { Pool } from 'pg';
@@ -45,7 +46,8 @@ describe('StakePoolBuilder', () => {
   });
   describe('queryPoolRewards', () => {
     it('queryPoolRewards', async () => {
-      const epochRewards = (await builder.queryPoolRewards([1, 2, 3])).map((eR) => eR?.epochReward);
+      const epochRewards = await builder.queryPoolRewards([1, 6, 15]);
+      expect(epochRewards).toHaveLength(3);
       expect(epochRewards).toMatchSnapshot();
     });
   });
@@ -277,6 +279,34 @@ describe('StakePoolBuilder', () => {
       const result = await builder.queryPoolStats();
       expect(result.qty).toBeDefined();
       expect(result).toMatchSnapshot();
+    });
+  });
+  describe('queryPoolAPY', () => {
+    describe('sort', () => {
+      it('by default sort (APY desc)', async () => {
+        const result = await builder.queryPoolAPY([1, 15]);
+        expect(result).toHaveLength(2);
+        expect(result[0].apy).toBeGreaterThan(result[1].apy);
+        expect(result).toMatchSnapshot();
+      });
+      it('by APY asc', async () => {
+        const result = await builder.queryPoolAPY([1, 15], { sort: { field: 'apy', order: 'asc' } });
+        expect(result).toHaveLength(2);
+        expect(result[0].apy).toBeLessThan(result[1].apy);
+        expect(result).toMatchSnapshot();
+      });
+    });
+    describe('pagination', () => {
+      it('with limit', async () => {
+        const result = await builder.queryPoolAPY([1, 15, 20], { pagination: { limit: 1, startAt: 0 } });
+        expect(result).toHaveLength(1);
+        expect(result).toMatchSnapshot();
+      });
+      it('with startAt', async () => {
+        const result = await builder.queryPoolAPY([1, 15, 20], { pagination: { limit: 5, startAt: 1 } });
+        expect(result).toHaveLength(2);
+        expect(result).toMatchSnapshot();
+      });
     });
   });
 });

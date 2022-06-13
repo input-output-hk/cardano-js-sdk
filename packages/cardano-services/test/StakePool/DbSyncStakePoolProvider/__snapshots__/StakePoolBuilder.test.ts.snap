@@ -811,6 +811,54 @@ exports[`StakePoolBuilder getLastEpoch getLastEpoch 1`] = `205`;
 
 exports[`StakePoolBuilder getTotalAmountOfAda getTotalAmountOfAda 1`] = `"69154436284251039"`;
 
+exports[`StakePoolBuilder queryPoolAPY pagination with limit 1`] = `
+Array [
+  Object {
+    "apy": 0.00138353507261546,
+    "hashId": "15",
+  },
+]
+`;
+
+exports[`StakePoolBuilder queryPoolAPY pagination with startAt 1`] = `
+Array [
+  Object {
+    "apy": 0,
+    "hashId": "1",
+  },
+  Object {
+    "apy": 0,
+    "hashId": "20",
+  },
+]
+`;
+
+exports[`StakePoolBuilder queryPoolAPY sort by APY asc 1`] = `
+Array [
+  Object {
+    "apy": 0,
+    "hashId": "1",
+  },
+  Object {
+    "apy": 0.00138353507261546,
+    "hashId": "15",
+  },
+]
+`;
+
+exports[`StakePoolBuilder queryPoolAPY sort by default sort (APY desc) 1`] = `
+Array [
+  Object {
+    "apy": 0.00138353507261546,
+    "hashId": "15",
+  },
+  Object {
+    "apy": 0,
+    "hashId": "1",
+  },
+]
+`;
+
 exports[`StakePoolBuilder queryPoolData pagination with limit 1`] = `
 Array [
   Object {
@@ -1120,15 +1168,15 @@ Array [
   Object {
     "blocksCreated": "0",
     "delegators": "1",
-    "livePledge": 22615260846603n,
-    "saturation": "0.73132364006522060905",
+    "livePledge": 22619409160966n,
+    "saturation": "0.73137299951713088875",
     "size": Object {
-      "active": "0.81599865573348361135",
-      "live": "0.18400134426651638865",
+      "active": "0.81594358500154092038",
+      "live": "0.18405641499845907962",
     },
     "stake": Object {
       "active": 50153400814617n,
-      "live": 11309201436284n,
+      "live": 11313349750647n,
     },
   },
   Object {
@@ -1186,15 +1234,15 @@ Array [
   Object {
     "blocksCreated": "0",
     "delegators": "1",
-    "livePledge": 22615260846603n,
-    "saturation": "0.73132364006522060905",
+    "livePledge": 22619409160966n,
+    "saturation": "0.73137299951713088875",
     "size": Object {
-      "active": "0.81599865573348361135",
-      "live": "0.18400134426651638865",
+      "active": "0.81594358500154092038",
+      "live": "0.18405641499845907962",
     },
     "stake": Object {
       "active": 50153400814617n,
-      "live": 11309201436284n,
+      "live": 11313349750647n,
     },
   },
   Object {
@@ -1261,15 +1309,15 @@ Array [
   Object {
     "blocksCreated": "0",
     "delegators": "1",
-    "livePledge": 22615260846603n,
-    "saturation": "0.73132364006522060905",
+    "livePledge": 22619409160966n,
+    "saturation": "0.73137299951713088875",
     "size": Object {
-      "active": "0.81599865573348361135",
-      "live": "0.18400134426651638865",
+      "active": "0.81594358500154092038",
+      "live": "0.18405641499845907962",
     },
     "stake": Object {
       "active": 50153400814617n,
-      "live": 11309201436284n,
+      "live": 11313349750647n,
     },
   },
 ]
@@ -1284,15 +1332,38 @@ Array [
 exports[`StakePoolBuilder queryPoolRewards queryPoolRewards 1`] = `
 Array [
   Object {
-    "activeStake": 1004862928388n,
-    "epoch": 77,
-    "epochLength": 431980000,
-    "memberROI": 0,
-    "operatorFees": 0n,
-    "totalRewards": 0n,
+    "epochReward": Object {
+      "activeStake": 1004862928388n,
+      "epoch": 77,
+      "epochLength": 431980000,
+      "memberROI": 0,
+      "operatorFees": 0n,
+      "totalRewards": 0n,
+    },
+    "hashId": 1,
   },
-  undefined,
-  undefined,
+  Object {
+    "epochReward": Object {
+      "activeStake": 497443657n,
+      "epoch": 77,
+      "epochLength": 431980000,
+      "memberROI": 0,
+      "operatorFees": 0n,
+      "totalRewards": 0n,
+    },
+    "hashId": 6,
+  },
+  Object {
+    "epochReward": Object {
+      "activeStake": 50153400814617n,
+      "epoch": 205,
+      "epochLength": 431850000,
+      "memberROI": 0,
+      "operatorFees": 0n,
+      "totalRewards": 0n,
+    },
+    "hashId": 15,
+  },
 ]
 `;
 

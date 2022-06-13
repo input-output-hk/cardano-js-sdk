@@ -262,6 +262,7 @@ pool_rewards_per_epoch AS (
 	JOIN reward 
 		ON reward.earned_epoch = epochs.epoch_no
 		AND reward.pool_id = ANY($1)
+  WHERE reward.type = 'member'
 	GROUP BY reward.pool_id, epochs.epoch_no
 ),
 pool_stake_per_epoch AS (
@@ -278,7 +279,7 @@ pool_stake_per_epoch AS (
 epoch_rewards AS (
 	SELECT 
 		epochs.epoch_no,
-		epochs.epoch_length::TEXT,
+		epochs.epoch_length,
 		stake.hash_id,
 		COALESCE(rewards.total_amount, 0) AS total_rewards,
 		COALESCE(stake.active_stake, 0) AS active_stake,		
@@ -327,9 +328,48 @@ epoch_rewards AS (
 
 export const findPoolEpochRewards = (limit?: number) => `
   ${epochRewardsSubqueries(limit)}
-  SELECT * 
+  SELECT 
+    epoch_no,
+    epoch_length::TEXT,
+    hash_id,
+    total_rewards,
+    active_stake,
+    operator_fees,
+    member_roi
   FROM epoch_rewards
   ORDER BY epoch_no desc
+`;
+
+export const findPoolAPY = (limit?: number) => `
+  ${epochRewardsSubqueries(limit)},
+  avg_daily_roi AS (
+    SELECT 
+      hash_id,
+      SUM(member_roi / (epoch_length / 86400000)) / count(1) AS avg_roi
+    FROM epoch_rewards
+    GROUP BY hash_id
+  ),
+  pool_apy AS (
+    SELECT 
+      epochs.hash_id,
+      POWER(
+        1 + (avg_daily_roi.avg_roi * (epochs.epoch_length / 86400000)), 
+        365 / (epochs.epoch_length / 86400000)
+      ) - 1 AS apy
+    FROM epoch_rewards AS epochs
+    JOIN (
+      SELECT
+        hash_id,
+        MAX(epoch_no) AS epoch_no
+        FROM epoch_rewards AS sub
+        GROUP BY hash_id
+      ) AS max_epoch 
+      ON max_epoch.epoch_no = epochs.epoch_no 
+      AND max_epoch.hash_id = epochs.hash_id
+    JOIN avg_daily_roi
+      ON avg_daily_roi.hash_id = epochs.hash_id
+  )
+  SELECT * FROM pool_apy
 `;
 
 export const findPools = `
@@ -790,6 +830,8 @@ export const withSort = (query: string, sort?: StakePoolQueryOptions['sort'], de
       return orderBy(query, [mappedSort, { field: 'pool_id', order: 'asc' }]);
     case 'metrics':
       return orderBy(query, [mappedSort, { field: 'id', order: 'asc' }]);
+    case 'apy':
+      return orderBy(query, [mappedSort, { field: 'hash_id', order: 'asc' }]);
     default:
       return orderBy(query, [mappedSort]);
   }
@@ -800,6 +842,7 @@ const Queries = {
   POOLS_WITH_PLEDGE_MET,
   STATUS_QUERY,
   findLastEpoch,
+  findPoolAPY,
   findPoolEpochRewards,
   findPoolStats,
   findPools,

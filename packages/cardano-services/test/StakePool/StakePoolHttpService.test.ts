@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-len */
 import {
@@ -732,6 +733,37 @@ describe('StakePoolHttpService', () => {
               setSortCondition(setPagination({}, 3, 3), 'asc', 'saturation')
             ]);
 
+            expect(firstPageResultSet).toMatchSnapshot();
+            expect(secondPageResultSet).toMatchSnapshot();
+          });
+        });
+
+        describe('sort by APY', () => {
+          it('desc order', async () => {
+            const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
+              setSortCondition({}, 'desc', 'apy')
+            ]);
+            expect(response).toMatchSnapshot();
+          });
+          it('asc order', async () => {
+            const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
+              setSortCondition({}, 'asc', 'apy')
+            ]);
+            expect(response).toMatchSnapshot();
+          });
+          it('with applied filters', async () => {
+            const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
+              setSortCondition(setFilterCondition(filterArgs, 'or'), 'asc', 'apy')
+            ]);
+            expect(response).toMatchSnapshot();
+          });
+          it('with applied pagination', async () => {
+            const firstPageResultSet = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
+              setSortCondition(setPagination({}, 0, 3), 'desc', 'apy')
+            ]);
+            const secondPageResultSet = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
+              setSortCondition(setPagination({}, 3, 3), 'desc', 'apy')
+            ]);
             expect(firstPageResultSet).toMatchSnapshot();
             expect(secondPageResultSet).toMatchSnapshot();
           });

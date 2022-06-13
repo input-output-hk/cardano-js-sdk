@@ -131,7 +131,7 @@ export interface PoolMetricsModel {
 }
 
 export interface PoolMetrics extends CommonPoolInfo {
-  metrics: Cardano.StakePoolMetrics;
+  metrics: Omit<Cardano.StakePoolMetrics, 'apy'>;
 }
 
 export interface TotalCountModel {
@@ -144,7 +144,16 @@ export interface StakePoolStatsModel {
   retiring: string;
 }
 
-export type PoolSortType = 'data' | 'metrics';
+export interface PoolAPYModel {
+  hash_id: number;
+  apy: number;
+}
+
+export interface PoolAPY extends CommonPoolInfo {
+  apy: number;
+}
+
+export type PoolSortType = 'data' | 'metrics' | 'apy';
 export interface OrderByOptions {
   field: string;
   order: 'asc' | 'desc';

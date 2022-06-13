@@ -12,6 +12,8 @@ import {
   EpochRewardModel,
   OrderByOptions,
   OwnerAddressModel,
+  PoolAPY,
+  PoolAPYModel,
   PoolDataModel,
   PoolMetricsModel,
   PoolRegistrationModel,
@@ -28,6 +30,7 @@ import { Pool, QueryResult } from 'pg';
 import {
   mapAddressOwner,
   mapEpochReward,
+  mapPoolAPY,
   mapPoolData,
   mapPoolMetrics,
   mapPoolRegistration,
@@ -88,6 +91,16 @@ export class StakePoolBuilder {
         return result.rows.length > 0 ? mapEpochReward(result.rows[0], hashId) : undefined;
       })
     );
+  }
+  public async queryPoolAPY(hashesIds: number[], options?: StakePoolQueryOptions): Promise<PoolAPY[]> {
+    this.#logger.debug('About to query pools APY');
+    const defaultSort: OrderByOptions[] = [{ field: 'apy', order: 'desc' }];
+    const queryWithSortAndPagination = withPagination(
+      withSort(Queries.findPoolAPY(options?.rewardsHistoryLimit), options?.sort, defaultSort),
+      options?.pagination
+    );
+    const result: QueryResult<PoolAPYModel> = await this.#db.query(queryWithSortAndPagination, [hashesIds]);
+    return result.rows.map(mapPoolAPY);
   }
   public async queryPoolData(updatesIds: number[], options?: StakePoolQueryOptions) {
     this.#logger.debug('About to query pool data');

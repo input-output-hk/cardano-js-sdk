@@ -2,6 +2,7 @@ import { Cardano, StakePoolStats } from '@cardano-sdk/core';
 import {
   mapAddressOwner,
   mapEpochReward,
+  mapPoolAPY,
   mapPoolData,
   mapPoolMetrics,
   mapPoolRegistration,
@@ -93,6 +94,10 @@ describe('mappers', () => {
     live_stake_percentage: 0.5,
     pool_hash_id: hash_id,
     saturation: 0.000_000_8
+  };
+  const poolAPYModel = {
+    apy: 0.015,
+    hash_id
   };
   it('mapPoolRetirement', () => {
     expect(mapPoolRetirement(poolRetirementModel)).toEqual({
@@ -187,6 +192,12 @@ describe('mappers', () => {
       }
     });
   });
+  it('mapPoolAPY', () => {
+    expect(mapPoolAPY(poolAPYModel)).toEqual({
+      apy: poolAPYModel.apy,
+      hashId: poolAPYModel.hash_id
+    });
+  });
   describe('toCoreStakePool', () => {
     const poolOwners = [mapAddressOwner(addressOwnerModel)];
     const poolDatas = [mapPoolData(poolDataModel)];
@@ -195,6 +206,7 @@ describe('mappers', () => {
     const poolRetirements = [mapPoolRetirement(poolRetirementModel)];
     const poolRewards = [mapEpochReward(epochRewardModel, hash_id)];
     const poolMetrics = [mapPoolMetrics(poolMetricsModel)];
+    const poolAPYs = [mapPoolAPY(poolAPYModel)];
     const stakePool = {
       cost: poolDatas[0].cost,
       epochRewards: poolRewards.map((r) => r.epochReward),
@@ -203,7 +215,7 @@ describe('mappers', () => {
       margin: { denominator: 10_000, numerator: 1 },
       metadata: poolDatas[0].metadata,
       metadataJson: poolDatas[0].metadataJson,
-      metrics: poolMetrics[0].metrics,
+      metrics: { ...poolMetrics[0].metrics, apy: poolAPYs[0].apy },
       owners: poolOwners.map((o) => o.address),
       pledge: poolDatas[0].pledge,
       relays: poolRelays.map((r) => r.relay),
@@ -214,12 +226,13 @@ describe('mappers', () => {
         retirement: poolRetirements.map((r) => r.transactionId)
       },
       vrf: poolDatas[0].vrfKeyHash
-    };
+    } as Cardano.StakePool;
     const totalCount = 1;
     it('toCoreStakePool with retiring status', () => {
       expect(
         toCoreStakePool([poolDataModel.hash_id], {
           lastEpoch: poolRetirementModel.retiring_epoch - 1,
+          poolAPYs,
           poolDatas,
           poolMetrics,
           poolOwners,
@@ -235,6 +248,7 @@ describe('mappers', () => {
       expect(
         toCoreStakePool([poolDataModel.hash_id], {
           lastEpoch: poolRetirementModel.retiring_epoch + 1,
+          poolAPYs,
           poolDatas,
           poolMetrics,
           poolOwners,
@@ -256,6 +270,7 @@ describe('mappers', () => {
       expect(
         toCoreStakePool([poolDataModel.hash_id], {
           lastEpoch: poolRegistrationModel.active_epoch_no - 1,
+          poolAPYs,
           poolDatas,
           poolMetrics,
           poolOwners,
@@ -286,6 +301,7 @@ describe('mappers', () => {
       expect(
         toCoreStakePool([poolDataModel.hash_id], {
           lastEpoch: poolRegistrationModel.active_epoch_no,
+          poolAPYs,
           poolDatas,
           poolMetrics,
           poolOwners,
