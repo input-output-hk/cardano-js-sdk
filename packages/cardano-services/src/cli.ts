@@ -27,7 +27,11 @@ import fs from 'fs';
 import onDeath from 'death';
 import path from 'path';
 
-const packageJsonPath = path.join(__dirname, 'original-package.json');
+const copiedPackageJsonPath = path.join(__dirname, 'original-package.json');
+// Exists in dist/, doesn't exist when run with ts-node
+const packageJsonPath = fs.existsSync(copiedPackageJsonPath)
+  ? copiedPackageJsonPath
+  : path.join(__dirname, '../package.json');
 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 
 clear();
