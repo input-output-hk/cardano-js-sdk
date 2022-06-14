@@ -6,7 +6,7 @@ export const findLastEpoch = `
  SELECT 
   "no"
  FROM epoch
- ORDER BY id DESC 
+ ORDER BY no DESC 
  LIMIT 1
 `;
 
@@ -31,7 +31,7 @@ with current_epoch AS (
   FROM epoch e
   JOIN epoch_param ep on 
     ep.epoch_no = e."no"
-  order by e.id desc limit 1
+  order by e.no desc limit 1
 ),
 blocks_created AS (
   SELECT 
@@ -249,7 +249,7 @@ WITH epochs AS (
 	  "no" AS epoch_no,
 		(extract(epoch FROM (end_time - start_time)) * 1000) AS epoch_length
 	FROM epoch
-	ORDER BY id DESC
+	ORDER BY no DESC
   ${limit !== undefined ? `LIMIT ${limit}` : ''}
 ),
 pool_rewards_per_epoch AS (

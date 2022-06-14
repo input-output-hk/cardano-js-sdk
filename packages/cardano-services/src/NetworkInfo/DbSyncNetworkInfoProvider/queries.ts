@@ -28,7 +28,7 @@ export const findTotalSupply = `
         FROM ada_pots
             WHERE ada_pots.epoch_no = (
             SELECT no FROM epoch
-            ORDER BY id DESC 
+            ORDER BY no DESC 
             LIMIT 1
         )
     )
