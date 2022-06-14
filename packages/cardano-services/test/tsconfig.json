@@ -10,7 +10,9 @@
     { "path": "../../core/src" },
     { "path": "../../ogmios/test" },
     { "path": "../../rabbitmq/test" },
+    { "path": "../../util/src" },
     { "path": "../../util-dev/src" },
-    { "path": "../../util/src" }
+    { "path": "../../wallet/src" },
+    { "path": "../../wallet/test" }
   ]
 }
