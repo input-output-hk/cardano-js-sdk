@@ -1,20 +1,13 @@
-import { Balance, DelegationTracker, StakeKeyStatus, TransactionalObservables, TransactionalTracker } from './types';
-import { BigIntMath } from '@cardano-sdk/util';
+import { BalanceTracker, DelegationTracker, StakeKeyStatus, TransactionalObservables } from './types';
 import { Cardano, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
 
 import { Observable, combineLatest, distinctUntilChanged, map } from 'rxjs';
-import { TrackerSubject } from '@cardano-sdk/util-rxjs';
-import { deepEquals } from './util';
 
-const mapToBalances = map<[Cardano.Utxo[], Cardano.Lovelace, Cardano.Lovelace], Balance>(
-  ([utxo, rewards, deposit]) => ({
-    ...Cardano.util.coalesceValueQuantities(utxo.map(([_, txOut]) => txOut.value)),
-    deposit,
-    rewards
-  })
+const mapUtxoValue = map<Cardano.Utxo[], Cardano.Value>((utxo) =>
+  Cardano.util.coalesceValueQuantities(utxo.map(([_, txOut]) => txOut.value))
 );
 
-const createDepositTracker = (
+const computeDepositCoin = (
   protocolParameters$: Observable<ProtocolParametersRequiredByWallet>,
   numDeposits$: Observable<number>
 ) =>
@@ -32,68 +25,21 @@ export const createBalanceTracker = (
   protocolParameters$: Observable<ProtocolParametersRequiredByWallet>,
   utxoTracker: TransactionalObservables<Cardano.Utxo[]>,
   delegationTracker: DelegationTracker
-): TransactionalTracker<Balance> => {
-  const depositTotal$ = createDepositTracker(
-    protocolParameters$,
-    numRewardAccountsWithKeyStatus(delegationTracker, [StakeKeyStatus.Registered, StakeKeyStatus.Unregistering])
-  ).pipe(distinctUntilChanged());
-  const depositRegistered$ = createDepositTracker(
-    protocolParameters$,
-    numRewardAccountsWithKeyStatus(delegationTracker, [StakeKeyStatus.Registered])
-  );
-  const depositUnregistering$ = createDepositTracker(
-    protocolParameters$,
-    numRewardAccountsWithKeyStatus(delegationTracker, [StakeKeyStatus.Unregistering])
-  );
-  const depositAvailable$ = combineLatest([depositRegistered$, depositUnregistering$]).pipe(
-    map(([totalDeposit, depositBeingSpent]) => BigIntMath.max([totalDeposit - depositBeingSpent, 0n])!),
-    distinctUntilChanged()
-  );
-  const rewardsAggregate$ = delegationTracker.rewardAccounts$.pipe(
-    map((accounts) =>
-      accounts.reduce(
-        (sum, { rewardBalance: { available, total } }) => ({
-          available: sum.available + available,
-          total: sum.total + total
-        }),
-        {
-          available: 0n,
-          total: 0n
-        }
-      )
+): BalanceTracker => ({
+  rewardAccounts: {
+    // 'Unregistering' balance will be reflected in utxo
+    deposit$: computeDepositCoin(
+      protocolParameters$,
+      numRewardAccountsWithKeyStatus(delegationTracker, [StakeKeyStatus.Registered, StakeKeyStatus.Registering])
     ),
-    distinctUntilChanged(deepEquals)
-  );
-  const available$ = new TrackerSubject<Balance>(
-    combineLatest([
-      utxoTracker.available$,
-      rewardsAggregate$.pipe(map(({ available }) => available)),
-      depositAvailable$
-    ]).pipe(mapToBalances)
-  );
-  const total$ = new TrackerSubject<Balance>(
-    combineLatest([utxoTracker.total$, rewardsAggregate$.pipe(map(({ total }) => total)), depositTotal$]).pipe(
-      mapToBalances
+    rewards$: delegationTracker.rewardAccounts$.pipe(
+      map((accounts) => accounts.reduce((sum, { rewardBalance }) => sum + rewardBalance, 0n)),
+      distinctUntilChanged()
     )
-  );
-
-  const unspendable$ = new TrackerSubject<Balance>(
-    utxoTracker.unspendable$.pipe(
-      map((utxo) => ({
-        ...Cardano.util.coalesceValueQuantities(utxo.map(([_, txOut]) => txOut.value)),
-        deposit: 0n,
-        rewards: 0n
-      }))
-    )
-  );
-
-  return {
-    available$,
-    shutdown() {
-      available$.complete();
-      total$.complete();
-    },
-    total$,
-    unspendable$
-  };
-};
+  },
+  utxo: {
+    available$: utxoTracker.available$.pipe(mapUtxoValue),
+    total$: utxoTracker.total$.pipe(mapUtxoValue),
+    unspendable$: utxoTracker.unspendable$.pipe(mapUtxoValue)
+  }
+});

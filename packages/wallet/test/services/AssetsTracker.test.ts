@@ -1,23 +1,25 @@
-import { Asset } from '@cardano-sdk/core';
+import { Asset, Cardano } from '@cardano-sdk/core';
 import { AssetId, createTestScheduler } from '@cardano-sdk/util-dev';
-import { AssetsTrackerProps, Balance, TransactionalTracker, createAssetsTracker } from '../../src/services';
+import { AssetsTrackerProps, BalanceTracker, TransactionalTracker, createAssetsTracker } from '../../src/services';
 import { of } from 'rxjs';
 
 describe('createAssetsTracker', () => {
   it('fetches asset info for every asset in total balance', () => {
     createTestScheduler().run(({ cold, expectObservable, flush }) => {
       const balanceTracker = {
-        total$: cold('a-b-c', {
-          a: {} as Balance,
-          b: { assets: new Map([[AssetId.TSLA, 1n]]) } as Balance,
-          c: {
-            assets: new Map([
-              [AssetId.TSLA, 1n],
-              [AssetId.PXL, 2n]
-            ])
-          } as Balance
-        })
-      } as unknown as TransactionalTracker<Balance>;
+        utxo: {
+          total$: cold('a-b-c', {
+            a: {} as Cardano.Value,
+            b: { assets: new Map([[AssetId.TSLA, 1n]]) } as Cardano.Value,
+            c: {
+              assets: new Map([
+                [AssetId.TSLA, 1n],
+                [AssetId.PXL, 2n]
+              ])
+            } as Cardano.Value
+          })
+        }
+      } as unknown as TransactionalTracker<BalanceTracker>;
       const nftMetadata = { name: 'nft' } as Asset.NftMetadata;
       const asset1 = { assetId: AssetId.TSLA } as Asset.AssetInfo;
       const asset2 = { assetId: AssetId.PXL, nftMetadata } as Asset.AssetInfo;

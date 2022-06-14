@@ -81,12 +81,11 @@ const assertWalletProperties = async (
   expect(utxoAvailable).toEqual(mocks.utxo);
   expect(utxoTotal).toEqual(mocks.utxo);
   // balance
-  const balanceAvailable = await firstValueFrom(wallet.balance.available$);
-  const balanceTotal = await firstValueFrom(wallet.balance.total$);
+  const balanceAvailable = await firstValueFrom(wallet.balance.utxo.available$);
   expect(balanceAvailable?.coins).toEqual(
     Cardano.util.coalesceValueQuantities(mocks.utxo.map((utxo) => utxo[1].value)).coins
   );
-  expect(balanceTotal?.rewards).toBe(mocks.rewardAccountBalance);
+  expect(await firstValueFrom(wallet.balance.rewardAccounts.rewards$)).toBe(mocks.rewardAccountBalance);
   // transactions
   const transactionsHistory = await firstValueFrom(wallet.transactions.history$);
   expect(transactionsHistory?.length).toBeGreaterThan(0);
@@ -109,7 +108,7 @@ const assertWalletProperties = async (
   expect(rewardAccounts).toHaveLength(1);
   expect(rewardAccounts[0].address).toBe(rewardAccount);
   expect(rewardAccounts[0].delegatee?.nextNextEpoch?.id).toEqual(expectedDelegateeId);
-  expect(rewardAccounts[0].rewardBalance.total).toBe(mocks.rewardAccountBalance);
+  expect(rewardAccounts[0].rewardBalance).toBe(mocks.rewardAccountBalance);
   // addresses$
   const addresses = await firstValueFrom(wallet.addresses$);
   expect(addresses[0].address).toEqual(address);
@@ -125,10 +124,10 @@ const assertWalletProperties = async (
 const assertWalletProperties2 = async (wallet: ObservableWallet) => {
   expect(await firstValueFrom(wallet.utxo.available$)).toEqual(mocks.utxo2);
   expect(await firstValueFrom(wallet.utxo.total$)).toEqual(mocks.utxo2);
-  expect((await firstValueFrom(wallet.balance.available$))?.coins).toEqual(
+  expect((await firstValueFrom(wallet.balance.utxo.available$))?.coins).toEqual(
     Cardano.util.coalesceValueQuantities(mocks.utxo2.map((utxo) => utxo[1].value)).coins
   );
-  expect((await firstValueFrom(wallet.balance.total$))?.rewards).toBe(mocks.rewardAccountBalance2);
+  expect(await firstValueFrom(wallet.balance.rewardAccounts.rewards$)).toBe(mocks.rewardAccountBalance2);
   expect((await firstValueFrom(wallet.transactions.history$))?.length).toEqual(queryTransactionsResult2.length);
   const walletTip = await firstValueFrom(wallet.tip$);
   expect(walletTip).toEqual(mocks.ledgerTip2);
@@ -146,7 +145,7 @@ const assertWalletProperties2 = async (wallet: ObservableWallet) => {
   expect(rewardsHistory.all).toEqual(expectedRewards);
   const rewardAccounts = await firstValueFrom(wallet.delegation.rewardAccounts$);
   expect(rewardAccounts).toHaveLength(1);
-  expect(rewardAccounts[0].rewardBalance.total).toBe(mocks.rewardAccountBalance2);
+  expect(rewardAccounts[0].rewardBalance).toBe(mocks.rewardAccountBalance2);
 };
 
 describe('SingleAddressWallet load', () => {

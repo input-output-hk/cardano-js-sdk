@@ -9,18 +9,21 @@ export enum TransactionFailure {
   Timeout = 'TIMEOUT'
 }
 
-export interface Balance extends Cardano.Value {
-  rewards: Cardano.Lovelace;
-  deposit: Cardano.Lovelace;
-}
-
 export interface TransactionalObservables<T> {
   total$: Observable<T>;
   /**
-   * total - unspendable - deposit
+   * total - unspendable
    */
   available$: Observable<T>;
   unspendable$: Observable<T>;
+}
+
+export interface BalanceTracker {
+  rewardAccounts: {
+    rewards$: Observable<Cardano.Lovelace>;
+    deposit$: Observable<Cardano.Lovelace>;
+  };
+  utxo: TransactionalObservables<Cardano.Value>;
 }
 
 export interface TransactionalTracker<T> extends TransactionalObservables<T> {
@@ -83,15 +86,11 @@ export enum StakeKeyStatus {
   Unregistered = 'UNREGISTERED'
 }
 
-export interface RewardBalance {
-  total: Cardano.Lovelace;
-  available: Cardano.Lovelace;
-}
 export interface RewardAccount {
   address: Cardano.RewardAccount;
   keyStatus: StakeKeyStatus;
   delegatee?: Delegatee;
-  rewardBalance: RewardBalance;
+  rewardBalance: Cardano.Lovelace;
   // Maybe add rewardsHistory for each reward account too
 }
 

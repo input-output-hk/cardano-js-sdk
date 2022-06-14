@@ -2,11 +2,13 @@
 /* eslint-disable no-multi-spaces */
 /* eslint-disable prettier/prettier */
 import { Cardano, RewardsProvider } from '@cardano-sdk/core';
-import { EMPTY, Observable } from 'rxjs';
+import { EMPTY, Observable, of } from 'rxjs';
+import { KeyValueStore } from '../../../src/persistence';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import {
   StakeKeyStatus,
   addressKeyStatuses,
+  addressRewards,
   createDelegateeTracker,
   createRewardsProvider,
   fetchRewardsTrigger$,
@@ -24,6 +26,10 @@ const coldObservableProviderMock: jest.Mock = jest.requireMock(
 describe('RewardAccounts', () => {
   const poolId1 = Cardano.PoolId('pool1zuevzm3xlrhmwjw87ec38mzs02tlkwec9wxpgafcaykmwg7efhh');
   const poolId2 = Cardano.PoolId('pool1y6chk7x7fup4ms9leesdr57r4qy9cwxuee0msan72x976a6u0nc');
+  const twoRewardAccounts = [
+    'stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27',
+    'stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d'
+  ].map(Cardano.RewardAccount);
 
   test.todo('createQueryStakePoolsProvider emits stored values if they exist, updates storage when provider resolves');
 
@@ -108,6 +114,48 @@ describe('RewardAccounts', () => {
     });
   });
 
+  describe('addressRewards', () => {
+    it(`emits reward account balance for every reward account,
+    starting with stored values and following up with provider, subtracting withdrawals in-flight`, () => {
+      createTestScheduler().run(({ cold, hot, expectObservable }) => {
+        const acc1Balance1 = 10_000_000n;
+        const acc1Balance2 = 9_000_000n;
+        const acc2Balance = 8_000_000n;
+        const storedBalances = [7_000_000n, 6_000_000n];
+        const acc1PendingWithdrawalQty = 1_000_000n;
+        const transactionsInFlight$ = hot('a-b--c', {
+          a: [],
+          b: [{ body: { withdrawals: [{
+            quantity: acc1PendingWithdrawalQty, stakeAddress: twoRewardAccounts[0] } as Cardano.Withdrawal
+          ] } as Cardano.NewTxBodyAlonzo } as Cardano.NewTxAlonzo],
+          c: []
+        });
+        const rewardsProvider = () => hot('-a--b-', {
+          a: [acc1Balance1, acc2Balance],
+          b: [acc1Balance2, acc2Balance]
+        });
+        const balancesStore = {
+          getValues(_: Cardano.RewardAccount[]) {
+            return cold('(a|)', { a: storedBalances }) as Observable<bigint[]>;
+          },
+          setValue(_, __) {
+            return of(void 0);
+          }
+        } as KeyValueStore<Cardano.RewardAccount, Cardano.Lovelace>;
+        const addressRewards$ = addressRewards(
+          twoRewardAccounts, transactionsInFlight$, rewardsProvider, balancesStore
+        );
+        expectObservable(addressRewards$).toBe('abc-de', {
+          a: storedBalances,
+          b: [acc1Balance1, acc2Balance],
+          c: [acc1Balance1 - acc1PendingWithdrawalQty, acc2Balance],
+          d: [acc1Balance2 - acc1PendingWithdrawalQty, acc2Balance],
+          e: [acc1Balance2, acc2Balance]
+        });
+      });
+    });
+  });
+
   describe('fetchRewardsTrigger$', () => {
     it('emits every epoch and after making a transaction with withdrawals', () => {
       const rewardAccount = Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27');
@@ -154,10 +202,7 @@ describe('RewardAccounts', () => {
         txConfirmed$,
         rewardsProvider,
         config
-      )([
-        'stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27',
-        'stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d'
-      ].map(Cardano.RewardAccount));
+      )(twoRewardAccounts);
       expectObservable(target$).toBe('-ab', {
         a: [0n, 3n],
         b: [5n, 3n]
