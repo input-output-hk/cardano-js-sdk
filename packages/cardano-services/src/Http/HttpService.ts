@@ -27,6 +27,10 @@ export abstract class HttpService {
     this.router.post('/health', healthHandler);
   }
 
+  async start(): Promise<void> {
+    return Promise.resolve();
+  }
+
   async close(): Promise<void> {
     return Promise.resolve();
   }

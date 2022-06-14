@@ -16,6 +16,10 @@ export interface LiveStakeModel {
   live_stake: string;
 }
 
+export interface EpochModel {
+  no: number;
+}
+
 export interface GenesisData {
   networkMagic: Cardano.CardanoNetworkMagic;
   networkId: Cardano.CardanoNetworkId;

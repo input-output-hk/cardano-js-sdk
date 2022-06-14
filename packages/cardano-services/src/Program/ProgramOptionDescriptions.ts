@@ -7,7 +7,9 @@ enum HttpServerOptionDescriptions {
   OgmiosUrl = 'Ogmios URL',
   RabbitMQUrl = 'RabbitMQ URL',
   UseQueue = 'Enables RabbitMQ',
-  CardanoNodeConfigPath = 'Cardano node config path'
+  CardanoNodeConfigPath = 'Cardano node config path',
+  DbQueriesCacheTtl = 'Db queries cache TTL in minutes between 1 and 2880',
+  DbPollInterval = 'Db poll interval'
 }
 
 export type ProgramOptionDescriptions = CommonOptionDescriptions | HttpServerOptionDescriptions;

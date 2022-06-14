@@ -1,4 +1,4 @@
-import { ActiveStakeModel, CirculatingSupplyModel, LiveStakeModel, TotalSupplyModel } from './types';
+import { ActiveStakeModel, CirculatingSupplyModel, EpochModel, LiveStakeModel, TotalSupplyModel } from './types';
 import { Cardano } from '@cardano-sdk/core';
 import { Logger, dummyLogger } from 'ts-log';
 import { Pool, QueryResult } from 'pg';
@@ -33,5 +33,11 @@ export class NetworkInfoBuilder {
     this.#logger.debug('About to query active stake');
     const result: QueryResult<ActiveStakeModel> = await this.#db.query(Queries.findActiveStake);
     return result.rows[0].active_stake;
+  }
+
+  public async queryLatestEpoch() {
+    this.#logger.debug('About to query the last epoch');
+    const result: QueryResult<EpochModel> = await this.#db.query(Queries.findLatestCompleteEpoch);
+    return result.rows[0].no;
   }
 }

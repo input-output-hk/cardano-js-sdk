@@ -68,9 +68,17 @@ export const findActiveStake = `
     )
 `;
 
+export const findLatestCompleteEpoch = `
+    SELECT no
+    FROM public.epoch
+    ORDER BY no DESC
+    LIMIT 1
+`;
+
 const Queries = {
   findActiveStake,
   findCirculatingSupply,
+  findLatestCompleteEpoch,
   findLiveStake,
   findTotalSupply
 };

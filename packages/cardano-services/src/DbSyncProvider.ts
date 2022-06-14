@@ -14,4 +14,8 @@ export abstract class DbSyncProvider implements Provider {
     const result = await this.db.query(HEALTH_CHECK_QUERY);
     return { ok: !!result.rowCount };
   }
+
+  public async start(): Promise<void> {
+    return Promise.resolve();
+  }
 }

@@ -110,14 +110,14 @@ describe('tx-worker entrypoints', () => {
       });
 
       describe('with bad parallel option', () => {
-        it('cli:start-worker exits with code 0', (done) => {
+        it('cli:start-worker exits with code 1', (done) => {
           expect.assertions(2);
           proc = fork(exePath('cli'), [...commonArgs, '--parallel', 'test'], { stdio: 'pipe' });
           proc.stderr!.on('data', (data) =>
             expect(data.toString()).toMatch('tx-submit requires a valid Parallel mode')
           );
           proc.on('exit', (code) => {
-            expect(code).toBe(0);
+            expect(code).toBe(1);
             done();
           });
         });
@@ -170,12 +170,12 @@ describe('tx-worker entrypoints', () => {
   });
 
   describe('without a working RabbitMQ server', () => {
-    it('cli:start-worker exits with code 0', (done) => {
+    it('cli:start-worker exits with code 1', (done) => {
       expect.assertions(2);
       proc = fork(exePath('cli'), [...commonArgs, '--rabbitmq-url', BAD_CONNECTION_URL.toString()], { stdio: 'pipe' });
       proc.stderr!.on('data', (data) => expect(data.toString()).toMatch('ECONNREFUSED'));
       proc.on('exit', (code) => {
-        expect(code).toBe(0);
+        expect(code).toBe(1);
         done();
       });
     });
