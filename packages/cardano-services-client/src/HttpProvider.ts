@@ -51,6 +51,7 @@ export const createHttpProvider = <T extends object>({
   new Proxy<T>({} as T, {
     // eslint-disable-next-line sonarjs/cognitive-complexity
     get(_, prop) {
+      if (prop === 'then') return;
       const method = prop as keyof T;
       const path = paths[method];
       if (!path)

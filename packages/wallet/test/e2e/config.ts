@@ -35,7 +35,7 @@ const keyAgentOptions = ['InMemory', 'Ledger', 'Trezor'];
 const chainHistoryProviderOptions = ['blockfrost'];
 const rewardsProviderOptions = ['blockfrost'];
 
-const env = envalid.cleanEnv(process.env, {
+export const env = envalid.cleanEnv(process.env, {
   ASSET_PROVIDER: envalid.str({ choices: assetProviderOptions }),
   BLOCKFROST_API_KEY: envalid.str(),
   CHAIN_HISTORY_PROVIDER: envalid.str({ choices: chainHistoryProviderOptions }),
@@ -63,7 +63,7 @@ const isTestnet = env.NETWORK_ID === 0;
 const networkId = Number.parseInt(process.env.NETWORK_ID || '');
 if (Number.isNaN(networkId)) throw new Error('NETWORK_ID not set');
 
-const logger = createLogger({
+export const logger = createLogger({
   level: env.LOGGER_MIN_SEVERITY as LogLevel,
   name: 'wallet e2e tests'
 });

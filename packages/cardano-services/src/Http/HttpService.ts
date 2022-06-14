@@ -11,7 +11,7 @@ export abstract class HttpService {
   protected constructor(slug: string, router: express.Router, logger = dummyLogger) {
     this.router = router;
     this.slug = slug;
-    this.router.post('/health', async (req, res) => {
+    const healthHandler = async (req: express.Request, res: express.Response) => {
       logger.debug('/health', { ip: req.ip });
       let body: HealthCheckResponse | Error['message'];
       try {
@@ -22,7 +22,9 @@ export abstract class HttpService {
         res.statusCode = 500;
       }
       res.send(body);
-    });
+    };
+    this.router.get('/health', healthHandler);
+    this.router.post('/health', healthHandler);
   }
 
   async close(): Promise<void> {

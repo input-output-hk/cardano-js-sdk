@@ -83,4 +83,13 @@ describe('txSubmitHttpProvider', () => {
       });
     });
   });
+
+  describe('standard behavior', () => {
+    it('txSubmitHttpProvider can be the return value of async functions', async () => {
+      const provider = txSubmitHttpProvider(url);
+      const getProvider = async () => provider;
+
+      await expect(getProvider()).resolves.toBe(provider);
+    });
+  });
 });
