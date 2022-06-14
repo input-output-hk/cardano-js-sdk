@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">88.88% </span>
+                <span class="strong">96.42% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>24/27</span>
+                <span class='fraction'>27/28</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">81.81% </span>
+                <span class="strong">90.9% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>9/11</span>
+                <span class='fraction'>10/11</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">90.47% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>19/21</span>
+                <span class='fraction'>23/23</span>
             </div>
         
             
@@ -183,7 +183,9 @@
 <a name='L118'></a><a href='#L118'>118</a>
 <a name='L119'></a><a href='#L119'>119</a>
 <a name='L120'></a><a href='#L120'>120</a>
-<a name='L121'></a><a href='#L121'>121</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">30x</span>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">32x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -192,8 +194,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">30x</span>
-<span class="cline-any cline-yes">30x</span>
+<span class="cline-any cline-yes">32x</span>
+<span class="cline-any cline-yes">32x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -201,16 +203,18 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">30x</span>
+<span class="cline-any cline-yes">32x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">30x</span>
+<span class="cline-any cline-yes">32x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">30x</span>
+<span class="cline-any cline-yes">32x</span>
+<span class="cline-any cline-yes">32x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">30x</span>
-<span class="cline-any cline-yes">30x</span>
+<span class="cline-any cline-yes">32x</span>
+<span class="cline-any cline-yes">32x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -234,7 +238,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">30x</span>
+<span class="cline-any cline-yes">32x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -249,7 +253,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">30x</span>
+<span class="cline-any cline-yes">32x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -298,17 +302,17 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">18x</span>
+<span class="cline-any cline-yes">18x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import {
   Cardano,
+  ChainHistoryProvider,
   SlotEpochCalc,
   StakePoolProvider,
   TimeSettings,
-  WalletProvider,
   createSlotEpochCalc
 } from '@cardano-sdk/core';
 import { DelegationTracker, TransactionsTracker } from '../types';
@@ -322,23 +326,25 @@ import {
 } from './RewardAccounts';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { RewardsHistoryProvider, createRewardsHistoryProvider, createRewardsHistoryTracker } from './RewardsHistory';
-import { Shutdown } from '../../types';
-import { TrackedWalletProvider } from '../ProviderTracker';
-import { TrackerSubject, coldObservableProvider } from '../util';
+import { Shutdown } from '@cardano-sdk/util';
+import { TrackedRewardsProvider } from '../ProviderTracker';
+import { TrackerSubject } from '@cardano-sdk/util-rxjs';
 import { TxWithEpoch } from './types';
 import { WalletStores } from '../../persistence';
+import { coldObservableProvider } from '../util';
 import { transactionsWithCertificates } from './transactionCertificates';
 &nbsp;
 export const createBlockEpochProvider =
-  (walletProvider: WalletProvider, retryBackoffConfig: RetryBackoffConfig) =&gt; (blockHashes: Cardano.BlockId[]) =&gt;
-    coldObservableProvider(<span class="fstat-no" title="function not covered" >() =</span>&gt; <span class="cstat-no" title="statement not covered" >walletProvider.blocksByHashes(blockHashes),</span> retryBackoffConfig).pipe(
+  (chainHistoryProvider: ChainHistoryProvider, retryBackoffConfig: RetryBackoffConfig) =&gt;
+  (blockHashes: Cardano.BlockId[]) =&gt;
+    coldObservableProvider(<span class="fstat-no" title="function not covered" >() =</span>&gt; <span class="cstat-no" title="statement not covered" >chainHistoryProvider.blocksByHashes(blockHashes),</span> retryBackoffConfig).pipe(
       map((blocks) =&gt; blocks.map(({ epoch }) =&gt; epoch))
     );
 &nbsp;
 export type BlockEpochProvider = ReturnType&lt;typeof createBlockEpochProvider&gt;;
 &nbsp;
 export interface DelegationTrackerProps {
-  walletProvider: TrackedWalletProvider;
+  rewardsTracker: TrackedRewardsProvider;
   rewardAccountAddresses$: Observable&lt;Cardano.RewardAccount[]&gt;;
   stakePoolProvider: StakePoolProvider;
   timeSettings$: Observable&lt;TimeSettings[]&gt;;
@@ -372,7 +378,7 @@ export const certificateTransactionsWithEpochs = (
 export const createDelegationTracker = ({
   rewardAccountAddresses$,
   epoch$,
-  walletProvider,
+  rewardsTracker,
   retryBackoffConfig,
   transactionsTracker,
   timeSettings$,
@@ -380,11 +386,11 @@ export const createDelegationTracker = ({
   stores,
   internals: {
     queryStakePoolsProvider = createQueryStakePoolsProvider(stakePoolProvider, stores.stakePools, retryBackoffConfig),
-    rewardsHistoryProvider = createRewardsHistoryProvider(walletProvider, retryBackoffConfig),
+    rewardsHistoryProvider = createRewardsHistoryProvider(rewardsTracker, retryBackoffConfig),
     rewardsProvider = createRewardsProvider(
       epoch$,
       transactionsTracker.outgoing.confirmed$,
-      walletProvider,
+      rewardsTracker,
       retryBackoffConfig
     ),
     slotEpochCalc$ = timeSettings$.pipe(map((timeSettings) =&gt; createSlotEpochCalc(timeSettings)))
@@ -417,9 +423,9 @@ export const createDelegationTracker = ({
   return {
     rewardAccounts$,
     rewardsHistory$,
-    shutdown: <span class="fstat-no" title="function not covered" >() =</span>&gt; {
-<span class="cstat-no" title="statement not covered" >      rewardAccounts$.complete();</span>
-<span class="cstat-no" title="statement not covered" >      rewardsHistory$.complete();</span>
+    shutdown: () =&gt; {
+      rewardAccounts$.complete();
+      rewardsHistory$.complete();
     }
   };
 };
@@ -430,7 +436,7 @@ export const createDelegationTracker = ({
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at Tue May 31 2022 10:16:25 GMT+0000 (Coordinated Universal Time)
+                at Tue Jun 14 2022 12:40:38 GMT+0000 (Coordinated Universal Time)
             </div>
         <script src="../../../prettify.js"></script>
         <script>
