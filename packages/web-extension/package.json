@@ -31,6 +31,7 @@
     "lint": "eslint --ignore-path ../../.eslintignore \"**/*.ts\"",
     "lint:fix": "eslint --fix --ignore-path ../../.eslintignore \"**/*.ts\"",
     "test": "jest -c ./jest.config.js",
+    "test:build:verify": "tsc --build ./test",
     "test:e2e:build": "webpack -c e2e/webpack.config.js",
     "test:e2e:run": "wdio run e2e/wdio.conf.js",
     "test:e2e": "run-s test:e2e:build test:e2e:run",

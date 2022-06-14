@@ -39,6 +39,7 @@ jobs:
     - name: 🔬 Test
       run: |
         yarn test
+        yarn test:build:verify
 
     - name: 📦 Pack
       run: |

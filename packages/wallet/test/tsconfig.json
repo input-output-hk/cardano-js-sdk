@@ -1,12 +1,12 @@
 {
-  "extends": "../../../tsconfig.json",
+  "extends": "../../../test/tsconfig.json",
   "compilerOptions": {
     "baseUrl": "."
   },
+  "include": [
+    "../../cip2/test/util"
+  ],
   "references": [
-    {
-      "path": "../../cip2/test"
-    },
     {
       "path": "../src"
     },

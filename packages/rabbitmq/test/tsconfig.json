@@ -1,13 +1,21 @@
 {
-  "extends": "../../../tsconfig.json",
+  "extends": "../../../test/tsconfig.json",
   "compilerOptions": {
     "baseUrl": ".",
     "noUnusedLocals": false
   },
+  "include": [
+    "../../ogmios/test"
+  ],
   "references": [
-    { "path": "../../core/src" },
-    { "path": "../../ogmios/src" },
-    { "path": "../../ogmios/test" },
-    { "path": "../src" }
+    {
+      "path": "../../core/src"
+    },
+    {
+      "path": "../../ogmios/src"
+    },
+    {
+      "path": "../src"
+    }
   ]
 }

@@ -1,13 +1,23 @@
 {
-  "extends": "../../../tsconfig.json",
+  "extends": "../../../test/tsconfig.json",
   "compilerOptions": {
     "baseUrl": "."
   },
   "references": [
-    { "path": "../../cip30/src" },
-    { "path": "../../core/src" },
-    { "path": "../../util-dev/src" },
-    { "path": "../../wallet/src" },
-    { "path": "../src" }
+    {
+      "path": "../../cip30/src"
+    },
+    {
+      "path": "../../core/src"
+    },
+    {
+      "path": "../../util-dev/src"
+    },
+    {
+      "path": "../../wallet/src"
+    },
+    {
+      "path": "../src"
+    }
   ]
 }
