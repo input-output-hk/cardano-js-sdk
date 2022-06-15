@@ -1,4 +1,12 @@
-import { ActiveStakeModel, CirculatingSupplyModel, EpochModel, LiveStakeModel, TotalSupplyModel } from './types';
+import {
+  ActiveStakeModel,
+  CirculatingSupplyModel,
+  EpochModel,
+  LedgerTipModel,
+  LiveStakeModel,
+  TotalSupplyModel,
+  WalletProtocolParamsModel
+} from './types';
 import { Cardano } from '@cardano-sdk/core';
 import { Logger, dummyLogger } from 'ts-log';
 import { Pool, QueryResult } from 'pg';
@@ -39,5 +47,19 @@ export class NetworkInfoBuilder {
     this.#logger.debug('About to query the last epoch');
     const result: QueryResult<EpochModel> = await this.#db.query(Queries.findLatestCompleteEpoch);
     return result.rows[0].no;
+  }
+
+  public async queryLedgerTip() {
+    this.#logger.debug('About to query the ledger tip');
+    const result: QueryResult<LedgerTipModel> = await this.#db.query(Queries.findLedgerTip);
+    return result.rows[0];
+  }
+
+  public async queryCurrentWalletProtocolParams() {
+    this.#logger.debug('About to query current wallet protocol params');
+    const result: QueryResult<WalletProtocolParamsModel> = await this.#db.query(
+      Queries.findCurrentWalletProtocolParams
+    );
+    return result.rows[0];
   }
 }

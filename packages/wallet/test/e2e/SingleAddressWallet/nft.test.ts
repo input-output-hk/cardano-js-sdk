@@ -9,8 +9,7 @@ import {
   rewardsProvider,
   stakePoolProvider,
   txSubmitProvider,
-  utxoProvider,
-  walletProvider
+  utxoProvider
 } from '../config';
 import { combineLatest, filter, firstValueFrom, map, of } from 'rxjs';
 
@@ -44,8 +43,7 @@ describe('SingleAddressWallet.assets/nft', () => {
         rewardsProvider: await rewardsProvider,
         stakePoolProvider,
         txSubmitProvider: await txSubmitProvider,
-        utxoProvider: await utxoProvider,
-        walletProvider: await walletProvider
+        utxoProvider: await utxoProvider
       }
     );
   });

@@ -7,8 +7,7 @@ import {
   blockfrostNetworkInfoProvider,
   blockfrostRewardsProvider,
   blockfrostTxSubmitProvider,
-  blockfrostUtxoProvider,
-  blockfrostWalletProvider
+  blockfrostUtxoProvider
 } from '@cardano-sdk/blockfrost';
 import { Cardano } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
@@ -20,7 +19,6 @@ const networkIdOptions = [0, 1];
 const stakePoolProviderOptions = ['stub'];
 const networkInfoProviderOptions = ['blockfrost'];
 const txSubmitProviderOptions = ['blockfrost'];
-const walletProviderOptions = ['blockfrost'];
 const assetProviderOptions = ['blockfrost'];
 const utxoProviderOptions = ['blockfrost'];
 const rewardsProviderOptions = ['blockfrost'];
@@ -47,8 +45,7 @@ const env = envalid.cleanEnv(process.env, {
   TX_SUBMIT_HTTP_URL: envalid.url(),
   TX_SUBMIT_PROVIDER: envalid.str({ choices: txSubmitProviderOptions }),
   UTXO_PROVIDER: envalid.str({ choices: utxoProviderOptions }),
-  WALLET_PASSWORD: envalid.str(),
-  WALLET_PROVIDER: envalid.str({ choices: walletProviderOptions })
+  WALLET_PASSWORD: envalid.str()
 });
 const isTestnet = env.NETWORK_ID === 0;
 const networkId = Number.parseInt(process.env.NETWORK_ID || '');
@@ -58,7 +55,6 @@ const logger = console;
 
 // Sharing a single BlockFrostAPI object ensures rate limiting is shared across all blockfrost providers
 const blockfrostApi = [
-  env.WALLET_PROVIDER,
   env.TX_SUBMIT_PROVIDER,
   env.ASSET_PROVIDER,
   env.NETWORK_INFO_PROVIDER,
@@ -77,13 +73,6 @@ const blockfrostApi = [
       return blockfrost;
     })()
   : null;
-
-export const walletProvider = (async () => {
-  if (env.WALLET_PROVIDER === 'blockfrost') {
-    return blockfrostWalletProvider(await blockfrostApi!);
-  }
-  throw new Error(`WALLET_PROVIDER unsupported: ${env.WALLET_PROVIDER}`);
-})();
 
 export const utxoProvider = (async () => {
   if (env.UTXO_PROVIDER === 'blockfrost') {

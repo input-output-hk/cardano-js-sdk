@@ -1,5 +1,6 @@
 /* eslint-disable jsdoc/require-returns-type */
-import { currentEpoch, genesisParameters, ledgerTip, protocolParameters } from './mockData';
+import { genesisParameters, ledgerTip, protocolParameters } from './mockData';
+import { networkInfo } from './mockNetworkInfoProvider';
 import delay from 'delay';
 
 export const protocolParameters2 = {
@@ -17,22 +18,19 @@ export const ledgerTip2 = {
   blockNo: ledgerTip.blockNo + 1
 };
 
-export const currentEpochNo2 = currentEpoch.number + 1;
-
-export const delegate2 = 'pool167u07rzwu6dr40hx2pr4vh592vxp4zen9ct2p3h84wzqzv6fkgv';
-
 /**
  * A different provider stub for testing, supports delay to simulate network requests.
  *
- * @returns WalletProvider that returns data that is slightly different to mockWalletProvider.
+ * @returns NetworkInfoProvider that returns data that is slightly different to mockNetworkInfoProvider.
  */
-export const mockWalletProvider2 = (delayMs: number) => {
+export const mockNetworkInfoProvider2 = (delayMs: number) => {
   const delayedJestFn = <T>(resolvedValue: T) =>
     jest.fn().mockImplementation(() => delay(delayMs).then(() => resolvedValue));
 
   return {
     currentWalletProtocolParameters: delayedJestFn(protocolParameters2),
     genesisParameters: delayedJestFn(genesisParameters2),
-    ledgerTip: delayedJestFn(ledgerTip2)
+    ledgerTip: delayedJestFn(ledgerTip2),
+    networkInfo: jest.fn().mockResolvedValue(networkInfo)
   };
 };

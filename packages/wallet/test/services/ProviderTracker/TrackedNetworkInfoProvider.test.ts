@@ -44,5 +44,29 @@ describe('TrackedNetworkInfoProvider', () => {
         (stats) => stats.networkInfo$
       )
     );
+
+    test(
+      'currentWalletProtocolParameters',
+      testFunctionStats(
+        (wp) => wp.currentWalletProtocolParameters(),
+        (stats) => stats.currentWalletProtocolParameters$
+      )
+    );
+
+    test(
+      'genesisParameters',
+      testFunctionStats(
+        (wp) => wp.genesisParameters(),
+        (stats) => stats.genesisParameters$
+      )
+    );
+
+    test(
+      'ledgerTip',
+      testFunctionStats(
+        (wp) => wp.ledgerTip(),
+        (stats) => stats.ledgerTip$
+      )
+    );
   });
 });

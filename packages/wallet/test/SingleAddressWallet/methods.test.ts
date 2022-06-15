@@ -4,7 +4,7 @@ import { AssetId, createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { Cardano } from '@cardano-sdk/core';
 import { KeyManagement, SingleAddressWallet } from '../../src';
 import { firstValueFrom, skip } from 'rxjs';
-import { mockChainHistoryProvider, mockNetworkInfoProvider, mockRewardsProvider, utxo } from '../mocks';
+import { mockChainHistoryProvider, mockRewardsProvider, utxo } from '../mocks';
 import { waitForWalletStateSettle } from '../util';
 
 jest.mock('../../src/KeyManagement/cip8/cip30signData');
@@ -31,17 +31,16 @@ const outputs = [
 describe('SingleAddressWallet methods', () => {
   const address = mocks.utxo[0][0].address!;
   let txSubmitProvider: mocks.TxSubmitProviderStub;
-  let walletProvider: mocks.WalletProviderStub;
+  let networkInfoProvider: mocks.NetworkInfoProviderStub;
   let wallet: SingleAddressWallet;
   let utxoProvider: mocks.UtxoProviderStub;
 
   beforeEach(async () => {
     txSubmitProvider = mocks.mockTxSubmitProvider();
-    walletProvider = mocks.mockWalletProvider();
+    networkInfoProvider = mocks.mockNetworkInfoProvider();
     utxoProvider = mocks.mockUtxoProvider();
     const assetProvider = mocks.mockAssetProvider();
     const stakePoolProvider = createStubStakePoolProvider();
-    const networkInfoProvider = mockNetworkInfoProvider();
     const rewardsProvider = mockRewardsProvider();
     const chainHistoryProvider = mockChainHistoryProvider();
     const groupedAddress: KeyManagement.GroupedAddress = {
@@ -64,8 +63,7 @@ describe('SingleAddressWallet methods', () => {
         rewardsProvider,
         stakePoolProvider,
         txSubmitProvider,
-        utxoProvider,
-        walletProvider
+        utxoProvider
       }
     );
     await waitForWalletStateSettle(wallet);
@@ -182,12 +180,12 @@ describe('SingleAddressWallet methods', () => {
   });
 
   it('sync() calls wallet provider functions until shutdown()', () => {
-    expect(walletProvider.ledgerTip).toHaveBeenCalledTimes(1);
+    expect(networkInfoProvider.ledgerTip).toHaveBeenCalledTimes(1);
     wallet.sync();
-    expect(walletProvider.ledgerTip).toHaveBeenCalledTimes(2);
+    expect(networkInfoProvider.ledgerTip).toHaveBeenCalledTimes(2);
     wallet.shutdown();
     wallet.sync();
-    expect(walletProvider.ledgerTip).toHaveBeenCalledTimes(2);
+    expect(networkInfoProvider.ledgerTip).toHaveBeenCalledTimes(2);
   });
 
   it('signData calls cip30signData', async () => {
