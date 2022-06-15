@@ -106,7 +106,7 @@ export const consumeMessengerRemoteApi = <T extends object>(
           }
         } else if (propMetadata === RemoteApiPropertyType.MethodReturningPromise) {
           return (receiver[prop] = consumeMethod({ getErrorPrototype, propName }, { logger, messenger }));
-        } else if (propMetadata === RemoteApiPropertyType.Observable) {
+        } else if (propMetadata === RemoteApiPropertyType.HotObservable) {
           const observableMessenger = messenger.deriveChannel(propName);
           const messageData$ = observableMessenger.message$.pipe(map(({ data }) => fromSerializableObject(data)));
           const unsubscribe$ = messageData$.pipe(
@@ -188,7 +188,7 @@ export const bindObservableChannels = <API extends object>(
   { messenger }: MessengerApiDependencies
 ) => {
   const subscriptions = Object.entries(properties)
-    .filter(([, propType]) => propType === RemoteApiPropertyType.Observable)
+    .filter(([, propType]) => propType === RemoteApiPropertyType.HotObservable)
     .map(([observableProperty]) => {
       if (!isObservable(api[observableProperty as keyof API])) {
         throw new NotImplementedError(`Trying to expose non-implemented observable ${observableProperty}`);

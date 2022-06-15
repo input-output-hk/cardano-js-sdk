@@ -110,9 +110,9 @@ const setUp = (someNumbers$: Observable<bigint> = of(0n), nestedSomeNumbers$ = o
           }
         }
       },
-      nestedSomeNumbers$: RemoteApiPropertyType.Observable
+      nestedSomeNumbers$: RemoteApiPropertyType.HotObservable
     },
-    someNumbers$: RemoteApiPropertyType.Observable
+    someNumbers$: RemoteApiPropertyType.HotObservable
   };
   const hostMessenger = createMessenger(baseChannel, true);
   const hostSubscription = exposeMessengerApi(
@@ -130,10 +130,10 @@ const setUp = (someNumbers$: Observable<bigint> = of(0n), nestedSomeNumbers$ = o
       properties: {
         ...properties,
         nestedNonExposed: {
-          nestedNonExposed$: RemoteApiPropertyType.Observable
+          nestedNonExposed$: RemoteApiPropertyType.HotObservable
         },
         nonExposedMethod: RemoteApiPropertyType.MethodReturningPromise,
-        nonExposedObservable$: RemoteApiPropertyType.Observable
+        nonExposedObservable$: RemoteApiPropertyType.HotObservable
       }
     },
     { logger, messenger: createMessenger(baseChannel, false) }

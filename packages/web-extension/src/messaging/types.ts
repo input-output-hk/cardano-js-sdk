@@ -79,8 +79,13 @@ export interface PortMessage<Data = unknown> {
 
 export enum RemoteApiPropertyType {
   MethodReturningPromise,
-  // eslint-disable-next-line @typescript-eslint/no-shadow
-  Observable
+  /**
+   * Exposing this observable:
+   * - subscribes immediately
+   * - shares a single underlying subscription for all connections
+   * - replays 1 last emitted value upon connection
+   */
+  HotObservable
 }
 
 export interface MethodRequestOptions {

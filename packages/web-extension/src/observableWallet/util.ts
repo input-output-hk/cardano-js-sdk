@@ -4,45 +4,45 @@ import { RemoteApiProperties, RemoteApiPropertyType } from '../messaging';
 export const observableWalletChannel = (walletName: string) => `${walletName}$`;
 
 export const observableWalletProperties: RemoteApiProperties<ObservableWallet> = {
-  addresses$: RemoteApiPropertyType.Observable,
-  assets$: RemoteApiPropertyType.Observable,
+  addresses$: RemoteApiPropertyType.HotObservable,
+  assets$: RemoteApiPropertyType.HotObservable,
   balance: {
-    available$: RemoteApiPropertyType.Observable,
-    total$: RemoteApiPropertyType.Observable,
-    unspendable$: RemoteApiPropertyType.Observable
+    available$: RemoteApiPropertyType.HotObservable,
+    total$: RemoteApiPropertyType.HotObservable,
+    unspendable$: RemoteApiPropertyType.HotObservable
   },
-  currentEpoch$: RemoteApiPropertyType.Observable,
+  currentEpoch$: RemoteApiPropertyType.HotObservable,
   delegation: {
-    rewardAccounts$: RemoteApiPropertyType.Observable,
-    rewardsHistory$: RemoteApiPropertyType.Observable
+    rewardAccounts$: RemoteApiPropertyType.HotObservable,
+    rewardsHistory$: RemoteApiPropertyType.HotObservable
   },
   finalizeTx: RemoteApiPropertyType.MethodReturningPromise,
-  genesisParameters$: RemoteApiPropertyType.Observable,
+  genesisParameters$: RemoteApiPropertyType.HotObservable,
   getName: RemoteApiPropertyType.MethodReturningPromise,
   initializeTx: RemoteApiPropertyType.MethodReturningPromise,
-  networkInfo$: RemoteApiPropertyType.Observable,
-  protocolParameters$: RemoteApiPropertyType.Observable,
+  networkInfo$: RemoteApiPropertyType.HotObservable,
+  protocolParameters$: RemoteApiPropertyType.HotObservable,
   signData: RemoteApiPropertyType.MethodReturningPromise,
   submitTx: RemoteApiPropertyType.MethodReturningPromise,
   syncStatus: {
-    isAnyRequestPending$: RemoteApiPropertyType.Observable,
-    isSettled$: RemoteApiPropertyType.Observable,
-    isUpToDate$: RemoteApiPropertyType.Observable
+    isAnyRequestPending$: RemoteApiPropertyType.HotObservable,
+    isSettled$: RemoteApiPropertyType.HotObservable,
+    isUpToDate$: RemoteApiPropertyType.HotObservable
   },
-  tip$: RemoteApiPropertyType.Observable,
+  tip$: RemoteApiPropertyType.HotObservable,
   transactions: {
-    history$: RemoteApiPropertyType.Observable,
+    history$: RemoteApiPropertyType.HotObservable,
     outgoing: {
-      confirmed$: RemoteApiPropertyType.Observable,
-      failed$: RemoteApiPropertyType.Observable,
-      inFlight$: RemoteApiPropertyType.Observable,
-      pending$: RemoteApiPropertyType.Observable,
-      submitting$: RemoteApiPropertyType.Observable
+      confirmed$: RemoteApiPropertyType.HotObservable,
+      failed$: RemoteApiPropertyType.HotObservable,
+      inFlight$: RemoteApiPropertyType.HotObservable,
+      pending$: RemoteApiPropertyType.HotObservable,
+      submitting$: RemoteApiPropertyType.HotObservable
     }
   },
   utxo: {
-    available$: RemoteApiPropertyType.Observable,
-    total$: RemoteApiPropertyType.Observable,
-    unspendable$: RemoteApiPropertyType.Observable
+    available$: RemoteApiPropertyType.HotObservable,
+    total$: RemoteApiPropertyType.HotObservable,
+    unspendable$: RemoteApiPropertyType.HotObservable
   }
 };

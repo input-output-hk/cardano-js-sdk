@@ -5,7 +5,7 @@ export const keyAgentChannel = (walletName: string) => `${walletName}$-keyAgent`
 
 export const keyAgentProperties: RemoteApiProperties<KeyManagement.AsyncKeyAgent> = {
   deriveAddress: RemoteApiPropertyType.MethodReturningPromise,
-  knownAddresses$: RemoteApiPropertyType.Observable,
+  knownAddresses$: RemoteApiPropertyType.HotObservable,
   signBlob: RemoteApiPropertyType.MethodReturningPromise,
   signTransaction: RemoteApiPropertyType.MethodReturningPromise
 };
