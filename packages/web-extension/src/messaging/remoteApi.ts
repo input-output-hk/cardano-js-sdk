@@ -14,7 +14,19 @@ import {
   RequestMessage,
   ResponseMessage
 } from './types';
-import { EMPTY, Observable, filter, firstValueFrom, isObservable, map, merge, mergeMap, takeUntil, tap } from 'rxjs';
+import {
+  EMPTY,
+  Observable,
+  filter,
+  firstValueFrom,
+  isObservable,
+  map,
+  merge,
+  mergeMap,
+  shareReplay,
+  takeUntil,
+  tap
+} from 'rxjs';
 import { GetErrorPrototype, Shutdown, fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
 import { NotImplementedError } from '@cardano-sdk/core';
 import { TrackerSubject } from '@cardano-sdk/util-rxjs';
@@ -73,27 +85,27 @@ export const consumeMessengerRemoteApi = <T extends object>(
       shutdown: messenger.destroy
     } as T & Shutdown,
     {
-      get(target, prop) {
+      get(target, prop, receiver) {
         if (prop in target) return (target as any)[prop];
         const propMetadata = properties[prop as keyof ExposableRemoteApi<T>];
         const propName = prop.toString();
         if (typeof propMetadata === 'object') {
           if ('propType' in propMetadata) {
             if (propMetadata.propType === RemoteApiPropertyType.MethodReturningPromise) {
-              return consumeMethod(
+              return (receiver[prop] = consumeMethod(
                 { getErrorPrototype, options: propMetadata.requestOptions, propName },
                 { logger, messenger }
-              );
+              ));
             }
             throw new NotImplementedError('Only MethodReturningPromise prop type can be specified as object');
           } else {
-            return consumeMessengerRemoteApi(
+            return (receiver[prop] = consumeMessengerRemoteApi(
               { getErrorPrototype, properties: propMetadata as any },
               { logger, messenger: messenger.deriveChannel(propName) }
-            );
+            ));
           }
         } else if (propMetadata === RemoteApiPropertyType.MethodReturningPromise) {
-          return consumeMethod({ getErrorPrototype, propName }, { logger, messenger });
+          return (receiver[prop] = consumeMethod({ getErrorPrototype, propName }, { logger, messenger }));
         } else if (propMetadata === RemoteApiPropertyType.Observable) {
           const observableMessenger = messenger.deriveChannel(propName);
           const messageData$ = observableMessenger.message$.pipe(map(({ data }) => fromSerializableObject(data)));
@@ -104,12 +116,13 @@ export const consumeMessengerRemoteApi = <T extends object>(
               if (error) throw error;
             })
           );
-          return messageData$
+          return (receiver[prop] = messageData$
             .pipe(
               filter(isEmitMessage),
-              map(({ emit }) => emit)
+              map(({ emit }) => emit),
+              shareReplay(1)
             )
-            .pipe(takeUntil(unsubscribe$));
+            .pipe(takeUntil(unsubscribe$)));
         }
       },
       has(_, p) {

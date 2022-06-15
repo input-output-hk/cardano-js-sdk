@@ -171,7 +171,17 @@ describe('remoteApi', () => {
       sut = setUp();
     });
 
+    it('accessing property returns the same function object', () => {
+      expect(sut.consumer.addOne).toBe(sut.consumer.addOne);
+      expect(sut.consumer.addOneTransformedToAddTwo).toBe(sut.consumer.addOneTransformedToAddTwo);
+    });
+
     describe('nested property', () => {
+      it('accessing property returns the same function object', () => {
+        expect(sut.consumer.nested.addOneNoZero).toBe(sut.consumer.nested.addOneNoZero);
+        expect(sut.consumer.nested.nestedSomeNumbers$).toBe(sut.consumer.nested.nestedSomeNumbers$);
+      });
+
       it('calls remote method and resolves result', async () => {
         expect(await sut.consumer.nested.addOneNoZero(2n)).toBe(3n);
       });
@@ -221,6 +231,10 @@ describe('remoteApi', () => {
       nestedSomeNumbersSource$.complete();
     });
 
+    it('accessing property returns the same observable object', () => {
+      expect(sut.consumer.someNumbers$).toBe(sut.consumer.someNumbers$);
+    });
+
     describe('top level property', () => {
       describe('mirrors source emissions and completion', () => {
         it('values emitted after subscription', (done) => {
@@ -238,13 +252,17 @@ describe('remoteApi', () => {
           someNumbersSource$.next(-1n);
           someNumbersSource$.next(0n);
           setTimeout(() => {
-            const emitted = firstValueFrom(sut.consumer.someNumbers$.pipe(toArray()));
+            const emittedFromSubscriptionBeforeConnect = firstValueFrom(sut.consumer.someNumbers$.pipe(toArray()));
             sut.hostMessenger.connect();
-            setTimeout(async () => {
-              someNumbersSource$.next(1n);
-              someNumbersSource$.complete();
-              expect(await emitted).toEqual([0n, 1n]);
-              done();
+            setTimeout(() => {
+              const emittedFromSubscriptionAfterConnect = firstValueFrom(sut.consumer.someNumbers$.pipe(toArray()));
+              setTimeout(async () => {
+                someNumbersSource$.next(1n);
+                someNumbersSource$.complete();
+                expect(await emittedFromSubscriptionBeforeConnect).toEqual([0n, 1n]);
+                expect(await emittedFromSubscriptionBeforeConnect).toEqual(await emittedFromSubscriptionAfterConnect);
+                done();
+              }, 1);
             }, 1);
           }, 1);
         });
