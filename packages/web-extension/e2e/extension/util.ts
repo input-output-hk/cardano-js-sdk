@@ -22,7 +22,7 @@ export interface BackgroundServices {
 }
 
 export const adaPriceProperties: RemoteApiProperties<BackgroundServices> = {
-  adaUsd$: RemoteApiPropertyType.Observable,
+  adaUsd$: RemoteApiPropertyType.HotObservable,
   clearAllowList: RemoteApiPropertyType.MethodReturningPromise
 };
 
