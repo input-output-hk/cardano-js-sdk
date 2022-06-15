@@ -61,7 +61,7 @@
     "@wdio/static-server-service": "^7.19.5",
     "babel-loader": "^8.2.5",
     "blake2b-no-wasm": "2.1.4",
-    "chromedriver": "^100.0.0",
+    "chromedriver": "^102.0.0",
     "copy-webpack-plugin": "^10.2.4",
     "dotenv": "^16.0.0",
     "expect-webdriverio": "^3.2.1",
