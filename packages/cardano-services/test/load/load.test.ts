@@ -1,7 +1,7 @@
 import * as envalid from 'envalid';
 import { Cardano } from '@cardano-sdk/core';
 import { ChildProcess, fork } from 'child_process';
-import { ObservableWallet, SingleAddressWallet } from '@cardano-sdk/wallet';
+import { InitializeTxResult, ObservableWallet, SingleAddressWallet } from '@cardano-sdk/wallet';
 import { ServiceNames } from '../../src';
 import {
   assetProvider,
@@ -17,6 +17,7 @@ import {
 } from '../../../wallet/test/e2e/config';
 import { filter, firstValueFrom } from 'rxjs';
 import { removeRabbitMQContainer, setupRabbitMQContainer } from '../../../rabbitmq/test/jest-setup/docker';
+import JSONBig from 'json-bigint';
 import path from 'path';
 
 interface TestOptions {
@@ -28,7 +29,7 @@ interface TestOptions {
 interface TestReport extends TestOptions {
   timeBeforeSubmitTxs: number;
   timeAfterWorkerStarted: number;
-  timeAfterTxsInMempool: number; // TODO: will work after https://input-output.atlassian.net/browse/ADP-1823
+  timeAfterTxsInMempool: number;
   timeAfterTxsInBlockchain: number;
 }
 
@@ -141,7 +142,9 @@ describe('load', () => {
     wallet = await getWallet();
     ({ address } = (await firstValueFrom(wallet.addresses$))[0]);
 
+    logger.debug('Waiting to settle wallet status');
     await firstValueFrom(wallet.syncStatus.isSettled$.pipe(filter((isSettled) => isSettled)));
+    logger.debug('Wallet status settled');
   };
 
   const waitForTxInBlockchain = (txId: Cardano.TransactionId) =>
@@ -164,9 +167,9 @@ describe('load', () => {
       });
 
       logger.info(`Fragmentation tx: ${tx.hash}`);
-
       await wallet.submitTx(await wallet.finalizeTx(tx));
       await waitForTxInBlockchain(tx.hash);
+      logger.info('Fragmentation completed');
     };
 
     if (options.directlyToOgmios) await fragment();
@@ -220,50 +223,70 @@ describe('load', () => {
   afterEach(stopWorker);
 
   const performTest = async (options: TestOptions) => {
-    const { directlyToOgmios, withRunningWorker } = options;
+    const { directlyToOgmios, parallel, withRunningWorker } = options;
     const submitPromises: Promise<void>[] = [];
     const txIds: Cardano.TransactionId[] = [];
     let timeAfterWorkerStarted = 0;
     let timeBeforeSubmitTxs = 0;
 
-    await fragmentWhenRequired(options);
+    try {
+      logger.debug(`Starting test with options: ${JSON.stringify({ directlyToOgmios, parallel, withRunningWorker })}`);
 
-    const startWorkerForTest = async () => {
-      if (!directlyToOgmios) await startWorker(options);
-      timeAfterWorkerStarted = Date.now();
-    };
+      await fragmentWhenRequired(options);
 
-    const submitTransactions = async () => {
-      timeBeforeSubmitTxs = Date.now();
-      for (let i = 0; i < env.TRANSACTIONS_NUMBER; ++i) {
-        const coins = 1_000_000n + 1000n * BigInt(i);
-        const tx = await wallet.initializeTx({ outputs: new Set([{ address, value: { coins } }]) });
+      const startWorkerForTest = async () => {
+        if (!directlyToOgmios) await startWorker(options);
+        timeAfterWorkerStarted = Date.now();
+      };
 
-        submitPromises.push(wallet.submitTx(await wallet.finalizeTx(tx)));
-        txIds.push(tx.hash);
+      const finalizeAndSubmit = async (tx: InitializeTxResult) => {
+        try {
+          await wallet.submitTx(await wallet.finalizeTx(tx));
+        } catch (error) {
+          logger.error(JSONBig.stringify(tx), error);
+          throw error;
+        }
+      };
+
+      const submitTransactions = async () => {
+        timeBeforeSubmitTxs = Date.now();
+        for (let i = 0; i < env.TRANSACTIONS_NUMBER; ++i) {
+          const coins = 1_000_000n + 1000n * BigInt(i);
+          const tx = await wallet.initializeTx({ outputs: new Set([{ address, value: { coins } }]) });
+
+          submitPromises.push(finalizeAndSubmit(tx));
+          txIds.push(tx.hash);
+        }
+      };
+
+      if (withRunningWorker) {
+        await startWorkerForTest();
+        await submitTransactions();
+      } else {
+        await submitTransactions();
+        await startWorkerForTest();
       }
-    };
 
-    if (withRunningWorker) {
-      await startWorkerForTest();
-      await submitTransactions();
-    } else {
-      await submitTransactions();
-      await startWorkerForTest();
+      await expect(Promise.all(submitPromises)).resolves.not.toThrow();
+      const timeAfterTxsInMempool = Date.now();
+
+      await Promise.all(txIds.map((txId) => waitForTxInBlockchain(txId)));
+
+      testReports.push({
+        ...options,
+        timeAfterTxsInBlockchain: Date.now(),
+        timeAfterTxsInMempool,
+        timeAfterWorkerStarted,
+        timeBeforeSubmitTxs
+      });
+
+      logger.debug(`Completed test with options: ${JSON.stringify({ directlyToOgmios, parallel, withRunningWorker })}`);
+    } catch (error) {
+      logger.error(
+        `Failed test with options: ${JSON.stringify({ directlyToOgmios, parallel, withRunningWorker })}`,
+        error
+      );
     }
-
-    await Promise.all(submitPromises);
-    const timeAfterTxsInMempool = Date.now();
-
-    await Promise.all(txIds.map((txId) => waitForTxInBlockchain(txId)));
-
-    testReports.push({
-      ...options,
-      timeAfterTxsInBlockchain: Date.now(),
-      timeAfterTxsInMempool,
-      timeAfterWorkerStarted,
-      timeBeforeSubmitTxs
-    });
   };
 
   describe('directly to ogmios', () => {

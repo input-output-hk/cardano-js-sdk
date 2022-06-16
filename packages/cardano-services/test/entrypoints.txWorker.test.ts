@@ -1,5 +1,5 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import { BAD_CONNECTION_URL, enqueueFakeTx, removeAllMessagesFromQueue } from '../../rabbitmq/test/utils';
+import { BAD_CONNECTION_URL, enqueueFakeTx, removeAllQueues } from '../../rabbitmq/test/utils';
 import { ChildProcess, fork } from 'child_process';
 import { createConnectionObject } from '@cardano-ogmios/client';
 import { createHealthyMockOgmiosServer, ogmiosServerReady } from './util';
@@ -52,46 +52,32 @@ describe('tx-worker entrypoints', () => {
   afterAll(async () => await serverClosePromise(ogmiosServer));
 
   beforeEach(async () => {
-    await removeAllMessagesFromQueue();
-    await enqueueFakeTx();
-    await enqueueFakeTx();
+    await removeAllQueues();
     hookLogs = [];
     loggerHookCounter = 0;
   });
 
   afterEach((done) => {
     resetHook();
-    if (proc?.kill()) proc.on('close', done);
+    if (proc?.kill()) proc.on('close', () => done());
     else done();
   });
 
   // Tests without any assertion fail if they get timeout
   // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('with a working RabbitMQ server', () => {
-    describe('worker starts', () => {
-      it('cli:start-worker', (done) => {
-        proc = fork(exePath('cli'), commonArgs, { stdio: 'pipe' });
-        proc.stdout!.on('data', (data) => (data.toString().match('RabbitMQ transactions worker') ? done() : null));
-      });
-
-      it('startWorker', (done) => {
-        hook = done;
-        proc = fork(exePath('startWorker'), { env: commonEnv, stdio: 'pipe' });
-      });
-    });
-
     describe('transaction are actually submitted', () => {
-      it('cli:start-worker submits transactions', () =>
-        new Promise<void>(async (resolve) => {
-          hook = resolve;
-          proc = fork(exePath('cli'), commonArgs, { stdio: 'pipe' });
-        }));
+      it('cli:start-worker submits transactions', async () => {
+        hookPromise = new Promise((resolve) => (hook = resolve));
+        proc = fork(exePath('cli'), commonArgs, { stdio: 'pipe' });
+        await Promise.all([hookPromise, enqueueFakeTx()]);
+      });
 
-      it('startWorker submits transactions', () =>
-        new Promise<void>(async (resolve) => {
-          hook = resolve;
-          proc = fork(exePath('startWorker'), { env: commonEnv, stdio: 'pipe' });
-        }));
+      it('startWorker submits transactions', async () => {
+        hookPromise = new Promise((resolve) => (hook = resolve));
+        proc = fork(exePath('startWorker'), { env: commonEnv, stdio: 'pipe' });
+        await Promise.all([hookPromise, enqueueFakeTx()]);
+      });
     });
 
     describe('parallel option', () => {
@@ -104,7 +90,9 @@ describe('tx-worker entrypoints', () => {
         it('startWorker starts in serial mode', async () => {
           [hook, hookPromise] = loggerHook();
           proc = fork(exePath('startWorker'), { env: commonEnv, stdio: 'pipe' });
+          const txPromises = [enqueueFakeTx(0), enqueueFakeTx(1)];
           await hookPromise;
+          await Promise.all(txPromises);
           expect(hookLogs).toEqual(['Processing tx 1', 'Processed tx 1', 'Processing tx 2', 'Processed tx 2']);
         });
       });
@@ -114,7 +102,7 @@ describe('tx-worker entrypoints', () => {
           expect.assertions(2);
           proc = fork(exePath('cli'), [...commonArgs, '--parallel', 'test'], { stdio: 'pipe' });
           proc.stderr!.on('data', (data) =>
-            expect(data.toString()).toMatch('tx-submit requires a valid Parallel mode')
+            expect(data.toString()).toMatch('RabbitMQ worker requires a valid Parallel mode')
           );
           proc.on('exit', (code) => {
             expect(code).toBe(1);
@@ -141,7 +129,9 @@ describe('tx-worker entrypoints', () => {
         it('startWorker starts in serial mode', async () => {
           [hook, hookPromise] = loggerHook();
           proc = fork(exePath('startWorker'), { env: { ...commonEnv, PARALLEL: 'false' }, stdio: 'pipe' });
+          const txPromises = [enqueueFakeTx(0), enqueueFakeTx(1)];
           await hookPromise;
+          await Promise.all(txPromises);
           expect(hookLogs).toEqual(['Processing tx 1', 'Processed tx 1', 'Processing tx 2', 'Processed tx 2']);
         });
       });
@@ -155,7 +145,9 @@ describe('tx-worker entrypoints', () => {
         it('startWorker starts in parallel mode', async () => {
           [hook, hookPromise] = loggerHook();
           proc = fork(exePath('startWorker'), { env: { ...commonEnv, PARALLEL: 'true' }, stdio: 'pipe' });
+          const txPromises = [enqueueFakeTx(0), enqueueFakeTx(1)];
           await hookPromise;
+          await Promise.all(txPromises);
           expect(hookLogs).toEqual(['Processing tx 1', 'Processing tx 2', 'Processed tx 1', 'Processed tx 2']);
         });
       });
