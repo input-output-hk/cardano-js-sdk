@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">98.92% </span>
+                <span class="strong">98.94% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>92/93</span>
+                <span class='fraction'>94/95</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">94.11% </span>
+                <span class="strong">94.44% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>16/17</span>
+                <span class='fraction'>17/18</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>75/75</span>
+                <span class='fraction'>76/76</span>
             </div>
         
             
@@ -836,7 +836,27 @@
 <a name='L771'></a><a href='#L771'>771</a>
 <a name='L772'></a><a href='#L772'>772</a>
 <a name='L773'></a><a href='#L773'>773</a>
-<a name='L774'></a><a href='#L774'>774</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L774'></a><a href='#L774'>774</a>
+<a name='L775'></a><a href='#L775'>775</a>
+<a name='L776'></a><a href='#L776'>776</a>
+<a name='L777'></a><a href='#L777'>777</a>
+<a name='L778'></a><a href='#L778'>778</a>
+<a name='L779'></a><a href='#L779'>779</a>
+<a name='L780'></a><a href='#L780'>780</a>
+<a name='L781'></a><a href='#L781'>781</a>
+<a name='L782'></a><a href='#L782'>782</a>
+<a name='L783'></a><a href='#L783'>783</a>
+<a name='L784'></a><a href='#L784'>784</a>
+<a name='L785'></a><a href='#L785'>785</a>
+<a name='L786'></a><a href='#L786'>786</a>
+<a name='L787'></a><a href='#L787'>787</a>
+<a name='L788'></a><a href='#L788'>788</a>
+<a name='L789'></a><a href='#L789'>789</a>
+<a name='L790'></a><a href='#L790'>790</a>
+<a name='L791'></a><a href='#L791'>791</a>
+<a name='L792'></a><a href='#L792'>792</a>
+<a name='L793'></a><a href='#L793'>793</a>
+<a name='L794'></a><a href='#L794'>794</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1143,6 +1163,26 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">294x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1854,72 +1894,92 @@ LEFT JOIN owners_total_utxos otu on
 where id = ANY($1)
 `;
 &nbsp;
-export const findPoolEpochRewards = (limit?: number) =&gt; `
+const epochRewardsSubqueries = (limit?: number) =&gt; `
 WITH epochs AS (
 	SELECT 
-		"no",
+	  "no" AS epoch_no,
 		(extract(epoch FROM (end_time - start_time)) * 1000) AS epoch_length
-	FROM epoch 
+	FROM epoch
 	ORDER BY id DESC
   ${limit !== undefined ? `LIMIT ${limit}` : ''}
 ),
-total_stake_per_epoch AS (
-  SELECT 
-      e."no" AS epoch_no,
-      sum(es.amount) AS active_stake
-    FROM epochs e
-    LEFT JOIN epoch_stake es on
-      es.epoch_no  = e."no" and 
-      es.pool_id = $1
-    GROUP BY e."no"
-  ),
-  total_rewards_per_epoch AS (
-  SELECT 
-    sum(r.amount) AS total_amount,
-    e."no" AS epoch_no
-  FROM  epochs e
-  LEFT JOIN reward r on
-    r.earned_epoch = e."no" and 
-    r.pool_id = $1
-  GROUP BY e."no"
-  )
-  SELECT 
-    rewards.epoch_no,
-    e.epoch_length,
-    COALESCE(rewards.total_amount,0) AS total_rewards,
-    CASE
-    WHEN update.fixed_cost &gt;= rewards.total_amount
-    THEN rewards.total_amount
-    ELSE (
-      COALESCE (FLOOR((rewards.total_amount-update.fixed_cost) * update.margin) + update.fixed_cost,0)
-    )
-    END AS operator_fees,
-    COALESCE(total_stake.active_stake,0) AS active_stake,
-    CASE
-    WHEN update.fixed_cost &gt;= rewards.total_amount
-    THEN (
-      COALESCE((rewards.total_amount - (rewards.total_amount + update.fixed_cost))
-      /total_stake.active_stake, 0)
-    )
-    ELSE (
-      COALESCE((rewards.total_amount - (((rewards.total_amount-update.fixed_cost) * update.margin) + update.fixed_cost))
-      /total_stake.active_stake, 0)
-    ) END AS member_roi
-  FROM total_rewards_per_epoch rewards
-  JOIN epochs e on 
-    e."no" = rewards.epoch_no
-  LEFT JOIN total_stake_per_epoch total_stake on 
-    rewards.epoch_no = total_stake.epoch_no
-  JOIN pool_update update
-    ON update.id = (
+pool_rewards_per_epoch AS (
+	SELECT
+		reward.pool_id AS hash_id,
+		epochs.epoch_no,
+		SUM(reward.amount) AS total_amount
+	FROM epochs
+	JOIN reward 
+		ON reward.earned_epoch = epochs.epoch_no
+		AND reward.pool_id = ANY($1)
+	GROUP BY reward.pool_id, epochs.epoch_no
+),
+pool_stake_per_epoch AS (
+	SELECT
+		epoch_stake.pool_id AS hash_id,
+		epochs.epoch_no,
+    SUM(epoch_stake.amount) AS active_stake
+	FROM epochs
+	JOIN epoch_stake 
+		ON epoch_stake.epoch_no = epochs.epoch_no
+		AND epoch_stake.pool_id = ANY($1)
+	GROUP BY epoch_stake.pool_id, epochs.epoch_no
+),
+epoch_rewards AS (
+	SELECT 
+		epochs.epoch_no,
+		epochs.epoch_length::TEXT,
+		stake.hash_id,
+		COALESCE(rewards.total_amount, 0) AS total_rewards,
+		COALESCE(stake.active_stake, 0) AS active_stake,		
+		CASE 
+			WHEN pool.fixed_cost &gt;= rewards.total_amount
+	    	THEN COALESCE(rewards.total_amount, 0)
+	    	ELSE (
+	      	COALESCE(
+	      		FLOOR((rewards.total_amount - pool.fixed_cost) * pool.margin) + pool.fixed_cost
+	      	, 0)
+	    	) 
+		END AS operator_fees,
+		CASE 
+			WHEN COALESCE(stake.active_stake, 0) = 0
+				THEN 0
+			WHEN pool.fixed_cost &gt;= rewards.total_amount
+		    THEN (
+		      COALESCE(
+		      	(rewards.total_amount - COALESCE(rewards.total_amount, 0)) / stake.active_stake
+		      , 0)
+		    )
+		    ELSE (
+		      COALESCE(
+						(rewards.total_amount - 
+							COALESCE(
+	      				FLOOR((rewards.total_amount - pool.fixed_cost) * pool.margin) + pool.fixed_cost
+	      			, 0)) / stake.active_stake
+		      , 0)
+		    ) END AS member_roi
+  FROM pool_stake_per_epoch AS stake 
+  JOIN epochs 
+  	ON epochs.epoch_no = stake.epoch_no
+  LEFT JOIN pool_rewards_per_epoch AS rewards
+  	ON rewards.epoch_no = stake.epoch_no
+  	AND rewards.hash_id = stake.hash_id
+  JOIN pool_update AS pool
+    ON pool.id = (
       SELECT id
-      FROM pool_update pu2
-      WHERE pu2.hash_id = $1 
-        and pu2.active_epoch_no &lt;= rewards.epoch_no
+      FROM pool_update
+      WHERE hash_id = stake.hash_id 
+        AND active_epoch_no &lt;= epochs.epoch_no
       ORDER BY id DESC
       LIMIT 1
     )
-   order by rewards.epoch_no desc
+)`;
+&nbsp;
+export const findPoolEpochRewards = (limit?: number) =&gt; `
+  ${epochRewardsSubqueries(limit)}
+  SELECT * 
+  FROM epoch_rewards
+  ORDER BY epoch_no desc
 `;
 &nbsp;
 export const findPools = `
@@ -2389,7 +2449,7 @@ export default Queries;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at Thu Jun 16 2022 07:47:15 GMT+0000 (Coordinated Universal Time)
+                at Thu Jun 16 2022 08:38:52 GMT+0000 (Coordinated Universal Time)
             </div>
         <script src="../../../prettify.js"></script>
         <script>
