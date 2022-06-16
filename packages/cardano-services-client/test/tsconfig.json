@@ -1,7 +1,17 @@
 {
-  "extends": "../../../tsconfig.json",
+  "extends": "../../../test/tsconfig.json",
   "compilerOptions": {
     "baseUrl": "."
   },
-  "references": [{ "path": "../src" }, { "path": "../../core/src" }, { "path": "../../util/src" }]
+  "references": [
+    {
+      "path": "../src"
+    },
+    {
+      "path": "../../core/src"
+    },
+    {
+      "path": "../../util/src"
+    }
+  ]
 }
