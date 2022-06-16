@@ -59,7 +59,7 @@ export interface EpochReward {
 
 export interface EpochRewardModel {
   epoch_no: number;
-  epoch_length: number;
+  epoch_length: string;
   operator_fees: string;
   active_stake: string;
   member_roi: number;

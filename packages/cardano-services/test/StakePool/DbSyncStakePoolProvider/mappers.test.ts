@@ -74,7 +74,7 @@ describe('mappers', () => {
   };
   const epochRewardModel = {
     active_stake: '10000000',
-    epoch_length: 10_000_000,
+    epoch_length: '10000000',
     epoch_no: 2,
     member_roi: 0.000_000_05,
     operator_fees: '233333333',
@@ -154,7 +154,7 @@ describe('mappers', () => {
       epochReward: {
         activeStake: BigInt(epochRewardModel.active_stake),
         epoch: epochRewardModel.epoch_no,
-        epochLength: epochRewardModel.epoch_length,
+        epochLength: Number(epochRewardModel.epoch_length),
         memberROI: epochRewardModel.member_roi,
         operatorFees: BigInt(epochRewardModel.operator_fees),
         totalRewards: BigInt(epochRewardModel.total_rewards)
