@@ -2,7 +2,7 @@ import { connect } from 'amqplib';
 import { imageExists, pullImageAsync } from 'dockerode-utils';
 import Docker from 'dockerode';
 
-const CONTAINER_IMAGE = 'rabbitmq:3.8-alpine';
+const CONTAINER_IMAGE = 'rabbitmq:3.10-management';
 const CONTAINER_NAME = 'cardano-rabbitmq-test';
 
 export const removeRabbitMQContainer = async (containerName = CONTAINER_NAME) => {
@@ -34,7 +34,7 @@ export const setupRabbitMQContainer = async (containerName = CONTAINER_NAME, por
   await removeRabbitMQContainer(containerName);
 
   const container = await docker.createContainer({
-    HostConfig: { PortBindings: { '5672/tcp': [{ HostPort: `${port}` }] } },
+    HostConfig: { PortBindings: { '5672/tcp': [{ HostPort: `${port}` }], '15672/tcp': [{ HostPort: '15672' }] } },
     Image: CONTAINER_IMAGE,
     name: containerName
   });

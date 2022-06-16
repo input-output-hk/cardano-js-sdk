@@ -1,30 +1,56 @@
-import { BAD_CONNECTION_URL, GOOD_CONNECTION_URL, enqueueFakeTx, removeAllMessagesFromQueue } from './utils';
-import { TxSubmitProvider } from '@cardano-sdk/core';
-import { TxSubmitWorker } from '../src';
+import {
+  BAD_CONNECTION_URL,
+  GOOD_CONNECTION_URL,
+  enqueueFakeTx,
+  removeAllQueues,
+  testLogger,
+  txsPromise
+} from './utils';
+import { Cardano, ProviderError, TxSubmitProvider } from '@cardano-sdk/core';
+import { RabbitMqTxSubmitProvider, TxSubmitWorker } from '../src';
 import {
   createMockOgmiosServer,
   listenPromise,
   serverClosePromise
 } from '@cardano-sdk/ogmios/test/mocks/mockOgmiosServer';
-import { dummyLogger } from 'ts-log';
 import { getRandomPort } from 'get-port-please';
 import { ogmiosTxSubmitProvider, urlToConnectionConfig } from '@cardano-sdk/ogmios';
-import { removeRabbitMQContainer, setupRabbitMQContainer } from './jest-setup/docker';
 import http from 'http';
 
-const logger = dummyLogger;
-
 describe('TxSubmitWorker', () => {
-  let txSubmitProvider: TxSubmitProvider;
+  let logger: ReturnType<typeof testLogger>;
+  let mock: http.Server | undefined;
   let port: number;
+  let txSubmitProvider: TxSubmitProvider;
+  let worker: TxSubmitWorker | undefined;
 
   beforeAll(async () => {
     port = await getRandomPort();
     txSubmitProvider = ogmiosTxSubmitProvider(urlToConnectionConfig(new URL(`http://localhost:${port}/`)));
   });
 
+  beforeEach(async () => {
+    await removeAllQueues();
+    logger = testLogger();
+  });
+
+  afterEach(async () => {
+    if (mock) {
+      await serverClosePromise(mock);
+      mock = undefined;
+    }
+
+    if (worker) {
+      await worker.stop();
+      worker = undefined;
+    }
+
+    // Uncomment this to have evidence of all the log messages
+    // console.log(logger.messages);
+  });
+
   it('is safe to call stop method on an idle worker', async () => {
-    const worker = new TxSubmitWorker({ rabbitmqUrl: GOOD_CONNECTION_URL }, { logger, txSubmitProvider });
+    worker = new TxSubmitWorker({ rabbitmqUrl: GOOD_CONNECTION_URL }, { logger, txSubmitProvider });
 
     expect(worker).toBeInstanceOf(TxSubmitWorker);
     expect(worker.getStatus()).toEqual('idle');
@@ -33,190 +59,148 @@ describe('TxSubmitWorker', () => {
   });
 
   it('rejects if the TxSubmitProvider is unhealthy on start', async () => {
-    const worker = new TxSubmitWorker({ rabbitmqUrl: GOOD_CONNECTION_URL }, { logger, txSubmitProvider });
-
-    const unhealthyMock = createMockOgmiosServer({
+    mock = createMockOgmiosServer({
       healthCheck: { response: { networkSynchronization: 0.8, success: true } },
       submitTx: { response: { success: true } }
     });
 
-    await listenPromise(unhealthyMock, port);
+    await listenPromise(mock, port);
 
-    try {
-      const res = await worker.start();
-      expect(res).toBeDefined();
-    } catch (error) {
-      expect(error).toBeDefined();
-    }
+    worker = new TxSubmitWorker({ rabbitmqUrl: GOOD_CONNECTION_URL }, { logger, txSubmitProvider });
 
-    await serverClosePromise(unhealthyMock);
+    await expect(worker.start()).rejects.toBeInstanceOf(ProviderError);
   });
 
   it('rejects if unable to connect to the RabbitMQ broker', async () => {
-    const worker = new TxSubmitWorker({ rabbitmqUrl: BAD_CONNECTION_URL }, { logger, txSubmitProvider });
-    const healthyMock = createMockOgmiosServer({
+    mock = createMockOgmiosServer({
       healthCheck: { response: { networkSynchronization: 1, success: true } },
       submitTx: { response: { success: true } }
     });
 
-    await listenPromise(healthyMock, port);
+    await listenPromise(mock, port);
 
-    try {
-      const res = await worker.start();
-      expect(res).toBeDefined();
-    } catch (error) {
-      expect(error).toBeDefined();
-    }
+    worker = new TxSubmitWorker({ rabbitmqUrl: BAD_CONNECTION_URL }, { logger, txSubmitProvider });
 
-    await serverClosePromise(healthyMock);
+    await expect(worker.start()).rejects.toBeInstanceOf(ProviderError);
   });
 
-  describe('RabbitMQ connection failure while running', () => {
-    const CONTAINER_NAME = 'cardano-rabbitmq-local-test';
+  describe('error while tx submission', () => {
+    describe('tx submission is retried if the error is retiable', () => {
+      // eslint-disable-next-line unicorn/consistent-function-scoping
+      const performTest = async (options: { parallel: boolean }) => {
+        const spy = jest.fn();
+        let hookAlreadyCalled = false;
+        let successMockListenPromise = Promise.resolve<http.Server>(new http.Server());
+        let successMock = new http.Server();
 
-    const performTest = async (options: { parallel: boolean }) => {
-      const healthyMock = createMockOgmiosServer({
-        healthCheck: { response: { networkSynchronization: 1, success: true } },
-        submitTx: { response: { success: true } }
-      });
+        const failMock = createMockOgmiosServer({
+          healthCheck: { response: { networkSynchronization: 1, success: true } },
+          submitTx: { response: { failWith: { type: 'beforeValidityInterval' }, success: false } },
+          submitTxHook: () => {
+            // eslint-disable-next-line @typescript-eslint/no-floating-promises
+            (async () => {
+              if (hookAlreadyCalled) return;
 
-      await listenPromise(healthyMock, port);
+              // This hook may be called multple times... ensure the core is executed only once
+              hookAlreadyCalled = true;
 
-      // Set up a new RabbitMQ container to test TxSubmitWorker on RabbitMQ server shut down
-      const rabbitmqPort = await getRandomPort();
-      await setupRabbitMQContainer(CONTAINER_NAME, rabbitmqPort);
+              // Stop the failing mock and start the succes one
+              await serverClosePromise(failMock);
+              successMockListenPromise = listenPromise(successMock, port);
+            })();
+          }
+        });
 
-      // Actually create the TxSubmitWorker
-      const worker = new TxSubmitWorker(
-        { rabbitmqUrl: new URL(`amqp://localhost:${rabbitmqPort}`), ...options },
-        { logger, txSubmitProvider }
-      );
-      const startPromise = worker.start();
+        // Start a failing ogmios server
+        await listenPromise(failMock, port);
 
-      // Wait until the worker is connected to the RabbitMQ server
-      await new Promise<void>(async (resolve) => {
-        // eslint-disable-next-line @typescript-eslint/no-shadow
-        while (worker.getStatus() === 'connecting') await new Promise((resolve) => setTimeout(resolve, 50));
-        resolve();
-      });
+        // Enqueue a tx
+        const providerClosePromise = enqueueFakeTx();
 
-      // Stop the RabbitMQ container while the TxSubmitWorker is connected
-      const removeContainerPromise = removeRabbitMQContainer(CONTAINER_NAME);
-      const innerMessage = "CONNECTION_FORCED - broker forced connection closure with reason 'shutdown'";
-      const fullMessage = `Connection closed: 320 (CONNECTION-FORCED) with message "${innerMessage}"`;
+        // Actually create the TxSubmitWorker
+        worker = new TxSubmitWorker({ rabbitmqUrl: GOOD_CONNECTION_URL, ...options }, { logger, txSubmitProvider });
+        await worker.start();
 
-      // Test the TxSubmitWorker actually exits with error
-      await expect(startPromise).rejects.toThrow(new Error(fullMessage));
+        await new Promise<void>((resolve) => {
+          successMock = createMockOgmiosServer({
+            healthCheck: { response: { networkSynchronization: 1, success: true } },
+            submitTx: { response: { success: true } },
+            submitTxHook: () => {
+              spy();
+              // Once the transaction is submitted with success we can stop the worker
+              // We wait half a second to be sure the tx is submitted only once
+              setTimeout(() => {
+                resolve();
+              }, 500);
+            }
+          });
+        });
 
-      // Test teardown
-      await serverClosePromise(healthyMock);
-      await removeContainerPromise;
-    };
+        // All these Promises are the return value of async functions called in a not async context,
+        // we need to await for them to perform a correct test teardown
+        await Promise.all([successMockListenPromise, providerClosePromise, serverClosePromise(successMock)]);
+        expect(spy).toBeCalledTimes(1);
+      };
 
-    it('rejects when configured to process jobs serially', async () => await performTest({ parallel: false }), 20_000);
-    it(
-      'rejects when configured to process jobs in parallel',
-      async () => await performTest({ parallel: true }),
-      20_000
-    );
-  });
+      it('when configured to process jobs serially', async () => performTest({ parallel: false }));
+      it('when configured to process jobs in parallel', async () => performTest({ parallel: true }));
+    });
 
-  describe('tx submission is retried until success', () => {
-    // First of all we need to remove from the queue every message sent by previous tests/suites
-    beforeAll(removeAllMessagesFromQueue);
+    describe('the error is propagated to RabbitMqTxSubmitProvider', () => {
+      // eslint-disable-next-line unicorn/consistent-function-scoping
+      const performTest = async (options: { parallel: boolean }) => {
+        mock = createMockOgmiosServer({
+          healthCheck: { response: { networkSynchronization: 1, success: true } },
+          submitTx: { response: { failWith: { type: 'eraMismatch' }, success: false } }
+        });
 
-    // eslint-disable-next-line unicorn/consistent-function-scoping
-    const performTest = async (options: { parallel: boolean }) => {
-      const spy = jest.fn();
-      let hookAlreadyCalled = false;
-      let successMockListenPromise = Promise.resolve<http.Server>(new http.Server());
-      let stopPromise = Promise.resolve();
-      // eslint-disable-next-line prefer-const
-      let worker: TxSubmitWorker;
+        // Start the mock
+        await listenPromise(mock, port);
 
-      const successMock = createMockOgmiosServer({
-        healthCheck: { response: { networkSynchronization: 1, success: true } },
-        submitTx: { response: { success: true } },
-        submitTxHook: () => {
-          spy();
-          // Once the transaction is submitted with success we can stop the worker
-          // We wait half a second to be ensure the tx is submitted only once
-          setTimeout(() => (stopPromise = worker.stop()), 500);
-        }
-      });
+        // Actually create the TxSubmitWorker
+        worker = new TxSubmitWorker(
+          { pollingCycle: 50, rabbitmqUrl: GOOD_CONNECTION_URL, ...options },
+          { logger, txSubmitProvider }
+        );
+        await worker.start();
 
-      const failMock = createMockOgmiosServer({
-        healthCheck: { response: { networkSynchronization: 1, success: true } },
-        submitTx: { response: { failWith: { type: 'eraMismatch' }, success: false } },
-        submitTxHook: () => {
-          // eslint-disable-next-line @typescript-eslint/no-floating-promises
-          (async () => {
-            if (hookAlreadyCalled) return;
+        // Tx submission by RabbitMqTxSubmitProvider must reject with the same error got by TxSubmitWorker
+        await expect(enqueueFakeTx(0, logger)).rejects.toBeInstanceOf(Cardano.TxSubmissionErrors.EraMismatchError);
+      };
 
-            // This hook may be called multple times... ensure the core is executed only once
-            hookAlreadyCalled = true;
-
-            // Stop the failing mock and start the succes one
-            await serverClosePromise(failMock);
-            successMockListenPromise = listenPromise(successMock, port);
-          })();
-        }
-      });
-
-      // Start a failing ogmios server
-      await listenPromise(failMock, port);
-
-      // Enqueue a tx
-      const providerClosePromise = enqueueFakeTx();
-
-      // Actually create the TxSubmitWorker
-      worker = new TxSubmitWorker({ rabbitmqUrl: GOOD_CONNECTION_URL, ...options }, { logger, txSubmitProvider });
-      const startPromise = worker.start();
-
-      await expect(startPromise).resolves.toEqual(undefined);
-      await serverClosePromise(successMock);
-      // All these Promises are the return value of async functions called in a not async context,
-      // we need to await for them to perform a correct test teardown
-      await Promise.all([stopPromise, successMockListenPromise, providerClosePromise]);
-      expect(spy).toBeCalledTimes(1);
-    };
-
-    it('when configured to process jobs serially', async () => performTest({ parallel: false }));
-    it('when configured to process jobs in parallel', async () => performTest({ parallel: true }));
+      it('when configured to process jobs serially', async () => performTest({ parallel: false }));
+      it('when configured to process jobs in parallel', async () => performTest({ parallel: true }));
+    });
   });
 
   it('submission is parallelized up to parallelTx Tx simultaneously', async () => {
-    // First of all we need to remove from the queue every message sent by previous tests/suites
-    await removeAllMessagesFromQueue();
+    const txs = await txsPromise;
+    const delays = [5, 2, 1, 3, 3, 4, 4];
 
-    let stopPromise = Promise.resolve();
-
-    const loggedMessages: unknown[][] = [];
-    const testLogger = {
-      debug: (...args: unknown[]) => loggedMessages.push(args),
-      error: jest.fn(),
-      info: jest.fn(),
-      trace: jest.fn(),
-      warn: jest.fn()
-    };
-
-    const worker = new TxSubmitWorker(
-      { parallel: true, parallelTxs: 4, rabbitmqUrl: GOOD_CONNECTION_URL },
-      { logger: testLogger, txSubmitProvider }
-    );
-
-    const mock = createMockOgmiosServer({
+    mock = createMockOgmiosServer({
       healthCheck: { response: { networkSynchronization: 1, success: true } },
       submitTx: { response: { success: true } },
       submitTxHook: async (data) => {
+        const txBody = Buffer.from(data!).toString('hex');
+        const txIdx = (() => {
+          for (let i = 0; i < txs.length; ++i) if (txBody === txs[i].txBodyHex) return i;
+        })();
+
         // Wait 100ms * the first byte of the Tx before sending the result
-        await new Promise((resolve) => setTimeout(resolve, 100 * data![0]));
-        // Exit condition: a Tx with length === 2
-        if (data?.length === 2) stopPromise = worker.stop();
+        // eslint-disable-next-line @typescript-eslint/no-shadow
+        await new Promise((resolve) => setTimeout(resolve, 100 * delays[txIdx!]));
       }
     });
 
     await listenPromise(mock, port);
+
+    worker = new TxSubmitWorker(
+      { parallel: true, parallelTxs: 4, rabbitmqUrl: GOOD_CONNECTION_URL },
+      { logger, txSubmitProvider }
+    );
+    await worker.start();
+
+    const rabbitMqTxSubmitProvider = new RabbitMqTxSubmitProvider({ rabbitmqUrl: GOOD_CONNECTION_URL });
 
     /*
      * Tx submission plan, time sample: 100ms
@@ -225,33 +209,42 @@ describe('TxSubmitWorker', () => {
      * 3555
      * 4447777
      */
-    await enqueueFakeTx([5]);
-    await enqueueFakeTx([2]);
-    await enqueueFakeTx([1]);
-    await enqueueFakeTx([3]);
-    await enqueueFakeTx([3]);
-    await enqueueFakeTx([4]);
-    await enqueueFakeTx([4, 0]);
 
-    await expect(worker.start()).resolves.toEqual(undefined);
-    await Promise.all([stopPromise, serverClosePromise(mock)]);
+    const promises: Promise<void>[] = [];
+    const result = [undefined, undefined, undefined, undefined, undefined, undefined, undefined];
+
+    for (let i = 0; i < 7; ++i) {
+      promises.push(rabbitMqTxSubmitProvider.submitTx(txs[i].txBodyUint8Array));
+      // Wait 10ms to be sure the transactions are enqueued in the right order
+      await new Promise((resolve) => setTimeout(resolve, 10));
+    }
+
+    await expect(Promise.all(promises)).resolves.toEqual(result);
+
+    await rabbitMqTxSubmitProvider.close();
 
     // We check only the relevant messages
-    expect(loggedMessages.filter(([_]) => typeof _ === 'string' && _.match(/(tx \d dump)|ACKing RabbitMQ/))).toEqual([
-      ['TxSubmitWorker: tx 1 dump:', '05'],
-      ['TxSubmitWorker: tx 2 dump:', '02'],
-      ['TxSubmitWorker: tx 3 dump:', '01'],
-      ['TxSubmitWorker: tx 4 dump:', '03'],
-      ['TxSubmitWorker: ACKing RabbitMQ message 3'],
-      ['TxSubmitWorker: tx 5 dump:', '03'],
-      ['TxSubmitWorker: ACKing RabbitMQ message 2'],
-      ['TxSubmitWorker: tx 6 dump:', '04'],
-      ['TxSubmitWorker: ACKing RabbitMQ message 4'],
-      ['TxSubmitWorker: tx 7 dump:', '0400'],
-      ['TxSubmitWorker: ACKing RabbitMQ message 5'],
-      ['TxSubmitWorker: ACKing RabbitMQ message 1'],
-      ['TxSubmitWorker: ACKing RabbitMQ message 6'],
-      ['TxSubmitWorker: ACKing RabbitMQ message 7']
+    expect(
+      logger.messages
+        .filter(({ level }) => level === 'debug')
+        .filter(({ message }) => typeof message[0] === 'string' && message[0].match(/(tx #\d dump)|ACKing RabbitMQ/))
+        .map(({ message }) => message)
+        .map((message) => (message.length === 2 ? [message[0]] : message))
+    ).toEqual([
+      ['TxSubmitWorker: tx #1 dump:'],
+      ['TxSubmitWorker: tx #2 dump:'],
+      ['TxSubmitWorker: tx #3 dump:'],
+      ['TxSubmitWorker: tx #4 dump:'],
+      ['TxSubmitWorker: ACKing RabbitMQ message #3'],
+      ['TxSubmitWorker: tx #5 dump:'],
+      ['TxSubmitWorker: ACKing RabbitMQ message #2'],
+      ['TxSubmitWorker: tx #6 dump:'],
+      ['TxSubmitWorker: ACKing RabbitMQ message #4'],
+      ['TxSubmitWorker: tx #7 dump:'],
+      ['TxSubmitWorker: ACKing RabbitMQ message #5'],
+      ['TxSubmitWorker: ACKing RabbitMQ message #1'],
+      ['TxSubmitWorker: ACKing RabbitMQ message #6'],
+      ['TxSubmitWorker: ACKing RabbitMQ message #7']
     ]);
   });
 });
