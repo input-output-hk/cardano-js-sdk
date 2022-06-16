@@ -174,12 +174,15 @@ describe('RewardsHttpService', () => {
           expect(response).toMatchSnapshot();
         });
         it('returns address rewards history with epochs ', async () => {
+          const accountWithRewardsAtEpoch76 = Cardano.RewardAccount(
+            'stake_test1up32f2hrv5ytqk8ad6e4apss5zrrjjlrkjhrksypn5g08fqrqf9gr'
+          );
           const response = await provider.rewardsHistory({
             epochs: {
-              lowerBound: 10,
-              upperBound: 11
+              lowerBound: 75,
+              upperBound: 76
             },
-            rewardAccounts: [rewardAcc]
+            rewardAccounts: [accountWithRewardsAtEpoch76]
           });
           expect(response).toMatchSnapshot();
         });
