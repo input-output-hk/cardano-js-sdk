@@ -7,6 +7,7 @@ import {
   mockAssetProvider,
   mockChainHistoryProvider,
   mockNetworkInfoProvider,
+  mockRewardsProvider,
   mockTxSubmitProvider,
   mockUtxoProvider,
   mockWalletProvider
@@ -19,6 +20,7 @@ const createWallet = (keyAgent: KeyAgent) => {
   const networkInfoProvider = mockNetworkInfoProvider();
   const assetProvider = mockAssetProvider();
   const utxoProvider = mockUtxoProvider();
+  const rewardsProvider = mockRewardsProvider();
   const asyncKeyAgent = util.createAsyncKeyAgent(keyAgent);
   const chainHistoryProvider = mockChainHistoryProvider();
   return new SingleAddressWallet(
@@ -28,6 +30,7 @@ const createWallet = (keyAgent: KeyAgent) => {
       chainHistoryProvider,
       keyAgent: asyncKeyAgent,
       networkInfoProvider,
+      rewardsProvider,
       stakePoolProvider,
       txSubmitProvider,
       utxoProvider,

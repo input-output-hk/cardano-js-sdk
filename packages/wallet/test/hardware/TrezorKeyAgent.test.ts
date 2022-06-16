@@ -38,14 +38,18 @@ describe('TrezorKeyAgent', () => {
     const assetProvider = mocks.mockAssetProvider();
     const stakePoolProvider = createStubStakePoolProvider();
     const networkInfoProvider = mocks.mockNetworkInfoProvider();
+    const rewardsProvider = mocks.mockRewardsProvider();
+    const chainHistoryProvider = mocks.mockChainHistoryProvider();
     const utxoProvider = mocks.mockUtxoProvider();
     const asyncKeyAgent = KeyManagement.util.createAsyncKeyAgent(keyAgent);
     wallet = new SingleAddressWallet(
       { name: 'Trezor Wallet' },
       {
         assetProvider,
+        chainHistoryProvider,
         keyAgent: asyncKeyAgent,
         networkInfoProvider,
+        rewardsProvider,
         stakePoolProvider,
         txSubmitProvider,
         utxoProvider,
