@@ -19,8 +19,8 @@
     "docs": "run-s docs:typedoc docs:coverage",
     "cleanup": "yarn workspaces run cleanup && shx rm -rf node_modules",
     "cleanup:dist": "yarn workspaces run cleanup:dist",
-    "lint": "yarn workspaces run lint --max-warnings 0",
-    "lint:fix": "yarn workspaces run lint:fix --max-warnings 0",
+    "lint": "eslint --max-warnings=0 \"packages/*/src/**/*.ts\" \"packages/*/test/**/*.ts\" \"packages/*/e2e/**/*.ts\"",
+    "lint:fix": "yarn lint --fix",
     "tscNoEmit": "yarn workspaces run tscNoEmit",
     "prepare": "husky install",
     "pre-commit": "lint-staged",
@@ -36,7 +36,7 @@
   },
   "lint-staged": {
     "packages/!(*golden-test-generator)/**/*.{js,ts}": [
-      "eslint",
+      "eslint --max-warnings=0",
       "yarn tscNoEmit"
     ]
   },

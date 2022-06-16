@@ -1,16 +1,35 @@
+const path = require("path");
+
 module.exports = {
   "root": true,
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "project": "./tsconfig.json",
-    "tsconfigRootDir": __dirname
+    "project": path.join(__dirname, './eslint.tsconfig.json'),
+    "tsconfigRootDir": __dirname,
+  },
+  // TODO: test if this is even needed
+  "globals": {
+    "it": "readonly",
+    "before": "readonly",
+    "after": "readonly",
+    "describe": "readonly",
+    "beforeEach": "readonly",
+    "afterEach": "readonly"
+  },
+  "env": {
+    "jest": true
   },
   "extends": [
       "@atixlabs/eslint-config/configurations/node",
       "plugin:@typescript-eslint/recommended",
       "plugin:jsdoc/recommended"
   ],
-  "plugins": ["jsdoc", "sort-keys-fix", "sort-imports-es6-autofix"],
+  "plugins": [
+    "jsdoc",
+    "sort-keys-fix",
+    "sort-imports-es6-autofix",
+    "jest"
+  ],
   "settings": {
     "import/resolver": {
       "typescript": {}
