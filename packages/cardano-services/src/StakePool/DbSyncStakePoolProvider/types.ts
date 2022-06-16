@@ -9,8 +9,11 @@ export interface PoolUpdate {
   updateId: number;
 }
 
-export interface PoolData {
+export interface CommonPoolInfo {
   hashId: number;
+}
+
+export interface PoolData extends CommonPoolInfo {
   hexId: Cardano.PoolIdHex;
   id: Cardano.PoolId;
   rewardAccount: Cardano.RewardAccount;
@@ -40,6 +43,7 @@ export interface PoolDataModel {
 }
 
 export interface RelayModel {
+  hash_id: number;
   update_id: number;
   ipv4?: string;
   ipv6?: string;
@@ -76,17 +80,15 @@ interface PoolTransactionModel {
   hash_id: number;
 }
 
-interface PoolTransaction {
-  hashId: number;
+interface PoolTransaction extends CommonPoolInfo {
   transactionId: Cardano.TransactionId;
 }
 
-export interface PoolOwner {
+export interface PoolOwner extends CommonPoolInfo {
   address: Cardano.RewardAccount;
-  hashId: number;
 }
 
-export interface PoolRelay {
+export interface PoolRelay extends CommonPoolInfo {
   relay: Cardano.Relay;
   updateId: number;
 }
@@ -128,8 +130,7 @@ export interface PoolMetricsModel {
   pool_hash_id: number;
 }
 
-export interface PoolMetrics {
-  hashId: number;
+export interface PoolMetrics extends CommonPoolInfo {
   metrics: Cardano.StakePoolMetrics;
 }
 
@@ -141,4 +142,10 @@ export interface StakePoolStatsModel {
   active: string;
   retired: string;
   retiring: string;
+}
+
+export type PoolSortType = 'data' | 'metrics';
+export interface OrderByOptions {
+  field: string;
+  order: 'asc' | 'desc';
 }

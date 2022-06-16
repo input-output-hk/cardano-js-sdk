@@ -37,15 +37,18 @@ describe('mappers', () => {
   };
 
   const poolRelayByName = {
+    hash_id,
     hostname: 'hostname',
     port: 3001,
     update_id
   };
   const poolRelayByNameMultiHost = {
     dns_name: 'dnsName',
+    hash_id,
     update_id
   };
   const poolRelayByAddress = {
+    hash_id,
     ipv4: '135.181.40.207',
     port: 3001,
     update_id
@@ -107,14 +110,17 @@ describe('mappers', () => {
   });
   it('mapRelay', () => {
     expect(mapRelay(poolRelayByName)).toEqual({
+      hashId: hash_id,
       relay: { __typename: 'RelayByName', hostname: poolRelayByName.hostname, port: poolRelayByName.port },
       updateId: update_id
     });
     expect(mapRelay(poolRelayByNameMultiHost)).toEqual({
+      hashId: hash_id,
       relay: { __typename: 'RelayByNameMultihost', dnsName: poolRelayByNameMultiHost.dns_name },
       updateId: update_id
     });
     expect(mapRelay(poolRelayByAddress)).toEqual({
+      hashId: hash_id,
       relay: { __typename: 'RelayByAddress', ipv4: poolRelayByAddress.ipv4, port: poolRelayByAddress.port },
       updateId: update_id
     });
@@ -212,7 +218,7 @@ describe('mappers', () => {
     const totalCount = 1;
     it('toCoreStakePool with retiring status', () => {
       expect(
-        toCoreStakePool({
+        toCoreStakePool([poolDataModel.hash_id], {
           lastEpoch: poolRetirementModel.retiring_epoch - 1,
           poolDatas,
           poolMetrics,
@@ -227,7 +233,7 @@ describe('mappers', () => {
     });
     it('toCoreStakePool with retired status', () => {
       expect(
-        toCoreStakePool({
+        toCoreStakePool([poolDataModel.hash_id], {
           lastEpoch: poolRetirementModel.retiring_epoch + 1,
           poolDatas,
           poolMetrics,
@@ -248,7 +254,7 @@ describe('mappers', () => {
         mapPoolRetirement({ ...poolRetirementModel, retiring_epoch: poolRegistrationModel.active_epoch_no - 1 })
       ];
       expect(
-        toCoreStakePool({
+        toCoreStakePool([poolDataModel.hash_id], {
           lastEpoch: poolRegistrationModel.active_epoch_no - 1,
           poolDatas,
           poolMetrics,
@@ -278,7 +284,7 @@ describe('mappers', () => {
         mapPoolRetirement({ ...poolRetirementModel, retiring_epoch: poolRegistrationModel.active_epoch_no })
       ];
       expect(
-        toCoreStakePool({
+        toCoreStakePool([poolDataModel.hash_id], {
           lastEpoch: poolRegistrationModel.active_epoch_no,
           poolDatas,
           poolMetrics,
