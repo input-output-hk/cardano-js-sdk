@@ -36,7 +36,7 @@
         }
       }
     },
-    "/network-info/tip": {
+    "/network-info/ledger-tip": {
       "post": {
         "summary": "fetch ledger tip",
         "description": "Fetch Ledger Tip",
