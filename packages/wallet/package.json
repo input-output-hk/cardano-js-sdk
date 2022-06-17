@@ -37,7 +37,8 @@
     "test:build:verify": "tsc --build ./test",
     "test:e2e": "jest -c ./e2e.jest.config.js --runInBand",
     "test:hw": "jest ./test/hardware/* -c ./hw.jest.config.js --runInBand",
-    "test:debug": "DEBUG=true yarn test"
+    "test:debug": "DEBUG=true yarn test",
+    "test:e2e": "shx echo 'test:e2e' command not implemented yet"
   },
   "devDependencies": {
     "@cardano-ogmios/client": "5.4.0",
