@@ -16,7 +16,7 @@ import {
 } from '@cardano-sdk/core';
 import { Assets, InitializeTxProps, InitializeTxResult, ObservableWallet, SignDataProps, SyncStatus } from './types';
 import {
-  Balance,
+  BalanceTracker,
   DelegationTracker,
   FailedTx,
   PersistentDocumentTrackerSubject,
@@ -112,7 +112,7 @@ export class SingleAddressWallet implements ObservableWallet {
   readonly assetProvider: TrackedAssetProvider;
   readonly chainHistoryProvider: TrackedChainHistoryProvider;
   readonly utxo: TransactionalTracker<Cardano.Utxo[]>;
-  readonly balance: TransactionalTracker<Balance>;
+  readonly balance: BalanceTracker;
   readonly transactions: TransactionsTracker & Shutdown;
   readonly delegation: DelegationTracker & Shutdown;
   readonly tip$: BehaviorObservable<Cardano.Tip>;
@@ -331,7 +331,6 @@ export class SingleAddressWallet implements ObservableWallet {
     this.#tip$.sync();
   }
   shutdown() {
-    this.balance.shutdown();
     this.utxo.shutdown();
     this.transactions.shutdown();
     this.networkInfo$.complete();

@@ -1,5 +1,5 @@
 import { Asset, Cardano } from '@cardano-sdk/core';
-import { Balance, TransactionalTracker } from './types';
+import { BalanceTracker } from './types';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TrackedAssetProvider } from './ProviderTracker';
 import { coldObservableProvider } from './util';
@@ -15,7 +15,7 @@ export const createAssetService =
 export type AssetService = ReturnType<typeof createAssetService>;
 
 export interface AssetsTrackerProps {
-  balanceTracker: TransactionalTracker<Balance>;
+  balanceTracker: BalanceTracker;
   assetProvider: TrackedAssetProvider;
   retryBackoffConfig: RetryBackoffConfig;
 }
@@ -28,7 +28,7 @@ export const createAssetsTracker = (
   { assetProvider, balanceTracker, retryBackoffConfig }: AssetsTrackerProps,
   { assetService = createAssetService(assetProvider, retryBackoffConfig) }: AssetsTrackerInternals = {}
 ) =>
-  balanceTracker.total$.pipe(
+  balanceTracker.utxo.total$.pipe(
     map(({ assets }) => [...(assets?.keys() || [])]),
     tap((assetIds) => assetIds.length === 0 && assetProvider.setStatInitialized(assetProvider.stats.getAsset$)),
     mergeMap((assetIds) => from(assetIds)),

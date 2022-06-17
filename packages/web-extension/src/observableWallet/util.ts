@@ -7,9 +7,15 @@ export const observableWalletProperties: RemoteApiProperties<ObservableWallet> =
   addresses$: RemoteApiPropertyType.HotObservable,
   assets$: RemoteApiPropertyType.HotObservable,
   balance: {
-    available$: RemoteApiPropertyType.HotObservable,
-    total$: RemoteApiPropertyType.HotObservable,
-    unspendable$: RemoteApiPropertyType.HotObservable
+    rewardAccounts: {
+      deposit$: RemoteApiPropertyType.HotObservable,
+      rewards$: RemoteApiPropertyType.HotObservable
+    },
+    utxo: {
+      available$: RemoteApiPropertyType.HotObservable,
+      total$: RemoteApiPropertyType.HotObservable,
+      unspendable$: RemoteApiPropertyType.HotObservable
+    }
   },
   currentEpoch$: RemoteApiPropertyType.HotObservable,
   delegation: {

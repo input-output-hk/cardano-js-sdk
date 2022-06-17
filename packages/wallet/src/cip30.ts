@@ -71,7 +71,7 @@ export const createWalletApi = (
     logger.debug('getting balance');
     try {
       const wallet = await walletReady;
-      const value = await firstValueFrom(wallet.balance.available$);
+      const value = await firstValueFrom(wallet.balance.utxo.available$);
       return Buffer.from(coreToCsl.value(value).to_bytes()).toString('hex');
     } catch (error) {
       logger.error(error);

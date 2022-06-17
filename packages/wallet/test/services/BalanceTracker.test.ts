@@ -17,29 +17,33 @@ describe('createBalanceTracker', () => {
       const utxoUnspendable = hot(     '-a-----', { a: utxo2 }) as unknown as BehaviorObservable<Cardano.Utxo[]>;
       const rewardAccounts$ = hot(     'a--b-cd', {
         a: [],
-        b: [{ keyStatus: StakeKeyStatus.Registered, rewardBalance: { available: 0n, total: 0n } }],
-        c: [{ keyStatus: StakeKeyStatus.Registered, rewardBalance: { available: 5n, total: 10n } }],
-        d: [{ keyStatus: StakeKeyStatus.Unregistering, rewardBalance: { available: 5n, total: 10n } }]
+        b: [{ keyStatus: StakeKeyStatus.Registering, rewardBalance: 0n }],
+        c: [{ keyStatus: StakeKeyStatus.Registered, rewardBalance: 5n }],
+        d: [{ keyStatus: StakeKeyStatus.Unregistering, rewardBalance: 5n }]
       }) as unknown as BehaviorObservable<RewardAccount[]>;
       const balanceTracker = createBalanceTracker(
         protocolParameters$,
         { available$: utxoAvailable, total$: utxoTotal, unspendable$: utxoUnspendable },
         { rewardAccounts$ } as unknown as DelegationTracker
       );
-      expectObservable(balanceTracker.total$).toBe('-a-b-c', {
-        a: { ...Cardano.util.coalesceValueQuantities(utxo.map((u) => u[1].value)), deposit: 0n, rewards: 0n },
-        b: { ...Cardano.util.coalesceValueQuantities(utxo.map((u) => u[1].value)), deposit: 2n, rewards: 0n },
-        c: { ...Cardano.util.coalesceValueQuantities(utxo.map((u) => u[1].value)), deposit: 2n, rewards: 10n }
+      expectObservable(balanceTracker.rewardAccounts.deposit$).toBe('a--b--d', {
+        a: 0n,
+        b: 2n,
+        d: 0n
       });
-      expectObservable(balanceTracker.available$).toBe('--abcde', {
-        a: { ...Cardano.util.coalesceValueQuantities(utxo.map((u) => u[1].value)), deposit: 0n, rewards: 0n },
-        b: { ...Cardano.util.coalesceValueQuantities(utxo.map((u) => u[1].value)), deposit: 2n, rewards: 0n },
-        c: { ...Cardano.util.coalesceValueQuantities(utxo.slice(1).map((u) => u[1].value)), deposit: 2n, rewards: 0n },
-        d: { ...Cardano.util.coalesceValueQuantities(utxo.slice(1).map((u) => u[1].value)), deposit: 2n, rewards: 5n },
-        e: { ...Cardano.util.coalesceValueQuantities(utxo.slice(1).map((u) => u[1].value)), deposit: 0n, rewards: 5n }
+      expectObservable(balanceTracker.rewardAccounts.rewards$).toBe('a----c-', {
+        a: 0n,
+        c: 5n
       });
-      expectObservable(balanceTracker.unspendable$).toBe('-a------', {
-        a: { ...Cardano.util.coalesceValueQuantities(utxo2.map((u) => u[1].value)), deposit: 0n, rewards: 0n }
+      expectObservable(balanceTracker.utxo.total$).toBe('-a-----', {
+        a: Cardano.util.coalesceValueQuantities(utxo.map((u) => u[1].value))
+      });
+      expectObservable(balanceTracker.utxo.available$).toBe('--a-b--', {
+        a: Cardano.util.coalesceValueQuantities(utxo.map((u) => u[1].value)),
+        b: Cardano.util.coalesceValueQuantities(utxo.slice(1).map((u) => u[1].value))
+      });
+      expectObservable(balanceTracker.utxo.unspendable$).toBe('-a-----', {
+        a: Cardano.util.coalesceValueQuantities(utxo2.map((u) => u[1].value))
       });
     });
   });

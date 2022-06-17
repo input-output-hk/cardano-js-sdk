@@ -56,7 +56,7 @@ describe('SingleAddressWallet.assets/nft', () => {
 
   it('supports multiple CIP-25 NFT metadata in one tx', async () => {
     const nfts = await firstValueFrom(
-      combineLatest([wallet.assets$, wallet.balance.total$]).pipe(
+      combineLatest([wallet.assets$, wallet.balance.utxo.total$]).pipe(
         filter(([assets, balance]) => assets.size === balance.assets?.size),
         map(([assets]) => [...assets.values()].filter((asset) => !!asset.nftMetadata))
       )
@@ -85,7 +85,7 @@ describe('SingleAddressWallet.assets/nft', () => {
 
   it('parses CIP-25 NFT metadata with files', async () => {
     const nfts = await firstValueFrom(
-      combineLatest([wallet.assets$, wallet.balance.total$]).pipe(
+      combineLatest([wallet.assets$, wallet.balance.utxo.total$]).pipe(
         filter(([assets, balance]) => assets.size === balance.assets?.size),
         map(([assets]) => [...assets.values()].filter((asset) => !!asset.nftMetadata))
       )
