@@ -38,9 +38,15 @@ rm -rf \
 
 mkdir -p sockets
 
-echo "Update start time in genesis files"
+#echo "Update start time in genesis files"
 $sed -i -E "s/\"startTime\": [0-9]+/\"startTime\": ${timeUnix}/" byron/genesis.json
 $sed -i -E "s/\"systemStart\": \".*\"/\"systemStart\": \"${timeISO}\"/" shelley/genesis.json
+
+$sed -i -E "s/\"startTime\": [0-9]+/\"startTime\": ${timeUnix}/" ../config/network/testnet/genesis/shelley.json
+$sed -i -E "s/\"systemStart\": \".*\"/\"systemStart\": \"${timeISO}\"/"  ../config/network/testnet/genesis/shelley.json
+
+$sed -i -E "s/\"startTime\": [0-9]+/\"startTime\": ${timeUnix}/" ../config/network/testnet/cardano-node/genesis/shelley.json
+$sed -i -E "s/\"systemStart\": \".*\"/\"systemStart\": \"${timeISO}\"/"  ../config/network/testnet/cardano-node/genesis/byron.json
 
 echo "Update VRF key permission, sometimes GitHub changes these"
 chmod 600 \
