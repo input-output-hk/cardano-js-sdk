@@ -29,7 +29,7 @@ const mapMetadata = (
  * Connect to the [Blockfrost service](https://docs.blockfrost.io/)
  *
  * @param {BlockFrostAPI} blockfrost BlockFrostAPI instance
- * @returns {AssetProvider} WalletProvider
+ * @returns {AssetProvider} AssetProvider
  * @throws ProviderFailure
  */
 export const blockfrostAssetProvider = (blockfrost: BlockFrostAPI): AssetProvider => {

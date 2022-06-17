@@ -1,6 +1,5 @@
 export * from './Provider';
 export * from './StakePoolProvider';
-export * from './WalletProvider';
 export * from './AssetProvider';
 export * from './NetworkInfoProvider';
 export * from './RewardsProvider';

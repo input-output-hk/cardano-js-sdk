@@ -1,6 +1,48 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`NetworkInfoHttpService healthy state /network with NetworkInfoHttpProvider response is an object of network info 1`] = `
+exports[`NetworkInfoHttpService healthy state with NetworkInfoHttpProvider response is an object of current wallet protocol parameters 1`] = `
+Object {
+  "coinsPerUtxoWord": 34482,
+  "maxCollateralInputs": 3,
+  "maxTxSize": 16384,
+  "maxValueSize": 5000,
+  "minFeeCoefficient": 44,
+  "minFeeConstant": 155381,
+  "minPoolCost": 340000000,
+  "poolDeposit": 500000000,
+  "protocolVersion": Object {
+    "major": 6,
+    "minor": 0,
+  },
+  "stakeKeyDeposit": 2000000,
+}
+`;
+
+exports[`NetworkInfoHttpService healthy state with NetworkInfoHttpProvider response is an object of genesis parameters 1`] = `
+Object {
+  "activeSlotsCoefficient": 0.05,
+  "epochLength": 432000,
+  "maxKesEvolutions": 62,
+  "maxLovelaceSupply": 45000000000000000n,
+  "networkId": "Testnet",
+  "networkMagic": 1097911063,
+  "securityParameter": 2160,
+  "slotLength": 1,
+  "slotsPerKesPeriod": 129600,
+  "systemStart": 2019-07-24T20:20:16.000Z,
+  "updateQuorum": 5,
+}
+`;
+
+exports[`NetworkInfoHttpService healthy state with NetworkInfoHttpProvider response is an object of ledger tip 1`] = `
+Object {
+  "blockNo": 3274726,
+  "hash": "5caede44f4a5a775443095159cd42c8a64f35494086957ab3e04624015a6e13c",
+  "slot": 49032415,
+}
+`;
+
+exports[`NetworkInfoHttpService healthy state with NetworkInfoHttpProvider response is an object of network info 1`] = `
 Object {
   "lovelaceSupply": Object {
     "circulating": 69163989759711432n,

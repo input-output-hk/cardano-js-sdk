@@ -1,13 +1,19 @@
+import {
+  Cardano,
+  NetworkInfo,
+  NetworkInfoProvider,
+  ProtocolParametersRequiredByWallet,
+  timeSettingsConfig
+} from '@cardano-sdk/core';
 import { DbSyncProvider } from '../../DbSyncProvider';
 import { GenesisData } from './types';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../InMemoryCache';
 import { Logger, dummyLogger } from 'ts-log';
-import { NetworkInfo, NetworkInfoProvider, timeSettingsConfig } from '@cardano-sdk/core';
 import { NetworkInfoBuilder } from './NetworkInfoBuilder';
 import { NetworkInfoCacheKey } from '.';
 import { Pool } from 'pg';
 import { Shutdown } from '@cardano-sdk/util';
-import { loadGenesisData, toNetworkInfo } from './mappers';
+import { loadGenesisData, toGenesisParams, toLedgerTip, toNetworkInfo, toWalletProtocolParams } from './mappers';
 import { pollDbSync } from './utils';
 
 export interface NetworkInfoProviderProps {
@@ -66,6 +72,21 @@ export class DbSyncNetworkInfoProvider extends DbSyncProvider implements Network
       timeSettings,
       totalSupply
     });
+  }
+
+  public async ledgerTip(): Promise<Cardano.Tip> {
+    const tip = await this.#builder.queryLedgerTip();
+    return toLedgerTip(tip);
+  }
+
+  public async currentWalletProtocolParameters(): Promise<ProtocolParametersRequiredByWallet> {
+    const currentProtocolParams = await this.#builder.queryCurrentWalletProtocolParams();
+    return toWalletProtocolParams(currentProtocolParams);
+  }
+
+  public async genesisParameters(): Promise<Cardano.CompactGenesis> {
+    const genesisData = await this.#genesisDataReady;
+    return toGenesisParams(genesisData);
   }
 
   async start(): Promise<void> {

@@ -19,11 +19,27 @@ describe('networkInfoHttpProvider', () => {
     axiosMock.restore();
   });
 
-  describe('networkInfo request', () => {
-    test('utxoByAddresses doesnt throw', async () => {
-      axiosMock.onPost().replyOnce(200, []);
-      const provider = networkInfoHttpProvider(url);
-      await expect(provider.networkInfo()).resolves.toEqual([]);
-    });
+  test('networkInfo does not throw', async () => {
+    axiosMock.onPost().replyOnce(200, {});
+    const provider = networkInfoHttpProvider(url);
+    await expect(provider.networkInfo()).resolves.toEqual({});
+  });
+
+  test('ledgerTip does not throw', async () => {
+    axiosMock.onPost().replyOnce(200, {});
+    const provider = networkInfoHttpProvider(url);
+    await expect(provider.ledgerTip()).resolves.toEqual({});
+  });
+
+  test('genesisParameters does not throw', async () => {
+    axiosMock.onPost().replyOnce(200, {});
+    const provider = networkInfoHttpProvider(url);
+    await expect(provider.genesisParameters()).resolves.toEqual({});
+  });
+
+  test('currentWalletProtocolParameters does not throw', async () => {
+    axiosMock.onPost().replyOnce(200, {});
+    const provider = networkInfoHttpProvider(url);
+    await expect(provider.currentWalletProtocolParameters()).resolves.toEqual({});
   });
 });

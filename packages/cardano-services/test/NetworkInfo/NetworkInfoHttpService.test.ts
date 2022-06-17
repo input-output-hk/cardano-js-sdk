@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable sonarjs/no-duplicate-string */
 import { Cardano, NetworkInfo, NetworkInfoProvider, testnetTimeSettings } from '@cardano-sdk/core';
 import { DbSyncNetworkInfoProvider, NetworkInfoCacheKey, NetworkInfoHttpService } from '../../src/NetworkInfo';
 import { HttpServer, HttpServerConfig } from '../../src';
@@ -163,28 +164,98 @@ describe('NetworkInfoHttpService', () => {
           }, db)
         );
       });
+    });
 
-      describe('with NetworkInfoHttpProvider', () => {
-        let provider: NetworkInfoProvider;
+    describe('with NetworkInfoHttpProvider', () => {
+      let provider: NetworkInfoProvider;
 
-        beforeEach(async () => {
-          provider = networkInfoHttpProvider(apiUrlBase);
-        });
+      beforeEach(async () => {
+        provider = networkInfoHttpProvider(apiUrlBase);
+      });
 
-        it('time settings response is an array of network info response', async () => {
-          const testnetNetworkInfo: NetworkInfo['network'] = {
-            id: Cardano.NetworkId.testnet,
-            magic: Cardano.CardanoNetworkMagic.Testnet,
-            timeSettings: testnetTimeSettings
-          };
-          const response = await provider.networkInfo();
-          expect(response.network).toEqual(testnetNetworkInfo);
-        });
+      it('time settings response is an array of network info response', async () => {
+        const testnetNetworkInfo: NetworkInfo['network'] = {
+          id: Cardano.NetworkId.testnet,
+          magic: Cardano.CardanoNetworkMagic.Testnet,
+          timeSettings: testnetTimeSettings
+        };
+        const response = await provider.networkInfo();
+        expect(response.network).toEqual(testnetNetworkInfo);
+      });
 
-        it('response is an object of network info', async () => {
-          const response = await provider.networkInfo();
-          expect(response).toMatchSnapshot();
-        });
+      it('response is an object of network info', async () => {
+        const response = await provider.networkInfo();
+        expect(response).toMatchSnapshot();
+      });
+
+      it('response is an object of ledger tip', async () => {
+        const response = await provider.ledgerTip();
+        expect(response).toMatchSnapshot();
+      });
+
+      it('response is an object of current wallet protocol parameters', async () => {
+        const response = await provider.currentWalletProtocolParameters();
+        expect(response).toMatchSnapshot();
+      });
+
+      it('response is an object of genesis parameters', async () => {
+        const response = await provider.genesisParameters();
+        expect(response).toMatchSnapshot();
+      });
+    });
+
+    describe('/ledger-tip', () => {
+      it('returns a 200 coded response with a well formed HTTP request', async () => {
+        expect((await axios.post(`${apiUrlBase}/ledger-tip`, { args: [] })).status).toEqual(200);
+      });
+
+      it('returns a 415 coded response if the wrong content type header is used', async () => {
+        try {
+          await axios.post(`${apiUrlBase}/ledger-tip`, { args: [] }, { headers: { 'Content-Type': APPLICATION_CBOR } });
+        } catch (error: any) {
+          expect(error.response.status).toBe(415);
+          expect(error.message).toBe(UNSUPPORTED_MEDIA_STRING);
+        }
+      });
+    });
+
+    describe('/current-wallet-protocol-parameters', () => {
+      it('returns a 200 coded response with a well formed HTTP request', async () => {
+        expect((await axios.post(`${apiUrlBase}/current-wallet-protocol-parameters`, { args: [] })).status).toEqual(
+          200
+        );
+      });
+
+      it('returns a 415 coded response if the wrong content type header is used', async () => {
+        try {
+          await axios.post(
+            `${apiUrlBase}/current-wallet-protocol-parameters`,
+            { args: [] },
+            { headers: { 'Content-Type': APPLICATION_CBOR } }
+          );
+        } catch (error: any) {
+          expect(error.response.status).toBe(415);
+          expect(error.message).toBe(UNSUPPORTED_MEDIA_STRING);
+        }
+      });
+    });
+
+    describe('/genesis-parameters', () => {
+      it('returns a 200 coded response with a well formed HTTP request', async () => {
+        expect((await axios.post(`${apiUrlBase}/genesis-parameters`, { args: [] })).status).toEqual(200);
+      });
+
+      it('returns a 415 coded response if the wrong content type header is used', async () => {
+        try {
+          await axios.post(
+            `${apiUrlBase}/genesis-parameters`,
+            { args: [] },
+            { headers: { 'Content-Type': APPLICATION_CBOR } }
+          );
+        } catch (error: any) {
+          expect(error.response.status).toBe(415);
+          expect(error.message).toBe(UNSUPPORTED_MEDIA_STRING);
+        }
       });
     });
   });

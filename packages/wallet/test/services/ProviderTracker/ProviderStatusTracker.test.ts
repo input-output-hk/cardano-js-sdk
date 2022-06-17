@@ -10,7 +10,6 @@ import {
   TrackedStakePoolProvider,
   TrackedTxSubmitProvider,
   TrackedUtxoProvider,
-  TrackedWalletProvider,
   createProviderStatusTracker
 } from '../../../src';
 import { createStubStakePoolProvider, createTestScheduler } from '@cardano-sdk/util-dev';
@@ -20,8 +19,7 @@ import {
   mockNetworkInfoProvider,
   mockRewardsProvider,
   mockTxSubmitProvider,
-  mockUtxoProvider,
-  mockWalletProvider
+  mockUtxoProvider
 } from '../../mocks';
 
 const providerFnStats = {
@@ -64,7 +62,6 @@ const providerFnStats = {
 };
 
 describe('createProviderStatusTracker', () => {
-  let walletProvider: TrackedWalletProvider;
   let stakePoolProvider: TrackedStakePoolProvider;
   let networkInfoProvider: TrackedNetworkInfoProvider;
   let txSubmitProvider: TrackedTxSubmitProvider;
@@ -76,7 +73,6 @@ describe('createProviderStatusTracker', () => {
   const timeout = 5000;
 
   beforeEach(() => {
-    walletProvider = new TrackedWalletProvider(mockWalletProvider());
     utxoProvider = new TrackedUtxoProvider(mockUtxoProvider());
     stakePoolProvider = new TrackedStakePoolProvider(createStubStakePoolProvider());
     networkInfoProvider = new TrackedNetworkInfoProvider(mockNetworkInfoProvider());
@@ -99,8 +95,7 @@ describe('createProviderStatusTracker', () => {
           rewardsProvider,
           stakePoolProvider,
           txSubmitProvider,
-          utxoProvider,
-          walletProvider
+          utxoProvider
         },
         { consideredOutOfSyncAfter: timeout },
         { getProviderSyncRelevantStats }
@@ -131,8 +126,7 @@ describe('createProviderStatusTracker', () => {
           rewardsProvider,
           stakePoolProvider,
           txSubmitProvider,
-          utxoProvider,
-          walletProvider
+          utxoProvider
         },
         { consideredOutOfSyncAfter: timeout },
         { getProviderSyncRelevantStats }
@@ -160,8 +154,7 @@ describe('createProviderStatusTracker', () => {
           rewardsProvider,
           stakePoolProvider,
           txSubmitProvider,
-          utxoProvider,
-          walletProvider
+          utxoProvider
         },
         { consideredOutOfSyncAfter: timeout },
         { getProviderSyncRelevantStats }
@@ -189,8 +182,7 @@ describe('createProviderStatusTracker', () => {
           rewardsProvider,
           stakePoolProvider,
           txSubmitProvider,
-          utxoProvider,
-          walletProvider
+          utxoProvider
         },
         { consideredOutOfSyncAfter: timeout },
         { getProviderSyncRelevantStats }
