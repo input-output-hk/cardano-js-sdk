@@ -31,7 +31,7 @@
     "cleanup": "run-s cleanup:dist cleanup:nm",
     "cli": "ts-node --transpile-only src/cli.ts",
     "coverage": "yarn test --coverage",
-    "lint": "eslint \"src/**/*.ts\" \"test/**/*.ts\"",
+    "lint": "eslint -c ../../complete.eslintrc.js \"src/**/*.ts\" \"test/**/*.ts\"",
     "lint:fix": "yarn lint --fix",
     "prepack": "yarn build",
     "pretest": "yarn build",
