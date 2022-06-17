@@ -44,6 +44,7 @@
     "test:debug": "DEBUG=true yarn test",
     "test:e2e": "shx echo 'test:e2e' command not implemented yet",
     "test:load": "jest -c ./load.jest.config.js --runInBand",
+    "test:e2e": "shx echo 'test:e2e' command not implemented yet",
     "tscNoEmit": "shx echo typescript --noEmit command not implemented yet"
   },
   "devDependencies": {

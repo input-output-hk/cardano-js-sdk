@@ -11,6 +11,9 @@
   ],
   "scripts": {
     "build": "yarn workspaces run build",
+    "cleanup-build": "yarn workspaces run cleanup && yarn install && yarn workspaces run build",
+    "reinstall": "yarn workspaces run cleanup:nm && yarn install",
+    "rebuild": "yarn workspaces run cleanup:dist && yarn workspaces run build",
     "predocs": "yarn build",
     "docs:typedoc": "typedoc --entryPointStrategy packages .",
     "docs:coverage:build": "yarn workspaces run coverage",
