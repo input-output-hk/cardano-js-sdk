@@ -19,8 +19,8 @@
     "docs": "run-s docs:typedoc docs:coverage",
     "cleanup": "yarn workspaces run cleanup && shx rm -rf node_modules",
     "cleanup:dist": "yarn workspaces run cleanup:dist",
-    "lint": "yarn workspaces run lint --max-warnings 0",
-    "lint:fix": "yarn workspaces run lint:fix --max-warnings 0",
+    "lint": "eslint -c complete.eslintrc.js --max-warnings=0 \"packages/*/src/**/*.ts\" \"packages/*/test/**/*.ts\" \"packages/*/e2e/**/*.ts\"",
+    "lint:fix": "yarn lint --fix",
     "tscNoEmit": "yarn workspaces run tscNoEmit",
     "prepare": "husky install",
     "pre-commit": "lint-staged",
@@ -33,12 +33,6 @@
     "testnet:up": "DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 OGMIOS_PORT=1338 NETWORK=testnet docker-compose -p sdk-testnet up",
     "testnet:down": "docker-compose -p sdk-testnet down",
     "bump-version": "npx standard-version"
-  },
-  "lint-staged": {
-    "packages/!(*golden-test-generator)/**/*.{js,ts}": [
-      "eslint",
-      "yarn tscNoEmit"
-    ]
   },
   "repository": {
     "type": "git",
@@ -81,7 +75,7 @@
     "fs-extra": "^10.0.0",
     "husky": "^7.0.1",
     "jest": "^27.5.0",
-    "lint-staged": "^11.1.2",
+    "lint-staged": "^13.0.1",
     "prettier": "^2.3.2",
     "ts-jest": "^27.1.3",
     "ts-node": "^10.0.0",
