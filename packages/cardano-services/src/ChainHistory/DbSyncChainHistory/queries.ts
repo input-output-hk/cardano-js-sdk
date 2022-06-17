@@ -57,7 +57,7 @@ export const findTip = `
 		hash,
 		slot_no
 	FROM block
-	ORDER BY block.id DESC
+	ORDER BY block.block_no DESC NULLS LAST
 	LIMIT 1`;
 
 export const findProtocolParameters = `
@@ -98,7 +98,7 @@ export const findBlocksByHashes = `
 	LEFT JOIN block AS prev_blk ON block.previous_id = prev_blk.id
 	LEFT JOIN pool_hash AS pool ON pool.id = leader.pool_hash_id
 	WHERE block.hash = ANY($1)
-	ORDER BY block.id ASC`;
+	ORDER BY block.block_no ASC NULLS LAST`;
 
 export const findBlocksOutputByHashes = `
 	SELECT
@@ -109,7 +109,7 @@ export const findBlocksOutputByHashes = `
 	JOIN block ON block.id = tx.block_id
 	WHERE block.hash = ANY($1)
 	GROUP BY block.hash, block.id
-	ORDER BY block.id ASC`;
+	ORDER BY block.block_no ASC NULLS LAST`;
 
 export const findMultiAssetByTxOut = `
 	SELECT 

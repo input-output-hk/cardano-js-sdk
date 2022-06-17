@@ -12,7 +12,7 @@ Object {
  SELECT 
   \\"no\\"
  FROM epoch
- ORDER BY id DESC 
+ ORDER BY no DESC 
  LIMIT 1
 ),
      pools_delegated AS (
@@ -151,7 +151,7 @@ Object {
  SELECT 
   \\"no\\"
  FROM epoch
- ORDER BY id DESC 
+ ORDER BY no DESC 
  LIMIT 1
 ), pools_by_identifier AS (
     
