@@ -1,0 +1,9 @@
+version: "3"
+services:
+  private-testnet:
+    build:
+      context: .
+    ports:
+      - 3001:3001
+    volumes:
+      - ${PWD}/sockets:/root/sockets

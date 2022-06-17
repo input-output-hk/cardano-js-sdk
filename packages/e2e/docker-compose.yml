@@ -1,0 +1,84 @@
+version: "3.5"
+
+services:
+
+  postgres:
+    image: postgres:${POSTGRES_VERSION:-11.5-alpine}
+    environment:
+      - POSTGRES_LOGGING=true
+      - POSTGRES_DB_FILE=/run/secrets/postgres_db
+      - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
+      - POSTGRES_USER_FILE=/run/secrets/postgres_user
+    ports:
+      - ${POSTGRES_PORT:-5432}:5432
+    secrets:
+      - postgres_db
+      - postgres_password
+      - postgres_user
+    shm_size: '2gb'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    restart: on-failure
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+
+  cardano-node-ogmios:
+    image: cardanosolutions/cardano-node-ogmios:${CARDANO_NODE_OGMIOS_VERSION:-v5.1.0}-${NETWORK:-mainnet}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "400k"
+        max-file: "20"
+    ports:
+      - ${OGMIOS_PORT:-1337}:1337
+    restart: on-failure
+    volumes:
+      - ./config/network/${NETWORK:-mainnet}:/config
+      - node-db:/db
+      - node-ipc:/ipc
+
+  cardano-db-sync-extended:
+    image: inputoutput/cardano-db-sync:${CARDANO_DB_SYNC_VERSION:-12.0.0}
+    command: [
+        "--config", "/config/cardano-db-sync/config.json",
+        "--socket-path", "/node-ipc/node.socket"
+    ]
+    environment:
+      - EXTENDED=true
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - RESTORE_SNAPSHOT=${RESTORE_SNAPSHOT:-}
+      - RESTORE_RECREATE_DB=N
+    depends_on:
+      - cardano-node-ogmios
+      - postgres
+    secrets:
+      - postgres_password
+      - postgres_user
+      - postgres_db
+    volumes:
+      - ./config/network/${NETWORK:-mainnet}:/config
+      - db-sync-data:/var/lib/cdbsync
+      - node-ipc:/node-ipc
+    restart: on-failure
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+
+secrets:
+  postgres_db:
+    file: ./placeholder-secrets/postgres_db
+  postgres_password:
+    file: ./placeholder-secrets/postgres_password
+  postgres_user:
+    file: ./placeholder-secrets/postgres_user
+volumes:
+  db-sync-data:
+  node-db:
+  node-ipc:
+  postgres-data:
