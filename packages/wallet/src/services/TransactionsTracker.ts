@@ -1,4 +1,5 @@
 import { Cardano, ChainHistoryProvider } from '@cardano-sdk/core';
+import { DocumentStore, OrderedCollectionStore } from '../persistence';
 import {
   EMPTY,
   Observable,
@@ -8,6 +9,7 @@ import {
   defaultIfEmpty,
   exhaustMap,
   filter,
+  from,
   map,
   merge,
   mergeMap,
@@ -22,7 +24,6 @@ import {
   tap
 } from 'rxjs';
 import { FailedTx, TransactionFailure, TransactionsTracker } from './types';
-import { OrderedCollectionStore } from '../persistence';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { Shutdown } from '@cardano-sdk/util';
 import { TrackerSubject } from '@cardano-sdk/util-rxjs';
@@ -36,7 +37,8 @@ export interface TransactionsTrackerProps {
   addresses$: Observable<Cardano.Address[]>;
   tip$: Observable<Cardano.Tip>;
   retryBackoffConfig: RetryBackoffConfig;
-  store: OrderedCollectionStore<Cardano.TxAlonzo>;
+  transactionsHistoryStore: OrderedCollectionStore<Cardano.TxAlonzo>;
+  inFlightTransactionsStore: DocumentStore<Cardano.NewTxAlonzo[]>;
   newTransactions: {
     submitting$: Observable<Cardano.NewTxAlonzo>;
     pending$: Observable<Cardano.NewTxAlonzo>;
@@ -132,9 +134,10 @@ export const createTransactionsTracker = (
     tip$,
     chainHistoryProvider,
     addresses$,
-    newTransactions: { submitting$, pending$, failedToSubmit$ },
+    newTransactions: { submitting$: newSubmitting$, pending$, failedToSubmit$ },
     retryBackoffConfig,
-    store
+    transactionsHistoryStore: transactionsStore,
+    inFlightTransactionsStore: newTransactionsStore
   }: TransactionsTrackerProps,
   {
     transactionsSource$ = new TrackerSubject<Cardano.TxAlonzo[]>(
@@ -143,11 +146,16 @@ export const createTransactionsTracker = (
         addresses$,
         retryBackoffConfig,
         distinctBlock(tip$),
-        store
+        transactionsStore
       )
     )
   }: TransactionsTrackerInternals = {}
 ): TransactionsTracker & Shutdown => {
+  const submitting$ = merge(
+    newTransactionsStore.get().pipe(mergeMap((transactions) => from(transactions))),
+    newSubmitting$
+  );
+
   const historicalTransactions$ = createHistoricalTransactionsTrackerSubject(transactionsSource$);
   const txConfirmed$ = (tx: Cardano.NewTxAlonzo) =>
     newTransactions$(historicalTransactions$).pipe(
@@ -199,6 +207,7 @@ export const createTransactionsTracker = (
         const idx = inFlight.indexOf(tx);
         return [...inFlight.splice(0, idx), ...inFlight.splice(idx + 1)];
       }, [] as Cardano.NewTxAlonzo[]),
+      tap((inFlight) => newTransactionsStore.set(inFlight)),
       startWith([])
     )
   );

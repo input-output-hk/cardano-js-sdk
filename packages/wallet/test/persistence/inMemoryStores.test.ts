@@ -4,6 +4,7 @@ import {
   InMemoryCollectionStore,
   InMemoryDocumentStore,
   InMemoryGenesisParametersStore,
+  InMemoryInFlightTransactionsStore,
   InMemoryKeyValueStore,
   InMemoryNetworkInfoStore,
   InMemoryProtocolParametersStore,
@@ -124,5 +125,6 @@ describe('inMemoryStores', () => {
     expect(new InMemoryNetworkInfoStore()).toBeInstanceOf(InMemoryDocumentStore);
     expect(new InMemoryAssetsStore()).toBeInstanceOf(InMemoryDocumentStore);
     expect(new InMemoryAddressesStore()).toBeInstanceOf(InMemoryDocumentStore);
+    expect(new InMemoryInFlightTransactionsStore()).toBeInstanceOf(InMemoryDocumentStore);
   });
 });
