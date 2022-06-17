@@ -42,11 +42,11 @@ mkdir -p sockets
 $sed -i -E "s/\"startTime\": [0-9]+/\"startTime\": ${timeUnix}/" byron/genesis.json
 $sed -i -E "s/\"systemStart\": \".*\"/\"systemStart\": \"${timeISO}\"/" shelley/genesis.json
 
-$sed -i -E "s/\"startTime\": [0-9]+/\"startTime\": ${timeUnix}/" ../config/network/testnet/genesis/byron.json
-$sed -i -E "s/\"systemStart\": \".*\"/\"systemStart\": \"${timeISO}\"/"  ../config/network/testnet/genesis/shelley.json
+$sed -i -E "s/\"startTime\": [0-9]+/\"startTime\": ${timeUnix}/" ./config/network/testnet/genesis/byron.json
+$sed -i -E "s/\"systemStart\": \".*\"/\"systemStart\": \"${timeISO}\"/"  ./config/network/testnet/genesis/shelley.json
 
-$sed -i -E "s/\"startTime\": [0-9]+/\"startTime\": ${timeUnix}/" ../config/network/testnet/cardano-node/genesis/byron.json
-$sed -i -E "s/\"systemStart\": \".*\"/\"systemStart\": \"${timeISO}\"/"  ../config/network/testnet/cardano-node/genesis/shelley.json
+$sed -i -E "s/\"startTime\": [0-9]+/\"startTime\": ${timeUnix}/" ./config/network/testnet/cardano-node/genesis/byron.json
+$sed -i -E "s/\"systemStart\": \".*\"/\"systemStart\": \"${timeISO}\"/"  ./config/network/testnet/cardano-node/genesis/shelley.json
 
 echo "Update VRF key permission, sometimes GitHub changes these"
 chmod 600 \
@@ -62,8 +62,8 @@ run/node-bft1.sh &
 run/node-bft2.sh &
 run/node-pool1.sh &
 
-# Mint test tokens as soon as nodes are ready
+CARDANO_NODE_SOCKET_PATH=$PWD/sockets/node-pool1.sock ./scripts/teardown-docker.sh &
 CARDANO_NODE_SOCKET_PATH=$PWD/sockets/node-pool1.sock ./scripts/mint-tokens.sh &
-CARDANO_NODE_SOCKET_PATH=$PWD/sockets/node-pool1.sock ./scripts/update-genesis-hashes.sh &
+CARDANO_NODE_SOCKET_PATH=$PWD/sockets/node-pool1.sock ./scripts/setup-docker.sh &
 
 wait

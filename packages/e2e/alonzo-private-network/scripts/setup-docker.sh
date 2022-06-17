@@ -33,3 +33,6 @@ echo "Shelley genesis hash: $shelleyGenesisHash"
 $sed -i -E "s/\"ByronGenesisHash\": \".*\"/\"ByronGenesisHash\": \"${byronGenesisHash}\"/"  ./config/network/testnet/cardano-node/config.json 
 $sed -i -E "s/\"ShelleyGenesisHash\": \".*\"/\"ShelleyGenesisHash\": \"${shelleyGenesisHash}\"/"  ./config/network/testnet/cardano-node/config.json 
 
+# TODO: Enviroment variables must be injected. 
+CARDANO_DB_SYNC_VERSION=13.0.0-rc3 DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 OGMIOS_PORT=1338 NETWORK=testnet docker-compose -p private-testnet-e2e up
+
