@@ -31,6 +31,8 @@ EOL
 
 currencySymbol=$(cardano-cli transaction policyid --script-file shelley/utxo-keys/minting-policy.json)
 addr=$(cardano-cli address build --payment-verification-key-file shelley/utxo-keys/utxo1.vkey --testnet-magic 42)
+echo "Address {$addr}"
+
 # Spend the first UTxO
 utxo=$(cardano-cli query utxo --address "$addr" --testnet-magic 42 | awk 'NR == 3 {printf("%s#%s", $1, $2)}')
 

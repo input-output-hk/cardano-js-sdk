@@ -38,15 +38,24 @@ rm -rf \
 
 mkdir -p sockets
 
-#echo "Update start time in genesis files"
+echo "Update start time in genesis files"
 $sed -i -E "s/\"startTime\": [0-9]+/\"startTime\": ${timeUnix}/" byron/genesis.json
 $sed -i -E "s/\"systemStart\": \".*\"/\"systemStart\": \"${timeISO}\"/" shelley/genesis.json
 
-$sed -i -E "s/\"startTime\": [0-9]+/\"startTime\": ${timeUnix}/" ./config/network/testnet/genesis/byron.json
-$sed -i -E "s/\"systemStart\": \".*\"/\"systemStart\": \"${timeISO}\"/"  ./config/network/testnet/genesis/shelley.json
+$sed -i -E "s/\"startTime\": [0-9]+/\"startTime\": ${timeUnix}/" /config/nodes/genesis/byron.json
+$sed -i -E "s/\"systemStart\": \".*\"/\"systemStart\": \"${timeISO}\"/"  /config/nodes/genesis/shelley.json
 
-$sed -i -E "s/\"startTime\": [0-9]+/\"startTime\": ${timeUnix}/" ./config/network/testnet/cardano-node/genesis/byron.json
-$sed -i -E "s/\"systemStart\": \".*\"/\"systemStart\": \"${timeISO}\"/"  ./config/network/testnet/cardano-node/genesis/shelley.json
+$sed -i -E "s/\"startTime\": [0-9]+/\"startTime\": ${timeUnix}/" /config/nodes/cardano-node/genesis/byron.json
+$sed -i -E "s/\"systemStart\": \".*\"/\"systemStart\": \"${timeISO}\"/"  /config/nodes/cardano-node/genesis/shelley.json
+
+byronGenesisHash=$(cardano-cli byron genesis print-genesis-hash --genesis-json byron/genesis.json)
+shelleyGenesisHash=$(cardano-cli genesis hash --genesis shelley/genesis.json)
+
+echo "Byron genesis hash: $byronGenesisHash"
+echo "Shelley genesis hash: $shelleyGenesisHash"
+
+$sed -i -E "s/\"ByronGenesisHash\": \".*\"/\"ByronGenesisHash\": \"${byronGenesisHash}\"/"  /config/nodes/cardano-node/config.json 
+$sed -i -E "s/\"ShelleyGenesisHash\": \".*\"/\"ShelleyGenesisHash\": \"${shelleyGenesisHash}\"/"  /config/nodes/cardano-node/config.json 
 
 echo "Update VRF key permission, sometimes GitHub changes these"
 chmod 600 \
@@ -62,8 +71,6 @@ run/node-bft1.sh &
 run/node-bft2.sh &
 run/node-pool1.sh &
 
-CARDANO_NODE_SOCKET_PATH=$PWD/sockets/node-pool1.sock ./scripts/teardown-docker.sh &
 CARDANO_NODE_SOCKET_PATH=$PWD/sockets/node-pool1.sock ./scripts/mint-tokens.sh &
-CARDANO_NODE_SOCKET_PATH=$PWD/sockets/node-pool1.sock ./scripts/setup-docker.sh &
 
 wait

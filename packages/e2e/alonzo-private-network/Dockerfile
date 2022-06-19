@@ -14,4 +14,4 @@ RUN apt-get update -y && \
   apt-get install -y tzdata ca-certificates
 COPY --from=builder /build/bin ./bin
 COPY . .
-CMD ["./scripts/reset.sh"]
+CMD ["./scripts/start.sh"]
