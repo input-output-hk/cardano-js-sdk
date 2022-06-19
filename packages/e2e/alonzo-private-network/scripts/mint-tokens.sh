@@ -31,7 +31,7 @@ EOL
 
 currencySymbol=$(cardano-cli transaction policyid --script-file shelley/utxo-keys/minting-policy.json)
 addr=$(cardano-cli address build --payment-verification-key-file shelley/utxo-keys/utxo1.vkey --testnet-magic 42)
-echo "Address {$addr}"
+faucetAddr="addr_test1qqen0wpmhg7fhkus45lyv4wju26cecgu6avplrnm6dgvuk6qel5hu3u3q0fht53ly97yx95hkt56j37ch07pesf6s4pqh5gd4e"
 
 # Spend the first UTxO
 utxo=$(cardano-cli query utxo --address "$addr" --testnet-magic 42 | awk 'NR == 3 {printf("%s#%s", $1, $2)}')
@@ -42,11 +42,12 @@ for i in "${!TOKENS[@]}"; do
   tokenList="${tokenList}+${AMOUNT} ${currencySymbol}.${TOKENS[i]}"
 done
 
+
 cardano-cli transaction build \
   --alonzo-era \
-  --change-address "$addr" \
+  --change-address "$faucetAddr" \
   --tx-in "$utxo" \
-  --tx-out "$addr"+10000000+"$tokenList" \
+  --tx-out "$faucetAddr"+10000000+"$tokenList" \
   --mint "$tokenList" \
   --mint-script-file shelley/utxo-keys/minting-policy.json \
   --testnet-magic 42 \

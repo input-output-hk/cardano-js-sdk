@@ -14,7 +14,7 @@ services:
       test: ["CMD-SHELL", "test - f /root/sockets/node-pool1.sock"]
       interval: 10s
       timeout: 5s
-      retries: 6
+      retries: 10
   postgres:
     image: postgres:${POSTGRES_VERSION:-11.5-alpine}
     environment:
@@ -97,7 +97,27 @@ services:
       options:
         max-size: "200k"
         max-file: "10"
-
+  cardano-wallet:
+    image: inputoutput/cardano-wallet:2022.5.27
+    volumes:
+      - wallet-${NETWORK}-db:/wallet-db
+      - node-ipc:/ipc
+      - ./config:/config
+    ports:
+      - 8090:8090
+    entrypoint: []                                                                            
+    command: bash -c "sleep 10 && ([[ $$NETWORK == \"mainnet\" ]] && $$CMD --mainnet) || ($$CMD --testnet /config/network/${NETWORK}/genesis/byron.json)"
+    environment:
+      CMD: "cardano-wallet serve --node-socket /ipc/node.socket --database /wallet-db --listen-address 0.0.0.0"
+      NETWORK:
+    depends_on:
+      - cardano-node-ogmios
+    restart: on-failure
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
 secrets:
   postgres_db:
     file: ./placeholder-secrets/postgres_db
@@ -110,3 +130,5 @@ volumes:
   node-db:
   node-ipc:
   postgres-data:
+  wallet-mainnet-db:
+  wallet-testnet-db:
