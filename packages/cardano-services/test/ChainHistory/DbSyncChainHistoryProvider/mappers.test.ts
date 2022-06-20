@@ -14,7 +14,6 @@ import {
   StakeCertModel,
   TipModel,
   TxInOutModel,
-  TxMetadataModel,
   TxModel,
   TxOutMultiAssetModel,
   TxOutTokenMap,
@@ -75,19 +74,6 @@ const withdrawalModel: WithdrawalModel = {
   stake_address: stakeAddress,
   tx_id: Buffer.from(transactionHash, 'hex')
 };
-const txMetadataModel: TxMetadataModel[] = [
-  {
-    json_value: { v: 1 },
-    key: '127',
-    tx_id: Buffer.from(transactionHash, 'hex')
-  },
-  {
-    json_value: { a: 2 },
-    key: '500',
-    tx_id: Buffer.from(transactionHash, 'hex')
-  }
-];
-
 const txModel: TxModel = {
   block_hash: Buffer.from(blockHash, 'hex'),
   block_no: 200,
@@ -448,17 +434,6 @@ describe('chain history mappers', () => {
       const result = mappers.mapTxTokenMap([multiAssetModel, multiAssetModel]);
       expect(result).toEqual<TxTokenMap>(
         new Map([[Cardano.TransactionId(transactionHash), new Map([[Cardano.AssetId(policyId + assetName), 24_000n]])]])
-      );
-    });
-  });
-  describe('mapTxMetadata', () => {
-    test('map TxMetadataModel to Cardano.TxMetadata', () => {
-      const result = mappers.mapTxMetadata(txMetadataModel);
-      expect(result).toEqual<Cardano.TxMetadata>(
-        new Map([
-          [127n, new Map([['v', 1n]])],
-          [500n, new Map([['a', 2n]])]
-        ])
       );
     });
   });

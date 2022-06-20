@@ -85,12 +85,6 @@ export interface RedeemerModel {
   tx_id: Buffer;
 }
 
-export interface TxMetadataModel {
-  key: string;
-  json_value: { [k: string]: unknown };
-  tx_id: Buffer;
-}
-
 export interface CertificateModel {
   cert_index: number;
   tx_id: Buffer;

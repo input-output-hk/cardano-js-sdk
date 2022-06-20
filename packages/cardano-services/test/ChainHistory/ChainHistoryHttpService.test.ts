@@ -12,7 +12,9 @@ import {
 import { ChainHistoryHttpService, DbSyncChainHistoryProvider, HttpServer, HttpServerConfig } from '../../src';
 import { Pool } from 'pg';
 import { chainHistoryHttpProvider } from '@cardano-sdk/cardano-services-client';
+import { createDbSyncMetadataService } from '../../src/Metadata';
 import { doServerRequest } from '../util';
+import { dummyLogger } from 'ts-log';
 import { fromSerializableObject } from '@cardano-sdk/util';
 import { getPort } from 'get-port-please';
 import axios from 'axios';
@@ -68,7 +70,8 @@ describe('ChainHistoryHttpService', () => {
 
   describe('healthy state', () => {
     beforeAll(async () => {
-      chainHistoryProvider = new DbSyncChainHistoryProvider(dbConnection);
+      const metadataService = createDbSyncMetadataService(dbConnection, dummyLogger);
+      chainHistoryProvider = new DbSyncChainHistoryProvider(dbConnection, metadataService);
       service = new ChainHistoryHttpService({ chainHistoryProvider });
       httpServer = new HttpServer(config, { services: [service] });
       await httpServer.initialize();
