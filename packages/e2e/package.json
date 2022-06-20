@@ -1,0 +1,19 @@
+{
+  "name": "e2e",
+  "version": "0.0.1",
+  "description": "End to end tests for the cardano-js-sdk packages.",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest -c ./jest.config.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/input-output-hk/cardano-js-sdk/packages/e2e"
+  },
+  "author": "Angel Castillo",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "cardano-wallet-js": "^1.4.0",
+    "minimal-timer": "^4.1.0"
+  }
+}
