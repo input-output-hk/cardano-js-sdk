@@ -7,7 +7,7 @@ describe('CardanoWalletFaucetProvider', () => {
    
     beforeAll(async () => {
 
-        await _faucetProvider.start?.();
+        await _faucetProvider.start();
         let healthCheck = await _faucetProvider.healthCheck();
 
         if (!healthCheck.ok)
@@ -16,7 +16,7 @@ describe('CardanoWalletFaucetProvider', () => {
 
     afterAll(async() => {
 
-        await _faucetProvider.close?.();
+        await _faucetProvider.close();
     });
 
     it('must be able to fund a wallet with the requested amount of ada.', async () => {
