@@ -11,7 +11,7 @@ const PARAM_NAME_MNEMONICS: string = 'mnomonics';
 export class FaucetFactory {
 
     /**
-     * Creates a new faucet factory.
+     * Create a new faucet provider.
      * 
      * @param name The name of the concrete facet provider implementation.
      * @param params The parameters to be passed to the concrete implementation constructor.
