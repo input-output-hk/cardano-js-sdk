@@ -1,21 +1,21 @@
 /* eslint-disable max-statements */
 import { Awaited } from '@cardano-sdk/util';
 import { Cardano } from '@cardano-sdk/core';
-import { ObservableWallet, SingleAddressWallet, StakeKeyStatus } from '../../../src';
-import { TX_TIMEOUT, firstValueFromTimed, waitForWalletStateSettle } from '../../util';
-import { TxInternals } from '../../../src/Transaction';
+import { ObservableWallet, SingleAddressWallet, StakeKeyStatus, Transaction } from '@cardano-sdk/wallet';
+import { TX_TIMEOUT, firstValueFromTimed, waitForWalletStateSettle } from '../util';
 import {
   assetProvider,
   chainHistoryProvider,
-  keyAgentByIdx,
+  keyAgentById,
   networkInfoProvider,
   poolId1,
   poolId2,
   rewardsProvider,
   stakePoolProvider,
   txSubmitProvider,
-  utxoProvider
-} from '../config';
+  utxoProvider,
+  walletProvider
+} from '../../config';
 import { combineLatest, filter, firstValueFrom } from 'rxjs';
 
 const getWalletStateSnapshot = async (wallet: ObservableWallet) => {
@@ -60,7 +60,7 @@ const createDelegationCertificates = ({
   };
 };
 
-const waitForTx = async (wallet: ObservableWallet, { hash }: TxInternals) => {
+const waitForTx = async (wallet: ObservableWallet, { hash }: Transaction.TxInternals) => {
   await firstValueFromTimed(
     combineLatest([
       wallet.transactions.history$.pipe(filter((txs) => txs.some(({ id }) => id === hash))),
@@ -79,12 +79,13 @@ const getWallet = async (idx: number) =>
     {
       assetProvider: await assetProvider,
       chainHistoryProvider: await chainHistoryProvider,
-      keyAgent: await keyAgentByIdx(idx),
+      keyAgent: await keyAgentById(idx),
       networkInfoProvider: await networkInfoProvider,
       rewardsProvider: await rewardsProvider,
-      stakePoolProvider,
+      stakePoolProvider: await stakePoolProvider,
       txSubmitProvider: await txSubmitProvider,
-      utxoProvider: await utxoProvider
+      utxoProvider: await utxoProvider,
+      walletProvider: await walletProvider
     }
   );
 
@@ -96,6 +97,7 @@ describe('SingleAddressWallet/delegation', () => {
     jest.setTimeout(180_000);
     wallet1 = await getWallet(0);
     wallet2 = await getWallet(1);
+
     await Promise.all([waitForWalletStateSettle(wallet1), waitForWalletStateSettle(wallet2)]);
   });
 
