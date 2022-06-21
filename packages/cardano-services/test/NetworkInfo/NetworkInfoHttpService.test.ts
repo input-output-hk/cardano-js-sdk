@@ -313,6 +313,20 @@ describe('NetworkInfoHttpService', () => {
         provider = networkInfoHttpProvider(apiUrlBase);
       });
 
+      it('stake', async () => {
+        const response = await provider.stake();
+        expect(response.active).toBeGreaterThan(0);
+        expect(response.live).toBeGreaterThan(0);
+      });
+
+      it('lovelaceSupply', async () => {
+        const response = await provider.lovelaceSupply();
+        expect(response.total).toBeGreaterThan(0);
+        expect(response.circulating).toBeGreaterThan(0);
+        // FIXME: fix circulating supply calculation
+        // expect(response.total).toBeGreaterThan(response.circulating);
+      });
+
       it('timeSettings', async () => {
         const response = await provider.timeSettings();
         expect(response[0].slotLength).toBeDefined();
