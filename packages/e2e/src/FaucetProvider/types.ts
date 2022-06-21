@@ -54,7 +54,7 @@ export interface FaucetProvider extends Provider {
    * @param timeout The time we are willing to wait (in milliseconds) for the faucet request transaction to be confirmed.
    * @param confirmations The number of blocks that has passed since our transaction was added to the blockchain.
    */
-  request(address: string, amount: number, confirmations?: number, timeout?: number): Promise<FaucetRequestResult>;
+   request(address: string, amount: number, confirmations?: number, timeout?: number): Promise<FaucetRequestResult>;
 
   /**
    * Request tAda to be transferred to several given addresses.
@@ -66,13 +66,20 @@ export interface FaucetProvider extends Provider {
    */
    multiRequest(addresses: string[], amounts: number[], confirmations?: number, timeout?: number): Promise<FaucetRequestResult>;
 
-   start?(): Promise<void>;
    /**
-    * @throws ProviderError
+    * Initializes the faucet provider.
     */
-   close?(): Promise<void>;
+   start(): Promise<void>;
+
    /**
-    * @throws ProviderError
+    * Finalizes the faucet provider.
     */
+   close(): Promise<void>;
+
+  /**
+   * Performs a health check on the provider.
+   * 
+   * @return A promise with the healthcheck reponse.
+   */
    healthCheck(): Promise<HealthCheckResponse>;
 }
