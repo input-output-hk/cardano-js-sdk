@@ -9,3 +9,7 @@ alonzo-private-network/config/network/testnet/cardano-node/genesis/byron.json
 alonzo-private-network/config/network/testnet/cardano-node/genesis/shelley.json
 alonzo-private-network/config/network/testnet/genesis/byron.json
 alonzo-private-network/config/network/testnet/genesis/shelley.json
+node_modules
+dist
+coverage
+.env
