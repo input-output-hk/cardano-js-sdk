@@ -807,9 +807,9 @@ Object {
 }
 `;
 
-exports[`StakePoolBuilder getLastEpoch getLastEpoch 1`] = `183`;
+exports[`StakePoolBuilder getLastEpoch getLastEpoch 1`] = `205`;
 
-exports[`StakePoolBuilder getTotalAmountOfAda getTotalAmountOfAda 1`] = `"69154425288708824"`;
+exports[`StakePoolBuilder getTotalAmountOfAda getTotalAmountOfAda 1`] = `"69154436284251039"`;
 
 exports[`StakePoolBuilder queryPoolData pagination with limit 1`] = `
 Array [
@@ -1121,28 +1121,28 @@ Array [
     "blocksCreated": "0",
     "delegators": "1",
     "livePledge": 22615260846603n,
-    "saturation": "0.73124766048102459411",
+    "saturation": "0.73132364006522060905",
     "size": Object {
-      "active": "0.81597953725094421936",
-      "live": "0.18402046274905578064",
+      "active": "0.81599865573348361135",
+      "live": "0.18400134426651638865",
     },
     "stake": Object {
-      "active": 50147015265584n,
+      "active": 50153400814617n,
       "live": 11309201436284n,
     },
   },
   Object {
     "blocksCreated": "0",
     "delegators": "1",
-    "livePledge": 487464117n,
-    "saturation": "0.000035543342979113939881",
+    "livePledge": 495463149n,
+    "saturation": "0.000041429290528821850262",
     "size": Object {
-      "active": "0.83681394324934275242",
-      "live": "0.16318605675065724758",
+      "active": "0.85770077629124006825",
+      "live": "0.14229922370875993175",
     },
     "stake": Object {
-      "active": 2499703578n,
-      "live": 487464117n,
+      "active": 2986376991n,
+      "live": 495463149n,
     },
   },
 ]
@@ -1153,6 +1153,20 @@ Array [
   Object {
     "blocksCreated": "0",
     "delegators": "1",
+    "livePledge": 495463149n,
+    "saturation": "0.000041429290528821850262",
+    "size": Object {
+      "active": "0.85770077629124006825",
+      "live": "0.14229922370875993175",
+    },
+    "stake": Object {
+      "active": 2986376991n,
+      "live": 495463149n,
+    },
+  },
+  Object {
+    "blocksCreated": "0",
+    "delegators": "1",
     "livePledge": 487464117n,
     "saturation": "0.000035543342979113939881",
     "size": Object {
@@ -1162,20 +1176,6 @@ Array [
     "stake": Object {
       "active": 2499703578n,
       "live": 487464117n,
-    },
-  },
-  Object {
-    "blocksCreated": "0",
-    "delegators": "1",
-    "livePledge": 495463149n,
-    "saturation": "0.000015358243471457568303",
-    "size": Object {
-      "active": "0.61614387139960263961",
-      "live": "0.38385612860039736039",
-    },
-    "stake": Object {
-      "active": 795289068n,
-      "live": 495463149n,
     },
   },
 ]
@@ -1187,14 +1187,28 @@ Array [
     "blocksCreated": "0",
     "delegators": "1",
     "livePledge": 22615260846603n,
-    "saturation": "0.73124766048102459411",
+    "saturation": "0.73132364006522060905",
     "size": Object {
-      "active": "0.81597953725094421936",
-      "live": "0.18402046274905578064",
+      "active": "0.81599865573348361135",
+      "live": "0.18400134426651638865",
     },
     "stake": Object {
-      "active": 50147015265584n,
+      "active": 50153400814617n,
       "live": 11309201436284n,
+    },
+  },
+  Object {
+    "blocksCreated": "0",
+    "delegators": "1",
+    "livePledge": 495463149n,
+    "saturation": "0.000041429290528821850262",
+    "size": Object {
+      "active": "0.85770077629124006825",
+      "live": "0.14229922370875993175",
+    },
+    "stake": Object {
+      "active": 2986376991n,
+      "live": 495463149n,
     },
   },
   Object {
@@ -1209,20 +1223,6 @@ Array [
     "stake": Object {
       "active": 2499703578n,
       "live": 487464117n,
-    },
-  },
-  Object {
-    "blocksCreated": "0",
-    "delegators": "1",
-    "livePledge": 495463149n,
-    "saturation": "0.000015358243471457568303",
-    "size": Object {
-      "active": "0.61614387139960263961",
-      "live": "0.38385612860039736039",
-    },
-    "stake": Object {
-      "active": 795289068n,
-      "live": 495463149n,
     },
   },
 ]
@@ -1233,20 +1233,6 @@ Array [
   Object {
     "blocksCreated": "0",
     "delegators": "1",
-    "livePledge": 495463149n,
-    "saturation": "0.000015358243471457568303",
-    "size": Object {
-      "active": "0.61614387139960263961",
-      "live": "0.38385612860039736039",
-    },
-    "stake": Object {
-      "active": 795289068n,
-      "live": 495463149n,
-    },
-  },
-  Object {
-    "blocksCreated": "0",
-    "delegators": "1",
     "livePledge": 487464117n,
     "saturation": "0.000035543342979113939881",
     "size": Object {
@@ -1261,14 +1247,28 @@ Array [
   Object {
     "blocksCreated": "0",
     "delegators": "1",
-    "livePledge": 22615260846603n,
-    "saturation": "0.73124766048102459411",
+    "livePledge": 495463149n,
+    "saturation": "0.000041429290528821850262",
     "size": Object {
-      "active": "0.81597953725094421936",
-      "live": "0.18402046274905578064",
+      "active": "0.85770077629124006825",
+      "live": "0.14229922370875993175",
     },
     "stake": Object {
-      "active": 50147015265584n,
+      "active": 2986376991n,
+      "live": 495463149n,
+    },
+  },
+  Object {
+    "blocksCreated": "0",
+    "delegators": "1",
+    "livePledge": 22615260846603n,
+    "saturation": "0.73132364006522060905",
+    "size": Object {
+      "active": "0.81599865573348361135",
+      "live": "0.18400134426651638865",
+    },
+    "stake": Object {
+      "active": 50153400814617n,
       "live": 11309201436284n,
     },
   },

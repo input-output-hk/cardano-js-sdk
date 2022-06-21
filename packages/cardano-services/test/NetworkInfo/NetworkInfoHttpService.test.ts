@@ -120,7 +120,7 @@ describe('NetworkInfoHttpService', () => {
         });
 
         it('should not invalidate the epoch values from the cache if there is no epoch rollover', async () => {
-          const currentEpochNo = 183;
+          const currentEpochNo = 205;
           const totalQueriesCount = networkInfoTotalQueriesCount + DB_POLL_QUERIES_COUNT;
 
           await doNetworkInfoRequest<[], NetworkInfo>(path, []);

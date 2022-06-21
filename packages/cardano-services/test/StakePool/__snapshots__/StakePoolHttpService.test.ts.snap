@@ -12,10 +12,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -50,15 +50,15 @@ Object {
           "__type": "bigint",
           "value": "22615260846603",
         },
-        "saturation": "0.44434044853455135587",
+        "saturation": "0.44438654664370572553",
         "size": Object {
-          "active": "0.81597953725094421936",
-          "live": "0.18402046274905578064",
+          "active": "0.81599865573348361135",
+          "live": "0.18400134426651638865",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
           "live": Object {
             "__type": "bigint",
@@ -102,10 +102,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -140,15 +140,15 @@ Object {
           "__type": "bigint",
           "value": "495463149",
         },
-        "saturation": "0.000009332390599815651490",
+        "saturation": "0.000025174380177782901422",
         "size": Object {
-          "active": "0.61614387139960263961",
-          "live": "0.38385612860039736039",
+          "active": "0.85770077629124006825",
+          "live": "0.14229922370875993175",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
           "live": Object {
             "__type": "bigint",
@@ -183,10 +183,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -221,15 +221,15 @@ Object {
           "__type": "bigint",
           "value": "22615260846603",
         },
-        "saturation": "0.44434044853455135587",
+        "saturation": "0.44438654664370572553",
         "size": Object {
-          "active": "0.81597953725094421936",
-          "live": "0.18402046274905578064",
+          "active": "0.81599865573348361135",
+          "live": "0.18400134426651638865",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
           "live": Object {
             "__type": "bigint",
@@ -265,10 +265,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -303,15 +303,15 @@ Object {
           "__type": "bigint",
           "value": "199806239",
         },
-        "saturation": "0.000010821238378828440746",
+        "saturation": "0.000011101058301516805716",
         "size": Object {
-          "active": "0.86649974082983449634",
-          "live": "0.13350025917016550366",
+          "active": "0.86986484899181539157",
+          "live": "0.13013515100818460843",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
           "live": Object {
             "__type": "bigint",
@@ -348,8 +348,8 @@ Object {
             "__type": "bigint",
             "value": "2499703578",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -384,7 +384,7 @@ Object {
           "__type": "bigint",
           "value": "487464117",
         },
-        "saturation": "0.000021597805798609747488",
+        "saturation": "0.000021597802364562733731",
         "size": Object {
           "active": "0.83681394324934275242",
           "live": "0.16318605675065724758",
@@ -435,10 +435,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -473,15 +473,15 @@ Object {
           "__type": "bigint",
           "value": "495463149",
         },
-        "saturation": "0.000009332390599815651490",
+        "saturation": "0.000025174380177782901422",
         "size": Object {
-          "active": "0.61614387139960263961",
-          "live": "0.38385612860039736039",
+          "active": "0.85770077629124006825",
+          "live": "0.14229922370875993175",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
           "live": Object {
             "__type": "bigint",
@@ -516,10 +516,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -554,15 +554,15 @@ Object {
           "__type": "bigint",
           "value": "22615260846603",
         },
-        "saturation": "0.44434044853455135587",
+        "saturation": "0.44438654664370572553",
         "size": Object {
-          "active": "0.81597953725094421936",
-          "live": "0.18402046274905578064",
+          "active": "0.81599865573348361135",
+          "live": "0.18400134426651638865",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
           "live": Object {
             "__type": "bigint",
@@ -600,8 +600,8 @@ Object {
             "__type": "bigint",
             "value": "0",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -636,7 +636,7 @@ Object {
           "__type": "bigint",
           "value": "1988240000",
         },
-        "saturation": "0.000003593840870810890678",
+        "saturation": "0.000003593840299390875820",
         "size": Object {
           "active": "0.0000000000000000000000000000",
           "live": "1.00000000000000000000",
@@ -684,8 +684,8 @@ Object {
             "__type": "bigint",
             "value": "321928331851",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -720,7 +720,7 @@ Object {
           "__type": "bigint",
           "value": "1791084124",
         },
-        "saturation": "0.00234055459664021839",
+        "saturation": "0.00234055422449248274",
         "size": Object {
           "active": "0.99446717115003592889",
           "live": "0.00553282884996407111",
@@ -767,8 +767,8 @@ Object {
             "__type": "bigint",
             "value": "10021869680",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -803,7 +803,7 @@ Object {
           "__type": "bigint",
           "value": "1099603790",
         },
-        "saturation": "0.000072460074956593695520",
+        "saturation": "0.000072460063435455560399",
         "size": Object {
           "active": "1.00000000000000000000",
           "live": "0.0000000000000000000000000000",
@@ -846,10 +846,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -884,15 +884,15 @@ Object {
           "__type": "bigint",
           "value": "199806239",
         },
-        "saturation": "0.000010821238378828440746",
+        "saturation": "0.000011101058301516805716",
         "size": Object {
-          "active": "0.86649974082983449634",
-          "live": "0.13350025917016550366",
+          "active": "0.86986484899181539157",
+          "live": "0.13013515100818460843",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
           "live": Object {
             "__type": "bigint",
@@ -929,8 +929,8 @@ Object {
             "__type": "bigint",
             "value": "2499703578",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -965,7 +965,7 @@ Object {
           "__type": "bigint",
           "value": "487464117",
         },
-        "saturation": "0.000021597805798609747488",
+        "saturation": "0.000021597802364562733731",
         "size": Object {
           "active": "0.83681394324934275242",
           "live": "0.16318605675065724758",
@@ -1040,7 +1040,7 @@ Object {
           "__type": "bigint",
           "value": "997623150",
         },
-        "saturation": "0.000007213010200251687547",
+        "saturation": "0.000007213009053384437728",
         "size": Object {
           "active": "0.0000000000000000000000000000",
           "live": "1.00000000000000000000",
@@ -1098,10 +1098,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -1136,15 +1136,15 @@ Object {
           "__type": "bigint",
           "value": "495463149",
         },
-        "saturation": "0.000009332390599815651490",
+        "saturation": "0.000025174380177782901422",
         "size": Object {
-          "active": "0.61614387139960263961",
-          "live": "0.38385612860039736039",
+          "active": "0.85770077629124006825",
+          "live": "0.14229922370875993175",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
           "live": Object {
             "__type": "bigint",
@@ -1179,10 +1179,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -1217,15 +1217,15 @@ Object {
           "__type": "bigint",
           "value": "22615260846603",
         },
-        "saturation": "0.44434044853455135587",
+        "saturation": "0.44438654664370572553",
         "size": Object {
-          "active": "0.81597953725094421936",
-          "live": "0.18402046274905578064",
+          "active": "0.81599865573348361135",
+          "live": "0.18400134426651638865",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
           "live": Object {
             "__type": "bigint",
@@ -1263,8 +1263,8 @@ Object {
             "__type": "bigint",
             "value": "321928331851",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -1299,7 +1299,7 @@ Object {
           "__type": "bigint",
           "value": "1791084124",
         },
-        "saturation": "0.00234055459664021839",
+        "saturation": "0.00234055422449248274",
         "size": Object {
           "active": "0.99446717115003592889",
           "live": "0.00553282884996407111",
@@ -1344,10 +1344,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -1382,15 +1382,15 @@ Object {
           "__type": "bigint",
           "value": "199806239",
         },
-        "saturation": "0.000010821238378828440746",
+        "saturation": "0.000011101058301516805716",
         "size": Object {
-          "active": "0.86649974082983449634",
-          "live": "0.13350025917016550366",
+          "active": "0.86986484899181539157",
+          "live": "0.13013515100818460843",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
           "live": Object {
             "__type": "bigint",
@@ -1427,8 +1427,8 @@ Object {
             "__type": "bigint",
             "value": "2499703578",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -1463,7 +1463,7 @@ Object {
           "__type": "bigint",
           "value": "487464117",
         },
-        "saturation": "0.000021597805798609747488",
+        "saturation": "0.000021597802364562733731",
         "size": Object {
           "active": "0.83681394324934275242",
           "live": "0.16318605675065724758",
@@ -1514,10 +1514,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -1552,15 +1552,15 @@ Object {
           "__type": "bigint",
           "value": "199806239",
         },
-        "saturation": "0.000010821238378828440746",
+        "saturation": "0.000011101058301516805716",
         "size": Object {
-          "active": "0.86649974082983449634",
-          "live": "0.13350025917016550366",
+          "active": "0.86986484899181539157",
+          "live": "0.13013515100818460843",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
           "live": Object {
             "__type": "bigint",
@@ -1597,8 +1597,8 @@ Object {
             "__type": "bigint",
             "value": "2499703578",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -1633,7 +1633,7 @@ Object {
           "__type": "bigint",
           "value": "487464117",
         },
-        "saturation": "0.000021597805798609747488",
+        "saturation": "0.000021597802364562733731",
         "size": Object {
           "active": "0.83681394324934275242",
           "live": "0.16318605675065724758",
@@ -1691,10 +1691,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -1729,15 +1729,15 @@ Object {
           "__type": "bigint",
           "value": "495463149",
         },
-        "saturation": "0.000009332390599815651490",
+        "saturation": "0.000025174380177782901422",
         "size": Object {
-          "active": "0.61614387139960263961",
-          "live": "0.38385612860039736039",
+          "active": "0.85770077629124006825",
+          "live": "0.14229922370875993175",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
           "live": Object {
             "__type": "bigint",
@@ -1772,10 +1772,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -1810,15 +1810,15 @@ Object {
           "__type": "bigint",
           "value": "22615260846603",
         },
-        "saturation": "0.44434044853455135587",
+        "saturation": "0.44438654664370572553",
         "size": Object {
-          "active": "0.81597953725094421936",
-          "live": "0.18402046274905578064",
+          "active": "0.81599865573348361135",
+          "live": "0.18400134426651638865",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
           "live": Object {
             "__type": "bigint",
@@ -1856,8 +1856,8 @@ Object {
             "__type": "bigint",
             "value": "321928331851",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -1892,7 +1892,7 @@ Object {
           "__type": "bigint",
           "value": "1791084124",
         },
-        "saturation": "0.00234055459664021839",
+        "saturation": "0.00234055422449248274",
         "size": Object {
           "active": "0.99446717115003592889",
           "live": "0.00553282884996407111",
@@ -1937,10 +1937,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -1975,15 +1975,15 @@ Object {
           "__type": "bigint",
           "value": "199806239",
         },
-        "saturation": "0.000010821238378828440746",
+        "saturation": "0.000011101058301516805716",
         "size": Object {
-          "active": "0.86649974082983449634",
-          "live": "0.13350025917016550366",
+          "active": "0.86986484899181539157",
+          "live": "0.13013515100818460843",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
           "live": Object {
             "__type": "bigint",
@@ -2020,8 +2020,8 @@ Object {
             "__type": "bigint",
             "value": "2499703578",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -2056,7 +2056,7 @@ Object {
           "__type": "bigint",
           "value": "487464117",
         },
-        "saturation": "0.000021597805798609747488",
+        "saturation": "0.000021597802364562733731",
         "size": Object {
           "active": "0.83681394324934275242",
           "live": "0.16318605675065724758",
@@ -2131,7 +2131,7 @@ Object {
           "__type": "bigint",
           "value": "999999828559",
         },
-        "saturation": "0.00723019405037463877",
+        "saturation": "0.00723019290077516005",
         "size": Object {
           "active": "0.0000000000000000000000000000",
           "live": "1.00000000000000000000",
@@ -2191,10 +2191,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -2229,15 +2229,15 @@ Object {
           "__type": "bigint",
           "value": "495463149",
         },
-        "saturation": "0.000009332390599815651490",
+        "saturation": "0.000025174380177782901422",
         "size": Object {
-          "active": "0.61614387139960263961",
-          "live": "0.38385612860039736039",
+          "active": "0.85770077629124006825",
+          "live": "0.14229922370875993175",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
           "live": Object {
             "__type": "bigint",
@@ -2272,10 +2272,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -2310,15 +2310,15 @@ Object {
           "__type": "bigint",
           "value": "22615260846603",
         },
-        "saturation": "0.44434044853455135587",
+        "saturation": "0.44438654664370572553",
         "size": Object {
-          "active": "0.81597953725094421936",
-          "live": "0.18402046274905578064",
+          "active": "0.81599865573348361135",
+          "live": "0.18400134426651638865",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
           "live": Object {
             "__type": "bigint",
@@ -2356,8 +2356,8 @@ Object {
             "__type": "bigint",
             "value": "321928331851",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -2392,7 +2392,7 @@ Object {
           "__type": "bigint",
           "value": "1791084124",
         },
-        "saturation": "0.00234055459664021839",
+        "saturation": "0.00234055422449248274",
         "size": Object {
           "active": "0.99446717115003592889",
           "live": "0.00553282884996407111",
@@ -2437,10 +2437,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -2475,15 +2475,15 @@ Object {
           "__type": "bigint",
           "value": "199806239",
         },
-        "saturation": "0.000010821238378828440746",
+        "saturation": "0.000011101058301516805716",
         "size": Object {
-          "active": "0.86649974082983449634",
-          "live": "0.13350025917016550366",
+          "active": "0.86986484899181539157",
+          "live": "0.13013515100818460843",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
           "live": Object {
             "__type": "bigint",
@@ -2520,8 +2520,8 @@ Object {
             "__type": "bigint",
             "value": "2499703578",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -2556,7 +2556,7 @@ Object {
           "__type": "bigint",
           "value": "487464117",
         },
-        "saturation": "0.000021597805798609747488",
+        "saturation": "0.000021597802364562733731",
         "size": Object {
           "active": "0.83681394324934275242",
           "live": "0.16318605675065724758",
@@ -2607,10 +2607,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -2645,15 +2645,15 @@ Object {
           "__type": "bigint",
           "value": "495463149",
         },
-        "saturation": "0.000009332390599815651490",
+        "saturation": "0.000025174380177782901422",
         "size": Object {
-          "active": "0.61614387139960263961",
-          "live": "0.38385612860039736039",
+          "active": "0.85770077629124006825",
+          "live": "0.14229922370875993175",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
           "live": Object {
             "__type": "bigint",
@@ -2688,10 +2688,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -2726,15 +2726,15 @@ Object {
           "__type": "bigint",
           "value": "22615260846603",
         },
-        "saturation": "0.44434044853455135587",
+        "saturation": "0.44438654664370572553",
         "size": Object {
-          "active": "0.81597953725094421936",
-          "live": "0.18402046274905578064",
+          "active": "0.81599865573348361135",
+          "live": "0.18400134426651638865",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
           "live": Object {
             "__type": "bigint",
@@ -2772,8 +2772,8 @@ Object {
             "__type": "bigint",
             "value": "0",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -2808,7 +2808,7 @@ Object {
           "__type": "bigint",
           "value": "1988240000",
         },
-        "saturation": "0.000003593840870810890678",
+        "saturation": "0.000003593840299390875820",
         "size": Object {
           "active": "0.0000000000000000000000000000",
           "live": "1.00000000000000000000",
@@ -2856,8 +2856,8 @@ Object {
             "__type": "bigint",
             "value": "10021869680",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -2892,7 +2892,7 @@ Object {
           "__type": "bigint",
           "value": "1099603790",
         },
-        "saturation": "0.000072460074956593695520",
+        "saturation": "0.000072460063435455560399",
         "size": Object {
           "active": "1.00000000000000000000",
           "live": "0.0000000000000000000000000000",
@@ -2935,10 +2935,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -2973,15 +2973,15 @@ Object {
           "__type": "bigint",
           "value": "199806239",
         },
-        "saturation": "0.000010821238378828440746",
+        "saturation": "0.000011101058301516805716",
         "size": Object {
-          "active": "0.86649974082983449634",
-          "live": "0.13350025917016550366",
+          "active": "0.86986484899181539157",
+          "live": "0.13013515100818460843",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
           "live": Object {
             "__type": "bigint",
@@ -3018,8 +3018,8 @@ Object {
             "__type": "bigint",
             "value": "2499703578",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -3054,7 +3054,7 @@ Object {
           "__type": "bigint",
           "value": "487464117",
         },
-        "saturation": "0.000021597805798609747488",
+        "saturation": "0.000021597802364562733731",
         "size": Object {
           "active": "0.83681394324934275242",
           "live": "0.16318605675065724758",
@@ -3129,7 +3129,7 @@ Object {
           "__type": "bigint",
           "value": "997623150",
         },
-        "saturation": "0.000007213010200251687547",
+        "saturation": "0.000007213009053384437728",
         "size": Object {
           "active": "0.0000000000000000000000000000",
           "live": "1.00000000000000000000",
@@ -3187,10 +3187,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -3225,15 +3225,15 @@ Object {
           "__type": "bigint",
           "value": "495463149",
         },
-        "saturation": "0.000009332390599815651490",
+        "saturation": "0.000025174380177782901422",
         "size": Object {
-          "active": "0.61614387139960263961",
-          "live": "0.38385612860039736039",
+          "active": "0.85770077629124006825",
+          "live": "0.14229922370875993175",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
           "live": Object {
             "__type": "bigint",
@@ -3268,10 +3268,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -3306,15 +3306,15 @@ Object {
           "__type": "bigint",
           "value": "22615260846603",
         },
-        "saturation": "0.44434044853455135587",
+        "saturation": "0.44438654664370572553",
         "size": Object {
-          "active": "0.81597953725094421936",
-          "live": "0.18402046274905578064",
+          "active": "0.81599865573348361135",
+          "live": "0.18400134426651638865",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
           "live": Object {
             "__type": "bigint",
@@ -3352,8 +3352,8 @@ Object {
             "__type": "bigint",
             "value": "0",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -3388,7 +3388,7 @@ Object {
           "__type": "bigint",
           "value": "1988240000",
         },
-        "saturation": "0.000003593840870810890678",
+        "saturation": "0.000003593840299390875820",
         "size": Object {
           "active": "0.0000000000000000000000000000",
           "live": "1.00000000000000000000",
@@ -3434,10 +3434,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -3472,15 +3472,15 @@ Object {
           "__type": "bigint",
           "value": "199806239",
         },
-        "saturation": "0.000010821238378828440746",
+        "saturation": "0.000011101058301516805716",
         "size": Object {
-          "active": "0.86649974082983449634",
-          "live": "0.13350025917016550366",
+          "active": "0.86986484899181539157",
+          "live": "0.13013515100818460843",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
           "live": Object {
             "__type": "bigint",
@@ -3517,8 +3517,8 @@ Object {
             "__type": "bigint",
             "value": "2499703578",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -3553,7 +3553,7 @@ Object {
           "__type": "bigint",
           "value": "487464117",
         },
-        "saturation": "0.000021597805798609747488",
+        "saturation": "0.000021597802364562733731",
         "size": Object {
           "active": "0.83681394324934275242",
           "live": "0.16318605675065724758",
@@ -3628,7 +3628,7 @@ Object {
           "__type": "bigint",
           "value": "997623150",
         },
-        "saturation": "0.000007213010200251687547",
+        "saturation": "0.000007213009053384437728",
         "size": Object {
           "active": "0.0000000000000000000000000000",
           "live": "1.00000000000000000000",
@@ -3679,10 +3679,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -3717,15 +3717,15 @@ Object {
           "__type": "bigint",
           "value": "495463149",
         },
-        "saturation": "0.000009332390599815651490",
+        "saturation": "0.000025174380177782901422",
         "size": Object {
-          "active": "0.61614387139960263961",
-          "live": "0.38385612860039736039",
+          "active": "0.85770077629124006825",
+          "live": "0.14229922370875993175",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
           "live": Object {
             "__type": "bigint",
@@ -3760,10 +3760,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -3798,15 +3798,15 @@ Object {
           "__type": "bigint",
           "value": "22615260846603",
         },
-        "saturation": "0.44434044853455135587",
+        "saturation": "0.44438654664370572553",
         "size": Object {
-          "active": "0.81597953725094421936",
-          "live": "0.18402046274905578064",
+          "active": "0.81599865573348361135",
+          "live": "0.18400134426651638865",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
           "live": Object {
             "__type": "bigint",
@@ -3857,10 +3857,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -3895,15 +3895,15 @@ Object {
           "__type": "bigint",
           "value": "495463149",
         },
-        "saturation": "0.000009332390599815651490",
+        "saturation": "0.000025174380177782901422",
         "size": Object {
-          "active": "0.61614387139960263961",
-          "live": "0.38385612860039736039",
+          "active": "0.85770077629124006825",
+          "live": "0.14229922370875993175",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
           "live": Object {
             "__type": "bigint",
@@ -3938,10 +3938,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -3976,15 +3976,15 @@ Object {
           "__type": "bigint",
           "value": "22615260846603",
         },
-        "saturation": "0.44434044853455135587",
+        "saturation": "0.44438654664370572553",
         "size": Object {
-          "active": "0.81597953725094421936",
-          "live": "0.18402046274905578064",
+          "active": "0.81599865573348361135",
+          "live": "0.18400134426651638865",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
           "live": Object {
             "__type": "bigint",
@@ -4022,8 +4022,8 @@ Object {
             "__type": "bigint",
             "value": "0",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -4058,7 +4058,7 @@ Object {
           "__type": "bigint",
           "value": "1988240000",
         },
-        "saturation": "0.000003593840870810890678",
+        "saturation": "0.000003593840299390875820",
         "size": Object {
           "active": "0.0000000000000000000000000000",
           "live": "1.00000000000000000000",
@@ -4106,8 +4106,8 @@ Object {
             "__type": "bigint",
             "value": "321928331851",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -4142,7 +4142,7 @@ Object {
           "__type": "bigint",
           "value": "1791084124",
         },
-        "saturation": "0.00234055459664021839",
+        "saturation": "0.00234055422449248274",
         "size": Object {
           "active": "0.99446717115003592889",
           "live": "0.00553282884996407111",
@@ -4187,10 +4187,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -4225,15 +4225,15 @@ Object {
           "__type": "bigint",
           "value": "199806239",
         },
-        "saturation": "0.000010821238378828440746",
+        "saturation": "0.000011101058301516805716",
         "size": Object {
-          "active": "0.86649974082983449634",
-          "live": "0.13350025917016550366",
+          "active": "0.86986484899181539157",
+          "live": "0.13013515100818460843",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
           "live": Object {
             "__type": "bigint",
@@ -4270,8 +4270,8 @@ Object {
             "__type": "bigint",
             "value": "2499703578",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -4306,7 +4306,7 @@ Object {
           "__type": "bigint",
           "value": "487464117",
         },
-        "saturation": "0.000021597805798609747488",
+        "saturation": "0.000021597802364562733731",
         "size": Object {
           "active": "0.83681394324934275242",
           "live": "0.16318605675065724758",
@@ -4381,7 +4381,7 @@ Object {
           "__type": "bigint",
           "value": "997623150",
         },
-        "saturation": "0.000007213010200251687547",
+        "saturation": "0.000007213009053384437728",
         "size": Object {
           "active": "0.0000000000000000000000000000",
           "live": "1.00000000000000000000",
@@ -4456,7 +4456,7 @@ Object {
           "__type": "bigint",
           "value": "999999828559",
         },
-        "saturation": "0.00723019405037463877",
+        "saturation": "0.00723019290077516005",
         "size": Object {
           "active": "0.0000000000000000000000000000",
           "live": "1.00000000000000000000",
@@ -4516,10 +4516,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -4554,15 +4554,15 @@ Object {
           "__type": "bigint",
           "value": "495463149",
         },
-        "saturation": "0.000009332390599815651490",
+        "saturation": "0.000025174380177782901422",
         "size": Object {
-          "active": "0.61614387139960263961",
-          "live": "0.38385612860039736039",
+          "active": "0.85770077629124006825",
+          "live": "0.14229922370875993175",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
           "live": Object {
             "__type": "bigint",
@@ -4597,10 +4597,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -4635,15 +4635,15 @@ Object {
           "__type": "bigint",
           "value": "22615260846603",
         },
-        "saturation": "0.44434044853455135587",
+        "saturation": "0.44438654664370572553",
         "size": Object {
-          "active": "0.81597953725094421936",
-          "live": "0.18402046274905578064",
+          "active": "0.81599865573348361135",
+          "live": "0.18400134426651638865",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
           "live": Object {
             "__type": "bigint",
@@ -4681,8 +4681,8 @@ Object {
             "__type": "bigint",
             "value": "0",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -4717,7 +4717,7 @@ Object {
           "__type": "bigint",
           "value": "1988240000",
         },
-        "saturation": "0.000003593840870810890678",
+        "saturation": "0.000003593840299390875820",
         "size": Object {
           "active": "0.0000000000000000000000000000",
           "live": "1.00000000000000000000",
@@ -4763,10 +4763,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -4801,15 +4801,15 @@ Object {
           "__type": "bigint",
           "value": "199806239",
         },
-        "saturation": "0.000010821238378828440746",
+        "saturation": "0.000011101058301516805716",
         "size": Object {
-          "active": "0.86649974082983449634",
-          "live": "0.13350025917016550366",
+          "active": "0.86986484899181539157",
+          "live": "0.13013515100818460843",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
           "live": Object {
             "__type": "bigint",
@@ -4846,8 +4846,8 @@ Object {
             "__type": "bigint",
             "value": "2499703578",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -4882,7 +4882,7 @@ Object {
           "__type": "bigint",
           "value": "487464117",
         },
-        "saturation": "0.000021597805798609747488",
+        "saturation": "0.000021597802364562733731",
         "size": Object {
           "active": "0.83681394324934275242",
           "live": "0.16318605675065724758",
@@ -4957,7 +4957,7 @@ Object {
           "__type": "bigint",
           "value": "997623150",
         },
-        "saturation": "0.000007213010200251687547",
+        "saturation": "0.000007213009053384437728",
         "size": Object {
           "active": "0.0000000000000000000000000000",
           "live": "1.00000000000000000000",
@@ -5008,10 +5008,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -5046,15 +5046,15 @@ Object {
           "__type": "bigint",
           "value": "495463149",
         },
-        "saturation": "0.000009332390599815651490",
+        "saturation": "0.000025174380177782901422",
         "size": Object {
-          "active": "0.61614387139960263961",
-          "live": "0.38385612860039736039",
+          "active": "0.85770077629124006825",
+          "live": "0.14229922370875993175",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
           "live": Object {
             "__type": "bigint",
@@ -5089,10 +5089,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -5127,15 +5127,15 @@ Object {
           "__type": "bigint",
           "value": "22615260846603",
         },
-        "saturation": "0.44434044853455135587",
+        "saturation": "0.44438654664370572553",
         "size": Object {
-          "active": "0.81597953725094421936",
-          "live": "0.18402046274905578064",
+          "active": "0.81599865573348361135",
+          "live": "0.18400134426651638865",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
           "live": Object {
             "__type": "bigint",
@@ -5171,10 +5171,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -5209,15 +5209,15 @@ Object {
           "__type": "bigint",
           "value": "199806239",
         },
-        "saturation": "0.000010821238378828440746",
+        "saturation": "0.000011101058301516805716",
         "size": Object {
-          "active": "0.86649974082983449634",
-          "live": "0.13350025917016550366",
+          "active": "0.86986484899181539157",
+          "live": "0.13013515100818460843",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
           "live": Object {
             "__type": "bigint",
@@ -5254,8 +5254,8 @@ Object {
             "__type": "bigint",
             "value": "2499703578",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -5290,7 +5290,7 @@ Object {
           "__type": "bigint",
           "value": "487464117",
         },
-        "saturation": "0.000021597805798609747488",
+        "saturation": "0.000021597802364562733731",
         "size": Object {
           "active": "0.83681394324934275242",
           "live": "0.16318605675065724758",
@@ -5341,10 +5341,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -5379,15 +5379,15 @@ Object {
           "__type": "bigint",
           "value": "495463149",
         },
-        "saturation": "0.000009332390599815651490",
+        "saturation": "0.000025174380177782901422",
         "size": Object {
-          "active": "0.61614387139960263961",
-          "live": "0.38385612860039736039",
+          "active": "0.85770077629124006825",
+          "live": "0.14229922370875993175",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
           "live": Object {
             "__type": "bigint",
@@ -5422,10 +5422,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -5460,15 +5460,15 @@ Object {
           "__type": "bigint",
           "value": "22615260846603",
         },
-        "saturation": "0.44434044853455135587",
+        "saturation": "0.44438654664370572553",
         "size": Object {
-          "active": "0.81597953725094421936",
-          "live": "0.18402046274905578064",
+          "active": "0.81599865573348361135",
+          "live": "0.18400134426651638865",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
           "live": Object {
             "__type": "bigint",
@@ -5506,8 +5506,8 @@ Object {
             "__type": "bigint",
             "value": "0",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -5542,7 +5542,7 @@ Object {
           "__type": "bigint",
           "value": "1988240000",
         },
-        "saturation": "0.000003593840870810890678",
+        "saturation": "0.000003593840299390875820",
         "size": Object {
           "active": "0.0000000000000000000000000000",
           "live": "1.00000000000000000000",
@@ -5590,8 +5590,8 @@ Object {
             "__type": "bigint",
             "value": "321928331851",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -5626,7 +5626,7 @@ Object {
           "__type": "bigint",
           "value": "1791084124",
         },
-        "saturation": "0.00234055459664021839",
+        "saturation": "0.00234055422449248274",
         "size": Object {
           "active": "0.99446717115003592889",
           "live": "0.00553282884996407111",
@@ -5673,8 +5673,8 @@ Object {
             "__type": "bigint",
             "value": "10021869680",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -5709,7 +5709,7 @@ Object {
           "__type": "bigint",
           "value": "1099603790",
         },
-        "saturation": "0.000072460074956593695520",
+        "saturation": "0.000072460063435455560399",
         "size": Object {
           "active": "1.00000000000000000000",
           "live": "0.0000000000000000000000000000",
@@ -5752,10 +5752,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -5790,15 +5790,15 @@ Object {
           "__type": "bigint",
           "value": "199806239",
         },
-        "saturation": "0.000010821238378828440746",
+        "saturation": "0.000011101058301516805716",
         "size": Object {
-          "active": "0.86649974082983449634",
-          "live": "0.13350025917016550366",
+          "active": "0.86986484899181539157",
+          "live": "0.13013515100818460843",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
           "live": Object {
             "__type": "bigint",
@@ -5835,8 +5835,8 @@ Object {
             "__type": "bigint",
             "value": "2499703578",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -5871,7 +5871,7 @@ Object {
           "__type": "bigint",
           "value": "487464117",
         },
-        "saturation": "0.000021597805798609747488",
+        "saturation": "0.000021597802364562733731",
         "size": Object {
           "active": "0.83681394324934275242",
           "live": "0.16318605675065724758",
@@ -5946,7 +5946,7 @@ Object {
           "__type": "bigint",
           "value": "997623150",
         },
-        "saturation": "0.000007213010200251687547",
+        "saturation": "0.000007213009053384437728",
         "size": Object {
           "active": "0.0000000000000000000000000000",
           "live": "1.00000000000000000000",
@@ -6021,7 +6021,7 @@ Object {
           "__type": "bigint",
           "value": "999999828559",
         },
-        "saturation": "0.00723019405037463877",
+        "saturation": "0.00723019290077516005",
         "size": Object {
           "active": "0.0000000000000000000000000000",
           "live": "1.00000000000000000000",
@@ -6081,10 +6081,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -6119,15 +6119,15 @@ Object {
           "__type": "bigint",
           "value": "495463149",
         },
-        "saturation": "0.000009332390599815651490",
+        "saturation": "0.000025174380177782901422",
         "size": Object {
-          "active": "0.61614387139960263961",
-          "live": "0.38385612860039736039",
+          "active": "0.85770077629124006825",
+          "live": "0.14229922370875993175",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
           "live": Object {
             "__type": "bigint",
@@ -6162,10 +6162,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -6200,15 +6200,15 @@ Object {
           "__type": "bigint",
           "value": "22615260846603",
         },
-        "saturation": "0.44434044853455135587",
+        "saturation": "0.44438654664370572553",
         "size": Object {
-          "active": "0.81597953725094421936",
-          "live": "0.18402046274905578064",
+          "active": "0.81599865573348361135",
+          "live": "0.18400134426651638865",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
           "live": Object {
             "__type": "bigint",
@@ -6244,10 +6244,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -6282,15 +6282,15 @@ Object {
           "__type": "bigint",
           "value": "199806239",
         },
-        "saturation": "0.000010821238378828440746",
+        "saturation": "0.000011101058301516805716",
         "size": Object {
-          "active": "0.86649974082983449634",
-          "live": "0.13350025917016550366",
+          "active": "0.86986484899181539157",
+          "live": "0.13013515100818460843",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
           "live": Object {
             "__type": "bigint",
@@ -6327,8 +6327,8 @@ Object {
             "__type": "bigint",
             "value": "2499703578",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -6363,7 +6363,7 @@ Object {
           "__type": "bigint",
           "value": "487464117",
         },
-        "saturation": "0.000021597805798609747488",
+        "saturation": "0.000021597802364562733731",
         "size": Object {
           "active": "0.83681394324934275242",
           "live": "0.16318605675065724758",
@@ -6414,10 +6414,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -6452,15 +6452,15 @@ Object {
           "__type": "bigint",
           "value": "495463149",
         },
-        "saturation": "0.000009332390599815651490",
+        "saturation": "0.000025174380177782901422",
         "size": Object {
-          "active": "0.61614387139960263961",
-          "live": "0.38385612860039736039",
+          "active": "0.85770077629124006825",
+          "live": "0.14229922370875993175",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
           "live": Object {
             "__type": "bigint",
@@ -6495,10 +6495,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -6533,15 +6533,15 @@ Object {
           "__type": "bigint",
           "value": "22615260846603",
         },
-        "saturation": "0.44434044853455135587",
+        "saturation": "0.44438654664370572553",
         "size": Object {
-          "active": "0.81597953725094421936",
-          "live": "0.18402046274905578064",
+          "active": "0.81599865573348361135",
+          "live": "0.18400134426651638865",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
           "live": Object {
             "__type": "bigint",
@@ -6577,10 +6577,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -6615,15 +6615,15 @@ Object {
           "__type": "bigint",
           "value": "199806239",
         },
-        "saturation": "0.000010821238378828440746",
+        "saturation": "0.000011101058301516805716",
         "size": Object {
-          "active": "0.86649974082983449634",
-          "live": "0.13350025917016550366",
+          "active": "0.86986484899181539157",
+          "live": "0.13013515100818460843",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
           "live": Object {
             "__type": "bigint",
@@ -6660,8 +6660,8 @@ Object {
             "__type": "bigint",
             "value": "2499703578",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -6696,7 +6696,7 @@ Object {
           "__type": "bigint",
           "value": "487464117",
         },
-        "saturation": "0.000021597805798609747488",
+        "saturation": "0.000021597802364562733731",
         "size": Object {
           "active": "0.83681394324934275242",
           "live": "0.16318605675065724758",
@@ -6747,10 +6747,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -6785,15 +6785,15 @@ Object {
           "__type": "bigint",
           "value": "495463149",
         },
-        "saturation": "0.000009332390599815651490",
+        "saturation": "0.000025174380177782901422",
         "size": Object {
-          "active": "0.61614387139960263961",
-          "live": "0.38385612860039736039",
+          "active": "0.85770077629124006825",
+          "live": "0.14229922370875993175",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
           "live": Object {
             "__type": "bigint",
@@ -6828,10 +6828,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -6866,15 +6866,15 @@ Object {
           "__type": "bigint",
           "value": "22615260846603",
         },
-        "saturation": "0.44434044853455135587",
+        "saturation": "0.44438654664370572553",
         "size": Object {
-          "active": "0.81597953725094421936",
-          "live": "0.18402046274905578064",
+          "active": "0.81599865573348361135",
+          "live": "0.18400134426651638865",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
           "live": Object {
             "__type": "bigint",
@@ -6912,8 +6912,8 @@ Object {
             "__type": "bigint",
             "value": "0",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -6948,7 +6948,7 @@ Object {
           "__type": "bigint",
           "value": "1988240000",
         },
-        "saturation": "0.000003593840870810890678",
+        "saturation": "0.000003593840299390875820",
         "size": Object {
           "active": "0.0000000000000000000000000000",
           "live": "1.00000000000000000000",
@@ -6996,8 +6996,8 @@ Object {
             "__type": "bigint",
             "value": "10021869680",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -7032,7 +7032,7 @@ Object {
           "__type": "bigint",
           "value": "1099603790",
         },
-        "saturation": "0.000072460074956593695520",
+        "saturation": "0.000072460063435455560399",
         "size": Object {
           "active": "1.00000000000000000000",
           "live": "0.0000000000000000000000000000",
@@ -7075,10 +7075,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -7113,15 +7113,15 @@ Object {
           "__type": "bigint",
           "value": "199806239",
         },
-        "saturation": "0.000010821238378828440746",
+        "saturation": "0.000011101058301516805716",
         "size": Object {
-          "active": "0.86649974082983449634",
-          "live": "0.13350025917016550366",
+          "active": "0.86986484899181539157",
+          "live": "0.13013515100818460843",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
           "live": Object {
             "__type": "bigint",
@@ -7158,8 +7158,8 @@ Object {
             "__type": "bigint",
             "value": "2499703578",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -7194,7 +7194,7 @@ Object {
           "__type": "bigint",
           "value": "487464117",
         },
-        "saturation": "0.000021597805798609747488",
+        "saturation": "0.000021597802364562733731",
         "size": Object {
           "active": "0.83681394324934275242",
           "live": "0.16318605675065724758",
@@ -7269,7 +7269,7 @@ Object {
           "__type": "bigint",
           "value": "997623150",
         },
-        "saturation": "0.000007213010200251687547",
+        "saturation": "0.000007213009053384437728",
         "size": Object {
           "active": "0.0000000000000000000000000000",
           "live": "1.00000000000000000000",
@@ -7327,10 +7327,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -7365,15 +7365,15 @@ Object {
           "__type": "bigint",
           "value": "495463149",
         },
-        "saturation": "0.000009332390599815651490",
+        "saturation": "0.000025174380177782901422",
         "size": Object {
-          "active": "0.61614387139960263961",
-          "live": "0.38385612860039736039",
+          "active": "0.85770077629124006825",
+          "live": "0.14229922370875993175",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
           "live": Object {
             "__type": "bigint",
@@ -7408,10 +7408,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -7446,15 +7446,15 @@ Object {
           "__type": "bigint",
           "value": "22615260846603",
         },
-        "saturation": "0.44434044853455135587",
+        "saturation": "0.44438654664370572553",
         "size": Object {
-          "active": "0.81597953725094421936",
-          "live": "0.18402046274905578064",
+          "active": "0.81599865573348361135",
+          "live": "0.18400134426651638865",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
           "live": Object {
             "__type": "bigint",
@@ -7492,8 +7492,8 @@ Object {
             "__type": "bigint",
             "value": "321928331851",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -7528,7 +7528,7 @@ Object {
           "__type": "bigint",
           "value": "1791084124",
         },
-        "saturation": "0.00234055459664021839",
+        "saturation": "0.00234055422449248274",
         "size": Object {
           "active": "0.99446717115003592889",
           "live": "0.00553282884996407111",
@@ -7573,10 +7573,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -7611,15 +7611,15 @@ Object {
           "__type": "bigint",
           "value": "199806239",
         },
-        "saturation": "0.000010821238378828440746",
+        "saturation": "0.000011101058301516805716",
         "size": Object {
-          "active": "0.86649974082983449634",
-          "live": "0.13350025917016550366",
+          "active": "0.86986484899181539157",
+          "live": "0.13013515100818460843",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
           "live": Object {
             "__type": "bigint",
@@ -7656,8 +7656,8 @@ Object {
             "__type": "bigint",
             "value": "2499703578",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -7692,7 +7692,7 @@ Object {
           "__type": "bigint",
           "value": "487464117",
         },
-        "saturation": "0.000021597805798609747488",
+        "saturation": "0.000021597802364562733731",
         "size": Object {
           "active": "0.83681394324934275242",
           "live": "0.16318605675065724758",
@@ -7767,7 +7767,7 @@ Object {
           "__type": "bigint",
           "value": "999999828559",
         },
-        "saturation": "0.00723019405037463877",
+        "saturation": "0.00723019290077516005",
         "size": Object {
           "active": "0.0000000000000000000000000000",
           "live": "1.00000000000000000000",
@@ -7827,10 +7827,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -7865,15 +7865,15 @@ Object {
           "__type": "bigint",
           "value": "495463149",
         },
-        "saturation": "0.000009332390599815651490",
+        "saturation": "0.000025174380177782901422",
         "size": Object {
-          "active": "0.61614387139960263961",
-          "live": "0.38385612860039736039",
+          "active": "0.85770077629124006825",
+          "live": "0.14229922370875993175",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
           "live": Object {
             "__type": "bigint",
@@ -7908,10 +7908,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -7946,15 +7946,15 @@ Object {
           "__type": "bigint",
           "value": "22615260846603",
         },
-        "saturation": "0.44434044853455135587",
+        "saturation": "0.44438654664370572553",
         "size": Object {
-          "active": "0.81597953725094421936",
-          "live": "0.18402046274905578064",
+          "active": "0.81599865573348361135",
+          "live": "0.18400134426651638865",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
           "live": Object {
             "__type": "bigint",
@@ -7990,10 +7990,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -8028,15 +8028,15 @@ Object {
           "__type": "bigint",
           "value": "199806239",
         },
-        "saturation": "0.000010821238378828440746",
+        "saturation": "0.000011101058301516805716",
         "size": Object {
-          "active": "0.86649974082983449634",
-          "live": "0.13350025917016550366",
+          "active": "0.86986484899181539157",
+          "live": "0.13013515100818460843",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
           "live": Object {
             "__type": "bigint",
@@ -8073,8 +8073,8 @@ Object {
             "__type": "bigint",
             "value": "2499703578",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -8109,7 +8109,7 @@ Object {
           "__type": "bigint",
           "value": "487464117",
         },
-        "saturation": "0.000021597805798609747488",
+        "saturation": "0.000021597802364562733731",
         "size": Object {
           "active": "0.83681394324934275242",
           "live": "0.16318605675065724758",
@@ -8162,8 +8162,8 @@ Object {
             "__type": "bigint",
             "value": "321928331851",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -8198,7 +8198,7 @@ Object {
           "__type": "bigint",
           "value": "1791084124",
         },
-        "saturation": "0.00234055459664021839",
+        "saturation": "0.00234055422449248274",
         "size": Object {
           "active": "0.99446717115003592889",
           "live": "0.00553282884996407111",
@@ -8243,10 +8243,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -8281,15 +8281,15 @@ Object {
           "__type": "bigint",
           "value": "199806239",
         },
-        "saturation": "0.000010821238378828440746",
+        "saturation": "0.000011101058301516805716",
         "size": Object {
-          "active": "0.86649974082983449634",
-          "live": "0.13350025917016550366",
+          "active": "0.86986484899181539157",
+          "live": "0.13013515100818460843",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
           "live": Object {
             "__type": "bigint",
@@ -8326,8 +8326,8 @@ Object {
             "__type": "bigint",
             "value": "2499703578",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -8362,7 +8362,7 @@ Object {
           "__type": "bigint",
           "value": "487464117",
         },
-        "saturation": "0.000021597805798609747488",
+        "saturation": "0.000021597802364562733731",
         "size": Object {
           "active": "0.83681394324934275242",
           "live": "0.16318605675065724758",
@@ -8420,10 +8420,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -8458,15 +8458,15 @@ Object {
           "__type": "bigint",
           "value": "495463149",
         },
-        "saturation": "0.000009332390599815651490",
+        "saturation": "0.000025174380177782901422",
         "size": Object {
-          "active": "0.61614387139960263961",
-          "live": "0.38385612860039736039",
+          "active": "0.85770077629124006825",
+          "live": "0.14229922370875993175",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
           "live": Object {
             "__type": "bigint",
@@ -8501,10 +8501,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -8539,15 +8539,15 @@ Object {
           "__type": "bigint",
           "value": "22615260846603",
         },
-        "saturation": "0.44434044853455135587",
+        "saturation": "0.44438654664370572553",
         "size": Object {
-          "active": "0.81597953725094421936",
-          "live": "0.18402046274905578064",
+          "active": "0.81599865573348361135",
+          "live": "0.18400134426651638865",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
           "live": Object {
             "__type": "bigint",
@@ -8585,8 +8585,8 @@ Object {
             "__type": "bigint",
             "value": "0",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -8621,7 +8621,7 @@ Object {
           "__type": "bigint",
           "value": "1988240000",
         },
-        "saturation": "0.000003593840870810890678",
+        "saturation": "0.000003593840299390875820",
         "size": Object {
           "active": "0.0000000000000000000000000000",
           "live": "1.00000000000000000000",
@@ -8669,8 +8669,8 @@ Object {
             "__type": "bigint",
             "value": "10021869680",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -8705,7 +8705,7 @@ Object {
           "__type": "bigint",
           "value": "1099603790",
         },
-        "saturation": "0.000072460074956593695520",
+        "saturation": "0.000072460063435455560399",
         "size": Object {
           "active": "1.00000000000000000000",
           "live": "0.0000000000000000000000000000",
@@ -8748,10 +8748,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -8786,15 +8786,15 @@ Object {
           "__type": "bigint",
           "value": "199806239",
         },
-        "saturation": "0.000010821238378828440746",
+        "saturation": "0.000011101058301516805716",
         "size": Object {
-          "active": "0.86649974082983449634",
-          "live": "0.13350025917016550366",
+          "active": "0.86986484899181539157",
+          "live": "0.13013515100818460843",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
           "live": Object {
             "__type": "bigint",
@@ -8831,8 +8831,8 @@ Object {
             "__type": "bigint",
             "value": "2499703578",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -8867,7 +8867,7 @@ Object {
           "__type": "bigint",
           "value": "487464117",
         },
-        "saturation": "0.000021597805798609747488",
+        "saturation": "0.000021597802364562733731",
         "size": Object {
           "active": "0.83681394324934275242",
           "live": "0.16318605675065724758",
@@ -8942,7 +8942,7 @@ Object {
           "__type": "bigint",
           "value": "997623150",
         },
-        "saturation": "0.000007213010200251687547",
+        "saturation": "0.000007213009053384437728",
         "size": Object {
           "active": "0.0000000000000000000000000000",
           "live": "1.00000000000000000000",
@@ -8995,8 +8995,8 @@ Object {
             "__type": "bigint",
             "value": "321928331851",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -9031,7 +9031,7 @@ Object {
           "__type": "bigint",
           "value": "1791084124",
         },
-        "saturation": "0.00234055459664021839",
+        "saturation": "0.00234055422449248274",
         "size": Object {
           "active": "0.99446717115003592889",
           "live": "0.00553282884996407111",
@@ -9108,7 +9108,7 @@ Object {
           "__type": "bigint",
           "value": "999999828559",
         },
-        "saturation": "0.00723019405037463877",
+        "saturation": "0.00723019290077516005",
         "size": Object {
           "active": "0.0000000000000000000000000000",
           "live": "1.00000000000000000000",
@@ -9168,10 +9168,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -9206,15 +9206,15 @@ Object {
           "__type": "bigint",
           "value": "495463149",
         },
-        "saturation": "0.000009332390599815651490",
+        "saturation": "0.000025174380177782901422",
         "size": Object {
-          "active": "0.61614387139960263961",
-          "live": "0.38385612860039736039",
+          "active": "0.85770077629124006825",
+          "live": "0.14229922370875993175",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
           "live": Object {
             "__type": "bigint",
@@ -9249,10 +9249,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -9287,15 +9287,15 @@ Object {
           "__type": "bigint",
           "value": "22615260846603",
         },
-        "saturation": "0.44434044853455135587",
+        "saturation": "0.44438654664370572553",
         "size": Object {
-          "active": "0.81597953725094421936",
-          "live": "0.18402046274905578064",
+          "active": "0.81599865573348361135",
+          "live": "0.18400134426651638865",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
           "live": Object {
             "__type": "bigint",
@@ -9333,8 +9333,8 @@ Object {
             "__type": "bigint",
             "value": "0",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -9369,7 +9369,7 @@ Object {
           "__type": "bigint",
           "value": "1988240000",
         },
-        "saturation": "0.000003593840870810890678",
+        "saturation": "0.000003593840299390875820",
         "size": Object {
           "active": "0.0000000000000000000000000000",
           "live": "1.00000000000000000000",
@@ -9417,8 +9417,8 @@ Object {
             "__type": "bigint",
             "value": "321928331851",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -9453,7 +9453,7 @@ Object {
           "__type": "bigint",
           "value": "1791084124",
         },
-        "saturation": "0.00234055459664021839",
+        "saturation": "0.00234055422449248274",
         "size": Object {
           "active": "0.99446717115003592889",
           "live": "0.00553282884996407111",
@@ -9500,8 +9500,8 @@ Object {
             "__type": "bigint",
             "value": "10021869680",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -9536,7 +9536,7 @@ Object {
           "__type": "bigint",
           "value": "1099603790",
         },
-        "saturation": "0.000072460074956593695520",
+        "saturation": "0.000072460063435455560399",
         "size": Object {
           "active": "1.00000000000000000000",
           "live": "0.0000000000000000000000000000",
@@ -9579,10 +9579,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -9617,15 +9617,15 @@ Object {
           "__type": "bigint",
           "value": "199806239",
         },
-        "saturation": "0.000010821238378828440746",
+        "saturation": "0.000011101058301516805716",
         "size": Object {
-          "active": "0.86649974082983449634",
-          "live": "0.13350025917016550366",
+          "active": "0.86986484899181539157",
+          "live": "0.13013515100818460843",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
           "live": Object {
             "__type": "bigint",
@@ -9662,8 +9662,8 @@ Object {
             "__type": "bigint",
             "value": "2499703578",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -9698,7 +9698,7 @@ Object {
           "__type": "bigint",
           "value": "487464117",
         },
-        "saturation": "0.000021597805798609747488",
+        "saturation": "0.000021597802364562733731",
         "size": Object {
           "active": "0.83681394324934275242",
           "live": "0.16318605675065724758",
@@ -9773,7 +9773,7 @@ Object {
           "__type": "bigint",
           "value": "997623150",
         },
-        "saturation": "0.000007213010200251687547",
+        "saturation": "0.000007213009053384437728",
         "size": Object {
           "active": "0.0000000000000000000000000000",
           "live": "1.00000000000000000000",
@@ -9848,7 +9848,7 @@ Object {
           "__type": "bigint",
           "value": "999999828559",
         },
-        "saturation": "0.00723019405037463877",
+        "saturation": "0.00723019290077516005",
         "size": Object {
           "active": "0.0000000000000000000000000000",
           "live": "1.00000000000000000000",
@@ -9901,10 +9901,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -9939,15 +9939,15 @@ Object {
           "__type": "bigint",
           "value": "495463149",
         },
-        "saturation": "0.000009332390599815651490",
+        "saturation": "0.000025174380177782901422",
         "size": Object {
-          "active": "0.61614387139960263961",
-          "live": "0.38385612860039736039",
+          "active": "0.85770077629124006825",
+          "live": "0.14229922370875993175",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
           "live": Object {
             "__type": "bigint",
@@ -9982,10 +9982,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -10020,15 +10020,15 @@ Object {
           "__type": "bigint",
           "value": "22615260846603",
         },
-        "saturation": "0.44434044853455135587",
+        "saturation": "0.44438654664370572553",
         "size": Object {
-          "active": "0.81597953725094421936",
-          "live": "0.18402046274905578064",
+          "active": "0.81599865573348361135",
+          "live": "0.18400134426651638865",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
           "live": Object {
             "__type": "bigint",
@@ -10066,8 +10066,8 @@ Object {
             "__type": "bigint",
             "value": "0",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -10102,7 +10102,7 @@ Object {
           "__type": "bigint",
           "value": "1988240000",
         },
-        "saturation": "0.000003593840870810890678",
+        "saturation": "0.000003593840299390875820",
         "size": Object {
           "active": "0.0000000000000000000000000000",
           "live": "1.00000000000000000000",
@@ -10158,8 +10158,8 @@ Object {
             "__type": "bigint",
             "value": "321928331851",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -10194,7 +10194,7 @@ Object {
           "__type": "bigint",
           "value": "1791084124",
         },
-        "saturation": "0.00234055459664021839",
+        "saturation": "0.00234055422449248274",
         "size": Object {
           "active": "0.99446717115003592889",
           "live": "0.00553282884996407111",
@@ -10241,8 +10241,8 @@ Object {
             "__type": "bigint",
             "value": "10021869680",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -10277,7 +10277,7 @@ Object {
           "__type": "bigint",
           "value": "1099603790",
         },
-        "saturation": "0.000072460074956593695520",
+        "saturation": "0.000072460063435455560399",
         "size": Object {
           "active": "1.00000000000000000000",
           "live": "0.0000000000000000000000000000",
@@ -10320,10 +10320,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -10358,15 +10358,15 @@ Object {
           "__type": "bigint",
           "value": "199806239",
         },
-        "saturation": "0.000010821238378828440746",
+        "saturation": "0.000011101058301516805716",
         "size": Object {
-          "active": "0.86649974082983449634",
-          "live": "0.13350025917016550366",
+          "active": "0.86986484899181539157",
+          "live": "0.13013515100818460843",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
           "live": Object {
             "__type": "bigint",
@@ -10409,10 +10409,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -10447,15 +10447,15 @@ Object {
           "__type": "bigint",
           "value": "22615260846603",
         },
-        "saturation": "0.44434044853455135587",
+        "saturation": "0.44438654664370572553",
         "size": Object {
-          "active": "0.81597953725094421936",
-          "live": "0.18402046274905578064",
+          "active": "0.81599865573348361135",
+          "live": "0.18400134426651638865",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
           "live": Object {
             "__type": "bigint",
@@ -10491,10 +10491,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -10529,15 +10529,15 @@ Object {
           "__type": "bigint",
           "value": "199806239",
         },
-        "saturation": "0.000010821238378828440746",
+        "saturation": "0.000011101058301516805716",
         "size": Object {
-          "active": "0.86649974082983449634",
-          "live": "0.13350025917016550366",
+          "active": "0.86986484899181539157",
+          "live": "0.13013515100818460843",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
           "live": Object {
             "__type": "bigint",
@@ -10574,8 +10574,8 @@ Object {
             "__type": "bigint",
             "value": "2499703578",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -10610,7 +10610,7 @@ Object {
           "__type": "bigint",
           "value": "487464117",
         },
-        "saturation": "0.000021597805798609747488",
+        "saturation": "0.000021597802364562733731",
         "size": Object {
           "active": "0.83681394324934275242",
           "live": "0.16318605675065724758",
@@ -10661,10 +10661,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -10699,15 +10699,15 @@ Object {
           "__type": "bigint",
           "value": "495463149",
         },
-        "saturation": "0.000009332390599815651490",
+        "saturation": "0.000025174380177782901422",
         "size": Object {
-          "active": "0.61614387139960263961",
-          "live": "0.38385612860039736039",
+          "active": "0.85770077629124006825",
+          "live": "0.14229922370875993175",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
           "live": Object {
             "__type": "bigint",
@@ -10742,10 +10742,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -10780,15 +10780,15 @@ Object {
           "__type": "bigint",
           "value": "22615260846603",
         },
-        "saturation": "0.44434044853455135587",
+        "saturation": "0.44438654664370572553",
         "size": Object {
-          "active": "0.81597953725094421936",
-          "live": "0.18402046274905578064",
+          "active": "0.81599865573348361135",
+          "live": "0.18400134426651638865",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
           "live": Object {
             "__type": "bigint",
@@ -10826,8 +10826,8 @@ Object {
             "__type": "bigint",
             "value": "0",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -10862,7 +10862,7 @@ Object {
           "__type": "bigint",
           "value": "1988240000",
         },
-        "saturation": "0.000003593840870810890678",
+        "saturation": "0.000003593840299390875820",
         "size": Object {
           "active": "0.0000000000000000000000000000",
           "live": "1.00000000000000000000",
@@ -10910,8 +10910,8 @@ Object {
             "__type": "bigint",
             "value": "321928331851",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -10946,7 +10946,7 @@ Object {
           "__type": "bigint",
           "value": "1791084124",
         },
-        "saturation": "0.00234055459664021839",
+        "saturation": "0.00234055422449248274",
         "size": Object {
           "active": "0.99446717115003592889",
           "live": "0.00553282884996407111",
@@ -10993,8 +10993,8 @@ Object {
             "__type": "bigint",
             "value": "10021869680",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -11029,7 +11029,7 @@ Object {
           "__type": "bigint",
           "value": "1099603790",
         },
-        "saturation": "0.000072460074956593695520",
+        "saturation": "0.000072460063435455560399",
         "size": Object {
           "active": "1.00000000000000000000",
           "live": "0.0000000000000000000000000000",
@@ -11080,10 +11080,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -11118,15 +11118,15 @@ Object {
           "__type": "bigint",
           "value": "199806239",
         },
-        "saturation": "0.000010821238378828440746",
+        "saturation": "0.000011101058301516805716",
         "size": Object {
-          "active": "0.86649974082983449634",
-          "live": "0.13350025917016550366",
+          "active": "0.86986484899181539157",
+          "live": "0.13013515100818460843",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
           "live": Object {
             "__type": "bigint",
@@ -11163,8 +11163,8 @@ Object {
             "__type": "bigint",
             "value": "2499703578",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -11199,7 +11199,7 @@ Object {
           "__type": "bigint",
           "value": "487464117",
         },
-        "saturation": "0.000021597805798609747488",
+        "saturation": "0.000021597802364562733731",
         "size": Object {
           "active": "0.83681394324934275242",
           "live": "0.16318605675065724758",
@@ -11274,7 +11274,7 @@ Object {
           "__type": "bigint",
           "value": "997623150",
         },
-        "saturation": "0.000007213010200251687547",
+        "saturation": "0.000007213009053384437728",
         "size": Object {
           "active": "0.0000000000000000000000000000",
           "live": "1.00000000000000000000",
@@ -11349,7 +11349,7 @@ Object {
           "__type": "bigint",
           "value": "999999828559",
         },
-        "saturation": "0.00723019405037463877",
+        "saturation": "0.00723019290077516005",
         "size": Object {
           "active": "0.0000000000000000000000000000",
           "live": "1.00000000000000000000",
@@ -11404,8 +11404,8 @@ Object {
             "__type": "bigint",
             "value": "2499703578",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -11440,7 +11440,7 @@ Object {
           "__type": "bigint",
           "value": "487464117",
         },
-        "saturation": "0.000021597805798609747488",
+        "saturation": "0.000021597802364562733731",
         "size": Object {
           "active": "0.83681394324934275242",
           "live": "0.16318605675065724758",
@@ -11483,10 +11483,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -11521,15 +11521,15 @@ Object {
           "__type": "bigint",
           "value": "199806239",
         },
-        "saturation": "0.000010821238378828440746",
+        "saturation": "0.000011101058301516805716",
         "size": Object {
-          "active": "0.86649974082983449634",
-          "live": "0.13350025917016550366",
+          "active": "0.86986484899181539157",
+          "live": "0.13013515100818460843",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
           "live": Object {
             "__type": "bigint",
@@ -11566,8 +11566,8 @@ Object {
             "__type": "bigint",
             "value": "10021869680",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -11602,7 +11602,7 @@ Object {
           "__type": "bigint",
           "value": "1099603790",
         },
-        "saturation": "0.000072460074956593695520",
+        "saturation": "0.000072460063435455560399",
         "size": Object {
           "active": "1.00000000000000000000",
           "live": "0.0000000000000000000000000000",
@@ -11647,8 +11647,8 @@ Object {
             "__type": "bigint",
             "value": "321928331851",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -11683,7 +11683,7 @@ Object {
           "__type": "bigint",
           "value": "1791084124",
         },
-        "saturation": "0.00234055459664021839",
+        "saturation": "0.00234055422449248274",
         "size": Object {
           "active": "0.99446717115003592889",
           "live": "0.00553282884996407111",
@@ -11730,8 +11730,8 @@ Object {
             "__type": "bigint",
             "value": "0",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -11766,7 +11766,7 @@ Object {
           "__type": "bigint",
           "value": "1988240000",
         },
-        "saturation": "0.000003593840870810890678",
+        "saturation": "0.000003593840299390875820",
         "size": Object {
           "active": "0.0000000000000000000000000000",
           "live": "1.00000000000000000000",
@@ -11812,10 +11812,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -11850,15 +11850,15 @@ Object {
           "__type": "bigint",
           "value": "22615260846603",
         },
-        "saturation": "0.44434044853455135587",
+        "saturation": "0.44438654664370572553",
         "size": Object {
-          "active": "0.81597953725094421936",
-          "live": "0.18402046274905578064",
+          "active": "0.81599865573348361135",
+          "live": "0.18400134426651638865",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
           "live": Object {
             "__type": "bigint",
@@ -11894,10 +11894,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -11932,15 +11932,15 @@ Object {
           "__type": "bigint",
           "value": "495463149",
         },
-        "saturation": "0.000009332390599815651490",
+        "saturation": "0.000025174380177782901422",
         "size": Object {
-          "active": "0.61614387139960263961",
-          "live": "0.38385612860039736039",
+          "active": "0.85770077629124006825",
+          "live": "0.14229922370875993175",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
           "live": Object {
             "__type": "bigint",
@@ -12007,7 +12007,7 @@ Object {
           "__type": "bigint",
           "value": "997623150",
         },
-        "saturation": "0.000007213010200251687547",
+        "saturation": "0.000007213009053384437728",
         "size": Object {
           "active": "0.0000000000000000000000000000",
           "live": "1.00000000000000000000",
@@ -12082,7 +12082,7 @@ Object {
           "__type": "bigint",
           "value": "999999828559",
         },
-        "saturation": "0.00723019405037463877",
+        "saturation": "0.00723019290077516005",
         "size": Object {
           "active": "0.0000000000000000000000000000",
           "live": "1.00000000000000000000",
@@ -12135,10 +12135,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -12173,15 +12173,15 @@ Object {
           "__type": "bigint",
           "value": "495463149",
         },
-        "saturation": "0.000009332390599815651490",
+        "saturation": "0.000025174380177782901422",
         "size": Object {
-          "active": "0.61614387139960263961",
-          "live": "0.38385612860039736039",
+          "active": "0.85770077629124006825",
+          "live": "0.14229922370875993175",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "795289068",
+            "value": "2986376991",
           },
           "live": Object {
             "__type": "bigint",
@@ -12216,10 +12216,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -12254,15 +12254,15 @@ Object {
           "__type": "bigint",
           "value": "22615260846603",
         },
-        "saturation": "0.44434044853455135587",
+        "saturation": "0.44438654664370572553",
         "size": Object {
-          "active": "0.81597953725094421936",
-          "live": "0.18402046274905578064",
+          "active": "0.81599865573348361135",
+          "live": "0.18400134426651638865",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
           "live": Object {
             "__type": "bigint",
@@ -12300,8 +12300,8 @@ Object {
             "__type": "bigint",
             "value": "0",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -12336,7 +12336,7 @@ Object {
           "__type": "bigint",
           "value": "1988240000",
         },
-        "saturation": "0.000003593840870810890678",
+        "saturation": "0.000003593840299390875820",
         "size": Object {
           "active": "0.0000000000000000000000000000",
           "live": "1.00000000000000000000",
@@ -12384,8 +12384,8 @@ Object {
             "__type": "bigint",
             "value": "321928331851",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -12420,7 +12420,7 @@ Object {
           "__type": "bigint",
           "value": "1791084124",
         },
-        "saturation": "0.00234055459664021839",
+        "saturation": "0.00234055422449248274",
         "size": Object {
           "active": "0.99446717115003592889",
           "live": "0.00553282884996407111",
@@ -12467,8 +12467,8 @@ Object {
             "__type": "bigint",
             "value": "10021869680",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -12503,7 +12503,7 @@ Object {
           "__type": "bigint",
           "value": "1099603790",
         },
-        "saturation": "0.000072460074956593695520",
+        "saturation": "0.000072460063435455560399",
         "size": Object {
           "active": "1.00000000000000000000",
           "live": "0.0000000000000000000000000000",
@@ -12546,10 +12546,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -12584,15 +12584,15 @@ Object {
           "__type": "bigint",
           "value": "199806239",
         },
-        "saturation": "0.000010821238378828440746",
+        "saturation": "0.000011101058301516805716",
         "size": Object {
-          "active": "0.86649974082983449634",
-          "live": "0.13350025917016550366",
+          "active": "0.86986484899181539157",
+          "live": "0.13013515100818460843",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
           "live": Object {
             "__type": "bigint",
@@ -12629,8 +12629,8 @@ Object {
             "__type": "bigint",
             "value": "2499703578",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -12665,7 +12665,7 @@ Object {
           "__type": "bigint",
           "value": "487464117",
         },
-        "saturation": "0.000021597805798609747488",
+        "saturation": "0.000021597802364562733731",
         "size": Object {
           "active": "0.83681394324934275242",
           "live": "0.16318605675065724758",
@@ -12740,7 +12740,7 @@ Object {
           "__type": "bigint",
           "value": "997623150",
         },
-        "saturation": "0.000007213010200251687547",
+        "saturation": "0.000007213009053384437728",
         "size": Object {
           "active": "0.0000000000000000000000000000",
           "live": "1.00000000000000000000",
@@ -12815,7 +12815,7 @@ Object {
           "__type": "bigint",
           "value": "999999828559",
         },
-        "saturation": "0.00723019405037463877",
+        "saturation": "0.00723019290077516005",
         "size": Object {
           "active": "0.0000000000000000000000000000",
           "live": "1.00000000000000000000",
@@ -12870,8 +12870,8 @@ Object {
             "__type": "bigint",
             "value": "2499703578",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -12906,7 +12906,7 @@ Object {
           "__type": "bigint",
           "value": "487464117",
         },
-        "saturation": "0.000021597805798609747488",
+        "saturation": "0.000021597802364562733731",
         "size": Object {
           "active": "0.83681394324934275242",
           "live": "0.16318605675065724758",
@@ -12949,10 +12949,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -12987,15 +12987,15 @@ Object {
           "__type": "bigint",
           "value": "199806239",
         },
-        "saturation": "0.000010821238378828440746",
+        "saturation": "0.000011101058301516805716",
         "size": Object {
-          "active": "0.86649974082983449634",
-          "live": "0.13350025917016550366",
+          "active": "0.86986484899181539157",
+          "live": "0.13013515100818460843",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
           "live": Object {
             "__type": "bigint",
@@ -13030,10 +13030,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -13068,15 +13068,15 @@ Object {
           "__type": "bigint",
           "value": "22615260846603",
         },
-        "saturation": "0.44434044853455135587",
+        "saturation": "0.44438654664370572553",
         "size": Object {
-          "active": "0.81597953725094421936",
-          "live": "0.18402046274905578064",
+          "active": "0.81599865573348361135",
+          "live": "0.18400134426651638865",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
           "live": Object {
             "__type": "bigint",
@@ -13122,8 +13122,8 @@ Object {
             "__type": "bigint",
             "value": "0",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -13158,7 +13158,7 @@ Object {
           "__type": "bigint",
           "value": "1988240000",
         },
-        "saturation": "0.000003593840870810890678",
+        "saturation": "0.000003593840299390875820",
         "size": Object {
           "active": "0.0000000000000000000000000000",
           "live": "1.00000000000000000000",
@@ -13236,7 +13236,7 @@ Object {
           "__type": "bigint",
           "value": "997623150",
         },
-        "saturation": "0.000007213010200251687547",
+        "saturation": "0.000007213009053384437728",
         "size": Object {
           "active": "0.0000000000000000000000000000",
           "live": "1.00000000000000000000",
@@ -13273,97 +13273,16 @@ Object {
     Object {
       "cost": Object {
         "__type": "bigint",
-        "value": "340000000",
-      },
-      "epochRewards": Array [
-        Object {
-          "activeStake": Object {
-            "__type": "bigint",
-            "value": "795289068",
-          },
-          "epoch": 183,
-          "epochLength": 431910000,
-          "memberROI": 0,
-          "operatorFees": Object {
-            "__type": "bigint",
-            "value": "0",
-          },
-          "totalRewards": Object {
-            "__type": "bigint",
-            "value": "0",
-          },
-        },
-      ],
-      "hexId": "5d99282bbb4840380bb98c075498ed1983aee18a4a0925b9b44d93f1",
-      "id": "pool1tkvjs2amfpqrszae3sr4fx8drxp6acv2fgyjtwd5fkflzguqp96",
-      "margin": Object {
-        "denominator": 1000,
-        "numerator": 27,
-      },
-      "metadata": Object {
-        "description": "Pool a of the banderini devtest staking pools",
-        "homepage": "http://www.banderini.net",
-        "name": "banderini-devtest-a",
-        "ticker": "BANDA",
-      },
-      "metadataJson": Object {
-        "hash": "4d89054c2962215694a7122dfe41bc728d3ec248f80ea9a2e0d493057d7d2338",
-        "url": "https://git.io/JJ7wm",
-      },
-      "metrics": Object {
-        "blocksCreated": "0",
-        "delegators": "1",
-        "livePledge": Object {
-          "__type": "bigint",
-          "value": "495463149",
-        },
-        "saturation": "0.000009332390599815651490",
-        "size": Object {
-          "active": "0.61614387139960263961",
-          "live": "0.38385612860039736039",
-        },
-        "stake": Object {
-          "active": Object {
-            "__type": "bigint",
-            "value": "795289068",
-          },
-          "live": Object {
-            "__type": "bigint",
-            "value": "495463149",
-          },
-        },
-      },
-      "owners": Array [
-        "stake_test1upx9faamuf54pm7alg4lna5l7ll08pz833rj45tgr9m2jyceasqjt",
-      ],
-      "pledge": Object {
-        "__type": "bigint",
-        "value": "100000000",
-      },
-      "relays": Array [],
-      "rewardAccount": "stake_test1upx9faamuf54pm7alg4lna5l7ll08pz833rj45tgr9m2jyceasqjt",
-      "status": "active",
-      "transactions": Object {
-        "registration": Array [
-          "047ee144d7adc5f10a107bf13eab570833bf2fb8bb6b016d030739a4cc585aa7",
-        ],
-        "retirement": Array [],
-      },
-      "vrf": "c062fabfeb7a68c61c34532e6f441b999c6a5a30b409d24c93174f047d4d935a",
-    },
-    Object {
-      "cost": Object {
-        "__type": "bigint",
         "value": "4321000000",
       },
       "epochRewards": Array [
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -13398,15 +13317,15 @@ Object {
           "__type": "bigint",
           "value": "199806239",
         },
-        "saturation": "0.000010821238378828440746",
+        "saturation": "0.000011101058301516805716",
         "size": Object {
-          "active": "0.86649974082983449634",
-          "live": "0.13350025917016550366",
+          "active": "0.86986484899181539157",
+          "live": "0.13013515100818460843",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
           "live": Object {
             "__type": "bigint",
@@ -13443,8 +13362,8 @@ Object {
             "__type": "bigint",
             "value": "2499703578",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -13479,7 +13398,7 @@ Object {
           "__type": "bigint",
           "value": "487464117",
         },
-        "saturation": "0.000021597805798609747488",
+        "saturation": "0.000021597802364562733731",
         "size": Object {
           "active": "0.83681394324934275242",
           "live": "0.16318605675065724758",
@@ -13522,10 +13441,91 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
+            "value": "2986376991",
+          },
+          "epoch": 205,
+          "epochLength": 431850000,
+          "memberROI": 0,
+          "operatorFees": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "totalRewards": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      ],
+      "hexId": "5d99282bbb4840380bb98c075498ed1983aee18a4a0925b9b44d93f1",
+      "id": "pool1tkvjs2amfpqrszae3sr4fx8drxp6acv2fgyjtwd5fkflzguqp96",
+      "margin": Object {
+        "denominator": 1000,
+        "numerator": 27,
+      },
+      "metadata": Object {
+        "description": "Pool a of the banderini devtest staking pools",
+        "homepage": "http://www.banderini.net",
+        "name": "banderini-devtest-a",
+        "ticker": "BANDA",
+      },
+      "metadataJson": Object {
+        "hash": "4d89054c2962215694a7122dfe41bc728d3ec248f80ea9a2e0d493057d7d2338",
+        "url": "https://git.io/JJ7wm",
+      },
+      "metrics": Object {
+        "blocksCreated": "0",
+        "delegators": "1",
+        "livePledge": Object {
+          "__type": "bigint",
+          "value": "495463149",
+        },
+        "saturation": "0.000025174380177782901422",
+        "size": Object {
+          "active": "0.85770077629124006825",
+          "live": "0.14229922370875993175",
+        },
+        "stake": Object {
+          "active": Object {
+            "__type": "bigint",
+            "value": "2986376991",
+          },
+          "live": Object {
+            "__type": "bigint",
+            "value": "495463149",
+          },
+        },
+      },
+      "owners": Array [
+        "stake_test1upx9faamuf54pm7alg4lna5l7ll08pz833rj45tgr9m2jyceasqjt",
+      ],
+      "pledge": Object {
+        "__type": "bigint",
+        "value": "100000000",
+      },
+      "relays": Array [],
+      "rewardAccount": "stake_test1upx9faamuf54pm7alg4lna5l7ll08pz833rj45tgr9m2jyceasqjt",
+      "status": "active",
+      "transactions": Object {
+        "registration": Array [
+          "047ee144d7adc5f10a107bf13eab570833bf2fb8bb6b016d030739a4cc585aa7",
+        ],
+        "retirement": Array [],
+      },
+      "vrf": "c062fabfeb7a68c61c34532e6f441b999c6a5a30b409d24c93174f047d4d935a",
+    },
+    Object {
+      "cost": Object {
+        "__type": "bigint",
+        "value": "340000000",
+      },
+      "epochRewards": Array [
+        Object {
+          "activeStake": Object {
+            "__type": "bigint",
             "value": "10021869680",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -13560,7 +13560,7 @@ Object {
           "__type": "bigint",
           "value": "1099603790",
         },
-        "saturation": "0.000072460074956593695520",
+        "saturation": "0.000072460063435455560399",
         "size": Object {
           "active": "1.00000000000000000000",
           "live": "0.0000000000000000000000000000",
@@ -13605,8 +13605,8 @@ Object {
             "__type": "bigint",
             "value": "321928331851",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -13641,7 +13641,7 @@ Object {
           "__type": "bigint",
           "value": "1791084124",
         },
-        "saturation": "0.00234055459664021839",
+        "saturation": "0.00234055422449248274",
         "size": Object {
           "active": "0.99446717115003592889",
           "live": "0.00553282884996407111",
@@ -13718,7 +13718,7 @@ Object {
           "__type": "bigint",
           "value": "999999828559",
         },
-        "saturation": "0.00723019405037463877",
+        "saturation": "0.00723019290077516005",
         "size": Object {
           "active": "0.0000000000000000000000000000",
           "live": "1.00000000000000000000",
@@ -13763,10 +13763,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -13801,15 +13801,15 @@ Object {
           "__type": "bigint",
           "value": "22615260846603",
         },
-        "saturation": "0.44434044853455135587",
+        "saturation": "0.44438654664370572553",
         "size": Object {
-          "active": "0.81597953725094421936",
-          "live": "0.18402046274905578064",
+          "active": "0.81599865573348361135",
+          "live": "0.18400134426651638865",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
           "live": Object {
             "__type": "bigint",
@@ -13853,10 +13853,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -13891,15 +13891,15 @@ Object {
           "__type": "bigint",
           "value": "22615260846603",
         },
-        "saturation": "0.44434044853455135587",
+        "saturation": "0.44438654664370572553",
         "size": Object {
-          "active": "0.81597953725094421936",
-          "live": "0.18402046274905578064",
+          "active": "0.81599865573348361135",
+          "live": "0.18400134426651638865",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
           "live": Object {
             "__type": "bigint",
@@ -13967,7 +13967,7 @@ Object {
           "__type": "bigint",
           "value": "999999828559",
         },
-        "saturation": "0.00723019405037463877",
+        "saturation": "0.00723019290077516005",
         "size": Object {
           "active": "0.0000000000000000000000000000",
           "live": "1.00000000000000000000",
@@ -14014,8 +14014,8 @@ Object {
             "__type": "bigint",
             "value": "321928331851",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -14050,7 +14050,7 @@ Object {
           "__type": "bigint",
           "value": "1791084124",
         },
-        "saturation": "0.00234055459664021839",
+        "saturation": "0.00234055422449248274",
         "size": Object {
           "active": "0.99446717115003592889",
           "live": "0.00553282884996407111",
@@ -14097,8 +14097,8 @@ Object {
             "__type": "bigint",
             "value": "10021869680",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -14133,7 +14133,7 @@ Object {
           "__type": "bigint",
           "value": "1099603790",
         },
-        "saturation": "0.000072460074956593695520",
+        "saturation": "0.000072460063435455560399",
         "size": Object {
           "active": "1.00000000000000000000",
           "live": "0.0000000000000000000000000000",
@@ -14170,6 +14170,87 @@ Object {
     Object {
       "cost": Object {
         "__type": "bigint",
+        "value": "340000000",
+      },
+      "epochRewards": Array [
+        Object {
+          "activeStake": Object {
+            "__type": "bigint",
+            "value": "2986376991",
+          },
+          "epoch": 205,
+          "epochLength": 431850000,
+          "memberROI": 0,
+          "operatorFees": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "totalRewards": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      ],
+      "hexId": "5d99282bbb4840380bb98c075498ed1983aee18a4a0925b9b44d93f1",
+      "id": "pool1tkvjs2amfpqrszae3sr4fx8drxp6acv2fgyjtwd5fkflzguqp96",
+      "margin": Object {
+        "denominator": 1000,
+        "numerator": 27,
+      },
+      "metadata": Object {
+        "description": "Pool a of the banderini devtest staking pools",
+        "homepage": "http://www.banderini.net",
+        "name": "banderini-devtest-a",
+        "ticker": "BANDA",
+      },
+      "metadataJson": Object {
+        "hash": "4d89054c2962215694a7122dfe41bc728d3ec248f80ea9a2e0d493057d7d2338",
+        "url": "https://git.io/JJ7wm",
+      },
+      "metrics": Object {
+        "blocksCreated": "0",
+        "delegators": "1",
+        "livePledge": Object {
+          "__type": "bigint",
+          "value": "495463149",
+        },
+        "saturation": "0.000025174380177782901422",
+        "size": Object {
+          "active": "0.85770077629124006825",
+          "live": "0.14229922370875993175",
+        },
+        "stake": Object {
+          "active": Object {
+            "__type": "bigint",
+            "value": "2986376991",
+          },
+          "live": Object {
+            "__type": "bigint",
+            "value": "495463149",
+          },
+        },
+      },
+      "owners": Array [
+        "stake_test1upx9faamuf54pm7alg4lna5l7ll08pz833rj45tgr9m2jyceasqjt",
+      ],
+      "pledge": Object {
+        "__type": "bigint",
+        "value": "100000000",
+      },
+      "relays": Array [],
+      "rewardAccount": "stake_test1upx9faamuf54pm7alg4lna5l7ll08pz833rj45tgr9m2jyceasqjt",
+      "status": "active",
+      "transactions": Object {
+        "registration": Array [
+          "047ee144d7adc5f10a107bf13eab570833bf2fb8bb6b016d030739a4cc585aa7",
+        ],
+        "retirement": Array [],
+      },
+      "vrf": "c062fabfeb7a68c61c34532e6f441b999c6a5a30b409d24c93174f047d4d935a",
+    },
+    Object {
+      "cost": Object {
+        "__type": "bigint",
         "value": "400000000",
       },
       "epochRewards": Array [
@@ -14178,8 +14259,8 @@ Object {
             "__type": "bigint",
             "value": "2499703578",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -14214,7 +14295,7 @@ Object {
           "__type": "bigint",
           "value": "487464117",
         },
-        "saturation": "0.000021597805798609747488",
+        "saturation": "0.000021597802364562733731",
         "size": Object {
           "active": "0.83681394324934275242",
           "live": "0.16318605675065724758",
@@ -14257,10 +14338,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -14295,15 +14376,15 @@ Object {
           "__type": "bigint",
           "value": "199806239",
         },
-        "saturation": "0.000010821238378828440746",
+        "saturation": "0.000011101058301516805716",
         "size": Object {
-          "active": "0.86649974082983449634",
-          "live": "0.13350025917016550366",
+          "active": "0.86986484899181539157",
+          "live": "0.13013515100818460843",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
           "live": Object {
             "__type": "bigint",
@@ -14328,87 +14409,6 @@ Object {
         "retirement": Array [],
       },
       "vrf": "474a6d2a44b51add62d8f2fd8fe80abc722bf84478479b617ad05b39aaa84971",
-    },
-    Object {
-      "cost": Object {
-        "__type": "bigint",
-        "value": "340000000",
-      },
-      "epochRewards": Array [
-        Object {
-          "activeStake": Object {
-            "__type": "bigint",
-            "value": "795289068",
-          },
-          "epoch": 183,
-          "epochLength": 431910000,
-          "memberROI": 0,
-          "operatorFees": Object {
-            "__type": "bigint",
-            "value": "0",
-          },
-          "totalRewards": Object {
-            "__type": "bigint",
-            "value": "0",
-          },
-        },
-      ],
-      "hexId": "5d99282bbb4840380bb98c075498ed1983aee18a4a0925b9b44d93f1",
-      "id": "pool1tkvjs2amfpqrszae3sr4fx8drxp6acv2fgyjtwd5fkflzguqp96",
-      "margin": Object {
-        "denominator": 1000,
-        "numerator": 27,
-      },
-      "metadata": Object {
-        "description": "Pool a of the banderini devtest staking pools",
-        "homepage": "http://www.banderini.net",
-        "name": "banderini-devtest-a",
-        "ticker": "BANDA",
-      },
-      "metadataJson": Object {
-        "hash": "4d89054c2962215694a7122dfe41bc728d3ec248f80ea9a2e0d493057d7d2338",
-        "url": "https://git.io/JJ7wm",
-      },
-      "metrics": Object {
-        "blocksCreated": "0",
-        "delegators": "1",
-        "livePledge": Object {
-          "__type": "bigint",
-          "value": "495463149",
-        },
-        "saturation": "0.000009332390599815651490",
-        "size": Object {
-          "active": "0.61614387139960263961",
-          "live": "0.38385612860039736039",
-        },
-        "stake": Object {
-          "active": Object {
-            "__type": "bigint",
-            "value": "795289068",
-          },
-          "live": Object {
-            "__type": "bigint",
-            "value": "495463149",
-          },
-        },
-      },
-      "owners": Array [
-        "stake_test1upx9faamuf54pm7alg4lna5l7ll08pz833rj45tgr9m2jyceasqjt",
-      ],
-      "pledge": Object {
-        "__type": "bigint",
-        "value": "100000000",
-      },
-      "relays": Array [],
-      "rewardAccount": "stake_test1upx9faamuf54pm7alg4lna5l7ll08pz833rj45tgr9m2jyceasqjt",
-      "status": "active",
-      "transactions": Object {
-        "registration": Array [
-          "047ee144d7adc5f10a107bf13eab570833bf2fb8bb6b016d030739a4cc585aa7",
-        ],
-        "retirement": Array [],
-      },
-      "vrf": "c062fabfeb7a68c61c34532e6f441b999c6a5a30b409d24c93174f047d4d935a",
     },
     Object {
       "cost": Object {
@@ -14451,7 +14451,7 @@ Object {
           "__type": "bigint",
           "value": "997623150",
         },
-        "saturation": "0.000007213010200251687547",
+        "saturation": "0.000007213009053384437728",
         "size": Object {
           "active": "0.0000000000000000000000000000",
           "live": "1.00000000000000000000",
@@ -14496,8 +14496,8 @@ Object {
             "__type": "bigint",
             "value": "0",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -14532,7 +14532,7 @@ Object {
           "__type": "bigint",
           "value": "1988240000",
         },
-        "saturation": "0.000003593840870810890678",
+        "saturation": "0.000003593840299390875820",
         "size": Object {
           "active": "0.0000000000000000000000000000",
           "live": "1.00000000000000000000",
@@ -14586,10 +14586,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -14624,15 +14624,15 @@ Object {
           "__type": "bigint",
           "value": "199806239",
         },
-        "saturation": "0.000010821238378828440746",
+        "saturation": "0.000011101058301516805716",
         "size": Object {
-          "active": "0.86649974082983449634",
-          "live": "0.13350025917016550366",
+          "active": "0.86986484899181539157",
+          "live": "0.13013515100818460843",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
           "live": Object {
             "__type": "bigint",
@@ -14669,8 +14669,8 @@ Object {
             "__type": "bigint",
             "value": "2499703578",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -14705,7 +14705,7 @@ Object {
           "__type": "bigint",
           "value": "487464117",
         },
-        "saturation": "0.000021597805798609747488",
+        "saturation": "0.000021597802364562733731",
         "size": Object {
           "active": "0.83681394324934275242",
           "live": "0.16318605675065724758",
@@ -14748,10 +14748,10 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -14786,15 +14786,15 @@ Object {
           "__type": "bigint",
           "value": "22615260846603",
         },
-        "saturation": "0.44434044853455135587",
+        "saturation": "0.44438654664370572553",
         "size": Object {
-          "active": "0.81597953725094421936",
-          "live": "0.18402046274905578064",
+          "active": "0.81599865573348361135",
+          "live": "0.18400134426651638865",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "50147015265584",
+            "value": "50153400814617",
           },
           "live": Object {
             "__type": "bigint",
@@ -14840,8 +14840,8 @@ Object {
             "__type": "bigint",
             "value": "0",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -14876,7 +14876,7 @@ Object {
           "__type": "bigint",
           "value": "1988240000",
         },
-        "saturation": "0.000003593840870810890678",
+        "saturation": "0.000003593840299390875820",
         "size": Object {
           "active": "0.0000000000000000000000000000",
           "live": "1.00000000000000000000",
@@ -14954,7 +14954,7 @@ Object {
           "__type": "bigint",
           "value": "997623150",
         },
-        "saturation": "0.000007213010200251687547",
+        "saturation": "0.000007213009053384437728",
         "size": Object {
           "active": "0.0000000000000000000000000000",
           "live": "1.00000000000000000000",
@@ -14991,105 +14991,16 @@ Object {
     Object {
       "cost": Object {
         "__type": "bigint",
-        "value": "340000000",
-      },
-      "epochRewards": Array [
-        Object {
-          "activeStake": Object {
-            "__type": "bigint",
-            "value": "795289068",
-          },
-          "epoch": 183,
-          "epochLength": 431910000,
-          "memberROI": 0,
-          "operatorFees": Object {
-            "__type": "bigint",
-            "value": "0",
-          },
-          "totalRewards": Object {
-            "__type": "bigint",
-            "value": "0",
-          },
-        },
-      ],
-      "hexId": "5d99282bbb4840380bb98c075498ed1983aee18a4a0925b9b44d93f1",
-      "id": "pool1tkvjs2amfpqrszae3sr4fx8drxp6acv2fgyjtwd5fkflzguqp96",
-      "margin": Object {
-        "denominator": 1000,
-        "numerator": 27,
-      },
-      "metadata": Object {
-        "description": "Pool a of the banderini devtest staking pools",
-        "homepage": "http://www.banderini.net",
-        "name": "banderini-devtest-a",
-        "ticker": "BANDA",
-      },
-      "metadataJson": Object {
-        "hash": "4d89054c2962215694a7122dfe41bc728d3ec248f80ea9a2e0d493057d7d2338",
-        "url": "https://git.io/JJ7wm",
-      },
-      "metrics": Object {
-        "blocksCreated": "0",
-        "delegators": "1",
-        "livePledge": Object {
-          "__type": "bigint",
-          "value": "495463149",
-        },
-        "saturation": "0.000009332390599815651490",
-        "size": Object {
-          "active": "0.61614387139960263961",
-          "live": "0.38385612860039736039",
-        },
-        "stake": Object {
-          "active": Object {
-            "__type": "bigint",
-            "value": "795289068",
-          },
-          "live": Object {
-            "__type": "bigint",
-            "value": "495463149",
-          },
-        },
-      },
-      "owners": Array [
-        "stake_test1upx9faamuf54pm7alg4lna5l7ll08pz833rj45tgr9m2jyceasqjt",
-      ],
-      "pledge": Object {
-        "__type": "bigint",
-        "value": "100000000",
-      },
-      "relays": Array [],
-      "rewardAccount": "stake_test1upx9faamuf54pm7alg4lna5l7ll08pz833rj45tgr9m2jyceasqjt",
-      "status": "active",
-      "transactions": Object {
-        "registration": Array [
-          "047ee144d7adc5f10a107bf13eab570833bf2fb8bb6b016d030739a4cc585aa7",
-        ],
-        "retirement": Array [],
-      },
-      "vrf": "c062fabfeb7a68c61c34532e6f441b999c6a5a30b409d24c93174f047d4d935a",
-    },
-  ],
-  "totalResultCount": 9,
-}
-`;
-
-exports[`StakePoolHttpService healthy state /search stake pools sort sort by saturation with applied pagination 2`] = `
-Object {
-  "pageResults": Array [
-    Object {
-      "cost": Object {
-        "__type": "bigint",
         "value": "4321000000",
       },
       "epochRewards": Array [
         Object {
           "activeStake": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -15124,15 +15035,15 @@ Object {
           "__type": "bigint",
           "value": "199806239",
         },
-        "saturation": "0.000010821238378828440746",
+        "saturation": "0.000011101058301516805716",
         "size": Object {
-          "active": "0.86649974082983449634",
-          "live": "0.13350025917016550366",
+          "active": "0.86986484899181539157",
+          "live": "0.13013515100818460843",
         },
         "stake": Object {
           "active": Object {
             "__type": "bigint",
-            "value": "1296866803",
+            "value": "1335568619",
           },
           "live": Object {
             "__type": "bigint",
@@ -15158,6 +15069,14 @@ Object {
       },
       "vrf": "474a6d2a44b51add62d8f2fd8fe80abc722bf84478479b617ad05b39aaa84971",
     },
+  ],
+  "totalResultCount": 9,
+}
+`;
+
+exports[`StakePoolHttpService healthy state /search stake pools sort sort by saturation with applied pagination 2`] = `
+Object {
+  "pageResults": Array [
     Object {
       "cost": Object {
         "__type": "bigint",
@@ -15169,8 +15088,8 @@ Object {
             "__type": "bigint",
             "value": "2499703578",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -15205,7 +15124,7 @@ Object {
           "__type": "bigint",
           "value": "487464117",
         },
-        "saturation": "0.000021597805798609747488",
+        "saturation": "0.000021597802364562733731",
         "size": Object {
           "active": "0.83681394324934275242",
           "live": "0.16318605675065724758",
@@ -15248,10 +15167,91 @@ Object {
         Object {
           "activeStake": Object {
             "__type": "bigint",
+            "value": "2986376991",
+          },
+          "epoch": 205,
+          "epochLength": 431850000,
+          "memberROI": 0,
+          "operatorFees": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "totalRewards": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      ],
+      "hexId": "5d99282bbb4840380bb98c075498ed1983aee18a4a0925b9b44d93f1",
+      "id": "pool1tkvjs2amfpqrszae3sr4fx8drxp6acv2fgyjtwd5fkflzguqp96",
+      "margin": Object {
+        "denominator": 1000,
+        "numerator": 27,
+      },
+      "metadata": Object {
+        "description": "Pool a of the banderini devtest staking pools",
+        "homepage": "http://www.banderini.net",
+        "name": "banderini-devtest-a",
+        "ticker": "BANDA",
+      },
+      "metadataJson": Object {
+        "hash": "4d89054c2962215694a7122dfe41bc728d3ec248f80ea9a2e0d493057d7d2338",
+        "url": "https://git.io/JJ7wm",
+      },
+      "metrics": Object {
+        "blocksCreated": "0",
+        "delegators": "1",
+        "livePledge": Object {
+          "__type": "bigint",
+          "value": "495463149",
+        },
+        "saturation": "0.000025174380177782901422",
+        "size": Object {
+          "active": "0.85770077629124006825",
+          "live": "0.14229922370875993175",
+        },
+        "stake": Object {
+          "active": Object {
+            "__type": "bigint",
+            "value": "2986376991",
+          },
+          "live": Object {
+            "__type": "bigint",
+            "value": "495463149",
+          },
+        },
+      },
+      "owners": Array [
+        "stake_test1upx9faamuf54pm7alg4lna5l7ll08pz833rj45tgr9m2jyceasqjt",
+      ],
+      "pledge": Object {
+        "__type": "bigint",
+        "value": "100000000",
+      },
+      "relays": Array [],
+      "rewardAccount": "stake_test1upx9faamuf54pm7alg4lna5l7ll08pz833rj45tgr9m2jyceasqjt",
+      "status": "active",
+      "transactions": Object {
+        "registration": Array [
+          "047ee144d7adc5f10a107bf13eab570833bf2fb8bb6b016d030739a4cc585aa7",
+        ],
+        "retirement": Array [],
+      },
+      "vrf": "c062fabfeb7a68c61c34532e6f441b999c6a5a30b409d24c93174f047d4d935a",
+    },
+    Object {
+      "cost": Object {
+        "__type": "bigint",
+        "value": "340000000",
+      },
+      "epochRewards": Array [
+        Object {
+          "activeStake": Object {
+            "__type": "bigint",
             "value": "10021869680",
           },
-          "epoch": 183,
-          "epochLength": 431910000,
+          "epoch": 205,
+          "epochLength": 431850000,
           "memberROI": 0,
           "operatorFees": Object {
             "__type": "bigint",
@@ -15286,7 +15286,7 @@ Object {
           "__type": "bigint",
           "value": "1099603790",
         },
-        "saturation": "0.000072460074956593695520",
+        "saturation": "0.000072460063435455560399",
         "size": Object {
           "active": "1.00000000000000000000",
           "live": "0.0000000000000000000000000000",
