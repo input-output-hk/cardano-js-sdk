@@ -1,24 +1,25 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { Cardano } from '@cardano-sdk/core';
-import { KeyManagement, ObservableWallet, SingleAddressWallet } from '../../../src';
+import { KeyManagement, ObservableWallet, SingleAddressWallet } from '@cardano-sdk/wallet';
 import {
   assetProvider,
   chainHistoryProvider,
-  keyAgentReady,
+  keyAgent,
   networkInfoProvider,
   rewardsProvider,
   stakePoolProvider,
   txSubmitProvider,
-  utxoProvider
-} from '../config';
+  utxoProvider,
+  walletProvider
+} from '../../config';
 import { combineLatest, filter, firstValueFrom, map, of } from 'rxjs';
 
 describe('SingleAddressWallet.assets/nft', () => {
   let wallet: ObservableWallet;
 
   beforeAll(async () => {
-    const keyAgent = await keyAgentReady;
-    keyAgent.knownAddresses$ = of([
+    const _keyAgent = await keyAgent;
+    _keyAgent.knownAddresses$ = of([
       {
         accountIndex: 0,
         address: Cardano.Address(
@@ -38,12 +39,13 @@ describe('SingleAddressWallet.assets/nft', () => {
       {
         assetProvider: await assetProvider,
         chainHistoryProvider: await chainHistoryProvider,
-        keyAgent,
+        keyAgent: await _keyAgent,
         networkInfoProvider: await networkInfoProvider,
         rewardsProvider: await rewardsProvider,
-        stakePoolProvider,
+        stakePoolProvider: await stakePoolProvider,
         txSubmitProvider: await txSubmitProvider,
-        utxoProvider: await utxoProvider
+        utxoProvider: await utxoProvider,
+        walletProvider: await walletProvider
       }
     );
   });

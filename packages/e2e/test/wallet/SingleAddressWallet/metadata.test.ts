@@ -1,15 +1,16 @@
 import { Cardano } from '@cardano-sdk/core';
-import { SingleAddressWallet } from '../../../src';
+import { SingleAddressWallet } from '@cardano-sdk/wallet';
 import {
   assetProvider,
   chainHistoryProvider,
-  keyAgentReady,
+  keyAgent,
   networkInfoProvider,
   rewardsProvider,
   stakePoolProvider,
   txSubmitProvider,
-  utxoProvider
-} from '../config';
+  utxoProvider,
+  walletProvider
+} from '../../config';
 import { filter, firstValueFrom, map } from 'rxjs';
 import { isNotNil } from '@cardano-sdk/util';
 
@@ -23,12 +24,13 @@ describe('SingleAddressWallet/metadata', () => {
       {
         assetProvider: await assetProvider,
         chainHistoryProvider: await chainHistoryProvider,
-        keyAgent: await keyAgentReady,
+        keyAgent: await keyAgent,
         networkInfoProvider: await networkInfoProvider,
         rewardsProvider: await rewardsProvider,
-        stakePoolProvider,
+        stakePoolProvider: await stakePoolProvider,
         txSubmitProvider: await txSubmitProvider,
-        utxoProvider: await utxoProvider
+        utxoProvider: await utxoProvider,
+        walletProvider: await walletProvider
       }
     );
     ownAddress = (await firstValueFrom(wallet.addresses$))[0].address;

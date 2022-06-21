@@ -12,16 +12,21 @@
   },
   "references": [
     {
-      "path": "../src"
+      "path": "../../src"
     },
     {
-      "path": "../../core/src"
+      "path": "../../../web-extension/src"
     },
     {
-      "path": "../../cip30/src"
+      "path": "../../../core/src"
     },
     {
-      "path": "../../wallet/src"
+      "path": "../../../cip30/src"
+    },
+    {
+      "path": "../../../wallet/src"
     }
   ]
 }
+
+

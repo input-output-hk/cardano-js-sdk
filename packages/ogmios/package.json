@@ -30,7 +30,6 @@
     "test": "jest -c ./jest.config.js",
     "test:e2e": "shx echo 'test:e2e' command not implemented yet",
     "test:build:verify": "tsc --build ./test",
-    "test:e2e": "shx echo 'test:e2e' command not implemented yet",
     "coverage": "shx echo No coverage report for this package",
     "prepack": "yarn build"
   },

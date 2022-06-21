@@ -7,3 +7,4 @@ export * from './TxSubmitProvider';
 export * as ProviderUtil from './providerUtil';
 export * from './UtxoProvider';
 export * from './ChainHistoryProvider';
+export * from './providerFactory';

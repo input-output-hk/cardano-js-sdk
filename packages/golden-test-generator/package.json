@@ -37,7 +37,6 @@
     "pretest": "yarn build",
     "test": "jest -c ./jest.config.js",
     "test:build:verify": "tsc --build ./test",
-    "test:e2e": "shx echo 'test:e2e' command not implemented yet",
     "coverage": "shx echo No coverage report for this package"
   },
   "dependencies": {

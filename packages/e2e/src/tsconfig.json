@@ -1,0 +1,21 @@
+{
+  "extends": "../../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../dist/cjs",
+    "rootDir": "."
+  },
+  "references": [
+    {
+      "path": "../../util-dev/src"
+    },
+    {
+      "path": "../../util/src"
+    },
+    {
+      "path": "../../wallet/src"
+    },
+    {
+      "path": "../../cardano-services/src"
+    }
+  ]
+}

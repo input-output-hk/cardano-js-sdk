@@ -1,53 +1,52 @@
 {
-  "name": "@cardano-sdk/core",
-  "version": "0.3.0",
-  "description": "Core types and libraries for Cardano",
-  "engines": {
-    "node": "^14"
-  },
-  "main": "dist/cjs/index.js",
-  "module": "dist/esm/index.js",
-  "exports": {
-    ".": {
-      "import": "./dist/esm/index.js",
-      "require": "./dist/cjs/index.js"
-    }
-  },
-  "repository": "https://github.com/input-output-hk/cardano-js-sdk/packages/core",
-  "author": "Rhys Bartels-Waller",
-  "license": "MPL-2.0",
-  "scripts": {
-    "build:esm": "tsc -p src/tsconfig.json --outDir ./dist/esm --module es2020",
-    "build:cjs": "tsc --build src",
-    "build": "run-s build:cjs build:esm module-fixup",
-    "module-fixup": "shx cp ../../build/cjs-package.json ./dist/cjs/package.json && cp ../../build/esm-package.json ./dist/esm/package.json",
-    "tscNoEmit": "shx echo typescript --noEmit command not implemented yet",
-    "cleanup:dist": "shx rm -rf dist",
-    "cleanup:nm": "shx rm -rf node_modules",
-    "cleanup": "run-s cleanup:dist cleanup:nm",
-    "lint": "eslint -c ../../complete.eslintrc.js \"src/**/*.ts\" \"test/**/*.ts\"",
-    "lint:fix": "yarn lint --fix",
-    "test": "jest -c ./jest.config.js",
-    "test:build:verify": "tsc --build ./test",
-    "test:e2e": "shx echo 'test:e2e' command not implemented yet",
-    "coverage": "shx echo No coverage report for this package",
-    "prepack": "yarn build"
-  },
-  "devDependencies": {
-    "shx": "^0.3.3"
-  },
-  "dependencies": {
-    "@cardano-ogmios/client": "5.4.0",
-    "@cardano-ogmios/schema": "5.4.0",
-    "@cardano-sdk/util": "0.3.0",
-    "@emurgo/cardano-serialization-lib-browser": "9.1.0",
-    "@emurgo/cardano-serialization-lib-nodejs": "9.1.0",
-    "bech32": "^2.0.0"
-  },
-  "files": [
-    "dist/*",
-    "!dist/tsconfig.tsbuildinfo",
-    "LICENSE",
-    "NOTICE"
-  ]
+    "name": "@cardano-sdk/core",
+    "version": "0.3.0",
+    "description": "Core types and libraries for Cardano",
+    "engines": {
+        "node": "^14"
+    },
+    "main": "dist/cjs/index.js",
+    "module": "dist/esm/index.js",
+    "exports": {
+        ".": {
+            "import": "./dist/esm/index.js",
+            "require": "./dist/cjs/index.js"
+        }
+    },
+    "repository": "https://github.com/input-output-hk/cardano-js-sdk/packages/core",
+    "author": "Rhys Bartels-Waller",
+    "license": "MPL-2.0",
+    "scripts": {
+      "build:esm": "tsc -p src/tsconfig.json --outDir ./dist/esm --module es2020",
+      "build:cjs": "tsc --build src",
+      "build": "run-s build:cjs build:esm module-fixup",
+      "module-fixup": "shx cp ../../build/cjs-package.json ./dist/cjs/package.json && cp ../../build/esm-package.json ./dist/esm/package.json",
+      "tscNoEmit": "shx echo typescript --noEmit command not implemented yet",
+      "cleanup:dist": "shx rm -rf dist",
+      "cleanup:nm": "shx rm -rf node_modules",
+      "cleanup": "run-s cleanup:dist cleanup:nm",
+      "lint": "eslint -c ../../complete.eslintrc.js \"src/**/*.ts\" \"test/**/*.ts\"",
+      "lint:fix": "yarn lint --fix",
+      "test": "jest -c ./jest.config.js",
+      "test:build:verify": "tsc --build ./test",
+      "coverage": "shx echo No coverage report for this package",
+      "prepack": "yarn build"
+    },
+    "devDependencies": {
+        "shx": "^0.3.3"
+    },
+    "dependencies": {
+        "@cardano-ogmios/client": "5.4.0",
+        "@cardano-ogmios/schema": "5.4.0",
+        "@cardano-sdk/util": "0.3.0",
+        "@emurgo/cardano-serialization-lib-browser": "9.1.0",
+        "@emurgo/cardano-serialization-lib-nodejs": "9.1.0",
+        "bech32": "^2.0.0"
+    },
+    "files": [
+        "dist/*",
+        "!dist/tsconfig.tsbuildinfo",
+        "LICENSE",
+        "NOTICE"
+    ]
 }

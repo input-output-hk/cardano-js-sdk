@@ -1,40 +1,41 @@
-import { SingleAddressWallet } from '../../../src';
-import { WalletStores, createPouchdbWalletStores } from '../../../src/persistence';
+import { SingleAddressWallet, storage } from '@cardano-sdk/wallet';
 import {
   assetProvider,
   chainHistoryProvider,
-  keyAgentReady,
+  keyAgent,
   networkInfoProvider,
   rewardsProvider,
   stakePoolProvider,
   txSubmitProvider,
-  utxoProvider
-} from '../config';
+  utxoProvider,
+  walletProvider
+} from '../../config';
 import { filter, firstValueFrom } from 'rxjs';
-import { waitForWalletStateSettle } from '../../util';
+import { waitForWalletStateSettle } from '../util';
 import delay from 'delay';
 
 describe('SingleAddressWallet/pouchdbWalletStores', () => {
   const walletName = 'DbTestWallet';
-  let stores1: WalletStores;
+  let stores1: storage.WalletStores;
 
   beforeAll(() => {
-    stores1 = createPouchdbWalletStores(walletName);
+    stores1 = storage.createPouchdbWalletStores(walletName);
   });
 
-  const createWallet = async (stores: WalletStores) =>
+  const createWallet = async (stores: storage.WalletStores) =>
     new SingleAddressWallet(
       { name: walletName },
       {
         assetProvider: await assetProvider,
         chainHistoryProvider: await chainHistoryProvider,
-        keyAgent: await keyAgentReady,
+        keyAgent: await keyAgent,
         networkInfoProvider: await networkInfoProvider,
         rewardsProvider: await rewardsProvider,
-        stakePoolProvider,
+        stakePoolProvider: await stakePoolProvider,
         stores,
         txSubmitProvider: await txSubmitProvider,
-        utxoProvider: await utxoProvider
+        utxoProvider: await utxoProvider,
+        walletProvider: await walletProvider
       }
     );
 
@@ -49,7 +50,7 @@ describe('SingleAddressWallet/pouchdbWalletStores', () => {
     const wallet1RewardsHistory = await firstValueFrom(wallet1.delegation.rewardsHistory$);
     wallet1.shutdown();
     // create a new wallet, with new stores sharing the underlying database
-    const wallet2 = await createWallet(createPouchdbWalletStores(walletName));
+    const wallet2 = await createWallet(storage.createPouchdbWalletStores(walletName));
     const tip = await firstValueFrom(wallet2.tip$);
     expect(await firstValueFrom(wallet2.delegation.rewardsHistory$)).toEqual(wallet1RewardsHistory);
     expect(await firstValueFrom(wallet1.delegation.rewardAccounts$)).toEqual(wallet1RewardAccounts);

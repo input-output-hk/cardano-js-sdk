@@ -8,7 +8,6 @@ import {
   userPromptServiceChannel,
   walletName
 } from './util';
-import { Cardano } from '@cardano-sdk/core';
 import { KeyManagement } from '@cardano-sdk/wallet';
 import {
   RemoteApiPropertyType,
@@ -75,10 +74,11 @@ document.querySelector('#createLedgerKeyAgent')!.addEventListener('click', async
   exposeKeyAgent(
     {
       keyAgent: KeyManagement.util.createAsyncKeyAgent(
-        await KeyManagement.LedgerKeyAgent.createWithDevice({
-          communicationType: KeyManagement.CommunicationType.Web,
-          networkId: Cardano.NetworkId.testnet,
-          protocolMagic: 1_097_911_063
+        await KeyManagement.InMemoryKeyAgent.fromBip39MnemonicWords({
+          accountIndex: 0,
+          getPassword: async () => Buffer.from(''),
+          mnemonicWords: process.env.MNEMONIC_WORDS.split(' '),
+          networkId: 0
         })
       ),
       walletName

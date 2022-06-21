@@ -29,7 +29,6 @@
     "lint:fix": "yarn lint --fix",
     "test": "jest -c ./jest.config.js",
     "test:build:verify": "tsc --build ./test",
-    "test:e2e": "jest -c ./e2e.jest.config.js",
     "coverage": "shx echo No coverage report for this package",
     "prepack": "yarn build"
   },
