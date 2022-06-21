@@ -154,7 +154,7 @@ export const createTransactionsTracker = (
   const submitting$ = merge(
     newTransactionsStore.get().pipe(mergeMap((transactions) => from(transactions))),
     newSubmitting$
-  );
+  ).pipe(share());
 
   const historicalTransactions$ = createHistoricalTransactionsTrackerSubject(transactionsSource$);
   const txConfirmed$ = (tx: Cardano.NewTxAlonzo) =>

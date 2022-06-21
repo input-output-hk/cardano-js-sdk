@@ -231,18 +231,18 @@ describe('TransactionsTracker', () => {
     });
 
     it('stored inFlight transactions are restored and merged with submitting ones', async () => {
-      const inFlightTransaction = { body: { validityInterval: { invalidHereafter: 1 } } } as Cardano.NewTxAlonzo;
+      const storedInFlightTransaction = { body: { validityInterval: { invalidHereafter: 1 } } } as Cardano.NewTxAlonzo;
       const outgoingTx = queryTransactionsResult[0];
-      createTestScheduler().run(({ cold, hot, expectObservable }) => {
-        const inFlight$ = cold<Cardano.NewTxAlonzo[]>('x|', {
-          x: [inFlightTransaction]
+      createTestScheduler().run(({ hot, expectObservable }) => {
+        const inFlight$ = hot<Cardano.NewTxAlonzo[]>('-x|', {
+          x: [storedInFlightTransaction]
         });
         inFlightTransactionsStore.get = jest.fn(() => inFlight$);
         inFlightTransactionsStore.set = jest.fn();
 
         const failedToSubmit$ = hot<FailedTx>('|');
         const tip$ = hot<Cardano.Tip>('|');
-        const submitting$ = hot('-a|', { a: outgoingTx });
+        const submitting$ = hot('--a|', { a: outgoingTx });
         const pending$ = hot<Cardano.TxAlonzo>('|');
         const transactionsSource$ = hot<Cardano.TxAlonzo[]>('|');
 
@@ -266,31 +266,32 @@ describe('TransactionsTracker', () => {
         );
 
         expectObservable(transactionsTracker.outgoing.pending$).toBe('|');
-        expectObservable(transactionsTracker.outgoing.confirmed$).toBe('--|');
-        expectObservable(transactionsTracker.outgoing.failed$).toBe('--|');
+        expectObservable(transactionsTracker.outgoing.confirmed$).toBe('---|');
+        expectObservable(transactionsTracker.outgoing.failed$).toBe('---|');
 
-        expectObservable(transactionsTracker.outgoing.submitting$).toBe('ab|', {
-          a: inFlightTransaction,
+        expectObservable(transactionsTracker.outgoing.submitting$).toBe('-ab|', {
+          a: storedInFlightTransaction,
           b: outgoingTx
         });
 
-        expectObservable(transactionsTracker.outgoing.inFlight$).toBe('ab|', {
-          a: [inFlightTransaction],
-          b: [inFlightTransaction, outgoingTx]
+        expectObservable(transactionsTracker.outgoing.inFlight$).toBe('abc|', {
+          a: [],
+          b: [storedInFlightTransaction],
+          c: [storedInFlightTransaction, outgoingTx]
         });
       });
       expect(inFlightTransactionsStore.set).toHaveBeenCalledTimes(2);
-      expect(inFlightTransactionsStore.set).lastCalledWith([inFlightTransaction, outgoingTx]);
+      expect(inFlightTransactionsStore.set).lastCalledWith([storedInFlightTransaction, outgoingTx]);
     });
 
     it('inFlight transactions are removed from store on successful transaction', async () => {
       const outgoingTx = queryTransactionsResult[0];
       const incomingTx = queryTransactionsResult[1];
-      const inFlightTransaction = outgoingTx;
+      const storedInFlightTransaction = outgoingTx;
 
-      createTestScheduler().run(({ cold, hot, expectObservable }) => {
-        const inFlight$ = cold<Cardano.NewTxAlonzo[]>('x|', {
-          x: [inFlightTransaction]
+      createTestScheduler().run(({ hot, expectObservable }) => {
+        const inFlight$ = hot<Cardano.NewTxAlonzo[]>('-x|', {
+          x: [storedInFlightTransaction]
         });
         inFlightTransactionsStore.get = jest.fn(() => inFlight$);
         inFlightTransactionsStore.set = jest.fn();
@@ -323,13 +324,13 @@ describe('TransactionsTracker', () => {
             transactionsSource$
           }
         );
-        expectObservable(transactionsTracker.outgoing.submitting$).toBe('a---|', { a: inFlightTransaction });
+        expectObservable(transactionsTracker.outgoing.submitting$).toBe('-a--|', { a: storedInFlightTransaction });
         expectObservable(transactionsTracker.outgoing.confirmed$).toBe('---a|', {
-          a: inFlightTransaction
+          a: storedInFlightTransaction
         });
-        expectObservable(transactionsTracker.outgoing.inFlight$).toBe('a--b|', {
-          a: [inFlightTransaction],
-          b: []
+        expectObservable(transactionsTracker.outgoing.inFlight$).toBe('ab-a|', {
+          a: [],
+          b: [storedInFlightTransaction]
         });
         expectObservable(transactionsTracker.outgoing.failed$).toBe('----|');
         expectObservable(transactionsTracker.history$).toBe('a-bc|', {
