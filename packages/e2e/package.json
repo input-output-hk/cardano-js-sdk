@@ -15,10 +15,15 @@
     "author": "Angel Castillo",
     "license": "Apache-2.0",
     "dependencies": {
+        "bunyan": "^1.8.15",
         "cardano-wallet-js": "^1.4.0",
+        "dotenv": "^16.0.1",
+        "envalid": "^7.3.1",
+        "ts-log": "^2.2.4",
         "ts-stopwatch": "0.0.4"
     },
     "devDependencies": {
+        "@types/bunyan": "^1.8.8",
         "@types/jest": "^28.1.2",
         "jest": "^28.1.1",
         "ts-jest": "^28.0.5",

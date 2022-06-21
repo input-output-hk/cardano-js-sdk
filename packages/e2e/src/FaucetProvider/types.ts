@@ -1,6 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import { Provider, Address } from '../../../core';
+import { Provider, Address, HealthCheckResponse } from '../../../core';
 
 /**
  * Faucet request transaction status.
@@ -47,6 +47,16 @@ export class FaucetRequestResult {
 export interface FaucetProvider extends Provider {
 
   /**
+   * Request tAda to be transferred to a single given address.
+   * 
+   * @param address The address where the tAda must be deposited.
+   * @param amount  The amount of tAda to be deposited at the given address address (in lovelace).
+   * @param timeout The time we are willing to wait (in milliseconds) for the faucet request transaction to be confirmed.
+   * @param confirmations The number of blocks that has passed since our transaction was added to the blockchain.
+   */
+  request(address: string, amount: number, confirmations?: number, timeout?: number): Promise<FaucetRequestResult>;
+
+  /**
    * Request tAda to be transferred to several given addresses.
    * 
    * @param addresses The addresses where the tAda must be deposited.
@@ -54,5 +64,15 @@ export interface FaucetProvider extends Provider {
    * @param timeout The time we are willing to wait (in milliseconds) for the faucet request transaction to be confirmed.
    * @param confirmations The number of blocks that has passed since our transaction was added to the blockchain.
    */
-  request(addresses: string[], amounts: number[], confirmations: number, timeout: number): Promise<FaucetRequestResult>;
+   multiRequest(addresses: string[], amounts: number[], confirmations?: number, timeout?: number): Promise<FaucetRequestResult>;
+
+   start?(): Promise<void>;
+   /**
+    * @throws ProviderError
+    */
+   close?(): Promise<void>;
+   /**
+    * @throws ProviderError
+    */
+   healthCheck(): Promise<HealthCheckResponse>;
 }
