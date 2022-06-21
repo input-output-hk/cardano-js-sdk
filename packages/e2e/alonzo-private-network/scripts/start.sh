@@ -42,11 +42,10 @@ echo "Update start time in genesis files"
 $sed -i -E "s/\"startTime\": [0-9]+/\"startTime\": ${timeUnix}/" byron/genesis.json
 $sed -i -E "s/\"systemStart\": \".*\"/\"systemStart\": \"${timeISO}\"/" shelley/genesis.json
 
-$sed -i -E "s/\"startTime\": [0-9]+/\"startTime\": ${timeUnix}/" /config/nodes/genesis/byron.json
-$sed -i -E "s/\"systemStart\": \".*\"/\"systemStart\": \"${timeISO}\"/"  /config/nodes/genesis/shelley.json
-
-$sed -i -E "s/\"startTime\": [0-9]+/\"startTime\": ${timeUnix}/" /config/nodes/cardano-node/genesis/byron.json
-$sed -i -E "s/\"systemStart\": \".*\"/\"systemStart\": \"${timeISO}\"/"  /config/nodes/cardano-node/genesis/shelley.json
+cp byron/genesis.json /config/nodes/genesis/byron.json
+cp byron/genesis.json /config/nodes/cardano-node/genesis/byron.json
+cp shelley/genesis.json /config/nodes/genesis/shelley.json
+cp shelley/genesis.json /config/nodes/cardano-node/genesis/shelley.json
 
 byronGenesisHash=$(cardano-cli byron genesis print-genesis-hash --genesis-json byron/genesis.json)
 shelleyGenesisHash=$(cardano-cli genesis hash --genesis shelley/genesis.json)
@@ -54,6 +53,7 @@ shelleyGenesisHash=$(cardano-cli genesis hash --genesis shelley/genesis.json)
 echo "Byron genesis hash: $byronGenesisHash"
 echo "Shelley genesis hash: $shelleyGenesisHash"
 
+cp /config/nodes/config.json  /config/nodes/cardano-node/config.json 
 $sed -i -E "s/\"ByronGenesisHash\": \".*\"/\"ByronGenesisHash\": \"${byronGenesisHash}\"/"  /config/nodes/cardano-node/config.json 
 $sed -i -E "s/\"ShelleyGenesisHash\": \".*\"/\"ShelleyGenesisHash\": \"${shelleyGenesisHash}\"/"  /config/nodes/cardano-node/config.json 
 

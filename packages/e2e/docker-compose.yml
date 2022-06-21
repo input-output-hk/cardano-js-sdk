@@ -1,0 +1,134 @@
+version: "3.3"
+
+services:
+  private-testnet:
+    build:
+      context: ./alonzo-private-network
+    ports:
+      - 3001:3001
+    volumes:
+      - ${PWD}/alonzo-private-network/sockets:/root/sockets
+      - ./alonzo-private-network/config/network/${NETWORK:-mainnet}:/config/nodes # Mount the config so we can update the genesis files and hashes.
+    healthcheck:
+      # Verify that the node socket is up.
+      test: ["CMD-SHELL", "test - f /root/sockets/node-pool1.sock"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+  postgres:
+    image: postgres:${POSTGRES_VERSION:-11.5-alpine}
+    environment:
+      - POSTGRES_LOGGING=true
+      - POSTGRES_DB_FILE=/run/secrets/postgres_db
+      - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
+      - POSTGRES_USER_FILE=/run/secrets/postgres_user
+    ports:
+      - ${POSTGRES_PORT:-5432}:5432
+    secrets:
+      - postgres_db
+      - postgres_password
+      - postgres_user
+    shm_size: '2gb'
+    restart: on-failure
+    healthcheck:
+      # Use pg_isready to check postgres is running. Substitute different
+      # user `postgres` if you've setup differently to config/pgpass-mainnet
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+
+  cardano-node-ogmios:
+    image: cardanosolutions/cardano-node-ogmios:${CARDANO_NODE_OGMIOS_VERSION:-v5.1.0}-${NETWORK:-mainnet}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "400k"
+        max-file: "20"
+    ports:
+      - ${OGMIOS_PORT:-1337}:1337
+    restart: on-failure
+    healthcheck:
+      # Ping the EKG port to see if it responds.
+      # Assuming if EKG isn't up then the rest of cardano-node isn't either.
+      test: ["CMD-SHELL", "curl -f 127.0.0.1:12788 || exit 1"]
+      interval: 60s
+      timeout: 10s
+      retries: 5
+    depends_on:
+      - private-testnet
+    # Temporary hack to delay ogmions cardano node startup after the configuration files have been updated.
+    entrypoint: sh -c "sleep 10 && /root/cardano-node-ogmios.sh"
+    volumes:
+      - ./alonzo-private-network/config/network/${NETWORK:-mainnet}:/config
+      - node-db:/db
+      - node-ipc:/ipc
+  cardano-db-sync-extended:
+    image: inputoutput/cardano-db-sync:${CARDANO_DB_SYNC_VERSION:-12.0.0}
+    command: [
+        "--config", "/config/cardano-db-sync/config.json",
+        "--socket-path", "/node-ipc/node.socket"
+    ]
+    environment:
+      - EXTENDED=true
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - RESTORE_SNAPSHOT=${RESTORE_SNAPSHOT:-}
+      - RESTORE_RECREATE_DB=N
+    depends_on:
+      - cardano-node-ogmios
+      - postgres
+      - private-testnet
+    secrets:
+      - postgres_password
+      - postgres_user
+      - postgres_db
+    volumes:
+      - ./alonzo-private-network/config/network/${NETWORK:-mainnet}:/config
+      - node-ipc:/node-ipc
+    restart: on-failure
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+  cardano-wallet:
+    image: inputoutput/cardano-wallet:2022.5.27
+    volumes:
+      - wallet-${NETWORK}-db:/wallet-db
+      - node-ipc:/ipc
+      - ./alonzo-private-network/config:/config
+    ports:
+      - 8090:8090
+    entrypoint: []                                                                            
+    command: bash -c "sleep 10 && ([[ $$NETWORK == \"mainnet\" ]] && $$CMD --mainnet) || ($$CMD --testnet /config/network/${NETWORK}/genesis/byron.json)"
+    environment:
+      CMD: "cardano-wallet serve --node-socket /ipc/node.socket --database /wallet-db --listen-address 0.0.0.0"
+      NETWORK:
+    depends_on:
+      - cardano-node-ogmios
+    restart: on-failure
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+secrets:
+  postgres_db:
+    file: ./alonzo-private-network/placeholder-secrets/postgres_db
+  postgres_password:
+    file: ./alonzo-private-network/placeholder-secrets/postgres_password
+  postgres_user:
+    file: ./alonzo-private-network/placeholder-secrets/postgres_user
+volumes:
+  db-sync-data:
+  node-db:
+  node-ipc:
+  postgres-data:
+  wallet-mainnet-db:
+  wallet-testnet-db:

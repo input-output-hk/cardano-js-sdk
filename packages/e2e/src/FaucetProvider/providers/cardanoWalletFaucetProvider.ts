@@ -89,6 +89,9 @@ export class CardanoWalletFaucetService implements FaucetProvider {
 
       let axiosResponse = await this._walletServer.walletsApi.postWallet(walletInfo).catch(e => {
 
+        if (e.response === undefined)
+          throw e;
+          
         // This seed phrases already exists on the cardano wallet service.
         if (e.response.status === HTTP_ERROR_CODE_IN_CONFLICT)
         {

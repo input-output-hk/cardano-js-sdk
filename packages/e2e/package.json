@@ -4,7 +4,9 @@
     "description": "End to end tests for the cardano-js-sdk packages.",
     "main": "index.js",
     "scripts": {
-        "test": "jest -c ./jest.config.js"
+        "test": "jest -c ./jest.config.js",
+        "private-network:up": "CARDANO_DB_SYNC_VERSION=13.0.0-rc3 DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 OGMIOS_PORT=1338 NETWORK=testnet docker-compose -p private-testnet-e2e up",
+        "private-network:down": "CARDANO_DB_SYNC_VERSION=13.0.0-rc3 DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 OGMIOS_PORT=1338 NETWORK=testnet docker-compose -p private-testnet-e2e down -v --remove-orphans"
     },
     "repository": {
         "type": "git",
