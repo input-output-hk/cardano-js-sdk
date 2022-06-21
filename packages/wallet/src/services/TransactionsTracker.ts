@@ -205,7 +205,7 @@ export const createTransactionsTracker = (
           return [...inFlight, tx];
         }
         const idx = inFlight.indexOf(tx);
-        return [...inFlight.splice(0, idx), ...inFlight.splice(idx + 1)];
+        return [...inFlight.slice(0, idx), ...inFlight.slice(idx + 1)];
       }, [] as Cardano.NewTxAlonzo[]),
       tap((inFlight) => newTransactionsStore.set(inFlight)),
       startWith([])
