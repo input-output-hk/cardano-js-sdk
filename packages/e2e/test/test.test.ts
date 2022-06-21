@@ -11,7 +11,7 @@ describe('CardanoWalletFaucetService', () => {
         let healthCheck = await _faucetProvider.healthCheck();
 
         if (!healthCheck.ok)
-            throw "Faucet provider could not be started."
+            throw "Faucet provider could not be started.";
     });
 
     afterAll(async() => {
@@ -22,8 +22,8 @@ describe('CardanoWalletFaucetService', () => {
     it('should do stuff', async () => {
 
         let result: FaucetRequestResult = await _faucetProvider.request(
-            "addr_test1vrgylrse49du60jdy7h46mg5mwft6kw8r0l4v5pklkj324cm247gf",
-            6000000, 1000000);
+            ["addr_test1vrgylrse49du60jdy7h46mg5mwft6kw8r0l4v5pklkj324cm247gf", "addr_test1vrgylrse49du60jdy7h46mg5mwft6kw8r0l4v5pklkj324cm247gf"],
+            [45000000, 33000000]);
 
         console.log(result);
     });

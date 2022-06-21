@@ -4,7 +4,8 @@
     "baseUrl": "."
   },
   "include": [
-    "../cip2/test/util"
+    "src/**/*.ts",
+    "tests/*.ts"
   ],
   "references": [
     {
