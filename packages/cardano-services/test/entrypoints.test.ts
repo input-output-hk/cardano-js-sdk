@@ -53,14 +53,14 @@ describe('entrypoints', () => {
     let ogmiosPort: ConnectionConfig['port'];
     let ogmiosConnection: Connection;
     let cardanoNodeConfigPath: string;
-    let dbQueriesCacheTtl: string;
+    let cacheTtl: string;
 
     beforeAll(async () => {
       ogmiosPort = await getRandomPort();
       ogmiosConnection = createConnectionObject({ port: ogmiosPort });
       dbConnectionString = process.env.DB_CONNECTION_STRING!;
       cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
-      dbQueriesCacheTtl = process.env.DB_QUERIES_CACHE_TTL!;
+      cacheTtl = process.env.CACHE_TTL!;
     });
 
     describe('with healthy internal providers', () => {
@@ -88,8 +88,8 @@ describe('entrypoints', () => {
             ogmiosConnection.address.webSocket,
             '--cardano-node-config-path',
             cardanoNodeConfigPath,
-            '--db-queries-cache-ttl',
-            dbQueriesCacheTtl,
+            '--cache-ttl',
+            cacheTtl,
             ServiceNames.StakePool,
             ServiceNames.TxSubmit,
             ServiceNames.NetworkInfo,
@@ -105,9 +105,9 @@ describe('entrypoints', () => {
           proc = fork(exePath('run'), {
             env: {
               API_URL: apiUrl,
+              CACHE_TTL: cacheTtl,
               CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
               DB_CONNECTION_STRING: dbConnectionString,
-              DB_QUERIES_CACHE_TTL: dbQueriesCacheTtl,
               LOGGER_MIN_SEVERITY: 'error',
               OGMIOS_URL: ogmiosConnection.address.webSocket,
               SERVICE_NAMES: `${ServiceNames.StakePool},${ServiceNames.TxSubmit},${ServiceNames.NetworkInfo},${ServiceNames.Utxo}`
@@ -182,7 +182,7 @@ describe('entrypoints', () => {
               'error',
               '--cardano-node-config-path',
               cardanoNodeConfigPath,
-              '--db-queries-cache-ttl',
+              '--cache-ttl',
               cacheTtlOutOfRange,
               ServiceNames.NetworkInfo
             ],
@@ -266,7 +266,7 @@ describe('entrypoints', () => {
           proc = fork(exePath('run'), {
             env: {
               API_URL: apiUrl,
-              DB_QUERIES_CACHE_TTL: cacheTtlOutOfRange,
+              CACHE_TTL: cacheTtlOutOfRange,
               LOGGER_MIN_SEVERITY: 'error',
               SERVICE_NAMES: ServiceNames.NetworkInfo
             },

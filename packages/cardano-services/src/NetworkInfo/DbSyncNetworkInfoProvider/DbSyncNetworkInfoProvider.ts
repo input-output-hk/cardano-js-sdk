@@ -15,12 +15,12 @@ import { NetworkInfoBuilder } from './NetworkInfoBuilder';
 import { NetworkInfoCacheKey } from '.';
 import { Pool } from 'pg';
 import { Shutdown } from '@cardano-sdk/util';
+import { epochPollService } from './utils';
 import { loadGenesisData, toGenesisParams, toLedgerTip, toStake, toSupply, toWalletProtocolParams } from './mappers';
-import { pollDbSync } from './utils';
 
 export interface NetworkInfoProviderProps {
   cardanoNodeConfigPath: string;
-  dbPollInterval: number;
+  epochPollInterval: number;
 }
 export interface NetworkInfoProviderDependencies {
   db: Pool;
@@ -32,11 +32,11 @@ export class DbSyncNetworkInfoProvider extends DbSyncProvider implements Network
   #cache: InMemoryCache;
   #builder: NetworkInfoBuilder;
   #genesisDataReady: Promise<GenesisData>;
-  #dbPollInterval: number;
-  #pollService: Shutdown | null;
+  #epochPollInterval: number;
+  #epochPollService: Shutdown | null;
 
   constructor(
-    { cardanoNodeConfigPath, dbPollInterval }: NetworkInfoProviderProps,
+    { cardanoNodeConfigPath, epochPollInterval }: NetworkInfoProviderProps,
     { db, cache, logger = dummyLogger }: NetworkInfoProviderDependencies
   ) {
     super(db);
@@ -44,7 +44,7 @@ export class DbSyncNetworkInfoProvider extends DbSyncProvider implements Network
     this.#cache = cache;
     this.#builder = new NetworkInfoBuilder(db, logger);
     this.#genesisDataReady = loadGenesisData(cardanoNodeConfigPath);
-    this.#dbPollInterval = dbPollInterval;
+    this.#epochPollInterval = epochPollInterval;
   }
 
   public async ledgerTip(): Promise<Cardano.Tip> {
@@ -97,13 +97,17 @@ export class DbSyncNetworkInfoProvider extends DbSyncProvider implements Network
   }
 
   async start(): Promise<void> {
-    if (!this.#pollService)
-      this.#pollService = pollDbSync(this.#cache, () => this.#builder.queryLatestEpoch(), this.#dbPollInterval);
+    if (!this.#epochPollService)
+      this.#epochPollService = epochPollService(
+        this.#cache,
+        () => this.#builder.queryLatestEpoch(),
+        this.#epochPollInterval
+      );
   }
 
   async close(): Promise<void> {
-    this.#pollService?.shutdown();
-    this.#pollService = null;
+    this.#epochPollService?.shutdown();
+    this.#epochPollService = null;
     this.#cache.shutdown();
   }
 }

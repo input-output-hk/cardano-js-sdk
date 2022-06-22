@@ -25,7 +25,7 @@ describe('NetworkInfoHttpService', () => {
   let config: HttpServerConfig;
   let doNetworkInfoRequest: ReturnType<typeof doServerRequest>;
 
-  const dbPollInterval = 2 * 1000;
+  const epochPollInterval = 2 * 1000;
   const cache = new InMemoryCache(UNLIMITED_CACHE_TTL);
   const cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
   const db = new Pool({ connectionString: process.env.DB_CONNECTION_STRING, max: 1, min: 1 });
@@ -67,7 +67,7 @@ describe('NetworkInfoHttpService', () => {
       port = await getPort();
       config = { listen: { port } };
       apiUrlBase = `http://localhost:${port}/network-info`;
-      networkInfoProvider = new DbSyncNetworkInfoProvider({ cardanoNodeConfigPath, dbPollInterval }, { cache, db });
+      networkInfoProvider = new DbSyncNetworkInfoProvider({ cardanoNodeConfigPath, epochPollInterval }, { cache, db });
       service = new NetworkInfoHttpService({ networkInfoProvider });
       httpServer = new HttpServer(config, { services: [service] });
       doNetworkInfoRequest = doServerRequest(apiUrlBase);
@@ -94,7 +94,7 @@ describe('NetworkInfoHttpService', () => {
         expect(cache.getVal(NetworkInfoCacheKey.CURRENT_EPOCH)).toBeUndefined();
         expect(cache.keys().length).toEqual(0);
 
-        await sleep(dbPollInterval * 2);
+        await sleep(epochPollInterval * 2);
 
         expect(cache.keys().length).toEqual(1);
         expect(cache.getVal(NetworkInfoCacheKey.CURRENT_EPOCH)).toBeDefined();
@@ -257,7 +257,7 @@ describe('NetworkInfoHttpService', () => {
         await doNetworkInfoRequest<[], StakeSummary>(path, []);
         expect(cache.getVal(NetworkInfoCacheKey.CURRENT_EPOCH)).toBeUndefined();
         expect(cache.keys().length).toEqual(lovelaceSupplyTotalQueriesCount);
-        await sleep(dbPollInterval);
+        await sleep(epochPollInterval);
 
         expect(cache.getVal(NetworkInfoCacheKey.CURRENT_EPOCH)).toEqual(currentEpochNo);
         expect(cache.keys().length).toEqual(totalQueriesCount);
@@ -271,7 +271,7 @@ describe('NetworkInfoHttpService', () => {
           const greaterEpoch = 255;
 
           await doNetworkInfoRequest<[], SupplySummary>(path, []);
-          await sleep(dbPollInterval);
+          await sleep(epochPollInterval);
 
           expect(cache.keys().length).toEqual(lovelaceSupplyTotalQueriesCount + DB_POLL_QUERIES_COUNT);
 
@@ -282,7 +282,7 @@ describe('NetworkInfoHttpService', () => {
             [greaterEpoch, 58_389_393_484_858, 43_424_552, 55_666, 10_000, greaterEpoch, '2022-05-28', '2022-06-02']
           );
 
-          await sleep(dbPollInterval);
+          await sleep(epochPollInterval);
           expect(invalidateCacheSpy).toHaveBeenCalledWith([
             NetworkInfoCacheKey.TOTAL_SUPPLY,
             NetworkInfoCacheKey.ACTIVE_STAKE
@@ -290,7 +290,7 @@ describe('NetworkInfoHttpService', () => {
           expect(cache.getVal(NetworkInfoCacheKey.CURRENT_EPOCH)).toEqual(greaterEpoch);
           expect(cache.keys().length).toEqual(2);
 
-          await sleep(dbPollInterval);
+          await sleep(epochPollInterval);
         }, db)
       );
     });

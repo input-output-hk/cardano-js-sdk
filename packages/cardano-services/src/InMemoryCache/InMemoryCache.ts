@@ -2,7 +2,7 @@ import { CACHE_TTL_DEFAULT } from './defaults';
 import NodeCache from 'node-cache';
 
 export type Key = string | number;
-export type DbSyncQuery<T> = () => Promise<T>;
+export type AsyncAction<T> = () => Promise<T>;
 
 export class InMemoryCache {
   #cache: NodeCache;
@@ -17,17 +17,17 @@ export class InMemoryCache {
    * Get a cached key value, if not found execute db query and cache the result with that key
    *
    * @param key cache key
-   * @param dbSyncQuery cache key
+   * @param asyncAction async function to get the value
    * @param ttl cache duration in seconds
    * @returns The value stored with the key
    */
-  public async get<T>(key: Key, dbSyncQuery: DbSyncQuery<T>, ttl = this.#ttlDefault): Promise<T> {
+  public async get<T>(key: Key, asyncAction: AsyncAction<T>, ttl = this.#ttlDefault): Promise<T> {
     const cachedValue: T | undefined = this.#cache.get(key);
     if (cachedValue) {
       return cachedValue;
     }
 
-    const resultPromise = dbSyncQuery();
+    const resultPromise = asyncAction();
     this.#cache.set(
       key,
       resultPromise.catch(() => this.#cache.del(key)),

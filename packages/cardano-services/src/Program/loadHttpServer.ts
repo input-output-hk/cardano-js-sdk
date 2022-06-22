@@ -20,8 +20,8 @@ import pg from 'pg';
 
 export interface HttpServerOptions extends CommonProgramOptions {
   dbConnectionString?: string;
-  dbQueriesCacheTtl: number;
-  dbPollInterval: number;
+  cacheTtl: number;
+  epochPollInterval: number;
   cardanoNodeConfigPath?: string;
   metricsEnabled?: boolean;
   useQueue?: boolean;
@@ -71,12 +71,12 @@ const serviceMapFactory = (args: ProgramArgs, logger: Logger, cache: InMemoryCac
       throw new MissingProgramOption(ServiceNames.NetworkInfo, ProgramOptionDescriptions.CardanoNodeConfigPath);
 
     const networkInfoProvider = new DbSyncNetworkInfoProvider(
-      {
-        cardanoNodeConfigPath: args.options?.cardanoNodeConfigPath,
-        dbPollInterval: args.options?.dbPollInterval
-      },
-      { cache, db, logger }
-    );
+        {
+          cardanoNodeConfigPath: args.options.cardanoNodeConfigPath,
+          epochPollInterval: args.options?.epochPollInterval
+        },
+        { cache, db, logger }
+      );
 
     return new NetworkInfoHttpService({ logger, networkInfoProvider });
   },
@@ -101,7 +101,7 @@ export const loadHttpServer = (args: ProgramArgs): HttpServer => {
     ? new pg.Pool({ connectionString: args.options.dbConnectionString })
     : undefined;
 
-  const cache = new InMemoryCache(args.options?.dbQueriesCacheTtl);
+  const cache = new InMemoryCache(args.options?.cacheTtl);
 
   const serviceMap = serviceMapFactory(args, logger, cache, db);
 
