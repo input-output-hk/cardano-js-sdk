@@ -1,12 +1,26 @@
 {
-    "name": "e2e",
-    "version": "0.0.1",
+    "name": "@cardano-sdk/e2e",
+    "version": "0.2.0",
     "description": "End to end tests for the cardano-js-sdk packages.",
     "main": "index.js",
     "scripts": {
         "test": "jest -c ./jest.config.js",
         "private-network:up": "CARDANO_DB_SYNC_VERSION=13.0.0-rc3 DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 OGMIOS_PORT=1338 NETWORK=testnet docker-compose -p private-testnet-e2e up",
-        "private-network:down": "CARDANO_DB_SYNC_VERSION=13.0.0-rc3 DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 OGMIOS_PORT=1338 NETWORK=testnet docker-compose -p private-testnet-e2e down -v --remove-orphans"
+        "private-network:down": "CARDANO_DB_SYNC_VERSION=13.0.0-rc3 DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 OGMIOS_PORT=1338 NETWORK=testnet docker-compose -p private-testnet-e2e down -v --remove-orphans",
+        "build:esm": "tsc -p src/tsconfig.json --outDir ./dist/esm --module es2020",
+        "build:cjs": "tsc --build src",
+        "build": "run-s build:cjs build:esm module-fixup",
+        "module-fixup": "shx cp ../../build/cjs-package.json ./dist/cjs/package.json && cp ../../build/esm-package.json ./dist/esm/package.json",
+        "tscNoEmit": "shx echo typescript --noEmit command not implemented yet",
+        "cleanup:dist": "shx rm -rf dist",
+        "cleanup:nm": "shx rm -rf node_modules",
+        "cleanup": "run-s cleanup:dist cleanup:nm",
+        "coverage": "yarn test --coverage",
+        "lint": "eslint --ignore-path ../../.eslintignore \"**/*.ts\"",
+        "lint:fix": "eslint --fix --ignore-path ../../.eslintignore \"**/*.ts\"",
+        "prepack": "yarn build",
+        "test:build:verify": "tsc --build ./test",
+        "test:debug": "DEBUG=true yarn test"
     },
     "repository": {
         "type": "git",
@@ -20,7 +34,9 @@
         "dotenv": "^16.0.1",
         "envalid": "^7.3.1",
         "ts-log": "^2.2.4",
-        "ts-stopwatch": "0.0.4"
+        "ts-stopwatch": "0.0.4",
+        "@cardano-sdk/core": "0.2.0",
+        "@cardano-sdk/util": "0.2.0"
     },
     "devDependencies": {
         "@types/bunyan": "^1.8.8",

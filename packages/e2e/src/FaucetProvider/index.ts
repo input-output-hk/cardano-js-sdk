@@ -1,3 +1,3 @@
 export * from './types';
 export * from './providers/cardanoWalletFaucetProvider';
-export * from './factory';
+export * from './faucetFactory';
