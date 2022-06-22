@@ -36,18 +36,18 @@ Object {
 
 exports[`NetworkInfoHttpService healthy state with NetworkInfoHttpProvider response is an object of ledger tip 1`] = `
 Object {
-  "blockNo": 3274726,
-  "hash": "5caede44f4a5a775443095159cd42c8a64f35494086957ab3e04624015a6e13c",
-  "slot": 49032415,
+  "blockNo": 3556390,
+  "hash": "332340bfcf47951b4bc8eca51c4e9190d29e2fd6dae30be231ebcdadb2d8c399",
+  "slot": 58336266,
 }
 `;
 
 exports[`NetworkInfoHttpService healthy state with NetworkInfoHttpProvider response is an object of network info 1`] = `
 Object {
   "lovelaceSupply": Object {
-    "circulating": 69163989759711432n,
+    "circulating": 69165246561822582n,
     "max": 45000000000000000n,
-    "total": 40342337171803411n,
+    "total": 40408479600434778n,
   },
   "network": Object {
     "id": 0,
@@ -68,8 +68,8 @@ Object {
     ],
   },
   "stake": Object {
-    "active": 14977960053990832n,
-    "live": 69154425288708824n,
+    "active": 15039823438862518n,
+    "live": 69154436284251039n,
   },
 }
 `;

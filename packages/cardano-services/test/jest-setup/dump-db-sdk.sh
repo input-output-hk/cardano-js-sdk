@@ -1,16 +1,15 @@
  #!/usr/bin/env bash
 
-# As Cardano Rosetta is mostly some queries and data mapping it makes no sense to mock repository
-# queries as, after that, it's just some data mapping nad that's it. In order to test our queries
-# we can populate the test db with some real mainnet data. We are already importing a mainned snapshot
-# but using a whole mainnet snapshot will be huge (+3GB) so, alternatively, we selecting and importing
-# some blocks data. It's not an ideal solution as we need to relax some constraints to do so
+# In order to test our queries we can populate the test db with some real testnet data. 
+# We are already importing a testnet snapshot but using a whole testnet snapshot will be huge (+3GB) so, 
+# alternatively, we selecting and importing some blocks data. 
+# It's not an ideal solution as we need to relax some constraints to do so
 # but still is better than inserting data manually. This script uses a similar process as 
 # `pg_dump` using COPY statements
 #
 # This script helps dumping some information based on block ids.
 #
-# To run this file, grab a mainnet db-sync postgres db and execute
+# To run this file, grab a testnet db-sync postgres db and execute
 #
 # $ bash dump_db-sdk.sh
 #
@@ -32,7 +31,7 @@ TAR_FILE='./testnet-fixture-data.tar'
 # Block Ids. Ideally we need to export them in batches of 3 as when we skip Epoch Boundary Blocks checking 3 blocks 
 # before the one we are interested, so, if you are willing to fetch a block, please state B-2, B-1, B
 # See: cardano-rosetta-server/src/server/db/queries/blockchain-queries.ts#findBlock
-BLOCKS_TO_EXPORT="1833726,1598507,1622869,1646557,1654555,1655520,1668437,1682503,1912426,2672896,2759361,2769413,2769469,2769577,2972717,3087425,3157934,3274726"
+BLOCKS_TO_EXPORT="1833726,1598507,1622869,1646557,1654555,1655520,1668437,1682503,1912426,2672896,2759361,2769413,2769469,2769577,2972717,3087425,3157934,3274726, 3556390"
 SELECT_BLOCK_ID="SELECT id FROM block WHERE block_no IN ($BLOCKS_TO_EXPORT)"
 SELECT_BLOCK_EPOCH="SELECT epoch_no FROM block WHERE block_no IN ($BLOCKS_TO_EXPORT)"
   
