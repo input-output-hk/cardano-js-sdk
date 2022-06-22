@@ -1,10 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable max-len */
 import { Cardano, ProviderError, TxSubmitProvider } from '@cardano-sdk/core';
 import { Connection, createConnectionObject } from '@cardano-ogmios/client';
-import { createMockOgmiosServer, listenPromise, serverClosePromise } from './mocks/mockOgmiosServer';
+import { createMockOgmiosServer, listenPromise, serverClosePromise } from '../../mocks/mockOgmiosServer';
 import { getRandomPort } from 'get-port-please';
-import { ogmiosTxSubmitProvider } from '../src';
+import { ogmiosTxSubmitProvider } from '../../../src';
 import http from 'http';
 
 describe('ogmiosTxSubmitProvider', () => {

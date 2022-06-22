@@ -9,12 +9,12 @@ import { DbSyncUtxoProvider, UtxoHttpService } from '../Utxo';
 import { HttpServer, HttpServerConfig, HttpService } from '../Http';
 import { InMemoryCache } from '../InMemoryCache';
 import { MissingProgramOption, UnknownServiceName } from './errors';
+import { OgmiosCardanoNode, ogmiosTxSubmitProvider, urlToConnectionConfig } from '@cardano-sdk/ogmios';
 import { ProgramOptionDescriptions } from './ProgramOptionDescriptions';
 import { RabbitMqTxSubmitProvider } from '@cardano-sdk/rabbitmq';
 import { ServiceNames } from './ServiceNames';
 import { TxSubmitHttpService } from '../TxSubmit';
 import { createDbSyncMetadataService } from '../Metadata';
-import { ogmiosTxSubmitProvider, urlToConnectionConfig } from '@cardano-sdk/ogmios';
 import Logger, { createLogger } from 'bunyan';
 import pg from 'pg';
 
@@ -69,14 +69,16 @@ const serviceMapFactory = (args: ProgramArgs, logger: Logger, cache: InMemoryCac
     if (!db) throw new MissingProgramOption(ServiceNames.NetworkInfo, ProgramOptionDescriptions.DbConnection);
     if (args.options?.cardanoNodeConfigPath === undefined)
       throw new MissingProgramOption(ServiceNames.NetworkInfo, ProgramOptionDescriptions.CardanoNodeConfigPath);
+    if (args.options?.ogmiosUrl === undefined)
+      throw new MissingProgramOption(ServiceNames.NetworkInfo, ProgramOptionDescriptions.OgmiosUrl);
 
     const networkInfoProvider = new DbSyncNetworkInfoProvider(
-        {
-          cardanoNodeConfigPath: args.options.cardanoNodeConfigPath,
-          epochPollInterval: args.options?.epochPollInterval
-        },
-        { cache, db, logger }
-      );
+      {
+        cardanoNodeConfigPath: args.options.cardanoNodeConfigPath,
+        epochPollInterval: args.options?.epochPollInterval
+      },
+      { cache, cardanoNode: new OgmiosCardanoNode(urlToConnectionConfig(args.options.ogmiosUrl), logger), db, logger }
+    );
 
     return new NetworkInfoHttpService({ logger, networkInfoProvider });
   },

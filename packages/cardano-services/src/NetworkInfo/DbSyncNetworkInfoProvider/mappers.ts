@@ -1,10 +1,12 @@
 import {
   Cardano,
+  EraSummary,
   ProtocolParametersRequiredByWallet,
   ProviderError,
   ProviderFailure,
   StakeSummary,
-  SupplySummary
+  SupplySummary,
+  TimeSettings
 } from '@cardano-sdk/core';
 import { GenesisData, LedgerTipModel, WalletProtocolParamsModel } from './types';
 import JSONbig from 'json-bigint';
@@ -25,6 +27,13 @@ export const networkIdMap = {
   Mainnet: Cardano.NetworkId.mainnet,
   Testnet: Cardano.NetworkId.testnet
 };
+
+export const toTimeSettings = (eraSummary: EraSummary): TimeSettings => ({
+  epochLength: eraSummary.parameters.epochLength,
+  fromSlotDate: eraSummary.start.time,
+  fromSlotNo: eraSummary.start.slot,
+  slotLength: eraSummary.parameters.slotLength
+});
 
 export const toSupply = ({ circulatingSupply, totalSupply }: ToLovalaceSupplyInput): SupplySummary => ({
   circulating: BigInt(circulatingSupply),

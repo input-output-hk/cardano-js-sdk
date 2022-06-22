@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Connection, createConnectionObject } from '@cardano-ogmios/client';
+import { Connection, createConnectionObject } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { createMockOgmiosServer } from '@cardano-sdk/ogmios/test/mocks/mockOgmiosServer';
 import { getRandomPort } from 'get-port-please';
@@ -20,6 +20,7 @@ export const ogmiosServerReady = (connection: Connection): Promise<void> => serv
 export const createHealthyMockOgmiosServer = (submitTxHook?: () => void) =>
   createMockOgmiosServer({
     healthCheck: { response: { networkSynchronization: 0.999, success: true } },
+    stateQuery: { eraSummaries: { response: { success: true } }, systemStart: { response: { success: true } } },
     submitTx: { response: { success: true } },
     submitTxHook
   });
@@ -27,6 +28,7 @@ export const createHealthyMockOgmiosServer = (submitTxHook?: () => void) =>
 export const createUnhealthyMockOgmiosServer = () =>
   createMockOgmiosServer({
     healthCheck: { response: { networkSynchronization: 0.8, success: true } },
+    stateQuery: { eraSummaries: { response: { success: false } }, systemStart: { response: { success: false } } },
     submitTx: { response: { success: false } }
   });
 

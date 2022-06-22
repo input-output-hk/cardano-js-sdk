@@ -1,8 +1,8 @@
 import { CACHE_TTL_DEFAULT } from '../../src/InMemoryCache';
-import { Connection } from '@cardano-ogmios/client';
+import { Connection } from '@cardano-sdk/ogmios';
 import { EPOCH_POLL_INTERVAL_DEFAULT } from '../../src/NetworkInfo';
 import { HttpServer } from '../../src';
-import { MissingProgramOption, ServiceNames, loadHttpServer } from '../../src/Program';
+import { MissingProgramOption, ProgramOptionDescriptions, ServiceNames, loadHttpServer } from '../../src/Program';
 import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { URL } from 'url';
 import {
@@ -79,7 +79,7 @@ describe('loadHttpServer', () => {
             ServiceNames.NetworkInfo
           ]
         })
-      ).toThrow(MissingProgramOption);
+      ).toThrow(new MissingProgramOption(ServiceNames.StakePool, ProgramOptionDescriptions.DbConnection));
     });
 
     it('throws if genesis-config dependent service is nominated without providing the node config path', () => {
@@ -87,30 +87,28 @@ describe('loadHttpServer', () => {
         loadHttpServer({
           apiUrl,
           options: {
-              cacheTtl: 0,
-              dbConnectionString: 'postgres',
-              epochPollInterval: 0
-            },
-            serviceNames: [ServiceNames.NetworkInfo]
-          })
-      ).rejects.toThrow(
-        new MissingProgramOption(ServiceNames.NetworkInfo, ProgramOptionDescriptions.CardanoNodeConfigPath)
-      );
+            cacheTtl: 0,
+            dbConnectionString: 'postgres',
+            epochPollInterval: 0,
+            ogmiosUrl: new URL('http://localhost:1337')
+          },
+          serviceNames: [ServiceNames.NetworkInfo]
+        })
+      ).toThrow(new MissingProgramOption(ServiceNames.NetworkInfo, ProgramOptionDescriptions.CardanoNodeConfigPath));
     });
-    it('throws if ogmios dependent service is nominated without providing the ogmios url', async () => {
-      await expect(
-        async () =>
-          await loadHttpServer({
-            apiUrl,
-            options: {
-              cacheTtl: 0,
-              cardanoNodeConfigPath: 'config',
-              dbConnectionString: 'postgres',
-              epochPollInterval: 0
-            },
-            serviceNames: [ServiceNames.NetworkInfo]
-          })
-      ).toThrow(MissingProgramOption);
+    it('throws if ogmios dependent service is nominated without providing the ogmios url', () => {
+      expect(() =>
+        loadHttpServer({
+          apiUrl,
+          options: {
+            cacheTtl: 0,
+            cardanoNodeConfigPath: 'config',
+            dbConnectionString: 'postgres',
+            epochPollInterval: 0
+          },
+          serviceNames: [ServiceNames.NetworkInfo]
+        })
+      ).toThrow(new MissingProgramOption(ServiceNames.NetworkInfo, ProgramOptionDescriptions.OgmiosUrl));
     });
   });
 

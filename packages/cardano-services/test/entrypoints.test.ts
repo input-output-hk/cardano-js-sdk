@@ -2,7 +2,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable max-len */
 import { ChildProcess, fork } from 'child_process';
-import { Connection, ConnectionConfig, createConnectionObject } from '@cardano-ogmios/client';
+import { Connection, ConnectionConfig, createConnectionObject } from '@cardano-sdk/ogmios';
 import { RABBITMQ_URL_DEFAULT, ServiceNames } from '../src';
 import { createHealthyMockOgmiosServer, createUnhealthyMockOgmiosServer, ogmiosServerReady, serverReady } from './util';
 import { getRandomPort } from 'get-port-please';
