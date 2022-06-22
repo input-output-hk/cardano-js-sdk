@@ -1,5 +1,5 @@
 import * as envalid from 'envalid';
-import { FaucetFactory } from '../src/FaucetProvider'
+import { Factory, FaucetProvider } from '../src/FaucetProvider'
 import { LogLevel, createLogger } from 'bunyan';
 import { Logger } from 'ts-log';
 
@@ -22,4 +22,4 @@ export const logger = createLogger({
 });
 
 // Faucet
-export const faucetProvider = FaucetFactory.create(env.FAUCET_PROVIDER, env.FAUCET_PROVIDER_PARAMS);
+export const faucetProvider = Factory<FaucetProvider>.get().create(env.FAUCET_PROVIDER, env.FAUCET_PROVIDER_PARAMS) as FaucetProvider;

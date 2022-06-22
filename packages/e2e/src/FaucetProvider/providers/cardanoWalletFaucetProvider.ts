@@ -1,10 +1,10 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import { Provider, HealthCheckResponse } from '../../../core';
 import { WalletServer, ApiNetworkInformationSyncProgressStatusEnum,
          AddressWallet, TransactionWallet, ApiTransactionStatusEnum } from 'cardano-wallet-js'
 import { FaucetProvider, FaucetRequestResult, FaucetRequestTransactionStatus, } from '../types'
 import { Stopwatch } from "ts-stopwatch";
+import { Factory } from '../factory'
 
 // Constnats
 const FAUCET_PASSPHRASE:           string = "passphrase";
@@ -12,6 +12,8 @@ const FAUCET_WALLET_NAME:          string = "faucet";
 const HTTP_ERROR_CODE_IN_CONFLICT: number = 409;
 const DEFAULT_TIMEOUT:             number = 10000;
 const DEFAULT_CONFIRMATIONS:       number = 0;
+const PARAM_NAME_URL:              string = 'url';
+const PARAM_NAME_MNEMONICS:        string = 'mnomonics';
 
 /**
  * Cardano Wallet implementation of the faucet provider. This provider utlizes the Cardano Wallet HTTP service
@@ -169,4 +171,28 @@ export class CardanoWalletFaucetProvider implements FaucetProvider {
 
     return mappedStatus;
   }
+
+  /**
+   * Create a new faucet provider.
+   * 
+   * @param name The name of the concrete facet provider implementation.
+   * @param params The parameters to be passed to the concrete implementation constructor.
+   * 
+   * @returns The new Faucet provider.
+   * 
+   * @throws if The give provider name is not registered, or the constructor parameters of the providers are either missing or invalid.
+   */
+  public static create(params: any): FaucetProvider {
+
+    if (!params.hasOwnProperty(PARAM_NAME_URL))
+        throw new Error(`${CardanoWalletFaucetProvider.name} missing argument: ${PARAM_NAME_URL}`);
+
+    if (!params.hasOwnProperty(PARAM_NAME_MNEMONICS))
+        throw new Error(`${CardanoWalletFaucetProvider.name} missing argument: ${PARAM_NAME_MNEMONICS}`);
+
+    return new CardanoWalletFaucetProvider(params[PARAM_NAME_URL], params[PARAM_NAME_MNEMONICS]);
+  }
 }
+
+// REGISTER PROVIDER
+Factory<FaucetProvider>.get<FaucetProvider>().register(CardanoWalletFaucetProvider.name, CardanoWalletFaucetProvider.create);
