@@ -229,10 +229,11 @@ export class SingleAddressWallet implements ObservableWallet {
     this.transactions = createTransactionsTracker({
       addresses$,
       chainHistoryProvider: this.chainHistoryProvider,
+      inFlightTransactionsStore: stores.inFlightTransactions,
       newTransactions: this.#newTransactions,
       retryBackoffConfig,
-      store: stores.transactions,
-      tip$: this.tip$
+      tip$: this.tip$,
+      transactionsHistoryStore: stores.transactions
     });
     this.utxo = createUtxoTracker({
       addresses$,

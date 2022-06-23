@@ -14,6 +14,7 @@ export class PouchdbGenesisParametersStore extends PouchdbDocumentStore<Cardano.
 export class PouchdbNetworkInfoStore extends PouchdbDocumentStore<NetworkInfo> {}
 export class PouchdbAssetsStore extends PouchdbDocumentStore<Assets> {}
 export class PouchdbAddressesStore extends PouchdbDocumentStore<GroupedAddress[]> {}
+export class PouchdbInFlightTransactionsStore extends PouchdbDocumentStore<Cardano.NewTxAlonzo[]> {}
 
 export class PouchdbTransactionsStore extends PouchdbCollectionStore<Cardano.TxAlonzo> {}
 export class PouchdbUtxoStore extends PouchdbCollectionStore<Cardano.Utxo> {}
@@ -45,6 +46,7 @@ export const createPouchdbWalletStores = (
         return combineLatest([
           destroyDocumentsDb,
           this.transactions.destroy(),
+          this.inFlightTransactions.destroy(),
           this.utxo.destroy(),
           this.unspendableUtxo.destroy(),
           this.rewardsHistory.destroy(),
@@ -56,6 +58,7 @@ export const createPouchdbWalletStores = (
     },
     destroyed: false,
     genesisParameters: new PouchdbGenesisParametersStore(docsDbName, 'genesisParameters', logger),
+    inFlightTransactions: new PouchdbInFlightTransactionsStore(docsDbName, 'newTransactions', logger),
     networkInfo: new PouchdbNetworkInfoStore(docsDbName, 'networkInfo', logger),
     protocolParameters: new PouchdbProtocolParametersStore(docsDbName, 'protocolParameters', logger),
     rewardsBalances: new PouchdbRewardsBalancesStore(`${baseDbName}RewardsBalances`, logger),
