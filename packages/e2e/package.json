@@ -36,7 +36,9 @@
         "ts-log": "^2.2.4",
         "ts-stopwatch": "0.0.4",
         "@cardano-sdk/core": "0.2.0",
-        "@cardano-sdk/util": "0.2.0"
+        "@cardano-sdk/util": "0.2.0",
+        "@cardano-sdk/wallet": "0.2.0",
+        "@cardano-foundation/ledgerjs-hw-app-cardano": "0.2.0"
     },
     "devDependencies": {
         "@types/bunyan": "^1.8.8",

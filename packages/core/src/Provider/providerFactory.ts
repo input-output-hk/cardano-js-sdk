@@ -3,7 +3,7 @@
  */
 export interface ProviderFactoryMethod<T> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (params: any): T;
+  (params: any): Promise<T>;
 }
 
 /**
@@ -16,10 +16,10 @@ export class ProviderFactory<T> {
    * Register a provider in this ProviderFactory.
    *
    * @param name The name of the provider.
-   * @param ProviderFactoryMethod The ProviderFactory method.
+   * @param providerFactoryMethod The provider factory method method.
    */
-  public register(name: string, ProviderFactoryMethod: ProviderFactoryMethod<T>) {
-    this._providers.set(name, ProviderFactoryMethod);
+  public register(name: string, providerFactoryMethod: ProviderFactoryMethod<T>) {
+    this._providers.set(name, providerFactoryMethod);
   }
 
   /**
@@ -32,7 +32,7 @@ export class ProviderFactory<T> {
    * the providers are either missing or invalid.
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public create(name: string, params: any): T {
+  public create(name: string, params: any): Promise<T> {
     if (!this._providers.has(name)) throw new Error(`Provider unsupported: ${name}`);
 
     if (!this._providers.get(name)) throw new Error(`Provider is undefined: ${name}`);

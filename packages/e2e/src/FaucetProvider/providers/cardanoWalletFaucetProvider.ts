@@ -16,7 +16,7 @@ const HTTP_ERROR_CODE_IN_CONFLICT = 409;
 const DEFAULT_TIMEOUT = 10_000;
 const DEFAULT_CONFIRMATIONS = 0;
 const PARAM_NAME_URL = 'url';
-const PARAM_NAME_MNEMONICS = 'mnomonics';
+const PARAM_NAME_MNEMONICS = 'mnemonic';
 
 /**
  * Cardano Wallet implementation of the faucet provider. This provider utlizes the Cardano Wallet HTTP service
@@ -185,13 +185,15 @@ export class CardanoWalletFaucetProvider implements FaucetProvider {
    *         the providers are either missing or invalid.
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public static create(params: any): FaucetProvider {
+  public static create(params: any): Promise<FaucetProvider> {
     if (!params.hasOwnProperty(PARAM_NAME_URL))
       throw new Error(`${CardanoWalletFaucetProvider.name} missing argument: ${PARAM_NAME_URL}`);
 
     if (!params.hasOwnProperty(PARAM_NAME_MNEMONICS))
       throw new Error(`${CardanoWalletFaucetProvider.name} missing argument: ${PARAM_NAME_MNEMONICS}`);
 
-    return new CardanoWalletFaucetProvider(params[PARAM_NAME_URL], params[PARAM_NAME_MNEMONICS]);
+    return new Promise<FaucetProvider>((resolve) => {
+      resolve(new CardanoWalletFaucetProvider(params[PARAM_NAME_URL], params[PARAM_NAME_MNEMONICS]));
+    });
   }
 }

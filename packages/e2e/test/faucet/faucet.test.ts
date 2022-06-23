@@ -1,11 +1,17 @@
 import { FaucetProvider } from '../../src/FaucetProvider/types';
-import { faucetProvider } from '../config';
+import { KeyManagement } from '@cardano-sdk/wallet';
+import { faucetProvider, keyAgent } from '../config';
 
 describe('CardanoWalletFaucetProvider', () => {
-  const _faucetProvider: FaucetProvider = faucetProvider;
+  let _faucetProvider: FaucetProvider;
+  let _keyAgent: KeyManagement.AsyncKeyAgent;
 
   beforeAll(async () => {
+    _faucetProvider = await faucetProvider;
+    _keyAgent = await keyAgent;
+
     await _faucetProvider.start();
+
     const healthCheck = await _faucetProvider.healthCheck();
 
     if (!healthCheck.ok) throw new Error('Faucet provider could not be started.');
@@ -16,6 +22,7 @@ describe('CardanoWalletFaucetProvider', () => {
   });
 
   it('must be able to fund a wallet with the requested amount of ada.', async () => {
+    await _keyAgent.deriveAddress({ index: 0, type: KeyManagement.AddressType.Internal });
     await _faucetProvider.request('addr_test1vrgylrse49du60jdy7h46mg5mwft6kw8r0l4v5pklkj324cm247gf', 33_000_000);
   });
 
