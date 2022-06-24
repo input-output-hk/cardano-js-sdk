@@ -26,15 +26,17 @@ export const observableWalletProperties: RemoteApiProperties<ObservableWallet> =
   genesisParameters$: RemoteApiPropertyType.HotObservable,
   getName: RemoteApiPropertyType.MethodReturningPromise,
   initializeTx: RemoteApiPropertyType.MethodReturningPromise,
-  networkInfo$: RemoteApiPropertyType.HotObservable,
+  lovelaceSupply$: RemoteApiPropertyType.HotObservable,
   protocolParameters$: RemoteApiPropertyType.HotObservable,
   signData: RemoteApiPropertyType.MethodReturningPromise,
+  stake$: RemoteApiPropertyType.HotObservable,
   submitTx: RemoteApiPropertyType.MethodReturningPromise,
   syncStatus: {
     isAnyRequestPending$: RemoteApiPropertyType.HotObservable,
     isSettled$: RemoteApiPropertyType.HotObservable,
     isUpToDate$: RemoteApiPropertyType.HotObservable
   },
+  timeSettings$: RemoteApiPropertyType.HotObservable,
   tip$: RemoteApiPropertyType.HotObservable,
   transactions: {
     history$: RemoteApiPropertyType.HotObservable,

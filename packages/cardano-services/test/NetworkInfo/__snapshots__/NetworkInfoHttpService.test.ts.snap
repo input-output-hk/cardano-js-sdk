@@ -24,7 +24,7 @@ Object {
   "epochLength": 432000,
   "maxKesEvolutions": 62,
   "maxLovelaceSupply": 45000000000000000n,
-  "networkId": "Testnet",
+  "networkId": 0,
   "networkMagic": 1097911063,
   "securityParameter": 2160,
   "slotLength": 1,
@@ -42,34 +42,33 @@ Object {
 }
 `;
 
-exports[`NetworkInfoHttpService healthy state with NetworkInfoHttpProvider response is an object of network info 1`] = `
+exports[`NetworkInfoHttpService healthy state with NetworkInfoHttpProvider response is an object of lovelace supply info 1`] = `
 Object {
-  "lovelaceSupply": Object {
-    "circulating": 69165246561822582n,
-    "max": 45000000000000000n,
-    "total": 40408479600434778n,
-  },
-  "network": Object {
-    "id": 0,
-    "magic": 1097911063,
-    "timeSettings": Array [
-      Object {
-        "epochLength": 21600,
-        "fromSlotDate": 2019-07-24T20:20:16.000Z,
-        "fromSlotNo": 0,
-        "slotLength": 20000,
-      },
-      Object {
-        "epochLength": 432000,
-        "fromSlotDate": 2020-07-28T19:20:16.000Z,
-        "fromSlotNo": 1598400,
-        "slotLength": 1000,
-      },
-    ],
-  },
-  "stake": Object {
-    "active": 15039823438862518n,
-    "live": 69154436284251039n,
-  },
+  "circulating": 69165246561822582n,
+  "total": 40408479600434778n,
 }
+`;
+
+exports[`NetworkInfoHttpService healthy state with NetworkInfoHttpProvider response is an object of stake info 1`] = `
+Object {
+  "active": 15039823438862518n,
+  "live": 69154436284251039n,
+}
+`;
+
+exports[`NetworkInfoHttpService healthy state with NetworkInfoHttpProvider response is an object of time settings 1`] = `
+Array [
+  Object {
+    "epochLength": 21600,
+    "fromSlotDate": 2019-07-24T20:20:16.000Z,
+    "fromSlotNo": 0,
+    "slotLength": 20000,
+  },
+  Object {
+    "epochLength": 432000,
+    "fromSlotDate": 2020-07-28T19:20:16.000Z,
+    "fromSlotNo": 1598400,
+    "slotLength": 1000,
+  },
+]
 `;

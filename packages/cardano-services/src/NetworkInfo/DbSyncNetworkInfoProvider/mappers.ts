@@ -1,23 +1,22 @@
 import {
   Cardano,
-  NetworkInfo,
   ProtocolParametersRequiredByWallet,
   ProviderError,
   ProviderFailure,
-  TimeSettings
+  StakeSummary,
+  SupplySummary
 } from '@cardano-sdk/core';
 import { GenesisData, LedgerTipModel, WalletProtocolParamsModel } from './types';
 import JSONbig from 'json-bigint';
 import fs from 'fs';
 import path from 'path';
 
-interface ToNetworkInfoInput {
-  networkMagic: Cardano.NetworkMagic;
-  networkId: Cardano.CardanoNetworkId;
-  timeSettings: TimeSettings[];
-  maxLovelaceSupply: Cardano.Lovelace;
+interface ToLovalaceSupplyInput {
   circulatingSupply: string;
   totalSupply: string;
+}
+
+interface ToStakeInput {
   activeStake: string;
   liveStake: string;
 }
@@ -27,30 +26,14 @@ export const networkIdMap = {
   Testnet: Cardano.NetworkId.testnet
 };
 
-export const toNetworkInfo = ({
-  networkId,
-  networkMagic,
-  timeSettings,
-  circulatingSupply,
-  maxLovelaceSupply,
-  totalSupply,
-  activeStake,
-  liveStake
-}: ToNetworkInfoInput): NetworkInfo => ({
-  lovelaceSupply: {
-    circulating: BigInt(circulatingSupply),
-    max: maxLovelaceSupply,
-    total: BigInt(totalSupply)
-  },
-  network: {
-    id: networkIdMap[networkId],
-    magic: networkMagic,
-    timeSettings
-  },
-  stake: {
-    active: BigInt(activeStake),
-    live: BigInt(liveStake)
-  }
+export const toSupply = ({ circulatingSupply, totalSupply }: ToLovalaceSupplyInput): SupplySummary => ({
+  circulating: BigInt(circulatingSupply),
+  total: BigInt(totalSupply)
+});
+
+export const toStake = ({ liveStake, activeStake }: ToStakeInput): StakeSummary => ({
+  active: BigInt(activeStake),
+  live: BigInt(liveStake)
 });
 
 export const toLedgerTip = ({ block_no, slot_no, hash }: LedgerTipModel): Cardano.Tip => ({
@@ -89,6 +72,7 @@ export const toWalletProtocolParams = ({
 
 export const toGenesisParams = (genesis: GenesisData): Cardano.CompactGenesis => ({
   ...genesis,
+  networkId: networkIdMap[genesis.networkId],
   systemStart: new Date(genesis.systemStart)
 });
 

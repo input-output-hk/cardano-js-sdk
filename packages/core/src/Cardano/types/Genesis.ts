@@ -1,5 +1,6 @@
 import { Epoch, Int64, NetworkMagic, UInt64 } from '@cardano-ogmios/schema';
 import { Lovelace } from '.';
+import { NetworkId } from '../NetworkId';
 
 export type Ratio = number;
 
@@ -9,6 +10,7 @@ export type Ratio = number;
 export interface CompactGenesis {
   systemStart: Date;
   networkMagic: NetworkMagic;
+  networkId: NetworkId;
   activeSlotsCoefficient: Ratio;
   securityParameter: UInt64;
   epochLength: Epoch;

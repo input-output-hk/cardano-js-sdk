@@ -9,11 +9,11 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/network-info/network": {
+    "/network-info/stake": {
       "post": {
-        "summary": "fetch network info",
-        "description": "Fetch Network Info",
-        "operationId": "networkInfo",
+        "summary": "fetch stake info",
+        "description": "Fetch Stake Info",
+        "operationId": "stake",
         "requestBody": {
           "content": {
             "application/json": {}
@@ -21,11 +21,68 @@
         },
         "responses": {
           "200": {
-            "description": "network info fetched",
+            "description": "stake info fetched",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NetworkInfoResponse"
+                  "$ref": "#/components/schemas/Stake"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid request"
+          }
+        }
+      }
+    },
+    "/network-info/lovelace-supply": {
+      "post": {
+        "summary": "fetch lovelace supply info",
+        "description": "Fetch Lovelace Supply Info",
+        "operationId": "lovelaceSupply",
+        "requestBody": {
+          "content": {
+            "application/json": {}
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "lovelace supply info fetched",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LovelaceSupply"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid request"
+          }
+        }
+      }
+    },
+    "/network-info/time-settings": {
+      "post": {
+        "summary": "fetch time settings info",
+        "description": "Fetch Time Settings Info",
+        "operationId": "timeSettings",
+        "requestBody": {
+          "content": {
+            "application/json": {}
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "time settings info fetched",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TimeSettings"
+                  }
                 }
               }
             }
@@ -120,30 +177,6 @@
   },
   "components": {
     "schemas": {
-      "Network": {
-        "required": [
-          "id",
-          "magic",
-          "timeSettings"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number",
-            "example": 1
-          },
-          "magic": {
-            "type": "number",
-            "example": 24
-          },
-          "timeSettings": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/TimeSettings"
-            }
-          }
-        }
-      },
       "Stake": {
         "required": [
           "active",
@@ -162,15 +195,11 @@
       "LovelaceSupply": {
         "required": [
           "circulating",
-          "max",
           "total"
         ],
         "type": "object",
         "properties": {
           "circulating": {
-            "$ref": "#/components/schemas/BigInt"
-          },
-          "max": {
             "$ref": "#/components/schemas/BigInt"
           },
           "total": {
@@ -238,20 +267,6 @@
             "enum": [
               "bigint"
             ]
-          }
-        }
-      },
-      "NetworkInfoResponse": {
-        "type": "object",
-        "properties": {
-          "network": {
-            "$ref": "#/components/schemas/Network"
-          },
-          "stake": {
-            "$ref": "#/components/schemas/Stake"
-          },
-          "lovelaceSupply": {
-            "$ref": "#/components/schemas/LovelaceSupply"
           }
         }
       },
@@ -352,6 +367,10 @@
           "networkMagic": {
             "type": "number",
             "example": 49032415
+          },
+          "networkId": {
+            "type": "number",
+            "example": 0
           },
           "activeSlotsCoefficient": {
             "type": "number",

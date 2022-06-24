@@ -38,10 +38,26 @@ describe('TrackedNetworkInfoProvider', () => {
       };
 
     test(
-      'networkInfo',
+      'stake',
       testFunctionStats(
-        (provider) => provider.networkInfo(),
-        (stats) => stats.networkInfo$
+        (provider) => provider.stake(),
+        (stats) => stats.stake$
+      )
+    );
+
+    test(
+      'lovelaceSupply',
+      testFunctionStats(
+        (provider) => provider.lovelaceSupply(),
+        (stats) => stats.lovelaceSupply$
+      )
+    );
+
+    test(
+      'timeSettings',
+      testFunctionStats(
+        (provider) => provider.timeSettings(),
+        (stats) => stats.timeSettings$
       )
     );
 

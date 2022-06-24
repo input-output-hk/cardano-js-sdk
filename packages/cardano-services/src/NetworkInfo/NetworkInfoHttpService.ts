@@ -41,8 +41,19 @@ export class NetworkInfoHttpService extends HttpService {
     );
 
     router.post(
-      '/network',
-      providerHandler(networkInfoProvider.networkInfo.bind(networkInfoProvider))(
+      '/stake',
+      providerHandler(networkInfoProvider.stake.bind(networkInfoProvider))(HttpService.routeHandler(logger), logger)
+    );
+    router.post(
+      '/lovelace-supply',
+      providerHandler(networkInfoProvider.lovelaceSupply.bind(networkInfoProvider))(
+        HttpService.routeHandler(logger),
+        logger
+      )
+    );
+    router.post(
+      '/time-settings',
+      providerHandler(networkInfoProvider.timeSettings.bind(networkInfoProvider))(
         HttpService.routeHandler(logger),
         logger
       )
