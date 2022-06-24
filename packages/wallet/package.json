@@ -35,7 +35,6 @@
     "prepack": "yarn build",
     "test": "jest -c ./jest.config.js",
     "test:build:verify": "tsc --build ./test",
-    "test:e2e": "jest -c ./e2e.jest.config.js --runInBand",
     "test:hw": "jest ./test/hardware/* -c ./hw.jest.config.js --runInBand",
     "test:debug": "DEBUG=true yarn test"
   },

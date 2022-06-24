@@ -4,7 +4,7 @@
     "description": "End to end tests for the cardano-js-sdk packages.",
     "main": "index.js",
     "scripts": {
-        "test": "jest -c ./jest.config.js --runInBand",
+        "test": "jest -c ./jest.config.js --runInBand --verbose",
         "private-network:up": "CARDANO_DB_SYNC_VERSION=13.0.0-rc3 DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 OGMIOS_PORT=1338 NETWORK=testnet docker-compose -p private-testnet-e2e up",
         "private-network:down": "CARDANO_DB_SYNC_VERSION=13.0.0-rc3 DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 OGMIOS_PORT=1338 NETWORK=testnet docker-compose -p private-testnet-e2e down -v --remove-orphans",
         "build:esm": "tsc -p src/tsconfig.json --outDir ./dist/esm --module es2020",
