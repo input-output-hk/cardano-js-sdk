@@ -57,9 +57,17 @@ export const createUtxoTracker = (
             inputs.some((input) => input.txId === utxoTxIn.txId && input.index === utxoTxIn.index)
           )
       ),
-      ...transactionsInFlight.flatMap((tx) =>
+      ...transactionsInFlight.flatMap((tx, txInFlightIndex) =>
         tx.body.outputs
-          .filter(({ address }) => ownAddresses.includes(address))
+          .filter(
+            ({ address }, outputIndex) =>
+              ownAddresses.includes(address) &&
+              // not already consumed by another tx in flight
+              !transactionsInFlight.some(
+                ({ body: { inputs } }, i) =>
+                  txInFlightIndex !== i && inputs.some((txIn) => txIn.txId === tx.id && txIn.index === outputIndex)
+              )
+          )
           .map(
             (txOut): Cardano.Utxo => [
               {
