@@ -1,5 +1,21 @@
 import { Cardano, TimeSettings } from '../..';
 
+export type ProtocolParametersRequiredByWallet = Required<
+  Pick<
+    Cardano.ProtocolParametersAlonzo,
+    | 'coinsPerUtxoWord'
+    | 'maxTxSize'
+    | 'maxValueSize'
+    | 'stakeKeyDeposit'
+    | 'maxCollateralInputs'
+    | 'minFeeCoefficient'
+    | 'minFeeConstant'
+    | 'minPoolCost'
+    | 'poolDeposit'
+    | 'protocolVersion'
+  >
+>;
+
 export type AssetSupply = {
   circulating: Cardano.Lovelace;
   max: Cardano.Lovelace;
@@ -23,4 +39,7 @@ export type NetworkInfo = {
 
 export interface NetworkInfoProvider {
   networkInfo(): Promise<NetworkInfo>;
+  ledgerTip(): Promise<Cardano.Tip>;
+  currentWalletProtocolParameters(): Promise<ProtocolParametersRequiredByWallet>;
+  genesisParameters(): Promise<Cardano.CompactGenesis>;
 }

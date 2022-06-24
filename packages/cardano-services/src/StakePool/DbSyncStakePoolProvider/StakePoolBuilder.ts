@@ -10,6 +10,7 @@ import {
 import {
   EpochModel,
   EpochRewardModel,
+  OrderByOptions,
   OwnerAddressModel,
   PoolDataModel,
   PoolMetricsModel,
@@ -90,8 +91,12 @@ export class StakePoolBuilder {
   }
   public async queryPoolData(updatesIds: number[], options?: StakePoolQueryOptions) {
     this.#logger.debug('About to query pool data');
+    const defaultSort: OrderByOptions[] = [
+      { field: 'name', order: 'asc' },
+      { field: 'pool_id', order: 'asc' }
+    ];
     const queryWithSortAndPagination = withPagination(
-      withSort(Queries.findPoolsData, options?.sort),
+      withSort(Queries.findPoolsData, options?.sort, defaultSort),
       options?.pagination
     );
     const result: QueryResult<PoolDataModel> = await this.#db.query(queryWithSortAndPagination, [updatesIds]);
@@ -102,9 +107,13 @@ export class StakePoolBuilder {
     const result: QueryResult<PoolUpdateModel> = await this.#db.query(query, params);
     return result.rows.length > 0 ? result.rows.map(mapPoolUpdate) : [];
   }
-  public async queryPoolMetrics(hashesIds: number[], totalAdaAmount: string) {
-    this.#logger.debug('About to query pool data');
-    const result: QueryResult<PoolMetricsModel> = await this.#db.query(Queries.findPoolsMetrics, [
+  public async queryPoolMetrics(hashesIds: number[], totalAdaAmount: string, options?: StakePoolQueryOptions) {
+    this.#logger.debug('About to query pool metrics');
+    const queryWithSortAndPagination = withPagination(
+      withSort(Queries.findPoolsMetrics, options?.sort, [{ field: 'saturation', order: 'desc' }]),
+      options?.pagination
+    );
+    const result: QueryResult<PoolMetricsModel> = await this.#db.query(queryWithSortAndPagination, [
       hashesIds,
       totalAdaAmount
     ]);

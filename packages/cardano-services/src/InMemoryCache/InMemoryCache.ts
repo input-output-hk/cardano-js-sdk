@@ -27,9 +27,13 @@ export class InMemoryCache {
       return cachedValue;
     }
 
-    const result = await dbSyncQuery();
-    this.#cache.set(key, result, ttl);
-    return result;
+    const resultPromise = dbSyncQuery();
+    this.#cache.set(
+      key,
+      resultPromise.catch(() => this.#cache.del(key)),
+      ttl
+    );
+    return resultPromise;
   }
 
   /**

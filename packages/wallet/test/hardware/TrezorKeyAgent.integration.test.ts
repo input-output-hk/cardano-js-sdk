@@ -9,13 +9,11 @@ import {
   mockNetworkInfoProvider,
   mockRewardsProvider,
   mockTxSubmitProvider,
-  mockUtxoProvider,
-  mockWalletProvider
+  mockUtxoProvider
 } from '../mocks';
 
 const createWallet = (keyAgent: KeyAgent) => {
   const txSubmitProvider = mockTxSubmitProvider();
-  const walletProvider = mockWalletProvider();
   const stakePoolProvider = createStubStakePoolProvider();
   const networkInfoProvider = mockNetworkInfoProvider();
   const assetProvider = mockAssetProvider();
@@ -33,8 +31,7 @@ const createWallet = (keyAgent: KeyAgent) => {
       rewardsProvider,
       stakePoolProvider,
       txSubmitProvider,
-      utxoProvider,
-      walletProvider
+      utxoProvider
     }
   );
 };

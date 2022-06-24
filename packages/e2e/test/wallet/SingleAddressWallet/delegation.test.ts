@@ -13,8 +13,7 @@ import {
   rewardsProvider,
   stakePoolProvider,
   txSubmitProvider,
-  utxoProvider,
-  walletProvider
+  utxoProvider
 } from '../../config';
 import { combineLatest, filter, firstValueFrom } from 'rxjs';
 
@@ -83,8 +82,7 @@ const getWallet = async (idx: number) =>
       rewardsProvider: await rewardsProvider,
       stakePoolProvider: await stakePoolProvider,
       txSubmitProvider: await txSubmitProvider,
-      utxoProvider: await utxoProvider,
-      walletProvider: await walletProvider
+      utxoProvider: await utxoProvider
     }
   );
 

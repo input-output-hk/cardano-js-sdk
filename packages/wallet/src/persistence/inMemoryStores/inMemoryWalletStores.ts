@@ -13,6 +13,7 @@ export class InMemoryGenesisParametersStore extends InMemoryDocumentStore<Cardan
 export class InMemoryNetworkInfoStore extends InMemoryDocumentStore<NetworkInfo> {}
 export class InMemoryAssetsStore extends InMemoryDocumentStore<Assets> {}
 export class InMemoryAddressesStore extends InMemoryDocumentStore<GroupedAddress[]> {}
+export class InMemoryInFlightTransactionsStore extends InMemoryDocumentStore<Cardano.NewTxAlonzo[]> {}
 
 export class InMemoryTransactionsStore extends InMemoryCollectionStore<Cardano.TxAlonzo> {}
 export class InMemoryUtxoStore extends InMemoryCollectionStore<Cardano.Utxo> {}
@@ -40,6 +41,7 @@ export const createInMemoryWalletStores = (): WalletStores => ({
         this.stakePools.destroy(),
         this.tip.destroy(),
         this.transactions.destroy(),
+        this.inFlightTransactions.destroy(),
         this.utxo.destroy()
       ]).pipe(map(() => void 0));
     }
@@ -47,6 +49,7 @@ export const createInMemoryWalletStores = (): WalletStores => ({
   },
   destroyed: false,
   genesisParameters: new InMemoryGenesisParametersStore(),
+  inFlightTransactions: new InMemoryInFlightTransactionsStore(),
   networkInfo: new InMemoryNetworkInfoStore(),
   protocolParameters: new InMemoryProtocolParametersStore(),
   rewardsBalances: new InMemoryRewardsBalancesStore(),

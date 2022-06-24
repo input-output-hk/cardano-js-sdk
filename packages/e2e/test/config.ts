@@ -7,8 +7,7 @@ import {
   RewardsProvider,
   StakePoolProvider,
   TxSubmitProvider,
-  UtxoProvider,
-  WalletProvider
+  UtxoProvider
 } from '@cardano-sdk/core';
 import { FaucetProvider } from '../src/FaucetProvider';
 import { KeyManagement } from '@cardano-sdk/wallet';
@@ -23,8 +22,7 @@ import {
   rewardsProviderFactory,
   stakePoolProviderFactory,
   txSubmitProviderFactory,
-  utxoProviderFactory,
-  walletProviderFactory
+  utxoProviderFactory
 } from '../src/factories';
 import memoize from 'lodash/memoize';
 
@@ -110,11 +108,6 @@ export const txSubmitProvider: Promise<TxSubmitProvider> = txSubmitProviderFacto
 export const utxoProvider: Promise<UtxoProvider> = utxoProviderFactory.create(
   env.UTXO_PROVIDER,
   env.UTXO_PROVIDER_PARAMS
-);
-
-export const walletProvider: Promise<WalletProvider> = walletProviderFactory.create(
-  env.WALLET_PROVIDER,
-  env.WALLET_PROVIDER_PARAMS
 );
 
 export const stakePoolProvider: Promise<StakePoolProvider> = stakePoolProviderFactory.create(

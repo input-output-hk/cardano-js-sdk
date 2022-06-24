@@ -1,4 +1,5 @@
 /* eslint-disable max-len */
+import { genesisParameters, ledgerTip, protocolParameters } from './mockData';
 import { testnetTimeSettings } from '@cardano-sdk/core';
 
 export const networkInfo = {
@@ -19,11 +20,12 @@ export const networkInfo = {
 
 /**
  * Provider stub for testing
- *
- * returns WalletProvider-compatible object
  */
 export const mockNetworkInfoProvider = () => ({
+  currentWalletProtocolParameters: jest.fn().mockResolvedValue(protocolParameters),
+  genesisParameters: jest.fn().mockResolvedValue(genesisParameters),
+  ledgerTip: jest.fn().mockResolvedValue(ledgerTip),
   networkInfo: jest.fn().mockResolvedValue(networkInfo)
 });
 
-export type WalletInfoProviderStub = ReturnType<typeof mockNetworkInfoProvider>;
+export type NetworkInfoProviderStub = ReturnType<typeof mockNetworkInfoProvider>;

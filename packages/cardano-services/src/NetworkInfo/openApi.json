@@ -35,6 +35,87 @@
           }
         }
       }
+    },
+    "/network-info/ledger-tip": {
+      "post": {
+        "summary": "fetch ledger tip",
+        "description": "Fetch Ledger Tip",
+        "operationId": "tip",
+        "requestBody": {
+          "content": {
+            "application/json": {}
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "ledger tip fetched",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LedgerTipResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid request"
+          }
+        }
+      }
+    },
+    "/network-info/current-wallet-protocol-parameters": {
+      "post": {
+        "summary": "fetch current wallet protocol params",
+        "description": "Fetch current Wallet Protocol Params",
+        "operationId": "protocolParams",
+        "requestBody": {
+          "content": {
+            "application/json": {}
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "current wallet protocol params fetched",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrentWalletProtocolParametersResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid request"
+          }
+        }
+      }
+    },
+    "/network-info/genesis-parameters": {
+      "post": {
+        "summary": "fetch genesis params",
+        "description": "Fetch Genesis Params",
+        "operationId": "genesisParams",
+        "requestBody": {
+          "content": {
+            "application/json": {}
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "genesis params fetched",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenesisParametersResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid request"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -171,6 +252,137 @@
           },
           "lovelaceSupply": {
             "$ref": "#/components/schemas/LovelaceSupply"
+          }
+        }
+      },
+      "LedgerTipResponse": {
+        "type": "object",
+        "required": [
+          "blockNo",
+          "slot",
+          "hash"
+        ],
+        "properties": {
+          "blockNo": {
+            "type": "number",
+            "example": 3274726
+          },
+          "slot": {
+            "type": "number",
+            "example": 49032415
+          },
+          "hash": {
+            "type": "string",
+            "example": "5caede44f4a5a775443095159cd42c8a64f35494086957ab3e04624015a6e13c"
+          }
+        }
+      },
+      "CurrentWalletProtocolParametersResponse": {
+        "type": "object",
+        "required": [
+          "minFeeCoefficient",
+          "minFeeConstant",
+          "maxCollateralInputs",
+          "stakeKeyDeposit",
+          "poolDeposit",
+          "maxValueSize",
+          "minPoolCost",
+          "coinsPerUtxoWord",
+          "maxTxSize",
+          "protocolVersion"
+        ],
+        "properties": {
+          "minFeeCoefficient": {
+            "type": "number",
+            "example": 44
+          },
+          "minFeeConstant": {
+            "type": "number",
+            "example": 155381
+          },
+          "maxCollateralInputs": {
+            "type": "number",
+            "example": 3
+          },
+          "stakeKeyDeposit": {
+            "type": "number",
+            "example": 2000000
+          },
+          "pool_deposit": {
+            "type": "number",
+            "example": 500000000
+          },
+          "maxValueSize": {
+            "type": "number",
+            "example": 5000
+          },
+          "minPoolCost": {
+            "type": "number",
+            "example": 340000000
+          },
+          "coinsPerUtxoWord": {
+            "type": "number",
+            "example": 34482
+          },
+          "maxTxSize": {
+            "type": "number",
+            "example": 16384
+          },
+          "protocolVersion": {
+            "type": "object",
+            "properties": {
+              "minor": {
+                "type": "number",
+                "example": 1
+              },
+              "major": {
+                "type": "number",
+                "example": 2
+              }
+            }
+          }
+        }
+      },
+      "GenesisParametersResponse": {
+        "type": "object",
+        "properties": {
+          "systemStart": {
+            "$ref": "#/components/schemas/Date"
+          },
+          "networkMagic": {
+            "type": "number",
+            "example": 49032415
+          },
+          "activeSlotsCoefficient": {
+            "type": "number",
+            "example": 0.05
+          },
+          "securityParameter": {
+            "type": "number",
+            "example": 2160
+          },
+          "epochLength": {
+            "type": "number",
+            "example": 432000
+          },
+          "slotsPerKesPeriod": {
+            "type": "number",
+            "example": 129600
+          },
+          "maxKesEvolutions": {
+            "type": "number",
+            "example": 62
+          },
+          "slotLength": {
+            "type": "number",
+            "example": 1
+          },
+          "updateQuorum": {
+            "type": "number",
+            "example": 5
+          },
+          "maxLovelaceSupply": {
+            "$ref": "#/components/schemas/BigInt"
           }
         }
       }

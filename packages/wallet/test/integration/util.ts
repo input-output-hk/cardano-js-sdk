@@ -7,14 +7,12 @@ import {
   mockRewardsProvider,
   mockTxSubmitProvider,
   mockUtxoProvider,
-  mockWalletProvider,
   testAsyncKeyAgent
 } from '../mocks';
 
 export const createWallet = async () => {
   const keyAgent = await testAsyncKeyAgent();
   const txSubmitProvider = mockTxSubmitProvider();
-  const walletProvider = mockWalletProvider();
   const stakePoolProvider = createStubStakePoolProvider();
   const networkInfoProvider = mockNetworkInfoProvider();
   const assetProvider = mockAssetProvider();
@@ -31,8 +29,7 @@ export const createWallet = async () => {
       rewardsProvider,
       stakePoolProvider,
       txSubmitProvider,
-      utxoProvider,
-      walletProvider
+      utxoProvider
     }
   );
 };

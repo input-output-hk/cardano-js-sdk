@@ -73,6 +73,7 @@ export interface WalletStores extends Destroyable {
   utxo: CollectionStore<Cardano.Utxo>;
   unspendableUtxo: CollectionStore<Cardano.Utxo>;
   transactions: OrderedCollectionStore<Cardano.TxAlonzo>;
+  inFlightTransactions: DocumentStore<Cardano.NewTxAlonzo[]>;
   rewardsHistory: KeyValueStore<Cardano.RewardAccount, EpochRewards[]>;
   rewardsBalances: KeyValueStore<Cardano.RewardAccount, Cardano.Lovelace>;
   stakePools: KeyValueStore<Cardano.PoolId, Cardano.StakePool>;

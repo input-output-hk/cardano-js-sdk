@@ -7,8 +7,7 @@ import {
   rewardsProvider,
   stakePoolProvider,
   txSubmitProvider,
-  utxoProvider,
-  walletProvider
+  utxoProvider
 } from '../../config';
 import { filter, firstValueFrom } from 'rxjs';
 import { waitForWalletStateSettle } from '../util';
@@ -34,8 +33,7 @@ describe('SingleAddressWallet/pouchdbWalletStores', () => {
         stakePoolProvider: await stakePoolProvider,
         stores,
         txSubmitProvider: await txSubmitProvider,
-        utxoProvider: await utxoProvider,
-        walletProvider: await walletProvider
+        utxoProvider: await utxoProvider
       }
     );
 

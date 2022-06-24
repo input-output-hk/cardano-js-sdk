@@ -11,13 +11,12 @@ describe('integration/withdrawal', () => {
   });
 
   it('has balance', async () => {
-    expect(typeof (await firstValueFrom(wallet.balance.total$))?.coins).toBe('bigint');
-    expect(typeof (await firstValueFrom(wallet.balance.available$))?.rewards).toBe('bigint');
+    expect(typeof (await firstValueFrom(wallet.balance.utxo.total$))?.coins).toBe('bigint');
+    expect(typeof (await firstValueFrom(wallet.balance.rewardAccounts.rewards$))).toBe('bigint');
   });
 
   it('can submit transaction', async () => {
-    const balanceAvailable = await firstValueFrom(wallet.balance.available$);
-    const availableRewards = balanceAvailable!.rewards;
+    const availableRewards = await firstValueFrom(wallet.balance.rewardAccounts.rewards$);
 
     const rewardAccount = (await firstValueFrom(wallet.addresses$))[0].rewardAccount;
     const txInternals = await wallet.initializeTx({

@@ -6,8 +6,7 @@ import {
   rewardsProvider,
   stakePoolProvider,
   txSubmitProvider,
-  utxoProvider,
-  walletProvider
+  utxoProvider
 } from './config';
 import { consumeKeyAgent, exposeObservableWallet } from '@cardano-sdk/web-extension';
 import { logger, walletName } from '../util';
@@ -28,8 +27,7 @@ export const walletReady = (async () => {
       stakePoolProvider: await stakePoolProvider,
       stores: storage.createPouchdbWalletStores(walletName, { logger }),
       txSubmitProvider: await txSubmitProvider,
-      utxoProvider: await utxoProvider,
-      walletProvider: await walletProvider
+      utxoProvider: await utxoProvider
     }
   );
   exposeObservableWallet({ wallet, walletName }, { logger, runtime });

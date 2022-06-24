@@ -9,7 +9,6 @@ describe('LedgerKeyAgent', () => {
   let keyAgent: KeyManagement.LedgerKeyAgent;
   const address = mocks.utxo[0][0].address;
   let txSubmitProvider: mocks.TxSubmitProviderStub;
-  let walletProvider: mocks.WalletProviderStub;
   let wallet: SingleAddressWallet;
 
   beforeAll(async () => {
@@ -19,7 +18,6 @@ describe('LedgerKeyAgent', () => {
       protocolMagic: 1_097_911_063
     });
     txSubmitProvider = mocks.mockTxSubmitProvider();
-    walletProvider = mocks.mockWalletProvider();
     const assetProvider = mocks.mockAssetProvider();
     const stakePoolProvider = createStubStakePoolProvider();
     const networkInfoProvider = mocks.mockNetworkInfoProvider();
@@ -47,8 +45,7 @@ describe('LedgerKeyAgent', () => {
         rewardsProvider,
         stakePoolProvider,
         txSubmitProvider,
-        utxoProvider,
-        walletProvider
+        utxoProvider
       }
     );
   });

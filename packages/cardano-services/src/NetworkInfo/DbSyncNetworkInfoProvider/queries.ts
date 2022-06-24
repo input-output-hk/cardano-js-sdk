@@ -28,7 +28,7 @@ export const findTotalSupply = `
         FROM ada_pots
             WHERE ada_pots.epoch_no = (
             SELECT no FROM epoch
-            ORDER BY id DESC 
+            ORDER BY no DESC 
             LIMIT 1
         )
     )
@@ -75,10 +75,36 @@ export const findLatestCompleteEpoch = `
     LIMIT 1
 `;
 
+export const findLedgerTip = `
+    SELECT block_no, slot_no, hash
+    FROM block
+    ORDER BY block_no DESC NULLS LAST
+    LIMIT 1;
+`;
+
+export const findCurrentWalletProtocolParams = `
+    SELECT 
+    min_fee_a, 
+    min_fee_b, max_tx_size, 
+    key_deposit, 
+    pool_deposit, 
+    protocol_major, 
+    protocol_minor, 
+    min_pool_cost, 
+    coins_per_utxo_word, 
+    max_val_size, 
+    max_collateral_inputs
+    FROM public.epoch_param
+    ORDER BY epoch_no DESC NULLS LAST
+    LIMIT 1;
+`;
+
 const Queries = {
   findActiveStake,
   findCirculatingSupply,
+  findCurrentWalletProtocolParams,
   findLatestCompleteEpoch,
+  findLedgerTip,
   findLiveStake,
   findTotalSupply
 };

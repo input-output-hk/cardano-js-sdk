@@ -11,12 +11,11 @@ import {
   StakePoolProvider,
   TxSubmitProvider,
   UtxoProvider,
-  WalletProvider,
   coreToCsl
 } from '@cardano-sdk/core';
 import { Assets, InitializeTxProps, InitializeTxResult, ObservableWallet, SignDataProps, SyncStatus } from './types';
 import {
-  Balance,
+  BalanceTracker,
   DelegationTracker,
   FailedTx,
   PersistentDocumentTrackerSubject,
@@ -28,7 +27,6 @@ import {
   TrackedRewardsProvider,
   TrackedStakePoolProvider,
   TrackedTxSubmitProvider,
-  TrackedWalletProvider,
   TransactionFailure,
   TransactionalTracker,
   TransactionsTracker,
@@ -81,7 +79,6 @@ export interface SingleAddressWalletProps {
 export interface SingleAddressWalletDependencies {
   readonly keyAgent: AsyncKeyAgent;
   readonly txSubmitProvider: TxSubmitProvider;
-  readonly walletProvider: WalletProvider;
   readonly stakePoolProvider: StakePoolProvider;
   readonly assetProvider: AssetProvider;
   readonly networkInfoProvider: NetworkInfoProvider;
@@ -105,14 +102,13 @@ export class SingleAddressWallet implements ObservableWallet {
   readonly keyAgent: AsyncKeyAgent;
   readonly currentEpoch$: TrackerSubject<EpochInfo>;
   readonly txSubmitProvider: TrackedTxSubmitProvider;
-  readonly walletProvider: TrackedWalletProvider;
   readonly utxoProvider: TrackedUtxoProvider;
   readonly networkInfoProvider: TrackedNetworkInfoProvider;
   readonly stakePoolProvider: TrackedStakePoolProvider;
   readonly assetProvider: TrackedAssetProvider;
   readonly chainHistoryProvider: TrackedChainHistoryProvider;
   readonly utxo: TransactionalTracker<Cardano.Utxo[]>;
-  readonly balance: TransactionalTracker<Balance>;
+  readonly balance: BalanceTracker;
   readonly transactions: TransactionsTracker & Shutdown;
   readonly delegation: DelegationTracker & Shutdown;
   readonly tip$: BehaviorObservable<Cardano.Tip>;
@@ -141,7 +137,6 @@ export class SingleAddressWallet implements ObservableWallet {
     }: SingleAddressWalletProps,
     {
       txSubmitProvider,
-      walletProvider,
       stakePoolProvider,
       keyAgent,
       assetProvider,
@@ -157,7 +152,6 @@ export class SingleAddressWallet implements ObservableWallet {
     this.#logger = logger;
     this.#inputSelector = inputSelector;
     this.txSubmitProvider = new TrackedTxSubmitProvider(txSubmitProvider);
-    this.walletProvider = new TrackedWalletProvider(walletProvider);
     this.utxoProvider = new TrackedUtxoProvider(utxoProvider);
     this.networkInfoProvider = new TrackedNetworkInfoProvider(networkInfoProvider);
     this.stakePoolProvider = new TrackedStakePoolProvider(stakePoolProvider);
@@ -172,8 +166,7 @@ export class SingleAddressWallet implements ObservableWallet {
         rewardsProvider: this.rewardsProvider,
         stakePoolProvider: this.stakePoolProvider,
         txSubmitProvider: this.txSubmitProvider,
-        utxoProvider: this.utxoProvider,
-        walletProvider: this.walletProvider
+        utxoProvider: this.utxoProvider
       },
       { consideredOutOfSyncAfter }
     );
@@ -201,7 +194,7 @@ export class SingleAddressWallet implements ObservableWallet {
       equals: tipEquals,
       maxPollInterval: maxInterval,
       pollInterval,
-      provider$: coldObservableProvider(this.walletProvider.ledgerTip, retryBackoffConfig),
+      provider$: coldObservableProvider(this.networkInfoProvider.ledgerTip, retryBackoffConfig),
       store: stores.tip,
       trigger$: this.syncStatus.isSettled$.pipe(filter((isSettled) => isSettled))
     });
@@ -217,11 +210,16 @@ export class SingleAddressWallet implements ObservableWallet {
     this.currentEpoch$ = currentEpochTracker(this.tip$, this.networkInfo$);
     const epoch$ = this.currentEpoch$.pipe(map((epoch) => epoch.epochNo));
     this.protocolParameters$ = new PersistentDocumentTrackerSubject(
-      coldObservableProvider(this.walletProvider.currentWalletProtocolParameters, retryBackoffConfig, epoch$, isEqual),
+      coldObservableProvider(
+        this.networkInfoProvider.currentWalletProtocolParameters,
+        retryBackoffConfig,
+        epoch$,
+        isEqual
+      ),
       stores.protocolParameters
     );
     this.genesisParameters$ = new PersistentDocumentTrackerSubject(
-      coldObservableProvider(this.walletProvider.genesisParameters, retryBackoffConfig, epoch$, isEqual),
+      coldObservableProvider(this.networkInfoProvider.genesisParameters, retryBackoffConfig, epoch$, isEqual),
       stores.genesisParameters
     );
 
@@ -231,10 +229,11 @@ export class SingleAddressWallet implements ObservableWallet {
     this.transactions = createTransactionsTracker({
       addresses$,
       chainHistoryProvider: this.chainHistoryProvider,
+      inFlightTransactionsStore: stores.inFlightTransactions,
       newTransactions: this.#newTransactions,
       retryBackoffConfig,
-      store: stores.transactions,
-      tip$: this.tip$
+      tip$: this.tip$,
+      transactionsHistoryStore: stores.transactions
     });
     this.utxo = createUtxoTracker({
       addresses$,
@@ -331,7 +330,6 @@ export class SingleAddressWallet implements ObservableWallet {
     this.#tip$.sync();
   }
   shutdown() {
-    this.balance.shutdown();
     this.utxo.shutdown();
     this.transactions.shutdown();
     this.networkInfo$.complete();
@@ -340,7 +338,6 @@ export class SingleAddressWallet implements ObservableWallet {
     this.#tip$.complete();
     this.addresses$.complete();
     this.assetProvider.stats.shutdown();
-    this.walletProvider.stats.shutdown();
     this.txSubmitProvider.stats.shutdown();
     this.networkInfoProvider.stats.shutdown();
     this.stakePoolProvider.stats.shutdown();

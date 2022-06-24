@@ -4,12 +4,14 @@ import { Cardano, RewardsProvider, StakePoolProvider } from '@cardano-sdk/core';
 import { Delegatee, RewardAccount, StakeKeyStatus } from '../types';
 import { KeyValueStore } from '../../persistence';
 import { Observable, combineLatest, concat, distinctUntilChanged, filter, map, merge, switchMap, tap } from 'rxjs';
-import { RegAndDeregCertificateTypes } from '.';
+import {
+  RegAndDeregCertificateTypes,
+  includesAnyCertificate,
+  isLastStakeKeyCertOfType
+} from './transactionCertificates';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { RewardBalance, includesAnyCertificate } from '..';
 import { TxWithEpoch } from './types';
 import { coldObservableProvider, deepEquals, shallowArrayEquals } from '../util';
-import { isLastStakeKeyCertOfType } from './transactionCertificates';
 import findLast from 'lodash/findLast';
 import isEqual from 'lodash/isEqual';
 import uniq from 'lodash/uniq';
@@ -202,7 +204,7 @@ export const addressRewards = (
   transactionsInFlight$: Observable<Cardano.NewTxAlonzo[]>,
   rewardsProvider: ObservableRewardsProvider,
   balancesStore: KeyValueStore<Cardano.RewardAccount, Cardano.Lovelace>
-): Observable<RewardBalance[]> =>
+): Observable<Cardano.Lovelace[]> =>
   combineLatest([
     concat(
       balancesStore.getValues(rewardAccounts),
@@ -217,18 +219,17 @@ export const addressRewards = (
     transactionsInFlight$
   ]).pipe(
     map(([totalRewards, transactionsInFlight]) =>
-      totalRewards.map((total, i) => ({
-        available:
-          total - transactionsInFlight.reduce((sum, tx) => sum + getWithdrawalQuantity(tx, rewardAccounts[i]), 0n),
-        total
-      }))
+      totalRewards.map(
+        (total, i) =>
+          total - transactionsInFlight.reduce((sum, tx) => sum + getWithdrawalQuantity(tx, rewardAccounts[i]), 0n)
+      )
     ),
     distinctUntilChanged(deepEquals)
   );
 
 export const toRewardAccounts =
   (addresses: Cardano.RewardAccount[]) =>
-  ([statuses, delegatees, rewards]: [StakeKeyStatus[], (Delegatee | undefined)[], RewardBalance[]]) =>
+  ([statuses, delegatees, rewards]: [StakeKeyStatus[], (Delegatee | undefined)[], Cardano.Lovelace[]]) =>
     addresses.map(
       (address, i): RewardAccount => ({
         address,

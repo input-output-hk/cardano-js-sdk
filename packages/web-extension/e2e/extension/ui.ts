@@ -66,7 +66,7 @@ document
 // Use observable wallet from UI:
 const wallet = consumeObservableWallet({ walletName }, { logger, runtime });
 wallet.addresses$.subscribe(([{ address }]) => (document.querySelector('#address')!.textContent = address.toString()));
-wallet.balance.available$.subscribe(
+wallet.balance.utxo.available$.subscribe(
   ({ coins }) => (document.querySelector('#balance')!.textContent = coins.toString())
 );
 

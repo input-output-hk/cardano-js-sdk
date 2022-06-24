@@ -13,8 +13,7 @@ import {
   rewardsProvider,
   stakePoolProvider,
   txSubmitProvider,
-  utxoProvider,
-  walletProvider
+  utxoProvider
 } from '../../../wallet/test/e2e/config';
 import { filter, firstValueFrom } from 'rxjs';
 import { removeRabbitMQContainer, setupRabbitMQContainer } from '../../../rabbitmq/test/jest-setup/docker';
@@ -62,8 +61,7 @@ const getWallet = async () =>
       rewardsProvider: await rewardsProvider,
       stakePoolProvider,
       txSubmitProvider: await txSubmitProvider,
-      utxoProvider: await utxoProvider,
-      walletProvider: await walletProvider
+      utxoProvider: await utxoProvider
     }
   );
 

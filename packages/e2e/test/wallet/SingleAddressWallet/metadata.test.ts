@@ -8,8 +8,7 @@ import {
   rewardsProvider,
   stakePoolProvider,
   txSubmitProvider,
-  utxoProvider,
-  walletProvider
+  utxoProvider
 } from '../../config';
 import { filter, firstValueFrom, map } from 'rxjs';
 import { isNotNil } from '@cardano-sdk/util';
@@ -29,8 +28,7 @@ describe('SingleAddressWallet/metadata', () => {
         rewardsProvider: await rewardsProvider,
         stakePoolProvider: await stakePoolProvider,
         txSubmitProvider: await txSubmitProvider,
-        utxoProvider: await utxoProvider,
-        walletProvider: await walletProvider
+        utxoProvider: await utxoProvider
       }
     );
     ownAddress = (await firstValueFrom(wallet.addresses$))[0].address;

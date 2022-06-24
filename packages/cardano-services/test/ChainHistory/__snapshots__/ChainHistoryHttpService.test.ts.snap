@@ -3,7 +3,7 @@
 exports[`ChainHistoryHttpService healthy state /blocks/by-hashes server and snapshot testing has all block information 1`] = `
 Array [
   Object {
-    "confirmations": 1676219,
+    "confirmations": 1957883,
     "date": Object {
       "__type": "Date",
       "value": 1595995096000,
@@ -35,7 +35,7 @@ Array [
     "vrf": "vrf_vk1wmmxg7swhx0raa2yddkt7ktlvh55dje8a5uwge2z90t5e7v4g5esp49zzk",
   },
   Object {
-    "confirmations": 1620171,
+    "confirmations": 1901835,
     "date": Object {
       "__type": "Date",
       "value": 1597132436000,

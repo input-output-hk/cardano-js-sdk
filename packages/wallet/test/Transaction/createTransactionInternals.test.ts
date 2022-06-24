@@ -1,8 +1,8 @@
-import { Cardano, WalletProvider } from '@cardano-sdk/core';
+import { Cardano, NetworkInfoProvider } from '@cardano-sdk/core';
 import { CreateTxInternalsProps, createTransactionInternals } from '../../src/Transaction';
 import { SelectionConstraints } from '../../../cip2/test/util';
 import { SelectionSkeleton, roundRobinRandomImprove } from '@cardano-sdk/cip2';
-import { mockWalletProvider, utxo } from '../mocks';
+import { mockNetworkInfoProvider, utxo } from '../mocks';
 
 const address = Cardano.Address(
   'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g'
@@ -16,10 +16,10 @@ const outputs = [
 ];
 
 describe('Transaction.createTransactionInternals', () => {
-  let provider: WalletProvider;
+  let provider: NetworkInfoProvider;
 
   beforeEach(() => {
-    provider = mockWalletProvider();
+    provider = mockNetworkInfoProvider();
   });
 
   const createSimpleTransactionInternals = async (

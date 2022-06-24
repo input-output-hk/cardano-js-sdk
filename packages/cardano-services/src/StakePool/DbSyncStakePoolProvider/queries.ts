@@ -1,12 +1,13 @@
 /* eslint-disable sonarjs/no-nested-template-literals */
 import { Cardano, MultipleChoiceSearchFilter, StakePoolQueryOptions } from '@cardano-sdk/core';
-import { SubQuery } from './types';
+import { OrderByOptions, SubQuery } from './types';
+import { getStakePoolSortType } from './util';
 
 export const findLastEpoch = `
  SELECT 
   "no"
  FROM epoch
- ORDER BY id DESC 
+ ORDER BY no DESC 
  LIMIT 1
 `;
 
@@ -31,7 +32,7 @@ with current_epoch AS (
   FROM epoch e
   JOIN epoch_param ep on 
     ep.epoch_no = e."no"
-  order by e.id desc limit 1
+  order by e.no desc limit 1
 ),
 blocks_created AS (
   SELECT 
@@ -249,7 +250,7 @@ WITH epochs AS (
 	  "no" AS epoch_no,
 		(extract(epoch FROM (end_time - start_time)) * 1000) AS epoch_length
 	FROM epoch
-	ORDER BY id DESC
+	ORDER BY no DESC
   ${limit !== undefined ? `LIMIT ${limit}` : ''}
 ),
 pool_rewards_per_epoch AS (
@@ -348,13 +349,16 @@ JOIN pool_update pu
 
 export const findPoolsRelays = `
 SELECT
-  update_id
+  hash_id,
+  update_id,
   ipv4,
   ipv6,
   port,
   dns_name,
   dns_srv_name AS hostname --fixme: check this is correct
 FROM pool_relay
+JOIN pool_update 
+  ON pool_relay.update_id = pool_update.id
 WHERE update_id = ANY($1)
 `;
 
@@ -680,13 +684,10 @@ export const withPagination = (query: string, pagination?: StakePoolQueryOptions
   return query;
 };
 
-export const defaultSort: StakePoolQueryOptions['sort'] = {
-  field: 'name',
-  order: 'asc'
-};
-
-export const withSort = (query: string, sort: StakePoolQueryOptions['sort'] = defaultSort) =>
-  `${query} ORDER BY ${sort.field} ${sort.order}, pool_id ASC`;
+const orderBy = (query: string, sort: OrderByOptions[]) =>
+  sort && sort.length > 0
+    ? `${query} ORDER BY ${sort.map(({ field, order }) => `${field} ${order} NULLS LAST`).join(', ')}`
+    : query;
 
 export const addSentenceToQuery = (query: string, sentence: string) => query + sentence;
 
@@ -771,6 +772,28 @@ SELECT
 FROM last_pool_update AS pool_update 
 LEFT JOIN last_pool_retire AS pool_retire 
 	ON pool_update.hash_id = pool_retire.hash_id`;
+
+const sortFieldMapping: Record<string, string> = {
+  name: "lower((pod.json -> 'name')::TEXT)"
+};
+
+export const withSort = (query: string, sort?: StakePoolQueryOptions['sort'], defaultSort?: OrderByOptions[]) => {
+  if (!sort?.field && defaultSort) {
+    const defaultMappedSort = defaultSort.map((s) => ({ field: sortFieldMapping[s.field] || s.field, order: s.order }));
+    return orderBy(query, defaultMappedSort);
+  }
+  if (!sort?.field) return query;
+  const sortType = getStakePoolSortType(sort.field);
+  const mappedSort = { field: sortFieldMapping[sort.field] || sort.field, order: sort.order };
+  switch (sortType) {
+    case 'data':
+      return orderBy(query, [mappedSort, { field: 'pool_id', order: 'asc' }]);
+    case 'metrics':
+      return orderBy(query, [mappedSort, { field: 'id', order: 'asc' }]);
+    default:
+      return orderBy(query, [mappedSort]);
+  }
+};
 
 const Queries = {
   IDENTIFIER_QUERY,

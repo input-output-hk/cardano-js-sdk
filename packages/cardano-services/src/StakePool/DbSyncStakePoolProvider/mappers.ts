@@ -18,6 +18,7 @@ import {
   RelayModel,
   StakePoolStatsModel
 } from './types';
+import { isNotNil } from '@cardano-sdk/util';
 import Fraction from 'fraction.js';
 
 const toHexString = (bytes: Buffer) => bytes.toString('hex');
@@ -47,43 +48,51 @@ interface ToCoreStakePoolInput {
   totalCount: number;
 }
 
-export const toCoreStakePool = ({
-  poolOwners,
-  poolDatas,
-  poolRegistrations,
-  poolRelays,
-  poolRetirements,
-  poolRewards,
-  lastEpoch,
-  poolMetrics,
-  totalCount
-}: ToCoreStakePoolInput): StakePoolSearchResults => ({
-  pageResults: poolDatas.map((poolData) => {
-    const registrations = poolRegistrations.filter((r) => r.hashId === poolData.hashId);
-    const retirements = poolRetirements.filter((r) => r.hashId === poolData.hashId);
-    const toReturn: Cardano.StakePool = {
-      cost: poolData.cost,
-      epochRewards: poolRewards.filter((r) => r.hashId === poolData.hashId).map((reward) => reward.epochReward),
-      hexId: poolData.hexId,
-      id: poolData.id,
-      margin: poolData.margin,
-      metrics:
-        poolMetrics.find((metrics) => metrics.hashId === poolData.hashId)?.metrics || ({} as Cardano.StakePoolMetrics),
-      owners: poolOwners.filter((o) => o.hashId === poolData.hashId).map((o) => o.address),
-      pledge: poolData.pledge,
-      relays: poolRelays.filter((r) => r.updateId === poolData.updateId).map((r) => r.relay),
-      rewardAccount: poolData.rewardAccount,
-      status: getPoolStatus(registrations[0], lastEpoch, retirements[0]),
-      transactions: {
-        registration: registrations.map((r) => r.transactionId),
-        retirement: retirements.map((r) => r.transactionId)
-      },
-      vrf: poolData.vrfKeyHash
-    };
-    if (poolData.metadata) toReturn.metadata = poolData.metadata;
-    if (poolData.metadataJson) toReturn.metadataJson = poolData.metadataJson;
-    return toReturn;
-  }),
+export const toCoreStakePool = (
+  poolHashIds: number[],
+  {
+    poolOwners,
+    poolDatas,
+    poolRegistrations,
+    poolRelays,
+    poolRetirements,
+    poolRewards,
+    lastEpoch,
+    poolMetrics,
+    totalCount
+  }: ToCoreStakePoolInput
+): StakePoolSearchResults => ({
+  pageResults: poolHashIds
+    .map((hashId) => {
+      const poolData = poolDatas.find((data) => data.hashId === hashId);
+      if (!poolData) return;
+      const registrations = poolRegistrations.filter((r) => r.hashId === poolData.hashId);
+      const retirements = poolRetirements.filter((r) => r.hashId === poolData.hashId);
+      const toReturn: Cardano.StakePool = {
+        cost: poolData.cost,
+        epochRewards: poolRewards.filter((r) => r.hashId === poolData.hashId).map((reward) => reward.epochReward),
+        hexId: poolData.hexId,
+        id: poolData.id,
+        margin: poolData.margin,
+        metrics:
+          poolMetrics.find((metrics) => metrics.hashId === poolData.hashId)?.metrics ||
+          ({} as Cardano.StakePoolMetrics),
+        owners: poolOwners.filter((o) => o.hashId === poolData.hashId).map((o) => o.address),
+        pledge: poolData.pledge,
+        relays: poolRelays.filter((r) => r.updateId === poolData.updateId).map((r) => r.relay),
+        rewardAccount: poolData.rewardAccount,
+        status: getPoolStatus(registrations[0], lastEpoch, retirements[0]),
+        transactions: {
+          registration: registrations.map((r) => r.transactionId),
+          retirement: retirements.map((r) => r.transactionId)
+        },
+        vrf: poolData.vrfKeyHash
+      };
+      if (poolData.metadata) toReturn.metadata = poolData.metadata;
+      if (poolData.metadataJson) toReturn.metadataJson = poolData.metadataJson;
+      return toReturn;
+    })
+    .filter(isNotNil),
   totalResultCount: Number(totalCount)
 });
 
@@ -142,7 +151,7 @@ export const mapRelay = (relayModel: RelayModel): PoolRelay => {
       port: relayModel.port
     };
 
-  return { relay, updateId: relayModel.update_id };
+  return { hashId: relayModel.hash_id, relay, updateId: relayModel.update_id };
 };
 
 export const mapEpochReward = (epochRewardModel: EpochRewardModel, hashId: number): EpochReward => ({

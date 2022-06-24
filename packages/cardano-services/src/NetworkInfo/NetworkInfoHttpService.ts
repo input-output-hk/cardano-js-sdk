@@ -39,6 +39,7 @@ export class NetworkInfoHttpService extends HttpService {
         validateResponses: true
       })
     );
+
     router.post(
       '/network',
       providerHandler(networkInfoProvider.networkInfo.bind(networkInfoProvider))(
@@ -46,6 +47,25 @@ export class NetworkInfoHttpService extends HttpService {
         logger
       )
     );
+    router.post(
+      '/ledger-tip',
+      providerHandler(networkInfoProvider.ledgerTip.bind(networkInfoProvider))(HttpService.routeHandler(logger), logger)
+    );
+    router.post(
+      '/current-wallet-protocol-parameters',
+      providerHandler(networkInfoProvider.currentWalletProtocolParameters.bind(networkInfoProvider))(
+        HttpService.routeHandler(logger),
+        logger
+      )
+    );
+    router.post(
+      '/genesis-parameters',
+      providerHandler(networkInfoProvider.genesisParameters.bind(networkInfoProvider))(
+        HttpService.routeHandler(logger),
+        logger
+      )
+    );
+
     return new NetworkInfoHttpService({ logger, networkInfoProvider }, router);
   }
 

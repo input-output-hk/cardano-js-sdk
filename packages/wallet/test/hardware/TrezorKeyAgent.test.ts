@@ -7,7 +7,6 @@ import { KeyManagement, SingleAddressWallet } from '../../src';
 describe('TrezorKeyAgent', () => {
   let keyAgent: KeyManagement.TrezorKeyAgent;
   let txSubmitProvider: mocks.TxSubmitProviderStub;
-  let walletProvider: mocks.WalletProviderStub;
   let wallet: SingleAddressWallet;
   const trezorConfig = {
     communicationType: CommunicationType.Node,
@@ -34,7 +33,6 @@ describe('TrezorKeyAgent', () => {
     keyAgent.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
     keyAgent.knownAddresses.push(groupedAddress);
     txSubmitProvider = mocks.mockTxSubmitProvider();
-    walletProvider = mocks.mockWalletProvider();
     const assetProvider = mocks.mockAssetProvider();
     const stakePoolProvider = createStubStakePoolProvider();
     const networkInfoProvider = mocks.mockNetworkInfoProvider();
@@ -52,8 +50,7 @@ describe('TrezorKeyAgent', () => {
         rewardsProvider,
         stakePoolProvider,
         txSubmitProvider,
-        utxoProvider,
-        walletProvider
+        utxoProvider
       }
     );
   });

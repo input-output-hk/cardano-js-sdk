@@ -9,8 +9,7 @@ import {
   rewardsProvider,
   stakePoolProvider,
   txSubmitProvider,
-  utxoProvider,
-  walletProvider
+  utxoProvider
 } from '../config';
 import { combineLatest, filter, firstValueFrom, map, of } from 'rxjs';
 
@@ -44,8 +43,7 @@ describe('SingleAddressWallet.assets/nft', () => {
         rewardsProvider: await rewardsProvider,
         stakePoolProvider,
         txSubmitProvider: await txSubmitProvider,
-        utxoProvider: await utxoProvider,
-        walletProvider: await walletProvider
+        utxoProvider: await utxoProvider
       }
     );
   });
@@ -56,7 +54,7 @@ describe('SingleAddressWallet.assets/nft', () => {
 
   it('supports multiple CIP-25 NFT metadata in one tx', async () => {
     const nfts = await firstValueFrom(
-      combineLatest([wallet.assets$, wallet.balance.total$]).pipe(
+      combineLatest([wallet.assets$, wallet.balance.utxo.total$]).pipe(
         filter(([assets, balance]) => assets.size === balance.assets?.size),
         map(([assets]) => [...assets.values()].filter((asset) => !!asset.nftMetadata))
       )
@@ -85,7 +83,7 @@ describe('SingleAddressWallet.assets/nft', () => {
 
   it('parses CIP-25 NFT metadata with files', async () => {
     const nfts = await firstValueFrom(
-      combineLatest([wallet.assets$, wallet.balance.total$]).pipe(
+      combineLatest([wallet.assets$, wallet.balance.utxo.total$]).pipe(
         filter(([assets, balance]) => assets.size === balance.assets?.size),
         map(([assets]) => [...assets.values()].filter((asset) => !!asset.nftMetadata))
       )

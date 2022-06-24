@@ -1,7 +1,7 @@
 /* eslint-disable max-statements */
 import { Awaited } from '@cardano-sdk/util';
 import { Cardano } from '@cardano-sdk/core';
-import { ObservableWallet, SingleAddressWallet, StakeKeyStatus, txInEquals } from '../../../src';
+import { ObservableWallet, SingleAddressWallet, StakeKeyStatus } from '../../../src';
 import { TX_TIMEOUT, firstValueFromTimed, waitForWalletStateSettle } from '../../util';
 import { TxInternals } from '../../../src/Transaction';
 import {
@@ -14,20 +14,20 @@ import {
   rewardsProvider,
   stakePoolProvider,
   txSubmitProvider,
-  utxoProvider,
-  walletProvider
+  utxoProvider
 } from '../config';
 import { combineLatest, filter, firstValueFrom } from 'rxjs';
 
 const getWalletStateSnapshot = async (wallet: ObservableWallet) => {
   const [rewardAccount] = await firstValueFrom(wallet.delegation.rewardAccounts$);
-  const balanceAvailable = await firstValueFrom(wallet.balance.available$);
-  const balanceTotal = await firstValueFrom(wallet.balance.total$);
+  const balanceAvailable = await firstValueFrom(wallet.balance.utxo.available$);
+  const balanceTotal = await firstValueFrom(wallet.balance.utxo.total$);
+  const deposit = await firstValueFrom(wallet.balance.rewardAccounts.deposit$);
   const epoch = await firstValueFrom(wallet.currentEpoch$);
   const utxoTotal = await firstValueFrom(wallet.utxo.total$);
   const utxoAvailable = await firstValueFrom(wallet.utxo.available$);
   return {
-    balance: { available: balanceAvailable, total: balanceTotal },
+    balance: { available: balanceAvailable, deposit, total: balanceTotal },
     epoch: epoch.epochNo,
     isStakeKeyRegistered: rewardAccount.keyStatus === StakeKeyStatus.Registered,
     rewardAccount,
@@ -84,8 +84,7 @@ const getWallet = async (idx: number) =>
       rewardsProvider: await rewardsProvider,
       stakePoolProvider,
       txSubmitProvider: await txSubmitProvider,
-      utxoProvider: await utxoProvider,
-      walletProvider: await walletProvider
+      utxoProvider: await utxoProvider
     }
   );
 
@@ -106,8 +105,8 @@ describe('SingleAddressWallet/delegation', () => {
   });
 
   const chooseWallets = async (): Promise<[ObservableWallet, ObservableWallet]> => {
-    const wallet1Balance = await firstValueFrom(wallet1.balance.available$);
-    const wallet2Balance = await firstValueFrom(wallet2.balance.available$);
+    const wallet1Balance = await firstValueFrom(wallet1.balance.utxo.available$);
+    const wallet2Balance = await firstValueFrom(wallet2.balance.utxo.available$);
     return wallet1Balance.coins > wallet2Balance.coins ? [wallet1, wallet2] : [wallet2, wallet1];
   };
 
@@ -133,7 +132,7 @@ describe('SingleAddressWallet/delegation', () => {
 
     const { poolId, certificates } = createDelegationCertificates(initialState);
     const initialDeposit = initialState.isStakeKeyRegistered ? stakeKeyDeposit : 0n;
-    expect(initialState.balance.available.deposit).toBe(initialDeposit);
+    expect(initialState.balance.deposit).toBe(initialDeposit);
 
     // Make a 1st tx with key registration (if not already registered) and stake delegation
     // Also send some coin to another wallet
@@ -151,27 +150,22 @@ describe('SingleAddressWallet/delegation', () => {
     );
 
     const tx1PendingState = await getWalletStateSnapshot(sourceWallet);
-    expect(tx1PendingState.balance.total).toEqual(initialState.balance.total);
-    const expectedCoinsWhileTxPending =
-      initialState.balance.total.coins -
-      Cardano.util.coalesceValueQuantities(
-        tx1Internals.body.inputs.map(
-          (txInput) => initialState.utxo.total.find(([txIn]) => txInEquals(txIn, txInput))![1].value
-        )
-      ).coins;
-    expect(tx1PendingState.balance.available.coins).toBe(expectedCoinsWhileTxPending);
+
+    // Updates total and available balance right after tx is submitted
+    const coinsSpentOnDeposit = initialState.isStakeKeyRegistered ? 0n : stakeKeyDeposit;
+    const expectedCoinsAfterTx1 =
+      initialState.balance.total.coins - tx1OutputCoins - tx1Internals.body.fee - coinsSpentOnDeposit;
+    expect(tx1PendingState.balance.total.coins).toEqual(expectedCoinsAfterTx1);
+    expect(tx1PendingState.balance.available.coins).toEqual(expectedCoinsAfterTx1);
+    expect(tx1PendingState.balance.deposit).toEqual(stakeKeyDeposit);
 
     await waitForTx(sourceWallet, tx1Internals);
     const tx1ConfirmedState = await getWalletStateSnapshot(sourceWallet);
 
     // Updates total and available balance after tx is confirmed
-    const expectedCoinsAfterTx1 =
-      initialState.balance.total.coins -
-      tx1OutputCoins -
-      tx1Internals.body.fee -
-      (initialState.isStakeKeyRegistered ? 0n : stakeKeyDeposit);
     expect(tx1ConfirmedState.balance.total.coins).toBe(expectedCoinsAfterTx1);
     expect(tx1ConfirmedState.balance.total).toEqual(tx1ConfirmedState.balance.available);
+    expect(tx1PendingState.balance.deposit).toEqual(stakeKeyDeposit);
 
     expect(tx1ConfirmedState.rewardAccount.delegatee?.nextNextEpoch!.id).toEqual(poolId);
     // nothing changes for 2 epochs
@@ -202,6 +196,6 @@ describe('SingleAddressWallet/delegation', () => {
     const expectedCoinsAfterTx2 = expectedCoinsAfterTx1 + stakeKeyDeposit - tx2Internals.body.fee;
     expect(tx2ConfirmedState.balance.total.coins).toBe(expectedCoinsAfterTx2);
     expect(tx2ConfirmedState.balance.total).toEqual(tx2ConfirmedState.balance.available);
-    expect(tx2ConfirmedState.balance.total.deposit).toBe(0n);
+    expect(tx2ConfirmedState.balance.deposit).toBe(0n);
   });
 });
