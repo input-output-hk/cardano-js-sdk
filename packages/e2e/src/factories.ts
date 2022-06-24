@@ -7,6 +7,7 @@ import {
   NetworkInfoProvider,
   ProviderFactory,
   RewardsProvider,
+  StakePoolProvider,
   TxSubmitProvider,
   UtxoProvider,
   WalletProvider
@@ -23,6 +24,7 @@ import {
 } from '@cardano-sdk/blockfrost';
 import { CardanoWalletFaucetProvider, FaucetProvider } from './FaucetProvider';
 import { KeyManagement } from '@cardano-sdk/wallet';
+import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import DeviceConnection from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
 const BLOCKFROST_MISSING_FLAG = 'Missing isTestnet flag';
@@ -58,6 +60,7 @@ export const rewardsProviderFactory = new ProviderFactory<RewardsProvider>();
 export const txSubmitProviderFactory = new ProviderFactory<TxSubmitProvider>();
 export const utxoProviderFactory = new ProviderFactory<UtxoProvider>();
 export const walletProviderFactory = new ProviderFactory<WalletProvider>();
+export const stakePoolProviderFactory = new ProviderFactory<StakePoolProvider>();
 
 // Faucet providers
 faucetProviderFactory.register(CardanoWalletFaucetProvider.name, CardanoWalletFaucetProvider.create);
@@ -182,6 +185,15 @@ walletProviderFactory.register(
       if (params.projectId === undefined) throw new Error(BLOCKFROST_MISSING_PROJECT_ID);
 
       resolve(blockfrostWalletProvider(await getBlockfrostApi(params.isTestnet, params.projectId)));
+    })
+);
+
+// Stake Pool providers
+stakePoolProviderFactory.register(
+  'NullStubStakePoolProvider',
+  async (): Promise<StakePoolProvider> =>
+    new Promise<StakePoolProvider>(async (resolve) => {
+      resolve(createStubStakePoolProvider());
     })
 );
 

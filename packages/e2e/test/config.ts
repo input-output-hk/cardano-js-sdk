@@ -1,9 +1,11 @@
 import * as envalid from 'envalid';
 import {
   AssetProvider,
+  Cardano,
   ChainHistoryProvider,
   NetworkInfoProvider,
   RewardsProvider,
+  StakePoolProvider,
   TxSubmitProvider,
   UtxoProvider,
   WalletProvider
@@ -19,10 +21,12 @@ import {
   keyManagementFactory,
   networkInfoProviderFactory,
   rewardsProviderFactory,
+  stakePoolProviderFactory,
   txSubmitProviderFactory,
   utxoProviderFactory,
   walletProviderFactory
 } from '../src/factories';
+import memoize from 'lodash/memoize';
 
 // Validate environemnt variables
 
@@ -40,8 +44,12 @@ export const env = envalid.cleanEnv(process.env, {
   LOGGER_MIN_SEVERITY: envalid.str({ choices: loggerMethodNames as string[], default: 'info' }),
   NETWORK_INFO_PROVIDER: envalid.str(),
   NETWORK_INFO_PROVIDER_PARAMS: envalid.json(),
+  POOL_ID_1: envalid.str(),
+  POOL_ID_2: envalid.str(),
   REWARDS_PROVIDER: envalid.str(),
   REWARDS_PROVIDER_PARAMS: envalid.json(),
+  STAKE_POOL_PROVIDER: envalid.str(),
+  STAKE_POOL_PROVIDER_PARAMS: envalid.json(),
   TX_SUBMIT_PROVIDER: envalid.str(),
   TX_SUBMIT_PROVIDER_PARAMS: envalid.json(),
   UTXO_PROVIDER: envalid.str(),
@@ -56,6 +64,9 @@ export const logger = createLogger({
   name: 'e2e tests'
 });
 
+export const poolId1 = Cardano.PoolId(env.POOL_ID_1);
+export const poolId2 = Cardano.PoolId(env.POOL_ID_2);
+
 // Instantiate providers
 
 export const faucetProvider: Promise<FaucetProvider> = faucetProviderFactory.create(
@@ -63,10 +74,13 @@ export const faucetProvider: Promise<FaucetProvider> = faucetProviderFactory.cre
   env.FAUCET_PROVIDER_PARAMS
 );
 
-export const keyAgent: Promise<KeyManagement.AsyncKeyAgent> = keyManagementFactory.create(
-  env.KEY_MANAGEMENT_PROVIDER,
-  env.KEY_MANAGEMENT_PARAMS
-);
+export const keyAgentById = memoize(async (accountIndex: number) => {
+  const params = env.KEY_MANAGEMENT_PARAMS;
+  params.accountIndex = accountIndex;
+  return keyManagementFactory.create(env.KEY_MANAGEMENT_PROVIDER, params);
+});
+
+export const keyAgent: Promise<KeyManagement.AsyncKeyAgent> = (() => keyAgentById(0))();
 
 export const assetProvider: Promise<AssetProvider> = assetProviderFactory.create(
   env.ASSET_PROVIDER,
@@ -101,4 +115,9 @@ export const utxoProvider: Promise<UtxoProvider> = utxoProviderFactory.create(
 export const walletProvider: Promise<WalletProvider> = walletProviderFactory.create(
   env.WALLET_PROVIDER,
   env.WALLET_PROVIDER_PARAMS
+);
+
+export const stakePoolProvider: Promise<StakePoolProvider> = stakePoolProviderFactory.create(
+  env.STAKE_POOL_PROVIDER,
+  env.STAKE_POOL_PROVIDER_PARAMS
 );

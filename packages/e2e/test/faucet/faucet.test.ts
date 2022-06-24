@@ -1,4 +1,4 @@
-import { FaucetProvider } from '../../src/FaucetProvider/types';
+import { FaucetProvider } from '../../src/FaucetProvider';
 import { KeyManagement } from '@cardano-sdk/wallet';
 import { faucetProvider, keyAgent } from '../config';
 

@@ -4,7 +4,7 @@
     "description": "End to end tests for the cardano-js-sdk packages.",
     "main": "index.js",
     "scripts": {
-        "test": "jest -c ./jest.config.js",
+        "test": "jest -c ./jest.config.js --runInBand",
         "private-network:up": "CARDANO_DB_SYNC_VERSION=13.0.0-rc3 DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 OGMIOS_PORT=1338 NETWORK=testnet docker-compose -p private-testnet-e2e up",
         "private-network:down": "CARDANO_DB_SYNC_VERSION=13.0.0-rc3 DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 OGMIOS_PORT=1338 NETWORK=testnet docker-compose -p private-testnet-e2e down -v --remove-orphans",
         "build:esm": "tsc -p src/tsconfig.json --outDir ./dist/esm --module es2020",
@@ -29,21 +29,22 @@
     "author": "Angel Castillo",
     "license": "Apache-2.0",
     "dependencies": {
+        "@cardano-foundation/ledgerjs-hw-app-cardano": "0.2.0",
+        "@cardano-sdk/core": "0.2.0",
+        "@cardano-sdk/util": "0.2.0",
+        "@cardano-sdk/wallet": "0.2.0",
         "bunyan": "^1.8.15",
         "cardano-wallet-js": "^1.4.0",
         "dotenv": "^16.0.1",
         "envalid": "^7.3.1",
         "ts-log": "^2.2.4",
-        "ts-stopwatch": "0.0.4",
-        "@cardano-sdk/core": "0.2.0",
-        "@cardano-sdk/util": "0.2.0",
-        "@cardano-sdk/wallet": "0.2.0",
-        "@cardano-foundation/ledgerjs-hw-app-cardano": "0.2.0"
+        "ts-stopwatch": "0.0.4"
     },
     "devDependencies": {
         "@types/bunyan": "^1.8.8",
         "@types/jest": "^28.1.2",
         "jest": "^28.1.1",
+        "jest-webextension-mock": "^3.7.22",
         "ts-jest": "^28.0.5",
         "typescript": "^4.7.4"
     }
