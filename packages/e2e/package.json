@@ -1,6 +1,6 @@
 {
     "name": "@cardano-sdk/e2e",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "description": "End to end tests for the cardano-js-sdk packages.",
     "main": "index.js",
     "scripts": {
@@ -29,11 +29,11 @@
     "author": "Angel Castillo",
     "license": "Apache-2.0",
     "dependencies": {
-        "@cardano-foundation/ledgerjs-hw-app-cardano": "0.2.0",
-        "@cardano-sdk/core": "0.2.0",
-        "@cardano-sdk/util": "0.2.0",
-        "@cardano-sdk/util-dev": "0.2.0",
-        "@cardano-sdk/wallet": "0.2.0",
+        "@cardano-foundation/ledgerjs-hw-app-cardano": "5.0.0",
+        "@cardano-sdk/core": "0.3.0",
+        "@cardano-sdk/util": "0.3.0",
+        "@cardano-sdk/util-dev": "0.3.0",
+        "@cardano-sdk/wallet": "0.3.0",
         "bunyan": "^1.8.15",
         "cardano-wallet-js": "^1.4.0",
         "dotenv": "^16.0.1",
@@ -42,7 +42,7 @@
         "ts-stopwatch": "0.0.4"
     },
     "devDependencies": {
-        "@cardano-sdk/util-dev": "0.2.0",
+        "@cardano-sdk/util-dev": "0.3.0",
         "@types/bunyan": "^1.8.8",
         "@types/jest": "^28.1.2",
         "jest": "^28.1.1",
