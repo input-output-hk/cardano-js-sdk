@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/cardano-services",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Cardano GraphQL Services",
   "engines": {
     "node": "^14"
@@ -47,9 +47,9 @@
     "tscNoEmit": "shx echo typescript --noEmit command not implemented yet"
   },
   "devDependencies": {
-    "@cardano-sdk/cardano-services-client": "0.2.0",
-    "@cardano-sdk/util-dev": "0.2.0",
-    "@cardano-sdk/wallet": "0.2.0",
+    "@cardano-sdk/cardano-services-client": "0.3.0",
+    "@cardano-sdk/util-dev": "0.3.0",
+    "@cardano-sdk/wallet": "0.3.0",
     "@types/clear": "^0.1.2",
     "@types/dockerode": "^3.3.8",
     "@types/express": "^4.17.13",
@@ -66,10 +66,10 @@
     "wait-on": "^6.0.1"
   },
   "dependencies": {
-    "@cardano-sdk/core": "0.2.0",
-    "@cardano-sdk/ogmios": "0.2.0",
-    "@cardano-sdk/rabbitmq": "0.2.0",
-    "@cardano-sdk/util": "0.2.0",
+    "@cardano-sdk/core": "0.3.0",
+    "@cardano-sdk/ogmios": "0.3.0",
+    "@cardano-sdk/rabbitmq": "0.3.0",
+    "@cardano-sdk/util": "0.3.0",
     "@types/bunyan": "^1.8.8",
     "@types/death": "^1.1.2",
     "@types/wait-on": "^5.3.1",
@@ -90,7 +90,6 @@
     "prom-client": "^14.0.1",
     "reflect-metadata": "~0.1.13",
     "ts-log": "^2.2.4",
-    "json-bigint": "^1.0.0",
     "node-cache": "^5.1.2"
   },
   "files": [

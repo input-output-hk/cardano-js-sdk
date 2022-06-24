@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/golden-test-generator",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Generate golden test files for a range of Cardano concepts",
   "engines": {
     "node": "^14"
@@ -42,7 +42,7 @@
   },
   "dependencies": {
     "@cardano-ogmios/client": "4.1.0",
-    "@cardano-sdk/util": "0.2.0",
+    "@cardano-sdk/util": "0.3.0",
     "chalk": "^4.1.1",
     "clear": "^0.1.0",
     "cli-progress": "^3.9.0",
