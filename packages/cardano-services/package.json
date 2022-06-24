@@ -90,7 +90,6 @@
     "prom-client": "^14.0.1",
     "reflect-metadata": "~0.1.13",
     "ts-log": "^2.2.4",
-    "json-bigint": "^1.0.0",
     "node-cache": "^5.1.2"
   },
   "files": [
