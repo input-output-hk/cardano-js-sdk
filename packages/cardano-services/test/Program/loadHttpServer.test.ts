@@ -60,7 +60,8 @@ describe('loadHttpServer', () => {
           ServiceNames.TxSubmit,
           ServiceNames.ChainHistory,
           ServiceNames.Utxo,
-          ServiceNames.NetworkInfo
+          ServiceNames.NetworkInfo,
+          ServiceNames.Rewards
         ]
       });
       expect(httpServer).toBeInstanceOf(HttpServer);
@@ -71,7 +72,13 @@ describe('loadHttpServer', () => {
         async () =>
           await loadHttpServer({
             apiUrl,
-            serviceNames: [ServiceNames.StakePool]
+            serviceNames: [
+              ServiceNames.StakePool,
+              ServiceNames.Utxo,
+              ServiceNames.ChainHistory,
+              ServiceNames.Rewards,
+              ServiceNames.NetworkInfo
+            ]
           })
       ).rejects.toThrow(MissingProgramOption);
     });
