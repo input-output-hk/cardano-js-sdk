@@ -2,6 +2,7 @@ import * as OpenApiValidator from 'express-openapi-validator';
 import { DbSyncNetworkInfoProvider } from './DbSyncNetworkInfoProvider';
 import { HttpService } from '../Http';
 import { Logger, dummyLogger } from 'ts-log';
+import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { ServiceNames } from '../Program';
 import { providerHandler } from '../util';
 import express from 'express';
@@ -21,10 +22,6 @@ export class NetworkInfoHttpService extends HttpService {
   ) {
     super(ServiceNames.NetworkInfo, router, logger);
     this.#networkInfoProvider = networkInfoProvider;
-  }
-
-  async healthCheck() {
-    return this.#networkInfoProvider.healthCheck();
   }
 
   static create({ logger = dummyLogger, networkInfoProvider }: NetworkInfoServiceDependencies) {
@@ -80,11 +77,21 @@ export class NetworkInfoHttpService extends HttpService {
     return new NetworkInfoHttpService({ logger, networkInfoProvider }, router);
   }
 
-  async start(): Promise<void> {
+  async healthCheck() {
+    return this.#networkInfoProvider.healthCheck();
+  }
+
+  async initializeImpl(): Promise<void> {
+    if (!(await this.healthCheck()).ok) {
+      throw new ProviderError(ProviderFailure.Unhealthy);
+    }
+  }
+
+  async startImpl(): Promise<void> {
     await this.#networkInfoProvider.start();
   }
 
-  async close(): Promise<void> {
+  async shutdownImpl(): Promise<void> {
     await this.#networkInfoProvider.close();
   }
 }

@@ -2,11 +2,10 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable sonarjs/cognitive-complexity */
 /* eslint-disable sonarjs/no-identical-functions */
-
 import { DbSyncNetworkInfoProvider, NetworkInfoCacheKey, NetworkInfoHttpService } from '../../src/NetworkInfo';
 import { HttpServer, HttpServerConfig } from '../../src';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../src/InMemoryCache';
-import { NetworkInfoProvider, StakeSummary, SupplySummary } from '@cardano-sdk/core';
+import { NetworkInfoProvider, ProviderError, ProviderFailure, StakeSummary, SupplySummary } from '@cardano-sdk/core';
 import { Pool } from 'pg';
 import { doServerRequest, ingestDbData, sleep, wrapWithTransaction } from '../util';
 import { getPort } from 'get-port-please';
@@ -31,14 +30,32 @@ describe('NetworkInfoHttpService', () => {
   const cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
   const db = new Pool({ connectionString: process.env.DB_CONNECTION_STRING, max: 1, min: 1 });
 
-  beforeAll(async () => {
-    port = await getPort();
-    config = { listen: { port } };
-    apiUrlBase = `http://localhost:${port}/network-info`;
-    networkInfoProvider = new DbSyncNetworkInfoProvider({ cardanoNodeConfigPath, dbPollInterval }, { cache, db });
-    service = await NetworkInfoHttpService.create({ networkInfoProvider });
-    httpServer = new HttpServer(config, { services: [service] });
-    doNetworkInfoRequest = doServerRequest(apiUrlBase);
+  describe('unhealthy NetworkInfoProvider', () => {
+    beforeEach(async () => {
+      port = await getPort();
+      config = { listen: { port } };
+      networkInfoProvider = {
+        currentWalletProtocolParameters: jest.fn(),
+        genesisParameters: jest.fn(),
+        healthCheck: jest.fn(() => Promise.resolve({ ok: false })),
+        ledgerTip: jest.fn(),
+        lovelaceSupply: jest.fn(),
+        stake: jest.fn(),
+        timeSettings: jest.fn()
+      } as unknown as DbSyncNetworkInfoProvider;
+    });
+
+    it('should not throw during service create if the NetworkInfoProvider is unhealthy', async () => {
+      expect(() => NetworkInfoHttpService.create({ networkInfoProvider })).not.toThrow(
+        new ProviderError(ProviderFailure.Unhealthy)
+      );
+    });
+
+    it('throws during service initialization if the NetworkInfoProvider is unhealthy', async () => {
+      service = NetworkInfoHttpService.create({ networkInfoProvider });
+      httpServer = new HttpServer(config, { services: [service] });
+      await expect(httpServer.initialize()).rejects.toThrow(new ProviderError(ProviderFailure.Unhealthy));
+    });
   });
 
   describe('healthy state', () => {
@@ -46,13 +63,15 @@ describe('NetworkInfoHttpService', () => {
     const invalidateCacheSpy = jest.spyOn(cache, 'invalidate');
     const DB_POLL_QUERIES_COUNT = 1;
 
-    beforeEach(async () => {
-      await cache.clear();
-      dbConnectionQuerySpy.mockClear();
-      invalidateCacheSpy.mockClear();
-    });
-
     beforeAll(async () => {
+      port = await getPort();
+      config = { listen: { port } };
+      apiUrlBase = `http://localhost:${port}/network-info`;
+      networkInfoProvider = new DbSyncNetworkInfoProvider({ cardanoNodeConfigPath, dbPollInterval }, { cache, db });
+      service = NetworkInfoHttpService.create({ networkInfoProvider });
+      httpServer = new HttpServer(config, { services: [service] });
+      doNetworkInfoRequest = doServerRequest(apiUrlBase);
+
       await httpServer.initialize();
       await httpServer.start();
     });
@@ -64,8 +83,14 @@ describe('NetworkInfoHttpService', () => {
       jest.clearAllTimers();
     });
 
-    describe('init', () => {
-      it('should start epoch polling once the db provider is initialized', async () => {
+    beforeEach(async () => {
+      await cache.clear();
+      dbConnectionQuerySpy.mockClear();
+      invalidateCacheSpy.mockClear();
+    });
+
+    describe('start', () => {
+      it('should start epoch polling once the db provider is initialized and started', async () => {
         expect(cache.getVal(NetworkInfoCacheKey.CURRENT_EPOCH)).toBeUndefined();
         expect(cache.keys().length).toEqual(0);
 

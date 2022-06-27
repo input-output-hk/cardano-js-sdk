@@ -39,8 +39,8 @@ describe('TxSubmitHttpService', () => {
       };
     });
 
-    it('throws during initialization if the TxSubmitProvider is unhealthy', async () => {
-      await expect(() => TxSubmitHttpService.create({ txSubmitProvider })).rejects.toThrow(
+    it('should not throw during initialization if the TxSubmitProvider is unhealthy', async () => {
+      await expect(TxSubmitHttpService.create({ txSubmitProvider })).resolves.not.toThrow(
         new ProviderError(ProviderFailure.Unhealthy)
       );
     });

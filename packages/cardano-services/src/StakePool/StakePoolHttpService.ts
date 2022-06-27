@@ -2,6 +2,7 @@ import * as OpenApiValidator from 'express-openapi-validator';
 import { DbSyncStakePoolProvider } from './DbSyncStakePoolProvider';
 import { HttpService } from '../Http';
 import { Logger, dummyLogger } from 'ts-log';
+import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { ServiceNames } from '../Program';
 import { providerHandler } from '../util';
 import express from 'express';
@@ -20,10 +21,6 @@ export class StakePoolHttpService extends HttpService {
   ) {
     super(ServiceNames.StakePool, router, logger);
     this.#stakePoolProvider = stakePoolProvider;
-  }
-
-  async healthCheck() {
-    return this.#stakePoolProvider.healthCheck();
   }
 
   static create({ logger = dummyLogger, stakePoolProvider }: StakePoolServiceDependencies) {
@@ -53,5 +50,15 @@ export class StakePoolHttpService extends HttpService {
       )
     );
     return new StakePoolHttpService({ logger, stakePoolProvider }, router);
+  }
+
+  async initializeImpl(): Promise<void> {
+    if (!(await this.healthCheck()).ok) {
+      throw new ProviderError(ProviderFailure.Unhealthy);
+    }
+  }
+
+  async healthCheck() {
+    return this.#stakePoolProvider.healthCheck();
   }
 }

@@ -24,19 +24,8 @@ export class TxSubmitHttpService extends HttpService {
     this.#txSubmitProvider = txSubmitProvider;
   }
 
-  async close(): Promise<void> {
-    await this.#txSubmitProvider.close?.();
-  }
-
-  async healthCheck() {
-    return this.#txSubmitProvider.healthCheck();
-  }
-
   static async create({ logger = dummyLogger, txSubmitProvider }: TxSubmitHttpServiceDependencies) {
     const router = express.Router();
-    if (!(await txSubmitProvider.healthCheck()).ok) {
-      throw new ProviderError(ProviderFailure.Unhealthy);
-    }
     router.use(bodyParser.raw());
     const apiSpec = path.join(__dirname, 'openApi.json');
     router.use(
@@ -75,5 +64,19 @@ export class TxSubmitHttpService extends HttpService {
       }, logger)
     );
     return new TxSubmitHttpService({ logger, txSubmitProvider }, router);
+  }
+
+  async initializeImpl(): Promise<void> {
+    if (!(await this.healthCheck()).ok) {
+      throw new ProviderError(ProviderFailure.Unhealthy);
+    }
+  }
+
+  async shutdownImpl(): Promise<void> {
+    await this.#txSubmitProvider.close?.();
+  }
+
+  async healthCheck() {
+    return this.#txSubmitProvider.healthCheck();
   }
 }

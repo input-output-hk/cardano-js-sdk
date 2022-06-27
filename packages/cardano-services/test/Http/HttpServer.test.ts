@@ -18,6 +18,10 @@ class SomeHttpService extends HttpService {
     return Promise.resolve({ ok: true });
   }
 
+  async initializeImpl(): Promise<void> {
+    await this.healthCheck();
+  }
+
   static create(logger = dummyLogger, assertReq?: (req: express.Request) => void) {
     const router = express.Router();
     router.post('/echo', (req, res) => {

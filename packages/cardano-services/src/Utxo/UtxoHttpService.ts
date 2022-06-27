@@ -2,6 +2,7 @@ import * as OpenApiValidator from 'express-openapi-validator';
 import { DbSyncUtxoProvider } from './DbSyncUtxoProvider';
 import { HttpService } from '../Http';
 import { Logger, dummyLogger } from 'ts-log';
+import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { ServiceNames } from '../Program';
 import { providerHandler } from '../util';
 import express from 'express';
@@ -20,10 +21,6 @@ export class UtxoHttpService extends HttpService {
     this.#utxoProvider = utxoProvider;
   }
 
-  async healthCheck() {
-    return this.#utxoProvider.healthCheck();
-  }
-
   static create({ logger = dummyLogger, utxoProvider }: UtxoServiceDependencies) {
     const router = express.Router();
     const apiSpec = path.join(__dirname, 'openApi.json');
@@ -40,5 +37,15 @@ export class UtxoHttpService extends HttpService {
       providerHandler(utxoProvider.utxoByAddresses.bind(utxoProvider))(HttpService.routeHandler(logger), logger)
     );
     return new UtxoHttpService({ logger, utxoProvider }, router);
+  }
+
+  async initializeImpl(): Promise<void> {
+    if (!(await this.healthCheck()).ok) {
+      throw new ProviderError(ProviderFailure.Unhealthy);
+    }
+  }
+
+  async healthCheck() {
+    return this.#utxoProvider.healthCheck();
   }
 }

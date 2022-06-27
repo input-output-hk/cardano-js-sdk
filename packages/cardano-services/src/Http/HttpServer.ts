@@ -61,6 +61,7 @@ export class HttpServer extends RunnableModule {
       this.logger.info(`Prometheus metrics configured at ${this.#config.metrics.options?.metricsPath || '/metrics'}`);
     }
     for (const service of this.#dependencies.services) {
+      await service.initialize();
       this.app.use(`/${service.slug}`, service.router);
       this.logger.debug(`Using /${service.slug}`);
     }
@@ -81,12 +82,12 @@ export class HttpServer extends RunnableModule {
   }
 
   async startImpl(): Promise<void> {
-    this.server = await listenPromise(this.app, this.#config.listen);
     for (const service of this.#dependencies.services) await service.start();
+    this.server = await listenPromise(this.app, this.#config.listen);
   }
 
   async shutdownImpl(): Promise<void> {
-    for (const service of this.#dependencies.services) await service.close();
+    for (const service of this.#dependencies.services) await service.shutdown();
 
     return serverClosePromise(this.server);
   }

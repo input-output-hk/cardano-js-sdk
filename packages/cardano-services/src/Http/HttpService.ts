@@ -2,13 +2,15 @@ import { HealthCheckResponse, ProviderError, ProviderFailure } from '@cardano-sd
 import { HttpServer } from './HttpServer';
 import { Logger, dummyLogger } from 'ts-log';
 import { ProviderHandler } from '../util';
+import { RunnableModule } from '../RunnableModule';
 import express from 'express';
 
-export abstract class HttpService {
+export abstract class HttpService extends RunnableModule {
   public router: express.Router;
   public slug: string;
 
   protected constructor(slug: string, router: express.Router, logger = dummyLogger) {
+    super(slug, logger);
     this.router = router;
     this.slug = slug;
     const healthHandler = async (req: express.Request, res: express.Response) => {
@@ -27,14 +29,15 @@ export abstract class HttpService {
     this.router.post('/health', healthHandler);
   }
 
-  async start(): Promise<void> {
+  async startImpl(): Promise<void> {
     return Promise.resolve();
   }
 
-  async close(): Promise<void> {
+  async shutdownImpl(): Promise<void> {
     return Promise.resolve();
   }
 
+  protected abstract initializeImpl(): Promise<void>;
   protected abstract healthCheck(): Promise<HealthCheckResponse>;
 
   static routeHandler(logger: Logger): ProviderHandler {

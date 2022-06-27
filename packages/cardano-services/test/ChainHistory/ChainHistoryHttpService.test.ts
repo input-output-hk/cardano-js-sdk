@@ -2,7 +2,13 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable max-len */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Cardano, ChainHistoryProvider, TransactionsByAddressesArgs } from '@cardano-sdk/core';
+import {
+  Cardano,
+  ChainHistoryProvider,
+  ProviderError,
+  ProviderFailure,
+  TransactionsByAddressesArgs
+} from '@cardano-sdk/core';
 import { ChainHistoryHttpService, DbSyncChainHistoryProvider, HttpServer, HttpServerConfig } from '../../src';
 import { Pool } from 'pg';
 import { chainHistoryHttpProvider } from '@cardano-sdk/cardano-services-client';
@@ -35,6 +41,29 @@ describe('ChainHistoryHttpService', () => {
 
   afterEach(async () => {
     jest.resetAllMocks();
+  });
+
+  describe('unhealthy ChainHistoryProvider', () => {
+    beforeEach(async () => {
+      chainHistoryProvider = {
+        blocksByHashes: jest.fn(),
+        healthCheck: jest.fn(() => Promise.resolve({ ok: false })),
+        transactionsByAddresses: jest.fn(),
+        transactionsByHashes: jest.fn()
+      } as unknown as DbSyncChainHistoryProvider;
+    });
+
+    it('should not throw during service create if the ChainHistoryProvider is unhealthy', async () => {
+      expect(() => ChainHistoryHttpService.create({ chainHistoryProvider })).not.toThrow(
+        new ProviderError(ProviderFailure.Unhealthy)
+      );
+    });
+
+    it('throws during service initialization if the ChainHistoryProvider is unhealthy', async () => {
+      service = await ChainHistoryHttpService.create({ chainHistoryProvider });
+      httpServer = new HttpServer(config, { services: [service] });
+      await expect(httpServer.initialize()).rejects.toThrow(new ProviderError(ProviderFailure.Unhealthy));
+    });
   });
 
   describe('healthy state', () => {

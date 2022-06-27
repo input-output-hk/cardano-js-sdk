@@ -2,6 +2,8 @@
 /* eslint-disable max-len */
 import {
   Cardano,
+  ProviderError,
+  ProviderFailure,
   SortField,
   StakePoolProvider,
   StakePoolQueryOptions,
@@ -66,6 +68,28 @@ describe('StakePoolHttpService', () => {
 
   afterEach(async () => {
     jest.resetAllMocks();
+  });
+
+  describe('unhealthy StakePoolProvider', () => {
+    beforeEach(async () => {
+      stakePoolProvider = {
+        healthCheck: jest.fn(() => Promise.resolve({ ok: false })),
+        queryStakePools: jest.fn(),
+        stakePoolStats: jest.fn()
+      } as unknown as DbSyncStakePoolProvider;
+    });
+
+    it('should not throw during service create if the StakePoolProvider is unhealthy', async () => {
+      expect(() => StakePoolHttpService.create({ stakePoolProvider })).not.toThrow(
+        new ProviderError(ProviderFailure.Unhealthy)
+      );
+    });
+
+    it('throws during service initialization if the StakePoolProvider is unhealthy', async () => {
+      service = StakePoolHttpService.create({ stakePoolProvider });
+      httpServer = new HttpServer(config, { services: [service] });
+      await expect(httpServer.initialize()).rejects.toThrow(new ProviderError(ProviderFailure.Unhealthy));
+    });
   });
 
   // eslint-disable-next-line sonarjs/cognitive-complexity

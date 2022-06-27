@@ -105,20 +105,19 @@ describe('loadHttpServer', () => {
       await serverClosePromise(ogmiosServer);
     });
 
-    it('throws if any internal providers are unhealthy', async () => {
+    it('should not throw if any internal providers are unhealthy during HTTP server initialization', async () => {
       await expect(
-        async () =>
-          await loadHttpServer({
-            apiUrl,
-            options: {
-              dbConnectionString,
-              dbPollInterval,
-              dbQueriesCacheTtl,
-              ogmiosUrl: new URL(ogmiosConnection.address.webSocket)
-            },
-            serviceNames: [ServiceNames.StakePool, ServiceNames.TxSubmit]
-          })
-      ).rejects.toThrow(new ProviderError(ProviderFailure.Unhealthy));
+        loadHttpServer({
+          apiUrl,
+          options: {
+            dbConnectionString,
+            dbPollInterval,
+            dbQueriesCacheTtl,
+            ogmiosUrl: new URL(ogmiosConnection.address.webSocket)
+          },
+          serviceNames: [ServiceNames.StakePool, ServiceNames.TxSubmit]
+        })
+      ).resolves.not.toThrow(new ProviderError(ProviderFailure.Unhealthy));
     });
   });
 });

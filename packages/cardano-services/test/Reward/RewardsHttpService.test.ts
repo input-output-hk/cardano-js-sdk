@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-len */
-import { Cardano, RewardsProvider } from '@cardano-sdk/core';
+import { Cardano, ProviderError, ProviderFailure, RewardsProvider } from '@cardano-sdk/core';
 import { DbSyncRewardsProvider, HttpServer, HttpServerConfig, RewardsHttpService } from '../../src';
 import { Pool } from 'pg';
 import { getPort } from 'get-port-please';
@@ -31,6 +31,28 @@ describe('RewardsHttpService', () => {
 
   afterEach(async () => {
     jest.resetAllMocks();
+  });
+
+  describe('unhealthy RewardsProvider', () => {
+    beforeEach(async () => {
+      rewardsProvider = {
+        healthCheck: jest.fn(() => Promise.resolve({ ok: false })),
+        rewardAccountBalance: jest.fn(),
+        rewardsHistory: jest.fn()
+      } as unknown as DbSyncRewardsProvider;
+    });
+
+    it('should not throw during service create if the RewardsProvider is unhealthy', async () => {
+      expect(() => RewardsHttpService.create({ rewardsProvider })).not.toThrow(
+        new ProviderError(ProviderFailure.Unhealthy)
+      );
+    });
+
+    it('throws during service initialization if the RewardsProvider is unhealthy', async () => {
+      service = RewardsHttpService.create({ rewardsProvider });
+      httpServer = new HttpServer(config, { services: [service] });
+      await expect(httpServer.initialize()).rejects.toThrow(new ProviderError(ProviderFailure.Unhealthy));
+    });
   });
 
   describe('healthy state', () => {

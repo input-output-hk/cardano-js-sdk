@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { Cardano, UtxoProvider } from '@cardano-sdk/core';
+import { Cardano, ProviderError, ProviderFailure, UtxoProvider } from '@cardano-sdk/core';
 import { DbSyncUtxoProvider, HttpServer, HttpServerConfig, UtxoHttpService } from '../../src';
 import { Pool } from 'pg';
 import { getPort } from 'get-port-please';
@@ -32,6 +32,25 @@ describe('UtxoHttpService', () => {
 
   afterEach(async () => {
     jest.resetAllMocks();
+  });
+
+  describe('unhealthy UtxoProvider', () => {
+    beforeEach(async () => {
+      utxoProvider = {
+        healthCheck: jest.fn(() => Promise.resolve({ ok: false })),
+        utxoByAddresses: jest.fn()
+      } as unknown as DbSyncUtxoProvider;
+    });
+
+    it('should not throw during service create if the UtxoProvider is unhealthy', async () => {
+      expect(() => UtxoHttpService.create({ utxoProvider })).not.toThrow(new ProviderError(ProviderFailure.Unhealthy));
+    });
+
+    it('throws during service initialization if the UtxoProvider is unhealthy', async () => {
+      service = UtxoHttpService.create({ utxoProvider });
+      httpServer = new HttpServer(config, { services: [service] });
+      await expect(httpServer.initialize()).rejects.toThrow(new ProviderError(ProviderFailure.Unhealthy));
+    });
   });
 
   describe('healthy state', () => {
