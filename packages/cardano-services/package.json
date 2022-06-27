@@ -47,6 +47,10 @@
     "tscNoEmit": "shx echo typescript --noEmit command not implemented yet"
   },
   "devDependencies": {
+    "@babel/preset-typescript": "^7.17.12",
+    "babel-loader": "^8.2.5",
+    "webpack": "^5.72.1",
+    "webpack-node-externals": "^3.0.0",
     "@cardano-sdk/cardano-services-client": "0.3.0",
     "@cardano-sdk/util-dev": "0.3.0",
     "@cardano-sdk/wallet": "0.3.0",
