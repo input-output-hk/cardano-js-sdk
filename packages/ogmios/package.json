@@ -39,7 +39,7 @@
     "ws": "^8.5.0"
   },
   "dependencies": {
-    "@cardano-ogmios/client": "5.1.0"
+    "@cardano-ogmios/client": "5.4.0"
   },
   "files": [
     "dist/*",

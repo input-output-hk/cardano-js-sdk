@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Cardano from '.';
+import * as Ogmios from '@cardano-ogmios/schema';
 import { AuxiliaryData } from './AuxiliaryData';
-import { BlockBodyAlonzo } from '@cardano-ogmios/schema';
 import { Ed25519PublicKey } from './Key';
 import { Hash32ByteBase16, HexBlob, OpaqueString, typedHex } from '../util';
 import { PartialBlockHeader } from './Block';
@@ -82,7 +82,7 @@ export interface Redeemer {
 
 export type Signatures = Map<Ed25519PublicKey, Ed25519Signature>;
 
-export type Witness = Omit<Partial<BlockBodyAlonzo['witness']>, 'redeemers' | 'signatures'> & {
+export type Witness = Omit<Partial<Ogmios.TxAlonzo['witness']>, 'redeemers' | 'signatures'> & {
   redeemers?: Redeemer[];
   signatures: Signatures;
 };
