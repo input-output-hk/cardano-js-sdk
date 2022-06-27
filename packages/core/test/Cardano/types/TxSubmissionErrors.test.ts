@@ -2,7 +2,7 @@ import { Cardano } from '../../../src';
 import { TxSubmission } from '@cardano-ogmios/client';
 import { TxSubmissionErrors } from '../../../src/Cardano';
 
-describe('Cardano/types/TxSuubmissionErrors', () => {
+describe('Cardano/types/TxSubmissionErrors', () => {
   test('TxSubmissionError can be narrowed down with "instanceof"', () => {
     const error: Cardano.TxSubmissionError = new Cardano.TxSubmissionErrors.FeeTooSmallError({
       feeTooSmall: { actualFee: 50n, requiredFee: 51n }
