@@ -7,11 +7,11 @@ import { distinct, from, map, mergeMap, of, scan, tap } from 'rxjs';
 
 export const createAssetService =
   (assetProvider: TrackedAssetProvider, retryBackoffConfig: RetryBackoffConfig) => (assetId: Cardano.AssetId) =>
-    coldObservableProvider(
-      () => assetProvider.getAsset(assetId, { history: false, nftMetadata: true, tokenMetadata: true }),
+    coldObservableProvider({
+      provider: () => assetProvider.getAsset(assetId, { history: false, nftMetadata: true, tokenMetadata: true }),
       retryBackoffConfig,
-      of(true) // fetch only once
-    );
+      trigger$: of(true) // fetch only once
+    });
 export type AssetService = ReturnType<typeof createAssetService>;
 
 export interface AssetsTrackerProps {

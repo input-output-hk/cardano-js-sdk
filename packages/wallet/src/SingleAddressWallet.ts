@@ -198,7 +198,10 @@ export class SingleAddressWallet implements ObservableWallet {
       equals: tipEquals,
       maxPollInterval: maxInterval,
       pollInterval,
-      provider$: coldObservableProvider(this.networkInfoProvider.ledgerTip, retryBackoffConfig),
+      provider$: coldObservableProvider({
+        provider: this.networkInfoProvider.ledgerTip,
+        retryBackoffConfig
+      }),
       store: stores.tip,
       trigger$: this.syncStatus.isSettled$.pipe(filter((isSettled) => isSettled))
     });
@@ -208,33 +211,53 @@ export class SingleAddressWallet implements ObservableWallet {
       // so we should replace the trigger from tipBlockHeight$ to epoch$.
       // This is a little complicated since there is a circular dependency.
       // Some logic is needed to initiate a fetch if epoch is not available in store already.
-      coldObservableProvider(this.networkInfoProvider.timeSettings, retryBackoffConfig, tipBlockHeight$, deepEquals),
+      coldObservableProvider({
+        equals: deepEquals,
+        provider: this.networkInfoProvider.timeSettings,
+        retryBackoffConfig,
+        trigger$: tipBlockHeight$
+      }),
       stores.timeSettings
     );
     this.currentEpoch$ = currentEpochTracker(this.tip$, this.timeSettings$);
     const epoch$ = this.currentEpoch$.pipe(map((epoch) => epoch.epochNo));
 
     this.stake$ = new PersistentDocumentTrackerSubject(
-      coldObservableProvider(this.networkInfoProvider.stake, retryBackoffConfig, epoch$, isEqual),
+      coldObservableProvider({
+        equals: isEqual,
+        provider: this.networkInfoProvider.stake,
+        retryBackoffConfig,
+        trigger$: epoch$
+      }),
       stores.stake
     );
 
     this.lovelaceSupply$ = new PersistentDocumentTrackerSubject(
-      coldObservableProvider(this.networkInfoProvider.lovelaceSupply, retryBackoffConfig, epoch$, isEqual),
+      coldObservableProvider({
+        equals: isEqual,
+        provider: this.networkInfoProvider.lovelaceSupply,
+        retryBackoffConfig,
+        trigger$: epoch$
+      }),
       stores.lovelaceSupply
     );
 
     this.protocolParameters$ = new PersistentDocumentTrackerSubject(
-      coldObservableProvider(
-        this.networkInfoProvider.currentWalletProtocolParameters,
+      coldObservableProvider({
+        equals: isEqual,
+        provider: this.networkInfoProvider.currentWalletProtocolParameters,
         retryBackoffConfig,
-        epoch$,
-        isEqual
-      ),
+        trigger$: epoch$
+      }),
       stores.protocolParameters
     );
     this.genesisParameters$ = new PersistentDocumentTrackerSubject(
-      coldObservableProvider(this.networkInfoProvider.genesisParameters, retryBackoffConfig, epoch$, isEqual),
+      coldObservableProvider({
+        equals: isEqual,
+        provider: this.networkInfoProvider.genesisParameters,
+        retryBackoffConfig,
+        trigger$: epoch$
+      }),
       stores.genesisParameters
     );
 

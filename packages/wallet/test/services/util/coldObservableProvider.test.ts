@@ -11,7 +11,7 @@ describe('coldObservableProvider', () => {
   it('returns an observable that calls underlying provider on each subscription and uses retryBackoff', async () => {
     const underlyingProvider = jest.fn().mockResolvedValue(true);
     const backoffConfig: RetryBackoffConfig = { initialInterval: 1 };
-    const provider$ = coldObservableProvider(underlyingProvider, backoffConfig);
+    const provider$ = coldObservableProvider({ provider: underlyingProvider, retryBackoffConfig: backoffConfig });
     expect(await firstValueFrom(provider$)).toBe(true);
     expect(await firstValueFrom(provider$)).toBe(true);
     expect(underlyingProvider).toBeCalledTimes(2);
