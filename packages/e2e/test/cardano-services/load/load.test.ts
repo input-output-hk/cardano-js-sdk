@@ -68,7 +68,9 @@ const getWallet = async () =>
 
 const runCli = (args: string[], startedString: string) =>
   new Promise<ChildProcess>((resolve, reject) => {
-    const proc = fork(path.join(__dirname, '..', '..', 'dist', 'cjs', 'cli.js'), args, { stdio: 'pipe' });
+    const proc = fork(path.join(__dirname, '..', '..', '..', '..', 'cardano-services', 'dist', 'cjs', 'cli.js'), args, {
+      stdio: 'pipe'
+    });
 
     const logChunk = (method: typeof logger.info, chunk: string) => {
       for (const line of chunk.split('\n')) {

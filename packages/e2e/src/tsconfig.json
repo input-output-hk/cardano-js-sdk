@@ -13,6 +13,9 @@
     },
     {
       "path": "../../wallet/src"
+    },
+    {
+      "path": "../../cardano-services/src"
     }
   ]
 }
