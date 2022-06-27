@@ -4,7 +4,10 @@
     "description": "End to end tests for the cardano-js-sdk packages.",
     "main": "index.js",
     "scripts": {
-        "test": "jest -c ./jest.config.js --runInBand --verbose",
+        "test:blockfrost": "jest -c jest.config.js --selectProjects blockfrost --runInBand --verbose",
+        "test:wallet": "jest -c jest.config.js --selectProjects wallet --runInBand --verbose",
+        "test:faucet": "jest -c jest.config.js --selectProjects faucet --runInBand --verbose",
+        "test:cardano-services": "jest -c jest.config.js --selectProjects cardano-services --runInBand --verbose",
         "private-network:up": "CARDANO_DB_SYNC_VERSION=13.0.0-rc3 DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 OGMIOS_PORT=1338 NETWORK=testnet docker-compose -p private-testnet-e2e up",
         "private-network:down": "CARDANO_DB_SYNC_VERSION=13.0.0-rc3 DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 OGMIOS_PORT=1338 NETWORK=testnet docker-compose -p private-testnet-e2e down -v --remove-orphans",
         "build:esm": "tsc -p src/tsconfig.json --outDir ./dist/esm --module es2020",
@@ -30,6 +33,7 @@
     "license": "Apache-2.0",
     "dependencies": {
         "@cardano-foundation/ledgerjs-hw-app-cardano": "5.0.0",
+        "@cardano-sdk/cardano-services": "0.3.0",
         "@cardano-sdk/core": "0.3.0",
         "@cardano-sdk/util": "0.3.0",
         "@cardano-sdk/util-dev": "0.3.0",
@@ -38,6 +42,7 @@
         "cardano-wallet-js": "^1.4.0",
         "dotenv": "^16.0.1",
         "envalid": "^7.3.1",
+        "optionator": "^0.9.1",
         "ts-log": "^2.2.4",
         "ts-stopwatch": "0.0.4"
     },

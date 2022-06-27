@@ -42,18 +42,23 @@ export const env = envalid.cleanEnv(process.env, {
   LOGGER_MIN_SEVERITY: envalid.str({ choices: loggerMethodNames as string[], default: 'info' }),
   NETWORK_INFO_PROVIDER: envalid.str(),
   NETWORK_INFO_PROVIDER_PARAMS: envalid.json(),
+  OGMIOS_URL: envalid.str(),
   POOL_ID_1: envalid.str(),
   POOL_ID_2: envalid.str(),
   REWARDS_PROVIDER: envalid.str(),
   REWARDS_PROVIDER_PARAMS: envalid.json(),
   STAKE_POOL_PROVIDER: envalid.str(),
   STAKE_POOL_PROVIDER_PARAMS: envalid.json(),
+  START_LOCAL_HTTP_SERVER: envalid.bool(),
+  TRANSACTIONS_NUMBER: envalid.num(),
+  TX_SUBMIT_HTTP_URL: envalid.str(),
   TX_SUBMIT_PROVIDER: envalid.str(),
   TX_SUBMIT_PROVIDER_PARAMS: envalid.json(),
   UTXO_PROVIDER: envalid.str(),
   UTXO_PROVIDER_PARAMS: envalid.json(),
   WALLET_PROVIDER: envalid.str(),
-  WALLET_PROVIDER_PARAMS: envalid.json()
+  WALLET_PROVIDER_PARAMS: envalid.json(),
+  WORKER_PARALLEL_TRANSACTION: envalid.num()
 });
 
 // Logger
