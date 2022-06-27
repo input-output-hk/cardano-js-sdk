@@ -12,6 +12,9 @@
   },
   "references": [
     {
+      "path": "../../src"
+    },
+    {
       "path": "../../../web-extension/src"
     },
     {

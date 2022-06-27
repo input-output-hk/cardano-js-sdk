@@ -32,7 +32,7 @@ const loggerMethodNames = ['debug', 'error', 'fatal', 'info', 'trace', 'warn'] a
 
 export const env = envalid.cleanEnv(process.env, {
   ASSET_PROVIDER: envalid.str(),
-  ASSET_PROVIDER_PPARAMS: envalid.json(),
+  ASSET_PROVIDER_PARAMS: envalid.json(),
   CHAIN_HISTORY_PROVIDER: envalid.str(),
   CHAIN_HISTORY_PROVIDER_PARAMS: envalid.json(),
   FAUCET_PROVIDER: envalid.str(),
@@ -87,7 +87,7 @@ export const keyAgent: Promise<KeyManagement.AsyncKeyAgent> = (() => keyAgentByI
 
 export const assetProvider: Promise<AssetProvider> = assetProviderFactory.create(
   env.ASSET_PROVIDER,
-  env.ASSET_PROVIDER_PPARAMS
+  env.ASSET_PROVIDER_PARAMS
 );
 
 export const chainHistoryProvider: Promise<ChainHistoryProvider> = chainHistoryProviderFactory.create(
