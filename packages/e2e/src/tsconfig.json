@@ -6,10 +6,13 @@
   },
   "references": [
     {
-      "path": "../../core/src"
+      "path": "../../util-dev/src"
     },
     {
       "path": "../../util/src"
+    },
+    {
+      "path": "../../wallet/src"
     }
   ]
 }

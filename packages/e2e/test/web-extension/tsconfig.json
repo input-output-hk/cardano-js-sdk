@@ -1,0 +1,29 @@
+{
+  "extends": "../../../tsconfig.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "baseUrl": "./extension",
+    "types": [
+      "node",
+      "webdriverio/async",
+      "@wdio/mocha-framework",
+      "expect-webdriverio"
+    ]
+  },
+  "references": [
+    {
+      "path": "../../../web-extension/src"
+    },
+    {
+      "path": "../../../core/src"
+    },
+    {
+      "path": "../../../cip30/src"
+    },
+    {
+      "path": "../../../wallet/src"
+    }
+  ]
+}
+
+

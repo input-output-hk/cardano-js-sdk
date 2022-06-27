@@ -1,0 +1,44 @@
+{
+  "name": "test",
+  "description": "For @cardano-sdk/web-extension e2e tests",
+  "version": "1.0",
+  "manifest_version": 3,
+  "permissions": [
+    "storage",
+    "tabs",
+    "unlimitedStorage"
+  ],
+  "content_security_policy": {
+    "extension_pages": "default-src 'self' http://localhost:3000; script-src 'self'; object-src 'self'; connect-src data: http://localhost:8080 https://cardano-testnet.blockfrost.io https://api.coingecko.com http://localhost:3000 ws://localhost:3000 wss://localhost:3000; style-src * 'unsafe-inline'; img-src * data:; font-src https://fonts.gstatic.com;"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "injectedScript.js"
+      ],
+      "matches": [
+        "http://*/*",
+        "https://*/*",
+        "<all_urls>"
+      ]
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "run_at": "document_idle",
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+        "contentScript.js"
+      ]
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  }
+}

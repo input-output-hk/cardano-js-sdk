@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Wallet UI</title>
+</head>
+
+<body>
+  <h1>Wallet</h1>
+  <div id="requestAccess" style="display: none;">
+    <span id="requestAccessOrigin"></span> requests access
+    <button id="requestAccessGrant">Grant</button>
+    <button id="requestAccessDeny">Deny</button>
+  </div>
+  <h2>ADA price</h2>
+  <div id="adaPrice">Loading...</div>
+  <button id="createLedgerKeyAgent">Create LedgerKeyAgent</button>
+  <button id="clearAllowList">Clear allow list</button>
+  <div>Address: <span id="address">-</span></div>
+  <div>Balance: <span id="balance">-</span></div>
+  <script src="ui.js"></script>
+</body>
+
+</html>
