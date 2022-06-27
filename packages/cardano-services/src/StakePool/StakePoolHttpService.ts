@@ -13,12 +13,17 @@ export interface StakePoolServiceDependencies {
 }
 
 export class StakePoolHttpService extends HttpService {
-  private constructor({ logger = dummyLogger }: StakePoolServiceDependencies, router: express.Router) {
+  #stakePoolProvider: DbSyncStakePoolProvider;
+  private constructor(
+    { logger = dummyLogger, stakePoolProvider }: StakePoolServiceDependencies,
+    router: express.Router
+  ) {
     super(ServiceNames.StakePool, router, logger);
+    this.#stakePoolProvider = stakePoolProvider;
   }
 
   async healthCheck() {
-    return Promise.resolve({ ok: true });
+    return this.#stakePoolProvider.healthCheck();
   }
 
   static create({ logger = dummyLogger, stakePoolProvider }: StakePoolServiceDependencies) {
