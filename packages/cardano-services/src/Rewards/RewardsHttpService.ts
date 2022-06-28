@@ -2,7 +2,6 @@ import * as OpenApiValidator from 'express-openapi-validator';
 import { DbSyncRewardsProvider } from './DbSyncRewardProvider/DbSyncRewards';
 import { HttpService } from '../Http';
 import { Logger, dummyLogger } from 'ts-log';
-import { ProviderError, ProviderFailure, RewardsProvider } from '@cardano-sdk/core';
 import { ServiceNames } from '../Program';
 import { providerHandler } from '../util';
 import express from 'express';
@@ -14,14 +13,12 @@ export interface RewardServiceDependencies {
 }
 
 export class RewardsHttpService extends HttpService {
-  #rewardsProvider: RewardsProvider;
-  private constructor({ logger = dummyLogger, rewardsProvider }: RewardServiceDependencies, router: express.Router) {
-    super(ServiceNames.Rewards, router, logger);
-    this.#rewardsProvider = rewardsProvider;
-  }
+  constructor(
+    { logger = dummyLogger, rewardsProvider }: RewardServiceDependencies,
+    router: express.Router = express.Router()
+  ) {
+    super(ServiceNames.Rewards, rewardsProvider, router, logger);
 
-  static create({ logger = dummyLogger, rewardsProvider }: RewardServiceDependencies) {
-    const router = express.Router();
     const apiSpec = path.join(__dirname, 'openApi.json');
     router.use(
       OpenApiValidator.middleware({
@@ -42,16 +39,5 @@ export class RewardsHttpService extends HttpService {
       '/history',
       providerHandler(rewardsProvider.rewardsHistory.bind(rewardsProvider))(HttpService.routeHandler(logger), logger)
     );
-    return new RewardsHttpService({ logger, rewardsProvider }, router);
-  }
-
-  async initializeImpl(): Promise<void> {
-    if (!(await this.healthCheck()).ok) {
-      throw new ProviderError(ProviderFailure.Unhealthy);
-    }
-  }
-
-  async healthCheck() {
-    return this.#rewardsProvider.healthCheck();
   }
 }

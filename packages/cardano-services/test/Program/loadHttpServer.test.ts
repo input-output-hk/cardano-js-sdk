@@ -45,8 +45,8 @@ describe('loadHttpServer', () => {
       await serverClosePromise(ogmiosServer);
     });
 
-    it('loads the nominated HTTP services and server if required program arguments are set', async () => {
-      httpServer = await loadHttpServer({
+    it('loads the nominated HTTP services and server if required program arguments are set', () => {
+      httpServer = loadHttpServer({
         apiUrl,
         options: {
           cardanoNodeConfigPath,
@@ -67,30 +67,28 @@ describe('loadHttpServer', () => {
       expect(httpServer).toBeInstanceOf(HttpServer);
     });
 
-    it('throws if postgres-dependent service is nominated without providing the connection string', async () => {
-      await expect(
-        async () =>
-          await loadHttpServer({
-            apiUrl,
-            serviceNames: [
-              ServiceNames.StakePool,
-              ServiceNames.Utxo,
-              ServiceNames.ChainHistory,
-              ServiceNames.Rewards,
-              ServiceNames.NetworkInfo
-            ]
-          })
-      ).rejects.toThrow(MissingProgramOption);
+    it('throws if postgres-dependent service is nominated without providing the connection string', () => {
+      expect(() =>
+        loadHttpServer({
+          apiUrl,
+          serviceNames: [
+            ServiceNames.StakePool,
+            ServiceNames.Utxo,
+            ServiceNames.ChainHistory,
+            ServiceNames.Rewards,
+            ServiceNames.NetworkInfo
+          ]
+        })
+      ).toThrow(MissingProgramOption);
     });
 
-    it('throws if genesis-config dependent service is nominated without providing the node config path', async () => {
-      await expect(
-        async () =>
-          await loadHttpServer({
-            apiUrl,
-            serviceNames: [ServiceNames.NetworkInfo]
-          })
-      ).rejects.toThrow(MissingProgramOption);
+    it('throws if genesis-config dependent service is nominated without providing the node config path', () => {
+      expect(() =>
+        loadHttpServer({
+          apiUrl,
+          serviceNames: [ServiceNames.NetworkInfo]
+        })
+      ).toThrow(MissingProgramOption);
     });
   });
 
@@ -105,8 +103,8 @@ describe('loadHttpServer', () => {
       await serverClosePromise(ogmiosServer);
     });
 
-    it('should not throw if any internal providers are unhealthy during HTTP server initialization', async () => {
-      await expect(
+    it('should not throw if any internal providers are unhealthy during HTTP server initialization', () => {
+      expect(() =>
         loadHttpServer({
           apiUrl,
           options: {
@@ -117,7 +115,7 @@ describe('loadHttpServer', () => {
           },
           serviceNames: [ServiceNames.StakePool, ServiceNames.TxSubmit]
         })
-      ).resolves.not.toThrow(new ProviderError(ProviderFailure.Unhealthy));
+      ).not.toThrow(new ProviderError(ProviderFailure.Unhealthy));
     });
   });
 });

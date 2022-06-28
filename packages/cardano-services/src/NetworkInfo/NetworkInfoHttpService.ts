@@ -2,7 +2,6 @@ import * as OpenApiValidator from 'express-openapi-validator';
 import { DbSyncNetworkInfoProvider } from './DbSyncNetworkInfoProvider';
 import { HttpService } from '../Http';
 import { Logger, dummyLogger } from 'ts-log';
-import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { ServiceNames } from '../Program';
 import { providerHandler } from '../util';
 import express from 'express';
@@ -14,18 +13,11 @@ export interface NetworkInfoServiceDependencies {
 }
 
 export class NetworkInfoHttpService extends HttpService {
-  #networkInfoProvider: DbSyncNetworkInfoProvider;
-
-  private constructor(
+  constructor(
     { networkInfoProvider, logger = dummyLogger }: NetworkInfoServiceDependencies,
-    router: express.Router
+    router: express.Router = express.Router()
   ) {
-    super(ServiceNames.NetworkInfo, router, logger);
-    this.#networkInfoProvider = networkInfoProvider;
-  }
-
-  static create({ logger = dummyLogger, networkInfoProvider }: NetworkInfoServiceDependencies) {
-    const router = express.Router();
+    super(ServiceNames.NetworkInfo, networkInfoProvider, router, logger);
 
     const apiSpec = path.join(__dirname, 'openApi.json');
     router.use(
@@ -73,25 +65,5 @@ export class NetworkInfoHttpService extends HttpService {
         logger
       )
     );
-
-    return new NetworkInfoHttpService({ logger, networkInfoProvider }, router);
-  }
-
-  async healthCheck() {
-    return this.#networkInfoProvider.healthCheck();
-  }
-
-  async initializeImpl(): Promise<void> {
-    if (!(await this.healthCheck()).ok) {
-      throw new ProviderError(ProviderFailure.Unhealthy);
-    }
-  }
-
-  async startImpl(): Promise<void> {
-    await this.#networkInfoProvider.start();
-  }
-
-  async shutdownImpl(): Promise<void> {
-    await this.#networkInfoProvider.close();
   }
 }

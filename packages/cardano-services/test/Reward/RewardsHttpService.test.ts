@@ -42,14 +42,14 @@ describe('RewardsHttpService', () => {
       } as unknown as DbSyncRewardsProvider;
     });
 
-    it('should not throw during service create if the RewardsProvider is unhealthy', async () => {
-      expect(() => RewardsHttpService.create({ rewardsProvider })).not.toThrow(
+    it('should not throw during service create if the RewardsProvider is unhealthy', () => {
+      expect(() => new RewardsHttpService({ rewardsProvider })).not.toThrow(
         new ProviderError(ProviderFailure.Unhealthy)
       );
     });
 
     it('throws during service initialization if the RewardsProvider is unhealthy', async () => {
-      service = RewardsHttpService.create({ rewardsProvider });
+      service = new RewardsHttpService({ rewardsProvider });
       httpServer = new HttpServer(config, { services: [service] });
       await expect(httpServer.initialize()).rejects.toThrow(new ProviderError(ProviderFailure.Unhealthy));
     });
@@ -58,7 +58,7 @@ describe('RewardsHttpService', () => {
   describe('healthy state', () => {
     beforeAll(async () => {
       rewardsProvider = new DbSyncRewardsProvider(dbConnection);
-      service = RewardsHttpService.create({ rewardsProvider });
+      service = new RewardsHttpService({ rewardsProvider });
       httpServer = new HttpServer(config, { services: [service] });
       await httpServer.initialize();
       await httpServer.start();

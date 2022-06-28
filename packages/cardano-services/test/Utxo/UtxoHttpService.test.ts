@@ -42,12 +42,12 @@ describe('UtxoHttpService', () => {
       } as unknown as DbSyncUtxoProvider;
     });
 
-    it('should not throw during service create if the UtxoProvider is unhealthy', async () => {
-      expect(() => UtxoHttpService.create({ utxoProvider })).not.toThrow(new ProviderError(ProviderFailure.Unhealthy));
+    it('should not throw during service create if the UtxoProvider is unhealthy', () => {
+      expect(() => new UtxoHttpService({ utxoProvider })).not.toThrow(new ProviderError(ProviderFailure.Unhealthy));
     });
 
     it('throws during service initialization if the UtxoProvider is unhealthy', async () => {
-      service = UtxoHttpService.create({ utxoProvider });
+      service = new UtxoHttpService({ utxoProvider });
       httpServer = new HttpServer(config, { services: [service] });
       await expect(httpServer.initialize()).rejects.toThrow(new ProviderError(ProviderFailure.Unhealthy));
     });
@@ -56,7 +56,7 @@ describe('UtxoHttpService', () => {
   describe('healthy state', () => {
     beforeAll(async () => {
       utxoProvider = new DbSyncUtxoProvider(dbConnection);
-      service = UtxoHttpService.create({ utxoProvider });
+      service = new UtxoHttpService({ utxoProvider });
       httpServer = new HttpServer(config, { services: [service] });
       provider = utxoHttpProvider(apiUrlBase);
       await httpServer.initialize();

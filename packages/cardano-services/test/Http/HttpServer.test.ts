@@ -1,4 +1,6 @@
-import { APPLICATION_JSON, CONTENT_TYPE, HttpServer, HttpService, RunnableModule } from '../../src';
+import { APPLICATION_JSON, CONTENT_TYPE, DbSyncUtxoProvider, HttpServer, HttpService, RunnableModule } from '../../src';
+import { Pool } from 'pg';
+import { Provider } from '@cardano-sdk/core';
 import { dummyLogger } from 'ts-log';
 import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
 import { getRandomPort } from 'get-port-please';
@@ -10,8 +12,19 @@ import waitOn from 'wait-on';
 const onHttpServer = (url: string) => waitOn({ resources: [url], validateStatus: (statusCode) => statusCode === 404 });
 
 class SomeHttpService extends HttpService {
-  private constructor(router: express.Router, logger = dummyLogger) {
-    super('some-http-service', router, logger);
+  constructor(
+    provider: Provider,
+    logger = dummyLogger,
+    router: express.Router = express.Router(),
+    assertReq?: (req: express.Request) => void
+  ) {
+    super('some-http-service', provider, router, logger);
+
+    router.post('/echo', (req, res) => {
+      logger.debug(req.body);
+      assertReq!(req);
+      HttpServer.sendJSON(res, req.body);
+    });
   }
 
   async healthCheck() {
@@ -21,37 +34,33 @@ class SomeHttpService extends HttpService {
   async initializeImpl(): Promise<void> {
     await this.healthCheck();
   }
-
-  static create(logger = dummyLogger, assertReq?: (req: express.Request) => void) {
-    const router = express.Router();
-    router.post('/echo', (req, res) => {
-      logger.debug(req.body);
-      assertReq!(req);
-      HttpServer.sendJSON(res, req.body);
-    });
-    return new SomeHttpService(router, logger);
-  }
 }
 
 describe('HttpServer', () => {
   let httpServer: HttpServer;
   let port: number;
   let apiUrlBase: string;
+  let provider: Provider;
+  const db = new Pool({ connectionString: process.env.DB_CONNECTION_STRING });
 
   it('Is a runnable module', async () => {
     port = await getRandomPort();
-    httpServer = new HttpServer({ listen: { host: 'localhost', port } }, { services: [SomeHttpService.create()] });
+    httpServer = new HttpServer({ listen: { host: 'localhost', port } }, { services: [new SomeHttpService(provider)] });
     expect(httpServer).toBeInstanceOf(RunnableModule);
   });
 
   beforeEach(async () => {
     port = await getRandomPort();
     apiUrlBase = `http://localhost:${port}`;
+    provider = new DbSyncUtxoProvider(db);
   });
 
   describe('initialize', () => {
     it('initializes the express application', async () => {
-      httpServer = new HttpServer({ listen: { host: 'localhost', port } }, { services: [SomeHttpService.create()] });
+      httpServer = new HttpServer(
+        { listen: { host: 'localhost', port } },
+        { services: [new SomeHttpService(provider)] }
+      );
       expect(httpServer.app).not.toBeDefined();
       await httpServer.initialize();
       expect(httpServer.app).toBeDefined();
@@ -63,7 +72,9 @@ describe('HttpServer', () => {
         { listen: { host: 'localhost', port } },
         {
           services: [
-            SomeHttpService.create(dummyLogger, (req: express.Request) => expect(req.body).toEqual(expectedBody))
+            new SomeHttpService(provider, dummyLogger, express.Router(), (req: express.Request) =>
+              expect(req.body).toEqual(expectedBody)
+            )
           ]
         }
       );
@@ -96,7 +107,10 @@ describe('HttpServer', () => {
 
   describe('start', () => {
     beforeEach(async () => {
-      httpServer = new HttpServer({ listen: { host: 'localhost', port } }, { services: [SomeHttpService.create()] });
+      httpServer = new HttpServer(
+        { listen: { host: 'localhost', port } },
+        { services: [new SomeHttpService(provider)] }
+      );
       await httpServer.initialize();
     });
 
@@ -118,7 +132,10 @@ describe('HttpServer', () => {
 
   describe('shutdown', () => {
     beforeEach(async () => {
-      httpServer = new HttpServer({ listen: { host: 'localhost', port } }, { services: [SomeHttpService.create()] });
+      httpServer = new HttpServer(
+        { listen: { host: 'localhost', port } },
+        { services: [new SomeHttpService(provider)] }
+      );
       await httpServer.initialize();
       await httpServer.start();
     });
@@ -136,7 +153,10 @@ describe('HttpServer', () => {
   describe('restarting', () => {
     // eslint-disable-next-line sonarjs/no-identical-functions
     beforeEach(async () => {
-      httpServer = new HttpServer({ listen: { host: 'localhost', port } }, { services: [SomeHttpService.create()] });
+      httpServer = new HttpServer(
+        { listen: { host: 'localhost', port } },
+        { services: [new SomeHttpService(provider)] }
+      );
       await httpServer.initialize();
       await httpServer.start();
     });
@@ -158,7 +178,10 @@ describe('HttpServer', () => {
     });
 
     it('is disabled by default', async () => {
-      httpServer = new HttpServer({ listen: { host: 'localhost', port } }, { services: [SomeHttpService.create()] });
+      httpServer = new HttpServer(
+        { listen: { host: 'localhost', port } },
+        { services: [new SomeHttpService(provider)] }
+      );
       await httpServer.initialize();
       await httpServer.start();
       await onHttpServer(apiUrlBase);
@@ -172,7 +195,7 @@ describe('HttpServer', () => {
     it('can expose Prometheus metrics, at /metrics by default', async () => {
       httpServer = new HttpServer(
         { listen: { host: 'localhost', port }, metrics: { enabled: true } },
-        { services: [SomeHttpService.create()] }
+        { services: [new SomeHttpService(provider)] }
       );
       await httpServer.initialize();
       await httpServer.start();
@@ -188,7 +211,7 @@ describe('HttpServer', () => {
       const metricsPath = '/metrics-custom';
       httpServer = new HttpServer(
         { listen: { port }, metrics: { enabled: true, options: { metricsPath } } },
-        { services: [SomeHttpService.create()] }
+        { services: [new SomeHttpService(provider)] }
       );
       await httpServer.initialize();
       await httpServer.start();
@@ -203,7 +226,10 @@ describe('HttpServer', () => {
 
   describe('HTTP API', () => {
     beforeEach(async () => {
-      httpServer = new HttpServer({ listen: { host: 'localhost', port } }, { services: [SomeHttpService.create()] });
+      httpServer = new HttpServer(
+        { listen: { host: 'localhost', port } },
+        { services: [new SomeHttpService(provider)] }
+      );
       await httpServer.initialize();
       await httpServer.start();
       await onHttpServer(apiUrlBase);

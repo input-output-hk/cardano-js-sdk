@@ -39,8 +39,8 @@ describe('TxSubmitHttpService', () => {
       };
     });
 
-    it('should not throw during initialization if the TxSubmitProvider is unhealthy', async () => {
-      await expect(TxSubmitHttpService.create({ txSubmitProvider })).resolves.not.toThrow(
+    it('should not throw during initialization if the TxSubmitProvider is unhealthy', () => {
+      expect(() => new TxSubmitHttpService({ txSubmitProvider })).not.toThrow(
         new ProviderError(ProviderFailure.Unhealthy)
       );
     });
@@ -59,7 +59,9 @@ describe('TxSubmitHttpService', () => {
     beforeAll(async () => {
       isOk = () => true;
       txSubmitProvider = { healthCheck: jest.fn(() => Promise.resolve({ ok: isOk() })), submitTx: jest.fn() };
-      httpServer = new HttpServer(config, { services: [await TxSubmitHttpService.create({ txSubmitProvider })] });
+      httpServer = new HttpServer(config, {
+        services: [new TxSubmitHttpService({ txSubmitProvider })]
+      });
       await httpServer.initialize();
       await httpServer.start();
       expect(await serverHealth()).toEqual({ ok: true });
@@ -93,7 +95,9 @@ describe('TxSubmitHttpService', () => {
   describe('healthy and successful submission', () => {
     beforeAll(async () => {
       txSubmitProvider = { healthCheck: jest.fn(() => Promise.resolve({ ok: true })), submitTx: jest.fn() };
-      httpServer = new HttpServer(config, { services: [await TxSubmitHttpService.create({ txSubmitProvider })] });
+      httpServer = new HttpServer(config, {
+        services: [new TxSubmitHttpService({ txSubmitProvider })]
+      });
       await httpServer.initialize();
       await httpServer.start();
     });
@@ -162,7 +166,9 @@ describe('TxSubmitHttpService', () => {
           healthCheck: jest.fn(() => Promise.resolve({ ok: true })),
           submitTx: jest.fn(() => Promise.reject(stubErrors))
         };
-        httpServer = new HttpServer(config, { services: [await TxSubmitHttpService.create({ txSubmitProvider })] });
+        httpServer = new HttpServer(config, {
+          services: [new TxSubmitHttpService({ txSubmitProvider })]
+        });
         await httpServer.initialize();
         await httpServer.start();
       });
