@@ -53,7 +53,7 @@ export const ogmiosTxSubmitProvider = (
       );
       const txSubmissionClient = await createTxSubmissionClient(interactionContext);
       const txHex = Buffer.from(signedTransaction).toString('hex');
-      return await txSubmissionClient.submitTx(txHex);
+      await txSubmissionClient.submitTx(txHex);
     } catch (error) {
       throw Cardano.util.asTxSubmissionError(error) || new Cardano.UnknownTxSubmissionError(error);
     }

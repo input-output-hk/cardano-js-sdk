@@ -83,7 +83,7 @@ export const createMockOgmiosServer = (config: MockOgmiosServerConfig): Server =
       if (methodname === 'SubmitTx') {
         let result: SubmitSuccess | SubmitFail;
         if (config.submitTx.response.success) {
-          result = 'SubmitSuccess';
+          result = { SubmitSuccess: { txId: '###' } };
         } else if (config.submitTx.response.failWith?.type === 'eraMismatch') {
           result = { SubmitFail: [{ eraMismatch: { ledgerEra: 'Shelley', queryEra: 'Alonzo' } }] };
         } else if (config.submitTx.response.failWith?.type === 'beforeValidityInterval') {
@@ -97,7 +97,7 @@ export const createMockOgmiosServer = (config: MockOgmiosServerConfig): Server =
         } else {
           throw new Error('Unknown mock response');
         }
-        if (config.submitTxHook) await config.submitTxHook(Uint8Array.from(Buffer.from(args.bytes, 'hex')));
+        if (config.submitTxHook) await config.submitTxHook(Uint8Array.from(Buffer.from(args.submit, 'hex')));
         ws.send(
           JSON.stringify({
             methodname: 'SubmitTx',
