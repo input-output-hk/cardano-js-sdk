@@ -5,9 +5,5 @@
     "outDir": "../dist/cjs",
     "rootDir": "."
   },
-  "references": [
-    {
-      "path": "../../core/src"
-    }
-  ]
+  "references": [{ "path": "../../core/src" }, { "path": "../../util/src" }]
 }

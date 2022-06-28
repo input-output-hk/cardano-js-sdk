@@ -46,7 +46,7 @@ export interface MockOgmiosServerConfig {
     response: {
       success: boolean;
       failWith?: {
-        type: 'eraMismatch';
+        type: 'eraMismatch' | 'beforeValidityInterval';
       };
     };
   };
@@ -86,6 +86,14 @@ export const createMockOgmiosServer = (config: MockOgmiosServerConfig): Server =
           result = 'SubmitSuccess';
         } else if (config.submitTx.response.failWith?.type === 'eraMismatch') {
           result = { SubmitFail: [{ eraMismatch: { ledgerEra: 'Shelley', queryEra: 'Alonzo' } }] };
+        } else if (config.submitTx.response.failWith?.type === 'beforeValidityInterval') {
+          result = {
+            SubmitFail: [
+              {
+                outsideOfValidityInterval: { currentSlot: 23, interval: { invalidBefore: 42, invalidHereafter: null } }
+              }
+            ]
+          };
         } else {
           throw new Error('Unknown mock response');
         }

@@ -2,8 +2,30 @@ import { Buffer } from 'buffer';
 import { Cardano, HealthCheckResponse, ProviderError, ProviderFailure, TxSubmitProvider } from '@cardano-sdk/core';
 import { Channel, Connection, connect } from 'amqplib';
 import { Logger, dummyLogger } from 'ts-log';
+import { TX_SUBMISSION_QUEUE, getErrorPrototype, waitForPending } from './utils';
+import { fromSerializableObject } from '@cardano-sdk/util';
 
-export const TX_SUBMISSION_QUEUE = 'cardano-tx-submit';
+const moduleName = 'RabbitMqTxSubmitProvider';
+
+/**
+ * Configuration options parameters for the RabbitMqTxSubmitProvider
+ */
+export interface RabbitMqTxSubmitProviderConfig {
+  /**
+   * The RabbitMQ connection URL
+   */
+  rabbitmqUrl: URL;
+}
+
+/**
+ * Dependencies for the RabbitMqTxSubmitProvider
+ */
+export interface RabbitMqTxSubmitProviderDependencies {
+  /**
+   * The logger. Default: silent
+   */
+  logger: Logger;
+}
 
 /**
  * Connect to a [RabbitMQ](https://www.rabbitmq.com/) instance
@@ -11,17 +33,28 @@ export const TX_SUBMISSION_QUEUE = 'cardano-tx-submit';
 export class RabbitMqTxSubmitProvider implements TxSubmitProvider {
   #channel?: Channel;
   #connection?: Connection;
-  #connectionURL: URL;
-  #logger: Logger;
   #queueWasCreated = false;
 
   /**
-   * @param {URL} connectionURL RabbitMQ connection URL
-   * @param {Logger} logger object implementing the Logger abstract class
+   * The configuration options
    */
-  constructor(connectionURL: URL, logger: Logger = dummyLogger) {
-    this.#connectionURL = connectionURL;
-    this.#logger = logger;
+  #config: RabbitMqTxSubmitProviderConfig;
+
+  /**
+   *  The dependency objects
+   */
+  #dependencies: RabbitMqTxSubmitProviderDependencies;
+
+  /**
+   * @param config The configuration options
+   * @param dependencies The dependency objects
+   */
+  constructor(
+    config: RabbitMqTxSubmitProviderConfig,
+    dependencies: Partial<RabbitMqTxSubmitProviderDependencies> = {}
+  ) {
+    this.#config = config;
+    this.#dependencies = { logger: dummyLogger, ...dependencies };
   }
 
   /**
@@ -31,35 +64,43 @@ export class RabbitMqTxSubmitProvider implements TxSubmitProvider {
     if (this.#connection) return;
 
     try {
-      this.#connection = await connect(this.#connectionURL.toString());
+      this.#connection = await connect(this.#config.rabbitmqUrl.toString());
     } catch (error) {
-      await this.close();
+      this.#dependencies.logger.error(`${moduleName}: while connecting`, error);
+      void this.close();
       throw new ProviderError(ProviderFailure.ConnectionFailure, error);
     }
+    this.#connection.on('error', (error: unknown) =>
+      this.#dependencies.logger.error(`${moduleName}: connection error`, error)
+    );
 
     try {
       this.#channel = await this.#connection.createChannel();
     } catch (error) {
-      await this.close();
+      this.#dependencies.logger.error(`${moduleName}: while creating channel`, error);
+      void this.close();
       throw new ProviderError(ProviderFailure.ConnectionFailure, error);
     }
+    this.#channel.on('error', (error: unknown) =>
+      this.#dependencies.logger.error(`${moduleName}: channel error`, error)
+    );
   }
 
   /**
    * Idempotently (channel.assertQueue does the job for us) creates the queue
    *
-   * @param {boolean} force Forces the creation of the queue just to have a response from the server
+   * @param force Forces the creation of the queue just to have a response from the server
    */
   async #ensureQueue(force?: boolean) {
     if (this.#queueWasCreated && !force) return;
 
     await this.#connectAndCreateChannel();
-    this.#queueWasCreated = true;
 
     try {
       await this.#channel!.assertQueue(TX_SUBMISSION_QUEUE);
+      this.#queueWasCreated = true;
     } catch (error) {
-      await this.close();
+      void this.close();
       throw new ProviderError(ProviderFailure.ConnectionFailure, error);
     }
   }
@@ -68,18 +109,21 @@ export class RabbitMqTxSubmitProvider implements TxSubmitProvider {
    * Closes the connection to RabbitMQ and (for interl purposes) it resets the state as well
    */
   async close() {
+    // Wait for pending operations before closing
+    await waitForPending(this.#channel);
+
     try {
       await this.#channel?.close();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      this.#logger.error({ error: error.name, module: 'rabbitmqTxSubmitProvider' }, error.message);
+      this.#dependencies.logger.error({ error: error.name, module: moduleName }, error.message);
     }
 
     try {
       await this.#connection?.close();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      this.#logger.error({ error: error.name, module: 'rabbitmqTxSubmitProvider' }, error.message);
+      this.#dependencies.logger.error({ error: error.name, module: moduleName }, error.message);
     }
 
     this.#channel = undefined;
@@ -99,7 +143,7 @@ export class RabbitMqTxSubmitProvider implements TxSubmitProvider {
       await this.#ensureQueue(true);
       ok = true;
     } catch {
-      this.#logger.error({ error: 'Connection error', module: 'rabbitmqTxSubmitProvider' });
+      this.#dependencies.logger.error({ error: 'Connection error', module: 'rabbitmqTxSubmitProvider' });
     }
 
     return { ok };
@@ -108,14 +152,70 @@ export class RabbitMqTxSubmitProvider implements TxSubmitProvider {
   /**
    * Submit a transaction to RabbitMQ
    *
-   * @param {Uint8Array} signedTransaction The Uint8Array representation of a signedTransaction
+   * @param signedTransaction The Uint8Array representation of a signedTransaction
    */
   async submitTx(signedTransaction: Uint8Array) {
-    try {
-      await this.#ensureQueue();
-      this.#channel!.sendToQueue(TX_SUBMISSION_QUEUE, Buffer.from(signedTransaction));
-    } catch (error) {
-      throw Cardano.util.asTxSubmissionError(error) || new Cardano.UnknownTxSubmissionError(error);
-    }
+    return new Promise<void>(async (resolve, reject) => {
+      let txId = '';
+
+      const done = (error?: unknown) => {
+        this.#dependencies.logger.debug(`${moduleName}: ${error ? 'rejecting' : 'resolving'} tx id: ${txId}`);
+
+        if (error) reject(error);
+        else resolve();
+      };
+
+      try {
+        txId = Cardano.util.deserializeTx(signedTransaction).id.toString();
+
+        this.#dependencies.logger.info(`${moduleName}: queuing tx id: ${txId}`);
+
+        // Actually send the message
+        await this.#ensureQueue();
+        this.#channel!.sendToQueue(TX_SUBMISSION_QUEUE, Buffer.from(signedTransaction));
+        this.#dependencies.logger.debug(`${moduleName}: queued tx id: ${txId}`);
+
+        // Set the queue for response message
+        this.#dependencies.logger.debug(`${moduleName}: creating queue: ${txId}`);
+        await this.#channel!.assertQueue(txId);
+        this.#dependencies.logger.debug(`${moduleName}: created queue: ${txId}`);
+
+        // We noticed that may happens that the response message handler is called before the
+        // Promise is resolved, that's why we are awaiting for it inside the handler itself
+        const consumePromise = this.#channel!.consume(txId, async (message) => {
+          try {
+            this.#dependencies.logger.debug(`${moduleName}: got result message from queue: ${txId}`);
+
+            // This should never happen, just handle it for correct logging
+            if (!message) return done(new Error('null message from result queue'));
+
+            this.#channel!.ack(message);
+
+            const { consumerTag } = await consumePromise;
+
+            this.#dependencies.logger.debug(`${moduleName}: canceling consumer for queue: ${txId}`);
+            await this.#channel!.cancel(consumerTag);
+            this.#dependencies.logger.debug(`${moduleName}: deleting queue: ${txId}`);
+            await this.#channel!.deleteQueue(txId);
+            this.#dependencies.logger.debug(`${moduleName}: deleted queue: ${txId}`);
+
+            const result = JSON.parse(message.content.toString());
+
+            // An empty result message means submission ok
+            if (Object.keys(result).length === 0) return done();
+
+            done(fromSerializableObject(result, { getErrorPrototype }));
+          } catch (error) {
+            this.#dependencies.logger.error(`${moduleName}: while handling response message: ${txId}`);
+            this.#dependencies.logger.error(error);
+            done(error);
+          }
+        });
+      } catch (error) {
+        this.#dependencies.logger.error(`${moduleName}: while queuing transaction: ${txId}`);
+        this.#dependencies.logger.error(error);
+        done(Cardano.util.asTxSubmissionError(error) || new Cardano.UnknownTxSubmissionError(error));
+      }
+    });
   }
 }
