@@ -26,8 +26,8 @@ export type StakeSummary = {
   live: Cardano.Lovelace;
 };
 
-export interface NetworkInfoProvider {
-  ledgerTip(): Promise<Cardano.Tip>;
+export interface NetworkInfoProvider<Tip = Cardano.Tip> {
+  ledgerTip(): Promise<Tip>;
   currentWalletProtocolParameters(): Promise<ProtocolParametersRequiredByWallet>;
   genesisParameters(): Promise<Cardano.CompactGenesis>;
   lovelaceSupply(): Promise<SupplySummary>;
