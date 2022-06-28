@@ -28,7 +28,7 @@
         "cleanup:dist": "shx rm -rf dist",
         "cleanup:nm": "shx rm -rf node_modules",
         "cleanup": "run-s cleanup:dist cleanup:nm",
-        "lint": "eslint -c ../../complete.eslintrc.js \"src/**/*.ts\" \"test/**/*.ts\" \"e2e/**/*.ts\"",
+        "lint": "eslint -c ../../complete.eslintrc.js \"src/**/*.ts\" \"test/**/*.ts\"",
         "lint:fix": "yarn lint --fix",
         "test": "jest -c ./jest.config.js",
         "test:build:verify": "tsc --build ./test",
