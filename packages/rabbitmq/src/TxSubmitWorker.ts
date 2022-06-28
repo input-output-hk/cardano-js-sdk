@@ -1,10 +1,12 @@
 /* eslint-disable @typescript-eslint/no-shadow */
+import { Cardano, ProviderError, ProviderFailure, TxSubmitProvider } from '@cardano-sdk/core';
 import { Channel, Connection, Message, connect } from 'amqplib';
 import { Logger, dummyLogger } from 'ts-log';
-import { ProviderError, ProviderFailure, TxSubmitProvider } from '@cardano-sdk/core';
-import { TX_SUBMISSION_QUEUE } from './rabbitmqTxSubmitProvider';
+import { TX_SUBMISSION_QUEUE, serializeError, waitForPending } from './utils';
 
 const moduleName = 'TxSubmitWorker';
+
+type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 
 /**
  * Configuration options parameters for the TxSubmitWorker
@@ -41,7 +43,7 @@ export interface TxSubmitWorkerDependencies {
   /**
    * The logger. Default: silent
    */
-  logger?: Logger;
+  logger: Logger;
 
   /**
    * The provider to use to submit tx
@@ -90,22 +92,31 @@ export class TxSubmitWorker {
   #dependencies: TxSubmitWorkerDependencies;
 
   /**
-   * The function to call to resolve the start method exit Promise
-   */
-  #exitResolver?: () => void;
-
-  /**
    * The internal worker status
    */
   #status: 'connected' | 'connecting' | 'error' | 'idle' = 'idle';
 
   /**
-   * @param {TxSubmitWorkerConfig} config The configuration options
-   * @param {TxSubmitWorkerDependencies} dependencies The dependency objects
+   * @param config The configuration options
+   * @param dependencies The dependency objects
    */
-  constructor(config: TxSubmitWorkerConfig, dependencies: TxSubmitWorkerDependencies) {
+  constructor(config: TxSubmitWorkerConfig, dependencies: Optional<TxSubmitWorkerDependencies, 'logger'>) {
     this.#config = { parallelTxs: 3, pollingCycle: 500, ...config };
     this.#dependencies = { logger: dummyLogger, ...dependencies };
+  }
+
+  /**
+   * The common handler for errors
+   *
+   * @param isAsync flag to identify asynchronous errors
+   * @param err the error itself
+   */
+  private async errorHandler(isAsync: boolean, err: unknown) {
+    if (err) {
+      this.logError(err, isAsync);
+      this.#status = 'error';
+      await this.stop();
+    }
   }
 
   /**
@@ -120,118 +131,108 @@ export class TxSubmitWorker {
   /**
    * Starts the worker
    */
-  start() {
-    return new Promise<void>(async (resolve, reject) => {
-      const closeHandler = async (isAsync: boolean, err: unknown) => {
-        if (err) {
-          this.logError(err, isAsync);
-          this.#exitResolver = undefined;
-          this.#status = 'error';
-          await this.stop();
-          reject(err);
-        }
-      };
+  async start() {
+    try {
+      this.#dependencies.logger.info(`${moduleName} init: checking tx submission provider health status`);
 
-      try {
-        this.#dependencies.logger!.info(`${moduleName} init: checking tx submission provider health status`);
+      const { ok } = await this.#dependencies.txSubmitProvider.healthCheck();
 
-        const { ok } = await this.#dependencies.txSubmitProvider.healthCheck();
+      if (!ok) throw new ProviderError(ProviderFailure.Unhealthy);
 
-        if (!ok) throw new ProviderError(ProviderFailure.Unhealthy);
+      this.#dependencies.logger.info(`${moduleName} init: opening RabbitMQ connection`);
+      this.#status = 'connecting';
+      this.#connection = await connect(this.#config.rabbitmqUrl.toString());
+      this.#connection.on('close', (error) => this.errorHandler(true, error));
 
-        this.#dependencies.logger!.info(`${moduleName} init: opening RabbitMQ connection`);
-        this.#exitResolver = resolve;
-        this.#status = 'connecting';
-        this.#connection = await connect(this.#config.rabbitmqUrl.toString());
-        this.#connection.on('close', (error) => closeHandler(true, error));
+      this.#dependencies.logger.info(`${moduleName} init: opening RabbitMQ channel`);
+      this.#channel = await this.#connection.createChannel();
+      this.#channel.on('close', (error) => this.errorHandler(true, error));
 
-        this.#dependencies.logger!.info(`${moduleName} init: opening RabbitMQ channel`);
-        this.#channel = await this.#connection.createChannel();
-        this.#channel.on('close', (error) => closeHandler(true, error));
+      this.#dependencies.logger.info(`${moduleName} init: ensuring RabbitMQ queue`);
+      await this.#channel.assertQueue(TX_SUBMISSION_QUEUE);
+      this.#dependencies.logger.info(`${moduleName}: init completed`);
 
-        this.#dependencies.logger!.info(`${moduleName} init: ensuring RabbitMQ queue`);
-        await this.#channel.assertQueue(TX_SUBMISSION_QUEUE);
-        this.#dependencies.logger!.info(`${moduleName}: init completed`);
+      if (this.#config.parallel) {
+        this.#dependencies.logger.info(`${moduleName}: starting parallel mode`);
+        await this.#channel.prefetch(this.#config.parallelTxs!, true);
 
-        if (this.#config.parallel) {
-          this.#dependencies.logger!.info(`${moduleName}: starting parallel mode`);
-          await this.#channel.prefetch(this.#config.parallelTxs!, true);
+        const parallelHandler = (message: Message | null) => (message ? this.submitTx(message) : null);
 
-          const parallelHandler = (message: Message | null) => (message ? this.submitTx(message) : null);
-          const { consumerTag } = await this.#channel.consume(TX_SUBMISSION_QUEUE, parallelHandler);
-
-          this.#consumerTag = consumerTag;
-          this.#status = 'connected';
-        } else {
-          this.#dependencies.logger!.info(`${moduleName}: starting serial mode`);
-          await this.infiniteLoop();
-        }
-      } catch (error) {
-        await closeHandler(false, error);
+        this.#consumerTag = (await this.#channel.consume(TX_SUBMISSION_QUEUE, parallelHandler)).consumerTag;
+      } else {
+        this.#dependencies.logger.info(`${moduleName}: starting serial mode`);
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        this.infiniteLoop();
       }
-    });
+
+      this.#status = 'connected';
+    } catch (error) {
+      await this.errorHandler(false, error);
+      if (error instanceof ProviderError) throw error;
+      throw new ProviderError(ProviderFailure.ConnectionFailure, error);
+    }
   }
 
   /**
-   * Stops the worker. Once connection shutdown is completed,
-   * the Promise returned by the start method is resolved as well
+   * Stops the worker.
    */
   async stop() {
-    // This method needs to call this.#exitResolver at the end.
-    // Since it may be called more than once simultaneously,
-    // we need to ensure this.#exitResolver is called only once,
-    // so we immediately store its value in a local variable and we reset it
-    const exitResolver = this.#exitResolver;
-    this.#exitResolver = undefined;
+    this.#dependencies.logger.info(`${moduleName} shutdown: closing RabbitMQ channel`);
+
+    // In case of parallel worker; first of all cancel the consumer
+    if (this.#consumerTag)
+      try {
+        // Let's immediately reset this.#consumerTag to be sure the cancel operation is called
+        // only once even if the this.stop methond is called more than once
+        const consumerTag = this.#consumerTag;
+        this.#consumerTag = undefined;
+
+        await this.#channel!.cancel(consumerTag);
+      } catch (error) {
+        this.logError(error);
+      }
+    // In case of serial worker; just instruct the infinite loop it can exit
+    else this.#continueForever = false;
+
+    // Wait for pending operations before closing
+    await waitForPending(this.#channel);
 
     try {
-      this.#dependencies.logger!.info(`${moduleName} shutdown: closing RabbitMQ channel`);
-
-      try {
-        if (this.#consumerTag) {
-          const consumerTag = this.#consumerTag;
-          this.#consumerTag = undefined;
-
-          await this.#channel?.cancel(consumerTag);
-        }
-      } catch (error) {
-        this.logError(error);
-      }
-
-      this.#dependencies.logger!.info(`${moduleName} shutdown: closing RabbitMQ connection`);
-
-      try {
-        await this.#connection?.close();
-      } catch (error) {
-        this.logError(error);
-      }
-
-      this.#dependencies.logger!.info(`${moduleName}: shutdown completed`);
-      this.#channel = undefined;
-      this.#connection = undefined;
-      this.#consumerTag = undefined;
-      this.#continueForever = false;
-      this.#status = 'idle';
-    } finally {
-      // Only logging functions could throw an error here...
-      // Although this is almost impossible, we want to be sure exitResolver is called
-      exitResolver?.();
+      await this.#channel?.close();
+    } catch (error) {
+      this.logError(error);
     }
+
+    this.#dependencies.logger.info(`${moduleName} shutdown: closing RabbitMQ connection`);
+
+    try {
+      await this.#connection?.close();
+    } catch (error) {
+      this.logError(error);
+    }
+
+    this.#dependencies.logger.info(`${moduleName}: shutdown completed`);
+    this.#channel = undefined;
+    this.#connection = undefined;
+    this.#status = 'idle';
   }
 
   /**
    * Wrapper to log errors from try/catch blocks
    *
-   * @param {any} error the error to log
+   * @param error the error to log
+   * @param isAsync flag to set in case the error is asynchronous
+   * @param asWarning flag to log the error with warning loglevel
    */
-  private logError(error: unknown, isAsync = false) {
+  private logError(error: unknown, isAsync = false, asWarning = false) {
     const errorMessage =
       // eslint-disable-next-line prettier/prettier
       error instanceof Error ? error.message : (typeof error === 'string' ? error : JSON.stringify(error));
     const errorObject = { error: error instanceof Error ? error.name : 'Unknown error', isAsync, module: moduleName };
 
-    this.#dependencies.logger!.error(errorObject, errorMessage);
-    if (error instanceof Error) this.#dependencies.logger!.debug(`${moduleName}:`, error.stack);
+    if (asWarning) this.#dependencies.logger.warn(errorObject, errorMessage);
+    else this.#dependencies.logger.error(errorObject, errorMessage);
+    if (error instanceof Error) this.#dependencies.logger.debug(`${moduleName}:`, error.stack);
   }
 
   /**
@@ -239,7 +240,6 @@ export class TxSubmitWorker {
    */
   private async infiniteLoop() {
     this.#continueForever = true;
-    this.#status = 'connected';
 
     while (this.#continueForever) {
       const message = await this.#channel?.get(TX_SUBMISSION_QUEUE);
@@ -254,29 +254,70 @@ export class TxSubmitWorker {
   /**
    * Submit a tx to the provider and ack (or nack) the message
    *
-   * @param {Message} message the message containing the transaction
+   * @param message the message containing the transaction
    */
   private async submitTx(message: Message) {
+    const counter = ++this.#counter;
+    let isRetriable = false;
+    let serializableError: unknown;
+    let txId = '';
+
     try {
-      const counter = ++this.#counter;
       const { content } = message;
+      const txBody = new Uint8Array(content);
 
-      this.#dependencies.logger!.info(`${moduleName}: submitting tx`);
-      this.#dependencies.logger!.debug(`${moduleName}: tx ${counter} dump:`, content.toString('hex'));
-      await this.#dependencies.txSubmitProvider.submitTx(new Uint8Array(content));
+      // Register the handling of current transaction
+      txId = Cardano.util.deserializeTx(txBody).id.toString();
 
-      this.#dependencies.logger!.debug(`${moduleName}: ACKing RabbitMQ message ${counter}`);
+      this.#dependencies.logger.info(`${moduleName}: submitting tx #${counter} id: ${txId}`);
+      this.#dependencies.logger.debug(`${moduleName}: tx #${counter} dump:`, content.toString('hex'));
+      await this.#dependencies.txSubmitProvider.submitTx(txBody);
+
+      this.#dependencies.logger.debug(`${moduleName}: ACKing RabbitMQ message #${counter}`);
       this.#channel?.ack(message);
     } catch (error) {
-      this.logError(error);
-
-      try {
-        this.#dependencies.logger!.info(`${moduleName}: NACKing RabbitMQ message`);
-        this.#channel?.nack(message);
-        // eslint-disable-next-line no-catch-shadow
-      } catch (error) {
-        this.logError(error);
+      ({ isRetriable, serializableError } = await this.submitTxErrorHandler(error, counter, message));
+    } finally {
+      // If there is no error or the error can't be retried
+      if (!serializableError || !isRetriable) {
+        // Send the response to the original submitter
+        try {
+          // An empty response message means succesful submission
+          const message = serializableError || {};
+          await this.#channel!.assertQueue(txId);
+          this.logError(`${moduleName}: sending response for message #${counter}`);
+          this.#channel!.sendToQueue(txId, Buffer.from(JSON.stringify(message)));
+        } catch (error) {
+          this.logError(`${moduleName}: while sending response for message #${counter}`);
+          this.logError(error);
+        }
       }
     }
+  }
+
+  /**
+   * The error handler of submitTx method
+   */
+  private async submitTxErrorHandler(err: unknown, counter: number, message: Message) {
+    const { isRetriable, serializableError } = serializeError(err);
+
+    if (isRetriable) this.#dependencies.logger.warn(`${moduleName}: submitting tx #${counter}`);
+    else this.#dependencies.logger.error(`${moduleName}: submitting tx #${counter}`);
+    this.logError(err, false, isRetriable);
+
+    const action = `${isRetriable ? 'N' : ''}ACKing RabbitMQ message #${counter}`;
+
+    try {
+      this.#dependencies.logger.info(`${moduleName}: ${action}`);
+      // In RabbitMQ languange, NACKing a message means to ask to retry for it
+      // We NACK only those messages which had an error which can be retried
+      if (isRetriable) this.#channel?.nack(message);
+      else this.#channel?.ack(message);
+    } catch (error) {
+      this.logError(`${moduleName}: while ${action}`);
+      this.logError(error);
+    }
+
+    return { isRetriable, serializableError };
   }
 }

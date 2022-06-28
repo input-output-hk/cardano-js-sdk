@@ -5,6 +5,7 @@ import { CACHE_TTL_DEFAULT } from './InMemoryCache';
 import { DB_POLL_INTERVAL_DEFAULT } from './NetworkInfo';
 import { LogLevel } from 'bunyan';
 import { URL } from 'url';
+import { USE_QUEUE_DEFAULT } from './ProgramsCommon';
 import { cacheTtlValidator } from './util/validators';
 import { config } from 'dotenv';
 import { loggerMethodNames } from './util';
@@ -20,7 +21,7 @@ const envSpecs = {
   OGMIOS_URL: envalid.url({ default: OGMIOS_URL_DEFAULT }),
   RABBITMQ_URL: envalid.url({ default: RABBITMQ_URL_DEFAULT }),
   SERVICE_NAMES: envalid.str({ example: Object.values(ServiceNames).toString() }),
-  USE_QUEUE: envalid.bool({ default: false })
+  USE_QUEUE: envalid.bool({ default: USE_QUEUE_DEFAULT })
 };
 
 void (async () => {

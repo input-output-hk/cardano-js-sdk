@@ -81,7 +81,7 @@ const serviceMapFactory = (args: ProgramArgs, logger: Logger, cache: InMemoryCac
       logger,
       txSubmitProvider:
         args.options?.useQueue && args.options?.rabbitmqUrl
-          ? new RabbitMqTxSubmitProvider(args.options.rabbitmqUrl)
+          ? new RabbitMqTxSubmitProvider({ rabbitmqUrl: args.options.rabbitmqUrl })
           : ogmiosTxSubmitProvider(urlToConnectionConfig(args.options?.ogmiosUrl))
     }),
   [ServiceNames.Rewards]: async () => {

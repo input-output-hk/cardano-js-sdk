@@ -10,7 +10,7 @@ import {
 } from './Program';
 import { CACHE_TTL_DEFAULT } from './InMemoryCache';
 import { Command } from 'commander';
-import { CommonOptionDescriptions } from './ProgramsCommon';
+import { CommonOptionDescriptions, Programs, USE_QUEUE_DEFAULT, WrongOption } from './ProgramsCommon';
 import { DB_POLL_INTERVAL_DEFAULT } from './NetworkInfo';
 import { InvalidLoggerLevel } from './errors';
 import {
@@ -19,7 +19,6 @@ import {
   POLLING_CYCLE_DEFAULT,
   TxWorkerOptionDescriptions,
   TxWorkerOptions,
-  WrongProgramOption,
   loadTxWorker
 } from './TxWorker';
 import { URL } from 'url';
@@ -40,6 +39,13 @@ const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 clear();
 // eslint-disable-next-line no-console
 console.log('Cardano Services CLI');
+
+const stringToBoolean = (value: string, program: Programs, option: string) => {
+  // for compatibility: accepting same values as envalid in startWorker.ts
+  if (['0', 'f', 'false'].includes(value)) return false;
+  if (['1', 't', 'true'].includes(value)) return true;
+  throw new WrongOption(program, option, ['false', 'true']);
+};
 
 const commonOptions = (command: Command) =>
   command
@@ -95,7 +101,7 @@ commonOptions(
     (interval) => Number.parseInt(interval, 10),
     DB_POLL_INTERVAL_DEFAULT
   )
-  .option('--use-queue', ProgramOptionDescriptions.UseQueue, () => true, false)
+  .option('--use-queue', ProgramOptionDescriptions.UseQueue, () => true, USE_QUEUE_DEFAULT)
   .action(async (serviceNames: ServiceNames[], options: { apiUrl: URL } & HttpServerOptions) => {
     const { apiUrl, ...rest } = options;
     const server = await loadHttpServer({ apiUrl: apiUrl || API_URL_DEFAULT, options: rest, serviceNames });
@@ -111,12 +117,7 @@ commonOptions(program.command('start-worker').description('Start RabbitMQ worker
   .option(
     '--parallel [parallel]',
     TxWorkerOptionDescriptions.Parallel,
-    (parallel) => {
-      // for compatibility: accepting same values as envalid in startWorker.ts
-      if (['0', 'f', 'false'].includes(parallel)) return false;
-      if (['1', 't', 'true'].includes(parallel)) return true;
-      throw new WrongProgramOption(ServiceNames.TxSubmit, TxWorkerOptionDescriptions.Parallel, ['false', 'true']);
-    },
+    (parallel) => stringToBoolean(parallel, Programs.RabbitmqWorker, TxWorkerOptionDescriptions.Parallel),
     PARALLEL_MODE_DEFAULT
   )
   .option(

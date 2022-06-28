@@ -6,3 +6,5 @@ export const OGMIOS_URL_DEFAULT = (() => {
 })();
 
 export const RABBITMQ_URL_DEFAULT = 'amqp://localhost:5672';
+
+export const USE_QUEUE_DEFAULT = false;
