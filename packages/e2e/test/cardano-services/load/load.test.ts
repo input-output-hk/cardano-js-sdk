@@ -2,21 +2,21 @@ import * as envalid from 'envalid';
 import { Cardano } from '@cardano-sdk/core';
 import { ChildProcess, fork } from 'child_process';
 import { InitializeTxResult, ObservableWallet, SingleAddressWallet } from '@cardano-sdk/wallet';
-import { ServiceNames } from '../../src';
+import { ServiceNames } from '@cardano-sdk/cardano-services';
 import {
   assetProvider,
   chainHistoryProvider,
   env as configEnv,
-  keyAgentByIdx,
+  keyAgentById,
   logger,
   networkInfoProvider,
   rewardsProvider,
   stakePoolProvider,
   txSubmitProvider,
   utxoProvider
-} from '../../../wallet/test/e2e/config';
+} from '../../config';
 import { filter, firstValueFrom } from 'rxjs';
-import { removeRabbitMQContainer, setupRabbitMQContainer } from '../../../rabbitmq/test/jest-setup/docker';
+import { removeRabbitMQContainer, setupRabbitMQContainer } from '../../../../rabbitmq/test/jest-setup/docker';
 import JSONBig from 'json-bigint';
 import path from 'path';
 
@@ -57,10 +57,10 @@ const getWallet = async () =>
     {
       assetProvider: await assetProvider,
       chainHistoryProvider: await chainHistoryProvider,
-      keyAgent: await keyAgentByIdx(0),
+      keyAgent: await keyAgentById(0),
       networkInfoProvider: await networkInfoProvider,
       rewardsProvider: await rewardsProvider,
-      stakePoolProvider,
+      stakePoolProvider: await stakePoolProvider,
       txSubmitProvider: await txSubmitProvider,
       utxoProvider: await utxoProvider
     }

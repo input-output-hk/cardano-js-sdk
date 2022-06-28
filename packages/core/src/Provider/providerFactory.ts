@@ -35,8 +35,6 @@ export class ProviderFactory<T> {
   public create(name: string, params: any): Promise<T> {
     if (!this._providers.has(name)) throw new Error(`Provider unsupported: ${name}`);
 
-    if (!this._providers.get(name)) throw new Error(`Provider is undefined: ${name}`);
-
     return this._providers.get(name)!(params);
   }
 
