@@ -9,12 +9,12 @@ import {
 } from '@cardano-sdk/core';
 import { BalanceTracker, DelegationTracker, TransactionalObservables, TransactionsTracker } from './services';
 import { Cip30DataSignature } from '@cardano-sdk/cip30';
-import { Cip30SignDataRequest } from './KeyManagement/cip8';
-import { GroupedAddress } from './KeyManagement';
+import { Cip30SignDataRequest } from '../KeyManagement/cip8';
+import { GroupedAddress } from '../KeyManagement';
 import { Observable } from 'rxjs';
 import { SelectionSkeleton } from '@cardano-sdk/cip2';
 import { Shutdown } from '@cardano-sdk/util';
-import { TxInternals } from './Transaction';
+import { TxInternals } from '../Transaction';
 
 export type InitializeTxProps = {
   outputs?: Set<Cardano.TxOut>;
