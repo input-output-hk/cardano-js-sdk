@@ -1,6 +1,6 @@
 # End to end tests for Cardano JS SDK
 
-This directory contains end-to-end tests for cardano-js-sdk. Each directory under 'test' is a self-contained set of tests for a particular component/use case that exactly mimics how a user might expect the cardano-js-sdk to work, so they allow high-fidelity reproductions of real-world issues.
+This directory contains end-to-end tests for cardano-js-sdk. Each directory under 'test' is a self-contained set of tests for a particular component/use case that exactly mimics how a user might expect the cardano-js-sdk to work, allowing high-fidelity reproductions of real-world issues.
 
 For this to work, we first install dependencies and build the sdk from the root via:
 
@@ -10,41 +10,45 @@ $ yarn install
 $ yarn build
 ```
 
-To test the different use cases, you can run the e2e tests as follow (from the root):
+To test the different use cases, you can run the e2e tests as follows:
 
 ```bash
-$ cd packages/e2e
-$ yarn test:wallet
+$ yarn workspace @cardano-sdk/e2e test:wallet
 ```
 
-This will run all the e2e tests related to the wallet component.
+This command will run all the e2e tests related to the wallet component.
 
 ## Configuring the Environment
 
-The providers used during the e2e test can be configured via environment variables, or by creating a file '.env', there is an example of such file in '.env.example'.
+The providers used during the e2e test can be configured via environment variables or by creating a file '.env'; there is an example of such file in '.env.example'.
 
-If you are using testnet or mainnet as your test environment, make sure that the wallets you are configuring via environment variables contain some funds.
+If you are using testnet or mainnet as your test environment, ensure that the wallets you are configuring via environment variables contain some funds.
 
-If you need to create a new wallet via a brand new set of mnemonics, you can run (from the root):
+<a name="generate_wallet"></a>
+If you need to create a new wallet via a brand new set of mnemonics, you can run:
 
 ```bash
-$ cd packages/e2e
-$ yarn generate-mnemonics
+$ yarn workspace @cardano-sdk/e2e generate-mnemonics
 ```
 
-And you will get the set of mnemonics on the console:
+And you will get the set of mnemonics plus the first derivatice address on the console:
 
 ```bash
 $ ts-node ./src/Util/mnemonic.ts
 
-polar thought measure warrior spot lens source school knock legal brave stone repeat item hero dose blade kit reflect assume dream current view farm 
+  Mnemonic:   toward bridge spell endless tunnel there deputy market scheme ketchup heavy fall fault pudding split desert swear maximum orchard estate match good decorate tribe 
 
-Done in 5.38s.
+  Address:    addr_test1qzdutxe3exf3vls6cymrs7r28dh8uuvk9gpj0w474zysxpx09lufhes0cfv0p2wkl7lg9g0zh6rfd5plk7d32qztf63qyk5mz5
+
+Done in 5.44s.
 ```
+To add funds to your newly created wallet, copy the address displayed in the console and go to [Public Testnet Faucet](https://testnets.cardano.org/en/testnets/cardano/tools/faucet/). You can request 1000 tADA every 24h.
 
-## Running blockfrost end to end tests
+> :pushpin: Please note that the tADA, although abundant, is a limited resource. So if you are no longer using the address, make sure to return the tADA to the faucet.
 
-To run the blockfrost end to end tests you only need to configure two providers, AssetProvider and ChainHistoryProvider, both must be configured as blockfrost providers and a valid blockfrost API key must be also set, make sure that in your .env file you have the environment variables set:
+## Blockfrost
+
+To run the blockfrost end to end tests you only need to configure two providers, AssetProvider and ChainHistoryProvider, both must be configured as blockfrost providers and a valid blockfrost API key must be also set, make sure that in your .env file, you have the environment variables set:
 
 ```
 LOGGER_MIN_SEVERITY=debug
@@ -53,50 +57,88 @@ ASSET_PROVIDER=blockfrost
 CHAIN_HISTORY_PROVIDER=blockfrost
 ```
 
-> :red_circle: Remember to get your own blockfrost API key at https://blockfrost.io/ and set it in the configuration file, the API key displayed here is invalid and for demostration purposes only.
+> :pushpin: Remember to get your blockfrost API key at [blockfrost.io](https://blockfrost.io/) and set it in the configuration file, the API key displayed here is invalid and for demonstration purposes only.
 
-Then to run the blockforst test run (from the root):
+Then to run the blockforst test run:
 
 ```bash
-$ cd packages/e2e
-$ yarn test:blockfrost
+$ yarn workspace @cardano-sdk/e2e test:blockfrost
 ```
 
-## Running cardano-services end to end tests
+## Cardano Services
 
 TBD
 
-## Running faucet end to end tests
+## Faucet (Private Network POC)
 
-The faucet end to end test are meant to showcase the use of the private testnet. The faucet end to end test show how we can fund wallets with out private testnet tAda so we can run the end to end tests. For the faucet end to end test to run we must first start our private testnet environment as follows:
-
-```bash
-$ cd packages/e2e
-$ yarn private-network:up
-```
-
-Note that once you finish running the test, it is advisable that you stop the enviroment with:
+The end-to-end faucet test are meant to showcase the use of the private testnet. The faucet end-to-end test shows how we can fund wallets with private testnet tADA so we can run the end-to-end tests. For the faucet end-to-end test to run, we must first start our private testnet environment as follows:
 
 ```bash
-$ cd packages/e2e
-$ yarn private-network:down
+$ yarn workspace @cardano-sdk/e2e private-network:up
 ```
-Instead of CTRL-C since there are some resources that need to be clear before the environment can be set up again, if you dont stop the containers with the proper command, you may run into issues restarting it.
 
-For the faucet to work correctly we must configured it with the mnemonic of the genesis wallet, this wallet control all the funds on the private testnet and is the only way of obtaining tADA on that network.
+Note that once you finish running the test, you should stop the enviroment with:
+
+```bash
+$ yarn workspace @cardano-sdk/e2e private-network:down
+```
+Instead of CTRL-C, since some resources need to be clear before you can set up the environment again, if you don't stop the containers with the proper command, you may run into issues restarting it.
+
+For the faucet to work correctly, we must configure it with the mnemonic of the genesis wallet. This wallet controls all the funds on the private testnet and is the only way of obtaining tADA on that network.
 
 ```
 FAUCET_PROVIDER=cardano-wallet
 FAUCET_PROVIDER_PARAMS='{"url":"http://localhost:8090/v2","mnemonic":"fire method repair aware foot tray accuse brother popular olive find account sick rocket next"}'
 ```
 
-## Running wallet end to end tests
+Then to run the faucet tests, run:
 
-The faucet 2e2e
+```bash
+$ yarn workspace @cardano-sdk/e2e test:faucet
+```
 
-## Running web-extension end to end tests
+## Wallet
 
-The web-extension end to end tests are a bit different from the rest as they emulate user interaction with a browser instance. There is only one key difference between running the web-extension end to end tests and the rest, and that is the location of the .env file, for the web-extension end to end tests the .env file must be located within the packages/e2e/web-extension directory, this is an example of the environment file you need to run the tests:
+The wallet end-to-end tests showcase the use of different providers to create, sign, send and keep track of transactions on the blockchain, query assets and their metadata, delegate to pools and keep track of rewards (among others):
+
+Since the wallet test interacts with most of the providers, you need to make sure to provide the proper values for all the environment variables that configure said providers, for example:
+
+```
+LOGGER_MIN_SEVERITY=debug
+BLOCKFROST_API_KEY=testnetNElagmhpQDubE6Ic4XBUVJjV5DROyijO
+KEY_MANAGEMENT_PROVIDER=inMemory
+KEY_MANAGEMENT_PARAMS='{"accountIndex": 0, "networkId": 0, "password":"some_password","mnemonic":"actor scout worth mansion thumb device mass pave gospel secret height document merge text broom kind lesson invest across estate erase interest end century"}'
+ASSET_PROVIDER=blockfrost
+CHAIN_HISTORY_PROVIDER=blockfrost
+NETWORK_INFO_PROVIDER=blockfrost
+REWARDS_PROVIDER=blockfrost
+TX_SUBMIT_PROVIDER=blockfrost
+UTXO_PROVIDER=blockfrost
+WALLET_PROVIDER=blockfrost
+STAKE_POOL_PROVIDER=stub
+POOL_ID_1=pool1euf2nh92ehqfw7rpd4s9qgq34z8dg4pvfqhjmhggmzk95gcd402
+POOL_ID_2=pool1fghrkl620rl3g54ezv56weeuwlyce2tdannm2hphs62syf3vyyh
+OGMIOS_URL=ws://localhost:1338
+TX_SUBMIT_HTTP_URL=http://localhost:3456/tx-submit
+RABBITMQ_URL=amqp://localhost
+TRANSACTIONS_NUMBER=10
+START_LOCAL_HTTP_SERVER=true
+WORKER_PARALLEL_TRANSACTION=3
+
+```
+> :pushpin: Remember to get your blockfrost API key at [blockfrost.io](https://blockfrost.io/) and set it in the configuration file, the API key displayed here is invalid and for demonstration purposes only.
+
+> :pushpin: Remember to use a wallet with enough funds to carry out transactions (see [here](#generate_wallet)).
+
+Then to run the wallet tests, run:
+
+```bash
+$ yarn workspace @cardano-sdk/e2e test:wallet
+```
+
+## Web Extensions
+
+The web-extension end-to-end tests are slightly different from the rest as they emulate user interaction with a browser instance. There is only one key difference between running the web-extension end-to-end tests and the rest, and that is the location of the .env file; for the web-extension end-to-end tests, the .env file must be located within the packages/e2e/web-extension directory, this is an example of the environment file you need to run the tests:
 
 ```
 TX_SUBMIT_PROVIDER=blockfrost
@@ -117,11 +159,10 @@ OGMIOS_URL=ws://localhost:1337
 LOGGER_MIN_SEVERITY=debug
 KEY_AGENT=InMemory
 ```
-> :red_circle: Remember to get your own blockfrost API key at https://blockfrost.io/ and set it in the configuration file, the API key displayed here is invalid and for demostration purposes only.
+> :pushpin: Remember to get your blockfrost API key at [blockfrost.io](https://blockfrost.io/) and set it in the configuration file, the API key displayed here is invalid and for demonstration purposes only.
 
-Then to run the blockforst test run (from the root):
+Then to run the web-extension tests run:
 
 ```bash
-$ cd packages/e2e
-$ yarn test:web-extension
+$ yarn workspace @cardano-sdk/e2e test:web-extension
 ```
