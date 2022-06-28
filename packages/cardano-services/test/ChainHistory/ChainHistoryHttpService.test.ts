@@ -53,14 +53,14 @@ describe('ChainHistoryHttpService', () => {
       } as unknown as DbSyncChainHistoryProvider;
     });
 
-    it('should not throw during service create if the ChainHistoryProvider is unhealthy', async () => {
-      expect(() => ChainHistoryHttpService.create({ chainHistoryProvider })).not.toThrow(
+    it('should not throw during service create if the ChainHistoryProvider is unhealthy', () => {
+      expect(() => new ChainHistoryHttpService({ chainHistoryProvider })).not.toThrow(
         new ProviderError(ProviderFailure.Unhealthy)
       );
     });
 
     it('throws during service initialization if the ChainHistoryProvider is unhealthy', async () => {
-      service = await ChainHistoryHttpService.create({ chainHistoryProvider });
+      service = new ChainHistoryHttpService({ chainHistoryProvider });
       httpServer = new HttpServer(config, { services: [service] });
       await expect(httpServer.initialize()).rejects.toThrow(new ProviderError(ProviderFailure.Unhealthy));
     });
@@ -69,7 +69,7 @@ describe('ChainHistoryHttpService', () => {
   describe('healthy state', () => {
     beforeAll(async () => {
       chainHistoryProvider = new DbSyncChainHistoryProvider(dbConnection);
-      service = await ChainHistoryHttpService.create({ chainHistoryProvider });
+      service = new ChainHistoryHttpService({ chainHistoryProvider });
       httpServer = new HttpServer(config, { services: [service] });
       await httpServer.initialize();
       await httpServer.start();

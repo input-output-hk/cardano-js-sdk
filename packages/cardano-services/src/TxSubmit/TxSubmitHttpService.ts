@@ -14,24 +14,18 @@ export interface TxSubmitHttpServiceDependencies {
 }
 
 export class TxSubmitHttpService extends HttpService {
-  #txSubmitProvider: TxSubmitProvider;
-
-  private constructor(
+  constructor(
     { logger = dummyLogger, txSubmitProvider }: TxSubmitHttpServiceDependencies,
-    router: express.Router
+    router: express.Router = express.Router()
   ) {
-    super(ServiceNames.TxSubmit, router, logger);
-    this.#txSubmitProvider = txSubmitProvider;
-  }
+    super(ServiceNames.TxSubmit, txSubmitProvider, router, logger);
 
-  static async create({ logger = dummyLogger, txSubmitProvider }: TxSubmitHttpServiceDependencies) {
-    const router = express.Router();
     router.use(bodyParser.raw());
     const apiSpec = path.join(__dirname, 'openApi.json');
     router.use(
       OpenApiValidator.middleware({
         apiSpec,
-        ignoreUndocumented: true, // otherwhise /metrics endpoint should be included in spec
+        ignoreUndocumented: true,
         validateRequests: true,
         validateResponses: true
       })
@@ -63,20 +57,5 @@ export class TxSubmitHttpService extends HttpService {
         }
       }, logger)
     );
-    return new TxSubmitHttpService({ logger, txSubmitProvider }, router);
-  }
-
-  async initializeImpl(): Promise<void> {
-    if (!(await this.healthCheck()).ok) {
-      throw new ProviderError(ProviderFailure.Unhealthy);
-    }
-  }
-
-  async shutdownImpl(): Promise<void> {
-    await this.#txSubmitProvider.close?.();
-  }
-
-  async healthCheck() {
-    return this.#txSubmitProvider.healthCheck();
   }
 }

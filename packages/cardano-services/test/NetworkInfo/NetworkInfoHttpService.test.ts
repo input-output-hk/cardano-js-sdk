@@ -45,14 +45,14 @@ describe('NetworkInfoHttpService', () => {
       } as unknown as DbSyncNetworkInfoProvider;
     });
 
-    it('should not throw during service create if the NetworkInfoProvider is unhealthy', async () => {
-      expect(() => NetworkInfoHttpService.create({ networkInfoProvider })).not.toThrow(
+    it('should not throw during service create if the NetworkInfoProvider is unhealthy', () => {
+      expect(() => new NetworkInfoHttpService({ networkInfoProvider })).not.toThrow(
         new ProviderError(ProviderFailure.Unhealthy)
       );
     });
 
     it('throws during service initialization if the NetworkInfoProvider is unhealthy', async () => {
-      service = NetworkInfoHttpService.create({ networkInfoProvider });
+      service = new NetworkInfoHttpService({ networkInfoProvider });
       httpServer = new HttpServer(config, { services: [service] });
       await expect(httpServer.initialize()).rejects.toThrow(new ProviderError(ProviderFailure.Unhealthy));
     });
@@ -68,7 +68,7 @@ describe('NetworkInfoHttpService', () => {
       config = { listen: { port } };
       apiUrlBase = `http://localhost:${port}/network-info`;
       networkInfoProvider = new DbSyncNetworkInfoProvider({ cardanoNodeConfigPath, dbPollInterval }, { cache, db });
-      service = NetworkInfoHttpService.create({ networkInfoProvider });
+      service = new NetworkInfoHttpService({ networkInfoProvider });
       httpServer = new HttpServer(config, { services: [service] });
       doNetworkInfoRequest = doServerRequest(apiUrlBase);
 

@@ -40,60 +40,52 @@ export interface ProgramArgs {
 }
 
 const serviceMapFactory = (args: ProgramArgs, logger: Logger, cache: InMemoryCache, db?: pg.Pool) => ({
-  [ServiceNames.StakePool]: async () => {
+  [ServiceNames.StakePool]: () => {
     if (!db) throw new MissingProgramOption(ServiceNames.StakePool, ProgramOptionDescriptions.DbConnection);
-    return await StakePoolHttpService.create({
-      logger,
-      stakePoolProvider: new DbSyncStakePoolProvider(db, logger)
-    });
+
+    return new StakePoolHttpService({ logger, stakePoolProvider: new DbSyncStakePoolProvider(db, logger) });
   },
-  [ServiceNames.Utxo]: async () => {
+  [ServiceNames.Utxo]: () => {
     if (!db) throw new MissingProgramOption(ServiceNames.Utxo, ProgramOptionDescriptions.DbConnection);
 
-    return await UtxoHttpService.create({
-      logger,
-      utxoProvider: new DbSyncUtxoProvider(db, logger)
-    });
+    return new UtxoHttpService({ logger, utxoProvider: new DbSyncUtxoProvider(db, logger) });
   },
-  [ServiceNames.ChainHistory]: async () => {
+  [ServiceNames.ChainHistory]: () => {
     if (!db) throw new MissingProgramOption(ServiceNames.ChainHistory, ProgramOptionDescriptions.DbConnection);
 
-    return await ChainHistoryHttpService.create({
-      chainHistoryProvider: new DbSyncChainHistoryProvider(db, logger),
-      logger
-    });
+    return new ChainHistoryHttpService({ chainHistoryProvider: new DbSyncChainHistoryProvider(db, logger), logger });
   },
-  [ServiceNames.NetworkInfo]: async () => {
+  [ServiceNames.Rewards]: () => {
+    if (!db) throw new MissingProgramOption(ServiceNames.Rewards, ProgramOptionDescriptions.DbConnection);
+
+    return new RewardsHttpService({ logger, rewardsProvider: new DbSyncRewardsProvider(db, logger) });
+  },
+  [ServiceNames.NetworkInfo]: () => {
     if (!db) throw new MissingProgramOption(ServiceNames.NetworkInfo, ProgramOptionDescriptions.DbConnection);
     if (args.options?.cardanoNodeConfigPath === undefined)
       throw new MissingProgramOption(ServiceNames.NetworkInfo, ProgramOptionDescriptions.CardanoNodeConfigPath);
 
-    return await NetworkInfoHttpService.create({
-      logger,
-      networkInfoProvider: new DbSyncNetworkInfoProvider(
-        { cardanoNodeConfigPath: args.options?.cardanoNodeConfigPath, dbPollInterval: args.options?.dbPollInterval },
-        { cache, db, logger }
-      )
-    });
+    const networkInfoProvider = new DbSyncNetworkInfoProvider(
+      {
+        cardanoNodeConfigPath: args.options?.cardanoNodeConfigPath,
+        dbPollInterval: args.options?.dbPollInterval
+      },
+      { cache, db, logger }
+    );
+
+    return new NetworkInfoHttpService({ logger, networkInfoProvider });
   },
-  [ServiceNames.TxSubmit]: async () =>
-    await TxSubmitHttpService.create({
-      logger,
-      txSubmitProvider:
-        args.options?.useQueue && args.options?.rabbitmqUrl
-          ? new RabbitMqTxSubmitProvider({ rabbitmqUrl: args.options.rabbitmqUrl })
-          : ogmiosTxSubmitProvider(urlToConnectionConfig(args.options?.ogmiosUrl))
-    }),
-  [ServiceNames.Rewards]: async () => {
-    if (!db) throw new MissingProgramOption(ServiceNames.Rewards, ProgramOptionDescriptions.DbConnection);
-    return await RewardsHttpService.create({
-      logger,
-      rewardsProvider: new DbSyncRewardsProvider(db, logger)
-    });
+  [ServiceNames.TxSubmit]: () => {
+    const txSubmitProvider =
+      args.options?.useQueue && args.options?.rabbitmqUrl
+        ? new RabbitMqTxSubmitProvider({ rabbitmqUrl: args.options.rabbitmqUrl })
+        : ogmiosTxSubmitProvider(urlToConnectionConfig(args.options?.ogmiosUrl));
+
+    return new TxSubmitHttpService({ logger, txSubmitProvider });
   }
 });
 
-export const loadHttpServer = async (args: ProgramArgs): Promise<HttpServer> => {
+export const loadHttpServer = (args: ProgramArgs): HttpServer => {
   const services: HttpService[] = [];
   const logger = createLogger({
     level: args.options?.loggerMinSeverity,
@@ -110,7 +102,7 @@ export const loadHttpServer = async (args: ProgramArgs): Promise<HttpServer> => 
 
   for (const serviceName of args.serviceNames) {
     if (serviceMap[serviceName]) {
-      services.push(await serviceMap[serviceName]());
+      services.push(serviceMap[serviceName]());
     } else {
       throw new UnknownServiceName(serviceName);
     }

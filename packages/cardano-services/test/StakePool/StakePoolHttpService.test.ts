@@ -79,14 +79,14 @@ describe('StakePoolHttpService', () => {
       } as unknown as DbSyncStakePoolProvider;
     });
 
-    it('should not throw during service create if the StakePoolProvider is unhealthy', async () => {
-      expect(() => StakePoolHttpService.create({ stakePoolProvider })).not.toThrow(
+    it('should not throw during service create if the StakePoolProvider is unhealthy', () => {
+      expect(() => new StakePoolHttpService({ stakePoolProvider })).not.toThrow(
         new ProviderError(ProviderFailure.Unhealthy)
       );
     });
 
     it('throws during service initialization if the StakePoolProvider is unhealthy', async () => {
-      service = StakePoolHttpService.create({ stakePoolProvider });
+      service = new StakePoolHttpService({ stakePoolProvider });
       httpServer = new HttpServer(config, { services: [service] });
       await expect(httpServer.initialize()).rejects.toThrow(new ProviderError(ProviderFailure.Unhealthy));
     });
@@ -96,7 +96,7 @@ describe('StakePoolHttpService', () => {
   describe('healthy state', () => {
     beforeAll(async () => {
       stakePoolProvider = new DbSyncStakePoolProvider(dbConnection);
-      service = StakePoolHttpService.create({ stakePoolProvider });
+      service = new StakePoolHttpService({ stakePoolProvider });
       httpServer = new HttpServer(config, { services: [service] });
       await httpServer.initialize();
       await httpServer.start();

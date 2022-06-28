@@ -1,4 +1,4 @@
-import { HealthCheckResponse, ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { HealthCheckResponse, Provider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { HttpServer } from './HttpServer';
 import { Logger, dummyLogger } from 'ts-log';
 import { ProviderHandler } from '../util';
@@ -8,11 +8,14 @@ import express from 'express';
 export abstract class HttpService extends RunnableModule {
   public router: express.Router;
   public slug: string;
+  public provider: Provider;
 
-  protected constructor(slug: string, router: express.Router, logger = dummyLogger) {
+  constructor(slug: string, provider: Provider, router: express.Router, logger = dummyLogger) {
     super(slug, logger);
     this.router = router;
     this.slug = slug;
+    this.provider = provider;
+
     const healthHandler = async (req: express.Request, res: express.Response) => {
       logger.debug('/health', { ip: req.ip });
       let body: HealthCheckResponse | Error['message'];
@@ -29,16 +32,23 @@ export abstract class HttpService extends RunnableModule {
     this.router.post('/health', healthHandler);
   }
 
+  async initializeImpl(): Promise<void> {
+    if (!(await this.healthCheck()).ok) {
+      throw new ProviderError(ProviderFailure.Unhealthy);
+    }
+  }
+
   async startImpl(): Promise<void> {
-    return Promise.resolve();
+    await this.provider.start?.();
   }
 
   async shutdownImpl(): Promise<void> {
-    return Promise.resolve();
+    await this.provider.close?.();
   }
 
-  protected abstract initializeImpl(): Promise<void>;
-  protected abstract healthCheck(): Promise<HealthCheckResponse>;
+  async healthCheck(): Promise<HealthCheckResponse> {
+    return await this.provider.healthCheck();
+  }
 
   static routeHandler(logger: Logger): ProviderHandler {
     return async (args, _r, res, _n, handler) => {
