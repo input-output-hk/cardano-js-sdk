@@ -25,7 +25,7 @@ import { KeyManagement } from '@cardano-sdk/wallet';
 import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import DeviceConnection from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
-const BLOCKFROST_MISSING_FLAG = 'Missing isTestnet flag';
+const BLOCKFROST_PROVIDER = 'blockfrost';
 const BLOCKFROST_MISSING_PROJECT_ID = 'Missing project id';
 const KEY_AGENT_MISSING_MNEMONIC = 'Missing mnemonic words';
 const KEY_AGENT_MISSING_PASSWORD = 'Missing wallet password';
@@ -38,15 +38,14 @@ let blockfrostApi: BlockFrostAPI;
 /**
  * Gets the singleton blockfrost API instance.
  *
- * @param isTestnet True to query the testnet network; and otherwise
- * to query the mainnet network.
- * @param projectId The blockfrost project api/api key.
  * @returns The blockfrost API instance, this function always returns the same instance.
  */
-const getBlockfrostApi = async (isTestnet: boolean, projectId: string) => {
+const getBlockfrostApi = async () => {
   if (blockfrostApi !== undefined) return blockfrostApi;
 
-  return new BlockFrostAPI({ isTestnet, projectId });
+  if (process.env.BLOCKFROST_API_KEY === undefined) throw new Error(BLOCKFROST_MISSING_PROJECT_ID);
+
+  return new BlockFrostAPI({ isTestnet: true, projectId: process.env.BLOCKFROST_API_KEY });
 };
 
 export const faucetProviderFactory = new ProviderFactory<FaucetProvider>();
@@ -60,7 +59,7 @@ export const utxoProviderFactory = new ProviderFactory<UtxoProvider>();
 export const stakePoolProviderFactory = new ProviderFactory<StakePoolProvider>();
 
 // Faucet providers
-faucetProviderFactory.register(CardanoWalletFaucetProvider.name, CardanoWalletFaucetProvider.create);
+faucetProviderFactory.register('cardano-wallet', CardanoWalletFaucetProvider.create);
 
 // Asset providers
 
@@ -88,7 +87,7 @@ class NullAssetProvider implements AssetProvider {
 }
 
 assetProviderFactory.register(
-  NullAssetProvider.name,
+  'stub',
   async (): Promise<AssetProvider> =>
     new Promise<AssetProvider>(async (resolve) => {
       resolve(new NullAssetProvider());
@@ -96,85 +95,61 @@ assetProviderFactory.register(
 );
 
 assetProviderFactory.register(
-  blockfrostAssetProvider.name,
-  async (params: any): Promise<AssetProvider> =>
+  BLOCKFROST_PROVIDER,
+  async (): Promise<AssetProvider> =>
     new Promise<AssetProvider>(async (resolve) => {
-      if (params.isTestnet === undefined) throw new Error(BLOCKFROST_MISSING_FLAG);
-
-      if (params.projectId === undefined) throw new Error(BLOCKFROST_MISSING_PROJECT_ID);
-
-      resolve(blockfrostAssetProvider(await getBlockfrostApi(params.isTestnet, params.projectId)));
+      resolve(blockfrostAssetProvider(await getBlockfrostApi()));
     })
 );
 
 // Chain history providers
 chainHistoryProviderFactory.register(
-  blockfrostChainHistoryProvider.name,
-  async (params: any): Promise<ChainHistoryProvider> =>
+  BLOCKFROST_PROVIDER,
+  async (): Promise<ChainHistoryProvider> =>
     new Promise<ChainHistoryProvider>(async (resolve) => {
-      if (params.isTestnet === undefined) throw new Error(BLOCKFROST_MISSING_FLAG);
-
-      if (params.projectId === undefined) throw new Error(BLOCKFROST_MISSING_PROJECT_ID);
-
-      resolve(blockfrostChainHistoryProvider(await getBlockfrostApi(params.isTestnet, params.projectId)));
+      resolve(blockfrostChainHistoryProvider(await getBlockfrostApi()));
     })
 );
 
 // Network info providers
 networkInfoProviderFactory.register(
-  blockfrostNetworkInfoProvider.name,
-  async (params: any): Promise<NetworkInfoProvider> =>
+  BLOCKFROST_PROVIDER,
+  async (): Promise<NetworkInfoProvider> =>
     new Promise<NetworkInfoProvider>(async (resolve) => {
-      if (params.isTestnet === undefined) throw new Error(BLOCKFROST_MISSING_FLAG);
-
-      if (params.projectId === undefined) throw new Error(BLOCKFROST_MISSING_PROJECT_ID);
-
-      resolve(blockfrostNetworkInfoProvider(await getBlockfrostApi(params.isTestnet, params.projectId)));
+      resolve(blockfrostNetworkInfoProvider(await getBlockfrostApi()));
     })
 );
 
 // Rewards providers
 rewardsProviderFactory.register(
-  blockfrostRewardsProvider.name,
-  async (params: any): Promise<RewardsProvider> =>
+  BLOCKFROST_PROVIDER,
+  async (): Promise<RewardsProvider> =>
     new Promise<RewardsProvider>(async (resolve) => {
-      if (params.isTestnet === undefined) throw new Error(BLOCKFROST_MISSING_FLAG);
-
-      if (params.projectId === undefined) throw new Error(BLOCKFROST_MISSING_PROJECT_ID);
-
-      resolve(blockfrostRewardsProvider(await getBlockfrostApi(params.isTestnet, params.projectId)));
+      resolve(blockfrostRewardsProvider(await getBlockfrostApi()));
     })
 );
 
 // Tx submit providers
 txSubmitProviderFactory.register(
-  blockfrostTxSubmitProvider.name,
-  async (params: any): Promise<TxSubmitProvider> =>
+  BLOCKFROST_PROVIDER,
+  async (): Promise<TxSubmitProvider> =>
     new Promise<TxSubmitProvider>(async (resolve) => {
-      if (params.isTestnet === undefined) throw new Error(BLOCKFROST_MISSING_FLAG);
-
-      if (params.projectId === undefined) throw new Error(BLOCKFROST_MISSING_PROJECT_ID);
-
-      resolve(blockfrostTxSubmitProvider(await getBlockfrostApi(params.isTestnet, params.projectId)));
+      resolve(blockfrostTxSubmitProvider(await getBlockfrostApi()));
     })
 );
 
 // Utxo providers
 utxoProviderFactory.register(
-  blockfrostUtxoProvider.name,
-  async (params: any): Promise<UtxoProvider> =>
+  BLOCKFROST_PROVIDER,
+  async (): Promise<UtxoProvider> =>
     new Promise<UtxoProvider>(async (resolve) => {
-      if (params.isTestnet === undefined) throw new Error(BLOCKFROST_MISSING_FLAG);
-
-      if (params.projectId === undefined) throw new Error(BLOCKFROST_MISSING_PROJECT_ID);
-
-      resolve(blockfrostUtxoProvider(await getBlockfrostApi(params.isTestnet, params.projectId)));
+      resolve(blockfrostUtxoProvider(await getBlockfrostApi()));
     })
 );
 
 // Stake Pool providers
 stakePoolProviderFactory.register(
-  'NullStubStakePoolProvider',
+  'stub',
   async (): Promise<StakePoolProvider> =>
     new Promise<StakePoolProvider>(async (resolve) => {
       resolve(createStubStakePoolProvider());
@@ -182,70 +157,61 @@ stakePoolProviderFactory.register(
 );
 
 // Key Agents
-keyManagementFactory.register(
-  KeyManagement.InMemoryKeyAgent.name,
-  async (params: any): Promise<KeyManagement.AsyncKeyAgent> => {
-    const mnemonicWords = (params?.mnemonic || '').split(' ');
+keyManagementFactory.register('inMemory', async (params: any): Promise<KeyManagement.AsyncKeyAgent> => {
+  const mnemonicWords = (params?.mnemonic || '').split(' ');
 
-    if (mnemonicWords.length === 0) throw new Error(KEY_AGENT_MISSING_MNEMONIC);
+  if (mnemonicWords.length === 0) throw new Error(KEY_AGENT_MISSING_MNEMONIC);
 
-    if (params.password === undefined) throw new Error(KEY_AGENT_MISSING_PASSWORD);
+  if (params.password === undefined) throw new Error(KEY_AGENT_MISSING_PASSWORD);
 
-    if (params.networkId === undefined) throw new Error(KEY_AGENT_MISSING_NETWORK_ID);
+  if (params.networkId === undefined) throw new Error(KEY_AGENT_MISSING_NETWORK_ID);
 
-    if (params.accountIndex === undefined) throw new Error(KEY_AGENT_MISSING_ACCOUNT_INDEX);
+  if (params.accountIndex === undefined) throw new Error(KEY_AGENT_MISSING_ACCOUNT_INDEX);
 
-    return KeyManagement.util.createAsyncKeyAgent(
-      await KeyManagement.InMemoryKeyAgent.fromBip39MnemonicWords({
-        accountIndex: params.accountIndex,
-        getPassword: async () => Buffer.from(params.password),
-        mnemonicWords,
-        networkId: params.networkId
-      })
-    );
-  }
-);
-
-keyManagementFactory.register(
-  KeyManagement.LedgerKeyAgent.name,
-  async (params: any): Promise<KeyManagement.AsyncKeyAgent> => {
-    if (params.networkId === undefined) throw new Error(KEY_AGENT_MISSING_NETWORK_ID);
-
-    if (params.accountIndex === undefined) throw new Error(KEY_AGENT_MISSING_ACCOUNT_INDEX);
-
-    let deviceConnection: DeviceConnection | null | undefined;
-    const ledgerKeyAgent = KeyManagement.LedgerKeyAgent.createWithDevice({
+  return KeyManagement.util.createAsyncKeyAgent(
+    await KeyManagement.InMemoryKeyAgent.fromBip39MnemonicWords({
       accountIndex: params.accountIndex,
-      communicationType: KeyManagement.CommunicationType.Node,
-      deviceConnection,
+      getPassword: async () => Buffer.from(params.password),
+      mnemonicWords,
+      networkId: params.networkId
+    })
+  );
+});
+
+keyManagementFactory.register('ledger', async (params: any): Promise<KeyManagement.AsyncKeyAgent> => {
+  if (params.networkId === undefined) throw new Error(KEY_AGENT_MISSING_NETWORK_ID);
+
+  if (params.accountIndex === undefined) throw new Error(KEY_AGENT_MISSING_ACCOUNT_INDEX);
+
+  let deviceConnection: DeviceConnection | null | undefined;
+  const ledgerKeyAgent = KeyManagement.LedgerKeyAgent.createWithDevice({
+    accountIndex: params.accountIndex,
+    communicationType: KeyManagement.CommunicationType.Node,
+    deviceConnection,
+    networkId: params.networkId,
+    protocolMagic: 1_097_911_063
+  });
+
+  return KeyManagement.util.createAsyncKeyAgent(await ledgerKeyAgent);
+});
+
+keyManagementFactory.register('trezor', async (params: any): Promise<KeyManagement.AsyncKeyAgent> => {
+  if (params.networkId === undefined) throw new Error(KEY_AGENT_MISSING_NETWORK_ID);
+
+  if (params.accountIndex === undefined) throw new Error(KEY_AGENT_MISSING_ACCOUNT_INDEX);
+
+  return KeyManagement.util.createAsyncKeyAgent(
+    await KeyManagement.TrezorKeyAgent.createWithDevice({
+      accountIndex: params.accountIndex,
       networkId: params.networkId,
-      protocolMagic: 1_097_911_063
-    });
-
-    return KeyManagement.util.createAsyncKeyAgent(await ledgerKeyAgent);
-  }
-);
-
-keyManagementFactory.register(
-  KeyManagement.TrezorKeyAgent.name,
-  async (params: any): Promise<KeyManagement.AsyncKeyAgent> => {
-    if (params.networkId === undefined) throw new Error(KEY_AGENT_MISSING_NETWORK_ID);
-
-    if (params.accountIndex === undefined) throw new Error(KEY_AGENT_MISSING_ACCOUNT_INDEX);
-
-    return KeyManagement.util.createAsyncKeyAgent(
-      await KeyManagement.TrezorKeyAgent.createWithDevice({
-        accountIndex: params.accountIndex,
-        networkId: params.networkId,
-        protocolMagic: 1_097_911_063,
-        trezorConfig: {
-          communicationType: KeyManagement.CommunicationType.Node,
-          manifest: {
-            appUrl: 'https://your.application.com',
-            email: 'email@developer.com'
-          }
+      protocolMagic: 1_097_911_063,
+      trezorConfig: {
+        communicationType: KeyManagement.CommunicationType.Node,
+        manifest: {
+          appUrl: 'https://your.application.com',
+          email: 'email@developer.com'
         }
-      })
-    );
-  }
-);
+      }
+    })
+  );
+});
