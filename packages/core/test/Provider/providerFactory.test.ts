@@ -5,7 +5,7 @@ import { ProviderFactory } from '../../src';
 /**
  * Provider interface.
  */
-interface IProvider {
+interface Provider {
   getName(): string;
 }
 
