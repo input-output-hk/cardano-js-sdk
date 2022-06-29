@@ -25,7 +25,7 @@ The providers used during the e2e test can be configured via environment variabl
 If you are using _testnet_ or _mainnet_ as your test environment, ensure that the wallets you are configuring via environment variables contain some funds.
 
 <a name="generate_wallet"></a>
-If you need to create a new wallet via a brand new set of mnemonics, you can run:
+If you need to create a new wallet via a new set of mnemonics, you can run:
 
 ```bash
 $ yarn workspace @cardano-sdk/e2e generate-mnemonics
