@@ -1,6 +1,6 @@
 # End to end tests for Cardano JS SDK
 
-This directory contains end-to-end tests for cardano-js-sdk. Each directory under 'test' is a self-contained set of tests for a particular component/use case that exactly mimics how a user might expect the cardano-js-sdk to work, allowing high-fidelity reproductions of real-world issues.
+Directories under `./test` group test suites to demonstrate the SDK for specific application use cases.
 
 For this to work, we first install dependencies and build the sdk from the root via:
 
