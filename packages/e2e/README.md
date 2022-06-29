@@ -1,4 +1,4 @@
-# End to end tests for Cardano JS SDK
+# End-to-end tests for Cardano JS SDK
 
 Directories under `./test` group test suites to demonstrate the SDK for specific application use cases.
 
