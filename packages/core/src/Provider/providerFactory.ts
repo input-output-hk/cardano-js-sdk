@@ -23,11 +23,11 @@ export class ProviderFactory<T> {
   }
 
   /**
-   * Create a new faucet provider.
+   * Create a new provider.
    *
-   * @param name The name of the concrete facet provider implementation.
+   * @param name The name of the concrete provider implementation.
    * @param params The parameters to be passed to the concrete implementation constructor.
-   * @returns The new Faucet provider.
+   * @returns The new provider.
    * @throws if The give provider name is not registered, or the constructor parameters of
    * the providers are either missing or invalid.
    */
