@@ -45,7 +45,6 @@
     "shx": "^0.3.3"
   },
   "dependencies": {
-    "@cardano-ogmios/client": "~5.1.0",
     "@cardano-sdk/core": "0.3.0",
     "@cardano-sdk/util": "0.3.0",
     "axios": "^0.27.2",
