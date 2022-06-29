@@ -5,7 +5,9 @@ export const defaultNetworkInfoProviderPaths: HttpProviderConfigPaths<NetworkInf
   currentWalletProtocolParameters: '/current-wallet-protocol-parameters',
   genesisParameters: '/genesis-parameters',
   ledgerTip: '/ledger-tip',
-  networkInfo: '/network'
+  lovelaceSupply: '/lovelace-supply',
+  stake: '/stake',
+  timeSettings: '/time-settings'
 };
 
 /**

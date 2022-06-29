@@ -45,6 +45,7 @@ export const genesisParameters = {
   epochLength: 432_000,
   maxKesEvolutions: 62,
   maxLovelaceSupply: 45_000_000_000_000_000n,
+  networkId: 0,
   networkMagic: 764_824_073,
   securityParameter: 2160,
   slotLength: 1,

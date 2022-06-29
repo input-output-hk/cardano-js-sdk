@@ -6,11 +6,13 @@ import {
   InMemoryGenesisParametersStore,
   InMemoryInFlightTransactionsStore,
   InMemoryKeyValueStore,
-  InMemoryNetworkInfoStore,
   InMemoryProtocolParametersStore,
   InMemoryRewardsBalancesStore,
   InMemoryRewardsHistoryStore,
   InMemoryStakePoolsStore,
+  InMemoryStakeSummaryStore,
+  InMemorySupplySummaryStore,
+  InMemoryTimeSettingsStore,
   InMemoryTipStore,
   InMemoryTransactionsStore,
   InMemoryUtxoStore
@@ -122,7 +124,9 @@ describe('inMemoryStores', () => {
     expect(new InMemoryTipStore()).toBeInstanceOf(InMemoryDocumentStore);
     expect(new InMemoryProtocolParametersStore()).toBeInstanceOf(InMemoryDocumentStore);
     expect(new InMemoryGenesisParametersStore()).toBeInstanceOf(InMemoryDocumentStore);
-    expect(new InMemoryNetworkInfoStore()).toBeInstanceOf(InMemoryDocumentStore);
+    expect(new InMemorySupplySummaryStore()).toBeInstanceOf(InMemoryDocumentStore);
+    expect(new InMemoryStakeSummaryStore()).toBeInstanceOf(InMemoryDocumentStore);
+    expect(new InMemoryTimeSettingsStore()).toBeInstanceOf(InMemoryDocumentStore);
     expect(new InMemoryAssetsStore()).toBeInstanceOf(InMemoryDocumentStore);
     expect(new InMemoryAddressesStore()).toBeInstanceOf(InMemoryDocumentStore);
     expect(new InMemoryInFlightTransactionsStore()).toBeInstanceOf(InMemoryDocumentStore);

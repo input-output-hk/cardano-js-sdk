@@ -5,7 +5,6 @@ import { testnetTimeSettings } from '@cardano-sdk/core';
 export const networkInfo = {
   lovelaceSupply: {
     circulating: 42_064_399_450_423_723n,
-    max: 45_000_000_000_000_000n,
     total: 40_267_211_394_073_980n
   },
   network: {
@@ -25,7 +24,10 @@ export const mockNetworkInfoProvider = () => ({
   currentWalletProtocolParameters: jest.fn().mockResolvedValue(protocolParameters),
   genesisParameters: jest.fn().mockResolvedValue(genesisParameters),
   ledgerTip: jest.fn().mockResolvedValue(ledgerTip),
-  networkInfo: jest.fn().mockResolvedValue(networkInfo)
+  lovelaceSupply: jest.fn().mockResolvedValue(networkInfo.lovelaceSupply),
+  networkInfo: jest.fn().mockResolvedValue(networkInfo),
+  stake: jest.fn().mockResolvedValue(networkInfo.stake),
+  timeSettings: jest.fn().mockResolvedValue(networkInfo.network.timeSettings)
 });
 
 export type NetworkInfoProviderStub = ReturnType<typeof mockNetworkInfoProvider>;

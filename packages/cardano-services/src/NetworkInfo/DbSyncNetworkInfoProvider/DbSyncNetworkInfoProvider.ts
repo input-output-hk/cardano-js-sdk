@@ -1,8 +1,10 @@
 import {
   Cardano,
-  NetworkInfo,
   NetworkInfoProvider,
   ProtocolParametersRequiredByWallet,
+  StakeSummary,
+  SupplySummary,
+  TimeSettings,
   timeSettingsConfig
 } from '@cardano-sdk/core';
 import { DbSyncProvider } from '../../DbSyncProvider';
@@ -13,7 +15,7 @@ import { NetworkInfoBuilder } from './NetworkInfoBuilder';
 import { NetworkInfoCacheKey } from '.';
 import { Pool } from 'pg';
 import { Shutdown } from '@cardano-sdk/util';
-import { loadGenesisData, toGenesisParams, toLedgerTip, toNetworkInfo, toWalletProtocolParams } from './mappers';
+import { loadGenesisData, toGenesisParams, toLedgerTip, toStake, toSupply, toWalletProtocolParams } from './mappers';
 import { pollDbSync } from './utils';
 
 export interface NetworkInfoProviderProps {
@@ -45,35 +47,6 @@ export class DbSyncNetworkInfoProvider extends DbSyncProvider implements Network
     this.#dbPollInterval = dbPollInterval;
   }
 
-  public async networkInfo(): Promise<NetworkInfo> {
-    const { networkMagic, networkId, maxLovelaceSupply } = await this.#genesisDataReady;
-    const timeSettings = timeSettingsConfig[networkMagic];
-
-    this.#logger.debug('About to query network info data');
-
-    const [liveStake, circulatingSupply, activeStake, totalSupply] = await Promise.all([
-      this.#cache.get(NetworkInfoCacheKey.LIVE_STAKE, () => this.#builder.queryLiveStake()),
-      this.#cache.get(NetworkInfoCacheKey.CIRCULATING_SUPPLY, () => this.#builder.queryCirculatingSupply()),
-      this.#cache.get(NetworkInfoCacheKey.ACTIVE_STAKE, () => this.#builder.queryActiveStake(), UNLIMITED_CACHE_TTL),
-      this.#cache.get(
-        NetworkInfoCacheKey.TOTAL_SUPPLY,
-        () => this.#builder.queryTotalSupply(maxLovelaceSupply),
-        UNLIMITED_CACHE_TTL
-      )
-    ]);
-
-    return toNetworkInfo({
-      activeStake,
-      circulatingSupply,
-      liveStake,
-      maxLovelaceSupply,
-      networkId,
-      networkMagic,
-      timeSettings,
-      totalSupply
-    });
-  }
-
   public async ledgerTip(): Promise<Cardano.Tip> {
     const tip = await this.#builder.queryLedgerTip();
     return toLedgerTip(tip);
@@ -87,6 +60,40 @@ export class DbSyncNetworkInfoProvider extends DbSyncProvider implements Network
   public async genesisParameters(): Promise<Cardano.CompactGenesis> {
     const genesisData = await this.#genesisDataReady;
     return toGenesisParams(genesisData);
+  }
+
+  public async lovelaceSupply(): Promise<SupplySummary> {
+    const { maxLovelaceSupply } = await this.#genesisDataReady;
+
+    const [circulatingSupply, totalSupply] = await Promise.all([
+      this.#cache.get(NetworkInfoCacheKey.CIRCULATING_SUPPLY, () => this.#builder.queryCirculatingSupply()),
+      this.#cache.get(
+        NetworkInfoCacheKey.TOTAL_SUPPLY,
+        () => this.#builder.queryTotalSupply(maxLovelaceSupply),
+        UNLIMITED_CACHE_TTL
+      )
+    ]);
+
+    return toSupply({ circulatingSupply, totalSupply });
+  }
+
+  public async stake(): Promise<StakeSummary> {
+    this.#logger.debug('About to query stake data');
+
+    const [liveStake, activeStake] = await Promise.all([
+      this.#cache.get(NetworkInfoCacheKey.LIVE_STAKE, () => this.#builder.queryLiveStake()),
+      this.#cache.get(NetworkInfoCacheKey.ACTIVE_STAKE, () => this.#builder.queryActiveStake(), UNLIMITED_CACHE_TTL)
+    ]);
+
+    return toStake({
+      activeStake,
+      liveStake
+    });
+  }
+
+  public async timeSettings(): Promise<TimeSettings[]> {
+    const { networkMagic } = await this.#genesisDataReady;
+    return timeSettingsConfig[networkMagic];
   }
 
   async start(): Promise<void> {

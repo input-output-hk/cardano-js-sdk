@@ -2,14 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as mocks from '../mocks';
 import { AssetId, createStubStakePoolProvider, somePartialStakePools } from '@cardano-sdk/util-dev';
-import {
-  Cardano,
-  ChainHistoryProvider,
-  NetworkInfoProvider,
-  RewardsProvider,
-  UtxoProvider,
-  testnetTimeSettings
-} from '@cardano-sdk/core';
+import { Cardano, ChainHistoryProvider, NetworkInfoProvider, RewardsProvider, UtxoProvider } from '@cardano-sdk/core';
 import { KeyManagement, ObservableWallet, SingleAddressWallet } from '../../src';
 import { WalletStores, createInMemoryWalletStores } from '../../src/persistence';
 import { currentEpoch, networkInfo, queryTransactionsResult, queryTransactionsResult2 } from '../mocks';
@@ -107,8 +100,6 @@ const assertWalletProperties = async (
   expect(addresses[0].rewardAccount).toEqual(rewardAccount);
   // assets$
   expect(await firstValueFrom(wallet.assets$)).toEqual(new Map([[AssetId.TSLA, mocks.asset]]));
-  // networkInfo$
-  expect(await firstValueFrom(wallet.networkInfo$)).toEqual(networkInfo);
   // inputAddressResolver
   expect(typeof wallet.util).toBe('object');
 };
@@ -123,14 +114,18 @@ const assertWalletProperties2 = async (wallet: ObservableWallet) => {
   expect((await firstValueFrom(wallet.transactions.history$))?.length).toEqual(queryTransactionsResult2.length);
   const walletTip = await firstValueFrom(wallet.tip$);
   expect(walletTip).toEqual(mocks.ledgerTip2);
-  const walletNetworkInfo = await firstValueFrom(wallet.networkInfo$);
-  expect(walletNetworkInfo.network.timeSettings).toEqual(testnetTimeSettings);
+
   const walletCurrentEpoch = await firstValueFrom(wallet.currentEpoch$);
   expect(walletCurrentEpoch.epochNo).toEqual(currentEpoch.number);
   const walletProtocolParameters = await firstValueFrom(wallet.protocolParameters$);
   expect(walletProtocolParameters).toEqual(mocks.protocolParameters2);
   const walletGenesisParameters = await firstValueFrom(wallet.genesisParameters$);
   expect(walletGenesisParameters).toEqual(mocks.genesisParameters2);
+
+  expect(await firstValueFrom(wallet.stake$)).toEqual(networkInfo.stake);
+  expect(await firstValueFrom(wallet.lovelaceSupply$)).toEqual(networkInfo.lovelaceSupply);
+  expect(await firstValueFrom(wallet.timeSettings$)).toEqual(networkInfo.network.timeSettings);
+
   // delegation
   const rewardsHistory = await firstValueFrom(wallet.delegation.rewardsHistory$)!;
   const expectedRewards = flatten([...mocks.rewardsHistory2.values()]);

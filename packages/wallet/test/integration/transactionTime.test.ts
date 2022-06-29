@@ -12,9 +12,7 @@ describe('integration/transactionTime', () => {
 
   it('provides utils necessary for computing transaction time', async () => {
     const transactions = await firstValueFrom(wallet.transactions.history$);
-    const {
-      network: { timeSettings }
-    } = await firstValueFrom(wallet.networkInfo$);
+    const timeSettings = await firstValueFrom(wallet.timeSettings$);
     const slotTimeCalc = createSlotTimeCalc(timeSettings);
     const transactionTime = slotTimeCalc(transactions[0].blockHeader.slot);
     expect(typeof transactionTime.getTime()).toBe('number');

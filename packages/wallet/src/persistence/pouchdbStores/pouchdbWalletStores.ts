@@ -1,5 +1,12 @@
 import { Assets } from '../../types';
-import { Cardano, EpochRewards, NetworkInfo, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
+import {
+  Cardano,
+  EpochRewards,
+  ProtocolParametersRequiredByWallet,
+  StakeSummary,
+  SupplySummary,
+  TimeSettings
+} from '@cardano-sdk/core';
 import { EMPTY, combineLatest, map } from 'rxjs';
 import { GroupedAddress } from '../../KeyManagement';
 import { Logger } from 'ts-log';
@@ -11,7 +18,10 @@ import { WalletStores } from '../types';
 export class PouchdbTipStore extends PouchdbDocumentStore<Cardano.Tip> {}
 export class PouchdbProtocolParametersStore extends PouchdbDocumentStore<ProtocolParametersRequiredByWallet> {}
 export class PouchdbGenesisParametersStore extends PouchdbDocumentStore<Cardano.CompactGenesis> {}
-export class PouchdbNetworkInfoStore extends PouchdbDocumentStore<NetworkInfo> {}
+export class PouchdbStakeSummaryStore extends PouchdbDocumentStore<StakeSummary> {}
+export class PouchdbSupplySummaryStore extends PouchdbDocumentStore<SupplySummary> {}
+export class PouchdbTimeSettingsStore extends PouchdbDocumentStore<TimeSettings[]> {}
+
 export class PouchdbAssetsStore extends PouchdbDocumentStore<Assets> {}
 export class PouchdbAddressesStore extends PouchdbDocumentStore<GroupedAddress[]> {}
 export class PouchdbInFlightTransactionsStore extends PouchdbDocumentStore<Cardano.NewTxAlonzo[]> {}
@@ -59,11 +69,13 @@ export const createPouchdbWalletStores = (
     destroyed: false,
     genesisParameters: new PouchdbGenesisParametersStore(docsDbName, 'genesisParameters', logger),
     inFlightTransactions: new PouchdbInFlightTransactionsStore(docsDbName, 'newTransactions', logger),
-    networkInfo: new PouchdbNetworkInfoStore(docsDbName, 'networkInfo', logger),
+    lovelaceSupply: new PouchdbSupplySummaryStore(docsDbName, 'lovelaceSupply', logger),
     protocolParameters: new PouchdbProtocolParametersStore(docsDbName, 'protocolParameters', logger),
     rewardsBalances: new PouchdbRewardsBalancesStore(`${baseDbName}RewardsBalances`, logger),
     rewardsHistory: new PouchdbRewardsHistoryStore(`${baseDbName}RewardsHistory`, logger),
+    stake: new PouchdbStakeSummaryStore(docsDbName, 'stake', logger),
     stakePools: new PouchdbStakePoolsStore(`${baseDbName}StakePools`, logger),
+    timeSettings: new PouchdbTimeSettingsStore(docsDbName, 'timeSettings', logger),
     tip: new PouchdbTipStore(docsDbName, 'tip', logger),
     transactions: new PouchdbTransactionsStore(
       {

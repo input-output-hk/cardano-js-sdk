@@ -1,6 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Error as BlockfrostError } from '@blockfrost/blockfrost-js';
-import { Cardano, InvalidStringError, ProviderError, ProviderFailure, ProviderUtil } from '@cardano-sdk/core';
+import {
+  Cardano,
+  InvalidStringError,
+  NetworkInfoProvider,
+  ProviderError,
+  ProviderFailure,
+  ProviderUtil,
+  testnetTimeSettings
+} from '@cardano-sdk/core';
 import { PaginationOptions } from '@blockfrost/blockfrost-js/lib/types';
 
 export const formatBlockfrostError = (error: unknown) => {
@@ -118,3 +126,10 @@ export const fetchByAddressSequentially = async <Item, Response>(props: {
       ? (response, arg) => props.responseTranslator!(arg, response)
       : undefined
   });
+
+export const networkMagicToIdMap: { [key in number]: Cardano.NetworkId } = {
+  [Cardano.CardanoNetworkMagic.Mainnet]: Cardano.NetworkId.mainnet,
+  [Cardano.CardanoNetworkMagic.Testnet]: Cardano.NetworkId.testnet
+};
+
+export const timeSettings: NetworkInfoProvider['timeSettings'] = async () => testnetTimeSettings;
