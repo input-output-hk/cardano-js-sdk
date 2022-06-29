@@ -19,7 +19,7 @@
     "docs": "run-s docs:typedoc docs:coverage",
     "cleanup": "yarn workspaces run cleanup && shx rm -rf node_modules",
     "cleanup:dist": "yarn workspaces run cleanup:dist",
-    "lint": "eslint -c complete.eslintrc.js --max-warnings=0 \"packages/*/src/**/*.ts\" \"packages/*/test/**/*.ts\" \"packages/*/e2e/**/*.ts\"",
+    "lint": "eslint -c complete.eslintrc.js --max-warnings=0 \"packages/*/src/**/*.ts\" \"packages/*/test/**/*.ts\"",
     "lint:fix": "yarn lint --fix",
     "tscNoEmit": "yarn workspaces run tscNoEmit",
     "prepare": "husky install",
