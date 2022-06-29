@@ -10,7 +10,7 @@ import {
   InMemoryRewardsBalancesStore,
   InMemoryRewardsHistoryStore,
   InMemoryStakePoolsStore,
-  InMemoryStakeSymmaryStore,
+  InMemoryStakeSummaryStore,
   InMemorySupplySummaryStore,
   InMemoryTimeSettingsStore,
   InMemoryTipStore,
@@ -125,7 +125,7 @@ describe('inMemoryStores', () => {
     expect(new InMemoryProtocolParametersStore()).toBeInstanceOf(InMemoryDocumentStore);
     expect(new InMemoryGenesisParametersStore()).toBeInstanceOf(InMemoryDocumentStore);
     expect(new InMemorySupplySummaryStore()).toBeInstanceOf(InMemoryDocumentStore);
-    expect(new InMemoryStakeSymmaryStore()).toBeInstanceOf(InMemoryDocumentStore);
+    expect(new InMemoryStakeSummaryStore()).toBeInstanceOf(InMemoryDocumentStore);
     expect(new InMemoryTimeSettingsStore()).toBeInstanceOf(InMemoryDocumentStore);
     expect(new InMemoryAssetsStore()).toBeInstanceOf(InMemoryDocumentStore);
     expect(new InMemoryAddressesStore()).toBeInstanceOf(InMemoryDocumentStore);

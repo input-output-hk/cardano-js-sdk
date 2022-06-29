@@ -17,7 +17,7 @@ import { WalletStores } from '../types';
 export class InMemoryTipStore extends InMemoryDocumentStore<Cardano.Tip> {}
 export class InMemoryProtocolParametersStore extends InMemoryDocumentStore<ProtocolParametersRequiredByWallet> {}
 export class InMemoryGenesisParametersStore extends InMemoryDocumentStore<Cardano.CompactGenesis> {}
-export class InMemoryStakeSymmaryStore extends InMemoryDocumentStore<StakeSummary> {}
+export class InMemoryStakeSummaryStore extends InMemoryDocumentStore<StakeSummary> {}
 export class InMemorySupplySummaryStore extends InMemoryDocumentStore<SupplySummary> {}
 export class InMemoryTimeSettingsStore extends InMemoryDocumentStore<TimeSettings[]> {}
 
@@ -66,7 +66,7 @@ export const createInMemoryWalletStores = (): WalletStores => ({
   protocolParameters: new InMemoryProtocolParametersStore(),
   rewardsBalances: new InMemoryRewardsBalancesStore(),
   rewardsHistory: new InMemoryRewardsHistoryStore(),
-  stake: new InMemoryStakeSymmaryStore(),
+  stake: new InMemoryStakeSummaryStore(),
   stakePools: new InMemoryStakePoolsStore(),
   timeSettings: new InMemoryTimeSettingsStore(),
   tip: new InMemoryTipStore(),
