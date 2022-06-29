@@ -1,25 +1,19 @@
+import { HealthCheckResponse, Provider } from '../../src/Provider/Provider';
 import { ProviderFactory } from '../../src';
 
 // Mock providers.
-
-/**
- * Provider interface.
- */
-interface Provider {
-  getName(): string;
-}
 
 /**
  * Mock provider A.
  */
 class MockProviderA implements Provider {
   /**
-   * Dummy provider method.
-   *
-   * @returns The provider name.
+   * Dummy health check method.
    */
-  getName() {
-    return 'A';
+  healthCheck(): Promise<HealthCheckResponse> {
+    return new Promise<HealthCheckResponse>(async (resolve) => {
+      resolve({ ok: true });
+    });
   }
 
   /**
@@ -39,12 +33,12 @@ class MockProviderA implements Provider {
  */
 class MockProviderB implements Provider {
   /**
-   * Dummy provider method.
-   *
-   * @returns The provider name.
+   * Dummy health check method.
    */
-  getName() {
-    return 'B';
+  healthCheck(): Promise<HealthCheckResponse> {
+    return new Promise<HealthCheckResponse>(async (resolve) => {
+      resolve({ ok: false });
+    });
   }
 
   /**
@@ -61,7 +55,7 @@ class MockProviderB implements Provider {
 
 describe('ProviderFactory', () => {
   it('can register several providers', async () => {
-    // Arrange.
+    // Arrange
     const factory = new ProviderFactory<Provider>();
 
     // Act
@@ -74,23 +68,26 @@ describe('ProviderFactory', () => {
   });
 
   it('can create a registered provider', async () => {
-    // Arrange.
+    // Arrange
     const factory = new ProviderFactory<Provider>();
 
-    // Act
     factory.register(MockProviderA.name, MockProviderA.create);
     factory.register(MockProviderB.name, MockProviderB.create);
 
+    // Act
     const providerA: Provider = await factory.create(MockProviderA.name, {});
     const providerB: Provider = await factory.create(MockProviderB.name, {});
 
+    const resultA = await providerA.healthCheck();
+    const resultB = await providerB.healthCheck();
+
     // Assert
-    expect(providerA.getName()).toEqual('A');
-    expect(providerB.getName()).toEqual('B');
+    expect(resultA.ok).toEqual(true);
+    expect(resultB.ok).toEqual(false);
   });
 
   it('throws if requested provider is not supported', async () => {
-    // Arrange.
+    // Arrange
     const factory = new ProviderFactory<Provider>();
 
     // Assert
