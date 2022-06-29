@@ -123,7 +123,7 @@ The end-to-end faucet test are meant to showcase the use of the private testnet.
 $ yarn workspace @cardano-sdk/e2e private-network:up
 ```
 
-Note that once you finish running the test, you should stop the enviroment with:
+:warning: Note that once you finish running the test, you should stop the enviroment with:
 
 ```bash
 $ yarn workspace @cardano-sdk/e2e private-network:down
