@@ -4,6 +4,7 @@
     "description": "End to end tests for the cardano-js-sdk packages.",
     "main": "index.js",
     "scripts": {
+        "test": "shx echo 'test' command not implemented yet",
         "test:blockfrost": "jest -c jest.config.js --selectProjects blockfrost --runInBand --verbose",
         "test:wallet": "jest -c jest.config.js --selectProjects wallet --runInBand --verbose",
         "test:faucet": "jest -c jest.config.js --selectProjects faucet --runInBand --verbose",
