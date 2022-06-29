@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">95.83% </span>
+                <span class="strong">96.29% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>23/24</span>
+                <span class='fraction'>26/27</span>
             </div>
         
             
@@ -39,7 +39,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>5/5</span>
+                <span class='fraction'>6/6</span>
             </div>
         
             
@@ -165,23 +165,7 @@
 <a name='L100'></a><a href='#L100'>100</a>
 <a name='L101'></a><a href='#L101'>101</a>
 <a name='L102'></a><a href='#L102'>102</a>
-<a name='L103'></a><a href='#L103'>103</a>
-<a name='L104'></a><a href='#L104'>104</a>
-<a name='L105'></a><a href='#L105'>105</a>
-<a name='L106'></a><a href='#L106'>106</a>
-<a name='L107'></a><a href='#L107'>107</a>
-<a name='L108'></a><a href='#L108'>108</a>
-<a name='L109'></a><a href='#L109'>109</a>
-<a name='L110'></a><a href='#L110'>110</a>
-<a name='L111'></a><a href='#L111'>111</a>
-<a name='L112'></a><a href='#L112'>112</a>
-<a name='L113'></a><a href='#L113'>113</a>
-<a name='L114'></a><a href='#L114'>114</a>
-<a name='L115'></a><a href='#L115'>115</a>
-<a name='L116'></a><a href='#L116'>116</a>
-<a name='L117'></a><a href='#L117'>117</a>
-<a name='L118'></a><a href='#L118'>118</a>
-<a name='L119'></a><a href='#L119'>119</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">16x</span>
+<a name='L103'></a><a href='#L103'>103</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -204,7 +188,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -215,23 +198,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">9x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -271,6 +238,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -301,24 +269,23 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import {
   Cardano,
-  NetworkInfo,
   ProtocolParametersRequiredByWallet,
   ProviderError,
   ProviderFailure,
-  TimeSettings
+  StakeSummary,
+  SupplySummary
 } from '@cardano-sdk/core';
 import { GenesisData, LedgerTipModel, WalletProtocolParamsModel } from './types';
 import JSONbig from 'json-bigint';
 import fs from 'fs';
 import path from 'path';
 &nbsp;
-interface ToNetworkInfoInput {
-  networkMagic: Cardano.NetworkMagic;
-  networkId: Cardano.CardanoNetworkId;
-  timeSettings: TimeSettings[];
-  maxLovelaceSupply: Cardano.Lovelace;
+interface ToLovalaceSupplyInput {
   circulatingSupply: string;
   totalSupply: string;
+}
+&nbsp;
+interface ToStakeInput {
   activeStake: string;
   liveStake: string;
 }
@@ -328,30 +295,14 @@ export const networkIdMap = {
   Testnet: Cardano.NetworkId.testnet
 };
 &nbsp;
-export const toNetworkInfo = ({
-  networkId,
-  networkMagic,
-  timeSettings,
-  circulatingSupply,
-  maxLovelaceSupply,
-  totalSupply,
-  activeStake,
-  liveStake
-}: ToNetworkInfoInput): NetworkInfo =&gt; ({
-  lovelaceSupply: {
-    circulating: BigInt(circulatingSupply),
-    max: maxLovelaceSupply,
-    total: BigInt(totalSupply)
-  },
-  network: {
-    id: networkIdMap[networkId],
-    magic: networkMagic,
-    timeSettings
-  },
-  stake: {
-    active: BigInt(activeStake),
-    live: BigInt(liveStake)
-  }
+export const toSupply = ({ circulatingSupply, totalSupply }: ToLovalaceSupplyInput): SupplySummary =&gt; ({
+  circulating: BigInt(circulatingSupply),
+  total: BigInt(totalSupply)
+});
+&nbsp;
+export const toStake = ({ liveStake, activeStake }: ToStakeInput): StakeSummary =&gt; ({
+  active: BigInt(activeStake),
+  live: BigInt(liveStake)
 });
 &nbsp;
 export const toLedgerTip = ({ block_no, slot_no, hash }: LedgerTipModel): Cardano.Tip =&gt; ({
@@ -390,6 +341,7 @@ export const toWalletProtocolParams = ({
 &nbsp;
 export const toGenesisParams = (genesis: GenesisData): Cardano.CompactGenesis =&gt; ({
   ...genesis,
+  networkId: networkIdMap[genesis.networkId],
   systemStart: new Date(genesis.systemStart)
 });
 &nbsp;
@@ -424,7 +376,7 @@ export const loadGenesisData = async (cardanoNodeConfigPath: string): Promise&lt
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at Tue Jun 28 2022 11:01:43 GMT+0000 (Coordinated Universal Time)
+                at Wed Jun 29 2022 10:38:56 GMT+0000 (Coordinated Universal Time)
             </div>
         <script src="../../../prettify.js"></script>
         <script>

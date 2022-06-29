@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">66.66% </span>
+                <span class="strong">68.96% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>18/27</span>
+                <span class='fraction'>20/29</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">65.38% </span>
+                <span class="strong">67.85% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>17/26</span>
+                <span class='fraction'>19/28</span>
             </div>
         
             
@@ -146,7 +146,26 @@
 <a name='L81'></a><a href='#L81'>81</a>
 <a name='L82'></a><a href='#L82'>82</a>
 <a name='L83'></a><a href='#L83'>83</a>
-<a name='L84'></a><a href='#L84'>84</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">32x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -160,6 +179,9 @@
 <span class="cline-any cline-yes">32x</span>
 <span class="cline-any cline-yes">32x</span>
 <span class="cline-any cline-yes">32x</span>
+<span class="cline-any cline-yes">32x</span>
+<span class="cline-any cline-yes">32x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">32x</span>
 <span class="cline-any cline-yes">32x</span>
 <span class="cline-any cline-yes">32x</span>
@@ -203,6 +225,8 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -230,7 +254,14 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Assets } from '../../types';
-import { Cardano, EpochRewards, NetworkInfo, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
+import {
+  Cardano,
+  EpochRewards,
+  ProtocolParametersRequiredByWallet,
+  StakeSummary,
+  SupplySummary,
+  TimeSettings
+} from '@cardano-sdk/core';
 import { EMPTY, combineLatest, map } from 'rxjs';
 import { GroupedAddress } from '../../KeyManagement';
 import { Logger } from 'ts-log';
@@ -242,7 +273,10 @@ import { WalletStores } from '../types';
 export class PouchdbTipStore extends PouchdbDocumentStore&lt;Cardano.Tip&gt; {}
 export class PouchdbProtocolParametersStore extends PouchdbDocumentStore&lt;ProtocolParametersRequiredByWallet&gt; {}
 export class PouchdbGenesisParametersStore extends PouchdbDocumentStore&lt;Cardano.CompactGenesis&gt; {}
-export class PouchdbNetworkInfoStore extends PouchdbDocumentStore&lt;NetworkInfo&gt; {}
+export class PouchdbStakeSummaryStore extends PouchdbDocumentStore&lt;StakeSummary&gt; {}
+export class PouchdbSupplySummaryStore extends PouchdbDocumentStore&lt;SupplySummary&gt; {}
+export class PouchdbTimeSettingsStore extends PouchdbDocumentStore&lt;TimeSettings[]&gt; {}
+&nbsp;
 export class PouchdbAssetsStore extends PouchdbDocumentStore&lt;Assets&gt; {}
 export class PouchdbAddressesStore extends PouchdbDocumentStore&lt;GroupedAddress[]&gt; {}
 export class PouchdbInFlightTransactionsStore extends PouchdbDocumentStore&lt;Cardano.NewTxAlonzo[]&gt; {}
@@ -290,11 +324,13 @@ export const createPouchdbWalletStores = <span class="fstat-no" title="function 
     destroyed: false,
     genesisParameters: new PouchdbGenesisParametersStore(docsDbName, 'genesisParameters', logger),
     inFlightTransactions: new PouchdbInFlightTransactionsStore(docsDbName, 'newTransactions', logger),
-    networkInfo: new PouchdbNetworkInfoStore(docsDbName, 'networkInfo', logger),
+    lovelaceSupply: new PouchdbSupplySummaryStore(docsDbName, 'lovelaceSupply', logger),
     protocolParameters: new PouchdbProtocolParametersStore(docsDbName, 'protocolParameters', logger),
     rewardsBalances: new PouchdbRewardsBalancesStore(`${baseDbName}RewardsBalances`, logger),
     rewardsHistory: new PouchdbRewardsHistoryStore(`${baseDbName}RewardsHistory`, logger),
+    stake: new PouchdbStakeSummaryStore(docsDbName, 'stake', logger),
     stakePools: new PouchdbStakePoolsStore(`${baseDbName}StakePools`, logger),
+    timeSettings: new PouchdbTimeSettingsStore(docsDbName, 'timeSettings', logger),
     tip: new PouchdbTipStore(docsDbName, 'tip', logger),
     transactions: new PouchdbTransactionsStore(
       {
@@ -319,7 +355,7 @@ export const createPouchdbWalletStores = <span class="fstat-no" title="function 
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at Tue Jun 28 2022 11:04:41 GMT+0000 (Coordinated Universal Time)
+                at Wed Jun 29 2022 10:41:43 GMT+0000 (Coordinated Universal Time)
             </div>
         <script src="../../../prettify.js"></script>
         <script>

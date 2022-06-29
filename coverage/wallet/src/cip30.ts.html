@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">73.33% </span>
+                <span class="strong">73.68% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>88/120</span>
+                <span class='fraction'>84/114</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">53.84% </span>
+                <span class="strong">54.16% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>14/26</span>
+                <span class='fraction'>13/24</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">94.73% </span>
+                <span class="strong">94.44% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>18/19</span>
+                <span class='fraction'>17/18</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">73.27% </span>
+                <span class="strong">73.21% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>85/116</span>
+                <span class='fraction'>82/112</span>
             </div>
         
             
@@ -312,14 +312,7 @@
 <a name='L247'></a><a href='#L247'>247</a>
 <a name='L248'></a><a href='#L248'>248</a>
 <a name='L249'></a><a href='#L249'>249</a>
-<a name='L250'></a><a href='#L250'>250</a>
-<a name='L251'></a><a href='#L251'>251</a>
-<a name='L252'></a><a href='#L252'>252</a>
-<a name='L253'></a><a href='#L253'>253</a>
-<a name='L254'></a><a href='#L254'>254</a>
-<a name='L255'></a><a href='#L255'>255</a>
-<a name='L256'></a><a href='#L256'>256</a>
-<a name='L257'></a><a href='#L257'>257</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">29x</span>
+<a name='L250'></a><a href='#L250'>250</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">29x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -378,12 +371,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">29x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">29x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -427,7 +414,6 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -590,7 +576,7 @@
   WalletApi
 } from '@cardano-sdk/cip30';
 import { AuthenticationError } from './KeyManagement/errors';
-import { CSL, Cardano, NotImplementedError, coreToCsl, cslToCore } from '@cardano-sdk/core';
+import { CSL, Cardano, coreToCsl, cslToCore } from '@cardano-sdk/core';
 import { InputSelectionError } from '@cardano-sdk/cip2';
 import { Logger, dummyLogger } from 'ts-log';
 import { ObservableWallet } from './types';
@@ -631,12 +617,6 @@ export type CallbackConfirmation = (
 const mapCallbackFailure = (err: unknown, logger?: Logger) =&gt; {
   logger?.error(err);
   return false;
-};
-&nbsp;
-const magicToNetworkId = (networkMagic: number) =&gt; {
-  <span class="missing-if-branch" title="if path not taken" >I</span>if (networkMagic === 764_824_073) <span class="cstat-no" title="statement not covered" >return Cardano.NetworkId.mainnet;</span>
-  if (networkMagic === 1_097_911_063) return Cardano.NetworkId.testnet;
-<span class="cstat-no" title="statement not covered" >  throw new NotImplementedError(`Unsupported network magic ${networkMagic}`);</span>
 };
 &nbsp;
 export const createWalletApi = (
@@ -682,9 +662,8 @@ export const createWalletApi = (
   getNetworkId: async (): Promise&lt;Cardano.NetworkId&gt; =&gt; {
     logger.debug('getting networkId');
     const wallet = await walletReady;
-    const networkInfo = await firstValueFrom(wallet.networkInfo$);
-    // TODO: use networkInfo.network.id instead of magicToNetworkId
-    return magicToNetworkId(networkInfo.network.magic);
+    const genesisParameters = await firstValueFrom(wallet.genesisParameters$);
+    return genesisParameters.networkId;
   },
   getRewardAddresses: async (): Promise&lt;Cbor[]&gt; =&gt; {
     logger.debug('getting reward addresses');
@@ -838,7 +817,7 @@ export const createWalletApi = (
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at Tue Jun 28 2022 11:04:41 GMT+0000 (Coordinated Universal Time)
+                at Wed Jun 29 2022 10:41:43 GMT+0000 (Coordinated Universal Time)
             </div>
         <script src="../prettify.js"></script>
         <script>
