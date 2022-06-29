@@ -22,7 +22,10 @@ import {
 } from '@cardano-sdk/blockfrost';
 import { CardanoWalletFaucetProvider, FaucetProvider } from './FaucetProvider';
 import { KeyManagement } from '@cardano-sdk/wallet';
+import { createConnectionObject } from '@cardano-ogmios/client';
 import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
+import { ogmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
+import { txSubmitHttpProvider } from '@cardano-sdk/cardano-services-client';
 import DeviceConnection from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
 const BLOCKFROST_PROVIDER = 'blockfrost';
@@ -137,6 +140,28 @@ txSubmitProviderFactory.register(
       resolve(blockfrostTxSubmitProvider(await getBlockfrostApi()));
     })
 );
+
+txSubmitProviderFactory.register('ogmios', async (params: any): Promise<TxSubmitProvider> => {
+  if (params.url === undefined) throw new Error('txSubmitHttpProvider: ogmios - Missing URL');
+
+  const connectionConfig = {
+    host: params.url.hostname,
+    port: params.url.port ? Number.parseInt(params.url.port) : undefined,
+    tls: params.url?.protocol === 'wss'
+  };
+
+  return new Promise<TxSubmitProvider>(async (resolve) => {
+    resolve(ogmiosTxSubmitProvider(createConnectionObject(connectionConfig)));
+  });
+});
+
+txSubmitProviderFactory.register('http', async (params: any): Promise<TxSubmitProvider> => {
+  if (params.url === undefined) throw new Error('txSubmitHttpProvider: http - Missing URL');
+
+  return new Promise<TxSubmitProvider>(async (resolve) => {
+    resolve(txSubmitHttpProvider(params.url));
+  });
+});
 
 // Utxo providers
 utxoProviderFactory.register(

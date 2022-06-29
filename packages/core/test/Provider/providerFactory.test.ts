@@ -12,7 +12,7 @@ interface Provider {
 /**
  * Mock provider A.
  */
-class MockProviderA implements IProvider {
+class MockProviderA implements Provider {
   /**
    * Dummy provider method.
    *
@@ -27,8 +27,8 @@ class MockProviderA implements IProvider {
    *
    * @returns a new provider A.
    */
-  static create(): Promise<IProvider> {
-    return new Promise<IProvider>(async (resolve) => {
+  static create(): Promise<Provider> {
+    return new Promise<Provider>(async (resolve) => {
       resolve(new MockProviderA());
     });
   }
@@ -37,7 +37,7 @@ class MockProviderA implements IProvider {
 /**
  * Mock provider B.
  */
-class MockProviderB implements IProvider {
+class MockProviderB implements Provider {
   /**
    * Dummy provider method.
    *
@@ -52,8 +52,8 @@ class MockProviderB implements IProvider {
    *
    * @returns a new provider B.
    */
-  static create(): Promise<IProvider> {
-    return new Promise<IProvider>(async (resolve) => {
+  static create(): Promise<Provider> {
+    return new Promise<Provider>(async (resolve) => {
       resolve(new MockProviderB());
     });
   }
@@ -62,7 +62,7 @@ class MockProviderB implements IProvider {
 describe('ProviderFactory', () => {
   it('can register several providers', async () => {
     // Arrange.
-    const factory = new ProviderFactory<IProvider>();
+    const factory = new ProviderFactory<Provider>();
 
     // Act
     factory.register(MockProviderA.name, MockProviderA.create);
@@ -75,14 +75,14 @@ describe('ProviderFactory', () => {
 
   it('can create a registered provider', async () => {
     // Arrange.
-    const factory = new ProviderFactory<IProvider>();
+    const factory = new ProviderFactory<Provider>();
 
     // Act
     factory.register(MockProviderA.name, MockProviderA.create);
     factory.register(MockProviderB.name, MockProviderB.create);
 
-    const providerA: IProvider = await factory.create(MockProviderA.name, {});
-    const providerB: IProvider = await factory.create(MockProviderB.name, {});
+    const providerA: Provider = await factory.create(MockProviderA.name, {});
+    const providerB: Provider = await factory.create(MockProviderB.name, {});
 
     // Assert
     expect(providerA.getName()).toEqual('A');
@@ -91,7 +91,7 @@ describe('ProviderFactory', () => {
 
   it('throws if requested provider is not supported', async () => {
     // Arrange.
-    const factory = new ProviderFactory<IProvider>();
+    const factory = new ProviderFactory<Provider>();
 
     // Assert
     expect(() => factory.create(MockProviderA.name, {})).toThrow(`Provider unsupported: ${MockProviderA.name}`);
