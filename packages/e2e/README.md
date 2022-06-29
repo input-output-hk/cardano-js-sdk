@@ -44,11 +44,11 @@ Done in 5.44s.
 ```
 To add funds to your newly created wallet, copy the address displayed in the console and go to [Public Testnet Faucet](https://testnets.cardano.org/en/testnets/cardano/tools/faucet/). You can request 1000 tADA every 24h.
 
-> :information_source: Please note that the tADA, although abundant, is a limited resource. So if you are no longer using the address, make sure to return the tADA to the faucet.
+> :information_source: tADA is a limited resource, so if you are no longer using the address, return the tADA to the faucet for others to use.
 
 ## Blockfrost
 
-To run the blockfrost end to end tests you only need to configure two providers, AssetProvider and ChainHistoryProvider, both must be configured as blockfrost providers and a valid blockfrost API key must be also set, make sure that in your .env file, you have the environment variables set:
+To run the Blockfrost end-to-end tests you only need to configure two providers, AssetProvider and ChainHistoryProvider, both must be configured as Blockfrost providers and a valid Blockfrost API key must be also set, make sure that in your .env file, you have the environment variables set:
 
 ```
 LOGGER_MIN_SEVERITY=debug
@@ -57,7 +57,7 @@ ASSET_PROVIDER=blockfrost
 CHAIN_HISTORY_PROVIDER=blockfrost
 ```
 
-> :information_source: Remember to get your blockfrost API key at [blockfrost.io](https://blockfrost.io/) and set it in the configuration file, the API key displayed here is invalid and for demonstration purposes only.
+> :information_source: Remember to get your Blockfrost API key at [blockfrost.io](https://blockfrost.io/) and set it in the configuration file, the API key displayed here is invalid and for demonstration purposes only.
 
 Then to run the blockforst test run:
 
@@ -105,7 +105,7 @@ TRANSACTIONS_NUMBER=10
 START_LOCAL_HTTP_SERVER=true
 WORKER_PARALLEL_TRANSACTION=3
 ```
-> :information_source: Remember to get your blockfrost API key at [blockfrost.io](https://blockfrost.io/) and set it in the configuration file, the API key displayed here is invalid and for demonstration purposes only.
+> :information_source: Remember to get your Blockfrost API key at [blockfrost.io](https://blockfrost.io/) and set it in the configuration file, the API key displayed here is invalid and for demonstration purposes only.
 
 > :information_source: Remember to use a wallet with enough funds to carry out transactions (see [here](#generate_wallet)).
 
@@ -172,7 +172,7 @@ START_LOCAL_HTTP_SERVER=true
 WORKER_PARALLEL_TRANSACTION=3
 
 ```
-> :information_source: Remember to get your blockfrost API key at [blockfrost.io](https://blockfrost.io/) and set it in the configuration file, the API key displayed here is invalid and for demonstration purposes only.
+> :information_source: Remember to get your Blockfrost API key at [blockfrost.io](https://blockfrost.io/) and set it in the configuration file, the API key displayed here is invalid and for demonstration purposes only.
 
 > :information_source: Remember to use a wallet with enough funds to carry out transactions (see [here](#generate_wallet)).
 
@@ -205,7 +205,7 @@ OGMIOS_URL=ws://localhost:1337
 LOGGER_MIN_SEVERITY=debug
 KEY_AGENT=InMemory
 ```
-> :information_source: Remember to get your blockfrost API key at [blockfrost.io](https://blockfrost.io/) and set it in the configuration file, the API key displayed here is invalid and for demonstration purposes only.
+> :information_source: Remember to get your Blockfrost API key at [blockfrost.io](https://blockfrost.io/) and set it in the configuration file, the API key displayed here is invalid and for demonstration purposes only.
 
 Then to run the web-extension tests run:
 
