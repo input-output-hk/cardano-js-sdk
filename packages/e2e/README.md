@@ -31,7 +31,7 @@ If you need to create a new wallet via a brand new set of mnemonics, you can run
 $ yarn workspace @cardano-sdk/e2e generate-mnemonics
 ```
 
-And you will get the set of mnemonics plus the first derivatice address on the console:
+And you will get the set of mnemonics plus the first derivative address on the console:
 
 ```bash
 $ ts-node ./src/Util/mnemonic.ts
