@@ -22,7 +22,7 @@ This command will run all the e2e tests related to the wallet component.
 
 The providers used during the e2e test can be configured via environment variables or by creating a file '.env'; there is an example of such file in '.env.example'.
 
-If you are using testnet or mainnet as your test environment, ensure that the wallets you are configuring via environment variables contain some funds.
+If you are using _testnet_ or _mainnet_ as your test environment, ensure that the wallets you are configuring via environment variables contain some funds.
 
 <a name="generate_wallet"></a>
 If you need to create a new wallet via a brand new set of mnemonics, you can run:
