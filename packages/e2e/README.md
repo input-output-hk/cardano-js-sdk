@@ -67,7 +67,53 @@ $ yarn workspace @cardano-sdk/e2e test:blockfrost
 
 ## Cardano Services
 
-TBD
+Cardano services end to end test perform load testing. Please note that you must have several services up before executing the test, to start the environment(from the root):
+
+```bash
+$ cd packages/cardano-services
+$ yarn testnet:up
+```
+
+Once your environment is synced up, in a different terminal you can proceed to run the test, this is an example of the configuration you may need:
+
+```
+LOGGER_MIN_SEVERITY=debug
+BLOCKFROST_API_KEY=testnetozfiHqTtDYvfiwgG4PQmRyt5E3tBJVDs
+FAUCET_PROVIDER=cardano-wallet
+FAUCET_PROVIDER_PARAMS='{"url":"http://localhost:8090/v2","mnemonic":"fire method repair aware foot tray accuse brother popular olive find account sick rocket next"}'
+KEY_MANAGEMENT_PROVIDER=inMemory
+KEY_MANAGEMENT_PARAMS='{"accountIndex": 0, "networkId": 0, "password":"some_password","mnemonic":"ire method repair aware foot tray accuse brother popular olive find account sick rocket next"}'
+ASSET_PROVIDER=blockfrost
+CHAIN_HISTORY_PROVIDER=blockfrost
+NETWORK_INFO_PROVIDER=blockfrost
+REWARDS_PROVIDER=blockfrost
+TX_SUBMIT_PROVIDER=http
+TX_SUBMIT_PROVIDER_PARAMS='{"url": "http://localhost:3456/tx-submit"}'
+UTXO_PROVIDER=blockfrost
+WALLET_PROVIDER=blockfrost
+STAKE_POOL_PROVIDER=stub
+POOL_ID_1=pool1euf2nh92ehqfw7rpd4s9qgq34z8dg4pvfqhjmhggmzk95gcd402
+POOL_ID_2=pool1fghrkl620rl3g54ezv56weeuwlyce2tdannm2hphs62syf3vyyh
+# System to test config
+# OGMIOS_URL should evaluate ws://localhost:1338 for load test while it should evaluate ws://localhost:1337 for unit tests
+OGMIOS_URL=ws://localhost:1338
+TX_SUBMIT_HTTP_URL=http://localhost:3456/tx-submit
+RABBITMQ_URL=amqp://localhost
+
+# Test config
+TRANSACTIONS_NUMBER=10
+START_LOCAL_HTTP_SERVER=true
+WORKER_PARALLEL_TRANSACTION=3
+```
+> :pushpin: Remember to get your blockfrost API key at [blockfrost.io](https://blockfrost.io/) and set it in the configuration file, the API key displayed here is invalid and for demonstration purposes only.
+
+> :pushpin: Remember to use a wallet with enough funds to carry out transactions (see [here](#generate_wallet)).
+
+To execute the test:
+
+```bash
+$ yarn workspace @cardano-sdk/e2e test:cardano-services
+```
 
 ## Faucet (Private Network POC)
 
