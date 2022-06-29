@@ -10,7 +10,7 @@ export interface ProviderFactoryMethod<T> {
  * Generic provider factory.
  */
 export class ProviderFactory<T> {
-  private _providers: Map<string, ProviderFactoryMethod<T>> = new Map<string, ProviderFactoryMethod<T>>();
+  #providers: Map<string, ProviderFactoryMethod<T>> = new Map<string, ProviderFactoryMethod<T>>();
 
   /**
    * Register a provider in this ProviderFactory.
@@ -19,7 +19,7 @@ export class ProviderFactory<T> {
    * @param providerFactoryMethod The provider factory method method.
    */
   public register(name: string, providerFactoryMethod: ProviderFactoryMethod<T>) {
-    this._providers.set(name, providerFactoryMethod);
+    this.#providers.set(name, providerFactoryMethod);
   }
 
   /**
@@ -33,9 +33,9 @@ export class ProviderFactory<T> {
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public create(name: string, params: any): Promise<T> {
-    if (!this._providers.has(name)) throw new Error(`Provider unsupported: ${name}`);
+    if (!this.#providers.has(name)) throw new Error(`Provider unsupported: ${name}`);
 
-    return this._providers.get(name)!(params);
+    return this.#providers.get(name)!(params);
   }
 
   /**
@@ -44,6 +44,6 @@ export class ProviderFactory<T> {
    * @returns The registered providers.
    */
   public getProviders(): Array<string> {
-    return [...this._providers.keys()];
+    return [...this.#providers.keys()];
   }
 }
