@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+/* eslint-disable @typescript-eslint/no-floating-promises */
 import { Cardano } from '@cardano-sdk/core';
 import { KeyManagement } from '@cardano-sdk/wallet';
 
