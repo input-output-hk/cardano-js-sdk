@@ -1,6 +1,7 @@
 import { BlockFrostAPI } from '@blockfrost/blockfrost-js';
 import { BlockfrostToCore } from './BlockfrostToCore';
-import { Cardano, NetworkInfoProvider, ProviderError, ProviderFailure, testnetTimeSettings } from '@cardano-sdk/core';
+import { NetworkInfoProvider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { networkMagicToIdMap, timeSettings } from './util';
 
 /**
  * Connect to the [Blockfrost service](https://docs.blockfrost.io/)
@@ -13,23 +14,20 @@ export const blockfrostNetworkInfoProvider = (blockfrost: BlockFrostAPI): Networ
   if (!blockfrost.apiUrl.includes('testnet')) {
     throw new ProviderError(ProviderFailure.NotImplemented);
   }
-  const networkInfo: NetworkInfoProvider['networkInfo'] = async () => {
-    const { stake, supply } = await blockfrost.network();
+
+  const stake: NetworkInfoProvider['stake'] = async () => {
+    const network = await blockfrost.network();
     return {
-      lovelaceSupply: {
-        circulating: BigInt(supply.circulating),
-        max: BigInt(supply.max),
-        total: BigInt(supply.total)
-      },
-      network: {
-        id: Cardano.NetworkId.testnet,
-        magic: 1_097_911_063,
-        timeSettings: testnetTimeSettings
-      },
-      stake: {
-        active: BigInt(stake.active),
-        live: BigInt(stake.live)
-      }
+      active: BigInt(network.stake.active),
+      live: BigInt(network.stake.live)
+    };
+  };
+
+  const lovelaceSupply: NetworkInfoProvider['lovelaceSupply'] = async () => {
+    const { supply } = await blockfrost.network();
+    return {
+      circulating: BigInt(supply.circulating),
+      total: BigInt(supply.total)
     };
   };
 
@@ -53,6 +51,7 @@ export const blockfrostNetworkInfoProvider = (blockfrost: BlockFrostAPI): Networ
       epochLength: response.epoch_length,
       maxKesEvolutions: response.max_kes_evolutions,
       maxLovelaceSupply: BigInt(response.max_lovelace_supply),
+      networkId: networkMagicToIdMap[response.network_magic],
       networkMagic: response.network_magic,
       securityParameter: response.security_param,
       slotLength: response.slot_length,
@@ -62,5 +61,5 @@ export const blockfrostNetworkInfoProvider = (blockfrost: BlockFrostAPI): Networ
     };
   };
 
-  return { currentWalletProtocolParameters, genesisParameters, ledgerTip, networkInfo };
+  return { currentWalletProtocolParameters, genesisParameters, ledgerTip, lovelaceSupply, stake, timeSettings };
 };

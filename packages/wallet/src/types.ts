@@ -1,4 +1,12 @@
-import { Asset, Cardano, EpochInfo, NetworkInfo, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
+import {
+  Asset,
+  Cardano,
+  EpochInfo,
+  ProtocolParametersRequiredByWallet,
+  StakeSummary,
+  SupplySummary,
+  TimeSettings
+} from '@cardano-sdk/core';
 import { BalanceTracker, DelegationTracker, TransactionalObservables, TransactionsTracker } from './services';
 import { Cip30DataSignature } from '@cardano-sdk/cip30';
 import { Cip30SignDataRequest } from './KeyManagement/cip8';
@@ -69,7 +77,9 @@ export interface ObservableWallet {
   readonly transactions: TransactionsTracker;
   readonly tip$: Observable<Cardano.Tip>;
   readonly genesisParameters$: Observable<Cardano.CompactGenesis>;
-  readonly networkInfo$: Observable<NetworkInfo>;
+  readonly lovelaceSupply$: Observable<SupplySummary>;
+  readonly stake$: Observable<StakeSummary>;
+  readonly timeSettings$: Observable<TimeSettings[]>;
   readonly currentEpoch$: Observable<EpochInfo>;
   readonly protocolParameters$: Observable<ProtocolParametersRequiredByWallet>;
   readonly addresses$: Observable<GroupedAddress[]>;

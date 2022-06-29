@@ -1,5 +1,12 @@
 import { Assets } from '../../types';
-import { Cardano, EpochRewards, NetworkInfo, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
+import {
+  Cardano,
+  EpochRewards,
+  ProtocolParametersRequiredByWallet,
+  StakeSummary,
+  SupplySummary,
+  TimeSettings
+} from '@cardano-sdk/core';
 import { EMPTY, combineLatest, map } from 'rxjs';
 import { GroupedAddress } from '../../KeyManagement';
 import { InMemoryCollectionStore } from './InMemoryCollectionStore';
@@ -10,7 +17,10 @@ import { WalletStores } from '../types';
 export class InMemoryTipStore extends InMemoryDocumentStore<Cardano.Tip> {}
 export class InMemoryProtocolParametersStore extends InMemoryDocumentStore<ProtocolParametersRequiredByWallet> {}
 export class InMemoryGenesisParametersStore extends InMemoryDocumentStore<Cardano.CompactGenesis> {}
-export class InMemoryNetworkInfoStore extends InMemoryDocumentStore<NetworkInfo> {}
+export class InMemoryStakeSummaryStore extends InMemoryDocumentStore<StakeSummary> {}
+export class InMemorySupplySummaryStore extends InMemoryDocumentStore<SupplySummary> {}
+export class InMemoryTimeSettingsStore extends InMemoryDocumentStore<TimeSettings[]> {}
+
 export class InMemoryAssetsStore extends InMemoryDocumentStore<Assets> {}
 export class InMemoryAddressesStore extends InMemoryDocumentStore<GroupedAddress[]> {}
 export class InMemoryInFlightTransactionsStore extends InMemoryDocumentStore<Cardano.NewTxAlonzo[]> {}
@@ -33,8 +43,10 @@ export const createInMemoryWalletStores = (): WalletStores => ({
         this.addresses.destroy(),
         this.assets.destroy(),
         this.genesisParameters.destroy(),
-        this.networkInfo.destroy(),
         this.protocolParameters.destroy(),
+        this.stake.destroy(),
+        this.lovelaceSupply.destroy(),
+        this.timeSettings.destroy(),
         this.unspendableUtxo.destroy(),
         this.rewardsBalances.destroy(),
         this.rewardsHistory.destroy(),
@@ -50,11 +62,13 @@ export const createInMemoryWalletStores = (): WalletStores => ({
   destroyed: false,
   genesisParameters: new InMemoryGenesisParametersStore(),
   inFlightTransactions: new InMemoryInFlightTransactionsStore(),
-  networkInfo: new InMemoryNetworkInfoStore(),
+  lovelaceSupply: new InMemorySupplySummaryStore(),
   protocolParameters: new InMemoryProtocolParametersStore(),
   rewardsBalances: new InMemoryRewardsBalancesStore(),
   rewardsHistory: new InMemoryRewardsHistoryStore(),
+  stake: new InMemoryStakeSummaryStore(),
   stakePools: new InMemoryStakePoolsStore(),
+  timeSettings: new InMemoryTimeSettingsStore(),
   tip: new InMemoryTipStore(),
   transactions: new InMemoryTransactionsStore(),
   unspendableUtxo: new InMemoryUnspendableUtxoStore(),

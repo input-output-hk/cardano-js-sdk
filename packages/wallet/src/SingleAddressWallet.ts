@@ -4,11 +4,13 @@ import {
   Cardano,
   ChainHistoryProvider,
   EpochInfo,
-  NetworkInfo,
   NetworkInfoProvider,
   ProtocolParametersRequiredByWallet,
   RewardsProvider,
   StakePoolProvider,
+  StakeSummary,
+  SupplySummary,
+  TimeSettings,
   TxSubmitProvider,
   UtxoProvider,
   coreToCsl
@@ -112,7 +114,9 @@ export class SingleAddressWallet implements ObservableWallet {
   readonly transactions: TransactionsTracker & Shutdown;
   readonly delegation: DelegationTracker & Shutdown;
   readonly tip$: BehaviorObservable<Cardano.Tip>;
-  readonly networkInfo$: TrackerSubject<NetworkInfo>;
+  readonly lovelaceSupply$: TrackerSubject<SupplySummary>;
+  readonly stake$: TrackerSubject<StakeSummary>;
+  readonly timeSettings$: TrackerSubject<TimeSettings[]>;
   readonly addresses$: TrackerSubject<GroupedAddress[]>;
   readonly protocolParameters$: TrackerSubject<ProtocolParametersRequiredByWallet>;
   readonly genesisParameters$: TrackerSubject<Cardano.CompactGenesis>;
@@ -199,16 +203,27 @@ export class SingleAddressWallet implements ObservableWallet {
       trigger$: this.syncStatus.isSettled$.pipe(filter((isSettled) => isSettled))
     });
     const tipBlockHeight$ = distinctBlock(this.tip$);
-    this.networkInfo$ = new PersistentDocumentTrackerSubject(
+    this.timeSettings$ = new PersistentDocumentTrackerSubject(
       // TODO: it only really needs to be fetched once per epoch,
       // so we should replace the trigger from tipBlockHeight$ to epoch$.
       // This is a little complicated since there is a circular dependency.
       // Some logic is needed to initiate a fetch if epoch is not available in store already.
-      coldObservableProvider(this.networkInfoProvider.networkInfo, retryBackoffConfig, tipBlockHeight$, deepEquals),
-      stores.networkInfo
+      coldObservableProvider(this.networkInfoProvider.timeSettings, retryBackoffConfig, tipBlockHeight$, deepEquals),
+      stores.timeSettings
     );
-    this.currentEpoch$ = currentEpochTracker(this.tip$, this.networkInfo$);
+    this.currentEpoch$ = currentEpochTracker(this.tip$, this.timeSettings$);
     const epoch$ = this.currentEpoch$.pipe(map((epoch) => epoch.epochNo));
+
+    this.stake$ = new PersistentDocumentTrackerSubject(
+      coldObservableProvider(this.networkInfoProvider.stake, retryBackoffConfig, epoch$, isEqual),
+      stores.stake
+    );
+
+    this.lovelaceSupply$ = new PersistentDocumentTrackerSubject(
+      coldObservableProvider(this.networkInfoProvider.lovelaceSupply, retryBackoffConfig, epoch$, isEqual),
+      stores.lovelaceSupply
+    );
+
     this.protocolParameters$ = new PersistentDocumentTrackerSubject(
       coldObservableProvider(
         this.networkInfoProvider.currentWalletProtocolParameters,
@@ -243,7 +258,7 @@ export class SingleAddressWallet implements ObservableWallet {
       transactionsInFlight$: this.transactions.outgoing.inFlight$,
       utxoProvider: this.utxoProvider
     });
-    const timeSettings$ = distinctTimeSettings(this.networkInfo$);
+    const timeSettings$ = distinctTimeSettings(this.timeSettings$);
     this.delegation = createDelegationTracker({
       epoch$,
       retryBackoffConfig,
@@ -332,7 +347,9 @@ export class SingleAddressWallet implements ObservableWallet {
   shutdown() {
     this.utxo.shutdown();
     this.transactions.shutdown();
-    this.networkInfo$.complete();
+    this.stake$.complete();
+    this.lovelaceSupply$.complete();
+    this.timeSettings$.complete();
     this.protocolParameters$.complete();
     this.genesisParameters$.complete();
     this.#tip$.complete();

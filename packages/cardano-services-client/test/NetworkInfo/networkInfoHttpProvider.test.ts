@@ -19,10 +19,22 @@ describe('networkInfoHttpProvider', () => {
     axiosMock.restore();
   });
 
-  test('networkInfo does not throw', async () => {
+  test('stake does not throw', async () => {
     axiosMock.onPost().replyOnce(200, {});
     const provider = networkInfoHttpProvider(url);
-    await expect(provider.networkInfo()).resolves.toEqual({});
+    await expect(provider.stake()).resolves.toEqual({});
+  });
+
+  test('lovelace  does not throw', async () => {
+    axiosMock.onPost().replyOnce(200, {});
+    const provider = networkInfoHttpProvider(url);
+    await expect(provider.lovelaceSupply()).resolves.toEqual({});
+  });
+
+  test('timeSettings does not throw', async () => {
+    axiosMock.onPost().replyOnce(200, {});
+    const provider = networkInfoHttpProvider(url);
+    await expect(provider.timeSettings()).resolves.toEqual({});
   });
 
   test('ledgerTip does not throw', async () => {
