@@ -13,6 +13,7 @@ import { ProgramOptionDescriptions } from './ProgramOptionDescriptions';
 import { RabbitMqTxSubmitProvider } from '@cardano-sdk/rabbitmq';
 import { ServiceNames } from './ServiceNames';
 import { TxSubmitHttpService } from '../TxSubmit';
+import { createDbSyncMetadataService } from '../Metadata';
 import { ogmiosTxSubmitProvider, urlToConnectionConfig } from '@cardano-sdk/ogmios';
 import Logger, { createLogger } from 'bunyan';
 import pg from 'pg';
@@ -53,7 +54,11 @@ const serviceMapFactory = (args: ProgramArgs, logger: Logger, cache: InMemoryCac
   [ServiceNames.ChainHistory]: () => {
     if (!db) throw new MissingProgramOption(ServiceNames.ChainHistory, ProgramOptionDescriptions.DbConnection);
 
-    return new ChainHistoryHttpService({ chainHistoryProvider: new DbSyncChainHistoryProvider(db, logger), logger });
+    const metadataService = createDbSyncMetadataService(db, logger);
+    return new ChainHistoryHttpService({
+      chainHistoryProvider: new DbSyncChainHistoryProvider(db, metadataService, logger),
+      logger
+    });
   },
   [ServiceNames.Rewards]: () => {
     if (!db) throw new MissingProgramOption(ServiceNames.Rewards, ProgramOptionDescriptions.DbConnection);

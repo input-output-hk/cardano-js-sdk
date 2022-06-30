@@ -4,6 +4,7 @@ import { Cardano, ChainHistoryProvider, TransactionsByAddressesArgs } from '@car
 import { ChainHistoryBuilder } from './ChainHistoryBuilder';
 import { DbSyncProvider } from '../../DbSyncProvider';
 import { Logger, dummyLogger } from 'ts-log';
+import { MetadataService } from '../../Metadata';
 import { Pool, QueryResult } from 'pg';
 import { hexStringToBuffer } from '../../util';
 import { mapBlock, mapTxAlonzo, mapTxIn, mapTxOut } from './mappers';
@@ -12,12 +13,14 @@ import uniq from 'lodash/uniq';
 
 export class DbSyncChainHistoryProvider extends DbSyncProvider implements ChainHistoryProvider {
   #builder: ChainHistoryBuilder;
+  #metadataService: MetadataService;
   #logger: Logger;
 
-  constructor(db: Pool, logger = dummyLogger) {
+  constructor(db: Pool, metadataService: MetadataService, logger = dummyLogger) {
     super(db);
     this.#builder = new ChainHistoryBuilder(db, logger);
     this.#logger = logger;
+    this.#metadataService = metadataService;
   }
 
   public async transactionsByAddresses({
@@ -55,7 +58,7 @@ export class DbSyncChainHistoryProvider extends DbSyncProvider implements ChainH
         this.#builder.queryTxMintByHashes(hashes),
         this.#builder.queryWithdrawalsByHashes(hashes),
         this.#builder.queryRedeemersByHashes(hashes),
-        this.#builder.queryTxMetadataByHashes(hashes),
+        this.#metadataService.queryTxMetadataByHashes(hashes),
         this.#builder.queryTransactionInputsByHashes(hashes, true),
         this.#builder.queryCertificatesByHashes(hashes),
         this.#builder.queryProtocolParams()

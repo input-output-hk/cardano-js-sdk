@@ -1,4 +1,4 @@
-import { Asset, Cardano, ProtocolParametersRequiredByWallet, ProviderUtil } from '@cardano-sdk/core';
+import { Asset, Cardano, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
 import { BigIntMath } from '@cardano-sdk/util';
 import {
   BlockModel,
@@ -9,7 +9,6 @@ import {
   RedeemerModel,
   TipModel,
   TxInOutModel,
-  TxMetadataModel,
   TxModel,
   TxOutMultiAssetModel,
   TxOutTokenMap,
@@ -90,14 +89,6 @@ export const mapRedeemer = (redeemerModel: RedeemerModel): Cardano.Redeemer => (
   purpose: redeemerModel.purpose as Cardano.RedeemerPurpose,
   scriptHash: Cardano.util.Hash28ByteBase16(redeemerModel.script_hash.toString('hex'))
 });
-
-export const mapTxMetadata = (metadataModel: Pick<TxMetadataModel, 'json_value' | 'key'>[]): Cardano.TxMetadata =>
-  metadataModel.reduce((map, metadatum) => {
-    const { key, json_value } = metadatum;
-    if (!json_value || !key) return map;
-    map.set(BigInt(key), ProviderUtil.jsonToMetadatum(json_value));
-    return map;
-  }, new Map<bigint, Cardano.Metadatum>());
 
 export const mapCertificate = (
   certModel: WithCertType<CertificateModel>

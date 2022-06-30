@@ -12,7 +12,6 @@ import {
   StakeCertModel,
   TransactionDataMap,
   TxInOutModel,
-  TxMetadataModel,
   TxOutMultiAssetModel,
   TxOutTokenMap,
   TxOutputModel,
@@ -29,7 +28,6 @@ import {
   mapProtocolParams,
   mapRedeemer,
   mapTxIn,
-  mapTxMetadata,
   mapTxOut,
   mapTxOutTokenMap,
   mapTxTokenMap,
@@ -112,22 +110,6 @@ export class ChainHistoryBuilder {
       redeemerMap.set(txId, [...currentRedeemers, mapRedeemer(redeemer)]);
     }
     return redeemerMap;
-  }
-
-  public async queryTxMetadataByHashes(
-    hashes: Cardano.TransactionId[]
-  ): Promise<TransactionDataMap<Cardano.TxMetadata>> {
-    const byteHashes = hashes.map((hash) => hexStringToBuffer(hash.toString()));
-    this.#logger.debug('About to find metadata for txs:', hashes);
-    const result: QueryResult<TxMetadataModel> = await this.#db.query(Queries.findTxMetadata, [byteHashes]);
-    if (result.rows.length === 0) return new Map();
-    const metadataMap: TransactionDataMap<TxMetadataModel[]> = new Map();
-    for (const metadata of result.rows) {
-      const txId = Cardano.TransactionId(metadata.tx_id.toString('hex'));
-      const currentMetadata: TxMetadataModel[] = metadataMap.get(txId) ?? [];
-      metadataMap.set(txId, [...currentMetadata, metadata]);
-    }
-    return new Map([...metadataMap].map(([id, metadata]) => [id, mapTxMetadata(metadata)]));
   }
 
   public async queryCertificatesByHashes(

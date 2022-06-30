@@ -7,6 +7,9 @@ export const Uri = (uri: string) => {
   if (/^[a-z]+:\/\/.+/.test(uri)) {
     return uri as unknown as Uri;
   }
+  if (uri.startsWith('Qm') && uri.length === 46) {
+    return `ipfs://${uri}` as unknown as Uri;
+  }
   throw new InvalidStringError(
     'Expected Uri to start with "[protocol]://", where protocol is usually "https" or "ipfs"'
   );

@@ -7,6 +7,11 @@ describe('NftMetadata/types', () => {
       expect(() => Uri('http://some.url')).not.toThrow();
       expect(() => Uri('ipfs://abc123')).not.toThrow();
     });
+    it('accepts a common ipfs hash without protocol://', () => {
+      expect(Uri('QmcDAmZubQig7tGUgEwbWcgdvz4Aoa2EiRZyFoX3fXTVmr')).toBe(
+        'ipfs://QmcDAmZubQig7tGUgEwbWcgdvz4Aoa2EiRZyFoX3fXTVmr'
+      );
+    });
     it('throws for string without protocol:// prefix', () => {
       expect(() => Uri('abc123')).toThrowError(InvalidStringError);
     });
