@@ -1,3 +1,4 @@
+import * as WC from './WalletCore';
 import {
   Asset,
   Cardano,
@@ -7,7 +8,7 @@ import {
   SupplySummary,
   TimeSettings
 } from '@cardano-sdk/core';
-import { BalanceTracker, DelegationTracker, TransactionalObservables, TransactionsTracker } from './services';
+import { BalanceTracker, DelegationTracker, TransactionalObservables, TransactionsTracker } from '../services';
 import { Cip30DataSignature } from '@cardano-sdk/cip30';
 import { Cip30SignDataRequest } from '../KeyManagement/cip8';
 import { GroupedAddress } from '../KeyManagement';
@@ -70,12 +71,12 @@ export interface SyncStatus extends Shutdown {
   isSettled$: Observable<boolean>;
 }
 
-export interface ObservableWallet {
+export interface ObservableWallet<Tip = WC.Tip> {
   readonly balance: BalanceTracker;
   readonly delegation: DelegationTracker;
   readonly utxo: TransactionalObservables<Cardano.Utxo[]>;
   readonly transactions: TransactionsTracker;
-  readonly tip$: Observable<Cardano.Tip>;
+  readonly tip$: Observable<Tip>;
   readonly genesisParameters$: Observable<Cardano.CompactGenesis>;
   readonly lovelaceSupply$: Observable<SupplySummary>;
   readonly stake$: Observable<StakeSummary>;

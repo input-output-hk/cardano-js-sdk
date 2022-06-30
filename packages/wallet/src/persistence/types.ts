@@ -1,4 +1,4 @@
-import { Assets } from '../types';
+import { Assets, WC } from '../types';
 import {
   Cardano,
   EpochRewards,
@@ -75,8 +75,8 @@ export interface KeyValueStore<K, V> extends Omit<CollectionStore<KeyValueCollec
   setValue(key: K, value: V): Observable<void>;
 }
 
-export interface WalletStores extends Destroyable {
-  tip: DocumentStore<Cardano.Tip>;
+export interface WalletStores<Tip extends WC.Tip = WC.Tip> extends Destroyable {
+  tip: DocumentStore<Tip>;
   utxo: CollectionStore<Cardano.Utxo>;
   unspendableUtxo: CollectionStore<Cardano.Utxo>;
   transactions: OrderedCollectionStore<Cardano.TxAlonzo>;

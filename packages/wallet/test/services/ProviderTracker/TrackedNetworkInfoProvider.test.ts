@@ -1,10 +1,16 @@
 import { BehaviorSubject } from 'rxjs';
-import { CLEAN_FN_STATS, NetworkInfoProviderStats, ProviderFnStats, TrackedNetworkInfoProvider } from '../../../src';
+import {
+  CLEAN_FN_STATS,
+  NetworkInfoProviderStats,
+  ProviderFnStats,
+  TrackedNetworkInfoProvider,
+  WC
+} from '../../../src';
 import { NetworkInfoProvider } from '@cardano-sdk/core';
 import { mockNetworkInfoProvider } from '../../mocks';
 
 describe('TrackedNetworkInfoProvider', () => {
-  let networkInfoProvider: NetworkInfoProvider;
+  let networkInfoProvider: NetworkInfoProvider<WC.Tip>;
   let trackedNetworkInfoProvider: TrackedNetworkInfoProvider;
   beforeEach(() => {
     networkInfoProvider = mockNetworkInfoProvider();
@@ -14,7 +20,7 @@ describe('TrackedNetworkInfoProvider', () => {
   describe('wraps underlying provider functions, tracks # of calls/responses and resets on stats.reset()', () => {
     const testFunctionStats =
       <T>(
-        call: (networkInfoProvider: NetworkInfoProvider) => Promise<T>,
+        call: (networkInfoProvider: NetworkInfoProvider<WC.Tip>) => Promise<T>,
         selectStats: (stats: NetworkInfoProviderStats) => BehaviorSubject<ProviderFnStats>
         // eslint-disable-next-line unicorn/consistent-function-scoping
       ) =>
