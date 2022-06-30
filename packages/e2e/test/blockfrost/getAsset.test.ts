@@ -1,10 +1,17 @@
+import * as envalid from 'envalid';
 import { Cardano } from '@cardano-sdk/core';
-import { assetProvider } from '../config';
+import { assetProviderFactory } from '../../src/factories';
+
+// Verify environment.
+export const env = envalid.cleanEnv(process.env, {
+  ASSET_PROVIDER: envalid.str(),
+  ASSET_PROVIDER_PARAMS: envalid.json({ default: {} })
+});
 
 describe('blockfrostAssetProvider', () => {
   test('getAsset', async () => {
     const asset = await (
-      await assetProvider
+      await assetProviderFactory.create(env.ASSET_PROVIDER, env.ASSET_PROVIDER_PARAMS)
     ).getAsset(Cardano.AssetId('6b8d07d69639e9413dd637a1a815a7323c69c86abbafb66dbfdb1aa7'), {
       history: true,
       nftMetadata: true,

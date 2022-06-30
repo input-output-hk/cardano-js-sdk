@@ -51,8 +51,10 @@ To add funds to your newly created wallet, copy the address displayed in the con
 To run the Blockfrost end-to-end tests you only need to configure two providers, AssetProvider and ChainHistoryProvider, both must be configured as Blockfrost providers and a valid Blockfrost API key must be also set, make sure that in your .env file, you have the environment variables set:
 
 ```
-LOGGER_MIN_SEVERITY=debug
-BLOCKFROST_API_KEY=testnetNElagmhpQDubE6Ic4XBUVJjV5DROyijO
+# Blockfrost secrets
+BLOCKFROST_API_KEY=testnetozfiHqTtDYvfiwgG4PQmRyt5E3tBJVDs
+
+# Providers setup
 ASSET_PROVIDER=blockfrost
 CHAIN_HISTORY_PROVIDER=blockfrost
 ```
