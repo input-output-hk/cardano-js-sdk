@@ -1,7 +1,7 @@
 /* eslint-disable complexity */
 /* eslint-disable sonarjs/cognitive-complexity */
 import { ChainHistoryHttpService, DbSyncChainHistoryProvider } from '../ChainHistory';
-import { CommonProgramOptions } from '../ProgramsCommon';
+import { CommonProgramOptions, SrvProgramOptions } from '../ProgramsCommon';
 import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../NetworkInfo';
 import { DbSyncRewardsProvider, RewardsHttpService } from '../Rewards';
 import { DbSyncStakePoolProvider, StakePoolHttpService } from '../StakePool';
@@ -14,14 +14,17 @@ import { RabbitMqTxSubmitProvider } from '@cardano-sdk/rabbitmq';
 import { ServiceNames } from './ServiceNames';
 import { TxSubmitHttpService } from '../TxSubmit';
 import { createDbSyncMetadataService } from '../Metadata';
+import { getPool } from './utils';
 import { ogmiosTxSubmitProvider, urlToConnectionConfig } from '@cardano-sdk/ogmios';
 import Logger, { createLogger } from 'bunyan';
 import pg from 'pg';
 
-export interface HttpServerOptions extends CommonProgramOptions {
+export interface HttpServerOptions extends CommonProgramOptions, SrvProgramOptions {
   dbConnectionString?: string;
   dbQueriesCacheTtl: number;
   dbPollInterval: number;
+  serviceDiscoveryBackoffFactor: number;
+  serviceDiscoveryTimeout: number;
   cardanoNodeConfigPath?: string;
   metricsEnabled?: boolean;
   useQueue?: boolean;
@@ -90,16 +93,14 @@ const serviceMapFactory = (args: ProgramArgs, logger: Logger, cache: InMemoryCac
   }
 });
 
-export const loadHttpServer = (args: ProgramArgs): HttpServer => {
+export const loadHttpServer = async (args: ProgramArgs): Promise<HttpServer> => {
   const services: HttpService[] = [];
   const logger = createLogger({
     level: args.options?.loggerMinSeverity,
     name: 'http-server'
   });
 
-  const db = args.options?.dbConnectionString
-    ? new pg.Pool({ connectionString: args.options.dbConnectionString })
-    : undefined;
+  const db = await getPool(logger, args.options);
 
   const cache = new InMemoryCache(args.options?.dbQueriesCacheTtl);
 

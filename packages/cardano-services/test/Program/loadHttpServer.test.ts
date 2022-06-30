@@ -2,7 +2,13 @@ import { CACHE_TTL_DEFAULT } from '../../src/InMemoryCache';
 import { Connection } from '@cardano-ogmios/client';
 import { DB_POLL_INTERVAL_DEFAULT } from '../../src/NetworkInfo';
 import { HttpServer } from '../../src';
-import { MissingProgramOption, ServiceNames, loadHttpServer } from '../../src/Program';
+import {
+  MissingProgramOption,
+  RETRY_BACKOFF_FACTOR_DEFAULT,
+  RETRY_BACKOFF_MAX_TIMEOUT_DEFAULT,
+  ServiceNames,
+  loadHttpServer
+} from '../../src/Program';
 import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { URL } from 'url';
 import {
@@ -24,6 +30,8 @@ describe('loadHttpServer', () => {
   let httpServer: HttpServer;
   let ogmiosConnection: Connection;
   let ogmiosServer: http.Server;
+  let serviceDiscoveryBackoffFactor: number;
+  let serviceDiscoveryTimeout: number;
 
   beforeEach(async () => {
     apiUrl = new URL(`http://localhost:${await getRandomPort()}`);
@@ -32,6 +40,8 @@ describe('loadHttpServer', () => {
     ogmiosConnection = await createConnectionObjectWithRandomPort();
     dbQueriesCacheTtl = CACHE_TTL_DEFAULT;
     dbPollInterval = DB_POLL_INTERVAL_DEFAULT;
+    serviceDiscoveryBackoffFactor = RETRY_BACKOFF_FACTOR_DEFAULT;
+    serviceDiscoveryTimeout = RETRY_BACKOFF_MAX_TIMEOUT_DEFAULT;
   });
 
   describe('healthy internal providers', () => {
@@ -45,15 +55,17 @@ describe('loadHttpServer', () => {
       await serverClosePromise(ogmiosServer);
     });
 
-    it('loads the nominated HTTP services and server if required program arguments are set', () => {
-      httpServer = loadHttpServer({
+    it('loads the nominated HTTP services and server if required program arguments are set', async () => {
+      httpServer = await loadHttpServer({
         apiUrl,
         options: {
           cardanoNodeConfigPath,
           dbConnectionString,
           dbPollInterval,
           dbQueriesCacheTtl,
-          ogmiosUrl: new URL(ogmiosConnection.address.webSocket)
+          ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
+          serviceDiscoveryBackoffFactor,
+          serviceDiscoveryTimeout
         },
         serviceNames: [
           ServiceNames.StakePool,
@@ -67,28 +79,30 @@ describe('loadHttpServer', () => {
       expect(httpServer).toBeInstanceOf(HttpServer);
     });
 
-    it('throws if postgres-dependent service is nominated without providing the connection string', () => {
-      expect(() =>
-        loadHttpServer({
-          apiUrl,
-          serviceNames: [
-            ServiceNames.StakePool,
-            ServiceNames.Utxo,
-            ServiceNames.ChainHistory,
-            ServiceNames.Rewards,
-            ServiceNames.NetworkInfo
-          ]
-        })
-      ).toThrow(MissingProgramOption);
+    it('throws if postgres-dependent service is nominated without providing the connection string', async () => {
+      await expect(
+        async () =>
+          await loadHttpServer({
+            apiUrl,
+            serviceNames: [
+              ServiceNames.StakePool,
+              ServiceNames.Utxo,
+              ServiceNames.ChainHistory,
+              ServiceNames.Rewards,
+              ServiceNames.NetworkInfo
+            ]
+          })
+      ).rejects.toThrow(MissingProgramOption);
     });
 
-    it('throws if genesis-config dependent service is nominated without providing the node config path', () => {
-      expect(() =>
-        loadHttpServer({
-          apiUrl,
-          serviceNames: [ServiceNames.NetworkInfo]
-        })
-      ).toThrow(MissingProgramOption);
+    it('throws if genesis-config dependent service is nominated without providing the node config path', async () => {
+      await expect(
+        async () =>
+          await loadHttpServer({
+            apiUrl,
+            serviceNames: [ServiceNames.NetworkInfo]
+          })
+      ).rejects.toThrow(MissingProgramOption);
     });
   });
 
@@ -103,18 +117,21 @@ describe('loadHttpServer', () => {
       await serverClosePromise(ogmiosServer);
     });
 
-    it('should not throw if any internal providers are unhealthy during HTTP server initialization', () => {
-      expect(() =>
-        loadHttpServer({
-          apiUrl,
-          options: {
-            dbConnectionString,
-            dbPollInterval,
-            dbQueriesCacheTtl,
-            ogmiosUrl: new URL(ogmiosConnection.address.webSocket)
-          },
-          serviceNames: [ServiceNames.StakePool, ServiceNames.TxSubmit]
-        })
+    it('should not throw if any internal providers are unhealthy during HTTP server initialization', async () => {
+      expect(
+        async () =>
+          await loadHttpServer({
+            apiUrl,
+            options: {
+              dbConnectionString,
+              dbPollInterval,
+              dbQueriesCacheTtl,
+              ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
+              serviceDiscoveryBackoffFactor,
+              serviceDiscoveryTimeout
+            },
+            serviceNames: [ServiceNames.StakePool, ServiceNames.TxSubmit]
+          })
       ).not.toThrow(new ProviderError(ProviderFailure.Unhealthy));
     });
   });

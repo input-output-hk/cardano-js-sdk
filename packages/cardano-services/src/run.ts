@@ -1,6 +1,14 @@
 #!/usr/bin/env node
 import * as envalid from 'envalid';
-import { API_URL_DEFAULT, OGMIOS_URL_DEFAULT, RABBITMQ_URL_DEFAULT, ServiceNames, loadHttpServer } from './Program';
+import {
+  API_URL_DEFAULT,
+  OGMIOS_URL_DEFAULT,
+  RABBITMQ_URL_DEFAULT,
+  RETRY_BACKOFF_FACTOR_DEFAULT,
+  RETRY_BACKOFF_MAX_TIMEOUT_DEFAULT,
+  ServiceNames,
+  loadHttpServer
+} from './Program';
 import { CACHE_TTL_DEFAULT } from './InMemoryCache';
 import { DB_POLL_INTERVAL_DEFAULT } from './NetworkInfo';
 import { LogLevel } from 'bunyan';
@@ -19,7 +27,13 @@ const envSpecs = {
   DB_QUERIES_CACHE_TTL: envalid.makeValidator(cacheTtlValidator)(envalid.num({ default: CACHE_TTL_DEFAULT })),
   LOGGER_MIN_SEVERITY: envalid.str({ choices: loggerMethodNames as string[], default: 'info' }),
   OGMIOS_URL: envalid.url({ default: OGMIOS_URL_DEFAULT }),
+  POSTGRES_NAME: envalid.str({ default: undefined }),
+  POSTGRES_PASSWORD: envalid.str({ default: undefined }),
+  POSTGRES_SRV_NAME: envalid.str({ default: undefined }),
+  POSTGRES_USER: envalid.str({ default: undefined }),
   RABBITMQ_URL: envalid.url({ default: RABBITMQ_URL_DEFAULT }),
+  SERVICE_DISCOVERY_BACKOFF_FACTOR: envalid.num({ default: RETRY_BACKOFF_FACTOR_DEFAULT }),
+  SERVICE_DISCOVERY_BACKOFF_MAX_TIMEOUT: envalid.num({ default: RETRY_BACKOFF_MAX_TIMEOUT_DEFAULT }),
   SERVICE_NAMES: envalid.str({ example: Object.values(ServiceNames).toString() }),
   USE_QUEUE: envalid.bool({ default: USE_QUEUE_DEFAULT })
 };
@@ -34,6 +48,12 @@ void (async () => {
   const dbQueriesCacheTtl = env.DB_QUERIES_CACHE_TTL;
   const dbPollInterval = env.DB_POLL_INTERVAL;
   const dbConnectionString = env.DB_CONNECTION_STRING ? new URL(env.DB_CONNECTION_STRING).toString() : undefined;
+  const serviceDiscoveryBackoffFactor = env.SERVICE_DISCOVERY_BACKOFF_FACTOR;
+  const serviceDiscoveryTimeout = env.SERVICE_DISCOVERY_BACKOFF_MAX_TIMEOUT;
+  const postgresSrvName = env.POSTGRES_SRV_NAME;
+  const postgresName = env.POSTGRES_NAME;
+  const postgresUser = env.POSTGRES_USER;
+  const postgresPassword = env.POSTGRES_PASSWORD;
   const serviceNames = env.SERVICE_NAMES.split(',') as ServiceNames[];
 
   try {
@@ -46,7 +66,13 @@ void (async () => {
         dbQueriesCacheTtl,
         loggerMinSeverity: env.LOGGER_MIN_SEVERITY as LogLevel,
         ogmiosUrl,
+        postgresName,
+        postgresPassword,
+        postgresSrvName,
+        postgresUser,
         rabbitmqUrl,
+        serviceDiscoveryBackoffFactor,
+        serviceDiscoveryTimeout,
         useQueue: env.USE_QUEUE
       },
       serviceNames

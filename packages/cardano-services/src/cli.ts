@@ -21,6 +21,7 @@ import {
   TxWorkerOptions,
   loadTxWorker
 } from './TxWorker';
+import { RETRY_BACKOFF_FACTOR_DEFAULT, RETRY_BACKOFF_MAX_TIMEOUT_DEFAULT } from './Program/utils';
 import { URL } from 'url';
 import { cacheTtlValidator } from './util/validators';
 import { loggerMethodNames } from './util';
@@ -101,7 +102,23 @@ commonOptions(
     (interval) => Number.parseInt(interval, 10),
     DB_POLL_INTERVAL_DEFAULT
   )
+  .option(
+    '--service-discovery-backoff-factor <serviceDiscoveryBackoffFactor>',
+    ProgramOptionDescriptions.ServiceDiscoveryBackoffFactor,
+    (factor) => Number.parseFloat(factor),
+    RETRY_BACKOFF_FACTOR_DEFAULT
+  )
+  .option(
+    '--service-discovery-timeout <serviceDiscoveryTimeout>',
+    ProgramOptionDescriptions.ServiceDiscoverBackoffTimeout,
+    (interval) => Number.parseInt(interval, 10),
+    RETRY_BACKOFF_MAX_TIMEOUT_DEFAULT
+  )
   .option('--use-queue', ProgramOptionDescriptions.UseQueue, () => true, USE_QUEUE_DEFAULT)
+  .option('--postgres-srv-name <postgresSrvName>', ProgramOptionDescriptions.DbConnection)
+  .option('--postgres-name <postgresName>', ProgramOptionDescriptions.DbConnection)
+  .option('--postgres-user <postgresUser>', ProgramOptionDescriptions.DbConnection)
+  .option('--postgres-password <postgresPassword>', ProgramOptionDescriptions.DbConnection)
   .action(async (serviceNames: ServiceNames[], options: { apiUrl: URL } & HttpServerOptions) => {
     const { apiUrl, ...rest } = options;
     const server = await loadHttpServer({ apiUrl: apiUrl || API_URL_DEFAULT, options: rest, serviceNames });
