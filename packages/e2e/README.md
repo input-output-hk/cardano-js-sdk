@@ -79,10 +79,13 @@ $ yarn testnet:up
 Once your environment is synced up, in a different terminal you can proceed to run the test, this is an example of the configuration you may need:
 
 ```
+# Logger
 LOGGER_MIN_SEVERITY=debug
+
+# Blockfrost secrets
 BLOCKFROST_API_KEY=testnetozfiHqTtDYvfiwgG4PQmRyt5E3tBJVDs
-FAUCET_PROVIDER=cardano-wallet
-FAUCET_PROVIDER_PARAMS='{"url":"http://localhost:8090/v2","mnemonic":"fire method repair aware foot tray accuse brother popular olive find account sick rocket next"}'
+
+# Providers setup
 KEY_MANAGEMENT_PROVIDER=inMemory
 KEY_MANAGEMENT_PARAMS='{"accountIndex": 0, "networkId": 0, "password":"some_password","mnemonic":"ire method repair aware foot tray accuse brother popular olive find account sick rocket next"}'
 ASSET_PROVIDER=blockfrost
@@ -94,15 +97,11 @@ TX_SUBMIT_PROVIDER_PARAMS='{"url": "http://localhost:3456/tx-submit"}'
 UTXO_PROVIDER=blockfrost
 WALLET_PROVIDER=blockfrost
 STAKE_POOL_PROVIDER=stub
-POOL_ID_1=pool1euf2nh92ehqfw7rpd4s9qgq34z8dg4pvfqhjmhggmzk95gcd402
-POOL_ID_2=pool1fghrkl620rl3g54ezv56weeuwlyce2tdannm2hphs62syf3vyyh
-# System to test config
-# OGMIOS_URL should evaluate ws://localhost:1338 for load test while it should evaluate ws://localhost:1337 for unit tests
+
+# Test Parameters
 OGMIOS_URL=ws://localhost:1338
 TX_SUBMIT_HTTP_URL=http://localhost:3456/tx-submit
 RABBITMQ_URL=amqp://localhost
-
-# Test config
 TRANSACTIONS_NUMBER=10
 START_LOCAL_HTTP_SERVER=true
 WORKER_PARALLEL_TRANSACTION=3
