@@ -134,6 +134,12 @@ Instead of CTRL-C, since some resources need to be clear before you can set up t
 For the faucet to work correctly, we must configure it with the mnemonic of the genesis wallet. This wallet controls all the funds on the private testnet and is the only way of obtaining tADA on that network.
 
 ```
+# Logger
+LOGGER_MIN_SEVERITY=debug
+
+# Providers setup
+KEY_MANAGEMENT_PROVIDER=inMemory
+KEY_MANAGEMENT_PARAMS='{"accountIndex": 0, "networkId": 0, "password":"some_password","mnemonic":"vacant invite slender salute undo drink above scatter item silver hold route repeat patch paper"}'
 FAUCET_PROVIDER=cardano-wallet
 FAUCET_PROVIDER_PARAMS='{"url":"http://localhost:8090/v2","mnemonic":"fire method repair aware foot tray accuse brother popular olive find account sick rocket next"}'
 ```
