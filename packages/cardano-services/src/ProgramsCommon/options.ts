@@ -9,4 +9,9 @@ export interface CommonProgramOptions {
   loggerMinSeverity?: LogLevel;
   ogmiosUrl?: URL;
   rabbitmqUrl?: URL;
+  ogmiosSrvServiceName?: string;
+  rabbitmqSrvServiceName?: string;
+  serviceDiscoveryBackoffFactor?: number;
+  serviceDiscoveryTimeout?: number;
+  cacheTtl: number;
 }

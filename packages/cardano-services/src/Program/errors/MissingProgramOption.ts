@@ -3,8 +3,10 @@ import { ProgramOptionDescriptions } from '../ProgramOptionDescriptions';
 import { ServiceNames } from '../ServiceNames';
 
 export class MissingProgramOption extends CustomError {
-  public constructor(service: ServiceNames, option: ProgramOptionDescriptions) {
+  public constructor(service: ServiceNames, option: ProgramOptionDescriptions | ProgramOptionDescriptions[]) {
     super();
-    this.message = `${service} requires the ${option} program option`;
+    this.message = `${service} requires the ${
+      typeof option === 'string' ? option : option.join(' or ')
+    } program option.`;
   }
 }

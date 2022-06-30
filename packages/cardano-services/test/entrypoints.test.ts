@@ -57,12 +57,24 @@ describe('entrypoints', () => {
     let ogmiosConnection: Ogmios.Connection;
     let cardanoNodeConfigPath: string;
     let cacheTtl: string;
+    let postgresSrvServiceName: string;
+    let postgresDb: string;
+    let postgresUser: string;
+    let postgresPassword: string;
+    let ogmiosSrvServiceName: string;
+    let rabbitmqSrvServiceName: string;
 
     beforeAll(async () => {
       ogmiosPort = await getRandomPort();
       ogmiosConnection = Ogmios.createConnectionObject({ port: ogmiosPort });
       dbConnectionString = process.env.DB_CONNECTION_STRING!;
       cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
+      postgresSrvServiceName = process.env.POSTGRES_SRV_SERVICE_NAME!;
+      postgresDb = process.env.POSTGRES_DB!;
+      postgresUser = process.env.POSTGRES_USER!;
+      postgresPassword = process.env.POSTGRES_PASSWORD!;
+      ogmiosSrvServiceName = process.env.OGMIOS_SRV_SERVICE_NAME!;
+      rabbitmqSrvServiceName = process.env.RABBITMQ_SRV_SERVICE_NAME!;
       cacheTtl = process.env.CACHE_TTL!;
     });
 
@@ -92,12 +104,14 @@ describe('entrypoints', () => {
             ServiceNames.StakePool,
             ServiceNames.TxSubmit,
             ServiceNames.NetworkInfo,
-            ServiceNames.Utxo
+            ServiceNames.Utxo,
+            ServiceNames.ChainHistory
           ]);
           await assertServiceHealthy(apiUrl, ServiceNames.StakePool);
           await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit);
           await assertServiceHealthy(apiUrl, ServiceNames.NetworkInfo);
           await assertServiceHealthy(apiUrl, ServiceNames.Utxo);
+          await assertServiceHealthy(apiUrl, ServiceNames.ChainHistory);
         });
 
         it('run exposes a HTTP server at the configured URL with all services attached', async () => {
@@ -109,13 +123,14 @@ describe('entrypoints', () => {
               DB_CONNECTION_STRING: dbConnectionString,
               LOGGER_MIN_SEVERITY: 'error',
               OGMIOS_URL: ogmiosConnection.address.webSocket,
-              SERVICE_NAMES: `${ServiceNames.StakePool},${ServiceNames.TxSubmit},${ServiceNames.NetworkInfo},${ServiceNames.Utxo}`
+              SERVICE_NAMES: `${ServiceNames.StakePool},${ServiceNames.TxSubmit},${ServiceNames.NetworkInfo},${ServiceNames.Utxo},${ServiceNames.ChainHistory}`
             }
           });
           await assertServiceHealthy(apiUrl, ServiceNames.StakePool);
           await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit);
           await assertServiceHealthy(apiUrl, ServiceNames.NetworkInfo);
           await assertServiceHealthy(apiUrl, ServiceNames.Utxo);
+          await assertServiceHealthy(apiUrl, ServiceNames.ChainHistory);
         });
       });
 
@@ -298,6 +313,80 @@ describe('entrypoints', () => {
         });
       });
 
+      describe('specifying PostgreSQL-dependent services with service discovery args', () => {
+        let spy: jest.Mock;
+        beforeEach(async () => {
+          spy = jest.fn();
+        });
+
+        it('cli:start-server throws DNS SRV error and exits with code 1', (done) => {
+          expect.assertions(3);
+          proc = fork(
+            exePath('cli'),
+            [
+              'start-server',
+              '--api-url',
+              apiUrl,
+              '--postgres-srv-service-name',
+              postgresSrvServiceName,
+              '--postgres-db',
+              postgresDb,
+              '--postgres-user',
+              postgresUser,
+              '--postgres-password',
+              postgresPassword,
+              '--logger-min-severity',
+              'error',
+              '--service-discovery-timeout',
+              '1000',
+              ServiceNames.StakePool,
+              ServiceNames.NetworkInfo,
+              ServiceNames.Utxo
+            ],
+            {
+              stdio: 'pipe'
+            }
+          );
+
+          proc.stderr!.on('data', (data) => {
+            spy();
+            expect(data.toString().includes('querySrv ENOTFOUND')).toEqual(true);
+          });
+
+          proc.on('exit', (code) => {
+            expect(code).toBe(1);
+            expect(spy).toHaveBeenCalled();
+            done();
+          });
+        });
+
+        it('run throws DNS SRV error and exits with code 1', (done) => {
+          expect.assertions(3);
+          proc = fork(exePath('run'), {
+            env: {
+              API_URL: apiUrl,
+              LOGGER_MIN_SEVERITY: 'error',
+              POSTGRES_DB: postgresDb,
+              POSTGRES_PASSWORD: postgresPassword,
+              POSTGRES_SRV_SERVICE_NAME: postgresSrvServiceName,
+              POSTGRES_USER: postgresUser,
+              SERVICE_DISCOVERY_TIMEOUT: '1000',
+              SERVICE_NAMES: `${ServiceNames.StakePool},${ServiceNames.NetworkInfo},${ServiceNames.Utxo}`
+            },
+            stdio: 'pipe'
+          });
+          proc.stderr!.on('data', (data) => {
+            spy();
+            expect(data.toString().includes('querySrv ENOTFOUND')).toEqual(true);
+          });
+          proc.on('exit', (code) => {
+            expect(code).toBe(1);
+            expect(spy).toHaveBeenCalled();
+            done();
+          });
+        });
+      });
+
       describe('specifying a Cardano-Configurations-dependent service without providing the node config path', () => {
         let spy: jest.Mock;
         beforeEach(() => {
@@ -384,6 +473,69 @@ describe('entrypoints', () => {
       });
     });
 
+    describe('specifying an Ogmios-dependent service with service discovery args', () => {
+      let spy: jest.Mock;
+      beforeEach(async () => {
+        spy = jest.fn();
+      });
+
+      it('cli:start-server throws DNS SRV error and exits with code 1', (done) => {
+        expect.assertions(3);
+        proc = fork(
+          exePath('cli'),
+          [
+            'start-server',
+            '--api-url',
+            apiUrl,
+            '--ogmios-srv-service-name',
+            ogmiosSrvServiceName,
+            '--logger-min-severity',
+            'error',
+            '--service-discovery-timeout',
+            '1000',
+            ServiceNames.TxSubmit
+          ],
+          {
+            stdio: 'pipe'
+          }
+        );
+
+        proc.stderr!.on('data', (data) => {
+          spy();
+          expect(data.toString().includes('querySrv ENOTFOUND')).toEqual(true);
+        });
+
+        proc.on('exit', (code) => {
+          expect(code).toBe(1);
+          expect(spy).toHaveBeenCalled();
+          done();
+        });
+      });
+
+      it('run throws DNS SRV error and exits with code 1', (done) => {
+        expect.assertions(3);
+        proc = fork(exePath('run'), {
+          env: {
+            API_URL: apiUrl,
+            LOGGER_MIN_SEVERITY: 'error',
+            OGMIOS_SRV_SERVICE_NAME: ogmiosSrvServiceName,
+            SERVICE_DISCOVERY_TIMEOUT: '1000',
+            SERVICE_NAMES: ServiceNames.TxSubmit
+          },
+          stdio: 'pipe'
+        });
+        proc.stderr!.on('data', (data) => {
+          spy();
+          expect(data.toString().includes('querySrv ENOTFOUND')).toEqual(true);
+        });
+        proc.on('exit', (code) => {
+          expect(code).toBe(1);
+          expect(spy).toHaveBeenCalled();
+          done();
+        });
+      });
+    });
+
     describe('with RabbitMQ and explicit URL', () => {
       it('cli:start-server', async () => {
         proc = fork(
@@ -444,6 +596,71 @@ describe('entrypoints', () => {
           stdio: 'pipe'
         });
         await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit);
+      });
+    });
+
+    describe('specifying a RabbitMQ-dependent service with service discovery args', () => {
+      let spy: jest.Mock;
+      beforeEach(async () => {
+        spy = jest.fn();
+      });
+
+      it('cli:start-server throws DNS SRV error and exits with code 1', (done) => {
+        expect.assertions(3);
+        proc = fork(
+          exePath('cli'),
+          [
+            'start-server',
+            '--api-url',
+            apiUrl,
+            '--use-queue',
+            '--rabbitmq-srv-service-name',
+            rabbitmqSrvServiceName,
+            '--logger-min-severity',
+            'error',
+            '--service-discovery-timeout',
+            '1000',
+            ServiceNames.TxSubmit
+          ],
+          {
+            stdio: 'pipe'
+          }
+        );
+
+        proc.stderr!.on('data', (data) => {
+          spy();
+          expect(data.toString().includes('querySrv ENOTFOUND')).toEqual(true);
+        });
+
+        proc.on('exit', (code) => {
+          expect(code).toBe(1);
+          expect(spy).toHaveBeenCalled();
+          done();
+        });
+      });
+
+      it('run throws DNS SRV error and exits with code 1', (done) => {
+        expect.assertions(3);
+        proc = fork(exePath('run'), {
+          env: {
+            API_URL: apiUrl,
+            LOGGER_MIN_SEVERITY: 'error',
+            RABBITMQ_SRV_SERVICE_NAME: rabbitmqSrvServiceName,
+            SERVICE_DISCOVERY_TIMEOUT: '1000',
+            SERVICE_NAMES: ServiceNames.TxSubmit,
+            USE_QUEUE: 'true'
+          },
+          stdio: 'pipe'
+        });
+        proc.stderr!.on('data', (data) => {
+          spy();
+          expect(data.toString().includes('querySrv ENOTFOUND')).toEqual(true);
+        });
+        proc.on('exit', (code) => {
+          expect(code).toBe(1);
+          expect(spy).toHaveBeenCalled();
+          done();
+        });
       });
     });
 

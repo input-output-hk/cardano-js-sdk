@@ -6,12 +6,18 @@ import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../NetworkInf
 import { DbSyncRewardsProvider, RewardsHttpService } from '../Rewards';
 import { DbSyncStakePoolProvider, StakePoolHttpService } from '../StakePool';
 import { DbSyncUtxoProvider, UtxoHttpService } from '../Utxo';
+import {
+  DnsResolver,
+  createDnsResolver,
+  getOgmiosTxSubmitProvider,
+  getPool,
+  getRabbitMqTxSubmitProvider
+} from './utils';
 import { HttpServer, HttpServerConfig, HttpService } from '../Http';
 import { InMemoryCache } from '../InMemoryCache';
 import { MissingProgramOption, UnknownServiceName } from './errors';
-import { OgmiosCardanoNode, ogmiosTxSubmitProvider, urlToConnectionConfig } from '@cardano-sdk/ogmios';
+import { OgmiosCardanoNode, urlToConnectionConfig } from '@cardano-sdk/ogmios';
 import { ProgramOptionDescriptions } from './ProgramOptionDescriptions';
-import { RabbitMqTxSubmitProvider } from '@cardano-sdk/rabbitmq';
 import { ServiceNames } from './ServiceNames';
 import { TxSubmitHttpService } from '../TxSubmit';
 import { createDbSyncMetadataService } from '../Metadata';
@@ -20,11 +26,14 @@ import pg from 'pg';
 
 export interface HttpServerOptions extends CommonProgramOptions {
   dbConnectionString?: string;
-  cacheTtl: number;
   epochPollInterval: number;
   cardanoNodeConfigPath?: string;
   metricsEnabled?: boolean;
   useQueue?: boolean;
+  postgresSrvServiceName?: string;
+  postgresDb?: string;
+  postgresUser?: string;
+  postgresPassword?: string;
 }
 
 export interface ProgramArgs {
@@ -37,22 +46,44 @@ export interface ProgramArgs {
     | ServiceNames.NetworkInfo
     | ServiceNames.Rewards
   )[];
+  /*
+    TODO: optimize passed options -> 'options' is always passed by default and shouldn't be optional field,
+    no need to check it with '.?' everywhere.Will be fixed within ADP-1990
+  */
   options?: HttpServerOptions;
 }
 
-const serviceMapFactory = (args: ProgramArgs, logger: Logger, cache: InMemoryCache, db?: pg.Pool) => ({
+const serviceMapFactory = (
+  args: ProgramArgs,
+  logger: Logger,
+  cache: InMemoryCache,
+  dnsResolver: DnsResolver,
+  db?: pg.Pool
+) => ({
   [ServiceNames.StakePool]: () => {
-    if (!db) throw new MissingProgramOption(ServiceNames.StakePool, ProgramOptionDescriptions.DbConnection);
+    if (!db)
+      throw new MissingProgramOption(ServiceNames.StakePool, [
+        ProgramOptionDescriptions.DbConnection,
+        ProgramOptionDescriptions.PostgresSrvArgs
+      ]);
 
     return new StakePoolHttpService({ logger, stakePoolProvider: new DbSyncStakePoolProvider(db, logger) });
   },
   [ServiceNames.Utxo]: () => {
-    if (!db) throw new MissingProgramOption(ServiceNames.Utxo, ProgramOptionDescriptions.DbConnection);
+    if (!db)
+      throw new MissingProgramOption(ServiceNames.Utxo, [
+        ProgramOptionDescriptions.DbConnection,
+        ProgramOptionDescriptions.PostgresSrvArgs
+      ]);
 
     return new UtxoHttpService({ logger, utxoProvider: new DbSyncUtxoProvider(db, logger) });
   },
   [ServiceNames.ChainHistory]: () => {
-    if (!db) throw new MissingProgramOption(ServiceNames.ChainHistory, ProgramOptionDescriptions.DbConnection);
+    if (!db)
+      throw new MissingProgramOption(ServiceNames.ChainHistory, [
+        ProgramOptionDescriptions.DbConnection,
+        ProgramOptionDescriptions.PostgresSrvArgs
+      ]);
 
     const metadataService = createDbSyncMetadataService(db, logger);
     return new ChainHistoryHttpService({
@@ -61,12 +92,20 @@ const serviceMapFactory = (args: ProgramArgs, logger: Logger, cache: InMemoryCac
     });
   },
   [ServiceNames.Rewards]: () => {
-    if (!db) throw new MissingProgramOption(ServiceNames.Rewards, ProgramOptionDescriptions.DbConnection);
+    if (!db)
+      throw new MissingProgramOption(ServiceNames.Rewards, [
+        ProgramOptionDescriptions.DbConnection,
+        ProgramOptionDescriptions.PostgresSrvArgs
+      ]);
 
     return new RewardsHttpService({ logger, rewardsProvider: new DbSyncRewardsProvider(db, logger) });
   },
   [ServiceNames.NetworkInfo]: () => {
-    if (!db) throw new MissingProgramOption(ServiceNames.NetworkInfo, ProgramOptionDescriptions.DbConnection);
+    if (!db)
+      throw new MissingProgramOption(ServiceNames.NetworkInfo, [
+        ProgramOptionDescriptions.DbConnection,
+        ProgramOptionDescriptions.PostgresSrvArgs
+      ]);
     if (args.options?.cardanoNodeConfigPath === undefined)
       throw new MissingProgramOption(ServiceNames.NetworkInfo, ProgramOptionDescriptions.CardanoNodeConfigPath);
     if (args.options?.ogmiosUrl === undefined)
@@ -82,34 +121,36 @@ const serviceMapFactory = (args: ProgramArgs, logger: Logger, cache: InMemoryCac
 
     return new NetworkInfoHttpService({ logger, networkInfoProvider });
   },
-  [ServiceNames.TxSubmit]: () => {
-    const txSubmitProvider =
-      args.options?.useQueue && args.options?.rabbitmqUrl
-        ? new RabbitMqTxSubmitProvider({ rabbitmqUrl: args.options.rabbitmqUrl })
-        : ogmiosTxSubmitProvider(urlToConnectionConfig(args.options?.ogmiosUrl));
+  [ServiceNames.TxSubmit]: async () => {
+    const txSubmitProvider = args.options?.useQueue
+      ? await getRabbitMqTxSubmitProvider(dnsResolver, logger, args.options)
+      : await getOgmiosTxSubmitProvider(dnsResolver, logger, args.options);
 
     return new TxSubmitHttpService({ logger, txSubmitProvider });
   }
 });
 
-export const loadHttpServer = (args: ProgramArgs): HttpServer => {
+export const loadHttpServer = async (args: ProgramArgs): Promise<HttpServer> => {
   const services: HttpService[] = [];
   const logger = createLogger({
     level: args.options?.loggerMinSeverity,
     name: 'http-server'
   });
 
-  const db = args.options?.dbConnectionString
-    ? new pg.Pool({ connectionString: args.options.dbConnectionString })
-    : undefined;
-
   const cache = new InMemoryCache(args.options?.cacheTtl);
-
-  const serviceMap = serviceMapFactory(args, logger, cache, db);
+  const dnsResolver = createDnsResolver(
+    {
+      factor: args.options?.serviceDiscoveryBackoffFactor,
+      maxRetryTime: args.options?.serviceDiscoveryTimeout
+    },
+    logger
+  );
+  const db = await getPool(dnsResolver, logger, args.options);
+  const serviceMap = serviceMapFactory(args, logger, cache, dnsResolver, db);
 
   for (const serviceName of args.serviceNames) {
     if (serviceMap[serviceName]) {
-      services.push(serviceMap[serviceName]());
+      services.push(await serviceMap[serviceName]());
     } else {
       throw new UnknownServiceName(serviceName);
     }
