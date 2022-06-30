@@ -28,6 +28,7 @@
     "lint": "eslint -c ../../complete.eslintrc.js \"src/**/*.ts\" \"test/**/*.ts\"",
     "lint:fix": "yarn lint --fix",
     "test": "jest -c ./jest.config.js",
+    "test:e2e": "shx echo 'test:e2e' command not implemented yet",
     "test:build:verify": "tsc --build ./test",
     "coverage": "shx echo No coverage report for this package",
     "prepack": "yarn build"

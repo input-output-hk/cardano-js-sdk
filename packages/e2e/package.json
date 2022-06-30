@@ -32,6 +32,7 @@
         "prepack": "yarn build",
         "test:build:verify": "tsc --build ./test",
         "test:debug": "DEBUG=true yarn test",
+        "test:e2e": "shx echo 'test:e2e' command not implemented yet",
         "generate-mnemonics": "ts-node ./src/Util/mnemonic.ts"
     },
     "repository": {

@@ -31,7 +31,8 @@
     "test:build:verify": "tsc --build ./test",
     "coverage": "yarn test --coverage",
     "prepack": "yarn build",
-    "test:debug": "DEBUG=true yarn test"
+    "test:debug": "DEBUG=true yarn test",
+    "test:e2e": "shx echo 'test:e2e' command not implemented yet"
   },
   "dependencies": {
     "rxjs": "^7.4.0"
