@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# This script is for development purpose only. It will download official config files so we can compare them with current config files.
+# This script is for development purposes only. It will download IOG-maintained config files so we can compare them with current config files.
 
 set -euo pipefail
 

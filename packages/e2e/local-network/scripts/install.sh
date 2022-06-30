@@ -23,7 +23,7 @@ MACOS_BUILD="13065616"
 rm -rf bin
 mkdir -p bin
 
-echo "Download binaries from official IOHK build"
+echo "Download binaries from IOG build"
 case $(uname) in
 Darwin)
   wget -O bin.tar.gz https://hydra.iohk.io/build/${MACOS_BUILD}/download/1/cardano-node-${VERSION}-macos.tar.gz
