@@ -116,7 +116,7 @@ To execute the test:
 $ yarn workspace @cardano-sdk/e2e test:cardano-services
 ```
 
-## Faucet (Private Network POC)
+## Local Network Faucet
 
 The end-to-end faucet test are meant to showcase the use of the private testnet. The faucet end-to-end test shows how we can fund wallets with private testnet tADA so we can run the end-to-end tests. For the faucet end-to-end test to run, we must first start our private testnet environment as follows:
 
