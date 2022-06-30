@@ -5,7 +5,7 @@ import { ProviderHandler } from '../util';
 import { RunnableModule } from '../RunnableModule';
 import express from 'express';
 
-export class HttpService extends RunnableModule {
+export abstract class HttpService extends RunnableModule {
   public router: express.Router;
   public slug: string;
   public provider: Provider;
