@@ -1,6 +1,6 @@
 **Current node version: 1.34.1**
 
-Run an Alonzo private testnet, with or without Docker.
+Run a local testnet, with or without Docker.
 
 ## How it works
 

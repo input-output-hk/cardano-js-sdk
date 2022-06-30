@@ -3,12 +3,12 @@ version: "3.3"
 services:
   private-testnet:
     build:
-      context: ./alonzo-private-network
+      context: ./local-network
     ports:
       - 3001:3001
     volumes:
-      - ${PWD}/alonzo-private-network/sockets:/root/sockets
-      - ./alonzo-private-network/config/network/${NETWORK:-mainnet}:/config/nodes # Mount the config so we can update the genesis files and hashes.
+      - ${PWD}/local-network/sockets:/root/sockets
+      - ./local-network/config/network/${NETWORK:-mainnet}:/config/nodes # Mount the config so we can update the genesis files and hashes.
     healthcheck:
       # Verify that the node socket is up.
       test: ["CMD-SHELL", "test - f /root/sockets/node-pool1.sock"]
@@ -65,7 +65,7 @@ services:
     # Temporary hack to delay ogmions cardano node startup after the configuration files have been updated.
     entrypoint: sh -c "sleep 10 && /root/cardano-node-ogmios.sh"
     volumes:
-      - ./alonzo-private-network/config/network/${NETWORK:-mainnet}:/config
+      - ./local-network/config/network/${NETWORK:-mainnet}:/config
       - node-db:/db
       - node-ipc:/ipc
   cardano-db-sync-extended:
@@ -89,7 +89,7 @@ services:
       - postgres_user
       - postgres_db
     volumes:
-      - ./alonzo-private-network/config/network/${NETWORK:-mainnet}:/config
+      - ./local-network/config/network/${NETWORK:-mainnet}:/config
       - node-ipc:/node-ipc
     restart: on-failure
     logging:
@@ -102,7 +102,7 @@ services:
     volumes:
       - wallet-${NETWORK}-db:/wallet-db
       - node-ipc:/ipc
-      - ./alonzo-private-network/config:/config
+      - ./local-network/config:/config
     ports:
       - 8090:8090
     entrypoint: []                                                                            
@@ -120,11 +120,11 @@ services:
         max-file: "10"
 secrets:
   postgres_db:
-    file: ./alonzo-private-network/placeholder-secrets/postgres_db
+    file: ./local-network/placeholder-secrets/postgres_db
   postgres_password:
-    file: ./alonzo-private-network/placeholder-secrets/postgres_password
+    file: ./local-network/placeholder-secrets/postgres_password
   postgres_user:
-    file: ./alonzo-private-network/placeholder-secrets/postgres_user
+    file: ./local-network/placeholder-secrets/postgres_user
 volumes:
   db-sync-data:
   node-db:
