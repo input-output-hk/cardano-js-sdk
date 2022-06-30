@@ -1,6 +1,6 @@
 import { BehaviorSubject } from 'rxjs';
 import { CLEAN_FN_STATS, ProviderFnStats, ProviderTracker } from './ProviderTracker';
-import { NetworkInfoProvider } from '@cardano-sdk/core';
+import { WC } from '../../types';
 
 export class NetworkInfoProviderStats {
   readonly stake$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
@@ -32,16 +32,16 @@ export class NetworkInfoProviderStats {
 /**
  * Wraps a NetworkInfoProvider, tracking # of calls of each function
  */
-export class TrackedNetworkInfoProvider extends ProviderTracker implements NetworkInfoProvider {
+export class TrackedNetworkInfoProvider extends ProviderTracker implements WC.NetworkInfoProvider {
   readonly stats = new NetworkInfoProviderStats();
-  readonly stake: NetworkInfoProvider['stake'];
-  readonly lovelaceSupply: NetworkInfoProvider['lovelaceSupply'];
-  readonly timeSettings: NetworkInfoProvider['timeSettings'];
-  readonly ledgerTip: NetworkInfoProvider['ledgerTip'];
-  readonly currentWalletProtocolParameters: NetworkInfoProvider['currentWalletProtocolParameters'];
-  readonly genesisParameters: NetworkInfoProvider['genesisParameters'];
+  readonly stake: WC.NetworkInfoProvider['stake'];
+  readonly lovelaceSupply: WC.NetworkInfoProvider['lovelaceSupply'];
+  readonly timeSettings: WC.NetworkInfoProvider['timeSettings'];
+  readonly ledgerTip: WC.NetworkInfoProvider['ledgerTip'];
+  readonly currentWalletProtocolParameters: WC.NetworkInfoProvider['currentWalletProtocolParameters'];
+  readonly genesisParameters: WC.NetworkInfoProvider['genesisParameters'];
 
-  constructor(networkInfoProvider: NetworkInfoProvider) {
+  constructor(networkInfoProvider: WC.NetworkInfoProvider) {
     super();
     networkInfoProvider = networkInfoProvider;
 

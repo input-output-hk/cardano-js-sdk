@@ -15,6 +15,7 @@ import { Observable } from 'rxjs';
 import { SelectionSkeleton } from '@cardano-sdk/cip2';
 import { Shutdown } from '@cardano-sdk/util';
 import { TxInternals } from '../Transaction';
+import { WC } from '.';
 
 export type InitializeTxProps = {
   outputs?: Set<Cardano.TxOut>;
@@ -70,12 +71,15 @@ export interface SyncStatus extends Shutdown {
   isSettled$: Observable<boolean>;
 }
 
-export interface ObservableWallet {
+export interface ObservableWalletCore {
+  // similar to ObservableWallet, but using WalletCore types instead of `core` package types
+  readonly tip$: Observable<WC.Tip>;
+
+  // Review: keeping the rest of the interface untouched for the sake of the the demonstration
   readonly balance: BalanceTracker;
   readonly delegation: DelegationTracker;
   readonly utxo: TransactionalObservables<Cardano.Utxo[]>;
   readonly transactions: TransactionsTracker;
-  readonly tip$: Observable<Cardano.Tip>;
   readonly genesisParameters$: Observable<Cardano.CompactGenesis>;
   readonly lovelaceSupply$: Observable<SupplySummary>;
   readonly stake$: Observable<StakeSummary>;
@@ -101,4 +105,8 @@ export interface ObservableWallet {
    */
   submitTx(tx: Cardano.NewTxAlonzo): Promise<void>;
   shutdown(): void;
+}
+
+export interface ObservableWallet extends ObservableWalletCore {
+  readonly tip$: Observable<Cardano.Tip>;
 }

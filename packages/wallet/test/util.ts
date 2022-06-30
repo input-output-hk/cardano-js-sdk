@@ -1,5 +1,5 @@
 import { Observable, catchError, filter, firstValueFrom, throwError, timeout } from 'rxjs';
-import { ObservableWallet } from '../src';
+import { ObservableWalletCore } from '../src';
 
 const SECOND = 1000;
 const MINUTE = 60 * SECOND;
@@ -19,7 +19,7 @@ export const firstValueFromTimed = <T>(
     )
   );
 
-export const waitForWalletStateSettle = (wallet: ObservableWallet) =>
+export const waitForWalletStateSettle = (wallet: ObservableWalletCore) =>
   firstValueFromTimed(
     wallet.syncStatus.isSettled$.pipe(filter((isSettled) => isSettled)),
     'Took too long to load',

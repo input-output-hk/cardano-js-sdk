@@ -15,7 +15,16 @@ import {
   UtxoProvider,
   coreToCsl
 } from '@cardano-sdk/core';
-import { Assets, InitializeTxProps, InitializeTxResult, ObservableWallet, SignDataProps, SyncStatus } from './types';
+import {
+  Assets,
+  InitializeTxProps,
+  InitializeTxResult,
+  ObservableWallet,
+  ObservableWalletCore,
+  SignDataProps,
+  SyncStatus,
+  WC
+} from './types';
 import {
   BalanceTracker,
   DelegationTracker,
@@ -78,12 +87,12 @@ export interface SingleAddressWalletProps {
   readonly retryBackoffConfig?: RetryBackoffConfig;
 }
 
-export interface SingleAddressWalletDependencies {
+export interface SingleAddressWalletCoreDependencies {
   readonly keyAgent: AsyncKeyAgent;
   readonly txSubmitProvider: TxSubmitProvider;
   readonly stakePoolProvider: StakePoolProvider;
   readonly assetProvider: AssetProvider;
-  readonly networkInfoProvider: NetworkInfoProvider;
+  readonly networkInfoProvider: WC.NetworkInfoProvider;
   readonly utxoProvider: UtxoProvider;
   readonly chainHistoryProvider: ChainHistoryProvider;
   readonly rewardsProvider: RewardsProvider;
@@ -92,10 +101,14 @@ export interface SingleAddressWalletDependencies {
   readonly logger?: Logger;
 }
 
-export class SingleAddressWallet implements ObservableWallet {
+export interface SingleAddressWalletDependencies extends SingleAddressWalletCoreDependencies {
+  readonly networkInfoProvider: NetworkInfoProvider;
+}
+
+export class SingleAddressWalletCore implements ObservableWalletCore {
   #inputSelector: InputSelector;
   #logger: Logger;
-  #tip$: SyncableIntervalPersistentDocumentTrackerSubject<Cardano.Tip>;
+  #tip$: SyncableIntervalPersistentDocumentTrackerSubject<WC.Tip>;
   #newTransactions = {
     failedToSubmit$: new Subject<FailedTx>(),
     pending$: new Subject<Cardano.NewTxAlonzo>(),
@@ -113,7 +126,7 @@ export class SingleAddressWallet implements ObservableWallet {
   readonly balance: BalanceTracker;
   readonly transactions: TransactionsTracker & Shutdown;
   readonly delegation: DelegationTracker & Shutdown;
-  readonly tip$: BehaviorObservable<Cardano.Tip>;
+  readonly tip$: BehaviorObservable<WC.Tip>;
   readonly lovelaceSupply$: TrackerSubject<SupplySummary>;
   readonly stake$: TrackerSubject<StakeSummary>;
   readonly timeSettings$: TrackerSubject<TimeSettings[]>;
@@ -151,7 +164,7 @@ export class SingleAddressWallet implements ObservableWallet {
       logger = dummyLogger,
       inputSelector = roundRobinRandomImprove(),
       stores = createInMemoryWalletStores()
-    }: SingleAddressWalletDependencies
+    }: SingleAddressWalletCoreDependencies
   ) {
     this.#logger = logger;
     this.#inputSelector = inputSelector;
@@ -396,5 +409,13 @@ export class SingleAddressWallet implements ObservableWallet {
         })
       )
     );
+  }
+}
+
+export class SingleAddressWallet extends SingleAddressWalletCore implements ObservableWallet {
+  readonly tip$: BehaviorObservable<Cardano.Tip>;
+
+  constructor(props: SingleAddressWalletProps, dependencies: SingleAddressWalletDependencies) {
+    super(props, dependencies);
   }
 }
