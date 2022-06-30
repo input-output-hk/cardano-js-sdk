@@ -7,7 +7,7 @@ import {
   SupplySummary,
   TimeSettings
 } from '@cardano-sdk/core';
-import { BalanceTracker, DelegationTracker, TransactionalObservables, TransactionsTracker } from './services';
+import { BalanceTracker, DelegationTracker, TransactionalObservables, TransactionsTracker } from '../services';
 import { Cip30DataSignature } from '@cardano-sdk/cip30';
 import { Cip30SignDataRequest } from '../KeyManagement/cip8';
 import { GroupedAddress } from '../KeyManagement';
