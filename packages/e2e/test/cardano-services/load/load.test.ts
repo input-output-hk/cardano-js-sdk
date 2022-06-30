@@ -5,21 +5,47 @@ import { ChildProcess, fork } from 'child_process';
 import { InitializeTxResult, ObservableWallet, SingleAddressWallet } from '@cardano-sdk/wallet';
 import { ServiceNames } from '@cardano-sdk/cardano-services';
 import {
-  assetProvider,
-  chainHistoryProvider,
-  env as configEnv,
+  assetProviderFactory,
+  chainHistoryProviderFactory,
+  getLogger,
   keyAgentById,
-  logger,
-  networkInfoProvider,
-  rewardsProvider,
-  stakePoolProvider,
-  txSubmitProvider,
-  utxoProvider
-} from '../../config';
+  networkInfoProviderFactory,
+  rewardsProviderFactory,
+  stakePoolProviderFactory,
+  txSubmitProviderFactory,
+  utxoProviderFactory
+} from '../../../src/factories';
 import { filter, firstValueFrom } from 'rxjs';
 import { removeRabbitMQContainer, setupRabbitMQContainer } from '../../../../rabbitmq/test/jest-setup/docker';
 import JSONBig from 'json-bigint';
 import path from 'path';
+
+// Verify environment.
+export const env = envalid.cleanEnv(process.env, {
+  ASSET_PROVIDER: envalid.str(),
+  ASSET_PROVIDER_PARAMS: envalid.json({ default: {} }),
+  CHAIN_HISTORY_PROVIDER: envalid.str(),
+  CHAIN_HISTORY_PROVIDER_PARAMS: envalid.json({ default: {} }),
+  KEY_MANAGEMENT_PARAMS: envalid.json({ default: {} }),
+  KEY_MANAGEMENT_PROVIDER: envalid.str(),
+  LOGGER_MIN_SEVERITY: envalid.str({ default: 'info' }),
+  NETWORK_INFO_PROVIDER: envalid.str(),
+  NETWORK_INFO_PROVIDER_PARAMS: envalid.json({ default: {} }),
+  OGMIOS_URL: envalid.str(),
+  RABBITMQ_URL: envalid.url(),
+  REWARDS_PROVIDER: envalid.str(),
+  REWARDS_PROVIDER_PARAMS: envalid.json({ default: {} }),
+  STAKE_POOL_PROVIDER: envalid.str(),
+  STAKE_POOL_PROVIDER_PARAMS: envalid.json({ default: {} }),
+  START_LOCAL_HTTP_SERVER: envalid.bool(),
+  TRANSACTIONS_NUMBER: envalid.num(),
+  TX_SUBMIT_HTTP_URL: envalid.str(),
+  TX_SUBMIT_PROVIDER: envalid.str(),
+  TX_SUBMIT_PROVIDER_PARAMS: envalid.json({ default: {} }),
+  UTXO_PROVIDER: envalid.str(),
+  UTXO_PROVIDER_PARAMS: envalid.json({ default: {} }),
+  WORKER_PARALLEL_TRANSACTION: envalid.num()
+});
 
 interface TestOptions {
   directlyToOgmios?: boolean;
@@ -36,18 +62,13 @@ interface TestReport extends TestOptions {
 
 const containerName = 'rabbitmq-load-test';
 
-export const env = envalid.cleanEnv(process.env, {
-  RABBITMQ_URL: envalid.url(),
-  START_LOCAL_HTTP_SERVER: envalid.bool(),
-  TRANSACTIONS_NUMBER: envalid.num(),
-  WORKER_PARALLEL_TRANSACTION: envalid.num()
-});
+const logger = getLogger(env.LOGGER_MIN_SEVERITY);
 
 const commonArgs = [
   '--logger-min-severity',
   'info',
   '--ogmios-url',
-  configEnv.OGMIOS_URL,
+  env.OGMIOS_URL,
   '--rabbitmq-url',
   env.RABBITMQ_URL
 ];
@@ -56,14 +77,20 @@ const getWallet = async () =>
   new SingleAddressWallet(
     { name: 'Test Wallet' },
     {
-      assetProvider: await assetProvider,
-      chainHistoryProvider: await chainHistoryProvider,
-      keyAgent: await keyAgentById(0),
-      networkInfoProvider: await networkInfoProvider,
-      rewardsProvider: await rewardsProvider,
-      stakePoolProvider: await stakePoolProvider,
-      txSubmitProvider: await txSubmitProvider,
-      utxoProvider: await utxoProvider
+      assetProvider: await assetProviderFactory.create(env.ASSET_PROVIDER, env.ASSET_PROVIDER_PARAMS),
+      chainHistoryProvider: await chainHistoryProviderFactory.create(
+        env.CHAIN_HISTORY_PROVIDER,
+        env.CHAIN_HISTORY_PROVIDER_PARAMS
+      ),
+      keyAgent: await keyAgentById(0, env.KEY_MANAGEMENT_PROVIDER, env.KEY_MANAGEMENT_PARAMS),
+      networkInfoProvider: await networkInfoProviderFactory.create(
+        env.NETWORK_INFO_PROVIDER,
+        env.NETWORK_INFO_PROVIDER_PARAMS
+      ),
+      rewardsProvider: await rewardsProviderFactory.create(env.REWARDS_PROVIDER, env.REWARDS_PROVIDER_PARAMS),
+      stakePoolProvider: await stakePoolProviderFactory.create(env.STAKE_POOL_PROVIDER, env.STAKE_POOL_PROVIDER_PARAMS),
+      txSubmitProvider: await txSubmitProviderFactory.create(env.TX_SUBMIT_PROVIDER, env.TX_SUBMIT_PROVIDER_PARAMS),
+      utxoProvider: await utxoProviderFactory.create(env.UTXO_PROVIDER, env.UTXO_PROVIDER_PARAMS)
     }
   );
 
@@ -112,7 +139,7 @@ const startServer = async (options: TestOptions = {}) => {
       [
         'start-server',
         '--api-url',
-        configEnv.TX_SUBMIT_HTTP_URL,
+        env.TX_SUBMIT_HTTP_URL,
         ...(options.directlyToOgmios ? [] : ['--use-queue']),
         ...commonArgs,
         ServiceNames.TxSubmit

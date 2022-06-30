@@ -2,23 +2,23 @@
 import { Cardano } from '@cardano-sdk/core';
 import { KeyManagement, ObservableWallet, SingleAddressWallet } from '@cardano-sdk/wallet';
 import {
-  assetProvider,
-  chainHistoryProvider,
-  keyAgent,
-  networkInfoProvider,
-  rewardsProvider,
-  stakePoolProvider,
-  txSubmitProvider,
-  utxoProvider,
-  walletProvider
-} from '../../config';
+  assetProviderFactory,
+  chainHistoryProviderFactory,
+  keyAgentById,
+  networkInfoProviderFactory,
+  rewardsProviderFactory,
+  stakePoolProviderFactory,
+  txSubmitProviderFactory,
+  utxoProviderFactory
+} from '../../../src/factories';
 import { combineLatest, filter, firstValueFrom, map, of } from 'rxjs';
+import { env } from '../environment';
 
 describe('SingleAddressWallet.assets/nft', () => {
   let wallet: ObservableWallet;
 
   beforeAll(async () => {
-    const _keyAgent = await keyAgent;
+    const _keyAgent = await keyAgentById(0, env.KEY_MANAGEMENT_PROVIDER, env.KEY_MANAGEMENT_PARAMS);
     _keyAgent.knownAddresses$ = of([
       {
         accountIndex: 0,
@@ -37,15 +37,23 @@ describe('SingleAddressWallet.assets/nft', () => {
         name: 'Test Wallet'
       },
       {
-        assetProvider: await assetProvider,
-        chainHistoryProvider: await chainHistoryProvider,
-        keyAgent: await _keyAgent,
-        networkInfoProvider: await networkInfoProvider,
-        rewardsProvider: await rewardsProvider,
-        stakePoolProvider: await stakePoolProvider,
-        txSubmitProvider: await txSubmitProvider,
-        utxoProvider: await utxoProvider,
-        walletProvider: await walletProvider
+        assetProvider: await assetProviderFactory.create(env.ASSET_PROVIDER, env.ASSET_PROVIDER_PARAMS),
+        chainHistoryProvider: await chainHistoryProviderFactory.create(
+          env.CHAIN_HISTORY_PROVIDER,
+          env.CHAIN_HISTORY_PROVIDER_PARAMS
+        ),
+        keyAgent: await keyAgentById(0, env.KEY_MANAGEMENT_PROVIDER, env.KEY_MANAGEMENT_PARAMS),
+        networkInfoProvider: await networkInfoProviderFactory.create(
+          env.NETWORK_INFO_PROVIDER,
+          env.NETWORK_INFO_PROVIDER_PARAMS
+        ),
+        rewardsProvider: await rewardsProviderFactory.create(env.REWARDS_PROVIDER, env.REWARDS_PROVIDER_PARAMS),
+        stakePoolProvider: await stakePoolProviderFactory.create(
+          env.STAKE_POOL_PROVIDER,
+          env.STAKE_POOL_PROVIDER_PARAMS
+        ),
+        txSubmitProvider: await txSubmitProviderFactory.create(env.TX_SUBMIT_PROVIDER, env.TX_SUBMIT_PROVIDER_PARAMS),
+        utxoProvider: await utxoProviderFactory.create(env.UTXO_PROVIDER, env.UTXO_PROVIDER_PARAMS)
       }
     );
   });

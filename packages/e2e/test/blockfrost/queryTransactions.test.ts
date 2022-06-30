@@ -1,16 +1,26 @@
+import * as envalid from 'envalid';
 import { Cardano, ChainHistoryProvider, InvalidStringError } from '@cardano-sdk/core';
-import { chainHistoryProvider } from '../config';
+import { chainHistoryProviderFactory } from '../../src/factories';
+
+// Verify environment.
+export const env = envalid.cleanEnv(process.env, {
+  CHAIN_HISTORY_PROVIDER: envalid.str(),
+  CHAIN_HISTORY_PROVIDER_PARAMS: envalid.json({ default: {} })
+});
 
 describe('blockfrostChainHistoryProvider', () => {
-  let _chainHistoryProvider: ChainHistoryProvider;
+  let chainHistoryProvider: ChainHistoryProvider;
 
   beforeAll(async () => {
-    _chainHistoryProvider = await chainHistoryProvider;
+    chainHistoryProvider = await chainHistoryProviderFactory.create(
+      env.CHAIN_HISTORY_PROVIDER,
+      env.CHAIN_HISTORY_PROVIDER_PARAMS
+    );
   });
 
   describe('transactionsByHashes', () => {
     it('parses metadata correctly', async () => {
-      const [tx] = await _chainHistoryProvider.transactionsByHashes([
+      const [tx] = await chainHistoryProvider.transactionsByHashes([
         Cardano.TransactionId('84801fb64a9c5078c406ead24017ba0b069ef6ac6446fef8bdb8f97bade3cfa5')
       ]);
       expect(tx.auxiliaryData!.body.blob!.get(9_223_372_036_854_775_707n)).toEqual(
@@ -18,7 +28,7 @@ describe('blockfrostChainHistoryProvider', () => {
       );
     });
     it('parses collaterals correctly', async () => {
-      const [tx] = await _chainHistoryProvider.transactionsByHashes([
+      const [tx] = await chainHistoryProvider.transactionsByHashes([
         Cardano.TransactionId('12fa9af65e21b36ec4dc4cbce478e911d52585adb46f2b4fe3d6563e7ee5a61a')
       ]);
       expect(tx.body.inputs!.length).toEqual(1);
@@ -35,7 +45,7 @@ describe('blockfrostChainHistoryProvider', () => {
     // TODO: waiting for release/deploy in db-sync/blockfrost
     // https://github.com/input-output-hk/cardano-db-sync/issues/1019
     it.skip('has collaterals for failed contract', async () => {
-      const [tx] = await _chainHistoryProvider.transactionsByHashes([
+      const [tx] = await chainHistoryProvider.transactionsByHashes([
         Cardano.TransactionId('9298f499a4c4aeba53a984cb4df0f9a93b7d158da4c2c2d12a06530841f94cd7')
       ]);
       expect(tx.body.inputs!.length).toEqual(0);
@@ -43,7 +53,7 @@ describe('blockfrostChainHistoryProvider', () => {
       expect(tx.body.collaterals!.length).toEqual(1);
     });
     it('has withdrawals', async () => {
-      const [tx] = await _chainHistoryProvider.transactionsByHashes([
+      const [tx] = await chainHistoryProvider.transactionsByHashes([
         Cardano.TransactionId('e92e3c2ce94d61449876e23ba9170ca20868ee447f13703c5fa7e888cc1701e1')
       ]);
       expect(tx.body.withdrawals).toEqual([
@@ -51,7 +61,7 @@ describe('blockfrostChainHistoryProvider', () => {
       ]);
     });
     it('has redeemer', async () => {
-      const [tx] = await _chainHistoryProvider.transactionsByHashes([
+      const [tx] = await chainHistoryProvider.transactionsByHashes([
         Cardano.TransactionId('3353309c6d3f2200c4e2084f76c1f1495f00eb21ea62f29c01da2adac71e1068')
       ]);
       expect(tx.witness.redeemers).toEqual([
@@ -65,13 +75,13 @@ describe('blockfrostChainHistoryProvider', () => {
     });
     // TODO: not implemented
     it.skip('has mint', async () => {
-      const [tx] = await _chainHistoryProvider.transactionsByHashes([
+      const [tx] = await chainHistoryProvider.transactionsByHashes([
         Cardano.TransactionId('c09d19f5ac172e35dbeb7b279d54de73f7e997e49ca812e446fa362a43b71b58')
       ]);
       expect(tx.body.mint!).toBeDefined();
     });
     it('has StakeKeyRegistration cert', async () => {
-      const [tx] = await _chainHistoryProvider.transactionsByHashes([
+      const [tx] = await chainHistoryProvider.transactionsByHashes([
         Cardano.TransactionId('bcd165c882dc17a416bfef7053f0e1cfc3d715f8d7fc05a9803309f795878d9b')
       ]);
       expect(tx.body.certificates![0]).toEqual({
@@ -82,7 +92,7 @@ describe('blockfrostChainHistoryProvider', () => {
       });
     });
     it('has StakeDelegation cert', async () => {
-      const [tx] = await _chainHistoryProvider.transactionsByHashes([
+      const [tx] = await chainHistoryProvider.transactionsByHashes([
         Cardano.TransactionId('bcd165c882dc17a416bfef7053f0e1cfc3d715f8d7fc05a9803309f795878d9b')
       ]);
       expect(tx.body.certificates![1]).toEqual({
@@ -94,7 +104,7 @@ describe('blockfrostChainHistoryProvider', () => {
       });
     });
     it('has StakeKeyDeregistration cert', async () => {
-      const [tx] = await _chainHistoryProvider.transactionsByHashes([
+      const [tx] = await chainHistoryProvider.transactionsByHashes([
         Cardano.TransactionId('150a445f4d1f2e692791daec9c09f32d6c8c25a3f9ca6c7cf14ff8085375aaa0')
       ]);
       expect(tx.body.certificates![0]).toEqual({
@@ -105,7 +115,7 @@ describe('blockfrostChainHistoryProvider', () => {
       });
     });
     it('PoolRegistration poolParameters are not implemented (null)', async () => {
-      const [tx] = await _chainHistoryProvider.transactionsByHashes([
+      const [tx] = await chainHistoryProvider.transactionsByHashes([
         Cardano.TransactionId('295d5e0f7ee182426eaeda8c9f1c63502c72cdf4afd6e0ee0f209adf94a614e7')
       ]);
       expect(tx.body.certificates![2]).toEqual({
@@ -115,7 +125,7 @@ describe('blockfrostChainHistoryProvider', () => {
       });
     });
     it('has PoolRetirement cert', async () => {
-      const [tx] = await _chainHistoryProvider.transactionsByHashes([
+      const [tx] = await chainHistoryProvider.transactionsByHashes([
         Cardano.TransactionId('545ee7080a01aa085be01dffc073020be04ea3283b945c408c0830e9c4f8253c')
       ]);
       expect(tx.body.certificates![0]).toEqual({
@@ -125,7 +135,7 @@ describe('blockfrostChainHistoryProvider', () => {
       });
     });
     it('has MoveInstantaneousRewards cert', async () => {
-      const [tx] = await _chainHistoryProvider.transactionsByHashes([
+      const [tx] = await chainHistoryProvider.transactionsByHashes([
         Cardano.TransactionId('24986c0cd3475419bfb44756c27a0e13a6354a4071153f76a78f9b2d1e596089')
       ]);
       expect(tx.body.certificates![0]).toEqual({
@@ -137,14 +147,14 @@ describe('blockfrostChainHistoryProvider', () => {
     });
     // TODO: blocked by https://github.com/input-output-hk/cardano-db-sync/issues/290
     it.skip('has GenesisKeyDelegation cert', async () => {
-      const [tx] = await _chainHistoryProvider.transactionsByHashes([Cardano.TransactionId('someValue')]);
+      const [tx] = await chainHistoryProvider.transactionsByHashes([Cardano.TransactionId('someValue')]);
       expect(tx.body.certificates![0]).toBeDefined();
     });
   });
 
   describe('transactionsByAddresses', () => {
     it('Shelley address (addr_test1)', async () => {
-      const txs = await _chainHistoryProvider.transactionsByAddresses({
+      const txs = await chainHistoryProvider.transactionsByAddresses({
         addresses: [Cardano.Address('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg')]
       });
       expect(txs.length).toBeGreaterThanOrEqual(47);
@@ -152,7 +162,7 @@ describe('blockfrostChainHistoryProvider', () => {
       expect(txs[46].id).toBe('f632b491bb481b4d93fa69e1901ebb623a3af65fde500f1b019eaabd4bb2a980');
     });
     it('extended Shelley address (addr_test1)', async () => {
-      const txs = await _chainHistoryProvider.transactionsByAddresses({
+      const txs = await chainHistoryProvider.transactionsByAddresses({
         addresses: [
           Cardano.Address(
             'addr_test1qph5x6uahxhxyvtqatzj77sjtjmdjycemt5ncjuj2r4e' +
@@ -165,7 +175,7 @@ describe('blockfrostChainHistoryProvider', () => {
       expect(txs[3].id).toBe('667f714ee9d9975ca4fa0f5451e006d3dafcdafb7342fe288ebcaf17c100a996');
     });
     it('Icarus Byron address (2c)', async () => {
-      const txs = await _chainHistoryProvider.transactionsByAddresses({
+      const txs = await chainHistoryProvider.transactionsByAddresses({
         addresses: [Cardano.Address('2cWKMJemoBai9J7kVvRTukMmdfxtjL9z7c396rTfrrzfAZ6EeQoKLC2y1k34hswwm4SVr')]
       });
       expect(txs.length).toBeGreaterThanOrEqual(1);
@@ -174,7 +184,7 @@ describe('blockfrostChainHistoryProvider', () => {
     // Failing because returned transactions are grouped by address
     // TODO: update and reenable test when we decide behaviour
     it.skip('multiple address types', async () => {
-      const txs = await _chainHistoryProvider.transactionsByAddresses({
+      const txs = await chainHistoryProvider.transactionsByAddresses({
         addresses: [
           Cardano.Address('2cWKMJemoBai9J7kVvRTukMmdfxtjL9z7c396rTfrrzfAZ6EeQoKLC2y1k34hswwm4SVr'),
           Cardano.Address('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg'),
@@ -189,13 +199,13 @@ describe('blockfrostChainHistoryProvider', () => {
       expect(txs[51].id).toBe('667f714ee9d9975ca4fa0f5451e006d3dafcdafb7342fe288ebcaf17c100a996');
     });
     it('Shelley address not used - no transactions', async () => {
-      const txs = await _chainHistoryProvider.transactionsByAddresses({
+      const txs = await chainHistoryProvider.transactionsByAddresses({
         addresses: [Cardano.Address('addr_test1vrfxjeunkc9xu8rpnhgkluptaq0rm8kyxh8m3q9vtcetjwshvpnsm')]
       });
       expect(txs.length).toBe(0);
     });
     it('query ignores invalid transaction (script failure)', async () => {
-      const txs = await _chainHistoryProvider.transactionsByAddresses({
+      const txs = await chainHistoryProvider.transactionsByAddresses({
         addresses: [Cardano.Address('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg')]
       });
       expect(
@@ -214,7 +224,7 @@ describe('blockfrostChainHistoryProvider', () => {
       const address = Cardano.Address(
         'addr_test1qp88yvfup4eykezr2dytygwyglfzflyn32dh83ftxkzeg4jrdz3th865e0s2cm6xuzc4xkd8desmtu3p5jfmzkazmxwsm2tk5a'
       );
-      const transactions = await _chainHistoryProvider.transactionsByAddresses({
+      const transactions = await chainHistoryProvider.transactionsByAddresses({
         addresses: [address],
         sinceBlock: 3_348_548
       });

@@ -1,14 +1,23 @@
+import * as envalid from 'envalid';
 import { FaucetProvider } from '../../src/FaucetProvider';
 import { KeyManagement } from '@cardano-sdk/wallet';
-import { faucetProvider, keyAgent } from '../config';
+import { faucetProviderFactory, keyAgentById } from '../../src/factories';
+
+// Verify environment.
+export const env = envalid.cleanEnv(process.env, {
+  FAUCET_PROVIDER: envalid.str(),
+  FAUCET_PROVIDER_PARAMS: envalid.json({ default: {} }),
+  KEY_MANAGEMENT_PARAMS: envalid.json({ default: {} }),
+  KEY_MANAGEMENT_PROVIDER: envalid.str()
+});
 
 describe('CardanoWalletFaucetProvider', () => {
   let _faucetProvider: FaucetProvider;
   let _keyAgent: KeyManagement.AsyncKeyAgent;
 
   beforeAll(async () => {
-    _faucetProvider = await faucetProvider;
-    _keyAgent = await keyAgent;
+    _faucetProvider = await faucetProviderFactory.create(env.FAUCET_PROVIDER, env.FAUCET_PROVIDER_PARAMS);
+    _keyAgent = await keyAgentById(0, env.KEY_MANAGEMENT_PROVIDER, env.KEY_MANAGEMENT_PARAMS);
 
     await _faucetProvider.start();
 
