@@ -51,8 +51,10 @@ To add funds to your newly created wallet, copy the address displayed in the con
 To run the Blockfrost end-to-end tests you only need to configure two providers, AssetProvider and ChainHistoryProvider, both must be configured as Blockfrost providers and a valid Blockfrost API key must be also set, make sure that in your .env file, you have the environment variables set:
 
 ```
-LOGGER_MIN_SEVERITY=debug
-BLOCKFROST_API_KEY=testnetNElagmhpQDubE6Ic4XBUVJjV5DROyijO
+# Blockfrost secrets
+BLOCKFROST_API_KEY=testnetSOMEAPIKEY
+
+# Providers setup
 ASSET_PROVIDER=blockfrost
 CHAIN_HISTORY_PROVIDER=blockfrost
 ```
@@ -77,12 +79,15 @@ $ yarn testnet:up
 Once your environment is synced up, in a different terminal you can proceed to run the test, this is an example of the configuration you may need:
 
 ```
+# Logger
 LOGGER_MIN_SEVERITY=debug
-BLOCKFROST_API_KEY=testnetozfiHqTtDYvfiwgG4PQmRyt5E3tBJVDs
-FAUCET_PROVIDER=cardano-wallet
-FAUCET_PROVIDER_PARAMS='{"url":"http://localhost:8090/v2","mnemonic":"fire method repair aware foot tray accuse brother popular olive find account sick rocket next"}'
+
+# Blockfrost secrets
+BLOCKFROST_API_KEY=testnetSOMEAPIKEY
+
+# Providers setup
 KEY_MANAGEMENT_PROVIDER=inMemory
-KEY_MANAGEMENT_PARAMS='{"accountIndex": 0, "networkId": 0, "password":"some_password","mnemonic":"ire method repair aware foot tray accuse brother popular olive find account sick rocket next"}'
+KEY_MANAGEMENT_PARAMS='{"accountIndex": 0, "networkId": 0, "password":"some_password","mnemonic":"run yarn workspace @cardano-sdk/e2e generate-mnemonics to generate your own"}'
 ASSET_PROVIDER=blockfrost
 CHAIN_HISTORY_PROVIDER=blockfrost
 NETWORK_INFO_PROVIDER=blockfrost
@@ -92,15 +97,11 @@ TX_SUBMIT_PROVIDER_PARAMS='{"url": "http://localhost:3456/tx-submit"}'
 UTXO_PROVIDER=blockfrost
 WALLET_PROVIDER=blockfrost
 STAKE_POOL_PROVIDER=stub
-POOL_ID_1=pool1euf2nh92ehqfw7rpd4s9qgq34z8dg4pvfqhjmhggmzk95gcd402
-POOL_ID_2=pool1fghrkl620rl3g54ezv56weeuwlyce2tdannm2hphs62syf3vyyh
-# System to test config
-# OGMIOS_URL should evaluate ws://localhost:1338 for load test while it should evaluate ws://localhost:1337 for unit tests
+
+# Test Parameters
 OGMIOS_URL=ws://localhost:1338
 TX_SUBMIT_HTTP_URL=http://localhost:3456/tx-submit
 RABBITMQ_URL=amqp://localhost
-
-# Test config
 TRANSACTIONS_NUMBER=10
 START_LOCAL_HTTP_SERVER=true
 WORKER_PARALLEL_TRANSACTION=3
@@ -115,7 +116,7 @@ To execute the test:
 $ yarn workspace @cardano-sdk/e2e test:cardano-services
 ```
 
-## Faucet (Private Network POC)
+## Local Network Faucet
 
 The end-to-end faucet test are meant to showcase the use of the private testnet. The faucet end-to-end test shows how we can fund wallets with private testnet tADA so we can run the end-to-end tests. For the faucet end-to-end test to run, we must first start our private testnet environment as follows:
 
@@ -133,6 +134,12 @@ Instead of CTRL-C, since some resources need to be clear before you can set up t
 For the faucet to work correctly, we must configure it with the mnemonic of the genesis wallet. This wallet controls all the funds on the private testnet and is the only way of obtaining tADA on that network.
 
 ```
+# Logger
+LOGGER_MIN_SEVERITY=debug
+
+# Providers setup
+KEY_MANAGEMENT_PROVIDER=inMemory
+KEY_MANAGEMENT_PARAMS='{"accountIndex": 0, "networkId": 0, "password":"some_password","mnemonic":"run yarn workspace @cardano-sdk/e2e generate-mnemonics to generate your own"}'
 FAUCET_PROVIDER=cardano-wallet
 FAUCET_PROVIDER_PARAMS='{"url":"http://localhost:8090/v2","mnemonic":"fire method repair aware foot tray accuse brother popular olive find account sick rocket next"}'
 ```
@@ -150,10 +157,15 @@ The wallet end-to-end tests showcase the use of different providers to create, s
 Since the wallet test interacts with most of the providers, you need to make sure to provide the proper values for all the environment variables that configure said providers, for example:
 
 ```
+# Logger
 LOGGER_MIN_SEVERITY=debug
-BLOCKFROST_API_KEY=testnetNElagmhpQDubE6Ic4XBUVJjV5DROyijO
+
+# Blockfrost secrets
+BLOCKFROST_API_KEY=testnetSOMEAPIKEY
+
+# Providers setup
 KEY_MANAGEMENT_PROVIDER=inMemory
-KEY_MANAGEMENT_PARAMS='{"accountIndex": 0, "networkId": 0, "password":"some_password","mnemonic":"actor scout worth mansion thumb device mass pave gospel secret height document merge text broom kind lesson invest across estate erase interest end century"}'
+KEY_MANAGEMENT_PARAMS='{"accountIndex": 0, "networkId": 0, "password":"some_password","mnemonic":"run yarn workspace @cardano-sdk/e2e generate-mnemonics to generate your own"}'
 ASSET_PROVIDER=blockfrost
 CHAIN_HISTORY_PROVIDER=blockfrost
 NETWORK_INFO_PROVIDER=blockfrost
@@ -162,15 +174,10 @@ TX_SUBMIT_PROVIDER=blockfrost
 UTXO_PROVIDER=blockfrost
 WALLET_PROVIDER=blockfrost
 STAKE_POOL_PROVIDER=stub
+
+# Test Params
 POOL_ID_1=pool1euf2nh92ehqfw7rpd4s9qgq34z8dg4pvfqhjmhggmzk95gcd402
 POOL_ID_2=pool1fghrkl620rl3g54ezv56weeuwlyce2tdannm2hphs62syf3vyyh
-OGMIOS_URL=ws://localhost:1338
-TX_SUBMIT_HTTP_URL=http://localhost:3456/tx-submit
-RABBITMQ_URL=amqp://localhost
-TRANSACTIONS_NUMBER=10
-START_LOCAL_HTTP_SERVER=true
-WORKER_PARALLEL_TRANSACTION=3
-
 ```
 > :information_source: Remember to get your Blockfrost API key at [blockfrost.io](https://blockfrost.io/) and set it in the configuration file, the API key displayed here is invalid and for demonstration purposes only.
 
@@ -195,7 +202,7 @@ REWARDS_PROVIDER=blockfrost
 STAKE_POOL_PROVIDER=stub
 NETWORK_INFO_PROVIDER=blockfrost
 CHAIN_HISTORY_PROVIDER=blockfrost
-BLOCKFROST_API_KEY=testnetNElagmhpQDubE6Ic4XBUVJjV5DROyijO
+BLOCKFROST_API_KEY=testnetSOMEAPIKEY
 NETWORK_ID=0
 MNEMONIC_WORDS="vacant invite slender salute undo drink above scatter item silver hold route repeat patch paper"
 WALLET_PASSWORD=some_password
