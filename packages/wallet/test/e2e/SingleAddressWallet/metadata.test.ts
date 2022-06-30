@@ -1,5 +1,5 @@
 import { Cardano } from '@cardano-sdk/core';
-import { CompleteObservableWallet, SingleAddressWallet } from '../../../src';
+import { SingleAddressWallet } from '../../../src';
 import {
   assetProvider,
   chainHistoryProvider,
@@ -14,7 +14,7 @@ import { filter, firstValueFrom, map } from 'rxjs';
 import { isNotNil } from '@cardano-sdk/util';
 
 describe('SingleAddressWallet/metadata', () => {
-  let wallet: CompleteObservableWallet;
+  let wallet: SingleAddressWallet;
   let ownAddress: Cardano.Address;
 
   beforeAll(async () => {

@@ -27,7 +27,6 @@ import { FailedTx, TransactionFailure, TransactionsTracker } from './types';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { Shutdown } from '@cardano-sdk/util';
 import { TrackerSubject } from '@cardano-sdk/util-rxjs';
-import { WC } from '../types';
 import { coldObservableProvider, distinctBlock, transactionsEquals } from './util';
 import intersectionBy from 'lodash/intersectionBy';
 import sortBy from 'lodash/sortBy';
@@ -36,7 +35,7 @@ import unionBy from 'lodash/unionBy';
 export interface TransactionsTrackerProps {
   chainHistoryProvider: ChainHistoryProvider;
   addresses$: Observable<Cardano.Address[]>;
-  tip$: Observable<WC.Tip>;
+  tip$: Observable<Cardano.Tip>;
   retryBackoffConfig: RetryBackoffConfig;
   transactionsHistoryStore: OrderedCollectionStore<Cardano.TxAlonzo>;
   inFlightTransactionsStore: DocumentStore<Cardano.NewTxAlonzo[]>;

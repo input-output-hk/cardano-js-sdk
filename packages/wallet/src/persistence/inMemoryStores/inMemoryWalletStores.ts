@@ -1,4 +1,4 @@
-import { Assets, WC } from '../../types';
+import { Assets } from '../../types';
 import {
   Cardano,
   EpochRewards,
@@ -14,7 +14,7 @@ import { InMemoryDocumentStore } from './InMemoryDocumentStore';
 import { InMemoryKeyValueStore } from './InMemoryKeyValueStore';
 import { WalletStores } from '../types';
 
-export class InMemoryTipStore<Tip extends WC.Tip> extends InMemoryDocumentStore<Tip> {}
+export class InMemoryTipStore extends InMemoryDocumentStore<Cardano.Tip> {}
 export class InMemoryProtocolParametersStore extends InMemoryDocumentStore<ProtocolParametersRequiredByWallet> {}
 export class InMemoryGenesisParametersStore extends InMemoryDocumentStore<Cardano.CompactGenesis> {}
 export class InMemoryStakeSummaryStore extends InMemoryDocumentStore<StakeSummary> {}
@@ -33,7 +33,7 @@ export class InMemoryRewardsHistoryStore extends InMemoryKeyValueStore<Cardano.R
 export class InMemoryStakePoolsStore extends InMemoryKeyValueStore<Cardano.PoolId, Cardano.StakePool> {}
 export class InMemoryRewardsBalancesStore extends InMemoryKeyValueStore<Cardano.RewardAccount, Cardano.Lovelace> {}
 
-export const createInMemoryWalletStores = <Tip extends WC.Tip>(): WalletStores<Tip> => ({
+export const createInMemoryWalletStores = (): WalletStores => ({
   addresses: new InMemoryAddressesStore(),
   assets: new InMemoryAssetsStore(),
   destroy() {

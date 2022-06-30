@@ -1,6 +1,5 @@
 import { Cardano, EpochInfo, TimeSettings } from '@cardano-sdk/core';
 import { GroupedAddress } from '../../KeyManagement';
-import { WC } from '../../types';
 import isEqual from 'lodash/isEqual';
 
 export const strictEquals = <T>(a: T, b: T) => a === b;
@@ -12,7 +11,7 @@ export const arrayEquals = <T>(arrayA: T[], arrayB: T[], itemEquals: (a: T, b: T
 
 export const shallowArrayEquals = <T>(a: T[], b: T[]) => arrayEquals(a, b, strictEquals);
 
-export const tipEquals = (a: WC.Tip, b: WC.Tip) => a.slot === b.slot;
+export const tipEquals = (a: Cardano.Tip, b: Cardano.Tip) => a.hash === b.hash;
 
 export const txEquals = (a: Cardano.TxAlonzo, b: Cardano.TxAlonzo) => a.id === b.id;
 

@@ -1,11 +1,10 @@
-import { EpochInfo, TimeSettings, createSlotEpochInfoCalc } from '@cardano-sdk/core';
+import { Cardano, EpochInfo, TimeSettings, createSlotEpochInfoCalc } from '@cardano-sdk/core';
 import { Observable, distinctUntilChanged, map, switchMap } from 'rxjs';
 import { TrackerSubject } from '@cardano-sdk/util-rxjs';
-import { WC } from '../types';
 import { epochInfoEquals } from './util';
 
 export const currentEpochTracker = (
-  tip$: Observable<WC.Tip>,
+  tip$: Observable<Cardano.Tip>,
   timeSettings$: Observable<TimeSettings[]>
 ): TrackerSubject<EpochInfo> =>
   new TrackerSubject(

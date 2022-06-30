@@ -15,15 +15,7 @@ import {
   UtxoProvider,
   coreToCsl
 } from '@cardano-sdk/core';
-import {
-  Assets,
-  InitializeTxProps,
-  InitializeTxResult,
-  ObservableWallet,
-  SignDataProps,
-  SyncStatus,
-  WC
-} from './types';
+import { Assets, InitializeTxProps, InitializeTxResult, ObservableWallet, SignDataProps, SyncStatus } from './types';
 import {
   BalanceTracker,
   DelegationTracker,
@@ -86,27 +78,24 @@ export interface SingleAddressWalletProps {
   readonly retryBackoffConfig?: RetryBackoffConfig;
 }
 
-export interface SingleAddressWalletDependencies<Tip extends WC.Tip> {
+export interface SingleAddressWalletDependencies {
   readonly keyAgent: AsyncKeyAgent;
   readonly txSubmitProvider: TxSubmitProvider;
   readonly stakePoolProvider: StakePoolProvider;
   readonly assetProvider: AssetProvider;
-  readonly networkInfoProvider: NetworkInfoProvider<Tip>;
+  readonly networkInfoProvider: NetworkInfoProvider;
   readonly utxoProvider: UtxoProvider;
   readonly chainHistoryProvider: ChainHistoryProvider;
   readonly rewardsProvider: RewardsProvider;
   readonly inputSelector?: InputSelector;
-  readonly stores?: WalletStores<Tip>;
+  readonly stores?: WalletStores;
   readonly logger?: Logger;
 }
 
-// Review: using WalletCore types as default
-// This should not be a breaking change when used with existing providers,
-// because an actual generic parameter is inferred from networkInfoProvider dependency.
-export class SingleAddressWallet<Tip extends WC.Tip = WC.Tip> implements ObservableWallet<Tip> {
+export class SingleAddressWallet implements ObservableWallet {
   #inputSelector: InputSelector;
   #logger: Logger;
-  #tip$: SyncableIntervalPersistentDocumentTrackerSubject<Tip>;
+  #tip$: SyncableIntervalPersistentDocumentTrackerSubject<Cardano.Tip>;
   #newTransactions = {
     failedToSubmit$: new Subject<FailedTx>(),
     pending$: new Subject<Cardano.NewTxAlonzo>(),
@@ -116,7 +105,7 @@ export class SingleAddressWallet<Tip extends WC.Tip = WC.Tip> implements Observa
   readonly currentEpoch$: TrackerSubject<EpochInfo>;
   readonly txSubmitProvider: TrackedTxSubmitProvider;
   readonly utxoProvider: TrackedUtxoProvider;
-  readonly networkInfoProvider: TrackedNetworkInfoProvider<Tip>;
+  readonly networkInfoProvider: TrackedNetworkInfoProvider;
   readonly stakePoolProvider: TrackedStakePoolProvider;
   readonly assetProvider: TrackedAssetProvider;
   readonly chainHistoryProvider: TrackedChainHistoryProvider;
@@ -124,7 +113,7 @@ export class SingleAddressWallet<Tip extends WC.Tip = WC.Tip> implements Observa
   readonly balance: BalanceTracker;
   readonly transactions: TransactionsTracker & Shutdown;
   readonly delegation: DelegationTracker & Shutdown;
-  readonly tip$: BehaviorObservable<Tip>;
+  readonly tip$: BehaviorObservable<Cardano.Tip>;
   readonly lovelaceSupply$: TrackerSubject<SupplySummary>;
   readonly stake$: TrackerSubject<StakeSummary>;
   readonly timeSettings$: TrackerSubject<TimeSettings[]>;
@@ -161,14 +150,14 @@ export class SingleAddressWallet<Tip extends WC.Tip = WC.Tip> implements Observa
       rewardsProvider,
       logger = dummyLogger,
       inputSelector = roundRobinRandomImprove(),
-      stores = createInMemoryWalletStores<Tip>()
-    }: SingleAddressWalletDependencies<Tip>
+      stores = createInMemoryWalletStores()
+    }: SingleAddressWalletDependencies
   ) {
     this.#logger = logger;
     this.#inputSelector = inputSelector;
     this.txSubmitProvider = new TrackedTxSubmitProvider(txSubmitProvider);
     this.utxoProvider = new TrackedUtxoProvider(utxoProvider);
-    this.networkInfoProvider = new TrackedNetworkInfoProvider<Tip>(networkInfoProvider);
+    this.networkInfoProvider = new TrackedNetworkInfoProvider(networkInfoProvider);
     this.stakePoolProvider = new TrackedStakePoolProvider(stakePoolProvider);
     this.assetProvider = new TrackedAssetProvider(assetProvider);
     this.chainHistoryProvider = new TrackedChainHistoryProvider(chainHistoryProvider);
@@ -205,7 +194,7 @@ export class SingleAddressWallet<Tip extends WC.Tip = WC.Tip> implements Observa
       )
     );
     this.name = name;
-    this.#tip$ = this.tip$ = new SyncableIntervalPersistentDocumentTrackerSubject<Tip>({
+    this.#tip$ = this.tip$ = new SyncableIntervalPersistentDocumentTrackerSubject({
       equals: tipEquals,
       maxPollInterval: maxInterval,
       pollInterval,

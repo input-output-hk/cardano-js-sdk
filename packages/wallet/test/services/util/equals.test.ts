@@ -75,9 +75,9 @@ describe('equals', () => {
     expect(groupedAddressesEquals(addresses1, addresses2)).toBe(false);
   });
 
-  test('tipEquals compares slot', () => {
-    const tip1 = { slot: 123 } as unknown as Cardano.Tip;
-    const tip2 = { slot: 1234 } as unknown as Cardano.Tip;
+  test('tipEquals compares hash', () => {
+    const tip1 = { hash: 'hash1' } as unknown as Cardano.Tip;
+    const tip2 = { hash: 'hash2' } as unknown as Cardano.Tip;
     expect(tipEquals(tip1, { ...tip1 })).toBe(true);
     expect(tipEquals(tip1, tip2)).toBe(false);
   });
