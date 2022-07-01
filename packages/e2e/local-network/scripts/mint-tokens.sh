@@ -30,11 +30,11 @@ cat >shelley/utxo-keys/minting-policy.json <<EOL
 EOL
 
 currencySymbol=$(cardano-cli transaction policyid --script-file shelley/utxo-keys/minting-policy.json)
-addr=$(cardano-cli address build --payment-verification-key-file shelley/utxo-keys/utxo1.vkey --testnet-magic 42)
+addr=$(cardano-cli address build --payment-verification-key-file shelley/utxo-keys/utxo1.vkey --testnet-magic 888)
 faucetAddr="addr_test1qqen0wpmhg7fhkus45lyv4wju26cecgu6avplrnm6dgvuk6qel5hu3u3q0fht53ly97yx95hkt56j37ch07pesf6s4pqh5gd4e"
 
 # Spend the first UTxO
-utxo=$(cardano-cli query utxo --address "$addr" --testnet-magic 42 | awk 'NR == 3 {printf("%s#%s", $1, $2)}')
+utxo=$(cardano-cli query utxo --address "$addr" --testnet-magic 888 | awk 'NR == 3 {printf("%s#%s", $1, $2)}')
 
 # Build token list. We start with a token with empty asset name as this is often an edge case for devs.
 tokenList="${AMOUNT} ${currencySymbol}"
@@ -50,13 +50,13 @@ cardano-cli transaction build \
   --tx-out "$faucetAddr"+10000000+"$tokenList" \
   --mint "$tokenList" \
   --mint-script-file shelley/utxo-keys/minting-policy.json \
-  --testnet-magic 42 \
+  --testnet-magic 888 \
   --out-file tx.raw
 
 cardano-cli transaction sign \
   --tx-body-file tx.raw \
   --signing-key-file shelley/utxo-keys/utxo1.skey \
-  --testnet-magic 42 \
+  --testnet-magic 888 \
   --out-file tx.signed
 
-cardano-cli transaction submit --testnet-magic 42 --tx-file tx.signed
+cardano-cli transaction submit --testnet-magic 888 --tx-file tx.signed
