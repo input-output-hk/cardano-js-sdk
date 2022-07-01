@@ -1,0 +1,15 @@
+bin
+node.sock
+db
+logs
+*.log
+sockets
+local-network/config/network/cardano-node/config.json
+local-network/config/network/cardano-node/genesis/byron.json
+local-network/config/network/cardano-node/genesis/shelley.json
+local-network/config/network/genesis/byron.json
+local-network/config/network/genesis/shelley.json
+node_modules
+dist
+coverage
+.env

@@ -1,0 +1,37 @@
+{
+  "extends": "../../../test/tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "."
+  },
+  "include": [
+    "../../ogmios/test",
+    "../../rabbitmq/test",
+    "../../wallet/test",
+    "../../cip2/test/util",
+  ],
+  "rootDir": ".",
+  "references": [
+    {
+      "path": "../src"
+    },
+    {
+      "path": "../../cardano-services-client/src"
+    },
+    {
+      "path": "../../core/src"
+    },
+    {
+      "path": "../../util/src"
+    },
+    {
+      "path": "../../util-dev/src"
+    },
+    {
+      "path": "../../wallet/src"
+    }
+    ,
+    {
+      "path": "../../ogmios/src"
+    }
+  ]
+}
