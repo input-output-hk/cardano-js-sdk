@@ -19,7 +19,7 @@
     "James Sweetland <james.sweetland@iohk.io> (https://iohk.io)",
     "Martynas Kazlauskas <martynas.kazlauskas@iohk.io> (https://iohk.io)"
   ],
-  "license": "MPL-2.0",
+  "license": "Apache-2.0",
   "scripts": {
     "build:esm": "tsc -p src/tsconfig.json --outDir ./dist/esm --module es2020",
     "build:cjs": "tsc --build src",

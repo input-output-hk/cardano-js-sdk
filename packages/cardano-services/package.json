@@ -21,7 +21,7 @@
     "Martynas Kazlauskas <martynas.kazlauskas@iohk.io>",
     "Rhys Bartels-Waller <rhys.bartelswaller@iohk.io> (https://iohk.io)"
   ],
-  "license": "MPL-2.0",
+  "license": "Apache-2.0",
   "scripts": {
     "build:cjs": "tsc --build src",
     "build:copy-assets": "bash ./copy-assets.sh",

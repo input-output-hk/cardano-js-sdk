@@ -15,7 +15,7 @@
   },
   "repository": "https://github.com/input-output-hk/cardano-js-sdk/packages/cip2",
   "author": "Martynas Kazlauskas <martynas.kazlauskas@iohk.io>",
-  "license": "MPL-2.0",
+  "license": "Apache-2.0",
   "scripts": {
     "build:esm": "tsc -p src/tsconfig.json --outDir ./dist/esm --module es2020",
     "build:cjs": "tsc --build src",
