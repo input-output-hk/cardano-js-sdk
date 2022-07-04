@@ -22,7 +22,7 @@ import {
   FailedTx,
   PersistentDocumentTrackerSubject,
   PollingConfig,
-  SyncableIntervalPersistentDocumentTrackerSubject,
+  TipTracker,
   TrackedAssetProvider,
   TrackedChainHistoryProvider,
   TrackedNetworkInfoProvider,
@@ -45,8 +45,7 @@ import {
   deepEquals,
   distinctBlock,
   distinctTimeSettings,
-  groupedAddressesEquals,
-  tipEquals
+  groupedAddressesEquals
 } from './services';
 import { BehaviorObservable, TrackerSubject } from '@cardano-sdk/util-rxjs';
 import { Cip30DataSignature } from '@cardano-sdk/cip30';
@@ -95,7 +94,7 @@ export interface SingleAddressWalletDependencies {
 export class SingleAddressWallet implements ObservableWallet {
   #inputSelector: InputSelector;
   #logger: Logger;
-  #tip$: SyncableIntervalPersistentDocumentTrackerSubject<Cardano.Tip>;
+  #tip$: TipTracker;
   #newTransactions = {
     failedToSubmit$: new Subject<FailedTx>(),
     pending$: new Subject<Cardano.NewTxAlonzo>(),
@@ -194,16 +193,15 @@ export class SingleAddressWallet implements ObservableWallet {
       )
     );
     this.name = name;
-    this.#tip$ = this.tip$ = new SyncableIntervalPersistentDocumentTrackerSubject({
-      equals: tipEquals,
+    this.#tip$ = this.tip$ = new TipTracker({
       maxPollInterval: maxInterval,
-      pollInterval,
+      minPollInterval: pollInterval,
       provider$: coldObservableProvider({
         provider: this.networkInfoProvider.ledgerTip,
         retryBackoffConfig
       }),
       store: stores.tip,
-      trigger$: this.syncStatus.isSettled$.pipe(filter((isSettled) => isSettled))
+      syncStatus: this.syncStatus
     });
     const tipBlockHeight$ = distinctBlock(this.tip$);
     this.timeSettings$ = new PersistentDocumentTrackerSubject(
