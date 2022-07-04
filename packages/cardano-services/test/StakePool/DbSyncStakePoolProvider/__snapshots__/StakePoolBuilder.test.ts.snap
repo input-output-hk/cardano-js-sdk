@@ -307,7 +307,7 @@ Object {
 }
 `;
 
-exports[`StakePoolBuilder buildOrQuery buildOrQuery, queryPoolHashes & queryTotalCount 2`] = `"9"`;
+exports[`StakePoolBuilder buildOrQuery buildOrQuery, queryPoolHashes & queryTotalCount 2`] = `"10"`;
 
 exports[`StakePoolBuilder buildPoolsByIdentifierQuery buildPoolsByIdentifierQuery 1`] = `
 Object {
@@ -809,12 +809,12 @@ Object {
 
 exports[`StakePoolBuilder getLastEpoch getLastEpoch 1`] = `205`;
 
-exports[`StakePoolBuilder getTotalAmountOfAda getTotalAmountOfAda 1`] = `"69154436284251039"`;
+exports[`StakePoolBuilder getTotalAmountOfAda getTotalAmountOfAda 1`] = `"69154436781576039"`;
 
 exports[`StakePoolBuilder queryPoolAPY pagination with limit 1`] = `
 Array [
   Object {
-    "apy": 0.00138353507261546,
+    "apy": 0.00186615265931667,
     "hashId": "15",
   },
 ]
@@ -840,7 +840,7 @@ Array [
     "hashId": "1",
   },
   Object {
-    "apy": 0.00138353507261546,
+    "apy": 0.00186615265931667,
     "hashId": "15",
   },
 ]
@@ -849,7 +849,7 @@ Array [
 exports[`StakePoolBuilder queryPoolAPY sort by default sort (APY desc) 1`] = `
 Array [
   Object {
-    "apy": 0.00138353507261546,
+    "apy": 0.00186615265931667,
     "hashId": "15",
   },
   Object {
@@ -1310,15 +1310,15 @@ Array [
   Object {
     "blocksCreated": "0",
     "delegators": "1",
-    "livePledge": 22619409160966n,
-    "saturation": "0.73137299951713088875",
+    "livePledge": 22623299531669n,
+    "saturation": "0.73141928978079572314",
     "size": Object {
-      "active": "0.81594358500154092038",
-      "live": "0.18405641499845907962",
+      "active": "0.81589194534120782856",
+      "live": "0.18410805465879217144",
     },
     "stake": Object {
       "active": 50153400814617n,
-      "live": 11313349750647n,
+      "live": 11317240121350n,
     },
   },
   Object {
@@ -1376,15 +1376,15 @@ Array [
   Object {
     "blocksCreated": "0",
     "delegators": "1",
-    "livePledge": 22619409160966n,
-    "saturation": "0.73137299951713088875",
+    "livePledge": 22623299531669n,
+    "saturation": "0.73141928978079572314",
     "size": Object {
-      "active": "0.81594358500154092038",
-      "live": "0.18405641499845907962",
+      "active": "0.81589194534120782856",
+      "live": "0.18410805465879217144",
     },
     "stake": Object {
       "active": 50153400814617n,
-      "live": 11313349750647n,
+      "live": 11317240121350n,
     },
   },
   Object {
@@ -1451,15 +1451,15 @@ Array [
   Object {
     "blocksCreated": "0",
     "delegators": "1",
-    "livePledge": 22619409160966n,
-    "saturation": "0.73137299951713088875",
+    "livePledge": 22623299531669n,
+    "saturation": "0.73141928978079572314",
     "size": Object {
-      "active": "0.81594358500154092038",
-      "live": "0.18405641499845907962",
+      "active": "0.81589194534120782856",
+      "live": "0.18410805465879217144",
     },
     "stake": Object {
       "active": 50153400814617n,
-      "live": 11313349750647n,
+      "live": 11317240121350n,
     },
   },
 ]
@@ -1468,6 +1468,75 @@ Array [
 exports[`StakePoolBuilder queryPoolOwners queryPoolOwners 1`] = `
 Array [
   "stake_test1urryfvusd49ej55gvf3cxtje4pqmtcdswwqxw37g6uclhnsqj7d5w",
+]
+`;
+
+exports[`StakePoolBuilder queryPoolRelays queryPoolRelays 1`] = `
+Array [
+  Object {
+    "hashId": "36",
+    "relay": Object {
+      "__typename": "RelayByName",
+      "hostname": "www.test2.test",
+      "port": null,
+    },
+    "updateId": "355",
+  },
+  Object {
+    "hashId": "36",
+    "relay": Object {
+      "__typename": "RelayByNameMultihost",
+      "dnsName": "www.test.test",
+    },
+    "updateId": "355",
+  },
+  Object {
+    "hashId": "36",
+    "relay": Object {
+      "__typename": "RelayByAddress",
+      "ipv4": null,
+      "ipv6": "b80d:120:0:a385:2e8a:0:3473:7003",
+      "port": 1234,
+    },
+    "updateId": "355",
+  },
+  Object {
+    "hashId": "36",
+    "relay": Object {
+      "__typename": "RelayByAddress",
+      "ipv4": "192.168.0.1",
+      "ipv6": "b80d:120:0:a385:2e8a:0:3473:7003",
+      "port": 1234,
+    },
+    "updateId": "355",
+  },
+  Object {
+    "hashId": "36",
+    "relay": Object {
+      "__typename": "RelayByAddress",
+      "ipv4": "8.8.8.8",
+      "ipv6": null,
+      "port": 1234,
+    },
+    "updateId": "355",
+  },
+  Object {
+    "hashId": "20",
+    "relay": Object {
+      "__typename": "RelayByName",
+      "hostname": "pool-devtest-a.banderini.net",
+      "port": null,
+    },
+    "updateId": "20",
+  },
+  Object {
+    "hashId": "1",
+    "relay": Object {
+      "__typename": "RelayByNameMultihost",
+      "dnsName": "relays-new.cardano-testnet.iohkdev.io",
+    },
+    "updateId": "1",
+  },
 ]
 `;
 
@@ -1512,7 +1581,7 @@ Array [
 exports[`StakePoolBuilder queryPoolStats returns active, retired and retiring pools count 1`] = `
 Object {
   "qty": Object {
-    "active": 7,
+    "active": 8,
     "retired": 2,
     "retiring": 0,
   },
