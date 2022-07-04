@@ -31,16 +31,16 @@ describe('CardanoWalletFaucetProvider', () => {
   });
 
   it('must be able to fund a wallet with the requested amount of ada.', async () => {
-    await _keyAgent.deriveAddress({ index: 0, type: KeyManagement.AddressType.Internal });
-    await _faucetProvider.request('addr_test1vrgylrse49du60jdy7h46mg5mwft6kw8r0l4v5pklkj324cm247gf', 33_000_000);
+    const address = await _keyAgent.deriveAddress({ index: 0, type: KeyManagement.AddressType.External });
+    await _faucetProvider.request(address.address.toString(), 33_000_000);
   });
 
   it('must be able to fund several wallets in a single transaction with the requested amount of ada.', async () => {
+    const address1 = await _keyAgent.deriveAddress({ index: 1, type: KeyManagement.AddressType.External });
+    const address2 = await _keyAgent.deriveAddress({ index: 2, type: KeyManagement.AddressType.External });
+
     await _faucetProvider.multiRequest(
-      [
-        'addr_test1vrgylrse49du60jdy7h46mg5mwft6kw8r0l4v5pklkj324cm247gf',
-        'addr_test1vrgylrse49du60jdy7h46mg5mwft6kw8r0l4v5pklkj324cm247gf'
-      ],
+      [address1.address.toString(), address2.address.toString()],
       [33_000_000, 22_000_000]
     );
   });
