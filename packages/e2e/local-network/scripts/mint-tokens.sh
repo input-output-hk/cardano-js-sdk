@@ -8,7 +8,7 @@ root="$(cd "$here/.." && pwd)"
 cd "$root"
 
 export PATH=$PWD/bin:$PATH
-TOKENS=(744d494e 748885443 74455448)
+TOKENS=(744d494e 74425443 74455448)
 AMOUNT='45000000000000000'
 
 clean() {
