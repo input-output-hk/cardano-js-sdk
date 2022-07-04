@@ -39,6 +39,7 @@
   },
   "devDependencies": {
     "@types/validator": "^13.7.1",
+    "@types/node": "14.18.12",
     "axios-mock-adapter": "^1.20.0",
     "express": "^4.17.3",
     "get-port-please": "^2.5.0",
