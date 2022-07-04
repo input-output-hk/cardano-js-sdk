@@ -12,6 +12,7 @@
     "noUnusedLocals": true,
     "removeComments": true,
     "preserveConstEnums": true,
+    "preserveSymlinks": true,
     "sourceMap": true,
     "strict": true,
     "strictPropertyInitialization": false,
