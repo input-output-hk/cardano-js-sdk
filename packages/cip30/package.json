@@ -39,11 +39,13 @@
   },
   "devDependencies": {
     "@types/webextension-polyfill": "^0.8.0",
+    "@types/node": "14.18.12",
     "jest-webextension-mock": "^3.7.19",
     "mock-browser": "^0.92.14",
     "shx": "^0.3.3"
   },
   "dependencies": {
+    "@cardano-sdk/core": "0.3.0",
     "ts-custom-error": "^3.2.0",
     "ts-log": "^2.2.3",
     "webextension-polyfill": "^0.8.0"
