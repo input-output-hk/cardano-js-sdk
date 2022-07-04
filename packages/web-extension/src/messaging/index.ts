@@ -1,3 +1,4 @@
+import '@cardano-sdk/util';
 import { BackgroundMessenger, createBackgroundMessenger, generalizeBackgroundMessenger } from './BackgroundMessenger';
 import { ChannelName, ConsumeRemoteApiOptions, ExposeApiProps, MessengerDependencies } from './types';
 import { consumeMessengerRemoteApi, exposeMessengerApi } from './remoteApi';

@@ -1,3 +1,5 @@
+import '@cardano-sdk/util';
+import '@cardano-sdk/wallet';
 import { MessengerDependencies, consumeRemoteApi } from '../messaging';
 import { observableWalletChannel, observableWalletProperties } from './util';
 

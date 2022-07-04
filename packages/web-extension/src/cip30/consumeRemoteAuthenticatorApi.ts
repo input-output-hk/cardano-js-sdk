@@ -1,3 +1,4 @@
+import '@cardano-sdk/util';
 import { MessengerDependencies, RemoteApiProperties, RemoteApiPropertyType, consumeRemoteApi } from '../messaging';
 import { RemoteAuthenticator, RemoteAuthenticatorMethod } from '@cardano-sdk/cip30';
 import { authenticatorChannel } from './util';
