@@ -18,6 +18,8 @@ import {
 import { Assets, InitializeTxProps, InitializeTxResult, ObservableWallet, SignDataProps, SyncStatus } from './types';
 import {
   BalanceTracker,
+  ConnectionStatus,
+  ConnectionStatusTracker,
   DelegationTracker,
   FailedTx,
   PersistentDocumentTrackerSubject,
@@ -38,6 +40,7 @@ import {
   createBalanceTracker,
   createDelegationTracker,
   createProviderStatusTracker,
+  createSimpleConnectionStatusTracker,
   createTransactionsTracker,
   createUtxoTracker,
   createWalletUtil,
@@ -89,6 +92,7 @@ export interface SingleAddressWalletDependencies {
   readonly inputSelector?: InputSelector;
   readonly stores?: WalletStores;
   readonly logger?: Logger;
+  readonly connectionStatusTracker$?: ConnectionStatusTracker;
 }
 
 export class SingleAddressWallet implements ObservableWallet {
@@ -125,6 +129,7 @@ export class SingleAddressWallet implements ObservableWallet {
   readonly util: WalletUtil;
   readonly rewardsProvider: TrackedRewardsProvider;
 
+  // eslint-disable-next-line max-statements
   constructor(
     {
       name,
@@ -149,7 +154,8 @@ export class SingleAddressWallet implements ObservableWallet {
       rewardsProvider,
       logger = dummyLogger,
       inputSelector = roundRobinRandomImprove(),
-      stores = createInMemoryWalletStores()
+      stores = createInMemoryWalletStores(),
+      connectionStatusTracker$ = createSimpleConnectionStatusTracker()
     }: SingleAddressWalletDependencies
   ) {
     this.#logger = logger;
@@ -193,10 +199,13 @@ export class SingleAddressWallet implements ObservableWallet {
       )
     );
     this.name = name;
+    const cancel$ = connectionStatusTracker$.pipe(filter((status) => status === ConnectionStatus.down));
     this.#tip$ = this.tip$ = new TipTracker({
+      connectionStatus$: connectionStatusTracker$,
       maxPollInterval: maxInterval,
       minPollInterval: pollInterval,
       provider$: coldObservableProvider({
+        cancel$,
         provider: this.networkInfoProvider.ledgerTip,
         retryBackoffConfig
       }),
@@ -210,6 +219,7 @@ export class SingleAddressWallet implements ObservableWallet {
       // This is a little complicated since there is a circular dependency.
       // Some logic is needed to initiate a fetch if epoch is not available in store already.
       coldObservableProvider({
+        cancel$,
         equals: deepEquals,
         provider: this.networkInfoProvider.timeSettings,
         retryBackoffConfig,
@@ -242,6 +252,7 @@ export class SingleAddressWallet implements ObservableWallet {
 
     this.protocolParameters$ = new PersistentDocumentTrackerSubject(
       coldObservableProvider({
+        cancel$,
         equals: isEqual,
         provider: this.networkInfoProvider.currentWalletProtocolParameters,
         retryBackoffConfig,
@@ -251,6 +262,7 @@ export class SingleAddressWallet implements ObservableWallet {
     );
     this.genesisParameters$ = new PersistentDocumentTrackerSubject(
       coldObservableProvider({
+        cancel$,
         equals: isEqual,
         provider: this.networkInfoProvider.genesisParameters,
         retryBackoffConfig,

@@ -1,9 +1,11 @@
 import { Cardano } from '@cardano-sdk/core';
+import { ConnectionStatus, PersistentDocumentTrackerSubject, tipEquals } from './util';
 import { DocumentStore } from '../persistence';
-import { Milliseconds } from './types';
 import {
+  EMPTY,
   Observable,
   Subject,
+  combineLatest,
   concat,
   delay,
   distinctUntilChanged,
@@ -17,11 +19,12 @@ import {
   takeUntil,
   timeout
 } from 'rxjs';
-import { PersistentDocumentTrackerSubject, tipEquals } from './util';
+import { Milliseconds } from './types';
 import { SyncStatus } from '../types';
 export interface TipTrackerProps {
   provider$: Observable<Cardano.Tip>;
   syncStatus: SyncStatus;
+  connectionStatus$: Observable<ConnectionStatus>;
   store: DocumentStore<Cardano.Tip>;
   /**
    * Once
@@ -34,14 +37,14 @@ export interface TipTrackerInternals {
   externalTrigger$?: Subject<void>;
 }
 
-const triggerOrInterval$ = (trigger$: Observable<unknown>, interval: number): Observable<unknown> =>
+const triggerOrInterval$ = <T = unknown>(trigger$: Observable<T>, interval: number): Observable<T | boolean> =>
   trigger$.pipe(timeout({ each: interval, with: () => concat(of(true), triggerOrInterval$(trigger$, interval)) }));
 
 export class TipTracker extends PersistentDocumentTrackerSubject<Cardano.Tip> {
   #externalTrigger$ = new Subject<void>();
 
   constructor(
-    { provider$, minPollInterval, maxPollInterval, store, syncStatus }: TipTrackerProps,
+    { provider$, minPollInterval, maxPollInterval, store, syncStatus, connectionStatus$ }: TipTrackerProps,
     { externalTrigger$ = new Subject() }: TipTrackerInternals = {}
   ) {
     super(
@@ -49,13 +52,19 @@ export class TipTracker extends PersistentDocumentTrackerSubject<Cardano.Tip> {
         // schedule a fetch:
         // - after some delay once fully synced and online
         // - if it's not settled for maxPollInterval
-        triggerOrInterval$(syncStatus.isSettled$.pipe(filter((isSettled) => isSettled)), maxPollInterval).pipe(
-          // trigger fetch after some delay once fully synced and online
-          delay(minPollInterval),
-          // trigger fetch on start
-          startWith(null),
+        combineLatest([
+          triggerOrInterval$(syncStatus.isSettled$.pipe(filter((isSettled) => isSettled)), maxPollInterval).pipe(
+            // trigger fetch after some delay once fully synced and online
+            delay(minPollInterval),
+            // trigger fetch on start
+            startWith(null)
+          ),
+          connectionStatus$
+        ]).pipe(
           // Throttle syncing by interval, cancel ongoing request on external trigger
-          exhaustMap(() => merge(provider$).pipe(takeUntil(externalTrigger$))),
+          exhaustMap(([_, connectionStatus]) =>
+            connectionStatus === ConnectionStatus.down ? EMPTY : provider$.pipe(takeUntil(externalTrigger$))
+          ),
           distinctUntilChanged(tipEquals)
         ),
         // Always immediately restart request on external trigger
