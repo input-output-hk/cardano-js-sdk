@@ -34,7 +34,7 @@ $ yarn workspace @cardano-sdk/e2e generate-mnemonics
 And you will get the set of mnemonics plus the first derivative address on the console:
 
 ```bash
-$ ts-node ./src/Util/mnemonic.ts
+$ ts-node ./src/util/mnemonic.ts
 
   Mnemonic:   toward bridge spell endless tunnel there deputy market scheme ketchup heavy fall fault pudding split desert swear maximum orchard estate match good decorate tribe 
 
@@ -118,20 +118,20 @@ $ yarn workspace @cardano-sdk/e2e test:cardano-services
 
 ## Local Network Faucet
 
-The end-to-end faucet test are meant to showcase the use of the private testnet. The faucet end-to-end test shows how we can fund wallets with private testnet tADA so we can run the end-to-end tests. For the faucet end-to-end test to run, we must first start our private testnet environment as follows:
+The end-to-end faucet test are meant to showcase the use of the local test network. The faucet end-to-end test shows how we can fund wallets with local test network tADA so we can run the end-to-end tests. For the faucet end-to-end test to run, we must first start our local test network environment as follows:
 
 ```bash
-$ yarn workspace @cardano-sdk/e2e private-network:up
+$ yarn workspace @cardano-sdk/e2e local-network:up
 ```
 
 :warning: Note that once you finish running the test, you should stop the enviroment with:
 
 ```bash
-$ yarn workspace @cardano-sdk/e2e private-network:down
+$ yarn workspace @cardano-sdk/e2e local-network:down
 ```
 Instead of CTRL-C, since some resources need to be clear before you can set up the environment again, if you don't stop the containers with the proper command, you may run into issues restarting it.
 
-For the faucet to work correctly, we must configure it with the mnemonic of the genesis wallet. This wallet controls all the funds on the private testnet and is the only way of obtaining tADA on that network.
+For the faucet to work correctly, we must configure it with the mnemonic of the genesis wallet. This wallet controls all the funds on the local test network and is the only way of obtaining tADA on that network.
 
 ```
 # Logger

@@ -3,3 +3,4 @@ node_modules
 docs
 .env
 tsconfig.tsbuildinfo
+.idea/codeStyles
