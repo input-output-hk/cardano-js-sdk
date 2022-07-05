@@ -302,7 +302,7 @@
 <a name='L237'></a><a href='#L237'>237</a>
 <a name='L238'></a><a href='#L238'>238</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">31x</span>
+<span class="cline-any cline-yes">32x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -325,17 +325,14 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">31x</span>
+<span class="cline-any cline-yes">32x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">31x</span>
-<span class="cline-any cline-yes">31x</span>
-<span class="cline-any cline-yes">31x</span>
-<span class="cline-any cline-yes">31x</span>
-<span class="cline-any cline-yes">31x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">32x</span>
+<span class="cline-any cline-yes">32x</span>
+<span class="cline-any cline-yes">32x</span>
+<span class="cline-any cline-yes">32x</span>
+<span class="cline-any cline-yes">32x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -352,7 +349,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">31x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">32x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -366,6 +366,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">21x</span>
 <span class="cline-any cline-yes">21x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">21x</span>
@@ -397,12 +402,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">31x</span>
+<span class="cline-any cline-yes">32x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">24x</span>
@@ -417,7 +417,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">31x</span>
+<span class="cline-any cline-yes">32x</span>
 <span class="cline-any cline-yes">39x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">30x</span>
@@ -431,7 +431,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">31x</span>
+<span class="cline-any cline-yes">32x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -602,8 +602,13 @@ export const createAddressTransactionsProvider = (
     combineLatest([addresses$, storedTransactions$.pipe(defaultIfEmpty([] as Cardano.TxAlonzo[]))]).pipe(
       switchMap(([addresses, storedTransactions]) =&gt; {
         let localTransactions = [...storedTransactions];
-        return coldObservableProvider(
-          async () =&gt; {
+        return coldObservableProvider({
+          // Do not re-fetch transactions twice on load when tipBlockHeight$ loads from storage first
+          // It should also help when using poor internet connection.
+          // Caveat is that local transactions might get out of date...
+          combinator: exhaustMap,
+          equals: transactionsEquals,
+          provider: async () =&gt; {
             // eslint-disable-next-line no-constant-condition
             while (true) {
               const lastStoredTransaction: Cardano.TxAlonzo | undefined =
@@ -627,13 +632,8 @@ export const createAddressTransactionsProvider = (
             }
           },
           retryBackoffConfig,
-          tipBlockHeight$,
-          transactionsEquals,
-          // Do not re-fetch transactions twice on load when tipBlockHeight$ loads from storage first
-          // It should also help when using poor internet connection.
-          // Caveat is that local transactions might get out of date...
-          exhaustMap
-        );
+          trigger$: tipBlockHeight$
+        });
       })
     )
   );
@@ -781,7 +781,7 @@ export const createTransactionsTracker = (
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at Mon Jul 04 2022 14:41:29 GMT+0000 (Coordinated Universal Time)
+                at Tue Jul 05 2022 14:25:30 GMT+0000 (Coordinated Universal Time)
             </div>
         <script src="../../prettify.js"></script>
         <script>
