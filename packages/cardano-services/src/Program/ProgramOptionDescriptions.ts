@@ -2,7 +2,7 @@ import { CommonOptionDescriptions } from '../ProgramsCommon';
 
 enum HttpServerOptionDescriptions {
   ApiUrl = 'API URL',
-  DbConnection = 'DB Connection',
+  DbConnection = 'DB Connection string',
   MetricsEnabled = 'Enable Prometheus Metrics',
   OgmiosUrl = 'Ogmios URL',
   RabbitMQUrl = 'RabbitMQ URL',
@@ -14,5 +14,15 @@ enum HttpServerOptionDescriptions {
   ServiceDiscoverBackoffTimeout = 'Exponential backoff max timeout for service discovery'
 }
 
-export type ProgramOptionDescriptions = CommonOptionDescriptions | HttpServerOptionDescriptions;
-export const ProgramOptionDescriptions = { ...CommonOptionDescriptions, ...HttpServerOptionDescriptions };
+enum SrvOptionDescriptions {
+  OgmiosSrvServiceName = 'Ogmios SRV service name',
+  PostgresSrvServiceName = 'Postgres SRV service name',
+  RabbitMQSrvServiceName = 'RabbitMQ SRV service name'
+}
+
+export type ProgramOptionDescriptions = CommonOptionDescriptions | HttpServerOptionDescriptions | SrvOptionDescriptions;
+export const ProgramOptionDescriptions = {
+  ...CommonOptionDescriptions,
+  ...HttpServerOptionDescriptions,
+  ...SrvOptionDescriptions
+};

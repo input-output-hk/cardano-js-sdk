@@ -6,16 +6,20 @@ import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../NetworkInf
 import { DbSyncRewardsProvider, RewardsHttpService } from '../Rewards';
 import { DbSyncStakePoolProvider, StakePoolHttpService } from '../StakePool';
 import { DbSyncUtxoProvider, UtxoHttpService } from '../Utxo';
+import {
+  DnsSrvResolve,
+  getCardanoNodeProvider,
+  getDnsSrvResolveWithExponentialBackoff,
+  getPool,
+  getRabbitMqTxSubmitProvider
+} from './utils';
 import { HttpServer, HttpServerConfig, HttpService } from '../Http';
 import { InMemoryCache } from '../InMemoryCache';
 import { MissingProgramOption, UnknownServiceName } from './errors';
 import { ProgramOptionDescriptions } from './ProgramOptionDescriptions';
-import { RabbitMqTxSubmitProvider } from '@cardano-sdk/rabbitmq';
 import { ServiceNames } from './ServiceNames';
 import { TxSubmitHttpService } from '../TxSubmit';
 import { createDbSyncMetadataService } from '../Metadata';
-import { getPool } from './utils';
-import { ogmiosTxSubmitProvider, urlToConnectionConfig } from '@cardano-sdk/ogmios';
 import Logger, { createLogger } from 'bunyan';
 import pg from 'pg';
 
@@ -40,10 +44,20 @@ export interface ProgramArgs {
     | ServiceNames.NetworkInfo
     | ServiceNames.Rewards
   )[];
+  /*
+    TODO: optimize passed options -> 'options' is always passed by default and shouldn't be optional field,
+    no need to check it with '.?' everywhere.Will be fixed within ADP-1990
+  */
   options?: HttpServerOptions;
 }
 
-const serviceMapFactory = (args: ProgramArgs, logger: Logger, cache: InMemoryCache, db?: pg.Pool) => ({
+const serviceMapFactory = (
+  args: ProgramArgs,
+  logger: Logger,
+  cache: InMemoryCache,
+  dnsSrvResolve: DnsSrvResolve,
+  db?: pg.Pool
+) => ({
   [ServiceNames.StakePool]: () => {
     if (!db) throw new MissingProgramOption(ServiceNames.StakePool, ProgramOptionDescriptions.DbConnection);
 
@@ -83,11 +97,10 @@ const serviceMapFactory = (args: ProgramArgs, logger: Logger, cache: InMemoryCac
 
     return new NetworkInfoHttpService({ logger, networkInfoProvider });
   },
-  [ServiceNames.TxSubmit]: () => {
-    const txSubmitProvider =
-      args.options?.useQueue && args.options?.rabbitmqUrl
-        ? new RabbitMqTxSubmitProvider({ rabbitmqUrl: args.options.rabbitmqUrl })
-        : ogmiosTxSubmitProvider(urlToConnectionConfig(args.options?.ogmiosUrl));
+  [ServiceNames.TxSubmit]: async () => {
+    const txSubmitProvider = args.options?.useQueue
+      ? await getRabbitMqTxSubmitProvider(dnsSrvResolve, args.options)
+      : await getCardanoNodeProvider(dnsSrvResolve, args.options);
 
     return new TxSubmitHttpService({ logger, txSubmitProvider });
   }
@@ -100,15 +113,21 @@ export const loadHttpServer = async (args: ProgramArgs): Promise<HttpServer> => 
     name: 'http-server'
   });
 
-  const db = await getPool(logger, args.options);
-
   const cache = new InMemoryCache(args.options?.dbQueriesCacheTtl);
-
-  const serviceMap = serviceMapFactory(args, logger, cache, db);
+  const dnsSrvResolve = getDnsSrvResolveWithExponentialBackoff(
+    {
+      factor: args.options?.serviceDiscoveryBackoffFactor,
+      maxRetryTime: args.options?.serviceDiscoveryTimeout
+    },
+    cache,
+    logger
+  );
+  const db = await getPool(dnsSrvResolve, args.options);
+  const serviceMap = serviceMapFactory(args, logger, cache, dnsSrvResolve, db);
 
   for (const serviceName of args.serviceNames) {
     if (serviceMap[serviceName]) {
-      services.push(serviceMap[serviceName]());
+      services.push(await serviceMap[serviceName]());
     } else {
       throw new UnknownServiceName(serviceName);
     }

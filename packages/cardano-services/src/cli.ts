@@ -21,7 +21,7 @@ import {
   TxWorkerOptions,
   loadTxWorker
 } from './TxWorker';
-import { RETRY_BACKOFF_FACTOR_DEFAULT, RETRY_BACKOFF_MAX_TIMEOUT_DEFAULT } from './Program/utils';
+import { SERVICE_DISCOVERY_BACKOFF_FACTOR_DEFAULT, SERVICE_DISCOVERY_BACKOFF_TIMEOUT_DEFAULT } from './Program/utils';
 import { URL } from 'url';
 import { cacheTtlValidator } from './util/validators';
 import { loggerMethodNames } from './util';
@@ -106,28 +106,36 @@ commonOptions(
     '--service-discovery-backoff-factor <serviceDiscoveryBackoffFactor>',
     ProgramOptionDescriptions.ServiceDiscoveryBackoffFactor,
     (factor) => Number.parseFloat(factor),
-    RETRY_BACKOFF_FACTOR_DEFAULT
+    SERVICE_DISCOVERY_BACKOFF_FACTOR_DEFAULT
   )
   .option(
     '--service-discovery-timeout <serviceDiscoveryTimeout>',
     ProgramOptionDescriptions.ServiceDiscoverBackoffTimeout,
     (interval) => Number.parseInt(interval, 10),
-    RETRY_BACKOFF_MAX_TIMEOUT_DEFAULT
+    SERVICE_DISCOVERY_BACKOFF_TIMEOUT_DEFAULT
   )
   .option('--use-queue', ProgramOptionDescriptions.UseQueue, () => true, USE_QUEUE_DEFAULT)
-  .option('--postgres-srv-name <postgresSrvName>', ProgramOptionDescriptions.DbConnection)
+  .option('--rabbitmq-srv-service-name <rabbitmqSrvServiceName>', ProgramOptionDescriptions.RabbitMQSrvServiceName)
+  .option('--ogmios-srv-service-name <ogmiosSrvServiceName>', ProgramOptionDescriptions.OgmiosSrvServiceName)
+  .option('--postgres-srv-service-name <postgresSrvServiceName>', ProgramOptionDescriptions.PostgresSrvServiceName)
   .option('--postgres-name <postgresName>', ProgramOptionDescriptions.DbConnection)
   .option('--postgres-user <postgresUser>', ProgramOptionDescriptions.DbConnection)
   .option('--postgres-password <postgresPassword>', ProgramOptionDescriptions.DbConnection)
   .action(async (serviceNames: ServiceNames[], options: { apiUrl: URL } & HttpServerOptions) => {
     const { apiUrl, ...rest } = options;
-    const server = await loadHttpServer({ apiUrl: apiUrl || API_URL_DEFAULT, options: rest, serviceNames });
-    await server.initialize();
-    await server.start();
-    onDeath(async () => {
-      await server.shutdown();
+    try {
+      const server = await loadHttpServer({ apiUrl: apiUrl || API_URL_DEFAULT, options: rest, serviceNames });
+      await server.initialize();
+      await server.start();
+      onDeath(async () => {
+        await server.shutdown();
+        process.exit(1);
+      });
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error(error);
       process.exit(1);
-    });
+    }
   });
 
 commonOptions(program.command('start-worker').description('Start RabbitMQ worker'))
