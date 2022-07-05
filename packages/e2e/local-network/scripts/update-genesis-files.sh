@@ -18,9 +18,8 @@ case $(uname) in
 Darwin) date='gdate' ;;
 *) date='date' ;;
 esac
-
-timeISO=$($date -Iseconds -d "now + 30 seconds")
-timeUnix=$($date -d "now + 30 seconds" +%s)
+timeISO=$($date -d "now + 30 seconds" -u +"%Y-%m-%dT%H:%M:%SZ")
+timeUnix=$($date -d "now + 30 seconds" -u +%s)
 
 echo "Update start time in genesis files"
 $sed -i -E "s/\"startTime\": [0-9]+/\"startTime\": ${timeUnix}/" byron/genesis.json

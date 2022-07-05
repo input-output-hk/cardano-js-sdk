@@ -44,7 +44,7 @@
     "slotsPerKESPeriod": 129600,
     "networkMagic": 888,  
     "maxLovelaceSupply": 45000000000000000,
-    "systemStart": "2022-07-05T19:12:52+08:00",
+    "systemStart": "2022-07-05T11:38:04Z",
     "epochLength": 100,
     "networkId": "Testnet",
     "activeSlotsCoeff": 0.1,
