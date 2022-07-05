@@ -22,7 +22,7 @@ import {
   FailedTx,
   PersistentDocumentTrackerSubject,
   PollingConfig,
-  SyncableIntervalPersistentDocumentTrackerSubject,
+  TipTracker,
   TrackedAssetProvider,
   TrackedChainHistoryProvider,
   TrackedNetworkInfoProvider,
@@ -45,8 +45,7 @@ import {
   deepEquals,
   distinctBlock,
   distinctTimeSettings,
-  groupedAddressesEquals,
-  tipEquals
+  groupedAddressesEquals
 } from './services';
 import { BehaviorObservable, TrackerSubject } from '@cardano-sdk/util-rxjs';
 import { Cip30DataSignature } from '@cardano-sdk/cip30';
@@ -95,7 +94,7 @@ export interface SingleAddressWalletDependencies {
 export class SingleAddressWallet implements ObservableWallet {
   #inputSelector: InputSelector;
   #logger: Logger;
-  #tip$: SyncableIntervalPersistentDocumentTrackerSubject<Cardano.Tip>;
+  #tip$: TipTracker;
   #newTransactions = {
     failedToSubmit$: new Subject<FailedTx>(),
     pending$: new Subject<Cardano.NewTxAlonzo>(),
@@ -194,13 +193,15 @@ export class SingleAddressWallet implements ObservableWallet {
       )
     );
     this.name = name;
-    this.#tip$ = this.tip$ = new SyncableIntervalPersistentDocumentTrackerSubject({
-      equals: tipEquals,
+    this.#tip$ = this.tip$ = new TipTracker({
       maxPollInterval: maxInterval,
-      pollInterval,
-      provider$: coldObservableProvider(this.networkInfoProvider.ledgerTip, retryBackoffConfig),
+      minPollInterval: pollInterval,
+      provider$: coldObservableProvider({
+        provider: this.networkInfoProvider.ledgerTip,
+        retryBackoffConfig
+      }),
       store: stores.tip,
-      trigger$: this.syncStatus.isSettled$.pipe(filter((isSettled) => isSettled))
+      syncStatus: this.syncStatus
     });
     const tipBlockHeight$ = distinctBlock(this.tip$);
     this.timeSettings$ = new PersistentDocumentTrackerSubject(
@@ -208,33 +209,53 @@ export class SingleAddressWallet implements ObservableWallet {
       // so we should replace the trigger from tipBlockHeight$ to epoch$.
       // This is a little complicated since there is a circular dependency.
       // Some logic is needed to initiate a fetch if epoch is not available in store already.
-      coldObservableProvider(this.networkInfoProvider.timeSettings, retryBackoffConfig, tipBlockHeight$, deepEquals),
+      coldObservableProvider({
+        equals: deepEquals,
+        provider: this.networkInfoProvider.timeSettings,
+        retryBackoffConfig,
+        trigger$: tipBlockHeight$
+      }),
       stores.timeSettings
     );
     this.currentEpoch$ = currentEpochTracker(this.tip$, this.timeSettings$);
     const epoch$ = this.currentEpoch$.pipe(map((epoch) => epoch.epochNo));
 
     this.stake$ = new PersistentDocumentTrackerSubject(
-      coldObservableProvider(this.networkInfoProvider.stake, retryBackoffConfig, epoch$, isEqual),
+      coldObservableProvider({
+        equals: isEqual,
+        provider: this.networkInfoProvider.stake,
+        retryBackoffConfig,
+        trigger$: epoch$
+      }),
       stores.stake
     );
 
     this.lovelaceSupply$ = new PersistentDocumentTrackerSubject(
-      coldObservableProvider(this.networkInfoProvider.lovelaceSupply, retryBackoffConfig, epoch$, isEqual),
+      coldObservableProvider({
+        equals: isEqual,
+        provider: this.networkInfoProvider.lovelaceSupply,
+        retryBackoffConfig,
+        trigger$: epoch$
+      }),
       stores.lovelaceSupply
     );
 
     this.protocolParameters$ = new PersistentDocumentTrackerSubject(
-      coldObservableProvider(
-        this.networkInfoProvider.currentWalletProtocolParameters,
+      coldObservableProvider({
+        equals: isEqual,
+        provider: this.networkInfoProvider.currentWalletProtocolParameters,
         retryBackoffConfig,
-        epoch$,
-        isEqual
-      ),
+        trigger$: epoch$
+      }),
       stores.protocolParameters
     );
     this.genesisParameters$ = new PersistentDocumentTrackerSubject(
-      coldObservableProvider(this.networkInfoProvider.genesisParameters, retryBackoffConfig, epoch$, isEqual),
+      coldObservableProvider({
+        equals: isEqual,
+        provider: this.networkInfoProvider.genesisParameters,
+        retryBackoffConfig,
+        trigger$: epoch$
+      }),
       stores.genesisParameters
     );
 

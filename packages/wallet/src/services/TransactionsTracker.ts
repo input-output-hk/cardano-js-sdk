@@ -63,8 +63,13 @@ export const createAddressTransactionsProvider = (
     combineLatest([addresses$, storedTransactions$.pipe(defaultIfEmpty([] as Cardano.TxAlonzo[]))]).pipe(
       switchMap(([addresses, storedTransactions]) => {
         let localTransactions = [...storedTransactions];
-        return coldObservableProvider(
-          async () => {
+        return coldObservableProvider({
+          // Do not re-fetch transactions twice on load when tipBlockHeight$ loads from storage first
+          // It should also help when using poor internet connection.
+          // Caveat is that local transactions might get out of date...
+          combinator: exhaustMap,
+          equals: transactionsEquals,
+          provider: async () => {
             // eslint-disable-next-line no-constant-condition
             while (true) {
               const lastStoredTransaction: Cardano.TxAlonzo | undefined =
@@ -88,13 +93,8 @@ export const createAddressTransactionsProvider = (
             }
           },
           retryBackoffConfig,
-          tipBlockHeight$,
-          transactionsEquals,
-          // Do not re-fetch transactions twice on load when tipBlockHeight$ loads from storage first
-          // It should also help when using poor internet connection.
-          // Caveat is that local transactions might get out of date...
-          exhaustMap
-        );
+          trigger$: tipBlockHeight$
+        });
       })
     )
   );

@@ -1,24 +1,6 @@
 import { CollectionStore, DocumentStore } from '../../persistence';
-import { Milliseconds } from '../types';
-import {
-  Observable,
-  Subject,
-  concat,
-  defaultIfEmpty,
-  delay,
-  distinctUntilChanged,
-  exhaustMap,
-  finalize,
-  merge,
-  of,
-  startWith,
-  switchMap,
-  takeUntil,
-  tap,
-  timeout
-} from 'rxjs';
+import { Observable, concat, defaultIfEmpty, of, switchMap, tap } from 'rxjs';
 import { TrackerSubject } from '@cardano-sdk/util-rxjs';
-import isEqual from 'lodash/isEqual';
 
 export class PersistentCollectionTrackerSubject<T> extends TrackerSubject<T[]> {
   readonly store: CollectionStore<T>;
@@ -43,61 +25,5 @@ export class PersistentCollectionTrackerSubject<T> extends TrackerSubject<T[]> {
 export class PersistentDocumentTrackerSubject<T> extends TrackerSubject<T> {
   constructor(source$: Observable<T>, store: DocumentStore<T>) {
     super(concat(store.get(), source$.pipe(tap(store.set.bind(store)))));
-  }
-}
-
-export interface SyncableIntervalPersistentDocumentTrackerSubjectProps<T> {
-  provider$: Observable<T>;
-  trigger$: Observable<unknown>;
-  store: DocumentStore<T>;
-  equals?: (t1: T, t2: T) => boolean;
-  pollInterval: Milliseconds;
-  maxPollInterval: Milliseconds;
-}
-
-export interface SyncableIntervalPersistentDocumentTrackerSubjectInternals {
-  externalTrigger$?: Subject<void>;
-}
-
-const triggerOrInterval$ = (trigger$: Observable<unknown>, interval: number): Observable<unknown> =>
-  trigger$.pipe(timeout({ each: interval, with: () => concat(of(true), triggerOrInterval$(trigger$, interval)) }));
-
-// Commemorating Java ☕
-export class SyncableIntervalPersistentDocumentTrackerSubject<T> extends PersistentDocumentTrackerSubject<T> {
-  #externalTrigger$ = new Subject<void>();
-
-  constructor(
-    {
-      provider$,
-      pollInterval,
-      maxPollInterval,
-      store,
-      equals = isEqual,
-      trigger$
-    }: SyncableIntervalPersistentDocumentTrackerSubjectProps<T>,
-    { externalTrigger$ = new Subject() }: SyncableIntervalPersistentDocumentTrackerSubjectInternals = {}
-  ) {
-    super(
-      merge(
-        // Trigger fetch:
-        // - on start
-        // - after some delay once fully synced
-        triggerOrInterval$(trigger$, maxPollInterval).pipe(
-          delay(pollInterval),
-          startWith(null),
-          // Throttle syncing by interval, cancel ongoing request on external trigger
-          exhaustMap(() => merge(provider$).pipe(takeUntil(externalTrigger$))),
-          distinctUntilChanged(equals)
-        ),
-        // Always immediately restart request on external trigger
-        externalTrigger$.pipe(switchMap(() => provider$))
-      ).pipe(finalize(() => this.#externalTrigger$.complete())),
-      store
-    );
-    this.#externalTrigger$ = externalTrigger$;
-  }
-
-  sync() {
-    this.#externalTrigger$.next();
   }
 }
