@@ -8,7 +8,6 @@ services:
       - 3001:3001
     volumes:
       - ${PWD}/local-network/sockets:/root/sockets
-      - ./local-network/config/network:/config/nodes # Mount the config so we can update the genesis files and hashes.
     healthcheck:
       # Verify that the node socket is up.
       test: ["CMD-SHELL", "test - f /root/sockets/node-pool1.sock"]
@@ -55,8 +54,6 @@ services:
     restart: on-failure
     depends_on:
       - local-testnet
-    # Temporary hack to delay ogmions cardano node startup after the configuration files have been updated.
-    entrypoint: sh -c "sleep 10 && /root/cardano-node-ogmios.sh"
     volumes:
       - ./local-network/config/network:/config
       - node-db:/db

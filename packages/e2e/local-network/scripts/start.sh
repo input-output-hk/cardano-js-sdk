@@ -8,20 +8,6 @@ cd "$root"
 
 export PATH=$PWD/bin:$PATH
 
-# Use GNU sed for MacOS
-case $(uname) in
-Darwin) sed='gsed' ;;
-*) sed='sed' ;;
-esac
-
-case $(uname) in
-Darwin) date='gdate' ;;
-*) date='date' ;;
-esac
-
-timeISO=$($date -Iseconds -d "now + 30 seconds")
-timeUnix=$($date -d "now + 30 seconds" +%s)
-
 echo "Clean old state and logs"
 rm -rf \
   logs \
@@ -37,25 +23,6 @@ rm -rf \
   sockets/*
 
 mkdir -p sockets
-
-echo "Update start time in genesis files"
-$sed -i -E "s/\"startTime\": [0-9]+/\"startTime\": ${timeUnix}/" byron/genesis.json
-$sed -i -E "s/\"systemStart\": \".*\"/\"systemStart\": \"${timeISO}\"/" shelley/genesis.json
-
-cp byron/genesis.json /config/nodes/genesis/byron.json
-cp byron/genesis.json /config/nodes/cardano-node/genesis/byron.json
-cp shelley/genesis.json /config/nodes/genesis/shelley.json
-cp shelley/genesis.json /config/nodes/cardano-node/genesis/shelley.json
-
-byronGenesisHash=$(cardano-cli byron genesis print-genesis-hash --genesis-json byron/genesis.json)
-shelleyGenesisHash=$(cardano-cli genesis hash --genesis shelley/genesis.json)
-
-echo "Byron genesis hash: $byronGenesisHash"
-echo "Shelley genesis hash: $shelleyGenesisHash"
-
-cp /config/nodes/config.json  /config/nodes/cardano-node/config.json 
-$sed -i -E "s/\"ByronGenesisHash\": \".*\"/\"ByronGenesisHash\": \"${byronGenesisHash}\"/"  /config/nodes/cardano-node/config.json 
-$sed -i -E "s/\"ShelleyGenesisHash\": \".*\"/\"ShelleyGenesisHash\": \"${shelleyGenesisHash}\"/"  /config/nodes/cardano-node/config.json 
 
 echo "Update VRF key permission, sometimes GitHub changes these"
 chmod 600 \
