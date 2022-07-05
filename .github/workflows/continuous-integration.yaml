@@ -20,6 +20,9 @@ jobs:
       with:
         submodules: true
 
+    - name: Setup kernel, increase watchers & file limits
+      run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p; ulimit -n 3000
+
     - name: 🧰 Setup Build Environment
       uses: cachix/install-nix-action@v17
       with:
