@@ -1,2 +1,2 @@
 export * from './ogmiosTxSubmitProvider';
-export { createConnectionObject } from '@cardano-ogmios/client';
+export { createConnectionObject, WebSocketClosed } from '@cardano-ogmios/client';
