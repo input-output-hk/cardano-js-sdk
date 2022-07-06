@@ -33,6 +33,8 @@
     "coverage": "yarn test --coverage",
     "lint": "eslint -c ../../complete.eslintrc.js \"src/**/*.ts\" \"test/**/*.ts\"",
     "lint:fix": "yarn lint --fix",
+    "mainnet:up": "DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 docker-compose -p cardano-services-mainnet up",
+    "mainnet:down": "docker-compose -p cardano-services-mainnet down",
     "prepack": "yarn build",
     "pretest": "yarn build",
     "run:http-server": "ts-node --transpile-only src/run.ts",
@@ -42,8 +44,10 @@
     "test": "jest --runInBand -c ./jest.config.js",
     "test:build:verify": "tsc --build ./test",
     "test:debug": "DEBUG=true yarn test",
-    "test:load": "jest -c ./load.jest.config.js --runInBand",
     "test:e2e": "shx echo 'test:e2e' command not implemented yet",
+    "test:load": "jest -c ./load.jest.config.js --runInBand",
+    "testnet:up": "DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 OGMIOS_PORT=1338 NETWORK=testnet docker-compose -p cardano-services-testnet up",
+    "testnet:down": "docker-compose -p cardano-services-testnet down",
     "tscNoEmit": "shx echo typescript --noEmit command not implemented yet"
   },
   "devDependencies": {
