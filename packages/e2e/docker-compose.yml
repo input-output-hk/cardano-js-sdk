@@ -1,4 +1,4 @@
-version: "3.3"
+version: "3.9"
 
 services:
   local-testnet:
@@ -108,6 +108,66 @@ services:
       options:
         max-size: "200k"
         max-file: "10"
+  rabbitmq:
+    image: rabbitmq:3.10-management
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    ports:
+      # HTTP management UI
+      - '15672:15672'
+    restart: on-failure
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+    volumes:
+      - rabbitmq-db:/var/lib/rabbitmq/mnesia
+  http-server:
+    build:
+      args:
+        - NETWORK=${NETWORK:-mainnet}
+      context: ../../
+      target: http-server
+    environment:
+      - DB_POLL_INTERVAL=${DB_POLL_INTERVAL:-10000}
+      - DB_QUERIES_CACHE_TTL=${DB_QUERIES_CACHE_TTL:-120}
+      - ENABLE_METRICS=${ENABLE_METRICS:-false}
+      - LOGGER_MIN_SEVERITY=${LOGGER_MIN_SEVERITY:-info}
+      - SERVICE_NAMES=${SERVICE_NAMES:-"chain-history,network-info,rewards,stake-pool,tx-submit,utxo"}
+      - USE_QUEUE=${USE_QUEUE:-false}
+    ports:
+      - ${API_PORT:-4000}:3000
+    restart: on-failure
+    volumes:
+      - ./local-network/config/network:/config
+    secrets:
+      - postgres_db
+      - postgres_password
+      - postgres_user
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+  worker:
+    build:
+      context: ../../
+      target: worker
+    environment:
+      - LOGGER_MIN_SEVERITY=${LOGGER_MIN_SEVERITY:-info}
+      - PARALLEL=${PARALLEL:-false}
+      - PARALLEL_TX=${PARALLEL_TX:-3}
+      - POLLING_CYCLE=${POLLING_CYCLE:-500}
+    restart: on-failure
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
 secrets:
   postgres_db:
     file: ./local-network/placeholder-secrets/postgres_db
@@ -121,3 +181,4 @@ volumes:
   node-ipc:
   postgres-data:
   wallet-db:
+  rabbitmq-db:
