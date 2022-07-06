@@ -43,6 +43,8 @@ services:
         max-file: "10"
 
   cardano-node-ogmios:
+    healthcheck:
+      retries: 200
     image: cardanosolutions/cardano-node-ogmios:${CARDANO_NODE_OGMIOS_VERSION:-v5.4.0}
     logging:
       driver: "json-file"
@@ -132,6 +134,11 @@ services:
         - NETWORK=${NETWORK:-mainnet}
       context: ../../
       target: http-server
+    depends_on:
+      cardano-node-ogmios:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
     environment:
       - DB_POLL_INTERVAL=${DB_POLL_INTERVAL:-10000}
       - DB_QUERIES_CACHE_TTL=${DB_QUERIES_CACHE_TTL:-120}
@@ -157,6 +164,11 @@ services:
     build:
       context: ../../
       target: worker
+    depends_on:
+      cardano-node-ogmios:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     environment:
       - LOGGER_MIN_SEVERITY=${LOGGER_MIN_SEVERITY:-info}
       - PARALLEL=${PARALLEL:-false}
