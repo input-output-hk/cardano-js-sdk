@@ -24,19 +24,31 @@ import { CardanoWalletFaucetProvider, FaucetProvider } from './FaucetProvider';
 import { KeyManagement } from '@cardano-sdk/wallet';
 import { LogLevel, createLogger } from 'bunyan';
 import { Logger } from 'ts-log';
+import {
+  chainHistoryHttpProvider,
+  networkInfoHttpProvider,
+  rewardsHttpProvider,
+  stakePoolHttpProvider,
+  txSubmitHttpProvider,
+  utxoHttpProvider
+} from '@cardano-sdk/cardano-services-client';
 import { createConnectionObject } from '@cardano-ogmios/client';
 import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { ogmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
-import { txSubmitHttpProvider } from '@cardano-sdk/cardano-services-client';
 import DeviceConnection from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import memoize from 'lodash/memoize';
 
+// CONSTANTS
 const BLOCKFROST_PROVIDER = 'blockfrost';
 const BLOCKFROST_MISSING_PROJECT_ID = 'Missing project id';
+const HTTP_PROVIDER = 'http';
+const OGMIOS_PROVIDER = 'ogmios';
+const STUB_PROVIDER = 'stub';
 const KEY_AGENT_MISSING_MNEMONIC = 'Missing mnemonic words';
 const KEY_AGENT_MISSING_PASSWORD = 'Missing wallet password';
 const KEY_AGENT_MISSING_NETWORK_ID = 'Missing network id';
 const KEY_AGENT_MISSING_ACCOUNT_INDEX = 'Missing account index';
+const MISSING_URL_PARAM = 'Missing URL';
 
 // Sharing a single BlockFrostAPI object ensures rate limiting is shared across all blockfrost providers
 let blockfrostApi: BlockFrostAPI;
@@ -64,7 +76,6 @@ export const rewardsProviderFactory = new ProviderFactory<RewardsProvider>();
 export const txSubmitProviderFactory = new ProviderFactory<TxSubmitProvider>();
 export const utxoProviderFactory = new ProviderFactory<UtxoProvider>();
 export const stakePoolProviderFactory = new ProviderFactory<StakePoolProvider>();
-export const loggerFactory = new ProviderFactory<Logger>();
 
 // Faucet providers
 faucetProviderFactory.register('cardano-wallet', CardanoWalletFaucetProvider.create);
@@ -95,7 +106,7 @@ class NullAssetProvider implements AssetProvider {
 }
 
 assetProviderFactory.register(
-  'stub',
+  STUB_PROVIDER,
   async (): Promise<AssetProvider> =>
     new Promise<AssetProvider>(async (resolve) => {
       resolve(new NullAssetProvider());
@@ -119,6 +130,14 @@ chainHistoryProviderFactory.register(
     })
 );
 
+chainHistoryProviderFactory.register(HTTP_PROVIDER, async (params: any): Promise<ChainHistoryProvider> => {
+  if (params.url === undefined) throw new Error(`${chainHistoryHttpProvider.name}: ${MISSING_URL_PARAM}`);
+
+  return new Promise<ChainHistoryProvider>(async (resolve) => {
+    resolve(chainHistoryHttpProvider(params.url));
+  });
+});
+
 // Network info providers
 networkInfoProviderFactory.register(
   BLOCKFROST_PROVIDER,
@@ -127,6 +146,14 @@ networkInfoProviderFactory.register(
       resolve(blockfrostNetworkInfoProvider(await getBlockfrostApi()));
     })
 );
+
+networkInfoProviderFactory.register(HTTP_PROVIDER, async (params: any): Promise<NetworkInfoProvider> => {
+  if (params.url === undefined) throw new Error(`${networkInfoHttpProvider.name}: ${MISSING_URL_PARAM}`);
+
+  return new Promise<NetworkInfoProvider>(async (resolve) => {
+    resolve(networkInfoHttpProvider(params.url));
+  });
+});
 
 // Rewards providers
 rewardsProviderFactory.register(
@@ -137,6 +164,14 @@ rewardsProviderFactory.register(
     })
 );
 
+rewardsProviderFactory.register(HTTP_PROVIDER, async (params: any): Promise<RewardsProvider> => {
+  if (params.url === undefined) throw new Error(`${rewardsHttpProvider.name}: ${MISSING_URL_PARAM}`);
+
+  return new Promise<RewardsProvider>(async (resolve) => {
+    resolve(rewardsHttpProvider(params.url));
+  });
+});
+
 // Tx submit providers
 txSubmitProviderFactory.register(
   BLOCKFROST_PROVIDER,
@@ -146,8 +181,8 @@ txSubmitProviderFactory.register(
     })
 );
 
-txSubmitProviderFactory.register('ogmios', async (params: any): Promise<TxSubmitProvider> => {
-  if (params.url === undefined) throw new Error('txSubmitHttpProvider: ogmios - Missing URL');
+txSubmitProviderFactory.register(OGMIOS_PROVIDER, async (params: any): Promise<TxSubmitProvider> => {
+  if (params.url === undefined) throw new Error(`${ogmiosTxSubmitProvider.name}: ${MISSING_URL_PARAM}`);
 
   const connectionConfig = {
     host: params.url.hostname,
@@ -160,8 +195,8 @@ txSubmitProviderFactory.register('ogmios', async (params: any): Promise<TxSubmit
   });
 });
 
-txSubmitProviderFactory.register('http', async (params: any): Promise<TxSubmitProvider> => {
-  if (params.url === undefined) throw new Error('txSubmitHttpProvider: http - Missing URL');
+txSubmitProviderFactory.register(HTTP_PROVIDER, async (params: any): Promise<TxSubmitProvider> => {
+  if (params.url === undefined) throw new Error(`${txSubmitHttpProvider.name}: ${MISSING_URL_PARAM}`);
 
   return new Promise<TxSubmitProvider>(async (resolve) => {
     resolve(txSubmitHttpProvider(params.url));
@@ -177,14 +212,30 @@ utxoProviderFactory.register(
     })
 );
 
+utxoProviderFactory.register(HTTP_PROVIDER, async (params: any): Promise<UtxoProvider> => {
+  if (params.url === undefined) throw new Error(`${utxoHttpProvider.name}: ${MISSING_URL_PARAM}`);
+
+  return new Promise<UtxoProvider>(async (resolve) => {
+    resolve(utxoHttpProvider(params.url));
+  });
+});
+
 // Stake Pool providers
 stakePoolProviderFactory.register(
-  'stub',
+  STUB_PROVIDER,
   async (): Promise<StakePoolProvider> =>
     new Promise<StakePoolProvider>(async (resolve) => {
       resolve(createStubStakePoolProvider());
     })
 );
+
+stakePoolProviderFactory.register(HTTP_PROVIDER, async (params: any): Promise<StakePoolProvider> => {
+  if (params.url === undefined) throw new Error(`${stakePoolHttpProvider.name}: ${MISSING_URL_PARAM}`);
+
+  return new Promise<StakePoolProvider>(async (resolve) => {
+    resolve(stakePoolHttpProvider(params.url));
+  });
+});
 
 // Key Agents
 keyManagementFactory.register('inMemory', async (params: any): Promise<CreateKeyAgent> => {
@@ -263,7 +314,7 @@ keyManagementFactory.register('trezor', async (params: any): Promise<CreateKeyAg
 /**
  * Utility function to create key agents at different account indices.
  *
- * @param accountIndex The ccount index.
+ * @param accountIndex The account index.
  * @param provider The provider.
  * @param params The provider parameters.
  * @returns a key agent.
@@ -272,6 +323,17 @@ export const keyAgentById = memoize(async (accountIndex: number, provider: strin
   params.accountIndex = accountIndex;
   return keyManagementFactory.create(provider, params);
 });
+
+/**
+ * Utility function to create key agents.
+ *
+ * @param provider The provider.
+ * @param params The provider parameters.
+ * @returns a key agent.
+ */
+export const getKeyAgent = memoize(async (provider: string, params: any) =>
+  keyManagementFactory.create(provider, params)
+);
 
 // Logger
 
