@@ -3,9 +3,9 @@ import * as envalid from 'envalid';
 import { API_URL_DEFAULT, OGMIOS_URL_DEFAULT, RABBITMQ_URL_DEFAULT, ServiceNames, loadHttpServer } from './Program';
 import { CACHE_TTL_DEFAULT } from './InMemoryCache';
 import { DB_POLL_INTERVAL_DEFAULT } from './NetworkInfo';
+import { ENABLE_METRICS_DEFAULT, USE_QUEUE_DEFAULT } from './ProgramsCommon';
 import { LogLevel } from 'bunyan';
 import { URL } from 'url';
-import { USE_QUEUE_DEFAULT } from './ProgramsCommon';
 import { cacheTtlValidator } from './util/validators';
 import { config } from 'dotenv';
 import { loggerMethodNames } from './util';
@@ -25,6 +25,7 @@ const envSpecs = {
   DB_CONNECTION_STRING: envalid.str({ default: undefined }),
   DB_POLL_INTERVAL: envalid.num({ default: DB_POLL_INTERVAL_DEFAULT }),
   DB_QUERIES_CACHE_TTL: envalid.makeValidator(cacheTtlValidator)(envalid.num({ default: CACHE_TTL_DEFAULT })),
+  ENABLE_METRICS: envalid.bool({ default: ENABLE_METRICS_DEFAULT }),
   LOGGER_MIN_SEVERITY: envalid.str({ choices: loggerMethodNames as string[], default: 'info' }),
   OGMIOS_URL: envalid.url({ default: OGMIOS_URL_DEFAULT }),
   POSTGRES_DB_FILE: existingFileValidator({ default: undefined }),
@@ -59,6 +60,7 @@ void (async () => {
   } else if (dbName && dbPassword && dbUser && env.POSTGRES_HOST && env.POSTGRES_PORT) {
     dbConnectionString = `postgresql://${dbUser}:${dbPassword}@${env.POSTGRES_HOST}:${env.POSTGRES_PORT}/${dbName}`;
   }
+  const metricsEnabled = env.ENABLE_METRICS;
 
   const serviceNames = env.SERVICE_NAMES.split(',') as ServiceNames[];
 
@@ -71,6 +73,7 @@ void (async () => {
         dbPollInterval,
         dbQueriesCacheTtl,
         loggerMinSeverity: env.LOGGER_MIN_SEVERITY as LogLevel,
+        metricsEnabled,
         ogmiosUrl,
         rabbitmqUrl,
         useQueue: env.USE_QUEUE
