@@ -82,6 +82,7 @@ services:
       - ./local-network/config/network:/config
       - node-ipc:/node-ipc
     restart: on-failure
+    stop_signal: SIGINT
     logging:
       driver: "json-file"
       options:
