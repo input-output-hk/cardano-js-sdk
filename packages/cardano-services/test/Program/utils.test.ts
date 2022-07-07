@@ -1,150 +1,258 @@
 /* eslint-disable sonarjs/no-identical-functions */
+/* eslint-disable sonarjs/no-duplicate-string */
+import { Connection } from '@cardano-ogmios/client';
 import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../src/NetworkInfo';
-import { HttpServer, HttpServerConfig, getDnsSrvResolveWithExponentialBackoff, getPool } from '../../src';
+import {
+  HttpServer,
+  HttpServerConfig,
+  TxSubmitHttpService,
+  getCardanoNodeProvider,
+  getDnsSrvResolveWithExponentialBackoff,
+  getPool,
+  getRabbitMqTxSubmitProvider
+} from '../../src';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../src/InMemoryCache';
 import { Pool } from 'pg';
 import { SrvRecord } from 'dns';
+import { TxSubmitProvider } from '@cardano-sdk/core';
+import { createConnectionObject } from '@cardano-sdk/ogmios';
+import { createHealthyMockOgmiosServer, ogmiosServerReady } from '../util';
 import { createLogger } from 'bunyan';
 import { getPort } from 'get-port-please';
+import { listenPromise, serverClosePromise } from '../../src/util';
 import { types } from 'util';
 import axios from 'axios';
+import http from 'http';
 
 jest.mock('dns', () => ({
   promises: {
     resolveSrv: async (serviceName: string): Promise<SrvRecord[]> => {
-      if (serviceName === 'db-test-domain') return [{ name: '127.0.0.1', port: 5433, priority: 6, weight: 5 }];
-      if (serviceName === 'ogmios-test-domain') return [{ name: '127.0.0.1', port: 1337, priority: 6, weight: 5 }];
-      if (serviceName === 'rabbitmq-test-domain') return [{ name: '127.0.0.1', port: 5672, priority: 6, weight: 5 }];
+      if (serviceName === 'db-test-domain') return [{ name: 'localhost', port: 5433, priority: 6, weight: 5 }];
+      if (serviceName === 'ogmios-test-domain') return [{ name: 'localhost', port: 1337, priority: 6, weight: 5 }];
+      if (serviceName === 'rabbitmq-test-domain') return [{ name: 'localhost', port: 5672, priority: 6, weight: 5 }];
       return [];
     }
   }
 }));
 
-const APPLICATION_JSON = 'application/json';
-const cache = new InMemoryCache(UNLIMITED_CACHE_TTL);
-const cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
-const logger = createLogger({ level: 'error', name: 'test' });
-const dnsSrvResolve = getDnsSrvResolveWithExponentialBackoff({ factor: 1.1, maxRetryTime: 1000 }, cache, logger);
+describe('Service dependencies abstractions', () => {
+  const APPLICATION_JSON = 'application/json';
+  const cache = new InMemoryCache(UNLIMITED_CACHE_TTL);
+  const cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
+  const logger = createLogger({ level: 'error', name: 'test' });
+  const dnsSrvResolve = getDnsSrvResolveWithExponentialBackoff({ factor: 1.1, maxRetryTime: 1000 }, cache, logger);
 
-describe('Postgres-dependant service with provided SRV service name', () => {
-  let httpServer: HttpServer;
-  let db: Pool | undefined;
-  let port: number;
-  let apiUrlBase: string;
-  let config: HttpServerConfig;
-  let service: NetworkInfoHttpService;
-  let networkInfoProvider: DbSyncNetworkInfoProvider;
+  describe('Postgres-dependant service with provided SRV service name', () => {
+    let httpServer: HttpServer;
+    let db: Pool | undefined;
+    let port: number;
+    let apiUrlBase: string;
+    let config: HttpServerConfig;
+    let service: NetworkInfoHttpService;
+    let networkInfoProvider: DbSyncNetworkInfoProvider;
 
-  beforeAll(async () => {
-    db = await getPool(dnsSrvResolve, {
-      dbPollInterval: 1000,
-      dbQueriesCacheTtl: 10_000,
-      postgresName: process.env.POSTGRES_NAME!,
-      postgresPassword: process.env.POSTGRES_PASSWORD!,
-      postgresSrvServiceName: process.env.POSTGRES_SRV_SERVICE_NAME!,
-      postgresUser: process.env.POSTGRES_USER!,
-      serviceDiscoveryBackoffFactor: 1.1,
-      serviceDiscoveryTimeout: 1000
-    });
-  });
-
-  describe('healthy state', () => {
     beforeAll(async () => {
-      port = await getPort();
-      config = { listen: { port } };
-      apiUrlBase = `http://localhost:${port}/network-info`;
-      networkInfoProvider = new DbSyncNetworkInfoProvider(
-        { cardanoNodeConfigPath, dbPollInterval: 2000 },
-        { cache, db: db! }
-      );
-      service = new NetworkInfoHttpService({ networkInfoProvider });
-      httpServer = new HttpServer(config, { services: [service] });
-
-      await httpServer.initialize();
-      await httpServer.start();
-    });
-
-    afterAll(async () => {
-      await db!.end();
-      await httpServer.shutdown();
-      await cache.shutdown();
-      jest.clearAllTimers();
-    });
-
-    it('db should be instance of a Proxy ', () => {
-      expect(types.isProxy(db!)).toEqual(true);
-    });
-
-    it('forwards the networkInfoProvider health response', async () => {
-      const res = await axios.post(`${apiUrlBase}/health`, {
-        headers: { 'Content-Type': APPLICATION_JSON }
+      db = await getPool(dnsSrvResolve, {
+        dbPollInterval: 1000,
+        dbQueriesCacheTtl: 10_000,
+        postgresDb: process.env.POSTGRES_DB!,
+        postgresPassword: process.env.POSTGRES_PASSWORD!,
+        postgresSrvServiceName: process.env.POSTGRES_SRV_SERVICE_NAME!,
+        postgresUser: process.env.POSTGRES_USER!,
+        serviceDiscoveryBackoffFactor: 1.1,
+        serviceDiscoveryBackoffTimeout: 1000
       });
-      expect(res.status).toBe(200);
-      expect(res.data).toEqual({ ok: true });
     });
 
-    it('returns a 200 coded response with a well formed HTTP request', async () => {
-      expect((await axios.post(`${apiUrlBase}/ledger-tip`, { args: [] })).status).toEqual(200);
+    describe('Established connection', () => {
+      beforeAll(async () => {
+        port = await getPort();
+        config = { listen: { port } };
+        apiUrlBase = `http://localhost:${port}/network-info`;
+        networkInfoProvider = new DbSyncNetworkInfoProvider(
+          { cardanoNodeConfigPath, dbPollInterval: 2000 },
+          { cache, db: db! }
+        );
+        service = new NetworkInfoHttpService({ networkInfoProvider });
+        httpServer = new HttpServer(config, { services: [service] });
+
+        await httpServer.initialize();
+        await httpServer.start();
+      });
+
+      afterAll(async () => {
+        await db!.end();
+        await httpServer.shutdown();
+        await cache.shutdown();
+        jest.clearAllTimers();
+      });
+
+      it('db should be instance of a Proxy ', () => {
+        expect(types.isProxy(db!)).toEqual(true);
+      });
+
+      it('forwards the db health response', async () => {
+        const res = await axios.post(`${apiUrlBase}/health`, {
+          headers: { 'Content-Type': APPLICATION_JSON }
+        });
+        expect(res.status).toBe(200);
+        expect(res.data).toEqual({ ok: true });
+      });
     });
   });
-});
 
-describe('Postgres-dependant service with provided db connection string', () => {
-  let httpServer: HttpServer;
-  let db: Pool | undefined;
-  let port: number;
-  let apiUrlBase: string;
-  let config: HttpServerConfig;
-  let service: NetworkInfoHttpService;
-  let networkInfoProvider: DbSyncNetworkInfoProvider;
+  describe('Postgres-dependant service with provided db connection string', () => {
+    let httpServer: HttpServer;
+    let db: Pool | undefined;
+    let port: number;
+    let apiUrlBase: string;
+    let config: HttpServerConfig;
+    let service: NetworkInfoHttpService;
+    let networkInfoProvider: DbSyncNetworkInfoProvider;
 
-  beforeAll(async () => {
-    db = await getPool(dnsSrvResolve, {
-      dbConnectionString: process.env.DB_CONNECTION_STRING,
-      dbPollInterval: 1000,
-      dbQueriesCacheTtl: 10_000,
-      serviceDiscoveryBackoffFactor: 1.1,
-      serviceDiscoveryTimeout: 1000
-    });
-  });
-
-  describe('healthy state', () => {
     beforeAll(async () => {
-      port = await getPort();
-      config = { listen: { port } };
-      apiUrlBase = `http://localhost:${port}/network-info`;
-      networkInfoProvider = new DbSyncNetworkInfoProvider(
-        { cardanoNodeConfigPath, dbPollInterval: 2000 },
-        { cache, db: db! }
-      );
-      service = new NetworkInfoHttpService({ networkInfoProvider });
-      httpServer = new HttpServer(config, { services: [service] });
-
-      await httpServer.initialize();
-      await httpServer.start();
-    });
-
-    afterAll(async () => {
-      await db!.end();
-      await httpServer.shutdown();
-      await cache.shutdown();
-      jest.clearAllTimers();
-    });
-
-    it('db should not be instance of a Proxy ', () => {
-      expect(types.isProxy(db!)).toEqual(false);
-    });
-
-    it('forwards the networkInfoProvider health response', async () => {
-      const res = await axios.post(`${apiUrlBase}/health`, {
-        headers: { 'Content-Type': APPLICATION_JSON }
+      db = await getPool(dnsSrvResolve, {
+        dbConnectionString: process.env.DB_CONNECTION_STRING,
+        dbPollInterval: 1000,
+        dbQueriesCacheTtl: 10_000,
+        serviceDiscoveryBackoffFactor: 1.1,
+        serviceDiscoveryBackoffTimeout: 1000
       });
-      expect(res.status).toBe(200);
-      expect(res.data).toEqual({ ok: true });
     });
 
-    it('returns a 200 coded response with a well formed HTTP request', async () => {
-      expect((await axios.post(`${apiUrlBase}/ledger-tip`, { args: [] })).status).toEqual(200);
+    describe('Established connection', () => {
+      beforeAll(async () => {
+        port = await getPort();
+        config = { listen: { port } };
+        apiUrlBase = `http://localhost:${port}/network-info`;
+        networkInfoProvider = new DbSyncNetworkInfoProvider(
+          { cardanoNodeConfigPath, dbPollInterval: 2000 },
+          { cache, db: db! }
+        );
+        service = new NetworkInfoHttpService({ networkInfoProvider });
+        httpServer = new HttpServer(config, { services: [service] });
+
+        await httpServer.initialize();
+        await httpServer.start();
+      });
+
+      afterAll(async () => {
+        await db!.end();
+        await httpServer.shutdown();
+        await cache.shutdown();
+        jest.clearAllTimers();
+      });
+
+      it('db should not be instance of a Proxy ', () => {
+        expect(types.isProxy(db!)).toEqual(false);
+      });
+
+      it('forwards the db health response', async () => {
+        const res = await axios.post(`${apiUrlBase}/health`, {
+          headers: { 'Content-Type': APPLICATION_JSON }
+        });
+        expect(res.status).toBe(200);
+        expect(res.data).toEqual({ ok: true });
+      });
+    });
+  });
+
+  describe('Ogmios-dependant service with provided SRV service name', () => {
+    let apiUrlBase: string;
+    let ogmiosServer: http.Server;
+    let ogmiosConnection: Connection;
+    let txSubmitProvider: TxSubmitProvider;
+    let httpServer: HttpServer;
+    let port: number;
+    let config: HttpServerConfig;
+
+    beforeAll(async () => {
+      ogmiosServer = createHealthyMockOgmiosServer();
+      ogmiosConnection = createConnectionObject();
+      await listenPromise(ogmiosServer, { port: ogmiosConnection.port });
+      await ogmiosServerReady(ogmiosConnection);
+    });
+
+    describe('Established connection', () => {
+      beforeAll(async () => {
+        port = await getPort();
+        apiUrlBase = `http://localhost:${port}/tx-submit`;
+        config = { listen: { port } };
+        txSubmitProvider = await getCardanoNodeProvider(dnsSrvResolve, {
+          dbPollInterval: 1000,
+          dbQueriesCacheTtl: 10_000,
+          ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME,
+          serviceDiscoveryBackoffFactor: 1.1,
+          serviceDiscoveryBackoffTimeout: 1000
+        });
+        httpServer = new HttpServer(config, {
+          services: [new TxSubmitHttpService({ txSubmitProvider })]
+        });
+        await httpServer.initialize();
+        await httpServer.start();
+      });
+
+      afterAll(async () => {
+        await httpServer.shutdown();
+        await serverClosePromise(ogmiosServer);
+      });
+
+      it('txSubmitProvider should be instance of a Proxy ', () => {
+        expect(types.isProxy(txSubmitProvider)).toEqual(true);
+      });
+
+      it('forwards the txSubmitProvider health response', async () => {
+        const res = await axios.post(`${apiUrlBase}/health`, {
+          headers: { 'Content-Type': APPLICATION_JSON }
+        });
+        expect(res.status).toBe(200);
+        expect(res.data).toEqual({ ok: true });
+      });
+    });
+  });
+
+  describe('RabbitMQ-dependant service with provided SRV service name', () => {
+    let apiUrlBase: string;
+    let txSubmitProvider: TxSubmitProvider;
+    let httpServer: HttpServer;
+    let port: number;
+    let config: HttpServerConfig;
+
+    describe('Established connection', () => {
+      beforeAll(async () => {
+        port = await getPort();
+        apiUrlBase = `http://localhost:${port}/tx-submit`;
+        config = { listen: { port } };
+        txSubmitProvider = await getRabbitMqTxSubmitProvider(dnsSrvResolve, {
+          dbPollInterval: 1000,
+          dbQueriesCacheTtl: 10_000,
+          rabbitmqSrvServiceName: process.env.RABBITMQ_SRV_SERVICE_NAME,
+          serviceDiscoveryBackoffFactor: 1.1,
+          serviceDiscoveryBackoffTimeout: 1000,
+          useQueue: true
+        });
+        httpServer = new HttpServer(config, {
+          services: [new TxSubmitHttpService({ txSubmitProvider })]
+        });
+        await httpServer.initialize();
+        await httpServer.start();
+      });
+
+      afterAll(async () => {
+        await httpServer.shutdown();
+      });
+
+      it('txSubmitProvider should be instance of a Proxy ', () => {
+        expect(types.isProxy(txSubmitProvider)).toEqual(true);
+      });
+
+      it('forwards the txSubmitProvider health response', async () => {
+        const res = await axios.post(`${apiUrlBase}/health`, {
+          headers: { 'Content-Type': APPLICATION_JSON }
+        });
+        expect(res.status).toBe(200);
+        expect(res.data).toEqual({ ok: true });
+      });
     });
   });
 });

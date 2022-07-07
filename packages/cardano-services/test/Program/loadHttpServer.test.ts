@@ -35,7 +35,7 @@ describe('loadHttpServer', () => {
   let cardanoNodeConfigPath: string;
   let dbConnectionString: string;
   let postgresSrvServiceName: string;
-  let postgresName: string;
+  let postgresDb: string;
   let postgresUser: string;
   let postgresPassword: string;
   let dbQueriesCacheTtl: number;
@@ -45,7 +45,7 @@ describe('loadHttpServer', () => {
   let ogmiosSrvServiceName: string;
   let ogmiosServer: http.Server;
   let serviceDiscoveryBackoffFactor: number;
-  let serviceDiscoveryTimeout: number;
+  let serviceDiscoveryBackoffTimeout: number;
   let rabbitmqSrvServiceName: string;
   let rabbitmqUrl: URL;
 
@@ -53,7 +53,7 @@ describe('loadHttpServer', () => {
     apiUrl = new URL(`http://localhost:${await getRandomPort()}`);
     dbConnectionString = process.env.DB_CONNECTION_STRING!;
     postgresSrvServiceName = process.env.POSTGRES_SRV_SERVICE_NAME!;
-    postgresName = process.env.POSTGRES_NAME!;
+    postgresDb = process.env.POSTGRES_DB!;
     postgresUser = process.env.POSTGRES_USER!;
     postgresPassword = process.env.POSTGRES_PASSWORD!;
     cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
@@ -62,7 +62,7 @@ describe('loadHttpServer', () => {
     dbQueriesCacheTtl = CACHE_TTL_DEFAULT;
     dbPollInterval = DB_POLL_INTERVAL_DEFAULT;
     serviceDiscoveryBackoffFactor = SERVICE_DISCOVERY_BACKOFF_FACTOR_DEFAULT;
-    serviceDiscoveryTimeout = SERVICE_DISCOVERY_BACKOFF_TIMEOUT_DEFAULT;
+    serviceDiscoveryBackoffTimeout = SERVICE_DISCOVERY_BACKOFF_TIMEOUT_DEFAULT;
     rabbitmqUrl = new URL(process.env.RABBITMQ_URL!);
     rabbitmqSrvServiceName = process.env.RABBITMQ_SRV_SERVICE_NAME!;
   });
@@ -88,7 +88,7 @@ describe('loadHttpServer', () => {
           dbQueriesCacheTtl,
           ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
           serviceDiscoveryBackoffFactor,
-          serviceDiscoveryTimeout
+          serviceDiscoveryBackoffTimeout
         },
         serviceNames: [
           ServiceNames.StakePool,
@@ -109,12 +109,12 @@ describe('loadHttpServer', () => {
           options: {
             dbPollInterval,
             dbQueriesCacheTtl,
-            postgresName,
+            postgresDb,
             postgresPassword,
             postgresSrvServiceName,
             postgresUser,
             serviceDiscoveryBackoffFactor,
-            serviceDiscoveryTimeout
+            serviceDiscoveryBackoffTimeout
           },
           serviceNames: [ServiceNames.StakePool]
         });
@@ -123,7 +123,7 @@ describe('loadHttpServer', () => {
       });
 
       it('throws if dns port resolution is used but one of the postgres args is missing', async () => {
-        const missingPostgresName = undefined;
+        const missingPostgresDb = undefined;
 
         await expect(
           async () =>
@@ -132,11 +132,11 @@ describe('loadHttpServer', () => {
               options: {
                 dbPollInterval,
                 dbQueriesCacheTtl,
-                postgresName: missingPostgresName,
+                postgresDb: missingPostgresDb,
                 postgresSrvServiceName,
                 postgresUser,
                 serviceDiscoveryBackoffFactor,
-                serviceDiscoveryTimeout
+                serviceDiscoveryBackoffTimeout
               },
               serviceNames: [ServiceNames.StakePool]
             })
@@ -152,7 +152,7 @@ describe('loadHttpServer', () => {
                 dbPollInterval,
                 dbQueriesCacheTtl,
                 serviceDiscoveryBackoffFactor,
-                serviceDiscoveryTimeout
+                serviceDiscoveryBackoffTimeout
               },
               serviceNames: [ServiceNames.StakePool]
             })
@@ -170,7 +170,7 @@ describe('loadHttpServer', () => {
                 dbQueriesCacheTtl,
                 postgresSrvServiceName,
                 serviceDiscoveryBackoffFactor,
-                serviceDiscoveryTimeout
+                serviceDiscoveryBackoffTimeout
               },
               serviceNames: [ServiceNames.StakePool]
             })
@@ -187,7 +187,24 @@ describe('loadHttpServer', () => {
             dbQueriesCacheTtl,
             ogmiosSrvServiceName,
             serviceDiscoveryBackoffFactor,
-            serviceDiscoveryTimeout
+            serviceDiscoveryBackoffTimeout
+          },
+          serviceNames: [ServiceNames.TxSubmit]
+        });
+
+        expect(httpServer).toBeInstanceOf(HttpServer);
+      });
+
+      it('loads the nominated HTTP server and take service discovery with priority if both ogmios srv name and url are provided', async () => {
+        httpServer = await loadHttpServer({
+          apiUrl,
+          options: {
+            dbPollInterval,
+            dbQueriesCacheTtl,
+            ogmiosSrvServiceName,
+            ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
+            serviceDiscoveryBackoffFactor,
+            serviceDiscoveryBackoffTimeout
           },
           serviceNames: [ServiceNames.TxSubmit]
         });
@@ -204,29 +221,11 @@ describe('loadHttpServer', () => {
                 dbPollInterval,
                 dbQueriesCacheTtl,
                 serviceDiscoveryBackoffFactor,
-                serviceDiscoveryTimeout
+                serviceDiscoveryBackoffTimeout
               },
               serviceNames: [ServiceNames.TxSubmit]
             })
         ).rejects.toThrow(MissingProgramOption);
-      });
-
-      it('throws if a service is nominated with providing both ogmios url and srv service name at same time', async () => {
-        await expect(
-          async () =>
-            await loadHttpServer({
-              apiUrl,
-              options: {
-                dbPollInterval,
-                dbQueriesCacheTtl,
-                ogmiosSrvServiceName,
-                ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
-                serviceDiscoveryBackoffFactor,
-                serviceDiscoveryTimeout
-              },
-              serviceNames: [ServiceNames.TxSubmit]
-            })
-        ).rejects.toThrow(InvalidArgsCombination);
       });
     });
 
@@ -239,7 +238,25 @@ describe('loadHttpServer', () => {
             dbQueriesCacheTtl,
             rabbitmqSrvServiceName,
             serviceDiscoveryBackoffFactor,
-            serviceDiscoveryTimeout,
+            serviceDiscoveryBackoffTimeout,
+            useQueue: true
+          },
+          serviceNames: [ServiceNames.TxSubmit]
+        });
+
+        expect(httpServer).toBeInstanceOf(HttpServer);
+      });
+
+      it('loads the nominated HTTP server and take service discovery with priority if both rabbitmq srv name and url are provided', async () => {
+        httpServer = await loadHttpServer({
+          apiUrl,
+          options: {
+            dbPollInterval,
+            dbQueriesCacheTtl,
+            rabbitmqSrvServiceName,
+            rabbitmqUrl,
+            serviceDiscoveryBackoffFactor,
+            serviceDiscoveryBackoffTimeout,
             useQueue: true
           },
           serviceNames: [ServiceNames.TxSubmit]
@@ -257,31 +274,12 @@ describe('loadHttpServer', () => {
                 dbPollInterval,
                 dbQueriesCacheTtl,
                 serviceDiscoveryBackoffFactor,
-                serviceDiscoveryTimeout,
+                serviceDiscoveryBackoffTimeout,
                 useQueue: true
               },
               serviceNames: [ServiceNames.TxSubmit]
             })
         ).rejects.toThrow(MissingProgramOption);
-      });
-
-      it('throws if a service is nominated with providing both rabbitmq url and srv service name at same time', async () => {
-        await expect(
-          async () =>
-            await loadHttpServer({
-              apiUrl,
-              options: {
-                dbPollInterval,
-                dbQueriesCacheTtl,
-                rabbitmqSrvServiceName,
-                rabbitmqUrl,
-                serviceDiscoveryBackoffFactor,
-                serviceDiscoveryTimeout,
-                useQueue: true
-              },
-              serviceNames: [ServiceNames.TxSubmit]
-            })
-        ).rejects.toThrow(InvalidArgsCombination);
       });
     });
 
@@ -294,7 +292,7 @@ describe('loadHttpServer', () => {
               dbPollInterval,
               dbQueriesCacheTtl,
               serviceDiscoveryBackoffFactor,
-              serviceDiscoveryTimeout
+              serviceDiscoveryBackoffTimeout
             },
             serviceNames: [ServiceNames.NetworkInfo]
           })
@@ -324,7 +322,7 @@ describe('loadHttpServer', () => {
               dbQueriesCacheTtl,
               ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
               serviceDiscoveryBackoffFactor,
-              serviceDiscoveryTimeout
+              serviceDiscoveryBackoffTimeout
             },
             serviceNames: [ServiceNames.StakePool, ServiceNames.TxSubmit]
           })

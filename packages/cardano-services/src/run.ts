@@ -28,7 +28,7 @@ const envSpecs = {
   LOGGER_MIN_SEVERITY: envalid.str({ choices: loggerMethodNames as string[], default: 'info' }),
   OGMIOS_SRV_SERVICE_NAME: envalid.str({ default: undefined }),
   OGMIOS_URL: envalid.url({ default: OGMIOS_URL_DEFAULT }),
-  POSTGRES_NAME: envalid.str({ default: undefined }),
+  POSTGRES_DB: envalid.str({ default: undefined }),
   POSTGRES_PASSWORD: envalid.str({ default: undefined }),
   POSTGRES_SRV_SERVICE_NAME: envalid.str({ default: undefined }),
   POSTGRES_USER: envalid.str({ default: undefined }),
@@ -53,9 +53,9 @@ void (async () => {
   const dbPollInterval = env.DB_POLL_INTERVAL;
   const dbConnectionString = env.DB_CONNECTION_STRING ? new URL(env.DB_CONNECTION_STRING).toString() : undefined;
   const serviceDiscoveryBackoffFactor = env.SERVICE_DISCOVERY_BACKOFF_FACTOR;
-  const serviceDiscoveryTimeout = env.SERVICE_DISCOVERY_BACKOFF_TIMEOUT;
+  const serviceDiscoveryBackoffTimeout = env.SERVICE_DISCOVERY_BACKOFF_TIMEOUT;
   const postgresSrvServiceName = env.POSTGRES_SRV_SERVICE_NAME;
-  const postgresName = env.POSTGRES_NAME;
+  const postgresDb = env.POSTGRES_DB;
   const postgresUser = env.POSTGRES_USER;
   const postgresPassword = env.POSTGRES_PASSWORD;
   const serviceNames = env.SERVICE_NAMES.split(',') as ServiceNames[];
@@ -71,14 +71,14 @@ void (async () => {
         loggerMinSeverity: env.LOGGER_MIN_SEVERITY as LogLevel,
         ogmiosSrvServiceName,
         ogmiosUrl,
-        postgresName,
+        postgresDb,
         postgresPassword,
         postgresSrvServiceName,
         postgresUser,
         rabbitmqSrvServiceName,
         rabbitmqUrl,
         serviceDiscoveryBackoffFactor,
-        serviceDiscoveryTimeout,
+        serviceDiscoveryBackoffTimeout,
         useQueue: env.USE_QUEUE
       },
       serviceNames

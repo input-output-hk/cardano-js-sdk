@@ -28,7 +28,7 @@ export interface HttpServerOptions extends CommonProgramOptions, SrvProgramOptio
   dbQueriesCacheTtl: number;
   dbPollInterval: number;
   serviceDiscoveryBackoffFactor: number;
-  serviceDiscoveryTimeout: number;
+  serviceDiscoveryBackoffTimeout: number;
   cardanoNodeConfigPath?: string;
   metricsEnabled?: boolean;
   useQueue?: boolean;
@@ -117,7 +117,7 @@ export const loadHttpServer = async (args: ProgramArgs): Promise<HttpServer> => 
   const dnsSrvResolve = getDnsSrvResolveWithExponentialBackoff(
     {
       factor: args.options?.serviceDiscoveryBackoffFactor,
-      maxRetryTime: args.options?.serviceDiscoveryTimeout
+      maxRetryTime: args.options?.serviceDiscoveryBackoffTimeout
     },
     cache,
     logger

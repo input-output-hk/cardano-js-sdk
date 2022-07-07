@@ -114,9 +114,9 @@ export const getPool = async (dnsSrvResolve: DnsSrvResolve, options?: HttpServer
       ProgramOptionDescriptions.PostgresSrvServiceName
     );
   if (options?.dbConnectionString) return new Pool({ connectionString: options.dbConnectionString });
-  if (options?.postgresSrvServiceName && options?.postgresUser && options.postgresName && options.postgresPassword) {
+  if (options?.postgresSrvServiceName && options?.postgresUser && options.postgresDb && options.postgresPassword) {
     return getSrvPool(dnsSrvResolve, {
-      database: options.postgresName,
+      database: options.postgresDb,
       host: options.postgresSrvServiceName,
       password: options.postgresPassword,
       user: options.postgresUser
@@ -151,7 +151,7 @@ export const getSrvOgmiosTxSubmitProvider = async (
           ogmiosProvider.submitTx(args).catch(async (error) => {
             if (error instanceof WebSocketClosed && error.message === 'WebSocket is closed') {
               const address = await dnsSrvResolve(serviceName!);
-              ogmiosProvider = ogmiosTxSubmitProvider(address);
+              ogmiosProvider = ogmiosTxSubmitProvider({ host: address.name, port: address.port });
               return await ogmiosProvider.submitTx(args);
             }
           });
@@ -169,15 +169,8 @@ export const getCardanoNodeProvider = async (
   dnsSrvResolve: DnsSrvResolve,
   options?: HttpServerOptions
 ): Promise<TxSubmitProvider> => {
-  if (options?.ogmiosUrl && options.ogmiosSrvServiceName)
-    throw new InvalidArgsCombination(
-      ProgramOptionDescriptions.OgmiosUrl,
-      ProgramOptionDescriptions.OgmiosSrvServiceName
-    );
+  if (options?.ogmiosSrvServiceName) return getSrvOgmiosTxSubmitProvider(dnsSrvResolve, options.ogmiosSrvServiceName);
   if (options?.ogmiosUrl) return ogmiosTxSubmitProvider(urlToConnectionConfig(options?.ogmiosUrl));
-  if (options?.ogmiosSrvServiceName) {
-    return getSrvOgmiosTxSubmitProvider(dnsSrvResolve, options.ogmiosSrvServiceName);
-  }
   throw new MissingProgramOption(ServiceNames.TxSubmit, [
     ProgramOptionDescriptions.OgmiosUrl,
     ProgramOptionDescriptions.OgmiosSrvServiceName
@@ -233,15 +226,9 @@ export const getRabbitMqTxSubmitProvider = async (
   dnsSrvResolve: DnsSrvResolve,
   options?: HttpServerOptions
 ): Promise<RabbitMqTxSubmitProvider> => {
-  if (options?.rabbitmqUrl && options.rabbitmqSrvServiceName)
-    throw new InvalidArgsCombination(
-      ProgramOptionDescriptions.RabbitMQUrl,
-      ProgramOptionDescriptions.RabbitMQSrvServiceName
-    );
-  if (options?.rabbitmqUrl) return new RabbitMqTxSubmitProvider({ rabbitmqUrl: options.rabbitmqUrl });
-  if (options?.rabbitmqSrvServiceName) {
+  if (options?.rabbitmqSrvServiceName)
     return getSrvRabbitMqTxSubmitProvider(dnsSrvResolve, options.rabbitmqSrvServiceName);
-  }
+  if (options?.rabbitmqUrl) return new RabbitMqTxSubmitProvider({ rabbitmqUrl: options.rabbitmqUrl });
   throw new MissingProgramOption(ServiceNames.TxSubmit, [
     ProgramOptionDescriptions.RabbitMQUrl,
     ProgramOptionDescriptions.RabbitMQSrvServiceName

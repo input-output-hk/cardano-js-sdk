@@ -109,7 +109,7 @@ commonOptions(
     SERVICE_DISCOVERY_BACKOFF_FACTOR_DEFAULT
   )
   .option(
-    '--service-discovery-timeout <serviceDiscoveryTimeout>',
+    '--service-discovery-backoff-timeout <serviceDiscoveryBackoffTimeout>',
     ProgramOptionDescriptions.ServiceDiscoverBackoffTimeout,
     (interval) => Number.parseInt(interval, 10),
     SERVICE_DISCOVERY_BACKOFF_TIMEOUT_DEFAULT
@@ -118,7 +118,7 @@ commonOptions(
   .option('--rabbitmq-srv-service-name <rabbitmqSrvServiceName>', ProgramOptionDescriptions.RabbitMQSrvServiceName)
   .option('--ogmios-srv-service-name <ogmiosSrvServiceName>', ProgramOptionDescriptions.OgmiosSrvServiceName)
   .option('--postgres-srv-service-name <postgresSrvServiceName>', ProgramOptionDescriptions.PostgresSrvServiceName)
-  .option('--postgres-name <postgresName>', ProgramOptionDescriptions.DbConnection)
+  .option('--postgres-db <postgresDb>', ProgramOptionDescriptions.DbConnection)
   .option('--postgres-user <postgresUser>', ProgramOptionDescriptions.DbConnection)
   .option('--postgres-password <postgresPassword>', ProgramOptionDescriptions.DbConnection)
   .action(async (serviceNames: ServiceNames[], options: { apiUrl: URL } & HttpServerOptions) => {

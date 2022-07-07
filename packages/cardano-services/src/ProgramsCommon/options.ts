@@ -13,7 +13,7 @@ export interface CommonProgramOptions {
 
 export interface SrvProgramOptions {
   postgresSrvServiceName?: string;
-  postgresName?: string;
+  postgresDb?: string;
   postgresUser?: string;
   postgresPassword?: string;
   ogmiosSrvServiceName?: string;
