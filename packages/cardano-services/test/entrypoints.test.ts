@@ -54,6 +54,10 @@ describe('entrypoints', () => {
     let ogmiosConnection: Connection;
     let cardanoNodeConfigPath: string;
     let dbQueriesCacheTtl: string;
+    let postgresSrvServiceName: string;
+    let postgresName: string;
+    let postgresUser: string;
+    let postgresPassword: string;
 
     beforeAll(async () => {
       ogmiosPort = await getRandomPort();
@@ -61,6 +65,10 @@ describe('entrypoints', () => {
       dbConnectionString = process.env.DB_CONNECTION_STRING!;
       cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
       dbQueriesCacheTtl = process.env.DB_QUERIES_CACHE_TTL!;
+      postgresSrvServiceName = process.env.POSTGRES_SRV_SERVICE_NAME!;
+      postgresName = process.env.POSTGRES_NAME!;
+      postgresUser = process.env.POSTGRES_USER!;
+      postgresPassword = process.env.POSTGRES_PASSWORD!;
     });
 
     describe('with healthy internal providers', () => {
@@ -291,6 +299,80 @@ describe('entrypoints', () => {
             stdio: 'pipe'
           });
           proc.stderr!.on('data', spy);
+          proc.on('exit', (code) => {
+            expect(code).toBe(1);
+            expect(spy).toHaveBeenCalled();
+            done();
+          });
+        });
+      });
+
+      describe('specifying a PostgreSQL-dependent services with providing db SRV service name alonside with db credentials ', () => {
+        let spy: jest.Mock;
+        beforeEach(async () => {
+          spy = jest.fn();
+        });
+
+        it('cli:start-server throws dns srv error and exits with code 1', (done) => {
+          expect.assertions(3);
+          proc = fork(
+            exePath('cli'),
+            [
+              'start-server',
+              '--api-url',
+              apiUrl,
+              '--postgres-srv-service-name',
+              'pg-test-domain',
+              '--postgres-name',
+              'testnet',
+              '--postgres-user',
+              'postgres',
+              '--postgres-password',
+              'password',
+              '--logger-min-severity',
+              'error',
+              '--service-discovery-timeout',
+              '1000',
+              ServiceNames.StakePool,
+              ServiceNames.NetworkInfo,
+              ServiceNames.Utxo
+            ],
+            {
+              stdio: 'pipe'
+            }
+          );
+
+          proc.stderr!.on('data', (data) => {
+            spy();
+            expect(data.toString().includes('querySrv ENOTFOUND')).toEqual(true);
+          });
+
+          proc.on('exit', (code) => {
+            expect(code).toBe(1);
+            expect(spy).toHaveBeenCalled();
+            done();
+          });
+        });
+
+        it('run throws dns srv error and exits with code 1', (done) => {
+          expect.assertions(3);
+          proc = fork(exePath('run'), {
+            env: {
+              API_URL: apiUrl,
+              LOGGER_MIN_SEVERITY: 'error',
+              POSTGRES_NAME: postgresName,
+              POSTGRES_PASSWORD: postgresPassword,
+              POSTGRES_SRV_SERVICE_NAME: postgresSrvServiceName,
+              POSTGRES_USER: postgresUser,
+              SERVICE_DISCOVERY_BACKOFF_TIMEOUT: '1000',
+              SERVICE_NAMES: `${ServiceNames.StakePool},${ServiceNames.NetworkInfo},${ServiceNames.Utxo}`
+            },
+            stdio: 'pipe'
+          });
+          proc.stderr!.on('data', (data) => {
+            spy();
+            expect(data.toString().includes('querySrv ENOTFOUND')).toEqual(true);
+          });
           proc.on('exit', (code) => {
             expect(code).toBe(1);
             expect(spy).toHaveBeenCalled();
