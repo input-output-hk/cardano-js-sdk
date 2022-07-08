@@ -11,7 +11,7 @@ enum HttpServerOptionDescriptions {
   CacheTtl = 'Cache TTL in minutes between 1 and 2880',
   EpochPollInterval = 'Epoch poll interval',
   ServiceDiscoveryBackoffFactor = 'Exponential backoff factor for service discovery',
-  ServiceDiscoverBackoffTimeout = 'Exponential backoff max timeout for service discovery'
+  ServiceDiscoveryBackoffTimeout = 'Exponential backoff max timeout for service discovery'
 }
 
 enum SrvOptionDescriptions {

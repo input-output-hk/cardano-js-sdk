@@ -1,4 +1,5 @@
 /* eslint-disable max-len */
+/* eslint-disable sonarjs/no-duplicate-string */
 import { CACHE_TTL_DEFAULT } from '../../src/InMemoryCache';
 import { Connection } from '@cardano-sdk/ogmios';
 import { EPOCH_POLL_INTERVAL_DEFAULT } from '../../src/NetworkInfo';
@@ -104,7 +105,7 @@ describe('loadHttpServer', () => {
     });
 
     describe('postgres-dependent services', () => {
-      it('loads the nominated HTTP service and server if all required postgres srv args are set', async () => {
+      it('loads the nominated HTTP service and server with service discovery', async () => {
         httpServer = await loadHttpServer({
           apiUrl,
           options: {
@@ -123,7 +124,7 @@ describe('loadHttpServer', () => {
         expect(httpServer).toBeInstanceOf(HttpServer);
       });
 
-      it('throws if dns port resolution is used but one of the postgres args is missing', async () => {
+      it('throws if service discovery is used but one of the postgres args is missing', async () => {
         const missingPostgresDb = undefined;
 
         await expect(
@@ -144,7 +145,7 @@ describe('loadHttpServer', () => {
         ).rejects.toThrow(MissingProgramOption);
       });
 
-      it('throws if a service is nominated without providing db connection string nor postgres srv service name', async () => {
+      it('throws if a service is nominated without providing db connection string nor service discovery args', async () => {
         await expect(
           async () =>
             await loadHttpServer({
@@ -160,7 +161,7 @@ describe('loadHttpServer', () => {
         ).rejects.toThrow(MissingProgramOption);
       });
 
-      it('throws if a service is nominated with providing both db connection string and postgres srv service name at same time', async () => {
+      it('throws if a service is nominated with providing both db connection string and service discovery args at same time', async () => {
         await expect(
           async () =>
             await loadHttpServer({
@@ -180,7 +181,7 @@ describe('loadHttpServer', () => {
     });
 
     describe('ogmios-dependent services', () => {
-      it('loads the nominated HTTP service and server if ogmios srv service name arg is set', async () => {
+      it('loads the nominated HTTP service and server with service discovery', async () => {
         httpServer = await loadHttpServer({
           apiUrl,
           options: {
@@ -196,7 +197,7 @@ describe('loadHttpServer', () => {
         expect(httpServer).toBeInstanceOf(HttpServer);
       });
 
-      it('loads the nominated HTTP server and take service discovery with priority if both ogmios srv name and url are provided', async () => {
+      it('loads the nominated HTTP server and service discovery takes preference over url if both are provided', async () => {
         httpServer = await loadHttpServer({
           apiUrl,
           options: {
@@ -213,7 +214,7 @@ describe('loadHttpServer', () => {
         expect(httpServer).toBeInstanceOf(HttpServer);
       });
 
-      it('throws if a service is nominated without providing ogmios url nor srv service name', async () => {
+      it('throws if a service is nominated without providing ogmios url nor service discovery name', async () => {
         await expect(
           async () =>
             await loadHttpServer({
@@ -231,7 +232,7 @@ describe('loadHttpServer', () => {
     });
 
     describe('rabbitmq-dependent services', () => {
-      it('loads the nominated HTTP service and server if rabbitmq srv service name arg is set', async () => {
+      it('loads the nominated HTTP service and server with service discovery', async () => {
         httpServer = await loadHttpServer({
           apiUrl,
           options: {
@@ -248,7 +249,7 @@ describe('loadHttpServer', () => {
         expect(httpServer).toBeInstanceOf(HttpServer);
       });
 
-      it('loads the nominated HTTP server and take service discovery with priority if both rabbitmq srv name and url are provided', async () => {
+      it('loads the nominated HTTP server and service discovery takes preference over url if both are provided', async () => {
         httpServer = await loadHttpServer({
           apiUrl,
           options: {
@@ -266,7 +267,7 @@ describe('loadHttpServer', () => {
         expect(httpServer).toBeInstanceOf(HttpServer);
       });
 
-      it('throws if a service is nominated without providing rabbitmq url nor srv service name', async () => {
+      it('throws if a service is nominated without providing rabbitmq url nor service discovery name', async () => {
         await expect(
           async () =>
             await loadHttpServer({

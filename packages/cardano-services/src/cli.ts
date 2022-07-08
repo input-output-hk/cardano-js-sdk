@@ -105,7 +105,7 @@ commonOptions(
   )
   .option(
     '--service-discovery-backoff-timeout <serviceDiscoveryBackoffTimeout>',
-    ProgramOptionDescriptions.ServiceDiscoverBackoffTimeout,
+    ProgramOptionDescriptions.ServiceDiscoveryBackoffTimeout,
     (interval) => Number.parseInt(interval, 10),
     SERVICE_DISCOVERY_BACKOFF_TIMEOUT_DEFAULT
   )

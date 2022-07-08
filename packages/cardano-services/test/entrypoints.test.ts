@@ -104,12 +104,14 @@ describe('entrypoints', () => {
             ServiceNames.StakePool,
             ServiceNames.TxSubmit,
             ServiceNames.NetworkInfo,
-            ServiceNames.Utxo
+            ServiceNames.Utxo,
+            ServiceNames.ChainHistory
           ]);
           await assertServiceHealthy(apiUrl, ServiceNames.StakePool);
           await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit);
           await assertServiceHealthy(apiUrl, ServiceNames.NetworkInfo);
           await assertServiceHealthy(apiUrl, ServiceNames.Utxo);
+          await assertServiceHealthy(apiUrl, ServiceNames.ChainHistory);
         });
 
         it('run exposes a HTTP server at the configured URL with all services attached', async () => {
@@ -121,13 +123,14 @@ describe('entrypoints', () => {
               DB_CONNECTION_STRING: dbConnectionString,
               LOGGER_MIN_SEVERITY: 'error',
               OGMIOS_URL: ogmiosConnection.address.webSocket,
-              SERVICE_NAMES: `${ServiceNames.StakePool},${ServiceNames.TxSubmit},${ServiceNames.NetworkInfo},${ServiceNames.Utxo}`
+              SERVICE_NAMES: `${ServiceNames.StakePool},${ServiceNames.TxSubmit},${ServiceNames.NetworkInfo},${ServiceNames.Utxo},${ServiceNames.ChainHistory}`
             }
           });
           await assertServiceHealthy(apiUrl, ServiceNames.StakePool);
           await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit);
           await assertServiceHealthy(apiUrl, ServiceNames.NetworkInfo);
           await assertServiceHealthy(apiUrl, ServiceNames.Utxo);
+          await assertServiceHealthy(apiUrl, ServiceNames.ChainHistory);
         });
       });
 
@@ -310,7 +313,7 @@ describe('entrypoints', () => {
         });
       });
 
-      describe('specifying a PostgreSQL-dependent services with providing db SRV service name alonside with db credentials', () => {
+      describe('specifying a PostgreSQL-dependent services with providing service discovery args', () => {
         let spy: jest.Mock;
         beforeEach(async () => {
           spy = jest.fn();
@@ -470,7 +473,7 @@ describe('entrypoints', () => {
       });
     });
 
-    describe('specifying a Ogmios-dependent service with providing ogmios SRV service name', () => {
+    describe('specifying a Ogmios-dependent service with providing service discovery name', () => {
       let spy: jest.Mock;
       beforeEach(async () => {
         spy = jest.fn();
@@ -596,7 +599,7 @@ describe('entrypoints', () => {
       });
     });
 
-    describe('specifying a RabbitMQ-dependent service with providing rabbitmq SRV service name', () => {
+    describe('specifying a RabbitMQ-dependent service with providing service discovery name', () => {
       let spy: jest.Mock;
       beforeEach(async () => {
         spy = jest.fn();

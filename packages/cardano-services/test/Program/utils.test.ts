@@ -55,7 +55,7 @@ describe('Service dependencies abstractions', () => {
     systemStart: jest.fn(() => Promise.resolve(new Date(1_563_999_616_000)))
   };
 
-  describe('Postgres-dependant service with provided SRV service name', () => {
+  describe('Postgres-dependant service with service discovery', () => {
     let httpServer: HttpServer;
     let db: Pool | undefined;
     let port: number;
@@ -100,7 +100,7 @@ describe('Service dependencies abstractions', () => {
         jest.clearAllTimers();
       });
 
-      it('db should be instance of a Proxy ', () => {
+      it('db should be a instance of Proxy ', () => {
         expect(types.isProxy(db!)).toEqual(true);
       });
 
@@ -156,7 +156,7 @@ describe('Service dependencies abstractions', () => {
         jest.clearAllTimers();
       });
 
-      it('db should not be instance of a Proxy ', () => {
+      it('db should not be instance a of Proxy ', () => {
         expect(types.isProxy(db!)).toEqual(false);
       });
 
@@ -170,7 +170,7 @@ describe('Service dependencies abstractions', () => {
     });
   });
 
-  describe('Ogmios-dependant service with provided SRV service name', () => {
+  describe('Ogmios-dependant service with service discovery', () => {
     let apiUrlBase: string;
     let ogmiosServer: http.Server;
     let ogmiosConnection: Connection;
@@ -224,7 +224,61 @@ describe('Service dependencies abstractions', () => {
     });
   });
 
-  describe('RabbitMQ-dependant service with provided SRV service name', () => {
+  describe('Ogmios-dependant service with provided connection url', () => {
+    let apiUrlBase: string;
+    let ogmiosServer: http.Server;
+    let ogmiosConnection: Connection;
+    let txSubmitProvider: TxSubmitProvider;
+    let httpServer: HttpServer;
+    let port: number;
+    let config: HttpServerConfig;
+
+    beforeAll(async () => {
+      ogmiosServer = createHealthyMockOgmiosServer();
+      ogmiosConnection = createConnectionObject();
+      await listenPromise(ogmiosServer, { port: ogmiosConnection.port });
+      await ogmiosServerReady(ogmiosConnection);
+    });
+
+    describe('Established connection', () => {
+      beforeAll(async () => {
+        port = await getPort();
+        apiUrlBase = `http://localhost:${port}/tx-submit`;
+        config = { listen: { port } };
+        txSubmitProvider = await getCardanoNodeProvider(dnsSrvResolve, {
+          cacheTtl: 10_000,
+          epochPollInterval: 1000,
+          ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
+          serviceDiscoveryBackoffFactor: 1.1,
+          serviceDiscoveryBackoffTimeout: 1000
+        });
+        httpServer = new HttpServer(config, {
+          services: [new TxSubmitHttpService({ txSubmitProvider })]
+        });
+        await httpServer.initialize();
+        await httpServer.start();
+      });
+
+      afterAll(async () => {
+        await httpServer.shutdown();
+        await serverClosePromise(ogmiosServer);
+      });
+
+      it('txSubmitProvider should be a instance of Proxy ', () => {
+        expect(types.isProxy(txSubmitProvider)).toEqual(false);
+      });
+
+      it('forwards the txSubmitProvider health response', async () => {
+        const res = await axios.post(`${apiUrlBase}/health`, {
+          headers: { 'Content-Type': APPLICATION_JSON }
+        });
+        expect(res.status).toBe(200);
+        expect(res.data).toEqual({ ok: true });
+      });
+    });
+  });
+
+  describe('RabbitMQ-dependant service with service discovery', () => {
     let apiUrlBase: string;
     let txSubmitProvider: TxSubmitProvider;
     let httpServer: HttpServer;
@@ -257,6 +311,51 @@ describe('Service dependencies abstractions', () => {
 
       it('txSubmitProvider should be instance of a Proxy ', () => {
         expect(types.isProxy(txSubmitProvider)).toEqual(true);
+      });
+
+      it('forwards the txSubmitProvider health response', async () => {
+        const res = await axios.post(`${apiUrlBase}/health`, {
+          headers: { 'Content-Type': APPLICATION_JSON }
+        });
+        expect(res.status).toBe(200);
+        expect(res.data).toEqual({ ok: true });
+      });
+    });
+  });
+
+  describe('RabbitMQ-dependant service with provided connection url', () => {
+    let apiUrlBase: string;
+    let txSubmitProvider: TxSubmitProvider;
+    let httpServer: HttpServer;
+    let port: number;
+    let config: HttpServerConfig;
+
+    describe('Established connection', () => {
+      beforeAll(async () => {
+        port = await getPort();
+        apiUrlBase = `http://localhost:${port}/tx-submit`;
+        config = { listen: { port } };
+        txSubmitProvider = await getRabbitMqTxSubmitProvider(dnsSrvResolve, {
+          cacheTtl: 10_000,
+          epochPollInterval: 1000,
+          rabbitmqUrl: new URL(process.env.RABBITMQ_URL!),
+          serviceDiscoveryBackoffFactor: 1.1,
+          serviceDiscoveryBackoffTimeout: 1000,
+          useQueue: true
+        });
+        httpServer = new HttpServer(config, {
+          services: [new TxSubmitHttpService({ txSubmitProvider })]
+        });
+        await httpServer.initialize();
+        await httpServer.start();
+      });
+
+      afterAll(async () => {
+        await httpServer.shutdown();
+      });
+
+      it('txSubmitProvider should not be a instance of Proxy ', () => {
+        expect(types.isProxy(txSubmitProvider)).toEqual(false);
       });
 
       it('forwards the txSubmitProvider health response', async () => {
