@@ -69,6 +69,7 @@ services:
       - db-sync-data:/var/lib/cdbsync
       - node-ipc:/node-ipc
     restart: on-failure
+    stop_signal: SIGINT
     logging:
       driver: "json-file"
       options:
