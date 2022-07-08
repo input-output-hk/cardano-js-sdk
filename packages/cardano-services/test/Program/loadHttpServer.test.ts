@@ -1,8 +1,8 @@
 import { CACHE_TTL_DEFAULT } from '../../src/InMemoryCache';
-import { Connection } from '@cardano-ogmios/client';
-import { DB_POLL_INTERVAL_DEFAULT } from '../../src/NetworkInfo';
+import { Connection } from '@cardano-sdk/ogmios';
+import { EPOCH_POLL_INTERVAL_DEFAULT } from '../../src/NetworkInfo';
 import { HttpServer } from '../../src';
-import { MissingProgramOption, ServiceNames, loadHttpServer } from '../../src/Program';
+import { MissingProgramOption, ProgramOptionDescriptions, ServiceNames, loadHttpServer } from '../../src/Program';
 import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { URL } from 'url';
 import {
@@ -19,8 +19,8 @@ describe('loadHttpServer', () => {
   let apiUrl: URL;
   let cardanoNodeConfigPath: string;
   let dbConnectionString: string;
-  let dbQueriesCacheTtl: number;
-  let dbPollInterval: number;
+  let cacheTtl: number;
+  let epochPollInterval: number;
   let httpServer: HttpServer;
   let ogmiosConnection: Connection;
   let ogmiosServer: http.Server;
@@ -30,8 +30,8 @@ describe('loadHttpServer', () => {
     dbConnectionString = process.env.DB_CONNECTION_STRING!;
     cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
     ogmiosConnection = await createConnectionObjectWithRandomPort();
-    dbQueriesCacheTtl = CACHE_TTL_DEFAULT;
-    dbPollInterval = DB_POLL_INTERVAL_DEFAULT;
+    cacheTtl = CACHE_TTL_DEFAULT;
+    epochPollInterval = EPOCH_POLL_INTERVAL_DEFAULT;
   });
 
   describe('healthy internal providers', () => {
@@ -49,10 +49,10 @@ describe('loadHttpServer', () => {
       httpServer = loadHttpServer({
         apiUrl,
         options: {
+          cacheTtl,
           cardanoNodeConfigPath,
           dbConnectionString,
-          dbPollInterval,
-          dbQueriesCacheTtl,
+          epochPollInterval,
           ogmiosUrl: new URL(ogmiosConnection.address.webSocket)
         },
         serviceNames: [
@@ -79,16 +79,36 @@ describe('loadHttpServer', () => {
             ServiceNames.NetworkInfo
           ]
         })
-      ).toThrow(MissingProgramOption);
+      ).toThrow(new MissingProgramOption(ServiceNames.StakePool, ProgramOptionDescriptions.DbConnection));
     });
 
     it('throws if genesis-config dependent service is nominated without providing the node config path', () => {
       expect(() =>
         loadHttpServer({
           apiUrl,
+          options: {
+            cacheTtl: 0,
+            dbConnectionString: 'postgres',
+            epochPollInterval: 0,
+            ogmiosUrl: new URL('http://localhost:1337')
+          },
           serviceNames: [ServiceNames.NetworkInfo]
         })
-      ).toThrow(MissingProgramOption);
+      ).toThrow(new MissingProgramOption(ServiceNames.NetworkInfo, ProgramOptionDescriptions.CardanoNodeConfigPath));
+    });
+    it('throws if ogmios dependent service is nominated without providing the ogmios url', () => {
+      expect(() =>
+        loadHttpServer({
+          apiUrl,
+          options: {
+            cacheTtl: 0,
+            cardanoNodeConfigPath: 'config',
+            dbConnectionString: 'postgres',
+            epochPollInterval: 0
+          },
+          serviceNames: [ServiceNames.NetworkInfo]
+        })
+      ).toThrow(new MissingProgramOption(ServiceNames.NetworkInfo, ProgramOptionDescriptions.OgmiosUrl));
     });
   });
 
@@ -108,9 +128,9 @@ describe('loadHttpServer', () => {
         loadHttpServer({
           apiUrl,
           options: {
+            cacheTtl,
             dbConnectionString,
-            dbPollInterval,
-            dbQueriesCacheTtl,
+            epochPollInterval,
             ogmiosUrl: new URL(ogmiosConnection.address.webSocket)
           },
           serviceNames: [ServiceNames.StakePool, ServiceNames.TxSubmit]

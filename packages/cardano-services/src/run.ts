@@ -2,8 +2,8 @@
 import * as envalid from 'envalid';
 import { API_URL_DEFAULT, OGMIOS_URL_DEFAULT, RABBITMQ_URL_DEFAULT, ServiceNames, loadHttpServer } from './Program';
 import { CACHE_TTL_DEFAULT } from './InMemoryCache';
-import { DB_POLL_INTERVAL_DEFAULT } from './NetworkInfo';
 import { ENABLE_METRICS_DEFAULT, USE_QUEUE_DEFAULT } from './ProgramsCommon';
+import { EPOCH_POLL_INTERVAL_DEFAULT } from './NetworkInfo';
 import { LogLevel } from 'bunyan';
 import { URL } from 'url';
 import { cacheTtlValidator } from './util/validators';
@@ -21,11 +21,11 @@ const existingFileValidator = envalid.makeValidator((filePath: string) => {
 
 const envSpecs = {
   API_URL: envalid.url({ default: API_URL_DEFAULT }),
+  CACHE_TTL: envalid.makeValidator(cacheTtlValidator)(envalid.num({ default: CACHE_TTL_DEFAULT })),
   CARDANO_NODE_CONFIG_PATH: envalid.str({ default: undefined }),
   DB_CONNECTION_STRING: envalid.str({ default: undefined }),
-  DB_POLL_INTERVAL: envalid.num({ default: DB_POLL_INTERVAL_DEFAULT }),
-  DB_QUERIES_CACHE_TTL: envalid.makeValidator(cacheTtlValidator)(envalid.num({ default: CACHE_TTL_DEFAULT })),
   ENABLE_METRICS: envalid.bool({ default: ENABLE_METRICS_DEFAULT }),
+  EPOCH_POLL_INTERVAL: envalid.num({ default: EPOCH_POLL_INTERVAL_DEFAULT }),
   LOGGER_MIN_SEVERITY: envalid.str({ choices: loggerMethodNames as string[], default: 'info' }),
   OGMIOS_URL: envalid.url({ default: OGMIOS_URL_DEFAULT }),
   POSTGRES_DB_FILE: existingFileValidator({ default: undefined }),
@@ -47,8 +47,8 @@ void (async () => {
   const ogmiosUrl = new URL(env.OGMIOS_URL);
   const rabbitmqUrl = new URL(env.RABBITMQ_URL);
   const cardanoNodeConfigPath = env.CARDANO_NODE_CONFIG_PATH;
-  const dbQueriesCacheTtl = env.DB_QUERIES_CACHE_TTL;
-  const dbPollInterval = env.DB_POLL_INTERVAL;
+  const cacheTtl = env.CACHE_TTL;
+  const epochPollInterval = env.EPOCH_POLL_INTERVAL;
   const dbName = env.POSTGRES_DB_FILE ? loadSecret(env.POSTGRES_DB_FILE) : undefined;
   const dbPassword = env.POSTGRES_PASSWORD_FILE ? loadSecret(env.POSTGRES_PASSWORD_FILE) : undefined;
   const dbUser = env.POSTGRES_USER_FILE ? loadSecret(env.POSTGRES_USER_FILE) : undefined;
@@ -61,17 +61,16 @@ void (async () => {
     dbConnectionString = `postgresql://${dbUser}:${dbPassword}@${env.POSTGRES_HOST}:${env.POSTGRES_PORT}/${dbName}`;
   }
   const metricsEnabled = env.ENABLE_METRICS;
-
   const serviceNames = env.SERVICE_NAMES.split(',') as ServiceNames[];
 
   try {
-    const server = await loadHttpServer({
+    const server = loadHttpServer({
       apiUrl,
       options: {
+        cacheTtl,
         cardanoNodeConfigPath,
         dbConnectionString,
-        dbPollInterval,
-        dbQueriesCacheTtl,
+        epochPollInterval,
         loggerMinSeverity: env.LOGGER_MIN_SEVERITY as LogLevel,
         metricsEnabled,
         ogmiosUrl,

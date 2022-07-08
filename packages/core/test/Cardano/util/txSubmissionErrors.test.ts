@@ -22,7 +22,7 @@ describe('txSubmissionErrors', () => {
     });
   });
 
-  describe('hasTxSubmissionError', () => {
+  describe('asTxSubmissionError', () => {
     it('is true if the value is a tx submission error', () => {
       expect(util.asTxSubmissionError(badInputsError)).toBeTruthy();
     });

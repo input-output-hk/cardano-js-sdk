@@ -9,19 +9,19 @@ import { DbSyncUtxoProvider, UtxoHttpService } from '../Utxo';
 import { HttpServer, HttpServerConfig, HttpService } from '../Http';
 import { InMemoryCache } from '../InMemoryCache';
 import { MissingProgramOption, UnknownServiceName } from './errors';
+import { OgmiosCardanoNode, ogmiosTxSubmitProvider, urlToConnectionConfig } from '@cardano-sdk/ogmios';
 import { ProgramOptionDescriptions } from './ProgramOptionDescriptions';
 import { RabbitMqTxSubmitProvider } from '@cardano-sdk/rabbitmq';
 import { ServiceNames } from './ServiceNames';
 import { TxSubmitHttpService } from '../TxSubmit';
 import { createDbSyncMetadataService } from '../Metadata';
-import { ogmiosTxSubmitProvider, urlToConnectionConfig } from '@cardano-sdk/ogmios';
 import Logger, { createLogger } from 'bunyan';
 import pg from 'pg';
 
 export interface HttpServerOptions extends CommonProgramOptions {
   dbConnectionString?: string;
-  dbQueriesCacheTtl: number;
-  dbPollInterval: number;
+  cacheTtl: number;
+  epochPollInterval: number;
   cardanoNodeConfigPath?: string;
   metricsEnabled?: boolean;
   useQueue?: boolean;
@@ -69,13 +69,15 @@ const serviceMapFactory = (args: ProgramArgs, logger: Logger, cache: InMemoryCac
     if (!db) throw new MissingProgramOption(ServiceNames.NetworkInfo, ProgramOptionDescriptions.DbConnection);
     if (args.options?.cardanoNodeConfigPath === undefined)
       throw new MissingProgramOption(ServiceNames.NetworkInfo, ProgramOptionDescriptions.CardanoNodeConfigPath);
+    if (args.options?.ogmiosUrl === undefined)
+      throw new MissingProgramOption(ServiceNames.NetworkInfo, ProgramOptionDescriptions.OgmiosUrl);
 
     const networkInfoProvider = new DbSyncNetworkInfoProvider(
       {
-        cardanoNodeConfigPath: args.options?.cardanoNodeConfigPath,
-        dbPollInterval: args.options?.dbPollInterval
+        cardanoNodeConfigPath: args.options.cardanoNodeConfigPath,
+        epochPollInterval: args.options?.epochPollInterval
       },
-      { cache, db, logger }
+      { cache, cardanoNode: new OgmiosCardanoNode(urlToConnectionConfig(args.options.ogmiosUrl), logger), db, logger }
     );
 
     return new NetworkInfoHttpService({ logger, networkInfoProvider });
@@ -101,7 +103,7 @@ export const loadHttpServer = (args: ProgramArgs): HttpServer => {
     ? new pg.Pool({ connectionString: args.options.dbConnectionString })
     : undefined;
 
-  const cache = new InMemoryCache(args.options?.dbQueriesCacheTtl);
+  const cache = new InMemoryCache(args.options?.cacheTtl);
 
   const serviceMap = serviceMapFactory(args, logger, cache, db);
 
