@@ -24,6 +24,7 @@ const assertServiceHealthy = async (apiUrl: string, serviceName: ServiceNames) =
 describe('entrypoints', () => {
   let apiPort: number;
   let apiUrl: string;
+  let ogmiosServer: http.Server;
   let proc: ChildProcess;
 
   beforeEach(async () => {
@@ -33,6 +34,9 @@ describe('entrypoints', () => {
 
   afterEach(() => {
     if (proc !== undefined) proc.kill();
+    if (ogmiosServer !== undefined) {
+      return serverClosePromise(ogmiosServer);
+    }
   });
 
   it('CLI version', (done) => {
@@ -49,7 +53,6 @@ describe('entrypoints', () => {
 
   describe('start-server', () => {
     let dbConnectionString: string;
-    let ogmiosServer: http.Server;
     let ogmiosPort: ConnectionConfig['port'];
     let ogmiosConnection: Connection;
     let cardanoNodeConfigPath: string;
@@ -69,10 +72,6 @@ describe('entrypoints', () => {
           ogmiosServer = createHealthyMockOgmiosServer();
           await listenPromise(ogmiosServer, { port: ogmiosConnection.port });
           await ogmiosServerReady(ogmiosConnection);
-        });
-
-        afterEach(async () => {
-          await serverClosePromise(ogmiosServer);
         });
 
         it('cli:start-server exposes a HTTP server at the configured URL with all services attached', async () => {
@@ -122,7 +121,7 @@ describe('entrypoints', () => {
 
       describe('specifying a PostgreSQL-dependent service without providing the connection string', () => {
         let spy: jest.Mock;
-        beforeEach(async () => {
+        beforeEach(() => {
           spy = jest.fn();
         });
 
@@ -301,7 +300,7 @@ describe('entrypoints', () => {
 
       describe('specifying a Cardano-Configurations-dependent service without providing the node config path', () => {
         let spy: jest.Mock;
-        beforeEach(async () => {
+        beforeEach(() => {
           spy = jest.fn();
         });
 
@@ -358,10 +357,6 @@ describe('entrypoints', () => {
           ogmiosConnection = createConnectionObject();
           await listenPromise(ogmiosServer, { port: ogmiosConnection.port });
           await ogmiosServerReady(ogmiosConnection);
-        });
-
-        afterEach(async () => {
-          await serverClosePromise(ogmiosServer);
         });
 
         it('cli:start-server uses the default Ogmios configuration if not specified', async () => {
@@ -454,13 +449,9 @@ describe('entrypoints', () => {
 
     describe('with unhealthy internal providers', () => {
       let spy: jest.Mock;
-      beforeEach(async () => {
+      beforeEach(() => {
         ogmiosServer = createUnhealthyMockOgmiosServer();
         spy = jest.fn();
-      });
-
-      afterEach(async () => {
-        await serverClosePromise(ogmiosServer);
       });
 
       it('cli:start-server exits with code 1', (done) => {
@@ -519,13 +510,9 @@ describe('entrypoints', () => {
 
     describe('specifying an unknown service', () => {
       let spy: jest.Mock;
-      beforeEach(async () => {
+      beforeEach(() => {
         ogmiosServer = createHealthyMockOgmiosServer();
         spy = jest.fn();
-      });
-
-      afterEach(async () => {
-        await serverClosePromise(ogmiosServer);
       });
 
       it('cli:start-server exits with code 1', (done) => {
