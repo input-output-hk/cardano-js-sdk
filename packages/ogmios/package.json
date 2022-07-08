@@ -28,18 +28,22 @@
     "lint": "eslint -c ../../complete.eslintrc.js \"src/**/*.ts\" \"test/**/*.ts\"",
     "lint:fix": "yarn lint --fix",
     "test": "jest -c ./jest.config.js",
-    "test:build:verify": "tsc --build ./test",
     "test:e2e": "shx echo 'test:e2e' command not implemented yet",
+    "test:build:verify": "tsc --build ./test",
     "coverage": "shx echo No coverage report for this package",
     "prepack": "yarn build"
   },
   "devDependencies": {
+    "@types/node": "14.18.12",
     "get-port-please": "^2.5.0",
     "shx": "^0.3.3",
     "ws": "^8.5.0"
   },
   "dependencies": {
-    "@cardano-ogmios/client": "5.4.0"
+    "@cardano-ogmios/client": "5.4.0",
+    "@cardano-sdk/core": "0.3.0",
+    "ts-log": "^2.2.3",
+    "buffer": "5.7.1"
   },
   "files": [
     "dist/*",

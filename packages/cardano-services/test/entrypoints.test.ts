@@ -2,7 +2,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable max-len */
 import { ChildProcess, fork } from 'child_process';
-import { Connection, ConnectionConfig, createConnectionObject } from '@cardano-ogmios/client';
+import { Connection, ConnectionConfig, createConnectionObject } from '@cardano-sdk/ogmios';
 import { RABBITMQ_URL_DEFAULT, ServiceNames } from '../src';
 import { createHealthyMockOgmiosServer, createUnhealthyMockOgmiosServer, ogmiosServerReady, serverReady } from './util';
 import { getRandomPort } from 'get-port-please';
@@ -24,6 +24,7 @@ const assertServiceHealthy = async (apiUrl: string, serviceName: ServiceNames) =
 describe('entrypoints', () => {
   let apiPort: number;
   let apiUrl: string;
+  let ogmiosServer: http.Server;
   let proc: ChildProcess;
 
   beforeEach(async () => {
@@ -33,6 +34,9 @@ describe('entrypoints', () => {
 
   afterEach(() => {
     if (proc !== undefined) proc.kill();
+    if (ogmiosServer !== undefined) {
+      return serverClosePromise(ogmiosServer);
+    }
   });
 
   it('CLI version', (done) => {
@@ -49,11 +53,10 @@ describe('entrypoints', () => {
 
   describe('start-server', () => {
     let dbConnectionString: string;
-    let ogmiosServer: http.Server;
     let ogmiosPort: ConnectionConfig['port'];
     let ogmiosConnection: Connection;
     let cardanoNodeConfigPath: string;
-    let dbQueriesCacheTtl: string;
+    let cacheTtl: string;
     let postgresSrvServiceName: string;
     let postgresDb: string;
     let postgresUser: string;
@@ -66,7 +69,7 @@ describe('entrypoints', () => {
       ogmiosConnection = createConnectionObject({ port: ogmiosPort });
       dbConnectionString = process.env.DB_CONNECTION_STRING!;
       cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
-      dbQueriesCacheTtl = process.env.DB_QUERIES_CACHE_TTL!;
+      cacheTtl = process.env.CACHE_TTL!;
       postgresSrvServiceName = process.env.POSTGRES_SRV_SERVICE_NAME!;
       postgresDb = process.env.POSTGRES_DB!;
       postgresUser = process.env.POSTGRES_USER!;
@@ -83,10 +86,6 @@ describe('entrypoints', () => {
           await ogmiosServerReady(ogmiosConnection);
         });
 
-        afterEach(async () => {
-          await serverClosePromise(ogmiosServer);
-        });
-
         it('cli:start-server exposes a HTTP server at the configured URL with all services attached', async () => {
           proc = fork(exePath('cli'), [
             'start-server',
@@ -100,8 +99,8 @@ describe('entrypoints', () => {
             ogmiosConnection.address.webSocket,
             '--cardano-node-config-path',
             cardanoNodeConfigPath,
-            '--db-queries-cache-ttl',
-            dbQueriesCacheTtl,
+            '--cache-ttl',
+            cacheTtl,
             ServiceNames.StakePool,
             ServiceNames.TxSubmit,
             ServiceNames.NetworkInfo,
@@ -117,9 +116,9 @@ describe('entrypoints', () => {
           proc = fork(exePath('run'), {
             env: {
               API_URL: apiUrl,
+              CACHE_TTL: cacheTtl,
               CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
               DB_CONNECTION_STRING: dbConnectionString,
-              DB_QUERIES_CACHE_TTL: dbQueriesCacheTtl,
               LOGGER_MIN_SEVERITY: 'error',
               OGMIOS_URL: ogmiosConnection.address.webSocket,
               SERVICE_NAMES: `${ServiceNames.StakePool},${ServiceNames.TxSubmit},${ServiceNames.NetworkInfo},${ServiceNames.Utxo}`
@@ -134,7 +133,7 @@ describe('entrypoints', () => {
 
       describe('specifying a PostgreSQL-dependent service without providing the connection string', () => {
         let spy: jest.Mock;
-        beforeEach(async () => {
+        beforeEach(() => {
           spy = jest.fn();
         });
 
@@ -194,7 +193,7 @@ describe('entrypoints', () => {
               'error',
               '--cardano-node-config-path',
               cardanoNodeConfigPath,
-              '--db-queries-cache-ttl',
+              '--cache-ttl',
               cacheTtlOutOfRange,
               ServiceNames.NetworkInfo
             ],
@@ -278,7 +277,7 @@ describe('entrypoints', () => {
           proc = fork(exePath('run'), {
             env: {
               API_URL: apiUrl,
-              DB_QUERIES_CACHE_TTL: cacheTtlOutOfRange,
+              CACHE_TTL: cacheTtlOutOfRange,
               LOGGER_MIN_SEVERITY: 'error',
               SERVICE_NAMES: ServiceNames.NetworkInfo
             },
@@ -387,7 +386,7 @@ describe('entrypoints', () => {
 
       describe('specifying a Cardano-Configurations-dependent service without providing the node config path', () => {
         let spy: jest.Mock;
-        beforeEach(async () => {
+        beforeEach(() => {
           spy = jest.fn();
         });
 
@@ -444,10 +443,6 @@ describe('entrypoints', () => {
           ogmiosConnection = createConnectionObject();
           await listenPromise(ogmiosServer, { port: ogmiosConnection.port });
           await ogmiosServerReady(ogmiosConnection);
-        });
-
-        afterEach(async () => {
-          await serverClosePromise(ogmiosServer);
         });
 
         it('cli:start-server uses the default Ogmios configuration if not specified', async () => {
@@ -668,13 +663,9 @@ describe('entrypoints', () => {
 
     describe('with unhealthy internal providers', () => {
       let spy: jest.Mock;
-      beforeEach(async () => {
+      beforeEach(() => {
         ogmiosServer = createUnhealthyMockOgmiosServer();
         spy = jest.fn();
-      });
-
-      afterEach(async () => {
-        await serverClosePromise(ogmiosServer);
       });
 
       it('cli:start-server exits with code 1', (done) => {
@@ -733,13 +724,9 @@ describe('entrypoints', () => {
 
     describe('specifying an unknown service', () => {
       let spy: jest.Mock;
-      beforeEach(async () => {
+      beforeEach(() => {
         ogmiosServer = createHealthyMockOgmiosServer();
         spy = jest.fn();
-      });
-
-      afterEach(async () => {
-        await serverClosePromise(ogmiosServer);
       });
 
       it('cli:start-server exits with code 1', (done) => {

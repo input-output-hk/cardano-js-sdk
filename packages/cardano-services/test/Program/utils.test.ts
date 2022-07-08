@@ -2,6 +2,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { Connection } from '@cardano-ogmios/client';
 import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../src/NetworkInfo';
+import { EraSummary, TxSubmitProvider } from '@cardano-sdk/core';
 import {
   HttpServer,
   HttpServerConfig,
@@ -14,7 +15,6 @@ import {
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../src/InMemoryCache';
 import { Pool } from 'pg';
 import { SrvRecord } from 'dns';
-import { TxSubmitProvider } from '@cardano-sdk/core';
 import { createConnectionObject } from '@cardano-sdk/ogmios';
 import { createHealthyMockOgmiosServer, ogmiosServerReady } from '../util';
 import { createLogger } from 'bunyan';
@@ -41,6 +41,19 @@ describe('Service dependencies abstractions', () => {
   const cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
   const logger = createLogger({ level: 'error', name: 'test' });
   const dnsSrvResolve = getDnsSrvResolveWithExponentialBackoff({ factor: 1.1, maxRetryTime: 1000 }, cache, logger);
+  const mockEraSummaries: EraSummary[] = [
+    { parameters: { epochLength: 21_600, slotLength: 20_000 }, start: { slot: 0, time: new Date(1_563_999_616_000) } },
+    {
+      parameters: { epochLength: 432_000, slotLength: 1000 },
+      start: { slot: 1_598_400, time: new Date(1_595_964_016_000) }
+    }
+  ];
+  const cardanoNode = {
+    eraSummaries: jest.fn(() => Promise.resolve(mockEraSummaries)),
+    initialize: jest.fn(() => Promise.resolve()),
+    shutdown: jest.fn(() => Promise.resolve()),
+    systemStart: jest.fn(() => Promise.resolve(new Date(1_563_999_616_000)))
+  };
 
   describe('Postgres-dependant service with provided SRV service name', () => {
     let httpServer: HttpServer;
@@ -53,8 +66,8 @@ describe('Service dependencies abstractions', () => {
 
     beforeAll(async () => {
       db = await getPool(dnsSrvResolve, {
-        dbPollInterval: 1000,
-        dbQueriesCacheTtl: 10_000,
+        cacheTtl: 10_000,
+        epochPollInterval: 1000,
         postgresDb: process.env.POSTGRES_DB!,
         postgresPassword: process.env.POSTGRES_PASSWORD!,
         postgresSrvServiceName: process.env.POSTGRES_SRV_SERVICE_NAME!,
@@ -70,8 +83,8 @@ describe('Service dependencies abstractions', () => {
         config = { listen: { port } };
         apiUrlBase = `http://localhost:${port}/network-info`;
         networkInfoProvider = new DbSyncNetworkInfoProvider(
-          { cardanoNodeConfigPath, dbPollInterval: 2000 },
-          { cache, db: db! }
+          { cardanoNodeConfigPath, epochPollInterval: 2000 },
+          { cache, cardanoNode, db: db! }
         );
         service = new NetworkInfoHttpService({ networkInfoProvider });
         httpServer = new HttpServer(config, { services: [service] });
@@ -112,9 +125,9 @@ describe('Service dependencies abstractions', () => {
 
     beforeAll(async () => {
       db = await getPool(dnsSrvResolve, {
+        cacheTtl: 10_000,
         dbConnectionString: process.env.DB_CONNECTION_STRING,
-        dbPollInterval: 1000,
-        dbQueriesCacheTtl: 10_000,
+        epochPollInterval: 1000,
         serviceDiscoveryBackoffFactor: 1.1,
         serviceDiscoveryBackoffTimeout: 1000
       });
@@ -126,8 +139,8 @@ describe('Service dependencies abstractions', () => {
         config = { listen: { port } };
         apiUrlBase = `http://localhost:${port}/network-info`;
         networkInfoProvider = new DbSyncNetworkInfoProvider(
-          { cardanoNodeConfigPath, dbPollInterval: 2000 },
-          { cache, db: db! }
+          { cardanoNodeConfigPath, epochPollInterval: 2000 },
+          { cache, cardanoNode, db: db! }
         );
         service = new NetworkInfoHttpService({ networkInfoProvider });
         httpServer = new HttpServer(config, { services: [service] });
@@ -179,8 +192,8 @@ describe('Service dependencies abstractions', () => {
         apiUrlBase = `http://localhost:${port}/tx-submit`;
         config = { listen: { port } };
         txSubmitProvider = await getCardanoNodeProvider(dnsSrvResolve, {
-          dbPollInterval: 1000,
-          dbQueriesCacheTtl: 10_000,
+          cacheTtl: 10_000,
+          epochPollInterval: 1000,
           ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME,
           serviceDiscoveryBackoffFactor: 1.1,
           serviceDiscoveryBackoffTimeout: 1000
@@ -224,8 +237,8 @@ describe('Service dependencies abstractions', () => {
         apiUrlBase = `http://localhost:${port}/tx-submit`;
         config = { listen: { port } };
         txSubmitProvider = await getRabbitMqTxSubmitProvider(dnsSrvResolve, {
-          dbPollInterval: 1000,
-          dbQueriesCacheTtl: 10_000,
+          cacheTtl: 10_000,
+          epochPollInterval: 1000,
           rabbitmqSrvServiceName: process.env.RABBITMQ_SRV_SERVICE_NAME,
           serviceDiscoveryBackoffFactor: 1.1,
           serviceDiscoveryBackoffTimeout: 1000,

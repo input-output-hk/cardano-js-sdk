@@ -1,11 +1,12 @@
 /* eslint-disable max-len */
 import { CACHE_TTL_DEFAULT } from '../../src/InMemoryCache';
-import { Connection } from '@cardano-ogmios/client';
-import { DB_POLL_INTERVAL_DEFAULT } from '../../src/NetworkInfo';
+import { Connection } from '@cardano-sdk/ogmios';
+import { EPOCH_POLL_INTERVAL_DEFAULT } from '../../src/NetworkInfo';
 import { HttpServer } from '../../src';
 import {
   InvalidArgsCombination,
   MissingProgramOption,
+  ProgramOptionDescriptions,
   SERVICE_DISCOVERY_BACKOFF_FACTOR_DEFAULT,
   SERVICE_DISCOVERY_BACKOFF_TIMEOUT_DEFAULT,
   ServiceNames,
@@ -38,8 +39,8 @@ describe('loadHttpServer', () => {
   let postgresDb: string;
   let postgresUser: string;
   let postgresPassword: string;
-  let dbQueriesCacheTtl: number;
-  let dbPollInterval: number;
+  let cacheTtl: number;
+  let epochPollInterval: number;
   let httpServer: HttpServer;
   let ogmiosConnection: Connection;
   let ogmiosSrvServiceName: string;
@@ -59,12 +60,12 @@ describe('loadHttpServer', () => {
     cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
     ogmiosConnection = await createConnectionObjectWithRandomPort();
     ogmiosSrvServiceName = process.env.OGMIOS_SRV_SERVICE_NAME!;
-    dbQueriesCacheTtl = CACHE_TTL_DEFAULT;
-    dbPollInterval = DB_POLL_INTERVAL_DEFAULT;
     serviceDiscoveryBackoffFactor = SERVICE_DISCOVERY_BACKOFF_FACTOR_DEFAULT;
     serviceDiscoveryBackoffTimeout = SERVICE_DISCOVERY_BACKOFF_TIMEOUT_DEFAULT;
     rabbitmqUrl = new URL(process.env.RABBITMQ_URL!);
     rabbitmqSrvServiceName = process.env.RABBITMQ_SRV_SERVICE_NAME!;
+    cacheTtl = CACHE_TTL_DEFAULT;
+    epochPollInterval = EPOCH_POLL_INTERVAL_DEFAULT;
   });
 
   describe('healthy internal providers', () => {
@@ -82,10 +83,10 @@ describe('loadHttpServer', () => {
       httpServer = await loadHttpServer({
         apiUrl,
         options: {
+          cacheTtl,
           cardanoNodeConfigPath,
           dbConnectionString,
-          dbPollInterval,
-          dbQueriesCacheTtl,
+          epochPollInterval,
           ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
           serviceDiscoveryBackoffFactor,
           serviceDiscoveryBackoffTimeout
@@ -107,8 +108,8 @@ describe('loadHttpServer', () => {
         httpServer = await loadHttpServer({
           apiUrl,
           options: {
-            dbPollInterval,
-            dbQueriesCacheTtl,
+            cacheTtl,
+            epochPollInterval,
             postgresDb,
             postgresPassword,
             postgresSrvServiceName,
@@ -130,8 +131,8 @@ describe('loadHttpServer', () => {
             await loadHttpServer({
               apiUrl,
               options: {
-                dbPollInterval,
-                dbQueriesCacheTtl,
+                cacheTtl,
+                epochPollInterval,
                 postgresDb: missingPostgresDb,
                 postgresSrvServiceName,
                 postgresUser,
@@ -149,8 +150,8 @@ describe('loadHttpServer', () => {
             await loadHttpServer({
               apiUrl,
               options: {
-                dbPollInterval,
-                dbQueriesCacheTtl,
+                cacheTtl,
+                epochPollInterval,
                 serviceDiscoveryBackoffFactor,
                 serviceDiscoveryBackoffTimeout
               },
@@ -165,9 +166,9 @@ describe('loadHttpServer', () => {
             await loadHttpServer({
               apiUrl,
               options: {
+                cacheTtl,
                 dbConnectionString,
-                dbPollInterval,
-                dbQueriesCacheTtl,
+                epochPollInterval,
                 postgresSrvServiceName,
                 serviceDiscoveryBackoffFactor,
                 serviceDiscoveryBackoffTimeout
@@ -183,8 +184,8 @@ describe('loadHttpServer', () => {
         httpServer = await loadHttpServer({
           apiUrl,
           options: {
-            dbPollInterval,
-            dbQueriesCacheTtl,
+            cacheTtl,
+            epochPollInterval,
             ogmiosSrvServiceName,
             serviceDiscoveryBackoffFactor,
             serviceDiscoveryBackoffTimeout
@@ -199,8 +200,8 @@ describe('loadHttpServer', () => {
         httpServer = await loadHttpServer({
           apiUrl,
           options: {
-            dbPollInterval,
-            dbQueriesCacheTtl,
+            cacheTtl,
+            epochPollInterval,
             ogmiosSrvServiceName,
             ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
             serviceDiscoveryBackoffFactor,
@@ -218,8 +219,8 @@ describe('loadHttpServer', () => {
             await loadHttpServer({
               apiUrl,
               options: {
-                dbPollInterval,
-                dbQueriesCacheTtl,
+                cacheTtl,
+                epochPollInterval,
                 serviceDiscoveryBackoffFactor,
                 serviceDiscoveryBackoffTimeout
               },
@@ -234,8 +235,8 @@ describe('loadHttpServer', () => {
         httpServer = await loadHttpServer({
           apiUrl,
           options: {
-            dbPollInterval,
-            dbQueriesCacheTtl,
+            cacheTtl,
+            epochPollInterval,
             rabbitmqSrvServiceName,
             serviceDiscoveryBackoffFactor,
             serviceDiscoveryBackoffTimeout,
@@ -251,8 +252,8 @@ describe('loadHttpServer', () => {
         httpServer = await loadHttpServer({
           apiUrl,
           options: {
-            dbPollInterval,
-            dbQueriesCacheTtl,
+            cacheTtl,
+            epochPollInterval,
             rabbitmqSrvServiceName,
             rabbitmqUrl,
             serviceDiscoveryBackoffFactor,
@@ -271,8 +272,8 @@ describe('loadHttpServer', () => {
             await loadHttpServer({
               apiUrl,
               options: {
-                dbPollInterval,
-                dbQueriesCacheTtl,
+                cacheTtl,
+                epochPollInterval,
                 serviceDiscoveryBackoffFactor,
                 serviceDiscoveryBackoffTimeout,
                 useQueue: true
@@ -289,14 +290,18 @@ describe('loadHttpServer', () => {
           await loadHttpServer({
             apiUrl,
             options: {
-              dbPollInterval,
-              dbQueriesCacheTtl,
+              cacheTtl: 0,
+              dbConnectionString: 'postgres',
+              epochPollInterval: 0,
+              ogmiosUrl: new URL('http://localhost:1337'),
               serviceDiscoveryBackoffFactor,
               serviceDiscoveryBackoffTimeout
             },
             serviceNames: [ServiceNames.NetworkInfo]
           })
-      ).rejects.toThrow(MissingProgramOption);
+      ).rejects.toThrow(
+        new MissingProgramOption(ServiceNames.NetworkInfo, ProgramOptionDescriptions.CardanoNodeConfigPath)
+      );
     });
   });
 
@@ -311,21 +316,20 @@ describe('loadHttpServer', () => {
       await serverClosePromise(ogmiosServer);
     });
 
-    it('should not throw if any internal providers are unhealthy during HTTP server initialization', async () => {
-      expect(
-        async () =>
-          await loadHttpServer({
-            apiUrl,
-            options: {
-              dbConnectionString,
-              dbPollInterval,
-              dbQueriesCacheTtl,
-              ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
-              serviceDiscoveryBackoffFactor,
-              serviceDiscoveryBackoffTimeout
-            },
-            serviceNames: [ServiceNames.StakePool, ServiceNames.TxSubmit]
-          })
+    it('should not throw if any internal providers are unhealthy during HTTP server initialization', () => {
+      expect(() =>
+        loadHttpServer({
+          apiUrl,
+          options: {
+            cacheTtl,
+            dbConnectionString,
+            epochPollInterval,
+            ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
+            serviceDiscoveryBackoffFactor,
+            serviceDiscoveryBackoffTimeout
+          },
+          serviceNames: [ServiceNames.StakePool, ServiceNames.TxSubmit]
+        })
       ).not.toThrow(new ProviderError(ProviderFailure.Unhealthy));
     });
   });

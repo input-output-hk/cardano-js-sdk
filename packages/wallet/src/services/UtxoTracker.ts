@@ -27,12 +27,12 @@ export const createUtxoProvider = (
 ) =>
   addresses$.pipe(
     switchMap((addresses) =>
-      coldObservableProvider(
-        () => utxoProvider.utxoByAddresses(addresses),
+      coldObservableProvider({
+        equals: utxoEquals,
+        provider: () => utxoProvider.utxoByAddresses(addresses),
         retryBackoffConfig,
-        tipBlockHeight$,
-        utxoEquals
-      )
+        trigger$: tipBlockHeight$
+      })
     )
   );
 

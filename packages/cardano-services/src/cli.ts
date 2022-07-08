@@ -11,7 +11,7 @@ import {
 import { CACHE_TTL_DEFAULT } from './InMemoryCache';
 import { Command } from 'commander';
 import { CommonOptionDescriptions, Programs, USE_QUEUE_DEFAULT, WrongOption } from './ProgramsCommon';
-import { DB_POLL_INTERVAL_DEFAULT } from './NetworkInfo';
+import { EPOCH_POLL_INTERVAL_DEFAULT } from './NetworkInfo';
 import { InvalidLoggerLevel } from './errors';
 import {
   PARALLEL_MODE_DEFAULT,
@@ -90,17 +90,12 @@ commonOptions(
     new URL(url).toString()
   )
   .option('--cardano-node-config-path <cardanoNodeConfigPath>', ProgramOptionDescriptions.CardanoNodeConfigPath)
+  .option('--cache-ttl <cacheTtl>', ProgramOptionDescriptions.CacheTtl, cacheTtlValidator, CACHE_TTL_DEFAULT)
   .option(
-    '--db-queries-cache-ttl <dbQueriesCacheTtl>',
-    ProgramOptionDescriptions.DbQueriesCacheTtl,
-    cacheTtlValidator,
-    CACHE_TTL_DEFAULT
-  )
-  .option(
-    '--db-poll-interval <dbPollInterval>',
-    ProgramOptionDescriptions.DbPollInterval,
+    '--epoch-poll-interval <epochPollInterval>',
+    ProgramOptionDescriptions.EpochPollInterval,
     (interval) => Number.parseInt(interval, 10),
-    DB_POLL_INTERVAL_DEFAULT
+    EPOCH_POLL_INTERVAL_DEFAULT
   )
   .option(
     '--service-discovery-backoff-factor <serviceDiscoveryBackoffFactor>',

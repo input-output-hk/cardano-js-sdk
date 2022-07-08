@@ -25,15 +25,15 @@ export const createQueryStakePoolsProvider =
   (poolIds: Cardano.PoolId[]) =>
     merge(
       store.getValues(poolIds),
-      coldObservableProvider(
-        () =>
+      coldObservableProvider({
+        provider: () =>
           stakePoolProvider
             .queryStakePools({
               filters: { identifier: { values: poolIds.map((poolId) => ({ id: poolId })) } }
             })
             .then(({ pageResults }) => pageResults),
         retryBackoffConfig
-      ).pipe(
+      }).pipe(
         tap((pageResults) => {
           for (const stakePool of pageResults) {
             store.setValue(stakePool.id, stakePool);
@@ -75,12 +75,12 @@ export const createRewardsProvider =
   (rewardAccounts: Cardano.RewardAccount[]): Observable<Cardano.Lovelace[]> =>
     combineLatest(
       rewardAccounts.map((rewardAccount) =>
-        coldObservableProvider(
-          () => rewardsProvider.rewardAccountBalance(rewardAccount),
+        coldObservableProvider({
+          equals: isEqual,
+          provider: () => rewardsProvider.rewardAccountBalance(rewardAccount),
           retryBackoffConfig,
-          fetchRewardsTrigger$(epoch$, txConfirmed$, rewardAccount),
-          isEqual
-        ).pipe(distinctUntilChanged())
+          trigger$: fetchRewardsTrigger$(epoch$, txConfirmed$, rewardAccount)
+        }).pipe(distinctUntilChanged())
       )
     );
 export type ObservableRewardsProvider = ReturnType<typeof createRewardsProvider>;

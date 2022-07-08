@@ -1,5 +1,6 @@
+/* eslint-disable sonarjs/no-duplicate-string */
+import { Schema, UnknownResultError } from '@cardano-ogmios/client';
 import { Server, createServer } from 'http';
-import { SubmitFail, SubmitSuccess } from '@cardano-ogmios/schema';
 import WebSocket from 'ws';
 
 const HEALTH_RESPONSE_BODY = {
@@ -42,7 +43,7 @@ export interface MockOgmiosServerConfig {
       networkSynchronization?: number;
     };
   };
-  submitTx: {
+  submitTx?: {
     response: {
       success: boolean;
       failWith?: {
@@ -50,8 +51,85 @@ export interface MockOgmiosServerConfig {
       };
     };
   };
+  stateQuery?: {
+    eraSummaries?: {
+      response: {
+        success: boolean;
+        failWith?: {
+          type: 'unknownResultError';
+        };
+      };
+    };
+    systemStart?: {
+      response: {
+        success: boolean;
+        failWith?: {
+          type: 'queryUnavailableInEra';
+        };
+      };
+    };
+  };
   submitTxHook?: (data?: Uint8Array) => void;
 }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const handleSubmitTx = async (config: MockOgmiosServerConfig, args: any, send: (result: unknown) => void) => {
+  let result: Schema.SubmitSuccess | Schema.SubmitFail;
+
+  if (config.submitTx?.response.success) {
+    result = { SubmitSuccess: { txId: '###' } };
+  } else if (config.submitTx?.response.failWith?.type === 'eraMismatch') {
+    result = { SubmitFail: [{ eraMismatch: { ledgerEra: 'Shelley', queryEra: 'Alonzo' } }] };
+  } else if (config.submitTx?.response.failWith?.type === 'beforeValidityInterval') {
+    result = {
+      SubmitFail: [
+        { outsideOfValidityInterval: { currentSlot: 23, interval: { invalidBefore: 42, invalidHereafter: null } } }
+      ]
+    };
+  } else {
+    throw new Error('Unknown mock response');
+  }
+  if (config.submitTxHook) await config.submitTxHook(Uint8Array.from(Buffer.from(args.submit, 'hex')));
+  send(result);
+};
+
+const handleQuery = async (query: string, config: MockOgmiosServerConfig, send: (result: unknown) => void) => {
+  let result: Schema.EraSummary[] | Date | 'QueryUnavailableInCurrentEra' | UnknownResultError;
+  switch (query) {
+    case 'eraSummaries':
+      if (config.stateQuery?.eraSummaries?.response.success) {
+        result = [
+          {
+            end: { epoch: 74, slot: 1_598_400, time: 31_968_000 },
+            parameters: { epochLength: 21_600, safeZone: 4320, slotLength: 20 },
+            start: { epoch: 0, slot: 0, time: 0 }
+          },
+          {
+            end: { epoch: 102, slot: 13_694_400, time: 44_064_000 },
+            parameters: { epochLength: 432_000, safeZone: 129_600, slotLength: 1 },
+            start: { epoch: 74, slot: 1_598_400, time: 31_968_000 }
+          }
+        ];
+      } else if (config.stateQuery?.eraSummaries?.response.failWith?.type === 'unknownResultError') {
+        result = new UnknownResultError('');
+      } else {
+        throw new Error('Unknown mock response');
+      }
+      break;
+    case 'systemStart':
+      if (config.stateQuery?.systemStart?.response.success) {
+        result = new Date(1_506_203_091_000);
+      } else if (config.stateQuery?.systemStart?.response.failWith?.type === 'queryUnavailableInEra') {
+        result = 'QueryUnavailableInCurrentEra';
+      } else {
+        throw new Error('Unknown mock response');
+      }
+      break;
+    default:
+      throw new Error('Query not mocked');
+  }
+  send(result);
+};
 
 export const createMockOgmiosServer = (config: MockOgmiosServerConfig): Server => {
   const server = createServer((req, res) => {
@@ -80,27 +158,10 @@ export const createMockOgmiosServer = (config: MockOgmiosServerConfig): Server =
   wss.on('connection', (ws) => {
     ws.on('message', async (data) => {
       const { args, methodname, mirror } = JSON.parse(data as string);
-      if (methodname === 'SubmitTx') {
-        let result: SubmitSuccess | SubmitFail;
-        if (config.submitTx.response.success) {
-          result = { SubmitSuccess: { txId: '###' } };
-        } else if (config.submitTx.response.failWith?.type === 'eraMismatch') {
-          result = { SubmitFail: [{ eraMismatch: { ledgerEra: 'Shelley', queryEra: 'Alonzo' } }] };
-        } else if (config.submitTx.response.failWith?.type === 'beforeValidityInterval') {
-          result = {
-            SubmitFail: [
-              {
-                outsideOfValidityInterval: { currentSlot: 23, interval: { invalidBefore: 42, invalidHereafter: null } }
-              }
-            ]
-          };
-        } else {
-          throw new Error('Unknown mock response');
-        }
-        if (config.submitTxHook) await config.submitTxHook(Uint8Array.from(Buffer.from(args.submit, 'hex')));
+      const send = (result: unknown) =>
         ws.send(
           JSON.stringify({
-            methodname: 'SubmitTx',
+            methodname,
             reflection: mirror,
             result,
             servicename: 'ogmios',
@@ -108,6 +169,15 @@ export const createMockOgmiosServer = (config: MockOgmiosServerConfig): Server =
             version: '1.0'
           })
         );
+      switch (methodname) {
+        case 'SubmitTx':
+          await handleSubmitTx(config, args, send);
+          break;
+        case 'Query':
+          await handleQuery(args.query, config, send);
+          break;
+        default:
+          throw new Error('Method not mocked');
       }
     });
   });

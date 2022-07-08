@@ -16,6 +16,7 @@ import {
 import { HttpServer, HttpServerConfig, HttpService } from '../Http';
 import { InMemoryCache } from '../InMemoryCache';
 import { MissingProgramOption, UnknownServiceName } from './errors';
+import { OgmiosCardanoNode, urlToConnectionConfig } from '@cardano-sdk/ogmios';
 import { ProgramOptionDescriptions } from './ProgramOptionDescriptions';
 import { ServiceNames } from './ServiceNames';
 import { TxSubmitHttpService } from '../TxSubmit';
@@ -25,10 +26,10 @@ import pg from 'pg';
 
 export interface HttpServerOptions extends CommonProgramOptions, SrvProgramOptions {
   dbConnectionString?: string;
-  dbQueriesCacheTtl: number;
-  dbPollInterval: number;
   serviceDiscoveryBackoffFactor: number;
   serviceDiscoveryBackoffTimeout: number;
+  cacheTtl: number;
+  epochPollInterval: number;
   cardanoNodeConfigPath?: string;
   metricsEnabled?: boolean;
   useQueue?: boolean;
@@ -86,13 +87,15 @@ const serviceMapFactory = (
     if (!db) throw new MissingProgramOption(ServiceNames.NetworkInfo, ProgramOptionDescriptions.DbConnection);
     if (args.options?.cardanoNodeConfigPath === undefined)
       throw new MissingProgramOption(ServiceNames.NetworkInfo, ProgramOptionDescriptions.CardanoNodeConfigPath);
+    if (args.options?.ogmiosUrl === undefined)
+      throw new MissingProgramOption(ServiceNames.NetworkInfo, ProgramOptionDescriptions.OgmiosUrl);
 
     const networkInfoProvider = new DbSyncNetworkInfoProvider(
       {
-        cardanoNodeConfigPath: args.options?.cardanoNodeConfigPath,
-        dbPollInterval: args.options?.dbPollInterval
+        cardanoNodeConfigPath: args.options.cardanoNodeConfigPath,
+        epochPollInterval: args.options?.epochPollInterval
       },
-      { cache, db, logger }
+      { cache, cardanoNode: new OgmiosCardanoNode(urlToConnectionConfig(args.options.ogmiosUrl), logger), db, logger }
     );
 
     return new NetworkInfoHttpService({ logger, networkInfoProvider });
@@ -113,7 +116,7 @@ export const loadHttpServer = async (args: ProgramArgs): Promise<HttpServer> => 
     name: 'http-server'
   });
 
-  const cache = new InMemoryCache(args.options?.dbQueriesCacheTtl);
+  const cache = new InMemoryCache(args.options?.cacheTtl);
   const dnsSrvResolve = getDnsSrvResolveWithExponentialBackoff(
     {
       factor: args.options?.serviceDiscoveryBackoffFactor,

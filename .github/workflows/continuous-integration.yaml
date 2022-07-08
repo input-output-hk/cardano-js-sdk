@@ -35,7 +35,12 @@ jobs:
         yarn install --frozen-lockfile --non-interactive --logevel=error
         yarn build
         yarn lint
-        
+
+    - name: Docker Build
+      run: |
+        docker build --target http-server -t cardano-services-http-server:${{ github.sha }} .
+        docker build --target worker -t cardano-services-worker:${{ github.sha }} .
+
     - name: 🔬 Test
       run: |
         yarn test
