@@ -7,8 +7,8 @@ import {
   HttpServer,
   HttpServerConfig,
   TxSubmitHttpService,
-  getCardanoNodeProvider,
   getDnsSrvResolveWithExponentialBackoff,
+  getOgmiosTxSubmitProvider,
   getPool,
   getRabbitMqTxSubmitProvider
 } from '../../src';
@@ -27,9 +27,12 @@ import http from 'http';
 jest.mock('dns', () => ({
   promises: {
     resolveSrv: async (serviceName: string): Promise<SrvRecord[]> => {
-      if (serviceName === 'db-test-domain') return [{ name: 'localhost', port: 5433, priority: 6, weight: 5 }];
-      if (serviceName === 'ogmios-test-domain') return [{ name: 'localhost', port: 1337, priority: 6, weight: 5 }];
-      if (serviceName === 'rabbitmq-test-domain') return [{ name: 'localhost', port: 5672, priority: 6, weight: 5 }];
+      if (serviceName === process.env.POSTGRES_SRV_SERVICE_NAME)
+        return [{ name: 'localhost', port: 5433, priority: 6, weight: 5 }];
+      if (serviceName === process.env.OGMIOS_SRV_SERVICE_NAME)
+        return [{ name: 'localhost', port: 1337, priority: 6, weight: 5 }];
+      if (serviceName === process.env.RABBITMQ_SRV_SERVICE_NAME)
+        return [{ name: 'localhost', port: 5672, priority: 6, weight: 5 }];
       return [];
     }
   }
@@ -191,7 +194,7 @@ describe('Service dependencies abstractions', () => {
         port = await getPort();
         apiUrlBase = `http://localhost:${port}/tx-submit`;
         config = { listen: { port } };
-        txSubmitProvider = await getCardanoNodeProvider(dnsSrvResolve, {
+        txSubmitProvider = await getOgmiosTxSubmitProvider(dnsSrvResolve, {
           cacheTtl: 10_000,
           epochPollInterval: 1000,
           ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME,
@@ -245,7 +248,7 @@ describe('Service dependencies abstractions', () => {
         port = await getPort();
         apiUrlBase = `http://localhost:${port}/tx-submit`;
         config = { listen: { port } };
-        txSubmitProvider = await getCardanoNodeProvider(dnsSrvResolve, {
+        txSubmitProvider = await getOgmiosTxSubmitProvider(dnsSrvResolve, {
           cacheTtl: 10_000,
           epochPollInterval: 1000,
           ogmiosUrl: new URL(ogmiosConnection.address.webSocket),

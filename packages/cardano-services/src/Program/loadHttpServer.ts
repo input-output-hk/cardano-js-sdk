@@ -8,8 +8,8 @@ import { DbSyncStakePoolProvider, StakePoolHttpService } from '../StakePool';
 import { DbSyncUtxoProvider, UtxoHttpService } from '../Utxo';
 import {
   DnsSrvResolve,
-  getCardanoNodeProvider,
   getDnsSrvResolveWithExponentialBackoff,
+  getOgmiosTxSubmitProvider,
   getPool,
   getRabbitMqTxSubmitProvider
 } from './utils';
@@ -103,7 +103,7 @@ const serviceMapFactory = (
   [ServiceNames.TxSubmit]: async () => {
     const txSubmitProvider = args.options?.useQueue
       ? await getRabbitMqTxSubmitProvider(dnsSrvResolve, args.options)
-      : await getCardanoNodeProvider(dnsSrvResolve, args.options);
+      : await getOgmiosTxSubmitProvider(dnsSrvResolve, args.options);
 
     return new TxSubmitHttpService({ logger, txSubmitProvider });
   }

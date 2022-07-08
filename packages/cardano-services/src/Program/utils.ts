@@ -165,7 +165,7 @@ export const getSrvOgmiosTxSubmitProvider = async (
   });
 };
 
-export const getCardanoNodeProvider = async (
+export const getOgmiosTxSubmitProvider = async (
   dnsSrvResolve: DnsSrvResolve,
   options?: HttpServerOptions
 ): Promise<TxSubmitProvider> => {
