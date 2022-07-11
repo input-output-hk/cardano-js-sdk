@@ -36,6 +36,7 @@ describe('serializableObject', () => {
       date: new Date(),
       error: new Error('error obj'),
       map: new Map([['key', 'value']]),
+      set: new Set(['item1', 'item2']),
       undefined
     };
     expect(serializeAndDeserialize(obj)).toEqual(obj);

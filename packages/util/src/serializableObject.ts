@@ -53,6 +53,12 @@ export const toSerializableObject = (obj: unknown, options: ToSerializableObject
         value: obj.getTime()
       };
     }
+    if (obj instanceof Set) {
+      return {
+        [transformationTypeKey]: 'Set',
+        value: [...obj].map((item) => toSerializableObject(item, options))
+      };
+    }
     if (obj instanceof Map) {
       return {
         [transformationTypeKey]: 'Map',
@@ -101,6 +107,8 @@ const fromSerializableObjectUnknown = (obj: unknown, options: FromSerializableOb
         return Buffer.from(docAsAny.value, 'hex');
       case 'Date':
         return new Date(docAsAny.value);
+      case 'Set':
+        return new Set(docAsAny.value);
       case 'Map':
         return new Map(
           docAsAny.value.map((keyValues: unknown[]) =>
