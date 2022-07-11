@@ -313,13 +313,13 @@ describe('entrypoints', () => {
         });
       });
 
-      describe('specifying a PostgreSQL-dependent services with providing service discovery args', () => {
+      describe('specifying PostgreSQL-dependent services with service discovery args', () => {
         let spy: jest.Mock;
         beforeEach(async () => {
           spy = jest.fn();
         });
 
-        it('cli:start-server throws dns srv error and exits with code 1', (done) => {
+        it('cli:start-server throws DNS SRV error and exits with code 1', (done) => {
           expect.assertions(3);
           proc = fork(
             exePath('cli'),
@@ -360,7 +360,7 @@ describe('entrypoints', () => {
           });
         });
 
-        it('run throws dns srv error and exits with code 1', (done) => {
+        it('run throws DNS SRV error and exits with code 1', (done) => {
           expect.assertions(3);
           proc = fork(exePath('run'), {
             env: {
@@ -473,13 +473,13 @@ describe('entrypoints', () => {
       });
     });
 
-    describe('specifying a Ogmios-dependent service with providing service discovery name', () => {
+    describe('specifying an Ogmios-dependent service with service discovery args', () => {
       let spy: jest.Mock;
       beforeEach(async () => {
         spy = jest.fn();
       });
 
-      it('cli:start-server throws dns srv error and exits with code 1', (done) => {
+      it('cli:start-server throws DNS SRV error and exits with code 1', (done) => {
         expect.assertions(3);
         proc = fork(
           exePath('cli'),
@@ -512,7 +512,7 @@ describe('entrypoints', () => {
         });
       });
 
-      it('run throws dns srv error and exits with code 1', (done) => {
+      it('run throws DNS SRV error and exits with code 1', (done) => {
         expect.assertions(3);
         proc = fork(exePath('run'), {
           env: {
@@ -599,13 +599,13 @@ describe('entrypoints', () => {
       });
     });
 
-    describe('specifying a RabbitMQ-dependent service with providing service discovery name', () => {
+    describe('specifying a RabbitMQ-dependent service with service discovery args', () => {
       let spy: jest.Mock;
       beforeEach(async () => {
         spy = jest.fn();
       });
 
-      it('cli:start-server throws dns srv error and exits with code 1', (done) => {
+      it('cli:start-server throws DNS SRV error and exits with code 1', (done) => {
         expect.assertions(3);
         proc = fork(
           exePath('cli'),
@@ -639,7 +639,7 @@ describe('entrypoints', () => {
         });
       });
 
-      it('run throws dns srv error and exits with code 1', (done) => {
+      it('run throws DNS SRV error and exits with code 1', (done) => {
         expect.assertions(3);
         proc = fork(exePath('run'), {
           env: {

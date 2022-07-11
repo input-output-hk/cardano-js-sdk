@@ -39,34 +39,34 @@ export const onFailedAttemptFor =
     }
   };
 
-// Get a random selection of dns srv resolved service address initially and make it sticky for reconnects by storing a reference in memory
-export const getStikyAddressWithDnsSrv = async (serviceName: string, cache: InMemoryCache): Promise<SrvRecord> => {
-  const stickyAddress = cache.getVal<SrvRecord>(`${DNS_SRV_CACHE_KEY}/${serviceName}`);
-  if (!stickyAddress) {
-    const [address] = await dns.promises.resolveSrv(serviceName);
-    cache.set(`${DNS_SRV_CACHE_KEY}/${serviceName}`, address, UNLIMITED_CACHE_TTL);
-    return address;
+// Return the cached record if present for stickiness with the service dependency, otherwise, select a random record from the DNS server
+export const resolveMaybeCachedSrvRecord = async (serviceName: string, cache: InMemoryCache): Promise<SrvRecord> => {
+  const cachedSrvRecord = cache.getVal<SrvRecord>(`${DNS_SRV_CACHE_KEY}/${serviceName}`);
+  if (!cachedSrvRecord) {
+    const [srvRecord] = await dns.promises.resolveSrv(serviceName);
+    cache.set(`${DNS_SRV_CACHE_KEY}/${serviceName}`, srvRecord, UNLIMITED_CACHE_TTL);
+    return srvRecord;
   }
-  const addresses = await dns.promises.resolveSrv(serviceName);
-  const addressFound = addresses.find((address) => address.name === stickyAddress.name);
-  if (!addressFound)
+  const records = await dns.promises.resolveSrv(serviceName);
+  const recordFound = records.find((record) => record.name === cachedSrvRecord.name);
+  if (!recordFound)
     throw new ProviderError(
       ProviderFailure.ConnectionFailure,
       null,
-      'Stiky address not found within dns srv resolved addresses'
+      'Cached SRV record not found within resolved list of records'
     );
-  return addressFound;
+  return recordFound;
 };
 
-export const getDnsSrvResolveWithExponentialBackoff =
+export const createDnsResolver =
   (config: RetryBackoffConfig, cache: InMemoryCache, logger: Logger) => async (serviceName: string) =>
-    await pRetry(async () => await getStikyAddressWithDnsSrv(serviceName, cache), {
+    await pRetry(async () => await resolveMaybeCachedSrvRecord(serviceName, cache), {
       factor: config.factor,
       maxRetryTime: config.maxRetryTime,
       onFailedAttempt: onFailedAttemptFor(serviceName, logger)
     });
 
-export type DnsSrvResolve = ReturnType<typeof getDnsSrvResolveWithExponentialBackoff>;
+export type DnsResolver = ReturnType<typeof createDnsResolver>;
 
 /**
  * Creates a extended Pool client :
@@ -78,11 +78,11 @@ export type DnsSrvResolve = ReturnType<typeof getDnsSrvResolveWithExponentialBac
  *
  * @returns pg.Pool instance
  */
-export const getSrvPool = async (
-  dnsSrvResolve: DnsSrvResolve,
+export const getPoolWithServiceDiscovery = async (
+  dnsResolver: DnsResolver,
   { host, database, password, user }: ClientConfig
 ): Promise<Pool> => {
-  const { name, port } = await dnsSrvResolve(host!);
+  const { name, port } = await dnsResolver(host!);
   let pool = new Pool({ database, host: name, password, port, user });
 
   return new Proxy<Pool>({} as Pool, {
@@ -92,7 +92,7 @@ export const getSrvPool = async (
         return (args: string | QueryConfig, values?: any) =>
           pool.query(args, values).catch(async (error) => {
             if (error.code && ['ENOTFOUND', 'ECONNREFUSED'].includes(error.code)) {
-              const address = await dnsSrvResolve(host!);
+              const address = await dnsResolver(host!);
               pool = new Pool({ database, host: address.name, password, port: address.port, user });
               return await pool.query(args, values);
             }
@@ -107,15 +107,12 @@ export const getSrvPool = async (
   });
 };
 
-export const getPool = async (dnsSrvResolve: DnsSrvResolve, options?: HttpServerOptions): Promise<Pool | undefined> => {
+export const getPool = async (dnsResolver: DnsResolver, options?: HttpServerOptions): Promise<Pool | undefined> => {
   if (options?.dbConnectionString && options.postgresSrvServiceName)
-    throw new InvalidArgsCombination(
-      ProgramOptionDescriptions.DbConnection,
-      ProgramOptionDescriptions.PostgresSrvServiceName
-    );
+    throw new InvalidArgsCombination(ProgramOptionDescriptions.DbConnection, ProgramOptionDescriptions.PostgresSrvArgs);
   if (options?.dbConnectionString) return new Pool({ connectionString: options.dbConnectionString });
   if (options?.postgresSrvServiceName && options?.postgresUser && options.postgresDb && options.postgresPassword) {
-    return getSrvPool(dnsSrvResolve, {
+    return getPoolWithServiceDiscovery(dnsResolver, {
       database: options.postgresDb,
       host: options.postgresSrvServiceName,
       password: options.postgresPassword,
@@ -136,11 +133,11 @@ export const getPool = async (dnsSrvResolve: DnsSrvResolve, options?: HttpServer
  *
  * @returns TxSubmitProvider instance
  */
-export const getSrvOgmiosTxSubmitProvider = async (
-  dnsSrvResolve: DnsSrvResolve,
+export const ogmiosTxSubmitProviderWithDiscovery = async (
+  dnsResolver: DnsResolver,
   serviceName: string
 ): Promise<TxSubmitProvider> => {
-  const { name, port } = await dnsSrvResolve(serviceName!);
+  const { name, port } = await dnsResolver(serviceName!);
   let ogmiosProvider = ogmiosTxSubmitProvider({ host: name, port });
 
   return new Proxy<TxSubmitProvider>({} as TxSubmitProvider, {
@@ -150,8 +147,8 @@ export const getSrvOgmiosTxSubmitProvider = async (
         return (args: Uint8Array) =>
           ogmiosProvider.submitTx(args).catch(async (error) => {
             if (error instanceof WebSocketClosed && error.message === 'WebSocket is closed') {
-              const address = await dnsSrvResolve(serviceName!);
-              ogmiosProvider = ogmiosTxSubmitProvider({ host: address.name, port: address.port });
+              const record = await dnsResolver(serviceName!);
+              ogmiosProvider = ogmiosTxSubmitProvider({ host: record.name, port: record.port });
               return await ogmiosProvider.submitTx(args);
             }
           });
@@ -166,10 +163,11 @@ export const getSrvOgmiosTxSubmitProvider = async (
 };
 
 export const getOgmiosTxSubmitProvider = async (
-  dnsSrvResolve: DnsSrvResolve,
+  dnsResolver: DnsResolver,
   options?: HttpServerOptions
 ): Promise<TxSubmitProvider> => {
-  if (options?.ogmiosSrvServiceName) return getSrvOgmiosTxSubmitProvider(dnsSrvResolve, options.ogmiosSrvServiceName);
+  if (options?.ogmiosSrvServiceName)
+    return ogmiosTxSubmitProviderWithDiscovery(dnsResolver, options.ogmiosSrvServiceName);
   if (options?.ogmiosUrl) return ogmiosTxSubmitProvider(urlToConnectionConfig(options?.ogmiosUrl));
   throw new MissingProgramOption(ServiceNames.TxSubmit, [
     ProgramOptionDescriptions.OgmiosUrl,
@@ -177,7 +175,7 @@ export const getOgmiosTxSubmitProvider = async (
   ]);
 };
 
-export const srvAddressToRabbitmqURL = ({ name, port }: SrvRecord) => new URL(`amqp://${name}:${port}`);
+export const srvRecordToRabbitmqURL = ({ name, port }: SrvRecord) => new URL(`amqp://${name}:${port}`);
 
 /**
  * Creates a extended RabbitMqTxSubmitProvider instance :
@@ -189,13 +187,13 @@ export const srvAddressToRabbitmqURL = ({ name, port }: SrvRecord) => new URL(`a
  *
  * @returns RabbitMqTxSubmitProvider instance
  */
-export const getSrvRabbitMqTxSubmitProvider = async (
-  dnsSrvResolve: DnsSrvResolve,
+export const rabbitMqTxSubmitProviderWithDiscovery = async (
+  dnsResolver: DnsResolver,
   serviceName: string
 ): Promise<RabbitMqTxSubmitProvider> => {
-  const address = await dnsSrvResolve(serviceName!);
+  const record = await dnsResolver(serviceName!);
   let rabbitmqProvider = new RabbitMqTxSubmitProvider({
-    rabbitmqUrl: srvAddressToRabbitmqURL(address)
+    rabbitmqUrl: srvRecordToRabbitmqURL(record)
   });
 
   return new Proxy<RabbitMqTxSubmitProvider>({} as RabbitMqTxSubmitProvider, {
@@ -205,9 +203,9 @@ export const getSrvRabbitMqTxSubmitProvider = async (
         return (args: Uint8Array) =>
           rabbitmqProvider.submitTx(args).catch(async (error) => {
             if (error instanceof ProviderError && error.innerError === ProviderFailure.ConnectionFailure) {
-              const resolvedAddress = await dnsSrvResolve(serviceName!);
+              const resolvedRecord = await dnsResolver(serviceName!);
               rabbitmqProvider = new RabbitMqTxSubmitProvider({
-                rabbitmqUrl: srvAddressToRabbitmqURL(resolvedAddress)
+                rabbitmqUrl: srvRecordToRabbitmqURL(resolvedRecord)
               });
               return await rabbitmqProvider.submitTx(args);
             }
@@ -223,11 +221,11 @@ export const getSrvRabbitMqTxSubmitProvider = async (
 };
 
 export const getRabbitMqTxSubmitProvider = async (
-  dnsSrvResolve: DnsSrvResolve,
+  dnsResolver: DnsResolver,
   options?: HttpServerOptions
 ): Promise<RabbitMqTxSubmitProvider> => {
   if (options?.rabbitmqSrvServiceName)
-    return getSrvRabbitMqTxSubmitProvider(dnsSrvResolve, options.rabbitmqSrvServiceName);
+    return rabbitMqTxSubmitProviderWithDiscovery(dnsResolver, options.rabbitmqSrvServiceName);
   if (options?.rabbitmqUrl) return new RabbitMqTxSubmitProvider({ rabbitmqUrl: options.rabbitmqUrl });
   throw new MissingProgramOption(ServiceNames.TxSubmit, [
     ProgramOptionDescriptions.RabbitMQUrl,

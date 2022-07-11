@@ -158,7 +158,12 @@ describe('loadHttpServer', () => {
               },
               serviceNames: [ServiceNames.StakePool]
             })
-        ).rejects.toThrow(MissingProgramOption);
+        ).rejects.toThrow(
+          new MissingProgramOption(ServiceNames.StakePool, [
+            ProgramOptionDescriptions.DbConnection,
+            ProgramOptionDescriptions.PostgresSrvArgs
+          ])
+        );
       });
 
       it('throws if a service is nominated with providing both db connection string and service discovery args at same time', async () => {
@@ -176,7 +181,9 @@ describe('loadHttpServer', () => {
               },
               serviceNames: [ServiceNames.StakePool]
             })
-        ).rejects.toThrow(InvalidArgsCombination);
+        ).rejects.toThrow(
+          new InvalidArgsCombination(ProgramOptionDescriptions.DbConnection, ProgramOptionDescriptions.PostgresSrvArgs)
+        );
       });
     });
 
@@ -227,7 +234,12 @@ describe('loadHttpServer', () => {
               },
               serviceNames: [ServiceNames.TxSubmit]
             })
-        ).rejects.toThrow(MissingProgramOption);
+        ).rejects.toThrow(
+          new MissingProgramOption(ServiceNames.TxSubmit, [
+            ProgramOptionDescriptions.OgmiosUrl,
+            ProgramOptionDescriptions.OgmiosSrvServiceName
+          ])
+        );
       });
     });
 
@@ -281,7 +293,12 @@ describe('loadHttpServer', () => {
               },
               serviceNames: [ServiceNames.TxSubmit]
             })
-        ).rejects.toThrow(MissingProgramOption);
+        ).rejects.toThrow(
+          new MissingProgramOption(ServiceNames.TxSubmit, [
+            ProgramOptionDescriptions.RabbitMQUrl,
+            ProgramOptionDescriptions.RabbitMQSrvServiceName
+          ])
+        );
       });
     });
 

@@ -7,7 +7,7 @@ import {
   HttpServer,
   HttpServerConfig,
   TxSubmitHttpService,
-  getDnsSrvResolveWithExponentialBackoff,
+  createDnsResolver,
   getOgmiosTxSubmitProvider,
   getPool,
   getRabbitMqTxSubmitProvider
@@ -38,12 +38,12 @@ jest.mock('dns', () => ({
   }
 }));
 
-describe('Service dependencies abstractions', () => {
+describe('Service dependency abstractions', () => {
   const APPLICATION_JSON = 'application/json';
   const cache = new InMemoryCache(UNLIMITED_CACHE_TTL);
   const cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
   const logger = createLogger({ level: 'error', name: 'test' });
-  const dnsSrvResolve = getDnsSrvResolveWithExponentialBackoff({ factor: 1.1, maxRetryTime: 1000 }, cache, logger);
+  const dnsResolver = createDnsResolver({ factor: 1.1, maxRetryTime: 1000 }, cache, logger);
   const mockEraSummaries: EraSummary[] = [
     { parameters: { epochLength: 21_600, slotLength: 20_000 }, start: { slot: 0, time: new Date(1_563_999_616_000) } },
     {
@@ -68,7 +68,7 @@ describe('Service dependencies abstractions', () => {
     let networkInfoProvider: DbSyncNetworkInfoProvider;
 
     beforeAll(async () => {
-      db = await getPool(dnsSrvResolve, {
+      db = await getPool(dnsResolver, {
         cacheTtl: 10_000,
         epochPollInterval: 1000,
         postgresDb: process.env.POSTGRES_DB!,
@@ -127,12 +127,10 @@ describe('Service dependencies abstractions', () => {
     let networkInfoProvider: DbSyncNetworkInfoProvider;
 
     beforeAll(async () => {
-      db = await getPool(dnsSrvResolve, {
+      db = await getPool(dnsResolver, {
         cacheTtl: 10_000,
         dbConnectionString: process.env.DB_CONNECTION_STRING,
-        epochPollInterval: 1000,
-        serviceDiscoveryBackoffFactor: 1.1,
-        serviceDiscoveryBackoffTimeout: 1000
+        epochPollInterval: 1000
       });
     });
 
@@ -194,7 +192,7 @@ describe('Service dependencies abstractions', () => {
         port = await getPort();
         apiUrlBase = `http://localhost:${port}/tx-submit`;
         config = { listen: { port } };
-        txSubmitProvider = await getOgmiosTxSubmitProvider(dnsSrvResolve, {
+        txSubmitProvider = await getOgmiosTxSubmitProvider(dnsResolver, {
           cacheTtl: 10_000,
           epochPollInterval: 1000,
           ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME,
@@ -248,12 +246,10 @@ describe('Service dependencies abstractions', () => {
         port = await getPort();
         apiUrlBase = `http://localhost:${port}/tx-submit`;
         config = { listen: { port } };
-        txSubmitProvider = await getOgmiosTxSubmitProvider(dnsSrvResolve, {
+        txSubmitProvider = await getOgmiosTxSubmitProvider(dnsResolver, {
           cacheTtl: 10_000,
           epochPollInterval: 1000,
-          ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
-          serviceDiscoveryBackoffFactor: 1.1,
-          serviceDiscoveryBackoffTimeout: 1000
+          ogmiosUrl: new URL(ogmiosConnection.address.webSocket)
         });
         httpServer = new HttpServer(config, {
           services: [new TxSubmitHttpService({ txSubmitProvider })]
@@ -267,7 +263,7 @@ describe('Service dependencies abstractions', () => {
         await serverClosePromise(ogmiosServer);
       });
 
-      it('txSubmitProvider should be a instance of Proxy ', () => {
+      it('txSubmitProvider should not be a instance of Proxy ', () => {
         expect(types.isProxy(txSubmitProvider)).toEqual(false);
       });
 
@@ -293,7 +289,7 @@ describe('Service dependencies abstractions', () => {
         port = await getPort();
         apiUrlBase = `http://localhost:${port}/tx-submit`;
         config = { listen: { port } };
-        txSubmitProvider = await getRabbitMqTxSubmitProvider(dnsSrvResolve, {
+        txSubmitProvider = await getRabbitMqTxSubmitProvider(dnsResolver, {
           cacheTtl: 10_000,
           epochPollInterval: 1000,
           rabbitmqSrvServiceName: process.env.RABBITMQ_SRV_SERVICE_NAME,
@@ -338,12 +334,10 @@ describe('Service dependencies abstractions', () => {
         port = await getPort();
         apiUrlBase = `http://localhost:${port}/tx-submit`;
         config = { listen: { port } };
-        txSubmitProvider = await getRabbitMqTxSubmitProvider(dnsSrvResolve, {
+        txSubmitProvider = await getRabbitMqTxSubmitProvider(dnsResolver, {
           cacheTtl: 10_000,
           epochPollInterval: 1000,
           rabbitmqUrl: new URL(process.env.RABBITMQ_URL!),
-          serviceDiscoveryBackoffFactor: 1.1,
-          serviceDiscoveryBackoffTimeout: 1000,
           useQueue: true
         });
         httpServer = new HttpServer(config, {

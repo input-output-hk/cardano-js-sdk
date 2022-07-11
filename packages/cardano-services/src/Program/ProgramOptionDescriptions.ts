@@ -16,7 +16,7 @@ enum HttpServerOptionDescriptions {
 
 enum SrvOptionDescriptions {
   OgmiosSrvServiceName = 'Ogmios SRV service name',
-  PostgresSrvServiceName = 'Postgres SRV service name',
+  PostgresSrvArgs = 'Postgres SRV service name, db, user and password',
   RabbitMQSrvServiceName = 'RabbitMQ SRV service name'
 }
 

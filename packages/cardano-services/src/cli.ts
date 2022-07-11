@@ -112,10 +112,10 @@ commonOptions(
   .option('--use-queue', ProgramOptionDescriptions.UseQueue, () => true, USE_QUEUE_DEFAULT)
   .option('--rabbitmq-srv-service-name <rabbitmqSrvServiceName>', ProgramOptionDescriptions.RabbitMQSrvServiceName)
   .option('--ogmios-srv-service-name <ogmiosSrvServiceName>', ProgramOptionDescriptions.OgmiosSrvServiceName)
-  .option('--postgres-srv-service-name <postgresSrvServiceName>', ProgramOptionDescriptions.PostgresSrvServiceName)
-  .option('--postgres-db <postgresDb>', ProgramOptionDescriptions.DbConnection)
-  .option('--postgres-user <postgresUser>', ProgramOptionDescriptions.DbConnection)
-  .option('--postgres-password <postgresPassword>', ProgramOptionDescriptions.DbConnection)
+  .option('--postgres-srv-service-name <postgresSrvServiceName>', ProgramOptionDescriptions.PostgresSrvArgs)
+  .option('--postgres-db <postgresDb>', ProgramOptionDescriptions.PostgresSrvArgs)
+  .option('--postgres-user <postgresUser>', ProgramOptionDescriptions.PostgresSrvArgs)
+  .option('--postgres-password <postgresPassword>', ProgramOptionDescriptions.PostgresSrvArgs)
   .action(async (serviceNames: ServiceNames[], options: { apiUrl: URL } & HttpServerOptions) => {
     const { apiUrl, ...rest } = options;
     try {
