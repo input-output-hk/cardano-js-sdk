@@ -13,6 +13,10 @@ export type CreateTxInternalsProps = {
   certificates?: Cardano.Certificate[];
   withdrawals?: Cardano.Withdrawal[];
   auxiliaryData?: Cardano.AuxiliaryData;
+  collaterals?: Set<Cardano.NewTxIn>;
+  mint?: Cardano.TokenMap;
+  scriptIntegrityHash?: Cardano.Hash32ByteBase16;
+  requiredExtraSignatures?: Cardano.Ed25519KeyHash[];
 };
 
 export const createTransactionInternals = async ({
@@ -21,7 +25,11 @@ export const createTransactionInternals = async ({
   withdrawals,
   certificates,
   validityInterval,
-  inputSelection
+  inputSelection,
+  collaterals,
+  mint,
+  scriptIntegrityHash,
+  requiredExtraSignatures
 }: CreateTxInternalsProps): Promise<TxInternals> => {
   const outputs = [...inputSelection.outputs];
   for (const value of inputSelection.change) {
@@ -30,16 +38,18 @@ export const createTransactionInternals = async ({
       value
     });
   }
-  const body = {
-    // TODO: return more fields. Also add support in coreToCsl.txBody:
-    // collaterals, mint, requiredExtraSignatures, scriptIntegrityHash
+  const body: Cardano.NewTxBodyAlonzo = {
     certificates,
     fee: inputSelection.fee,
     inputs: [...inputSelection.inputs].map(([txIn]) => txIn),
+    mint,
     outputs,
+    requiredExtraSignatures,
+    scriptIntegrityHash,
     validityInterval,
     withdrawals
   };
+  if (collaterals) body.collaterals = [...collaterals];
   const cslBody = coreToCsl.txBody(body, auxiliaryData);
 
   return {

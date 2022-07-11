@@ -24,6 +24,10 @@ export type InitializeTxProps = {
   options?: {
     validityInterval?: Cardano.ValidityInterval;
   };
+  collaterals?: Set<Cardano.NewTxIn>;
+  mint?: Cardano.TokenMap;
+  scriptIntegrityHash?: Cardano.Hash32ByteBase16;
+  requiredExtraSignatures?: Cardano.Ed25519KeyHash[];
 };
 
 export interface FinalizeTxProps {
