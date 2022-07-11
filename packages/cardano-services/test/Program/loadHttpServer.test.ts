@@ -142,7 +142,12 @@ describe('loadHttpServer', () => {
               },
               serviceNames: [ServiceNames.StakePool]
             })
-        ).rejects.toThrow(MissingProgramOption);
+        ).rejects.toThrow(
+          new MissingProgramOption(ServiceNames.StakePool, [
+            ProgramOptionDescriptions.DbConnection,
+            ProgramOptionDescriptions.PostgresSrvArgs
+          ])
+        );
       });
 
       it('throws if a service is nominated without providing db connection string nor service discovery args', async () => {
