@@ -3,6 +3,8 @@ import {
   EpochReward,
   EpochRewardModel,
   OwnerAddressModel,
+  PoolAPY,
+  PoolAPYModel,
   PoolData,
   PoolDataModel,
   PoolMetrics,
@@ -46,6 +48,7 @@ interface ToCoreStakePoolInput {
   lastEpoch: number;
   poolMetrics: PoolMetrics[];
   totalCount: number;
+  poolAPYs: PoolAPY[];
 }
 
 export const toCoreStakePool = (
@@ -59,24 +62,25 @@ export const toCoreStakePool = (
     poolRewards,
     lastEpoch,
     poolMetrics,
-    totalCount
+    totalCount,
+    poolAPYs
   }: ToCoreStakePoolInput
 ): StakePoolSearchResults => ({
   pageResults: poolHashIds
     .map((hashId) => {
       const poolData = poolDatas.find((data) => data.hashId === hashId);
       if (!poolData) return;
+      const apy = poolAPYs.find((pool) => pool.hashId === hashId)?.apy;
       const registrations = poolRegistrations.filter((r) => r.hashId === poolData.hashId);
       const retirements = poolRetirements.filter((r) => r.hashId === poolData.hashId);
+      const metrics = poolMetrics.find((metric) => metric.hashId === poolData.hashId)?.metrics;
       const toReturn: Cardano.StakePool = {
         cost: poolData.cost,
         epochRewards: poolRewards.filter((r) => r.hashId === poolData.hashId).map((reward) => reward.epochReward),
         hexId: poolData.hexId,
         id: poolData.id,
         margin: poolData.margin,
-        metrics:
-          poolMetrics.find((metrics) => metrics.hashId === poolData.hashId)?.metrics ||
-          ({} as Cardano.StakePoolMetrics),
+        metrics: metrics ? { ...metrics, apy } : ({} as Cardano.StakePoolMetrics),
         owners: poolOwners.filter((o) => o.hashId === poolData.hashId).map((o) => o.address),
         pledge: poolData.pledge,
         relays: poolRelays.filter((r) => r.updateId === poolData.updateId).map((r) => r.relay),
@@ -203,4 +207,9 @@ export const mapPoolMetrics = (poolMetricsModel: PoolMetricsModel): PoolMetrics 
 
 export const mapPoolStats = (poolStats: StakePoolStatsModel): StakePoolStats => ({
   qty: { active: Number(poolStats.active), retired: Number(poolStats.retired), retiring: Number(poolStats.retiring) }
+});
+
+export const mapPoolAPY = (poolAPYModel: PoolAPYModel): PoolAPY => ({
+  apy: poolAPYModel.apy,
+  hashId: poolAPYModel.hash_id
 });

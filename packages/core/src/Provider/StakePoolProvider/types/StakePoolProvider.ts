@@ -1,9 +1,9 @@
 import { Cardano } from '../../..';
-import { PoolDataSortFields, PoolMetricsSortFields } from '../util';
+import { SortFields } from '../util';
 
 type FilterCondition = 'and' | 'or';
 type SortOrder = 'asc' | 'desc';
-export type SortField = typeof PoolDataSortFields[number] | typeof PoolMetricsSortFields[number];
+export type SortField = typeof SortFields[number];
 interface StakePoolSortOptions {
   order: SortOrder;
   field: SortField;

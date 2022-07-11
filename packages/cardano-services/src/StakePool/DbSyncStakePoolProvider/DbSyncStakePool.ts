@@ -1,4 +1,4 @@
-import { CommonPoolInfo, PoolData, PoolMetrics, PoolSortType } from './types';
+import { CommonPoolInfo, PoolAPY, PoolData, PoolMetrics, PoolSortType } from './types';
 import { DbSyncProvider } from '../../DbSyncProvider';
 import { Logger, dummyLogger } from 'ts-log';
 import { Pool } from 'pg';
@@ -29,6 +29,8 @@ export class DbSyncStakePoolProvider extends DbSyncProvider implements StakePool
       // Add more cases as more sort types are supported
       case 'metrics':
         return (options?: StakePoolQueryOptions) => this.#builder.queryPoolMetrics(hashesIds, totalAdaAmount, options);
+      case 'apy':
+        return (options?: StakePoolQueryOptions) => this.#builder.queryPoolAPY(hashesIds, options);
       case 'data':
       default:
         return (options?: StakePoolQueryOptions) => this.#builder.queryPoolData(updatesIds, options);
@@ -85,6 +87,7 @@ export class DbSyncStakePoolProvider extends DbSyncProvider implements StakePool
       poolRetirements,
       poolRewards,
       poolMetrics,
+      poolAPYs,
       totalCount,
       lastEpoch
     ] = await Promise.all([
@@ -98,12 +101,16 @@ export class DbSyncStakePoolProvider extends DbSyncProvider implements StakePool
       sortType === 'metrics'
         ? (orderedResult as PoolMetrics[])
         : this.#builder.queryPoolMetrics(orderedResultHashIds, totalAdaAmount),
+      sortType === 'apy'
+        ? (orderedResult as PoolAPY[])
+        : this.#builder.queryPoolAPY(hashesIds, { rewardsHistoryLimit: options?.rewardsHistoryLimit }),
       this.#builder.queryTotalCount(query, params),
       this.#builder.getLastEpoch()
     ]);
 
     return toCoreStakePool(orderedResultHashIds, {
       lastEpoch,
+      poolAPYs,
       poolDatas,
       poolMetrics,
       poolOwners,

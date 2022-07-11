@@ -99,12 +99,16 @@ WHERE tx_id IN $SELECT_TX_ID"
 REWARD_ADDRESSES_QUERY="
 SELECT addr_id
 FROM reward 
-WHERE spendable_epoch IN ($SELECT_BLOCK_EPOCH)"
+WHERE spendable_epoch IN ($SELECT_BLOCK_EPOCH) 
+OR earned_epoch IN ($SELECT_BLOCK_EPOCH)
+"
 
 REWARDS_POOL_HASH_QUERY="
 SELECT pool_id 
 FROM reward 
-WHERE spendable_epoch in ($SELECT_BLOCK_EPOCH)
+WHERE (spendable_epoch in ($SELECT_BLOCK_EPOCH)
+OR earned_epoch IN ($SELECT_BLOCK_EPOCH))
+AND pool_id IS NOT NULL
 "
 
 DELEGATIONS_POOL_HASH_QUERY="
@@ -187,7 +191,7 @@ echo "\." >> $OUT_FILE;
 echo "-- Dumping Block rewards" >> $OUT_FILE;
 echo "ALTER TABLE public.reward DISABLE TRIGGER ALL;" >> $OUT_FILE;
 echo 'COPY public.reward (id, addr_id, type, amount, earned_epoch, spendable_epoch,  pool_id) FROM stdin WITH CSV;' >> $OUT_FILE;
-psql -c "\copy (SELECT * from reward WHERE spendable_epoch in ($SELECT_BLOCK_EPOCH) OR addr_id = 12126) to STDOUT WITH CSV" $DB >> $OUT_FILE;
+psql -c "\copy (SELECT * from reward WHERE spendable_epoch in ($SELECT_BLOCK_EPOCH) OR earned_epoch IN ($SELECT_BLOCK_EPOCH) OR addr_id = 12126) to STDOUT WITH CSV" $DB >> $OUT_FILE;
 echo "\." >> $OUT_FILE;
 
 echo "-- Dumping Block rewards stake_addresses" >> $OUT_FILE;

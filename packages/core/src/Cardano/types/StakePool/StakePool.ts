@@ -32,6 +32,10 @@ export interface StakePoolMetrics {
   size: StakePoolMetricsSize;
   saturation: Percent;
   delegators: number;
+  /**
+   * Annual Percentage Yield (APY)
+   */
+  apy?: Percent;
 }
 
 export interface StakePoolTransactions {
