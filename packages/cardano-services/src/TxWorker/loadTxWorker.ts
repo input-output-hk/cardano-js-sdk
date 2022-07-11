@@ -15,7 +15,6 @@ export const loadTxWorker = async (args: TxWorkerArgs) => {
   const { loggerMinSeverity, serviceDiscoveryBackoffFactor, serviceDiscoveryBackoffTimeout, cacheTtl } = args.options;
   const logger = createLogger({ level: loggerMinSeverity, name: 'tx-worker' });
   const cache = new InMemoryCache(cacheTtl);
-
   const dnsResolver = createDnsResolver(
     {
       factor: serviceDiscoveryBackoffFactor,
@@ -24,7 +23,6 @@ export const loadTxWorker = async (args: TxWorkerArgs) => {
     cache,
     logger
   );
-
   const txSubmitProvider = await getOgmiosTxSubmitProvider(dnsResolver, args.options);
   const url = await getRabbitMqUrl(dnsResolver, args.options);
 
