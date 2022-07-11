@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">88.88% </span>
+                <span class="strong">89.28% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>48/54</span>
+                <span class='fraction'>50/56</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">46.66% </span>
+                <span class="strong">50% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>7/15</span>
+                <span class='fraction'>8/16</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">93.61% </span>
+                <span class="strong">95.91% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>44/47</span>
+                <span class='fraction'>47/49</span>
             </div>
         
             
@@ -189,7 +189,9 @@
 <a name='L124'></a><a href='#L124'>124</a>
 <a name='L125'></a><a href='#L125'>125</a>
 <a name='L126'></a><a href='#L126'>126</a>
-<a name='L127'></a><a href='#L127'>127</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -257,9 +259,11 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -282,23 +286,23 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">16x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">10x</span>
-<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -326,19 +330,19 @@ import { DbSyncUtxoProvider, UtxoHttpService } from '../Utxo';
 import { HttpServer, HttpServerConfig, HttpService } from '../Http';
 import { InMemoryCache } from '../InMemoryCache';
 import { MissingProgramOption, UnknownServiceName } from './errors';
+import { OgmiosCardanoNode, ogmiosTxSubmitProvider, urlToConnectionConfig } from '@cardano-sdk/ogmios';
 import { ProgramOptionDescriptions } from './ProgramOptionDescriptions';
 import { RabbitMqTxSubmitProvider } from '@cardano-sdk/rabbitmq';
 import { ServiceNames } from './ServiceNames';
 import { TxSubmitHttpService } from '../TxSubmit';
 import { createDbSyncMetadataService } from '../Metadata';
-import { ogmiosTxSubmitProvider, urlToConnectionConfig } from '@cardano-sdk/ogmios';
 import Logger, { createLogger } from 'bunyan';
 import pg from 'pg';
 &nbsp;
 export interface HttpServerOptions extends CommonProgramOptions {
   dbConnectionString?: string;
-  dbQueriesCacheTtl: number;
-  dbPollInterval: number;
+  cacheTtl: number;
+  epochPollInterval: number;
   cardanoNodeConfigPath?: string;
   metricsEnabled?: boolean;
   useQueue?: boolean;
@@ -383,16 +387,18 @@ const serviceMapFactory = (args: ProgramArgs, logger: Logger, cache: InMemoryCac
     return new RewardsHttpService({ logger, rewardsProvider: new DbSyncRewardsProvider(db, logger) });
   },
   [ServiceNames.NetworkInfo]: () =&gt; {
-    if (!db) throw new MissingProgramOption(ServiceNames.NetworkInfo, ProgramOptionDescriptions.DbConnection);
-    <span class="missing-if-branch" title="if path not taken" >I</span>if (args.options?.cardanoNodeConfigPath === undefined)
-<span class="cstat-no" title="statement not covered" >      throw new MissingProgramOption(ServiceNames.NetworkInfo, ProgramOptionDescriptions.CardanoNodeConfigPath);</span>
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (!db) <span class="cstat-no" title="statement not covered" >throw new MissingProgramOption(ServiceNames.NetworkInfo, ProgramOptionDescriptions.DbConnection);</span>
+    if (args.options?.cardanoNodeConfigPath === undefined)
+      throw new MissingProgramOption(ServiceNames.NetworkInfo, ProgramOptionDescriptions.CardanoNodeConfigPath);
+    if (args.options?.ogmiosUrl === undefined)
+      throw new MissingProgramOption(ServiceNames.NetworkInfo, ProgramOptionDescriptions.OgmiosUrl);
 &nbsp;
     const networkInfoProvider = new DbSyncNetworkInfoProvider(
       {
-        cardanoNodeConfigPath: args.options?.cardanoNodeConfigPath,
-        dbPollInterval: args.options?.dbPollInterval
+        cardanoNodeConfigPath: args.options.cardanoNodeConfigPath,
+        epochPollInterval: args.options?.epochPollInterval
       },
-      { cache, db, logger }
+      { cache, cardanoNode: new OgmiosCardanoNode(urlToConnectionConfig(args.options.ogmiosUrl), logger), db, logger }
     );
 &nbsp;
     return new NetworkInfoHttpService({ logger, networkInfoProvider });
@@ -418,7 +424,7 @@ export const loadHttpServer = (args: ProgramArgs): HttpServer =&gt; {
     ? new pg.Pool({ connectionString: args.options.dbConnectionString })
     : undefined;
 &nbsp;
-  const cache = new InMemoryCache(args.options?.dbQueriesCacheTtl);
+  const cache = new InMemoryCache(args.options?.cacheTtl);
 &nbsp;
   const serviceMap = serviceMapFactory(args, logger, cache, db);
 &nbsp;
@@ -448,7 +454,7 @@ export const loadHttpServer = (args: ProgramArgs): HttpServer =&gt; {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at Wed Jul 06 2022 04:44:33 GMT+0000 (Coordinated Universal Time)
+                at Mon Jul 11 2022 11:55:21 GMT+0000 (Coordinated Universal Time)
             </div>
         <script src="../../prettify.js"></script>
         <script>
