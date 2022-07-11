@@ -53,7 +53,7 @@ export class InMemoryCache {
    * @param value A value to cache
    * @param ttl The time to live in seconds.
    */
-  public set<T>(key: Key, value: T, ttl: number) {
+  public set<T>(key: Key, value: T, ttl = this.#ttlDefault) {
     return this.#cache.set<T>(key, value, ttl);
   }
 
