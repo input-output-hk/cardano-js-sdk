@@ -10,6 +10,8 @@ import {
 } from './types';
 import { ProtocolParametersRequiredByInputSelection } from '.';
 
+const coinsPerUTxOByteToCoinsPerUTxOWord = (coinsPerByte: number): number => coinsPerByte * 8;
+
 export type BuildTx = (selection: SelectionSkeleton) => Promise<CSL.Transaction>;
 
 export interface DefaultSelectionConstraintsProps {
@@ -39,9 +41,9 @@ export const computeMinimumCost =
   };
 
 export const computeMinimumCoinQuantity =
-  (coinsPerUtxoWord: ProtocolParametersRequiredByInputSelection['coinsPerUtxoWord']): ComputeMinimumCoinQuantity =>
+  (coinsPerUtxoByte: ProtocolParametersRequiredByInputSelection['coinsPerUtxoByte']): ComputeMinimumCoinQuantity =>
   (multiasset) => {
-    const minUTxOValue = CSL.BigNum.from_str((coinsPerUtxoWord * 29).toString());
+    const minUTxOValue = CSL.BigNum.from_str((coinsPerUTxOByteToCoinsPerUTxOWord(coinsPerUtxoByte) * 29).toString());
     const value = CSL.Value.new(CSL.BigNum.from_str('0'));
     if (multiasset) {
       value.set_multiasset(coreToCsl.tokenMap(multiasset));
@@ -81,16 +83,16 @@ export const computeSelectionLimit =
   };
 
 export const defaultSelectionConstraints = ({
-  protocolParameters: { coinsPerUtxoWord, maxTxSize, maxValueSize, minFeeCoefficient, minFeeConstant },
+  protocolParameters: { coinsPerUtxoByte, maxTxSize, maxValueSize, minFeeCoefficient, minFeeConstant },
   buildTx
 }: DefaultSelectionConstraintsProps): SelectionConstraints => {
-  if (!coinsPerUtxoWord || !maxTxSize || !maxValueSize || !minFeeCoefficient || !minFeeConstant) {
+  if (!coinsPerUtxoByte || !maxTxSize || !maxValueSize || !minFeeCoefficient || !minFeeConstant) {
     throw new InvalidProtocolParametersError(
-      'Missing one of: coinsPerUtxoWord, maxTxSize, maxValueSize, minFeeCoefficient, minFeeConstant'
+      'Missing one of: coinsPerUtxoByte, maxTxSize, maxValueSize, minFeeCoefficient, minFeeConstant'
     );
   }
   return {
-    computeMinimumCoinQuantity: computeMinimumCoinQuantity(coinsPerUtxoWord),
+    computeMinimumCoinQuantity: computeMinimumCoinQuantity(coinsPerUtxoByte),
     computeMinimumCost: computeMinimumCost({ minFeeCoefficient, minFeeConstant }, buildTx),
     computeSelectionLimit: computeSelectionLimit(maxTxSize, buildTx),
     tokenBundleSizeExceedsLimit: tokenBundleSizeExceedsLimit(maxValueSize)

@@ -19,7 +19,7 @@ export * from './Key';
 export * from './TxSubmissionErrors';
 export * as NativeScriptType from './NativeScriptType';
 
-export type ProtocolParametersAlonzo = OptionalUndefined<
-  RecursivelyReplaceNullWithUndefined<Ogmios.ProtocolParametersAlonzo>
+export type ProtocolParametersBabbage = OptionalUndefined<
+  RecursivelyReplaceNullWithUndefined<Ogmios.ProtocolParametersBabbage>
 >;
 export type ValidityInterval = OptionalUndefined<RecursivelyReplaceNullWithUndefined<Ogmios.ValidityInterval>>;

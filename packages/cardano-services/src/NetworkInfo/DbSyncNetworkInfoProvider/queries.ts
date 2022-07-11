@@ -91,7 +91,7 @@ export const findCurrentWalletProtocolParams = `
     protocol_major, 
     protocol_minor, 
     min_pool_cost, 
-    coins_per_utxo_word, 
+    coins_per_utxo_size, 
     max_val_size, 
     max_collateral_inputs
     FROM public.epoch_param

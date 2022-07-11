@@ -133,7 +133,7 @@ describe('blockfrostNetworkInfoProvider', () => {
     const response = await client.currentWalletProtocolParameters();
 
     expect(response).toMatchObject({
-      coinsPerUtxoWord: 0,
+      coinsPerUtxoByte: 0,
       maxCollateralInputs: 1,
       maxTxSize: 16_384,
       maxValueSize: 1000,

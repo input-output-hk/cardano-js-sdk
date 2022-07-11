@@ -26,7 +26,7 @@ export const BlockfrostToCore = {
   currentWalletProtocolParameters: (
     blockfrost: Responses['epoch_param_content']
   ): ProtocolParametersRequiredByWallet => ({
-    coinsPerUtxoWord: Number(blockfrost.coins_per_utxo_word),
+    coinsPerUtxoByte: Number(blockfrost.coins_per_utxo_word),
     maxCollateralInputs: Number(blockfrost.max_collateral_inputs),
     maxTxSize: Number(blockfrost.max_tx_size),
     maxValueSize: Number(blockfrost.max_val_size),

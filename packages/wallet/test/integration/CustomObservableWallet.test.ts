@@ -143,7 +143,7 @@ describe('CustomObservableWallet', () => {
 
       it('can provide an implementation that utilize SDK utils, but doesnt depend on full ObservableWallet', () => {
         const protocolParameters$ = of<ProtocolParametersRequiredByOutputValidator>({
-          coinsPerUtxoWord: 34_482,
+          coinsPerUtxoByte: 34_482,
           maxValueSize: 5000
         });
         // this compiles

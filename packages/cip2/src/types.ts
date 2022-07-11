@@ -95,8 +95,8 @@ export interface InputSelector {
 }
 
 export type ProtocolParametersForInputSelection = Pick<
-  Cardano.ProtocolParametersAlonzo,
-  'coinsPerUtxoWord' | 'maxTxSize' | 'maxValueSize' | 'minFeeCoefficient' | 'minFeeConstant'
+  Cardano.ProtocolParametersBabbage,
+  'coinsPerUtxoByte' | 'maxTxSize' | 'maxValueSize' | 'minFeeCoefficient' | 'minFeeConstant'
 >;
 
 export type ProtocolParametersRequiredByInputSelection = Required<{

@@ -2,8 +2,8 @@ import { Cardano, TimeSettings } from '../..';
 
 export type ProtocolParametersRequiredByWallet = Required<
   Pick<
-    Cardano.ProtocolParametersAlonzo,
-    | 'coinsPerUtxoWord'
+    Cardano.ProtocolParametersBabbage,
+    | 'coinsPerUtxoByte'
     | 'maxTxSize'
     | 'maxValueSize'
     | 'stakeKeyDeposit'

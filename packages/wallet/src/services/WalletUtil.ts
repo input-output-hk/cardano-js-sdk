@@ -8,7 +8,7 @@ import { txInEquals } from './util';
 
 export type ProtocolParametersRequiredByOutputValidator = Pick<
   ProtocolParametersRequiredByWallet,
-  'coinsPerUtxoWord' | 'maxValueSize'
+  'coinsPerUtxoByte' | 'maxValueSize'
 >;
 export interface OutputValidatorContext {
   /**
@@ -54,8 +54,8 @@ export const createOutputValidator = ({ protocolParameters$ }: OutputValidatorCo
     value: Cardano.Value,
     protocolParameters?: ProtocolParametersRequiredByOutputValidator
   ): Promise<OutputValidation> => {
-    const { coinsPerUtxoWord, maxValueSize } = protocolParameters || (await firstValueFrom(protocolParameters$));
-    const minimumCoin = BigInt(computeMinimumCoinQuantity(coinsPerUtxoWord)(value.assets));
+    const { coinsPerUtxoByte, maxValueSize } = protocolParameters || (await firstValueFrom(protocolParameters$));
+    const minimumCoin = BigInt(computeMinimumCoinQuantity(coinsPerUtxoByte)(value.assets));
     return {
       coinMissing: BigIntMath.max([minimumCoin - value.coins, 0n])!,
       minimumCoin,

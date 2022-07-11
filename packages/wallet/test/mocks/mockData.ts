@@ -16,7 +16,7 @@ export const currentEpoch = {
 };
 
 export const protocolParameters = {
-  coinsPerUtxoWord: 34_482,
+  coinsPerUtxoByte: 4310,
   maxCollateralInputs: 1,
   maxTxSize: 16_384,
   maxValueSize: 1000,

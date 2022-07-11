@@ -1208,12 +1208,12 @@
     blake2 "^4.0.2"
     int64-buffer "^1.0.1"
 
-"@cardano-ogmios/client@5.4.0":
-  version "5.4.0"
-  resolved "https://registry.yarnpkg.com/@cardano-ogmios/client/-/client-5.4.0.tgz#9662b4b3c344cd37d353bda2481ed49348370838"
-  integrity sha512-tA4DzhtTb5B+0Y0Pa2hm75QI5yZjHQFLFlBnwHnxZ7tPr8qoEGC0znQeygdOWFJroc6N/jvmzG9Qzi8oHp5hWA==
+"@cardano-ogmios/client@5.5.2":
+  version "5.5.2"
+  resolved "https://registry.yarnpkg.com/@cardano-ogmios/client/-/client-5.5.2.tgz#ee75f922ca3b4a439c233a1cf0691346aa76a797"
+  integrity sha512-PvXMimCDZLTqG4VLmvus5PvYpzCrHx3NxNLLxM3L+6ltT9qggwBw36UehSottLn+HPEFBsVqIOySgxM8oGVK0g==
   dependencies:
-    "@cardano-ogmios/schema" "5.4.0"
+    "@cardano-ogmios/schema" "5.5.2"
     "@cardanosolutions/json-bigint" "^1.0.0"
     "@types/json-bigint" "^1.0.1"
     cross-fetch "^3.1.4"
@@ -1223,10 +1223,10 @@
     ts-custom-error "^3.2.0"
     ws "^7.4.6"
 
-"@cardano-ogmios/schema@5.4.0":
-  version "5.4.0"
-  resolved "https://registry.yarnpkg.com/@cardano-ogmios/schema/-/schema-5.4.0.tgz#6877764ef86eb61c169a46ea3de09bce6d1f6109"
-  integrity sha512-GxgOG5rRVn56sF2XU0uE12ydUyZ1/dxPo807V5XaE7DIfP3e0oPxVreZusQ5oKS5qb2ZVTWbNP9L0nYN1xetXQ==
+"@cardano-ogmios/schema@5.5.2":
+  version "5.5.2"
+  resolved "https://registry.yarnpkg.com/@cardano-ogmios/schema/-/schema-5.5.2.tgz#7e00c8b6f6c5639149ea06b172b5bc780605840d"
+  integrity sha512-0+vlT13y+/hXYCHoX8Fvd1O+8mRoPJ0ajc/NMtFgZr6aIRm7zu8Jpa8gWjNJJqAp8f3F2vj4eIeB7F9suIfmaQ==
 
 "@cardanosolutions/json-bigint@^1.0.0":
   version "1.0.0"

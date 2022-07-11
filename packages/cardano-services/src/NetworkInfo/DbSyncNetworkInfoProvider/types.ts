@@ -22,12 +22,12 @@ export interface EpochModel {
 
 export interface LedgerTipModel {
   block_no: number;
-  slot_no: number;
+  slot_no: string;
   hash: Buffer;
 }
 
 export interface WalletProtocolParamsModel {
-  coins_per_utxo_word: string;
+  coins_per_utxo_size: string;
   max_tx_size: number;
   max_val_size: string;
   min_pool_cost: string;

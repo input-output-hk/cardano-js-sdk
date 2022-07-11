@@ -138,7 +138,7 @@ export const mapCertificate = (
 };
 
 export const mapProtocolParams = (protocolParamsModel: ProtocolParamsModel): ProtocolParametersRequiredByWallet => ({
-  coinsPerUtxoWord: Number(protocolParamsModel.coin_per_utxo_word),
+  coinsPerUtxoByte: Number(protocolParamsModel.coin_per_utxo_size),
   maxCollateralInputs: protocolParamsModel.max_collateral_inputs,
   maxTxSize: protocolParamsModel.max_tx_size,
   maxValueSize: Number(protocolParamsModel.max_val_size),
@@ -180,7 +180,7 @@ export const mapTxAlonzo = (
   blockHeader: {
     blockNo: txModel.block_no,
     hash: Cardano.BlockId(txModel.block_hash.toString('hex')),
-    slot: txModel.block_slot_no
+    slot: Number(txModel.block_slot_no)
   },
   body: {
     certificates,
@@ -219,7 +219,7 @@ export const mapBlock = (blockModel: BlockModel, blockOutputModel: BlockOutputMo
   header: {
     blockNo: blockModel.block_no,
     hash: Cardano.BlockId(blockModel.hash.toString('hex')),
-    slot: blockModel.slot_no
+    slot: Number(blockModel.slot_no)
   },
   nextBlock: blockModel.next_block ? Cardano.BlockId(blockModel.next_block.toString('hex')) : undefined,
   previousBlock: blockModel.previous_block ? Cardano.BlockId(blockModel.previous_block.toString('hex')) : undefined,

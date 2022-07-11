@@ -46,13 +46,13 @@ export const toStake = ({ liveStake, activeStake }: ToStakeInput): StakeSummary 
 });
 
 export const toLedgerTip = ({ block_no, slot_no, hash }: LedgerTipModel): Cardano.Tip => ({
-  blockNo: block_no,
+  blockNo: Number(block_no),
   hash: Cardano.BlockId(hash.toString('hex')),
-  slot: slot_no
+  slot: Number(slot_no)
 });
 
 export const toWalletProtocolParams = ({
-  coins_per_utxo_word,
+  coins_per_utxo_size,
   max_tx_size,
   max_val_size,
   max_collateral_inputs,
@@ -64,7 +64,7 @@ export const toWalletProtocolParams = ({
   min_fee_a,
   min_fee_b
 }: WalletProtocolParamsModel): ProtocolParametersRequiredByWallet => ({
-  coinsPerUtxoWord: Number(coins_per_utxo_word),
+  coinsPerUtxoByte: Number(coins_per_utxo_size),
   maxCollateralInputs: max_collateral_inputs,
   maxTxSize: max_tx_size,
   maxValueSize: Number(max_val_size),

@@ -15,7 +15,7 @@ describe('WalletUtil', () => {
     beforeAll(() => {
       validator = createOutputValidator({
         protocolParameters$: of<ProtocolParametersRequiredByOutputValidator>({
-          coinsPerUtxoWord: 34_482,
+          coinsPerUtxoByte: 4310,
           maxValueSize: 90
         })
       });
