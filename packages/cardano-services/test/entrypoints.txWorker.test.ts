@@ -12,13 +12,17 @@ const exePath = (name: 'cli' | 'startWorker') => path.join(__dirname, '..', 'dis
 
 describe('tx-worker entrypoints', () => {
   let commonArgs: string[];
+  let commonArgsWithServiceDiscovery: string[];
   let commonEnv: Record<string, string>;
+  let commonEnvWithServiceDiscovery: Record<string, string>;
   let hook: () => void;
   let hookLogs: string[];
   let hookPromise: Promise<void>;
   let loggerHookCounter: number;
   let ogmiosServer: http.Server;
   let proc: ChildProcess;
+  let rabbitmqSrvServiceName: string;
+  let ogmiosSrvServiceName: string;
 
   const resetHook = () => (hook = jest.fn());
 
@@ -43,10 +47,29 @@ describe('tx-worker entrypoints', () => {
     const port = await getRandomPort();
     const ogmiosConnection = createConnectionObject({ port });
     ogmiosServer = createHealthyMockOgmiosServer(() => hook());
+    rabbitmqSrvServiceName = process.env.RABBITMQ_SRV_SERVICE_NAME!;
+    ogmiosSrvServiceName = process.env.OGMIOS_SRV_SERVICE_NAME!;
     await listenPromise(ogmiosServer, { port });
     await ogmiosServerReady(ogmiosConnection);
     commonArgs = ['start-worker', '--logger-min-severity', 'error', '--ogmios-url', ogmiosConnection.address.webSocket];
+    commonArgsWithServiceDiscovery = [
+      'start-worker',
+      '--logger-min-severity',
+      'error',
+      '--rabbitmq-srv-service-name',
+      rabbitmqSrvServiceName,
+      '--ogmios-srv-service-name',
+      ogmiosSrvServiceName,
+      '--service-discovery-backoff-timeout',
+      '1000'
+    ];
     commonEnv = { LOGGER_MIN_SEVERITY: 'error', OGMIOS_URL: ogmiosConnection.address.webSocket };
+    commonEnvWithServiceDiscovery = {
+      LOGGER_MIN_SEVERITY: 'error',
+      OGMIOS_SRV_SERVICE_NAME: ogmiosSrvServiceName,
+      RABBITMQ_SRV_SERVICE_NAME: rabbitmqSrvServiceName,
+      SERVICE_DISCOVERY_BACKOFF_TIMEOUT: '1000'
+    };
   });
 
   afterAll(async () => await serverClosePromise(ogmiosServer));
@@ -178,6 +201,38 @@ describe('tx-worker entrypoints', () => {
         env: { ...commonEnv, RABBITMQ_URL: BAD_CONNECTION_URL.toString() },
         stdio: 'pipe'
       });
+      proc.on('exit', (code) => {
+        expect(code).toBe(1);
+        done();
+      });
+    });
+  });
+
+  describe('with service discovery', () => {
+    it('cli:start-worker throws DNS SRV error and exits with code 1', (done) => {
+      expect.assertions(2);
+      proc = fork(exePath('cli'), commonArgsWithServiceDiscovery, { stdio: 'pipe' });
+
+      proc.stderr!.on('data', (data) => {
+        expect(data.toString().includes('querySrv ENOTFOUND')).toEqual(true);
+      });
+
+      proc.on('exit', (code) => {
+        expect(code).toBe(1);
+        done();
+      });
+    });
+
+    it('startWorker throws DNS SRV error and exits with code 1', (done) => {
+      expect.assertions(2);
+      proc = fork(exePath('startWorker'), {
+        env: commonEnvWithServiceDiscovery,
+        stdio: 'pipe'
+      });
+      proc.stderr!.on('data', (data) => {
+        expect(data.toString().includes('querySrv ENOTFOUND')).toEqual(true);
+      });
+
       proc.on('exit', (code) => {
         expect(code).toBe(1);
         done();

@@ -1,7 +1,7 @@
 /* eslint-disable complexity */
 /* eslint-disable sonarjs/cognitive-complexity */
 import { ChainHistoryHttpService, DbSyncChainHistoryProvider } from '../ChainHistory';
-import { CommonProgramOptions, SrvProgramOptions } from '../ProgramsCommon';
+import { CommonProgramOptions } from '../ProgramsCommon';
 import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../NetworkInfo';
 import { DbSyncRewardsProvider, RewardsHttpService } from '../Rewards';
 import { DbSyncStakePoolProvider, StakePoolHttpService } from '../StakePool';
@@ -24,15 +24,16 @@ import { createDbSyncMetadataService } from '../Metadata';
 import Logger, { createLogger } from 'bunyan';
 import pg from 'pg';
 
-export interface HttpServerOptions extends CommonProgramOptions, SrvProgramOptions {
+export interface HttpServerOptions extends CommonProgramOptions {
   dbConnectionString?: string;
-  serviceDiscoveryBackoffFactor?: number;
-  serviceDiscoveryBackoffTimeout?: number;
-  cacheTtl: number;
   epochPollInterval: number;
   cardanoNodeConfigPath?: string;
   metricsEnabled?: boolean;
   useQueue?: boolean;
+  postgresSrvServiceName?: string;
+  postgresDb?: string;
+  postgresUser?: string;
+  postgresPassword?: string;
 }
 
 export interface ProgramArgs {

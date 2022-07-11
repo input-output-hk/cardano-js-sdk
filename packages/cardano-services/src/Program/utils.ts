@@ -1,6 +1,7 @@
 /* eslint-disable max-len */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ClientConfig, Pool, QueryConfig } from 'pg';
+import { CommonOptionDescriptions, CommonProgramOptions } from '../ProgramsCommon';
 import { HttpServerOptions } from './loadHttpServer';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../InMemoryCache';
 import { InvalidArgsCombination, MissingProgramOption } from './errors';
@@ -164,14 +165,14 @@ export const ogmiosTxSubmitProviderWithDiscovery = async (
 
 export const getOgmiosTxSubmitProvider = async (
   dnsResolver: DnsResolver,
-  options?: HttpServerOptions
+  options?: CommonProgramOptions
 ): Promise<TxSubmitProvider> => {
   if (options?.ogmiosSrvServiceName)
     return ogmiosTxSubmitProviderWithDiscovery(dnsResolver, options.ogmiosSrvServiceName);
   if (options?.ogmiosUrl) return ogmiosTxSubmitProvider(urlToConnectionConfig(options?.ogmiosUrl));
   throw new MissingProgramOption(ServiceNames.TxSubmit, [
-    ProgramOptionDescriptions.OgmiosUrl,
-    ProgramOptionDescriptions.OgmiosSrvServiceName
+    CommonOptionDescriptions.OgmiosUrl,
+    CommonOptionDescriptions.OgmiosSrvServiceName
   ]);
 };
 
@@ -222,13 +223,27 @@ export const rabbitMqTxSubmitProviderWithDiscovery = async (
 
 export const getRabbitMqTxSubmitProvider = async (
   dnsResolver: DnsResolver,
-  options?: HttpServerOptions
+  options?: CommonProgramOptions
 ): Promise<RabbitMqTxSubmitProvider> => {
   if (options?.rabbitmqSrvServiceName)
     return rabbitMqTxSubmitProviderWithDiscovery(dnsResolver, options.rabbitmqSrvServiceName);
   if (options?.rabbitmqUrl) return new RabbitMqTxSubmitProvider({ rabbitmqUrl: options.rabbitmqUrl });
   throw new MissingProgramOption(ServiceNames.TxSubmit, [
-    ProgramOptionDescriptions.RabbitMQUrl,
-    ProgramOptionDescriptions.RabbitMQSrvServiceName
+    CommonOptionDescriptions.RabbitMQUrl,
+    CommonOptionDescriptions.RabbitMQSrvServiceName
+  ]);
+};
+
+export const getRabbitMqUrl = async (dnsResolver: DnsResolver, args: CommonProgramOptions) => {
+  if (args.rabbitmqSrvServiceName) {
+    const record = await dnsResolver(args.rabbitmqSrvServiceName);
+    return srvRecordToRabbitmqURL(record);
+  }
+  if (args.rabbitmqUrl) {
+    return args.rabbitmqUrl;
+  }
+  throw new MissingProgramOption(ServiceNames.TxSubmit, [
+    CommonOptionDescriptions.RabbitMQUrl,
+    CommonOptionDescriptions.RabbitMQSrvServiceName
   ]);
 };

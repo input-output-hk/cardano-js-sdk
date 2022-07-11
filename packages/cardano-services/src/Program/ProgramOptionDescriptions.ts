@@ -8,21 +8,12 @@ enum HttpServerOptionDescriptions {
   RabbitMQUrl = 'RabbitMQ URL',
   UseQueue = 'Enables RabbitMQ',
   CardanoNodeConfigPath = 'Cardano node config path',
-  CacheTtl = 'Cache TTL in minutes between 1 and 2880',
   EpochPollInterval = 'Epoch poll interval',
-  ServiceDiscoveryBackoffFactor = 'Exponential backoff factor for service discovery',
-  ServiceDiscoveryBackoffTimeout = 'Exponential backoff max timeout for service discovery'
+  PostgresSrvArgs = 'Postgres SRV service name, db, user and password'
 }
 
-enum SrvOptionDescriptions {
-  OgmiosSrvServiceName = 'Ogmios SRV service name',
-  PostgresSrvArgs = 'Postgres SRV service name, db, user and password',
-  RabbitMQSrvServiceName = 'RabbitMQ SRV service name'
-}
-
-export type ProgramOptionDescriptions = CommonOptionDescriptions | HttpServerOptionDescriptions | SrvOptionDescriptions;
+export type ProgramOptionDescriptions = CommonOptionDescriptions | HttpServerOptionDescriptions;
 export const ProgramOptionDescriptions = {
   ...CommonOptionDescriptions,
-  ...HttpServerOptionDescriptions,
-  ...SrvOptionDescriptions
+  ...HttpServerOptionDescriptions
 };

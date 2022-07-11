@@ -194,7 +194,6 @@ describe('Service dependency abstractions', () => {
         config = { listen: { port } };
         txSubmitProvider = await getOgmiosTxSubmitProvider(dnsResolver, {
           cacheTtl: 10_000,
-          epochPollInterval: 1000,
           ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME,
           serviceDiscoveryBackoffFactor: 1.1,
           serviceDiscoveryBackoffTimeout: 1000
@@ -248,7 +247,6 @@ describe('Service dependency abstractions', () => {
         config = { listen: { port } };
         txSubmitProvider = await getOgmiosTxSubmitProvider(dnsResolver, {
           cacheTtl: 10_000,
-          epochPollInterval: 1000,
           ogmiosUrl: new URL(ogmiosConnection.address.webSocket)
         });
         httpServer = new HttpServer(config, {
@@ -291,11 +289,9 @@ describe('Service dependency abstractions', () => {
         config = { listen: { port } };
         txSubmitProvider = await getRabbitMqTxSubmitProvider(dnsResolver, {
           cacheTtl: 10_000,
-          epochPollInterval: 1000,
           rabbitmqSrvServiceName: process.env.RABBITMQ_SRV_SERVICE_NAME,
           serviceDiscoveryBackoffFactor: 1.1,
-          serviceDiscoveryBackoffTimeout: 1000,
-          useQueue: true
+          serviceDiscoveryBackoffTimeout: 1000
         });
         httpServer = new HttpServer(config, {
           services: [new TxSubmitHttpService({ txSubmitProvider })]
@@ -336,9 +332,7 @@ describe('Service dependency abstractions', () => {
         config = { listen: { port } };
         txSubmitProvider = await getRabbitMqTxSubmitProvider(dnsResolver, {
           cacheTtl: 10_000,
-          epochPollInterval: 1000,
-          rabbitmqUrl: new URL(process.env.RABBITMQ_URL!),
-          useQueue: true
+          rabbitmqUrl: new URL(process.env.RABBITMQ_URL!)
         });
         httpServer = new HttpServer(config, {
           services: [new TxSubmitHttpService({ txSubmitProvider })]

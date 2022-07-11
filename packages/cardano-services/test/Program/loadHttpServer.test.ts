@@ -88,9 +88,7 @@ describe('loadHttpServer', () => {
           cardanoNodeConfigPath,
           dbConnectionString,
           epochPollInterval,
-          ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
-          serviceDiscoveryBackoffFactor,
-          serviceDiscoveryBackoffTimeout
+          ogmiosUrl: new URL(ogmiosConnection.address.webSocket)
         },
         serviceNames: [
           ServiceNames.StakePool,
@@ -157,9 +155,7 @@ describe('loadHttpServer', () => {
               apiUrl,
               options: {
                 cacheTtl,
-                epochPollInterval,
-                serviceDiscoveryBackoffFactor,
-                serviceDiscoveryBackoffTimeout
+                epochPollInterval
               },
               serviceNames: [ServiceNames.StakePool]
             })
@@ -316,9 +312,7 @@ describe('loadHttpServer', () => {
               cacheTtl: 0,
               dbConnectionString: 'postgres',
               epochPollInterval: 0,
-              ogmiosUrl: new URL('http://localhost:1337'),
-              serviceDiscoveryBackoffFactor,
-              serviceDiscoveryBackoffTimeout
+              ogmiosUrl: new URL('http://localhost:1337')
             },
             serviceNames: [ServiceNames.NetworkInfo]
           })
@@ -347,9 +341,7 @@ describe('loadHttpServer', () => {
             cacheTtl,
             dbConnectionString,
             epochPollInterval,
-            ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
-            serviceDiscoveryBackoffFactor,
-            serviceDiscoveryBackoffTimeout
+            ogmiosUrl: new URL(ogmiosConnection.address.webSocket)
           },
           serviceNames: [ServiceNames.StakePool, ServiceNames.TxSubmit]
         })

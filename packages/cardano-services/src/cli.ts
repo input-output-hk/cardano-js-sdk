@@ -72,6 +72,21 @@ const commonOptions = (command: Command) =>
       CommonOptionDescriptions.RabbitMQUrl,
       (url) => new URL(url),
       new URL(RABBITMQ_URL_DEFAULT)
+    )
+    .option('--ogmios-srv-service-name <ogmiosSrvServiceName>', ProgramOptionDescriptions.OgmiosSrvServiceName)
+    .option('--rabbitmq-srv-service-name <rabbitmqSrvServiceName>', ProgramOptionDescriptions.RabbitMQSrvServiceName)
+    .option('--cache-ttl <cacheTtl>', ProgramOptionDescriptions.CacheTtl, cacheTtlValidator, CACHE_TTL_DEFAULT)
+    .option(
+      '--service-discovery-backoff-factor <serviceDiscoveryBackoffFactor>',
+      ProgramOptionDescriptions.ServiceDiscoveryBackoffFactor,
+      (factor) => Number.parseFloat(factor),
+      SERVICE_DISCOVERY_BACKOFF_FACTOR_DEFAULT
+    )
+    .option(
+      '--service-discovery-backoff-timeout <serviceDiscoveryBackoffTimeout>',
+      ProgramOptionDescriptions.ServiceDiscoveryBackoffTimeout,
+      (interval) => Number.parseInt(interval, 10),
+      SERVICE_DISCOVERY_BACKOFF_TIMEOUT_DEFAULT
     );
 
 const program = new Command('cardano-services');
@@ -90,28 +105,13 @@ commonOptions(
     new URL(url).toString()
   )
   .option('--cardano-node-config-path <cardanoNodeConfigPath>', ProgramOptionDescriptions.CardanoNodeConfigPath)
-  .option('--cache-ttl <cacheTtl>', ProgramOptionDescriptions.CacheTtl, cacheTtlValidator, CACHE_TTL_DEFAULT)
   .option(
     '--epoch-poll-interval <epochPollInterval>',
     ProgramOptionDescriptions.EpochPollInterval,
     (interval) => Number.parseInt(interval, 10),
     EPOCH_POLL_INTERVAL_DEFAULT
   )
-  .option(
-    '--service-discovery-backoff-factor <serviceDiscoveryBackoffFactor>',
-    ProgramOptionDescriptions.ServiceDiscoveryBackoffFactor,
-    (factor) => Number.parseFloat(factor),
-    SERVICE_DISCOVERY_BACKOFF_FACTOR_DEFAULT
-  )
-  .option(
-    '--service-discovery-backoff-timeout <serviceDiscoveryBackoffTimeout>',
-    ProgramOptionDescriptions.ServiceDiscoveryBackoffTimeout,
-    (interval) => Number.parseInt(interval, 10),
-    SERVICE_DISCOVERY_BACKOFF_TIMEOUT_DEFAULT
-  )
   .option('--use-queue', ProgramOptionDescriptions.UseQueue, () => true, USE_QUEUE_DEFAULT)
-  .option('--rabbitmq-srv-service-name <rabbitmqSrvServiceName>', ProgramOptionDescriptions.RabbitMQSrvServiceName)
-  .option('--ogmios-srv-service-name <ogmiosSrvServiceName>', ProgramOptionDescriptions.OgmiosSrvServiceName)
   .option('--postgres-srv-service-name <postgresSrvServiceName>', ProgramOptionDescriptions.PostgresSrvArgs)
   .option('--postgres-db <postgresDb>', ProgramOptionDescriptions.PostgresSrvArgs)
   .option('--postgres-user <postgresUser>', ProgramOptionDescriptions.PostgresSrvArgs)
