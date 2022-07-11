@@ -53,9 +53,8 @@ describe('StakePoolBuilder', () => {
   });
   describe('queryPoolRelays', () => {
     it('queryPoolRelays', async () => {
-      // todo: change ids
-      const relays = await builder.queryPoolRelays([1, 2, 3]);
-      expect(relays).toEqual([]);
+      const relays = await builder.queryPoolRelays([1, 20, 355]);
+      expect(relays).toMatchSnapshot();
     });
   });
   describe('queryPoolOwners', () => {
@@ -204,7 +203,7 @@ describe('StakePoolBuilder', () => {
       expect(buildPoolsByStatusQuerySpy).toHaveBeenCalledTimes(2);
       expect(buildPoolsByStatusQuerySpy).toHaveReturnedWith(poolsByStatusQuery);
       expect(poolsByStatusQuery).toMatchSnapshot();
-      expect(poolHashes).toHaveLength(7);
+      expect(poolHashes).toHaveLength(8);
     });
     it('retiring', async () => {
       const retiringStatus = [Cardano.StakePoolStatus.Retiring];
@@ -246,7 +245,7 @@ describe('StakePoolBuilder', () => {
       expect(buildPoolsByStatusQuerySpy).toHaveBeenCalledTimes(2);
       expect(buildPoolsByStatusQuerySpy).toHaveReturnedWith(poolsByStatusQuery);
       expect(poolsByStatusQuery).toMatchSnapshot();
-      expect(poolHashes).toHaveLength(9);
+      expect(poolHashes).toHaveLength(10);
     });
   });
   describe('buildPoolsByPledgeMetQuery', () => {
@@ -279,7 +278,7 @@ describe('StakePoolBuilder', () => {
       const poolHashes = await builder.queryPoolHashes(query, params);
       const totalCount = await builder.queryTotalCount(query, params);
       expect(builtQuery).toMatchSnapshot();
-      expect(poolHashes).toHaveLength(9);
+      expect(poolHashes).toHaveLength(10);
       expect(totalCount).toMatchSnapshot();
     });
   });

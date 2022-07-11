@@ -31,7 +31,7 @@ TAR_FILE='./testnet-fixture-data.tar'
 # Block Ids. Ideally we need to export them in batches of 3 as when we skip Epoch Boundary Blocks checking 3 blocks 
 # before the one we are interested, so, if you are willing to fetch a block, please state B-2, B-1, B
 # See: cardano-rosetta-server/src/server/db/queries/blockchain-queries.ts#findBlock
-BLOCKS_TO_EXPORT="1833726,1598507,1622869,1646557,1654555,1655520,1668437,1682503,1912426,2672896,2759361,2769413,2769469,2769577,2972717,3087425,3157934,3274726, 3556390"
+BLOCKS_TO_EXPORT="1833726,1598507,1622869,1646557,1654555,1655520,1668437,1682503,1912426,1932634,2672896,2759361,2769413,2769469,2769577,2972717,3087425,3157934,3274726, 3556390"
 SELECT_BLOCK_ID="SELECT id FROM block WHERE block_no IN ($BLOCKS_TO_EXPORT)"
 SELECT_BLOCK_EPOCH="SELECT epoch_no FROM block WHERE block_no IN ($BLOCKS_TO_EXPORT)"
   
@@ -131,6 +131,12 @@ POOL_UPDATE_POOL_HASH_QUERY="
 SELECT hash_id
 FROM pool_update 
 WHERE registered_tx_id IN ($SELECT_TX_ID)"
+
+POOL_UPDATE_ID_QUERY="
+SELECT id 
+FROM pool_update 
+WHERE registered_tx_id IN ($SELECT_TX_ID)
+"
 
 POOL_RETIRE_POOL_HASH_QUERY="
 SELECT hash_id
@@ -275,7 +281,7 @@ echo "\." >> $OUT_FILE;
 echo "-- Dumping pool registrations" >> $OUT_FILE;
 echo "ALTER TABLE public.pool_update DISABLE TRIGGER ALL;" >> $OUT_FILE;
 echo 'COPY public.pool_update (id, hash_id, cert_index, vrf_key_hash, pledge, reward_addr, active_epoch_no, meta_id, margin, fixed_cost, registered_tx_id) FROM stdin WITH CSV;' >> $OUT_FILE;
-psql -c "\copy (SELECT * from pool_update WHERE registered_tx_id IN ($SELECT_TX_ID)) to STDOUT WITH CSV" $DB >> $OUT_FILE;
+psql -c "\copy (SELECT * from pool_update WHERE id IN ($POOL_UPDATE_ID_QUERY)) to STDOUT WITH CSV" $DB >> $OUT_FILE;
 echo "\." >> $OUT_FILE;
 
 echo "-- Dumping pool hashes of pool retirements" >> $OUT_FILE;
@@ -363,6 +369,12 @@ echo "-- Dumping reserve" >> $OUT_FILE;
 echo "ALTER TABLE public.reserve DISABLE TRIGGER ALL;" >> $OUT_FILE;
 echo 'COPY public.reserve (id, addr_id, cert_index, amount, tx_id) FROM stdin WITH CSV;' >> $OUT_FILE;
 psql -c "\copy (SELECT * from reserve WHERE tx_id IN ($SELECT_TX_ID)) to STDOUT WITH CSV" $DB >> $OUT_FILE;
+echo "\." >> $OUT_FILE;
+
+echo "-- Dumping pool relays" >> $OUT_FILE;
+echo "ALTER TABLE public.pool_relay DISABLE TRIGGER ALL;" >> $OUT_FILE;
+echo 'COPY public.pool_relay (id, update_id, ipv4, ipv6, dns_name, dns_srv_name, port) FROM stdin WITH CSV;' >> $OUT_FILE;
+psql -c "\copy (SELECT * from pool_relay WHERE update_id IN ($POOL_UPDATE_ID_QUERY)) to STDOUT WITH CSV" $DB >> $OUT_FILE;
 echo "\." >> $OUT_FILE;
 
 tar -cf $TAR_FILE $OUT_FILE;

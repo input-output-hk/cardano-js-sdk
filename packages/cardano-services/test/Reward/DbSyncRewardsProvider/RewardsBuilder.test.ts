@@ -38,7 +38,7 @@ describe('RewardsBuilder', () => {
     it('returns RewardEpochModel when there is epochs field', async () => {
       const epochs = { lowerBound: 80, upperBound: 90 };
       const result = await builder.getRewardsHistory([rewardAccWithBalance], epochs);
-      expect(result).toHaveLength(2);
+      expect(result).toHaveLength(3);
       for (const reward of result) {
         expect(Number(reward.epoch)).toBeGreaterThanOrEqual(epochs.lowerBound);
         expect(Number(reward.epoch)).toBeLessThanOrEqual(epochs.upperBound);
@@ -53,7 +53,7 @@ describe('RewardsBuilder', () => {
     it('returns RewardEpochModel when there is partially epochs field with upperBound', async () => {
       const epochs = { upperBound: 90 };
       const result = await builder.getRewardsHistory([rewardAccWithBalance], epochs);
-      expect(result).toHaveLength(2);
+      expect(result).toHaveLength(3);
       for (const reward of result) expect(Number(reward.epoch)).toBeLessThanOrEqual(epochs.upperBound);
     });
   });

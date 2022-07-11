@@ -167,7 +167,7 @@ describe('StakePoolHttpService', () => {
             url,
             [reqWithPagination]
           );
-          expect(response.pageResults.length).toEqual(9);
+          expect(response.pageResults.length).toEqual(10);
           expect(responseWithPagination.pageResults.length).toEqual(2);
           expect(response.pageResults[0]).not.toEqual(responseWithPagination.pageResults[0]);
         });
@@ -179,7 +179,7 @@ describe('StakePoolHttpService', () => {
             url,
             [reqWithPagination]
           );
-          expect(response.pageResults.length).toEqual(9);
+          expect(response.pageResults.length).toEqual(10);
           expect(responseWithPagination.pageResults.length).toEqual(2);
           expect(response.pageResults[0]).not.toEqual(responseWithPagination.pageResults[0]);
         });
@@ -826,7 +826,7 @@ describe('StakePoolHttpService', () => {
 
         it('response is an object with stake pool stats', async () => {
           const response = await provider.stakePoolStats();
-          expect(response.qty.active).toBe(7);
+          expect(response.qty.active).toBe(8);
           expect(response.qty.retired).toBe(2);
           expect(response.qty.retiring).toBe(0);
         });

@@ -76,6 +76,13 @@
   },
   "components": {
     "schemas": {
+      "Undefined": {
+        "required": ["__type"],
+        "type": "object",
+        "properties": {
+          "__type": { "type": "string", "enum": ["undefined"] }
+        }
+      },
       "StakePoolStats": {
         "type": "object",
         "properties": {
@@ -227,13 +234,13 @@
         "type": "object",
         "properties": {
           "ipv4": {
-            "type": "string"
+            "anyOf": [{ "$ref": "#/components/schemas/Undefined" }, { "type": "string", "nullable": true }]
           },
           "ipv6": {
-            "type": "string"
+            "anyOf": [{ "$ref": "#/components/schemas/Undefined" }, { "type": "string", "nullable": true }]
           },
           "port": {
-            "type": "number"
+            "anyOf": [{ "$ref": "#/components/schemas/Undefined" }, { "type": "number", "nullable": true }]
           },
           "dnsName": {
             "type": "string"
