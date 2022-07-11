@@ -1,4 +1,4 @@
-import { Observable, distinctUntilChanged, from, of, switchMap } from 'rxjs';
+import { NEVER, Observable, distinctUntilChanged, from, of, switchMap, takeUntil } from 'rxjs';
 import { RetryBackoffConfig, retryBackoff } from 'backoff-rxjs';
 import { strictEquals } from './equals';
 
@@ -8,6 +8,7 @@ export interface ColdObservableProviderProps<T> {
   trigger$?: Observable<unknown>;
   equals?: (t1: T, t2: T) => boolean;
   combinator?: typeof switchMap;
+  cancel$?: Observable<unknown>;
 }
 
 export const coldObservableProvider = <T>({
@@ -15,13 +16,15 @@ export const coldObservableProvider = <T>({
   retryBackoffConfig,
   trigger$ = of(true),
   equals = strictEquals,
-  combinator = switchMap
+  combinator = switchMap,
+  cancel$ = NEVER
 }: ColdObservableProviderProps<T>) =>
   new Observable<T>((subscriber) => {
     const sub = trigger$
       .pipe(
         combinator(() => from(provider()).pipe(retryBackoff(retryBackoffConfig))),
-        distinctUntilChanged(equals)
+        distinctUntilChanged(equals),
+        takeUntil(cancel$)
       )
       .subscribe(subscriber);
     return () => sub.unsubscribe();

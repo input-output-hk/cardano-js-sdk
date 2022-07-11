@@ -1,6 +1,6 @@
+import { BehaviorSubject, EmptyError, Subject, firstValueFrom } from 'rxjs';
 import { RetryBackoffConfig, retryBackoff } from 'backoff-rxjs';
 import { coldObservableProvider } from '../../../src';
-import { firstValueFrom } from 'rxjs';
 
 // There might be a more elegant way to mock with original implementation (spy)
 jest.mock('backoff-rxjs', () => ({
@@ -17,5 +17,24 @@ describe('coldObservableProvider', () => {
     expect(underlyingProvider).toBeCalledTimes(2);
     expect(retryBackoff).toBeCalledTimes(2);
     expect(retryBackoff).toBeCalledWith(backoffConfig);
+  });
+
+  it('provider is unsubscribed on cancel emit', async () => {
+    const fakeProviderSubject = new Subject();
+    const underlyingProvider = () => firstValueFrom(fakeProviderSubject);
+    const backoffConfig: RetryBackoffConfig = { initialInterval: 1 };
+    const cancel$ = new BehaviorSubject<boolean>(true);
+    const provider$ = coldObservableProvider({
+      cancel$,
+      provider: underlyingProvider,
+      retryBackoffConfig: backoffConfig
+    });
+
+    try {
+      await firstValueFrom(provider$);
+    } catch (error) {
+      expect(error).toBeInstanceOf(EmptyError);
+    }
+    expect.assertions(1);
   });
 });

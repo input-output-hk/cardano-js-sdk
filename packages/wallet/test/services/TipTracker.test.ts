@@ -1,8 +1,8 @@
 import { Cardano } from '@cardano-sdk/core';
-import { InMemoryDocumentStore } from '../../../src/persistence';
-import { Milliseconds, SyncStatus } from '../../../src';
-import { Observable, firstValueFrom } from 'rxjs';
-import { TipTracker } from '../../../src/services';
+import { ConnectionStatus, TipTracker } from '../../src/services';
+import { InMemoryDocumentStore } from '../../src/persistence';
+import { Milliseconds, SyncStatus } from '../../src';
+import { Observable, firstValueFrom, of } from 'rxjs';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
 
 const stubObservableProvider = <T>(...calls: Observable<T>[]) => {
@@ -25,9 +25,11 @@ const mockTips = {
 describe('TipTracker', () => {
   const pollInterval: Milliseconds = 1; // delays emission after trigger
   let store: InMemoryDocumentStore<Cardano.Tip>;
+  let connectionStatus$: Observable<ConnectionStatus>;
 
   beforeEach(() => {
     store = new InMemoryDocumentStore();
+    connectionStatus$ = of(ConnectionStatus.up);
   });
 
   it('calls the provider immediately, only emitting distinct values, with throttling', () => {
@@ -40,6 +42,7 @@ describe('TipTracker', () => {
         cold('d|', mockTips)
       );
       const tracker$ = new TipTracker({
+        connectionStatus$,
         maxPollInterval: Number.MAX_VALUE,
         minPollInterval: pollInterval,
         provider$,
@@ -47,6 +50,28 @@ describe('TipTracker', () => {
         syncStatus: syncStatus as SyncStatus
       });
       expectObservable(tracker$.asObservable()).toBe('-x----a---b-d', mockTips);
+    });
+  });
+
+  it('starting offline, then coming online should subscribe to provider immediatelly for initial fetch', () => {
+    createTestScheduler().run(({ cold, hot, expectObservable, expectSubscriptions }) => {
+      const connectionStatusOffOn$ = hot('d--u----|', {
+        d: ConnectionStatus.down,
+        u: ConnectionStatus.up
+      });
+      const syncStatus: Partial<SyncStatus> = { isSettled$: cold('------|') };
+      const provider$ = cold<Cardano.PartialBlockHeader>('|');
+      const tracker$ = new TipTracker({
+        connectionStatus$: connectionStatusOffOn$,
+        maxPollInterval: Number.MAX_VALUE,
+        minPollInterval: pollInterval,
+        provider$,
+        store,
+        syncStatus: syncStatus as SyncStatus
+      });
+      expectObservable(tracker$, '^-----------!').toBe('----');
+      // unsubscribes in the same frame because provider$ instantly completes
+      expectSubscriptions(provider$.subscriptions).toBe('---(^!)');
     });
   });
 
@@ -62,6 +87,7 @@ describe('TipTracker', () => {
         cold('-ab|', mockTips)
       );
       const tracker$ = new TipTracker({
+        connectionStatus$,
         maxPollInterval: Number.MAX_VALUE,
         minPollInterval: pollInterval,
         provider$,
@@ -83,6 +109,7 @@ describe('TipTracker', () => {
         cold('-c|', mockTips)
       );
       const tracker$ = new TipTracker({
+        connectionStatus$,
         maxPollInterval: 6,
         minPollInterval: pollInterval,
         provider$,
@@ -92,6 +119,44 @@ describe('TipTracker', () => {
       // b is emitted at t=8 (before trigger$ emits anything)
       // c is emitted at t=12 (after trigger$ emits upon resubscribing to it)
       expectObservable(tracker$, '^ 15ms !').toBe('-a------b---c', mockTips);
+    });
+  });
+
+  it('syncStatus updates emitted only once connection is back up', () => {
+    createTestScheduler().run(({ cold, hot, expectObservable }) => {
+      const syncStatus: Partial<SyncStatus> = { isSettled$: cold('x-ba-|') };
+      const connectionStatusMock$: Observable<ConnectionStatus> = hot('pd--p|', {
+        d: ConnectionStatus.down,
+        p: ConnectionStatus.up
+      });
+      const provider$ = stubObservableProvider<Cardano.Tip>(cold('x|', mockTips), cold('a|', mockTips));
+      const tracker$ = new TipTracker({
+        connectionStatus$: connectionStatusMock$,
+        maxPollInterval: Number.MAX_VALUE,
+        minPollInterval: 0,
+        provider$,
+        store,
+        syncStatus: syncStatus as SyncStatus
+      });
+      expectObservable(tracker$.asObservable()).toBe('x---a', mockTips);
+    });
+  });
+
+  it('syncStatus timeout while connection is down does not emit tip updates', () => {
+    createTestScheduler().run(({ cold, hot, expectObservable, expectSubscriptions }) => {
+      const syncStatus: Partial<SyncStatus> = { isSettled$: hot('10ms |') };
+      const connectionStatusMock$: Observable<ConnectionStatus> = hot('d--|', { d: ConnectionStatus.down });
+      const provider$ = cold('x|', mockTips);
+      const tracker$ = new TipTracker({
+        connectionStatus$: connectionStatusMock$,
+        maxPollInterval: 6,
+        minPollInterval: 0,
+        provider$,
+        store,
+        syncStatus: syncStatus as SyncStatus
+      });
+      expectObservable(tracker$.asObservable()).toBe('');
+      expectSubscriptions(provider$.subscriptions).toBe('');
     });
   });
 
