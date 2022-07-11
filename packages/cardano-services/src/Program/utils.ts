@@ -97,6 +97,7 @@ export const getPoolWithServiceDiscovery = async (
               pool = new Pool({ database, host: address.name, password, port: address.port, user });
               return await pool.query(args, values);
             }
+            throw error;
           });
       }
       // Bind if it is a function, no intercept operations
@@ -152,6 +153,7 @@ export const ogmiosTxSubmitProviderWithDiscovery = async (
               ogmiosProvider = ogmiosTxSubmitProvider({ host: record.name, port: record.port });
               return await ogmiosProvider.submitTx(args);
             }
+            throw error;
           });
       }
       // Bind if it is a function, no intercept operations
@@ -210,6 +212,7 @@ export const rabbitMqTxSubmitProviderWithDiscovery = async (
               });
               return await rabbitmqProvider.submitTx(args);
             }
+            throw error;
           });
       }
       // Bind if it is a function, no intercept operations
