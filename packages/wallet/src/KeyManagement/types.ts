@@ -1,4 +1,5 @@
 import { Cardano } from '@cardano-sdk/core';
+import { InputResolver } from '../services';
 import { Observable } from 'rxjs';
 import { Shutdown } from '@cardano-sdk/util';
 import { TxInternals } from '../Transaction';
@@ -48,6 +49,10 @@ export enum CommunicationType {
 }
 
 export type BIP32Path = Array<number>;
+
+export interface KeyAgentDependencies {
+  inputResolver: InputResolver;
+}
 
 export interface AccountAddressDerivationPath {
   type: AddressType;
@@ -114,14 +119,7 @@ export type LedgerTransportType = TransportWebHID | TransportNodeHid;
  */
 export type GetPassword = (noCache?: true) => Promise<Uint8Array>;
 
-/**
- * @param txIn transaction input to resolve address from
- * @returns input owner address
- */
-export type ResolveInputAddress = (txIn: Cardano.NewTxIn) => Promise<Cardano.Address | null>;
-
 export interface SignTransactionOptions {
-  inputAddressResolver: ResolveInputAddress;
   additionalKeyPaths?: AccountKeyDerivationPath[];
 }
 
@@ -138,7 +136,7 @@ export interface KeyAgent {
   /**
    * @throws AuthenticationError
    */
-  signTransaction(txInternals: TxInternals, options: SignTransactionOptions): Promise<Cardano.Signatures>;
+  signTransaction(txInternals: TxInternals, options?: SignTransactionOptions): Promise<Cardano.Signatures>;
   /**
    * @throws AuthenticationError
    */

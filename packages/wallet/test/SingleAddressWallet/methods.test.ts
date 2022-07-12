@@ -2,7 +2,7 @@
 import * as mocks from '../mocks';
 import { AssetId, createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { Cardano } from '@cardano-sdk/core';
-import { InitializeTxProps, KeyManagement, SingleAddressWallet } from '../../src';
+import { InitializeTxProps, KeyManagement, SingleAddressWallet, setupWallet } from '../../src';
 import { firstValueFrom, skip } from 'rxjs';
 import { mockChainHistoryProvider, mockRewardsProvider, utxo } from '../mocks';
 import { waitForWalletStateSettle } from '../util';
@@ -51,21 +51,27 @@ describe('SingleAddressWallet methods', () => {
       rewardAccount: mocks.rewardAccount,
       type: KeyManagement.AddressType.External
     };
-    const keyAgent = await mocks.testAsyncKeyAgent([groupedAddress]);
-    keyAgent.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
-    wallet = new SingleAddressWallet(
-      { name: 'Test Wallet' },
-      {
-        assetProvider,
-        chainHistoryProvider,
-        keyAgent,
-        networkInfoProvider,
-        rewardsProvider,
-        stakePoolProvider,
-        txSubmitProvider,
-        utxoProvider
-      }
-    );
+    ({ wallet } = await setupWallet({
+      createKeyAgent: async (dependencies) => {
+        const asyncKeyAgent = await mocks.testAsyncKeyAgent([groupedAddress], dependencies);
+        asyncKeyAgent.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
+        return asyncKeyAgent;
+      },
+      createWallet: async (keyAgent) =>
+        new SingleAddressWallet(
+          { name: 'Test Wallet' },
+          {
+            assetProvider,
+            chainHistoryProvider,
+            keyAgent,
+            networkInfoProvider,
+            rewardsProvider,
+            stakePoolProvider,
+            txSubmitProvider,
+            utxoProvider
+          }
+        )
+    }));
     await waitForWalletStateSettle(wallet);
   });
 

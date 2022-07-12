@@ -3,10 +3,11 @@
 /* eslint-disable sonarjs/cognitive-complexity,  max-depth, max-statements, complexity */
 import * as ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import * as trezor from 'trezor-connect';
-import { BIP32Path, GroupedAddress, ResolveInputAddress } from '../types';
+import { BIP32Path, GroupedAddress } from '../types';
 import { CSL, Cardano, cslToCore } from '@cardano-sdk/core';
 import { CardanoKeyConst, harden } from '../util';
 import { HwMappingError } from '../errors';
+import { InputResolver } from '../../services';
 import { isNotNil } from '@cardano-sdk/util';
 import concat from 'lodash/concat';
 import uniq from 'lodash/uniq';
@@ -15,7 +16,7 @@ export interface TxToLedgerProps {
   cslTxBody: CSL.TransactionBody;
   networkId: Cardano.NetworkId;
   accountIndex: number;
-  inputAddressResolver: ResolveInputAddress;
+  inputResolver: InputResolver;
   knownAddresses: GroupedAddress[];
   protocolMagic: Cardano.NetworkMagic;
 }
@@ -24,7 +25,7 @@ export interface TxToTrezorProps {
   cslTxBody: CSL.TransactionBody;
   networkId: Cardano.NetworkId;
   accountIndex: number;
-  inputAddressResolver: ResolveInputAddress;
+  inputResolver: InputResolver;
   knownAddresses: GroupedAddress[];
   protocolMagic: Cardano.NetworkMagic;
 }
@@ -106,14 +107,14 @@ const checkIsChangeAddress = (knownAddresses: GroupedAddress[], outputAddress: B
 
 const prepareTrezorInputs = async (
   inputs: CSL.TransactionInputs,
-  inputAddressResolver: ResolveInputAddress,
+  inputResolver: InputResolver,
   knownAddresses: GroupedAddress[]
 ): Promise<trezor.CardanoInput[]> => {
   const trezorInputs = [];
   for (let i = 0; i < inputs.len(); i++) {
     const input = inputs.get(i);
     const coreInput = cslToCore.txIn(input);
-    const paymentAddress = await inputAddressResolver(coreInput);
+    const paymentAddress = await inputResolver.resolveInputAddress(coreInput);
 
     let trezorInput = {
       prev_hash: Buffer.from(input.transaction_id().to_bytes()).toString('hex'),
@@ -422,14 +423,14 @@ const prepareTrezorMintBundle = (
 
 const prepareLedgerInputs = async (
   inputs: CSL.TransactionInputs,
-  inputAddressResolver: ResolveInputAddress,
+  inputResolver: InputResolver,
   knownAddresses: GroupedAddress[]
 ): Promise<ledger.TxInput[]> => {
   const ledgerInputs = [];
   for (let i = 0; i < inputs.len(); i++) {
     const input = inputs.get(i);
     const coreInput = cslToCore.txIn(input);
-    const paymentAddress = await inputAddressResolver(coreInput);
+    const paymentAddress = await inputResolver.resolveInputAddress(coreInput);
 
     let paymentKeyPath = null;
     if (paymentAddress) {
@@ -830,7 +831,7 @@ export const txToLedger = async ({
   cslTxBody,
   networkId,
   accountIndex,
-  inputAddressResolver,
+  inputResolver: inputAddressResolver,
   knownAddresses,
   protocolMagic
 }: TxToLedgerProps): Promise<ledger.SignTransactionRequest> => {
@@ -922,7 +923,7 @@ export const txToTrezor = async ({
   cslTxBody,
   networkId,
   accountIndex,
-  inputAddressResolver,
+  inputResolver: inputAddressResolver,
   knownAddresses,
   protocolMagic
 }: TxToTrezorProps): Promise<trezor.CardanoSignTransaction> => {

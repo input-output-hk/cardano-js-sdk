@@ -349,10 +349,8 @@ export class SingleAddressWallet implements ObservableWallet {
   ): Promise<Cardano.NewTxAlonzo> {
     const addresses = await firstValueFrom(this.addresses$);
     const signatures = stubSign
-      ? await keyManagementUtil.stubSignTransaction(tx.body, addresses, this.util.resolveInputAddress)
-      : await this.keyAgent.signTransaction(tx, {
-          inputAddressResolver: this.util.resolveInputAddress
-        });
+      ? await keyManagementUtil.stubSignTransaction(tx.body, addresses, this.util)
+      : await this.keyAgent.signTransaction(tx);
     return {
       auxiliaryData,
       body: tx.body,

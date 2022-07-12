@@ -1,8 +1,11 @@
 import { Cardano } from '@cardano-sdk/core';
 import { InvalidSerializableDataError } from '../../src/KeyManagement/errors';
+import { KeyAgentDependencies } from '../../src/KeyManagement';
 import { KeyManagement } from '../../src';
 
 describe('KeyManagement/restoreKeyAgent', () => {
+  const dependencies: KeyAgentDependencies = { inputResolver: { resolveInputAddress: jest.fn() } }; // not called
+
   describe('InMemoryKeyAgent', () => {
     const inMemoryKeyAgentData: KeyManagement.SerializableInMemoryKeyAgentData = {
       __typename: KeyManagement.KeyAgentType.InMemory,
@@ -38,12 +41,12 @@ describe('KeyManagement/restoreKeyAgent', () => {
     const getPassword: KeyManagement.GetPassword = async () => Buffer.from('password');
 
     it('can restore key manager from valid data and password', async () => {
-      const keyAgent = await KeyManagement.restoreKeyAgent(inMemoryKeyAgentData, getPassword);
+      const keyAgent = await KeyManagement.restoreKeyAgent(inMemoryKeyAgentData, dependencies, getPassword);
       expect(keyAgent.knownAddresses).toBe(inMemoryKeyAgentData.knownAddresses);
     });
 
     it('throws when attempting to restore key manager from valid data and no password', async () => {
-      await expect(() => KeyManagement.restoreKeyAgent(inMemoryKeyAgentData)).rejects.toThrowError(
+      await expect(() => KeyManagement.restoreKeyAgent(inMemoryKeyAgentData, dependencies)).rejects.toThrowError(
         new InvalidSerializableDataError('Expected "getPassword" in RestoreKeyAgentProps for InMemoryKeyAgent"')
       );
     });
@@ -51,7 +54,7 @@ describe('KeyManagement/restoreKeyAgent', () => {
     it('does not attempt to decrypt private key on restoration', async () => {
       // invalid password, would throw if it attempts to decrypt
       await expect(
-        KeyManagement.restoreKeyAgent(inMemoryKeyAgentData, async () => Buffer.from('123'))
+        KeyManagement.restoreKeyAgent(inMemoryKeyAgentData, dependencies, async () => Buffer.from('123'))
       ).resolves.not.toThrow();
     });
   });
@@ -82,7 +85,7 @@ describe('KeyManagement/restoreKeyAgent', () => {
     };
 
     it('can restore key manager from valid data', async () => {
-      const keyAgent = await KeyManagement.restoreKeyAgent(ledgerKeyAgentData);
+      const keyAgent = await KeyManagement.restoreKeyAgent(ledgerKeyAgentData, dependencies);
       expect(keyAgent.knownAddresses).toBe(ledgerKeyAgentData.knownAddresses);
     });
   });
@@ -119,17 +122,20 @@ describe('KeyManagement/restoreKeyAgent', () => {
     };
 
     it('can restore key manager from valid data', async () => {
-      const keyAgent = await KeyManagement.restoreKeyAgent(trezorKeyAgentData);
+      const keyAgent = await KeyManagement.restoreKeyAgent(trezorKeyAgentData, dependencies);
       expect(keyAgent.knownAddresses).toBe(trezorKeyAgentData.knownAddresses);
     });
   });
 
   it('throws when attempting to restore key manager of unsupported __typename', async () => {
     await expect(() =>
-      KeyManagement.restoreKeyAgent({
-        __typename: 'OTHER'
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any)
+      KeyManagement.restoreKeyAgent(
+        {
+          __typename: 'OTHER'
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any,
+        dependencies
+      )
     ).rejects.toThrowError(
       new InvalidSerializableDataError("Restoring key agent of __typename 'OTHER' is not implemented")
     );

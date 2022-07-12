@@ -7,7 +7,7 @@ describe('integration/transactionTime', () => {
   let wallet: SingleAddressWallet;
 
   beforeAll(async () => {
-    wallet = await createWallet();
+    ({ wallet } = await createWallet());
   });
 
   it('provides utils necessary for computing transaction time', async () => {

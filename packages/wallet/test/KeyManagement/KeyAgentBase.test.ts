@@ -1,13 +1,13 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { CSL, Cardano } from '@cardano-sdk/core';
-import { KeyManagement } from '../../src';
+import { KeyManagement, createLazyWalletUtil } from '../../src';
 
 const NETWORK_ID = Cardano.NetworkId.testnet;
 const ACCOUNT_INDEX = 1;
 
 class MockKeyAgent extends KeyManagement.KeyAgentBase {
   constructor(data: KeyManagement.SerializableInMemoryKeyAgentData) {
-    super(data);
+    super(data, { inputResolver: createLazyWalletUtil() });
   }
 
   serializableDataImpl = jest.fn();

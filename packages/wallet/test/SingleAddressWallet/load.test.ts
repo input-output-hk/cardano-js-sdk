@@ -9,7 +9,8 @@ import {
   KeyManagement,
   ObservableWallet,
   PollingConfig,
-  SingleAddressWallet
+  SingleAddressWallet,
+  setupWallet
 } from '../../src';
 import { ReplaySubject, firstValueFrom } from 'rxjs';
 import { WalletStores, createInMemoryWalletStores } from '../../src/persistence';
@@ -32,36 +33,45 @@ interface Providers {
 }
 
 const createWallet = async (stores: WalletStores, providers: Providers, pollingConfig?: PollingConfig) => {
-  const { rewardsProvider, utxoProvider, chainHistoryProvider, networkInfoProvider, connectionStatusTracker$ } =
-    providers;
-  const txSubmitProvider = mocks.mockTxSubmitProvider();
-  const assetProvider = mocks.mockAssetProvider();
-  const stakePoolProvider = createStubStakePoolProvider();
-  const groupedAddress: KeyManagement.GroupedAddress = {
-    accountIndex: 0,
-    address,
-    index: 0,
-    networkId: Cardano.NetworkId.testnet,
-    rewardAccount,
-    type: KeyManagement.AddressType.External
-  };
-  const keyAgent = await mocks.testAsyncKeyAgent([groupedAddress]);
-  keyAgent.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
-  return new SingleAddressWallet(
-    { name, polling: pollingConfig },
-    {
-      assetProvider,
-      chainHistoryProvider,
-      connectionStatusTracker$,
-      keyAgent,
-      networkInfoProvider,
-      rewardsProvider,
-      stakePoolProvider,
-      stores,
-      txSubmitProvider,
-      utxoProvider
+  const { wallet } = await setupWallet({
+    createKeyAgent: async (dependencies) => {
+      const groupedAddress: KeyManagement.GroupedAddress = {
+        accountIndex: 0,
+        address,
+        index: 0,
+        networkId: Cardano.NetworkId.testnet,
+        rewardAccount,
+        type: KeyManagement.AddressType.External
+      };
+      const asyncKeyAgent = await mocks.testAsyncKeyAgent([groupedAddress], dependencies);
+      asyncKeyAgent.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
+      return asyncKeyAgent;
+    },
+    createWallet: async (keyAgent) => {
+      const { rewardsProvider, utxoProvider, chainHistoryProvider, networkInfoProvider, connectionStatusTracker$ } =
+        providers;
+      const txSubmitProvider = mocks.mockTxSubmitProvider();
+      const assetProvider = mocks.mockAssetProvider();
+      const stakePoolProvider = createStubStakePoolProvider();
+
+      return new SingleAddressWallet(
+        { name, polling: pollingConfig },
+        {
+          assetProvider,
+          chainHistoryProvider,
+          connectionStatusTracker$,
+          keyAgent,
+          networkInfoProvider,
+          rewardsProvider,
+          stakePoolProvider,
+          stores,
+          txSubmitProvider,
+          utxoProvider
+        }
+      );
     }
-  );
+  });
+  return wallet;
 };
 
 const assertWalletProperties = async (

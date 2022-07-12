@@ -3,6 +3,7 @@
 import {
   GetPassword,
   KeyAgent,
+  KeyAgentDependencies,
   KeyAgentType,
   SerializableInMemoryKeyAgentData,
   SerializableKeyAgentData,
@@ -22,10 +23,24 @@ export interface RestoreInMemoryKeyAgentProps {
   getPassword?: GetPassword;
 }
 
-export function restoreKeyAgent(data: SerializableInMemoryKeyAgentData, getPassword: GetPassword): Promise<KeyAgent>;
-export function restoreKeyAgent(data: SerializableKeyAgentData, getPassword?: GetPassword): Promise<KeyAgent>;
-export function restoreKeyAgent(data: SerializableLedgerKeyAgentData): Promise<KeyAgent>;
-export function restoreKeyAgent(data: SerializableTrezorKeyAgentData): Promise<KeyAgent>;
+export function restoreKeyAgent(
+  data: SerializableInMemoryKeyAgentData,
+  dependencies: KeyAgentDependencies,
+  getPassword: GetPassword
+): Promise<KeyAgent>;
+export function restoreKeyAgent(
+  data: SerializableKeyAgentData,
+  dependencies: KeyAgentDependencies,
+  getPassword?: GetPassword
+): Promise<KeyAgent>;
+export function restoreKeyAgent(
+  data: SerializableLedgerKeyAgentData,
+  dependencies: KeyAgentDependencies
+): Promise<KeyAgent>;
+export function restoreKeyAgent(
+  data: SerializableTrezorKeyAgentData,
+  dependencies: KeyAgentDependencies
+): Promise<KeyAgent>;
 /**
  * Restore key agent from serializable data
  *
@@ -33,6 +48,7 @@ export function restoreKeyAgent(data: SerializableTrezorKeyAgentData): Promise<K
  */
 export async function restoreKeyAgent<T extends SerializableKeyAgentData>(
   data: T,
+  dependencies: KeyAgentDependencies,
   getPassword?: GetPassword
 ): Promise<KeyAgent> {
   switch (data.__typename) {
@@ -45,13 +61,13 @@ export async function restoreKeyAgent<T extends SerializableKeyAgentData>(
       if (!getPassword) {
         throw new InvalidSerializableDataError('Expected "getPassword" in RestoreKeyAgentProps for InMemoryKeyAgent"');
       }
-      return new InMemoryKeyAgent({ ...data, getPassword });
+      return new InMemoryKeyAgent({ ...data, getPassword }, dependencies);
     }
     case KeyAgentType.Ledger: {
-      return new LedgerKeyAgent(data);
+      return new LedgerKeyAgent(data, dependencies);
     }
     case KeyAgentType.Trezor: {
-      return new TrezorKeyAgent(data);
+      return new TrezorKeyAgent(data, dependencies);
     }
     default:
       throw new InvalidSerializableDataError(

@@ -26,7 +26,7 @@ describe('cip30', () => {
 
   beforeAll(async () => {
     // CREATE A WALLET
-    wallet = await createWallet();
+    ({ wallet } = await createWallet());
     confirmationCallback = jest.fn().mockResolvedValue(true);
     api = cip30.createWalletApi(Promise.resolve(wallet), confirmationCallback);
     await waitForWalletStateSettle(wallet);

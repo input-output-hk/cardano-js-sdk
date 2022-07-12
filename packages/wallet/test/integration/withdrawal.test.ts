@@ -7,7 +7,7 @@ describe('integration/withdrawal', () => {
   let wallet: SingleAddressWallet;
 
   beforeAll(async () => {
-    wallet = await createWallet();
+    ({ wallet } = await createWallet());
   });
 
   it('has balance', async () => {

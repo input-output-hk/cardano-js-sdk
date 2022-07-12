@@ -2,9 +2,14 @@ import { BigIntMath } from '@cardano-sdk/util';
 import { Cardano, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
 import { Observable, firstValueFrom } from 'rxjs';
 import { OutputValidation } from '../types';
-import { ResolveInputAddress } from '../KeyManagement';
 import { computeMinimumCoinQuantity, tokenBundleSizeExceedsLimit } from '@cardano-sdk/cip2';
 import { txInEquals } from './util';
+
+/**
+ * @param txIn transaction input to resolve address from
+ * @returns input owner address
+ */
+export type ResolveInputAddress = (txIn: Cardano.NewTxIn) => Promise<Cardano.Address | null>;
 
 export type ProtocolParametersRequiredByOutputValidator = Pick<
   ProtocolParametersRequiredByWallet,

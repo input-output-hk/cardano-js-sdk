@@ -1,6 +1,6 @@
 import { Cardano } from '@cardano-sdk/core';
 import { CommunicationType, KeyAgent, TrezorKeyAgent, restoreKeyAgent, util } from '../../src/KeyManagement';
-import { ObservableWallet, SingleAddressWallet } from '../../src';
+import { ObservableWallet, SingleAddressWallet, setupWallet } from '../../src';
 import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { firstValueFrom } from 'rxjs';
 import {
@@ -12,7 +12,7 @@ import {
   mockUtxoProvider
 } from '../mocks';
 
-const createWallet = (keyAgent: KeyAgent) => {
+const createWallet = async (keyAgent: KeyAgent) => {
   const txSubmitProvider = mockTxSubmitProvider();
   const stakePoolProvider = createStubStakePoolProvider();
   const networkInfoProvider = mockNetworkInfoProvider();
@@ -40,20 +40,29 @@ const getAddress = async (wallet: ObservableWallet) => (await firstValueFrom(wal
 
 describe('TrezorKeyAgent+SingleAddressWallet', () => {
   test('creating and restoring TrezorKeyAgent wallet', async () => {
-    const freshKeyAgent = await TrezorKeyAgent.createWithDevice({
-      networkId: Cardano.NetworkId.testnet,
-      protocolMagic: 1_097_911_063,
-      trezorConfig: {
-        communicationType: CommunicationType.Node,
-        manifest: {
-          appUrl: 'https://your.application.com',
-          email: 'email@developer.com'
-        }
-      }
+    const { wallet: freshWallet, keyAgent: freshKeyAgent } = await setupWallet({
+      createKeyAgent: (dependencies) =>
+        TrezorKeyAgent.createWithDevice(
+          {
+            networkId: Cardano.NetworkId.testnet,
+            protocolMagic: 1_097_911_063,
+            trezorConfig: {
+              communicationType: CommunicationType.Node,
+              manifest: {
+                appUrl: 'https://your.application.com',
+                email: 'email@developer.com'
+              }
+            }
+          },
+          dependencies
+        ),
+      createWallet
     });
-    const freshWallet = createWallet(freshKeyAgent);
-    const restoredKeyAgent = await restoreKeyAgent(freshKeyAgent.serializableData);
-    const restoredWallet = createWallet(restoredKeyAgent);
+    const { wallet: restoredWallet } = await setupWallet({
+      createKeyAgent: (dependencies) => restoreKeyAgent(freshKeyAgent.serializableData, dependencies),
+      createWallet
+    });
+
     expect(await getAddress(freshWallet)).toEqual(await getAddress(restoredWallet));
     freshWallet.shutdown();
     restoredWallet.shutdown();

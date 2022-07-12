@@ -3,17 +3,20 @@ import {
   AccountKeyDerivationPath,
   GroupedAddress,
   KeyAgent,
+  KeyAgentDependencies,
   KeyRole,
   SerializableKeyAgentData,
   SignBlobResult,
   SignTransactionOptions
 } from './types';
 import { CSL, Cardano, util } from '@cardano-sdk/core';
+import { InputResolver } from '../services';
 import { STAKE_KEY_DERIVATION_PATH } from './util';
 import { TxInternals } from '../Transaction';
 
 export abstract class KeyAgentBase implements KeyAgent {
   readonly #serializableData: SerializableKeyAgentData;
+  protected readonly inputResolver: InputResolver;
 
   get knownAddresses(): GroupedAddress[] {
     return this.#serializableData.knownAddresses;
@@ -37,11 +40,12 @@ export abstract class KeyAgentBase implements KeyAgent {
   abstract exportRootPrivateKey(): Promise<Cardano.Bip32PrivateKey>;
   abstract signTransaction(
     txInternals: TxInternals,
-    signTransactionOptions: SignTransactionOptions
+    signTransactionOptions?: SignTransactionOptions
   ): Promise<Cardano.Signatures>;
 
-  constructor(serializableData: SerializableKeyAgentData) {
+  constructor(serializableData: SerializableKeyAgentData, { inputResolver }: KeyAgentDependencies) {
     this.#serializableData = serializableData;
+    this.inputResolver = inputResolver;
   }
 
   /**

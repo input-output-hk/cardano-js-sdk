@@ -23,12 +23,12 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
     const knownAddresses = [address1, address2].map((address, index) =>
       createGroupedAddress(address, AddressType.External, index)
     );
-    const resolveInput = jest
+    const resolveInputAddress = jest
       .fn()
       .mockReturnValueOnce(address1)
       .mockReturnValueOnce(address2)
       .mockReturnValueOnce(address1);
-    expect(await util.ownSignatureKeyPaths(txBody, knownAddresses, resolveInput)).toEqual([
+    expect(await util.ownSignatureKeyPaths(txBody, knownAddresses, { resolveInputAddress })).toEqual([
       {
         index: 0,
         role: KeyRole.External

@@ -11,11 +11,14 @@ import { KeyManagement } from '@cardano-sdk/wallet';
   const mnemonicArray = KeyManagement.util.generateMnemonicWords();
   for (const word of mnemonicArray) mnemonic += `${word} `;
 
-  const keyAgentFromMnemonic = await KeyManagement.InMemoryKeyAgent.fromBip39MnemonicWords({
-    getPassword: async () => Buffer.from(''),
-    mnemonicWords: mnemonicArray,
-    networkId: Cardano.NetworkId.testnet
-  });
+  const keyAgentFromMnemonic = await KeyManagement.InMemoryKeyAgent.fromBip39MnemonicWords(
+    {
+      getPassword: async () => Buffer.from(''),
+      mnemonicWords: mnemonicArray,
+      networkId: Cardano.NetworkId.testnet
+    },
+    { inputResolver: { resolveInputAddress: async () => null } }
+  );
 
   const derivedAddress = await keyAgentFromMnemonic.deriveAddress({
     index: 0,
