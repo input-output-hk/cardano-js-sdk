@@ -13,9 +13,7 @@
       "require": "./dist/cjs/index.js"
     }
   },
-  "bin": {
-    "cardano-services": "./dist/cjs/cli.js"
-  },
+  "bin": "./dist/cjs/cli.js",
   "repository": "https://github.com/input-output-hk/cardano-js-sdk/packages/cardano-services",
   "contributors": [
     "Martynas Kazlauskas <martynas.kazlauskas@iohk.io>",
@@ -57,13 +55,13 @@
     "@types/bunyan": "^1.8.8",
     "@types/clear": "^0.1.2",
     "@types/death": "^1.1.2",
-    "@types/node": "14.18.12",
-    "@types/wait-on": "^5.3.1",
     "@types/dockerode": "^3.3.8",
     "@types/express": "^4.17.13",
     "@types/express-prometheus-middleware": "^1.2.1",
     "@types/lodash": "^4.14.182",
+    "@types/node": "14.18.12",
     "@types/pg": "^8.6.5",
+    "@types/wait-on": "^5.3.1",
     "axios": "^0.27.2",
     "cbor": "^8.1.0",
     "dockerode": "^3.3.1",
@@ -79,6 +77,7 @@
     "@cardano-sdk/util": "0.3.0",
     "body-parser": "^1.19.2",
     "bunyan": "^1.8.15",
+    "clear": "0.1.0",
     "commander": "^9.1.0",
     "death": "^1.1.0",
     "debug": "^4.3.4",
@@ -90,13 +89,12 @@
     "fraction.js": "^4.2.0",
     "json-bigint": "^1.0.0",
     "lodash": "^4.17.21",
+    "node-cache": "^5.1.2",
     "p-retry": "^4.2.0",
     "pg": "^8.7.3",
     "prom-client": "^14.0.1",
     "reflect-metadata": "~0.1.13",
-    "ts-log": "^2.2.4",
-    "node-cache": "^5.1.2",
-    "clear": "0.1.0"
+    "ts-log": "^2.2.4"
   },
   "files": [
     "dist/*",
