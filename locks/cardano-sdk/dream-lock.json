@@ -957,6 +957,7 @@
         [ "body-parser", "1.19.2" ],
         [ "bunyan", "1.8.15" ],
         [ "cbor", "8.1.0" ],
+        [ "clear", "0.1.0" ],
         [ "commander", "9.1.0" ],
         [ "death", "1.1.0" ],
         [ "debug", "4.3.4" ],
@@ -972,6 +973,7 @@
         [ "json-bigint", "1.0.0" ],
         [ "lodash", "4.17.21" ],
         [ "node-cache", "5.1.2" ],
+        [ "p-retry", "4.6.2" ],
         [ "pg", "8.7.3" ],
         [ "prom-client", "14.0.1" ],
         [ "reflect-metadata", "0.1.13" ],
@@ -5956,6 +5958,12 @@
         [ "aggregate-error", "3.1.0" ]
       ]
     },
+    "p-retry": {
+      "4.6.2": [
+        [ "@types/retry", "0.12.0" ],
+        [ "retry", "0.13.1" ]
+      ]
+    },
     "parent-module": {
       "1.0.1": [
         [ "callsites", "3.1.0" ]
@@ -9847,6 +9855,13 @@
         "hash": "sha512-85Y2BjiufFzaMIlvJDvTTB8Fxl2xfLo4HgmHzVBz08w4wDePCTjYw66PdrolO0kzli3yam/YCgRufyo1DdQVTA==",
         "type": "http",
         "url": "https://registry.yarnpkg.com/@types/responselike/-/responselike-1.0.0.tgz"
+      }
+    },
+    "@types/retry": {
+      "0.12.0": {
+        "hash": "sha512-wWKOClTTiizcZhXnPY4wikVAwmdYHp8q6DmC+EJUzAMsycb7HB32Kh9RN4+0gExjmPmZSAQjgURXIGATPegAvA==",
+        "type": "http",
+        "url": "https://registry.yarnpkg.com/@types/retry/-/retry-0.12.0.tgz"
       }
     },
     "@types/serve-static": {
@@ -16093,6 +16108,13 @@
         "url": "https://registry.yarnpkg.com/p-map/-/p-map-4.0.0.tgz"
       }
     },
+    "p-retry": {
+      "4.6.2": {
+        "hash": "sha512-312Id396EbJdvRONlngUx0NydfrIQ5lsYu0znKVUzVvArzEIt08V1qhtyESbGVd1FGX7UKtiFp5uwKZdM8wIuQ==",
+        "type": "http",
+        "url": "https://registry.yarnpkg.com/p-retry/-/p-retry-4.6.2.tgz"
+      }
+    },
     "p-try": {
       "1.0.0": {
         "hash": "sha1-y8ec26+P1CKOE/Yh8rGiN8GyB7M=",
@@ -17001,6 +17023,13 @@
         "hash": "sha512-l+sSefzHpj5qimhFSE5a8nufZYAM3sBSVMAPtYkmC+4EH2anSGaEMXSD0izRQbu9nfyQ9y5JrVmp7E8oZrUjvA==",
         "type": "http",
         "url": "https://registry.yarnpkg.com/restore-cursor/-/restore-cursor-3.1.0.tgz"
+      }
+    },
+    "retry": {
+      "0.13.1": {
+        "hash": "sha512-XQBQ3I8W1Cge0Seh+6gjj03LbmRFWuoszgK9ooCpwYIrhhoO80pfq4cUkU5DkknwfOfFteRwlZ56PYOGYyFWdg==",
+        "type": "http",
+        "url": "https://registry.yarnpkg.com/retry/-/retry-0.13.1.tgz"
       }
     },
     "retry-axios": {
