@@ -1,4 +1,5 @@
 import { SingleAddressWallet, setupWallet } from '../../src';
+import { WalletStores } from '../../src/persistence';
 import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import {
   mockAssetProvider,
@@ -10,7 +11,7 @@ import {
   testAsyncKeyAgent
 } from '../mocks';
 
-export const createWallet = async () =>
+export const createWallet = async (stores?: WalletStores) =>
   setupWallet({
     createKeyAgent: (dependencies) => testAsyncKeyAgent(undefined, dependencies),
     createWallet: async (keyAgent) => {
@@ -30,6 +31,7 @@ export const createWallet = async () =>
           networkInfoProvider,
           rewardsProvider,
           stakePoolProvider,
+          stores,
           txSubmitProvider,
           utxoProvider
         }
