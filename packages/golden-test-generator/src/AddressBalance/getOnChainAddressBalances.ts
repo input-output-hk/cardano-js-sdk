@@ -80,6 +80,7 @@ export const getOnChainAddressBalances = (
               blockBody = b.body;
             } else if (Ogmios.isAlonzoBlock(block)) {
               b = block.alonzo as Ogmios.Schema.BlockAlonzo;
+              blockBody = b.body;
             } else if (Ogmios.isByronEpochBoundaryBlock(block)) {
               b = block.byron as Ogmios.Schema.BlockByron;
             } else {
