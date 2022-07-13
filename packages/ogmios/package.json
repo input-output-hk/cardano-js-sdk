@@ -55,8 +55,8 @@
   "dependencies": {
     "@cardano-ogmios/client": "5.4.0",
     "@cardano-sdk/core": "0.3.0",
-    "ts-log": "^2.2.3",
-    "buffer": "5.7.1"
+    "buffer": "5.7.1",
+    "ts-log": "^2.2.3"
   },
   "files": [
     "dist/*",

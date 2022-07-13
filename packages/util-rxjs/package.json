@@ -52,8 +52,8 @@
   },
   "devDependencies": {
     "@cardano-sdk/util-dev": "0.3.0",
-    "shx": "^0.3.3",
-    "rxjs": "^7.4.0"
+    "rxjs": "^7.4.0",
+    "shx": "^0.3.3"
   },
   "files": [
     "dist/*",

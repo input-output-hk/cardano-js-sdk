@@ -47,9 +47,9 @@
     "prepack": "yarn build"
   },
   "devDependencies": {
-    "shx": "^0.3.3",
-    "@types/node": "14.18.12",
     "@types/lodash": "^4.14.182",
+    "@types/node": "14.18.12",
+    "shx": "^0.3.3",
     "ts-log": "2.2.4",
     "typescript": "4.6.3"
   },
@@ -59,8 +59,8 @@
     "@cardano-sdk/util": "0.3.0",
     "@emurgo/cardano-serialization-lib-browser": "9.1.0",
     "@emurgo/cardano-serialization-lib-nodejs": "9.1.0",
-    "lodash": "^4.17.21",
-    "bech32": "^2.0.0"
+    "bech32": "^2.0.0",
+    "lodash": "^4.17.21"
   },
   "files": [
     "dist/*",

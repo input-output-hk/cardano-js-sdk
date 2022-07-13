@@ -48,8 +48,8 @@
     "test:debug": "DEBUG=true yarn test"
   },
   "devDependencies": {
-    "@types/webextension-polyfill": "^0.8.0",
     "@types/node": "14.18.12",
+    "@types/webextension-polyfill": "^0.8.0",
     "jest-webextension-mock": "^3.7.19",
     "mock-browser": "^0.92.14",
     "shx": "^0.3.3"
