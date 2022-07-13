@@ -332,7 +332,11 @@ export class SingleAddressWallet implements ObservableWallet {
       auxiliaryData: props.auxiliaryData,
       certificates: props.certificates,
       changeAddress,
+      collaterals: props.collaterals,
       inputSelection,
+      mint: props.mint,
+      requiredExtraSignatures: props.requiredExtraSignatures,
+      scriptIntegrityHash: props.scriptIntegrityHash,
       validityInterval,
       withdrawals: props.withdrawals
     });
@@ -416,7 +420,11 @@ export class SingleAddressWallet implements ObservableWallet {
                 auxiliaryData: props.auxiliaryData,
                 certificates: props.certificates,
                 changeAddress,
+                collaterals: props.collaterals,
                 inputSelection,
+                mint: props.mint,
+                requiredExtraSignatures: props.requiredExtraSignatures,
+                scriptIntegrityHash: props.scriptIntegrityHash,
                 validityInterval,
                 withdrawals: props.withdrawals
               });

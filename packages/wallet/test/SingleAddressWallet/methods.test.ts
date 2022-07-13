@@ -2,7 +2,7 @@
 import * as mocks from '../mocks';
 import { AssetId, createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { Cardano } from '@cardano-sdk/core';
-import { KeyManagement, SingleAddressWallet } from '../../src';
+import { InitializeTxProps, KeyManagement, SingleAddressWallet } from '../../src';
 import { firstValueFrom, skip } from 'rxjs';
 import { mockChainHistoryProvider, mockRewardsProvider, utxo } from '../mocks';
 import { waitForWalletStateSettle } from '../util';
@@ -142,16 +142,29 @@ describe('SingleAddressWallet methods', () => {
 
   describe('creating transactions', () => {
     const props = {
+      collaterals: new Set([utxo[2][0]]),
       inputs: new Set<Cardano.TxIn>([utxo[1][0]]),
-      outputs: new Set<Cardano.TxOut>(outputs)
-    };
+      mint: new Map([
+        [AssetId.PXL, 5n],
+        [AssetId.TSLA, 20n]
+      ]),
+      outputs: new Set<Cardano.TxOut>(outputs),
+      requiredExtraSignatures: [Cardano.Ed25519KeyHash('6199186adb51974690d7247d2646097d2c62763b767b528816fb7ed5')],
+      scriptIntegrityHash: Cardano.util.Hash32ByteBase16(
+        '3e33018e8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d'
+      )
+    } as InitializeTxProps;
 
     it('initializeTx', async () => {
       mocks.getPassword.mockClear();
       const { body, hash, inputSelection } = await wallet.initializeTx(props);
-      expect(body.outputs).toHaveLength(props.outputs.size + 1 /* change output */);
+      expect(body.outputs).toHaveLength(props.outputs!.size + 1 /* change output */);
+      expect(body.collaterals).toEqual([utxo[2][0]]);
+      expect(body.mint).toEqual(props.mint);
+      expect(body.requiredExtraSignatures).toEqual(props.requiredExtraSignatures);
+      expect(body.scriptIntegrityHash).toEqual(props.scriptIntegrityHash);
       expect(typeof hash).toBe('string');
-      expect(inputSelection.outputs.size).toBe(props.outputs.size);
+      expect(inputSelection.outputs.size).toBe(props.outputs!.size);
       expect(inputSelection.inputs.size).toBeGreaterThan(0);
       expect(inputSelection.fee).toBeGreaterThan(0n);
       expect(inputSelection.change.size).toBeGreaterThan(0);
