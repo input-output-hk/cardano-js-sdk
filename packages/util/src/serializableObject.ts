@@ -108,7 +108,7 @@ const fromSerializableObjectUnknown = (obj: unknown, options: FromSerializableOb
       case 'Date':
         return new Date(docAsAny.value);
       case 'Set':
-        return new Set(docAsAny.value);
+        return new Set(docAsAny.value.map((item: unknown) => fromSerializableObjectUnknown(item, options)));
       case 'Map':
         return new Map(
           docAsAny.value.map((keyValues: unknown[]) =>
