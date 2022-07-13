@@ -1,7 +1,6 @@
-import { Address, Ed25519Signature, PublicKey } from '@emurgo/cardano-serialization-lib-nodejs';
 import { AddressType, AsyncKeyAgent, GroupedAddress, KeyAgent, KeyRole } from '../../../src/KeyManagement';
 import { COSEKey, COSESign1, SigStructure } from '@emurgo/cardano-message-signing-nodejs';
-import { Cardano, util } from '@cardano-sdk/core';
+import { CSL, Cardano, util } from '@cardano-sdk/core';
 import { CoseLabel } from '../../../src/KeyManagement/cip8/util';
 import { cip30signData } from '../../../src/KeyManagement/cip8';
 import { testAsyncKeyAgent, testKeyAgent } from '../../mocks';
@@ -31,7 +30,7 @@ describe('cip30signData', () => {
 
     const publicKeyHeader = coseKey.header(CoseLabel.x)!;
     const publicKeyBytes = publicKeyHeader.as_bytes()!;
-    const publicKey = PublicKey.from_bytes(publicKeyBytes);
+    const publicKey = CSL.PublicKey.from_bytes(publicKeyBytes);
     const publicKeyHex = util.bytesToHex(publicKeyBytes);
     const signedData = coseSign1.signed_data();
     return { coseKey, coseSign1, publicKey, publicKeyHex, signedData };
@@ -46,7 +45,7 @@ describe('cip30signData', () => {
     // @emurgo/cardano-message-signing-nodejs only allows CBORValue for headers
     const addressHeaderBytes = addressHeader.as_bytes();
 
-    expect(addressHeaderBytes).toEqual(Address.from_bech32(signWith.toString()).to_bytes());
+    expect(addressHeaderBytes).toEqual(CSL.Address.from_bech32(signWith.toString()).to_bytes());
   };
 
   it('supports sign with payment address', async () => {
@@ -82,6 +81,6 @@ describe('cip30signData', () => {
     const { coseSign1, publicKey, signedData } = await signAndDecode(signWith);
     const signedDataBytes = signedData.to_bytes();
     const signatureBytes = coseSign1.signature();
-    expect(publicKey.verify(signedDataBytes, Ed25519Signature.from_bytes(signatureBytes))).toBe(true);
+    expect(publicKey.verify(signedDataBytes, CSL.Ed25519Signature.from_bytes(signatureBytes))).toBe(true);
   });
 });

@@ -10,27 +10,27 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "yarn workspaces run build",
-    "cleanup-build": "yarn workspaces run cleanup && yarn install && yarn workspaces run build",
-    "reinstall": "yarn workspaces run cleanup:nm && yarn install",
-    "rebuild": "yarn workspaces run cleanup:dist && yarn workspaces run build",
+    "build": "yarn workspaces foreach -v run build",
+    "cleanup-build": "yarn workspaces foreach -v run cleanup && yarn install && yarn workspaces foreach -v run build",
+    "reinstall": "yarn workspaces foreach -v run cleanup:nm && yarn install",
+    "rebuild": "yarn workspaces foreach -v run cleanup:dist && yarn workspaces foreach -v run build",
     "predocs": "yarn build",
     "docs:typedoc": "typedoc --entryPointStrategy packages .",
-    "docs:coverage:build": "yarn workspaces run coverage",
+    "docs:coverage:build": "yarn workspaces foreach -v run coverage",
     "docs:coverage:collect": "node collectCoverage.mjs",
     "docs:coverage": "run-s docs:coverage:build docs:coverage:collect",
     "docs": "run-s docs:typedoc docs:coverage",
-    "cleanup": "yarn workspaces run cleanup && shx rm -rf node_modules",
-    "cleanup:dist": "yarn workspaces run cleanup:dist",
+    "cleanup": "yarn workspaces foreach -v run cleanup && shx rm -rf node_modules",
+    "cleanup:dist": "yarn workspaces foreach -v run cleanup:dist",
     "lint": "eslint -c complete.eslintrc.js --max-warnings=0 \"packages/*/src/**/*.ts\" \"packages/*/test/**/*.ts\"",
     "lint:fix": "yarn lint --fix",
-    "tscNoEmit": "yarn workspaces run tscNoEmit",
+    "tscNoEmit": "yarn workspaces foreach -v run tscNoEmit",
     "prepare": "husky install",
     "pre-commit": "lint-staged",
-    "test": "yarn workspaces run test",
-    "test:build:verify": "yarn workspaces run test:build:verify",
-    "test:e2e": "yarn workspaces run test:e2e",
-    "test:debug": "DEBUG=true yarn workspaces run test",
+    "test": "yarn workspaces foreach -v run test",
+    "test:build:verify": "yarn workspaces foreach -v run test:build:verify",
+    "test:e2e": "yarn workspaces foreach -v run test:e2e",
+    "test:debug": "DEBUG=true yarn workspaces foreach -v run test",
     "bump-version": "npx standard-version"
   },
   "repository": {
@@ -92,5 +92,6 @@
     "ts-node-dev": "^1.1.8",
     "typedoc": "^0.22.17",
     "typescript": "^4.3.5"
-  }
+  },
+  "packageManager": "yarn@3.2.1"
 }

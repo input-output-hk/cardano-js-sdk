@@ -23,7 +23,7 @@ jobs:
         env:
           NODE_OPTIONS: "--max-old-space-size=8192"
         run: |
-          yarn install --frozen-lockfile --non-interactive --logevel=error
+          yarn install --immutable --inline-builds
           yarn docs
           
       - name: 📘 Publish
