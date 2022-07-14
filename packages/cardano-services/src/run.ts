@@ -1,6 +1,15 @@
 #!/usr/bin/env node
+/* eslint-disable max-statements */
 import * as envalid from 'envalid';
-import { API_URL_DEFAULT, OGMIOS_URL_DEFAULT, RABBITMQ_URL_DEFAULT, ServiceNames, loadHttpServer } from './Program';
+import {
+  API_URL_DEFAULT,
+  OGMIOS_URL_DEFAULT,
+  RABBITMQ_URL_DEFAULT,
+  SERVICE_DISCOVERY_BACKOFF_FACTOR_DEFAULT,
+  SERVICE_DISCOVERY_TIMEOUT_DEFAULT,
+  ServiceNames,
+  loadHttpServer
+} from './Program';
 import { CACHE_TTL_DEFAULT } from './InMemoryCache';
 import { ENABLE_METRICS_DEFAULT, USE_QUEUE_DEFAULT } from './ProgramsCommon';
 import { EPOCH_POLL_INTERVAL_DEFAULT } from './NetworkInfo';
@@ -27,13 +36,21 @@ const envSpecs = {
   ENABLE_METRICS: envalid.bool({ default: ENABLE_METRICS_DEFAULT }),
   EPOCH_POLL_INTERVAL: envalid.num({ default: EPOCH_POLL_INTERVAL_DEFAULT }),
   LOGGER_MIN_SEVERITY: envalid.str({ choices: loggerMethodNames as string[], default: 'info' }),
+  OGMIOS_SRV_SERVICE_NAME: envalid.str({ default: undefined }),
   OGMIOS_URL: envalid.url({ default: OGMIOS_URL_DEFAULT }),
+  POSTGRES_DB: envalid.str({ default: undefined }),
   POSTGRES_DB_FILE: existingFileValidator({ default: undefined }),
   POSTGRES_HOST: envalid.host({ default: undefined }),
+  POSTGRES_PASSWORD: envalid.str({ default: undefined }),
   POSTGRES_PASSWORD_FILE: existingFileValidator({ default: undefined }),
   POSTGRES_PORT: envalid.num({ default: undefined }),
+  POSTGRES_SRV_SERVICE_NAME: envalid.str({ default: undefined }),
+  POSTGRES_USER: envalid.str({ default: undefined }),
   POSTGRES_USER_FILE: existingFileValidator({ default: undefined }),
+  RABBITMQ_SRV_SERVICE_NAME: envalid.str({ default: undefined }),
   RABBITMQ_URL: envalid.url({ default: RABBITMQ_URL_DEFAULT }),
+  SERVICE_DISCOVERY_BACKOFF_FACTOR: envalid.num({ default: SERVICE_DISCOVERY_BACKOFF_FACTOR_DEFAULT }),
+  SERVICE_DISCOVERY_TIMEOUT: envalid.num({ default: SERVICE_DISCOVERY_TIMEOUT_DEFAULT }),
   SERVICE_NAMES: envalid.str({ example: Object.values(ServiceNames).toString() }),
   USE_QUEUE: envalid.bool({ default: USE_QUEUE_DEFAULT })
 };
@@ -45,8 +62,16 @@ void (async () => {
   const env = envalid.cleanEnv(process.env, envSpecs);
   const apiUrl = new URL(env.API_URL);
   const ogmiosUrl = new URL(env.OGMIOS_URL);
+  const ogmiosSrvServiceName = env.OGMIOS_SRV_SERVICE_NAME;
   const rabbitmqUrl = new URL(env.RABBITMQ_URL);
+  const rabbitmqSrvServiceName = env.RABBITMQ_SRV_SERVICE_NAME;
   const cardanoNodeConfigPath = env.CARDANO_NODE_CONFIG_PATH;
+  const serviceDiscoveryBackoffFactor = env.SERVICE_DISCOVERY_BACKOFF_FACTOR;
+  const serviceDiscoveryTimeout = env.SERVICE_DISCOVERY_TIMEOUT;
+  const postgresSrvServiceName = env.POSTGRES_SRV_SERVICE_NAME;
+  const postgresDb = env.POSTGRES_DB;
+  const postgresUser = env.POSTGRES_USER;
+  const postgresPassword = env.POSTGRES_PASSWORD;
   const cacheTtl = env.CACHE_TTL;
   const epochPollInterval = env.EPOCH_POLL_INTERVAL;
   const dbName = env.POSTGRES_DB_FILE ? loadSecret(env.POSTGRES_DB_FILE) : undefined;
@@ -64,7 +89,7 @@ void (async () => {
   const serviceNames = env.SERVICE_NAMES.split(',') as ServiceNames[];
 
   try {
-    const server = loadHttpServer({
+    const server = await loadHttpServer({
       apiUrl,
       options: {
         cacheTtl,
@@ -73,8 +98,16 @@ void (async () => {
         epochPollInterval,
         loggerMinSeverity: env.LOGGER_MIN_SEVERITY as LogLevel,
         metricsEnabled,
+        ogmiosSrvServiceName,
         ogmiosUrl,
+        postgresDb,
+        postgresPassword,
+        postgresSrvServiceName,
+        postgresUser,
+        rabbitmqSrvServiceName,
         rabbitmqUrl,
+        serviceDiscoveryBackoffFactor,
+        serviceDiscoveryTimeout,
         useQueue: env.USE_QUEUE
       },
       serviceNames

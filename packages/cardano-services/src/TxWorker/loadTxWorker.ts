@@ -1,8 +1,7 @@
-import { CommonOptionDescriptions, CommonProgramOptions } from '../ProgramsCommon';
-import { MissingProgramOption, ServiceNames } from '../Program';
+import { CommonProgramOptions } from '../ProgramsCommon';
 import { TxSubmitWorker, TxSubmitWorkerConfig } from '@cardano-sdk/rabbitmq';
+import { createDnsResolver, getOgmiosTxSubmitProvider, getRabbitMqUrl } from '../Program';
 import { createLogger } from 'bunyan';
-import { ogmiosTxSubmitProvider, urlToConnectionConfig } from '@cardano-sdk/ogmios';
 
 export type TxWorkerOptions = CommonProgramOptions &
   Pick<TxSubmitWorkerConfig, 'parallel' | 'parallelTxs' | 'pollingCycle'>;
@@ -12,12 +11,17 @@ export interface TxWorkerArgs {
 }
 
 export const loadTxWorker = async (args: TxWorkerArgs) => {
-  const { loggerMinSeverity, ogmiosUrl, rabbitmqUrl } = args.options;
-  const txSubmitProvider = ogmiosTxSubmitProvider(urlToConnectionConfig(ogmiosUrl));
+  const { loggerMinSeverity, serviceDiscoveryBackoffFactor, serviceDiscoveryTimeout } = args.options;
   const logger = createLogger({ level: loggerMinSeverity, name: 'tx-worker' });
+  const dnsResolver = createDnsResolver(
+    {
+      factor: serviceDiscoveryBackoffFactor,
+      maxRetryTime: serviceDiscoveryTimeout
+    },
+    logger
+  );
+  const txSubmitProvider = await getOgmiosTxSubmitProvider(dnsResolver, logger, args.options);
+  const url = await getRabbitMqUrl(dnsResolver, args.options);
 
-  // Ensure rabbitmqUrl is not undefined
-  if (!rabbitmqUrl) throw new MissingProgramOption(ServiceNames.TxSubmit, CommonOptionDescriptions.RabbitMQUrl);
-
-  return new TxSubmitWorker({ ...args.options, rabbitmqUrl }, { logger, txSubmitProvider });
+  return new TxSubmitWorker({ ...args.options, rabbitmqUrl: url }, { logger, txSubmitProvider });
 };

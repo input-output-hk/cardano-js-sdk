@@ -1,8 +1,20 @@
+/* eslint-disable max-len */
+/* eslint-disable sonarjs/no-duplicate-string */
 import { CACHE_TTL_DEFAULT } from '../../src/InMemoryCache';
 import { EPOCH_POLL_INTERVAL_DEFAULT } from '../../src/NetworkInfo';
-import { HttpServer, MissingProgramOption, ProgramOptionDescriptions, ServiceNames, loadHttpServer } from '../../src';
+import {
+  HttpServer,
+  InvalidArgsCombination,
+  MissingProgramOption,
+  ProgramOptionDescriptions,
+  SERVICE_DISCOVERY_BACKOFF_FACTOR_DEFAULT,
+  SERVICE_DISCOVERY_TIMEOUT_DEFAULT,
+  ServiceNames,
+  loadHttpServer
+} from '../../src';
 import { Ogmios } from '@cardano-sdk/ogmios';
 import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { SrvRecord } from 'dns';
 import { URL } from 'url';
 import {
   createConnectionObjectWithRandomPort,
@@ -14,21 +26,45 @@ import { getRandomPort } from 'get-port-please';
 import { listenPromise, serverClosePromise } from '../../src/util';
 import http from 'http';
 
+jest.mock('dns', () => ({
+  promises: {
+    resolveSrv: async (): Promise<SrvRecord[]> => [{ name: 'localhost', port: 5433, priority: 6, weight: 5 }]
+  }
+}));
+
 describe('loadHttpServer', () => {
   let apiUrl: URL;
   let cardanoNodeConfigPath: string;
   let dbConnectionString: string;
+  let postgresSrvServiceName: string;
+  let postgresDb: string;
+  let postgresUser: string;
+  let postgresPassword: string;
   let cacheTtl: number;
   let epochPollInterval: number;
   let httpServer: HttpServer;
   let ogmiosConnection: Ogmios.Connection;
+  let ogmiosSrvServiceName: string;
   let ogmiosServer: http.Server;
+  let serviceDiscoveryBackoffFactor: number;
+  let serviceDiscoveryTimeout: number;
+  let rabbitmqSrvServiceName: string;
+  let rabbitmqUrl: URL;
 
   beforeEach(async () => {
     apiUrl = new URL(`http://localhost:${await getRandomPort()}`);
     dbConnectionString = process.env.DB_CONNECTION_STRING!;
+    postgresSrvServiceName = process.env.POSTGRES_SRV_SERVICE_NAME!;
+    postgresDb = process.env.POSTGRES_DB!;
+    postgresUser = process.env.POSTGRES_USER!;
+    postgresPassword = process.env.POSTGRES_PASSWORD!;
     cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
     ogmiosConnection = await createConnectionObjectWithRandomPort();
+    ogmiosSrvServiceName = process.env.OGMIOS_SRV_SERVICE_NAME!;
+    serviceDiscoveryBackoffFactor = SERVICE_DISCOVERY_BACKOFF_FACTOR_DEFAULT;
+    serviceDiscoveryTimeout = SERVICE_DISCOVERY_TIMEOUT_DEFAULT;
+    rabbitmqUrl = new URL(process.env.RABBITMQ_URL!);
+    rabbitmqSrvServiceName = process.env.RABBITMQ_SRV_SERVICE_NAME!;
     cacheTtl = CACHE_TTL_DEFAULT;
     epochPollInterval = EPOCH_POLL_INTERVAL_DEFAULT;
   });
@@ -44,8 +80,8 @@ describe('loadHttpServer', () => {
       await serverClosePromise(ogmiosServer);
     });
 
-    it('loads the nominated HTTP services and server if required program arguments are set', () => {
-      httpServer = loadHttpServer({
+    it('loads the nominated HTTP services and server if required program arguments are set', async () => {
+      httpServer = await loadHttpServer({
         apiUrl,
         options: {
           cacheTtl,
@@ -66,48 +102,223 @@ describe('loadHttpServer', () => {
       expect(httpServer).toBeInstanceOf(HttpServer);
     });
 
-    it('throws if postgres-dependent service is nominated without providing the connection string', () => {
-      expect(() =>
-        loadHttpServer({
+    describe('postgres-dependent services', () => {
+      it('loads the nominated HTTP service and server with service discovery', async () => {
+        httpServer = await loadHttpServer({
           apiUrl,
-          serviceNames: [
-            ServiceNames.StakePool,
-            ServiceNames.Utxo,
-            ServiceNames.ChainHistory,
-            ServiceNames.Rewards,
-            ServiceNames.NetworkInfo
-          ]
-        })
-      ).toThrow(new MissingProgramOption(ServiceNames.StakePool, ProgramOptionDescriptions.DbConnection));
+          options: {
+            cacheTtl,
+            epochPollInterval,
+            postgresDb,
+            postgresPassword,
+            postgresSrvServiceName,
+            postgresUser,
+            serviceDiscoveryBackoffFactor,
+            serviceDiscoveryTimeout
+          },
+          serviceNames: [ServiceNames.StakePool]
+        });
+
+        expect(httpServer).toBeInstanceOf(HttpServer);
+      });
+
+      it('throws if service discovery is used but one of the postgres args is missing', async () => {
+        const missingPostgresDb = undefined;
+
+        await expect(
+          async () =>
+            await loadHttpServer({
+              apiUrl,
+              options: {
+                cacheTtl,
+                epochPollInterval,
+                postgresDb: missingPostgresDb,
+                postgresSrvServiceName,
+                postgresUser,
+                serviceDiscoveryBackoffFactor,
+                serviceDiscoveryTimeout
+              },
+              serviceNames: [ServiceNames.StakePool]
+            })
+        ).rejects.toThrow(
+          new MissingProgramOption(ServiceNames.StakePool, [
+            ProgramOptionDescriptions.DbConnection,
+            ProgramOptionDescriptions.PostgresSrvArgs
+          ])
+        );
+      });
+
+      it('throws if a service is nominated without providing db connection string nor service discovery args', async () => {
+        await expect(
+          async () =>
+            await loadHttpServer({
+              apiUrl,
+              options: {
+                cacheTtl,
+                epochPollInterval
+              },
+              serviceNames: [ServiceNames.StakePool]
+            })
+        ).rejects.toThrow(
+          new MissingProgramOption(ServiceNames.StakePool, [
+            ProgramOptionDescriptions.DbConnection,
+            ProgramOptionDescriptions.PostgresSrvArgs
+          ])
+        );
+      });
+
+      it('throws if a service is nominated with providing both db connection string and service discovery args at same time', async () => {
+        await expect(
+          async () =>
+            await loadHttpServer({
+              apiUrl,
+              options: {
+                cacheTtl,
+                dbConnectionString,
+                epochPollInterval,
+                postgresSrvServiceName,
+                serviceDiscoveryBackoffFactor,
+                serviceDiscoveryTimeout
+              },
+              serviceNames: [ServiceNames.StakePool]
+            })
+        ).rejects.toThrow(
+          new InvalidArgsCombination(ProgramOptionDescriptions.DbConnection, ProgramOptionDescriptions.PostgresSrvArgs)
+        );
+      });
     });
 
-    it('throws if genesis-config dependent service is nominated without providing the node config path', () => {
-      expect(() =>
-        loadHttpServer({
+    describe('ogmios-dependent services', () => {
+      it('loads the nominated HTTP service and server with service discovery', async () => {
+        httpServer = await loadHttpServer({
           apiUrl,
           options: {
-            cacheTtl: 0,
-            dbConnectionString: 'postgres',
-            epochPollInterval: 0,
-            ogmiosUrl: new URL('http://localhost:1337')
+            cacheTtl,
+            epochPollInterval,
+            ogmiosSrvServiceName,
+            serviceDiscoveryBackoffFactor,
+            serviceDiscoveryTimeout
           },
-          serviceNames: [ServiceNames.NetworkInfo]
-        })
-      ).toThrow(new MissingProgramOption(ServiceNames.NetworkInfo, ProgramOptionDescriptions.CardanoNodeConfigPath));
+          serviceNames: [ServiceNames.TxSubmit]
+        });
+
+        expect(httpServer).toBeInstanceOf(HttpServer);
+      });
+
+      it('loads the nominated HTTP server and service discovery takes preference over url if both are provided', async () => {
+        httpServer = await loadHttpServer({
+          apiUrl,
+          options: {
+            cacheTtl,
+            epochPollInterval,
+            ogmiosSrvServiceName,
+            ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
+            serviceDiscoveryBackoffFactor,
+            serviceDiscoveryTimeout
+          },
+          serviceNames: [ServiceNames.TxSubmit]
+        });
+
+        expect(httpServer).toBeInstanceOf(HttpServer);
+      });
+
+      it('throws if a service is nominated without providing ogmios url nor service discovery name', async () => {
+        await expect(
+          async () =>
+            await loadHttpServer({
+              apiUrl,
+              options: {
+                cacheTtl,
+                epochPollInterval,
+                serviceDiscoveryBackoffFactor,
+                serviceDiscoveryTimeout
+              },
+              serviceNames: [ServiceNames.TxSubmit]
+            })
+        ).rejects.toThrow(
+          new MissingProgramOption(ServiceNames.TxSubmit, [
+            ProgramOptionDescriptions.OgmiosUrl,
+            ProgramOptionDescriptions.OgmiosSrvServiceName
+          ])
+        );
+      });
     });
-    it('throws if ogmios dependent service is nominated without providing the ogmios url', () => {
-      expect(() =>
-        loadHttpServer({
+
+    describe('rabbitmq-dependent services', () => {
+      it('loads the nominated HTTP service and server with service discovery', async () => {
+        httpServer = await loadHttpServer({
           apiUrl,
           options: {
-            cacheTtl: 0,
-            cardanoNodeConfigPath: 'config',
-            dbConnectionString: 'postgres',
-            epochPollInterval: 0
+            cacheTtl,
+            epochPollInterval,
+            rabbitmqSrvServiceName,
+            serviceDiscoveryBackoffFactor,
+            serviceDiscoveryTimeout,
+            useQueue: true
           },
-          serviceNames: [ServiceNames.NetworkInfo]
-        })
-      ).toThrow(new MissingProgramOption(ServiceNames.NetworkInfo, ProgramOptionDescriptions.OgmiosUrl));
+          serviceNames: [ServiceNames.TxSubmit]
+        });
+
+        expect(httpServer).toBeInstanceOf(HttpServer);
+      });
+
+      it('loads the nominated HTTP server and service discovery takes preference over url if both are provided', async () => {
+        httpServer = await loadHttpServer({
+          apiUrl,
+          options: {
+            cacheTtl,
+            epochPollInterval,
+            rabbitmqSrvServiceName,
+            rabbitmqUrl,
+            serviceDiscoveryBackoffFactor,
+            serviceDiscoveryTimeout,
+            useQueue: true
+          },
+          serviceNames: [ServiceNames.TxSubmit]
+        });
+
+        expect(httpServer).toBeInstanceOf(HttpServer);
+      });
+
+      it('throws if a service is nominated without providing rabbitmq url nor service discovery name', async () => {
+        await expect(
+          async () =>
+            await loadHttpServer({
+              apiUrl,
+              options: {
+                cacheTtl,
+                epochPollInterval,
+                serviceDiscoveryBackoffFactor,
+                serviceDiscoveryTimeout,
+                useQueue: true
+              },
+              serviceNames: [ServiceNames.TxSubmit]
+            })
+        ).rejects.toThrow(
+          new MissingProgramOption(ServiceNames.TxSubmit, [
+            ProgramOptionDescriptions.RabbitMQUrl,
+            ProgramOptionDescriptions.RabbitMQSrvServiceName
+          ])
+        );
+      });
+    });
+
+    it('throws if genesis-config dependent service is nominated without providing the node config path', async () => {
+      await expect(
+        async () =>
+          await loadHttpServer({
+            apiUrl,
+            options: {
+              cacheTtl: 0,
+              dbConnectionString: 'postgres',
+              epochPollInterval: 0,
+              ogmiosUrl: new URL('http://localhost:1337')
+            },
+            serviceNames: [ServiceNames.NetworkInfo]
+          })
+      ).rejects.toThrow(
+        new MissingProgramOption(ServiceNames.NetworkInfo, ProgramOptionDescriptions.CardanoNodeConfigPath)
+      );
     });
   });
 
