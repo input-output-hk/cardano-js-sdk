@@ -2071,7 +2071,7 @@ __metadata:
     mock-browser: ^0.92.14
     npm-run-all: ^4.1.5
     pbkdf2: ^3.1.2
-    pouchdb: ^7.2.2
+    pouchdb: ^7.3.0
     rxjs: ^7.4.0
     shx: ^0.3.3
     trezor-connect: 8.2.8-extended
@@ -6133,14 +6133,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"buffer-from@npm:1.1.1":
-  version: 1.1.1
-  resolution: "buffer-from@npm:1.1.1"
-  checksum: ccc53b69736008bff764497367c4d24879ba7122bc619ee499ff47eef3a5b885ca496e87272e7ebffa0bec3804c83f84041c616f6e3318f40624e27c1d80f045
-  languageName: node
-  linkType: hard
-
-"buffer-from@npm:^1.0.0":
+"buffer-from@npm:1.1.2, buffer-from@npm:^1.0.0":
   version: 1.1.2
   resolution: "buffer-from@npm:1.1.2"
   checksum: 0448524a562b37d4d7ed9efd91685a5b77a50672c556ea254ac9a6d30e3403a517d8981f10e565db24e8339413b43c97ca2951f10e399c6125a0d8911f5679bb
@@ -8992,12 +8985,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fetch-cookie@npm:0.10.1":
-  version: 0.10.1
-  resolution: "fetch-cookie@npm:0.10.1"
+"fetch-cookie@npm:0.11.0":
+  version: 0.11.0
+  resolution: "fetch-cookie@npm:0.11.0"
   dependencies:
     tough-cookie: ^2.3.3 || ^3.0.1 || ^4.0.0
-  checksum: cf297501c6eb70bfe0e4f4e85f4d6d3ac6447030a867229b588d94c8eb0e53f6594601c06eb6a7db071bf2f24d5b9111abcae9f885e4c72ab41ce2a0bed2628b
+  checksum: 0d2082cb7de34c1e566a7c22ab844c6e9e6a8f8c9c1bc7a62382931b4bb99f0ff6c00324ec00874728c57cfd0c655c6fde62badcae019f2e5bb220c5726fdd17
   languageName: node
   linkType: hard
 
@@ -12929,13 +12922,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-fetch@npm:2.6.0":
-  version: 2.6.0
-  resolution: "node-fetch@npm:2.6.0"
-  checksum: 2b741e9315c1c07df4a291d0b304892fa7e8d623fe789fedd53f9bcb8d09102b07591b4b93e552a65dfc457eee9d5d879d0440aefdb64f2d78e7cb78cbad28e9
-  languageName: node
-  linkType: hard
-
 "node-fetch@npm:2.6.7, node-fetch@npm:^2.6.6":
   version: 2.6.7
   resolution: "node-fetch@npm:2.6.7"
@@ -13956,16 +13942,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pouchdb@npm:^7.2.2":
-  version: 7.2.2
-  resolution: "pouchdb@npm:7.2.2"
+"pouchdb@npm:^7.3.0":
+  version: 7.3.0
+  resolution: "pouchdb@npm:7.3.0"
   dependencies:
     abort-controller: 3.0.0
     argsarray: 0.0.1
-    buffer-from: 1.1.1
+    buffer-from: 1.1.2
     clone-buffer: 1.0.0
     double-ended-queue: 2.1.0-0
-    fetch-cookie: 0.10.1
+    fetch-cookie: 0.11.0
     immediate: 3.3.0
     inherits: 2.0.4
     level: 6.0.1
@@ -13974,13 +13960,13 @@ __metadata:
     leveldown: 5.6.0
     levelup: 4.4.0
     ltgt: 2.2.1
-    node-fetch: 2.6.0
+    node-fetch: 2.6.7
     readable-stream: 1.1.14
-    spark-md5: 3.0.1
+    spark-md5: 3.0.2
     through2: 3.0.2
-    uuid: 8.1.0
+    uuid: 8.3.2
     vuvuzela: 1.0.3
-  checksum: 340ccb785721d6e5cbb4ed15fe31a7b871870abf82f4e23b6cf69d0487a203ad51bd4c4144520efa67cd11db45af6acb94661962792304655574a0f7e79e18e6
+  checksum: a7fccc451ab1aa94ebb69175ac53049818c6de1e2e25c96e0f814eb040a3d9de48038b9477269aae120ae8794cf503b9da9fc785d5c65ffbf4e794f2705eb2d4
   languageName: node
   linkType: hard
 
@@ -15469,10 +15455,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"spark-md5@npm:3.0.1":
-  version: 3.0.1
-  resolution: "spark-md5@npm:3.0.1"
-  checksum: 613a7f4e20929b832406ef2ed925d696d4d004455360b07ba1a829975fc12a005d745db370cb261ecc827c3dedf3b431a9337f4bab1f1954df776f41a05aaabe
+"spark-md5@npm:3.0.2":
+  version: 3.0.2
+  resolution: "spark-md5@npm:3.0.2"
+  checksum: 5feebff0bfabcecf56ba03af3e38fdb068272ed41fbf0a94ff9ef65b9bb9cb1dd69be3684db6542e62497b1eac3ae324c07ac4dcb606465dc36ca048177077bf
   languageName: node
   linkType: hard
 
@@ -16799,12 +16785,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"uuid@npm:8.1.0":
-  version: 8.1.0
-  resolution: "uuid@npm:8.1.0"
+"uuid@npm:8.3.2, uuid@npm:^8.0.0, uuid@npm:^8.3.2":
+  version: 8.3.2
+  resolution: "uuid@npm:8.3.2"
   bin:
     uuid: dist/bin/uuid
-  checksum: 4fc4f12e5c704947cce132df07e6e8a20ca34dcbba4a5aef7a24cf76e0e13830cf7cdd69035a916caf2a00fa011876ceabc098d01f5827adc174ca5defdc8c99
+  checksum: 5575a8a75c13120e2f10e6ddc801b2c7ed7d8f3c8ac22c7ed0c7b2ba6383ec0abda88c905085d630e251719e0777045ae3236f04c812184b7c765f63a70e58df
   languageName: node
   linkType: hard
 
@@ -16814,15 +16800,6 @@ __metadata:
   bin:
     uuid: ./bin/uuid
   checksum: 58de2feed61c59060b40f8203c0e4ed7fd6f99d42534a499f1741218a1dd0c129f4aa1de797bcf822c8ea5da7e4137aa3673431a96dae729047f7aca7b27866f
-  languageName: node
-  linkType: hard
-
-"uuid@npm:^8.0.0, uuid@npm:^8.3.2":
-  version: 8.3.2
-  resolution: "uuid@npm:8.3.2"
-  bin:
-    uuid: dist/bin/uuid
-  checksum: 5575a8a75c13120e2f10e6ddc801b2c7ed7d8f3c8ac22c7ed0c7b2ba6383ec0abda88c905085d630e251719e0777045ae3236f04c812184b7c765f63a70e58df
   languageName: node
   linkType: hard
 
