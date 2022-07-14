@@ -1,15 +1,15 @@
 #!/usr/bin/env node
-
-import chalk from 'chalk';
-import { Command } from 'commander';
-import hash from 'object-hash';
-import path from 'node:path';
-import { SingleBar, Options } from 'cli-progress';
-import { ensureDir, writeFile } from 'fs-extra';
-import JSONBig from 'json-bigint';
+/* eslint-disable no-console */
 import { AddressBalancesResponse, getOnChainAddressBalances } from './AddressBalance';
-import { getBlocks, GetBlocksResponse } from './Block';
+import { Command } from 'commander';
+import { GetBlocksResponse, getBlocks } from './Block';
+import { Options, SingleBar } from 'cli-progress';
+import { ensureDir, writeFile } from 'fs-extra';
 import { prepareContent } from './Content';
+import JSONBig from 'json-bigint';
+import chalk from 'chalk';
+import hash from 'object-hash';
+import path from 'path';
 
 const clear = require('clear');
 const packageJson = require('../package.json');
@@ -24,7 +24,7 @@ const createProgressBar = (lastblockHeight: number) =>
     format: `Syncing from genesis to block ${lastblockHeight} | ${chalk.blue(
       '{bar}'
     )} | {percentage}% || {value}/{total} Blocks`,
-    hideCursor: true,
+    hideCursor: false,
     renderThrottle: 300
   } as Options);
 

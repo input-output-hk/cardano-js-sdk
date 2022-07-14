@@ -2,7 +2,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable max-len */
 import { ChildProcess, fork } from 'child_process';
-import { Connection, ConnectionConfig, createConnectionObject } from '@cardano-sdk/ogmios';
+import { Ogmios } from '@cardano-sdk/ogmios';
 import { RABBITMQ_URL_DEFAULT, ServiceNames } from '../src';
 import { createHealthyMockOgmiosServer, createUnhealthyMockOgmiosServer, ogmiosServerReady, serverReady } from './util';
 import { getRandomPort } from 'get-port-please';
@@ -53,14 +53,14 @@ describe('entrypoints', () => {
 
   describe('start-server', () => {
     let dbConnectionString: string;
-    let ogmiosPort: ConnectionConfig['port'];
-    let ogmiosConnection: Connection;
+    let ogmiosPort: Ogmios.ConnectionConfig['port'];
+    let ogmiosConnection: Ogmios.Connection;
     let cardanoNodeConfigPath: string;
     let cacheTtl: string;
 
     beforeAll(async () => {
       ogmiosPort = await getRandomPort();
-      ogmiosConnection = createConnectionObject({ port: ogmiosPort });
+      ogmiosConnection = Ogmios.createConnectionObject({ port: ogmiosPort });
       dbConnectionString = process.env.DB_CONNECTION_STRING!;
       cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
       cacheTtl = process.env.CACHE_TTL!;
@@ -354,7 +354,7 @@ describe('entrypoints', () => {
         beforeEach(async () => {
           ogmiosServer = createHealthyMockOgmiosServer();
           // ws://localhost:1337
-          ogmiosConnection = createConnectionObject();
+          ogmiosConnection = Ogmios.createConnectionObject();
           await listenPromise(ogmiosServer, { port: ogmiosConnection.port });
           await ogmiosServerReady(ogmiosConnection);
         });

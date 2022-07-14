@@ -1,7 +1,7 @@
-import { createConnectionObject } from '@cardano-sdk/ogmios';
+import { Ogmios } from '@cardano-sdk/ogmios';
 
 export const OGMIOS_URL_DEFAULT = (() => {
-  const connection = createConnectionObject();
+  const connection = Ogmios.createConnectionObject();
   return connection.address.webSocket;
 })();
 

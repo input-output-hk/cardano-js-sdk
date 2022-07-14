@@ -1,4 +1,4 @@
 export * from './Provider';
 export * from './CardanoNode';
 export * from './util';
-export { createConnectionObject, Connection, ConnectionConfig } from '@cardano-ogmios/client';
+export * as Ogmios from '@cardano-ogmios/client';

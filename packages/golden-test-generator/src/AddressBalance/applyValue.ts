@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { BigIntMath } from '@cardano-sdk/util';
-import { Schema } from '@cardano-ogmios/client';
+import { Ogmios } from '@cardano-sdk/ogmios';
 
 
 const throwIfNegative = (value: bigint | number): void => {
@@ -10,10 +10,13 @@ const throwIfNegative = (value: bigint | number): void => {
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-export const applyValue = (balance: Schema.Value, value: Schema.Value, spending = false): Schema.Value => {
-  const coins = balance.coins + (spending ? -Math.abs(value.coins) : value.coins);
+export const applyValue = (balance: Ogmios.Schema.Value, value: Ogmios.Schema.Value, spending = false): Ogmios.Schema.Value => {
+  // This is a workaround. coins is typed as a bigint, but it's sometimes being parsed from the raw response as a number.
+  const valueCoins: bigint = typeof value.coins === 'bigint' ? value.coins : BigInt(value.coins);
+  const balanceCoins: bigint = typeof balance.coins === 'bigint' ? balance.coins : BigInt(balance.coins);
+  const coins = balanceCoins + (spending ? -BigIntMath.abs(valueCoins) : valueCoins);
   throwIfNegative(coins);
-  const balanceToApply: Schema.Value = { coins };
+  const balanceToApply: Ogmios.Schema.Value = { coins };
   if (balance.assets !== undefined || value.assets !== undefined) {
     balanceToApply.assets = { ...balance.assets } ?? {};
   }

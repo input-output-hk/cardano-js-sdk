@@ -10,7 +10,7 @@ const removeIgnoredFiles = async (files) => {
 }
 
 export default {
-  "packages/!(*golden-test-generator)/**/*.{js,ts}": async (files) => {
+  "packages/**/*.{js,ts}": async (files) => {
     const filesToLint = await removeIgnoredFiles(files)
     return [`eslint --debug --max-warnings=0 ${filesToLint}`, "yarn tscNoEmit"]
   },

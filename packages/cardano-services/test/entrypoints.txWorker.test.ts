@@ -1,7 +1,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { BAD_CONNECTION_URL, enqueueFakeTx, removeAllQueues } from '../../rabbitmq/test/utils';
 import { ChildProcess, fork } from 'child_process';
-import { createConnectionObject } from '@cardano-sdk/ogmios';
+import { Ogmios } from '@cardano-sdk/ogmios';
 import { createHealthyMockOgmiosServer, ogmiosServerReady } from './util';
 import { getRandomPort } from 'get-port-please';
 import { listenPromise, serverClosePromise } from '../src/util';
@@ -41,7 +41,7 @@ describe('tx-worker entrypoints', () => {
   beforeAll(async () => {
     resetHook();
     const port = await getRandomPort();
-    const ogmiosConnection = createConnectionObject({ port });
+    const ogmiosConnection = Ogmios.createConnectionObject({ port });
     ogmiosServer = createHealthyMockOgmiosServer(() => hook());
     await listenPromise(ogmiosServer, { port });
     await ogmiosServerReady(ogmiosConnection);
