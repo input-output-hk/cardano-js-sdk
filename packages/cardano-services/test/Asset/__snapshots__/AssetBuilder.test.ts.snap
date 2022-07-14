@@ -1,0 +1,115 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AssetBuilder queryLastMintTx query last Mint transaction 1`] = `
+Object {
+  "tx_hash": Object {
+    "data": Array [
+      246,
+      103,
+      145,
+      160,
+      53,
+      76,
+      67,
+      216,
+      197,
+      169,
+      54,
+      113,
+      235,
+      150,
+      217,
+      70,
+      51,
+      227,
+      65,
+      159,
+      60,
+      203,
+      176,
+      160,
+      12,
+      0,
+      161,
+      82,
+      211,
+      182,
+      202,
+      6,
+    ],
+    "type": "Buffer",
+  },
+}
+`;
+
+exports[`AssetBuilder queryLastMintTx return undefined when not found 1`] = `undefined`;
+
+exports[`AssetBuilder queryMultiAsset query multi_asset 1`] = `
+Object {
+  "fingerprint": "asset1f0azzptnr8dghzjh7egqvdjmt33e3lz5uy59th",
+  "id": "590675",
+}
+`;
+
+exports[`AssetBuilder queryMultiAsset return undefined when not found 1`] = `undefined`;
+
+exports[`AssetBuilder queryMultiAssetHistory query multi_asset transactions history 1`] = `
+Array [
+  Object {
+    "hash": Object {
+      "data": Array [
+        246,
+        103,
+        145,
+        160,
+        53,
+        76,
+        67,
+        216,
+        197,
+        169,
+        54,
+        113,
+        235,
+        150,
+        217,
+        70,
+        51,
+        227,
+        65,
+        159,
+        60,
+        203,
+        176,
+        160,
+        12,
+        0,
+        161,
+        82,
+        211,
+        182,
+        202,
+        6,
+      ],
+      "type": "Buffer",
+    },
+    "quantity": "1",
+  },
+]
+`;
+
+exports[`AssetBuilder queryMultiAssetHistory return empty array when not found 1`] = `Array []`;
+
+exports[`AssetBuilder queryMultiAssetQuantities query multi_asset 1`] = `
+Object {
+  "count": "1",
+  "sum": "1",
+}
+`;
+
+exports[`AssetBuilder queryMultiAssetQuantities return the record with empty data when not found 1`] = `
+Object {
+  "count": "0",
+  "sum": null,
+}
+`;
