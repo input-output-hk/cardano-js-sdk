@@ -77,7 +77,7 @@
     "@ledgerhq/hw-transport": "^6.27.1",
     "@ledgerhq/hw-transport-node-hid-noevents": "6.27.1",
     "@ledgerhq/hw-transport-webhid": "6.27.1",
-    "backoff-rxjs": "^6.5.7",
+    "backoff-rxjs": "^7.0.0",
     "bip39": "^3.0.4",
     "blake2b": "^2.1.4",
     "chacha": "^2.1.0",

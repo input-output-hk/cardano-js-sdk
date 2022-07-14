@@ -2037,7 +2037,7 @@ __metadata:
     "@types/pbkdf2": ^3.1.0
     "@types/pouchdb": ^6.4.0
     "@types/w3c-web-hid": ^1.0.2
-    backoff-rxjs: ^6.5.7
+    backoff-rxjs: ^7.0.0
     bip39: ^3.0.4
     blake2b: ^2.1.4
     bunyan: ^1.8.15
@@ -5929,12 +5929,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"backoff-rxjs@npm:^6.5.7":
-  version: 6.5.7
-  resolution: "backoff-rxjs@npm:6.5.7"
+"backoff-rxjs@npm:^7.0.0":
+  version: 7.0.0
+  resolution: "backoff-rxjs@npm:7.0.0"
   peerDependencies:
-    rxjs: ^6.5.5
-  checksum: b38dac48dc30fafabe1e3fa076acb99c2ced52e80df31450c735a701090b63006247eb7a409a861a0b6d5908c57784920aa459b4bd4af9a64a75746ae9c2520a
+    rxjs: ^7.0.0
+  checksum: 5ff9f9b8ffde323274131c594705251e22e6725db20ce69e67552f46110c32c7576296718ec4abe3f49965b011a13eeeb81c9f05765bd82955ab23e56944a070
   languageName: node
   linkType: hard
 
