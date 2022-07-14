@@ -98,7 +98,7 @@ describe('chain history mappers', () => {
       size: 50,
       slot_leader_hash: Buffer.from(genesisLeaderHash, 'hex'),
       slot_leader_pool: poolId,
-      slot_no: 100,
+      slot_no: '100',
       time: datetime,
       tx_count: '3000',
       vrf: vrfKey
@@ -252,7 +252,7 @@ describe('chain history mappers', () => {
   });
   describe('mapProtocolParams', () => {
     const protocolParams: ProtocolParamsModel = {
-      coin_per_utxo_word: '91218',
+      coin_per_utxo_size: '4310',
       key_deposit: '20000000',
       max_collateral_inputs: 2,
       max_tx_size: 20,
@@ -264,10 +264,10 @@ describe('chain history mappers', () => {
       protocol_major: 2,
       protocol_minor: 1
     };
-    test('map ProtocolParamsModel to Cardano.ProtocolParametersAlonzo', () => {
+    test('map ProtocolParamsModel to Cardano.ProtocolParametersBabbage', () => {
       const result = mappers.mapProtocolParams(protocolParams);
-      expect(result).toEqual<Cardano.ProtocolParametersAlonzo>({
-        coinsPerUtxoWord: 91_218,
+      expect(result).toEqual<Cardano.ProtocolParametersBabbage>({
+        coinsPerUtxoByte: 4310,
         maxCollateralInputs: 2,
         maxTxSize: 20,
         maxValueSize: 40_000_000_000,
@@ -311,7 +311,7 @@ describe('chain history mappers', () => {
     ];
     const outputs: Cardano.TxOut[] = [{ address: Cardano.Address(address), value: { assets, coins: 20_000_000n } }];
     const protocolParams = {
-      coinsPerUtxoWord: 91_218,
+      coinsPerUtxoByte: 4310,
       maxCollateralInputs: 2,
       maxTxSize: 20,
       maxValueSize: 40_000_000_000,

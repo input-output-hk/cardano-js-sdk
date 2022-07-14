@@ -66,7 +66,7 @@ pools_delegates AS (
             LIMIT 1
       )
    JOIN stake_address sa ON 
-     sa.hash_raw  = pu.reward_addr 
+     sa.id  = pu.reward_addr_id 
    WHERE (pr.id is null or pr.announced_tx_id < pu.registered_tx_id) and
        ph.id = ANY($1)
   ),
@@ -91,11 +91,13 @@ pools_delegates AS (
   owners_total_utxos AS (
     SELECT
       sum(tx_out.value) AS amount,
-      o.pool_hash_id 
+      pu.hash_id 
     FROM tx_out
-    JOIN pool_owner o on 
-      o.addr_id = tx_out.stake_address_id and 
-      o.pool_hash_id = ANY($1)
+    JOIN pool_owner o ON 
+      o.addr_id = tx_out.stake_address_id
+    JOIN pool_update pu ON
+      o.pool_update_id = pu.id
+      AND pu.hash_id = ANY($1)
     LEFT JOIN tx_in ON 
       tx_out.tx_id = tx_in.tx_out_id AND 
       tx_out.index::smallint = tx_in.tx_out_index::smallint
@@ -107,7 +109,7 @@ pools_delegates AS (
         tx_out_tx.valid_contract = TRUE
     WHERE 
       tx_in_tx.id IS null
-    GROUP BY o.pool_hash_id 
+    GROUP BY pu.hash_id 
   ),
 active_stake AS (
 SELECT 
@@ -240,7 +242,7 @@ LEFT JOIN total_rewards_of_reward_acc AS tr ON
 LEFT JOIN total_withdraws_of_reward_acc AS tw ON
 	tw.pool_hash_id = ph.id
 LEFT JOIN owners_total_utxos otu on 
-	otu.pool_hash_id = ph.id
+	otu.hash_id = ph.id
 where id = ANY($1)
 `;
 
@@ -404,13 +406,13 @@ WHERE update_id = ANY($1)
 
 export const findPoolsOwners = `
 SELECT 
-  stake.view AS address,
-  owner.pool_hash_id AS hash_id
-FROM pool_owner owner
-JOIN pool_update 
-    ON pool_update.registered_tx_id = owner.registered_tx_id
-JOIN stake_address stake
-  ON stake.id = owner.addr_id
+ 	address."view" AS address,
+	pool_update.hash_id AS hash_id
+FROM pool_owner AS "owner"
+JOIN pool_update
+ 	ON "owner".pool_update_id = pool_update.id
+JOIN stake_address AS address
+ 	ON "owner".addr_id = address.id
 WHERE pool_update.id = ANY($1)
 `;
 
@@ -458,7 +460,7 @@ export const poolsByPledgeMetSubqueries: readonly SubQuery[] = [
         LIMIT 1
       ) 
     JOIN stake_address sa ON
-      sa.hash_raw = pu.reward_addr 
+      sa.id = pu.reward_addr_id 
     JOIN delegation d1 on
       sa.id = d1.addr_id 
     WHERE NOT EXISTS
@@ -516,11 +518,13 @@ export const poolsByPledgeMetSubqueries: readonly SubQuery[] = [
     query: `
   SELECT
     tx_out.value AS value,
-    o.pool_hash_id 
+    pu.hash_id 
   FROM tx_out
-  JOIN pool_owner o on 
-    o.addr_id = tx_out.stake_address_id and 
-    o.pool_hash_id in (SELECT id FROM pools_delegated)
+  JOIN pool_owner o ON 
+    o.addr_id = tx_out.stake_address_id
+  JOIN pool_update pu ON
+    o.pool_update_id = pu.id
+    AND pu.hash_id IN (SELECT id FROM pools_delegated)
   LEFT JOIN tx_in ON 
     tx_out.tx_id = tx_in.tx_out_id AND 
     tx_out.index::smallint = tx_in.tx_out_index::smallint
@@ -538,9 +542,9 @@ export const poolsByPledgeMetSubqueries: readonly SubQuery[] = [
     query: `
   SELECT 
     SUM(value) AS total_amount,
-    pool_hash_id
+    hash_id AS pool_hash_id
   FROM owners_utxo 
-  GROUP BY pool_hash_id`
+  GROUP BY hash_id`
   }
 ];
 
@@ -633,7 +637,7 @@ SELECT
   pu.id AS update_id,
   ph.view AS pool_id,
   sa.view AS reward_address,
-  pu.reward_addr,
+  pu.reward_addr_id,
   pu.pledge,
   pu.fixed_cost,
   pu.margin,
@@ -646,7 +650,7 @@ FROM pool_update pu
 JOIN pool_hash ph ON 
   ph.id = pu.hash_id
 JOIN stake_address sa ON
-  sa.hash_raw = pu.reward_addr
+  sa.id = pu.reward_addr_id
 LEFT JOIN pool_metadata_ref metadata
   ON metadata.id = pu.meta_id
 LEFT JOIN pool_offline_data pod

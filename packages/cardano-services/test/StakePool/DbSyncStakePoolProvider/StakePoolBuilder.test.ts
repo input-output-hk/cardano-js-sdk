@@ -67,13 +67,13 @@ describe('StakePoolBuilder', () => {
     const totalAda = '42021479194505231';
     describe('sort', () => {
       it('by default sort', async () => {
-        const metrics = (await builder.queryPoolMetrics([14, 15, 20], totalAda)).map((m) => m.metrics);
+        const metrics = (await builder.queryPoolMetrics([1, 31, 19], totalAda)).map((m) => m.metrics);
         expect(metrics).toHaveLength(3);
         expect(metrics).toMatchSnapshot();
       });
       it('by saturation', async () => {
         const metrics = (
-          await builder.queryPoolMetrics([14, 15, 20], totalAda, { sort: { field: 'saturation', order: 'asc' } })
+          await builder.queryPoolMetrics([1, 31, 19], totalAda, { sort: { field: 'saturation', order: 'asc' } })
         ).map((m) => m.metrics);
         expect(metrics).toHaveLength(3);
         expect(metrics).toMatchSnapshot();
@@ -82,14 +82,14 @@ describe('StakePoolBuilder', () => {
     describe('pagination', () => {
       it('with limit', async () => {
         const metrics = (
-          await builder.queryPoolMetrics([14, 15, 20], totalAda, { pagination: { limit: 2, startAt: 0 } })
+          await builder.queryPoolMetrics([1, 31, 19], totalAda, { pagination: { limit: 2, startAt: 0 } })
         ).map((m) => m.metrics);
         expect(metrics).toHaveLength(2);
         expect(metrics).toMatchSnapshot();
       });
       it('with startAt', async () => {
         const metrics = (
-          await builder.queryPoolMetrics([14, 15, 20], totalAda, { pagination: { limit: 3, startAt: 1 } })
+          await builder.queryPoolMetrics([1, 31, 19], totalAda, { pagination: { limit: 3, startAt: 1 } })
         ).map((m) => m.metrics);
         expect(metrics).toHaveLength(2);
         expect(metrics).toMatchSnapshot();
@@ -303,13 +303,13 @@ describe('StakePoolBuilder', () => {
   describe('queryPoolAPY', () => {
     describe('sort', () => {
       it('by default sort (APY desc)', async () => {
-        const result = await builder.queryPoolAPY([1, 15]);
+        const result = await builder.queryPoolAPY([1, 14]);
         expect(result).toHaveLength(2);
         expect(result[0].apy).toBeGreaterThan(result[1].apy);
         expect(result).toMatchSnapshot();
       });
       it('by APY asc', async () => {
-        const result = await builder.queryPoolAPY([1, 15], { sort: { field: 'apy', order: 'asc' } });
+        const result = await builder.queryPoolAPY([1, 14], { sort: { field: 'apy', order: 'asc' } });
         expect(result).toHaveLength(2);
         expect(result[0].apy).toBeLessThan(result[1].apy);
         expect(result).toMatchSnapshot();
@@ -317,12 +317,12 @@ describe('StakePoolBuilder', () => {
     });
     describe('pagination', () => {
       it('with limit', async () => {
-        const result = await builder.queryPoolAPY([1, 15, 20], { pagination: { limit: 1, startAt: 0 } });
+        const result = await builder.queryPoolAPY([1, 15, 19], { pagination: { limit: 1, startAt: 0 } });
         expect(result).toHaveLength(1);
         expect(result).toMatchSnapshot();
       });
       it('with startAt', async () => {
-        const result = await builder.queryPoolAPY([1, 15, 20], { pagination: { limit: 5, startAt: 1 } });
+        const result = await builder.queryPoolAPY([1, 15, 19], { pagination: { limit: 5, startAt: 1 } });
         expect(result).toHaveLength(2);
         expect(result).toMatchSnapshot();
       });

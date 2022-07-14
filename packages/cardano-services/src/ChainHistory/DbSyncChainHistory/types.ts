@@ -14,7 +14,7 @@ export interface BlockModel {
   size: number;
   slot_leader_hash: Buffer;
   slot_leader_pool: string | null;
-  slot_no: number;
+  slot_no: string;
   time: string;
   tx_count: string;
   vrf: string;
@@ -118,7 +118,7 @@ export interface DelegationCertModel extends CertificateModel {
 }
 
 export interface ProtocolParamsModel {
-  coin_per_utxo_word: string;
+  coin_per_utxo_size: string;
   max_collateral_inputs: number;
   max_tx_size: number;
   max_val_size: string;

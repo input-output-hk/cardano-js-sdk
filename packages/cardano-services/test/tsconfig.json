@@ -28,6 +28,15 @@
     },
     {
       "path": "../../wallet/src"
+    },
+    {
+      "path": "../../ogmios/src"
+    },
+    {
+      "path": "../../rabbitmq/src"
+    },
+    {
+      "path": "../../cip2/src"
     }
   ]
 }

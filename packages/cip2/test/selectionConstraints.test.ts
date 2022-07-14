@@ -22,7 +22,7 @@ const cslMock = jest.requireMock('@emurgo/cardano-serialization-lib-nodejs');
 
 describe('defaultSelectionConstraints', () => {
   const protocolParameters = {
-    coinsPerUtxoWord: 34_482,
+    coinsPerUtxoByte: 4310,
     maxTxSize: 16_384,
     maxValueSize: 5000,
     minFeeCoefficient: 44,
@@ -30,7 +30,7 @@ describe('defaultSelectionConstraints', () => {
   } as ProtocolParametersForInputSelection;
 
   it('Invalid parameters', () => {
-    for (const param of ['minFeeCoefficient', 'minFeeConstant', 'coinsPerUtxoWord', 'maxTxSize', 'maxValueSize']) {
+    for (const param of ['minFeeCoefficient', 'minFeeConstant', 'coinsPerUtxoByte', 'maxTxSize', 'maxValueSize']) {
       expect(() =>
         defaultSelectionConstraints({
           protocolParameters: { ...protocolParameters, [param]: null }

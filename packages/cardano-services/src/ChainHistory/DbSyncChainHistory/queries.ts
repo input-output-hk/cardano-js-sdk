@@ -62,7 +62,7 @@ export const findTip = `
 
 export const findProtocolParameters = `
 	SELECT 
-		coins_per_utxo_word,
+		coins_per_utxo_size,
 		max_collateral_inputs,
 		max_tx_size,
 		max_val_size,

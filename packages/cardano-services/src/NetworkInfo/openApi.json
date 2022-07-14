@@ -302,7 +302,7 @@
           "poolDeposit",
           "maxValueSize",
           "minPoolCost",
-          "coinsPerUtxoWord",
+          "coinsPerUtxoByte",
           "maxTxSize",
           "protocolVersion"
         ],

@@ -33,7 +33,7 @@ Object {
         LIMIT 1
       ) 
     JOIN stake_address sa ON
-      sa.hash_raw = pu.reward_addr 
+      sa.id = pu.reward_addr_id 
     JOIN delegation d1 on
       sa.id = d1.addr_id 
     WHERE NOT EXISTS
@@ -75,11 +75,13 @@ Object {
     on r.stake_address_id = w.stake_address_id ), owners_utxo AS (
   SELECT
     tx_out.value AS value,
-    o.pool_hash_id 
+    pu.hash_id 
   FROM tx_out
-  JOIN pool_owner o on 
-    o.addr_id = tx_out.stake_address_id and 
-    o.pool_hash_id in (SELECT id FROM pools_delegated)
+  JOIN pool_owner o ON 
+    o.addr_id = tx_out.stake_address_id
+  JOIN pool_update pu ON
+    o.pool_update_id = pu.id
+    AND pu.hash_id IN (SELECT id FROM pools_delegated)
   LEFT JOIN tx_in ON 
     tx_out.tx_id = tx_in.tx_out_id AND 
     tx_out.index::smallint = tx_in.tx_out_index::smallint
@@ -93,9 +95,9 @@ Object {
     tx_in_tx.id IS NULL), owners_balance AS (
   SELECT 
     SUM(value) AS total_amount,
-    pool_hash_id
+    hash_id AS pool_hash_id
   FROM owners_utxo 
-  GROUP BY pool_hash_id)
+  GROUP BY hash_id)
       
     SELECT
         ph.id,
@@ -220,7 +222,7 @@ Object {
         LIMIT 1
       ) 
     JOIN stake_address sa ON
-      sa.hash_raw = pu.reward_addr 
+      sa.id = pu.reward_addr_id 
     JOIN delegation d1 on
       sa.id = d1.addr_id 
     WHERE NOT EXISTS
@@ -262,11 +264,13 @@ Object {
     on r.stake_address_id = w.stake_address_id ), owners_utxo AS (
   SELECT
     tx_out.value AS value,
-    o.pool_hash_id 
+    pu.hash_id 
   FROM tx_out
-  JOIN pool_owner o on 
-    o.addr_id = tx_out.stake_address_id and 
-    o.pool_hash_id in (SELECT id FROM pools_delegated)
+  JOIN pool_owner o ON 
+    o.addr_id = tx_out.stake_address_id
+  JOIN pool_update pu ON
+    o.pool_update_id = pu.id
+    AND pu.hash_id IN (SELECT id FROM pools_delegated)
   LEFT JOIN tx_in ON 
     tx_out.tx_id = tx_in.tx_out_id AND 
     tx_out.index::smallint = tx_in.tx_out_index::smallint
@@ -280,9 +284,9 @@ Object {
     tx_in_tx.id IS NULL), owners_balance AS (
   SELECT 
     SUM(value) AS total_amount,
-    pool_hash_id
+    hash_id AS pool_hash_id
   FROM owners_utxo 
-  GROUP BY pool_hash_id), pools_by_pledge_met AS (
+  GROUP BY hash_id), pools_by_pledge_met AS (
     
     SELECT
         ph.id,
@@ -369,7 +373,7 @@ Array [
         LIMIT 1
       ) 
     JOIN stake_address sa ON
-      sa.hash_raw = pu.reward_addr 
+      sa.id = pu.reward_addr_id 
     JOIN delegation d1 on
       sa.id = d1.addr_id 
     WHERE NOT EXISTS
@@ -435,11 +439,13 @@ Array [
     "query": "
   SELECT
     tx_out.value AS value,
-    o.pool_hash_id 
+    pu.hash_id 
   FROM tx_out
-  JOIN pool_owner o on 
-    o.addr_id = tx_out.stake_address_id and 
-    o.pool_hash_id in (SELECT id FROM pools_delegated)
+  JOIN pool_owner o ON 
+    o.addr_id = tx_out.stake_address_id
+  JOIN pool_update pu ON
+    o.pool_update_id = pu.id
+    AND pu.hash_id IN (SELECT id FROM pools_delegated)
   LEFT JOIN tx_in ON 
     tx_out.tx_id = tx_in.tx_out_id AND 
     tx_out.index::smallint = tx_in.tx_out_index::smallint
@@ -459,9 +465,9 @@ Array [
     "query": "
   SELECT 
     SUM(value) AS total_amount,
-    pool_hash_id
+    hash_id AS pool_hash_id
   FROM owners_utxo 
-  GROUP BY pool_hash_id",
+  GROUP BY hash_id",
   },
   Object {
     "id": Object {
@@ -511,7 +517,7 @@ Array [
         LIMIT 1
       ) 
     JOIN stake_address sa ON
-      sa.hash_raw = pu.reward_addr 
+      sa.id = pu.reward_addr_id 
     JOIN delegation d1 on
       sa.id = d1.addr_id 
     WHERE NOT EXISTS
@@ -577,11 +583,13 @@ Array [
     "query": "
   SELECT
     tx_out.value AS value,
-    o.pool_hash_id 
+    pu.hash_id 
   FROM tx_out
-  JOIN pool_owner o on 
-    o.addr_id = tx_out.stake_address_id and 
-    o.pool_hash_id in (SELECT id FROM pools_delegated)
+  JOIN pool_owner o ON 
+    o.addr_id = tx_out.stake_address_id
+  JOIN pool_update pu ON
+    o.pool_update_id = pu.id
+    AND pu.hash_id IN (SELECT id FROM pools_delegated)
   LEFT JOIN tx_in ON 
     tx_out.tx_id = tx_in.tx_out_id AND 
     tx_out.index::smallint = tx_in.tx_out_index::smallint
@@ -601,9 +609,9 @@ Array [
     "query": "
   SELECT 
     SUM(value) AS total_amount,
-    pool_hash_id
+    hash_id AS pool_hash_id
   FROM owners_utxo 
-  GROUP BY pool_hash_id",
+  GROUP BY hash_id",
   },
   Object {
     "id": Object {
@@ -809,12 +817,12 @@ Object {
 
 exports[`StakePoolBuilder getLastEpoch getLastEpoch 1`] = `205`;
 
-exports[`StakePoolBuilder getTotalAmountOfAda getTotalAmountOfAda 1`] = `"69154436781576039"`;
+exports[`StakePoolBuilder getTotalAmountOfAda getTotalAmountOfAda 1`] = `"69154436740315746"`;
 
 exports[`StakePoolBuilder queryPoolAPY pagination with limit 1`] = `
 Array [
   Object {
-    "apy": 0.00186615265931667,
+    "apy": 0,
     "hashId": "15",
   },
 ]
@@ -824,11 +832,11 @@ exports[`StakePoolBuilder queryPoolAPY pagination with startAt 1`] = `
 Array [
   Object {
     "apy": 0,
-    "hashId": "1",
+    "hashId": "19",
   },
   Object {
     "apy": 0,
-    "hashId": "20",
+    "hashId": "1",
   },
 ]
 `;
@@ -841,7 +849,7 @@ Array [
   },
   Object {
     "apy": 0.00186615265931667,
-    "hashId": "15",
+    "hashId": "14",
   },
 ]
 `;
@@ -850,7 +858,7 @@ exports[`StakePoolBuilder queryPoolAPY sort by default sort (APY desc) 1`] = `
 Array [
   Object {
     "apy": 0.00186615265931667,
-    "hashId": "15",
+    "hashId": "14",
   },
   Object {
     "apy": 0,
@@ -1310,15 +1318,15 @@ Array [
   Object {
     "blocksCreated": "0",
     "delegators": "1",
-    "livePledge": 22623299531669n,
-    "saturation": "0.73141928978079572314",
+    "livePledge": 999999828559n,
+    "saturation": "0.01189867476975633141",
     "size": Object {
-      "active": "0.81589194534120782856",
-      "live": "0.18410805465879217144",
+      "active": "0.0000000000000000000000000000",
+      "live": "1.00000000000000000000",
     },
     "stake": Object {
-      "active": 50153400814617n,
-      "live": 11317240121350n,
+      "active": 0n,
+      "live": 999999828559n,
     },
   },
   Object {
@@ -1356,16 +1364,16 @@ Array [
   },
   Object {
     "blocksCreated": "0",
-    "delegators": "1",
-    "livePledge": 487464117n,
-    "saturation": "0.000035543342979113939881",
+    "delegators": "0",
+    "livePledge": 497325000n,
+    "saturation": "0.000019215708620404440214",
     "size": Object {
-      "active": "0.83681394324934275242",
-      "live": "0.16318605675065724758",
+      "active": "1.00000000000000000000",
+      "live": "0.0000000000000000000000000000",
     },
     "stake": Object {
-      "active": 2499703578n,
-      "live": 487464117n,
+      "active": 1614945000n,
+      "live": 0n,
     },
   },
 ]
@@ -1376,15 +1384,15 @@ Array [
   Object {
     "blocksCreated": "0",
     "delegators": "1",
-    "livePledge": 22623299531669n,
-    "saturation": "0.73141928978079572314",
+    "livePledge": 999999828559n,
+    "saturation": "0.01189867476975633141",
     "size": Object {
-      "active": "0.81589194534120782856",
-      "live": "0.18410805465879217144",
+      "active": "0.0000000000000000000000000000",
+      "live": "1.00000000000000000000",
     },
     "stake": Object {
-      "active": 50153400814617n,
-      "live": 11317240121350n,
+      "active": 0n,
+      "live": 999999828559n,
     },
   },
   Object {
@@ -1403,16 +1411,16 @@ Array [
   },
   Object {
     "blocksCreated": "0",
-    "delegators": "1",
-    "livePledge": 487464117n,
-    "saturation": "0.000035543342979113939881",
+    "delegators": "0",
+    "livePledge": 497325000n,
+    "saturation": "0.000019215708620404440214",
     "size": Object {
-      "active": "0.83681394324934275242",
-      "live": "0.16318605675065724758",
+      "active": "1.00000000000000000000",
+      "live": "0.0000000000000000000000000000",
     },
     "stake": Object {
-      "active": 2499703578n,
-      "live": 487464117n,
+      "active": 1614945000n,
+      "live": 0n,
     },
   },
 ]
@@ -1422,16 +1430,16 @@ exports[`StakePoolBuilder queryPoolMetrics sort by saturation 1`] = `
 Array [
   Object {
     "blocksCreated": "0",
-    "delegators": "1",
-    "livePledge": 487464117n,
-    "saturation": "0.000035543342979113939881",
+    "delegators": "0",
+    "livePledge": 497325000n,
+    "saturation": "0.000019215708620404440214",
     "size": Object {
-      "active": "0.83681394324934275242",
-      "live": "0.16318605675065724758",
+      "active": "1.00000000000000000000",
+      "live": "0.0000000000000000000000000000",
     },
     "stake": Object {
-      "active": 2499703578n,
-      "live": 487464117n,
+      "active": 1614945000n,
+      "live": 0n,
     },
   },
   Object {
@@ -1451,15 +1459,15 @@ Array [
   Object {
     "blocksCreated": "0",
     "delegators": "1",
-    "livePledge": 22623299531669n,
-    "saturation": "0.73141928978079572314",
+    "livePledge": 999999828559n,
+    "saturation": "0.01189867476975633141",
     "size": Object {
-      "active": "0.81589194534120782856",
-      "live": "0.18410805465879217144",
+      "active": "0.0000000000000000000000000000",
+      "live": "1.00000000000000000000",
     },
     "stake": Object {
-      "active": 50153400814617n,
-      "live": 11317240121350n,
+      "active": 0n,
+      "live": 999999828559n,
     },
   },
 ]
@@ -1474,7 +1482,7 @@ Array [
 exports[`StakePoolBuilder queryPoolRelays queryPoolRelays 1`] = `
 Array [
   Object {
-    "hashId": "36",
+    "hashId": "31",
     "relay": Object {
       "__typename": "RelayByName",
       "hostname": "www.test2.test",
@@ -1483,7 +1491,7 @@ Array [
     "updateId": "355",
   },
   Object {
-    "hashId": "36",
+    "hashId": "31",
     "relay": Object {
       "__typename": "RelayByNameMultihost",
       "dnsName": "www.test.test",
@@ -1491,7 +1499,7 @@ Array [
     "updateId": "355",
   },
   Object {
-    "hashId": "36",
+    "hashId": "31",
     "relay": Object {
       "__typename": "RelayByAddress",
       "ipv4": null,
@@ -1501,7 +1509,7 @@ Array [
     "updateId": "355",
   },
   Object {
-    "hashId": "36",
+    "hashId": "31",
     "relay": Object {
       "__typename": "RelayByAddress",
       "ipv4": "192.168.0.1",
@@ -1511,7 +1519,7 @@ Array [
     "updateId": "355",
   },
   Object {
-    "hashId": "36",
+    "hashId": "31",
     "relay": Object {
       "__typename": "RelayByAddress",
       "ipv4": "8.8.8.8",
@@ -1521,21 +1529,21 @@ Array [
     "updateId": "355",
   },
   Object {
-    "hashId": "20",
-    "relay": Object {
-      "__typename": "RelayByName",
-      "hostname": "pool-devtest-a.banderini.net",
-      "port": null,
-    },
-    "updateId": "20",
-  },
-  Object {
     "hashId": "1",
     "relay": Object {
       "__typename": "RelayByNameMultihost",
       "dnsName": "relays-new.cardano-testnet.iohkdev.io",
     },
     "updateId": "1",
+  },
+  Object {
+    "hashId": "19",
+    "relay": Object {
+      "__typename": "RelayByName",
+      "hostname": "pool-devtest-a.banderini.net",
+      "port": null,
+    },
+    "updateId": "20",
   },
 ]
 `;
@@ -1566,7 +1574,7 @@ Array [
   },
   Object {
     "epochReward": Object {
-      "activeStake": 50153400814617n,
+      "activeStake": 1335568619n,
       "epoch": 205,
       "epochLength": 431850000,
       "memberROI": 0,
