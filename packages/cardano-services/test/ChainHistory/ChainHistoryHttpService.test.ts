@@ -16,7 +16,7 @@ import { createDbSyncMetadataService } from '../../src/Metadata';
 import { doServerRequest } from '../util';
 import { dummyLogger } from 'ts-log';
 import { fromSerializableObject } from '@cardano-sdk/util';
-import { getPort } from 'get-port-please';
+import { getRandomPort } from 'get-port-please';
 import axios from 'axios';
 
 const UNSUPPORTED_MEDIA_STRING = 'Request failed with status code 415';
@@ -34,7 +34,7 @@ describe('ChainHistoryHttpService', () => {
   let doChainHistoryRequest: ReturnType<typeof doServerRequest>;
 
   beforeAll(async () => {
-    port = await getPort();
+    port = await getRandomPort();
     apiUrlBase = `http://localhost:${port}/chain-history`;
     config = { listen: { port } };
     dbConnection = new Pool({ connectionString: process.env.DB_CONNECTION_STRING });

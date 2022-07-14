@@ -3,10 +3,9 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { HttpProviderConfig, createHttpProvider } from '../src';
 import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
-import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
-
 import { Server } from 'http';
-import { getPort } from 'get-port-please';
+import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
+import { getRandomPort } from 'get-port-please';
 import express, { RequestHandler } from 'express';
 
 type ComplexArg2 = { map: Map<string, Buffer> };
@@ -45,7 +44,7 @@ describe('createHttpServer', () => {
     });
 
   beforeAll(async () => {
-    port = await getPort();
+    port = await getRandomPort();
     baseUrl = `http://localhost:${port}`;
   });
 

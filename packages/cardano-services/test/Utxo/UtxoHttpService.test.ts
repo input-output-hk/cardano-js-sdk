@@ -2,7 +2,7 @@
 import { Cardano, ProviderError, ProviderFailure, UtxoProvider } from '@cardano-sdk/core';
 import { DbSyncUtxoProvider, HttpServer, HttpServerConfig, UtxoHttpService } from '../../src';
 import { Pool } from 'pg';
-import { getPort } from 'get-port-please';
+import { getRandomPort } from 'get-port-please';
 import { utxoHttpProvider } from '@cardano-sdk/cardano-services-client';
 import axios from 'axios';
 
@@ -24,7 +24,7 @@ describe('UtxoHttpService', () => {
   let provider: UtxoProvider;
 
   beforeAll(async () => {
-    port = await getPort();
+    port = await getRandomPort();
     apiUrlBase = `http://localhost:${port}/utxo`;
     config = { listen: { port } };
     dbConnection = new Pool({ connectionString: process.env.DB_CONNECTION_STRING });

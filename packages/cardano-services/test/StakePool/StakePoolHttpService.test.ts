@@ -14,8 +14,8 @@ import {
 import { DbSyncStakePoolProvider, HttpServer, HttpServerConfig, StakePoolHttpService } from '../../src';
 import { Pool } from 'pg';
 import { doServerRequest } from '../util';
-import { getPort } from 'get-port-please';
-import { stakePoolHttpProvider } from '../../../cardano-services-client';
+import { getRandomPort } from 'get-port-please';
+import { stakePoolHttpProvider } from '@cardano-sdk/cardano-services-client';
 import axios from 'axios';
 
 const UNSUPPORTED_MEDIA_STRING = 'Request failed with status code 415';
@@ -60,7 +60,7 @@ describe('StakePoolHttpService', () => {
   let doStakePoolRequest: ReturnType<typeof doServerRequest>;
 
   beforeAll(async () => {
-    port = await getPort();
+    port = await getRandomPort();
     apiUrlBase = `http://localhost:${port}/stake-pool`;
     config = { listen: { port } };
     dbConnection = new Pool({ connectionString: process.env.DB_CONNECTION_STRING });

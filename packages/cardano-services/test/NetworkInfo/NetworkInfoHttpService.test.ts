@@ -16,7 +16,7 @@ import { HttpServer, HttpServerConfig } from '../../src';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../src/InMemoryCache';
 import { Pool } from 'pg';
 import { doServerRequest, ingestDbData, sleep, wrapWithTransaction } from '../util';
-import { getPort } from 'get-port-please';
+import { getRandomPort } from 'get-port-please';
 import { networkInfoHttpProvider } from '@cardano-sdk/cardano-services-client';
 import axios from 'axios';
 
@@ -49,9 +49,12 @@ describe('NetworkInfoHttpService', () => {
     }
   ];
 
+  beforeAll(async () => {
+    port = await getRandomPort();
+  });
+
   describe('unhealthy NetworkInfoProvider', () => {
     beforeEach(async () => {
-      port = await getPort();
       apiUrlBase = `http://localhost:${port}/network-info`;
       config = { listen: { port } };
       cardanoNode = {
@@ -94,7 +97,6 @@ describe('NetworkInfoHttpService', () => {
     });
 
     beforeAll(async () => {
-      port = await getPort();
       apiUrlBase = `http://localhost:${port}/network-info`;
       cardanoNode = {
         eraSummaries: jest.fn(() => Promise.resolve(mockEraSummaries)),

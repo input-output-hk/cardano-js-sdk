@@ -3,8 +3,7 @@
 import { APPLICATION_JSON, CONTENT_TYPE, HttpServer, HttpServerConfig, TxSubmitHttpService } from '../../src';
 import { Cardano, ProviderError, ProviderFailure, TxSubmitProvider } from '@cardano-sdk/core';
 import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
-
-import { getPort } from 'get-port-please';
+import { getRandomPort } from 'get-port-please';
 import { txSubmitHttpProvider } from '@cardano-sdk/cardano-services-client';
 import axios from 'axios';
 import cbor from 'cbor';
@@ -22,7 +21,7 @@ describe('TxSubmitHttpService', () => {
   let config: HttpServerConfig;
 
   beforeAll(async () => {
-    port = await getPort();
+    port = await getRandomPort();
     apiUrlBase = `http://localhost:${port}/tx-submit`;
     config = { listen: { port } };
   });

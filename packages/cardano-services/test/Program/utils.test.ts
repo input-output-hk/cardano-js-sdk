@@ -22,7 +22,7 @@ import { TxSubmitWorker } from '@cardano-sdk/rabbitmq';
 import { createHealthyMockOgmiosServer, ogmiosServerReady } from '../util';
 import { createLogger } from 'bunyan';
 import { createMockOgmiosServer } from '../../../ogmios/test/mocks/mockOgmiosServer';
-import { getPort, getRandomPort } from 'get-port-please';
+import { getRandomPort } from 'get-port-please';
 import { listenPromise, serverClosePromise } from '../../src/util';
 import { txsPromise } from '../../../rabbitmq/test/utils';
 import { types } from 'util';
@@ -44,6 +44,7 @@ jest.mock('dns', () => ({
 }));
 
 describe('Service dependency abstractions', () => {
+  let port: number;
   const APPLICATION_JSON = 'application/json';
   const cache = new InMemoryCache(UNLIMITED_CACHE_TTL);
   const cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
@@ -62,11 +63,12 @@ describe('Service dependency abstractions', () => {
     shutdown: jest.fn(() => Promise.resolve()),
     systemStart: jest.fn(() => Promise.resolve(new Date(1_563_999_616_000)))
   };
-
+  beforeAll(async () => {
+    port = await getRandomPort();
+  });
   describe('Postgres-dependant service with service discovery', () => {
     let httpServer: HttpServer;
     let db: Pool | undefined;
-    let port: number;
     let apiUrlBase: string;
     let config: HttpServerConfig;
     let service: NetworkInfoHttpService;
@@ -87,7 +89,6 @@ describe('Service dependency abstractions', () => {
 
     describe('Established connection', () => {
       beforeAll(async () => {
-        port = await getPort();
         config = { listen: { port } };
         apiUrlBase = `http://localhost:${port}/network-info`;
         networkInfoProvider = new DbSyncNetworkInfoProvider(
@@ -125,7 +126,6 @@ describe('Service dependency abstractions', () => {
   describe('Postgres-dependant service with provided db connection string', () => {
     let httpServer: HttpServer;
     let db: Pool | undefined;
-    let port: number;
     let apiUrlBase: string;
     let config: HttpServerConfig;
     let service: NetworkInfoHttpService;
@@ -141,7 +141,6 @@ describe('Service dependency abstractions', () => {
 
     describe('Established connection', () => {
       beforeAll(async () => {
-        port = await getPort();
         config = { listen: { port } };
         apiUrlBase = `http://localhost:${port}/network-info`;
         networkInfoProvider = new DbSyncNetworkInfoProvider(
@@ -233,7 +232,6 @@ describe('Service dependency abstractions', () => {
     let ogmiosConnection: Connection;
     let txSubmitProvider: TxSubmitProvider;
     let httpServer: HttpServer;
-    let port: number;
     let config: HttpServerConfig;
 
     beforeAll(async () => {
@@ -245,7 +243,6 @@ describe('Service dependency abstractions', () => {
 
     describe('Established connection', () => {
       beforeAll(async () => {
-        port = await getPort();
         apiUrlBase = `http://localhost:${port}/tx-submit`;
         config = { listen: { port } };
         txSubmitProvider = await getOgmiosTxSubmitProvider(dnsResolver, logger, {
@@ -286,7 +283,6 @@ describe('Service dependency abstractions', () => {
     let ogmiosConnection: Connection;
     let txSubmitProvider: TxSubmitProvider;
     let httpServer: HttpServer;
-    let port: number;
     let config: HttpServerConfig;
 
     beforeAll(async () => {
@@ -298,7 +294,6 @@ describe('Service dependency abstractions', () => {
 
     describe('Established connection', () => {
       beforeAll(async () => {
-        port = await getPort();
         apiUrlBase = `http://localhost:${port}/tx-submit`;
         config = { listen: { port } };
         txSubmitProvider = await getOgmiosTxSubmitProvider(dnsResolver, logger, {
@@ -397,12 +392,10 @@ describe('Service dependency abstractions', () => {
     let apiUrlBase: string;
     let txSubmitProvider: TxSubmitProvider;
     let httpServer: HttpServer;
-    let port: number;
     let config: HttpServerConfig;
 
     describe('Established connection', () => {
       beforeAll(async () => {
-        port = await getPort();
         apiUrlBase = `http://localhost:${port}/tx-submit`;
         config = { listen: { port } };
         txSubmitProvider = await getRabbitMqTxSubmitProvider(dnsResolver, logger, {
@@ -440,12 +433,10 @@ describe('Service dependency abstractions', () => {
     let apiUrlBase: string;
     let txSubmitProvider: TxSubmitProvider;
     let httpServer: HttpServer;
-    let port: number;
     let config: HttpServerConfig;
 
     describe('Established connection', () => {
       beforeAll(async () => {
-        port = await getPort();
         apiUrlBase = `http://localhost:${port}/tx-submit`;
         config = { listen: { port } };
         txSubmitProvider = await getRabbitMqTxSubmitProvider(dnsResolver, logger, {

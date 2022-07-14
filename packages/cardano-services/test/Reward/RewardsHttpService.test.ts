@@ -3,7 +3,7 @@
 import { Cardano, ProviderError, ProviderFailure, RewardsProvider } from '@cardano-sdk/core';
 import { DbSyncRewardsProvider, HttpServer, HttpServerConfig, RewardsHttpService } from '../../src';
 import { Pool } from 'pg';
-import { getPort } from 'get-port-please';
+import { getRandomPort } from 'get-port-please';
 import { rewardsHttpProvider } from '@cardano-sdk/cardano-services-client';
 import axios from 'axios';
 
@@ -22,7 +22,7 @@ describe('RewardsHttpService', () => {
   let config: HttpServerConfig;
 
   beforeAll(async () => {
-    port = await getPort();
+    port = await getRandomPort();
     apiUrlBase = `http://localhost:${port}/rewards`;
     config = { listen: { port } };
     dbConnection = new Pool({ connectionString: process.env.DB_CONNECTION_STRING });
