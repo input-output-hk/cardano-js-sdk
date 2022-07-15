@@ -18,7 +18,6 @@ MaxConcurrencyDeadline: 2
 
 #TODO: These parameters cannot yet be used in the config file, only on the CLI:
 #DatabasePath: db/
-#Topology: configuration/mainnet-topology.json
 #Port 7776
 
 ##### Core protocol parameters #####
@@ -30,7 +29,6 @@ Protocol: RealPBFT
 
 # The mainnet does not include the network magic into addresses. Testnets do.
 RequiresNetworkMagic: RequiresNoMagic
-
 
 ##### Update system parameters #####
 
@@ -117,7 +115,7 @@ defaultBackends:
 # be specified in the defaults below or overridden on a per-scribe basis here.
 setupScribes:
   - scKind: FileSK
-    scName: "logs/mainnet.log"
+    scName: "logs/testnet.log"
     scFormat: ScText
 
   - scKind: StdoutSK
@@ -128,7 +126,7 @@ setupScribes:
 # output is sent to if it is not configured to be sent to other scribes.
 defaultScribes:
   - - FileSK
-    - "logs/mainnet.log"
+    - "logs/testnet.log"
   - - StdoutSK
     - stdout
 
@@ -277,7 +275,7 @@ options:
   # type and its name, separated by "::":
   mapScribes:
     cardano.node.metrics:
-      - "FileSK::logs/mainnet.log"
+      - "FileSK::logs/testnet.log"
 
   # apply a filter on message severity on messages in a specific named context.
   # this filter is applied additionally to the global 'minSeverity' and thus

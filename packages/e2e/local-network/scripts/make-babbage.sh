@@ -42,7 +42,7 @@ SECURITY_PARAM=10
 NUM_SPO_NODES=3
 INIT_SUPPLY=10020000000
 START_TIME="$(${DATE} -d "now + 30 seconds" +%s)"
-ROOT=example
+ROOT=network-files
 mkdir -p "${ROOT}"
 
 cat > "${ROOT}/byron.genesis.spec.json" <<EOF
@@ -282,10 +282,11 @@ for NODE in ${SPO_NODES}; do
   echo "$ROOT/${NODE}.sh &" >> "${ROOT}/run/all.sh"
 done
 echo "" >> "${ROOT}/run/all.sh"
-echo "wait" >> "${ROOT}/run/all.sh"
 
 chmod a+x "${ROOT}/run/all.sh"
 
-echo "CARDANO_NODE_SOCKET_PATH=${ROOT}/node-spo1/node.sock "
+echo "CARDANO_NODE_SOCKET_PATH=${ROOT}/node-spo1/node.sock"
 
 (cd "$ROOT"; ln -s node-spo1/node.sock main.sock)
+
+wait

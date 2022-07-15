@@ -4,3 +4,4 @@ docs
 .env
 tsconfig.tsbuildinfo
 .idea/codeStyles
+network-files/
