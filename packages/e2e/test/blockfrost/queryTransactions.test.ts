@@ -27,7 +27,10 @@ describe('blockfrostChainHistoryProvider', () => {
         '9223372036854775707922337203685477570792233720368547757079223372'
       );
     });
-    it('parses collaterals correctly', async () => {
+
+    // TODO: waiting for resolution of
+    // https://github.com/blockfrost/openapi/issues/211
+    it.skip('parses collaterals correctly', async () => {
       const [tx] = await chainHistoryProvider.transactionsByHashes([
         Cardano.TransactionId('12fa9af65e21b36ec4dc4cbce478e911d52585adb46f2b4fe3d6563e7ee5a61a')
       ]);
@@ -157,9 +160,20 @@ describe('blockfrostChainHistoryProvider', () => {
       const txs = await chainHistoryProvider.transactionsByAddresses({
         addresses: [Cardano.Address('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg')]
       });
+
       expect(txs.length).toBeGreaterThanOrEqual(47);
-      expect(txs[0].id).toBe('bedfc2ff545ef1ac3cc4d1a06aa67a6d68a663ffb1092f8764390b8a58ef97b4');
-      expect(txs[46].id).toBe('f632b491bb481b4d93fa69e1901ebb623a3af65fde500f1b019eaabd4bb2a980');
+
+      expect(
+        txs.find(
+          (tx) => tx.id === Cardano.TransactionId('bedfc2ff545ef1ac3cc4d1a06aa67a6d68a663ffb1092f8764390b8a58ef97b4')
+        )
+      ).toBeDefined();
+
+      expect(
+        txs.find(
+          (tx) => tx.id === Cardano.TransactionId('f632b491bb481b4d93fa69e1901ebb623a3af65fde500f1b019eaabd4bb2a980')
+        )
+      ).toBeDefined();
     });
     it('extended Shelley address (addr_test1)', async () => {
       const txs = await chainHistoryProvider.transactionsByAddresses({
@@ -171,15 +185,30 @@ describe('blockfrostChainHistoryProvider', () => {
         ]
       });
       expect(txs.length).toBeGreaterThanOrEqual(4);
-      expect(txs[0].id).toBe('a01623f7e3fc679c9f369e06ac0cd942740cade30367b24cedace20a430af1cf');
-      expect(txs[3].id).toBe('667f714ee9d9975ca4fa0f5451e006d3dafcdafb7342fe288ebcaf17c100a996');
+
+      expect(
+        txs.find(
+          (tx) => tx.id === Cardano.TransactionId('a01623f7e3fc679c9f369e06ac0cd942740cade30367b24cedace20a430af1cf')
+        )
+      ).toBeDefined();
+
+      expect(
+        txs.find(
+          (tx) => tx.id === Cardano.TransactionId('667f714ee9d9975ca4fa0f5451e006d3dafcdafb7342fe288ebcaf17c100a996')
+        )
+      ).toBeDefined();
     });
     it('Icarus Byron address (2c)', async () => {
       const txs = await chainHistoryProvider.transactionsByAddresses({
         addresses: [Cardano.Address('2cWKMJemoBai9J7kVvRTukMmdfxtjL9z7c396rTfrrzfAZ6EeQoKLC2y1k34hswwm4SVr')]
       });
       expect(txs.length).toBeGreaterThanOrEqual(1);
-      expect(txs[0].id).toBe('2822d491a890b40cd2a22003b81a97f63c2b8c373b1b0b8dfa1598739fe34c06');
+
+      expect(
+        txs.find(
+          (tx) => tx.id === Cardano.TransactionId('2822d491a890b40cd2a22003b81a97f63c2b8c373b1b0b8dfa1598739fe34c06')
+        )
+      ).toBeDefined();
     });
     // Failing because returned transactions are grouped by address
     // TODO: update and reenable test when we decide behaviour
@@ -195,8 +224,18 @@ describe('blockfrostChainHistoryProvider', () => {
         ]
       });
       expect(txs.length).toBeGreaterThanOrEqual(52);
-      expect(txs[0].id).toBe('2822d491a890b40cd2a22003b81a97f63c2b8c373b1b0b8dfa1598739fe34c06');
-      expect(txs[51].id).toBe('667f714ee9d9975ca4fa0f5451e006d3dafcdafb7342fe288ebcaf17c100a996');
+
+      expect(
+        txs.find(
+          (tx) => tx.id === Cardano.TransactionId('2822d491a890b40cd2a22003b81a97f63c2b8c373b1b0b8dfa1598739fe34c06')
+        )
+      ).toBeDefined();
+
+      expect(
+        txs.find(
+          (tx) => tx.id === Cardano.TransactionId('667f714ee9d9975ca4fa0f5451e006d3dafcdafb7342fe288ebcaf17c100a996')
+        )
+      ).toBeDefined();
     });
     it('Shelley address not used - no transactions', async () => {
       const txs = await chainHistoryProvider.transactionsByAddresses({
@@ -204,16 +243,18 @@ describe('blockfrostChainHistoryProvider', () => {
       });
       expect(txs.length).toBe(0);
     });
-    it('query ignores invalid transaction (script failure)', async () => {
+    it('queries successfully invalid transaction (script failure)', async () => {
       const txs = await chainHistoryProvider.transactionsByAddresses({
         addresses: [Cardano.Address('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg')]
       });
-      expect(
-        txs.find(
-          (tx) => tx.id === Cardano.TransactionId('43149210cbbfbc92bc2b199bb14cb15330414e2288ac31be92a3b5a490f9abfc')
-        )
-      ).toBeUndefined();
+
+      const invalidTx = txs.find(
+        (tx) => tx.id === Cardano.TransactionId('43149210cbbfbc92bc2b199bb14cb15330414e2288ac31be92a3b5a490f9abfc')
+      );
+      expect(invalidTx).toBeDefined();
+      expect(invalidTx?.body.outputs.length).toEqual(0);
     });
+
     it('stake address throws error', async () => {
       expect(() => Cardano.Address('stake_test1ur676rnu57m272uvflhm8ahgu8xk980vxg382zye2wpxnjs2dnddx')).toThrowError(
         InvalidStringError
@@ -228,7 +269,13 @@ describe('blockfrostChainHistoryProvider', () => {
         addresses: [address],
         sinceBlock: 3_348_548
       });
-      expect(transactions[0].id).toBe('264ad5454078db439532e81a5918930779562601b098d6aeae556f785d35e187');
+
+      expect(
+        transactions.find(
+          (tx) => tx.id === Cardano.TransactionId('264ad5454078db439532e81a5918930779562601b098d6aeae556f785d35e187')
+        )
+      ).toBeDefined();
+
       expect(transactions.length).toBeGreaterThanOrEqual(4);
     });
   });
