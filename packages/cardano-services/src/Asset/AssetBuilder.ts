@@ -13,6 +13,15 @@ export class AssetBuilder {
     this.#logger = logger;
   }
 
+  public async queryLastMintTx(policyId: Cardano.PolicyId, name: Cardano.AssetName) {
+    this.#logger.debug('About to query last nft mint tx for asset', { name, policyId });
+    const result: QueryResult<LastMintTxModel> = await this.#db.query(Queries.findLastNftMintTx, [
+      Buffer.from(policyId, 'hex'),
+      Buffer.from(name, 'hex')
+    ]);
+    return result.rows[0];
+  }
+
   public async queryMultiAsset(policyId: Cardano.PolicyId, name: Cardano.AssetName) {
     this.#logger.debug('About to query multi asset', { name, policyId });
     const result: QueryResult<MultiAssetModel> = await this.#db.query(Queries.findMultiAsset, [

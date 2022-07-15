@@ -9,10 +9,6 @@ export const findLastNftMintTx = `
 	LIMIT 1
 `;
 
-export interface FindLastMintTxModel {
-  tx_hash: Buffer;
-}
-
 export const findMultiAsset = `
 	SELECT id, fingerprint
 	FROM multi_asset
