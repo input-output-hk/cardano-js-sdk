@@ -4,7 +4,7 @@ describe('wallet', () => {
   const pNetworkId = '#root > div > p:nth-child(8)';
   const liFirstUtxo = '#root > div > p:nth-child(9) > li';
   const btnGrantAccess = '#requestAccessGrant';
-  const btnCreateLedgerKeyAgent = '#createLedgerKeyAgent';
+  const btnCreateKeyAgent = '#createKeyAgent';
   const spanAddress = '#address';
   const spanBalance = '#balance';
   const divAdaPrice = '#adaPrice';
@@ -32,7 +32,7 @@ describe('wallet', () => {
     describe('ui grants access and creates key agent', () => {
       before(async () => {
         await $(btnGrantAccess).click();
-        await $(btnCreateLedgerKeyAgent).click();
+        await $(btnCreateKeyAgent).click();
       });
       it('ui has access to remote ObservableWallet', async () => {
         await browser.waitUntil(async () => {

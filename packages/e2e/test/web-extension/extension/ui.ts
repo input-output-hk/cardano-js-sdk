@@ -71,8 +71,8 @@ wallet.balance.utxo.available$.subscribe(
   ({ coins }) => (document.querySelector('#balance')!.textContent = coins.toString())
 );
 
-document.querySelector('#createLedgerKeyAgent')!.addEventListener('click', async () => {
-  // setupWallet call is required to provider context (InputResolver) to the key agent
+document.querySelector('#createKeyAgent')!.addEventListener('click', async () => {
+  // setupWallet call is required to provide context (InputResolver) to the key agent
   const { keyAgent } = await setupWallet({
     createKeyAgent: async (dependencies) =>
       KeyManagement.util.createAsyncKeyAgent(
@@ -80,7 +80,7 @@ document.querySelector('#createLedgerKeyAgent')!.addEventListener('click', async
           {
             accountIndex: 0,
             getPassword: async () => Buffer.from(''),
-            mnemonicWords: process.env.MNEMONIC_WORDS.split(' '),
+            mnemonicWords: process.env.MNEMONIC_WORDS!.split(' '),
             networkId: 0
           },
           dependencies
