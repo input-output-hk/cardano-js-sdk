@@ -55,7 +55,8 @@ const getBlockfrostApi = async () => {
 };
 
 export const faucetProviderFactory = new ProviderFactory<FaucetProvider>();
-export const keyManagementFactory = new ProviderFactory<KeyManagement.AsyncKeyAgent>();
+export type CreateKeyAgent = (dependencies: KeyManagement.KeyAgentDependencies) => Promise<KeyManagement.AsyncKeyAgent>;
+export const keyManagementFactory = new ProviderFactory<CreateKeyAgent>();
 export const assetProviderFactory = new ProviderFactory<AssetProvider>();
 export const chainHistoryProviderFactory = new ProviderFactory<ChainHistoryProvider>();
 export const networkInfoProviderFactory = new ProviderFactory<NetworkInfoProvider>();
@@ -186,7 +187,7 @@ stakePoolProviderFactory.register(
 );
 
 // Key Agents
-keyManagementFactory.register('inMemory', async (params: any): Promise<KeyManagement.AsyncKeyAgent> => {
+keyManagementFactory.register('inMemory', async (params: any): Promise<CreateKeyAgent> => {
   const mnemonicWords = (params?.mnemonic || '').split(' ');
 
   if (mnemonicWords.length === 0) throw new Error(KEY_AGENT_MISSING_MNEMONIC);
@@ -197,52 +198,66 @@ keyManagementFactory.register('inMemory', async (params: any): Promise<KeyManage
 
   if (params.accountIndex === undefined) throw new Error(KEY_AGENT_MISSING_ACCOUNT_INDEX);
 
-  return KeyManagement.util.createAsyncKeyAgent(
-    await KeyManagement.InMemoryKeyAgent.fromBip39MnemonicWords({
-      accountIndex: params.accountIndex,
-      getPassword: async () => Buffer.from(params.password),
-      mnemonicWords,
-      networkId: params.networkId
-    })
-  );
+  return async (dependencies) =>
+    KeyManagement.util.createAsyncKeyAgent(
+      await KeyManagement.InMemoryKeyAgent.fromBip39MnemonicWords(
+        {
+          accountIndex: params.accountIndex,
+          getPassword: async () => Buffer.from(params.password),
+          mnemonicWords,
+          networkId: params.networkId
+        },
+        dependencies
+      )
+    );
 });
 
-keyManagementFactory.register('ledger', async (params: any): Promise<KeyManagement.AsyncKeyAgent> => {
+keyManagementFactory.register('ledger', async (params: any): Promise<CreateKeyAgent> => {
   if (params.networkId === undefined) throw new Error(KEY_AGENT_MISSING_NETWORK_ID);
 
   if (params.accountIndex === undefined) throw new Error(KEY_AGENT_MISSING_ACCOUNT_INDEX);
 
   let deviceConnection: DeviceConnection | null | undefined;
-  const ledgerKeyAgent = KeyManagement.LedgerKeyAgent.createWithDevice({
-    accountIndex: params.accountIndex,
-    communicationType: KeyManagement.CommunicationType.Node,
-    deviceConnection,
-    networkId: params.networkId,
-    protocolMagic: 1_097_911_063
-  });
 
-  return KeyManagement.util.createAsyncKeyAgent(await ledgerKeyAgent);
+  return async (dependencies) => {
+    const ledgerKeyAgent = await KeyManagement.LedgerKeyAgent.createWithDevice(
+      {
+        accountIndex: params.accountIndex,
+        communicationType: KeyManagement.CommunicationType.Node,
+        deviceConnection,
+        networkId: params.networkId,
+        protocolMagic: 1_097_911_063
+      },
+      dependencies
+    );
+
+    return KeyManagement.util.createAsyncKeyAgent(ledgerKeyAgent);
+  };
 });
 
-keyManagementFactory.register('trezor', async (params: any): Promise<KeyManagement.AsyncKeyAgent> => {
+keyManagementFactory.register('trezor', async (params: any): Promise<CreateKeyAgent> => {
   if (params.networkId === undefined) throw new Error(KEY_AGENT_MISSING_NETWORK_ID);
 
   if (params.accountIndex === undefined) throw new Error(KEY_AGENT_MISSING_ACCOUNT_INDEX);
 
-  return KeyManagement.util.createAsyncKeyAgent(
-    await KeyManagement.TrezorKeyAgent.createWithDevice({
-      accountIndex: params.accountIndex,
-      networkId: params.networkId,
-      protocolMagic: 1_097_911_063,
-      trezorConfig: {
-        communicationType: KeyManagement.CommunicationType.Node,
-        manifest: {
-          appUrl: 'https://your.application.com',
-          email: 'email@developer.com'
-        }
-      }
-    })
-  );
+  return async (dependencies) =>
+    KeyManagement.util.createAsyncKeyAgent(
+      await KeyManagement.TrezorKeyAgent.createWithDevice(
+        {
+          accountIndex: params.accountIndex,
+          networkId: params.networkId,
+          protocolMagic: 1_097_911_063,
+          trezorConfig: {
+            communicationType: KeyManagement.CommunicationType.Node,
+            manifest: {
+              appUrl: 'https://your.application.com',
+              email: 'email@developer.com'
+            }
+          }
+        },
+        dependencies
+      )
+    );
 });
 
 /**

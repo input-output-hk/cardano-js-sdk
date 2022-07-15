@@ -2,6 +2,8 @@ import * as errors from './errors';
 import {
   AccountKeyDerivationPath,
   GetPassword,
+  KeyAgent,
+  KeyAgentDependencies,
   KeyAgentType,
   SerializableInMemoryKeyAgentData,
   SignBlobResult,
@@ -41,11 +43,11 @@ const getPasswordRethrowTypedError = async (getPassword: GetPassword) => {
   }
 };
 
-export class InMemoryKeyAgent extends KeyAgentBase {
+export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
   readonly #getPassword: GetPassword;
 
-  constructor({ getPassword, ...serializableData }: InMemoryKeyAgentProps) {
-    super({ ...serializableData, __typename: KeyAgentType.InMemory });
+  constructor({ getPassword, ...serializableData }: InMemoryKeyAgentProps, dependencies: KeyAgentDependencies) {
+    super({ ...serializableData, __typename: KeyAgentType.InMemory }, dependencies);
     this.#getPassword = getPassword;
   }
 
@@ -70,13 +72,16 @@ export class InMemoryKeyAgent extends KeyAgentBase {
   /**
    * @throws AuthenticationError
    */
-  static async fromBip39MnemonicWords({
-    networkId,
-    getPassword,
-    mnemonicWords,
-    mnemonic2ndFactorPassphrase = Buffer.from(''),
-    accountIndex = 0
-  }: FromBip39MnemonicWordsProps): Promise<InMemoryKeyAgent> {
+  static async fromBip39MnemonicWords(
+    {
+      networkId,
+      getPassword,
+      mnemonicWords,
+      mnemonic2ndFactorPassphrase = Buffer.from(''),
+      accountIndex = 0
+    }: FromBip39MnemonicWordsProps,
+    dependencies: KeyAgentDependencies
+  ): Promise<InMemoryKeyAgent> {
     const mnemonic = joinMnemonicWords(mnemonicWords);
     const validMnemonic = validateMnemonic(mnemonic);
     if (!validMnemonic) throw new errors.InvalidMnemonicError();
@@ -87,23 +92,26 @@ export class InMemoryKeyAgent extends KeyAgentBase {
     const extendedAccountPublicKey = Cardano.Bip32PublicKey(
       Buffer.from(deriveAccountPrivateKey(rootPrivateKey, accountIndex).to_public().as_bytes()).toString('hex')
     );
-    return new InMemoryKeyAgent({
-      accountIndex,
-      encryptedRootPrivateKeyBytes: [...encryptedRootPrivateKey],
-      extendedAccountPublicKey,
-      getPassword,
-      knownAddresses: [],
-      networkId
-    });
+    return new InMemoryKeyAgent(
+      {
+        accountIndex,
+        encryptedRootPrivateKeyBytes: [...encryptedRootPrivateKey],
+        extendedAccountPublicKey,
+        getPassword,
+        knownAddresses: [],
+        networkId
+      },
+      dependencies
+    );
   }
 
   async signTransaction(
     { body, hash }: TxInternals,
-    { inputAddressResolver, additionalKeyPaths = [] }: SignTransactionOptions
+    { additionalKeyPaths = [] }: SignTransactionOptions | undefined = {}
   ): Promise<Cardano.Signatures> {
     // Possible optimization is casting strings to OpaqueString types directly and skipping validation
     const blob = Cardano.util.HexBlob(hash.toString());
-    const derivationPaths = await ownSignatureKeyPaths(body, this.knownAddresses, inputAddressResolver);
+    const derivationPaths = await ownSignatureKeyPaths(body, this.knownAddresses, this.inputResolver);
     const keyPaths = uniqBy([...derivationPaths, ...additionalKeyPaths], ({ role, index }) => `${role}.${index}`);
     // TODO:
     // if (keyPaths.length === 0) {

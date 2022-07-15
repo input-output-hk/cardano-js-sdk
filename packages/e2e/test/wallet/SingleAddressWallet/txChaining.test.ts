@@ -1,5 +1,5 @@
 import { Cardano } from '@cardano-sdk/core';
-import { ObservableWallet, SingleAddressWallet } from '@cardano-sdk/wallet';
+import { ObservableWallet, SingleAddressWallet, setupWallet } from '@cardano-sdk/wallet';
 import {
   assetProviderFactory,
   chainHistoryProviderFactory,
@@ -14,26 +14,35 @@ import { env } from '../environment';
 import { filter, firstValueFrom } from 'rxjs';
 import { waitForWalletStateSettle } from '../util';
 
-const getWallet = async () =>
-  new SingleAddressWallet(
-    { name: 'Test Wallet' },
-    {
-      assetProvider: await assetProviderFactory.create(env.ASSET_PROVIDER, env.ASSET_PROVIDER_PARAMS),
-      chainHistoryProvider: await chainHistoryProviderFactory.create(
-        env.CHAIN_HISTORY_PROVIDER,
-        env.CHAIN_HISTORY_PROVIDER_PARAMS
-      ),
-      keyAgent: await keyAgentById(0, env.KEY_MANAGEMENT_PROVIDER, env.KEY_MANAGEMENT_PARAMS),
-      networkInfoProvider: await networkInfoProviderFactory.create(
-        env.NETWORK_INFO_PROVIDER,
-        env.NETWORK_INFO_PROVIDER_PARAMS
-      ),
-      rewardsProvider: await rewardsProviderFactory.create(env.REWARDS_PROVIDER, env.REWARDS_PROVIDER_PARAMS),
-      stakePoolProvider: await stakePoolProviderFactory.create(env.STAKE_POOL_PROVIDER, env.STAKE_POOL_PROVIDER_PARAMS),
-      txSubmitProvider: await txSubmitProviderFactory.create(env.TX_SUBMIT_PROVIDER, env.TX_SUBMIT_PROVIDER_PARAMS),
-      utxoProvider: await utxoProviderFactory.create(env.UTXO_PROVIDER, env.UTXO_PROVIDER_PARAMS)
-    }
-  );
+const getWallet = async () => {
+  const { wallet } = await setupWallet({
+    createKeyAgent: await keyAgentById(0, env.KEY_MANAGEMENT_PROVIDER, env.KEY_MANAGEMENT_PARAMS),
+    createWallet: async (keyAgent) =>
+      new SingleAddressWallet(
+        { name: 'Test Wallet' },
+        {
+          assetProvider: await assetProviderFactory.create(env.ASSET_PROVIDER, env.ASSET_PROVIDER_PARAMS),
+          chainHistoryProvider: await chainHistoryProviderFactory.create(
+            env.CHAIN_HISTORY_PROVIDER,
+            env.CHAIN_HISTORY_PROVIDER_PARAMS
+          ),
+          keyAgent,
+          networkInfoProvider: await networkInfoProviderFactory.create(
+            env.NETWORK_INFO_PROVIDER,
+            env.NETWORK_INFO_PROVIDER_PARAMS
+          ),
+          rewardsProvider: await rewardsProviderFactory.create(env.REWARDS_PROVIDER, env.REWARDS_PROVIDER_PARAMS),
+          stakePoolProvider: await stakePoolProviderFactory.create(
+            env.STAKE_POOL_PROVIDER,
+            env.STAKE_POOL_PROVIDER_PARAMS
+          ),
+          txSubmitProvider: await txSubmitProviderFactory.create(env.TX_SUBMIT_PROVIDER, env.TX_SUBMIT_PROVIDER_PARAMS),
+          utxoProvider: await utxoProviderFactory.create(env.UTXO_PROVIDER, env.UTXO_PROVIDER_PARAMS)
+        }
+      )
+  });
+  return wallet;
+};
 
 describe('SingleAddressWallet', () => {
   let wallet: ObservableWallet;

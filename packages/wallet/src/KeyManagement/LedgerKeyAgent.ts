@@ -4,11 +4,11 @@ import { Cardano, NotImplementedError, coreToCsl } from '@cardano-sdk/core';
 import { CardanoKeyConst, Cip1852PathLevelIndexes, txToLedger } from './util';
 import {
   CommunicationType,
+  KeyAgentDependencies,
   KeyAgentType,
   LedgerTransportType,
   SerializableLedgerKeyAgentData,
-  SignBlobResult,
-  SignTransactionOptions
+  SignBlobResult
 } from './types';
 import { KeyAgentBase } from './KeyAgentBase';
 import { TxInternals } from '../Transaction';
@@ -49,8 +49,8 @@ export class LedgerKeyAgent extends KeyAgentBase {
   readonly #communicationType: CommunicationType;
   readonly #protocolMagic: Cardano.NetworkMagic;
 
-  constructor({ deviceConnection, ...serializableData }: LedgerKeyAgentProps) {
-    super({ ...serializableData, __typename: KeyAgentType.Ledger });
+  constructor({ deviceConnection, ...serializableData }: LedgerKeyAgentProps, dependencies: KeyAgentDependencies) {
+    super({ ...serializableData, __typename: KeyAgentType.Ledger }, dependencies);
     this.deviceConnection = deviceConnection;
     this.#communicationType = serializableData.communicationType;
     this.#protocolMagic = serializableData.protocolMagic;
@@ -196,13 +196,10 @@ export class LedgerKeyAgent extends KeyAgentBase {
    * @throws AuthenticationError
    * @throws TransportError
    */
-  static async createWithDevice({
-    networkId,
-    protocolMagic,
-    accountIndex = 0,
-    communicationType,
-    deviceConnection
-  }: CreateLedgerKeyAgentProps) {
+  static async createWithDevice(
+    { networkId, protocolMagic, accountIndex = 0, communicationType, deviceConnection }: CreateLedgerKeyAgentProps,
+    dependencies: KeyAgentDependencies
+  ) {
     const deviceListPaths = await LedgerKeyAgent.getHidDeviceList(communicationType);
     // Re-use device connection if you want to create a key agent with new / additional account(s) and pass accountIndex
     const activeDeviceConnection = await (deviceConnection
@@ -214,27 +211,27 @@ export class LedgerKeyAgent extends KeyAgentBase {
       deviceConnection: activeDeviceConnection
     });
 
-    return new LedgerKeyAgent({
-      accountIndex,
-      communicationType,
-      deviceConnection: activeDeviceConnection,
-      extendedAccountPublicKey,
-      knownAddresses: [],
-      networkId,
-      protocolMagic
-    });
+    return new LedgerKeyAgent(
+      {
+        accountIndex,
+        communicationType,
+        deviceConnection: activeDeviceConnection,
+        extendedAccountPublicKey,
+        knownAddresses: [],
+        networkId,
+        protocolMagic
+      },
+      dependencies
+    );
   }
 
-  async signTransaction(
-    { body }: TxInternals,
-    { inputAddressResolver }: SignTransactionOptions
-  ): Promise<Cardano.Signatures> {
+  async signTransaction({ body }: TxInternals): Promise<Cardano.Signatures> {
     try {
       const cslTxBody = coreToCsl.txBody(body);
       const ledgerTxData = await txToLedger({
         accountIndex: this.accountIndex,
         cslTxBody,
-        inputAddressResolver,
+        inputResolver: this.inputResolver,
         knownAddresses: this.knownAddresses,
         networkId: this.networkId,
         protocolMagic: this.#protocolMagic

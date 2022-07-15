@@ -4,10 +4,10 @@ import { Cardano, NotImplementedError, coreToCsl } from '@cardano-sdk/core';
 import { CardanoKeyConst, txToTrezor } from './util';
 import {
   CommunicationType,
+  KeyAgentDependencies,
   KeyAgentType,
   SerializableTrezorKeyAgentData,
   SignBlobResult,
-  SignTransactionOptions,
   TrezorConfig
 } from './types';
 import { KeyAgentBase } from './KeyAgentBase';
@@ -36,8 +36,8 @@ export class TrezorKeyAgent extends KeyAgentBase {
   readonly isTrezorInitialized: Promise<boolean>;
   readonly #protocolMagic: Cardano.NetworkMagic;
 
-  constructor({ isTrezorInitialized, ...serializableData }: TrezorKeyAgentProps) {
-    super({ ...serializableData, __typename: KeyAgentType.Trezor });
+  constructor({ isTrezorInitialized, ...serializableData }: TrezorKeyAgentProps, dependencies: KeyAgentDependencies) {
+    super({ ...serializableData, __typename: KeyAgentType.Trezor }, dependencies);
     this.#protocolMagic = serializableData.protocolMagic;
     if (!isTrezorInitialized) {
       this.isTrezorInitialized = TrezorKeyAgent.initializeTrezorTransport(serializableData.trezorConfig);
@@ -114,38 +114,36 @@ export class TrezorKeyAgent extends KeyAgentBase {
   /**
    * @throws AuthenticationError
    */
-  static async createWithDevice({
-    networkId,
-    accountIndex = 0,
-    protocolMagic,
-    trezorConfig
-  }: CreateTrezorKeyAgentProps) {
+  static async createWithDevice(
+    { networkId, accountIndex = 0, protocolMagic, trezorConfig }: CreateTrezorKeyAgentProps,
+    dependencies: KeyAgentDependencies
+  ) {
     const isTrezorInitialized = await TrezorKeyAgent.initializeTrezorTransport(trezorConfig);
     const extendedAccountPublicKey = await TrezorKeyAgent.getXpub({
       accountIndex
     });
-    return new TrezorKeyAgent({
-      accountIndex,
-      extendedAccountPublicKey,
-      isTrezorInitialized,
-      knownAddresses: [],
-      networkId,
-      protocolMagic,
-      trezorConfig
-    });
+    return new TrezorKeyAgent(
+      {
+        accountIndex,
+        extendedAccountPublicKey,
+        isTrezorInitialized,
+        knownAddresses: [],
+        networkId,
+        protocolMagic,
+        trezorConfig
+      },
+      dependencies
+    );
   }
 
-  async signTransaction(
-    { body }: TxInternals,
-    { inputAddressResolver }: SignTransactionOptions
-  ): Promise<Cardano.Signatures> {
+  async signTransaction({ body }: TxInternals): Promise<Cardano.Signatures> {
     try {
       await this.isTrezorInitialized;
       const cslTxBody = coreToCsl.txBody(body);
       const trezorTxData = await txToTrezor({
         accountIndex: this.accountIndex,
         cslTxBody,
-        inputAddressResolver,
+        inputResolver: this.inputResolver,
         knownAddresses: this.knownAddresses,
         networkId: this.networkId,
         protocolMagic: this.#protocolMagic

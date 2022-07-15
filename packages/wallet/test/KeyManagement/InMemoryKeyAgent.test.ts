@@ -1,5 +1,5 @@
 import { CSL, Cardano } from '@cardano-sdk/core';
-import { KeyManagement } from '../../src';
+import { InputResolver, KeyManagement } from '../../src';
 import { deriveAccountPrivateKey } from '../../src/KeyManagement/util';
 
 jest.mock('../../src/KeyManagement/util/ownSignatureKeyPaths');
@@ -8,16 +8,21 @@ const { ownSignatureKeyPaths } = jest.requireMock('../../src/KeyManagement/util/
 describe('InMemoryKeyAgent', () => {
   let keyAgent: KeyManagement.KeyAgent;
   let getPassword: jest.Mock;
+  let inputResolver: jest.Mocked<InputResolver>;
   let mnemonicWords: string[];
 
   beforeEach(async () => {
     mnemonicWords = KeyManagement.util.generateMnemonicWords();
     getPassword = jest.fn().mockResolvedValue(Buffer.from('password'));
-    keyAgent = await KeyManagement.InMemoryKeyAgent.fromBip39MnemonicWords({
-      getPassword,
-      mnemonicWords,
-      networkId: Cardano.NetworkId.testnet
-    });
+    inputResolver = { resolveInputAddress: jest.fn() };
+    keyAgent = await KeyManagement.InMemoryKeyAgent.fromBip39MnemonicWords(
+      {
+        getPassword,
+        mnemonicWords,
+        networkId: Cardano.NetworkId.testnet
+      },
+      { inputResolver }
+    );
   });
 
   afterEach(() => getPassword.mockReset());
@@ -35,12 +40,15 @@ describe('InMemoryKeyAgent', () => {
   });
 
   test('fromBip39MnemonicWords with "mnemonic2ndFactorPassphrase" results in different key', async () => {
-    const saferKeyAgent = await KeyManagement.InMemoryKeyAgent.fromBip39MnemonicWords({
-      getPassword,
-      mnemonic2ndFactorPassphrase: Buffer.from('passphrase'),
-      mnemonicWords,
-      networkId: Cardano.NetworkId.testnet
-    });
+    const saferKeyAgent = await KeyManagement.InMemoryKeyAgent.fromBip39MnemonicWords(
+      {
+        getPassword,
+        mnemonic2ndFactorPassphrase: Buffer.from('passphrase'),
+        mnemonicWords,
+        networkId: Cardano.NetworkId.testnet
+      },
+      { inputResolver }
+    );
     expect(await saferKeyAgent.exportRootPrivateKey()).not.toEqual(await keyAgent.exportRootPrivateKey());
   });
 
@@ -83,16 +91,11 @@ describe('InMemoryKeyAgent', () => {
       { index: 0, role: 2 }
     ]);
     const body = {} as unknown as Cardano.TxBodyAlonzo;
-    const inputAddressResolver = {} as KeyManagement.ResolveInputAddress;
-    const options = { inputAddressResolver } as KeyManagement.SignTransactionOptions;
-    const witnessSet = await keyAgent.signTransaction(
-      {
-        body,
-        hash: Cardano.TransactionId('8561258e210352fba2ac0488afed67b3427a27ccf1d41ec030c98a8199bc22ec')
-      },
-      options
-    );
-    expect(ownSignatureKeyPaths).toBeCalledWith(body, keyAgent.knownAddresses, inputAddressResolver);
+    const witnessSet = await keyAgent.signTransaction({
+      body,
+      hash: Cardano.TransactionId('8561258e210352fba2ac0488afed67b3427a27ccf1d41ec030c98a8199bc22ec')
+    });
+    expect(ownSignatureKeyPaths).toBeCalledWith(body, keyAgent.knownAddresses, inputResolver);
     expect(witnessSet.size).toBe(2);
     expect(typeof [...witnessSet.values()][0]).toBe('string');
   });
@@ -135,30 +138,36 @@ describe('InMemoryKeyAgent', () => {
       '7ec495800df33892c274b954145208c7038d22478f98d7c6843697a964ec10f49856e2c7ee7b2dbf9fa939d3b6b80caee60fa097cb1fb8bfb75271662c8d35c93aa0515f61d79d3f2e21d2dc26d144e83d6791122c45c9b6e1c941b8f71b7904efa16e68c3512e14e30f8831b397c7ddeb56242f376177721eb7d6acd7e99848cd8cf64de5f88e14a6a2e9890329c7d80d91250da96bb1343f22529d';
 
     it('can decrypt yoroi-encrypted root private key', async () => {
-      const keyAgentFromEncryptedKey = new KeyManagement.InMemoryKeyAgent({
-        accountIndex: 0,
-        encryptedRootPrivateKeyBytes: [...Buffer.from(yoroiEncryptedRootPrivateKeyHex, 'hex')],
-        extendedAccountPublicKey: Cardano.Bip32PublicKey(
-          Buffer.from(
-            deriveAccountPrivateKey(CSL.Bip32PrivateKey.from_bytes(Buffer.from(yoroiRootPrivateKeyHex, 'hex')), 0)
-              .to_public()
-              .as_bytes()
-          ).toString('hex')
-        ),
-        getPassword,
-        knownAddresses: [],
-        networkId: Cardano.NetworkId.testnet
-      });
+      const keyAgentFromEncryptedKey = new KeyManagement.InMemoryKeyAgent(
+        {
+          accountIndex: 0,
+          encryptedRootPrivateKeyBytes: [...Buffer.from(yoroiEncryptedRootPrivateKeyHex, 'hex')],
+          extendedAccountPublicKey: Cardano.Bip32PublicKey(
+            Buffer.from(
+              deriveAccountPrivateKey(CSL.Bip32PrivateKey.from_bytes(Buffer.from(yoroiRootPrivateKeyHex, 'hex')), 0)
+                .to_public()
+                .as_bytes()
+            ).toString('hex')
+          ),
+          getPassword,
+          knownAddresses: [],
+          networkId: Cardano.NetworkId.testnet
+        },
+        { inputResolver }
+      );
       const exportedPrivateKeyHex = await keyAgentFromEncryptedKey.exportRootPrivateKey();
       expect(exportedPrivateKeyHex).toEqual(yoroiRootPrivateKeyHex);
     });
 
     it('can import yoroi 15-word mnemonic', async () => {
-      const keyAgentFromMnemonic = await KeyManagement.InMemoryKeyAgent.fromBip39MnemonicWords({
-        getPassword,
-        mnemonicWords: yoroiMnemonic,
-        networkId: Cardano.NetworkId.testnet
-      });
+      const keyAgentFromMnemonic = await KeyManagement.InMemoryKeyAgent.fromBip39MnemonicWords(
+        {
+          getPassword,
+          mnemonicWords: yoroiMnemonic,
+          networkId: Cardano.NetworkId.testnet
+        },
+        { inputResolver }
+      );
       const exportedPrivateKeyHex = await keyAgentFromMnemonic.exportRootPrivateKey();
       expect(exportedPrivateKeyHex).toEqual(yoroiRootPrivateKeyHex);
     });
@@ -199,20 +208,23 @@ describe('InMemoryKeyAgent', () => {
 
     // fails to decrypt root private key
     it.skip('can decrypt daedelus-encrypted root private key to produce expected stake address', async () => {
-      const keyAgentFromEncryptedKey = new KeyManagement.InMemoryKeyAgent({
-        accountIndex: 0,
-        encryptedRootPrivateKeyBytes: [...Buffer.from(daedelusEncryptedRootPrivateKeyHex, 'hex')],
-        extendedAccountPublicKey: Cardano.Bip32PublicKey(
-          Buffer.from(
-            deriveAccountPrivateKey(CSL.Bip32PrivateKey.from_bytes(Buffer.from(daedalusRootPrivateKeyHex, 'hex')), 0)
-              .to_public()
-              .as_bytes()
-          ).toString('hex')
-        ),
-        getPassword: jest.fn().mockResolvedValue(Buffer.from('nMmys*X002')), // daedelus enforces min length of 10
-        knownAddresses: [],
-        networkId: Cardano.NetworkId.testnet
-      });
+      const keyAgentFromEncryptedKey = new KeyManagement.InMemoryKeyAgent(
+        {
+          accountIndex: 0,
+          encryptedRootPrivateKeyBytes: [...Buffer.from(daedelusEncryptedRootPrivateKeyHex, 'hex')],
+          extendedAccountPublicKey: Cardano.Bip32PublicKey(
+            Buffer.from(
+              deriveAccountPrivateKey(CSL.Bip32PrivateKey.from_bytes(Buffer.from(daedalusRootPrivateKeyHex, 'hex')), 0)
+                .to_public()
+                .as_bytes()
+            ).toString('hex')
+          ),
+          getPassword: jest.fn().mockResolvedValue(Buffer.from('nMmys*X002')), // daedelus enforces min length of 10
+          knownAddresses: [],
+          networkId: Cardano.NetworkId.testnet
+        },
+        { inputResolver }
+      );
       const derivedAddress = await keyAgentFromEncryptedKey.deriveAddress({
         index: 1,
         type: KeyManagement.AddressType.External
@@ -221,11 +233,14 @@ describe('InMemoryKeyAgent', () => {
     });
 
     it('can import daedelus 24-word mnemonic to produce expected stake address', async () => {
-      const keyAgentFromMnemonic = await KeyManagement.InMemoryKeyAgent.fromBip39MnemonicWords({
-        getPassword,
-        mnemonicWords: daedelusMnemonic24,
-        networkId: Cardano.NetworkId.testnet
-      });
+      const keyAgentFromMnemonic = await KeyManagement.InMemoryKeyAgent.fromBip39MnemonicWords(
+        {
+          getPassword,
+          mnemonicWords: daedelusMnemonic24,
+          networkId: Cardano.NetworkId.testnet
+        },
+        { inputResolver }
+      );
       const derivedAddress = await keyAgentFromMnemonic.deriveAddress({
         index: 1,
         type: KeyManagement.AddressType.External

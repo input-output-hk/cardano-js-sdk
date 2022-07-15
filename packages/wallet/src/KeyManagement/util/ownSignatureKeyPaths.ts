@@ -1,5 +1,6 @@
-import { AccountKeyDerivationPath, GroupedAddress, KeyRole, ResolveInputAddress } from '../types';
+import { AccountKeyDerivationPath, GroupedAddress, KeyRole } from '../types';
 import { Cardano } from '@cardano-sdk/core';
+import { InputResolver } from '../../services';
 import { isNotNil } from '@cardano-sdk/util';
 import uniq from 'lodash/uniq';
 
@@ -11,13 +12,13 @@ import uniq from 'lodash/uniq';
 export const ownSignatureKeyPaths = async (
   txBody: Cardano.NewTxBodyAlonzo,
   knownAddresses: GroupedAddress[],
-  resolveInputAddress: ResolveInputAddress
+  inputResolver: InputResolver
 ): Promise<AccountKeyDerivationPath[]> => {
   const paymentKeyPaths = uniq(
     (
       await Promise.all(
         txBody.inputs.map(async (input) => {
-          const ownAddress = await resolveInputAddress(input);
+          const ownAddress = await inputResolver.resolveInputAddress(input);
           if (!ownAddress) return null;
           return knownAddresses.find(({ address }) => address === ownAddress);
         })

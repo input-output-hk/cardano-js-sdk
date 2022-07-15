@@ -2,7 +2,8 @@ import * as mocks from '../mocks';
 import { AssetId, createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { Cardano } from '@cardano-sdk/core';
 import { CommunicationType, LedgerTransportType } from '../../src/KeyManagement/types';
-import { KeyManagement, SingleAddressWallet } from '../../src';
+import { KeyManagement, SingleAddressWallet, setupWallet } from '../../src';
+import { mockKeyAgentDependencies } from '../mocks';
 import DeviceConnection from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
 describe('LedgerKeyAgent', () => {
@@ -12,52 +13,67 @@ describe('LedgerKeyAgent', () => {
   let wallet: SingleAddressWallet;
 
   beforeAll(async () => {
-    keyAgent = await KeyManagement.LedgerKeyAgent.createWithDevice({
-      communicationType: CommunicationType.Node,
-      networkId: Cardano.NetworkId.testnet,
-      protocolMagic: 1_097_911_063
-    });
     txSubmitProvider = mocks.mockTxSubmitProvider();
-    const assetProvider = mocks.mockAssetProvider();
-    const stakePoolProvider = createStubStakePoolProvider();
-    const networkInfoProvider = mocks.mockNetworkInfoProvider();
-    const utxoProvider = mocks.mockUtxoProvider();
-    const rewardsProvider = mocks.mockRewardsProvider();
-    const chainHistoryProvider = mocks.mockChainHistoryProvider();
-    const groupedAddress: KeyManagement.GroupedAddress = {
-      accountIndex: 0,
-      address,
-      index: 0,
-      networkId: Cardano.NetworkId.testnet,
-      rewardAccount: mocks.rewardAccount,
-      type: KeyManagement.AddressType.External
-    };
-    keyAgent.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
-    keyAgent.knownAddresses.push(groupedAddress);
-    const asyncKeyAgent = KeyManagement.util.createAsyncKeyAgent(keyAgent);
-    wallet = new SingleAddressWallet(
-      { name: 'HW Wallet' },
-      {
-        assetProvider,
-        chainHistoryProvider,
-        keyAgent: asyncKeyAgent,
-        networkInfoProvider,
-        rewardsProvider,
-        stakePoolProvider,
-        txSubmitProvider,
-        utxoProvider
+    ({ keyAgent, wallet } = await setupWallet({
+      createKeyAgent: async (dependencies) => {
+        const ledgerKeyAgent = await KeyManagement.LedgerKeyAgent.createWithDevice(
+          {
+            communicationType: CommunicationType.Node,
+            networkId: Cardano.NetworkId.testnet,
+            protocolMagic: 1_097_911_063
+          },
+          dependencies
+        );
+        const groupedAddress: KeyManagement.GroupedAddress = {
+          accountIndex: 0,
+          address,
+          index: 0,
+          networkId: Cardano.NetworkId.testnet,
+          rewardAccount: mocks.rewardAccount,
+          type: KeyManagement.AddressType.External
+        };
+        ledgerKeyAgent.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
+        ledgerKeyAgent.knownAddresses.push(groupedAddress);
+        return ledgerKeyAgent;
+      },
+      createWallet: async (ledgerKeyAgent) => {
+        const assetProvider = mocks.mockAssetProvider();
+        const stakePoolProvider = createStubStakePoolProvider();
+        const networkInfoProvider = mocks.mockNetworkInfoProvider();
+        const utxoProvider = mocks.mockUtxoProvider();
+        const rewardsProvider = mocks.mockRewardsProvider();
+        const chainHistoryProvider = mocks.mockChainHistoryProvider();
+        const asyncKeyAgent = KeyManagement.util.createAsyncKeyAgent(ledgerKeyAgent);
+        return new SingleAddressWallet(
+          { name: 'HW Wallet' },
+          {
+            assetProvider,
+            chainHistoryProvider,
+            keyAgent: asyncKeyAgent,
+            networkInfoProvider,
+            rewardsProvider,
+            stakePoolProvider,
+            txSubmitProvider,
+            utxoProvider
+          }
+        );
       }
-    );
+    }));
   });
 
+  afterAll(() => wallet.shutdown());
+
   it('can be created with any account index', async () => {
-    const ledgerKeyAgentWithRandomIndex = await KeyManagement.LedgerKeyAgent.createWithDevice({
-      accountIndex: 5,
-      communicationType: CommunicationType.Node,
-      deviceConnection: keyAgent.deviceConnection,
-      networkId: Cardano.NetworkId.testnet,
-      protocolMagic: 1_097_911_063
-    });
+    const ledgerKeyAgentWithRandomIndex = await KeyManagement.LedgerKeyAgent.createWithDevice(
+      {
+        accountIndex: 5,
+        communicationType: CommunicationType.Node,
+        deviceConnection: keyAgent.deviceConnection,
+        networkId: Cardano.NetworkId.testnet,
+        protocolMagic: 1_097_911_063
+      },
+      mockKeyAgentDependencies()
+    );
     expect(ledgerKeyAgentWithRandomIndex).toBeInstanceOf(KeyManagement.LedgerKeyAgent);
     expect(ledgerKeyAgentWithRandomIndex.accountIndex).toEqual(5);
     expect(ledgerKeyAgentWithRandomIndex.extendedAccountPublicKey).not.toEqual(keyAgent.extendedAccountPublicKey);
@@ -106,15 +122,10 @@ describe('LedgerKeyAgent', () => {
     };
 
     const txInternals = await wallet.initializeTx(props);
-    const signatures = await keyAgent.signTransaction(
-      {
-        body: txInternals.body,
-        hash: txInternals.hash
-      },
-      {
-        inputAddressResolver: wallet.util.resolveInputAddress
-      }
-    );
+    const signatures = await keyAgent.signTransaction({
+      body: txInternals.body,
+      hash: txInternals.hash
+    });
     expect(signatures.size).toBe(1);
   });
 

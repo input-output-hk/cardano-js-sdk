@@ -8,7 +8,7 @@ describe('integration/txChainingBalance', () => {
 
   beforeAll(async () => {
     // Using mock TxSubmitProvider which doesn't do anything and instantly resolves
-    wallet = await createWallet();
+    ({ wallet } = await createWallet());
   });
 
   it('available balance includes change outputs from pending transaction', async () => {

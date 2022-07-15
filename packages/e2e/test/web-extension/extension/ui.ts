@@ -8,7 +8,8 @@ import {
   userPromptServiceChannel,
   walletName
 } from './util';
-import { KeyManagement } from '@cardano-sdk/wallet';
+import { Cardano } from '@cardano-sdk/core';
+import { KeyManagement, setupWallet } from '@cardano-sdk/wallet';
 import {
   RemoteApiPropertyType,
   consumeObservableWallet,
@@ -16,6 +17,7 @@ import {
   exposeApi,
   exposeKeyAgent
 } from '@cardano-sdk/web-extension';
+import { firstValueFrom } from 'rxjs';
 import { runtime } from 'webextension-polyfill';
 
 const api: UserPromptService = {
@@ -69,20 +71,43 @@ wallet.balance.utxo.available$.subscribe(
   ({ coins }) => (document.querySelector('#balance')!.textContent = coins.toString())
 );
 
-document.querySelector('#createLedgerKeyAgent')!.addEventListener('click', async () => {
+document.querySelector('#createKeyAgent')!.addEventListener('click', async () => {
+  // setupWallet call is required to provide context (InputResolver) to the key agent
+  const { keyAgent } = await setupWallet({
+    createKeyAgent: async (dependencies) =>
+      KeyManagement.util.createAsyncKeyAgent(
+        await KeyManagement.InMemoryKeyAgent.fromBip39MnemonicWords(
+          {
+            accountIndex: 0,
+            getPassword: async () => Buffer.from(''),
+            mnemonicWords: process.env.MNEMONIC_WORDS!.split(' '),
+            networkId: 0
+          },
+          dependencies
+        )
+      ),
+    createWallet: async () => wallet
+  });
   // restoreKeyAgent or create a new one and expose it
   exposeKeyAgent(
     {
-      keyAgent: KeyManagement.util.createAsyncKeyAgent(
-        await KeyManagement.InMemoryKeyAgent.fromBip39MnemonicWords({
-          accountIndex: 0,
-          getPassword: async () => Buffer.from(''),
-          mnemonicWords: process.env.MNEMONIC_WORDS.split(' '),
-          networkId: 0
-        })
-      ),
+      keyAgent,
       walletName
     },
     { logger, runtime }
   );
+});
+
+document.querySelector('#buildAndSignTx')!.addEventListener('click', async () => {
+  const [{ address: ownAddress }] = await firstValueFrom(wallet.addresses$);
+  const tx = await wallet.initializeTx({
+    outputs: new Set<Cardano.TxOut>([
+      {
+        address: ownAddress,
+        value: { coins: 2_000_000n }
+      }
+    ])
+  });
+  const signedTx = await wallet.finalizeTx(tx);
+  document.querySelector('#signature')!.textContent = signedTx.witness.signatures.values().next().value;
 });

@@ -15,7 +15,7 @@ describe('cip30signData', () => {
   beforeAll(async () => {
     const keyAgentReady = testKeyAgent();
     keyAgent = await keyAgentReady;
-    asyncKeyAgent = await testAsyncKeyAgent(undefined, keyAgentReady);
+    asyncKeyAgent = await testAsyncKeyAgent(undefined, undefined, keyAgentReady);
     address = await asyncKeyAgent.deriveAddress(addressDerivationPath);
   });
 

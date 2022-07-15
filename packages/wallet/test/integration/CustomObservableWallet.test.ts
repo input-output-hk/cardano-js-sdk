@@ -48,7 +48,7 @@ describe('CustomObservableWallet', () => {
         {
           assetProvider: mocks.mockAssetProvider(),
           chainHistoryProvider: mocks.mockChainHistoryProvider(),
-          keyAgent: KeyManagement.util.createAsyncKeyAgent(await mocks.testKeyAgent()),
+          keyAgent: await mocks.testAsyncKeyAgent(),
           networkInfoProvider: mocks.mockNetworkInfoProvider(),
           rewardsProvider: mocks.mockRewardsProvider(),
           stakePoolProvider: createStubStakePoolProvider(),

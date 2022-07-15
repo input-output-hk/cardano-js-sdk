@@ -2,9 +2,14 @@ import { BigIntMath } from '@cardano-sdk/util';
 import { Cardano, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
 import { Observable, firstValueFrom } from 'rxjs';
 import { OutputValidation } from '../types';
-import { ResolveInputAddress } from '../KeyManagement';
 import { computeMinimumCoinQuantity, tokenBundleSizeExceedsLimit } from '@cardano-sdk/cip2';
 import { txInEquals } from './util';
+
+/**
+ * @param txIn transaction input to resolve address from
+ * @returns input owner address
+ */
+export type ResolveInputAddress = (txIn: Cardano.NewTxIn) => Promise<Cardano.Address | null>;
 
 export type ProtocolParametersRequiredByOutputValidator = Pick<
   ProtocolParametersRequiredByWallet,
@@ -104,3 +109,39 @@ export const createWalletUtil = (context: WalletUtilContext) => ({
 });
 
 export type WalletUtil = ReturnType<typeof createWalletUtil>;
+
+type SetWalletUtilContext = (context: WalletUtilContext) => void;
+
+/**
+ * Creates a WalletUtil that has an additional function to `initialize` by setting the context.
+ * Calls to WalletUtil functions will only resolve after initializing.
+ *
+ * @returns common wallet utility functions that are aware of wallet state and computes useful things
+ */
+export const createLazyWalletUtil = (): WalletUtil & { initialize: SetWalletUtilContext } => {
+  let initialize: SetWalletUtilContext;
+  const resolverReady = new Promise((resolve: SetWalletUtilContext) => (initialize = resolve)).then(createWalletUtil);
+  return {
+    initialize: initialize!,
+    async resolveInputAddress(input) {
+      const resolver = await resolverReady;
+      return resolver.resolveInputAddress(input);
+    },
+    async validateOutput(output) {
+      const resolver = await resolverReady;
+      return resolver.validateOutput(output);
+    },
+    async validateOutputs(outputs) {
+      const resolver = await resolverReady;
+      return resolver.validateOutputs(outputs);
+    },
+    async validateValue(value) {
+      const resolver = await resolverReady;
+      return resolver.validateValue(value);
+    },
+    async validateValues(values) {
+      const resolver = await resolverReady;
+      return resolver.validateValues(values);
+    }
+  };
+};

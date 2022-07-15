@@ -1,6 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { Cardano } from '@cardano-sdk/core';
-import { KeyManagement, ObservableWallet, SingleAddressWallet } from '@cardano-sdk/wallet';
+import { KeyManagement, ObservableWallet, SingleAddressWallet, setupWallet } from '@cardano-sdk/wallet';
 import {
   assetProviderFactory,
   chainHistoryProviderFactory,
@@ -18,44 +18,54 @@ describe('SingleAddressWallet.assets/nft', () => {
   let wallet: ObservableWallet;
 
   beforeAll(async () => {
-    const _keyAgent = await keyAgentById(0, env.KEY_MANAGEMENT_PROVIDER, env.KEY_MANAGEMENT_PARAMS);
-    _keyAgent.knownAddresses$ = of([
-      {
-        accountIndex: 0,
-        address: Cardano.Address(
-          // eslint-disable-next-line max-len
-          'addr_test1qpapna8hhj2hx2q2s9mdp7995a3hgundyvvvj0v0yq68lt8e6dgndgyep9stycsnejcnu8vm7a6dtqqhmf362z7fy5ksg46rum'
-        ),
-        index: 0,
-        networkId: Cardano.NetworkId.testnet,
-        rewardAccount: Cardano.RewardAccount('stake_test1uruax5fk5zvsjc9jvgfuevf7rkdlwax4sqta5ca9p0yj2tg4cf29e'),
-        type: KeyManagement.AddressType.External
-      }
-    ]);
-    wallet = new SingleAddressWallet(
-      {
-        name: 'Test Wallet'
+    ({ wallet } = await setupWallet({
+      createKeyAgent: async (dependencies) => {
+        const createKeyAgent = await keyAgentById(0, env.KEY_MANAGEMENT_PROVIDER, env.KEY_MANAGEMENT_PARAMS);
+        const keyAgent = await createKeyAgent(dependencies);
+        keyAgent.knownAddresses$ = of([
+          {
+            accountIndex: 0,
+            address: Cardano.Address(
+              // eslint-disable-next-line max-len
+              'addr_test1qpapna8hhj2hx2q2s9mdp7995a3hgundyvvvj0v0yq68lt8e6dgndgyep9stycsnejcnu8vm7a6dtqqhmf362z7fy5ksg46rum'
+            ),
+            index: 0,
+            networkId: Cardano.NetworkId.testnet,
+            rewardAccount: Cardano.RewardAccount('stake_test1uruax5fk5zvsjc9jvgfuevf7rkdlwax4sqta5ca9p0yj2tg4cf29e'),
+            type: KeyManagement.AddressType.External
+          }
+        ]);
+        return keyAgent;
       },
-      {
-        assetProvider: await assetProviderFactory.create(env.ASSET_PROVIDER, env.ASSET_PROVIDER_PARAMS),
-        chainHistoryProvider: await chainHistoryProviderFactory.create(
-          env.CHAIN_HISTORY_PROVIDER,
-          env.CHAIN_HISTORY_PROVIDER_PARAMS
-        ),
-        keyAgent: await keyAgentById(0, env.KEY_MANAGEMENT_PROVIDER, env.KEY_MANAGEMENT_PARAMS),
-        networkInfoProvider: await networkInfoProviderFactory.create(
-          env.NETWORK_INFO_PROVIDER,
-          env.NETWORK_INFO_PROVIDER_PARAMS
-        ),
-        rewardsProvider: await rewardsProviderFactory.create(env.REWARDS_PROVIDER, env.REWARDS_PROVIDER_PARAMS),
-        stakePoolProvider: await stakePoolProviderFactory.create(
-          env.STAKE_POOL_PROVIDER,
-          env.STAKE_POOL_PROVIDER_PARAMS
-        ),
-        txSubmitProvider: await txSubmitProviderFactory.create(env.TX_SUBMIT_PROVIDER, env.TX_SUBMIT_PROVIDER_PARAMS),
-        utxoProvider: await utxoProviderFactory.create(env.UTXO_PROVIDER, env.UTXO_PROVIDER_PARAMS)
-      }
-    );
+      createWallet: async (keyAgent) =>
+        new SingleAddressWallet(
+          {
+            name: 'Test Wallet'
+          },
+          {
+            assetProvider: await assetProviderFactory.create(env.ASSET_PROVIDER, env.ASSET_PROVIDER_PARAMS),
+            chainHistoryProvider: await chainHistoryProviderFactory.create(
+              env.CHAIN_HISTORY_PROVIDER,
+              env.CHAIN_HISTORY_PROVIDER_PARAMS
+            ),
+            keyAgent,
+            networkInfoProvider: await networkInfoProviderFactory.create(
+              env.NETWORK_INFO_PROVIDER,
+              env.NETWORK_INFO_PROVIDER_PARAMS
+            ),
+            rewardsProvider: await rewardsProviderFactory.create(env.REWARDS_PROVIDER, env.REWARDS_PROVIDER_PARAMS),
+            stakePoolProvider: await stakePoolProviderFactory.create(
+              env.STAKE_POOL_PROVIDER,
+              env.STAKE_POOL_PROVIDER_PARAMS
+            ),
+            txSubmitProvider: await txSubmitProviderFactory.create(
+              env.TX_SUBMIT_PROVIDER,
+              env.TX_SUBMIT_PROVIDER_PARAMS
+            ),
+            utxoProvider: await utxoProviderFactory.create(env.UTXO_PROVIDER, env.UTXO_PROVIDER_PARAMS)
+          }
+        )
+    }));
   });
 
   afterAll(() => {

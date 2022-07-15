@@ -7,3 +7,4 @@ export * from './mockAssetProvider';
 export * from './mockUtxoProvider';
 export * from './mockChainHistoryProvider';
 export * from './mockRewardsProvider';
+export * from './mockKeyAgentDependencies';
