@@ -11,6 +11,20 @@ export interface SignBlobResult {
   signature: Cardano.Ed25519Signature;
 }
 
+export enum CardanoKeyConst {
+  PURPOSE = 1852,
+  COIN_TYPE = 1815
+}
+
+export enum Cip1852PathLevelIndexes {
+  PURPOSE = 0,
+  COIN_TYPE = 1,
+  ACCOUNT = 2,
+  ROLE = 3,
+  // address
+  INDEX = 4
+}
+
 export enum KeyAgentType {
   InMemory = 'InMemory',
   Ledger = 'Ledger',
@@ -78,11 +92,6 @@ export interface TrezorConfig {
   };
 }
 
-/**
- * number[] is used by InMemoryKeyAgent
- */
-export type AgentSpecificData = number[] | null;
-
 export interface SerializableKeyAgentDataBase {
   networkId: Cardano.NetworkId;
   accountIndex: number;
@@ -113,6 +122,16 @@ export type SerializableKeyAgentData =
   | SerializableTrezorKeyAgentData;
 
 export type LedgerTransportType = TransportWebHID | TransportNodeHid;
+
+export interface KeyPair {
+  skey: Cardano.Bip32PrivateKey;
+  vkey: Cardano.Bip32PublicKey;
+}
+
+export interface Ed25519KeyPair {
+  skey: Cardano.Ed25519PrivateKey;
+  vkey: Cardano.Ed25519PublicKey;
+}
 
 /**
  * @returns password used to decrypt root private key
@@ -151,6 +170,6 @@ export interface KeyAgent {
   exportRootPrivateKey(): Promise<Cardano.Bip32PrivateKey>;
 }
 
-export type AsyncKeyAgent = Pick<KeyAgent, 'deriveAddress' | 'signBlob' | 'signTransaction'> & {
+export type AsyncKeyAgent = Pick<KeyAgent, 'deriveAddress' | 'derivePublicKey' | 'signBlob' | 'signTransaction'> & {
   knownAddresses$: Observable<GroupedAddress[]>;
 } & Shutdown;

@@ -29,6 +29,18 @@ export const Ed25519PublicKey = (value: string): Ed25519PublicKey => typedHex(va
 Ed25519PublicKey.fromHexBlob = (value: HexBlob) => castHexBlob<Ed25519PublicKey>(value, 64);
 
 /**
+ * Ed25519 private key as hex string
+ */
+export type Ed25519PrivateKey = OpaqueString<'Ed25519PrivateKey'>;
+
+/**
+ * @param {string} value Ed25519 private key as hex string
+ * @throws InvalidStringError
+ */
+export const Ed25519PrivateKey = (value: string): Ed25519PrivateKey => typedHex(value, 128);
+Ed25519PrivateKey.fromHexBlob = (value: HexBlob) => castHexBlob<Ed25519PrivateKey>(value, 128);
+
+/**
  * 28 byte ED25519 key hash as hex string
  */
 export type Ed25519KeyHash = OpaqueString<'Ed25519KeyHash'>;

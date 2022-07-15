@@ -5,6 +5,7 @@ import {
   KeyAgent,
   KeyAgentDependencies,
   KeyAgentType,
+  KeyPair,
   SerializableInMemoryKeyAgentData,
   SignBlobResult,
   SignTransactionOptions
@@ -15,6 +16,7 @@ import { KeyAgentBase } from './KeyAgentBase';
 import { TxInternals } from '../Transaction';
 import {
   deriveAccountPrivateKey,
+  harden,
   joinMnemonicWords,
   mnemonicWordsToEntropy,
   ownSignatureKeyPaths,
@@ -53,7 +55,10 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
 
   async signBlob({ index, role: type }: AccountKeyDerivationPath, blob: Cardano.util.HexBlob): Promise<SignBlobResult> {
     const rootPrivateKey = await this.#decryptRootPrivateKey();
-    const accountKey = deriveAccountPrivateKey(rootPrivateKey, this.accountIndex);
+    const accountKey = deriveAccountPrivateKey({
+      accountIndex: this.accountIndex,
+      rootPrivateKey
+    });
     const signingKey = accountKey.derive(type).derive(index).to_raw_key();
     const signature = Cardano.Ed25519Signature(signingKey.sign(Buffer.from(blob, 'hex')).to_hex());
     const publicKey = Cardano.Ed25519PublicKey.fromHexBlob(util.bytesToHex(signingKey.to_public().as_bytes()));
@@ -89,8 +94,12 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
     const rootPrivateKey = CSL.Bip32PrivateKey.from_bip39_entropy(entropy, mnemonic2ndFactorPassphrase);
     const password = await getPasswordRethrowTypedError(getPassword);
     const encryptedRootPrivateKey = await emip3encrypt(rootPrivateKey.as_bytes(), password);
+    const accountPrivateKey = deriveAccountPrivateKey({
+      accountIndex,
+      rootPrivateKey
+    });
     const extendedAccountPublicKey = Cardano.Bip32PublicKey(
-      Buffer.from(deriveAccountPrivateKey(rootPrivateKey, accountIndex).to_public().as_bytes()).toString('hex')
+      Buffer.from(accountPrivateKey.to_public().as_bytes()).toString('hex')
     );
     return new InMemoryKeyAgent(
       {
@@ -125,6 +134,22 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
         })
       )
     );
+  }
+
+  /**
+   * Based on root private key
+   */
+  async exportExtendedKeyPair(derivationPath: number[]): Promise<KeyPair> {
+    const rootPrivateKey = await this.exportRootPrivateKey();
+    const cslRootPrivateKey = CSL.Bip32PrivateKey.from_bytes(Buffer.from(rootPrivateKey, 'hex'));
+    let cslPrivateKey = cslRootPrivateKey;
+    for (const val of derivationPath) {
+      cslPrivateKey = cslPrivateKey.derive(harden(val));
+    }
+    return {
+      skey: Cardano.Bip32PrivateKey(Buffer.from(cslPrivateKey.as_bytes()).toString('hex')),
+      vkey: Cardano.Bip32PublicKey(Buffer.from(cslPrivateKey.to_public().as_bytes()).toString('hex'))
+    };
   }
 
   async #decryptRootPrivateKey(noCache?: true) {

@@ -3,11 +3,11 @@
 /* eslint-disable sonarjs/cognitive-complexity,  max-depth, max-statements, complexity */
 import * as ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import * as trezor from 'trezor-connect';
-import { BIP32Path, GroupedAddress } from '../types';
+import { BIP32Path, CardanoKeyConst, GroupedAddress } from '../types';
 import { CSL, Cardano, cslToCore } from '@cardano-sdk/core';
-import { CardanoKeyConst, harden } from '../util';
 import { HwMappingError } from '../errors';
 import { InputResolver } from '../../services';
+import { STAKE_KEY_DERIVATION_PATH, harden } from '../util';
 import { isNotNil } from '@cardano-sdk/util';
 import concat from 'lodash/concat';
 import uniq from 'lodash/uniq';
@@ -15,7 +15,6 @@ import uniq from 'lodash/uniq';
 export interface TxToLedgerProps {
   cslTxBody: CSL.TransactionBody;
   networkId: Cardano.NetworkId;
-  accountIndex: number;
   inputResolver: InputResolver;
   knownAddresses: GroupedAddress[];
   protocolMagic: Cardano.NetworkMagic;
@@ -48,12 +47,6 @@ export interface TrezorMintBundle {
 export interface TrezorCertificates {
   certs: trezor.CardanoCertificate[];
   signingMode?: trezor.CardanoTxSigningMode;
-}
-
-export interface ChangeAddressType {
-  isDeviceOwned: boolean;
-  changeAddressIndex: number;
-  changeAddressRole: number;
 }
 
 const sortTokensCanonically = (tokens: trezor.CardanoToken[] | ledger.Token[]) => {
@@ -90,19 +83,9 @@ const bytesToIp = (bytes?: Uint8Array) => {
   return null;
 };
 
-const checkIsChangeAddress = (knownAddresses: GroupedAddress[], outputAddress: Buffer): ChangeAddressType => {
-  let changeAddressIndex = 0;
-  let changeAddressRole = 0;
-  const isDeviceOwned = knownAddresses.some(({ address, index, type }) => {
-    changeAddressIndex = index;
-    changeAddressRole = type;
-    return address.toString() === ledger.utils.bech32_encodeAddress(outputAddress);
-  });
-  return {
-    changeAddressIndex,
-    changeAddressRole,
-    isDeviceOwned
-  };
+const matchGroupedAddress = (knownAddresses: GroupedAddress[], outputAddress: Buffer): GroupedAddress | undefined => {
+  const outputAddressBech32 = ledger.utils.bech32_encodeAddress(outputAddress);
+  return knownAddresses.find(({ address }) => address.toString() === outputAddressBech32);
 };
 
 const prepareTrezorInputs = async (
@@ -145,7 +128,6 @@ const prepareTrezorInputs = async (
 
 const prepareTrezorOutputs = (
   outputs: CSL.TransactionOutputs,
-  accountIndex: number,
   knownAddresses: GroupedAddress[]
 ): trezor.CardanoOutput[] => {
   const trezorOutputs = [];
@@ -178,17 +160,15 @@ const prepareTrezorOutputs = (
       }
     }
     const outputAddress = Buffer.from(output.address().to_bytes());
-    const { isDeviceOwned, changeAddressIndex, changeAddressRole } = checkIsChangeAddress(
-      knownAddresses,
-      outputAddress
-    );
-    const destination = isDeviceOwned
+    const ownAddress = matchGroupedAddress(knownAddresses, outputAddress);
+    const destination = ownAddress
       ? {
           addressParameters: {
             addressType: trezor.CardanoAddressType.BASE,
             // eslint-disable-next-line max-len
-            path: `m/${CardanoKeyConst.PURPOSE}'/${CardanoKeyConst.COIN_TYPE}'/${accountIndex}'/${changeAddressRole}/${changeAddressIndex}`,
-            stakingPath: `m/${CardanoKeyConst.PURPOSE}'/${CardanoKeyConst.COIN_TYPE}'/${accountIndex}'/2/0`
+            path: `m/${CardanoKeyConst.PURPOSE}'/${CardanoKeyConst.COIN_TYPE}'/${ownAddress.accountIndex}'/${ownAddress.type}/${ownAddress.index}`,
+            // eslint-disable-next-line max-len
+            stakingPath: `m/${CardanoKeyConst.PURPOSE}'/${CardanoKeyConst.COIN_TYPE}'/${ownAddress.accountIndex}'/${STAKE_KEY_DERIVATION_PATH.role}/${STAKE_KEY_DERIVATION_PATH.index}`
           }
         }
       : {
@@ -454,11 +434,7 @@ const prepareLedgerInputs = async (
   return ledgerInputs;
 };
 
-const prepareLedgerOutputs = (
-  outputs: CSL.TransactionOutputs,
-  accountIndex: number,
-  knownAddresses: GroupedAddress[]
-): ledger.TxOutput[] => {
+const prepareLedgerOutputs = (outputs: CSL.TransactionOutputs, knownAddresses: GroupedAddress[]): ledger.TxOutput[] => {
   const ledgerOutputs = [];
   for (let i = 0; i < outputs.len(); i++) {
     const output = outputs.get(i);
@@ -489,27 +465,24 @@ const prepareLedgerOutputs = (
       }
     }
     const outputAddress = Buffer.from(output.address().to_bytes());
-    const { isDeviceOwned, changeAddressIndex, changeAddressRole } = checkIsChangeAddress(
-      knownAddresses,
-      outputAddress
-    );
-    const destination: ledger.TxOutputDestination = isDeviceOwned
+    const ownAddress = matchGroupedAddress(knownAddresses, outputAddress);
+    const destination: ledger.TxOutputDestination = ownAddress
       ? {
           params: {
             params: {
               spendingPath: [
                 harden(CardanoKeyConst.PURPOSE),
                 harden(CardanoKeyConst.COIN_TYPE),
-                harden(accountIndex),
-                changeAddressRole,
-                changeAddressIndex
+                harden(ownAddress.accountIndex),
+                ownAddress.type,
+                ownAddress.index
               ],
               stakingPath: [
                 harden(CardanoKeyConst.PURPOSE),
                 harden(CardanoKeyConst.COIN_TYPE),
-                harden(accountIndex),
-                2,
-                0
+                harden(ownAddress.accountIndex),
+                STAKE_KEY_DERIVATION_PATH.role,
+                STAKE_KEY_DERIVATION_PATH.index
               ]
             },
             type: ledger.AddressType.BASE_PAYMENT_KEY_STAKE_KEY
@@ -830,26 +803,26 @@ const prepareLedgerMintBundle = (
 export const txToLedger = async ({
   cslTxBody,
   networkId,
-  accountIndex,
   inputResolver: inputAddressResolver,
   knownAddresses,
   protocolMagic
 }: TxToLedgerProps): Promise<ledger.SignTransactionRequest> => {
-  const rewardAccount = knownAddresses[0].rewardAccount;
+  const accountAddress = knownAddresses[0];
+  const rewardAccount = accountAddress.rewardAccount;
   const rewardAccountKeyHash = getRewardAccountKeyHash(rewardAccount);
   const rewardAccountKeyPath = [
     harden(CardanoKeyConst.PURPOSE),
     harden(CardanoKeyConst.COIN_TYPE),
-    harden(accountIndex),
-    2,
-    0
+    harden(accountAddress.accountIndex),
+    STAKE_KEY_DERIVATION_PATH.role,
+    STAKE_KEY_DERIVATION_PATH.index
   ];
 
   // TX - Inputs
   const ledgerInputs = await prepareLedgerInputs(cslTxBody.inputs(), inputAddressResolver, knownAddresses);
 
   // TX - Outputs
-  const ledgerOutputs = prepareLedgerOutputs(cslTxBody.outputs(), accountIndex, knownAddresses);
+  const ledgerOutputs = prepareLedgerOutputs(cslTxBody.outputs(), knownAddresses);
 
   // TX - Withdrawals
   const cslWithdrawals = cslTxBody.withdrawals();
@@ -922,26 +895,26 @@ export const txToLedger = async ({
 export const txToTrezor = async ({
   cslTxBody,
   networkId,
-  accountIndex,
   inputResolver: inputAddressResolver,
   knownAddresses,
   protocolMagic
 }: TxToTrezorProps): Promise<trezor.CardanoSignTransaction> => {
-  const rewardAccount = knownAddresses[0].rewardAccount;
+  const accountAddress = knownAddresses[0];
+  const rewardAccount = accountAddress.rewardAccount;
   const rewardAccountKeyHash = getRewardAccountKeyHash(rewardAccount);
   const rewardAccountKeyPath = [
     harden(CardanoKeyConst.PURPOSE),
     harden(CardanoKeyConst.COIN_TYPE),
-    harden(accountIndex),
-    2,
-    0
+    harden(accountAddress.accountIndex),
+    STAKE_KEY_DERIVATION_PATH.role,
+    STAKE_KEY_DERIVATION_PATH.index
   ];
 
   // TX - Inputs
   const trezorInputs = await prepareTrezorInputs(cslTxBody.inputs(), inputAddressResolver, knownAddresses);
 
   // TX - Outputs
-  const trezorOutputs = prepareTrezorOutputs(cslTxBody.outputs(), accountIndex, knownAddresses);
+  const trezorOutputs = prepareTrezorOutputs(cslTxBody.outputs(), knownAddresses);
 
   // TX - Withdrawals
   const cslWithdrawals = cslTxBody.withdrawals();

@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AuthenticationError, TransportError } from './errors';
 import { Cardano, NotImplementedError, coreToCsl } from '@cardano-sdk/core';
-import { CardanoKeyConst, Cip1852PathLevelIndexes, txToLedger } from './util';
 import {
+  CardanoKeyConst,
+  Cip1852PathLevelIndexes,
   CommunicationType,
   KeyAgentDependencies,
   KeyAgentType,
@@ -12,6 +13,7 @@ import {
 } from './types';
 import { KeyAgentBase } from './KeyAgentBase';
 import { TxInternals } from '../Transaction';
+import { txToLedger } from './util';
 import LedgerConnection, { GetVersionResponse, utils } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents';
 import TransportWebHID from '@ledgerhq/hw-transport-webhid';
@@ -229,7 +231,6 @@ export class LedgerKeyAgent extends KeyAgentBase {
     try {
       const cslTxBody = coreToCsl.txBody(body);
       const ledgerTxData = await txToLedger({
-        accountIndex: this.accountIndex,
         cslTxBody,
         inputResolver: this.inputResolver,
         knownAddresses: this.knownAddresses,
