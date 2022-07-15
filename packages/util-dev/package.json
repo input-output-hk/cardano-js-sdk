@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/util-dev",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Utilities for tests in other packages",
   "engines": {
     "node": "^14"
@@ -54,7 +54,7 @@
     "shx": "^0.3.3"
   },
   "dependencies": {
-    "@cardano-sdk/core": "0.3.0",
+    "@cardano-sdk/core": "0.4.0",
     "rxjs": "^7.4.0",
     "delay": "^5.0.0"
   },

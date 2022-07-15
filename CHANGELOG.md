@@ -2,6 +2,56 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.4.0](https://github.com/input-output-hk/cardano-js-sdk/compare/0.3.0...0.4.0) (2022-07-15)
+
+
+### ⚠ BREAKING CHANGES
+
+* hoist KeyAgent's InputResolver dependency to constructor
+* **wallet:** tipTracker replaces more generic SyncableIntervalPersistentDocumentTrackerSubject
+* **wallet:** - coldObservableProvider expects an object of type
+ColdObservableProviderProps instead of positional args
+* **cardano-services:** remove static create
+* **cardano-services:** service improvements
+
+### Features
+
+* add cip36 metadataBuilder ([0632dc5](https://github.com/input-output-hk/cardano-js-sdk/commit/0632dc508e6be7bc37024e5f8128337ba64a9f47))
+* add new `apy` sort field to stake pools ([161ccd8](https://github.com/input-output-hk/cardano-js-sdk/commit/161ccd83c318bb874e59c39cbb9fc1f9b94e3e32))
+* **cardano-services:** add DbSyncNftMetadataService ([f667c0a](https://github.com/input-output-hk/cardano-js-sdk/commit/f667c0a41365eb658b6ec7e8fe9f74bb80aa5243))
+* **cardano-services:** add token metadata provider ([040e0eb](https://github.com/input-output-hk/cardano-js-sdk/commit/040e0eb4e7e116724a759eb13d38b803863338c7))
+* **cardano-services:** implements rabbitmq new interface ([a880367](https://github.com/input-output-hk/cardano-js-sdk/commit/a880367bb8044a45645dbd30772040ad9422dc59))
+* **cardano-services:** service discovery via DNS ([4d4dd36](https://github.com/input-output-hk/cardano-js-sdk/commit/4d4dd36cd4cdf302efc4797821917bdb22974519))
+* **cardano-services:** support loading secrets in run.ts for compatibility with existing pattern ([b9ece18](https://github.com/input-output-hk/cardano-js-sdk/commit/b9ece181b36022d2c7d732ef8342be47d9f9aad8))
+* **core:** accept common ipfs hash without protocol for nft metadata uri ([f1878e3](https://github.com/input-output-hk/cardano-js-sdk/commit/f1878e39b63800d451db1f97624f041f4f424567))
+* **core:** added Ed25519PrivateKey to keys ([db1f42c](https://github.com/input-output-hk/cardano-js-sdk/commit/db1f42c9d21115e43a1581de077b5f4f9c84ca43))
+* **core:** adds util to get a tx from its body ([f680720](https://github.com/input-output-hk/cardano-js-sdk/commit/f680720f8bd6610871aad587e4a198de9190e229))
+* **ogmios:** enriched the test mock to respond with beforeValidityInterval ([b56f9a8](https://github.com/input-output-hk/cardano-js-sdk/commit/b56f9a83b38d9c46dfa1d7008ab632f9a737b9ea))
+* sort stake pools by fixed cost ([6e1d6e4](https://github.com/input-output-hk/cardano-js-sdk/commit/6e1d6e4179794aa92b7d3279e3534beb2ac29978))
+* support any network by fetching time settings from the node ([08d9ed2](https://github.com/input-output-hk/cardano-js-sdk/commit/08d9ed2b6aa20cf4df2a063f046f4e5ca28c6bd5))
+* **wallet:** add createLazyWalletUtil ([8a5ec35](https://github.com/input-output-hk/cardano-js-sdk/commit/8a5ec35cd1af283b15a494d8b25911543252d1b8))
+* **wallet:** add missing Alonzo-era tx body fields ([69d3db4](https://github.com/input-output-hk/cardano-js-sdk/commit/69d3db4750d40bb816441b6490e604030c3d7540))
+* **wallet:** polling strategy uses new connection status tracker ([03603d8](https://github.com/input-output-hk/cardano-js-sdk/commit/03603d82bddf03bee0fe181c11adb02660fc195d))
+
+
+### Bug Fixes
+
+* allow pool relay nullable fields in open api validation ([e7fe121](https://github.com/input-output-hk/cardano-js-sdk/commit/e7fe1215ee02e8672c269796e49f639268b02483))
+* **cardano-services:** add missing ENV to run.ts ([13f8698](https://github.com/input-output-hk/cardano-js-sdk/commit/13f869899ba50390e8abe29424d742590be17ae1))
+* **cardano-services:** stake pool healthcheck ([90e84ee](https://github.com/input-output-hk/cardano-js-sdk/commit/90e84eee1d3d50e043098f73b01d2d084f46f40f))
+* **golden-test-generator:** add missing blockBody assignment if Alonzo block ([888e25b](https://github.com/input-output-hk/cardano-js-sdk/commit/888e25b681b370fe072d40728f8d71223a9b42fe))
+* **util:** add Set serialization support ([237913f](https://github.com/input-output-hk/cardano-js-sdk/commit/237913f685ee5ae2d5cd7353a92ada8d9f9ff82b))
+* **util:** correctly deserialize Set items ([adf458d](https://github.com/input-output-hk/cardano-js-sdk/commit/adf458d150c398ce9589821ef40703c2da5685f7))
+* **wallet:** in memory store name typo ([d63d3fb](https://github.com/input-output-hk/cardano-js-sdk/commit/d63d3fbccb414cc75dad8d4a5a43cc611798c281))
+* **wallet:** remove assets no longer available in total balance ([fef65d0](https://github.com/input-output-hk/cardano-js-sdk/commit/fef65d0da9413a2f4631736240ddb88d1de7a86b))
+
+
+* **cardano-services:** remove static create ([7eddc2b](https://github.com/input-output-hk/cardano-js-sdk/commit/7eddc2b5aa44ba96b9fe50d599bc10fa80c0bff8))
+* **cardano-services:** service improvements ([6eda4aa](https://github.com/input-output-hk/cardano-js-sdk/commit/6eda4aa5776db6658c3526e0a17a2554bf01c6b0))
+* hoist KeyAgent's InputResolver dependency to constructor ([759dc09](https://github.com/input-output-hk/cardano-js-sdk/commit/759dc09b427831cb193f1c0a545901abd4d50254))
+* **wallet:** replace positional with named params in coldObservableProvider ([4361cb0](https://github.com/input-output-hk/cardano-js-sdk/commit/4361cb0ff5c2c587668c20e3824bf9c2a8a2ff76))
+* **wallet:** tipTracker replaces more generic SyncableIntervalPersistentDocumentTrackerSubject ([311a437](https://github.com/input-output-hk/cardano-js-sdk/commit/311a43708f0468d9810a454bf10f265cd104e857))
+
 ## [0.3.0](https://github.com/input-output-hk/cardano-js-sdk/compare/0.2.0...0.3.0) (2022-06-24)
 
 
