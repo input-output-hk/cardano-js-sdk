@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>9/9</span>
+                <span class='fraction'>18/18</span>
             </div>
         
             
@@ -39,14 +39,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>2/2</span>
+                <span class='fraction'>3/3</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>6/6</span>
+                <span class='fraction'>14/14</span>
             </div>
         
             
@@ -79,25 +79,64 @@
 <a name='L14'></a><a href='#L14'>14</a>
 <a name='L15'></a><a href='#L15'>15</a>
 <a name='L16'></a><a href='#L16'>16</a>
-<a name='L17'></a><a href='#L17'>17</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">37x</span>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">39x</span>
+<span class="cline-any cline-yes">39x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">37x</span>
+<span class="cline-any cline-yes">264x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">165x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">37x</span>
+<span class="cline-any cline-yes">39x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">37x</span>
-<span class="cline-any cline-yes">55x</span>
+<span class="cline-any cline-yes">39x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { AccountKeyDerivationPath, KeyRole } from '../types';
-import { CSL } from '@cardano-sdk/core';
-import { CardanoKeyConst } from '.';
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">39x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">61x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { AccountKeyDerivationPath, CardanoKeyConst, Ed25519KeyPair, KeyPair, KeyRole } from '../types';
+import { CSL, Cardano, util } from '@cardano-sdk/core';
 &nbsp;
 export const harden = (num: number): number =&gt; 0x80_00_00_00 + num;
 &nbsp;
@@ -106,7 +145,28 @@ export const STAKE_KEY_DERIVATION_PATH: AccountKeyDerivationPath = {
   role: KeyRole.Stake
 };
 &nbsp;
-export const deriveAccountPrivateKey = (rootPrivateKey: CSL.Bip32PrivateKey, accountIndex: number) =&gt;
+export const toEd25519KeyPair = (bip32KeyPair: KeyPair): Ed25519KeyPair =&gt; {
+  const pubKeyBytes = Buffer.from(bip32KeyPair.vkey, 'hex');
+  const cslPubKey = CSL.Bip32PublicKey.from_bytes(pubKeyBytes);
+  const vkey = Cardano.Ed25519PublicKey.fromHexBlob(util.bytesToHex(cslPubKey.to_raw_key().as_bytes()));
+  const prvKeyBytes = Buffer.from(bip32KeyPair.skey, 'hex');
+  const cslPrvKey = CSL.Bip32PrivateKey.from_bytes(prvKeyBytes);
+  const skey = Cardano.Ed25519PrivateKey.fromHexBlob(util.bytesToHex(cslPrvKey.to_raw_key().as_bytes()));
+  return {
+    skey,
+    vkey
+  };
+};
+&nbsp;
+export interface DeriveAccountPrivateKeyProps {
+  rootPrivateKey: CSL.Bip32PrivateKey;
+  accountIndex: number;
+}
+&nbsp;
+export const deriveAccountPrivateKey = ({
+  rootPrivateKey,
+  accountIndex
+}: DeriveAccountPrivateKeyProps): CSL.Bip32PrivateKey =&gt;
   rootPrivateKey
     .derive(harden(CardanoKeyConst.PURPOSE))
     .derive(harden(CardanoKeyConst.COIN_TYPE))
@@ -118,7 +178,7 @@ export const deriveAccountPrivateKey = (rootPrivateKey: CSL.Bip32PrivateKey, acc
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at Fri Jul 15 2022 13:52:46 GMT+0000 (Coordinated Universal Time)
+                at Fri Jul 15 2022 15:29:10 GMT+0000 (Coordinated Universal Time)
             </div>
         <script src="../../../prettify.js"></script>
         <script>
