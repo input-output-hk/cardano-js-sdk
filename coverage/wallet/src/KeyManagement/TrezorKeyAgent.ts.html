@@ -245,13 +245,11 @@
 <a name='L180'></a><a href='#L180'>180</a>
 <a name='L181'></a><a href='#L181'>181</a>
 <a name='L182'></a><a href='#L182'>182</a>
-<a name='L183'></a><a href='#L183'>183</a>
-<a name='L184'></a><a href='#L184'>184</a>
-<a name='L185'></a><a href='#L185'>185</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">34x</span>
-<span class="cline-any cline-yes">34x</span>
-<span class="cline-any cline-yes">34x</span>
-<span class="cline-any cline-yes">34x</span>
+<a name='L183'></a><a href='#L183'>183</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">35x</span>
+<span class="cline-any cline-yes">35x</span>
+<span class="cline-any cline-yes">35x</span>
+<span class="cline-any cline-yes">35x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -259,14 +257,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">34x</span>
+<span class="cline-any cline-yes">35x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">34x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">35x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -278,10 +271,15 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">34x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">35x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">34x</span>
+<span class="cline-any cline-yes">35x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -357,8 +355,6 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -437,10 +433,10 @@ import { Cardano, NotImplementedError, coreToCsl } from '@cardano-sdk/core';
 import { CardanoKeyConst, txToTrezor } from './util';
 import {
   CommunicationType,
+  KeyAgentDependencies,
   KeyAgentType,
   SerializableTrezorKeyAgentData,
   SignBlobResult,
-  SignTransactionOptions,
   TrezorConfig
 } from './types';
 import { KeyAgentBase } from './KeyAgentBase';
@@ -469,8 +465,8 @@ export class TrezorKeyAgent extends KeyAgentBase {
   readonly isTrezorInitialized: Promise&lt;boolean&gt;;
   readonly #protocolMagic: Cardano.NetworkMagic;
 &nbsp;
-  constructor({ isTrezorInitialized, ...serializableData }: TrezorKeyAgentProps) {
-    super({ ...serializableData, __typename: KeyAgentType.Trezor });
+  constructor({ isTrezorInitialized, ...serializableData }: TrezorKeyAgentProps, dependencies: KeyAgentDependencies) {
+    super({ ...serializableData, __typename: KeyAgentType.Trezor }, dependencies);
     this.#protocolMagic = serializableData.protocolMagic;
     if (!isTrezorInitialized) {
       this.isTrezorInitialized = TrezorKeyAgent.initializeTrezorTransport(serializableData.trezorConfig);
@@ -547,38 +543,36 @@ export class TrezorKeyAgent extends KeyAgentBase {
   /**
    * @throws AuthenticationError
    */
-<span class="fstat-no" title="function not covered" >  static </span>async createWithDevice({
-    networkId,
-    accountIndex = <span class="branch-0 cbranch-no" title="branch not covered" >0,</span>
-    protocolMagic,
-    trezorConfig
-  }: CreateTrezorKeyAgentProps) {
+<span class="fstat-no" title="function not covered" >  static </span>async createWithDevice(
+    { networkId, accountIndex = <span class="branch-0 cbranch-no" title="branch not covered" >0,</span> protocolMagic, trezorConfig }: CreateTrezorKeyAgentProps,
+    dependencies: KeyAgentDependencies
+  ) {
     const isTrezorInitialized = <span class="cstat-no" title="statement not covered" >await TrezorKeyAgent.initializeTrezorTransport(trezorConfig);</span>
     const extendedAccountPublicKey = <span class="cstat-no" title="statement not covered" >await TrezorKeyAgent.getXpub({</span>
       accountIndex
     });
-<span class="cstat-no" title="statement not covered" >    return new TrezorKeyAgent({</span>
-      accountIndex,
-      extendedAccountPublicKey,
-      isTrezorInitialized,
-      knownAddresses: [],
-      networkId,
-      protocolMagic,
-      trezorConfig
-    });
+<span class="cstat-no" title="statement not covered" >    return new TrezorKeyAgent(</span>
+      {
+        accountIndex,
+        extendedAccountPublicKey,
+        isTrezorInitialized,
+        knownAddresses: [],
+        networkId,
+        protocolMagic,
+        trezorConfig
+      },
+      dependencies
+    );
   }
 &nbsp;
-<span class="fstat-no" title="function not covered" >  async </span>signTransaction(
-    { body }: TxInternals,
-    { inputAddressResolver }: SignTransactionOptions
-  ): Promise&lt;Cardano.Signatures&gt; {
+<span class="fstat-no" title="function not covered" >  async </span>signTransaction({ body }: TxInternals): Promise&lt;Cardano.Signatures&gt; {
 <span class="cstat-no" title="statement not covered" >    try {</span>
 <span class="cstat-no" title="statement not covered" >      await this.isTrezorInitialized;</span>
       const cslTxBody = <span class="cstat-no" title="statement not covered" >coreToCsl.txBody(body);</span>
       const trezorTxData = <span class="cstat-no" title="statement not covered" >await txToTrezor({</span>
         accountIndex: this.accountIndex,
         cslTxBody,
-        inputAddressResolver,
+        inputResolver: this.inputResolver,
         knownAddresses: this.knownAddresses,
         networkId: this.networkId,
         protocolMagic: this.#protocolMagic
@@ -622,7 +616,7 @@ export class TrezorKeyAgent extends KeyAgentBase {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at Fri Jul 15 2022 07:53:56 GMT+0000 (Coordinated Universal Time)
+                at Fri Jul 15 2022 13:52:46 GMT+0000 (Coordinated Universal Time)
             </div>
         <script src="../../prettify.js"></script>
         <script>
