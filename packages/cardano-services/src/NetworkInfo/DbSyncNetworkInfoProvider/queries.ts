@@ -8,33 +8,23 @@ export const findCirculatingSupply = `
         FROM withdrawal
     ),
     total_utxo AS (
-        SELECT COALESCE(SUM(value)) AS utxo_amount
-        FROM tx_out AS tx_outer WHERE
-        NOT exists
-            ( SELECT tx_out.id
+        SELECT
+            SUM(tx_out.value) AS utxo_amount
         FROM tx_out
-        JOIN tx_in on
-        tx_out.tx_id = tx_in.tx_out_id AND
-        tx_out.index = tx_in.tx_out_index
-        WHERE tx_outer.id = tx_out.id)
+        LEFT JOIN tx_in 
+            ON tx_out.tx_id = tx_in.tx_out_id
+            AND tx_out.index = tx_in.tx_out_index
+        WHERE tx_in.id IS NULL    
     )
     SELECT CAST(utxo_amount + (rewards_amount - withdrawals_amount) AS BIGINT) as circulating_supply
     FROM total_rewards, total_withdrawals, total_utxo
 `;
 
 export const findTotalSupply = `
-    WITH total_reserves AS (
-        SELECT CAST(COALESCE(SUM(reserves),0) AS BIGINT) as reserves_amount
-        FROM ada_pots
-            WHERE ada_pots.epoch_no = (
-            SELECT no FROM epoch
-            ORDER BY no DESC 
-            LIMIT 1
-        )
-    )
-
-    SELECT CAST($1 - reserves_amount AS BIGINT) as total_supply
-    FROM total_reserves   
+    SELECT CAST($1 - reserves AS BIGINT) AS total_supply
+    FROM ada_pots
+    ORDER BY ada_pots.block_id DESC 
+    LIMIT 1
 `;
 
 // Live stake is the current epoch’s delegated stake that has yet to be snapshotted
