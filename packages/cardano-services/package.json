@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/cardano-services",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Cardano GraphQL Services",
   "engines": {
     "node": "^14"
@@ -62,8 +62,8 @@
   },
   "devDependencies": {
     "@babel/preset-typescript": "^7.17.12",
-    "@cardano-sdk/cardano-services-client": "0.3.0",
-    "@cardano-sdk/util-dev": "0.3.0",
+    "@cardano-sdk/cardano-services-client": "0.4.0",
+    "@cardano-sdk/util-dev": "0.4.0",
     "@types/bunyan": "^1.8.8",
     "@types/clear": "^0.1.2",
     "@types/death": "^1.1.2",
@@ -83,10 +83,10 @@
     "wait-on": "^6.0.1"
   },
   "dependencies": {
-    "@cardano-sdk/core": "0.3.0",
-    "@cardano-sdk/ogmios": "0.3.0",
-    "@cardano-sdk/rabbitmq": "0.3.0",
-    "@cardano-sdk/util": "0.3.0",
+    "@cardano-sdk/core": "0.4.0",
+    "@cardano-sdk/ogmios": "0.4.0",
+    "@cardano-sdk/rabbitmq": "0.4.0",
+    "@cardano-sdk/util": "0.4.0",
     "body-parser": "^1.19.2",
     "bunyan": "^1.8.15",
     "commander": "^9.1.0",
