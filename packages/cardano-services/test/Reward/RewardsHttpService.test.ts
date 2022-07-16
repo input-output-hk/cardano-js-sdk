@@ -6,7 +6,6 @@ import { Pool } from 'pg';
 import { getPort } from 'get-port-please';
 import { rewardsHttpProvider } from '@cardano-sdk/cardano-services-client';
 import axios from 'axios';
-import got from 'got';
 
 const APPLICATION_JSON = 'application/json';
 const UNSUPPORTED_MEDIA_STRING = 'Request failed with status code 415';
@@ -71,11 +70,9 @@ describe('RewardsHttpService', () => {
 
     describe('/health', () => {
       it('forwards the stakePoolSearchProvider health response', async () => {
-        const res = await got.post(`${apiUrlBase}/health`, {
-          headers: { 'Content-Type': APPLICATION_JSON }
-        });
-        expect(res.statusCode).toBe(200);
-        expect(JSON.parse(res.body)).toEqual({ ok: true });
+        const res = await axios.post(`${apiUrlBase}/health`, {}, { headers: { 'Content-Type': APPLICATION_JSON } });
+        expect(res.status).toBe(200);
+        expect(res.data).toEqual({ ok: true });
       });
     });
 
