@@ -10,10 +10,10 @@ services:
       - ${PWD}/local-network/sockets:/root/sockets
     healthcheck:
       # Verify that the node socket is up.
-      test: ["CMD-SHELL", "test - f /root/sockets/node-pool1.sock"]
+      test: ["CMD-SHELL", "test - f /root/network-files/node-spo1/node.sock"]
       interval: 10s
-      timeout: 5s
-      retries: 10
+      timeout: 10s
+      retries: 500
   postgres:
     image: postgres:${POSTGRES_VERSION:-11.5-alpine}
     environment:
@@ -41,7 +41,6 @@ services:
       options:
         max-size: "200k"
         max-file: "10"
-
   cardano-node-ogmios:
     healthcheck:
       retries: 200
@@ -55,7 +54,8 @@ services:
       - ${OGMIOS_PORT:-1337}:1337
     restart: on-failure
     depends_on:
-      - local-testnet
+      local-testnet:
+        condition: service_healthy
     volumes:
       - ./local-network/config/network:/config
       - node-db:/db
@@ -73,9 +73,10 @@ services:
       - RESTORE_SNAPSHOT=${RESTORE_SNAPSHOT:-}
       - RESTORE_RECREATE_DB=N
     depends_on:
-      - cardano-node-ogmios
-      - postgres
-      - local-testnet
+      local-testnet:
+        condition: service_healthy
+      cardano-node-ogmios:
+        condition: service_healthy
     secrets:
       - postgres_password
       - postgres_user
@@ -104,7 +105,8 @@ services:
       CMD: "cardano-wallet serve --node-socket /ipc/node.socket --database /wallet-db --listen-address 0.0.0.0"
       NETWORK:
     depends_on:
-      - cardano-node-ogmios
+      cardano-node-ogmios:
+        condition: service_healthy
     restart: on-failure
     logging:
       driver: "json-file"
@@ -127,6 +129,9 @@ services:
       options:
         max-size: "200k"
         max-file: "10"
+    depends_on:
+      cardano-node-ogmios:
+        condition: service_healthy
     volumes:
       - rabbitmq-db:/var/lib/rabbitmq/mnesia
 secrets:

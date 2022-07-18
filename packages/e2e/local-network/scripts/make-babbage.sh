@@ -41,8 +41,11 @@ NETWORK_MAGIC=888
 SECURITY_PARAM=10
 NUM_SPO_NODES=3
 INIT_SUPPLY=10020000000
+MAX_SUPPLY=45000000000000000
 START_TIME="$(${DATE} -d "now + 30 seconds" +%s)"
 ROOT=network-files
+
+rm -rf "${ROOT}"
 mkdir -p "${ROOT}"
 
 cat > "${ROOT}/byron.genesis.spec.json" <<EOF
@@ -88,10 +91,9 @@ cardano-cli byron genesis genesis \
 # are deprecated, we must use the "create-staked" cli command to create
 # SPOs in the ShelleyGenesis
 
+cp templates/babbage/alonzo-babbage-test-genesis.json "${ROOT}/genesis.alonzo.spec.json"
+cp templates/babbage/byron-configuration.yaml "${ROOT}/configuration.yaml"
 
-cp alonzo/alonzo-babbage-test-genesis.json "${ROOT}/genesis.alonzo.spec.json"
-
-cp byron/configuration.yaml "${ROOT}/"
 $SED -i "${ROOT}/configuration.yaml" \
      -e 's/Protocol: RealPBFT/Protocol: Cardano/' \
      -e '/Protocol/ aPBftSignatureThreshold: 0.6' \
@@ -113,12 +115,11 @@ $SED -i "${ROOT}/configuration.yaml" \
 
 # Copy the cost mode
 
-
 cardano-cli genesis create-staked --genesis-dir "${ROOT}" \
   --testnet-magic "${NETWORK_MAGIC}" \
   --gen-pools 3 \
-  --supply 1000000000000 \
-  --supply-delegated 1000000000000 \
+  --supply ${MAX_SUPPLY} \
+  --supply-delegated ${MAX_SUPPLY} \
   --gen-stake-delegs 3 \
   --gen-utxo-keys 3
 
@@ -152,7 +153,7 @@ $SED -i "${ROOT}/genesis/shelley/genesis.json" \
     -e 's/"activeSlotsCoeff": 5.0e-2/"activeSlotsCoeff": 0.1/' \
     -e 's/"securityParam": 2160/"securityParam": 10/' \
     -e 's/"epochLength": 432000/"epochLength": 100/' \
-    -e 's/"maxLovelaceSupply": 0/"maxLovelaceSupply": 1000000000000/' \
+    -e "s/\"maxLovelaceSupply\": 0/\"maxLovelaceSupply\": ${MAX_SUPPLY}/" \
     -e 's/"minFeeA": 1/"minFeeA": 44/' \
     -e 's/"minFeeB": 0/"minFeeB": 155381/' \
     -e 's/"minUTxOValue": 0/"minUTxOValue": 1000000/' \
@@ -184,13 +185,10 @@ mv "${ROOT}/byron-gen-command/delegation-cert.000.json" "${ROOT}/node-spo1/byron
 mv "${ROOT}/byron-gen-command/delegation-cert.001.json" "${ROOT}/node-spo2/byron-delegation.cert"
 mv "${ROOT}/byron-gen-command/delegation-cert.002.json" "${ROOT}/node-spo3/byron-delegation.cert"
 
-
-
 echo 3001 > "${ROOT}/node-spo1/port"
 echo 3002 > "${ROOT}/node-spo2/port"
 echo 3003 > "${ROOT}/node-spo3/port"
 
-# Make topology files
 # Make topology files
 #TODO generalise this over the N BFT nodes and pool nodes
 cat > "${ROOT}/node-spo1/topology.json" <<EOF
@@ -244,7 +242,6 @@ cat > "${ROOT}/node-spo3/topology.json" <<EOF
  }
 EOF
 
-
 for NODE in ${SPO_NODES}; do
   (
     echo "#!/usr/bin/env bash"
@@ -270,6 +267,26 @@ for NODE in ${SPO_NODES}; do
   echo "${ROOT}/${NODE}.sh"
 done
 
+# Create config folder
+rm -rf ./config
+mkdir -p ./config/network/cardano-db-sync
+mkdir -p ./config/network/cardano-db-sync
+mkdir -p ./config/network/cardano-node/genesis
+mkdir -p ./config/network/genesis
+
+cp ./templates/babbage/db-sync-config.json ./config/network/cardano-db-sync/
+cp ./templates/babbage/node-config.json ./config/network/cardano-node/
+cp ./templates/babbage/topology.json ./config/network/cardano-node/
+
+cp "${ROOT}"/genesis/byron/genesis.json ./config/network/cardano-node/genesis/byron.json
+cp "${ROOT}"/genesis/byron/genesis.json ./config/network/genesis/byron.json
+
+cp "${ROOT}"/genesis/shelley/genesis.json ./config/network/cardano-node/genesis/shelley.json
+cp "${ROOT}"/genesis/shelley/genesis.json ./config/network/genesis/shelley.json
+
+cp "${ROOT}"/genesis/shelley/genesis.alonzo.json ./config/network/cardano-node/genesis/alonzo.json
+cp "${ROOT}"/genesis/shelley/genesis.alonzo.json ./config/network/genesis/alonzo.json
+
 mkdir -p "${ROOT}/run"
 
 echo "#!/usr/bin/env bash" > "${ROOT}/run/all.sh"
@@ -284,9 +301,5 @@ done
 echo "" >> "${ROOT}/run/all.sh"
 
 chmod a+x "${ROOT}/run/all.sh"
-
-echo "CARDANO_NODE_SOCKET_PATH=${ROOT}/node-spo1/node.sock"
-
-(cd "$ROOT"; ln -s node-spo1/node.sock main.sock)
 
 wait
