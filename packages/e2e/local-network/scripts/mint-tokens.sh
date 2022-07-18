@@ -13,7 +13,9 @@ AMOUNT='45000000000000000'
 
 clean() {
   rm -rf tx.raw tx.signed
+  rm -rf shelley
 }
+
 trap clean EXIT
 
 while [ ! -S "$CARDANO_NODE_SOCKET_PATH" ]; do
@@ -22,9 +24,10 @@ while [ ! -S "$CARDANO_NODE_SOCKET_PATH" ]; do
 done
 
 echo "Create Mary-era minting policy"
+mkdir -p shelley/utxo-keys
 cat >shelley/utxo-keys/minting-policy.json <<EOL
 {
-  "keyHash": "$(cardano-cli address key-hash --payment-verification-key-file shelley/utxo-keys/utxo1.vkey)",
+  "keyHash": "$(cardano-cli address key-hash --payment-verification-key-file network-files/genesis-keys/genesis1.vkey)",
   "type": "sig"
 }
 EOL
@@ -55,7 +58,7 @@ cardano-cli transaction build \
 
 cardano-cli transaction sign \
   --tx-body-file tx.raw \
-  --signing-key-file shelley/utxo-keys/utxo1.skey \
+  --signing-key-file network-files/genesis-keys/genesis1.vkey \
   --testnet-magic 888 \
   --out-file tx.signed
 

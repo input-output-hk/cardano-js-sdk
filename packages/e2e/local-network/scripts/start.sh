@@ -18,6 +18,7 @@ trap 'kill 0' INT
 
 echo "Run"
 ./scripts/make-babbage.sh
+./scripts/update-genesis-hash.sh
 ./network-files/run/all.sh &
-CARDANO_NODE_SOCKET_PATH=${ROOT}/main.sock ./scripts/mint-tokens.sh
+CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-spo1/node.sock ./scripts/mint-tokens.sh
 wait
