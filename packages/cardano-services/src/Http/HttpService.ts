@@ -56,6 +56,13 @@ export abstract class HttpService extends RunnableModule {
         return HttpServer.sendJSON(res, await handler(...args));
       } catch (error) {
         logger.error(error);
+
+        if (error instanceof ProviderError) {
+          const code = error.reason === ProviderFailure.NotFound ? 404 : 500;
+
+          return HttpServer.sendJSON(res, error, code);
+        }
+
         return HttpServer.sendJSON(res, new ProviderError(ProviderFailure.Unhealthy, error), 500);
       }
     };

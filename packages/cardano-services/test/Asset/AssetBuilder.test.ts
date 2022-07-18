@@ -1,4 +1,4 @@
-import { AssetBuilder } from '../../src/Asset/AssetBuilder';
+import { AssetBuilder } from '../../src/Asset';
 import { Cardano } from '@cardano-sdk/core';
 import { Pool } from 'pg';
 import { dummyLogger } from 'ts-log';

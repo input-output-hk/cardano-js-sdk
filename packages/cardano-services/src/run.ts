@@ -11,6 +11,7 @@ import {
   loadHttpServer
 } from './Program';
 import { CACHE_TTL_DEFAULT } from './InMemoryCache';
+import { DEFAULT_TOKEN_METADATA_CACHE_TTL, DEFAULT_TOKEN_METADATA_SERVER_URL } from './Asset';
 import { ENABLE_METRICS_DEFAULT, USE_QUEUE_DEFAULT } from './ProgramsCommon';
 import { EPOCH_POLL_INTERVAL_DEFAULT } from './NetworkInfo';
 import { LogLevel } from 'bunyan';
@@ -52,6 +53,10 @@ const envSpecs = {
   SERVICE_DISCOVERY_BACKOFF_FACTOR: envalid.num({ default: SERVICE_DISCOVERY_BACKOFF_FACTOR_DEFAULT }),
   SERVICE_DISCOVERY_TIMEOUT: envalid.num({ default: SERVICE_DISCOVERY_TIMEOUT_DEFAULT }),
   SERVICE_NAMES: envalid.str({ example: Object.values(ServiceNames).toString() }),
+  TOKEN_METADATA_CACHE_TTL: envalid.makeValidator(cacheTtlValidator)(
+    envalid.num({ default: DEFAULT_TOKEN_METADATA_CACHE_TTL })
+  ),
+  TOKEN_METADATA_SERVER_URL: envalid.url({ default: DEFAULT_TOKEN_METADATA_SERVER_URL }),
   USE_QUEUE: envalid.bool({ default: USE_QUEUE_DEFAULT })
 };
 
@@ -68,6 +73,8 @@ void (async () => {
   const cardanoNodeConfigPath = env.CARDANO_NODE_CONFIG_PATH;
   const serviceDiscoveryBackoffFactor = env.SERVICE_DISCOVERY_BACKOFF_FACTOR;
   const serviceDiscoveryTimeout = env.SERVICE_DISCOVERY_TIMEOUT;
+  const tokenMetadataCacheTTL = env.TOKEN_METADATA_CACHE_TTL;
+  const tokenMetadataServerUrl = env.TOKEN_METADATA_SERVER_URL;
   const postgresSrvServiceName = env.POSTGRES_SRV_SERVICE_NAME;
   const postgresDb = env.POSTGRES_DB;
   const postgresUser = env.POSTGRES_USER;
@@ -108,6 +115,8 @@ void (async () => {
         rabbitmqUrl,
         serviceDiscoveryBackoffFactor,
         serviceDiscoveryTimeout,
+        tokenMetadataCacheTTL,
+        tokenMetadataServerUrl,
         useQueue: env.USE_QUEUE
       },
       serviceNames

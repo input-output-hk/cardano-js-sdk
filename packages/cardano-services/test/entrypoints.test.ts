@@ -5,8 +5,10 @@ import { ChildProcess, fork } from 'child_process';
 import { Ogmios } from '@cardano-sdk/ogmios';
 import { RABBITMQ_URL_DEFAULT, ServiceNames } from '../src';
 import { createHealthyMockOgmiosServer, createUnhealthyMockOgmiosServer, ogmiosServerReady, serverReady } from './util';
+import { fromSerializableObject } from '@cardano-sdk/util';
 import { getRandomPort } from 'get-port-please';
 import { listenPromise, serverClosePromise } from '../src/util';
+import { mockTokenRegistry } from './Asset/CardanoTokenRegistry.test';
 import axios from 'axios';
 import http from 'http';
 import path from 'path';
@@ -87,31 +89,37 @@ describe('entrypoints', () => {
         });
 
         it('cli:start-server exposes a HTTP server at the configured URL with all services attached', async () => {
-          proc = fork(exePath('cli'), [
-            'start-server',
-            '--api-url',
-            apiUrl,
-            '--db-connection-string',
-            dbConnectionString,
-            '--logger-min-severity',
-            'error',
-            '--ogmios-url',
-            ogmiosConnection.address.webSocket,
-            '--cardano-node-config-path',
-            cardanoNodeConfigPath,
-            '--cache-ttl',
-            cacheTtl,
-            ServiceNames.StakePool,
-            ServiceNames.TxSubmit,
-            ServiceNames.NetworkInfo,
-            ServiceNames.Utxo,
-            ServiceNames.ChainHistory
-          ]);
+          proc = fork(
+            exePath('cli'),
+            [
+              'start-server',
+              '--api-url',
+              apiUrl,
+              '--db-connection-string',
+              dbConnectionString,
+              '--logger-min-severity',
+              'error',
+              '--ogmios-url',
+              ogmiosConnection.address.webSocket,
+              '--cardano-node-config-path',
+              cardanoNodeConfigPath,
+              '--cache-ttl',
+              cacheTtl,
+              ServiceNames.Asset,
+              ServiceNames.ChainHistory,
+              ServiceNames.NetworkInfo,
+              ServiceNames.StakePool,
+              ServiceNames.TxSubmit,
+              ServiceNames.Utxo
+            ],
+            { stdio: 'pipe' }
+          );
+          await assertServiceHealthy(apiUrl, ServiceNames.Asset);
+          await assertServiceHealthy(apiUrl, ServiceNames.ChainHistory);
+          await assertServiceHealthy(apiUrl, ServiceNames.NetworkInfo);
           await assertServiceHealthy(apiUrl, ServiceNames.StakePool);
           await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit);
-          await assertServiceHealthy(apiUrl, ServiceNames.NetworkInfo);
           await assertServiceHealthy(apiUrl, ServiceNames.Utxo);
-          await assertServiceHealthy(apiUrl, ServiceNames.ChainHistory);
         });
 
         it('run exposes a HTTP server at the configured URL with all services attached', async () => {
@@ -123,14 +131,16 @@ describe('entrypoints', () => {
               DB_CONNECTION_STRING: dbConnectionString,
               LOGGER_MIN_SEVERITY: 'error',
               OGMIOS_URL: ogmiosConnection.address.webSocket,
-              SERVICE_NAMES: `${ServiceNames.StakePool},${ServiceNames.TxSubmit},${ServiceNames.NetworkInfo},${ServiceNames.Utxo},${ServiceNames.ChainHistory}`
-            }
+              SERVICE_NAMES: `${ServiceNames.Asset},${ServiceNames.ChainHistory},${ServiceNames.NetworkInfo},${ServiceNames.StakePool},${ServiceNames.TxSubmit},${ServiceNames.Utxo}`
+            },
+            stdio: 'pipe'
           });
+          await assertServiceHealthy(apiUrl, ServiceNames.Asset);
+          await assertServiceHealthy(apiUrl, ServiceNames.ChainHistory);
+          await assertServiceHealthy(apiUrl, ServiceNames.NetworkInfo);
           await assertServiceHealthy(apiUrl, ServiceNames.StakePool);
           await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit);
-          await assertServiceHealthy(apiUrl, ServiceNames.NetworkInfo);
           await assertServiceHealthy(apiUrl, ServiceNames.Utxo);
-          await assertServiceHealthy(apiUrl, ServiceNames.ChainHistory);
         });
       });
 
@@ -469,6 +479,77 @@ describe('entrypoints', () => {
             stdio: 'pipe'
           });
           await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit);
+        });
+      });
+
+      describe('using the asset service', () => {
+        let closeMock: () => Promise<void> = jest.fn();
+        let tokenMetadataServerUrl = '';
+        const record = {
+          name: { value: 'test' },
+          subject: '50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65'
+        };
+
+        beforeAll(async () => {
+          ({ closeMock, tokenMetadataServerUrl } = await mockTokenRegistry(() => ({ body: { subjects: [record] } })));
+        });
+
+        afterAll(async () => await closeMock());
+
+        it('cli:start-server uses the asset service', async () => {
+          proc = fork(
+            exePath('cli'),
+            [
+              'start-server',
+              '--api-url',
+              apiUrl,
+              '--db-connection-string',
+              dbConnectionString,
+              '--logger-min-severity',
+              'error',
+              '--token-metadata-server-url',
+              tokenMetadataServerUrl,
+              ServiceNames.Asset
+            ],
+            { stdio: 'pipe' }
+          );
+
+          await assertServiceHealthy(apiUrl, ServiceNames.Asset);
+
+          const res = await axios.post(`${apiUrl}/asset/get-asset`, {
+            args: [
+              '50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65',
+              { tokenMetadata: true }
+            ]
+          });
+
+          const { tokenMetadata } = fromSerializableObject(res.data);
+          expect(tokenMetadata).toStrictEqual({ name: 'test' });
+        });
+
+        it('run uses the asset service', async () => {
+          proc = fork(exePath('run'), {
+            env: {
+              API_URL: apiUrl,
+              DB_CONNECTION_STRING: dbConnectionString,
+              LOGGER_MIN_SEVERITY: 'error',
+              SERVICE_NAMES: ServiceNames.Asset,
+              TOKEN_METADATA_SERVER_URL: tokenMetadataServerUrl
+            },
+            stdio: 'pipe'
+          });
+
+          await assertServiceHealthy(apiUrl, ServiceNames.Asset);
+
+          const res = await axios.post(`${apiUrl}/asset/get-asset`, {
+            args: [
+              '50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65',
+              { tokenMetadata: true }
+            ]
+          });
+
+          const { tokenMetadata } = fromSerializableObject(res.data);
+          expect(tokenMetadata).toStrictEqual({ name: 'test' });
         });
       });
     });

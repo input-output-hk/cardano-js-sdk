@@ -1,3 +1,4 @@
+export * from './Asset';
 export * from './Http';
 export * from './Program';
 export * from './RunnableModule';

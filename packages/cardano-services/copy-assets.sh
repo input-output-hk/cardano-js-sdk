@@ -4,12 +4,13 @@
 
 cp ./package.json ./dist/cjs/original-package.json
 
-cp ./src/StakePool/openApi.json ./dist/cjs/StakePool/openApi.json
-cp ./src/TxSubmit/openApi.json ./dist/cjs/TxSubmit/openApi.json
-cp ./src/Utxo/openApi.json ./dist/cjs/Utxo/openApi.json
+cp ./src/Asset/openApi.json ./dist/cjs/Asset/openApi.json
 cp ./src/ChainHistory/openApi.json ./dist/cjs/ChainHistory/openApi.json
 cp ./src/NetworkInfo/openApi.json ./dist/cjs/NetworkInfo/openApi.json
 cp ./src/Rewards/openApi.json ./dist/cjs/Rewards/openApi.json
+cp ./src/StakePool/openApi.json ./dist/cjs/StakePool/openApi.json
+cp ./src/TxSubmit/openApi.json ./dist/cjs/TxSubmit/openApi.json
+cp ./src/Utxo/openApi.json ./dist/cjs/Utxo/openApi.json
 
 # TODO: uncomment when ESM builds are enabled for this package
 # cp ./src/StakePool/openApi.json ./dist/esm/StakePool/openApi.json

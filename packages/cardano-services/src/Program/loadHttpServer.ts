@@ -1,5 +1,6 @@
 /* eslint-disable complexity */
 /* eslint-disable sonarjs/cognitive-complexity */
+import { AssetHttpService, CardanoTokenRegistry, DbSyncAssetProvider, DbSyncNftMetadataService } from '../Asset';
 import { ChainHistoryHttpService, DbSyncChainHistoryProvider } from '../ChainHistory';
 import { CommonProgramOptions } from '../ProgramsCommon';
 import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../NetworkInfo';
@@ -28,6 +29,8 @@ export interface HttpServerOptions extends CommonProgramOptions {
   dbConnectionString?: string;
   epochPollInterval: number;
   cardanoNodeConfigPath?: string;
+  tokenMetadataCacheTTL?: number;
+  tokenMetadataServerUrl?: string;
   metricsEnabled?: boolean;
   useQueue?: boolean;
   postgresSrvServiceName?: string;
@@ -39,6 +42,7 @@ export interface HttpServerOptions extends CommonProgramOptions {
 export interface ProgramArgs {
   apiUrl: URL;
   serviceNames: (
+    | ServiceNames.Asset
     | ServiceNames.StakePool
     | ServiceNames.TxSubmit
     | ServiceNames.ChainHistory
@@ -73,6 +77,17 @@ const serviceMapFactory = (
     };
 
   return {
+    [ServiceNames.Asset]: withDb((db) => {
+      const ntfMetadataService = new DbSyncNftMetadataService({
+        db,
+        logger,
+        metadataService: createDbSyncMetadataService(db, logger)
+      });
+      const tokenMetadataService = new CardanoTokenRegistry({ logger }, args.options);
+      const assetProvider = new DbSyncAssetProvider({ db, logger, ntfMetadataService, tokenMetadataService });
+
+      return new AssetHttpService({ assetProvider, logger });
+    }),
     [ServiceNames.StakePool]: withDb(
       (db) => new StakePoolHttpService({ logger, stakePoolProvider: new DbSyncStakePoolProvider(db, logger) })
     ),
