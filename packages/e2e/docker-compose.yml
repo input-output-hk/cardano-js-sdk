@@ -7,13 +7,8 @@ services:
     ports:
       - 3001:3001
     volumes:
-      - ${PWD}/local-network/sockets:/root/sockets
-    healthcheck:
-      # Verify that the node socket is up.
-      test: ["CMD-SHELL", "test - f /root/network-files/node-spo1/node.sock"]
-      interval: 10s
-      timeout: 10s
-      retries: 500
+      - ./local-network/network-files/node-spo1/:/root/network-files/node-spo1
+      - ./local-network/config:/root/config
   postgres:
     image: postgres:${POSTGRES_VERSION:-11.5-alpine}
     environment:
@@ -29,13 +24,16 @@ services:
       - postgres_user
     shm_size: '2gb'
     restart: on-failure
+    depends_on:
+      cardano-node-ogmios:
+        condition: service_healthy
     healthcheck:
       # Use pg_isready to check postgres is running. Substitute different
       # user `postgres` if you've setup differently to config/pgpass-mainnet
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
     logging:
       driver: "json-file"
       options:
@@ -73,8 +71,6 @@ services:
       - RESTORE_SNAPSHOT=${RESTORE_SNAPSHOT:-}
       - RESTORE_RECREATE_DB=N
     depends_on:
-      local-testnet:
-        condition: service_healthy
       cardano-node-ogmios:
         condition: service_healthy
     secrets:
@@ -86,20 +82,22 @@ services:
       - node-ipc:/node-ipc
     restart: on-failure
     stop_signal: SIGINT
+    healthcheck:
+      retries: 200
     logging:
       driver: "json-file"
       options:
         max-size: "200k"
         max-file: "10"
   cardano-wallet:
-    image: inputoutput/cardano-wallet:2022.5.27
+    image: inputoutput/cardano-wallet:2022.7.1
     volumes:
       - wallet-db:/wallet-db
       - node-ipc:/ipc
       - ./local-network/config:/config
     ports:
       - 8090:8090
-    entrypoint: []                                                                            
+    entrypoint: []
     command: bash -c "sleep 10 && ([[ $$NETWORK == \"mainnet\" ]] && $$CMD --mainnet) || ($$CMD --testnet /config/network/genesis/byron.json)"
     environment:
       CMD: "cardano-wallet serve --node-socket /ipc/node.socket --database /wallet-db --listen-address 0.0.0.0"
@@ -119,7 +117,7 @@ services:
       test: rabbitmq-diagnostics -q ping
       interval: 30s
       timeout: 30s
-      retries: 3
+      retries: 200
     ports:
       # HTTP management UI
       - '15672:15672'
