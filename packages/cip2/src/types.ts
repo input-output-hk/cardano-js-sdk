@@ -51,7 +51,7 @@ export type TokenBundleSizeExceedsLimit = (tokenBundle?: Cardano.TokenMap) => bo
 /**
  * @returns minimum lovelace amount in a UTxO
  */
-export type ComputeMinimumCoinQuantity = (assetQuantities?: Cardano.TokenMap) => Cardano.Lovelace;
+export type ComputeMinimumCoinQuantity = (output: Cardano.TxOut) => Cardano.Lovelace;
 
 /**
  * @returns an upper bound for the number of ordinary inputs to

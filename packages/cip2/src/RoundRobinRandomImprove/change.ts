@@ -197,8 +197,15 @@ const coalesceChangeBundlesForMinCoinRequirement = (
     })
   );
   let sortedBundles = orderBy(noZeroQuantityAssetChangeBundles, ({ coins }) => coins, 'desc');
-  const satisfiesMinCoinRequirement = (valueQuantities: Cardano.Value) =>
-    valueQuantities.coins >= computeMinimumCoinQuantity(valueQuantities.assets);
+  // Assuming change will be sent to a grouped address.
+  // The actual address is not important here, we're only concerned with size of the output.
+  const stubMaxSizeAddress = Cardano.Address(
+    'addr_test1qqydn46r6mhge0kfpqmt36m6q43knzsd9ga32n96m89px3nuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qypp3m9'
+  );
+  const satisfiesMinCoinRequirement = (value: Cardano.Value) => {
+    const stubTxOut: Cardano.TxOut = { address: stubMaxSizeAddress, value };
+    return value.coins >= computeMinimumCoinQuantity(stubTxOut);
+  };
 
   while (sortedBundles.length > 1 && !satisfiesMinCoinRequirement(sortedBundles[sortedBundles.length - 1])) {
     const smallestBundle = sortedBundles.pop()!;

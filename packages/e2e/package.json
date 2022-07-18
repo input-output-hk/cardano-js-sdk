@@ -87,7 +87,7 @@
     "@cardano-sdk/wallet": "0.4.0",
     "@cardano-sdk/web-extension": "0.4.0",
     "@emurgo/cardano-message-signing-asmjs": "^1.0.1",
-    "@emurgo/cardano-serialization-lib-asmjs": "^9.1.0",
+    "@emurgo/cardano-serialization-lib-asmjs": "11.0.0-rc.6",
     "@types/bunyan": "^1.8.8",
     "@types/jest": "^28.1.2",
     "@types/lodash": "^4.14.182",

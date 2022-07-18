@@ -10,8 +10,6 @@ import {
 } from './types';
 import { ProtocolParametersRequiredByInputSelection } from '.';
 
-const coinsPerUTxOByteToCoinsPerUTxOWord = (coinsPerByte: number): number => coinsPerByte * 8;
-
 export type BuildTx = (selection: SelectionSkeleton) => Promise<CSL.Transaction>;
 
 export interface DefaultSelectionConstraintsProps {
@@ -42,14 +40,13 @@ export const computeMinimumCost =
 
 export const computeMinimumCoinQuantity =
   (coinsPerUtxoByte: ProtocolParametersRequiredByInputSelection['coinsPerUtxoByte']): ComputeMinimumCoinQuantity =>
-  (multiasset) => {
-    const minUTxOValue = CSL.BigNum.from_str((coinsPerUTxOByteToCoinsPerUTxOWord(coinsPerUtxoByte) * 29).toString());
-    const value = CSL.Value.new(CSL.BigNum.from_str('0'));
-    if (multiasset) {
-      value.set_multiasset(coreToCsl.tokenMap(multiasset));
-    }
-    return BigInt(CSL.min_ada_required(value, minUTxOValue).to_str());
-  };
+  (output) =>
+    BigInt(
+      CSL.min_ada_for_output(
+        coreToCsl.txOut(output),
+        CSL.DataCost.new_coins_per_byte(CSL.BigNum.from_str(coinsPerUtxoByte.toString()))
+      ).to_str()
+    );
 
 export const tokenBundleSizeExceedsLimit =
   (maxValueSize: ProtocolParametersRequiredByInputSelection['maxValueSize']): TokenBundleSizeExceedsLimit =>
