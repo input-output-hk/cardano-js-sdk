@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install curl -y &&\
 FROM ubuntu-nodejs as nodejs-builder
 RUN curl --proto '=https' --tlsv1.2 -sSf -L https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - &&\
   echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list &&\
-  apt-get update && apt-get install gcc g++ make gnupg2 yarn -y
+  apt-get update && apt-get install pkg-config libusb-1.0 libudev-dev gcc g++ make gnupg2 yarn -y
 RUN mkdir -p /app/packages
 WORKDIR /app
 COPY build build
