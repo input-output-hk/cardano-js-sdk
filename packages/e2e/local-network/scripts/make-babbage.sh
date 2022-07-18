@@ -18,6 +18,13 @@ case $UNAME in
   Linux )       SED="sed";;
 esac
 
+case $(uname) in
+Darwin) date='gdate' ;;
+*) date='date' ;;
+esac
+timeISO=$($date -d "now + 30 seconds" -u +"%Y-%m-%dT%H:%M:%SZ")
+timeUnix=$($date -d "now + 30 seconds" -u +%s)
+
 sprocket() {
   if [ "$UNAME" == "Windows_NT" ]; then
     # Named pipes names on Windows must have the structure: "\\.\pipe\PipeName"
@@ -45,7 +52,6 @@ MAX_SUPPLY=45000000000000000
 START_TIME="$(${DATE} -d "now + 30 seconds" +%s)"
 ROOT=network-files
 
-rm -rf "${ROOT}"
 mkdir -p "${ROOT}"
 
 cat > "${ROOT}/byron.genesis.spec.json" <<EOF
@@ -96,7 +102,6 @@ cp templates/babbage/byron-configuration.yaml "${ROOT}/configuration.yaml"
 
 $SED -i "${ROOT}/configuration.yaml" \
      -e 's/Protocol: RealPBFT/Protocol: Cardano/' \
-     -e '/Protocol/ aPBftSignatureThreshold: 0.6' \
      -e 's/minSeverity: Info/minSeverity: Debug/' \
      -e 's|GenesisFile: genesis.json|ByronGenesisFile: genesis/byron/genesis.json|' \
      -e '/ByronGenesisFile/ aShelleyGenesisFile: genesis/shelley/genesis.json' \
@@ -106,6 +111,9 @@ $SED -i "${ROOT}/configuration.yaml" \
      -e 's/LastKnownBlockVersion-Minor: 2/LastKnownBlockVersion-Minor: 0/'
 
   echo "" >> "${ROOT}/configuration.yaml"
+  echo "PBftSignatureThreshold: 0.6" >> "${ROOT}/configuration.yaml"
+  echo "" >> "${ROOT}/configuration.yaml"
+
   echo "TestShelleyHardForkAtEpoch: 0" >> "${ROOT}/configuration.yaml"
   echo "TestAllegraHardForkAtEpoch: 0" >> "${ROOT}/configuration.yaml"
   echo "TestMaryHardForkAtEpoch: 0" >> "${ROOT}/configuration.yaml"
@@ -128,7 +136,7 @@ SPO_NODES="node-spo1 node-spo2 node-spo3"
 # create the node directories
 for NODE in ${SPO_NODES}; do
 
-  mkdir "${ROOT}/${NODE}"
+  mkdir -p "${ROOT}/${NODE}"
 
 done
 
@@ -260,6 +268,8 @@ for NODE in ${SPO_NODES}; do
     echo "  --shelley-operational-certificate '${ROOT}/${NODE}/opcert.cert' \\"
     echo "  --port                            $(cat "${ROOT}/${NODE}/port") \\"
     echo "  | tee -a '${ROOT}/${NODE}/node.log'"
+    echo ""
+    echo "wait"
   ) > "${ROOT}/${NODE}.sh"
 
   chmod a+x "${ROOT}/${NODE}.sh"
@@ -267,16 +277,35 @@ for NODE in ${SPO_NODES}; do
   echo "${ROOT}/${NODE}.sh"
 done
 
-# Create config folder
-rm -rf ./config
-mkdir -p ./config/network/cardano-db-sync
-mkdir -p ./config/network/cardano-db-sync
-mkdir -p ./config/network/cardano-node/genesis
-mkdir -p ./config/network/genesis
+echo "Update start time in genesis files"
+$SED -i -E "s/\"startTime\": [0-9]+/\"startTime\": ${timeUnix}/" ${ROOT}/genesis/byron/genesis.json
+$SED -i -E "s/\"systemStart\": \".*\"/\"systemStart\": \"${timeISO}\"/" ${ROOT}/genesis/shelley/genesis.json
 
-cp ./templates/babbage/db-sync-config.json ./config/network/cardano-db-sync/
-cp ./templates/babbage/node-config.json ./config/network/cardano-node/
-cp ./templates/babbage/topology.json ./config/network/cardano-node/
+byronGenesisHash=$(cardano-cli byron genesis print-genesis-hash --genesis-json ${ROOT}/genesis/byron/genesis.json)
+shelleyGenesisHash=$(cardano-cli genesis hash --genesis ${ROOT}/genesis/shelley/genesis.json)
+
+echo "Byron genesis hash: $byronGenesisHash"
+echo "Shelley genesis hash: $shelleyGenesisHash"
+
+$SED -i -E "s/ByronGenesisHash: \".*\"/ByronGenesisHash: \"${byronGenesisHash}\"/"  ${ROOT}/configuration.yaml
+$SED -i -E "s/ShelleyGenesisHash: \".*\"/ShelleyGenesisHash: \"${shelleyGenesisHash}\"/"  ${ROOT}/configuration.yaml
+
+# Create config folder
+rm -rf ./config/*
+mkdir -p ./config/network/cardano-db-sync/
+mkdir -p ./config/network/cardano-db-sync/
+mkdir -p ./config/network/cardano-node/genesis/
+mkdir -p ./config/network/genesis/
+
+cp ./templates/babbage/db-sync-config.json ./config/network/cardano-db-sync/config.json
+cp ${ROOT}/configuration.yaml ./config/network/cardano-node/config.json
+
+$SED -i ./config/network/cardano-node/config.json \
+     -e 's|ByronGenesisFile: genesis/byron/genesis.json|ByronGenesisFile: genesis/byron.json|' \
+     -e 's|ShelleyGenesisFile: genesis/shelley/genesis.json|ShelleyGenesisFile: genesis/shelley.json|' \
+     -e 's|AlonzoGenesisFile: genesis/shelley/genesis.alonzo.json|AlonzoGenesisFile: genesis/alonzo.json|'
+
+cp ./templates/babbage/topology.json ./config/network/cardano-node/topology.json
 
 cp "${ROOT}"/genesis/byron/genesis.json ./config/network/cardano-node/genesis/byron.json
 cp "${ROOT}"/genesis/byron/genesis.json ./config/network/genesis/byron.json
@@ -299,6 +328,7 @@ for NODE in ${SPO_NODES}; do
   echo "$ROOT/${NODE}.sh &" >> "${ROOT}/run/all.sh"
 done
 echo "" >> "${ROOT}/run/all.sh"
+echo "wait" >> "${ROOT}/run/all.sh"
 
 chmod a+x "${ROOT}/run/all.sh"
 
