@@ -15,7 +15,7 @@ import { DbSyncStakePoolProvider, HttpServer, HttpServerConfig, StakePoolHttpSer
 import { Pool } from 'pg';
 import { doServerRequest } from '../util';
 import { getPort } from 'get-port-please';
-import { stakePoolHttpProvider } from '@cardano-sdk/cardano-services-client';
+import { stakePoolHttpProvider } from '../../../cardano-services-client';
 import axios from 'axios';
 
 const UNSUPPORTED_MEDIA_STRING = 'Request failed with status code 415';

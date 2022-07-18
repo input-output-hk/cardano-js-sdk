@@ -8,11 +8,7 @@ import {
 } from './utils';
 import { Cardano, ProviderError, TxSubmitProvider } from '@cardano-sdk/core';
 import { RabbitMqTxSubmitProvider, TxSubmitWorker } from '../src';
-import {
-  createMockOgmiosServer,
-  listenPromise,
-  serverClosePromise
-} from '@cardano-sdk/ogmios/test/mocks/mockOgmiosServer';
+import { createMockOgmiosServer, listenPromise, serverClosePromise } from '../../ogmios/test/mocks/mockOgmiosServer';
 import { getRandomPort } from 'get-port-please';
 import { ogmiosTxSubmitProvider, urlToConnectionConfig } from '@cardano-sdk/ogmios';
 import http from 'http';

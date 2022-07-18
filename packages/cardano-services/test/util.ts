@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Ogmios } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
-import { createMockOgmiosServer } from '@cardano-sdk/ogmios/test/mocks/mockOgmiosServer';
+import { createMockOgmiosServer } from '../../ogmios/test/mocks/mockOgmiosServer';
 import { getRandomPort } from 'get-port-please';
 import axios, { AxiosRequestConfig } from 'axios';
 import waitOn from 'wait-on';

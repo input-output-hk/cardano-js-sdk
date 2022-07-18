@@ -16,18 +16,20 @@ WORKDIR /app
 COPY build build
 COPY packages packages
 COPY scripts scripts
+COPY .yarn .yarn
 COPY \
+  .yarnrc.yml \
   package.json \
   tsconfig.json \
   yarn.lock \
   /app/
 
 FROM nodejs-builder as cardano-services-builder
-RUN yarn --frozen-lockfile --non-interactive &&\
+RUN yarn --immutable --inline-builds &&\
   yarn build
 
 FROM nodejs-builder as cardano-services-production-deps
-RUN yarn --frozen-lockfile --non-interactive --production
+RUN yarn workspaces focus --all --production
 
 FROM ubuntu-nodejs as cardano-services
 COPY --from=cardano-services-production-deps /app/node_modules /app/node_modules
