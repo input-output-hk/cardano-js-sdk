@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable unicorn/consistent-function-scoping */
 import { AssetId } from '@cardano-sdk/util-dev';
-import { CSL, InvalidProtocolParametersError } from '@cardano-sdk/core';
+import { CSL, Cardano, InvalidProtocolParametersError } from '@cardano-sdk/core';
 import { DefaultSelectionConstraintsProps, defaultSelectionConstraints } from '../src/selectionConstraints';
 import { ProtocolParametersForInputSelection, SelectionSkeleton } from '../src/types';
 
@@ -64,8 +64,11 @@ describe('defaultSelectionConstraints', () => {
     const constraints = defaultSelectionConstraints({
       protocolParameters
     } as DefaultSelectionConstraintsProps);
-    const minCoinWithAssets = constraints.computeMinimumCoinQuantity(assets);
-    const minCoinWithoutAssets = constraints.computeMinimumCoinQuantity();
+    const address = Cardano.Address(
+      'addr_test1qqydn46r6mhge0kfpqmt36m6q43knzsd9ga32n96m89px3nuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qypp3m9'
+    );
+    const minCoinWithAssets = constraints.computeMinimumCoinQuantity({ address, value: { assets, coins: 0n } });
+    const minCoinWithoutAssets = constraints.computeMinimumCoinQuantity({ address, value: { coins: 0n } });
     expect(typeof minCoinWithAssets).toBe('bigint');
     expect(typeof minCoinWithoutAssets).toBe('bigint');
     expect(minCoinWithAssets).toBeGreaterThan(minCoinWithoutAssets);

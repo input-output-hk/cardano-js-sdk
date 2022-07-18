@@ -1,5 +1,5 @@
 import { Cardano } from '@cardano-sdk/core';
-import { SingleAddressWallet, setupWallet } from '@cardano-sdk/wallet';
+import { SingleAddressWallet, createWalletUtil, setupWallet } from '@cardano-sdk/wallet';
 import {
   assetProviderFactory,
   chainHistoryProviderFactory,
@@ -59,9 +59,11 @@ describe('SingleAddressWallet/metadata', () => {
         blob: new Map([[123n, '1234']])
       }
     };
+    const walletUtil = createWalletUtil(wallet);
+    const { minimumCoin } = await walletUtil.validateValue({ coins: 0n });
     const txInternals = await wallet.initializeTx({
       auxiliaryData,
-      outputs: new Set([{ address: ownAddress, value: { coins: 2_000_000n } }])
+      outputs: new Set([{ address: ownAddress, value: { coins: minimumCoin } }])
     });
     const outgoingTx = await wallet.finalizeTx(txInternals, auxiliaryData);
     await wallet.submitTx(outgoingTx);

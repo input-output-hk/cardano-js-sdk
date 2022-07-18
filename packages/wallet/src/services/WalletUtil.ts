@@ -33,10 +33,18 @@ export type WalletUtilContext = OutputValidatorContext & InputResolverContext;
 
 export interface OutputValidator {
   /**
+   * Assumes that value will be used with an output that has:
+   * - no datum
+   * - grouped address (Shelley era+)
+   *
    * @returns Validates that token bundle size is within limits and computes minimum coin quantity
    */
   validateValue(output: Cardano.Value): Promise<OutputValidation>;
   /**
+   * Assumes that values will be used with outputs that have:
+   * - no datum
+   * - grouped address (Shelley era+)
+   *
    * @returns For every value, validates that token bundle size is within limits and computes minimum coin quantity
    */
   validateValues(outputs: Iterable<Cardano.Value>): Promise<Map<Cardano.Value, OutputValidation>>;
@@ -60,7 +68,11 @@ export const createOutputValidator = ({ protocolParameters$ }: OutputValidatorCo
     protocolParameters?: ProtocolParametersRequiredByOutputValidator
   ): Promise<OutputValidation> => {
     const { coinsPerUtxoByte, maxValueSize } = protocolParameters || (await firstValueFrom(protocolParameters$));
-    const minimumCoin = BigInt(computeMinimumCoinQuantity(coinsPerUtxoByte)(value.assets));
+    const stubMaxSizeAddress = Cardano.Address(
+      'addr_test1qqydn46r6mhge0kfpqmt36m6q43knzsd9ga32n96m89px3nuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qypp3m9'
+    );
+    const stubTxOut: Cardano.TxOut = { address: stubMaxSizeAddress, value };
+    const minimumCoin = BigInt(computeMinimumCoinQuantity(coinsPerUtxoByte)(stubTxOut));
     return {
       coinMissing: BigIntMath.max([minimumCoin - value.coins, 0n])!,
       minimumCoin,
@@ -75,8 +87,18 @@ export const createOutputValidator = ({ protocolParameters$ }: OutputValidatorCo
     }
     return validations;
   };
-  const validateOutput = (output: Cardano.TxOut, protocolParameters?: ProtocolParametersRequiredByOutputValidator) =>
-    validateValue(output.value, protocolParameters);
+  const validateOutput = async (
+    output: Cardano.TxOut,
+    protocolParameters?: ProtocolParametersRequiredByOutputValidator
+  ) => {
+    const { coinsPerUtxoByte, maxValueSize } = protocolParameters || (await firstValueFrom(protocolParameters$));
+    const minimumCoin = BigInt(computeMinimumCoinQuantity(coinsPerUtxoByte)(output));
+    return {
+      coinMissing: BigIntMath.max([minimumCoin - output.value.coins, 0n])!,
+      minimumCoin,
+      tokenBundleSizeExceedsLimit: tokenBundleSizeExceedsLimit(maxValueSize)(output.value.assets)
+    };
+  };
 
   return {
     validateOutput,
