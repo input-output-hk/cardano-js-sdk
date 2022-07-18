@@ -57,18 +57,27 @@ echo "\." | tee -a $OUT_FILE;
 
 # Inputs require the source tx to be able to compute the amount
 # TODO: Check if this query can be improved as it's a copy from the one we use to query the data
-INPUT_TX_QUERY="
-  tx
-JOIN tx_in
-  ON tx_in.tx_in_id = tx.id
-JOIN tx_out as source_tx_out
+INPUT_OUTPUT_TX_QUERY="
+tx_in
+JOIN tx_out AS source_tx_out
   ON tx_in.tx_out_id = source_tx_out.tx_id
   AND tx_in.tx_out_index = source_tx_out.index
-JOIN tx as source_tx
-  ON source_tx_out.tx_id = source_tx.id
-WHERE
-  tx.id = ANY ($SELECT_TX_ID) AND
-  source_tx.id NOT IN ($SELECT_TX_ID)
+"
+
+INPUT_UTXO_QUERY="
+  $INPUT_OUTPUT_TX_QUERY
+  JOIN tx
+    ON source_tx_out.tx_id = tx.id
+  WHERE tx_in.tx_in_id = ANY $SELECT_TX_ID
+    AND tx.id NOT IN $SELECT_TX_ID
+"
+
+OUTPUT_SPENT_QUERY="
+  $INPUT_OUTPUT_TX_QUERY
+	JOIN tx
+	  ON tx_in.tx_in_id = tx.id
+	WHERE source_tx_out.tx_id = ANY $SELECT_TX_ID
+		AND tx.id NOT IN $SELECT_TX_ID
 "
 
 WITHDRAWAL_ADDRESSES_QUERY="
@@ -155,21 +164,31 @@ WHERE pool_update_id IN ($POOL_UPDATE_REGISTERED_TX_ID_QUERY)
 MA_TX_OUT_IDS_QUERY="SELECT ident FROM ma_tx_out WHERE tx_out_id IN ($TX_OUT_IDS_QUERY)"
 MA_TX_MINT_IDS_QUERY="SELECT ident FROM ma_tx_mint WHERE tx_id IN ($SELECT_TX_ID)"
 
-echo "-- Dumping transaction inputs references where spent outputs were defined" | tee -a $OUT_FILE;
+echo "-- Dumping transaction references for outputs used as inputs" | tee -a $OUT_FILE;
 echo 'COPY public.tx (id, hash, block_id, block_index, out_sum, fee, deposit, size, invalid_before, invalid_hereafter, valid_contract, script_size) FROM stdin WITH CSV;' | tee -a $OUT_FILE;
-psql -c "\copy (SELECT source_tx.* FROM $INPUT_TX_QUERY) to STDOUT WITH CSV" $DB | tee -a $OUT_FILE;
+psql -c "\copy (SELECT tx.* FROM $INPUT_UTXO_QUERY) to STDOUT WITH CSV" $DB | tee -a $OUT_FILE;
 echo "\." | tee -a $OUT_FILE;
 
 echo "ALTER TABLE public.tx_out DISABLE TRIGGER ALL;" | tee -a $OUT_FILE;
 
 echo "-- Dumping spent outputs" | tee -a $OUT_FILE;
 echo 'COPY public.tx_out (id, tx_id, index, address, address_raw, address_has_script, payment_cred, stake_address_id, value, data_hash, inline_datum_id, reference_script_id) FROM stdin WITH CSV;' | tee -a $OUT_FILE;
-psql -c "\copy (SELECT source_tx_out.* FROM $INPUT_TX_QUERY) to STDOUT WITH CSV" $DB | tee -a $OUT_FILE;
+psql -c "\copy (SELECT source_tx_out.* FROM $INPUT_UTXO_QUERY) to STDOUT WITH CSV" $DB | tee -a $OUT_FILE;
 echo "\." | tee -a $OUT_FILE;
 
 echo "-- Dumping transactions outputs" | tee -a $OUT_FILE;
 echo 'COPY public.tx_out (id, tx_id, index, address, address_raw, address_has_script, payment_cred, stake_address_id, value, data_hash, inline_datum_id, reference_script_id) FROM stdin WITH CSV;' | tee -a $OUT_FILE;
 psql -c "\copy (SELECT * from tx_out WHERE tx_id IN $SELECT_TX_ID) to STDOUT WITH CSV" $DB | tee -a $OUT_FILE;
+echo "\." | tee -a $OUT_FILE;
+
+echo "-- Dumping transaction references for inputs where outputs were spent" | tee -a $OUT_FILE;
+echo 'COPY public.tx (id, hash, block_id, block_index, out_sum, fee, deposit, size, invalid_before, invalid_hereafter, valid_contract, script_size) FROM stdin WITH CSV;' | tee -a $OUT_FILE;
+psql -c "\copy (SELECT tx.* FROM $OUTPUT_SPENT_QUERY) to STDOUT WITH CSV" $DB | tee -a $OUT_FILE;
+echo "\." | tee -a $OUT_FILE;
+
+echo "-- Dumping inputs for spent outputs" | tee -a $OUT_FILE;
+echo 'COPY public.tx_in (id, tx_in_id, tx_out_id, tx_out_index, redeemer_id) FROM stdin WITH CSV;' | tee -a $OUT_FILE;
+psql -c "\copy (SELECT tx_in.* FROM $OUTPUT_SPENT_QUERY) to STDOUT WITH CSV" $DB | tee -a $OUT_FILE;
 echo "\." | tee -a $OUT_FILE;
 
 echo "-- Dumping transactions withdrawals" | tee -a $OUT_FILE;

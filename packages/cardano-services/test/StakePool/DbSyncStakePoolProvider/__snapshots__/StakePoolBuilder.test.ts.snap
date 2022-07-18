@@ -817,7 +817,7 @@ Object {
 
 exports[`StakePoolBuilder getLastEpoch getLastEpoch 1`] = `205`;
 
-exports[`StakePoolBuilder getTotalAmountOfAda getTotalAmountOfAda 1`] = `"69154436740315746"`;
+exports[`StakePoolBuilder getTotalAmountOfAda getTotalAmountOfAda 1`] = `"42000004107749657"`;
 
 exports[`StakePoolBuilder queryPoolAPY pagination with limit 1`] = `
 Array [

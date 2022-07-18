@@ -112,24 +112,24 @@ describe('UtxoHttpService', () => {
       it('return UTxOs for a single address', async () => {
         const res = await utxoProvider.utxoByAddresses([
           Cardano.Address(
-            'addr_test1qretqkqqvc4dax3482tpjdazrfl8exey274m3mzch3dv8lu476aeq3kd8q8splpsswcfmv4y370e8r76rc8lnnhte49qqyjmtc'
+            'addr_test1qpcnmvyjmxmsm75f747u566gw7ewz4mesdw7yl278uf9r3f5l7d7dpx2ymfwlm3e56flupga8yamjr2kwdt7dw77ktyqqtx2r7'
           )
         ]);
         expect(res).toMatchSnapshot();
       });
       it('return UTxOs for multiple addresses', async () => {
         const addresses = [
-          'addr_test1qpcnmvyjmxmsm75f747u566gw7ewz4mesdw7yl278uf9r3f5l7d7dpx2ymfwlm3e56flupga8yamjr2kwdt7dw77ktyqqtx2r7',
-          'addr_test1qr4m502gr9hnaxac5mxjln22jwavf7pcjmh9sw7fujdvgvj9ef6afquphwg7tj4mmm548m3t50hxfyygjuu222kx96eshcathg',
-          'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
+          'addr_test1qp620qa3rqzd5fxj3hy4dughv7xx2dt9gu9de70jf8hagdcvmqt35f2psxv7ajj5jnh4ajlc752rert8f9msffxdl45qyjefw8',
+          'addr_test1qryz24mkq35j8s67fdrm44pe8na7n3tqkmyzy3sgnjq3d7szlx56h6fkjl8y3p73zpyce04eku9w943rcr6rgznp8cwq2axy9q',
+          'addr_test1qpcnmvyjmxmsm75f747u566gw7ewz4mesdw7yl278uf9r3f5l7d7dpx2ymfwlm3e56flupga8yamjr2kwdt7dw77ktyqqtx2r7'
         ];
         const res = await utxoProvider.utxoByAddresses(toCardanoAddresses(addresses));
         expect(res).toMatchSnapshot();
       });
       it('returns UTxOs containing multiple assets', async () => {
         const addresses = [
-          'addr_test1qrcj98ukemwfuwc72ad95yydnx83qch6s7plr8rg44nxv53fumt3ljeck26752eajzyavd8my3cp8cx3x2c538lx7h5swm4j4n',
-          'addr_test1qretqkqqvc4dax3482tpjdazrfl8exey274m3mzch3dv8lu476aeq3kd8q8splpsswcfmv4y370e8r76rc8lnnhte49qqyjmtc'
+          'addr_test1qp620qa3rqzd5fxj3hy4dughv7xx2dt9gu9de70jf8hagdcvmqt35f2psxv7ajj5jnh4ajlc752rert8f9msffxdl45qyjefw8',
+          'addr_test1qryz24mkq35j8s67fdrm44pe8na7n3tqkmyzy3sgnjq3d7szlx56h6fkjl8y3p73zpyce04eku9w943rcr6rgznp8cwq2axy9q'
         ];
         const res = await utxoProvider.utxoByAddresses(toCardanoAddresses(addresses));
         expect(res).toMatchSnapshot();
