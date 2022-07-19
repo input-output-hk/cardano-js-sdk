@@ -13,7 +13,10 @@
       "require": "./dist/cjs/index.js"
     }
   },
-  "repository": "https://github.com/input-output-hk/cardano-js-sdk/packages/cip2",
+  "repository": "https://github.com/input-output-hk/cardano-js-sdk",
+  "publishConfig": {
+    "access": "public"
+  },
   "contributors": [
     "Rhys Bartels-Waller <rhys.bartelswaller@iohk.io> (https://iohk.io)",
     "Martynas Kazlauskas <martynas.kazlauskas@iohk.io> (https://iohk.io)",

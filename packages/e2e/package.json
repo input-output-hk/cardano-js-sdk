@@ -1,6 +1,7 @@
 {
   "name": "@cardano-sdk/e2e",
   "version": "0.3.0",
+  "private": true,
   "description": "End to end tests for the cardano-js-sdk packages.",
   "main": "index.js",
   "scripts": {
@@ -36,10 +37,7 @@
     "test:debug": "DEBUG=true yarn test",
     "generate-mnemonics": "ts-node src/util/mnemonic.ts"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/input-output-hk/cardano-js-sdk/packages/e2e"
-  },
+  "repository": "https://github.com/input-output-hk/cardano-js-sdk",
   "contributors": [
     "Rhys Bartels-Waller <rhys.bartelswaller@iohk.io> (https://iohk.io)",
     "Martynas Kazlauskas <martynas.kazlauskas@iohk.io> (https://iohk.io)",

@@ -3,6 +3,7 @@ node_modules
 docs
 .env
 tsconfig.tsbuildinfo
+lerna-debug.log
 .yarn/*
 !.yarn/patches
 !.yarn/plugins
