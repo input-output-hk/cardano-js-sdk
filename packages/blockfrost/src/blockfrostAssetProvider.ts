@@ -6,22 +6,14 @@ import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
 import { blockfrostMetadataToTxMetadata, fetchSequentially, toProviderError } from './util';
 import omit from 'lodash/omit';
 
-const mapMetadata = (
-  onChain: Responses['asset']['onchain_metadata'],
-  offChain: Responses['asset']['metadata']
-): Asset.TokenMetadata | null => {
-  const metadata = { ...onChain, ...offChain };
+const mapMetadata = (offChain: Responses['asset']['metadata']): Asset.TokenMetadata | null => {
+  const metadata = { ...offChain };
   if (Object.values(metadata).every((value) => value === undefined || value === null)) return null;
   return {
-    ...replaceNullsWithUndefineds(omit(metadata, ['logo', 'image'])),
+    ...replaceNullsWithUndefineds(omit(metadata, ['logo'])),
     desc: metadata.description,
     // The other type option is any[] - not sure what it means, omitting if no string.
-    icon:
-      typeof metadata.logo === 'string'
-        ? metadata.logo
-        : typeof metadata.image === 'string'
-        ? metadata.image
-        : undefined
+    icon: typeof metadata.logo === 'string' ? metadata.logo : undefined
   };
 };
 
@@ -101,7 +93,7 @@ export const blockfrostAssetProvider = (blockfrost: BlockFrostAPI): AssetProvide
       nftMetadata: extraData?.nftMetadata ? await nftMetadata() : undefined,
       policyId,
       quantity,
-      tokenMetadata: extraData?.tokenMetadata ? mapMetadata(response.onchain_metadata, response.metadata) : undefined
+      tokenMetadata: extraData?.tokenMetadata ? mapMetadata(response.metadata) : undefined
     };
   };
 
