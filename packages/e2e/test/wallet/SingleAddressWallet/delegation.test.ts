@@ -1,19 +1,10 @@
 /* eslint-disable max-statements */
 import { Awaited } from '@cardano-sdk/util';
 import { Cardano } from '@cardano-sdk/core';
-import { ObservableWallet, SingleAddressWallet, StakeKeyStatus, Transaction, setupWallet } from '@cardano-sdk/wallet';
+import { ObservableWallet, StakeKeyStatus, Transaction } from '@cardano-sdk/wallet';
 import { TX_TIMEOUT, firstValueFromTimed, waitForWalletStateSettle } from '../util';
-import {
-  assetProviderFactory,
-  chainHistoryProviderFactory,
-  keyAgentById,
-  networkInfoProviderFactory,
-  rewardsProviderFactory,
-  stakePoolProviderFactory,
-  txSubmitProviderFactory,
-  utxoProviderFactory
-} from '../../../src/factories';
 import { env } from '../environment';
+import { getWallet } from '../../../src/factories';
 
 import { combineLatest, filter, firstValueFrom } from 'rxjs';
 
@@ -75,44 +66,14 @@ const waitForTx = async (wallet: ObservableWallet, { hash }: Transaction.TxInter
   await waitForWalletStateSettle(wallet);
 };
 
-const getWallet = async (idx: number) => {
-  const { wallet } = await setupWallet({
-    createKeyAgent: await keyAgentById(idx, env.KEY_MANAGEMENT_PROVIDER, env.KEY_MANAGEMENT_PARAMS),
-    createWallet: async (keyAgent) =>
-      new SingleAddressWallet(
-        { name: `Test Wallet ${idx}` },
-        {
-          assetProvider: await assetProviderFactory.create(env.ASSET_PROVIDER, env.ASSET_PROVIDER_PARAMS),
-          chainHistoryProvider: await chainHistoryProviderFactory.create(
-            env.CHAIN_HISTORY_PROVIDER,
-            env.CHAIN_HISTORY_PROVIDER_PARAMS
-          ),
-          keyAgent,
-          networkInfoProvider: await networkInfoProviderFactory.create(
-            env.NETWORK_INFO_PROVIDER,
-            env.NETWORK_INFO_PROVIDER_PARAMS
-          ),
-          rewardsProvider: await rewardsProviderFactory.create(env.REWARDS_PROVIDER, env.REWARDS_PROVIDER_PARAMS),
-          stakePoolProvider: await stakePoolProviderFactory.create(
-            env.STAKE_POOL_PROVIDER,
-            env.STAKE_POOL_PROVIDER_PARAMS
-          ),
-          txSubmitProvider: await txSubmitProviderFactory.create(env.TX_SUBMIT_PROVIDER, env.TX_SUBMIT_PROVIDER_PARAMS),
-          utxoProvider: await utxoProviderFactory.create(env.UTXO_PROVIDER, env.UTXO_PROVIDER_PARAMS)
-        }
-      )
-  });
-  return wallet;
-};
-
 describe('SingleAddressWallet/delegation', () => {
   let wallet1: ObservableWallet;
   let wallet2: ObservableWallet;
 
   beforeAll(async () => {
     jest.setTimeout(180_000);
-    wallet1 = await getWallet(0);
-    wallet2 = await getWallet(1);
+    wallet1 = await getWallet({ env, idx: 0, name: 'Test Wallet 1' });
+    wallet2 = await getWallet({ env, idx: 1, name: 'Test Wallet 2' });
 
     await Promise.all([waitForWalletStateSettle(wallet1), waitForWalletStateSettle(wallet2)]);
   });

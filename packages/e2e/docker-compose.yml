@@ -1,4 +1,4 @@
-version: "3.3"
+version: "3.9"
 
 services:
   local-testnet:
@@ -7,14 +7,8 @@ services:
     ports:
       - 3001:3001
     volumes:
-      - ${PWD}/local-network/sockets:/root/sockets
-      - ./local-network/config/network:/config/nodes # Mount the config so we can update the genesis files and hashes.
-    healthcheck:
-      # Verify that the node socket is up.
-      test: ["CMD-SHELL", "test - f /root/sockets/node-pool1.sock"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
+      - ./local-network/network-files/node-spo1/:/root/network-files/node-spo1
+      - ./local-network/config:/root/config
   postgres:
     image: postgres:${POSTGRES_VERSION:-11.5-alpine}
     environment:
@@ -30,19 +24,21 @@ services:
       - postgres_user
     shm_size: '2gb'
     restart: on-failure
+    depends_on:
+      cardano-node-ogmios:
+        condition: service_healthy
     healthcheck:
       # Use pg_isready to check postgres is running. Substitute different
       # user `postgres` if you've setup differently to config/pgpass-mainnet
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
     logging:
       driver: "json-file"
       options:
         max-size: "200k"
         max-file: "10"
-
   cardano-node-ogmios:
     image: cardanosolutions/cardano-node-ogmios:${CARDANO_NODE_OGMIOS_VERSION:-v5.5.2}
     logging:
@@ -54,9 +50,8 @@ services:
       - ${OGMIOS_PORT:-1337}:1337
     restart: on-failure
     depends_on:
-      - local-testnet
-    # Temporary hack to delay ogmions cardano node startup after the configuration files have been updated.
-    entrypoint: sh -c "sleep 10 && /root/cardano-node-ogmios.sh"
+      local-testnet:
+        condition: service_healthy
     volumes:
       - ./local-network/config/network:/config
       - node-db:/db
@@ -74,9 +69,8 @@ services:
       - RESTORE_SNAPSHOT=${RESTORE_SNAPSHOT:-}
       - RESTORE_RECREATE_DB=N
     depends_on:
-      - cardano-node-ogmios
-      - postgres
-      - local-testnet
+      cardano-node-ogmios:
+        condition: service_healthy
     secrets:
       - postgres_password
       - postgres_user
@@ -85,27 +79,100 @@ services:
       - ./local-network/config/network:/config
       - node-ipc:/node-ipc
     restart: on-failure
+    stop_signal: SIGINT
+    healthcheck:
+      retries: 200
     logging:
       driver: "json-file"
       options:
         max-size: "200k"
         max-file: "10"
   cardano-wallet:
-    image: inputoutput/cardano-wallet:2022.5.27
+    image: inputoutput/cardano-wallet:2022.7.1
     volumes:
       - wallet-db:/wallet-db
       - node-ipc:/ipc
       - ./local-network/config:/config
     ports:
       - 8090:8090
-    entrypoint: []                                                                            
+    entrypoint: []
     command: bash -c "sleep 10 && ([[ $$NETWORK == \"mainnet\" ]] && $$CMD --mainnet) || ($$CMD --testnet /config/network/genesis/byron.json)"
     environment:
       CMD: "cardano-wallet serve --node-socket /ipc/node.socket --database /wallet-db --listen-address 0.0.0.0"
       NETWORK:
     depends_on:
-      - cardano-node-ogmios
+      cardano-node-ogmios:
+        condition: service_healthy
     restart: on-failure
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+  rabbitmq:
+    image: rabbitmq:3.10-management
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 30s
+      retries: 200
+    ports:
+      # HTTP management UI
+      - '15672:15672'
+    restart: on-failure
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+    depends_on:
+      cardano-node-ogmios:
+        condition: service_healthy
+    volumes:
+      - rabbitmq-db:/var/lib/rabbitmq/mnesia
+  http-server:
+    build:
+      args:
+        - NETWORK=${NETWORK:-mainnet}
+      context: ../../
+      target: http-server
+    environment:
+      - DB_POLL_INTERVAL=${DB_POLL_INTERVAL:-10000}
+      - DB_QUERIES_CACHE_TTL=${DB_QUERIES_CACHE_TTL:-120}
+      - ENABLE_METRICS=${ENABLE_METRICS:-false}
+      - LOGGER_MIN_SEVERITY=${LOGGER_MIN_SEVERITY:-info}
+      - SERVICE_NAMES=${SERVICE_NAMES:-chain-history,network-info,rewards,stake-pool,tx-submit,utxo}
+      - USE_QUEUE=${USE_QUEUE:-false}
+    ports:
+      - ${API_PORT:-4000}:3000
+    restart: on-failure
+    depends_on:
+      cardano-node-ogmios:
+        condition: service_healthy
+    volumes:
+      - ./local-network/config/network:/config
+    secrets:
+      - postgres_db
+      - postgres_password
+      - postgres_user
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+  worker:
+    build:
+      context: ../../
+      target: worker
+    environment:
+      - LOGGER_MIN_SEVERITY=${LOGGER_MIN_SEVERITY:-info}
+      - PARALLEL=${PARALLEL:-false}
+      - PARALLEL_TX=${PARALLEL_TX:-3}
+      - POLLING_CYCLE=${POLLING_CYCLE:-500}
+    restart: on-failure
+    depends_on:
+      cardano-node-ogmios:
+        condition: service_healthy
     logging:
       driver: "json-file"
       options:
@@ -124,3 +191,4 @@ volumes:
   node-ipc:
   postgres-data:
   wallet-db:
+  rabbitmq-db:

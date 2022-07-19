@@ -20,10 +20,10 @@ module.exports = {
       }
     },
     {
-      displayName: 'faucet',
+      displayName: 'local-network',
       preset: 'ts-jest',
       setupFiles: ['dotenv/config'],
-      testMatch: ['<rootDir>/test/faucet/**/*.test.ts'],
+      testMatch: ['<rootDir>/test/local-network/**/*.test.ts'],
       transform: {
         '^.+\\.test.ts?$': 'ts-jest'
       }

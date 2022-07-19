@@ -4,8 +4,3 @@ db
 logs
 *.log
 sockets
-local-network/config/network/testnet/cardano-node/config.json
-local-network/config/network/testnet/cardano-node/genesis/byron.json
-local-network/config/network/testnet/cardano-node/genesis/shelley.json
-local-network/config/network/testnet/genesis/byron.json
-local-network/config/network/testnet/genesis/shelley.json

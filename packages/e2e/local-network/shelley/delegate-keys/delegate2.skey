@@ -1,5 +1,0 @@
-{
-    "type": "GenesisDelegateSigningKey_ed25519",
-    "description": "Genesis delegate operator key",
-    "cborHex": "5820e7099c2d90c9f0ce45305718210ceba49fbbfdcac70d3d7cd3931e7eb0897e6f"
-}
