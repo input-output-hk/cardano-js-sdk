@@ -61,7 +61,7 @@ CHAIN_HISTORY_PROVIDER=blockfrost
 
 > :information_source: Remember to get your Blockfrost API key at [blockfrost.io](https://blockfrost.io/) and set it in the configuration file, the API key displayed here is invalid and for demonstration purposes only.
 
-Then to run the blockforst test run:
+Then to run the Blockforst test run:
 
 ```bash
 $ yarn workspace @cardano-sdk/e2e test:blockfrost
@@ -116,7 +116,7 @@ To execute the test:
 $ yarn workspace @cardano-sdk/e2e test:cardano-services
 ```
 
-## Local Network Faucet
+## Local Network
 
 The end-to-end faucet test are meant to showcase the use of the local test network. The faucet end-to-end test shows how we can fund wallets with local test network tADA so we can run the end-to-end tests. For the faucet end-to-end test to run, we must first start our local test network environment as follows:
 
@@ -124,7 +124,7 @@ The end-to-end faucet test are meant to showcase the use of the local test netwo
 $ yarn workspace @cardano-sdk/e2e local-network:up
 ```
 
-:warning: Note that once you finish running the test, you should stop the enviroment with:
+:warning: Note that once you finish running the test, you should stop the environment with:
 
 ```bash
 $ yarn workspace @cardano-sdk/e2e local-network:down
@@ -138,16 +138,31 @@ For the faucet to work correctly, we must configure it with the mnemonic of the 
 LOGGER_MIN_SEVERITY=debug
 
 # Providers setup
-KEY_MANAGEMENT_PROVIDER=inMemory
-KEY_MANAGEMENT_PARAMS='{"accountIndex": 0, "networkId": 0, "password":"some_password","mnemonic":"run yarn workspace @cardano-sdk/e2e generate-mnemonics to generate your own"}'
 FAUCET_PROVIDER=cardano-wallet
 FAUCET_PROVIDER_PARAMS='{"url":"http://localhost:8090/v2","mnemonic":"fire method repair aware foot tray accuse brother popular olive find account sick rocket next"}'
+KEY_MANAGEMENT_PROVIDER=inMemory
+KEY_MANAGEMENT_PARAMS='{"accountIndex": 0, "networkId": 0, "password":"some_password","mnemonic":""}'
+ASSET_PROVIDER=stub
+CHAIN_HISTORY_PROVIDER=http
+CHAIN_HISTORY_PROVIDER_PARAMS='{"url":"http://localhost:4000/chain-history"}'
+NETWORK_INFO_PROVIDER=http
+NETWORK_INFO_PROVIDER_PARAMS='{"url":"http://localhost:4000/network-info"}'
+REWARDS_PROVIDER=http
+REWARDS_PROVIDER_PARAMS='{"url":"http://localhost:4000/rewards"}'
+TX_SUBMIT_PROVIDER=http
+TX_SUBMIT_PROVIDER_PARAMS='{"url":"http://localhost:4000/tx-submit"}'
+UTXO_PROVIDER=http
+UTXO_PROVIDER_PARAMS='{"url":"http://localhost:4000/utxo"}'
+STAKE_POOL_PROVIDER=stub
+STAKE_POOL_PROVIDER_PARAMS='{"url":"http://localhost:4000/stake-pool"}'
 ```
+
+> :information_source: Notice that KEY_MANAGEMENT_PARAMS *mnemonic* property is empty, if you leave this empty on the **local network's** e2e tests a new set of random mnemonics will be generated for you, this is the recommended way of setting up e2e tests on this network.
 
 Then to run the faucet tests, run:
 
 ```bash
-$ yarn workspace @cardano-sdk/e2e test:faucet
+$ yarn workspace @cardano-sdk/e2e test:local-network
 ```
 
 ## Wallet

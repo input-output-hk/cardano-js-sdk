@@ -21,7 +21,7 @@ import {
   blockfrostUtxoProvider
 } from '@cardano-sdk/blockfrost';
 import { CardanoWalletFaucetProvider, FaucetProvider } from './FaucetProvider';
-import { KeyManagement } from '@cardano-sdk/wallet';
+import { KeyManagement, SingleAddressWallet, setupWallet, storage } from '@cardano-sdk/wallet';
 import { LogLevel, createLogger } from 'bunyan';
 import { Logger } from 'ts-log';
 import {
@@ -44,7 +44,6 @@ const BLOCKFROST_MISSING_PROJECT_ID = 'Missing project id';
 const HTTP_PROVIDER = 'http';
 const OGMIOS_PROVIDER = 'ogmios';
 const STUB_PROVIDER = 'stub';
-const KEY_AGENT_MISSING_MNEMONIC = 'Missing mnemonic words';
 const KEY_AGENT_MISSING_PASSWORD = 'Missing wallet password';
 const KEY_AGENT_MISSING_NETWORK_ID = 'Missing network id';
 const KEY_AGENT_MISSING_ACCOUNT_INDEX = 'Missing account index';
@@ -239,9 +238,9 @@ stakePoolProviderFactory.register(HTTP_PROVIDER, async (params: any): Promise<St
 
 // Key Agents
 keyManagementFactory.register('inMemory', async (params: any): Promise<CreateKeyAgent> => {
-  const mnemonicWords = (params?.mnemonic || '').split(' ');
+  let mnemonicWords = (params?.mnemonic || '').split(' ');
 
-  if (mnemonicWords.length === 0) throw new Error(KEY_AGENT_MISSING_MNEMONIC);
+  if (mnemonicWords.length <= 1) mnemonicWords = KeyManagement.util.generateMnemonicWords();
 
   if (params.password === undefined) throw new Error(KEY_AGENT_MISSING_PASSWORD);
 
@@ -325,15 +324,51 @@ export const keyAgentById = memoize(async (accountIndex: number, provider: strin
 });
 
 /**
- * Utility function to create key agents.
+ * Create a single wallet instance given the environment variables.
  *
- * @param provider The provider.
- * @param params The provider parameters.
- * @returns a key agent.
+ * @param environment The environment variables.
+ * @param stores The wallet store.
+ * @param idx The id of the key agent.
  */
-export const getKeyAgent = memoize(async (provider: string, params: any) =>
-  keyManagementFactory.create(provider, params)
-);
+export const getWallet = async (environment: any, stores?: storage.WalletStores, idx = 0) => {
+  const { wallet } = await setupWallet({
+    createKeyAgent: await keyAgentById(idx, environment.KEY_MANAGEMENT_PROVIDER, environment.KEY_MANAGEMENT_PARAMS),
+    createWallet: async (keyAgent) =>
+      new SingleAddressWallet(
+        { name: 'Test Wallet' },
+        {
+          assetProvider: await assetProviderFactory.create(
+            environment.ASSET_PROVIDER,
+            environment.ASSET_PROVIDER_PARAMS
+          ),
+          chainHistoryProvider: await chainHistoryProviderFactory.create(
+            environment.CHAIN_HISTORY_PROVIDER,
+            environment.CHAIN_HISTORY_PROVIDER_PARAMS
+          ),
+          keyAgent,
+          networkInfoProvider: await networkInfoProviderFactory.create(
+            environment.NETWORK_INFO_PROVIDER,
+            environment.NETWORK_INFO_PROVIDER_PARAMS
+          ),
+          rewardsProvider: await rewardsProviderFactory.create(
+            environment.REWARDS_PROVIDER,
+            environment.REWARDS_PROVIDER_PARAMS
+          ),
+          stakePoolProvider: await stakePoolProviderFactory.create(
+            environment.STAKE_POOL_PROVIDER,
+            environment.STAKE_POOL_PROVIDER_PARAMS
+          ),
+          stores,
+          txSubmitProvider: await txSubmitProviderFactory.create(
+            environment.TX_SUBMIT_PROVIDER,
+            environment.TX_SUBMIT_PROVIDER_PARAMS
+          ),
+          utxoProvider: await utxoProviderFactory.create(environment.UTXO_PROVIDER, environment.UTXO_PROVIDER_PARAMS)
+        }
+      )
+  });
+  return wallet;
+};
 
 // Logger
 

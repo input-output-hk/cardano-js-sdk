@@ -5,3 +5,4 @@ docs
 tsconfig.tsbuildinfo
 .idea/codeStyles
 network-files/
+.yarn

@@ -5,8 +5,8 @@ import {
   TransactionWallet,
   WalletServer
 } from 'cardano-wallet-js';
+import { Cardano, HealthCheckResponse } from '@cardano-sdk/core';
 import { FaucetProvider, FaucetRequestResult, FaucetRequestTransactionStatus } from '../types';
-import { HealthCheckResponse } from '@cardano-sdk/core';
 import { Stopwatch } from 'ts-stopwatch';
 
 // Constnats
@@ -96,9 +96,9 @@ export class CardanoWalletFaucetProvider implements FaucetProvider {
 
     return {
       confirmations: transaction.depth?.quantity,
+      id: Cardano.TransactionId(transaction.id),
       status: this.mapStatus(transaction.status),
-      time: transaction.inserted_at?.time,
-      txId: transaction.id
+      time: transaction.inserted_at?.time
     };
   }
 

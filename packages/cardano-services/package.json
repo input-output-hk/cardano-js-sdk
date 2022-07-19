@@ -108,7 +108,8 @@
     "prom-client": "^14.0.1",
     "reflect-metadata": "~0.1.13",
     "ts-custom-error": "^3.2.0",
-    "ts-log": "^2.2.4"
+    "ts-log": "^2.2.4",
+    "ts-node": "^10.9.1"
   },
   "files": [
     "dist/*",

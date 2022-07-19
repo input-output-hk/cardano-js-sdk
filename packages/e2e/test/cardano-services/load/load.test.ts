@@ -2,20 +2,10 @@
 import * as envalid from 'envalid';
 import { Cardano } from '@cardano-sdk/core';
 import { ChildProcess, fork } from 'child_process';
-import { InitializeTxResult, ObservableWallet, SingleAddressWallet, setupWallet } from '@cardano-sdk/wallet';
+import { InitializeTxResult, ObservableWallet } from '@cardano-sdk/wallet';
 import { ServiceNames } from '@cardano-sdk/cardano-services';
-import {
-  assetProviderFactory,
-  chainHistoryProviderFactory,
-  getLogger,
-  keyAgentById,
-  networkInfoProviderFactory,
-  rewardsProviderFactory,
-  stakePoolProviderFactory,
-  txSubmitProviderFactory,
-  utxoProviderFactory
-} from '../../../src/factories';
 import { filter, firstValueFrom } from 'rxjs';
+import { getLogger, getWallet } from '../../../src/factories';
 import { removeRabbitMQContainer, setupRabbitMQContainer } from '../../../../rabbitmq/test/jest-setup/docker';
 import JSONBig from 'json-bigint';
 import path from 'path';
@@ -72,36 +62,6 @@ const commonArgs = [
   '--rabbitmq-url',
   env.RABBITMQ_URL
 ];
-
-const getWallet = async () => {
-  const { wallet } = await setupWallet({
-    createKeyAgent: await keyAgentById(0, env.KEY_MANAGEMENT_PROVIDER, env.KEY_MANAGEMENT_PARAMS),
-    createWallet: async (keyAgent) =>
-      new SingleAddressWallet(
-        { name: 'Test Wallet' },
-        {
-          assetProvider: await assetProviderFactory.create(env.ASSET_PROVIDER, env.ASSET_PROVIDER_PARAMS),
-          chainHistoryProvider: await chainHistoryProviderFactory.create(
-            env.CHAIN_HISTORY_PROVIDER,
-            env.CHAIN_HISTORY_PROVIDER_PARAMS
-          ),
-          keyAgent,
-          networkInfoProvider: await networkInfoProviderFactory.create(
-            env.NETWORK_INFO_PROVIDER,
-            env.NETWORK_INFO_PROVIDER_PARAMS
-          ),
-          rewardsProvider: await rewardsProviderFactory.create(env.REWARDS_PROVIDER, env.REWARDS_PROVIDER_PARAMS),
-          stakePoolProvider: await stakePoolProviderFactory.create(
-            env.STAKE_POOL_PROVIDER,
-            env.STAKE_POOL_PROVIDER_PARAMS
-          ),
-          txSubmitProvider: await txSubmitProviderFactory.create(env.TX_SUBMIT_PROVIDER, env.TX_SUBMIT_PROVIDER_PARAMS),
-          utxoProvider: await utxoProviderFactory.create(env.UTXO_PROVIDER, env.UTXO_PROVIDER_PARAMS)
-        }
-      )
-  });
-  return wallet;
-};
 
 const runCli = (args: string[], startedString: string) =>
   new Promise<ChildProcess>((resolve, reject) => {
@@ -178,7 +138,7 @@ describe('load', () => {
   let address: Cardano.Address;
 
   const prepareWallets = async () => {
-    wallet = await getWallet();
+    wallet = await getWallet(env);
     ({ address } = (await firstValueFrom(wallet.addresses$))[0]);
 
     logger.debug('Waiting to settle wallet status');
