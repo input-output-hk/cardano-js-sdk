@@ -8,7 +8,7 @@ import {
   PARALLEL_TXS_DEFAULT,
   POLLING_CYCLE_DEFAULT,
   RABBITMQ_URL_DEFAULT,
-  loadTxWorker
+  loadAndStartTxWorker
 } from './TxWorker';
 import { SERVICE_DISCOVERY_BACKOFF_FACTOR_DEFAULT, SERVICE_DISCOVERY_TIMEOUT_DEFAULT } from './Program';
 import { URL } from 'url';
@@ -36,7 +36,7 @@ void (async () => {
   const env = envalid.cleanEnv(process.env, envSpecs);
 
   try {
-    const worker = await loadTxWorker({
+    const worker = await loadAndStartTxWorker({
       options: {
         cacheTtl: env.CACHE_TTL,
         loggerMinSeverity: env.LOGGER_MIN_SEVERITY as LogLevel,
@@ -51,7 +51,6 @@ void (async () => {
         serviceDiscoveryTimeout: env.SERVICE_DISCOVERY_TIMEOUT
       }
     });
-    await worker.start();
     onDeath(async () => {
       await worker.stop();
       // eslint-disable-next-line unicorn/no-process-exit

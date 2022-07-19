@@ -12,13 +12,13 @@ import {
   getOgmiosTxSubmitProvider,
   getPool,
   getRabbitMqTxSubmitProvider,
-  loadTxWorker
+  loadAndStartTxWorker
 } from '../../src';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../src/InMemoryCache';
 import { Ogmios } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
+import { RunningTxSubmitWorker } from '../../src/TxWorker/utils';
 import { SrvRecord } from 'dns';
-import { TxSubmitWorker } from '@cardano-sdk/rabbitmq';
 import { createHealthyMockOgmiosServer, ogmiosServerReady } from '../util';
 import { createLogger } from 'bunyan';
 import { createMockOgmiosServer } from '../../../ogmios/test/mocks/mockOgmiosServer';
@@ -482,7 +482,7 @@ describe('Service dependency abstractions', () => {
     let mockServer: http.Server;
     let connection: Connection;
     let provider: TxSubmitProvider;
-    let txSubmitWorker: TxSubmitWorker;
+    let txSubmitWorker: RunningTxSubmitWorker;
     const ogmiosPortDefault = 1337;
     const rabbitmqPortDedault = 5672;
 
@@ -496,20 +496,17 @@ describe('Service dependency abstractions', () => {
       await listenPromise(mockServer, connection);
       await ogmiosServerReady(connection);
 
-      txSubmitWorker = await loadTxWorker(
-        {
-          options: {
-            cacheTtl: 10_000,
-            ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME,
-            parallel: true,
-            rabbitmqSrvServiceName: process.env.RABBITMQ_SRV_SERVICE_NAME,
-            serviceDiscoveryBackoffFactor: 1.1,
-            serviceDiscoveryTimeout: 1000
-          }
-        },
-        dummyLogger
-      );
-      await txSubmitWorker.start();
+      txSubmitWorker = await loadAndStartTxWorker({
+        options: {
+          cacheTtl: 10_000,
+          loggerMinSeverity: 'error',
+          ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME,
+          parallel: true,
+          rabbitmqSrvServiceName: process.env.RABBITMQ_SRV_SERVICE_NAME,
+          serviceDiscoveryBackoffFactor: 1.1,
+          serviceDiscoveryTimeout: 1000
+        }
+      });
     });
 
     afterEach(async () => {

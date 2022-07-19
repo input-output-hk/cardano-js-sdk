@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   BAD_CONNECTION_URL,
   GOOD_CONNECTION_URL,
@@ -6,8 +7,8 @@ import {
   testLogger,
   txsPromise
 } from './utils';
+import { CONNECTION_ERROR_EVENT, RabbitMqTxSubmitProvider, TxSubmitWorker } from '../src';
 import { Cardano, ProviderError, TxSubmitProvider } from '@cardano-sdk/core';
-import { RabbitMqTxSubmitProvider, TxSubmitWorker } from '../src';
 import { createMockOgmiosServer, listenPromise, serverClosePromise } from '../../ogmios/test/mocks/mockOgmiosServer';
 import { getRandomPort } from 'get-port-please';
 import { ogmiosTxSubmitProvider, urlToConnectionConfig } from '@cardano-sdk/ogmios';
@@ -78,6 +79,25 @@ describe('TxSubmitWorker', () => {
     worker = new TxSubmitWorker({ rabbitmqUrl: BAD_CONNECTION_URL }, { logger, txSubmitProvider });
 
     await expect(worker.start()).rejects.toBeInstanceOf(ProviderError);
+  });
+
+  it('emits event if unable to connect to the RabbitMQ broker', async () => {
+    expect.assertions(1);
+    mock = createMockOgmiosServer({
+      healthCheck: { response: { networkSynchronization: 1, success: true } },
+      submitTx: { response: { success: true } }
+    });
+
+    await listenPromise(mock, port);
+
+    worker = new TxSubmitWorker({ rabbitmqUrl: BAD_CONNECTION_URL }, { logger, txSubmitProvider });
+    const emitEventSpy = jest.spyOn(worker, 'emitEvent');
+
+    try {
+      await worker.start();
+    } catch (error: any) {
+      expect(emitEventSpy).toHaveBeenCalledWith(CONNECTION_ERROR_EVENT, error.innerError);
+    }
   });
 
   describe('error while tx submission', () => {
