@@ -9,7 +9,7 @@ import { FaucetProvider, FaucetRequestResult, FaucetRequestTransactionStatus } f
 import { HealthCheckResponse } from '@cardano-sdk/core';
 import { Stopwatch } from 'ts-stopwatch';
 
-// Constnats
+// Constants
 const FAUCET_PASSPHRASE = 'passphrase';
 const FAUCET_WALLET_NAME = 'faucet';
 const HTTP_ERROR_CODE_IN_CONFLICT = 409;
