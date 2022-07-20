@@ -53,6 +53,15 @@ describe('TrackedRewardsProvider', () => {
       };
 
     test(
+      'healthCheck',
+      testFunctionStats(
+        (rp) => rp.healthCheck(),
+        (stats) => stats.healthCheck$,
+        (mockRP) => mockRP.healthCheck
+      )
+    );
+
+    test(
       'rewards',
       testFunctionStats(
         (rp) => rp.rewardAccountBalance(rewardAccount),
