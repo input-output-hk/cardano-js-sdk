@@ -1,5 +1,5 @@
 import * as OpenApiValidator from 'express-openapi-validator';
-import { DbSyncChainHistoryProvider } from './DbSyncChainHistory/DbSyncChainHistoryProvider';
+import { ChainHistoryProvider } from '@cardano-sdk/core';
 import { HttpService } from '../Http';
 import { Logger, dummyLogger } from 'ts-log';
 import { ServiceNames } from '../Program';
@@ -9,7 +9,7 @@ import path from 'path';
 
 export interface ChainHistoryHttpServiceDependencies {
   logger?: Logger;
-  chainHistoryProvider: DbSyncChainHistoryProvider;
+  chainHistoryProvider: ChainHistoryProvider;
 }
 
 export class ChainHistoryHttpService extends HttpService {

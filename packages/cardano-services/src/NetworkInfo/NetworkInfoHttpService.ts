@@ -1,7 +1,7 @@
 import * as OpenApiValidator from 'express-openapi-validator';
-import { DbSyncNetworkInfoProvider } from './DbSyncNetworkInfoProvider';
 import { HttpService } from '../Http';
 import { Logger, dummyLogger } from 'ts-log';
+import { NetworkInfoProvider } from '@cardano-sdk/core';
 import { ServiceNames } from '../Program';
 import { providerHandler } from '../util';
 import express from 'express';
@@ -9,7 +9,7 @@ import path from 'path';
 
 export interface NetworkInfoServiceDependencies {
   logger?: Logger;
-  networkInfoProvider: DbSyncNetworkInfoProvider;
+  networkInfoProvider: NetworkInfoProvider;
 }
 
 export class NetworkInfoHttpService extends HttpService {
