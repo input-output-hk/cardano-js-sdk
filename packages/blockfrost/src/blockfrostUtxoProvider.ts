@@ -1,25 +1,15 @@
 import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
 import { BlockfrostToCore, BlockfrostUtxo } from './BlockfrostToCore';
-import { Cardano, ProviderError, ProviderFailure, UtxoProvider } from '@cardano-sdk/core';
-import { fetchByAddressSequentially } from './util';
+import { Cardano, UtxoProvider } from '@cardano-sdk/core';
+import { fetchByAddressSequentially, healthCheck } from './util';
 
 /**
  * Connect to the [Blockfrost service](https://docs.blockfrost.io/)
  *
  * @param {BlockFrostAPI} blockfrost BlockFrostAPI instance
  * @returns {UtxoProvider} UtxoProvider
- * @throws {ProviderError}
  */
 export const blockfrostUtxoProvider = (blockfrost: BlockFrostAPI): UtxoProvider => {
-  const healthCheck: UtxoProvider['healthCheck'] = async () => {
-    try {
-      const result = await blockfrost.health();
-      return { ok: result.is_healthy };
-    } catch (error) {
-      throw new ProviderError(ProviderFailure.Unknown, error);
-    }
-  };
-
   const utxoByAddresses: UtxoProvider['utxoByAddresses'] = async (addresses) => {
     const utxoResults = await Promise.all(
       addresses.map(async (address) =>
@@ -35,7 +25,7 @@ export const blockfrostUtxoProvider = (blockfrost: BlockFrostAPI): UtxoProvider 
   };
 
   return {
-    healthCheck,
+    healthCheck: healthCheck.bind(undefined, blockfrost),
     utxoByAddresses
   };
 };

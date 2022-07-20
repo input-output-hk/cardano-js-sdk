@@ -1,6 +1,6 @@
 import { BlockFrostAPI } from '@blockfrost/blockfrost-js';
-import { Cardano, EpochRange, EpochRewards, ProviderError, ProviderFailure, RewardsProvider } from '@cardano-sdk/core';
-import { formatBlockfrostError } from './util';
+import { Cardano, EpochRange, EpochRewards, RewardsProvider } from '@cardano-sdk/core';
+import { formatBlockfrostError, healthCheck } from './util';
 /**
  * Connect to the [Blockfrost service](https://docs.blockfrost.io/)
  *
@@ -9,15 +9,6 @@ import { formatBlockfrostError } from './util';
  * @throws {Cardano.TxSubmissionErrors.UnknownTxSubmissionError}
  */
 export const blockfrostRewardsProvider = (blockfrost: BlockFrostAPI): RewardsProvider => {
-  const healthCheck: RewardsProvider['healthCheck'] = async () => {
-    try {
-      const result = await blockfrost.health();
-      return { ok: result.is_healthy };
-    } catch (error) {
-      throw new ProviderError(ProviderFailure.Unknown, error);
-    }
-  };
-
   const rewardAccountBalance: RewardsProvider['rewardAccountBalance'] = async (
     rewardAccount: Cardano.RewardAccount
   ) => {
@@ -60,7 +51,7 @@ export const blockfrostRewardsProvider = (blockfrost: BlockFrostAPI): RewardsPro
   };
 
   return {
-    healthCheck,
+    healthCheck: healthCheck.bind(undefined, blockfrost),
     rewardAccountBalance,
     rewardsHistory
   };

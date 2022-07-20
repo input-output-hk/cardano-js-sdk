@@ -3,13 +3,16 @@ import { BehaviorSubject } from 'rxjs';
 import { CLEAN_FN_STATS, ProviderFnStats, ProviderTracker } from './ProviderTracker';
 
 export class AssetProviderStats {
+  readonly healthCheck$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
   readonly getAsset$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
 
   shutdown() {
+    this.healthCheck$.complete();
     this.getAsset$.complete();
   }
 
   reset() {
+    this.healthCheck$.next(CLEAN_FN_STATS);
     this.getAsset$.next(CLEAN_FN_STATS);
   }
 }
@@ -19,11 +22,14 @@ export class AssetProviderStats {
  */
 export class TrackedAssetProvider extends ProviderTracker implements AssetProvider {
   readonly stats = new AssetProviderStats();
+  readonly healthCheck: AssetProvider['healthCheck'];
   readonly getAsset: AssetProvider['getAsset'];
 
   constructor(assetProvider: AssetProvider) {
     super();
     assetProvider = assetProvider;
+
+    this.healthCheck = () => this.trackedCall(() => assetProvider.healthCheck(), this.stats.healthCheck$);
 
     this.getAsset = (assetId, extraData) =>
       this.trackedCall(() => assetProvider.getAsset(assetId, extraData), this.stats.getAsset$);

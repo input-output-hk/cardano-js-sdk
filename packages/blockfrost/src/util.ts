@@ -1,9 +1,12 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { Error as BlockfrostError } from '@blockfrost/blockfrost-js';
+import { BlockFrostAPI, Error as BlockfrostError } from '@blockfrost/blockfrost-js';
 import {
   Cardano,
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  HealthCheckResponse,
   InvalidStringError,
   NetworkInfoProvider,
+  Provider,
   ProviderError,
   ProviderFailure,
   ProviderUtil,
@@ -133,3 +136,19 @@ export const networkMagicToIdMap: { [key in number]: Cardano.NetworkId } = {
 };
 
 export const timeSettings: NetworkInfoProvider['timeSettings'] = async () => testnetTimeSettings;
+
+/**
+ * Check health of the [Blockfrost service](https://docs.blockfrost.io/)
+ *
+ * @param {BlockFrostAPI} blockfrost BlockFrostAPI instance
+ * @returns {HealthCheckResponse} HealthCheckResponse
+ * @throws {ProviderError}
+ */
+export const healthCheck = async (blockfrost: BlockFrostAPI): ReturnType<Provider['healthCheck']> => {
+  try {
+    const result = await blockfrost.health();
+    return { ok: result.is_healthy };
+  } catch (error) {
+    throw new ProviderError(ProviderFailure.Unknown, error);
+  }
+};

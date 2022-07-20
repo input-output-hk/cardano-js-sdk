@@ -92,6 +92,9 @@ class NullAssetProvider implements AssetProvider {
       } as Asset.AssetInfo)
     );
   }
+  healthCheck() {
+    return Promise.resolve({ ok: true });
+  }
 }
 
 assetProviderFactory.register(

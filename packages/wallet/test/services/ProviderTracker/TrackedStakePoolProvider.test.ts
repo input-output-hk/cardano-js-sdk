@@ -38,6 +38,14 @@ describe('TrackedStakePoolProvider', () => {
       };
 
     test(
+      'healthCheck',
+      testFunctionStats(
+        (provider) => provider.healthCheck(),
+        (stats) => stats.healthCheck$
+      )
+    );
+
+    test(
       'queryStakePools',
       testFunctionStats(
         (provider) => provider.queryStakePools({}),

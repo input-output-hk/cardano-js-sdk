@@ -42,6 +42,10 @@ export const createStubStakePoolProvider = (
   stakePools: Cardano.StakePool[] = somePartialStakePools,
   delayMs?: number
 ): StakePoolProvider => ({
+  healthCheck: async () => {
+    if (delayMs) await delay(delayMs);
+    return { ok: true };
+  },
   queryStakePools: async (options) => {
     if (delayMs) await delay(delayMs);
     const identifierFilters = options?.filters?.identifier;

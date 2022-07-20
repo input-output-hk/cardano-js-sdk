@@ -2,6 +2,7 @@ import { HttpProviderConfigPaths, createHttpProvider } from '../HttpProvider';
 import { StakePoolProvider } from '@cardano-sdk/core';
 
 export const defaultStakePoolProviderPaths: HttpProviderConfigPaths<StakePoolProvider> = {
+  healthCheck: '/health',
   queryStakePools: '/search',
   stakePoolStats: '/stats'
 };

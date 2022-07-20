@@ -2,7 +2,8 @@ import { AssetProvider } from '@cardano-sdk/core';
 import { HttpProviderConfigPaths, createHttpProvider } from '../HttpProvider';
 
 export const defaultAssetProviderPaths: HttpProviderConfigPaths<AssetProvider> = {
-  getAsset: '/get-asset'
+  getAsset: '/get-asset',
+  healthCheck: '/health'
 };
 
 /**
