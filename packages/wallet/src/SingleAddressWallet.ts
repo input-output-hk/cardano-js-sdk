@@ -51,12 +51,8 @@ import {
   groupedAddressesEquals
 } from './services';
 import { BehaviorObservable, TrackerSubject } from '@cardano-sdk/util-rxjs';
-import { Cip30DataSignature } from '@cardano-sdk/cip30';
-import { InputSelector, defaultSelectionConstraints, roundRobinRandomImprove } from '@cardano-sdk/cip2';
-import { Logger, dummyLogger } from 'ts-log';
-import { RetryBackoffConfig } from 'backoff-rxjs';
-import { Shutdown } from '@cardano-sdk/util';
 import {
+  BehaviorSubject,
   Subject,
   combineLatest,
   concat,
@@ -68,6 +64,11 @@ import {
   take,
   tap
 } from 'rxjs';
+import { Cip30DataSignature } from '@cardano-sdk/cip30';
+import { InputSelector, defaultSelectionConstraints, roundRobinRandomImprove } from '@cardano-sdk/cip2';
+import { Logger, dummyLogger } from 'ts-log';
+import { RetryBackoffConfig } from 'backoff-rxjs';
+import { Shutdown } from '@cardano-sdk/util';
 import { TrackedUtxoProvider } from './services/ProviderTracker/TrackedUtxoProvider';
 import { TxInternals, createTransactionInternals, ensureValidityInterval } from './Transaction';
 import { WalletStores, createInMemoryWalletStores } from './persistence';
@@ -104,6 +105,7 @@ export class SingleAddressWallet implements ObservableWallet {
     pending$: new Subject<Cardano.NewTxAlonzo>(),
     submitting$: new Subject<Cardano.NewTxAlonzo>()
   };
+
   readonly keyAgent: AsyncKeyAgent;
   readonly currentEpoch$: TrackerSubject<EpochInfo>;
   readonly txSubmitProvider: TrackedTxSubmitProvider;
@@ -213,21 +215,24 @@ export class SingleAddressWallet implements ObservableWallet {
       syncStatus: this.syncStatus
     });
     const tipBlockHeight$ = distinctBlock(this.tip$);
+
+    // Time settings
+    const timeSettingsTrigger = new BehaviorSubject<void>(void 0);
     this.timeSettings$ = new PersistentDocumentTrackerSubject(
-      // TODO: it only really needs to be fetched once per epoch,
-      // so we should replace the trigger from tipBlockHeight$ to epoch$.
-      // This is a little complicated since there is a circular dependency.
-      // Some logic is needed to initiate a fetch if epoch is not available in store already.
       coldObservableProvider({
         cancel$,
         equals: deepEquals,
         provider: this.networkInfoProvider.timeSettings,
         retryBackoffConfig,
-        trigger$: tipBlockHeight$
+        trigger$: timeSettingsTrigger
       }),
       stores.timeSettings
     );
+
+    // Epoch tracker triggers the first timeSettings fetch from timeSettingsTrigger
+    // Epoch changes also trigger refetch of timeSettings
     this.currentEpoch$ = currentEpochTracker(this.tip$, this.timeSettings$);
+    this.currentEpoch$.pipe(map(() => void 0)).subscribe(timeSettingsTrigger);
     const epoch$ = this.currentEpoch$.pipe(map((epoch) => epoch.epochNo));
 
     this.stake$ = new PersistentDocumentTrackerSubject(
