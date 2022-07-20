@@ -1,7 +1,7 @@
 import { BlockFrostAPI } from '@blockfrost/blockfrost-js';
 import { BlockfrostToCore } from './BlockfrostToCore';
 import { NetworkInfoProvider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
-import { networkMagicToIdMap, timeSettings } from './util';
+import { healthCheck, networkMagicToIdMap, timeSettings } from './util';
 
 /**
  * Connect to the [Blockfrost service](https://docs.blockfrost.io/)
@@ -61,5 +61,13 @@ export const blockfrostNetworkInfoProvider = (blockfrost: BlockFrostAPI): Networ
     };
   };
 
-  return { currentWalletProtocolParameters, genesisParameters, ledgerTip, lovelaceSupply, stake, timeSettings };
+  return {
+    currentWalletProtocolParameters,
+    genesisParameters,
+    healthCheck: healthCheck.bind(undefined, blockfrost),
+    ledgerTip,
+    lovelaceSupply,
+    stake,
+    timeSettings
+  };
 };

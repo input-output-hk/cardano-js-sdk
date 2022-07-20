@@ -3,6 +3,7 @@ import { CLEAN_FN_STATS, ProviderFnStats, ProviderTracker } from './ProviderTrac
 import { NetworkInfoProvider } from '@cardano-sdk/core';
 
 export class NetworkInfoProviderStats {
+  readonly healthCheck$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
   readonly stake$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
   readonly lovelaceSupply$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
   readonly timeSettings$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
@@ -11,6 +12,7 @@ export class NetworkInfoProviderStats {
   readonly ledgerTip$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
 
   shutdown() {
+    this.healthCheck$.complete();
     this.stake$.complete();
     this.lovelaceSupply$.complete();
     this.timeSettings$.complete();
@@ -20,6 +22,7 @@ export class NetworkInfoProviderStats {
   }
 
   reset() {
+    this.healthCheck$.next(CLEAN_FN_STATS);
     this.stake$.next(CLEAN_FN_STATS);
     this.lovelaceSupply$.next(CLEAN_FN_STATS);
     this.timeSettings$.next(CLEAN_FN_STATS);
@@ -34,6 +37,7 @@ export class NetworkInfoProviderStats {
  */
 export class TrackedNetworkInfoProvider extends ProviderTracker implements NetworkInfoProvider {
   readonly stats = new NetworkInfoProviderStats();
+  readonly healthCheck: NetworkInfoProvider['healthCheck'];
   readonly stake: NetworkInfoProvider['stake'];
   readonly lovelaceSupply: NetworkInfoProvider['lovelaceSupply'];
   readonly timeSettings: NetworkInfoProvider['timeSettings'];
@@ -45,6 +49,7 @@ export class TrackedNetworkInfoProvider extends ProviderTracker implements Netwo
     super();
     networkInfoProvider = networkInfoProvider;
 
+    this.healthCheck = () => this.trackedCall(() => networkInfoProvider.healthCheck(), this.stats.healthCheck$);
     this.stake = () => this.trackedCall(networkInfoProvider.stake, this.stats.stake$);
     this.lovelaceSupply = () => this.trackedCall(networkInfoProvider.lovelaceSupply, this.stats.lovelaceSupply$);
     this.timeSettings = () => this.trackedCall(networkInfoProvider.timeSettings, this.stats.timeSettings$);

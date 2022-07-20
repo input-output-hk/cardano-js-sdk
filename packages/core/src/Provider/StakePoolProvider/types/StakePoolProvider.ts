@@ -1,4 +1,4 @@
-import { Cardano } from '../../..';
+import { Cardano, Provider } from '../../..';
 import { SortFields } from '../util';
 
 type FilterCondition = 'and' | 'or';
@@ -65,7 +65,7 @@ export interface StakePoolStats {
   };
 }
 
-export interface StakePoolProvider {
+export interface StakePoolProvider extends Provider {
   /**
    * @param {StakePoolQueryOptions} options query options
    * @returns Stake pools

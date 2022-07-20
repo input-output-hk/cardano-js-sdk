@@ -7,7 +7,7 @@ import {
   ProviderError,
   ProviderFailure
 } from '@cardano-sdk/core';
-import { blockfrostMetadataToTxMetadata, fetchByAddressSequentially, formatBlockfrostError } from './util';
+import { blockfrostMetadataToTxMetadata, fetchByAddressSequentially, formatBlockfrostError, healthCheck } from './util';
 import { dummyLogger } from 'ts-log';
 import omit from 'lodash/omit';
 import orderBy from 'lodash/orderBy';
@@ -25,15 +25,6 @@ export const blockfrostChainHistoryProvider = (
   blockfrost: BlockFrostAPI,
   logger = dummyLogger
 ): ChainHistoryProvider => {
-  const healthCheck: ChainHistoryProvider['healthCheck'] = async () => {
-    try {
-      const result = await blockfrost.health();
-      return { ok: result.is_healthy };
-    } catch (error) {
-      throw new ProviderError(ProviderFailure.Unknown, error);
-    }
-  };
-
   const fetchRedeemers = async ({
     redeemer_count,
     hash
@@ -301,7 +292,7 @@ export const blockfrostChainHistoryProvider = (
 
   return {
     blocksByHashes,
-    healthCheck,
+    healthCheck: healthCheck.bind(undefined, blockfrost),
     transactionsByAddresses,
     transactionsByHashes
   };

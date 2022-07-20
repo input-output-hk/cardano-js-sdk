@@ -1,15 +1,15 @@
 import * as OpenApiValidator from 'express-openapi-validator';
-import { DbSyncStakePoolProvider } from './DbSyncStakePoolProvider';
 import { HttpService } from '../Http';
 import { Logger, dummyLogger } from 'ts-log';
 import { ServiceNames } from '../Program';
+import { StakePoolProvider } from '@cardano-sdk/core';
 import { providerHandler } from '../util';
 import express from 'express';
 import path from 'path';
 
 export interface StakePoolServiceDependencies {
   logger?: Logger;
-  stakePoolProvider: DbSyncStakePoolProvider;
+  stakePoolProvider: StakePoolProvider;
 }
 
 export class StakePoolHttpService extends HttpService {

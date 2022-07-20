@@ -46,6 +46,14 @@ describe('TrackedNetworkInfoProvider', () => {
     );
 
     test(
+      'healthCheck',
+      testFunctionStats(
+        (provider) => provider.healthCheck(),
+        (stats) => stats.healthCheck$
+      )
+    );
+
+    test(
       'lovelaceSupply',
       testFunctionStats(
         (provider) => provider.lovelaceSupply(),

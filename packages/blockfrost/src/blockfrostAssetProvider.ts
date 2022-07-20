@@ -3,7 +3,7 @@ import { Asset, AssetProvider, Cardano, ProviderUtil } from '@cardano-sdk/core';
 import { replaceNullsWithUndefineds } from '@cardano-sdk/util';
 
 import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
-import { blockfrostMetadataToTxMetadata, fetchSequentially, toProviderError } from './util';
+import { blockfrostMetadataToTxMetadata, fetchSequentially, healthCheck, toProviderError } from './util';
 import omit from 'lodash/omit';
 
 const mapMetadata = (
@@ -106,7 +106,8 @@ export const blockfrostAssetProvider = (blockfrost: BlockFrostAPI): AssetProvide
   };
 
   const providerFunctions: AssetProvider = {
-    getAsset
+    getAsset,
+    healthCheck: healthCheck.bind(undefined, blockfrost)
   };
 
   return ProviderUtil.withProviderErrors(providerFunctions, toProviderError);

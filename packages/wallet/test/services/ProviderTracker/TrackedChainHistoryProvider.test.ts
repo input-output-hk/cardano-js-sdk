@@ -66,6 +66,15 @@ describe('TrackedChainHistoryProvider', () => {
     );
 
     test(
+      'healthCheck',
+      testFunctionStats(
+        (provider) => provider.healthCheck(),
+        (stats) => stats.healthCheck$,
+        (mock) => mock.healthCheck
+      )
+    );
+
+    test(
       'transactionsByAddresses',
       testFunctionStats(
         (provider) => provider.transactionsByAddresses({ addresses: [] }),

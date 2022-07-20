@@ -30,9 +30,9 @@ export const mockNetworkInfoProvider2 = (delayMs: number) => {
   return {
     currentWalletProtocolParameters: delayedJestFn(protocolParameters2),
     genesisParameters: delayedJestFn(genesisParameters2),
+    healthCheck: delayedJestFn({ ok: true }),
     ledgerTip: delayedJestFn(ledgerTip2),
     lovelaceSupply: jest.fn().mockResolvedValue(networkInfo.lovelaceSupply),
-    networkInfo: jest.fn().mockResolvedValue(networkInfo),
     stake: jest.fn().mockResolvedValue(networkInfo.stake),
     timeSettings: jest.fn().mockResolvedValue(networkInfo.network.timeSettings)
   };

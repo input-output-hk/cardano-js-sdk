@@ -1,4 +1,4 @@
-import { Asset, Cardano } from '../..';
+import { Asset, Cardano, Provider } from '../..';
 
 interface AssetExtraData {
   nftMetadata?: boolean;
@@ -6,7 +6,7 @@ interface AssetExtraData {
   history?: boolean;
 }
 
-export interface AssetProvider {
+export interface AssetProvider extends Provider {
   /**
    * @param id asset ID (concatenated hex values of policyId + assetName)
    * @throws ProviderError

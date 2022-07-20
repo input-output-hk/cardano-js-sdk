@@ -53,5 +53,14 @@ describe('TrackedAssetProvider', () => {
         () => expect(assetProvider.getAsset).toBeCalledWith(assetId, extraData)
       )
     );
+
+    test(
+      'healthCheck',
+      testFunctionStats(
+        (provider) => provider.healthCheck(),
+        (stats) => stats.healthCheck$,
+        () => expect(assetProvider.healthCheck).toBeCalled()
+      )
+    );
   });
 });

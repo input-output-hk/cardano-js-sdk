@@ -1,15 +1,15 @@
 import * as OpenApiValidator from 'express-openapi-validator';
-import { DbSyncUtxoProvider } from './DbSyncUtxoProvider';
 import { HttpService } from '../Http';
 import { Logger, dummyLogger } from 'ts-log';
 import { ServiceNames } from '../Program';
+import { UtxoProvider } from '@cardano-sdk/core';
 import { providerHandler } from '../util';
 import express from 'express';
 import path from 'path';
 
 export interface UtxoServiceDependencies {
   logger?: Logger;
-  utxoProvider: DbSyncUtxoProvider;
+  utxoProvider: UtxoProvider;
 }
 
 export class UtxoHttpService extends HttpService {

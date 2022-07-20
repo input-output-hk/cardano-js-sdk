@@ -4,6 +4,7 @@ import { NetworkInfoProvider } from '@cardano-sdk/core';
 export const defaultNetworkInfoProviderPaths: HttpProviderConfigPaths<NetworkInfoProvider> = {
   currentWalletProtocolParameters: '/current-wallet-protocol-parameters',
   genesisParameters: '/genesis-parameters',
+  healthCheck: '/health',
   ledgerTip: '/ledger-tip',
   lovelaceSupply: '/lovelace-supply',
   stake: '/stake',
