@@ -10,7 +10,7 @@ import { Pool } from 'pg';
 import { createDbSyncMetadataService } from '../../src/Metadata';
 import { dummyLogger as logger } from 'ts-log';
 
-export const nonvalidAssetId = Cardano.AssetId('0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef');
+export const notValidAssetId = Cardano.AssetId('0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef');
 export const validAssetId = Cardano.AssetId(
   '50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65'
 );
@@ -38,7 +38,7 @@ describe('DbSyncAssetProvider', () => {
   });
 
   it('rejects for not found assetId', async () => {
-    await expect(provider.getAsset(nonvalidAssetId)).rejects.toThrow(ProviderError);
+    await expect(provider.getAsset(notValidAssetId)).rejects.toThrow(ProviderError);
   });
 
   it('returns an AssetInfo without extra data', async () => {

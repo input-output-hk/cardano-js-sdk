@@ -10,7 +10,7 @@ import { Pool } from 'pg';
  */
 export type DbSyncAssetProviderDependencies = {
   /**
-   * The db-sync database Pgpool
+   * The db-sync database PgPool
    */
   db: Pool;
 
@@ -26,7 +26,7 @@ export type DbSyncAssetProviderDependencies = {
   ntfMetadataService: NftMetadataService;
 
   /**
-   * The TokenMetadataService toretrieve Asset.TokenMetadata.
+   * The TokenMetadataService to retrieve Asset.TokenMetadata.
    */
   tokenMetadataService: TokenMetadataService;
 };

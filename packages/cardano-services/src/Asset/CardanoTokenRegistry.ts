@@ -139,7 +139,7 @@ export class CardanoTokenRegistry implements TokenMetadataService {
         }
       }
     } catch (error) {
-      throw toProviderError(error, 'while fetching metadata from token registriy');
+      throw toProviderError(error, 'while fetching metadata from token registry');
     }
 
     return tokenMetadata;
@@ -156,7 +156,7 @@ export class CardanoTokenRegistry implements TokenMetadataService {
       const cachedMetadata = this.#cache.getVal<Asset.TokenMetadata>(stringAssetId);
 
       if (cachedMetadata) {
-        this.#logger.debug(`Using chached asset metatada value for "${stringAssetId}"`);
+        this.#logger.debug(`Using cached asset metatada value for "${stringAssetId}"`);
         cachedTokenMetadata[i] = cachedMetadata;
       } else assetIdsToRequest.push(assetId);
     }

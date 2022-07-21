@@ -36,7 +36,7 @@ const mockTokenRegistry = async (handler: () => { body: unknown; code?: number }
 };
 
 describe('CardanoTokenRegistry', () => {
-  const nonvalidAssetId = Cardano.AssetId('0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef');
+  const invalidAssetId = Cardano.AssetId('0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef');
   const validAssetId = Cardano.AssetId('f43a62fdc3965df486de8a0d32fe800963589c41b38946602a0dc53541474958');
 
   describe('return value', () => {
@@ -44,8 +44,8 @@ describe('CardanoTokenRegistry', () => {
 
     afterAll(() => tokenRegistry.shutdown());
 
-    it('returns null for nonexisting AssetId', async () => {
-      expect(await tokenRegistry.getTokenMetadata([nonvalidAssetId])).toEqual([null]);
+    it('returns null for non-existent AssetId', async () => {
+      expect(await tokenRegistry.getTokenMetadata([invalidAssetId])).toEqual([null]);
     });
 
     it('returns metadata when subject exists', async () => {
@@ -69,8 +69,8 @@ describe('CardanoTokenRegistry', () => {
     });
 
     it('correctly returns null or metadata for request with good and bad assetIds', async () => {
-      const firstResult = await tokenRegistry.getTokenMetadata([nonvalidAssetId, validAssetId]);
-      const secondResult = await tokenRegistry.getTokenMetadata([validAssetId, nonvalidAssetId]);
+      const firstResult = await tokenRegistry.getTokenMetadata([invalidAssetId, validAssetId]);
+      const secondResult = await tokenRegistry.getTokenMetadata([validAssetId, invalidAssetId]);
 
       expect(firstResult[0]).toBeNull();
       expect(firstResult[1]).not.toBeNull();
@@ -150,9 +150,9 @@ describe('CardanoTokenRegistry', () => {
       ({ closeMock, metadataServerUri } = await mockTokenRegistry(record));
       const tokenRegistry = new CardanoTokenRegistry({ logger }, { metadataServerUri });
 
-      const result = await tokenRegistry.getTokenMetadata([nonvalidAssetId, validAssetId]);
+      const result = await tokenRegistry.getTokenMetadata([invalidAssetId, validAssetId]);
 
-      await expect(tokenRegistry.getTokenMetadata([nonvalidAssetId, validAssetId])).rejects.toThrow(ProviderError);
+      await expect(tokenRegistry.getTokenMetadata([invalidAssetId, validAssetId])).rejects.toThrow(ProviderError);
 
       expect(result[0]).toBeNull();
       expect(result[1]).toEqual({ name: 'test' });
