@@ -18,7 +18,7 @@ trap clean EXIT
 
 VERSION="1.35.0"
 LINUX_BUILD="16159630"
-MACOS_BUILD="16159630"
+MACOS_BUILD="17006848"
 
 rm -rf bin
 mkdir -p bin
