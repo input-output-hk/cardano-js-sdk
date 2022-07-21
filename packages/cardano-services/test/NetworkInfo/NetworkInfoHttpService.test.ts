@@ -17,6 +17,7 @@ import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../src/InMemoryCache';
 import { Pool } from 'pg';
 import { doServerRequest, ingestDbData, sleep, wrapWithTransaction } from '../util';
 import { getPort } from 'get-port-please';
+import { loadGenesisData } from '../../src/NetworkInfo/DbSyncNetworkInfoProvider/mappers';
 import { networkInfoHttpProvider } from '@cardano-sdk/cardano-services-client';
 import axios from 'axios';
 
@@ -320,11 +321,20 @@ describe('NetworkInfoHttpService', () => {
       });
 
       it('lovelaceSupply', async () => {
+        const { maxLovelaceSupply } = await loadGenesisData(cardanoNodeConfigPath);
         const response = await provider.lovelaceSupply();
-        expect(response.total).toBeGreaterThan(0);
-        expect(response.circulating).toBeGreaterThan(0);
-        // FIXME: fix circulating supply calculation
-        // expect(response.total).toBeGreaterThan(response.circulating);
+        expect(response.circulating).toBeGreaterThan(0n);
+        expect(response.total).toBeLessThan(maxLovelaceSupply);
+      });
+
+      // FIXME: When upstream bug is fixed. https://github.com/input-output-hk/cardano-db-sync/issues/942
+      //        Total supply is incorrect, so we can't assert it's larger than circulating
+      it.skip('lovelaceSupply (with better circulating supply assertion)', async () => {
+        const { maxLovelaceSupply } = await loadGenesisData(cardanoNodeConfigPath);
+        const response = await provider.lovelaceSupply();
+        // Replaces the weak assertion on line 326
+        expect(response.total).toBeGreaterThan(response.circulating);
+        expect(response.total).toBeLessThan(maxLovelaceSupply);
       });
 
       it('timeSettings', async () => {
