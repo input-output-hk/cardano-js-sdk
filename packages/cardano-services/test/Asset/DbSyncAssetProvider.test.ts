@@ -1,4 +1,4 @@
-import { Cardano, ProviderError } from '@cardano-sdk/core';
+import { Asset, Cardano, ProviderError } from '@cardano-sdk/core';
 import {
   CardanoTokenRegistry,
   DbSyncAssetProvider,
@@ -9,6 +9,7 @@ import {
 import { Pool } from 'pg';
 import { createDbSyncMetadataService } from '../../src/Metadata';
 import { dummyLogger as logger } from 'ts-log';
+import { mockTokenRegistry } from './CardanoTokenRegistry.test';
 
 export const notValidAssetId = Cardano.AssetId('0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef');
 export const validAssetId = Cardano.AssetId(
@@ -16,25 +17,29 @@ export const validAssetId = Cardano.AssetId(
 );
 
 describe('DbSyncAssetProvider', () => {
+  let closeMock: () => Promise<void> = jest.fn();
   let db: Pool;
   let ntfMetadataService: NftMetadataService;
   let provider: DbSyncAssetProvider;
+  let tokenMetadataServerUrl = '';
   let tokenMetadataService: TokenMetadataService;
 
-  beforeAll(() => {
+  beforeAll(async () => {
+    ({ closeMock, tokenMetadataServerUrl } = await mockTokenRegistry(() => ({})));
     db = new Pool({ connectionString: process.env.DB_CONNECTION_STRING });
     ntfMetadataService = new DbSyncNftMetadataService({
       db,
       logger,
       metadataService: createDbSyncMetadataService(db, logger)
     });
-    tokenMetadataService = new CardanoTokenRegistry({ logger });
+    tokenMetadataService = new CardanoTokenRegistry({ logger }, { tokenMetadataServerUrl });
     provider = new DbSyncAssetProvider({ db, logger, ntfMetadataService, tokenMetadataService });
   });
 
   afterAll(async () => {
     tokenMetadataService.shutdown();
     await db.end();
+    await closeMock();
   });
 
   it('rejects for not found assetId', async () => {
@@ -58,7 +63,18 @@ describe('DbSyncAssetProvider', () => {
     expect(asset.history).toEqual([
       { quantity: BigInt(1), transactionId: 'f66791a0354c43d8c5a93671eb96d94633e3419f3ccbb0a00c00a152d3b6ca06' }
     ]);
-    expect(asset.nftMetadata).not.toBeUndefined();
-    expect(asset.tokenMetadata).not.toBeUndefined();
+    expect(asset.nftMetadata).toStrictEqual({
+      description: ['This is my first NFT of the macaron cake'],
+      files: undefined,
+      image: [Asset.Uri('ipfs://QmcDAmZubQig7tGUgEwbWcgdvz4Aoa2EiRZyFoX3fXTVmr')],
+      mediaType: undefined,
+      name: 'macaron cake token',
+      otherProperties: new Map([['id', 1n]]),
+      version: '1.0'
+    });
+    expect(asset.tokenMetadata).toStrictEqual({
+      desc: 'This is my first NFT of the macaron cake',
+      name: 'macaron cake token'
+    });
   });
 });

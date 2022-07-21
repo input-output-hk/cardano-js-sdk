@@ -1,18 +1,55 @@
 import { Asset, Cardano, ProviderError } from '@cardano-sdk/core';
 import { CardanoTokenRegistry, toCoreTokenMetadata } from '../../src/Asset';
 import { InMemoryCache, Key } from '../../src/InMemoryCache';
-import { createServer } from 'http';
+import { IncomingMessage, createServer } from 'http';
 import { dummyLogger } from 'ts-log';
 import { getRandomPort } from 'get-port-please';
 import { testLogger } from '../../../rabbitmq/test/utils';
 
-const mockTokenRegistry = async (handler: () => { body: unknown; code?: number }) => {
+const mockResults: Record<string, unknown> = {
+  '50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65': {
+    description: { value: 'This is my first NFT of the macaron cake' },
+    name: { value: 'macaron cake token' },
+    subject: '50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65'
+  },
+  f43a62fdc3965df486de8a0d32fe800963589c41b38946602a0dc53541474958: {
+    decimals: { value: 8 },
+    description: { value: 'SingularityNET' },
+    logo: { value: 'testLogo' },
+    name: { value: 'SingularityNet AGIX Token' },
+    subject: 'f43a62fdc3965df486de8a0d32fe800963589c41b38946602a0dc53541474958',
+    ticker: { value: 'AGIX' },
+    url: { value: 'https://singularitynet.io/' }
+  }
+};
+
+export const mockTokenRegistry = async (
+  handler: (req?: IncomingMessage) => { body?: unknown; code?: number } = () => ({})
+) => {
   const port = await getRandomPort();
-  const server = createServer((_req, res) => {
-    const { body, code } = handler();
-    res.statusCode = code || 200;
+  const server = createServer(async (req, res) => {
+    const { body, code } = handler(req);
+
     res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify(body));
+
+    if (body) {
+      res.statusCode = code || 200;
+
+      return res.end(JSON.stringify(body));
+    }
+
+    const buffers: Buffer[] = [];
+    for await (const chunk of req) buffers.push(chunk);
+    const data = Buffer.concat(buffers).toString();
+    const subjects: unknown[] = [];
+
+    for (const subject of JSON.parse(data).subjects) {
+      const mockResult = mockResults[subject as string];
+
+      if (mockResult) subjects.push(mockResult);
+    }
+
+    return res.end(JSON.stringify({ subjects }));
   });
 
   let resolver: () => void = jest.fn();
@@ -74,9 +111,19 @@ describe('CardanoTokenRegistry', () => {
   });
 
   describe('return value', () => {
-    const tokenRegistry = new CardanoTokenRegistry({ logger: dummyLogger });
+    let closeMock: () => Promise<void> = jest.fn();
+    let tokenMetadataServerUrl = '';
+    let tokenRegistry = new CardanoTokenRegistry({ logger: dummyLogger });
 
-    afterAll(() => tokenRegistry.shutdown());
+    beforeAll(async () => {
+      ({ closeMock, tokenMetadataServerUrl } = await mockTokenRegistry(() => ({})));
+      tokenRegistry = new CardanoTokenRegistry({ logger: dummyLogger }, { tokenMetadataServerUrl });
+    });
+
+    afterAll(async () => {
+      tokenRegistry.shutdown();
+      await closeMock();
+    });
 
     it('returns null for non-existent AssetId', async () => {
       expect(await tokenRegistry.getTokenMetadata([invalidAssetId])).toEqual([null]);
@@ -87,19 +134,16 @@ describe('CardanoTokenRegistry', () => {
 
       expect(metadata).not.toBeNull();
 
-      const { icon, ...rest } = metadata!;
       const result: Asset.TokenMetadata = {
         decimals: 8,
-        // eslint-disable-next-line max-len
-        desc: "SingularityNET lets anyone - create, share, and monetize AI services at scale. SingularityNET is the world's first decentralized AI network",
+        desc: 'SingularityNET',
+        icon: 'testLogo',
         name: 'SingularityNet AGIX Token',
         ticker: 'AGIX',
         url: 'https://singularitynet.io/'
       };
 
-      // We do not check the entire icon value as it is a long long string
-      expect(icon).toBeDefined();
-      expect(rest).toEqual(result);
+      expect(metadata).toEqual(result);
     });
 
     it('correctly returns null or metadata for request with good and bad assetIds', async () => {
@@ -126,9 +170,22 @@ describe('CardanoTokenRegistry', () => {
       }
     }
 
-    const tokenRegistry = new CardanoTokenRegistry({ cache: new TestInMemoryCache(1), logger: dummyLogger });
+    let closeMock: () => Promise<void> = jest.fn();
+    let tokenMetadataServerUrl = '';
+    let tokenRegistry = new CardanoTokenRegistry({ logger: dummyLogger });
 
-    afterAll(() => tokenRegistry.shutdown());
+    beforeAll(async () => {
+      ({ closeMock, tokenMetadataServerUrl } = await mockTokenRegistry(() => ({})));
+      tokenRegistry = new CardanoTokenRegistry(
+        { cache: new TestInMemoryCache(1), logger: dummyLogger },
+        { tokenMetadataServerUrl }
+      );
+    });
+
+    afterAll(async () => {
+      tokenRegistry.shutdown();
+      await closeMock();
+    });
 
     it('metadata are cached', async () => {
       const [firstResult] = await tokenRegistry.getTokenMetadata([validAssetId]);
@@ -140,7 +197,7 @@ describe('CardanoTokenRegistry', () => {
     });
   });
 
-  describe('error cases are correctly logged', () => {
+  describe('error cases are correctly handled', () => {
     let closeMock: () => Promise<void> = jest.fn();
     let tokenMetadataServerUrl: string;
 
