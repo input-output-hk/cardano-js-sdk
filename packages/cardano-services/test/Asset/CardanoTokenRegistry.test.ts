@@ -1,5 +1,5 @@
 import { Asset, Cardano, ProviderError } from '@cardano-sdk/core';
-import { CardanoTokenRegistry } from '../../src/Asset';
+import { CardanoTokenRegistry, toCoreTokenMetadata } from '../../src/Asset';
 import { InMemoryCache, Key } from '../../src/InMemoryCache';
 import { createServer } from 'http';
 import { dummyLogger } from 'ts-log';
@@ -35,9 +35,43 @@ const mockTokenRegistry = async (handler: () => { body: unknown; code?: number }
   };
 };
 
+const testDescription = 'test description';
+const testName = 'test name';
+
 describe('CardanoTokenRegistry', () => {
   const invalidAssetId = Cardano.AssetId('0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef');
   const validAssetId = Cardano.AssetId('f43a62fdc3965df486de8a0d32fe800963589c41b38946602a0dc53541474958');
+
+  describe('toCoreTokenMetadata', () => {
+    it('complete attributes', () =>
+      expect(
+        toCoreTokenMetadata({
+          decimals: { value: 23 },
+          description: { value: testDescription },
+          logo: { value: 'test logo' },
+          name: { value: testName },
+          subject: 'test',
+          ticker: { value: 'test ticker' },
+          url: { value: 'test url' }
+        })
+      ).toStrictEqual({
+        decimals: 23,
+        desc: testDescription,
+        icon: 'test logo',
+        name: testName,
+        ticker: 'test ticker',
+        url: 'test url'
+      }));
+
+    it('incomplete attributes', () =>
+      expect(
+        toCoreTokenMetadata({
+          description: { value: testDescription },
+          name: { value: testName },
+          subject: 'test'
+        })
+      ).toStrictEqual({ desc: testDescription, name: testName }));
+  });
 
   describe('return value', () => {
     const tokenRegistry = new CardanoTokenRegistry({ logger: dummyLogger });
@@ -155,7 +189,7 @@ describe('CardanoTokenRegistry', () => {
       await expect(tokenRegistry.getTokenMetadata([invalidAssetId, validAssetId])).rejects.toThrow(ProviderError);
 
       expect(result[0]).toBeNull();
-      expect(result[1]).toEqual({ name: 'test' });
+      expect(result[1]).toStrictEqual({ name: 'test' });
     });
   });
 });

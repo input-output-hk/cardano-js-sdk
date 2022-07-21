@@ -25,6 +25,14 @@ interface TokenMetadataServiceRecord {
   url?: StringValue;
 }
 
+const propertiesToChange: Record<string, string> = { description: 'desc', logo: 'icon' };
+export const toCoreTokenMetadata = (record: TokenMetadataServiceRecord) =>
+  Object.fromEntries(
+    Object.entries(record)
+      .filter(([key]) => ['decimals', 'description', 'logo', 'name', 'ticker', 'url'].includes(key))
+      .map(([key, value]) => [propertiesToChange[key] || key, value.value])
+  ) as Asset.TokenMetadata;
+
 const toProviderError = (error: unknown, details: string) => {
   if (error instanceof ProviderError) return error;
 
@@ -125,7 +133,7 @@ export class CardanoTokenRegistry implements TokenMetadataService {
 
           if (subject) {
             const assetId = Cardano.AssetId(subject);
-            const metadata = this.parseTokenMetadataServiceRecord(record);
+            const metadata = toCoreTokenMetadata(record);
 
             tokenMetadata[assetIds.indexOf(assetId)] = metadata;
             this.#cache.set(assetId.toString(), metadata);
@@ -163,19 +171,5 @@ export class CardanoTokenRegistry implements TokenMetadataService {
     }
 
     return [assetIdsToRequest, cachedTokenMetadata] as const;
-  }
-
-  private parseTokenMetadataServiceRecord(record: TokenMetadataServiceRecord) {
-    const { decimals, description, logo, name, ticker, url } = record;
-    const metadata: Asset.TokenMetadata = {};
-
-    metadata.decimals = decimals?.value;
-    metadata.desc = description?.value;
-    metadata.icon = logo?.value;
-    metadata.name = name?.value;
-    metadata.ticker = ticker?.value;
-    metadata.url = url?.value;
-
-    return metadata;
   }
 }
