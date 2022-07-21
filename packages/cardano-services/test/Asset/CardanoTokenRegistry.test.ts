@@ -31,7 +31,7 @@ const mockTokenRegistry = async (handler: () => { body: unknown; code?: number }
       server.close((error) => (error ? rejecter(error) : resolver()));
       return closePromise;
     },
-    metadataServerUri: `http://localhost:${port}`
+    tokenMetadataServerUrl: `http://localhost:${port}`
   };
 };
 
@@ -108,7 +108,7 @@ describe('CardanoTokenRegistry', () => {
 
   describe('error cases are correctly logged', () => {
     let closeMock: () => Promise<void> = jest.fn();
-    let metadataServerUri: string;
+    let tokenMetadataServerUrl: string;
 
     beforeEach(() => (closeMock = jest.fn()));
 
@@ -116,8 +116,8 @@ describe('CardanoTokenRegistry', () => {
 
     it('null record', async () => {
       const logger = testLogger();
-      ({ closeMock, metadataServerUri } = await mockTokenRegistry(() => ({ body: { subjects: [null] } })));
-      const tokenRegistry = new CardanoTokenRegistry({ logger }, { metadataServerUri });
+      ({ closeMock, tokenMetadataServerUrl } = await mockTokenRegistry(() => ({ body: { subjects: [null] } })));
+      const tokenRegistry = new CardanoTokenRegistry({ logger }, { tokenMetadataServerUrl });
 
       await expect(tokenRegistry.getTokenMetadata([validAssetId])).rejects.toThrow(ProviderError);
     });
@@ -125,8 +125,8 @@ describe('CardanoTokenRegistry', () => {
     it('record without the subject property', async () => {
       const logger = testLogger();
       const record = { test: 'test' };
-      ({ closeMock, metadataServerUri } = await mockTokenRegistry(() => ({ body: { subjects: [record] } })));
-      const tokenRegistry = new CardanoTokenRegistry({ logger }, { metadataServerUri });
+      ({ closeMock, tokenMetadataServerUrl } = await mockTokenRegistry(() => ({ body: { subjects: [record] } })));
+      const tokenRegistry = new CardanoTokenRegistry({ logger }, { tokenMetadataServerUrl });
 
       await expect(tokenRegistry.getTokenMetadata([validAssetId])).rejects.toThrow(ProviderError);
     });
@@ -147,8 +147,8 @@ describe('CardanoTokenRegistry', () => {
         };
       };
       const logger = testLogger();
-      ({ closeMock, metadataServerUri } = await mockTokenRegistry(record));
-      const tokenRegistry = new CardanoTokenRegistry({ logger }, { metadataServerUri });
+      ({ closeMock, tokenMetadataServerUrl } = await mockTokenRegistry(record));
+      const tokenRegistry = new CardanoTokenRegistry({ logger }, { tokenMetadataServerUrl });
 
       const result = await tokenRegistry.getTokenMetadata([invalidAssetId, validAssetId]);
 

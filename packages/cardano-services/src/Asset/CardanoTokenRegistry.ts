@@ -4,7 +4,8 @@ import { Logger } from 'ts-log';
 import { TokenMetadataService } from './types';
 import axios, { AxiosInstance } from 'axios';
 
-const DEFAULT_METADATA_SERVER_URI = 'https://tokens.cardano.org';
+export const DEFAULT_TOKEN_METADATA_CACHE_TTL = 600;
+export const DEFAULT_TOKEN_METADATA_SERVER_URL = 'https://tokens.cardano.org';
 
 interface NumberValue {
   value?: number;
@@ -39,17 +40,17 @@ export interface CardanoTokenRegistryConfiguration {
   /**
    * The cache TTL in seconds. Default: 10 minutes.
    */
-  cacheTTL?: number;
+  tokenMetadataCacheTTL?: number;
 
   /**
    * The Cardano Token Registry public API base URL. Default: https://tokens.cardano.org
    */
-  metadataServerUri?: string;
+  tokenMetadataServerUrl?: string;
 }
 
 interface CardanoTokenRegistryConfigurationWithRequired extends CardanoTokenRegistryConfiguration {
-  cacheTTL: number;
-  metadataServerUri: string;
+  tokenMetadataCacheTTL: number;
+  tokenMetadataServerUrl: string;
 }
 
 /**
@@ -88,13 +89,13 @@ export class CardanoTokenRegistry implements TokenMetadataService {
 
   constructor({ cache, logger }: CardanoTokenRegistryDependencies, config: CardanoTokenRegistryConfiguration = {}) {
     const defaultConfig: CardanoTokenRegistryConfigurationWithRequired = {
-      cacheTTL: 600,
-      metadataServerUri: DEFAULT_METADATA_SERVER_URI,
+      tokenMetadataCacheTTL: DEFAULT_TOKEN_METADATA_CACHE_TTL,
+      tokenMetadataServerUrl: DEFAULT_TOKEN_METADATA_SERVER_URL,
       ...config
     };
 
-    this.#cache = cache || new InMemoryCache(defaultConfig.cacheTTL);
-    this.#axiosClient = axios.create({ baseURL: defaultConfig.metadataServerUri });
+    this.#cache = cache || new InMemoryCache(defaultConfig.tokenMetadataCacheTTL);
+    this.#axiosClient = axios.create({ baseURL: defaultConfig.tokenMetadataServerUrl });
     this.#logger = logger;
   }
 
