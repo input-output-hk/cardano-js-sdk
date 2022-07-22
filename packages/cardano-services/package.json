@@ -34,7 +34,7 @@
   ],
   "license": "Apache-2.0",
   "scripts": {
-    "build:cjs": "tsc --build src",
+    "build:cjs": "tsc --build src && shx chmod +x ./dist/cjs/cli.js ./dist/cjs/run.js ./dist/cjs/startWorker.js",
     "build:copy-assets": "bash ./copy-assets.sh",
     "build": "run-s build:cjs build:copy-assets",
     "cleanup:dist": "shx rm -rf dist",
