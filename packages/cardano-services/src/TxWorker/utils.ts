@@ -5,7 +5,7 @@ import { CONNECTION_ERROR_EVENT, TxSubmitWorker } from '@cardano-sdk/rabbitmq';
 import { CommonOptionDescriptions } from '../ProgramsCommon';
 import { DnsResolver, MissingProgramOption, ServiceNames, srvRecordToRabbitmqURL } from '../Program';
 import { Logger } from 'ts-log';
-import { TxSubmitProvider } from '@cardano-sdk/core';
+import { ProviderError, ProviderFailure, TxSubmitProvider } from '@cardano-sdk/core';
 import { TxWorkerOptions } from './loadTxWorker';
 
 type WorkerFactory = () => Promise<TxSubmitWorker>;
@@ -13,7 +13,7 @@ type WorkerFactory = () => Promise<TxSubmitWorker>;
 /**
  * Create a worker factory with service discovery
  *
- * @param {DnsResolver} dnsResolver used for dns resoluton
+ * @param {DnsResolver} dnsResolver used for DNS resolution
  * @param {TxSubmitProvider} txSubmitProvider tx submit provider 'ogmiosTxSubmitProvider'
  * @param {Logger} logger common logger
  * @param {TxWorkerOptions} options needed for tx worker initialization
@@ -76,6 +76,16 @@ export const startTxSubmitWorkerWithDiscovery = async (
   };
 };
 
+/**
+ * Create and return a running worker instance with static service config or service discovery
+ *
+ * @param {DnsResolver} dnsResolver used for DNS resolution
+ * @param {TxSubmitProvider} txSubmitProvider tx submit provider 'ogmiosTxSubmitProvider'
+ * @param {Logger} logger common logger
+ * @param {TxWorkerOptions} options needed for tx worker initialization
+ * @returns {RunningTxSubmitWorker} RunningTxSubmitWorker instance
+ * @throws {MissingProgramOption} error if neither URL nor service name is provided
+ */
 export const getRunningTxSubmitWorker = async (
   dnsResolver: DnsResolver,
   txSubmitProvider: TxSubmitProvider,
@@ -88,6 +98,10 @@ export const getRunningTxSubmitWorker = async (
     );
   if (options?.rabbitmqUrl) {
     const worker = new TxSubmitWorker({ ...options, rabbitmqUrl: options.rabbitmqUrl }, { logger, txSubmitProvider });
+    worker.on(CONNECTION_ERROR_EVENT, (error) => {
+      logger.error(`Worker received a connection error event, terminating the process caused by: ${error}`);
+      throw new ProviderError(ProviderFailure.ConnectionFailure, error);
+    });
     await worker.start();
     return worker;
   }

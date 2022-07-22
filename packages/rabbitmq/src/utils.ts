@@ -63,5 +63,3 @@ export const waitForPending = async (channel: unknown) => {
 };
 
 export const CONNECTION_ERROR_EVENT = 'connection-error';
-
-export const isConnectionError = (error: any) => ['ENOTFOUND', 'ECONNREFUSED', 'ECONNRESET'].includes(error.code);
