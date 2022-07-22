@@ -1,5 +1,6 @@
 /* eslint-disable complexity */
 /* eslint-disable sonarjs/cognitive-complexity */
+import { AssetHttpService, CardanoTokenRegistry, DbSyncAssetProvider, DbSyncNftMetadataService } from '../Asset';
 import { ChainHistoryHttpService, DbSyncChainHistoryProvider } from '../ChainHistory';
 import { CommonProgramOptions } from '../ProgramsCommon';
 import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../NetworkInfo';
@@ -28,6 +29,8 @@ export interface HttpServerOptions extends CommonProgramOptions {
   dbConnectionString?: string;
   epochPollInterval: number;
   cardanoNodeConfigPath?: string;
+  tokenMetadataCacheTTL?: number;
+  tokenMetadataServerUrl?: string;
   metricsEnabled?: boolean;
   useQueue?: boolean;
   postgresSrvServiceName?: string;
@@ -39,6 +42,7 @@ export interface HttpServerOptions extends CommonProgramOptions {
 export interface ProgramArgs {
   apiUrl: URL;
   serviceNames: (
+    | ServiceNames.Asset
     | ServiceNames.StakePool
     | ServiceNames.TxSubmit
     | ServiceNames.ChainHistory
@@ -58,77 +62,73 @@ const serviceMapFactory = (
   logger: Logger,
   cache: InMemoryCache,
   dnsResolver: DnsResolver,
-  db?: pg.Pool
-) => ({
-  [ServiceNames.StakePool]: () => {
-    if (!db)
-      throw new MissingProgramOption(ServiceNames.StakePool, [
-        ProgramOptionDescriptions.DbConnection,
-        ProgramOptionDescriptions.PostgresSrvArgs
-      ]);
+  dbConnection?: pg.Pool
+) => {
+  const withDb =
+    <T>(factory: (db: pg.Pool) => T) =>
+    () => {
+      if (!dbConnection)
+        throw new MissingProgramOption(ServiceNames.StakePool, [
+          ProgramOptionDescriptions.DbConnection,
+          ProgramOptionDescriptions.PostgresSrvArgs
+        ]);
 
-    return new StakePoolHttpService({ logger, stakePoolProvider: new DbSyncStakePoolProvider(db, logger) });
-  },
-  [ServiceNames.Utxo]: () => {
-    if (!db)
-      throw new MissingProgramOption(ServiceNames.Utxo, [
-        ProgramOptionDescriptions.DbConnection,
-        ProgramOptionDescriptions.PostgresSrvArgs
-      ]);
+      return factory(dbConnection);
+    };
 
-    return new UtxoHttpService({ logger, utxoProvider: new DbSyncUtxoProvider(db, logger) });
-  },
-  [ServiceNames.ChainHistory]: () => {
-    if (!db)
-      throw new MissingProgramOption(ServiceNames.ChainHistory, [
-        ProgramOptionDescriptions.DbConnection,
-        ProgramOptionDescriptions.PostgresSrvArgs
-      ]);
+  return {
+    [ServiceNames.Asset]: withDb((db) => {
+      const ntfMetadataService = new DbSyncNftMetadataService({
+        db,
+        logger,
+        metadataService: createDbSyncMetadataService(db, logger)
+      });
+      const tokenMetadataService = new CardanoTokenRegistry({ logger }, args.options);
+      const assetProvider = new DbSyncAssetProvider({ db, logger, ntfMetadataService, tokenMetadataService });
 
-    const metadataService = createDbSyncMetadataService(db, logger);
-    return new ChainHistoryHttpService({
-      chainHistoryProvider: new DbSyncChainHistoryProvider(db, metadataService, logger),
-      logger
-    });
-  },
-  [ServiceNames.Rewards]: () => {
-    if (!db)
-      throw new MissingProgramOption(ServiceNames.Rewards, [
-        ProgramOptionDescriptions.DbConnection,
-        ProgramOptionDescriptions.PostgresSrvArgs
-      ]);
+      return new AssetHttpService({ assetProvider, logger });
+    }),
+    [ServiceNames.StakePool]: withDb(
+      (db) => new StakePoolHttpService({ logger, stakePoolProvider: new DbSyncStakePoolProvider(db, logger) })
+    ),
+    [ServiceNames.Utxo]: withDb(
+      (db) => new UtxoHttpService({ logger, utxoProvider: new DbSyncUtxoProvider(db, logger) })
+    ),
+    [ServiceNames.ChainHistory]: withDb(
+      (db) =>
+        new ChainHistoryHttpService({
+          chainHistoryProvider: new DbSyncChainHistoryProvider(db, createDbSyncMetadataService(db, logger), logger),
+          logger
+        })
+    ),
+    [ServiceNames.Rewards]: withDb(
+      (db) => new RewardsHttpService({ logger, rewardsProvider: new DbSyncRewardsProvider(db, logger) })
+    ),
+    [ServiceNames.NetworkInfo]: withDb((db) => {
+      if (args.options?.cardanoNodeConfigPath === undefined)
+        throw new MissingProgramOption(ServiceNames.NetworkInfo, ProgramOptionDescriptions.CardanoNodeConfigPath);
+      if (args.options?.ogmiosUrl === undefined)
+        throw new MissingProgramOption(ServiceNames.NetworkInfo, ProgramOptionDescriptions.OgmiosUrl);
 
-    return new RewardsHttpService({ logger, rewardsProvider: new DbSyncRewardsProvider(db, logger) });
-  },
-  [ServiceNames.NetworkInfo]: () => {
-    if (!db)
-      throw new MissingProgramOption(ServiceNames.NetworkInfo, [
-        ProgramOptionDescriptions.DbConnection,
-        ProgramOptionDescriptions.PostgresSrvArgs
-      ]);
-    if (args.options?.cardanoNodeConfigPath === undefined)
-      throw new MissingProgramOption(ServiceNames.NetworkInfo, ProgramOptionDescriptions.CardanoNodeConfigPath);
-    if (args.options?.ogmiosUrl === undefined)
-      throw new MissingProgramOption(ServiceNames.NetworkInfo, ProgramOptionDescriptions.OgmiosUrl);
+      const networkInfoProvider = new DbSyncNetworkInfoProvider(
+        {
+          cardanoNodeConfigPath: args.options.cardanoNodeConfigPath,
+          epochPollInterval: args.options?.epochPollInterval
+        },
+        { cache, cardanoNode: new OgmiosCardanoNode(urlToConnectionConfig(args.options.ogmiosUrl), logger), db, logger }
+      );
 
-    const networkInfoProvider = new DbSyncNetworkInfoProvider(
-      {
-        cardanoNodeConfigPath: args.options.cardanoNodeConfigPath,
-        epochPollInterval: args.options?.epochPollInterval
-      },
-      { cache, cardanoNode: new OgmiosCardanoNode(urlToConnectionConfig(args.options.ogmiosUrl), logger), db, logger }
-    );
+      return new NetworkInfoHttpService({ logger, networkInfoProvider });
+    }),
+    [ServiceNames.TxSubmit]: async () => {
+      const txSubmitProvider = args.options?.useQueue
+        ? await getRabbitMqTxSubmitProvider(dnsResolver, logger, args.options)
+        : await getOgmiosTxSubmitProvider(dnsResolver, logger, args.options);
 
-    return new NetworkInfoHttpService({ logger, networkInfoProvider });
-  },
-  [ServiceNames.TxSubmit]: async () => {
-    const txSubmitProvider = args.options?.useQueue
-      ? await getRabbitMqTxSubmitProvider(dnsResolver, logger, args.options)
-      : await getOgmiosTxSubmitProvider(dnsResolver, logger, args.options);
-
-    return new TxSubmitHttpService({ logger, txSubmitProvider });
-  }
-});
+      return new TxSubmitHttpService({ logger, txSubmitProvider });
+    }
+  };
+};
 
 export const loadHttpServer = async (args: ProgramArgs): Promise<HttpServer> => {
   const services: HttpService[] = [];

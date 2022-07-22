@@ -22,6 +22,7 @@ import { TxSubmitWorker } from '@cardano-sdk/rabbitmq';
 import { createHealthyMockOgmiosServer, ogmiosServerReady } from '../util';
 import { createLogger } from 'bunyan';
 import { createMockOgmiosServer } from '../../../ogmios/test/mocks/mockOgmiosServer';
+import { dummyLogger } from 'ts-log';
 import { getPort, getRandomPort } from 'get-port-please';
 import { listenPromise, serverClosePromise } from '../../src/util';
 import { txsPromise } from '../../../rabbitmq/test/utils';
@@ -495,17 +496,19 @@ describe('Service dependency abstractions', () => {
       await listenPromise(mockServer, connection);
       await ogmiosServerReady(connection);
 
-      txSubmitWorker = await loadTxWorker({
-        options: {
-          cacheTtl: 10_000,
-          loggerMinSeverity: 'error',
-          ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME,
-          parallel: true,
-          rabbitmqSrvServiceName: process.env.RABBITMQ_SRV_SERVICE_NAME,
-          serviceDiscoveryBackoffFactor: 1.1,
-          serviceDiscoveryTimeout: 1000
-        }
-      });
+      txSubmitWorker = await loadTxWorker(
+        {
+          options: {
+            cacheTtl: 10_000,
+            ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME,
+            parallel: true,
+            rabbitmqSrvServiceName: process.env.RABBITMQ_SRV_SERVICE_NAME,
+            serviceDiscoveryBackoffFactor: 1.1,
+            serviceDiscoveryTimeout: 1000
+          }
+        },
+        dummyLogger
+      );
       await txSubmitWorker.start();
     });
 

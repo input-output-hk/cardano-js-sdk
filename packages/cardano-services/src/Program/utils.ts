@@ -5,12 +5,12 @@ import { ClientConfig, Pool, QueryConfig } from 'pg';
 import { CommonOptionDescriptions, CommonProgramOptions } from '../ProgramsCommon';
 import { HttpServerOptions } from './loadHttpServer';
 import { InvalidArgsCombination, MissingProgramOption } from './errors';
+import { Logger } from 'ts-log';
 import { Ogmios, ogmiosTxSubmitProvider, urlToConnectionConfig } from '@cardano-sdk/ogmios';
 import { ProgramOptionDescriptions } from './ProgramOptionDescriptions';
 import { ProviderFailure, TxSubmitProvider } from '@cardano-sdk/core';
 import { RabbitMqTxSubmitProvider } from '@cardano-sdk/rabbitmq';
 import { ServiceNames } from './ServiceNames';
-import Logger from 'bunyan';
 import dns, { SrvRecord } from 'dns';
 import pRetry, { FailedAttemptError } from 'p-retry';
 

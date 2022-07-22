@@ -4,7 +4,8 @@ import { Logger } from 'ts-log';
 import { TokenMetadataService } from './types';
 import axios, { AxiosInstance } from 'axios';
 
-const DEFAULT_METADATA_SERVER_URI = 'https://tokens.cardano.org';
+export const DEFAULT_TOKEN_METADATA_CACHE_TTL = 600;
+export const DEFAULT_TOKEN_METADATA_SERVER_URL = 'https://tokens.cardano.org';
 
 interface NumberValue {
   value?: number;
@@ -24,6 +25,14 @@ interface TokenMetadataServiceRecord {
   url?: StringValue;
 }
 
+const propertiesToChange: Record<string, string> = { description: 'desc', logo: 'icon' };
+export const toCoreTokenMetadata = (record: TokenMetadataServiceRecord) =>
+  Object.fromEntries(
+    Object.entries(record)
+      .filter(([key]) => ['decimals', 'description', 'logo', 'name', 'ticker', 'url'].includes(key))
+      .map(([key, value]) => [propertiesToChange[key] || key, value.value])
+  ) as Asset.TokenMetadata;
+
 const toProviderError = (error: unknown, details: string) => {
   if (error instanceof ProviderError) return error;
 
@@ -39,17 +48,17 @@ export interface CardanoTokenRegistryConfiguration {
   /**
    * The cache TTL in seconds. Default: 10 minutes.
    */
-  cacheTTL?: number;
+  tokenMetadataCacheTTL?: number;
 
   /**
    * The Cardano Token Registry public API base URL. Default: https://tokens.cardano.org
    */
-  metadataServerUri?: string;
+  tokenMetadataServerUrl?: string;
 }
 
 interface CardanoTokenRegistryConfigurationWithRequired extends CardanoTokenRegistryConfiguration {
-  cacheTTL: number;
-  metadataServerUri: string;
+  tokenMetadataCacheTTL: number;
+  tokenMetadataServerUrl: string;
 }
 
 /**
@@ -88,13 +97,13 @@ export class CardanoTokenRegistry implements TokenMetadataService {
 
   constructor({ cache, logger }: CardanoTokenRegistryDependencies, config: CardanoTokenRegistryConfiguration = {}) {
     const defaultConfig: CardanoTokenRegistryConfigurationWithRequired = {
-      cacheTTL: 600,
-      metadataServerUri: DEFAULT_METADATA_SERVER_URI,
+      tokenMetadataCacheTTL: DEFAULT_TOKEN_METADATA_CACHE_TTL,
+      tokenMetadataServerUrl: DEFAULT_TOKEN_METADATA_SERVER_URL,
       ...config
     };
 
-    this.#cache = cache || new InMemoryCache(defaultConfig.cacheTTL);
-    this.#axiosClient = axios.create({ baseURL: defaultConfig.metadataServerUri });
+    this.#cache = cache || new InMemoryCache(defaultConfig.tokenMetadataCacheTTL);
+    this.#axiosClient = axios.create({ baseURL: defaultConfig.tokenMetadataServerUrl });
     this.#logger = logger;
   }
 
@@ -124,7 +133,7 @@ export class CardanoTokenRegistry implements TokenMetadataService {
 
           if (subject) {
             const assetId = Cardano.AssetId(subject);
-            const metadata = this.parseTokenMetadataServiceRecord(record);
+            const metadata = toCoreTokenMetadata(record);
 
             tokenMetadata[assetIds.indexOf(assetId)] = metadata;
             this.#cache.set(assetId.toString(), metadata);
@@ -139,7 +148,7 @@ export class CardanoTokenRegistry implements TokenMetadataService {
         }
       }
     } catch (error) {
-      throw toProviderError(error, 'while fetching metadata from token registriy');
+      throw toProviderError(error, 'while fetching metadata from token registry');
     }
 
     return tokenMetadata;
@@ -156,25 +165,11 @@ export class CardanoTokenRegistry implements TokenMetadataService {
       const cachedMetadata = this.#cache.getVal<Asset.TokenMetadata>(stringAssetId);
 
       if (cachedMetadata) {
-        this.#logger.debug(`Using chached asset metatada value for "${stringAssetId}"`);
+        this.#logger.debug(`Using cached asset metatada value for "${stringAssetId}"`);
         cachedTokenMetadata[i] = cachedMetadata;
       } else assetIdsToRequest.push(assetId);
     }
 
     return [assetIdsToRequest, cachedTokenMetadata] as const;
-  }
-
-  private parseTokenMetadataServiceRecord(record: TokenMetadataServiceRecord) {
-    const { decimals, description, logo, name, ticker, url } = record;
-    const metadata: Asset.TokenMetadata = {};
-
-    metadata.decimals = decimals?.value;
-    metadata.desc = description?.value;
-    metadata.icon = logo?.value;
-    metadata.name = name?.value;
-    metadata.ticker = ticker?.value;
-    metadata.url = url?.value;
-
-    return metadata;
   }
 }

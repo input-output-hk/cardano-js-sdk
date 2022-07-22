@@ -21,7 +21,7 @@ describe('assetInfoHttpProvider', () => {
   });
 
   describe('getAsset', () => {
-    test('getAsset doesnt throw', async () => {
+    test("getAsset doesn't throw", async () => {
       axiosMock.onPost().replyOnce(200, {});
       const provider = assetInfoHttpProvider(url);
       await expect(

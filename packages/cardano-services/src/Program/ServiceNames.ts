@@ -3,6 +3,7 @@
  *
  */
 export enum ServiceNames {
+  Asset = 'asset',
   StakePool = 'stake-pool',
   NetworkInfo = 'network-info',
   TxSubmit = 'tx-submit',

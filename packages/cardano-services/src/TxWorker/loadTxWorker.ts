@@ -1,4 +1,5 @@
 import { CommonProgramOptions } from '../ProgramsCommon';
+import { Logger } from 'ts-log';
 import { TxSubmitWorker, TxSubmitWorkerConfig } from '@cardano-sdk/rabbitmq';
 import { createDnsResolver, getOgmiosTxSubmitProvider, getRabbitMqUrl } from '../Program';
 import { createLogger } from 'bunyan';
@@ -10,9 +11,11 @@ export interface TxWorkerArgs {
   options: TxWorkerOptions;
 }
 
-export const loadTxWorker = async (args: TxWorkerArgs) => {
+export const loadTxWorker = async (args: TxWorkerArgs, logger?: Logger) => {
   const { loggerMinSeverity, serviceDiscoveryBackoffFactor, serviceDiscoveryTimeout } = args.options;
-  const logger = createLogger({ level: loggerMinSeverity, name: 'tx-worker' });
+
+  if (!logger) logger = createLogger({ level: loggerMinSeverity, name: 'tx-worker' });
+
   const dnsResolver = createDnsResolver(
     {
       factor: serviceDiscoveryBackoffFactor,

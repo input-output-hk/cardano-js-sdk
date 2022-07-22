@@ -11,6 +11,7 @@ import {
 import { CACHE_TTL_DEFAULT } from './InMemoryCache';
 import { Command } from 'commander';
 import { CommonOptionDescriptions, Programs, USE_QUEUE_DEFAULT, WrongOption } from './ProgramsCommon';
+import { DEFAULT_TOKEN_METADATA_CACHE_TTL, DEFAULT_TOKEN_METADATA_SERVER_URL } from './Asset';
 import { EPOCH_POLL_INTERVAL_DEFAULT } from './NetworkInfo';
 import { InvalidLoggerLevel } from './errors';
 import {
@@ -111,6 +112,18 @@ commonOptions(
     ProgramOptionDescriptions.EpochPollInterval,
     (interval) => Number.parseInt(interval, 10),
     EPOCH_POLL_INTERVAL_DEFAULT
+  )
+  .option(
+    '--token-metadata-cache-ttl <tokenMetadataCacheTTL>',
+    ProgramOptionDescriptions.TokenMetadataCacheTtl,
+    cacheTtlValidator,
+    DEFAULT_TOKEN_METADATA_CACHE_TTL
+  )
+  .option(
+    '--token-metadata-server-url <tokenMetadataServerUrl>',
+    ProgramOptionDescriptions.TokenMetadataServerUrl,
+    (url) => new URL(url).toString(),
+    DEFAULT_TOKEN_METADATA_SERVER_URL
   )
   .option('--use-queue', ProgramOptionDescriptions.UseQueue, () => true, USE_QUEUE_DEFAULT)
   .option('--postgres-srv-service-name <postgresSrvServiceName>', ProgramOptionDescriptions.PostgresSrvArgs)
