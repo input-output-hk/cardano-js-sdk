@@ -20,7 +20,7 @@ describe('cip36', () => {
       const getNonce = (metadata: Cardano.TxMetadata) =>
         (metadata.get(61_284n) as Cardano.MetadatumMap).get(4n) as bigint;
       const nonce1 = getNonce(cip36.metadataBuilder.buildVotingRegistration(props));
-      await delay(1);
+      await delay(2);
       const nonce2 = getNonce(cip36.metadataBuilder.buildVotingRegistration(props));
       expect(nonce2).toBeGreaterThan(nonce1);
     });
