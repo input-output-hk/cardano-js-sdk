@@ -137,6 +137,7 @@ commonOptions(
   .option('--postgres-db <postgresDb>', ProgramOptionDescriptions.PostgresDb)
   .option('--postgres-user <postgresUser>', ProgramOptionDescriptions.PostgresUser)
   .option('--postgres-password <postgresPassword>', ProgramOptionDescriptions.PostgresPassword)
+  .option('--postgres-ssl-ca-file <postgresSslCaFile>', ProgramOptionDescriptions.PostgresSslCaFile)
   .action(async (serviceNames: ServiceNames[], options: { apiUrl: URL } & HttpServerOptions) => {
     const { apiUrl, ...rest } = options;
     try {

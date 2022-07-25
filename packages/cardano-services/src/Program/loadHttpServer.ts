@@ -37,6 +37,7 @@ export interface HttpServerOptions extends CommonProgramOptions {
   postgresDb?: string;
   postgresUser?: string;
   postgresPassword?: string;
+  postgresSslCaFile?: string;
   dbCacheTtl: number;
 }
 
