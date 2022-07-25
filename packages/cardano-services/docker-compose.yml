@@ -45,10 +45,13 @@ services:
 
   cardano-db-sync:
     image: inputoutput/cardano-db-sync:${CARDANO_DB_SYNC_VERSION:-13.0.1}
-    command: [
-        "--config", "/config/cardano-db-sync/config.json",
-        "--socket-path", "/node-ipc/node.socket"
-    ]
+    command:
+      [
+        "--config",
+        "/config/cardano-db-sync/config.json",
+        "--socket-path",
+        "/node-ipc/node.socket"
+      ]
     environment:
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
@@ -105,8 +108,8 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      - DB_POLL_INTERVAL=${DB_POLL_INTERVAL:-10000}
-      - DB_QUERIES_CACHE_TTL=${DB_QUERIES_CACHE_TTL:-120}
+      - EPOCH_POLL_INTERVAL=${EPOCH_POLL_INTERVAL:-10000}
+      - DB_CACHE_TTL=${DB_CACHE_TTL:-120}
       - ENABLE_METRICS=${ENABLE_METRICS:-false}
       - LOGGER_MIN_SEVERITY=${LOGGER_MIN_SEVERITY:-info}
       - SERVICE_NAMES=${SERVICE_NAMES:-asset,chain-history,network-info,rewards,stake-pool,tx-submit,utxo}

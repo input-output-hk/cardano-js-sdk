@@ -40,7 +40,7 @@ describe('NetworkInfoHttpService', () => {
   const epochPollInterval = 2 * 1000;
   const cache = new InMemoryCache(UNLIMITED_CACHE_TTL);
   const cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
-  const db = new Pool({ connectionString: process.env.DB_CONNECTION_STRING, max: 1, min: 1 });
+  const db = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING, max: 1, min: 1 });
 
   const mockEraSummaries: EraSummary[] = [
     { parameters: { epochLength: 21_600, slotLength: 20_000 }, start: { slot: 0, time: new Date(1_563_999_616_000) } },

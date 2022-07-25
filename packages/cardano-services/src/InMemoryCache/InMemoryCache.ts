@@ -1,4 +1,3 @@
-import { CACHE_TTL_DEFAULT } from './defaults';
 import NodeCache from 'node-cache';
 
 export type Key = string | number;
@@ -8,7 +7,7 @@ export class InMemoryCache {
   #cache: NodeCache;
   #ttlDefault: number;
 
-  constructor(cacheTtlInMins: number = CACHE_TTL_DEFAULT, cache: NodeCache = new NodeCache()) {
+  constructor(cacheTtlInMins: number, cache: NodeCache = new NodeCache()) {
     this.#ttlDefault = cacheTtlInMins * 60;
     this.#cache = cache;
   }

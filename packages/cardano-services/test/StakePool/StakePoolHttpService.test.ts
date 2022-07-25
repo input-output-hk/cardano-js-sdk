@@ -63,7 +63,7 @@ describe('StakePoolHttpService', () => {
     port = await getPort();
     apiUrlBase = `http://localhost:${port}/stake-pool`;
     config = { listen: { port } };
-    dbConnection = new Pool({ connectionString: process.env.DB_CONNECTION_STRING });
+    dbConnection = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING });
     doStakePoolRequest = doServerRequest(apiUrlBase);
   });
 

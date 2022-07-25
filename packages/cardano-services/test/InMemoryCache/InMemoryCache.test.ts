@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { CACHE_TTL_DEFAULT, InMemoryCache } from '../../src/InMemoryCache';
+import { DB_CACHE_TTL_DEFAULT, InMemoryCache } from '../../src/InMemoryCache';
 import NodeCache from 'node-cache';
 
 describe('InMemoryCache', () => {
@@ -23,7 +23,7 @@ describe('InMemoryCache', () => {
       keys: jest.fn(() => [CURRENT_EPOCH_KEY, TOTAL_STAKE_KEY]),
       set: jest.fn(() => true)
     };
-    const cache = new InMemoryCache(CACHE_TTL_DEFAULT, nodeCacheMocked);
+    const cache = new InMemoryCache(DB_CACHE_TTL_DEFAULT, nodeCacheMocked);
 
     afterEach(async () => {
       jest.clearAllMocks();
@@ -84,7 +84,7 @@ describe('InMemoryCache', () => {
 
   describe('with real node-cache', () => {
     it('get called multiple times does not query twice and returns the same result', async () => {
-      const realCache = new InMemoryCache(CACHE_TTL_DEFAULT, new NodeCache());
+      const realCache = new InMemoryCache(DB_CACHE_TTL_DEFAULT, new NodeCache());
 
       let resolveQuery: Function;
       const queryResult = new Promise((resolve) => (resolveQuery = resolve));

@@ -26,17 +26,18 @@ import Logger, { createLogger } from 'bunyan';
 import pg from 'pg';
 
 export interface HttpServerOptions extends CommonProgramOptions {
-  dbConnectionString?: string;
+  postgresConnectionString?: string;
   epochPollInterval: number;
   cardanoNodeConfigPath?: string;
   tokenMetadataCacheTTL?: number;
   tokenMetadataServerUrl?: string;
-  metricsEnabled?: boolean;
+  enableMetrics?: boolean;
   useQueue?: boolean;
   postgresSrvServiceName?: string;
   postgresDb?: string;
   postgresUser?: string;
   postgresPassword?: string;
+  dbCacheTtl: number;
 }
 
 export interface ProgramArgs {
@@ -69,8 +70,8 @@ const serviceMapFactory = (
     () => {
       if (!dbConnection)
         throw new MissingProgramOption(ServiceNames.StakePool, [
-          ProgramOptionDescriptions.DbConnection,
-          ProgramOptionDescriptions.PostgresSrvArgs
+          ProgramOptionDescriptions.PostgresConnectionString,
+          ProgramOptionDescriptions.PostgresServiceDiscoveryArgs
         ]);
 
       return factory(dbConnection);
@@ -137,7 +138,7 @@ export const loadHttpServer = async (args: ProgramArgs): Promise<HttpServer> => 
     name: 'http-server'
   });
 
-  const cache = new InMemoryCache(args.options?.cacheTtl);
+  const cache = new InMemoryCache(args.options!.dbCacheTtl!);
   const dnsResolver = createDnsResolver(
     {
       factor: args.options?.serviceDiscoveryBackoffFactor,
@@ -162,8 +163,8 @@ export const loadHttpServer = async (args: ProgramArgs): Promise<HttpServer> => 
       port: Number.parseInt(args.apiUrl.port)
     }
   };
-  if (args.options?.metricsEnabled) {
-    config.metrics = { enabled: args.options?.metricsEnabled };
+  if (args.options?.enableMetrics) {
+    config.metrics = { enabled: args.options?.enableMetrics };
   }
   return new HttpServer(config, { logger, services });
 };

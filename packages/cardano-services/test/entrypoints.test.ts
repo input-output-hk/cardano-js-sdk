@@ -54,11 +54,11 @@ describe('entrypoints', () => {
   });
 
   describe('start-server', () => {
-    let dbConnectionString: string;
+    let postgresConnectionString: string;
     let ogmiosPort: Ogmios.ConnectionConfig['port'];
     let ogmiosConnection: Ogmios.Connection;
     let cardanoNodeConfigPath: string;
-    let cacheTtl: string;
+    let dbCacheTtl: string;
     let postgresSrvServiceName: string;
     let postgresDb: string;
     let postgresUser: string;
@@ -69,7 +69,7 @@ describe('entrypoints', () => {
     beforeAll(async () => {
       ogmiosPort = await getRandomPort();
       ogmiosConnection = Ogmios.createConnectionObject({ port: ogmiosPort });
-      dbConnectionString = process.env.DB_CONNECTION_STRING!;
+      postgresConnectionString = process.env.POSTGRES_CONNECTION_STRING!;
       cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
       postgresSrvServiceName = process.env.POSTGRES_SRV_SERVICE_NAME!;
       postgresDb = process.env.POSTGRES_DB!;
@@ -77,7 +77,7 @@ describe('entrypoints', () => {
       postgresPassword = process.env.POSTGRES_PASSWORD!;
       ogmiosSrvServiceName = process.env.OGMIOS_SRV_SERVICE_NAME!;
       rabbitmqSrvServiceName = process.env.RABBITMQ_SRV_SERVICE_NAME!;
-      cacheTtl = process.env.CACHE_TTL!;
+      dbCacheTtl = process.env.DB_CACHE_TTL!;
     });
 
     describe('with healthy internal providers', () => {
@@ -95,16 +95,16 @@ describe('entrypoints', () => {
               'start-server',
               '--api-url',
               apiUrl,
-              '--db-connection-string',
-              dbConnectionString,
+              '--postgres-connection-string',
+              postgresConnectionString,
               '--logger-min-severity',
               'error',
               '--ogmios-url',
               ogmiosConnection.address.webSocket,
               '--cardano-node-config-path',
               cardanoNodeConfigPath,
-              '--cache-ttl',
-              cacheTtl,
+              '--db-cache-ttl',
+              dbCacheTtl,
               ServiceNames.Asset,
               ServiceNames.ChainHistory,
               ServiceNames.NetworkInfo,
@@ -126,11 +126,11 @@ describe('entrypoints', () => {
           proc = fork(exePath('run'), {
             env: {
               API_URL: apiUrl,
-              CACHE_TTL: cacheTtl,
               CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
-              DB_CONNECTION_STRING: dbConnectionString,
+              DB_CACHE_TTL: dbCacheTtl,
               LOGGER_MIN_SEVERITY: 'error',
               OGMIOS_URL: ogmiosConnection.address.webSocket,
+              POSTGRES_CONNECTION_STRING: postgresConnectionString,
               SERVICE_NAMES: `${ServiceNames.Asset},${ServiceNames.ChainHistory},${ServiceNames.NetworkInfo},${ServiceNames.StakePool},${ServiceNames.TxSubmit},${ServiceNames.Utxo}`
             },
             stdio: 'pipe'
@@ -206,7 +206,7 @@ describe('entrypoints', () => {
               'error',
               '--cardano-node-config-path',
               cardanoNodeConfigPath,
-              '--cache-ttl',
+              '--db-cache-ttl',
               cacheTtlOutOfRange,
               ServiceNames.NetworkInfo
             ],
@@ -290,7 +290,7 @@ describe('entrypoints', () => {
           proc = fork(exePath('run'), {
             env: {
               API_URL: apiUrl,
-              CACHE_TTL: cacheTtlOutOfRange,
+              DB_CACHE_TTL: cacheTtlOutOfRange,
               LOGGER_MIN_SEVERITY: 'error',
               SERVICE_NAMES: ServiceNames.NetworkInfo
             },
@@ -411,8 +411,8 @@ describe('entrypoints', () => {
               'start-server',
               '--api-url',
               apiUrl,
-              '--db-connection-string',
-              dbConnectionString,
+              '--postgres-connection-string',
+              postgresConnectionString,
               '--logger-min-severity',
               'error',
               ServiceNames.NetworkInfo
@@ -434,8 +434,8 @@ describe('entrypoints', () => {
           proc = fork(exePath('run'), {
             env: {
               API_URL: apiUrl,
-              DB_CONNECTION_STRING: dbConnectionString,
               LOGGER_MIN_SEVERITY: 'error',
+              POSTGRES_CONNECTION_STRING: postgresConnectionString,
               SERVICE_NAMES: ServiceNames.NetworkInfo
             },
             stdio: 'pipe'
@@ -503,8 +503,8 @@ describe('entrypoints', () => {
               'start-server',
               '--api-url',
               apiUrl,
-              '--db-connection-string',
-              dbConnectionString,
+              '--postgres-connection-string',
+              postgresConnectionString,
               '--logger-min-severity',
               'error',
               '--token-metadata-server-url',
@@ -531,8 +531,8 @@ describe('entrypoints', () => {
           proc = fork(exePath('run'), {
             env: {
               API_URL: apiUrl,
-              DB_CONNECTION_STRING: dbConnectionString,
               LOGGER_MIN_SEVERITY: 'error',
+              POSTGRES_CONNECTION_STRING: postgresConnectionString,
               SERVICE_NAMES: ServiceNames.Asset,
               TOKEN_METADATA_SERVER_URL: tokenMetadataServerUrl
             },
@@ -761,8 +761,8 @@ describe('entrypoints', () => {
               'start-server',
               '--api-url',
               apiUrl,
-              '--db-connection-string',
-              dbConnectionString,
+              '--postgres-connection-string',
+              postgresConnectionString,
               '--logger-min-severity',
               'error',
               '--ogmios-url',
@@ -789,9 +789,9 @@ describe('entrypoints', () => {
           proc = fork(exePath('run'), {
             env: {
               API_URL: apiUrl,
-              DB_CONNECTION_STRING: dbConnectionString,
               LOGGER_MIN_SEVERITY: 'error',
               OGMIOS_URL: ogmiosConnection.address.webSocket,
+              POSTGRES_CONNECTION_STRING: postgresConnectionString,
               SERVICE_NAMES: `${ServiceNames.StakePool},${ServiceNames.TxSubmit}`
             },
             stdio: 'pipe'

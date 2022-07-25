@@ -102,10 +102,13 @@ export const getPool = async (
   logger: Logger,
   options?: HttpServerOptions
 ): Promise<Pool | undefined> => {
-  if (options?.dbConnectionString && options.postgresSrvServiceName)
-    throw new InvalidArgsCombination(ProgramOptionDescriptions.DbConnection, ProgramOptionDescriptions.PostgresSrvArgs);
-  if (options?.dbConnectionString) return new Pool({ connectionString: options.dbConnectionString });
-  if (options?.postgresSrvServiceName && options?.postgresUser && options.postgresDb && options.postgresPassword) {
+  if (options?.postgresConnectionString && options.postgresSrvServiceName)
+    throw new InvalidArgsCombination(
+      ProgramOptionDescriptions.PostgresConnectionString,
+      ProgramOptionDescriptions.PostgresServiceDiscoveryArgs
+    );
+  if (options?.postgresConnectionString) return new Pool({ connectionString: options.postgresConnectionString });
+  if (options?.postgresSrvServiceName && options.postgresUser && options.postgresDb && options.postgresPassword) {
     return getPoolWithServiceDiscovery(dnsResolver, logger, {
       database: options.postgresDb,
       host: options.postgresSrvServiceName,

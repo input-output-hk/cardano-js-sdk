@@ -25,7 +25,7 @@ describe('RewardsHttpService', () => {
     port = await getPort();
     apiUrlBase = `http://localhost:${port}/rewards`;
     config = { listen: { port } };
-    dbConnection = new Pool({ connectionString: process.env.DB_CONNECTION_STRING });
+    dbConnection = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING });
   });
 
   afterEach(async () => {

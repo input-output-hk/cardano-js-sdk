@@ -8,7 +8,7 @@ describe('createDbSyncMetadataService', () => {
   let service: MetadataService;
 
   beforeAll(() => {
-    dbConnection = new Pool({ connectionString: process.env.DB_CONNECTION_STRING });
+    dbConnection = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING });
     service = createDbSyncMetadataService(dbConnection, dummyLogger);
   });
 
