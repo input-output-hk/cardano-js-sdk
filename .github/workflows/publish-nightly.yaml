@@ -1,0 +1,54 @@
+name: Publish (nightly)
+
+on:
+  schedule:
+    # Every day 00:00 UTC
+    - cron:  '0 0 * * *'
+
+jobs:
+  publish:
+    strategy:
+      matrix:
+        os: [ ubuntu-20.04 ]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v2.3.3
+      with:
+        # Fetch all history for all tags and branches
+        fetch-depth: 0
+        ref: nightly
+        submodules: true
+
+    - name: Rebase on master
+      run: git rebase master
+
+    - name: 🧰 Setup Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: 14.17
+        registry-url: 'https://registry.npmjs.org'
+
+    - name: Install dependencies
+      run: yarn install --immutable --inline-builds
+
+    - name: Check if any packages changed
+      id: precondition
+      run: |
+        CHANGED=$(yarn run lerna changed --json | node -e "console.log(JSON.parse(require('fs').readFileSync(0).toString()).length)")
+        echo "::set-output name=changed::$(($CHANGED))"
+
+    - name: 🔨 Build
+      if: steps.precondition.changed > 0
+      run: |
+        yarn build
+
+    - name: Publish
+      if: steps.precondition.changed > 0
+      run: |
+        git config user.name github-actions  
+        git config user.email github-actions@github.com
+        yarn publish:nightly
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_REGISTRY_TOKEN }}
+        
