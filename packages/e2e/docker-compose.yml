@@ -140,7 +140,7 @@ services:
       - DB_QUERIES_CACHE_TTL=${DB_QUERIES_CACHE_TTL:-120}
       - ENABLE_METRICS=${ENABLE_METRICS:-false}
       - LOGGER_MIN_SEVERITY=${LOGGER_MIN_SEVERITY:-info}
-      - SERVICE_NAMES=${SERVICE_NAMES:-chain-history,network-info,rewards,stake-pool,tx-submit,utxo}
+      - SERVICE_NAMES=${SERVICE_NAMES:-asset,chain-history,network-info,rewards,stake-pool,tx-submit,utxo}
       - USE_QUEUE=${USE_QUEUE:-false}
     ports:
       - ${API_PORT:-4000}:3000
