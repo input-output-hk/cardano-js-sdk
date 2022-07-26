@@ -184,11 +184,14 @@ describe('tx-worker entrypoints', () => {
     });
   });
 
-  describe('without a working RabbitMQ server', () => {
+  describe('without a working RabbitMQ server handles a connection error event', () => {
     it('cli:start-worker exits with code 1', (done) => {
       expect.assertions(2);
       proc = fork(exePath('cli'), [...commonArgs, '--rabbitmq-url', BAD_CONNECTION_URL.toString()], { stdio: 'pipe' });
-      proc.stderr!.on('data', (data) => expect(data.toString()).toMatch('ECONNREFUSED'));
+
+      proc.stderr!.on('data', (data) => {
+        expect(data.toString()).toMatch('CONNECTION_FAILURE');
+      });
       proc.on('exit', (code) => {
         expect(code).toBe(1);
         done();
@@ -196,11 +199,12 @@ describe('tx-worker entrypoints', () => {
     });
 
     it('startWorker exits with code 1', (done) => {
-      expect.assertions(1);
+      expect.assertions(2);
       proc = fork(exePath('startWorker'), {
         env: { ...commonEnv, RABBITMQ_URL: BAD_CONNECTION_URL.toString() },
         stdio: 'pipe'
       });
+      proc.stderr!.on('data', (data) => expect(data.toString()).toMatch('CONNECTION_FAILURE'));
       proc.on('exit', (code) => {
         expect(code).toBe(1);
         done();

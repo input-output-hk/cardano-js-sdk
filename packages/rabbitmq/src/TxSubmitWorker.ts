@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-shadow */
+import { CONNECTION_ERROR_EVENT, TX_SUBMISSION_QUEUE, serializeError, waitForPending } from './utils';
 import { Cardano, ProviderError, ProviderFailure, TxSubmitProvider } from '@cardano-sdk/core';
 import { Channel, Connection, Message, connect } from 'amqplib';
+import { EventEmitter } from 'events';
 import { Logger, dummyLogger } from 'ts-log';
-import { TX_SUBMISSION_QUEUE, serializeError, waitForPending } from './utils';
 
 const moduleName = 'TxSubmitWorker';
 
@@ -55,7 +56,7 @@ export interface TxSubmitWorkerDependencies {
  * Controller class for the transactions submission worker which gets
  * transactions from RabbitMQ and submit them via the TxSubmitProvider
  */
-export class TxSubmitWorker {
+export class TxSubmitWorker extends EventEmitter {
   /**
    * The RabbitMQ channel
    */
@@ -101,6 +102,7 @@ export class TxSubmitWorker {
    * @param dependencies The dependency objects
    */
   constructor(config: TxSubmitWorkerConfig, dependencies: Optional<TxSubmitWorkerDependencies, 'logger'>) {
+    super();
     this.#config = { parallelTxs: 3, pollingCycle: 500, ...config };
     this.#dependencies = { logger: dummyLogger, ...dependencies };
   }
@@ -109,13 +111,16 @@ export class TxSubmitWorker {
    * The common handler for errors
    *
    * @param isAsync flag to identify asynchronous errors
-   * @param err the error itself
+   * @param err the connection error itself supplied by 'close' handler runtime or by catch block of 'worker.start()'
    */
-  private async errorHandler(isAsync: boolean, err: unknown) {
+  private async connectionErrorHandler(isAsync: boolean, err?: unknown) {
     if (err) {
       this.logError(err, isAsync);
       this.#status = 'error';
       await this.stop();
+
+      // Emit event due to connection error in order to notify the worker abstraction listener
+      this.emitEvent(CONNECTION_ERROR_EVENT, err);
     }
   }
 
@@ -129,24 +134,36 @@ export class TxSubmitWorker {
   }
 
   /**
+   * Emit event raised by the worker
+   *
+   */
+  emitEvent(eventName: string, err?: unknown) {
+    this.emit(eventName, err);
+  }
+
+  /**
    * Starts the worker
+   *
+   * In the case of a server-initiated shutdown or an error,
+   * the 'close' handler will be supplied with an error indicating the cause
+   * https://amqp-node.github.io/amqplib/channel_api.html#model_events
    */
   async start() {
+    this.#dependencies.logger.info(`${moduleName} init: checking tx submission provider health status`);
+
+    const { ok } = await this.#dependencies.txSubmitProvider.healthCheck();
+
+    if (!ok) throw new ProviderError(ProviderFailure.Unhealthy);
+
     try {
-      this.#dependencies.logger.info(`${moduleName} init: checking tx submission provider health status`);
-
-      const { ok } = await this.#dependencies.txSubmitProvider.healthCheck();
-
-      if (!ok) throw new ProviderError(ProviderFailure.Unhealthy);
-
       this.#dependencies.logger.info(`${moduleName} init: opening RabbitMQ connection`);
       this.#status = 'connecting';
       this.#connection = await connect(this.#config.rabbitmqUrl.toString());
-      this.#connection.on('close', (error) => this.errorHandler(true, error));
+      this.#connection.on('close', (error) => this.connectionErrorHandler(true, error));
 
       this.#dependencies.logger.info(`${moduleName} init: opening RabbitMQ channel`);
       this.#channel = await this.#connection.createChannel();
-      this.#channel.on('close', (error) => this.errorHandler(true, error));
+      this.#channel.on('close', (error) => this.connectionErrorHandler(true, error));
 
       this.#dependencies.logger.info(`${moduleName} init: ensuring RabbitMQ queue`);
       await this.#channel.assertQueue(TX_SUBMISSION_QUEUE);
@@ -167,9 +184,7 @@ export class TxSubmitWorker {
 
       this.#status = 'connected';
     } catch (error) {
-      await this.errorHandler(false, error);
-      if (error instanceof ProviderError) throw error;
-      throw new ProviderError(ProviderFailure.ConnectionFailure, error);
+      await this.connectionErrorHandler(false, error);
     }
   }
 

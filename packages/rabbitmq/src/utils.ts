@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Cardano } from '@cardano-sdk/core';
 import { OutsideOfValidityInterval } from '@cardano-ogmios/schema';
 import { toSerializableObject } from '@cardano-sdk/util';
@@ -60,3 +61,5 @@ export const waitForPending = async (channel: unknown) => {
     // If something is wrong in the workaround as well... let's simply go on and close the channel
   }
 };
+
+export const CONNECTION_ERROR_EVENT = 'connection-error';

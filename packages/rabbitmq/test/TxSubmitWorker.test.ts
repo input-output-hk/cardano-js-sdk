@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   BAD_CONNECTION_URL,
   GOOD_CONNECTION_URL,
@@ -67,7 +68,8 @@ describe('TxSubmitWorker', () => {
     await expect(worker.start()).rejects.toBeInstanceOf(ProviderError);
   });
 
-  it('rejects if unable to connect to the RabbitMQ broker', async () => {
+  it('resolves and emits a connection error event if unable to connect to the RabbitMQ broker', async () => {
+    expect.assertions(2);
     mock = createMockOgmiosServer({
       healthCheck: { response: { networkSynchronization: 1, success: true } },
       submitTx: { response: { success: true } }
@@ -76,8 +78,10 @@ describe('TxSubmitWorker', () => {
     await listenPromise(mock, port);
 
     worker = new TxSubmitWorker({ rabbitmqUrl: BAD_CONNECTION_URL }, { logger, txSubmitProvider });
+    const emitEventSpy = jest.spyOn(worker, 'emitEvent');
 
-    await expect(worker.start()).rejects.toBeInstanceOf(ProviderError);
+    await expect(worker.start()).resolves.toBeUndefined();
+    expect(emitEventSpy).toHaveBeenCalledTimes(1);
   });
 
   describe('error while tx submission', () => {

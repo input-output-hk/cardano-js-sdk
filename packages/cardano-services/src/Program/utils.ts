@@ -253,17 +253,3 @@ export const getRabbitMqTxSubmitProvider = async (
     CommonOptionDescriptions.RabbitMQSrvServiceName
   ]);
 };
-
-export const getRabbitMqUrl = async (dnsResolver: DnsResolver, args: CommonProgramOptions) => {
-  if (args.rabbitmqSrvServiceName) {
-    const record = await dnsResolver(args.rabbitmqSrvServiceName);
-    return srvRecordToRabbitmqURL(record);
-  }
-  if (args.rabbitmqUrl) {
-    return args.rabbitmqUrl;
-  }
-  throw new MissingProgramOption(ServiceNames.TxSubmit, [
-    CommonOptionDescriptions.RabbitMQUrl,
-    CommonOptionDescriptions.RabbitMQSrvServiceName
-  ]);
-};

@@ -20,7 +20,7 @@ import {
   POLLING_CYCLE_DEFAULT,
   TxWorkerOptionDescriptions,
   TxWorkerOptions,
-  loadTxWorker
+  loadAndStartTxWorker
 } from './TxWorker';
 import { SERVICE_DISCOVERY_BACKOFF_FACTOR_DEFAULT, SERVICE_DISCOVERY_TIMEOUT_DEFAULT } from './Program/utils';
 import { URL } from 'url';
@@ -169,8 +169,7 @@ commonOptions(program.command('start-worker').description('Start RabbitMQ worker
   .action(async (options: TxWorkerOptions) => {
     // eslint-disable-next-line no-console
     console.log(`RabbitMQ transactions worker: ${options.parallel ? 'parallel' : 'serial'} mode`);
-    const txWorker = await loadTxWorker({ options });
-    await txWorker.start();
+    const txWorker = await loadAndStartTxWorker({ options });
     onDeath(async () => {
       await txWorker.stop();
       process.exit(1);
