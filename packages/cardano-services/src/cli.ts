@@ -5,6 +5,8 @@ import {
   OGMIOS_URL_DEFAULT,
   ProgramOptionDescriptions,
   RABBITMQ_URL_DEFAULT,
+  SERVICE_DISCOVERY_BACKOFF_FACTOR_DEFAULT,
+  SERVICE_DISCOVERY_TIMEOUT_DEFAULT,
   ServiceNames,
   loadHttpServer
 } from './Program';
@@ -28,7 +30,6 @@ import {
   TxWorkerOptions,
   loadAndStartTxWorker
 } from './TxWorker';
-import { SERVICE_DISCOVERY_BACKOFF_FACTOR_DEFAULT, SERVICE_DISCOVERY_TIMEOUT_DEFAULT } from './Program/utils';
 import { URL } from 'url';
 import { cacheTtlValidator } from './util/validators';
 import { loggerMethodNames } from './util';
