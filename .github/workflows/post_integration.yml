@@ -18,13 +18,19 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 14.17
-
+      
       - name: 🔨 Build Docs
         env:
           NODE_OPTIONS: "--max-old-space-size=8192"
         run: |
           yarn install --immutable --inline-builds
+          yarn build
           yarn docs
+
+      - name: Docker Build
+        run: |
+          docker build --target http-server -t cardano-services-http-server:${{ github.sha }} .
+          docker build --target worker -t cardano-services-worker:${{ github.sha }} .
           
       - name: 📘 Publish
         uses: peaceiris/actions-gh-pages@v3
