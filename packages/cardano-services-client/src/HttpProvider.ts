@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { Logger } from 'ts-log';
 import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
 import axios, { AxiosAdapter, AxiosRequestConfig } from 'axios';
@@ -35,7 +36,18 @@ export interface HttpProviderConfig<T> {
    * This adapter that allows to you to modify the way Axios make requests.
    */
   adapter?: AxiosAdapter;
+
+  /**
+   * Logger strategy.
+   */
+  logger: Logger;
 }
+
+/**
+ * The subset of parameters from HttpProviderConfig that must be set by the
+ * client code.
+ */
+export type CreateHttpProviderConfig<T> = Pick<HttpProviderConfig<T>, 'baseUrl' | 'adapter' | 'logger'>;
 
 /**
  * Creates a HTTP client for specified provider type, following some conventions:
@@ -52,7 +64,8 @@ export const createHttpProvider = <T extends object>({
   axiosOptions,
   mapError,
   paths,
-  adapter
+  adapter,
+  logger
 }: HttpProviderConfig<T>): T =>
   new Proxy<T>({} as T, {
     // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -73,6 +86,10 @@ export const createHttpProvider = <T extends object>({
             responseType: 'json',
             url: path
           };
+
+          logger.debug(`Sending ${req.method} request to ${req.baseURL}${req.url} with data:`);
+          logger.debug(req.data);
+
           const axiosInstance = axios.create(req);
 
           axiosInstance.interceptors.request.use((value) => {
@@ -86,6 +103,7 @@ export const createHttpProvider = <T extends object>({
           const response = (await axiosInstance.request(req)).data;
           return !isEmptyResponse(response) ? response : undefined;
         } catch (error) {
+          logger.error(error);
           if (axios.isAxiosError(error)) {
             if (error.response) {
               const typedError = fromSerializableObject(error.response.data, {

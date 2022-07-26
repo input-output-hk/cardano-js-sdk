@@ -10,8 +10,9 @@ import {
   TransactionsByAddressesArgs
 } from '@cardano-sdk/core';
 import { ChainHistoryHttpService, DbSyncChainHistoryProvider, HttpServer, HttpServerConfig } from '../../src';
+import { CreateHttpProviderConfig, chainHistoryHttpProvider } from '@cardano-sdk/cardano-services-client';
+import { INFO, createLogger } from 'bunyan';
 import { Pool } from 'pg';
-import { chainHistoryHttpProvider } from '@cardano-sdk/cardano-services-client';
 import { createDbSyncMetadataService } from '../../src/Metadata';
 import { doServerRequest } from '../util';
 import { dummyLogger } from 'ts-log';
@@ -29,16 +30,18 @@ describe('ChainHistoryHttpService', () => {
   let chainHistoryProvider: DbSyncChainHistoryProvider;
   let service: ChainHistoryHttpService;
   let port: number;
-  let apiUrlBase: string;
+  let baseUrl: string;
+  let clientConfig: CreateHttpProviderConfig<ChainHistoryProvider>;
   let config: HttpServerConfig;
   let doChainHistoryRequest: ReturnType<typeof doServerRequest>;
 
   beforeAll(async () => {
     port = await getPort();
-    apiUrlBase = `http://localhost:${port}/chain-history`;
+    baseUrl = `http://localhost:${port}/chain-history`;
+    clientConfig = { baseUrl, logger: createLogger({ level: INFO, name: 'unit tests' }) };
     config = { listen: { port } };
     dbConnection = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING });
-    doChainHistoryRequest = doServerRequest(apiUrlBase);
+    doChainHistoryRequest = doServerRequest(baseUrl);
   });
 
   afterEach(async () => {
@@ -86,7 +89,7 @@ describe('ChainHistoryHttpService', () => {
     describe('/health', () => {
       const url = '/health';
       it('forwards the ChainHistoryProvider health response', async () => {
-        const res = await axios.post(`${apiUrlBase}${url}`, undefined, {
+        const res = await axios.post(`${baseUrl}${url}`, undefined, {
           headers: { 'Content-Type': APPLICATION_JSON }
         });
         expect(res.status).toBe(200);
@@ -97,12 +100,12 @@ describe('ChainHistoryHttpService', () => {
     describe('/blocks/by-hashes', () => {
       const url = '/blocks/by-hashes';
       it('returns a 200 coded response with a well formed HTTP request', async () => {
-        expect((await axios.post(`${apiUrlBase}${url}`, { args: [[]] })).status).toEqual(200);
+        expect((await axios.post(`${baseUrl}${url}`, { args: [[]] })).status).toEqual(200);
       });
 
       it('returns a 415 coded response if the wrong content type header is used', async () => {
         try {
-          await axios.post(`${apiUrlBase}${url}`, { args: [[]] }, { headers: { 'Content-Type': APPLICATION_CBOR } });
+          await axios.post(`${baseUrl}${url}`, { args: [[]] }, { headers: { 'Content-Type': APPLICATION_CBOR } });
           throw new Error('fail');
         } catch (error: any) {
           expect(error.response.status).toBe(415);
@@ -113,7 +116,7 @@ describe('ChainHistoryHttpService', () => {
       describe('with ChainHistoryProvider', () => {
         let provider: ChainHistoryProvider;
         beforeEach(() => {
-          provider = chainHistoryHttpProvider(apiUrlBase);
+          provider = chainHistoryHttpProvider(clientConfig);
         });
 
         it('returns an array of blocks', async () => {
@@ -151,12 +154,12 @@ describe('ChainHistoryHttpService', () => {
     describe('/txs/by-hashes', () => {
       const url = '/txs/by-hashes';
       it('returns a 200 coded response with a well formed HTTP request', async () => {
-        expect((await axios.post(`${apiUrlBase}${url}`, { args: [[]] })).status).toEqual(200);
+        expect((await axios.post(`${baseUrl}${url}`, { args: [[]] })).status).toEqual(200);
       });
 
       it('returns a 415 coded response if the wrong content type header is used', async () => {
         try {
-          await axios.post(`${apiUrlBase}${url}`, { args: [[]] }, { headers: { 'Content-Type': APPLICATION_CBOR } });
+          await axios.post(`${baseUrl}${url}`, { args: [[]] }, { headers: { 'Content-Type': APPLICATION_CBOR } });
           throw new Error('fail');
         } catch (error: any) {
           expect(error.response.status).toBe(415);
@@ -167,7 +170,7 @@ describe('ChainHistoryHttpService', () => {
       describe('with ChainHistoryProvider', () => {
         let provider: ChainHistoryProvider;
         beforeEach(() => {
-          provider = chainHistoryHttpProvider(apiUrlBase);
+          provider = chainHistoryHttpProvider(clientConfig);
         });
 
         it('returns an array of transactions', async () => {
@@ -281,12 +284,12 @@ describe('ChainHistoryHttpService', () => {
     describe('/txs/by-addresses', () => {
       const url = '/txs/by-addresses';
       it('returns a 200 coded response with a well formed HTTP request', async () => {
-        expect((await axios.post(`${apiUrlBase}${url}`, { args: [{ addresses: [] }] })).status).toEqual(200);
+        expect((await axios.post(`${baseUrl}${url}`, { args: [{ addresses: [] }] })).status).toEqual(200);
       });
 
       it('returns a 415 coded response if the wrong content type header is used', async () => {
         try {
-          await axios.post(`${apiUrlBase}${url}`, { args: [[]] }, { headers: { 'Content-Type': APPLICATION_CBOR } });
+          await axios.post(`${baseUrl}${url}`, { args: [[]] }, { headers: { 'Content-Type': APPLICATION_CBOR } });
           throw new Error('fail');
         } catch (error: any) {
           expect(error.response.status).toBe(415);
@@ -297,7 +300,7 @@ describe('ChainHistoryHttpService', () => {
       describe('with ChainHistoryProvider', () => {
         let provider: ChainHistoryProvider;
         beforeEach(() => {
-          provider = chainHistoryHttpProvider(apiUrlBase);
+          provider = chainHistoryHttpProvider(clientConfig);
         });
 
         it('returns an array of transactions', async () => {

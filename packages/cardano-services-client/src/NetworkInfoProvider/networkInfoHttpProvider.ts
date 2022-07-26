@@ -1,8 +1,10 @@
-import { AxiosAdapter } from 'axios';
-import { HttpProviderConfigPaths, createHttpProvider } from '../HttpProvider';
+import { CreateHttpProviderConfig, HttpProviderConfigPaths, createHttpProvider } from '../HttpProvider';
 import { NetworkInfoProvider } from '@cardano-sdk/core';
 
-export const defaultNetworkInfoProviderPaths: HttpProviderConfigPaths<NetworkInfoProvider> = {
+/**
+ * The NetworkInfoProvider endpoint paths.
+ */
+const paths: HttpProviderConfigPaths<NetworkInfoProvider> = {
   currentWalletProtocolParameters: '/current-wallet-protocol-parameters',
   genesisParameters: '/genesis-parameters',
   healthCheck: '/health',
@@ -15,17 +17,10 @@ export const defaultNetworkInfoProviderPaths: HttpProviderConfigPaths<NetworkInf
 /**
  * Connect to a Cardano Services HttpServer instance with the service available
  *
- * @param {string} baseUrl server root url, w/o trailing /
- * @param paths A mapping between provider method names and url paths. Paths have to use /leadingSlash
- * @param adapter This adapter that allows to you to modify the way Axios make requests.
+ * @param config The configuration object fot the NetworkInfoProvider Provider.
  */
-export const networkInfoHttpProvider = (
-  baseUrl: string,
-  paths = defaultNetworkInfoProviderPaths,
-  adapter?: AxiosAdapter
-): NetworkInfoProvider =>
+export const networkInfoHttpProvider = (config: CreateHttpProviderConfig<NetworkInfoProvider>): NetworkInfoProvider =>
   createHttpProvider<NetworkInfoProvider>({
-    adapter,
-    baseUrl,
+    ...config,
     paths
   });

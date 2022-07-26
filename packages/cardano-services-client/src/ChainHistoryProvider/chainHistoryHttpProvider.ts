@@ -1,8 +1,10 @@
-import { AxiosAdapter } from 'axios';
 import { ChainHistoryProvider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
-import { HttpProviderConfigPaths, createHttpProvider } from '../HttpProvider';
+import { CreateHttpProviderConfig, HttpProviderConfigPaths, createHttpProvider } from '../HttpProvider';
 
-export const defaultChainHistoryProviderPaths: HttpProviderConfigPaths<ChainHistoryProvider> = {
+/**
+ * The ChainHistoryProvider endpoint paths.
+ */
+const paths: HttpProviderConfigPaths<ChainHistoryProvider> = {
   blocksByHashes: '/blocks/by-hashes',
   healthCheck: '/health',
   transactionsByAddresses: '/txs/by-addresses',
@@ -12,19 +14,14 @@ export const defaultChainHistoryProviderPaths: HttpProviderConfigPaths<ChainHist
 /**
  * Connect to a Cardano Services HttpServer instance with the service available
  *
- * @param {string} baseUrl server root url, w/o trailing /
- * @param paths A mapping between provider method names and url paths. Paths have to use /leadingSlash
- * @param adapter This adapter that allows to you to modify the way Axios make requests.
+ * @param config The configuration object fot the NetworkInfoProvider Provider.
  * @returns {ChainHistoryProvider} ChainHistoryProvider
  */
 export const chainHistoryHttpProvider = (
-  baseUrl: string,
-  paths = defaultChainHistoryProviderPaths,
-  adapter?: AxiosAdapter
+  config: CreateHttpProviderConfig<ChainHistoryProvider>
 ): ChainHistoryProvider =>
   createHttpProvider<ChainHistoryProvider>({
-    adapter,
-    baseUrl,
+    ...config,
     mapError: (error, method) => {
       if (method === 'healthCheck' && !error) {
         return { ok: false };

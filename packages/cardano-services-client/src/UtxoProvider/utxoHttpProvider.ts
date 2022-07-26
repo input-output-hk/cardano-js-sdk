@@ -1,9 +1,11 @@
-import { AxiosAdapter } from 'axios';
-import { HttpProviderConfigPaths, createHttpProvider } from '../HttpProvider';
+import { CreateHttpProviderConfig, HttpProviderConfigPaths, createHttpProvider } from '../HttpProvider';
 import { ProviderError, ProviderFailure, UtxoProvider } from '@cardano-sdk/core';
 import { mapHealthCheckError } from '../mapHealthCheckError';
 
-export const defaultUtxoProviderPaths: HttpProviderConfigPaths<UtxoProvider> = {
+/**
+ * The UtxoProvider endpoint paths.
+ */
+const paths: HttpProviderConfigPaths<UtxoProvider> = {
   healthCheck: '/health',
   utxoByAddresses: '/utxo-by-addresses'
 };
@@ -11,18 +13,11 @@ export const defaultUtxoProviderPaths: HttpProviderConfigPaths<UtxoProvider> = {
 /**
  * Connect to a Cardano Services HttpServer instance with the service available
  *
- * @param {string} baseUrl server root url, w/o trailing /
- * @param paths  A mapping between provider method names and url paths. Paths have to use /leadingSlash
- * @param adapter This adapter that allows to you to modify the way Axios make requests.
+ * @param config The configuration object fot the Utxo Provider.
  */
-export const utxoHttpProvider = (
-  baseUrl: string,
-  paths = defaultUtxoProviderPaths,
-  adapter?: AxiosAdapter
-): UtxoProvider =>
+export const utxoHttpProvider = (config: CreateHttpProviderConfig<UtxoProvider>): UtxoProvider =>
   createHttpProvider<UtxoProvider>({
-    adapter,
-    baseUrl,
+    ...config,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     mapError: (error: any, method) => {
       if (method === 'healthCheck') {

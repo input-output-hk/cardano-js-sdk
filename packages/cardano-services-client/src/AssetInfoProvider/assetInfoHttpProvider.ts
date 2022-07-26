@@ -1,8 +1,10 @@
 import { AssetProvider } from '@cardano-sdk/core';
-import { AxiosAdapter } from 'axios';
-import { HttpProviderConfigPaths, createHttpProvider } from '../HttpProvider';
+import { CreateHttpProviderConfig, HttpProviderConfigPaths, createHttpProvider } from '../HttpProvider';
 
-export const defaultAssetProviderPaths: HttpProviderConfigPaths<AssetProvider> = {
+/**
+ * The AssetProvider endpoint paths.
+ */
+const paths: HttpProviderConfigPaths<AssetProvider> = {
   getAsset: '/get-asset',
   healthCheck: '/health'
 };
@@ -10,17 +12,10 @@ export const defaultAssetProviderPaths: HttpProviderConfigPaths<AssetProvider> =
 /**
  * Connect to a Cardano Services HttpServer instance with the service available
  *
- * @param {string} baseUrl server root url, w/o trailing /
- * @param paths A mapping between provider method names and url paths. Paths have to use /leadingSlash
- * @param adapter This adapter that allows to you to modify the way Axios make requests.
+ * @param config The configuration object fot the AssetProvider Provider.
  */
-export const assetInfoHttpProvider = (
-  baseUrl: string,
-  paths = defaultAssetProviderPaths,
-  adapter?: AxiosAdapter
-): AssetProvider =>
+export const assetInfoHttpProvider = (config: CreateHttpProviderConfig<AssetProvider>): AssetProvider =>
   createHttpProvider<AssetProvider>({
-    adapter,
-    baseUrl,
+    ...config,
     paths
   });
