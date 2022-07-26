@@ -21,8 +21,12 @@ jobs:
         ref: nightly
         submodules: true
 
-    - name: Rebase on master
-      run: git rebase master
+    - name: Merge in master
+      run: |
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+        git merge origin/master
+        git push --force
 
     - name: 🧰 Setup Node.js
       uses: actions/setup-node@v1
@@ -31,25 +35,19 @@ jobs:
         registry-url: 'https://registry.npmjs.org'
 
     - name: Install dependencies
-      run: yarn install --immutable --inline-builds
+      run: yarn install --immutable --inline-builds --mode=skip-build
 
     - name: Check if any packages changed
       id: precondition
       run: |
         CHANGED=$(yarn run lerna changed --json | node -e "console.log(JSON.parse(require('fs').readFileSync(0).toString()).length)")
+        echo "$CHANGED packages changed"
         echo "::set-output name=changed::$(($CHANGED))"
 
-    - name: 🔨 Build
-      if: steps.precondition.changed > 0
-      run: |
-        yarn build
-
     - name: Publish
-      if: steps.precondition.changed > 0
+      if: steps.precondition.outputs.changed > 0
       run: |
-        git config user.name github-actions  
-        git config user.email github-actions@github.com
-        yarn publish:nightly
+        yarn publish:nightly --loglevel silly
       env:
+        YARN_ENABLE_IMMUTABLE_INSTALLS: false
         NODE_AUTH_TOKEN: ${{ secrets.NPM_REGISTRY_TOKEN }}
-        
