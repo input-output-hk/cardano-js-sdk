@@ -1,6 +1,7 @@
-name: Publish (nightly)
+name: nightly
 
 on:
+  workflow_dispatch:
   schedule:
     # Every day 00:00 UTC
     - cron:  '0 0 * * *'
