@@ -9,3 +9,4 @@ export * from './ProviderTracker';
 export * from './WalletUtil';
 export * from './EpochTracker';
 export * from './TipTracker';
+export * from './TransactionReemitter';

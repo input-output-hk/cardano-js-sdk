@@ -10,6 +10,7 @@ import {
 import { EMPTY, combineLatest, map } from 'rxjs';
 import { GroupedAddress } from '../../KeyManagement';
 import { Logger } from 'ts-log';
+import { NewTxAlonzoWithSlot } from '../../services';
 import { PouchdbCollectionStore } from './PouchdbCollectionStore';
 import { PouchdbDocumentStore } from './PouchdbDocumentStore';
 import { PouchdbKeyValueStore } from './PouchdbKeyValueStore';
@@ -25,6 +26,7 @@ export class PouchdbTimeSettingsStore extends PouchdbDocumentStore<TimeSettings[
 export class PouchdbAssetsStore extends PouchdbDocumentStore<Assets> {}
 export class PouchdbAddressesStore extends PouchdbDocumentStore<GroupedAddress[]> {}
 export class PouchdbInFlightTransactionsStore extends PouchdbDocumentStore<Cardano.NewTxAlonzo[]> {}
+export class PouchdbVolatileTransactionsStore extends PouchdbDocumentStore<NewTxAlonzoWithSlot[]> {}
 
 export class PouchdbTransactionsStore extends PouchdbCollectionStore<Cardano.TxAlonzo> {}
 export class PouchdbUtxoStore extends PouchdbCollectionStore<Cardano.Utxo> {}
@@ -56,7 +58,6 @@ export const createPouchdbWalletStores = (
         return combineLatest([
           destroyDocumentsDb,
           this.transactions.destroy(),
-          this.inFlightTransactions.destroy(),
           this.utxo.destroy(),
           this.unspendableUtxo.destroy(),
           this.rewardsHistory.destroy(),
@@ -90,6 +91,7 @@ export const createPouchdbWalletStores = (
       logger
     ),
     unspendableUtxo: new PouchdbUtxoStore({ dbName: `${baseDbName}UnspendableUtxo` }, logger),
-    utxo: new PouchdbUtxoStore({ dbName: `${baseDbName}Utxo` }, logger)
+    utxo: new PouchdbUtxoStore({ dbName: `${baseDbName}Utxo` }, logger),
+    volatileTransactions: new PouchdbVolatileTransactionsStore(docsDbName, 'volatileTransactions', logger)
   };
 };

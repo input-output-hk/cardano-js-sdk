@@ -12,6 +12,7 @@ import { GroupedAddress } from '../../KeyManagement';
 import { InMemoryCollectionStore } from './InMemoryCollectionStore';
 import { InMemoryDocumentStore } from './InMemoryDocumentStore';
 import { InMemoryKeyValueStore } from './InMemoryKeyValueStore';
+import { NewTxAlonzoWithSlot } from '../../services';
 import { WalletStores } from '../types';
 
 export class InMemoryTipStore extends InMemoryDocumentStore<Cardano.Tip> {}
@@ -24,6 +25,7 @@ export class InMemoryTimeSettingsStore extends InMemoryDocumentStore<TimeSetting
 export class InMemoryAssetsStore extends InMemoryDocumentStore<Assets> {}
 export class InMemoryAddressesStore extends InMemoryDocumentStore<GroupedAddress[]> {}
 export class InMemoryInFlightTransactionsStore extends InMemoryDocumentStore<Cardano.NewTxAlonzo[]> {}
+export class InMemoryVolatileTransactionsStore extends InMemoryDocumentStore<NewTxAlonzoWithSlot[]> {}
 
 export class InMemoryTransactionsStore extends InMemoryCollectionStore<Cardano.TxAlonzo> {}
 export class InMemoryUtxoStore extends InMemoryCollectionStore<Cardano.Utxo> {}
@@ -54,6 +56,7 @@ export const createInMemoryWalletStores = (): WalletStores => ({
         this.tip.destroy(),
         this.transactions.destroy(),
         this.inFlightTransactions.destroy(),
+        this.volatileTransactions.destroy(),
         this.utxo.destroy()
       ]).pipe(map(() => void 0));
     }
@@ -72,5 +75,6 @@ export const createInMemoryWalletStores = (): WalletStores => ({
   tip: new InMemoryTipStore(),
   transactions: new InMemoryTransactionsStore(),
   unspendableUtxo: new InMemoryUnspendableUtxoStore(),
-  utxo: new InMemoryUtxoStore()
+  utxo: new InMemoryUtxoStore(),
+  volatileTransactions: new InMemoryVolatileTransactionsStore()
 });

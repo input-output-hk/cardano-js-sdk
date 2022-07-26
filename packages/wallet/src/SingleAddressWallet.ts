@@ -53,14 +53,19 @@ import {
 import { BehaviorObservable, TrackerSubject } from '@cardano-sdk/util-rxjs';
 import {
   BehaviorSubject,
+  EMPTY,
   Subject,
+  Subscription,
+  catchError,
   combineLatest,
   concat,
   distinctUntilChanged,
   filter,
   firstValueFrom,
+  from,
   lastValueFrom,
   map,
+  mergeMap,
   take,
   tap
 } from 'rxjs';
@@ -73,6 +78,7 @@ import { TrackedUtxoProvider } from './services/ProviderTracker/TrackedUtxoProvi
 import { TxInternals, createTransactionInternals, ensureValidityInterval } from './Transaction';
 import { WalletStores, createInMemoryWalletStores } from './persistence';
 import { cip30signData } from './KeyManagement/cip8';
+import { createTransactionReemitter } from './services/TransactionReemitter';
 import isEqual from 'lodash/isEqual';
 
 export interface SingleAddressWalletProps {
@@ -105,6 +111,7 @@ export class SingleAddressWallet implements ObservableWallet {
     pending$: new Subject<Cardano.NewTxAlonzo>(),
     submitting$: new Subject<Cardano.NewTxAlonzo>()
   };
+  #resubmitSubscription: Subscription;
 
   readonly keyAgent: AsyncKeyAgent;
   readonly currentEpoch$: TrackerSubject<EpochInfo>;
@@ -288,6 +295,23 @@ export class SingleAddressWallet implements ObservableWallet {
       tip$: this.tip$,
       transactionsHistoryStore: stores.transactions
     });
+
+    this.#resubmitSubscription = createTransactionReemitter({
+      confirmed$: this.transactions.outgoing.confirmed$,
+      rollback$: this.transactions.rollback$,
+      store: stores.volatileTransactions,
+      submitting$: this.transactions.outgoing.submitting$,
+      tipSlot$: this.tip$.pipe(map((tip) => tip.slot))
+    })
+      .pipe(
+        mergeMap((transaction) => from(this.submitTx(transaction))),
+        catchError((err) => {
+          this.#logger.error('Failed to resubmit transaction', err);
+          return EMPTY;
+        })
+      )
+      .subscribe();
+
     this.utxo = createUtxoTracker({
       addresses$,
       retryBackoffConfig,
@@ -408,6 +432,7 @@ export class SingleAddressWallet implements ObservableWallet {
     this.#newTransactions.failedToSubmit$.complete();
     this.#newTransactions.pending$.complete();
     this.#newTransactions.submitting$.complete();
+    this.#resubmitSubscription.unsubscribe();
   }
 
   #prepareTx(props: InitializeTxProps) {
