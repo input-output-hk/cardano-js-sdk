@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>19/19</span>
+                <span class='fraction'>25/25</span>
             </div>
         
             
@@ -39,14 +39,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>8/8</span>
+                <span class='fraction'>10/10</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>17/17</span>
+                <span class='fraction'>21/21</span>
             </div>
         
             
@@ -101,22 +101,31 @@
 <a name='L36'></a><a href='#L36'>36</a>
 <a name='L37'></a><a href='#L37'>37</a>
 <a name='L38'></a><a href='#L38'>38</a>
-<a name='L39'></a><a href='#L39'>39</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">38x</span>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">38x</span>
 <span class="cline-any cline-yes">38x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">38x</span>
-<span class="cline-any cline-yes">26x</span>
-<span class="cline-any cline-yes">26x</span>
+<span class="cline-any cline-yes">27x</span>
+<span class="cline-any cline-yes">27x</span>
+<span class="cline-any cline-yes">27x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">20x</span>
 <span class="cline-any cline-yes">20x</span>
+<span class="cline-any cline-yes">20x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -124,18 +133,21 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">38x</span>
-<span class="cline-any cline-yes">26x</span>
+<span class="cline-any cline-yes">27x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">26x</span>
-<span class="cline-any cline-yes">26x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">26x</span>
+<span class="cline-any cline-yes">27x</span>
+<span class="cline-any cline-yes">27x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">27x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">27x</span>
 <span class="cline-any cline-yes">22x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">26x</span>
+<span class="cline-any cline-yes">27x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -144,15 +156,18 @@ import { CLEAN_FN_STATS, ProviderFnStats, ProviderTracker } from './ProviderTrac
 import { StakePoolProvider } from '@cardano-sdk/core';
 &nbsp;
 export class StakePoolProviderStats {
+  readonly healthCheck$ = new BehaviorSubject&lt;ProviderFnStats&gt;(CLEAN_FN_STATS);
   readonly queryStakePools$ = new BehaviorSubject&lt;ProviderFnStats&gt;(CLEAN_FN_STATS);
   readonly stakePoolStats$ = new BehaviorSubject&lt;ProviderFnStats&gt;(CLEAN_FN_STATS);
 &nbsp;
   shutdown() {
+    this.healthCheck$.complete();
     this.queryStakePools$.complete();
     this.stakePoolStats$.complete();
   }
 &nbsp;
   reset() {
+    this.healthCheck$.next(CLEAN_FN_STATS);
     this.queryStakePools$.next(CLEAN_FN_STATS);
     this.stakePoolStats$.next(CLEAN_FN_STATS);
   }
@@ -163,12 +178,15 @@ export class StakePoolProviderStats {
  */
 export class TrackedStakePoolProvider extends ProviderTracker implements StakePoolProvider {
   readonly stats = new StakePoolProviderStats();
+  readonly healthCheck: StakePoolProvider['healthCheck'];
   readonly queryStakePools: StakePoolProvider['queryStakePools'];
   readonly stakePoolStats: StakePoolProvider['stakePoolStats'];
 &nbsp;
   constructor(queryStakePoolsProvider: StakePoolProvider) {
     super();
     queryStakePoolsProvider = queryStakePoolsProvider;
+&nbsp;
+    this.healthCheck = () =&gt; this.trackedCall(() =&gt; queryStakePoolsProvider.healthCheck(), this.stats.healthCheck$);
 &nbsp;
     this.queryStakePools = (fragments) =&gt;
       this.trackedCall(() =&gt; queryStakePoolsProvider.queryStakePools(fragments), this.stats.queryStakePools$);
@@ -184,7 +202,7 @@ export class TrackedStakePoolProvider extends ProviderTracker implements StakePo
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at Mon Jul 18 2022 03:41:49 GMT+0000 (Coordinated Universal Time)
+                at Tue Jul 26 2022 11:30:29 GMT+0000 (Coordinated Universal Time)
             </div>
         <script src="../../../prettify.js"></script>
         <script>

@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>18/18</span>
+                <span class='fraction'>17/17</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>17/17</span>
+                <span class='fraction'>16/16</span>
             </div>
         
             
@@ -107,10 +107,8 @@
 <a name='L42'></a><a href='#L42'>42</a>
 <a name='L43'></a><a href='#L43'>43</a>
 <a name='L44'></a><a href='#L44'>44</a>
-<a name='L45'></a><a href='#L45'>45</a>
-<a name='L46'></a><a href='#L46'>46</a>
-<a name='L47'></a><a href='#L47'>47</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
+<a name='L45'></a><a href='#L45'>45</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">23x</span>
+<span class="cline-any cline-yes">23x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -128,39 +126,37 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">23x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import * as Queries from './queries';
-import { Asset, Cardano } from '@cardano-sdk/core';
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Asset, Cardano } from '@cardano-sdk/core';
+import { AssetBuilder } from './AssetBuilder';
 import { AssetPolicyIdAndName, NftMetadataService } from './types';
 import { Logger } from 'ts-log';
 import { MetadataService } from '../Metadata';
-import { Pool, QueryResult } from 'pg';
+import { Pool } from 'pg';
 &nbsp;
 /**
  * Dependencies that are need to create DbSyncNftMetadataService
@@ -175,25 +171,23 @@ export interface DbSyncNftMetadataServiceDependencies {
  * NftMetadataService implementation using cardano-db-sync database as a source
  */
 export class DbSyncNftMetadataService implements NftMetadataService {
-  #db: Pool;
+  #builder: AssetBuilder;
   #logger: Logger;
   #metadataService: MetadataService;
 &nbsp;
   constructor({ db, logger, metadataService }: DbSyncNftMetadataServiceDependencies) {
-    this.#db = db;
+    this.#builder = new AssetBuilder(db, logger);
     this.#logger = logger;
     this.#metadataService = metadataService;
   }
 &nbsp;
   async getNftMetadata(assetInfo: AssetPolicyIdAndName): Promise&lt;Asset.NftMetadata | undefined&gt; {
     // Perf: could query last mint tx metadata in 1 query instead of 2
-    this.#logger.debug('Querying find last nft mint tx for asset:', assetInfo);
-    const result: QueryResult&lt;Queries.FindLastMintTxModel&gt; = await this.#db.query(Queries.findLastNftMintTx, [
-      Buffer.from(assetInfo.policyId, 'hex'),
-      Buffer.from(assetInfo.name, 'hex')
-    ]);
-    if (result.rows.length === 0) return;
-    const lastMintedTxId = Cardano.TransactionId(result.rows[0].tx_hash.toString('hex'));
+    const lastMintedTx = await this.#builder.queryLastMintTx(assetInfo.policyId, assetInfo.name);
+&nbsp;
+    if (!lastMintedTx) return;
+&nbsp;
+    const lastMintedTxId = Cardano.TransactionId(lastMintedTx.tx_hash.toString('hex'));
 &nbsp;
     this.#logger.debug('Querying tx metadata', lastMintedTxId);
     const metadatas = await this.#metadataService.queryTxMetadataByHashes([lastMintedTxId]);
@@ -208,7 +202,7 @@ export class DbSyncNftMetadataService implements NftMetadataService {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at Mon Jul 18 2022 03:38:41 GMT+0000 (Coordinated Universal Time)
+                at Tue Jul 26 2022 11:26:43 GMT+0000 (Coordinated Universal Time)
             </div>
         <script src="../../prettify.js"></script>
         <script>

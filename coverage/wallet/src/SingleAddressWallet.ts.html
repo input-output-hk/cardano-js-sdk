@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">96.19% </span>
+                <span class="strong">96.29% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>101/105</span>
+                <span class='fraction'>104/108</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">90% </span>
+                <span class="strong">90.47% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>18/20</span>
+                <span class='fraction'>19/21</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">96.03% </span>
+                <span class="strong">96.11% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>97/101</span>
+                <span class='fraction'>99/103</span>
             </div>
         
             
@@ -502,7 +502,12 @@
 <a name='L437'></a><a href='#L437'>437</a>
 <a name='L438'></a><a href='#L438'>438</a>
 <a name='L439'></a><a href='#L439'>439</a>
-<a name='L440'></a><a href='#L440'>440</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">35x</span>
+<a name='L440'></a><a href='#L440'>440</a>
+<a name='L441'></a><a href='#L441'>441</a>
+<a name='L442'></a><a href='#L442'>442</a>
+<a name='L443'></a><a href='#L443'>443</a>
+<a name='L444'></a><a href='#L444'>444</a>
+<a name='L445'></a><a href='#L445'>445</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">35x</span>
 <span class="cline-any cline-yes">35x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -555,11 +560,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">35x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">35x</span>
-<span class="cline-any cline-yes">35x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">35x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -570,6 +570,12 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">35x</span>
+<span class="cline-any cline-yes">35x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">35x</span>
@@ -604,6 +610,7 @@
 <span class="cline-any cline-yes">20x</span>
 <span class="cline-any cline-yes">20x</span>
 <span class="cline-any cline-yes">20x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -717,6 +724,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">20x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">20x</span>
 <span class="cline-any cline-yes">20x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -730,8 +740,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">20x</span>
+<span class="cline-any cline-yes">21x</span>
 <span class="cline-any cline-yes">126x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">20x</span>
@@ -776,7 +786,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">20x</span>
-<span class="cline-any cline-yes">127x</span>
+<span class="cline-any cline-yes">132x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">20x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -994,12 +1004,8 @@ import {
   groupedAddressesEquals
 } from './services';
 import { BehaviorObservable, TrackerSubject } from '@cardano-sdk/util-rxjs';
-import { Cip30DataSignature } from '@cardano-sdk/cip30';
-import { InputSelector, defaultSelectionConstraints, roundRobinRandomImprove } from '@cardano-sdk/cip2';
-import { Logger, dummyLogger } from 'ts-log';
-import { RetryBackoffConfig } from 'backoff-rxjs';
-import { Shutdown } from '@cardano-sdk/util';
 import {
+  BehaviorSubject,
   Subject,
   combineLatest,
   concat,
@@ -1011,6 +1017,11 @@ import {
   take,
   tap
 } from 'rxjs';
+import { Cip30DataSignature } from '@cardano-sdk/cip30';
+import { InputSelector, defaultSelectionConstraints, roundRobinRandomImprove } from '@cardano-sdk/cip2';
+import { Logger, dummyLogger } from 'ts-log';
+import { RetryBackoffConfig } from 'backoff-rxjs';
+import { Shutdown } from '@cardano-sdk/util';
 import { TrackedUtxoProvider } from './services/ProviderTracker/TrackedUtxoProvider';
 import { TxInternals, createTransactionInternals, ensureValidityInterval } from './Transaction';
 import { WalletStores, createInMemoryWalletStores } from './persistence';
@@ -1047,6 +1058,7 @@ export class SingleAddressWallet implements ObservableWallet {
     pending$: new Subject&lt;Cardano.NewTxAlonzo&gt;(),
     submitting$: new Subject&lt;Cardano.NewTxAlonzo&gt;()
   };
+&nbsp;
   readonly keyAgent: AsyncKeyAgent;
   readonly currentEpoch$: TrackerSubject&lt;EpochInfo&gt;;
   readonly txSubmitProvider: TrackedTxSubmitProvider;
@@ -1156,21 +1168,24 @@ export class SingleAddressWallet implements ObservableWallet {
       syncStatus: this.syncStatus
     });
     const tipBlockHeight$ = distinctBlock(this.tip$);
+&nbsp;
+    // Time settings
+    const timeSettingsTrigger = new BehaviorSubject&lt;void&gt;(void 0);
     this.timeSettings$ = new PersistentDocumentTrackerSubject(
-      // TODO: it only really needs to be fetched once per epoch,
-      // so we should replace the trigger from tipBlockHeight$ to epoch$.
-      // This is a little complicated since there is a circular dependency.
-      // Some logic is needed to initiate a fetch if epoch is not available in store already.
       coldObservableProvider({
         cancel$,
         equals: deepEquals,
         provider: this.networkInfoProvider.timeSettings,
         retryBackoffConfig,
-        trigger$: tipBlockHeight$
+        trigger$: timeSettingsTrigger
       }),
       stores.timeSettings
     );
+&nbsp;
+    // Epoch tracker triggers the first timeSettings fetch from timeSettingsTrigger
+    // Epoch changes also trigger refetch of timeSettings
     this.currentEpoch$ = currentEpochTracker(this.tip$, this.timeSettings$);
+    this.currentEpoch$.pipe(map(() =&gt; void 0)).subscribe(timeSettingsTrigger);
     const epoch$ = this.currentEpoch$.pipe(map((epoch) =&gt; epoch.epochNo));
 &nbsp;
     this.stake$ = new PersistentDocumentTrackerSubject(
@@ -1387,7 +1402,7 @@ export class SingleAddressWallet implements ObservableWallet {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at Mon Jul 18 2022 03:41:49 GMT+0000 (Coordinated Universal Time)
+                at Tue Jul 26 2022 11:30:29 GMT+0000 (Coordinated Universal Time)
             </div>
         <script src="../prettify.js"></script>
         <script>
