@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 import * as envalid from 'envalid';
-import { CACHE_TTL_DEFAULT } from './InMemoryCache';
 import { LogLevel } from 'bunyan';
 import {
   OGMIOS_URL_DEFAULT,
@@ -12,13 +11,11 @@ import {
 } from './TxWorker';
 import { SERVICE_DISCOVERY_BACKOFF_FACTOR_DEFAULT, SERVICE_DISCOVERY_TIMEOUT_DEFAULT } from './Program';
 import { URL } from 'url';
-import { cacheTtlValidator } from './util/validators';
 import { config } from 'dotenv';
 import { loggerMethodNames } from './util';
 import onDeath from 'death';
 
 const envSpecs = {
-  CACHE_TTL: envalid.makeValidator(cacheTtlValidator)(envalid.num({ default: CACHE_TTL_DEFAULT })),
   LOGGER_MIN_SEVERITY: envalid.str({ choices: loggerMethodNames as string[], default: 'info' }),
   OGMIOS_SRV_SERVICE_NAME: envalid.str({ default: undefined }),
   OGMIOS_URL: envalid.url({ default: OGMIOS_URL_DEFAULT }),
@@ -38,7 +35,6 @@ void (async () => {
   try {
     const worker = await loadAndStartTxWorker({
       options: {
-        cacheTtl: env.CACHE_TTL,
         loggerMinSeverity: env.LOGGER_MIN_SEVERITY as LogLevel,
         ogmiosSrvServiceName: env.OGMIOS_SRV_SERVICE_NAME,
         ogmiosUrl: new URL(env.OGMIOS_URL),

@@ -1,5 +1,5 @@
 export enum CommonOptionDescriptions {
-  CacheTtl = 'Cache TTL in minutes between 1 and 2880',
+  DbCacheTtl = 'Cache TTL in minutes between 1 and 2880, an option for database related operations',
   LoggerMinSeverity = 'Log level',
   OgmiosSrvServiceName = 'Ogmios SRV service name',
   OgmiosUrl = 'Ogmios URL',

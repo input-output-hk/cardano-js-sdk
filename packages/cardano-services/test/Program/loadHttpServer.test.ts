@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 /* eslint-disable sonarjs/no-duplicate-string */
-import { CACHE_TTL_DEFAULT } from '../../src/InMemoryCache';
+import { DB_CACHE_TTL_DEFAULT } from '../../src/InMemoryCache';
 import { EPOCH_POLL_INTERVAL_DEFAULT } from '../../src/NetworkInfo';
 import {
   HttpServer,
@@ -35,12 +35,12 @@ jest.mock('dns', () => ({
 describe('loadHttpServer', () => {
   let apiUrl: URL;
   let cardanoNodeConfigPath: string;
-  let dbConnectionString: string;
+  let postgresConnectionString: string;
   let postgresSrvServiceName: string;
   let postgresDb: string;
   let postgresUser: string;
   let postgresPassword: string;
-  let cacheTtl: number;
+  let dbCacheTtl: number;
   let epochPollInterval: number;
   let httpServer: HttpServer;
   let ogmiosConnection: Ogmios.Connection;
@@ -53,7 +53,7 @@ describe('loadHttpServer', () => {
 
   beforeEach(async () => {
     apiUrl = new URL(`http://localhost:${await getRandomPort()}`);
-    dbConnectionString = process.env.DB_CONNECTION_STRING!;
+    postgresConnectionString = process.env.POSTGRES_CONNECTION_STRING!;
     postgresSrvServiceName = process.env.POSTGRES_SRV_SERVICE_NAME!;
     postgresDb = process.env.POSTGRES_DB!;
     postgresUser = process.env.POSTGRES_USER!;
@@ -65,7 +65,7 @@ describe('loadHttpServer', () => {
     serviceDiscoveryTimeout = SERVICE_DISCOVERY_TIMEOUT_DEFAULT;
     rabbitmqUrl = new URL(process.env.RABBITMQ_URL!);
     rabbitmqSrvServiceName = process.env.RABBITMQ_SRV_SERVICE_NAME!;
-    cacheTtl = CACHE_TTL_DEFAULT;
+    dbCacheTtl = DB_CACHE_TTL_DEFAULT;
     epochPollInterval = EPOCH_POLL_INTERVAL_DEFAULT;
   });
 
@@ -84,11 +84,11 @@ describe('loadHttpServer', () => {
       httpServer = await loadHttpServer({
         apiUrl,
         options: {
-          cacheTtl,
           cardanoNodeConfigPath,
-          dbConnectionString,
+          dbCacheTtl,
           epochPollInterval,
-          ogmiosUrl: new URL(ogmiosConnection.address.webSocket)
+          ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
+          postgresConnectionString
         },
         serviceNames: [
           ServiceNames.StakePool,
@@ -107,7 +107,7 @@ describe('loadHttpServer', () => {
         httpServer = await loadHttpServer({
           apiUrl,
           options: {
-            cacheTtl,
+            dbCacheTtl,
             epochPollInterval,
             postgresDb,
             postgresPassword,
@@ -130,7 +130,7 @@ describe('loadHttpServer', () => {
             await loadHttpServer({
               apiUrl,
               options: {
-                cacheTtl,
+                dbCacheTtl,
                 epochPollInterval,
                 postgresDb: missingPostgresDb,
                 postgresSrvServiceName,
@@ -142,8 +142,8 @@ describe('loadHttpServer', () => {
             })
         ).rejects.toThrow(
           new MissingProgramOption(ServiceNames.StakePool, [
-            ProgramOptionDescriptions.DbConnection,
-            ProgramOptionDescriptions.PostgresSrvArgs
+            ProgramOptionDescriptions.PostgresConnectionString,
+            ProgramOptionDescriptions.PostgresServiceDiscoveryArgs
           ])
         );
       });
@@ -154,15 +154,15 @@ describe('loadHttpServer', () => {
             await loadHttpServer({
               apiUrl,
               options: {
-                cacheTtl,
+                dbCacheTtl,
                 epochPollInterval
               },
               serviceNames: [ServiceNames.StakePool]
             })
         ).rejects.toThrow(
           new MissingProgramOption(ServiceNames.StakePool, [
-            ProgramOptionDescriptions.DbConnection,
-            ProgramOptionDescriptions.PostgresSrvArgs
+            ProgramOptionDescriptions.PostgresConnectionString,
+            ProgramOptionDescriptions.PostgresServiceDiscoveryArgs
           ])
         );
       });
@@ -173,9 +173,9 @@ describe('loadHttpServer', () => {
             await loadHttpServer({
               apiUrl,
               options: {
-                cacheTtl,
-                dbConnectionString,
+                dbCacheTtl,
                 epochPollInterval,
+                postgresConnectionString,
                 postgresSrvServiceName,
                 serviceDiscoveryBackoffFactor,
                 serviceDiscoveryTimeout
@@ -183,7 +183,10 @@ describe('loadHttpServer', () => {
               serviceNames: [ServiceNames.StakePool]
             })
         ).rejects.toThrow(
-          new InvalidArgsCombination(ProgramOptionDescriptions.DbConnection, ProgramOptionDescriptions.PostgresSrvArgs)
+          new InvalidArgsCombination(
+            ProgramOptionDescriptions.PostgresConnectionString,
+            ProgramOptionDescriptions.PostgresServiceDiscoveryArgs
+          )
         );
       });
     });
@@ -193,7 +196,7 @@ describe('loadHttpServer', () => {
         httpServer = await loadHttpServer({
           apiUrl,
           options: {
-            cacheTtl,
+            dbCacheTtl,
             epochPollInterval,
             ogmiosSrvServiceName,
             serviceDiscoveryBackoffFactor,
@@ -209,7 +212,7 @@ describe('loadHttpServer', () => {
         httpServer = await loadHttpServer({
           apiUrl,
           options: {
-            cacheTtl,
+            dbCacheTtl,
             epochPollInterval,
             ogmiosSrvServiceName,
             ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
@@ -228,7 +231,7 @@ describe('loadHttpServer', () => {
             await loadHttpServer({
               apiUrl,
               options: {
-                cacheTtl,
+                dbCacheTtl,
                 epochPollInterval,
                 serviceDiscoveryBackoffFactor,
                 serviceDiscoveryTimeout
@@ -249,7 +252,7 @@ describe('loadHttpServer', () => {
         httpServer = await loadHttpServer({
           apiUrl,
           options: {
-            cacheTtl,
+            dbCacheTtl,
             epochPollInterval,
             rabbitmqSrvServiceName,
             serviceDiscoveryBackoffFactor,
@@ -266,7 +269,7 @@ describe('loadHttpServer', () => {
         httpServer = await loadHttpServer({
           apiUrl,
           options: {
-            cacheTtl,
+            dbCacheTtl,
             epochPollInterval,
             rabbitmqSrvServiceName,
             rabbitmqUrl,
@@ -286,7 +289,7 @@ describe('loadHttpServer', () => {
             await loadHttpServer({
               apiUrl,
               options: {
-                cacheTtl,
+                dbCacheTtl,
                 epochPollInterval,
                 serviceDiscoveryBackoffFactor,
                 serviceDiscoveryTimeout,
@@ -309,10 +312,10 @@ describe('loadHttpServer', () => {
           await loadHttpServer({
             apiUrl,
             options: {
-              cacheTtl: 0,
-              dbConnectionString: 'postgres',
+              dbCacheTtl: 0,
               epochPollInterval: 0,
-              ogmiosUrl: new URL('http://localhost:1337')
+              ogmiosUrl: new URL('http://localhost:1337'),
+              postgresConnectionString: 'postgres'
             },
             serviceNames: [ServiceNames.NetworkInfo]
           })
@@ -338,10 +341,10 @@ describe('loadHttpServer', () => {
         loadHttpServer({
           apiUrl,
           options: {
-            cacheTtl,
-            dbConnectionString,
+            dbCacheTtl,
             epochPollInterval,
-            ogmiosUrl: new URL(ogmiosConnection.address.webSocket)
+            ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
+            postgresConnectionString
           },
           serviceNames: [ServiceNames.StakePool, ServiceNames.TxSubmit]
         })

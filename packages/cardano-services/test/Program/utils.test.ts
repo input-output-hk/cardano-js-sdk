@@ -75,7 +75,7 @@ describe('Service dependency abstractions', () => {
 
     beforeAll(async () => {
       db = await getPool(dnsResolver, logger, {
-        cacheTtl: 10_000,
+        dbCacheTtl: 10_000,
         epochPollInterval: 1000,
         postgresDb: process.env.POSTGRES_DB!,
         postgresPassword: process.env.POSTGRES_PASSWORD!,
@@ -134,9 +134,9 @@ describe('Service dependency abstractions', () => {
 
     beforeAll(async () => {
       db = await getPool(dnsResolver, logger, {
-        cacheTtl: 10_000,
-        dbConnectionString: process.env.DB_CONNECTION_STRING,
-        epochPollInterval: 1000
+        dbCacheTtl: 10_000,
+        epochPollInterval: 1000,
+        postgresConnectionString: process.env.POSTGRES_CONNECTION_STRING
       });
     });
 
@@ -197,7 +197,7 @@ describe('Service dependency abstractions', () => {
       });
 
       provider = await getPool(dnsResolverMock, logger, {
-        cacheTtl: 10_000,
+        dbCacheTtl: 10_000,
         epochPollInterval: 1000,
         postgresDb: process.env.POSTGRES_DB!,
         postgresPassword: process.env.POSTGRES_PASSWORD!,
@@ -214,7 +214,7 @@ describe('Service dependency abstractions', () => {
 
     it('should execute a provider operation without to intercept it', async () => {
       provider = await getPool(dnsResolver, logger, {
-        cacheTtl: 10_000,
+        dbCacheTtl: 10_000,
         epochPollInterval: 1000,
         postgresDb: process.env.POSTGRES_DB!,
         postgresPassword: process.env.POSTGRES_PASSWORD!,
@@ -250,7 +250,6 @@ describe('Service dependency abstractions', () => {
         apiUrlBase = `http://localhost:${port}/tx-submit`;
         config = { listen: { port } };
         txSubmitProvider = await getOgmiosTxSubmitProvider(dnsResolver, logger, {
-          cacheTtl: 10_000,
           ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME,
           serviceDiscoveryBackoffFactor: 1.1,
           serviceDiscoveryTimeout: 1000
@@ -303,7 +302,6 @@ describe('Service dependency abstractions', () => {
         apiUrlBase = `http://localhost:${port}/tx-submit`;
         config = { listen: { port } };
         txSubmitProvider = await getOgmiosTxSubmitProvider(dnsResolver, logger, {
-          cacheTtl: 10_000,
           ogmiosUrl: new URL(ogmiosConnection.address.webSocket)
         });
         httpServer = new HttpServer(config, {
@@ -370,7 +368,6 @@ describe('Service dependency abstractions', () => {
       });
 
       provider = await getOgmiosTxSubmitProvider(dnsResolverMock, logger, {
-        cacheTtl: 10_000,
         ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME,
         serviceDiscoveryBackoffFactor: 1.1,
         serviceDiscoveryTimeout: 1000
@@ -384,7 +381,6 @@ describe('Service dependency abstractions', () => {
 
     it('should execute a provider operation without to intercept it', async () => {
       provider = await getOgmiosTxSubmitProvider(dnsResolver, logger, {
-        cacheTtl: 10_000,
         ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME,
         serviceDiscoveryBackoffFactor: 1.1,
         serviceDiscoveryTimeout: 1000
@@ -407,7 +403,6 @@ describe('Service dependency abstractions', () => {
         apiUrlBase = `http://localhost:${port}/tx-submit`;
         config = { listen: { port } };
         txSubmitProvider = await getRabbitMqTxSubmitProvider(dnsResolver, logger, {
-          cacheTtl: 10_000,
           rabbitmqSrvServiceName: process.env.RABBITMQ_SRV_SERVICE_NAME,
           serviceDiscoveryBackoffFactor: 1.1,
           serviceDiscoveryTimeout: 1000
@@ -450,7 +445,6 @@ describe('Service dependency abstractions', () => {
         apiUrlBase = `http://localhost:${port}/tx-submit`;
         config = { listen: { port } };
         txSubmitProvider = await getRabbitMqTxSubmitProvider(dnsResolver, logger, {
-          cacheTtl: 10_000,
           rabbitmqUrl: new URL(process.env.RABBITMQ_URL!)
         });
         httpServer = new HttpServer(config, {
@@ -499,7 +493,6 @@ describe('Service dependency abstractions', () => {
       txSubmitWorker = await loadAndStartTxWorker(
         {
           options: {
-            cacheTtl: 10_000,
             loggerMinSeverity: 'error',
             ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME,
             parallel: true,
@@ -536,7 +529,6 @@ describe('Service dependency abstractions', () => {
       });
 
       provider = await getRabbitMqTxSubmitProvider(dnsResolverMock, logger, {
-        cacheTtl: 10_000,
         rabbitmqSrvServiceName: process.env.RABBITMQ_SRV_SERVICE_NAME!,
         serviceDiscoveryBackoffFactor: 1.1,
         serviceDiscoveryTimeout: 1000
@@ -551,7 +543,6 @@ describe('Service dependency abstractions', () => {
 
     it('should execute a provider operation without to intercept it', async () => {
       provider = await getRabbitMqTxSubmitProvider(dnsResolver, logger, {
-        cacheTtl: 10_000,
         rabbitmqSrvServiceName: process.env.RABBITMQ_SRV_SERVICE_NAME,
         serviceDiscoveryBackoffFactor: 1.1,
         serviceDiscoveryTimeout: 1000

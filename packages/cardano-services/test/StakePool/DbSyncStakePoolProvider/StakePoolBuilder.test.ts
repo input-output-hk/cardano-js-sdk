@@ -5,7 +5,7 @@ import { Pool } from 'pg';
 import { StakePoolBuilder } from '../../../src';
 
 describe('StakePoolBuilder', () => {
-  const dbConnection = new Pool({ connectionString: process.env.DB_CONNECTION_STRING });
+  const dbConnection = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING });
   const builder = new StakePoolBuilder(dbConnection);
 
   afterAll(async () => {

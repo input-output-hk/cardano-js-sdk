@@ -26,7 +26,7 @@ describe('DbSyncAssetProvider', () => {
 
   beforeAll(async () => {
     ({ closeMock, tokenMetadataServerUrl } = await mockTokenRegistry(() => ({})));
-    db = new Pool({ connectionString: process.env.DB_CONNECTION_STRING });
+    db = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING });
     ntfMetadataService = new DbSyncNftMetadataService({
       db,
       logger,

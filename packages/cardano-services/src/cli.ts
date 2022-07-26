@@ -8,9 +8,15 @@ import {
   ServiceNames,
   loadHttpServer
 } from './Program';
-import { CACHE_TTL_DEFAULT } from './InMemoryCache';
 import { Command } from 'commander';
-import { CommonOptionDescriptions, Programs, USE_QUEUE_DEFAULT, WrongOption } from './ProgramsCommon';
+import {
+  CommonOptionDescriptions,
+  ENABLE_METRICS_DEFAULT,
+  Programs,
+  USE_QUEUE_DEFAULT,
+  WrongOption
+} from './ProgramsCommon';
+import { DB_CACHE_TTL_DEFAULT } from './InMemoryCache';
 import { DEFAULT_TOKEN_METADATA_CACHE_TTL, DEFAULT_TOKEN_METADATA_SERVER_URL } from './Asset';
 import { EPOCH_POLL_INTERVAL_DEFAULT } from './NetworkInfo';
 import { InvalidLoggerLevel } from './errors';
@@ -76,7 +82,6 @@ const commonOptions = (command: Command) =>
     )
     .option('--ogmios-srv-service-name <ogmiosSrvServiceName>', ProgramOptionDescriptions.OgmiosSrvServiceName)
     .option('--rabbitmq-srv-service-name <rabbitmqSrvServiceName>', ProgramOptionDescriptions.RabbitMQSrvServiceName)
-    .option('--cache-ttl <cacheTtl>', ProgramOptionDescriptions.CacheTtl, cacheTtlValidator, CACHE_TTL_DEFAULT)
     .option(
       '--service-discovery-backoff-factor <serviceDiscoveryBackoffFactor>',
       ProgramOptionDescriptions.ServiceDiscoveryBackoffFactor,
@@ -101,12 +106,14 @@ commonOptions(
     .argument('<serviceNames...>', `List of services to attach: ${Object.values(ServiceNames).toString()}`)
 )
   .option('--api-url <apiUrl>', ProgramOptionDescriptions.ApiUrl, (url) => new URL(url), new URL(API_URL_DEFAULT))
-  .option('--enable-metrics <metricsEnabled>', ProgramOptionDescriptions.MetricsEnabled, false)
-  .option('--db-connection-string <dbConnectionString>', ProgramOptionDescriptions.DbConnection, (url) =>
-    new URL(url).toString()
+  .option('--enable-metrics', ProgramOptionDescriptions.EnableMetrics, () => true, ENABLE_METRICS_DEFAULT)
+  .option(
+    '--postgres-connection-string <postgresConnectionString>',
+    ProgramOptionDescriptions.PostgresConnectionString,
+    (url) => new URL(url).toString()
   )
   .option('--cardano-node-config-path <cardanoNodeConfigPath>', ProgramOptionDescriptions.CardanoNodeConfigPath)
-  .option('--cache-ttl <cacheTtl>', ProgramOptionDescriptions.CacheTtl, cacheTtlValidator, CACHE_TTL_DEFAULT)
+  .option('--db-cache-ttl <dbCacheTtl>', ProgramOptionDescriptions.DbCacheTtl, cacheTtlValidator, DB_CACHE_TTL_DEFAULT)
   .option(
     '--epoch-poll-interval <epochPollInterval>',
     ProgramOptionDescriptions.EpochPollInterval,
@@ -126,10 +133,10 @@ commonOptions(
     DEFAULT_TOKEN_METADATA_SERVER_URL
   )
   .option('--use-queue', ProgramOptionDescriptions.UseQueue, () => true, USE_QUEUE_DEFAULT)
-  .option('--postgres-srv-service-name <postgresSrvServiceName>', ProgramOptionDescriptions.PostgresSrvArgs)
-  .option('--postgres-db <postgresDb>', ProgramOptionDescriptions.PostgresSrvArgs)
-  .option('--postgres-user <postgresUser>', ProgramOptionDescriptions.PostgresSrvArgs)
-  .option('--postgres-password <postgresPassword>', ProgramOptionDescriptions.PostgresSrvArgs)
+  .option('--postgres-srv-service-name <postgresSrvServiceName>', ProgramOptionDescriptions.PostgresSrvServiceName)
+  .option('--postgres-db <postgresDb>', ProgramOptionDescriptions.PostgresDb)
+  .option('--postgres-user <postgresUser>', ProgramOptionDescriptions.PostgresUser)
+  .option('--postgres-password <postgresPassword>', ProgramOptionDescriptions.PostgresPassword)
   .action(async (serviceNames: ServiceNames[], options: { apiUrl: URL } & HttpServerOptions) => {
     const { apiUrl, ...rest } = options;
     try {

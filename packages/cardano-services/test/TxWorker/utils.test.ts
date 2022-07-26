@@ -64,12 +64,10 @@ describe('TxSubmitWorker abstraction', () => {
       const dnsResolverMock = jest.fn();
 
       txSubmitProvider = await getOgmiosTxSubmitProvider(dnsResolver, logger, {
-        cacheTtl: 10_000,
         ogmiosUrl: new URL(connection.address.webSocket)
       });
 
       txSubmitWorker = await getRunningTxSubmitWorker(dnsResolverMock, txSubmitProvider, logger, {
-        cacheTtl: 10_000,
         rabbitmqUrl: new URL(RABBITMQ_URL_DEFAULT)
       });
 
@@ -80,14 +78,12 @@ describe('TxSubmitWorker abstraction', () => {
     it('should instantiate a running worker with service discovery', async () => {
       const dnsResolverMock = jest.fn().mockResolvedValueOnce(srvRecord);
       txSubmitProvider = await getOgmiosTxSubmitProvider(dnsResolver, logger, {
-        cacheTtl: 10_000,
         ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME,
         serviceDiscoveryBackoffFactor: 1.1,
         serviceDiscoveryTimeout: 1000
       });
 
       txSubmitWorker = await getRunningTxSubmitWorker(dnsResolverMock, txSubmitProvider, logger, {
-        cacheTtl: 10_000,
         rabbitmqSrvServiceName: process.env.RABBITMQ_SRV_SERVICE_NAME,
         serviceDiscoveryBackoffFactor: 1.1,
         serviceDiscoveryTimeout: 1000

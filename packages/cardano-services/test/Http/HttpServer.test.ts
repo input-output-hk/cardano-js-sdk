@@ -41,7 +41,7 @@ describe('HttpServer', () => {
   let port: number;
   let apiUrlBase: string;
   let provider: Provider;
-  const db = new Pool({ connectionString: process.env.DB_CONNECTION_STRING });
+  const db = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING });
 
   it('Is a runnable module', async () => {
     port = await getRandomPort();

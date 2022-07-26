@@ -13,5 +13,4 @@ export interface CommonProgramOptions {
   rabbitmqSrvServiceName?: string;
   serviceDiscoveryBackoffFactor?: number;
   serviceDiscoveryTimeout?: number;
-  cacheTtl: number;
 }

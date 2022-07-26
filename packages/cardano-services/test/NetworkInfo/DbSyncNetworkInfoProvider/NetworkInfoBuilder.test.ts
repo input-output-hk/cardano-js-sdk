@@ -6,7 +6,7 @@ describe('NetworkInfoBuilder', () => {
   let builder: NetworkInfoBuilder;
 
   beforeAll(async () => {
-    dbConnection = new Pool({ connectionString: process.env.DB_CONNECTION_STRING });
+    dbConnection = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING });
     builder = new NetworkInfoBuilder(dbConnection);
   });
 

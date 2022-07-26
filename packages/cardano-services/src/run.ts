@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint-disable max-len */
 /* eslint-disable max-statements */
 import * as envalid from 'envalid';
 import {
@@ -10,7 +11,7 @@ import {
   ServiceNames,
   loadHttpServer
 } from './Program';
-import { CACHE_TTL_DEFAULT } from './InMemoryCache';
+import { DB_CACHE_TTL_DEFAULT } from './InMemoryCache';
 import { DEFAULT_TOKEN_METADATA_CACHE_TTL, DEFAULT_TOKEN_METADATA_SERVER_URL } from './Asset';
 import { ENABLE_METRICS_DEFAULT, USE_QUEUE_DEFAULT } from './ProgramsCommon';
 import { EPOCH_POLL_INTERVAL_DEFAULT } from './NetworkInfo';
@@ -31,14 +32,14 @@ const existingFileValidator = envalid.makeValidator((filePath: string) => {
 
 const envSpecs = {
   API_URL: envalid.url({ default: API_URL_DEFAULT }),
-  CACHE_TTL: envalid.makeValidator(cacheTtlValidator)(envalid.num({ default: CACHE_TTL_DEFAULT })),
   CARDANO_NODE_CONFIG_PATH: envalid.str({ default: undefined }),
-  DB_CONNECTION_STRING: envalid.str({ default: undefined }),
+  DB_CACHE_TTL: envalid.makeValidator(cacheTtlValidator)(envalid.num({ default: DB_CACHE_TTL_DEFAULT })),
   ENABLE_METRICS: envalid.bool({ default: ENABLE_METRICS_DEFAULT }),
   EPOCH_POLL_INTERVAL: envalid.num({ default: EPOCH_POLL_INTERVAL_DEFAULT }),
   LOGGER_MIN_SEVERITY: envalid.str({ choices: loggerMethodNames as string[], default: 'info' }),
   OGMIOS_SRV_SERVICE_NAME: envalid.str({ default: undefined }),
   OGMIOS_URL: envalid.url({ default: OGMIOS_URL_DEFAULT }),
+  POSTGRES_CONNECTION_STRING: envalid.str({ default: undefined }),
   POSTGRES_DB: envalid.str({ default: undefined }),
   POSTGRES_DB_FILE: existingFileValidator({ default: undefined }),
   POSTGRES_HOST: envalid.host({ default: undefined }),
@@ -79,34 +80,34 @@ void (async () => {
   const postgresDb = env.POSTGRES_DB;
   const postgresUser = env.POSTGRES_USER;
   const postgresPassword = env.POSTGRES_PASSWORD;
-  const cacheTtl = env.CACHE_TTL;
+  const dbCacheTtl = env.DB_CACHE_TTL;
   const epochPollInterval = env.EPOCH_POLL_INTERVAL;
   const dbName = env.POSTGRES_DB_FILE ? loadSecret(env.POSTGRES_DB_FILE) : undefined;
   const dbPassword = env.POSTGRES_PASSWORD_FILE ? loadSecret(env.POSTGRES_PASSWORD_FILE) : undefined;
   const dbUser = env.POSTGRES_USER_FILE ? loadSecret(env.POSTGRES_USER_FILE) : undefined;
   // Setting the connection string takes preference over secrets.
   // It can also remain undefined since there is a default value.
-  let dbConnectionString;
-  if (env.DB_CONNECTION_STRING) {
-    dbConnectionString = new URL(env.DB_CONNECTION_STRING).toString();
+  let postgresConnectionString;
+  if (env.POSTGRES_CONNECTION_STRING) {
+    postgresConnectionString = new URL(env.POSTGRES_CONNECTION_STRING).toString();
   } else if (dbName && dbPassword && dbUser && env.POSTGRES_HOST && env.POSTGRES_PORT) {
-    dbConnectionString = `postgresql://${dbUser}:${dbPassword}@${env.POSTGRES_HOST}:${env.POSTGRES_PORT}/${dbName}`;
+    postgresConnectionString = `postgresql://${dbUser}:${dbPassword}@${env.POSTGRES_HOST}:${env.POSTGRES_PORT}/${dbName}`;
   }
-  const metricsEnabled = env.ENABLE_METRICS;
+  const enableMetrics = env.ENABLE_METRICS;
   const serviceNames = env.SERVICE_NAMES.split(',') as ServiceNames[];
 
   try {
     const server = await loadHttpServer({
       apiUrl,
       options: {
-        cacheTtl,
         cardanoNodeConfigPath,
-        dbConnectionString,
+        dbCacheTtl,
+        enableMetrics,
         epochPollInterval,
         loggerMinSeverity: env.LOGGER_MIN_SEVERITY as LogLevel,
-        metricsEnabled,
         ogmiosSrvServiceName,
         ogmiosUrl,
+        postgresConnectionString,
         postgresDb,
         postgresPassword,
         postgresSrvServiceName,

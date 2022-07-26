@@ -3,7 +3,7 @@ import { Pool } from 'pg';
 import { RewardsBuilder } from '../../../src';
 
 describe('RewardsBuilder', () => {
-  const dbConnection = new Pool({ connectionString: process.env.DB_CONNECTION_STRING });
+  const dbConnection = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING });
   const builder = new RewardsBuilder(dbConnection);
   const rewardAccWithBalance = Cardano.RewardAccount(
     'stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27'
