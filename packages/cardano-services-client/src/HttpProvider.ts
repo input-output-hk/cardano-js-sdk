@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
-import axios, { AxiosRequestConfig } from 'axios';
+import axios, { AxiosAdapter, AxiosRequestConfig } from 'axios';
 
 const isEmptyResponse = (response: any) => response === '';
 
@@ -30,6 +30,11 @@ export interface HttpProviderConfig<T> {
    * @param method provider method name
    */
   mapError?: (error: unknown, method: keyof T) => unknown;
+
+  /**
+   * This adapter that allows to you to modify the way Axios make requests.
+   */
+  adapter?: AxiosAdapter;
 }
 
 /**
@@ -46,7 +51,8 @@ export const createHttpProvider = <T extends object>({
   baseUrl,
   axiosOptions,
   mapError,
-  paths
+  paths,
+  adapter
 }: HttpProviderConfig<T>): T =>
   new Proxy<T>({} as T, {
     // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -60,6 +66,7 @@ export const createHttpProvider = <T extends object>({
         try {
           const req: AxiosRequestConfig = {
             ...axiosOptions,
+            adapter,
             baseURL: baseUrl,
             data: { args },
             method: 'post',
@@ -67,6 +74,7 @@ export const createHttpProvider = <T extends object>({
             url: path
           };
           const axiosInstance = axios.create(req);
+
           axiosInstance.interceptors.request.use((value) => {
             if (value.data) value.data = toSerializableObject(value.data);
             return value;

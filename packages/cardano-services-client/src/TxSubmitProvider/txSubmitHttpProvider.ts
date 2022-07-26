@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { AxiosAdapter } from 'axios';
 import { Cardano, ProviderError, ProviderFailure, TxSubmitProvider } from '@cardano-sdk/core';
 import { HttpProviderConfigPaths, createHttpProvider } from '../HttpProvider';
 import { mapHealthCheckError } from '../mapHealthCheckError';
@@ -26,12 +27,19 @@ const toTxSubmissionError = (error: any): Cardano.TxSubmissionError | null => {
  * Connect to a Cardano Services HttpServer instance with the service available
  *
  * @param {string} baseUrl server root url, w/o trailing /
+ * @param paths  A mapping between provider method names and url paths. Paths have to use /leadingSlash
+ * @param adapter This adapter that allows to you to modify the way Axios make requests.
  * @returns {TxSubmitProvider} TxSubmitProvider
  * @throws {ProviderError} if reason === ProviderFailure.BadRequest then
  * innerError is set to either one of Cardano.TxSubmissionErrors or Cardano.UnknownTxSubmissionError
  */
-export const txSubmitHttpProvider = (baseUrl: string, paths = defaultTxSubmitProviderPaths): TxSubmitProvider =>
+export const txSubmitHttpProvider = (
+  baseUrl: string,
+  paths = defaultTxSubmitProviderPaths,
+  adapter?: AxiosAdapter
+): TxSubmitProvider =>
   createHttpProvider<TxSubmitProvider>({
+    adapter,
     baseUrl,
     mapError: (error: any, method) => {
       switch (method) {

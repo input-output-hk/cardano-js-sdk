@@ -1,3 +1,4 @@
+import { AxiosAdapter } from 'axios';
 import { HttpProviderConfigPaths, createHttpProvider } from '../HttpProvider';
 import { NetworkInfoProvider } from '@cardano-sdk/core';
 
@@ -15,12 +16,16 @@ export const defaultNetworkInfoProviderPaths: HttpProviderConfigPaths<NetworkInf
  * Connect to a Cardano Services HttpServer instance with the service available
  *
  * @param {string} baseUrl server root url, w/o trailing /
+ * @param paths A mapping between provider method names and url paths. Paths have to use /leadingSlash
+ * @param adapter This adapter that allows to you to modify the way Axios make requests.
  */
 export const networkInfoHttpProvider = (
   baseUrl: string,
-  paths = defaultNetworkInfoProviderPaths
+  paths = defaultNetworkInfoProviderPaths,
+  adapter?: AxiosAdapter
 ): NetworkInfoProvider =>
   createHttpProvider<NetworkInfoProvider>({
+    adapter,
     baseUrl,
     paths
   });
