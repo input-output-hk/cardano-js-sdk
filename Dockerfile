@@ -62,7 +62,7 @@ ENV \
   POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password \
   POSTGRES_PORT=5432 \
   POSTGRES_USER_FILE=/run/secrets/postgres_user \
-  SERVICE_NAMES="chain-history,network-info,rewards,stake-pool,tx-submit,utxo"
+  SERVICE_NAMES=asset,chain-history,network-info,rewards,stake-pool,tx-submit,utxo
 WORKDIR /app/packages/cardano-services
 COPY packages/cardano-services/config/network/${NETWORK} /config/
 EXPOSE 3000
