@@ -16,15 +16,13 @@
       "includeMergedTags": true,
       "noCommitHooks": true,
       "yes": true,
-      "conventionalCommits": true,
-      "verifyAccess": true
+      "conventionalCommits": true
     }
   },
   "changelogPreset": {
     "name": "conventionalcommits",
     "preMajor": true
   },
-  "npmClient": "yarn",
   "useWorkspaces": true,
   "version": "independent"
 }
