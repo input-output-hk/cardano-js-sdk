@@ -11,11 +11,12 @@ import {
   StakePoolSearchResults,
   StakePoolStats
 } from '@cardano-sdk/core';
+import { CreateHttpProviderConfig, stakePoolHttpProvider } from '../../../cardano-services-client';
 import { DbSyncStakePoolProvider, HttpServer, HttpServerConfig, StakePoolHttpService } from '../../src';
+import { INFO, createLogger } from 'bunyan';
 import { Pool } from 'pg';
 import { doServerRequest } from '../util';
 import { getPort } from 'get-port-please';
-import { stakePoolHttpProvider } from '../../../cardano-services-client';
 import axios from 'axios';
 
 const UNSUPPORTED_MEDIA_STRING = 'Request failed with status code 415';
@@ -55,16 +56,18 @@ describe('StakePoolHttpService', () => {
   let stakePoolProvider: DbSyncStakePoolProvider;
   let service: StakePoolHttpService;
   let port: number;
-  let apiUrlBase: string;
+  let baseUrl: string;
+  let clientConfig: CreateHttpProviderConfig<StakePoolProvider>;
   let config: HttpServerConfig;
   let doStakePoolRequest: ReturnType<typeof doServerRequest>;
 
   beforeAll(async () => {
     port = await getPort();
-    apiUrlBase = `http://localhost:${port}/stake-pool`;
+    baseUrl = `http://localhost:${port}/stake-pool`;
     config = { listen: { port } };
+    clientConfig = { baseUrl, logger: createLogger({ level: INFO, name: 'unit tests' }) };
     dbConnection = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING });
-    doStakePoolRequest = doServerRequest(apiUrlBase);
+    doStakePoolRequest = doServerRequest(baseUrl);
   });
 
   afterEach(async () => {
@@ -110,7 +113,7 @@ describe('StakePoolHttpService', () => {
 
     describe('/health', () => {
       it('forwards the stakePoolProvider health response', async () => {
-        const res = await axios.post(`${apiUrlBase}/health`, {
+        const res = await axios.post(`${baseUrl}/health`, {
           headers: { 'Content-Type': APPLICATION_JSON }
         });
         expect(res.status).toBe(200);
@@ -121,12 +124,12 @@ describe('StakePoolHttpService', () => {
     describe('/search', () => {
       const url = '/search';
       it('returns a 200 coded response with a well formed HTTP request', async () => {
-        expect((await axios.post(`${apiUrlBase}${url}`, { args: [] })).status).toEqual(200);
+        expect((await axios.post(`${baseUrl}${url}`, { args: [] })).status).toEqual(200);
       });
 
       it('returns a 415 coded response if the wrong content type header is used', async () => {
         try {
-          await axios.post(`${apiUrlBase}${url}`, undefined, { headers: { 'Content-Type': APPLICATION_CBOR } });
+          await axios.post(`${baseUrl}${url}`, undefined, { headers: { 'Content-Type': APPLICATION_CBOR } });
           throw new Error('fail');
         } catch (error: any) {
           expect(error.response.status).toBe(415);
@@ -137,7 +140,7 @@ describe('StakePoolHttpService', () => {
       describe('with StakePoolHttpProvider', () => {
         let provider: StakePoolProvider;
         beforeEach(() => {
-          provider = stakePoolHttpProvider(apiUrlBase);
+          provider = stakePoolHttpProvider(clientConfig);
         });
 
         it('response is an array of stake pools', async () => {
@@ -336,7 +339,7 @@ describe('StakePoolHttpService', () => {
             url,
             [req]
           );
-          const responseWithOrCondition = await axios.post(`${apiUrlBase}${url}`, {
+          const responseWithOrCondition = await axios.post(`${baseUrl}${url}`, {
             args: [setFilterCondition(req, 'or')]
           });
           expect(responseWithOrCondition.status).toEqual(200);
@@ -805,12 +808,12 @@ describe('StakePoolHttpService', () => {
     describe('/stats', () => {
       const url = '/stats';
       it('returns a 200 coded response with a well formed HTTP request', async () => {
-        expect((await axios.post(`${apiUrlBase}${url}`, { args: [] })).status).toEqual(200);
+        expect((await axios.post(`${baseUrl}${url}`, { args: [] })).status).toEqual(200);
       });
 
       it('returns a 415 coded response if the wrong content type header is used', async () => {
         try {
-          await axios.post(`${apiUrlBase}${url}`, { args: [] }, { headers: { 'Content-Type': APPLICATION_CBOR } });
+          await axios.post(`${baseUrl}${url}`, { args: [] }, { headers: { 'Content-Type': APPLICATION_CBOR } });
           throw new Error('fail');
         } catch (error: any) {
           expect(error.response.status).toBe(415);
@@ -821,7 +824,7 @@ describe('StakePoolHttpService', () => {
       describe('with StakePoolHttpProvider', () => {
         let provider: StakePoolProvider;
         beforeEach(() => {
-          provider = stakePoolHttpProvider(apiUrlBase);
+          provider = stakePoolHttpProvider(clientConfig);
         });
 
         it('response is an object with stake pool stats', async () => {

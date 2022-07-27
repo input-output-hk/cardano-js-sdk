@@ -1,7 +1,10 @@
-import { HttpProviderConfigPaths, createHttpProvider } from '../HttpProvider';
+import { CreateHttpProviderConfig, HttpProviderConfigPaths, createHttpProvider } from '../HttpProvider';
 import { NetworkInfoProvider } from '@cardano-sdk/core';
 
-export const defaultNetworkInfoProviderPaths: HttpProviderConfigPaths<NetworkInfoProvider> = {
+/**
+ * The NetworkInfoProvider endpoint paths.
+ */
+const paths: HttpProviderConfigPaths<NetworkInfoProvider> = {
   currentWalletProtocolParameters: '/current-wallet-protocol-parameters',
   genesisParameters: '/genesis-parameters',
   healthCheck: '/health',
@@ -14,13 +17,10 @@ export const defaultNetworkInfoProviderPaths: HttpProviderConfigPaths<NetworkInf
 /**
  * Connect to a Cardano Services HttpServer instance with the service available
  *
- * @param {string} baseUrl server root url, w/o trailing /
+ * @param config The configuration object fot the NetworkInfoProvider Provider.
  */
-export const networkInfoHttpProvider = (
-  baseUrl: string,
-  paths = defaultNetworkInfoProviderPaths
-): NetworkInfoProvider =>
+export const networkInfoHttpProvider = (config: CreateHttpProviderConfig<NetworkInfoProvider>): NetworkInfoProvider =>
   createHttpProvider<NetworkInfoProvider>({
-    baseUrl,
+    ...config,
     paths
   });

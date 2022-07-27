@@ -11,14 +11,15 @@ import {
   StakeSummary,
   SupplySummary
 } from '@cardano-sdk/core';
+import { CreateHttpProviderConfig, networkInfoHttpProvider } from '@cardano-sdk/cardano-services-client';
 import { DbSyncNetworkInfoProvider, NetworkInfoCacheKey, NetworkInfoHttpService } from '../../src/NetworkInfo';
 import { HttpServer, HttpServerConfig } from '../../src';
+import { INFO, createLogger } from 'bunyan';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../src/InMemoryCache';
 import { Pool } from 'pg';
 import { doServerRequest, ingestDbData, sleep, wrapWithTransaction } from '../util';
 import { getPort } from 'get-port-please';
 import { loadGenesisData } from '../../src/NetworkInfo/DbSyncNetworkInfoProvider/mappers';
-import { networkInfoHttpProvider } from '@cardano-sdk/cardano-services-client';
 import axios from 'axios';
 
 const UNSUPPORTED_MEDIA_STRING = 'Request failed with status code 415';
@@ -32,7 +33,8 @@ describe('NetworkInfoHttpService', () => {
   let networkInfoProvider: DbSyncNetworkInfoProvider;
   let service: NetworkInfoHttpService;
   let port: number;
-  let apiUrlBase: string;
+  let baseUrl: string;
+  let clientConfig: CreateHttpProviderConfig<NetworkInfoProvider>;
   let config: HttpServerConfig;
   let doNetworkInfoRequest: ReturnType<typeof doServerRequest>;
   let cardanoNode: CardanoNode;
@@ -53,7 +55,8 @@ describe('NetworkInfoHttpService', () => {
   describe('unhealthy NetworkInfoProvider', () => {
     beforeEach(async () => {
       port = await getPort();
-      apiUrlBase = `http://localhost:${port}/network-info`;
+      baseUrl = `http://localhost:${port}/network-info`;
+      clientConfig = { baseUrl, logger: createLogger({ level: INFO, name: 'unit tests' }) };
       config = { listen: { port } };
       cardanoNode = {
         eraSummaries: jest.fn(() => Promise.resolve(mockEraSummaries)),
@@ -96,7 +99,7 @@ describe('NetworkInfoHttpService', () => {
 
     beforeAll(async () => {
       port = await getPort();
-      apiUrlBase = `http://localhost:${port}/network-info`;
+      baseUrl = `http://localhost:${port}/network-info`;
       cardanoNode = {
         eraSummaries: jest.fn(() => Promise.resolve(mockEraSummaries)),
         initialize: jest.fn(() => Promise.resolve()),
@@ -110,7 +113,7 @@ describe('NetworkInfoHttpService', () => {
       );
       service = new NetworkInfoHttpService({ networkInfoProvider });
       httpServer = new HttpServer(config, { services: [service] });
-      doNetworkInfoRequest = doServerRequest(apiUrlBase);
+      doNetworkInfoRequest = doServerRequest(baseUrl);
 
       await httpServer.initialize();
       await httpServer.start();
@@ -144,7 +147,7 @@ describe('NetworkInfoHttpService', () => {
 
     describe('/health', () => {
       it('forwards the networkInfoProvider health response', async () => {
-        const res = await axios.post(`${apiUrlBase}/health`, {
+        const res = await axios.post(`${baseUrl}/health`, {
           headers: { 'Content-Type': APPLICATION_JSON }
         });
         expect(res.status).toBe(200);
@@ -154,16 +157,12 @@ describe('NetworkInfoHttpService', () => {
 
     describe('/time-settings', () => {
       it('returns a 200 coded response with a well formed HTTP request', async () => {
-        expect((await axios.post(`${apiUrlBase}/time-settings`, { args: [] })).status).toEqual(200);
+        expect((await axios.post(`${baseUrl}/time-settings`, { args: [] })).status).toEqual(200);
       });
 
       it('returns a 415 coded response if the wrong content type header is used', async () => {
         try {
-          await axios.post(
-            `${apiUrlBase}/time-settings`,
-            { args: [] },
-            { headers: { 'Content-Type': APPLICATION_CBOR } }
-          );
+          await axios.post(`${baseUrl}/time-settings`, { args: [] }, { headers: { 'Content-Type': APPLICATION_CBOR } });
         } catch (error: any) {
           expect(error.response.status).toBe(415);
           expect(error.message).toBe(UNSUPPORTED_MEDIA_STRING);
@@ -177,12 +176,12 @@ describe('NetworkInfoHttpService', () => {
       const DB_POLL_QUERIES_COUNT = 1;
 
       it('returns a 200 coded response with a well formed HTTP request', async () => {
-        expect((await axios.post(`${apiUrlBase}/stake`, { args: [] })).status).toEqual(200);
+        expect((await axios.post(`${baseUrl}/stake`, { args: [] })).status).toEqual(200);
       });
 
       it('returns a 415 coded response if the wrong content type header is used', async () => {
         try {
-          await axios.post(`${apiUrlBase}/stake`, { args: [] }, { headers: { 'Content-Type': APPLICATION_CBOR } });
+          await axios.post(`${baseUrl}/stake`, { args: [] }, { headers: { 'Content-Type': APPLICATION_CBOR } });
         } catch (error: any) {
           expect(error.response.status).toBe(415);
           expect(error.message).toBe(UNSUPPORTED_MEDIA_STRING);
@@ -260,13 +259,13 @@ describe('NetworkInfoHttpService', () => {
       const DB_POLL_QUERIES_COUNT = 1;
 
       it('returns a 200 coded response with a well formed HTTP request', async () => {
-        expect((await axios.post(`${apiUrlBase}/lovelace-supply`, { args: [] })).status).toEqual(200);
+        expect((await axios.post(`${baseUrl}/lovelace-supply`, { args: [] })).status).toEqual(200);
       });
 
       it('returns a 415 coded response if the wrong content type header is used', async () => {
         try {
           await axios.post(
-            `${apiUrlBase}/lovelace-supply`,
+            `${baseUrl}/lovelace-supply`,
             { args: [] },
             { headers: { 'Content-Type': APPLICATION_CBOR } }
           );
@@ -311,7 +310,7 @@ describe('NetworkInfoHttpService', () => {
       let provider: NetworkInfoProvider;
 
       beforeEach(async () => {
-        provider = networkInfoHttpProvider(apiUrlBase);
+        provider = networkInfoHttpProvider(clientConfig);
       });
 
       it('stake', async () => {
@@ -360,12 +359,12 @@ describe('NetworkInfoHttpService', () => {
 
     describe('/ledger-tip', () => {
       it('returns a 200 coded response with a well formed HTTP request', async () => {
-        expect((await axios.post(`${apiUrlBase}/ledger-tip`, { args: [] })).status).toEqual(200);
+        expect((await axios.post(`${baseUrl}/ledger-tip`, { args: [] })).status).toEqual(200);
       });
 
       it('returns a 415 coded response if the wrong content type header is used', async () => {
         try {
-          await axios.post(`${apiUrlBase}/ledger-tip`, { args: [] }, { headers: { 'Content-Type': APPLICATION_CBOR } });
+          await axios.post(`${baseUrl}/ledger-tip`, { args: [] }, { headers: { 'Content-Type': APPLICATION_CBOR } });
         } catch (error: any) {
           expect(error.response.status).toBe(415);
           expect(error.message).toBe(UNSUPPORTED_MEDIA_STRING);
@@ -375,15 +374,13 @@ describe('NetworkInfoHttpService', () => {
 
     describe('/current-wallet-protocol-parameters', () => {
       it('returns a 200 coded response with a well formed HTTP request', async () => {
-        expect((await axios.post(`${apiUrlBase}/current-wallet-protocol-parameters`, { args: [] })).status).toEqual(
-          200
-        );
+        expect((await axios.post(`${baseUrl}/current-wallet-protocol-parameters`, { args: [] })).status).toEqual(200);
       });
 
       it('returns a 415 coded response if the wrong content type header is used', async () => {
         try {
           await axios.post(
-            `${apiUrlBase}/current-wallet-protocol-parameters`,
+            `${baseUrl}/current-wallet-protocol-parameters`,
             { args: [] },
             { headers: { 'Content-Type': APPLICATION_CBOR } }
           );
@@ -396,13 +393,13 @@ describe('NetworkInfoHttpService', () => {
 
     describe('/genesis-parameters', () => {
       it('returns a 200 coded response with a well formed HTTP request', async () => {
-        expect((await axios.post(`${apiUrlBase}/genesis-parameters`, { args: [] })).status).toEqual(200);
+        expect((await axios.post(`${baseUrl}/genesis-parameters`, { args: [] })).status).toEqual(200);
       });
 
       it('returns a 415 coded response if the wrong content type header is used', async () => {
         try {
           await axios.post(
-            `${apiUrlBase}/genesis-parameters`,
+            `${baseUrl}/genesis-parameters`,
             { args: [] },
             { headers: { 'Content-Type': APPLICATION_CBOR } }
           );

@@ -1,8 +1,11 @@
-import { HttpProviderConfigPaths, createHttpProvider } from '../HttpProvider';
+import { CreateHttpProviderConfig, HttpProviderConfigPaths, createHttpProvider } from '../HttpProvider';
 import { ProviderError, ProviderFailure, UtxoProvider } from '@cardano-sdk/core';
 import { mapHealthCheckError } from '../mapHealthCheckError';
 
-export const defaultUtxoProviderPaths: HttpProviderConfigPaths<UtxoProvider> = {
+/**
+ * The UtxoProvider endpoint paths.
+ */
+const paths: HttpProviderConfigPaths<UtxoProvider> = {
   healthCheck: '/health',
   utxoByAddresses: '/utxo-by-addresses'
 };
@@ -10,11 +13,11 @@ export const defaultUtxoProviderPaths: HttpProviderConfigPaths<UtxoProvider> = {
 /**
  * Connect to a Cardano Services HttpServer instance with the service available
  *
- * @param {string} baseUrl server root url, w/o trailing /
+ * @param config The configuration object fot the Utxo Provider.
  */
-export const utxoHttpProvider = (baseUrl: string, paths = defaultUtxoProviderPaths): UtxoProvider =>
+export const utxoHttpProvider = (config: CreateHttpProviderConfig<UtxoProvider>): UtxoProvider =>
   createHttpProvider<UtxoProvider>({
-    baseUrl,
+    ...config,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     mapError: (error: any, method) => {
       if (method === 'healthCheck') {

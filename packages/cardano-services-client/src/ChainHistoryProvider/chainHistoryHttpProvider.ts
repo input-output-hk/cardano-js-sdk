@@ -1,7 +1,10 @@
 import { ChainHistoryProvider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
-import { HttpProviderConfigPaths, createHttpProvider } from '../HttpProvider';
+import { CreateHttpProviderConfig, HttpProviderConfigPaths, createHttpProvider } from '../HttpProvider';
 
-export const defaultChainHistoryProviderPaths: HttpProviderConfigPaths<ChainHistoryProvider> = {
+/**
+ * The ChainHistoryProvider endpoint paths.
+ */
+const paths: HttpProviderConfigPaths<ChainHistoryProvider> = {
   blocksByHashes: '/blocks/by-hashes',
   healthCheck: '/health',
   transactionsByAddresses: '/txs/by-addresses',
@@ -11,15 +14,14 @@ export const defaultChainHistoryProviderPaths: HttpProviderConfigPaths<ChainHist
 /**
  * Connect to a Cardano Services HttpServer instance with the service available
  *
- * @param {string} baseUrl server root url, w/o trailing /
+ * @param config The configuration object fot the NetworkInfoProvider Provider.
  * @returns {ChainHistoryProvider} ChainHistoryProvider
  */
 export const chainHistoryHttpProvider = (
-  baseUrl: string,
-  paths = defaultChainHistoryProviderPaths
+  config: CreateHttpProviderConfig<ChainHistoryProvider>
 ): ChainHistoryProvider =>
   createHttpProvider<ChainHistoryProvider>({
-    baseUrl,
+    ...config,
     mapError: (error, method) => {
       if (method === 'healthCheck' && !error) {
         return { ok: false };

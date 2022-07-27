@@ -1,10 +1,14 @@
 /* eslint-disable max-len */
 import { Cardano } from '@cardano-sdk/core';
+import { INFO, createLogger } from 'bunyan';
 import { utxoHttpProvider } from '../../src';
 import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
 
-const url = 'http://some-hostname:3000/utxo';
+const config = {
+  baseUrl: 'http://some-hostname:3000/utxo',
+  logger: createLogger({ level: INFO, name: 'unit tests' })
+};
 
 describe('utxoHttpProvider', () => {
   let axiosMock: MockAdapter;
@@ -21,19 +25,19 @@ describe('utxoHttpProvider', () => {
   });
   describe('healtCheck', () => {
     it('is not ok if cannot connect', async () => {
-      const provider = utxoHttpProvider(url);
+      const provider = utxoHttpProvider(config);
       await expect(provider.healthCheck()).resolves.toEqual({ ok: false });
     });
     describe('mocked', () => {
       it('is ok if 200 response body is { ok: true }', async () => {
         axiosMock.onPost().replyOnce(200, { ok: true });
-        const provider = utxoHttpProvider(url);
+        const provider = utxoHttpProvider(config);
         await expect(provider.healthCheck()).resolves.toEqual({ ok: true });
       });
 
       it('is not ok if 200 response body is { ok: false }', async () => {
         axiosMock.onPost().replyOnce(200, { ok: false });
-        const provider = utxoHttpProvider(url);
+        const provider = utxoHttpProvider(config);
         await expect(provider.healthCheck()).resolves.toEqual({ ok: false });
       });
     });
@@ -41,7 +45,7 @@ describe('utxoHttpProvider', () => {
   describe('utxoByAddresses', () => {
     test('utxoByAddresses doesnt throw', async () => {
       axiosMock.onPost().replyOnce(200, []);
-      const provider = utxoHttpProvider(url);
+      const provider = utxoHttpProvider(config);
       await expect(
         provider.utxoByAddresses([
           Cardano.Address(

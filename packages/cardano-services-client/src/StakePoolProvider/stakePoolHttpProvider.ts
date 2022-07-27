@@ -1,7 +1,10 @@
-import { HttpProviderConfigPaths, createHttpProvider } from '../HttpProvider';
+import { CreateHttpProviderConfig, HttpProviderConfigPaths, createHttpProvider } from '../HttpProvider';
 import { StakePoolProvider } from '@cardano-sdk/core';
 
-export const defaultStakePoolProviderPaths: HttpProviderConfigPaths<StakePoolProvider> = {
+/**
+ * The StakePoolProvider endpoint paths.
+ */
+const paths: HttpProviderConfigPaths<StakePoolProvider> = {
   healthCheck: '/health',
   queryStakePools: '/search',
   stakePoolStats: '/stats'
@@ -10,10 +13,10 @@ export const defaultStakePoolProviderPaths: HttpProviderConfigPaths<StakePoolPro
 /**
  * Connect to a Cardano Services HttpServer instance with the service available
  *
- * @param {string} baseUrl server root url, w/o trailing /
+ * @param config The configuration object fot the StakePool Provider.
  */
-export const stakePoolHttpProvider = (baseUrl: string, paths = defaultStakePoolProviderPaths): StakePoolProvider =>
+export const stakePoolHttpProvider = (config: CreateHttpProviderConfig<StakePoolProvider>): StakePoolProvider =>
   createHttpProvider<StakePoolProvider>({
-    baseUrl,
+    ...config,
     paths
   });

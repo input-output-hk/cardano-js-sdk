@@ -2,10 +2,11 @@
 /* eslint-disable max-len */
 import { APPLICATION_JSON, CONTENT_TYPE, HttpServer, HttpServerConfig, TxSubmitHttpService } from '../../src';
 import { Cardano, ProviderError, ProviderFailure, TxSubmitProvider } from '@cardano-sdk/core';
+import { INFO, createLogger } from 'bunyan';
 import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
 
+import { CreateHttpProviderConfig, txSubmitHttpProvider } from '@cardano-sdk/cardano-services-client';
 import { getPort } from 'get-port-please';
-import { txSubmitHttpProvider } from '@cardano-sdk/cardano-services-client';
 import axios from 'axios';
 import cbor from 'cbor';
 
@@ -18,12 +19,14 @@ describe('TxSubmitHttpService', () => {
   let txSubmitProvider: TxSubmitProvider;
   let httpServer: HttpServer;
   let port: number;
-  let apiUrlBase: string;
+  let baseUrl: string;
+  let clientConfig: CreateHttpProviderConfig<TxSubmitProvider>;
   let config: HttpServerConfig;
 
   beforeAll(async () => {
     port = await getPort();
-    apiUrlBase = `http://localhost:${port}/tx-submit`;
+    baseUrl = `http://localhost:${port}/tx-submit`;
+    clientConfig = { baseUrl, logger: createLogger({ level: INFO, name: 'unit tests' }) };
     config = { listen: { port } };
   });
 
@@ -50,7 +53,7 @@ describe('TxSubmitHttpService', () => {
     let isOk: () => boolean;
     // eslint-disable-next-line unicorn/consistent-function-scoping
     const serverHealth = async () => {
-      const response = await axios.post(`${apiUrlBase}/health`, {
+      const response = await axios.post(`${baseUrl}/health`, {
         headers: { [CONTENT_TYPE]: APPLICATION_JSON }
       });
       return response.data;
@@ -78,7 +81,7 @@ describe('TxSubmitHttpService', () => {
       expect(await serverHealth()).toEqual({ ok: false });
 
       try {
-        await axios.post(`${apiUrlBase}/submit`, serializeProviderArg(Buffer.from(new Uint8Array())), {
+        await axios.post(`${baseUrl}/submit`, serializeProviderArg(Buffer.from(new Uint8Array())), {
           headers: { [CONTENT_TYPE]: APPLICATION_JSON }
         });
         throw new Error('fail');
@@ -108,7 +111,7 @@ describe('TxSubmitHttpService', () => {
 
     describe('/health', () => {
       it('forwards the txSubmitProvider health response', async () => {
-        const res = await axios.post(`${apiUrlBase}/health`, {
+        const res = await axios.post(`${baseUrl}/health`, {
           headers: { [CONTENT_TYPE]: APPLICATION_JSON }
         });
         expect(res.status).toBe(200);
@@ -123,7 +126,7 @@ describe('TxSubmitHttpService', () => {
         });
         expect(
           (
-            await axios.post(`${apiUrlBase}/submit`, bodyTx, {
+            await axios.post(`${baseUrl}/submit`, bodyTx, {
               headers: { [CONTENT_TYPE]: APPLICATION_JSON }
             })
           ).status
@@ -134,7 +137,7 @@ describe('TxSubmitHttpService', () => {
       it('returns a 200 coded response with a well formed HTTP request', async () => {
         expect(
           (
-            await axios.post(`${apiUrlBase}/submit`, bodyTx, {
+            await axios.post(`${baseUrl}/submit`, bodyTx, {
               headers: { [CONTENT_TYPE]: APPLICATION_JSON }
             })
           ).status
@@ -144,7 +147,7 @@ describe('TxSubmitHttpService', () => {
 
       it('returns a 415 coded response if the wrong content type header is used', async () => {
         try {
-          await axios.post(`${apiUrlBase}/submit`, bodyTx, {
+          await axios.post(`${baseUrl}/submit`, bodyTx, {
             headers: { [CONTENT_TYPE]: APPLICATION_CBOR }
           });
           throw new Error('fail');
@@ -179,7 +182,7 @@ describe('TxSubmitHttpService', () => {
 
       it('rehydrates errors when used with TxSubmitHttpProvider', async () => {
         expect.assertions(2);
-        const clientProvider = txSubmitHttpProvider(apiUrlBase);
+        const clientProvider = txSubmitHttpProvider(clientConfig);
         try {
           await clientProvider.submitTx(new Uint8Array());
         } catch (error: any) {
@@ -195,7 +198,7 @@ describe('TxSubmitHttpService', () => {
       it('returns a 400 coded response with detail in the body to a transaction containing a domain violation', async () => {
         expect.assertions(3);
         try {
-          await axios.post(`${apiUrlBase}/submit`, serializeProviderArg(Buffer.from(new Uint8Array())), {
+          await axios.post(`${baseUrl}/submit`, serializeProviderArg(Buffer.from(new Uint8Array())), {
             headers: { [CONTENT_TYPE]: APPLICATION_JSON }
           });
           // eslint-disable-next-line @typescript-eslint/no-explicit-any

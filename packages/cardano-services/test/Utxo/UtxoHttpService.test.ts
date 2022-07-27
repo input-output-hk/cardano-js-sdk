@@ -1,9 +1,10 @@
 /* eslint-disable max-len */
 import { Cardano, ProviderError, ProviderFailure, UtxoProvider } from '@cardano-sdk/core';
+import { CreateHttpProviderConfig, utxoHttpProvider } from '@cardano-sdk/cardano-services-client';
 import { DbSyncUtxoProvider, HttpServer, HttpServerConfig, UtxoHttpService } from '../../src';
+import { INFO, createLogger } from 'bunyan';
 import { Pool } from 'pg';
 import { getPort } from 'get-port-please';
-import { utxoHttpProvider } from '@cardano-sdk/cardano-services-client';
 import axios from 'axios';
 
 const APPLICATION_JSON = 'application/json';
@@ -19,13 +20,15 @@ describe('UtxoHttpService', () => {
   let utxoProvider: DbSyncUtxoProvider;
   let service: UtxoHttpService;
   let port: number;
-  let apiUrlBase: string;
+  let baseUrl: string;
+  let clientConfig: CreateHttpProviderConfig<UtxoProvider>;
   let config: HttpServerConfig;
   let provider: UtxoProvider;
 
   beforeAll(async () => {
     port = await getPort();
-    apiUrlBase = `http://localhost:${port}/utxo`;
+    baseUrl = `http://localhost:${port}/utxo`;
+    clientConfig = { baseUrl, logger: createLogger({ level: INFO, name: 'unit tests' }) };
     config = { listen: { port } };
     dbConnection = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING });
   });
@@ -58,7 +61,7 @@ describe('UtxoHttpService', () => {
       utxoProvider = new DbSyncUtxoProvider(dbConnection);
       service = new UtxoHttpService({ utxoProvider });
       httpServer = new HttpServer(config, { services: [service] });
-      provider = utxoHttpProvider(apiUrlBase);
+      provider = utxoHttpProvider(clientConfig);
       await httpServer.initialize();
       await httpServer.start();
     });
@@ -70,7 +73,7 @@ describe('UtxoHttpService', () => {
 
     describe('/health', () => {
       it('/health response should be true', async () => {
-        const res = await axios.post(`${apiUrlBase}/health`, undefined, {
+        const res = await axios.post(`${baseUrl}/health`, undefined, {
           headers: { 'Content-Type': APPLICATION_JSON }
         });
         expect(res.status).toBe(200);
@@ -85,7 +88,7 @@ describe('UtxoHttpService', () => {
       it('returns a 415 coded response if the wrong content type header is used', async () => {
         try {
           await axios.post(
-            `${apiUrlBase}/utxo-by-addresses`,
+            `${baseUrl}/utxo-by-addresses`,
             { args: [[]] },
             { headers: { 'Content-Type': APPLICATION_CBOR } }
           );
@@ -97,7 +100,7 @@ describe('UtxoHttpService', () => {
       });
       it('returns 400 coded respons if the request is bad formed', async () => {
         try {
-          await axios.post(`${apiUrlBase}/utxo-by-addresses`, { args: [{ addresses: ['asd'] }] });
+          await axios.post(`${baseUrl}/utxo-by-addresses`, { args: [{ addresses: ['asd'] }] });
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
           expect(error.response.status).toBe(400);
@@ -106,7 +109,7 @@ describe('UtxoHttpService', () => {
       });
       it('valid request should pass OpenApi schema validations', async () => {
         const req = ['asd'];
-        const res = await axios.post(`${apiUrlBase}/utxo-by-addresses`, { args: [req] });
+        const res = await axios.post(`${baseUrl}/utxo-by-addresses`, { args: [req] });
         expect(res.status).toEqual(200);
       });
       it('return UTxOs for a single address', async () => {
