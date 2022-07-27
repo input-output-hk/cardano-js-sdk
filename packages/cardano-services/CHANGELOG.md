@@ -1,3 +1,39 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [0.5.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.4.0...@cardano-sdk/cardano-services@0.5.0-nightly.0) (2022-07-27)
+
+
+### ⚠ BREAKING CHANGES
+
+* **cardano-services:** make interface properties name more specific
+
+### Features
+
+* **cardano-services:** add db-sync asset http service ([fb254e5](https://github.com/input-output-hk/cardano-js-sdk/commit/fb254e5e8d6058f891cefb479456558fb3835dd0))
+* **cardano-services:** add db-sync asset provider ([9763c59](https://github.com/input-output-hk/cardano-js-sdk/commit/9763c598ef5f1b3c95672424fb57647784024298))
+* implement tx submit worker error handling ([55bc023](https://github.com/input-output-hk/cardano-js-sdk/commit/55bc023a255a27ecdcf19ee6a2e92cc37b0f3801))
+
+
+### Bug Fixes
+
+* **cardano-services:** make HTTP services depend on provider interfaces, rather than classes ([1fef381](https://github.com/input-output-hk/cardano-js-sdk/commit/1fef3819d159e92af6d691d89b0e90a73d9f66ca))
+* malformed string and add missing service to Docker defaults ([b40edf6](https://github.com/input-output-hk/cardano-js-sdk/commit/b40edf6f2aec7d654206725e38c88ab1f60d8222))
+
+
+### Performance Improvements
+
+* improve lovelace supply queries ([7964a2f](https://github.com/input-output-hk/cardano-js-sdk/commit/7964a2f4119c5ee9e8c81589781a8494967b81ee))
+
+
+### Code Refactoring
+
+* **cardano-services:** make interface properties name more specific ([854408d](https://github.com/input-output-hk/cardano-js-sdk/commit/854408dbf6cf5e7c80280ab104826d8309c801fa))
+
+
+
 ## [0.4.0](https://github.com/input-output-hk/cardano-js-sdk/compare/0.3.0...@cardano-sdk/cardano-services@0.4.0) (2022-07-25)
 
 
@@ -105,4 +141,3 @@
 * **cardano-services:** make TxSubmitHttpServer compatible with createHttpProvider<T> ([131f234](https://github.com/input-output-hk/cardano-js-sdk/commit/131f2349b2e54be4765a1db1505d2e7ac4504089))
 * move stakePoolStats from wallet provider to stake pool provider ([52d71a7](https://github.com/input-output-hk/cardano-js-sdk/commit/52d71a70700b05902cca6205fe01a63f811ba5af))
 * rename `StakePoolSearchProvider` to `StakePoolProvider` ([b432103](https://github.com/input-output-hk/cardano-js-sdk/commit/b43210348da7914664733f85f8be8999271a8667))
-

@@ -1,3 +1,17 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [0.4.1-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/blockfrost@0.4.0...@cardano-sdk/blockfrost@0.4.1-nightly.0) (2022-07-27)
+
+
+### Bug Fixes
+
+* **blockfrost:** avoid  cip 25 mapping for AssetInfo.TokenMetadata ([9f7b914](https://github.com/input-output-hk/cardano-js-sdk/commit/9f7b9142feadc404d7ae39e3ebfd6ef1496f81ce))
+
+
+
 ## [0.4.0](https://github.com/input-output-hk/cardano-js-sdk/compare/0.3.0...@cardano-sdk/blockfrost@0.4.0) (2022-07-25)
 
 ## 0.3.0 (2022-06-24)
@@ -112,4 +126,3 @@ it's more flexible modelled as an independent provider.
 
 * add missing yarn script, and rename ([840135f](https://github.com/input-output-hk/cardano-js-sdk/commit/840135f7d100c9a00ff410147758ee7d02112897))
 * blockfrost types ([4f77001](https://github.com/input-output-hk/cardano-js-sdk/commit/4f77001f5f6264bd6dd254c4e0ef0a8a14cfb820))
-

@@ -1,3 +1,21 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [0.5.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.4.0...@cardano-sdk/web-extension@0.5.0-nightly.0) (2022-07-27)
+
+
+### ⚠ BREAKING CHANGES
+
+* update min utxo computation to be Babbage-compatible
+
+### Bug Fixes
+
+* update min utxo computation to be Babbage-compatible ([51ca1d5](https://github.com/input-output-hk/cardano-js-sdk/commit/51ca1d5716b62b47d211475aba1be4a6d5782397))
+
+
+
 ## [0.4.0](https://github.com/input-output-hk/cardano-js-sdk/compare/0.3.0...@cardano-sdk/web-extension@0.4.0) (2022-07-25)
 
 
@@ -64,4 +82,3 @@
 * rm cip30 dependency on web-extension ([77f8642](https://github.com/input-output-hk/cardano-js-sdk/commit/77f8642ebaac3b2615d082184d22a96f4cf86d42))
 * rm ObservableWallet.networkId (to be resolved via networkInfo$) ([72be7d7](https://github.com/input-output-hk/cardano-js-sdk/commit/72be7d7fc9dfd1bd12593ab572d9b6734d789822))
 * **web-extension:** rename RemoteApiProperty.Observable->HotObservable ([4bc9922](https://github.com/input-output-hk/cardano-js-sdk/commit/4bc99224d3cdcadc90729eecd8cb9ea2d6227438))
-

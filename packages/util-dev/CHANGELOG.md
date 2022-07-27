@@ -1,3 +1,16 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [0.4.1-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.4.0...@cardano-sdk/util-dev@0.4.1-nightly.0) (2022-07-27)
+
+**Note:** Version bump only for package @cardano-sdk/util-dev
+
+
+
+
+
 ## [0.4.0](https://github.com/input-output-hk/cardano-js-sdk/compare/0.3.0...@cardano-sdk/util-dev@0.4.0) (2022-07-25)
 
 ## 0.3.0 (2022-06-24)
@@ -43,4 +56,3 @@
 * **util-dev:** add flushPromises util ([19eb508](https://github.com/input-output-hk/cardano-js-sdk/commit/19eb508af9c5364f9db604cfe4705857cd62f720))
 
 ### 0.1.3 (2021-10-05)
-

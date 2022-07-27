@@ -1,3 +1,16 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [0.4.1-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.4.0...@cardano-sdk/util@0.4.1-nightly.0) (2022-07-27)
+
+**Note:** Version bump only for package @cardano-sdk/util
+
+
+
+
+
 ## [0.4.0](https://github.com/input-output-hk/cardano-js-sdk/compare/0.3.0...@cardano-sdk/util@0.4.0) (2022-07-25)
 
 
@@ -7,4 +20,3 @@
 * **util:** correctly deserialize Set items ([adf458d](https://github.com/input-output-hk/cardano-js-sdk/commit/adf458d150c398ce9589821ef40703c2da5685f7))
 
 ## 0.3.0 (2022-06-24)
-

@@ -1,3 +1,16 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [0.4.1-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.4.0...@cardano-sdk/ogmios@0.4.1-nightly.0) (2022-07-27)
+
+**Note:** Version bump only for package @cardano-sdk/ogmios
+
+
+
+
+
 ## [0.4.0](https://github.com/input-output-hk/cardano-js-sdk/compare/0.3.0...@cardano-sdk/ogmios@0.4.0) (2022-07-25)
 
 
@@ -23,4 +36,3 @@
 
 * **ogmios:** fix failing tests ([3c8c5f7](https://github.com/input-output-hk/cardano-js-sdk/commit/3c8c5f746a41508006e9f059e138b70d9ea1baff))
 * **ogmios:** tx submit provider ts error fix ([a24a78c](https://github.com/input-output-hk/cardano-js-sdk/commit/a24a78c5b2d8e75f0c99c12c47cf0b5eb3424b49))
-

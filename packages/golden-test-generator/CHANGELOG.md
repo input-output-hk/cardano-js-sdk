@@ -1,3 +1,16 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [0.4.1-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/golden-test-generator@0.4.0...@cardano-sdk/golden-test-generator@0.4.1-nightly.0) (2022-07-27)
+
+**Note:** Version bump only for package @cardano-sdk/golden-test-generator
+
+
+
+
+
 ## [0.4.0](https://github.com/input-output-hk/cardano-js-sdk/compare/0.3.0...@cardano-sdk/golden-test-generator@0.4.0) (2022-07-25)
 
 
@@ -32,4 +45,3 @@
 
 * add missing yarn script, and rename ([840135f](https://github.com/input-output-hk/cardano-js-sdk/commit/840135f7d100c9a00ff410147758ee7d02112897))
 * getBlocks invalid return ([98f495d](https://github.com/input-output-hk/cardano-js-sdk/commit/98f495de0f5e6701b842eaa4567dc8b47d739b27))
-

@@ -1,3 +1,17 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [0.4.1-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.4.0...@cardano-sdk/cardano-services-client@0.4.1-nightly.0) (2022-07-27)
+
+
+### Features
+
+* **cardano-services-client:** add asset info http provider ([866f3d5](https://github.com/input-output-hk/cardano-js-sdk/commit/866f3d5374e7572a966bff0a93a92ebf0412208c))
+
+
+
 ## [0.4.0](https://github.com/input-output-hk/cardano-js-sdk/compare/0.3.0...@cardano-sdk/cardano-services-client@0.4.0) (2022-07-25)
 
 
@@ -44,4 +58,3 @@
 * **cardano-services-client:** reimplement txSubmitHttpProvider using createHttpProvider ([db17e34](https://github.com/input-output-hk/cardano-js-sdk/commit/db17e34193322856b1f5073c39658f223d31087b))
 * move stakePoolStats from wallet provider to stake pool provider ([52d71a7](https://github.com/input-output-hk/cardano-js-sdk/commit/52d71a70700b05902cca6205fe01a63f811ba5af))
 * rename `StakePoolSearchProvider` to `StakePoolProvider` ([b432103](https://github.com/input-output-hk/cardano-js-sdk/commit/b43210348da7914664733f85f8be8999271a8667))
-
