@@ -205,5 +205,75 @@ describe('blockfrostAssetProvider', () => {
       expect(BlockFrostAPI.prototype.assetsHistory).not.toHaveBeenCalled();
       expect(BlockFrostAPI.prototype.txsMetadata).not.toHaveBeenCalled();
     });
+
+    test('description and image as array', async () => {
+      BlockFrostAPI.prototype.assetsById = jest.fn().mockResolvedValue({
+        asset: '8153f8be9f05b2f32b481bbf7af877f592160b39e87f5f55c8ab035f4e46543031',
+        asset_name: '4e46543031',
+        fingerprint: 'asset1h2z87pq2tr4ksxl5nkzd2ltrrtd6vvmf5nnn46',
+        initial_mint_tx_hash: 'cb2cf241d03f0f6c523a2064b51de783db590f2871da24ce89698db2bef5fb39',
+        metadata: null,
+        mint_or_burn_count: 1,
+        onchain_metadata: {
+          description: ['description 1', 'description 2'],
+          id: '1',
+          image: [
+            'ipfs://QmRhTTbUrPYEw3mJGGhQqQST9k86v1DPBiTTWJGKDJsVFw',
+            'ipfs://QmRhTTbUrPYEw3mJGGhQqQST9k86v1DPBiTTWJGKDJsVFw'
+          ],
+          name: 'Cardano foundation NFT guide token'
+        },
+        policy_id: '8153f8be9f05b2f32b481bbf7af877f592160b39e87f5f55c8ab035f',
+        quantity: '1'
+      });
+      BlockFrostAPI.prototype.txsMetadata = jest.fn().mockResolvedValue([
+        { json_metadata: { other: 'no nft' }, label: '1' },
+        {
+          json_metadata: {
+            '8153f8be9f05b2f32b481bbf7af877f592160b39e87f5f55c8ab035f': {
+              '4e46543031': {
+                image: [
+                  'ipfs://QmRhTTbUrPYEw3mJGGhQqQST9k86v1DPBiTTWJGKDJsVFw',
+                  'ipfs://QmRhTTbUrPYEw3mJGGhQqQST9k86v1DPBiTTWJGKDJsVFw'
+                ],
+                name: 'test nft',
+                version: '1.0'
+              }
+            }
+          },
+          label: '721'
+        }
+      ]);
+
+      const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
+      const client = blockfrostAssetProvider(blockfrost);
+      const response = await client.getAsset(
+        Cardano.AssetId('8153f8be9f05b2f32b481bbf7af877f592160b39e87f5f55c8ab035f4e46543031'),
+        { history: true, nftMetadata: true, tokenMetadata: true }
+      );
+      expect(response).toMatchObject<Asset.AssetInfo>({
+        assetId: Cardano.AssetId('8153f8be9f05b2f32b481bbf7af877f592160b39e87f5f55c8ab035f4e46543031'),
+        fingerprint: Cardano.AssetFingerprint('asset1h2z87pq2tr4ksxl5nkzd2ltrrtd6vvmf5nnn46'),
+        history: [
+          {
+            quantity: 1n,
+            transactionId: Cardano.TransactionId('cb2cf241d03f0f6c523a2064b51de783db590f2871da24ce89698db2bef5fb39')
+          }
+        ],
+        mintOrBurnCount: 1,
+        name: Cardano.AssetName('4e46543031'),
+        nftMetadata: {
+          image: [
+            Asset.Uri('ipfs://QmRhTTbUrPYEw3mJGGhQqQST9k86v1DPBiTTWJGKDJsVFw'),
+            Asset.Uri('ipfs://QmRhTTbUrPYEw3mJGGhQqQST9k86v1DPBiTTWJGKDJsVFw')
+          ],
+          name: 'test nft',
+          version: '1.0'
+        },
+        policyId: Cardano.PolicyId('8153f8be9f05b2f32b481bbf7af877f592160b39e87f5f55c8ab035f'),
+        quantity: 1n,
+        tokenMetadata: null
+      });
+    });
   });
 });
