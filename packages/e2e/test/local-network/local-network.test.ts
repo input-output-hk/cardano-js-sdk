@@ -33,7 +33,11 @@ describe('Local Network', () => {
   let faucetProvider: FaucetProvider;
 
   beforeAll(async () => {
-    faucetProvider = await faucetProviderFactory.create(env.FAUCET_PROVIDER, env.FAUCET_PROVIDER_PARAMS);
+    faucetProvider = await faucetProviderFactory.create(
+      env.FAUCET_PROVIDER,
+      env.FAUCET_PROVIDER_PARAMS,
+      getLogger(env.LOGGER_MIN_SEVERITY)
+    );
 
     await faucetProvider.start();
 

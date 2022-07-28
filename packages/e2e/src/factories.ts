@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
-  Asset,
   AssetProvider,
-  Cardano,
   ChainHistoryProvider,
   NetworkInfoProvider,
   ProviderFactory,
@@ -23,8 +21,9 @@ import {
 import { CardanoWalletFaucetProvider, FaucetProvider } from './FaucetProvider';
 import { KeyManagement, PollingConfig, SingleAddressWallet, setupWallet, storage } from '@cardano-sdk/wallet';
 import { LogLevel, createLogger } from 'bunyan';
-import { Logger } from 'ts-log';
+import { Logger, dummyLogger } from 'ts-log';
 import {
+  assetInfoHttpProvider,
   chainHistoryHttpProvider,
   networkInfoHttpProvider,
   rewardsHttpProvider,
@@ -81,39 +80,13 @@ faucetProviderFactory.register('cardano-wallet', CardanoWalletFaucetProvider.cre
 
 // Asset providers
 
-/**
- * Asset provider which does nothing.
- */
-class NullAssetProvider implements AssetProvider {
-  getAsset() {
-    return new Promise<Asset.AssetInfo>((resolve) =>
-      resolve({
-        assetId: Cardano.AssetId(''),
-        fingerprint: Cardano.AssetFingerprint(''),
-        history: [
-          {
-            quantity: 0n,
-            transactionId: Cardano.TransactionId('')
-          }
-        ],
-        name: Cardano.AssetName(''),
-        policyId: Cardano.PolicyId(''),
-        quantity: 0n
-      } as Asset.AssetInfo)
-    );
-  }
-  healthCheck() {
-    return Promise.resolve({ ok: true });
-  }
-}
+assetProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Logger): Promise<AssetProvider> => {
+  if (params.url === undefined) throw new Error(`${assetInfoHttpProvider.name}: ${MISSING_URL_PARAM}`);
 
-assetProviderFactory.register(
-  STUB_PROVIDER,
-  async (): Promise<AssetProvider> =>
-    new Promise<AssetProvider>(async (resolve) => {
-      resolve(new NullAssetProvider());
-    })
-);
+  return new Promise<AssetProvider>(async (resolve) => {
+    resolve(assetInfoHttpProvider({ baseUrl: params.url, logger }));
+  });
+});
 
 assetProviderFactory.register(
   BLOCKFROST_PROVIDER,
@@ -132,13 +105,16 @@ chainHistoryProviderFactory.register(
     })
 );
 
-chainHistoryProviderFactory.register(HTTP_PROVIDER, async (params: any): Promise<ChainHistoryProvider> => {
-  if (params.url === undefined) throw new Error(`${chainHistoryHttpProvider.name}: ${MISSING_URL_PARAM}`);
+chainHistoryProviderFactory.register(
+  HTTP_PROVIDER,
+  async (params: any, logger: Logger): Promise<ChainHistoryProvider> => {
+    if (params.url === undefined) throw new Error(`${chainHistoryHttpProvider.name}: ${MISSING_URL_PARAM}`);
 
-  return new Promise<ChainHistoryProvider>(async (resolve) => {
-    resolve(chainHistoryHttpProvider(params.url));
-  });
-});
+    return new Promise<ChainHistoryProvider>(async (resolve) => {
+      resolve(chainHistoryHttpProvider({ baseUrl: params.url, logger }));
+    });
+  }
+);
 
 // Network info providers
 networkInfoProviderFactory.register(
@@ -149,13 +125,16 @@ networkInfoProviderFactory.register(
     })
 );
 
-networkInfoProviderFactory.register(HTTP_PROVIDER, async (params: any): Promise<NetworkInfoProvider> => {
-  if (params.url === undefined) throw new Error(`${networkInfoHttpProvider.name}: ${MISSING_URL_PARAM}`);
+networkInfoProviderFactory.register(
+  HTTP_PROVIDER,
+  async (params: any, logger: Logger): Promise<NetworkInfoProvider> => {
+    if (params.url === undefined) throw new Error(`${networkInfoHttpProvider.name}: ${MISSING_URL_PARAM}`);
 
-  return new Promise<NetworkInfoProvider>(async (resolve) => {
-    resolve(networkInfoHttpProvider(params.url));
-  });
-});
+    return new Promise<NetworkInfoProvider>(async (resolve) => {
+      resolve(networkInfoHttpProvider({ baseUrl: params.url, logger }));
+    });
+  }
+);
 
 // Rewards providers
 rewardsProviderFactory.register(
@@ -166,11 +145,11 @@ rewardsProviderFactory.register(
     })
 );
 
-rewardsProviderFactory.register(HTTP_PROVIDER, async (params: any): Promise<RewardsProvider> => {
+rewardsProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Logger): Promise<RewardsProvider> => {
   if (params.url === undefined) throw new Error(`${rewardsHttpProvider.name}: ${MISSING_URL_PARAM}`);
 
   return new Promise<RewardsProvider>(async (resolve) => {
-    resolve(rewardsHttpProvider(params.url));
+    resolve(rewardsHttpProvider({ baseUrl: params.url, logger }));
   });
 });
 
@@ -197,11 +176,11 @@ txSubmitProviderFactory.register(OGMIOS_PROVIDER, async (params: any): Promise<T
   });
 });
 
-txSubmitProviderFactory.register(HTTP_PROVIDER, async (params: any): Promise<TxSubmitProvider> => {
+txSubmitProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Logger): Promise<TxSubmitProvider> => {
   if (params.url === undefined) throw new Error(`${txSubmitHttpProvider.name}: ${MISSING_URL_PARAM}`);
 
   return new Promise<TxSubmitProvider>(async (resolve) => {
-    resolve(txSubmitHttpProvider(params.url));
+    resolve(txSubmitHttpProvider({ baseUrl: params.url, logger }));
   });
 });
 
@@ -214,11 +193,11 @@ utxoProviderFactory.register(
     })
 );
 
-utxoProviderFactory.register(HTTP_PROVIDER, async (params: any): Promise<UtxoProvider> => {
+utxoProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Logger): Promise<UtxoProvider> => {
   if (params.url === undefined) throw new Error(`${utxoHttpProvider.name}: ${MISSING_URL_PARAM}`);
 
   return new Promise<UtxoProvider>(async (resolve) => {
-    resolve(utxoHttpProvider(params.url));
+    resolve(utxoHttpProvider({ baseUrl: params.url, logger }));
   });
 });
 
@@ -231,11 +210,11 @@ stakePoolProviderFactory.register(
     })
 );
 
-stakePoolProviderFactory.register(HTTP_PROVIDER, async (params: any): Promise<StakePoolProvider> => {
+stakePoolProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Logger): Promise<StakePoolProvider> => {
   if (params.url === undefined) throw new Error(`${stakePoolHttpProvider.name}: ${MISSING_URL_PARAM}`);
 
   return new Promise<StakePoolProvider>(async (resolve) => {
-    resolve(stakePoolHttpProvider(params.url));
+    resolve(stakePoolHttpProvider({ baseUrl: params.url, logger }));
   });
 });
 
@@ -313,6 +292,23 @@ keyManagementFactory.register('trezor', async (params: any): Promise<CreateKeyAg
     );
 });
 
+// Logger
+
+/**
+ * Gets the logger instance.
+ *
+ * @param severity The minimum severity of the log messages that will be logged.
+ * @returns The Logger instance.
+ */
+export const getLogger = function (severity: string): Logger {
+  return createLogger({
+    level: severity as LogLevel,
+    name: 'e2e tests'
+  });
+};
+
+// Wallet
+
 /**
  * Utility function to create key agents at different account indices.
  *
@@ -323,17 +319,17 @@ keyManagementFactory.register('trezor', async (params: any): Promise<CreateKeyAg
  */
 export const keyAgentById = memoize(async (accountIndex: number, provider: string, params: any) => {
   params.accountIndex = accountIndex;
-  return keyManagementFactory.create(provider, params);
+  return keyManagementFactory.create(provider, params, dummyLogger);
 });
 
 /**
  * Updates the id property of the params object
  *
- * @param idx The new id.
+ * @param idx The new account index.
  * @param params the params to be updated.
  */
 const updateParamsId = function (idx: number, params: any) {
-  params.id = idx;
+  params.accountIndex = idx;
   return params;
 };
 
@@ -354,53 +350,52 @@ export const getWallet = async (props: GetWalletProps) => {
   const { wallet } = await setupWallet({
     createKeyAgent: await keyManagementFactory.create(
       props.env.KEY_MANAGEMENT_PROVIDER,
-      updateParamsId(props.idx !== undefined ? props.idx : 0, props.env.KEY_MANAGEMENT_PARAMS)
+      updateParamsId(props.idx !== undefined ? props.idx : 0, props.env.KEY_MANAGEMENT_PARAMS),
+      dummyLogger
     ),
-    createWallet: async (keyAgent) =>
+    createWallet: async (keyAgent: any) =>
       new SingleAddressWallet(
         { name: props.name, polling: props.polling },
         {
-          assetProvider: await assetProviderFactory.create(props.env.ASSET_PROVIDER, props.env.ASSET_PROVIDER_PARAMS),
+          assetProvider: await assetProviderFactory.create(
+            props.env.ASSET_PROVIDER,
+            props.env.ASSET_PROVIDER_PARAMS,
+            props.env.LOGGER_MIN_SEVERITY ? getLogger(props.env.LOGGER_MIN_SEVERITY) : dummyLogger
+          ),
           chainHistoryProvider: await chainHistoryProviderFactory.create(
             props.env.CHAIN_HISTORY_PROVIDER,
-            props.env.CHAIN_HISTORY_PROVIDER_PARAMS
+            props.env.CHAIN_HISTORY_PROVIDER_PARAMS,
+            props.env.LOGGER_MIN_SEVERITY ? getLogger(props.env.LOGGER_MIN_SEVERITY) : dummyLogger
           ),
           keyAgent,
           networkInfoProvider: await networkInfoProviderFactory.create(
             props.env.NETWORK_INFO_PROVIDER,
-            props.env.NETWORK_INFO_PROVIDER_PARAMS
+            props.env.NETWORK_INFO_PROVIDER_PARAMS,
+            props.env.LOGGER_MIN_SEVERITY ? getLogger(props.env.LOGGER_MIN_SEVERITY) : dummyLogger
           ),
           rewardsProvider: await rewardsProviderFactory.create(
             props.env.REWARDS_PROVIDER,
-            props.env.REWARDS_PROVIDER_PARAMS
+            props.env.REWARDS_PROVIDER_PARAMS,
+            props.env.LOGGER_MIN_SEVERITY ? getLogger(props.env.LOGGER_MIN_SEVERITY) : dummyLogger
           ),
           stakePoolProvider: await stakePoolProviderFactory.create(
             props.env.STAKE_POOL_PROVIDER,
-            props.env.STAKE_POOL_PROVIDER_PARAMS
+            props.env.STAKE_POOL_PROVIDER_PARAMS,
+            props.env.LOGGER_MIN_SEVERITY ? getLogger(props.env.LOGGER_MIN_SEVERITY) : dummyLogger
           ),
           stores: props.stores,
           txSubmitProvider: await txSubmitProviderFactory.create(
             props.env.TX_SUBMIT_PROVIDER,
-            props.env.TX_SUBMIT_PROVIDER_PARAMS
+            props.env.TX_SUBMIT_PROVIDER_PARAMS,
+            props.env.LOGGER_MIN_SEVERITY ? getLogger(props.env.LOGGER_MIN_SEVERITY) : dummyLogger
           ),
-          utxoProvider: await utxoProviderFactory.create(props.env.UTXO_PROVIDER, props.env.UTXO_PROVIDER_PARAMS)
+          utxoProvider: await utxoProviderFactory.create(
+            props.env.UTXO_PROVIDER,
+            props.env.UTXO_PROVIDER_PARAMS,
+            props.env.LOGGER_MIN_SEVERITY ? getLogger(props.env.LOGGER_MIN_SEVERITY) : dummyLogger
+          )
         }
       )
   });
   return wallet;
-};
-
-// Logger
-
-/**
- * Gets the logger instance.
- *
- * @param severity The minimum severity of the log messages that will be logged.
- * @returns The Logger instance.
- */
-export const getLogger = function (severity: string): Logger {
-  return createLogger({
-    level: severity as LogLevel,
-    name: 'e2e tests'
-  });
 };
