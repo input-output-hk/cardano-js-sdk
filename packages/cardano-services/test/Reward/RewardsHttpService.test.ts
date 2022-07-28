@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-len */
 import { Cardano, ProviderError, ProviderFailure, RewardsProvider } from '@cardano-sdk/core';
+import { CreateHttpProviderConfig, rewardsHttpProvider } from '@cardano-sdk/cardano-services-client';
 import { DbSyncRewardsProvider, HttpServer, HttpServerConfig, RewardsHttpService } from '../../src';
+import { INFO, createLogger } from 'bunyan';
 import { Pool } from 'pg';
 import { getPort } from 'get-port-please';
-import { rewardsHttpProvider } from '@cardano-sdk/cardano-services-client';
 import axios from 'axios';
 
 const APPLICATION_JSON = 'application/json';
@@ -18,12 +19,14 @@ describe('RewardsHttpService', () => {
   let rewardsProvider: DbSyncRewardsProvider;
   let service: RewardsHttpService;
   let port: number;
-  let apiUrlBase: string;
+  let baseUrl: string;
+  let clientConfig: CreateHttpProviderConfig<RewardsProvider>;
   let config: HttpServerConfig;
 
   beforeAll(async () => {
     port = await getPort();
-    apiUrlBase = `http://localhost:${port}/rewards`;
+    baseUrl = `http://localhost:${port}/rewards`;
+    clientConfig = { baseUrl, logger: createLogger({ level: INFO, name: 'unit tests' }) };
     config = { listen: { port } };
     dbConnection = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING });
   });
@@ -70,7 +73,7 @@ describe('RewardsHttpService', () => {
 
     describe('/health', () => {
       it('forwards the stakePoolSearchProvider health response', async () => {
-        const res = await axios.post(`${apiUrlBase}/health`, {}, { headers: { 'Content-Type': APPLICATION_JSON } });
+        const res = await axios.post(`${baseUrl}/health`, {}, { headers: { 'Content-Type': APPLICATION_JSON } });
         expect(res.status).toBe(200);
         expect(res.data).toEqual({ ok: true });
       });
@@ -82,7 +85,7 @@ describe('RewardsHttpService', () => {
       it('returns a 200 coded response with a well formed HTTP request', async () => {
         expect(
           (
-            await axios.post(`${apiUrlBase}${historyUrl}`, {
+            await axios.post(`${baseUrl}${historyUrl}`, {
               args: [
                 {
                   epochs: {
@@ -99,7 +102,7 @@ describe('RewardsHttpService', () => {
       it('returns a 415 coded response if the wrong content type header is used', async () => {
         try {
           await axios.post(
-            `${apiUrlBase}${historyUrl}`,
+            `${baseUrl}${historyUrl}`,
             {
               args: [
                 {
@@ -117,7 +120,7 @@ describe('RewardsHttpService', () => {
 
       it('returns 400 coded respons if the request is bad formed', async () => {
         try {
-          await axios.post(`${apiUrlBase}${historyUrl}`, { args: [{ field: 'value' }] });
+          await axios.post(`${baseUrl}${historyUrl}`, { args: [{ field: 'value' }] });
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
           expect(error.response.status).toBe(400);
@@ -132,7 +135,7 @@ describe('RewardsHttpService', () => {
       it('returns a 200 coded response with a well formed HTTP request', async () => {
         expect(
           (
-            await axios.post(`${apiUrlBase}${accountBalanceUrl}`, {
+            await axios.post(`${baseUrl}${accountBalanceUrl}`, {
               args: [rewardAddress]
             })
           ).status
@@ -141,7 +144,7 @@ describe('RewardsHttpService', () => {
       it('returns a 415 coded response if the wrong content type header is used', async () => {
         try {
           await axios.post(
-            `${apiUrlBase}${accountBalanceUrl}`,
+            `${baseUrl}${accountBalanceUrl}`,
             { args: [rewardAddress] },
             { headers: { 'Content-Type': APPLICATION_CBOR } }
           );
@@ -152,7 +155,7 @@ describe('RewardsHttpService', () => {
       });
       it('returns 400 coded respons if the request is bad formed', async () => {
         try {
-          await axios.post(`${apiUrlBase}${accountBalanceUrl}`, { args: [{ address: 'asd' }] });
+          await axios.post(`${baseUrl}${accountBalanceUrl}`, { args: [{ address: 'asd' }] });
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
           expect(error.response.status).toBe(400);
@@ -164,7 +167,7 @@ describe('RewardsHttpService', () => {
     describe('with rewardsHttpProvider', () => {
       let provider: RewardsProvider;
       beforeEach(() => {
-        provider = rewardsHttpProvider(apiUrlBase);
+        provider = rewardsHttpProvider(clientConfig);
       });
       const rewardAcc = Cardano.RewardAccount('stake_test1upd9j9rwxeu44xfxnrl6sqsswf9k60gcdjuy2gz6zyu2jmqyvn80c');
       describe('rewardAccountBalance', () => {

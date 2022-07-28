@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { Logger } from 'ts-log';
 import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
-import axios, { AxiosRequestConfig } from 'axios';
+import axios, { AxiosAdapter, AxiosRequestConfig } from 'axios';
 
 const isEmptyResponse = (response: any) => response === '';
 
@@ -30,7 +31,23 @@ export interface HttpProviderConfig<T> {
    * @param method provider method name
    */
   mapError?: (error: unknown, method: keyof T) => unknown;
+
+  /**
+   * This adapter that allows to you to modify the way Axios make requests.
+   */
+  adapter?: AxiosAdapter;
+
+  /**
+   * Logger strategy.
+   */
+  logger: Logger;
 }
+
+/**
+ * The subset of parameters from HttpProviderConfig that must be set by the
+ * client code.
+ */
+export type CreateHttpProviderConfig<T> = Pick<HttpProviderConfig<T>, 'baseUrl' | 'adapter' | 'logger'>;
 
 /**
  * Creates a HTTP client for specified provider type, following some conventions:
@@ -46,7 +63,9 @@ export const createHttpProvider = <T extends object>({
   baseUrl,
   axiosOptions,
   mapError,
-  paths
+  paths,
+  adapter,
+  logger
 }: HttpProviderConfig<T>): T =>
   new Proxy<T>({} as T, {
     // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -60,13 +79,19 @@ export const createHttpProvider = <T extends object>({
         try {
           const req: AxiosRequestConfig = {
             ...axiosOptions,
+            adapter,
             baseURL: baseUrl,
             data: { args },
             method: 'post',
             responseType: 'json',
             url: path
           };
+
+          logger.debug(`Sending ${req.method} request to ${req.baseURL}${req.url} with data:`);
+          logger.debug(req.data);
+
           const axiosInstance = axios.create(req);
+
           axiosInstance.interceptors.request.use((value) => {
             if (value.data) value.data = toSerializableObject(value.data);
             return value;
@@ -78,6 +103,7 @@ export const createHttpProvider = <T extends object>({
           const response = (await axiosInstance.request(req)).data;
           return !isEmptyResponse(response) ? response : undefined;
         } catch (error) {
+          logger.error(error);
           if (axios.isAxiosError(error)) {
             if (error.response) {
               const typedError = fromSerializableObject(error.response.data, {

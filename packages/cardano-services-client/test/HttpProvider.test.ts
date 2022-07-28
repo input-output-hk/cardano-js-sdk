@@ -5,6 +5,8 @@ import { HttpProviderConfig, createHttpProvider } from '../src';
 import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
 
+import { INFO, createLogger } from 'bunyan';
+import { Logger } from 'ts-log';
 import { Server } from 'http';
 import { getPort } from 'get-port-please';
 import express, { RequestHandler } from 'express';
@@ -34,12 +36,14 @@ const stubProviderPaths = {
 describe('createHttpServer', () => {
   let port: number;
   let baseUrl: string;
+  const logger: Logger = createLogger({ level: INFO, name: 'unit tests' });
 
   const createTxSubmitProviderClient = (
     config: Pick<HttpProviderConfig<TestProvider>, 'axiosOptions' | 'mapError'> = {}
   ) =>
     createHttpProvider<TestProvider>({
       baseUrl,
+      logger,
       paths: stubProviderPaths,
       ...config
     });
