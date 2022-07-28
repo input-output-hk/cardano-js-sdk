@@ -8,6 +8,7 @@ export const env = envalid.cleanEnv(process.env, {
   CHAIN_HISTORY_PROVIDER_PARAMS: envalid.json({ default: {} }),
   KEY_MANAGEMENT_PARAMS: envalid.json({ default: {} }),
   KEY_MANAGEMENT_PROVIDER: envalid.str(),
+  LOGGER_MIN_SEVERITY: envalid.str({ default: 'info' }),
   NETWORK_INFO_PROVIDER: envalid.str(),
   NETWORK_INFO_PROVIDER_PARAMS: envalid.json({ default: {} }),
   POOL_ID_1: envalid.str(),

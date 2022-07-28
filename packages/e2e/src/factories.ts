@@ -347,52 +347,53 @@ export type GetWalletProps = {
  * @param props Wallet configuration parameters.
  */
 export const getWallet = async (props: GetWalletProps) => {
+  const logger = props.env.LOGGER_MIN_SEVERITY ? getLogger(props.env.LOGGER_MIN_SEVERITY) : dummyLogger;
   const { wallet } = await setupWallet({
     createKeyAgent: await keyManagementFactory.create(
       props.env.KEY_MANAGEMENT_PROVIDER,
       updateParamsId(props.idx !== undefined ? props.idx : 0, props.env.KEY_MANAGEMENT_PARAMS),
-      dummyLogger
+      logger
     ),
-    createWallet: async (keyAgent: any) =>
+    createWallet: async (keyAgent: KeyManagement.AsyncKeyAgent) =>
       new SingleAddressWallet(
         { name: props.name, polling: props.polling },
         {
           assetProvider: await assetProviderFactory.create(
             props.env.ASSET_PROVIDER,
             props.env.ASSET_PROVIDER_PARAMS,
-            props.env.LOGGER_MIN_SEVERITY ? getLogger(props.env.LOGGER_MIN_SEVERITY) : dummyLogger
+            logger
           ),
           chainHistoryProvider: await chainHistoryProviderFactory.create(
             props.env.CHAIN_HISTORY_PROVIDER,
             props.env.CHAIN_HISTORY_PROVIDER_PARAMS,
-            props.env.LOGGER_MIN_SEVERITY ? getLogger(props.env.LOGGER_MIN_SEVERITY) : dummyLogger
+            logger
           ),
           keyAgent,
           networkInfoProvider: await networkInfoProviderFactory.create(
             props.env.NETWORK_INFO_PROVIDER,
             props.env.NETWORK_INFO_PROVIDER_PARAMS,
-            props.env.LOGGER_MIN_SEVERITY ? getLogger(props.env.LOGGER_MIN_SEVERITY) : dummyLogger
+            logger
           ),
           rewardsProvider: await rewardsProviderFactory.create(
             props.env.REWARDS_PROVIDER,
             props.env.REWARDS_PROVIDER_PARAMS,
-            props.env.LOGGER_MIN_SEVERITY ? getLogger(props.env.LOGGER_MIN_SEVERITY) : dummyLogger
+            logger
           ),
           stakePoolProvider: await stakePoolProviderFactory.create(
             props.env.STAKE_POOL_PROVIDER,
             props.env.STAKE_POOL_PROVIDER_PARAMS,
-            props.env.LOGGER_MIN_SEVERITY ? getLogger(props.env.LOGGER_MIN_SEVERITY) : dummyLogger
+            logger
           ),
           stores: props.stores,
           txSubmitProvider: await txSubmitProviderFactory.create(
             props.env.TX_SUBMIT_PROVIDER,
             props.env.TX_SUBMIT_PROVIDER_PARAMS,
-            props.env.LOGGER_MIN_SEVERITY ? getLogger(props.env.LOGGER_MIN_SEVERITY) : dummyLogger
+            logger
           ),
           utxoProvider: await utxoProviderFactory.create(
             props.env.UTXO_PROVIDER,
             props.env.UTXO_PROVIDER_PARAMS,
-            props.env.LOGGER_MIN_SEVERITY ? getLogger(props.env.LOGGER_MIN_SEVERITY) : dummyLogger
+            logger
           )
         }
       )
