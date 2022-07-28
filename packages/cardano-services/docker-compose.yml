@@ -68,7 +68,7 @@ services:
       - postgres_db
     volumes:
       - ./config/network/${NETWORK:-mainnet}:/config
-      - db-sync-data:/var/lib/cdbsync
+      - db-sync-data:/var/lib/cexplorer
       - node-ipc:/node-ipc
     restart: on-failure
     logging:
