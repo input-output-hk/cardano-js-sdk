@@ -46,6 +46,69 @@ To add funds to your newly created wallet, copy the address displayed in the con
 
 > :information_source: tADA is a limited resource, so if you are no longer using the address, return the tADA to the faucet for others to use.
 
+## Local Test Network
+<a name="local_test_network"></a>
+
+Some end-to-end tests can be run using the local test network, this network can be started as follows:
+
+```bash
+$ yarn workspace @cardano-sdk/e2e local-network:up
+```
+
+:warning: Note that once you finish running the test, you should stop the environment with:
+
+```bash
+$ yarn workspace @cardano-sdk/e2e local-network:down
+```
+Instead of CTRL-C, since some resources need to be clear before you can set up the environment again, if you don't stop the containers with the proper command, you may run into issues restarting it.
+
+There are two ways of obtaining tADA on this network, first we have the faucet:
+
+```javascript
+    let faucetProvider = await faucetProviderFactory.create(
+      env.FAUCET_PROVIDER,
+      env.FAUCET_PROVIDER_PARAMS,
+      getLogger(env.LOGGER_MIN_SEVERITY));
+    
+    await faucetProvider.request(address, amountFromFaucet, blockConfirmations);
+```
+
+The faucet allows you to request an arbitrary amount of tADA to a given address. The faucet will make sure the transaction is in a block before returning, which means you can access the funds immediately after.
+
+The second way is via a set of fixed wallets that are created when the network bootstraps, these wallets contain 5 million tADA each, and you can use them directly if you find the use of the faucet not convenient:
+
+```
+Mnemonic:   vacant violin soft weird deliver render brief always monitor general maid smart jelly core drastic erode echo there clump dizzy card filter option defense
+
+Address:    addr_test1qpw0djgj0x59ngrjvqthn7enhvruxnsavsw5th63la3mjel3tkc974sr23jmlzgq5zda4gtv8k9cy38756r9y3qgmkqqjz6aa7
+```
+
+```
+Mnemonic:   slab gorilla reflect display cage aim silver add own arrange crew start female bitter menu inner combine exit swallow bamboo midnight wealth culture picnic
+
+Address:    addr_test1qrml5hwl9s7ydm2djyup95ud6s74skkl4zzf8zk657s8thgm78sn3uhch64ujc7ffnpga68dfdqhg3sp7tk6759jrm7spy03k9
+```
+
+```
+Mnemonic:   decorate survey empower stairs pledge humble social leisure baby wrap grief exact monster rug dash kiss perfect select science light frame play swallow day
+
+Address:    addr_test1qrxhyr2flena4ams5pcx26n0yj4ttpmjq2tmuesu4waw8n0qkvxuy9e4kdpz0s7r67jr8pjl9q6ezm2jgg247y9q3zpqxga37s
+```
+
+```
+Mnemonic:   phrase raw learn suspect inmate powder combine apology regular hero gain chronic fruit ritual short screen goddess odor keen creek brand today kit machine
+
+Address:    addr_test1qpv5muwgjmmtqh2ta0kq9pmz0nurg9kmw7dryueqt57mncynjnzmk67fvy2unhzydrgzp2v6hl625t0d4qd5h3nxt04qu0ww7k
+```
+
+```
+Mnemonic:   salon zoo engage submit smile frost later decide wing sight chaos renew lizard rely canal coral scene hobby scare step bus leaf tobacco slice
+
+Address:    addr_test1qr0c3frkem9cqn5f73dnvqpena27k2fgqew6wct9eaka03agfwkvzr0zyq7nqvcj24zehrshx63zzdxv24x3a4tcnfeq9zwmn7
+```
+
+You can configure any of these five wallets in your test and use any amount of tADA you need.
+
 ## Blockfrost
 
 To run the Blockfrost end-to-end tests you only need to configure two providers, AssetProvider and ChainHistoryProvider, both must be configured as Blockfrost providers and a valid Blockfrost API key must be also set, make sure that in your .env file, you have the environment variables set:
@@ -118,31 +181,21 @@ $ yarn workspace @cardano-sdk/e2e test:cardano-services
 
 ## Local Network
 
-The end-to-end local network test are meant to showcase the use of the local test network. The local network end-to-end test shows how we can fund wallets with local test network tADA so we can run the end-to-end tests. For the local network end-to-end test to run, we must first start our local test network environment as follows:
+The end-to-end local network test are meant to showcase the use of the local test network. The local network end-to-end test shows how we can fund wallets with local test network tADA so we can run the end-to-end tests. For the local network end-to-end test to run, we must first start our local test network environment (see [here](#local_test_network)).
 
-```bash
-$ yarn workspace @cardano-sdk/e2e local-network:up
-```
-
-:warning: Note that once you finish running the test, you should stop the environment with:
-
-```bash
-$ yarn workspace @cardano-sdk/e2e local-network:down
-```
-Instead of CTRL-C, since some resources need to be clear before you can set up the environment again, if you don't stop the containers with the proper command, you may run into issues restarting it.
-
-For the local network to work correctly, we must configure it with the mnemonic of the genesis wallet. This wallet controls all the funds on the local test network and is the only way of obtaining tADA on that network.
+For the local network tests to work correctly, we must configure it with the mnemonic of the genesis wallet. This wallet controls almost all the funds on the local test network and is the one of the ways of obtaining tADA on that network.
 
 ```
 # Logger
-LOGGER_MIN_SEVERITY=debug
+LOGGER_MIN_SEVERITY=info
 
 # Providers setup
 FAUCET_PROVIDER=cardano-wallet
 FAUCET_PROVIDER_PARAMS='{"url":"http://localhost:8090/v2","mnemonic":"fire method repair aware foot tray accuse brother popular olive find account sick rocket next"}'
 KEY_MANAGEMENT_PROVIDER=inMemory
 KEY_MANAGEMENT_PARAMS='{"accountIndex": 0, "networkId": 0, "password":"some_password","mnemonic":""}'
-ASSET_PROVIDER=stub
+ASSET_PROVIDER=http
+ASSET_PROVIDER_PARAMS='{"url":"http://localhost:4000/asset"}'
 CHAIN_HISTORY_PROVIDER=http
 CHAIN_HISTORY_PROVIDER_PARAMS='{"url":"http://localhost:4000/chain-history"}'
 NETWORK_INFO_PROVIDER=http
@@ -209,23 +262,29 @@ $ yarn workspace @cardano-sdk/e2e test:wallet
 The web-extension end-to-end tests are slightly different from the rest as they emulate user interaction with a browser instance. There is only one key difference between running the web-extension end-to-end tests and the rest, and that is the location of the .env file; for the web-extension end-to-end tests, the .env file must be located within the packages/e2e/web-extension directory, this is an example of the environment file you need to run the tests:
 
 ```
-TX_SUBMIT_PROVIDER=blockfrost
-TX_SUBMIT_HTTP_URL=http://localhost:3000
-ASSET_PROVIDER=blockfrost
-UTXO_PROVIDER=blockfrost
-REWARDS_PROVIDER=blockfrost
-STAKE_POOL_PROVIDER=stub
-NETWORK_INFO_PROVIDER=blockfrost
-CHAIN_HISTORY_PROVIDER=blockfrost
-BLOCKFROST_API_KEY=testnetSOMEAPIKEY
-NETWORK_ID=0
-MNEMONIC_WORDS="vacant invite slender salute undo drink above scatter item silver hold route repeat patch paper"
-WALLET_PASSWORD=some_password
-POOL_ID_1=pool1euf2nh92ehqfw7rpd4s9qgq34z8dg4pvfqhjmhggmzk95gcd402
-POOL_ID_2=pool1fghrkl620rl3g54ezv56weeuwlyce2tdannm2hphs62syf3vyyh
-OGMIOS_URL=ws://localhost:1337
+# Logger
 LOGGER_MIN_SEVERITY=debug
-KEY_AGENT=InMemory
+
+# Providers setup
+ASSET_PROVIDER=http
+ASSET_PROVIDER_PARAMS='{"url":"http://localhost:4000/asset"}'
+CHAIN_HISTORY_PROVIDER=http
+CHAIN_HISTORY_PROVIDER_PARAMS='{"url":"http://localhost:4000/chain-history"}'
+NETWORK_INFO_PROVIDER=http
+NETWORK_INFO_PROVIDER_PARAMS='{"url":"http://localhost:4000/network-info"}'
+REWARDS_PROVIDER=http
+REWARDS_PROVIDER_PARAMS='{"url":"http://localhost:4000/rewards"}'
+TX_SUBMIT_PROVIDER=http
+TX_SUBMIT_PROVIDER_PARAMS='{"url":"http://localhost:4000/tx-submit"}'
+UTXO_PROVIDER=http
+UTXO_PROVIDER_PARAMS='{"url":"http://localhost:4000/utxo"}'
+STAKE_POOL_PROVIDER=stub
+STAKE_POOL_PROVIDER_PARAMS='{"url":"http://localhost:4000/stake-pool"}'
+
+# Test Environment
+BLOCKFROST_API_KEY=someAPIKEY
+NETWORK_ID=0
+MNEMONIC_WORDS="vacant violin soft weird deliver render brief always monitor general maid smart jelly core drastic erode echo there clump dizzy card filter option defense"
 ```
 > :information_source: Remember to get your Blockfrost API key at [blockfrost.io](https://blockfrost.io/) and set it in the configuration file, the API key displayed here is invalid and for demonstration purposes only.
 
