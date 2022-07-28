@@ -11,6 +11,7 @@ enum HttpServerOptionDescriptions {
   PostgresDb = 'PostgreSQL database name when using service discovery',
   PostgresUser = 'PostgreSQL user when using service discovery',
   PostgresPassword = 'PostgreSQL password when using service discovery',
+  PostgresSslCaFile = 'PostgreSQL SSL CA file path',
   // Will be removed once we consolidate entrypoints and validations via Commander.js
   PostgresServiceDiscoveryArgs = 'Postgres SRV service name, db, user and password',
   RabbitMQUrl = 'RabbitMQ URL',

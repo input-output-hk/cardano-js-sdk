@@ -12,6 +12,7 @@ import { ProviderFailure, TxSubmitProvider } from '@cardano-sdk/core';
 import { RabbitMqTxSubmitProvider } from '@cardano-sdk/rabbitmq';
 import { ServiceNames } from './ServiceNames';
 import dns, { SrvRecord } from 'dns';
+import fs from 'fs';
 import pRetry, { FailedAttemptError } from 'p-retry';
 
 export const SERVICE_DISCOVERY_BACKOFF_FACTOR_DEFAULT = 1.1;
@@ -68,10 +69,10 @@ export type DnsResolver = ReturnType<typeof createDnsResolver>;
 export const getPoolWithServiceDiscovery = async (
   dnsResolver: DnsResolver,
   logger: Logger,
-  { host, database, password, user }: ClientConfig
+  { host, database, password, ssl, user }: ClientConfig
 ): Promise<Pool> => {
   const { name, port } = await dnsResolver(host!);
-  let pool = new Pool({ database, host: name, password, port, user });
+  let pool = new Pool({ database, host: name, password, port, ssl, user });
 
   return new Proxy<Pool>({} as Pool, {
     get(_, prop) {
@@ -82,7 +83,7 @@ export const getPoolWithServiceDiscovery = async (
             if (error.code && ['ENOTFOUND', 'ECONNREFUSED', 'ECONNRESET'].includes(error.code)) {
               const record = await dnsResolver(host!);
               logger.info(`DNS resolution for Postgres service, resolved with record: ${JSON.stringify(record)}`);
-              pool = new Pool({ database, host: record.name, password, port: record.port, user });
+              pool = new Pool({ database, host: record.name, password, port: record.port, ssl, user });
               return await pool.query(args, values);
             }
             throw error;
@@ -97,22 +98,26 @@ export const getPoolWithServiceDiscovery = async (
   });
 };
 
+export const loadSecret = (path: string) => fs.readFileSync(path, 'utf8').toString();
+
 export const getPool = async (
   dnsResolver: DnsResolver,
   logger: Logger,
   options?: HttpServerOptions
 ): Promise<Pool | undefined> => {
+  const ssl = options?.postgresSslCaFile ? { ca: loadSecret(options.postgresSslCaFile) } : undefined;
   if (options?.postgresConnectionString && options.postgresSrvServiceName)
     throw new InvalidArgsCombination(
       ProgramOptionDescriptions.PostgresConnectionString,
       ProgramOptionDescriptions.PostgresServiceDiscoveryArgs
     );
-  if (options?.postgresConnectionString) return new Pool({ connectionString: options.postgresConnectionString });
+  if (options?.postgresConnectionString) return new Pool({ connectionString: options.postgresConnectionString, ssl });
   if (options?.postgresSrvServiceName && options.postgresUser && options.postgresDb && options.postgresPassword) {
     return getPoolWithServiceDiscovery(dnsResolver, logger, {
       database: options.postgresDb,
       host: options.postgresSrvServiceName,
       password: options.postgresPassword,
+      ssl,
       user: options.postgresUser
     });
   }

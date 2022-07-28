@@ -63,6 +63,7 @@ describe('entrypoints', () => {
     let postgresDb: string;
     let postgresUser: string;
     let postgresPassword: string;
+    let postgresSslCaFile: string;
     let ogmiosSrvServiceName: string;
     let rabbitmqSrvServiceName: string;
 
@@ -75,6 +76,7 @@ describe('entrypoints', () => {
       postgresDb = process.env.POSTGRES_DB!;
       postgresUser = process.env.POSTGRES_USER!;
       postgresPassword = process.env.POSTGRES_PASSWORD!;
+      postgresSslCaFile = process.env.POSTGRES_SSL_CA_FILE!;
       ogmiosSrvServiceName = process.env.OGMIOS_SRV_SERVICE_NAME!;
       rabbitmqSrvServiceName = process.env.RABBITMQ_SRV_SERVICE_NAME!;
       dbCacheTtl = process.env.DB_CACHE_TTL!;
@@ -855,6 +857,134 @@ describe('entrypoints', () => {
             stdio: 'pipe'
           });
           proc.stderr!.on('data', spy);
+          proc.on('exit', (code) => {
+            expect(code).toBe(1);
+            expect(spy).toHaveBeenCalled();
+            done();
+          });
+        });
+      });
+    });
+
+    describe('specifying ssl ca file path that does not exist', () => {
+      let spy: jest.Mock;
+      const invalidFilePath = 'this-is-not-a-valid-file-path';
+
+      beforeEach(async () => {
+        spy = jest.fn();
+      });
+
+      it('cli:start-server exits with code 1', (done) => {
+        proc = fork(
+          exePath('cli'),
+          [
+            'start-server',
+            '--api-url',
+            apiUrl,
+            '--postgres-connection-string',
+            postgresConnectionString,
+            '--logger-min-severity',
+            'error',
+            '--cardano-node-config-path',
+            cardanoNodeConfigPath,
+            ServiceNames.NetworkInfo,
+            '--postgres-ssl-ca-file',
+            invalidFilePath
+          ],
+          { stdio: 'pipe' }
+        );
+        proc.stderr!.on('data', (data) => {
+          spy();
+          expect(data.toString().includes('ENOENT: no such file or directory')).toEqual(true);
+        });
+
+        proc.on('exit', (code) => {
+          expect(code).toBe(1);
+          expect(spy).toHaveBeenCalled();
+          done();
+        });
+      });
+      it('run exits with code 1', (done) => {
+        expect.assertions(3);
+        ogmiosServer.listen(ogmiosConnection.port, () => {
+          proc = fork(exePath('run'), {
+            env: {
+              API_URL: apiUrl,
+              CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
+              LOGGER_MIN_SEVERITY: 'error',
+              POSTGRES_CONNECTION_STRING: postgresConnectionString,
+              POSTGRES_SSL_CA_FILE: invalidFilePath,
+              SERVICE_NAMES: ServiceNames.NetworkInfo
+            },
+            stdio: 'pipe'
+          });
+          proc.stderr!.on('data', (data) => {
+            spy();
+            expect(data.toString().includes('No file exists')).toEqual(true);
+          });
+          proc.on('exit', (code) => {
+            expect(code).toBe(1);
+            expect(spy).toHaveBeenCalled();
+            done();
+          });
+        });
+      });
+    });
+
+    describe('specifying ssl ca file path to an invalid cert', () => {
+      let spy: jest.Mock;
+
+      beforeEach(async () => {
+        spy = jest.fn();
+      });
+      it('cli:start-server exits with code 1', (done) => {
+        proc = fork(
+          exePath('cli'),
+          [
+            'start-server',
+            '--api-url',
+            apiUrl,
+            '--postgres-connection-string',
+            postgresConnectionString,
+            '--logger-min-severity',
+            'error',
+            '--cardano-node-config-path',
+            cardanoNodeConfigPath,
+            ServiceNames.NetworkInfo,
+            '--postgres-ssl-ca-file',
+            postgresSslCaFile
+          ],
+          { stdio: 'pipe' }
+        );
+        proc.stderr!.on('data', (data) => {
+          spy();
+          expect(data.toString().includes('The server does not support SSL connections')).toEqual(true);
+        });
+
+        proc.on('exit', (code) => {
+          expect(code).toBe(1);
+          expect(spy).toHaveBeenCalled();
+          done();
+        });
+      });
+      it('run exits with code 1', (done) => {
+        expect.assertions(3);
+        ogmiosServer.listen(ogmiosConnection.port, () => {
+          proc = fork(exePath('run'), {
+            env: {
+              API_URL: apiUrl,
+              CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
+              LOGGER_MIN_SEVERITY: 'error',
+              POSTGRES_CONNECTION_STRING: postgresConnectionString,
+              POSTGRES_SSL_CA_FILE: postgresSslCaFile,
+              SERVICE_NAMES: ServiceNames.NetworkInfo
+            },
+            stdio: 'pipe'
+          });
+          proc.stderr!.on('data', (data) => {
+            spy();
+            expect(data.toString().includes('The server does not support SSL connections')).toEqual(true);
+          });
           proc.on('exit', (code) => {
             expect(code).toBe(1);
             expect(spy).toHaveBeenCalled();
