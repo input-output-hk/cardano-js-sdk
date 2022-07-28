@@ -10,6 +10,7 @@ import { DbSyncUtxoProvider, UtxoHttpService } from '../Utxo';
 import {
   DnsResolver,
   createDnsResolver,
+  getOgmiosCardanoNode,
   getOgmiosTxSubmitProvider,
   getPool,
   getRabbitMqTxSubmitProvider
@@ -17,7 +18,6 @@ import {
 import { HttpServer, HttpServerConfig, HttpService } from '../Http';
 import { InMemoryCache } from '../InMemoryCache';
 import { MissingProgramOption, UnknownServiceName } from './errors';
-import { OgmiosCardanoNode, urlToConnectionConfig } from '@cardano-sdk/ogmios';
 import { ProgramOptionDescriptions } from './ProgramOptionDescriptions';
 import { ServiceNames } from './ServiceNames';
 import { TxSubmitHttpService } from '../TxSubmit';
@@ -106,18 +106,19 @@ const serviceMapFactory = (
     [ServiceNames.Rewards]: withDb(
       (db) => new RewardsHttpService({ logger, rewardsProvider: new DbSyncRewardsProvider(db, logger) })
     ),
-    [ServiceNames.NetworkInfo]: withDb((db) => {
+    [ServiceNames.NetworkInfo]: withDb(async (db) => {
       if (args.options?.cardanoNodeConfigPath === undefined)
         throw new MissingProgramOption(ServiceNames.NetworkInfo, ProgramOptionDescriptions.CardanoNodeConfigPath);
       if (args.options?.ogmiosUrl === undefined)
         throw new MissingProgramOption(ServiceNames.NetworkInfo, ProgramOptionDescriptions.OgmiosUrl);
 
+      const cardanoNode = await getOgmiosCardanoNode(dnsResolver, logger, args.options);
       const networkInfoProvider = new DbSyncNetworkInfoProvider(
         {
           cardanoNodeConfigPath: args.options.cardanoNodeConfigPath,
           epochPollInterval: args.options?.epochPollInterval
         },
-        { cache, cardanoNode: new OgmiosCardanoNode(urlToConnectionConfig(args.options.ogmiosUrl), logger), db, logger }
+        { cache, cardanoNode, db, logger }
       );
 
       return new NetworkInfoHttpService({ logger, networkInfoProvider });
