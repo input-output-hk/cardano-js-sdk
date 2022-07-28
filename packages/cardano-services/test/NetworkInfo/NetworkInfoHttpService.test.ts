@@ -2,23 +2,15 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable sonarjs/cognitive-complexity */
 /* eslint-disable sonarjs/no-identical-functions */
-import {
-  CardanoNode,
-  EraSummary,
-  NetworkInfoProvider,
-  ProviderError,
-  ProviderFailure,
-  StakeSummary,
-  SupplySummary
-} from '@cardano-sdk/core';
+import { CardanoNode, EraSummary, NetworkInfoProvider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { CreateHttpProviderConfig, networkInfoHttpProvider } from '@cardano-sdk/cardano-services-client';
 import { DbSyncNetworkInfoProvider, NetworkInfoCacheKey, NetworkInfoHttpService } from '../../src/NetworkInfo';
 import { HttpServer, HttpServerConfig } from '../../src';
 import { INFO, createLogger } from 'bunyan';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../src/InMemoryCache';
 import { Pool } from 'pg';
-import { doServerRequest, ingestDbData, sleep, wrapWithTransaction } from '../util';
 import { getPort } from 'get-port-please';
+import { ingestDbData, sleep, wrapWithTransaction } from '../util';
 import { loadGenesisData } from '../../src/NetworkInfo/DbSyncNetworkInfoProvider/mappers';
 import axios from 'axios';
 
@@ -36,8 +28,8 @@ describe('NetworkInfoHttpService', () => {
   let baseUrl: string;
   let clientConfig: CreateHttpProviderConfig<NetworkInfoProvider>;
   let config: HttpServerConfig;
-  let doNetworkInfoRequest: ReturnType<typeof doServerRequest>;
   let cardanoNode: CardanoNode;
+  let provider: NetworkInfoProvider;
 
   const epochPollInterval = 2 * 1000;
   const cache = new InMemoryCache(UNLIMITED_CACHE_TTL);
@@ -113,7 +105,8 @@ describe('NetworkInfoHttpService', () => {
       );
       service = new NetworkInfoHttpService({ networkInfoProvider });
       httpServer = new HttpServer(config, { services: [service] });
-      doNetworkInfoRequest = doServerRequest(baseUrl);
+      clientConfig = { baseUrl, logger: createLogger({ level: INFO, name: 'unit tests' }) };
+      provider = networkInfoHttpProvider(clientConfig);
 
       await httpServer.initialize();
       await httpServer.start();
@@ -156,52 +149,69 @@ describe('NetworkInfoHttpService', () => {
     });
 
     describe('/time-settings', () => {
-      it('returns a 200 coded response with a well formed HTTP request', async () => {
-        expect((await axios.post(`${baseUrl}/time-settings`, { args: [] })).status).toEqual(200);
+      describe('with Http Server', () => {
+        it('returns a 200 coded response with a well formed HTTP request', async () => {
+          expect((await axios.post(`${baseUrl}/time-settings`, { args: [] })).status).toEqual(200);
+        });
+
+        it('returns a 415 coded response if the wrong content type header is used', async () => {
+          try {
+            await axios.post(
+              `${baseUrl}/time-settings`,
+              { args: [] },
+              { headers: { 'Content-Type': APPLICATION_CBOR } }
+            );
+          } catch (error: any) {
+            expect(error.response.status).toBe(415);
+            expect(error.message).toBe(UNSUPPORTED_MEDIA_STRING);
+          }
+        });
       });
 
-      it('returns a 415 coded response if the wrong content type header is used', async () => {
-        try {
-          await axios.post(`${baseUrl}/time-settings`, { args: [] }, { headers: { 'Content-Type': APPLICATION_CBOR } });
-        } catch (error: any) {
-          expect(error.response.status).toBe(415);
-          expect(error.message).toBe(UNSUPPORTED_MEDIA_STRING);
-        }
+      it('successful request', async () => {
+        const response = await provider.timeSettings();
+        expect(response[0].slotLength).toBeDefined();
       });
     });
 
     describe('/stake', () => {
-      const path = '/stake';
       const stakeTotalQueriesCount = 2;
       const DB_POLL_QUERIES_COUNT = 1;
 
-      it('returns a 200 coded response with a well formed HTTP request', async () => {
-        expect((await axios.post(`${baseUrl}/stake`, { args: [] })).status).toEqual(200);
+      describe('with Http Server', () => {
+        it('returns a 200 coded response with a well formed HTTP request', async () => {
+          expect((await axios.post(`${baseUrl}/stake`, { args: [] })).status).toEqual(200);
+        });
+
+        it('returns a 415 coded response if the wrong content type header is used', async () => {
+          try {
+            await axios.post(`${baseUrl}/stake`, { args: [] }, { headers: { 'Content-Type': APPLICATION_CBOR } });
+          } catch (error: any) {
+            expect(error.response.status).toBe(415);
+            expect(error.message).toBe(UNSUPPORTED_MEDIA_STRING);
+          }
+        });
       });
 
-      it('returns a 415 coded response if the wrong content type header is used', async () => {
-        try {
-          await axios.post(`${baseUrl}/stake`, { args: [] }, { headers: { 'Content-Type': APPLICATION_CBOR } });
-        } catch (error: any) {
-          expect(error.response.status).toBe(415);
-          expect(error.message).toBe(UNSUPPORTED_MEDIA_STRING);
-        }
+      it('successful request', async () => {
+        const response = await provider.stake();
+        expect(response.active).toBeGreaterThan(0);
+        expect(response.live).toBeGreaterThan(0);
       });
 
       it('should query the DB only once when the response is cached', async () => {
-        await doNetworkInfoRequest<[], StakeSummary>(path, []);
-        await doNetworkInfoRequest<[], StakeSummary>(path, []);
-
+        await provider.stake();
+        await provider.stake();
         expect(dbConnectionQuerySpy).toHaveBeenCalledTimes(stakeTotalQueriesCount);
         expect(cache.keys().length).toEqual(stakeTotalQueriesCount);
       });
 
       it('should call db-sync queries again once the cache is cleared', async () => {
-        await doNetworkInfoRequest<[], StakeSummary>(path, []);
+        await provider.stake();
         await cache.clear();
         expect(cache.keys().length).toEqual(0);
 
-        await doNetworkInfoRequest<[], StakeSummary>(path, []);
+        await provider.stake();
         expect(dbConnectionQuerySpy).toBeCalledTimes(stakeTotalQueriesCount * 2);
       });
 
@@ -209,7 +219,7 @@ describe('NetworkInfoHttpService', () => {
         const currentEpochNo = 205;
         const totalQueriesCount = stakeTotalQueriesCount + DB_POLL_QUERIES_COUNT;
 
-        await doNetworkInfoRequest<[], StakeSummary>(path, []);
+        await provider.stake();
 
         expect(cache.getVal(NetworkInfoCacheKey.CURRENT_EPOCH)).toBeUndefined();
         expect(cache.keys().length).toEqual(stakeTotalQueriesCount);
@@ -227,7 +237,7 @@ describe('NetworkInfoHttpService', () => {
         wrapWithTransaction(async (dbConnection) => {
           const greaterEpoch = 255;
 
-          await doNetworkInfoRequest<[], StakeSummary>(path, []);
+          await provider.stake();
           await sleep(epochPollInterval);
 
           expect(cache.keys().length).toEqual(stakeTotalQueriesCount + DB_POLL_QUERIES_COUNT);
@@ -254,72 +264,29 @@ describe('NetworkInfoHttpService', () => {
     });
 
     describe('/lovelace-supply', () => {
-      const path = '/lovelace-supply';
       const dbSyncQueriesCount = 2;
       const DB_POLL_QUERIES_COUNT = 1;
 
-      it('returns a 200 coded response with a well formed HTTP request', async () => {
-        expect((await axios.post(`${baseUrl}/lovelace-supply`, { args: [] })).status).toEqual(200);
+      describe('with Http Server', () => {
+        it('returns a 200 coded response with a well formed HTTP request', async () => {
+          expect((await axios.post(`${baseUrl}/lovelace-supply`, { args: [] })).status).toEqual(200);
+        });
+
+        it('returns a 415 coded response if the wrong content type header is used', async () => {
+          try {
+            await axios.post(
+              `${baseUrl}/lovelace-supply`,
+              { args: [] },
+              { headers: { 'Content-Type': APPLICATION_CBOR } }
+            );
+          } catch (error: any) {
+            expect(error.response.status).toBe(415);
+            expect(error.message).toBe(UNSUPPORTED_MEDIA_STRING);
+          }
+        });
       });
 
-      it('returns a 415 coded response if the wrong content type header is used', async () => {
-        try {
-          await axios.post(
-            `${baseUrl}/lovelace-supply`,
-            { args: [] },
-            { headers: { 'Content-Type': APPLICATION_CBOR } }
-          );
-        } catch (error: any) {
-          expect(error.response.status).toBe(415);
-          expect(error.message).toBe(UNSUPPORTED_MEDIA_STRING);
-        }
-      });
-
-      it('should query only once when the response is cached', async () => {
-        await doNetworkInfoRequest<[], SupplySummary>(path, []);
-        await doNetworkInfoRequest<[], SupplySummary>(path, []);
-        expect(dbConnectionQuerySpy).toHaveBeenCalledTimes(cacheItemsInSupplySummaryCount);
-      });
-
-      it('should call queries again once the cache is cleared', async () => {
-        await cache.clear();
-        await doNetworkInfoRequest<[], SupplySummary>(path, []);
-        expect(cache.keys().length).toEqual(cacheItemsInSupplySummaryCount);
-        expect(dbConnectionQuerySpy).toBeCalledTimes(2);
-        await cache.clear();
-        expect(cache.keys().length).toEqual(0);
-        await doNetworkInfoRequest<[], SupplySummary>(path, []);
-        expect(dbConnectionQuerySpy).toBeCalledTimes(dbSyncQueriesCount * 2);
-      });
-
-      it('should not invalidate the epoch values from the cache if there is no epoch rollover', async () => {
-        const currentEpochNo = 205;
-        const totalDbQueriesCount = dbSyncQueriesCount + DB_POLL_QUERIES_COUNT;
-        await doNetworkInfoRequest<[], SupplySummary>(path, []);
-        expect(cache.getVal(NetworkInfoCacheKey.CURRENT_EPOCH)).toBeUndefined();
-        expect(cache.keys().length).toEqual(2);
-        await sleep(epochPollInterval);
-        expect(cache.getVal(NetworkInfoCacheKey.CURRENT_EPOCH)).toEqual(currentEpochNo);
-        expect(cache.keys().length).toEqual(3);
-        expect(dbConnectionQuerySpy).toBeCalledTimes(totalDbQueriesCount);
-        expect(invalidateCacheSpy).not.toHaveBeenCalled();
-      });
-    });
-
-    describe('with NetworkInfoHttpProvider', () => {
-      let provider: NetworkInfoProvider;
-
-      beforeEach(async () => {
-        provider = networkInfoHttpProvider(clientConfig);
-      });
-
-      it('stake', async () => {
-        const response = await provider.stake();
-        expect(response.active).toBeGreaterThan(0);
-        expect(response.live).toBeGreaterThan(0);
-      });
-
-      it('lovelaceSupply', async () => {
+      it('successful request', async () => {
         const { maxLovelaceSupply } = await loadGenesisData(cardanoNodeConfigPath);
         const response = await provider.lovelaceSupply();
         expect(response.circulating).toBeGreaterThan(0n);
@@ -336,77 +303,107 @@ describe('NetworkInfoHttpService', () => {
         expect(response.total).toBeLessThan(maxLovelaceSupply);
       });
 
-      it('timeSettings', async () => {
-        const response = await provider.timeSettings();
-        expect(response[0].slotLength).toBeDefined();
+      it('should query only once when the response is cached', async () => {
+        await provider.lovelaceSupply();
+        await provider.lovelaceSupply();
+        expect(dbConnectionQuerySpy).toHaveBeenCalledTimes(cacheItemsInSupplySummaryCount);
       });
 
-      it('ledgerTip', async () => {
-        const response = await provider.ledgerTip();
-        expect(response.slot).toBeDefined();
+      it('should call queries again once the cache is cleared', async () => {
+        await cache.clear();
+        await provider.lovelaceSupply();
+        expect(cache.keys().length).toEqual(cacheItemsInSupplySummaryCount);
+        expect(dbConnectionQuerySpy).toBeCalledTimes(2);
+        await cache.clear();
+        expect(cache.keys().length).toEqual(0);
+        await provider.lovelaceSupply();
+        expect(dbConnectionQuerySpy).toBeCalledTimes(dbSyncQueriesCount * 2);
       });
 
-      it('currentWalletProtocolParameters', async () => {
-        const response = await provider.currentWalletProtocolParameters();
-        expect(response.maxTxSize).toBeDefined();
-      });
-
-      it('genesisParameters', async () => {
-        const response = await provider.genesisParameters();
-        expect(response.networkMagic).toBeDefined();
+      it('should not invalidate the epoch values from the cache if there is no epoch rollover', async () => {
+        const currentEpochNo = 205;
+        const totalDbQueriesCount = dbSyncQueriesCount + DB_POLL_QUERIES_COUNT;
+        await provider.lovelaceSupply();
+        expect(cache.getVal(NetworkInfoCacheKey.CURRENT_EPOCH)).toBeUndefined();
+        expect(cache.keys().length).toEqual(2);
+        await sleep(epochPollInterval);
+        expect(cache.getVal(NetworkInfoCacheKey.CURRENT_EPOCH)).toEqual(currentEpochNo);
+        expect(cache.keys().length).toEqual(3);
+        expect(dbConnectionQuerySpy).toBeCalledTimes(totalDbQueriesCount);
+        expect(invalidateCacheSpy).not.toHaveBeenCalled();
       });
     });
 
     describe('/ledger-tip', () => {
-      it('returns a 200 coded response with a well formed HTTP request', async () => {
-        expect((await axios.post(`${baseUrl}/ledger-tip`, { args: [] })).status).toEqual(200);
+      describe('with Http Server', () => {
+        it('returns a 200 coded response with a well formed HTTP request', async () => {
+          expect((await axios.post(`${baseUrl}/ledger-tip`, { args: [] })).status).toEqual(200);
+        });
+
+        it('returns a 415 coded response if the wrong content type header is used', async () => {
+          try {
+            await axios.post(`${baseUrl}/ledger-tip`, { args: [] }, { headers: { 'Content-Type': APPLICATION_CBOR } });
+          } catch (error: any) {
+            expect(error.response.status).toBe(415);
+            expect(error.message).toBe(UNSUPPORTED_MEDIA_STRING);
+          }
+        });
       });
 
-      it('returns a 415 coded response if the wrong content type header is used', async () => {
-        try {
-          await axios.post(`${baseUrl}/ledger-tip`, { args: [] }, { headers: { 'Content-Type': APPLICATION_CBOR } });
-        } catch (error: any) {
-          expect(error.response.status).toBe(415);
-          expect(error.message).toBe(UNSUPPORTED_MEDIA_STRING);
-        }
+      it('successful request', async () => {
+        const response = await provider.ledgerTip();
+        expect(response.slot).toBeDefined();
       });
     });
 
     describe('/current-wallet-protocol-parameters', () => {
-      it('returns a 200 coded response with a well formed HTTP request', async () => {
-        expect((await axios.post(`${baseUrl}/current-wallet-protocol-parameters`, { args: [] })).status).toEqual(200);
+      describe('with Http Server', () => {
+        it('returns a 200 coded response with a well formed HTTP request', async () => {
+          expect((await axios.post(`${baseUrl}/current-wallet-protocol-parameters`, { args: [] })).status).toEqual(200);
+        });
+
+        it('returns a 415 coded response if the wrong content type header is used', async () => {
+          try {
+            await axios.post(
+              `${baseUrl}/current-wallet-protocol-parameters`,
+              { args: [] },
+              { headers: { 'Content-Type': APPLICATION_CBOR } }
+            );
+          } catch (error: any) {
+            expect(error.response.status).toBe(415);
+            expect(error.message).toBe(UNSUPPORTED_MEDIA_STRING);
+          }
+        });
       });
 
-      it('returns a 415 coded response if the wrong content type header is used', async () => {
-        try {
-          await axios.post(
-            `${baseUrl}/current-wallet-protocol-parameters`,
-            { args: [] },
-            { headers: { 'Content-Type': APPLICATION_CBOR } }
-          );
-        } catch (error: any) {
-          expect(error.response.status).toBe(415);
-          expect(error.message).toBe(UNSUPPORTED_MEDIA_STRING);
-        }
+      it('successful request', async () => {
+        const response = await provider.currentWalletProtocolParameters();
+        expect(response.maxTxSize).toBeDefined();
       });
     });
 
     describe('/genesis-parameters', () => {
-      it('returns a 200 coded response with a well formed HTTP request', async () => {
-        expect((await axios.post(`${baseUrl}/genesis-parameters`, { args: [] })).status).toEqual(200);
-      });
+      describe('with Http Server', () => {
+        it('returns a 200 coded response with a well formed HTTP request', async () => {
+          expect((await axios.post(`${baseUrl}/genesis-parameters`, { args: [] })).status).toEqual(200);
+        });
 
-      it('returns a 415 coded response if the wrong content type header is used', async () => {
-        try {
-          await axios.post(
-            `${baseUrl}/genesis-parameters`,
-            { args: [] },
-            { headers: { 'Content-Type': APPLICATION_CBOR } }
-          );
-        } catch (error: any) {
-          expect(error.response.status).toBe(415);
-          expect(error.message).toBe(UNSUPPORTED_MEDIA_STRING);
-        }
+        it('returns a 415 coded response if the wrong content type header is used', async () => {
+          try {
+            await axios.post(
+              `${baseUrl}/genesis-parameters`,
+              { args: [] },
+              { headers: { 'Content-Type': APPLICATION_CBOR } }
+            );
+          } catch (error: any) {
+            expect(error.response.status).toBe(415);
+            expect(error.message).toBe(UNSUPPORTED_MEDIA_STRING);
+          }
+        });
+      });
+      it('successful request', async () => {
+        const response = await provider.genesisParameters();
+        expect(response.networkMagic).toBeDefined();
       });
     });
   });

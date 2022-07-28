@@ -4,65 +4,39 @@ exports[`ChainHistoryHttpService healthy state /blocks/by-hashes server and snap
 Array [
   Object {
     "confirmations": 1957883,
-    "date": Object {
-      "__type": "Date",
-      "value": 1595995096000,
-    },
+    "date": 2020-07-29T03:58:16.000Z,
     "epoch": 74,
     "epochSlot": 27480,
-    "fees": Object {
-      "__type": "bigint",
-      "value": "0",
-    },
+    "fees": 0n,
     "header": Object {
       "blockNo": 1598507,
       "hash": "7a48b034645f51743550bbaf81f8a14771e58856e031eb63844738ca8ad72298",
       "slot": 1625880,
     },
-    "nextBlock": Object {
-      "__type": "undefined",
-    },
-    "previousBlock": Object {
-      "__type": "undefined",
-    },
+    "nextBlock": undefined,
+    "previousBlock": undefined,
     "size": 989,
     "slotLeader": "de665a71064706f946030505eae950583f08c316f0f58997961092b1",
-    "totalOutput": Object {
-      "__type": "bigint",
-      "value": "0",
-    },
+    "totalOutput": 0n,
     "txCount": 1,
     "vrf": "vrf_vk1wmmxg7swhx0raa2yddkt7ktlvh55dje8a5uwge2z90t5e7v4g5esp49zzk",
   },
   Object {
     "confirmations": 1901835,
-    "date": Object {
-      "__type": "Date",
-      "value": 1597132436000,
-    },
+    "date": 2020-08-11T07:53:56.000Z,
     "epoch": 76,
     "epochSlot": 300820,
-    "fees": Object {
-      "__type": "bigint",
-      "value": "0",
-    },
+    "fees": 0n,
     "header": Object {
       "blockNo": 1654555,
       "hash": "469cc6fbcc186de6b12c392ad0cc84a20c4d4774c1f9c3cfd80745de00856f4b",
       "slot": 2763220,
     },
-    "nextBlock": Object {
-      "__type": "undefined",
-    },
-    "previousBlock": Object {
-      "__type": "undefined",
-    },
+    "nextBlock": undefined,
+    "previousBlock": undefined,
     "size": 737,
     "slotLeader": "b0dca078b823cde627da136200d6618c49ad712b77972a1c5e135763",
-    "totalOutput": Object {
-      "__type": "bigint",
-      "value": "0",
-    },
+    "totalOutput": 0n,
     "txCount": 1,
     "vrf": "vrf_vk15nyl9g8sa4jkyjqm0jf9qm6n9ageea8z4duzssvkqz5ssrjfs7ksqhx8dk",
   },
@@ -72,9 +46,7 @@ Array [
 exports[`ChainHistoryHttpService healthy state /txs/by-addresses server and snapshot testing does not include transactions before indicated block 1`] = `
 Array [
   Object {
-    "auxiliaryData": Object {
-      "__type": "undefined",
-    },
+    "auxiliaryData": undefined,
     "blockHeader": Object {
       "blockNo": 1654555,
       "hash": "469cc6fbcc186de6b12c392ad0cc84a20c4d4774c1f9c3cfd80745de00856f4b",
@@ -93,10 +65,7 @@ Array [
         },
       ],
       "collaterals": Array [],
-      "fee": Object {
-        "__type": "bigint",
-        "value": "197929",
-      },
+      "fee": 197929n,
       "inputs": Array [
         Object {
           "address": "addr_test1qr4m502gr9hnaxac5mxjln22jwavf7pcjmh9sw7fujdvgvj9ef6afquphwg7tj4mmm548m3t50hxfyygjuu222kx96eshcathg",
@@ -104,65 +73,39 @@ Array [
           "txId": "8fd14baca91c674fafae59701b7dc0eda1266202ec8445bad3244bd8669a7fb5",
         },
       ],
-      "mint": Object {
-        "__type": "undefined",
-      },
+      "mint": undefined,
       "outputs": Array [
         Object {
           "address": "addr_test1qr4m502gr9hnaxac5mxjln22jwavf7pcjmh9sw7fujdvgvj9ef6afquphwg7tj4mmm548m3t50hxfyygjuu222kx96eshcathg",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 0,
           "txId": "8fd14baca91c674fafae59701b7dc0eda1266202ec8445bad3244bd8669a7fb5",
           "value": Object {
-            "assets": Object {
-              "__type": "undefined",
-            },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "999502622402",
-            },
+            "assets": undefined,
+            "coins": 999502622402n,
           },
         },
       ],
       "validityInterval": Object {
-        "invalidBefore": Object {
-          "__type": "undefined",
-        },
+        "invalidBefore": undefined,
         "invalidHereafter": 2764200,
       },
-      "withdrawals": Object {
-        "__type": "undefined",
-      },
+      "withdrawals": undefined,
     },
     "id": "8fd14baca91c674fafae59701b7dc0eda1266202ec8445bad3244bd8669a7fb5",
     "implicitCoin": Object {
-      "deposit": Object {
-        "__type": "bigint",
-        "value": "500000000",
-      },
-      "input": Object {
-        "__type": "bigint",
-        "value": "0",
-      },
+      "deposit": 500000000n,
+      "input": 0n,
     },
     "index": 0,
     "txSize": 736,
     "witness": Object {
-      "redeemers": Object {
-        "__type": "undefined",
-      },
-      "signatures": Object {
-        "__type": "Map",
-        "value": Array [],
-      },
+      "redeemers": undefined,
+      "signatures": Map {},
     },
   },
   Object {
-    "auxiliaryData": Object {
-      "__type": "undefined",
-    },
+    "auxiliaryData": undefined,
     "blockHeader": Object {
       "blockNo": 1912426,
       "hash": "1c87c4191424d3a3825f7717f327749f08ba5c1a95ca4dffd46b15db518b6876",
@@ -176,10 +119,7 @@ Array [
         },
       ],
       "collaterals": Array [],
-      "fee": Object {
-        "__type": "bigint",
-        "value": "205145",
-      },
+      "fee": 205145n,
       "inputs": Array [
         Object {
           "address": "addr_test1qr4m502gr9hnaxac5mxjln22jwavf7pcjmh9sw7fujdvgvj9ef6afquphwg7tj4mmm548m3t50hxfyygjuu222kx96eshcathg",
@@ -202,59 +142,35 @@ Array [
           "txId": "3d4cd09885d39673125c3a15f8acb45d92fde137f9effe7a5131f6cc7241d960",
         },
       ],
-      "mint": Object {
-        "__type": "undefined",
-      },
+      "mint": undefined,
       "outputs": Array [
         Object {
           "address": "addr_test1qr4m502gr9hnaxac5mxjln22jwavf7pcjmh9sw7fujdvgvj9ef6afquphwg7tj4mmm548m3t50hxfyygjuu222kx96eshcathg",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 0,
           "txId": "3d4cd09885d39673125c3a15f8acb45d92fde137f9effe7a5131f6cc7241d960",
           "value": Object {
-            "assets": Object {
-              "__type": "undefined",
-            },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "10306556787917",
-            },
+            "assets": undefined,
+            "coins": 10306556787917n,
           },
         },
       ],
       "validityInterval": Object {
-        "invalidBefore": Object {
-          "__type": "undefined",
-        },
+        "invalidBefore": undefined,
         "invalidHereafter": 8064171,
       },
-      "withdrawals": Object {
-        "__type": "undefined",
-      },
+      "withdrawals": undefined,
     },
     "id": "3d4cd09885d39673125c3a15f8acb45d92fde137f9effe7a5131f6cc7241d960",
     "implicitCoin": Object {
-      "deposit": Object {
-        "__type": "bigint",
-        "value": "500000000",
-      },
-      "input": Object {
-        "__type": "bigint",
-        "value": "0",
-      },
+      "deposit": 500000000n,
+      "input": 0n,
     },
     "index": 0,
     "txSize": 780,
     "witness": Object {
-      "redeemers": Object {
-        "__type": "undefined",
-      },
-      "signatures": Object {
-        "__type": "Map",
-        "value": Array [],
-      },
+      "redeemers": undefined,
+      "signatures": Map {},
     },
   },
 ]
@@ -263,23 +179,16 @@ Array [
 exports[`ChainHistoryHttpService healthy state /txs/by-addresses server and snapshot testing finds transactions with address within inputs 1`] = `
 Array [
   Object {
-    "auxiliaryData": Object {
-      "__type": "undefined",
-    },
+    "auxiliaryData": undefined,
     "blockHeader": Object {
       "blockNo": 3274726,
       "hash": "5caede44f4a5a775443095159cd42c8a64f35494086957ab3e04624015a6e13c",
       "slot": 49032415,
     },
     "body": Object {
-      "certificates": Object {
-        "__type": "undefined",
-      },
+      "certificates": undefined,
       "collaterals": Array [],
-      "fee": Object {
-        "__type": "bigint",
-        "value": "183761",
-      },
+      "fee": 183761n,
       "inputs": Array [
         Object {
           "address": "addr_test1qq7rv7r27wq5nz2q6htul8k55xrcjsz2tpxkhqfk5f6kfgfnqdurhe3e8zlltj63kwh78hg7ykrexmn6jxxn42egzs4skzyvvc",
@@ -292,9 +201,7 @@ Array [
           "txId": "6eec4e9691e0fc2442e5c9bf22847998b80a1625b18a882a4e7b9e0cdda48dc3",
         },
       ],
-      "mint": Object {
-        "__type": "undefined",
-      },
+      "mint": undefined,
       "outputs": Array [
         Object {
           "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
@@ -302,84 +209,41 @@ Array [
           "index": 0,
           "txId": "6eec4e9691e0fc2442e5c9bf22847998b80a1625b18a882a4e7b9e0cdda48dc3",
           "value": Object {
-            "assets": Object {
-              "__type": "Map",
-              "value": Array [
-                Array [
-                  "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7453554e444145",
-                  Object {
-                    "__type": "bigint",
-                    "value": "1678546",
-                  },
-                ],
-              ],
+            "assets": Map {
+              "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7453554e444145" => 1678546n,
             },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "254640002",
-            },
+            "coins": 254640002n,
           },
         },
         Object {
           "address": "addr_test1qq7rv7r27wq5nz2q6htul8k55xrcjsz2tpxkhqfk5f6kfgfnqdurhe3e8zlltj63kwh78hg7ykrexmn6jxxn42egzs4skzyvvc",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 1,
           "txId": "6eec4e9691e0fc2442e5c9bf22847998b80a1625b18a882a4e7b9e0cdda48dc3",
           "value": Object {
-            "assets": Object {
-              "__type": "Map",
-              "value": Array [
-                Array [
-                  "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7453554e444145",
-                  Object {
-                    "__type": "bigint",
-                    "value": "661706",
-                  },
-                ],
-              ],
+            "assets": Map {
+              "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7453554e444145" => 661706n,
             },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "38816239",
-            },
+            "coins": 38816239n,
           },
         },
       ],
       "validityInterval": Object {
-        "invalidBefore": Object {
-          "__type": "undefined",
-        },
-        "invalidHereafter": Object {
-          "__type": "undefined",
-        },
+        "invalidBefore": undefined,
+        "invalidHereafter": undefined,
       },
-      "withdrawals": Object {
-        "__type": "undefined",
-      },
+      "withdrawals": undefined,
     },
     "id": "6eec4e9691e0fc2442e5c9bf22847998b80a1625b18a882a4e7b9e0cdda48dc3",
     "implicitCoin": Object {
-      "deposit": Object {
-        "__type": "bigint",
-        "value": "0",
-      },
-      "input": Object {
-        "__type": "bigint",
-        "value": "0",
-      },
+      "deposit": 0n,
+      "input": 0n,
     },
     "index": 11,
     "txSize": 640,
     "witness": Object {
-      "redeemers": Object {
-        "__type": "undefined",
-      },
-      "signatures": Object {
-        "__type": "Map",
-        "value": Array [],
-      },
+      "redeemers": undefined,
+      "signatures": Map {},
     },
   },
 ]
@@ -388,23 +252,16 @@ Array [
 exports[`ChainHistoryHttpService healthy state /txs/by-addresses server and snapshot testing finds transactions with address within outputs 1`] = `
 Array [
   Object {
-    "auxiliaryData": Object {
-      "__type": "undefined",
-    },
+    "auxiliaryData": undefined,
     "blockHeader": Object {
       "blockNo": 3274726,
       "hash": "5caede44f4a5a775443095159cd42c8a64f35494086957ab3e04624015a6e13c",
       "slot": 49032415,
     },
     "body": Object {
-      "certificates": Object {
-        "__type": "undefined",
-      },
+      "certificates": undefined,
       "collaterals": Array [],
-      "fee": Object {
-        "__type": "bigint",
-        "value": "181605",
-      },
+      "fee": 181605n,
       "inputs": Array [
         Object {
           "address": "addr_test1qp64f82kqyn934qtytqf2xhzqnasknqk5f5y88e3jh7s95cmtpwh9z5nwy2egezfnm7eddt4ysfp7tg87attl3ejgjns2qgy69",
@@ -417,9 +274,7 @@ Array [
           "txId": "caaada4c53256a9bcba2d006b3f427f089d43372442a550a7349627a46682375",
         },
       ],
-      "mint": Object {
-        "__type": "undefined",
-      },
+      "mint": undefined,
       "outputs": Array [
         Object {
           "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
@@ -427,95 +282,52 @@ Array [
           "index": 0,
           "txId": "caaada4c53256a9bcba2d006b3f427f089d43372442a550a7349627a46682375",
           "value": Object {
-            "assets": Object {
-              "__type": "Map",
-              "value": Array [
-                Array [
-                  "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f744d494e",
-                  Object {
-                    "__type": "bigint",
-                    "value": "359387",
-                  },
-                ],
-              ],
+            "assets": Map {
+              "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f744d494e" => 359387n,
             },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "201519044",
-            },
+            "coins": 201519044n,
           },
         },
         Object {
           "address": "addr_test1qp64f82kqyn934qtytqf2xhzqnasknqk5f5y88e3jh7s95cmtpwh9z5nwy2egezfnm7eddt4ysfp7tg87attl3ejgjns2qgy69",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 1,
           "txId": "caaada4c53256a9bcba2d006b3f427f089d43372442a550a7349627a46682375",
           "value": Object {
-            "assets": Object {
-              "__type": "undefined",
-            },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "391939485",
-            },
+            "assets": undefined,
+            "coins": 391939485n,
           },
         },
       ],
       "validityInterval": Object {
-        "invalidBefore": Object {
-          "__type": "undefined",
-        },
-        "invalidHereafter": Object {
-          "__type": "undefined",
-        },
+        "invalidBefore": undefined,
+        "invalidHereafter": undefined,
       },
-      "withdrawals": Object {
-        "__type": "undefined",
-      },
+      "withdrawals": undefined,
     },
     "id": "caaada4c53256a9bcba2d006b3f427f089d43372442a550a7349627a46682375",
     "implicitCoin": Object {
-      "deposit": Object {
-        "__type": "bigint",
-        "value": "0",
-      },
-      "input": Object {
-        "__type": "bigint",
-        "value": "0",
-      },
+      "deposit": 0n,
+      "input": 0n,
     },
     "index": 1,
     "txSize": 591,
     "witness": Object {
-      "redeemers": Object {
-        "__type": "undefined",
-      },
-      "signatures": Object {
-        "__type": "Map",
-        "value": Array [],
-      },
+      "redeemers": undefined,
+      "signatures": Map {},
     },
   },
   Object {
-    "auxiliaryData": Object {
-      "__type": "undefined",
-    },
+    "auxiliaryData": undefined,
     "blockHeader": Object {
       "blockNo": 3274726,
       "hash": "5caede44f4a5a775443095159cd42c8a64f35494086957ab3e04624015a6e13c",
       "slot": 49032415,
     },
     "body": Object {
-      "certificates": Object {
-        "__type": "undefined",
-      },
+      "certificates": undefined,
       "collaterals": Array [],
-      "fee": Object {
-        "__type": "bigint",
-        "value": "179977",
-      },
+      "fee": 179977n,
       "inputs": Array [
         Object {
           "address": "addr_test1qr6sape30ttq8zahxmah2wzaqk3ldc0n0cehj8e408ejhwrq5hrg8xmfyakef5awud6g6uew447r6970evl9lzgrak0qgz3ejq",
@@ -523,9 +335,7 @@ Array [
           "txId": "49fa6b7245674fd11727cfb4d47ec7fad380c198a2a975b0423c5f6c255488f9",
         },
       ],
-      "mint": Object {
-        "__type": "undefined",
-      },
+      "mint": undefined,
       "outputs": Array [
         Object {
           "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
@@ -533,86 +343,50 @@ Array [
           "index": 0,
           "txId": "49fa6b7245674fd11727cfb4d47ec7fad380c198a2a975b0423c5f6c255488f9",
           "value": Object {
-            "assets": Object {
-              "__type": "undefined",
-            },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "23000000",
-            },
+            "assets": undefined,
+            "coins": 23000000n,
           },
         },
         Object {
           "address": "addr_test1qr6sape30ttq8zahxmah2wzaqk3ldc0n0cehj8e408ejhwrq5hrg8xmfyakef5awud6g6uew447r6970evl9lzgrak0qgz3ejq",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 1,
           "txId": "49fa6b7245674fd11727cfb4d47ec7fad380c198a2a975b0423c5f6c255488f9",
           "value": Object {
-            "assets": Object {
-              "__type": "undefined",
-            },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "893280136",
-            },
+            "assets": undefined,
+            "coins": 893280136n,
           },
         },
       ],
       "validityInterval": Object {
-        "invalidBefore": Object {
-          "__type": "undefined",
-        },
-        "invalidHereafter": Object {
-          "__type": "undefined",
-        },
+        "invalidBefore": undefined,
+        "invalidHereafter": undefined,
       },
-      "withdrawals": Object {
-        "__type": "undefined",
-      },
+      "withdrawals": undefined,
     },
     "id": "49fa6b7245674fd11727cfb4d47ec7fad380c198a2a975b0423c5f6c255488f9",
     "implicitCoin": Object {
-      "deposit": Object {
-        "__type": "bigint",
-        "value": "0",
-      },
-      "input": Object {
-        "__type": "bigint",
-        "value": "0",
-      },
+      "deposit": 0n,
+      "input": 0n,
     },
     "index": 3,
     "txSize": 554,
     "witness": Object {
-      "redeemers": Object {
-        "__type": "undefined",
-      },
-      "signatures": Object {
-        "__type": "Map",
-        "value": Array [],
-      },
+      "redeemers": undefined,
+      "signatures": Map {},
     },
   },
   Object {
-    "auxiliaryData": Object {
-      "__type": "undefined",
-    },
+    "auxiliaryData": undefined,
     "blockHeader": Object {
       "blockNo": 3274726,
       "hash": "5caede44f4a5a775443095159cd42c8a64f35494086957ab3e04624015a6e13c",
       "slot": 49032415,
     },
     "body": Object {
-      "certificates": Object {
-        "__type": "undefined",
-      },
+      "certificates": undefined,
       "collaterals": Array [],
-      "fee": Object {
-        "__type": "bigint",
-        "value": "179977",
-      },
+      "fee": 179977n,
       "inputs": Array [
         Object {
           "address": "addr_test1qq75mx8z9sh8aucku2lwjp7c6fe2m3w90aqt9kw4rczjt8lj0rhad28c9f9cmcm64jyqpvths06w4tgwc0vnpx3veqvsj2953n",
@@ -620,9 +394,7 @@ Array [
           "txId": "a7eda535edc983139cc1053d074106aef54b25e9c9ee9de6bf1bf69709dabfd4",
         },
       ],
-      "mint": Object {
-        "__type": "undefined",
-      },
+      "mint": undefined,
       "outputs": Array [
         Object {
           "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
@@ -630,86 +402,50 @@ Array [
           "index": 0,
           "txId": "a7eda535edc983139cc1053d074106aef54b25e9c9ee9de6bf1bf69709dabfd4",
           "value": Object {
-            "assets": Object {
-              "__type": "undefined",
-            },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "154000000",
-            },
+            "assets": undefined,
+            "coins": 154000000n,
           },
         },
         Object {
           "address": "addr_test1qq75mx8z9sh8aucku2lwjp7c6fe2m3w90aqt9kw4rczjt8lj0rhad28c9f9cmcm64jyqpvths06w4tgwc0vnpx3veqvsj2953n",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 1,
           "txId": "a7eda535edc983139cc1053d074106aef54b25e9c9ee9de6bf1bf69709dabfd4",
           "value": Object {
-            "assets": Object {
-              "__type": "undefined",
-            },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "612159447",
-            },
+            "assets": undefined,
+            "coins": 612159447n,
           },
         },
       ],
       "validityInterval": Object {
-        "invalidBefore": Object {
-          "__type": "undefined",
-        },
-        "invalidHereafter": Object {
-          "__type": "undefined",
-        },
+        "invalidBefore": undefined,
+        "invalidHereafter": undefined,
       },
-      "withdrawals": Object {
-        "__type": "undefined",
-      },
+      "withdrawals": undefined,
     },
     "id": "a7eda535edc983139cc1053d074106aef54b25e9c9ee9de6bf1bf69709dabfd4",
     "implicitCoin": Object {
-      "deposit": Object {
-        "__type": "bigint",
-        "value": "0",
-      },
-      "input": Object {
-        "__type": "bigint",
-        "value": "0",
-      },
+      "deposit": 0n,
+      "input": 0n,
     },
     "index": 5,
     "txSize": 554,
     "witness": Object {
-      "redeemers": Object {
-        "__type": "undefined",
-      },
-      "signatures": Object {
-        "__type": "Map",
-        "value": Array [],
-      },
+      "redeemers": undefined,
+      "signatures": Map {},
     },
   },
   Object {
-    "auxiliaryData": Object {
-      "__type": "undefined",
-    },
+    "auxiliaryData": undefined,
     "blockHeader": Object {
       "blockNo": 3274726,
       "hash": "5caede44f4a5a775443095159cd42c8a64f35494086957ab3e04624015a6e13c",
       "slot": 49032415,
     },
     "body": Object {
-      "certificates": Object {
-        "__type": "undefined",
-      },
+      "certificates": undefined,
       "collaterals": Array [],
-      "fee": Object {
-        "__type": "bigint",
-        "value": "186401",
-      },
+      "fee": 186401n,
       "inputs": Array [
         Object {
           "address": "addr_test1qry75qe2e5zez3ny5nuu2dsxrrwhxpl7mr7gdwpsgyfsvtgcgddl7qwm2vl7vedf3xp0vy7ya9ag7dqkcqqktv5403nspw962t",
@@ -722,9 +458,7 @@ Array [
           "txId": "b46c48229336aec327a5f537bcbf1ca8fa6a3afbf60aa66880aa6a234e5fce92",
         },
       ],
-      "mint": Object {
-        "__type": "undefined",
-      },
+      "mint": undefined,
       "outputs": Array [
         Object {
           "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
@@ -732,111 +466,55 @@ Array [
           "index": 0,
           "txId": "b46c48229336aec327a5f537bcbf1ca8fa6a3afbf60aa66880aa6a234e5fce92",
           "value": Object {
-            "assets": Object {
-              "__type": "Map",
-              "value": Array [
-                Array [
-                  "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f744d494e",
-                  Object {
-                    "__type": "bigint",
-                    "value": "30000",
-                  },
-                ],
-              ],
+            "assets": Map {
+              "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f744d494e" => 30000n,
             },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "20487995",
-            },
+            "coins": 20487995n,
           },
         },
         Object {
           "address": "addr_test1qry75qe2e5zez3ny5nuu2dsxrrwhxpl7mr7gdwpsgyfsvtgcgddl7qwm2vl7vedf3xp0vy7ya9ag7dqkcqqktv5403nspw962t",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 1,
           "txId": "b46c48229336aec327a5f537bcbf1ca8fa6a3afbf60aa66880aa6a234e5fce92",
           "value": Object {
-            "assets": Object {
-              "__type": "Map",
-              "value": Array [
-                Array [
-                  "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f744d494e",
-                  Object {
-                    "__type": "bigint",
-                    "value": "60704",
-                  },
-                ],
-                Array [
-                  "22c3b86a5b88a78b5de52f4aed2831d1483b3b7681f1ee2569538130cb6de817be83e93a5771e6c98ee305e1012bae70d9eb9dff70e2d71e4b611779",
-                  Object {
-                    "__type": "bigint",
-                    "value": "194994",
-                  },
-                ],
-              ],
+            "assets": Map {
+              "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f744d494e" => 60704n,
+              "22c3b86a5b88a78b5de52f4aed2831d1483b3b7681f1ee2569538130cb6de817be83e93a5771e6c98ee305e1012bae70d9eb9dff70e2d71e4b611779" => 194994n,
             },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "591423467",
-            },
+            "coins": 591423467n,
           },
         },
       ],
       "validityInterval": Object {
-        "invalidBefore": Object {
-          "__type": "undefined",
-        },
-        "invalidHereafter": Object {
-          "__type": "undefined",
-        },
+        "invalidBefore": undefined,
+        "invalidHereafter": undefined,
       },
-      "withdrawals": Object {
-        "__type": "undefined",
-      },
+      "withdrawals": undefined,
     },
     "id": "b46c48229336aec327a5f537bcbf1ca8fa6a3afbf60aa66880aa6a234e5fce92",
     "implicitCoin": Object {
-      "deposit": Object {
-        "__type": "bigint",
-        "value": "0",
-      },
-      "input": Object {
-        "__type": "bigint",
-        "value": "0",
-      },
+      "deposit": 0n,
+      "input": 0n,
     },
     "index": 7,
     "txSize": 700,
     "witness": Object {
-      "redeemers": Object {
-        "__type": "undefined",
-      },
-      "signatures": Object {
-        "__type": "Map",
-        "value": Array [],
-      },
+      "redeemers": undefined,
+      "signatures": Map {},
     },
   },
   Object {
-    "auxiliaryData": Object {
-      "__type": "undefined",
-    },
+    "auxiliaryData": undefined,
     "blockHeader": Object {
       "blockNo": 3274726,
       "hash": "5caede44f4a5a775443095159cd42c8a64f35494086957ab3e04624015a6e13c",
       "slot": 49032415,
     },
     "body": Object {
-      "certificates": Object {
-        "__type": "undefined",
-      },
+      "certificates": undefined,
       "collaterals": Array [],
-      "fee": Object {
-        "__type": "bigint",
-        "value": "181649",
-      },
+      "fee": 181649n,
       "inputs": Array [
         Object {
           "address": "addr_test1qp2fxvmxlly62thlzmlrtf5tya2kay8lyucz40ns7xesrz2j8m73lvtj885qvfldxhadg5rsh5h79eczh6gu0deu96hqrrcz3e",
@@ -849,9 +527,7 @@ Array [
           "txId": "56caf0441c4f0e209195b86b95e5304b338ca38ec232252c194153e8a3440c28",
         },
       ],
-      "mint": Object {
-        "__type": "undefined",
-      },
+      "mint": undefined,
       "outputs": Array [
         Object {
           "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
@@ -859,95 +535,52 @@ Array [
           "index": 0,
           "txId": "56caf0441c4f0e209195b86b95e5304b338ca38ec232252c194153e8a3440c28",
           "value": Object {
-            "assets": Object {
-              "__type": "Map",
-              "value": Array [
-                Array [
-                  "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7441444158",
-                  Object {
-                    "__type": "bigint",
-                    "value": "2086814",
-                  },
-                ],
-              ],
+            "assets": Map {
+              "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7441444158" => 2086814n,
             },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "56670077",
-            },
+            "coins": 56670077n,
           },
         },
         Object {
           "address": "addr_test1qp2fxvmxlly62thlzmlrtf5tya2kay8lyucz40ns7xesrz2j8m73lvtj885qvfldxhadg5rsh5h79eczh6gu0deu96hqrrcz3e",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 1,
           "txId": "56caf0441c4f0e209195b86b95e5304b338ca38ec232252c194153e8a3440c28",
           "value": Object {
-            "assets": Object {
-              "__type": "undefined",
-            },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "736788144",
-            },
+            "assets": undefined,
+            "coins": 736788144n,
           },
         },
       ],
       "validityInterval": Object {
-        "invalidBefore": Object {
-          "__type": "undefined",
-        },
-        "invalidHereafter": Object {
-          "__type": "undefined",
-        },
+        "invalidBefore": undefined,
+        "invalidHereafter": undefined,
       },
-      "withdrawals": Object {
-        "__type": "undefined",
-      },
+      "withdrawals": undefined,
     },
     "id": "56caf0441c4f0e209195b86b95e5304b338ca38ec232252c194153e8a3440c28",
     "implicitCoin": Object {
-      "deposit": Object {
-        "__type": "bigint",
-        "value": "0",
-      },
-      "input": Object {
-        "__type": "bigint",
-        "value": "0",
-      },
+      "deposit": 0n,
+      "input": 0n,
     },
     "index": 8,
     "txSize": 592,
     "witness": Object {
-      "redeemers": Object {
-        "__type": "undefined",
-      },
-      "signatures": Object {
-        "__type": "Map",
-        "value": Array [],
-      },
+      "redeemers": undefined,
+      "signatures": Map {},
     },
   },
   Object {
-    "auxiliaryData": Object {
-      "__type": "undefined",
-    },
+    "auxiliaryData": undefined,
     "blockHeader": Object {
       "blockNo": 3274726,
       "hash": "5caede44f4a5a775443095159cd42c8a64f35494086957ab3e04624015a6e13c",
       "slot": 49032415,
     },
     "body": Object {
-      "certificates": Object {
-        "__type": "undefined",
-      },
+      "certificates": undefined,
       "collaterals": Array [],
-      "fee": Object {
-        "__type": "bigint",
-        "value": "179933",
-      },
+      "fee": 179933n,
       "inputs": Array [
         Object {
           "address": "addr_test1qquh3j3u2v54pe2t6ntt0lyqnvm38v6prryuk8yhk556yjjkgqwx367r8umqax3slc758afpqsy9fzv45rsvgff8me4qa5md5z",
@@ -955,9 +588,7 @@ Array [
           "txId": "3d8e3e7c6d0929812abc40d29a3b1e4f470f6d04e9d4b3c521f1f87f74f7ab88",
         },
       ],
-      "mint": Object {
-        "__type": "undefined",
-      },
+      "mint": undefined,
       "outputs": Array [
         Object {
           "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
@@ -965,86 +596,50 @@ Array [
           "index": 0,
           "txId": "3d8e3e7c6d0929812abc40d29a3b1e4f470f6d04e9d4b3c521f1f87f74f7ab88",
           "value": Object {
-            "assets": Object {
-              "__type": "undefined",
-            },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "204000000",
-            },
+            "assets": undefined,
+            "coins": 204000000n,
           },
         },
         Object {
           "address": "addr_test1qquh3j3u2v54pe2t6ntt0lyqnvm38v6prryuk8yhk556yjjkgqwx367r8umqax3slc758afpqsy9fzv45rsvgff8me4qa5md5z",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 1,
           "txId": "3d8e3e7c6d0929812abc40d29a3b1e4f470f6d04e9d4b3c521f1f87f74f7ab88",
           "value": Object {
-            "assets": Object {
-              "__type": "undefined",
-            },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "510111262",
-            },
+            "assets": undefined,
+            "coins": 510111262n,
           },
         },
       ],
       "validityInterval": Object {
-        "invalidBefore": Object {
-          "__type": "undefined",
-        },
-        "invalidHereafter": Object {
-          "__type": "undefined",
-        },
+        "invalidBefore": undefined,
+        "invalidHereafter": undefined,
       },
-      "withdrawals": Object {
-        "__type": "undefined",
-      },
+      "withdrawals": undefined,
     },
     "id": "3d8e3e7c6d0929812abc40d29a3b1e4f470f6d04e9d4b3c521f1f87f74f7ab88",
     "implicitCoin": Object {
-      "deposit": Object {
-        "__type": "bigint",
-        "value": "0",
-      },
-      "input": Object {
-        "__type": "bigint",
-        "value": "0",
-      },
+      "deposit": 0n,
+      "input": 0n,
     },
     "index": 10,
     "txSize": 553,
     "witness": Object {
-      "redeemers": Object {
-        "__type": "undefined",
-      },
-      "signatures": Object {
-        "__type": "Map",
-        "value": Array [],
-      },
+      "redeemers": undefined,
+      "signatures": Map {},
     },
   },
   Object {
-    "auxiliaryData": Object {
-      "__type": "undefined",
-    },
+    "auxiliaryData": undefined,
     "blockHeader": Object {
       "blockNo": 3274726,
       "hash": "5caede44f4a5a775443095159cd42c8a64f35494086957ab3e04624015a6e13c",
       "slot": 49032415,
     },
     "body": Object {
-      "certificates": Object {
-        "__type": "undefined",
-      },
+      "certificates": undefined,
       "collaterals": Array [],
-      "fee": Object {
-        "__type": "bigint",
-        "value": "183761",
-      },
+      "fee": 183761n,
       "inputs": Array [
         Object {
           "address": "addr_test1qq7rv7r27wq5nz2q6htul8k55xrcjsz2tpxkhqfk5f6kfgfnqdurhe3e8zlltj63kwh78hg7ykrexmn6jxxn42egzs4skzyvvc",
@@ -1057,9 +652,7 @@ Array [
           "txId": "6eec4e9691e0fc2442e5c9bf22847998b80a1625b18a882a4e7b9e0cdda48dc3",
         },
       ],
-      "mint": Object {
-        "__type": "undefined",
-      },
+      "mint": undefined,
       "outputs": Array [
         Object {
           "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
@@ -1067,104 +660,54 @@ Array [
           "index": 0,
           "txId": "6eec4e9691e0fc2442e5c9bf22847998b80a1625b18a882a4e7b9e0cdda48dc3",
           "value": Object {
-            "assets": Object {
-              "__type": "Map",
-              "value": Array [
-                Array [
-                  "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7453554e444145",
-                  Object {
-                    "__type": "bigint",
-                    "value": "1678546",
-                  },
-                ],
-              ],
+            "assets": Map {
+              "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7453554e444145" => 1678546n,
             },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "254640002",
-            },
+            "coins": 254640002n,
           },
         },
         Object {
           "address": "addr_test1qq7rv7r27wq5nz2q6htul8k55xrcjsz2tpxkhqfk5f6kfgfnqdurhe3e8zlltj63kwh78hg7ykrexmn6jxxn42egzs4skzyvvc",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 1,
           "txId": "6eec4e9691e0fc2442e5c9bf22847998b80a1625b18a882a4e7b9e0cdda48dc3",
           "value": Object {
-            "assets": Object {
-              "__type": "Map",
-              "value": Array [
-                Array [
-                  "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7453554e444145",
-                  Object {
-                    "__type": "bigint",
-                    "value": "661706",
-                  },
-                ],
-              ],
+            "assets": Map {
+              "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7453554e444145" => 661706n,
             },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "38816239",
-            },
+            "coins": 38816239n,
           },
         },
       ],
       "validityInterval": Object {
-        "invalidBefore": Object {
-          "__type": "undefined",
-        },
-        "invalidHereafter": Object {
-          "__type": "undefined",
-        },
+        "invalidBefore": undefined,
+        "invalidHereafter": undefined,
       },
-      "withdrawals": Object {
-        "__type": "undefined",
-      },
+      "withdrawals": undefined,
     },
     "id": "6eec4e9691e0fc2442e5c9bf22847998b80a1625b18a882a4e7b9e0cdda48dc3",
     "implicitCoin": Object {
-      "deposit": Object {
-        "__type": "bigint",
-        "value": "0",
-      },
-      "input": Object {
-        "__type": "bigint",
-        "value": "0",
-      },
+      "deposit": 0n,
+      "input": 0n,
     },
     "index": 11,
     "txSize": 640,
     "witness": Object {
-      "redeemers": Object {
-        "__type": "undefined",
-      },
-      "signatures": Object {
-        "__type": "Map",
-        "value": Array [],
-      },
+      "redeemers": undefined,
+      "signatures": Map {},
     },
   },
   Object {
-    "auxiliaryData": Object {
-      "__type": "undefined",
-    },
+    "auxiliaryData": undefined,
     "blockHeader": Object {
       "blockNo": 3274726,
       "hash": "5caede44f4a5a775443095159cd42c8a64f35494086957ab3e04624015a6e13c",
       "slot": 49032415,
     },
     "body": Object {
-      "certificates": Object {
-        "__type": "undefined",
-      },
+      "certificates": undefined,
       "collaterals": Array [],
-      "fee": Object {
-        "__type": "bigint",
-        "value": "181605",
-      },
+      "fee": 181605n,
       "inputs": Array [
         Object {
           "address": "addr_test1qqt9fumrwz43e79rfjznn8nlnc05kdfyv7qrxx9ks2vacq8lxxtya039kqwxltw2q73wrdsvhgqrycllm0tg38c9nnkqxysjz6",
@@ -1177,9 +720,7 @@ Array [
           "txId": "0dbbc0e6d13549a1960476aae42fd492a7a19fba856f9cc9695ecc5c84fe87e9",
         },
       ],
-      "mint": Object {
-        "__type": "undefined",
-      },
+      "mint": undefined,
       "outputs": Array [
         Object {
           "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
@@ -1187,90 +728,50 @@ Array [
           "index": 0,
           "txId": "0dbbc0e6d13549a1960476aae42fd492a7a19fba856f9cc9695ecc5c84fe87e9",
           "value": Object {
-            "assets": Object {
-              "__type": "Map",
-              "value": Array [
-                Array [
-                  "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f744d494e",
-                  Object {
-                    "__type": "bigint",
-                    "value": "726163",
-                  },
-                ],
-              ],
+            "assets": Map {
+              "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f744d494e" => 726163n,
             },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "403099082",
-            },
+            "coins": 403099082n,
           },
         },
         Object {
           "address": "addr_test1qqt9fumrwz43e79rfjznn8nlnc05kdfyv7qrxx9ks2vacq8lxxtya039kqwxltw2q73wrdsvhgqrycllm0tg38c9nnkqxysjz6",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 1,
           "txId": "0dbbc0e6d13549a1960476aae42fd492a7a19fba856f9cc9695ecc5c84fe87e9",
           "value": Object {
-            "assets": Object {
-              "__type": "undefined",
-            },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "194539380",
-            },
+            "assets": undefined,
+            "coins": 194539380n,
           },
         },
       ],
       "validityInterval": Object {
-        "invalidBefore": Object {
-          "__type": "undefined",
-        },
-        "invalidHereafter": Object {
-          "__type": "undefined",
-        },
+        "invalidBefore": undefined,
+        "invalidHereafter": undefined,
       },
-      "withdrawals": Object {
-        "__type": "undefined",
-      },
+      "withdrawals": undefined,
     },
     "id": "0dbbc0e6d13549a1960476aae42fd492a7a19fba856f9cc9695ecc5c84fe87e9",
     "implicitCoin": Object {
-      "deposit": Object {
-        "__type": "bigint",
-        "value": "0",
-      },
-      "input": Object {
-        "__type": "bigint",
-        "value": "0",
-      },
+      "deposit": 0n,
+      "input": 0n,
     },
     "index": 13,
     "txSize": 591,
     "witness": Object {
-      "redeemers": Object {
-        "__type": "undefined",
-      },
-      "signatures": Object {
-        "__type": "Map",
-        "value": Array [],
-      },
+      "redeemers": undefined,
+      "signatures": Map {},
     },
   },
   Object {
-    "auxiliaryData": Object {
-      "__type": "undefined",
-    },
+    "auxiliaryData": undefined,
     "blockHeader": Object {
       "blockNo": 3274726,
       "hash": "5caede44f4a5a775443095159cd42c8a64f35494086957ab3e04624015a6e13c",
       "slot": 49032415,
     },
     "body": Object {
-      "certificates": Object {
-        "__type": "undefined",
-      },
+      "certificates": undefined,
       "collaterals": Array [
         Object {
           "address": "addr_test1qqemvcq8wdt9cv0sxsghv497zjsjzyzkekpw4vlvea44kdgy720vc4ggn5u4y39cc2wctg2u6sgackadnl78lxqq3m9q47wq8e",
@@ -1278,10 +779,7 @@ Array [
           "txId": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
         },
       ],
-      "fee": Object {
-        "__type": "bigint",
-        "value": "1030338",
-      },
+      "fee": 1030338n,
       "inputs": Array [
         Object {
           "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
@@ -1314,145 +812,67 @@ Array [
           "txId": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
         },
       ],
-      "mint": Object {
-        "__type": "Map",
-        "value": Array [
-          Array [
-            "22c3b86a5b88a78b5de52f4aed2831d1483b3b7681f1ee2569538130f32324c10a93fe1962cf7470543932cc064482c3495fe3de7502f9edd84ca114",
-            Object {
-              "__type": "bigint",
-              "value": "15355454",
-            },
-          ],
-        ],
+      "mint": Map {
+        "22c3b86a5b88a78b5de52f4aed2831d1483b3b7681f1ee2569538130f32324c10a93fe1962cf7470543932cc064482c3495fe3de7502f9edd84ca114" => 15355454n,
       },
       "outputs": Array [
         Object {
           "address": "addr_test1qqemvcq8wdt9cv0sxsghv497zjsjzyzkekpw4vlvea44kdgy720vc4ggn5u4y39cc2wctg2u6sgackadnl78lxqq3m9q47wq8e",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 0,
           "txId": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
           "value": Object {
-            "assets": Object {
-              "__type": "undefined",
-            },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "28178818258",
-            },
+            "assets": undefined,
+            "coins": 28178818258n,
           },
         },
         Object {
           "address": "addr_test1qqemvcq8wdt9cv0sxsghv497zjsjzyzkekpw4vlvea44kdgy720vc4ggn5u4y39cc2wctg2u6sgackadnl78lxqq3m9q47wq8e",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 1,
           "txId": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
           "value": Object {
-            "assets": Object {
-              "__type": "Map",
-              "value": Array [
-                Array [
-                  "ccc526143b6d41d56036248dbaa79440d68653f5b6a1919aa2c9e06131363732343139363030303033",
-                  Object {
-                    "__type": "bigint",
-                    "value": "1",
-                  },
-                ],
-              ],
+            "assets": Map {
+              "ccc526143b6d41d56036248dbaa79440d68653f5b6a1919aa2c9e06131363732343139363030303033" => 1n,
             },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "10000000",
-            },
+            "coins": 10000000n,
           },
         },
         Object {
           "address": "addr_test1qq9gwfwevn5s96jx9xzclntlrd8m0mrs3ezzva7akkvyj9y7yjf2z5h4fealu2rktu38m3mfv68vsjrtrfwuym60dfyq0axz58",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 2,
           "txId": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
           "value": Object {
-            "assets": Object {
-              "__type": "Map",
-              "value": Array [
-                Array [
-                  "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7453554e444145",
-                  Object {
-                    "__type": "bigint",
-                    "value": "1909",
-                  },
-                ],
-                Array [
-                  "22c3b86a5b88a78b5de52f4aed2831d1483b3b7681f1ee2569538130f32324c10a93fe1962cf7470543932cc064482c3495fe3de7502f9edd84ca114",
-                  Object {
-                    "__type": "bigint",
-                    "value": "15355454",
-                  },
-                ],
-              ],
+            "assets": Map {
+              "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7453554e444145" => 1909n,
+              "22c3b86a5b88a78b5de52f4aed2831d1483b3b7681f1ee2569538130f32324c10a93fe1962cf7470543932cc064482c3495fe3de7502f9edd84ca114" => 15355454n,
             },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "2000000",
-            },
+            "coins": 2000000n,
           },
         },
         Object {
           "address": "addr_test1qqfleha26t47j6khuetrsjyxkwl4x2lya5jsmn24h53n6d6akgetsg2jxgxsqglg8k9m74c8uwl8gxen3hvxsupapqasdzvh6n",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 3,
           "txId": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
           "value": Object {
-            "assets": Object {
-              "__type": "Map",
-              "value": Array [
-                Array [
-                  "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7453554e444145",
-                  Object {
-                    "__type": "bigint",
-                    "value": "333305",
-                  },
-                ],
-              ],
+            "assets": Map {
+              "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7453554e444145" => 333305n,
             },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "2000000",
-            },
+            "coins": 2000000n,
           },
         },
         Object {
           "address": "addr_test1qqvl0h49qke8yv8r5as3vrt3zaqdygjmfsfj63futhj803s2wkugrs72zdued30dtsce7mwclnd6n49a64q6f4mmcfksqaspe4",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 4,
           "txId": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
           "value": Object {
-            "assets": Object {
-              "__type": "Map",
-              "value": Array [
-                Array [
-                  "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7453554e444145",
-                  Object {
-                    "__type": "bigint",
-                    "value": "932541",
-                  },
-                ],
-              ],
+            "assets": Map {
+              "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7453554e444145" => 932541n,
             },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "2000000",
-            },
+            "coins": 2000000n,
           },
         },
         Object {
@@ -1461,59 +881,25 @@ Array [
           "index": 5,
           "txId": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
           "value": Object {
-            "assets": Object {
-              "__type": "Map",
-              "value": Array [
-                Array [
-                  "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7453554e444145",
-                  Object {
-                    "__type": "bigint",
-                    "value": "1651585768",
-                  },
-                ],
-                Array [
-                  "75ac961881fd5d8d0008d54b4f6914eb6a712faa3403dc32097379b0f32324c10a93fe1962cf7470543932cc064482c3495fe3de7502f9edd84ca114",
-                  Object {
-                    "__type": "bigint",
-                    "value": "1",
-                  },
-                ],
-                Array [
-                  "95b7f0bbaa0b327e6b822840b0f7f7ee1c949e618f0aaeb6c5321cc34d494e53574150",
-                  Object {
-                    "__type": "bigint",
-                    "value": "1",
-                  },
-                ],
-              ],
+            "assets": Map {
+              "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7453554e444145" => 1651585768n,
+              "75ac961881fd5d8d0008d54b4f6914eb6a712faa3403dc32097379b0f32324c10a93fe1962cf7470543932cc064482c3495fe3de7502f9edd84ca114" => 1n,
+              "95b7f0bbaa0b327e6b822840b0f7f7ee1c949e618f0aaeb6c5321cc34d494e53574150" => 1n,
             },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "247344475554",
-            },
+            "coins": 247344475554n,
           },
         },
       ],
       "validityInterval": Object {
-        "invalidBefore": Object {
-          "__type": "undefined",
-        },
+        "invalidBefore": undefined,
         "invalidHereafter": 49033345,
       },
-      "withdrawals": Object {
-        "__type": "undefined",
-      },
+      "withdrawals": undefined,
     },
     "id": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
     "implicitCoin": Object {
-      "deposit": Object {
-        "__type": "bigint",
-        "value": "0",
-      },
-      "input": Object {
-        "__type": "bigint",
-        "value": "0",
-      },
+      "deposit": 0n,
+      "input": 0n,
     },
     "index": 14,
     "txSize": 10662,
@@ -1565,25 +951,18 @@ Array [
           "scriptHash": "22c3b86a5b88a78b5de52f4aed2831d1483b3b7681f1ee2569538130",
         },
       ],
-      "signatures": Object {
-        "__type": "Map",
-        "value": Array [],
-      },
+      "signatures": Map {},
     },
   },
   Object {
-    "auxiliaryData": Object {
-      "__type": "undefined",
-    },
+    "auxiliaryData": undefined,
     "blockHeader": Object {
       "blockNo": 3274726,
       "hash": "5caede44f4a5a775443095159cd42c8a64f35494086957ab3e04624015a6e13c",
       "slot": 49032415,
     },
     "body": Object {
-      "certificates": Object {
-        "__type": "undefined",
-      },
+      "certificates": undefined,
       "collaterals": Array [
         Object {
           "address": "addr_test1qqemvcq8wdt9cv0sxsghv497zjsjzyzkekpw4vlvea44kdgy720vc4ggn5u4y39cc2wctg2u6sgackadnl78lxqq3m9q47wq8e",
@@ -1591,10 +970,7 @@ Array [
           "txId": "a08e293256180196de69ff025321be2f7ce5911ce4e3a96406b7c62de0e19bb2",
         },
       ],
-      "fee": Object {
-        "__type": "bigint",
-        "value": "1130814",
-      },
+      "fee": 1130814n,
       "inputs": Array [
         Object {
           "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
@@ -1632,171 +1008,79 @@ Array [
           "txId": "a08e293256180196de69ff025321be2f7ce5911ce4e3a96406b7c62de0e19bb2",
         },
       ],
-      "mint": Object {
-        "__type": "Map",
-        "value": Array [
-          Array [
-            "22c3b86a5b88a78b5de52f4aed2831d1483b3b7681f1ee2569538130cb6de817be83e93a5771e6c98ee305e1012bae70d9eb9dff70e2d71e4b611779",
-            Object {
-              "__type": "bigint",
-              "value": "13542175",
-            },
-          ],
-        ],
+      "mint": Map {
+        "22c3b86a5b88a78b5de52f4aed2831d1483b3b7681f1ee2569538130cb6de817be83e93a5771e6c98ee305e1012bae70d9eb9dff70e2d71e4b611779" => 13542175n,
       },
       "outputs": Array [
         Object {
           "address": "addr_test1qqemvcq8wdt9cv0sxsghv497zjsjzyzkekpw4vlvea44kdgy720vc4ggn5u4y39cc2wctg2u6sgackadnl78lxqq3m9q47wq8e",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 0,
           "txId": "a08e293256180196de69ff025321be2f7ce5911ce4e3a96406b7c62de0e19bb2",
           "value": Object {
-            "assets": Object {
-              "__type": "undefined",
-            },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "28185687444",
-            },
+            "assets": undefined,
+            "coins": 28185687444n,
           },
         },
         Object {
           "address": "addr_test1qqemvcq8wdt9cv0sxsghv497zjsjzyzkekpw4vlvea44kdgy720vc4ggn5u4y39cc2wctg2u6sgackadnl78lxqq3m9q47wq8e",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 1,
           "txId": "a08e293256180196de69ff025321be2f7ce5911ce4e3a96406b7c62de0e19bb2",
           "value": Object {
-            "assets": Object {
-              "__type": "Map",
-              "value": Array [
-                Array [
-                  "ccc526143b6d41d56036248dbaa79440d68653f5b6a1919aa2c9e06131363732343139363030303033",
-                  Object {
-                    "__type": "bigint",
-                    "value": "1",
-                  },
-                ],
-              ],
+            "assets": Map {
+              "ccc526143b6d41d56036248dbaa79440d68653f5b6a1919aa2c9e06131363732343139363030303033" => 1n,
             },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "10000000",
-            },
+            "coins": 10000000n,
           },
         },
         Object {
           "address": "addr_test1qp620qa3rqzd5fxj3hy4dughv7xx2dt9gu9de70jf8hagdcvmqt35f2psxv7ajj5jnh4ajlc752rert8f9msffxdl45qyjefw8",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 2,
           "txId": "a08e293256180196de69ff025321be2f7ce5911ce4e3a96406b7c62de0e19bb2",
           "value": Object {
-            "assets": Object {
-              "__type": "Map",
-              "value": Array [
-                Array [
-                  "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f744d494e",
-                  Object {
-                    "__type": "bigint",
-                    "value": "70",
-                  },
-                ],
-                Array [
-                  "22c3b86a5b88a78b5de52f4aed2831d1483b3b7681f1ee2569538130cb6de817be83e93a5771e6c98ee305e1012bae70d9eb9dff70e2d71e4b611779",
-                  Object {
-                    "__type": "bigint",
-                    "value": "780407",
-                  },
-                ],
-              ],
+            "assets": Map {
+              "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f744d494e" => 70n,
+              "22c3b86a5b88a78b5de52f4aed2831d1483b3b7681f1ee2569538130cb6de817be83e93a5771e6c98ee305e1012bae70d9eb9dff70e2d71e4b611779" => 780407n,
             },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "2000000",
-            },
+            "coins": 2000000n,
           },
         },
         Object {
           "address": "addr_test1qryz24mkq35j8s67fdrm44pe8na7n3tqkmyzy3sgnjq3d7szlx56h6fkjl8y3p73zpyce04eku9w943rcr6rgznp8cwq2axy9q",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 3,
           "txId": "a08e293256180196de69ff025321be2f7ce5911ce4e3a96406b7c62de0e19bb2",
           "value": Object {
-            "assets": Object {
-              "__type": "Map",
-              "value": Array [
-                Array [
-                  "22c3b86a5b88a78b5de52f4aed2831d1483b3b7681f1ee2569538130cb6de817be83e93a5771e6c98ee305e1012bae70d9eb9dff70e2d71e4b611779",
-                  Object {
-                    "__type": "bigint",
-                    "value": "11598880",
-                  },
-                ],
-              ],
+            "assets": Map {
+              "22c3b86a5b88a78b5de52f4aed2831d1483b3b7681f1ee2569538130cb6de817be83e93a5771e6c98ee305e1012bae70d9eb9dff70e2d71e4b611779" => 11598880n,
             },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "4854535",
-            },
+            "coins": 4854535n,
           },
         },
         Object {
           "address": "addr_test1qq75mx8z9sh8aucku2lwjp7c6fe2m3w90aqt9kw4rczjt8lj0rhad28c9f9cmcm64jyqpvths06w4tgwc0vnpx3veqvsj2953n",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 4,
           "txId": "a08e293256180196de69ff025321be2f7ce5911ce4e3a96406b7c62de0e19bb2",
           "value": Object {
-            "assets": Object {
-              "__type": "Map",
-              "value": Array [
-                Array [
-                  "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f744d494e",
-                  Object {
-                    "__type": "bigint",
-                    "value": "90699",
-                  },
-                ],
-              ],
+            "assets": Map {
+              "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f744d494e" => 90699n,
             },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "2000000",
-            },
+            "coins": 2000000n,
           },
         },
         Object {
           "address": "addr_test1qpps0d880t3w6q8hu99nudrgrtzmexk9g9czflg4s06rnrwq6k380kzqphzpaj6pfcqaxjqj8ghcxc9cr9qlsp9xa56qu3c9ma",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 5,
           "txId": "a08e293256180196de69ff025321be2f7ce5911ce4e3a96406b7c62de0e19bb2",
           "value": Object {
-            "assets": Object {
-              "__type": "Map",
-              "value": Array [
-                Array [
-                  "22c3b86a5b88a78b5de52f4aed2831d1483b3b7681f1ee2569538130cb6de817be83e93a5771e6c98ee305e1012bae70d9eb9dff70e2d71e4b611779",
-                  Object {
-                    "__type": "bigint",
-                    "value": "1162888",
-                  },
-                ],
-              ],
+            "assets": Map {
+              "22c3b86a5b88a78b5de52f4aed2831d1483b3b7681f1ee2569538130cb6de817be83e93a5771e6c98ee305e1012bae70d9eb9dff70e2d71e4b611779" => 1162888n,
             },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "2286437",
-            },
+            "coins": 2286437n,
           },
         },
         Object {
@@ -1805,59 +1089,25 @@ Array [
           "index": 6,
           "txId": "a08e293256180196de69ff025321be2f7ce5911ce4e3a96406b7c62de0e19bb2",
           "value": Object {
-            "assets": Object {
-              "__type": "Map",
-              "value": Array [
-                Array [
-                  "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f744d494e",
-                  Object {
-                    "__type": "bigint",
-                    "value": "3280594639",
-                  },
-                ],
-                Array [
-                  "75ac961881fd5d8d0008d54b4f6914eb6a712faa3403dc32097379b0cb6de817be83e93a5771e6c98ee305e1012bae70d9eb9dff70e2d71e4b611779",
-                  Object {
-                    "__type": "bigint",
-                    "value": "1",
-                  },
-                ],
-                Array [
-                  "95b7f0bbaa0b327e6b822840b0f7f7ee1c949e618f0aaeb6c5321cc34d494e53574150",
-                  Object {
-                    "__type": "bigint",
-                    "value": "1",
-                  },
-                ],
-              ],
+            "assets": Map {
+              "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f744d494e" => 3280594639n,
+              "75ac961881fd5d8d0008d54b4f6914eb6a712faa3403dc32097379b0cb6de817be83e93a5771e6c98ee305e1012bae70d9eb9dff70e2d71e4b611779" => 1n,
+              "95b7f0bbaa0b327e6b822840b0f7f7ee1c949e618f0aaeb6c5321cc34d494e53574150" => 1n,
             },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "1803114201564",
-            },
+            "coins": 1803114201564n,
           },
         },
       ],
       "validityInterval": Object {
-        "invalidBefore": Object {
-          "__type": "undefined",
-        },
+        "invalidBefore": undefined,
         "invalidHereafter": 49033345,
       },
-      "withdrawals": Object {
-        "__type": "undefined",
-      },
+      "withdrawals": undefined,
     },
     "id": "a08e293256180196de69ff025321be2f7ce5911ce4e3a96406b7c62de0e19bb2",
     "implicitCoin": Object {
-      "deposit": Object {
-        "__type": "bigint",
-        "value": "0",
-      },
-      "input": Object {
-        "__type": "bigint",
-        "value": "0",
-      },
+      "deposit": 0n,
+      "input": 0n,
     },
     "index": 15,
     "txSize": 11003,
@@ -1918,25 +1168,18 @@ Array [
           "scriptHash": "22c3b86a5b88a78b5de52f4aed2831d1483b3b7681f1ee2569538130",
         },
       ],
-      "signatures": Object {
-        "__type": "Map",
-        "value": Array [],
-      },
+      "signatures": Map {},
     },
   },
   Object {
-    "auxiliaryData": Object {
-      "__type": "undefined",
-    },
+    "auxiliaryData": undefined,
     "blockHeader": Object {
       "blockNo": 3274726,
       "hash": "5caede44f4a5a775443095159cd42c8a64f35494086957ab3e04624015a6e13c",
       "slot": 49032415,
     },
     "body": Object {
-      "certificates": Object {
-        "__type": "undefined",
-      },
+      "certificates": undefined,
       "collaterals": Array [
         Object {
           "address": "addr_test1qqemvcq8wdt9cv0sxsghv497zjsjzyzkekpw4vlvea44kdgy720vc4ggn5u4y39cc2wctg2u6sgackadnl78lxqq3m9q47wq8e",
@@ -1944,10 +1187,7 @@ Array [
           "txId": "34186a836e81a0852e583a870863535ded787ef63f7d3bc80380d306f8a9fb40",
         },
       ],
-      "fee": Object {
-        "__type": "bigint",
-        "value": "979374",
-      },
+      "fee": 979374n,
       "inputs": Array [
         Object {
           "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
@@ -1980,129 +1220,64 @@ Array [
           "txId": "34186a836e81a0852e583a870863535ded787ef63f7d3bc80380d306f8a9fb40",
         },
       ],
-      "mint": Object {
-        "__type": "undefined",
-      },
+      "mint": undefined,
       "outputs": Array [
         Object {
           "address": "addr_test1qqemvcq8wdt9cv0sxsghv497zjsjzyzkekpw4vlvea44kdgy720vc4ggn5u4y39cc2wctg2u6sgackadnl78lxqq3m9q47wq8e",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 0,
           "txId": "34186a836e81a0852e583a870863535ded787ef63f7d3bc80380d306f8a9fb40",
           "value": Object {
-            "assets": Object {
-              "__type": "undefined",
-            },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "28190708070",
-            },
+            "assets": undefined,
+            "coins": 28190708070n,
           },
         },
         Object {
           "address": "addr_test1qqemvcq8wdt9cv0sxsghv497zjsjzyzkekpw4vlvea44kdgy720vc4ggn5u4y39cc2wctg2u6sgackadnl78lxqq3m9q47wq8e",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 1,
           "txId": "34186a836e81a0852e583a870863535ded787ef63f7d3bc80380d306f8a9fb40",
           "value": Object {
-            "assets": Object {
-              "__type": "Map",
-              "value": Array [
-                Array [
-                  "ccc526143b6d41d56036248dbaa79440d68653f5b6a1919aa2c9e06131363732343139363030303033",
-                  Object {
-                    "__type": "bigint",
-                    "value": "1",
-                  },
-                ],
-              ],
+            "assets": Map {
+              "ccc526143b6d41d56036248dbaa79440d68653f5b6a1919aa2c9e06131363732343139363030303033" => 1n,
             },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "10000000",
-            },
+            "coins": 10000000n,
           },
         },
         Object {
           "address": "addr_test1qq670vd7x8m3qr0kfzjtrxnzprgkcqu4uhfpznpvs8x9556ewgmuhmsn8nvd5a8ugl4t3wqj4xk63jjyfpqrxmuwklzs42j7cp",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 2,
           "txId": "34186a836e81a0852e583a870863535ded787ef63f7d3bc80380d306f8a9fb40",
           "value": Object {
-            "assets": Object {
-              "__type": "Map",
-              "value": Array [
-                Array [
-                  "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f744c51",
-                  Object {
-                    "__type": "bigint",
-                    "value": "64697",
-                  },
-                ],
-              ],
+            "assets": Map {
+              "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f744c51" => 64697n,
             },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "2000000",
-            },
+            "coins": 2000000n,
           },
         },
         Object {
           "address": "addr_test1qpps0d880t3w6q8hu99nudrgrtzmexk9g9czflg4s06rnrwq6k380kzqphzpaj6pfcqaxjqj8ghcxc9cr9qlsp9xa56qu3c9ma",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 3,
           "txId": "34186a836e81a0852e583a870863535ded787ef63f7d3bc80380d306f8a9fb40",
           "value": Object {
-            "assets": Object {
-              "__type": "Map",
-              "value": Array [
-                Array [
-                  "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f744c51",
-                  Object {
-                    "__type": "bigint",
-                    "value": "225522",
-                  },
-                ],
-              ],
+            "assets": Map {
+              "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f744c51" => 225522n,
             },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "2000000",
-            },
+            "coins": 2000000n,
           },
         },
         Object {
           "address": "addr_test1qp5jds8hszuh3l84p6vangr702r4da04wmcpqlpcp5u4dqqslc0zqn9k3f5teyhxvwr62gh0waxr5pjm38hn0ct7lsnsezf9n6",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 4,
           "txId": "34186a836e81a0852e583a870863535ded787ef63f7d3bc80380d306f8a9fb40",
           "value": Object {
-            "assets": Object {
-              "__type": "Map",
-              "value": Array [
-                Array [
-                  "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f744c51",
-                  Object {
-                    "__type": "bigint",
-                    "value": "55771",
-                  },
-                ],
-              ],
+            "assets": Map {
+              "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f744c51" => 55771n,
             },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "2000000",
-            },
+            "coins": 2000000n,
           },
         },
         Object {
@@ -2111,59 +1286,25 @@ Array [
           "index": 5,
           "txId": "34186a836e81a0852e583a870863535ded787ef63f7d3bc80380d306f8a9fb40",
           "value": Object {
-            "assets": Object {
-              "__type": "Map",
-              "value": Array [
-                Array [
-                  "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f744c51",
-                  Object {
-                    "__type": "bigint",
-                    "value": "3177821999",
-                  },
-                ],
-                Array [
-                  "75ac961881fd5d8d0008d54b4f6914eb6a712faa3403dc32097379b0b2ab12019a6d74df56c8056f6a5fe6f4b6cd5135d99ffe46b9a6b4864018ff6f",
-                  Object {
-                    "__type": "bigint",
-                    "value": "1",
-                  },
-                ],
-                Array [
-                  "95b7f0bbaa0b327e6b822840b0f7f7ee1c949e618f0aaeb6c5321cc34d494e53574150",
-                  Object {
-                    "__type": "bigint",
-                    "value": "1",
-                  },
-                ],
-              ],
+            "assets": Map {
+              "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f744c51" => 3177821999n,
+              "75ac961881fd5d8d0008d54b4f6914eb6a712faa3403dc32097379b0b2ab12019a6d74df56c8056f6a5fe6f4b6cd5135d99ffe46b9a6b4864018ff6f" => 1n,
+              "95b7f0bbaa0b327e6b822840b0f7f7ee1c949e618f0aaeb6c5321cc34d494e53574150" => 1n,
             },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "140501471364",
-            },
+            "coins": 140501471364n,
           },
         },
       ],
       "validityInterval": Object {
-        "invalidBefore": Object {
-          "__type": "undefined",
-        },
+        "invalidBefore": undefined,
         "invalidHereafter": 49033345,
       },
-      "withdrawals": Object {
-        "__type": "undefined",
-      },
+      "withdrawals": undefined,
     },
     "id": "34186a836e81a0852e583a870863535ded787ef63f7d3bc80380d306f8a9fb40",
     "implicitCoin": Object {
-      "deposit": Object {
-        "__type": "bigint",
-        "value": "0",
-      },
-      "input": Object {
-        "__type": "bigint",
-        "value": "0",
-      },
+      "deposit": 0n,
+      "input": 0n,
     },
     "index": 16,
     "txSize": 10025,
@@ -2206,10 +1347,7 @@ Array [
           "scriptHash": "6e4664e3f6acc48e849eacf4e3607ee6ae2758d6d8b80fa9d8fdd761",
         },
       ],
-      "signatures": Object {
-        "__type": "Map",
-        "value": Array [],
-      },
+      "signatures": Map {},
     },
   },
 ]
@@ -2220,183 +1358,63 @@ Array [
   Object {
     "auxiliaryData": Object {
       "body": Object {
-        "blob": Object {
-          "__type": "Map",
-          "value": Array [
-            Array [
-              Object {
-                "__type": "bigint",
-                "value": "1968",
-              },
-              Object {
-                "__type": "Map",
-                "value": Array [
-                  Array [
-                    "LQADA",
-                    Array [
-                      Object {
-                        "__type": "Map",
-                        "value": Array [
-                          Array [
-                            "value",
-                            "0.00006725",
-                          ],
-                          Array [
-                            "source",
-                            "muesliswap",
-                          ],
-                        ],
-                      },
-                    ],
-                  ],
-                  Array [
-                    "ADABTC",
-                    Array [
-                      Object {
-                        "__type": "Map",
-                        "value": Array [
-                          Array [
-                            "value",
-                            "0.00002789",
-                          ],
-                          Array [
-                            "source",
-                            "coinGecko",
-                          ],
-                        ],
-                      },
-                    ],
-                  ],
-                  Array [
-                    "ADAEUR",
-                    Array [
-                      Object {
-                        "__type": "Map",
-                        "value": Array [
-                          Array [
-                            "value",
-                            "0.934303",
-                          ],
-                          Array [
-                            "source",
-                            "coinGecko",
-                          ],
-                        ],
-                      },
-                    ],
-                  ],
-                  Array [
-                    "ADAJPY",
-                    Array [
-                      Object {
-                        "__type": "Map",
-                        "value": Array [
-                          Array [
-                            "value",
-                            "119.97",
-                          ],
-                          Array [
-                            "source",
-                            "coinGecko",
-                          ],
-                        ],
-                      },
-                    ],
-                  ],
-                  Array [
-                    "ADAUSD",
-                    Array [
-                      Object {
-                        "__type": "Map",
-                        "value": Array [
-                          Array [
-                            "value",
-                            "1.04",
-                          ],
-                          Array [
-                            "source",
-                            "coinGecko",
-                          ],
-                        ],
-                      },
-                    ],
-                  ],
-                  Array [
-                    "WMTADA",
-                    Array [
-                      Object {
-                        "__type": "Map",
-                        "value": Array [
-                          Array [
-                            "value",
-                            "7.95e-7",
-                          ],
-                          Array [
-                            "source",
-                            "muesliswap",
-                          ],
-                        ],
-                      },
-                    ],
-                  ],
-                  Array [
-                    "BTCDIFF",
-                    Array [
-                      Object {
-                        "__type": "Map",
-                        "value": Array [
-                          Array [
-                            "value",
-                            "26643185256535.46",
-                          ],
-                          Array [
-                            "source",
-                            "trezor",
-                          ],
-                        ],
-                      },
-                    ],
-                  ],
-                  Array [
-                    "HoskyADA",
-                    Array [
-                      Object {
-                        "__type": "Map",
-                        "value": Array [
-                          Array [
-                            "value",
-                            "5.9e-8",
-                          ],
-                          Array [
-                            "source",
-                            "muesliswap",
-                          ],
-                        ],
-                      },
-                    ],
-                  ],
-                  Array [
-                    "SpacecoinsADA",
-                    Array [
-                      Object {
-                        "__type": "Map",
-                        "value": Array [
-                          Array [
-                            "value",
-                            "0.00955",
-                          ],
-                          Array [
-                            "source",
-                            "muesliswap",
-                          ],
-                        ],
-                      },
-                    ],
-                  ],
-                ],
+        "blob": Map {
+          1968n => Map {
+            "LQADA" => Array [
+              Map {
+                "value" => "0.00006725",
+                "source" => "muesliswap",
               },
             ],
-          ],
+            "ADABTC" => Array [
+              Map {
+                "value" => "0.00002789",
+                "source" => "coinGecko",
+              },
+            ],
+            "ADAEUR" => Array [
+              Map {
+                "value" => "0.934303",
+                "source" => "coinGecko",
+              },
+            ],
+            "ADAJPY" => Array [
+              Map {
+                "value" => "119.97",
+                "source" => "coinGecko",
+              },
+            ],
+            "ADAUSD" => Array [
+              Map {
+                "value" => "1.04",
+                "source" => "coinGecko",
+              },
+            ],
+            "WMTADA" => Array [
+              Map {
+                "value" => "7.95e-7",
+                "source" => "muesliswap",
+              },
+            ],
+            "BTCDIFF" => Array [
+              Map {
+                "value" => "26643185256535.46",
+                "source" => "trezor",
+              },
+            ],
+            "HoskyADA" => Array [
+              Map {
+                "value" => "5.9e-8",
+                "source" => "muesliswap",
+              },
+            ],
+            "SpacecoinsADA" => Array [
+              Map {
+                "value" => "0.00955",
+                "source" => "muesliswap",
+              },
+            ],
+          },
         },
       },
     },
@@ -2406,14 +1424,9 @@ Array [
       "slot": 49032415,
     },
     "body": Object {
-      "certificates": Object {
-        "__type": "undefined",
-      },
+      "certificates": undefined,
       "collaterals": Array [],
-      "fee": Object {
-        "__type": "bigint",
-        "value": "183673",
-      },
+      "fee": 183673n,
       "inputs": Array [
         Object {
           "address": "addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp",
@@ -2421,61 +1434,35 @@ Array [
           "txId": "3d2278e9cef71c79720a11bc3e08acbbd5f2175f7015d358c867fc9b419ae0b2",
         },
       ],
-      "mint": Object {
-        "__type": "undefined",
-      },
+      "mint": undefined,
       "outputs": Array [
         Object {
           "address": "addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 0,
           "txId": "3d2278e9cef71c79720a11bc3e08acbbd5f2175f7015d358c867fc9b419ae0b2",
           "value": Object {
-            "assets": Object {
-              "__type": "undefined",
-            },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "1477211770",
-            },
+            "assets": undefined,
+            "coins": 1477211770n,
           },
         },
       ],
       "validityInterval": Object {
-        "invalidBefore": Object {
-          "__type": "undefined",
-        },
-        "invalidHereafter": Object {
-          "__type": "undefined",
-        },
+        "invalidBefore": undefined,
+        "invalidHereafter": undefined,
       },
-      "withdrawals": Object {
-        "__type": "undefined",
-      },
+      "withdrawals": undefined,
     },
     "id": "3d2278e9cef71c79720a11bc3e08acbbd5f2175f7015d358c867fc9b419ae0b2",
     "implicitCoin": Object {
-      "deposit": Object {
-        "__type": "bigint",
-        "value": "0",
-      },
-      "input": Object {
-        "__type": "bigint",
-        "value": "0",
-      },
+      "deposit": 0n,
+      "input": 0n,
     },
     "index": 9,
     "txSize": 639,
     "witness": Object {
-      "redeemers": Object {
-        "__type": "undefined",
-      },
-      "signatures": Object {
-        "__type": "Map",
-        "value": Array [],
-      },
+      "redeemers": undefined,
+      "signatures": Map {},
     },
   },
 ]
@@ -2484,9 +1471,7 @@ Array [
 exports[`ChainHistoryHttpService healthy state /txs/by-hashes server and snapshot testing has certificates 1`] = `
 Array [
   Object {
-    "auxiliaryData": Object {
-      "__type": "undefined",
-    },
+    "auxiliaryData": undefined,
     "blockHeader": Object {
       "blockNo": 2972717,
       "hash": "05fbc6f8a26c8e16d731dd86880be59b123d17b7ebc7271b8d9dedb4152888c2",
@@ -2501,10 +1486,7 @@ Array [
         },
       ],
       "collaterals": Array [],
-      "fee": Object {
-        "__type": "bigint",
-        "value": "179493",
-      },
+      "fee": 179493n,
       "inputs": Array [
         Object {
           "address": "addr_test1qpcnmvyjmxmsm75f747u566gw7ewz4mesdw7yl278uf9r3f5l7d7dpx2ymfwlm3e56flupga8yamjr2kwdt7dw77ktyqqtx2r7",
@@ -2512,65 +1494,39 @@ Array [
           "txId": "face165bd7aa8d0d661cf1ceaa4e35d7611be3b1c7997da378c547aa2464a4fd",
         },
       ],
-      "mint": Object {
-        "__type": "undefined",
-      },
+      "mint": undefined,
       "outputs": Array [
         Object {
           "address": "addr_test1qpcnmvyjmxmsm75f747u566gw7ewz4mesdw7yl278uf9r3f5l7d7dpx2ymfwlm3e56flupga8yamjr2kwdt7dw77ktyqqtx2r7",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 0,
           "txId": "face165bd7aa8d0d661cf1ceaa4e35d7611be3b1c7997da378c547aa2464a4fd",
           "value": Object {
-            "assets": Object {
-              "__type": "undefined",
-            },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "1497444361",
-            },
+            "assets": undefined,
+            "coins": 1497444361n,
           },
         },
       ],
       "validityInterval": Object {
-        "invalidBefore": Object {
-          "__type": "undefined",
-        },
+        "invalidBefore": undefined,
         "invalidHereafter": 39233846,
       },
-      "withdrawals": Object {
-        "__type": "undefined",
-      },
+      "withdrawals": undefined,
     },
     "id": "face165bd7aa8d0d661cf1ceaa4e35d7611be3b1c7997da378c547aa2464a4fd",
     "implicitCoin": Object {
-      "deposit": Object {
-        "__type": "bigint",
-        "value": "0",
-      },
-      "input": Object {
-        "__type": "bigint",
-        "value": "500000000",
-      },
+      "deposit": 0n,
+      "input": 500000000n,
     },
     "index": 1,
     "txSize": 361,
     "witness": Object {
-      "redeemers": Object {
-        "__type": "undefined",
-      },
-      "signatures": Object {
-        "__type": "Map",
-        "value": Array [],
-      },
+      "redeemers": undefined,
+      "signatures": Map {},
     },
   },
   Object {
-    "auxiliaryData": Object {
-      "__type": "undefined",
-    },
+    "auxiliaryData": undefined,
     "blockHeader": Object {
       "blockNo": 3087425,
       "hash": "2d64f08b80b2f2afffa0887bf6421c3bacf863c70017ef78289340bc45bae1c5",
@@ -2589,10 +1545,7 @@ Array [
         },
       ],
       "collaterals": Array [],
-      "fee": Object {
-        "__type": "bigint",
-        "value": "197973",
-      },
+      "fee": 197973n,
       "inputs": Array [
         Object {
           "address": "addr_test1qpcnmvyjmxmsm75f747u566gw7ewz4mesdw7yl278uf9r3f5l7d7dpx2ymfwlm3e56flupga8yamjr2kwdt7dw77ktyqqtx2r7",
@@ -2600,59 +1553,35 @@ Array [
           "txId": "19251f57476d7af2777252270413c01383d9503110a68b4fde1a239c119c4f5d",
         },
       ],
-      "mint": Object {
-        "__type": "undefined",
-      },
+      "mint": undefined,
       "outputs": Array [
         Object {
           "address": "addr_test1qpcnmvyjmxmsm75f747u566gw7ewz4mesdw7yl278uf9r3f5l7d7dpx2ymfwlm3e56flupga8yamjr2kwdt7dw77ktyqqtx2r7",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 0,
           "txId": "19251f57476d7af2777252270413c01383d9503110a68b4fde1a239c119c4f5d",
           "value": Object {
-            "assets": Object {
-              "__type": "undefined",
-            },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "1497246388",
-            },
+            "assets": undefined,
+            "coins": 1497246388n,
           },
         },
       ],
       "validityInterval": Object {
-        "invalidBefore": Object {
-          "__type": "undefined",
-        },
+        "invalidBefore": undefined,
         "invalidHereafter": 43018365,
       },
-      "withdrawals": Object {
-        "__type": "undefined",
-      },
+      "withdrawals": undefined,
     },
     "id": "19251f57476d7af2777252270413c01383d9503110a68b4fde1a239c119c4f5d",
     "implicitCoin": Object {
-      "deposit": Object {
-        "__type": "bigint",
-        "value": "500000000",
-      },
-      "input": Object {
-        "__type": "bigint",
-        "value": "0",
-      },
+      "deposit": 500000000n,
+      "input": 0n,
     },
     "index": 2,
     "txSize": 737,
     "witness": Object {
-      "redeemers": Object {
-        "__type": "undefined",
-      },
-      "signatures": Object {
-        "__type": "Map",
-        "value": Array [],
-      },
+      "redeemers": undefined,
+      "signatures": Map {},
     },
   },
 ]
@@ -2661,18 +1590,14 @@ Array [
 exports[`ChainHistoryHttpService healthy state /txs/by-hashes server and snapshot testing has collateral inputs 1`] = `
 Array [
   Object {
-    "auxiliaryData": Object {
-      "__type": "undefined",
-    },
+    "auxiliaryData": undefined,
     "blockHeader": Object {
       "blockNo": 3274726,
       "hash": "5caede44f4a5a775443095159cd42c8a64f35494086957ab3e04624015a6e13c",
       "slot": 49032415,
     },
     "body": Object {
-      "certificates": Object {
-        "__type": "undefined",
-      },
+      "certificates": undefined,
       "collaterals": Array [
         Object {
           "address": "addr_test1vpmwgcd7xuqr60ej3qnlfeyy5qhaudhmnmxey6str7v4rrcd3t2q4",
@@ -2680,10 +1605,7 @@ Array [
           "txId": "5acd6efb1b66299f1c5a2c4221af4bcaa4ba9929e8e6aa0e3f48707fa1796fc3",
         },
       ],
-      "fee": Object {
-        "__type": "bigint",
-        "value": "774103",
-      },
+      "fee": 774103n,
       "inputs": Array [
         Object {
           "address": "addr_test1vpmwgcd7xuqr60ej3qnlfeyy5qhaudhmnmxey6str7v4rrcd3t2q4",
@@ -2701,153 +1623,83 @@ Array [
           "txId": "5acd6efb1b66299f1c5a2c4221af4bcaa4ba9929e8e6aa0e3f48707fa1796fc3",
         },
       ],
-      "mint": Object {
-        "__type": "undefined",
-      },
+      "mint": undefined,
       "outputs": Array [
         Object {
           "address": "addr_test1vpmwgcd7xuqr60ej3qnlfeyy5qhaudhmnmxey6str7v4rrcd3t2q4",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 0,
           "txId": "5acd6efb1b66299f1c5a2c4221af4bcaa4ba9929e8e6aa0e3f48707fa1796fc3",
           "value": Object {
-            "assets": Object {
-              "__type": "undefined",
-            },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "448931056",
-            },
+            "assets": undefined,
+            "coins": 448931056n,
           },
         },
         Object {
           "address": "addr_test1vq6pv6z64ldwflq5zxllfyjzxwdsgajhwg00guhrjmwq2gs0s97am",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 1,
           "txId": "5acd6efb1b66299f1c5a2c4221af4bcaa4ba9929e8e6aa0e3f48707fa1796fc3",
           "value": Object {
-            "assets": Object {
-              "__type": "undefined",
-            },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "8000000",
-            },
+            "assets": undefined,
+            "coins": 8000000n,
           },
         },
         Object {
           "address": "addr_test1vpmwgcd7xuqr60ej3qnlfeyy5qhaudhmnmxey6str7v4rrcd3t2q4",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 2,
           "txId": "5acd6efb1b66299f1c5a2c4221af4bcaa4ba9929e8e6aa0e3f48707fa1796fc3",
           "value": Object {
-            "assets": Object {
-              "__type": "Map",
-              "value": Array [
-                Array [
-                  "d6cfdbedd242056674c0e51ead01785497e3a48afbbb146dc72ee1e2123456",
-                  Object {
-                    "__type": "bigint",
-                    "value": "1",
-                  },
-                ],
-              ],
+            "assets": Map {
+              "d6cfdbedd242056674c0e51ead01785497e3a48afbbb146dc72ee1e2123456" => 1n,
             },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "1724100",
-            },
+            "coins": 1724100n,
           },
         },
         Object {
           "address": "addr_test1vzal5wcx2cnfvux84kf8clcj65ej2qklhtahecr5caytrdqr0jl5z",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 3,
           "txId": "5acd6efb1b66299f1c5a2c4221af4bcaa4ba9929e8e6aa0e3f48707fa1796fc3",
           "value": Object {
-            "assets": Object {
-              "__type": "undefined",
-            },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "1000000",
-            },
+            "assets": undefined,
+            "coins": 1000000n,
           },
         },
         Object {
           "address": "addr_test1vqfn7fxr9wlraeymtcfvn6nlkyndp4ry0uryyk3vk73wlzsk8y0yd",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 4,
           "txId": "5acd6efb1b66299f1c5a2c4221af4bcaa4ba9929e8e6aa0e3f48707fa1796fc3",
           "value": Object {
-            "assets": Object {
-              "__type": "undefined",
-            },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "1000000",
-            },
+            "assets": undefined,
+            "coins": 1000000n,
           },
         },
         Object {
           "address": "addr_test1vpmwgcd7xuqr60ej3qnlfeyy5qhaudhmnmxey6str7v4rrcd3t2q4",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 5,
           "txId": "5acd6efb1b66299f1c5a2c4221af4bcaa4ba9929e8e6aa0e3f48707fa1796fc3",
           "value": Object {
-            "assets": Object {
-              "__type": "Map",
-              "value": Array [
-                Array [
-                  "d6cfdbedd242056674c0e51ead01785497e3a48afbbb146dc72ee1e2123456",
-                  Object {
-                    "__type": "bigint",
-                    "value": "3",
-                  },
-                ],
-              ],
+            "assets": Map {
+              "d6cfdbedd242056674c0e51ead01785497e3a48afbbb146dc72ee1e2123456" => 3n,
             },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "3000000",
-            },
+            "coins": 3000000n,
           },
         },
       ],
       "validityInterval": Object {
-        "invalidBefore": Object {
-          "__type": "undefined",
-        },
-        "invalidHereafter": Object {
-          "__type": "undefined",
-        },
+        "invalidBefore": undefined,
+        "invalidHereafter": undefined,
       },
-      "withdrawals": Object {
-        "__type": "undefined",
-      },
+      "withdrawals": undefined,
     },
     "id": "5acd6efb1b66299f1c5a2c4221af4bcaa4ba9929e8e6aa0e3f48707fa1796fc3",
     "implicitCoin": Object {
-      "deposit": Object {
-        "__type": "bigint",
-        "value": "0",
-      },
-      "input": Object {
-        "__type": "bigint",
-        "value": "0",
-      },
+      "deposit": 0n,
+      "input": 0n,
     },
     "index": 12,
     "txSize": 4763,
@@ -2863,10 +1715,7 @@ Array [
           "scriptHash": "9f244c64c6ca8e495f4d0ac48f106a1dbdf20b0821d598ebbcd1c57d",
         },
       ],
-      "signatures": Object {
-        "__type": "Map",
-        "value": Array [],
-      },
+      "signatures": Map {},
     },
   },
 ]
@@ -2875,23 +1724,16 @@ Array [
 exports[`ChainHistoryHttpService healthy state /txs/by-hashes server and snapshot testing has mint operations 1`] = `
 Array [
   Object {
-    "auxiliaryData": Object {
-      "__type": "undefined",
-    },
+    "auxiliaryData": undefined,
     "blockHeader": Object {
       "blockNo": 3157934,
       "hash": "f03084089ec7e74a79e69a5929b2d3c0836d6f12279bd103d0875847c740ae27",
       "slot": 45286016,
     },
     "body": Object {
-      "certificates": Object {
-        "__type": "undefined",
-      },
+      "certificates": undefined,
       "collaterals": Array [],
-      "fee": Object {
-        "__type": "bigint",
-        "value": "177777",
-      },
+      "fee": 177777n,
       "inputs": Array [
         Object {
           "address": "addr_test1qr74u5d3d07x53pq37acghulu7wvjt794s53xp2fz343drhx2aghqc4747n2yhu0dht5xz0t5j6n0fju3rs8mfj83tzqly49jr",
@@ -2899,152 +1741,57 @@ Array [
           "txId": "952dfa431223fd671c5e9e048e016f70fcebd9e41fcb726969415ff692736eeb",
         },
       ],
-      "mint": Object {
-        "__type": "Map",
-        "value": Array [
-          Array [
-            "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf391652243484f43",
-            Object {
-              "__type": "bigint",
-              "value": "10000000",
-            },
-          ],
-          Array [
-            "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf39165224d494e54",
-            Object {
-              "__type": "bigint",
-              "value": "5000000000",
-            },
-          ],
-          Array [
-            "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf3916522524245525259",
-            Object {
-              "__type": "bigint",
-              "value": "1000000000",
-            },
-          ],
-          Array [
-            "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf3916522534245525259",
-            Object {
-              "__type": "bigint",
-              "value": "2000000000",
-            },
-          ],
-          Array [
-            "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf391652256414e494c",
-            Object {
-              "__type": "bigint",
-              "value": "15000000",
-            },
-          ],
-        ],
+      "mint": Map {
+        "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf391652243484f43" => 10000000n,
+        "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf39165224d494e54" => 5000000000n,
+        "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf3916522524245525259" => 1000000000n,
+        "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf3916522534245525259" => 2000000000n,
+        "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf391652256414e494c" => 15000000n,
       },
       "outputs": Array [
         Object {
           "address": "addr_test1qr74u5d3d07x53pq37acghulu7wvjt794s53xp2fz343drhx2aghqc4747n2yhu0dht5xz0t5j6n0fju3rs8mfj83tzqly49jr",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 0,
           "txId": "952dfa431223fd671c5e9e048e016f70fcebd9e41fcb726969415ff692736eeb",
           "value": Object {
-            "assets": Object {
-              "__type": "undefined",
-            },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "5528822746696",
-            },
+            "assets": undefined,
+            "coins": 5528822746696n,
           },
         },
         Object {
           "address": "addr_test1qzmpmxyl7prdf0pazt0futtrg6k9drcay3ednatxqm5ky854nqdumcu3xny9qu5sk9m0wm0ypyty84kxj0gwd9seppfqzs9z2n",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 1,
           "txId": "952dfa431223fd671c5e9e048e016f70fcebd9e41fcb726969415ff692736eeb",
           "value": Object {
-            "assets": Object {
-              "__type": "Map",
-              "value": Array [
-                Array [
-                  "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf391652243484f43",
-                  Object {
-                    "__type": "bigint",
-                    "value": "10000000",
-                  },
-                ],
-                Array [
-                  "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf39165224d494e54",
-                  Object {
-                    "__type": "bigint",
-                    "value": "5000000000",
-                  },
-                ],
-                Array [
-                  "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf3916522524245525259",
-                  Object {
-                    "__type": "bigint",
-                    "value": "1000000000",
-                  },
-                ],
-                Array [
-                  "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf3916522534245525259",
-                  Object {
-                    "__type": "bigint",
-                    "value": "2000000000",
-                  },
-                ],
-                Array [
-                  "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf391652256414e494c",
-                  Object {
-                    "__type": "bigint",
-                    "value": "15000000",
-                  },
-                ],
-              ],
+            "assets": Map {
+              "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf391652243484f43" => 10000000n,
+              "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf39165224d494e54" => 5000000000n,
+              "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf3916522524245525259" => 1000000000n,
+              "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf3916522534245525259" => 2000000000n,
+              "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf391652256414e494c" => 15000000n,
             },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "1000000000",
-            },
+            "coins": 1000000000n,
           },
         },
       ],
       "validityInterval": Object {
-        "invalidBefore": Object {
-          "__type": "undefined",
-        },
-        "invalidHereafter": Object {
-          "__type": "undefined",
-        },
+        "invalidBefore": undefined,
+        "invalidHereafter": undefined,
       },
-      "withdrawals": Object {
-        "__type": "undefined",
-      },
+      "withdrawals": undefined,
     },
     "id": "952dfa431223fd671c5e9e048e016f70fcebd9e41fcb726969415ff692736eeb",
     "implicitCoin": Object {
-      "deposit": Object {
-        "__type": "bigint",
-        "value": "0",
-      },
-      "input": Object {
-        "__type": "bigint",
-        "value": "0",
-      },
+      "deposit": 0n,
+      "input": 0n,
     },
     "index": 0,
     "txSize": 509,
     "witness": Object {
-      "redeemers": Object {
-        "__type": "undefined",
-      },
-      "signatures": Object {
-        "__type": "Map",
-        "value": Array [],
-      },
+      "redeemers": undefined,
+      "signatures": Map {},
     },
   },
 ]
@@ -3053,23 +1800,16 @@ Array [
 exports[`ChainHistoryHttpService healthy state /txs/by-hashes server and snapshot testing has outputs with multi-assets 1`] = `
 Array [
   Object {
-    "auxiliaryData": Object {
-      "__type": "undefined",
-    },
+    "auxiliaryData": undefined,
     "blockHeader": Object {
       "blockNo": 3157934,
       "hash": "f03084089ec7e74a79e69a5929b2d3c0836d6f12279bd103d0875847c740ae27",
       "slot": 45286016,
     },
     "body": Object {
-      "certificates": Object {
-        "__type": "undefined",
-      },
+      "certificates": undefined,
       "collaterals": Array [],
-      "fee": Object {
-        "__type": "bigint",
-        "value": "191109",
-      },
+      "fee": 191109n,
       "inputs": Array [
         Object {
           "address": "addr_test1qpvl4gf5r5h5w4yjrf58rt8slltem9tqfge36zqhsz5kgc8f2tc4ydn4zz9p0eymajqa4vj87he7yz6ssmh9x9h685hst9rgvk",
@@ -3077,9 +1817,7 @@ Array [
           "txId": "cefd2fcf657e5e5d6c35975f4e052f427819391b153ebb16ad8aa107ba5a3819",
         },
       ],
-      "mint": Object {
-        "__type": "undefined",
-      },
+      "mint": undefined,
       "outputs": Array [
         Object {
           "address": "addr_test1wrsexavz37208qda7mwwu4k7hcpg26cz0ce86f5e9kul3hqzlh22t",
@@ -3087,133 +1825,48 @@ Array [
           "index": 0,
           "txId": "cefd2fcf657e5e5d6c35975f4e052f427819391b153ebb16ad8aa107ba5a3819",
           "value": Object {
-            "assets": Object {
-              "__type": "Map",
-              "value": Array [
-                Array [
-                  "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf3916522534245525259",
-                  Object {
-                    "__type": "bigint",
-                    "value": "10000000",
-                  },
-                ],
-              ],
+            "assets": Map {
+              "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf3916522534245525259" => 10000000n,
             },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "7420514",
-            },
+            "coins": 7420514n,
           },
         },
         Object {
           "address": "addr_test1qpvl4gf5r5h5w4yjrf58rt8slltem9tqfge36zqhsz5kgc8f2tc4ydn4zz9p0eymajqa4vj87he7yz6ssmh9x9h685hst9rgvk",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 1,
           "txId": "cefd2fcf657e5e5d6c35975f4e052f427819391b153ebb16ad8aa107ba5a3819",
           "value": Object {
-            "assets": Object {
-              "__type": "Map",
-              "value": Array [
-                Array [
-                  "22be35160908d953c25b30d1ad59876cbf073a8b31ef7a4f77468355414141",
-                  Object {
-                    "__type": "bigint",
-                    "value": "4208",
-                  },
-                ],
-                Array [
-                  "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf39165224d494e54",
-                  Object {
-                    "__type": "bigint",
-                    "value": "1914111968",
-                  },
-                ],
-                Array [
-                  "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf3916522524245525259",
-                  Object {
-                    "__type": "bigint",
-                    "value": "1000000000",
-                  },
-                ],
-                Array [
-                  "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf3916522534245525259",
-                  Object {
-                    "__type": "bigint",
-                    "value": "1990000000",
-                  },
-                ],
-                Array [
-                  "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf391652256414e494c",
-                  Object {
-                    "__type": "bigint",
-                    "value": "15000000",
-                  },
-                ],
-                Array [
-                  "cd9d85fe5c8a1684c42ae0082e7e912fb7a7cca0900c5a3915eb1c3442454e59",
-                  Object {
-                    "__type": "bigint",
-                    "value": "2819431",
-                  },
-                ],
-                Array [
-                  "d311d3488cc4fef19d05634adce8534977a3bc6fc18136ad65df1d4f6c71202e01",
-                  Object {
-                    "__type": "bigint",
-                    "value": "100000000",
-                  },
-                ],
-                Array [
-                  "d311d3488cc4fef19d05634adce8534977a3bc6fc18136ad65df1d4f6c712038",
-                  Object {
-                    "__type": "bigint",
-                    "value": "172696733",
-                  },
-                ],
-              ],
+            "assets": Map {
+              "22be35160908d953c25b30d1ad59876cbf073a8b31ef7a4f77468355414141" => 4208n,
+              "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf39165224d494e54" => 1914111968n,
+              "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf3916522524245525259" => 1000000000n,
+              "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf3916522534245525259" => 1990000000n,
+              "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf391652256414e494c" => 15000000n,
+              "cd9d85fe5c8a1684c42ae0082e7e912fb7a7cca0900c5a3915eb1c3442454e59" => 2819431n,
+              "d311d3488cc4fef19d05634adce8534977a3bc6fc18136ad65df1d4f6c71202e01" => 100000000n,
+              "d311d3488cc4fef19d05634adce8534977a3bc6fc18136ad65df1d4f6c712038" => 172696733n,
             },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "850065083",
-            },
+            "coins": 850065083n,
           },
         },
       ],
       "validityInterval": Object {
-        "invalidBefore": Object {
-          "__type": "undefined",
-        },
-        "invalidHereafter": Object {
-          "__type": "undefined",
-        },
+        "invalidBefore": undefined,
+        "invalidHereafter": undefined,
       },
-      "withdrawals": Object {
-        "__type": "undefined",
-      },
+      "withdrawals": undefined,
     },
     "id": "cefd2fcf657e5e5d6c35975f4e052f427819391b153ebb16ad8aa107ba5a3819",
     "implicitCoin": Object {
-      "deposit": Object {
-        "__type": "bigint",
-        "value": "0",
-      },
-      "input": Object {
-        "__type": "bigint",
-        "value": "0",
-      },
+      "deposit": 0n,
+      "input": 0n,
     },
     "index": 30,
     "txSize": 711,
     "witness": Object {
-      "redeemers": Object {
-        "__type": "undefined",
-      },
-      "signatures": Object {
-        "__type": "Map",
-        "value": Array [],
-      },
+      "redeemers": undefined,
+      "signatures": Map {},
     },
   },
 ]
@@ -3222,18 +1875,14 @@ Array [
 exports[`ChainHistoryHttpService healthy state /txs/by-hashes server and snapshot testing has redeemers 1`] = `
 Array [
   Object {
-    "auxiliaryData": Object {
-      "__type": "undefined",
-    },
+    "auxiliaryData": undefined,
     "blockHeader": Object {
       "blockNo": 3274726,
       "hash": "5caede44f4a5a775443095159cd42c8a64f35494086957ab3e04624015a6e13c",
       "slot": 49032415,
     },
     "body": Object {
-      "certificates": Object {
-        "__type": "undefined",
-      },
+      "certificates": undefined,
       "collaterals": Array [
         Object {
           "address": "addr_test1qqemvcq8wdt9cv0sxsghv497zjsjzyzkekpw4vlvea44kdgy720vc4ggn5u4y39cc2wctg2u6sgackadnl78lxqq3m9q47wq8e",
@@ -3241,10 +1890,7 @@ Array [
           "txId": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
         },
       ],
-      "fee": Object {
-        "__type": "bigint",
-        "value": "1030338",
-      },
+      "fee": 1030338n,
       "inputs": Array [
         Object {
           "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
@@ -3277,145 +1923,67 @@ Array [
           "txId": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
         },
       ],
-      "mint": Object {
-        "__type": "Map",
-        "value": Array [
-          Array [
-            "22c3b86a5b88a78b5de52f4aed2831d1483b3b7681f1ee2569538130f32324c10a93fe1962cf7470543932cc064482c3495fe3de7502f9edd84ca114",
-            Object {
-              "__type": "bigint",
-              "value": "15355454",
-            },
-          ],
-        ],
+      "mint": Map {
+        "22c3b86a5b88a78b5de52f4aed2831d1483b3b7681f1ee2569538130f32324c10a93fe1962cf7470543932cc064482c3495fe3de7502f9edd84ca114" => 15355454n,
       },
       "outputs": Array [
         Object {
           "address": "addr_test1qqemvcq8wdt9cv0sxsghv497zjsjzyzkekpw4vlvea44kdgy720vc4ggn5u4y39cc2wctg2u6sgackadnl78lxqq3m9q47wq8e",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 0,
           "txId": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
           "value": Object {
-            "assets": Object {
-              "__type": "undefined",
-            },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "28178818258",
-            },
+            "assets": undefined,
+            "coins": 28178818258n,
           },
         },
         Object {
           "address": "addr_test1qqemvcq8wdt9cv0sxsghv497zjsjzyzkekpw4vlvea44kdgy720vc4ggn5u4y39cc2wctg2u6sgackadnl78lxqq3m9q47wq8e",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 1,
           "txId": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
           "value": Object {
-            "assets": Object {
-              "__type": "Map",
-              "value": Array [
-                Array [
-                  "ccc526143b6d41d56036248dbaa79440d68653f5b6a1919aa2c9e06131363732343139363030303033",
-                  Object {
-                    "__type": "bigint",
-                    "value": "1",
-                  },
-                ],
-              ],
+            "assets": Map {
+              "ccc526143b6d41d56036248dbaa79440d68653f5b6a1919aa2c9e06131363732343139363030303033" => 1n,
             },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "10000000",
-            },
+            "coins": 10000000n,
           },
         },
         Object {
           "address": "addr_test1qq9gwfwevn5s96jx9xzclntlrd8m0mrs3ezzva7akkvyj9y7yjf2z5h4fealu2rktu38m3mfv68vsjrtrfwuym60dfyq0axz58",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 2,
           "txId": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
           "value": Object {
-            "assets": Object {
-              "__type": "Map",
-              "value": Array [
-                Array [
-                  "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7453554e444145",
-                  Object {
-                    "__type": "bigint",
-                    "value": "1909",
-                  },
-                ],
-                Array [
-                  "22c3b86a5b88a78b5de52f4aed2831d1483b3b7681f1ee2569538130f32324c10a93fe1962cf7470543932cc064482c3495fe3de7502f9edd84ca114",
-                  Object {
-                    "__type": "bigint",
-                    "value": "15355454",
-                  },
-                ],
-              ],
+            "assets": Map {
+              "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7453554e444145" => 1909n,
+              "22c3b86a5b88a78b5de52f4aed2831d1483b3b7681f1ee2569538130f32324c10a93fe1962cf7470543932cc064482c3495fe3de7502f9edd84ca114" => 15355454n,
             },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "2000000",
-            },
+            "coins": 2000000n,
           },
         },
         Object {
           "address": "addr_test1qqfleha26t47j6khuetrsjyxkwl4x2lya5jsmn24h53n6d6akgetsg2jxgxsqglg8k9m74c8uwl8gxen3hvxsupapqasdzvh6n",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 3,
           "txId": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
           "value": Object {
-            "assets": Object {
-              "__type": "Map",
-              "value": Array [
-                Array [
-                  "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7453554e444145",
-                  Object {
-                    "__type": "bigint",
-                    "value": "333305",
-                  },
-                ],
-              ],
+            "assets": Map {
+              "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7453554e444145" => 333305n,
             },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "2000000",
-            },
+            "coins": 2000000n,
           },
         },
         Object {
           "address": "addr_test1qqvl0h49qke8yv8r5as3vrt3zaqdygjmfsfj63futhj803s2wkugrs72zdued30dtsce7mwclnd6n49a64q6f4mmcfksqaspe4",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 4,
           "txId": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
           "value": Object {
-            "assets": Object {
-              "__type": "Map",
-              "value": Array [
-                Array [
-                  "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7453554e444145",
-                  Object {
-                    "__type": "bigint",
-                    "value": "932541",
-                  },
-                ],
-              ],
+            "assets": Map {
+              "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7453554e444145" => 932541n,
             },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "2000000",
-            },
+            "coins": 2000000n,
           },
         },
         Object {
@@ -3424,59 +1992,25 @@ Array [
           "index": 5,
           "txId": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
           "value": Object {
-            "assets": Object {
-              "__type": "Map",
-              "value": Array [
-                Array [
-                  "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7453554e444145",
-                  Object {
-                    "__type": "bigint",
-                    "value": "1651585768",
-                  },
-                ],
-                Array [
-                  "75ac961881fd5d8d0008d54b4f6914eb6a712faa3403dc32097379b0f32324c10a93fe1962cf7470543932cc064482c3495fe3de7502f9edd84ca114",
-                  Object {
-                    "__type": "bigint",
-                    "value": "1",
-                  },
-                ],
-                Array [
-                  "95b7f0bbaa0b327e6b822840b0f7f7ee1c949e618f0aaeb6c5321cc34d494e53574150",
-                  Object {
-                    "__type": "bigint",
-                    "value": "1",
-                  },
-                ],
-              ],
+            "assets": Map {
+              "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7453554e444145" => 1651585768n,
+              "75ac961881fd5d8d0008d54b4f6914eb6a712faa3403dc32097379b0f32324c10a93fe1962cf7470543932cc064482c3495fe3de7502f9edd84ca114" => 1n,
+              "95b7f0bbaa0b327e6b822840b0f7f7ee1c949e618f0aaeb6c5321cc34d494e53574150" => 1n,
             },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "247344475554",
-            },
+            "coins": 247344475554n,
           },
         },
       ],
       "validityInterval": Object {
-        "invalidBefore": Object {
-          "__type": "undefined",
-        },
+        "invalidBefore": undefined,
         "invalidHereafter": 49033345,
       },
-      "withdrawals": Object {
-        "__type": "undefined",
-      },
+      "withdrawals": undefined,
     },
     "id": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
     "implicitCoin": Object {
-      "deposit": Object {
-        "__type": "bigint",
-        "value": "0",
-      },
-      "input": Object {
-        "__type": "bigint",
-        "value": "0",
-      },
+      "deposit": 0n,
+      "input": 0n,
     },
     "index": 14,
     "txSize": 10662,
@@ -3528,10 +2062,7 @@ Array [
           "scriptHash": "22c3b86a5b88a78b5de52f4aed2831d1483b3b7681f1ee2569538130",
         },
       ],
-      "signatures": Object {
-        "__type": "Map",
-        "value": Array [],
-      },
+      "signatures": Map {},
     },
   },
 ]
@@ -3540,9 +2071,7 @@ Array [
 exports[`ChainHistoryHttpService healthy state /txs/by-hashes server and snapshot testing has withdrawals 1`] = `
 Array [
   Object {
-    "auxiliaryData": Object {
-      "__type": "undefined",
-    },
+    "auxiliaryData": undefined,
     "blockHeader": Object {
       "blockNo": 3274726,
       "hash": "5caede44f4a5a775443095159cd42c8a64f35494086957ab3e04624015a6e13c",
@@ -3557,10 +2086,7 @@ Array [
         },
       ],
       "collaterals": Array [],
-      "fee": Object {
-        "__type": "bigint",
-        "value": "183233",
-      },
+      "fee": 183233n,
       "inputs": Array [
         Object {
           "address": "addr_test1qq8n7qxxlau6dt0v47fya55pyfz42ul86tyuy8al5rg4crgeq9dceusu9snpw8hrugasdcp00akqvtfjfr3hrsv0pa4sxqg7e2",
@@ -3568,91 +2094,54 @@ Array [
           "txId": "cb66e0f5778718f8bfcfd043712f37d9993f4703b254a7a4d954d34225fe2f99",
         },
       ],
-      "mint": Object {
-        "__type": "undefined",
-      },
+      "mint": undefined,
       "outputs": Array [
         Object {
           "address": "addr_test1qre8ns5ahywhp3c3y3tx94d3mlefhz5z52gzyl5rhypjfdseq9dceusu9snpw8hrugasdcp00akqvtfjfr3hrsv0pa4scxxqx6",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 0,
           "txId": "cb66e0f5778718f8bfcfd043712f37d9993f4703b254a7a4d954d34225fe2f99",
           "value": Object {
-            "assets": Object {
-              "__type": "undefined",
-            },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "489109783",
-            },
+            "assets": undefined,
+            "coins": 489109783n,
           },
         },
         Object {
           "address": "addr_test1qr66d9smqd69upk9pkkl0ll7pchzfr60zc496xzatln48ewrd7syppw2gqywrvfcdsu2mlqyrngnlxdyhlffjrlm5jkqqw05lr",
-          "datum": Object {
-            "__type": "undefined",
-          },
+          "datum": undefined,
           "index": 1,
           "txId": "cb66e0f5778718f8bfcfd043712f37d9993f4703b254a7a4d954d34225fe2f99",
           "value": Object {
-            "assets": Object {
-              "__type": "undefined",
-            },
-            "coins": Object {
-              "__type": "bigint",
-              "value": "512345678",
-            },
+            "assets": undefined,
+            "coins": 512345678n,
           },
         },
       ],
       "validityInterval": Object {
-        "invalidBefore": Object {
-          "__type": "undefined",
-        },
-        "invalidHereafter": Object {
-          "__type": "undefined",
-        },
+        "invalidBefore": undefined,
+        "invalidHereafter": undefined,
       },
       "withdrawals": Array [
         Object {
-          "quantity": Object {
-            "__type": "bigint",
-            "value": "1409612",
-          },
+          "quantity": 1409612n,
           "stakeAddress": "stake_test1uqvszkuv7gwzcfshrm37ywcxuqhh7mqx95ey3cm3cx8s76c7w97f8",
         },
         Object {
-          "quantity": Object {
-            "__type": "bigint",
-            "value": "229082",
-          },
+          "quantity": 229082n,
           "stakeAddress": "stake_test1urpklgzqsh9yqz8pkyuxcw9dlszpe5flnxjtl55epla6ftqktdyfz",
         },
       ],
     },
     "id": "cb66e0f5778718f8bfcfd043712f37d9993f4703b254a7a4d954d34225fe2f99",
     "implicitCoin": Object {
-      "deposit": Object {
-        "__type": "bigint",
-        "value": "0",
-      },
-      "input": Object {
-        "__type": "bigint",
-        "value": "1638694",
-      },
+      "deposit": 0n,
+      "input": 1638694n,
     },
     "index": 2,
     "txSize": 629,
     "witness": Object {
-      "redeemers": Object {
-        "__type": "undefined",
-      },
-      "signatures": Object {
-        "__type": "Map",
-        "value": Array [],
-      },
+      "redeemers": undefined,
+      "signatures": Map {},
     },
   },
 ]

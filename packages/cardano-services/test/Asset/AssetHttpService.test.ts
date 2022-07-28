@@ -8,10 +8,11 @@ import {
   NftMetadataService,
   TokenMetadataService
 } from '../../src';
-import { AssetProvider } from '@cardano-sdk/core';
+import { AssetProvider, Cardano } from '@cardano-sdk/core';
+import { CreateHttpProviderConfig, assetInfoHttpProvider } from '@cardano-sdk/cardano-services-client';
+import { INFO, createLogger } from 'bunyan';
 import { Pool } from 'pg';
 import { createDbSyncMetadataService } from '../../src/Metadata';
-import { fromSerializableObject } from '@cardano-sdk/util';
 import { getPort } from 'get-port-please';
 import { dummyLogger as logger } from 'ts-log';
 import { mockTokenRegistry } from './CardanoTokenRegistry.test';
@@ -34,11 +35,15 @@ describe('AssetHttpService', () => {
   let port: number;
   let tokenMetadataServerUrl = '';
   let tokenMetadataService: TokenMetadataService;
+  let clientConfig: CreateHttpProviderConfig<AssetProvider>;
+  let provider: AssetProvider;
 
   beforeAll(async () => {
     port = await getPort();
     apiUrlBase = `http://localhost:${port}/asset`;
     config = { listen: { port } };
+    clientConfig = { baseUrl: apiUrlBase, logger: createLogger({ level: INFO, name: 'unit tests' }) };
+    provider = assetInfoHttpProvider(clientConfig);
   });
 
   describe('healthy state', () => {
@@ -109,46 +114,23 @@ describe('AssetHttpService', () => {
       });
 
       it('returns asset info for existing asset id', async () => {
-        const res = await axios.post(`${apiUrlBase}/get-asset`, {
-          args: ['50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65']
-        });
-        expect(fromSerializableObject(res.data)).toEqual({
-          assetId: '50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65',
-          fingerprint: 'asset1f0azzptnr8dghzjh7egqvdjmt33e3lz5uy59th',
-          mintOrBurnCount: 1,
-          name: '6d616361726f6e2d63616b65',
-          policyId: '50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb',
-          quantity: 1n
-        });
+        const res = await provider.getAsset(
+          Cardano.AssetId('50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65')
+        );
+        expect(res).toMatchSnapshot();
       });
 
       it('returns asset info with extra data when requested', async () => {
-        const res = await axios.post(`${apiUrlBase}/get-asset`, {
-          args: [
-            '50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65',
-            { history: true, nftMetadata: true, tokenMetadata: true }
-          ]
-        });
-        const { history, nftMetadata, tokenMetadata } = fromSerializableObject(res.data);
-        expect(history).toEqual([
-          {
-            quantity: 1n,
-            transactionId: 'f66791a0354c43d8c5a93671eb96d94633e3419f3ccbb0a00c00a152d3b6ca06'
-          }
-        ]);
-        expect(nftMetadata).toEqual({
-          description: ['This is my first NFT of the macaron cake'],
-          files: undefined,
-          image: ['ipfs://QmcDAmZubQig7tGUgEwbWcgdvz4Aoa2EiRZyFoX3fXTVmr'],
-          mediaType: undefined,
-          name: 'macaron cake token',
-          otherProperties: new Map([['id', 1n]]),
-          version: '1.0'
-        });
-        expect(tokenMetadata).toEqual({
-          desc: 'This is my first NFT of the macaron cake',
-          name: 'macaron cake token'
-        });
+        const res = await provider.getAsset(
+          Cardano.AssetId('50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65'),
+          { history: true, nftMetadata: true, tokenMetadata: true }
+        );
+        const { history, nftMetadata, tokenMetadata } = res;
+
+        expect(res).toMatchSnapshot();
+        expect(history).toHaveLength(1);
+        expect(nftMetadata).toBeDefined();
+        expect(tokenMetadata).toBeDefined();
       });
     });
   });
