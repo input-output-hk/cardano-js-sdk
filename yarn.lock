@@ -1707,7 +1707,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cardano-sdk/cardano-services-client@^0.4.1-nightly.0, @cardano-sdk/cardano-services-client@workspace:packages/cardano-services-client":
+"@cardano-sdk/cardano-services-client@^0.4.1-nightly.1, @cardano-sdk/cardano-services-client@workspace:packages/cardano-services-client":
   version: 0.0.0-use.local
   resolution: "@cardano-sdk/cardano-services-client@workspace:packages/cardano-services-client"
   dependencies:
@@ -1730,11 +1730,11 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cardano-sdk/cardano-services@^0.5.0-nightly.0, @cardano-sdk/cardano-services@workspace:packages/cardano-services":
+"@cardano-sdk/cardano-services@^0.5.0-nightly.1, @cardano-sdk/cardano-services@workspace:packages/cardano-services":
   version: 0.0.0-use.local
   resolution: "@cardano-sdk/cardano-services@workspace:packages/cardano-services"
   dependencies:
-    "@cardano-sdk/cardano-services-client": ^0.4.1-nightly.0
+    "@cardano-sdk/cardano-services-client": ^0.4.1-nightly.1
     "@cardano-sdk/core": ^0.5.0-nightly.0
     "@cardano-sdk/ogmios": ^0.4.1-nightly.0
     "@cardano-sdk/rabbitmq": ^0.4.1-nightly.0
@@ -1904,8 +1904,8 @@ __metadata:
     "@cardano-foundation/ledgerjs-hw-app-cardano": 5.0.0
     "@cardano-ogmios/client": ^5.5.2
     "@cardano-sdk/blockfrost": ^0.4.1-nightly.0
-    "@cardano-sdk/cardano-services": ^0.5.0-nightly.0
-    "@cardano-sdk/cardano-services-client": ^0.4.1-nightly.0
+    "@cardano-sdk/cardano-services": ^0.5.0-nightly.1
+    "@cardano-sdk/cardano-services-client": ^0.4.1-nightly.1
     "@cardano-sdk/cip30": ^0.4.1-nightly.0
     "@cardano-sdk/core": ^0.5.0-nightly.0
     "@cardano-sdk/ogmios": ^0.4.1-nightly.0

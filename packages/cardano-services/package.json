@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/cardano-services",
-  "version": "0.5.0-nightly.0",
+  "version": "0.5.0-nightly.1",
   "description": "Cardano GraphQL Services",
   "engines": {
     "node": "^14"
@@ -62,7 +62,7 @@
     "tscNoEmit": "shx echo typescript --noEmit command not implemented yet"
   },
   "devDependencies": {
-    "@cardano-sdk/cardano-services-client": "^0.4.1-nightly.0",
+    "@cardano-sdk/cardano-services-client": "^0.4.1-nightly.1",
     "@cardano-sdk/util-dev": "^0.4.1-nightly.0",
     "@types/bunyan": "^1.8.8",
     "@types/clear": "^0.1.2",
