@@ -23,6 +23,9 @@
     "name": "conventionalcommits",
     "preMajor": true
   },
+  "ignoreChanges": [
+    "packages/*/test/**"
+  ],
   "useWorkspaces": true,
   "version": "independent"
 }
