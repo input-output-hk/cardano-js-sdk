@@ -7,14 +7,7 @@ import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../NetworkInf
 import { DbSyncRewardsProvider, RewardsHttpService } from '../Rewards';
 import { DbSyncStakePoolProvider, StakePoolHttpService } from '../StakePool';
 import { DbSyncUtxoProvider, UtxoHttpService } from '../Utxo';
-import {
-  DnsResolver,
-  createDnsResolver,
-  getOgmiosCardanoNode,
-  getOgmiosTxSubmitProvider,
-  getPool,
-  getRabbitMqTxSubmitProvider
-} from './utils';
+import { DnsResolver, createDnsResolver } from './utils';
 import { HttpServer, HttpServerConfig, HttpService } from '../Http';
 import { InMemoryCache } from '../InMemoryCache';
 import { MissingProgramOption, UnknownServiceName } from './errors';
@@ -22,6 +15,7 @@ import { ProgramOptionDescriptions } from './ProgramOptionDescriptions';
 import { ServiceNames } from './ServiceNames';
 import { TxSubmitHttpService } from '../TxSubmit';
 import { createDbSyncMetadataService } from '../Metadata';
+import { getOgmiosCardanoNode, getOgmiosTxSubmitProvider, getPool, getRabbitMqTxSubmitProvider } from './services';
 import Logger, { createLogger } from 'bunyan';
 import pg from 'pg';
 

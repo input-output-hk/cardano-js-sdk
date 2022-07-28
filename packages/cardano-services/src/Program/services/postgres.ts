@@ -1,0 +1,80 @@
+/* eslint-disable max-len */
+/* eslint-disable promise/no-nesting */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { ClientConfig, Pool, QueryConfig } from 'pg';
+import { DnsResolver } from '../utils';
+import { HttpServerOptions } from '../loadHttpServer';
+import { InvalidArgsCombination } from '../errors';
+import { Logger } from 'ts-log';
+import { ProgramOptionDescriptions } from '../ProgramOptionDescriptions';
+import { isConnectionError } from '@cardano-sdk/util';
+import fs from 'fs';
+
+/**
+ * Creates a extended Pool client :
+ * - use passed srv service name in order to resolve the port
+ * - make dealing with failovers (re-resolving the port) opaque
+ * - use exponential backoff retry internally with default timeout and factor
+ * - intercept 'query' operation and handle connection errors runtime
+ * - all other operations are bind to pool object withoud modifications
+ *
+ * @returns pg.Pool instance
+ */
+export const getPoolWithServiceDiscovery = async (
+  dnsResolver: DnsResolver,
+  logger: Logger,
+  { host, database, password, ssl, user }: ClientConfig
+): Promise<Pool> => {
+  const { name, port } = await dnsResolver(host!);
+  let pool = new Pool({ database, host: name, password, port, ssl, user });
+
+  return new Proxy<Pool>({} as Pool, {
+    get(_, prop) {
+      if (prop === 'then') return;
+      if (prop === 'query') {
+        return (args: string | QueryConfig, values?: any) =>
+          pool.query(args, values).catch(async (error) => {
+            if (isConnectionError(error)) {
+              const record = await dnsResolver(host!);
+              logger.info(`DNS resolution for Postgres service, resolved with record: ${JSON.stringify(record)}`);
+              pool = new Pool({ database, host: record.name, password, port: record.port, ssl, user });
+              return await pool.query(args, values);
+            }
+            throw error;
+          });
+      }
+      // Bind if it is a function, no intercept operations
+      if (typeof pool[prop as keyof Pool] === 'function') {
+        const method = pool[prop as keyof Pool] as any;
+        return method.bind(pool);
+      }
+    }
+  });
+};
+
+export const loadSecret = (path: string) => fs.readFileSync(path, 'utf8').toString();
+
+export const getPool = async (
+  dnsResolver: DnsResolver,
+  logger: Logger,
+  options?: HttpServerOptions
+): Promise<Pool | undefined> => {
+  const ssl = options?.postgresSslCaFile ? { ca: loadSecret(options.postgresSslCaFile) } : undefined;
+  if (options?.postgresConnectionString && options.postgresSrvServiceName)
+    throw new InvalidArgsCombination(
+      ProgramOptionDescriptions.PostgresConnectionString,
+      ProgramOptionDescriptions.PostgresServiceDiscoveryArgs
+    );
+  if (options?.postgresConnectionString) return new Pool({ connectionString: options.postgresConnectionString, ssl });
+  if (options?.postgresSrvServiceName && options.postgresUser && options.postgresDb && options.postgresPassword) {
+    return getPoolWithServiceDiscovery(dnsResolver, logger, {
+      database: options.postgresDb,
+      host: options.postgresSrvServiceName,
+      password: options.postgresPassword,
+      ssl,
+      user: options.postgresUser
+    });
+  }
+  // If db connection string is not passed nor postgres srv service name
+  return undefined;
+};
