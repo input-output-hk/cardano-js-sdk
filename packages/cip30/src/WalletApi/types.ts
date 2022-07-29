@@ -63,7 +63,7 @@ export type GetUtxos = (amount?: Cbor, paginate?: Paginate) => Promise<Cbor[] | 
  * for transactions with plutus script inputs (pure ADA-only UTxOs).
  * @throws ApiError
  */
-export type GetCollateral = (params: { amount: Cbor }) => Promise<Cbor[] | null>;
+export type GetCollateral = (params?: { amount?: Cbor }) => Promise<Cbor[] | null>;
 
 /**
  * Returns the total balance available of the wallet.
