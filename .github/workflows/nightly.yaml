@@ -35,7 +35,9 @@ jobs:
         registry-url: 'https://registry.npmjs.org'
 
     - name: Install dependencies
-      run: yarn install --immutable --inline-builds --mode=skip-build
+      run: |
+        yarn install --immutable --inline-builds --mode=skip-build
+        git checkout yarn-project.nix
 
     - name: Check if any packages changed
       id: precondition

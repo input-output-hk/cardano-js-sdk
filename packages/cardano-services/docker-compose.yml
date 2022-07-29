@@ -28,7 +28,7 @@ services:
         max-file: "10"
 
   cardano-node-ogmios:
-    image: cardanosolutions/cardano-node-ogmios:${CARDANO_NODE_OGMIOS_VERSION:-v5.5.2}-${NETWORK:-mainnet}
+    image: cardanosolutions/cardano-node-ogmios:${CARDANO_NODE_OGMIOS_VERSION:-v5.5.2_1.35.2}-${NETWORK:-mainnet}
     healthcheck:
       retries: 200
     logging:
@@ -68,7 +68,7 @@ services:
       - postgres_db
     volumes:
       - ./config/network/${NETWORK:-mainnet}:/config
-      - db-sync-data:/var/lib/cdbsync
+      - db-sync-data:/var/lib/cexplorer
       - node-ipc:/node-ipc
     restart: on-failure
     logging:

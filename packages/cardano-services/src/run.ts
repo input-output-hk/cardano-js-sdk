@@ -9,7 +9,8 @@ import {
   SERVICE_DISCOVERY_BACKOFF_FACTOR_DEFAULT,
   SERVICE_DISCOVERY_TIMEOUT_DEFAULT,
   ServiceNames,
-  loadHttpServer
+  loadHttpServer,
+  loadSecret
 } from './Program';
 import { DB_CACHE_TTL_DEFAULT } from './InMemoryCache';
 import { DEFAULT_TOKEN_METADATA_CACHE_TTL, DEFAULT_TOKEN_METADATA_SERVER_URL } from './Asset';
@@ -47,6 +48,7 @@ const envSpecs = {
   POSTGRES_PASSWORD_FILE: existingFileValidator({ default: undefined }),
   POSTGRES_PORT: envalid.num({ default: undefined }),
   POSTGRES_SRV_SERVICE_NAME: envalid.str({ default: undefined }),
+  POSTGRES_SSL_CA_FILE: existingFileValidator({ default: undefined }),
   POSTGRES_USER: envalid.str({ default: undefined }),
   POSTGRES_USER_FILE: existingFileValidator({ default: undefined }),
   RABBITMQ_SRV_SERVICE_NAME: envalid.str({ default: undefined }),
@@ -60,8 +62,6 @@ const envSpecs = {
   TOKEN_METADATA_SERVER_URL: envalid.url({ default: DEFAULT_TOKEN_METADATA_SERVER_URL }),
   USE_QUEUE: envalid.bool({ default: USE_QUEUE_DEFAULT })
 };
-
-const loadSecret = (path: string) => fs.readFileSync(path, 'utf8').toString();
 
 void (async () => {
   config();
@@ -95,6 +95,7 @@ void (async () => {
   }
   const enableMetrics = env.ENABLE_METRICS;
   const serviceNames = env.SERVICE_NAMES.split(',') as ServiceNames[];
+  const postgresSslCaFile = env.POSTGRES_SSL_CA_FILE;
 
   try {
     const server = await loadHttpServer({
@@ -111,6 +112,7 @@ void (async () => {
         postgresDb,
         postgresPassword,
         postgresSrvServiceName,
+        postgresSslCaFile,
         postgresUser,
         rabbitmqSrvServiceName,
         rabbitmqUrl,
