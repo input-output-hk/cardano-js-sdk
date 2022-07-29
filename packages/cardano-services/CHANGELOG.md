@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.0-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.5.0-nightly.1...@cardano-sdk/cardano-services@0.5.0-nightly.2) (2022-07-29)
+
+
+### Features
+
+* **cardano-services:** add support for secure db connection ([380a633](https://github.com/input-output-hk/cardano-js-sdk/commit/380a6338db024a8dd7ca960fb93ec4da7d3769b5))
+
+
+
 ## [0.5.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.5.0-nightly.0...@cardano-sdk/cardano-services@0.5.0-nightly.1) (2022-07-28)
 
 **Note:** Version bump only for package @cardano-sdk/cardano-services
