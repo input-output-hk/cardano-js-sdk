@@ -1,4 +1,5 @@
 import {
+  APIErrorCode,
   ApiError,
   Bytes,
   Cbor,
@@ -51,9 +52,25 @@ export type CallbackConfirmation = (
   args: SignDataCallbackParams | SignTxCallbackParams | SubmitTxCallbackParams
 ) => Promise<boolean>;
 
+interface CslInterface {
+  to_bytes(): Uint8Array;
+}
+
 const mapCallbackFailure = (err: unknown, logger?: Logger) => {
   logger?.error(err);
   return false;
+};
+
+const MAX_COLLATERAL_AMOUNT = CSL.BigNum.from_str('5000000');
+
+const cslToCbor = (csl: CslInterface) => Buffer.from(csl.to_bytes()).toString('hex');
+
+const compareUtxos = (utxo: Cardano.Utxo, comparedTo: Cardano.Utxo) => {
+  const currentCoin = utxo[1].value.coins;
+  const comparedToCoin = comparedTo[1].value.coins;
+  if (currentCoin < comparedToCoin) return -1;
+  if (currentCoin > comparedToCoin) return 1;
+  return 0;
 };
 
 export const createWalletApi = (
@@ -92,9 +109,40 @@ export const createWalletApi = (
       throw new ApiError(500, 'Nope');
     }
   },
-  getCollateral: async () => {
-    logger.warn('getCollateral is not implemented');
-    return null;
+  getCollateral: async ({ amount = cslToCbor(MAX_COLLATERAL_AMOUNT) }: { amount?: Cbor } = {}): Promise<
+    Cbor[] | null
+    // eslint-disable-next-line sonarjs/cognitive-complexity
+  > => {
+    logger.debug('getting collateral');
+    const wallet = await walletReady;
+    let unspendables = (await firstValueFrom(wallet.utxo.unspendable$)).sort(compareUtxos);
+    if (unspendables.some((utxo) => utxo[1].value.assets && utxo[1].value.assets.size > 0))
+      throw new ApiError(APIErrorCode.Refused, 'unspendable UTxOs must not contain assets when used as collateral');
+    if (amount) {
+      try {
+        const filterAmount = CSL.BigNum.from_bytes(Buffer.from(amount, 'hex'));
+        if (filterAmount.compare(MAX_COLLATERAL_AMOUNT) > 0)
+          throw new ApiError(APIErrorCode.InvalidRequest, 'requested amount is too big');
+        const utxos = [];
+        let totalCoins = CSL.BigNum.from_str('0');
+        for (const utxo of unspendables) {
+          const coin = CSL.BigNum.from_str(utxo[1].value.coins.toString());
+          totalCoins = totalCoins.checked_add(coin);
+          utxos.push(utxo);
+          if (totalCoins.compare(filterAmount) !== -1) break;
+        }
+        if (totalCoins.compare(filterAmount) === -1)
+          throw new ApiError(APIErrorCode.Refused, 'not enough coins in configured collateral UTxOs');
+        unspendables = utxos;
+      } catch (error) {
+        logger.error(error);
+        if (error instanceof ApiError) {
+          throw error;
+        }
+        throw new ApiError(APIErrorCode.InternalError, 'Nope');
+      }
+    }
+    return coreToCsl.utxo(unspendables).map(cslToCbor);
   },
   getNetworkId: async (): Promise<Cardano.NetworkId> => {
     logger.debug('getting networkId');
@@ -109,7 +157,7 @@ export const createWalletApi = (
       const [{ rewardAccount }] = await firstValueFrom(wallet.addresses$);
 
       if (!rewardAccount) {
-        throw new ApiError(500, 'could not get reward address');
+        throw new ApiError(APIErrorCode.InternalError, 'could not get reward address');
       } else {
         return [rewardAccount.toString()];
       }
@@ -118,7 +166,7 @@ export const createWalletApi = (
       if (error instanceof ApiError) {
         throw error;
       }
-      throw new ApiError(500, 'Nope');
+      throw new ApiError(APIErrorCode.InternalError, 'Nope');
     }
   },
   getUnusedAddresses: async (): Promise<Cbor[]> => {
@@ -132,7 +180,7 @@ export const createWalletApi = (
     const [{ address }] = await firstValueFrom(wallet.addresses$);
 
     if (!address) {
-      throw new ApiError(500, 'could not get used addresses');
+      throw new ApiError(APIErrorCode.InternalError, 'could not get used addresses');
     } else {
       return [address.toString()];
     }
@@ -140,7 +188,6 @@ export const createWalletApi = (
   getUtxos: async (amount?: Cbor, paginate?: Paginate): Promise<Cbor[] | undefined> => {
     const wallet = await walletReady;
     let utxos = await firstValueFrom(wallet.utxo.available$);
-
     if (amount) {
       try {
         const filterAmount = CSL.Value.from_bytes(Buffer.from(amount, 'hex'));
@@ -160,13 +207,13 @@ export const createWalletApi = (
       } catch (error) {
         logger.debug(error);
         const message = error instanceof InputSelectionError ? error.message : 'Nope';
-        throw new ApiError(400, message);
+        throw new ApiError(APIErrorCode.Refused, message);
       }
     } else if (paginate) {
       utxos = utxos.slice(paginate.page * paginate.limit, paginate.page * paginate.limit + paginate.limit);
     }
 
-    return Promise.resolve(coreToCsl.utxo(utxos).map((utxo) => Buffer.from(utxo.to_bytes()).toString('hex')));
+    return coreToCsl.utxo(utxos).map(cslToCbor);
   },
   signData: async (addr: Cardano.Address, payload: Bytes): Promise<Cip30DataSignature> => {
     logger.debug('signData');

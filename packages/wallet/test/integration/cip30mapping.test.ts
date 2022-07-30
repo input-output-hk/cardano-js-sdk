@@ -1,11 +1,23 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, sonarjs/no-duplicate-string */
+import { ApiError, DataSignError, TxSendError, TxSignError, WalletApi } from '@cardano-sdk/cip30';
 import { CSL, Cardano, coreToCsl, cslToCore } from '@cardano-sdk/core';
-import { DataSignError, TxSendError, TxSignError, WalletApi } from '@cardano-sdk/cip30';
+import { InMemoryUnspendableUtxoStore, createInMemoryWalletStores } from '../../src/persistence';
 import { InitializeTxProps, InitializeTxResult, SingleAddressWallet, cip30 } from '../../src';
 import { createWallet } from './util';
 import { firstValueFrom } from 'rxjs';
-import { networkId } from '../mocks';
+import { utxo as mockedUtxo, networkId, utxosWithLowCoins } from '../mocks';
 import { waitForWalletStateSettle } from '../util';
+
+const createWalletAndApiWithStores = async (utxos: Cardano.Utxo[]) => {
+  const unspendableUtxo = new InMemoryUnspendableUtxoStore();
+  unspendableUtxo.setAll(utxos);
+  const stores = { ...createInMemoryWalletStores(), unspendableUtxo };
+  const { wallet } = await createWallet(stores);
+  const confirmationCallback = jest.fn().mockResolvedValue(true);
+  const api = cip30.createWalletApi(Promise.resolve(wallet), confirmationCallback);
+  await waitForWalletStateSettle(wallet);
+  return { api, confirmationCallback, wallet };
+};
 
 describe('cip30', () => {
   let wallet: SingleAddressWallet;
@@ -26,10 +38,7 @@ describe('cip30', () => {
 
   beforeAll(async () => {
     // CREATE A WALLET
-    ({ wallet } = await createWallet());
-    confirmationCallback = jest.fn().mockResolvedValue(true);
-    api = cip30.createWalletApi(Promise.resolve(wallet), confirmationCallback);
-    await waitForWalletStateSettle(wallet);
+    ({ wallet, api, confirmationCallback } = await createWalletAndApiWithStores([mockedUtxo[2]]));
   });
 
   afterAll(() => {
@@ -44,6 +53,14 @@ describe('cip30', () => {
 
     test('api.getUtxos', async () => {
       const utxos = await api.getUtxos();
+      expect(() =>
+        cslToCore.utxo(utxos!.map((utxo) => CSL.TransactionUnspentOutput.from_bytes(Buffer.from(utxo, 'hex'))))
+      ).not.toThrow();
+    });
+
+    test('api.getCollateral', async () => {
+      // 1a003d0900 Represents a CSL.BigNum object of 4 ADA
+      const utxos = await api.getCollateral({ amount: '1a003d0900' });
       expect(() =>
         cslToCore.utxo(utxos!.map((utxo) => CSL.TransactionUnspentOutput.from_bytes(Buffer.from(utxo, 'hex'))))
       ).not.toThrow();
@@ -174,6 +191,79 @@ describe('cip30', () => {
       test('rejects', async () => {
         confirmationCallback.mockRejectedValue(1);
         await expect(api.submitTx(cslTx)).rejects.toThrowError(TxSendError);
+      });
+    });
+
+    describe('getCollateral', () => {
+      // Wallet 2
+      let wallet2: SingleAddressWallet;
+      let api2: WalletApi;
+
+      // Wallet 3
+      let wallet3: SingleAddressWallet;
+      let api3: WalletApi;
+
+      // Wallet 4
+      let wallet4: SingleAddressWallet;
+      let api4: WalletApi;
+
+      beforeAll(async () => {
+        // CREATE A WALLET WITH LOW COINS UTXOS
+        ({ wallet: wallet2, api: api2 } = await createWalletAndApiWithStores(utxosWithLowCoins));
+
+        // CREATE A WALLET WITH NO UTXOS
+        ({ wallet: wallet3, api: api3 } = await createWalletAndApiWithStores([]));
+
+        // CREATE A WALLET WITH UTXOS WITH ASSETS
+        ({ wallet: wallet4, api: api4 } = await createWalletAndApiWithStores([mockedUtxo[1], mockedUtxo[2]]));
+      });
+
+      afterAll(() => {
+        wallet2.shutdown();
+        wallet3.shutdown();
+        wallet4.shutdown();
+      });
+
+      test('returns multiple UTxOs when more than 1 utxo needed to satisfy amount', async () => {
+        // 1a003d0900 Represents a CSL.BigNum object of 4 ADA
+        const utxos = await api2.getCollateral({ amount: '1a003d0900' });
+        expect(() =>
+          cslToCore.utxo(utxos!.map((utxo) => CSL.TransactionUnspentOutput.from_bytes(Buffer.from(utxo, 'hex'))))
+        ).not.toThrow();
+        expect(utxos).toHaveLength(2);
+      });
+      test('throws when there are not enough UTxOs', async () => {
+        // 1a004c4b40 Represents a CSL.BigNum object of 5 ADA
+        await expect(api2.getCollateral({ amount: '1a004c4b40' })).rejects.toThrow(ApiError);
+      });
+      test('throws an error when there are no UTxOs in the wallet', async () => {
+        // 1a003d0900 Represents a CSL.BigNum object of 4 ADA
+        await expect(api3.getCollateral({ amount: '1a003d0900' })).rejects.toThrow(ApiError);
+        wallet3.shutdown();
+      });
+      test('throws when the given amount is greater than max amount', async () => {
+        // 1a005b8d80 Represents a CSL.BigNum object of 6 ADA
+        await expect(api2.getCollateral({ amount: '1a005b8d80' })).rejects.toThrow(ApiError);
+      });
+      test('returns first UTxO when amount is 0', async () => {
+        // 00 Represents a CSL.BigNum object of 0 ADA
+        const utxos = await api2.getCollateral({ amount: '00' });
+        expect(() =>
+          cslToCore.utxo(utxos!.map((utxo) => CSL.TransactionUnspentOutput.from_bytes(Buffer.from(utxo, 'hex'))))
+        ).not.toThrow();
+      });
+      test('returns all UTxOs when there is no given amount', async () => {
+        const utxos = await api.getCollateral();
+        expect(() =>
+          cslToCore.utxo(utxos!.map((utxo) => CSL.TransactionUnspentOutput.from_bytes(Buffer.from(utxo, 'hex'))))
+        ).not.toThrow();
+        expect(utxos).toHaveLength(1);
+      });
+      test('throws when there is no given amount and wallet has no UTxOs', async () => {
+        await expect(api3.getCollateral()).rejects.toThrow(ApiError);
+      });
+      test('throws when unspendable UTxOs contain assets', async () => {
+        await expect(api4.getCollateral()).rejects.toThrow(ApiError);
       });
     });
   });
