@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/wallet",
-  "version": "0.5.0-nightly.0",
+  "version": "0.5.0-nightly.1",
   "description": "Wallet modules",
   "engines": {
     "node": "^14"
@@ -76,7 +76,7 @@
   "dependencies": {
     "@cardano-foundation/ledgerjs-hw-app-cardano": "5.0.0",
     "@cardano-sdk/cip2": "^0.5.0-nightly.0",
-    "@cardano-sdk/cip30": "^0.4.1-nightly.0",
+    "@cardano-sdk/cip30": "^0.4.1-nightly.1",
     "@cardano-sdk/core": "^0.5.0-nightly.0",
     "@cardano-sdk/util": "^0.4.1-nightly.0",
     "@cardano-sdk/util-rxjs": "^0.4.1-nightly.0",
