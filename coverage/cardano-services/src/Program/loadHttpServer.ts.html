@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">87.27% </span>
+                <span class="strong">87.5% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>48/55</span>
+                <span class='fraction'>49/56</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">87.03% </span>
+                <span class="strong">87.27% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>47/54</span>
+                <span class='fraction'>48/55</span>
             </div>
         
             
@@ -229,36 +229,25 @@
 <a name='L164'></a><a href='#L164'>164</a>
 <a name='L165'></a><a href='#L165'>165</a>
 <a name='L166'></a><a href='#L166'>166</a>
-<a name='L167'></a><a href='#L167'>167</a>
-<a name='L168'></a><a href='#L168'>168</a>
-<a name='L169'></a><a href='#L169'>169</a>
-<a name='L170'></a><a href='#L170'>170</a>
-<a name='L171'></a><a href='#L171'>171</a>
-<a name='L172'></a><a href='#L172'>172</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L167'></a><a href='#L167'>167</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">23x</span>
-<span class="cline-any cline-yes">23x</span>
+<span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-yes">25x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">23x</span>
-<span class="cline-any cline-yes">23x</span>
-<span class="cline-any cline-yes">23x</span>
-<span class="cline-any cline-yes">23x</span>
-<span class="cline-any cline-yes">23x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">23x</span>
-<span class="cline-any cline-yes">23x</span>
-<span class="cline-any cline-yes">23x</span>
-<span class="cline-any cline-yes">23x</span>
-<span class="cline-any cline-yes">23x</span>
-<span class="cline-any cline-yes">23x</span>
-<span class="cline-any cline-yes">23x</span>
-<span class="cline-any cline-yes">23x</span>
-<span class="cline-any cline-yes">23x</span>
+<span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-yes">25x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -295,7 +284,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">23x</span>
+<span class="cline-any cline-yes">25x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -349,6 +338,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -368,7 +358,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">23x</span>
+<span class="cline-any cline-yes">25x</span>
 <span class="cline-any cline-yes">13x</span>
 <span class="cline-any cline-yes">13x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -414,21 +404,15 @@ import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../NetworkInf
 import { DbSyncRewardsProvider, RewardsHttpService } from '../Rewards';
 import { DbSyncStakePoolProvider, StakePoolHttpService } from '../StakePool';
 import { DbSyncUtxoProvider, UtxoHttpService } from '../Utxo';
-import {
-  DnsResolver,
-  createDnsResolver,
-  getOgmiosTxSubmitProvider,
-  getPool,
-  getRabbitMqTxSubmitProvider
-} from './utils';
+import { DnsResolver, createDnsResolver } from './utils';
 import { HttpServer, HttpServerConfig, HttpService } from '../Http';
 import { InMemoryCache } from '../InMemoryCache';
 import { MissingProgramOption, UnknownServiceName } from './errors';
-import { OgmiosCardanoNode, urlToConnectionConfig } from '@cardano-sdk/ogmios';
 import { ProgramOptionDescriptions } from './ProgramOptionDescriptions';
 import { ServiceNames } from './ServiceNames';
 import { TxSubmitHttpService } from '../TxSubmit';
 import { createDbSyncMetadataService } from '../Metadata';
+import { getOgmiosCardanoNode, getOgmiosTxSubmitProvider, getPool, getRabbitMqTxSubmitProvider } from './services';
 import Logger, { createLogger } from 'bunyan';
 import pg from 'pg';
 &nbsp;
@@ -513,18 +497,19 @@ const serviceMapFactory = (
     [ServiceNames.Rewards]: withDb(
       (db) =&gt; new RewardsHttpService({ logger, rewardsProvider: new DbSyncRewardsProvider(db, logger) })
     ),
-    [ServiceNames.NetworkInfo]: withDb((db) =&gt; {
+    [ServiceNames.NetworkInfo]: withDb(async (db) =&gt; {
       if (args.options?.cardanoNodeConfigPath === undefined)
         throw new MissingProgramOption(ServiceNames.NetworkInfo, ProgramOptionDescriptions.CardanoNodeConfigPath);
       <span class="missing-if-branch" title="if path not taken" >I</span>if (args.options?.ogmiosUrl === undefined)
 <span class="cstat-no" title="statement not covered" >        throw new MissingProgramOption(ServiceNames.NetworkInfo, ProgramOptionDescriptions.OgmiosUrl);</span>
 &nbsp;
+      const cardanoNode = await getOgmiosCardanoNode(dnsResolver, logger, args.options);
       const networkInfoProvider = new DbSyncNetworkInfoProvider(
         {
           cardanoNodeConfigPath: args.options.cardanoNodeConfigPath,
           epochPollInterval: args.options?.epochPollInterval
         },
-        { cache, cardanoNode: new OgmiosCardanoNode(urlToConnectionConfig(args.options.ogmiosUrl), logger), db, logger }
+        { cache, cardanoNode, db, logger }
       );
 &nbsp;
       return new NetworkInfoHttpService({ logger, networkInfoProvider });
@@ -583,7 +568,7 @@ export const loadHttpServer = async (args: ProgramArgs): Promise&lt;HttpServer&g
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at Thu Jul 28 2022 13:04:04 GMT+0000 (Coordinated Universal Time)
+                at Mon Aug 01 2022 02:37:44 GMT+0000 (Coordinated Universal Time)
             </div>
         <script src="../../prettify.js"></script>
         <script>
