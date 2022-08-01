@@ -74,6 +74,103 @@ Object {
 }
 `;
 
+exports[`StakePoolHttpService healthy state /search search pools by identifier filter no given condition equals to OR condition 1`] = `
+Object {
+  "pageResults": Array [
+    Object {
+      "cost": Object {
+        "__type": "bigint",
+        "value": "4321000000",
+      },
+      "epochRewards": Array [
+        Object {
+          "activeStake": Object {
+            "__type": "bigint",
+            "value": "1335568619",
+          },
+          "epoch": 205,
+          "epochLength": 431850000,
+          "memberROI": 0,
+          "operatorFees": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+          "totalRewards": Object {
+            "__type": "bigint",
+            "value": "0",
+          },
+        },
+      ],
+      "hexId": "ff5b4952dd7734f07e4905dea64fa230fb75f7b2d603d154d9ff1d43",
+      "id": "pool1lad5j5kawu60qljfqh02vnazxrahtaaj6cpaz4xeluw5xf023cg",
+      "margin": Object {
+        "denominator": 25,
+        "numerator": 1,
+      },
+      "metadata": Object {
+        "description": "The pool that tests all the pools",
+        "homepage": "https://teststakepool.com",
+        "name": "TestPool",
+        "ticker": "TEST",
+      },
+      "metadataJson": Object {
+        "hash": "2412f77be9b650eff7b015455d15cea355e1782dda2e7d7b1cb34943eefac348",
+        "url": "https://git.io/JJyYy",
+      },
+      "metrics": Object {
+        "apy": 0,
+        "blocksCreated": "0",
+        "delegators": "1",
+        "livePledge": Object {
+          "__type": "bigint",
+          "value": "199806239",
+        },
+        "saturation": "0.000018278270331367650376",
+        "size": Object {
+          "active": "0.86986484899181539157",
+          "live": "0.13013515100818460843",
+        },
+        "stake": Object {
+          "active": Object {
+            "__type": "bigint",
+            "value": "1335568619",
+          },
+          "live": Object {
+            "__type": "bigint",
+            "value": "199806239",
+          },
+        },
+      },
+      "owners": Array [
+        "stake_test1uzxvhl83q8ujv2yvpy6n2krvpdlqqx28h7e9vsk6re43h3c3kufy6",
+      ],
+      "pledge": Object {
+        "__type": "bigint",
+        "value": "70000000000",
+      },
+      "relays": Array [
+        Object {
+          "__typename": "RelayByAddress",
+          "ipv4": "3.16.164.91",
+          "ipv6": null,
+          "port": 3001,
+        },
+      ],
+      "rewardAccount": "stake_test1uzxvhl83q8ujv2yvpy6n2krvpdlqqx28h7e9vsk6re43h3c3kufy6",
+      "status": "active",
+      "transactions": Object {
+        "registration": Array [
+          "071b93a1a134389c22a1dc43fe747e43d23088448fed2b5ab22564cc0cb8bbc5",
+        ],
+        "retirement": Array [],
+      },
+      "vrf": "474a6d2a44b51add62d8f2fd8fe80abc722bf84478479b617ad05b39aaa84971",
+    },
+  ],
+  "totalResultCount": 1,
+}
+`;
+
 exports[`StakePoolHttpService healthy state /search search pools by identifier filter or condition 1`] = `
 Object {
   "pageResults": Array [

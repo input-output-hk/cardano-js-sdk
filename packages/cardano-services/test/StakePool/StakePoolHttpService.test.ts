@@ -234,17 +234,46 @@ describe('StakePoolHttpService', () => {
           expect(responseWithOrCondition).toMatchSnapshot();
           expect(responseWithAndCondition).toEqual(responseWithAndCondition);
         });
+        it('no given condition equals to OR condition', async () => {
+          const req: StakePoolQueryOptions = {
+            filters: {
+              identifier: { values: [{ name: 'Unknown Name', ticker: 'TEST' }] }
+            }
+          };
+          const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [req]);
+          const responseWithOrCondition = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(
+            url,
+            [setFilterCondition(req, 'or')]
+          );
+          expect(response).toMatchSnapshot();
+          expect(response).toEqual(responseWithOrCondition);
+        });
         it('stake pools do not match identifier filter', async () => {
           const req = {
             filters: {
               identifier: {
                 condition: 'and',
-                values: [{ name: 'imaginary name' }]
+                values: [{ name: 'Unknown Name' }]
               }
             }
           };
           const response = await provider.queryStakePools(req);
           expect(response.pageResults).toEqual([]);
+        });
+        it('empty values ignores identifier filter', async () => {
+          const req = {
+            filters: {
+              identifier: {
+                values: []
+              }
+            }
+          };
+          const reqWithNoFilters = {};
+          const response = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [req]);
+          const responseWithNoFilters = await doStakePoolRequest<[StakePoolQueryOptions], StakePoolSearchResults>(url, [
+            reqWithNoFilters
+          ]);
+          expect(response).toEqual(responseWithNoFilters);
         });
       });
       describe('search pools by status', () => {
