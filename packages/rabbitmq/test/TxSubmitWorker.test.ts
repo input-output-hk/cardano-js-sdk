@@ -1,13 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-  BAD_CONNECTION_URL,
-  GOOD_CONNECTION_URL,
-  enqueueFakeTx,
-  removeAllQueues,
-  testLogger,
-  txsPromise
-} from './utils';
+import { BAD_CONNECTION_URL, testLogger, txsPromise } from './utils';
 import { Cardano, ProviderError, TxSubmitProvider } from '@cardano-sdk/core';
+import { RabbitMQContainer } from './docker';
 import { RabbitMqTxSubmitProvider, TxSubmitWorker } from '../src';
 import { createMockOgmiosServer, listenPromise, serverClosePromise } from '../../ogmios/test/mocks/mockOgmiosServer';
 import { getRandomPort } from 'get-port-please';
@@ -15,19 +8,23 @@ import { ogmiosTxSubmitProvider, urlToConnectionConfig } from '@cardano-sdk/ogmi
 import http from 'http';
 
 describe('TxSubmitWorker', () => {
+  const container = new RabbitMQContainer();
+
   let logger: ReturnType<typeof testLogger>;
   let mock: http.Server | undefined;
   let port: number;
+  let rabbitmqUrl: URL;
   let txSubmitProvider: TxSubmitProvider;
   let worker: TxSubmitWorker | undefined;
 
   beforeAll(async () => {
+    ({ rabbitmqUrl } = await container.load());
     port = await getRandomPort();
     txSubmitProvider = ogmiosTxSubmitProvider(urlToConnectionConfig(new URL(`http://localhost:${port}/`)));
   });
 
   beforeEach(async () => {
-    await removeAllQueues();
+    await container.removeQueues();
     logger = testLogger();
   });
 
@@ -47,7 +44,7 @@ describe('TxSubmitWorker', () => {
   });
 
   it('is safe to call stop method on an idle worker', async () => {
-    worker = new TxSubmitWorker({ rabbitmqUrl: GOOD_CONNECTION_URL }, { logger, txSubmitProvider });
+    worker = new TxSubmitWorker({ rabbitmqUrl }, { logger, txSubmitProvider });
 
     expect(worker).toBeInstanceOf(TxSubmitWorker);
     expect(worker.getStatus()).toEqual('idle');
@@ -63,7 +60,7 @@ describe('TxSubmitWorker', () => {
 
     await listenPromise(mock, port);
 
-    worker = new TxSubmitWorker({ rabbitmqUrl: GOOD_CONNECTION_URL }, { logger, txSubmitProvider });
+    worker = new TxSubmitWorker({ rabbitmqUrl }, { logger, txSubmitProvider });
 
     await expect(worker.start()).rejects.toBeInstanceOf(ProviderError);
   });
@@ -115,10 +112,10 @@ describe('TxSubmitWorker', () => {
         await listenPromise(failMock, port);
 
         // Enqueue a tx
-        const providerClosePromise = enqueueFakeTx();
+        const providerClosePromise = container.enqueueTx();
 
         // Actually create the TxSubmitWorker
-        worker = new TxSubmitWorker({ rabbitmqUrl: GOOD_CONNECTION_URL, ...options }, { logger, txSubmitProvider });
+        worker = new TxSubmitWorker({ rabbitmqUrl, ...options }, { logger, txSubmitProvider });
         await worker.start();
 
         await new Promise<void>((resolve) => {
@@ -158,14 +155,13 @@ describe('TxSubmitWorker', () => {
         await listenPromise(mock, port);
 
         // Actually create the TxSubmitWorker
-        worker = new TxSubmitWorker(
-          { pollingCycle: 50, rabbitmqUrl: GOOD_CONNECTION_URL, ...options },
-          { logger, txSubmitProvider }
-        );
+        worker = new TxSubmitWorker({ pollingCycle: 50, rabbitmqUrl, ...options }, { logger, txSubmitProvider });
         await worker.start();
 
         // Tx submission by RabbitMqTxSubmitProvider must reject with the same error got by TxSubmitWorker
-        await expect(enqueueFakeTx(0, logger)).rejects.toBeInstanceOf(Cardano.TxSubmissionErrors.EraMismatchError);
+        await expect(container.enqueueTx(0, logger)).rejects.toBeInstanceOf(
+          Cardano.TxSubmissionErrors.EraMismatchError
+        );
       };
 
       it('when configured to process jobs serially', async () => performTest({ parallel: false }));
@@ -194,13 +190,10 @@ describe('TxSubmitWorker', () => {
 
     await listenPromise(mock, port);
 
-    worker = new TxSubmitWorker(
-      { parallel: true, parallelTxs: 4, rabbitmqUrl: GOOD_CONNECTION_URL },
-      { logger, txSubmitProvider }
-    );
+    worker = new TxSubmitWorker({ parallel: true, parallelTxs: 4, rabbitmqUrl }, { logger, txSubmitProvider });
     await worker.start();
 
-    const rabbitMqTxSubmitProvider = new RabbitMqTxSubmitProvider({ rabbitmqUrl: GOOD_CONNECTION_URL });
+    const rabbitMqTxSubmitProvider = new RabbitMqTxSubmitProvider({ rabbitmqUrl });
 
     /*
      * Tx submission plan, time sample: 100ms

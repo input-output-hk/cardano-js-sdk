@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { Connection } from '@cardano-ogmios/client';
 import { Ogmios } from '@cardano-sdk/ogmios';
-import { RABBITMQ_URL_DEFAULT, createDnsResolver, getOgmiosTxSubmitProvider } from '../../src';
+import { RabbitMQContainer } from '../../../rabbitmq/test/docker';
 import {
   RunningTxSubmitWorker,
   getRunningTxSubmitWorker,
@@ -11,6 +11,7 @@ import {
 } from '../../src/TxWorker/utils';
 import { SrvRecord } from 'dns';
 import { TxSubmitProvider } from '@cardano-sdk/core';
+import { createDnsResolver, getOgmiosTxSubmitProvider } from '../../src';
 import { createLogger } from 'bunyan';
 import { createMockOgmiosServer } from '../../../ogmios/test/mocks/mockOgmiosServer';
 import { listenPromise, serverClosePromise } from '../../src/util';
@@ -19,29 +20,36 @@ import http from 'http';
 
 const flushPromises = () => new Promise((resolve) => setImmediate(resolve));
 
+let rabbitmqPort: number;
+let rabbitmqUrl: URL;
+
 jest.mock('dns', () => ({
   promises: {
     resolveSrv: async (serviceName: string): Promise<SrvRecord[]> => {
       if (serviceName === process.env.OGMIOS_SRV_SERVICE_NAME)
         return [{ name: 'localhost', port: 1337, priority: 6, weight: 5 }];
       if (serviceName === process.env.RABBITMQ_SRV_SERVICE_NAME)
-        return [{ name: 'localhost', port: 5672, priority: 6, weight: 5 }];
+        return [{ name: 'localhost', port: rabbitmqPort, priority: 6, weight: 5 }];
       return [];
     }
   }
 }));
 
 describe('TxSubmitWorker abstraction', () => {
+  beforeAll(async () => {
+    const container = new RabbitMQContainer();
+
+    ({ rabbitmqPort, rabbitmqUrl } = await container.load());
+  });
+
   describe('getRunningTxSubmitWorker', () => {
     let mockServer: http.Server;
     let connection: Connection;
     let txSubmitWorker: RunningTxSubmitWorker;
     let txSubmitProvider: TxSubmitProvider;
     const ogmiosPortDefault = 1337;
-    const rabbitmqPortDefault = 5672;
     const logger = createLogger({ level: 'error', name: 'test' });
     const dnsResolver = createDnsResolver({ factor: 1.1, maxRetryTime: 1000 }, logger);
-    const srvRecord = { name: 'localhost', port: rabbitmqPortDefault, priority: 1, weight: 1 };
 
     beforeEach(async () => {
       connection = Ogmios.createConnectionObject({ port: ogmiosPortDefault });
@@ -67,15 +75,14 @@ describe('TxSubmitWorker abstraction', () => {
         ogmiosUrl: new URL(connection.address.webSocket)
       });
 
-      txSubmitWorker = await getRunningTxSubmitWorker(dnsResolverMock, txSubmitProvider, logger, {
-        rabbitmqUrl: new URL(RABBITMQ_URL_DEFAULT)
-      });
+      txSubmitWorker = await getRunningTxSubmitWorker(dnsResolverMock, txSubmitProvider, logger, { rabbitmqUrl });
 
-      await expect(dnsResolverMock).toBeCalledTimes(0);
+      expect(dnsResolverMock).toBeCalledTimes(0);
       expect(txSubmitWorker.getStatus()).toEqual('connected');
     });
 
     it('should instantiate a running worker with service discovery', async () => {
+      const srvRecord = { name: 'localhost', port: rabbitmqPort, priority: 1, weight: 1 };
       const dnsResolverMock = jest.fn().mockResolvedValueOnce(srvRecord);
       txSubmitProvider = await getOgmiosTxSubmitProvider(dnsResolver, logger, {
         ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME,
@@ -89,7 +96,7 @@ describe('TxSubmitWorker abstraction', () => {
         serviceDiscoveryTimeout: 1000
       });
 
-      await expect(dnsResolverMock).toBeCalledTimes(1);
+      expect(dnsResolverMock).toBeCalledTimes(1);
       expect(txSubmitWorker.getStatus()).toEqual('connected');
     });
   });

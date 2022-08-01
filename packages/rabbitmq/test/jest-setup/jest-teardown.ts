@@ -1,5 +1,9 @@
-import { removeRabbitMQContainer } from './docker';
+import { RabbitMQContainer } from '../docker';
 
-const removeContainer = () => removeRabbitMQContainer();
+const removeContainer = async () => {
+  const container = new RabbitMQContainer();
+
+  await container.stop();
+};
 
 export default removeContainer;

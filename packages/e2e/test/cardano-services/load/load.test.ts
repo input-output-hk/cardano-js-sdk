@@ -181,6 +181,7 @@ describe('load', () => {
   beforeAll(async () => {
     jest.setTimeout(180_000);
 
+    await removeRabbitMQContainer();
     await startServer({ directlyToOgmios: true });
     await prepareWallets();
   });

@@ -12,6 +12,7 @@ import {
   loadAndStartTxWorker
 } from '../../../src';
 import { Ogmios } from '@cardano-sdk/ogmios';
+import { RabbitMQContainer } from '../../../../rabbitmq/test/docker';
 import { RunningTxSubmitWorker } from '../../../src/TxWorker/utils';
 import { SrvRecord } from 'dns';
 import { createLogger } from 'bunyan';
@@ -25,13 +26,16 @@ import { types } from 'util';
 import axios from 'axios';
 import http from 'http';
 
+let rabbitmqPort: number;
+let rabbitmqUrl: URL;
+
 jest.mock('dns', () => ({
   promises: {
     resolveSrv: async (serviceName: string): Promise<SrvRecord[]> => {
       if (serviceName === process.env.OGMIOS_SRV_SERVICE_NAME)
         return [{ name: 'localhost', port: 1337, priority: 6, weight: 5 }];
       if (serviceName === process.env.RABBITMQ_SRV_SERVICE_NAME)
-        return [{ name: 'localhost', port: 5672, priority: 6, weight: 5 }];
+        return [{ name: 'localhost', port: rabbitmqPort, priority: 6, weight: 5 }];
       return [];
     }
   }
@@ -39,8 +43,11 @@ jest.mock('dns', () => ({
 
 describe('Service dependency abstractions', () => {
   const APPLICATION_JSON = 'application/json';
+  const container = new RabbitMQContainer();
   const logger = createLogger({ level: 'error', name: 'test' });
   const dnsResolver = createDnsResolver({ factor: 1.1, maxRetryTime: 1000 }, logger);
+
+  beforeAll(async () => ({ rabbitmqPort, rabbitmqUrl } = await container.load()));
 
   describe('RabbitMQ-dependant service with service discovery', () => {
     let apiUrlBase: string;
@@ -96,9 +103,7 @@ describe('Service dependency abstractions', () => {
         port = await getPort();
         apiUrlBase = `http://localhost:${port}/tx-submit`;
         config = { listen: { port } };
-        txSubmitProvider = await getRabbitMqTxSubmitProvider(dnsResolver, logger, {
-          rabbitmqUrl: new URL(process.env.RABBITMQ_URL!)
-        });
+        txSubmitProvider = await getRabbitMqTxSubmitProvider(dnsResolver, logger, { rabbitmqUrl });
         httpServer = new HttpServer(config, {
           services: [new TxSubmitHttpService({ txSubmitProvider })]
         });
@@ -130,7 +135,6 @@ describe('Service dependency abstractions', () => {
     let provider: TxSubmitProvider;
     let txSubmitWorker: RunningTxSubmitWorker;
     const ogmiosPortDefault = 1337;
-    const rabbitmqPortDedault = 5672;
 
     beforeEach(async () => {
       connection = Ogmios.createConnectionObject({ port: ogmiosPortDefault });
@@ -167,7 +171,7 @@ describe('Service dependency abstractions', () => {
     });
 
     it('should initially fail with a connection error, then re-resolve the port and propagate the correct non-connection error to the caller', async () => {
-      const srvRecord = { name: 'localhost', port: rabbitmqPortDedault, priority: 1, weight: 1 };
+      const srvRecord = { name: 'localhost', port: rabbitmqPort, priority: 1, weight: 1 };
       const failingRabbitMqMockPort = await getRandomPort();
       let resolverAlreadyCalled = false;
 
