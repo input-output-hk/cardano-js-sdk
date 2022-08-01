@@ -4,6 +4,7 @@ import { KeyManagement, ObservableWallet, SingleAddressWallet, setupWallet } fro
 import {
   assetProviderFactory,
   chainHistoryProviderFactory,
+  getLogger,
   keyAgentById,
   networkInfoProviderFactory,
   rewardsProviderFactory,
@@ -13,6 +14,8 @@ import {
 } from '../../../src/factories';
 import { combineLatest, filter, firstValueFrom, map, of } from 'rxjs';
 import { env } from '../environment';
+
+const logger = getLogger(env.LOGGER_MIN_SEVERITY);
 
 describe('SingleAddressWallet.assets/nft', () => {
   let wallet: ObservableWallet;
@@ -43,26 +46,34 @@ describe('SingleAddressWallet.assets/nft', () => {
             name: 'Test Wallet'
           },
           {
-            assetProvider: await assetProviderFactory.create(env.ASSET_PROVIDER, env.ASSET_PROVIDER_PARAMS),
+            assetProvider: await assetProviderFactory.create(env.ASSET_PROVIDER, env.ASSET_PROVIDER_PARAMS, logger),
             chainHistoryProvider: await chainHistoryProviderFactory.create(
               env.CHAIN_HISTORY_PROVIDER,
-              env.CHAIN_HISTORY_PROVIDER_PARAMS
+              env.CHAIN_HISTORY_PROVIDER_PARAMS,
+              logger
             ),
             keyAgent,
             networkInfoProvider: await networkInfoProviderFactory.create(
               env.NETWORK_INFO_PROVIDER,
-              env.NETWORK_INFO_PROVIDER_PARAMS
+              env.NETWORK_INFO_PROVIDER_PARAMS,
+              logger
             ),
-            rewardsProvider: await rewardsProviderFactory.create(env.REWARDS_PROVIDER, env.REWARDS_PROVIDER_PARAMS),
+            rewardsProvider: await rewardsProviderFactory.create(
+              env.REWARDS_PROVIDER,
+              env.REWARDS_PROVIDER_PARAMS,
+              logger
+            ),
             stakePoolProvider: await stakePoolProviderFactory.create(
               env.STAKE_POOL_PROVIDER,
-              env.STAKE_POOL_PROVIDER_PARAMS
+              env.STAKE_POOL_PROVIDER_PARAMS,
+              logger
             ),
             txSubmitProvider: await txSubmitProviderFactory.create(
               env.TX_SUBMIT_PROVIDER,
-              env.TX_SUBMIT_PROVIDER_PARAMS
+              env.TX_SUBMIT_PROVIDER_PARAMS,
+              logger
             ),
-            utxoProvider: await utxoProviderFactory.create(env.UTXO_PROVIDER, env.UTXO_PROVIDER_PARAMS)
+            utxoProvider: await utxoProviderFactory.create(env.UTXO_PROVIDER, env.UTXO_PROVIDER_PARAMS, logger)
           }
         )
     }));
