@@ -56,7 +56,7 @@ export interface MockOgmiosServerConfig {
       response: {
         success: boolean;
         failWith?: {
-          type: 'unknownResultError';
+          type: 'unknownResultError' | 'connectionError';
         };
       };
     };
@@ -112,6 +112,8 @@ const handleQuery = async (query: string, config: MockOgmiosServerConfig, send: 
         ];
       } else if (config.stateQuery?.eraSummaries?.response.failWith?.type === 'unknownResultError') {
         result = new UnknownResultError('');
+      } else if (config.stateQuery?.eraSummaries?.response.failWith?.type === 'connectionError') {
+        result = new UnknownResultError({ code: 'ECONNREFUSED' });
       } else {
         throw new Error('Unknown mock response');
       }

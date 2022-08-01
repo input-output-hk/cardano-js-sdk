@@ -7,21 +7,15 @@ import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../NetworkInf
 import { DbSyncRewardsProvider, RewardsHttpService } from '../Rewards';
 import { DbSyncStakePoolProvider, StakePoolHttpService } from '../StakePool';
 import { DbSyncUtxoProvider, UtxoHttpService } from '../Utxo';
-import {
-  DnsResolver,
-  createDnsResolver,
-  getOgmiosTxSubmitProvider,
-  getPool,
-  getRabbitMqTxSubmitProvider
-} from './utils';
+import { DnsResolver, createDnsResolver } from './utils';
 import { HttpServer, HttpServerConfig, HttpService } from '../Http';
 import { InMemoryCache } from '../InMemoryCache';
 import { MissingProgramOption, UnknownServiceName } from './errors';
-import { OgmiosCardanoNode, urlToConnectionConfig } from '@cardano-sdk/ogmios';
 import { ProgramOptionDescriptions } from './ProgramOptionDescriptions';
 import { ServiceNames } from './ServiceNames';
 import { TxSubmitHttpService } from '../TxSubmit';
 import { createDbSyncMetadataService } from '../Metadata';
+import { getOgmiosCardanoNode, getOgmiosTxSubmitProvider, getPool, getRabbitMqTxSubmitProvider } from './services';
 import Logger, { createLogger } from 'bunyan';
 import pg from 'pg';
 
@@ -106,18 +100,19 @@ const serviceMapFactory = (
     [ServiceNames.Rewards]: withDb(
       (db) => new RewardsHttpService({ logger, rewardsProvider: new DbSyncRewardsProvider(db, logger) })
     ),
-    [ServiceNames.NetworkInfo]: withDb((db) => {
+    [ServiceNames.NetworkInfo]: withDb(async (db) => {
       if (args.options?.cardanoNodeConfigPath === undefined)
         throw new MissingProgramOption(ServiceNames.NetworkInfo, ProgramOptionDescriptions.CardanoNodeConfigPath);
       if (args.options?.ogmiosUrl === undefined)
         throw new MissingProgramOption(ServiceNames.NetworkInfo, ProgramOptionDescriptions.OgmiosUrl);
 
+      const cardanoNode = await getOgmiosCardanoNode(dnsResolver, logger, args.options);
       const networkInfoProvider = new DbSyncNetworkInfoProvider(
         {
           cardanoNodeConfigPath: args.options.cardanoNodeConfigPath,
           epochPollInterval: args.options?.epochPollInterval
         },
-        { cache, cardanoNode: new OgmiosCardanoNode(urlToConnectionConfig(args.options.ogmiosUrl), logger), db, logger }
+        { cache, cardanoNode, db, logger }
       );
 
       return new NetworkInfoHttpService({ logger, networkInfoProvider });
