@@ -212,6 +212,7 @@ describe('TxSubmitWorker', () => {
 
     const promises: Promise<void>[] = [];
     const result = [undefined, undefined, undefined, undefined, undefined, undefined, undefined];
+    let res: unknown = null;
 
     for (let i = 0; i < 7; ++i) {
       promises.push(rabbitMqTxSubmitProvider.submitTx(txs[i].txBodyUint8Array));
@@ -219,7 +220,15 @@ describe('TxSubmitWorker', () => {
       await new Promise((resolve) => setTimeout(resolve, 10));
     }
 
-    await expect(Promise.all(promises)).resolves.toEqual(result);
+    try {
+      res = await Promise.all(promises);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      expect(error.innerError).toBeUndefined();
+      expect(error).toBeUndefined();
+    }
+
+    expect(res).toEqual(result);
 
     await rabbitMqTxSubmitProvider.close();
 
