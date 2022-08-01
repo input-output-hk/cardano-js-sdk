@@ -1,13 +1,21 @@
-import { BAD_CONNECTION_URL, GOOD_CONNECTION_URL, removeAllQueues, testLogger, txsPromise } from './utils';
+import { BAD_CONNECTION_URL, testLogger, txsPromise } from './utils';
 import { ProviderError, TxSubmitProvider } from '@cardano-sdk/core';
+import { RabbitMQContainer } from './docker';
 import { RabbitMqTxSubmitProvider, TxSubmitWorker } from '../src';
 
 describe('RabbitMqTxSubmitProvider', () => {
+  const container = new RabbitMQContainer();
+
   let logger: ReturnType<typeof testLogger>;
   let provider: TxSubmitProvider | undefined;
+  let rabbitmqUrl: URL;
+
+  beforeAll(async () => {
+    ({ rabbitmqUrl } = await container.load());
+  });
 
   beforeEach(async () => {
-    await removeAllQueues();
+    await container.removeQueues();
     logger = testLogger();
   });
 
@@ -29,9 +37,9 @@ describe('RabbitMqTxSubmitProvider', () => {
     });
 
     it('is ok if can connect', async () => {
-      provider = new RabbitMqTxSubmitProvider({ rabbitmqUrl: GOOD_CONNECTION_URL });
+      provider = new RabbitMqTxSubmitProvider({ rabbitmqUrl });
       const resA = await provider.healthCheck();
-      // Call again to cover the idemopotent RabbitMqTxSubmitProvider.#connectAndCreateChannel() operation
+      // Call again to cover the idempotent RabbitMqTxSubmitProvider.#connectAndCreateChannel() operation
       const resB = await provider.healthCheck();
       expect(resA).toEqual({ ok: true });
       expect(resB).toEqual({ ok: true });
@@ -40,12 +48,12 @@ describe('RabbitMqTxSubmitProvider', () => {
 
   describe('submitTx', () => {
     // eslint-disable-next-line unicorn/consistent-function-scoping
-    const performTest = async (rabbitmqUrl: URL) => {
+    const performTest = async (url: URL) => {
       try {
         const txs = await txsPromise;
-        provider = new RabbitMqTxSubmitProvider({ rabbitmqUrl }, { logger });
+        provider = new RabbitMqTxSubmitProvider({ rabbitmqUrl: url }, { logger });
         const resA = await provider.submitTx(txs[0].txBodyUint8Array);
-        // Called again to cover the idemopotent RabbitMqTxSubmitProvider.#ensureQueue() operation
+        // Called again to cover the idempotent RabbitMqTxSubmitProvider.#ensureQueue() operation
         const resB = await provider.submitTx(txs[1].txBodyUint8Array);
         expect(resA).toBeUndefined();
         expect(resB).toBeUndefined();
@@ -56,13 +64,13 @@ describe('RabbitMqTxSubmitProvider', () => {
 
     it('resolves if successful', async () => {
       const worker = new TxSubmitWorker(
-        { parallel: true, rabbitmqUrl: GOOD_CONNECTION_URL },
+        { parallel: true, rabbitmqUrl },
         { logger, txSubmitProvider: { healthCheck: async () => ({ ok: true }), submitTx: () => Promise.resolve() } }
       );
 
       expect.assertions(2);
       await worker.start();
-      await performTest(GOOD_CONNECTION_URL);
+      await performTest(rabbitmqUrl);
       await worker.stop();
     });
 

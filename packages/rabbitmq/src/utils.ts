@@ -28,22 +28,22 @@ export const getErrorPrototype = (error: unknown) => {
 };
 
 /**
- * Serializes an error and checks if it is retriable
+ * Serializes an error and checks if it is retryable
  *
  * @param err the error to serialize
  */
 export const serializeError = (err: unknown) => {
-  let isRetriable = false;
+  let isRetryable = false;
 
   const serializableError = toSerializableObject(err);
 
   if (err instanceof Cardano.TxSubmissionErrors.OutsideOfValidityIntervalError) {
     const details = JSON.parse(err.message) as OutsideOfValidityInterval['outsideOfValidityInterval'];
 
-    if (details.interval.invalidBefore && details.currentSlot <= details.interval.invalidBefore) isRetriable = true;
+    if (details.interval.invalidBefore && details.currentSlot <= details.interval.invalidBefore) isRetryable = true;
   }
 
-  return { isRetriable, serializableError };
+  return { isRetryable, serializableError };
 };
 
 // Workaround inspired to https://github.com/amqp-node/amqplib/issues/250#issuecomment-888558719

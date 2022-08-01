@@ -23,54 +23,59 @@ const mockResults: Record<string, unknown> = {
   }
 };
 
-export const mockTokenRegistry = async (
-  handler: (req?: IncomingMessage) => { body?: unknown; code?: number } = () => ({})
-) => {
-  const port = await getRandomPort();
-  const server = createServer(async (req, res) => {
-    const { body, code } = handler(req);
+export const mockTokenRegistry = (handler: (req?: IncomingMessage) => { body?: unknown; code?: number } = () => ({})) =>
+  // eslint-disable-next-line func-call-spacing
+  new Promise<{ closeMock: () => Promise<void>; tokenMetadataServerUrl: string }>(async (resolve, reject) => {
+    try {
+      const port = await getRandomPort();
+      const server = createServer(async (req, res) => {
+        const { body, code } = handler(req);
 
-    res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Content-Type', 'application/json');
 
-    if (body) {
-      res.statusCode = code || 200;
+        if (body) {
+          res.statusCode = code || 200;
 
-      return res.end(JSON.stringify(body));
+          return res.end(JSON.stringify(body));
+        }
+
+        const buffers: Buffer[] = [];
+        for await (const chunk of req) buffers.push(chunk);
+        const data = Buffer.concat(buffers).toString();
+        const subjects: unknown[] = [];
+
+        for (const subject of JSON.parse(data).subjects) {
+          const mockResult = mockResults[subject as string];
+
+          if (mockResult) subjects.push(mockResult);
+        }
+
+        return res.end(JSON.stringify({ subjects }));
+      });
+
+      let resolver: () => void = jest.fn();
+      let rejecter: (reason: unknown) => void = jest.fn();
+
+      // eslint-disable-next-line @typescript-eslint/no-shadow
+      const closePromise = new Promise<void>((resolve, reject) => {
+        resolver = resolve;
+        rejecter = reject;
+      });
+
+      server.on('error', rejecter);
+      server.listen(port, 'localhost', () =>
+        resolve({
+          closeMock: () => {
+            server.close((error) => (error ? rejecter(error) : resolver()));
+            return closePromise;
+          },
+          tokenMetadataServerUrl: `http://localhost:${port}`
+        })
+      );
+    } catch (error) {
+      reject(error);
     }
-
-    const buffers: Buffer[] = [];
-    for await (const chunk of req) buffers.push(chunk);
-    const data = Buffer.concat(buffers).toString();
-    const subjects: unknown[] = [];
-
-    for (const subject of JSON.parse(data).subjects) {
-      const mockResult = mockResults[subject as string];
-
-      if (mockResult) subjects.push(mockResult);
-    }
-
-    return res.end(JSON.stringify({ subjects }));
   });
-
-  let resolver: () => void = jest.fn();
-  let rejecter: (reason: unknown) => void = jest.fn();
-
-  const closePromise = new Promise<void>((resolve, reject) => {
-    resolver = resolve;
-    rejecter = reject;
-  });
-
-  server.listen(port, 'localhost');
-  server.on('error', rejecter);
-
-  return {
-    closeMock: () => {
-      server.close((error) => (error ? rejecter(error) : resolver()));
-      return closePromise;
-    },
-    tokenMetadataServerUrl: `http://localhost:${port}`
-  };
-};
 
 const testDescription = 'test description';
 const testName = 'test name';

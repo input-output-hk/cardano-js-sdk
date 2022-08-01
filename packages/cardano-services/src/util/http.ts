@@ -13,8 +13,6 @@ export const listenPromise = (
 
 export const serverClosePromise = (server: http.Server): Promise<void> =>
   new Promise((resolve, reject) => {
-    server.on('close', resolve);
-    server.close((error) => {
-      if (error !== undefined) reject(error);
-    });
+    server.once('close', resolve);
+    server.close((error) => (error ? reject(error) : null));
   });

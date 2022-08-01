@@ -3,7 +3,8 @@
 /* eslint-disable max-len */
 import { ChildProcess, fork } from 'child_process';
 import { Ogmios } from '@cardano-sdk/ogmios';
-import { RABBITMQ_URL_DEFAULT, ServiceNames } from '../src';
+import { RabbitMQContainer } from '../../rabbitmq/test/docker';
+import { ServiceNames } from '../src';
 import { createHealthyMockOgmiosServer, createUnhealthyMockOgmiosServer, ogmiosServerReady, serverReady } from './util';
 import { fromSerializableObject } from '@cardano-sdk/util';
 import { getRandomPort } from 'get-port-please';
@@ -24,10 +25,17 @@ const assertServiceHealthy = async (apiUrl: string, serviceName: ServiceNames) =
 };
 
 describe('entrypoints', () => {
+  const container = new RabbitMQContainer();
+
   let apiPort: number;
   let apiUrl: string;
   let ogmiosServer: http.Server;
   let proc: ChildProcess;
+  let rabbitmqUrl: URL;
+
+  beforeAll(async () => {
+    ({ rabbitmqUrl } = await container.load());
+  });
 
   beforeEach(async () => {
     apiPort = await getRandomPort();
@@ -736,7 +744,7 @@ describe('entrypoints', () => {
             'error',
             '--use-queue',
             '--rabbitmq-url',
-            RABBITMQ_URL_DEFAULT,
+            rabbitmqUrl.toString(),
             ServiceNames.TxSubmit
           ],
           {
@@ -751,7 +759,7 @@ describe('entrypoints', () => {
           env: {
             API_URL: apiUrl,
             LOGGER_MIN_SEVERITY: 'error',
-            RABBITMQ_URL: RABBITMQ_URL_DEFAULT,
+            RABBITMQ_URL: rabbitmqUrl.toString(),
             SERVICE_NAMES: ServiceNames.TxSubmit,
             USE_QUEUE: 'true'
           },
@@ -762,7 +770,9 @@ describe('entrypoints', () => {
     });
 
     describe('with RabbitMQ and default URL', () => {
-      it('cli:start-server', async () => {
+      it('cli:start-server', (done) => {
+        expect.assertions(2);
+
         proc = fork(
           exePath('cli'),
           ['start-server', '--api-url', apiUrl, '--logger-min-severity', 'error', '--use-queue', ServiceNames.TxSubmit],
@@ -770,10 +780,18 @@ describe('entrypoints', () => {
             stdio: 'pipe'
           }
         );
-        await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit);
+
+        proc.stderr!.on('data', (data) => expect(data.toString()).toMatch('ProviderError: UNHEALTHY'));
+
+        proc.on('exit', (code) => {
+          expect(code).toBe(1);
+          done();
+        });
       });
 
-      it('run', async () => {
+      it('run', (done) => {
+        expect.assertions(2);
+
         proc = fork(exePath('run'), {
           env: {
             API_URL: apiUrl,
@@ -783,7 +801,13 @@ describe('entrypoints', () => {
           },
           stdio: 'pipe'
         });
-        await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit);
+
+        proc.stderr!.on('data', (data) => expect(data.toString()).toMatch('ProviderError: UNHEALTHY'));
+
+        proc.on('exit', (code) => {
+          expect(code).toBe(1);
+          done();
+        });
       });
     });
 
