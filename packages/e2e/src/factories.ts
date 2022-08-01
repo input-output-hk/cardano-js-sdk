@@ -81,10 +81,10 @@ faucetProviderFactory.register('cardano-wallet', CardanoWalletFaucetProvider.cre
 // Asset providers
 
 assetProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Logger): Promise<AssetProvider> => {
-  if (params.url === undefined) throw new Error(`${assetInfoHttpProvider.name}: ${MISSING_URL_PARAM}`);
+  if (params.baseUrl === undefined) throw new Error(`${assetInfoHttpProvider.name}: ${MISSING_URL_PARAM}`);
 
   return new Promise<AssetProvider>(async (resolve) => {
-    resolve(assetInfoHttpProvider({ baseUrl: params.url, logger }));
+    resolve(assetInfoHttpProvider({ baseUrl: params.baseUrl, logger }));
   });
 });
 
@@ -108,10 +108,10 @@ chainHistoryProviderFactory.register(
 chainHistoryProviderFactory.register(
   HTTP_PROVIDER,
   async (params: any, logger: Logger): Promise<ChainHistoryProvider> => {
-    if (params.url === undefined) throw new Error(`${chainHistoryHttpProvider.name}: ${MISSING_URL_PARAM}`);
+    if (params.baseUrl === undefined) throw new Error(`${chainHistoryHttpProvider.name}: ${MISSING_URL_PARAM}`);
 
     return new Promise<ChainHistoryProvider>(async (resolve) => {
-      resolve(chainHistoryHttpProvider({ baseUrl: params.url, logger }));
+      resolve(chainHistoryHttpProvider({ baseUrl: params.baseUrl, logger }));
     });
   }
 );
@@ -128,10 +128,10 @@ networkInfoProviderFactory.register(
 networkInfoProviderFactory.register(
   HTTP_PROVIDER,
   async (params: any, logger: Logger): Promise<NetworkInfoProvider> => {
-    if (params.url === undefined) throw new Error(`${networkInfoHttpProvider.name}: ${MISSING_URL_PARAM}`);
+    if (params.baseUrl === undefined) throw new Error(`${networkInfoHttpProvider.name}: ${MISSING_URL_PARAM}`);
 
     return new Promise<NetworkInfoProvider>(async (resolve) => {
-      resolve(networkInfoHttpProvider({ baseUrl: params.url, logger }));
+      resolve(networkInfoHttpProvider({ baseUrl: params.baseUrl, logger }));
     });
   }
 );
@@ -146,10 +146,10 @@ rewardsProviderFactory.register(
 );
 
 rewardsProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Logger): Promise<RewardsProvider> => {
-  if (params.url === undefined) throw new Error(`${rewardsHttpProvider.name}: ${MISSING_URL_PARAM}`);
+  if (params.baseUrl === undefined) throw new Error(`${rewardsHttpProvider.name}: ${MISSING_URL_PARAM}`);
 
   return new Promise<RewardsProvider>(async (resolve) => {
-    resolve(rewardsHttpProvider({ baseUrl: params.url, logger }));
+    resolve(rewardsHttpProvider({ baseUrl: params.baseUrl, logger }));
   });
 });
 
@@ -163,12 +163,12 @@ txSubmitProviderFactory.register(
 );
 
 txSubmitProviderFactory.register(OGMIOS_PROVIDER, async (params: any): Promise<TxSubmitProvider> => {
-  if (params.url === undefined) throw new Error(`${ogmiosTxSubmitProvider.name}: ${MISSING_URL_PARAM}`);
+  if (params.baseUrl === undefined) throw new Error(`${ogmiosTxSubmitProvider.name}: ${MISSING_URL_PARAM}`);
 
   const connectionConfig = {
-    host: params.url.hostname,
-    port: params.url.port ? Number.parseInt(params.url.port) : undefined,
-    tls: params.url?.protocol === 'wss'
+    host: params.baseUrl.hostname,
+    port: params.baseUrl.port ? Number.parseInt(params.baseUrl.port) : undefined,
+    tls: params.baseUrl?.protocol === 'wss'
   };
 
   return new Promise<TxSubmitProvider>(async (resolve) => {
@@ -177,10 +177,10 @@ txSubmitProviderFactory.register(OGMIOS_PROVIDER, async (params: any): Promise<T
 });
 
 txSubmitProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Logger): Promise<TxSubmitProvider> => {
-  if (params.url === undefined) throw new Error(`${txSubmitHttpProvider.name}: ${MISSING_URL_PARAM}`);
+  if (params.baseUrl === undefined) throw new Error(`${txSubmitHttpProvider.name}: ${MISSING_URL_PARAM}`);
 
   return new Promise<TxSubmitProvider>(async (resolve) => {
-    resolve(txSubmitHttpProvider({ baseUrl: params.url, logger }));
+    resolve(txSubmitHttpProvider({ baseUrl: params.baseUrl, logger }));
   });
 });
 
@@ -194,10 +194,10 @@ utxoProviderFactory.register(
 );
 
 utxoProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Logger): Promise<UtxoProvider> => {
-  if (params.url === undefined) throw new Error(`${utxoHttpProvider.name}: ${MISSING_URL_PARAM}`);
+  if (params.baseUrl === undefined) throw new Error(`${utxoHttpProvider.name}: ${MISSING_URL_PARAM}`);
 
   return new Promise<UtxoProvider>(async (resolve) => {
-    resolve(utxoHttpProvider({ baseUrl: params.url, logger }));
+    resolve(utxoHttpProvider({ baseUrl: params.baseUrl, logger }));
   });
 });
 
@@ -211,10 +211,10 @@ stakePoolProviderFactory.register(
 );
 
 stakePoolProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Logger): Promise<StakePoolProvider> => {
-  if (params.url === undefined) throw new Error(`${stakePoolHttpProvider.name}: ${MISSING_URL_PARAM}`);
+  if (params.baseUrl === undefined) throw new Error(`${stakePoolHttpProvider.name}: ${MISSING_URL_PARAM}`);
 
   return new Promise<StakePoolProvider>(async (resolve) => {
-    resolve(stakePoolHttpProvider({ baseUrl: params.url, logger }));
+    resolve(stakePoolHttpProvider({ baseUrl: params.baseUrl, logger }));
   });
 });
 
