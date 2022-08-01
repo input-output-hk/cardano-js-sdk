@@ -31,7 +31,7 @@ describe('RabbitMqTxSubmitProvider', () => {
     it('is ok if can connect', async () => {
       provider = new RabbitMqTxSubmitProvider({ rabbitmqUrl: GOOD_CONNECTION_URL });
       const resA = await provider.healthCheck();
-      // Call again to cover the idemopotent RabbitMqTxSubmitProvider.#connectAndCreateChannel() operation
+      // Call again to cover the idempotent RabbitMqTxSubmitProvider.#connectAndCreateChannel() operation
       const resB = await provider.healthCheck();
       expect(resA).toEqual({ ok: true });
       expect(resB).toEqual({ ok: true });
@@ -45,7 +45,7 @@ describe('RabbitMqTxSubmitProvider', () => {
         const txs = await txsPromise;
         provider = new RabbitMqTxSubmitProvider({ rabbitmqUrl }, { logger });
         const resA = await provider.submitTx(txs[0].txBodyUint8Array);
-        // Called again to cover the idemopotent RabbitMqTxSubmitProvider.#ensureQueue() operation
+        // Called again to cover the idempotent RabbitMqTxSubmitProvider.#ensureQueue() operation
         const resB = await provider.submitTx(txs[1].txBodyUint8Array);
         expect(resA).toBeUndefined();
         expect(resB).toBeUndefined();

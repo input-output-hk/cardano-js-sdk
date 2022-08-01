@@ -106,7 +106,7 @@ export class RabbitMqTxSubmitProvider implements TxSubmitProvider {
   }
 
   /**
-   * Closes the connection to RabbitMQ and (for interl purposes) it resets the state as well
+   * Closes the connection to RabbitMQ and (for internal purposes) it resets the state as well
    */
   async close() {
     // Wait for pending operations before closing

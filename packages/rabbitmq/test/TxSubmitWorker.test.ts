@@ -85,7 +85,7 @@ describe('TxSubmitWorker', () => {
   });
 
   describe('error while tx submission', () => {
-    describe('tx submission is retried if the error is retiable', () => {
+    describe('tx submission is retried if the error is retryable', () => {
       // eslint-disable-next-line unicorn/consistent-function-scoping
       const performTest = async (options: { parallel: boolean }) => {
         const spy = jest.fn();
@@ -101,10 +101,10 @@ describe('TxSubmitWorker', () => {
             (async () => {
               if (hookAlreadyCalled) return;
 
-              // This hook may be called multple times... ensure the core is executed only once
+              // This hook may be called multiple times... ensure the core is executed only once
               hookAlreadyCalled = true;
 
-              // Stop the failing mock and start the succes one
+              // Stop the failing mock and start the success one
               await serverClosePromise(failMock);
               successMockListenPromise = listenPromise(successMock, port);
             })();
