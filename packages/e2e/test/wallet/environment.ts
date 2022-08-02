@@ -11,8 +11,6 @@ export const env = envalid.cleanEnv(process.env, {
   LOGGER_MIN_SEVERITY: envalid.str({ default: 'info' }),
   NETWORK_INFO_PROVIDER: envalid.str(),
   NETWORK_INFO_PROVIDER_PARAMS: envalid.json({ default: {} }),
-  POOL_ID_1: envalid.str(),
-  POOL_ID_2: envalid.str(),
   REWARDS_PROVIDER: envalid.str(),
   REWARDS_PROVIDER_PARAMS: envalid.json({ default: {} }),
   STAKE_POOL_PROVIDER: envalid.str(),

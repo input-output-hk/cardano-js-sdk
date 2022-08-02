@@ -8,9 +8,6 @@ import { getWallet } from '../../../src/factories';
 
 import { combineLatest, filter, firstValueFrom } from 'rxjs';
 
-export const poolId1 = Cardano.PoolId(env.POOL_ID_1);
-export const poolId2 = Cardano.PoolId(env.POOL_ID_2);
-
 const getWalletStateSnapshot = async (wallet: ObservableWallet) => {
   const [rewardAccount] = await firstValueFrom(wallet.delegation.rewardAccounts$);
   const balanceAvailable = await firstValueFrom(wallet.balance.utxo.available$);
@@ -29,28 +26,22 @@ const getWalletStateSnapshot = async (wallet: ObservableWallet) => {
 };
 type WalletStateSnapshot = Awaited<ReturnType<typeof getWalletStateSnapshot>>;
 
-const createDelegationCertificates = ({
-  epoch,
-  isStakeKeyRegistered,
-  rewardAccount: { delegatee: delegateeBefore1stTx, address: rewardAccount }
-}: WalletStateSnapshot) => {
-  // swap poolId if it's already delegating to one of the pools
-  const poolId = delegateeBefore1stTx?.nextNextEpoch?.id === poolId2 ? poolId1 : poolId2;
+const createDelegationCertificates = (
+  { epoch, isStakeKeyRegistered, rewardAccount: { address: rewardAccount } }: WalletStateSnapshot,
+  poolId: Cardano.PoolId
+) => {
   const stakeKeyHash = Cardano.Ed25519KeyHash.fromRewardAccount(rewardAccount);
-  return {
-    certificates: [
-      ...(isStakeKeyRegistered
-        ? []
-        : ([
-            {
-              __typename: Cardano.CertificateType.StakeKeyRegistration,
-              stakeKeyHash
-            }
-          ] as Cardano.Certificate[])),
-      { __typename: Cardano.CertificateType.StakeDelegation, epoch, poolId, stakeKeyHash }
-    ] as Cardano.Certificate[],
-    poolId
-  };
+  return [
+    ...(isStakeKeyRegistered
+      ? []
+      : ([
+          {
+            __typename: Cardano.CertificateType.StakeKeyRegistration,
+            stakeKeyHash
+          }
+        ] as Cardano.Certificate[])),
+    { __typename: Cardano.CertificateType.StakeDelegation, epoch, poolId, stakeKeyHash }
+  ] as Cardano.Certificate[];
 };
 
 const waitForTx = async (wallet: ObservableWallet, { hash }: Transaction.TxInternals) => {
@@ -75,7 +66,7 @@ describe('SingleAddressWallet/delegation', () => {
     wallet1 = await getWallet({ env, idx: 0, name: 'Test Wallet 1' });
     wallet2 = await getWallet({ env, idx: 1, name: 'Test Wallet 2' });
 
-    await Promise.all([waitForWalletStateSettle(wallet1), waitForWalletStateSettle(wallet2)]);
+    await Promise.all([waitForWalletStateSettle(wallet1.wallet), waitForWalletStateSettle(wallet2.wallet)]);
   });
 
   afterAll(() => {
@@ -89,6 +80,16 @@ describe('SingleAddressWallet/delegation', () => {
     return wallet1Balance.coins > wallet2Balance.coins
       ? [wallet1.wallet, wallet2.wallet]
       : [wallet2.wallet, wallet1.wallet];
+  };
+
+  const chooseDifferentPoolIdRandomly = async (delegateeBefore1stTx?: Cardano.PoolId): Promise<Cardano.PoolId> => {
+    const activePools = await wallet1.providers.stakePoolProvider.queryStakePools({
+      filters: { status: [Cardano.StakePoolStatus.Active] },
+      pagination: { limit: 2, startAt: 0 }
+    });
+    return activePools.pageResults.filter(({ id }) => id !== delegateeBefore1stTx)[
+      Math.floor(Math.random() * activePools.pageResults.length)
+    ].id;
   };
 
   test('delegation preconditions', async () => {
@@ -110,8 +111,8 @@ describe('SingleAddressWallet/delegation', () => {
     expect(initialState.balance.total.coins).toBeGreaterThan(0n);
     expect(initialState.balance.total.coins).toBe(initialState.balance.available.coins);
     const tx1OutputCoins = 1_000_000n;
-
-    const { poolId, certificates } = createDelegationCertificates(initialState);
+    const poolId = await chooseDifferentPoolIdRandomly(initialState.rewardAccount.delegatee?.nextNextEpoch?.id);
+    const certificates = createDelegationCertificates(initialState, poolId);
     const initialDeposit = initialState.isStakeKeyRegistered ? stakeKeyDeposit : 0n;
     expect(initialState.balance.deposit).toBe(initialDeposit);
 
