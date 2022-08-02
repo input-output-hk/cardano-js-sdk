@@ -1,6 +1,7 @@
 /* eslint-disable sonarjs/no-identical-functions */
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable max-len */
+import { DbSyncEpochPollService, EpochMonitor } from '../../../src/util';
 import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../../src/NetworkInfo';
 import { HttpServer, HttpServerConfig, createDnsResolver, getPool } from '../../../src';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../../src/InMemoryCache';
@@ -37,6 +38,7 @@ describe('Service dependency abstractions', () => {
     let config: HttpServerConfig;
     let service: NetworkInfoHttpService;
     let networkInfoProvider: DbSyncNetworkInfoProvider;
+    let epochMonitor: EpochMonitor;
 
     beforeAll(async () => {
       db = await getPool(dnsResolver, logger, {
@@ -56,9 +58,10 @@ describe('Service dependency abstractions', () => {
         port = await getPort();
         config = { listen: { port } };
         apiUrlBase = `http://localhost:${port}/network-info`;
+        epochMonitor = new DbSyncEpochPollService(db!, 10_000);
         networkInfoProvider = new DbSyncNetworkInfoProvider(
-          { cardanoNodeConfigPath, epochPollInterval: 2000 },
-          { cache, cardanoNode, db: db!, logger }
+          { cardanoNodeConfigPath },
+          { cache, cardanoNode, db: db!, epochMonitor, logger }
         );
         service = new NetworkInfoHttpService({ logger, networkInfoProvider });
         httpServer = new HttpServer(config, { logger, services: [service] });
@@ -96,6 +99,7 @@ describe('Service dependency abstractions', () => {
     let config: HttpServerConfig;
     let service: NetworkInfoHttpService;
     let networkInfoProvider: DbSyncNetworkInfoProvider;
+    let epochMonitor: EpochMonitor;
 
     beforeAll(async () => {
       db = await getPool(dnsResolver, logger, {
@@ -110,9 +114,10 @@ describe('Service dependency abstractions', () => {
         port = await getPort();
         config = { listen: { port } };
         apiUrlBase = `http://localhost:${port}/network-info`;
+        epochMonitor = new DbSyncEpochPollService(db!, 1000);
         networkInfoProvider = new DbSyncNetworkInfoProvider(
-          { cardanoNodeConfigPath, epochPollInterval: 2000 },
-          { cache, cardanoNode, db: db!, logger }
+          { cardanoNodeConfigPath },
+          { cache, cardanoNode, db: db!, epochMonitor, logger }
         );
         service = new NetworkInfoHttpService({ logger, networkInfoProvider });
         httpServer = new HttpServer(config, { logger, services: [service] });

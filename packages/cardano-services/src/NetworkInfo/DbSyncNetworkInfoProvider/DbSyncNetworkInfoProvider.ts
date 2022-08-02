@@ -9,46 +9,45 @@ import {
   SupplySummary
 } from '@cardano-sdk/core';
 import { DbSyncProvider } from '../../DbSyncProvider';
+import { Disposer, EpochMonitor } from '../../util/polling/types';
 import { GenesisData } from './types';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../InMemoryCache';
 import { Logger } from 'ts-log';
 import { NetworkInfoBuilder } from './NetworkInfoBuilder';
 import { NetworkInfoCacheKey } from '.';
 import { Pool } from 'pg';
-import { Shutdown } from '@cardano-sdk/util';
-import { epochPollService } from './utils';
 import { loadGenesisData, toGenesisParams, toLedgerTip, toSupply, toWalletProtocolParams } from './mappers';
 
 export interface NetworkInfoProviderProps {
   cardanoNodeConfigPath: string;
-  epochPollInterval: number;
 }
 export interface NetworkInfoProviderDependencies {
   db: Pool;
   cache: InMemoryCache;
   logger: Logger;
   cardanoNode: CardanoNode;
+  epochMonitor: EpochMonitor;
 }
 export class DbSyncNetworkInfoProvider extends DbSyncProvider implements NetworkInfoProvider {
   #logger: Logger;
   #cache: InMemoryCache;
   #builder: NetworkInfoBuilder;
   #genesisDataReady: Promise<GenesisData>;
-  #epochPollInterval: number;
-  #epochPollService: Shutdown | null;
+  #epochMonitor: EpochMonitor;
+  #epochRolloverDisposer: Disposer;
   #cardanoNode: CardanoNode;
 
   constructor(
-    { cardanoNodeConfigPath, epochPollInterval }: NetworkInfoProviderProps,
-    { db, cache, logger, cardanoNode }: NetworkInfoProviderDependencies
+    { cardanoNodeConfigPath }: NetworkInfoProviderProps,
+    { db, cache, logger, cardanoNode, epochMonitor }: NetworkInfoProviderDependencies
   ) {
     super(db);
     this.#logger = logger;
     this.#cache = cache;
+    this.#cardanoNode = cardanoNode;
+    this.#epochMonitor = epochMonitor;
     this.#builder = new NetworkInfoBuilder(db, logger);
     this.#genesisDataReady = loadGenesisData(cardanoNodeConfigPath);
-    this.#epochPollInterval = epochPollInterval;
-    this.#cardanoNode = cardanoNode;
   }
 
   public async ledgerTip(): Promise<Cardano.Tip> {
@@ -106,19 +105,11 @@ export class DbSyncNetworkInfoProvider extends DbSyncProvider implements Network
   }
 
   async start(): Promise<void> {
-    await this.#cardanoNode.initialize();
-    if (!this.#epochPollService)
-      this.#epochPollService = epochPollService(
-        this.#cache,
-        () => this.#builder.queryLatestEpoch(),
-        this.#epochPollInterval
-      );
+    this.#epochRolloverDisposer = this.#epochMonitor.onEpochRollover(() => this.#cache.clear());
   }
 
   async close(): Promise<void> {
-    this.#epochPollService?.shutdown();
-    this.#epochPollService = null;
     this.#cache.shutdown();
-    await this.#cardanoNode.shutdown();
+    this.#epochRolloverDisposer();
   }
 }

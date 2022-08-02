@@ -15,7 +15,7 @@ import {
 import { DB_CACHE_TTL_DEFAULT } from './InMemoryCache';
 import { DEFAULT_TOKEN_METADATA_CACHE_TTL, DEFAULT_TOKEN_METADATA_SERVER_URL } from './Asset';
 import { ENABLE_METRICS_DEFAULT, USE_QUEUE_DEFAULT } from './ProgramsCommon';
-import { EPOCH_POLL_INTERVAL_DEFAULT } from './NetworkInfo';
+import { EPOCH_POLL_INTERVAL_DEFAULT } from './util';
 import { LogLevel } from 'bunyan';
 import { URL } from 'url';
 import { cacheTtlValidator } from './util/validators';

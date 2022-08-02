@@ -1,7 +1,8 @@
-import { Cardano, StakePoolSearchResults, StakePoolStats } from '@cardano-sdk/core';
+import { Cardano, StakePoolStats } from '@cardano-sdk/core';
 import {
   EpochReward,
   EpochRewardModel,
+  HashIdStakePoolMap,
   OwnerAddressModel,
   PoolAPY,
   PoolAPYModel,
@@ -17,7 +18,9 @@ import {
   PoolRetirementModel,
   PoolUpdate,
   PoolUpdateModel,
+  PoolsToCache,
   RelayModel,
+  StakePoolResults,
   StakePoolStatsModel
 } from './types';
 import { isNotNil } from '@cardano-sdk/util';
@@ -51,8 +54,9 @@ interface ToCoreStakePoolInput {
   poolAPYs: PoolAPY[];
 }
 
-export const toCoreStakePool = (
+export const toStakePoolResults = (
   poolHashIds: number[],
+  fromCache: HashIdStakePoolMap,
   {
     poolOwners,
     poolDatas,
@@ -65,40 +69,59 @@ export const toCoreStakePool = (
     totalCount,
     poolAPYs
   }: ToCoreStakePoolInput
-): StakePoolSearchResults => ({
-  pageResults: poolHashIds
-    .map((hashId) => {
-      const poolData = poolDatas.find((data) => data.hashId === hashId);
-      if (!poolData) return;
-      const apy = poolAPYs.find((pool) => pool.hashId === hashId)?.apy;
-      const registrations = poolRegistrations.filter((r) => r.hashId === poolData.hashId);
-      const retirements = poolRetirements.filter((r) => r.hashId === poolData.hashId);
-      const metrics = poolMetrics.find((metric) => metric.hashId === poolData.hashId)?.metrics;
-      const toReturn: Cardano.StakePool = {
-        cost: poolData.cost,
-        epochRewards: poolRewards.filter((r) => r.hashId === poolData.hashId).map((reward) => reward.epochReward),
-        hexId: poolData.hexId,
-        id: poolData.id,
-        margin: poolData.margin,
-        metrics: metrics ? { ...metrics, apy } : ({} as Cardano.StakePoolMetrics),
-        owners: poolOwners.filter((o) => o.hashId === poolData.hashId).map((o) => o.address),
-        pledge: poolData.pledge,
-        relays: poolRelays.filter((r) => r.updateId === poolData.updateId).map((r) => r.relay),
-        rewardAccount: poolData.rewardAccount,
-        status: getPoolStatus(registrations[0], lastEpoch, retirements[0]),
-        transactions: {
-          registration: registrations.map((r) => r.transactionId),
-          retirement: retirements.map((r) => r.transactionId)
-        },
-        vrf: poolData.vrfKeyHash
-      };
-      if (poolData.metadata) toReturn.metadata = poolData.metadata;
-      if (poolData.metadataJson) toReturn.metadataJson = poolData.metadataJson;
-      return toReturn;
-    })
-    .filter(isNotNil),
-  totalResultCount: Number(totalCount)
-});
+): StakePoolResults => {
+  const poolsToCache: PoolsToCache = {};
+  return {
+    poolsToCache,
+    results: {
+      pageResults: poolHashIds
+        .map((hashId) => {
+          const poolData = poolDatas.find((data) => data.hashId === hashId);
+          if (!poolData) return;
+
+          const epochRewards = poolRewards
+            .filter((r) => r.hashId === poolData.hashId)
+            .map((reward) => reward.epochReward);
+
+          // Get the cached value if given hash id persist in the in-memory cache
+          if (fromCache[hashId]) return { ...fromCache[hashId], epochRewards } as Cardano.StakePool;
+
+          const apy = poolAPYs.find((pool) => pool.hashId === hashId)?.apy;
+          const registrations = poolRegistrations.filter((r) => r.hashId === poolData.hashId);
+          const retirements = poolRetirements.filter((r) => r.hashId === poolData.hashId);
+          const metrics = poolMetrics.find((metric) => metric.hashId === poolData.hashId)?.metrics;
+
+          const coreStakePool: Cardano.StakePool = {
+            cost: poolData.cost,
+            epochRewards,
+            hexId: poolData.hexId,
+            id: poolData.id,
+            margin: poolData.margin,
+            metrics: metrics ? { ...metrics, apy } : ({} as Cardano.StakePoolMetrics),
+            owners: poolOwners.filter((o) => o.hashId === poolData.hashId).map((o) => o.address),
+            pledge: poolData.pledge,
+            relays: poolRelays.filter((r) => r.updateId === poolData.updateId).map((r) => r.relay),
+            rewardAccount: poolData.rewardAccount,
+            status: getPoolStatus(registrations[0], lastEpoch, retirements[0]),
+            transactions: {
+              registration: registrations.map((r) => r.transactionId),
+              retirement: retirements.map((r) => r.transactionId)
+            },
+            vrf: poolData.vrfKeyHash
+          };
+          if (poolData.metadata) coreStakePool.metadata = poolData.metadata;
+          if (poolData.metadataJson) coreStakePool.metadataJson = poolData.metadataJson;
+
+          // Mark stake pool as pool to cache
+          poolsToCache[hashId] = coreStakePool;
+
+          return coreStakePool;
+        })
+        .filter(isNotNil),
+      totalResultCount: Number(totalCount)
+    }
+  };
+};
 
 export const mapPoolUpdate = (poolUpdateModel: PoolUpdateModel): PoolUpdate => ({
   id: poolUpdateModel.id,
