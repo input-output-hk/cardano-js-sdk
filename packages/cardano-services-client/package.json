@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/cardano-services-client",
-  "version": "0.4.1-nightly.1",
+  "version": "0.4.1-nightly.2",
   "description": "Cardano Services Client",
   "engines": {
     "node": "^14"
@@ -64,8 +64,8 @@
     "typescript": "^4.7.4"
   },
   "dependencies": {
-    "@cardano-sdk/core": "^0.5.0-nightly.0",
-    "@cardano-sdk/util": "^0.4.1-nightly.0",
+    "@cardano-sdk/core": "^0.5.0-nightly.1",
+    "@cardano-sdk/util": "^0.4.1-nightly.1",
     "axios": "^0.27.2",
     "class-validator": "^0.13.1",
     "json-bigint": "~1.0.0"

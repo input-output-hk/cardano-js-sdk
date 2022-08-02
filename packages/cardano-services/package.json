@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/cardano-services",
-  "version": "0.5.0-nightly.2",
+  "version": "0.5.0-nightly.3",
   "description": "Cardano GraphQL Services",
   "engines": {
     "node": "^14"
@@ -62,8 +62,8 @@
     "tscNoEmit": "shx echo typescript --noEmit command not implemented yet"
   },
   "devDependencies": {
-    "@cardano-sdk/cardano-services-client": "^0.4.1-nightly.1",
-    "@cardano-sdk/util-dev": "^0.4.1-nightly.0",
+    "@cardano-sdk/cardano-services-client": "^0.4.1-nightly.2",
+    "@cardano-sdk/util-dev": "^0.4.1-nightly.1",
     "@types/bunyan": "^1.8.8",
     "@types/clear": "^0.1.2",
     "@types/death": "^1.1.2",
@@ -90,10 +90,10 @@
     "wait-on": "^6.0.1"
   },
   "dependencies": {
-    "@cardano-sdk/core": "^0.5.0-nightly.0",
-    "@cardano-sdk/ogmios": "^0.4.1-nightly.0",
-    "@cardano-sdk/rabbitmq": "^0.4.1-nightly.0",
-    "@cardano-sdk/util": "^0.4.1-nightly.0",
+    "@cardano-sdk/core": "^0.5.0-nightly.1",
+    "@cardano-sdk/ogmios": "^0.4.1-nightly.1",
+    "@cardano-sdk/rabbitmq": "^0.4.1-nightly.1",
+    "@cardano-sdk/util": "^0.4.1-nightly.1",
     "body-parser": "^1.19.2",
     "bunyan": "^1.8.15",
     "clear": "^0.1.0",
