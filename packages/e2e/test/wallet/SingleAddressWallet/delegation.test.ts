@@ -67,8 +67,8 @@ const waitForTx = async (wallet: ObservableWallet, { hash }: Transaction.TxInter
 };
 
 describe('SingleAddressWallet/delegation', () => {
-  let wallet1: ObservableWallet;
-  let wallet2: ObservableWallet;
+  let wallet1: Awaited<ReturnType<typeof getWallet>>;
+  let wallet2: Awaited<ReturnType<typeof getWallet>>;
 
   beforeAll(async () => {
     jest.setTimeout(180_000);
@@ -79,19 +79,21 @@ describe('SingleAddressWallet/delegation', () => {
   });
 
   afterAll(() => {
-    wallet1.shutdown();
-    wallet2.shutdown();
+    wallet1.wallet.shutdown();
+    wallet2.wallet.shutdown();
   });
 
   const chooseWallets = async (): Promise<[ObservableWallet, ObservableWallet]> => {
-    const wallet1Balance = await firstValueFrom(wallet1.balance.utxo.available$);
-    const wallet2Balance = await firstValueFrom(wallet2.balance.utxo.available$);
-    return wallet1Balance.coins > wallet2Balance.coins ? [wallet1, wallet2] : [wallet2, wallet1];
+    const wallet1Balance = await firstValueFrom(wallet1.wallet.balance.utxo.available$);
+    const wallet2Balance = await firstValueFrom(wallet2.wallet.balance.utxo.available$);
+    return wallet1Balance.coins > wallet2Balance.coins
+      ? [wallet1.wallet, wallet2.wallet]
+      : [wallet2.wallet, wallet1.wallet];
   };
 
   test('delegation preconditions', async () => {
-    const addresses = await firstValueFrom(wallet1.addresses$);
-    const currentEpoch = await firstValueFrom(wallet1.currentEpoch$);
+    const addresses = await firstValueFrom(wallet1.wallet.addresses$);
+    const currentEpoch = await firstValueFrom(wallet1.wallet.currentEpoch$);
     expect(addresses[0].rewardAccount).toBeTruthy();
     expect(currentEpoch.epochNo).toBeGreaterThan(0);
   });

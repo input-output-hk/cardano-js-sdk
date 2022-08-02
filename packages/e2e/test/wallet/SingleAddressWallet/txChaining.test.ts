@@ -10,7 +10,7 @@ describe('SingleAddressWallet', () => {
 
   beforeAll(async () => {
     jest.setTimeout(180_000);
-    wallet = await getWallet({ env, name: 'Test Wallet' });
+    wallet = (await getWallet({ env, name: 'Test Wallet' })).wallet;
     await waitForWalletStateSettle(wallet);
   });
 

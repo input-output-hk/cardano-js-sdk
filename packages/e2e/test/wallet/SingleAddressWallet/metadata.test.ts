@@ -10,7 +10,7 @@ describe('SingleAddressWallet/metadata', () => {
   let ownAddress: Cardano.Address;
 
   beforeAll(async () => {
-    wallet = await getWallet({ env, name: 'Test Wallet' });
+    wallet = (await getWallet({ env, name: 'Test Wallet' })).wallet;
     ownAddress = (await firstValueFrom(wallet.addresses$))[0].address;
   });
 

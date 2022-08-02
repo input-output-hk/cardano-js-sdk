@@ -138,7 +138,7 @@ describe('load', () => {
   let address: Cardano.Address;
 
   const prepareWallets = async () => {
-    wallet = await getWallet({ env, name: 'Test Wallet' });
+    wallet = (await getWallet({ env, name: 'Test Wallet' })).wallet;
     ({ address } = (await firstValueFrom(wallet.addresses$))[0]);
 
     logger.debug('Waiting to settle wallet status');
