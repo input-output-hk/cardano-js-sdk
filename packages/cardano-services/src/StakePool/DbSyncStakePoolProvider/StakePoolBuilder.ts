@@ -180,7 +180,7 @@ export class StakePoolBuilder {
     const subQueries: SubQuery[] = [];
     const params = [];
     let query = Queries.findPools;
-    if (filters?.identifier) {
+    if (filters?.identifier && filters.identifier.values.length > 0) {
       const { id: _id, query: _query, params: _params } = this.buildPoolsByIdentifierQuery(filters.identifier);
       subQueries.push({ id: _id, query: _query });
       params.push(..._params);
@@ -200,18 +200,20 @@ export class StakePoolBuilder {
     }
     return { params, query };
   }
+  // eslint-disable-next-line max-statements
   public buildAndQuery(filters: StakePoolQueryOptions['filters']) {
     let query = Queries.findPools;
     let groupByClause = ' GROUP BY ph.id, pu.id ORDER BY ph.id DESC';
     const params = [];
     const whereClause = [];
+    const containsIdentifierCondition = filters?.identifier && filters.identifier.values.length > 0;
     if (filters?.pledgeMet !== undefined) {
       const { WITH_CLAUSE, SELECT_CLAUSE, JOIN_CLAUSE, WHERE_CLAUSE } = Queries.POOLS_WITH_PLEDGE_MET;
       query = WITH_CLAUSE + SELECT_CLAUSE + JOIN_CLAUSE;
       whereClause.push(WHERE_CLAUSE(filters.pledgeMet));
-      if (filters.identifier) {
+      if (containsIdentifierCondition) {
         query = addSentenceToQuery(query, `${getIdentifierFullJoinClause()}`);
-        const { where, params: identifierParams } = getIdentifierWhereClause(filters.identifier);
+        const { where, params: identifierParams } = getIdentifierWhereClause(filters!.identifier!);
         whereClause.push(where);
         params.push(...identifierParams);
       }
@@ -235,14 +237,14 @@ export class StakePoolBuilder {
     } else if (filters?.status) {
       query = `${Queries.STATUS_QUERY.WITH_CLAUSE} ${Queries.STATUS_QUERY.SELECT_CLAUSE}`;
       whereClause.push(getStatusWhereClause(filters.status));
-      if (filters?.identifier) {
+      if (containsIdentifierCondition) {
         query = addSentenceToQuery(query, Queries.IDENTIFIER_QUERY.JOIN_CLAUSE.OFFLINE_METADATA);
-        const { where, params: identifierParams } = getIdentifierWhereClause(filters.identifier);
+        const { where, params: identifierParams } = getIdentifierWhereClause(filters!.identifier!);
         whereClause.push(where);
         params.push(...identifierParams);
       }
-    } else if (filters?.identifier) {
-      const { where, params: identifierParams } = getIdentifierWhereClause(filters.identifier);
+    } else if (containsIdentifierCondition) {
+      const { where, params: identifierParams } = getIdentifierWhereClause(filters!.identifier!);
       query = `
         ${Queries.IDENTIFIER_QUERY.SELECT_CLAUSE}
         ${getIdentifierFullJoinClause()}

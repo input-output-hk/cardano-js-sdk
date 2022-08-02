@@ -1,5 +1,6 @@
 import { HealthCheckResponse, Provider } from '../../src/Provider/Provider';
 import { ProviderFactory } from '../../src';
+import { dummyLogger } from 'ts-log';
 
 // Mock providers.
 
@@ -75,8 +76,8 @@ describe('ProviderFactory', () => {
     factory.register(MockProviderB.name, MockProviderB.create);
 
     // Act
-    const providerA: Provider = await factory.create(MockProviderA.name, {});
-    const providerB: Provider = await factory.create(MockProviderB.name, {});
+    const providerA: Provider = await factory.create(MockProviderA.name, {}, dummyLogger);
+    const providerB: Provider = await factory.create(MockProviderB.name, {}, dummyLogger);
 
     const resultA = await providerA.healthCheck();
     const resultB = await providerB.healthCheck();
@@ -91,6 +92,8 @@ describe('ProviderFactory', () => {
     const factory = new ProviderFactory<Provider>();
 
     // Assert
-    expect(() => factory.create(MockProviderA.name, {})).toThrow(`Provider unsupported: ${MockProviderA.name}`);
+    expect(() => factory.create(MockProviderA.name, {}, dummyLogger)).toThrow(
+      `Provider unsupported: ${MockProviderA.name}`
+    );
   });
 });

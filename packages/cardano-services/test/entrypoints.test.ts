@@ -3,7 +3,8 @@
 /* eslint-disable max-len */
 import { ChildProcess, fork } from 'child_process';
 import { Ogmios } from '@cardano-sdk/ogmios';
-import { RABBITMQ_URL_DEFAULT, ServiceNames } from '../src';
+import { RabbitMQContainer } from '../../rabbitmq/test/docker';
+import { ServiceNames } from '../src';
 import { createHealthyMockOgmiosServer, createUnhealthyMockOgmiosServer, ogmiosServerReady, serverReady } from './util';
 import { fromSerializableObject } from '@cardano-sdk/util';
 import { getRandomPort } from 'get-port-please';
@@ -24,10 +25,17 @@ const assertServiceHealthy = async (apiUrl: string, serviceName: ServiceNames) =
 };
 
 describe('entrypoints', () => {
+  const container = new RabbitMQContainer();
+
   let apiPort: number;
   let apiUrl: string;
   let ogmiosServer: http.Server;
   let proc: ChildProcess;
+  let rabbitmqUrl: URL;
+
+  beforeAll(async () => {
+    ({ rabbitmqUrl } = await container.load());
+  });
 
   beforeEach(async () => {
     apiPort = await getRandomPort();
@@ -460,7 +468,44 @@ describe('entrypoints', () => {
           await ogmiosServerReady(ogmiosConnection);
         });
 
-        it('cli:start-server uses the default Ogmios configuration if not specified', async () => {
+        it('cli:start-server netrowk-info uses the default Ogmios configuration if not specified', async () => {
+          proc = fork(
+            exePath('cli'),
+            [
+              'start-server',
+              '--api-url',
+              apiUrl,
+              '--postgres-connection-string',
+              postgresConnectionString,
+              '--cardano-node-config-path',
+              cardanoNodeConfigPath,
+              '--logger-min-severity',
+              'error',
+              ServiceNames.NetworkInfo
+            ],
+            {
+              stdio: 'pipe'
+            }
+          );
+
+          await assertServiceHealthy(apiUrl, ServiceNames.NetworkInfo);
+        });
+
+        it('run network-info uses the default Ogmios configuration if not specified', async () => {
+          proc = fork(exePath('run'), {
+            env: {
+              API_URL: apiUrl,
+              CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
+              LOGGER_MIN_SEVERITY: 'error',
+              POSTGRES_CONNECTION_STRING: postgresConnectionString,
+              SERVICE_NAMES: ServiceNames.NetworkInfo
+            },
+            stdio: 'pipe'
+          });
+          await assertServiceHealthy(apiUrl, ServiceNames.NetworkInfo);
+        });
+
+        it('cli:start-server tx-submit uses the default Ogmios configuration if not specified', async () => {
           proc = fork(
             exePath('cli'),
             ['start-server', '--api-url', apiUrl, '--logger-min-severity', 'error', ServiceNames.TxSubmit],
@@ -471,7 +516,7 @@ describe('entrypoints', () => {
           await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit);
         });
 
-        it('run uses the default Ogmios configuration if not specified', async () => {
+        it('run tx-submit uses the default Ogmios configuration if not specified', async () => {
           proc = fork(exePath('run'), {
             env: {
               API_URL: apiUrl,
@@ -562,7 +607,75 @@ describe('entrypoints', () => {
         spy = jest.fn();
       });
 
-      it('cli:start-server throws DNS SRV error and exits with code 1', (done) => {
+      it('cli:start-server network-info throws DNS SRV error and exits with code 1', (done) => {
+        expect.assertions(3);
+        proc = fork(
+          exePath('cli'),
+          [
+            'start-server',
+            '--api-url',
+            apiUrl,
+            '--postgres-srv-service-name',
+            postgresSrvServiceName,
+            '--postgres-db',
+            postgresDb,
+            '--postgres-user',
+            postgresUser,
+            '--postgres-password',
+            postgresPassword,
+            '--ogmios-srv-service-name',
+            ogmiosSrvServiceName,
+            '--logger-min-severity',
+            'error',
+            '--service-discovery-timeout',
+            '1000',
+            ServiceNames.NetworkInfo
+          ],
+          {
+            stdio: 'pipe'
+          }
+        );
+
+        proc.stderr!.on('data', (data) => {
+          spy();
+          expect(data.toString().includes('querySrv ENOTFOUND')).toEqual(true);
+        });
+
+        proc.on('exit', (code) => {
+          expect(code).toBe(1);
+          expect(spy).toHaveBeenCalled();
+          done();
+        });
+      });
+
+      it('run network-info throws DNS SRV error and exits with code 1', (done) => {
+        expect.assertions(3);
+        proc = fork(exePath('run'), {
+          env: {
+            API_URL: apiUrl,
+            LOGGER_MIN_SEVERITY: 'error',
+            OGMIOS_SRV_SERVICE_NAME: ogmiosSrvServiceName,
+            POSTGRES_DB: postgresDb,
+            POSTGRES_PASSWORD: postgresPassword,
+            POSTGRES_SRV_SERVICE_NAME: postgresSrvServiceName,
+            POSTGRES_USER: postgresUser,
+            SERVICE_DISCOVERY_TIMEOUT: '1000',
+            SERVICE_NAMES: ServiceNames.NetworkInfo
+          },
+          stdio: 'pipe'
+        });
+        proc.stderr!.on('data', (data) => {
+          spy();
+          expect(data.toString().includes('querySrv ENOTFOUND')).toEqual(true);
+        });
+        proc.on('exit', (code) => {
+          expect(code).toBe(1);
+          expect(spy).toHaveBeenCalled();
+          done();
+        });
+      });
+
+      it('cli:start-server tx-submit throws DNS SRV error and exits with code 1', (done) => {
         expect.assertions(3);
         proc = fork(
           exePath('cli'),
@@ -595,7 +708,7 @@ describe('entrypoints', () => {
         });
       });
 
-      it('run throws DNS SRV error and exits with code 1', (done) => {
+      it('run tx-submit throws DNS SRV error and exits with code 1', (done) => {
         expect.assertions(3);
         proc = fork(exePath('run'), {
           env: {
@@ -631,7 +744,7 @@ describe('entrypoints', () => {
             'error',
             '--use-queue',
             '--rabbitmq-url',
-            RABBITMQ_URL_DEFAULT,
+            rabbitmqUrl.toString(),
             ServiceNames.TxSubmit
           ],
           {
@@ -646,7 +759,7 @@ describe('entrypoints', () => {
           env: {
             API_URL: apiUrl,
             LOGGER_MIN_SEVERITY: 'error',
-            RABBITMQ_URL: RABBITMQ_URL_DEFAULT,
+            RABBITMQ_URL: rabbitmqUrl.toString(),
             SERVICE_NAMES: ServiceNames.TxSubmit,
             USE_QUEUE: 'true'
           },
@@ -657,7 +770,9 @@ describe('entrypoints', () => {
     });
 
     describe('with RabbitMQ and default URL', () => {
-      it('cli:start-server', async () => {
+      it('cli:start-server', (done) => {
+        expect.assertions(2);
+
         proc = fork(
           exePath('cli'),
           ['start-server', '--api-url', apiUrl, '--logger-min-severity', 'error', '--use-queue', ServiceNames.TxSubmit],
@@ -665,10 +780,18 @@ describe('entrypoints', () => {
             stdio: 'pipe'
           }
         );
-        await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit);
+
+        proc.stderr!.on('data', (data) => expect(data.toString()).toMatch('ProviderError: UNHEALTHY'));
+
+        proc.on('exit', (code) => {
+          expect(code).toBe(1);
+          done();
+        });
       });
 
-      it('run', async () => {
+      it('run', (done) => {
+        expect.assertions(2);
+
         proc = fork(exePath('run'), {
           env: {
             API_URL: apiUrl,
@@ -678,7 +801,13 @@ describe('entrypoints', () => {
           },
           stdio: 'pipe'
         });
-        await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit);
+
+        proc.stderr!.on('data', (data) => expect(data.toString()).toMatch('ProviderError: UNHEALTHY'));
+
+        proc.on('exit', (code) => {
+          expect(code).toBe(1);
+          done();
+        });
       });
     });
 

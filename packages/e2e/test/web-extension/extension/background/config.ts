@@ -1,4 +1,6 @@
 /* eslint-disable sonarjs/no-small-switch */
+/* eslint-disable no-console */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as envalid from 'envalid';
 import {
   BlockFrostAPI,
@@ -9,28 +11,35 @@ import {
   blockfrostTxSubmitProvider,
   blockfrostUtxoProvider
 } from '@cardano-sdk/blockfrost';
-import { Cardano } from '@cardano-sdk/core';
-import { Logger } from 'ts-log';
+import {
+  assetInfoHttpProvider,
+  chainHistoryHttpProvider,
+  networkInfoHttpProvider,
+  rewardsHttpProvider,
+  txSubmitHttpProvider,
+  utxoHttpProvider
+} from '@cardano-sdk/cardano-services-client';
+import { createConnectionObject } from '@cardano-ogmios/client';
 import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
+import { ogmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
 import axiosFetchAdapter from '@vespaiach/axios-fetch-adapter';
 
-const loggerMethodNames = ['debug', 'error', 'fatal', 'info', 'trace', 'warn'] as (keyof Logger)[];
 const networkIdOptions = [0, 1];
-const stakePoolProviderOptions = ['stub'];
-const networkInfoProviderOptions = ['blockfrost'];
-const txSubmitProviderOptions = ['blockfrost'];
-const assetProviderOptions = ['blockfrost'];
-const utxoProviderOptions = ['blockfrost'];
-const rewardsProviderOptions = ['blockfrost'];
-const keyAgentOptions = ['InMemory'];
-const chainHistoryProviderOptions = ['blockfrost'];
+const stakePoolProviderOptions = ['stub', 'http'];
+const networkInfoProviderOptions = ['blockfrost', 'http'];
+const txSubmitProviderOptions = ['blockfrost', 'http'];
+const assetProviderOptions = ['blockfrost', 'http'];
+const utxoProviderOptions = ['blockfrost', 'http'];
+const rewardsProviderOptions = ['blockfrost', 'http'];
+const chainHistoryProviderOptions = ['blockfrost', 'http'];
 
 const env = envalid.cleanEnv(process.env, {
   ASSET_PROVIDER: envalid.str({ choices: assetProviderOptions }),
+  ASSET_PROVIDER_PARAMS: envalid.json({ default: {} }),
   BLOCKFROST_API_KEY: envalid.str(),
   CHAIN_HISTORY_PROVIDER: envalid.str({ choices: chainHistoryProviderOptions }),
-  KEY_AGENT: envalid.str({ choices: keyAgentOptions }),
-  LOGGER_MIN_SEVERITY: envalid.str({ choices: loggerMethodNames as string[], default: 'info' }),
+  CHAIN_HISTORY_PROVIDER_PARAMS: envalid.json({ default: {} }),
+  LOGGER_MIN_SEVERITY: envalid.str({ default: 'info' }),
   MNEMONIC_WORDS: envalid.makeValidator<string[]>((input) => {
     const words = input.split(' ');
     if (words.length === 0) throw new Error('MNEMONIC_WORDS not set');
@@ -38,20 +47,22 @@ const env = envalid.cleanEnv(process.env, {
   })(),
   NETWORK_ID: envalid.num({ choices: networkIdOptions }),
   NETWORK_INFO_PROVIDER: envalid.str({ choices: networkInfoProviderOptions }),
-  POOL_ID_1: envalid.str(),
-  POOL_ID_2: envalid.str(),
+  NETWORK_INFO_PROVIDER_PARAMS: envalid.json({ default: {} }),
   REWARDS_PROVIDER: envalid.str({ choices: rewardsProviderOptions }),
+  REWARDS_PROVIDER_PARAMS: envalid.json({ default: {} }),
   STAKE_POOL_PROVIDER: envalid.str({ choices: stakePoolProviderOptions }),
-  TX_SUBMIT_HTTP_URL: envalid.url(),
+  STAKE_POOL_PROVIDER_PARAMS: envalid.json({ default: {} }),
   TX_SUBMIT_PROVIDER: envalid.str({ choices: txSubmitProviderOptions }),
+  TX_SUBMIT_PROVIDER_PARAMS: envalid.json({ default: {} }),
   UTXO_PROVIDER: envalid.str({ choices: utxoProviderOptions }),
-  WALLET_PASSWORD: envalid.str()
+  UTXO_PROVIDER_PARAMS: envalid.json({ default: {} })
 });
+
+const logger = console;
+
 const isTestnet = env.NETWORK_ID === 0;
 const networkId = Number.parseInt(process.env.NETWORK_ID || '');
 if (Number.isNaN(networkId)) throw new Error('NETWORK_ID not set');
-
-const logger = console;
 
 // Sharing a single BlockFrostAPI object ensures rate limiting is shared across all blockfrost providers
 const blockfrostApi = [
@@ -75,23 +86,51 @@ const blockfrostApi = [
   : null;
 
 export const utxoProvider = (async () => {
-  if (env.UTXO_PROVIDER === 'blockfrost') {
-    return blockfrostUtxoProvider(await blockfrostApi!);
+  switch (env.UTXO_PROVIDER) {
+    case 'blockfrost': {
+      return blockfrostUtxoProvider(await blockfrostApi!);
+    }
+    case 'http': {
+      return utxoHttpProvider({ adapter: axiosFetchAdapter, baseUrl: env.UTXO_PROVIDER_PARAMS.url, logger });
+    }
+    default: {
+      throw new Error(`UTXO_PROVIDER unsupported: ${env.UTXO_PROVIDER}`);
+    }
   }
-  throw new Error(`UTXO_PROVIDER unsupported: ${env.UTXO_PROVIDER}`);
 })();
 
 export const assetProvider = (async () => {
-  if (env.ASSET_PROVIDER === 'blockfrost') {
-    return blockfrostAssetProvider(await blockfrostApi!);
+  switch (env.ASSET_PROVIDER) {
+    case 'blockfrost': {
+      return blockfrostAssetProvider(await blockfrostApi!);
+    }
+    case 'http': {
+      return assetInfoHttpProvider({ adapter: axiosFetchAdapter, baseUrl: env.ASSET_PROVIDER_PARAMS.url, logger });
+    }
+    default: {
+      throw new Error(`ASSET_PROVIDER unsupported: ${env.ASSET_PROVIDER}`);
+    }
   }
-  throw new Error(`ASSET_PROVIDER unsupported: ${env.ASSET_PROVIDER}`);
 })();
 
 export const txSubmitProvider = (async () => {
   switch (env.TX_SUBMIT_PROVIDER) {
     case 'blockfrost': {
       return blockfrostTxSubmitProvider(await blockfrostApi!);
+    }
+    case 'http': {
+      return txSubmitHttpProvider({ adapter: axiosFetchAdapter, baseUrl: env.TX_SUBMIT_PROVIDER_PARAMS.url, logger });
+    }
+    case 'ogmios': {
+      const connectionConfig = {
+        host: env.TX_SUBMIT_PROVIDER_PARAMS.url.hostname,
+        port: env.TX_SUBMIT_PROVIDER_PARAMS.url.port
+          ? Number.parseInt(env.TX_SUBMIT_PROVIDER_PARAMS.url.port)
+          : undefined,
+        tls: env.TX_SUBMIT_PROVIDER_PARAMS.url?.protocol === 'wss'
+      };
+
+      return ogmiosTxSubmitProvider(createConnectionObject(connectionConfig));
     }
     default: {
       throw new Error(`TX_SUBMIT_PROVIDER unsupported: ${env.TX_SUBMIT_PROVIDER}`);
@@ -100,10 +139,17 @@ export const txSubmitProvider = (async () => {
 })();
 
 export const rewardsProvider = (async () => {
-  if (env.REWARDS_PROVIDER === 'blockfrost') {
-    return blockfrostRewardsProvider(await blockfrostApi!);
+  switch (env.REWARDS_PROVIDER) {
+    case 'blockfrost': {
+      return blockfrostRewardsProvider(await blockfrostApi!);
+    }
+    case 'http': {
+      return rewardsHttpProvider({ adapter: axiosFetchAdapter, baseUrl: env.REWARDS_PROVIDER_PARAMS.url, logger });
+    }
+    default: {
+      throw new Error(`REWARDS_PROVIDER unsupported: ${env.REWARDS_PROVIDER}`);
+    }
   }
-  throw new Error(`REWARDS_PROVIDER unsupported: ${env.REWARDS_PROVIDER}`);
 })();
 
 export const stakePoolProvider = (async () => {
@@ -114,18 +160,37 @@ export const stakePoolProvider = (async () => {
 })();
 
 export const networkInfoProvider = (async () => {
-  if (env.NETWORK_INFO_PROVIDER === 'blockfrost') {
-    return blockfrostNetworkInfoProvider(await blockfrostApi!);
+  switch (env.NETWORK_INFO_PROVIDER) {
+    case 'blockfrost': {
+      return blockfrostNetworkInfoProvider(await blockfrostApi!);
+    }
+    case 'http': {
+      return networkInfoHttpProvider({
+        adapter: axiosFetchAdapter,
+        baseUrl: env.NETWORK_INFO_PROVIDER_PARAMS.url,
+        logger
+      });
+    }
+    default: {
+      throw new Error(`NETWORK_INFO_PROVIDER unsupported: ${env.NETWORK_INFO_PROVIDER}`);
+    }
   }
-  throw new Error(`NETWORK_INFO_PROVIDER unsupported: ${env.NETWORK_INFO_PROVIDER}`);
 })();
 
 export const chainHistoryProvider = (async () => {
-  if (env.CHAIN_HISTORY_PROVIDER === 'blockfrost') {
-    return blockfrostChainHistoryProvider(await blockfrostApi!);
+  switch (env.CHAIN_HISTORY_PROVIDER) {
+    case 'blockfrost': {
+      return blockfrostChainHistoryProvider(await blockfrostApi!);
+    }
+    case 'http': {
+      return chainHistoryHttpProvider({
+        adapter: axiosFetchAdapter,
+        baseUrl: env.CHAIN_HISTORY_PROVIDER_PARAMS.url,
+        logger
+      });
+    }
+    default: {
+      throw new Error(`CHAIN_HISTORY_PROVIDER unsupported: ${env.CHAIN_HISTORY_PROVIDER}`);
+    }
   }
-  throw new Error(`CHAIN_HISTORY_PROVIDER unsupported: ${env.CHAIN_HISTORY_PROVIDER}`);
 })();
-
-export const poolId1 = Cardano.PoolId(env.POOL_ID_1);
-export const poolId2 = Cardano.PoolId(env.POOL_ID_2);

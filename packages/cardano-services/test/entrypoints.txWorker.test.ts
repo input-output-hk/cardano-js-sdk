@@ -1,7 +1,8 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import { BAD_CONNECTION_URL, enqueueFakeTx, removeAllQueues } from '../../rabbitmq/test/utils';
+import { BAD_CONNECTION_URL } from '../../rabbitmq/test/utils';
 import { ChildProcess, fork } from 'child_process';
 import { Ogmios } from '@cardano-sdk/ogmios';
+import { RabbitMQContainer } from '../../rabbitmq/test/docker';
 import { createHealthyMockOgmiosServer, ogmiosServerReady } from './util';
 import { getRandomPort } from 'get-port-please';
 import { listenPromise, serverClosePromise } from '../src/util';
@@ -11,6 +12,8 @@ import path from 'path';
 const exePath = (name: 'cli' | 'startWorker') => path.join(__dirname, '..', 'dist', 'cjs', `${name}.js`);
 
 describe('tx-worker entrypoints', () => {
+  const container = new RabbitMQContainer();
+
   let commonArgs: string[];
   let commonArgsWithServiceDiscovery: string[];
   let commonEnv: Record<string, string>;
@@ -21,6 +24,7 @@ describe('tx-worker entrypoints', () => {
   let loggerHookCounter: number;
   let ogmiosServer: http.Server;
   let proc: ChildProcess;
+  let rabbitmqUrl: URL;
   let rabbitmqSrvServiceName: string;
   let ogmiosSrvServiceName: string;
 
@@ -43,6 +47,7 @@ describe('tx-worker entrypoints', () => {
   };
 
   beforeAll(async () => {
+    ({ rabbitmqUrl } = await container.load());
     resetHook();
     const port = await getRandomPort();
     const ogmiosConnection = Ogmios.createConnectionObject({ port });
@@ -51,7 +56,15 @@ describe('tx-worker entrypoints', () => {
     ogmiosSrvServiceName = process.env.OGMIOS_SRV_SERVICE_NAME!;
     await listenPromise(ogmiosServer, { port });
     await ogmiosServerReady(ogmiosConnection);
-    commonArgs = ['start-worker', '--logger-min-severity', 'error', '--ogmios-url', ogmiosConnection.address.webSocket];
+    commonArgs = [
+      'start-worker',
+      '--logger-min-severity',
+      'error',
+      '--ogmios-url',
+      ogmiosConnection.address.webSocket,
+      '--rabbitmq-url',
+      rabbitmqUrl.toString()
+    ];
     commonArgsWithServiceDiscovery = [
       'start-worker',
       '--logger-min-severity',
@@ -63,7 +76,11 @@ describe('tx-worker entrypoints', () => {
       '--service-discovery-timeout',
       '1000'
     ];
-    commonEnv = { LOGGER_MIN_SEVERITY: 'error', OGMIOS_URL: ogmiosConnection.address.webSocket };
+    commonEnv = {
+      LOGGER_MIN_SEVERITY: 'error',
+      OGMIOS_URL: ogmiosConnection.address.webSocket,
+      RABBITMQ_URL: rabbitmqUrl.toString()
+    };
     commonEnvWithServiceDiscovery = {
       LOGGER_MIN_SEVERITY: 'error',
       OGMIOS_SRV_SERVICE_NAME: ogmiosSrvServiceName,
@@ -75,7 +92,7 @@ describe('tx-worker entrypoints', () => {
   afterAll(async () => await serverClosePromise(ogmiosServer));
 
   beforeEach(async () => {
-    await removeAllQueues();
+    await container.removeQueues();
     hookLogs = [];
     loggerHookCounter = 0;
   });
@@ -93,13 +110,13 @@ describe('tx-worker entrypoints', () => {
       it('cli:start-worker submits transactions', async () => {
         hookPromise = new Promise((resolve) => (hook = resolve));
         proc = fork(exePath('cli'), commonArgs, { stdio: 'pipe' });
-        await Promise.all([hookPromise, enqueueFakeTx()]);
+        await Promise.all([hookPromise, container.enqueueTx()]);
       });
 
       it('startWorker submits transactions', async () => {
         hookPromise = new Promise((resolve) => (hook = resolve));
         proc = fork(exePath('startWorker'), { env: commonEnv, stdio: 'pipe' });
-        await Promise.all([hookPromise, enqueueFakeTx()]);
+        await Promise.all([hookPromise, container.enqueueTx()]);
       });
     });
 
@@ -113,7 +130,7 @@ describe('tx-worker entrypoints', () => {
         it('startWorker starts in serial mode', async () => {
           [hook, hookPromise] = loggerHook();
           proc = fork(exePath('startWorker'), { env: commonEnv, stdio: 'pipe' });
-          const txPromises = [enqueueFakeTx(0), enqueueFakeTx(1)];
+          const txPromises = [container.enqueueTx(0), container.enqueueTx(1)];
           await hookPromise;
           await Promise.all(txPromises);
           expect(hookLogs).toEqual(['Processing tx 1', 'Processed tx 1', 'Processing tx 2', 'Processed tx 2']);
@@ -152,7 +169,7 @@ describe('tx-worker entrypoints', () => {
         it('startWorker starts in serial mode', async () => {
           [hook, hookPromise] = loggerHook();
           proc = fork(exePath('startWorker'), { env: { ...commonEnv, PARALLEL: 'false' }, stdio: 'pipe' });
-          const txPromises = [enqueueFakeTx(0), enqueueFakeTx(1)];
+          const txPromises = [container.enqueueTx(0), container.enqueueTx(1)];
           await hookPromise;
           await Promise.all(txPromises);
           expect(hookLogs).toEqual(['Processing tx 1', 'Processed tx 1', 'Processing tx 2', 'Processed tx 2']);
@@ -168,7 +185,7 @@ describe('tx-worker entrypoints', () => {
         it('startWorker starts in parallel mode', async () => {
           [hook, hookPromise] = loggerHook();
           proc = fork(exePath('startWorker'), { env: { ...commonEnv, PARALLEL: 'true' }, stdio: 'pipe' });
-          const txPromises = [enqueueFakeTx(0), enqueueFakeTx(1)];
+          const txPromises = [container.enqueueTx(0), container.enqueueTx(1)];
           await hookPromise;
           await Promise.all(txPromises);
           expect(hookLogs).toEqual(['Processing tx 1', 'Processing tx 2', 'Processed tx 1', 'Processed tx 2']);
