@@ -1,4 +1,4 @@
-import { CardanoNode, CardanoNodeErrors, CardanoNodeUtil } from '@cardano-sdk/core';
+import { Cardano, CardanoNode, CardanoNodeErrors, CardanoNodeUtil, StakeDistribution } from '@cardano-sdk/core';
 import { ConnectionConfig, StateQuery, createInteractionContext, createStateQueryClient } from '@cardano-ogmios/client';
 import { Logger, dummyLogger } from 'ts-log';
 import { mapEraSummary } from './mappers';
@@ -69,6 +69,26 @@ export class OgmiosCardanoNode implements CardanoNode {
     try {
       this.#logger.info('Getting system start');
       return await this.#stateQueryClient.systemStart();
+    } catch (error) {
+      throw CardanoNodeUtil.asCardanoNodeError(error) || new CardanoNodeErrors.UnknownCardanoNodeError(error);
+    }
+  }
+
+  public async stakeDistribution(): Promise<StakeDistribution> {
+    if (this.#state !== 'initialized') {
+      throw new CardanoNodeErrors.CardanoNodeNotInitializedError('stakeDistribution');
+    }
+    try {
+      this.#logger.info('Getting stake distribution');
+      const map = new Map();
+      for (const [key, value] of Object.entries(await this.#stateQueryClient.stakeDistribution())) {
+        const splitStake = value.stake.split('/');
+        map.set(Cardano.PoolId(key), {
+          ...value,
+          stake: { pool: BigInt(splitStake[0]), supply: BigInt(splitStake[1]) }
+        });
+      }
+      return map;
     } catch (error) {
       throw CardanoNodeUtil.asCardanoNodeError(error) || new CardanoNodeErrors.UnknownCardanoNodeError(error);
     }

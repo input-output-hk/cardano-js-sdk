@@ -10,8 +10,8 @@ import { ServiceNames } from '../ServiceNames';
 import { TxSubmitProvider } from '@cardano-sdk/core';
 import { isConnectionError } from '@cardano-sdk/util';
 
-const isCardanoNodeOperation = (prop: string | symbol): prop is 'eraSummaries' | 'systemStart' =>
-  ['eraSummaries', 'systemStart'].includes(prop as string);
+const isCardanoNodeOperation = (prop: string | symbol): prop is 'eraSummaries' | 'systemStart' | 'stakeDistribution' =>
+  ['eraSummaries', 'systemStart', 'stakeDistribution'].includes(prop as string);
 
 const recreateOgmiosCardanoNode = async (
   serviceName: string,

@@ -4,9 +4,9 @@
     "baseUrl": "."
   },
   "include": [
-    "../../ogmios/test",
-    "../../rabbitmq/test",
-    "../../wallet/test",
+    "../../core/test/CardanoNode/mocks",
+    "../../ogmios/test/mocks",
+    "../../rabbitmq/test/docker",
     "../../cip2/test/util",
   ],
   "rootDir": ".",
@@ -25,9 +25,6 @@
     },
     {
       "path": "../../util-dev/src"
-    },
-    {
-      "path": "../../wallet/src"
     },
     {
       "path": "../../ogmios/src"

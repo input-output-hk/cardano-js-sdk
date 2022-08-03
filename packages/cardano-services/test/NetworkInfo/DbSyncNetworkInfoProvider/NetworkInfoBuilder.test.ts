@@ -31,14 +31,6 @@ describe('NetworkInfoBuilder', () => {
     });
   });
 
-  describe('queryLiveStake', () => {
-    test('query live stake', async () => {
-      const result = await builder.queryLiveStake();
-      expect(BigInt(result)).toBeGreaterThan(0n);
-      expect(result).toMatchSnapshot();
-    });
-  });
-
   describe('queryActiveStake', () => {
     test('query active stake', async () => {
       const result = await builder.queryActiveStake();

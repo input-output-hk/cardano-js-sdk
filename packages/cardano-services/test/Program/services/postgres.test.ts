@@ -2,13 +2,13 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable max-len */
 import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../../src/NetworkInfo';
-import { EraSummary } from '@cardano-sdk/core';
 import { HttpServer, HttpServerConfig, createDnsResolver, getPool } from '../../../src';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../../src/InMemoryCache';
 import { Pool } from 'pg';
 import { SrvRecord } from 'dns';
 import { createLogger } from 'bunyan';
 import { getPort, getRandomPort } from 'get-port-please';
+import { mockCardanoNode } from '../../../../core/test/CardanoNode/mocks';
 import { types } from 'util';
 import axios from 'axios';
 
@@ -28,19 +28,7 @@ describe('Service dependency abstractions', () => {
   const cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
   const logger = createLogger({ level: 'error', name: 'test' });
   const dnsResolver = createDnsResolver({ factor: 1.1, maxRetryTime: 1000 }, logger);
-  const mockEraSummaries: EraSummary[] = [
-    { parameters: { epochLength: 21_600, slotLength: 20_000 }, start: { slot: 0, time: new Date(1_563_999_616_000) } },
-    {
-      parameters: { epochLength: 432_000, slotLength: 1000 },
-      start: { slot: 1_598_400, time: new Date(1_595_964_016_000) }
-    }
-  ];
-  const cardanoNode = {
-    eraSummaries: jest.fn(() => Promise.resolve(mockEraSummaries)),
-    initialize: jest.fn(() => Promise.resolve()),
-    shutdown: jest.fn(() => Promise.resolve()),
-    systemStart: jest.fn(() => Promise.resolve(new Date(1_563_999_616_000)))
-  };
+  const cardanoNode = mockCardanoNode();
 
   describe('Postgres-dependant service with service discovery', () => {
     let httpServer: HttpServer;

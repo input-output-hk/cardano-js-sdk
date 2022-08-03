@@ -3,7 +3,6 @@ import {
   CirculatingSupplyModel,
   EpochModel,
   LedgerTipModel,
-  LiveStakeModel,
   TotalSupplyModel,
   WalletProtocolParamsModel
 } from './types';
@@ -30,11 +29,6 @@ export class NetworkInfoBuilder {
     this.#logger.debug('About to query total supply');
     const result: QueryResult<TotalSupplyModel> = await this.#db.query(Queries.findTotalSupply, [maxLovelaceSupply]);
     return result.rows[0].total_supply;
-  }
-  public async queryLiveStake() {
-    this.#logger.debug('About to query live stake');
-    const result: QueryResult<LiveStakeModel> = await this.#db.query(Queries.findLiveStake);
-    return result.rows[0].live_stake;
   }
 
   public async queryActiveStake() {

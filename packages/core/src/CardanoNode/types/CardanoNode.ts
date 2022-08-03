@@ -1,6 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import { CardanoNodeError, CardanoNodeNotInitializedError } from './CardanoNodeErrors';
+import { Lovelace, PoolId, VrfVkHex } from '../../Cardano';
 
 export interface EraSummary {
   parameters: {
@@ -12,6 +13,20 @@ export interface EraSummary {
     time: Date;
   };
 }
+
+/**
+ * Map of the live stake distribution, indexed by PoolId
+ */
+export type StakeDistribution = Map<
+  PoolId,
+  {
+    stake: {
+      pool: Lovelace;
+      supply: Lovelace;
+    };
+    vrf: VrfVkHex;
+  }
+>;
 
 export interface CardanoNode {
   /**
@@ -38,4 +53,11 @@ export interface CardanoNode {
    * @throws {CardanoNodeError}
    */
   systemStart: () => Promise<Date>;
+  /**
+   * Get the live stake distribution of the network.
+   *
+   * @returns {StakeDistribution}
+   * @throws {CardanoNodeError}
+   */
+  stakeDistribution: () => Promise<StakeDistribution>;
 }

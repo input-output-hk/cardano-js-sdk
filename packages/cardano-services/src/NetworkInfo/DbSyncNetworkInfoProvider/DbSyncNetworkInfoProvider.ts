@@ -1,6 +1,7 @@
 import {
   Cardano,
   CardanoNode,
+  CardanoNodeUtil,
   NetworkInfoProvider,
   ProtocolParametersRequiredByWallet,
   StakeSummary,
@@ -20,7 +21,6 @@ import {
   loadGenesisData,
   toGenesisParams,
   toLedgerTip,
-  toStake,
   toSupply,
   toTimeSettings,
   toWalletProtocolParams
@@ -91,15 +91,17 @@ export class DbSyncNetworkInfoProvider extends DbSyncProvider implements Network
   public async stake(): Promise<StakeSummary> {
     this.#logger.debug('About to query stake data');
 
-    const [liveStake, activeStake] = await Promise.all([
-      this.#cache.get(NetworkInfoCacheKey.LIVE_STAKE, () => this.#builder.queryLiveStake()),
+    const [live, activeStake] = await Promise.all([
+      this.#cache.get(NetworkInfoCacheKey.LIVE_STAKE, () =>
+        this.#cardanoNode.stakeDistribution().then(CardanoNodeUtil.toLiveStake)
+      ),
       this.#cache.get(NetworkInfoCacheKey.ACTIVE_STAKE, () => this.#builder.queryActiveStake(), UNLIMITED_CACHE_TTL)
     ]);
 
-    return toStake({
-      activeStake,
-      liveStake
-    });
+    return {
+      active: BigInt(activeStake),
+      live
+    };
   }
 
   public async timeSettings(): Promise<TimeSettings[]> {

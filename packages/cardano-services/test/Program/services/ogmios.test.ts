@@ -1,7 +1,7 @@
 /* eslint-disable sonarjs/no-identical-functions */
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable max-len */
-import { Cardano, EraSummary, TxSubmitProvider } from '@cardano-sdk/core';
+import { Cardano, TxSubmitProvider } from '@cardano-sdk/core';
 import { Connection } from '@cardano-ogmios/client';
 import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../../src/NetworkInfo';
 import {
@@ -22,6 +22,7 @@ import { createLogger } from 'bunyan';
 import { createMockOgmiosServer } from '../../../../ogmios/test/mocks/mockOgmiosServer';
 import { getPort, getRandomPort } from 'get-port-please';
 import { listenPromise, serverClosePromise } from '../../../src/util';
+import { mockCardanoNode } from '../../../../core/test/CardanoNode/mocks';
 import { types } from 'util';
 import axios from 'axios';
 import http from 'http';
@@ -46,19 +47,7 @@ describe('Service dependency abstractions', () => {
   const cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
   const logger = createLogger({ level: 'error', name: 'test' });
   const dnsResolver = createDnsResolver({ factor: 1.1, maxRetryTime: 1000 }, logger);
-  const mockEraSummaries: EraSummary[] = [
-    { parameters: { epochLength: 21_600, slotLength: 20_000 }, start: { slot: 0, time: new Date(1_563_999_616_000) } },
-    {
-      parameters: { epochLength: 432_000, slotLength: 1000 },
-      start: { slot: 1_598_400, time: new Date(1_595_964_016_000) }
-    }
-  ];
-  const cardanoNode = {
-    eraSummaries: jest.fn(() => Promise.resolve(mockEraSummaries)),
-    initialize: jest.fn(() => Promise.resolve()),
-    shutdown: jest.fn(() => Promise.resolve()),
-    systemStart: jest.fn(() => Promise.resolve(new Date(1_563_999_616_000)))
-  };
+  const cardanoNode = mockCardanoNode();
 
   describe('Ogmios-dependant services with service discovery', () => {
     let apiUrlBase: string;
