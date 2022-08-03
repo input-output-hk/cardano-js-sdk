@@ -1,9 +1,9 @@
 import { Cardano, ChainHistoryProvider } from '@cardano-sdk/core';
 import { ChainHistoryProviderStub, mockChainHistoryProvider, queryTransactionsResult } from '../mocks';
+import { EMPTY, bufferCount, firstValueFrom, of } from 'rxjs';
 import { FailedTx, TransactionFailure, createAddressTransactionsProvider, createTransactionsTracker } from '../../src';
 import { InMemoryInFlightTransactionsStore, InMemoryTransactionsStore, WalletStores } from '../../src/persistence';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { bufferCount, firstValueFrom, of } from 'rxjs';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
 import delay from 'delay';
 
@@ -28,7 +28,7 @@ describe('TransactionsTracker', () => {
         retryBackoffConfig,
         tip$,
         store
-      );
+      ).transactionsSource$;
       expect(await firstValueFrom(provider$)).toEqual(queryTransactionsResult);
       expect(store.setAll).toBeCalledTimes(1);
       expect(store.setAll).toBeCalledWith(queryTransactionsResult);
@@ -45,7 +45,7 @@ describe('TransactionsTracker', () => {
         retryBackoffConfig,
         tip$,
         store
-      );
+      ).transactionsSource$;
       expect(await firstValueFrom(provider$.pipe(bufferCount(2)))).toEqual([
         [queryTransactionsResult[0]],
         queryTransactionsResult
@@ -70,11 +70,12 @@ describe('TransactionsTracker', () => {
         retryBackoffConfig,
         tip$,
         store
-      );
+      ).transactionsSource$;
       expect(await firstValueFrom(provider$.pipe(bufferCount(2)))).toEqual([
         queryTransactionsResult,
         [queryTransactionsResult[0]]
       ]);
+      // expect(await firstValueFrom(rollback$)).toEqual(queryTransactionsResult[1]);
       expect(store.setAll).toBeCalledTimes(2);
       expect(chainHistoryProvider.transactionsByAddresses).toBeCalledTimes(2);
       expect(chainHistoryProvider.transactionsByAddresses).nthCalledWith(1, {
@@ -132,13 +133,14 @@ describe('TransactionsTracker', () => {
             transactionsHistoryStore: transactionsStore
           },
           {
+            rollback$: EMPTY,
             transactionsSource$
           }
         );
         expectObservable(transactionsTracker.outgoing.submitting$).toBe('-a--|', { a: outgoingTx });
         expectObservable(transactionsTracker.outgoing.pending$).toBe('--a-|', { a: outgoingTx });
         expectObservable(transactionsTracker.outgoing.confirmed$, confirmedSubscription).toBe('---a|', {
-          a: outgoingTx
+          a: { ...outgoingTx, slot: outgoingTx.blockHeader.slot }
         });
         expectObservable(transactionsTracker.outgoing.inFlight$).toBe('ab-c|', { a: [], b: [outgoingTx], c: [] });
         expectObservable(transactionsTracker.outgoing.failed$).toBe('----|');
@@ -175,6 +177,7 @@ describe('TransactionsTracker', () => {
             transactionsHistoryStore: transactionsStore
           },
           {
+            rollback$: EMPTY,
             transactionsSource$
           }
         );
@@ -217,6 +220,7 @@ describe('TransactionsTracker', () => {
             transactionsHistoryStore: transactionsStore
           },
           {
+            rollback$: EMPTY,
             transactionsSource$
           }
         );
@@ -261,6 +265,7 @@ describe('TransactionsTracker', () => {
             transactionsHistoryStore: transactionsStore
           },
           {
+            rollback$: EMPTY,
             transactionsSource$
           }
         );
@@ -321,12 +326,13 @@ describe('TransactionsTracker', () => {
             transactionsHistoryStore: transactionsStore
           },
           {
+            rollback$: EMPTY,
             transactionsSource$
           }
         );
         expectObservable(transactionsTracker.outgoing.submitting$).toBe('-a--|', { a: storedInFlightTransaction });
         expectObservable(transactionsTracker.outgoing.confirmed$).toBe('---a|', {
-          a: storedInFlightTransaction
+          a: { ...storedInFlightTransaction, slot: storedInFlightTransaction.blockHeader.slot }
         });
         expectObservable(transactionsTracker.outgoing.inFlight$).toBe('ab-a|', {
           a: [],
@@ -391,6 +397,7 @@ describe('TransactionsTracker', () => {
             transactionsHistoryStore: transactionsStore
           },
           {
+            rollback$: EMPTY,
             transactionsSource$
           }
         );
