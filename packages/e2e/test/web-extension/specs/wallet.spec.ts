@@ -7,6 +7,7 @@ describe('wallet', () => {
   const btnCreateKeyAgent = '#createKeyAgent';
   const spanAddress = '#address';
   const spanBalance = '#balance';
+  const spanSupplyDistribution = '#supplyDistribution';
   const divAdaPrice = '#adaPrice';
   const btnSignAndBuildTx = '#buildAndSignTx';
   const divSignature = '#signature';
@@ -34,11 +35,12 @@ describe('wallet', () => {
         await $(btnGrantAccess).click();
         await $(btnCreateKeyAgent).click();
       });
-      it('ui has access to remote ObservableWallet', async () => {
+      it('ui has access to remote ObservableWallet and SupplyDistribution', async () => {
         await browser.waitUntil(async () => {
           try {
             BigInt(await $(spanBalance).getText());
-            return true;
+            const stats = await (await $(spanSupplyDistribution)).getText();
+            return stats.length > 1;
           } catch {
             return false;
           }
