@@ -1,3 +1,4 @@
+import { dummyLogger } from 'ts-log';
 import { env } from '../environment';
 import { filter, firstValueFrom } from 'rxjs';
 import { getWallet } from '../../../src/factories';
@@ -10,7 +11,7 @@ describe('SingleAddressWallet/pouchdbWalletStores', () => {
   let stores1: storage.WalletStores;
 
   beforeAll(() => {
-    stores1 = storage.createPouchdbWalletStores(walletName);
+    stores1 = storage.createPouchdbWalletStores(walletName, { logger: dummyLogger });
   });
 
   it('stores and restores SingleAddressWallet, continues sync after initial load', async () => {
@@ -24,8 +25,13 @@ describe('SingleAddressWallet/pouchdbWalletStores', () => {
     const wallet1RewardsHistory = await firstValueFrom(wallet1.delegation.rewardsHistory$);
     wallet1.shutdown();
     // create a new wallet, with new stores sharing the underlying database
-    const wallet2 = (await getWallet({ env, name: walletName, stores: storage.createPouchdbWalletStores(walletName) }))
-      .wallet;
+    const wallet2 = (
+      await getWallet({
+        env,
+        name: walletName,
+        stores: storage.createPouchdbWalletStores(walletName, { logger: dummyLogger })
+      })
+    ).wallet;
     const tip = await firstValueFrom(wallet2.tip$);
     expect(await firstValueFrom(wallet2.delegation.rewardsHistory$)).toEqual(wallet1RewardsHistory);
     expect(await firstValueFrom(wallet1.delegation.rewardAccounts$)).toEqual(wallet1RewardAccounts);

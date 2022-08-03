@@ -5,11 +5,11 @@ import {
   ProviderFnStats,
   TrackedAssetProvider,
   TrackedChainHistoryProvider,
-  TrackedNetworkInfoProvider,
   TrackedRewardsProvider,
   TrackedStakePoolProvider,
   TrackedTxSubmitProvider,
   TrackedUtxoProvider,
+  TrackedWalletNetworkInfoProvider,
   createProviderStatusTracker
 } from '../../../src';
 import { createStubStakePoolProvider, createTestScheduler } from '@cardano-sdk/util-dev';
@@ -63,7 +63,7 @@ const providerFnStats = {
 
 describe('createProviderStatusTracker', () => {
   let stakePoolProvider: TrackedStakePoolProvider;
-  let networkInfoProvider: TrackedNetworkInfoProvider;
+  let networkInfoProvider: TrackedWalletNetworkInfoProvider;
   let txSubmitProvider: TrackedTxSubmitProvider;
   let assetProvider: TrackedAssetProvider;
   let utxoProvider: TrackedUtxoProvider;
@@ -75,7 +75,7 @@ describe('createProviderStatusTracker', () => {
   beforeEach(() => {
     utxoProvider = new TrackedUtxoProvider(mockUtxoProvider());
     stakePoolProvider = new TrackedStakePoolProvider(createStubStakePoolProvider());
-    networkInfoProvider = new TrackedNetworkInfoProvider(mockNetworkInfoProvider());
+    networkInfoProvider = new TrackedWalletNetworkInfoProvider(mockNetworkInfoProvider());
     txSubmitProvider = new TrackedTxSubmitProvider(mockTxSubmitProvider());
     assetProvider = new TrackedAssetProvider(mockAssetProvider());
     chainHistoryProvider = new TrackedChainHistoryProvider(mockChainHistoryProvider());

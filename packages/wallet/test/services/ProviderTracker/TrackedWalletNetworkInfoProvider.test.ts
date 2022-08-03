@@ -1,21 +1,26 @@
 import { BehaviorSubject } from 'rxjs';
-import { CLEAN_FN_STATS, NetworkInfoProviderStats, ProviderFnStats, TrackedNetworkInfoProvider } from '../../../src';
-import { NetworkInfoProvider } from '@cardano-sdk/core';
+import {
+  CLEAN_FN_STATS,
+  ProviderFnStats,
+  TrackedWalletNetworkInfoProvider,
+  WalletNetworkInfoProvider,
+  WalletNetworkInfoProviderStats
+} from '../../../src';
 import { mockNetworkInfoProvider } from '../../mocks';
 
 describe('TrackedNetworkInfoProvider', () => {
-  let networkInfoProvider: NetworkInfoProvider;
-  let trackedNetworkInfoProvider: TrackedNetworkInfoProvider;
+  let networkInfoProvider: WalletNetworkInfoProvider;
+  let trackedNetworkInfoProvider: TrackedWalletNetworkInfoProvider;
   beforeEach(() => {
     networkInfoProvider = mockNetworkInfoProvider();
-    trackedNetworkInfoProvider = new TrackedNetworkInfoProvider(networkInfoProvider);
+    trackedNetworkInfoProvider = new TrackedWalletNetworkInfoProvider(networkInfoProvider);
   });
 
   describe('wraps underlying provider functions, tracks # of calls/responses and resets on stats.reset()', () => {
     const testFunctionStats =
       <T>(
-        call: (networkInfoProvider: NetworkInfoProvider) => Promise<T>,
-        selectStats: (stats: NetworkInfoProviderStats) => BehaviorSubject<ProviderFnStats>
+        call: (networkInfoProvider: WalletNetworkInfoProvider) => Promise<T>,
+        selectStats: (stats: WalletNetworkInfoProviderStats) => BehaviorSubject<ProviderFnStats>
         // eslint-disable-next-line unicorn/consistent-function-scoping
       ) =>
       async () => {
@@ -36,30 +41,6 @@ describe('TrackedNetworkInfoProvider', () => {
         trackedNetworkInfoProvider.setStatInitialized(stats$);
         expect(stats$.value).toEqual({ ...CLEAN_FN_STATS, initialized: true });
       };
-
-    test(
-      'stake',
-      testFunctionStats(
-        (provider) => provider.stake(),
-        (stats) => stats.stake$
-      )
-    );
-
-    test(
-      'healthCheck',
-      testFunctionStats(
-        (provider) => provider.healthCheck(),
-        (stats) => stats.healthCheck$
-      )
-    );
-
-    test(
-      'lovelaceSupply',
-      testFunctionStats(
-        (provider) => provider.lovelaceSupply(),
-        (stats) => stats.lovelaceSupply$
-      )
-    );
 
     test(
       'timeSettings',

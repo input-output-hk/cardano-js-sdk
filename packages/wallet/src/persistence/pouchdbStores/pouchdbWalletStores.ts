@@ -1,15 +1,8 @@
 import { Assets } from '../../types';
-import {
-  Cardano,
-  EpochRewards,
-  ProtocolParametersRequiredByWallet,
-  StakeSummary,
-  SupplySummary,
-  TimeSettings
-} from '@cardano-sdk/core';
+import { Cardano, EpochRewards, ProtocolParametersRequiredByWallet, TimeSettings } from '@cardano-sdk/core';
+import { CreatePouchdbStoresDependencies } from './types';
 import { EMPTY, combineLatest, map } from 'rxjs';
 import { GroupedAddress } from '../../KeyManagement';
-import { Logger } from 'ts-log';
 import { NewTxAlonzoWithSlot } from '../../services';
 import { PouchdbCollectionStore } from './PouchdbCollectionStore';
 import { PouchdbDocumentStore } from './PouchdbDocumentStore';
@@ -19,8 +12,6 @@ import { WalletStores } from '../types';
 export class PouchdbTipStore extends PouchdbDocumentStore<Cardano.Tip> {}
 export class PouchdbProtocolParametersStore extends PouchdbDocumentStore<ProtocolParametersRequiredByWallet> {}
 export class PouchdbGenesisParametersStore extends PouchdbDocumentStore<Cardano.CompactGenesis> {}
-export class PouchdbStakeSummaryStore extends PouchdbDocumentStore<StakeSummary> {}
-export class PouchdbSupplySummaryStore extends PouchdbDocumentStore<SupplySummary> {}
 export class PouchdbTimeSettingsStore extends PouchdbDocumentStore<TimeSettings[]> {}
 
 export class PouchdbAssetsStore extends PouchdbDocumentStore<Assets> {}
@@ -35,16 +26,12 @@ export class PouchdbRewardsHistoryStore extends PouchdbKeyValueStore<Cardano.Rew
 export class PouchdbStakePoolsStore extends PouchdbKeyValueStore<Cardano.PoolId, Cardano.StakePool> {}
 export class PouchdbRewardsBalancesStore extends PouchdbKeyValueStore<Cardano.RewardAccount, Cardano.Lovelace> {}
 
-export interface CreatePouchdbWalletStoresDependencies {
-  logger?: Logger;
-}
-
 /**
  * @param {string} walletName used to derive underlying db names
  */
 export const createPouchdbWalletStores = (
   walletName: string,
-  { logger }: CreatePouchdbWalletStoresDependencies = {}
+  { logger }: CreatePouchdbStoresDependencies
 ): WalletStores => {
   const baseDbName = walletName.replace(/[^\da-z]/gi, '');
   const docsDbName = `${baseDbName}Docs`;
@@ -54,6 +41,8 @@ export const createPouchdbWalletStores = (
     destroy() {
       if (!this.destroyed) {
         // since the database of document stores is shared, destroying any document store destroys all of them
+        this.destroyed = true;
+        logger.debug('Destroying pouchdb WalletStores...');
         const destroyDocumentsDb = this.tip.destroy();
         return combineLatest([
           destroyDocumentsDb,
@@ -70,11 +59,9 @@ export const createPouchdbWalletStores = (
     destroyed: false,
     genesisParameters: new PouchdbGenesisParametersStore(docsDbName, 'genesisParameters', logger),
     inFlightTransactions: new PouchdbInFlightTransactionsStore(docsDbName, 'newTransactions', logger),
-    lovelaceSupply: new PouchdbSupplySummaryStore(docsDbName, 'lovelaceSupply', logger),
     protocolParameters: new PouchdbProtocolParametersStore(docsDbName, 'protocolParameters', logger),
     rewardsBalances: new PouchdbRewardsBalancesStore(`${baseDbName}RewardsBalances`, logger),
     rewardsHistory: new PouchdbRewardsHistoryStore(`${baseDbName}RewardsHistory`, logger),
-    stake: new PouchdbStakeSummaryStore(docsDbName, 'stake', logger),
     stakePools: new PouchdbStakePoolsStore(`${baseDbName}StakePools`, logger),
     timeSettings: new PouchdbTimeSettingsStore(docsDbName, 'timeSettings', logger),
     tip: new PouchdbTipStore(docsDbName, 'tip', logger),

@@ -2,9 +2,8 @@ import {
   Asset,
   Cardano,
   EpochInfo,
+  NetworkInfoProvider,
   ProtocolParametersRequiredByWallet,
-  StakeSummary,
-  SupplySummary,
   TimeSettings
 } from '@cardano-sdk/core';
 import { BalanceTracker, DelegationTracker, TransactionalObservables, TransactionsTracker } from './services';
@@ -81,8 +80,6 @@ export interface ObservableWallet {
   readonly transactions: TransactionsTracker;
   readonly tip$: Observable<Cardano.Tip>;
   readonly genesisParameters$: Observable<Cardano.CompactGenesis>;
-  readonly lovelaceSupply$: Observable<SupplySummary>;
-  readonly stake$: Observable<StakeSummary>;
   readonly timeSettings$: Observable<TimeSettings[]>;
   readonly currentEpoch$: Observable<EpochInfo>;
   readonly protocolParameters$: Observable<ProtocolParametersRequiredByWallet>;
@@ -106,3 +103,8 @@ export interface ObservableWallet {
   submitTx(tx: Cardano.NewTxAlonzo): Promise<void>;
   shutdown(): void;
 }
+
+export type WalletNetworkInfoProvider = Pick<
+  NetworkInfoProvider,
+  'currentWalletProtocolParameters' | 'ledgerTip' | 'genesisParameters' | 'timeSettings'
+>;
