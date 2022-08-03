@@ -30,6 +30,6 @@ Object {
 }
 `;
 
-exports[`NetworkInfoBuilder queryLiveStake query live stake 1`] = `"42000004107749657"`;
+exports[`NetworkInfoBuilder queryLiveStake query live stake 1`] = `"2679979893"`;
 
 exports[`NetworkInfoBuilder queryTotalSupply query total supply 1`] = `"40408479600434778"`;
