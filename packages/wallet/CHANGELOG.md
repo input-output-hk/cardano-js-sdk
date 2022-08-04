@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.0-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.5.0-nightly.2...@cardano-sdk/wallet@0.5.0-nightly.3) (2022-08-04)
+
+
+### ⚠ BREAKING CHANGES
+
+*   - (web-extension) observableWalletProperties has new `transactions.rollback$` property
+  - (wallet) createAddressTransactionsProvider returns an object with two observables
+    `{rollback$, transactionsSource$}`, instead of only the transactionsSource$ observable
+  - (wallet) TransactionsTracker interface contains new `rollback$` property
+  - (wallet) TransactionsTracker interface `$confirmed` Observable emits `NewTxAlonzoWithSlot`
+    object instead of NewTxAlonzo
+
+### Features
+
+* resubmit rollback transactions ([2a4ccb0](https://github.com/input-output-hk/cardano-js-sdk/commit/2a4ccb0abead34481e817f807850d29e77d7340a))
+
+
+
 ## [0.5.0-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.5.0-nightly.1...@cardano-sdk/wallet@0.5.0-nightly.2) (2022-08-02)
 
 **Note:** Version bump only for package @cardano-sdk/wallet

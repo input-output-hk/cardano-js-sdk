@@ -1730,7 +1730,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cardano-sdk/cardano-services@^0.5.0-nightly.3, @cardano-sdk/cardano-services@workspace:packages/cardano-services":
+"@cardano-sdk/cardano-services@^0.5.0-nightly.4, @cardano-sdk/cardano-services@workspace:packages/cardano-services":
   version: 0.0.0-use.local
   resolution: "@cardano-sdk/cardano-services@workspace:packages/cardano-services"
   dependencies:
@@ -1905,7 +1905,7 @@ __metadata:
     "@cardano-foundation/ledgerjs-hw-app-cardano": 5.0.0
     "@cardano-ogmios/client": ^5.5.2
     "@cardano-sdk/blockfrost": ^0.4.1-nightly.1
-    "@cardano-sdk/cardano-services": ^0.5.0-nightly.3
+    "@cardano-sdk/cardano-services": ^0.5.0-nightly.4
     "@cardano-sdk/cardano-services-client": ^0.4.1-nightly.2
     "@cardano-sdk/cip30": ^0.4.1-nightly.2
     "@cardano-sdk/core": ^0.5.0-nightly.1
@@ -1914,7 +1914,7 @@ __metadata:
     "@cardano-sdk/util-dev": ^0.4.1-nightly.1
     "@cardano-sdk/util-rxjs": ^0.4.1-nightly.1
     "@cardano-sdk/wallet": 0.4.0
-    "@cardano-sdk/web-extension": ^0.5.0-nightly.2
+    "@cardano-sdk/web-extension": ^0.5.0-nightly.3
     "@emurgo/cardano-message-signing-asmjs": ^1.0.1
     "@emurgo/cardano-serialization-lib-asmjs": 11.0.0-rc.6
     "@types/bunyan": ^1.8.8
@@ -2115,7 +2115,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@cardano-sdk/wallet@^0.5.0-nightly.2, @cardano-sdk/wallet@workspace:packages/wallet":
+"@cardano-sdk/wallet@^0.5.0-nightly.3, @cardano-sdk/wallet@workspace:packages/wallet":
   version: 0.0.0-use.local
   resolution: "@cardano-sdk/wallet@workspace:packages/wallet"
   dependencies:
@@ -2197,7 +2197,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@cardano-sdk/web-extension@^0.5.0-nightly.2, @cardano-sdk/web-extension@workspace:packages/web-extension":
+"@cardano-sdk/web-extension@^0.5.0-nightly.3, @cardano-sdk/web-extension@workspace:packages/web-extension":
   version: 0.0.0-use.local
   resolution: "@cardano-sdk/web-extension@workspace:packages/web-extension"
   dependencies:
@@ -2206,7 +2206,7 @@ __metadata:
     "@cardano-sdk/util": ^0.4.1-nightly.1
     "@cardano-sdk/util-dev": ^0.4.1-nightly.1
     "@cardano-sdk/util-rxjs": ^0.4.1-nightly.1
-    "@cardano-sdk/wallet": ^0.5.0-nightly.2
+    "@cardano-sdk/wallet": ^0.5.0-nightly.3
     "@types/lodash": ^4.14.182
     "@types/uuid": ^8.3.4
     "@types/webextension-polyfill": ^0.8.0
