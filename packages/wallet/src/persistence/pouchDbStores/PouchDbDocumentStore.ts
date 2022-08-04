@@ -1,14 +1,14 @@
 /* eslint-disable promise/always-return */
 import { DocumentStore } from '../types';
 import { EMPTY, Observable } from 'rxjs';
-import { PouchdbStore } from './PouchdbStore';
+import { PouchDbStore } from './PouchDbStore';
 import { dummyLogger } from 'ts-log';
-import { sanitizePouchdbDoc } from './util';
+import { sanitizePouchDbDoc } from './util';
 
 /**
  * PouchDB implementation that uses a shared db for multiple PouchDbDocumentStores
  */
-export class PouchdbDocumentStore<T> extends PouchdbStore<T> implements DocumentStore<T> {
+export class PouchDbDocumentStore<T> extends PouchDbStore<T> implements DocumentStore<T> {
   readonly #docId: string;
 
   /**
@@ -27,7 +27,7 @@ export class PouchdbDocumentStore<T> extends PouchdbStore<T> implements Document
       this.db
         .get(this.#docId)
         .then((doc) => {
-          observer.next(sanitizePouchdbDoc(doc));
+          observer.next(sanitizePouchDbDoc(doc));
           observer.complete();
         })
         .catch(observer.complete.bind(observer));

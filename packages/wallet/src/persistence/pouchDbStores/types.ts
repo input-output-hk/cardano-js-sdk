@@ -1,5 +1,5 @@
 import { Logger } from 'ts-log';
 
-export interface CreatePouchdbStoresDependencies {
+export interface CreatePouchDbStoresDependencies {
   logger: Logger;
 }

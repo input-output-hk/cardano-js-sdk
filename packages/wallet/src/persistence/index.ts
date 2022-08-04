@@ -1,3 +1,3 @@
 export * from './inMemoryStores';
-export * from './pouchdbStores';
+export * from './pouchDbStores';
 export * from './types';

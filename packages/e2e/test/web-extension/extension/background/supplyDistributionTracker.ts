@@ -10,7 +10,7 @@ export const supplyDistributionTrackerReady = (async () => {
     {
       logger,
       networkInfoProvider: await networkInfoProvider,
-      stores: storage.createPouchdbSupplyDistributionStores(walletName, { logger })
+      stores: storage.createPouchDbSupplyDistributionStores(walletName, { logger })
     }
   );
 })();
