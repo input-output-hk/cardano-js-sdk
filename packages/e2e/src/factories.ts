@@ -345,9 +345,39 @@ export type GetWalletProps = {
  * Create a single wallet instance given the environment variables.
  *
  * @param props Wallet configuration parameters.
+ * @returns an object containing the wallet and providers passed to it
  */
 export const getWallet = async (props: GetWalletProps) => {
   const logger = props.env.LOGGER_MIN_SEVERITY ? getLogger(props.env.LOGGER_MIN_SEVERITY) : dummyLogger;
+  const providers = {
+    assetProvider: await assetProviderFactory.create(props.env.ASSET_PROVIDER, props.env.ASSET_PROVIDER_PARAMS, logger),
+    chainHistoryProvider: await chainHistoryProviderFactory.create(
+      props.env.CHAIN_HISTORY_PROVIDER,
+      props.env.CHAIN_HISTORY_PROVIDER_PARAMS,
+      logger
+    ),
+    networkInfoProvider: await networkInfoProviderFactory.create(
+      props.env.NETWORK_INFO_PROVIDER,
+      props.env.NETWORK_INFO_PROVIDER_PARAMS,
+      logger
+    ),
+    rewardsProvider: await rewardsProviderFactory.create(
+      props.env.REWARDS_PROVIDER,
+      props.env.REWARDS_PROVIDER_PARAMS,
+      logger
+    ),
+    stakePoolProvider: await stakePoolProviderFactory.create(
+      props.env.STAKE_POOL_PROVIDER,
+      props.env.STAKE_POOL_PROVIDER_PARAMS,
+      logger
+    ),
+    txSubmitProvider: await txSubmitProviderFactory.create(
+      props.env.TX_SUBMIT_PROVIDER,
+      props.env.TX_SUBMIT_PROVIDER_PARAMS,
+      logger
+    ),
+    utxoProvider: await utxoProviderFactory.create(props.env.UTXO_PROVIDER, props.env.UTXO_PROVIDER_PARAMS, logger)
+  };
   const { wallet } = await setupWallet({
     createKeyAgent: await keyManagementFactory.create(
       props.env.KEY_MANAGEMENT_PROVIDER,
@@ -358,45 +388,14 @@ export const getWallet = async (props: GetWalletProps) => {
       new SingleAddressWallet(
         { name: props.name, polling: props.polling },
         {
-          assetProvider: await assetProviderFactory.create(
-            props.env.ASSET_PROVIDER,
-            props.env.ASSET_PROVIDER_PARAMS,
-            logger
-          ),
-          chainHistoryProvider: await chainHistoryProviderFactory.create(
-            props.env.CHAIN_HISTORY_PROVIDER,
-            props.env.CHAIN_HISTORY_PROVIDER_PARAMS,
-            logger
-          ),
+          ...providers,
           keyAgent,
-          networkInfoProvider: await networkInfoProviderFactory.create(
-            props.env.NETWORK_INFO_PROVIDER,
-            props.env.NETWORK_INFO_PROVIDER_PARAMS,
-            logger
-          ),
-          rewardsProvider: await rewardsProviderFactory.create(
-            props.env.REWARDS_PROVIDER,
-            props.env.REWARDS_PROVIDER_PARAMS,
-            logger
-          ),
-          stakePoolProvider: await stakePoolProviderFactory.create(
-            props.env.STAKE_POOL_PROVIDER,
-            props.env.STAKE_POOL_PROVIDER_PARAMS,
-            logger
-          ),
-          stores: props.stores,
-          txSubmitProvider: await txSubmitProviderFactory.create(
-            props.env.TX_SUBMIT_PROVIDER,
-            props.env.TX_SUBMIT_PROVIDER_PARAMS,
-            logger
-          ),
-          utxoProvider: await utxoProviderFactory.create(
-            props.env.UTXO_PROVIDER,
-            props.env.UTXO_PROVIDER_PARAMS,
-            logger
-          )
+          stores: props.stores
         }
       )
   });
-  return wallet;
+  return {
+    providers,
+    wallet
+  };
 };

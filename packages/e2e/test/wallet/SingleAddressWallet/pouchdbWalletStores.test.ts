@@ -14,7 +14,7 @@ describe('SingleAddressWallet/pouchdbWalletStores', () => {
   });
 
   it('stores and restores SingleAddressWallet, continues sync after initial load', async () => {
-    const wallet1 = await getWallet({ env, name: 'Test Wallet', stores: stores1 });
+    const wallet1 = (await getWallet({ env, name: 'Test Wallet', stores: stores1 })).wallet;
     // wallet1 fetched all responses from wallet provider
     await waitForWalletStateSettle(wallet1);
     // give it a second to store data to pouchdb, this is technically a race condition
@@ -24,7 +24,8 @@ describe('SingleAddressWallet/pouchdbWalletStores', () => {
     const wallet1RewardsHistory = await firstValueFrom(wallet1.delegation.rewardsHistory$);
     wallet1.shutdown();
     // create a new wallet, with new stores sharing the underlying database
-    const wallet2 = await getWallet({ env, name: walletName, stores: storage.createPouchdbWalletStores(walletName) });
+    const wallet2 = (await getWallet({ env, name: walletName, stores: storage.createPouchdbWalletStores(walletName) }))
+      .wallet;
     const tip = await firstValueFrom(wallet2.tip$);
     expect(await firstValueFrom(wallet2.delegation.rewardsHistory$)).toEqual(wallet1RewardsHistory);
     expect(await firstValueFrom(wallet1.delegation.rewardAccounts$)).toEqual(wallet1RewardAccounts);
