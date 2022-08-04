@@ -19,11 +19,11 @@ import { Milliseconds } from '../types';
 import { ProviderFnStats } from './ProviderTracker';
 import { TrackedAssetProvider } from './TrackedAssetProvider';
 import { TrackedChainHistoryProvider } from './TrackedChainHistoryProvider';
-import { TrackedNetworkInfoProvider } from './TrackedNetworkInfoProvider';
 import { TrackedRewardsProvider } from './TrackedRewardsProvider';
 import { TrackedStakePoolProvider } from './TrackedStakePoolProvider';
 import { TrackedTxSubmitProvider } from './TrackedTxSubmitProvider';
 import { TrackedUtxoProvider } from './TrackedUtxoProvider';
+import { TrackedWalletNetworkInfoProvider } from './TrackedWalletNetworkInfoProvider';
 import { TrackerSubject } from '@cardano-sdk/util-rxjs';
 
 export interface ProviderStatusTrackerProps {
@@ -32,7 +32,7 @@ export interface ProviderStatusTrackerProps {
 
 export interface ProviderStatusTrackerDependencies {
   stakePoolProvider: TrackedStakePoolProvider;
-  networkInfoProvider: TrackedNetworkInfoProvider;
+  networkInfoProvider: TrackedWalletNetworkInfoProvider;
   txSubmitProvider: TrackedTxSubmitProvider;
   assetProvider: TrackedAssetProvider;
   utxoProvider: TrackedUtxoProvider;
@@ -53,8 +53,6 @@ const getDefaultProviderSyncRelevantStats = ({
     networkInfoProvider.stats.ledgerTip$,
     networkInfoProvider.stats.currentWalletProtocolParameters$,
     networkInfoProvider.stats.genesisParameters$,
-    networkInfoProvider.stats.stake$,
-    networkInfoProvider.stats.lovelaceSupply$,
     networkInfoProvider.stats.timeSettings$,
     assetProvider.stats.getAsset$,
     txSubmitProvider.stats.submitTx$,

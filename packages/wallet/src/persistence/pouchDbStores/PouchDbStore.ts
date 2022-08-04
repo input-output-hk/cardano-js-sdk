@@ -1,9 +1,9 @@
 import { EMPTY, Observable, from } from 'rxjs';
 import { Logger } from 'ts-log';
-import { toPouchdbDoc } from './util';
+import { toPouchDbDoc } from './util';
 import PouchDB from 'pouchdb';
 
-export abstract class PouchdbStore<T> {
+export abstract class PouchDbStore<T> {
   destroyed = false;
   protected idle: Promise<void> = Promise.resolve();
   protected readonly logger: Logger;
@@ -33,7 +33,7 @@ export abstract class PouchdbStore<T> {
   }
 
   /**
-   * Might all destroy other stores, if the underlying pouchdb database is shared.
+   * Might all destroy other stores, if the underlying PouchDb database is shared.
    */
   destroy(): Observable<void> {
     if (!this.destroyed) {
@@ -43,8 +43,8 @@ export abstract class PouchdbStore<T> {
     return EMPTY;
   }
 
-  protected toPouchdbDoc(obj: T): T {
-    return toPouchdbDoc(obj) as T;
+  protected toPouchDbDoc(obj: T): T {
+    return toPouchDbDoc(obj) as T;
   }
 
   async #getRev(docId: string) {
@@ -54,20 +54,20 @@ export abstract class PouchdbStore<T> {
 
   protected forcePut(docId: string, doc: T) {
     if (this.destroyed) return EMPTY;
-    const serializableDoc = this.toPouchdbDoc(doc);
+    const serializableDoc = this.toPouchDbDoc(doc);
     return from(
       (this.idle = this.idle
         .then(async () => {
-          const pouchdbDoc = {
+          const pouchDbDoc = {
             _id: docId,
             _rev: await this.#getRev(docId),
             ...serializableDoc
           };
           // eslint-disable-next-line promise/always-return
           try {
-            await this.db.put(pouchdbDoc, { force: true });
+            await this.db.put(pouchDbDoc, { force: true });
           } catch (error) {
-            this.logger.error(`PouchdbStore(${this.dbName}): failed to forcePut`, pouchdbDoc, error);
+            this.logger.error(`PouchDbStore(${this.dbName}): failed to forcePut`, pouchDbDoc, error);
           }
         })
         .catch(() => void 0))

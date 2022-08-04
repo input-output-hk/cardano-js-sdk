@@ -88,9 +88,12 @@ export interface WalletStores extends Destroyable {
   stakePools: KeyValueStore<Cardano.PoolId, Cardano.StakePool>;
   protocolParameters: DocumentStore<ProtocolParametersRequiredByWallet>;
   genesisParameters: DocumentStore<Cardano.CompactGenesis>;
-  stake: DocumentStore<StakeSummary>;
-  lovelaceSupply: DocumentStore<SupplySummary>;
   timeSettings: DocumentStore<TimeSettings[]>;
   assets: DocumentStore<Assets>;
   addresses: DocumentStore<GroupedAddress[]>;
+}
+
+export interface SupplyDistributionStores extends Destroyable {
+  stake: DocumentStore<StakeSummary>;
+  lovelaceSupply: DocumentStore<SupplySummary>;
 }

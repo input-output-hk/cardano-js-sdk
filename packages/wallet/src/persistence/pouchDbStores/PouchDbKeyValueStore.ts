@@ -4,15 +4,15 @@
 import { Cardano } from '@cardano-sdk/core';
 import { EMPTY, Observable, from } from 'rxjs';
 import { KeyValueCollection, KeyValueStore } from '../types';
-import { PouchdbStore } from './PouchdbStore';
+import { PouchDbStore } from './PouchDbStore';
 import { dummyLogger } from 'ts-log';
-import { sanitizePouchdbDoc } from './util';
+import { sanitizePouchDbDoc } from './util';
 
 /**
  * PouchDB database that implements KeyValueStore by using keys as document _id
  */
-export class PouchdbKeyValueStore<K extends string | Cardano.util.OpaqueString<any>, V>
-  extends PouchdbStore<V>
+export class PouchDbKeyValueStore<K extends string | Cardano.util.OpaqueString<any>, V>
+  extends PouchDbStore<V>
   implements KeyValueStore<K, V>
 {
   /**
@@ -32,12 +32,12 @@ export class PouchdbKeyValueStore<K extends string | Cardano.util.OpaqueString<a
           await this.clearDB();
           await this.db.bulkDocs(
             docs.map(({ key, value }) => ({
-              ...this.toPouchdbDoc(value),
+              ...this.toPouchDbDoc(value),
               _id: key.toString()
             }))
           );
         } catch (error) {
-          this.logger.error(`PouchdbDocumentStore(${this.dbName}): failed to setAll`, docs, error);
+          this.logger.error(`PouchDbDocumentStore(${this.dbName}): failed to setAll`, docs, error);
         }
       }))
     );
@@ -54,7 +54,7 @@ export class PouchdbKeyValueStore<K extends string | Cardano.util.OpaqueString<a
             if (docs.length !== 1 || 'error' in docs[0]) {
               return observer.complete();
             }
-            values.push(sanitizePouchdbDoc(docs[0].ok));
+            values.push(sanitizePouchDbDoc(docs[0].ok));
           }
           observer.next(values);
           observer.complete();
