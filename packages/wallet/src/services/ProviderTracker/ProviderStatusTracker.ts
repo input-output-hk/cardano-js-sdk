@@ -13,8 +13,10 @@ import {
   skipWhile,
   switchMap,
   take,
+  tap,
   timer
 } from 'rxjs';
+import { Logger } from 'ts-log';
 import { Milliseconds } from '../types';
 import { ProviderFnStats } from './ProviderTracker';
 import { TrackedAssetProvider } from './TrackedAssetProvider';
@@ -38,6 +40,7 @@ export interface ProviderStatusTrackerDependencies {
   utxoProvider: TrackedUtxoProvider;
   chainHistoryProvider: TrackedChainHistoryProvider;
   rewardsProvider: TrackedRewardsProvider;
+  logger: Logger;
 }
 
 const getDefaultProviderSyncRelevantStats = ({
@@ -76,6 +79,7 @@ export const createProviderStatusTracker = (
   { consideredOutOfSyncAfter }: ProviderStatusTrackerProps,
   { getProviderSyncRelevantStats = getDefaultProviderSyncRelevantStats }: ProviderStatusTrackerInternals = {}
 ) => {
+  const logger = dependencies.logger;
   const relevantStats$ = getProviderSyncRelevantStats(dependencies).pipe(share());
   const isAnyRequestPending$ = new TrackerSubject<boolean>(
     relevantStats$.pipe(
@@ -86,17 +90,22 @@ export const createProviderStatusTracker = (
             didLastRequestFail || numCalls > numResponses + numFailures
         )
       ),
-      distinctUntilChanged()
+      distinctUntilChanged(),
+      tap((isReqPending) => logger.debug(`${isReqPending ? 'Some' : 'No'} requests are pending`))
     )
   );
   const statsReady$ = relevantStats$.pipe(
     debounceTime(1),
     skipWhile((allStats) => allStats.some(({ initialized }) => !initialized)),
     take(1),
+    tap(() => logger.debug('All stats are initialized')),
     mergeMap(() => EMPTY)
   );
   const isSettled$ = new TrackerSubject<boolean>(
-    concat(of(false), statsReady$, isAnyRequestPending$.pipe(map((pending) => !pending))).pipe(distinctUntilChanged())
+    concat(of(false), statsReady$, isAnyRequestPending$.pipe(map((pending) => !pending))).pipe(
+      distinctUntilChanged(),
+      tap((isSettled) => logger.debug('isSettled', isSettled))
+    )
   );
   const isUpToDate$ = new TrackerSubject<boolean>(
     concat(
@@ -106,7 +115,7 @@ export const createProviderStatusTracker = (
         switchMap(() => concat(of(true), timer(consideredOutOfSyncAfter).pipe(map(() => false)))),
         distinctUntilChanged()
       )
-    )
+    ).pipe(tap((isUpToDate) => logger.debug('isUpToDate', isUpToDate)))
   );
   return {
     isAnyRequestPending$,
@@ -116,6 +125,7 @@ export const createProviderStatusTracker = (
       isAnyRequestPending$.complete();
       isSettled$.complete();
       isUpToDate$.complete();
+      logger.debug('Shutdown');
     }
   };
 };

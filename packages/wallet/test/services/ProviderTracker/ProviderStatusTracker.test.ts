@@ -13,6 +13,7 @@ import {
   createProviderStatusTracker
 } from '../../../src';
 import { createStubStakePoolProvider, createTestScheduler } from '@cardano-sdk/util-dev';
+import { dummyLogger } from 'ts-log';
 import {
   mockAssetProvider,
   mockChainHistoryProvider,
@@ -91,6 +92,7 @@ describe('createProviderStatusTracker', () => {
         {
           assetProvider,
           chainHistoryProvider,
+          logger: dummyLogger,
           networkInfoProvider,
           rewardsProvider,
           stakePoolProvider,
@@ -122,6 +124,7 @@ describe('createProviderStatusTracker', () => {
         {
           assetProvider,
           chainHistoryProvider,
+          logger: dummyLogger,
           networkInfoProvider,
           rewardsProvider,
           stakePoolProvider,
@@ -150,6 +153,7 @@ describe('createProviderStatusTracker', () => {
         {
           assetProvider,
           chainHistoryProvider,
+          logger: dummyLogger,
           networkInfoProvider,
           rewardsProvider,
           stakePoolProvider,
@@ -178,6 +182,7 @@ describe('createProviderStatusTracker', () => {
         {
           assetProvider,
           chainHistoryProvider,
+          logger: dummyLogger,
           networkInfoProvider,
           rewardsProvider,
           stakePoolProvider,

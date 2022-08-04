@@ -1,6 +1,6 @@
 import { Cardano } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
-import { Observable, filter, from, map, merge, mergeMap, scan, withLatestFrom } from 'rxjs';
+import { Observable, filter, from, map, merge, mergeMap, scan, tap, withLatestFrom } from 'rxjs';
 
 import { CustomError } from 'ts-custom-error';
 import { DocumentStore } from '../persistence';
@@ -49,6 +49,7 @@ export const createTransactionReemitter = ({
 }: TransactionReemitterProps): Observable<Cardano.NewTxAlonzo> => {
   const volatileTransactions$ = merge(
     store.get().pipe(
+      tap((txs) => logger.debug(`Store contains ${txs.length} volatile transactions`)),
       mergeMap((txs) => from(txs)),
       map((tx) => ({ source: txSource.store, tx }))
     ),
@@ -64,6 +65,7 @@ export const createTransactionReemitter = ({
         }
         case txSource.submitting: {
           // Transactions in submitting are the ones reemitted. Remove them from volatiles
+          logger.debug(`Transaction ${tx.id} is being resubmitted. Remove it from volatiles`);
           volatiles = volatiles.filter((v) => v.id !== tx.id);
           store.set(volatiles);
           break;
@@ -71,6 +73,8 @@ export const createTransactionReemitter = ({
         case txSource.confirmed: {
           const oldestAcceptedSlot = tx.slot > stabilityWindowSlotsCount ? tx.slot - stabilityWindowSlotsCount : 0;
           // Remove transactions considered stable
+          logger.debug(`Removing stable transactions (slot <= ${oldestAcceptedSlot}), from volatiles`);
+          logger.debug(`Adding new volatile transaction ${tx.id}`);
           volatiles = [...volatiles.filter(({ slot }) => slot > oldestAcceptedSlot), tx];
           store.set(volatiles);
           break;

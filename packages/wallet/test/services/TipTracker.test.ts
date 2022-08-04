@@ -4,6 +4,7 @@ import { InMemoryDocumentStore } from '../../src/persistence';
 import { Milliseconds, SyncStatus } from '../../src';
 import { Observable, firstValueFrom, of } from 'rxjs';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
+import { dummyLogger } from 'ts-log';
 
 const stubObservableProvider = <T>(...calls: Observable<T>[]) => {
   let numCall = 0;
@@ -26,6 +27,7 @@ describe('TipTracker', () => {
   const pollInterval: Milliseconds = 1; // delays emission after trigger
   let store: InMemoryDocumentStore<Cardano.Tip>;
   let connectionStatus$: Observable<ConnectionStatus>;
+  const logger = dummyLogger;
 
   beforeEach(() => {
     store = new InMemoryDocumentStore();
@@ -43,6 +45,7 @@ describe('TipTracker', () => {
       );
       const tracker$ = new TipTracker({
         connectionStatus$,
+        logger,
         maxPollInterval: Number.MAX_VALUE,
         minPollInterval: pollInterval,
         provider$,
@@ -63,6 +66,7 @@ describe('TipTracker', () => {
       const provider$ = cold<Cardano.PartialBlockHeader>('|');
       const tracker$ = new TipTracker({
         connectionStatus$: connectionStatusOffOn$,
+        logger,
         maxPollInterval: Number.MAX_VALUE,
         minPollInterval: pollInterval,
         provider$,
@@ -88,6 +92,7 @@ describe('TipTracker', () => {
       );
       const tracker$ = new TipTracker({
         connectionStatus$,
+        logger,
         maxPollInterval: Number.MAX_VALUE,
         minPollInterval: pollInterval,
         provider$,
@@ -110,6 +115,7 @@ describe('TipTracker', () => {
       );
       const tracker$ = new TipTracker({
         connectionStatus$,
+        logger,
         maxPollInterval: 6,
         minPollInterval: pollInterval,
         provider$,
@@ -132,6 +138,7 @@ describe('TipTracker', () => {
       const provider$ = stubObservableProvider<Cardano.Tip>(cold('x|', mockTips), cold('a|', mockTips));
       const tracker$ = new TipTracker({
         connectionStatus$: connectionStatusMock$,
+        logger,
         maxPollInterval: Number.MAX_VALUE,
         minPollInterval: 0,
         provider$,
@@ -149,6 +156,7 @@ describe('TipTracker', () => {
       const provider$ = cold('x|', mockTips);
       const tracker$ = new TipTracker({
         connectionStatus$: connectionStatusMock$,
+        logger,
         maxPollInterval: 6,
         minPollInterval: 0,
         provider$,

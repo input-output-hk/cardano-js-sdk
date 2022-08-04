@@ -24,8 +24,9 @@ import {
   tap
 } from 'rxjs';
 import { FailedTx, NewTxAlonzoWithSlot, TransactionFailure, TransactionsTracker } from './types';
+import { Logger } from 'ts-log';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { Shutdown } from '@cardano-sdk/util';
+import { Shutdown, contextLogger } from '@cardano-sdk/util';
 import { TrackerSubject } from '@cardano-sdk/util-rxjs';
 import { coldObservableProvider, distinctBlock, transactionsEquals } from './util';
 import intersectionBy from 'lodash/intersectionBy';
@@ -44,6 +45,7 @@ export interface TransactionsTrackerProps {
     pending$: Observable<Cardano.NewTxAlonzo>;
     failedToSubmit$: Observable<FailedTx>;
   };
+  logger: Logger;
 }
 
 export interface TransactionsTrackerInternals {
@@ -57,6 +59,7 @@ export interface TransactionsTrackerInternalsProps {
   retryBackoffConfig: RetryBackoffConfig;
   tipBlockHeight$: Observable<number>;
   store: OrderedCollectionStore<Cardano.TxAlonzo>;
+  logger: Logger;
 }
 
 export const createAddressTransactionsProvider = ({
@@ -64,7 +67,8 @@ export const createAddressTransactionsProvider = ({
   addresses$,
   retryBackoffConfig,
   tipBlockHeight$,
-  store
+  store,
+  logger
 }: TransactionsTrackerInternalsProps): TransactionsTrackerInternals => {
   const rollback$ = new Subject<Cardano.TxAlonzo>();
   const storedTransactions$ = store.getAll().pipe(share());
@@ -75,6 +79,7 @@ export const createAddressTransactionsProvider = ({
       combineLatest([addresses$, storedTransactions$.pipe(defaultIfEmpty([] as Cardano.TxAlonzo[]))]).pipe(
         switchMap(([addresses, storedTransactions]) => {
           let localTransactions: Cardano.TxAlonzo[] = [...storedTransactions];
+          logger.debug(`Stored history transactions count: ${localTransactions.length}`);
           return coldObservableProvider({
             // Do not re-fetch transactions twice on load when tipBlockHeight$ loads from storage first
             // It should also help when using poor internet connection.
@@ -86,23 +91,29 @@ export const createAddressTransactionsProvider = ({
               while (true) {
                 const lastStoredTransaction: Cardano.TxAlonzo | undefined =
                   localTransactions[localTransactions.length - 1];
+
+                const sinceBlock = lastStoredTransaction?.blockHeader.blockNo;
                 const newTransactions = await chainHistoryProvider.transactionsByAddresses({
                   addresses,
-                  sinceBlock: lastStoredTransaction?.blockHeader.blockNo
+                  sinceBlock
                 });
+                logger.debug(
+                  `chainHistoryProvider returned ${newTransactions.length} transactions`,
+                  sinceBlock !== undefined && `since block ${sinceBlock}`
+                );
                 const duplicateTransactions =
                   lastStoredTransaction && intersectionBy(localTransactions, newTransactions, (tx) => tx.id);
                 if (typeof duplicateTransactions !== 'undefined' && duplicateTransactions.length === 0) {
-                  from(
-                    localTransactions.filter(
-                      ({ blockHeader: { blockNo } }) => blockNo >= lastStoredTransaction.blockHeader.blockNo
-                    )
-                  ).subscribe(rollback$);
+                  const rollbackTransactions = localTransactions.filter(
+                    ({ blockHeader: { blockNo } }) => blockNo >= sinceBlock
+                  );
+
+                  from(rollbackTransactions)
+                    .pipe(tap((tx) => logger.debug(`Transaction ${tx.id} was rolled back`)))
+                    .subscribe(rollback$);
 
                   // Rollback by 1 block, try again in next loop iteration
-                  localTransactions = localTransactions.filter(
-                    ({ blockHeader: { blockNo } }) => blockNo < lastStoredTransaction.blockHeader.blockNo
-                  );
+                  localTransactions = localTransactions.filter(({ blockHeader: { blockNo } }) => blockNo < sinceBlock);
                 } else {
                   localTransactions = unionBy(localTransactions, newTransactions, (tx) => tx.id);
                   store.setAll(localTransactions);
@@ -156,19 +167,24 @@ export const createTransactionsTracker = (
     newTransactions: { submitting$: newSubmitting$, pending$, failedToSubmit$ },
     retryBackoffConfig,
     transactionsHistoryStore: transactionsStore,
-    inFlightTransactionsStore: newTransactionsStore
+    inFlightTransactionsStore: newTransactionsStore,
+    logger
   }: TransactionsTrackerProps,
   { transactionsSource$: txSource$, rollback$ }: TransactionsTrackerInternals = createAddressTransactionsProvider({
     addresses$,
     chainHistoryProvider,
+    logger: contextLogger(logger, 'AddressTransactionsProvider'),
     retryBackoffConfig,
     store: transactionsStore,
     tipBlockHeight$: distinctBlock(tip$)
   })
 ): TransactionsTracker & Shutdown => {
   const submitting$ = merge(
-    newTransactionsStore.get().pipe(mergeMap((transactions) => from(transactions))),
-    newSubmitting$
+    newTransactionsStore.get().pipe(
+      tap((transactions) => logger.debug(`Store contains ${transactions?.length} in flight transactions`)),
+      mergeMap((transactions) => from(transactions))
+    ),
+    newSubmitting$.pipe(tap((newSubmitting) => logger.debug(`Got new submitting transaction: ${newSubmitting.id}`)))
   ).pipe(share());
 
   const transactionsSource$ = new TrackerSubject(txSource$);
@@ -178,7 +194,8 @@ export const createTransactionsTracker = (
     newTransactions$(historicalTransactions$).pipe(
       filter((historyTx) => historyTx.id === tx.id),
       take(1),
-      map((historyTx) => ({ ...tx, slot: historyTx.blockHeader.slot }))
+      map((historyTx) => ({ ...tx, slot: historyTx.blockHeader.slot })),
+      tap((historyTx) => logger.debug(`Transaction ${historyTx.id} is confirmed in slot ${historyTx.slot}`))
     );
 
   const failed$ = new Subject<FailedTx>();
@@ -199,7 +216,8 @@ export const createTransactionsTracker = (
               )
             : EMPTY
         ).pipe(takeUntil(txConfirmed$(tx)));
-      })
+      }),
+      tap((failed) => logger.debug(`Transaction ${failed.tx.id} failed`, failed.reason))
     )
     .subscribe(failed$);
 
@@ -225,6 +243,7 @@ export const createTransactionsTracker = (
         return [...inFlight.slice(0, idx), ...inFlight.slice(idx + 1)];
       }, [] as Cardano.NewTxAlonzo[]),
       tap((inFlight) => newTransactionsStore.set(inFlight)),
+      tap((inFlight) => logger.debug(`${inFlight.length} in flight transactions`)),
       startWith([])
     )
   );
@@ -250,6 +269,7 @@ export const createTransactionsTracker = (
       confirmed$.complete();
       failedSubscription.unsubscribe();
       failed$.complete();
+      logger.debug('Shutdown');
     }
   };
 };

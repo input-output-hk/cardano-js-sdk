@@ -5,9 +5,12 @@ import { FailedTx, TransactionFailure, createAddressTransactionsProvider, create
 import { InMemoryInFlightTransactionsStore, InMemoryTransactionsStore, WalletStores } from '../../src/persistence';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
+import { dummyLogger } from 'ts-log';
 import delay from 'delay';
 
 describe('TransactionsTracker', () => {
+  const logger = dummyLogger;
+
   describe('createAddressTransactionsProvider', () => {
     let store: InMemoryTransactionsStore;
     let chainHistoryProvider: ChainHistoryProviderStub;
@@ -25,6 +28,7 @@ describe('TransactionsTracker', () => {
       const provider$ = createAddressTransactionsProvider({
         addresses$: of(addresses),
         chainHistoryProvider,
+        logger,
         retryBackoffConfig,
         store,
         tipBlockHeight$
@@ -42,6 +46,7 @@ describe('TransactionsTracker', () => {
       const provider$ = createAddressTransactionsProvider({
         addresses$: of(addresses),
         chainHistoryProvider,
+        logger,
         retryBackoffConfig,
         store,
         tipBlockHeight$
@@ -67,6 +72,7 @@ describe('TransactionsTracker', () => {
       const provider$ = createAddressTransactionsProvider({
         addresses$: of(addresses),
         chainHistoryProvider,
+        logger,
         retryBackoffConfig,
         store,
         tipBlockHeight$
@@ -123,6 +129,7 @@ describe('TransactionsTracker', () => {
             addresses$,
             chainHistoryProvider,
             inFlightTransactionsStore,
+            logger,
             newTransactions: {
               failedToSubmit$,
               pending$,
@@ -167,6 +174,7 @@ describe('TransactionsTracker', () => {
             addresses$,
             chainHistoryProvider,
             inFlightTransactionsStore,
+            logger,
             newTransactions: {
               failedToSubmit$,
               pending$,
@@ -210,6 +218,7 @@ describe('TransactionsTracker', () => {
             addresses$,
             chainHistoryProvider,
             inFlightTransactionsStore,
+            logger,
             newTransactions: {
               failedToSubmit$,
               pending$,
@@ -255,6 +264,7 @@ describe('TransactionsTracker', () => {
             addresses$,
             chainHistoryProvider,
             inFlightTransactionsStore,
+            logger,
             newTransactions: {
               failedToSubmit$,
               pending$,
@@ -316,6 +326,7 @@ describe('TransactionsTracker', () => {
             addresses$,
             chainHistoryProvider,
             inFlightTransactionsStore,
+            logger,
             newTransactions: {
               failedToSubmit$,
               pending$,
@@ -387,6 +398,7 @@ describe('TransactionsTracker', () => {
             addresses$,
             chainHistoryProvider,
             inFlightTransactionsStore,
+            logger,
             newTransactions: {
               failedToSubmit$,
               pending$,
