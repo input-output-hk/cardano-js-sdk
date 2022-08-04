@@ -9,7 +9,7 @@ import {
   walletName
 } from './util';
 import { Cardano } from '@cardano-sdk/core';
-import { KeyManagement, setupWallet } from '@cardano-sdk/wallet';
+import { KeyManagement, createWalletUtil } from '@cardano-sdk/wallet';
 import {
   RemoteApiPropertyType,
   consumeObservableWallet,
@@ -72,26 +72,25 @@ wallet.balance.utxo.available$.subscribe(
 );
 
 document.querySelector('#createKeyAgent')!.addEventListener('click', async () => {
-  // setupWallet call is required to provide context (InputResolver) to the key agent
-  const { keyAgent } = await setupWallet({
-    createKeyAgent: async (dependencies) =>
-      KeyManagement.util.createAsyncKeyAgent(
-        await KeyManagement.InMemoryKeyAgent.fromBip39MnemonicWords(
-          {
-            accountIndex: 0,
-            getPassword: async () => Buffer.from(''),
-            mnemonicWords: process.env.MNEMONIC_WORDS!.split(' '),
-            networkId: 0
-          },
-          dependencies
-        )
-      ),
-    createWallet: async () => wallet
-  });
+  const deviceConnection = await KeyManagement.LedgerKeyAgent.establishDeviceConnection(
+    KeyManagement.CommunicationType.Web
+  );
+
+  const keyAgent = await KeyManagement.LedgerKeyAgent.createWithDevice(
+    {
+      accountIndex: 0,
+      communicationType: KeyManagement.CommunicationType.Web,
+      deviceConnection,
+      networkId: 0,
+      protocolMagic: 1_097_911_063
+    },
+    { inputResolver: createWalletUtil(wallet) }
+  );
+
   // restoreKeyAgent or create a new one and expose it
   exposeKeyAgent(
     {
-      keyAgent,
+      keyAgent: KeyManagement.util.createAsyncKeyAgent(keyAgent),
       walletName
     },
     { logger, runtime }
