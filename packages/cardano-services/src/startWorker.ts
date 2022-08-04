@@ -12,7 +12,7 @@ import {
 import { SERVICE_DISCOVERY_BACKOFF_FACTOR_DEFAULT, SERVICE_DISCOVERY_TIMEOUT_DEFAULT } from './Program';
 import { URL } from 'url';
 import { config } from 'dotenv';
-import { loggerMethodNames } from './util';
+import { loggerMethodNames } from '@cardano-sdk/util';
 import onDeath from 'death';
 
 const envSpecs = {
