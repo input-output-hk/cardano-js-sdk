@@ -3,10 +3,10 @@ import * as envalid from 'envalid';
 import { Cardano } from '@cardano-sdk/core';
 import { ChildProcess, fork } from 'child_process';
 import { InitializeTxResult, ObservableWallet } from '@cardano-sdk/wallet';
+import { RabbitMQContainer } from '../../../../rabbitmq/test/docker';
 import { ServiceNames } from '@cardano-sdk/cardano-services';
 import { filter, firstValueFrom } from 'rxjs';
 import { getLogger, getWallet } from '../../../src/factories';
-import { removeRabbitMQContainer, setupRabbitMQContainer } from '../../../../rabbitmq/test/jest-setup/docker';
 import JSONBig from 'json-bigint';
 import path from 'path';
 
@@ -22,7 +22,6 @@ export const env = envalid.cleanEnv(process.env, {
   NETWORK_INFO_PROVIDER: envalid.str(),
   NETWORK_INFO_PROVIDER_PARAMS: envalid.json({ default: {} }),
   OGMIOS_URL: envalid.str(),
-  RABBITMQ_URL: envalid.url(),
   REWARDS_PROVIDER: envalid.str(),
   REWARDS_PROVIDER_PARAMS: envalid.json({ default: {} }),
   STAKE_POOL_PROVIDER: envalid.str(),
@@ -50,18 +49,9 @@ interface TestReport extends TestOptions {
   timeAfterTxsInBlockchain: number;
 }
 
-const containerName = 'rabbitmq-load-test';
-
 const logger = getLogger(env.LOGGER_MIN_SEVERITY);
 
-const commonArgs = [
-  '--logger-min-severity',
-  'info',
-  '--ogmios-url',
-  env.OGMIOS_URL,
-  '--rabbitmq-url',
-  env.RABBITMQ_URL
-];
+let commonArgs: string[];
 
 const runCli = (args: string[], startedString: string) =>
   new Promise<ChildProcess>((resolve, reject) => {
@@ -98,11 +88,11 @@ const runCli = (args: string[], startedString: string) =>
 const stopProc = (proc: ChildProcess) =>
   new Promise<void>((resolve) => (proc?.kill() ? proc.on('close', resolve) : resolve()));
 
+let rabbitmqUrl: URL;
 let serverProc: ChildProcess;
 let workerProc: ChildProcess;
 
 const startServer = async (options: TestOptions = {}) => {
-  await setupRabbitMQContainer(containerName);
   if (env.START_LOCAL_HTTP_SERVER)
     serverProc = await runCli(
       [
@@ -133,7 +123,7 @@ const stopWorker = () => stopProc(workerProc);
 
 describe('load', () => {
   const testReports: TestReport[] = [];
-
+  const container = new RabbitMQContainer('rabbitmq-load-test');
   let wallet: ObservableWallet;
   let address: Cardano.Address;
 
@@ -181,7 +171,17 @@ describe('load', () => {
   beforeAll(async () => {
     jest.setTimeout(180_000);
 
-    await removeRabbitMQContainer();
+    ({ rabbitmqUrl } = await container.start());
+
+    commonArgs = [
+      '--logger-min-severity',
+      'debug',
+      '--ogmios-url',
+      env.OGMIOS_URL,
+      '--rabbitmq-url',
+      rabbitmqUrl.toString()
+    ];
+
     await startServer({ directlyToOgmios: true });
     await prepareWallets();
   });
@@ -217,7 +217,7 @@ describe('load', () => {
     wallet.shutdown();
 
     // Dependencies teardown parallelization
-    await Promise.all([removeRabbitMQContainer(containerName), stopServer()]);
+    await Promise.all([container.stop(), stopServer()]);
   });
 
   afterEach(stopWorker);
