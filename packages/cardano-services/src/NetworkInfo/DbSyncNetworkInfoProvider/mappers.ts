@@ -4,7 +4,6 @@ import {
   ProtocolParametersRequiredByWallet,
   ProviderError,
   ProviderFailure,
-  StakeSummary,
   SupplySummary,
   TimeSettings
 } from '@cardano-sdk/core';
@@ -16,11 +15,6 @@ import path from 'path';
 interface ToLovalaceSupplyInput {
   circulatingSupply: string;
   totalSupply: string;
-}
-
-interface ToStakeInput {
-  activeStake: string;
-  liveStake: string;
 }
 
 export const networkIdMap = {
@@ -38,11 +32,6 @@ export const toTimeSettings = (eraSummary: EraSummary): TimeSettings => ({
 export const toSupply = ({ circulatingSupply, totalSupply }: ToLovalaceSupplyInput): SupplySummary => ({
   circulating: BigInt(circulatingSupply),
   total: BigInt(totalSupply)
-});
-
-export const toStake = ({ liveStake, activeStake }: ToStakeInput): StakeSummary => ({
-  active: BigInt(activeStake),
-  live: BigInt(liveStake)
 });
 
 export const toLedgerTip = ({ block_no, slot_no, hash }: LedgerTipModel): Cardano.Tip => ({

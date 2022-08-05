@@ -68,6 +68,14 @@ export interface MockOgmiosServerConfig {
         };
       };
     };
+    stakeDistribution?: {
+      response: {
+        success: boolean;
+        failWith?: {
+          type: 'queryUnavailableInEra';
+        };
+      };
+    };
   };
   submitTxHook?: (data?: Uint8Array) => void;
 }
@@ -94,7 +102,12 @@ const handleSubmitTx = async (config: MockOgmiosServerConfig, args: any, send: (
 };
 
 const handleQuery = async (query: string, config: MockOgmiosServerConfig, send: (result: unknown) => void) => {
-  let result: Schema.EraSummary[] | Date | 'QueryUnavailableInCurrentEra' | UnknownResultError;
+  let result:
+    | Schema.EraSummary[]
+    | Date
+    | 'QueryUnavailableInCurrentEra'
+    | Schema.PoolDistribution
+    | UnknownResultError;
   switch (query) {
     case 'eraSummaries':
       if (config.stateQuery?.eraSummaries?.response.success) {
@@ -122,6 +135,32 @@ const handleQuery = async (query: string, config: MockOgmiosServerConfig, send: 
       if (config.stateQuery?.systemStart?.response.success) {
         result = new Date(1_506_203_091_000);
       } else if (config.stateQuery?.systemStart?.response.failWith?.type === 'queryUnavailableInEra') {
+        result = 'QueryUnavailableInCurrentEra';
+      } else {
+        throw new Error('Unknown mock response');
+      }
+      break;
+    case 'stakeDistribution':
+      if (config.stateQuery?.stakeDistribution?.response.success) {
+        result = {
+          pool1la4ghj4w4f8p4yk4qmx0qvqmzv6592ee9rs0vgla5w6lc2nc8w5: {
+            stake: '10098109508/40453712883332027',
+            vrf: '4e4a2e82dc455449bf5f1f6d249470963cf97389b5dc4d2118fe21625f50f518'
+          },
+          pool1lad5j5kawu60qljfqh02vnazxrahtaaj6cpaz4xeluw5xf023cg: {
+            stake: '14255969766/40453712883332027',
+            vrf: '474a6d2a44b51add62d8f2fd8fe80abc722bf84478479b617ad05b39aaa84971'
+          },
+          pool1llugtz5r4t6m7xz6es4qu7cszllm5y3uvx3ast5a9jzlv7h3xdu: {
+            stake: '98763124501826/40453712883332027',
+            vrf: 'dc1c0fd7d2fd95b6e9bf0e50ab5cb722edbd7d6e85b7d53323884d429ec6a83c'
+          },
+          pool1lu6ll4rcxm92059ggy6uym2p804s5hcwqyyn5vyqhy35kuxtn2f: {
+            stake: '1494933206/40453712883332027',
+            vrf: '4a13d5e99a1868788057bf401fdb4379b7846290dd948918839981088059a564'
+          }
+        };
+      } else if (config.stateQuery?.stakeDistribution?.response.failWith?.type === 'queryUnavailableInEra') {
         result = 'QueryUnavailableInCurrentEra';
       } else {
         throw new Error('Unknown mock response');
