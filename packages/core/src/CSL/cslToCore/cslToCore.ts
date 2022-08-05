@@ -1,5 +1,7 @@
 import { Asset, CSL, Cardano, SerializationFailure, util } from '../..';
 import { BootstrapWitness } from '@cardano-ogmios/schema';
+import { Ed25519KeyHash, NativeScriptType } from '../../Cardano';
+import { NativeScript } from '@emurgo/cardano-serialization-lib-nodejs';
 import { SerializationError } from '../../errors';
 import { createCertificate } from './certificate';
 
@@ -281,4 +283,71 @@ export const newTx = (cslTx: CSL.Transaction): Cardano.NewTxAlonzo => {
     id: transactionHash,
     witness: txWitnessSet(witnessSet)
   };
+};
+
+export enum NativeScriptKind {
+  RequireSignature = 0,
+  RequireAllOf = 1,
+  RequireAnyOf = 2,
+  RequireMOf = 3,
+  RequireTimeAfter = 4,
+  RequireTimeBefore = 5
+}
+
+export const nativeScript = (script: NativeScript): Cardano.NativeScript => {
+  let coreScript: Cardano.NativeScript;
+  const scriptKind = script.kind();
+
+  switch (scriptKind) {
+    case NativeScriptKind.RequireSignature: {
+      coreScript = {
+        __type: NativeScriptType.RequireSignature,
+        keyHash: Ed25519KeyHash(util.bytesToHex(script.as_script_pubkey()!.addr_keyhash().to_bytes()).toString())
+      };
+      break;
+    }
+    case NativeScriptKind.RequireAllOf: {
+      coreScript = { __type: NativeScriptType.RequireAllOf, scripts: new Array<Cardano.NativeScript>() };
+      const scriptAll = script.as_script_all();
+      for (let i = 0; i < scriptAll!.native_scripts().len(); ++i) {
+        coreScript.scripts.push(nativeScript(scriptAll!.native_scripts().get(i)));
+      }
+      break;
+    }
+    case NativeScriptKind.RequireAnyOf: {
+      coreScript = { __type: NativeScriptType.RequireAnyOf, scripts: new Array<Cardano.NativeScript>() };
+      const scriptAny = script.as_script_any();
+      for (let i = 0; i < scriptAny!.native_scripts().len(); ++i) {
+        coreScript.scripts.push(nativeScript(scriptAny!.native_scripts().get(i)));
+      }
+      break;
+    }
+    case NativeScriptKind.RequireMOf: {
+      const scriptMofK = script.as_script_n_of_k();
+      coreScript = {
+        __type: NativeScriptType.RequireMOf,
+        required: scriptMofK!.n(),
+        scripts: new Array<Cardano.NativeScript>()
+      };
+
+      for (let i = 0; i < scriptMofK!.native_scripts().len(); ++i) {
+        coreScript.scripts.push(nativeScript(scriptMofK!.native_scripts().get(i)));
+      }
+      break;
+    }
+    case NativeScriptKind.RequireTimeBefore: {
+      coreScript = { __type: NativeScriptType.RequireTimeBefore, slot: script.as_timelock_expiry()!.slot() };
+      break;
+    }
+    case NativeScriptKind.RequireTimeAfter: {
+      coreScript = { __type: NativeScriptType.RequireTimeAfter, slot: script.as_timelock_start()!.slot() };
+      break;
+    }
+    default:
+      throw new SerializationError(
+        SerializationFailure.InvalidNativeScriptType,
+        `Native Script Kind value '${scriptKind}' is not supported.`
+      );
+  }
+  return coreScript;
 };
