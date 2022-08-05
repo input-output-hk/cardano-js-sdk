@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.0-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.5.0-nightly.3...@cardano-sdk/web-extension@0.5.0-nightly.4) (2022-08-05)
+
+
+### ⚠ BREAKING CHANGES
+
+* hoist stake$ and lovelaceSupply$ out of ObservableWallet
+
+### Features
+
+* **web-extension:** add utils to expose/consume NetworkInfoStatsTracker ([1598969](https://github.com/input-output-hk/cardano-js-sdk/commit/159896957899d4182b0892b93f4389ed2fc064c3))
+
+
+### Code Refactoring
+
+* hoist stake$ and lovelaceSupply$ out of ObservableWallet ([3bf1720](https://github.com/input-output-hk/cardano-js-sdk/commit/3bf17200c8bae46b02817c16e5138d3678cfa3f5))
+
+
+
 ## [0.5.0-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.5.0-nightly.2...@cardano-sdk/web-extension@0.5.0-nightly.3) (2022-08-04)
 
 

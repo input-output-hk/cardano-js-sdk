@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.0-nightly.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.5.0-nightly.4...@cardano-sdk/cardano-services@0.5.0-nightly.5) (2022-08-05)
+
+
+### Bug Fixes
+
+* **cardano-services:** fixed a division by 0 on APY calculation if epoch lenght is less than 1 day ([bb041cf](https://github.com/input-output-hk/cardano-js-sdk/commit/bb041cf9f36b3eefc38859a1260c9baf585593aa))
+
+
+
 ## [0.5.0-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.5.0-nightly.3...@cardano-sdk/cardano-services@0.5.0-nightly.4) (2022-08-04)
 
 **Note:** Version bump only for package @cardano-sdk/cardano-services

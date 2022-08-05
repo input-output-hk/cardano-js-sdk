@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.0-nightly.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.4.0-nightly.5...@cardano-sdk/e2e@0.4.0-nightly.6) (2022-08-05)
+
+
+### ⚠ BREAKING CHANGES
+
+* rename pouchdb->pouchDb
+* hoist stake$ and lovelaceSupply$ out of ObservableWallet
+
+### Code Refactoring
+
+* hoist stake$ and lovelaceSupply$ out of ObservableWallet ([3bf1720](https://github.com/input-output-hk/cardano-js-sdk/commit/3bf17200c8bae46b02817c16e5138d3678cfa3f5))
+* rename pouchdb->pouchDb ([c58ccf9](https://github.com/input-output-hk/cardano-js-sdk/commit/c58ccf9f7a8f701dce87e2f6ddc2f28c0aa68745))
+
+
+
 ## [0.4.0-nightly.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.4.0-nightly.4...@cardano-sdk/e2e@0.4.0-nightly.5) (2022-08-04)
 
 **Note:** Version bump only for package @cardano-sdk/e2e
