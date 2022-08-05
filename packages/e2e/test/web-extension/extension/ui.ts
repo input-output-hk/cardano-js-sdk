@@ -14,10 +14,11 @@ import {
   RemoteApiPropertyType,
   consumeObservableWallet,
   consumeRemoteApi,
+  consumeSupplyDistributionTracker,
   exposeApi,
   exposeKeyAgent
 } from '@cardano-sdk/web-extension';
-import { firstValueFrom } from 'rxjs';
+import { combineLatest, firstValueFrom } from 'rxjs';
 import { runtime } from 'webextension-polyfill';
 
 const api: UserPromptService = {
@@ -63,6 +64,12 @@ backgroundServices.adaUsd$.subscribe((price) => (document.querySelector('#adaPri
 document
   .querySelector<HTMLButtonElement>('#clearAllowList')!
   .addEventListener('click', backgroundServices.clearAllowList);
+
+const supplyDistribution = consumeSupplyDistributionTracker({ walletName }, { logger, runtime });
+combineLatest([supplyDistribution.lovelaceSupply$, supplyDistribution.stake$]).subscribe(
+  ([lovelaceSupply, stake]) =>
+    (document.querySelector('#supplyDistribution')!.textContent = `${stake.live} out of ${lovelaceSupply.total}`)
+);
 
 // Use observable wallet from UI:
 const wallet = consumeObservableWallet({ walletName }, { logger, runtime });

@@ -6,10 +6,10 @@ import {
 } from '@cardano-sdk/util';
 import omit from 'lodash/omit';
 
-const PouchdbDocMetadata = ['_id', '_rev', '_attachments', '_conflicts', '_revisions', '_revs_info'] as const;
-type PouchdbDocMetadata = typeof PouchdbDocMetadata[number];
-type PouchdbDoc = {
-  [k in PouchdbDocMetadata]: unknown;
+const PouchDbDocMetadata = ['_id', '_rev', '_attachments', '_conflicts', '_revisions', '_revs_info'] as const;
+type PouchDbDocMetadata = typeof PouchDbDocMetadata[number];
+type PouchDbDoc = {
+  [k in PouchDbDocMetadata]: unknown;
 };
 
 const transformationTypeKey = 'transformed_type_';
@@ -34,9 +34,9 @@ const deserializeOptions: FromSerializableObjectOptions = {
   transformationTypeKey
 };
 
-// Pouchdb doesn't know how to store bigint and Map
-// toPouchdbDoc/fromPouchdbDoc converts to/from plain json objects
-export const toPouchdbDoc = <T>(obj: T): unknown => {
+// PouchDb doesn't know how to store bigint and Map
+// toPouchDbDoc/fromPouchDbDoc converts to/from plain json objects
+export const toPouchDbDoc = <T>(obj: T): unknown => {
   if (Array.isArray(obj)) {
     const value = obj.map((item) => toSerializableObject(item, serializeOptions));
     return {
@@ -47,7 +47,7 @@ export const toPouchdbDoc = <T>(obj: T): unknown => {
   return toSerializableObject(obj, serializeOptions);
 };
 
-export const fromPouchdbDoc = <T>(doc: unknown): T => {
+export const fromPouchDbDoc = <T>(doc: unknown): T => {
   if (typeof doc === 'object') {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const docAsAny = doc as any;
@@ -59,7 +59,7 @@ export const fromPouchdbDoc = <T>(doc: unknown): T => {
 
 // PouchDB adds some metadata on docs when you query them.
 // Best to keep the objects used by the wallet clean.
-// Would be great to have generic constraints on pouchdb stores, to say "not extends {_id, _rev...}".
+// Would be great to have generic constraints on PouchDb stores, to say "not extends {_id, _rev...}".
 // Don't think it's possible.
-export const sanitizePouchdbDoc = <T>(doc: T & Partial<PouchdbDoc>): T =>
-  fromPouchdbDoc(omit(doc, PouchdbDocMetadata)) as T;
+export const sanitizePouchDbDoc = <T>(doc: T & Partial<PouchDbDoc>): T =>
+  fromPouchDbDoc(omit(doc, PouchDbDocMetadata)) as T;

@@ -25,7 +25,7 @@ export const walletReady = (async () => {
       networkInfoProvider: await networkInfoProvider,
       rewardsProvider: await rewardsProvider,
       stakePoolProvider: await stakePoolProvider,
-      stores: storage.createPouchdbWalletStores(walletName, { logger }),
+      stores: storage.createPouchDbWalletStores(walletName, { logger }),
       txSubmitProvider: await txSubmitProvider,
       utxoProvider: await utxoProvider
     }

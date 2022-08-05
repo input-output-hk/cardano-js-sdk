@@ -4,18 +4,23 @@ import {
   Cardano,
   ChainHistoryProvider,
   EpochInfo,
-  NetworkInfoProvider,
   ProtocolParametersRequiredByWallet,
   RewardsProvider,
   StakePoolProvider,
-  StakeSummary,
-  SupplySummary,
   TimeSettings,
   TxSubmitProvider,
   UtxoProvider,
   coreToCsl
 } from '@cardano-sdk/core';
-import { Assets, InitializeTxProps, InitializeTxResult, ObservableWallet, SignDataProps, SyncStatus } from './types';
+import {
+  Assets,
+  InitializeTxProps,
+  InitializeTxResult,
+  ObservableWallet,
+  SignDataProps,
+  SyncStatus,
+  WalletNetworkInfoProvider
+} from './types';
 import {
   BalanceTracker,
   ConnectionStatus,
@@ -27,10 +32,10 @@ import {
   TipTracker,
   TrackedAssetProvider,
   TrackedChainHistoryProvider,
-  TrackedNetworkInfoProvider,
   TrackedRewardsProvider,
   TrackedStakePoolProvider,
   TrackedTxSubmitProvider,
+  TrackedWalletNetworkInfoProvider,
   TransactionFailure,
   TransactionalTracker,
   TransactionsTracker,
@@ -92,7 +97,7 @@ export interface SingleAddressWalletDependencies {
   readonly txSubmitProvider: TxSubmitProvider;
   readonly stakePoolProvider: StakePoolProvider;
   readonly assetProvider: AssetProvider;
-  readonly networkInfoProvider: NetworkInfoProvider;
+  readonly networkInfoProvider: WalletNetworkInfoProvider;
   readonly utxoProvider: UtxoProvider;
   readonly chainHistoryProvider: ChainHistoryProvider;
   readonly rewardsProvider: RewardsProvider;
@@ -117,7 +122,7 @@ export class SingleAddressWallet implements ObservableWallet {
   readonly currentEpoch$: TrackerSubject<EpochInfo>;
   readonly txSubmitProvider: TrackedTxSubmitProvider;
   readonly utxoProvider: TrackedUtxoProvider;
-  readonly networkInfoProvider: TrackedNetworkInfoProvider;
+  readonly networkInfoProvider: TrackedWalletNetworkInfoProvider;
   readonly stakePoolProvider: TrackedStakePoolProvider;
   readonly assetProvider: TrackedAssetProvider;
   readonly chainHistoryProvider: TrackedChainHistoryProvider;
@@ -126,8 +131,6 @@ export class SingleAddressWallet implements ObservableWallet {
   readonly transactions: TransactionsTracker & Shutdown;
   readonly delegation: DelegationTracker & Shutdown;
   readonly tip$: BehaviorObservable<Cardano.Tip>;
-  readonly lovelaceSupply$: TrackerSubject<SupplySummary>;
-  readonly stake$: TrackerSubject<StakeSummary>;
   readonly timeSettings$: TrackerSubject<TimeSettings[]>;
   readonly addresses$: TrackerSubject<GroupedAddress[]>;
   readonly protocolParameters$: TrackerSubject<ProtocolParametersRequiredByWallet>;
@@ -171,7 +174,7 @@ export class SingleAddressWallet implements ObservableWallet {
     this.#inputSelector = inputSelector;
     this.txSubmitProvider = new TrackedTxSubmitProvider(txSubmitProvider);
     this.utxoProvider = new TrackedUtxoProvider(utxoProvider);
-    this.networkInfoProvider = new TrackedNetworkInfoProvider(networkInfoProvider);
+    this.networkInfoProvider = new TrackedWalletNetworkInfoProvider(networkInfoProvider);
     this.stakePoolProvider = new TrackedStakePoolProvider(stakePoolProvider);
     this.assetProvider = new TrackedAssetProvider(assetProvider);
     this.chainHistoryProvider = new TrackedChainHistoryProvider(chainHistoryProvider);
@@ -241,27 +244,6 @@ export class SingleAddressWallet implements ObservableWallet {
     this.currentEpoch$ = currentEpochTracker(this.tip$, this.timeSettings$);
     this.currentEpoch$.pipe(map(() => void 0)).subscribe(timeSettingsTrigger);
     const epoch$ = this.currentEpoch$.pipe(map((epoch) => epoch.epochNo));
-
-    this.stake$ = new PersistentDocumentTrackerSubject(
-      coldObservableProvider({
-        equals: isEqual,
-        provider: this.networkInfoProvider.stake,
-        retryBackoffConfig,
-        trigger$: epoch$
-      }),
-      stores.stake
-    );
-
-    this.lovelaceSupply$ = new PersistentDocumentTrackerSubject(
-      coldObservableProvider({
-        equals: isEqual,
-        provider: this.networkInfoProvider.lovelaceSupply,
-        retryBackoffConfig,
-        trigger$: epoch$
-      }),
-      stores.lovelaceSupply
-    );
-
     this.protocolParameters$ = new PersistentDocumentTrackerSubject(
       coldObservableProvider({
         cancel$,
@@ -411,8 +393,6 @@ export class SingleAddressWallet implements ObservableWallet {
   shutdown() {
     this.utxo.shutdown();
     this.transactions.shutdown();
-    this.stake$.complete();
-    this.lovelaceSupply$.complete();
     this.timeSettings$.complete();
     this.protocolParameters$.complete();
     this.genesisParameters$.complete();

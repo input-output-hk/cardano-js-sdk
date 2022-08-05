@@ -2,22 +2,22 @@
 import { CollectionStore } from '../types';
 import { EMPTY, Observable, from } from 'rxjs';
 import { Logger, dummyLogger } from 'ts-log';
-import { PouchdbStore } from './PouchdbStore';
-import { sanitizePouchdbDoc } from './util';
+import { PouchDbStore } from './PouchDbStore';
+import { sanitizePouchDbDoc } from './util';
 
-export type ComputePouchdbDocId<T> = (doc: T) => string;
+export type ComputePouchDbDocId<T> = (doc: T) => string;
 
-export interface PouchdbCollectionStoreProps<T> {
+export interface PouchDbCollectionStoreProps<T> {
   dbName: string;
-  computeDocId?: ComputePouchdbDocId<T>;
+  computeDocId?: ComputePouchDbDocId<T>;
 }
 
 /**
  * PouchDB database that implements CollectionStore.
  * Supports sorting by custom document _id
  */
-export class PouchdbCollectionStore<T> extends PouchdbStore<T> implements CollectionStore<T> {
-  readonly #computeDocId: ComputePouchdbDocId<T> | undefined;
+export class PouchDbCollectionStore<T> extends PouchDbStore<T> implements CollectionStore<T> {
+  readonly #computeDocId: ComputePouchDbDocId<T> | undefined;
 
   /**
    * @param props store properties
@@ -25,7 +25,7 @@ export class PouchdbCollectionStore<T> extends PouchdbStore<T> implements Collec
    * @param props.computeDocId used for document sort order
    * @param logger will silently swallow the errors if not set
    */
-  constructor({ dbName, computeDocId }: PouchdbCollectionStoreProps<T>, logger: Logger = dummyLogger) {
+  constructor({ dbName, computeDocId }: PouchDbCollectionStoreProps<T>, logger: Logger = dummyLogger) {
     // Using a db per collection
     super(dbName, logger);
     this.#computeDocId = computeDocId;
@@ -37,7 +37,7 @@ export class PouchdbCollectionStore<T> extends PouchdbStore<T> implements Collec
       this.db
         .allDocs({ include_docs: true })
         .then((result) => {
-          const docs = result.rows.map(({ doc }) => sanitizePouchdbDoc(doc!));
+          const docs = result.rows.map(({ doc }) => sanitizePouchDbDoc(doc!));
           if (docs.length > 0) observer.next(docs);
           observer.complete();
         })
@@ -53,12 +53,12 @@ export class PouchdbCollectionStore<T> extends PouchdbStore<T> implements Collec
           await this.clearDB();
           await this.db.bulkDocs(
             docs.map((doc) => ({
-              ...this.toPouchdbDoc(doc),
+              ...this.toPouchDbDoc(doc),
               _id: this.#computeDocId?.(doc)
             }))
           );
         } catch (error) {
-          this.logger.error(`PouchdbCollectionStore(${this.dbName}): failed to setAll`, docs, error);
+          this.logger.error(`PouchDbCollectionStore(${this.dbName}): failed to setAll`, docs, error);
         }
       }))
     );

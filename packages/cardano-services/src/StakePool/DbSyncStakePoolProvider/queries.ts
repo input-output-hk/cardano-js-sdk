@@ -347,7 +347,7 @@ export const findPoolAPY = (limit?: number) => `
   avg_daily_roi AS (
     SELECT 
       hash_id,
-      SUM(member_roi / (epoch_length / 86400000)) / count(1) AS avg_roi
+      SUM(COALESCE(member_roi / NULLIF(epoch_length / 86400000, 0.0), 0.0)) / count(1) AS avg_roi
     FROM epoch_rewards
     GROUP BY hash_id
   ),
@@ -356,7 +356,7 @@ export const findPoolAPY = (limit?: number) => `
       epochs.hash_id,
       POWER(
         1 + (avg_daily_roi.avg_roi * (epochs.epoch_length / 86400000)), 
-        365 / (epochs.epoch_length / 86400000)
+        COALESCE(365 / NULLIF(epochs.epoch_length / 86400000, 0), 0)
       ) - 1 AS apy
     FROM epoch_rewards AS epochs
     JOIN (

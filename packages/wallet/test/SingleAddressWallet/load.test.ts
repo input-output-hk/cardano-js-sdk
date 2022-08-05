@@ -144,8 +144,6 @@ const assertWalletProperties2 = async (wallet: ObservableWallet) => {
   const walletGenesisParameters = await firstValueFrom(wallet.genesisParameters$);
   expect(walletGenesisParameters).toEqual(mocks.genesisParameters2);
 
-  expect(await firstValueFrom(wallet.stake$)).toEqual(networkInfo.stake);
-  expect(await firstValueFrom(wallet.lovelaceSupply$)).toEqual(networkInfo.lovelaceSupply);
   expect(await firstValueFrom(wallet.timeSettings$)).toEqual(networkInfo.network.timeSettings);
 
   // delegation
