@@ -32,7 +32,7 @@ import {
 } from './TxWorker';
 import { URL } from 'url';
 import { cacheTtlValidator } from './util/validators';
-import { loggerMethodNames } from './util';
+import { loggerMethodNames } from '@cardano-sdk/util';
 import clear from 'clear';
 import fs from 'fs';
 import onDeath from 'death';

@@ -20,7 +20,7 @@ import { LogLevel } from 'bunyan';
 import { URL } from 'url';
 import { cacheTtlValidator } from './util/validators';
 import { config } from 'dotenv';
-import { loggerMethodNames } from './util';
+import { loggerMethodNames } from '@cardano-sdk/util';
 import fs from 'fs';
 import onDeath from 'death';
 
