@@ -88,7 +88,7 @@ describe('SingleAddressWallet/delegation', () => {
       pagination: { limit: 2, startAt: 0 }
     });
     return activePools.pageResults.filter(({ id }) => id !== delegateeBefore1stTx)[
-      Math.floor(Math.random() * activePools.pageResults.length)
+      Math.floor(Math.random() * activePools.pageResults.length) - 1
     ].id;
   };
 
