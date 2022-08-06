@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.0-nightly.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.5.0-nightly.5...@cardano-sdk/cardano-services@0.5.0-nightly.6) (2022-08-06)
+
+
+### ⚠ BREAKING CHANGES
+
+* contextLogger support
+
+### Code Refactoring
+
+* contextLogger support ([6d5da8e](https://github.com/input-output-hk/cardano-js-sdk/commit/6d5da8ec8bba2033ce378d2f0d9321fd758e7c90))
+
+
+
 ## [0.5.0-nightly.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.5.0-nightly.4...@cardano-sdk/cardano-services@0.5.0-nightly.5) (2022-08-05)
 
 

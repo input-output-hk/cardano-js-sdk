@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/web-extension",
-  "version": "0.5.0-nightly.4",
+  "version": "0.5.0-nightly.5",
   "description": "Web extension wallet utilities",
   "engines": {
     "node": "^14"
@@ -51,8 +51,8 @@
     "test:debug": "DEBUG=true yarn test"
   },
   "devDependencies": {
-    "@cardano-sdk/util-dev": "^0.4.1-nightly.1",
-    "@cardano-sdk/wallet": "^0.5.0-nightly.4",
+    "@cardano-sdk/util-dev": "^0.4.1-nightly.2",
+    "@cardano-sdk/wallet": "^0.5.0-nightly.5",
     "@types/lodash": "^4.14.182",
     "@types/uuid": "^8.3.4",
     "@types/webextension-polyfill": "^0.8.0",
@@ -66,10 +66,10 @@
     "util": "^0.12.4"
   },
   "dependencies": {
-    "@cardano-sdk/cip30": "^0.4.1-nightly.2",
-    "@cardano-sdk/core": "^0.5.0-nightly.1",
-    "@cardano-sdk/util": "^0.4.1-nightly.1",
-    "@cardano-sdk/util-rxjs": "^0.4.1-nightly.1",
+    "@cardano-sdk/cip30": "^0.4.1-nightly.3",
+    "@cardano-sdk/core": "^0.5.0-nightly.2",
+    "@cardano-sdk/util": "^0.5.0-nightly.0",
+    "@cardano-sdk/util-rxjs": "^0.4.1-nightly.2",
     "lodash": "^4.17.21",
     "rxjs": "^7.4.0",
     "ts-log": "^2.2.3",
