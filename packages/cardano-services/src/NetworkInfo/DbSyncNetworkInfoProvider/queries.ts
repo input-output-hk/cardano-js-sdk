@@ -27,25 +27,6 @@ export const findTotalSupply = `
     LIMIT 1
 `;
 
-// Live stake is the current epoch’s delegated stake that has yet to be snapshotted
-export const findLiveStake = `
-    WITH current_delegation AS (
-        SELECT DISTINCT ON (delegation.addr_id) delegation.addr_id,
-    delegation.pool_hash_id
-    FROM delegation
-    ORDER BY delegation.addr_id, delegation.slot_no DESC, delegation.pool_hash_id 
-    )
-
-    SELECT CAST(COALESCE(SUM(tx_out.value), 0) AS BIGINT) AS live_stake
-    FROM tx_out 
-    LEFT JOIN tx_in ON tx_out.tx_id = tx_in.tx_out_id AND tx_out.index::smallint = tx_in.tx_out_index::smallint
-    LEFT JOIN current_delegation ON current_delegation.addr_id = tx_out.stake_address_id 
-    LEFT JOIN stake_address ON stake_address.id = current_delegation.addr_id 
-
-    WHERE 
-        tx_in.tx_in_id IS NULL
-`;
-
 // Active stake is the stake snapshot from n-1 epochs, where n = current epoch
 // epoch_stake contains records of completed epochs
 export const findActiveStake = `
@@ -95,7 +76,6 @@ const Queries = {
   findCurrentWalletProtocolParams,
   findLatestCompleteEpoch,
   findLedgerTip,
-  findLiveStake,
   findTotalSupply
 };
 

@@ -2,7 +2,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable sonarjs/cognitive-complexity */
 /* eslint-disable sonarjs/no-identical-functions */
-import { CardanoNode, EraSummary, NetworkInfoProvider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { CardanoNode, NetworkInfoProvider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { CreateHttpProviderConfig, networkInfoHttpProvider } from '@cardano-sdk/cardano-services-client';
 import { DbSyncNetworkInfoProvider, NetworkInfoCacheKey, NetworkInfoHttpService } from '../../src/NetworkInfo';
 import { HttpServer, HttpServerConfig } from '../../src';
@@ -12,6 +12,7 @@ import { Pool } from 'pg';
 import { getPort } from 'get-port-please';
 import { ingestDbData, sleep, wrapWithTransaction } from '../util';
 import { loadGenesisData } from '../../src/NetworkInfo/DbSyncNetworkInfoProvider/mappers';
+import { mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
 import axios from 'axios';
 
 const UNSUPPORTED_MEDIA_STRING = 'Request failed with status code 415';
@@ -36,26 +37,13 @@ describe('NetworkInfoHttpService', () => {
   const cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
   const db = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING, max: 1, min: 1 });
 
-  const mockEraSummaries: EraSummary[] = [
-    { parameters: { epochLength: 21_600, slotLength: 20_000 }, start: { slot: 0, time: new Date(1_563_999_616_000) } },
-    {
-      parameters: { epochLength: 432_000, slotLength: 1000 },
-      start: { slot: 1_598_400, time: new Date(1_595_964_016_000) }
-    }
-  ];
-
   describe('unhealthy NetworkInfoProvider', () => {
     beforeEach(async () => {
       port = await getPort();
       baseUrl = `http://localhost:${port}/network-info`;
       clientConfig = { baseUrl, logger: createLogger({ level: INFO, name: 'unit tests' }) };
       config = { listen: { port } };
-      cardanoNode = {
-        eraSummaries: jest.fn(() => Promise.resolve(mockEraSummaries)),
-        initialize: jest.fn(() => Promise.resolve()),
-        shutdown: jest.fn(() => Promise.resolve()),
-        systemStart: jest.fn(() => Promise.resolve(new Date(1_563_999_616_000)))
-      };
+      cardanoNode = mockCardanoNode();
       networkInfoProvider = {
         currentWalletProtocolParameters: jest.fn(),
         genesisParameters: jest.fn(),
@@ -84,20 +72,10 @@ describe('NetworkInfoHttpService', () => {
     const dbConnectionQuerySpy = jest.spyOn(db, 'query');
     const invalidateCacheSpy = jest.spyOn(cache, 'invalidate');
 
-    beforeEach(async () => {
-      await cache.clear();
-      jest.clearAllMocks();
-    });
-
     beforeAll(async () => {
       port = await getPort();
       baseUrl = `http://localhost:${port}/network-info`;
-      cardanoNode = {
-        eraSummaries: jest.fn(() => Promise.resolve(mockEraSummaries)),
-        initialize: jest.fn(() => Promise.resolve()),
-        shutdown: jest.fn(() => Promise.resolve()),
-        systemStart: jest.fn(() => Promise.resolve(new Date(1_563_999_616_000)))
-      };
+      cardanoNode = mockCardanoNode();
       config = { listen: { port } };
       networkInfoProvider = new DbSyncNetworkInfoProvider(
         { cardanoNodeConfigPath, epochPollInterval },
@@ -121,8 +99,7 @@ describe('NetworkInfoHttpService', () => {
 
     beforeEach(async () => {
       await cache.clear();
-      dbConnectionQuerySpy.mockClear();
-      invalidateCacheSpy.mockClear();
+      jest.clearAllMocks();
     });
 
     describe('start', () => {
@@ -176,6 +153,8 @@ describe('NetworkInfoHttpService', () => {
 
     describe('/stake', () => {
       const stakeTotalQueriesCount = 2;
+      const stakeDbQueriesCount = 1;
+      const stakeNodeQueriesCount = 1;
       const DB_POLL_QUERIES_COUNT = 1;
 
       describe('with Http Server', () => {
@@ -200,22 +179,27 @@ describe('NetworkInfoHttpService', () => {
       });
 
       it('should query the DB only once when the response is cached', async () => {
+        const cardanoNodeStakeSpy = jest.spyOn(cardanoNode, 'stakeDistribution');
         await provider.stake();
         await provider.stake();
-        expect(dbConnectionQuerySpy).toHaveBeenCalledTimes(stakeTotalQueriesCount);
+        expect(dbConnectionQuerySpy).toHaveBeenCalledTimes(stakeDbQueriesCount);
+        expect(cardanoNodeStakeSpy).toHaveBeenCalledTimes(stakeNodeQueriesCount);
         expect(cache.keys().length).toEqual(stakeTotalQueriesCount);
       });
 
       it('should call db-sync queries again once the cache is cleared', async () => {
+        const cardanoNodeStakeSpy = jest.spyOn(cardanoNode, 'stakeDistribution');
         await provider.stake();
         await cache.clear();
         expect(cache.keys().length).toEqual(0);
 
         await provider.stake();
-        expect(dbConnectionQuerySpy).toBeCalledTimes(stakeTotalQueriesCount * 2);
+        expect(dbConnectionQuerySpy).toBeCalledTimes(stakeDbQueriesCount * 2);
+        expect(cardanoNodeStakeSpy).toBeCalledTimes(stakeNodeQueriesCount * 2);
       });
 
       it('should not invalidate the epoch values from the cache if there is no epoch rollover', async () => {
+        const cardanoNodeStakeSpy = jest.spyOn(cardanoNode, 'stakeDistribution');
         const currentEpochNo = 205;
         const totalQueriesCount = stakeTotalQueriesCount + DB_POLL_QUERIES_COUNT;
 
@@ -228,7 +212,8 @@ describe('NetworkInfoHttpService', () => {
 
         expect(cache.getVal(NetworkInfoCacheKey.CURRENT_EPOCH)).toEqual(currentEpochNo);
         expect(cache.keys().length).toEqual(totalQueriesCount);
-        expect(dbConnectionQuerySpy).toBeCalledTimes(totalQueriesCount);
+        expect(dbConnectionQuerySpy).toBeCalledTimes(stakeDbQueriesCount + DB_POLL_QUERIES_COUNT);
+        expect(cardanoNodeStakeSpy).toHaveBeenCalledTimes(stakeNodeQueriesCount);
         expect(invalidateCacheSpy).not.toHaveBeenCalled();
       });
 

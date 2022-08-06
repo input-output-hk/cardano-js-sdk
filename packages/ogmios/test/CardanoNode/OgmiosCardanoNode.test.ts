@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/no-duplicate-string */
 import { CardanoNode, CardanoNodeErrors } from '@cardano-sdk/core';
 import { Connection, createConnectionObject } from '@cardano-ogmios/client';
 import { OgmiosCardanoNode } from '../../src';
@@ -34,6 +35,11 @@ describe('OgmiosCardanoNode', () => {
     it('systemStart rejects with not initialized error', async () => {
       await expect(node.systemStart()).rejects.toThrowError(
         new CardanoNodeErrors.CardanoNodeNotInitializedError('systemStart')
+      );
+    });
+    it('stakeDistribution rejects with not initialized error', async () => {
+      await expect(node.stakeDistribution()).rejects.toThrowError(
+        new CardanoNodeErrors.CardanoNodeNotInitializedError('stakeDistribution')
       );
     });
     it('shutdown rejects with not initialized error', async () => {
@@ -125,6 +131,52 @@ describe('OgmiosCardanoNode', () => {
 
         it('rejects with errors thrown by the service', async () => {
           await expect(node.systemStart()).rejects.toThrowError(
+            CardanoNodeErrors.CardanoClientErrors.QueryUnavailableInCurrentEraError
+          );
+        });
+      });
+    });
+
+    describe('stakeDistribution', () => {
+      describe('success', () => {
+        beforeAll(async () => {
+          mockServer = createMockOgmiosServer({
+            stateQuery: { stakeDistribution: { response: { success: true } } }
+          });
+          await listenPromise(mockServer, connection.port);
+          node = new OgmiosCardanoNode(connection);
+          await node.initialize();
+        });
+        afterAll(async () => {
+          await node.shutdown();
+          await serverClosePromise(mockServer);
+        });
+
+        it('resolves if successful', async () => {
+          const res = await node.stakeDistribution();
+          expect(res).toMatchSnapshot();
+        });
+      });
+
+      describe('failure', () => {
+        beforeAll(async () => {
+          mockServer = createMockOgmiosServer({
+            stateQuery: {
+              stakeDistribution: { response: { failWith: { type: 'queryUnavailableInEra' }, success: false } },
+              systemStart: { response: { success: true } }
+            }
+          });
+          await listenPromise(mockServer, connection.port);
+          node = new OgmiosCardanoNode(connection);
+          await node.initialize();
+        });
+        afterAll(async () => {
+          await node.shutdown();
+          await serverClosePromise(mockServer);
+        });
+
+        it('rejects with errors thrown by the service', async () => {
+          await expect(node.stakeDistribution()).rejects.toThrowError(
             CardanoNodeErrors.CardanoClientErrors.QueryUnavailableInCurrentEraError
           );
         });

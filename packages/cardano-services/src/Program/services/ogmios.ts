@@ -10,8 +10,8 @@ import { ServiceNames } from '../ServiceNames';
 import { TxSubmitProvider } from '@cardano-sdk/core';
 import { isConnectionError } from '@cardano-sdk/util';
 
-const isCardanoNodeOperation = (prop: string | symbol): prop is 'eraSummaries' | 'systemStart' =>
-  ['eraSummaries', 'systemStart'].includes(prop as string);
+const isCardanoNodeOperation = (prop: string | symbol): prop is 'eraSummaries' | 'systemStart' | 'stakeDistribution' =>
+  ['eraSummaries', 'systemStart', 'stakeDistribution'].includes(prop as string);
 
 const recreateOgmiosCardanoNode = async (
   serviceName: string,
@@ -28,12 +28,12 @@ const recreateOgmiosCardanoNode = async (
 };
 
 /**
- * Creates a extended TxSubmitProvider instance :
+ * Creates an extended TxSubmitProvider instance :
  * - use passed srv service name in order to resolve the port
- * - make dealing with failovers (re-resolving the port) opaque
+ * - make dealing with fail-overs (re-resolving the port) opaque
  * - use exponential backoff retry internally with default timeout and factor
  * - intercept 'submitTx' operation and handle connection errors runtime
- * - all other operations are bind to pool object withoud modifications
+ * - all other operations are bind to pool object without modifications
  *
  * @returns TxSubmitProvider instance
  */
@@ -89,13 +89,13 @@ export const getOgmiosTxSubmitProvider = async (
 };
 
 /**
- * Creates a extended OgmiosCardanoNode instance :
+ * Creates an extended OgmiosCardanoNode instance :
  * - use passed srv service name in order to resolve the port
- * - make dealing with failovers (re-resolving the port) opaque
+ * - make dealing with fail-overs (re-resolving the port) opaque
  * - use exponential backoff retry internally with default timeout and factor
  * - intercept 'initialize' operation and handle connection errors on initialization
  * - intercept 'eraSummaries' operation and handle connection errors runtime
- * - all other operations are bind to pool object withoud modifications
+ * - all other operations are bind to pool object without modifications
  *
  * @returns OgmiosCardanoNode instance
  */
