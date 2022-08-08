@@ -1,11 +1,4 @@
-import {
-  Cardano,
-  ChainHistoryProvider,
-  SlotEpochCalc,
-  StakePoolProvider,
-  TimeSettings,
-  createSlotEpochCalc
-} from '@cardano-sdk/core';
+import { Cardano, ChainHistoryProvider, SlotEpochCalc, TimeSettings, createSlotEpochCalc } from '@cardano-sdk/core';
 import { DelegationTracker, TransactionsTracker } from '../types';
 import { Observable, combineLatest, map } from 'rxjs';
 import {
@@ -18,7 +11,7 @@ import {
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { RewardsHistoryProvider, createRewardsHistoryProvider, createRewardsHistoryTracker } from './RewardsHistory';
 import { Shutdown } from '@cardano-sdk/util';
-import { TrackedRewardsProvider } from '../ProviderTracker';
+import { TrackedRewardsProvider, TrackedStakePoolProvider } from '../ProviderTracker';
 import { TrackerSubject } from '@cardano-sdk/util-rxjs';
 import { TxWithEpoch } from './types';
 import { WalletStores } from '../../persistence';
@@ -38,7 +31,7 @@ export type BlockEpochProvider = ReturnType<typeof createBlockEpochProvider>;
 export interface DelegationTrackerProps {
   rewardsTracker: TrackedRewardsProvider;
   rewardAccountAddresses$: Observable<Cardano.RewardAccount[]>;
-  stakePoolProvider: StakePoolProvider;
+  stakePoolProvider: TrackedStakePoolProvider;
   timeSettings$: Observable<TimeSettings[]>;
   epoch$: Observable<Cardano.Epoch>;
   transactionsTracker: TransactionsTracker;

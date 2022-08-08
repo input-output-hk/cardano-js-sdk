@@ -3,13 +3,15 @@
 /* eslint-disable prettier/prettier */
 import { Cardano, RewardsProvider } from '@cardano-sdk/core';
 import { EMPTY, Observable, of } from 'rxjs';
-import { KeyValueStore } from '../../../src/persistence';
+import { InMemoryStakePoolsStore, KeyValueStore } from '../../../src/persistence';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import {
   StakeKeyStatus,
+  TrackedStakePoolProvider,
   addressKeyStatuses,
   addressRewards,
   createDelegateeTracker,
+  createQueryStakePoolsProvider,
   createRewardsProvider,
   fetchRewardsTrigger$,
   getStakePoolIdAtEpoch
@@ -256,6 +258,42 @@ describe('RewardAccounts', () => {
         flush();
         expect(stakePoolProvider).toBeCalledTimes(1);
         expect(stakePoolProvider).toBeCalledWith([poolId1, poolId2]);
+      });
+    });
+
+    test('does not query the StakePoolProvider when there are no delegations certs provided', () => {
+      createTestScheduler().run(({ cold, expectObservable, flush }) => {
+        const epoch$ = cold('-a', { a: currentEpoch.number });
+        const trackedStakePoolProvider = {
+          queryStakePools: jest.fn(),
+          setStatInitialized: jest.fn(),
+          stats: { queryStakePools$: {} }
+        };
+        const observableStakePoolProvider = createQueryStakePoolsProvider(
+          trackedStakePoolProvider as unknown as TrackedStakePoolProvider,
+          new InMemoryStakePoolsStore(),
+          { initialInterval: 10 }
+        );
+        const target$ = createDelegateeTracker(
+          observableStakePoolProvider,
+          epoch$,
+          cold('a', {
+            a: []
+          })
+        );
+        expectObservable(target$).toBe('-a', {
+          a: {
+            currentEpoch: undefined,
+            nextEpoch: undefined,
+            nextNextEpoch: undefined
+          }
+        });
+        flush();
+        expect(trackedStakePoolProvider.queryStakePools).toBeCalledTimes(0);
+        expect(trackedStakePoolProvider.setStatInitialized).toBeCalledTimes(1);
+        expect(trackedStakePoolProvider.setStatInitialized).toBeCalledWith(
+          trackedStakePoolProvider.stats.queryStakePools$
+        );
       });
     });
   });
