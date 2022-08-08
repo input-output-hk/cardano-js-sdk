@@ -9,7 +9,6 @@
     "../../rabbitmq/test/docker",
     "../../cip2/test/util",
   ],
-  "rootDir": ".",
   "references": [
     {
       "path": "../src"

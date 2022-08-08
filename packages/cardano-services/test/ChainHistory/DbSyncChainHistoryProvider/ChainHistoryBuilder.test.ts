@@ -1,6 +1,7 @@
 import { Cardano } from '@cardano-sdk/core';
 import { ChainHistoryBuilder } from '../../../src';
 import { Pool } from 'pg';
+import { dummyLogger as logger } from 'ts-log';
 
 describe('ChainHistoryBuilder', () => {
   let dbConnection: Pool;
@@ -8,7 +9,7 @@ describe('ChainHistoryBuilder', () => {
 
   beforeAll(async () => {
     dbConnection = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING });
-    builder = new ChainHistoryBuilder(dbConnection);
+    builder = new ChainHistoryBuilder(dbConnection, logger);
   });
 
   afterAll(async () => {

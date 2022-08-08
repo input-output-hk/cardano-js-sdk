@@ -6,6 +6,7 @@ import { CreateHttpProviderConfig, txSubmitHttpProvider } from '@cardano-sdk/car
 import { FATAL, createLogger } from 'bunyan';
 import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
 import { getPort } from 'get-port-please';
+import { dummyLogger as logger } from 'ts-log';
 import axios from 'axios';
 import cbor from 'cbor';
 
@@ -42,7 +43,7 @@ describe('TxSubmitHttpService', () => {
     });
 
     it('should not throw during initialization if the TxSubmitProvider is unhealthy', () => {
-      expect(() => new TxSubmitHttpService({ txSubmitProvider })).not.toThrow(
+      expect(() => new TxSubmitHttpService({ logger, txSubmitProvider })).not.toThrow(
         new ProviderError(ProviderFailure.Unhealthy)
       );
     });
@@ -62,7 +63,8 @@ describe('TxSubmitHttpService', () => {
       isOk = () => true;
       txSubmitProvider = { healthCheck: jest.fn(() => Promise.resolve({ ok: isOk() })), submitTx: jest.fn() };
       httpServer = new HttpServer(config, {
-        services: [new TxSubmitHttpService({ txSubmitProvider })]
+        logger,
+        services: [new TxSubmitHttpService({ logger, txSubmitProvider })]
       });
       await httpServer.initialize();
       await httpServer.start();
@@ -98,7 +100,8 @@ describe('TxSubmitHttpService', () => {
     beforeAll(async () => {
       txSubmitProvider = { healthCheck: jest.fn(() => Promise.resolve({ ok: true })), submitTx: jest.fn() };
       httpServer = new HttpServer(config, {
-        services: [new TxSubmitHttpService({ txSubmitProvider })]
+        logger,
+        services: [new TxSubmitHttpService({ logger, txSubmitProvider })]
       });
       await httpServer.initialize();
       await httpServer.start();
@@ -169,7 +172,8 @@ describe('TxSubmitHttpService', () => {
           submitTx: jest.fn(() => Promise.reject(stubErrors))
         };
         httpServer = new HttpServer(config, {
-          services: [new TxSubmitHttpService({ txSubmitProvider })]
+          logger,
+          services: [new TxSubmitHttpService({ logger, txSubmitProvider })]
         });
         await httpServer.initialize();
         await httpServer.start();

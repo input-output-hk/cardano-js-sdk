@@ -8,6 +8,7 @@ import {
 } from '@cardano-sdk/core';
 import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom } from 'rxjs';
+import { dummyLogger as logger } from 'ts-log';
 
 import * as mocks from '../mocks';
 import { ConnectionStatusTracker, KeyManagement, PollingConfig, SingleAddressWallet, setupWallet } from '../../src';
@@ -61,6 +62,7 @@ const createWallet = async (stores: WalletStores, providers: Providers, pollingC
           chainHistoryProvider,
           connectionStatusTracker$,
           keyAgent,
+          logger,
           networkInfoProvider,
           rewardsProvider,
           stakePoolProvider,

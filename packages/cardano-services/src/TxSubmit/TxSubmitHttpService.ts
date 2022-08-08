@@ -1,7 +1,7 @@
 import * as OpenApiValidator from 'express-openapi-validator';
 import { Cardano, ProviderError, ProviderFailure, TxSubmitProvider } from '@cardano-sdk/core';
 import { HttpServer, HttpService } from '../Http';
-import { Logger, dummyLogger } from 'ts-log';
+import { Logger } from 'ts-log';
 import { ServiceNames } from '../Program';
 import { providerHandler } from '../util';
 import bodyParser from 'body-parser';
@@ -9,13 +9,13 @@ import express from 'express';
 import path from 'path';
 
 export interface TxSubmitHttpServiceDependencies {
-  logger?: Logger;
+  logger: Logger;
   txSubmitProvider: TxSubmitProvider;
 }
 
 export class TxSubmitHttpService extends HttpService {
   constructor(
-    { logger = dummyLogger, txSubmitProvider }: TxSubmitHttpServiceDependencies,
+    { logger, txSubmitProvider }: TxSubmitHttpServiceDependencies,
     router: express.Router = express.Router()
   ) {
     super(ServiceNames.TxSubmit, txSubmitProvider, router, logger);

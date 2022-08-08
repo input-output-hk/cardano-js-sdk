@@ -31,13 +31,13 @@ describe('RabbitMqTxSubmitProvider', () => {
 
   describe('healthCheck', () => {
     it('is not ok if cannot connect', async () => {
-      provider = new RabbitMqTxSubmitProvider({ rabbitmqUrl: BAD_CONNECTION_URL });
+      provider = new RabbitMqTxSubmitProvider({ rabbitmqUrl: BAD_CONNECTION_URL }, { logger });
       const res = await provider.healthCheck();
       expect(res).toEqual({ ok: false });
     });
 
     it('is ok if can connect', async () => {
-      provider = new RabbitMqTxSubmitProvider({ rabbitmqUrl });
+      provider = new RabbitMqTxSubmitProvider({ rabbitmqUrl }, { logger });
       const resA = await provider.healthCheck();
       // Call again to cover the idempotent RabbitMqTxSubmitProvider.#connectAndCreateChannel() operation
       const resB = await provider.healthCheck();

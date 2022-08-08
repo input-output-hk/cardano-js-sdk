@@ -1,7 +1,7 @@
 import { Buffer } from 'buffer';
 import { Cardano, HealthCheckResponse, ProviderError, ProviderFailure, TxSubmitProvider } from '@cardano-sdk/core';
 import { Channel, Connection, connect } from 'amqplib';
-import { Logger, dummyLogger } from 'ts-log';
+import { Logger } from 'ts-log';
 import { TX_SUBMISSION_QUEUE, getErrorPrototype, waitForPending } from './utils';
 import { fromSerializableObject } from '@cardano-sdk/util';
 
@@ -49,12 +49,9 @@ export class RabbitMqTxSubmitProvider implements TxSubmitProvider {
    * @param config The configuration options
    * @param dependencies The dependency objects
    */
-  constructor(
-    config: RabbitMqTxSubmitProviderConfig,
-    dependencies: Partial<RabbitMqTxSubmitProviderDependencies> = {}
-  ) {
+  constructor(config: RabbitMqTxSubmitProviderConfig, dependencies: RabbitMqTxSubmitProviderDependencies) {
     this.#config = config;
-    this.#dependencies = { logger: dummyLogger, ...dependencies };
+    this.#dependencies = dependencies;
   }
 
   /**

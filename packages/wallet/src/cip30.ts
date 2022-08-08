@@ -16,12 +16,12 @@ import {
 import { AuthenticationError } from './KeyManagement/errors';
 import { CSL, Cardano, coreToCsl, cslToCore } from '@cardano-sdk/core';
 import { InputSelectionError } from '@cardano-sdk/cip2';
-import { Logger, dummyLogger } from 'ts-log';
+import { Logger } from 'ts-log';
 import { ObservableWallet } from './types';
 import { firstValueFrom } from 'rxjs';
 
 export type Cip30WalletDependencies = {
-  logger?: Logger;
+  logger: Logger;
 };
 
 export enum Cip30ConfirmationCallbackType {
@@ -56,8 +56,8 @@ interface CslInterface {
   to_bytes(): Uint8Array;
 }
 
-const mapCallbackFailure = (err: unknown, logger?: Logger) => {
-  logger?.error(err);
+const mapCallbackFailure = (err: unknown, logger: Logger) => {
+  logger.error(err);
   return false;
 };
 
@@ -76,7 +76,7 @@ const compareUtxos = (utxo: Cardano.Utxo, comparedTo: Cardano.Utxo) => {
 export const createWalletApi = (
   walletReady: Promise<ObservableWallet>,
   confirmationCallback: CallbackConfirmation,
-  { logger = dummyLogger }: Cip30WalletDependencies = {}
+  { logger }: Cip30WalletDependencies
 ): WalletApi => ({
   getBalance: async (): Promise<Cbor> => {
     logger.debug('getting balance');

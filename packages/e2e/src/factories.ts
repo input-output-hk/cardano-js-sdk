@@ -99,9 +99,9 @@ assetProviderFactory.register(
 // Chain history providers
 chainHistoryProviderFactory.register(
   BLOCKFROST_PROVIDER,
-  async (): Promise<ChainHistoryProvider> =>
+  async (_params: any, logger: Logger): Promise<ChainHistoryProvider> =>
     new Promise<ChainHistoryProvider>(async (resolve) => {
-      resolve(blockfrostChainHistoryProvider(await getBlockfrostApi()));
+      resolve(blockfrostChainHistoryProvider(await getBlockfrostApi(), logger));
     })
 );
 
@@ -162,7 +162,7 @@ txSubmitProviderFactory.register(
     })
 );
 
-txSubmitProviderFactory.register(OGMIOS_PROVIDER, async (params: any): Promise<TxSubmitProvider> => {
+txSubmitProviderFactory.register(OGMIOS_PROVIDER, async (params: any, logger: Logger): Promise<TxSubmitProvider> => {
   if (params.baseUrl === undefined) throw new Error(`${ogmiosTxSubmitProvider.name}: ${MISSING_URL_PARAM}`);
 
   const connectionConfig = {
@@ -172,7 +172,7 @@ txSubmitProviderFactory.register(OGMIOS_PROVIDER, async (params: any): Promise<T
   };
 
   return new Promise<TxSubmitProvider>(async (resolve) => {
-    resolve(ogmiosTxSubmitProvider(createConnectionObject(connectionConfig)));
+    resolve(ogmiosTxSubmitProvider(createConnectionObject(connectionConfig), logger));
   });
 });
 
@@ -387,11 +387,7 @@ export const getWallet = async (props: GetWalletProps) => {
     createWallet: async (keyAgent: KeyManagement.AsyncKeyAgent) =>
       new SingleAddressWallet(
         { name: props.name, polling: props.polling },
-        {
-          ...providers,
-          keyAgent,
-          stores: props.stores
-        }
+        { ...providers, keyAgent, logger, stores: props.stores }
       )
   });
   return {

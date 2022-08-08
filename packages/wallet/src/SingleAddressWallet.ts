@@ -76,7 +76,7 @@ import {
 } from 'rxjs';
 import { Cip30DataSignature } from '@cardano-sdk/cip30';
 import { InputSelector, defaultSelectionConstraints, roundRobinRandomImprove } from '@cardano-sdk/cip2';
-import { Logger, dummyLogger } from 'ts-log';
+import { Logger } from 'ts-log';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { Shutdown } from '@cardano-sdk/util';
 import { TrackedUtxoProvider } from './services/ProviderTracker/TrackedUtxoProvider';
@@ -103,7 +103,7 @@ export interface SingleAddressWalletDependencies {
   readonly rewardsProvider: RewardsProvider;
   readonly inputSelector?: InputSelector;
   readonly stores?: WalletStores;
-  readonly logger?: Logger;
+  readonly logger: Logger;
   readonly connectionStatusTracker$?: ConnectionStatusTracker;
 }
 
@@ -164,7 +164,7 @@ export class SingleAddressWallet implements ObservableWallet {
       utxoProvider,
       chainHistoryProvider,
       rewardsProvider,
-      logger = dummyLogger,
+      logger,
       inputSelector = roundRobinRandomImprove(),
       stores = createInMemoryWalletStores(),
       connectionStatusTracker$ = createSimpleConnectionStatusTracker()
@@ -280,6 +280,7 @@ export class SingleAddressWallet implements ObservableWallet {
 
     this.#resubmitSubscription = createTransactionReemitter({
       confirmed$: this.transactions.outgoing.confirmed$,
+      logger,
       rollback$: this.transactions.rollback$,
       store: stores.volatileTransactions,
       submitting$: this.transactions.outgoing.submitting$,

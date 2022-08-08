@@ -5,6 +5,7 @@ import { DbSyncUtxoProvider, HttpServer, HttpServerConfig, UtxoHttpService } fro
 import { INFO, createLogger } from 'bunyan';
 import { Pool } from 'pg';
 import { getPort } from 'get-port-please';
+import { dummyLogger as logger } from 'ts-log';
 import axios from 'axios';
 
 const APPLICATION_JSON = 'application/json';
@@ -46,21 +47,23 @@ describe('UtxoHttpService', () => {
     });
 
     it('should not throw during service create if the UtxoProvider is unhealthy', () => {
-      expect(() => new UtxoHttpService({ utxoProvider })).not.toThrow(new ProviderError(ProviderFailure.Unhealthy));
+      expect(() => new UtxoHttpService({ logger, utxoProvider })).not.toThrow(
+        new ProviderError(ProviderFailure.Unhealthy)
+      );
     });
 
     it('throws during service initialization if the UtxoProvider is unhealthy', async () => {
-      service = new UtxoHttpService({ utxoProvider });
-      httpServer = new HttpServer(config, { services: [service] });
+      service = new UtxoHttpService({ logger, utxoProvider });
+      httpServer = new HttpServer(config, { logger, services: [service] });
       await expect(httpServer.initialize()).rejects.toThrow(new ProviderError(ProviderFailure.Unhealthy));
     });
   });
 
   describe('healthy state', () => {
     beforeAll(async () => {
-      utxoProvider = new DbSyncUtxoProvider(dbConnection);
-      service = new UtxoHttpService({ utxoProvider });
-      httpServer = new HttpServer(config, { services: [service] });
+      utxoProvider = new DbSyncUtxoProvider(dbConnection, logger);
+      service = new UtxoHttpService({ logger, utxoProvider });
+      httpServer = new HttpServer(config, { logger, services: [service] });
       provider = utxoHttpProvider(clientConfig);
       await httpServer.initialize();
       await httpServer.start();

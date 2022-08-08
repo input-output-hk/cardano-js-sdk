@@ -1,8 +1,8 @@
 /* eslint-disable promise/always-return */
 import { DocumentStore } from '../types';
 import { EMPTY, Observable } from 'rxjs';
+import { Logger } from 'ts-log';
 import { PouchDbStore } from './PouchDbStore';
-import { dummyLogger } from 'ts-log';
 import { sanitizePouchDbDoc } from './util';
 
 /**
@@ -16,7 +16,7 @@ export class PouchDbDocumentStore<T> extends PouchDbStore<T> implements Document
    * @param docId unique document id within the db
    * @param logger will silently swallow the errors if not set
    */
-  constructor(dbName: string, docId: string, logger = dummyLogger) {
+  constructor(dbName: string, docId: string, logger: Logger) {
     super(dbName, logger);
     this.#docId = docId;
   }

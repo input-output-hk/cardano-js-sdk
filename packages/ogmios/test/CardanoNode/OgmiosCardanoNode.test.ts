@@ -4,6 +4,7 @@ import { Connection, createConnectionObject } from '@cardano-ogmios/client';
 import { OgmiosCardanoNode } from '../../src';
 import { createMockOgmiosServer, listenPromise, serverClosePromise } from '../mocks/mockOgmiosServer';
 import { getRandomPort } from 'get-port-please';
+import { dummyLogger as logger } from 'ts-log';
 import http from 'http';
 
 describe('OgmiosCardanoNode', () => {
@@ -20,7 +21,7 @@ describe('OgmiosCardanoNode', () => {
       mockServer = createMockOgmiosServer({
         stateQuery: { eraSummaries: { response: { success: true } }, systemStart: { response: { success: true } } }
       });
-      node = new OgmiosCardanoNode(connection);
+      node = new OgmiosCardanoNode(connection, logger);
       await listenPromise(mockServer, connection.port);
     });
     afterAll(async () => {
@@ -57,7 +58,7 @@ describe('OgmiosCardanoNode', () => {
             stateQuery: { eraSummaries: { response: { success: true } }, systemStart: { response: { success: true } } }
           });
           await listenPromise(mockServer, connection.port);
-          node = new OgmiosCardanoNode(connection);
+          node = new OgmiosCardanoNode(connection, logger);
           await node.initialize();
         });
         afterAll(async () => {
@@ -80,7 +81,7 @@ describe('OgmiosCardanoNode', () => {
             }
           });
           await listenPromise(mockServer, connection.port);
-          node = new OgmiosCardanoNode(connection);
+          node = new OgmiosCardanoNode(connection, logger);
           await node.initialize();
         });
         afterAll(async () => {
@@ -101,7 +102,7 @@ describe('OgmiosCardanoNode', () => {
         beforeAll(async () => {
           mockServer = createMockOgmiosServer({ stateQuery: { systemStart: { response: { success: true } } } });
           await listenPromise(mockServer, connection.port);
-          node = new OgmiosCardanoNode(connection);
+          node = new OgmiosCardanoNode(connection, logger);
           await node.initialize();
         });
         afterAll(async () => {
@@ -121,7 +122,7 @@ describe('OgmiosCardanoNode', () => {
             stateQuery: { systemStart: { response: { failWith: { type: 'queryUnavailableInEra' }, success: false } } }
           });
           await listenPromise(mockServer, connection.port);
-          node = new OgmiosCardanoNode(connection);
+          node = new OgmiosCardanoNode(connection, logger);
           await node.initialize();
         });
         afterAll(async () => {
@@ -144,7 +145,7 @@ describe('OgmiosCardanoNode', () => {
             stateQuery: { stakeDistribution: { response: { success: true } } }
           });
           await listenPromise(mockServer, connection.port);
-          node = new OgmiosCardanoNode(connection);
+          node = new OgmiosCardanoNode(connection, logger);
           await node.initialize();
         });
         afterAll(async () => {
@@ -167,7 +168,7 @@ describe('OgmiosCardanoNode', () => {
             }
           });
           await listenPromise(mockServer, connection.port);
-          node = new OgmiosCardanoNode(connection);
+          node = new OgmiosCardanoNode(connection, logger);
           await node.initialize();
         });
         afterAll(async () => {
@@ -187,7 +188,7 @@ describe('OgmiosCardanoNode', () => {
       beforeAll(async () => {
         mockServer = createMockOgmiosServer({ stateQuery: { systemStart: { response: { success: true } } } });
         await listenPromise(mockServer, connection.port);
-        node = new OgmiosCardanoNode(connection);
+        node = new OgmiosCardanoNode(connection, logger);
       });
       afterAll(async () => {
         await serverClosePromise(mockServer);

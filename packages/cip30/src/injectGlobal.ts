@@ -1,13 +1,9 @@
 import { Cip30Wallet } from './WalletApi';
-import { Logger, dummyLogger } from 'ts-log';
+import { Logger } from 'ts-log';
 
 export type WindowMaybeWithCardano = Window & { cardano?: { [k: string]: Cip30Wallet } };
 
-export const injectGlobal = (
-  window: WindowMaybeWithCardano,
-  wallet: Cip30Wallet,
-  logger: Logger = dummyLogger
-): void => {
+export const injectGlobal = (window: WindowMaybeWithCardano, wallet: Cip30Wallet, logger: Logger): void => {
   if (!window.cardano) {
     logger.debug(
       {

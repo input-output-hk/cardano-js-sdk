@@ -3,6 +3,7 @@ import { AssetId, createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { Cardano } from '@cardano-sdk/core';
 import { CommunicationType } from '../../src/KeyManagement/types';
 import { KeyManagement, SingleAddressWallet, setupWallet } from '../../src';
+import { dummyLogger as logger } from 'ts-log';
 import { mockKeyAgentDependencies } from '../mocks';
 
 describe('TrezorKeyAgent', () => {
@@ -56,6 +57,7 @@ describe('TrezorKeyAgent', () => {
             assetProvider,
             chainHistoryProvider,
             keyAgent: asyncKeyAgent,
+            logger,
             networkInfoProvider,
             rewardsProvider,
             stakePoolProvider,

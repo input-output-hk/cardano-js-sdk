@@ -20,12 +20,12 @@ describe('TxSubmitWorker', () => {
   beforeAll(async () => {
     ({ rabbitmqUrl } = await container.load());
     port = await getRandomPort();
-    txSubmitProvider = ogmiosTxSubmitProvider(urlToConnectionConfig(new URL(`http://localhost:${port}/`)));
   });
 
   beforeEach(async () => {
     await container.removeQueues();
     logger = testLogger();
+    txSubmitProvider = ogmiosTxSubmitProvider(urlToConnectionConfig(new URL(`http://localhost:${port}/`)), logger);
   });
 
   afterEach(async () => {
@@ -193,7 +193,7 @@ describe('TxSubmitWorker', () => {
     worker = new TxSubmitWorker({ parallel: true, parallelTxs: 4, rabbitmqUrl }, { logger, txSubmitProvider });
     await worker.start();
 
-    const rabbitMqTxSubmitProvider = new RabbitMqTxSubmitProvider({ rabbitmqUrl });
+    const rabbitMqTxSubmitProvider = new RabbitMqTxSubmitProvider({ rabbitmqUrl }, { logger });
 
     /*
      * Tx submission plan, time sample: 100ms

@@ -25,7 +25,7 @@ import {
   TotalAdaModel,
   TotalCountModel
 } from './types';
-import { Logger, dummyLogger } from 'ts-log';
+import { Logger } from 'ts-log';
 import { Pool, QueryResult } from 'pg';
 import {
   mapAddressOwner,
@@ -56,7 +56,7 @@ import Queries, {
 export class StakePoolBuilder {
   #db: Pool;
   #logger: Logger;
-  constructor(db: Pool, logger = dummyLogger) {
+  constructor(db: Pool, logger: Logger) {
     this.#db = db;
     this.#logger = logger;
   }

@@ -8,8 +8,8 @@ import { CreateHttpProviderConfig, chainHistoryHttpProvider } from '@cardano-sdk
 import { INFO, createLogger } from 'bunyan';
 import { Pool } from 'pg';
 import { createDbSyncMetadataService } from '../../src/Metadata';
-import { dummyLogger } from 'ts-log';
 import { getPort } from 'get-port-please';
+import { dummyLogger as logger } from 'ts-log';
 import axios from 'axios';
 
 const UNSUPPORTED_MEDIA_STRING = 'Request failed with status code 415';
@@ -51,24 +51,24 @@ describe('ChainHistoryHttpService', () => {
     });
 
     it('should not throw during service create if the ChainHistoryProvider is unhealthy', () => {
-      expect(() => new ChainHistoryHttpService({ chainHistoryProvider })).not.toThrow(
+      expect(() => new ChainHistoryHttpService({ chainHistoryProvider, logger })).not.toThrow(
         new ProviderError(ProviderFailure.Unhealthy)
       );
     });
 
     it('throws during service initialization if the ChainHistoryProvider is unhealthy', async () => {
-      service = new ChainHistoryHttpService({ chainHistoryProvider });
-      httpServer = new HttpServer(config, { services: [service] });
+      service = new ChainHistoryHttpService({ chainHistoryProvider, logger });
+      httpServer = new HttpServer(config, { logger, services: [service] });
       await expect(httpServer.initialize()).rejects.toThrow(new ProviderError(ProviderFailure.Unhealthy));
     });
   });
 
   describe('healthy state', () => {
     beforeAll(async () => {
-      const metadataService = createDbSyncMetadataService(dbConnection, dummyLogger);
-      chainHistoryProvider = new DbSyncChainHistoryProvider(dbConnection, metadataService);
-      service = new ChainHistoryHttpService({ chainHistoryProvider });
-      httpServer = new HttpServer(config, { services: [service] });
+      const metadataService = createDbSyncMetadataService(dbConnection, logger);
+      chainHistoryProvider = new DbSyncChainHistoryProvider(dbConnection, metadataService, logger);
+      service = new ChainHistoryHttpService({ chainHistoryProvider, logger });
+      httpServer = new HttpServer(config, { logger, services: [service] });
       await httpServer.initialize();
       await httpServer.start();
     });

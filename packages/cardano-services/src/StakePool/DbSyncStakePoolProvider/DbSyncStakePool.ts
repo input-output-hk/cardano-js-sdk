@@ -1,6 +1,6 @@
 import { CommonPoolInfo, PoolAPY, PoolData, PoolMetrics, PoolSortType } from './types';
 import { DbSyncProvider } from '../../DbSyncProvider';
-import { Logger, dummyLogger } from 'ts-log';
+import { Logger } from 'ts-log';
 import { Pool } from 'pg';
 import { StakePoolBuilder } from './StakePoolBuilder';
 import { StakePoolProvider, StakePoolQueryOptions, StakePoolSearchResults, StakePoolStats } from '@cardano-sdk/core';
@@ -12,7 +12,7 @@ export class DbSyncStakePoolProvider extends DbSyncProvider implements StakePool
   #builder: StakePoolBuilder;
   #logger: Logger;
 
-  constructor(db: Pool, logger = dummyLogger) {
+  constructor(db: Pool, logger: Logger) {
     super(db);
     this.#builder = new StakePoolBuilder(db, logger);
     this.#logger = logger;

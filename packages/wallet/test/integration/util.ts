@@ -1,6 +1,7 @@
 import { SingleAddressWallet, setupWallet } from '../../src';
 import { WalletStores } from '../../src/persistence';
 import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
+import { dummyLogger as logger } from 'ts-log';
 import {
   mockAssetProvider,
   mockChainHistoryProvider,
@@ -28,6 +29,7 @@ export const createWallet = async (stores?: WalletStores) =>
           assetProvider,
           chainHistoryProvider,
           keyAgent,
+          logger,
           networkInfoProvider,
           rewardsProvider,
           stakePoolProvider,

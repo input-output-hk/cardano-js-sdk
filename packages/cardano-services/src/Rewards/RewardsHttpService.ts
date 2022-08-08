@@ -1,6 +1,6 @@
 import * as OpenApiValidator from 'express-openapi-validator';
 import { HttpService } from '../Http';
-import { Logger, dummyLogger } from 'ts-log';
+import { Logger } from 'ts-log';
 import { RewardsProvider } from '@cardano-sdk/core';
 import { ServiceNames } from '../Program';
 import { providerHandler } from '../util';
@@ -8,15 +8,12 @@ import express from 'express';
 import path from 'path';
 
 export interface RewardServiceDependencies {
-  logger?: Logger;
+  logger: Logger;
   rewardsProvider: RewardsProvider;
 }
 
 export class RewardsHttpService extends HttpService {
-  constructor(
-    { logger = dummyLogger, rewardsProvider }: RewardServiceDependencies,
-    router: express.Router = express.Router()
-  ) {
+  constructor({ logger, rewardsProvider }: RewardServiceDependencies, router: express.Router = express.Router()) {
     super(ServiceNames.Rewards, rewardsProvider, router, logger);
 
     const apiSpec = path.join(__dirname, 'openApi.json');

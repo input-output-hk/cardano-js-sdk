@@ -1,11 +1,11 @@
 #!/usr/bin/env node
-/* eslint-disable no-console */
 import { AddressBalancesResponse, getOnChainAddressBalances } from './AddressBalance';
 import { Command } from 'commander';
 import { GetBlocksResponse, getBlocks } from './Block';
 import { Options, SingleBar } from 'cli-progress';
 import { ensureDir, writeFile } from 'fs-extra';
 import { prepareContent } from './Content';
+import { createLogger } from 'bunyan';
 import JSONBig from 'json-bigint';
 import chalk from 'chalk';
 import hash from 'object-hash';
@@ -49,26 +49,27 @@ program
       .filter((b) => b !== '')
       .map((height) => Number.parseInt(height))
   )
+  .option('--log-level [logLevel]', 'Minimum log level', 'info')
   .requiredOption('--out-dir [outDir]', 'File path to write results to')
-  .action(async (addresses: string[], { atBlocks, outDir }) => {
+  .action(async (addresses: string[], { atBlocks, logLevel, outDir }) => {
     try {
       const { ogmiosHost, ogmiosPort, ogmiosTls } = program.opts();
       const atBlockHeights = atBlocks.sort((a: number, b: number) => a - b);
       const lastBlockHeight = atBlockHeights[atBlockHeights.length - 1];
+      const logger = createLogger({ level: logLevel, name: 'address-balance' });
       const progress = createProgressBar(lastBlockHeight);
       await ensureDir(outDir);
       progress.start(lastBlockHeight, 0);
       const { balances, metadata } = await getOnChainAddressBalances(addresses, atBlockHeights, {
+        logger,
         ogmiosConnectionConfig: { host: ogmiosHost, port: ogmiosPort, tls: ogmiosTls },
-        onBlock: (blockHeight) => {
-          progress.update(blockHeight);
-        }
+        onBlock: (blockHeight) => progress.update(blockHeight)
       });
       const content = await prepareContent<AddressBalancesResponse['balances']>(metadata, balances);
       progress.stop();
       const fileName = path.join(outDir, `address-balances-${hash(content)}.json`);
 
-      console.log(`Writing ${fileName}`);
+      logger.info(`Writing ${fileName}`);
       await writeFile(fileName, JSONBig.stringify(content, undefined, 2));
       process.exit(0);
     } catch (error) {
@@ -87,16 +88,18 @@ program
       .map((blockHeight) => Number.parseInt(blockHeight))
   )
   .requiredOption('--out-dir [outDir]', 'File path to write results to')
-  .action(async (blockHeights: number[], { outDir }) => {
+  .option('--log-level [logLevel]', 'Minimum log level', 'info')
+  .action(async (blockHeights: number[], { logLevel, outDir }) => {
     try {
       const { ogmiosHost, ogmiosPort, ogmiosTls } = program.opts();
       const sortedblockHeights = blockHeights.sort((a: number, b: number) => a - b);
       const lastblockHeight = sortedblockHeights[sortedblockHeights.length - 1];
+      const logger = createLogger({ level: logLevel, name: 'get-block' });
       const progress = createProgressBar(lastblockHeight);
       await ensureDir(outDir);
       progress.start(lastblockHeight, 0);
       const { blocks, metadata } = await getBlocks(sortedblockHeights, {
-        logger: console,
+        logger,
         ogmiosConnectionConfig: { host: ogmiosHost, port: ogmiosPort, tls: ogmiosTls },
         onBlock: (blockHeight) => {
           progress.update(blockHeight);
@@ -106,7 +109,7 @@ program
       const content = await prepareContent<GetBlocksResponse['blocks']>(metadata, blocks);
       const fileName = path.join(outDir, `blocks-${hash(content)}.json`);
 
-      console.log(`Writing ${fileName}`);
+      logger.info(`Writing ${fileName}`);
       await writeFile(fileName, JSONBig.stringify(content, undefined, 2));
       process.exit(0);
     } catch (error) {

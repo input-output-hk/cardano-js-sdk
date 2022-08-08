@@ -9,7 +9,6 @@
     "../../wallet/test",
     "../../cip2/test/util",
   ],
-  "rootDir": ".",
   "references": [
     {
       "path": "../src"
