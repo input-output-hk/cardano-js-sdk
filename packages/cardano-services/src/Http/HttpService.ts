@@ -1,6 +1,6 @@
 import { HealthCheckResponse, Provider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { HttpServer } from './HttpServer';
-import { Logger, dummyLogger } from 'ts-log';
+import { Logger } from 'ts-log';
 import { ProviderHandler } from '../util';
 import { RunnableModule } from '../RunnableModule';
 import express from 'express';
@@ -10,7 +10,7 @@ export abstract class HttpService extends RunnableModule {
   public slug: string;
   public provider: Provider;
 
-  constructor(slug: string, provider: Provider, router: express.Router, logger = dummyLogger) {
+  constructor(slug: string, provider: Provider, router: express.Router, logger: Logger) {
     super(slug, logger);
     this.router = router;
     this.slug = slug;

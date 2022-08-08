@@ -12,6 +12,7 @@ import { Pool } from 'pg';
 import { getPort } from 'get-port-please';
 import { ingestDbData, sleep, wrapWithTransaction } from '../util';
 import { loadGenesisData } from '../../src/NetworkInfo/DbSyncNetworkInfoProvider/mappers';
+import { dummyLogger as logger } from 'ts-log';
 import { mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
 import axios from 'axios';
 
@@ -56,14 +57,14 @@ describe('NetworkInfoHttpService', () => {
     });
 
     it('should not throw during service create if the NetworkInfoProvider is unhealthy', () => {
-      expect(() => new NetworkInfoHttpService({ networkInfoProvider })).not.toThrow(
+      expect(() => new NetworkInfoHttpService({ logger, networkInfoProvider })).not.toThrow(
         new ProviderError(ProviderFailure.Unhealthy)
       );
     });
 
     it('throws during service initialization if the NetworkInfoProvider is unhealthy', async () => {
-      service = new NetworkInfoHttpService({ networkInfoProvider });
-      httpServer = new HttpServer(config, { services: [service] });
+      service = new NetworkInfoHttpService({ logger, networkInfoProvider });
+      httpServer = new HttpServer(config, { logger, services: [service] });
       await expect(httpServer.initialize()).rejects.toThrow(new ProviderError(ProviderFailure.Unhealthy));
     });
   });
@@ -79,10 +80,10 @@ describe('NetworkInfoHttpService', () => {
       config = { listen: { port } };
       networkInfoProvider = new DbSyncNetworkInfoProvider(
         { cardanoNodeConfigPath, epochPollInterval },
-        { cache, cardanoNode, db }
+        { cache, cardanoNode, db, logger }
       );
-      service = new NetworkInfoHttpService({ networkInfoProvider });
-      httpServer = new HttpServer(config, { services: [service] });
+      service = new NetworkInfoHttpService({ logger, networkInfoProvider });
+      httpServer = new HttpServer(config, { logger, services: [service] });
       clientConfig = { baseUrl, logger: createLogger({ level: INFO, name: 'unit tests' }) };
       provider = networkInfoHttpProvider(clientConfig);
 

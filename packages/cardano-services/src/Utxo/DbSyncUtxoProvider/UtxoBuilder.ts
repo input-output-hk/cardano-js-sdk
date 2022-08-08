@@ -1,5 +1,5 @@
 import { Cardano } from '@cardano-sdk/core';
-import { Logger, dummyLogger } from 'ts-log';
+import { Logger } from 'ts-log';
 import { Pool, QueryResult } from 'pg';
 import { UtxoModel } from './types';
 import { findUtxosByAddresses } from './queries';
@@ -8,7 +8,7 @@ import { utxosToCore } from './mappers';
 export class UtxoBuilder {
   #db: Pool;
   #logger: Logger;
-  constructor(db: Pool, logger = dummyLogger) {
+  constructor(db: Pool, logger: Logger) {
     this.#db = db;
     this.#logger = logger;
   }

@@ -1,5 +1,6 @@
 import { NetworkInfoBuilder } from '../../../src/NetworkInfo/DbSyncNetworkInfoProvider/NetworkInfoBuilder';
 import { Pool } from 'pg';
+import { dummyLogger as logger } from 'ts-log';
 
 describe('NetworkInfoBuilder', () => {
   let dbConnection: Pool;
@@ -7,7 +8,7 @@ describe('NetworkInfoBuilder', () => {
 
   beforeAll(async () => {
     dbConnection = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING });
-    builder = new NetworkInfoBuilder(dbConnection);
+    builder = new NetworkInfoBuilder(dbConnection, logger);
   });
 
   afterAll(async () => {

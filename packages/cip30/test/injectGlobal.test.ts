@@ -2,11 +2,10 @@ import { ApiError } from '../src/errors';
 import { Cip30Wallet } from '../src/WalletApi';
 import { RemoteAuthenticator, WindowMaybeWithCardano, injectGlobal } from '../src';
 import { api, properties, stubAuthenticator } from './testWallet';
-import { dummyLogger } from 'ts-log';
+import { dummyLogger as logger } from 'ts-log';
 import { mocks } from 'mock-browser';
 
 describe('injectGlobal', () => {
-  const logger = dummyLogger;
   let window: ReturnType<typeof mocks.MockBrowser>;
 
   beforeEach(() => {
@@ -16,7 +15,7 @@ describe('injectGlobal', () => {
   it('creates the cardano scope when not exists, and injects the wallet public API into it', async () => {
     const wallet = new Cip30Wallet(properties, { api, authenticator: stubAuthenticator(), logger });
     expect(window.cardano).not.toBeDefined();
-    injectGlobal(window, wallet);
+    injectGlobal(window, wallet, logger);
     expect(window.cardano).toBeDefined();
     expect(window.cardano[properties.walletName].name).toBe(properties.walletName);
     expect(typeof window.cardano[properties.walletName].apiVersion).toBe('string');
@@ -34,7 +33,7 @@ describe('injectGlobal', () => {
       logger
     });
 
-    injectGlobal(window, wallet);
+    injectGlobal(window, wallet, logger);
 
     await expect(window.cardano[properties.walletName].enable()).rejects.toThrow(ApiError);
   });
@@ -54,7 +53,7 @@ describe('injectGlobal', () => {
     it('injects the wallet public API into the existing cardano scope', () => {
       const wallet = new Cip30Wallet(properties, { api, authenticator: stubAuthenticator(), logger });
       expect(window.cardano).toBeDefined();
-      injectGlobal(window, wallet);
+      injectGlobal(window, wallet, logger);
       expect(window.cardano[properties.walletName].name).toBe(properties.walletName);
       expect(typeof window.cardano[properties.walletName].apiVersion).toBe('string');
       expect(window.cardano[properties.walletName].icon).toBe(properties.icon);

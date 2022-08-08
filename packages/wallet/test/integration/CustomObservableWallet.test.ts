@@ -15,6 +15,7 @@ import {
 } from '../../src';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
+import { dummyLogger as logger } from 'ts-log';
 import { of, timer } from 'rxjs';
 
 describe('CustomObservableWallet', () => {
@@ -49,6 +50,7 @@ describe('CustomObservableWallet', () => {
           assetProvider: mocks.mockAssetProvider(),
           chainHistoryProvider: mocks.mockChainHistoryProvider(),
           keyAgent: await mocks.testAsyncKeyAgent(),
+          logger,
           networkInfoProvider: mocks.mockNetworkInfoProvider(),
           rewardsProvider: mocks.mockRewardsProvider(),
           stakePoolProvider: createStubStakePoolProvider(),

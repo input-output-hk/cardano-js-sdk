@@ -1,7 +1,7 @@
 /* eslint-disable promise/always-return */
 import { CollectionStore } from '../types';
 import { EMPTY, Observable, from } from 'rxjs';
-import { Logger, dummyLogger } from 'ts-log';
+import { Logger } from 'ts-log';
 import { PouchDbStore } from './PouchDbStore';
 import { sanitizePouchDbDoc } from './util';
 
@@ -25,7 +25,7 @@ export class PouchDbCollectionStore<T> extends PouchDbStore<T> implements Collec
    * @param props.computeDocId used for document sort order
    * @param logger will silently swallow the errors if not set
    */
-  constructor({ dbName, computeDocId }: PouchDbCollectionStoreProps<T>, logger: Logger = dummyLogger) {
+  constructor({ dbName, computeDocId }: PouchDbCollectionStoreProps<T>, logger: Logger) {
     // Using a db per collection
     super(dbName, logger);
     this.#computeDocId = computeDocId;

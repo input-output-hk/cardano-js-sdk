@@ -5,6 +5,7 @@ import { InMemoryUnspendableUtxoStore, createInMemoryWalletStores } from '../../
 import { InitializeTxProps, InitializeTxResult, SingleAddressWallet, cip30 } from '../../src';
 import { createWallet } from './util';
 import { firstValueFrom } from 'rxjs';
+import { dummyLogger as logger } from 'ts-log';
 import { utxo as mockedUtxo, networkId, utxosWithLowCoins } from '../mocks';
 import { waitForWalletStateSettle } from '../util';
 
@@ -14,7 +15,7 @@ const createWalletAndApiWithStores = async (utxos: Cardano.Utxo[]) => {
   const stores = { ...createInMemoryWalletStores(), unspendableUtxo };
   const { wallet } = await createWallet(stores);
   const confirmationCallback = jest.fn().mockResolvedValue(true);
-  const api = cip30.createWalletApi(Promise.resolve(wallet), confirmationCallback);
+  const api = cip30.createWalletApi(Promise.resolve(wallet), confirmationCallback, { logger });
   await waitForWalletStateSettle(wallet);
   return { api, confirmationCallback, wallet };
 };

@@ -10,7 +10,7 @@ import {
   createTxSubmissionClient,
   getServerHealth
 } from '@cardano-ogmios/client';
-import { Logger, dummyLogger } from 'ts-log';
+import { Logger } from 'ts-log';
 
 /**
  * Connect to an [Ogmios](https://ogmios.dev/) instance
@@ -20,10 +20,7 @@ import { Logger, dummyLogger } from 'ts-log';
  * @returns {TxSubmitProvider} TxSubmitProvider
  * @throws {TxSubmission.errors}
  */
-export const ogmiosTxSubmitProvider = (
-  connectionConfig: ConnectionConfig,
-  logger: Logger = dummyLogger
-): TxSubmitProvider => ({
+export const ogmiosTxSubmitProvider = (connectionConfig: ConnectionConfig, logger: Logger): TxSubmitProvider => ({
   async healthCheck() {
     try {
       const serverHealth = await getServerHealth({ connection: createConnectionObject(connectionConfig) });

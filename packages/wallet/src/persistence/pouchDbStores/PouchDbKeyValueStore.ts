@@ -4,8 +4,8 @@
 import { Cardano } from '@cardano-sdk/core';
 import { EMPTY, Observable, from } from 'rxjs';
 import { KeyValueCollection, KeyValueStore } from '../types';
+import { Logger } from 'ts-log';
 import { PouchDbStore } from './PouchDbStore';
-import { dummyLogger } from 'ts-log';
 import { sanitizePouchDbDoc } from './util';
 
 /**
@@ -19,7 +19,7 @@ export class PouchDbKeyValueStore<K extends string | Cardano.util.OpaqueString<a
    * @param dbName collection name
    * @param logger will silently swallow the errors if not set
    */
-  constructor(dbName: string, logger = dummyLogger) {
+  constructor(dbName: string, logger: Logger) {
     // Using a db per collection
     super(dbName, logger);
   }

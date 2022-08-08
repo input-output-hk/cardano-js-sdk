@@ -1,7 +1,7 @@
 import { contextLogger } from '@cardano-sdk/util';
 
 import { InvalidModuleState } from './errors';
-import { Logger, dummyLogger } from 'ts-log';
+import { Logger } from 'ts-log';
 import { ModuleState } from './types';
 
 export type RunnableModuleState = ModuleState | 'starting' | 'running' | 'stopping';
@@ -14,9 +14,9 @@ export abstract class RunnableModule {
   logger: Logger;
   name: string;
 
-  protected constructor(name: string, logger: Logger = dummyLogger) {
+  protected constructor(name: string, logger: Logger) {
     this.state = null;
-    this.logger = contextLogger(logger, name) || dummyLogger;
+    this.logger = contextLogger(logger, name);
     this.name = name;
   }
 

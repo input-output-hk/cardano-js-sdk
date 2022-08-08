@@ -1,6 +1,6 @@
 import * as OpenApiValidator from 'express-openapi-validator';
 import { HttpService } from '../Http';
-import { Logger, dummyLogger } from 'ts-log';
+import { Logger } from 'ts-log';
 import { ServiceNames } from '../Program';
 import { StakePoolProvider } from '@cardano-sdk/core';
 import { providerHandler } from '../util';
@@ -8,15 +8,12 @@ import express from 'express';
 import path from 'path';
 
 export interface StakePoolServiceDependencies {
-  logger?: Logger;
+  logger: Logger;
   stakePoolProvider: StakePoolProvider;
 }
 
 export class StakePoolHttpService extends HttpService {
-  constructor(
-    { logger = dummyLogger, stakePoolProvider }: StakePoolServiceDependencies,
-    router: express.Router = express.Router()
-  ) {
+  constructor({ logger, stakePoolProvider }: StakePoolServiceDependencies, router: express.Router = express.Router()) {
     super(ServiceNames.StakePool, stakePoolProvider, router, logger);
 
     const apiSpec = path.join(__dirname, 'openApi.json');

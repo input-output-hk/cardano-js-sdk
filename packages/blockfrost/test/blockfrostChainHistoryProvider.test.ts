@@ -4,6 +4,7 @@
 import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
 import { Cardano } from '@cardano-sdk/core';
 import { blockfrostChainHistoryProvider } from '../src';
+import { dummyLogger as logger } from 'ts-log';
 
 jest.mock('@blockfrost/blockfrost-js');
 
@@ -142,7 +143,7 @@ describe('blockfrostChainHistoryProvider', () => {
       BlockFrostAPI.prototype.txs = jest.fn().mockResolvedValue(mockedTxResponse);
       BlockFrostAPI.prototype.txsMetadata = jest.fn().mockResolvedValue(mockedMetadataResponse);
       const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
-      const client = blockfrostChainHistoryProvider(blockfrost);
+      const client = blockfrostChainHistoryProvider(blockfrost, logger);
       const response = await client.transactionsByHashes(
         ['4123d70f66414cc921f6ffc29a899aafc7137a99a0fd453d6b200863ef5702d6'].map(Cardano.TransactionId)
       );
@@ -243,7 +244,7 @@ describe('blockfrostChainHistoryProvider', () => {
     BlockFrostAPI.prototype.blocks = jest.fn().mockResolvedValue(blockResponse);
 
     const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
-    const client = blockfrostChainHistoryProvider(blockfrost);
+    const client = blockfrostChainHistoryProvider(blockfrost, logger);
     const response = await client.blocksByHashes([
       Cardano.BlockId('0dbe461fb5f981c0d01615332b8666340eb1a692b3034f46bcb5f5ea4172b2ed')
     ]);
@@ -276,7 +277,7 @@ describe('blockfrostChainHistoryProvider', () => {
     BlockFrostAPI.prototype.blocks = jest.fn().mockResolvedValue({ ...blockResponse, slot_leader: slotLeader });
 
     const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
-    const client = blockfrostChainHistoryProvider(blockfrost);
+    const client = blockfrostChainHistoryProvider(blockfrost, logger);
     const response = await client.blocksByHashes([
       Cardano.BlockId('0dbe461fb5f981c0d01615332b8666340eb1a692b3034f46bcb5f5ea4172b2ed')
     ]);

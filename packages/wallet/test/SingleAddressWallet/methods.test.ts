@@ -4,6 +4,7 @@ import { AssetId, createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { Cardano } from '@cardano-sdk/core';
 import { InitializeTxProps, KeyManagement, SingleAddressWallet, setupWallet } from '../../src';
 import { firstValueFrom, skip } from 'rxjs';
+import { dummyLogger as logger } from 'ts-log';
 import { mockChainHistoryProvider, mockRewardsProvider, utxo } from '../mocks';
 import { waitForWalletStateSettle } from '../util';
 
@@ -64,6 +65,7 @@ describe('SingleAddressWallet methods', () => {
             assetProvider,
             chainHistoryProvider,
             keyAgent,
+            logger,
             networkInfoProvider,
             rewardsProvider,
             stakePoolProvider,

@@ -1,6 +1,6 @@
 import { Cardano, RewardHistoryProps, RewardsProvider } from '@cardano-sdk/core';
 import { DbSyncProvider } from '../../DbSyncProvider';
-import { Logger, dummyLogger } from 'ts-log';
+import { Logger } from 'ts-log';
 import { Pool } from 'pg';
 import { RewardsBuilder } from './RewardsBuilder';
 import { rewardsToCore } from './mappers';
@@ -9,7 +9,7 @@ export class DbSyncRewardsProvider extends DbSyncProvider implements RewardsProv
   #builder: RewardsBuilder;
   #logger: Logger;
 
-  constructor(db: Pool, logger = dummyLogger) {
+  constructor(db: Pool, logger: Logger) {
     super(db);
     this.#builder = new RewardsBuilder(db, logger);
     this.#logger = logger;

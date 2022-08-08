@@ -18,10 +18,10 @@ import { Ogmios, OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { SrvRecord } from 'dns';
 import { createHealthyMockOgmiosServer, ogmiosServerReady } from '../../util';
-import { createLogger } from 'bunyan';
 import { createMockOgmiosServer } from '../../../../ogmios/test/mocks/mockOgmiosServer';
 import { getPort, getRandomPort } from 'get-port-please';
 import { listenPromise, serverClosePromise } from '../../../src/util';
+import { dummyLogger as logger } from 'ts-log';
 import { mockCardanoNode } from '../../../../core/test/CardanoNode/mocks';
 import { types } from 'util';
 import axios from 'axios';
@@ -45,7 +45,6 @@ describe('Service dependency abstractions', () => {
   const APPLICATION_JSON = 'application/json';
   const cache = new InMemoryCache(UNLIMITED_CACHE_TTL);
   const cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
-  const logger = createLogger({ level: 'error', name: 'test' });
   const dnsResolver = createDnsResolver({ factor: 1.1, maxRetryTime: 1000 }, logger);
   const cardanoNode = mockCardanoNode();
 
@@ -83,7 +82,8 @@ describe('Service dependency abstractions', () => {
             serviceDiscoveryTimeout: 1000
           });
           httpServer = new HttpServer(config, {
-            services: [new TxSubmitHttpService({ txSubmitProvider })]
+            logger,
+            services: [new TxSubmitHttpService({ logger, txSubmitProvider })]
           });
           await httpServer.initialize();
           await httpServer.start();
@@ -135,7 +135,8 @@ describe('Service dependency abstractions', () => {
           );
 
           httpServer = new HttpServer(config, {
-            services: [new NetworkInfoHttpService({ networkInfoProvider })]
+            logger,
+            services: [new NetworkInfoHttpService({ logger, networkInfoProvider })]
           });
           await httpServer.initialize();
           await httpServer.start();
@@ -194,7 +195,8 @@ describe('Service dependency abstractions', () => {
             ogmiosUrl: new URL(ogmiosConnection.address.webSocket)
           });
           httpServer = new HttpServer(config, {
-            services: [new TxSubmitHttpService({ txSubmitProvider })]
+            logger,
+            services: [new TxSubmitHttpService({ logger, txSubmitProvider })]
           });
           await httpServer.initialize();
           await httpServer.start();
@@ -244,7 +246,8 @@ describe('Service dependency abstractions', () => {
           );
 
           httpServer = new HttpServer(config, {
-            services: [new NetworkInfoHttpService({ networkInfoProvider })]
+            logger,
+            services: [new NetworkInfoHttpService({ logger, networkInfoProvider })]
           });
           await httpServer.initialize();
           await httpServer.start();

@@ -15,7 +15,7 @@ import {
 import { ReplaySubject, firstValueFrom } from 'rxjs';
 import { WalletStores, createInMemoryWalletStores } from '../../src/persistence';
 import { currentEpoch, networkInfo, queryTransactionsResult, queryTransactionsResult2 } from '../mocks';
-
+import { dummyLogger as logger } from 'ts-log';
 import { waitForWalletStateSettle } from '../util';
 import delay from 'delay';
 import flatten from 'lodash/flatten';
@@ -61,6 +61,7 @@ const createWallet = async (stores: WalletStores, providers: Providers, pollingC
           chainHistoryProvider,
           connectionStatusTracker$,
           keyAgent,
+          logger,
           networkInfoProvider,
           rewardsProvider,
           stakePoolProvider,

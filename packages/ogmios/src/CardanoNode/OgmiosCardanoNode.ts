@@ -1,6 +1,6 @@
 import { Cardano, CardanoNode, CardanoNodeErrors, CardanoNodeUtil, StakeDistribution } from '@cardano-sdk/core';
 import { ConnectionConfig, StateQuery, createInteractionContext, createStateQueryClient } from '@cardano-ogmios/client';
-import { Logger, dummyLogger } from 'ts-log';
+import { Logger } from 'ts-log';
 import { mapEraSummary } from './mappers';
 
 type CardanoNodeState = 'initialized' | 'initializing' | null;
@@ -16,7 +16,7 @@ export class OgmiosCardanoNode implements CardanoNode {
   #state: CardanoNodeState;
   #connectionConfig: ConnectionConfig;
 
-  constructor(connectionConfig: ConnectionConfig, logger = dummyLogger) {
+  constructor(connectionConfig: ConnectionConfig, logger: Logger) {
     this.#logger = logger;
     this.#state = null;
     this.#connectionConfig = connectionConfig;

@@ -11,7 +11,7 @@ import {
 import { DbSyncProvider } from '../../DbSyncProvider';
 import { GenesisData } from './types';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../InMemoryCache';
-import { Logger, dummyLogger } from 'ts-log';
+import { Logger } from 'ts-log';
 import { NetworkInfoBuilder } from './NetworkInfoBuilder';
 import { NetworkInfoCacheKey } from '.';
 import { Pool } from 'pg';
@@ -33,7 +33,7 @@ export interface NetworkInfoProviderProps {
 export interface NetworkInfoProviderDependencies {
   db: Pool;
   cache: InMemoryCache;
-  logger?: Logger;
+  logger: Logger;
   cardanoNode: CardanoNode;
 }
 export class DbSyncNetworkInfoProvider extends DbSyncProvider implements NetworkInfoProvider {
@@ -47,7 +47,7 @@ export class DbSyncNetworkInfoProvider extends DbSyncProvider implements Network
 
   constructor(
     { cardanoNodeConfigPath, epochPollInterval }: NetworkInfoProviderProps,
-    { db, cache, logger = dummyLogger, cardanoNode }: NetworkInfoProviderDependencies
+    { db, cache, logger, cardanoNode }: NetworkInfoProviderDependencies
   ) {
     super(db);
     this.#logger = logger;

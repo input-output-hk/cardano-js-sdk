@@ -7,8 +7,8 @@ import {
   ProviderError,
   ProviderFailure
 } from '@cardano-sdk/core';
+import { Logger } from 'ts-log';
 import { blockfrostMetadataToTxMetadata, fetchByAddressSequentially, formatBlockfrostError, healthCheck } from './util';
-import { dummyLogger } from 'ts-log';
 import omit from 'lodash/omit';
 import orderBy from 'lodash/orderBy';
 
@@ -21,10 +21,7 @@ type WithCertIndex<T> = T & { cert_index: number };
  * @returns {ChainHistoryProvider} ChainHistoryProvider
  * @throws {ProviderError}
  */
-export const blockfrostChainHistoryProvider = (
-  blockfrost: BlockFrostAPI,
-  logger = dummyLogger
-): ChainHistoryProvider => {
+export const blockfrostChainHistoryProvider = (blockfrost: BlockFrostAPI, logger: Logger): ChainHistoryProvider => {
   const fetchRedeemers = async ({
     redeemer_count,
     hash

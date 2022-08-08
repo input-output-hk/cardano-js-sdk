@@ -1,6 +1,6 @@
 import * as OpenApiValidator from 'express-openapi-validator';
 import { HttpService } from '../Http';
-import { Logger, dummyLogger } from 'ts-log';
+import { Logger } from 'ts-log';
 import { NetworkInfoProvider } from '@cardano-sdk/core';
 import { ServiceNames } from '../Program';
 import { providerHandler } from '../util';
@@ -8,13 +8,13 @@ import express from 'express';
 import path from 'path';
 
 export interface NetworkInfoServiceDependencies {
-  logger?: Logger;
+  logger: Logger;
   networkInfoProvider: NetworkInfoProvider;
 }
 
 export class NetworkInfoHttpService extends HttpService {
   constructor(
-    { networkInfoProvider, logger = dummyLogger }: NetworkInfoServiceDependencies,
+    { networkInfoProvider, logger }: NetworkInfoServiceDependencies,
     router: express.Router = express.Router()
   ) {
     super(ServiceNames.NetworkInfo, networkInfoProvider, router, logger);

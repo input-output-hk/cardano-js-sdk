@@ -3,10 +3,11 @@
 import { Cardano, StakePoolQueryOptions } from '@cardano-sdk/core';
 import { Pool } from 'pg';
 import { StakePoolBuilder } from '../../../src';
+import { dummyLogger as logger } from 'ts-log';
 
 describe('StakePoolBuilder', () => {
   const dbConnection = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING });
-  const builder = new StakePoolBuilder(dbConnection);
+  const builder = new StakePoolBuilder(dbConnection, logger);
 
   afterAll(async () => {
     await dbConnection.end();
