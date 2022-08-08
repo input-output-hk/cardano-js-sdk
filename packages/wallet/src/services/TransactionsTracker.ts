@@ -51,13 +51,21 @@ export interface TransactionsTrackerInternals {
   rollback$: Observable<Cardano.TxAlonzo>;
 }
 
-export const createAddressTransactionsProvider = (
-  chainHistoryProvider: ChainHistoryProvider,
-  addresses$: Observable<Cardano.Address[]>,
-  retryBackoffConfig: RetryBackoffConfig,
-  tipBlockHeight$: Observable<number>,
-  store: OrderedCollectionStore<Cardano.TxAlonzo>
-): TransactionsTrackerInternals => {
+export interface TransactionsTrackerInternalsProps {
+  chainHistoryProvider: ChainHistoryProvider;
+  addresses$: Observable<Cardano.Address[]>;
+  retryBackoffConfig: RetryBackoffConfig;
+  tipBlockHeight$: Observable<number>;
+  store: OrderedCollectionStore<Cardano.TxAlonzo>;
+}
+
+export const createAddressTransactionsProvider = ({
+  chainHistoryProvider,
+  addresses$,
+  retryBackoffConfig,
+  tipBlockHeight$,
+  store
+}: TransactionsTrackerInternalsProps): TransactionsTrackerInternals => {
   const rollback$ = new Subject<Cardano.TxAlonzo>();
   const storedTransactions$ = store.getAll().pipe(share());
   return {
@@ -150,13 +158,13 @@ export const createTransactionsTracker = (
     transactionsHistoryStore: transactionsStore,
     inFlightTransactionsStore: newTransactionsStore
   }: TransactionsTrackerProps,
-  { transactionsSource$: txSource$, rollback$ }: TransactionsTrackerInternals = createAddressTransactionsProvider(
-    chainHistoryProvider,
+  { transactionsSource$: txSource$, rollback$ }: TransactionsTrackerInternals = createAddressTransactionsProvider({
     addresses$,
+    chainHistoryProvider,
     retryBackoffConfig,
-    distinctBlock(tip$),
-    transactionsStore
-  )
+    store: transactionsStore,
+    tipBlockHeight$: distinctBlock(tip$)
+  })
 ): TransactionsTracker & Shutdown => {
   const submitting$ = merge(
     newTransactionsStore.get().pipe(mergeMap((transactions) => from(transactions))),

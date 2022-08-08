@@ -11,7 +11,7 @@ describe('TransactionsTracker', () => {
   describe('createAddressTransactionsProvider', () => {
     let store: InMemoryTransactionsStore;
     let chainHistoryProvider: ChainHistoryProviderStub;
-    const tip$ = of(300);
+    const tipBlockHeight$ = of(300);
     const retryBackoffConfig = { initialInterval: 1 }; // not relevant
     const addresses = [queryTransactionsResult[0].body.inputs[0].address!];
 
@@ -22,13 +22,13 @@ describe('TransactionsTracker', () => {
     });
 
     it('if store is empty, stores and emits transactions resolved by ChainHistoryProvider', async () => {
-      const provider$ = createAddressTransactionsProvider(
+      const provider$ = createAddressTransactionsProvider({
+        addresses$: of(addresses),
         chainHistoryProvider,
-        of(addresses),
         retryBackoffConfig,
-        tip$,
-        store
-      ).transactionsSource$;
+        store,
+        tipBlockHeight$
+      }).transactionsSource$;
       expect(await firstValueFrom(provider$)).toEqual(queryTransactionsResult);
       expect(store.setAll).toBeCalledTimes(1);
       expect(store.setAll).toBeCalledWith(queryTransactionsResult);
@@ -39,13 +39,13 @@ describe('TransactionsTracker', () => {
       chainHistoryProvider.transactionsByAddresses = jest
         .fn()
         .mockImplementation(() => delay(50).then(() => queryTransactionsResult));
-      const provider$ = createAddressTransactionsProvider(
+      const provider$ = createAddressTransactionsProvider({
+        addresses$: of(addresses),
         chainHistoryProvider,
-        of(addresses),
         retryBackoffConfig,
-        tip$,
-        store
-      ).transactionsSource$;
+        store,
+        tipBlockHeight$
+      }).transactionsSource$;
       expect(await firstValueFrom(provider$.pipe(bufferCount(2)))).toEqual([
         [queryTransactionsResult[0]],
         queryTransactionsResult
@@ -64,13 +64,13 @@ describe('TransactionsTracker', () => {
         .fn()
         .mockImplementationOnce(() => delay(50).then(() => []))
         .mockImplementationOnce(() => delay(50).then(() => [queryTransactionsResult[0]]));
-      const provider$ = createAddressTransactionsProvider(
+      const provider$ = createAddressTransactionsProvider({
+        addresses$: of(addresses),
         chainHistoryProvider,
-        of(addresses),
         retryBackoffConfig,
-        tip$,
-        store
-      ).transactionsSource$;
+        store,
+        tipBlockHeight$
+      }).transactionsSource$;
       expect(await firstValueFrom(provider$.pipe(bufferCount(2)))).toEqual([
         queryTransactionsResult,
         [queryTransactionsResult[0]]
