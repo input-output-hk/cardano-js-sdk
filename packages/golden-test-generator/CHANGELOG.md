@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.1-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/golden-test-generator@0.4.1-nightly.2...@cardano-sdk/golden-test-generator@0.4.1-nightly.3) (2022-08-08)
+
+
+### Features
+
+* **golden-test-generator:** replace console logging with bunyan ([fcdeb6a](https://github.com/input-output-hk/cardano-js-sdk/commit/fcdeb6a89d778bf7e1101580bc7430a0c7469294))
+
+
+
 ## [0.4.1-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/golden-test-generator@0.4.1-nightly.1...@cardano-sdk/golden-test-generator@0.4.1-nightly.2) (2022-08-06)
 
 **Note:** Version bump only for package @cardano-sdk/golden-test-generator

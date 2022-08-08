@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/rabbitmq",
-  "version": "0.4.1-nightly.2",
+  "version": "0.5.0-nightly.0",
   "description": "RabbitMQ Providers",
   "engines": {
     "node": "^14"
@@ -50,7 +50,7 @@
     "tscNoEmit": "shx echo typescript --noEmit command not implemented yet"
   },
   "devDependencies": {
-    "@cardano-sdk/ogmios": "^0.4.1-nightly.2",
+    "@cardano-sdk/ogmios": "^0.5.0-nightly.0",
     "@types/amqplib": "^0.8.2",
     "@types/node": "14.18.12",
     "axios": "^0.27.2",
@@ -67,7 +67,7 @@
   },
   "dependencies": {
     "@cardano-ogmios/schema": "5.5.2",
-    "@cardano-sdk/core": "^0.5.0-nightly.2",
+    "@cardano-sdk/core": "^0.5.0-nightly.3",
     "@cardano-sdk/util": "^0.5.0-nightly.0",
     "amqplib": "^0.10.0",
     "ts-log": "^2.2.4"

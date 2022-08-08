@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.0-nightly.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.5.0-nightly.5...@cardano-sdk/wallet@0.5.0-nightly.6) (2022-08-08)
+
+
+### ⚠ BREAKING CHANGES
+
+* logger is now required
+
+### Bug Fixes
+
+* **wallet:** stop querying the `StakePoolProvider` for all pools when no delegation certs found ([336f597](https://github.com/input-output-hk/cardano-js-sdk/commit/336f59708234dbf00df41d79b5547765ab7ce894))
+
+
+### Code Refactoring
+
+* logger is now required ([cc82bc2](https://github.com/input-output-hk/cardano-js-sdk/commit/cc82bc27539e3ff07f7c2d5816fa7e70c32d06ac))
+
+
+
 ## [0.5.0-nightly.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.5.0-nightly.4...@cardano-sdk/wallet@0.5.0-nightly.5) (2022-08-06)
 
 **Note:** Version bump only for package @cardano-sdk/wallet
