@@ -2,10 +2,9 @@
   "extends": "../../../test/tsconfig.json",
   "compilerOptions": {
     "baseUrl": ".",
-    "noUnusedLocals": false
   },
   "include": [
-    "../../ogmios/test"
+    "../../ogmios/test/mocks"
   ],
   "references": [
     {
