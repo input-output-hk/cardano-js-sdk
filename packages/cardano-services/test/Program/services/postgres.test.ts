@@ -6,8 +6,8 @@ import { HttpServer, HttpServerConfig, createDnsResolver, getPool } from '../../
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../../src/InMemoryCache';
 import { Pool } from 'pg';
 import { SrvRecord } from 'dns';
-import { createLogger } from 'bunyan';
 import { getPort, getRandomPort } from 'get-port-please';
+import { dummyLogger as logger } from 'ts-log';
 import { mockCardanoNode } from '../../../../core/test/CardanoNode/mocks';
 import { types } from 'util';
 import axios from 'axios';
@@ -26,7 +26,6 @@ describe('Service dependency abstractions', () => {
   const APPLICATION_JSON = 'application/json';
   const cache = new InMemoryCache(UNLIMITED_CACHE_TTL);
   const cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
-  const logger = createLogger({ level: 'error', name: 'test' });
   const dnsResolver = createDnsResolver({ factor: 1.1, maxRetryTime: 1000 }, logger);
   const cardanoNode = mockCardanoNode();
 
@@ -59,10 +58,10 @@ describe('Service dependency abstractions', () => {
         apiUrlBase = `http://localhost:${port}/network-info`;
         networkInfoProvider = new DbSyncNetworkInfoProvider(
           { cardanoNodeConfigPath, epochPollInterval: 2000 },
-          { cache, cardanoNode, db: db! }
+          { cache, cardanoNode, db: db!, logger }
         );
-        service = new NetworkInfoHttpService({ networkInfoProvider });
-        httpServer = new HttpServer(config, { services: [service] });
+        service = new NetworkInfoHttpService({ logger, networkInfoProvider });
+        httpServer = new HttpServer(config, { logger, services: [service] });
 
         await httpServer.initialize();
         await httpServer.start();
@@ -113,10 +112,10 @@ describe('Service dependency abstractions', () => {
         apiUrlBase = `http://localhost:${port}/network-info`;
         networkInfoProvider = new DbSyncNetworkInfoProvider(
           { cardanoNodeConfigPath, epochPollInterval: 2000 },
-          { cache, cardanoNode, db: db! }
+          { cache, cardanoNode, db: db!, logger }
         );
-        service = new NetworkInfoHttpService({ networkInfoProvider });
-        httpServer = new HttpServer(config, { services: [service] });
+        service = new NetworkInfoHttpService({ logger, networkInfoProvider });
+        httpServer = new HttpServer(config, { logger, services: [service] });
 
         await httpServer.initialize();
         await httpServer.start();

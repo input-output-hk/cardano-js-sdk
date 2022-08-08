@@ -1,7 +1,7 @@
 import { AssetInfo, ImageMediaType, MediaType, NftMetadata, NftMetadataFile, Uri } from '../types';
 import { CustomError } from 'ts-custom-error';
+import { Logger } from 'ts-log';
 import { Metadatum, MetadatumMap, util } from '../../Cardano';
-import { dummyLogger } from 'ts-log';
 import difference from 'lodash/difference';
 
 class InvalidFileError extends CustomError {}
@@ -78,7 +78,7 @@ const getAssetMetadata = (policy: MetadatumMap, asset: Pick<AssetInfo, 'name'>) 
 export const metadatumToCip25 = (
   asset: Pick<AssetInfo, 'policyId' | 'name'>,
   metadatumMap: MetadatumMap | undefined,
-  logger = dummyLogger
+  logger: Logger
 ): NftMetadata | undefined => {
   const cip25Metadata = metadatumMap?.get(721n);
   if (!cip25Metadata) return;

@@ -1,5 +1,5 @@
 import { Cardano } from '@cardano-sdk/core';
-import { Logger, dummyLogger } from 'ts-log';
+import { Logger } from 'ts-log';
 import { Observable, filter, from, map, merge, mergeMap, scan, withLatestFrom } from 'rxjs';
 
 import { CustomError } from 'ts-custom-error';
@@ -25,7 +25,7 @@ interface TransactionReemitterProps {
   store: DocumentStore<NewTxAlonzoWithSlot[]>;
   tipSlot$: Observable<Cardano.Slot>;
   stabilityWindowSlotsCount?: number;
-  logger?: Logger;
+  logger: Logger;
 }
 
 enum txSource {
@@ -45,7 +45,7 @@ export const createTransactionReemitter = ({
   store,
   tipSlot$,
   stabilityWindowSlotsCount = kStabilityWindowSlotsCount,
-  logger = dummyLogger
+  logger
 }: TransactionReemitterProps): Observable<Cardano.NewTxAlonzo> => {
   const volatileTransactions$ = merge(
     store.get().pipe(

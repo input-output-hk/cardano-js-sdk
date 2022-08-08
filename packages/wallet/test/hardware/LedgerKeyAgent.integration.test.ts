@@ -3,6 +3,7 @@ import { CommunicationType, KeyAgent, LedgerKeyAgent, restoreKeyAgent, util } fr
 import { ObservableWallet, SingleAddressWallet, setupWallet } from '../../src';
 import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { firstValueFrom } from 'rxjs';
+import { dummyLogger as logger } from 'ts-log';
 import {
   mockAssetProvider,
   mockChainHistoryProvider,
@@ -27,6 +28,7 @@ const createWallet = async (keyAgent: KeyAgent) => {
       assetProvider,
       chainHistoryProvider,
       keyAgent: asyncKeyAgent,
+      logger,
       networkInfoProvider,
       rewardsProvider,
       stakePoolProvider,

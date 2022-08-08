@@ -20,7 +20,7 @@ import {
   WithCertType,
   WithdrawalModel
 } from './types';
-import { Logger, dummyLogger } from 'ts-log';
+import { Logger } from 'ts-log';
 import { Pool, QueryResult } from 'pg';
 import { hexStringToBuffer } from '../../util';
 import {
@@ -40,7 +40,7 @@ export class ChainHistoryBuilder {
   #db: Pool;
   #logger: Logger;
 
-  constructor(db: Pool, logger = dummyLogger) {
+  constructor(db: Pool, logger: Logger) {
     this.#db = db;
     this.#logger = logger;
   }

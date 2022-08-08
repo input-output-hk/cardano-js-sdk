@@ -1,5 +1,5 @@
 import { APIErrorCode, ApiError } from '../errors';
-import { Logger, dummyLogger } from 'ts-log';
+import { Logger } from 'ts-log';
 import { RemoteAuthenticator } from '../AuthenticatorApi';
 import { WalletApi } from './types';
 
@@ -23,7 +23,7 @@ export type WalletIcon = string;
 export type WalletProperties = { icon: WalletIcon; walletName: WalletName };
 
 export type WalletDependencies = {
-  logger?: Logger;
+  logger: Logger;
   authenticator: RemoteAuthenticator;
   api: WalletApi;
 };
@@ -40,7 +40,7 @@ export class Cip30Wallet {
   readonly #api: WalletApi;
   readonly #authenticator: RemoteAuthenticator;
 
-  constructor(properties: WalletProperties, { api, authenticator, logger = dummyLogger }: WalletDependencies) {
+  constructor(properties: WalletProperties, { api, authenticator, logger }: WalletDependencies) {
     this.enable = this.enable.bind(this);
     this.icon = properties.icon;
     this.isEnabled = this.isEnabled.bind(this);

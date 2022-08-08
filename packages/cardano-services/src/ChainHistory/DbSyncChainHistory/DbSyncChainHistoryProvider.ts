@@ -3,7 +3,7 @@ import { BlockModel, BlockOutputModel, TipModel, TxInOutModel, TxModel } from '.
 import { Cardano, ChainHistoryProvider, TransactionsByAddressesArgs } from '@cardano-sdk/core';
 import { ChainHistoryBuilder } from './ChainHistoryBuilder';
 import { DbSyncProvider } from '../../DbSyncProvider';
-import { Logger, dummyLogger } from 'ts-log';
+import { Logger } from 'ts-log';
 import { MetadataService } from '../../Metadata';
 import { Pool, QueryResult } from 'pg';
 import { hexStringToBuffer } from '../../util';
@@ -16,7 +16,7 @@ export class DbSyncChainHistoryProvider extends DbSyncProvider implements ChainH
   #metadataService: MetadataService;
   #logger: Logger;
 
-  constructor(db: Pool, metadataService: MetadataService, logger = dummyLogger) {
+  constructor(db: Pool, metadataService: MetadataService, logger: Logger) {
     super(db);
     this.#builder = new ChainHistoryBuilder(db, logger);
     this.#logger = logger;

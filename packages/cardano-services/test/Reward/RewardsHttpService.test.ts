@@ -6,6 +6,7 @@ import { DbSyncRewardsProvider, HttpServer, HttpServerConfig, RewardsHttpService
 import { INFO, createLogger } from 'bunyan';
 import { Pool } from 'pg';
 import { getPort } from 'get-port-please';
+import { dummyLogger as logger } from 'ts-log';
 import axios from 'axios';
 
 const APPLICATION_JSON = 'application/json';
@@ -45,23 +46,23 @@ describe('RewardsHttpService', () => {
     });
 
     it('should not throw during service create if the RewardsProvider is unhealthy', () => {
-      expect(() => new RewardsHttpService({ rewardsProvider })).not.toThrow(
+      expect(() => new RewardsHttpService({ logger, rewardsProvider })).not.toThrow(
         new ProviderError(ProviderFailure.Unhealthy)
       );
     });
 
     it('throws during service initialization if the RewardsProvider is unhealthy', async () => {
-      service = new RewardsHttpService({ rewardsProvider });
-      httpServer = new HttpServer(config, { services: [service] });
+      service = new RewardsHttpService({ logger, rewardsProvider });
+      httpServer = new HttpServer(config, { logger, services: [service] });
       await expect(httpServer.initialize()).rejects.toThrow(new ProviderError(ProviderFailure.Unhealthy));
     });
   });
 
   describe('healthy state', () => {
     beforeAll(async () => {
-      rewardsProvider = new DbSyncRewardsProvider(dbConnection);
-      service = new RewardsHttpService({ rewardsProvider });
-      httpServer = new HttpServer(config, { services: [service] });
+      rewardsProvider = new DbSyncRewardsProvider(dbConnection, logger);
+      service = new RewardsHttpService({ logger, rewardsProvider });
+      httpServer = new HttpServer(config, { logger, services: [service] });
       await httpServer.initialize();
       await httpServer.start();
     });

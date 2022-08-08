@@ -1,9 +1,8 @@
 import { Cardano } from '@cardano-sdk/core';
-import { createTestScheduler } from '@cardano-sdk/util-dev';
-
 import { InMemoryVolatileTransactionsStore, WalletStores } from '../../src/persistence';
-import { Logger } from 'ts-log';
+import { Logger, dummyLogger as logger } from 'ts-log';
 import { NewTxAlonzoWithSlot, TransactionReemitErrorCode, createTransactionReemitter } from '../../src';
+import { createTestScheduler } from '@cardano-sdk/util-dev';
 
 describe('TransactionReemiter', () => {
   let store: WalletStores['volatileTransactions'];
@@ -44,7 +43,14 @@ describe('TransactionReemiter', () => {
       const confirmed$ = cold<NewTxAlonzoWithSlot>('-|');
       const rollback$ = cold<Cardano.TxAlonzo>('-|');
       const submitting$ = cold<NewTxAlonzoWithSlot>('-|');
-      const transactionReemiter = createTransactionReemitter({ confirmed$, rollback$, store, submitting$, tipSlot$ });
+      const transactionReemiter = createTransactionReemitter({
+        confirmed$,
+        logger,
+        rollback$,
+        store,
+        submitting$,
+        tipSlot$
+      });
       expectObservable(transactionReemiter).toBe('-|');
     });
     expect(store.get).toHaveBeenCalledTimes(1);
@@ -59,7 +65,14 @@ describe('TransactionReemiter', () => {
       const confirmed$ = cold<NewTxAlonzoWithSlot>('-bc|', { b: volatileTransactions[1], c: volatileTransactions[2] });
       const rollback$ = cold<Cardano.TxAlonzo>('--|');
       const submitting$ = cold<NewTxAlonzoWithSlot>('--|');
-      const transactionReemiter = createTransactionReemitter({ confirmed$, rollback$, store, submitting$, tipSlot$ });
+      const transactionReemiter = createTransactionReemitter({
+        confirmed$,
+        logger,
+        rollback$,
+        store,
+        submitting$,
+        tipSlot$
+      });
       expectObservable(transactionReemiter).toBe('--|');
     });
     expect(store.set).toHaveBeenCalledTimes(2);
@@ -74,7 +87,14 @@ describe('TransactionReemiter', () => {
       const confirmed$ = cold<NewTxAlonzoWithSlot>('--|');
       const rollback$ = cold<Cardano.TxAlonzo>('--|');
       const submitting$ = cold<NewTxAlonzoWithSlot>('-b|', { b: volatileTransactions[0] });
-      const transactionReemiter = createTransactionReemitter({ confirmed$, rollback$, store, submitting$, tipSlot$ });
+      const transactionReemiter = createTransactionReemitter({
+        confirmed$,
+        logger,
+        rollback$,
+        store,
+        submitting$,
+        tipSlot$
+      });
       expectObservable(transactionReemiter).toBe('--|');
     });
     expect(store.set).toHaveBeenCalledTimes(1);
@@ -94,6 +114,7 @@ describe('TransactionReemiter', () => {
       const submitting$ = cold<NewTxAlonzoWithSlot>('---|');
       const transactionReemiter = createTransactionReemitter({
         confirmed$,
+        logger,
         rollback$,
         stabilityWindowSlotsCount: 200,
         store,
@@ -116,6 +137,7 @@ describe('TransactionReemiter', () => {
     } as Cardano.TxAlonzo;
     const rollbackD: Cardano.TxAlonzo = { body: volatileD.body, id: volatileD.id } as Cardano.TxAlonzo;
 
+    // eslint-disable-next-line @typescript-eslint/no-shadow
     const logger = {} as Logger;
     logger.error = jest.fn();
 
@@ -146,6 +168,7 @@ describe('TransactionReemiter', () => {
   it('Logs error message for rolledback transactions not found in volatiles', () => {
     const [volatileA, volatileB, volatileC] = volatileTransactions;
     const rollbackC: Cardano.TxAlonzo = { body: volatileC.body, id: volatileC.id } as Cardano.TxAlonzo;
+    // eslint-disable-next-line @typescript-eslint/no-shadow
     const logger = {} as Logger;
     logger.error = jest.fn();
 

@@ -58,7 +58,7 @@ describe('AssetHttpService', () => {
       tokenMetadataService = new CardanoTokenRegistry({ logger }, { tokenMetadataServerUrl });
       assetProvider = new DbSyncAssetProvider({ db, logger, ntfMetadataService, tokenMetadataService });
       service = new AssetHttpService({ assetProvider, logger });
-      httpServer = new HttpServer(config, { services: [service] });
+      httpServer = new HttpServer(config, { logger, services: [service] });
       await httpServer.initialize();
       await httpServer.start();
     });

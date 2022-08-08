@@ -1,13 +1,13 @@
 import { AccountBalanceModel, RewardEpochModel } from './types';
 import { Cardano, EpochRange } from '@cardano-sdk/core';
-import { Logger, dummyLogger } from 'ts-log';
+import { Logger } from 'ts-log';
 import { Pool, QueryResult } from 'pg';
 import { findAccountBalance, findRewardsHistory } from './queries';
 
 export class RewardsBuilder {
   #db: Pool;
   #logger: Logger;
-  constructor(db: Pool, logger = dummyLogger) {
+  constructor(db: Pool, logger: Logger) {
     this.#db = db;
     this.#logger = logger;
   }

@@ -1,20 +1,20 @@
 import * as OpenApiValidator from 'express-openapi-validator';
 import { ChainHistoryProvider } from '@cardano-sdk/core';
 import { HttpService } from '../Http';
-import { Logger, dummyLogger } from 'ts-log';
+import { Logger } from 'ts-log';
 import { ServiceNames } from '../Program';
 import { providerHandler } from '../util';
 import express from 'express';
 import path from 'path';
 
 export interface ChainHistoryHttpServiceDependencies {
-  logger?: Logger;
+  logger: Logger;
   chainHistoryProvider: ChainHistoryProvider;
 }
 
 export class ChainHistoryHttpService extends HttpService {
   constructor(
-    { logger = dummyLogger, chainHistoryProvider }: ChainHistoryHttpServiceDependencies,
+    { logger, chainHistoryProvider }: ChainHistoryHttpServiceDependencies,
     router: express.Router = express.Router()
   ) {
     super(ServiceNames.ChainHistory, chainHistoryProvider, router, logger);

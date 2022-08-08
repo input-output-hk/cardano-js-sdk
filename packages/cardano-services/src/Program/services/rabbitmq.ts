@@ -26,9 +26,7 @@ export const rabbitMqTxSubmitProviderWithDiscovery = async (
   serviceName: string
 ): Promise<RabbitMqTxSubmitProvider> => {
   const record = await dnsResolver(serviceName!);
-  let rabbitmqProvider = new RabbitMqTxSubmitProvider({
-    rabbitmqUrl: srvRecordToRabbitmqURL(record)
-  });
+  let rabbitmqProvider = new RabbitMqTxSubmitProvider({ rabbitmqUrl: srvRecordToRabbitmqURL(record) }, { logger });
 
   return new Proxy<RabbitMqTxSubmitProvider>({} as RabbitMqTxSubmitProvider, {
     get(_, prop) {
@@ -45,9 +43,10 @@ export const rabbitMqTxSubmitProviderWithDiscovery = async (
               await rabbitmqProvider
                 .close?.()
                 .catch((error_) => logger.warn(`RabbitMQ provider failed to close after DNS resolution: ${error_}`));
-              rabbitmqProvider = new RabbitMqTxSubmitProvider({
-                rabbitmqUrl: srvRecordToRabbitmqURL(resolvedRecord)
-              });
+              rabbitmqProvider = new RabbitMqTxSubmitProvider(
+                { rabbitmqUrl: srvRecordToRabbitmqURL(resolvedRecord) },
+                { logger }
+              );
               return await rabbitmqProvider.submitTx(args);
             }
             throw error;
@@ -69,7 +68,7 @@ export const getRabbitMqTxSubmitProvider = async (
 ): Promise<RabbitMqTxSubmitProvider> => {
   if (options?.rabbitmqSrvServiceName)
     return rabbitMqTxSubmitProviderWithDiscovery(dnsResolver, logger, options.rabbitmqSrvServiceName);
-  if (options?.rabbitmqUrl) return new RabbitMqTxSubmitProvider({ rabbitmqUrl: options.rabbitmqUrl });
+  if (options?.rabbitmqUrl) return new RabbitMqTxSubmitProvider({ rabbitmqUrl: options.rabbitmqUrl }, { logger });
   throw new MissingProgramOption(ServiceNames.TxSubmit, [
     CommonOptionDescriptions.RabbitMQUrl,
     CommonOptionDescriptions.RabbitMQSrvServiceName

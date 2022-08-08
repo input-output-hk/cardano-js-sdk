@@ -1,5 +1,6 @@
 import { AssetInfo } from '../../../src/Asset';
 import { AssetName, Metadatum, PolicyId, TxMetadata } from '../../../src/Cardano';
+import { dummyLogger as logger } from 'ts-log';
 import { metadatumToCip25 } from '../../../src/Asset/util';
 
 describe('NftMetadata/metadatumToCip25', () => {
@@ -21,26 +22,26 @@ describe('NftMetadata/metadatumToCip25', () => {
 
   it('returns undefined for non-cip25 metadatum', () => {
     const metadatum: TxMetadata = new Map([[123n, 'metadatum']]);
-    expect(metadatumToCip25(asset, metadatum)).toBeUndefined();
+    expect(metadatumToCip25(asset, metadatum, logger)).toBeUndefined();
   });
 
   it('returns undefined for cip25 metadatum with no metadata for given policyId', () => {
     const metadata: TxMetadata = new Map([[721n, new Map([['other_policy_id', minimalMetadata]])]]);
-    expect(metadatumToCip25(asset, metadata)).toBeUndefined();
+    expect(metadatumToCip25(asset, metadata, logger)).toBeUndefined();
   });
 
   it('returns undefined for cip25 metadatum with no metadata for given assetId', () => {
     const metadatum: TxMetadata = new Map([
       [721n, new Map([[asset.policyId.toString(), new Map([['other_asset_id', minimalMetadata]])]])]
     ]);
-    expect(metadatumToCip25(asset, metadatum)).toBeUndefined();
+    expect(metadatumToCip25(asset, metadatum, logger)).toBeUndefined();
   });
 
   it('converts minimal metadata', () => {
     const metadatum: TxMetadata = new Map([
       [721n, new Map([[asset.policyId.toString(), new Map([[asset.name.toString(), minimalMetadata]])]])]
     ]);
-    expect(metadatumToCip25(asset, metadatum)).toEqual(minimalConvertedMetadata);
+    expect(metadatumToCip25(asset, metadatum, logger)).toEqual(minimalConvertedMetadata);
   });
 
   it('supports asset name as utf8 string', () => {
@@ -52,7 +53,7 @@ describe('NftMetadata/metadatumToCip25', () => {
         ])
       ]
     ]);
-    expect(metadatumToCip25(asset, metadatum)).toEqual(minimalConvertedMetadata);
+    expect(metadatumToCip25(asset, metadatum, logger)).toEqual(minimalConvertedMetadata);
   });
 
   it('converts version', () => {
@@ -70,7 +71,7 @@ describe('NftMetadata/metadatumToCip25', () => {
         ])
       ]
     ]);
-    expect(metadatumToCip25(asset, metadatum)).toEqual({
+    expect(metadatumToCip25(asset, metadatum, logger)).toEqual({
       ...minimalConvertedMetadata,
       version: '2.0'
     });
@@ -98,7 +99,7 @@ describe('NftMetadata/metadatumToCip25', () => {
         ])
       ]
     ]);
-    expect(metadatumToCip25(asset, metadatum)).toEqual({
+    expect(metadatumToCip25(asset, metadatum, logger)).toEqual({
       ...minimalConvertedMetadata,
       description: ['description'],
       mediaType: 'image/png',
@@ -134,7 +135,7 @@ describe('NftMetadata/metadatumToCip25', () => {
         ])
       ]
     ]);
-    expect(metadatumToCip25(asset, metadatum)).toEqual({
+    expect(metadatumToCip25(asset, metadatum, logger)).toEqual({
       ...minimalConvertedMetadata,
       files: [
         { mediaType: 'image/jpg', name: 'file1', src: ['https://file1.location'] },

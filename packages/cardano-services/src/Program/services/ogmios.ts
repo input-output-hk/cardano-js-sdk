@@ -43,7 +43,7 @@ export const ogmiosTxSubmitProviderWithDiscovery = async (
   serviceName: string
 ): Promise<TxSubmitProvider> => {
   const { name, port } = await dnsResolver(serviceName!);
-  let ogmiosProvider = ogmiosTxSubmitProvider({ host: name, port });
+  let ogmiosProvider = ogmiosTxSubmitProvider({ host: name, port }, logger);
 
   return new Proxy<TxSubmitProvider>({} as TxSubmitProvider, {
     get(_, prop) {
@@ -59,7 +59,7 @@ export const ogmiosTxSubmitProviderWithDiscovery = async (
                 .catch((error_) =>
                   logger.warn(`Ogmios tx submit provider failed to close after DNS resolution: ${error_}`)
                 );
-              ogmiosProvider = ogmiosTxSubmitProvider({ host: record.name, port: record.port });
+              ogmiosProvider = ogmiosTxSubmitProvider({ host: record.name, port: record.port }, logger);
               return await ogmiosProvider.submitTx(args);
             }
             throw error;
@@ -81,7 +81,7 @@ export const getOgmiosTxSubmitProvider = async (
 ): Promise<TxSubmitProvider> => {
   if (options?.ogmiosSrvServiceName)
     return ogmiosTxSubmitProviderWithDiscovery(dnsResolver, logger, options.ogmiosSrvServiceName);
-  if (options?.ogmiosUrl) return ogmiosTxSubmitProvider(urlToConnectionConfig(options?.ogmiosUrl));
+  if (options?.ogmiosUrl) return ogmiosTxSubmitProvider(urlToConnectionConfig(options?.ogmiosUrl), logger);
   throw new MissingProgramOption(ServiceNames.TxSubmit, [
     CommonOptionDescriptions.OgmiosUrl,
     CommonOptionDescriptions.OgmiosSrvServiceName

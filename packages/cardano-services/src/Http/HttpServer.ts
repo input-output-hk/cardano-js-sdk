@@ -1,5 +1,5 @@
 import { HttpService } from './HttpService';
-import { Logger, dummyLogger } from 'ts-log';
+import { Logger } from 'ts-log';
 import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { RunnableModule } from '../RunnableModule';
 import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
@@ -28,7 +28,7 @@ export type HttpServerConfig = {
 
 export interface HttpServerDependencies {
   services: HttpService[];
-  logger?: Logger;
+  logger: Logger;
 }
 
 export class HttpServer extends RunnableModule {
@@ -37,7 +37,7 @@ export class HttpServer extends RunnableModule {
   #config: HttpServerConfig;
   #dependencies: HttpServerDependencies;
 
-  constructor(config: HttpServerConfig, { logger = dummyLogger, ...rest }: HttpServerDependencies) {
+  constructor(config: HttpServerConfig, { logger, ...rest }: HttpServerDependencies) {
     super(config.name || 'HttpServer', logger);
     this.#config = config;
     this.#dependencies = { logger, ...rest };

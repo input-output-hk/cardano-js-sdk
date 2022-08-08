@@ -17,6 +17,7 @@ import { INFO, createLogger } from 'bunyan';
 import { Pool } from 'pg';
 import { doServerRequest } from '../util';
 import { getPort } from 'get-port-please';
+import { dummyLogger as logger } from 'ts-log';
 import axios from 'axios';
 
 const UNSUPPORTED_MEDIA_STRING = 'Request failed with status code 415';
@@ -85,14 +86,14 @@ describe('StakePoolHttpService', () => {
     });
 
     it('should not throw during service create if the StakePoolProvider is unhealthy', () => {
-      expect(() => new StakePoolHttpService({ stakePoolProvider })).not.toThrow(
+      expect(() => new StakePoolHttpService({ logger, stakePoolProvider })).not.toThrow(
         new ProviderError(ProviderFailure.Unhealthy)
       );
     });
 
     it('throws during service initialization if the StakePoolProvider is unhealthy', async () => {
-      service = new StakePoolHttpService({ stakePoolProvider });
-      httpServer = new HttpServer(config, { services: [service] });
+      service = new StakePoolHttpService({ logger, stakePoolProvider });
+      httpServer = new HttpServer(config, { logger, services: [service] });
       await expect(httpServer.initialize()).rejects.toThrow(new ProviderError(ProviderFailure.Unhealthy));
     });
   });
@@ -100,9 +101,9 @@ describe('StakePoolHttpService', () => {
   // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('healthy state', () => {
     beforeAll(async () => {
-      stakePoolProvider = new DbSyncStakePoolProvider(dbConnection);
-      service = new StakePoolHttpService({ stakePoolProvider });
-      httpServer = new HttpServer(config, { services: [service] });
+      stakePoolProvider = new DbSyncStakePoolProvider(dbConnection, logger);
+      service = new StakePoolHttpService({ logger, stakePoolProvider });
+      httpServer = new HttpServer(config, { logger, services: [service] });
       await httpServer.initialize();
       await httpServer.start();
       provider = stakePoolHttpProvider(clientConfig);

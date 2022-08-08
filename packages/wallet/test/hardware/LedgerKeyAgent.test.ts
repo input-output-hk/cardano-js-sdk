@@ -3,6 +3,7 @@ import { AssetId, createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { Cardano } from '@cardano-sdk/core';
 import { CommunicationType, LedgerTransportType } from '../../src/KeyManagement/types';
 import { KeyManagement, SingleAddressWallet, setupWallet } from '../../src';
+import { dummyLogger as logger } from 'ts-log';
 import { mockKeyAgentDependencies } from '../mocks';
 import DeviceConnection from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
@@ -50,6 +51,7 @@ describe('LedgerKeyAgent', () => {
             assetProvider,
             chainHistoryProvider,
             keyAgent: asyncKeyAgent,
+            logger,
             networkInfoProvider,
             rewardsProvider,
             stakePoolProvider,

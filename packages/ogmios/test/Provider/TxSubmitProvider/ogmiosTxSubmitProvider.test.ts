@@ -2,6 +2,7 @@ import { Cardano, ProviderError, TxSubmitProvider } from '@cardano-sdk/core';
 import { Connection, createConnectionObject } from '@cardano-ogmios/client';
 import { createMockOgmiosServer, listenPromise, serverClosePromise } from '../../mocks/mockOgmiosServer';
 import { getRandomPort } from 'get-port-please';
+import { dummyLogger as logger } from 'ts-log';
 import { ogmiosTxSubmitProvider } from '../../../src';
 import http from 'http';
 
@@ -21,7 +22,7 @@ describe('ogmiosTxSubmitProvider', () => {
     });
 
     it('is not ok if cannot connect', async () => {
-      provider = ogmiosTxSubmitProvider(connection);
+      provider = ogmiosTxSubmitProvider(connection, logger);
       const res = await provider.healthCheck();
       expect(res).toEqual({ ok: false });
     });
@@ -32,7 +33,7 @@ describe('ogmiosTxSubmitProvider', () => {
         submitTx: { response: { success: true } }
       });
       await listenPromise(mockServer, connection.port);
-      provider = ogmiosTxSubmitProvider(connection);
+      provider = ogmiosTxSubmitProvider(connection, logger);
       const res = await provider.healthCheck();
       expect(res).toEqual({ ok: true });
     });
@@ -43,7 +44,7 @@ describe('ogmiosTxSubmitProvider', () => {
         submitTx: { response: { success: true } }
       });
       await listenPromise(mockServer, connection.port);
-      provider = ogmiosTxSubmitProvider(connection);
+      provider = ogmiosTxSubmitProvider(connection, logger);
       const res = await provider.healthCheck();
       expect(res).toEqual({ ok: false });
     });
@@ -54,7 +55,7 @@ describe('ogmiosTxSubmitProvider', () => {
         submitTx: { response: { success: true } }
       });
       await listenPromise(mockServer, connection.port);
-      provider = ogmiosTxSubmitProvider(connection);
+      provider = ogmiosTxSubmitProvider(connection, logger);
       await expect(provider.healthCheck()).rejects.toThrowError(ProviderError);
     });
   });
@@ -64,7 +65,7 @@ describe('ogmiosTxSubmitProvider', () => {
       beforeAll(async () => {
         mockServer = createMockOgmiosServer({ submitTx: { response: { success: true } } });
         await listenPromise(mockServer, connection.port);
-        provider = ogmiosTxSubmitProvider(connection);
+        provider = ogmiosTxSubmitProvider(connection, logger);
       });
 
       afterAll(async () => {
@@ -91,7 +92,7 @@ describe('ogmiosTxSubmitProvider', () => {
           submitTx: { response: { failWith: { type: 'eraMismatch' }, success: false } }
         });
         await listenPromise(mockServer, connection.port);
-        provider = ogmiosTxSubmitProvider(connection);
+        provider = ogmiosTxSubmitProvider(connection, logger);
         await expect(provider.submitTx(new Uint8Array())).rejects.toThrowError(
           Cardano.TxSubmissionErrors.EraMismatchError
         );

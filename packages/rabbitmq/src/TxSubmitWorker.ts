@@ -3,11 +3,9 @@ import { CONNECTION_ERROR_EVENT, TX_SUBMISSION_QUEUE, serializeError, waitForPen
 import { Cardano, ProviderError, ProviderFailure, TxSubmitProvider } from '@cardano-sdk/core';
 import { Channel, Connection, Message, connect } from 'amqplib';
 import { EventEmitter } from 'events';
-import { Logger, dummyLogger } from 'ts-log';
+import { Logger } from 'ts-log';
 
 const moduleName = 'TxSubmitWorker';
-
-type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 
 /**
  * Configuration options parameters for the TxSubmitWorker
@@ -101,10 +99,10 @@ export class TxSubmitWorker extends EventEmitter {
    * @param config The configuration options
    * @param dependencies The dependency objects
    */
-  constructor(config: TxSubmitWorkerConfig, dependencies: Optional<TxSubmitWorkerDependencies, 'logger'>) {
+  constructor(config: TxSubmitWorkerConfig, dependencies: TxSubmitWorkerDependencies) {
     super();
     this.#config = { parallelTxs: 3, pollingCycle: 500, ...config };
-    this.#dependencies = { logger: dummyLogger, ...dependencies };
+    this.#dependencies = dependencies;
   }
 
   /**

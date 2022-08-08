@@ -17,7 +17,7 @@ export const initializeInjectedScript = (props: WalletProperties, { logger }: In
 
   const authenticator = consumeRemoteAuthenticatorApi(props, dependencies);
   const walletApi = consumeRemoteWalletApi(props, dependencies);
-  const wallet = new Cip30Wallet(props, { api: walletApi, authenticator });
+  const wallet = new Cip30Wallet(props, { api: walletApi, authenticator, logger });
 
-  injectGlobal(window, wallet);
+  injectGlobal(window, wallet, logger);
 };
