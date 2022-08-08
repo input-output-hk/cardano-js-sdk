@@ -1939,6 +1939,7 @@ __metadata:
     "@types/fs-extra": ^9.0.12
     "@types/object-hash": ^2.1.1
     "@types/ws": ^7.4.6
+    bunyan: ^1.8.15
     chalk: ^4.1.1
     clear: ^0.1.0
     cli-progress: ^3.9.0

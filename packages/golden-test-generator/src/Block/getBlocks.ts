@@ -1,6 +1,6 @@
 /* eslint-disable sonarjs/cognitive-complexity */
 import { GeneratorMetadata } from '../Content';
-import { Logger, dummyLogger } from 'ts-log';
+import { Logger } from 'ts-log';
 import { Ogmios } from '@cardano-sdk/ogmios';
 
 export type GetBlocksResponse = GeneratorMetadata & {
@@ -10,12 +10,12 @@ export type GetBlocksResponse = GeneratorMetadata & {
 export const getBlocks = async (
   blockHeights: number[],
   options: {
-    logger?: Logger;
+    logger: Logger;
     ogmiosConnectionConfig: Ogmios.ConnectionConfig;
     onBlock?: (slot: number) => void;
   }
 ): Promise<GetBlocksResponse> => {
-  const logger = options?.logger ?? dummyLogger;
+  const { logger } = options;
   const requestedBlocks: { [blockHeight: string]: Ogmios.Schema.Block } = {};
   return new Promise(async (resolve, reject) => {
     let currentBlock: number;

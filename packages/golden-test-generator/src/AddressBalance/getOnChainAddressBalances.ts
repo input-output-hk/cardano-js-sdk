@@ -1,6 +1,6 @@
 /* eslint-disable complexity */
 import { GeneratorMetadata } from '../Content';
-import { Logger, dummyLogger } from 'ts-log';
+import { Logger } from 'ts-log';
 import { Ogmios } from '@cardano-sdk/ogmios';
 import { applyValue } from './applyValue';
 
@@ -16,16 +16,16 @@ export const getOnChainAddressBalances = (
   addresses: string[],
   atBlocks: number[],
   options: {
-    logger?: Logger;
+    logger: Logger;
     ogmiosConnectionConfig: Ogmios.ConnectionConfig;
     onBlock?: (slot: number) => void;
   }
 ): Promise<AddressBalancesResponse> => {
-  const logger = options?.logger ?? dummyLogger;
+  const { logger } = options;
   const trackedAddressBalances: AddressBalances = Object.fromEntries(
     addresses.map((address) => [address, { assets: {}, coins: 0n }])
   );
-  const trackedTxs: { id: Ogmios.Schema.TxId, inputs: Ogmios.Schema.TxIn[], outputs: Ogmios.Schema.TxOut[] }[] = [];
+  const trackedTxs: { id: Ogmios.Schema.TxId; inputs: Ogmios.Schema.TxIn[]; outputs: Ogmios.Schema.TxOut[] }[] = [];
   // eslint-disable-next-line sonarjs/cognitive-complexity
   return new Promise(async (resolve, reject) => {
     let currentBlock: number;
