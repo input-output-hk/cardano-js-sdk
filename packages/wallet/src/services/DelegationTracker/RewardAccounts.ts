@@ -1,15 +1,16 @@
 /* eslint-disable unicorn/no-nested-ternary */
 import { BigIntMath, isNotNil } from '@cardano-sdk/util';
-import { Cardano, RewardsProvider, StakePoolProvider } from '@cardano-sdk/core';
+import { Cardano, RewardsProvider } from '@cardano-sdk/core';
 import { Delegatee, RewardAccount, StakeKeyStatus } from '../types';
 import { KeyValueStore } from '../../persistence';
-import { Observable, combineLatest, concat, distinctUntilChanged, filter, map, merge, switchMap, tap } from 'rxjs';
+import { Observable, combineLatest, concat, distinctUntilChanged, filter, map, merge, of, switchMap, tap } from 'rxjs';
 import {
   RegAndDeregCertificateTypes,
   includesAnyCertificate,
   isLastStakeKeyCertOfType
 } from './transactionCertificates';
 import { RetryBackoffConfig } from 'backoff-rxjs';
+import { TrackedStakePoolProvider } from '../ProviderTracker';
 import { TxWithEpoch } from './types';
 import { coldObservableProvider, deepEquals, shallowArrayEquals } from '../util';
 import findLast from 'lodash/findLast';
@@ -18,12 +19,16 @@ import uniq from 'lodash/uniq';
 
 export const createQueryStakePoolsProvider =
   (
-    stakePoolProvider: StakePoolProvider,
+    stakePoolProvider: TrackedStakePoolProvider,
     store: KeyValueStore<Cardano.PoolId, Cardano.StakePool>,
     retryBackoffConfig: RetryBackoffConfig
   ) =>
-  (poolIds: Cardano.PoolId[]) =>
-    merge(
+  (poolIds: Cardano.PoolId[]) => {
+    if (poolIds.length === 0) {
+      stakePoolProvider.setStatInitialized(stakePoolProvider.stats.queryStakePools$);
+      return of([]);
+    }
+    return merge(
       store.getValues(poolIds),
       coldObservableProvider({
         provider: () =>
@@ -41,6 +46,7 @@ export const createQueryStakePoolsProvider =
         })
       )
     );
+  };
 export type ObservableStakePoolProvider = ReturnType<typeof createQueryStakePoolsProvider>;
 
 const getWithdrawalQuantity = (
@@ -169,7 +175,8 @@ export const createDelegateeTracker = (
   combineLatest([certificates$, epoch$]).pipe(
     switchMap(([transactions, lastEpoch]) => {
       const stakePoolIds = [lastEpoch + 1, lastEpoch + 2, lastEpoch + 3].map(getStakePoolIdAtEpoch(transactions));
-      return stakePoolProvider(uniq(stakePoolIds.filter(isNotNil))).pipe(
+      const uniqStakePoolIds = uniq(stakePoolIds.filter(isNotNil));
+      return stakePoolProvider(uniqStakePoolIds).pipe(
         map((stakePools) => stakePoolIds.map((poolId) => stakePools.find((pool) => pool.id === poolId) || undefined)),
         map(([currentEpoch, nextEpoch, nextNextEpoch]) => ({ currentEpoch, nextEpoch, nextNextEpoch }))
       );
