@@ -36,7 +36,7 @@ const inputSelectionTotals = ({
 }: {
   results: SelectionResult;
   outputs: Set<Cardano.TxOut>;
-  implicitCoin?: Cardano.ImplicitCoin;
+  implicitCoin?: Cardano.util.ImplicitCoin;
 }) => {
   const vSelectedUtxo = totalUtxosValue(results);
   const vSelected = {
@@ -64,7 +64,7 @@ export const assertInputSelectionProperties = ({
   outputs: Set<Cardano.TxOut>;
   utxo: Set<Cardano.Utxo>;
   constraints: SelectionConstraints.MockSelectionConstraints;
-  implicitCoin?: Cardano.ImplicitCoin;
+  implicitCoin?: Cardano.util.ImplicitCoin;
 }) => {
   const { vSelected, vRequested, vChange } = inputSelectionTotals({ implicitCoin, outputs, results });
 
@@ -109,7 +109,7 @@ export const assertFailureProperties = ({
   utxoAmounts: Cardano.Value[];
   outputsAmounts: Cardano.Value[];
   constraints: SelectionConstraints.MockSelectionConstraints;
-  implicitCoin?: Cardano.ImplicitCoin;
+  implicitCoin?: Cardano.util.ImplicitCoin;
 }) => {
   const availableQuantities = Cardano.util.coalesceValueQuantities([
     ...utxoAmounts,
@@ -186,7 +186,7 @@ export const generateSelectionParams = (() => {
         );
       });
 
-  const generateImplicitCoin: Arbitrary<Cardano.ImplicitCoin | undefined> = fc.oneof(
+  const generateImplicitCoin: Arbitrary<Cardano.util.ImplicitCoin | undefined> = fc.oneof(
     fc.constant(void 0),
     fc.record({
       deposit: fc.oneof(
@@ -215,7 +215,7 @@ export const generateSelectionParams = (() => {
     utxoAmounts: Cardano.Value[];
     outputsAmounts: Cardano.Value[];
     constraints: SelectionConstraints.MockSelectionConstraints;
-    implicitCoin?: Cardano.ImplicitCoin;
+    implicitCoin?: Cardano.util.ImplicitCoin;
   }> =>
     generateImplicitCoin.chain((implicitCoin) =>
       fc.record({

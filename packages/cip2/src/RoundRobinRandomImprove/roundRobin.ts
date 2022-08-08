@@ -31,7 +31,7 @@ const improvesSelection = (
 const listTokensWithin = (
   uniqueOutputAssetIDs: Cardano.AssetId[],
   outputs: Cardano.TxOut[],
-  implicitCoin: Required<Cardano.ImplicitCoin>
+  implicitCoin: Required<Cardano.util.ImplicitCoin>
 ) => [
   ...uniqueOutputAssetIDs.map((id) => {
     const getQuantity = assetQuantitySelector(id);

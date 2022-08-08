@@ -82,7 +82,7 @@ export interface InputSelectionParameters {
   /**
    * Implicit coin quantities used in the transaction
    */
-  implicitCoin?: Cardano.ImplicitCoin;
+  implicitCoin?: Cardano.util.ImplicitCoin;
 }
 
 export interface InputSelector {

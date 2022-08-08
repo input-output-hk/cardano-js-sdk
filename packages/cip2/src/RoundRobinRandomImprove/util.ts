@@ -8,7 +8,7 @@ export interface RoundRobinRandomImproveArgs {
   utxo: Cardano.Utxo[];
   outputs: Cardano.TxOut[];
   uniqueOutputAssetIDs: Cardano.AssetId[];
-  implicitCoin: Required<Cardano.ImplicitCoin>;
+  implicitCoin: Required<Cardano.util.ImplicitCoin>;
   random: typeof Math.random;
 }
 
@@ -25,11 +25,11 @@ const noImplicitCoin = {
 export const preprocessArgs = (
   availableUtxo: Set<Cardano.Utxo>,
   outputSet: Set<Cardano.TxOut>,
-  partialImplicitCoin: Cardano.ImplicitCoin = noImplicitCoin
+  partialImplicitCoin: Cardano.util.ImplicitCoin = noImplicitCoin
 ): Omit<RoundRobinRandomImproveArgs, 'random'> => {
   const outputs = [...outputSet];
   const uniqueOutputAssetIDs = uniq(outputs.flatMap(({ value: { assets } }) => [...(assets?.keys() || [])]));
-  const implicitCoin: Required<Cardano.ImplicitCoin> = {
+  const implicitCoin: Required<Cardano.util.ImplicitCoin> = {
     deposit: partialImplicitCoin.deposit || 0n,
     input: partialImplicitCoin.input || 0n
   };
@@ -62,7 +62,7 @@ export const getCoinQuantity = (quantities: Cardano.Value[]): bigint =>
 export const assertIsCoinBalanceSufficient = (
   utxoValues: Cardano.Value[],
   outputValues: Cardano.Value[],
-  implicitCoin: Required<Cardano.ImplicitCoin>
+  implicitCoin: Required<Cardano.util.ImplicitCoin>
 ) => {
   const utxoCoinTotal = getCoinQuantity(utxoValues);
   const outputsCoinTotal = getCoinQuantity(outputValues);
@@ -81,7 +81,7 @@ export const assertIsBalanceSufficient = (
   uniqueOutputAssetIDs: Cardano.AssetId[],
   utxo: Cardano.Utxo[],
   outputs: Cardano.TxOut[],
-  implicitCoin: Required<Cardano.ImplicitCoin>
+  implicitCoin: Required<Cardano.util.ImplicitCoin>
 ): void => {
   if (utxo.length === 0) {
     throw new InputSelectionError(InputSelectionFailure.UtxoBalanceInsufficient);

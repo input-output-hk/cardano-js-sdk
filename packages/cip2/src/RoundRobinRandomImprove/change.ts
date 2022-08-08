@@ -11,7 +11,7 @@ interface ChangeComputationArgs {
   utxoSelection: UtxoSelection;
   outputValues: Cardano.Value[];
   uniqueOutputAssetIDs: Cardano.AssetId[];
-  implicitCoin: Required<Cardano.ImplicitCoin>;
+  implicitCoin: Required<Cardano.util.ImplicitCoin>;
   estimateTxFee: EstimateTxFeeWithOriginalOutputs;
   computeMinimumCoinQuantity: ComputeMinimumCoinQuantity;
   tokenBundleSizeExceedsLimit: TokenBundleSizeExceedsLimit;
@@ -122,7 +122,7 @@ const computeRequestedAssetChangeBundles = (
   utxoSelected: Cardano.Utxo[],
   outputValues: Cardano.Value[],
   uniqueOutputAssetIDs: Cardano.AssetId[],
-  implicitCoin: Required<Cardano.ImplicitCoin>,
+  implicitCoin: Required<Cardano.util.ImplicitCoin>,
   fee: Cardano.Lovelace
 ): Cardano.Value[] => {
   const assetTotals: Map<Cardano.AssetId, { selected: bigint; requested: bigint }> = new Map();
@@ -235,7 +235,7 @@ const computeChangeBundles = ({
   utxoSelection: UtxoSelection;
   outputValues: Cardano.Value[];
   uniqueOutputAssetIDs: Cardano.AssetId[];
-  implicitCoin: Required<Cardano.ImplicitCoin>;
+  implicitCoin: Required<Cardano.util.ImplicitCoin>;
   computeMinimumCoinQuantity: ComputeMinimumCoinQuantity;
   fee?: bigint;
 }): (UtxoSelection & { changeBundles: Cardano.Value[] }) | false => {

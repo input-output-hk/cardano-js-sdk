@@ -2,12 +2,26 @@ import { BigIntMath } from '@cardano-sdk/util';
 import { Cardano, ProtocolParametersRequiredByWallet } from '../../';
 
 /**
+ * Implicit coin quantities used in the transaction
+ */
+export interface ImplicitCoin {
+  /**
+   * Reward withdrawals + deposit reclaims
+   */
+  input?: Cardano.Lovelace;
+  /**
+   * Delegation registration deposit
+   */
+  deposit?: Cardano.Lovelace;
+}
+
+/**
  * Implementation is the same as in CSL.get_implicit_input() and CSL.get_deposit().
  */
 export const computeImplicitCoin = (
   { stakeKeyDeposit, poolDeposit }: Pick<ProtocolParametersRequiredByWallet, 'stakeKeyDeposit' | 'poolDeposit'>,
   { certificates, withdrawals }: Pick<Cardano.TxBodyAlonzo, 'certificates' | 'withdrawals'>
-): Cardano.ImplicitCoin => {
+): ImplicitCoin => {
   const stakeKeyDepositBigint = stakeKeyDeposit && BigInt(stakeKeyDeposit);
   const poolDepositBigint = poolDeposit && BigInt(poolDeposit);
   const deposit = BigIntMath.sum(

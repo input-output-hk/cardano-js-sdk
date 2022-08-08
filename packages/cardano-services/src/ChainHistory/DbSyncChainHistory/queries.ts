@@ -60,23 +60,6 @@ export const findTip = `
 	ORDER BY block.block_no DESC NULLS LAST
 	LIMIT 1`;
 
-export const findProtocolParameters = `
-	SELECT 
-		coins_per_utxo_size,
-		max_collateral_inputs,
-		max_tx_size,
-		max_val_size,
-		min_fee_a AS min_fee_coefficient,
-		min_fee_b AS min_fee_constant,
-		min_pool_cost,
-		pool_deposit,
-		protocol_major,
-		protocol_minor,
-		key_deposit
-	FROM epoch_param
-	ORDER BY epoch_no DESC
-	LIMIT 1`;
-
 export const findBlocksByHashes = `
 	SELECT
 		block.hash AS hash,

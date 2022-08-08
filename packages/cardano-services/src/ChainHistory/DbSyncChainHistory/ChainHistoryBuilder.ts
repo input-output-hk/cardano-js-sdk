@@ -1,5 +1,5 @@
 import * as Queries from './queries';
-import { Cardano, ProtocolParametersRequiredByWallet, ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
 import {
   CertificateModel,
   DelegationCertModel,
@@ -7,7 +7,6 @@ import {
   MultiAssetModel,
   PoolRegisterCertModel,
   PoolRetireCertModel,
-  ProtocolParamsModel,
   RedeemerModel,
   StakeCertModel,
   TransactionDataMap,
@@ -25,7 +24,6 @@ import { Pool, QueryResult } from 'pg';
 import { hexStringToBuffer } from '../../util';
 import {
   mapCertificate,
-  mapProtocolParams,
   mapRedeemer,
   mapTxIn,
   mapTxOut,
@@ -157,14 +155,5 @@ export class ChainHistoryBuilder {
       certsMap.set(txId, certs);
     }
     return certsMap;
-  }
-
-  public async queryProtocolParams(): Promise<ProtocolParametersRequiredByWallet> {
-    this.#logger.debug('About to find protocol parameters');
-    const results: QueryResult<ProtocolParamsModel> = await this.#db.query(Queries.findProtocolParameters);
-    if (results.rows.length === 0) {
-      throw new ProviderError(ProviderFailure.Unknown, null, "Couldn't fetch protocol parameters");
-    }
-    return mapProtocolParams(results.rows[0]);
   }
 }
