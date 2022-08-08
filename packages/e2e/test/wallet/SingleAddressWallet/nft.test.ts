@@ -53,6 +53,7 @@ describe('SingleAddressWallet.assets/nft', () => {
               logger
             ),
             keyAgent,
+            logger,
             networkInfoProvider: await networkInfoProviderFactory.create(
               env.NETWORK_INFO_PROVIDER,
               env.NETWORK_INFO_PROVIDER_PARAMS,
