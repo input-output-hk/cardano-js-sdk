@@ -1,5 +1,6 @@
 import { Cardano, StakePoolStats } from '@cardano-sdk/core';
 import {
+  calcNodeMetricsValues,
   mapAddressOwner,
   mapEpochReward,
   mapPoolAPY,
@@ -12,7 +13,9 @@ import {
   mapRelay,
   toStakePoolResults
 } from '../../../src';
+import { mockStakeDistribution } from '../../../../core/test/CardanoNode/mocks';
 
+// eslint-disable-next-line max-statements
 describe('mappers', () => {
   const txHash = '15535f16b41c6c27483b0b3346d5aaa14c3629323a642fe6518c2a27573f6354';
   const vrfKeyHash = '83a817519ec34d3c637db8f9d46fcf6f7f9e826093d1b9a8158c89da4b47a801';
@@ -99,6 +102,11 @@ describe('mappers', () => {
     apy: 0.015,
     hash_id
   };
+  const nodeMetricsDependencies = {
+    poolOptimalCount: 10,
+    stakeDistribution: mockStakeDistribution,
+    totalAdaAmount: BigInt('42000004107749657')
+  };
   it('mapPoolRetirement', () => {
     expect(mapPoolRetirement(poolRetirementModel)).toEqual({
       hashId: poolRetirementModel.hash_id,
@@ -177,18 +185,11 @@ describe('mappers', () => {
     expect(mapPoolMetrics(poolMetricsModel)).toEqual({
       hashId: poolMetricsModel.pool_hash_id,
       metrics: {
+        activeStake: BigInt(poolMetricsModel.active_stake),
         blocksCreated: poolMetricsModel.blocks_created,
         delegators: poolMetricsModel.delegators,
         livePledge: BigInt(poolMetricsModel.live_pledge),
-        saturation: poolMetricsModel.saturation,
-        size: {
-          active: poolMetricsModel.active_stake_percentage,
-          live: poolMetricsModel.live_stake_percentage
-        },
-        stake: {
-          active: BigInt(poolMetricsModel.active_stake),
-          live: BigInt(poolMetricsModel.live_stake)
-        }
+        saturation: poolMetricsModel.saturation
       }
     });
   });
@@ -198,6 +199,32 @@ describe('mappers', () => {
       hashId: poolAPYModel.hash_id
     });
   });
+  it('calcNodeMetricsValues', () => {
+    const metrics = mapPoolMetrics(poolMetricsModel).metrics;
+    const apy = poolAPYModel.apy;
+    expect(
+      calcNodeMetricsValues(
+        Cardano.PoolId('pool1la4ghj4w4f8p4yk4qmx0qvqmzv6592ee9rs0vgla5w6lc2nc8w5'),
+        metrics,
+        nodeMetricsDependencies,
+        apy
+      )
+    ).toEqual({
+      apy: 0.015,
+      blocksCreated: 20,
+      delegators: 88,
+      livePledge: 99_999n,
+      saturation: 0.000_002_404_549_647_683_62,
+      size: {
+        active: 0.000_099_018_631_217_717_84,
+        live: 0.999_900_981_368_782_2
+      },
+      stake: {
+        active: 1_000_000n,
+        live: 10_098_109_508n
+      }
+    });
+  });
   describe('mapAndCacheStakePools', () => {
     const poolOwners = [mapAddressOwner(addressOwnerModel)];
     const poolDatas = [mapPoolData(poolDataModel)];
@@ -205,8 +232,14 @@ describe('mappers', () => {
     const poolRelays = [mapRelay(poolRelayByAddress)];
     const poolRetirements = [mapPoolRetirement(poolRetirementModel)];
     const poolRewards = [mapEpochReward(epochRewardModel, hash_id)];
-    const poolMetrics = [mapPoolMetrics(poolMetricsModel)];
+    const partialMetrics = [mapPoolMetrics(poolMetricsModel)];
     const poolAPYs = [mapPoolAPY(poolAPYModel)];
+    const poolMetrics = calcNodeMetricsValues(
+      poolDatas[0].id,
+      partialMetrics[0].metrics,
+      nodeMetricsDependencies,
+      poolAPYs[0].apy
+    );
     const stakePool = {
       cost: poolDatas[0].cost,
       epochRewards: poolRewards.map((r) => r.epochReward),
@@ -215,7 +248,7 @@ describe('mappers', () => {
       margin: { denominator: 10_000, numerator: 1 },
       metadata: poolDatas[0].metadata,
       metadataJson: poolDatas[0].metadataJson,
-      metrics: { ...poolMetrics[0].metrics, apy: poolAPYs[0].apy },
+      metrics: poolMetrics,
       owners: poolOwners.map((o) => o.address),
       pledge: poolDatas[0].pledge,
       relays: poolRelays.map((r) => r.relay),
@@ -233,10 +266,11 @@ describe('mappers', () => {
     it('toStakePoolResults with retiring status', () => {
       expect(
         toStakePoolResults([poolDataModel.hash_id], fromCache, {
-          lastEpoch: poolRetirementModel.retiring_epoch - 1,
+          lastEpochNo: poolRetirementModel.retiring_epoch - 1,
+          nodeMetricsDependencies,
           poolAPYs,
           poolDatas,
-          poolMetrics,
+          poolMetrics: partialMetrics,
           poolOwners,
           poolRegistrations,
           poolRelays,
@@ -255,10 +289,11 @@ describe('mappers', () => {
 
       expect(
         toStakePoolResults([poolDataModel.hash_id], fromCache, {
-          lastEpoch: poolRetirementModel.retiring_epoch + 1,
+          lastEpochNo: poolRetirementModel.retiring_epoch + 1,
+          nodeMetricsDependencies,
           poolAPYs,
           poolDatas,
-          poolMetrics,
+          poolMetrics: partialMetrics,
           poolOwners,
           poolRegistrations,
           poolRelays,
@@ -289,10 +324,11 @@ describe('mappers', () => {
 
       expect(
         toStakePoolResults([poolDataModel.hash_id], fromCache, {
-          lastEpoch: poolRegistrationModel.active_epoch_no - 1,
+          lastEpochNo: poolRegistrationModel.active_epoch_no - 1,
+          nodeMetricsDependencies,
           poolAPYs,
           poolDatas,
-          poolMetrics,
+          poolMetrics: partialMetrics,
           poolOwners,
           poolRegistrations,
           poolRelays,
@@ -323,10 +359,11 @@ describe('mappers', () => {
 
       expect(
         toStakePoolResults([poolDataModel.hash_id], fromCache, {
-          lastEpoch: poolRegistrationModel.active_epoch_no,
+          lastEpochNo: poolRegistrationModel.active_epoch_no,
+          nodeMetricsDependencies,
           poolAPYs,
           poolDatas,
-          poolMetrics,
+          poolMetrics: partialMetrics,
           poolOwners,
           poolRegistrations,
           poolRelays,
@@ -349,10 +386,11 @@ describe('mappers', () => {
           [poolDataModel.hash_id],
           { [poolDataModel.hash_id]: stakePool },
           {
-            lastEpoch: poolRetirementModel.retiring_epoch - 1,
+            lastEpochNo: poolRetirementModel.retiring_epoch - 1,
+            nodeMetricsDependencies,
             poolAPYs,
             poolDatas,
-            poolMetrics,
+            poolMetrics: partialMetrics,
             poolOwners,
             poolRegistrations,
             poolRelays,

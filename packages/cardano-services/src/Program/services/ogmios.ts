@@ -4,11 +4,11 @@
 import { CommonOptionDescriptions, CommonProgramOptions } from '../../ProgramsCommon';
 import { DnsResolver } from '../utils';
 import { Logger } from 'ts-log';
-import { MissingProgramOption } from '../errors';
+import { MissingCardanoNodeOption } from '../errors';
 import { OgmiosCardanoNode, ogmiosTxSubmitProvider, urlToConnectionConfig } from '@cardano-sdk/ogmios';
-import { ServiceNames } from '../ServiceNames';
 import { TxSubmitProvider } from '@cardano-sdk/core';
 import { isConnectionError } from '@cardano-sdk/util';
+import memoize from 'lodash/memoize';
 
 const isCardanoNodeOperation = (prop: string | symbol): prop is 'eraSummaries' | 'systemStart' | 'stakeDistribution' =>
   ['eraSummaries', 'systemStart', 'stakeDistribution'].includes(prop as string);
@@ -82,7 +82,7 @@ export const getOgmiosTxSubmitProvider = async (
   if (options?.ogmiosSrvServiceName)
     return ogmiosTxSubmitProviderWithDiscovery(dnsResolver, logger, options.ogmiosSrvServiceName);
   if (options?.ogmiosUrl) return ogmiosTxSubmitProvider(urlToConnectionConfig(options?.ogmiosUrl), logger);
-  throw new MissingProgramOption(ServiceNames.TxSubmit, [
+  throw new MissingCardanoNodeOption([
     CommonOptionDescriptions.OgmiosUrl,
     CommonOptionDescriptions.OgmiosSrvServiceName
   ]);
@@ -140,16 +140,14 @@ export const ogmiosCardanoNodeWithDiscovery = async (
   });
 };
 
-export const getOgmiosCardanoNode = async (
-  dnsResolver: DnsResolver,
-  logger: Logger,
-  options?: CommonProgramOptions
-): Promise<OgmiosCardanoNode> => {
-  if (options?.ogmiosSrvServiceName)
-    return ogmiosCardanoNodeWithDiscovery(dnsResolver, logger, options.ogmiosSrvServiceName);
-  if (options?.ogmiosUrl) return new OgmiosCardanoNode(urlToConnectionConfig(options.ogmiosUrl), logger);
-  throw new MissingProgramOption(ServiceNames.TxSubmit, [
-    CommonOptionDescriptions.OgmiosUrl,
-    CommonOptionDescriptions.OgmiosSrvServiceName
-  ]);
-};
+export const getOgmiosCardanoNode = memoize(
+  async (dnsResolver: DnsResolver, logger: Logger, options?: CommonProgramOptions): Promise<OgmiosCardanoNode> => {
+    if (options?.ogmiosSrvServiceName)
+      return ogmiosCardanoNodeWithDiscovery(dnsResolver, logger, options.ogmiosSrvServiceName);
+    if (options?.ogmiosUrl) return new OgmiosCardanoNode(urlToConnectionConfig(options.ogmiosUrl), logger);
+    throw new MissingCardanoNodeOption([
+      CommonOptionDescriptions.OgmiosUrl,
+      CommonOptionDescriptions.OgmiosSrvServiceName
+    ]);
+  }
+);

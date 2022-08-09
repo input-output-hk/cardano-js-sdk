@@ -1,5 +1,7 @@
-import { Cardano, StakePoolStats } from '@cardano-sdk/core';
+import { Cardano, StakeDistribution, StakePoolStats } from '@cardano-sdk/core';
 import {
+  Epoch,
+  EpochModel,
   EpochReward,
   EpochRewardModel,
   HashIdStakePoolMap,
@@ -23,10 +25,10 @@ import {
   StakePoolResults,
   StakePoolStatsModel
 } from './types';
+import { bufferToHexString } from '../../util';
+import { divideBigIntToFloat } from './util';
 import { isNotNil } from '@cardano-sdk/util';
 import Fraction from 'fraction.js';
-
-const toHexString = (bytes: Buffer) => bytes.toString('hex');
 
 const getPoolStatus = (
   lastPoolRegistration: PoolRegistration,
@@ -41,6 +43,12 @@ const getPoolStatus = (
   return Cardano.StakePoolStatus.Retired;
 };
 
+interface NodeMetricsDependencies {
+  stakeDistribution: StakeDistribution;
+  totalAdaAmount: Cardano.Lovelace;
+  poolOptimalCount?: number;
+}
+
 interface ToCoreStakePoolInput {
   poolOwners: PoolOwner[];
   poolDatas: PoolData[];
@@ -48,11 +56,43 @@ interface ToCoreStakePoolInput {
   poolRelays: PoolRelay[];
   poolRetirements: PoolRetirement[];
   poolRewards: EpochReward[];
-  lastEpoch: number;
+  lastEpochNo: Cardano.EpochNo;
   poolMetrics: PoolMetrics[];
   totalCount: number;
   poolAPYs: PoolAPY[];
+  nodeMetricsDependencies: NodeMetricsDependencies;
 }
+
+/**
+ * Calculates metrics that depends on Node's retrieved data.
+ * Since some metrics are obtained from the Node they have to be calculated outside db queries
+ */
+export const calcNodeMetricsValues = (
+  poolId: Cardano.PoolId,
+  metrics: PoolMetrics['metrics'],
+  { totalAdaAmount, stakeDistribution, poolOptimalCount = 0 }: NodeMetricsDependencies,
+  apy: number
+): Cardano.StakePoolMetrics => {
+  const { activeStake, ...rest } = metrics;
+  const stakePoolMetrics = { ...rest, apy } as unknown as Cardano.StakePoolMetrics;
+  const poolStake = stakeDistribution.get(poolId)?.stake;
+  const liveStake = poolStake ? poolStake.pool : 0n;
+  const totalStake = liveStake + activeStake;
+  const isZeroStake = totalStake === 0n;
+  const activePercentage = !isZeroStake ? Number(divideBigIntToFloat(activeStake, totalStake)) : 0;
+  const size: Cardano.StakePoolMetricsSize = {
+    active: activePercentage,
+    live: !isZeroStake ? 1 - activePercentage : 0
+  };
+  const stake: Cardano.StakePoolMetricsStake = {
+    active: activeStake,
+    live: liveStake
+  };
+  stakePoolMetrics.size = size;
+  stakePoolMetrics.stake = stake;
+  stakePoolMetrics.saturation = Number(divideBigIntToFloat(totalStake * BigInt(poolOptimalCount), totalAdaAmount));
+  return stakePoolMetrics;
+};
 
 export const toStakePoolResults = (
   poolHashIds: number[],
@@ -64,10 +104,11 @@ export const toStakePoolResults = (
     poolRelays,
     poolRetirements,
     poolRewards,
-    lastEpoch,
+    lastEpochNo,
     poolMetrics,
     totalCount,
-    poolAPYs
+    poolAPYs,
+    nodeMetricsDependencies
   }: ToCoreStakePoolInput
 ): StakePoolResults => {
   const poolsToCache: PoolsToCache = {};
@@ -89,20 +130,23 @@ export const toStakePoolResults = (
           const apy = poolAPYs.find((pool) => pool.hashId === hashId)?.apy;
           const registrations = poolRegistrations.filter((r) => r.hashId === poolData.hashId);
           const retirements = poolRetirements.filter((r) => r.hashId === poolData.hashId);
-          const metrics = poolMetrics.find((metric) => metric.hashId === poolData.hashId)?.metrics;
-
+          const partialMetrics = poolMetrics.find((metric) => metric.hashId === poolData.hashId)?.metrics;
+          let metrics: Cardano.StakePoolMetrics | undefined;
+          if (partialMetrics) {
+            metrics = calcNodeMetricsValues(poolData.id, partialMetrics, nodeMetricsDependencies, apy!);
+          }
           const coreStakePool: Cardano.StakePool = {
             cost: poolData.cost,
             epochRewards,
             hexId: poolData.hexId,
             id: poolData.id,
             margin: poolData.margin,
-            metrics: metrics ? { ...metrics, apy } : ({} as Cardano.StakePoolMetrics),
+            metrics: metrics ? metrics : ({} as Cardano.StakePoolMetrics),
             owners: poolOwners.filter((o) => o.hashId === poolData.hashId).map((o) => o.address),
             pledge: poolData.pledge,
             relays: poolRelays.filter((r) => r.updateId === poolData.updateId).map((r) => r.relay),
             rewardAccount: poolData.rewardAccount,
-            status: getPoolStatus(registrations[0], lastEpoch, retirements[0]),
+            status: getPoolStatus(registrations[0], lastEpochNo, retirements[0]),
             transactions: {
               registration: registrations.map((r) => r.transactionId),
               retirement: retirements.map((r) => r.transactionId)
@@ -135,12 +179,12 @@ const isOfflineMetadata = (_object: any): _object is Cardano.StakePoolMetadataFi
   Object.keys(_object).every((k) => metadataKeys.has(k) && typeof _object[k] === 'string');
 
 export const mapPoolData = (poolDataModel: PoolDataModel): PoolData => {
-  const vrfAsHexString = toHexString(poolDataModel.vrf_key_hash);
+  const vrfAsHexString = bufferToHexString(poolDataModel.vrf_key_hash);
   const { n: numerator, d: denominator } = new Fraction(poolDataModel.margin);
   const toReturn: PoolData = {
     cost: BigInt(poolDataModel.fixed_cost),
     hashId: poolDataModel.hash_id,
-    hexId: Cardano.PoolIdHex(toHexString(poolDataModel.pool_hash)),
+    hexId: Cardano.PoolIdHex(bufferToHexString(poolDataModel.pool_hash)),
     id: Cardano.PoolId(poolDataModel.pool_id),
     margin: { denominator, numerator },
     pledge: BigInt(poolDataModel.pledge),
@@ -150,7 +194,7 @@ export const mapPoolData = (poolDataModel: PoolDataModel): PoolData => {
   };
   if (poolDataModel.metadata_hash) {
     toReturn.metadataJson = {
-      hash: Cardano.util.Hash32ByteBase16(toHexString(poolDataModel.metadata_hash)),
+      hash: Cardano.util.Hash32ByteBase16(bufferToHexString(poolDataModel.metadata_hash)),
       url: poolDataModel.metadata_url
     };
   }
@@ -181,6 +225,11 @@ export const mapRelay = (relayModel: RelayModel): PoolRelay => {
   return { hashId: relayModel.hash_id, relay, updateId: relayModel.update_id };
 };
 
+export const mapEpoch = ({ no, pool_optimal_count }: EpochModel): Epoch => ({
+  no,
+  poolOptimalCount: pool_optimal_count
+});
+
 export const mapEpochReward = (epochRewardModel: EpochRewardModel, hashId: number): EpochReward => ({
   epochReward: {
     activeStake: BigInt(epochRewardModel.active_stake),
@@ -201,30 +250,23 @@ export const mapAddressOwner = (ownerAddressModel: OwnerAddressModel): PoolOwner
 export const mapPoolRegistration = (poolRegistrationModel: PoolRegistrationModel): PoolRegistration => ({
   activeEpochNo: poolRegistrationModel.active_epoch_no,
   hashId: poolRegistrationModel.hash_id,
-  transactionId: Cardano.TransactionId(toHexString(poolRegistrationModel.tx_hash))
+  transactionId: Cardano.TransactionId(bufferToHexString(poolRegistrationModel.tx_hash))
 });
 
 export const mapPoolRetirement = (poolRetirementModel: PoolRetirementModel): PoolRetirement => ({
   hashId: poolRetirementModel.hash_id,
   retiringEpoch: poolRetirementModel.retiring_epoch,
-  transactionId: Cardano.TransactionId(toHexString(poolRetirementModel.tx_hash))
+  transactionId: Cardano.TransactionId(bufferToHexString(poolRetirementModel.tx_hash))
 });
 
 export const mapPoolMetrics = (poolMetricsModel: PoolMetricsModel): PoolMetrics => ({
   hashId: poolMetricsModel.pool_hash_id,
   metrics: {
+    activeStake: BigInt(poolMetricsModel.active_stake),
     blocksCreated: poolMetricsModel.blocks_created,
     delegators: poolMetricsModel.delegators,
     livePledge: BigInt(poolMetricsModel.live_pledge),
-    saturation: poolMetricsModel.saturation,
-    size: {
-      active: poolMetricsModel.active_stake_percentage,
-      live: poolMetricsModel.live_stake_percentage
-    },
-    stake: {
-      active: BigInt(poolMetricsModel.active_stake),
-      live: BigInt(poolMetricsModel.live_stake)
-    }
+    saturation: poolMetricsModel.saturation
   }
 });
 

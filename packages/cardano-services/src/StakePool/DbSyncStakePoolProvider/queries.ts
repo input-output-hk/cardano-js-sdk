@@ -11,6 +11,16 @@ export const findLastEpoch = `
  LIMIT 1
 `;
 
+export const findLastEpochWithData = ` 
+SELECT 
+  epoch."no",
+  ep.optimal_pool_count
+FROM epoch 
+LEFT JOIN epoch_param ep ON 
+  ep.epoch_no = epoch."no"
+ORDER BY no DESC 
+LIMIT 1`;
+
 export const findTotalAda = `
 SELECT COALESCE(SUM(value)) AS total_ada
 FROM tx_out AS tx_outer WHERE
@@ -221,12 +231,6 @@ SELECT
     ELSE
     (COALESCE(a_stake.active_stake,0)/(COALESCE(a_stake.active_stake,0)+COALESCE(l_stake.live_stake,0))) 
   END AS active_stake_percentage,
-  CASE
-  WHEN (COALESCE(a_stake.active_stake,0)+COALESCE(l_stake.live_stake,0))::numeric = 0::numeric
-  THEN 0::numeric
-  ELSE
-  (COALESCE(l_stake.live_stake,0)/(COALESCE(a_stake.active_stake,0)+COALESCE(l_stake.live_stake,0))) 
-  END AS live_stake_percentage,
   ph.id AS pool_hash_id 
 FROM pool_hash ph
 LEFT JOIN blocks_created bc on 
@@ -855,6 +859,7 @@ const Queries = {
   POOLS_WITH_PLEDGE_MET,
   STATUS_QUERY,
   findLastEpoch,
+  findLastEpochWithData,
   findPoolAPY,
   findPoolEpochRewards,
   findPoolStats,

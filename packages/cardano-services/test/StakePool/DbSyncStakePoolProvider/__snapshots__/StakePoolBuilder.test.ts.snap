@@ -1316,32 +1316,18 @@ Array [
 exports[`StakePoolBuilder queryPoolMetrics pagination with limit 1`] = `
 Array [
   Object {
+    "activeStake": 0n,
     "blocksCreated": "0",
     "delegators": "1",
     "livePledge": 999999828559n,
     "saturation": "0.01189867476975633141",
-    "size": Object {
-      "active": "0.0000000000000000000000000000",
-      "live": "1.00000000000000000000",
-    },
-    "stake": Object {
-      "active": 0n,
-      "live": 999999828559n,
-    },
   },
   Object {
+    "activeStake": 2986376991n,
     "blocksCreated": "0",
     "delegators": "1",
     "livePledge": 495463149n,
     "saturation": "0.000041429290528821850262",
-    "size": Object {
-      "active": "0.85770077629124006825",
-      "live": "0.14229922370875993175",
-    },
-    "stake": Object {
-      "active": 2986376991n,
-      "live": 495463149n,
-    },
   },
 ]
 `;
@@ -1349,32 +1335,18 @@ Array [
 exports[`StakePoolBuilder queryPoolMetrics pagination with startAt 1`] = `
 Array [
   Object {
+    "activeStake": 2986376991n,
     "blocksCreated": "0",
     "delegators": "1",
     "livePledge": 495463149n,
     "saturation": "0.000041429290528821850262",
-    "size": Object {
-      "active": "0.85770077629124006825",
-      "live": "0.14229922370875993175",
-    },
-    "stake": Object {
-      "active": 2986376991n,
-      "live": 495463149n,
-    },
   },
   Object {
+    "activeStake": 1614945000n,
     "blocksCreated": "0",
     "delegators": "0",
     "livePledge": 497325000n,
     "saturation": "0.000019215708620404440214",
-    "size": Object {
-      "active": "1.00000000000000000000",
-      "live": "0.0000000000000000000000000000",
-    },
-    "stake": Object {
-      "active": 1614945000n,
-      "live": 0n,
-    },
   },
 ]
 `;
@@ -1382,46 +1354,25 @@ Array [
 exports[`StakePoolBuilder queryPoolMetrics sort by default sort 1`] = `
 Array [
   Object {
+    "activeStake": 0n,
     "blocksCreated": "0",
     "delegators": "1",
     "livePledge": 999999828559n,
     "saturation": "0.01189867476975633141",
-    "size": Object {
-      "active": "0.0000000000000000000000000000",
-      "live": "1.00000000000000000000",
-    },
-    "stake": Object {
-      "active": 0n,
-      "live": 999999828559n,
-    },
   },
   Object {
+    "activeStake": 2986376991n,
     "blocksCreated": "0",
     "delegators": "1",
     "livePledge": 495463149n,
     "saturation": "0.000041429290528821850262",
-    "size": Object {
-      "active": "0.85770077629124006825",
-      "live": "0.14229922370875993175",
-    },
-    "stake": Object {
-      "active": 2986376991n,
-      "live": 495463149n,
-    },
   },
   Object {
+    "activeStake": 1614945000n,
     "blocksCreated": "0",
     "delegators": "0",
     "livePledge": 497325000n,
     "saturation": "0.000019215708620404440214",
-    "size": Object {
-      "active": "1.00000000000000000000",
-      "live": "0.0000000000000000000000000000",
-    },
-    "stake": Object {
-      "active": 1614945000n,
-      "live": 0n,
-    },
   },
 ]
 `;
@@ -1429,46 +1380,25 @@ Array [
 exports[`StakePoolBuilder queryPoolMetrics sort by saturation 1`] = `
 Array [
   Object {
+    "activeStake": 1614945000n,
     "blocksCreated": "0",
     "delegators": "0",
     "livePledge": 497325000n,
     "saturation": "0.000019215708620404440214",
-    "size": Object {
-      "active": "1.00000000000000000000",
-      "live": "0.0000000000000000000000000000",
-    },
-    "stake": Object {
-      "active": 1614945000n,
-      "live": 0n,
-    },
   },
   Object {
+    "activeStake": 2986376991n,
     "blocksCreated": "0",
     "delegators": "1",
     "livePledge": 495463149n,
     "saturation": "0.000041429290528821850262",
-    "size": Object {
-      "active": "0.85770077629124006825",
-      "live": "0.14229922370875993175",
-    },
-    "stake": Object {
-      "active": 2986376991n,
-      "live": 495463149n,
-    },
   },
   Object {
+    "activeStake": 0n,
     "blocksCreated": "0",
     "delegators": "1",
     "livePledge": 999999828559n,
     "saturation": "0.01189867476975633141",
-    "size": Object {
-      "active": "0.0000000000000000000000000000",
-      "live": "1.00000000000000000000",
-    },
-    "stake": Object {
-      "active": 0n,
-      "live": 999999828559n,
-    },
   },
 ]
 `;
