@@ -1,25 +1,7 @@
 import { CardanoNetworkMagic, Epoch, Slot } from '../Cardano';
 import { CustomError } from 'ts-custom-error';
+import { EraSummary } from '../CardanoNode';
 import orderBy from 'lodash/orderBy';
-
-export interface TimeSettings {
-  /**
-   * 1st slot date (of the epoch when these settings take effect)
-   */
-  fromSlotDate: Date;
-  /**
-   * 1st slot number (of the epoch when these settings take effect)
-   */
-  fromSlotNo: number;
-  /**
-   * Slot length in milliseconds
-   */
-  slotLength: number;
-  /**
-   * Epoch length in slots
-   */
-  epochLength: number;
-}
 
 export interface SlotDate {
   slot: Slot;
@@ -32,60 +14,66 @@ export interface EpochInfo {
   lastSlot: SlotDate;
 }
 
-export class TimeSettingsError extends CustomError {}
+export class EraSummaryError extends CustomError {}
 
 /**
  * Were valid at 2022-05-28
  */
-export const mainnetTimeSettings: TimeSettings[] = [
-  { epochLength: 21_600, fromSlotDate: new Date(1_506_192_291_000), fromSlotNo: 0, slotLength: 20_000 },
-  { epochLength: 432_000, fromSlotDate: new Date(1_596_059_091_000), fromSlotNo: 4_492_800, slotLength: 1000 }
+export const mainnetEraSummaries: EraSummary[] = [
+  { parameters: { epochLength: 21_600, slotLength: 20_000 }, start: { slot: 0, time: new Date(1_506_192_291_000) } },
+  {
+    parameters: { epochLength: 432_000, slotLength: 1000 },
+    start: { slot: 4_492_800, time: new Date(1_596_059_091_000) }
+  }
 ];
 
-export const testnetTimeSettings: TimeSettings[] = [
-  { epochLength: 21_600, fromSlotDate: new Date(1_563_999_616_000), fromSlotNo: 0, slotLength: 20_000 },
-  { epochLength: 432_000, fromSlotDate: new Date(1_595_964_016_000), fromSlotNo: 1_598_400, slotLength: 1000 }
+export const testnetEraSummaries: EraSummary[] = [
+  { parameters: { epochLength: 21_600, slotLength: 20_000 }, start: { slot: 0, time: new Date(1_563_999_616_000) } },
+  {
+    parameters: { epochLength: 432_000, slotLength: 1000 },
+    start: { slot: 1_598_400, time: new Date(1_595_964_016_000) }
+  }
 ];
 
-export type TimeSettingsMap = { [key in CardanoNetworkMagic]: TimeSettings[] };
+export type EraSummariesMap = { [key in CardanoNetworkMagic]: EraSummary[] };
 
-export const timeSettingsConfig: TimeSettingsMap = {
-  [CardanoNetworkMagic.Mainnet]: mainnetTimeSettings,
-  [CardanoNetworkMagic.Testnet]: testnetTimeSettings
+export const eraSummariesConfig: EraSummariesMap = {
+  [CardanoNetworkMagic.Mainnet]: mainnetEraSummaries,
+  [CardanoNetworkMagic.Testnet]: testnetEraSummaries
 };
 
-const createSlotEpochCalcImpl = (timeSettings: TimeSettings[]) => {
-  const timeSettingsAsc = orderBy(timeSettings, ({ fromSlotNo }) => fromSlotNo);
-
+const createSlotEpochCalcImpl = (eraSummaries: EraSummary[]) => {
+  const eraSummariesAsc = orderBy(eraSummaries, ({ start }) => start.slot);
   return (slotNo: Slot) => {
-    const relevantTimeSettingsAsc = orderBy(
-      timeSettingsAsc.filter(({ fromSlotNo }) => fromSlotNo <= slotNo),
-      ({ fromSlotNo }) => fromSlotNo
+    const relevantEraSummariesAsc = orderBy(
+      eraSummariesAsc.filter(({ start }) => start.slot <= slotNo),
+      ({ start }) => start.slot
     );
-    if (relevantTimeSettingsAsc.length === 0) {
-      throw new TimeSettingsError(`No TimeSettings for slot ${slotNo} found`);
+    if (relevantEraSummariesAsc.length === 0) {
+      throw new EraSummaryError(`No EraSummary for slot ${slotNo} found`);
     }
     let epochNo = 0;
-    let currentTimeSettings: TimeSettings;
-    for (let i = 0; i < relevantTimeSettingsAsc.length; i++) {
-      currentTimeSettings = relevantTimeSettingsAsc[i];
-      const nextTimeSettings: TimeSettings | undefined = relevantTimeSettingsAsc[i + 1];
+    let currentEraSummary: EraSummary;
+    for (let i = 0; i < relevantEraSummariesAsc.length; i++) {
+      currentEraSummary = relevantEraSummariesAsc[i];
+      const nextEraSummary: EraSummary | undefined = relevantEraSummariesAsc[i + 1];
       epochNo += Math.floor(
-        ((nextTimeSettings?.fromSlotNo || slotNo) - currentTimeSettings.fromSlotNo) / currentTimeSettings.epochLength
+        ((nextEraSummary?.start.slot || slotNo) - currentEraSummary.start.slot) /
+          currentEraSummary.parameters.epochLength
       );
     }
-    return { epochNo, epochTimeSettings: currentTimeSettings! };
+    return { epochEraSummary: currentEraSummary!, epochNo };
   };
 };
 
 /**
  * @returns {SlotEpochCalc} function that computes epoch # given a slot #
  */
-export const createSlotEpochCalc = (timeSettings: TimeSettings[]) => {
-  const calc = createSlotEpochCalcImpl(timeSettings);
+export const createSlotEpochCalc = (eraSummaries: EraSummary[]) => {
+  const calc = createSlotEpochCalcImpl(eraSummaries);
 
   /**
-   * @throws TimeSettingsError
+   * @throws EraSummaryError
    * @returns {Epoch} epoch of the slot
    */
   return (slotNo: Slot): Epoch => calc(slotNo).epochNo;
@@ -94,21 +82,21 @@ export const createSlotEpochCalc = (timeSettings: TimeSettings[]) => {
 /**
  * @returns {SlotTimeCalc} function that computes date/time of a given slot #
  */
-export const createSlotTimeCalc = (timeSettings: TimeSettings[]) => {
-  const timeSettingsDesc = orderBy(timeSettings, ({ fromSlotNo }) => fromSlotNo, 'desc');
+export const createSlotTimeCalc = (eraSummaries: EraSummary[]) => {
+  const eraSummariesDesc = orderBy(eraSummaries, ({ start }) => start.slot, 'desc');
 
   /**
-   * @throws TimeSettingsError
+   * @throws EraSummaryError
    * @returns {Date} date of the slot
    */
   return (slotNo: Slot): Date => {
-    const activeTimeSettings = timeSettingsDesc.find(({ fromSlotNo }) => fromSlotNo <= slotNo);
-    if (!activeTimeSettings) {
-      throw new TimeSettingsError(`No TimeSettings for slot ${slotNo} found`);
+    const activeEraSummary = eraSummariesDesc.find(({ start }) => start.slot <= slotNo);
+    if (!activeEraSummary) {
+      throw new EraSummaryError(`No EraSummary for slot ${slotNo} found`);
     }
     return new Date(
-      activeTimeSettings.fromSlotDate.getTime() +
-        (slotNo - activeTimeSettings.fromSlotNo) * activeTimeSettings.slotLength
+      activeEraSummary.start.time.getTime() +
+        (slotNo - activeEraSummary.start.slot) * activeEraSummary.parameters.slotLength
     );
   };
 };
@@ -116,19 +104,20 @@ export const createSlotTimeCalc = (timeSettings: TimeSettings[]) => {
 /**
  * @returns {SlotEpochInfoCalc} function that computes epoch of the slot and it's first/last slots
  */
-export const createSlotEpochInfoCalc = (timeSettings: TimeSettings[]) => {
-  const slotTimeCalc = createSlotTimeCalc(timeSettings);
-  const epochCalc = createSlotEpochCalcImpl(timeSettings);
+export const createSlotEpochInfoCalc = (eraSummaries: EraSummary[]) => {
+  const slotTimeCalc = createSlotTimeCalc(eraSummaries);
+  const epochCalc = createSlotEpochCalcImpl(eraSummaries);
   /**
-   * @throws TimeSettingsError
+   * @throws EraSummaryError
    * @returns {EpochInfo} epoch of the slot and it's first/last slots
    */
   return (slot: Slot): EpochInfo => {
-    const { epochNo, epochTimeSettings } = epochCalc(slot);
+    const { epochNo, epochEraSummary } = epochCalc(slot);
     const firstSlot =
-      epochTimeSettings.fromSlotNo +
-      Math.floor((slot - epochTimeSettings.fromSlotNo) / epochTimeSettings.epochLength) * epochTimeSettings.epochLength;
-    const lastSlot = firstSlot + epochTimeSettings.epochLength - 1;
+      epochEraSummary.start.slot +
+      Math.floor((slot - epochEraSummary.start.slot) / epochEraSummary.parameters.epochLength) *
+        epochEraSummary.parameters.epochLength;
+    const lastSlot = firstSlot + epochEraSummary.parameters.epochLength - 1;
     return {
       epochNo,
       firstSlot: {
@@ -144,19 +133,19 @@ export const createSlotEpochInfoCalc = (timeSettings: TimeSettings[]) => {
 };
 
 /**
- * @throws TimeSettingsError
+ * @throws EraSummaryError
  * @returns {Date} date of the slot
  */
 export type SlotTimeCalc = ReturnType<typeof createSlotTimeCalc>;
 
 /**
- * @throws TimeSettingsError
+ * @throws EraSummaryError
  * @returns {Epoch} epoch of the slot
  */
 export type SlotEpochCalc = ReturnType<typeof createSlotEpochCalc>;
 
 /**
- * @throws TimeSettingsError
+ * @throws EraSummaryError
  * @returns {EpochInfo} epoch of the slot and it's first/last slots
  */
 export type SlotEpochInfoCalc = ReturnType<typeof createSlotEpochInfoCalc>;

@@ -6,12 +6,12 @@ import { NetworkInfoProvider } from '@cardano-sdk/core';
  */
 const paths: HttpProviderConfigPaths<NetworkInfoProvider> = {
   currentWalletProtocolParameters: '/current-wallet-protocol-parameters',
+  eraSummaries: '/era-summaries',
   genesisParameters: '/genesis-parameters',
   healthCheck: '/health',
   ledgerTip: '/ledger-tip',
   lovelaceSupply: '/lovelace-supply',
-  stake: '/stake',
-  timeSettings: '/time-settings'
+  stake: '/stake'
 };
 
 /**

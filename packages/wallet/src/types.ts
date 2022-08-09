@@ -2,9 +2,9 @@ import {
   Asset,
   Cardano,
   EpochInfo,
+  EraSummary,
   NetworkInfoProvider,
-  ProtocolParametersRequiredByWallet,
-  TimeSettings
+  ProtocolParametersRequiredByWallet
 } from '@cardano-sdk/core';
 import { BalanceTracker, DelegationTracker, TransactionalObservables, TransactionsTracker } from './services';
 import { Cip30DataSignature } from '@cardano-sdk/cip30';
@@ -80,7 +80,7 @@ export interface ObservableWallet {
   readonly transactions: TransactionsTracker;
   readonly tip$: Observable<Cardano.Tip>;
   readonly genesisParameters$: Observable<Cardano.CompactGenesis>;
-  readonly timeSettings$: Observable<TimeSettings[]>;
+  readonly eraSummaries$: Observable<EraSummary[]>;
   readonly currentEpoch$: Observable<EpochInfo>;
   readonly protocolParameters$: Observable<ProtocolParametersRequiredByWallet>;
   readonly addresses$: Observable<GroupedAddress[]>;
@@ -106,5 +106,5 @@ export interface ObservableWallet {
 
 export type WalletNetworkInfoProvider = Pick<
   NetworkInfoProvider,
-  'currentWalletProtocolParameters' | 'ledgerTip' | 'genesisParameters' | 'timeSettings'
+  'currentWalletProtocolParameters' | 'ledgerTip' | 'genesisParameters' | 'eraSummaries'
 >;

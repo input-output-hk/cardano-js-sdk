@@ -43,10 +43,10 @@ describe('TrackedNetworkInfoProvider', () => {
       };
 
     test(
-      'timeSettings',
+      'eraSummaries',
       testFunctionStats(
-        (provider) => provider.timeSettings(),
-        (stats) => stats.timeSettings$
+        (provider) => provider.eraSummaries(),
+        (stats) => stats.eraSummaries$
       )
     );
 

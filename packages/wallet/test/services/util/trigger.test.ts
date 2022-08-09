@@ -1,6 +1,7 @@
-import { Cardano, TimeSettings, testnetTimeSettings } from '@cardano-sdk/core';
+import { Cardano, EraSummary, testnetEraSummaries } from '@cardano-sdk/core';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
-import { distinctBlock, distinctTimeSettings } from '../../../src/services/util';
+import { distinctBlock, distinctEraSummaries } from '../../../src/services/util';
+import merge from 'lodash/merge';
 
 describe('trigger', () => {
   it('distinctBlock subscribes to tip$ on each subscription and emits when tip$ has new blockNo', () => {
@@ -22,22 +23,25 @@ describe('trigger', () => {
     });
   });
 
-  it('distinctTimeSettings emits when timeSettings changes', () => {
+  it('distinctEraSummaries emits when eraSummaries changes', () => {
     createTestScheduler().run(({ cold, expectObservable }) => {
-      const timeSettings1 = testnetTimeSettings;
-      const latestTimeSettings = timeSettings1[timeSettings1.length - 1];
-      const timeSettings2 = [
-        ...testnetTimeSettings,
-        { ...latestTimeSettings, fromSlotNo: latestTimeSettings.fromSlotNo + 10_000 }
+      const eraSummaries1 = testnetEraSummaries;
+      const latestEraSummary = eraSummaries1[eraSummaries1.length - 1];
+      const eraSummaries2 = [
+        ...testnetEraSummaries,
+        merge({}, latestEraSummary, {
+          parameters: { epochLength: 1, slotLength: 1 },
+          start: { slot: latestEraSummary.start.slot + 10_000 }
+        })
       ];
-      const timeSettings$ = cold('-a--b-c', {
-        a: timeSettings1 as TimeSettings[],
-        b: [...timeSettings1] as TimeSettings[],
-        c: timeSettings2 as TimeSettings[]
+      const eraSummaries$ = cold('-a--b-c', {
+        a: eraSummaries1 as EraSummary[],
+        b: [...eraSummaries1] as EraSummary[],
+        c: eraSummaries2 as EraSummary[]
       });
-      expectObservable(distinctTimeSettings(timeSettings$)).toBe('-a----b', {
-        a: timeSettings1,
-        b: timeSettings2
+      expectObservable(distinctEraSummaries(eraSummaries$)).toBe('-a----b', {
+        a: eraSummaries1,
+        b: eraSummaries2
       });
     });
   });

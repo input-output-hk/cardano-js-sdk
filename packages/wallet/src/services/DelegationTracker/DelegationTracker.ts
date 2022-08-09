@@ -1,4 +1,4 @@
-import { Cardano, ChainHistoryProvider, SlotEpochCalc, TimeSettings, createSlotEpochCalc } from '@cardano-sdk/core';
+import { Cardano, ChainHistoryProvider, EraSummary, SlotEpochCalc, createSlotEpochCalc } from '@cardano-sdk/core';
 import { DelegationTracker, TransactionsTracker } from '../types';
 import { Observable, combineLatest, map } from 'rxjs';
 import {
@@ -32,7 +32,7 @@ export interface DelegationTrackerProps {
   rewardsTracker: TrackedRewardsProvider;
   rewardAccountAddresses$: Observable<Cardano.RewardAccount[]>;
   stakePoolProvider: TrackedStakePoolProvider;
-  timeSettings$: Observable<TimeSettings[]>;
+  eraSummaries$: Observable<EraSummary[]>;
   epoch$: Observable<Cardano.Epoch>;
   transactionsTracker: TransactionsTracker;
   retryBackoffConfig: RetryBackoffConfig;
@@ -66,7 +66,7 @@ export const createDelegationTracker = ({
   rewardsTracker,
   retryBackoffConfig,
   transactionsTracker,
-  timeSettings$,
+  eraSummaries$,
   stakePoolProvider,
   stores,
   internals: {
@@ -78,7 +78,7 @@ export const createDelegationTracker = ({
       rewardsTracker,
       retryBackoffConfig
     ),
-    slotEpochCalc$ = timeSettings$.pipe(map((timeSettings) => createSlotEpochCalc(timeSettings)))
+    slotEpochCalc$ = eraSummaries$.pipe(map((eraSummaries) => createSlotEpochCalc(eraSummaries)))
   } = {}
 }: DelegationTrackerProps): DelegationTracker & Shutdown => {
   const transactions$ = certificateTransactionsWithEpochs(

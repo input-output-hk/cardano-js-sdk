@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Cardano, EpochInfo, TimeSettings } from '@cardano-sdk/core';
+import { Cardano, EpochInfo, EraSummary } from '@cardano-sdk/core';
 import { GroupedAddress } from '../../../src/KeyManagement';
 import {
   arrayEquals,
   deepEquals,
   epochInfoEquals,
+  eraSummariesEquals,
   groupedAddressesEquals,
   shallowArrayEquals,
   strictEquals,
-  timeSettingsEquals,
   tipEquals,
   transactionsEquals,
   txEquals,
@@ -63,9 +63,13 @@ describe('equals', () => {
     expect(utxoEquals([[{ index: 1, txId: 'tx1' }]] as any, [[{ index: 0, txId: 'tx1' }]] as any)).toBe(false);
   });
 
-  test('timeSettingsEquals compares fromSlotNo', () => {
-    expect(timeSettingsEquals([{ fromSlotNo: 1 } as TimeSettings], [{ fromSlotNo: 1 } as TimeSettings])).toBe(true);
-    expect(timeSettingsEquals([{ fromSlotNo: 1 } as TimeSettings], [{ fromSlotNo: 2 } as TimeSettings])).toBe(false);
+  test('eraSummariesEquals compares fromSlotNo', () => {
+    expect(eraSummariesEquals([{ start: { slot: 1 } } as EraSummary], [{ start: { slot: 1 } } as EraSummary])).toBe(
+      true
+    );
+    expect(eraSummariesEquals([{ start: { slot: 1 } } as EraSummary], [{ start: { slot: 2 } } as EraSummary])).toBe(
+      false
+    );
   });
 
   test('groupedAddressesEquals compares address', () => {
