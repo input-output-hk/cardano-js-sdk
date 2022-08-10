@@ -35,10 +35,10 @@ describe('networkInfoHttpProvider', () => {
     await expect(provider.lovelaceSupply()).resolves.toEqual({});
   });
 
-  test('timeSettings does not throw', async () => {
+  test('eraSummaries does not throw', async () => {
     axiosMock.onPost().replyOnce(200, {});
     const provider = networkInfoHttpProvider(config);
-    await expect(provider.timeSettings()).resolves.toEqual({});
+    await expect(provider.eraSummaries()).resolves.toEqual({});
   });
 
   test('ledgerTip does not throw', async () => {

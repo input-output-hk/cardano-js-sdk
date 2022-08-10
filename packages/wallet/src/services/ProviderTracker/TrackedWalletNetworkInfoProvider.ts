@@ -4,20 +4,20 @@ import { CLEAN_FN_STATS, ProviderFnStats, ProviderTracker } from './ProviderTrac
 import { WalletNetworkInfoProvider } from '../../types';
 
 export class WalletNetworkInfoProviderStats {
-  readonly timeSettings$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
+  readonly eraSummaries$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
   readonly currentWalletProtocolParameters$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
   readonly genesisParameters$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
   readonly ledgerTip$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);
 
   shutdown() {
-    this.timeSettings$.complete();
+    this.eraSummaries$.complete();
     this.currentWalletProtocolParameters$.complete();
     this.genesisParameters$.complete();
     this.ledgerTip$.complete();
   }
 
   reset() {
-    this.timeSettings$.next(CLEAN_FN_STATS);
+    this.eraSummaries$.next(CLEAN_FN_STATS);
     this.currentWalletProtocolParameters$.next(CLEAN_FN_STATS);
     this.genesisParameters$.next(CLEAN_FN_STATS);
     this.ledgerTip$.next(CLEAN_FN_STATS);
@@ -29,7 +29,7 @@ export class WalletNetworkInfoProviderStats {
  */
 export class TrackedWalletNetworkInfoProvider extends ProviderTracker implements WalletNetworkInfoProvider {
   readonly stats = new WalletNetworkInfoProviderStats();
-  readonly timeSettings: WalletNetworkInfoProvider['timeSettings'];
+  readonly eraSummaries: WalletNetworkInfoProvider['eraSummaries'];
   readonly ledgerTip: WalletNetworkInfoProvider['ledgerTip'];
   readonly currentWalletProtocolParameters: WalletNetworkInfoProvider['currentWalletProtocolParameters'];
   readonly genesisParameters: WalletNetworkInfoProvider['genesisParameters'];
@@ -38,7 +38,7 @@ export class TrackedWalletNetworkInfoProvider extends ProviderTracker implements
     super();
     networkInfoProvider = networkInfoProvider;
 
-    this.timeSettings = () => this.trackedCall(networkInfoProvider.timeSettings, this.stats.timeSettings$);
+    this.eraSummaries = () => this.trackedCall(networkInfoProvider.eraSummaries, this.stats.eraSummaries$);
     this.ledgerTip = () => this.trackedCall(networkInfoProvider.ledgerTip, this.stats.ledgerTip$);
     this.currentWalletProtocolParameters = () =>
       this.trackedCall(

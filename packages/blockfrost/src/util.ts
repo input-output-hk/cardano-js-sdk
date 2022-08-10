@@ -10,7 +10,7 @@ import {
   ProviderError,
   ProviderFailure,
   ProviderUtil,
-  testnetTimeSettings
+  testnetEraSummaries
 } from '@cardano-sdk/core';
 import { PaginationOptions } from '@blockfrost/blockfrost-js/lib/types';
 
@@ -135,7 +135,7 @@ export const networkMagicToIdMap: { [key in number]: Cardano.NetworkId } = {
   [Cardano.CardanoNetworkMagic.Testnet]: Cardano.NetworkId.testnet
 };
 
-export const timeSettings: NetworkInfoProvider['timeSettings'] = async () => testnetTimeSettings;
+export const eraSummaries: NetworkInfoProvider['eraSummaries'] = async () => testnetEraSummaries;
 
 /**
  * Check health of the [Blockfrost service](https://docs.blockfrost.io/)

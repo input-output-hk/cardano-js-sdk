@@ -63,11 +63,11 @@
         }
       }
     },
-    "/network-info/time-settings": {
+    "/network-info/era-summaries": {
       "post": {
-        "summary": "fetch time settings info",
-        "description": "Fetch Time Settings Info",
-        "operationId": "timeSettings",
+        "summary": "fetch era summaries info",
+        "description": "Fetch Era Summaries Info",
+        "operationId": "eraSummaries",
         "requestBody": {
           "content": {
             "application/json": {}
@@ -75,13 +75,13 @@
         },
         "responses": {
           "200": {
-            "description": "time settings info fetched",
+            "description": "era summaries info fetched",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/TimeSettings"
+                    "$ref": "#/components/schemas/EraSummary"
                   }
                 }
               }
@@ -207,29 +207,45 @@
           }
         }
       },
-      "TimeSettings": {
+      "EraSummary": {
         "required": [
-          "epochLength",
-          "fromSlotDate",
-          "fromSlotNo",
-          "slotLength"
+          "parameters",
+          "start"
         ],
         "type": "object",
         "properties": {
-          "epochLength": {
-            "type": "number",
-            "example": 21600
+          "parameters": {
+            "required": [
+              "epochLength",
+              "slotLength"
+            ],
+            "type": "object",
+            "properties": {
+              "epochLength": {
+                "type": "number",
+                "example": 21600
+              },
+              "slotLength": {
+                "type": "number",
+                "example": 1000
+              }
+            }
           },
-          "fromSlotDate": {
-            "$ref": "#/components/schemas/Date"
-          },
-          "fromSlotNo": {
-            "type": "number",
-            "example": 1200
-          },
-          "slotLength": {
-            "type": "number",
-            "example": 1000
+          "start": {
+            "required": [
+              "slot",
+              "time"
+            ],
+            "type": "object",
+            "properties": {
+              "slot": {
+                "type": "number",
+                "example": 1200
+              },
+              "time": {
+                "$ref": "#/components/schemas/Date"
+              }
+            }
           }
         }
       },

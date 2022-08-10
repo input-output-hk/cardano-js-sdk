@@ -53,6 +53,7 @@ describe('SingleAddressWallet.assets/nft', () => {
               logger
             ),
             keyAgent,
+            logger,
             networkInfoProvider: await networkInfoProviderFactory.create(
               env.NETWORK_INFO_PROVIDER,
               env.NETWORK_INFO_PROVIDER_PARAMS,
@@ -93,21 +94,16 @@ describe('SingleAddressWallet.assets/nft', () => {
     expect(nfts.find((nft) => nft.nftMetadata!.name === 'One')).toEqual({
       assetId: 'd1ac67dcebc491ce17635d3d9c8775eb739325ce522f6eac733489aa4e4654303031',
       fingerprint: 'asset15wsawsn72dw07m33fqp42suze636mv2k4agxvs',
-      history: undefined,
       mintOrBurnCount: 1,
       name: '4e4654303031',
       nftMetadata: {
-        description: undefined,
-        files: undefined,
         image: ['ipfs://some_hash1'],
-        mediaType: undefined,
         name: 'One',
         version: '1.0'
       },
-      otherProperties: undefined,
       policyId: 'd1ac67dcebc491ce17635d3d9c8775eb739325ce522f6eac733489aa',
       quantity: 1n,
-      tokenMetadata: { desc: undefined, icon: 'ipfs://some_hash1', name: 'One' }
+      tokenMetadata: null
     });
     expect(nfts.find((nft) => nft.nftMetadata!.name === 'Two')).toBeDefined();
   });
@@ -122,7 +118,6 @@ describe('SingleAddressWallet.assets/nft', () => {
     expect(nfts.find((nft) => nft.nftMetadata!.name === 'NFT with files')).toEqual({
       assetId: 'e80c05f27dec74e8c04f27bdf711dff8ae03167dda9b7760b7d92cef4e46542d66696c6573',
       fingerprint: 'asset16w7fcptllh5qfgux8hmp3wymne7xh5y65vxueh',
-      history: undefined,
       mintOrBurnCount: 1,
       name: '4e46542d66696c6573',
       nftMetadata: {
@@ -145,29 +140,9 @@ describe('SingleAddressWallet.assets/nft', () => {
         otherProperties: new Map([['id', '1']]),
         version: '1.0'
       },
-      otherProperties: undefined,
       policyId: 'e80c05f27dec74e8c04f27bdf711dff8ae03167dda9b7760b7d92cef',
       quantity: 1n,
-      tokenMetadata: {
-        desc: 'NFT with different types of files',
-        description: 'NFT with different types of files',
-        files: [
-          {
-            mediaType: 'video/mp4',
-            name: 'some name',
-            src: 'file://some_video_file'
-          },
-          {
-            mediaType: 'audio/mpeg',
-            name: 'some name',
-            src: ['file://some_audio_file', 'file://another_audio_file']
-          }
-        ],
-        icon: 'ipfs://somehash',
-        id: '1',
-        mediaType: 'image/png',
-        name: 'NFT with files'
-      }
+      tokenMetadata: null
     });
   });
 });

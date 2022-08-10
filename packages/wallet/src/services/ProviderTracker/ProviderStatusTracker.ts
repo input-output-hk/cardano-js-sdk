@@ -53,7 +53,7 @@ const getDefaultProviderSyncRelevantStats = ({
     networkInfoProvider.stats.ledgerTip$,
     networkInfoProvider.stats.currentWalletProtocolParameters$,
     networkInfoProvider.stats.genesisParameters$,
-    networkInfoProvider.stats.timeSettings$,
+    networkInfoProvider.stats.eraSummaries$,
     assetProvider.stats.getAsset$,
     txSubmitProvider.stats.submitTx$,
     stakePoolProvider.stats.queryStakePools$,

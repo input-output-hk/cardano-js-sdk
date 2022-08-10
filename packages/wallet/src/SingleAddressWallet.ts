@@ -4,10 +4,10 @@ import {
   Cardano,
   ChainHistoryProvider,
   EpochInfo,
+  EraSummary,
   ProtocolParametersRequiredByWallet,
   RewardsProvider,
   StakePoolProvider,
-  TimeSettings,
   TxSubmitProvider,
   UtxoProvider,
   coreToCsl
@@ -52,7 +52,7 @@ import {
   currentEpochTracker,
   deepEquals,
   distinctBlock,
-  distinctTimeSettings,
+  distinctEraSummaries,
   groupedAddressesEquals
 } from './services';
 import { BehaviorObservable, TrackerSubject } from '@cardano-sdk/util-rxjs';
@@ -131,7 +131,7 @@ export class SingleAddressWallet implements ObservableWallet {
   readonly transactions: TransactionsTracker & Shutdown;
   readonly delegation: DelegationTracker & Shutdown;
   readonly tip$: BehaviorObservable<Cardano.Tip>;
-  readonly timeSettings$: TrackerSubject<TimeSettings[]>;
+  readonly eraSummaries$: TrackerSubject<EraSummary[]>;
   readonly addresses$: TrackerSubject<GroupedAddress[]>;
   readonly protocolParameters$: TrackerSubject<ProtocolParametersRequiredByWallet>;
   readonly genesisParameters$: TrackerSubject<Cardano.CompactGenesis>;
@@ -226,23 +226,23 @@ export class SingleAddressWallet implements ObservableWallet {
     });
     const tipBlockHeight$ = distinctBlock(this.tip$);
 
-    // Time settings
-    const timeSettingsTrigger = new BehaviorSubject<void>(void 0);
-    this.timeSettings$ = new PersistentDocumentTrackerSubject(
+    // Era summaries
+    const eraSummariesTrigger = new BehaviorSubject<void>(void 0);
+    this.eraSummaries$ = new PersistentDocumentTrackerSubject(
       coldObservableProvider({
         cancel$,
         equals: deepEquals,
-        provider: this.networkInfoProvider.timeSettings,
+        provider: this.networkInfoProvider.eraSummaries,
         retryBackoffConfig,
-        trigger$: timeSettingsTrigger
+        trigger$: eraSummariesTrigger
       }),
-      stores.timeSettings
+      stores.eraSummaries
     );
 
-    // Epoch tracker triggers the first timeSettings fetch from timeSettingsTrigger
-    // Epoch changes also trigger refetch of timeSettings
-    this.currentEpoch$ = currentEpochTracker(this.tip$, this.timeSettings$);
-    this.currentEpoch$.pipe(map(() => void 0)).subscribe(timeSettingsTrigger);
+    // Epoch tracker triggers the first eraSummaries fetch from eraSummariesTrigger
+    // Epoch changes also trigger refetch of eraSummaries
+    this.currentEpoch$ = currentEpochTracker(this.tip$, this.eraSummaries$);
+    this.currentEpoch$.pipe(map(() => void 0)).subscribe(eraSummariesTrigger);
     const epoch$ = this.currentEpoch$.pipe(map((epoch) => epoch.epochNo));
     this.protocolParameters$ = new PersistentDocumentTrackerSubject(
       coldObservableProvider({
@@ -303,9 +303,10 @@ export class SingleAddressWallet implements ObservableWallet {
       transactionsInFlight$: this.transactions.outgoing.inFlight$,
       utxoProvider: this.utxoProvider
     });
-    const timeSettings$ = distinctTimeSettings(this.timeSettings$);
+    const eraSummaries$ = distinctEraSummaries(this.eraSummaries$);
     this.delegation = createDelegationTracker({
       epoch$,
+      eraSummaries$,
       retryBackoffConfig,
       rewardAccountAddresses$: this.addresses$.pipe(
         map((addresses) => addresses.map((groupedAddress) => groupedAddress.rewardAccount))
@@ -313,7 +314,6 @@ export class SingleAddressWallet implements ObservableWallet {
       rewardsTracker: this.rewardsProvider,
       stakePoolProvider: this.stakePoolProvider,
       stores,
-      timeSettings$,
       transactionsTracker: this.transactions
     });
     this.balance = createBalanceTracker(this.protocolParameters$, this.utxo, this.delegation);
@@ -394,7 +394,7 @@ export class SingleAddressWallet implements ObservableWallet {
   shutdown() {
     this.utxo.shutdown();
     this.transactions.shutdown();
-    this.timeSettings$.complete();
+    this.eraSummaries$.complete();
     this.protocolParameters$.complete();
     this.genesisParameters$.complete();
     this.#tip$.complete();

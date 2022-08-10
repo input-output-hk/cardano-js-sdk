@@ -2,11 +2,11 @@ import {
   Cardano,
   CardanoNode,
   CardanoNodeUtil,
+  EraSummary,
   NetworkInfoProvider,
   ProtocolParametersRequiredByWallet,
   StakeSummary,
-  SupplySummary,
-  TimeSettings
+  SupplySummary
 } from '@cardano-sdk/core';
 import { DbSyncProvider } from '../../DbSyncProvider';
 import { GenesisData } from './types';
@@ -17,14 +17,7 @@ import { NetworkInfoCacheKey } from '.';
 import { Pool } from 'pg';
 import { Shutdown } from '@cardano-sdk/util';
 import { epochPollService } from './utils';
-import {
-  loadGenesisData,
-  toGenesisParams,
-  toLedgerTip,
-  toSupply,
-  toTimeSettings,
-  toWalletProtocolParams
-} from './mappers';
+import { loadGenesisData, toGenesisParams, toLedgerTip, toSupply, toWalletProtocolParams } from './mappers';
 
 export interface NetworkInfoProviderProps {
   cardanoNodeConfigPath: string;
@@ -104,14 +97,12 @@ export class DbSyncNetworkInfoProvider extends DbSyncProvider implements Network
     };
   }
 
-  public async timeSettings(): Promise<TimeSettings[]> {
-    return (
-      await this.#cache.get(
-        NetworkInfoCacheKey.ERA_SUMMARIES,
-        () => this.#cardanoNode.eraSummaries(),
-        UNLIMITED_CACHE_TTL
-      )
-    ).map(toTimeSettings);
+  public async eraSummaries(): Promise<EraSummary[]> {
+    return await this.#cache.get(
+      NetworkInfoCacheKey.ERA_SUMMARIES,
+      () => this.#cardanoNode.eraSummaries(),
+      UNLIMITED_CACHE_TTL
+    );
   }
 
   async start(): Promise<void> {

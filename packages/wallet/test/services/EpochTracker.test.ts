@@ -1,18 +1,18 @@
-import { Cardano, TimeSettings, testnetTimeSettings } from '@cardano-sdk/core';
+import { Cardano, EraSummary, testnetEraSummaries } from '@cardano-sdk/core';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
 import { currentEpochTracker } from '../../src/services';
 
 describe('currentEpochTracker', () => {
-  it('computes epoch info from timeSettings$ and tip$', () => {
+  it('computes epoch info from eraSummaries$ and tip$', () => {
     createTestScheduler().run(({ hot, expectObservable }) => {
       const tip$ = hot('-a-b', {
         a: { slot: 123_456 } as Cardano.Tip,
         b: { slot: 1_234_567 } as Cardano.Tip
       });
-      const timeSettings$ = hot('a---', {
-        a: testnetTimeSettings as TimeSettings[]
+      const eraSummaries$ = hot('a---', {
+        a: testnetEraSummaries as EraSummary[]
       });
-      const currentEpoch$ = currentEpochTracker(tip$, timeSettings$);
+      const currentEpoch$ = currentEpochTracker(tip$, eraSummaries$);
       expectObservable(currentEpoch$).toBe('-a-b', {
         a: {
           epochNo: 5,

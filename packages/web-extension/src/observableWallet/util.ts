@@ -22,6 +22,7 @@ export const observableWalletProperties: RemoteApiProperties<ObservableWallet> =
     rewardAccounts$: RemoteApiPropertyType.HotObservable,
     rewardsHistory$: RemoteApiPropertyType.HotObservable
   },
+  eraSummaries$: RemoteApiPropertyType.HotObservable,
   finalizeTx: RemoteApiPropertyType.MethodReturningPromise,
   genesisParameters$: RemoteApiPropertyType.HotObservable,
   getName: RemoteApiPropertyType.MethodReturningPromise,
@@ -34,7 +35,6 @@ export const observableWalletProperties: RemoteApiProperties<ObservableWallet> =
     isSettled$: RemoteApiPropertyType.HotObservable,
     isUpToDate$: RemoteApiPropertyType.HotObservable
   },
-  timeSettings$: RemoteApiPropertyType.HotObservable,
   tip$: RemoteApiPropertyType.HotObservable,
   transactions: {
     history$: RemoteApiPropertyType.HotObservable,
