@@ -41,8 +41,8 @@ export class NetworkInfoHttpService extends HttpService {
       )
     );
     router.post(
-      '/time-settings',
-      providerHandler(networkInfoProvider.timeSettings.bind(networkInfoProvider))(
+      '/era-summaries',
+      providerHandler(networkInfoProvider.eraSummaries.bind(networkInfoProvider))(
         HttpService.routeHandler(logger),
         logger
       )

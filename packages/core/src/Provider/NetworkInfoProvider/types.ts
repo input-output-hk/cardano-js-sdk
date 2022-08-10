@@ -1,4 +1,4 @@
-import { Cardano, Provider, TimeSettings } from '../..';
+import { Cardano, EraSummary, Provider } from '../..';
 
 export type ProtocolParametersRequiredByWallet = Required<
   Pick<
@@ -32,5 +32,5 @@ export interface NetworkInfoProvider extends Provider {
   genesisParameters(): Promise<Cardano.CompactGenesis>;
   lovelaceSupply(): Promise<SupplySummary>;
   stake(): Promise<StakeSummary>;
-  timeSettings(): Promise<TimeSettings[]>;
+  eraSummaries(): Promise<EraSummary[]>;
 }

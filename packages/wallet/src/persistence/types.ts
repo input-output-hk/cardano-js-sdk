@@ -2,10 +2,10 @@ import { Assets } from '../types';
 import {
   Cardano,
   EpochRewards,
+  EraSummary,
   ProtocolParametersRequiredByWallet,
   StakeSummary,
-  SupplySummary,
-  TimeSettings
+  SupplySummary
 } from '@cardano-sdk/core';
 import { GroupedAddress } from '../KeyManagement';
 import { NewTxAlonzoWithSlot } from '../services';
@@ -88,7 +88,7 @@ export interface WalletStores extends Destroyable {
   stakePools: KeyValueStore<Cardano.PoolId, Cardano.StakePool>;
   protocolParameters: DocumentStore<ProtocolParametersRequiredByWallet>;
   genesisParameters: DocumentStore<Cardano.CompactGenesis>;
-  timeSettings: DocumentStore<TimeSettings[]>;
+  eraSummaries: DocumentStore<EraSummary[]>;
   assets: DocumentStore<Assets>;
   addresses: DocumentStore<GroupedAddress[]>;
 }

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-len */
 import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
-import { Cardano, StakeSummary, SupplySummary, TimeSettings, testnetTimeSettings } from '@cardano-sdk/core';
+import { Cardano, EraSummary, StakeSummary, SupplySummary, testnetEraSummaries } from '@cardano-sdk/core';
 import { blockfrostNetworkInfoProvider } from '../src';
 
 jest.mock('@blockfrost/blockfrost-js');
@@ -69,12 +69,12 @@ describe('blockfrostNetworkInfoProvider', () => {
     });
   });
 
-  test('timeSettings', async () => {
+  test('eraSummaries', async () => {
     const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
     const client = blockfrostNetworkInfoProvider(blockfrost);
-    const response = await client.timeSettings();
+    const response = await client.eraSummaries();
 
-    expect(response).toMatchObject<TimeSettings[]>(testnetTimeSettings);
+    expect(response).toMatchObject<EraSummary[]>(testnetEraSummaries);
   });
 
   test('genesisParameters', async () => {

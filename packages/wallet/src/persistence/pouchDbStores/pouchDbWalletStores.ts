@@ -1,5 +1,5 @@
 import { Assets } from '../../types';
-import { Cardano, EpochRewards, ProtocolParametersRequiredByWallet, TimeSettings } from '@cardano-sdk/core';
+import { Cardano, EpochRewards, EraSummary, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
 import { CreatePouchDbStoresDependencies } from './types';
 import { EMPTY, combineLatest, map } from 'rxjs';
 import { GroupedAddress } from '../../KeyManagement';
@@ -12,7 +12,7 @@ import { WalletStores } from '../types';
 export class PouchDbTipStore extends PouchDbDocumentStore<Cardano.Tip> {}
 export class PouchDbProtocolParametersStore extends PouchDbDocumentStore<ProtocolParametersRequiredByWallet> {}
 export class PouchDbGenesisParametersStore extends PouchDbDocumentStore<Cardano.CompactGenesis> {}
-export class PouchDbTimeSettingsStore extends PouchDbDocumentStore<TimeSettings[]> {}
+export class PouchDbEraSummariesStore extends PouchDbDocumentStore<EraSummary[]> {}
 
 export class PouchDbAssetsStore extends PouchDbDocumentStore<Assets> {}
 export class PouchDbAddressesStore extends PouchDbDocumentStore<GroupedAddress[]> {}
@@ -57,13 +57,13 @@ export const createPouchDbWalletStores = (
       return EMPTY;
     },
     destroyed: false,
+    eraSummaries: new PouchDbEraSummariesStore(docsDbName, 'EraSummaries', logger),
     genesisParameters: new PouchDbGenesisParametersStore(docsDbName, 'genesisParameters', logger),
     inFlightTransactions: new PouchDbInFlightTransactionsStore(docsDbName, 'newTransactions', logger),
     protocolParameters: new PouchDbProtocolParametersStore(docsDbName, 'protocolParameters', logger),
     rewardsBalances: new PouchDbRewardsBalancesStore(`${baseDbName}RewardsBalances`, logger),
     rewardsHistory: new PouchDbRewardsHistoryStore(`${baseDbName}RewardsHistory`, logger),
     stakePools: new PouchDbStakePoolsStore(`${baseDbName}StakePools`, logger),
-    timeSettings: new PouchDbTimeSettingsStore(docsDbName, 'timeSettings', logger),
     tip: new PouchDbTipStore(docsDbName, 'tip', logger),
     transactions: new PouchDbTransactionsStore(
       {

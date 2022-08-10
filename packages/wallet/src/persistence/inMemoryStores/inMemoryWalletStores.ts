@@ -1,5 +1,5 @@
 import { Assets } from '../../types';
-import { Cardano, EpochRewards, ProtocolParametersRequiredByWallet, TimeSettings } from '@cardano-sdk/core';
+import { Cardano, EpochRewards, EraSummary, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
 import { EMPTY, combineLatest, map } from 'rxjs';
 import { GroupedAddress } from '../../KeyManagement';
 import { InMemoryCollectionStore } from './InMemoryCollectionStore';
@@ -11,7 +11,7 @@ import { WalletStores } from '../types';
 export class InMemoryTipStore extends InMemoryDocumentStore<Cardano.Tip> {}
 export class InMemoryProtocolParametersStore extends InMemoryDocumentStore<ProtocolParametersRequiredByWallet> {}
 export class InMemoryGenesisParametersStore extends InMemoryDocumentStore<Cardano.CompactGenesis> {}
-export class InMemoryTimeSettingsStore extends InMemoryDocumentStore<TimeSettings[]> {}
+export class InMemoryEraSummariesStore extends InMemoryDocumentStore<EraSummary[]> {}
 
 export class InMemoryAssetsStore extends InMemoryDocumentStore<Assets> {}
 export class InMemoryAddressesStore extends InMemoryDocumentStore<GroupedAddress[]> {}
@@ -37,7 +37,7 @@ export const createInMemoryWalletStores = (): WalletStores => ({
         this.assets.destroy(),
         this.genesisParameters.destroy(),
         this.protocolParameters.destroy(),
-        this.timeSettings.destroy(),
+        this.eraSummaries.destroy(),
         this.unspendableUtxo.destroy(),
         this.rewardsBalances.destroy(),
         this.rewardsHistory.destroy(),
@@ -52,13 +52,13 @@ export const createInMemoryWalletStores = (): WalletStores => ({
     return EMPTY;
   },
   destroyed: false,
+  eraSummaries: new InMemoryEraSummariesStore(),
   genesisParameters: new InMemoryGenesisParametersStore(),
   inFlightTransactions: new InMemoryInFlightTransactionsStore(),
   protocolParameters: new InMemoryProtocolParametersStore(),
   rewardsBalances: new InMemoryRewardsBalancesStore(),
   rewardsHistory: new InMemoryRewardsHistoryStore(),
   stakePools: new InMemoryStakePoolsStore(),
-  timeSettings: new InMemoryTimeSettingsStore(),
   tip: new InMemoryTipStore(),
   transactions: new InMemoryTransactionsStore(),
   unspendableUtxo: new InMemoryUnspendableUtxoStore(),

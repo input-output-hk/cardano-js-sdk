@@ -1,6 +1,6 @@
-import { Cardano, TimeSettings } from '@cardano-sdk/core';
+import { Cardano, EraSummary } from '@cardano-sdk/core';
 import { Observable, distinctUntilChanged, map } from 'rxjs';
-import { timeSettingsEquals } from './equals';
+import { eraSummariesEquals } from './equals';
 
 export const distinctBlock = (tip$: Observable<Cardano.Tip>) =>
   tip$.pipe(
@@ -8,8 +8,8 @@ export const distinctBlock = (tip$: Observable<Cardano.Tip>) =>
     distinctUntilChanged()
   );
 
-export const distinctTimeSettings = (timeSettings$: Observable<TimeSettings[]>) =>
-  timeSettings$.pipe(
-    map((timeSettings) => timeSettings),
-    distinctUntilChanged(timeSettingsEquals)
+export const distinctEraSummaries = (eraSummaries$: Observable<EraSummary[]>) =>
+  eraSummaries$.pipe(
+    map((eraSummaries) => eraSummaries),
+    distinctUntilChanged(eraSummariesEquals)
   );

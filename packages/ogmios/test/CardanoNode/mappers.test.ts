@@ -9,7 +9,7 @@ describe('cardano node mappers', () => {
       parameters: { epochLength: 432_000, safeZone: 129_600, slotLength: 1 },
       start: { epoch: 74, slot: 1_598_400, time: 31_968_000 }
     };
-    test('map ogmios EraSummary to TimeSettings', () => {
+    it('maps ogmios EraSummary to core EraSummary', () => {
       const result = mappers.mapEraSummary(eraSummary, new Date(1_506_203_091_000));
       expect(result).toEqual<EraSummary>({
         parameters: {

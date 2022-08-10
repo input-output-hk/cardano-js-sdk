@@ -1,4 +1,4 @@
-import { Cardano, EpochInfo, TimeSettings } from '@cardano-sdk/core';
+import { Cardano, EpochInfo, EraSummary } from '@cardano-sdk/core';
 import { GroupedAddress } from '../../KeyManagement';
 import isEqual from 'lodash/isEqual';
 
@@ -22,8 +22,8 @@ export const txInEquals = (a: Cardano.NewTxIn, b: Cardano.NewTxIn) => a.txId ===
 export const utxoEquals = (a: Cardano.Utxo[], b: Cardano.Utxo[]) =>
   arrayEquals(a, b, ([aTxIn], [bTxIn]) => txInEquals(aTxIn, bTxIn));
 
-export const timeSettingsEquals = (a: TimeSettings[], b: TimeSettings[]) =>
-  arrayEquals(a, b, (ts1, ts2) => ts1.fromSlotNo === ts2.fromSlotNo);
+export const eraSummariesEquals = (a: EraSummary[], b: EraSummary[]) =>
+  arrayEquals(a, b, (es1, es2) => es1.start.slot === es2.start.slot);
 
 const groupedAddressEquals = (a: GroupedAddress, b: GroupedAddress) => a.address === b.address;
 
