@@ -75,11 +75,15 @@ export const createAddressTransactionsProvider = ({
   return {
     rollback$: rollback$.asObservable(),
     transactionsSource$: concat(
-      storedTransactions$,
+      storedTransactions$.pipe(
+        tap((storedTransactions) =>
+          logger.debug(`Stored history transactions count: ${storedTransactions?.length || 0}`)
+        )
+      ),
       combineLatest([addresses$, storedTransactions$.pipe(defaultIfEmpty([] as Cardano.TxAlonzo[]))]).pipe(
         switchMap(([addresses, storedTransactions]) => {
           let localTransactions: Cardano.TxAlonzo[] = [...storedTransactions];
-          logger.debug(`Stored history transactions count: ${localTransactions.length}`);
+
           return coldObservableProvider({
             // Do not re-fetch transactions twice on load when tipBlockHeight$ loads from storage first
             // It should also help when using poor internet connection.
@@ -91,6 +95,11 @@ export const createAddressTransactionsProvider = ({
               while (true) {
                 const lastStoredTransaction: Cardano.TxAlonzo | undefined =
                   localTransactions[localTransactions.length - 1];
+
+                lastStoredTransaction &&
+                  logger.debug(
+                    `Last stored tx: ${lastStoredTransaction?.id} block:${lastStoredTransaction?.blockHeader.blockNo}`
+                  );
 
                 const sinceBlock = lastStoredTransaction?.blockHeader.blockNo;
                 const newTransactions = await chainHistoryProvider.transactionsByAddresses({
@@ -110,7 +119,7 @@ export const createAddressTransactionsProvider = ({
 
                   from(rollbackTransactions)
                     .pipe(tap((tx) => logger.debug(`Transaction ${tx.id} was rolled back`)))
-                    .subscribe(rollback$);
+                    .subscribe((v) => rollback$.next(v));
 
                   // Rollback by 1 block, try again in next loop iteration
                   localTransactions = localTransactions.filter(({ blockHeader: { blockNo } }) => blockNo < sinceBlock);
