@@ -50,7 +50,7 @@ _The following examples require the [install and build] steps to be completed._
     --api-url http://localhost:6000 \
     --cardano-node-config-path ./config/cardano-node/config.json \
     --ogmios-url  ws://localhost:1338 \
-    --db-connection-string postgresql://somePgUser:somePassword@localhost:5432/someDbName \
+    --postgres-connection-string postgresql://somePgUser:somePassword@localhost:5432/someDbName \
     asset,chain-history,stake-pool,tx-submit,network-info,utxo
 ```
 
