@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.0-nightly.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.5.0-nightly.8...@cardano-sdk/cardano-services@0.5.0-nightly.9) (2022-08-10)
+
+
+### ⚠ BREAKING CHANGES
+
+* replace `NetworkInfoProvider.timeSettings` with `eraSummaries`
+
+### Features
+
+* replace `NetworkInfoProvider.timeSettings` with `eraSummaries` ([58f6fc7](https://github.com/input-output-hk/cardano-js-sdk/commit/58f6fc7c5ace703583c36f95d3d6962483ad924d))
+
+
+
 ## [0.5.0-nightly.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.5.0-nightly.7...@cardano-sdk/cardano-services@0.5.0-nightly.8) (2022-08-10)
 
 **Note:** Version bump only for package @cardano-sdk/cardano-services
