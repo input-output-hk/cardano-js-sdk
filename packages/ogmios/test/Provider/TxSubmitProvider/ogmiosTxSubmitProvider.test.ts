@@ -91,7 +91,7 @@ describe('ogmiosTxSubmitProvider', () => {
 
       it('resolves if successful', async () => {
         try {
-          const res = await provider.submitTx(new Uint8Array());
+          const res = await provider.submitTx({ signedTransaction: new Uint8Array() });
           expect(res).toBeUndefined();
         } catch (error) {
           expect(error).toBeUndefined();
@@ -110,7 +110,7 @@ describe('ogmiosTxSubmitProvider', () => {
         });
         await listenPromise(mockServer, connection.port);
         provider = ogmiosTxSubmitProvider(connection, logger);
-        await expect(provider.submitTx(new Uint8Array())).rejects.toThrowError(
+        await expect(provider.submitTx({ signedTransaction: new Uint8Array() })).rejects.toThrowError(
           Cardano.TxSubmissionErrors.EraMismatchError
         );
       });

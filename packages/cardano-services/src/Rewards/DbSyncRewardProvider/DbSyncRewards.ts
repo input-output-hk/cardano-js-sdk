@@ -1,7 +1,7 @@
-import { Cardano, RewardHistoryProps, RewardsProvider } from '@cardano-sdk/core';
 import { DbSyncProvider } from '../../DbSyncProvider';
 import { Logger } from 'ts-log';
 import { Pool } from 'pg';
+import { RewardAccountBalanceArgs, RewardsHistoryArgs, RewardsProvider } from '@cardano-sdk/core';
 import { RewardsBuilder } from './RewardsBuilder';
 import { rewardsToCore } from './mappers';
 
@@ -15,12 +15,11 @@ export class DbSyncRewardsProvider extends DbSyncProvider implements RewardsProv
     this.#logger = logger;
   }
 
-  public async rewardsHistory(props: RewardHistoryProps) {
-    const { rewardAccounts, epochs } = props;
+  public async rewardsHistory({ rewardAccounts, epochs }: RewardsHistoryArgs) {
     const rewards = await this.#builder.getRewardsHistory(rewardAccounts, epochs);
     return rewardsToCore(rewards);
   }
-  public async rewardAccountBalance(rewardAccount: Cardano.RewardAccount) {
+  public async rewardAccountBalance({ rewardAccount }: RewardAccountBalanceArgs) {
     this.#logger.debug(`About to get balance of reward account ${rewardAccount.toString()}`);
     const balance = await this.#builder.getAccountBalance(rewardAccount);
     return BigInt(balance?.balance || '0');

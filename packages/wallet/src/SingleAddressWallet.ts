@@ -412,7 +412,7 @@ export class SingleAddressWallet implements ObservableWallet {
     this.#logger.debug(`Submitting transaction ${tx.id}`);
     this.#newTransactions.submitting$.next(tx);
     try {
-      await this.txSubmitProvider.submitTx(coreToCsl.tx(tx).to_bytes());
+      await this.txSubmitProvider.submitTx({ signedTransaction: coreToCsl.tx(tx).to_bytes() });
       this.#logger.debug(`Submitted transaction ${tx.id}`);
       this.#newTransactions.pending$.next(tx);
     } catch (error) {

@@ -284,7 +284,7 @@ export class TxSubmitWorker extends EventEmitter {
 
       this.#dependencies.logger.info(`${moduleName}: submitting tx #${counter} id: ${txId}`);
       this.#dependencies.logger.debug(`${moduleName}: tx #${counter} dump:`, [content.toString('hex')]);
-      await this.#dependencies.txSubmitProvider.submitTx(txBody);
+      await this.#dependencies.txSubmitProvider.submitTx({ signedTransaction: txBody });
 
       this.#dependencies.logger.debug(`${moduleName}: ACKing RabbitMQ message #${counter}`);
       this.#channel?.ack(message);

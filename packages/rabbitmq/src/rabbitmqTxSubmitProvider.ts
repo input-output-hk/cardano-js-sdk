@@ -1,5 +1,12 @@
 import { Buffer } from 'buffer';
-import { Cardano, HealthCheckResponse, ProviderError, ProviderFailure, TxSubmitProvider } from '@cardano-sdk/core';
+import {
+  Cardano,
+  HealthCheckResponse,
+  ProviderError,
+  ProviderFailure,
+  SubmitTxArgs,
+  TxSubmitProvider
+} from '@cardano-sdk/core';
 import { Channel, Connection, connect } from 'amqplib';
 import { Logger } from 'ts-log';
 import { TX_SUBMISSION_QUEUE, getErrorPrototype, waitForPending } from './utils';
@@ -149,9 +156,10 @@ export class RabbitMqTxSubmitProvider implements TxSubmitProvider {
   /**
    * Submit a transaction to RabbitMQ
    *
-   * @param signedTransaction The Uint8Array representation of a signedTransaction
+   * @param args data required to submit tx
+   * @param args.signedTransaction Uint8Array representation of a signedTransaction
    */
-  async submitTx(signedTransaction: Uint8Array) {
+  async submitTx({ signedTransaction }: SubmitTxArgs) {
     return new Promise<void>(async (resolve, reject) => {
       let txId = '';
 

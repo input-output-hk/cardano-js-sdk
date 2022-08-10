@@ -20,10 +20,9 @@ import { coldObservableProvider } from '../util';
 import { transactionsWithCertificates } from './transactionCertificates';
 
 export const createBlockEpochProvider =
-  (chainHistoryProvider: ChainHistoryProvider, retryBackoffConfig: RetryBackoffConfig) =>
-  (blockHashes: Cardano.BlockId[]) =>
+  (chainHistoryProvider: ChainHistoryProvider, retryBackoffConfig: RetryBackoffConfig) => (ids: Cardano.BlockId[]) =>
     coldObservableProvider({
-      provider: () => chainHistoryProvider.blocksByHashes(blockHashes),
+      provider: () => chainHistoryProvider.blocksByHashes({ ids }),
       retryBackoffConfig
     }).pipe(map((blocks) => blocks.map(({ epoch }) => epoch)));
 

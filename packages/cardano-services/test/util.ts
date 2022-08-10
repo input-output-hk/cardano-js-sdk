@@ -39,7 +39,7 @@ export const createConnectionObjectWithRandomPort = async () =>
 export const doServerRequest =
   (apiBaseUrl: string) =>
   async <Args, Response>(url: string, args: Args, extraOptions: AxiosRequestConfig = {}) =>
-    (await axios.post(`${apiBaseUrl}${url}`, { args }, extraOptions)).data as Promise<Response>;
+    (await axios.post(`${apiBaseUrl}${url}`, { ...args }, extraOptions)).data as Promise<Response>;
 
 export const ingestDbData = async (db: Pool, tableName: string, columns: string[], values: any[]) => {
   const columnsPlaceholder = columns.toString();

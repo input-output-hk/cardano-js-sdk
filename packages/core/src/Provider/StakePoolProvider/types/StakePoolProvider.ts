@@ -17,7 +17,7 @@ export interface MultipleChoiceSearchFilter<T> {
   values: T[];
 }
 
-export interface StakePoolQueryOptions {
+export interface QueryStakePoolsArgs {
   /**
    * Will return all stake pools sorted by name ascending if not specified
    */
@@ -67,11 +67,11 @@ export interface StakePoolStats {
 
 export interface StakePoolProvider extends Provider {
   /**
-   * @param {StakePoolQueryOptions} options query options
+   * @param {QueryStakePoolsArgs} args query args
    * @returns Stake pools
    * @throws ProviderError
    */
-  queryStakePools: (options?: StakePoolQueryOptions) => Promise<StakePoolSearchResults>;
+  queryStakePools: (args?: QueryStakePoolsArgs) => Promise<StakePoolSearchResults>;
   /**
    * @returns {StakePoolStats} Stake pool stats
    */

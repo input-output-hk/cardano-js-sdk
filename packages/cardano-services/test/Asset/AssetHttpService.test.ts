@@ -83,7 +83,11 @@ describe('AssetHttpService', () => {
     describe('/get-asset', () => {
       it('returns a 415 coded response if the wrong content type header is used', async () => {
         try {
-          await axios.post(`${apiUrlBase}/get-asset`, { args: [] }, { headers: { 'Content-Type': APPLICATION_CBOR } });
+          await axios.post(
+            `${apiUrlBase}/get-asset`,
+            { assetId: '' },
+            { headers: { 'Content-Type': APPLICATION_CBOR } }
+          );
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
           expect(error.response.status).toBe(415);
@@ -93,7 +97,7 @@ describe('AssetHttpService', () => {
 
       it('returns 400 coded response if the request is bad formed', async () => {
         try {
-          await axios.post(`${apiUrlBase}/get-asset`, { args: [['test']] });
+          await axios.post(`${apiUrlBase}/get-asset`, { assetId: [['test']] });
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
           expect(error.response.status).toBe(400);
@@ -104,7 +108,7 @@ describe('AssetHttpService', () => {
       it('returns 404 coded response for not existing existing asset id', async () => {
         try {
           const res = await axios.post(`${apiUrlBase}/get-asset`, {
-            args: ['0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef']
+            assetId: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'
           });
           expect(res.data[0]).toEqual({});
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -112,19 +116,18 @@ describe('AssetHttpService', () => {
           expect(error.response.status).toBe(404);
         }
       });
-
       it('returns asset info for existing asset id', async () => {
-        const res = await provider.getAsset(
-          Cardano.AssetId('50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65')
-        );
+        const res = await provider.getAsset({
+          assetId: Cardano.AssetId('50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65')
+        });
         expect(res).toMatchSnapshot();
       });
 
       it('returns asset info with extra data when requested', async () => {
-        const res = await provider.getAsset(
-          Cardano.AssetId('50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65'),
-          { history: true, nftMetadata: true, tokenMetadata: true }
-        );
+        const res = await provider.getAsset({
+          assetId: Cardano.AssetId('50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65'),
+          extraData: { history: true, nftMetadata: true, tokenMetadata: true }
+        });
         const { history, nftMetadata, tokenMetadata } = res;
 
         expect(res).toMatchSnapshot();

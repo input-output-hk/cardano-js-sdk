@@ -48,9 +48,9 @@ describe('TrackedAssetProvider', () => {
     test(
       'getAsset',
       testFunctionStats(
-        (provider) => provider.getAsset(assetId, extraData),
+        (provider) => provider.getAsset({ assetId, extraData }),
         (stats) => stats.getAsset$,
-        () => expect(assetProvider.getAsset).toBeCalledWith(assetId, extraData)
+        () => expect(assetProvider.getAsset).toBeCalledWith({ assetId, extraData })
       )
     );
 

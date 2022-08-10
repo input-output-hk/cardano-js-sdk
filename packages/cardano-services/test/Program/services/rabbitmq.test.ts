@@ -191,7 +191,7 @@ describe('Service dependency abstractions', () => {
       });
 
       const txs = await txsPromise;
-      await expect(provider.submitTx(txs[0].txBodyUint8Array)).rejects.toBeInstanceOf(
+      await expect(provider.submitTx({ signedTransaction: txs[0].txBodyUint8Array })).rejects.toBeInstanceOf(
         Cardano.TxSubmissionErrors.EraMismatchError
       );
       expect(dnsResolverMock).toBeCalledTimes(2);

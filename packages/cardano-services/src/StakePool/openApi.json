@@ -17,7 +17,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/stakepoolsearch_search_body"
+                "$ref": "#/components/schemas/SearchStakePoolRequest"
               }
             }
           },
@@ -97,8 +97,7 @@
         }
       },
       "StakePoolStats_body": {
-        "type": "object",
-        "properties": { "args": { "type": "array" } }
+        "type": "object"
       },
       "SearchStakePoolRequest": {
         "type": "object",
@@ -316,17 +315,6 @@
           "__type": {
             "type": "string",
             "enum": ["bigint"]
-          }
-        }
-      },
-      "stakepoolsearch_search_body": {
-        "type": "object",
-        "properties": {
-          "args": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SearchStakePoolRequest"
-            }
           }
         }
       },

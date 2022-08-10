@@ -4,24 +4,27 @@ import { providerHandler } from '../../src/util';
 
 describe('util/provider', () => {
   describe('providerHandler', () => {
-    it('calls handler with {args} from request body, doesnt send any response', () => {
+    it('calls handler with request body, doesnt send any response', () => {
+      const body = {
+        field: 'value'
+      };
       const handler = jest.fn().mockImplementation((args) => {
-        expect(args[0]).toBe('arg');
+        expect(args).toBe(body);
       });
       const fn = jest.fn();
-      const req = { body: { args: ['arg'] } };
+      const req = { body };
       const res = { send: jest.fn(), status: jest.fn() };
       const next = {} as any;
       providerHandler(fn)(handler, dummyLogger)(req as any, res as any, next);
       expect(handler).toBeCalledTimes(1);
-      expect(handler).toBeCalledWith(['arg'], req, res, next, fn);
+      expect(handler).toBeCalledWith(body, req, res, next, fn);
       expect(res.send).not.toBeCalled();
       expect(res.status).not.toBeCalled();
     });
 
     it('given invalid request, sends 400 and does not call handler', () => {
       const handler = jest.fn();
-      const req = { body: { args: {} } };
+      const req = { body: 'invalidBody' };
       const res: any = {
         send: jest.fn(),
         status: jest.fn().mockImplementation(() => res)

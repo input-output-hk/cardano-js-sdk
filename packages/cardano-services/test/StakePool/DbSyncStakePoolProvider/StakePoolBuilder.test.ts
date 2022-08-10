@@ -1,6 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Cardano, StakePoolQueryOptions } from '@cardano-sdk/core';
+import { Cardano, QueryStakePoolsArgs } from '@cardano-sdk/core';
 import { Pool } from 'pg';
 import { StakePoolBuilder } from '../../../src';
 import { dummyLogger as logger } from 'ts-log';
@@ -13,7 +13,7 @@ describe('StakePoolBuilder', () => {
     await dbConnection.end();
   });
 
-  const filters: StakePoolQueryOptions['filters'] = {
+  const filters: QueryStakePoolsArgs['filters'] = {
     _condition: 'or',
     identifier: {
       _condition: 'and',
@@ -182,7 +182,7 @@ describe('StakePoolBuilder', () => {
       const activatingStatus = [Cardano.StakePoolStatus.Activating];
       const poolsByStatusQuery = builder.buildPoolsByStatusQuery(activatingStatus);
 
-      const _filters: StakePoolQueryOptions['filters'] = {
+      const _filters: QueryStakePoolsArgs['filters'] = {
         status: activatingStatus
       };
       const builtQuery = builder.buildOrQuery(_filters);
@@ -196,7 +196,7 @@ describe('StakePoolBuilder', () => {
       const activeStatus = [Cardano.StakePoolStatus.Active];
       const poolsByStatusQuery = builder.buildPoolsByStatusQuery(activeStatus);
 
-      const _filters: StakePoolQueryOptions['filters'] = {
+      const _filters: QueryStakePoolsArgs['filters'] = {
         status: activeStatus
       };
       const builtQuery = builder.buildOrQuery(_filters);
@@ -210,7 +210,7 @@ describe('StakePoolBuilder', () => {
       const retiringStatus = [Cardano.StakePoolStatus.Retiring];
       const poolsByStatusQuery = builder.buildPoolsByStatusQuery(retiringStatus);
 
-      const _filters: StakePoolQueryOptions['filters'] = {
+      const _filters: QueryStakePoolsArgs['filters'] = {
         status: retiringStatus
       };
       const builtQuery = builder.buildOrQuery(_filters);
@@ -224,7 +224,7 @@ describe('StakePoolBuilder', () => {
       const retiredStatus = [Cardano.StakePoolStatus.Retired];
       const poolsByStatusQuery = builder.buildPoolsByStatusQuery(retiredStatus);
 
-      const _filters: StakePoolQueryOptions['filters'] = {
+      const _filters: QueryStakePoolsArgs['filters'] = {
         status: retiredStatus
       };
       const builtQuery = builder.buildOrQuery(_filters);
@@ -238,7 +238,7 @@ describe('StakePoolBuilder', () => {
       const poolStatus = Object.values(Cardano.StakePoolStatus);
       const poolsByStatusQuery = builder.buildPoolsByStatusQuery(poolStatus);
 
-      const _filters: StakePoolQueryOptions['filters'] = {
+      const _filters: QueryStakePoolsArgs['filters'] = {
         status: poolStatus
       };
       const builtQuery = builder.buildOrQuery(_filters);

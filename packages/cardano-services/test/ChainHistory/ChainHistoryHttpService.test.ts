@@ -93,12 +93,12 @@ describe('ChainHistoryHttpService', () => {
       const url = '/blocks/by-hashes';
       describe('with Http Service', () => {
         it('returns a 200 coded response with a well formed HTTP request', async () => {
-          expect((await axios.post(`${baseUrl}${url}`, { args: [[]] })).status).toEqual(200);
+          expect((await axios.post(`${baseUrl}${url}`, { ids: [] })).status).toEqual(200);
         });
 
         it('returns a 415 coded response if the wrong content type header is used', async () => {
           try {
-            await axios.post(`${baseUrl}${url}`, { args: [[]] }, { headers: { 'Content-Type': APPLICATION_CBOR } });
+            await axios.post(`${baseUrl}${url}`, { ids: [] }, { headers: { 'Content-Type': APPLICATION_CBOR } });
             throw new Error('fail');
           } catch (error: any) {
             expect(error.response.status).toBe(415);
@@ -108,30 +108,30 @@ describe('ChainHistoryHttpService', () => {
       });
 
       it('returns an array of blocks', async () => {
-        const hashes: Cardano.BlockId[] = [
+        const ids: Cardano.BlockId[] = [
           Cardano.BlockId('7a48b034645f51743550bbaf81f8a14771e58856e031eb63844738ca8ad72298'),
           Cardano.BlockId('469cc6fbcc186de6b12c392ad0cc84a20c4d4774c1f9c3cfd80745de00856f4b')
         ];
-        const response = await provider.blocksByHashes(hashes);
+        const response = await provider.blocksByHashes({ ids });
         expect(response).toHaveLength(2);
       });
 
       it('does not include blocks not found', async () => {
-        const hashes: Cardano.BlockId[] = [
+        const ids: Cardano.BlockId[] = [
           Cardano.BlockId('7a48b034645f51743550bbaf81f8a14771e58856e031eb63844738ca8ad72298'),
           Cardano.BlockId('0000000000000000000000000000000000000000000000000000000000000000')
         ];
-        const response = await provider.blocksByHashes(hashes);
+        const response = await provider.blocksByHashes({ ids });
         expect(response).toHaveLength(1);
       });
 
       describe('server and snapshot testing', () => {
         it('has all block information', async () => {
-          const hashes: Cardano.BlockId[] = [
+          const ids: Cardano.BlockId[] = [
             Cardano.BlockId('7a48b034645f51743550bbaf81f8a14771e58856e031eb63844738ca8ad72298'),
             Cardano.BlockId('469cc6fbcc186de6b12c392ad0cc84a20c4d4774c1f9c3cfd80745de00856f4b')
           ];
-          const response = await provider.blocksByHashes(hashes);
+          const response = await provider.blocksByHashes({ ids });
           expect(response.length).toEqual(2);
           expect(response).toMatchSnapshot();
         });
@@ -142,12 +142,12 @@ describe('ChainHistoryHttpService', () => {
       const url = '/txs/by-hashes';
       describe('with Http Service', () => {
         it('returns a 200 coded response with a well formed HTTP request', async () => {
-          expect((await axios.post(`${baseUrl}${url}`, { args: [[]] })).status).toEqual(200);
+          expect((await axios.post(`${baseUrl}${url}`, { ids: [] })).status).toEqual(200);
         });
 
         it('returns a 415 coded response if the wrong content type header is used', async () => {
           try {
-            await axios.post(`${baseUrl}${url}`, { args: [[]] }, { headers: { 'Content-Type': APPLICATION_CBOR } });
+            await axios.post(`${baseUrl}${url}`, { ids: [] }, { headers: { 'Content-Type': APPLICATION_CBOR } });
             throw new Error('fail');
           } catch (error: any) {
             expect(error.response.status).toBe(415);
@@ -157,7 +157,7 @@ describe('ChainHistoryHttpService', () => {
       });
 
       it('returns an array of transactions', async () => {
-        const hashes: Cardano.TransactionId[] = [
+        const ids: Cardano.TransactionId[] = [
           Cardano.TransactionId('cefd2fcf657e5e5d6c35975f4e052f427819391b153ebb16ad8aa107ba5a3819'),
           Cardano.TransactionId('952dfa431223fd671c5e9e048e016f70fcebd9e41fcb726969415ff692736eeb'),
           Cardano.TransactionId('cb66e0f5778718f8bfcfd043712f37d9993f4703b254a7a4d954d34225fe2f99'),
@@ -167,25 +167,25 @@ describe('ChainHistoryHttpService', () => {
           Cardano.TransactionId('face165bd7aa8d0d661cf1ceaa4e35d7611be3b1c7997da378c547aa2464a4fd'),
           Cardano.TransactionId('19251f57476d7af2777252270413c01383d9503110a68b4fde1a239c119c4f5d')
         ];
-        const response = await provider.transactionsByHashes(hashes);
+        const response = await provider.transactionsByHashes({ ids });
         expect(response).toHaveLength(8);
       });
 
       it('does not include transactions not found', async () => {
-        const hashes: Cardano.TransactionId[] = [
+        const ids: Cardano.TransactionId[] = [
           Cardano.TransactionId('295d5e0f7ee182426eaeda8c9f1c63502c72cdf4afd6e0ee0f209adf94a614e7'),
           Cardano.TransactionId('0000000000000000000000000000000000000000000000000000000000000000')
         ];
-        const response = await provider.transactionsByHashes(hashes);
+        const response = await provider.transactionsByHashes({ ids });
         expect(response.length).toEqual(1);
       });
 
       describe('server and snapshot testing', () => {
         it('has outputs with multi-assets', async () => {
-          const hashes: Cardano.TransactionId[] = [
+          const ids: Cardano.TransactionId[] = [
             Cardano.TransactionId('cefd2fcf657e5e5d6c35975f4e052f427819391b153ebb16ad8aa107ba5a3819')
           ];
-          const response = await provider.transactionsByHashes(hashes);
+          const response = await provider.transactionsByHashes({ ids });
           const tx: Cardano.TxAlonzo = response[0];
           expect(response.length).toEqual(1);
           expect(tx.body.outputs[0].value.assets?.size).toBeGreaterThan(0);
@@ -193,10 +193,10 @@ describe('ChainHistoryHttpService', () => {
         });
 
         it('has mint operations', async () => {
-          const hashes: Cardano.TransactionId[] = [
+          const ids: Cardano.TransactionId[] = [
             Cardano.TransactionId('952dfa431223fd671c5e9e048e016f70fcebd9e41fcb726969415ff692736eeb')
           ];
-          const response = await provider.transactionsByHashes(hashes);
+          const response = await provider.transactionsByHashes({ ids });
           const tx: Cardano.TxAlonzo = response[0];
           expect(response.length).toEqual(1);
           expect(response).toMatchSnapshot();
@@ -204,10 +204,10 @@ describe('ChainHistoryHttpService', () => {
         });
 
         it('has withdrawals', async () => {
-          const hashes: Cardano.TransactionId[] = [
+          const ids: Cardano.TransactionId[] = [
             Cardano.TransactionId('cb66e0f5778718f8bfcfd043712f37d9993f4703b254a7a4d954d34225fe2f99')
           ];
-          const response = await provider.transactionsByHashes(hashes);
+          const response = await provider.transactionsByHashes({ ids });
           const tx: Cardano.TxAlonzo = response[0];
           expect(response.length).toEqual(1);
           expect(response).toMatchSnapshot();
@@ -215,10 +215,10 @@ describe('ChainHistoryHttpService', () => {
         });
 
         it('has redeemers', async () => {
-          const hashes: Cardano.TransactionId[] = [
+          const ids: Cardano.TransactionId[] = [
             Cardano.TransactionId('24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e')
           ];
-          const response = await provider.transactionsByHashes(hashes);
+          const response = await provider.transactionsByHashes({ ids });
           const tx: Cardano.TxAlonzo = response[0];
           expect(response.length).toEqual(1);
           expect(response).toMatchSnapshot();
@@ -226,10 +226,10 @@ describe('ChainHistoryHttpService', () => {
         });
 
         it('has auxiliary data', async () => {
-          const hashes: Cardano.TransactionId[] = [
+          const ids: Cardano.TransactionId[] = [
             Cardano.TransactionId('3d2278e9cef71c79720a11bc3e08acbbd5f2175f7015d358c867fc9b419ae0b2')
           ];
-          const response = await provider.transactionsByHashes(hashes);
+          const response = await provider.transactionsByHashes({ ids });
           const tx: Cardano.TxAlonzo = response[0];
           expect(response.length).toEqual(1);
           expect(response).toMatchSnapshot();
@@ -237,10 +237,10 @@ describe('ChainHistoryHttpService', () => {
         });
 
         it('has collateral inputs', async () => {
-          const hashes: Cardano.TransactionId[] = [
+          const ids: Cardano.TransactionId[] = [
             Cardano.TransactionId('5acd6efb1b66299f1c5a2c4221af4bcaa4ba9929e8e6aa0e3f48707fa1796fc3')
           ];
-          const response = await provider.transactionsByHashes(hashes);
+          const response = await provider.transactionsByHashes({ ids });
           const tx: Cardano.TxAlonzo = response[0];
           expect(response.length).toEqual(1);
           expect(response).toMatchSnapshot();
@@ -248,11 +248,11 @@ describe('ChainHistoryHttpService', () => {
         });
 
         it('has certificates', async () => {
-          const hashes: Cardano.TransactionId[] = [
+          const ids: Cardano.TransactionId[] = [
             Cardano.TransactionId('face165bd7aa8d0d661cf1ceaa4e35d7611be3b1c7997da378c547aa2464a4fd'),
             Cardano.TransactionId('19251f57476d7af2777252270413c01383d9503110a68b4fde1a239c119c4f5d')
           ];
-          const response = await provider.transactionsByHashes(hashes);
+          const response = await provider.transactionsByHashes({ ids });
           const tx1: Cardano.TxAlonzo = response[0];
           const tx2: Cardano.TxAlonzo = response[1];
           expect(response.length).toEqual(2);
@@ -267,12 +267,12 @@ describe('ChainHistoryHttpService', () => {
       const url = '/txs/by-addresses';
       describe('with Http Server', () => {
         it('returns a 200 coded response with a well formed HTTP request', async () => {
-          expect((await axios.post(`${baseUrl}${url}`, { args: [{ addresses: [] }] })).status).toEqual(200);
+          expect((await axios.post(`${baseUrl}${url}`, { addresses: [] })).status).toEqual(200);
         });
 
         it('returns a 415 coded response if the wrong content type header is used', async () => {
           try {
-            await axios.post(`${baseUrl}${url}`, { args: [[]] }, { headers: { 'Content-Type': APPLICATION_CBOR } });
+            await axios.post(`${baseUrl}${url}`, { addresses: [] }, { headers: { 'Content-Type': APPLICATION_CBOR } });
             throw new Error('fail');
           } catch (error: any) {
             expect(error.response.status).toBe(415);

@@ -87,15 +87,11 @@ describe('RewardsHttpService', () => {
         expect(
           (
             await axios.post(`${baseUrl}${historyUrl}`, {
-              args: [
-                {
-                  epochs: {
-                    lowerBound: 1,
-                    upperBound: 14
-                  },
-                  rewardAccounts: [rewardAddress]
-                }
-              ]
+              epochs: {
+                lowerBound: 1,
+                upperBound: 14
+              },
+              rewardAccounts: [rewardAddress]
             })
           ).status
         ).toEqual(200);
@@ -105,11 +101,7 @@ describe('RewardsHttpService', () => {
           await axios.post(
             `${baseUrl}${historyUrl}`,
             {
-              args: [
-                {
-                  rewardAccounts: [rewardAddress]
-                }
-              ]
+              rewardAccounts: [rewardAddress]
             },
             { headers: { 'Content-Type': APPLICATION_CBOR } }
           );
@@ -121,7 +113,7 @@ describe('RewardsHttpService', () => {
 
       it('returns 400 coded respons if the request is bad formed', async () => {
         try {
-          await axios.post(`${baseUrl}${historyUrl}`, { args: [{ field: 'value' }] });
+          await axios.post(`${baseUrl}${historyUrl}`, { field: 'value' });
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
           expect(error.response.status).toBe(400);
@@ -132,12 +124,12 @@ describe('RewardsHttpService', () => {
 
     describe('/account-balance', () => {
       const accountBalanceUrl = '/account-balance';
-      const rewardAddress = 'stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27';
+      const rewardAccount = 'stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27';
       it('returns a 200 coded response with a well formed HTTP request', async () => {
         expect(
           (
             await axios.post(`${baseUrl}${accountBalanceUrl}`, {
-              args: [rewardAddress]
+              rewardAccount
             })
           ).status
         ).toEqual(200);
@@ -146,7 +138,7 @@ describe('RewardsHttpService', () => {
         try {
           await axios.post(
             `${baseUrl}${accountBalanceUrl}`,
-            { args: [rewardAddress] },
+            { rewardAccount },
             { headers: { 'Content-Type': APPLICATION_CBOR } }
           );
         } catch (error: any) {
@@ -156,7 +148,7 @@ describe('RewardsHttpService', () => {
       });
       it('returns 400 coded respons if the request is bad formed', async () => {
         try {
-          await axios.post(`${baseUrl}${accountBalanceUrl}`, { args: [{ address: 'asd' }] });
+          await axios.post(`${baseUrl}${accountBalanceUrl}`, { address: 'asd' });
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
           expect(error.response.status).toBe(400);
@@ -170,23 +162,23 @@ describe('RewardsHttpService', () => {
       beforeEach(() => {
         provider = rewardsHttpProvider(clientConfig);
       });
-      const rewardAcc = Cardano.RewardAccount('stake_test1upd9j9rwxeu44xfxnrl6sqsswf9k60gcdjuy2gz6zyu2jmqyvn80c');
+      const rewardAccount = Cardano.RewardAccount('stake_test1upd9j9rwxeu44xfxnrl6sqsswf9k60gcdjuy2gz6zyu2jmqyvn80c');
       describe('rewardAccountBalance', () => {
         it('returns address balance', async () => {
-          const response = await provider.rewardAccountBalance(rewardAcc);
+          const response = await provider.rewardAccountBalance({ rewardAccount });
           expect(response).toMatchSnapshot();
         });
         it('returns address balance 0 when it has no rewards', async () => {
-          const response = await provider.rewardAccountBalance(
-            Cardano.RewardAccount('stake_test1uzxvhl83q8ujv2yvpy6n2krvpdlqqx28h7e9vsk6re43h3c3kufy6')
-          );
+          const response = await provider.rewardAccountBalance({
+            rewardAccount: Cardano.RewardAccount('stake_test1uzxvhl83q8ujv2yvpy6n2krvpdlqqx28h7e9vsk6re43h3c3kufy6')
+          });
           expect(response).toMatchSnapshot();
         });
       });
       describe('rewardsHistory', () => {
         it('returns rewards address history', async () => {
           const response = await provider.rewardsHistory({
-            rewardAccounts: [rewardAcc]
+            rewardAccounts: [rewardAccount]
           });
           expect(response).toMatchSnapshot();
         });
@@ -214,7 +206,7 @@ describe('RewardsHttpService', () => {
             epochs: {
               lowerBound: 10
             },
-            rewardAccounts: [rewardAcc]
+            rewardAccounts: [rewardAccount]
           });
           expect(response).toMatchSnapshot();
         });
@@ -223,7 +215,7 @@ describe('RewardsHttpService', () => {
             epochs: {
               upperBound: 10
             },
-            rewardAccounts: [rewardAcc]
+            rewardAccounts: [rewardAccount]
           });
           expect(response).toMatchSnapshot();
         });

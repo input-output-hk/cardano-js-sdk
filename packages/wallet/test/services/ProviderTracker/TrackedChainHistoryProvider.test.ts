@@ -59,7 +59,7 @@ describe('TrackedChainHistoryProvider', () => {
     test(
       'blocksByHashes',
       testFunctionStats(
-        (provider) => provider.blocksByHashes([]),
+        (provider) => provider.blocksByHashes({ ids: [] }),
         (stats) => stats.blocksByHashes$,
         (mock) => mock.blocksByHashes
       )
@@ -86,7 +86,7 @@ describe('TrackedChainHistoryProvider', () => {
     test(
       'transactionsByHashes',
       testFunctionStats(
-        (provider) => provider.transactionsByHashes([]),
+        (provider) => provider.transactionsByHashes({ ids: [] }),
         (stats) => stats.transactionsByHashes$,
         (mock) => mock.transactionsByHashes
       )

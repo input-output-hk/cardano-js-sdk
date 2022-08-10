@@ -46,7 +46,7 @@ describe('txSubmitHttpProvider', () => {
       it('resolves if successful', async () => {
         axiosMock.onPost().replyOnce(200, '');
         const provider = txSubmitHttpProvider(config);
-        await expect(provider.submitTx(new Uint8Array())).resolves.not.toThrow();
+        await expect(provider.submitTx({ signedTransaction: new Uint8Array() })).resolves.not.toThrow();
       });
 
       describe('errors', () => {
@@ -56,7 +56,7 @@ describe('txSubmitHttpProvider', () => {
               throw axiosError(bodyError);
             });
             const provider = txSubmitHttpProvider(config);
-            await provider.submitTx(new Uint8Array());
+            await provider.submitTx({ signedTransaction: new Uint8Array() });
             throw new Error('Expected to throw');
           } catch (error) {
             if (error instanceof ProviderError) {

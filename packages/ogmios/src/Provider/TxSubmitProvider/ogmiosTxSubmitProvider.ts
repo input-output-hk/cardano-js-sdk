@@ -41,7 +41,7 @@ export const ogmiosTxSubmitProvider = (connectionConfig: ConnectionConfig, logge
       throw new ProviderError(ProviderFailure.Unknown, error);
     }
   },
-  submitTx: async (signedTransaction) => {
+  submitTx: async ({ signedTransaction }) => {
     // The Ogmios client supports opening a long-running ws connection,
     // however as the provider interface doesn't include shutdown handling,
     // we're using the one time interaction type for now.

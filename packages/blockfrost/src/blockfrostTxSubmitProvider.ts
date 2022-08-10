@@ -10,7 +10,7 @@ import { healthCheck } from './util';
  * @throws {Cardano.TxSubmissionErrors.UnknownTxSubmissionError}
  */
 export const blockfrostTxSubmitProvider = (blockfrost: BlockFrostAPI): TxSubmitProvider => {
-  const submitTx: TxSubmitProvider['submitTx'] = async (signedTransaction) => {
+  const submitTx: TxSubmitProvider['submitTx'] = async ({ signedTransaction }) => {
     try {
       await blockfrost.txSubmit(signedTransaction);
     } catch (error) {

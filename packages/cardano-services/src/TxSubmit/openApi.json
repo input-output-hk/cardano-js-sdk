@@ -62,13 +62,11 @@
         }
       },
       "txsubmit_submit_body": {
+        "required": ["signedTransaction"],
         "type": "object",
         "properties": {
-          "args": {
-            "type": "array",
-            "items": {
-              "$ref":"#/components/schemas/TypifiedValue"
-            }
+          "signedTransaction": {
+            "$ref": "#/components/schemas/TypifiedValue"
           }
         }
       }

@@ -323,7 +323,7 @@ describe('Service dependency abstractions', () => {
         serviceDiscoveryTimeout: 1000
       });
 
-      await expect(provider.submitTx(new Uint8Array([]))).rejects.toBeInstanceOf(
+      await expect(provider.submitTx({ signedTransaction: new Uint8Array([]) })).rejects.toBeInstanceOf(
         Cardano.TxSubmissionErrors.EraMismatchError
       );
       expect(dnsResolverMock).toBeCalledTimes(2);

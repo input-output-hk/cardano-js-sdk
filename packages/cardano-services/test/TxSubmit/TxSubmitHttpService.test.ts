@@ -10,7 +10,7 @@ import { dummyLogger as logger } from 'ts-log';
 import axios from 'axios';
 import cbor from 'cbor';
 
-const serializeProviderArg = (arg: unknown) => JSON.stringify({ args: [toSerializableObject(arg)] });
+const serializeProviderArg = (arg: unknown) => JSON.stringify({ signedTransaction: toSerializableObject(arg) });
 const bodyTx = serializeProviderArg(cbor.encode('#####'));
 const UNSUPPORTED_MEDIA_STRING = 'Request failed with status code 415';
 const APPLICATION_CBOR = 'application/cbor';
@@ -123,8 +123,8 @@ describe('TxSubmitHttpService', () => {
 
     describe('/submit', () => {
       it('calls underlying TxSubmitProvider with a valid argument', async () => {
-        (txSubmitProvider.submitTx as jest.Mock).mockImplementation(async (tx) => {
-          expect(ArrayBuffer.isView(tx)).toBe(true);
+        (txSubmitProvider.submitTx as jest.Mock).mockImplementation(async ({ signedTransaction }) => {
+          expect(ArrayBuffer.isView(signedTransaction)).toBe(true);
         });
         expect(
           (
@@ -187,7 +187,7 @@ describe('TxSubmitHttpService', () => {
         expect.assertions(2);
         const clientProvider = txSubmitHttpProvider(clientConfig);
         try {
-          await clientProvider.submitTx(new Uint8Array());
+          await clientProvider.submitTx({ signedTransaction: new Uint8Array() });
         } catch (error: any) {
           if (error instanceof ProviderError) {
             const innerError = error.innerError as Cardano.TxSubmissionError;

@@ -43,11 +43,11 @@ describe('DbSyncAssetProvider', () => {
   });
 
   it('rejects for not found assetId', async () => {
-    await expect(provider.getAsset(notValidAssetId)).rejects.toThrow(ProviderError);
+    await expect(provider.getAsset({ assetId: notValidAssetId })).rejects.toThrow(ProviderError);
   });
 
   it('returns an AssetInfo without extra data', async () => {
-    expect(await provider.getAsset(validAssetId)).toEqual({
+    expect(await provider.getAsset({ assetId: validAssetId })).toEqual({
       assetId: '50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65',
       fingerprint: 'asset1f0azzptnr8dghzjh7egqvdjmt33e3lz5uy59th',
       mintOrBurnCount: 1,
@@ -58,7 +58,10 @@ describe('DbSyncAssetProvider', () => {
   });
 
   it('returns an AssetInfo with extra data', async () => {
-    const asset = await provider.getAsset(validAssetId, { history: true, nftMetadata: true, tokenMetadata: true });
+    const asset = await provider.getAsset({
+      assetId: validAssetId,
+      extraData: { history: true, nftMetadata: true, tokenMetadata: true }
+    });
 
     expect(asset.history).toEqual([
       { quantity: BigInt(1), transactionId: 'f66791a0354c43d8c5a93671eb96d94633e3419f3ccbb0a00c00a152d3b6ca06' }

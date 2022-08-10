@@ -53,7 +53,7 @@ export abstract class HttpService extends RunnableModule {
   static routeHandler(logger: Logger): ProviderHandler {
     return async (args, _r, res, _n, handler) => {
       try {
-        return HttpServer.sendJSON(res, await handler(...args));
+        return HttpServer.sendJSON(res, await handler(args));
       } catch (error) {
         logger.error(error);
 

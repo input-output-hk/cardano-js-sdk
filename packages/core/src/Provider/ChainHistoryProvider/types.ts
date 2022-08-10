@@ -4,8 +4,8 @@ export type TransactionsByAddressesArgs = {
   addresses: Cardano.Address[];
   sinceBlock?: Cardano.BlockNo;
 };
-export type TransactionsByHashesArgs = Cardano.TransactionId[];
-export type BlocksByHashesArgs = Cardano.BlockId[];
+export type TransactionsByIdsArgs = { ids: Cardano.TransactionId[] };
+export type BlocksByIdsArgs = { ids: Cardano.BlockId[] };
 
 export interface ChainHistoryProvider extends Provider {
   /**
@@ -20,15 +20,15 @@ export interface ChainHistoryProvider extends Provider {
   /**
    * Gets the transactions matching the provided hashes.
    *
-   * @param {Cardano.TransactionId[]} hashes array of transaction ids
+   * @param {Cardano.TransactionId[]} ids array of transaction ids
    * @returns {Cardano.TxAlonzo[]} an array of transactions
    */
-  transactionsByHashes: (args: TransactionsByHashesArgs) => Promise<Cardano.TxAlonzo[]>;
+  transactionsByHashes: (args: TransactionsByIdsArgs) => Promise<Cardano.TxAlonzo[]>;
   /**
    * Gets the blocks matching the provided hashes.
    *
-   * @param {Cardano.BlockId[]} hashes array of block ids
+   * @param {Cardano.BlockId[]} ids array of block ids
    * @returns {Cardano.Block[]} an array of blocks, same length and in the same order as `hashes` argument.
    */
-  blocksByHashes: (args: BlocksByHashesArgs) => Promise<Cardano.Block[]>;
+  blocksByHashes: (args: BlocksByIdsArgs) => Promise<Cardano.Block[]>;
 }

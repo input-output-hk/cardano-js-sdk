@@ -31,7 +31,7 @@ export class TrackedAssetProvider extends ProviderTracker implements AssetProvid
 
     this.healthCheck = () => this.trackedCall(() => assetProvider.healthCheck(), this.stats.healthCheck$);
 
-    this.getAsset = (assetId, extraData) =>
-      this.trackedCall(() => assetProvider.getAsset(assetId, extraData), this.stats.getAsset$);
+    this.getAsset = ({ assetId, extraData }) =>
+      this.trackedCall(() => assetProvider.getAsset({ assetId, extraData }), this.stats.getAsset$);
   }
 }

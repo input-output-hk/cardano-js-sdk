@@ -5,11 +5,15 @@ interface AssetExtraData {
   tokenMetadata?: boolean;
   history?: boolean;
 }
+export interface GetAssetArgs {
+  assetId: Cardano.AssetId;
+  extraData?: AssetExtraData;
+}
 
 export interface AssetProvider extends Provider {
   /**
    * @param id asset ID (concatenated hex values of policyId + assetName)
    * @throws ProviderError
    */
-  getAsset: (id: Cardano.AssetId, extraData?: AssetExtraData) => Promise<Asset.AssetInfo>;
+  getAsset: (args: GetAssetArgs) => Promise<Asset.AssetInfo>;
 }

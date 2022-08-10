@@ -48,7 +48,7 @@ describe('TrackedTxSubmitProvider', () => {
     test(
       'submitTx',
       testFunctionStats(
-        (provider) => provider.submitTx(new Uint8Array()),
+        (provider) => provider.submitTx({ signedTransaction: new Uint8Array() }),
         (stats) => stats.submitTx$
       )
     );

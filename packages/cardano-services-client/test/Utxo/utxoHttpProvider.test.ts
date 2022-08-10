@@ -44,11 +44,13 @@ describe('utxoHttpProvider', () => {
       axiosMock.onPost().replyOnce(200, []);
       const provider = utxoHttpProvider(config);
       await expect(
-        provider.utxoByAddresses([
-          Cardano.Address(
-            'addr_test1qretqkqqvc4dax3482tpjdazrfl8exey274m3mzch3dv8lu476aeq3kd8q8splpsswcfmv4y370e8r76rc8lnnhte49qqyjmtc'
-          )
-        ])
+        provider.utxoByAddresses({
+          addresses: [
+            Cardano.Address(
+              'addr_test1qretqkqqvc4dax3482tpjdazrfl8exey274m3mzch3dv8lu476aeq3kd8q8splpsswcfmv4y370e8r76rc8lnnhte49qqyjmtc'
+            )
+          ]
+        })
       ).resolves.toEqual([]);
     });
   });
