@@ -1,10 +1,15 @@
 {
   "extends": "../../../tsconfig.json",
   "compilerOptions": {
-    "outDir": "../dist/cjs",
-    "rootDir": "."
+    "outDir": "../dist/cjs"
   },
   "references": [
+    {
+      "path": "../../blockfrost/src"
+    },
+    {
+      "path": "../../cardano-services/src"
+    },
     {
       "path": "../../util-dev/src"
     },
@@ -13,9 +18,6 @@
     },
     {
       "path": "../../wallet/src"
-    },
-    {
-      "path": "../../cardano-services/src"
     }
   ]
 }

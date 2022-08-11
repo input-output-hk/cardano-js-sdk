@@ -1,6 +1,7 @@
+import { Logger } from 'ts-log';
 import { RabbitMqTxSubmitProvider } from '../src/rabbitmqTxSubmitProvider';
 import { connect } from 'amqplib';
-import { dummyLogger } from 'ts-log';
+import { contextLogger } from '@cardano-sdk/util';
 import { getRandomPort } from 'get-port-please';
 import { imageExists, pullImageAsync } from 'dockerode-utils';
 import { readFile, writeFile } from 'fs/promises';
@@ -151,10 +152,10 @@ export class RabbitMQContainer {
   /**
    * Enqueues a transaction to RabbitMQ
    *
-   * @param idx the index of the tx in transactions.txt file
    * @param logger the logger object
+   * @param idx the index of the tx in transactions.txt file
    */
-  enqueueTx(idx = 0, logger = dummyLogger) {
+  enqueueTx(logger: Logger, idx = 0) {
     const { rabbitmqUrl } = this.getPublicProperties();
 
     return new Promise<void>(async (resolve, reject) => {
@@ -163,7 +164,10 @@ export class RabbitMQContainer {
       let rabbitMqTxSubmitProvider: RabbitMqTxSubmitProvider | null = null;
 
       try {
-        rabbitMqTxSubmitProvider = new RabbitMqTxSubmitProvider({ rabbitmqUrl }, { logger });
+        rabbitMqTxSubmitProvider = new RabbitMqTxSubmitProvider(
+          { rabbitmqUrl },
+          { logger: contextLogger(logger, 'enqueueTx') }
+        );
         await rabbitMqTxSubmitProvider.submitTx(txs[idx].txBodyUint8Array);
       } catch (error) {
         err = error;

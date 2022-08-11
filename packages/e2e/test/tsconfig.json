@@ -3,11 +3,13 @@
   "compilerOptions": {
     "baseUrl": "."
   },
+  "exclude": ["./web-extension"],
   "include": [
+    "./**/*.ts",
     "../../ogmios/test",
     "../../rabbitmq/test",
     "../../wallet/test",
-    "../../cip2/test/util",
+    "../../cip2/test/util"
   ],
   "references": [
     {
