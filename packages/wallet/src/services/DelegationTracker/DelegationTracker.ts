@@ -1,6 +1,7 @@
 import { Cardano, ChainHistoryProvider, EraSummary, SlotEpochCalc, createSlotEpochCalc } from '@cardano-sdk/core';
 import { DelegationTracker, TransactionsTracker } from '../types';
-import { Observable, combineLatest, map } from 'rxjs';
+import { Logger } from 'ts-log';
+import { Observable, combineLatest, map, tap } from 'rxjs';
 import {
   ObservableRewardsProvider,
   ObservableStakePoolProvider,
@@ -10,7 +11,7 @@ import {
 } from './RewardAccounts';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { RewardsHistoryProvider, createRewardsHistoryProvider, createRewardsHistoryTracker } from './RewardsHistory';
-import { Shutdown } from '@cardano-sdk/util';
+import { Shutdown, contextLogger } from '@cardano-sdk/util';
 import { TrackedRewardsProvider, TrackedStakePoolProvider } from '../ProviderTracker';
 import { TrackerSubject } from '@cardano-sdk/util-rxjs';
 import { TxWithEpoch } from './types';
@@ -43,6 +44,7 @@ export interface DelegationTrackerProps {
     rewardsHistoryProvider?: RewardsHistoryProvider;
     slotEpochCalc$?: Observable<SlotEpochCalc>;
   };
+  logger: Logger;
 }
 
 export const certificateTransactionsWithEpochs = (
@@ -69,6 +71,7 @@ export const createDelegationTracker = ({
   eraSummaries$,
   stakePoolProvider,
   stores,
+  logger,
   internals: {
     queryStakePoolsProvider = createQueryStakePoolsProvider(stakePoolProvider, stores.stakePools, retryBackoffConfig),
     rewardsHistoryProvider = createRewardsHistoryProvider(rewardsTracker, retryBackoffConfig),
@@ -90,9 +93,15 @@ export const createDelegationTracker = ({
       Cardano.CertificateType.StakeKeyRegistration,
       Cardano.CertificateType.StakeKeyDeregistration
     ]
-  );
+  ).pipe(tap((transactionsWithEpochs) => logger.debug(`Found ${transactionsWithEpochs.length} staking transactions`)));
   const rewardsHistory$ = new TrackerSubject(
-    createRewardsHistoryTracker(transactions$, rewardAccountAddresses$, rewardsHistoryProvider, stores.rewardsHistory)
+    createRewardsHistoryTracker(
+      transactions$,
+      rewardAccountAddresses$,
+      rewardsHistoryProvider,
+      stores.rewardsHistory,
+      contextLogger(logger, 'rewardsHistory$')
+    )
   );
   const rewardAccounts$ = new TrackerSubject(
     createRewardAccountsTracker({
@@ -111,6 +120,7 @@ export const createDelegationTracker = ({
     shutdown: () => {
       rewardAccounts$.complete();
       rewardsHistory$.complete();
+      logger.debug('Shutdown');
     }
   };
 };

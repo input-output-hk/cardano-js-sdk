@@ -5,13 +5,16 @@ import { FailedTx, TransactionFailure, createAddressTransactionsProvider, create
 import { InMemoryInFlightTransactionsStore, InMemoryTransactionsStore, WalletStores } from '../../src/persistence';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
+import { dummyLogger } from 'ts-log';
 import delay from 'delay';
 
 describe('TransactionsTracker', () => {
+  const logger = dummyLogger;
+
   describe('createAddressTransactionsProvider', () => {
     let store: InMemoryTransactionsStore;
     let chainHistoryProvider: ChainHistoryProviderStub;
-    const tip$ = of(300);
+    const tipBlockHeight$ = of(300);
     const retryBackoffConfig = { initialInterval: 1 }; // not relevant
     const addresses = [queryTransactionsResult[0].body.inputs[0].address!];
 
@@ -22,13 +25,14 @@ describe('TransactionsTracker', () => {
     });
 
     it('if store is empty, stores and emits transactions resolved by ChainHistoryProvider', async () => {
-      const provider$ = createAddressTransactionsProvider(
+      const provider$ = createAddressTransactionsProvider({
+        addresses$: of(addresses),
         chainHistoryProvider,
-        of(addresses),
+        logger,
         retryBackoffConfig,
-        tip$,
-        store
-      ).transactionsSource$;
+        store,
+        tipBlockHeight$
+      }).transactionsSource$;
       expect(await firstValueFrom(provider$)).toEqual(queryTransactionsResult);
       expect(store.setAll).toBeCalledTimes(1);
       expect(store.setAll).toBeCalledWith(queryTransactionsResult);
@@ -39,13 +43,14 @@ describe('TransactionsTracker', () => {
       chainHistoryProvider.transactionsByAddresses = jest
         .fn()
         .mockImplementation(() => delay(50).then(() => queryTransactionsResult));
-      const provider$ = createAddressTransactionsProvider(
+      const provider$ = createAddressTransactionsProvider({
+        addresses$: of(addresses),
         chainHistoryProvider,
-        of(addresses),
+        logger,
         retryBackoffConfig,
-        tip$,
-        store
-      ).transactionsSource$;
+        store,
+        tipBlockHeight$
+      }).transactionsSource$;
       expect(await firstValueFrom(provider$.pipe(bufferCount(2)))).toEqual([
         [queryTransactionsResult[0]],
         queryTransactionsResult
@@ -63,21 +68,29 @@ describe('TransactionsTracker', () => {
       chainHistoryProvider.transactionsByAddresses = jest
         .fn()
         .mockImplementationOnce(() => delay(50).then(() => []))
+        .mockImplementationOnce(() => delay(50).then(() => []))
         .mockImplementationOnce(() => delay(50).then(() => [queryTransactionsResult[0]]));
-      const provider$ = createAddressTransactionsProvider(
+      const { transactionsSource$: provider$, rollback$ } = createAddressTransactionsProvider({
+        addresses$: of(addresses),
         chainHistoryProvider,
-        of(addresses),
+        logger,
         retryBackoffConfig,
-        tip$,
-        store
-      ).transactionsSource$;
+        store,
+        tipBlockHeight$
+      });
+
+      const rollbacks: Cardano.TxAlonzo[] = [];
+      rollback$.subscribe((tx) => rollbacks.push(tx));
+
       expect(await firstValueFrom(provider$.pipe(bufferCount(2)))).toEqual([
-        queryTransactionsResult,
-        [queryTransactionsResult[0]]
+        queryTransactionsResult, // from store
+        [queryTransactionsResult[0]] // store + chain history
       ]);
-      // expect(await firstValueFrom(rollback$)).toEqual(queryTransactionsResult[1]);
+
+      expect(rollbacks).toEqual([queryTransactionsResult[1], queryTransactionsResult[0]]);
+
       expect(store.setAll).toBeCalledTimes(2);
-      expect(chainHistoryProvider.transactionsByAddresses).toBeCalledTimes(2);
+      expect(chainHistoryProvider.transactionsByAddresses).toBeCalledTimes(3);
       expect(chainHistoryProvider.transactionsByAddresses).nthCalledWith(1, {
         addresses,
         sinceBlock: queryTransactionsResult[1].blockHeader.blockNo
@@ -85,6 +98,9 @@ describe('TransactionsTracker', () => {
       expect(chainHistoryProvider.transactionsByAddresses).nthCalledWith(2, {
         addresses,
         sinceBlock: queryTransactionsResult[0].blockHeader.blockNo
+      });
+      expect(chainHistoryProvider.transactionsByAddresses).nthCalledWith(3, {
+        addresses
       });
     });
   });
@@ -123,6 +139,7 @@ describe('TransactionsTracker', () => {
             addresses$,
             chainHistoryProvider,
             inFlightTransactionsStore,
+            logger,
             newTransactions: {
               failedToSubmit$,
               pending$,
@@ -167,6 +184,7 @@ describe('TransactionsTracker', () => {
             addresses$,
             chainHistoryProvider,
             inFlightTransactionsStore,
+            logger,
             newTransactions: {
               failedToSubmit$,
               pending$,
@@ -210,6 +228,7 @@ describe('TransactionsTracker', () => {
             addresses$,
             chainHistoryProvider,
             inFlightTransactionsStore,
+            logger,
             newTransactions: {
               failedToSubmit$,
               pending$,
@@ -255,6 +274,7 @@ describe('TransactionsTracker', () => {
             addresses$,
             chainHistoryProvider,
             inFlightTransactionsStore,
+            logger,
             newTransactions: {
               failedToSubmit$,
               pending$,
@@ -316,6 +336,7 @@ describe('TransactionsTracker', () => {
             addresses$,
             chainHistoryProvider,
             inFlightTransactionsStore,
+            logger,
             newTransactions: {
               failedToSubmit$,
               pending$,
@@ -387,6 +408,7 @@ describe('TransactionsTracker', () => {
             addresses$,
             chainHistoryProvider,
             inFlightTransactionsStore,
+            logger,
             newTransactions: {
               failedToSubmit$,
               pending$,
