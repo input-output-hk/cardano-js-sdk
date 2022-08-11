@@ -1,15 +1,12 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import { INFO, createLogger } from 'bunyan';
 import { ProviderFailure } from '@cardano-sdk/core';
 import { axiosError } from '../util';
 import { chainHistoryHttpProvider } from '../../src';
+import { logger } from '@cardano-sdk/util-dev';
 import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
 
-const config = {
-  baseUrl: 'http://some-hostname:3000/history',
-  logger: createLogger({ level: INFO, name: 'unit tests' })
-};
+const config = { baseUrl: 'http://some-hostname:3000/history', logger };
 
 describe('chainHistoryProvider', () => {
   describe('healthCheck', () => {
