@@ -1,12 +1,12 @@
-import { BAD_CONNECTION_URL, testLogger, txsPromise } from './utils';
+import { BAD_CONNECTION_URL, txsPromise } from './utils';
 import { ProviderError, TxSubmitProvider } from '@cardano-sdk/core';
 import { RabbitMQContainer } from './docker';
 import { RabbitMqTxSubmitProvider, TxSubmitWorker } from '../src';
+import { logger } from '@cardano-sdk/util-dev';
 
 describe('RabbitMqTxSubmitProvider', () => {
   const container = new RabbitMQContainer();
 
-  let logger: ReturnType<typeof testLogger>;
   let provider: TxSubmitProvider | undefined;
   let rabbitmqUrl: URL;
 
@@ -16,7 +16,6 @@ describe('RabbitMqTxSubmitProvider', () => {
 
   beforeEach(async () => {
     await container.removeQueues();
-    logger = testLogger();
   });
 
   afterEach(async () => {
@@ -24,9 +23,6 @@ describe('RabbitMqTxSubmitProvider', () => {
       await provider.close!();
       provider = undefined;
     }
-
-    // Uncomment this to have evidence of all the log messages
-    // console.log(logger.messages);
   });
 
   describe('healthCheck', () => {

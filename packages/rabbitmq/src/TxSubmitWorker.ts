@@ -283,7 +283,7 @@ export class TxSubmitWorker extends EventEmitter {
       txId = Cardano.util.deserializeTx(txBody).id.toString();
 
       this.#dependencies.logger.info(`${moduleName}: submitting tx #${counter} id: ${txId}`);
-      this.#dependencies.logger.debug(`${moduleName}: tx #${counter} dump:`, content.toString('hex'));
+      this.#dependencies.logger.debug(`${moduleName}: tx #${counter} dump:`, [content.toString('hex')]);
       await this.#dependencies.txSubmitProvider.submitTx(txBody);
 
       this.#dependencies.logger.debug(`${moduleName}: ACKing RabbitMQ message #${counter}`);

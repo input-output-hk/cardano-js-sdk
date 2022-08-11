@@ -26,16 +26,3 @@ export const txsPromise = (async () => {
 
   return ret;
 })();
-
-export const testLogger = () => {
-  const messages: { message: unknown[]; level: 'debug' | 'error' | 'info' | 'trace' | 'warn' }[] = [];
-
-  return {
-    debug: (...message: unknown[]) => messages.push({ level: 'debug', message }),
-    error: (...message: unknown[]) => messages.push({ level: 'error', message }),
-    info: (...message: unknown[]) => messages.push({ level: 'info', message }),
-    messages,
-    trace: (...message: unknown[]) => messages.push({ level: 'trace', message }),
-    warn: (...message: unknown[]) => messages.push({ level: 'warn', message })
-  };
-};

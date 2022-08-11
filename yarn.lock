@@ -1989,6 +1989,7 @@ __metadata:
     "@cardano-sdk/core": 0.4.0
     "@cardano-sdk/ogmios": 0.4.0
     "@cardano-sdk/util": 0.4.0
+    "@cardano-sdk/util-dev": 0.4.0
     "@types/amqplib": ^0.8.2
     "@types/node": 14.18.12
     amqplib: ^0.10.0
