@@ -1,14 +1,11 @@
 import { Cardano, ProviderError, ProviderFailure } from '@cardano-sdk/core';
-import { INFO, createLogger } from 'bunyan';
 import { axiosError } from '../util';
+import { logger } from '@cardano-sdk/util-dev';
 import { txSubmitHttpProvider } from '../../src';
 import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
 
-const config = {
-  baseUrl: 'http://some-hostname:3000/tx-submit',
-  logger: createLogger({ level: INFO, name: 'unit tests' })
-};
+const config = { baseUrl: 'http://some-hostname:3000/tx-submit', logger };
 
 describe('txSubmitHttpProvider', () => {
   describe('healthCheck', () => {

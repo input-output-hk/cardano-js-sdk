@@ -1,12 +1,9 @@
-import { INFO, createLogger } from 'bunyan';
+import { logger } from '@cardano-sdk/util-dev';
 import { stakePoolHttpProvider } from '../../src';
 import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
 
-const config = {
-  baseUrl: 'http://some-hostname:3000/stake-pool',
-  logger: createLogger({ level: INFO, name: 'unit tests' })
-};
+const config = { baseUrl: 'http://some-hostname:3000/stake-pool', logger };
 
 describe('stakePoolHttpProvider', () => {
   let axiosMock: MockAdapter;
