@@ -4,7 +4,7 @@ import { InMemoryCache, Key } from '../../src/InMemoryCache';
 import { IncomingMessage, createServer } from 'http';
 import { dummyLogger } from 'ts-log';
 import { getRandomPort } from 'get-port-please';
-import { testLogger } from '../../../rabbitmq/test/utils';
+import { logger } from '@cardano-sdk/util-dev';
 
 const mockResults: Record<string, unknown> = {
   '50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65': {
@@ -211,7 +211,6 @@ describe('CardanoTokenRegistry', () => {
     afterEach(async () => await closeMock());
 
     it('null record', async () => {
-      const logger = testLogger();
       ({ closeMock, tokenMetadataServerUrl } = await mockTokenRegistry(() => ({ body: { subjects: [null] } })));
       const tokenRegistry = new CardanoTokenRegistry({ logger }, { tokenMetadataServerUrl });
 
@@ -219,7 +218,6 @@ describe('CardanoTokenRegistry', () => {
     });
 
     it('record without the subject property', async () => {
-      const logger = testLogger();
       const record = { test: 'test' };
       ({ closeMock, tokenMetadataServerUrl } = await mockTokenRegistry(() => ({ body: { subjects: [record] } })));
       const tokenRegistry = new CardanoTokenRegistry({ logger }, { tokenMetadataServerUrl });
@@ -242,10 +240,9 @@ describe('CardanoTokenRegistry', () => {
           }
         };
       };
-      const logger = testLogger();
+
       ({ closeMock, tokenMetadataServerUrl } = await mockTokenRegistry(record));
       const tokenRegistry = new CardanoTokenRegistry({ logger }, { tokenMetadataServerUrl });
-
       const result = await tokenRegistry.getTokenMetadata([invalidAssetId, validAssetId]);
 
       await expect(tokenRegistry.getTokenMetadata([invalidAssetId, validAssetId])).rejects.toThrow(ProviderError);
