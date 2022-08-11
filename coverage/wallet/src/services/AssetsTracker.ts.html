@@ -25,28 +25,28 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>22/22</span>
+                <span class='fraction'>27/27</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>8/8</span>
+                <span class='fraction'>9/9</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>14/14</span>
+                <span class='fraction'>16/16</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>18/18</span>
+                <span class='fraction'>24/24</span>
             </div>
         
             
@@ -114,7 +114,24 @@
 <a name='L49'></a><a href='#L49'>49</a>
 <a name='L50'></a><a href='#L50'>50</a>
 <a name='L51'></a><a href='#L51'>51</a>
-<a name='L52'></a><a href='#L52'>52</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">42x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -140,6 +157,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">42x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -149,13 +167,27 @@
 <span class="cline-any cline-yes">27x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">37x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">37x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">37x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">37x</span>
 <span class="cline-any cline-yes">67x</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">58x</span>
+<span class="cline-any cline-yes">58x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">37x</span>
+<span class="cline-any cline-yes">35x</span>
 <span class="cline-any cline-yes">67x</span>
 <span class="cline-any cline-yes">35x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -167,6 +199,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Asset, Cardano } from '@cardano-sdk/core';
 import { BalanceTracker } from './types';
+import { Logger } from 'ts-log';
 import { Observable, forkJoin, map, mergeMap, of, tap } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TrackedAssetProvider } from './ProviderTracker';
@@ -185,6 +218,7 @@ export interface AssetsTrackerProps {
   balanceTracker: BalanceTracker;
   assetProvider: TrackedAssetProvider;
   retryBackoffConfig: RetryBackoffConfig;
+  logger: Logger;
 }
 &nbsp;
 interface AssetsTrackerInternals {
@@ -192,7 +226,7 @@ interface AssetsTrackerInternals {
 }
 &nbsp;
 export const createAssetsTracker = (
-  { assetProvider, balanceTracker, retryBackoffConfig }: AssetsTrackerProps,
+  { assetProvider, balanceTracker, retryBackoffConfig, logger }: AssetsTrackerProps,
   { assetService = createAssetService(assetProvider, retryBackoffConfig) }: AssetsTrackerInternals = {}
 ) =&gt;
   new Observable&lt;Map&lt;Cardano.AssetId, Asset.AssetInfo&gt;&gt;((subscriber) =&gt; {
@@ -200,13 +234,27 @@ export const createAssetsTracker = (
     const sub = balanceTracker.utxo.total$
       .pipe(
         map(({ assets }) =&gt; [...(assets?.keys() || [])]),
+        tap((assetIds) =&gt;
+          logger.debug(
+            assetIds.length &gt; 0
+              ? `Balance total assets: ${assetIds.length}`
+              : 'Setting assetProvider stats as initialized'
+          )
+        ),
         tap((assetIds) =&gt; assetIds.length === 0 &amp;&amp; assetProvider.setStatInitialized(assetProvider.stats.getAsset$)),
         // Fetch asset metadata only for assets not already present in assetsMap
         map((assetIds) =&gt;
-          assetIds.map((assetId) =&gt; (assetsMap.has(assetId) ? of(assetsMap.get(assetId)) : assetService(assetId)))
+          assetIds.map((assetId) =&gt; {
+            if (assetsMap.has(assetId)) {
+              return of(assetsMap.get(assetId));
+            }
+            logger.debug(`Fetching metadata for asset ${assetId}`);
+            return assetService(assetId);
+          })
         ),
         // Wait for all asset metadata fetches to complete
         mergeMap((assetInfos) =&gt; forkJoin(assetInfos)),
+        tap((assetInfos) =&gt; logger.debug(`Done fetching metadata for ${assetInfos.length} assets`)),
         map((assetInfos) =&gt; new Map(assetInfos.map((assetInfo) =&gt; [assetInfo!.assetId, assetInfo!]))),
         tap((v) =&gt; (assetsMap = v))
       )
@@ -223,7 +271,7 @@ export const createAssetsTracker = (
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at Thu Aug 11 2022 12:11:06 GMT+0000 (Coordinated Universal Time)
+                at Thu Aug 11 2022 12:18:19 GMT+0000 (Coordinated Universal Time)
             </div>
         <script src="../../prettify.js"></script>
         <script>
