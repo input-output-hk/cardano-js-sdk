@@ -3,6 +3,7 @@ import {
   CardanoNode,
   CardanoNodeUtil,
   EraSummary,
+  HealthCheckResponse,
   NetworkInfoProvider,
   ProtocolParametersRequiredByWallet,
   StakeSummary,
@@ -113,5 +114,14 @@ export class DbSyncNetworkInfoProvider extends DbSyncProvider implements Network
     this.#cache.shutdown();
     await this.#cardanoNode.shutdown();
     this.#epochRolloverDisposer();
+  }
+
+  public async healthCheck(): Promise<HealthCheckResponse> {
+    const dbHealthCheck = await super.healthCheck();
+    const cardanoNodeHealthCheck = await this.#cardanoNode.healthCheck();
+    return {
+      localNode: cardanoNodeHealthCheck.localNode,
+      ok: dbHealthCheck.ok && cardanoNodeHealthCheck.ok
+    };
   }
 }

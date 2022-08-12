@@ -1,30 +1,18 @@
+import { HttpServerConfig, ServiceHealth, ServicesHealthCheckResponse } from './types';
 import { HttpService } from './HttpService';
 import { Logger } from 'ts-log';
 import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { RunnableModule } from '../RunnableModule';
 import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
 import { listenPromise, serverClosePromise } from '../util';
-import bodyParser, { Options } from 'body-parser';
+import bodyParser from 'body-parser';
 import express from 'express';
 import expressPromBundle from 'express-prom-bundle';
 import http from 'http';
-import net from 'net';
 import promClient from 'prom-client';
 
 export const CONTENT_TYPE = 'Content-Type';
 export const APPLICATION_JSON = 'application/json';
-
-export type HttpServerConfig = {
-  metrics?: {
-    enabled: boolean;
-    options?: expressPromBundle.Opts;
-  };
-  bodyParser?: {
-    limit?: Options['limit'];
-  };
-  name?: string;
-  listen: net.ListenOptions;
-};
 
 export interface HttpServerDependencies {
   services: HttpService[];
@@ -65,6 +53,38 @@ export class HttpServer extends RunnableModule {
       this.app.use(`/${service.slug}`, service.router);
       this.logger.debug(`Using /${service.slug}`);
     }
+
+    const servicesHealthCheckHandler = async (req: express.Request, res: express.Response) => {
+      this.logger.debug('/health', { ip: req.ip });
+      let body: ServicesHealthCheckResponse | Error['message'];
+      try {
+        const servicesHealth: ServiceHealth[] = await Promise.all(
+          this.#dependencies.services.map((service) =>
+            service
+              .healthCheck()
+              .then(({ ok }) => ({
+                name: service.name,
+                ok
+              }))
+              .catch((error) => {
+                this.logger.error(error);
+                return { name: service.name, ok: false };
+              })
+          )
+        );
+        body = {
+          ok: servicesHealth.every((service) => service.ok),
+          services: servicesHealth
+        };
+      } catch (error) {
+        this.logger.error(error);
+        return HttpServer.sendJSON(res, new ProviderError(ProviderFailure.Unhealthy, error), 500);
+      }
+      return HttpServer.sendJSON(res, body);
+    };
+
+    this.app.use('/health', servicesHealthCheckHandler);
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.app.use((err: any, _req: express.Request, res: express.Response, _n: express.NextFunction) => {
       HttpServer.sendJSON(res, new ProviderError(ProviderFailure.Unhealthy, err), err.status || 500);

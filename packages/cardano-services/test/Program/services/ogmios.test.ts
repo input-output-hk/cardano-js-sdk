@@ -1,7 +1,7 @@
 /* eslint-disable sonarjs/no-identical-functions */
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable max-len */
-import { Cardano, TxSubmitProvider } from '@cardano-sdk/core';
+import { Cardano, HealthCheckResponse, TxSubmitProvider } from '@cardano-sdk/core';
 import { Connection } from '@cardano-ogmios/client';
 import { DbSyncEpochPollService, listenPromise, serverClosePromise } from '../../../src/util';
 import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../../src/NetworkInfo';
@@ -47,6 +47,17 @@ describe('Service dependency abstractions', () => {
   const cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
   const dnsResolver = createDnsResolver({ factor: 1.1, maxRetryTime: 1000 }, logger);
   const cardanoNode = mockCardanoNode();
+  const responseWithServiceState: HealthCheckResponse = {
+    localNode: {
+      ledgerTip: {
+        blockNo: 3_391_731,
+        hash: '9ef43ab6e234fcf90d103413096c7da752da2f45b15e1259f43d476afd12932c',
+        slot: 52_819_355
+      },
+      networkSync: 0.999
+    },
+    ok: true
+  };
 
   describe('Ogmios-dependant services with service discovery', () => {
     let apiUrlBase: string;
@@ -102,7 +113,7 @@ describe('Service dependency abstractions', () => {
             headers: { 'Content-Type': APPLICATION_JSON }
           });
           expect(res.status).toBe(200);
-          expect(res.data).toEqual({ ok: true });
+          expect(res.data).toEqual(responseWithServiceState);
         });
       });
 
@@ -155,7 +166,7 @@ describe('Service dependency abstractions', () => {
             headers: { 'Content-Type': APPLICATION_JSON }
           });
           expect(res.status).toBe(200);
-          expect(res.data).toEqual({ ok: true });
+          expect(res.data).toEqual(responseWithServiceState);
         });
       });
     });
@@ -214,7 +225,7 @@ describe('Service dependency abstractions', () => {
             headers: { 'Content-Type': APPLICATION_JSON }
           });
           expect(res.status).toBe(200);
-          expect(res.data).toEqual({ ok: true });
+          expect(res.data).toEqual(responseWithServiceState);
         });
       });
 
@@ -263,7 +274,7 @@ describe('Service dependency abstractions', () => {
             headers: { 'Content-Type': APPLICATION_JSON }
           });
           expect(res.status).toBe(200);
-          expect(res.data).toEqual({ ok: true });
+          expect(res.data).toEqual(responseWithServiceState);
         });
       });
     });
@@ -325,7 +336,7 @@ describe('Service dependency abstractions', () => {
         serviceDiscoveryTimeout: 1000
       });
 
-      await expect(provider.healthCheck()).resolves.toEqual({ ok: true });
+      await expect(provider.healthCheck()).resolves.toEqual(responseWithServiceState);
     });
   });
 

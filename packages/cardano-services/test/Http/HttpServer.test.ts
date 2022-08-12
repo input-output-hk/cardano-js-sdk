@@ -1,4 +1,16 @@
-import { APPLICATION_JSON, CONTENT_TYPE, DbSyncUtxoProvider, HttpServer, HttpService, RunnableModule } from '../../src';
+/* eslint-disable max-params */
+/* eslint-disable sonarjs/no-duplicate-string */
+/* eslint-disable @typescript-eslint/no-empty-function */
+
+import {
+  APPLICATION_JSON,
+  CONTENT_TYPE,
+  DbSyncUtxoProvider,
+  HttpServer,
+  HttpService,
+  RunnableModule,
+  ServiceNames
+} from '../../src';
 import { Logger, dummyLogger as logger } from 'ts-log';
 import { Pool } from 'pg';
 import { Provider } from '@cardano-sdk/core';
@@ -12,14 +24,18 @@ import waitOn from 'wait-on';
 const onHttpServer = (url: string) => waitOn({ resources: [url], validateStatus: (statusCode) => statusCode === 404 });
 
 class SomeHttpService extends HttpService {
+  shouldFail?: boolean;
   constructor(
+    name: ServiceNames,
     provider: Provider,
     // eslint-disable-next-line @typescript-eslint/no-shadow
     logger: Logger,
     router: express.Router = express.Router(),
-    assertReq?: (req: express.Request) => void
+    assertReq?: (req: express.Request) => void,
+    shouldFail?: boolean
   ) {
-    super('some-http-service', provider, router, logger);
+    super(name, provider, router, logger);
+    this.shouldFail = shouldFail;
 
     router.post('/echo', (req, res) => {
       logger.debug(req.body);
@@ -29,7 +45,7 @@ class SomeHttpService extends HttpService {
   }
 
   async healthCheck() {
-    return Promise.resolve({ ok: true });
+    return this.shouldFail ? Promise.resolve({ ok: false }) : Promise.resolve({ ok: true });
   }
 
   async initializeImpl(): Promise<void> {
@@ -48,7 +64,7 @@ describe('HttpServer', () => {
     port = await getRandomPort();
     httpServer = new HttpServer(
       { listen: { host: 'localhost', port } },
-      { logger, services: [new SomeHttpService(provider, logger)] }
+      { logger, services: [new SomeHttpService(ServiceNames.StakePool, provider, logger)] }
     );
     expect(httpServer).toBeInstanceOf(RunnableModule);
   });
@@ -63,7 +79,7 @@ describe('HttpServer', () => {
     it('initializes the express application', async () => {
       httpServer = new HttpServer(
         { listen: { host: 'localhost', port } },
-        { logger, services: [new SomeHttpService(provider, logger)] }
+        { logger, services: [new SomeHttpService(ServiceNames.StakePool, provider, logger)] }
       );
       expect(httpServer.app).not.toBeDefined();
       await httpServer.initialize();
@@ -77,7 +93,7 @@ describe('HttpServer', () => {
         {
           logger,
           services: [
-            new SomeHttpService(provider, logger, express.Router(), (req: express.Request) =>
+            new SomeHttpService(ServiceNames.StakePool, provider, logger, express.Router(), (req: express.Request) =>
               expect(req.body).toEqual(expectedBody)
             )
           ]
@@ -86,9 +102,13 @@ describe('HttpServer', () => {
       await httpServer.initialize();
       await httpServer.start();
       await onHttpServer(apiUrlBase);
-      await axios.post(`${apiUrlBase}/some-http-service/echo`, JSON.stringify(toSerializableObject(expectedBody)), {
-        headers: { [CONTENT_TYPE]: APPLICATION_JSON }
-      });
+      await axios.post(
+        `${apiUrlBase}/${ServiceNames.StakePool}/echo`,
+        JSON.stringify(toSerializableObject(expectedBody)),
+        {
+          headers: { [CONTENT_TYPE]: APPLICATION_JSON }
+        }
+      );
       await httpServer.shutdown();
     });
   });
@@ -114,7 +134,7 @@ describe('HttpServer', () => {
     beforeEach(async () => {
       httpServer = new HttpServer(
         { listen: { host: 'localhost', port } },
-        { logger, services: [new SomeHttpService(provider, logger)] }
+        { logger, services: [new SomeHttpService(ServiceNames.StakePool, provider, logger)] }
       );
       await httpServer.initialize();
     });
@@ -139,7 +159,7 @@ describe('HttpServer', () => {
     beforeEach(async () => {
       httpServer = new HttpServer(
         { listen: { host: 'localhost', port } },
-        { logger, services: [new SomeHttpService(provider, logger)] }
+        { logger, services: [new SomeHttpService(ServiceNames.StakePool, provider, logger)] }
       );
       await httpServer.initialize();
       await httpServer.start();
@@ -160,7 +180,7 @@ describe('HttpServer', () => {
     beforeEach(async () => {
       httpServer = new HttpServer(
         { listen: { host: 'localhost', port } },
-        { logger, services: [new SomeHttpService(provider, logger)] }
+        { logger, services: [new SomeHttpService(ServiceNames.StakePool, provider, logger)] }
       );
       await httpServer.initialize();
       await httpServer.start();
@@ -185,12 +205,12 @@ describe('HttpServer', () => {
     it('is disabled by default', async () => {
       httpServer = new HttpServer(
         { listen: { host: 'localhost', port } },
-        { logger, services: [new SomeHttpService(provider, logger)] }
+        { logger, services: [new SomeHttpService(ServiceNames.StakePool, provider, logger)] }
       );
       await httpServer.initialize();
       await httpServer.start();
       await onHttpServer(apiUrlBase);
-      const res2 = await axios.get(`${apiUrlBase}/some-http-service/metrics`, {
+      const res2 = await axios.get(`${apiUrlBase}/${ServiceNames.StakePool}/metrics`, {
         headers: { [CONTENT_TYPE]: APPLICATION_JSON },
         validateStatus: null
       });
@@ -200,7 +220,7 @@ describe('HttpServer', () => {
     it('can expose Prometheus metrics, at /metrics by default', async () => {
       httpServer = new HttpServer(
         { listen: { host: 'localhost', port }, metrics: { enabled: true } },
-        { logger, services: [new SomeHttpService(provider, logger)] }
+        { logger, services: [new SomeHttpService(ServiceNames.StakePool, provider, logger)] }
       );
       await httpServer.initialize();
       await httpServer.start();
@@ -216,7 +236,7 @@ describe('HttpServer', () => {
       const metricsPath = '/metrics-custom';
       httpServer = new HttpServer(
         { listen: { port }, metrics: { enabled: true, options: { metricsPath } } },
-        { logger, services: [new SomeHttpService(provider, logger)] }
+        { logger, services: [new SomeHttpService(ServiceNames.StakePool, provider, logger)] }
       );
       await httpServer.initialize();
       await httpServer.start();
@@ -229,11 +249,18 @@ describe('HttpServer', () => {
     });
   });
 
-  describe('HTTP API', () => {
+  describe('Service health check', () => {
+    const shouldFail = true;
     beforeEach(async () => {
       httpServer = new HttpServer(
         { listen: { host: 'localhost', port } },
-        { logger, services: [new SomeHttpService(provider, logger)] }
+        {
+          logger,
+          services: [
+            new SomeHttpService(ServiceNames.StakePool, provider, logger),
+            new SomeHttpService(ServiceNames.NetworkInfo, provider, logger, express.Router(), () => {}, shouldFail)
+          ]
+        }
       );
       await httpServer.initialize();
       await httpServer.start();
@@ -244,12 +271,95 @@ describe('HttpServer', () => {
       await httpServer.shutdown();
     });
 
-    it('health', async () => {
-      const res = await axios.post(`${apiUrlBase}/some-http-service/health`, {
+    it('healthy', async () => {
+      const res = await axios.post(`${apiUrlBase}/${ServiceNames.StakePool}/health`, {
         headers: { [CONTENT_TYPE]: 'application/json' }
       });
       expect(res.status).toBe(200);
       expect(res.data).toEqual({ ok: true });
+    });
+
+    it('not healthy', async () => {
+      const res = await axios.post(`${apiUrlBase}/${ServiceNames.NetworkInfo}/health`, {
+        headers: { [CONTENT_TYPE]: 'application/json' }
+      });
+      expect(res.status).toBe(200);
+      expect(res.data).toEqual({ ok: false });
+    });
+  });
+
+  describe('Root health check', () => {
+    afterEach(async () => {
+      await httpServer.shutdown();
+    });
+
+    it('healthy', async () => {
+      httpServer = new HttpServer(
+        { listen: { host: 'localhost', port } },
+        {
+          logger,
+          services: [
+            new SomeHttpService(ServiceNames.StakePool, provider, logger),
+            new SomeHttpService(ServiceNames.NetworkInfo, provider, logger)
+          ]
+        }
+      );
+      await httpServer.initialize();
+      await httpServer.start();
+      await onHttpServer(apiUrlBase);
+
+      const res = await axios.post(`${apiUrlBase}/health`, {
+        headers: { [CONTENT_TYPE]: 'application/json' }
+      });
+      expect(res.status).toBe(200);
+      expect(res.data).toEqual({
+        ok: true,
+        services: [
+          {
+            name: ServiceNames.StakePool,
+            ok: true
+          },
+          {
+            name: ServiceNames.NetworkInfo,
+            ok: true
+          }
+        ]
+      });
+    });
+
+    it('not healthy', async () => {
+      const shouldFail = true;
+      httpServer = new HttpServer(
+        { listen: { host: 'localhost', port } },
+        {
+          logger,
+          services: [
+            new SomeHttpService(ServiceNames.StakePool, provider, logger),
+            new SomeHttpService(ServiceNames.NetworkInfo, provider, logger, express.Router(), () => {}, shouldFail)
+          ]
+        }
+      );
+      await httpServer.initialize();
+      await httpServer.start();
+      await onHttpServer(apiUrlBase);
+
+      const res = await axios.post(`${apiUrlBase}/health`, {
+        headers: { [CONTENT_TYPE]: 'application/json' }
+      });
+      expect(res.status).toBe(200);
+      expect(res.data).toEqual({
+        ok: false,
+        services: [
+          {
+            name: ServiceNames.StakePool,
+            ok: true
+          },
+          {
+            name: ServiceNames.NetworkInfo,
+            ok: false
+          }
+        ]
+      });
     });
   });
 });
