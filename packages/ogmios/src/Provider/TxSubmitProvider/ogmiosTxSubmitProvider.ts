@@ -23,8 +23,16 @@ import { Logger } from 'ts-log';
 export const ogmiosTxSubmitProvider = (connectionConfig: ConnectionConfig, logger: Logger): TxSubmitProvider => ({
   async healthCheck() {
     try {
-      const serverHealth = await getServerHealth({ connection: createConnectionObject(connectionConfig) });
-      return { ok: serverHealth.networkSynchronization > 0.99 };
+      const { networkSynchronization, lastKnownTip } = await getServerHealth({
+        connection: createConnectionObject(connectionConfig)
+      });
+      return {
+        localNode: {
+          ledgerTip: lastKnownTip,
+          networkSync: networkSynchronization
+        },
+        ok: networkSynchronization > 0.99
+      };
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       if (error.name === 'FetchError') {

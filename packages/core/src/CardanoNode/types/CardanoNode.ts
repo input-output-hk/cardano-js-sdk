@@ -1,6 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import { CardanoNodeError, CardanoNodeNotInitializedError } from './CardanoNodeErrors';
+import { HealthCheckResponse } from '../../Provider';
 import { Lovelace, PoolId, VrfVkHex } from '../../Cardano';
 
 export interface EraSummary {
@@ -60,4 +61,10 @@ export interface CardanoNode {
    * @throws {CardanoNodeError}
    */
   stakeDistribution: () => Promise<StakeDistribution>;
+  /**
+   * Performs a health check on the CardanoNode.
+   *
+   * @returns {HealthCheckResponse} A promise with the healthcheck reponse.
+   */
+  healthCheck(): Promise<HealthCheckResponse>;
 }
