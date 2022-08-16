@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 /* eslint-disable sonarjs/no-duplicate-string */
 import { DB_CACHE_TTL_DEFAULT } from '../../src/InMemoryCache';
-import { EPOCH_POLL_INTERVAL_DEFAULT } from '../../src/NetworkInfo';
+import { EPOCH_POLL_INTERVAL_DEFAULT, listenPromise, serverClosePromise } from '../../src/util';
 import {
   HttpServer,
   InvalidArgsCombination,
@@ -23,7 +23,6 @@ import {
   ogmiosServerReady
 } from '../util';
 import { getRandomPort } from 'get-port-please';
-import { listenPromise, serverClosePromise } from '../../src/util';
 import http from 'http';
 
 jest.mock('dns', () => ({

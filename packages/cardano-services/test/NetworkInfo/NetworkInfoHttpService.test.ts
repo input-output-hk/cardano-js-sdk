@@ -4,7 +4,8 @@
 /* eslint-disable sonarjs/no-identical-functions */
 import { CardanoNode, NetworkInfoProvider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { CreateHttpProviderConfig, networkInfoHttpProvider } from '@cardano-sdk/cardano-services-client';
-import { DbSyncNetworkInfoProvider, NetworkInfoCacheKey, NetworkInfoHttpService } from '../../src/NetworkInfo';
+import { DbSyncEpochPollService } from '../../src/util';
+import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../src/NetworkInfo';
 import { HttpServer, HttpServerConfig } from '../../src';
 import { INFO, createLogger } from 'bunyan';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../src/InMemoryCache';
@@ -37,6 +38,7 @@ describe('NetworkInfoHttpService', () => {
   const cache = new InMemoryCache(UNLIMITED_CACHE_TTL);
   const cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
   const db = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING, max: 1, min: 1 });
+  const epochMonitor = new DbSyncEpochPollService(db, epochPollInterval!);
 
   describe('unhealthy NetworkInfoProvider', () => {
     beforeEach(async () => {
@@ -71,7 +73,7 @@ describe('NetworkInfoHttpService', () => {
 
   describe('healthy state', () => {
     const dbConnectionQuerySpy = jest.spyOn(db, 'query');
-    const invalidateCacheSpy = jest.spyOn(cache, 'invalidate');
+    const clearCacheSpy = jest.spyOn(cache, 'clear');
 
     beforeAll(async () => {
       port = await getPort();
@@ -79,8 +81,8 @@ describe('NetworkInfoHttpService', () => {
       cardanoNode = mockCardanoNode();
       config = { listen: { port } };
       networkInfoProvider = new DbSyncNetworkInfoProvider(
-        { cardanoNodeConfigPath, epochPollInterval },
-        { cache, cardanoNode, db, logger }
+        { cardanoNodeConfigPath },
+        { cache, cardanoNode, db, epochMonitor, logger }
       );
       service = new NetworkInfoHttpService({ logger, networkInfoProvider });
       httpServer = new HttpServer(config, { logger, services: [service] });
@@ -101,18 +103,16 @@ describe('NetworkInfoHttpService', () => {
     beforeEach(async () => {
       await cache.clear();
       jest.clearAllMocks();
+      dbConnectionQuerySpy.mockClear();
+      clearCacheSpy.mockClear();
     });
 
     describe('start', () => {
-      it('should start epoch polling once the db provider is initialized and started', async () => {
-        expect(cache.getVal(NetworkInfoCacheKey.CURRENT_EPOCH)).toBeUndefined();
-        expect(cache.keys().length).toEqual(0);
-
+      it('should start epoch monitor once the db provider is initialized and started', async () => {
         await sleep(epochPollInterval * 2);
 
-        expect(cache.keys().length).toEqual(1);
-        expect(cache.getVal(NetworkInfoCacheKey.CURRENT_EPOCH)).toBeDefined();
-        expect(invalidateCacheSpy).not.toHaveBeenCalled();
+        expect(await epochMonitor.getLastKnownEpoch()).toBeDefined();
+        expect(clearCacheSpy).not.toHaveBeenCalled();
       });
     });
 
@@ -201,21 +201,16 @@ describe('NetworkInfoHttpService', () => {
 
       it('should not invalidate the epoch values from the cache if there is no epoch rollover', async () => {
         const cardanoNodeStakeSpy = jest.spyOn(cardanoNode, 'stakeDistribution');
-        const currentEpochNo = 205;
         const totalQueriesCount = stakeTotalQueriesCount + DB_POLL_QUERIES_COUNT;
-
+        const currentEpochNo = 205;
         await provider.stake();
-
-        expect(cache.getVal(NetworkInfoCacheKey.CURRENT_EPOCH)).toBeUndefined();
         expect(cache.keys().length).toEqual(stakeTotalQueriesCount);
-
-        await sleep(epochPollInterval);
-
-        expect(cache.getVal(NetworkInfoCacheKey.CURRENT_EPOCH)).toEqual(currentEpochNo);
-        expect(cache.keys().length).toEqual(totalQueriesCount);
-        expect(dbConnectionQuerySpy).toBeCalledTimes(stakeDbQueriesCount + DB_POLL_QUERIES_COUNT);
+        await sleep(epochPollInterval * 2);
+        expect(await epochMonitor.getLastKnownEpoch()).toEqual(currentEpochNo);
+        expect(cache.keys().length).toEqual(stakeTotalQueriesCount);
+        expect(dbConnectionQuerySpy).toBeCalledTimes(totalQueriesCount);
         expect(cardanoNodeStakeSpy).toHaveBeenCalledTimes(stakeNodeQueriesCount);
-        expect(invalidateCacheSpy).not.toHaveBeenCalled();
+        expect(clearCacheSpy).not.toHaveBeenCalled();
       });
 
       it(
@@ -226,7 +221,7 @@ describe('NetworkInfoHttpService', () => {
           await provider.stake();
           await sleep(epochPollInterval);
 
-          expect(cache.keys().length).toEqual(stakeTotalQueriesCount + DB_POLL_QUERIES_COUNT);
+          expect(cache.keys().length).toEqual(stakeTotalQueriesCount);
           await ingestDbData(
             dbConnection,
             'epoch',
@@ -235,23 +230,16 @@ describe('NetworkInfoHttpService', () => {
           );
 
           await sleep(epochPollInterval);
-          expect(invalidateCacheSpy).toHaveBeenCalledWith([
-            NetworkInfoCacheKey.TOTAL_SUPPLY,
-            NetworkInfoCacheKey.ACTIVE_STAKE,
-            NetworkInfoCacheKey.ERA_SUMMARIES
-          ]);
+          expect(clearCacheSpy).toHaveBeenCalled();
 
-          expect(cache.getVal(NetworkInfoCacheKey.CURRENT_EPOCH)).toEqual(greaterEpoch);
-          expect(cache.keys().length).toEqual(2);
-
-          await sleep(epochPollInterval);
+          expect(await epochMonitor.getLastKnownEpoch()).toEqual(greaterEpoch);
+          expect(cache.keys().length).toEqual(0);
         }, db)
       );
     });
 
     describe('/lovelace-supply', () => {
       const dbSyncQueriesCount = 2;
-      const DB_POLL_QUERIES_COUNT = 1;
 
       describe('with Http Server', () => {
         it('returns a 200 coded response with a well formed HTTP request', async () => {
@@ -304,19 +292,6 @@ describe('NetworkInfoHttpService', () => {
         expect(cache.keys().length).toEqual(0);
         await provider.lovelaceSupply();
         expect(dbConnectionQuerySpy).toBeCalledTimes(dbSyncQueriesCount * 2);
-      });
-
-      it('should not invalidate the epoch values from the cache if there is no epoch rollover', async () => {
-        const currentEpochNo = 205;
-        const totalDbQueriesCount = dbSyncQueriesCount + DB_POLL_QUERIES_COUNT;
-        await provider.lovelaceSupply();
-        expect(cache.getVal(NetworkInfoCacheKey.CURRENT_EPOCH)).toBeUndefined();
-        expect(cache.keys().length).toEqual(2);
-        await sleep(epochPollInterval);
-        expect(cache.getVal(NetworkInfoCacheKey.CURRENT_EPOCH)).toEqual(currentEpochNo);
-        expect(cache.keys().length).toEqual(3);
-        expect(dbConnectionQuerySpy).toBeCalledTimes(totalDbQueriesCount);
-        expect(invalidateCacheSpy).not.toHaveBeenCalled();
       });
     });
 

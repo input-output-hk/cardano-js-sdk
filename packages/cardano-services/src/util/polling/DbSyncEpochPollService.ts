@@ -1,0 +1,100 @@
+import { Cardano } from '@cardano-sdk/core';
+import { EpochModel } from '../../StakePool';
+import { EpochMonitor } from './types';
+import { Pool, QueryResult } from 'pg';
+import { findLastEpoch } from './queries';
+
+export const EPOCH_POLL_INTERVAL_DEFAULT = 10_000;
+
+/**
+ * Class to handle epoch rollover through db polling
+ */
+export class DbSyncEpochPollService implements EpochMonitor {
+  #timeoutId?: number;
+  #callbacks: Function[];
+  #currentEpoch: Promise<Cardano.Epoch | null>;
+
+  /**
+   * Db connection
+   */
+  #db: Pool;
+
+  /**
+   * Polling interval in ms
+   */
+  #interval: number;
+
+  /**
+   * @param db Db connection
+   * @param interval Polling interval in ms
+   */
+  constructor(db: Pool, interval: number) {
+    this.#db = db;
+    this.#callbacks = [];
+    this.#interval = interval;
+    this.#currentEpoch = Promise.resolve(null);
+  }
+
+  /**
+   * Poll execution to detect a new epoch rollover
+   * Upon the occurrence of rollover event it executes all callbacks by registered dependand services
+   */
+  async #executePoll() {
+    const lastEpoch = await this.#queryLastEpoch();
+    const currentEpoch = await this.#currentEpoch;
+    const shouldClearCache = !!(currentEpoch && lastEpoch > currentEpoch);
+
+    if (shouldClearCache) {
+      this.#currentEpoch = Promise.resolve(lastEpoch);
+      for (const cb of this.#callbacks) {
+        cb();
+      }
+    }
+  }
+
+  /**
+   * Query the last epoch number stored in db
+   *
+   * @returns {number} epoch number
+   */
+  async #queryLastEpoch() {
+    const result: QueryResult<EpochModel> = await this.#db.query(findLastEpoch);
+    return result.rows[0].no;
+  }
+
+  /**
+   * Starts the poll execution
+   */
+  #start() {
+    if (this.#timeoutId) return;
+
+    this.#currentEpoch = this.#queryLastEpoch();
+    this.#timeoutId = setInterval(() => this.#executePoll(), this.#interval);
+  }
+
+  /**
+   * Shutdown the poll execution
+   */
+  #shutdown() {
+    clearInterval(this.#timeoutId);
+  }
+
+  /**
+   * Get current epoch
+   */
+  onEpochRollover(cb: Function) {
+    this.#callbacks.push(cb);
+    if (this.#callbacks.length === 1) this.#start();
+    return () => {
+      this.#callbacks.splice(this.#callbacks.indexOf(cb), 1);
+      if (this.#callbacks.length === 0) this.#shutdown();
+    };
+  }
+
+  /**
+   * Get last known epoch
+   */
+  async getLastKnownEpoch() {
+    return await this.#currentEpoch;
+  }
+}

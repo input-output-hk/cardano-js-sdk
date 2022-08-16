@@ -3,6 +3,7 @@
 /* eslint-disable max-len */
 import { Cardano, TxSubmitProvider } from '@cardano-sdk/core';
 import { Connection } from '@cardano-ogmios/client';
+import { DbSyncEpochPollService, listenPromise, serverClosePromise } from '../../../src/util';
 import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../../src/NetworkInfo';
 import {
   HttpServer,
@@ -20,7 +21,6 @@ import { SrvRecord } from 'dns';
 import { createHealthyMockOgmiosServer, ogmiosServerReady } from '../../util';
 import { createMockOgmiosServer } from '../../../../ogmios/test/mocks/mockOgmiosServer';
 import { getPort, getRandomPort } from 'get-port-please';
-import { listenPromise, serverClosePromise } from '../../../src/util';
 import { dummyLogger as logger } from 'ts-log';
 import { mockCardanoNode } from '../../../../core/test/CardanoNode/mocks';
 import { types } from 'util';
@@ -126,12 +126,10 @@ describe('Service dependency abstractions', () => {
             serviceDiscoveryBackoffFactor: 1.1,
             serviceDiscoveryTimeout: 1000
           });
+          const epochMonitor = new DbSyncEpochPollService(db!, 10_000);
           const networkInfoProvider = new DbSyncNetworkInfoProvider(
-            {
-              cardanoNodeConfigPath,
-              epochPollInterval: 10_000
-            },
-            { cache, cardanoNode, db: db!, logger }
+            { cardanoNodeConfigPath },
+            { cache, cardanoNode, db: db!, epochMonitor, logger }
           );
 
           httpServer = new HttpServer(config, {
@@ -237,12 +235,10 @@ describe('Service dependency abstractions', () => {
             serviceDiscoveryBackoffFactor: 1.1,
             serviceDiscoveryTimeout: 1000
           });
+          const epochMonitor = new DbSyncEpochPollService(db!, 10_000);
           const networkInfoProvider = new DbSyncNetworkInfoProvider(
-            {
-              cardanoNodeConfigPath,
-              epochPollInterval: 10_000
-            },
-            { cache, cardanoNode, db: db!, logger }
+            { cardanoNodeConfigPath },
+            { cache, cardanoNode, db: db!, epochMonitor, logger }
           );
 
           httpServer = new HttpServer(config, {

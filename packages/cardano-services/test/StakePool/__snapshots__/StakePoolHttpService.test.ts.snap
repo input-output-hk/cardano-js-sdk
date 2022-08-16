@@ -78,27 +78,15 @@ exports[`StakePoolHttpService healthy state /search search pools by identifier f
 Object {
   "pageResults": Array [
     Object {
-      "cost": Object {
-        "__type": "bigint",
-        "value": "4321000000",
-      },
+      "cost": 4321000000n,
       "epochRewards": Array [
         Object {
-          "activeStake": Object {
-            "__type": "bigint",
-            "value": "1335568619",
-          },
+          "activeStake": 1335568619n,
           "epoch": 205,
           "epochLength": 431850000,
           "memberROI": 0,
-          "operatorFees": Object {
-            "__type": "bigint",
-            "value": "0",
-          },
-          "totalRewards": Object {
-            "__type": "bigint",
-            "value": "0",
-          },
+          "operatorFees": 0n,
+          "totalRewards": 0n,
         },
       ],
       "hexId": "ff5b4952dd7734f07e4905dea64fa230fb75f7b2d603d154d9ff1d43",
@@ -121,33 +109,21 @@ Object {
         "apy": 0,
         "blocksCreated": "0",
         "delegators": "1",
-        "livePledge": Object {
-          "__type": "bigint",
-          "value": "199806239",
-        },
+        "livePledge": 199806239n,
         "saturation": "0.000018278270331367650376",
         "size": Object {
           "active": "0.86986484899181539157",
           "live": "0.13013515100818460843",
         },
         "stake": Object {
-          "active": Object {
-            "__type": "bigint",
-            "value": "1335568619",
-          },
-          "live": Object {
-            "__type": "bigint",
-            "value": "199806239",
-          },
+          "active": 1335568619n,
+          "live": 199806239n,
         },
       },
       "owners": Array [
         "stake_test1uzxvhl83q8ujv2yvpy6n2krvpdlqqx28h7e9vsk6re43h3c3kufy6",
       ],
-      "pledge": Object {
-        "__type": "bigint",
-        "value": "70000000000",
-      },
+      "pledge": 70000000000n,
       "relays": Array [
         Object {
           "__typename": "RelayByAddress",
@@ -439,7 +415,7 @@ Object {
 }
 `;
 
-exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet false, active,  or condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status & pledgeMet filters pledgeMet false, active,  or condition 1`] = `
 Object {
   "pageResults": Array [
     Object {
@@ -1043,14 +1019,14 @@ Object {
 }
 `;
 
-exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet false, status activating, and condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status & pledgeMet filters pledgeMet false, status activating, and condition 1`] = `
 Object {
   "pageResults": Array [],
   "totalResultCount": 0,
 }
 `;
 
-exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet false, status activating, or condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status & pledgeMet filters pledgeMet false, status activating, or condition 1`] = `
 Object {
   "pageResults": Array [
     Object {
@@ -1383,7 +1359,7 @@ Object {
 }
 `;
 
-exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet false, status active, and condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status & pledgeMet filters pledgeMet false, status active, and condition 1`] = `
 Object {
   "pageResults": Array [
     Object {
@@ -1521,14 +1497,14 @@ Object {
 }
 `;
 
-exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet false, status retired, and condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status & pledgeMet filters pledgeMet false, status retired, and condition 1`] = `
 Object {
   "pageResults": Array [],
   "totalResultCount": 0,
 }
 `;
 
-exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet false, status retired, or condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status & pledgeMet filters pledgeMet false, status retired, or condition 1`] = `
 Object {
   "pageResults": Array [
     Object {
@@ -1920,14 +1896,14 @@ Object {
 }
 `;
 
-exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet false, status retiring, and condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status & pledgeMet filters pledgeMet false, status retiring, and condition 1`] = `
 Object {
   "pageResults": Array [],
   "totalResultCount": 0,
 }
 `;
 
-exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet false, status retiring, or condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status & pledgeMet filters pledgeMet false, status retiring, or condition 1`] = `
 Object {
   "pageResults": Array [
     Object {
@@ -2260,7 +2236,7 @@ Object {
 }
 `;
 
-exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet true, active,  or condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status & pledgeMet filters pledgeMet true, active, or condition 1`] = `
 Object {
   "pageResults": Array [
     Object {
@@ -2799,14 +2775,14 @@ Object {
 }
 `;
 
-exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet true, status activating, and condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status & pledgeMet filters pledgeMet true, status activating, and condition 1`] = `
 Object {
   "pageResults": Array [],
   "totalResultCount": 0,
 }
 `;
 
-exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet true, status activating, or condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status & pledgeMet filters pledgeMet true, status activating, or condition 1`] = `
 Object {
   "pageResults": Array [
     Object {
@@ -3201,7 +3177,7 @@ Object {
 }
 `;
 
-exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet true, status active, and condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status & pledgeMet filters pledgeMet true, status active, and condition 1`] = `
 Object {
   "pageResults": Array [
     Object {
@@ -3339,14 +3315,14 @@ Object {
 }
 `;
 
-exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet true, status retired, and condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status & pledgeMet filters pledgeMet true, status retired, and condition 1`] = `
 Object {
   "pageResults": Array [],
   "totalResultCount": 0,
 }
 `;
 
-exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet true, status retired, or condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status & pledgeMet filters pledgeMet true, status retired, or condition 1`] = `
 Object {
   "pageResults": Array [
     Object {
@@ -3865,14 +3841,14 @@ Object {
 }
 `;
 
-exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet true, status retiring, and condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status & pledgeMet filters pledgeMet true, status retiring, and condition 1`] = `
 Object {
   "pageResults": Array [],
   "totalResultCount": 0,
 }
 `;
 
-exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet true, status retiring, or condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status & pledgeMet filters pledgeMet true, status retiring, or condition 1`] = `
 Object {
   "pageResults": Array [
     Object {
@@ -4267,7 +4243,7 @@ Object {
 }
 `;
 
-exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet, multiple status, and condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status & pledgeMet filters pledgeMet, multiple status, and condition 1`] = `
 Object {
   "pageResults": Array [
     Object {
@@ -4535,7 +4511,7 @@ Object {
 }
 `;
 
-exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status  & pledgeMet filters pledgeMet, multiple status, or condition 1`] = `
+exports[`StakePoolHttpService healthy state /search search pools by multiple filters identifier & status & pledgeMet filters pledgeMet, multiple status, or condition 1`] = `
 Object {
   "pageResults": Array [
     Object {

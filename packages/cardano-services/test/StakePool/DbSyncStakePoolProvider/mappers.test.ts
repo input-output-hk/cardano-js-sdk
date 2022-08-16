@@ -10,7 +10,7 @@ import {
   mapPoolStats,
   mapPoolUpdate,
   mapRelay,
-  toCoreStakePool
+  toStakePoolResults
 } from '../../../src';
 
 describe('mappers', () => {
@@ -198,7 +198,7 @@ describe('mappers', () => {
       hashId: poolAPYModel.hash_id
     });
   });
-  describe('toCoreStakePool', () => {
+  describe('mapAndCacheStakePools', () => {
     const poolOwners = [mapAddressOwner(addressOwnerModel)];
     const poolDatas = [mapPoolData(poolDataModel)];
     const poolRegistrations = [mapPoolRegistration(poolRegistrationModel)];
@@ -228,9 +228,11 @@ describe('mappers', () => {
       vrf: poolDatas[0].vrfKeyHash
     } as Cardano.StakePool;
     const totalCount = 1;
-    it('toCoreStakePool with retiring status', () => {
+    const fromCache = {};
+
+    it('toStakePoolResults with retiring status', () => {
       expect(
-        toCoreStakePool([poolDataModel.hash_id], {
+        toStakePoolResults([poolDataModel.hash_id], fromCache, {
           lastEpoch: poolRetirementModel.retiring_epoch - 1,
           poolAPYs,
           poolDatas,
@@ -242,11 +244,17 @@ describe('mappers', () => {
           poolRewards,
           totalCount
         })
-      ).toStrictEqual({ pageResults: [stakePool], totalResultCount: totalCount });
+      ).toStrictEqual({
+        poolsToCache: { [poolDataModel.hash_id]: stakePool },
+        results: { pageResults: [stakePool], totalResultCount: totalCount }
+      });
     });
-    it('toCoreStakePool with retired status', () => {
+
+    it('toStakePoolResults with retired status', () => {
+      const stakePoolRetired = { ...stakePool, status: Cardano.StakePoolStatus.Retired };
+
       expect(
-        toCoreStakePool([poolDataModel.hash_id], {
+        toStakePoolResults([poolDataModel.hash_id], fromCache, {
           lastEpoch: poolRetirementModel.retiring_epoch + 1,
           poolAPYs,
           poolDatas,
@@ -259,16 +267,28 @@ describe('mappers', () => {
           totalCount
         })
       ).toStrictEqual({
-        pageResults: [{ ...stakePool, status: Cardano.StakePoolStatus.Retired }],
-        totalResultCount: totalCount
+        poolsToCache: { [poolDataModel.hash_id]: stakePoolRetired },
+        results: {
+          pageResults: [stakePoolRetired],
+          totalResultCount: totalCount
+        }
       });
     });
-    it('toCoreStakePool with activating status', () => {
+    it('toStakePoolResults with activating status', () => {
       const _retirements = [
         mapPoolRetirement({ ...poolRetirementModel, retiring_epoch: poolRegistrationModel.active_epoch_no - 1 })
       ];
+      const stakePoolActivating = {
+        ...stakePool,
+        status: Cardano.StakePoolStatus.Activating,
+        transactions: {
+          registration: poolRegistrations.map((r) => r.transactionId),
+          retirement: _retirements.map((r) => r.transactionId)
+        }
+      };
+
       expect(
-        toCoreStakePool([poolDataModel.hash_id], {
+        toStakePoolResults([poolDataModel.hash_id], fromCache, {
           lastEpoch: poolRegistrationModel.active_epoch_no - 1,
           poolAPYs,
           poolDatas,
@@ -281,25 +301,28 @@ describe('mappers', () => {
           totalCount
         })
       ).toEqual({
-        pageResults: [
-          {
-            ...stakePool,
-            status: Cardano.StakePoolStatus.Activating,
-            transactions: {
-              registration: poolRegistrations.map((r) => r.transactionId),
-              retirement: _retirements.map((r) => r.transactionId)
-            }
-          }
-        ],
-        totalResultCount: totalCount
+        poolsToCache: { [poolDataModel.hash_id]: stakePoolActivating },
+        results: {
+          pageResults: [stakePoolActivating],
+          totalResultCount: totalCount
+        }
       });
     });
-    it('toCoreStakePool with active status', () => {
+    it('toStakePoolResults with active status', () => {
       const _retirements = [
         mapPoolRetirement({ ...poolRetirementModel, retiring_epoch: poolRegistrationModel.active_epoch_no })
       ];
+      const stakePoolActive = {
+        ...stakePool,
+        status: Cardano.StakePoolStatus.Active,
+        transactions: {
+          registration: poolRegistrations.map((r) => r.transactionId),
+          retirement: _retirements.map((r) => r.transactionId)
+        }
+      };
+
       expect(
-        toCoreStakePool([poolDataModel.hash_id], {
+        toStakePoolResults([poolDataModel.hash_id], fromCache, {
           lastEpoch: poolRegistrationModel.active_epoch_no,
           poolAPYs,
           poolDatas,
@@ -312,20 +335,39 @@ describe('mappers', () => {
           totalCount
         })
       ).toEqual({
-        pageResults: [
+        poolsToCache: { [poolDataModel.hash_id]: stakePoolActive },
+        results: {
+          pageResults: [stakePoolActive],
+          totalResultCount: totalCount
+        }
+      });
+    });
+
+    it('toStakePoolResults with cached pool', () => {
+      expect(
+        toStakePoolResults(
+          [poolDataModel.hash_id],
+          { [poolDataModel.hash_id]: stakePool },
           {
-            ...stakePool,
-            status: Cardano.StakePoolStatus.Active,
-            transactions: {
-              registration: poolRegistrations.map((r) => r.transactionId),
-              retirement: _retirements.map((r) => r.transactionId)
-            }
+            lastEpoch: poolRetirementModel.retiring_epoch - 1,
+            poolAPYs,
+            poolDatas,
+            poolMetrics,
+            poolOwners,
+            poolRegistrations,
+            poolRelays,
+            poolRetirements,
+            poolRewards,
+            totalCount
           }
-        ],
-        totalResultCount: totalCount
+        )
+      ).toStrictEqual({
+        poolsToCache: {},
+        results: { pageResults: [stakePool], totalResultCount: totalCount }
       });
     });
   });
+
   it('mapPoolStats', () => {
     expect(mapPoolStats({ active: '20', retired: '0', retiring: '1' })).toEqual<StakePoolStats>({
       qty: { active: 20, retired: 0, retiring: 1 }
