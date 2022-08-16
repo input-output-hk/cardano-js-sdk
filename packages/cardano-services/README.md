@@ -7,8 +7,7 @@ with one or more workers handling submission and response job creation. Data is 
 remote sources.
 
 ## Features
-- [CLI] or run scripts for the [HTTP server](./src/run.ts) and [worker](./src/startWorker.ts) with 
-configuration via environment variables and _optional_ loading of secrets from disk.
+- [CLI] with configuration via CLI arguments or environment variables and _optional_ loading of secrets from disk.
 - Service port discovery via DNS resolution, or static configuration.
 - Fault-tolerant transaction submission via persistent queue, or direct submission.
 - _Optional_ [Prometheus] metrics available at `/metrics`
@@ -25,12 +24,12 @@ dependency.
 ### HTTP Server
 The HTTP server can be started with one or more provider modules by name, segmented by URL path. 
 Run the [CLI] with `start-server --help` to see the full list of options, or inspect the 
-environment variables within [./src/run.ts](./src/run.ts). 
+environment variables within [./src/cli.ts](./src/cli.ts). 
 
 ### Worker
 A worker must be started when opting for queue-based transaction submission.
 Run the [CLI] with `start-worker --help` to see the full list of options, or inspect the
-environment variables within [./src/startWorker.ts](./src/startWorker.ts).
+environment variables within [./src/cli.ts](./src/cli.ts).
 
 
 ## Examples

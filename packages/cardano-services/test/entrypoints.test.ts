@@ -15,7 +15,14 @@ import axios from 'axios';
 import http from 'http';
 import path from 'path';
 
-const exePath = (name: 'cli' | 'run') => path.join(__dirname, '..', 'dist', 'cjs', `${name}.js`);
+jest.setTimeout(60_000);
+
+const DNS_SERVER_NOT_REACHABLE_ERROR = 'querySrv ENOTFOUND';
+const CLI_CONFLICTING_OPTIONS_ERROR_MESSAGE = 'cannot be used with option';
+const CLI_CONFLICTING_ENV_VARS_ERROR_MESSAGE = 'cannot be used with environment variable';
+const METRICS_ENDPOINT_LABEL_RESPONSE = 'http_request_duration_seconds duration histogram of http responses';
+
+const exePath = (name: 'cli') => path.join(__dirname, '..', 'dist', 'cjs', `${name}.js`);
 const cardanoNodeDependantServices = new Set([ServiceNames.NetworkInfo, ServiceNames.TxSubmit]);
 
 const assertServiceHealthy = async (apiUrl: string, serviceName: ServiceNames, usedQueue?: boolean) => {
@@ -38,6 +45,47 @@ const assertServiceHealthy = async (apiUrl: string, serviceName: ServiceNames, u
 
   expect(res.status).toBe(200);
   expect(res.data).toEqual(healthCheckResponse);
+};
+
+const assertMetricsEndpoint = async (apiUrl: string) => {
+  await serverReady(apiUrl);
+  const headers = { 'Content-Type': 'application/json' };
+  const res = await axios.post(`${apiUrl}/metrics`, { headers });
+
+  expect(res.status).toBe(200);
+  expect(res.data.toString().includes(METRICS_ENDPOINT_LABEL_RESPONSE)).toEqual(true);
+};
+
+type CallCliAndAssertExitArgs = {
+  args?: string[];
+  dataMatchOnError?: string;
+  env?: NodeJS.ProcessEnv;
+};
+
+const baseArgs = ['start-server', '--logger-min-severity', 'error'];
+
+const callCliAndAssertExit = (
+  { args = [], dataMatchOnError, env = {} }: CallCliAndAssertExitArgs,
+  done: jest.DoneCallback
+) => {
+  const spy = jest.fn();
+  expect.assertions(dataMatchOnError ? 3 : 2);
+  const proc = fork(exePath('cli'), [...baseArgs, ...args], {
+    env,
+    stdio: 'pipe'
+  });
+  proc.stderr!.on('data', spy);
+  proc.stderr!.on('data', (data) => {
+    spy();
+    if (dataMatchOnError) {
+      expect(data.toString().includes(dataMatchOnError)).toEqual(true);
+    }
+  });
+  proc.on('exit', (code) => {
+    expect(code).toBe(1);
+    expect(spy).toHaveBeenCalled();
+    done();
+  });
 };
 
 describe('entrypoints', () => {
@@ -77,7 +125,7 @@ describe('entrypoints', () => {
     });
   });
 
-  describe('start-server', () => {
+  describe('cli:start-server', () => {
     let postgresConnectionString: string;
     let ogmiosPort: Ogmios.ConnectionConfig['port'];
     let ogmiosConnection: Ogmios.Connection;
@@ -87,7 +135,12 @@ describe('entrypoints', () => {
     let postgresDb: string;
     let postgresUser: string;
     let postgresPassword: string;
+    let postgresDbFile: string;
+    let postgresUserFile: string;
+    let postgresPasswordFile: string;
     let postgresSslCaFile: string;
+    let postgresHost: string;
+    let postgresPort: string;
     let ogmiosSrvServiceName: string;
     let rabbitmqSrvServiceName: string;
 
@@ -98,8 +151,13 @@ describe('entrypoints', () => {
       cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
       postgresSrvServiceName = process.env.POSTGRES_SRV_SERVICE_NAME!;
       postgresDb = process.env.POSTGRES_DB!;
+      postgresDbFile = process.env.POSTGRES_DB_FILE!;
       postgresUser = process.env.POSTGRES_USER!;
+      postgresUserFile = process.env.POSTGRES_USER_FILE!;
       postgresPassword = process.env.POSTGRES_PASSWORD!;
+      postgresPasswordFile = process.env.POSTGRES_PASSWORD_FILE!;
+      postgresHost = process.env.POSTGRES_HOST!;
+      postgresPort = process.env.POSTGRES_PORT!;
       postgresSslCaFile = process.env.POSTGRES_SSL_CA_FILE!;
       ogmiosSrvServiceName = process.env.OGMIOS_SRV_SERVICE_NAME!;
       rabbitmqSrvServiceName = process.env.RABBITMQ_SRV_SERVICE_NAME!;
@@ -114,17 +172,16 @@ describe('entrypoints', () => {
           await ogmiosServerReady(ogmiosConnection);
         });
 
-        it('cli:start-server exposes a HTTP server at the configured URL with all services attached', async () => {
+        it('exposes a HTTP server at the configured URL with all services attached when using CLI options', async () => {
           proc = fork(
             exePath('cli'),
             [
-              'start-server',
+              ...baseArgs,
               '--api-url',
               apiUrl,
+              '--enable-metrics',
               '--postgres-connection-string',
               postgresConnectionString,
-              '--logger-min-severity',
-              'error',
               '--ogmios-url',
               ogmiosConnection.address.webSocket,
               '--cardano-node-config-path',
@@ -136,346 +193,755 @@ describe('entrypoints', () => {
               ServiceNames.NetworkInfo,
               ServiceNames.StakePool,
               ServiceNames.TxSubmit,
-              ServiceNames.Utxo
+              ServiceNames.Utxo,
+              ServiceNames.Rewards
             ],
-            { stdio: 'pipe' }
+            { env: {}, stdio: 'pipe' }
           );
+
           await assertServiceHealthy(apiUrl, ServiceNames.Asset);
           await assertServiceHealthy(apiUrl, ServiceNames.ChainHistory);
           await assertServiceHealthy(apiUrl, ServiceNames.NetworkInfo);
           await assertServiceHealthy(apiUrl, ServiceNames.StakePool);
           await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit);
           await assertServiceHealthy(apiUrl, ServiceNames.Utxo);
+          await assertServiceHealthy(apiUrl, ServiceNames.Rewards);
         });
 
-        it('run exposes a HTTP server at the configured URL with all services attached', async () => {
-          proc = fork(exePath('run'), {
+        it('exposes a HTTP server at the configured URL with all services attached when using env variables', async () => {
+          proc = fork(exePath('cli'), ['start-server'], {
             env: {
               API_URL: apiUrl,
               CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
               DB_CACHE_TTL: dbCacheTtl,
+              ENABLE_METRICS: 'true',
               LOGGER_MIN_SEVERITY: 'error',
               OGMIOS_URL: ogmiosConnection.address.webSocket,
               POSTGRES_CONNECTION_STRING: postgresConnectionString,
-              SERVICE_NAMES: `${ServiceNames.Asset},${ServiceNames.ChainHistory},${ServiceNames.NetworkInfo},${ServiceNames.StakePool},${ServiceNames.TxSubmit},${ServiceNames.Utxo}`
+              SERVICE_NAMES: `${ServiceNames.Asset},${ServiceNames.ChainHistory},${ServiceNames.NetworkInfo},${ServiceNames.StakePool},${ServiceNames.TxSubmit},${ServiceNames.Utxo},${ServiceNames.Rewards}`
             },
             stdio: 'pipe'
           });
+
           await assertServiceHealthy(apiUrl, ServiceNames.Asset);
           await assertServiceHealthy(apiUrl, ServiceNames.ChainHistory);
           await assertServiceHealthy(apiUrl, ServiceNames.NetworkInfo);
           await assertServiceHealthy(apiUrl, ServiceNames.StakePool);
           await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit);
           await assertServiceHealthy(apiUrl, ServiceNames.Utxo);
-        });
-      });
-
-      describe('specifying a PostgreSQL-dependent service without providing the connection string', () => {
-        let spy: jest.Mock;
-        beforeEach(() => {
-          spy = jest.fn();
+          await assertServiceHealthy(apiUrl, ServiceNames.Rewards);
         });
 
-        it('cli:start-server stake-pool exits with code 1', (done) => {
-          expect.assertions(2);
-          proc = fork(
-            exePath('cli'),
-            ['start-server', '--api-url', apiUrl, '--logger-min-severity', 'error', ServiceNames.StakePool],
-            {
-              stdio: 'pipe'
-            }
-          );
-          proc.stderr!.on('data', spy);
-          proc.on('exit', (code) => {
-            expect(code).toBe(1);
-            expect(spy).toHaveBeenCalled();
-            done();
-          });
-        });
-
-        it('cli:start-server network-info exits with code 1', (done) => {
-          expect.assertions(2);
+        it('exposes a HTTP server with /metrics endpoint using CLI options', async () => {
           proc = fork(
             exePath('cli'),
             [
-              'start-server',
+              ...baseArgs,
               '--api-url',
               apiUrl,
-              '--logger-min-severity',
-              'error',
-              '--cardano-node-config-path',
-              cardanoNodeConfigPath,
-              ServiceNames.NetworkInfo
-            ],
-            {
-              stdio: 'pipe'
-            }
-          );
-          proc.stderr!.on('data', spy);
-          proc.on('exit', (code) => {
-            expect(code).toBe(1);
-            expect(spy).toHaveBeenCalled();
-            done();
-          });
-        });
-
-        it('cli:start-server network-info exits with code 1 when cache TTL is out of range', (done) => {
-          expect.assertions(2);
-          const cacheTtlOutOfRange = '3000';
-          proc = fork(
-            exePath('cli'),
-            [
-              'start-server',
-              '--api-url',
-              apiUrl,
-              '--logger-min-severity',
-              'error',
+              '--enable-metrics',
+              '--postgres-connection-string',
+              postgresConnectionString,
+              '--ogmios-url',
+              ogmiosConnection.address.webSocket,
               '--cardano-node-config-path',
               cardanoNodeConfigPath,
               '--db-cache-ttl',
-              cacheTtlOutOfRange,
-              ServiceNames.NetworkInfo
+              dbCacheTtl,
+              ServiceNames.Asset,
+              ServiceNames.ChainHistory,
+              ServiceNames.NetworkInfo,
+              ServiceNames.StakePool,
+              ServiceNames.TxSubmit,
+              ServiceNames.Utxo,
+              ServiceNames.Rewards
             ],
-            {
-              stdio: 'pipe'
-            }
+            { env: {}, stdio: 'pipe' }
           );
-          proc.stderr!.on('data', spy);
-          proc.on('exit', (code) => {
-            expect(code).toBe(1);
-            expect(spy).toHaveBeenCalled();
-            done();
-          });
+
+          await assertMetricsEndpoint(apiUrl);
         });
 
-        it('cli:start-server utxo exits with code 1', (done) => {
-          expect.assertions(2);
+        it('exposes a HTTP server with /metrics endpoint using env variables', async () => {
+          proc = fork(exePath('cli'), ['start-server'], {
+            env: {
+              API_URL: apiUrl,
+              CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
+              DB_CACHE_TTL: dbCacheTtl,
+              ENABLE_METRICS: 'true',
+              LOGGER_MIN_SEVERITY: 'error',
+              OGMIOS_URL: ogmiosConnection.address.webSocket,
+              POSTGRES_CONNECTION_STRING: postgresConnectionString,
+              SERVICE_NAMES: `${ServiceNames.Asset},${ServiceNames.ChainHistory},${ServiceNames.NetworkInfo},${ServiceNames.StakePool},${ServiceNames.TxSubmit},${ServiceNames.Utxo},${ServiceNames.Rewards}`
+            },
+            stdio: 'pipe'
+          });
+
+          await assertMetricsEndpoint(apiUrl);
+        });
+
+        it('setting the service names via env variable takes preference over command line argument', async () => {
           proc = fork(
             exePath('cli'),
             [
-              'start-server',
+              ...baseArgs,
               '--api-url',
               apiUrl,
-              '--logger-min-severity',
-              'error',
+              '--postgres-connection-string',
+              postgresConnectionString,
+              '--ogmios-url',
+              ogmiosConnection.address.webSocket,
               '--cardano-node-config-path',
               cardanoNodeConfigPath,
+              '--db-cache-ttl',
+              dbCacheTtl,
               ServiceNames.Utxo
             ],
             {
+              env: {
+                SERVICE_NAMES: `${ServiceNames.Utxo},${ServiceNames.Rewards}`
+              },
               stdio: 'pipe'
             }
           );
-          proc.stderr!.on('data', spy);
-          proc.on('exit', (code) => {
-            expect(code).toBe(1);
-            expect(spy).toHaveBeenCalled();
-            done();
-          });
-        });
 
-        it('run stake-pool exits with code 1', (done) => {
-          expect.assertions(2);
-          proc = fork(exePath('run'), {
-            env: {
-              API_URL: apiUrl,
-              LOGGER_MIN_SEVERITY: 'error',
-              SERVICE_NAMES: ServiceNames.StakePool
-            },
-            stdio: 'pipe'
-          });
-          proc.stderr!.on('data', spy);
-          proc.on('exit', (code) => {
-            expect(code).toBe(1);
-            expect(spy).toHaveBeenCalled();
-            done();
-          });
-        });
-
-        it('run network-info exits with code 1', (done) => {
-          expect.assertions(2);
-          proc = fork(exePath('run'), {
-            env: {
-              API_URL: apiUrl,
-              LOGGER_MIN_SEVERITY: 'error',
-              SERVICE_NAMES: ServiceNames.NetworkInfo
-            },
-            stdio: 'pipe'
-          });
-          proc.stderr!.on('data', spy);
-          proc.on('exit', (code) => {
-            expect(code).toBe(1);
-            expect(spy).toHaveBeenCalled();
-            done();
-          });
-        });
-
-        it('run network-info exits with code 1 when cache TTL is out of range', (done) => {
-          expect.assertions(2);
-          const cacheTtlOutOfRange = '3000';
-          proc = fork(exePath('run'), {
-            env: {
-              API_URL: apiUrl,
-              DB_CACHE_TTL: cacheTtlOutOfRange,
-              LOGGER_MIN_SEVERITY: 'error',
-              SERVICE_NAMES: ServiceNames.NetworkInfo
-            },
-            stdio: 'pipe'
-          });
-          proc.stderr!.on('data', spy);
-          proc.on('exit', (code) => {
-            expect(code).toBe(1);
-            expect(spy).toHaveBeenCalled();
-            done();
-          });
-        });
-
-        it('run utxo exits with code 1', (done) => {
-          expect.assertions(2);
-          proc = fork(exePath('run'), {
-            env: {
-              API_URL: apiUrl,
-              LOGGER_MIN_SEVERITY: 'error',
-              SERVICE_NAMES: ServiceNames.Utxo
-            },
-            stdio: 'pipe'
-          });
-          proc.stderr!.on('data', spy);
-          proc.on('exit', (code) => {
-            expect(code).toBe(1);
-            expect(spy).toHaveBeenCalled();
-            done();
-          });
+          await assertServiceHealthy(apiUrl, ServiceNames.Utxo);
+          await assertServiceHealthy(apiUrl, ServiceNames.Rewards);
         });
       });
 
-      describe('specifying PostgreSQL-dependent services with service discovery args', () => {
-        let spy: jest.Mock;
-        beforeEach(async () => {
-          spy = jest.fn();
+      describe('specifying a PostgreSQL-dependent service', () => {
+        describe('without provided static nor service discovery config', () => {
+          it('stake-pool exits with code 1', (done) => {
+            callCliAndAssertExit(
+              {
+                args: ['--service-names', ServiceNames.StakePool]
+              },
+              done
+            );
+          });
+
+          it('network-info exits with code 1', (done) => {
+            callCliAndAssertExit(
+              {
+                args: ['--cardano-node-config-path', cardanoNodeConfigPath, '--service-names', ServiceNames.NetworkInfo]
+              },
+              done
+            );
+          });
+
+          it('network-info exits with code 1 when cache TTL is out of range', (done) => {
+            const cacheTtlOutOfRange = '3000';
+            callCliAndAssertExit(
+              {
+                args: [
+                  '--cardano-node-config-path',
+                  cardanoNodeConfigPath,
+                  '--db-cache-ttl',
+                  cacheTtlOutOfRange,
+                  '--service-names',
+                  ServiceNames.NetworkInfo
+                ]
+              },
+              done
+            );
+          });
+
+          it('utxo exits with code 1', (done) => {
+            callCliAndAssertExit(
+              {
+                args: ['--service-names', ServiceNames.Utxo]
+              },
+              done
+            );
+          });
+
+          it('rewards exits with code 1', (done) => {
+            callCliAndAssertExit(
+              {
+                args: ['--service-names', ServiceNames.Rewards]
+              },
+              done
+            );
+          });
+
+          it('chain-history exits with code 1', (done) => {
+            callCliAndAssertExit(
+              {
+                args: ['--service-names', ServiceNames.ChainHistory]
+              },
+              done
+            );
+          });
+
+          it('asset exits with code 1', (done) => {
+            callCliAndAssertExit(
+              {
+                args: ['--service-names', ServiceNames.Asset]
+              },
+              done
+            );
+          });
         });
 
-        it('cli:start-server throws DNS SRV error and exits with code 1', (done) => {
-          expect.assertions(3);
-          proc = fork(
-            exePath('cli'),
-            [
-              'start-server',
-              '--api-url',
-              apiUrl,
-              '--postgres-srv-service-name',
-              postgresSrvServiceName,
-              '--postgres-db',
-              postgresDb,
-              '--postgres-user',
-              postgresUser,
-              '--postgres-password',
-              postgresPassword,
-              '--logger-min-severity',
-              'error',
-              '--service-discovery-timeout',
-              '1000',
-              ServiceNames.StakePool,
-              ServiceNames.NetworkInfo,
-              ServiceNames.Utxo
-            ],
-            {
+        describe('with provided static config', () => {
+          it('exposes a HTTP server when using CLI options', async () => {
+            proc = fork(
+              exePath('cli'),
+              [
+                ...baseArgs,
+                '--api-url',
+                apiUrl,
+                '--postgres-db',
+                postgresDb,
+                '--postgres-user',
+                postgresUser,
+                '--postgres-password',
+                postgresPassword,
+                '--postgres-host',
+                postgresHost,
+                '--postgres-port',
+                postgresPort,
+                ServiceNames.Utxo
+              ],
+              {
+                env: {},
+                stdio: 'pipe'
+              }
+            );
+
+            await assertServiceHealthy(apiUrl, ServiceNames.Utxo);
+          });
+
+          it('exposes a HTTP server when using env variables', async () => {
+            proc = fork(exePath('cli'), ['start-server'], {
+              env: {
+                API_URL: apiUrl,
+                LOGGER_MIN_SEVERITY: 'error',
+                POSTGRES_DB: postgresDb,
+                POSTGRES_HOST: postgresHost,
+                POSTGRES_PASSWORD: postgresPassword,
+                POSTGRES_PORT: postgresPort,
+                POSTGRES_USER: postgresUser,
+                SERVICE_NAMES: ServiceNames.Utxo
+              },
               stdio: 'pipe'
-            }
-          );
+            });
 
-          proc.stderr!.on('data', (data) => {
-            spy();
-            expect(data.toString().includes('querySrv ENOTFOUND')).toEqual(true);
-          });
-
-          proc.on('exit', (code) => {
-            expect(code).toBe(1);
-            expect(spy).toHaveBeenCalled();
-            done();
+            await assertServiceHealthy(apiUrl, ServiceNames.Utxo);
           });
         });
 
-        it('run throws DNS SRV error and exits with code 1', (done) => {
-          expect.assertions(3);
-          proc = fork(exePath('run'), {
-            env: {
-              API_URL: apiUrl,
-              LOGGER_MIN_SEVERITY: 'error',
-              POSTGRES_DB: postgresDb,
-              POSTGRES_PASSWORD: postgresPassword,
-              POSTGRES_SRV_SERVICE_NAME: postgresSrvServiceName,
-              POSTGRES_USER: postgresUser,
-              SERVICE_DISCOVERY_TIMEOUT: '1000',
-              SERVICE_NAMES: `${ServiceNames.StakePool},${ServiceNames.NetworkInfo},${ServiceNames.Utxo}`
-            },
-            stdio: 'pipe'
+        describe('with provided service discovery config', () => {
+          it('exits with code 1 if DNS server not reachable when using CLI options', (done) => {
+            callCliAndAssertExit(
+              {
+                args: [
+                  '--postgres-srv-service-name',
+                  postgresSrvServiceName,
+                  '--postgres-db',
+                  postgresDb,
+                  '--postgres-user',
+                  postgresUser,
+                  '--postgres-password',
+                  postgresPassword,
+                  '--service-discovery-timeout',
+                  '1000',
+                  '--service-names',
+                  ServiceNames.Utxo
+                ],
+                dataMatchOnError: DNS_SERVER_NOT_REACHABLE_ERROR
+              },
+              done
+            );
           });
-          proc.stderr!.on('data', (data) => {
-            spy();
-            expect(data.toString().includes('querySrv ENOTFOUND')).toEqual(true);
+
+          it('exits with code 1 if DNS server not reachable when using env variables', (done) => {
+            callCliAndAssertExit(
+              {
+                dataMatchOnError: DNS_SERVER_NOT_REACHABLE_ERROR,
+                env: {
+                  POSTGRES_DB: postgresDb,
+                  POSTGRES_PASSWORD: postgresPassword,
+                  POSTGRES_SRV_SERVICE_NAME: postgresSrvServiceName,
+                  POSTGRES_USER: postgresUser,
+                  SERVICE_DISCOVERY_TIMEOUT: '1000',
+                  SERVICE_NAMES: ServiceNames.Utxo
+                }
+              },
+              done
+            );
           });
-          proc.on('exit', (code) => {
-            expect(code).toBe(1);
-            expect(spy).toHaveBeenCalled();
-            done();
+        });
+
+        describe('with both postgres srv service name and connection string', () => {
+          it('throws a CLI validation error and exits with code 1 when using CLI options', (done) => {
+            callCliAndAssertExit(
+              {
+                args: [
+                  '--postgres-connection-string',
+                  postgresConnectionString,
+                  '--postgres-srv-service-name',
+                  postgresSrvServiceName,
+                  '--service-names',
+                  ServiceNames.Utxo
+                ],
+                dataMatchOnError: CLI_CONFLICTING_OPTIONS_ERROR_MESSAGE
+              },
+              done
+            );
+          });
+
+          it('throws a CLI validation error and exits with code 1 when using env variables', (done) => {
+            callCliAndAssertExit(
+              {
+                dataMatchOnError: CLI_CONFLICTING_ENV_VARS_ERROR_MESSAGE,
+                env: {
+                  POSTGRES_CONNECTION_STRING: postgresConnectionString,
+                  POSTGRES_SRV_SERVICE_NAME: postgresSrvServiceName,
+                  SERVICE_NAMES: ServiceNames.Utxo
+                }
+              },
+              done
+            );
+          });
+        });
+
+        describe('with both postgres srv service name and host', () => {
+          it('throws a CLI validation error and exits with code 1 when using CLI options', (done) => {
+            callCliAndAssertExit(
+              {
+                args: [
+                  '--postgres-host',
+                  postgresHost,
+                  '--postgres-srv-service-name',
+                  postgresSrvServiceName,
+                  '--service-names',
+                  ServiceNames.Utxo
+                ],
+                dataMatchOnError: CLI_CONFLICTING_OPTIONS_ERROR_MESSAGE
+              },
+              done
+            );
+          });
+
+          it('throws a CLI validation error and exits with code 1 when using env variables', (done) => {
+            callCliAndAssertExit(
+              {
+                dataMatchOnError: CLI_CONFLICTING_ENV_VARS_ERROR_MESSAGE,
+                env: {
+                  POSTGRES_HOST: postgresHost,
+                  POSTGRES_SRV_SERVICE_NAME: postgresSrvServiceName,
+                  SERVICE_NAMES: ServiceNames.Utxo
+                }
+              },
+              done
+            );
+          });
+        });
+
+        describe('with both postgres srv service name and port', () => {
+          it('throws a CLI validation error and exits with code 1 when using CLI options', (done) => {
+            callCliAndAssertExit(
+              {
+                args: [
+                  '--postgres-port',
+                  postgresPort,
+                  '--postgres-srv-service-name',
+                  postgresSrvServiceName,
+                  '--service-names',
+                  ServiceNames.Utxo
+                ],
+                dataMatchOnError: CLI_CONFLICTING_OPTIONS_ERROR_MESSAGE
+              },
+              done
+            );
+          });
+
+          it('throws a CLI validation error and exits with code 1 when using env variables', (done) => {
+            callCliAndAssertExit(
+              {
+                dataMatchOnError: CLI_CONFLICTING_ENV_VARS_ERROR_MESSAGE,
+                env: {
+                  POSTGRES_PORT: postgresPort,
+                  POSTGRES_SRV_SERVICE_NAME: postgresSrvServiceName,
+                  SERVICE_NAMES: ServiceNames.Utxo
+                }
+              },
+              done
+            );
+          });
+        });
+
+        describe('with both connection string and postgres db name', () => {
+          it('throws a CLI validation error and exits with code 1 when using CLI options', (done) => {
+            callCliAndAssertExit(
+              {
+                args: [
+                  '--postgres-connection-string',
+                  postgresConnectionString,
+                  '--postgres-db',
+                  postgresDb,
+                  '--service-names',
+                  ServiceNames.Utxo
+                ],
+                dataMatchOnError: CLI_CONFLICTING_OPTIONS_ERROR_MESSAGE
+              },
+              done
+            );
+          });
+
+          it('throws a CLI validation error and exits with code 1 when using env variables', (done) => {
+            callCliAndAssertExit(
+              {
+                dataMatchOnError: CLI_CONFLICTING_ENV_VARS_ERROR_MESSAGE,
+                env: {
+                  POSTGRES_CONNECTION_STRING: postgresConnectionString,
+                  POSTGRES_DB: postgresDb,
+                  SERVICE_NAMES: ServiceNames.Utxo
+                }
+              },
+              done
+            );
+          });
+        });
+
+        describe('with both connection string and postgres db name file', () => {
+          it('throws a CLI validation error and exits with code 1 when using CLI options', (done) => {
+            callCliAndAssertExit(
+              {
+                args: [
+                  '--postgres-connection-string',
+                  postgresConnectionString,
+                  '--postgres-db-file',
+                  postgresDbFile,
+                  '--service-names',
+                  ServiceNames.Utxo
+                ],
+                dataMatchOnError: CLI_CONFLICTING_OPTIONS_ERROR_MESSAGE
+              },
+              done
+            );
+          });
+
+          it('throws a CLI validation error and exits with code 1 when using env variables', (done) => {
+            callCliAndAssertExit(
+              {
+                dataMatchOnError: CLI_CONFLICTING_ENV_VARS_ERROR_MESSAGE,
+                env: {
+                  POSTGRES_CONNECTION_STRING: postgresConnectionString,
+                  POSTGRES_DB_FILE: postgresDbFile,
+                  SERVICE_NAMES: ServiceNames.Utxo
+                }
+              },
+              done
+            );
+          });
+        });
+
+        describe('with both connection string and postgres user', () => {
+          it('throws a CLI validation error and exits with code 1 when using CLI options', (done) => {
+            callCliAndAssertExit(
+              {
+                args: [
+                  '--postgres-connection-string',
+                  postgresConnectionString,
+                  '--postgres-user',
+                  postgresUser,
+                  '--service-names',
+                  ServiceNames.Utxo
+                ],
+                dataMatchOnError: CLI_CONFLICTING_OPTIONS_ERROR_MESSAGE
+              },
+              done
+            );
+          });
+
+          it('throws a CLI validation error and exits with code 1 when using env variables', (done) => {
+            callCliAndAssertExit(
+              {
+                dataMatchOnError: CLI_CONFLICTING_ENV_VARS_ERROR_MESSAGE,
+                env: {
+                  POSTGRES_CONNECTION_STRING: postgresConnectionString,
+                  POSTGRES_USER: postgresUser,
+                  SERVICE_NAMES: ServiceNames.Utxo
+                }
+              },
+              done
+            );
+          });
+        });
+
+        describe('with both connection string and postgres user file', () => {
+          it('throws a CLI validation error and exits with code 1 when using CLI options', (done) => {
+            callCliAndAssertExit(
+              {
+                args: [
+                  '--postgres-connection-string',
+                  postgresConnectionString,
+                  '--postgres-user-file',
+                  postgresUserFile,
+                  '--service-names',
+                  ServiceNames.Utxo
+                ],
+                dataMatchOnError: CLI_CONFLICTING_OPTIONS_ERROR_MESSAGE
+              },
+              done
+            );
+          });
+
+          it('throws a CLI validation error and exits with code 1 when using env variables', (done) => {
+            callCliAndAssertExit(
+              {
+                dataMatchOnError: CLI_CONFLICTING_ENV_VARS_ERROR_MESSAGE,
+                env: {
+                  POSTGRES_CONNECTION_STRING: postgresConnectionString,
+                  POSTGRES_USER_FILE: postgresUserFile,
+                  SERVICE_NAMES: ServiceNames.Utxo
+                }
+              },
+              done
+            );
+          });
+        });
+
+        describe('with both connection string and postgres password', () => {
+          it('throws a CLI validation error and exits with code 1 when using CLI options', (done) => {
+            callCliAndAssertExit(
+              {
+                args: [
+                  '--postgres-connection-string',
+                  postgresConnectionString,
+                  '--postgres-password',
+                  postgresPassword,
+                  ServiceNames.Utxo
+                ],
+                dataMatchOnError: CLI_CONFLICTING_OPTIONS_ERROR_MESSAGE
+              },
+              done
+            );
+          });
+
+          it('throws a CLI validation error and exits with code 1 when using env variables', (done) => {
+            callCliAndAssertExit(
+              {
+                dataMatchOnError: CLI_CONFLICTING_ENV_VARS_ERROR_MESSAGE,
+                env: {
+                  POSTGRES_CONNECTION_STRING: postgresConnectionString,
+                  POSTGRES_PASSWORD: postgresPassword,
+                  SERVICE_NAMES: ServiceNames.Utxo
+                }
+              },
+              done
+            );
+          });
+        });
+
+        describe('with both connection string and postgres password file', () => {
+          it('throws a CLI validation error and exits with code 1 when using CLI options', (done) => {
+            callCliAndAssertExit(
+              {
+                args: [
+                  '--postgres-connection-string',
+                  postgresConnectionString,
+                  '--postgres-password-file',
+                  postgresPasswordFile,
+                  ServiceNames.Utxo
+                ],
+                dataMatchOnError: CLI_CONFLICTING_OPTIONS_ERROR_MESSAGE
+              },
+              done
+            );
+          });
+
+          it('throws a CLI validation error and exits with code 1 when using env variables', (done) => {
+            callCliAndAssertExit(
+              {
+                dataMatchOnError: CLI_CONFLICTING_ENV_VARS_ERROR_MESSAGE,
+                env: {
+                  POSTGRES_CONNECTION_STRING: postgresConnectionString,
+                  POSTGRES_PASSWORD_FILE: postgresPasswordFile,
+                  SERVICE_NAMES: ServiceNames.Utxo
+                }
+              },
+              done
+            );
+          });
+        });
+
+        describe('with both connection string and postgres host', () => {
+          it('throws a CLI validation error and exits with code 1 when using CLI options', (done) => {
+            callCliAndAssertExit(
+              {
+                args: [
+                  '--postgres-connection-string',
+                  postgresConnectionString,
+                  '--postgres-host',
+                  postgresHost,
+                  ServiceNames.Utxo
+                ],
+                dataMatchOnError: CLI_CONFLICTING_OPTIONS_ERROR_MESSAGE
+              },
+              done
+            );
+          });
+
+          it('throws a CLI validation error and exits with code 1 when using env variables', (done) => {
+            callCliAndAssertExit(
+              {
+                dataMatchOnError: CLI_CONFLICTING_ENV_VARS_ERROR_MESSAGE,
+                env: {
+                  POSTGRES_CONNECTION_STRING: postgresConnectionString,
+                  POSTGRES_HOST: postgresHost,
+                  SERVICE_NAMES: ServiceNames.Utxo
+                }
+              },
+              done
+            );
+          });
+        });
+
+        describe('with both connection string and postgres port', () => {
+          it('throws a CLI validation error and exits with code 1 when using CLI options', (done) => {
+            callCliAndAssertExit(
+              {
+                args: [
+                  '--postgres-connection-string',
+                  postgresConnectionString,
+                  '--postgres-port',
+                  postgresPort,
+                  ServiceNames.Utxo
+                ],
+                dataMatchOnError: CLI_CONFLICTING_OPTIONS_ERROR_MESSAGE
+              },
+              done
+            );
+          });
+
+          it('throws a CLI validation error and exits with code 1 when using env variables', (done) => {
+            callCliAndAssertExit(
+              {
+                dataMatchOnError: CLI_CONFLICTING_ENV_VARS_ERROR_MESSAGE,
+                env: {
+                  POSTGRES_CONNECTION_STRING: postgresConnectionString,
+                  POSTGRES_PORT: postgresPort,
+                  SERVICE_NAMES: ServiceNames.Utxo
+                }
+              },
+              done
+            );
+          });
+        });
+
+        describe('with both postgres db name from config and from file', () => {
+          it('throws a CLI validation error and exits with code 1 when using CLI options', (done) => {
+            callCliAndAssertExit(
+              {
+                args: ['--postgres-db', postgresDb, '--postgres-db-file', postgresDbFile, ServiceNames.Utxo],
+                dataMatchOnError: CLI_CONFLICTING_OPTIONS_ERROR_MESSAGE
+              },
+              done
+            );
+          });
+
+          it('throws a CLI validation error and exits with code 1 when using env variables', (done) => {
+            callCliAndAssertExit(
+              {
+                dataMatchOnError: CLI_CONFLICTING_ENV_VARS_ERROR_MESSAGE,
+                env: {
+                  POSTGRES_DB: postgresDb,
+                  POSTGRES_DB_FILE: postgresDbFile,
+                  SERVICE_NAMES: ServiceNames.Utxo
+                }
+              },
+              done
+            );
+          });
+        });
+
+        describe('with both postgres user from config and from file', () => {
+          it('throws a CLI validation error and exits with code 1 when using CLI options', (done) => {
+            callCliAndAssertExit(
+              {
+                args: ['--postgres-user', postgresUser, '--postgres-user-file', postgresUserFile, ServiceNames.Utxo],
+                dataMatchOnError: CLI_CONFLICTING_OPTIONS_ERROR_MESSAGE
+              },
+              done
+            );
+          });
+
+          it('throws a CLI validation error and exits with code 1 when using env variables', (done) => {
+            callCliAndAssertExit(
+              {
+                dataMatchOnError: CLI_CONFLICTING_ENV_VARS_ERROR_MESSAGE,
+                env: {
+                  POSTGRES_USER: postgresUser,
+                  POSTGRES_USER_FILE: postgresUserFile,
+                  SERVICE_NAMES: ServiceNames.Utxo
+                }
+              },
+              done
+            );
+          });
+        });
+
+        describe('with both postgres password from config and from file', () => {
+          it('throws a CLI validation error and exits with code 1 whens use CLI options', (done) => {
+            callCliAndAssertExit(
+              {
+                args: [
+                  '--postgres-password',
+                  postgresPassword,
+                  '--postgres-password-file',
+                  postgresPasswordFile,
+                  ServiceNames.Utxo
+                ],
+                dataMatchOnError: CLI_CONFLICTING_OPTIONS_ERROR_MESSAGE
+              },
+              done
+            );
+          });
+
+          it('throws a CLI validation error and exits with code 1 when using env variables', (done) => {
+            callCliAndAssertExit(
+              {
+                dataMatchOnError: CLI_CONFLICTING_ENV_VARS_ERROR_MESSAGE,
+                env: {
+                  POSTGRES_PASSWORD: postgresPassword,
+                  POSTGRES_PASSWORD_FILE: postgresPasswordFile,
+                  SERVICE_NAMES: ServiceNames.Utxo
+                }
+              },
+              done
+            );
           });
         });
       });
 
       describe('specifying a Cardano-Configurations-dependent service without providing the node config path', () => {
-        let spy: jest.Mock;
-        beforeEach(() => {
-          spy = jest.fn();
-        });
-
-        it('cli:start-server network-info exits with code 1', (done) => {
-          expect.assertions(2);
-          proc = fork(
-            exePath('cli'),
-            [
-              'start-server',
-              '--api-url',
-              apiUrl,
-              '--postgres-connection-string',
-              postgresConnectionString,
-              '--logger-min-severity',
-              'error',
-              ServiceNames.NetworkInfo
-            ],
+        it('network-info exits with code 1 when using CLI options', (done) => {
+          callCliAndAssertExit(
             {
-              stdio: 'pipe'
-            }
+              args: ['--postgres-connection-string', postgresConnectionString, ServiceNames.NetworkInfo]
+            },
+            done
           );
-          proc.stderr!.on('data', spy);
-          proc.on('exit', (code) => {
-            expect(code).toBe(1);
-            expect(spy).toHaveBeenCalled();
-            done();
-          });
         });
 
-        it('run network-info exits with code 1', (done) => {
-          expect.assertions(2);
-          proc = fork(exePath('run'), {
-            env: {
-              API_URL: apiUrl,
-              LOGGER_MIN_SEVERITY: 'error',
-              POSTGRES_CONNECTION_STRING: postgresConnectionString,
-              SERVICE_NAMES: ServiceNames.NetworkInfo
+        it('network-info exits with code 1 when using env variables', (done) => {
+          callCliAndAssertExit(
+            {
+              env: {
+                POSTGRES_CONNECTION_STRING: postgresConnectionString,
+                SERVICE_NAMES: ServiceNames.NetworkInfo
+              }
             },
-            stdio: 'pipe'
-          });
-          proc.stderr!.on('data', spy);
-          proc.on('exit', (code) => {
-            expect(code).toBe(1);
-            expect(spy).toHaveBeenCalled();
-            done();
-          });
+            done
+          );
         });
       });
 
-      describe('specifying an Ogmios-dependent service without providing the Ogmios URL', () => {
+      describe('specifying an Ogmios-dependent service', () => {
         beforeEach(async () => {
           ogmiosServer = createHealthyMockOgmiosServer();
           // ws://localhost:1337
@@ -484,68 +950,218 @@ describe('entrypoints', () => {
           await ogmiosServerReady(ogmiosConnection);
         });
 
-        it('cli:start-server netrowk-info uses the default Ogmios configuration if not specified', async () => {
-          proc = fork(
-            exePath('cli'),
-            [
-              'start-server',
-              '--api-url',
-              apiUrl,
-              '--postgres-connection-string',
-              postgresConnectionString,
-              '--cardano-node-config-path',
-              cardanoNodeConfigPath,
-              '--logger-min-severity',
-              'error',
-              ServiceNames.NetworkInfo
-            ],
-            {
-              stdio: 'pipe'
-            }
-          );
+        describe('without providing the Ogmios URL', () => {
+          it('network-info uses the default Ogmios configuration if not specified when using CLI options', async () => {
+            proc = fork(
+              exePath('cli'),
+              [
+                ...baseArgs,
+                '--api-url',
+                apiUrl,
+                '--postgres-connection-string',
+                postgresConnectionString,
+                '--cardano-node-config-path',
+                cardanoNodeConfigPath,
+                ServiceNames.NetworkInfo
+              ],
+              {
+                env: {},
+                stdio: 'pipe'
+              }
+            );
 
-          await assertServiceHealthy(apiUrl, ServiceNames.NetworkInfo);
-        });
-
-        it('run network-info uses the default Ogmios configuration if not specified', async () => {
-          proc = fork(exePath('run'), {
-            env: {
-              API_URL: apiUrl,
-              CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
-              LOGGER_MIN_SEVERITY: 'error',
-              POSTGRES_CONNECTION_STRING: postgresConnectionString,
-              SERVICE_NAMES: ServiceNames.NetworkInfo
-            },
-            stdio: 'pipe'
+            await assertServiceHealthy(apiUrl, ServiceNames.NetworkInfo);
           });
-          await assertServiceHealthy(apiUrl, ServiceNames.NetworkInfo);
-        });
 
-        it('cli:start-server tx-submit uses the default Ogmios configuration if not specified', async () => {
-          proc = fork(
-            exePath('cli'),
-            ['start-server', '--api-url', apiUrl, '--logger-min-severity', 'error', ServiceNames.TxSubmit],
-            {
+          it('netrowk-info uses the default Ogmios configuration if not specified using env variables', async () => {
+            proc = fork(exePath('cli'), ['start-server'], {
+              env: {
+                API_URL: apiUrl,
+                CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
+                LOGGER_MIN_SEVERITY: 'error',
+                POSTGRES_CONNECTION_STRING: postgresConnectionString,
+                SERVICE_NAMES: ServiceNames.NetworkInfo
+              },
               stdio: 'pipe'
-            }
-          );
-          await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit);
+            });
+
+            await assertServiceHealthy(apiUrl, ServiceNames.NetworkInfo);
+          });
+
+          it('tx-submit uses the default Ogmios configuration if not specified when using CLI options', async () => {
+            proc = fork(exePath('cli'), [...baseArgs, '--api-url', apiUrl, ServiceNames.TxSubmit], {
+              env: {},
+              stdio: 'pipe'
+            });
+            await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit);
+          });
+
+          it('tx-submit uses the default Ogmios configuration if not specified when using env variables', async () => {
+            proc = fork(exePath('cli'), ['start-server'], {
+              env: {
+                API_URL: apiUrl,
+                LOGGER_MIN_SEVERITY: 'error',
+                SERVICE_NAMES: ServiceNames.TxSubmit
+              },
+              stdio: 'pipe'
+            });
+
+            await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit);
+          });
         });
 
-        it('run tx-submit uses the default Ogmios configuration if not specified', async () => {
-          proc = fork(exePath('run'), {
-            env: {
-              API_URL: apiUrl,
-              LOGGER_MIN_SEVERITY: 'error',
-              SERVICE_NAMES: ServiceNames.TxSubmit
-            },
-            stdio: 'pipe'
+        describe('with service discovery', () => {
+          it('network-info throws DNS SRV error and exits with code 1 when using CLI options', (done) => {
+            callCliAndAssertExit(
+              {
+                args: [
+                  '--cardano-node-config-path',
+                  cardanoNodeConfigPath,
+                  '--postgres-srv-service-name',
+                  postgresSrvServiceName,
+                  '--postgres-db',
+                  postgresDb,
+                  '--postgres-user',
+                  postgresUser,
+                  '--postgres-password',
+                  postgresPassword,
+                  '--ogmios-srv-service-name',
+                  ogmiosSrvServiceName,
+                  '--service-discovery-timeout',
+                  '1000',
+                  '--service-names',
+                  ServiceNames.NetworkInfo
+                ],
+                dataMatchOnError: DNS_SERVER_NOT_REACHABLE_ERROR
+              },
+              done
+            );
           });
-          await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit);
+
+          it('network-info throws DNS SRV error and exits with code 1 when using env variables', (done) => {
+            callCliAndAssertExit(
+              {
+                dataMatchOnError: DNS_SERVER_NOT_REACHABLE_ERROR,
+                env: {
+                  API_URL: apiUrl,
+                  CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
+                  OGMIOS_SRV_SERVICE_NAME: ogmiosSrvServiceName,
+                  POSTGRES_DB: postgresDb,
+                  POSTGRES_PASSWORD: postgresPassword,
+                  POSTGRES_SRV_SERVICE_NAME: postgresSrvServiceName,
+                  POSTGRES_USER: postgresUser,
+                  SERVICE_DISCOVERY_TIMEOUT: '1000',
+                  SERVICE_NAMES: ServiceNames.NetworkInfo
+                }
+              },
+              done
+            );
+          });
+
+          it('tx-submit throws DNS SRV error and exits with code 1 when using CLI options', (done) => {
+            callCliAndAssertExit(
+              {
+                args: [
+                  '--ogmios-srv-service-name',
+                  ogmiosSrvServiceName,
+                  '--service-discovery-timeout',
+                  '1000',
+                  '--service-names',
+                  ServiceNames.TxSubmit
+                ],
+                dataMatchOnError: DNS_SERVER_NOT_REACHABLE_ERROR
+              },
+              done
+            );
+          });
+
+          it('tx-submit throws DNS SRV error and exits with code 1 when using env variables', (done) => {
+            callCliAndAssertExit(
+              {
+                dataMatchOnError: DNS_SERVER_NOT_REACHABLE_ERROR,
+                env: {
+                  API_URL: apiUrl,
+                  OGMIOS_SRV_SERVICE_NAME: ogmiosSrvServiceName,
+                  SERVICE_DISCOVERY_TIMEOUT: '1000',
+                  SERVICE_NAMES: ServiceNames.TxSubmit
+                }
+              },
+              done
+            );
+          });
+        });
+
+        describe('with providing both Ogmios URL and SRV service name', () => {
+          it('network-info throws a CLI validation error and exits with code 1 whens use CLI options', (done) => {
+            callCliAndAssertExit(
+              {
+                args: [
+                  '--postgres-password',
+                  postgresPassword,
+                  '--ogmios-url',
+                  ogmiosConnection.address.webSocket,
+                  '--ogmios-srv-service-name',
+                  ogmiosSrvServiceName,
+                  '--service_names',
+                  ServiceNames.NetworkInfo
+                ],
+                dataMatchOnError: CLI_CONFLICTING_OPTIONS_ERROR_MESSAGE
+              },
+              done
+            );
+          });
+
+          it('network-info throws a CLI validation error and exits with code 1 when using env variables', (done) => {
+            callCliAndAssertExit(
+              {
+                dataMatchOnError: CLI_CONFLICTING_ENV_VARS_ERROR_MESSAGE,
+                env: {
+                  API_URL: apiUrl,
+                  OGMIOS_SRV_SERVICE_NAME: ogmiosSrvServiceName,
+                  OGMIOS_URL: ogmiosConnection.address.webSocket,
+                  POSTGRES_CONNECTION_STRING: postgresConnectionString,
+                  SERVICE_NAMES: ServiceNames.NetworkInfo
+                }
+              },
+              done
+            );
+          });
+
+          it('tx-submit throws a CLI validation error and exits with code 1 whens use CLI options', (done) => {
+            callCliAndAssertExit(
+              {
+                args: [
+                  '--ogmios-url',
+                  ogmiosConnection.address.webSocket,
+                  '--ogmios-srv-service-name',
+                  ogmiosSrvServiceName,
+                  '--service_names',
+                  ServiceNames.TxSubmit
+                ],
+                dataMatchOnError: CLI_CONFLICTING_OPTIONS_ERROR_MESSAGE
+              },
+              done
+            );
+          });
+
+          it('tx-submit throws a CLI validation error and exits with code 1 when using env variables', (done) => {
+            callCliAndAssertExit(
+              {
+                dataMatchOnError: CLI_CONFLICTING_ENV_VARS_ERROR_MESSAGE,
+                env: {
+                  API_URL: apiUrl,
+                  OGMIOS_SRV_SERVICE_NAME: ogmiosSrvServiceName,
+                  OGMIOS_URL: ogmiosConnection.address.webSocket,
+                  SERVICE_NAMES: ServiceNames.TxSubmit
+                }
+              },
+              done
+            );
+          });
         });
       });
 
-      describe('using the asset service', () => {
+      describe('specifying a Token-Registry-dependent service', () => {
         let closeMock: () => Promise<void> = jest.fn();
         let tokenMetadataServerUrl = '';
         const record = {
@@ -559,22 +1175,20 @@ describe('entrypoints', () => {
 
         afterAll(async () => await closeMock());
 
-        it('cli:start-server uses the asset service', async () => {
+        it('exposes a HTTP server with healthy state when using CLI options', async () => {
           proc = fork(
             exePath('cli'),
             [
-              'start-server',
+              ...baseArgs,
               '--api-url',
               apiUrl,
               '--postgres-connection-string',
               postgresConnectionString,
-              '--logger-min-severity',
-              'error',
               '--token-metadata-server-url',
               tokenMetadataServerUrl,
               ServiceNames.Asset
             ],
-            { stdio: 'pipe' }
+            { env: {}, stdio: 'pipe' }
           );
 
           await assertServiceHealthy(apiUrl, ServiceNames.Asset);
@@ -590,8 +1204,8 @@ describe('entrypoints', () => {
           expect(tokenMetadata).toStrictEqual({ name: 'test' });
         });
 
-        it('run uses the asset service', async () => {
-          proc = fork(exePath('run'), {
+        it('exposes a HTTP server with healthy state when using env variables', async () => {
+          proc = fork(exePath('cli'), ['start-server'], {
             env: {
               API_URL: apiUrl,
               LOGGER_MIN_SEVERITY: 'error',
@@ -615,527 +1229,275 @@ describe('entrypoints', () => {
           expect(tokenMetadata).toStrictEqual({ name: 'test' });
         });
       });
-    });
 
-    describe('specifying an Ogmios-dependent service with service discovery args', () => {
-      let spy: jest.Mock;
-      beforeEach(async () => {
-        spy = jest.fn();
-      });
+      describe('specifying a RabbitMQ-dependent service', () => {
+        describe('with RabbitMQ and explicit URL', () => {
+          it('exposes a HTTP server with healthy state when using CLI options', async () => {
+            proc = fork(
+              exePath('cli'),
+              [
+                ...baseArgs,
+                '--api-url',
+                apiUrl,
+                '--use-queue',
+                '--rabbitmq-url',
+                rabbitmqUrl.toString(),
+                ServiceNames.TxSubmit
+              ],
+              {
+                env: {},
+                stdio: 'pipe'
+              }
+            );
+            await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, true);
+          });
 
-      it('cli:start-server network-info throws DNS SRV error and exits with code 1', (done) => {
-        expect.assertions(3);
-        proc = fork(
-          exePath('cli'),
-          [
-            'start-server',
-            '--api-url',
-            apiUrl,
-            '--postgres-srv-service-name',
-            postgresSrvServiceName,
-            '--postgres-db',
-            postgresDb,
-            '--postgres-user',
-            postgresUser,
-            '--postgres-password',
-            postgresPassword,
-            '--ogmios-srv-service-name',
-            ogmiosSrvServiceName,
-            '--logger-min-severity',
-            'error',
-            '--service-discovery-timeout',
-            '1000',
-            ServiceNames.NetworkInfo
-          ],
-          {
-            stdio: 'pipe'
-          }
-        );
-
-        proc.stderr!.on('data', (data) => {
-          spy();
-          expect(data.toString().includes('querySrv ENOTFOUND')).toEqual(true);
+          it('exposes a HTTP server with healthy state when using env variables', async () => {
+            proc = fork(exePath('cli'), ['start-server'], {
+              env: {
+                API_URL: apiUrl,
+                LOGGER_MIN_SEVERITY: 'error',
+                RABBITMQ_URL: rabbitmqUrl.toString(),
+                SERVICE_NAMES: ServiceNames.TxSubmit,
+                USE_QUEUE: 'true'
+              },
+              stdio: 'pipe'
+            });
+            await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, true);
+          });
         });
 
-        proc.on('exit', (code) => {
-          expect(code).toBe(1);
-          expect(spy).toHaveBeenCalled();
-          done();
-        });
-      });
+        describe('with RabbitMQ and default URL', () => {
+          it('throws a provider unhealthy error when using CLI options', (done) => {
+            expect.assertions(2);
 
-      it('run network-info throws DNS SRV error and exits with code 1', (done) => {
-        expect.assertions(3);
-        proc = fork(exePath('run'), {
-          env: {
-            API_URL: apiUrl,
-            LOGGER_MIN_SEVERITY: 'error',
-            OGMIOS_SRV_SERVICE_NAME: ogmiosSrvServiceName,
-            POSTGRES_DB: postgresDb,
-            POSTGRES_PASSWORD: postgresPassword,
-            POSTGRES_SRV_SERVICE_NAME: postgresSrvServiceName,
-            POSTGRES_USER: postgresUser,
-            SERVICE_DISCOVERY_TIMEOUT: '1000',
-            SERVICE_NAMES: ServiceNames.NetworkInfo
-          },
-          stdio: 'pipe'
-        });
-        proc.stderr!.on('data', (data) => {
-          spy();
-          expect(data.toString().includes('querySrv ENOTFOUND')).toEqual(true);
-        });
-        proc.on('exit', (code) => {
-          expect(code).toBe(1);
-          expect(spy).toHaveBeenCalled();
-          done();
-        });
-      });
+            proc = fork(exePath('cli'), [...baseArgs, '--api-url', apiUrl, '--use-queue', ServiceNames.TxSubmit], {
+              env: {},
+              stdio: 'pipe'
+            });
 
-      it('cli:start-server tx-submit throws DNS SRV error and exits with code 1', (done) => {
-        expect.assertions(3);
-        proc = fork(
-          exePath('cli'),
-          [
-            'start-server',
-            '--api-url',
-            apiUrl,
-            '--ogmios-srv-service-name',
-            ogmiosSrvServiceName,
-            '--logger-min-severity',
-            'error',
-            '--service-discovery-timeout',
-            '1000',
-            ServiceNames.TxSubmit
-          ],
-          {
-            stdio: 'pipe'
-          }
-        );
+            proc.stderr!.on('data', (data) => expect(data.toString()).toMatch('ProviderError: UNHEALTHY'));
 
-        proc.stderr!.on('data', (data) => {
-          spy();
-          expect(data.toString().includes('querySrv ENOTFOUND')).toEqual(true);
+            proc.on('exit', (code) => {
+              expect(code).toBe(1);
+              done();
+            });
+          });
+
+          it('throws a provider unhealthy error when using env variables', (done) => {
+            expect.assertions(2);
+
+            proc = fork(exePath('cli'), ['start-server'], {
+              env: {
+                API_URL: apiUrl,
+                LOGGER_MIN_SEVERITY: 'error',
+                SERVICE_NAMES: ServiceNames.TxSubmit,
+                USE_QUEUE: 'true'
+              },
+              stdio: 'pipe'
+            });
+
+            proc.stderr!.on('data', (data) => expect(data.toString()).toMatch('ProviderError: UNHEALTHY'));
+
+            proc.on('exit', (code) => {
+              expect(code).toBe(1);
+              done();
+            });
+          });
         });
 
-        proc.on('exit', (code) => {
-          expect(code).toBe(1);
-          expect(spy).toHaveBeenCalled();
-          done();
-        });
-      });
+        describe('with service discovery', () => {
+          it('tx-submit throws DNS SRV error and exits with code 1 when using CLI options', (done) => {
+            callCliAndAssertExit(
+              {
+                args: [
+                  '--use-queue',
+                  '--rabbitmq-srv-service-name',
+                  rabbitmqSrvServiceName,
+                  '--service-discovery-timeout',
+                  '1000',
+                  '--service-names',
+                  ServiceNames.TxSubmit
+                ],
+                dataMatchOnError: DNS_SERVER_NOT_REACHABLE_ERROR
+              },
+              done
+            );
+          });
 
-      it('run tx-submit throws DNS SRV error and exits with code 1', (done) => {
-        expect.assertions(3);
-        proc = fork(exePath('run'), {
-          env: {
-            API_URL: apiUrl,
-            LOGGER_MIN_SEVERITY: 'error',
-            OGMIOS_SRV_SERVICE_NAME: ogmiosSrvServiceName,
-            SERVICE_DISCOVERY_TIMEOUT: '1000',
-            SERVICE_NAMES: ServiceNames.TxSubmit
-          },
-          stdio: 'pipe'
-        });
-        proc.stderr!.on('data', (data) => {
-          spy();
-          expect(data.toString().includes('querySrv ENOTFOUND')).toEqual(true);
-        });
-        proc.on('exit', (code) => {
-          expect(code).toBe(1);
-          expect(spy).toHaveBeenCalled();
-          done();
-        });
-      });
-    });
-
-    describe('with RabbitMQ and explicit URL', () => {
-      it('cli:start-server', async () => {
-        proc = fork(
-          exePath('cli'),
-          [
-            'start-server',
-            '--api-url',
-            apiUrl,
-            '--logger-min-severity',
-            'error',
-            '--use-queue',
-            '--rabbitmq-url',
-            rabbitmqUrl.toString(),
-            ServiceNames.TxSubmit
-          ],
-          {
-            stdio: 'pipe'
-          }
-        );
-        await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, true);
-      });
-
-      it('run', async () => {
-        proc = fork(exePath('run'), {
-          env: {
-            API_URL: apiUrl,
-            LOGGER_MIN_SEVERITY: 'error',
-            RABBITMQ_URL: rabbitmqUrl.toString(),
-            SERVICE_NAMES: ServiceNames.TxSubmit,
-            USE_QUEUE: 'true'
-          },
-          stdio: 'pipe'
-        });
-        await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, true);
-      });
-    });
-
-    describe('with RabbitMQ and default URL', () => {
-      it('cli:start-server', (done) => {
-        expect.assertions(2);
-
-        proc = fork(
-          exePath('cli'),
-          ['start-server', '--api-url', apiUrl, '--logger-min-severity', 'error', '--use-queue', ServiceNames.TxSubmit],
-          {
-            stdio: 'pipe'
-          }
-        );
-
-        proc.stderr!.on('data', (data) => expect(data.toString()).toMatch('ProviderError: UNHEALTHY'));
-
-        proc.on('exit', (code) => {
-          expect(code).toBe(1);
-          done();
-        });
-      });
-
-      it('run', (done) => {
-        expect.assertions(2);
-
-        proc = fork(exePath('run'), {
-          env: {
-            API_URL: apiUrl,
-            LOGGER_MIN_SEVERITY: 'error',
-            SERVICE_NAMES: ServiceNames.TxSubmit,
-            USE_QUEUE: 'true'
-          },
-          stdio: 'pipe'
+          it('tx-submit throws DNS SRV error and exits with code 1 when using env variables', (done) => {
+            callCliAndAssertExit(
+              {
+                dataMatchOnError: DNS_SERVER_NOT_REACHABLE_ERROR,
+                env: {
+                  API_URL: apiUrl,
+                  RABBITMQ_SRV_SERVICE_NAME: rabbitmqSrvServiceName,
+                  SERVICE_DISCOVERY_TIMEOUT: '1000',
+                  SERVICE_NAMES: ServiceNames.TxSubmit,
+                  USE_QUEUE: 'true'
+                }
+              },
+              done
+            );
+          });
         });
 
-        proc.stderr!.on('data', (data) => expect(data.toString()).toMatch('ProviderError: UNHEALTHY'));
+        describe('with providing both RabbitMQ URL and SRV service name', () => {
+          it('tx-submit throws a CLI validation error and exits with code 1 whens use CLI options', (done) => {
+            callCliAndAssertExit(
+              {
+                args: [
+                  '--use-queue',
+                  '--rabbitmq-srv-service-name',
+                  rabbitmqSrvServiceName,
+                  '--rabbitmq-url',
+                  rabbitmqUrl.toString(),
+                  '--service-discovery-timeout',
+                  '1000',
+                  '--service_names',
+                  ServiceNames.TxSubmit
+                ],
+                dataMatchOnError: CLI_CONFLICTING_OPTIONS_ERROR_MESSAGE
+              },
+              done
+            );
+          });
 
-        proc.on('exit', (code) => {
-          expect(code).toBe(1);
-          done();
-        });
-      });
-    });
-
-    describe('specifying a RabbitMQ-dependent service with service discovery args', () => {
-      let spy: jest.Mock;
-      beforeEach(async () => {
-        spy = jest.fn();
-      });
-
-      it('cli:start-server throws DNS SRV error and exits with code 1', (done) => {
-        expect.assertions(3);
-        proc = fork(
-          exePath('cli'),
-          [
-            'start-server',
-            '--api-url',
-            apiUrl,
-            '--use-queue',
-            '--rabbitmq-srv-service-name',
-            rabbitmqSrvServiceName,
-            '--logger-min-severity',
-            'error',
-            '--service-discovery-timeout',
-            '1000',
-            ServiceNames.TxSubmit
-          ],
-          {
-            stdio: 'pipe'
-          }
-        );
-
-        proc.stderr!.on('data', (data) => {
-          spy();
-          expect(data.toString().includes('querySrv ENOTFOUND')).toEqual(true);
-        });
-
-        proc.on('exit', (code) => {
-          expect(code).toBe(1);
-          expect(spy).toHaveBeenCalled();
-          done();
-        });
-      });
-
-      it('run throws DNS SRV error and exits with code 1', (done) => {
-        expect.assertions(3);
-        proc = fork(exePath('run'), {
-          env: {
-            API_URL: apiUrl,
-            LOGGER_MIN_SEVERITY: 'error',
-            RABBITMQ_SRV_SERVICE_NAME: rabbitmqSrvServiceName,
-            SERVICE_DISCOVERY_TIMEOUT: '1000',
-            SERVICE_NAMES: ServiceNames.TxSubmit,
-            USE_QUEUE: 'true'
-          },
-          stdio: 'pipe'
-        });
-        proc.stderr!.on('data', (data) => {
-          spy();
-          expect(data.toString().includes('querySrv ENOTFOUND')).toEqual(true);
-        });
-        proc.on('exit', (code) => {
-          expect(code).toBe(1);
-          expect(spy).toHaveBeenCalled();
-          done();
+          it('tx-submit throws a CLI validation error and exits with code 1 when using env variables', (done) => {
+            callCliAndAssertExit(
+              {
+                dataMatchOnError: CLI_CONFLICTING_ENV_VARS_ERROR_MESSAGE,
+                env: {
+                  API_URL: apiUrl,
+                  RABBITMQ_SRV_SERVICE_NAME: rabbitmqSrvServiceName,
+                  RABBITMQ_URL: rabbitmqUrl.toString(),
+                  SERVICE_DISCOVERY_TIMEOUT: '1000',
+                  SERVICE_NAMES: ServiceNames.TxSubmit,
+                  USE_QUEUE: 'true'
+                }
+              },
+              done
+            );
+          });
         });
       });
     });
 
     describe('with unhealthy internal providers', () => {
-      let spy: jest.Mock;
       beforeEach(() => {
         ogmiosServer = createUnhealthyMockOgmiosServer();
-        spy = jest.fn();
       });
 
-      it('cli:start-server exits with code 1', (done) => {
-        expect.assertions(2);
+      it('exits with code 1', (done) => {
         ogmiosServer.listen(ogmiosConnection.port, () => {
-          proc = fork(
-            exePath('cli'),
-            [
-              'start-server',
-              '--api-url',
-              apiUrl,
-              '--postgres-connection-string',
-              postgresConnectionString,
-              '--logger-min-severity',
-              'error',
-              '--ogmios-url',
-              ogmiosConnection.address.webSocket,
-              ServiceNames.StakePool,
-              ServiceNames.TxSubmit
-            ],
+          callCliAndAssertExit(
             {
-              stdio: 'pipe'
-            }
-          );
-          proc.stderr!.on('data', spy);
-          proc.on('exit', (code) => {
-            expect(code).toBe(1);
-            expect(spy).toHaveBeenCalled();
-            done();
-          });
-        });
-      });
-
-      it('run exits with code 1', (done) => {
-        expect.assertions(2);
-        ogmiosServer.listen(ogmiosConnection.port, () => {
-          proc = fork(exePath('run'), {
-            env: {
-              API_URL: apiUrl,
-              LOGGER_MIN_SEVERITY: 'error',
-              OGMIOS_URL: ogmiosConnection.address.webSocket,
-              POSTGRES_CONNECTION_STRING: postgresConnectionString,
-              SERVICE_NAMES: `${ServiceNames.StakePool},${ServiceNames.TxSubmit}`
+              args: [
+                '--postgres-connection-string',
+                postgresConnectionString,
+                '--ogmios-url',
+                ogmiosConnection.address.webSocket,
+                '--service_names',
+                ServiceNames.StakePool,
+                ServiceNames.TxSubmit
+              ]
             },
-            stdio: 'pipe'
-          });
-          proc.stderr!.on('data', spy);
-          proc.on('exit', (code) => {
-            expect(code).toBe(1);
-            expect(spy).toHaveBeenCalled();
-            done();
-          });
+            done
+          );
         });
       });
     });
 
     describe('specifying an unknown service', () => {
-      let spy: jest.Mock;
       beforeEach(() => {
         ogmiosServer = createHealthyMockOgmiosServer();
-        spy = jest.fn();
       });
 
       it('cli:start-server exits with code 1', (done) => {
-        expect.assertions(2);
         ogmiosServer.listen(ogmiosConnection.port, () => {
-          proc = fork(
-            exePath('cli'),
-            [
-              'start-server',
-              '--api-url',
-              apiUrl,
-              '--ogmios-url',
-              ogmiosConnection.address.webSocket,
-              '--logger-min-severity',
-              'error',
-              'some-unknown-service',
-              ServiceNames.TxSubmit
-            ],
+          callCliAndAssertExit(
             {
-              stdio: 'pipe'
-            }
-          );
-          proc.stderr!.on('data', spy);
-          proc.on('exit', (code) => {
-            expect(code).toBe(1);
-            expect(spy).toHaveBeenCalled();
-            done();
-          });
-        });
-      });
-
-      it('run exits with code 1', (done) => {
-        expect.assertions(2);
-        ogmiosServer.listen(ogmiosConnection.port, () => {
-          proc = fork(exePath('run'), {
-            env: {
-              API_URL: apiUrl,
-              LOGGER_MIN_SEVERITY: 'error',
-              OGMIOS_URL: ogmiosConnection.address.webSocket,
-              SERVICE_NAMES: `some-unknown-service,${ServiceNames.TxSubmit}`
+              args: ['--ogmios-url', ogmiosConnection.address.webSocket, 'some-unknown-service', ServiceNames.TxSubmit]
             },
-            stdio: 'pipe'
-          });
-          proc.stderr!.on('data', spy);
-          proc.on('exit', (code) => {
-            expect(code).toBe(1);
-            expect(spy).toHaveBeenCalled();
-            done();
-          });
+            done
+          );
         });
       });
     });
 
     describe('specifying ssl ca file path that does not exist', () => {
-      let spy: jest.Mock;
       const invalidFilePath = 'this-is-not-a-valid-file-path';
 
-      beforeEach(async () => {
-        spy = jest.fn();
-      });
-
-      it('cli:start-server exits with code 1', (done) => {
-        proc = fork(
-          exePath('cli'),
-          [
-            'start-server',
-            '--api-url',
-            apiUrl,
-            '--postgres-connection-string',
-            postgresConnectionString,
-            '--logger-min-severity',
-            'error',
-            '--cardano-node-config-path',
-            cardanoNodeConfigPath,
-            ServiceNames.NetworkInfo,
-            '--postgres-ssl-ca-file',
-            invalidFilePath
-          ],
-          { stdio: 'pipe' }
+      it('exits with code 1 when using CLI options', (done) => {
+        callCliAndAssertExit(
+          {
+            args: [
+              '--postgres-connection-string',
+              postgresConnectionString,
+              '--cardano-node-config-path',
+              cardanoNodeConfigPath,
+              '--postgres-ssl-ca-file',
+              invalidFilePath,
+              '--service-names',
+              ServiceNames.NetworkInfo
+            ],
+            dataMatchOnError: 'ENOENT: no such file or directory'
+          },
+          done
         );
-        proc.stderr!.on('data', (data) => {
-          spy();
-          expect(data.toString().includes('ENOENT: no such file or directory')).toEqual(true);
-        });
-
-        proc.on('exit', (code) => {
-          expect(code).toBe(1);
-          expect(spy).toHaveBeenCalled();
-          done();
-        });
       });
-      it('run exits with code 1', (done) => {
-        expect.assertions(3);
-        ogmiosServer.listen(ogmiosConnection.port, () => {
-          proc = fork(exePath('run'), {
+
+      it('exits with code 1 when using env variables', (done) => {
+        callCliAndAssertExit(
+          {
+            dataMatchOnError: 'ENOENT: no such file or directory',
             env: {
               API_URL: apiUrl,
               CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
-              LOGGER_MIN_SEVERITY: 'error',
               POSTGRES_CONNECTION_STRING: postgresConnectionString,
               POSTGRES_SSL_CA_FILE: invalidFilePath,
               SERVICE_NAMES: ServiceNames.NetworkInfo
-            },
-            stdio: 'pipe'
-          });
-          proc.stderr!.on('data', (data) => {
-            spy();
-            expect(data.toString().includes('No file exists')).toEqual(true);
-          });
-          proc.on('exit', (code) => {
-            expect(code).toBe(1);
-            expect(spy).toHaveBeenCalled();
-            done();
-          });
-        });
+            }
+          },
+          done
+        );
       });
     });
 
     describe('specifying ssl ca file path to an invalid cert', () => {
-      let spy: jest.Mock;
-
-      beforeEach(async () => {
-        spy = jest.fn();
-      });
-      it('cli:start-server exits with code 1', (done) => {
-        proc = fork(
-          exePath('cli'),
-          [
-            'start-server',
-            '--api-url',
-            apiUrl,
-            '--postgres-connection-string',
-            postgresConnectionString,
-            '--logger-min-severity',
-            'error',
-            '--cardano-node-config-path',
-            cardanoNodeConfigPath,
-            ServiceNames.NetworkInfo,
-            '--postgres-ssl-ca-file',
-            postgresSslCaFile
-          ],
-          { stdio: 'pipe' }
+      it('exits with code 1 when using CLI options', (done) => {
+        callCliAndAssertExit(
+          {
+            args: [
+              '--postgres-connection-string',
+              postgresConnectionString,
+              '--cardano-node-config-path',
+              cardanoNodeConfigPath,
+              '--postgres-ssl-ca-file',
+              postgresSslCaFile,
+              '--service-names',
+              ServiceNames.NetworkInfo
+            ],
+            dataMatchOnError: 'The server does not support SSL connections'
+          },
+          done
         );
-        proc.stderr!.on('data', (data) => {
-          spy();
-          expect(data.toString().includes('The server does not support SSL connections')).toEqual(true);
-        });
-
-        proc.on('exit', (code) => {
-          expect(code).toBe(1);
-          expect(spy).toHaveBeenCalled();
-          done();
-        });
       });
-      it('run exits with code 1', (done) => {
-        expect.assertions(3);
-        ogmiosServer.listen(ogmiosConnection.port, () => {
-          proc = fork(exePath('run'), {
+
+      it('exits with code 1 when using env variables', (done) => {
+        callCliAndAssertExit(
+          {
+            dataMatchOnError: 'The server does not support SSL connections',
             env: {
               API_URL: apiUrl,
               CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
-              LOGGER_MIN_SEVERITY: 'error',
               POSTGRES_CONNECTION_STRING: postgresConnectionString,
               POSTGRES_SSL_CA_FILE: postgresSslCaFile,
               SERVICE_NAMES: ServiceNames.NetworkInfo
-            },
-            stdio: 'pipe'
-          });
-          proc.stderr!.on('data', (data) => {
-            spy();
-            expect(data.toString().includes('The server does not support SSL connections')).toEqual(true);
-          });
-          proc.on('exit', (code) => {
-            expect(code).toBe(1);
-            expect(spy).toHaveBeenCalled();
-            done();
-          });
-        });
+            }
+          },
+          done
+        );
       });
     });
   });
