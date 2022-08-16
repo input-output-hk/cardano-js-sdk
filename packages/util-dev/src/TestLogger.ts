@@ -2,7 +2,6 @@
 /* eslint key-spacing: ["error", { align: { afterColon: true, beforeColon: false, on: "value" } }] */
 import * as envalid from 'envalid';
 import { InspectOptions, inspect } from 'util';
-import { Writable } from 'stream';
 import JSONbig from 'json-bigint';
 
 const logLevels = { debug: 2, error: 5, fatal: 6, info: 3, trace: 1, warn: 4 };
@@ -32,7 +31,7 @@ export type Logger = { [l in LogLevel]: LogFunction };
  */
 export type TestLogger = Logger & { messages: LoggedMessage[] };
 
-type TestStream = Writable & { columns?: number; isTTY?: boolean };
+type TestStream = { columns?: number; isTTY?: boolean; write: Function };
 
 /**
  * Options for createLogger
@@ -54,12 +53,12 @@ export interface TestLoggerOptions {
   stream?: TestStream;
 }
 
-const getConfig = (env: NodeJS.ProcessEnv, stream: TestStream) => {
+const getConfig = (env: NodeJS.ProcessEnv, stream?: TestStream) => {
   const { TL_ARRAY, TL_BREAK, TL_COLOR, TL_COMPACT, TL_DEPTH, TL_HIDDEN, TL_JSON, TL_LEVEL, TL_PROXY, TL_STRING } =
     envalid.cleanEnv(env, {
       TL_ARRAY:   envalid.num({ default: 100 }),
-      TL_BREAK:   envalid.num({ default: stream.columns ? stream.columns - 33 : 90 }),
-      TL_COLOR:   envalid.bool({ default: stream.isTTY || false }),
+      TL_BREAK:   envalid.num({ default: stream?.columns ? stream?.columns - 33 : 90 }),
+      TL_COLOR:   envalid.bool({ default: stream?.isTTY || false }),
       TL_COMPACT: envalid.num({ default: 3 }),
       TL_DEPTH:   envalid.num({ default: 2 }),
       TL_HIDDEN:  envalid.bool({ default: false }),
