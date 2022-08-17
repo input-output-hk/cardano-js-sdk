@@ -368,4 +368,38 @@ describe('NetworkInfoHttpService', () => {
       });
     });
   });
+
+  describe('lifecycle methods', () => {
+    const dbConnection = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING, max: 1, min: 1 });
+
+    beforeAll(async () => {
+      port = await getPort();
+      baseUrl = `http://localhost:${port}/network-info`;
+      cardanoNode = mockCardanoNode();
+      config = { listen: { port } };
+      networkInfoProvider = new DbSyncNetworkInfoProvider(
+        { cardanoNodeConfigPath },
+        { cache, cardanoNode, db: dbConnection, epochMonitor, logger }
+      );
+      service = new NetworkInfoHttpService({ logger, networkInfoProvider });
+      httpServer = new HttpServer(config, { logger, services: [service] });
+      clientConfig = { baseUrl, logger: createLogger({ level: INFO, name: 'unit tests' }) };
+      provider = networkInfoHttpProvider(clientConfig);
+    });
+
+    afterAll(async () => {
+      await dbConnection.end();
+    });
+
+    it('initializes the CardanoNode instance when starting', async () => {
+      await httpServer.initialize();
+      await httpServer.start();
+      expect(cardanoNode.initialize).toBeCalledTimes(1);
+    });
+
+    it('shuts the CardanoNode instance down when shutting down', async () => {
+      await httpServer.shutdown();
+      expect(cardanoNode.shutdown).toBeCalledTimes(1);
+    });
+  });
 });

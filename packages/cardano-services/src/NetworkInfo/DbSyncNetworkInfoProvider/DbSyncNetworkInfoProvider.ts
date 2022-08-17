@@ -105,11 +105,13 @@ export class DbSyncNetworkInfoProvider extends DbSyncProvider implements Network
   }
 
   async start(): Promise<void> {
+    await this.#cardanoNode.initialize();
     this.#epochRolloverDisposer = this.#epochMonitor.onEpochRollover(() => this.#cache.clear());
   }
 
   async close(): Promise<void> {
     this.#cache.shutdown();
+    await this.#cardanoNode.shutdown();
     this.#epochRolloverDisposer();
   }
 }
