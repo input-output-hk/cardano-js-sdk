@@ -1,6 +1,7 @@
 /* eslint-disable max-len */
 import { Asset, CSL, Cardano, SerializationFailure, coreToCsl } from '../../src';
 import { BigNum } from '@emurgo/cardano-serialization-lib-nodejs';
+import { Ed25519KeyHash, NativeScript, NativeScriptType } from '../../src/Cardano';
 import { signature, tx, txBody, txIn, txInWithAddress, txOut, valueCoinOnly, valueWithAssets, vkey } from './testData';
 
 const txOutByron = {
@@ -84,6 +85,49 @@ describe('coreToCsl', () => {
     const witness = cslTx.witness_set().vkeys()!.get(0)!;
     expect(Buffer.from(witness.vkey().public_key().as_bytes()).toString('hex')).toBe(vkey);
     expect(witness.signature().to_hex()).toBe(signature);
+  });
+  it('NativeScript', () => {
+    const script: NativeScript = {
+      __type: NativeScriptType.RequireAnyOf,
+      scripts: [
+        {
+          __type: NativeScriptType.RequireSignature,
+          keyHash: Ed25519KeyHash('b275b08c999097247f7c17e77007c7010cd19f20cc086ad99d398538')
+        },
+        {
+          __type: NativeScriptType.RequireAllOf,
+          scripts: [
+            {
+              __type: NativeScriptType.RequireTimeBefore,
+              slot: 3000
+            },
+            {
+              __type: NativeScriptType.RequireSignature,
+              keyHash: Ed25519KeyHash('966e394a544f242081e41d1965137b1bb412ac230d40ed5407821c37')
+            },
+            {
+              __type: NativeScriptType.RequireTimeAfter,
+              slot: 4000
+            }
+          ]
+        }
+      ]
+    };
+
+    const baseScript = coreToCsl.nativeScript(script);
+    const firstSubScript = baseScript.as_script_any()?.native_scripts().get(0).as_script_pubkey();
+    const secondSubScript = baseScript.as_script_any()?.native_scripts().get(1).as_script_all();
+
+    expect(baseScript.as_script_any()?.native_scripts().len()).toBe(2);
+    expect(firstSubScript?.addr_keyhash()?.to_bytes()).toStrictEqual(
+      Uint8Array.from(Buffer.from('b275b08c999097247f7c17e77007c7010cd19f20cc086ad99d398538', 'hex'))
+    );
+    expect(secondSubScript?.native_scripts()?.len()).toEqual(3);
+    expect(secondSubScript?.native_scripts()?.get(0).as_timelock_expiry()?.slot()).toEqual(3000);
+    expect(secondSubScript?.native_scripts()?.get(1).as_script_pubkey()?.addr_keyhash().to_bytes()).toStrictEqual(
+      Uint8Array.from(Buffer.from('966e394a544f242081e41d1965137b1bb412ac230d40ed5407821c37', 'hex'))
+    );
+    expect(secondSubScript?.native_scripts()?.get(2).as_timelock_start()?.slot()).toEqual(4000);
   });
   describe('txAuxiliaryData', () => {
     it('returns undefined for undefined data', () => expect(coreToCsl.txAuxiliaryData()).toBeUndefined());

@@ -17,7 +17,7 @@ export * from './Asset';
 export * from './AuxiliaryData';
 export * from './Key';
 export * from './TxSubmissionErrors';
-export * as NativeScriptType from './NativeScriptType';
+export * from './NativeScript';
 
 export type ProtocolParametersBabbage = OptionalUndefined<
   RecursivelyReplaceNullWithUndefined<Ogmios.ProtocolParametersBabbage>

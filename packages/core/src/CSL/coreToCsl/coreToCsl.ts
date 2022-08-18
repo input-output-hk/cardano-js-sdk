@@ -17,10 +17,18 @@ import {
   Mint,
   MintAssets,
   MultiAsset,
+  NativeScript,
+  NativeScripts,
   PublicKey,
   RewardAddress,
+  ScriptAll,
+  ScriptAny,
   ScriptDataHash,
   ScriptHash,
+  ScriptNOfK,
+  ScriptPubkey,
+  TimelockExpiry,
+  TimelockStart,
   Transaction,
   TransactionBody,
   TransactionHash,
@@ -40,8 +48,7 @@ import {
 } from '@emurgo/cardano-serialization-lib-nodejs';
 
 import * as certificate from './certificate';
-import { SerializationError } from '../../errors';
-import { SerializationFailure } from '../..';
+import { SerializationError, SerializationFailure } from '../..';
 import { parseCslAddress } from '../parseCslAddress';
 
 export const tokenMap = (map: Cardano.TokenMap) => {
@@ -282,4 +289,61 @@ export const tx = ({ body, witness, auxiliaryData }: Cardano.NewTxAlonzo): Trans
   const txWitnessSet = witnessSet(witness.signatures);
   // Possible optimization: only convert auxiliary data once
   return Transaction.new(txBody(body, auxiliaryData), txWitnessSet, txAuxiliaryData(auxiliaryData));
+};
+
+export const nativeScript = (script: Cardano.NativeScript): NativeScript => {
+  let cslScript: NativeScript;
+  const type = script.__type;
+
+  switch (type) {
+    case Cardano.NativeScriptType.RequireSignature: {
+      cslScript = NativeScript.new_script_pubkey(
+        ScriptPubkey.new(Ed25519KeyHash.from_bytes(Buffer.from(script.keyHash, 'hex')))
+      );
+      break;
+    }
+    case Cardano.NativeScriptType.RequireAllOf: {
+      const cslScripts = NativeScripts.new();
+      for (const subscript of script.scripts) {
+        cslScripts.add(nativeScript(subscript));
+      }
+      cslScript = NativeScript.new_script_all(ScriptAll.new(cslScripts));
+      break;
+    }
+    case Cardano.NativeScriptType.RequireAnyOf: {
+      const cslScripts2 = NativeScripts.new();
+      for (const subscript of script.scripts) {
+        cslScripts2.add(nativeScript(subscript));
+      }
+      cslScript = NativeScript.new_script_any(ScriptAny.new(cslScripts2));
+      break;
+    }
+    case Cardano.NativeScriptType.RequireMOf: {
+      const cslScripts3 = NativeScripts.new();
+      for (const subscript of script.scripts) {
+        cslScripts3.add(nativeScript(subscript));
+      }
+      cslScript = NativeScript.new_script_n_of_k(ScriptNOfK.new(script.required, cslScripts3));
+      break;
+    }
+    case Cardano.NativeScriptType.RequireTimeBefore: {
+      cslScript = NativeScript.new_timelock_expiry(
+        TimelockExpiry.new_timelockexpiry(BigNum.from_str(script.slot.toString()))
+      );
+      break;
+    }
+    case Cardano.NativeScriptType.RequireTimeAfter: {
+      cslScript = NativeScript.new_timelock_start(
+        TimelockStart.new_timelockstart(BigNum.from_str(script.slot.toString()))
+      );
+      break;
+    }
+    default:
+      throw new SerializationError(
+        SerializationFailure.InvalidNativeScriptType,
+        `Native Script Type value '${type}' is not supported.`
+      );
+  }
+
+  return cslScript;
 };
