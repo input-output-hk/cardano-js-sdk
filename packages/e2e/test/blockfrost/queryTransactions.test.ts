@@ -1,6 +1,7 @@
 import * as envalid from 'envalid';
 import { Cardano, ChainHistoryProvider, InvalidStringError } from '@cardano-sdk/core';
 import { chainHistoryProviderFactory } from '../../src/factories';
+import { logger } from '@cardano-sdk/util-dev';
 
 // Verify environment.
 export const env = envalid.cleanEnv(process.env, {
@@ -14,7 +15,8 @@ describe('blockfrostChainHistoryProvider', () => {
   beforeAll(async () => {
     chainHistoryProvider = await chainHistoryProviderFactory.create(
       env.CHAIN_HISTORY_PROVIDER,
-      env.CHAIN_HISTORY_PROVIDER_PARAMS
+      env.CHAIN_HISTORY_PROVIDER_PARAMS,
+      logger
     );
   });
 
