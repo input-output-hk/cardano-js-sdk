@@ -12,6 +12,7 @@ import { IDS_NAMESPACE, StakePoolsSubQuery, emptyPoolsExtraInfo, getStakePoolSor
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../InMemoryCache';
 import { Logger } from 'ts-log';
 import { Pool } from 'pg';
+import { StakePoolAverages } from './StakePoolAverages';
 import { StakePoolBuilder } from './StakePoolBuilder';
 import { isNotNil } from '@cardano-sdk/util';
 import { toStakePoolResults } from './mappers';
@@ -24,6 +25,7 @@ export interface StakePoolProviderDependencies {
 }
 
 export class DbSyncStakePoolProvider extends DbSyncProvider implements StakePoolProvider {
+  #averagesProvider: StakePoolAverages;
   #builder: StakePoolBuilder;
   #logger: Logger;
   #cache: InMemoryCache;
@@ -32,10 +34,16 @@ export class DbSyncStakePoolProvider extends DbSyncProvider implements StakePool
 
   constructor({ db, cache, logger, epochMonitor }: StakePoolProviderDependencies) {
     super(db);
+
+    this.#averagesProvider = new StakePoolAverages({ logger, stakePoolProvider: this });
     this.#logger = logger;
     this.#cache = cache;
     this.#epochMonitor = epochMonitor;
     this.#builder = new StakePoolBuilder(db, logger);
+  }
+
+  getAverages() {
+    return this.#averagesProvider.getAverages();
   }
 
   private getQueryBySortType(
@@ -217,11 +225,19 @@ export class DbSyncStakePoolProvider extends DbSyncProvider implements StakePool
   }
 
   async start(): Promise<void> {
-    this.#epochRolloverDisposer = this.#epochMonitor.onEpochRollover(() => this.#cache.clear());
+    this.#epochRolloverDisposer = this.#epochMonitor.onEpochRollover(async () => {
+      try {
+        this.#cache.clear();
+        await this.#averagesProvider.start();
+      } catch (error) {
+        this.#logger.error(error, 'While executing onEpochRollover handler');
+      }
+    });
   }
 
   async close(): Promise<void> {
-    this.#cache.shutdown();
     this.#epochRolloverDisposer();
+    await this.#averagesProvider.close();
+    this.#cache.shutdown();
   }
 }
