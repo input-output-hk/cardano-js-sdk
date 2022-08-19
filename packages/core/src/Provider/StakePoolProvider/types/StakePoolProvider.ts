@@ -17,6 +17,26 @@ export interface MultipleChoiceSearchFilter<T> {
   values: T[];
 }
 
+/**
+ * The response for a StakePoolAverages request
+ */
+export interface StakePoolAveragesResponse {
+  /**
+   * The epoch the result refers to
+   */
+  epoch?: Cardano.Epoch;
+
+  /**
+   * The average margin for all active stake pools
+   */
+  margin?: bigint;
+
+  /**
+   * The average APY for all active stake pools
+   */
+  reward?: number;
+}
+
 export interface StakePoolQueryOptions {
   /**
    * Will return all stake pools sorted by name ascending if not specified
@@ -66,6 +86,10 @@ export interface StakePoolStats {
 }
 
 export interface StakePoolProvider extends Provider {
+  /**
+   * @returns {StakePoolAveragesResponse} Stake pool averages
+   */
+  getAverages: () => Promise<StakePoolAveragesResponse>;
   /**
    * @param {StakePoolQueryOptions} options query options
    * @returns Stake pools
