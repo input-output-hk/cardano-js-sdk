@@ -164,9 +164,10 @@ export class StakePoolAverages implements Provider {
   }
 
   getAverages() {
-    if (this.#cachedResult) this.#cachedResult = this.compute();
+    // If so far a compute process never started, start it as well
+    if (!this.#cachedResult) this.#cachedResult = this.compute();
 
-    return this.#cachedResult!;
+    return this.#cachedResult;
   }
 
   healthCheck() {
