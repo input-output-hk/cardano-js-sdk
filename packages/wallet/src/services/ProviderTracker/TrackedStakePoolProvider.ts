@@ -25,6 +25,7 @@ export class StakePoolProviderStats {
  */
 export class TrackedStakePoolProvider extends ProviderTracker implements StakePoolProvider {
   readonly stats = new StakePoolProviderStats();
+  readonly getAverages: StakePoolProvider['getAverages'];
   readonly healthCheck: StakePoolProvider['healthCheck'];
   readonly queryStakePools: StakePoolProvider['queryStakePools'];
   readonly stakePoolStats: StakePoolProvider['stakePoolStats'];
@@ -32,6 +33,8 @@ export class TrackedStakePoolProvider extends ProviderTracker implements StakePo
   constructor(queryStakePoolsProvider: StakePoolProvider) {
     super();
     queryStakePoolsProvider = queryStakePoolsProvider;
+
+    this.getAverages = () => this.trackedCall(() => queryStakePoolsProvider.getAverages(), this.stats.healthCheck$);
 
     this.healthCheck = () => this.trackedCall(() => queryStakePoolsProvider.healthCheck(), this.stats.healthCheck$);
 
