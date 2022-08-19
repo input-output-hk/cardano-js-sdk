@@ -42,6 +42,7 @@ export const createStubStakePoolProvider = (
   stakePools: Cardano.StakePool[] = somePartialStakePools,
   delayMs?: number
 ): StakePoolProvider => ({
+  getAverages: () => Promise.resolve({}),
   healthCheck: async () => {
     if (delayMs) await delay(delayMs);
     return { ok: true };
