@@ -26,6 +26,10 @@ export class StakePoolHttpService extends HttpService {
       })
     );
     router.post(
+      '/averages',
+      providerHandler(stakePoolProvider.getAverages.bind(stakePoolProvider))(HttpService.routeHandler(logger), logger)
+    );
+    router.post(
       '/search',
       providerHandler(stakePoolProvider.queryStakePools.bind(stakePoolProvider))(
         HttpService.routeHandler(logger),
