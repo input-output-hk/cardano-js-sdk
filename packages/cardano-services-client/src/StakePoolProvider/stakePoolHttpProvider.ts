@@ -5,6 +5,7 @@ import { StakePoolProvider } from '@cardano-sdk/core';
  * The StakePoolProvider endpoint paths.
  */
 const paths: HttpProviderConfigPaths<StakePoolProvider> = {
+  getAverages: '/averages',
   healthCheck: '/health',
   queryStakePools: '/search',
   stakePoolStats: '/stats'
