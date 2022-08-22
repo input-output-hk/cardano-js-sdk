@@ -6,6 +6,7 @@ import { RabbitMQContainer } from '../../rabbitmq/test/docker';
 import { createHealthyMockOgmiosServer, ogmiosServerReady } from './util';
 import { getRandomPort } from 'get-port-please';
 import { listenPromise, serverClosePromise } from '../src/util';
+import { logger } from '@cardano-sdk/util-dev';
 import http from 'http';
 import path from 'path';
 
@@ -110,13 +111,13 @@ describe('tx-worker entrypoints', () => {
       it('cli:start-worker submits transactions', async () => {
         hookPromise = new Promise((resolve) => (hook = resolve));
         proc = fork(exePath('cli'), commonArgs, { stdio: 'pipe' });
-        await Promise.all([hookPromise, container.enqueueTx()]);
+        await Promise.all([hookPromise, container.enqueueTx(logger)]);
       });
 
       it('startWorker submits transactions', async () => {
         hookPromise = new Promise((resolve) => (hook = resolve));
         proc = fork(exePath('startWorker'), { env: commonEnv, stdio: 'pipe' });
-        await Promise.all([hookPromise, container.enqueueTx()]);
+        await Promise.all([hookPromise, container.enqueueTx(logger)]);
       });
     });
 
@@ -130,7 +131,7 @@ describe('tx-worker entrypoints', () => {
         it('startWorker starts in serial mode', async () => {
           [hook, hookPromise] = loggerHook();
           proc = fork(exePath('startWorker'), { env: commonEnv, stdio: 'pipe' });
-          const txPromises = [container.enqueueTx(0), container.enqueueTx(1)];
+          const txPromises = [container.enqueueTx(logger, 0), container.enqueueTx(logger, 1)];
           await hookPromise;
           await Promise.all(txPromises);
           expect(hookLogs).toEqual(['Processing tx 1', 'Processed tx 1', 'Processing tx 2', 'Processed tx 2']);
@@ -169,7 +170,7 @@ describe('tx-worker entrypoints', () => {
         it('startWorker starts in serial mode', async () => {
           [hook, hookPromise] = loggerHook();
           proc = fork(exePath('startWorker'), { env: { ...commonEnv, PARALLEL: 'false' }, stdio: 'pipe' });
-          const txPromises = [container.enqueueTx(0), container.enqueueTx(1)];
+          const txPromises = [container.enqueueTx(logger, 0), container.enqueueTx(logger, 1)];
           await hookPromise;
           await Promise.all(txPromises);
           expect(hookLogs).toEqual(['Processing tx 1', 'Processed tx 1', 'Processing tx 2', 'Processed tx 2']);
@@ -185,7 +186,7 @@ describe('tx-worker entrypoints', () => {
         it('startWorker starts in parallel mode', async () => {
           [hook, hookPromise] = loggerHook();
           proc = fork(exePath('startWorker'), { env: { ...commonEnv, PARALLEL: 'true' }, stdio: 'pipe' });
-          const txPromises = [container.enqueueTx(0), container.enqueueTx(1)];
+          const txPromises = [container.enqueueTx(logger, 0), container.enqueueTx(logger, 1)];
           await hookPromise;
           await Promise.all(txPromises);
           expect(hookLogs).toEqual(['Processing tx 1', 'Processing tx 2', 'Processed tx 1', 'Processed tx 2']);

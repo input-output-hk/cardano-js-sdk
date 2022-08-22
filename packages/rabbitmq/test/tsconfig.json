@@ -3,13 +3,19 @@
   "compilerOptions": {
     "baseUrl": "."
   },
-  "include": ["./**/*.ts", "../../ogmios/test/mocks"],
+  "include": [
+    "./**/*.ts",
+    "../../ogmios/test/mocks"
+  ],
   "references": [
     {
       "path": "../../core/src"
     },
     {
       "path": "../../ogmios/src"
+    },
+    {
+      "path": "../../util/src"
     },
     {
       "path": "../../util-dev/src"

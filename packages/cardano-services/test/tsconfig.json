@@ -4,10 +4,11 @@
     "baseUrl": "."
   },
   "include": [
-    "../../core/test/CardanoNode/mocks",
-    "../../ogmios/test/mocks",
-    "../../rabbitmq/test/docker",
+    "./**/*.ts",
     "../../cip2/test/util",
+    "../../core/test/CardanoNode",
+    "../../ogmios/test/mocks",
+    "../../rabbitmq/test"
   ],
   "references": [
     {

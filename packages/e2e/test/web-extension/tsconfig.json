@@ -1,7 +1,6 @@
 {
-  "extends": "../../../../tsconfig.json",
+  "extends": "../../../../test/tsconfig.json",
   "compilerOptions": {
-    "rootDir": ".",
     "baseUrl": "./extension",
     "types": [
       "node",
