@@ -18,6 +18,7 @@ import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../../src/InMemoryCache';
 import { Ogmios, OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { SrvRecord } from 'dns';
+import { bufferToHexString } from '@cardano-sdk/util';
 import { createHealthyMockOgmiosServer, ogmiosServerReady } from '../../util';
 import { createMockOgmiosServer } from '../../../../ogmios/test/mocks/mockOgmiosServer';
 import { getPort, getRandomPort } from 'get-port-please';
@@ -323,9 +324,9 @@ describe('Service dependency abstractions', () => {
         serviceDiscoveryTimeout: 1000
       });
 
-      await expect(provider.submitTx({ signedTransaction: new Uint8Array([]) })).rejects.toBeInstanceOf(
-        Cardano.TxSubmissionErrors.EraMismatchError
-      );
+      await expect(
+        provider.submitTx({ signedTransaction: bufferToHexString(Buffer.from(new Uint8Array([]))) })
+      ).rejects.toBeInstanceOf(Cardano.TxSubmissionErrors.EraMismatchError);
       expect(dnsResolverMock).toBeCalledTimes(2);
     });
 

@@ -2,8 +2,10 @@
 // @ts-ignore
 import Cardano, { Provider } from '../..';
 
+type SerializedTransaction = Cardano.util.HexBlob;
+
 export interface SubmitTxArgs {
-  signedTransaction: Uint8Array;
+  signedTransaction: SerializedTransaction;
 }
 
 export interface TxSubmitProvider extends Provider {

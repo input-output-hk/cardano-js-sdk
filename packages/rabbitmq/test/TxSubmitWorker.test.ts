@@ -209,7 +209,7 @@ describe('TxSubmitWorker', () => {
     let res: unknown = null;
 
     for (let i = 0; i < 7; ++i) {
-      promises.push(rabbitMqTxSubmitProvider.submitTx({ signedTransaction: txs[i].txBodyUint8Array }));
+      promises.push(rabbitMqTxSubmitProvider.submitTx({ signedTransaction: txs[i].txBodyHex }));
       // Wait 10ms to be sure the transactions are enqueued in the right order
       await new Promise((resolve) => setTimeout(resolve, 10));
     }

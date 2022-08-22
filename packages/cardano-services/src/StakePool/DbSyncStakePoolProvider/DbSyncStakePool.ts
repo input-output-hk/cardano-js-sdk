@@ -1,8 +1,8 @@
 import {
   Cardano,
   CardanoNode,
-  StakePoolProvider,
   QueryStakePoolsArgs,
+  StakePoolProvider,
   StakePoolSearchResults,
   StakePoolStats
 } from '@cardano-sdk/core';
@@ -68,11 +68,7 @@ export class DbSyncStakePoolProvider extends DbSyncProvider implements StakePool
     }
   }
 
-  private async getPoolsDataOrdered(
-    poolUpdates: PoolUpdate[],
-    totalAdaAmount: string,
-    options?: QueryStakePoolsArgs
-  ) {
+  private async getPoolsDataOrdered(poolUpdates: PoolUpdate[], totalAdaAmount: string, options?: QueryStakePoolsArgs) {
     const hashesIds = poolUpdates.map(({ id }) => id);
     const updatesIds = poolUpdates.map(({ updateId }) => updateId);
 

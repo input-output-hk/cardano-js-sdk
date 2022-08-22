@@ -50,23 +50,13 @@
   },
   "components": {
     "schemas": {
-      "TypifiedValue": {
-        "type": "object",
-        "properties": {
-          "value": {
-            "type": "string"
-          },
-          "__type": {
-            "type": "string"
-          }
-        }
-      },
       "txsubmit_submit_body": {
         "required": ["signedTransaction"],
         "type": "object",
         "properties": {
           "signedTransaction": {
-            "$ref": "#/components/schemas/TypifiedValue"
+            "type": "string",
+            "description": "transaction hash represented as hex string"
           }
         }
       }
