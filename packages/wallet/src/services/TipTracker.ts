@@ -17,8 +17,10 @@ import {
   startWith,
   switchMap,
   takeUntil,
+  tap,
   timeout
 } from 'rxjs';
+import { Logger } from 'ts-log';
 import { Milliseconds } from './types';
 import { SyncStatus } from '../types';
 export interface TipTrackerProps {
@@ -31,6 +33,7 @@ export interface TipTrackerProps {
    */
   minPollInterval: Milliseconds;
   maxPollInterval: Milliseconds;
+  logger: Logger;
 }
 
 export interface TipTrackerInternals {
@@ -42,9 +45,10 @@ const triggerOrInterval$ = <T = unknown>(trigger$: Observable<T>, interval: numb
 
 export class TipTracker extends PersistentDocumentTrackerSubject<Cardano.Tip> {
   #externalTrigger$ = new Subject<void>();
+  #logger: Logger;
 
   constructor(
-    { provider$, minPollInterval, maxPollInterval, store, syncStatus, connectionStatus$ }: TipTrackerProps,
+    { provider$, minPollInterval, maxPollInterval, store, syncStatus, connectionStatus$, logger }: TipTrackerProps,
     { externalTrigger$ = new Subject() }: TipTrackerInternals = {}
   ) {
     super(
@@ -62,20 +66,31 @@ export class TipTracker extends PersistentDocumentTrackerSubject<Cardano.Tip> {
           connectionStatus$
         ]).pipe(
           // Throttle syncing by interval, cancel ongoing request on external trigger
-          exhaustMap(([_, connectionStatus]) =>
-            connectionStatus === ConnectionStatus.down ? EMPTY : provider$.pipe(takeUntil(externalTrigger$))
+          tap(([, connectionStatus]) => {
+            logger.debug(connectionStatus === ConnectionStatus.down ? 'Skipping fetch tip' : 'Fetching tip...');
+          }),
+          exhaustMap(([, connectionStatus]) =>
+            connectionStatus === ConnectionStatus.down
+              ? EMPTY
+              : provider$.pipe(takeUntil(externalTrigger$.pipe(tap(() => logger.debug('Tip fetch canceled')))))
           ),
-          distinctUntilChanged(tipEquals)
+          distinctUntilChanged(tipEquals),
+          tap((tip) => logger.debug('Fetched new tip', tip))
         ),
         // Always immediately restart request on external trigger
-        externalTrigger$.pipe(switchMap(() => provider$))
+        externalTrigger$.pipe(
+          switchMap(() => provider$),
+          tap((tip) => logger.debug('External trigger fetched tip', tip))
+        )
       ).pipe(finalize(() => this.#externalTrigger$.complete())),
       store
     );
     this.#externalTrigger$ = externalTrigger$;
+    this.#logger = logger;
   }
 
   sync() {
+    this.#logger.debug('Manual sync triggered');
     this.#externalTrigger$.next();
   }
 }

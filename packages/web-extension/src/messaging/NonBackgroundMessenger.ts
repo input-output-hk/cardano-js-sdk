@@ -1,6 +1,6 @@
 // only tested in ../e2e tests
 /* eslint-disable no-use-before-define */
-import { BehaviorSubject, Observable, Subject, debounceTime, filter, first, map, takeWhile, tap } from 'rxjs';
+import { BehaviorSubject, Observable, ReplaySubject, debounceTime, filter, first, map, takeWhile, tap } from 'rxjs';
 import { Messenger, MessengerDependencies, MessengerPort, PortMessage, ReconnectConfig } from './types';
 import { deriveChannelName } from './util';
 import { isNotNil } from '@cardano-sdk/util';
@@ -26,7 +26,12 @@ export const createNonBackgroundMessenger = (
   let delay = initialDelay;
   let isDestroyed = false;
   const port$ = new BehaviorSubject<MessengerPort | null | 'destroyed'>(null);
-  const message$ = new Subject<PortMessage>();
+  // Originally this was a 'new Subject()', but there seems to be a race between
+  // - when it receives a value from 'onMessage'
+  // - when message$ is subscribed to through `remoteApi`
+  // It is most likely because event listener to onMessage is added during
+  // createNonBackgroundMessenger and messenger on the other end emits immediately upon connection.
+  const message$ = new ReplaySubject<PortMessage>(1);
   const connect = () => {
     if (typeof port$.value === 'string' || port$.value) return;
     // assuming this doesn't throw
@@ -42,12 +47,12 @@ export const createNonBackgroundMessenger = (
     reconnectTimeout = setTimeout(connect, delay);
   };
   const onMessage = (data: unknown, port: MessengerPort) => {
-    logger.debug(`[NonBackgroundMessenger(${channel})] receive message`, data, port);
+    logger.debug(`[NonBackgroundMessenger(${channel})] message`, data);
     delay = initialDelay;
     message$.next({ data, port });
   };
   const onDisconnect = (port: MessengerPort) => {
-    logger.debug(`[NonBackgroundMessenger(${channel})] disconnected`, port);
+    logger.debug(`[NonBackgroundMessenger(${channel})] disconnected`);
     port!.onMessage.removeListener(onMessage);
     port!.onDisconnect.removeListener(onDisconnect);
     port$.next(isDestroyed ? 'destroyed' : null);

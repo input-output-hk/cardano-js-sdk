@@ -1,4 +1,4 @@
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, StakePoolSearchResults } from '@cardano-sdk/core';
 export interface PoolUpdateModel {
   id: number; // pool hash id
   update_id: number;
@@ -158,3 +158,18 @@ export interface OrderByOptions {
   field: string;
   order: 'asc' | 'desc';
 }
+
+export type THashId = number;
+export type TUpdateId = number;
+export type PoolIdsMap = Record<THashId, TUpdateId>;
+
+export type HashIdStakePoolMap = Record<THashId, Cardano.StakePool | undefined>;
+
+export type OrderedResult = PoolMetrics[] | PoolData[] | PoolAPY[];
+
+export type PoolsToCache = { [hashId: THashId]: Cardano.StakePool };
+
+export type StakePoolResults = {
+  results: StakePoolSearchResults;
+  poolsToCache: PoolsToCache;
+};

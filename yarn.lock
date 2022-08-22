@@ -1713,6 +1713,7 @@ __metadata:
   dependencies:
     "@cardano-sdk/core": ^0.5.0-nightly.4
     "@cardano-sdk/util": ^0.5.0-nightly.0
+    "@cardano-sdk/util-dev": 0.4.0
     "@types/node": 14.18.12
     "@types/validator": ^13.7.1
     axios: ^0.27.2
@@ -1935,7 +1936,7 @@ __metadata:
     buffer: ^6.0.3
     bunyan: ^1.8.15
     cardano-wallet-js: ^1.4.0
-    chromedriver: ^102.0.0
+    chromedriver: ^104.0.0
     copy-webpack-plugin: ^10.2.4
     delay: ^5.0.0
     dotenv: ^16.0.1
@@ -2028,6 +2029,7 @@ __metadata:
     "@cardano-sdk/core": ^0.5.0-nightly.4
     "@cardano-sdk/ogmios": ^0.5.0-nightly.1
     "@cardano-sdk/util": ^0.5.0-nightly.0
+    "@cardano-sdk/util-dev": ^0.4.1-nightly.4
     "@types/amqplib": ^0.8.2
     "@types/node": 14.18.12
     amqplib: ^0.10.0
@@ -2053,8 +2055,10 @@ __metadata:
     "@cardano-sdk/core": ^0.5.0-nightly.4
     "@types/jest": ^26.0.24
     delay: ^5.0.0
+    envalid: ^7.3.1
     eslint: ^7.32.0
     jest: ^28.1.3
+    json-bigint: ^1.0.0
     npm-run-all: ^4.1.5
     rxjs: ^7.4.0
     shx: ^0.3.3
@@ -2063,6 +2067,17 @@ __metadata:
     typescript: ^4.7.4
   languageName: unknown
   linkType: soft
+
+"@cardano-sdk/util-dev@npm:0.4.0":
+  version: 0.4.0
+  resolution: "@cardano-sdk/util-dev@npm:0.4.0"
+  dependencies:
+    "@cardano-sdk/core": 0.4.0
+    delay: ^5.0.0
+    rxjs: ^7.4.0
+  checksum: 816d6387d02262cbc11d61f38da52939454d5afdd5423b7800c3745fd4481a61b38f40b966f7ef4b4fe779aef0582703fd6ca0d5779f0e48a05af6a4e6f365d2
+  languageName: node
+  linkType: hard
 
 "@cardano-sdk/util-rxjs@^0.4.1-nightly.4, @cardano-sdk/util-rxjs@workspace:packages/util-rxjs":
   version: 0.0.0-use.local
@@ -8111,9 +8126,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chromedriver@npm:^102.0.0":
-  version: 102.0.0
-  resolution: "chromedriver@npm:102.0.0"
+"chromedriver@npm:^104.0.0":
+  version: 104.0.0
+  resolution: "chromedriver@npm:104.0.0"
   dependencies:
     "@testim/chrome-version": ^1.1.2
     axios: ^0.27.2
@@ -8124,7 +8139,7 @@ __metadata:
     tcp-port-used: ^1.0.1
   bin:
     chromedriver: bin/chromedriver
-  checksum: b73cb8e7b2a6281bfca7a14e2e448565b6b7d4f877b48df45a3a5941625f8c171b1bed5adf1803d15e0d5e7fea87f19cf49099bf3db468c32e3a218161c3de41
+  checksum: c27a266d1f94ce3d064f7fa429236da0bb9d977c716284ea31bcaa1fc82a432e4951282f42c7b13c5417257e79c2aa4034ba6dfc3f37748e82b143f40433afcb
   languageName: node
   linkType: hard
 

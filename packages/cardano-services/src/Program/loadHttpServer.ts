@@ -3,6 +3,7 @@
 import { AssetHttpService, CardanoTokenRegistry, DbSyncAssetProvider, DbSyncNftMetadataService } from '../Asset';
 import { ChainHistoryHttpService, DbSyncChainHistoryProvider } from '../ChainHistory';
 import { CommonProgramOptions } from '../ProgramsCommon';
+import { DbSyncEpochPollService } from '../util';
 import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../NetworkInfo';
 import { DbSyncRewardsProvider, RewardsHttpService } from '../Rewards';
 import { DbSyncStakePoolProvider, StakePoolHttpService } from '../StakePool';
@@ -17,6 +18,7 @@ import { TxSubmitHttpService } from '../TxSubmit';
 import { createDbSyncMetadataService } from '../Metadata';
 import { getOgmiosCardanoNode, getOgmiosTxSubmitProvider, getPool, getRabbitMqTxSubmitProvider } from './services';
 import Logger, { createLogger } from 'bunyan';
+import memoize from 'lodash/memoize';
 import pg from 'pg';
 
 export interface HttpServerOptions extends CommonProgramOptions {
@@ -53,13 +55,7 @@ export interface ProgramArgs {
   options?: HttpServerOptions;
 }
 
-const serviceMapFactory = (
-  args: ProgramArgs,
-  logger: Logger,
-  cache: InMemoryCache,
-  dnsResolver: DnsResolver,
-  dbConnection?: pg.Pool
-) => {
+const serviceMapFactory = (args: ProgramArgs, logger: Logger, dnsResolver: DnsResolver, dbConnection?: pg.Pool) => {
   const withDb =
     <T>(factory: (db: pg.Pool) => T) =>
     () => {
@@ -71,6 +67,8 @@ const serviceMapFactory = (
 
       return factory(dbConnection);
     };
+
+  const getEpochMonitor = memoize((dbPool) => new DbSyncEpochPollService(dbPool, args.options!.epochPollInterval!));
 
   return {
     [ServiceNames.Asset]: withDb((db) => {
@@ -84,9 +82,15 @@ const serviceMapFactory = (
 
       return new AssetHttpService({ assetProvider, logger });
     }),
-    [ServiceNames.StakePool]: withDb(
-      (db) => new StakePoolHttpService({ logger, stakePoolProvider: new DbSyncStakePoolProvider(db, logger) })
-    ),
+    [ServiceNames.StakePool]: withDb((db) => {
+      const stakePoolProvider = new DbSyncStakePoolProvider({
+        cache: new InMemoryCache(args.options!.dbCacheTtl!),
+        db,
+        epochMonitor: getEpochMonitor(db),
+        logger
+      });
+      return new StakePoolHttpService({ logger, stakePoolProvider });
+    }),
     [ServiceNames.Utxo]: withDb(
       (db) => new UtxoHttpService({ logger, utxoProvider: new DbSyncUtxoProvider(db, logger) })
     ),
@@ -108,11 +112,14 @@ const serviceMapFactory = (
 
       const cardanoNode = await getOgmiosCardanoNode(dnsResolver, logger, args.options);
       const networkInfoProvider = new DbSyncNetworkInfoProvider(
+        { cardanoNodeConfigPath: args.options.cardanoNodeConfigPath },
         {
-          cardanoNodeConfigPath: args.options.cardanoNodeConfigPath,
-          epochPollInterval: args.options?.epochPollInterval
-        },
-        { cache, cardanoNode, db, logger }
+          cache: new InMemoryCache(args.options!.dbCacheTtl!),
+          cardanoNode,
+          db,
+          epochMonitor: getEpochMonitor(db),
+          logger
+        }
       );
 
       return new NetworkInfoHttpService({ logger, networkInfoProvider });
@@ -134,7 +141,6 @@ export const loadHttpServer = async (args: ProgramArgs): Promise<HttpServer> => 
     name: 'http-server'
   });
 
-  const cache = new InMemoryCache(args.options!.dbCacheTtl!);
   const dnsResolver = createDnsResolver(
     {
       factor: args.options?.serviceDiscoveryBackoffFactor,
@@ -143,7 +149,7 @@ export const loadHttpServer = async (args: ProgramArgs): Promise<HttpServer> => 
     logger
   );
   const db = await getPool(dnsResolver, logger, args.options);
-  const serviceMap = serviceMapFactory(args, logger, cache, dnsResolver, db);
+  const serviceMap = serviceMapFactory(args, logger, dnsResolver, db);
 
   for (const serviceName of args.serviceNames) {
     if (serviceMap[serviceName]) {

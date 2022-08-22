@@ -60,11 +60,13 @@ export class StakePoolBuilder {
     this.#db = db;
     this.#logger = logger;
   }
+
   public async queryRetirements(hashesIds: number[]) {
     this.#logger.debug('About to query pool retirements');
     const result: QueryResult<PoolRetirementModel> = await this.#db.query(Queries.findPoolsRetirements, [hashesIds]);
     return result.rows.length > 0 ? result.rows.map(mapPoolRetirement) : [];
   }
+
   public async queryRegistrations(hashesIds: number[]) {
     this.#logger.debug('About to query pool registrations');
     const result: QueryResult<PoolRegistrationModel> = await this.#db.query(Queries.findPoolsRegistrations, [
@@ -72,16 +74,19 @@ export class StakePoolBuilder {
     ]);
     return result.rows.length > 0 ? result.rows.map(mapPoolRegistration) : [];
   }
+
   public async queryPoolRelays(updatesIds: number[]) {
     this.#logger.debug('About to query pool relays');
     const result: QueryResult<RelayModel> = await this.#db.query(Queries.findPoolsRelays, [updatesIds]);
     return result.rows.length > 0 ? result.rows.map(mapRelay) : [];
   }
+
   public async queryPoolOwners(updatesIds: number[]) {
     this.#logger.debug('About to query pool owners');
     const result: QueryResult<OwnerAddressModel> = await this.#db.query(Queries.findPoolsOwners, [updatesIds]);
     return result.rows.length > 0 ? result.rows.map(mapAddressOwner) : [];
   }
+
   public async queryPoolRewards(hashesIds: number[], limit?: number) {
     this.#logger.debug('About to query pool rewards');
     return Promise.all(
@@ -93,6 +98,7 @@ export class StakePoolBuilder {
       })
     );
   }
+
   public async queryPoolAPY(hashesIds: number[], options?: StakePoolQueryOptions): Promise<PoolAPY[]> {
     this.#logger.debug('About to query pools APY');
     const defaultSort: OrderByOptions[] = [{ field: 'apy', order: 'desc' }];
@@ -103,6 +109,7 @@ export class StakePoolBuilder {
     const result: QueryResult<PoolAPYModel> = await this.#db.query(queryWithSortAndPagination, [hashesIds]);
     return result.rows.map(mapPoolAPY);
   }
+
   public async queryPoolData(updatesIds: number[], options?: StakePoolQueryOptions) {
     this.#logger.debug('About to query pool data');
     const defaultSort: OrderByOptions[] = [
@@ -116,11 +123,14 @@ export class StakePoolBuilder {
     const result: QueryResult<PoolDataModel> = await this.#db.query(queryWithSortAndPagination, [updatesIds]);
     return result.rows.length > 0 ? result.rows.map(mapPoolData) : [];
   }
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public async queryPoolHashes(query: string, params: any[] = []) {
+    this.#logger.debug('About to query pool hashes');
     const result: QueryResult<PoolUpdateModel> = await this.#db.query(query, params);
     return result.rows.length > 0 ? result.rows.map(mapPoolUpdate) : [];
   }
+
   public async queryPoolMetrics(hashesIds: number[], totalAdaAmount: string, options?: StakePoolQueryOptions) {
     this.#logger.debug('About to query pool metrics');
     const queryWithSortAndPagination = withPagination(
@@ -133,6 +143,7 @@ export class StakePoolBuilder {
     ]);
     return result.rows.length > 0 ? result.rows.map(mapPoolMetrics) : [];
   }
+
   public buildPoolsByIdentifierQuery(
     identifier: MultipleChoiceSearchFilter<
       Partial<Pick<Cardano.PoolParameters, 'id'> & Pick<Cardano.StakePoolMetadata, 'name' | 'ticker'>>
@@ -148,6 +159,7 @@ export class StakePoolBuilder {
     `;
     return { id: { isPrimary: true, name: 'pools_by_identifier' }, params, query };
   }
+
   public buildPoolsByStatusQuery(status: Cardano.StakePoolStatus[]) {
     const whereClause = getStatusWhereClause(status);
     const query = `
@@ -156,6 +168,7 @@ export class StakePoolBuilder {
     `;
     return { id: { isPrimary: true, name: 'pools_by_status' }, query };
   }
+
   public buildPoolsByPledgeMetQuery(pledgeMet: boolean) {
     const subQueries = [...poolsByPledgeMetSubqueries];
     subQueries.push({
@@ -167,16 +180,19 @@ export class StakePoolBuilder {
     });
     return subQueries;
   }
+
   public async getLastEpoch() {
     this.#logger.debug('About to query last epoch');
     const result: QueryResult<EpochModel> = await this.#db.query(Queries.findLastEpoch);
     return result.rows[0].no;
   }
+
   public async getTotalAmountOfAda() {
-    this.#logger.debug('About to get total amount of ada');
+    this.#logger.debug('About to query total ada amount');
     const result: QueryResult<TotalAdaModel> = await this.#db.query(Queries.findTotalAda);
     return result.rows[0].total_ada;
   }
+
   public buildOrQuery(filters: StakePoolQueryOptions['filters']) {
     const subQueries: SubQuery[] = [];
     const params = [];
@@ -201,6 +217,7 @@ export class StakePoolBuilder {
     }
     return { params, query };
   }
+
   // eslint-disable-next-line max-statements
   public buildAndQuery(filters: StakePoolQueryOptions['filters']) {
     let query = Queries.findPools;
@@ -257,6 +274,7 @@ export class StakePoolBuilder {
     query = addSentenceToQuery(query, groupByClause);
     return { params, query };
   }
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public async queryTotalCount(query: string, _params: any[]) {
     this.#logger.debug('About to get total count of pools');

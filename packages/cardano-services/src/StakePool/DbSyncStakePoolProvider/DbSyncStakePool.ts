@@ -1,21 +1,41 @@
-import { CommonPoolInfo, PoolAPY, PoolData, PoolMetrics, PoolSortType } from './types';
+import {
+  Cardano,
+  StakePoolProvider,
+  StakePoolQueryOptions,
+  StakePoolSearchResults,
+  StakePoolStats
+} from '@cardano-sdk/core';
+import { CommonPoolInfo, OrderedResult, PoolAPY, PoolData, PoolMetrics, PoolSortType, PoolUpdate } from './types';
 import { DbSyncProvider } from '../../DbSyncProvider';
+import { Disposer, EpochMonitor } from '../../util/polling/types';
+import { IDS_NAMESPACE, StakePoolsSubQuery, emptyPoolsExtraInfo, getStakePoolSortType, queryCacheKey } from './util';
+import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../InMemoryCache';
 import { Logger } from 'ts-log';
 import { Pool } from 'pg';
 import { StakePoolBuilder } from './StakePoolBuilder';
-import { StakePoolProvider, StakePoolQueryOptions, StakePoolSearchResults, StakePoolStats } from '@cardano-sdk/core';
-import { getStakePoolSortType } from './util';
 import { isNotNil } from '@cardano-sdk/util';
-import { toCoreStakePool } from './mappers';
+import { toStakePoolResults } from './mappers';
+
+export interface StakePoolProviderDependencies {
+  db: Pool;
+  logger: Logger;
+  cache: InMemoryCache;
+  epochMonitor: EpochMonitor;
+}
 
 export class DbSyncStakePoolProvider extends DbSyncProvider implements StakePoolProvider {
   #builder: StakePoolBuilder;
   #logger: Logger;
+  #cache: InMemoryCache;
+  #epochMonitor: EpochMonitor;
+  #epochRolloverDisposer: Disposer;
 
-  constructor(db: Pool, logger: Logger) {
+  constructor({ db, cache, logger, epochMonitor }: StakePoolProviderDependencies) {
     super(db);
-    this.#builder = new StakePoolBuilder(db, logger);
     this.#logger = logger;
+    this.#cache = cache;
+    this.#epochMonitor = epochMonitor;
+    this.#builder = new StakePoolBuilder(db, logger);
   }
 
   private getQueryBySortType(
@@ -37,19 +57,16 @@ export class DbSyncStakePoolProvider extends DbSyncProvider implements StakePool
     }
   }
 
-  public async queryStakePools(options?: StakePoolQueryOptions): Promise<StakePoolSearchResults> {
-    const { params, query } =
-      options?.filters?._condition === 'or'
-        ? this.#builder.buildOrQuery(options?.filters)
-        : this.#builder.buildAndQuery(options?.filters);
-    this.#logger.debug('About to query pool hashes');
-    const poolUpdates = await this.#builder.queryPoolHashes(query, params);
+  private async getPoolsDataOrdered(
+    poolUpdates: PoolUpdate[],
+    totalAdaAmount: string,
+    options?: StakePoolQueryOptions
+  ) {
     const hashesIds = poolUpdates.map(({ id }) => id);
     const updatesIds = poolUpdates.map(({ updateId }) => updateId);
-    this.#logger.debug(`${hashesIds.length} pools found`);
-    const totalAdaAmount = await this.#builder.getTotalAmountOfAda();
 
-    this.#logger.debug('About to query stake pools by sort options');
+    this.#logger.debug(`${hashesIds.length} pools found`);
+
     const sortType = options?.sort?.field ? getStakePoolSortType(options.sort.field) : 'data';
     const orderedResult = await this.getQueryBySortType(sortType, { hashesIds, totalAdaAmount, updatesIds })(options);
     const orderedResultHashIds = (orderedResult as CommonPoolInfo[]).map(({ hashId }) => hashId);
@@ -78,37 +95,104 @@ export class DbSyncStakePoolProvider extends DbSyncProvider implements StakePool
     } else {
       poolDatas = orderedResult as PoolData[];
     }
+    return { hashesIds, orderedResult, orderedResultHashIds, orderedResultUpdateIds, poolDatas, sortType };
+  }
+
+  private cacheStakePools(itemsToCache: { [hashId: number]: Cardano.StakePool }) {
+    for (const [hashId, pool] of Object.entries(itemsToCache))
+      this.#cache.set(`${IDS_NAMESPACE}/${hashId}`, pool, UNLIMITED_CACHE_TTL);
+  }
+
+  private async queryExtraPoolsData(
+    idsToFetch: PoolUpdate[],
+    sortType: PoolSortType,
+    totalAdaAmount: string,
+    orderedResult: OrderedResult
+  ) {
+    if (idsToFetch.length === 0) return emptyPoolsExtraInfo;
 
     this.#logger.debug('About to query stake pool extra information');
-    const [
-      poolRelays,
-      poolOwners,
-      poolRegistrations,
-      poolRetirements,
-      poolRewards,
-      poolMetrics,
-      poolAPYs,
-      totalCount,
-      lastEpoch
-    ] = await Promise.all([
+    const orderedResultHashIds = idsToFetch.map(({ id }) => id);
+    const orderedResultUpdateIds = idsToFetch.map(({ updateId }) => updateId);
+
+    const [poolRelays, poolOwners, poolRegistrations, poolRetirements, poolMetrics] = await Promise.all([
       // TODO: it would be easier and make the code cleaner if all queries had the same id as argument
       //       (either hash or update id)
       this.#builder.queryPoolRelays(orderedResultUpdateIds),
       this.#builder.queryPoolOwners(orderedResultUpdateIds),
       this.#builder.queryRegistrations(orderedResultHashIds),
       this.#builder.queryRetirements(orderedResultHashIds),
-      this.#builder.queryPoolRewards(orderedResultHashIds, options?.rewardsHistoryLimit),
       sortType === 'metrics'
         ? (orderedResult as PoolMetrics[])
-        : this.#builder.queryPoolMetrics(orderedResultHashIds, totalAdaAmount),
+        : this.#builder.queryPoolMetrics(orderedResultHashIds, totalAdaAmount)
+    ]);
+    return { poolMetrics, poolOwners, poolRegistrations, poolRelays, poolRetirements };
+  }
+
+  public async queryStakePools(options?: StakePoolQueryOptions): Promise<StakePoolSearchResults> {
+    const { params, query } =
+      options?.filters?._condition === 'or'
+        ? this.#builder.buildOrQuery(options?.filters)
+        : this.#builder.buildAndQuery(options?.filters);
+
+    // Get pool updates/hashes
+    const poolUpdates = await this.#cache.get(queryCacheKey(StakePoolsSubQuery.POOL_HASHES, options), () =>
+      this.#builder.queryPoolHashes(query, params)
+    );
+    // Get pool total amount of ada
+    const totalAdaAmount = await this.#cache.get(queryCacheKey(StakePoolsSubQuery.TOTAL_ADA_AMOUNT), () =>
+      this.#builder.getTotalAmountOfAda()
+    );
+    // Get pool total stake pools count
+    const totalCount = await this.#builder.queryTotalCount(query, params);
+    // Get last epoch no
+    const lastEpoch = await this.#builder.getLastEpoch();
+    // Get stake pools data
+    const { orderedResultHashIds, orderedResultUpdateIds, orderedResult, poolDatas, hashesIds, sortType } =
+      await this.#cache.get(queryCacheKey(StakePoolsSubQuery.POOLS_DATA_ORDERED, options), () =>
+        this.getPoolsDataOrdered(poolUpdates, totalAdaAmount, options)
+      );
+    // Get stake pools APYs
+    const poolAPYs =
       sortType === 'apy'
         ? (orderedResult as PoolAPY[])
-        : this.#builder.queryPoolAPY(hashesIds, { rewardsHistoryLimit: options?.rewardsHistoryLimit }),
-      this.#builder.queryTotalCount(query, params),
-      this.#builder.getLastEpoch()
-    ]);
+        : await this.#cache.get(queryCacheKey(StakePoolsSubQuery.APY, hashesIds, options), () =>
+            this.#builder.queryPoolAPY(hashesIds, { rewardsHistoryLimit: options?.rewardsHistoryLimit })
+          );
 
-    return toCoreStakePool(orderedResultHashIds, {
+    const poolRewards = await this.#cache.get(
+      queryCacheKey(StakePoolsSubQuery.REWARDS, orderedResultHashIds, options),
+      () => this.#builder.queryPoolRewards(orderedResultHashIds, options?.rewardsHistoryLimit),
+      UNLIMITED_CACHE_TTL
+    );
+
+    // Create lookup table with pool ids: (hashId:updateId)
+    const hashIdsMap = Object.fromEntries(
+      orderedResultHashIds.map((hashId, idx) => [hashId, orderedResultUpdateIds[idx]])
+    );
+
+    // Create a lookup table with cached pools: (hashId:Cardano.StakePool)
+    const fromCache = Object.fromEntries(
+      orderedResultHashIds.map((hashId) => [
+        hashId,
+        this.#cache.getVal<Cardano.StakePool>(`${IDS_NAMESPACE}/${hashId}`)
+      ])
+    );
+
+    // Compute ids to fetch from db
+    const idsToFetch = Object.entries(fromCache)
+      .filter(([_, pool]) => pool === undefined)
+      .map(([hashId, _]) => ({ id: Number(hashId), updateId: hashIdsMap[hashId] }));
+
+    // Get stake pools extra information
+    const { poolRelays, poolOwners, poolRegistrations, poolRetirements, poolMetrics } = await this.queryExtraPoolsData(
+      idsToFetch,
+      sortType,
+      totalAdaAmount,
+      orderedResult
+    );
+
+    const { results, poolsToCache } = toStakePoolResults(orderedResultHashIds, fromCache, {
       lastEpoch,
       poolAPYs,
       poolDatas,
@@ -120,10 +204,24 @@ export class DbSyncStakePoolProvider extends DbSyncProvider implements StakePool
       poolRewards: poolRewards.filter(isNotNil),
       totalCount
     });
+
+    // Cache stake pools core objects
+    this.cacheStakePools(poolsToCache);
+
+    return results;
   }
 
   public async stakePoolStats(): Promise<StakePoolStats> {
     this.#logger.debug('About to query pool stats');
-    return this.#builder.queryPoolStats();
+    return await this.#cache.get(queryCacheKey(StakePoolsSubQuery.STATS), () => this.#builder.queryPoolStats());
+  }
+
+  async start(): Promise<void> {
+    this.#epochRolloverDisposer = this.#epochMonitor.onEpochRollover(() => this.#cache.clear());
+  }
+
+  async close(): Promise<void> {
+    this.#cache.shutdown();
+    this.#epochRolloverDisposer();
   }
 }

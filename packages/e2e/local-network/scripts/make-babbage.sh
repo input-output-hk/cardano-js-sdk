@@ -52,6 +52,11 @@ MAX_SUPPLY=45000000000000000
 START_TIME="$(${DATE} -d "now + 30 seconds" +%s)"
 ROOT=network-files
 
+if test -d "${ROOT}/byron-gen-command"; then
+  echo  "Existing \"${ROOT}/byron-gen-command\" directory will be deleted"
+  rm -rf "${ROOT}/byron-gen-command"
+fi
+
 mkdir -p "${ROOT}"
 
 cat > "${ROOT}/byron.genesis.spec.json" <<EOF
@@ -283,12 +288,15 @@ $SED -i -E "s/\"systemStart\": \".*\"/\"systemStart\": \"${timeISO}\"/" ${ROOT}/
 
 byronGenesisHash=$(cardano-cli byron genesis print-genesis-hash --genesis-json ${ROOT}/genesis/byron/genesis.json)
 shelleyGenesisHash=$(cardano-cli genesis hash --genesis ${ROOT}/genesis/shelley/genesis.json)
+alonzoGenesisHash=$(cardano-cli genesis hash --genesis ${ROOT}/genesis/shelley/genesis.alonzo.json)
 
 echo "Byron genesis hash: $byronGenesisHash"
 echo "Shelley genesis hash: $shelleyGenesisHash"
+echo "Alonzo genesis hash: $alonzoGenesisHash"
 
 $SED -i -E "s/ByronGenesisHash: \".*\"/ByronGenesisHash: \"${byronGenesisHash}\"/"  ${ROOT}/configuration.yaml
 $SED -i -E "s/ShelleyGenesisHash: \".*\"/ShelleyGenesisHash: \"${shelleyGenesisHash}\"/"  ${ROOT}/configuration.yaml
+$SED -i -E "s/AlonzoGenesisHash: \".*\"/AlonzoGenesisHash: \"${alonzoGenesisHash}\"/"  ${ROOT}/configuration.yaml
 
 # Create config folder
 rm -rf ./config/*
@@ -302,6 +310,7 @@ cp ./templates/babbage/node-config.json ./config/network/cardano-node/config.jso
 
 $SED -i -E "s/\"ByronGenesisHash\": \".*\"/\"ByronGenesisHash\": \"${byronGenesisHash}\"/" ./config/network/cardano-node/config.json
 $SED -i -E "s/\"ShelleyGenesisHash\": \".*\"/\"ShelleyGenesisHash\": \"${shelleyGenesisHash}\"/" ./config/network/cardano-node/config.json
+$SED -i -E "s/\"AlonzoGenesisHash\": \".*\"/\"AlonzoGenesisHash\": \"${alonzoGenesisHash}\"/" ./config/network/cardano-node/config.json
 
 cp ./templates/babbage/topology.json ./config/network/cardano-node/topology.json
 

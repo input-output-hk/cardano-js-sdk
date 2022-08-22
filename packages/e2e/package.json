@@ -103,7 +103,7 @@
     "babel-loader": "^8.2.5",
     "blake2b-no-wasm": "2.1.4",
     "buffer": "^6.0.3",
-    "chromedriver": "^102.0.0",
+    "chromedriver": "^104.0.0",
     "copy-webpack-plugin": "^10.2.4",
     "delay": "^5.0.0",
     "eslint": "^7.32.0",

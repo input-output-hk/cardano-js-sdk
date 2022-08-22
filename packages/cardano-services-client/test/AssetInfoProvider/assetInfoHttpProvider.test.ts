@@ -1,14 +1,10 @@
 import { Cardano } from '@cardano-sdk/core';
-import { INFO, createLogger } from 'bunyan';
 import { assetInfoHttpProvider } from '../../src';
+import { logger } from '@cardano-sdk/util-dev';
 import MockAdapter from 'axios-mock-adapter';
-
 import axios from 'axios';
 
-const config = {
-  baseUrl: 'http://some-hostname:3000/asset',
-  logger: createLogger({ level: INFO, name: 'unit tests' })
-};
+const config = { baseUrl: 'http://some-hostname:3000/asset', logger };
 
 describe('assetInfoHttpProvider', () => {
   let axiosMock: MockAdapter;

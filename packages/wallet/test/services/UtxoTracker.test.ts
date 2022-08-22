@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { PersistentCollectionTrackerSubject, createUtxoTracker } from '../../src/services';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
+import { dummyLogger } from 'ts-log';
 import { utxo } from '../mocks';
 
 describe('createUtxoTracker', () => {
@@ -11,6 +12,7 @@ describe('createUtxoTracker', () => {
   let retryBackoffConfig: RetryBackoffConfig;
   let tipBlockHeight$: Observable<number>;
   let utxoProvider: UtxoProvider;
+  const logger = dummyLogger;
 
   it(`fetches utxo from UtxoProvider;
       includes change from a transaction in flight;
@@ -72,6 +74,7 @@ describe('createUtxoTracker', () => {
       const utxoTracker = createUtxoTracker(
         {
           addresses$: cold('a|', { a: [ownAddress!] }),
+          logger,
           retryBackoffConfig,
           stores: {
             unspendableUtxo: store,
@@ -112,6 +115,7 @@ describe('createUtxoTracker', () => {
       const utxoTracker = createUtxoTracker(
         {
           addresses$: cold('a|', { a: [address!] }),
+          logger,
           retryBackoffConfig,
           stores: {
             unspendableUtxo: store,
@@ -150,6 +154,7 @@ describe('createUtxoTracker', () => {
       const utxoTracker = createUtxoTracker(
         {
           addresses$: cold('a|', { a: [address!] }),
+          logger,
           retryBackoffConfig,
           stores: {
             unspendableUtxo: store,

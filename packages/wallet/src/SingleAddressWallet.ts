@@ -78,7 +78,7 @@ import { Cip30DataSignature } from '@cardano-sdk/cip30';
 import { InputSelector, defaultSelectionConstraints, roundRobinRandomImprove } from '@cardano-sdk/cip2';
 import { Logger } from 'ts-log';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { Shutdown } from '@cardano-sdk/util';
+import { Shutdown, contextLogger } from '@cardano-sdk/util';
 import { TrackedUtxoProvider } from './services/ProviderTracker/TrackedUtxoProvider';
 import { TxInternals, createTransactionInternals, ensureValidityInterval } from './Transaction';
 import { WalletStores, createInMemoryWalletStores } from './persistence';
@@ -170,8 +170,10 @@ export class SingleAddressWallet implements ObservableWallet {
       connectionStatusTracker$ = createSimpleConnectionStatusTracker()
     }: SingleAddressWalletDependencies
   ) {
-    this.#logger = logger;
+    this.#logger = contextLogger(logger, name);
+
     this.#inputSelector = inputSelector;
+
     this.txSubmitProvider = new TrackedTxSubmitProvider(txSubmitProvider);
     this.utxoProvider = new TrackedUtxoProvider(utxoProvider);
     this.networkInfoProvider = new TrackedWalletNetworkInfoProvider(networkInfoProvider);
@@ -179,10 +181,12 @@ export class SingleAddressWallet implements ObservableWallet {
     this.assetProvider = new TrackedAssetProvider(assetProvider);
     this.chainHistoryProvider = new TrackedChainHistoryProvider(chainHistoryProvider);
     this.rewardsProvider = new TrackedRewardsProvider(rewardsProvider);
+
     this.syncStatus = createProviderStatusTracker(
       {
         assetProvider: this.assetProvider,
         chainHistoryProvider: this.chainHistoryProvider,
+        logger: contextLogger(this.#logger, 'syncStatus'),
         networkInfoProvider: this.networkInfoProvider,
         rewardsProvider: this.rewardsProvider,
         stakePoolProvider: this.stakePoolProvider,
@@ -191,6 +195,7 @@ export class SingleAddressWallet implements ObservableWallet {
       },
       { consideredOutOfSyncAfter }
     );
+
     this.keyAgent = keyAgent;
     this.addresses$ = new TrackerSubject<GroupedAddress[]>(
       concat(
@@ -199,21 +204,29 @@ export class SingleAddressWallet implements ObservableWallet {
           distinctUntilChanged(groupedAddressesEquals),
           tap(
             // derive an address if none available
-            (addresses) =>
-              addresses.length === 0 &&
-              void keyAgent
-                .deriveAddress({ index: 0, type: AddressType.External })
-                .catch(() => logger.error('SingleAddressWallet failed to derive address'))
+            (addresses) => {
+              if (addresses.length === 0) {
+                this.#logger.debug('No addresses available; deriving one');
+                void keyAgent
+                  .deriveAddress({ index: 0, type: AddressType.External })
+                  .catch(() => this.#logger.error('Failed to derive address'));
+              }
+            }
           ),
           filter((addresses) => addresses.length > 0),
           tap(stores.addresses.set.bind(stores.addresses))
         )
       )
     );
+
     this.name = name;
-    const cancel$ = connectionStatusTracker$.pipe(filter((status) => status === ConnectionStatus.down));
+    const cancel$ = connectionStatusTracker$.pipe(
+      tap((status) => (status === ConnectionStatus.up ? 'Connection UP' : 'Connection DOWN')),
+      filter((status) => status === ConnectionStatus.down)
+    );
     this.#tip$ = this.tip$ = new TipTracker({
       connectionStatus$: connectionStatusTracker$,
+      logger: contextLogger(this.#logger, 'tip$'),
       maxPollInterval: maxInterval,
       minPollInterval: pollInterval,
       provider$: coldObservableProvider({
@@ -234,16 +247,22 @@ export class SingleAddressWallet implements ObservableWallet {
         equals: deepEquals,
         provider: this.networkInfoProvider.eraSummaries,
         retryBackoffConfig,
-        trigger$: eraSummariesTrigger
+        trigger$: eraSummariesTrigger.pipe(tap(() => 'Trigger request era summaries'))
       }),
       stores.eraSummaries
     );
 
     // Epoch tracker triggers the first eraSummaries fetch from eraSummariesTrigger
     // Epoch changes also trigger refetch of eraSummaries
-    this.currentEpoch$ = currentEpochTracker(this.tip$, this.eraSummaries$);
+    this.currentEpoch$ = currentEpochTracker(
+      this.tip$,
+      this.eraSummaries$.pipe(tap((es) => this.#logger.debug('Era summaries are', es)))
+    );
     this.currentEpoch$.pipe(map(() => void 0)).subscribe(eraSummariesTrigger);
-    const epoch$ = this.currentEpoch$.pipe(map((epoch) => epoch.epochNo));
+    const epoch$ = this.currentEpoch$.pipe(
+      map((epoch) => epoch.epochNo),
+      tap((epoch) => this.#logger.debug(`Current epoch is ${epoch}`))
+    );
     this.protocolParameters$ = new PersistentDocumentTrackerSubject(
       coldObservableProvider({
         cancel$,
@@ -272,6 +291,7 @@ export class SingleAddressWallet implements ObservableWallet {
       addresses$,
       chainHistoryProvider: this.chainHistoryProvider,
       inFlightTransactionsStore: stores.inFlightTransactions,
+      logger: contextLogger(this.#logger, 'transactions'),
       newTransactions: this.#newTransactions,
       retryBackoffConfig,
       tip$: this.tip$,
@@ -280,7 +300,7 @@ export class SingleAddressWallet implements ObservableWallet {
 
     this.#resubmitSubscription = createTransactionReemitter({
       confirmed$: this.transactions.outgoing.confirmed$,
-      logger,
+      logger: contextLogger(this.#logger, 'transactionsReemiter'),
       rollback$: this.transactions.rollback$,
       store: stores.volatileTransactions,
       submitting$: this.transactions.outgoing.submitting$,
@@ -297,6 +317,7 @@ export class SingleAddressWallet implements ObservableWallet {
 
     this.utxo = createUtxoTracker({
       addresses$,
+      logger: contextLogger(logger, 'utxo'),
       retryBackoffConfig,
       stores,
       tipBlockHeight$,
@@ -307,6 +328,7 @@ export class SingleAddressWallet implements ObservableWallet {
     this.delegation = createDelegationTracker({
       epoch$,
       eraSummaries$,
+      logger: contextLogger(this.#logger, 'delegation'),
       retryBackoffConfig,
       rewardAccountAddresses$: this.addresses$.pipe(
         map((addresses) => addresses.map((groupedAddress) => groupedAddress.rewardAccount))
@@ -316,16 +338,19 @@ export class SingleAddressWallet implements ObservableWallet {
       stores,
       transactionsTracker: this.transactions
     });
+
     this.balance = createBalanceTracker(this.protocolParameters$, this.utxo, this.delegation);
     this.assets$ = new PersistentDocumentTrackerSubject(
       createAssetsTracker({
         assetProvider: this.assetProvider,
         balanceTracker: this.balance,
+        logger: contextLogger(logger, 'assets$'),
         retryBackoffConfig
       }),
       stores.assets
     );
     this.util = createWalletUtil(this);
+    this.#logger.debug('Created');
   }
 
   async getName(): Promise<string> {
@@ -354,6 +379,7 @@ export class SingleAddressWallet implements ObservableWallet {
     });
     return { body, hash, inputSelection };
   }
+
   async finalizeTx(
     tx: TxInternals,
     auxiliaryData?: Cardano.AuxiliaryData,
@@ -371,10 +397,13 @@ export class SingleAddressWallet implements ObservableWallet {
       witness: { signatures }
     };
   }
+
   async submitTx(tx: Cardano.NewTxAlonzo): Promise<void> {
+    this.#logger.debug(`Submitting transaction ${tx.id}`);
     this.#newTransactions.submitting$.next(tx);
     try {
       await this.txSubmitProvider.submitTx(coreToCsl.tx(tx).to_bytes());
+      this.#logger.debug(`Submitted transaction ${tx.id}`);
       this.#newTransactions.pending$.next(tx);
     } catch (error) {
       this.#newTransactions.failedToSubmit$.next({
@@ -414,6 +443,7 @@ export class SingleAddressWallet implements ObservableWallet {
     this.#newTransactions.pending$.complete();
     this.#newTransactions.submitting$.complete();
     this.#resubmitSubscription.unsubscribe();
+    this.#logger.debug('Shutdown');
   }
 
   #prepareTx(props: InitializeTxProps) {

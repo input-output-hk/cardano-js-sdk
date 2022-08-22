@@ -9,11 +9,13 @@ import {
 } from '../../../src/services';
 import { createStubTxWithCertificates } from './stub-tx';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
+import { dummyLogger } from 'ts-log';
 import { firstValueFrom, of } from 'rxjs';
 import { mockRewardsProvider, rewardAccount, rewardsHistory } from '../../mocks';
 
 describe('RewardsHistory', () => {
   const rewardAccounts = [rewardAccount];
+  const logger = dummyLogger;
 
   describe('createRewardsHistoryProvider', () => {
     let rewardsProvider: TrackedRewardsProvider;
@@ -62,7 +64,8 @@ describe('RewardsHistory', () => {
           }),
           of(rewardAccounts),
           getRewardsHistory,
-          new InMemoryRewardsHistoryStore()
+          new InMemoryRewardsHistoryStore(),
+          logger
         );
         expectObservable(target$).toBe('-a', {
           a: {
@@ -104,7 +107,8 @@ describe('RewardsHistory', () => {
           }),
           of(rewardAccounts),
           getRewardsHistory,
-          new InMemoryRewardsHistoryStore()
+          new InMemoryRewardsHistoryStore(),
+          logger
         );
         expectObservable(target$).toBe('-a', {
           a: {

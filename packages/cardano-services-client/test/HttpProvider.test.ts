@@ -1,14 +1,11 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable sonarjs/cognitive-complexity */
 /* eslint-disable sonarjs/no-duplicate-string */
 import { HttpProviderConfig, createHttpProvider } from '../src';
 import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
-import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
-
-import { INFO, createLogger } from 'bunyan';
-import { Logger } from 'ts-log';
 import { Server } from 'http';
+import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
 import { getPort } from 'get-port-please';
+import { logger } from '@cardano-sdk/util-dev';
 import express, { RequestHandler } from 'express';
 
 type ComplexArg2 = { map: Map<string, Buffer> };
@@ -36,7 +33,6 @@ const stubProviderPaths = {
 describe('createHttpServer', () => {
   let port: number;
   let baseUrl: string;
-  const logger: Logger = createLogger({ level: INFO, name: 'unit tests' });
 
   const createTxSubmitProviderClient = (
     config: Pick<HttpProviderConfig<TestProvider>, 'axiosOptions' | 'mapError'> = {}
@@ -55,7 +51,8 @@ describe('createHttpServer', () => {
 
   it('attempting to access unimplemented method throws ProviderError', async () => {
     const provider = createTxSubmitProviderClient();
-    expect(() => (provider as any).doesntExist).toThrowError(ProviderError);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect(() => (provider as any).doesNotExist).toThrowError(ProviderError);
   });
 
   describe('method with no args and void return', () => {

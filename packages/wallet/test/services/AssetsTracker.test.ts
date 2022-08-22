@@ -8,6 +8,7 @@ import {
   TransactionalTracker,
   createAssetsTracker
 } from '../../src/services';
+import { dummyLogger } from 'ts-log';
 import { of } from 'rxjs';
 
 describe('createAssetsTracker', () => {
@@ -15,6 +16,7 @@ describe('createAssetsTracker', () => {
   let assetPxl: Asset.AssetInfo;
   let assetService: AssetService;
   let assetProvider: TrackedAssetProvider;
+  const logger = dummyLogger;
 
   beforeEach(() => {
     const nftMetadata = { name: 'nft' } as Asset.NftMetadata;
@@ -44,7 +46,7 @@ describe('createAssetsTracker', () => {
         }
       } as unknown as TransactionalTracker<BalanceTracker>;
 
-      const target$ = createAssetsTracker({ assetProvider, balanceTracker } as unknown as AssetsTrackerProps, {
+      const target$ = createAssetsTracker({ assetProvider, balanceTracker, logger } as unknown as AssetsTrackerProps, {
         assetService
       });
       expectObservable(target$).toBe('--b-c', {
@@ -77,7 +79,7 @@ describe('createAssetsTracker', () => {
         }
       } as unknown as TransactionalTracker<BalanceTracker>;
 
-      const target$ = createAssetsTracker({ assetProvider, balanceTracker } as unknown as AssetsTrackerProps, {
+      const target$ = createAssetsTracker({ assetProvider, balanceTracker, logger } as unknown as AssetsTrackerProps, {
         assetService
       });
       expectObservable(target$).toBe('--b-c', {

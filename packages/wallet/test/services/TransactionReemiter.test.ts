@@ -1,14 +1,16 @@
 import { Cardano } from '@cardano-sdk/core';
 import { InMemoryVolatileTransactionsStore, WalletStores } from '../../src/persistence';
-import { Logger, dummyLogger as logger } from 'ts-log';
+import { Logger, dummyLogger } from 'ts-log';
 import { NewTxAlonzoWithSlot, TransactionReemitErrorCode, createTransactionReemitter } from '../../src';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
 
 describe('TransactionReemiter', () => {
   let store: WalletStores['volatileTransactions'];
   let volatileTransactions: NewTxAlonzoWithSlot[];
+  let logger: Logger;
 
   beforeEach(() => {
+    logger = dummyLogger;
     store = new InMemoryVolatileTransactionsStore();
     store.set = jest.fn();
     volatileTransactions = [
@@ -138,7 +140,6 @@ describe('TransactionReemiter', () => {
     const rollbackD: Cardano.TxAlonzo = { body: volatileD.body, id: volatileD.id } as Cardano.TxAlonzo;
 
     // eslint-disable-next-line @typescript-eslint/no-shadow
-    const logger = {} as Logger;
     logger.error = jest.fn();
 
     createTestScheduler().run(({ hot, cold, expectObservable }) => {
@@ -169,7 +170,7 @@ describe('TransactionReemiter', () => {
     const [volatileA, volatileB, volatileC] = volatileTransactions;
     const rollbackC: Cardano.TxAlonzo = { body: volatileC.body, id: volatileC.id } as Cardano.TxAlonzo;
     // eslint-disable-next-line @typescript-eslint/no-shadow
-    const logger = {} as Logger;
+    const logger = dummyLogger;
     logger.error = jest.fn();
 
     createTestScheduler().run(({ hot, cold, expectObservable }) => {
