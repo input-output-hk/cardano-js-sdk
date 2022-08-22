@@ -170,7 +170,7 @@ export class SingleAddressWallet implements ObservableWallet {
       connectionStatusTracker$ = createSimpleConnectionStatusTracker()
     }: SingleAddressWalletDependencies
   ) {
-    this.#logger = contextLogger(logger, this.name);
+    this.#logger = contextLogger(logger, name);
 
     this.#inputSelector = inputSelector;
 

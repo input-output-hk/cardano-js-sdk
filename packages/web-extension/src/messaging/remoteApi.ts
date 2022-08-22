@@ -116,13 +116,12 @@ export const consumeMessengerRemoteApi = <T extends object>(
               if (error) throw error;
             })
           );
-          return (receiver[prop] = messageData$
-            .pipe(
-              filter(isEmitMessage),
-              map(({ emit }) => emit),
-              shareReplay(1)
-            )
-            .pipe(takeUntil(unsubscribe$)));
+          return (receiver[prop] = messageData$.pipe(
+            takeUntil(unsubscribe$),
+            filter(isEmitMessage),
+            map(({ emit }) => emit),
+            shareReplay(1)
+          ));
         }
       },
       has(_, p) {
