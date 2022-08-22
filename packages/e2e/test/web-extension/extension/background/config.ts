@@ -130,7 +130,7 @@ export const txSubmitProvider = (async () => {
         tls: env.TX_SUBMIT_PROVIDER_PARAMS.url?.protocol === 'wss'
       };
 
-      return ogmiosTxSubmitProvider(createConnectionObject(connectionConfig));
+      return ogmiosTxSubmitProvider(createConnectionObject(connectionConfig), logger);
     }
     default: {
       throw new Error(`TX_SUBMIT_PROVIDER unsupported: ${env.TX_SUBMIT_PROVIDER}`);
@@ -180,7 +180,7 @@ export const networkInfoProvider = (async () => {
 export const chainHistoryProvider = (async () => {
   switch (env.CHAIN_HISTORY_PROVIDER) {
     case 'blockfrost': {
-      return blockfrostChainHistoryProvider(await blockfrostApi!);
+      return blockfrostChainHistoryProvider(await blockfrostApi!, logger);
     }
     case 'http': {
       return chainHistoryHttpProvider({
