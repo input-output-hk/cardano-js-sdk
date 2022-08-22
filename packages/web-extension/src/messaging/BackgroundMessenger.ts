@@ -32,7 +32,7 @@ export const createBackgroundMessenger = ({ logger, runtime }: MessengerDependen
     return channel;
   };
   const onPortMessage = (data: unknown, port: MessengerPort) => {
-    logger.debug('[BackgroundMessenger] Port message', data, port);
+    logger.debug(`[BackgroundMessenger(${port.name})] message`, data);
     const { message$ } = channels.get(port.name)!;
     message$.next({ data, port });
   };
@@ -43,7 +43,7 @@ export const createBackgroundMessenger = ({ logger, runtime }: MessengerDependen
     const newPorts = new Set(ports$.value);
     newPorts.delete(port);
     ports$.next(newPorts);
-    logger.debug('[BackgroundMessenger] Port disconnected', port);
+    logger.debug(`[BackgroundMessenger(${port.name})] disconnected`, port);
   };
   const onConnect = (port: MessengerPort) => {
     const { ports$ } = getChannel(port.name);
@@ -52,7 +52,7 @@ export const createBackgroundMessenger = ({ logger, runtime }: MessengerDependen
     port.onMessage.addListener(onPortMessage);
     port.onDisconnect.addListener(onPortDisconnected);
     ports$.next(newPorts);
-    logger.debug('[BackgroundMessenger] Port connected', port);
+    logger.debug(`[BackgroundMessenger(${port.name})] connected`);
   };
   runtime.onConnect.addListener(onConnect);
   return {

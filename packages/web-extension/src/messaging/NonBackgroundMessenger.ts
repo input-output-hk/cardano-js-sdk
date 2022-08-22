@@ -47,12 +47,12 @@ export const createNonBackgroundMessenger = (
     reconnectTimeout = setTimeout(connect, delay);
   };
   const onMessage = (data: unknown, port: MessengerPort) => {
-    logger.debug(`[NonBackgroundMessenger(${channel})] receive message`, data, port);
+    logger.debug(`[NonBackgroundMessenger(${channel})] message`, data);
     delay = initialDelay;
     message$.next({ data, port });
   };
   const onDisconnect = (port: MessengerPort) => {
-    logger.debug(`[NonBackgroundMessenger(${channel})] disconnected`, port);
+    logger.debug(`[NonBackgroundMessenger(${channel})] disconnected`);
     port!.onMessage.removeListener(onMessage);
     port!.onDisconnect.removeListener(onDisconnect);
     port$.next(isDestroyed ? 'destroyed' : null);
