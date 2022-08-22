@@ -169,7 +169,12 @@
 <a name='L104'></a><a href='#L104'>104</a>
 <a name='L105'></a><a href='#L105'>105</a>
 <a name='L106'></a><a href='#L106'>106</a>
-<a name='L107'></a><a href='#L107'>107</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -197,6 +202,11 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -277,7 +287,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// only tested in ../e2e tests
 /* eslint-disable no-use-before-define */
-import { BehaviorSubject, Observable, Subject, debounceTime, filter, first, map, takeWhile, tap } from 'rxjs';
+import { BehaviorSubject, Observable, ReplaySubject, debounceTime, filter, first, map, takeWhile, tap } from 'rxjs';
 import { Messenger, MessengerDependencies, MessengerPort, PortMessage, ReconnectConfig } from './types';
 import { deriveChannelName } from './util';
 import { isNotNil } from '@cardano-sdk/util';
@@ -303,7 +313,12 @@ export const createNonBackgroundMessenger = <span class="fstat-no" title="functi
   let delay = <span class="cstat-no" title="statement not covered" >initialDelay;</span>
   let isDestroyed = <span class="cstat-no" title="statement not covered" >false;</span>
   const port$ = <span class="cstat-no" title="statement not covered" >new BehaviorSubject&lt;MessengerPort | null | 'destroyed'&gt;(null);</span>
-  const message$ = <span class="cstat-no" title="statement not covered" >new Subject&lt;PortMessage&gt;();</span>
+  // Originally this was a 'new Subject()', but there seems to be a race between
+  // - when it receives a value from 'onMessage'
+  // - when message$ is subscribed to through `remoteApi`
+  // It is most likely because event listener to onMessage is added during
+  // createNonBackgroundMessenger and messenger on the other end emits immediately upon connection.
+  const message$ = <span class="cstat-no" title="statement not covered" >new ReplaySubject&lt;PortMessage&gt;(1);</span>
   const connect = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >() =</span>&gt; {</span>
 <span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (typeof port$.value === 'string' || port$.value) <span class="cstat-no" title="statement not covered" >return;</span></span>
     // assuming this doesn't throw
@@ -319,12 +334,12 @@ export const createNonBackgroundMessenger = <span class="fstat-no" title="functi
 <span class="cstat-no" title="statement not covered" >    reconnectTimeout = setTimeout(connect, delay);</span>
   };
   const onMessage = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(d</span>ata: unknown, port: MessengerPort) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >    logger.debug(`[NonBackgroundMessenger(${channel})] receive message`, data, port);</span>
+<span class="cstat-no" title="statement not covered" >    logger.debug(`[NonBackgroundMessenger(${channel})] message`, data);</span>
 <span class="cstat-no" title="statement not covered" >    delay = initialDelay;</span>
 <span class="cstat-no" title="statement not covered" >    message$.next({ data, port });</span>
   };
   const onDisconnect = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(p</span>ort: MessengerPort) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >    logger.debug(`[NonBackgroundMessenger(${channel})] disconnected`, port);</span>
+<span class="cstat-no" title="statement not covered" >    logger.debug(`[NonBackgroundMessenger(${channel})] disconnected`);</span>
 <span class="cstat-no" title="statement not covered" >    port!.onMessage.removeListener(onMessage);</span>
 <span class="cstat-no" title="statement not covered" >    port!.onDisconnect.removeListener(onDisconnect);</span>
 <span class="cstat-no" title="statement not covered" >    port$.next(isDestroyed ? 'destroyed' : null);</span>
@@ -388,7 +403,7 @@ export type NonBackgroundMessenger = ReturnType&lt;typeof createNonBackgroundMes
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at Mon Aug 22 2022 12:57:17 GMT+0000 (Coordinated Universal Time)
+                at Mon Aug 22 2022 14:12:54 GMT+0000 (Coordinated Universal Time)
             </div>
         <script src="../../prettify.js"></script>
         <script>
