@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.0-nightly.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.5.0-nightly.7...@cardano-sdk/web-extension@0.5.0-nightly.8) (2022-08-22)
+
+
+### Features
+
+* **web-extension:** slightly improve messengers log output ([baf7499](https://github.com/input-output-hk/cardano-js-sdk/commit/baf7499c485818c6a3c7affbf97270d7840e2372))
+
+
+### Bug Fixes
+
+* **web-extension:** use ReplaySubject as a workaround to postMessage/subscribe race ([ed294af](https://github.com/input-output-hk/cardano-js-sdk/commit/ed294af6a6e7283bf9271c5bdef8b591e12658be))
+
+
+
 ## [0.5.0-nightly.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.5.0-nightly.6...@cardano-sdk/web-extension@0.5.0-nightly.7) (2022-08-10)
 
 

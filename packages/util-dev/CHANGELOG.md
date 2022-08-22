@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.1-nightly.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.4.1-nightly.4...@cardano-sdk/util-dev@0.4.1-nightly.5) (2022-08-22)
+
+
+### Features
+
+* **util-dev:** add test logger object ([d0453e3](https://github.com/input-output-hk/cardano-js-sdk/commit/d0453e30ac1381f98295394453c038e881ba77a9))
+
+
+### Bug Fixes
+
+* **util-dev:** rm TestLogger dependency on 'stream' for browser compat ([297a27e](https://github.com/input-output-hk/cardano-js-sdk/commit/297a27e089dff5a8dd0dfa33835d4982db370801))
+
+
+
 ## [0.4.1-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.4.1-nightly.3...@cardano-sdk/util-dev@0.4.1-nightly.4) (2022-08-10)
 
 **Note:** Version bump only for package @cardano-sdk/util-dev
