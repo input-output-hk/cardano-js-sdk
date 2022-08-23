@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 import { Asset, CSL, Cardano, SerializationFailure, coreToCsl } from '../../src';
 import { BigNum } from '@emurgo/cardano-serialization-lib-nodejs';
-import { Ed25519KeyHash, NativeScript, NativeScriptType } from '../../src/Cardano';
+import { Ed25519KeyHash, NativeScript, NativeScriptKind, ScriptType } from '../../src/Cardano';
 import { signature, tx, txBody, txIn, txInWithAddress, txOut, valueCoinOnly, valueWithAssets, vkey } from './testData';
 
 const txOutByron = {
@@ -86,27 +86,33 @@ describe('coreToCsl', () => {
     expect(Buffer.from(witness.vkey().public_key().as_bytes()).toString('hex')).toBe(vkey);
     expect(witness.signature().to_hex()).toBe(signature);
   });
-  it('NativeScript', () => {
+  it('nativeScript', () => {
     const script: NativeScript = {
-      __type: NativeScriptType.RequireAnyOf,
+      __type: ScriptType.Native,
+      kind: NativeScriptKind.RequireAnyOf,
       scripts: [
         {
-          __type: NativeScriptType.RequireSignature,
-          keyHash: Ed25519KeyHash('b275b08c999097247f7c17e77007c7010cd19f20cc086ad99d398538')
+          __type: ScriptType.Native,
+          keyHash: Ed25519KeyHash('b275b08c999097247f7c17e77007c7010cd19f20cc086ad99d398538'),
+          kind: NativeScriptKind.RequireSignature
         },
         {
-          __type: NativeScriptType.RequireAllOf,
+          __type: ScriptType.Native,
+          kind: NativeScriptKind.RequireAllOf,
           scripts: [
             {
-              __type: NativeScriptType.RequireTimeBefore,
+              __type: ScriptType.Native,
+              kind: NativeScriptKind.RequireTimeBefore,
               slot: 3000
             },
             {
-              __type: NativeScriptType.RequireSignature,
-              keyHash: Ed25519KeyHash('966e394a544f242081e41d1965137b1bb412ac230d40ed5407821c37')
+              __type: ScriptType.Native,
+              keyHash: Ed25519KeyHash('966e394a544f242081e41d1965137b1bb412ac230d40ed5407821c37'),
+              kind: NativeScriptKind.RequireSignature
             },
             {
-              __type: NativeScriptType.RequireTimeAfter,
+              __type: ScriptType.Native,
+              kind: NativeScriptKind.RequireTimeAfter,
               slot: 4000
             }
           ]

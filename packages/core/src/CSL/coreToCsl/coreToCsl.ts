@@ -293,16 +293,16 @@ export const tx = ({ body, witness, auxiliaryData }: Cardano.NewTxAlonzo): Trans
 
 export const nativeScript = (script: Cardano.NativeScript): NativeScript => {
   let cslScript: NativeScript;
-  const type = script.__type;
+  const kind = script.kind;
 
-  switch (type) {
-    case Cardano.NativeScriptType.RequireSignature: {
+  switch (kind) {
+    case Cardano.NativeScriptKind.RequireSignature: {
       cslScript = NativeScript.new_script_pubkey(
         ScriptPubkey.new(Ed25519KeyHash.from_bytes(Buffer.from(script.keyHash, 'hex')))
       );
       break;
     }
-    case Cardano.NativeScriptType.RequireAllOf: {
+    case Cardano.NativeScriptKind.RequireAllOf: {
       const cslScripts = NativeScripts.new();
       for (const subscript of script.scripts) {
         cslScripts.add(nativeScript(subscript));
@@ -310,7 +310,7 @@ export const nativeScript = (script: Cardano.NativeScript): NativeScript => {
       cslScript = NativeScript.new_script_all(ScriptAll.new(cslScripts));
       break;
     }
-    case Cardano.NativeScriptType.RequireAnyOf: {
+    case Cardano.NativeScriptKind.RequireAnyOf: {
       const cslScripts2 = NativeScripts.new();
       for (const subscript of script.scripts) {
         cslScripts2.add(nativeScript(subscript));
@@ -318,7 +318,7 @@ export const nativeScript = (script: Cardano.NativeScript): NativeScript => {
       cslScript = NativeScript.new_script_any(ScriptAny.new(cslScripts2));
       break;
     }
-    case Cardano.NativeScriptType.RequireMOf: {
+    case Cardano.NativeScriptKind.RequireMOf: {
       const cslScripts3 = NativeScripts.new();
       for (const subscript of script.scripts) {
         cslScripts3.add(nativeScript(subscript));
@@ -326,13 +326,13 @@ export const nativeScript = (script: Cardano.NativeScript): NativeScript => {
       cslScript = NativeScript.new_script_n_of_k(ScriptNOfK.new(script.required, cslScripts3));
       break;
     }
-    case Cardano.NativeScriptType.RequireTimeBefore: {
+    case Cardano.NativeScriptKind.RequireTimeBefore: {
       cslScript = NativeScript.new_timelock_expiry(
         TimelockExpiry.new_timelockexpiry(BigNum.from_str(script.slot.toString()))
       );
       break;
     }
-    case Cardano.NativeScriptType.RequireTimeAfter: {
+    case Cardano.NativeScriptKind.RequireTimeAfter: {
       cslScript = NativeScript.new_timelock_start(
         TimelockStart.new_timelockstart(BigNum.from_str(script.slot.toString()))
       );
@@ -340,8 +340,8 @@ export const nativeScript = (script: Cardano.NativeScript): NativeScript => {
     }
     default:
       throw new SerializationError(
-        SerializationFailure.InvalidNativeScriptType,
-        `Native Script Type value '${type}' is not supported.`
+        SerializationFailure.InvalidNativeScriptKind,
+        `Native Script Type value '${kind}' is not supported.`
       );
   }
 

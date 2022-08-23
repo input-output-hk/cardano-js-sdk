@@ -19,7 +19,7 @@ export const createRewardsHistoryProvider =
   (rewardsProvider: TrackedRewardsProvider, retryBackoffConfig: RetryBackoffConfig) =>
   (
     rewardAccounts: Cardano.RewardAccount[],
-    lowerBound: Cardano.Epoch | null
+    lowerBound: Cardano.EpochNo | null
   ): Observable<Map<Cardano.RewardAccount, EpochRewards[]>> => {
     if (lowerBound) {
       return coldObservableProvider({

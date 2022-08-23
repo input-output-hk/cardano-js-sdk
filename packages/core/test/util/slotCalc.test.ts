@@ -93,7 +93,7 @@ describe('slotCalc utils', () => {
       };
 
       const assertNthEpochInfoValid = (
-        expectedEpochNo: Cardano.Epoch,
+        expectedEpochNo: Cardano.EpochNo,
         { epochNo, firstSlot, lastSlot }: EpochInfo,
         epochEraSummary: EraSummary & { firstEpoch: number }
       ) => {

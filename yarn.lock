@@ -1838,7 +1838,6 @@ __metadata:
   resolution: "@cardano-sdk/core@workspace:packages/core"
   dependencies:
     "@cardano-ogmios/client": 5.5.2
-    "@cardano-ogmios/schema": 5.5.2
     "@cardano-sdk/util": 0.4.0
     "@emurgo/cardano-serialization-lib-browser": 11.0.0-rc.6
     "@emurgo/cardano-serialization-lib-nodejs": 11.0.0-rc.6

@@ -58,7 +58,7 @@ const getWithdrawalQuantity = (
   );
 
 export const fetchRewardsTrigger$ = (
-  epoch$: Observable<Cardano.Epoch>,
+  epoch$: Observable<Cardano.EpochNo>,
   txConfirmed$: Observable<Cardano.NewTxAlonzo>,
   rewardAccount: Cardano.RewardAccount
 ) =>
@@ -73,7 +73,7 @@ export const fetchRewardsTrigger$ = (
 
 export const createRewardsProvider =
   (
-    epoch$: Observable<Cardano.Epoch>,
+    epoch$: Observable<Cardano.EpochNo>,
     txConfirmed$: Observable<Cardano.NewTxAlonzo>,
     rewardsProvider: RewardsProvider,
     retryBackoffConfig: RetryBackoffConfig
@@ -155,7 +155,7 @@ const accountCertificateTransactions = (
 type ObservableType<O> = O extends Observable<infer T> ? T : unknown;
 type TransactionsCertificates = ObservableType<ReturnType<typeof accountCertificateTransactions>>;
 
-export const getStakePoolIdAtEpoch = (transactions: TransactionsCertificates) => (atEpoch: Cardano.Epoch) => {
+export const getStakePoolIdAtEpoch = (transactions: TransactionsCertificates) => (atEpoch: Cardano.EpochNo) => {
   const certificatesUpToEpoch = transactions
     .filter(({ epoch }) => epoch < atEpoch - 2)
     .map(({ certificates }) => certificates);
@@ -169,7 +169,7 @@ export const getStakePoolIdAtEpoch = (transactions: TransactionsCertificates) =>
 
 export const createDelegateeTracker = (
   stakePoolProvider: ObservableStakePoolProvider,
-  epoch$: Observable<Cardano.Epoch>,
+  epoch$: Observable<Cardano.EpochNo>,
   certificates$: Observable<TransactionsCertificates>
 ): Observable<Delegatee | undefined> =>
   combineLatest([certificates$, epoch$]).pipe(
@@ -198,7 +198,7 @@ export const addressDelegatees = (
   addresses: Cardano.RewardAccount[],
   transactions$: Observable<TxWithEpoch[]>,
   stakePoolProvider: ObservableStakePoolProvider,
-  epoch$: Observable<Cardano.Epoch>
+  epoch$: Observable<Cardano.EpochNo>
 ) =>
   combineLatest(
     addresses.map((address) =>
@@ -259,7 +259,7 @@ export const createRewardAccountsTracker = ({
   stakePoolProvider: ObservableStakePoolProvider;
   rewardsProvider: ObservableRewardsProvider;
   balancesStore: KeyValueStore<Cardano.RewardAccount, Cardano.Lovelace>;
-  epoch$: Observable<Cardano.Epoch>;
+  epoch$: Observable<Cardano.EpochNo>;
   transactions$: Observable<TxWithEpoch[]>;
   transactionsInFlight$: Observable<Cardano.NewTxAlonzo[]>;
 }) =>
