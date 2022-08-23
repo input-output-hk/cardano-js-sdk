@@ -16,12 +16,12 @@ export const roundRobinRandomImprove = ({
     utxo: utxoSet,
     outputs: outputSet,
     constraints: { computeMinimumCost, computeSelectionLimit, computeMinimumCoinQuantity, tokenBundleSizeExceedsLimit },
-    implicitCoin: implicitCoinAsNumber
+    implicitValue = {}
   }: InputSelectionParameters): Promise<SelectionResult> => {
     const { utxo, outputs, uniqueOutputAssetIDs, implicitCoin } = preprocessArgs(
       utxoSet,
       outputSet,
-      implicitCoinAsNumber
+      implicitValue.coin
     );
 
     assertIsBalanceSufficient(uniqueOutputAssetIDs, utxo, outputs, implicitCoin);

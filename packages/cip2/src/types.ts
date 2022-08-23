@@ -80,9 +80,14 @@ export interface InputSelectionParameters {
    */
   constraints: SelectionConstraints;
   /**
-   * Implicit coin quantities used in the transaction
+   * Implicit input or spent value
    */
-  implicitCoin?: Cardano.util.ImplicitCoin;
+  implicitValue?: {
+    /**
+     * Implicit coin quantities used in the transaction
+     */
+    coin?: Cardano.util.ImplicitCoin;
+  };
 }
 
 export interface InputSelector {

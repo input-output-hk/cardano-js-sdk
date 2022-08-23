@@ -51,7 +51,7 @@ describe('RoundRobinRandomImprove', () => {
         const outputs = new Set([TxTestUtil.createOutput({ coins: 1_000_000n })]);
         const results = await roundRobinRandomImprove().select({
           constraints: SelectionConstraints.NO_CONSTRAINTS,
-          implicitCoin: { input: 2_000_000n },
+          implicitValue: { coin: { input: 2_000_000n } },
           outputs,
           utxo
         });
@@ -223,7 +223,7 @@ describe('RoundRobinRandomImprove', () => {
           try {
             const results = await algorithm.select({
               constraints: SelectionConstraints.mockConstraintsToConstraints(constraints),
-              implicitCoin,
+              implicitValue: { coin: implicitCoin },
               outputs,
               utxo: new Set(utxo)
             });
