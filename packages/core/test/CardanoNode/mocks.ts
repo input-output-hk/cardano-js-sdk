@@ -1,4 +1,4 @@
-import { Cardano, EraSummary, StakeDistribution } from '@cardano-sdk/core';
+import { Cardano, EraSummary, HealthCheckResponse, StakeDistribution } from '@cardano-sdk/core';
 
 const mockEraSummaries: EraSummary[] = [
   { parameters: { epochLength: 21_600, slotLength: 20_000 }, start: { slot: 0, time: new Date(1_563_999_616_000) } },
@@ -48,8 +48,21 @@ export const mockStakeDistribution: StakeDistribution = new Map([
   ]
 ]);
 
+const responseWithServiceState: HealthCheckResponse = {
+  localNode: {
+    ledgerTip: {
+      blockNo: 3_391_731,
+      hash: '9ef43ab6e234fcf90d103413096c7da752da2f45b15e1259f43d476afd12932c',
+      slot: 52_819_355
+    },
+    networkSync: 0.999
+  },
+  ok: true
+};
+
 export const mockCardanoNode = () => ({
   eraSummaries: jest.fn(() => Promise.resolve(mockEraSummaries)),
+  healthCheck: jest.fn(() => Promise.resolve(responseWithServiceState)),
   initialize: jest.fn(() => Promise.resolve()),
   shutdown: jest.fn(() => Promise.resolve()),
   stakeDistribution: jest.fn(() => Promise.resolve(mockStakeDistribution)),

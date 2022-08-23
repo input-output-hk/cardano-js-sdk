@@ -51,7 +51,7 @@ ARG NETWORK=mainnet
 RUN curl --proto '=https' --tlsv1.2 -sSf -L https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - &&\
   echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" | tee  /etc/apt/sources.list.d/pgdg.list &&\
   apt-get update && apt-get install -y --no-install-recommends \
-  ca-certificates
+  ca-certificates jq
 ENV \
   API_URL="http://0.0.0.0:3000" \
   CARDANO_NODE_CONFIG_PATH=/config/cardano-node/config.json \
@@ -66,6 +66,8 @@ ENV \
 WORKDIR /app/packages/cardano-services
 COPY packages/cardano-services/config/network/${NETWORK} /config/
 EXPOSE 3000
+HEALTHCHECK --interval=15s --timeout=15s \
+  CMD curl --fail --silent http://0.0.0.0:3000/health | jq '.ok' | awk '{ if ($0 == "true") exit 0; else exit 1}'
 CMD ["node", "dist/cjs/run.js"]
 
 FROM cardano-services as worker

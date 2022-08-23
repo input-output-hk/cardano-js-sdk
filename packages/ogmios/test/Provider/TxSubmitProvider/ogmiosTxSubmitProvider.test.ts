@@ -1,4 +1,4 @@
-import { Cardano, ProviderError, TxSubmitProvider } from '@cardano-sdk/core';
+import { Cardano, HealthCheckResponse, ProviderError, TxSubmitProvider } from '@cardano-sdk/core';
 import { Connection, createConnectionObject } from '@cardano-ogmios/client';
 import { createMockOgmiosServer, listenPromise, serverClosePromise } from '../../mocks/mockOgmiosServer';
 import { getRandomPort } from 'get-port-please';
@@ -11,9 +11,22 @@ describe('ogmiosTxSubmitProvider', () => {
   let connection: Connection;
   let provider: TxSubmitProvider;
 
+  const responseWithServiceState: HealthCheckResponse = {
+    localNode: {
+      ledgerTip: {
+        blockNo: 3_391_731,
+        hash: '9ef43ab6e234fcf90d103413096c7da752da2f45b15e1259f43d476afd12932c',
+        slot: 52_819_355
+      },
+      networkSync: 0.999
+    },
+    ok: true
+  };
+
   beforeAll(async () => {
     connection = createConnectionObject({ port: await getRandomPort() });
   });
+
   describe('healthCheck', () => {
     afterEach(async () => {
       if (mockServer !== undefined) {
@@ -35,7 +48,7 @@ describe('ogmiosTxSubmitProvider', () => {
       await listenPromise(mockServer, connection.port);
       provider = ogmiosTxSubmitProvider(connection, logger);
       const res = await provider.healthCheck();
-      expect(res).toEqual({ ok: true });
+      expect(res).toEqual(responseWithServiceState);
     });
 
     it('is not ok if node is not close to the network tip', async () => {
@@ -46,7 +59,11 @@ describe('ogmiosTxSubmitProvider', () => {
       await listenPromise(mockServer, connection.port);
       provider = ogmiosTxSubmitProvider(connection, logger);
       const res = await provider.healthCheck();
-      expect(res).toEqual({ ok: false });
+      expect(res).toEqual({
+        ...responseWithServiceState,
+        localNode: { ...responseWithServiceState.localNode, networkSync: 0.8 },
+        ok: false
+      });
     });
 
     it('throws a typed error if caught during the service interaction', async () => {

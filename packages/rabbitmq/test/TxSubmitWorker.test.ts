@@ -113,7 +113,7 @@ describe('TxSubmitWorker', () => {
         await listenPromise(failMock, port);
 
         // Enqueue a tx
-        const providerClosePromise = container.enqueueTx();
+        const providerClosePromise = container.enqueueTx(logger);
 
         // Actually create the TxSubmitWorker
         worker = new TxSubmitWorker({ rabbitmqUrl, ...options }, { logger, txSubmitProvider });
@@ -160,7 +160,7 @@ describe('TxSubmitWorker', () => {
         await worker.start();
 
         // Tx submission by RabbitMqTxSubmitProvider must reject with the same error got by TxSubmitWorker
-        await expect(container.enqueueTx(0, logger)).rejects.toBeInstanceOf(
+        await expect(container.enqueueTx(logger, 0)).rejects.toBeInstanceOf(
           Cardano.TxSubmissionErrors.EraMismatchError
         );
       };

@@ -2,6 +2,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable max-len */
 import { ChildProcess, fork } from 'child_process';
+import { HealthCheckResponse } from '@cardano-sdk/core';
 import { Ogmios } from '@cardano-sdk/ogmios';
 import { RabbitMQContainer } from '../../rabbitmq/test/docker';
 import { ServiceNames } from '../src';
@@ -15,13 +16,28 @@ import http from 'http';
 import path from 'path';
 
 const exePath = (name: 'cli' | 'run') => path.join(__dirname, '..', 'dist', 'cjs', `${name}.js`);
+const cardanoNodeDependantServices = new Set([ServiceNames.NetworkInfo, ServiceNames.TxSubmit]);
 
-const assertServiceHealthy = async (apiUrl: string, serviceName: ServiceNames) => {
+const assertServiceHealthy = async (apiUrl: string, serviceName: ServiceNames, usedQueue?: boolean) => {
   await serverReady(apiUrl);
   const headers = { 'Content-Type': 'application/json' };
   const res = await axios.post(`${apiUrl}/${serviceName}/health`, { headers });
+  const responseWithServiceState: HealthCheckResponse = {
+    localNode: {
+      ledgerTip: {
+        blockNo: 3_391_731,
+        hash: '9ef43ab6e234fcf90d103413096c7da752da2f45b15e1259f43d476afd12932c',
+        slot: 52_819_355
+      },
+      networkSync: 0.999
+    },
+    ok: true
+  };
+  const healthCheckResponse =
+    cardanoNodeDependantServices.has(serviceName) && !usedQueue ? responseWithServiceState : { ok: true };
+
   expect(res.status).toBe(200);
-  expect(res.data).toEqual({ ok: true });
+  expect(res.data).toEqual(healthCheckResponse);
 };
 
 describe('entrypoints', () => {
@@ -751,7 +767,7 @@ describe('entrypoints', () => {
             stdio: 'pipe'
           }
         );
-        await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit);
+        await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, true);
       });
 
       it('run', async () => {
@@ -765,7 +781,7 @@ describe('entrypoints', () => {
           },
           stdio: 'pipe'
         });
-        await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit);
+        await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, true);
       });
     });
 

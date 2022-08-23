@@ -3,6 +3,7 @@
 /* eslint-disable max-len */
 import { DbSyncEpochPollService, EpochMonitor } from '../../../src/util';
 import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../../src/NetworkInfo';
+import { HealthCheckResponse } from '@cardano-sdk/core';
 import { HttpServer, HttpServerConfig, createDnsResolver, getPool } from '../../../src';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../../src/InMemoryCache';
 import { Pool } from 'pg';
@@ -29,6 +30,17 @@ describe('Service dependency abstractions', () => {
   const cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
   const dnsResolver = createDnsResolver({ factor: 1.1, maxRetryTime: 1000 }, logger);
   const cardanoNode = mockCardanoNode();
+  const responseWithServiceState: HealthCheckResponse = {
+    localNode: {
+      ledgerTip: {
+        blockNo: 3_391_731,
+        hash: '9ef43ab6e234fcf90d103413096c7da752da2f45b15e1259f43d476afd12932c',
+        slot: 52_819_355
+      },
+      networkSync: 0.999
+    },
+    ok: true
+  };
 
   describe('Postgres-dependant service with service discovery', () => {
     let httpServer: HttpServer;
@@ -86,7 +98,7 @@ describe('Service dependency abstractions', () => {
           headers: { 'Content-Type': APPLICATION_JSON }
         });
         expect(res.status).toBe(200);
-        expect(res.data).toEqual({ ok: true });
+        expect(res.data).toEqual(responseWithServiceState);
       });
     });
   });
@@ -142,7 +154,7 @@ describe('Service dependency abstractions', () => {
           headers: { 'Content-Type': APPLICATION_JSON }
         });
         expect(res.status).toBe(200);
-        expect(res.data).toEqual({ ok: true });
+        expect(res.data).toEqual(responseWithServiceState);
       });
     });
   });

@@ -1,5 +1,22 @@
-import { Cardano, CardanoNode, CardanoNodeErrors, CardanoNodeUtil, StakeDistribution } from '@cardano-sdk/core';
-import { ConnectionConfig, StateQuery, createInteractionContext, createStateQueryClient } from '@cardano-ogmios/client';
+import {
+  Cardano,
+  CardanoNode,
+  CardanoNodeErrors,
+  CardanoNodeUtil,
+  EraSummary,
+  HealthCheckResponse,
+  ProviderError,
+  ProviderFailure,
+  StakeDistribution
+} from '@cardano-sdk/core';
+import {
+  ConnectionConfig,
+  StateQuery,
+  createConnectionObject,
+  createInteractionContext,
+  createStateQueryClient,
+  getServerHealth
+} from '@cardano-ogmios/client';
 import { Logger } from 'ts-log';
 import { mapEraSummary } from './mappers';
 
@@ -22,7 +39,7 @@ export class OgmiosCardanoNode implements CardanoNode {
     this.#connectionConfig = connectionConfig;
   }
 
-  public async initialize() {
+  public async initialize(): Promise<void> {
     if (this.#state !== null) return;
     this.#state = 'initializing';
     this.#logger.info('Initializing CardanoNode');
@@ -48,7 +65,7 @@ export class OgmiosCardanoNode implements CardanoNode {
     this.#state = null;
   }
 
-  public async eraSummaries() {
+  public async eraSummaries(): Promise<EraSummary[]> {
     if (this.#state !== 'initialized') {
       throw new CardanoNodeErrors.CardanoNodeNotInitializedError('eraSummaries');
     }
@@ -62,7 +79,7 @@ export class OgmiosCardanoNode implements CardanoNode {
     }
   }
 
-  public async systemStart() {
+  public async systemStart(): Promise<Date> {
     if (this.#state !== 'initialized') {
       throw new CardanoNodeErrors.CardanoNodeNotInitializedError('systemStart');
     }
@@ -91,6 +108,27 @@ export class OgmiosCardanoNode implements CardanoNode {
       return map;
     } catch (error) {
       throw CardanoNodeUtil.asCardanoNodeError(error) || new CardanoNodeErrors.UnknownCardanoNodeError(error);
+    }
+  }
+
+  async healthCheck(): Promise<HealthCheckResponse> {
+    try {
+      const { networkSynchronization, lastKnownTip } = await getServerHealth({
+        connection: createConnectionObject(this.#connectionConfig)
+      });
+      return {
+        localNode: {
+          ledgerTip: lastKnownTip,
+          networkSync: networkSynchronization
+        },
+        ok: networkSynchronization > 0.99
+      };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      if (error.name === 'FetchError') {
+        return { ok: false };
+      }
+      throw new ProviderError(ProviderFailure.Unknown, error);
     }
   }
 }
