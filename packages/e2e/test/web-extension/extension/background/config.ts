@@ -91,7 +91,7 @@ export const utxoProvider = (async () => {
       return blockfrostUtxoProvider(await blockfrostApi!);
     }
     case 'http': {
-      return utxoHttpProvider({ adapter: axiosFetchAdapter, baseUrl: env.UTXO_PROVIDER_PARAMS.url, logger });
+      return utxoHttpProvider({ adapter: axiosFetchAdapter, baseUrl: env.UTXO_PROVIDER_PARAMS.baseUrl, logger });
     }
     default: {
       throw new Error(`UTXO_PROVIDER unsupported: ${env.UTXO_PROVIDER}`);
@@ -105,7 +105,7 @@ export const assetProvider = (async () => {
       return blockfrostAssetProvider(await blockfrostApi!);
     }
     case 'http': {
-      return assetInfoHttpProvider({ adapter: axiosFetchAdapter, baseUrl: env.ASSET_PROVIDER_PARAMS.url, logger });
+      return assetInfoHttpProvider({ adapter: axiosFetchAdapter, baseUrl: env.ASSET_PROVIDER_PARAMS.baseUrl, logger });
     }
     default: {
       throw new Error(`ASSET_PROVIDER unsupported: ${env.ASSET_PROVIDER}`);
@@ -119,15 +119,19 @@ export const txSubmitProvider = (async () => {
       return blockfrostTxSubmitProvider(await blockfrostApi!);
     }
     case 'http': {
-      return txSubmitHttpProvider({ adapter: axiosFetchAdapter, baseUrl: env.TX_SUBMIT_PROVIDER_PARAMS.url, logger });
+      return txSubmitHttpProvider({
+        adapter: axiosFetchAdapter,
+        baseUrl: env.TX_SUBMIT_PROVIDER_PARAMS.baseUrl,
+        logger
+      });
     }
     case 'ogmios': {
       const connectionConfig = {
-        host: env.TX_SUBMIT_PROVIDER_PARAMS.url.hostname,
-        port: env.TX_SUBMIT_PROVIDER_PARAMS.url.port
-          ? Number.parseInt(env.TX_SUBMIT_PROVIDER_PARAMS.url.port)
+        host: env.TX_SUBMIT_PROVIDER_PARAMS.baseUrl.hostname,
+        port: env.TX_SUBMIT_PROVIDER_PARAMS.baseUrl.port
+          ? Number.parseInt(env.TX_SUBMIT_PROVIDER_PARAMS.baseUrl.port)
           : undefined,
-        tls: env.TX_SUBMIT_PROVIDER_PARAMS.url?.protocol === 'wss'
+        tls: env.TX_SUBMIT_PROVIDER_PARAMS.baseUrl?.protocol === 'wss'
       };
 
       return ogmiosTxSubmitProvider(createConnectionObject(connectionConfig), logger);
@@ -144,7 +148,7 @@ export const rewardsProvider = (async () => {
       return blockfrostRewardsProvider(await blockfrostApi!);
     }
     case 'http': {
-      return rewardsHttpProvider({ adapter: axiosFetchAdapter, baseUrl: env.REWARDS_PROVIDER_PARAMS.url, logger });
+      return rewardsHttpProvider({ adapter: axiosFetchAdapter, baseUrl: env.REWARDS_PROVIDER_PARAMS.baseUrl, logger });
     }
     default: {
       throw new Error(`REWARDS_PROVIDER unsupported: ${env.REWARDS_PROVIDER}`);
@@ -167,7 +171,7 @@ export const networkInfoProvider = (async () => {
     case 'http': {
       return networkInfoHttpProvider({
         adapter: axiosFetchAdapter,
-        baseUrl: env.NETWORK_INFO_PROVIDER_PARAMS.url,
+        baseUrl: env.NETWORK_INFO_PROVIDER_PARAMS.baseUrl,
         logger
       });
     }
@@ -185,7 +189,7 @@ export const chainHistoryProvider = (async () => {
     case 'http': {
       return chainHistoryHttpProvider({
         adapter: axiosFetchAdapter,
-        baseUrl: env.CHAIN_HISTORY_PROVIDER_PARAMS.url,
+        baseUrl: env.CHAIN_HISTORY_PROVIDER_PARAMS.baseUrl,
         logger
       });
     }
