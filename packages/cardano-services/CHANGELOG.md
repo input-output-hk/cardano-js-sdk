@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.0-nightly.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.5.0-nightly.10...@cardano-sdk/cardano-services@0.5.0-nightly.11) (2022-08-23)
+
+
+### Features
+
+* **cardano-services:** root health check endpoint ([aff7c6a](https://github.com/input-output-hk/cardano-js-sdk/commit/aff7c6a2b277d24c067e9cec1a14ffd35e8afb17))
+
+
+
 ## [0.5.0-nightly.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.5.0-nightly.9...@cardano-sdk/cardano-services@0.5.0-nightly.10) (2022-08-22)
 
 
