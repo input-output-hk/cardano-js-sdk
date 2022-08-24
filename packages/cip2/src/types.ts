@@ -66,6 +66,21 @@ export interface SelectionConstraints {
   computeSelectionLimit: ComputeSelectionLimit;
 }
 
+/**
+ * Implicit input or spent value
+ */
+export interface ImplicitValue {
+  /**
+   * Implicit coin quantities used in the transaction
+   */
+  coin?: Cardano.util.ImplicitCoin;
+  /**
+   * Positive quantity = mint (implicit input)
+   * Negative quantity = burn (implicit spend)
+   */
+  mint?: Cardano.TokenMap;
+}
+
 export interface InputSelectionParameters {
   /**
    * The set of inputs available for selection.
@@ -82,12 +97,7 @@ export interface InputSelectionParameters {
   /**
    * Implicit input or spent value
    */
-  implicitValue?: {
-    /**
-     * Implicit coin quantities used in the transaction
-     */
-    coin?: Cardano.util.ImplicitCoin;
-  };
+  implicitValue?: ImplicitValue;
 }
 
 export interface InputSelector {

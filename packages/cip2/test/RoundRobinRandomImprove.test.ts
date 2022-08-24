@@ -1,4 +1,5 @@
 import { AssetId, TxTestUtil } from '@cardano-sdk/util-dev';
+import { Cardano } from '@cardano-sdk/core';
 import { InputSelectionError, InputSelectionFailure } from '../src/InputSelectionError';
 import {
   SelectionConstraints,
@@ -90,6 +91,45 @@ describe('RoundRobinRandomImprove', () => {
         expect(results.selection.fee).toBe(600_000n);
       });
     });
+    describe('mint', () => {
+      const assetId = AssetId.TSLA;
+
+      it('Considers positive quantity mint as implicit input', async () => {
+        const utxo = new Set([TxTestUtil.createUnspentTxOutput({ coins: 10_000_000n })]);
+        const assets = new Map([[assetId, 100n]]);
+        const outputs = new Set([TxTestUtil.createOutput({ assets, coins: 1_000_000n })]);
+        const results = await roundRobinRandomImprove().select({
+          constraints: SelectionConstraints.NO_CONSTRAINTS,
+          implicitValue: { mint: new Map(assets.entries()) },
+          outputs,
+          utxo
+        });
+        expect(results.selection.inputs.size).toBe(1);
+        expect(results.selection.outputs).toBe(outputs);
+      });
+
+      it('Considers negative quantity mint as implicit spend', async () => {
+        const burnQuantity = 100n;
+        const expectedChangeQuantity = 30n;
+        const utxo = new Set([
+          TxTestUtil.createUnspentTxOutput({
+            assets: new Map([[assetId, burnQuantity + expectedChangeQuantity]]),
+            coins: 10_000_000n
+          })
+        ]);
+        const outputs = new Set([TxTestUtil.createOutput({ coins: 1_000_000n })]);
+        const results = await roundRobinRandomImprove().select({
+          constraints: SelectionConstraints.NO_CONSTRAINTS,
+          implicitValue: { mint: new Map([[assetId, -burnQuantity]]) },
+          outputs,
+          utxo
+        });
+        expect(results.selection.inputs.size).toBe(1);
+        expect(results.selection.outputs).toBe(outputs);
+        const totalChange = Cardano.util.coalesceValueQuantities([...results.selection.change.values()]);
+        expect(totalChange.assets!.get(assetId)).toBe(expectedChangeQuantity);
+      });
+    });
     describe('Failure Modes', () => {
       describe('UtxoBalanceInsufficient', () => {
         it('Coin (Outputs>UTxO)', async () => {
@@ -141,6 +181,16 @@ describe('RoundRobinRandomImprove', () => {
             createUtxo: () => [],
             expectedError: InputSelectionFailure.UtxoBalanceInsufficient,
             getAlgorithm: roundRobinRandomImprove,
+            mockConstraints: SelectionConstraints.MOCK_NO_CONSTRAINTS
+          });
+        });
+        it('Attempting to burn tokens with insufficient quantity in utxo', async () => {
+          await testInputSelectionFailureMode({
+            createOutputs: () => [],
+            createUtxo: () => [TxTestUtil.createUnspentTxOutput({ coins: 10_000_000n })],
+            expectedError: InputSelectionFailure.UtxoBalanceInsufficient,
+            getAlgorithm: roundRobinRandomImprove,
+            implicitValue: { mint: new Map([[AssetId.TSLA, -4n]]) },
             mockConstraints: SelectionConstraints.MOCK_NO_CONSTRAINTS
           });
         });
@@ -215,7 +265,7 @@ describe('RoundRobinRandomImprove', () => {
     await fc.assert(
       fc.asyncProperty(
         generateSelectionParams(),
-        async ({ utxoAmounts, outputsAmounts, constraints, implicitCoin }) => {
+        async ({ utxoAmounts, outputsAmounts, constraints, implicitValue }) => {
           // Run input selection
           const utxo = new Set(utxoAmounts.map((valueQuantities) => TxTestUtil.createUnspentTxOutput(valueQuantities)));
           const outputs = new Set(outputsAmounts.map((valueQuantities) => TxTestUtil.createOutput(valueQuantities)));
@@ -223,14 +273,14 @@ describe('RoundRobinRandomImprove', () => {
           try {
             const results = await algorithm.select({
               constraints: SelectionConstraints.mockConstraintsToConstraints(constraints),
-              implicitValue: { coin: implicitCoin },
+              implicitValue,
               outputs,
               utxo: new Set(utxo)
             });
-            assertInputSelectionProperties({ constraints, implicitCoin, outputs, results, utxo });
+            assertInputSelectionProperties({ constraints, implicitValue, outputs, results, utxo });
           } catch (error) {
             if (error instanceof InputSelectionError) {
-              assertFailureProperties({ constraints, error, implicitCoin, outputsAmounts, utxoAmounts });
+              assertFailureProperties({ constraints, error, implicitValue, outputsAmounts, utxoAmounts });
             } else {
               throw error;
             }
