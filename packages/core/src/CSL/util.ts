@@ -1,6 +1,10 @@
 import { BigNum } from '@emurgo/cardano-serialization-lib-nodejs';
 
 export const MAX_U64 = 18_446_744_073_709_551_615n;
+
+export const MIN_I64 = -9_223_372_036_854_775_808n;
+export const MAX_I64 = 9_223_372_036_854_775_807n;
+
 export const maxBigNum = BigNum.from_str(MAX_U64.toString());
 
 export type CslObject = { to_bytes: () => Uint8Array };
