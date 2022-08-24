@@ -22,6 +22,7 @@ COPY \
   package.json \
   tsconfig.json \
   yarn.lock \
+  yarn-project.nix \
   /app/
 
 FROM nodejs-builder as cardano-services-builder
