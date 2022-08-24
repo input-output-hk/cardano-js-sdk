@@ -1,5 +1,4 @@
 import { Cardano, coreToCsl, cslToCore } from '../../src';
-import { Ed25519KeyHash, NativeScriptType } from '../../src/Cardano';
 import { NativeScript } from '@emurgo/cardano-serialization-lib-nodejs';
 import { mintTokenMap, tx, txBody, txIn, txInWithAddress, txOut, valueCoinOnly, valueWithAssets } from './testData';
 
@@ -49,26 +48,32 @@ describe('cslToCore', () => {
       )
     );
 
-    const coreScript = {
-      __type: NativeScriptType.RequireAnyOf,
+    const coreScript: Cardano.NativeScript = {
+      __type: Cardano.ScriptType.Native,
+      kind: Cardano.NativeScriptKind.RequireAnyOf,
       scripts: [
         {
-          __type: NativeScriptType.RequireSignature,
-          keyHash: Ed25519KeyHash('b275b08c999097247f7c17e77007c7010cd19f20cc086ad99d398538')
+          __type: Cardano.ScriptType.Native,
+          keyHash: Cardano.Ed25519KeyHash('b275b08c999097247f7c17e77007c7010cd19f20cc086ad99d398538'),
+          kind: Cardano.NativeScriptKind.RequireSignature
         },
         {
-          __type: NativeScriptType.RequireAllOf,
+          __type: Cardano.ScriptType.Native,
+          kind: Cardano.NativeScriptKind.RequireAllOf,
           scripts: [
             {
-              __type: NativeScriptType.RequireTimeBefore,
+              __type: Cardano.ScriptType.Native,
+              kind: Cardano.NativeScriptKind.RequireTimeBefore,
               slot: 3000
             },
             {
-              __type: NativeScriptType.RequireSignature,
-              keyHash: Ed25519KeyHash('966e394a544f242081e41d1965137b1bb412ac230d40ed5407821c37')
+              __type: Cardano.ScriptType.Native,
+              keyHash: Cardano.Ed25519KeyHash('966e394a544f242081e41d1965137b1bb412ac230d40ed5407821c37'),
+              kind: Cardano.NativeScriptKind.RequireSignature
             },
             {
-              __type: NativeScriptType.RequireTimeAfter,
+              __type: Cardano.ScriptType.Native,
+              kind: Cardano.NativeScriptKind.RequireTimeAfter,
               slot: 4000
             }
           ]

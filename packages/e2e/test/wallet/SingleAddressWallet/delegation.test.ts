@@ -87,9 +87,8 @@ describe('SingleAddressWallet/delegation', () => {
       filters: { status: [Cardano.StakePoolStatus.Active] },
       pagination: { limit: 2, startAt: 0 }
     });
-    return activePools.pageResults.filter(({ id }) => id !== delegateeBefore1stTx)[
-      Math.floor(Math.random() * activePools.pageResults.length) - 1
-    ].id;
+    const filteredPools = activePools.pageResults.filter(({ id }) => id !== delegateeBefore1stTx);
+    return filteredPools[Math.round(Math.random() * (filteredPools.length - 1))]?.id;
   };
 
   test('delegation preconditions', async () => {
@@ -112,6 +111,7 @@ describe('SingleAddressWallet/delegation', () => {
     expect(initialState.balance.total.coins).toBe(initialState.balance.available.coins);
     const tx1OutputCoins = 1_000_000n;
     const poolId = await chooseDifferentPoolIdRandomly(initialState.rewardAccount.delegatee?.nextNextEpoch?.id);
+    expect(poolId).toBeDefined();
     const certificates = createDelegationCertificates(initialState, poolId);
     const initialDeposit = initialState.isStakeKeyRegistered ? stakeKeyDeposit : 0n;
     expect(initialState.balance.deposit).toBe(initialDeposit);

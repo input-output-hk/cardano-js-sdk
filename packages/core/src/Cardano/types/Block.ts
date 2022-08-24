@@ -1,9 +1,26 @@
-import { BlockNo, BlockSize, Slot } from '@cardano-ogmios/schema';
-import { Epoch, Lovelace, PoolId } from '.';
 import { Hash28ByteBase16, Hash32ByteBase16, OpaqueString, typedBech32 } from '../util';
 import { InvalidStringError } from '../..';
+import { Lovelace, PoolId } from '.';
 
-export { BlockNo } from '@cardano-ogmios/schema';
+/**
+ * The block size in bytes
+ */
+export type BlockSize = number;
+
+/**
+ * The block number.
+ */
+export type BlockNo = number;
+
+/**
+ * The epoch number.
+ */
+export type EpochNo = number;
+
+/**
+ * Smallest time period in the blockchain
+ */
+export type Slot = number;
 
 /**
  * block hash as hex string
@@ -23,8 +40,6 @@ export type Tip = PartialBlockHeader;
  * @throws InvalidStringError
  */
 export const BlockId = (value: string): BlockId => Hash32ByteBase16<'BlockId'>(value);
-
-export { BlockSize };
 
 /**
  * 32 byte ed25519 verification key as bech32 string.
@@ -61,7 +76,7 @@ export const SlotLeader = (value: string): SlotLeader => {
 export interface Block {
   header: PartialBlockHeader;
   date: Date;
-  epoch: Epoch;
+  epoch: EpochNo;
   epochSlot: number;
   slotLeader: SlotLeader;
   size: BlockSize;

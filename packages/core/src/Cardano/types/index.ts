@@ -1,8 +1,4 @@
-import * as Ogmios from '@cardano-ogmios/schema';
-import { OptionalUndefined, RecursivelyReplaceNullWithUndefined } from '@cardano-sdk/util';
-
-export { Epoch, Slot, ExUnits } from '@cardano-ogmios/schema';
-export { Hash32ByteBase16, Hash28ByteBase16 } from '../util';
+export * from '../util';
 export * from './Address';
 export * from './RewardAccount';
 export * from './StakePool';
@@ -16,10 +12,6 @@ export * from './Block';
 export * from './Asset';
 export * from './AuxiliaryData';
 export * from './Key';
+export * from './Script';
 export * from './TxSubmissionErrors';
-export * from './NativeScript';
-
-export type ProtocolParametersBabbage = OptionalUndefined<
-  RecursivelyReplaceNullWithUndefined<Ogmios.ProtocolParametersBabbage>
->;
-export type ValidityInterval = OptionalUndefined<RecursivelyReplaceNullWithUndefined<Ogmios.ValidityInterval>>;
+export * from './ProtocolParameters';

@@ -183,7 +183,7 @@ describe('RewardAccounts', () => {
   test('createRewardsProvider', () => {
     const rewardsProvider = null as unknown as RewardsProvider; // not used in this test
     const config = null as unknown as RetryBackoffConfig; // not used in this test
-    const epoch$ = null as unknown as Observable<Cardano.Epoch>; // not used in this test
+    const epoch$ = null as unknown as Observable<Cardano.EpochNo>; // not used in this test
     const txConfirmed$ = EMPTY as Observable<Cardano.NewTxAlonzo>;
     createTestScheduler().run(({ cold, expectObservable, flush }) => {
       coldObservableProviderMock

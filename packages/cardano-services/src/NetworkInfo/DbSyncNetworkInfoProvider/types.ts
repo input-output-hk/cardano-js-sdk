@@ -44,7 +44,7 @@ export interface GenesisData {
   networkMagic: Cardano.CardanoNetworkMagic;
   networkId: Cardano.CardanoNetworkId;
   maxLovelaceSupply: Cardano.Lovelace;
-  activeSlotsCoefficient: Cardano.Ratio;
+  activeSlotsCoefficient: number;
   securityParameter: number;
   systemStart: string;
   epochLength: number;

@@ -1,4 +1,4 @@
-import { CardanoNetworkMagic, Epoch, Slot } from '../Cardano';
+import { CardanoNetworkMagic, EpochNo, Slot } from '../Cardano';
 import { CustomError } from 'ts-custom-error';
 import { EraSummary } from '../CardanoNode';
 import orderBy from 'lodash/orderBy';
@@ -9,7 +9,7 @@ export interface SlotDate {
 }
 
 export interface EpochInfo {
-  epochNo: Epoch;
+  epochNo: EpochNo;
   firstSlot: SlotDate;
   lastSlot: SlotDate;
 }
@@ -74,9 +74,9 @@ export const createSlotEpochCalc = (eraSummaries: EraSummary[]) => {
 
   /**
    * @throws EraSummaryError
-   * @returns {Epoch} epoch of the slot
+   * @returns {EpochNo} epoch of the slot
    */
-  return (slotNo: Slot): Epoch => calc(slotNo).epochNo;
+  return (slotNo: Slot): EpochNo => calc(slotNo).epochNo;
 };
 
 /**
@@ -140,7 +140,7 @@ export type SlotTimeCalc = ReturnType<typeof createSlotTimeCalc>;
 
 /**
  * @throws EraSummaryError
- * @returns {Epoch} epoch of the slot
+ * @returns {EpochNo} epoch of the slot
  */
 export type SlotEpochCalc = ReturnType<typeof createSlotEpochCalc>;
 

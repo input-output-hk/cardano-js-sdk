@@ -5,15 +5,15 @@ export interface EpochRange {
   /**
    * Inclusive
    */
-  lowerBound?: Cardano.Epoch;
+  lowerBound?: Cardano.EpochNo;
   /**
    * Inclusive
    */
-  upperBound?: Cardano.Epoch;
+  upperBound?: Cardano.EpochNo;
 }
 
 export interface EpochRewards {
-  epoch: Cardano.Epoch;
+  epoch: Cardano.EpochNo;
   rewards: Cardano.Lovelace;
 }
 
