@@ -1,6 +1,4 @@
 import { Asset, CSL, Cardano, SerializationFailure, util } from '../..';
-import { Ed25519KeyHash, NativeScriptKind, ScriptType } from '../../Cardano';
-import { NativeScript } from '@emurgo/cardano-serialization-lib-nodejs';
 import { SerializationError } from '../../errors';
 import { createCertificate } from './certificate';
 
@@ -284,23 +282,25 @@ export const newTx = (cslTx: CSL.Transaction): Cardano.NewTxAlonzo => {
   };
 };
 
-export const nativeScript = (script: NativeScript): Cardano.NativeScript => {
+export const nativeScript = (script: CSL.NativeScript): Cardano.NativeScript => {
   let coreScript: Cardano.NativeScript;
   const scriptKind = script.kind();
 
   switch (scriptKind) {
-    case NativeScriptKind.RequireSignature: {
+    case Cardano.NativeScriptKind.RequireSignature: {
       coreScript = {
-        __type: ScriptType.Native,
-        keyHash: Ed25519KeyHash(util.bytesToHex(script.as_script_pubkey()!.addr_keyhash().to_bytes()).toString()),
-        kind: NativeScriptKind.RequireSignature
+        __type: Cardano.ScriptType.Native,
+        keyHash: Cardano.Ed25519KeyHash(
+          util.bytesToHex(script.as_script_pubkey()!.addr_keyhash().to_bytes()).toString()
+        ),
+        kind: Cardano.NativeScriptKind.RequireSignature
       };
       break;
     }
-    case NativeScriptKind.RequireAllOf: {
+    case Cardano.NativeScriptKind.RequireAllOf: {
       coreScript = {
-        __type: ScriptType.Native,
-        kind: NativeScriptKind.RequireAllOf,
+        __type: Cardano.ScriptType.Native,
+        kind: Cardano.NativeScriptKind.RequireAllOf,
         scripts: new Array<Cardano.NativeScript>()
       };
       const scriptAll = script.as_script_all();
@@ -309,10 +309,10 @@ export const nativeScript = (script: NativeScript): Cardano.NativeScript => {
       }
       break;
     }
-    case NativeScriptKind.RequireAnyOf: {
+    case Cardano.NativeScriptKind.RequireAnyOf: {
       coreScript = {
-        __type: ScriptType.Native,
-        kind: NativeScriptKind.RequireAnyOf,
+        __type: Cardano.ScriptType.Native,
+        kind: Cardano.NativeScriptKind.RequireAnyOf,
         scripts: new Array<Cardano.NativeScript>()
       };
       const scriptAny = script.as_script_any();
@@ -321,11 +321,11 @@ export const nativeScript = (script: NativeScript): Cardano.NativeScript => {
       }
       break;
     }
-    case NativeScriptKind.RequireMOf: {
+    case Cardano.NativeScriptKind.RequireMOf: {
       const scriptMofK = script.as_script_n_of_k();
       coreScript = {
-        __type: ScriptType.Native,
-        kind: NativeScriptKind.RequireMOf,
+        __type: Cardano.ScriptType.Native,
+        kind: Cardano.NativeScriptKind.RequireMOf,
         required: scriptMofK!.n(),
         scripts: new Array<Cardano.NativeScript>()
       };
@@ -335,18 +335,18 @@ export const nativeScript = (script: NativeScript): Cardano.NativeScript => {
       }
       break;
     }
-    case NativeScriptKind.RequireTimeBefore: {
+    case Cardano.NativeScriptKind.RequireTimeBefore: {
       coreScript = {
-        __type: ScriptType.Native,
-        kind: NativeScriptKind.RequireTimeBefore,
+        __type: Cardano.ScriptType.Native,
+        kind: Cardano.NativeScriptKind.RequireTimeBefore,
         slot: script.as_timelock_expiry()!.slot()
       };
       break;
     }
-    case NativeScriptKind.RequireTimeAfter: {
+    case Cardano.NativeScriptKind.RequireTimeAfter: {
       coreScript = {
-        __type: ScriptType.Native,
-        kind: NativeScriptKind.RequireTimeAfter,
+        __type: Cardano.ScriptType.Native,
+        kind: Cardano.NativeScriptKind.RequireTimeAfter,
         slot: script.as_timelock_start()!.slot()
       };
       break;
