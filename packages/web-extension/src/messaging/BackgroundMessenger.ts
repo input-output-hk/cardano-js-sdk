@@ -1,5 +1,5 @@
 // only tested in ../e2e tests
-import { BehaviorSubject, ReplaySubject, Subject, bufferCount, filter, from, map, mergeMap, tap } from 'rxjs';
+import { BehaviorSubject, ReplaySubject, Subject, bufferCount, filter, first, from, map, mergeMap, tap } from 'rxjs';
 import { ChannelName, Messenger, MessengerDependencies, MessengerPort, PortMessage } from './types';
 import { Logger } from 'ts-log';
 import { deriveChannelName } from './util';
@@ -96,12 +96,16 @@ export const generalizeBackgroundMessenger = (channel: ChannelName, messenger: B
     messenger.destroy();
   },
   message$: messenger.getChannel(channel).message$,
+  /**
+   * @throws RxJS EmptyError if messenger is destroyed
+   */
   postMessage: (message) => {
     const { ports$ } = messenger.getChannel(channel);
     return ports$.pipe(
       // wait for at least 1 port to be connected
       // to be able to post messages even before the other end comes alive
       filter((ports) => ports.size > 0),
+      first(),
       tap((ports) => {
         for (const port of ports) port.postMessage(message);
       }),
