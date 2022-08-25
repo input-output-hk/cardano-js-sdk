@@ -12,7 +12,7 @@ export const EPOCH_POLL_INTERVAL_DEFAULT = 10_000;
 export class DbSyncEpochPollService implements EpochMonitor {
   #timeoutId?: number;
   #callbacks: Function[];
-  #currentEpoch: Promise<Cardano.Epoch | null>;
+  #currentEpoch: Promise<Cardano.EpochNo | null>;
 
   /**
    * Db connection

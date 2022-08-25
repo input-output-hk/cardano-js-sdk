@@ -1,7 +1,7 @@
 import * as SelectionConstraints from './selectionConstraints';
 import { Cardano } from '@cardano-sdk/core';
+import { ImplicitValue, InputSelector } from '../../src/types';
 import { InputSelectionError, InputSelectionFailure } from '../../src/InputSelectionError';
-import { InputSelector } from '../../src/types';
 import { assertInputSelectionProperties } from './properties';
 
 export interface InputSelectionPropertiesTestParams {
@@ -17,6 +17,10 @@ export interface InputSelectionPropertiesTestParams {
    * Transaction outputs
    */
   createOutputs: () => Cardano.TxOut[];
+  /**
+   * Transaction outputs
+   */
+  implicitValue?: ImplicitValue;
   /**
    * Input selection constraints passed to the algorithm.
    */
@@ -37,6 +41,7 @@ export const testInputSelectionFailureMode = async ({
   getAlgorithm,
   createUtxo,
   createOutputs,
+  implicitValue,
   expectedError,
   mockConstraints
 }: InputSelectionFailureModeTestParams) => {
@@ -44,7 +49,12 @@ export const testInputSelectionFailureMode = async ({
   const outputs = new Set(createOutputs());
   const algorithm = getAlgorithm();
   await expect(
-    algorithm.select({ constraints: SelectionConstraints.mockConstraintsToConstraints(mockConstraints), outputs, utxo })
+    algorithm.select({
+      constraints: SelectionConstraints.mockConstraintsToConstraints(mockConstraints),
+      implicitValue,
+      outputs,
+      utxo
+    })
   ).rejects.toThrowError(new InputSelectionError(expectedError));
 };
 
@@ -55,6 +65,7 @@ export const testInputSelectionProperties = async ({
   getAlgorithm,
   createUtxo,
   createOutputs,
+  implicitValue,
   mockConstraints
 }: InputSelectionPropertiesTestParams) => {
   const utxo = new Set(createUtxo());
@@ -62,6 +73,7 @@ export const testInputSelectionProperties = async ({
   const algorithm = getAlgorithm();
   const results = await algorithm.select({
     constraints: SelectionConstraints.mockConstraintsToConstraints(mockConstraints),
+    implicitValue,
     outputs,
     utxo
   });

@@ -1,12 +1,6 @@
 import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
 import { BlockfrostToCore, BlockfrostTransactionContent } from './BlockfrostToCore';
-import {
-  Cardano,
-  ChainHistoryProvider,
-  ProtocolParametersRequiredByWallet,
-  ProviderError,
-  ProviderFailure
-} from '@cardano-sdk/core';
+import { Cardano, ChainHistoryProvider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
 import { blockfrostMetadataToTxMetadata, fetchByAddressSequentially, formatBlockfrostError, healthCheck } from './util';
 import omit from 'lodash/omit';
@@ -169,10 +163,7 @@ export const blockfrostChainHistoryProvider = (blockfrost: BlockFrostAPI, logger
   // eslint-disable-next-line unicorn/consistent-function-scoping
   const parseValidityInterval = (num: string | null) => Number.parseInt(num || '') || undefined;
 
-  const fetchTransaction = async (
-    hash: Cardano.TransactionId,
-    protocolParameters: ProtocolParametersRequiredByWallet
-  ): Promise<Cardano.TxAlonzo> => {
+  const fetchTransaction = async (hash: Cardano.TransactionId): Promise<Cardano.TxAlonzo> => {
     const { inputs, outputs, collaterals } = BlockfrostToCore.transactionUtxos(
       await blockfrost.txsUtxos(hash.toString())
     );
@@ -205,7 +196,6 @@ export const blockfrostChainHistoryProvider = (blockfrost: BlockFrostAPI, logger
         withdrawals
       },
       id: hash,
-      implicitCoin: Cardano.util.computeImplicitCoin(protocolParameters, { certificates, withdrawals }),
       index: response.index,
       txSize: response.size,
       witness: {
@@ -213,16 +203,6 @@ export const blockfrostChainHistoryProvider = (blockfrost: BlockFrostAPI, logger
         signatures: new Map() // not available in blockfrost
       }
     };
-  };
-
-  // TODO: move `currentWalletProtocolParameters` from WalletProvider to NetworkInfoProvider
-  //       and add NetworkInfoProvider dependency to this provider
-  const currentWalletProtocolParameters = async (): Promise<ProtocolParametersRequiredByWallet> => {
-    const response = await blockfrost.axiosInstance({
-      url: `${blockfrost.apiUrl}/epochs/latest/parameters`
-    });
-
-    return BlockfrostToCore.currentWalletProtocolParameters(response.data);
   };
 
   const blocksByHashes: ChainHistoryProvider['blocksByHashes'] = async (hashes) => {
@@ -253,10 +233,8 @@ export const blockfrostChainHistoryProvider = (blockfrost: BlockFrostAPI, logger
     });
   };
 
-  const transactionsByHashes: ChainHistoryProvider['transactionsByHashes'] = async (hashes) => {
-    const protocolParameters = await currentWalletProtocolParameters();
-    return Promise.all(hashes.map((hash) => fetchTransaction(hash, protocolParameters)));
-  };
+  const transactionsByHashes: ChainHistoryProvider['transactionsByHashes'] = async (hashes) =>
+    Promise.all(hashes.map((hash) => fetchTransaction(hash)));
 
   const transactionsByAddresses: ChainHistoryProvider['transactionsByAddresses'] = async ({
     addresses,

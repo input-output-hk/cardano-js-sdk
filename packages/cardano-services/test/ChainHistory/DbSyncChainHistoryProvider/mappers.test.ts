@@ -9,7 +9,6 @@ import {
   MultiAssetModel,
   PoolRegisterCertModel,
   PoolRetireCertModel,
-  ProtocolParamsModel,
   RedeemerModel,
   StakeCertModel,
   TipModel,
@@ -250,39 +249,6 @@ describe('chain history mappers', () => {
       });
     });
   });
-  describe('mapProtocolParams', () => {
-    const protocolParams: ProtocolParamsModel = {
-      coin_per_utxo_size: '4310',
-      key_deposit: '20000000',
-      max_collateral_inputs: 2,
-      max_tx_size: 20,
-      max_val_size: '40000000000',
-      min_fee_coefficient: 23,
-      min_fee_constant: 44,
-      min_pool_cost: '500000',
-      pool_deposit: '20000000',
-      protocol_major: 2,
-      protocol_minor: 1
-    };
-    test('map ProtocolParamsModel to Cardano.ProtocolParametersBabbage', () => {
-      const result = mappers.mapProtocolParams(protocolParams);
-      expect(result).toEqual<Cardano.ProtocolParametersBabbage>({
-        coinsPerUtxoByte: 4310,
-        maxCollateralInputs: 2,
-        maxTxSize: 20,
-        maxValueSize: 40_000_000_000,
-        minFeeCoefficient: 23,
-        minFeeConstant: 44,
-        minPoolCost: 500_000,
-        poolDeposit: 20_000_000,
-        protocolVersion: {
-          major: 2,
-          minor: 1
-        },
-        stakeKeyDeposit: 20_000_000
-      });
-    });
-  });
   describe('mapRedeemer', () => {
     const redeemerModel: RedeemerModel = {
       index: 1,
@@ -310,18 +276,6 @@ describe('chain history mappers', () => {
       { address: Cardano.Address(address), index: 1, txId: Cardano.TransactionId(transactionHash) }
     ];
     const outputs: Cardano.TxOut[] = [{ address: Cardano.Address(address), value: { assets, coins: 20_000_000n } }];
-    const protocolParams = {
-      coinsPerUtxoByte: 4310,
-      maxCollateralInputs: 2,
-      maxTxSize: 20,
-      maxValueSize: 40_000_000_000,
-      minFeeCoefficient: 23,
-      minFeeConstant: 44,
-      minPoolCost: 500_000,
-      poolDeposit: 2_000_000,
-      protocolVersion: { major: 2, minor: 1 },
-      stakeKeyDeposit: 2_000_000
-    };
     const redeemers: Cardano.Redeemer[] = [
       {
         executionUnits: { memory: 1, steps: 2 },
@@ -343,19 +297,18 @@ describe('chain history mappers', () => {
       blockHeader: { blockNo: 200, hash: Cardano.BlockId(blockHash), slot: 250 },
       body: { fee: 170_000n, inputs, outputs, validityInterval: { invalidBefore: 300, invalidHereafter: 500 } },
       id: Cardano.TransactionId(transactionHash),
-      implicitCoin: { deposit: 0n, input: 0n },
       index: 1,
       txSize: 20,
       witness: { signatures: new Map() }
     };
     test('map TxModel to Cardano.TxAlonzo with minimal data', () => {
-      const result = mappers.mapTxAlonzo(txModel, { inputs, outputs, protocolParams });
+      const result = mappers.mapTxAlonzo(txModel, { inputs, outputs });
       expect(result).toEqual<Cardano.TxAlonzo>(expected);
     });
     test('map TxModel with null fields to Cardano.TxAlonzo', () => {
       const result = mappers.mapTxAlonzo(
         { ...txModel, invalid_before: null, invalid_hereafter: null },
-        { inputs, outputs, protocolParams }
+        { inputs, outputs }
       );
       expect(result).toEqual<Cardano.TxAlonzo>({ ...expected, body: { ...expected.body, validityInterval: {} } });
     });
@@ -367,7 +320,6 @@ describe('chain history mappers', () => {
         metadata,
         mint: assets,
         outputs,
-        protocolParams,
         redeemers,
         withdrawals
       });
@@ -375,7 +327,6 @@ describe('chain history mappers', () => {
         ...expected,
         auxiliaryData: { body: { blob: metadata } },
         body: { ...expected.body, certificates, collaterals: inputs, mint: assets, withdrawals },
-        implicitCoin: { deposit: 2_000_000n, input: 200n },
         witness: { ...expected.witness, redeemers }
       });
     });

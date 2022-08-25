@@ -1,5 +1,4 @@
 import { AssetId } from './Asset';
-import { Value as _OgmiosValue } from '@cardano-ogmios/schema';
 
 export type Lovelace = bigint;
 

@@ -1,4 +1,4 @@
-import { Epoch, Lovelace, TransactionId } from '..';
+import { EpochNo, Lovelace, TransactionId } from '..';
 import { PoolIdHex } from './primitives';
 import { PoolParameters } from './PoolParameters';
 
@@ -58,7 +58,7 @@ export class StakePoolEpochRewards {
    * Epoch length in milliseconds
    */
   epochLength: number;
-  epoch: Epoch;
+  epoch: EpochNo;
   activeStake: Lovelace;
   totalRewards: Lovelace;
   operatorFees: Lovelace;

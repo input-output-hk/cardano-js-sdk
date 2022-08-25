@@ -163,13 +163,6 @@ describe('ChainHistoryBuilder', () => {
     });
   });
 
-  describe('queryProtocolParams', () => {
-    test('query protocol parameters from last epoch', async () => {
-      const result = await builder.queryProtocolParams();
-      expect(result).toMatchSnapshot();
-    });
-  });
-
   describe('queryCertificatesByHashes', () => {
     test('query certificates by tx hashes', async () => {
       const result = await builder.queryCertificatesByHashes([

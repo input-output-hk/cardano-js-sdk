@@ -361,7 +361,7 @@ export class SingleAddressWallet implements ObservableWallet {
     const { constraints, utxo, implicitCoin, validityInterval, changeAddress } = await this.#prepareTx(props);
     const { selection: inputSelection } = await this.#inputSelector.select({
       constraints,
-      implicitCoin,
+      implicitValue: { coin: implicitCoin },
       outputs: props.outputs || new Set(),
       utxo: new Set(utxo)
     });

@@ -1,6 +1,6 @@
 import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
 import { InputSelectionParameters, InputSelector, SelectionResult } from '../types';
-import { assertIsBalanceSufficient, preprocessArgs, toValues } from './util';
+import { assertIsBalanceSufficient, preProcessArgs, toValues } from './util';
 import { computeChangeAndAdjustForFee } from './change';
 import { cslUtil } from '@cardano-sdk/core';
 import { roundRobinSelection } from './roundRobin';
@@ -16,21 +16,17 @@ export const roundRobinRandomImprove = ({
     utxo: utxoSet,
     outputs: outputSet,
     constraints: { computeMinimumCost, computeSelectionLimit, computeMinimumCoinQuantity, tokenBundleSizeExceedsLimit },
-    implicitCoin: implicitCoinAsNumber
+    implicitValue: partialImplicitValue = {}
   }: InputSelectionParameters): Promise<SelectionResult> => {
-    const { utxo, outputs, uniqueOutputAssetIDs, implicitCoin } = preprocessArgs(
-      utxoSet,
-      outputSet,
-      implicitCoinAsNumber
-    );
+    const { utxo, outputs, uniqueTxAssetIDs, implicitValue } = preProcessArgs(utxoSet, outputSet, partialImplicitValue);
 
-    assertIsBalanceSufficient(uniqueOutputAssetIDs, utxo, outputs, implicitCoin);
+    assertIsBalanceSufficient(uniqueTxAssetIDs, utxo, outputs, implicitValue);
 
     const roundRobinSelectionResult = roundRobinSelection({
-      implicitCoin,
+      implicitValue,
       outputs,
       random,
-      uniqueOutputAssetIDs,
+      uniqueTxAssetIDs,
       utxo
     });
 
@@ -43,11 +39,11 @@ export const roundRobinRandomImprove = ({
           inputs: new Set(utxos),
           outputs: outputSet
         }),
-      implicitCoin,
+      implicitValue,
       outputValues: toValues(outputs),
       random,
       tokenBundleSizeExceedsLimit,
-      uniqueOutputAssetIDs,
+      uniqueTxAssetIDs,
       utxoSelection: roundRobinSelectionResult
     });
 

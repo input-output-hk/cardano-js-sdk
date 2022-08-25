@@ -51,18 +51,16 @@ export class DbSyncChainHistoryProvider extends DbSyncProvider implements ChainH
     this.#logger.debug('About to find transactions with hashes:', byteHashes);
     const txResults: QueryResult<TxModel> = await this.db.query(Queries.findTransactionsByHashes, [byteHashes]);
     if (txResults.rows.length === 0) return [];
-    const [inputs, outputs, mints, withdrawals, redeemers, metadata, collaterals, certificates, protocolParams] =
-      await Promise.all([
-        this.#builder.queryTransactionInputsByHashes(hashes),
-        this.#builder.queryTransactionOutputsByHashes(hashes),
-        this.#builder.queryTxMintByHashes(hashes),
-        this.#builder.queryWithdrawalsByHashes(hashes),
-        this.#builder.queryRedeemersByHashes(hashes),
-        this.#metadataService.queryTxMetadataByHashes(hashes),
-        this.#builder.queryTransactionInputsByHashes(hashes, true),
-        this.#builder.queryCertificatesByHashes(hashes),
-        this.#builder.queryProtocolParams()
-      ]);
+    const [inputs, outputs, mints, withdrawals, redeemers, metadata, collaterals, certificates] = await Promise.all([
+      this.#builder.queryTransactionInputsByHashes(hashes),
+      this.#builder.queryTransactionOutputsByHashes(hashes),
+      this.#builder.queryTxMintByHashes(hashes),
+      this.#builder.queryWithdrawalsByHashes(hashes),
+      this.#builder.queryRedeemersByHashes(hashes),
+      this.#metadataService.queryTxMetadataByHashes(hashes),
+      this.#builder.queryTransactionInputsByHashes(hashes, true),
+      this.#builder.queryCertificatesByHashes(hashes)
+    ]);
     return txResults.rows.map((tx) => {
       const txId = Cardano.TransactionId(tx.id.toString('hex'));
       const txInputs = orderBy(
@@ -84,7 +82,6 @@ export class DbSyncChainHistoryProvider extends DbSyncProvider implements ChainH
         metadata: metadata.get(txId),
         mint: mints.get(txId),
         outputs: txOutputs,
-        protocolParams,
         redeemers: redeemers.get(txId),
         withdrawals: withdrawals.get(txId)
       });

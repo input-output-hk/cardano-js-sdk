@@ -34,7 +34,7 @@ export interface DelegationTrackerProps {
   rewardAccountAddresses$: Observable<Cardano.RewardAccount[]>;
   stakePoolProvider: TrackedStakePoolProvider;
   eraSummaries$: Observable<EraSummary[]>;
-  epoch$: Observable<Cardano.Epoch>;
+  epoch$: Observable<Cardano.EpochNo>;
   transactionsTracker: TransactionsTracker;
   retryBackoffConfig: RetryBackoffConfig;
   stores: WalletStores;

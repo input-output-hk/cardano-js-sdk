@@ -93,10 +93,6 @@ Array [
       "withdrawals": undefined,
     },
     "id": "8fd14baca91c674fafae59701b7dc0eda1266202ec8445bad3244bd8669a7fb5",
-    "implicitCoin": Object {
-      "deposit": 500000000n,
-      "input": 0n,
-    },
     "index": 0,
     "txSize": 736,
     "witness": Object {
@@ -162,10 +158,6 @@ Array [
       "withdrawals": undefined,
     },
     "id": "3d4cd09885d39673125c3a15f8acb45d92fde137f9effe7a5131f6cc7241d960",
-    "implicitCoin": Object {
-      "deposit": 500000000n,
-      "input": 0n,
-    },
     "index": 0,
     "txSize": 780,
     "witness": Object {
@@ -235,10 +227,6 @@ Array [
       "withdrawals": undefined,
     },
     "id": "6eec4e9691e0fc2442e5c9bf22847998b80a1625b18a882a4e7b9e0cdda48dc3",
-    "implicitCoin": Object {
-      "deposit": 0n,
-      "input": 0n,
-    },
     "index": 11,
     "txSize": 640,
     "witness": Object {
@@ -306,10 +294,6 @@ Array [
       "withdrawals": undefined,
     },
     "id": "caaada4c53256a9bcba2d006b3f427f089d43372442a550a7349627a46682375",
-    "implicitCoin": Object {
-      "deposit": 0n,
-      "input": 0n,
-    },
     "index": 1,
     "txSize": 591,
     "witness": Object {
@@ -365,10 +349,6 @@ Array [
       "withdrawals": undefined,
     },
     "id": "49fa6b7245674fd11727cfb4d47ec7fad380c198a2a975b0423c5f6c255488f9",
-    "implicitCoin": Object {
-      "deposit": 0n,
-      "input": 0n,
-    },
     "index": 3,
     "txSize": 554,
     "witness": Object {
@@ -424,10 +404,6 @@ Array [
       "withdrawals": undefined,
     },
     "id": "a7eda535edc983139cc1053d074106aef54b25e9c9ee9de6bf1bf69709dabfd4",
-    "implicitCoin": Object {
-      "deposit": 0n,
-      "input": 0n,
-    },
     "index": 5,
     "txSize": 554,
     "witness": Object {
@@ -493,10 +469,6 @@ Array [
       "withdrawals": undefined,
     },
     "id": "b46c48229336aec327a5f537bcbf1ca8fa6a3afbf60aa66880aa6a234e5fce92",
-    "implicitCoin": Object {
-      "deposit": 0n,
-      "input": 0n,
-    },
     "index": 7,
     "txSize": 700,
     "witness": Object {
@@ -559,10 +531,6 @@ Array [
       "withdrawals": undefined,
     },
     "id": "56caf0441c4f0e209195b86b95e5304b338ca38ec232252c194153e8a3440c28",
-    "implicitCoin": Object {
-      "deposit": 0n,
-      "input": 0n,
-    },
     "index": 8,
     "txSize": 592,
     "witness": Object {
@@ -618,10 +586,6 @@ Array [
       "withdrawals": undefined,
     },
     "id": "3d8e3e7c6d0929812abc40d29a3b1e4f470f6d04e9d4b3c521f1f87f74f7ab88",
-    "implicitCoin": Object {
-      "deposit": 0n,
-      "input": 0n,
-    },
     "index": 10,
     "txSize": 553,
     "witness": Object {
@@ -686,10 +650,6 @@ Array [
       "withdrawals": undefined,
     },
     "id": "6eec4e9691e0fc2442e5c9bf22847998b80a1625b18a882a4e7b9e0cdda48dc3",
-    "implicitCoin": Object {
-      "deposit": 0n,
-      "input": 0n,
-    },
     "index": 11,
     "txSize": 640,
     "witness": Object {
@@ -752,10 +712,6 @@ Array [
       "withdrawals": undefined,
     },
     "id": "0dbbc0e6d13549a1960476aae42fd492a7a19fba856f9cc9695ecc5c84fe87e9",
-    "implicitCoin": Object {
-      "deposit": 0n,
-      "input": 0n,
-    },
     "index": 13,
     "txSize": 591,
     "witness": Object {
@@ -897,10 +853,6 @@ Array [
       "withdrawals": undefined,
     },
     "id": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
-    "implicitCoin": Object {
-      "deposit": 0n,
-      "input": 0n,
-    },
     "index": 14,
     "txSize": 10662,
     "witness": Object {
@@ -1105,10 +1057,6 @@ Array [
       "withdrawals": undefined,
     },
     "id": "a08e293256180196de69ff025321be2f7ce5911ce4e3a96406b7c62de0e19bb2",
-    "implicitCoin": Object {
-      "deposit": 0n,
-      "input": 0n,
-    },
     "index": 15,
     "txSize": 11003,
     "witness": Object {
@@ -1302,10 +1250,6 @@ Array [
       "withdrawals": undefined,
     },
     "id": "34186a836e81a0852e583a870863535ded787ef63f7d3bc80380d306f8a9fb40",
-    "implicitCoin": Object {
-      "deposit": 0n,
-      "input": 0n,
-    },
     "index": 16,
     "txSize": 10025,
     "witness": Object {
@@ -1454,10 +1398,6 @@ Array [
       "withdrawals": undefined,
     },
     "id": "3d2278e9cef71c79720a11bc3e08acbbd5f2175f7015d358c867fc9b419ae0b2",
-    "implicitCoin": Object {
-      "deposit": 0n,
-      "input": 0n,
-    },
     "index": 9,
     "txSize": 639,
     "witness": Object {
@@ -1514,10 +1454,6 @@ Array [
       "withdrawals": undefined,
     },
     "id": "face165bd7aa8d0d661cf1ceaa4e35d7611be3b1c7997da378c547aa2464a4fd",
-    "implicitCoin": Object {
-      "deposit": 0n,
-      "input": 500000000n,
-    },
     "index": 1,
     "txSize": 361,
     "witness": Object {
@@ -1573,10 +1509,6 @@ Array [
       "withdrawals": undefined,
     },
     "id": "19251f57476d7af2777252270413c01383d9503110a68b4fde1a239c119c4f5d",
-    "implicitCoin": Object {
-      "deposit": 500000000n,
-      "input": 0n,
-    },
     "index": 2,
     "txSize": 737,
     "witness": Object {
@@ -1697,10 +1629,6 @@ Array [
       "withdrawals": undefined,
     },
     "id": "5acd6efb1b66299f1c5a2c4221af4bcaa4ba9929e8e6aa0e3f48707fa1796fc3",
-    "implicitCoin": Object {
-      "deposit": 0n,
-      "input": 0n,
-    },
     "index": 12,
     "txSize": 4763,
     "witness": Object {
@@ -1783,10 +1711,6 @@ Array [
       "withdrawals": undefined,
     },
     "id": "952dfa431223fd671c5e9e048e016f70fcebd9e41fcb726969415ff692736eeb",
-    "implicitCoin": Object {
-      "deposit": 0n,
-      "input": 0n,
-    },
     "index": 0,
     "txSize": 509,
     "witness": Object {
@@ -1858,10 +1782,6 @@ Array [
       "withdrawals": undefined,
     },
     "id": "cefd2fcf657e5e5d6c35975f4e052f427819391b153ebb16ad8aa107ba5a3819",
-    "implicitCoin": Object {
-      "deposit": 0n,
-      "input": 0n,
-    },
     "index": 30,
     "txSize": 711,
     "witness": Object {
@@ -2008,10 +1928,6 @@ Array [
       "withdrawals": undefined,
     },
     "id": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
-    "implicitCoin": Object {
-      "deposit": 0n,
-      "input": 0n,
-    },
     "index": 14,
     "txSize": 10662,
     "witness": Object {
@@ -2133,10 +2049,6 @@ Array [
       ],
     },
     "id": "cb66e0f5778718f8bfcfd043712f37d9993f4703b254a7a4d954d34225fe2f99",
-    "implicitCoin": Object {
-      "deposit": 0n,
-      "input": 1638694n,
-    },
     "index": 2,
     "txSize": 629,
     "witness": Object {

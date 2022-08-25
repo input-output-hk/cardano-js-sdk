@@ -1,6 +1,13 @@
 import { BigIntMath } from '@cardano-sdk/util';
 import { Cardano } from '@cardano-sdk/core';
-import { RoundRobinRandomImproveArgs, UtxoSelection, assetQuantitySelector, getCoinQuantity, toValues } from './util';
+import {
+  RequiredImplicitValue,
+  RoundRobinRandomImproveArgs,
+  UtxoSelection,
+  assetQuantitySelector,
+  getCoinQuantity,
+  toValues
+} from './util';
 
 const improvesSelection = (
   utxoAlreadySelected: Cardano.Utxo[],
@@ -31,10 +38,12 @@ const improvesSelection = (
 const listTokensWithin = (
   uniqueOutputAssetIDs: Cardano.AssetId[],
   outputs: Cardano.TxOut[],
-  implicitCoin: Required<Cardano.ImplicitCoin>
+  { implicitCoin, implicitTokens }: RequiredImplicitValue
 ) => [
   ...uniqueOutputAssetIDs.map((id) => {
     const getQuantity = assetQuantitySelector(id);
+    const implicitInput = implicitTokens.input(id);
+    const implicitSpend = implicitTokens.spend(id);
     return {
       filterUtxo: (utxo: Cardano.Utxo[]) =>
         utxo.filter(
@@ -45,8 +54,8 @@ const listTokensWithin = (
             }
           ]) => assets?.get(id)
         ),
-      getTotalSelectedQuantity: (utxo: Cardano.Utxo[]) => getQuantity(toValues(utxo)),
-      minimumTarget: getQuantity(toValues(outputs))
+      getTotalSelectedQuantity: (utxo: Cardano.Utxo[]) => getQuantity(toValues(utxo)) + implicitInput,
+      minimumTarget: getQuantity(toValues(outputs)) + implicitSpend
     };
   }),
   {
@@ -66,16 +75,16 @@ const listTokensWithin = (
 export const roundRobinSelection = ({
   utxo: utxosWithValue,
   outputs: outputsWithValue,
-  uniqueOutputAssetIDs,
+  uniqueTxAssetIDs,
   random,
-  implicitCoin
+  implicitValue
 }: RoundRobinRandomImproveArgs): UtxoSelection => {
   // The subset of the UTxO that has already been selected:
   const utxoSelected: Cardano.Utxo[] = [];
   // The subset of the UTxO that remains available for selection:
   const utxoRemaining = [...utxosWithValue];
   // The set of tokens that we still need to cover:
-  const tokensRemaining = listTokensWithin(uniqueOutputAssetIDs, outputsWithValue, implicitCoin);
+  const tokensRemaining = listTokensWithin(uniqueTxAssetIDs, outputsWithValue, implicitValue);
   while (tokensRemaining.length > 0) {
     // Consider each token in round-robin fashion:
     for (const [tokenIdx, { filterUtxo, minimumTarget, getTotalSelectedQuantity }] of tokensRemaining.entries()) {

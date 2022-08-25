@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Cardano from '.';
-import * as Ogmios from '@cardano-ogmios/schema';
 import { AuxiliaryData } from './AuxiliaryData';
 import { Ed25519PublicKey } from './Key';
 import { Hash32ByteBase16, HexBlob, OpaqueString, typedHex } from '../util';
@@ -52,20 +51,6 @@ export interface NewTxBodyAlonzo extends Omit<TxBodyAlonzo, 'inputs' | 'collater
   collaterals?: Cardano.NewTxIn[];
 }
 
-/**
- * Implicit coin quantities used in the transaction
- */
-export interface ImplicitCoin {
-  /**
-   * Reward withdrawals + deposit reclaims
-   */
-  input?: Cardano.Lovelace;
-  /**
-   * Delegation registration deposit
-   */
-  deposit?: Cardano.Lovelace;
-}
-
 export enum RedeemerPurpose {
   spend = 'spend',
   mint = 'mint',
@@ -82,9 +67,24 @@ export interface Redeemer {
 
 export type Signatures = Map<Ed25519PublicKey, Ed25519Signature>;
 
-export type Witness = Omit<Partial<Ogmios.TxAlonzo['witness']>, 'redeemers' | 'signatures'> & {
+export type Signature = Ed25519Signature;
+export type ChainCode = string;
+export type AddressAttributes = string;
+export type VerificationKey = Ed25519PublicKey;
+
+export interface BootstrapWitness {
+  signature?: Signature;
+  chainCode?: ChainCode;
+  addressAttributes?: AddressAttributes;
+  key?: VerificationKey;
+}
+
+export type Witness = {
   redeemers?: Redeemer[];
   signatures: Signatures;
+  scripts?: Cardano.Script[];
+  bootstrap?: BootstrapWitness[];
+  datums?: Cardano.Datum[];
 };
 
 export interface NewTxAlonzo<TBody extends NewTxBodyAlonzo = NewTxBodyAlonzo> {
@@ -98,6 +98,5 @@ export interface TxAlonzo extends NewTxAlonzo<TxBodyAlonzo> {
   index: number;
   blockHeader: PartialBlockHeader;
   body: TxBodyAlonzo;
-  implicitCoin: ImplicitCoin;
   txSize: number;
 }

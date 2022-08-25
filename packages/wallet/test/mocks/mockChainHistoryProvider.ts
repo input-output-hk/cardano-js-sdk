@@ -57,7 +57,6 @@ export const queryTransactionsResult: Cardano.TxAlonzo[] = [
       }
     },
     id: Cardano.TransactionId('12fa9af65e21b36ec4dc4cbce478e911d52585adb46f2b4fe3d6563e7ee5a61a'),
-    implicitCoin: {},
     index: 0,
     txSize: 100_000,
     witness: {
