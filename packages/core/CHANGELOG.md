@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.0-nightly.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.5.0-nightly.6...@cardano-sdk/core@0.5.0-nightly.7) (2022-08-25)
+
+
+### ⚠ BREAKING CHANGES
+
+* rm TxAlonzo.implicitCoin
+* removed Ogmios schema package dependency
+
+### Features
+
+* **core:** export cslUtil MIN_I64 and MAX_I64 consts ([618eef0](https://github.com/input-output-hk/cardano-js-sdk/commit/618eef04e7c9d2e27d2b0c5a9f1a172d340abde4))
+
+
+### Code Refactoring
+
+* removed Ogmios schema package dependency ([4ed2408](https://github.com/input-output-hk/cardano-js-sdk/commit/4ed24087aa5646c6f68ba31c42fc3f8a317df3b9))
+* rm TxAlonzo.implicitCoin ([167d205](https://github.com/input-output-hk/cardano-js-sdk/commit/167d205dd15c857b229f968ab53a6e52e5504d3f))
+
+
+
 ## [0.5.0-nightly.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.5.0-nightly.5...@cardano-sdk/core@0.5.0-nightly.6) (2022-08-23)
 
 

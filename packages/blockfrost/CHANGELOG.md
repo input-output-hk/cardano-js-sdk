@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.0-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/blockfrost@0.5.0-nightly.3...@cardano-sdk/blockfrost@0.5.0-nightly.4) (2022-08-25)
+
+
+### ⚠ BREAKING CHANGES
+
+* rm TxAlonzo.implicitCoin
+
+### Code Refactoring
+
+* rm TxAlonzo.implicitCoin ([167d205](https://github.com/input-output-hk/cardano-js-sdk/commit/167d205dd15c857b229f968ab53a6e52e5504d3f))
+
+
+
 ## [0.5.0-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/blockfrost@0.5.0-nightly.2...@cardano-sdk/blockfrost@0.5.0-nightly.3) (2022-08-23)
 
 **Note:** Version bump only for package @cardano-sdk/blockfrost

@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.0-nightly.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cip2@0.5.0-nightly.6...@cardano-sdk/cip2@0.5.0-nightly.7) (2022-08-25)
+
+
+### ⚠ BREAKING CHANGES
+
+* rename InputSelectionParameters implicitCoin->implicitValue.coin
+* rm TxAlonzo.implicitCoin
+
+### Features
+
+* **cip2:** add implicit tokens support (mint/burn) for input selection ([3361855](https://github.com/input-output-hk/cardano-js-sdk/commit/3361855a2fbf20afc8ead11565ac6759548ab13f))
+
+
+### Code Refactoring
+
+* rename InputSelectionParameters implicitCoin->implicitValue.coin ([3242a0d](https://github.com/input-output-hk/cardano-js-sdk/commit/3242a0dc63da0e59c4f8536d16758ea19f58a2c0))
+* rm TxAlonzo.implicitCoin ([167d205](https://github.com/input-output-hk/cardano-js-sdk/commit/167d205dd15c857b229f968ab53a6e52e5504d3f))
+
+
+
 ## [0.5.0-nightly.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cip2@0.5.0-nightly.5...@cardano-sdk/cip2@0.5.0-nightly.6) (2022-08-23)
 
 **Note:** Version bump only for package @cardano-sdk/cip2
