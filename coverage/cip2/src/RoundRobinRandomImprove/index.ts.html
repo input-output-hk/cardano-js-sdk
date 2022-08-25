@@ -32,7 +32,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>3/3</span>
+                <span class='fraction'>4/4</span>
             </div>
         
             
@@ -130,11 +130,7 @@
 <a name='L65'></a><a href='#L65'>65</a>
 <a name='L66'></a><a href='#L66'>66</a>
 <a name='L67'></a><a href='#L67'>67</a>
-<a name='L68'></a><a href='#L68'>68</a>
-<a name='L69'></a><a href='#L69'>69</a>
-<a name='L70'></a><a href='#L70'>70</a>
-<a name='L71'></a><a href='#L71'>71</a>
-<a name='L72'></a><a href='#L72'>72</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L68'></a><a href='#L68'>68</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -147,22 +143,18 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">13x</span>
+<span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2412x</span>
+<span class="cline-any cline-yes">2415x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2415x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2412x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">825x</span>
+<span class="cline-any cline-yes">745x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -170,10 +162,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">825x</span>
+<span class="cline-any cline-yes">745x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">584x</span>
+<span class="cline-any cline-yes">497x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -187,14 +179,14 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">574x</span>
-<span class="cline-any cline-yes">574x</span>
+<span class="cline-any cline-yes">485x</span>
+<span class="cline-any cline-yes">485x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">574x</span>
-<span class="cline-any cline-yes">94x</span>
+<span class="cline-any cline-yes">485x</span>
+<span class="cline-any cline-yes">83x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">480x</span>
+<span class="cline-any cline-yes">402x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -207,7 +199,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
 import { InputSelectionParameters, InputSelector, SelectionResult } from '../types';
-import { assertIsBalanceSufficient, preprocessArgs, toValues } from './util';
+import { assertIsBalanceSufficient, preProcessArgs, toValues } from './util';
 import { computeChangeAndAdjustForFee } from './change';
 import { cslUtil } from '@cardano-sdk/core';
 import { roundRobinSelection } from './roundRobin';
@@ -223,21 +215,17 @@ export const roundRobinRandomImprove = ({
     utxo: utxoSet,
     outputs: outputSet,
     constraints: { computeMinimumCost, computeSelectionLimit, computeMinimumCoinQuantity, tokenBundleSizeExceedsLimit },
-    implicitCoin: implicitCoinAsNumber
+    implicitValue: partialImplicitValue = {}
   }: InputSelectionParameters): Promise&lt;SelectionResult&gt; =&gt; {
-    const { utxo, outputs, uniqueOutputAssetIDs, implicitCoin } = preprocessArgs(
-      utxoSet,
-      outputSet,
-      implicitCoinAsNumber
-    );
+    const { utxo, outputs, uniqueTxAssetIDs, implicitValue } = preProcessArgs(utxoSet, outputSet, partialImplicitValue);
 &nbsp;
-    assertIsBalanceSufficient(uniqueOutputAssetIDs, utxo, outputs, implicitCoin);
+    assertIsBalanceSufficient(uniqueTxAssetIDs, utxo, outputs, implicitValue);
 &nbsp;
     const roundRobinSelectionResult = roundRobinSelection({
-      implicitCoin,
+      implicitValue,
       outputs,
       random,
-      uniqueOutputAssetIDs,
+      uniqueTxAssetIDs,
       utxo
     });
 &nbsp;
@@ -250,11 +238,11 @@ export const roundRobinRandomImprove = ({
           inputs: new Set(utxos),
           outputs: outputSet
         }),
-      implicitCoin,
+      implicitValue,
       outputValues: toValues(outputs),
       random,
       tokenBundleSizeExceedsLimit,
-      uniqueOutputAssetIDs,
+      uniqueTxAssetIDs,
       utxoSelection: roundRobinSelectionResult
     });
 &nbsp;
@@ -283,7 +271,7 @@ export const roundRobinRandomImprove = ({
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at Wed Aug 24 2022 07:46:41 GMT+0000 (Coordinated Universal Time)
+                at Thu Aug 25 2022 04:32:11 GMT+0000 (Coordinated Universal Time)
             </div>
         <script src="../../prettify.js"></script>
         <script>
