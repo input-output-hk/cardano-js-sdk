@@ -51,20 +51,6 @@ export interface NewTxBodyAlonzo extends Omit<TxBodyAlonzo, 'inputs' | 'collater
   collaterals?: Cardano.NewTxIn[];
 }
 
-/**
- * Implicit coin quantities used in the transaction
- */
-export interface ImplicitCoin {
-  /**
-   * Reward withdrawals + deposit reclaims
-   */
-  input?: Cardano.Lovelace;
-  /**
-   * Delegation registration deposit
-   */
-  deposit?: Cardano.Lovelace;
-}
-
 export enum RedeemerPurpose {
   spend = 'spend',
   mint = 'mint',
@@ -112,6 +98,5 @@ export interface TxAlonzo extends NewTxAlonzo<TxBodyAlonzo> {
   index: number;
   blockHeader: PartialBlockHeader;
   body: TxBodyAlonzo;
-  implicitCoin: ImplicitCoin;
   txSize: number;
 }

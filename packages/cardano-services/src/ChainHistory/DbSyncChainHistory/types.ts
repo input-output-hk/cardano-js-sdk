@@ -116,17 +116,3 @@ export interface DelegationCertModel extends CertificateModel {
   address: string;
   pool_id: string;
 }
-
-export interface ProtocolParamsModel {
-  coin_per_utxo_size: string;
-  max_collateral_inputs: number;
-  max_tx_size: number;
-  max_val_size: string;
-  min_fee_coefficient: number;
-  min_fee_constant: number;
-  min_pool_cost: string;
-  pool_deposit: string;
-  protocol_major: number;
-  protocol_minor: number;
-  key_deposit: string;
-}

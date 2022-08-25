@@ -1,39 +1,68 @@
 /* eslint-disable func-style */
 import { BigIntMath } from '@cardano-sdk/util';
 import { Cardano } from '@cardano-sdk/core';
+import { ImplicitValue } from '../types';
 import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
 import uniq from 'lodash/uniq';
+
+export interface ImplicitTokens {
+  spend(assetId: Cardano.AssetId): bigint;
+  input(assetId: Cardano.AssetId): bigint;
+}
+
+export interface RequiredImplicitValue {
+  implicitCoin: Required<Cardano.util.ImplicitCoin>;
+  implicitTokens: ImplicitTokens;
+}
 
 export interface RoundRobinRandomImproveArgs {
   utxo: Cardano.Utxo[];
   outputs: Cardano.TxOut[];
-  uniqueOutputAssetIDs: Cardano.AssetId[];
-  implicitCoin: Required<Cardano.ImplicitCoin>;
+  uniqueTxAssetIDs: Cardano.AssetId[];
+  implicitValue: RequiredImplicitValue;
   random: typeof Math.random;
 }
+
+export type PreProcessedArgs = Omit<RoundRobinRandomImproveArgs, 'random'>;
 
 export interface UtxoSelection {
   utxoSelected: Cardano.Utxo[];
   utxoRemaining: Cardano.Utxo[];
 }
 
-const noImplicitCoin = {
-  deposit: 0n,
-  input: 0n
+export const mintToImplicitTokens = (mintMap: Cardano.TokenMap = new Map()) => {
+  const mint = [...mintMap.entries()];
+  const implicitTokensInput = new Map(mint.filter(([_, quantity]) => quantity > 0));
+  const implicitTokensSpend = new Map(
+    mint.filter(([_, quantity]) => quantity < 0).map(([assetId, quantity]) => [assetId, -quantity])
+  );
+  return { implicitTokensInput, implicitTokensSpend };
 };
 
-export const preprocessArgs = (
+export const preProcessArgs = (
   availableUtxo: Set<Cardano.Utxo>,
   outputSet: Set<Cardano.TxOut>,
-  partialImplicitCoin: Cardano.ImplicitCoin = noImplicitCoin
-): Omit<RoundRobinRandomImproveArgs, 'random'> => {
+  partialImplicitValue?: ImplicitValue
+): PreProcessedArgs => {
   const outputs = [...outputSet];
-  const uniqueOutputAssetIDs = uniq(outputs.flatMap(({ value: { assets } }) => [...(assets?.keys() || [])]));
-  const implicitCoin: Required<Cardano.ImplicitCoin> = {
-    deposit: partialImplicitCoin.deposit || 0n,
-    input: partialImplicitCoin.input || 0n
+  const implicitCoin: Required<Cardano.util.ImplicitCoin> = {
+    deposit: partialImplicitValue?.coin?.deposit || 0n,
+    input: partialImplicitValue?.coin?.input || 0n
   };
-  return { implicitCoin, outputs, uniqueOutputAssetIDs, utxo: [...availableUtxo] };
+  const mintMap: Cardano.TokenMap = partialImplicitValue?.mint || new Map();
+  const { implicitTokensInput, implicitTokensSpend } = mintToImplicitTokens(mintMap);
+  const implicitTokens: ImplicitTokens = {
+    input: (assetId) => implicitTokensInput.get(assetId) || 0n,
+    spend: (assetId) => implicitTokensSpend.get(assetId) || 0n
+  };
+  const uniqueOutputAssetIDs = uniq(outputs.flatMap(({ value: { assets } }) => [...(assets?.keys() || [])]));
+  const uniqueTxAssetIDs = uniq([...uniqueOutputAssetIDs, ...mintMap.keys()]);
+  return {
+    implicitValue: { implicitCoin, implicitTokens },
+    outputs,
+    uniqueTxAssetIDs,
+    utxo: [...availableUtxo]
+  };
 };
 
 const isUtxoArray = (outputsOrUtxo: Cardano.TxOut[] | Cardano.Utxo[]): outputsOrUtxo is Cardano.Utxo[] =>
@@ -62,7 +91,7 @@ export const getCoinQuantity = (quantities: Cardano.Value[]): bigint =>
 export const assertIsCoinBalanceSufficient = (
   utxoValues: Cardano.Value[],
   outputValues: Cardano.Value[],
-  implicitCoin: Required<Cardano.ImplicitCoin>
+  implicitCoin: Required<Cardano.util.ImplicitCoin>
 ) => {
   const utxoCoinTotal = getCoinQuantity(utxoValues);
   const outputsCoinTotal = getCoinQuantity(outputValues);
@@ -78,21 +107,21 @@ export const assertIsCoinBalanceSufficient = (
  * @throws InputSelectionError { UtxoBalanceInsufficient }
  */
 export const assertIsBalanceSufficient = (
-  uniqueOutputAssetIDs: Cardano.AssetId[],
+  uniqueTxAssetIDs: Cardano.AssetId[],
   utxo: Cardano.Utxo[],
   outputs: Cardano.TxOut[],
-  implicitCoin: Required<Cardano.ImplicitCoin>
+  { implicitCoin, implicitTokens }: RequiredImplicitValue
 ): void => {
   if (utxo.length === 0) {
     throw new InputSelectionError(InputSelectionFailure.UtxoBalanceInsufficient);
   }
   const utxoValues = toValues(utxo);
   const outputsValues = toValues(outputs);
-  for (const assetId of uniqueOutputAssetIDs) {
+  for (const assetId of uniqueTxAssetIDs) {
     const getAssetQuantity = assetQuantitySelector(assetId);
     const utxoTotal = getAssetQuantity(utxoValues);
     const outputsTotal = getAssetQuantity(outputsValues);
-    if (outputsTotal > utxoTotal) {
+    if (outputsTotal + implicitTokens.spend(assetId) > utxoTotal + implicitTokens.input(assetId)) {
       throw new InputSelectionError(InputSelectionFailure.UtxoBalanceInsufficient);
     }
   }

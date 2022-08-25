@@ -1,8 +1,9 @@
 import * as SelectionConstraints from './selectionConstraints';
+import { Asset, Cardano, cslUtil } from '@cardano-sdk/core';
 import { AssetId } from '@cardano-sdk/util-dev';
-import { Cardano, cslUtil } from '@cardano-sdk/core';
+import { ImplicitValue, SelectionResult } from '../../src/types';
 import { InputSelectionError, InputSelectionFailure } from '../../src/InputSelectionError';
-import { SelectionResult } from '../../src/types';
+import { mintToImplicitTokens } from '../../src/RoundRobinRandomImprove/util';
 import fc, { Arbitrary } from 'fast-check';
 
 const assertExtraChangeProperties = (
@@ -32,22 +33,23 @@ const totalUtxosValue = (results: SelectionResult) =>
 const inputSelectionTotals = ({
   results,
   outputs,
-  implicitCoin
+  implicitValue
 }: {
   results: SelectionResult;
   outputs: Set<Cardano.TxOut>;
-  implicitCoin?: Cardano.ImplicitCoin;
+  implicitValue?: ImplicitValue;
 }) => {
+  const { implicitTokensInput, implicitTokensSpend } = mintToImplicitTokens(implicitValue?.mint);
   const vSelectedUtxo = totalUtxosValue(results);
   const vSelected = {
-    ...vSelectedUtxo,
-    coins: vSelectedUtxo.coins + BigInt(implicitCoin?.input || 0)
+    assets: Asset.util.coalesceTokenMaps([vSelectedUtxo.assets, implicitTokensInput]),
+    coins: vSelectedUtxo.coins + BigInt(implicitValue?.coin?.input || 0)
   };
   const vRequestedOutputs = totalOutputsValue(outputs);
   const vFee = results.selection.fee;
   const vRequested = {
-    ...vRequestedOutputs,
-    coins: vRequestedOutputs.coins + BigInt(implicitCoin?.deposit || 0) + vFee
+    assets: Asset.util.coalesceTokenMaps([vRequestedOutputs.assets, implicitTokensSpend]),
+    coins: vRequestedOutputs.coins + BigInt(implicitValue?.coin?.deposit || 0) + vFee
   };
   const vChange = Cardano.util.coalesceValueQuantities([...results.selection.change]);
   return { vChange, vRequested, vSelected };
@@ -58,15 +60,15 @@ export const assertInputSelectionProperties = ({
   outputs,
   utxo,
   constraints,
-  implicitCoin
+  implicitValue
 }: {
   results: SelectionResult;
   outputs: Set<Cardano.TxOut>;
   utxo: Set<Cardano.Utxo>;
   constraints: SelectionConstraints.MockSelectionConstraints;
-  implicitCoin?: Cardano.ImplicitCoin;
+  implicitValue?: ImplicitValue;
 }) => {
-  const { vSelected, vRequested, vChange } = inputSelectionTotals({ implicitCoin, outputs, results });
+  const { vSelected, vRequested, vChange } = inputSelectionTotals({ implicitValue, outputs, results });
 
   // Coverage of Payments
   expect(vSelected.coins).toBeGreaterThanOrEqual(vRequested.coins);
@@ -103,22 +105,23 @@ export const assertFailureProperties = ({
   constraints,
   utxoAmounts,
   outputsAmounts,
-  implicitCoin
+  implicitValue
 }: {
   error: InputSelectionError;
   utxoAmounts: Cardano.Value[];
   outputsAmounts: Cardano.Value[];
   constraints: SelectionConstraints.MockSelectionConstraints;
-  implicitCoin?: Cardano.ImplicitCoin;
+  implicitValue?: ImplicitValue;
 }) => {
+  const { implicitTokensInput, implicitTokensSpend } = mintToImplicitTokens(implicitValue?.mint);
   const availableQuantities = Cardano.util.coalesceValueQuantities([
     ...utxoAmounts,
-    { coins: BigInt(implicitCoin?.input || 0) }
+    { assets: implicitTokensInput, coins: BigInt(implicitValue?.coin?.input || 0) }
   ]);
   const maxPossibleFee = constraints.minimumCostCoefficient * BigInt(utxoAmounts.length);
   const requestedQuantities = Cardano.util.coalesceValueQuantities([
     ...outputsAmounts,
-    { coins: BigInt(implicitCoin?.deposit || 0) + maxPossibleFee }
+    { assets: implicitTokensSpend, coins: BigInt(implicitValue?.coin?.deposit || 0) + maxPossibleFee }
   ]);
   switch (error.failure) {
     case InputSelectionFailure.UtxoBalanceInsufficient: {
@@ -150,6 +153,14 @@ export const assertFailureProperties = ({
   throw error;
 };
 
+const generateTokenMap = (minQuantity: bigint, maxQuantity: bigint) =>
+  fc
+    .uniqueArray(fc.oneof(...AssetId.All.map((asset) => fc.constant(asset))), { comparator: 'IsStrictlyEqual' })
+    .chain((assets) =>
+      fc.tuple(...assets.map((asset) => fc.bigInt(minQuantity, maxQuantity).map((amount) => ({ amount, asset }))))
+    )
+    .map((assets) => new Map<Cardano.AssetId, Cardano.Lovelace>(assets.map(({ amount, asset }) => [asset, amount])));
+
 /**
  * @returns {Arbitrary} fast-check arbitrary that generates valid sets of UTxO and outputs for input selection.
  */
@@ -161,18 +172,7 @@ export const generateSelectionParams = (() => {
     fc
       .array(
         fc.record<Cardano.Value>({
-          assets: fc.oneof(
-            fc
-              .set(fc.oneof(...AssetId.All.map((asset) => fc.constant(asset))))
-              .chain((assets) =>
-                fc.tuple(...assets.map((asset) => fc.bigInt(1n, cslUtil.MAX_U64).map((amount) => ({ amount, asset }))))
-              )
-              .map(
-                (assets) =>
-                  new Map<Cardano.AssetId, Cardano.Lovelace>(assets.map(({ amount, asset }) => [asset, amount]))
-              ),
-            fc.constant(void 0)
-          ),
+          assets: fc.oneof(generateTokenMap(1n, cslUtil.MAX_U64), fc.constant(void 0)),
           coins: fc.bigInt(1n, cslUtil.MAX_U64 - implicitCoin)
         }),
         { maxLength: 11 }
@@ -186,28 +186,33 @@ export const generateSelectionParams = (() => {
         );
       });
 
-  const generateImplicitCoin: Arbitrary<Cardano.ImplicitCoin | undefined> = fc.oneof(
+  const generateImplicitCoin: Arbitrary<Cardano.util.ImplicitCoin> = fc.record({
+    deposit: fc.oneof(
+      fc.constant(void 0),
+      fc
+        .tuple(fc.bigUint(2n), fc.bigUint(2n))
+        .map(([numKeyDeposits, numPoolDeposits]) => numKeyDeposits * 2_000_000n + numPoolDeposits * 500_000_000n)
+    ),
+    input: fc.oneof(
+      fc.constant(void 0),
+      fc
+        .tuple(
+          fc.bigUint(2n),
+          fc.bigUint(2n),
+          fc.oneof(fc.constant(0n), fc.constant(1n), fc.constant(200_000n), fc.constant(2_000_003n))
+        )
+        .map(
+          ([numKeyDeposits, numPoolDeposits, withdrawals]) =>
+            numKeyDeposits * 2_000_000n + numPoolDeposits * 500_000_000n + withdrawals
+        )
+    )
+  });
+
+  const generateImplicitValue: Arbitrary<ImplicitValue | undefined> = fc.oneof(
     fc.constant(void 0),
-    fc.record({
-      deposit: fc.oneof(
-        fc.constant(void 0),
-        fc
-          .tuple(fc.bigUint(2n), fc.bigUint(2n))
-          .map(([numKeyDeposits, numPoolDeposits]) => numKeyDeposits * 2_000_000n + numPoolDeposits * 500_000_000n)
-      ),
-      input: fc.oneof(
-        fc.constant(void 0),
-        fc
-          .tuple(
-            fc.bigUint(2n),
-            fc.bigUint(2n),
-            fc.oneof(fc.constant(0n), fc.constant(1n), fc.constant(200_000n), fc.constant(2_000_003n))
-          )
-          .map(
-            ([numKeyDeposits, numPoolDeposits, withdrawals]) =>
-              numKeyDeposits * 2_000_000n + numPoolDeposits * 500_000_000n + withdrawals
-          )
-      )
+    fc.record<ImplicitValue>({
+      coin: fc.oneof(fc.constant(void 0), generateImplicitCoin),
+      mint: fc.oneof(fc.constant(void 0), generateTokenMap(cslUtil.MIN_I64, cslUtil.MAX_I64))
     })
   );
 
@@ -215,9 +220,9 @@ export const generateSelectionParams = (() => {
     utxoAmounts: Cardano.Value[];
     outputsAmounts: Cardano.Value[];
     constraints: SelectionConstraints.MockSelectionConstraints;
-    implicitCoin?: Cardano.ImplicitCoin;
+    implicitValue?: ImplicitValue;
   }> =>
-    generateImplicitCoin.chain((implicitCoin) =>
+    generateImplicitValue.chain((implicitValue) =>
       fc.record({
         constraints: fc.record<SelectionConstraints.MockSelectionConstraints>({
           maxTokenBundleSize: fc.nat(AssetId.All.length),
@@ -225,9 +230,9 @@ export const generateSelectionParams = (() => {
           minimumCostCoefficient: fc.oneof(...[0n, 1n, 200_000n, 2_000_003n].map((n) => fc.constant(n))),
           selectionLimit: fc.oneof(...[0, 1, 2, 7, 30, Number.MAX_SAFE_INTEGER].map((n) => fc.constant(n)))
         }),
-        implicitCoin: fc.constant(implicitCoin),
-        outputsAmounts: arrayOfCoinAndAssets(implicitCoin?.deposit),
-        utxoAmounts: arrayOfCoinAndAssets(implicitCoin?.input)
+        implicitValue: fc.constant(implicitValue),
+        outputsAmounts: arrayOfCoinAndAssets(implicitValue?.coin?.deposit),
+        utxoAmounts: arrayOfCoinAndAssets(implicitValue?.coin?.input)
       })
     );
 })();

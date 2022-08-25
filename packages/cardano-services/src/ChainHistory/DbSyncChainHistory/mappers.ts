@@ -1,11 +1,10 @@
-import { Asset, Cardano, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
+import { Asset, Cardano } from '@cardano-sdk/core';
 import { BigIntMath } from '@cardano-sdk/util';
 import {
   BlockModel,
   BlockOutputModel,
   CertificateModel,
   MultiAssetModel,
-  ProtocolParamsModel,
   RedeemerModel,
   TipModel,
   TxInOutModel,
@@ -137,26 +136,9 @@ export const mapCertificate = (
   return null;
 };
 
-export const mapProtocolParams = (protocolParamsModel: ProtocolParamsModel): ProtocolParametersRequiredByWallet => ({
-  coinsPerUtxoByte: Number(protocolParamsModel.coin_per_utxo_size),
-  maxCollateralInputs: protocolParamsModel.max_collateral_inputs,
-  maxTxSize: protocolParamsModel.max_tx_size,
-  maxValueSize: Number(protocolParamsModel.max_val_size),
-  minFeeCoefficient: protocolParamsModel.min_fee_coefficient,
-  minFeeConstant: protocolParamsModel.min_fee_constant,
-  minPoolCost: Number(protocolParamsModel.min_pool_cost),
-  poolDeposit: Number(protocolParamsModel.pool_deposit),
-  protocolVersion: {
-    major: protocolParamsModel.protocol_major,
-    minor: protocolParamsModel.protocol_minor
-  },
-  stakeKeyDeposit: Number(protocolParamsModel.key_deposit)
-});
-
 interface TxAlonzoData {
   inputs: Cardano.TxIn[];
   outputs: Cardano.TxOut[];
-  protocolParams: ProtocolParametersRequiredByWallet;
   mint?: Cardano.TokenMap;
   withdrawals?: Cardano.Withdrawal[];
   redeemers?: Cardano.Redeemer[];
@@ -167,7 +149,7 @@ interface TxAlonzoData {
 
 export const mapTxAlonzo = (
   txModel: TxModel,
-  { inputs, outputs, mint, withdrawals, redeemers, metadata, collaterals, certificates, protocolParams }: TxAlonzoData
+  { inputs, outputs, mint, withdrawals, redeemers, metadata, collaterals, certificates }: TxAlonzoData
 ): Cardano.TxAlonzo => ({
   auxiliaryData:
     metadata && metadata.size > 0
@@ -196,10 +178,6 @@ export const mapTxAlonzo = (
     withdrawals
   },
   id: Cardano.TransactionId(txModel.id.toString('hex')),
-  implicitCoin: Cardano.util.computeImplicitCoin(protocolParams, {
-    certificates,
-    withdrawals
-  }),
   index: txModel.index,
   txSize: txModel.size,
   witness: {

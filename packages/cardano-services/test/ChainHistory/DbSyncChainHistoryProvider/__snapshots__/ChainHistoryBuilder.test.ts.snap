@@ -97,24 +97,6 @@ Map {
 }
 `;
 
-exports[`ChainHistoryBuilder queryProtocolParams query protocol parameters from last epoch 1`] = `
-Object {
-  "coinsPerUtxoByte": NaN,
-  "maxCollateralInputs": 3,
-  "maxTxSize": 16384,
-  "maxValueSize": 5000,
-  "minFeeCoefficient": 44,
-  "minFeeConstant": 155381,
-  "minPoolCost": 340000000,
-  "poolDeposit": 500000000,
-  "protocolVersion": Object {
-    "major": 6,
-    "minor": 0,
-  },
-  "stakeKeyDeposit": 2000000,
-}
-`;
-
 exports[`ChainHistoryBuilder queryRedeemersByHashes query transaction redeemers by tx hashes 1`] = `
 Map {
   "5acd6efb1b66299f1c5a2c4221af4bcaa4ba9929e8e6aa0e3f48707fa1796fc3" => Array [
