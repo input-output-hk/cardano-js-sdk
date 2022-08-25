@@ -210,11 +210,11 @@ describe('HttpServer', () => {
       await httpServer.initialize();
       await httpServer.start();
       await onHttpServer(apiUrlBase);
-      const res2 = await axios.get(`${apiUrlBase}/${ServiceNames.StakePool}/metrics`, {
+      const response = await axios.get(`${apiUrlBase}/${ServiceNames.StakePool}/metrics`, {
         headers: { [CONTENT_TYPE]: APPLICATION_JSON },
         validateStatus: null
       });
-      expect(res2.status).toBe(404);
+      expect(response.status).toBe(404);
     });
 
     it('can expose Prometheus metrics, at /metrics by default', async () => {
@@ -235,17 +235,51 @@ describe('HttpServer', () => {
     it('Prometheus metrics can be configured with prom-client options', async () => {
       const metricsPath = '/metrics-custom';
       httpServer = new HttpServer(
-        { listen: { port }, metrics: { enabled: true, options: { metricsPath } } },
+        { listen: { host: 'localhost', port }, metrics: { enabled: true, options: { metricsPath } } },
         { logger, services: [new SomeHttpService(ServiceNames.StakePool, provider, logger)] }
       );
       await httpServer.initialize();
       await httpServer.start();
       await onHttpServer(apiUrlBase);
-      const res = await axios.get(`${apiUrlBase}${metricsPath}`, {
+      const response = await axios.get(`${apiUrlBase}${metricsPath}`, {
         headers: { [CONTENT_TYPE]: APPLICATION_JSON }
       });
-      expect(res.status).toBe(200);
-      expect(typeof res.data).toBe('string');
+      expect(response.status).toBe(200);
+      expect(typeof response.data).toBe('string');
+    });
+
+    it('metrics endpoint with healthy service', async () => {
+      httpServer = new HttpServer(
+        { listen: { host: 'localhost', port }, metrics: { enabled: true } },
+        { logger, services: [new SomeHttpService(ServiceNames.StakePool, provider, logger)] }
+      );
+      await httpServer.initialize();
+      await httpServer.start();
+      await onHttpServer(apiUrlBase);
+      const response = await axios.get(`${apiUrlBase}/metrics`, {
+        headers: { [CONTENT_TYPE]: APPLICATION_JSON }
+      });
+      expect(response.status).toBe(200);
+      expect(response.data.includes('healthcheck 1')).toEqual(true);
+    });
+
+    it('metrics endpoint with unhealthy service', async () => {
+      const service = new SomeHttpService(ServiceNames.StakePool, provider, logger);
+      httpServer = new HttpServer(
+        { listen: { host: 'localhost', port }, metrics: { enabled: true } },
+        { logger, services: [service] }
+      );
+      await httpServer.initialize();
+      await httpServer.start();
+      await onHttpServer(apiUrlBase);
+      service.healthCheck = async () => Promise.resolve({ ok: false });
+
+      const response = await axios.get(`${apiUrlBase}/metrics`, {
+        headers: { [CONTENT_TYPE]: APPLICATION_JSON }
+      });
+
+      expect(response.status).toBe(200);
+      expect(response.data.includes('healthcheck 0')).toEqual(true);
     });
   });
 
