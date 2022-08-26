@@ -1,7 +1,9 @@
 /* eslint-disable no-use-before-define */
+import * as Cardano from './';
 import * as util from '../util';
-import { Ed25519KeyHash } from './Key';
+import { BaseAddress, Ed25519KeyHash, NetworkInfo, StakeCredential } from '@emurgo/cardano-serialization-lib-nodejs';
 import { Slot } from '@cardano-ogmios/schema';
+import { nativeScript } from '../../CSL/coreToCsl';
 
 /**
  * Plutus script type.
@@ -39,7 +41,7 @@ export interface RequireSignatureScript {
   /**
    * The hash of a verification key.
    */
-  keyHash: Ed25519KeyHash;
+  keyHash: Cardano.Ed25519KeyHash;
 
   /**
    * The native script kind.
@@ -226,3 +228,32 @@ export interface PlutusScript {
  * Program that decides whether the transaction that spends the output is authorized to do so.
  */
 export type Script = NativeScript | PlutusScript;
+
+/**
+ * Gets the policy id of the given native script.
+ *
+ * @param script The native script to get the policy ID of.
+ * @returns the policy Id.
+ */
+export const nativeScriptPolicyId = (script: NativeScript): string =>
+  Buffer.from(nativeScript(script).hash().to_bytes()).toString('hex'); // TODO: Use opaque strings
+
+/**
+ * Gets the public key hash of the given Ed25519PublicKey.
+ *
+ * @param policyPubKey the Ed25519PublicKey to get the key ahsh for.
+ * @returns the key hash.
+ */
+// TODO: Use opaque strings
+export const policyKeyHash = (policyPubKey: Cardano.Ed25519PublicKey): string => {
+  const address = BaseAddress.new(
+    // TODO: Get the right network id.
+    NetworkInfo.testnet().network_id(),
+    StakeCredential.from_keyhash(Ed25519KeyHash.from_bech32(policyPubKey.toString())),
+    StakeCredential.from_keyhash(Ed25519KeyHash.from_bech32(policyPubKey.toString()))
+  ).to_address();
+
+  const keyHash = BaseAddress.from_address(address)!.payment_cred().to_keyhash()?.to_bytes();
+
+  return Buffer.from(keyHash!).toString('hex');
+};
