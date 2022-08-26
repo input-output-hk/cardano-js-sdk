@@ -322,23 +322,13 @@ export const keyAgentById = memoize(async (accountIndex: number, provider: strin
   return keyManagementFactory.create(provider, params, dummyLogger);
 });
 
-/**
- * Updates the id property of the params object
- *
- * @param idx The new account index.
- * @param params the params to be updated.
- */
-const updateParamsId = function (idx: number, params: any) {
-  params.accountIndex = idx;
-  return params;
-};
-
 export type GetWalletProps = {
-  name: string;
   env: any;
-  stores?: storage.WalletStores;
   idx?: number;
+  logger: Logger;
+  name: string;
   polling?: PollingConfig;
+  stores?: storage.WalletStores;
 };
 
 /**
@@ -348,50 +338,38 @@ export type GetWalletProps = {
  * @returns an object containing the wallet and providers passed to it
  */
 export const getWallet = async (props: GetWalletProps) => {
-  const logger = props.env.LOGGER_MIN_SEVERITY ? getLogger(props.env.LOGGER_MIN_SEVERITY) : dummyLogger;
+  const { env, idx, logger, name, polling, stores } = props;
   const providers = {
-    assetProvider: await assetProviderFactory.create(props.env.ASSET_PROVIDER, props.env.ASSET_PROVIDER_PARAMS, logger),
+    assetProvider: await assetProviderFactory.create(env.ASSET_PROVIDER, env.ASSET_PROVIDER_PARAMS, logger),
     chainHistoryProvider: await chainHistoryProviderFactory.create(
-      props.env.CHAIN_HISTORY_PROVIDER,
-      props.env.CHAIN_HISTORY_PROVIDER_PARAMS,
+      env.CHAIN_HISTORY_PROVIDER,
+      env.CHAIN_HISTORY_PROVIDER_PARAMS,
       logger
     ),
     networkInfoProvider: await networkInfoProviderFactory.create(
-      props.env.NETWORK_INFO_PROVIDER,
-      props.env.NETWORK_INFO_PROVIDER_PARAMS,
+      env.NETWORK_INFO_PROVIDER,
+      env.NETWORK_INFO_PROVIDER_PARAMS,
       logger
     ),
-    rewardsProvider: await rewardsProviderFactory.create(
-      props.env.REWARDS_PROVIDER,
-      props.env.REWARDS_PROVIDER_PARAMS,
-      logger
-    ),
+    rewardsProvider: await rewardsProviderFactory.create(env.REWARDS_PROVIDER, env.REWARDS_PROVIDER_PARAMS, logger),
     stakePoolProvider: await stakePoolProviderFactory.create(
-      props.env.STAKE_POOL_PROVIDER,
-      props.env.STAKE_POOL_PROVIDER_PARAMS,
+      env.STAKE_POOL_PROVIDER,
+      env.STAKE_POOL_PROVIDER_PARAMS,
       logger
     ),
     txSubmitProvider: await txSubmitProviderFactory.create(
-      props.env.TX_SUBMIT_PROVIDER,
-      props.env.TX_SUBMIT_PROVIDER_PARAMS,
+      env.TX_SUBMIT_PROVIDER,
+      env.TX_SUBMIT_PROVIDER_PARAMS,
       logger
     ),
-    utxoProvider: await utxoProviderFactory.create(props.env.UTXO_PROVIDER, props.env.UTXO_PROVIDER_PARAMS, logger)
+    utxoProvider: await utxoProviderFactory.create(env.UTXO_PROVIDER, env.UTXO_PROVIDER_PARAMS, logger)
   };
+  const keyManagementParams = { ...env.KEY_MANAGEMENT_PARAMS, ...(idx === undefined ? {} : { accountIndex: idx }) };
   const { wallet } = await setupWallet({
-    createKeyAgent: await keyManagementFactory.create(
-      props.env.KEY_MANAGEMENT_PROVIDER,
-      updateParamsId(props.idx !== undefined ? props.idx : 0, props.env.KEY_MANAGEMENT_PARAMS),
-      logger
-    ),
+    createKeyAgent: await keyManagementFactory.create(env.KEY_MANAGEMENT_PROVIDER, keyManagementParams, logger),
     createWallet: async (keyAgent: KeyManagement.AsyncKeyAgent) =>
-      new SingleAddressWallet(
-        { name: props.name, polling: props.polling },
-        { ...providers, keyAgent, logger, stores: props.stores }
-      )
+      new SingleAddressWallet({ name, polling }, { ...providers, keyAgent, logger, stores })
   });
-  return {
-    providers,
-    wallet
-  };
+
+  return { providers, wallet };
 };

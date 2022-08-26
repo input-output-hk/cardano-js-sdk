@@ -1,7 +1,7 @@
-import { dummyLogger } from 'ts-log';
 import { env } from '../environment';
 import { filter, firstValueFrom } from 'rxjs';
 import { getWallet } from '../../../src/factories';
+import { logger } from '@cardano-sdk/util-dev';
 import { storage } from '@cardano-sdk/wallet';
 import { waitForWalletStateSettle } from '../util';
 import delay from 'delay';
@@ -11,11 +11,11 @@ describe('SingleAddressWallet/pouchDbWalletStores', () => {
   let stores1: storage.WalletStores;
 
   beforeAll(() => {
-    stores1 = storage.createPouchDbWalletStores(walletName, { logger: dummyLogger });
+    stores1 = storage.createPouchDbWalletStores(walletName, { logger });
   });
 
   it('stores and restores SingleAddressWallet, continues sync after initial load', async () => {
-    const wallet1 = (await getWallet({ env, name: 'Test Wallet', stores: stores1 })).wallet;
+    const wallet1 = (await getWallet({ env, logger, name: 'Test Wallet', stores: stores1 })).wallet;
     // wallet1 fetched all responses from wallet provider
     await waitForWalletStateSettle(wallet1);
     // give it a second to store data to PouchDb, this is technically a race condition
@@ -28,8 +28,9 @@ describe('SingleAddressWallet/pouchDbWalletStores', () => {
     const wallet2 = (
       await getWallet({
         env,
+        logger,
         name: walletName,
-        stores: storage.createPouchDbWalletStores(walletName, { logger: dummyLogger })
+        stores: storage.createPouchDbWalletStores(walletName, { logger })
       })
     ).wallet;
     const tip = await firstValueFrom(wallet2.tip$);
