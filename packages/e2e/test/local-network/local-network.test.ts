@@ -1,7 +1,6 @@
 import * as envalid from 'envalid';
-import { Cardano } from '@cardano-sdk/core';
 import { FaucetProvider } from '../../src/FaucetProvider';
-import { KeyManagement, SingleAddressWallet } from '@cardano-sdk/wallet';
+import { SingleAddressWallet } from '@cardano-sdk/wallet';
 import { faucetProviderFactory, getLogger, getWallet } from '../../src/factories';
 import { filter, firstValueFrom, map } from 'rxjs';
 
@@ -90,7 +89,7 @@ describe('Local Network', () => {
       outputs: new Set([{ address: receivingAddress, value: { coins: tAdaToSend } }])
     });
 
-    const signedTx = await wallet1.finalizeTx(unsignedTx);
+    const signedTx = await wallet1.finalizeTx({ tx: unsignedTx });
     await wallet1.submitTx(signedTx);
 
     // Wait until wallet two is aware of the funds.
@@ -109,80 +108,6 @@ describe('Local Network', () => {
     expect(txFoundInHistory?.id).toEqual(signedTx.id);
 
     wallet1.shutdown();
-    wallet2.shutdown();
-  });
-
-  it('will mint an NFT using native scripts.', async () => {
-    const amountFromFaucet = 100_000_000;
-
-    const wallet: SingleAddressWallet = (await getWallet({ env, name: 'Sending Wallet', polling: { interval: 50 } }))
-      .wallet;
-    const wallet2: SingleAddressWallet = (await getWallet({ env, name: 'Minting Wallet', polling: { interval: 50 } }))
-      .wallet;
-
-    await firstValueFrom(wallet.syncStatus.isSettled$.pipe(filter((isSettled) => isSettled)));
-    await firstValueFrom(wallet2.syncStatus.isSettled$.pipe(filter((isSettled) => isSettled)));
-
-    const [{ address: sendingAddress }] = await firstValueFrom(wallet.addresses$);
-
-    await faucetProvider.request(sendingAddress.toString(), amountFromFaucet, 1);
-
-    const pubKey = await wallet2.keyAgent.derivePublicKey({
-      index: 0,
-      role: KeyManagement.KeyRole.External
-    });
-
-    const keyHash = Cardano.policyKeyHash(pubKey);
-
-    const script: Cardano.NativeScript = {
-      __type: Cardano.ScriptType.Native,
-      keyHash: Cardano.Ed25519KeyHash(keyHash),
-      kind: Cardano.NativeScriptKind.RequireSignature
-    };
-
-    const policyId = Cardano.nativeScriptPolicyId(script);
-
-    // Wait until wallet is aware of the funds.
-    await firstValueFrom(wallet.balance.utxo.total$.pipe(filter(({ coins }) => coins >= amountFromFaucet)));
-
-    const txProps = {
-      mint: new Map([[Cardano.AssetId(policyId), 1n]]),
-      outputs: new Set([
-        {
-          address: sendingAddress,
-          value: {
-            assets: new Map([[Cardano.AssetId(policyId), 1n]]),
-            coins: 50_000_000n
-          }
-        }
-      ]),
-      signOptions: { extraSigners: [wallet2.keyAgent.signTransaction] }
-    };
-    const unsignedTx = await wallet.initializeTx(txProps);
-
-    const finalizeProps = {
-      scripts: [script],
-      signOptions: { extraSigners: [wallet2.keyAgent.signTransaction] },
-      tx: unsignedTx
-    };
-
-    const signedTx = await wallet.finalizeTx(finalizeProps);
-    await wallet.submitTx(signedTx);
-
-    // Wait until wallet two is aware of the funds.
-    await firstValueFrom(wallet.balance.utxo.total$.pipe(filter(({ assets }) => (assets ? assets.size > 0 : false))));
-
-    // Search chain history to see if the transaction is there.
-    const txFoundInHistory = await firstValueFrom(
-      wallet.transactions.history$
-        .pipe(filter((txs) => txs.filter((tx) => tx.id === signedTx.id).length === 1))
-        .pipe(map((txs) => (txs.length > 0 ? txs.find((tx) => tx.id === signedTx.id) : undefined)))
-    );
-
-    expect(txFoundInHistory).toBeDefined();
-    expect(txFoundInHistory?.id).toEqual(signedTx.id);
-
-    wallet.shutdown();
     wallet2.shutdown();
   });
 });

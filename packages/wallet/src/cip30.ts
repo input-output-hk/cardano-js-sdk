@@ -252,10 +252,7 @@ export const createWalletApi = (
       try {
         const {
           witness: { signatures }
-        } = await wallet.finalizeTx({
-          body: coreTx,
-          hash
-        });
+        } = await wallet.finalizeTx({ tx: { body: coreTx, hash } });
 
         const cslWitnessSet = coreToCsl.witnessSet(signatures);
 

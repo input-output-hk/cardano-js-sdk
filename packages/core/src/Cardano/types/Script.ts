@@ -1,7 +1,7 @@
 /* eslint-disable no-use-before-define */
 import * as Cardano from './';
 import * as util from '../util';
-import { BaseAddress, Ed25519KeyHash, NetworkInfo, StakeCredential } from '@emurgo/cardano-serialization-lib-nodejs';
+import { Address, BaseAddress } from '@emurgo/cardano-serialization-lib-nodejs';
 import { Slot } from '@cardano-ogmios/schema';
 import { nativeScript } from '../../CSL/coreToCsl';
 
@@ -233,27 +233,21 @@ export type Script = NativeScript | PlutusScript;
  * Gets the policy id of the given native script.
  *
  * @param script The native script to get the policy ID of.
- * @returns the policy Id.
+ * @returns The policy Id.
  */
-export const nativeScriptPolicyId = (script: NativeScript): string =>
-  Buffer.from(nativeScript(script).hash().to_bytes()).toString('hex'); // TODO: Use opaque strings
+export const nativeScriptPolicyId = (script: NativeScript): Cardano.PolicyId =>
+  Cardano.PolicyId(Buffer.from(nativeScript(script).hash().to_bytes()).toString('hex'));
 
 /**
- * Gets the public key hash of the given Ed25519PublicKey.
+ * Gets the public key hash from the given Bech32 address.
  *
- * @param policyPubKey the Ed25519PublicKey to get the key ahsh for.
+ * @param address The address to get the public key hash from.
  * @returns the key hash.
  */
 // TODO: Use opaque strings
-export const policyKeyHash = (policyPubKey: Cardano.Ed25519PublicKey): string => {
-  const address = BaseAddress.new(
-    // TODO: Get the right network id.
-    NetworkInfo.testnet().network_id(),
-    StakeCredential.from_keyhash(Ed25519KeyHash.from_bech32(policyPubKey.toString())),
-    StakeCredential.from_keyhash(Ed25519KeyHash.from_bech32(policyPubKey.toString()))
-  ).to_address();
-
-  const keyHash = BaseAddress.from_address(address)!.payment_cred().to_keyhash()?.to_bytes();
+export const policyKeyHash = (address: Cardano.Address): string => {
+  const cslAddress = Address.from_bech32(address.toString());
+  const keyHash = BaseAddress.from_address(cslAddress)!.payment_cred().to_keyhash()?.to_bytes();
 
   return Buffer.from(keyHash!).toString('hex');
 };

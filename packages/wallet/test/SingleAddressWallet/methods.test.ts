@@ -181,14 +181,14 @@ describe('SingleAddressWallet methods', () => {
 
     it('finalizeTx', async () => {
       const txInternals = await wallet.initializeTx(props);
-      const tx = await wallet.finalizeTx(txInternals);
+      const tx = await wallet.finalizeTx({ tx: txInternals });
       expect(tx.body).toBe(txInternals.body);
       expect(tx.id).toBe(txInternals.hash);
       expect(tx.witness.signatures.size).toBe(1);
     });
 
     it('submitTx', async () => {
-      const tx = await wallet.finalizeTx(await wallet.initializeTx(props));
+      const tx = await wallet.finalizeTx({ tx: await wallet.initializeTx(props) });
       const txSubmitting = firstValueFrom(wallet.transactions.outgoing.submitting$);
       const txPending = firstValueFrom(wallet.transactions.outgoing.pending$);
       const txInFlight = firstValueFrom(wallet.transactions.outgoing.inFlight$.pipe(skip(1)));

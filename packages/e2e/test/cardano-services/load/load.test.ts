@@ -201,7 +201,7 @@ describe('load', () => {
       });
 
       logger.info(`Fragmentation tx: ${tx.hash}`);
-      await wallet.submitTx(await wallet.finalizeTx(tx));
+      await wallet.submitTx(await wallet.finalizeTx({ tx }));
       await waitForTxInBlockchain(wallet, tx.hash);
       logger.info('Fragmentation completed');
     };
@@ -290,7 +290,7 @@ describe('load', () => {
 
       const finalizeAndSubmit = async (wallet: ObservableWallet, tx: InitializeTxResult) => {
         try {
-          await wallet.submitTx(await wallet.finalizeTx(tx));
+          await wallet.submitTx(await wallet.finalizeTx({ tx }));
           logger.info(`Submitted tx: ${tx.hash}`);
         } catch (error) {
           logger.error(JSONBig.stringify(tx), error);
