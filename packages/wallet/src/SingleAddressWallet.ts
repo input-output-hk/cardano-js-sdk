@@ -1,4 +1,11 @@
-import { AddressType, AsyncKeyAgent, GroupedAddress, util as keyManagementUtil } from './KeyManagement';
+import {
+  AddressType,
+  AsyncKeyAgent,
+  GroupedAddress,
+  SignTransactionOptions,
+  TransactionSigner,
+  util as keyManagementUtil
+} from './KeyManagement';
 import {
   AssetProvider,
   Cardano,
@@ -14,6 +21,7 @@ import {
 } from '@cardano-sdk/core';
 import {
   Assets,
+  FinalizeTxProps,
   InitializeTxProps,
   InitializeTxResult,
   ObservableWallet,
@@ -380,21 +388,23 @@ export class SingleAddressWallet implements ObservableWallet {
     return { body, hash, inputSelection };
   }
 
-  async finalizeTx(
-    tx: TxInternals,
-    auxiliaryData?: Cardano.AuxiliaryData,
-    stubSign = false
-  ): Promise<Cardano.NewTxAlonzo> {
+  async finalizeTx(props: FinalizeTxProps, stubSign = false): Promise<Cardano.NewTxAlonzo> {
     const addresses = await firstValueFrom(this.addresses$);
     const signatures = stubSign
-      ? await keyManagementUtil.stubSignTransaction(tx.body, addresses, this.util)
-      : await this.keyAgent.signTransaction(tx);
+      ? await keyManagementUtil.stubSignTransaction(
+          props.tx.body,
+          addresses,
+          this.util,
+          props.extraSigners,
+          props.signingOptions
+        )
+      : await this.#getSignatures(props.tx, props.extraSigners, props.signingOptions);
     return {
-      auxiliaryData,
-      body: tx.body,
-      id: tx.hash,
+      auxiliaryData: props.auxiliaryData,
+      body: props.tx.body,
+      id: props.tx.hash,
       // TODO: add support for the rest of the witness properties
-      witness: { signatures }
+      witness: { scripts: props.scripts, signatures }
     };
   }
 
@@ -446,6 +456,23 @@ export class SingleAddressWallet implements ObservableWallet {
     this.#logger.debug('Shutdown');
   }
 
+  async #getSignatures(
+    txInternals: TxInternals,
+    extraSigners?: TransactionSigner[],
+    signingOptions?: SignTransactionOptions
+  ) {
+    const signatures: Cardano.Signatures = await this.keyAgent.signTransaction(txInternals, signingOptions);
+
+    if (extraSigners) {
+      for (const extraSigner of extraSigners) {
+        const extraSignature = await extraSigner.sign(txInternals);
+        signatures.set(extraSignature.pubKey, extraSignature.signature);
+      }
+    }
+
+    return signatures;
+  }
+
   #prepareTx(props: InitializeTxProps) {
     return lastValueFrom(
       combineLatest([this.tip$, this.utxo.available$, this.protocolParameters$, this.addresses$]).pipe(
@@ -467,7 +494,18 @@ export class SingleAddressWallet implements ObservableWallet {
                 validityInterval,
                 withdrawals: props.withdrawals
               });
-              return coreToCsl.tx(await this.finalizeTx(txInternals, props.auxiliaryData, true));
+              return coreToCsl.tx(
+                await this.finalizeTx(
+                  {
+                    auxiliaryData: props.auxiliaryData,
+                    extraSigners: props.extraSigners,
+                    scripts: props.scripts,
+                    signingOptions: props.signingOptions,
+                    tx: txInternals
+                  },
+                  true
+                )
+              );
             },
             protocolParameters
           });

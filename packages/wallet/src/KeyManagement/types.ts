@@ -173,3 +173,31 @@ export interface KeyAgent {
 export type AsyncKeyAgent = Pick<KeyAgent, 'deriveAddress' | 'derivePublicKey' | 'signBlob' | 'signTransaction'> & {
   knownAddresses$: Observable<GroupedAddress[]>;
 } & Shutdown;
+
+/**
+ * The result of the transaction signer signing operation.
+ */
+export type TransactionSignerResult = {
+  /**
+   * The public key matching the private key that generate the signautre.
+   */
+  pubKey: Cardano.Ed25519PublicKey;
+
+  /**
+   * The transaction signature.
+   */
+  signature: Cardano.Ed25519Signature;
+};
+
+/**
+ * Produces a Ed25519Signature of a transaction.
+ */
+export interface TransactionSigner {
+  /**
+   * Sings a transaction.
+   *
+   * @param tx The transaction to be signed.
+   * @returns A Ed25519 transaction signature.
+   */
+  sign(tx: TxInternals): Promise<TransactionSignerResult>;
+}

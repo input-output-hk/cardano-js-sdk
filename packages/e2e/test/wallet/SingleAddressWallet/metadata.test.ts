@@ -29,7 +29,7 @@ describe('SingleAddressWallet/metadata', () => {
       auxiliaryData,
       outputs: new Set([{ address: ownAddress, value: { coins: minimumCoin } }])
     });
-    const outgoingTx = await wallet.finalizeTx(txInternals, auxiliaryData);
+    const outgoingTx = await wallet.finalizeTx({ auxiliaryData, tx: txInternals });
     await wallet.submitTx(outgoingTx);
     const loadedTx = await firstValueFrom(
       wallet.transactions.history$.pipe(
