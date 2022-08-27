@@ -28,7 +28,7 @@ services:
         max-file: "10"
 
   cardano-node-ogmios:
-    image: cardanosolutions/cardano-node-ogmios:${CARDANO_NODE_OGMIOS_VERSION:-v5.5.2_1.35.2}-${NETWORK:-mainnet}
+    image: cardanosolutions/cardano-node-ogmios:${OGMIOS_VERSION:-v5.5.5}_${CARDANO_NODE_VERSION:-1.35.3}-${NETWORK:-mainnet}
     healthcheck:
       retries: 200
     logging:
@@ -40,11 +40,12 @@ services:
       - ${OGMIOS_PORT:-1337}:1337
     restart: on-failure
     volumes:
+      - ./config/network/${NETWORK:-mainnet}:/config
       - node-db:/db
       - node-ipc:/ipc
 
   cardano-db-sync:
-    image: inputoutput/cardano-db-sync:${CARDANO_DB_SYNC_VERSION:-13.0.1}
+    image: inputoutput/cardano-db-sync:${CARDANO_DB_SYNC_VERSION:-13.0.4}
     command:
       [
         "--config",
