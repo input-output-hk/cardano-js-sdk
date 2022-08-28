@@ -15,7 +15,7 @@ const FAUCET_WALLET_NAME = 'faucet';
 const HTTP_ERROR_CODE_IN_CONFLICT = 409;
 const DEFAULT_TIMEOUT = 10_000;
 const DEFAULT_CONFIRMATIONS = 0;
-const PARAM_NAME_URL = 'url';
+const PARAM_NAME_URL = 'baseUrl';
 const PARAM_NAME_MNEMONICS = 'mnemonic';
 
 /**
