@@ -26,8 +26,12 @@ jobs:
 
     - name: Install dependencies & git config
       run: |
+        # git user config to make commits
         git config user.name github-actions
         git config user.email github-actions@github.com
+        # Create a local 'nightly' branch tracking origin/nightly
+        git fetch origin nightly:nightly
+        # Install dependencies and put yarn-project.nix to staging if it has any changes
         yarn install --immutable --inline-builds --mode=skip-build
         git checkout yarn-project.nix
 
