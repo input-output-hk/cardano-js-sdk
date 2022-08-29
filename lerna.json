@@ -5,14 +5,12 @@
   "tagVersionPrefix": "",
   "command": {
     "version": {
-      "message": "ci: publish [skip actions]",
       "includeMergedTags": true,
       "noCommitHooks": true,
       "yes": true,
       "conventionalCommits": true
     },
     "publish": {
-      "message": "ci: publish [skip actions]",
       "includeMergedTags": true,
       "noCommitHooks": true,
       "yes": true,
