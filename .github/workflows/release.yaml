@@ -31,6 +31,9 @@ jobs:
         git config user.email github-actions@github.com
         # Create a local 'nightly' branch tracking origin/nightly
         git fetch origin nightly:nightly
+        # Delete tags of the private 'e2e' package - seems like a lerna bug as it's
+        # trying to create the same tag again when doing --conventional-graduate
+        git tag | grep e2e | xargs -L1 git push --delete origin
         # Install dependencies and put yarn-project.nix to staging if it has any changes
         yarn install --immutable --inline-builds --mode=skip-build
         git checkout yarn-project.nix
