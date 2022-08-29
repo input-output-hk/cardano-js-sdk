@@ -14,7 +14,7 @@ export const AssetName = (value: string): AssetName => {
       throw new InvalidStringError('too long');
     }
   }
-  return value as unknown as AssetName;
+  return value.toLowerCase() as unknown as AssetName;
 };
 
 /**
