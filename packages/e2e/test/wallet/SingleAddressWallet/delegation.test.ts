@@ -5,6 +5,7 @@ import { ObservableWallet, StakeKeyStatus, Transaction } from '@cardano-sdk/wall
 import { TX_TIMEOUT, firstValueFromTimed, waitForWalletStateSettle } from '../util';
 import { env } from '../environment';
 import { getWallet } from '../../../src/factories';
+import { logger } from '@cardano-sdk/util-dev';
 
 import { combineLatest, filter, firstValueFrom } from 'rxjs';
 
@@ -63,8 +64,8 @@ describe('SingleAddressWallet/delegation', () => {
 
   beforeAll(async () => {
     jest.setTimeout(180_000);
-    wallet1 = await getWallet({ env, idx: 0, name: 'Test Wallet 1' });
-    wallet2 = await getWallet({ env, idx: 1, name: 'Test Wallet 2' });
+    wallet1 = await getWallet({ env, idx: 0, logger, name: 'Test Wallet 1' });
+    wallet2 = await getWallet({ env, idx: 1, logger, name: 'Test Wallet 2' });
 
     await Promise.all([waitForWalletStateSettle(wallet1.wallet), waitForWalletStateSettle(wallet2.wallet)]);
   });

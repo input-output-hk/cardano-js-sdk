@@ -55,10 +55,12 @@ describe('Local Network', () => {
     const amountFromFaucet = 100_000_000;
     const tAdaToSend = 50_000_000n;
 
-    const wallet1: SingleAddressWallet = (await getWallet({ env, name: 'Sending Wallet', polling: { interval: 50 } }))
-      .wallet;
-    const wallet2: SingleAddressWallet = (await getWallet({ env, name: 'Receiving Wallet', polling: { interval: 50 } }))
-      .wallet;
+    const wallet1: SingleAddressWallet = (
+      await getWallet({ env, logger, name: 'Sending Wallet', polling: { interval: 50 } })
+    ).wallet;
+    const wallet2: SingleAddressWallet = (
+      await getWallet({ env, logger, name: 'Receiving Wallet', polling: { interval: 50 } })
+    ).wallet;
 
     await firstValueFrom(wallet1.syncStatus.isSettled$.pipe(filter((isSettled) => isSettled)));
     await firstValueFrom(wallet2.syncStatus.isSettled$.pipe(filter((isSettled) => isSettled)));
