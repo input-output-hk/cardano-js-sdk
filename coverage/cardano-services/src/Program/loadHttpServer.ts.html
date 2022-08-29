@@ -235,7 +235,16 @@
 <a name='L170'></a><a href='#L170'>170</a>
 <a name='L171'></a><a href='#L171'>171</a>
 <a name='L172'></a><a href='#L172'>172</a>
-<a name='L173'></a><a href='#L173'>173</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">25x</span>
 <span class="cline-any cline-yes">25x</span>
@@ -256,6 +265,12 @@
 <span class="cline-any cline-yes">25x</span>
 <span class="cline-any cline-yes">25x</span>
 <span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -333,13 +348,16 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
@@ -372,20 +390,20 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">25x</span>
-<span class="cline-any cline-yes">13x</span>
-<span class="cline-any cline-yes">13x</span>
+<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">13x</span>
+<span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">13x</span>
+<span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">12x</span>
@@ -431,19 +449,25 @@ import memoize from 'lodash/memoize';
 import pg from 'pg';
 &nbsp;
 export interface HttpServerOptions extends CommonProgramOptions {
-  postgresConnectionString?: string;
-  epochPollInterval: number;
+  serviceNames?: ServiceNames[];
+  enableMetrics?: boolean;
   cardanoNodeConfigPath?: string;
   tokenMetadataCacheTTL?: number;
   tokenMetadataServerUrl?: string;
-  enableMetrics?: boolean;
-  useQueue?: boolean;
+  postgresConnectionString?: string;
   postgresSrvServiceName?: string;
   postgresDb?: string;
+  postgresDbFile?: string;
   postgresUser?: string;
+  postgresUserFile?: string;
   postgresPassword?: string;
+  postgresPasswordFile?: string;
+  postgresHost?: string;
+  postgresPort?: string;
   postgresSslCaFile?: string;
+  epochPollInterval: number;
   dbCacheTtl: number;
+  useQueue?: boolean;
 }
 &nbsp;
 export interface ProgramArgs {
@@ -466,10 +490,10 @@ export interface ProgramArgs {
 &nbsp;
 const serviceMapFactory = (args: ProgramArgs, logger: Logger, dnsResolver: DnsResolver, dbConnection?: pg.Pool) =&gt; {
   const withDb =
-    &lt;T&gt;(factory: (db: pg.Pool) =&gt; T) =&gt;
+    &lt;T&gt;(factory: (db: pg.Pool) =&gt; T, serviceName: ServiceNames) =&gt;
     () =&gt; {
       if (!dbConnection)
-        throw new MissingProgramOption(ServiceNames.StakePool, [
+        throw new MissingProgramOption(serviceName, [
           ProgramOptionDescriptions.PostgresConnectionString,
           ProgramOptionDescriptions.PostgresServiceDiscoveryArgs
         ]);
@@ -490,7 +514,7 @@ const serviceMapFactory = (args: ProgramArgs, logger: Logger, dnsResolver: DnsRe
       const assetProvider = <span class="cstat-no" title="statement not covered" >new DbSyncAssetProvider({ db, logger, ntfMetadataService, tokenMetadataService });</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      return new AssetHttpService({ assetProvider, logger });</span>
-    }),
+    }, ServiceNames.Asset),
     [ServiceNames.StakePool]: withDb((db) =&gt; {
       const stakePoolProvider = new DbSyncStakePoolProvider({
         cache: new InMemoryCache(args.options!.dbCacheTtl!),
@@ -499,19 +523,22 @@ const serviceMapFactory = (args: ProgramArgs, logger: Logger, dnsResolver: DnsRe
         logger
       });
       return new StakePoolHttpService({ logger, stakePoolProvider });
-    }),
+    }, ServiceNames.StakePool),
     [ServiceNames.Utxo]: withDb(
-      (db) =&gt; new UtxoHttpService({ logger, utxoProvider: new DbSyncUtxoProvider(db, logger) })
+      (db) =&gt; new UtxoHttpService({ logger, utxoProvider: new DbSyncUtxoProvider(db, logger) }),
+      ServiceNames.Utxo
     ),
     [ServiceNames.ChainHistory]: withDb(
       (db) =&gt;
         new ChainHistoryHttpService({
           chainHistoryProvider: new DbSyncChainHistoryProvider(db, createDbSyncMetadataService(db, logger), logger),
           logger
-        })
+        }),
+      ServiceNames.ChainHistory
     ),
     [ServiceNames.Rewards]: withDb(
-      (db) =&gt; new RewardsHttpService({ logger, rewardsProvider: new DbSyncRewardsProvider(db, logger) })
+      (db) =&gt; new RewardsHttpService({ logger, rewardsProvider: new DbSyncRewardsProvider(db, logger) }),
+      ServiceNames.Rewards
     ),
     [ServiceNames.NetworkInfo]: withDb(async (db) =&gt; {
       if (args.options?.cardanoNodeConfigPath === undefined)
@@ -532,7 +559,7 @@ const serviceMapFactory = (args: ProgramArgs, logger: Logger, dnsResolver: DnsRe
       );
 &nbsp;
       return new NetworkInfoHttpService({ logger, networkInfoProvider });
-    }),
+    }, ServiceNames.NetworkInfo),
     [ServiceNames.TxSubmit]: async () =&gt; {
       const txSubmitProvider = args.options?.useQueue
         ? await getRabbitMqTxSubmitProvider(dnsResolver, logger, args.options)
@@ -586,7 +613,7 @@ export const loadHttpServer = async (args: ProgramArgs): Promise&lt;HttpServer&g
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at Thu Aug 25 2022 11:10:48 GMT+0000 (Coordinated Universal Time)
+                at Mon Aug 29 2022 12:08:13 GMT+0000 (Coordinated Universal Time)
             </div>
         <script src="../../prettify.js"></script>
         <script>
