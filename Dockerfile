@@ -69,11 +69,11 @@ COPY packages/cardano-services/config/network/${NETWORK} /config/
 EXPOSE 3000
 HEALTHCHECK --interval=15s --timeout=15s \
   CMD curl --fail --silent http://0.0.0.0:3000/health | jq '.ok' | awk '{ if ($0 == "true") exit 0; else exit 1}'
-CMD ["node", "dist/cjs/run.js"]
+CMD ["node", "dist/cjs/cli.js", "start-server"]
 
 FROM cardano-services as worker
 ENV \
   OGMIOS_URL="ws://cardano-node-ogmios:1337" \
   RABBITMQ_URL='amqp://rabbitmq:5672'
 WORKDIR /app/packages/cardano-services
-CMD ["node", "dist/cjs/startWorker.js"]
+CMD ["node", "dist/cjs/cli.js", "start-worker"]

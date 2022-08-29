@@ -1,4 +1,9 @@
 #!/usr/bin/env node
+
+/* eslint-disable max-len */
+/* eslint-disable complexity */
+/* eslint-disable sonarjs/cognitive-complexity */
+/* eslint-disable unicorn/no-nested-ternary */
 import {
   API_URL_DEFAULT,
   HttpServerOptions,
@@ -8,9 +13,10 @@ import {
   SERVICE_DISCOVERY_BACKOFF_FACTOR_DEFAULT,
   SERVICE_DISCOVERY_TIMEOUT_DEFAULT,
   ServiceNames,
-  loadHttpServer
+  loadHttpServer,
+  loadSecret
 } from './Program';
-import { Command } from 'commander';
+import { Command, Option } from 'commander';
 import {
   CommonOptionDescriptions,
   ENABLE_METRICS_DEFAULT,
@@ -56,44 +62,70 @@ const stringToBoolean = (value: string, program: Programs, option: string) => {
   throw new WrongOption(program, option, ['false', 'true']);
 };
 
+const existingFileValidator = (filePath: string) => {
+  if (fs.existsSync(filePath)) {
+    return filePath;
+  }
+  throw new Error(`No file exists at ${filePath}`);
+};
+const getSecret = (secretFilePath?: string, secret?: string) =>
+  secretFilePath ? loadSecret(secretFilePath) : secret ? secret : undefined;
+
 const commonOptions = (command: Command) =>
   command
-    .option(
-      '--logger-min-severity <level>',
-      CommonOptionDescriptions.LoggerMinSeverity,
-      (level) => {
-        if (!loggerMethodNames.includes(level)) {
-          throw new InvalidLoggerLevel(level);
-        }
-        return level;
-      },
-      'info'
+    .addOption(
+      new Option('--logger-min-severity <level>', CommonOptionDescriptions.LoggerMinSeverity)
+        .env('LOGGER_MIN_SEVERITY')
+        .default('info')
+        .argParser((level) => {
+          if (!loggerMethodNames.includes(level)) {
+            throw new InvalidLoggerLevel(level);
+          }
+          return level;
+        })
     )
-    .option(
-      '--ogmios-url <ogmiosUrl>',
-      CommonOptionDescriptions.OgmiosUrl,
-      (url) => new URL(url),
-      new URL(OGMIOS_URL_DEFAULT)
+    .addOption(
+      new Option('--ogmios-srv-service-name <ogmiosSrvServiceName>', CommonOptionDescriptions.OgmiosSrvServiceName).env(
+        'OGMIOS_SRV_SERVICE_NAME'
+      )
     )
-    .option(
-      '--rabbitmq-url <rabbitMQUrl>',
-      CommonOptionDescriptions.RabbitMQUrl,
-      (url) => new URL(url),
-      new URL(RABBITMQ_URL_DEFAULT)
+    .addOption(
+      new Option('--ogmios-url <ogmiosUrl>', CommonOptionDescriptions.OgmiosUrl)
+        .env('OGMIOS_URL')
+        .default(new URL(OGMIOS_URL_DEFAULT))
+        .conflicts('ogmiosSrvServiceName')
+        .argParser((url) => new URL(url))
     )
-    .option('--ogmios-srv-service-name <ogmiosSrvServiceName>', ProgramOptionDescriptions.OgmiosSrvServiceName)
-    .option('--rabbitmq-srv-service-name <rabbitmqSrvServiceName>', ProgramOptionDescriptions.RabbitMQSrvServiceName)
-    .option(
-      '--service-discovery-backoff-factor <serviceDiscoveryBackoffFactor>',
-      ProgramOptionDescriptions.ServiceDiscoveryBackoffFactor,
-      (factor) => Number.parseFloat(factor),
-      SERVICE_DISCOVERY_BACKOFF_FACTOR_DEFAULT
+    .addOption(
+      new Option(
+        '--rabbitmq-srv-service-name <rabbitmqSrvServiceName>',
+        CommonOptionDescriptions.RabbitMQSrvServiceName
+      ).env('RABBITMQ_SRV_SERVICE_NAME')
     )
-    .option(
-      '--service-discovery-timeout <serviceDiscoveryTimeout>',
-      ProgramOptionDescriptions.ServiceDiscoveryTimeout,
-      (interval) => Number.parseInt(interval, 10),
-      SERVICE_DISCOVERY_TIMEOUT_DEFAULT
+    .addOption(
+      new Option('--rabbitmq-url <rabbitmqUrl>', CommonOptionDescriptions.RabbitMQUrl)
+        .env('RABBITMQ_URL')
+        .default(new URL(RABBITMQ_URL_DEFAULT))
+        .conflicts('rabbitmqSrvServiceName')
+        .argParser((url) => new URL(url))
+    )
+    .addOption(
+      new Option(
+        '--service-discovery-backoff-factor <serviceDiscoveryBackoffFactor>',
+        CommonOptionDescriptions.ServiceDiscoveryBackoffFactor
+      )
+        .env('SERVICE_DISCOVERY_BACKOFF_FACTOR')
+        .default(SERVICE_DISCOVERY_BACKOFF_FACTOR_DEFAULT)
+        .argParser((factor) => Number.parseFloat(factor))
+    )
+    .addOption(
+      new Option(
+        '--service-discovery-timeout <serviceDiscoveryTimeout>',
+        CommonOptionDescriptions.ServiceDiscoveryTimeout
+      )
+        .env('SERVICE_DISCOVERY_TIMEOUT')
+        .default(SERVICE_DISCOVERY_TIMEOUT_DEFAULT)
+        .argParser((interval) => Number.parseInt(interval, 10))
     );
 
 const program = new Command('cardano-services');
@@ -104,45 +136,141 @@ commonOptions(
   program
     .command('start-server')
     .description('Start the HTTP server')
-    .argument('<serviceNames...>', `List of services to attach: ${Object.values(ServiceNames).toString()}`)
+    .argument('[serviceNames...]', `List of services to attach: ${Object.values(ServiceNames).toString()}`)
 )
-  .option('--api-url <apiUrl>', ProgramOptionDescriptions.ApiUrl, (url) => new URL(url), new URL(API_URL_DEFAULT))
-  .option('--enable-metrics', ProgramOptionDescriptions.EnableMetrics, () => true, ENABLE_METRICS_DEFAULT)
-  .option(
-    '--postgres-connection-string <postgresConnectionString>',
-    ProgramOptionDescriptions.PostgresConnectionString,
-    (url) => new URL(url).toString()
+  .addOption(
+    new Option(
+      '--service-names <serviceNames>',
+      `List of services to attach: ${Object.values(ServiceNames).toString()}`
+    )
+      .env('SERVICE_NAMES')
+      .argParser((names) => names.split(',') as ServiceNames[])
   )
-  .option('--cardano-node-config-path <cardanoNodeConfigPath>', ProgramOptionDescriptions.CardanoNodeConfigPath)
-  .option('--db-cache-ttl <dbCacheTtl>', ProgramOptionDescriptions.DbCacheTtl, cacheTtlValidator, DB_CACHE_TTL_DEFAULT)
-  .option(
-    '--epoch-poll-interval <epochPollInterval>',
-    ProgramOptionDescriptions.EpochPollInterval,
-    (interval) => Number.parseInt(interval, 10),
-    EPOCH_POLL_INTERVAL_DEFAULT
+  .addOption(
+    new Option('--api-url <apiUrl>', ProgramOptionDescriptions.ApiUrl)
+      .env('API_URL')
+      .default(new URL(API_URL_DEFAULT))
+      .argParser((url) => new URL(url))
   )
-  .option(
-    '--token-metadata-cache-ttl <tokenMetadataCacheTTL>',
-    ProgramOptionDescriptions.TokenMetadataCacheTtl,
-    cacheTtlValidator,
-    DEFAULT_TOKEN_METADATA_CACHE_TTL
+  .addOption(
+    new Option('--enable-metrics', ProgramOptionDescriptions.EnableMetrics)
+      .env('ENABLE_METRICS')
+      .default(ENABLE_METRICS_DEFAULT)
   )
-  .option(
-    '--token-metadata-server-url <tokenMetadataServerUrl>',
-    ProgramOptionDescriptions.TokenMetadataServerUrl,
-    (url) => new URL(url).toString(),
-    DEFAULT_TOKEN_METADATA_SERVER_URL
+  .addOption(
+    new Option(
+      '--cardano-node-config-path <cardanoNodeConfigPath>',
+      ProgramOptionDescriptions.CardanoNodeConfigPath
+    ).env('CARDANO_NODE_CONFIG_PATH')
   )
-  .option('--use-queue', ProgramOptionDescriptions.UseQueue, () => true, USE_QUEUE_DEFAULT)
-  .option('--postgres-srv-service-name <postgresSrvServiceName>', ProgramOptionDescriptions.PostgresSrvServiceName)
-  .option('--postgres-db <postgresDb>', ProgramOptionDescriptions.PostgresDb)
-  .option('--postgres-user <postgresUser>', ProgramOptionDescriptions.PostgresUser)
-  .option('--postgres-password <postgresPassword>', ProgramOptionDescriptions.PostgresPassword)
-  .option('--postgres-ssl-ca-file <postgresSslCaFile>', ProgramOptionDescriptions.PostgresSslCaFile)
+  .addOption(
+    new Option(
+      '--postgres-connection-string <postgresConnectionString>',
+      ProgramOptionDescriptions.PostgresConnectionString
+    )
+      .env('POSTGRES_CONNECTION_STRING')
+      .conflicts('postgresSrvServiceName')
+      .conflicts('postgresDb')
+      .conflicts('postgresDbFile')
+      .conflicts('postgresUser')
+      .conflicts('postgresUserFile')
+      .conflicts('postgresPassword')
+      .conflicts('postgresPasswordFile')
+      .conflicts('postgresHost')
+      .conflicts('postgresPort')
+  )
+  .addOption(
+    new Option('--postgres-srv-service-name <postgresSrvServiceName>', ProgramOptionDescriptions.PostgresSrvServiceName)
+      .env('POSTGRES_SRV_SERVICE_NAME')
+      .conflicts('postgresHost')
+      .conflicts('postgresPort')
+  )
+  .addOption(
+    new Option('--postgres-db <postgresDb>', ProgramOptionDescriptions.PostgresDb)
+      .env('POSTGRES_DB')
+      .conflicts('postgresDbFile')
+  )
+  .addOption(
+    new Option('--postgres-db-file <postgresDbFile>', ProgramOptionDescriptions.PostgresDbFile)
+      .env('POSTGRES_DB_FILE')
+      .argParser(existingFileValidator)
+  )
+  .addOption(
+    new Option('--postgres-user <postgresUser>', ProgramOptionDescriptions.PostgresUser)
+      .env('POSTGRES_USER')
+      .conflicts('postgresUserFile')
+  )
+  .addOption(
+    new Option('--postgres-user-file <postgresUserFile>', ProgramOptionDescriptions.PostgresUserFile)
+      .env('POSTGRES_USER_FILE')
+      .argParser(existingFileValidator)
+  )
+  .addOption(
+    new Option('--postgres-password <postgresPassword>', ProgramOptionDescriptions.PostgresPassword)
+      .env('POSTGRES_PASSWORD')
+      .conflicts('postgresPasswordFile')
+  )
+  .addOption(
+    new Option('--postgres-password-file <postgresPasswordFile>', ProgramOptionDescriptions.PostgresPasswordFile)
+      .env('POSTGRES_PASSWORD_FILE')
+      .argParser(existingFileValidator)
+  )
+  .addOption(new Option('--postgres-host <postgresHost>', ProgramOptionDescriptions.PostgresHost).env('POSTGRES_HOST'))
+  .addOption(new Option('--postgres-port <postgresPort>', ProgramOptionDescriptions.PostgresPort).env('POSTGRES_PORT'))
+  .addOption(
+    new Option('--postgres-ssl-ca-file <postgresSslCaFile>', ProgramOptionDescriptions.PostgresSslCaFile).env(
+      'POSTGRES_SSL_CA_FILE'
+    )
+  )
+  .addOption(
+    new Option('--db-cache-ttl <dbCacheTtl>', ProgramOptionDescriptions.DbCacheTtl)
+      .env('DB_CACHE_TTL')
+      .default(DB_CACHE_TTL_DEFAULT)
+      .argParser(cacheTtlValidator)
+  )
+  .addOption(
+    new Option('--epoch-poll-interval <epochPollInterval>', ProgramOptionDescriptions.EpochPollInterval)
+      .env('EPOCH_POLL_INTERVAL')
+      .default(EPOCH_POLL_INTERVAL_DEFAULT)
+      .argParser((interval) => Number.parseInt(interval, 10))
+  )
+  .addOption(
+    new Option('--token-metadata-server-url <tokenMetadataServerUrl>', ProgramOptionDescriptions.TokenMetadataServerUrl)
+      .env('TOKEN_METADATA_SERVER_URL')
+      .default(DEFAULT_TOKEN_METADATA_SERVER_URL)
+      .argParser((url) => new URL(url).toString())
+  )
+  .addOption(
+    new Option('--token-metadata-cache-ttl <tokenMetadataCacheTTL>', ProgramOptionDescriptions.TokenMetadataCacheTtl)
+      .env('TOKEN_METADATA_CACHE_TTL')
+      .default(DEFAULT_TOKEN_METADATA_CACHE_TTL)
+      .argParser(cacheTtlValidator)
+  )
+  .addOption(new Option('--use-queue', ProgramOptionDescriptions.UseQueue).env('USE_QUEUE').default(USE_QUEUE_DEFAULT))
   .action(async (serviceNames: ServiceNames[], options: { apiUrl: URL } & HttpServerOptions) => {
     const { apiUrl, ...rest } = options;
+
+    const dbName = getSecret(rest.postgresDbFile, rest.postgresDb);
+    const dbUser = getSecret(rest.postgresUserFile, rest.postgresUser);
+    const dbPassword = getSecret(rest.postgresPasswordFile, rest.postgresPassword);
+
+    // Setting the connection string takes preference over secrets.
+    // It can also remain undefined since there is no a default value. Usually used locally with static config.
+    let postgresConnectionString;
+    if (rest.postgresConnectionString) {
+      postgresConnectionString = new URL(rest.postgresConnectionString).toString();
+    } else if (dbName && dbPassword && dbUser && rest.postgresHost && rest.postgresPort) {
+      postgresConnectionString = `postgresql://${dbUser}:${dbPassword}@${rest.postgresHost}:${rest.postgresPort}/${dbName}`;
+    }
+
+    // Setting the service names via env variable takes preference over command line argument
+    const services = rest.serviceNames ? rest.serviceNames : serviceNames;
     try {
-      const server = await loadHttpServer({ apiUrl: apiUrl || API_URL_DEFAULT, options: rest, serviceNames });
+      const server = await loadHttpServer({
+        apiUrl: apiUrl || API_URL_DEFAULT,
+        options: { ...rest, postgresConnectionString },
+        serviceNames: services
+      });
       await server.initialize();
       await server.start();
       onDeath(async () => {
@@ -157,23 +285,23 @@ commonOptions(
   });
 
 commonOptions(program.command('start-worker').description('Start RabbitMQ worker'))
-  .option(
-    '--parallel [parallel]',
-    TxWorkerOptionDescriptions.Parallel,
-    (parallel) => stringToBoolean(parallel, Programs.RabbitmqWorker, TxWorkerOptionDescriptions.Parallel),
-    PARALLEL_MODE_DEFAULT
+  .addOption(
+    new Option('--parallel [parallel]', TxWorkerOptionDescriptions.Parallel)
+      .env('PARALLEL')
+      .default(PARALLEL_MODE_DEFAULT)
+      .argParser((parallel) => stringToBoolean(parallel, Programs.RabbitmqWorker, TxWorkerOptionDescriptions.Parallel))
   )
-  .option(
-    '--parallel-txs <parallelTxs>',
-    TxWorkerOptionDescriptions.ParallelTxs,
-    (parallelTxs) => Number.parseInt(parallelTxs, 10),
-    PARALLEL_TXS_DEFAULT
+  .addOption(
+    new Option('--parallel-txs <parallelTxs>', TxWorkerOptionDescriptions.ParallelTxs)
+      .env('PARALLEL_TXS')
+      .default(PARALLEL_TXS_DEFAULT)
+      .argParser((parallelTxs) => Number.parseInt(parallelTxs, 10))
   )
-  .option(
-    '--polling-cycle <pollingCycle>',
-    TxWorkerOptionDescriptions.PollingCycle,
-    (pollingCycle) => Number.parseInt(pollingCycle, 10),
-    POLLING_CYCLE_DEFAULT
+  .addOption(
+    new Option('--polling-cycle <pollingCycle>', TxWorkerOptionDescriptions.PollingCycle)
+      .env('POLLING_CYCLE')
+      .default(POLLING_CYCLE_DEFAULT)
+      .argParser((pollingCycle) => Number.parseInt(pollingCycle, 10))
   )
   .action(async (options: TxWorkerOptions) => {
     // eslint-disable-next-line no-console

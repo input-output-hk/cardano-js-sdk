@@ -4,9 +4,7 @@
 import { ClientConfig, Pool, QueryConfig } from 'pg';
 import { DnsResolver } from '../utils';
 import { HttpServerOptions } from '../loadHttpServer';
-import { InvalidArgsCombination } from '../errors';
 import { Logger } from 'ts-log';
-import { ProgramOptionDescriptions } from '../ProgramOptionDescriptions';
 import { isConnectionError } from '@cardano-sdk/util';
 import fs from 'fs';
 
@@ -60,11 +58,6 @@ export const getPool = async (
   options?: HttpServerOptions
 ): Promise<Pool | undefined> => {
   const ssl = options?.postgresSslCaFile ? { ca: loadSecret(options.postgresSslCaFile) } : undefined;
-  if (options?.postgresConnectionString && options.postgresSrvServiceName)
-    throw new InvalidArgsCombination(
-      ProgramOptionDescriptions.PostgresConnectionString,
-      ProgramOptionDescriptions.PostgresServiceDiscoveryArgs
-    );
   if (options?.postgresConnectionString) return new Pool({ connectionString: options.postgresConnectionString, ssl });
   if (options?.postgresSrvServiceName && options.postgresUser && options.postgresDb && options.postgresPassword) {
     return getPoolWithServiceDiscovery(dnsResolver, logger, {

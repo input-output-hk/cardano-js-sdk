@@ -10,7 +10,7 @@ import { logger } from '@cardano-sdk/util-dev';
 import http from 'http';
 import path from 'path';
 
-const exePath = (name: 'cli' | 'startWorker') => path.join(__dirname, '..', 'dist', 'cjs', `${name}.js`);
+const exePath = (name: 'cli') => path.join(__dirname, '..', 'dist', 'cjs', `${name}.js`);
 
 describe('tx-worker entrypoints', () => {
   const container = new RabbitMQContainer();
@@ -20,9 +20,7 @@ describe('tx-worker entrypoints', () => {
   let commonEnv: Record<string, string>;
   let commonEnvWithServiceDiscovery: Record<string, string>;
   let hook: () => void;
-  let hookLogs: string[];
   let hookPromise: Promise<void>;
-  let loggerHookCounter: number;
   let ogmiosServer: http.Server;
   let proc: ChildProcess;
   let rabbitmqUrl: URL;
@@ -30,22 +28,6 @@ describe('tx-worker entrypoints', () => {
   let ogmiosSrvServiceName: string;
 
   const resetHook = () => (hook = jest.fn());
-
-  const loggerHook = (): [() => void, Promise<void>] => {
-    let resolver: () => void;
-
-    const promise = new Promise<void>((resolve) => (resolver = resolve));
-    const loggingHook = async () => {
-      const counter = ++loggerHookCounter;
-
-      hookLogs.push(`Processing tx ${counter}`);
-      await new Promise((resolve) => setTimeout(resolve, 100));
-      hookLogs.push(`Processed tx ${counter}`);
-      if (counter === 2) resolver();
-    };
-
-    return [loggingHook, promise];
-  };
 
   beforeAll(async () => {
     ({ rabbitmqUrl } = await container.load());
@@ -94,8 +76,6 @@ describe('tx-worker entrypoints', () => {
 
   beforeEach(async () => {
     await container.removeQueues();
-    hookLogs = [];
-    loggerHookCounter = 0;
   });
 
   afterEach((done) => {
@@ -106,42 +86,38 @@ describe('tx-worker entrypoints', () => {
 
   // Tests without any assertion fail if they get timeout
   // eslint-disable-next-line sonarjs/cognitive-complexity
-  describe('with a working RabbitMQ server', () => {
+  describe('cli:start-worker with a working RabbitMQ server', () => {
     describe('transaction are actually submitted', () => {
-      it('cli:start-worker submits transactions', async () => {
+      it('submits transactions using CLI options', async () => {
         hookPromise = new Promise((resolve) => (hook = resolve));
-        proc = fork(exePath('cli'), commonArgs, { stdio: 'pipe' });
+        proc = fork(exePath('cli'), commonArgs, { env: {}, stdio: 'pipe' });
         await Promise.all([hookPromise, container.enqueueTx(logger)]);
       });
 
-      it('startWorker submits transactions', async () => {
+      it('submits transactions using env variables', async () => {
         hookPromise = new Promise((resolve) => (hook = resolve));
-        proc = fork(exePath('startWorker'), { env: commonEnv, stdio: 'pipe' });
+        proc = fork(exePath('cli'), ['start-worker'], { env: commonEnv, stdio: 'pipe' });
         await Promise.all([hookPromise, container.enqueueTx(logger)]);
       });
     });
 
     describe('parallel option', () => {
       describe('without parallel option', () => {
-        it('cli:start-worker starts in serial mode', (done) => {
-          proc = fork(exePath('cli'), commonArgs, { stdio: 'pipe' });
+        it('starts in serial mode', (done) => {
+          proc = fork(exePath('cli'), commonArgs, { env: {}, stdio: 'pipe' });
           proc.stdout!.on('data', (data) => (data.toString().match('serial mode') ? done() : null));
         });
 
-        it('startWorker starts in serial mode', async () => {
-          [hook, hookPromise] = loggerHook();
-          proc = fork(exePath('startWorker'), { env: commonEnv, stdio: 'pipe' });
-          const txPromises = [container.enqueueTx(logger, 0), container.enqueueTx(logger, 1)];
-          await hookPromise;
-          await Promise.all(txPromises);
-          expect(hookLogs).toEqual(['Processing tx 1', 'Processed tx 1', 'Processing tx 2', 'Processed tx 2']);
+        it('starts in serial mode', (done) => {
+          proc = fork(exePath('cli'), ['start-worker'], { env: commonEnv, stdio: 'pipe' });
+          proc.stdout!.on('data', (data) => (data.toString().match('serial mode') ? done() : null));
         });
       });
 
       describe('with bad parallel option', () => {
-        it('cli:start-worker exits with code 1', (done) => {
+        it('exits with code 1 using CLI options', (done) => {
           expect.assertions(2);
-          proc = fork(exePath('cli'), [...commonArgs, '--parallel', 'test'], { stdio: 'pipe' });
+          proc = fork(exePath('cli'), [...commonArgs, '--parallel', 'test'], { env: {}, stdio: 'pipe' });
           proc.stderr!.on('data', (data) =>
             expect(data.toString()).toMatch('RabbitMQ worker requires a valid Parallel mode')
           );
@@ -151,9 +127,12 @@ describe('tx-worker entrypoints', () => {
           });
         });
 
-        it('startWorker exits with code 1', (done) => {
-          expect.assertions(1);
-          proc = fork(exePath('startWorker'), { env: { ...commonEnv, PARALLEL: 'test' }, stdio: 'pipe' });
+        it('exits with code 1 using env variables', (done) => {
+          expect.assertions(2);
+          proc = fork(exePath('cli'), ['start-worker'], { env: { ...commonEnv, PARALLEL: 'test' }, stdio: 'pipe' });
+          proc.stderr!.on('data', (data) =>
+            expect(data.toString()).toMatch('RabbitMQ worker requires a valid Parallel mode')
+          );
           proc.on('exit', (code) => {
             expect(code).toBe(1);
             done();
@@ -162,40 +141,32 @@ describe('tx-worker entrypoints', () => {
       });
 
       describe('with parallel option set to false', () => {
-        it('worker starts in serial mode', (done) => {
-          proc = fork(exePath('cli'), [...commonArgs, '--parallel', 'false'], { stdio: 'pipe' });
+        it('worker starts in serial mode using CLI options', (done) => {
+          proc = fork(exePath('cli'), [...commonArgs, '--parallel', 'false'], { env: {}, stdio: 'pipe' });
           proc.stdout!.on('data', (data) => (data.toString().match('serial mode') ? done() : null));
         });
 
-        it('startWorker starts in serial mode', async () => {
-          [hook, hookPromise] = loggerHook();
-          proc = fork(exePath('startWorker'), { env: { ...commonEnv, PARALLEL: 'false' }, stdio: 'pipe' });
-          const txPromises = [container.enqueueTx(logger, 0), container.enqueueTx(logger, 1)];
-          await hookPromise;
-          await Promise.all(txPromises);
-          expect(hookLogs).toEqual(['Processing tx 1', 'Processed tx 1', 'Processing tx 2', 'Processed tx 2']);
+        it('worker starts in serial mode using env variables', (done) => {
+          proc = fork(exePath('cli'), ['start-worker'], { env: { ...commonEnv, PARALLEL: 'false' }, stdio: 'pipe' });
+          proc.stdout!.on('data', (data) => (data.toString().match('serial mode') ? done() : null));
         });
       });
 
       describe('with parallel option set to true', () => {
-        it('worker starts in parallel mode', (done) => {
-          proc = fork(exePath('cli'), [...commonArgs, '--parallel', 'true'], { stdio: 'pipe' });
+        it('worker starts in parallel mode using CLI options', (done) => {
+          proc = fork(exePath('cli'), [...commonArgs, '--parallel', 'true'], { env: {}, stdio: 'pipe' });
           proc.stdout!.on('data', (data) => (data.toString().match('parallel mode') ? done() : null));
         });
 
-        it('startWorker starts in parallel mode', async () => {
-          [hook, hookPromise] = loggerHook();
-          proc = fork(exePath('startWorker'), { env: { ...commonEnv, PARALLEL: 'true' }, stdio: 'pipe' });
-          const txPromises = [container.enqueueTx(logger, 0), container.enqueueTx(logger, 1)];
-          await hookPromise;
-          await Promise.all(txPromises);
-          expect(hookLogs).toEqual(['Processing tx 1', 'Processing tx 2', 'Processed tx 1', 'Processed tx 2']);
+        it('worker starts in parallel mode using env variables', (done) => {
+          proc = fork(exePath('cli'), ['start-worker'], { env: { ...commonEnv, PARALLEL: 'true' }, stdio: 'pipe' });
+          proc.stdout!.on('data', (data) => (data.toString().match('parallel mode') ? done() : null));
         });
       });
 
       describe('default parallel option value', () => {
-        it('worker starts in parallel mode', (done) => {
-          proc = fork(exePath('cli'), [...commonArgs, '--parallel'], { stdio: 'pipe' });
+        it('worker starts in parallel mode using CLI options', (done) => {
+          proc = fork(exePath('cli'), [...commonArgs, '--parallel'], { env: {}, stdio: 'pipe' });
           proc.stdout!.on('data', (data) => (data.toString().match('parallel mode') ? done() : null));
         });
       });
@@ -203,9 +174,12 @@ describe('tx-worker entrypoints', () => {
   });
 
   describe('without a working RabbitMQ server handles a connection error event', () => {
-    it('cli:start-worker exits with code 1', (done) => {
+    it('exits with code 1 using CLI options', (done) => {
       expect.assertions(2);
-      proc = fork(exePath('cli'), [...commonArgs, '--rabbitmq-url', BAD_CONNECTION_URL.toString()], { stdio: 'pipe' });
+      proc = fork(exePath('cli'), [...commonArgs, '--rabbitmq-url', BAD_CONNECTION_URL.toString()], {
+        env: {},
+        stdio: 'pipe'
+      });
 
       proc.stderr!.on('data', (data) => {
         expect(data.toString()).toMatch('CONNECTION_FAILURE');
@@ -216,13 +190,16 @@ describe('tx-worker entrypoints', () => {
       });
     });
 
-    it('startWorker exits with code 1', (done) => {
+    it('exits with code 1 using env variables', (done) => {
       expect.assertions(2);
-      proc = fork(exePath('startWorker'), {
+      proc = fork(exePath('cli'), ['start-worker'], {
         env: { ...commonEnv, RABBITMQ_URL: BAD_CONNECTION_URL.toString() },
         stdio: 'pipe'
       });
-      proc.stderr!.on('data', (data) => expect(data.toString()).toMatch('CONNECTION_FAILURE'));
+
+      proc.stderr!.on('data', (data) => {
+        expect(data.toString()).toMatch('CONNECTION_FAILURE');
+      });
       proc.on('exit', (code) => {
         expect(code).toBe(1);
         done();
@@ -231,9 +208,9 @@ describe('tx-worker entrypoints', () => {
   });
 
   describe('with service discovery', () => {
-    it('cli:start-worker throws DNS SRV error and exits with code 1', (done) => {
+    it('throws DNS SRV error and exits with code 1 using CLI options', (done) => {
       expect.assertions(2);
-      proc = fork(exePath('cli'), commonArgsWithServiceDiscovery, { stdio: 'pipe' });
+      proc = fork(exePath('cli'), commonArgsWithServiceDiscovery, { env: {}, stdio: 'pipe' });
 
       proc.stderr!.on('data', (data) => {
         expect(data.toString().includes('querySrv ENOTFOUND')).toEqual(true);
@@ -245,12 +222,10 @@ describe('tx-worker entrypoints', () => {
       });
     });
 
-    it('startWorker throws DNS SRV error and exits with code 1', (done) => {
+    it('throws DNS SRV error and exits with code 1 using env variables', (done) => {
       expect.assertions(2);
-      proc = fork(exePath('startWorker'), {
-        env: commonEnvWithServiceDiscovery,
-        stdio: 'pipe'
-      });
+      proc = fork(exePath('cli'), ['start-worker'], { env: commonEnvWithServiceDiscovery, stdio: 'pipe' });
+
       proc.stderr!.on('data', (data) => {
         expect(data.toString().includes('querySrv ENOTFOUND')).toEqual(true);
       });
