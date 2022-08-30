@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.5.0-nightly.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.5.0-nightly.9...@cardano-sdk/wallet@0.5.0-nightly.10) (2022-08-25)
+## [0.5.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.4.0...@cardano-sdk/wallet@0.5.0) (2022-08-30)
 
 
 ### ⚠ BREAKING CHANGES
@@ -11,153 +11,51 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * rename InputSelectionParameters implicitCoin->implicitValue.coin
 * rm TxAlonzo.implicitCoin
 * removed Ogmios schema package dependency
-
-### Code Refactoring
-
-* removed Ogmios schema package dependency ([4ed2408](https://github.com/input-output-hk/cardano-js-sdk/commit/4ed24087aa5646c6f68ba31c42fc3f8a317df3b9))
-* rename InputSelectionParameters implicitCoin->implicitValue.coin ([3242a0d](https://github.com/input-output-hk/cardano-js-sdk/commit/3242a0dc63da0e59c4f8536d16758ea19f58a2c0))
-* rm TxAlonzo.implicitCoin ([167d205](https://github.com/input-output-hk/cardano-js-sdk/commit/167d205dd15c857b229f968ab53a6e52e5504d3f))
-
-
-
-## [0.5.0-nightly.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.5.0-nightly.8...@cardano-sdk/wallet@0.5.0-nightly.9) (2022-08-23)
-
-**Note:** Version bump only for package @cardano-sdk/wallet
-
-
-
-
-
-## [0.5.0-nightly.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.5.0-nightly.7...@cardano-sdk/wallet@0.5.0-nightly.8) (2022-08-22)
-
-
-### ⚠ BREAKING CHANGES
-
 * **wallet:** SingleAddressWallet debug logs
 * **wallet:** named instead of positional args for createAddressTransactionsProvider
-
-### Bug Fixes
-
-* **wallet:** create contextLogger with non-undefined 'name' ([7f07d35](https://github.com/input-output-hk/cardano-js-sdk/commit/7f07d3514ef4a7d9f74b2ead5a4ed6c9dc1e3724))
-* **wallet:** prevent rollback$ from being completed after the first round of rollbacks ([a6cacaa](https://github.com/input-output-hk/cardano-js-sdk/commit/a6cacaa24f2094dcc244072a6611bff2699d6c36))
-
-
-### Code Refactoring
-
-* **wallet:** named instead of positional args for createAddressTransactionsProvider ([3852644](https://github.com/input-output-hk/cardano-js-sdk/commit/3852644daf887098222aeafc2eaa373af83af81b))
-* **wallet:** SingleAddressWallet debug logs ([8f5cd0d](https://github.com/input-output-hk/cardano-js-sdk/commit/8f5cd0d24be34d89659a7745c4ef17489a4cbeb8))
-
-
-
-## [0.5.0-nightly.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.5.0-nightly.6...@cardano-sdk/wallet@0.5.0-nightly.7) (2022-08-10)
-
-
-### ⚠ BREAKING CHANGES
-
 * replace `NetworkInfoProvider.timeSettings` with `eraSummaries`
-
-### Features
-
-* replace `NetworkInfoProvider.timeSettings` with `eraSummaries` ([58f6fc7](https://github.com/input-output-hk/cardano-js-sdk/commit/58f6fc7c5ace703583c36f95d3d6962483ad924d))
-
-
-
-## [0.5.0-nightly.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.5.0-nightly.5...@cardano-sdk/wallet@0.5.0-nightly.6) (2022-08-08)
-
-
-### ⚠ BREAKING CHANGES
-
 * logger is now required
-
-### Bug Fixes
-
-* **wallet:** stop querying the `StakePoolProvider` for all pools when no delegation certs found ([336f597](https://github.com/input-output-hk/cardano-js-sdk/commit/336f59708234dbf00df41d79b5547765ab7ce894))
-
-
-### Code Refactoring
-
-* logger is now required ([cc82bc2](https://github.com/input-output-hk/cardano-js-sdk/commit/cc82bc27539e3ff07f7c2d5816fa7e70c32d06ac))
-
-
-
-## [0.5.0-nightly.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.5.0-nightly.4...@cardano-sdk/wallet@0.5.0-nightly.5) (2022-08-06)
-
-**Note:** Version bump only for package @cardano-sdk/wallet
-
-
-
-
-
-## [0.5.0-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.5.0-nightly.3...@cardano-sdk/wallet@0.5.0-nightly.4) (2022-08-05)
-
-
-### ⚠ BREAKING CHANGES
-
 * rename pouchdb->pouchDb
 * hoist stake$ and lovelaceSupply$ out of ObservableWallet
-
-### Code Refactoring
-
-* hoist stake$ and lovelaceSupply$ out of ObservableWallet ([3bf1720](https://github.com/input-output-hk/cardano-js-sdk/commit/3bf17200c8bae46b02817c16e5138d3678cfa3f5))
-* rename pouchdb->pouchDb ([c58ccf9](https://github.com/input-output-hk/cardano-js-sdk/commit/c58ccf9f7a8f701dce87e2f6ddc2f28c0aa68745))
-
-
-
-## [0.5.0-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.5.0-nightly.2...@cardano-sdk/wallet@0.5.0-nightly.3) (2022-08-04)
-
-
-### ⚠ BREAKING CHANGES
-
 *   - (web-extension) observableWalletProperties has new `transactions.rollback$` property
   - (wallet) createAddressTransactionsProvider returns an object with two observables
     `{rollback$, transactionsSource$}`, instead of only the transactionsSource$ observable
   - (wallet) TransactionsTracker interface contains new `rollback$` property
   - (wallet) TransactionsTracker interface `$confirmed` Observable emits `NewTxAlonzoWithSlot`
     object instead of NewTxAlonzo
-
-### Features
-
-* resubmit rollback transactions ([2a4ccb0](https://github.com/input-output-hk/cardano-js-sdk/commit/2a4ccb0abead34481e817f807850d29e77d7340a))
-
-
-
-## [0.5.0-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.5.0-nightly.1...@cardano-sdk/wallet@0.5.0-nightly.2) (2022-08-02)
-
-**Note:** Version bump only for package @cardano-sdk/wallet
-
-
-
-
-
-## [0.5.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.5.0-nightly.0...@cardano-sdk/wallet@0.5.0-nightly.1) (2022-07-30)
-
+* update min utxo computation to be Babbage-compatible
 
 ### Features
 
 * implement cip30 getCollateral ([878f021](https://github.com/input-output-hk/cardano-js-sdk/commit/878f021d3620a4842a1629b442ae12a2acd1bf94))
+* replace `NetworkInfoProvider.timeSettings` with `eraSummaries` ([58f6fc7](https://github.com/input-output-hk/cardano-js-sdk/commit/58f6fc7c5ace703583c36f95d3d6962483ad924d))
+* resubmit rollback transactions ([2a4ccb0](https://github.com/input-output-hk/cardano-js-sdk/commit/2a4ccb0abead34481e817f807850d29e77d7340a))
 
-
-### Bug Fixes
-
-* **wallet:** replace ApiError hardcoded numbers per APIErroCode enum ([9f5b2c2](https://github.com/input-output-hk/cardano-js-sdk/commit/9f5b2c2533bd1a3e41a9b4f891fab3729c54a7b7))
-
-
-
-## [0.5.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.4.0...@cardano-sdk/wallet@0.5.0-nightly.0) (2022-07-27)
-
-
-### ⚠ BREAKING CHANGES
-
-* update min utxo computation to be Babbage-compatible
 
 ### Bug Fixes
 
 * update min utxo computation to be Babbage-compatible ([51ca1d5](https://github.com/input-output-hk/cardano-js-sdk/commit/51ca1d5716b62b47d211475aba1be4a6d5782397))
+* **wallet:** create contextLogger with non-undefined 'name' ([7f07d35](https://github.com/input-output-hk/cardano-js-sdk/commit/7f07d3514ef4a7d9f74b2ead5a4ed6c9dc1e3724))
+* **wallet:** prevent rollback$ from being completed after the first round of rollbacks ([a6cacaa](https://github.com/input-output-hk/cardano-js-sdk/commit/a6cacaa24f2094dcc244072a6611bff2699d6c36))
+* **wallet:** replace ApiError hardcoded numbers per APIErroCode enum ([9f5b2c2](https://github.com/input-output-hk/cardano-js-sdk/commit/9f5b2c2533bd1a3e41a9b4f891fab3729c54a7b7))
+* **wallet:** stop querying the `StakePoolProvider` for all pools when no delegation certs found ([336f597](https://github.com/input-output-hk/cardano-js-sdk/commit/336f59708234dbf00df41d79b5547765ab7ce894))
 
 
 ### Performance Improvements
 
 * **wallet:** fetch time settings only when epoch changes (ADP-1682) ([8dc7aab](https://github.com/input-output-hk/cardano-js-sdk/commit/8dc7aab8b616f3b9f8f44283a00f77b1271c62f0))
+
+
+### Code Refactoring
+
+* hoist stake$ and lovelaceSupply$ out of ObservableWallet ([3bf1720](https://github.com/input-output-hk/cardano-js-sdk/commit/3bf17200c8bae46b02817c16e5138d3678cfa3f5))
+* logger is now required ([cc82bc2](https://github.com/input-output-hk/cardano-js-sdk/commit/cc82bc27539e3ff07f7c2d5816fa7e70c32d06ac))
+* removed Ogmios schema package dependency ([4ed2408](https://github.com/input-output-hk/cardano-js-sdk/commit/4ed24087aa5646c6f68ba31c42fc3f8a317df3b9))
+* rename InputSelectionParameters implicitCoin->implicitValue.coin ([3242a0d](https://github.com/input-output-hk/cardano-js-sdk/commit/3242a0dc63da0e59c4f8536d16758ea19f58a2c0))
+* rename pouchdb->pouchDb ([c58ccf9](https://github.com/input-output-hk/cardano-js-sdk/commit/c58ccf9f7a8f701dce87e2f6ddc2f28c0aa68745))
+* rm TxAlonzo.implicitCoin ([167d205](https://github.com/input-output-hk/cardano-js-sdk/commit/167d205dd15c857b229f968ab53a6e52e5504d3f))
+* **wallet:** named instead of positional args for createAddressTransactionsProvider ([3852644](https://github.com/input-output-hk/cardano-js-sdk/commit/3852644daf887098222aeafc2eaa373af83af81b))
+* **wallet:** SingleAddressWallet debug logs ([8f5cd0d](https://github.com/input-output-hk/cardano-js-sdk/commit/8f5cd0d24be34d89659a7745c4ef17489a4cbeb8))
 
 
 

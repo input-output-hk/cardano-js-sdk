@@ -3,84 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.5.0-nightly.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cip2@0.5.0-nightly.6...@cardano-sdk/cip2@0.5.0-nightly.7) (2022-08-25)
+## [0.5.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cip2@0.4.0...@cardano-sdk/cip2@0.5.0) (2022-08-30)
 
 
 ### ⚠ BREAKING CHANGES
 
 * rename InputSelectionParameters implicitCoin->implicitValue.coin
 * rm TxAlonzo.implicitCoin
+* update min utxo computation to be Babbage-compatible
 
 ### Features
 
 * **cip2:** add implicit tokens support (mint/burn) for input selection ([3361855](https://github.com/input-output-hk/cardano-js-sdk/commit/3361855a2fbf20afc8ead11565ac6759548ab13f))
 
 
+### Bug Fixes
+
+* update min utxo computation to be Babbage-compatible ([51ca1d5](https://github.com/input-output-hk/cardano-js-sdk/commit/51ca1d5716b62b47d211475aba1be4a6d5782397))
+
+
 ### Code Refactoring
 
 * rename InputSelectionParameters implicitCoin->implicitValue.coin ([3242a0d](https://github.com/input-output-hk/cardano-js-sdk/commit/3242a0dc63da0e59c4f8536d16758ea19f58a2c0))
 * rm TxAlonzo.implicitCoin ([167d205](https://github.com/input-output-hk/cardano-js-sdk/commit/167d205dd15c857b229f968ab53a6e52e5504d3f))
-
-
-
-## [0.5.0-nightly.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cip2@0.5.0-nightly.5...@cardano-sdk/cip2@0.5.0-nightly.6) (2022-08-23)
-
-**Note:** Version bump only for package @cardano-sdk/cip2
-
-
-
-
-
-## [0.5.0-nightly.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cip2@0.5.0-nightly.4...@cardano-sdk/cip2@0.5.0-nightly.5) (2022-08-22)
-
-**Note:** Version bump only for package @cardano-sdk/cip2
-
-
-
-
-
-## [0.5.0-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cip2@0.5.0-nightly.3...@cardano-sdk/cip2@0.5.0-nightly.4) (2022-08-10)
-
-**Note:** Version bump only for package @cardano-sdk/cip2
-
-
-
-
-
-## [0.5.0-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cip2@0.5.0-nightly.2...@cardano-sdk/cip2@0.5.0-nightly.3) (2022-08-08)
-
-**Note:** Version bump only for package @cardano-sdk/cip2
-
-
-
-
-
-## [0.5.0-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cip2@0.5.0-nightly.1...@cardano-sdk/cip2@0.5.0-nightly.2) (2022-08-06)
-
-**Note:** Version bump only for package @cardano-sdk/cip2
-
-
-
-
-
-## [0.5.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cip2@0.5.0-nightly.0...@cardano-sdk/cip2@0.5.0-nightly.1) (2022-08-02)
-
-**Note:** Version bump only for package @cardano-sdk/cip2
-
-
-
-
-
-## [0.5.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cip2@0.4.0...@cardano-sdk/cip2@0.5.0-nightly.0) (2022-07-27)
-
-
-### ⚠ BREAKING CHANGES
-
-* update min utxo computation to be Babbage-compatible
-
-### Bug Fixes
-
-* update min utxo computation to be Babbage-compatible ([51ca1d5](https://github.com/input-output-hk/cardano-js-sdk/commit/51ca1d5716b62b47d211475aba1be4a6d5782397))
 
 
 

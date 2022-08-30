@@ -3,31 +3,7 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.5.0-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.5.0-nightly.2...@cardano-sdk/cardano-services-client@0.5.0-nightly.3) (2022-08-25)
-
-**Note:** Version bump only for package @cardano-sdk/cardano-services-client
-
-
-
-
-
-## [0.5.0-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.5.0-nightly.1...@cardano-sdk/cardano-services-client@0.5.0-nightly.2) (2022-08-23)
-
-**Note:** Version bump only for package @cardano-sdk/cardano-services-client
-
-
-
-
-
-## [0.5.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.5.0-nightly.0...@cardano-sdk/cardano-services-client@0.5.0-nightly.1) (2022-08-22)
-
-**Note:** Version bump only for package @cardano-sdk/cardano-services-client
-
-
-
-
-
-## [0.5.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.4.1-nightly.4...@cardano-sdk/cardano-services-client@0.5.0-nightly.0) (2022-08-10)
+## [0.5.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.4.0...@cardano-sdk/cardano-services-client@0.5.0) (2022-08-30)
 
 
 ### ⚠ BREAKING CHANGES
@@ -36,49 +12,13 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Features
 
+* **cardano-services-client:** add asset info http provider ([866f3d5](https://github.com/input-output-hk/cardano-js-sdk/commit/866f3d5374e7572a966bff0a93a92ebf0412208c))
 * replace `NetworkInfoProvider.timeSettings` with `eraSummaries` ([58f6fc7](https://github.com/input-output-hk/cardano-js-sdk/commit/58f6fc7c5ace703583c36f95d3d6962483ad924d))
-
-
-
-## [0.4.1-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.4.1-nightly.3...@cardano-sdk/cardano-services-client@0.4.1-nightly.4) (2022-08-08)
-
-**Note:** Version bump only for package @cardano-sdk/cardano-services-client
-
-
-
-
-
-## [0.4.1-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.4.1-nightly.2...@cardano-sdk/cardano-services-client@0.4.1-nightly.3) (2022-08-06)
-
-**Note:** Version bump only for package @cardano-sdk/cardano-services-client
-
-
-
-
-
-## [0.4.1-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.4.1-nightly.1...@cardano-sdk/cardano-services-client@0.4.1-nightly.2) (2022-08-02)
-
-**Note:** Version bump only for package @cardano-sdk/cardano-services-client
-
-
-
-
-
-## [0.4.1-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.4.1-nightly.0...@cardano-sdk/cardano-services-client@0.4.1-nightly.1) (2022-07-28)
 
 
 ### Bug Fixes
 
 * **cardano-services-client:** added Axios adapter to allow patching the axios requests method ([166a273](https://github.com/input-output-hk/cardano-js-sdk/commit/166a273d378e321dd190d0bc4adb50d6f96bb389))
-
-
-
-## [0.4.1-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.4.0...@cardano-sdk/cardano-services-client@0.4.1-nightly.0) (2022-07-27)
-
-
-### Features
-
-* **cardano-services-client:** add asset info http provider ([866f3d5](https://github.com/input-output-hk/cardano-js-sdk/commit/866f3d5374e7572a966bff0a93a92ebf0412208c))
 
 
 

@@ -3,100 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.5.0-nightly.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.5.0-nightly.6...@cardano-sdk/core@0.5.0-nightly.7) (2022-08-25)
+## [0.5.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.4.0...@cardano-sdk/core@0.5.0) (2022-08-30)
 
 
 ### ⚠ BREAKING CHANGES
 
 * rm TxAlonzo.implicitCoin
 * removed Ogmios schema package dependency
-
-### Features
-
-* **core:** export cslUtil MIN_I64 and MAX_I64 consts ([618eef0](https://github.com/input-output-hk/cardano-js-sdk/commit/618eef04e7c9d2e27d2b0c5a9f1a172d340abde4))
-
-
-### Code Refactoring
-
-* removed Ogmios schema package dependency ([4ed2408](https://github.com/input-output-hk/cardano-js-sdk/commit/4ed24087aa5646c6f68ba31c42fc3f8a317df3b9))
-* rm TxAlonzo.implicitCoin ([167d205](https://github.com/input-output-hk/cardano-js-sdk/commit/167d205dd15c857b229f968ab53a6e52e5504d3f))
-
-
-
-## [0.5.0-nightly.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.5.0-nightly.5...@cardano-sdk/core@0.5.0-nightly.6) (2022-08-23)
-
-
-### Features
-
-* extend HealthCheckResponse ([2e6d0a3](https://github.com/input-output-hk/cardano-js-sdk/commit/2e6d0a3d2067ce8538886f1a9d0d55fab7647ae9))
-
-
-
-## [0.5.0-nightly.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.5.0-nightly.4...@cardano-sdk/core@0.5.0-nightly.5) (2022-08-22)
-
-
-### ⚠ BREAKING CHANGES
-
 * **core:** added native script type and serialization functions.
+* replace `NetworkInfoProvider.timeSettings` with `eraSummaries`
+* logger is now required
+* update min utxo computation to be Babbage-compatible
 
 ### Features
 
 * **core:** added native script type and serialization functions. ([51b46c8](https://github.com/input-output-hk/cardano-js-sdk/commit/51b46c83909ce0f978ea81d1542315eab707d511))
-
-
-
-## [0.5.0-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.5.0-nightly.3...@cardano-sdk/core@0.5.0-nightly.4) (2022-08-10)
-
-
-### ⚠ BREAKING CHANGES
-
-* replace `NetworkInfoProvider.timeSettings` with `eraSummaries`
-
-### Features
-
+* **core:** export cslUtil MIN_I64 and MAX_I64 consts ([618eef0](https://github.com/input-output-hk/cardano-js-sdk/commit/618eef04e7c9d2e27d2b0c5a9f1a172d340abde4))
+* extend HealthCheckResponse ([2e6d0a3](https://github.com/input-output-hk/cardano-js-sdk/commit/2e6d0a3d2067ce8538886f1a9d0d55fab7647ae9))
 * replace `NetworkInfoProvider.timeSettings` with `eraSummaries` ([58f6fc7](https://github.com/input-output-hk/cardano-js-sdk/commit/58f6fc7c5ace703583c36f95d3d6962483ad924d))
 
-
-
-## [0.5.0-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.5.0-nightly.2...@cardano-sdk/core@0.5.0-nightly.3) (2022-08-08)
-
-
-### ⚠ BREAKING CHANGES
-
-* logger is now required
-
-### Code Refactoring
-
-* logger is now required ([cc82bc2](https://github.com/input-output-hk/cardano-js-sdk/commit/cc82bc27539e3ff07f7c2d5816fa7e70c32d06ac))
-
-
-
-## [0.5.0-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.5.0-nightly.1...@cardano-sdk/core@0.5.0-nightly.2) (2022-08-06)
-
-**Note:** Version bump only for package @cardano-sdk/core
-
-
-
-
-
-## [0.5.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.5.0-nightly.0...@cardano-sdk/core@0.5.0-nightly.1) (2022-08-02)
-
-**Note:** Version bump only for package @cardano-sdk/core
-
-
-
-
-
-## [0.5.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.4.0...@cardano-sdk/core@0.5.0-nightly.0) (2022-07-27)
-
-
-### ⚠ BREAKING CHANGES
-
-* update min utxo computation to be Babbage-compatible
 
 ### Bug Fixes
 
 * update min utxo computation to be Babbage-compatible ([51ca1d5](https://github.com/input-output-hk/cardano-js-sdk/commit/51ca1d5716b62b47d211475aba1be4a6d5782397))
+
+
+### Code Refactoring
+
+* logger is now required ([cc82bc2](https://github.com/input-output-hk/cardano-js-sdk/commit/cc82bc27539e3ff07f7c2d5816fa7e70c32d06ac))
+* removed Ogmios schema package dependency ([4ed2408](https://github.com/input-output-hk/cardano-js-sdk/commit/4ed24087aa5646c6f68ba31c42fc3f8a317df3b9))
+* rm TxAlonzo.implicitCoin ([167d205](https://github.com/input-output-hk/cardano-js-sdk/commit/167d205dd15c857b229f968ab53a6e52e5504d3f))
 
 
 

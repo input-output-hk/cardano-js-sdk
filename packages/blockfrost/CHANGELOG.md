@@ -3,83 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.5.0-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/blockfrost@0.5.0-nightly.3...@cardano-sdk/blockfrost@0.5.0-nightly.4) (2022-08-25)
+## [0.5.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/blockfrost@0.4.0...@cardano-sdk/blockfrost@0.5.0) (2022-08-30)
 
 
 ### ⚠ BREAKING CHANGES
 
 * rm TxAlonzo.implicitCoin
-
-### Code Refactoring
-
-* rm TxAlonzo.implicitCoin ([167d205](https://github.com/input-output-hk/cardano-js-sdk/commit/167d205dd15c857b229f968ab53a6e52e5504d3f))
-
-
-
-## [0.5.0-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/blockfrost@0.5.0-nightly.2...@cardano-sdk/blockfrost@0.5.0-nightly.3) (2022-08-23)
-
-**Note:** Version bump only for package @cardano-sdk/blockfrost
-
-
-
-
-
-## [0.5.0-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/blockfrost@0.5.0-nightly.1...@cardano-sdk/blockfrost@0.5.0-nightly.2) (2022-08-22)
-
-**Note:** Version bump only for package @cardano-sdk/blockfrost
-
-
-
-
-
-## [0.5.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/blockfrost@0.5.0-nightly.0...@cardano-sdk/blockfrost@0.5.0-nightly.1) (2022-08-10)
-
-
-### ⚠ BREAKING CHANGES
-
 * replace `NetworkInfoProvider.timeSettings` with `eraSummaries`
+* logger is now required
 
 ### Features
 
 * replace `NetworkInfoProvider.timeSettings` with `eraSummaries` ([58f6fc7](https://github.com/input-output-hk/cardano-js-sdk/commit/58f6fc7c5ace703583c36f95d3d6962483ad924d))
 
 
+### Bug Fixes
 
-## [0.5.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/blockfrost@0.4.1-nightly.2...@cardano-sdk/blockfrost@0.5.0-nightly.0) (2022-08-08)
+* **blockfrost:** avoid  cip 25 mapping for AssetInfo.TokenMetadata ([9f7b914](https://github.com/input-output-hk/cardano-js-sdk/commit/9f7b9142feadc404d7ae39e3ebfd6ef1496f81ce))
 
-
-### ⚠ BREAKING CHANGES
-
-* logger is now required
 
 ### Code Refactoring
 
 * logger is now required ([cc82bc2](https://github.com/input-output-hk/cardano-js-sdk/commit/cc82bc27539e3ff07f7c2d5816fa7e70c32d06ac))
-
-
-
-## [0.4.1-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/blockfrost@0.4.1-nightly.1...@cardano-sdk/blockfrost@0.4.1-nightly.2) (2022-08-06)
-
-**Note:** Version bump only for package @cardano-sdk/blockfrost
-
-
-
-
-
-## [0.4.1-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/blockfrost@0.4.1-nightly.0...@cardano-sdk/blockfrost@0.4.1-nightly.1) (2022-08-02)
-
-**Note:** Version bump only for package @cardano-sdk/blockfrost
-
-
-
-
-
-## [0.4.1-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/blockfrost@0.4.0...@cardano-sdk/blockfrost@0.4.1-nightly.0) (2022-07-27)
-
-
-### Bug Fixes
-
-* **blockfrost:** avoid  cip 25 mapping for AssetInfo.TokenMetadata ([9f7b914](https://github.com/input-output-hk/cardano-js-sdk/commit/9f7b9142feadc404d7ae39e3ebfd6ef1496f81ce))
+* rm TxAlonzo.implicitCoin ([167d205](https://github.com/input-output-hk/cardano-js-sdk/commit/167d205dd15c857b229f968ab53a6e52e5504d3f))
 
 
 

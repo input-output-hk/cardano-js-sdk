@@ -3,163 +3,37 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.5.0-nightly.13](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.5.0-nightly.12...@cardano-sdk/cardano-services@0.5.0-nightly.13) (2022-08-28)
-
-**Note:** Version bump only for package @cardano-sdk/cardano-services
-
-
-
-
-
-## [0.5.0-nightly.12](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.5.0-nightly.11...@cardano-sdk/cardano-services@0.5.0-nightly.12) (2022-08-25)
+## [0.5.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.4.0...@cardano-sdk/cardano-services@0.5.0) (2022-08-30)
 
 
 ### ⚠ BREAKING CHANGES
 
+* consolidate cli & run entrypoints
 * rm TxAlonzo.implicitCoin
 * removed Ogmios schema package dependency
-
-### Code Refactoring
-
-* removed Ogmios schema package dependency ([4ed2408](https://github.com/input-output-hk/cardano-js-sdk/commit/4ed24087aa5646c6f68ba31c42fc3f8a317df3b9))
-* rm TxAlonzo.implicitCoin ([167d205](https://github.com/input-output-hk/cardano-js-sdk/commit/167d205dd15c857b229f968ab53a6e52e5504d3f))
-
-
-
-## [0.5.0-nightly.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.5.0-nightly.10...@cardano-sdk/cardano-services@0.5.0-nightly.11) (2022-08-23)
-
-
-### Features
-
-* **cardano-services:** root health check endpoint ([aff7c6a](https://github.com/input-output-hk/cardano-js-sdk/commit/aff7c6a2b277d24c067e9cec1a14ffd35e8afb17))
-
-
-
-## [0.5.0-nightly.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.5.0-nightly.9...@cardano-sdk/cardano-services@0.5.0-nightly.10) (2022-08-22)
-
-
-### Features
-
-* **cardano-services:** cache stake pool queries ([3b65972](https://github.com/input-output-hk/cardano-js-sdk/commit/3b65972b74d410312005c9c60d1b48c269b81aaa))
-
-
-### Bug Fixes
-
-* **cardano-services:** initialize CardanoNode ([3c3a5ee](https://github.com/input-output-hk/cardano-js-sdk/commit/3c3a5ee9e6d7068981ed35fcf892992f215473b9))
-
-
-
-## [0.5.0-nightly.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.5.0-nightly.8...@cardano-sdk/cardano-services@0.5.0-nightly.9) (2022-08-10)
-
-
-### ⚠ BREAKING CHANGES
-
 * replace `NetworkInfoProvider.timeSettings` with `eraSummaries`
-
-### Features
-
-* replace `NetworkInfoProvider.timeSettings` with `eraSummaries` ([58f6fc7](https://github.com/input-output-hk/cardano-js-sdk/commit/58f6fc7c5ace703583c36f95d3d6962483ad924d))
-
-
-
-## [0.5.0-nightly.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.5.0-nightly.7...@cardano-sdk/cardano-services@0.5.0-nightly.8) (2022-08-10)
-
-**Note:** Version bump only for package @cardano-sdk/cardano-services
-
-
-
-
-
-## [0.5.0-nightly.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.5.0-nightly.6...@cardano-sdk/cardano-services@0.5.0-nightly.7) (2022-08-08)
-
-
-### ⚠ BREAKING CHANGES
-
 * logger is now required
-
-### Code Refactoring
-
-* logger is now required ([cc82bc2](https://github.com/input-output-hk/cardano-js-sdk/commit/cc82bc27539e3ff07f7c2d5816fa7e70c32d06ac))
-
-
-
-## [0.5.0-nightly.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.5.0-nightly.5...@cardano-sdk/cardano-services@0.5.0-nightly.6) (2022-08-06)
-
-
-### ⚠ BREAKING CHANGES
-
 * contextLogger support
-
-### Code Refactoring
-
-* contextLogger support ([6d5da8e](https://github.com/input-output-hk/cardano-js-sdk/commit/6d5da8ec8bba2033ce378d2f0d9321fd758e7c90))
-
-
-
-## [0.5.0-nightly.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.5.0-nightly.4...@cardano-sdk/cardano-services@0.5.0-nightly.5) (2022-08-05)
-
-
-### Bug Fixes
-
-* **cardano-services:** fixed a division by 0 on APY calculation if epoch lenght is less than 1 day ([bb041cf](https://github.com/input-output-hk/cardano-js-sdk/commit/bb041cf9f36b3eefc38859a1260c9baf585593aa))
-
-
-
-## [0.5.0-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.5.0-nightly.3...@cardano-sdk/cardano-services@0.5.0-nightly.4) (2022-08-04)
-
-**Note:** Version bump only for package @cardano-sdk/cardano-services
-
-
-
-
-
-## [0.5.0-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.5.0-nightly.2...@cardano-sdk/cardano-services@0.5.0-nightly.3) (2022-08-02)
-
-
-### Features
-
-* ogmios cardano node DNS resolution ([d132c9f](https://github.com/input-output-hk/cardano-js-sdk/commit/d132c9f52485086a5cf797217d48c816ae51d2b3))
-
-
-### Bug Fixes
-
-* **cardano-services:**  empty array and default condition for  identifier filters - search stakePool ([43b8481](https://github.com/input-output-hk/cardano-js-sdk/commit/43b848141d66680001f7cf8efc56d14784077de7))
-
-
-
-## [0.5.0-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.5.0-nightly.1...@cardano-sdk/cardano-services@0.5.0-nightly.2) (2022-07-29)
-
-
-### Features
-
-* **cardano-services:** add support for secure db connection ([380a633](https://github.com/input-output-hk/cardano-js-sdk/commit/380a6338db024a8dd7ca960fb93ec4da7d3769b5))
-
-
-
-## [0.5.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.5.0-nightly.0...@cardano-sdk/cardano-services@0.5.0-nightly.1) (2022-07-28)
-
-**Note:** Version bump only for package @cardano-sdk/cardano-services
-
-
-
-
-
-## [0.5.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.4.0...@cardano-sdk/cardano-services@0.5.0-nightly.0) (2022-07-27)
-
-
-### ⚠ BREAKING CHANGES
-
 * **cardano-services:** make interface properties name more specific
 
 ### Features
 
 * **cardano-services:** add db-sync asset http service ([fb254e5](https://github.com/input-output-hk/cardano-js-sdk/commit/fb254e5e8d6058f891cefb479456558fb3835dd0))
 * **cardano-services:** add db-sync asset provider ([9763c59](https://github.com/input-output-hk/cardano-js-sdk/commit/9763c598ef5f1b3c95672424fb57647784024298))
+* **cardano-services:** add support for secure db connection ([380a633](https://github.com/input-output-hk/cardano-js-sdk/commit/380a6338db024a8dd7ca960fb93ec4da7d3769b5))
+* **cardano-services:** cache stake pool queries ([3b65972](https://github.com/input-output-hk/cardano-js-sdk/commit/3b65972b74d410312005c9c60d1b48c269b81aaa))
+* **cardano-services:** root health check endpoint ([aff7c6a](https://github.com/input-output-hk/cardano-js-sdk/commit/aff7c6a2b277d24c067e9cec1a14ffd35e8afb17))
+* **cardano-services:** uniform ttl parameter of in memory cache methods to be expressed in seconds ([670d0c1](https://github.com/input-output-hk/cardano-js-sdk/commit/670d0c12589a4385b72c445e5f332e195f3b8000))
 * implement tx submit worker error handling ([55bc023](https://github.com/input-output-hk/cardano-js-sdk/commit/55bc023a255a27ecdcf19ee6a2e92cc37b0f3801))
+* ogmios cardano node DNS resolution ([d132c9f](https://github.com/input-output-hk/cardano-js-sdk/commit/d132c9f52485086a5cf797217d48c816ae51d2b3))
+* replace `NetworkInfoProvider.timeSettings` with `eraSummaries` ([58f6fc7](https://github.com/input-output-hk/cardano-js-sdk/commit/58f6fc7c5ace703583c36f95d3d6962483ad924d))
 
 
 ### Bug Fixes
 
+* **cardano-services:**  empty array and default condition for  identifier filters - search stakePool ([43b8481](https://github.com/input-output-hk/cardano-js-sdk/commit/43b848141d66680001f7cf8efc56d14784077de7))
+* **cardano-services:** fixed a division by 0 on APY calculation if epoch lenght is less than 1 day ([bb041cf](https://github.com/input-output-hk/cardano-js-sdk/commit/bb041cf9f36b3eefc38859a1260c9baf585593aa))
+* **cardano-services:** initialize CardanoNode ([3c3a5ee](https://github.com/input-output-hk/cardano-js-sdk/commit/3c3a5ee9e6d7068981ed35fcf892992f215473b9))
 * **cardano-services:** make HTTP services depend on provider interfaces, rather than classes ([1fef381](https://github.com/input-output-hk/cardano-js-sdk/commit/1fef3819d159e92af6d691d89b0e90a73d9f66ca))
 * malformed string and add missing service to Docker defaults ([b40edf6](https://github.com/input-output-hk/cardano-js-sdk/commit/b40edf6f2aec7d654206725e38c88ab1f60d8222))
 
@@ -172,6 +46,11 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 ### Code Refactoring
 
 * **cardano-services:** make interface properties name more specific ([854408d](https://github.com/input-output-hk/cardano-js-sdk/commit/854408dbf6cf5e7c80280ab104826d8309c801fa))
+* consolidate cli & run entrypoints ([1452bfb](https://github.com/input-output-hk/cardano-js-sdk/commit/1452bfb4935129a37dbd83680d623dca081f3948))
+* contextLogger support ([6d5da8e](https://github.com/input-output-hk/cardano-js-sdk/commit/6d5da8ec8bba2033ce378d2f0d9321fd758e7c90))
+* logger is now required ([cc82bc2](https://github.com/input-output-hk/cardano-js-sdk/commit/cc82bc27539e3ff07f7c2d5816fa7e70c32d06ac))
+* removed Ogmios schema package dependency ([4ed2408](https://github.com/input-output-hk/cardano-js-sdk/commit/4ed24087aa5646c6f68ba31c42fc3f8a317df3b9))
+* rm TxAlonzo.implicitCoin ([167d205](https://github.com/input-output-hk/cardano-js-sdk/commit/167d205dd15c857b229f968ab53a6e52e5504d3f))
 
 
 

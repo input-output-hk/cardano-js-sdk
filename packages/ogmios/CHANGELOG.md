@@ -3,79 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.5.0-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.5.0-nightly.3...@cardano-sdk/ogmios@0.5.0-nightly.4) (2022-08-25)
-
-**Note:** Version bump only for package @cardano-sdk/ogmios
-
-
-
-
-
-## [0.5.0-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.5.0-nightly.2...@cardano-sdk/ogmios@0.5.0-nightly.3) (2022-08-23)
-
-
-### Features
-
-* extend HealthCheckResponse ([2e6d0a3](https://github.com/input-output-hk/cardano-js-sdk/commit/2e6d0a3d2067ce8538886f1a9d0d55fab7647ae9))
-
-
-
-## [0.5.0-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.5.0-nightly.1...@cardano-sdk/ogmios@0.5.0-nightly.2) (2022-08-22)
-
-**Note:** Version bump only for package @cardano-sdk/ogmios
-
-
-
-
-
-## [0.5.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.5.0-nightly.0...@cardano-sdk/ogmios@0.5.0-nightly.1) (2022-08-10)
+## [0.5.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.4.0...@cardano-sdk/ogmios@0.5.0) (2022-08-30)
 
 
 ### ⚠ BREAKING CHANGES
 
 * replace `NetworkInfoProvider.timeSettings` with `eraSummaries`
+* logger is now required
 
 ### Features
 
+* extend HealthCheckResponse ([2e6d0a3](https://github.com/input-output-hk/cardano-js-sdk/commit/2e6d0a3d2067ce8538886f1a9d0d55fab7647ae9))
+* ogmios cardano node DNS resolution ([d132c9f](https://github.com/input-output-hk/cardano-js-sdk/commit/d132c9f52485086a5cf797217d48c816ae51d2b3))
 * replace `NetworkInfoProvider.timeSettings` with `eraSummaries` ([58f6fc7](https://github.com/input-output-hk/cardano-js-sdk/commit/58f6fc7c5ace703583c36f95d3d6962483ad924d))
 
-
-
-## [0.5.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.4.1-nightly.2...@cardano-sdk/ogmios@0.5.0-nightly.0) (2022-08-08)
-
-
-### ⚠ BREAKING CHANGES
-
-* logger is now required
 
 ### Code Refactoring
 
 * logger is now required ([cc82bc2](https://github.com/input-output-hk/cardano-js-sdk/commit/cc82bc27539e3ff07f7c2d5816fa7e70c32d06ac))
-
-
-
-## [0.4.1-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.4.1-nightly.1...@cardano-sdk/ogmios@0.4.1-nightly.2) (2022-08-06)
-
-**Note:** Version bump only for package @cardano-sdk/ogmios
-
-
-
-
-
-## [0.4.1-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.4.1-nightly.0...@cardano-sdk/ogmios@0.4.1-nightly.1) (2022-08-02)
-
-
-### Features
-
-* ogmios cardano node DNS resolution ([d132c9f](https://github.com/input-output-hk/cardano-js-sdk/commit/d132c9f52485086a5cf797217d48c816ae51d2b3))
-
-
-
-## [0.4.1-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.4.0...@cardano-sdk/ogmios@0.4.1-nightly.0) (2022-07-27)
-
-**Note:** Version bump only for package @cardano-sdk/ogmios
-
-
 
 
 

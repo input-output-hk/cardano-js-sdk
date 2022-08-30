@@ -7,17 +7,22 @@ export class InMemoryCache {
   #cache: NodeCache;
   #ttlDefault: number;
 
-  constructor(cacheTtlInMins: number, cache: NodeCache = new NodeCache()) {
-    this.#ttlDefault = cacheTtlInMins * 60;
+  /**
+   *
+   * @param ttl The default time to live in seconds
+   * @param cache The cache engine. It must extend NodeCache
+   */
+  constructor(ttl: number, cache: NodeCache = new NodeCache()) {
+    this.#ttlDefault = ttl;
     this.#cache = cache;
   }
 
   /**
    * Get a cached key value, if not found execute db query and cache the result with that key
    *
-   * @param key cache key
-   * @param asyncAction async function to get the value
-   * @param ttl cache duration in seconds
+   * @param key Cache key
+   * @param asyncAction Async function to get the value
+   * @param ttl The time to live in seconds
    * @returns The value stored with the key
    */
   public async get<T>(key: Key, asyncAction: AsyncAction<T>, ttl = this.#ttlDefault): Promise<T> {
@@ -38,7 +43,7 @@ export class InMemoryCache {
   /**
    * Get a cached key
    *
-   * @param key cache key
+   * @param key Cache key
    * @returns The value stored in the key
    */
   public getVal<T>(key: Key) {
@@ -50,7 +55,8 @@ export class InMemoryCache {
    *
    * @param key Cache key
    * @param value A value to cache
-   * @param ttl The time to live in seconds.
+   * @param ttl The time to live in seconds
+   * @returns The success state of the operation
    */
   public set<T>(key: Key, value: T, ttl = this.#ttlDefault) {
     return this.#cache.set<T>(key, value, ttl);
