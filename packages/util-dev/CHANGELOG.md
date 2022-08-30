@@ -1,3 +1,22 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [0.4.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.4.0...@cardano-sdk/util-dev@0.4.1) (2022-08-30)
+
+
+### Features
+
+* **util-dev:** add test logger object ([d0453e3](https://github.com/input-output-hk/cardano-js-sdk/commit/d0453e30ac1381f98295394453c038e881ba77a9))
+
+
+### Bug Fixes
+
+* **util-dev:** rm TestLogger dependency on 'stream' for browser compat ([297a27e](https://github.com/input-output-hk/cardano-js-sdk/commit/297a27e089dff5a8dd0dfa33835d4982db370801))
+
+
+
 ## [0.4.0](https://github.com/input-output-hk/cardano-js-sdk/compare/0.3.0...@cardano-sdk/util-dev@0.4.0) (2022-07-25)
 
 ## 0.3.0 (2022-06-24)
@@ -43,4 +62,3 @@
 * **util-dev:** add flushPromises util ([19eb508](https://github.com/input-output-hk/cardano-js-sdk/commit/19eb508af9c5364f9db604cfe4705857cd62f720))
 
 ### 0.1.3 (2021-10-05)
-

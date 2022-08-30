@@ -1,3 +1,46 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [0.5.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.4.0...@cardano-sdk/web-extension@0.5.0) (2022-08-30)
+
+
+### ⚠ BREAKING CHANGES
+
+* replace `NetworkInfoProvider.timeSettings` with `eraSummaries`
+* logger is now required
+* hoist stake$ and lovelaceSupply$ out of ObservableWallet
+*   - (web-extension) observableWalletProperties has new `transactions.rollback$` property
+  - (wallet) createAddressTransactionsProvider returns an object with two observables
+    `{rollback$, transactionsSource$}`, instead of only the transactionsSource$ observable
+  - (wallet) TransactionsTracker interface contains new `rollback$` property
+  - (wallet) TransactionsTracker interface `$confirmed` Observable emits `NewTxAlonzoWithSlot`
+    object instead of NewTxAlonzo
+* update min utxo computation to be Babbage-compatible
+
+### Features
+
+* replace `NetworkInfoProvider.timeSettings` with `eraSummaries` ([58f6fc7](https://github.com/input-output-hk/cardano-js-sdk/commit/58f6fc7c5ace703583c36f95d3d6962483ad924d))
+* resubmit rollback transactions ([2a4ccb0](https://github.com/input-output-hk/cardano-js-sdk/commit/2a4ccb0abead34481e817f807850d29e77d7340a))
+* **web-extension:** add utils to expose/consume NetworkInfoStatsTracker ([1598969](https://github.com/input-output-hk/cardano-js-sdk/commit/159896957899d4182b0892b93f4389ed2fc064c3))
+* **web-extension:** slightly improve messengers log output ([baf7499](https://github.com/input-output-hk/cardano-js-sdk/commit/baf7499c485818c6a3c7affbf97270d7840e2372))
+
+
+### Bug Fixes
+
+* update min utxo computation to be Babbage-compatible ([51ca1d5](https://github.com/input-output-hk/cardano-js-sdk/commit/51ca1d5716b62b47d211475aba1be4a6d5782397))
+* **web-extension:** do not re-emit all messages upon new port connection ([4b56cab](https://github.com/input-output-hk/cardano-js-sdk/commit/4b56cab7379f359b2d6dce41ff9533fdabdad4c4))
+* **web-extension:** use ReplaySubject as a workaround to postMessage/subscribe race ([ed294af](https://github.com/input-output-hk/cardano-js-sdk/commit/ed294af6a6e7283bf9271c5bdef8b591e12658be))
+
+
+### Code Refactoring
+
+* hoist stake$ and lovelaceSupply$ out of ObservableWallet ([3bf1720](https://github.com/input-output-hk/cardano-js-sdk/commit/3bf17200c8bae46b02817c16e5138d3678cfa3f5))
+* logger is now required ([cc82bc2](https://github.com/input-output-hk/cardano-js-sdk/commit/cc82bc27539e3ff07f7c2d5816fa7e70c32d06ac))
+
+
+
 ## [0.4.0](https://github.com/input-output-hk/cardano-js-sdk/compare/0.3.0...@cardano-sdk/web-extension@0.4.0) (2022-07-25)
 
 
@@ -64,4 +107,3 @@
 * rm cip30 dependency on web-extension ([77f8642](https://github.com/input-output-hk/cardano-js-sdk/commit/77f8642ebaac3b2615d082184d22a96f4cf86d42))
 * rm ObservableWallet.networkId (to be resolved via networkInfo$) ([72be7d7](https://github.com/input-output-hk/cardano-js-sdk/commit/72be7d7fc9dfd1bd12593ab572d9b6734d789822))
 * **web-extension:** rename RemoteApiProperty.Observable->HotObservable ([4bc9922](https://github.com/input-output-hk/cardano-js-sdk/commit/4bc99224d3cdcadc90729eecd8cb9ea2d6227438))
-

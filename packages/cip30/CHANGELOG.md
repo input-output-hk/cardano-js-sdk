@@ -1,3 +1,26 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [0.5.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cip30@0.4.0...@cardano-sdk/cip30@0.5.0) (2022-08-30)
+
+
+### ⚠ BREAKING CHANGES
+
+* logger is now required
+
+### Features
+
+* implement cip30 getCollateral ([878f021](https://github.com/input-output-hk/cardano-js-sdk/commit/878f021d3620a4842a1629b442ae12a2acd1bf94))
+
+
+### Code Refactoring
+
+* logger is now required ([cc82bc2](https://github.com/input-output-hk/cardano-js-sdk/commit/cc82bc27539e3ff07f7c2d5816fa7e70c32d06ac))
+
+
+
 ## [0.4.0](https://github.com/input-output-hk/cardano-js-sdk/compare/0.3.0...@cardano-sdk/cip30@0.4.0) (2022-07-25)
 
 ## 0.3.0 (2022-06-24)
@@ -65,4 +88,3 @@
 ### Bug Fixes
 
 * add missing yarn script, and rename ([840135f](https://github.com/input-output-hk/cardano-js-sdk/commit/840135f7d100c9a00ff410147758ee7d02112897))
-
