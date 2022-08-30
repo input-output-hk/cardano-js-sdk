@@ -1811,18 +1811,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cardano-sdk/cip2@npm:0.4.0":
-  version: 0.4.0
-  resolution: "@cardano-sdk/cip2@npm:0.4.0"
-  dependencies:
-    "@cardano-sdk/core": 0.4.0
-    "@cardano-sdk/util": 0.4.0
-    lodash: ^4.17.21
-    ts-custom-error: ^3.2.0
-  checksum: 3f2a55b7ee18df798e166d2cb15b725aaaae9432a1d019c625c6dc0a9e5b91eca884e04257e0d063bbe3af5117bfd6aaf0d94d65bd4cb057becb4ba710921330
-  languageName: node
-  linkType: hard
-
 "@cardano-sdk/cip30@^0.5.0, @cardano-sdk/cip30@workspace:packages/cip30":
   version: 0.0.0-use.local
   resolution: "@cardano-sdk/cip30@workspace:packages/cip30"
@@ -1844,18 +1832,6 @@ __metadata:
     webextension-polyfill: ^0.8.0
   languageName: unknown
   linkType: soft
-
-"@cardano-sdk/cip30@npm:0.4.0":
-  version: 0.4.0
-  resolution: "@cardano-sdk/cip30@npm:0.4.0"
-  dependencies:
-    "@cardano-sdk/core": 0.4.0
-    ts-custom-error: ^3.2.0
-    ts-log: ^2.2.3
-    webextension-polyfill: ^0.8.0
-  checksum: 2dcd8c78b4a8c16229250f265ee587ce240820ef83f8aa3cdd867583f19d1e284ed0c2bbb81c518b0b3e45d748dbe7899c4a39ba8fd9b22cce28b89a7569c743
-  languageName: node
-  linkType: hard
 
 "@cardano-sdk/core@^0.5.0, @cardano-sdk/core@workspace:packages/core":
   version: 0.0.0-use.local
@@ -1913,7 +1889,7 @@ __metadata:
     "@cardano-sdk/util": ^0.5.0
     "@cardano-sdk/util-dev": ^0.4.1
     "@cardano-sdk/util-rxjs": ^0.4.1
-    "@cardano-sdk/wallet": 0.4.0
+    "@cardano-sdk/wallet": ^0.5.0
     "@cardano-sdk/web-extension": ^0.5.0
     "@emurgo/cardano-message-signing-asmjs": ^1.0.1
     "@emurgo/cardano-serialization-lib-asmjs": 11.0.0-rc.6
@@ -2093,15 +2069,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cardano-sdk/util-rxjs@npm:0.4.0":
-  version: 0.4.0
-  resolution: "@cardano-sdk/util-rxjs@npm:0.4.0"
-  dependencies:
-    rxjs: ^7.4.0
-  checksum: 7456205dcec7c4fe799c16445d81f040aae15fa46706d0ffe5d4560ec93e680a098b4e75d103220a2ae4e623c019bcc84e5f831048e62f95c5309492d0035cb5
-  languageName: node
-  linkType: hard
-
 "@cardano-sdk/util@^0.5.0, @cardano-sdk/util@workspace:packages/util":
   version: 0.0.0-use.local
   resolution: "@cardano-sdk/util@workspace:packages/util"
@@ -2180,37 +2147,6 @@ __metadata:
     webextension-polyfill: ^0.9.0
   languageName: unknown
   linkType: soft
-
-"@cardano-sdk/wallet@npm:0.4.0":
-  version: 0.4.0
-  resolution: "@cardano-sdk/wallet@npm:0.4.0"
-  dependencies:
-    "@cardano-foundation/ledgerjs-hw-app-cardano": 5.0.0
-    "@cardano-sdk/cip2": 0.4.0
-    "@cardano-sdk/cip30": 0.4.0
-    "@cardano-sdk/core": 0.4.0
-    "@cardano-sdk/util": 0.4.0
-    "@cardano-sdk/util-rxjs": 0.4.0
-    "@emurgo/cardano-message-signing-nodejs": ^1.0.1
-    "@ledgerhq/hw-transport-node-hid-noevents": 6.27.1
-    "@ledgerhq/hw-transport-webhid": 6.27.1
-    backoff-rxjs: ^6.5.7
-    bip39: ^3.0.4
-    blake2b: ^2.1.4
-    chacha: ^2.1.0
-    delay: ^5.0.0
-    emittery: ^0.10.0
-    get-random-values: ^1.2.2
-    lodash: ^4.17.21
-    pbkdf2: ^3.1.2
-    pouchdb: ^7.2.2
-    rxjs: ^7.4.0
-    trezor-connect: 8.2.8-extended
-    ts-custom-error: ^3.2.0
-    ts-log: ^2.2.3
-  checksum: 2f1cd80e51a4a67e812e70c72133c1d6cb94dcb6b576c4124b00c4fafcb95eeb946651499d970554ca168db306717b29b649e0ae674dfe5c348c00b9fd71fda6
-  languageName: node
-  linkType: hard
 
 "@cardano-sdk/web-extension@^0.5.0, @cardano-sdk/web-extension@workspace:packages/web-extension":
   version: 0.0.0-use.local
@@ -7074,15 +7010,6 @@ __metadata:
   peerDependencies:
     "@babel/core": ^7.0.0
   checksum: 8248a4a5ca4242cc06ad13b10b9183ad2664da8fb0da060c352223dcf286f0ce9c708fa17901dc44ecabec25e6d309e5e5b9830a61dd777c3925f187a345a47d
-  languageName: node
-  linkType: hard
-
-"backoff-rxjs@npm:^6.5.7":
-  version: 6.5.7
-  resolution: "backoff-rxjs@npm:6.5.7"
-  peerDependencies:
-    rxjs: ^6.5.5
-  checksum: b38dac48dc30fafabe1e3fa076acb99c2ced52e80df31450c735a701090b63006247eb7a409a861a0b6d5908c57784920aa459b4bd4af9a64a75746ae9c2520a
   languageName: node
   linkType: hard
 
@@ -16532,7 +16459,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pouchdb@npm:^7.2.2, pouchdb@npm:^7.3.0":
+"pouchdb@npm:^7.3.0":
   version: 7.3.0
   resolution: "pouchdb@npm:7.3.0"
   dependencies:
