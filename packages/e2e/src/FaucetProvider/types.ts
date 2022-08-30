@@ -1,6 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import { Cardano, HealthCheckResponse, Provider } from '../../../core';
+import { Cardano, HealthCheckResponse, Provider } from '@cardano-sdk/core';
 
 /**
  * Faucet request transaction status.

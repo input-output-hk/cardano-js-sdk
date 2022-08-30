@@ -8,11 +8,13 @@
       "includeMergedTags": true,
       "noCommitHooks": true,
       "yes": true,
+      "private": false,
       "conventionalCommits": true
     },
     "publish": {
       "includeMergedTags": true,
       "noCommitHooks": true,
+      "private": false,
       "yes": true,
       "conventionalCommits": true
     }
