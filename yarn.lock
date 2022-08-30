@@ -1713,7 +1713,7 @@ __metadata:
   dependencies:
     "@cardano-sdk/core": ^0.5.0
     "@cardano-sdk/util": ^0.5.0
-    "@cardano-sdk/util-dev": 0.4.0
+    "@cardano-sdk/util-dev": ^0.4.1
     "@types/node": 14.18.12
     "@types/validator": ^13.7.1
     axios: ^0.27.2
@@ -1855,21 +1855,6 @@ __metadata:
     typescript: ^4.7.4
   languageName: unknown
   linkType: soft
-
-"@cardano-sdk/core@npm:0.4.0":
-  version: 0.4.0
-  resolution: "@cardano-sdk/core@npm:0.4.0"
-  dependencies:
-    "@cardano-ogmios/client": 5.5.2
-    "@cardano-ogmios/schema": 5.5.2
-    "@cardano-sdk/util": 0.4.0
-    "@emurgo/cardano-serialization-lib-browser": 9.1.0
-    "@emurgo/cardano-serialization-lib-nodejs": 9.1.0
-    bech32: ^2.0.0
-    lodash: ^4.17.21
-  checksum: a3724eaa3a04788d05b211e62607f750ef5be7e50c29cf9ff0a0c1d3acba0509c11175049332b7f7b4af0dc5aa3bdce1a5326866e119df687c3437de491fefa2
-  languageName: node
-  linkType: hard
 
 "@cardano-sdk/e2e@workspace:packages/e2e":
   version: 0.0.0-use.local
@@ -2043,17 +2028,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cardano-sdk/util-dev@npm:0.4.0":
-  version: 0.4.0
-  resolution: "@cardano-sdk/util-dev@npm:0.4.0"
-  dependencies:
-    "@cardano-sdk/core": 0.4.0
-    delay: ^5.0.0
-    rxjs: ^7.4.0
-  checksum: 816d6387d02262cbc11d61f38da52939454d5afdd5423b7800c3745fd4481a61b38f40b966f7ef4b4fe779aef0582703fd6ca0d5779f0e48a05af6a4e6f365d2
-  languageName: node
-  linkType: hard
-
 "@cardano-sdk/util-rxjs@^0.4.1, @cardano-sdk/util-rxjs@workspace:packages/util-rxjs":
   version: 0.0.0-use.local
   resolution: "@cardano-sdk/util-rxjs@workspace:packages/util-rxjs"
@@ -2086,16 +2060,6 @@ __metadata:
     typescript: ^4.7.4
   languageName: unknown
   linkType: soft
-
-"@cardano-sdk/util@npm:0.4.0":
-  version: 0.4.0
-  resolution: "@cardano-sdk/util@npm:0.4.0"
-  dependencies:
-    lodash: ^4.17.21
-    serialize-error: ^8
-  checksum: 43b7e2d2480bb397043c08ea986c8cdc1820f47ae62289a88d7a929cb6844b4fa30cd1dabe1e3fef63b02194ae21ee2ca6e0c56995db64d6d7fc86325c97a859
-  languageName: node
-  linkType: hard
 
 "@cardano-sdk/wallet@^0.5.0, @cardano-sdk/wallet@workspace:packages/wallet":
   version: 0.0.0-use.local
@@ -2420,24 +2384,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@emurgo/cardano-serialization-lib-browser@npm:9.1.0":
-  version: 9.1.0
-  resolution: "@emurgo/cardano-serialization-lib-browser@npm:9.1.0"
-  checksum: 1d2f4123ee1ece220688546fb6a6ac5790d148cab23ed2408ba3cbf31729caffd087d76508386e2b95fd4a549b70fb5ef21658526526d699a048d5bb709db048
-  languageName: node
-  linkType: hard
-
 "@emurgo/cardano-serialization-lib-nodejs@npm:11.0.0-rc.6":
   version: 11.0.0-rc.6
   resolution: "@emurgo/cardano-serialization-lib-nodejs@npm:11.0.0-rc.6"
   checksum: 16f1fda7896b9a26a0a450db0e121b99ec7a61c65d8ade998d9082a5aeb0517fb12dade2439321659b62ffe87d15796eee1654080336a5bda79537d623007ab6
-  languageName: node
-  linkType: hard
-
-"@emurgo/cardano-serialization-lib-nodejs@npm:9.1.0":
-  version: 9.1.0
-  resolution: "@emurgo/cardano-serialization-lib-nodejs@npm:9.1.0"
-  checksum: 7381557b65ed2b6b471b0eed3639d11b69f11f18c74565d11c9cc9b6dc9c4c4a7033fa79f83bc6463f8b5150e01c1f60447ba7a9d9da247099c4ece67d55177b
   languageName: node
   linkType: hard
 
