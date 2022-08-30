@@ -4,13 +4,14 @@ import { env } from '../environment';
 import { filter, firstValueFrom, map } from 'rxjs';
 import { getWallet } from '../../../src/factories';
 import { isNotNil } from '@cardano-sdk/util';
+import { logger } from '@cardano-sdk/util-dev';
 
 describe('SingleAddressWallet/metadata', () => {
   let wallet: SingleAddressWallet;
   let ownAddress: Cardano.Address;
 
   beforeAll(async () => {
-    wallet = (await getWallet({ env, name: 'Test Wallet' })).wallet;
+    wallet = (await getWallet({ env, logger, name: 'Test Wallet' })).wallet;
     ownAddress = (await firstValueFrom(wallet.addresses$))[0].address;
   });
 

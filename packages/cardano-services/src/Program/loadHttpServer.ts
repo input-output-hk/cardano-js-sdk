@@ -22,19 +22,25 @@ import memoize from 'lodash/memoize';
 import pg from 'pg';
 
 export interface HttpServerOptions extends CommonProgramOptions {
-  postgresConnectionString?: string;
-  epochPollInterval: number;
+  serviceNames?: ServiceNames[];
+  enableMetrics?: boolean;
   cardanoNodeConfigPath?: string;
   tokenMetadataCacheTTL?: number;
   tokenMetadataServerUrl?: string;
-  enableMetrics?: boolean;
-  useQueue?: boolean;
+  postgresConnectionString?: string;
   postgresSrvServiceName?: string;
   postgresDb?: string;
+  postgresDbFile?: string;
   postgresUser?: string;
+  postgresUserFile?: string;
   postgresPassword?: string;
+  postgresPasswordFile?: string;
+  postgresHost?: string;
+  postgresPort?: string;
   postgresSslCaFile?: string;
+  epochPollInterval: number;
   dbCacheTtl: number;
+  useQueue?: boolean;
 }
 
 export interface ProgramArgs {
@@ -57,10 +63,10 @@ export interface ProgramArgs {
 
 const serviceMapFactory = (args: ProgramArgs, logger: Logger, dnsResolver: DnsResolver, dbConnection?: pg.Pool) => {
   const withDb =
-    <T>(factory: (db: pg.Pool) => T) =>
+    <T>(factory: (db: pg.Pool) => T, serviceName: ServiceNames) =>
     () => {
       if (!dbConnection)
-        throw new MissingProgramOption(ServiceNames.StakePool, [
+        throw new MissingProgramOption(serviceName, [
           ProgramOptionDescriptions.PostgresConnectionString,
           ProgramOptionDescriptions.PostgresServiceDiscoveryArgs
         ]);
@@ -81,7 +87,7 @@ const serviceMapFactory = (args: ProgramArgs, logger: Logger, dnsResolver: DnsRe
       const assetProvider = new DbSyncAssetProvider({ db, logger, ntfMetadataService, tokenMetadataService });
 
       return new AssetHttpService({ assetProvider, logger });
-    }),
+    }, ServiceNames.Asset),
     [ServiceNames.StakePool]: withDb((db) => {
       const stakePoolProvider = new DbSyncStakePoolProvider({
         cache: new InMemoryCache(args.options!.dbCacheTtl!),
@@ -90,19 +96,22 @@ const serviceMapFactory = (args: ProgramArgs, logger: Logger, dnsResolver: DnsRe
         logger
       });
       return new StakePoolHttpService({ logger, stakePoolProvider });
-    }),
+    }, ServiceNames.StakePool),
     [ServiceNames.Utxo]: withDb(
-      (db) => new UtxoHttpService({ logger, utxoProvider: new DbSyncUtxoProvider(db, logger) })
+      (db) => new UtxoHttpService({ logger, utxoProvider: new DbSyncUtxoProvider(db, logger) }),
+      ServiceNames.Utxo
     ),
     [ServiceNames.ChainHistory]: withDb(
       (db) =>
         new ChainHistoryHttpService({
           chainHistoryProvider: new DbSyncChainHistoryProvider(db, createDbSyncMetadataService(db, logger), logger),
           logger
-        })
+        }),
+      ServiceNames.ChainHistory
     ),
     [ServiceNames.Rewards]: withDb(
-      (db) => new RewardsHttpService({ logger, rewardsProvider: new DbSyncRewardsProvider(db, logger) })
+      (db) => new RewardsHttpService({ logger, rewardsProvider: new DbSyncRewardsProvider(db, logger) }),
+      ServiceNames.Rewards
     ),
     [ServiceNames.NetworkInfo]: withDb(async (db) => {
       if (args.options?.cardanoNodeConfigPath === undefined)
@@ -123,7 +132,7 @@ const serviceMapFactory = (args: ProgramArgs, logger: Logger, dnsResolver: DnsRe
       );
 
       return new NetworkInfoHttpService({ logger, networkInfoProvider });
-    }),
+    }, ServiceNames.NetworkInfo),
     [ServiceNames.TxSubmit]: async () => {
       const txSubmitProvider = args.options?.useQueue
         ? await getRabbitMqTxSubmitProvider(dnsResolver, logger, args.options)

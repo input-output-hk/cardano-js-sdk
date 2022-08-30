@@ -4,7 +4,6 @@ import { DB_CACHE_TTL_DEFAULT } from '../../src/InMemoryCache';
 import { EPOCH_POLL_INTERVAL_DEFAULT, listenPromise, serverClosePromise } from '../../src/util';
 import {
   HttpServer,
-  InvalidArgsCombination,
   MissingProgramOption,
   ProgramOptionDescriptions,
   SERVICE_DISCOVERY_BACKOFF_FACTOR_DEFAULT,
@@ -163,29 +162,6 @@ describe('loadHttpServer', () => {
             ProgramOptionDescriptions.PostgresConnectionString,
             ProgramOptionDescriptions.PostgresServiceDiscoveryArgs
           ])
-        );
-      });
-
-      it('throws if a service is nominated with providing both db connection string and service discovery args at same time', async () => {
-        await expect(
-          async () =>
-            await loadHttpServer({
-              apiUrl,
-              options: {
-                dbCacheTtl,
-                epochPollInterval,
-                postgresConnectionString,
-                postgresSrvServiceName,
-                serviceDiscoveryBackoffFactor,
-                serviceDiscoveryTimeout
-              },
-              serviceNames: [ServiceNames.StakePool]
-            })
-        ).rejects.toThrow(
-          new InvalidArgsCombination(
-            ProgramOptionDescriptions.PostgresConnectionString,
-            ProgramOptionDescriptions.PostgresServiceDiscoveryArgs
-          )
         );
       });
     });

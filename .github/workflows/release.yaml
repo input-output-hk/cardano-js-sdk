@@ -1,0 +1,56 @@
+name: release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  publish:
+    strategy:
+      matrix:
+        os: [ ubuntu-20.04 ]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v2.3.3
+      with:
+        # Fetch all history for all tags and branches
+        fetch-depth: 0
+        ref: master
+        submodules: true
+
+    - name: 🧰 Setup Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: 14.17
+        registry-url: 'https://registry.npmjs.org'
+
+    - name: Install dependencies & git config
+      run: |
+        # git user config to make commits
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+        # Create a local 'nightly' branch tracking origin/nightly
+        git fetch origin nightly:nightly
+        # Delete tags of the private 'e2e' package - seems like a lerna bug as it's
+        # trying to create the same tag again when doing --conventional-graduate
+        git tag | grep e2e | xargs -L1 git push --delete origin
+        # Install dependencies and put yarn-project.nix to staging if it has any changes
+        yarn install --immutable --inline-builds --mode=skip-build
+        git checkout yarn-project.nix
+
+    - name: Publish
+      run: |
+        # Base on nightly branch versions
+        git merge --squash nightly
+        # Omit nighly release CHANGELOG changes
+        git checkout HEAD packages/*/CHANGELOG.md
+        # Publish
+        yarn publish:release --loglevel silly
+        # Merge package.json/yarn.lock/CHANGELOG back to nightly
+        git checkout nightly
+        git merge --no-edit -s recursive -X theirs master
+        git push
+      env:
+        YARN_ENABLE_IMMUTABLE_INSTALLS: false
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_REGISTRY_TOKEN }}
+        GH_TOKEN: ${{ github.token }}
