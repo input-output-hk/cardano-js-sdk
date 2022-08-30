@@ -25,9 +25,8 @@ import {
   StakePoolResults,
   StakePoolStatsModel
 } from './types';
-import { bufferToHexString } from '../../util';
+import { bufferToHexString, isNotNil } from '@cardano-sdk/util';
 import { divideBigIntToFloat } from './util';
-import { isNotNil } from '@cardano-sdk/util';
 import Fraction from 'fraction.js';
 
 const getPoolStatus = (

@@ -3,7 +3,7 @@ import { Cardano } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
 import { MetadataService, TxMetadataModel } from './types';
 import { Pool, QueryResult } from 'pg';
-import { hexStringToBuffer } from '../util';
+import { hexStringToBuffer } from '@cardano-sdk/util';
 import { mapTxMetadata } from './mappers';
 
 export const createDbSyncMetadataService = (db: Pool, logger: Logger): MetadataService => ({
