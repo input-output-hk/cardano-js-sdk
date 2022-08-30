@@ -182,7 +182,7 @@ describe('CardanoTokenRegistry', () => {
     beforeAll(async () => {
       ({ closeMock, tokenMetadataServerUrl } = await mockTokenRegistry(() => ({})));
       tokenRegistry = new CardanoTokenRegistry(
-        { cache: new TestInMemoryCache(1), logger: dummyLogger },
+        { cache: new TestInMemoryCache(60), logger: dummyLogger },
         { tokenMetadataServerUrl }
       );
     });
