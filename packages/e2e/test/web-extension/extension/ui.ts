@@ -203,20 +203,24 @@ const createWallet = async (accountIndex: number) => {
 
   // setupWallet call is required to provide context (InputResolver) to the key agent
   const { keyAgent } = await setupWallet({
-    bip32Ed25519: await bip32Ed25519Factory.create(env.KEY_MANAGEMENT_PARAMS.bip32Ed25519, null, logger),
-    createKeyAgent: async (dependencies) =>
-      (
-        await keyManagementFactory.create(
-          env.KEY_MANAGEMENT_PROVIDER,
+    createKeyAgent: async (dependencies) => {
+      const deviceConnection = await KeyManagement.LedgerKeyAgent.establishDeviceConnection(
+        KeyManagement.CommunicationType.Web
+      );
+      return KeyManagement.util.createAsyncKeyAgent(
+        await KeyManagement.LedgerKeyAgent.createWithDevice(
           {
-            ...env.KEY_MANAGEMENT_PARAMS,
-            accountIndex
+            accountIndex: 0,
+            communicationType: KeyManagement.CommunicationType.Web,
+            deviceConnection,
+            networkId: 0,
+            protocolMagic: 764_824_073
           },
           logger
         )
-      )(dependencies),
-    createWallet: async () => wallet,
-    logger
+      );
+    },
+    createWallet: async () => wallet
   });
 
   await walletManager.destroy();
