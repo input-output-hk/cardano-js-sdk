@@ -57,7 +57,6 @@ ENV \
   API_URL="http://0.0.0.0:3000" \
   CARDANO_NODE_CONFIG_PATH=/config/cardano-node/config.json \
   NETWORK=${NETWORK} \
-  OGMIOS_URL="ws://cardano-node-ogmios:1337" \
   POSTGRES_DB_FILE=/run/secrets/postgres_db \
   POSTGRES_HOST=postgres \
   POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password \
@@ -72,8 +71,5 @@ HEALTHCHECK --interval=15s --timeout=15s \
 CMD ["node", "dist/cjs/cli.js", "start-server"]
 
 FROM cardano-services as worker
-ENV \
-  OGMIOS_URL="ws://cardano-node-ogmios:1337" \
-  RABBITMQ_URL='amqp://rabbitmq:5672'
 WORKDIR /app/packages/cardano-services
 CMD ["node", "dist/cjs/cli.js", "start-worker"]
