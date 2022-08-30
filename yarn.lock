@@ -1841,6 +1841,7 @@ __metadata:
     "@cardano-sdk/util": ^0.5.0
     "@emurgo/cardano-serialization-lib-browser": 11.0.0-rc.6
     "@emurgo/cardano-serialization-lib-nodejs": 11.0.0-rc.6
+    "@emurgo/cip14-js": ^3.0.1
     "@types/lodash": ^4.14.182
     "@types/node": 14.18.12
     bech32: ^2.0.0
@@ -2412,6 +2413,16 @@ __metadata:
     bech32: 2.0.0
     blake2b: 2.1.3
   checksum: 1b07171cd238f4888db422f219ef35e5b1433bda77e2fc80eaf56b8e05b54785308504a6709f2f00f0de2db7c4741f15d44e71ff9e070e95a72787c622a5c184
+  languageName: node
+  linkType: hard
+
+"@emurgo/cip14-js@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "@emurgo/cip14-js@npm:3.0.1"
+  dependencies:
+    bech32: 2.0.0
+    blake2b: 2.1.3
+  checksum: 9eaf3124108e8c252a745de9ef1f334ab26a32271077b00fe0ea2a06e40838dd435165dac523ebd4d851ae7a94d8c56766dabc372aabffedd36551c798c607c5
   languageName: node
   linkType: hard
 

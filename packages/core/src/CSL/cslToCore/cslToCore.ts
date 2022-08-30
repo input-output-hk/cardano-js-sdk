@@ -203,7 +203,7 @@ export const txWitnessSet = (witnessSet: CSL.TransactionWitnessSet): Cardano.Wit
   };
 };
 
-const txMetadatum = (transactionMetadatum: CSL.TransactionMetadatum): Cardano.Metadatum => {
+export const txMetadatum = (transactionMetadatum: CSL.TransactionMetadatum): Cardano.Metadatum => {
   switch (transactionMetadatum.kind()) {
     case CSL.TransactionMetadatumKind.Bytes:
       return transactionMetadatum.as_bytes();

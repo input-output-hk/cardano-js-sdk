@@ -1,3 +1,4 @@
+import * as cip14 from '@emurgo/cip14-js';
 import { Hash28ByteBase16, OpaqueString, assertIsHexString, typedBech32 } from '../util';
 import { InvalidStringError } from '../..';
 
@@ -14,7 +15,7 @@ export const AssetName = (value: string): AssetName => {
       throw new InvalidStringError('too long');
     }
   }
-  return value as unknown as AssetName;
+  return value.toLowerCase() as unknown as AssetName;
 };
 
 /**
@@ -40,3 +41,19 @@ export const PolicyId = (value: string): PolicyId => Hash28ByteBase16(value);
  */
 export type AssetFingerprint = OpaqueString<'AssetFingerprint'>;
 export const AssetFingerprint = (value: string): AssetFingerprint => typedBech32(value, 'asset', 32);
+
+/**
+ * Gets the native asset fingerprint from its policy id and asset name.
+ * See CIP-0014
+ *
+ * @param policyId The native asset policy id.
+ * @param assetName The native asset name.
+ */
+AssetFingerprint.fromParts = (policyId: PolicyId, assetName: AssetName): AssetFingerprint => {
+  const cip14Fingerprint = cip14.default.fromParts(
+    Buffer.from(policyId.toString(), 'hex'),
+    Buffer.from(assetName.toString(), 'hex')
+  );
+
+  return AssetFingerprint(cip14Fingerprint.fingerprint());
+};

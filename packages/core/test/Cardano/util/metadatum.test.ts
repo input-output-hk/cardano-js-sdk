@@ -24,4 +24,38 @@ describe('Cardano.util.metadatum', () => {
       expect(Cardano.util.metadatum.asMetadatumArray(metadatum)).toBeNull();
     });
   });
+
+  describe('jsonToMetadatum', () => {
+    it('returns the json object from a metadatum object', () => {
+      const json = {
+        field1: '1',
+        field2: '2',
+        field3: '3'
+      };
+      const metadatum: Cardano.Metadatum = new Map([
+        ['field1', '1'],
+        ['field2', '2'],
+        ['field3', '3']
+      ]);
+
+      expect(Cardano.util.metadatum.jsonToMetadatum(json)).toMatchObject(metadatum);
+    });
+  });
+
+  describe('metadatumToJson', () => {
+    it('returns the metadatum object from a json object', () => {
+      const json = {
+        field1: '1',
+        field2: '2',
+        field3: '3'
+      };
+      const metadatum: Cardano.Metadatum = new Map([
+        ['field1', '1'],
+        ['field2', '2'],
+        ['field3', '3']
+      ]);
+
+      expect(Cardano.util.metadatum.metadatumToJson(metadatum)).toMatchObject(json);
+    });
+  });
 });
