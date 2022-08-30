@@ -1,4 +1,4 @@
-import { Asset, Cardano, ProviderError } from '@cardano-sdk/core';
+import { Cardano, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { CardanoTokenRegistry, toCoreTokenMetadata } from '../../src/Asset';
 import { InMemoryCache, Key } from '../../src/InMemoryCache';
 import { IncomingMessage, createServer } from 'http';
@@ -135,11 +135,11 @@ describe('CardanoTokenRegistry', () => {
     });
 
     it('returns metadata when subject exists', async () => {
-      const [metadata] = await tokenRegistry.getTokenMetadata([validAssetId]);
+      const metadata = await tokenRegistry.getTokenMetadata([validAssetId]);
 
-      expect(metadata).not.toBeNull();
+      expect(metadata![0]).not.toBeNull();
 
-      const result: Asset.TokenMetadata = {
+      const result = {
         decimals: 8,
         desc: 'SingularityNET',
         icon: 'testLogo',
@@ -148,17 +148,17 @@ describe('CardanoTokenRegistry', () => {
         url: 'https://singularitynet.io/'
       };
 
-      expect(metadata).toEqual(result);
+      expect(metadata![0]).toEqual(result);
     });
 
     it('correctly returns null or metadata for request with good and bad assetIds', async () => {
       const firstResult = await tokenRegistry.getTokenMetadata([invalidAssetId, validAssetId]);
       const secondResult = await tokenRegistry.getTokenMetadata([validAssetId, invalidAssetId]);
 
-      expect(firstResult[0]).toBeNull();
-      expect(firstResult[1]).not.toBeNull();
-      expect(secondResult[0]).not.toBeNull();
-      expect(secondResult[1]).toBeNull();
+      expect(firstResult![0]).toBeNull();
+      expect(firstResult![1]).not.toBeNull();
+      expect(secondResult![0]).not.toBeNull();
+      expect(secondResult![1]).toBeNull();
     });
   });
 
@@ -193,12 +193,12 @@ describe('CardanoTokenRegistry', () => {
     });
 
     it('metadata are cached', async () => {
-      const [firstResult] = await tokenRegistry.getTokenMetadata([validAssetId]);
-      const [secondResult] = await tokenRegistry.getTokenMetadata([validAssetId]);
+      const firstResult = await tokenRegistry.getTokenMetadata([validAssetId]);
+      const secondResult = await tokenRegistry.getTokenMetadata([validAssetId]);
 
       expect(gotValues[0]).toBeUndefined();
-      expect(gotValues[1]).toEqual(firstResult);
-      expect(firstResult).toEqual(secondResult);
+      expect(gotValues[1]).toEqual(firstResult![0]);
+      expect(firstResult![0]).toEqual(secondResult![0]);
     });
   });
 
@@ -214,7 +214,13 @@ describe('CardanoTokenRegistry', () => {
       ({ closeMock, tokenMetadataServerUrl } = await mockTokenRegistry(() => ({ body: { subjects: [null] } })));
       const tokenRegistry = new CardanoTokenRegistry({ logger }, { tokenMetadataServerUrl });
 
-      await expect(tokenRegistry.getTokenMetadata([validAssetId])).rejects.toThrow(ProviderError);
+      await expect(tokenRegistry.getTokenMetadata([validAssetId])).rejects.toThrow(
+        new ProviderError(
+          ProviderFailure.Unknown,
+          undefined,
+          "Cannot destructure property 'subject' of 'record' as it is null. while evaluating metatada record null"
+        )
+      );
     });
 
     it('record without the subject property', async () => {
@@ -222,10 +228,19 @@ describe('CardanoTokenRegistry', () => {
       ({ closeMock, tokenMetadataServerUrl } = await mockTokenRegistry(() => ({ body: { subjects: [record] } })));
       const tokenRegistry = new CardanoTokenRegistry({ logger }, { tokenMetadataServerUrl });
 
-      await expect(tokenRegistry.getTokenMetadata([validAssetId])).rejects.toThrow(ProviderError);
+      await expect(tokenRegistry.getTokenMetadata([validAssetId])).rejects.toThrow(
+        new ProviderError(
+          ProviderFailure.InvalidResponse,
+          undefined,
+          'Missing \'subject\' property in metadata record {"test":"test"}'
+        )
+      );
     });
 
     it('internal server error', async () => {
+      const failedMetadata = null;
+      const succeededMetadata = { name: 'test' };
+
       let alreadyCalled = false;
       const record = () => {
         if (alreadyCalled) return { body: {}, code: 500 };
@@ -243,12 +258,16 @@ describe('CardanoTokenRegistry', () => {
 
       ({ closeMock, tokenMetadataServerUrl } = await mockTokenRegistry(record));
       const tokenRegistry = new CardanoTokenRegistry({ logger }, { tokenMetadataServerUrl });
-      const result = await tokenRegistry.getTokenMetadata([invalidAssetId, validAssetId]);
+      const firstSucceedResult = await tokenRegistry.getTokenMetadata([invalidAssetId, validAssetId]);
+      expect(firstSucceedResult).toEqual([failedMetadata, succeededMetadata]);
 
-      await expect(tokenRegistry.getTokenMetadata([invalidAssetId, validAssetId])).rejects.toThrow(ProviderError);
-
-      expect(result[0]).toBeNull();
-      expect(result[1]).toStrictEqual({ name: 'test' });
+      await expect(tokenRegistry.getTokenMetadata([invalidAssetId, validAssetId])).rejects.toThrow(
+        new ProviderError(
+          ProviderFailure.ConnectionFailure,
+          null,
+          'CardanoTokenRegistry failed to fetch asset metatada from the token registry server'
+        )
+      );
     });
   });
 });

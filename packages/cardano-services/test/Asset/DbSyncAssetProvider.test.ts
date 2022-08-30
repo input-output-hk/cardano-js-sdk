@@ -1,4 +1,5 @@
-import { Asset, Cardano, ProviderError } from '@cardano-sdk/core';
+/* eslint-disable @typescript-eslint/no-shadow */
+import { Asset, Cardano, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import {
   CardanoTokenRegistry,
   DbSyncAssetProvider,
@@ -43,7 +44,9 @@ describe('DbSyncAssetProvider', () => {
   });
 
   it('rejects for not found assetId', async () => {
-    await expect(provider.getAsset({ assetId: notValidAssetId })).rejects.toThrow(ProviderError);
+    await expect(provider.getAsset({ assetId: notValidAssetId })).rejects.toThrow(
+      new ProviderError(ProviderFailure.NotFound, undefined, 'No entries found in multi_asset table')
+    );
   });
 
   it('returns an AssetInfo without extra data', async () => {
@@ -79,5 +82,21 @@ describe('DbSyncAssetProvider', () => {
       desc: 'This is my first NFT of the macaron cake',
       name: 'macaron cake token'
     });
+  });
+
+  it('returns undefined asset token metadata if the token registry throws a network error', async () => {
+    const { tokenMetadataServerUrl, closeMock } = await mockTokenRegistry(() => ({ body: {}, code: 500 }));
+    const tokenMetadataService = new CardanoTokenRegistry({ logger }, { tokenMetadataServerUrl });
+
+    provider = new DbSyncAssetProvider({ db, logger, ntfMetadataService, tokenMetadataService });
+
+    const asset = await provider.getAsset({
+      assetId: validAssetId,
+      extraData: { tokenMetadata: true }
+    });
+
+    expect(asset.tokenMetadata).toBeUndefined();
+    tokenMetadataService.shutdown();
+    await closeMock();
   });
 });

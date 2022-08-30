@@ -148,7 +148,15 @@ export class CardanoTokenRegistry implements TokenMetadataService {
         }
       }
     } catch (error) {
-      throw toProviderError(error, 'while fetching metadata from token registry');
+      if (axios.isAxiosError(error)) {
+        throw new ProviderError(
+          ProviderFailure.ConnectionFailure,
+          error,
+          'CardanoTokenRegistry failed to fetch asset metatada from the token registry server'
+        );
+      }
+
+      throw error;
     }
 
     return tokenMetadata;
