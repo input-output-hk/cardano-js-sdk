@@ -56,7 +56,8 @@ export const findLedgerTip = `
 export const findCurrentWalletProtocolParams = `
     SELECT 
     min_fee_a, 
-    min_fee_b, max_tx_size, 
+    min_fee_b, 
+    max_tx_size,
     key_deposit, 
     pool_deposit, 
     protocol_major, 
@@ -64,7 +65,22 @@ export const findCurrentWalletProtocolParams = `
     min_pool_cost, 
     coins_per_utxo_size, 
     max_val_size, 
-    max_collateral_inputs
+    max_collateral_inputs,
+    max_block_size,
+    max_bh_size,
+    optimal_pool_count,
+    influence,
+    monetary_expand_rate,
+    treasury_growth_rate,
+    decentralisation,
+    collateral_percent,
+    price_mem,
+    price_step,
+    max_tx_ex_mem,
+    max_tx_ex_steps,
+    max_block_ex_mem,
+    max_block_ex_steps,
+    max_epoch
     FROM public.epoch_param
     ORDER BY epoch_no DESC NULLS LAST
     LIMIT 1;

@@ -188,14 +188,14 @@ export type NativeScript =
  */
 export enum PlutusLanguageVersion {
   /**
-   * PlutusV1 was the initial version of Plutus, introduced in the Alonzo hard fork.
+   * V1 was the initial version of Plutus, introduced in the Alonzo hard fork.
    */
-  PlutusV1 = 1,
+  V1 = 0,
 
   /**
-   * PlutusV2 was introduced in the Vasil hard fork.
+   * V2 was introduced in the Vasil hard fork.
    *
-   * The main changes in PlutusV2 were to the interface to scripts. The ScriptContext was extended
+   * The main changes in V2 of Plutus were to the interface to scripts. The ScriptContext was extended
    * to include the following information:
    *
    *  - The full “redeemers” structure, which contains all the redeemers used in the transaction
@@ -203,7 +203,7 @@ export enum PlutusLanguageVersion {
    *  - Inline datums in the transaction (proposed in CIP-32)
    *  - Reference scripts in the transaction (proposed in CIP-33)
    */
-  PlutusV2 = 2
+  V2 = 1
 }
 
 /**

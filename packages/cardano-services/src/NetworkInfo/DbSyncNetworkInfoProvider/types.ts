@@ -38,6 +38,21 @@ export interface WalletProtocolParamsModel {
   min_fee_a: number;
   min_fee_b: number;
   max_collateral_inputs: number;
+  max_block_size: number;
+  max_bh_size: number;
+  optimal_pool_count: number;
+  influence: number;
+  monetary_expand_rate: number;
+  treasury_growth_rate: number;
+  decentralisation: number;
+  collateral_percent: number;
+  price_mem: number;
+  price_step: number;
+  max_tx_ex_mem: string;
+  max_tx_ex_steps: string;
+  max_block_ex_mem: string;
+  max_block_ex_steps: string;
+  max_epoch: number;
 }
 
 export interface GenesisData {
