@@ -1,9 +1,15 @@
 {
   "name": "@cardano-sdk/e2e",
   "version": "0.4.0",
-  "private": true,
   "description": "End to end tests for the cardano-js-sdk packages.",
-  "main": "index.js",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    }
+  },
   "scripts": {
     "test": "shx echo 'test' command not implemented yet",
     "test:blockfrost": "jest -c jest.config.js --selectProjects blockfrost --runInBand --verbose",
@@ -84,7 +90,6 @@
     "@babel/preset-typescript": "^7.17.12",
     "@cardano-sdk/cip30": "^0.5.0",
     "@cardano-sdk/util-dev": "^0.4.1",
-    "@cardano-sdk/wallet": "0.4.0",
     "@cardano-sdk/web-extension": "^0.5.0",
     "@emurgo/cardano-message-signing-asmjs": "^1.0.1",
     "@emurgo/cardano-serialization-lib-asmjs": "11.0.0-rc.6",

@@ -140,10 +140,12 @@ services:
       context: ../../
       target: http-server
     environment:
-      - EPOCH_POLL_INTERVAL=${EPOCH_POLL_INTERVAL:-10000}
       - DB_CACHE_TTL=${DB_CACHE_TTL:-120}
+      - EPOCH_POLL_INTERVAL=${EPOCH_POLL_INTERVAL:-10000}
       - ENABLE_METRICS=${ENABLE_METRICS:-false}
       - LOGGER_MIN_SEVERITY=${LOGGER_MIN_SEVERITY:-info}
+      - OGMIOS_URL=ws://cardano-node-ogmios:1337
+      - RABBITMQ_URL=amqp://rabbitmq:5672
       - SERVICE_NAMES=${SERVICE_NAMES:-asset,chain-history,network-info,rewards,stake-pool,tx-submit,utxo}
       - USE_QUEUE=${USE_QUEUE:-false}
     ports:
@@ -169,9 +171,11 @@ services:
       target: worker
     environment:
       - LOGGER_MIN_SEVERITY=${LOGGER_MIN_SEVERITY:-info}
+      - OGMIOS_URL=ws://cardano-node-ogmios:1337
       - PARALLEL=${PARALLEL:-false}
       - PARALLEL_TX=${PARALLEL_TX:-3}
       - POLLING_CYCLE=${POLLING_CYCLE:-500}
+      - RABBITMQ_URL=amqp://rabbitmq:5672
     restart: on-failure
     depends_on:
       cardano-node-ogmios:
