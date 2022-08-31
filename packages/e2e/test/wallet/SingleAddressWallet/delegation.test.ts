@@ -124,7 +124,7 @@ describe('SingleAddressWallet/delegation', () => {
       certificates,
       outputs: new Set([{ address: destAddresses, value: { coins: tx1OutputCoins } }])
     });
-    await sourceWallet.submitTx(await sourceWallet.finalizeTx(tx1Internals));
+    await sourceWallet.submitTx(await sourceWallet.finalizeTx({ tx: tx1Internals }));
 
     // Test it locks available balance after tx is submitted
     await firstValueFromTimed(
@@ -168,7 +168,7 @@ describe('SingleAddressWallet/delegation', () => {
         }
       ]
     });
-    await sourceWallet.submitTx(await sourceWallet.finalizeTx(tx2Internals));
+    await sourceWallet.submitTx(await sourceWallet.finalizeTx({ tx: tx2Internals }));
     await waitForTx(sourceWallet, tx2Internals);
     const tx2ConfirmedState = await getWalletStateSnapshot(sourceWallet);
 

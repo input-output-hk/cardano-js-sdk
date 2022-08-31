@@ -97,7 +97,7 @@ describe('cip30', () => {
 
     test('api.signTx', async () => {
       const txInternals = await wallet.initializeTx(simpleTxProps);
-      const finalizedTx = await wallet.finalizeTx(txInternals);
+      const finalizedTx = await wallet.finalizeTx({ tx: txInternals });
       const hexTxBody = Buffer.from(coreToCsl.tx(finalizedTx).body().to_bytes()).toString('hex');
 
       const cip30witnessSet = await api.signTx(hexTxBody);
@@ -114,7 +114,7 @@ describe('cip30', () => {
 
     test('api.submitTx', async () => {
       const txInternals = await wallet.initializeTx(simpleTxProps);
-      const finalizedTx = await wallet.finalizeTx(txInternals);
+      const finalizedTx = await wallet.finalizeTx({ tx: txInternals });
 
       const cslTx = coreToCsl.tx(finalizedTx).to_bytes();
       await expect(api.submitTx(Buffer.from(cslTx).toString('hex'))).resolves.not.toThrow();
@@ -147,7 +147,7 @@ describe('cip30', () => {
       let hexTxBody: string;
       beforeAll(async () => {
         const txInternals = await wallet.initializeTx(simpleTxProps);
-        const finalizedTx = await wallet.finalizeTx(txInternals);
+        const finalizedTx = await wallet.finalizeTx({ tx: txInternals });
         hexTxBody = Buffer.from(coreToCsl.tx(finalizedTx).body().to_bytes()).toString('hex');
       });
 
@@ -174,7 +174,7 @@ describe('cip30', () => {
 
       beforeAll(async () => {
         txInternals = await wallet.initializeTx(simpleTxProps);
-        finalizedTx = await wallet.finalizeTx(txInternals);
+        finalizedTx = await wallet.finalizeTx({ tx: txInternals });
 
         cslTx = Buffer.from(coreToCsl.tx(finalizedTx).to_bytes()).toString('hex');
       });

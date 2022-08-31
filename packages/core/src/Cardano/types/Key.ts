@@ -54,3 +54,10 @@ Ed25519KeyHash.fromRewardAccount = (rewardAccount: RewardAccount): Ed25519KeyHas
         .to_bytes()
     ).toString('hex')
   );
+
+Ed25519KeyHash.fromKey = (pubKey: Ed25519PublicKey): Ed25519KeyHash => {
+  const cslPubKey = CSL.PublicKey.from_bytes(Buffer.from(pubKey, 'hex'));
+  const keyHash = cslPubKey.hash().to_bytes();
+
+  return Ed25519KeyHash(Buffer.from(keyHash!).toString('hex'));
+};

@@ -50,8 +50,16 @@ describe('Cardano/types/Asset', () => {
     });
   });
 
-  it('AssetFingerprint() accepts a valid asset fingerprint and is implemented using util.typedBech32', () => {
-    expect(() => AssetFingerprint('asset13n25uv0yaf5kus35fm2k86cqy60z58d9xmde92')).not.toThrow();
-    expect(util.typedBech32).toBeCalledWith('asset13n25uv0yaf5kus35fm2k86cqy60z58d9xmde92', 'asset', 32);
+  describe('AssetFingerprint', () => {
+    it('accepts a valid asset fingerprint and is implemented using util.typedBech32', () => {
+      expect(() => AssetFingerprint('asset13n25uv0yaf5kus35fm2k86cqy60z58d9xmde92')).not.toThrow();
+      expect(util.typedBech32).toBeCalledWith('asset13n25uv0yaf5kus35fm2k86cqy60z58d9xmde92', 'asset', 32);
+    });
+
+    it('can be build from the policy id and asset name', async () => {
+      const policyId = PolicyId('659f2917fb63f12b33667463ee575eeac1845bbc736b9c0bbc40ba82');
+      const assetName = AssetName('54534c41');
+      expect(AssetFingerprint.fromParts(policyId, assetName)).toEqual('asset1rqluyux4nxv6kjashz626c8usp8g88unmqwnyh');
+    });
   });
 });

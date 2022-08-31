@@ -44,7 +44,14 @@ describe('Cardano/types/Key', () => {
 
     test('fromRewardAccount', () => {
       const rewardAccount = Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr');
-      expect(() => Ed25519KeyHash.fromRewardAccount(rewardAccount)).not.toThrow();
+      expect(Ed25519KeyHash.fromRewardAccount(rewardAccount)).toEqual(
+        'cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f'
+      );
+    });
+
+    test('fromKey', () => {
+      const pubKey = Cardano.Ed25519PublicKey('6f48ffce45af1722cd7f641d624cd36671a0777c15ff78f016779177a48f7ba2');
+      expect(Ed25519KeyHash.fromKey(pubKey)).toEqual('6f233080cebdc47e520885876caea84bdb02ba67bcea95ed890b22e6');
     });
   });
 
