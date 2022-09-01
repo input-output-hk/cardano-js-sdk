@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.1-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.5.1-nightly.0...@cardano-sdk/core@0.5.1-nightly.1) (2022-09-01)
+
+
+### Features
+
+* added signing options with extra signers to the transaction finalize method ([514b718](https://github.com/input-output-hk/cardano-js-sdk/commit/514b718825af93965739ec5f890f6be2aacf4f48))
+* **core:** added several utility functions to derive some of the information requiered for the use of native scripts native scripts: ([3b757ba](https://github.com/input-output-hk/cardano-js-sdk/commit/3b757ba77e163b44136227ae2a8fa59600b4474f))
+
+
+
 ## [0.5.1-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.5.0...@cardano-sdk/core@0.5.1-nightly.0) (2022-08-31)
 
 **Note:** Version bump only for package @cardano-sdk/core
