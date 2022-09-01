@@ -1,5 +1,6 @@
 import {
   Cardano,
+  CardanoNode,
   StakePoolProvider,
   StakePoolQueryOptions,
   StakePoolSearchResults,
@@ -8,7 +9,14 @@ import {
 import { CommonPoolInfo, OrderedResult, PoolAPY, PoolData, PoolMetrics, PoolSortType, PoolUpdate } from './types';
 import { DbSyncProvider } from '../../DbSyncProvider';
 import { Disposer, EpochMonitor } from '../../util/polling/types';
-import { IDS_NAMESPACE, StakePoolsSubQuery, emptyPoolsExtraInfo, getStakePoolSortType, queryCacheKey } from './util';
+import {
+  IDS_NAMESPACE,
+  LIVE_STAKE_CACHE_KEY,
+  StakePoolsSubQuery,
+  emptyPoolsExtraInfo,
+  getStakePoolSortType,
+  queryCacheKey
+} from './util';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../InMemoryCache';
 import { Logger } from 'ts-log';
 import { Pool } from 'pg';
@@ -21,6 +29,7 @@ export interface StakePoolProviderDependencies {
   logger: Logger;
   cache: InMemoryCache;
   epochMonitor: EpochMonitor;
+  cardanoNode: CardanoNode;
 }
 
 export class DbSyncStakePoolProvider extends DbSyncProvider implements StakePoolProvider {
@@ -29,13 +38,15 @@ export class DbSyncStakePoolProvider extends DbSyncProvider implements StakePool
   #cache: InMemoryCache;
   #epochMonitor: EpochMonitor;
   #epochRolloverDisposer: Disposer;
+  #cardanoNode: CardanoNode;
 
-  constructor({ db, cache, logger, epochMonitor }: StakePoolProviderDependencies) {
+  constructor({ db, cache, cardanoNode, logger, epochMonitor }: StakePoolProviderDependencies) {
     super(db);
     this.#logger = logger;
     this.#cache = cache;
     this.#epochMonitor = epochMonitor;
     this.#builder = new StakePoolBuilder(db, logger);
+    this.#cardanoNode = cardanoNode;
   }
 
   private getQueryBySortType(
@@ -135,7 +146,7 @@ export class DbSyncStakePoolProvider extends DbSyncProvider implements StakePool
         ? this.#builder.buildOrQuery(options?.filters)
         : this.#builder.buildAndQuery(options?.filters);
 
-    // Get pool updates/hashes
+    // Get pool updates/hashes cached
     const poolUpdates = await this.#cache.get(queryCacheKey(StakePoolsSubQuery.POOL_HASHES, options), () =>
       this.#builder.queryPoolHashes(query, params)
     );
@@ -145,8 +156,9 @@ export class DbSyncStakePoolProvider extends DbSyncProvider implements StakePool
     );
     // Get pool total stake pools count
     const totalCount = await this.#builder.queryTotalCount(query, params);
-    // Get last epoch no
-    const lastEpoch = await this.#builder.getLastEpoch();
+    // Get last epoch data
+    const lastEpoch = await this.#builder.getLastEpochWithData();
+    const { poolOptimalCount, no: lastEpochNo } = lastEpoch;
     // Get stake pools data
     const { orderedResultHashIds, orderedResultUpdateIds, orderedResult, poolDatas, hashesIds, sortType } =
       await this.#cache.get(queryCacheKey(StakePoolsSubQuery.POOLS_DATA_ORDERED, options), () =>
@@ -159,6 +171,9 @@ export class DbSyncStakePoolProvider extends DbSyncProvider implements StakePool
         : await this.#cache.get(queryCacheKey(StakePoolsSubQuery.APY, hashesIds, options), () =>
             this.#builder.queryPoolAPY(hashesIds, { rewardsHistoryLimit: options?.rewardsHistoryLimit })
           );
+
+    // Get pools' stake distribution
+    const stakeDistribution = await this.#cache.get(LIVE_STAKE_CACHE_KEY, () => this.#cardanoNode.stakeDistribution());
 
     const poolRewards = await this.#cache.get(
       queryCacheKey(StakePoolsSubQuery.REWARDS, orderedResultHashIds, options),
@@ -193,7 +208,12 @@ export class DbSyncStakePoolProvider extends DbSyncProvider implements StakePool
     );
 
     const { results, poolsToCache } = toStakePoolResults(orderedResultHashIds, fromCache, {
-      lastEpoch,
+      lastEpochNo,
+      nodeMetricsDependencies: {
+        poolOptimalCount,
+        stakeDistribution,
+        totalAdaAmount: BigInt(totalAdaAmount)
+      },
       poolAPYs,
       poolDatas,
       poolMetrics,

@@ -88,9 +88,11 @@ const serviceMapFactory = (args: ProgramArgs, logger: Logger, dnsResolver: DnsRe
 
       return new AssetHttpService({ assetProvider, logger });
     }, ServiceNames.Asset),
-    [ServiceNames.StakePool]: withDb((db) => {
+    [ServiceNames.StakePool]: withDb(async (db) => {
+      const cardanoNode = await getOgmiosCardanoNode(dnsResolver, logger, args.options);
       const stakePoolProvider = new DbSyncStakePoolProvider({
         cache: new InMemoryCache(args.options!.dbCacheTtl!),
+        cardanoNode,
         db,
         epochMonitor: getEpochMonitor(db),
         logger
@@ -116,9 +118,6 @@ const serviceMapFactory = (args: ProgramArgs, logger: Logger, dnsResolver: DnsRe
     [ServiceNames.NetworkInfo]: withDb(async (db) => {
       if (args.options?.cardanoNodeConfigPath === undefined)
         throw new MissingProgramOption(ServiceNames.NetworkInfo, ProgramOptionDescriptions.CardanoNodeConfigPath);
-      if (args.options?.ogmiosUrl === undefined)
-        throw new MissingProgramOption(ServiceNames.NetworkInfo, ProgramOptionDescriptions.OgmiosUrl);
-
       const cardanoNode = await getOgmiosCardanoNode(dnsResolver, logger, args.options);
       const networkInfoProvider = new DbSyncNetworkInfoProvider(
         { cardanoNodeConfigPath: args.options.cardanoNodeConfigPath },

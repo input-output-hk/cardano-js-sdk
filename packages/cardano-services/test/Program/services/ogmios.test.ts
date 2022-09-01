@@ -241,6 +241,7 @@ describe('Service dependency abstractions', () => {
             serviceDiscoveryBackoffFactor: 1.1,
             serviceDiscoveryTimeout: 1000
           });
+          getOgmiosCardanoNode.cache.clear!();
           ogmiosCardanoNode = await getOgmiosCardanoNode(dnsResolver, logger, {
             ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
             serviceDiscoveryBackoffFactor: 1.1,
@@ -264,7 +265,6 @@ describe('Service dependency abstractions', () => {
           await httpServer.shutdown();
           await serverClosePromise(ogmiosServer);
         });
-
         it('ogmiosCardanoNode should not be a instance of Proxy ', () => {
           expect(types.isProxy(ogmiosCardanoNode)).toEqual(false);
         });
@@ -368,7 +368,6 @@ describe('Service dependency abstractions', () => {
         await serverClosePromise(mockServer);
       }
     });
-
     it('should initially fail with a connection error, then re-resolve the port and initialize', async () => {
       const srvRecord = { name: 'localhost', port: ogmiosPortDefault, priority: 1, weight: 1 };
       const failingOgmiosMockPort = await getRandomPort();

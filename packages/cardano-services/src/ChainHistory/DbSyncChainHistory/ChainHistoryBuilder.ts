@@ -21,7 +21,7 @@ import {
 } from './types';
 import { Logger } from 'ts-log';
 import { Pool, QueryResult } from 'pg';
-import { hexStringToBuffer } from '../../util';
+import { hexStringToBuffer } from '@cardano-sdk/util';
 import {
   mapCertificate,
   mapRedeemer,
