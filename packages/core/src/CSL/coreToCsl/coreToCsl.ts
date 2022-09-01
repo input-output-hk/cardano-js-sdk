@@ -19,6 +19,7 @@ import {
   MultiAsset,
   NativeScript,
   NativeScripts,
+  PlutusScripts,
   PublicKey,
   RewardAddress,
   ScriptAll,
@@ -176,14 +177,103 @@ export const txMint = (mint: Cardano.TokenMap) => {
   return cslMint;
 };
 
+export const nativeScript = (script: Cardano.NativeScript): NativeScript => {
+  let cslScript: NativeScript;
+  const kind = script.kind;
+
+  switch (kind) {
+    case Cardano.NativeScriptKind.RequireSignature: {
+      cslScript = NativeScript.new_script_pubkey(
+        ScriptPubkey.new(Ed25519KeyHash.from_bytes(Buffer.from(script.keyHash, 'hex')))
+      );
+      break;
+    }
+    case Cardano.NativeScriptKind.RequireAllOf: {
+      const cslScripts = NativeScripts.new();
+      for (const subscript of script.scripts) {
+        cslScripts.add(nativeScript(subscript));
+      }
+      cslScript = NativeScript.new_script_all(ScriptAll.new(cslScripts));
+      break;
+    }
+    case Cardano.NativeScriptKind.RequireAnyOf: {
+      const cslScripts2 = NativeScripts.new();
+      for (const subscript of script.scripts) {
+        cslScripts2.add(nativeScript(subscript));
+      }
+      cslScript = NativeScript.new_script_any(ScriptAny.new(cslScripts2));
+      break;
+    }
+    case Cardano.NativeScriptKind.RequireMOf: {
+      const cslScripts3 = NativeScripts.new();
+      for (const subscript of script.scripts) {
+        cslScripts3.add(nativeScript(subscript));
+      }
+      cslScript = NativeScript.new_script_n_of_k(ScriptNOfK.new(script.required, cslScripts3));
+      break;
+    }
+    case Cardano.NativeScriptKind.RequireTimeBefore: {
+      cslScript = NativeScript.new_timelock_expiry(
+        TimelockExpiry.new_timelockexpiry(BigNum.from_str(script.slot.toString()))
+      );
+      break;
+    }
+    case Cardano.NativeScriptKind.RequireTimeAfter: {
+      cslScript = NativeScript.new_timelock_start(
+        TimelockStart.new_timelockstart(BigNum.from_str(script.slot.toString()))
+      );
+      break;
+    }
+    default:
+      throw new SerializationError(
+        SerializationFailure.InvalidNativeScriptKind,
+        `Native Script Type value '${kind}' is not supported.`
+      );
+  }
+
+  return cslScript;
+};
+
+export const getScripts = (
+  scripts: Cardano.Script[]
+): { nativeScripts: NativeScripts; plutusScripts: PlutusScripts } => {
+  const nativeScripts: NativeScripts = NativeScripts.new();
+  const plutusScripts: PlutusScripts = PlutusScripts.new();
+
+  for (const script of scripts) {
+    switch (script.__type) {
+      case Cardano.ScriptType.Native:
+        nativeScripts.add(nativeScript(script));
+        break;
+      // TODO: add support for Plutus scripts.
+      case Cardano.ScriptType.Plutus:
+      default:
+        throw new SerializationError(
+          SerializationFailure.InvalidScriptType,
+          `Script Type value '${script.__type}' is not supported.`
+        );
+    }
+  }
+
+  return { nativeScripts, plutusScripts };
+};
+
 export const txAuxiliaryData = (auxiliaryData?: Cardano.AuxiliaryData): AuxiliaryData | undefined => {
   if (!auxiliaryData) return;
   const result = AuxiliaryData.new();
-  // TODO: add support for auxiliaryData.scripts
-  const { blob } = auxiliaryData.body;
+
+  const { blob, scripts } = auxiliaryData.body;
   if (blob) {
     result.set_metadata(txMetadata(blob));
   }
+
+  if (scripts) {
+    const { nativeScripts, plutusScripts } = getScripts(scripts);
+
+    result.set_native_scripts(nativeScripts);
+    result.set_plutus_scripts(plutusScripts);
+  }
+
   return result;
 };
 
@@ -241,6 +331,7 @@ export const txBody = (
     BigNum.from_str(fee.toString()),
     validityInterval.invalidHereafter
   );
+
   if (validityInterval.invalidBefore) {
     cslBody.set_validity_start_interval(validityInterval.invalidBefore);
   }
@@ -270,80 +361,33 @@ export const txBody = (
   if (cslAuxiliaryData) {
     cslBody.set_auxiliary_data_hash(hash_auxiliary_data(cslAuxiliaryData));
   }
+
   return cslBody;
 };
 
-export const witnessSet = (signatures: Cardano.Signatures): TransactionWitnessSet => {
+export const witnessSet = (witness: Cardano.Witness): TransactionWitnessSet => {
   const cslWitnessSet = TransactionWitnessSet.new();
   const vkeyWitnesses = Vkeywitnesses.new();
-  for (const [vkey, signature] of signatures.entries()) {
+
+  if (witness.scripts) {
+    const { nativeScripts, plutusScripts } = getScripts(witness.scripts);
+
+    cslWitnessSet.set_native_scripts(nativeScripts);
+    cslWitnessSet.set_plutus_scripts(plutusScripts);
+  }
+
+  for (const [vkey, signature] of witness.signatures.entries()) {
     const publicKey = PublicKey.from_bytes(Buffer.from(vkey, 'hex'));
     const vkeyWitness = Vkeywitness.new(Vkey.new(publicKey), Ed25519Signature.from_hex(signature.toString()));
     vkeyWitnesses.add(vkeyWitness);
   }
   cslWitnessSet.set_vkeys(vkeyWitnesses);
+
   return cslWitnessSet;
 };
 
 export const tx = ({ body, witness, auxiliaryData }: Cardano.NewTxAlonzo): Transaction => {
-  const txWitnessSet = witnessSet(witness.signatures);
+  const txWitnessSet = witnessSet(witness);
   // Possible optimization: only convert auxiliary data once
   return Transaction.new(txBody(body, auxiliaryData), txWitnessSet, txAuxiliaryData(auxiliaryData));
-};
-
-export const nativeScript = (script: Cardano.NativeScript): NativeScript => {
-  let cslScript: NativeScript;
-  const kind = script.kind;
-
-  switch (kind) {
-    case Cardano.NativeScriptKind.RequireSignature: {
-      cslScript = NativeScript.new_script_pubkey(
-        ScriptPubkey.new(Ed25519KeyHash.from_bytes(Buffer.from(script.keyHash, 'hex')))
-      );
-      break;
-    }
-    case Cardano.NativeScriptKind.RequireAllOf: {
-      const cslScripts = NativeScripts.new();
-      for (const subscript of script.scripts) {
-        cslScripts.add(nativeScript(subscript));
-      }
-      cslScript = NativeScript.new_script_all(ScriptAll.new(cslScripts));
-      break;
-    }
-    case Cardano.NativeScriptKind.RequireAnyOf: {
-      const cslScripts2 = NativeScripts.new();
-      for (const subscript of script.scripts) {
-        cslScripts2.add(nativeScript(subscript));
-      }
-      cslScript = NativeScript.new_script_any(ScriptAny.new(cslScripts2));
-      break;
-    }
-    case Cardano.NativeScriptKind.RequireMOf: {
-      const cslScripts3 = NativeScripts.new();
-      for (const subscript of script.scripts) {
-        cslScripts3.add(nativeScript(subscript));
-      }
-      cslScript = NativeScript.new_script_n_of_k(ScriptNOfK.new(script.required, cslScripts3));
-      break;
-    }
-    case Cardano.NativeScriptKind.RequireTimeBefore: {
-      cslScript = NativeScript.new_timelock_expiry(
-        TimelockExpiry.new_timelockexpiry(BigNum.from_str(script.slot.toString()))
-      );
-      break;
-    }
-    case Cardano.NativeScriptKind.RequireTimeAfter: {
-      cslScript = NativeScript.new_timelock_start(
-        TimelockStart.new_timelockstart(BigNum.from_str(script.slot.toString()))
-      );
-      break;
-    }
-    default:
-      throw new SerializationError(
-        SerializationFailure.InvalidNativeScriptKind,
-        `Native Script Type value '${kind}' is not supported.`
-      );
-  }
-
-  return cslScript;
 };

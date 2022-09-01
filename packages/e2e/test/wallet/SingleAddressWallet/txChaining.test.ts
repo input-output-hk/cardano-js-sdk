@@ -32,7 +32,7 @@ describe('SingleAddressWallet', () => {
       outputs: new Set([{ address, value: { coins: moreThanHalfOfTheBalanceCoins } }])
     });
 
-    const finalizedTx1 = await wallet.finalizeTx(tx1);
+    const finalizedTx1 = await wallet.finalizeTx({ tx: tx1 });
     await wallet.submitTx(finalizedTx1);
 
     const tx2 = await wallet.initializeTx({
@@ -43,7 +43,7 @@ describe('SingleAddressWallet', () => {
     const usingTx1OutputAsInput = [...tx2.inputSelection.inputs].some(([txIn]) => txIn.txId === finalizedTx1.id);
     expect(usingTx1OutputAsInput).toBe(true);
 
-    const finalizedTx2 = await wallet.finalizeTx(tx2);
+    const finalizedTx2 = await wallet.finalizeTx({ tx: tx2 });
 
     try {
       await wallet.submitTx(finalizedTx2);

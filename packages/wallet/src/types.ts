@@ -9,7 +9,7 @@ import {
 import { BalanceTracker, DelegationTracker, TransactionalObservables, TransactionsTracker } from './services';
 import { Cip30DataSignature } from '@cardano-sdk/cip30';
 import { Cip30SignDataRequest } from './KeyManagement/cip8';
-import { GroupedAddress } from './KeyManagement';
+import { GroupedAddress, SignTransactionOptions, TransactionSigner } from './KeyManagement';
 import { Observable } from 'rxjs';
 import { SelectionSkeleton } from '@cardano-sdk/cip2';
 import { Shutdown } from '@cardano-sdk/util';
@@ -27,10 +27,17 @@ export type InitializeTxProps = {
   mint?: Cardano.TokenMap;
   scriptIntegrityHash?: Cardano.Hash32ByteBase16;
   requiredExtraSignatures?: Cardano.Ed25519KeyHash[];
+  extraSigners?: TransactionSigner[];
+  signingOptions?: SignTransactionOptions;
+  scripts?: Cardano.Script[];
 };
 
 export interface FinalizeTxProps {
-  readonly body: Cardano.TxBodyAlonzo;
+  tx: TxInternals;
+  auxiliaryData?: Cardano.AuxiliaryData;
+  scripts?: Cardano.Script[];
+  extraSigners?: TransactionSigner[];
+  signingOptions?: SignTransactionOptions;
 }
 
 export type Assets = Map<Cardano.AssetId, Asset.AssetInfo>;
@@ -92,7 +99,7 @@ export interface ObservableWallet {
    * @throws InputSelectionError
    */
   initializeTx(props: InitializeTxProps): Promise<InitializeTxResult>;
-  finalizeTx(props: TxInternals, auxiliaryData?: Cardano.AuxiliaryData): Promise<Cardano.NewTxAlonzo>;
+  finalizeTx(props: FinalizeTxProps): Promise<Cardano.NewTxAlonzo>;
   /**
    * @throws Cip30DataSignError
    */

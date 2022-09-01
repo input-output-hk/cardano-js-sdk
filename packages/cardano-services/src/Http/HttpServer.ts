@@ -1,3 +1,4 @@
+import { Gauge, Registry } from 'prom-client';
 import { HttpServerConfig, ServiceHealth, ServicesHealthCheckResponse } from './types';
 import { HttpService } from './HttpService';
 import { Logger } from 'ts-log';
@@ -9,7 +10,6 @@ import bodyParser from 'body-parser';
 import express from 'express';
 import expressPromBundle from 'express-prom-bundle';
 import http from 'http';
-import promClient from 'prom-client';
 
 export const CONTENT_TYPE = 'Content-Type';
 export const APPLICATION_JSON = 'application/json';
@@ -24,12 +24,36 @@ export class HttpServer extends RunnableModule {
   public server: http.Server;
   #config: HttpServerConfig;
   #dependencies: HttpServerDependencies;
+  #healthGauge: Gauge<string>;
 
   constructor(config: HttpServerConfig, { logger, ...rest }: HttpServerDependencies) {
     super(config.name || 'HttpServer', logger);
     this.#config = config;
     this.#dependencies = { logger, ...rest };
   }
+
+  async #getServicesHealth() {
+    const servicesHealth: ServiceHealth[] = await Promise.all(
+      this.#dependencies.services.map((service) =>
+        service
+          .healthCheck()
+          .then(({ ok }) => ({
+            name: service.name,
+            ok
+          }))
+          .catch((error) => {
+            this.logger.error(error);
+            return { name: service.name, ok: false };
+          })
+      )
+    );
+
+    return {
+      ok: servicesHealth.every((service) => service.ok),
+      services: servicesHealth
+    };
+  }
+
   async initializeImpl(): Promise<void> {
     this.app = express();
     this.app.use(
@@ -38,16 +62,37 @@ export class HttpServer extends RunnableModule {
         reviver: (key, value) => (key === '' ? fromSerializableObject(value) : value)
       })
     );
+
     if (this.#config?.metrics?.enabled) {
+      const promRegistry = new Registry();
+      const getServicesHealth = async () => await this.#getServicesHealth();
+      this.#healthGauge = new Gauge<string>({
+        async collect() {
+          const currentValue = Number((await getServicesHealth()).ok);
+          // Set a health check gauge value with type number.Health check values: 0/1 (unhealthy/healthy)
+          this.set(currentValue);
+        },
+        help: 'healthcheck_help',
+        labelNames: ['method', 'statusCode'],
+        name: 'healthcheck',
+        registers: [promRegistry]
+      });
+
       this.app.use(
         expressPromBundle({
           includeMethod: true,
-          promRegistry: new promClient.Registry(),
+          promRegistry,
           ...this.#config.metrics.options
         })
       );
-      this.logger.info(`Prometheus metrics configured at ${this.#config.metrics.options?.metricsPath || '/metrics'}`);
+
+      this.logger.info(
+        `Prometheus metrics: ${(await promRegistry.getMetricsAsArray()).map(({ name }) => name)} configured at ${
+          this.#config.metrics.options?.metricsPath || '/metrics'
+        }`
+      );
     }
+
     for (const service of this.#dependencies.services) {
       await service.initialize();
       this.app.use(`/${service.slug}`, service.router);
@@ -58,24 +103,7 @@ export class HttpServer extends RunnableModule {
       this.logger.debug('/health', { ip: req.ip });
       let body: ServicesHealthCheckResponse | Error['message'];
       try {
-        const servicesHealth: ServiceHealth[] = await Promise.all(
-          this.#dependencies.services.map((service) =>
-            service
-              .healthCheck()
-              .then(({ ok }) => ({
-                name: service.name,
-                ok
-              }))
-              .catch((error) => {
-                this.logger.error(error);
-                return { name: service.name, ok: false };
-              })
-          )
-        );
-        body = {
-          ok: servicesHealth.every((service) => service.ok),
-          services: servicesHealth
-        };
+        body = await this.#getServicesHealth();
       } catch (error) {
         this.logger.error(error);
         return HttpServer.sendJSON(res, new ProviderError(ProviderFailure.Unhealthy, error), 500);
@@ -107,6 +135,7 @@ export class HttpServer extends RunnableModule {
   }
 
   async shutdownImpl(): Promise<void> {
+    this.#healthGauge?.set(0);
     for (const service of this.#dependencies.services) await service.shutdown();
 
     return serverClosePromise(this.server);

@@ -11,7 +11,7 @@ describe('KeyManagement.util.stubSignTransaction', () => {
     const inputResolver = {} as InputResolver; // not called
     const txBody = {} as Cardano.TxBodyAlonzo;
     const knownAddresses = [{} as GroupedAddress];
-    ownSignatureKeyPaths.mockReturnValueOnce([{}]).mockReturnValueOnce([{}, {}]);
+    ownSignatureKeyPaths.mockReturnValueOnce(['a']).mockReturnValueOnce(['a', 'b']);
     expect((await stubSignTransaction(txBody, knownAddresses, inputResolver)).size).toBe(1);
     expect((await stubSignTransaction(txBody, knownAddresses, inputResolver)).size).toBe(2);
     expect(ownSignatureKeyPaths).toBeCalledWith(txBody, knownAddresses, inputResolver);

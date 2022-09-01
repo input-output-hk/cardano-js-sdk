@@ -115,6 +115,6 @@ document.querySelector('#buildAndSignTx')!.addEventListener('click', async () =>
       }
     ])
   });
-  const signedTx = await wallet.finalizeTx(tx);
+  const signedTx = await wallet.finalizeTx({ tx });
   document.querySelector('#signature')!.textContent = signedTx.witness.signatures.values().next().value;
 });

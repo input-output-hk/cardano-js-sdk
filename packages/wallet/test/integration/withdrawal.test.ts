@@ -30,7 +30,7 @@ describe('integration/withdrawal', () => {
       withdrawals: [{ quantity: availableRewards, stakeAddress: rewardAccount }]
     });
     expect(typeof txInternals.body.fee).toBe('bigint');
-    const tx = await wallet.finalizeTx(txInternals);
+    const tx = await wallet.finalizeTx({ tx: txInternals });
 
     const confirmedSubscription = wallet.transactions.outgoing.confirmed$.subscribe((confirmedTx) => {
       if (confirmedTx === tx) {

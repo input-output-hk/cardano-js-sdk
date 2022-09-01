@@ -1,6 +1,6 @@
 /* eslint-disable no-use-before-define */
+import * as Cardano from './';
 import * as util from '../util';
-import { Ed25519KeyHash } from './Key';
 import { Slot } from '@cardano-ogmios/schema';
 
 /**
@@ -39,7 +39,7 @@ export interface RequireSignatureScript {
   /**
    * The hash of a verification key.
    */
-  keyHash: Ed25519KeyHash;
+  keyHash: Cardano.Ed25519KeyHash;
 
   /**
    * The native script kind.

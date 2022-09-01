@@ -89,7 +89,7 @@ describe('Local Network', () => {
       outputs: new Set([{ address: receivingAddress, value: { coins: tAdaToSend } }])
     });
 
-    const signedTx = await wallet1.finalizeTx(unsignedTx);
+    const signedTx = await wallet1.finalizeTx({ tx: unsignedTx });
     await wallet1.submitTx(signedTx);
 
     // Wait until wallet two is aware of the funds.

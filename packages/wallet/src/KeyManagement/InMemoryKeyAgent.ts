@@ -10,7 +10,6 @@ import {
   SignBlobResult,
   SignTransactionOptions
 } from './types';
-import { AuthenticationError } from './errors';
 import { CSL, Cardano, util } from '@cardano-sdk/core';
 import { KeyAgentBase } from './KeyAgentBase';
 import { TxInternals } from '../Transaction';
@@ -41,7 +40,7 @@ const getPasswordRethrowTypedError = async (getPassword: GetPassword) => {
   try {
     return await getPassword();
   } catch (error) {
-    throw new AuthenticationError('Failed to enter password', error);
+    throw new errors.AuthenticationError('Failed to enter password', error);
   }
 };
 
@@ -161,7 +160,7 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
         password
       );
     } catch (error) {
-      throw new AuthenticationError('Failed to decrypt root private key', error);
+      throw new errors.AuthenticationError('Failed to decrypt root private key', error);
     }
     return CSL.Bip32PrivateKey.from_bytes(decryptedRootKeyBytes);
   }

@@ -23,7 +23,8 @@ export enum SerializationFailure {
   Overflow = 'OVERFLOW',
   InvalidAddress = 'INVALID_ADDRESS',
   MaxLengthLimit = 'MAX_LENGTH_LIMIT',
-  InvalidNativeScriptKind = 'INVALID_NATIVE_SCRIPT_KIND'
+  InvalidNativeScriptKind = 'INVALID_NATIVE_SCRIPT_KIND',
+  InvalidScriptType = 'INVALID_SCRIPT_TYPE'
 }
 
 export class SerializationError extends CustomError {
