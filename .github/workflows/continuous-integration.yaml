@@ -40,29 +40,3 @@ jobs:
       run: |
         yarn test:build:verify
         yarn test
-
-    - name: 📦 Pack
-      run: |
-        ./scripts/pack.sh
-
-    - name: 📤 Upload npm packages
-      uses: actions/upload-artifact@v3
-      with:
-        name: cardano-js-sdk-packages
-        path: ./cardano-sdk-*-${{ steps.package-version.outputs.current-version}}.tgz
-          
-    - name: 📦 Package Golden Test Generator
-      working-directory: packages/golden-test-generator
-      run: yarn pkg
-
-    - name: 📤 Upload Golden Test Generator exe - Linux
-      uses: actions/upload-artifact@v3
-      with:
-        name: golden-test-generator-linux
-        path: ./packages/golden-test-generator/build/golden-test-generator-linux
-
-    - name: 📤 Upload Golden Test Generator exe - macOS
-      uses: actions/upload-artifact@v3
-      with:
-        name: golden-test-generator-macos
-        path: ./packages/golden-test-generator/build/golden-test-generator-macos
