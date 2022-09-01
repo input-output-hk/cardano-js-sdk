@@ -56,7 +56,6 @@ clear();
 console.log('Cardano Services CLI');
 
 const stringToBoolean = (value: string, program: Programs, option: string) => {
-  // for compatibility: accepting same values as envalid in startWorker.ts
   if (['0', 'f', 'false'].includes(value)) return false;
   if (['1', 't', 'true'].includes(value)) return true;
   throw new WrongOption(program, option, ['false', 'true']);
@@ -153,9 +152,12 @@ commonOptions(
       .argParser((url) => new URL(url))
   )
   .addOption(
-    new Option('--enable-metrics', ProgramOptionDescriptions.EnableMetrics)
+    new Option('--enable-metrics <true/false>', ProgramOptionDescriptions.EnableMetrics)
       .env('ENABLE_METRICS')
       .default(ENABLE_METRICS_DEFAULT)
+      .argParser((enableMetrics) =>
+        stringToBoolean(enableMetrics, Programs.HttpServer, ProgramOptionDescriptions.EnableMetrics)
+      )
   )
   .addOption(
     new Option(
@@ -246,7 +248,12 @@ commonOptions(
       .default(DEFAULT_TOKEN_METADATA_CACHE_TTL)
       .argParser(cacheTtlValidator)
   )
-  .addOption(new Option('--use-queue', ProgramOptionDescriptions.UseQueue).env('USE_QUEUE').default(USE_QUEUE_DEFAULT))
+  .addOption(
+    new Option('--use-queue <true/false>', ProgramOptionDescriptions.UseQueue)
+      .env('USE_QUEUE')
+      .default(USE_QUEUE_DEFAULT)
+      .argParser((useQueue) => stringToBoolean(useQueue, Programs.HttpServer, ProgramOptionDescriptions.UseQueue))
+  )
   .action(async (serviceNames: ServiceNames[], options: { apiUrl: URL } & HttpServerOptions) => {
     const { apiUrl, ...rest } = options;
 
@@ -286,7 +293,7 @@ commonOptions(
 
 commonOptions(program.command('start-worker').description('Start RabbitMQ worker'))
   .addOption(
-    new Option('--parallel [parallel]', TxWorkerOptionDescriptions.Parallel)
+    new Option('--parallel <true/false>', TxWorkerOptionDescriptions.Parallel)
       .env('PARALLEL')
       .default(PARALLEL_MODE_DEFAULT)
       .argParser((parallel) => stringToBoolean(parallel, Programs.RabbitmqWorker, TxWorkerOptionDescriptions.Parallel))
