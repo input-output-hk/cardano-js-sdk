@@ -13,7 +13,7 @@ import { getRandomPort } from 'get-port-please';
 import { listenPromise, serverClosePromise } from '../src/util';
 import { logger } from '@cardano-sdk/util-dev';
 import { mockTokenRegistry } from './Asset/CardanoTokenRegistry.test';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import http from 'http';
 import path from 'path';
 
@@ -49,13 +49,16 @@ const assertServiceHealthy = async (apiUrl: string, serviceName: ServiceNames, u
   expect(res.data).toEqual(healthCheckResponse);
 };
 
-const assertMetricsEndpoint = async (apiUrl: string) => {
+const assertMetricsEndpoint = async (apiUrl: string, assertFound: boolean) => {
+  expect.assertions(1);
   await serverReady(apiUrl);
   const headers = { 'Content-Type': 'application/json' };
-  const res = await axios.post(`${apiUrl}/metrics`, { headers });
-
-  expect(res.status).toBe(200);
-  expect(res.data.toString().includes(METRICS_ENDPOINT_LABEL_RESPONSE)).toEqual(true);
+  try {
+    const res = await axios.get(`${apiUrl}/metrics`, { headers });
+    expect(res.data.toString().includes(METRICS_ENDPOINT_LABEL_RESPONSE)).toEqual(assertFound);
+  } catch (error) {
+    expect((error as AxiosError).response?.status).toBe(404);
+  }
 };
 
 type CallCliAndAssertExitArgs = {
@@ -183,6 +186,7 @@ describe('CLI', () => {
                 '--api-url',
                 apiUrl,
                 '--enable-metrics',
+                'true',
                 '--postgres-connection-string',
                 postgresConnectionString,
                 '--ogmios-url',
@@ -243,6 +247,7 @@ describe('CLI', () => {
                 '--api-url',
                 apiUrl,
                 '--enable-metrics',
+                'true',
                 '--postgres-connection-string',
                 postgresConnectionString,
                 '--ogmios-url',
@@ -262,7 +267,7 @@ describe('CLI', () => {
               { env: {}, stdio: 'pipe' }
             );
 
-            await assertMetricsEndpoint(apiUrl);
+            await assertMetricsEndpoint(apiUrl, true);
           });
 
           it('exposes a HTTP server with /metrics endpoint using env variables', async () => {
@@ -280,7 +285,25 @@ describe('CLI', () => {
               stdio: 'pipe'
             });
 
-            await assertMetricsEndpoint(apiUrl);
+            await assertMetricsEndpoint(apiUrl, true);
+          });
+
+          it('exposes a HTTP server without /metrics endpoint when env set to false', async () => {
+            proc = fork(exePath, ['start-server'], {
+              env: {
+                API_URL: apiUrl,
+                CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
+                DB_CACHE_TTL: dbCacheTtl,
+                ENABLE_METRICS: 'false',
+                LOGGER_MIN_SEVERITY: 'error',
+                OGMIOS_URL: ogmiosConnection.address.webSocket,
+                POSTGRES_CONNECTION_STRING: postgresConnectionString,
+                SERVICE_NAMES: `${ServiceNames.Asset},${ServiceNames.ChainHistory},${ServiceNames.NetworkInfo},${ServiceNames.StakePool},${ServiceNames.TxSubmit},${ServiceNames.Utxo},${ServiceNames.Rewards}`
+              },
+              stdio: 'pipe'
+            });
+
+            await assertMetricsEndpoint(apiUrl, false);
           });
 
           it('setting the service names via env variable takes preference over command line argument', async () => {
@@ -981,7 +1004,7 @@ describe('CLI', () => {
               await assertServiceHealthy(apiUrl, ServiceNames.NetworkInfo);
             });
 
-            it('netrowk-info uses the default Ogmios configuration if not specified using env variables', async () => {
+            it('network-info uses the default Ogmios configuration if not specified using env variables', async () => {
               proc = fork(exePath, ['start-server'], {
                 env: {
                   API_URL: apiUrl,
@@ -1009,7 +1032,8 @@ describe('CLI', () => {
                 env: {
                   API_URL: apiUrl,
                   LOGGER_MIN_SEVERITY: 'error',
-                  SERVICE_NAMES: ServiceNames.TxSubmit
+                  SERVICE_NAMES: ServiceNames.TxSubmit,
+                  USE_QUEUE: 'false'
                 },
                 stdio: 'pipe'
               });
@@ -1248,6 +1272,7 @@ describe('CLI', () => {
                   '--api-url',
                   apiUrl,
                   '--use-queue',
+                  'true',
                   '--rabbitmq-url',
                   rabbitmqUrl.toString(),
                   ServiceNames.TxSubmit
@@ -1279,7 +1304,7 @@ describe('CLI', () => {
             it('throws a provider unhealthy error when using CLI options', (done) => {
               expect.assertions(2);
 
-              proc = fork(exePath, [...baseArgs, '--api-url', apiUrl, '--use-queue', ServiceNames.TxSubmit], {
+              proc = fork(exePath, [...baseArgs, '--api-url', apiUrl, '--use-queue', 'true', ServiceNames.TxSubmit], {
                 env: {},
                 stdio: 'pipe'
               });
@@ -1320,6 +1345,7 @@ describe('CLI', () => {
                 {
                   args: [
                     '--use-queue',
+                    'true',
                     '--rabbitmq-srv-service-name',
                     rabbitmqSrvServiceName,
                     '--service-discovery-timeout',
@@ -1356,6 +1382,7 @@ describe('CLI', () => {
                 {
                   args: [
                     '--use-queue',
+                    'true',
                     '--rabbitmq-srv-service-name',
                     rabbitmqSrvServiceName,
                     '--rabbitmq-url',
@@ -1668,7 +1695,7 @@ describe('CLI', () => {
 
         describe('default parallel option value', () => {
           it('worker starts in parallel mode using CLI options', (done) => {
-            proc = fork(exePath, [...commonArgs, '--parallel'], { env: {}, stdio: 'pipe' });
+            proc = fork(exePath, [...commonArgs, '--parallel', 'true'], { env: {}, stdio: 'pipe' });
             proc.stdout!.on('data', (data) => (data.toString().match('parallel mode') ? done() : null));
           });
         });
