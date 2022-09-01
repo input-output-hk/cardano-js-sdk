@@ -1738,9 +1738,9 @@ __metadata:
     "@cardano-sdk/cardano-services-client": ^0.5.0
     "@cardano-sdk/core": ^0.5.0
     "@cardano-sdk/ogmios": ^0.5.0
-    "@cardano-sdk/rabbitmq": ^0.5.0
     "@cardano-sdk/util": ^0.5.0
     "@cardano-sdk/util-dev": ^0.4.1
+    "@types/amqplib": ^0.8.2
     "@types/bunyan": ^1.8.8
     "@types/clear": ^0.1.2
     "@types/death": ^1.1.2
@@ -1751,6 +1751,7 @@ __metadata:
     "@types/node": 14.18.12
     "@types/pg": ^8.6.5
     "@types/wait-on": ^5.3.1
+    amqplib: ^0.10.0
     axios: ^0.27.2
     body-parser: ^1.19.2
     bunyan: ^1.8.15
@@ -1977,33 +1978,6 @@ __metadata:
     shx: ^0.3.3
     ts-jest: ^28.0.7
     ts-log: ^2.2.3
-    typescript: ^4.7.4
-    ws: ^8.5.0
-  languageName: unknown
-  linkType: soft
-
-"@cardano-sdk/rabbitmq@^0.5.0, @cardano-sdk/rabbitmq@workspace:packages/rabbitmq":
-  version: 0.0.0-use.local
-  resolution: "@cardano-sdk/rabbitmq@workspace:packages/rabbitmq"
-  dependencies:
-    "@cardano-ogmios/schema": 5.5.2
-    "@cardano-sdk/core": ^0.5.0
-    "@cardano-sdk/ogmios": ^0.5.0
-    "@cardano-sdk/util": ^0.5.0
-    "@cardano-sdk/util-dev": ^0.4.1
-    "@types/amqplib": ^0.8.2
-    "@types/node": 14.18.12
-    amqplib: ^0.10.0
-    axios: ^0.27.2
-    dockerode: ^3.3.2
-    dockerode-utils: ^0.0.7
-    eslint: ^7.32.0
-    get-port-please: ^2.5.0
-    jest: ^28.1.3
-    npm-run-all: ^4.1.5
-    shx: ^0.3.3
-    ts-jest: ^28.0.7
-    ts-log: ^2.2.4
     typescript: ^4.7.4
     ws: ^8.5.0
   languageName: unknown
@@ -9315,16 +9289,6 @@ __metadata:
     docker-modem: ^3.0.0
     tar-fs: ~2.0.1
   checksum: 930162ae2d8a1fe0e99d9a5885b09aa438da6274d4a30cb90e73046655dbc90764eb755361a63ba08f167e257c4d649d67bce71f650461a20b97fcde0af05ca5
-  languageName: node
-  linkType: hard
-
-"dockerode@npm:^3.3.2":
-  version: 3.3.2
-  resolution: "dockerode@npm:3.3.2"
-  dependencies:
-    docker-modem: ^3.0.0
-    tar-fs: ~2.0.1
-  checksum: 69b60547ed2e6156e6ec1df16fccea9150c935ee0b0517723b4d05a5d840a01d4cd945341390d24b7fa301383be64145d563d9319be56d487a5bcbf9f872ee59
   languageName: node
   linkType: hard
 

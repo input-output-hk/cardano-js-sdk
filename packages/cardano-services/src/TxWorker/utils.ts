@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable no-use-before-define */
-import { CONNECTION_ERROR_EVENT, TxSubmitWorker } from '@cardano-sdk/rabbitmq';
+import { CONNECTION_ERROR_EVENT, TxSubmitWorker } from '../TxSubmit';
 import { CommonOptionDescriptions } from '../ProgramsCommon';
 import { DnsResolver, MissingProgramOption, ServiceNames, srvRecordToRabbitmqURL } from '../Program';
 import { Logger } from 'ts-log';

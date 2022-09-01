@@ -1,5 +1,5 @@
 import { Logger } from 'ts-log';
-import { RabbitMqTxSubmitProvider } from '../src/rabbitmqTxSubmitProvider';
+import { RabbitMqTxSubmitProvider } from '../../../src';
 import { connect } from 'amqplib';
 import { contextLogger } from '@cardano-sdk/util';
 import { getRandomPort } from 'get-port-please';

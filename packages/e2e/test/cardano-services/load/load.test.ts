@@ -3,7 +3,7 @@ import * as envalid from 'envalid';
 import { Cardano } from '@cardano-sdk/core';
 import { ChildProcess, fork } from 'child_process';
 import { InitializeTxResult, ObservableWallet } from '@cardano-sdk/wallet';
-import { RabbitMQContainer } from '../../../../rabbitmq/test/docker';
+import { RabbitMQContainer } from '../../../../cardano-services/test/TxSubmit/rabbitmq/docker';
 import { ServiceNames } from '@cardano-sdk/cardano-services';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom } from 'rxjs';

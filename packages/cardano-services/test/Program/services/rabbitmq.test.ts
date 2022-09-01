@@ -12,7 +12,7 @@ import {
   loadAndStartTxWorker
 } from '../../../src';
 import { Ogmios } from '@cardano-sdk/ogmios';
-import { RabbitMQContainer } from '../../../../rabbitmq/test/docker';
+import { RabbitMQContainer } from '../../TxSubmit/rabbitmq/docker';
 import { RunningTxSubmitWorker } from '../../../src/TxWorker/utils';
 import { SrvRecord } from 'dns';
 import { bufferToHexString } from '@cardano-sdk/util';
@@ -21,7 +21,7 @@ import { getPort, getRandomPort } from 'get-port-please';
 import { listenPromise, serverClosePromise } from '../../../src/util';
 import { dummyLogger as logger } from 'ts-log';
 import { ogmiosServerReady } from '../../util';
-import { txsPromise } from '../../../../rabbitmq/test/utils';
+import { txsPromise } from '../../TxSubmit/rabbitmq/utils';
 import { types } from 'util';
 import axios from 'axios';
 import http from 'http';

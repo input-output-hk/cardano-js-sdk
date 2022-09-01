@@ -1,6 +1,6 @@
 import { CommonProgramOptions } from '../ProgramsCommon';
 import { Logger } from 'ts-log';
-import { TxSubmitWorkerConfig } from '@cardano-sdk/rabbitmq';
+import { TxSubmitWorkerConfig } from '../TxSubmit';
 import { createDnsResolver, getOgmiosTxSubmitProvider } from '../Program';
 import { createLogger } from 'bunyan';
 import { getRunningTxSubmitWorker } from './utils';

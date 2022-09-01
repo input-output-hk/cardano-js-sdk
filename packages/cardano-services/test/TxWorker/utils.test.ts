@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { Connection } from '@cardano-ogmios/client';
 import { Ogmios } from '@cardano-sdk/ogmios';
-import { RabbitMQContainer } from '../../../rabbitmq/test/docker';
+import { RabbitMQContainer } from '../TxSubmit/rabbitmq/docker';
 import {
   RunningTxSubmitWorker,
   getRunningTxSubmitWorker,

@@ -6,7 +6,7 @@ import { DnsResolver, srvRecordToRabbitmqURL } from '../utils';
 import { Logger } from 'ts-log';
 import { MissingProgramOption } from '../errors';
 import { ProviderFailure, SubmitTxArgs } from '@cardano-sdk/core';
-import { RabbitMqTxSubmitProvider } from '@cardano-sdk/rabbitmq';
+import { RabbitMqTxSubmitProvider } from '../../TxSubmit';
 import { ServiceNames } from '../ServiceNames';
 import { isConnectionError } from '@cardano-sdk/util';
 

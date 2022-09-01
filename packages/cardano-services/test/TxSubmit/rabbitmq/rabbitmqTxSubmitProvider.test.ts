@@ -1,7 +1,7 @@
 import { BAD_CONNECTION_URL, txsPromise } from './utils';
 import { ProviderError, TxSubmitProvider } from '@cardano-sdk/core';
 import { RabbitMQContainer } from './docker';
-import { RabbitMqTxSubmitProvider, TxSubmitWorker } from '../src';
+import { RabbitMqTxSubmitProvider, TxSubmitWorker } from '../../../src';
 import { logger } from '@cardano-sdk/util-dev';
 
 describe('RabbitMqTxSubmitProvider', () => {
