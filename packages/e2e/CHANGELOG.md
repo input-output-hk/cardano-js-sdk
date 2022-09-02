@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.0-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.5.0-nightly.1...@cardano-sdk/e2e@0.5.0-nightly.2) (2022-09-02)
+
+
+### ⚠ BREAKING CHANGES
+
+* convert boolean args to support ENV counterparts, parse as booleans
+
+### Bug Fixes
+
+* convert boolean args to support ENV counterparts, parse as booleans ([d14bd9d](https://github.com/input-output-hk/cardano-js-sdk/commit/d14bd9d8aeec64f04aab094e0aceb8dc5b803926))
+
+
+
 ## [0.5.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.5.0-nightly.0...@cardano-sdk/e2e@0.5.0-nightly.1) (2022-09-01)
 
 

@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.5.1-nightly.0...@cardano-sdk/util@0.6.0-nightly.0) (2022-09-02)
+
+
+### ⚠ BREAKING CHANGES
+
+* hoist hexString utils to util package
+
+### Code Refactoring
+
+* hoist hexString utils to util package ([0c99d9d](https://github.com/input-output-hk/cardano-js-sdk/commit/0c99d9d37f23bb504d1ac2a530fbe78aa045db66))
+
+
+
 ## [0.5.1-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.5.0...@cardano-sdk/util@0.5.1-nightly.0) (2022-08-31)
 
 **Note:** Version bump only for package @cardano-sdk/util

@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.5.1-nightly.1...@cardano-sdk/cardano-services@0.6.0-nightly.0) (2022-09-02)
+
+
+### ⚠ BREAKING CHANGES
+
+* convert boolean args to support ENV counterparts, parse as booleans
+* hoist hexString utils to util package
+
+### Features
+
+* **cardano-services:** adds log of incoming requests ([f302f9c](https://github.com/input-output-hk/cardano-js-sdk/commit/f302f9c656b9026b3b19a63a4ce818acea841a77))
+
+
+### Bug Fixes
+
+* convert boolean args to support ENV counterparts, parse as booleans ([d14bd9d](https://github.com/input-output-hk/cardano-js-sdk/commit/d14bd9d8aeec64f04aab094e0aceb8dc5b803926))
+
+
+### Code Refactoring
+
+* hoist hexString utils to util package ([0c99d9d](https://github.com/input-output-hk/cardano-js-sdk/commit/0c99d9d37f23bb504d1ac2a530fbe78aa045db66))
+
+
+
 ## [0.5.1-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.5.1-nightly.0...@cardano-sdk/cardano-services@0.5.1-nightly.1) (2022-09-01)
 
 
