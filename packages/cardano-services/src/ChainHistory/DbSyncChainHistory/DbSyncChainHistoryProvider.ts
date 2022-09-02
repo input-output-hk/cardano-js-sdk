@@ -6,7 +6,7 @@ import { DbSyncProvider } from '../../DbSyncProvider';
 import { Logger } from 'ts-log';
 import { MetadataService } from '../../Metadata';
 import { Pool, QueryResult } from 'pg';
-import { hexStringToBuffer } from '../../util';
+import { hexStringToBuffer } from '@cardano-sdk/util';
 import { mapBlock, mapTxAlonzo, mapTxIn, mapTxOut } from './mappers';
 import orderBy from 'lodash/orderBy';
 import uniq from 'lodash/uniq';

@@ -6,6 +6,7 @@ import {
   isPoolDataSortField,
   isPoolMetricsSortField
 } from '@cardano-sdk/core';
+import BigNumber from 'bignumber.js';
 
 export const getStakePoolSortType = (field: string): PoolSortType => {
   if (isPoolDataSortField(field)) return 'data';
@@ -16,6 +17,7 @@ export const getStakePoolSortType = (field: string): PoolSortType => {
 
 export const QUERIES_NAMESPACE = 'StakePoolQueries';
 export const IDS_NAMESPACE = 'StakePoolIds';
+export const LIVE_STAKE_CACHE_KEY = 'StakePoolLiveStake';
 
 export enum StakePoolsSubQuery {
   APY = 'apy',
@@ -42,3 +44,6 @@ export const emptyPoolsExtraInfo = {
   poolRetirements: [],
   poolRewards: []
 };
+
+export const divideBigIntToFloat = (numerator: bigint, denominator: bigint) =>
+  new BigNumber(numerator.toString()).dividedBy(new BigNumber(denominator.toString())).toString();

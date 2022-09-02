@@ -11,9 +11,10 @@ import {
   RunnableModule,
   ServiceNames
 } from '../../src';
-import { Logger, dummyLogger as logger } from 'ts-log';
+import { Logger } from 'ts-log';
 import { Pool } from 'pg';
 import { Provider } from '@cardano-sdk/core';
+import { createLogger, logger } from '@cardano-sdk/util-dev';
 import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
 import { getRandomPort } from 'get-port-please';
 import axios from 'axios';
@@ -21,6 +22,7 @@ import express from 'express';
 import net from 'net';
 import waitOn from 'wait-on';
 
+const headers = { [CONTENT_TYPE]: APPLICATION_JSON };
 const onHttpServer = (url: string) => waitOn({ resources: [url], validateStatus: (statusCode) => statusCode === 404 });
 
 class SomeHttpService extends HttpService {
@@ -37,7 +39,7 @@ class SomeHttpService extends HttpService {
     super(name, provider, router, logger);
     this.shouldFail = shouldFail;
 
-    router.post('/echo', (req, res) => {
+    router.all('/echo', (req, res) => {
       logger.debug(req.body);
       assertReq!(req);
       HttpServer.sendJSON(res, req.body);
@@ -76,6 +78,8 @@ describe('HttpServer', () => {
   });
 
   describe('initialize', () => {
+    afterEach(() => httpServer.shutdown());
+
     it('initializes the express application', async () => {
       httpServer = new HttpServer(
         { listen: { host: 'localhost', port } },
@@ -84,6 +88,8 @@ describe('HttpServer', () => {
       expect(httpServer.app).not.toBeDefined();
       await httpServer.initialize();
       expect(httpServer.app).toBeDefined();
+      await httpServer.start();
+      await onHttpServer(apiUrlBase);
     });
 
     it('uses core serializableObject with body parser', async () => {
@@ -105,11 +111,46 @@ describe('HttpServer', () => {
       await axios.post(
         `${apiUrlBase}/${ServiceNames.StakePool}/echo`,
         JSON.stringify(toSerializableObject(expectedBody)),
+        { headers }
+      );
+    });
+
+    it('correctly logs requests', async () => {
+      const testLogger = createLogger({ record: true });
+      const expectedBody = { bigint: 23n, check: 'ok', test: 42 };
+      const expectedQuery = { bigint: '23', check: 'ok', test: '42' };
+      const url = `${apiUrlBase}/${ServiceNames.StakePool}/echo`;
+      let requestCounter = 0;
+
+      httpServer = new HttpServer(
+        { listen: { host: 'localhost', port } },
         {
-          headers: { [CONTENT_TYPE]: APPLICATION_JSON }
+          logger: testLogger,
+          services: [
+            new SomeHttpService(ServiceNames.StakePool, provider, logger, express.Router(), (req: express.Request) => {
+              if (requestCounter++ === 0) return expect(req.body).toEqual(expectedBody);
+              expect(req.query).toEqual(expectedQuery);
+            })
+          ]
         }
       );
-      await httpServer.shutdown();
+
+      await httpServer.initialize();
+      await httpServer.start();
+      await onHttpServer(apiUrlBase);
+
+      await axios.post(url, JSON.stringify(toSerializableObject(expectedBody)), { headers });
+      await axios.get(url, { params: expectedBody });
+
+      expect(
+        testLogger.messages
+          .filter(({ level, message }) => level === 'debug' && message[0] === '[HttpServer|request]')
+          .map(({ message: [, requestDetails] }) => requestDetails)
+      ).toEqual([
+        { body: {}, method: 'HEAD', path: '/', query: {} },
+        { body: { bigint: 23n, check: 'ok', test: 42 }, method: 'POST', path: '/stake-pool/echo', query: {} },
+        { body: {}, method: 'GET', path: '/stake-pool/echo', query: { bigint: '23', check: 'ok', test: '42' } }
+      ]);
     });
   });
 
@@ -211,7 +252,7 @@ describe('HttpServer', () => {
       await httpServer.start();
       await onHttpServer(apiUrlBase);
       const response = await axios.get(`${apiUrlBase}/${ServiceNames.StakePool}/metrics`, {
-        headers: { [CONTENT_TYPE]: APPLICATION_JSON },
+        headers,
         validateStatus: null
       });
       expect(response.status).toBe(404);
@@ -225,9 +266,7 @@ describe('HttpServer', () => {
       await httpServer.initialize();
       await httpServer.start();
       await onHttpServer(apiUrlBase);
-      const res = await axios.get(`${apiUrlBase}/metrics`, {
-        headers: { [CONTENT_TYPE]: APPLICATION_JSON }
-      });
+      const res = await axios.get(`${apiUrlBase}/metrics`, { headers });
       expect(res.status).toBe(200);
       expect(typeof res.data).toBe('string');
     });
@@ -241,9 +280,7 @@ describe('HttpServer', () => {
       await httpServer.initialize();
       await httpServer.start();
       await onHttpServer(apiUrlBase);
-      const response = await axios.get(`${apiUrlBase}${metricsPath}`, {
-        headers: { [CONTENT_TYPE]: APPLICATION_JSON }
-      });
+      const response = await axios.get(`${apiUrlBase}${metricsPath}`, { headers });
       expect(response.status).toBe(200);
       expect(typeof response.data).toBe('string');
     });
@@ -256,9 +293,7 @@ describe('HttpServer', () => {
       await httpServer.initialize();
       await httpServer.start();
       await onHttpServer(apiUrlBase);
-      const response = await axios.get(`${apiUrlBase}/metrics`, {
-        headers: { [CONTENT_TYPE]: APPLICATION_JSON }
-      });
+      const response = await axios.get(`${apiUrlBase}/metrics`, { headers });
       expect(response.status).toBe(200);
       expect(response.data.includes('healthcheck 1')).toEqual(true);
     });
@@ -274,9 +309,7 @@ describe('HttpServer', () => {
       await onHttpServer(apiUrlBase);
       service.healthCheck = async () => Promise.resolve({ ok: false });
 
-      const response = await axios.get(`${apiUrlBase}/metrics`, {
-        headers: { [CONTENT_TYPE]: APPLICATION_JSON }
-      });
+      const response = await axios.get(`${apiUrlBase}/metrics`, { headers });
 
       expect(response.status).toBe(200);
       expect(response.data.includes('healthcheck 0')).toEqual(true);

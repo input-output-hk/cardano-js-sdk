@@ -3,6 +3,7 @@
 /* eslint-disable max-len */
 import {
   Cardano,
+  CardanoNode,
   ProviderError,
   ProviderFailure,
   SortField,
@@ -18,6 +19,7 @@ import { Pool } from 'pg';
 import { getPort } from 'get-port-please';
 import { ingestDbData, sleep, wrapWithTransaction } from '../util';
 import { dummyLogger as logger } from 'ts-log';
+import { mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
 import axios from 'axios';
 
 const UNSUPPORTED_MEDIA_STRING = 'Request failed with status code 415';
@@ -60,6 +62,7 @@ describe('StakePoolHttpService', () => {
   let clientConfig: CreateHttpProviderConfig<StakePoolProvider>;
   let config: HttpServerConfig;
   let provider: StakePoolProvider;
+  let cardanoNode: CardanoNode;
 
   const epochPollInterval = 2 * 1000;
   const cache = new InMemoryCache(UNLIMITED_CACHE_TTL);
@@ -101,11 +104,11 @@ describe('StakePoolHttpService', () => {
     const clearCacheSpy = jest.spyOn(cache, 'clear');
 
     beforeAll(async () => {
-      stakePoolProvider = new DbSyncStakePoolProvider({ cache, db, epochMonitor, logger });
+      cardanoNode = mockCardanoNode();
+      stakePoolProvider = new DbSyncStakePoolProvider({ cache, cardanoNode, db, epochMonitor, logger });
       service = new StakePoolHttpService({ logger, stakePoolProvider });
       httpServer = new HttpServer(config, { logger, services: [service] });
       provider = stakePoolHttpProvider(clientConfig);
-
       await httpServer.initialize();
       await httpServer.start();
     });
@@ -147,7 +150,7 @@ describe('StakePoolHttpService', () => {
       const url = '/search';
       const DB_POLL_QUERIES_COUNT = 1;
       const cachedSubQueriesCount = 10;
-      const cacheKeysCount = 6;
+      const cacheKeysCount = 7;
       const nonCacheableSubQueriesCount = 2; // queryTotalCount and getLastEpoch
       const filerOnePoolOptions: StakePoolQueryOptions = {
         filters: {

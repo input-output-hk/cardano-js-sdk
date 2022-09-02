@@ -52,8 +52,14 @@ export interface RelayModel {
   hostname?: string;
 }
 
+export interface Epoch {
+  no: number;
+  poolOptimalCount?: number;
+}
+
 export interface EpochModel {
   no: number;
+  pool_optimal_count?: number;
 }
 
 export interface EpochReward {
@@ -131,7 +137,13 @@ export interface PoolMetricsModel {
 }
 
 export interface PoolMetrics extends CommonPoolInfo {
-  metrics: Omit<Cardano.StakePoolMetrics, 'apy'>;
+  metrics: {
+    blocksCreated: number;
+    livePledge: Cardano.Lovelace;
+    activeStake: Cardano.Lovelace;
+    saturation: Cardano.Percent;
+    delegators: number;
+  };
 }
 
 export interface TotalCountModel {

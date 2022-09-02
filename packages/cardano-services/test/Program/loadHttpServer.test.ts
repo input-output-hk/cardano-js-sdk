@@ -4,6 +4,7 @@ import { DB_CACHE_TTL_DEFAULT } from '../../src/InMemoryCache';
 import { EPOCH_POLL_INTERVAL_DEFAULT, listenPromise, serverClosePromise } from '../../src/util';
 import {
   HttpServer,
+  MissingCardanoNodeOption,
   MissingProgramOption,
   ProgramOptionDescriptions,
   SERVICE_DISCOVERY_BACKOFF_FACTOR_DEFAULT,
@@ -105,8 +106,10 @@ describe('loadHttpServer', () => {
         httpServer = await loadHttpServer({
           apiUrl,
           options: {
+            cardanoNodeConfigPath,
             dbCacheTtl,
             epochPollInterval,
+            ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
             postgresDb,
             postgresPassword,
             postgresSrvServiceName,
@@ -214,7 +217,7 @@ describe('loadHttpServer', () => {
               serviceNames: [ServiceNames.TxSubmit]
             })
         ).rejects.toThrow(
-          new MissingProgramOption(ServiceNames.TxSubmit, [
+          new MissingCardanoNodeOption([
             ProgramOptionDescriptions.OgmiosUrl,
             ProgramOptionDescriptions.OgmiosSrvServiceName
           ])

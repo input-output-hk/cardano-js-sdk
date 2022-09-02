@@ -29,6 +29,7 @@ import { Logger } from 'ts-log';
 import { Pool, QueryResult } from 'pg';
 import {
   mapAddressOwner,
+  mapEpoch,
   mapEpochReward,
   mapPoolAPY,
   mapPoolData,
@@ -184,7 +185,17 @@ export class StakePoolBuilder {
   public async getLastEpoch() {
     this.#logger.debug('About to query last epoch');
     const result: QueryResult<EpochModel> = await this.#db.query(Queries.findLastEpoch);
-    return result.rows[0].no;
+    const lastEpoch = result.rows[0];
+    if (!lastEpoch) throw new ProviderError(ProviderFailure.Unknown, null, "Couldn't find last epoch");
+    return lastEpoch.no;
+  }
+
+  public async getLastEpochWithData() {
+    this.#logger.debug('About to query last epoch with data');
+    const result: QueryResult<EpochModel> = await this.#db.query(Queries.findLastEpochWithData);
+    const lastEpoch = result.rows[0];
+    if (!lastEpoch) throw new ProviderError(ProviderFailure.Unknown, null, "Couldn't find last epoch");
+    return mapEpoch(lastEpoch);
   }
 
   public async getTotalAmountOfAda() {

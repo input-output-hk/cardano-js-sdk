@@ -119,7 +119,7 @@ const startWorker = async (options: TestOptions = {}) => {
     [
       'start-worker',
       ...commonArgs,
-      ...(options.parallel ? ['--parallel', '--parallel-txs', env.WORKER_PARALLEL_TRANSACTION.toString()] : [])
+      ...(options.parallel ? ['--parallel', 'true', '--parallel-txs', env.WORKER_PARALLEL_TRANSACTION.toString()] : [])
     ],
     '"msg":"TxSubmitWorker: starting'
   );

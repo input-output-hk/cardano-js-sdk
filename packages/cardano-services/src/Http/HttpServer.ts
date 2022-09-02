@@ -4,7 +4,7 @@ import { HttpService } from './HttpService';
 import { Logger } from 'ts-log';
 import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { RunnableModule } from '../RunnableModule';
-import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
+import { contextLogger, fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
 import { listenPromise, serverClosePromise } from '../util';
 import bodyParser from 'body-parser';
 import express from 'express';
@@ -92,6 +92,15 @@ export class HttpServer extends RunnableModule {
         }`
       );
     }
+
+    const requestLogger = contextLogger(this.logger, 'request');
+
+    this.app.use((req, _res, next) => {
+      const { body, method, path, query } = req;
+
+      requestLogger.debug({ body, method, path, query });
+      next();
+    });
 
     for (const service of this.#dependencies.services) {
       await service.initialize();
