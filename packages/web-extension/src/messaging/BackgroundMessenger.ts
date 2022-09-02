@@ -60,14 +60,21 @@ export const createBackgroundMessenger = ({ logger, runtime }: MessengerDependen
      * Disconnect all existing ports and stop listening for new ones.
      */
     destroy() {
-      for (const { message$, ports$ } of channels.values()) {
-        message$.complete();
-        for (const port of ports$.value) {
-          port.disconnect();
-        }
+      // eslint-disable-next-line unicorn/no-useless-spread
+      for (const channelName of [...channels.keys()]) {
+        this.destroyChannel(channelName);
       }
       runtime.onConnect.removeListener(onConnect);
       logger.warn('[BackgroundMessenger] destroyed');
+    },
+    destroyChannel(channelName: string) {
+      const channel = channels.get(channelName);
+      if (!channel) return;
+      channel.message$.complete();
+      for (const port of channel.ports$.value) {
+        port.disconnect();
+      }
+      channels.delete(channelName);
     },
     getChannel
   };
@@ -93,7 +100,7 @@ export const generalizeBackgroundMessenger = (channel: ChannelName, messenger: B
     return generalizeBackgroundMessenger(deriveChannelName(channel, path), messenger);
   },
   destroy() {
-    messenger.destroy();
+    messenger.destroyChannel(channel);
   },
   message$: messenger.getChannel(channel).message$,
   /**
