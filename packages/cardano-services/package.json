@@ -57,8 +57,6 @@
     "test:debug": "DEBUG=true yarn test",
     "test:e2e": "shx echo 'test:e2e' command not implemented yet",
     "test:load": "jest -c ./load.jest.config.js --runInBand",
-    "testnet:up": "DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 OGMIOS_PORT=1338 NETWORK=testnet CARDANO_NODE_VERSION=1.35.2 docker-compose -p cardano-services-testnet up",
-    "testnet:down": "docker-compose -p cardano-services-testnet down",
     "tscNoEmit": "shx echo typescript --noEmit command not implemented yet"
   },
   "devDependencies": {
