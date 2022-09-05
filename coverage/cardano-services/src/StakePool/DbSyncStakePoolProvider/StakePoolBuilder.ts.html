@@ -362,11 +362,7 @@
 <a name='L297'></a><a href='#L297'>297</a>
 <a name='L298'></a><a href='#L298'>298</a>
 <a name='L299'></a><a href='#L299'>299</a>
-<a name='L300'></a><a href='#L300'>300</a>
-<a name='L301'></a><a href='#L301'>301</a>
-<a name='L302'></a><a href='#L302'>302</a>
-<a name='L303'></a><a href='#L303'>303</a>
-<a name='L304'></a><a href='#L304'>304</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L300'></a><a href='#L300'>300</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">25x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -468,7 +464,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">92x</span>
 <span class="cline-any cline-yes">92x</span>
 <span class="cline-any cline-yes">92x</span>
@@ -477,7 +472,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">92x</span>
 <span class="cline-any cline-yes">92x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">94x</span>
@@ -498,7 +492,6 @@
 <span class="cline-any cline-yes">95x</span>
 <span class="cline-any cline-yes">95x</span>
 <span class="cline-any cline-yes">95x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">69x</span>
@@ -570,7 +563,6 @@
 <span class="cline-any cline-yes">71x</span>
 <span class="cline-any cline-yes">71x</span>
 <span class="cline-any cline-yes">71x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">50x</span>
@@ -675,7 +667,7 @@ import {
   MultipleChoiceSearchFilter,
   ProviderError,
   ProviderFailure,
-  StakePoolQueryOptions,
+  QueryStakePoolsArgs,
   StakePoolStats
 } from '@cardano-sdk/core';
 import {
@@ -770,8 +762,7 @@ export class StakePoolBuilder {
       })
     );
   }
-&nbsp;
-  public async queryPoolAPY(hashesIds: number[], options?: StakePoolQueryOptions): Promise&lt;PoolAPY[]&gt; {
+  public async queryPoolAPY(hashesIds: number[], options?: QueryStakePoolsArgs): Promise&lt;PoolAPY[]&gt; {
     this.#logger.debug('About to query pools APY');
     const defaultSort: OrderByOptions[] = [{ field: 'apy', order: 'desc' }];
     const queryWithSortAndPagination = withPagination(
@@ -781,8 +772,7 @@ export class StakePoolBuilder {
     const result: QueryResult&lt;PoolAPYModel&gt; = await this.#db.query(queryWithSortAndPagination, [hashesIds]);
     return result.rows.map(mapPoolAPY);
   }
-&nbsp;
-  public async queryPoolData(updatesIds: number[], options?: StakePoolQueryOptions) {
+  public async queryPoolData(updatesIds: number[], options?: QueryStakePoolsArgs) {
     this.#logger.debug('About to query pool data');
     const defaultSort: OrderByOptions[] = [
       { field: 'name', order: 'asc' },
@@ -802,8 +792,7 @@ export class StakePoolBuilder {
     const result: QueryResult&lt;PoolUpdateModel&gt; = await this.#db.query(query, params);
     return result.rows.length &gt; 0 ? result.rows.map(mapPoolUpdate) : [];
   }
-&nbsp;
-  public async queryPoolMetrics(hashesIds: number[], totalAdaAmount: string, options?: StakePoolQueryOptions) {
+  public async queryPoolMetrics(hashesIds: number[], totalAdaAmount: string, options?: QueryStakePoolsArgs) {
     this.#logger.debug('About to query pool metrics');
     const queryWithSortAndPagination = withPagination(
       withSort(Queries.findPoolsMetrics, options?.sort, [{ field: 'saturation', order: 'desc' }]),
@@ -874,8 +863,7 @@ export class StakePoolBuilder {
     const result: QueryResult&lt;TotalAdaModel&gt; = await this.#db.query(Queries.findTotalAda);
     return result.rows[0].total_ada;
   }
-&nbsp;
-  public buildOrQuery(filters: StakePoolQueryOptions['filters']) {
+  public buildOrQuery(filters: QueryStakePoolsArgs['filters']) {
     const subQueries: SubQuery[] = [];
     const params = [];
     let query = Queries.findPools;
@@ -901,7 +889,7 @@ export class StakePoolBuilder {
   }
 &nbsp;
   // eslint-disable-next-line max-statements
-  public buildAndQuery(filters: StakePoolQueryOptions['filters']) {
+  public buildAndQuery(filters: QueryStakePoolsArgs['filters']) {
     let query = Queries.findPools;
     let groupByClause = ' GROUP BY ph.id, pu.id ORDER BY ph.id DESC';
     const params = [];
@@ -979,7 +967,7 @@ export class StakePoolBuilder {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at Fri Sep 02 2022 03:35:51 GMT+0000 (Coordinated Universal Time)
+                at Mon Sep 05 2022 16:57:12 GMT+0000 (Coordinated Universal Time)
             </div>
         <script src="../../../prettify.js"></script>
         <script>
