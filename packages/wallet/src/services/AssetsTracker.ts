@@ -9,7 +9,8 @@ import { coldObservableProvider } from './util';
 export const createAssetService =
   (assetProvider: TrackedAssetProvider, retryBackoffConfig: RetryBackoffConfig) => (assetId: Cardano.AssetId) =>
     coldObservableProvider({
-      provider: () => assetProvider.getAsset(assetId, { history: false, nftMetadata: true, tokenMetadata: true }),
+      provider: () =>
+        assetProvider.getAsset({ assetId, extraData: { history: false, nftMetadata: true, tokenMetadata: true } }),
       retryBackoffConfig,
       trigger$: of(true) // fetch only once
     });

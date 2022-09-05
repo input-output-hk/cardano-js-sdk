@@ -83,7 +83,7 @@ export const createRewardsProvider =
       rewardAccounts.map((rewardAccount) =>
         coldObservableProvider({
           equals: isEqual,
-          provider: () => rewardsProvider.rewardAccountBalance(rewardAccount),
+          provider: () => rewardsProvider.rewardAccountBalance({ rewardAccount }),
           retryBackoffConfig,
           trigger$: fetchRewardsTrigger$(epoch$, txConfirmed$, rewardAccount)
         }).pipe(distinctUntilChanged())

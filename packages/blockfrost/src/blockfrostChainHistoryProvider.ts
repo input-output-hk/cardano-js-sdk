@@ -205,8 +205,8 @@ export const blockfrostChainHistoryProvider = (blockfrost: BlockFrostAPI, logger
     };
   };
 
-  const blocksByHashes: ChainHistoryProvider['blocksByHashes'] = async (hashes) => {
-    const responses = await Promise.all(hashes.map((hash) => blockfrost.blocks(hash.toString())));
+  const blocksByHashes: ChainHistoryProvider['blocksByHashes'] = async ({ ids }) => {
+    const responses = await Promise.all(ids.map((id) => blockfrost.blocks(id.toString())));
     return responses.map((response) => {
       if (!response.epoch || !response.epoch_slot || !response.height || !response.slot || !response.block_vrf) {
         throw new ProviderError(ProviderFailure.Unknown, null, 'Queried unsupported block');
@@ -233,8 +233,8 @@ export const blockfrostChainHistoryProvider = (blockfrost: BlockFrostAPI, logger
     });
   };
 
-  const transactionsByHashes: ChainHistoryProvider['transactionsByHashes'] = async (hashes) =>
-    Promise.all(hashes.map((hash) => fetchTransaction(hash)));
+  const transactionsByHashes: ChainHistoryProvider['transactionsByHashes'] = async ({ ids }) =>
+    Promise.all(ids.map((id) => fetchTransaction(id)));
 
   const transactionsByAddresses: ChainHistoryProvider['transactionsByAddresses'] = async ({
     addresses,
@@ -261,8 +261,8 @@ export const blockfrostChainHistoryProvider = (blockfrost: BlockFrostAPI, logger
     const addressTransactionsSinceBlock = sinceBlock
       ? allTransactions.filter(({ block_height }) => block_height >= sinceBlock)
       : allTransactions;
-
-    return transactionsByHashes(addressTransactionsSinceBlock.map(({ tx_hash }) => Cardano.TransactionId(tx_hash)));
+    const ids = addressTransactionsSinceBlock.map(({ tx_hash }) => Cardano.TransactionId(tx_hash));
+    return transactionsByHashes({ ids });
   };
 
   return {

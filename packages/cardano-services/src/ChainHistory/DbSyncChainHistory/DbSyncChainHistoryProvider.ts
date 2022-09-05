@@ -1,6 +1,12 @@
 import * as Queries from './queries';
 import { BlockModel, BlockOutputModel, TipModel, TxInOutModel, TxModel } from './types';
-import { Cardano, ChainHistoryProvider, TransactionsByAddressesArgs } from '@cardano-sdk/core';
+import {
+  BlocksByIdsArgs,
+  Cardano,
+  ChainHistoryProvider,
+  TransactionsByAddressesArgs,
+  TransactionsByIdsArgs
+} from '@cardano-sdk/core';
 import { ChainHistoryBuilder } from './ChainHistoryBuilder';
 import { DbSyncProvider } from '../../DbSyncProvider';
 import { Logger } from 'ts-log';
@@ -39,27 +45,27 @@ export class DbSyncChainHistoryProvider extends DbSyncProvider implements ChainH
 
     if (inputsResults.rows.length === 0 && outputsResults.rows.length === 0) return [];
 
-    const hashes = uniq([
+    const ids = uniq([
       ...inputsResults.rows.map(mapTxIn).flatMap((input) => input.txId),
       ...outputsResults.rows.map((output) => mapTxOut(output)).flatMap((output) => output.txId)
     ]);
-    return this.transactionsByHashes(hashes);
+    return this.transactionsByHashes({ ids });
   }
 
-  public async transactionsByHashes(hashes: Cardano.TransactionId[]): Promise<Cardano.TxAlonzo[]> {
-    const byteHashes = hashes.map((hash) => hexStringToBuffer(hash.toString()));
-    this.#logger.debug('About to find transactions with hashes:', byteHashes);
-    const txResults: QueryResult<TxModel> = await this.db.query(Queries.findTransactionsByHashes, [byteHashes]);
+  public async transactionsByHashes({ ids }: TransactionsByIdsArgs): Promise<Cardano.TxAlonzo[]> {
+    const byteIds = ids.map((id) => hexStringToBuffer(id.toString()));
+    this.#logger.debug('About to find transactions with hashes:', byteIds);
+    const txResults: QueryResult<TxModel> = await this.db.query(Queries.findTransactionsByHashes, [byteIds]);
     if (txResults.rows.length === 0) return [];
     const [inputs, outputs, mints, withdrawals, redeemers, metadata, collaterals, certificates] = await Promise.all([
-      this.#builder.queryTransactionInputsByHashes(hashes),
-      this.#builder.queryTransactionOutputsByHashes(hashes),
-      this.#builder.queryTxMintByHashes(hashes),
-      this.#builder.queryWithdrawalsByHashes(hashes),
-      this.#builder.queryRedeemersByHashes(hashes),
-      this.#metadataService.queryTxMetadataByHashes(hashes),
-      this.#builder.queryTransactionInputsByHashes(hashes, true),
-      this.#builder.queryCertificatesByHashes(hashes)
+      this.#builder.queryTransactionInputsByHashes(ids),
+      this.#builder.queryTransactionOutputsByHashes(ids),
+      this.#builder.queryTxMintByHashes(ids),
+      this.#builder.queryWithdrawalsByHashes(ids),
+      this.#builder.queryRedeemersByHashes(ids),
+      this.#metadataService.queryTxMetadataByHashes(ids),
+      this.#builder.queryTransactionInputsByHashes(ids, true),
+      this.#builder.queryCertificatesByHashes(ids)
     ]);
     return txResults.rows.map((tx) => {
       const txId = Cardano.TransactionId(tx.id.toString('hex'));
@@ -88,20 +94,20 @@ export class DbSyncChainHistoryProvider extends DbSyncProvider implements ChainH
     });
   }
 
-  public async blocksByHashes(hashes: Cardano.BlockId[]): Promise<Cardano.Block[]> {
+  public async blocksByHashes({ ids }: BlocksByIdsArgs): Promise<Cardano.Block[]> {
     this.#logger.debug('About to find network tip');
     const tipResult: QueryResult<TipModel> = await this.db.query(Queries.findTip);
     const tip: TipModel = tipResult.rows[0];
     if (!tip) return [];
 
-    const byteHashes = hashes.map((hash) => hexStringToBuffer(hash.toString()));
-    this.#logger.debug('About to find blocks with hashes:', byteHashes);
-    const blocksResult: QueryResult<BlockModel> = await this.db.query(Queries.findBlocksByHashes, [byteHashes]);
+    const byteIds = ids.map((id) => hexStringToBuffer(id.toString()));
+    this.#logger.debug('About to find blocks with hashes:', byteIds);
+    const blocksResult: QueryResult<BlockModel> = await this.db.query(Queries.findBlocksByHashes, [byteIds]);
     if (blocksResult.rows.length === 0) return [];
 
-    this.#logger.debug('About to find blocks outputs and fees for blocks:', byteHashes);
+    this.#logger.debug('About to find blocks outputs and fees for blocks:', byteIds);
     const outputResult: QueryResult<BlockOutputModel> = await this.db.query(Queries.findBlocksOutputByHashes, [
-      byteHashes
+      byteIds
     ]);
     return blocksResult.rows.map((block) => {
       const blockOutput = outputResult.rows.find((output) => output.hash === block.hash) ?? {

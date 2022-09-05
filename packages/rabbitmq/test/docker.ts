@@ -168,7 +168,7 @@ export class RabbitMQContainer {
           { rabbitmqUrl },
           { logger: contextLogger(logger, 'enqueueTx') }
         );
-        await rabbitMqTxSubmitProvider.submitTx(txs[idx].txBodyUint8Array);
+        await rabbitMqTxSubmitProvider.submitTx({ signedTransaction: txs[idx].txBodyHex });
       } catch (error) {
         err = error;
       } finally {

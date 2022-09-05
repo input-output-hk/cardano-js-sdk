@@ -6,7 +6,7 @@ import { DnsResolver } from '../utils';
 import { Logger } from 'ts-log';
 import { MissingCardanoNodeOption } from '../errors';
 import { OgmiosCardanoNode, ogmiosTxSubmitProvider, urlToConnectionConfig } from '@cardano-sdk/ogmios';
-import { TxSubmitProvider } from '@cardano-sdk/core';
+import { SubmitTxArgs, TxSubmitProvider } from '@cardano-sdk/core';
 import { isConnectionError } from '@cardano-sdk/util';
 import memoize from 'lodash/memoize';
 
@@ -49,8 +49,8 @@ export const ogmiosTxSubmitProviderWithDiscovery = async (
     get(_, prop) {
       if (prop === 'then') return;
       if (prop === 'submitTx') {
-        return (args: Uint8Array) =>
-          ogmiosProvider.submitTx(args).catch(async (error) => {
+        return (submitTxArgs: SubmitTxArgs) =>
+          ogmiosProvider.submitTx(submitTxArgs).catch(async (error) => {
             if (error.innerError && isConnectionError(error.innerError)) {
               const record = await dnsResolver(serviceName!);
               logger.info(`DNS resolution for Ogmios service, resolved with record: ${JSON.stringify(record)}`);
@@ -60,7 +60,7 @@ export const ogmiosTxSubmitProviderWithDiscovery = async (
                   logger.warn(`Ogmios tx submit provider failed to close after DNS resolution: ${error_}`)
                 );
               ogmiosProvider = ogmiosTxSubmitProvider({ host: record.name, port: record.port }, logger);
-              return await ogmiosProvider.submitTx(args);
+              return await ogmiosProvider.submitTx(submitTxArgs);
             }
             throw error;
           });

@@ -17,9 +17,12 @@ export interface EpochRewards {
   rewards: Cardano.Lovelace;
 }
 
-export interface RewardHistoryProps {
+export interface RewardsHistoryArgs {
   rewardAccounts: Cardano.RewardAccount[];
   epochs?: EpochRange;
+}
+export interface RewardAccountBalanceArgs {
+  rewardAccount: Cardano.RewardAccount;
 }
 
 export interface RewardsProvider extends Provider {
@@ -28,6 +31,6 @@ export interface RewardsProvider extends Provider {
    *
    * @returns Rewards quantity for every epoch that had any rewards in ascending order.
    */
-  rewardsHistory: (props: RewardHistoryProps) => Promise<Map<Cardano.RewardAccount, EpochRewards[]>>;
-  rewardAccountBalance: (rewardAccount: Cardano.RewardAccount) => Promise<Cardano.Lovelace>;
+  rewardsHistory: (args: RewardsHistoryArgs) => Promise<Map<Cardano.RewardAccount, EpochRewards[]>>;
+  rewardAccountBalance: (args: RewardAccountBalanceArgs) => Promise<Cardano.Lovelace>;
 }

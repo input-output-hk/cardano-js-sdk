@@ -1,4 +1,4 @@
-import { Cardano, UtxoProvider } from '@cardano-sdk/core';
+import { Cardano, UtxoByAddressesArgs, UtxoProvider } from '@cardano-sdk/core';
 import delay from 'delay';
 
 export const somePartialUtxos: Cardano.Utxo[] = [
@@ -77,7 +77,7 @@ export const createStubUtxoProvider = (utxos: Cardano.Utxo[] = somePartialUtxos,
     if (delayMs) await delay(delayMs);
     return { ok: true };
   },
-  utxoByAddresses: async (addresses: Cardano.Address[]) => {
+  utxoByAddresses: async ({ addresses }: UtxoByAddressesArgs) => {
     if (delayMs) await delay(delayMs);
     return utxos.filter((u) => addresses.includes(u[0].address) && addresses.includes(u[1].address));
   }

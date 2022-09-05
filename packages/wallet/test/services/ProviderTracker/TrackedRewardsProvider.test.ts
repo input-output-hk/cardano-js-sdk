@@ -64,7 +64,7 @@ describe('TrackedRewardsProvider', () => {
     test(
       'rewards',
       testFunctionStats(
-        (rp) => rp.rewardAccountBalance(rewardAccount),
+        (rp) => rp.rewardAccountBalance({ rewardAccount }),
         (stats) => stats.rewardAccountBalance$,
         (mockRP) => mockRP.rewardAccountBalance
       )

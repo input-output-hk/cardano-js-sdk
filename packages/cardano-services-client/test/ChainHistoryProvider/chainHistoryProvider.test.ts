@@ -46,7 +46,7 @@ describe('chainHistoryProvider', () => {
       it('resolves if successful', async () => {
         axiosMock.onPost().replyOnce(200, []);
         const provider = chainHistoryHttpProvider(config);
-        await expect(provider.blocksByHashes([])).resolves.not.toThrow();
+        await expect(provider.blocksByHashes({ ids: [] })).resolves.not.toThrow();
       });
 
       describe('errors', () => {
@@ -55,7 +55,7 @@ describe('chainHistoryProvider', () => {
             throw axiosError();
           });
           const provider = chainHistoryHttpProvider(config);
-          await expect(provider.blocksByHashes([])).rejects.toThrow(ProviderFailure.Unknown);
+          await expect(provider.blocksByHashes({ ids: [] })).rejects.toThrow(ProviderFailure.Unknown);
         });
       });
     });
@@ -64,7 +64,7 @@ describe('chainHistoryProvider', () => {
       it('resolves if successful', async () => {
         axiosMock.onPost().replyOnce(200, []);
         const provider = chainHistoryHttpProvider(config);
-        await expect(provider.transactionsByHashes([])).resolves.not.toThrow();
+        await expect(provider.transactionsByHashes({ ids: [] })).resolves.not.toThrow();
       });
 
       describe('errors', () => {
@@ -73,7 +73,7 @@ describe('chainHistoryProvider', () => {
             throw axiosError();
           });
           const provider = chainHistoryHttpProvider(config);
-          await expect(provider.transactionsByHashes([])).rejects.toThrow(ProviderFailure.Unknown);
+          await expect(provider.transactionsByHashes({ ids: [] })).rejects.toThrow(ProviderFailure.Unknown);
         });
       });
     });

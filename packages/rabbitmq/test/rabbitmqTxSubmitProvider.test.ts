@@ -48,9 +48,13 @@ describe('RabbitMqTxSubmitProvider', () => {
       try {
         const txs = await txsPromise;
         provider = new RabbitMqTxSubmitProvider({ rabbitmqUrl: url }, { logger });
-        const resA = await provider.submitTx(txs[0].txBodyUint8Array);
+        const resA = await provider.submitTx({
+          signedTransaction: txs[0].txBodyHex
+        });
         // Called again to cover the idempotent RabbitMqTxSubmitProvider.#ensureQueue() operation
-        const resB = await provider.submitTx(txs[1].txBodyUint8Array);
+        const resB = await provider.submitTx({
+          signedTransaction: txs[1].txBodyHex
+        });
         expect(resA).toBeUndefined();
         expect(resB).toBeUndefined();
       } catch (error) {

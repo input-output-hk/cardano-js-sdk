@@ -1,4 +1,4 @@
-import { Asset, AssetProvider, Cardano, ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { Asset, AssetProvider, Cardano, GetAssetArgs, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { AssetBuilder } from './AssetBuilder';
 import { DbSyncProvider } from '../DbSyncProvider';
 import { Logger } from 'ts-log';
@@ -31,8 +31,6 @@ export type DbSyncAssetProviderDependencies = {
   tokenMetadataService: TokenMetadataService;
 };
 
-type AssetExtraData = Parameters<AssetProvider['getAsset']>[1];
-
 /**
  * AssetProvider implementation using NftMetadataService, TokenMetadataService
  * and cardano-db-sync database as sources
@@ -50,7 +48,7 @@ export class DbSyncAssetProvider extends DbSyncProvider implements AssetProvider
     this.#dependencies = dependencies;
   }
 
-  async getAsset(assetId: Cardano.AssetId, extraData?: AssetExtraData) {
+  async getAsset({ assetId, extraData }: GetAssetArgs) {
     const name = Asset.util.assetNameFromAssetId(assetId);
     const policyId = Asset.util.policyIdFromAssetId(assetId);
     const multiAsset = await this.#builder.queryMultiAsset(policyId, name);

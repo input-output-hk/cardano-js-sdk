@@ -81,12 +81,11 @@ export const createHttpProvider = <T extends object>({
             ...axiosOptions,
             adapter,
             baseURL: baseUrl,
-            data: { args },
+            data: { ...args[0] },
             method: 'post',
             responseType: 'json',
             url: path
           };
-
           logger.debug(`Sending ${req.method} request to ${req.baseURL}${req.url} with data:`);
           logger.debug(req.data);
 

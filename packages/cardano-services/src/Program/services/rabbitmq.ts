@@ -5,7 +5,7 @@ import { CommonOptionDescriptions, CommonProgramOptions } from '../../ProgramsCo
 import { DnsResolver, srvRecordToRabbitmqURL } from '../utils';
 import { Logger } from 'ts-log';
 import { MissingProgramOption } from '../errors';
-import { ProviderFailure } from '@cardano-sdk/core';
+import { ProviderFailure, SubmitTxArgs } from '@cardano-sdk/core';
 import { RabbitMqTxSubmitProvider } from '@cardano-sdk/rabbitmq';
 import { ServiceNames } from '../ServiceNames';
 import { isConnectionError } from '@cardano-sdk/util';
@@ -32,8 +32,8 @@ export const rabbitMqTxSubmitProviderWithDiscovery = async (
     get(_, prop) {
       if (prop === 'then') return;
       if (prop === 'submitTx') {
-        return (args: Uint8Array) =>
-          rabbitmqProvider.submitTx(args).catch(async (error) => {
+        return (submitTxArgs: SubmitTxArgs) =>
+          rabbitmqProvider.submitTx(submitTxArgs).catch(async (error) => {
             if (
               error.innerError?.reason === ProviderFailure.ConnectionFailure ||
               isConnectionError(error.innerError.innerError)
@@ -47,7 +47,7 @@ export const rabbitMqTxSubmitProviderWithDiscovery = async (
                 { rabbitmqUrl: srvRecordToRabbitmqURL(resolvedRecord) },
                 { logger }
               );
-              return await rabbitmqProvider.submitTx(args);
+              return await rabbitmqProvider.submitTx(submitTxArgs);
             }
             throw error;
           });

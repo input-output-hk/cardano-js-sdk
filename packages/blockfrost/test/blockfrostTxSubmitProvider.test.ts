@@ -38,7 +38,9 @@ describe('blockfrostTxSubmitProvider', () => {
       BlockFrostAPI.prototype.txSubmit = jest.fn().mockRejectedValue(innerError);
       const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
       const provider = blockfrostTxSubmitProvider(blockfrost);
-      await expect(provider.submitTx(null as any)).rejects.toThrowError(Cardano.UnknownTxSubmissionError);
+      await expect(provider.submitTx({ signedTransaction: null as any })).rejects.toThrowError(
+        Cardano.UnknownTxSubmissionError
+      );
     });
   });
 });

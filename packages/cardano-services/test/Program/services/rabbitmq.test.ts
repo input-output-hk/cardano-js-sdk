@@ -15,6 +15,7 @@ import { Ogmios } from '@cardano-sdk/ogmios';
 import { RabbitMQContainer } from '../../../../rabbitmq/test/docker';
 import { RunningTxSubmitWorker } from '../../../src/TxWorker/utils';
 import { SrvRecord } from 'dns';
+import { bufferToHexString } from '@cardano-sdk/util';
 import { createMockOgmiosServer } from '../../../../ogmios/test/mocks/mockOgmiosServer';
 import { getPort, getRandomPort } from 'get-port-please';
 import { listenPromise, serverClosePromise } from '../../../src/util';
@@ -191,9 +192,9 @@ describe('Service dependency abstractions', () => {
       });
 
       const txs = await txsPromise;
-      await expect(provider.submitTx(txs[0].txBodyUint8Array)).rejects.toBeInstanceOf(
-        Cardano.TxSubmissionErrors.EraMismatchError
-      );
+      await expect(
+        provider.submitTx({ signedTransaction: bufferToHexString(Buffer.from(txs[0].txBodyUint8Array)) })
+      ).rejects.toBeInstanceOf(Cardano.TxSubmissionErrors.EraMismatchError);
       expect(dnsResolverMock).toBeCalledTimes(2);
     });
 

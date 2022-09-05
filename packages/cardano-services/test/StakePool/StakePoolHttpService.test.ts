@@ -6,9 +6,9 @@ import {
   CardanoNode,
   ProviderError,
   ProviderFailure,
+  QueryStakePoolsArgs,
   SortField,
-  StakePoolProvider,
-  StakePoolQueryOptions
+  StakePoolProvider
 } from '@cardano-sdk/core';
 import { CreateHttpProviderConfig, stakePoolHttpProvider } from '../../../cardano-services-client';
 import { DbSyncEpochPollService } from '../../src/util';
@@ -27,29 +27,29 @@ const APPLICATION_CBOR = 'application/cbor';
 const APPLICATION_JSON = 'application/json';
 const STAKE_POOL_NAME = 'THE AMSTERDAM NODE';
 
-const setFilterCondition = (options: StakePoolQueryOptions, condition: 'and' | 'or'): StakePoolQueryOptions => ({
+const setFilterCondition = (options: QueryStakePoolsArgs, condition: 'and' | 'or'): QueryStakePoolsArgs => ({
   filters: { ...options.filters, _condition: condition }
 });
 
 const setSortCondition = (
-  options: StakePoolQueryOptions,
+  options: QueryStakePoolsArgs,
   order: 'asc' | 'desc',
   field: SortField
-): StakePoolQueryOptions => ({
+): QueryStakePoolsArgs => ({
   ...options,
   sort: { ...options.sort, field, order }
 });
 
-const setPagination = (options: StakePoolQueryOptions, startAt: number, limit: number): StakePoolQueryOptions => ({
+const setPagination = (options: QueryStakePoolsArgs, startAt: number, limit: number): QueryStakePoolsArgs => ({
   ...options,
   pagination: { ...options.pagination, limit, startAt }
 });
 
-const addStatusFilter = (options: StakePoolQueryOptions, status: Cardano.StakePoolStatus): StakePoolQueryOptions => ({
+const addStatusFilter = (options: QueryStakePoolsArgs, status: Cardano.StakePoolStatus): QueryStakePoolsArgs => ({
   filters: { ...options.filters, status: [status] }
 });
 
-const addPledgeMetFilter = (options: StakePoolQueryOptions, pledgeMet: boolean): StakePoolQueryOptions => ({
+const addPledgeMetFilter = (options: QueryStakePoolsArgs, pledgeMet: boolean): QueryStakePoolsArgs => ({
   filters: { ...options.filters, pledgeMet }
 });
 
@@ -152,7 +152,7 @@ describe('StakePoolHttpService', () => {
       const cachedSubQueriesCount = 10;
       const cacheKeysCount = 7;
       const nonCacheableSubQueriesCount = 2; // queryTotalCount and getLastEpoch
-      const filerOnePoolOptions: StakePoolQueryOptions = {
+      const filerOnePoolOptions: QueryStakePoolsArgs = {
         filters: {
           identifier: {
             values: [{ id: Cardano.PoolId('pool1jcwn98a6rqr7a7yakanm5sz6asx9gfjsr343mus0tsye23wmg70') }]
@@ -177,7 +177,7 @@ describe('StakePoolHttpService', () => {
       });
 
       it('response is an array of stake pools', async () => {
-        const options: StakePoolQueryOptions = {
+        const options: QueryStakePoolsArgs = {
           filters: {
             identifier: {
               _condition: 'or',
@@ -257,8 +257,8 @@ describe('StakePoolHttpService', () => {
 
       describe('pagination', () => {
         it('should paginate response', async () => {
-          const req: StakePoolQueryOptions = {};
-          const reqWithPagination: StakePoolQueryOptions = { pagination: { limit: 2, startAt: 1 } };
+          const req: QueryStakePoolsArgs = {};
+          const reqWithPagination: QueryStakePoolsArgs = { pagination: { limit: 2, startAt: 1 } };
           const responseWithPagination = await provider.queryStakePools(reqWithPagination);
           const response = await provider.queryStakePools(req);
           expect(response.pageResults.length).toEqual(10);
@@ -269,8 +269,8 @@ describe('StakePoolHttpService', () => {
           expect(responseWithPagination.pageResults).toEqual(responseWithPaginationCached.pageResults);
         });
         it('should paginate response with or condition', async () => {
-          const req: StakePoolQueryOptions = { filters: { _condition: 'or' } };
-          const reqWithPagination: StakePoolQueryOptions = { ...req, pagination: { limit: 2, startAt: 1 } };
+          const req: QueryStakePoolsArgs = { filters: { _condition: 'or' } };
+          const reqWithPagination: QueryStakePoolsArgs = { ...req, pagination: { limit: 2, startAt: 1 } };
           const responseWithPagination = await provider.queryStakePools(reqWithPagination);
           const response = await provider.queryStakePools(req);
           expect(response.pageResults.length).toEqual(10);
@@ -294,7 +294,7 @@ describe('StakePoolHttpService', () => {
           expect(responseWithPagination.pageResults).toEqual(responsePaginatedCached.pageResults);
         });
         it('should paginate rewards response with or condition', async () => {
-          const req: StakePoolQueryOptions = { filters: { _condition: 'or' }, pagination: { limit: 1, startAt: 1 } };
+          const req: QueryStakePoolsArgs = { filters: { _condition: 'or' }, pagination: { limit: 1, startAt: 1 } };
           const reqWithRewardsPagination = { pagination: { limit: 1, startAt: 1 }, rewardsHistoryLimit: 0 };
           const responseWithPagination = await provider.queryStakePools(reqWithRewardsPagination);
           const response = await provider.queryStakePools(req);
@@ -307,7 +307,7 @@ describe('StakePoolHttpService', () => {
           expect(responseWithPagination.pageResults).toEqual(responsePaginatedCached.pageResults);
         });
         it('should cache paginated response', async () => {
-          const reqWithPagination: StakePoolQueryOptions = { pagination: { limit: 2, startAt: 1 } };
+          const reqWithPagination: QueryStakePoolsArgs = { pagination: { limit: 2, startAt: 1 } };
           const firstResponseWithPagination = await provider.queryStakePools(reqWithPagination);
           expect(dbConnectionQuerySpy).toHaveBeenCalledTimes(
             cachedSubQueriesCount + nonCacheableSubQueriesCount + DB_POLL_QUERIES_COUNT
@@ -325,7 +325,7 @@ describe('StakePoolHttpService', () => {
       describe('search pools by identifier filter', () => {
         // response should be the same despite the high order condition
         it('or condition', async () => {
-          const req: StakePoolQueryOptions = {
+          const req: QueryStakePoolsArgs = {
             filters: {
               identifier: {
                 _condition: 'or',
@@ -344,7 +344,7 @@ describe('StakePoolHttpService', () => {
           expect(responseWithAndCondition).toEqual(responseWithOrCondition);
         });
         it('and condition', async () => {
-          const req: StakePoolQueryOptions = {
+          const req: QueryStakePoolsArgs = {
             filters: {
               identifier: {
                 _condition: 'and',
@@ -366,7 +366,7 @@ describe('StakePoolHttpService', () => {
           expect(responseWithAndCondition).toEqual(responseWithAndConditionCached);
         });
         it('no given condition equals to OR condition', async () => {
-          const req: StakePoolQueryOptions = {
+          const req: QueryStakePoolsArgs = {
             filters: {
               identifier: { values: [{ name: 'Unknown Name', ticker: 'TEST' }] }
             }
@@ -411,7 +411,7 @@ describe('StakePoolHttpService', () => {
       });
       describe('search pools by status', () => {
         it('search by active status', async () => {
-          const req: StakePoolQueryOptions = {
+          const req: QueryStakePoolsArgs = {
             filters: {
               status: [Cardano.StakePoolStatus.Active]
             }
@@ -425,7 +425,7 @@ describe('StakePoolHttpService', () => {
           expect(response.pageResults).toEqual(responseCached.pageResults);
         });
         it('search by activating status', async () => {
-          const req: StakePoolQueryOptions = {
+          const req: QueryStakePoolsArgs = {
             filters: {
               _condition: 'or',
               status: [Cardano.StakePoolStatus.Activating]
@@ -438,7 +438,7 @@ describe('StakePoolHttpService', () => {
           expect(response.pageResults).toEqual(responseCached.pageResults);
         });
         it('search by retired status', async () => {
-          const req: StakePoolQueryOptions = {
+          const req: QueryStakePoolsArgs = {
             filters: {
               status: [Cardano.StakePoolStatus.Retired]
             }
@@ -452,7 +452,7 @@ describe('StakePoolHttpService', () => {
           expect(response.pageResults).toEqual(responseCached.pageResults);
         });
         it('search by retiring status', async () => {
-          const req: StakePoolQueryOptions = {
+          const req: QueryStakePoolsArgs = {
             filters: {
               status: [Cardano.StakePoolStatus.Retiring]
             }
@@ -469,7 +469,7 @@ describe('StakePoolHttpService', () => {
 
       describe('search pools by pledge met', () => {
         it('search by pledge met on true', async () => {
-          const req: StakePoolQueryOptions = {
+          const req: QueryStakePoolsArgs = {
             filters: {
               pledgeMet: true
             }
@@ -501,7 +501,7 @@ describe('StakePoolHttpService', () => {
       });
 
       describe('search pools by multiple filters', () => {
-        const req: StakePoolQueryOptions = {
+        const req: QueryStakePoolsArgs = {
           filters: {
             identifier: {
               _condition: 'or',
@@ -514,7 +514,7 @@ describe('StakePoolHttpService', () => {
             }
           }
         };
-        const reqWithMultipleFilters: StakePoolQueryOptions = {
+        const reqWithMultipleFilters: QueryStakePoolsArgs = {
           filters: {
             ...req.filters,
             _condition: 'or',
@@ -722,7 +722,7 @@ describe('StakePoolHttpService', () => {
       });
 
       describe('stake pools sort', () => {
-        const filterArgs: StakePoolQueryOptions = {
+        const filterArgs: QueryStakePoolsArgs = {
           filters: {
             identifier: {
               _condition: 'or',
@@ -777,7 +777,7 @@ describe('StakePoolHttpService', () => {
             const firstNamedPoolId = Cardano.PoolId('pool1jcwn98a6rqr7a7yakanm5sz6asx9gfjsr343mus0tsye23wmg70');
             const secondNamedPoolId = Cardano.PoolId('pool168d9plflldfr6mpjg9q2typv2m6a0hx4u5g8kfa486dwkke2uj7');
 
-            const reqOptions: StakePoolQueryOptions = {
+            const reqOptions: QueryStakePoolsArgs = {
               filters: {
                 identifier: {
                   _condition: 'or',

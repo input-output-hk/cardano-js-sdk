@@ -1226,10 +1226,8 @@ describe('CLI', () => {
             await assertServiceHealthy(apiUrl, ServiceNames.Asset);
 
             const res = await axios.post(`${apiUrl}/asset/get-asset`, {
-              args: [
-                '50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65',
-                { tokenMetadata: true }
-              ]
+              assetId: '50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65',
+              extraData: { tokenMetadata: true }
             });
 
             const { tokenMetadata } = fromSerializableObject(res.data);
@@ -1251,10 +1249,8 @@ describe('CLI', () => {
             await assertServiceHealthy(apiUrl, ServiceNames.Asset);
 
             const res = await axios.post(`${apiUrl}/asset/get-asset`, {
-              args: [
-                '50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65',
-                { tokenMetadata: true }
-              ]
+              assetId: '50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65',
+              extraData: { tokenMetadata: true }
             });
 
             const { tokenMetadata } = fromSerializableObject(res.data);

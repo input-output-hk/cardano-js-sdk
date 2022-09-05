@@ -60,7 +60,7 @@ export const blockfrostAssetProvider = (blockfrost: BlockFrostAPI): AssetProvide
     return Asset.util.metadatumToCip25(asset, metadatumMap, console) ?? null;
   };
 
-  const getAsset: AssetProvider['getAsset'] = async (assetId, extraData) => {
+  const getAsset: AssetProvider['getAsset'] = async ({ assetId, extraData }) => {
     const response = await blockfrost.assetsById(assetId.toString());
     const name = Asset.util.assetNameFromAssetId(assetId);
     const policyId = Cardano.PolicyId(response.policy_id);

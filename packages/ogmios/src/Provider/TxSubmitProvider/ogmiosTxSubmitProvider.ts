@@ -1,4 +1,3 @@
-import { Buffer } from 'buffer';
 import { Cardano, ProviderError, ProviderFailure, TxSubmitProvider } from '@cardano-sdk/core';
 import {
   ConnectionConfig,
@@ -41,7 +40,7 @@ export const ogmiosTxSubmitProvider = (connectionConfig: ConnectionConfig, logge
       throw new ProviderError(ProviderFailure.Unknown, error);
     }
   },
-  submitTx: async (signedTransaction) => {
+  submitTx: async ({ signedTransaction }) => {
     // The Ogmios client supports opening a long-running ws connection,
     // however as the provider interface doesn't include shutdown handling,
     // we're using the one time interaction type for now.
@@ -57,8 +56,7 @@ export const ogmiosTxSubmitProvider = (connectionConfig: ConnectionConfig, logge
         }
       );
       const txSubmissionClient = await createTxSubmissionClient(interactionContext);
-      const txHex = Buffer.from(signedTransaction).toString('hex');
-      await txSubmissionClient.submitTx(txHex);
+      await txSubmissionClient.submitTx(signedTransaction);
     } catch (error) {
       throw Cardano.util.asTxSubmissionError(error) || new Cardano.UnknownTxSubmissionError(error);
     }

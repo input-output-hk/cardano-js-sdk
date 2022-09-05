@@ -48,7 +48,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/HistorySearchRequest"
+                "$ref": "#/components/schemas/RewardHistoryProps"
               }
             }
           },
@@ -100,34 +100,15 @@
           }
         }
       },
-      "HistorySearchRequest": {
-        "type": "object",
-        "required": ["args"],
-        "properties": {
-          "args": {
-            "type": "array",
-            "maxLength": 1,
-            "minLength": 1,
-            "items": {
-              "$ref": "#/components/schemas/RewardHistoryProps"
-            }
-          }
-        }
-      },
       "HistorySearchResponse": {
         "$ref": "#/components/schemas/Map"
       },
       "BalanceSearchRequest": {
         "type": "object",
-        "required": ["args"],
+        "required": ["rewardAccount"],
         "properties": {
-          "args": {
-            "type": "array",
-            "maxLength": 1,
-            "minLength": 1,
-            "items": {
-              "type": "string"
-            }
+          "rewardAccount": {
+            "$ref": "#/components/schemas/RewardAccount"
           }
         }
       },
@@ -138,7 +119,7 @@
           "rewardAccounts": {
             "type": "array",
             "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/RewardAccount"
             }
           },
           "epochs": {
@@ -156,6 +137,9 @@
             "type": "number"
           }
         }
+      },
+      "RewardAccount": {
+        "type": "string"
       }
     }
   }

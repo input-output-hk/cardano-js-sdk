@@ -32,9 +32,9 @@ export class TxSubmitHttpService extends HttpService {
     );
     router.post(
       '/submit',
-      providerHandler(txSubmitProvider.submitTx.bind(txSubmitProvider))(async (args, _r, res, _n, handler) => {
+      providerHandler(txSubmitProvider.submitTx.bind(txSubmitProvider))(async (_, _r, res, _n, handler) => {
         try {
-          return HttpServer.sendJSON(res, await handler(...args));
+          return HttpServer.sendJSON(res, await handler(_r.body));
         } catch (error) {
           logger.error(error);
           const firstError = Array.isArray(error) ? error[0] : error;
