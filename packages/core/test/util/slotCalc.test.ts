@@ -54,6 +54,40 @@ describe('slotCalc utils', () => {
   });
 
   describe('slotEpochCalc', () => {
+    describe('testnet with auto-upgrading eras', () => {
+      it('correctly computes epoch with multiple summaries starting from genesis', () => {
+        const eraSummaries: EraSummary[] = [
+          {
+            parameters: { epochLength: 100, slotLength: 3 },
+            start: { slot: 0, time: new Date(1_563_999_616_000) }
+          },
+          { parameters: { epochLength: 200, slotLength: 10 }, start: { slot: 0, time: new Date(1_563_999_616_000) } },
+          { parameters: { epochLength: 200, slotLength: 1 }, start: { slot: 0, time: new Date(1_563_999_616_000) } }
+        ];
+        const slotEpochCalc: SlotEpochCalc = createSlotEpochCalc(eraSummaries);
+
+        expect(slotEpochCalc(1031)).toEqual(5);
+      });
+      it('correctly computes epoch with summaries indicating an upgrade after genesis, from the same slotNo', () => {
+        const eraSummaries: EraSummary[] = [
+          {
+            parameters: { epochLength: 100, slotLength: 3 },
+            start: { slot: 0, time: new Date(1_563_999_616_000) }
+          },
+          {
+            parameters: { epochLength: 200, slotLength: 10 },
+            start: { slot: 301, time: new Date(1_563_999_716_000) }
+          },
+          {
+            parameters: { epochLength: 200, slotLength: 1 },
+            start: { slot: 301, time: new Date(1_563_999_716_000) }
+          }
+        ];
+        const slotEpochCalc: SlotEpochCalc = createSlotEpochCalc(eraSummaries);
+
+        expect(slotEpochCalc(1031)).toEqual(6);
+      });
+    });
     describe('testnet', () => {
       const slotEpochCalc: SlotEpochCalc = createSlotEpochCalc(testnetEraSummaries);
 

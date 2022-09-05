@@ -1,6 +1,8 @@
 import { CardanoNetworkMagic, EpochNo, Slot } from '../Cardano';
 import { CustomError } from 'ts-custom-error';
 import { EraSummary } from '../CardanoNode';
+import groupBy from 'lodash/groupBy';
+import last from 'lodash/last';
 import orderBy from 'lodash/orderBy';
 
 export interface SlotDate {
@@ -17,7 +19,7 @@ export interface EpochInfo {
 export class EraSummaryError extends CustomError {}
 
 /**
- * Were valid at 2022-05-28
+ * Valid at 2022-05-28
  */
 export const mainnetEraSummaries: EraSummary[] = [
   { parameters: { epochLength: 21_600, slotLength: 20_000 }, start: { slot: 0, time: new Date(1_506_192_291_000) } },
@@ -43,7 +45,12 @@ export const eraSummariesConfig: EraSummariesMap = {
 };
 
 const createSlotEpochCalcImpl = (eraSummaries: EraSummary[]) => {
-  const eraSummariesAsc = orderBy(eraSummaries, ({ start }) => start.slot);
+  // It's possible to configure when particular eras are upgraded, without an upgrade proposal, in
+  // testnet cardano-node configuration, including the specification of multiple eras in the same
+  // epoch. Era summaries therefore need to be filtered to remove eras that are being skipped,
+  // which is evidenced by a later era starting in the same slot.
+  const eraSummariesWithoutSkippedEras = Object.values(groupBy(eraSummaries, 'start.slot')).map(last) as EraSummary[];
+  const eraSummariesAsc = orderBy(eraSummariesWithoutSkippedEras, ({ start }) => start.slot);
   return (slotNo: Slot) => {
     const relevantEraSummariesAsc = orderBy(
       eraSummariesAsc.filter(({ start }) => start.slot <= slotNo),
