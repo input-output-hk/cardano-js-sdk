@@ -63,14 +63,19 @@ const _backgroundConsumeRemoteApi: ConsumeApi = <T extends object>(
 
 /**
  * Bind an API object to handle messages from other parts of extension.
- * Only compatible with interfaces where all methods return a Promise.
+ * Only compatible with interfaces where all members are either:
+ * - Methods that return a Promise
+ * - Observable
+ *
  * This can only used once per channelName per process.
  */
 export const exposeApi: ExposeApi = isInBackgroundProcess ? _backgroundExposeApi : _nonBackgroundExposeApi;
 
 /**
  * Create a client to remote api, exposed via `exposeApi`.
- * Only compatible with interfaces where all methods return a Promise.
+ * Only compatible with interfaces where all members are either:
+ * - Methods that return a Promise
+ * - Observable
  */
 export const consumeRemoteApi: ConsumeApi = isInBackgroundProcess
   ? _backgroundConsumeRemoteApi

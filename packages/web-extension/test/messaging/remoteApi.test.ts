@@ -6,6 +6,7 @@ import {
   PortMessage,
   RemoteApiProperties,
   RemoteApiPropertyType,
+  RemoteApiShutdownError,
   consumeMessengerRemoteApi,
   deriveChannelName,
   exposeMessengerApi
@@ -220,6 +221,11 @@ describe('remoteApi', () => {
       //     }, 1);
       //   });
       // });
+    });
+
+    it('throws RemoteApiShutdownError when the remote object shutdown method is called more than once', async () => {
+      sut.consumer.shutdown();
+      await expect(sut.consumer.addOne(1n)).rejects.toThrowError(RemoteApiShutdownError);
     });
   });
 

@@ -14,8 +14,10 @@ import {
   RequestMessage,
   ResponseMessage
 } from './types';
+import { CustomError } from 'ts-custom-error';
 import {
   EMPTY,
+  EmptyError,
   Observable,
   filter,
   firstValueFrom,
@@ -38,13 +40,19 @@ import {
   newMessageId
 } from './util';
 
+export class RemoteApiShutdownError extends CustomError {
+  constructor(channel: string) {
+    super(`Remote API with channel '${channel}' was shutdown: object can no longer be used.`);
+  }
+}
+
 const consumeMethod =
   (
     {
       propName,
       getErrorPrototype
     }: { propName: string; getErrorPrototype?: GetErrorPrototype; options?: MethodRequestOptions },
-    { messenger: { message$, postMessage } }: MessengerApiDependencies
+    { messenger: { message$, postMessage, channel } }: MessengerApiDependencies
   ) =>
   async (...args: unknown[]) => {
     const requestMessage: RequestMessage = {
@@ -65,7 +73,12 @@ const consumeMethod =
           map(({ response }) => response)
         )
       )
-    );
+    ).catch((error) => {
+      if (error instanceof EmptyError) {
+        throw new RemoteApiShutdownError(channel);
+      }
+      throw error;
+    });
 
     if (result instanceof Error) {
       throw result;

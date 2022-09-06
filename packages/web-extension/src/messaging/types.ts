@@ -78,6 +78,10 @@ export interface PortMessage<Data = unknown> {
 }
 
 export enum RemoteApiPropertyType {
+  /**
+   * Methods might throw RemoteApiShutdownError when attempting
+   * to call a method on remote api object that was previously shutdown.
+   */
   MethodReturningPromise,
   /**
    * Exposing this observable:
