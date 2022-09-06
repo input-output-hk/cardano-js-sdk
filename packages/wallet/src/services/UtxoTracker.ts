@@ -31,7 +31,7 @@ export const createUtxoProvider = (
     switchMap((addresses) =>
       coldObservableProvider({
         equals: utxoEquals,
-        provider: () => utxoProvider.utxoByAddresses(addresses),
+        provider: () => utxoProvider.utxoByAddresses({ addresses }),
         retryBackoffConfig,
         trigger$: tipBlockHeight$
       })

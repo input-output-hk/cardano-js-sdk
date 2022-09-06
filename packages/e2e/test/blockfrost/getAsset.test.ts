@@ -13,10 +13,13 @@ describe('blockfrostAssetProvider', () => {
   test('getAsset', async () => {
     const asset = await (
       await assetProviderFactory.create(env.ASSET_PROVIDER, env.ASSET_PROVIDER_PARAMS, logger)
-    ).getAsset(Cardano.AssetId('6b8d07d69639e9413dd637a1a815a7323c69c86abbafb66dbfdb1aa7'), {
-      history: true,
-      nftMetadata: true,
-      tokenMetadata: true
+    ).getAsset({
+      assetId: Cardano.AssetId('6b8d07d69639e9413dd637a1a815a7323c69c86abbafb66dbfdb1aa7'),
+      extraData: {
+        history: true,
+        nftMetadata: true,
+        tokenMetadata: true
+      }
     });
     expect(typeof asset.assetId).toBe('string');
     expect(typeof asset.fingerprint).toBe('string');

@@ -10,7 +10,7 @@ import { fetchByAddressSequentially, healthCheck } from './util';
  * @returns {UtxoProvider} UtxoProvider
  */
 export const blockfrostUtxoProvider = (blockfrost: BlockFrostAPI): UtxoProvider => {
-  const utxoByAddresses: UtxoProvider['utxoByAddresses'] = async (addresses) => {
+  const utxoByAddresses: UtxoProvider['utxoByAddresses'] = async ({ addresses }) => {
     const utxoResults = await Promise.all(
       addresses.map(async (address) =>
         fetchByAddressSequentially<Cardano.Utxo, BlockfrostUtxo>({

@@ -86,7 +86,7 @@ import { Cip30DataSignature } from '@cardano-sdk/cip30';
 import { InputSelector, defaultSelectionConstraints, roundRobinRandomImprove } from '@cardano-sdk/cip2';
 import { Logger } from 'ts-log';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { Shutdown, contextLogger } from '@cardano-sdk/util';
+import { Shutdown, bufferToHexString, contextLogger } from '@cardano-sdk/util';
 import { TrackedUtxoProvider } from './services/ProviderTracker/TrackedUtxoProvider';
 import { TxInternals, createTransactionInternals, ensureValidityInterval } from './Transaction';
 import { WalletStores, createInMemoryWalletStores } from './persistence';
@@ -412,7 +412,9 @@ export class SingleAddressWallet implements ObservableWallet {
     this.#logger.debug(`Submitting transaction ${tx.id}`);
     this.#newTransactions.submitting$.next(tx);
     try {
-      await this.txSubmitProvider.submitTx(coreToCsl.tx(tx).to_bytes());
+      await this.txSubmitProvider.submitTx({
+        signedTransaction: bufferToHexString(Buffer.from(coreToCsl.tx(tx).to_bytes()))
+      });
       this.#logger.debug(`Submitted transaction ${tx.id}`);
       this.#newTransactions.pending$.next(tx);
     } catch (error) {

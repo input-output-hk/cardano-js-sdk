@@ -38,7 +38,7 @@ describe('rewardsHttpProvider', () => {
     const expectedResponse = toSerializableObject(BigInt('0'));
     axiosMock.onPost().replyOnce(200, expectedResponse);
     const provider = rewardsHttpProvider(config);
-    const response = toSerializableObject(await provider.rewardAccountBalance(rewardAccount));
+    const response = toSerializableObject(await provider.rewardAccountBalance({ rewardAccount }));
     expect(response).toEqual(expectedResponse);
   });
   test('rewardsHistory doesnt throw', async () => {

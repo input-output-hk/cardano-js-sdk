@@ -4,16 +4,17 @@ import { APPLICATION_JSON, CONTENT_TYPE, HttpServer, HttpServerConfig, TxSubmitH
 import { Cardano, ProviderError, ProviderFailure, TxSubmitProvider } from '@cardano-sdk/core';
 import { CreateHttpProviderConfig, txSubmitHttpProvider } from '@cardano-sdk/cardano-services-client';
 import { FATAL, createLogger } from 'bunyan';
-import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
+import { bufferToHexString, fromSerializableObject } from '@cardano-sdk/util';
 import { getPort } from 'get-port-please';
 import { dummyLogger as logger } from 'ts-log';
 import axios from 'axios';
 import cbor from 'cbor';
 
-const serializeProviderArg = (arg: unknown) => JSON.stringify({ args: [toSerializableObject(arg)] });
-const bodyTx = serializeProviderArg(cbor.encode('#####'));
+const serializeProviderArg = (arg: unknown) => ({ signedTransaction: arg });
+const bodyTx = serializeProviderArg(cbor.encode('#####').toString('hex'));
 const UNSUPPORTED_MEDIA_STRING = 'Request failed with status code 415';
 const APPLICATION_CBOR = 'application/cbor';
+const emptyUintArrayAsHexString = bufferToHexString(Buffer.from(new Uint8Array()));
 
 describe('TxSubmitHttpService', () => {
   let txSubmitProvider: TxSubmitProvider;
@@ -82,9 +83,13 @@ describe('TxSubmitHttpService', () => {
       expect(await serverHealth()).toEqual({ ok: false });
 
       try {
-        await axios.post(`${baseUrl}/submit`, serializeProviderArg(Buffer.from(new Uint8Array())), {
-          headers: { [CONTENT_TYPE]: APPLICATION_JSON }
-        });
+        await axios.post(
+          `${baseUrl}/submit`,
+          { signedTransaction: emptyUintArrayAsHexString },
+          {
+            headers: { [CONTENT_TYPE]: APPLICATION_JSON }
+          }
+        );
         throw new Error('fail');
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
@@ -123,8 +128,8 @@ describe('TxSubmitHttpService', () => {
 
     describe('/submit', () => {
       it('calls underlying TxSubmitProvider with a valid argument', async () => {
-        (txSubmitProvider.submitTx as jest.Mock).mockImplementation(async (tx) => {
-          expect(ArrayBuffer.isView(tx)).toBe(true);
+        (txSubmitProvider.submitTx as jest.Mock).mockImplementation(async ({ signedTransaction }) => {
+          expect(typeof signedTransaction === 'string').toBe(true);
         });
         expect(
           (
@@ -187,7 +192,7 @@ describe('TxSubmitHttpService', () => {
         expect.assertions(2);
         const clientProvider = txSubmitHttpProvider(clientConfig);
         try {
-          await clientProvider.submitTx(new Uint8Array());
+          await clientProvider.submitTx({ signedTransaction: emptyUintArrayAsHexString });
         } catch (error: any) {
           if (error instanceof ProviderError) {
             const innerError = error.innerError as Cardano.TxSubmissionError;
@@ -198,12 +203,17 @@ describe('TxSubmitHttpService', () => {
       });
 
       // eslint-disable-next-line max-len
-      it('returns a 400 coded response with detail in the body to a transaction containing a domain violation', async () => {
+      // returns a 400 coded response with detail in the body to a transaction containing a domain violation
+      it('asd', async () => {
         expect.assertions(3);
         try {
-          await axios.post(`${baseUrl}/submit`, serializeProviderArg(Buffer.from(new Uint8Array())), {
-            headers: { [CONTENT_TYPE]: APPLICATION_JSON }
-          });
+          await axios.post(
+            `${baseUrl}/submit`,
+            { signedTransaction: emptyUintArrayAsHexString },
+            {
+              headers: { [CONTENT_TYPE]: APPLICATION_JSON }
+            }
+          );
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
           expect(error.response.status).toBe(400);

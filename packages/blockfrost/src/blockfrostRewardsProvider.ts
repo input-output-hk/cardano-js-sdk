@@ -1,5 +1,5 @@
 import { BlockFrostAPI } from '@blockfrost/blockfrost-js';
-import { Cardano, EpochRange, EpochRewards, RewardsProvider } from '@cardano-sdk/core';
+import { Cardano, EpochRange, EpochRewards, RewardAccountBalanceArgs, RewardsProvider } from '@cardano-sdk/core';
 import { formatBlockfrostError, healthCheck } from './util';
 /**
  * Connect to the [Blockfrost service](https://docs.blockfrost.io/)
@@ -9,9 +9,9 @@ import { formatBlockfrostError, healthCheck } from './util';
  * @throws {Cardano.TxSubmissionErrors.UnknownTxSubmissionError}
  */
 export const blockfrostRewardsProvider = (blockfrost: BlockFrostAPI): RewardsProvider => {
-  const rewardAccountBalance: RewardsProvider['rewardAccountBalance'] = async (
-    rewardAccount: Cardano.RewardAccount
-  ) => {
+  const rewardAccountBalance: RewardsProvider['rewardAccountBalance'] = async ({
+    rewardAccount
+  }: RewardAccountBalanceArgs) => {
     try {
       const accountResponse = await blockfrost.accounts(rewardAccount.toString());
       return BigInt(accountResponse.withdrawable_amount);

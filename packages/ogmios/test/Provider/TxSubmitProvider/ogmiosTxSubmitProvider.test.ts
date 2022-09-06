@@ -1,10 +1,13 @@
 import { Cardano, HealthCheckResponse, ProviderError, TxSubmitProvider } from '@cardano-sdk/core';
 import { Connection, createConnectionObject } from '@cardano-ogmios/client';
+import { bufferToHexString } from '@cardano-sdk/util';
 import { createMockOgmiosServer, listenPromise, serverClosePromise } from '../../mocks/mockOgmiosServer';
 import { getRandomPort } from 'get-port-please';
 import { dummyLogger as logger } from 'ts-log';
 import { ogmiosTxSubmitProvider } from '../../../src';
 import http from 'http';
+
+const emptyUintArrayAsHexString = bufferToHexString(Buffer.from(new Uint8Array()));
 
 describe('ogmiosTxSubmitProvider', () => {
   let mockServer: http.Server;
@@ -91,7 +94,7 @@ describe('ogmiosTxSubmitProvider', () => {
 
       it('resolves if successful', async () => {
         try {
-          const res = await provider.submitTx(new Uint8Array());
+          const res = await provider.submitTx({ signedTransaction: emptyUintArrayAsHexString });
           expect(res).toBeUndefined();
         } catch (error) {
           expect(error).toBeUndefined();
@@ -110,7 +113,7 @@ describe('ogmiosTxSubmitProvider', () => {
         });
         await listenPromise(mockServer, connection.port);
         provider = ogmiosTxSubmitProvider(connection, logger);
-        await expect(provider.submitTx(new Uint8Array())).rejects.toThrowError(
+        await expect(provider.submitTx({ signedTransaction: emptyUintArrayAsHexString })).rejects.toThrowError(
           Cardano.TxSubmissionErrors.EraMismatchError
         );
       });

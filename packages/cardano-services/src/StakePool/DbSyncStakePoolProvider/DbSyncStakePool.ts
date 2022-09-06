@@ -1,8 +1,8 @@
 import {
   Cardano,
   CardanoNode,
+  QueryStakePoolsArgs,
   StakePoolProvider,
-  StakePoolQueryOptions,
   StakePoolSearchResults,
   StakePoolStats
 } from '@cardano-sdk/core';
@@ -59,20 +59,16 @@ export class DbSyncStakePoolProvider extends DbSyncProvider implements StakePool
     switch (sortType) {
       // Add more cases as more sort types are supported
       case 'metrics':
-        return (options?: StakePoolQueryOptions) => this.#builder.queryPoolMetrics(hashesIds, totalAdaAmount, options);
+        return (options?: QueryStakePoolsArgs) => this.#builder.queryPoolMetrics(hashesIds, totalAdaAmount, options);
       case 'apy':
-        return (options?: StakePoolQueryOptions) => this.#builder.queryPoolAPY(hashesIds, options);
+        return (options?: QueryStakePoolsArgs) => this.#builder.queryPoolAPY(hashesIds, options);
       case 'data':
       default:
-        return (options?: StakePoolQueryOptions) => this.#builder.queryPoolData(updatesIds, options);
+        return (options?: QueryStakePoolsArgs) => this.#builder.queryPoolData(updatesIds, options);
     }
   }
 
-  private async getPoolsDataOrdered(
-    poolUpdates: PoolUpdate[],
-    totalAdaAmount: string,
-    options?: StakePoolQueryOptions
-  ) {
+  private async getPoolsDataOrdered(poolUpdates: PoolUpdate[], totalAdaAmount: string, options?: QueryStakePoolsArgs) {
     const hashesIds = poolUpdates.map(({ id }) => id);
     const updatesIds = poolUpdates.map(({ updateId }) => updateId);
 
@@ -140,7 +136,7 @@ export class DbSyncStakePoolProvider extends DbSyncProvider implements StakePool
     return { poolMetrics, poolOwners, poolRegistrations, poolRelays, poolRetirements };
   }
 
-  public async queryStakePools(options?: StakePoolQueryOptions): Promise<StakePoolSearchResults> {
+  public async queryStakePools(options?: QueryStakePoolsArgs): Promise<StakePoolSearchResults> {
     const { params, query } =
       options?.filters?._condition === 'or'
         ? this.#builder.buildOrQuery(options?.filters)

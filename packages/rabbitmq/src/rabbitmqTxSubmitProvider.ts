@@ -1,9 +1,15 @@
-import { Buffer } from 'buffer';
-import { Cardano, HealthCheckResponse, ProviderError, ProviderFailure, TxSubmitProvider } from '@cardano-sdk/core';
+import {
+  Cardano,
+  HealthCheckResponse,
+  ProviderError,
+  ProviderFailure,
+  SubmitTxArgs,
+  TxSubmitProvider
+} from '@cardano-sdk/core';
 import { Channel, Connection, connect } from 'amqplib';
 import { Logger } from 'ts-log';
 import { TX_SUBMISSION_QUEUE, getErrorPrototype, waitForPending } from './utils';
-import { fromSerializableObject } from '@cardano-sdk/util';
+import { fromSerializableObject, hexStringToBuffer } from '@cardano-sdk/util';
 
 const moduleName = 'RabbitMqTxSubmitProvider';
 
@@ -149,9 +155,10 @@ export class RabbitMqTxSubmitProvider implements TxSubmitProvider {
   /**
    * Submit a transaction to RabbitMQ
    *
-   * @param signedTransaction The Uint8Array representation of a signedTransaction
+   * @param args data required to submit tx
+   * @param args.signedTransaction hex string representation of a signedTransaction
    */
-  async submitTx(signedTransaction: Uint8Array) {
+  async submitTx({ signedTransaction }: SubmitTxArgs) {
     return new Promise<void>(async (resolve, reject) => {
       let txId = '';
 
@@ -169,7 +176,7 @@ export class RabbitMqTxSubmitProvider implements TxSubmitProvider {
 
         // Actually send the message
         await this.#ensureQueue();
-        this.#channel!.sendToQueue(TX_SUBMISSION_QUEUE, Buffer.from(signedTransaction));
+        this.#channel!.sendToQueue(TX_SUBMISSION_QUEUE, hexStringToBuffer(signedTransaction));
         this.#dependencies.logger.debug(`${moduleName}: queued tx id: ${txId}`);
 
         // Set the queue for response message

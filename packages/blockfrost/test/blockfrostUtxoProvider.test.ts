@@ -60,11 +60,11 @@ describe('blockfrostUtxoProvider', () => {
 
       const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
       const client = blockfrostUtxoProvider(blockfrost);
-      const response = await client.utxoByAddresses(
-        [
+      const response = await client.utxoByAddresses({
+        addresses: [
           'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
         ].map(Cardano.Address)
-      );
+      });
 
       expect(response).toBeTruthy();
       expect(response[0]).toHaveLength(2);
@@ -118,11 +118,11 @@ describe('blockfrostUtxoProvider', () => {
 
       const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
       const client = blockfrostUtxoProvider(blockfrost);
-      const response = await client.utxoByAddresses(
-        [
+      const response = await client.utxoByAddresses({
+        addresses: [
           'addr_test1qz44wna7xvs8n2ukxw0qat3vktymndgk8nerey6mlxr97s47n48hk78hcuyku03lj7qplmfqscm87j9wv3amxqaur2hs055pjt'
         ].map(Cardano.Address)
-      );
+      });
       expect(response).toBeTruthy();
       expect(response.length).toBe(0);
     });

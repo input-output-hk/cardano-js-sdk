@@ -12,7 +12,7 @@ type ComplexArg2 = { map: Map<string, Buffer> };
 type ComplexResponse = Map<bigint, Buffer>[];
 interface TestProvider {
   noArgsEmptyReturn(): Promise<void>;
-  complexArgsAndReturn(arg1: bigint, arg2: ComplexArg2): Promise<ComplexResponse>;
+  complexArgsAndReturn({ arg1, arg2 }: { arg1: bigint; arg2: ComplexArg2 }): Promise<ComplexResponse>;
 }
 
 const createStubHttpProviderServer = async (port: number, path: string, handler: RequestHandler) => {
@@ -59,7 +59,7 @@ describe('createHttpServer', () => {
     it('calls http server with empty args in req body and parses the response', async () => {
       const provider = createTxSubmitProviderClient();
       const closeServer = await createStubHttpProviderServer(port, stubProviderPaths.noArgsEmptyReturn, (req, res) => {
-        expect(req.body.args).toEqual([]);
+        expect(req.body).toEqual({});
         res.send();
       });
       const response = await provider.noArgsEmptyReturn();
@@ -78,11 +78,11 @@ describe('createHttpServer', () => {
         port,
         stubProviderPaths.complexArgsAndReturn,
         (req, res) => {
-          expect(fromSerializableObject(req.body.args)).toEqual([arg1, arg2]);
+          expect(fromSerializableObject(req.body)).toEqual({ arg1, arg2 });
           res.send(toSerializableObject(expectedResponse));
         }
       );
-      const response = await provider.complexArgsAndReturn(arg1, arg2);
+      const response = await provider.complexArgsAndReturn({ arg1, arg2 });
       await closeServer();
       expect(response).toEqual(expectedResponse);
     });

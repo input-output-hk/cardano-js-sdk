@@ -148,17 +148,14 @@
         }
       },
       "utxo_search_body": {
-        "required": ["args"],
+        "required": ["addresses"],
         "type": "object",
         "properties": {
-          "args": {
+          "addresses": {
             "type": "array",
-            "minItems": 1,
             "items": {
-              "type": "array",
-              "items":{
-                "$ref": "#/components/schemas/Address"
-              }
+              "$ref": "#/components/schemas/Address"
+
             }
           }
         }

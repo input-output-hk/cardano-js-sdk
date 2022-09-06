@@ -34,13 +34,16 @@ describe('slotCalc utils', () => {
         expect(slotTimeCalc(1_598_399)).toEqual(new Date(1_595_967_596_000)));
 
       it('correctly computes date of the 1st Shelley block', () =>
-        expect(slotTimeCalc(1_598_400)).toEqual(new Date(1_595_964_016_000)));
+        expect(slotTimeCalc(1_598_400)).toEqual(new Date('2020/07/28 20:20:16 UTC')));
 
       it('correctly computes date of the 2nd Shelley block', () =>
-        expect(slotTimeCalc(1_598_420)).toEqual(new Date(1_595_964_036_000)));
+        expect(slotTimeCalc(1_598_420)).toEqual(new Date('2020/07/28 20:20:36 UTC')));
 
       it('correctly computes date of some Shelley block', () =>
-        expect(slotTimeCalc(8_078_371)).toEqual(new Date(1_602_443_987_000)));
+        expect(slotTimeCalc(8_078_371)).toEqual(new Date(new Date('2020/10/11 20:19:47 UTC'))));
+
+      it('correctly computes date of some Alonzo block', () =>
+        expect(slotTimeCalc(67_951_416)).toEqual(new Date('2022-09-04 19:43:52 UTC')));
 
       it('throws with invalid slot', () => expect(() => slotTimeCalc(-1)).toThrowError(EraSummaryError));
     });
@@ -54,6 +57,40 @@ describe('slotCalc utils', () => {
   });
 
   describe('slotEpochCalc', () => {
+    describe('testnet with auto-upgrading eras', () => {
+      it('correctly computes epoch with multiple summaries starting from genesis', () => {
+        const eraSummaries: EraSummary[] = [
+          {
+            parameters: { epochLength: 100, slotLength: 3 },
+            start: { slot: 0, time: new Date(1_563_999_616_000) }
+          },
+          { parameters: { epochLength: 200, slotLength: 10 }, start: { slot: 0, time: new Date(1_563_999_616_000) } },
+          { parameters: { epochLength: 200, slotLength: 1 }, start: { slot: 0, time: new Date(1_563_999_616_000) } }
+        ];
+        const slotEpochCalc: SlotEpochCalc = createSlotEpochCalc(eraSummaries);
+
+        expect(slotEpochCalc(1031)).toEqual(5);
+      });
+      it('correctly computes epoch with summaries indicating an upgrade after genesis, from the same slotNo', () => {
+        const eraSummaries: EraSummary[] = [
+          {
+            parameters: { epochLength: 100, slotLength: 3 },
+            start: { slot: 0, time: new Date(1_563_999_616_000) }
+          },
+          {
+            parameters: { epochLength: 200, slotLength: 10 },
+            start: { slot: 301, time: new Date(1_563_999_716_000) }
+          },
+          {
+            parameters: { epochLength: 200, slotLength: 1 },
+            start: { slot: 301, time: new Date(1_563_999_716_000) }
+          }
+        ];
+        const slotEpochCalc: SlotEpochCalc = createSlotEpochCalc(eraSummaries);
+
+        expect(slotEpochCalc(1031)).toEqual(6);
+      });
+    });
     describe('testnet', () => {
       const slotEpochCalc: SlotEpochCalc = createSlotEpochCalc(testnetEraSummaries);
 

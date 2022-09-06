@@ -40,10 +40,10 @@ describe('blockfrostAssetProvider', () => {
 
       const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
       const client = blockfrostAssetProvider(blockfrost);
-      const response = await client.getAsset(
-        Cardano.AssetId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e'),
-        { history: true, nftMetadata: true, tokenMetadata: true }
-      );
+      const response = await client.getAsset({
+        assetId: Cardano.AssetId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e'),
+        extraData: { history: true, nftMetadata: true, tokenMetadata: true }
+      });
 
       expect(response).toMatchObject<Asset.AssetInfo>({
         assetId: Cardano.AssetId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e'),
@@ -92,10 +92,10 @@ describe('blockfrostAssetProvider', () => {
 
       const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
       const client = blockfrostAssetProvider(blockfrost);
-      const response = await client.getAsset(
-        Cardano.AssetId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e'),
-        { history: true, nftMetadata: true, tokenMetadata: true }
-      );
+      const response = await client.getAsset({
+        assetId: Cardano.AssetId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e'),
+        extraData: { history: true, nftMetadata: true, tokenMetadata: true }
+      });
 
       expect(response).toMatchObject<Asset.AssetInfo>({
         assetId: Cardano.AssetId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e'),
@@ -146,10 +146,10 @@ describe('blockfrostAssetProvider', () => {
 
       const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
       const client = blockfrostAssetProvider(blockfrost);
-      const response = await client.getAsset(
-        Cardano.AssetId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e'),
-        { history: true, nftMetadata: true, tokenMetadata: true }
-      );
+      const response = await client.getAsset({
+        assetId: Cardano.AssetId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e'),
+        extraData: { history: true, nftMetadata: true, tokenMetadata: true }
+      });
       expect(response).toMatchObject<Asset.AssetInfo>({
         assetId: Cardano.AssetId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e'),
         fingerprint: Cardano.AssetFingerprint('asset1pkpwyknlvul7az0xx8czhl60pyel45rpje4z8w'),
@@ -186,10 +186,10 @@ describe('blockfrostAssetProvider', () => {
 
       const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
       const client = blockfrostAssetProvider(blockfrost);
-      const response = await client.getAsset(
-        Cardano.AssetId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e'),
-        { history: false, nftMetadata: false, tokenMetadata: false }
-      );
+      const response = await client.getAsset({
+        assetId: Cardano.AssetId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e'),
+        extraData: { history: false, nftMetadata: false, tokenMetadata: false }
+      });
 
       expect(response).toMatchObject<Asset.AssetInfo>({
         assetId: Cardano.AssetId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e'),
@@ -247,10 +247,10 @@ describe('blockfrostAssetProvider', () => {
 
       const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
       const client = blockfrostAssetProvider(blockfrost);
-      const response = await client.getAsset(
-        Cardano.AssetId('8153f8be9f05b2f32b481bbf7af877f592160b39e87f5f55c8ab035f4e46543031'),
-        { history: true, nftMetadata: true, tokenMetadata: true }
-      );
+      const response = await client.getAsset({
+        assetId: Cardano.AssetId('8153f8be9f05b2f32b481bbf7af877f592160b39e87f5f55c8ab035f4e46543031'),
+        extraData: { history: true, nftMetadata: true, tokenMetadata: true }
+      });
       expect(response).toMatchObject<Asset.AssetInfo>({
         assetId: Cardano.AssetId('8153f8be9f05b2f32b481bbf7af877f592160b39e87f5f55c8ab035f4e46543031'),
         fingerprint: Cardano.AssetFingerprint('asset1h2z87pq2tr4ksxl5nkzd2ltrrtd6vvmf5nnn46'),

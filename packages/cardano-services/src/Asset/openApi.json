@@ -95,22 +95,14 @@
         }
       },
       "GetAssetRequest": {
-        "required": ["args"],
+        "required": ["assetId"],
         "type": "object",
         "properties": {
-          "args": {
-            "type": "array",
-            "minItems": 1,
-            "items": {
-              "oneOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "$ref": "#/components/schemas/ExtraData"
-                }
-              ]
-            }
+          "assetId": {
+            "type": "string"
+          },
+          "extraData": {
+            "$ref": "#/components/schemas/ExtraData"
           }
         }
       }

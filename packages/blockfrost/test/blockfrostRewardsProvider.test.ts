@@ -46,9 +46,9 @@ describe('blockfrostRewardsProvider', () => {
 
       const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
       const client = blockfrostRewardsProvider(blockfrost);
-      const response = await client.rewardAccountBalance(
-        Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27')
-      );
+      const response = await client.rewardAccountBalance({
+        rewardAccount: Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27')
+      });
 
       expect(response).toEqual(BigInt(accountsMockResponse.withdrawable_amount));
     });
@@ -63,9 +63,9 @@ describe('blockfrostRewardsProvider', () => {
 
       const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
       const client = blockfrostRewardsProvider(blockfrost);
-      const response = await client.rewardAccountBalance(
-        Cardano.RewardAccount('stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d')
-      );
+      const response = await client.rewardAccountBalance({
+        rewardAccount: Cardano.RewardAccount('stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d')
+      });
       expect(response).toEqual(0n);
     });
   });

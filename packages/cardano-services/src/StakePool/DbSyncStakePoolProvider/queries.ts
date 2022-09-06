@@ -1,5 +1,5 @@
 /* eslint-disable sonarjs/no-nested-template-literals */
-import { Cardano, MultipleChoiceSearchFilter, StakePoolQueryOptions } from '@cardano-sdk/core';
+import { Cardano, MultipleChoiceSearchFilter, QueryStakePoolsArgs } from '@cardano-sdk/core';
 import { OrderByOptions, SubQuery } from './types';
 import { getStakePoolSortType } from './util';
 
@@ -727,7 +727,7 @@ export const getStatusWhereClause = (
   return `(${whereClause.join(' OR ')})`;
 };
 
-export const withPagination = (query: string, pagination?: StakePoolQueryOptions['pagination']) => {
+export const withPagination = (query: string, pagination?: QueryStakePoolsArgs['pagination']) => {
   if (pagination) return `${query} LIMIT ${pagination.limit} OFFSET ${pagination.startAt} `;
   return query;
 };
@@ -834,7 +834,7 @@ const mapSort = (sort: OrderByOptions | undefined) => {
   return [{ field: mapping.field, order: sort.order }, ...secondarySorts];
 };
 
-export const withSort = (query: string, sort?: StakePoolQueryOptions['sort'], defaultSort?: OrderByOptions[]) => {
+export const withSort = (query: string, sort?: QueryStakePoolsArgs['sort'], defaultSort?: OrderByOptions[]) => {
   if (!sort?.field && defaultSort) {
     const defaultMappedSort = defaultSort.flatMap(mapSort);
     return orderBy(query, defaultMappedSort);

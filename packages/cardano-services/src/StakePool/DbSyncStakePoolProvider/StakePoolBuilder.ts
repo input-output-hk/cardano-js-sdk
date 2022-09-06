@@ -4,7 +4,7 @@ import {
   MultipleChoiceSearchFilter,
   ProviderError,
   ProviderFailure,
-  StakePoolQueryOptions,
+  QueryStakePoolsArgs,
   StakePoolStats
 } from '@cardano-sdk/core';
 import {
@@ -99,8 +99,7 @@ export class StakePoolBuilder {
       })
     );
   }
-
-  public async queryPoolAPY(hashesIds: number[], options?: StakePoolQueryOptions): Promise<PoolAPY[]> {
+  public async queryPoolAPY(hashesIds: number[], options?: QueryStakePoolsArgs): Promise<PoolAPY[]> {
     this.#logger.debug('About to query pools APY');
     const defaultSort: OrderByOptions[] = [{ field: 'apy', order: 'desc' }];
     const queryWithSortAndPagination = withPagination(
@@ -110,8 +109,7 @@ export class StakePoolBuilder {
     const result: QueryResult<PoolAPYModel> = await this.#db.query(queryWithSortAndPagination, [hashesIds]);
     return result.rows.map(mapPoolAPY);
   }
-
-  public async queryPoolData(updatesIds: number[], options?: StakePoolQueryOptions) {
+  public async queryPoolData(updatesIds: number[], options?: QueryStakePoolsArgs) {
     this.#logger.debug('About to query pool data');
     const defaultSort: OrderByOptions[] = [
       { field: 'name', order: 'asc' },
@@ -131,8 +129,7 @@ export class StakePoolBuilder {
     const result: QueryResult<PoolUpdateModel> = await this.#db.query(query, params);
     return result.rows.length > 0 ? result.rows.map(mapPoolUpdate) : [];
   }
-
-  public async queryPoolMetrics(hashesIds: number[], totalAdaAmount: string, options?: StakePoolQueryOptions) {
+  public async queryPoolMetrics(hashesIds: number[], totalAdaAmount: string, options?: QueryStakePoolsArgs) {
     this.#logger.debug('About to query pool metrics');
     const queryWithSortAndPagination = withPagination(
       withSort(Queries.findPoolsMetrics, options?.sort, [{ field: 'saturation', order: 'desc' }]),
@@ -203,8 +200,7 @@ export class StakePoolBuilder {
     const result: QueryResult<TotalAdaModel> = await this.#db.query(Queries.findTotalAda);
     return result.rows[0].total_ada;
   }
-
-  public buildOrQuery(filters: StakePoolQueryOptions['filters']) {
+  public buildOrQuery(filters: QueryStakePoolsArgs['filters']) {
     const subQueries: SubQuery[] = [];
     const params = [];
     let query = Queries.findPools;
@@ -230,7 +226,7 @@ export class StakePoolBuilder {
   }
 
   // eslint-disable-next-line max-statements
-  public buildAndQuery(filters: StakePoolQueryOptions['filters']) {
+  public buildAndQuery(filters: QueryStakePoolsArgs['filters']) {
     let query = Queries.findPools;
     let groupByClause = ' GROUP BY ph.id, pu.id ORDER BY ph.id DESC';
     const params = [];

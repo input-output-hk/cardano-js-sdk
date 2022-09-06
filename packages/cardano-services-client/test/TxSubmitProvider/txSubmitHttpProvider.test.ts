@@ -1,11 +1,14 @@
 import { Cardano, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { axiosError } from '../util';
+import { bufferToHexString } from '@cardano-sdk/util';
 import { logger } from '@cardano-sdk/util-dev';
 import { txSubmitHttpProvider } from '../../src';
 import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
 
 const config = { baseUrl: 'http://some-hostname:3000/tx-submit', logger };
+
+const emptyUintArrayAsHexString = bufferToHexString(Buffer.from(new Uint8Array()));
 
 describe('txSubmitHttpProvider', () => {
   describe('healthCheck', () => {
@@ -46,7 +49,7 @@ describe('txSubmitHttpProvider', () => {
       it('resolves if successful', async () => {
         axiosMock.onPost().replyOnce(200, '');
         const provider = txSubmitHttpProvider(config);
-        await expect(provider.submitTx(new Uint8Array())).resolves.not.toThrow();
+        await expect(provider.submitTx({ signedTransaction: emptyUintArrayAsHexString })).resolves.not.toThrow();
       });
 
       describe('errors', () => {
@@ -56,7 +59,7 @@ describe('txSubmitHttpProvider', () => {
               throw axiosError(bodyError);
             });
             const provider = txSubmitHttpProvider(config);
-            await provider.submitTx(new Uint8Array());
+            await provider.submitTx({ signedTransaction: emptyUintArrayAsHexString });
             throw new Error('Expected to throw');
           } catch (error) {
             if (error instanceof ProviderError) {

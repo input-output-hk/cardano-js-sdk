@@ -4,6 +4,7 @@ import { Cardano, ProviderError, ProviderFailure, TxSubmitProvider } from '@card
 import { Channel, Connection, Message, connect } from 'amqplib';
 import { EventEmitter } from 'events';
 import { Logger } from 'ts-log';
+import { bufferToHexString } from '@cardano-sdk/util';
 
 const moduleName = 'TxSubmitWorker';
 
@@ -284,7 +285,7 @@ export class TxSubmitWorker extends EventEmitter {
 
       this.#dependencies.logger.info(`${moduleName}: submitting tx #${counter} id: ${txId}`);
       this.#dependencies.logger.debug(`${moduleName}: tx #${counter} dump:`, [content.toString('hex')]);
-      await this.#dependencies.txSubmitProvider.submitTx(txBody);
+      await this.#dependencies.txSubmitProvider.submitTx({ signedTransaction: bufferToHexString(Buffer.from(txBody)) });
 
       this.#dependencies.logger.debug(`${moduleName}: ACKing RabbitMQ message #${counter}`);
       this.#channel?.ack(message);

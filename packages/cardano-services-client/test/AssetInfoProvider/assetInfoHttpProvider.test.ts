@@ -26,7 +26,9 @@ describe('assetInfoHttpProvider', () => {
       axiosMock.onPost().replyOnce(200, {});
       const provider = assetInfoHttpProvider(config);
       await expect(
-        provider.getAsset(Cardano.AssetId('f43a62fdc3965df486de8a0d32fe800963589c41b38946602a0dc53541474958'))
+        provider.getAsset({
+          assetId: Cardano.AssetId('f43a62fdc3965df486de8a0d32fe800963589c41b38946602a0dc53541474958')
+        })
       ).resolves.toEqual({});
     });
   });

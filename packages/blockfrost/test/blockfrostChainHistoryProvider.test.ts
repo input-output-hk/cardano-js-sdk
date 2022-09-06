@@ -138,9 +138,9 @@ describe('blockfrostChainHistoryProvider', () => {
       BlockFrostAPI.prototype.txsMetadata = jest.fn().mockResolvedValue(mockedMetadataResponse);
       const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
       const client = blockfrostChainHistoryProvider(blockfrost, logger);
-      const response = await client.transactionsByHashes(
-        ['4123d70f66414cc921f6ffc29a899aafc7137a99a0fd453d6b200863ef5702d6'].map(Cardano.TransactionId)
-      );
+      const response = await client.transactionsByHashes({
+        ids: ['4123d70f66414cc921f6ffc29a899aafc7137a99a0fd453d6b200863ef5702d6'].map(Cardano.TransactionId)
+      });
 
       expect(response).toHaveLength(1);
       expect(response[0]).toMatchObject({
@@ -235,9 +235,9 @@ describe('blockfrostChainHistoryProvider', () => {
 
     const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
     const client = blockfrostChainHistoryProvider(blockfrost, logger);
-    const response = await client.blocksByHashes([
-      Cardano.BlockId('0dbe461fb5f981c0d01615332b8666340eb1a692b3034f46bcb5f5ea4172b2ed')
-    ]);
+    const response = await client.blocksByHashes({
+      ids: [Cardano.BlockId('0dbe461fb5f981c0d01615332b8666340eb1a692b3034f46bcb5f5ea4172b2ed')]
+    });
 
     expect(response).toMatchObject([
       {
@@ -268,9 +268,9 @@ describe('blockfrostChainHistoryProvider', () => {
 
     const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
     const client = blockfrostChainHistoryProvider(blockfrost, logger);
-    const response = await client.blocksByHashes([
-      Cardano.BlockId('0dbe461fb5f981c0d01615332b8666340eb1a692b3034f46bcb5f5ea4172b2ed')
-    ]);
+    const response = await client.blocksByHashes({
+      ids: [Cardano.BlockId('0dbe461fb5f981c0d01615332b8666340eb1a692b3034f46bcb5f5ea4172b2ed')]
+    });
 
     expect(response[0].slotLeader).toBe(slotLeader);
   });

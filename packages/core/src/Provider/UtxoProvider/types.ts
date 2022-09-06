@@ -2,9 +2,13 @@
 // @ts-ignore
 import Cardano, { Provider } from '../..';
 
+export interface UtxoByAddressesArgs {
+  addresses: Cardano.Address[];
+}
+
 export interface UtxoProvider extends Provider {
   /**
    * @returns an array of utxo corresponding to the given addresses
    */
-  utxoByAddresses: (addresses: Cardano.Address[]) => Promise<Cardano.Utxo[]>;
+  utxoByAddresses: (args: UtxoByAddressesArgs) => Promise<Cardano.Utxo[]>;
 }

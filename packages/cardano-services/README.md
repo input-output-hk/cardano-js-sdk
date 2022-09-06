@@ -46,7 +46,7 @@ _The following examples require the [install and build] steps to be completed._
 ./dist/cjs/cli.js \
   start-server \
     --api-url http://localhost:6000 \
-    --cardano-node-config-path ./config/network/testnet/cardano-node/config.json \
+    --cardano-node-config-path ./config/network/preprod/cardano-node/config.json \
     --postgres-connection-string postgresql://somePgUser:somePassword@localhost:5432/someDbName \
     --ogmios-url  ws://localhost:1338 \
     asset chain-history stake-pool tx-submit network-info utxo rewards
@@ -56,7 +56,7 @@ _The following examples require the [install and build] steps to be completed._
 ``` console
 SERVICE_NAMES=asset,chain-history,stake-pool,tx-submit,network-info,utxo,rewards \
 API_URL=http://localhost:6000 \
-CARDANO_NODE_CONFIG_PATH=./config/network/testnet/cardano-node/config.json \
+CARDANO_NODE_CONFIG_PATH=./config/network/preprod/cardano-node/config.json \
 POSTGRES_CONNECTION_STRING=postgresql://somePgUser:somePassword@localhost:5432/someDbName \
 OGMIOS_URL=ws://localhost:1338 \
 ./dist/cjs/cli.js start-server
@@ -78,7 +78,7 @@ OGMIOS_URL=ws://localhost:1338 \
   start-server \
     --api-url http://localhost:6000 \
     --enable-metrics \
-    --cardano-node-config-path ./config/network/testnet/cardano-node/config.json \
+    --cardano-node-config-path ./config/network/preprod/cardano-node/config.json \
     --postgres-srv-service-name \
     --postgres-db someDbName \
     --postgres-user somePgUser \
@@ -94,7 +94,7 @@ OGMIOS_URL=ws://localhost:1338 \
 SERVICE_NAMES=asset,chain-history,stake-pool,tx-submit,network-info,utxo,rewards \
 API_URL=http://localhost:6000 \
 ENABLE_METRICS=true \
-CARDANO_NODE_CONFIG_PATH=./config/network/testnet/cardano-node/config.json \
+CARDANO_NODE_CONFIG_PATH=./config/network/preprod/cardano-node/config.json \
 POSTGRES_SRV_SERVICE_NAME=some-domain-for-postgres-db
 POSTGRES_DB=someDbName \
 POSTGRES_USER=someUser \
