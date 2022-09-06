@@ -24,6 +24,12 @@ enum HttpServerOptionDescriptions {
   UseQueue = 'Enables RabbitMQ'
 }
 
+export enum TxWorkerOptionDescriptions {
+  Parallel = 'Parallel mode',
+  ParallelTxs = 'Parallel transactions',
+  PollingCycle = 'Polling cycle'
+}
+
 export type ProgramOptionDescriptions = CommonOptionDescriptions | HttpServerOptionDescriptions;
 export const ProgramOptionDescriptions = {
   ...CommonOptionDescriptions,

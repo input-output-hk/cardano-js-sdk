@@ -8,11 +8,17 @@ import {
   API_URL_DEFAULT,
   HttpServerOptions,
   OGMIOS_URL_DEFAULT,
+  PARALLEL_MODE_DEFAULT,
+  PARALLEL_TXS_DEFAULT,
+  POLLING_CYCLE_DEFAULT,
   ProgramOptionDescriptions,
   RABBITMQ_URL_DEFAULT,
   SERVICE_DISCOVERY_BACKOFF_FACTOR_DEFAULT,
   SERVICE_DISCOVERY_TIMEOUT_DEFAULT,
   ServiceNames,
+  TxWorkerOptionDescriptions,
+  TxWorkerOptions,
+  loadAndStartTxWorker,
   loadHttpServer,
   loadSecret
 } from './Program';
@@ -28,14 +34,6 @@ import { DB_CACHE_TTL_DEFAULT } from './InMemoryCache';
 import { DEFAULT_TOKEN_METADATA_CACHE_TTL, DEFAULT_TOKEN_METADATA_SERVER_URL } from './Asset';
 import { EPOCH_POLL_INTERVAL_DEFAULT } from './util';
 import { InvalidLoggerLevel } from './errors';
-import {
-  PARALLEL_MODE_DEFAULT,
-  PARALLEL_TXS_DEFAULT,
-  POLLING_CYCLE_DEFAULT,
-  TxWorkerOptionDescriptions,
-  TxWorkerOptions,
-  loadAndStartTxWorker
-} from './TxWorker';
 import { URL } from 'url';
 import { cacheTtlValidator } from './util/validators';
 import { loggerMethodNames } from '@cardano-sdk/util';
