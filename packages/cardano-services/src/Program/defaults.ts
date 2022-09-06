@@ -1,5 +1,15 @@
-export { OGMIOS_URL_DEFAULT, RABBITMQ_URL_DEFAULT } from '../ProgramsCommon';
+import { Ogmios } from '@cardano-sdk/ogmios';
 
+export const OGMIOS_URL_DEFAULT = (() => {
+  const connection = Ogmios.createConnectionObject();
+  return connection.address.webSocket;
+})();
+
+export const RABBITMQ_URL_DEFAULT = 'amqp://localhost:5672';
+
+export const USE_QUEUE_DEFAULT = false;
+
+export const ENABLE_METRICS_DEFAULT = false;
 // http-server
 export const API_URL_DEFAULT = 'http://localhost:3000';
 

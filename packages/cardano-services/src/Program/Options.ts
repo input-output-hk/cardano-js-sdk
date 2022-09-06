@@ -1,4 +1,15 @@
-import { CommonOptionDescriptions } from '../ProgramsCommon';
+import { LogLevel } from 'bunyan';
+
+export enum CommonOptionDescriptions {
+  DbCacheTtl = 'Cache TTL in minutes between 1 and 2880, an option for database related operations',
+  LoggerMinSeverity = 'Log level',
+  OgmiosSrvServiceName = 'Ogmios SRV service name',
+  OgmiosUrl = 'Ogmios URL',
+  RabbitMQSrvServiceName = 'RabbitMQ SRV service name',
+  RabbitMQUrl = 'RabbitMQ URL',
+  ServiceDiscoveryBackoffFactor = 'Exponential backoff factor for service discovery',
+  ServiceDiscoveryTimeout = 'Timeout for service discovery attempts'
+}
 
 enum HttpServerOptionDescriptions {
   ApiUrl = 'API URL',
@@ -31,7 +42,23 @@ export enum TxWorkerOptionDescriptions {
 }
 
 export type ProgramOptionDescriptions = CommonOptionDescriptions | HttpServerOptionDescriptions;
+
 export const ProgramOptionDescriptions = {
   ...CommonOptionDescriptions,
   ...HttpServerOptionDescriptions
 };
+
+/**
+ * Common options for programs:
+ * - HTTP server
+ * - RabbitMQ worker
+ */
+export interface CommonProgramOptions {
+  loggerMinSeverity?: LogLevel;
+  ogmiosUrl?: URL;
+  rabbitmqUrl?: URL;
+  ogmiosSrvServiceName?: string;
+  rabbitmqSrvServiceName?: string;
+  serviceDiscoveryBackoffFactor?: number;
+  serviceDiscoveryTimeout?: number;
+}

@@ -2,7 +2,7 @@
 /* eslint-disable sonarjs/cognitive-complexity */
 import { AssetHttpService, CardanoTokenRegistry, DbSyncAssetProvider, DbSyncNftMetadataService } from '../Asset';
 import { ChainHistoryHttpService, DbSyncChainHistoryProvider } from '../ChainHistory';
-import { CommonProgramOptions } from '../ProgramsCommon';
+import { CommonProgramOptions, ProgramOptionDescriptions } from './Options';
 import { DbSyncEpochPollService } from '../util';
 import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../NetworkInfo';
 import { DbSyncRewardsProvider, RewardsHttpService } from '../Rewards';
@@ -12,7 +12,6 @@ import { DnsResolver, createDnsResolver } from './utils';
 import { HttpServer, HttpServerConfig, HttpService } from '../Http';
 import { InMemoryCache } from '../InMemoryCache';
 import { MissingProgramOption, UnknownServiceName } from './errors';
-import { ProgramOptionDescriptions } from './ProgramOptionDescriptions';
 import { ServiceNames } from './ServiceNames';
 import { TxSubmitHttpService } from '../TxSubmit';
 import { createDbSyncMetadataService } from '../Metadata';

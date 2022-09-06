@@ -3,7 +3,7 @@
 /* eslint-disable no-use-before-define */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { CONNECTION_ERROR_EVENT, RabbitMqTxSubmitProvider, TxSubmitWorker } from '../../TxSubmit';
-import { CommonOptionDescriptions, CommonProgramOptions } from '../../ProgramsCommon';
+import { CommonOptionDescriptions, CommonProgramOptions } from '../Options';
 import { DnsResolver, srvRecordToRabbitmqURL } from '../utils';
 import { Logger } from 'ts-log';
 import { MissingProgramOption } from '../errors';

@@ -1,4 +1,4 @@
-import { CommonProgramOptions } from '../ProgramsCommon';
+import { CommonProgramOptions } from './Options';
 import { Logger } from 'ts-log';
 import { TxSubmitWorkerConfig } from '../TxSubmit';
 import { createDnsResolver, getOgmiosTxSubmitProvider, getRunningTxSubmitWorker } from './';
