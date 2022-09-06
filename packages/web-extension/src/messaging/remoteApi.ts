@@ -232,6 +232,8 @@ export const bindObservableChannels = <API extends object>(
  * Caches and replays (1) last emission upon remote subscription (unless item === null).
  *
  * In addition to errors thrown by the underlying API, methods can throw TypeError
+ *
+ * @returns object that can be used to destroy all ports (destroys 'messenger' dependency)
  */
 export const exposeMessengerApi = <API extends object>(
   { api, properties }: ExposeApiProps<API>,
@@ -270,6 +272,7 @@ export const exposeMessengerApi = <API extends object>(
       nestedObjChannelsSubscription.unsubscribe();
       observableChannelsSubscription.unsubscribe();
       methodHandlerSubscription.unsubscribe();
+      dependencies.messenger.destroy();
     }
   };
 };

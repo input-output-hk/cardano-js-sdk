@@ -10,7 +10,7 @@ import {
   deriveChannelName,
   exposeMessengerApi
 } from '../../src/messaging';
-import { Observable, Subject, firstValueFrom, map, of, tap, throwError, timer, toArray } from 'rxjs';
+import { EmptyError, Observable, Subject, firstValueFrom, map, of, tap, throwError, timer, toArray } from 'rxjs';
 import { dummyLogger } from 'ts-log';
 import memoize from 'lodash/memoize';
 
@@ -146,7 +146,8 @@ const setUp = (someNumbers$: Observable<bigint> = of(0n), nestedSomeNumbers$ = o
       consumer.shutdown();
     },
     consumer,
-    hostMessenger
+    hostMessenger,
+    hostSubscription
   };
 };
 
@@ -164,6 +165,12 @@ describe('remoteApi', () => {
     sut = setUp();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect((sut.consumer as any).addTwo).toBeUndefined();
+  });
+
+  it('unsubscribing exposed object destroys underlying messenger', async () => {
+    sut = setUp();
+    sut.hostSubscription.unsubscribe();
+    await expect(firstValueFrom(sut.hostMessenger.message$)).rejects.toThrowError(EmptyError);
   });
 
   describe('methods returning promise', () => {
