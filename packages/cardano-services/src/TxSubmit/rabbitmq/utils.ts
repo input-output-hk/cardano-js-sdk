@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Cardano } from '@cardano-sdk/core';
-import { OutsideOfValidityInterval } from '@cardano-ogmios/schema';
+import { Ogmios } from '@cardano-sdk/ogmios';
 import { toSerializableObject } from '@cardano-sdk/util';
 
 export const TX_SUBMISSION_QUEUE = 'cardano-tx-submit';
@@ -38,7 +38,7 @@ export const serializeError = (err: unknown) => {
   const serializableError = toSerializableObject(err);
 
   if (err instanceof Cardano.TxSubmissionErrors.OutsideOfValidityIntervalError) {
-    const details = JSON.parse(err.message) as OutsideOfValidityInterval['outsideOfValidityInterval'];
+    const details = JSON.parse(err.message) as Ogmios.Schema.OutsideOfValidityInterval['outsideOfValidityInterval'];
 
     if (details.interval.invalidBefore && details.currentSlot <= details.interval.invalidBefore) isRetryable = true;
   }

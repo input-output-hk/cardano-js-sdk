@@ -1,5 +1,5 @@
 import { CustomError } from 'ts-custom-error';
-import { ProgramOptionDescriptions } from '../ProgramOptionDescriptions';
+import { ProgramOptionDescriptions } from '../Options';
 
 export class MissingCardanoNodeOption extends CustomError {
   public constructor(option: ProgramOptionDescriptions | ProgramOptionDescriptions[]) {

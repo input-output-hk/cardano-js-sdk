@@ -1,9 +1,8 @@
-import { CommonProgramOptions } from '../ProgramsCommon';
+import { CommonProgramOptions } from './Options';
 import { Logger } from 'ts-log';
-import { TxSubmitWorkerConfig } from '@cardano-sdk/rabbitmq';
-import { createDnsResolver, getOgmiosTxSubmitProvider } from '../Program';
+import { TxSubmitWorkerConfig } from '../TxSubmit';
+import { createDnsResolver, getOgmiosTxSubmitProvider, getRunningTxSubmitWorker } from './';
 import { createLogger } from 'bunyan';
-import { getRunningTxSubmitWorker } from './utils';
 
 export type TxWorkerOptions = CommonProgramOptions &
   Pick<TxSubmitWorkerConfig, 'parallel' | 'parallelTxs' | 'pollingCycle'>;

@@ -1,5 +1,5 @@
 import { CustomError } from 'ts-custom-error';
-import { ProgramOptionDescriptions } from '../ProgramOptionDescriptions';
+import { ProgramOptionDescriptions } from '../Options';
 import { ServiceNames } from '../ServiceNames';
 
 export class MissingProgramOption extends CustomError {

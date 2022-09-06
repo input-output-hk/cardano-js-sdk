@@ -1,1 +1,0 @@
-# Cardano JS SDK | RabbitMQ
