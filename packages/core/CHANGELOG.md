@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.5.1-nightly.2...@cardano-sdk/core@0.6.0-nightly.0) (2022-09-06)
+
+
+### ⚠ BREAKING CHANGES
+
+* rework TxSubmitProvider to submit transactions as hex string instead of Buffer
+* rework all provider signatures args from positional to a single object
+
+### Bug Fixes
+
+* **core:** handle skipped testnet eras when configured for auto-upgrade ([47fe7c1](https://github.com/input-output-hk/cardano-js-sdk/commit/47fe7c1d33576359175db1000a67ae08736254a7))
+* **core:** update hardcoded testnetEraSummaries with correct start of shelley era ([8489da9](https://github.com/input-output-hk/cardano-js-sdk/commit/8489da9da98e90e9e3a2198ee19b662ed3475772))
+
+
+### Code Refactoring
+
+* rework all provider signatures args from positional to a single object ([dee30b5](https://github.com/input-output-hk/cardano-js-sdk/commit/dee30b52af5edc1241142a2c06708266a1ae7fa4))
+* rework TxSubmitProvider to submit transactions as hex string instead of Buffer ([032a1b7](https://github.com/input-output-hk/cardano-js-sdk/commit/032a1b7a11941d52b5baf0d447b615c58a294068))
+
+
+
 ## [0.5.1-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.5.1-nightly.1...@cardano-sdk/core@0.5.1-nightly.2) (2022-09-02)
 
 **Note:** Version bump only for package @cardano-sdk/core

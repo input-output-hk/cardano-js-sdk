@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.6.0-nightly.0...@cardano-sdk/cardano-services@0.6.0-nightly.1) (2022-09-06)
+
+
+### ⚠ BREAKING CHANGES
+
+* rework TxSubmitProvider to submit transactions as hex string instead of Buffer
+* rework all provider signatures args from positional to a single object
+
+### Code Refactoring
+
+* rework all provider signatures args from positional to a single object ([dee30b5](https://github.com/input-output-hk/cardano-js-sdk/commit/dee30b52af5edc1241142a2c06708266a1ae7fa4))
+* rework TxSubmitProvider to submit transactions as hex string instead of Buffer ([032a1b7](https://github.com/input-output-hk/cardano-js-sdk/commit/032a1b7a11941d52b5baf0d447b615c58a294068))
+
+
+
 ## [0.6.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.5.1-nightly.1...@cardano-sdk/cardano-services@0.6.0-nightly.0) (2022-09-02)
 
 
