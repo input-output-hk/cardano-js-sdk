@@ -8,6 +8,7 @@ import {
 } from '@cardano-sdk/core';
 import { Channel, Connection, connect } from 'amqplib';
 import { Logger } from 'ts-log';
+import { RunnableProvider } from '../../util';
 import { TX_SUBMISSION_QUEUE, getErrorPrototype, waitForPending } from './utils';
 import { fromSerializableObject, hexStringToBuffer } from '@cardano-sdk/util';
 
@@ -36,7 +37,7 @@ export interface RabbitMqTxSubmitProviderDependencies {
 /**
  * Connect to a [RabbitMQ](https://www.rabbitmq.com/) instance
  */
-export class RabbitMqTxSubmitProvider implements TxSubmitProvider {
+export class RabbitMqTxSubmitProvider implements RunnableProvider, TxSubmitProvider {
   #channel?: Channel;
   #connection?: Connection;
   #queueWasCreated = false;
@@ -63,14 +64,14 @@ export class RabbitMqTxSubmitProvider implements TxSubmitProvider {
   /**
    * Connects to the RabbitMQ server and create the channel
    */
-  async #connectAndCreateChannel() {
+  async start() {
     if (this.#connection) return;
 
     try {
       this.#connection = await connect(this.#config.rabbitmqUrl.toString());
     } catch (error) {
       this.#dependencies.logger.error(`${moduleName}: while connecting`, error);
-      void this.close();
+      void this.shutdown();
       throw new ProviderError(ProviderFailure.ConnectionFailure, error);
     }
     this.#connection.on('error', (error: unknown) =>
@@ -81,7 +82,7 @@ export class RabbitMqTxSubmitProvider implements TxSubmitProvider {
       this.#channel = await this.#connection.createChannel();
     } catch (error) {
       this.#dependencies.logger.error(`${moduleName}: while creating channel`, error);
-      void this.close();
+      void this.shutdown();
       throw new ProviderError(ProviderFailure.ConnectionFailure, error);
     }
     this.#channel.on('error', (error: unknown) =>
@@ -97,13 +98,13 @@ export class RabbitMqTxSubmitProvider implements TxSubmitProvider {
   async #ensureQueue(force?: boolean) {
     if (this.#queueWasCreated && !force) return;
 
-    await this.#connectAndCreateChannel();
+    await this.start();
 
     try {
       await this.#channel!.assertQueue(TX_SUBMISSION_QUEUE);
       this.#queueWasCreated = true;
     } catch (error) {
-      void this.close();
+      void this.shutdown();
       throw new ProviderError(ProviderFailure.ConnectionFailure, error);
     }
   }
@@ -111,7 +112,7 @@ export class RabbitMqTxSubmitProvider implements TxSubmitProvider {
   /**
    * Closes the connection to RabbitMQ and (for internal purposes) it resets the state as well
    */
-  async close() {
+  public async shutdown() {
     // Wait for pending operations before closing
     await waitForPending(this.#channel);
 

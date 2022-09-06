@@ -228,7 +228,7 @@ describe('TxSubmitWorker', () => {
 
     expect(res).toEqual(result);
 
-    await rabbitMqTxSubmitProvider.close();
+    await rabbitMqTxSubmitProvider.shutdown();
 
     // We check only the relevant messages
     expect(

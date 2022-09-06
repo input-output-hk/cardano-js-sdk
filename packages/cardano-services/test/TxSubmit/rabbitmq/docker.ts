@@ -172,7 +172,7 @@ export class RabbitMQContainer {
       } catch (error) {
         err = error;
       } finally {
-        if (rabbitMqTxSubmitProvider) await rabbitMqTxSubmitProvider.close();
+        if (rabbitMqTxSubmitProvider) await rabbitMqTxSubmitProvider.shutdown();
         if (err) reject(err);
         else resolve();
       }

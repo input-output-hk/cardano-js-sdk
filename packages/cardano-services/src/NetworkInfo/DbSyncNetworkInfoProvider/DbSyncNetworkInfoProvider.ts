@@ -17,6 +17,7 @@ import { Logger } from 'ts-log';
 import { NetworkInfoBuilder } from './NetworkInfoBuilder';
 import { NetworkInfoCacheKey } from '.';
 import { Pool } from 'pg';
+import { RunnableProvider } from '../../util';
 import { loadGenesisData, toGenesisParams, toLedgerTip, toSupply, toWalletProtocolParams } from './mappers';
 
 export interface NetworkInfoProviderProps {
@@ -29,7 +30,7 @@ export interface NetworkInfoProviderDependencies {
   cardanoNode: CardanoNode;
   epochMonitor: EpochMonitor;
 }
-export class DbSyncNetworkInfoProvider extends DbSyncProvider implements NetworkInfoProvider {
+export class DbSyncNetworkInfoProvider extends DbSyncProvider implements RunnableProvider, NetworkInfoProvider {
   #logger: Logger;
   #cache: InMemoryCache;
   #builder: NetworkInfoBuilder;
@@ -105,12 +106,12 @@ export class DbSyncNetworkInfoProvider extends DbSyncProvider implements Network
     );
   }
 
-  async start(): Promise<void> {
+  async start() {
     await this.#cardanoNode.initialize();
     this.#epochRolloverDisposer = this.#epochMonitor.onEpochRollover(() => this.#cache.clear());
   }
 
-  async close(): Promise<void> {
+  async shutdown() {
     this.#cache.shutdown();
     await this.#cardanoNode.shutdown();
     this.#epochRolloverDisposer();

@@ -1,14 +1,14 @@
 import { HealthCheckResponse, Provider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { HttpServer } from './HttpServer';
 import { Logger } from 'ts-log';
-import { ProviderHandler } from '../util';
+import { ProviderHandler, RunnableProvider } from '../util';
 import { RunnableModule } from '../RunnableModule';
 import express from 'express';
 
 export abstract class HttpService extends RunnableModule {
   public router: express.Router;
   public slug: string;
-  public provider: Provider;
+  public provider: RunnableProvider;
 
   constructor(slug: string, provider: Provider, router: express.Router, logger: Logger) {
     super(slug, logger);
@@ -38,12 +38,12 @@ export abstract class HttpService extends RunnableModule {
     }
   }
 
-  async startImpl(): Promise<void> {
+  async startImpl() {
     await this.provider.start?.();
   }
 
-  async shutdownImpl(): Promise<void> {
-    await this.provider.close?.();
+  async shutdownImpl() {
+    await this.provider.shutdown?.();
   }
 
   async healthCheck(): Promise<HealthCheckResponse> {

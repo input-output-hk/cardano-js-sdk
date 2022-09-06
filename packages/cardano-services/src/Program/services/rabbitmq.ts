@@ -43,7 +43,7 @@ export const rabbitMqTxSubmitProviderWithDiscovery = async (
               const resolvedRecord = await dnsResolver(serviceName!);
               logger.info(`DNS resolution for RabbitMQ service, resolved with record: ${JSON.stringify(record)}`);
               await rabbitmqProvider
-                .close?.()
+                .shutdown()
                 .catch((error_) => logger.warn(`RabbitMQ provider failed to close after DNS resolution: ${error_}`));
               rabbitmqProvider = new RabbitMqTxSubmitProvider(
                 { rabbitmqUrl: srvRecordToRabbitmqURL(resolvedRecord) },

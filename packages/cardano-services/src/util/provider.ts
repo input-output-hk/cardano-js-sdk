@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Awaited } from '@cardano-sdk/util';
 import { Logger } from 'ts-log';
-import { ProviderError } from '@cardano-sdk/core';
+import { Provider, ProviderError } from '@cardano-sdk/core';
 import express from 'express';
 
 export type ProviderHandler<Args = any, ResponseBody = any, Handler extends (...args: any) => any = any> = (
@@ -29,3 +29,8 @@ export const providerHandler =
     }
     handler(req.body, req, res, next, handlerFn);
   };
+
+export interface RunnableProvider extends Provider {
+  start?(): Promise<void>;
+  shutdown?(): Promise<void>;
+}
