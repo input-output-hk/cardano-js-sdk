@@ -1,3 +1,3 @@
 export * from './TxSubmitWorker';
-export * from './rabbitmqTxSubmitProvider';
+export * from './RabbitMqTxSubmitProvider';
 export * from './utils';
