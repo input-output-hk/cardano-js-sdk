@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Events, Runtime } from 'webextension-polyfill';
-import { GetErrorPrototype } from '@cardano-sdk/util';
+import { GetErrorPrototype, Shutdown } from '@cardano-sdk/util';
 import { Logger } from 'ts-log';
 import { Observable } from 'rxjs';
 
@@ -122,13 +122,12 @@ export interface ConsumeRemoteApiOptions<T> {
   getErrorPrototype?: GetErrorPrototype;
 }
 
-export interface Messenger {
+export interface Messenger extends Shutdown {
   channel: ChannelName;
   connect$: Observable<MinimalPort>;
   postMessage(message: unknown): Observable<void>;
   message$: Observable<PortMessage>;
   deriveChannel(path: string): Messenger;
-  destroy(): void;
 }
 
 export interface MessengerApiDependencies {

@@ -55,18 +55,18 @@ const createMessenger = (channel: ChannelName, isHost: boolean): TestMessenger =
       derivedMessengers.push(messenger);
       return messenger;
     },
-    destroy() {
+    message$: local$.pipe(
+      map((data): PortMessage => ({ data, port: { postMessage: (message) => postMessage(message).subscribe() } }))
+    ),
+    postMessage,
+    shutdown() {
       for (const messenger of derivedMessengers) {
-        messenger.destroy();
+        messenger.shutdown();
       }
       local$.complete();
       remote$.complete();
       connect$.complete();
-    },
-    message$: local$.pipe(
-      map((data): PortMessage => ({ data, port: { postMessage: (message) => postMessage(message).subscribe() } }))
-    ),
-    postMessage
+    }
   };
 };
 
@@ -143,7 +143,7 @@ const setUp = (someNumbers$: Observable<bigint> = of(0n), nestedSomeNumbers$ = o
   return {
     api,
     cleanup() {
-      hostSubscription.unsubscribe();
+      hostSubscription.shutdown();
       consumer.shutdown();
     },
     consumer,
@@ -168,9 +168,9 @@ describe('remoteApi', () => {
     expect((sut.consumer as any).addTwo).toBeUndefined();
   });
 
-  it('unsubscribing exposed object destroys underlying messenger', async () => {
+  it('shuts down underlying messenger when the exposed object is shut down', async () => {
     sut = setUp();
-    sut.hostSubscription.unsubscribe();
+    sut.hostSubscription.shutdown();
     await expect(firstValueFrom(sut.hostMessenger.message$)).rejects.toThrowError(EmptyError);
   });
 

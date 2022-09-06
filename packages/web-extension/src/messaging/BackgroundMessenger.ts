@@ -56,18 +56,21 @@ export const createBackgroundMessenger = ({ logger, runtime }: MessengerDependen
   };
   runtime.onConnect.addListener(onConnect);
   return {
+    getChannel,
+
     /**
      * Disconnect all existing ports and stop listening for new ones.
      */
-    destroy() {
+    shutdown() {
       // eslint-disable-next-line unicorn/no-useless-spread
       for (const channelName of [...channels.keys()]) {
-        this.destroyChannel(channelName);
+        this.shutdownChannel(channelName);
       }
       runtime.onConnect.removeListener(onConnect);
-      logger.warn('[BackgroundMessenger] destroyed');
+      logger.warn('[BackgroundMessenger] shutdown');
     },
-    destroyChannel(channelName: string) {
+
+    shutdownChannel(channelName: string) {
       const channel = channels.get(channelName);
       if (!channel) return;
       channel.message$.complete();
@@ -75,8 +78,7 @@ export const createBackgroundMessenger = ({ logger, runtime }: MessengerDependen
         port.disconnect();
       }
       channels.delete(channelName);
-    },
-    getChannel
+    }
   };
 };
 
@@ -99,12 +101,9 @@ export const generalizeBackgroundMessenger = (channel: ChannelName, messenger: B
   deriveChannel(path) {
     return generalizeBackgroundMessenger(deriveChannelName(channel, path), messenger);
   },
-  destroy() {
-    messenger.destroyChannel(channel);
-  },
   message$: messenger.getChannel(channel).message$,
   /**
-   * @throws RxJS EmptyError if messenger is destroyed
+   * @throws RxJS EmptyError if messenger is shutdown
    */
   postMessage: (message) => {
     const { ports$ } = messenger.getChannel(channel);
@@ -118,5 +117,9 @@ export const generalizeBackgroundMessenger = (channel: ChannelName, messenger: B
       }),
       map(() => void 0)
     );
+  },
+
+  shutdown() {
+    messenger.shutdownChannel(channel);
   }
 });

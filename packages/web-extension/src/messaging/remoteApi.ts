@@ -95,7 +95,7 @@ export const consumeMessengerRemoteApi = <T extends object>(
 ): T & Shutdown =>
   new Proxy<T & Shutdown>(
     {
-      shutdown: messenger.destroy
+      shutdown: messenger.shutdown
     } as T & Shutdown,
     {
       get(target, prop, receiver) {
@@ -146,8 +146,8 @@ export const consumeMessengerRemoteApi = <T extends object>(
 export const bindMessengerRequestHandler = <Response>(
   { handler }: BindRequestHandlerOptions<Response>,
   { logger, messenger: { message$ } }: MessengerApiDependencies
-) =>
-  message$.subscribe(async ({ data, port }) => {
+): Shutdown => {
+  const subscription = message$.subscribe(async ({ data, port }) => {
     if (!isRequestMessage(data)) return;
     let response: Response | Error;
     try {
@@ -166,6 +166,10 @@ export const bindMessengerRequestHandler = <Response>(
     // TODO: can this throw if port is closed?
     port.postMessage(responseMessage);
   });
+  return {
+    shutdown: () => subscription.unsubscribe()
+  };
+};
 
 const isRemoteApiMethod = (prop: unknown): prop is RemoteApiMethod =>
   typeof prop === 'object' && prop !== null && 'propType' in prop;
@@ -173,7 +177,7 @@ const isRemoteApiMethod = (prop: unknown): prop is RemoteApiMethod =>
 export const bindNestedObjChannels = <API extends object>(
   { api, properties }: ExposeApiProps<API>,
   { messenger, logger }: MessengerApiDependencies
-) => {
+): Shutdown => {
   const subscriptions = Object.entries(properties)
     .filter(([_, type]) => typeof type === 'object' && !isRemoteApiMethod(type))
     .map(([prop]) => {
@@ -187,9 +191,9 @@ export const bindNestedObjChannels = <API extends object>(
       );
     });
   return {
-    unsubscribe: () => {
+    shutdown: () => {
       for (const subscription of subscriptions) {
-        subscription.unsubscribe();
+        subscription.shutdown();
       }
     }
   };
@@ -198,7 +202,7 @@ export const bindNestedObjChannels = <API extends object>(
 export const bindObservableChannels = <API extends object>(
   { api, properties }: ExposeApiProps<API>,
   { messenger }: MessengerApiDependencies
-) => {
+): Shutdown => {
   const subscriptions = Object.entries(properties)
     .filter(([, propType]) => propType === RemoteApiPropertyType.HotObservable)
     .map(([observableProperty]) => {
@@ -231,7 +235,7 @@ export const bindObservableChannels = <API extends object>(
       };
     });
   return {
-    unsubscribe: () => {
+    shutdown: () => {
       for (const unsubscribe of subscriptions) unsubscribe();
     }
   };
@@ -246,12 +250,12 @@ export const bindObservableChannels = <API extends object>(
  *
  * In addition to errors thrown by the underlying API, methods can throw TypeError
  *
- * @returns object that can be used to destroy all ports (destroys 'messenger' dependency)
+ * @returns object that can be used to shutdown all ports (shuts down 'messenger' dependency)
  */
 export const exposeMessengerApi = <API extends object>(
   { api, properties }: ExposeApiProps<API>,
   dependencies: MessengerApiDependencies
-) => {
+): Shutdown => {
   const observableChannelsSubscription = bindObservableChannels({ api, properties }, dependencies);
   const nestedObjChannelsSubscription = bindNestedObjChannels({ api, properties }, dependencies);
   const methodHandlerSubscription = bindMessengerRequestHandler(
@@ -281,11 +285,11 @@ export const exposeMessengerApi = <API extends object>(
     dependencies
   );
   return {
-    unsubscribe: () => {
-      nestedObjChannelsSubscription.unsubscribe();
-      observableChannelsSubscription.unsubscribe();
-      methodHandlerSubscription.unsubscribe();
-      dependencies.messenger.destroy();
+    shutdown: () => {
+      nestedObjChannelsSubscription.shutdown();
+      observableChannelsSubscription.shutdown();
+      methodHandlerSubscription.shutdown();
+      dependencies.messenger.shutdown();
     }
   };
 };
