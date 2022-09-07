@@ -6,11 +6,12 @@ import {
   PortMessage,
   RemoteApiProperties,
   RemoteApiPropertyType,
+  RemoteApiShutdownError,
   consumeMessengerRemoteApi,
   deriveChannelName,
   exposeMessengerApi
 } from '../../src/messaging';
-import { Observable, Subject, firstValueFrom, map, of, tap, throwError, timer, toArray } from 'rxjs';
+import { EmptyError, Observable, Subject, firstValueFrom, map, of, tap, throwError, timer, toArray } from 'rxjs';
 import { dummyLogger } from 'ts-log';
 import memoize from 'lodash/memoize';
 
@@ -54,18 +55,18 @@ const createMessenger = (channel: ChannelName, isHost: boolean): TestMessenger =
       derivedMessengers.push(messenger);
       return messenger;
     },
-    destroy() {
+    message$: local$.pipe(
+      map((data): PortMessage => ({ data, port: { postMessage: (message) => postMessage(message).subscribe() } }))
+    ),
+    postMessage,
+    shutdown() {
       for (const messenger of derivedMessengers) {
-        messenger.destroy();
+        messenger.shutdown();
       }
       local$.complete();
       remote$.complete();
       connect$.complete();
-    },
-    message$: local$.pipe(
-      map((data): PortMessage => ({ data, port: { postMessage: (message) => postMessage(message).subscribe() } }))
-    ),
-    postMessage
+    }
   };
 };
 
@@ -142,11 +143,12 @@ const setUp = (someNumbers$: Observable<bigint> = of(0n), nestedSomeNumbers$ = o
   return {
     api,
     cleanup() {
-      hostSubscription.unsubscribe();
+      hostSubscription.shutdown();
       consumer.shutdown();
     },
     consumer,
-    hostMessenger
+    hostMessenger,
+    hostSubscription
   };
 };
 
@@ -164,6 +166,12 @@ describe('remoteApi', () => {
     sut = setUp();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect((sut.consumer as any).addTwo).toBeUndefined();
+  });
+
+  it('shuts down underlying messenger when the exposed object is shut down', async () => {
+    sut = setUp();
+    sut.hostSubscription.shutdown();
+    await expect(firstValueFrom(sut.hostMessenger.message$)).rejects.toThrowError(EmptyError);
   });
 
   describe('methods returning promise', () => {
@@ -213,6 +221,11 @@ describe('remoteApi', () => {
       //     }, 1);
       //   });
       // });
+    });
+
+    it('throws RemoteApiShutdownError when the remote object shutdown method is called more than once', async () => {
+      sut.consumer.shutdown();
+      await expect(sut.consumer.addOne(1n)).rejects.toThrowError(RemoteApiShutdownError);
     });
   });
 

@@ -325,7 +325,7 @@ export class SingleAddressWallet implements ObservableWallet {
 
     this.utxo = createUtxoTracker({
       addresses$,
-      logger: contextLogger(logger, 'utxo'),
+      logger: contextLogger(this.#logger, 'utxo'),
       retryBackoffConfig,
       stores,
       tipBlockHeight$,
@@ -352,7 +352,7 @@ export class SingleAddressWallet implements ObservableWallet {
       createAssetsTracker({
         assetProvider: this.assetProvider,
         balanceTracker: this.balance,
-        logger: contextLogger(logger, 'assets$'),
+        logger: contextLogger(this.#logger, 'assets$'),
         retryBackoffConfig
       }),
       stores.assets

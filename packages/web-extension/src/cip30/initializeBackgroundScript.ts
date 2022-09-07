@@ -23,7 +23,7 @@ export const initializeBackgroundScript = (
   const authenticator = exposeAuthenticatorApi(props, dependencies);
   const wallet = exposeWalletApi(props, dependencies);
   return () => {
-    wallet.unsubscribe();
-    authenticator.unsubscribe();
+    wallet.shutdown();
+    authenticator.shutdown();
   };
 };

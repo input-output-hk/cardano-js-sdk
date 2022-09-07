@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Events, Runtime } from 'webextension-polyfill';
-import { GetErrorPrototype } from '@cardano-sdk/util';
+import { GetErrorPrototype, Shutdown } from '@cardano-sdk/util';
 import { Logger } from 'ts-log';
 import { Observable } from 'rxjs';
 
@@ -78,6 +78,10 @@ export interface PortMessage<Data = unknown> {
 }
 
 export enum RemoteApiPropertyType {
+  /**
+   * Methods might throw RemoteApiShutdownError when attempting
+   * to call a method on remote api object that was previously shutdown.
+   */
   MethodReturningPromise,
   /**
    * Exposing this observable:
@@ -118,13 +122,12 @@ export interface ConsumeRemoteApiOptions<T> {
   getErrorPrototype?: GetErrorPrototype;
 }
 
-export interface Messenger {
+export interface Messenger extends Shutdown {
   channel: ChannelName;
   connect$: Observable<MinimalPort>;
   postMessage(message: unknown): Observable<void>;
   message$: Observable<PortMessage>;
   deriveChannel(path: string): Messenger;
-  destroy(): void;
 }
 
 export interface MessengerApiDependencies {
