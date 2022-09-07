@@ -12,7 +12,6 @@ import {
   SignBlobResult
 } from './types';
 import { KeyAgentBase } from './KeyAgentBase';
-import { TxInternals } from '../Transaction';
 import { txToLedger } from './util';
 import LedgerConnection, { GetVersionResponse, utils } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents';
@@ -227,7 +226,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
     );
   }
 
-  async signTransaction({ body }: TxInternals): Promise<Cardano.Signatures> {
+  async signTransaction({ body }: Cardano.TxInternals): Promise<Cardano.Signatures> {
     try {
       const cslTxBody = coreToCsl.txBody(body);
       const ledgerTxData = await txToLedger({

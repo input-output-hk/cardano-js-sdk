@@ -12,7 +12,6 @@ import {
 import { CSL, Cardano, util } from '@cardano-sdk/core';
 import { InputResolver } from '../services';
 import { STAKE_KEY_DERIVATION_PATH } from './util';
-import { TxInternals } from '../Transaction';
 
 export abstract class KeyAgentBase implements KeyAgent {
   readonly #serializableData: SerializableKeyAgentData;
@@ -39,7 +38,7 @@ export abstract class KeyAgentBase implements KeyAgent {
   abstract signBlob(derivationPath: AccountKeyDerivationPath, blob: Cardano.util.HexBlob): Promise<SignBlobResult>;
   abstract exportRootPrivateKey(): Promise<Cardano.Bip32PrivateKey>;
   abstract signTransaction(
-    txInternals: TxInternals,
+    txInternals: Cardano.TxInternals,
     signTransactionOptions?: SignTransactionOptions
   ): Promise<Cardano.Signatures>;
 

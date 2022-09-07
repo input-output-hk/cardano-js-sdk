@@ -13,7 +13,6 @@ import { GroupedAddress, SignTransactionOptions, TransactionSigner } from './Key
 import { Observable } from 'rxjs';
 import { SelectionSkeleton } from '@cardano-sdk/cip2';
 import { Shutdown } from '@cardano-sdk/util';
-import { TxInternals } from './Transaction';
 
 export type InitializeTxProps = {
   outputs?: Set<Cardano.TxOut>;
@@ -33,7 +32,7 @@ export type InitializeTxProps = {
 };
 
 export interface FinalizeTxProps {
-  tx: TxInternals;
+  tx: Cardano.TxInternals;
   auxiliaryData?: Cardano.AuxiliaryData;
   scripts?: Cardano.Script[];
   extraSigners?: TransactionSigner[];
@@ -53,7 +52,7 @@ export interface InitializeTxPropsValidationResult {
   minimumCoinQuantities: MinimumCoinQuantityPerOutput;
 }
 
-export type InitializeTxResult = TxInternals & { inputSelection: SelectionSkeleton };
+export type InitializeTxResult = Cardano.TxInternals & { inputSelection: SelectionSkeleton };
 
 export type SignDataProps = Omit<Cip30SignDataRequest, 'keyAgent'>;
 

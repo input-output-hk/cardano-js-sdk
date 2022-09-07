@@ -2,7 +2,6 @@ import { Cardano } from '@cardano-sdk/core';
 import { InputResolver } from '../services';
 import { Observable } from 'rxjs';
 import { Shutdown } from '@cardano-sdk/util';
-import { TxInternals } from '../Transaction';
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents';
 import TransportWebHID from '@ledgerhq/hw-transport-webhid';
 
@@ -155,7 +154,7 @@ export interface KeyAgent {
   /**
    * @throws AuthenticationError
    */
-  signTransaction(txInternals: TxInternals, options?: SignTransactionOptions): Promise<Cardano.Signatures>;
+  signTransaction(txInternals: Cardano.TxInternals, options?: SignTransactionOptions): Promise<Cardano.Signatures>;
   /**
    * @throws AuthenticationError
    */
@@ -199,5 +198,5 @@ export interface TransactionSigner {
    * @param tx The transaction to be signed.
    * @returns A Ed25519 transaction signature.
    */
-  sign(tx: TxInternals): Promise<TransactionSignerResult>;
+  sign(tx: Cardano.TxInternals): Promise<TransactionSignerResult>;
 }

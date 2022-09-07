@@ -12,7 +12,6 @@ import {
 } from './types';
 import { CSL, Cardano, util } from '@cardano-sdk/core';
 import { KeyAgentBase } from './KeyAgentBase';
-import { TxInternals } from '../Transaction';
 import {
   deriveAccountPrivateKey,
   harden,
@@ -114,7 +113,7 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
   }
 
   async signTransaction(
-    { body, hash }: TxInternals,
+    { body, hash }: Cardano.TxInternals,
     { additionalKeyPaths = [] }: SignTransactionOptions | undefined = {}
   ): Promise<Cardano.Signatures> {
     // Possible optimization is casting strings to OpaqueString types directly and skipping validation

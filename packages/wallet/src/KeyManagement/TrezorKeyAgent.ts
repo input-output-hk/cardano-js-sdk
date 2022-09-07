@@ -11,7 +11,6 @@ import {
   TrezorConfig
 } from './types';
 import { KeyAgentBase } from './KeyAgentBase';
-import { TxInternals } from '../Transaction';
 import { txToTrezor } from './util';
 import TrezorConnect, { Features } from 'trezor-connect';
 
@@ -135,7 +134,7 @@ export class TrezorKeyAgent extends KeyAgentBase {
     );
   }
 
-  async signTransaction({ body }: TxInternals): Promise<Cardano.Signatures> {
+  async signTransaction({ body }: Cardano.TxInternals): Promise<Cardano.Signatures> {
     try {
       await this.isTrezorInitialized;
       const cslTxBody = coreToCsl.txBody(body);

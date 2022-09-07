@@ -88,9 +88,9 @@ import { Logger } from 'ts-log';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { Shutdown, bufferToHexString, contextLogger } from '@cardano-sdk/util';
 import { TrackedUtxoProvider } from './services/ProviderTracker/TrackedUtxoProvider';
-import { TxInternals, createTransactionInternals, ensureValidityInterval } from './Transaction';
 import { WalletStores, createInMemoryWalletStores } from './persistence';
 import { cip30signData } from './KeyManagement/cip8';
+import { createTransactionInternals, ensureValidityInterval } from './Transaction';
 import { createTransactionReemitter } from './services/TransactionReemitter';
 import isEqual from 'lodash/isEqual';
 
@@ -459,7 +459,7 @@ export class SingleAddressWallet implements ObservableWallet {
   }
 
   async #getSignatures(
-    txInternals: TxInternals,
+    txInternals: Cardano.TxInternals,
     extraSigners?: TransactionSigner[],
     signingOptions?: SignTransactionOptions
   ) {
