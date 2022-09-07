@@ -84,7 +84,6 @@ describe('SingleAddressWallet/delegation', () => {
   test('balance & transaction', async () => {
     // source wallet has the highest balance to begin with
     const [sourceWallet, destWallet] = await chooseWallets();
-    const [{ rewardAccount }] = await firstValueFrom(sourceWallet.addresses$);
 
     const protocolParameters = await firstValueFrom(sourceWallet.protocolParameters$);
     const stakeKeyDeposit = BigInt(protocolParameters.stakeKeyDeposit);
@@ -148,23 +147,18 @@ describe('SingleAddressWallet/delegation', () => {
     }
 
     // Make a 2nd tx with key deregistration
-    const tx2Internals = await sourceWallet.initializeTx({
-      certificates: [
-        {
-          __typename: Cardano.CertificateType.StakeKeyDeregistration,
-          stakeKeyHash: Cardano.Ed25519KeyHash.fromRewardAccount(rewardAccount)
-        }
-      ]
-    });
-    await sourceWallet.submitTx(await sourceWallet.finalizeTx({ tx: tx2Internals }));
-    await waitForTx(sourceWallet, tx2Internals.hash);
+    const txDeregister = await buildTx(sourceWallet).delegate().build();
+    assertTxIsValid(txDeregister);
+    const txDeregisterSigned = await txDeregister.sign();
+    await txDeregisterSigned.submit();
+    await waitForTx(sourceWallet, txDeregisterSigned.tx.id);
     const tx2ConfirmedState = await getWalletStateSnapshot(sourceWallet);
 
     // No longer delegating
     expect(tx2ConfirmedState.rewardAccount.delegatee?.nextNextEpoch?.id).toBeUndefined();
 
     // Deposit is returned to wallet balance
-    const expectedCoinsAfterTx2 = expectedCoinsAfterTx1 + stakeKeyDeposit - tx2Internals.body.fee;
+    const expectedCoinsAfterTx2 = expectedCoinsAfterTx1 + stakeKeyDeposit - txDeregisterSigned.tx.body.fee;
     expect(tx2ConfirmedState.balance.total.coins).toBe(expectedCoinsAfterTx2);
     expect(tx2ConfirmedState.balance.total).toEqual(tx2ConfirmedState.balance.available);
     expect(tx2ConfirmedState.balance.deposit).toBe(0n);

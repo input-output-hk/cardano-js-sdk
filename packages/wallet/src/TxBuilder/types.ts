@@ -149,13 +149,14 @@ export interface TxBuilder {
   buildOutput(txOut?: PartialTxOut): OutputBuilder;
   /**
    * Configure transaction to include delegation.
-   * - On `build()`, StakeDelegation and (if needed) StakeKeyRegistration certificates are added in
-   *   the transaction body.
+   * - On `build()`, StakeKeyDeregistration or StakeDelegation and (if needed)
+   *   StakeKeyRegistration certificates are added in the transaction body.
+   * - Stake key deregister is done by not providing the `poolId` parameter: `delegate()`.
    * - If wallet contains multiple reward accounts, it will create certificates for all of them.
    *
-   * @param poolId Pool Id to delegate to.
+   * @param poolId Pool Id to delegate to. If undefined, stake key deregistration will be done.
    */
-  delegate(poolId: Cardano.PoolId): TxBuilder;
+  delegate(poolId?: Cardano.PoolId): TxBuilder;
   /** Sets TxMetadata in {@link auxiliaryData} */
   setMetadata(metadata: Cardano.TxMetadata): TxBuilder;
   /** Sets extra signers in {@link extraSigners} */

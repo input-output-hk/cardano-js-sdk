@@ -107,8 +107,8 @@ export class ObservableWalletTxBuilder implements TxBuilder {
     return new ObservableWalletTxOutputBuilder(this.#util, txOut);
   }
 
-  delegate(poolId: Cardano.PoolId): TxBuilder {
-    this.#delegateConfig = { poolId, type: 'delegate' };
+  delegate(poolId?: Cardano.PoolId): TxBuilder {
+    this.#delegateConfig = poolId ? { poolId, type: 'delegate' } : { type: 'deregister' };
     return this;
   }
 
@@ -178,8 +178,8 @@ export class ObservableWalletTxBuilder implements TxBuilder {
   }
 
   async #addDelegationCertificates(): Promise<void> {
-    // Deregistration not implemented yet
-    if (!this.#delegateConfig || this.#delegateConfig.type === 'deregister') {
+    if (!this.#delegateConfig) {
+      // Delegation was not configured by user
       return Promise.resolve();
     }
 
@@ -195,14 +195,25 @@ export class ObservableWalletTxBuilder implements TxBuilder {
 
     for (const rewardAccount of rewardAccounts) {
       const stakeKeyHash = Cardano.Ed25519KeyHash.fromRewardAccount(rewardAccount.address);
+      if (this.#delegateConfig.type === 'deregister' && rewardAccount.keyStatus !== StakeKeyStatus.Unregistered) {
+        // Deregister scenario
+        this.partialTxBody.certificates!.push({
+          __typename: Cardano.CertificateType.StakeKeyDeregistration,
+          stakeKeyHash
+        });
+      } else if (this.#delegateConfig.type === 'delegate') {
+        // Register and delegate scenario
+        if (rewardAccount.keyStatus === StakeKeyStatus.Unregistered) {
+          this.partialTxBody.certificates!.push({
+            __typename: Cardano.CertificateType.StakeKeyRegistration,
+            stakeKeyHash
+          });
+        }
 
-      if (rewardAccount.keyStatus === StakeKeyStatus.Unregistered) {
-        this.partialTxBody.certificates!.push(ObservableWalletTxBuilder.#createStakeKeyCert(stakeKeyHash));
+        this.partialTxBody.certificates!.push(
+          ObservableWalletTxBuilder.#createDelegationCert(this.#delegateConfig.poolId, stakeKeyHash)
+        );
       }
-
-      this.partialTxBody.certificates!.push(
-        ObservableWalletTxBuilder.#createDelegationCert(this.#delegateConfig.poolId, stakeKeyHash)
-      );
     }
   }
 
@@ -213,13 +224,6 @@ export class ObservableWalletTxBuilder implements TxBuilder {
     return {
       __typename: Cardano.CertificateType.StakeDelegation,
       poolId,
-      stakeKeyHash
-    };
-  }
-
-  static #createStakeKeyCert(stakeKeyHash: Cardano.Ed25519KeyHash): Cardano.StakeAddressCertificate {
-    return {
-      __typename: Cardano.CertificateType.StakeKeyRegistration,
       stakeKeyHash
     };
   }

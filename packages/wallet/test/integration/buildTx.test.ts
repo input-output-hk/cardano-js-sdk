@@ -414,6 +414,32 @@ describe('buildTx', () => {
       assertTxIsValid(txDelegate);
       expect(txDelegate.body.certificates?.length).toBe(4);
     });
+
+    it('undefined poolId adds stake key deregister certificate if already registered', async () => {
+      wallet.delegation.rewardAccounts$ = of([
+        {
+          address: Cardano.RewardAccount('stake_test1uqu7qkgf00zwqupzqfzdq87dahwntcznklhp3x30t3ukz6gswungn'),
+          delegatee: {
+            currentEpoch: undefined,
+            nextEpoch: undefined,
+            nextNextEpoch: undefined
+          },
+          keyStatus: StakeKeyStatus.Registered,
+          rewardBalance: 33_333n
+        }
+      ]);
+      const txDeregister = await txBuilder.delegate().build();
+      assertTxIsValid(txDeregister);
+      expect(txDeregister.body.certificates?.length).toBe(1);
+      const [deregisterCert] = txDeregister.body.certificates!;
+      expect(deregisterCert.__typename).toBe(Cardano.CertificateType.StakeKeyDeregistration);
+    });
+
+    it('undefined poolId does NOT add certificate if not registered', async () => {
+      const txDeregister = await txBuilder.delegate().build();
+      assertTxIsValid(txDeregister);
+      expect(txDeregister.body.certificates?.length).toBeFalsy();
+    });
   });
 
   it('can be used to build, sign and submit a tx', async () => {
