@@ -10,7 +10,7 @@ export const EPOCH_POLL_INTERVAL_DEFAULT = 10_000;
  * Class to handle epoch rollover through db polling
  */
 export class DbSyncEpochPollService implements EpochMonitor {
-  #timeoutId?: number;
+  #timeoutId?: ReturnType<typeof setInterval>;
   #callbacks: Function[];
   #currentEpoch: Promise<Cardano.EpochNo | null>;
 
@@ -76,7 +76,7 @@ export class DbSyncEpochPollService implements EpochMonitor {
    * Shutdown the poll execution
    */
   #shutdown() {
-    clearInterval(this.#timeoutId);
+    if (this.#timeoutId) clearInterval(this.#timeoutId);
   }
 
   /**
