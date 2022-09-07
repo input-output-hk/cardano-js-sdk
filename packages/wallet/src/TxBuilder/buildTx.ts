@@ -16,7 +16,7 @@ import {
 } from './types';
 import { ObservableWalletTxOutputBuilder, toOutputValidationError } from './OutputBuilder';
 import { OutputValidator, RewardAccount, StakeKeyStatus, WalletUtilContext, createWalletUtil } from '../services';
-import { SignTransactionOptions, TransactionSigner } from '../KeyManagement';
+import { SignTransactionOptions, TransactionSigner } from '@cardano-sdk/key-management';
 import { deepEquals } from '@cardano-sdk/util';
 
 /**

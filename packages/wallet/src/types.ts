@@ -8,8 +8,7 @@ import {
 } from '@cardano-sdk/core';
 import { BalanceTracker, DelegationTracker, TransactionalObservables, TransactionsTracker } from './services';
 import { Cip30DataSignature } from '@cardano-sdk/cip30';
-import { Cip30SignDataRequest } from './KeyManagement/cip8';
-import { GroupedAddress, SignTransactionOptions, TransactionSigner } from './KeyManagement';
+import { GroupedAddress, SignTransactionOptions, TransactionSigner, cip8 } from '@cardano-sdk/key-management';
 import { Observable } from 'rxjs';
 import { SelectionSkeleton } from '@cardano-sdk/cip2';
 import { Shutdown } from '@cardano-sdk/util';
@@ -54,7 +53,7 @@ export interface InitializeTxPropsValidationResult {
 
 export type InitializeTxResult = Cardano.TxInternals & { inputSelection: SelectionSkeleton };
 
-export type SignDataProps = Omit<Cip30SignDataRequest, 'keyAgent'>;
+export type SignDataProps = Omit<cip8.Cip30SignDataRequest, 'keyAgent'>;
 
 export interface SyncStatus extends Shutdown {
   /**

@@ -1,6 +1,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { Cardano } from '@cardano-sdk/core';
-import { KeyManagement, SingleAddressWallet } from '@cardano-sdk/wallet';
+import { InMemoryKeyAgent, KeyRole, TransactionSigner, util } from '@cardano-sdk/key-management';
+import { SingleAddressWallet } from '@cardano-sdk/wallet';
 import { combineLatest, filter, firstValueFrom, map } from 'rxjs';
 import { env } from '../environment';
 import { getLogger, getWallet } from '../../../src/factories';
@@ -13,7 +14,7 @@ describe('SingleAddressWallet.assets/nft', () => {
   const TOKEN_BRUN_INDEX = 2;
 
   let wallet: SingleAddressWallet;
-  let policySigner: KeyManagement.TransactionSigner;
+  let policySigner: TransactionSigner;
   let policyId: Cardano.PolicyId;
   let policyScript: Cardano.NativeScript;
   let assetIds: Cardano.AssetId[];
@@ -29,10 +30,10 @@ describe('SingleAddressWallet.assets/nft', () => {
 
     const params = await firstValueFrom(wallet.genesisParameters$);
 
-    const keyAgent = await KeyManagement.InMemoryKeyAgent.fromBip39MnemonicWords(
+    const keyAgent = await InMemoryKeyAgent.fromBip39MnemonicWords(
       {
         getPassword: async () => Buffer.from(''),
-        mnemonicWords: KeyManagement.util.generateMnemonicWords(),
+        mnemonicWords: util.generateMnemonicWords(),
         networkId: params.networkId
       },
       { inputResolver: { resolveInputAddress: async () => null } }
@@ -40,14 +41,14 @@ describe('SingleAddressWallet.assets/nft', () => {
 
     const pubKey = await keyAgent.derivePublicKey({
       index: 0,
-      role: KeyManagement.KeyRole.External
+      role: KeyRole.External
     });
 
     const keyHash = Cardano.Ed25519KeyHash.fromKey(pubKey);
 
-    policySigner = new KeyManagement.util.KeyAgentTransactionSigner(keyAgent, {
+    policySigner = new util.KeyAgentTransactionSigner(keyAgent, {
       index: 0,
-      role: KeyManagement.KeyRole.External
+      role: KeyRole.External
     });
 
     policyScript = {

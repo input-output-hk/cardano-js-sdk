@@ -1,5 +1,5 @@
 import { Cardano, EpochInfo, EraSummary } from '@cardano-sdk/core';
-import { GroupedAddress } from '../../KeyManagement';
+import { GroupedAddress } from '@cardano-sdk/key-management';
 
 export const strictEquals = <T>(a: T, b: T) => a === b;
 

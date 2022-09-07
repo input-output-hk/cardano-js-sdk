@@ -19,7 +19,7 @@ import {
   TxOutputFailure,
   buildTx
 } from '../../src';
-import { KeyRole, SignTransactionOptions, TransactionSigner } from '../../src/KeyManagement';
+import { KeyRole, SignTransactionOptions, TransactionSigner } from '@cardano-sdk/key-management';
 import { assertTxIsValid, assertTxOutIsValid } from '../util';
 import { createWallet } from './util';
 

@@ -4,8 +4,9 @@ import {
   GroupedAddress,
   SignTransactionOptions,
   TransactionSigner,
+  cip8,
   util as keyManagementUtil
-} from './KeyManagement';
+} from '@cardano-sdk/key-management';
 import {
   AssetProvider,
   Cardano,
@@ -88,7 +89,6 @@ import { RetryBackoffConfig } from 'backoff-rxjs';
 import { Shutdown, bufferToHexString, contextLogger, deepEquals } from '@cardano-sdk/util';
 import { TrackedUtxoProvider } from './services/ProviderTracker/TrackedUtxoProvider';
 import { WalletStores, createInMemoryWalletStores } from './persistence';
-import { cip30signData } from './KeyManagement/cip8';
 import { createTransactionInternals, ensureValidityInterval } from './Transaction';
 import { createTransactionReemitter } from './services/TransactionReemitter';
 import isEqual from 'lodash/isEqual';
@@ -426,7 +426,7 @@ export class SingleAddressWallet implements ObservableWallet {
     }
   }
   signData(props: SignDataProps): Promise<Cip30DataSignature> {
-    return cip30signData({ keyAgent: this.keyAgent, ...props });
+    return cip8.cip30signData({ keyAgent: this.keyAgent, ...props });
   }
   sync() {
     this.#tip$.sync();

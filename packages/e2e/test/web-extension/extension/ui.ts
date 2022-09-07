@@ -9,7 +9,7 @@ import {
   walletName
 } from './util';
 import { Cardano } from '@cardano-sdk/core';
-import { KeyManagement, setupWallet } from '@cardano-sdk/wallet';
+import { InMemoryKeyAgent, util } from '@cardano-sdk/key-management';
 import {
   RemoteApiPropertyType,
   consumeObservableWallet,
@@ -20,6 +20,7 @@ import {
 } from '@cardano-sdk/web-extension';
 import { combineLatest, firstValueFrom } from 'rxjs';
 import { runtime } from 'webextension-polyfill';
+import { setupWallet } from '@cardano-sdk/wallet';
 
 const api: UserPromptService = {
   allowOrigin(origin) {
@@ -82,8 +83,8 @@ document.querySelector('#createKeyAgent')!.addEventListener('click', async () =>
   // setupWallet call is required to provide context (InputResolver) to the key agent
   const { keyAgent } = await setupWallet({
     createKeyAgent: async (dependencies) =>
-      KeyManagement.util.createAsyncKeyAgent(
-        await KeyManagement.InMemoryKeyAgent.fromBip39MnemonicWords(
+      util.createAsyncKeyAgent(
+        await InMemoryKeyAgent.fromBip39MnemonicWords(
           {
             accountIndex: 0,
             getPassword: async () => Buffer.from(''),

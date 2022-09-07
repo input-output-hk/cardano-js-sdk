@@ -1,4 +1,4 @@
-import { AsyncKeyAgent, KeyAgentDependencies } from './KeyManagement';
+import { AsyncKeyAgent, KeyAgentDependencies } from '@cardano-sdk/key-management';
 import { ObservableWallet } from './types';
 import { WalletUtil, WalletUtilContext, createLazyWalletUtil } from './services';
 

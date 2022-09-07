@@ -10,6 +10,15 @@ import {
   UtxoProvider
 } from '@cardano-sdk/core';
 import {
+  AsyncKeyAgent,
+  CommunicationType,
+  InMemoryKeyAgent,
+  KeyAgentDependencies,
+  LedgerKeyAgent,
+  TrezorKeyAgent,
+  util
+} from '@cardano-sdk/key-management';
+import {
   BlockFrostAPI,
   blockfrostAssetProvider,
   blockfrostChainHistoryProvider,
@@ -19,9 +28,9 @@ import {
   blockfrostUtxoProvider
 } from '@cardano-sdk/blockfrost';
 import { CardanoWalletFaucetProvider, FaucetProvider } from './FaucetProvider';
-import { KeyManagement, PollingConfig, SingleAddressWallet, setupWallet, storage } from '@cardano-sdk/wallet';
 import { LogLevel, createLogger } from 'bunyan';
 import { Logger, dummyLogger } from 'ts-log';
+import { PollingConfig, SingleAddressWallet, setupWallet, storage } from '@cardano-sdk/wallet';
 import {
   assetInfoHttpProvider,
   chainHistoryHttpProvider,
@@ -65,7 +74,7 @@ const getBlockfrostApi = async () => {
 };
 
 export const faucetProviderFactory = new ProviderFactory<FaucetProvider>();
-export type CreateKeyAgent = (dependencies: KeyManagement.KeyAgentDependencies) => Promise<KeyManagement.AsyncKeyAgent>;
+export type CreateKeyAgent = (dependencies: KeyAgentDependencies) => Promise<AsyncKeyAgent>;
 export const keyManagementFactory = new ProviderFactory<CreateKeyAgent>();
 export const assetProviderFactory = new ProviderFactory<AssetProvider>();
 export const chainHistoryProviderFactory = new ProviderFactory<ChainHistoryProvider>();
@@ -222,7 +231,7 @@ stakePoolProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Log
 keyManagementFactory.register('inMemory', async (params: any): Promise<CreateKeyAgent> => {
   let mnemonicWords = (params?.mnemonic || '').split(' ');
 
-  if (mnemonicWords.length <= 1) mnemonicWords = KeyManagement.util.generateMnemonicWords();
+  if (mnemonicWords.length <= 1) mnemonicWords = util.generateMnemonicWords();
 
   if (params.password === undefined) throw new Error(KEY_AGENT_MISSING_PASSWORD);
 
@@ -231,8 +240,8 @@ keyManagementFactory.register('inMemory', async (params: any): Promise<CreateKey
   if (params.accountIndex === undefined) throw new Error(KEY_AGENT_MISSING_ACCOUNT_INDEX);
 
   return async (dependencies) =>
-    KeyManagement.util.createAsyncKeyAgent(
-      await KeyManagement.InMemoryKeyAgent.fromBip39MnemonicWords(
+    util.createAsyncKeyAgent(
+      await InMemoryKeyAgent.fromBip39MnemonicWords(
         {
           accountIndex: params.accountIndex,
           getPassword: async () => Buffer.from(params.password),
@@ -252,10 +261,10 @@ keyManagementFactory.register('ledger', async (params: any): Promise<CreateKeyAg
   let deviceConnection: DeviceConnection | null | undefined;
 
   return async (dependencies) => {
-    const ledgerKeyAgent = await KeyManagement.LedgerKeyAgent.createWithDevice(
+    const ledgerKeyAgent = await LedgerKeyAgent.createWithDevice(
       {
         accountIndex: params.accountIndex,
-        communicationType: KeyManagement.CommunicationType.Node,
+        communicationType: CommunicationType.Node,
         deviceConnection,
         networkId: params.networkId,
         protocolMagic: 1_097_911_063
@@ -263,7 +272,7 @@ keyManagementFactory.register('ledger', async (params: any): Promise<CreateKeyAg
       dependencies
     );
 
-    return KeyManagement.util.createAsyncKeyAgent(ledgerKeyAgent);
+    return util.createAsyncKeyAgent(ledgerKeyAgent);
   };
 });
 
@@ -273,14 +282,14 @@ keyManagementFactory.register('trezor', async (params: any): Promise<CreateKeyAg
   if (params.accountIndex === undefined) throw new Error(KEY_AGENT_MISSING_ACCOUNT_INDEX);
 
   return async (dependencies) =>
-    KeyManagement.util.createAsyncKeyAgent(
-      await KeyManagement.TrezorKeyAgent.createWithDevice(
+    util.createAsyncKeyAgent(
+      await TrezorKeyAgent.createWithDevice(
         {
           accountIndex: params.accountIndex,
           networkId: params.networkId,
           protocolMagic: 1_097_911_063,
           trezorConfig: {
-            communicationType: KeyManagement.CommunicationType.Node,
+            communicationType: CommunicationType.Node,
             manifest: {
               appUrl: 'https://your.application.com',
               email: 'email@developer.com'
@@ -367,7 +376,7 @@ export const getWallet = async (props: GetWalletProps) => {
   const keyManagementParams = { ...env.KEY_MANAGEMENT_PARAMS, ...(idx === undefined ? {} : { accountIndex: idx }) };
   const { wallet } = await setupWallet({
     createKeyAgent: await keyManagementFactory.create(env.KEY_MANAGEMENT_PROVIDER, keyManagementParams, logger),
-    createWallet: async (keyAgent: KeyManagement.AsyncKeyAgent) =>
+    createWallet: async (keyAgent: AsyncKeyAgent) =>
       new SingleAddressWallet({ name, polling }, { ...providers, keyAgent, logger, stores })
   });
 

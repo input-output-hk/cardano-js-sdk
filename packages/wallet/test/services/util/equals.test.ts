@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Cardano, EpochInfo, EraSummary } from '@cardano-sdk/core';
-import { GroupedAddress } from '../../../src/KeyManagement';
+import { GroupedAddress } from '@cardano-sdk/key-management';
 import {
   arrayEquals,
   epochInfoEquals,
