@@ -38,7 +38,7 @@ export type TxOutValidationError =
   | OutputValidationMissingRequiredError
   | OutputValidationMinimumCoinError
   | OutputValidationTokenBundleSizeError;
-export type TxBodyValidationError = TxOutValidationError | InputSelectionError;
+export type TxBodyValidationError = TxOutValidationError | InputSelectionError | IncompatibleWalletError;
 
 export type Valid<TValid> = TValid & {
   isValid: true;
@@ -148,14 +148,14 @@ export interface TxBuilder {
    */
   buildOutput(txOut?: PartialTxOut): OutputBuilder;
   /**
-   * Add StakeDelegation and (if needed) StakeKeyRegistration certificate to {@link partialTxBody}.
-   * If wallet contains multiple reward accounts, it will create certificates for all of them.
-   * The call returns a Promise because it waits for the reward accounts to be returned by the wallet.
+   * Configure transaction to include delegation.
+   * - On `build()`, StakeDelegation and (if needed) StakeKeyRegistration certificates are added in
+   *   the transaction body.
+   * - If wallet contains multiple reward accounts, it will create certificates for all of them.
    *
    * @param poolId Pool Id to delegate to.
-   * @throws `IncompatibleWalletError` if no reward accounts are provided by the wallet.
    */
-  delegate(poolId: Cardano.PoolId): Promise<TxBuilder>;
+  delegate(poolId: Cardano.PoolId): TxBuilder;
   /** Sets TxMetadata in {@link auxiliaryData} */
   setMetadata(metadata: Cardano.TxMetadata): TxBuilder;
   /** Sets extra signers in {@link extraSigners} */

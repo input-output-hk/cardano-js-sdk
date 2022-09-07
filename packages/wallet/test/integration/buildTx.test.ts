@@ -320,7 +320,7 @@ describe('buildTx', () => {
 
     it('certificates are added to tx.body on build', async () => {
       const address = Cardano.Address('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg');
-      await txBuilder.delegate(poolId);
+      txBuilder.delegate(poolId);
       const maybeValidTxOut = await txBuilder.buildOutput().address(address).coin(10_000_000n).build();
       assertTxOutIsValid(maybeValidTxOut);
       const txBuilt = await txBuilder.addOutput(maybeValidTxOut.txOut).build();
@@ -330,43 +330,36 @@ describe('buildTx', () => {
     });
 
     it('adds both stake key and delegation certificates when reward account was not registered', async () => {
-      const txDelegate = await txBuilder.delegate(poolId);
-      const [stakeKeyCert, delegationCert] = txDelegate.partialTxBody.certificates!;
+      const txDelegate = await txBuilder.delegate(poolId).build();
+      assertTxIsValid(txDelegate);
+      const [stakeKeyCert, delegationCert] = txDelegate.body.certificates!;
       expect(stakeKeyCert.__typename).toBe(Cardano.CertificateType.StakeKeyRegistration);
 
       if (delegationCert.__typename === Cardano.CertificateType.StakeDelegation) {
         expect(delegationCert.poolId).toBe(poolId);
       }
 
-      expect.assertions(2);
+      expect.assertions(3);
     });
 
     it('delegate again removes previous certificates', async () => {
-      await txBuilder.delegate(poolId);
+      await txBuilder.delegate(poolId).build();
       const poolIdOther = somePartialStakePools[1].id;
-      const secondDelegation = await txBuilder.delegate(poolIdOther);
-      expect(secondDelegation.partialTxBody.certificates?.length).toBe(2);
-      const delegationCert = secondDelegation.partialTxBody.certificates![1] as Cardano.StakeDelegationCertificate;
+      const secondDelegation = await txBuilder.delegate(poolIdOther).build();
+      assertTxIsValid(secondDelegation);
+      expect(secondDelegation.body.certificates?.length).toBe(2);
+      const delegationCert = secondDelegation.body.certificates![1] as Cardano.StakeDelegationCertificate;
       expect(delegationCert.poolId).toBe(poolIdOther);
-    });
-
-    it('always recreates partialTxBody', async () => {
-      const txDelegate = await txBuilder.delegate(poolId);
-      const { partialTxBody } = txDelegate;
-
-      const poolIdOther = somePartialStakePools[1].id;
-      const txDelegateOther = await txBuilder.delegate(poolIdOther);
-      assertObjectRefsAreDifferent(txDelegateOther.partialTxBody, partialTxBody);
     });
 
     it('throws IncompatibleWallet error if no reward accounts were found', async () => {
       wallet.delegation.rewardAccounts$ = of([]);
-      try {
-        await txBuilder.delegate(poolId);
-      } catch (error) {
-        expect(error instanceof IncompatibleWalletError).toBeTruthy();
+      const txBuilt = await txBuilder.delegate(poolId).build();
+      if (!txBuilt.isValid) {
+        expect(txBuilt.errors?.length).toBe(1);
+        expect(txBuilt.errors[0] instanceof IncompatibleWalletError).toBeTruthy();
       }
-      expect.assertions(1);
+      expect.assertions(2);
     });
 
     it('adds only delegation certificate with correct poolId when reward account was already registered', async () => {
@@ -382,14 +375,15 @@ describe('buildTx', () => {
           rewardBalance: 33_333n
         }
       ]);
-      const txDelegate = await txBuilder.delegate(poolId);
-      expect(txDelegate.partialTxBody.certificates?.length).toBe(1);
-      const [delegationCert] = txDelegate.partialTxBody.certificates!;
+      const txDelegate = await txBuilder.delegate(poolId).build();
+      assertTxIsValid(txDelegate);
+      expect(txDelegate.body.certificates?.length).toBe(1);
+      const [delegationCert] = txDelegate.body.certificates!;
       if (delegationCert.__typename === Cardano.CertificateType.StakeDelegation) {
         expect(delegationCert.poolId).toBe(poolId);
       }
 
-      expect.assertions(2);
+      expect.assertions(3);
     });
 
     it('adds multiple certificates when handling multiple reward accounts', async () => {
@@ -416,8 +410,9 @@ describe('buildTx', () => {
         }
       ]);
 
-      const txDelegate = await txBuilder.delegate(poolId);
-      expect(txDelegate.partialTxBody.certificates?.length).toBe(4);
+      const txDelegate = await txBuilder.delegate(poolId).build();
+      assertTxIsValid(txDelegate);
+      expect(txDelegate.body.certificates?.length).toBe(4);
     });
   });
 

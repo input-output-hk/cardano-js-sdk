@@ -34,6 +34,16 @@ export type ObservableWalletTxBuilderDependencies = Pick<ObservableWallet, 'subm
   ) => ReturnType<ObservableWallet['finalizeTx']>;
 } & WalletUtilContext;
 
+interface Delegate {
+  type: 'delegate';
+  poolId: Cardano.PoolId;
+}
+
+interface KeyDeregistration {
+  type: 'deregister';
+}
+type DelegateConfig = Delegate | KeyDeregistration;
+
 /**
  * Transactions built with {@link ObservableWalletTxBuilder.build} method, use this method to sign the transaction.
  *
@@ -66,6 +76,7 @@ export class ObservableWalletTxBuilder implements TxBuilder {
 
   #observableWallet: ObservableWalletTxBuilderDependencies;
   #util: OutputValidator;
+  #delegateConfig: DelegateConfig;
 
   /**
    * @param observableWallet minimal ObservableWallet needed to do actions like {@link build()}, {@link delegate()} etc.
@@ -96,26 +107,8 @@ export class ObservableWalletTxBuilder implements TxBuilder {
     return new ObservableWalletTxOutputBuilder(this.#util, txOut);
   }
 
-  async delegate(poolId: Cardano.PoolId): Promise<TxBuilder> {
-    const rewardAccounts = await firstValueFrom(this.#observableWallet.delegation.rewardAccounts$);
-
-    if (!rewardAccounts?.length) {
-      // This shouldn't happen
-      throw new IncompatibleWalletError();
-    }
-
-    // Discard previous delegation and prepare for new one
-    this.partialTxBody = { ...this.partialTxBody, certificates: [] };
-
-    for (const rewardAccount of rewardAccounts) {
-      const stakeKeyHash = Cardano.Ed25519KeyHash.fromRewardAccount(rewardAccount.address);
-
-      if (rewardAccount.keyStatus === StakeKeyStatus.Unregistered) {
-        this.partialTxBody.certificates!.push(ObservableWalletTxBuilder.#createStakeKeyCert(stakeKeyHash));
-      }
-
-      this.partialTxBody.certificates!.push(ObservableWalletTxBuilder.#createDelegationCert(poolId, stakeKeyHash));
-    }
+  delegate(poolId: Cardano.PoolId): TxBuilder {
+    this.#delegateConfig = { poolId, type: 'delegate' };
     return this;
   }
 
@@ -136,6 +129,7 @@ export class ObservableWalletTxBuilder implements TxBuilder {
 
   async build(): Promise<MaybeValidTx> {
     try {
+      await this.#addDelegationCertificates();
       await this.#validateOutputs();
 
       const tx = await this.#observableWallet.initializeTx({
@@ -181,6 +175,35 @@ export class ObservableWalletTxBuilder implements TxBuilder {
       throw errors;
     }
     return [];
+  }
+
+  async #addDelegationCertificates(): Promise<void> {
+    // Deregistration not implemented yet
+    if (!this.#delegateConfig || this.#delegateConfig.type === 'deregister') {
+      return Promise.resolve();
+    }
+
+    const rewardAccounts = await firstValueFrom(this.#observableWallet.delegation.rewardAccounts$);
+
+    if (!rewardAccounts?.length) {
+      // This shouldn't happen
+      throw new IncompatibleWalletError();
+    }
+
+    // Discard previous delegation and prepare for new one
+    this.partialTxBody = { ...this.partialTxBody, certificates: [] };
+
+    for (const rewardAccount of rewardAccounts) {
+      const stakeKeyHash = Cardano.Ed25519KeyHash.fromRewardAccount(rewardAccount.address);
+
+      if (rewardAccount.keyStatus === StakeKeyStatus.Unregistered) {
+        this.partialTxBody.certificates!.push(ObservableWalletTxBuilder.#createStakeKeyCert(stakeKeyHash));
+      }
+
+      this.partialTxBody.certificates!.push(
+        ObservableWalletTxBuilder.#createDelegationCert(this.#delegateConfig.poolId, stakeKeyHash)
+      );
+    }
   }
 
   static #createDelegationCert(
