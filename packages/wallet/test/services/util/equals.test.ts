@@ -3,7 +3,6 @@ import { Cardano, EpochInfo, EraSummary } from '@cardano-sdk/core';
 import { GroupedAddress } from '../../../src/KeyManagement';
 import {
   arrayEquals,
-  deepEquals,
   epochInfoEquals,
   eraSummariesEquals,
   groupedAddressesEquals,
@@ -36,13 +35,6 @@ describe('equals', () => {
     const b = { prop: 'prop' };
     expect(shallowArrayEquals([a], [b])).toBe(false);
     expect(shallowArrayEquals([a], [a])).toBe(true);
-  });
-
-  test('deepEquals', () => {
-    expect(deepEquals([], [])).toBe(true);
-    expect(deepEquals({}, {})).toBe(true);
-    expect(deepEquals([{ prop: 'prop' }], [{ prop: 'prop' }])).toBe(true);
-    expect(deepEquals([{ prop: 'prop' }], [{ prop: 'prop2' }])).toBe(false);
   });
 
   test('txEquals', () => {

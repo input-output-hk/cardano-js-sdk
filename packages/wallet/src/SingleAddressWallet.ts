@@ -58,7 +58,6 @@ import {
   createUtxoTracker,
   createWalletUtil,
   currentEpochTracker,
-  deepEquals,
   distinctBlock,
   distinctEraSummaries,
   groupedAddressesEquals
@@ -86,7 +85,7 @@ import { Cip30DataSignature } from '@cardano-sdk/cip30';
 import { InputSelector, defaultSelectionConstraints, roundRobinRandomImprove } from '@cardano-sdk/cip2';
 import { Logger } from 'ts-log';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { Shutdown, bufferToHexString, contextLogger } from '@cardano-sdk/util';
+import { Shutdown, bufferToHexString, contextLogger, deepEquals } from '@cardano-sdk/util';
 import { TrackedUtxoProvider } from './services/ProviderTracker/TrackedUtxoProvider';
 import { WalletStores, createInMemoryWalletStores } from './persistence';
 import { cip30signData } from './KeyManagement/cip8';

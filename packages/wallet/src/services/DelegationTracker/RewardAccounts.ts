@@ -1,5 +1,5 @@
 /* eslint-disable unicorn/no-nested-ternary */
-import { BigIntMath, isNotNil } from '@cardano-sdk/util';
+import { BigIntMath, deepEquals, isNotNil } from '@cardano-sdk/util';
 import { Cardano, RewardsProvider } from '@cardano-sdk/core';
 import { Delegatee, RewardAccount, StakeKeyStatus } from '../types';
 import { KeyValueStore } from '../../persistence';
@@ -12,7 +12,7 @@ import {
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TrackedStakePoolProvider } from '../ProviderTracker';
 import { TxWithEpoch } from './types';
-import { coldObservableProvider, deepEquals, shallowArrayEquals } from '../util';
+import { coldObservableProvider, shallowArrayEquals } from '../util';
 import findLast from 'lodash/findLast';
 import isEqual from 'lodash/isEqual';
 import uniq from 'lodash/uniq';

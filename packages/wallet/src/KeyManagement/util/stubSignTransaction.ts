@@ -1,6 +1,6 @@
 import { Address, Cardano } from '@cardano-sdk/core';
 import { GroupedAddress, SignTransactionOptions, TransactionSigner } from '../types';
-import { deepEquals } from '../../services';
+import { deepEquals } from '@cardano-sdk/util';
 import { ownSignatureKeyPaths } from './ownSignatureKeyPaths';
 import uniqWith from 'lodash/uniqWith';
 
