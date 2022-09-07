@@ -1,5 +1,4 @@
-import { Cardano } from '@cardano-sdk/core';
-import { InputResolver } from '../services';
+import { Address, Cardano } from '@cardano-sdk/core';
 import { Observable } from 'rxjs';
 import { Shutdown } from '@cardano-sdk/util';
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents';
@@ -64,7 +63,7 @@ export enum CommunicationType {
 export type BIP32Path = Array<number>;
 
 export interface KeyAgentDependencies {
-  inputResolver: InputResolver;
+  inputResolver: Address.util.InputResolver;
 }
 
 export interface AccountAddressDerivationPath {

@@ -1,5 +1,5 @@
-import { CSL, Cardano } from '@cardano-sdk/core';
-import { InputResolver, KeyManagement } from '../../src';
+import { Address, CSL, Cardano } from '@cardano-sdk/core';
+import { KeyManagement } from '../../src';
 import { deriveAccountPrivateKey } from '../../src/KeyManagement/util';
 
 jest.mock('../../src/KeyManagement/util/ownSignatureKeyPaths');
@@ -8,7 +8,7 @@ const { ownSignatureKeyPaths } = jest.requireMock('../../src/KeyManagement/util/
 describe('InMemoryKeyAgent', () => {
   let keyAgent: KeyManagement.InMemoryKeyAgent;
   let getPassword: jest.Mock;
-  let inputResolver: jest.Mocked<InputResolver>;
+  let inputResolver: jest.Mocked<Address.util.InputResolver>;
   let mnemonicWords: string[];
 
   beforeEach(async () => {

@@ -3,10 +3,9 @@
 /* eslint-disable sonarjs/cognitive-complexity,  max-depth, max-statements, complexity */
 import * as ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import * as trezor from 'trezor-connect';
+import { Address, CSL, Cardano, cslToCore } from '@cardano-sdk/core';
 import { BIP32Path, CardanoKeyConst, GroupedAddress } from '../types';
-import { CSL, Cardano, cslToCore } from '@cardano-sdk/core';
 import { HwMappingError } from '../errors';
-import { InputResolver } from '../../services';
 import { STAKE_KEY_DERIVATION_PATH, harden } from '../util';
 import { isNotNil } from '@cardano-sdk/util';
 import concat from 'lodash/concat';
@@ -15,7 +14,7 @@ import uniq from 'lodash/uniq';
 export interface TxToLedgerProps {
   cslTxBody: CSL.TransactionBody;
   networkId: Cardano.NetworkId;
-  inputResolver: InputResolver;
+  inputResolver: Address.util.InputResolver;
   knownAddresses: GroupedAddress[];
   protocolMagic: Cardano.NetworkMagic;
 }
@@ -24,7 +23,7 @@ export interface TxToTrezorProps {
   cslTxBody: CSL.TransactionBody;
   networkId: Cardano.NetworkId;
   accountIndex: number;
-  inputResolver: InputResolver;
+  inputResolver: Address.util.InputResolver;
   knownAddresses: GroupedAddress[];
   protocolMagic: Cardano.NetworkMagic;
 }
@@ -90,7 +89,7 @@ const matchGroupedAddress = (knownAddresses: GroupedAddress[], outputAddress: Bu
 
 const prepareTrezorInputs = async (
   inputs: CSL.TransactionInputs,
-  inputResolver: InputResolver,
+  inputResolver: Address.util.InputResolver,
   knownAddresses: GroupedAddress[]
 ): Promise<trezor.CardanoInput[]> => {
   const trezorInputs = [];
@@ -403,7 +402,7 @@ const prepareTrezorMintBundle = (
 
 const prepareLedgerInputs = async (
   inputs: CSL.TransactionInputs,
-  inputResolver: InputResolver,
+  inputResolver: Address.util.InputResolver,
   knownAddresses: GroupedAddress[]
 ): Promise<ledger.TxInput[]> => {
   const ledgerInputs = [];
