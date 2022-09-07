@@ -106,7 +106,7 @@ const startServer = async (options: TestOptions = {}) => {
         'start-server',
         '--api-url',
         env.TX_SUBMIT_HTTP_URL,
-        ...(options.directlyToOgmios ? [] : ['--use-queue']),
+        ...(options.directlyToOgmios ? [] : ['--use-queue', 'true']),
         ...commonArgs,
         ServiceNames.TxSubmit
       ],
