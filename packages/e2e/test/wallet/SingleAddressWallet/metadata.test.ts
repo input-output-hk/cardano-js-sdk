@@ -1,5 +1,5 @@
 import { Cardano } from '@cardano-sdk/core';
-import { SingleAddressWallet, createWalletUtil } from '@cardano-sdk/wallet';
+import { SingleAddressWallet, buildTx, createWalletUtil } from '@cardano-sdk/wallet';
 import { env } from '../environment';
 import { filter, firstValueFrom, map } from 'rxjs';
 import { getWallet } from '../../../src/factories';
@@ -18,25 +18,29 @@ describe('SingleAddressWallet/metadata', () => {
   afterAll(() => wallet.shutdown());
 
   test('can submit tx with metadata and then query it', async () => {
-    const auxiliaryData: Cardano.AuxiliaryData = {
-      body: {
-        blob: new Map([[123n, '1234']])
-      }
-    };
+    const metadata: Cardano.TxMetadata = new Map([[123n, '1234']]);
     const walletUtil = createWalletUtil(wallet);
     const { minimumCoin } = await walletUtil.validateValue({ coins: 0n });
-    const txInternals = await wallet.initializeTx({
-      auxiliaryData,
-      outputs: new Set([{ address: ownAddress, value: { coins: minimumCoin } }])
-    });
-    const outgoingTx = await wallet.finalizeTx({ auxiliaryData, tx: txInternals });
-    await wallet.submitTx(outgoingTx);
+
+    const builtTx = await buildTx(wallet)
+      .addOutput({ address: ownAddress, value: { coins: minimumCoin } })
+      .setMetadata(metadata)
+      .build();
+
+    if (!builtTx.isValid) {
+      throw new Error('Invalid tx');
+    }
+
+    const signedTx = await builtTx.sign();
+    const outgoingTx = signedTx.tx;
+    await signedTx.submit();
+
     const loadedTx = await firstValueFrom(
       wallet.transactions.history$.pipe(
         map((txs) => txs.find((tx) => tx.id === outgoingTx.id)),
         filter(isNotNil)
       )
     );
-    expect(loadedTx.auxiliaryData).toEqual(auxiliaryData);
+    expect(loadedTx.auxiliaryData?.body.blob).toEqual(metadata);
   });
 });

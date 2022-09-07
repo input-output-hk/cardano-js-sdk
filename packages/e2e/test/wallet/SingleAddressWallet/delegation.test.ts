@@ -1,8 +1,9 @@
 /* eslint-disable max-statements */
 import { Awaited } from '@cardano-sdk/util';
 import { Cardano } from '@cardano-sdk/core';
-import { ObservableWallet, StakeKeyStatus, Transaction } from '@cardano-sdk/wallet';
+import { ObservableWallet, StakeKeyStatus, buildTx } from '@cardano-sdk/wallet';
 import { TX_TIMEOUT, firstValueFromTimed, waitForWalletStateSettle } from '../util';
+import { assertTxIsValid, assertTxOutIsValid } from '../../../../wallet/test/util';
 import { env } from '../environment';
 import { getWallet } from '../../../src/factories';
 import { logger } from '@cardano-sdk/util-dev';
@@ -25,27 +26,8 @@ const getWalletStateSnapshot = async (wallet: ObservableWallet) => {
     utxo: { available: utxoTotal, total: utxoAvailable }
   };
 };
-type WalletStateSnapshot = Awaited<ReturnType<typeof getWalletStateSnapshot>>;
 
-const createDelegationCertificates = (
-  { epoch, isStakeKeyRegistered, rewardAccount: { address: rewardAccount } }: WalletStateSnapshot,
-  poolId: Cardano.PoolId
-) => {
-  const stakeKeyHash = Cardano.Ed25519KeyHash.fromRewardAccount(rewardAccount);
-  return [
-    ...(isStakeKeyRegistered
-      ? []
-      : ([
-          {
-            __typename: Cardano.CertificateType.StakeKeyRegistration,
-            stakeKeyHash
-          }
-        ] as Cardano.Certificate[])),
-    { __typename: Cardano.CertificateType.StakeDelegation, epoch, poolId, stakeKeyHash }
-  ] as Cardano.Certificate[];
-};
-
-const waitForTx = async (wallet: ObservableWallet, { hash }: Transaction.TxInternals) => {
+const waitForTx = async (wallet: ObservableWallet, hash: Cardano.TransactionId) => {
   await firstValueFromTimed(
     combineLatest([
       wallet.transactions.history$.pipe(filter((txs) => txs.some(({ id }) => id === hash))),
@@ -99,7 +81,6 @@ describe('SingleAddressWallet/delegation', () => {
     expect(currentEpoch.epochNo).toBeGreaterThan(0);
   });
 
-  // eslint-disable-next-line max-statements
   test('balance & transaction', async () => {
     // source wallet has the highest balance to begin with
     const [sourceWallet, destWallet] = await chooseWallets();
@@ -113,18 +94,21 @@ describe('SingleAddressWallet/delegation', () => {
     const tx1OutputCoins = 1_000_000n;
     const poolId = await chooseDifferentPoolIdRandomly(initialState.rewardAccount.delegatee?.nextNextEpoch?.id);
     expect(poolId).toBeDefined();
-    const certificates = createDelegationCertificates(initialState, poolId);
     const initialDeposit = initialState.isStakeKeyRegistered ? stakeKeyDeposit : 0n;
     expect(initialState.balance.deposit).toBe(initialDeposit);
 
     // Make a 1st tx with key registration (if not already registered) and stake delegation
     // Also send some coin to another wallet
     const destAddresses = (await firstValueFrom(destWallet.addresses$))[0].address;
-    const tx1Internals = await sourceWallet.initializeTx({
-      certificates,
-      outputs: new Set([{ address: destAddresses, value: { coins: tx1OutputCoins } }])
-    });
-    await sourceWallet.submitTx(await sourceWallet.finalizeTx({ tx: tx1Internals }));
+    const txBuilder = await buildTx(sourceWallet).delegate(poolId);
+    const maybeValidTxOut = await txBuilder.buildOutput().address(destAddresses).coin(tx1OutputCoins).build();
+    assertTxOutIsValid(maybeValidTxOut);
+
+    const tx = await txBuilder.addOutput(maybeValidTxOut.txOut).build();
+    assertTxIsValid(tx);
+
+    const signedTx = await tx.sign();
+    await signedTx.submit();
 
     // Test it locks available balance after tx is submitted
     await firstValueFromTimed(
@@ -136,13 +120,12 @@ describe('SingleAddressWallet/delegation', () => {
 
     // Updates total and available balance right after tx is submitted
     const coinsSpentOnDeposit = initialState.isStakeKeyRegistered ? 0n : stakeKeyDeposit;
-    const expectedCoinsAfterTx1 =
-      initialState.balance.total.coins - tx1OutputCoins - tx1Internals.body.fee - coinsSpentOnDeposit;
+    const expectedCoinsAfterTx1 = initialState.balance.total.coins - tx1OutputCoins - tx.body.fee - coinsSpentOnDeposit;
     expect(tx1PendingState.balance.total.coins).toEqual(expectedCoinsAfterTx1);
     expect(tx1PendingState.balance.available.coins).toEqual(expectedCoinsAfterTx1);
     expect(tx1PendingState.balance.deposit).toEqual(stakeKeyDeposit);
 
-    await waitForTx(sourceWallet, tx1Internals);
+    await waitForTx(sourceWallet, signedTx.tx.id);
     const tx1ConfirmedState = await getWalletStateSnapshot(sourceWallet);
 
     // Updates total and available balance after tx is confirmed
@@ -169,7 +152,7 @@ describe('SingleAddressWallet/delegation', () => {
       ]
     });
     await sourceWallet.submitTx(await sourceWallet.finalizeTx({ tx: tx2Internals }));
-    await waitForTx(sourceWallet, tx2Internals);
+    await waitForTx(sourceWallet, tx2Internals.hash);
     const tx2ConfirmedState = await getWalletStateSnapshot(sourceWallet);
 
     // No longer delegating
