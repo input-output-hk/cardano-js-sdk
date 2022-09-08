@@ -3,11 +3,11 @@ import * as envalid from 'envalid';
 import { Cardano } from '@cardano-sdk/core';
 import { ChildProcess, fork } from 'child_process';
 import { InitializeTxResult, ObservableWallet } from '@cardano-sdk/wallet';
-import { RabbitMQContainer } from '../../../../cardano-services/test/TxSubmit/rabbitmq/docker';
+import { RabbitMQContainer } from '../../../cardano-services/test/TxSubmit/rabbitmq/docker';
 import { ServiceNames } from '@cardano-sdk/cardano-services';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom } from 'rxjs';
-import { getWallet } from '../../../src/factories';
+import { getWallet } from '../../src/factories';
 import JSONBig from 'json-bigint';
 import path from 'path';
 
@@ -62,7 +62,7 @@ let commonArgs: string[];
 
 const runCli = (args: string[], startedString: string) =>
   new Promise<ChildProcess>((resolve, reject) => {
-    const proc = fork(path.join(__dirname, '..', '..', '..', '..', 'cardano-services', 'dist', 'cjs', 'cli.js'), args, {
+    const proc = fork(path.join(__dirname, '..', '..', '..', 'cardano-services', 'dist', 'cjs', 'cli.js'), args, {
       stdio: 'pipe'
     });
 
@@ -106,7 +106,7 @@ const startServer = async (options: TestOptions = {}) => {
         'start-server',
         '--api-url',
         env.TX_SUBMIT_HTTP_URL,
-        ...(options.directlyToOgmios ? [] : ['--use-queue']),
+        ...(options.directlyToOgmios ? [] : ['--use-queue', 'true']),
         ...commonArgs,
         ServiceNames.TxSubmit
       ],
