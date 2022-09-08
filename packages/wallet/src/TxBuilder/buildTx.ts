@@ -6,15 +6,13 @@ import {
   IncompatibleWalletError,
   MaybeValidTx,
   OutputBuilder,
-  OutputValidationMinimumCoinError,
-  OutputValidationTokenBundleSizeError,
   PartialTxOut,
   SignedTx,
   TxBodyValidationError,
   TxBuilder,
   TxOutValidationError
 } from './types';
-import { ObservableWalletTxOutputBuilder, toOutputValidationError } from './OutputBuilder';
+import { ObservableWalletTxOutputBuilder } from './OutputBuilder';
 import { OutputValidator, RewardAccount, StakeKeyStatus, WalletUtilContext, createWalletUtil } from '../services';
 import { SignTransactionOptions, TransactionSigner } from '@cardano-sdk/key-management';
 import { deepEquals } from '@cardano-sdk/util';
@@ -164,12 +162,9 @@ export class ObservableWalletTxBuilder implements TxBuilder {
   }
 
   async #validateOutputs(): Promise<TxOutValidationError[]> {
-    const outputValidations =
-      this.partialTxBody.outputs && (await this.#util.validateOutputs(this.partialTxBody.outputs));
-
-    const errors = [...(outputValidations?.entries() || [])]
-      .map(([txOut, validation]) => toOutputValidationError(txOut, validation))
-      .filter((err): err is OutputValidationTokenBundleSizeError | OutputValidationMinimumCoinError => !!err);
+    const errors = (
+      await Promise.all(this.partialTxBody.outputs?.map((output) => this.buildOutput(output).build()) || [])
+    ).flatMap((output) => (output.isValid ? [] : output.errors));
 
     if (errors.length > 0) {
       throw errors;

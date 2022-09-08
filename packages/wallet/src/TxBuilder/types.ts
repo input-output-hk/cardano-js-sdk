@@ -63,17 +63,19 @@ export type MaybeValidTxOut = ValidTxOut | InvalidTxOut;
  */
 export interface OutputBuilder {
   /**
-   * Transaction output that is updated by `OutputBuilder` methods.
-   * It should not be updated directly, but this is not restricted to allow experimental TxOutput changes that are not
-   * yet available in the OutputBuilder interface.
-   * Every method call recreates the `partialOutput`, thus updating it immutably.
+   * Create transaction output snapshot, as it was configured until the point of calling this method.
+   *
+   * @returns {Cardano.TxOut} transaction output snapshot.
+   *  - It can be used in `TxBuilder.addOutput()`.
+   *  - It will be validated once `TxBuilder.build()` method is called.
+   * @throws {OutputValidationMissingRequiredError} if the mandatory fields 'address' or 'coins' are missing
    */
-  partialOutput: PartialTxOut;
-  /** Sets {@link partialOutput} `value` field. Preexisting `value` is overwritten. */
+  toTxOut(): Cardano.TxOut;
+  /** Sets transaction output `value` field. Preexisting `value` is overwritten. */
   value(value: Cardano.Value): OutputBuilder;
-  /** Sets {@link partialOutput}.value `coins` field. */
+  /** Sets transaction output value `coins` field. */
   coin(coin: Cardano.Lovelace): OutputBuilder;
-  /** Sets {@link partialOutput}.value `assets` field. Preexisting assets are overwritten */
+  /** Sets transaction output value `assets` field. Preexisting assets are overwritten */
   assets(assets: Cardano.TokenMap): OutputBuilder;
   /**
    * Add/Remove/Update asset.
@@ -85,12 +87,12 @@ export interface OutputBuilder {
    * @param quantity To remove an asset, set quantity to 0
    */
   asset(assetId: Cardano.AssetId, quantity: bigint): OutputBuilder;
-  /** Sets {@link partialOutput} `address` field. */
+  /** Sets transaction output `address` field. */
   address(address: Cardano.Address): OutputBuilder;
-  /** Sets {@link partialOutput} `datum` field. */
+  /** Sets transaction output `datum` field. */
   datum(datum: Cardano.util.Hash32ByteBase16): OutputBuilder;
   /**
-   * Checks if the constructed `partialOutput` is complete and valid
+   * Checks if the transaction output is complete and valid
    *
    * @returns {Promise<MaybeValidTxOut>} When it is a `ValidTxOut` it can be used as input in `TxBuilder.addOutput()`.
    * In case of it is an `InvalidTxOut`, it embeds a TxOutValidationError with more details
@@ -141,7 +143,7 @@ export interface TxBuilder {
    */
   removeOutput(txOut: Cardano.TxOut): TxBuilder;
   /**
-   * Does *not* addOutput
+   * Does *not* addOutput.
    *
    * @param txOut optional partial transaction output to use for initialization.
    * @returns {OutputBuilder} {@link OutputBuilder} util for building transaction outputs.

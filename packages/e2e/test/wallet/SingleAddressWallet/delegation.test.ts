@@ -3,7 +3,7 @@ import { Awaited } from '@cardano-sdk/util';
 import { Cardano } from '@cardano-sdk/core';
 import { ObservableWallet, StakeKeyStatus, buildTx } from '@cardano-sdk/wallet';
 import { TX_TIMEOUT, firstValueFromTimed, waitForWalletStateSettle } from '../util';
-import { assertTxIsValid, assertTxOutIsValid } from '../../../../wallet/test/util';
+import { assertTxIsValid } from '../../../../wallet/test/util';
 import { env } from '../environment';
 import { getWallet } from '../../../src/factories';
 import { logger } from '@cardano-sdk/util-dev';
@@ -100,10 +100,11 @@ describe('SingleAddressWallet/delegation', () => {
     // Also send some coin to another wallet
     const destAddresses = (await firstValueFrom(destWallet.addresses$))[0].address;
     const txBuilder = buildTx(sourceWallet);
-    const maybeValidTxOut = await txBuilder.buildOutput().address(destAddresses).coin(tx1OutputCoins).build();
-    assertTxOutIsValid(maybeValidTxOut);
 
-    const tx = await txBuilder.addOutput(maybeValidTxOut.txOut).delegate(poolId).build();
+    const tx = await txBuilder
+      .addOutput(txBuilder.buildOutput().address(destAddresses).coin(tx1OutputCoins).toTxOut())
+      .delegate(poolId)
+      .build();
     assertTxIsValid(tx);
 
     const signedTx = await tx.sign();

@@ -202,67 +202,66 @@ describe('buildTx', () => {
       output1Coin = 10_000_000n;
       output2Base = mocks.utxo[0][1];
 
-      outputBuilder = txBuilder.buildOutput();
+      outputBuilder = txBuilder.buildOutput().address(address).coin(output1Coin);
     });
 
     it('can create OutputBuilder without initial output', () => {
-      expect(outputBuilder.partialOutput).toBeTruthy();
+      expect(outputBuilder.toTxOut()).toBeTruthy();
     });
 
     it('can create OutputBuilder starting from an existing output', () => {
       const outputBuilderFromExisting = txBuilder.buildOutput(output);
-      expect(outputBuilderFromExisting.partialOutput).toEqual(output);
+      expect(outputBuilderFromExisting.toTxOut()).toEqual(output);
     });
 
-    it('can set partialOutput value overwriting preexisting value', () => {
+    it('can set output value, overwriting preexisting value', () => {
       const outValue = { assets, coins: output1Coin };
       outputBuilder.value(outValue);
-      expect(outputBuilder.partialOutput.value).toEqual(outValue);
+      expect(outputBuilder.toTxOut().value).toEqual(outValue);
 
       // Setting outValueOther will remove previously configured assets
       const outValueOther = { coins: output1Coin + 100n };
       outputBuilder.value(outValueOther);
-      expect(outputBuilder.partialOutput.value).toEqual(outValueOther);
+      expect(outputBuilder.toTxOut().value).toEqual(outValueOther);
     });
 
     it('can set coin value', () => {
-      outputBuilder.coin(output1Coin);
-      expect(outputBuilder.partialOutput.value).toEqual({ coins: output1Coin });
+      expect(outputBuilder.toTxOut().value).toEqual({ coins: output1Coin });
     });
 
-    it('can set partialOutput assets', () => {
+    it('can set assets', () => {
       outputBuilder.assets(assets);
-      expect(outputBuilder.partialOutput.value).toEqual({ assets });
+      expect(outputBuilder.toTxOut().value).toEqual(expect.objectContaining({ assets }));
     });
 
     it('can add assets one by one', () => {
       outputBuilder.asset(AssetId.PXL, 5n).asset(AssetId.TSLA, 10n);
-      expect(outputBuilder.partialOutput.value?.assets?.size).toBe(2);
-      expect(outputBuilder.partialOutput.value?.assets?.get(AssetId.PXL)).toBe(5n);
-      expect(outputBuilder.partialOutput.value?.assets?.get(AssetId.TSLA)).toBe(10n);
+      const txOut = outputBuilder.toTxOut();
+      expect(txOut.value?.assets?.size).toBe(2);
+      expect(txOut.value?.assets?.get(AssetId.PXL)).toBe(5n);
+      expect(txOut.value?.assets?.get(AssetId.TSLA)).toBe(10n);
     });
 
     it('can update asset quantity by assetId', () => {
       outputBuilder.asset(AssetId.PXL, 5n).asset(AssetId.TSLA, 10n);
       outputBuilder.asset(AssetId.PXL, 11n);
-      expect(outputBuilder.partialOutput.value?.assets?.get(AssetId.PXL)).toBe(11n);
+      expect(outputBuilder.toTxOut().value?.assets?.get(AssetId.PXL)).toBe(11n);
     });
 
     it('can remove asset by using quantity 0', () => {
       outputBuilder.assets(assets);
-      expect(outputBuilder.partialOutput.value?.assets?.size).toBe(1);
+      expect(outputBuilder.toTxOut().value?.assets?.size).toBe(1);
       outputBuilder.asset(assetId, 0n);
-      expect(outputBuilder.partialOutput.value?.assets?.size).toBe(0);
+      expect(outputBuilder.toTxOut().value?.assets?.size).toBe(0);
     });
 
     it('can set address', () => {
-      outputBuilder.address(address);
-      expect(outputBuilder.partialOutput.address).toEqual(address);
+      expect(outputBuilder.toTxOut().address).toEqual(address);
     });
 
     it('can set datum', () => {
       outputBuilder.datum(datum);
-      expect(outputBuilder.partialOutput.datum).toEqual(datum);
+      expect(outputBuilder.toTxOut().datum).toEqual(datum);
     });
 
     it('can build a valid output', async () => {
@@ -285,7 +284,7 @@ describe('buildTx', () => {
       });
     });
 
-    describe('can validate', () => {
+    describe('can build and validate', () => {
       it('missing coin field', async () => {
         const builtOutput = await txBuilder.buildOutput().address(address).build();
         const [error] = (!builtOutput.isValid && builtOutput.errors) || [];
@@ -307,6 +306,24 @@ describe('buildTx', () => {
       it('legit output with valid with address and coin', async () => {
         const builtOutput = await txBuilder.buildOutput().address(address).coin(output1Coin).build();
         assertTxOutIsValid(builtOutput);
+      });
+    });
+
+    describe('can validate required output fields', () => {
+      it('missing coin field', () => {
+        expect(() => txBuilder.buildOutput().address(address).toTxOut()).toThrowError(
+          OutputValidationMissingRequiredError
+        );
+      });
+
+      it('missing address field', () => {
+        expect(() => txBuilder.buildOutput().coin(output1Coin).toTxOut()).toThrowError(
+          OutputValidationMissingRequiredError
+        );
+      });
+
+      it('legit output with valid with address and coin', async () => {
+        expect(() => txBuilder.buildOutput().address(address).coin(output1Coin).toTxOut()).not.toThrow();
       });
     });
   });
@@ -491,7 +508,8 @@ describe('buildTx', () => {
       validateValue: jest.fn(),
       validateValues: jest.fn()
     };
-    const tx = await buildTx(wallet, mockValidator).addOutput(output).addOutput(output2).build();
+    const builder = buildTx(wallet, mockValidator).addOutput(output);
+    const tx = await builder.addOutput(builder.buildOutput(output2).toTxOut()).build();
 
     expect(tx.isValid).toBeFalsy();
     const [error1, error2] = (!tx.isValid && tx.errors) || [];
