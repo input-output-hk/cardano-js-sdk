@@ -458,7 +458,7 @@ export class SingleAddressWallet implements ObservableWallet {
   }
 
   async #getSignatures(
-    txInternals: Cardano.TxInternals,
+    txInternals: Cardano.TxBodyWithHash,
     extraSigners?: TransactionSigner[],
     signingOptions?: SignTransactionOptions
   ) {

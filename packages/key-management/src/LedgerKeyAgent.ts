@@ -226,7 +226,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
     );
   }
 
-  async signTransaction({ body }: Cardano.TxInternals): Promise<Cardano.Signatures> {
+  async signTransaction({ body }: Cardano.TxBodyWithHash): Promise<Cardano.Signatures> {
     try {
       const cslTxBody = coreToCsl.txBody(body);
       const ledgerTxData = await txToLedger({

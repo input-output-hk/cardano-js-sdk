@@ -153,7 +153,7 @@ export interface KeyAgent {
   /**
    * @throws AuthenticationError
    */
-  signTransaction(txInternals: Cardano.TxInternals, options?: SignTransactionOptions): Promise<Cardano.Signatures>;
+  signTransaction(txInternals: Cardano.TxBodyWithHash, options?: SignTransactionOptions): Promise<Cardano.Signatures>;
   /**
    * @throws AuthenticationError
    */
@@ -197,5 +197,5 @@ export interface TransactionSigner {
    * @param tx The transaction to be signed.
    * @returns A Ed25519 transaction signature.
    */
-  sign(tx: Cardano.TxInternals): Promise<TransactionSignerResult>;
+  sign(tx: Cardano.TxBodyWithHash): Promise<TransactionSignerResult>;
 }

@@ -31,7 +31,7 @@ export type InitializeTxProps = {
 };
 
 export interface FinalizeTxProps {
-  tx: Cardano.TxInternals;
+  tx: Cardano.TxBodyWithHash;
   auxiliaryData?: Cardano.AuxiliaryData;
   scripts?: Cardano.Script[];
   extraSigners?: TransactionSigner[];
@@ -51,7 +51,7 @@ export interface InitializeTxPropsValidationResult {
   minimumCoinQuantities: MinimumCoinQuantityPerOutput;
 }
 
-export type InitializeTxResult = Cardano.TxInternals & { inputSelection: SelectionSkeleton };
+export type InitializeTxResult = Cardano.TxBodyWithHash & { inputSelection: SelectionSkeleton };
 
 export type SignDataProps = Omit<cip8.Cip30SignDataRequest, 'keyAgent'>;
 

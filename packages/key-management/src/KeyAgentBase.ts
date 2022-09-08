@@ -37,7 +37,7 @@ export abstract class KeyAgentBase implements KeyAgent {
   abstract signBlob(derivationPath: AccountKeyDerivationPath, blob: Cardano.util.HexBlob): Promise<SignBlobResult>;
   abstract exportRootPrivateKey(): Promise<Cardano.Bip32PrivateKey>;
   abstract signTransaction(
-    txInternals: Cardano.TxInternals,
+    txInternals: Cardano.TxBodyWithHash,
     signTransactionOptions?: SignTransactionOptions
   ): Promise<Cardano.Signatures>;
 

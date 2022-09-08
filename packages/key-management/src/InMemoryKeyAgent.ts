@@ -113,7 +113,7 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
   }
 
   async signTransaction(
-    { body, hash }: Cardano.TxInternals,
+    { body, hash }: Cardano.TxBodyWithHash,
     { additionalKeyPaths = [] }: SignTransactionOptions | undefined = {}
   ): Promise<Cardano.Signatures> {
     // Possible optimization is casting strings to OpaqueString types directly and skipping validation

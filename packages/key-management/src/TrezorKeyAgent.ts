@@ -134,7 +134,7 @@ export class TrezorKeyAgent extends KeyAgentBase {
     );
   }
 
-  async signTransaction({ body }: Cardano.TxInternals): Promise<Cardano.Signatures> {
+  async signTransaction({ body }: Cardano.TxBodyWithHash): Promise<Cardano.Signatures> {
     try {
       await this.isTrezorInitialized;
       const cslTxBody = coreToCsl.txBody(body);

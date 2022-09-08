@@ -25,7 +25,7 @@ export const createTransactionInternals = async ({
   mint,
   scriptIntegrityHash,
   requiredExtraSignatures
-}: CreateTxInternalsProps): Promise<Cardano.TxInternals> => {
+}: CreateTxInternalsProps): Promise<Cardano.TxBodyWithHash> => {
   const outputs = [...inputSelection.outputs];
   for (const value of inputSelection.change) {
     outputs.push({
