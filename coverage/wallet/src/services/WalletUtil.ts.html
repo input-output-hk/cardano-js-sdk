@@ -222,22 +222,12 @@
 <a name='L157'></a><a href='#L157'>157</a>
 <a name='L158'></a><a href='#L158'>158</a>
 <a name='L159'></a><a href='#L159'>159</a>
-<a name='L160'></a><a href='#L160'>160</a>
-<a name='L161'></a><a href='#L161'>161</a>
-<a name='L162'></a><a href='#L162'>162</a>
-<a name='L163'></a><a href='#L163'>163</a>
-<a name='L164'></a><a href='#L164'>164</a>
-<a name='L165'></a><a href='#L165'>165</a>
-<a name='L166'></a><a href='#L166'>166</a>
-<a name='L167'></a><a href='#L167'>167</a>
-<a name='L168'></a><a href='#L168'>168</a>
-<a name='L169'></a><a href='#L169'>169</a>
-<a name='L170'></a><a href='#L170'>170</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">47x</span>
-<span class="cline-any cline-yes">47x</span>
-<span class="cline-any cline-yes">47x</span>
+<a name='L160'></a><a href='#L160'>160</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">34x</span>
+<span class="cline-any cline-yes">34x</span>
+<span class="cline-any cline-yes">34x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">47x</span>
-<span class="cline-any cline-yes">47x</span>
+<span class="cline-any cline-yes">34x</span>
+<span class="cline-any cline-yes">34x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -286,17 +276,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">47x</span>
+<span class="cline-any cline-yes">34x</span>
 <span class="cline-any cline-yes">168x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -351,8 +331,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">166x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">90x</span>
-<span class="cline-any cline-yes">162x</span>
+<span class="cline-any cline-yes">107x</span>
+<span class="cline-any cline-yes">197x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -374,14 +354,14 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">47x</span>
+<span class="cline-any cline-yes">34x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">64x</span>
-<span class="cline-any cline-yes">64x</span>
+<span class="cline-any cline-yes">63x</span>
+<span class="cline-any cline-yes">63x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">24x</span>
-<span class="cline-any cline-yes">24x</span>
+<span class="cline-any cline-yes">29x</span>
+<span class="cline-any cline-yes">29x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -401,18 +381,12 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { BigIntMath } from '@cardano-sdk/util';
-import { Cardano, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Address, Cardano, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
+import { BigIntMath } from '@cardano-sdk/util';
 import { Observable, firstValueFrom } from 'rxjs';
 import { OutputValidation } from '../types';
 import { computeMinimumCoinQuantity, tokenBundleSizeExceedsLimit } from '@cardano-sdk/cip2';
 import { txInEquals } from './util';
-&nbsp;
-/**
- * @param txIn transaction input to resolve address from
- * @returns input owner address
- */
-export type ResolveInputAddress = (txIn: Cardano.NewTxIn) =&gt; Promise&lt;Cardano.Address | null&gt;;
 &nbsp;
 export type ProtocolParametersRequiredByOutputValidator = Pick&lt;
   ProtocolParametersRequiredByWallet,
@@ -459,10 +433,6 @@ export interface OutputValidator {
    * @returns For every output, validates that token bundle size is within limits and computes minimum coin quantity
    */
   validateOutputs(outputs: Iterable&lt;Cardano.TxOut&gt;): Promise&lt;Map&lt;Cardano.TxOut, OutputValidation&gt;&gt;;
-}
-&nbsp;
-export interface InputResolver {
-  resolveInputAddress: ResolveInputAddress;
 }
 &nbsp;
 export const createOutputValidator = ({ protocolParameters$ }: OutputValidatorContext): OutputValidator =&gt; {
@@ -518,7 +488,7 @@ export const createOutputValidator = ({ protocolParameters$ }: OutputValidatorCo
   };
 };
 &nbsp;
-export const createInputResolver = ({ utxo }: InputResolverContext): InputResolver =&gt; ({
+export const createInputResolver = ({ utxo }: InputResolverContext): Address.util.InputResolver =&gt; ({
   async resolveInputAddress(input: Cardano.NewTxIn) {
     const utxoAvailable = await firstValueFrom(utxo.available$);
     return utxoAvailable?.find(([txIn]) =&gt; txInEquals(txIn, input))?.[1].address || null;
@@ -577,7 +547,7 @@ export const createLazyWalletUtil = (): WalletUtil &amp; { initialize: SetWallet
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at Thu Sep 08 2022 11:10:33 GMT+0000 (Coordinated Universal Time)
+                at Thu Sep 08 2022 15:39:37 GMT+0000 (Coordinated Universal Time)
             </div>
         <script src="../../prettify.js"></script>
         <script>
