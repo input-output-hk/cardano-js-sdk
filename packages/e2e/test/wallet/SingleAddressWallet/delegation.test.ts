@@ -64,8 +64,8 @@ describe('SingleAddressWallet/delegation', () => {
 
   beforeAll(async () => {
     jest.setTimeout(180_000);
-    wallet1 = await getWallet({ env, idx: 0, logger, name: 'Test Wallet 1' });
-    wallet2 = await getWallet({ env, idx: 1, logger, name: 'Test Wallet 2' });
+    wallet1 = await getWallet({ env, idx: 0, logger, name: 'Test Wallet 1', polling: { interval: 500 } });
+    wallet2 = await getWallet({ env, idx: 1, logger, name: 'Test Wallet 2', polling: { interval: 500 } });
 
     await Promise.all([waitForWalletStateSettle(wallet1.wallet), waitForWalletStateSettle(wallet2.wallet)]);
   });
@@ -150,14 +150,19 @@ describe('SingleAddressWallet/delegation', () => {
     expect(tx1ConfirmedState.balance.total).toEqual(tx1ConfirmedState.balance.available);
     expect(tx1PendingState.balance.deposit).toEqual(stakeKeyDeposit);
 
-    expect(tx1ConfirmedState.rewardAccount.delegatee?.nextNextEpoch!.id).toEqual(poolId);
-    // nothing changes for 2 epochs
-    expect(tx1ConfirmedState.rewardAccount.delegatee?.nextEpoch).toEqual(
-      initialState.rewardAccount?.delegatee?.nextEpoch
-    );
-    expect(tx1ConfirmedState.rewardAccount.delegatee?.currentEpoch).toEqual(
-      initialState.rewardAccount?.delegatee?.currentEpoch
-    );
+    // If less than two epochs have elapsed, delegatee will still delegate to former pool during current epoch
+    // if more than two epochs has elapsed, delegatee will delegate to new pool.
+    if (tx1ConfirmedState.epoch - initialState.epoch < 2) {
+      expect(tx1ConfirmedState.rewardAccount.delegatee?.currentEpoch?.id).toEqual(
+        initialState?.rewardAccount.delegatee?.currentEpoch?.id
+      );
+      expect(tx1ConfirmedState.rewardAccount.delegatee?.nextEpoch?.id).toEqual(
+        initialState?.rewardAccount.delegatee?.nextEpoch?.id
+      );
+      expect(tx1ConfirmedState.rewardAccount.delegatee?.nextNextEpoch?.id).toEqual(poolId);
+    } else {
+      expect(tx1ConfirmedState.rewardAccount.delegatee?.currentEpoch?.id).toEqual(poolId);
+    }
 
     // Make a 2nd tx with key deregistration
     const tx2Internals = await sourceWallet.initializeTx({
