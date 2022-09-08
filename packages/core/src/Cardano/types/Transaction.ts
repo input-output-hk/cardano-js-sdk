@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Cardano from '.';
 import { AuxiliaryData } from './AuxiliaryData';
+import { Base64Blob, Hash32ByteBase16, HexBlob, OpaqueString, typedHex } from '../util';
 import { Ed25519PublicKey } from './Key';
-import { Hash32ByteBase16, HexBlob, OpaqueString, typedHex } from '../util';
 import { PartialBlockHeader } from './Block';
 
 /**
@@ -68,15 +68,15 @@ export interface Redeemer {
 export type Signatures = Map<Ed25519PublicKey, Ed25519Signature>;
 
 export type Signature = Ed25519Signature;
-export type ChainCode = string;
-export type AddressAttributes = string;
+export type ChainCode = HexBlob;
+export type AddressAttributes = Base64Blob;
 export type VerificationKey = Ed25519PublicKey;
 
 export interface BootstrapWitness {
-  signature?: Signature;
+  signature: Signature;
   chainCode?: ChainCode;
   addressAttributes?: AddressAttributes;
-  key?: VerificationKey;
+  key: VerificationKey;
 }
 
 export type Witness = {

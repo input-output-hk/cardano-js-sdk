@@ -138,22 +138,24 @@ export const txBody = (body: CSL.TransactionBody): Cardano.NewTxBodyAlonzo => {
   };
 };
 
-export const txBootstrap = (bootstraps?: CSL.BootstrapWitnesses): Cardano.BootstrapWitness[] | undefined => {
+export const txWitnessBootstrap = (bootstraps?: CSL.BootstrapWitnesses): Cardano.BootstrapWitness[] | undefined => {
   if (!bootstraps) return;
   const result: Cardano.BootstrapWitness[] = [];
   for (let i = 0; i < bootstraps.len(); i++) {
     const bootstrap = bootstraps.get(i);
+    const attributes = bootstrap.attributes();
+    const chainCode = bootstrap.chain_code();
     result.push({
-      addressAttributes: bootstrap.attributes().toString(),
-      chainCode: bootstrap.chain_code().toString(),
-      key: Cardano.Ed25519PublicKey(bootstrap.vkey.toString()),
-      signature: Cardano.Ed25519Signature(bootstrap.signature.toString())
+      addressAttributes: attributes?.length > 0 ? Cardano.Base64Blob.fromBytes(attributes) : undefined,
+      chainCode: chainCode?.length > 0 ? Cardano.HexBlob.fromBytes(chainCode) : undefined,
+      key: Cardano.Ed25519PublicKey(Buffer.from(bootstrap.vkey().public_key().as_bytes()).toString('hex')),
+      signature: Cardano.Ed25519Signature(bootstrap.signature().to_hex())
     });
   }
   return result;
 };
 
-export const txRedeemers = (redeemers?: CSL.Redeemers): Cardano.Redeemer[] | undefined => {
+export const txWitnessRedeemers = (redeemers?: CSL.Redeemers): Cardano.Redeemer[] | undefined => {
   if (!redeemers) return;
   const result: Cardano.Redeemer[] = [];
   for (let j = 0; j < redeemers.len(); j++) {
@@ -196,9 +198,9 @@ export const txWitnessSet = (witnessSet: CSL.TransactionWitnessSet): Cardano.Wit
 
   return {
     // TODO: add support for scripts
-    bootstrap: txBootstrap(bootstraps),
+    bootstrap: txWitnessBootstrap(bootstraps),
     // TODO: implement datums
-    redeemers: txRedeemers(redeemers),
+    redeemers: txWitnessRedeemers(redeemers),
     signatures: txSignatures
   };
 };
