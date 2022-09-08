@@ -4,7 +4,7 @@ import { CustomError } from 'ts-custom-error';
 import { InputSelectionError } from '@cardano-sdk/cip2';
 
 import { OutputValidation } from '../types';
-import { SignTransactionOptions, TransactionSigner } from '../KeyManagement';
+import { SignTransactionOptions, TransactionSigner } from '@cardano-sdk/key-management';
 
 export type PartialTxOut = Partial<Pick<Cardano.TxOut, 'address' | 'datum'> & { value: Partial<Cardano.Value> }>;
 

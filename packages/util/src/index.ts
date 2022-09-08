@@ -1,3 +1,4 @@
+export * from './equals';
 export * from './types';
 export * from './BigIntMath';
 export * from './hexString';

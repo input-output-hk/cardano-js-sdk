@@ -68,6 +68,7 @@
   "dependencies": {
     "@cardano-sdk/cip30": "^0.5.0",
     "@cardano-sdk/core": "^0.5.0",
+    "@cardano-sdk/key-management": "^0.1.0",
     "@cardano-sdk/util": "^0.5.0",
     "@cardano-sdk/util-rxjs": "^0.4.1",
     "lodash": "^4.17.21",

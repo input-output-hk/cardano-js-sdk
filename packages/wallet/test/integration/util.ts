@@ -8,9 +8,9 @@ import {
   mockNetworkInfoProvider,
   mockRewardsProvider,
   mockTxSubmitProvider,
-  mockUtxoProvider,
-  testAsyncKeyAgent
+  mockUtxoProvider
 } from '../mocks';
+import { testAsyncKeyAgent } from '../../../key-management/test/mocks';
 
 export const createWallet = async (stores?: WalletStores) =>
   setupWallet({

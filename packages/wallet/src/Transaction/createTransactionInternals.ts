@@ -1,11 +1,6 @@
 import { CSL, Cardano, coreToCsl, util } from '@cardano-sdk/core';
 import { SelectionResult } from '@cardano-sdk/cip2';
 
-export type TxInternals = {
-  hash: Cardano.TransactionId;
-  body: Cardano.NewTxBodyAlonzo;
-};
-
 export type CreateTxInternalsProps = {
   changeAddress: Cardano.Address;
   inputSelection: SelectionResult['selection'];
@@ -30,7 +25,7 @@ export const createTransactionInternals = async ({
   mint,
   scriptIntegrityHash,
   requiredExtraSignatures
-}: CreateTxInternalsProps): Promise<TxInternals> => {
+}: CreateTxInternalsProps): Promise<Cardano.TxBodyWithHash> => {
   const outputs = [...inputSelection.outputs];
   for (const value of inputSelection.change) {
     outputs.push({

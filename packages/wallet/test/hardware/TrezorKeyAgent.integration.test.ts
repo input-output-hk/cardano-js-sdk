@@ -1,5 +1,5 @@
 import { Cardano } from '@cardano-sdk/core';
-import { CommunicationType, KeyAgent, TrezorKeyAgent, restoreKeyAgent, util } from '../../src/KeyManagement';
+import { CommunicationType, KeyAgent, TrezorKeyAgent, restoreKeyAgent, util } from '@cardano-sdk/key-management';
 import { ObservableWallet, SingleAddressWallet, setupWallet } from '../../src';
 import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { firstValueFrom } from 'rxjs';

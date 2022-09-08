@@ -1,13 +1,20 @@
 import * as mocks from '../mocks';
+import {
+  AddressType,
+  CommunicationType,
+  GroupedAddress,
+  SerializableTrezorKeyAgentData,
+  TrezorKeyAgent,
+  util
+} from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { Cardano } from '@cardano-sdk/core';
-import { CommunicationType } from '../../src/KeyManagement/types';
-import { KeyManagement, SingleAddressWallet, setupWallet } from '../../src';
+import { SingleAddressWallet, setupWallet } from '../../src';
 import { dummyLogger as logger } from 'ts-log';
-import { mockKeyAgentDependencies } from '../mocks';
+import { mockKeyAgentDependencies } from '../../../key-management/test/mocks';
 
 describe('TrezorKeyAgent', () => {
-  let keyAgent: KeyManagement.TrezorKeyAgent;
+  let keyAgent: TrezorKeyAgent;
   let txSubmitProvider: mocks.TxSubmitProviderStub;
   let wallet: SingleAddressWallet;
   const trezorConfig = {
@@ -22,7 +29,7 @@ describe('TrezorKeyAgent', () => {
     txSubmitProvider = mocks.mockTxSubmitProvider();
     ({ keyAgent, wallet } = await setupWallet({
       createKeyAgent: async (dependencies) => {
-        const trezorKeyAgent = await KeyManagement.TrezorKeyAgent.createWithDevice(
+        const trezorKeyAgent = await TrezorKeyAgent.createWithDevice(
           {
             networkId: Cardano.NetworkId.testnet,
             protocolMagic: 1_097_911_063,
@@ -30,13 +37,13 @@ describe('TrezorKeyAgent', () => {
           },
           dependencies
         );
-        const groupedAddress: KeyManagement.GroupedAddress = {
+        const groupedAddress: GroupedAddress = {
           accountIndex: 0,
           address: mocks.utxo[0][0].address,
           index: 0,
           networkId: Cardano.NetworkId.testnet,
           rewardAccount: mocks.rewardAccount,
-          type: KeyManagement.AddressType.External
+          type: AddressType.External
         };
         trezorKeyAgent.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
         trezorKeyAgent.knownAddresses.push(groupedAddress);
@@ -50,7 +57,7 @@ describe('TrezorKeyAgent', () => {
         const rewardsProvider = mocks.mockRewardsProvider();
         const chainHistoryProvider = mocks.mockChainHistoryProvider();
         const utxoProvider = mocks.mockUtxoProvider();
-        const asyncKeyAgent = KeyManagement.util.createAsyncKeyAgent(trezorKeyAgent);
+        const asyncKeyAgent = util.createAsyncKeyAgent(trezorKeyAgent);
         return new SingleAddressWallet(
           { name: 'Trezor Wallet' },
           {
@@ -72,7 +79,7 @@ describe('TrezorKeyAgent', () => {
   afterAll(() => wallet.shutdown());
 
   it('can be created with any account index', async () => {
-    const trezorKeyAgentWithRandomIndex = await KeyManagement.TrezorKeyAgent.createWithDevice(
+    const trezorKeyAgentWithRandomIndex = await TrezorKeyAgent.createWithDevice(
       {
         accountIndex: 5,
         networkId: Cardano.NetworkId.testnet,
@@ -81,7 +88,7 @@ describe('TrezorKeyAgent', () => {
       },
       mockKeyAgentDependencies()
     );
-    expect(trezorKeyAgentWithRandomIndex).toBeInstanceOf(KeyManagement.TrezorKeyAgent);
+    expect(trezorKeyAgentWithRandomIndex).toBeInstanceOf(TrezorKeyAgent);
     expect(trezorKeyAgentWithRandomIndex.accountIndex).toEqual(5);
     expect(trezorKeyAgentWithRandomIndex.extendedAccountPublicKey).not.toEqual(keyAgent.extendedAccountPublicKey);
   });
@@ -136,10 +143,10 @@ describe('TrezorKeyAgent', () => {
   });
 
   describe('serializableData', () => {
-    let serializableData: KeyManagement.SerializableTrezorKeyAgentData;
+    let serializableData: SerializableTrezorKeyAgentData;
 
     beforeEach(() => {
-      serializableData = keyAgent.serializableData as KeyManagement.SerializableTrezorKeyAgentData;
+      serializableData = keyAgent.serializableData as SerializableTrezorKeyAgentData;
     });
 
     it('all fields are of correct types', () => {

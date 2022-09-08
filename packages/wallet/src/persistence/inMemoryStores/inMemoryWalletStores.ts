@@ -1,7 +1,7 @@
 import { Assets } from '../../types';
 import { Cardano, EpochRewards, EraSummary, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
 import { EMPTY, combineLatest, map } from 'rxjs';
-import { GroupedAddress } from '../../KeyManagement';
+import { GroupedAddress } from '@cardano-sdk/key-management';
 import { InMemoryCollectionStore } from './InMemoryCollectionStore';
 import { InMemoryDocumentStore } from './InMemoryDocumentStore';
 import { InMemoryKeyValueStore } from './InMemoryKeyValueStore';

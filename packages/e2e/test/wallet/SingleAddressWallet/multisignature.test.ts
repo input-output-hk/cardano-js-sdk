@@ -1,6 +1,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { Cardano } from '@cardano-sdk/core';
-import { KeyManagement, SingleAddressWallet } from '@cardano-sdk/wallet';
+import { InMemoryKeyAgent, KeyRole, util } from '@cardano-sdk/key-management';
+import { SingleAddressWallet } from '@cardano-sdk/wallet';
 import { env } from '../environment';
 import { filter, firstValueFrom } from 'rxjs';
 import { getLogger, getWallet } from '../../../src/factories';
@@ -14,7 +15,7 @@ const logger = getLogger(env.LOGGER_MIN_SEVERITY);
  * @param networkId the network id.
  */
 const getKeyAgent = async (mnemonics: string[], networkId: Cardano.NetworkId) =>
-  await KeyManagement.InMemoryKeyAgent.fromBip39MnemonicWords(
+  await InMemoryKeyAgent.fromBip39MnemonicWords(
     {
       getPassword: async () => Buffer.from(''),
       mnemonicWords: mnemonics,
@@ -38,12 +39,12 @@ describe('SingleAddressWallet/multisignature', () => {
 
     const params = await firstValueFrom(wallet.genesisParameters$);
 
-    const aliceKeyAgent = await getKeyAgent(KeyManagement.util.generateMnemonicWords(), params.networkId);
-    const bobKeyAgent = await getKeyAgent(KeyManagement.util.generateMnemonicWords(), params.networkId);
+    const aliceKeyAgent = await getKeyAgent(util.generateMnemonicWords(), params.networkId);
+    const bobKeyAgent = await getKeyAgent(util.generateMnemonicWords(), params.networkId);
 
     const derivationPath = {
       index: 0,
-      role: KeyManagement.KeyRole.External
+      role: KeyRole.External
     };
 
     const alicePubKey = await aliceKeyAgent.derivePublicKey(derivationPath);
@@ -52,8 +53,8 @@ describe('SingleAddressWallet/multisignature', () => {
     const bobPubKey = await bobKeyAgent.derivePublicKey(derivationPath);
     const bobKeyHash = Cardano.Ed25519KeyHash.fromKey(bobPubKey);
 
-    const alicePolicySigner = new KeyManagement.util.KeyAgentTransactionSigner(aliceKeyAgent, derivationPath);
-    const bobPolicySigner = new KeyManagement.util.KeyAgentTransactionSigner(bobKeyAgent, derivationPath);
+    const alicePolicySigner = new util.KeyAgentTransactionSigner(aliceKeyAgent, derivationPath);
+    const bobPolicySigner = new util.KeyAgentTransactionSigner(bobKeyAgent, derivationPath);
 
     const policyScript: Cardano.NativeScript = {
       __type: Cardano.ScriptType.Native,

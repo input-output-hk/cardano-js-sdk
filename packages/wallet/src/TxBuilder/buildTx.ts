@@ -15,15 +15,9 @@ import {
   TxOutValidationError
 } from './types';
 import { ObservableWalletTxOutputBuilder, toOutputValidationError } from './OutputBuilder';
-import {
-  OutputValidator,
-  RewardAccount,
-  StakeKeyStatus,
-  WalletUtilContext,
-  createWalletUtil,
-  deepEquals
-} from '../services';
-import { SignTransactionOptions, TransactionSigner } from '../KeyManagement';
+import { OutputValidator, RewardAccount, StakeKeyStatus, WalletUtilContext, createWalletUtil } from '../services';
+import { SignTransactionOptions, TransactionSigner } from '@cardano-sdk/key-management';
+import { deepEquals } from '@cardano-sdk/util';
 
 /**
  * Minimal sub-type of ObservableWallet that is used by TxBuilder.
