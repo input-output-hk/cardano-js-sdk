@@ -12,6 +12,7 @@ import {
   TxBuilder,
   TxOutValidationError
 } from './types';
+import { Logger } from 'ts-log';
 import { ObservableWalletTxOutputBuilder } from './OutputBuilder';
 import { OutputValidator, RewardAccount, StakeKeyStatus, WalletUtilContext, createWalletUtil } from '../services';
 import { SignTransactionOptions, TransactionSigner } from '@cardano-sdk/key-management';
@@ -31,6 +32,20 @@ export type ObservableWalletTxBuilderDependencies = Pick<ObservableWallet, 'subm
     props: Pick<FinalizeTxProps, 'auxiliaryData' | 'tx' | 'signingOptions' | 'extraSigners'>
   ) => ReturnType<ObservableWallet['finalizeTx']>;
 } & WalletUtilContext;
+
+/**
+ * Properties needed by {@link buildTx} to build a {@link ObservableWalletTxBuilder} TxBuilder
+ *
+ * - {@link BuildTxProps.observableWallet} minimal ObservableWallet needed to do actions like {@link build()},
+ *   {@link delegate()} etc.
+ * - {@link BuildTxProps.outputValidator} optional custom output validator util.
+ *   Uses {@link createWalletUtil} by default.
+ */
+export interface BuildTxProps {
+  observableWallet: ObservableWalletTxBuilderDependencies;
+  outputValidator?: OutputValidator;
+  logger: Logger;
+}
 
 interface Delegate {
   type: 'delegate';
@@ -73,19 +88,14 @@ export class ObservableWalletTxBuilder implements TxBuilder {
   signingOptions?: SignTransactionOptions;
 
   #observableWallet: ObservableWalletTxBuilderDependencies;
-  #util: OutputValidator;
+  #outputValidator: OutputValidator;
   #delegateConfig: DelegateConfig;
+  #logger: Logger;
 
-  /**
-   * @param observableWallet minimal ObservableWallet needed to do actions like {@link build()}, {@link delegate()} etc.
-   * @param util optional custom output validator util. Uses {@link createWalletUtil} by default.
-   */
-  constructor(
-    observableWallet: ObservableWalletTxBuilderDependencies,
-    util: OutputValidator = createWalletUtil(observableWallet)
-  ) {
+  constructor({ observableWallet, outputValidator = createWalletUtil(observableWallet), logger }: BuildTxProps) {
     this.#observableWallet = observableWallet;
-    this.#util = util;
+    this.#outputValidator = outputValidator;
+    this.#logger = logger;
   }
 
   addOutput(txOut: Cardano.TxOut): TxBuilder {
@@ -102,7 +112,7 @@ export class ObservableWalletTxBuilder implements TxBuilder {
   }
 
   buildOutput(txOut?: PartialTxOut): OutputBuilder {
-    return new ObservableWalletTxOutputBuilder(this.#util, txOut);
+    return new ObservableWalletTxOutputBuilder({ outputValidator: this.#outputValidator, txOut });
   }
 
   delegate(poolId?: Cardano.PoolId): TxBuilder {
@@ -154,6 +164,7 @@ export class ObservableWalletTxBuilder implements TxBuilder {
       };
     } catch (error) {
       const errors = Array.isArray(error) ? (error as TxBodyValidationError[]) : [error as TxBodyValidationError];
+      this.#logger.debug('Build errors', errors);
       return {
         errors,
         isValid: false
@@ -190,15 +201,29 @@ export class ObservableWalletTxBuilder implements TxBuilder {
 
     for (const rewardAccount of rewardAccounts) {
       const stakeKeyHash = Cardano.Ed25519KeyHash.fromRewardAccount(rewardAccount.address);
-      if (this.#delegateConfig.type === 'deregister' && rewardAccount.keyStatus !== StakeKeyStatus.Unregistered) {
+      if (this.#delegateConfig.type === 'deregister') {
         // Deregister scenario
-        this.partialTxBody.certificates!.push({
-          __typename: Cardano.CertificateType.StakeKeyDeregistration,
-          stakeKeyHash
-        });
+        if (rewardAccount.keyStatus === StakeKeyStatus.Unregistered) {
+          this.#logger.warn(
+            'Skipping stake key deregister. Stake key not registered.',
+            rewardAccount.address,
+            rewardAccount.keyStatus
+          );
+        } else {
+          this.partialTxBody.certificates!.push({
+            __typename: Cardano.CertificateType.StakeKeyDeregistration,
+            stakeKeyHash
+          });
+        }
       } else if (this.#delegateConfig.type === 'delegate') {
         // Register and delegate scenario
-        if (rewardAccount.keyStatus === StakeKeyStatus.Unregistered) {
+        if (rewardAccount.keyStatus !== StakeKeyStatus.Unregistered) {
+          this.#logger.debug(
+            'Skipping stake key register. Stake key already registered',
+            rewardAccount.address,
+            rewardAccount.keyStatus
+          );
+        } else {
           this.partialTxBody.certificates!.push({
             __typename: Cardano.CertificateType.StakeKeyRegistration,
             stakeKeyHash
@@ -230,5 +255,4 @@ export class ObservableWalletTxBuilder implements TxBuilder {
  * `ObservableWallet.buildTx()` would be nice, but it adds quite a lot of complexity
  * to web-extension messaging, so it will be separate util like this one for MVP.
  */
-export const buildTx = (observableWallet: ObservableWalletTxBuilderDependencies, util?: OutputValidator): TxBuilder =>
-  new ObservableWalletTxBuilder(observableWallet, util);
+export const buildTx = (props: BuildTxProps): TxBuilder => new ObservableWalletTxBuilder(props);

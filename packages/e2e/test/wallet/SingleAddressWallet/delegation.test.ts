@@ -99,7 +99,7 @@ describe('SingleAddressWallet/delegation', () => {
     // Make a 1st tx with key registration (if not already registered) and stake delegation
     // Also send some coin to another wallet
     const destAddresses = (await firstValueFrom(destWallet.addresses$))[0].address;
-    const txBuilder = buildTx(sourceWallet);
+    const txBuilder = buildTx({ logger, observableWallet: sourceWallet });
 
     const tx = await txBuilder
       .addOutput(txBuilder.buildOutput().address(destAddresses).coin(tx1OutputCoins).toTxOut())
@@ -148,7 +148,7 @@ describe('SingleAddressWallet/delegation', () => {
     }
 
     // Make a 2nd tx with key deregistration
-    const txDeregister = await buildTx(sourceWallet).delegate().build();
+    const txDeregister = await buildTx({ logger, observableWallet: sourceWallet }).delegate().build();
     assertTxIsValid(txDeregister);
     const txDeregisterSigned = await txDeregister.sign();
     await txDeregisterSigned.submit();

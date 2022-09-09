@@ -1,6 +1,6 @@
 /* eslint-disable func-style */
 /* eslint-disable jsdoc/require-jsdoc */
-import { AssetId, somePartialStakePools } from '@cardano-sdk/util-dev';
+import { AssetId, logger, somePartialStakePools } from '@cardano-sdk/util-dev';
 import { Cardano } from '@cardano-sdk/core';
 import { of } from 'rxjs';
 
@@ -28,19 +28,19 @@ function assertObjectRefsAreDifferent(obj1: unknown, obj2: unknown): void {
 }
 
 describe('buildTx', () => {
-  let wallet: ObservableWallet;
+  let observableWallet: ObservableWallet;
   let txBuilder: TxBuilder;
   let output: Cardano.TxOut;
   let output2: Cardano.TxOut;
 
   beforeEach(async () => {
-    ({ wallet } = await createWallet());
+    ({ wallet: observableWallet } = await createWallet());
     output = mocks.utxo[0][1];
     output2 = mocks.utxo[1][1];
-    txBuilder = buildTx(wallet);
+    txBuilder = buildTx({ logger, observableWallet });
   });
 
-  afterEach(() => wallet.shutdown());
+  afterEach(() => observableWallet.shutdown());
 
   describe('addOutput', () => {
     it('can add output without mutating partialTxBody', () => {
@@ -169,8 +169,8 @@ describe('buildTx', () => {
     });
 
     it('uses signingOptions to finalize transaction when submitting', async () => {
-      const origFinalizeTx = wallet.finalizeTx;
-      wallet.finalizeTx = jest.fn(origFinalizeTx);
+      const origFinalizeTx = observableWallet.finalizeTx;
+      observableWallet.finalizeTx = jest.fn(origFinalizeTx);
 
       const tx = await txBuilder.addOutput(mocks.utxo[0][1]).setSigningOptions(signingOptions).build();
       assertTxIsValid(tx);
@@ -179,7 +179,7 @@ describe('buildTx', () => {
       expect(tx.signingOptions).toEqual(signingOptions);
 
       await (await tx.sign()).submit();
-      expect(wallet.finalizeTx).toHaveBeenLastCalledWith(expect.objectContaining({ signingOptions }));
+      expect(observableWallet.finalizeTx).toHaveBeenLastCalledWith(expect.objectContaining({ signingOptions }));
     });
   });
 
@@ -346,7 +346,7 @@ describe('buildTx', () => {
       expect(txBuilt.body.certificates?.length).toBe(2);
     });
 
-    it('adds both stake key and delegation certificates when reward account was not registered', async () => {
+    it('adds both stake key and delegation certificates when stake key was not registered', async () => {
       const txDelegate = await txBuilder.delegate(poolId).build();
       assertTxIsValid(txDelegate);
       const [stakeKeyCert, delegationCert] = txDelegate.body.certificates!;
@@ -370,7 +370,7 @@ describe('buildTx', () => {
     });
 
     it('throws IncompatibleWallet error if no reward accounts were found', async () => {
-      wallet.delegation.rewardAccounts$ = of([]);
+      observableWallet.delegation.rewardAccounts$ = of([]);
       const txBuilt = await txBuilder.delegate(poolId).build();
       if (!txBuilt.isValid) {
         expect(txBuilt.errors?.length).toBe(1);
@@ -379,8 +379,8 @@ describe('buildTx', () => {
       expect.assertions(2);
     });
 
-    it('adds only delegation certificate with correct poolId when reward account was already registered', async () => {
-      wallet.delegation.rewardAccounts$ = of([
+    it('adds only delegation certificate with correct poolId when stake key was already registered', async () => {
+      observableWallet.delegation.rewardAccounts$ = of([
         {
           address: Cardano.RewardAccount('stake_test1uqu7qkgf00zwqupzqfzdq87dahwntcznklhp3x30t3ukz6gswungn'),
           delegatee: {
@@ -404,7 +404,7 @@ describe('buildTx', () => {
     });
 
     it('adds multiple certificates when handling multiple reward accounts', async () => {
-      wallet.delegation.rewardAccounts$ = of([
+      observableWallet.delegation.rewardAccounts$ = of([
         {
           address: Cardano.RewardAccount('stake_test1uqu7qkgf00zwqupzqfzdq87dahwntcznklhp3x30t3ukz6gswungn'),
           delegatee: {
@@ -433,7 +433,7 @@ describe('buildTx', () => {
     });
 
     it('undefined poolId adds stake key deregister certificate if already registered', async () => {
-      wallet.delegation.rewardAccounts$ = of([
+      observableWallet.delegation.rewardAccounts$ = of([
         {
           address: Cardano.RewardAccount('stake_test1uqu7qkgf00zwqupzqfzdq87dahwntcznklhp3x30t3ukz6gswungn'),
           delegatee: {
@@ -460,7 +460,7 @@ describe('buildTx', () => {
   });
 
   it('can be used to build, sign and submit a tx', async () => {
-    const tx = await buildTx(wallet).addOutput(mocks.utxo[0][1]).build();
+    const tx = await buildTx({ logger, observableWallet }).addOutput(mocks.utxo[0][1]).build();
     if (tx.isValid) {
       const signedTx = await tx.sign();
       await signedTx.submit();
@@ -496,19 +496,15 @@ describe('buildTx', () => {
     };
 
     const mockValidator: OutputValidator = {
-      validateOutput: jest.fn(),
-      validateOutputs: jest.fn(() =>
-        Promise.resolve(
-          new Map([
-            [output, coinMissingValidation],
-            [output2, bundleSizeValidation]
-          ])
-        )
-      ),
+      validateOutput: jest
+        .fn()
+        .mockResolvedValueOnce(coinMissingValidation)
+        .mockResolvedValueOnce(bundleSizeValidation),
+      validateOutputs: jest.fn(),
       validateValue: jest.fn(),
       validateValues: jest.fn()
     };
-    const builder = buildTx(wallet, mockValidator).addOutput(output);
+    const builder = buildTx({ logger, observableWallet, outputValidator: mockValidator }).addOutput(output);
     const tx = await builder.addOutput(builder.buildOutput(output2).toTxOut()).build();
 
     expect(tx.isValid).toBeFalsy();

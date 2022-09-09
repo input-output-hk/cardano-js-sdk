@@ -11,6 +11,14 @@ import {
 import { OutputValidation } from '../types';
 import { OutputValidator } from '../services';
 
+/** Properties needed to construct an {@link ObservableWalletTxOutputBuilder} */
+export interface OutputBuilderProps {
+  /** This validator is normally created and passed as an arg here by the {@link TxBuilder.buildOutput} method */
+  outputValidator: OutputValidator;
+  /** Optional partial transaction output to use for initialization. */
+  txOut?: PartialTxOut;
+}
+
 /** Determines if the `PartialTxOut` arg have at least an address and coins. */
 const isViableTxOut = (txOut: PartialTxOut): txOut is Cardano.TxOut => !!(txOut?.address && txOut?.value?.coins);
 
@@ -31,22 +39,17 @@ const toOutputValidationError = (
 };
 
 /**
- * `OutputBuilder` implementation based on the minimal wallet type.
+ * `OutputBuilder` implementation based on the minimal wallet type: {@link ObservableWalletTxBuilderDependencies}.
  */
 export class ObservableWalletTxOutputBuilder implements OutputBuilder {
   /**
-   * Transaction output that is updated by `OutputBuilder` methods.
+   * Transaction output that is updated by `ObservableWalletTxOutputBuilder` methods.
    * Every method call recreates the `partialOutput`, thus updating it immutably.
    */
   #partialOutput: PartialTxOut;
   #outputValidator: OutputValidator;
 
-  /**
-   *
-   * @param outputValidator this validator is normally created and passed as an arg here, by the TxBuilder
-   * @param txOut optional partial transaction output to use for initialization.
-   */
-  constructor(outputValidator: OutputValidator, txOut?: PartialTxOut) {
+  constructor({ outputValidator, txOut }: OutputBuilderProps) {
     this.#partialOutput = { ...txOut };
     this.#outputValidator = outputValidator;
   }

@@ -66,9 +66,10 @@ export interface OutputBuilder {
    * Create transaction output snapshot, as it was configured until the point of calling this method.
    *
    * @returns {Cardano.TxOut} transaction output snapshot.
-   *  - It can be used in `TxBuilder.addOutput()`.
-   *  - It will be validated once `TxBuilder.build()` method is called.
-   * @throws {OutputValidationMissingRequiredError} if the mandatory fields 'address' or 'coins' are missing
+   *  - It can be used in {@link TxBuilder.addOutput}.
+   *  - It will be validated once {@link TxBuilder.build} method is called.
+   * @throws OutputValidationMissingRequiredError {@link OutputValidationMissingRequiredError} if
+   * the mandatory fields 'address' or 'coins' are missing
    */
   toTxOut(): Cardano.TxOut;
   /** Sets transaction output `value` field. Preexisting `value` is overwritten. */
