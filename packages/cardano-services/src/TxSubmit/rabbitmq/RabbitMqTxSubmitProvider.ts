@@ -8,7 +8,7 @@ import {
 } from '@cardano-sdk/core';
 import { Channel, Connection, connect } from 'amqplib';
 import { Logger } from 'ts-log';
-import { RunnableProvider } from '../../util';
+import { Runnable } from '../..';
 import { TX_SUBMISSION_QUEUE, getErrorPrototype, waitForPending } from './utils';
 import { fromSerializableObject, hexStringToBuffer } from '@cardano-sdk/util';
 
@@ -37,7 +37,7 @@ export interface RabbitMqTxSubmitProviderDependencies {
 /**
  * Connect to a [RabbitMQ](https://www.rabbitmq.com/) instance
  */
-export class RabbitMqTxSubmitProvider implements RunnableProvider, TxSubmitProvider {
+export class RabbitMqTxSubmitProvider implements Runnable, TxSubmitProvider {
   #channel?: Channel;
   #connection?: Connection;
   #queueWasCreated = false;

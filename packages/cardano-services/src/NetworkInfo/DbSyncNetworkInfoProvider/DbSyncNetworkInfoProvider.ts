@@ -17,7 +17,7 @@ import { Logger } from 'ts-log';
 import { NetworkInfoBuilder } from './NetworkInfoBuilder';
 import { NetworkInfoCacheKey } from '.';
 import { Pool } from 'pg';
-import { RunnableProvider } from '../../util';
+import { Runnable } from '../..';
 import { loadGenesisData, toGenesisParams, toLedgerTip, toSupply, toWalletProtocolParams } from './mappers';
 
 export interface NetworkInfoProviderProps {
@@ -30,7 +30,7 @@ export interface NetworkInfoProviderDependencies {
   cardanoNode: CardanoNode;
   epochMonitor: EpochMonitor;
 }
-export class DbSyncNetworkInfoProvider extends DbSyncProvider implements RunnableProvider, NetworkInfoProvider {
+export class DbSyncNetworkInfoProvider extends DbSyncProvider implements Runnable, NetworkInfoProvider {
   #logger: Logger;
   #cache: InMemoryCache;
   #builder: NetworkInfoBuilder;
