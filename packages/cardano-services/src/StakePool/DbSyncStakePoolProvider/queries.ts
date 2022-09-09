@@ -766,7 +766,7 @@ SELECT
 FROM (${query}) as query
 `;
 
-export const findPoolStats = `
+export const findPoolQty = `
 WITH current_epoch AS (
 	SELECT max(epoch_no) AS epoch_no 
 	FROM block
@@ -821,6 +821,114 @@ FROM last_pool_update AS pool_update
 LEFT JOIN last_pool_retire AS pool_retire 
 	ON pool_update.hash_id = pool_retire.hash_id`;
 
+const findActivePoolsAverages = `
+with last_epoch AS (
+	SELECT
+		no AS epoch_no,
+		(extract(epoch FROM (end_time - start_time)) * 1000) AS epoch_length
+	FROM epoch
+	ORDER BY id DESC
+	LIMIT 1
+),
+active_pools as (
+	select 
+		es.pool_id,
+		SUM(es.amount) AS amount
+	from epoch_stake es
+	join last_epoch ON last_epoch.epoch_no = es.epoch_no
+	GROUP BY es.pool_id
+),
+total_rewards AS (
+	select sum(reward.amount) as total_amount
+	from reward 
+	where reward.pool_id in (select pool_id from active_pools) and 
+		reward.spendable_epoch = (select epoch_no from last_epoch) and 
+		reward.type = 'member'
+),
+active_stake AS (
+	SELECT
+    SUM(amount) AS total_amount
+	FROM active_pools
+),
+epoch_rewards AS (
+	SELECT 
+		active_pools.pool_id AS hash_id,
+		COALESCE((SELECT total_amount FROM total_rewards), 0) AS total_rewards,
+		COALESCE((SELECT total_amount FROM active_stake), 0) AS active_stake,		
+		CASE 
+			WHEN pool.fixed_cost >= (SELECT total_amount FROM total_rewards)
+	    	THEN COALESCE((SELECT total_amount FROM total_rewards), 0)
+	    	ELSE (
+	      	COALESCE(
+	      		FLOOR((
+              (SELECT total_amount FROM total_rewards) - pool.fixed_cost) * pool.margin) + pool.fixed_cost
+	      	, 0)
+	    	) 
+		END AS operator_fees,
+		CASE 
+			WHEN COALESCE((SELECT total_amount FROM active_stake), 0) = 0
+				THEN 0
+			WHEN pool.fixed_cost >= (SELECT total_amount FROM total_rewards)
+		    THEN (
+		      COALESCE(
+		      	(pool.fixed_cost - COALESCE((SELECT total_amount FROM total_rewards), 0)) / 
+            (SELECT total_amount FROM active_stake)
+		      , 0)
+		    )
+		    ELSE (
+		      COALESCE(
+						((SELECT total_amount FROM total_rewards) - 
+							COALESCE(
+	      				FLOOR((
+                  (SELECT total_amount FROM total_rewards) - pool.fixed_cost) * pool.margin) + pool.fixed_cost
+	      			, 0)) / (SELECT total_amount FROM active_stake)
+		      , 0)
+		    ) END AS member_roi
+  FROM active_pools
+  JOIN pool_update AS pool
+    ON pool.id = (
+      SELECT id
+      FROM pool_update
+      WHERE hash_id = active_pools.pool_id 
+        AND active_epoch_no <= (SELECT epoch_no FROM last_epoch)
+      ORDER BY id DESC
+      LIMIT 1
+    )
+),
+avg_daily_roi AS (
+    SELECT 
+      hash_id,
+      SUM(COALESCE(member_roi / NULLIF((SELECT epoch_length FROM last_epoch) / 86400000, 0.0), 0.0)) 
+      / count(1) AS avg_roi
+    FROM epoch_rewards
+    GROUP BY hash_id
+  ),
+apy_average AS (
+  SELECT
+    SUM(POWER(
+      1 + (avg_daily_roi.avg_roi * ((SELECT epoch_length FROM last_epoch) / 86400000)), 
+      COALESCE(365 / NULLIF((SELECT epoch_length FROM last_epoch) / 86400000, 0), 0)
+    ) - 1)/(SELECT COUNT(1) FROM active_pools) AS apy_average
+  FROM avg_daily_roi
+),
+margin_average AS (
+	SELECT
+		coalesce(SUM(pool.margin),0)/(SELECT COUNT(1) FROM active_pools) AS margin_average
+	FROM active_pools 
+	JOIN pool_update AS pool
+  ON pool.id = (
+    SELECT id
+    FROM pool_update
+    WHERE hash_id = active_pools.pool_id 
+      AND active_epoch_no <= (SELECT epoch_no FROM last_epoch)
+    ORDER BY id DESC
+    LIMIT 1
+))
+select 
+	*
+from apy_average, margin_average;
+`;
+
 const sortFieldMapping: Record<string, { field: string; secondary?: string[] }> = {
   cost: { field: 'fixed_cost', secondary: ['margin'] },
   name: { field: "lower((pod.json -> 'name')::TEXT)" }
@@ -858,11 +966,12 @@ const Queries = {
   IDENTIFIER_QUERY,
   POOLS_WITH_PLEDGE_MET,
   STATUS_QUERY,
+  findActivePoolsAverages,
   findLastEpoch,
   findLastEpochWithData,
   findPoolAPY,
   findPoolEpochRewards,
-  findPoolStats,
+  findPoolQty,
   findPools,
   findPoolsData,
   findPoolsMetrics,

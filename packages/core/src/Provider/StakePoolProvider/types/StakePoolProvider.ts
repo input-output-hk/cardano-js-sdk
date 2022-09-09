@@ -58,6 +58,17 @@ export interface StakePoolSearchResults {
 }
 
 export interface StakePoolStats {
+  averages: {
+    /**
+     * Average margin of active stake pools in latest Epoch
+     */
+    margin: Cardano.Percent;
+    /**
+     * Average Annual Percentage Yield (APY)
+     * of active stake pools in latest epoch
+     */
+    apy: Cardano.Percent;
+  };
   qty: {
     active: number;
     retired: number;

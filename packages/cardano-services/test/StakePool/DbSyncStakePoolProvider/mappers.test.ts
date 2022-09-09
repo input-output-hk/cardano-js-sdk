@@ -407,7 +407,15 @@ describe('mappers', () => {
   });
 
   it('mapPoolStats', () => {
-    expect(mapPoolStats({ active: '20', retired: '0', retiring: '1' })).toEqual<StakePoolStats>({
+    const apyAverage = '0.00034';
+    const marginAverage = '00.1';
+    expect(
+      mapPoolStats({
+        averages: { apy_average: apyAverage, margin_average: marginAverage },
+        qty: { active: '20', retired: '0', retiring: '1' }
+      })
+    ).toEqual<StakePoolStats>({
+      averages: { apy: Number(apyAverage), margin: Number(marginAverage) },
       qty: { active: 20, retired: 0, retiring: 1 }
     });
   });

@@ -1518,6 +1518,10 @@ Array [
 
 exports[`StakePoolBuilder queryPoolStats returns active, retired and retiring pools count 1`] = `
 Object {
+  "averages": Object {
+    "apy": 0.0000158041676290942,
+    "margin": 0.000201057770545159,
+  },
   "qty": Object {
     "active": 8,
     "retired": 2,

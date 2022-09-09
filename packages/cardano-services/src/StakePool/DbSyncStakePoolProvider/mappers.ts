@@ -22,8 +22,9 @@ import {
   PoolUpdateModel,
   PoolsToCache,
   RelayModel,
+  StakePoolAveragesModel,
   StakePoolResults,
-  StakePoolStatsModel
+  StakePoolsQtyModel
 } from './types';
 import { bufferToHexString, isNotNil } from '@cardano-sdk/util';
 import { divideBigIntToFloat } from './util';
@@ -269,8 +270,15 @@ export const mapPoolMetrics = (poolMetricsModel: PoolMetricsModel): PoolMetrics 
   }
 });
 
-export const mapPoolStats = (poolStats: StakePoolStatsModel): StakePoolStats => ({
-  qty: { active: Number(poolStats.active), retired: Number(poolStats.retired), retiring: Number(poolStats.retiring) }
+export const mapPoolStats = ({
+  qty,
+  averages
+}: {
+  qty: StakePoolsQtyModel;
+  averages: StakePoolAveragesModel;
+}): StakePoolStats => ({
+  averages: { apy: Number(averages.apy_average), margin: Number(averages.margin_average) },
+  qty: { active: Number(qty.active), retired: Number(qty.retired), retiring: Number(qty.retiring) }
 });
 
 export const mapPoolAPY = (poolAPYModel: PoolAPYModel): PoolAPY => ({

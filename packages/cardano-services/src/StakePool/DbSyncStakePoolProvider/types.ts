@@ -150,10 +150,15 @@ export interface TotalCountModel {
   total_count: number;
 }
 
-export interface StakePoolStatsModel {
+export interface StakePoolsQtyModel {
   active: string;
   retired: string;
   retiring: string;
+}
+
+export interface StakePoolAveragesModel {
+  apy_average: string;
+  margin_average: string;
 }
 
 export interface PoolAPYModel {

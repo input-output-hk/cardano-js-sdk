@@ -17107,6 +17107,10 @@ Object {
 
 exports[`StakePoolHttpService healthy state /stats server and snapshot testing has active, retired and retiring stake pools count 1`] = `
 Object {
+  "averages": Object {
+    "apy": 0.0000158041676290942,
+    "margin": 0.000201057770545159,
+  },
   "qty": Object {
     "active": 8,
     "retired": 2,

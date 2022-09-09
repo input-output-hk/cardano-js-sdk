@@ -20,7 +20,7 @@ import {
   PoolRetirementModel,
   PoolUpdateModel,
   RelayModel,
-  StakePoolStatsModel,
+  StakePoolsQtyModel,
   SubQuery,
   TotalAdaModel,
   TotalCountModel
@@ -44,7 +44,7 @@ import Queries, {
   addSentenceToQuery,
   buildOrQueryFromClauses,
   findLastEpoch,
-  findPoolStats,
+  findPoolQty,
   getIdentifierFullJoinClause,
   getIdentifierWhereClause,
   getStatusWhereClause,
@@ -291,9 +291,13 @@ export class StakePoolBuilder {
 
   public async queryPoolStats(): Promise<StakePoolStats> {
     this.#logger.debug('About to get pool stats');
-    const result: QueryResult<StakePoolStatsModel> = await this.#db.query(findPoolStats);
-    const poolStats = result.rows[0];
-    if (!poolStats) throw new ProviderError(ProviderFailure.Unknown, null, "Couldn't fetch pool stats");
-    return mapPoolStats(poolStats);
+    const result: QueryResult<StakePoolsQtyModel> = await this.#db.query(findPoolQty);
+    const qty = result.rows[0];
+    if (!qty) throw new ProviderError(ProviderFailure.Unknown, null, "Couldn't fetch pool stats");
+    this.#logger.debug('About to get pool averages');
+    const averagesResult = await this.#db.query(Queries.findActivePoolsAverages);
+    const averages = averagesResult.rows[0];
+    if (!averages) throw new ProviderError(ProviderFailure.Unknown, null, "Couldn't fetch pools averages");
+    return mapPoolStats({ averages, qty });
   }
 }

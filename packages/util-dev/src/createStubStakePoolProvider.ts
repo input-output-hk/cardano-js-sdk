@@ -66,6 +66,10 @@ export const createStubStakePoolProvider = (
   stakePoolStats: async () => {
     if (delayMs) await delay(delayMs);
     return {
+      averages: {
+        apy: 0.000_015,
+        margin: 0.0002
+      },
       qty: {
         active: stakePools.filter((pool) => pool.status === Cardano.StakePoolStatus.Active).length,
         retired: stakePools.filter((pool) => pool.status === Cardano.StakePoolStatus.Retired).length,
