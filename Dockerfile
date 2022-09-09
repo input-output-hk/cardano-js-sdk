@@ -43,8 +43,6 @@ COPY --from=cardano-services-builder /app/packages/core/dist /app/packages/core/
 COPY --from=cardano-services-builder /app/packages/core/package.json /app/packages/core/package.json
 COPY --from=cardano-services-builder /app/packages/ogmios/dist /app/packages/ogmios/dist
 COPY --from=cardano-services-builder /app/packages/ogmios/package.json /app/packages/ogmios/package.json
-COPY --from=cardano-services-builder /app/packages/rabbitmq/dist /app/packages/rabbitmq/dist
-COPY --from=cardano-services-builder /app/packages/rabbitmq/package.json /app/packages/rabbitmq/package.json
 COPY --from=cardano-services-builder /app/packages/util/dist /app/packages/util/dist
 COPY --from=cardano-services-builder /app/packages/util/package.json /app/packages/util/package.json
 

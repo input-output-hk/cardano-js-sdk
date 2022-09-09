@@ -1,12 +1,12 @@
 /* eslint-disable max-statements */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as mocks from '../mocks';
+import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider, somePartialStakePools } from '@cardano-sdk/util-dev';
 import { Cardano, ChainHistoryProvider, NetworkInfoProvider, RewardsProvider, UtxoProvider } from '@cardano-sdk/core';
 import {
   ConnectionStatus,
   ConnectionStatusTracker,
-  KeyManagement,
   ObservableWallet,
   PollingConfig,
   SingleAddressWallet,
@@ -16,6 +16,7 @@ import { ReplaySubject, firstValueFrom } from 'rxjs';
 import { WalletStores, createInMemoryWalletStores } from '../../src/persistence';
 import { currentEpoch, networkInfo, queryTransactionsResult, queryTransactionsResult2 } from '../mocks';
 import { dummyLogger as logger } from 'ts-log';
+import { testAsyncKeyAgent } from '../../../key-management/test/mocks';
 import { waitForWalletStateSettle } from '../util';
 import delay from 'delay';
 import flatten from 'lodash/flatten';
@@ -35,15 +36,15 @@ interface Providers {
 const createWallet = async (stores: WalletStores, providers: Providers, pollingConfig?: PollingConfig) => {
   const { wallet } = await setupWallet({
     createKeyAgent: async (dependencies) => {
-      const groupedAddress: KeyManagement.GroupedAddress = {
+      const groupedAddress: GroupedAddress = {
         accountIndex: 0,
         address,
         index: 0,
         networkId: Cardano.NetworkId.testnet,
         rewardAccount,
-        type: KeyManagement.AddressType.External
+        type: AddressType.External
       };
-      const asyncKeyAgent = await mocks.testAsyncKeyAgent([groupedAddress], dependencies);
+      const asyncKeyAgent = await testAsyncKeyAgent([groupedAddress], dependencies);
       asyncKeyAgent.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
       return asyncKeyAgent;
     },

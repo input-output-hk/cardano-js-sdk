@@ -3,7 +3,6 @@ import * as envalid from 'envalid';
 export const env = envalid.cleanEnv(process.env, {
   ASSET_PROVIDER: envalid.str(),
   ASSET_PROVIDER_PARAMS: envalid.json({ default: {} }),
-  BLOCKFROST_API_KEY: envalid.str(),
   CHAIN_HISTORY_PROVIDER: envalid.str(),
   CHAIN_HISTORY_PROVIDER_PARAMS: envalid.json({ default: {} }),
   KEY_MANAGEMENT_PARAMS: envalid.json({ default: {} }),

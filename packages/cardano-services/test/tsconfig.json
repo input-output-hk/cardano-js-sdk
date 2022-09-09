@@ -7,8 +7,7 @@
     "./**/*.ts",
     "../../cip2/test/util",
     "../../core/test/CardanoNode",
-    "../../ogmios/test/mocks",
-    "../../rabbitmq/test"
+    "../../ogmios/test/mocks"
   ],
   "references": [
     {
@@ -28,9 +27,6 @@
     },
     {
       "path": "../../ogmios/src"
-    },
-    {
-      "path": "../../rabbitmq/src"
     },
     {
       "path": "../../cip2/src"

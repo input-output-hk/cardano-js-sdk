@@ -25,7 +25,7 @@ export const createNonBackgroundMessenger = (
   let reconnectTimeout: any;
   let delay = initialDelay;
   let isDestroyed = false;
-  const port$ = new BehaviorSubject<MessengerPort | null | 'destroyed'>(null);
+  const port$ = new BehaviorSubject<MessengerPort | null | 'shutdown'>(null);
   // Originally this was a 'new Subject()', but there seems to be a race between
   // - when it receives a value from 'onMessage'
   // - when message$ is subscribed to through `remoteApi`
@@ -55,7 +55,7 @@ export const createNonBackgroundMessenger = (
     logger.debug(`[NonBackgroundMessenger(${channel})] disconnected`);
     port!.onMessage.removeListener(onMessage);
     port!.onDisconnect.removeListener(onDisconnect);
-    port$.next(isDestroyed ? 'destroyed' : null);
+    port$.next(isDestroyed ? 'shutdown' : null);
     if (!isDestroyed) reconnect();
   };
   connect();
@@ -79,23 +79,9 @@ export const createNonBackgroundMessenger = (
       derivedMessengers.add(messenger);
       return messenger;
     },
-    destroy() {
-      isDestroyed = true;
-      const port = port$.value;
-      if (typeof port !== 'string') {
-        port?.disconnect();
-      }
-      clearTimeout(reconnectTimeout);
-      for (const messenger of derivedMessengers.values()) {
-        messenger.destroy();
-        derivedMessengers.delete(messenger);
-      }
-      port$.complete();
-      logger.warn(`[NonBackgroundMessenger(${channel})] destroyed`);
-    },
     message$,
     /**
-     * @throws RxJS EmptyError if client is destroyed
+     * @throws RxJS EmptyError if client is shutdown
      */
     postMessage(message: unknown): Observable<void> {
       return connect$.pipe(
@@ -104,6 +90,21 @@ export const createNonBackgroundMessenger = (
         tap((port) => port.postMessage(message)),
         map(() => void 0)
       );
+    },
+
+    shutdown() {
+      isDestroyed = true;
+      const port = port$.value;
+      if (typeof port !== 'string') {
+        port?.disconnect();
+      }
+      clearTimeout(reconnectTimeout);
+      for (const messenger of derivedMessengers.values()) {
+        messenger.shutdown();
+        derivedMessengers.delete(messenger);
+      }
+      port$.complete();
+      logger.warn(`[NonBackgroundMessenger(${channel})] shutdown`);
     }
   };
 };

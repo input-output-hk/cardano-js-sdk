@@ -1,14 +1,22 @@
 import * as mocks from '../mocks';
+import {
+  AddressType,
+  CommunicationType,
+  GroupedAddress,
+  LedgerKeyAgent,
+  LedgerTransportType,
+  SerializableLedgerKeyAgentData,
+  util
+} from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { Cardano } from '@cardano-sdk/core';
-import { CommunicationType, LedgerTransportType } from '../../src/KeyManagement/types';
-import { KeyManagement, SingleAddressWallet, setupWallet } from '../../src';
+import { SingleAddressWallet, setupWallet } from '../../src';
 import { dummyLogger as logger } from 'ts-log';
-import { mockKeyAgentDependencies } from '../mocks';
+import { mockKeyAgentDependencies } from '../../../key-management/test/mocks';
 import DeviceConnection from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
 describe('LedgerKeyAgent', () => {
-  let keyAgent: KeyManagement.LedgerKeyAgent;
+  let keyAgent: LedgerKeyAgent;
   const address = mocks.utxo[0][0].address;
   let txSubmitProvider: mocks.TxSubmitProviderStub;
   let wallet: SingleAddressWallet;
@@ -17,7 +25,7 @@ describe('LedgerKeyAgent', () => {
     txSubmitProvider = mocks.mockTxSubmitProvider();
     ({ keyAgent, wallet } = await setupWallet({
       createKeyAgent: async (dependencies) => {
-        const ledgerKeyAgent = await KeyManagement.LedgerKeyAgent.createWithDevice(
+        const ledgerKeyAgent = await LedgerKeyAgent.createWithDevice(
           {
             communicationType: CommunicationType.Node,
             networkId: Cardano.NetworkId.testnet,
@@ -25,13 +33,13 @@ describe('LedgerKeyAgent', () => {
           },
           dependencies
         );
-        const groupedAddress: KeyManagement.GroupedAddress = {
+        const groupedAddress: GroupedAddress = {
           accountIndex: 0,
           address,
           index: 0,
           networkId: Cardano.NetworkId.testnet,
           rewardAccount: mocks.rewardAccount,
-          type: KeyManagement.AddressType.External
+          type: AddressType.External
         };
         ledgerKeyAgent.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
         ledgerKeyAgent.knownAddresses.push(groupedAddress);
@@ -44,7 +52,7 @@ describe('LedgerKeyAgent', () => {
         const utxoProvider = mocks.mockUtxoProvider();
         const rewardsProvider = mocks.mockRewardsProvider();
         const chainHistoryProvider = mocks.mockChainHistoryProvider();
-        const asyncKeyAgent = KeyManagement.util.createAsyncKeyAgent(ledgerKeyAgent);
+        const asyncKeyAgent = util.createAsyncKeyAgent(ledgerKeyAgent);
         return new SingleAddressWallet(
           { name: 'HW Wallet' },
           {
@@ -66,7 +74,7 @@ describe('LedgerKeyAgent', () => {
   afterAll(() => wallet.shutdown());
 
   it('can be created with any account index', async () => {
-    const ledgerKeyAgentWithRandomIndex = await KeyManagement.LedgerKeyAgent.createWithDevice(
+    const ledgerKeyAgentWithRandomIndex = await LedgerKeyAgent.createWithDevice(
       {
         accountIndex: 5,
         communicationType: CommunicationType.Node,
@@ -76,7 +84,7 @@ describe('LedgerKeyAgent', () => {
       },
       mockKeyAgentDependencies()
     );
-    expect(ledgerKeyAgentWithRandomIndex).toBeInstanceOf(KeyManagement.LedgerKeyAgent);
+    expect(ledgerKeyAgentWithRandomIndex).toBeInstanceOf(LedgerKeyAgent);
     expect(ledgerKeyAgentWithRandomIndex.accountIndex).toEqual(5);
     expect(ledgerKeyAgentWithRandomIndex.extendedAccountPublicKey).not.toEqual(keyAgent.extendedAccountPublicKey);
   });
@@ -137,11 +145,11 @@ describe('LedgerKeyAgent', () => {
       if (keyAgent.deviceConnection) {
         keyAgent.deviceConnection.transport.close();
       }
-      deviceConnection = await KeyManagement.LedgerKeyAgent.establishDeviceConnection(CommunicationType.Node);
+      deviceConnection = await LedgerKeyAgent.establishDeviceConnection(CommunicationType.Node);
     });
 
     it('can check active device connection', async () => {
-      const activeDeviceConnection = await KeyManagement.LedgerKeyAgent.checkDeviceConnection(
+      const activeDeviceConnection = await LedgerKeyAgent.checkDeviceConnection(
         CommunicationType.Node,
         deviceConnection
       );
@@ -154,7 +162,7 @@ describe('LedgerKeyAgent', () => {
       if (deviceConnection) {
         deviceConnection.transport.close();
       }
-      const activeDeviceConnection = await KeyManagement.LedgerKeyAgent.checkDeviceConnection(CommunicationType.Node);
+      const activeDeviceConnection = await LedgerKeyAgent.checkDeviceConnection(CommunicationType.Node);
       expect(activeDeviceConnection).toBeDefined();
       expect(typeof activeDeviceConnection).toBe('object');
       activeDeviceConnection.transport.close();
@@ -164,13 +172,13 @@ describe('LedgerKeyAgent', () => {
   describe('create device connection with transport', () => {
     let transport: LedgerTransportType;
     beforeAll(async () => {
-      transport = await KeyManagement.LedgerKeyAgent.createTransport({
+      transport = await LedgerKeyAgent.createTransport({
         communicationType: CommunicationType.Node
       });
     });
 
     it('can create device connection with activeTransport', async () => {
-      const activeDeviceConnection = await KeyManagement.LedgerKeyAgent.createDeviceConnection(transport);
+      const activeDeviceConnection = await LedgerKeyAgent.createDeviceConnection(transport);
       expect(activeDeviceConnection).toBeDefined();
       expect(typeof activeDeviceConnection).toBe('object');
       activeDeviceConnection.transport.close();
@@ -178,10 +186,10 @@ describe('LedgerKeyAgent', () => {
   });
 
   describe('serializableData', () => {
-    let serializableData: KeyManagement.SerializableLedgerKeyAgentData;
+    let serializableData: SerializableLedgerKeyAgentData;
 
     beforeEach(() => {
-      serializableData = keyAgent.serializableData as KeyManagement.SerializableLedgerKeyAgentData;
+      serializableData = keyAgent.serializableData as SerializableLedgerKeyAgentData;
     });
 
     it('all fields are of correct types', () => {

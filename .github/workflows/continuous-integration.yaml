@@ -36,33 +36,37 @@ jobs:
         yarn build
         yarn lint
 
+    - name: 🌐 Setup local test network
+      working-directory: packages/e2e
+      run: |
+        yarn local-network:up -d
+      env:
+        POSTGRES_PORT: '5435'
+        OGMIOS_PORT: '1340'
+        OGMIOS_URL: 'ws://cardano-node-ogmios:1340'
+
     - name: 🔬 Test
       run: |
         yarn test:build:verify
         yarn test
 
-    - name: 📦 Pack
+    - name: 🔬 Test - e2e
       run: |
-        ./scripts/pack.sh
-
-    - name: 📤 Upload npm packages
-      uses: actions/upload-artifact@v3
-      with:
-        name: cardano-js-sdk-packages
-        path: ./cardano-sdk-*-${{ steps.package-version.outputs.current-version}}.tgz
-          
-    - name: 📦 Package Golden Test Generator
-      working-directory: packages/golden-test-generator
-      run: yarn pkg
-
-    - name: 📤 Upload Golden Test Generator exe - Linux
-      uses: actions/upload-artifact@v3
-      with:
-        name: golden-test-generator-linux
-        path: ./packages/golden-test-generator/build/golden-test-generator-linux
-
-    - name: 📤 Upload Golden Test Generator exe - macOS
-      uses: actions/upload-artifact@v3
-      with:
-        name: golden-test-generator-macos
-        path: ./packages/golden-test-generator/build/golden-test-generator-macos
+        yarn workspace @cardano-sdk/e2e test:wallet
+      env:
+        KEY_MANAGEMENT_PROVIDER: 'inMemory'
+        KEY_MANAGEMENT_PARAMS: '{"accountIndex": 0, "networkId": 0, "password":"some_password","mnemonic":"vacant violin soft weird deliver render brief always monitor general maid smart jelly core drastic erode echo there clump dizzy card filter option defense"}'
+        ASSET_PROVIDER: 'http'
+        ASSET_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/asset"}'
+        CHAIN_HISTORY_PROVIDER: 'http'
+        CHAIN_HISTORY_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/chain-history"}'
+        NETWORK_INFO_PROVIDER: 'http'
+        NETWORK_INFO_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/network-info"}'
+        REWARDS_PROVIDER: 'http'
+        REWARDS_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/rewards"}'
+        TX_SUBMIT_PROVIDER: 'http'
+        TX_SUBMIT_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/tx-submit"}'
+        UTXO_PROVIDER: 'http'
+        UTXO_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/utxo"}'
+        STAKE_POOL_PROVIDER: 'http'
+        STAKE_POOL_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/stake-pool"}'

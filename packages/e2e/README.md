@@ -122,7 +122,7 @@ ASSET_PROVIDER=blockfrost
 CHAIN_HISTORY_PROVIDER=blockfrost
 ```
 
-> :information_source: Remember to get your Blockfrost API key at [blockfrost.io](https://blockfrost.io/) and set it in the configuration file, the API key displayed here is invalid and for demonstration purposes only.
+> :information_source: If you are using blockfrost providers, remember to get your Blockfrost API key at [blockfrost.io](https://blockfrost.io/) and set it in the configuration file.
 
 Then to run the Blockforst test run:
 
@@ -130,53 +130,55 @@ Then to run the Blockforst test run:
 $ yarn workspace @cardano-sdk/e2e test:blockfrost
 ```
 
-## Cardano Services
+## Load Testing
 
-Cardano services end to end test perform load testing. Please note that you must have several services up before executing the test, to start the environment(from the root):
+Cardano services end to end load tests. Please note that you must have several services up before executing the test, to start the environment(from the root):
 
 ```bash
 $ cd packages/cardano-services
-$ yarn testnet:up
+$ yarn preview:up
 ```
 
 Once your environment is synced up, in a different terminal you can proceed to run the test, this is an example of the configuration you may need:
 
 ```
 # Logger
-LOGGER_MIN_SEVERITY=debug
-
-# Blockfrost secrets
-BLOCKFROST_API_KEY=testnetSOMEAPIKEY
+LOGGER_MIN_SEVERITY=info
 
 # Providers setup
 KEY_MANAGEMENT_PROVIDER=inMemory
-KEY_MANAGEMENT_PARAMS='{"accountIndex": 0, "networkId": 0, "password":"some_password","mnemonic":"run yarn workspace @cardano-sdk/e2e generate-mnemonics to generate your own"}'
-ASSET_PROVIDER=blockfrost
-CHAIN_HISTORY_PROVIDER=blockfrost
-NETWORK_INFO_PROVIDER=blockfrost
-REWARDS_PROVIDER=blockfrost
+KEY_MANAGEMENT_PARAMS='{"accountIndex": 0, "networkId": 0, "password":"some_password","mnemonic":"vacant violin soft weird deliver render brief always monitor general maid smart jelly core drastic erode echo there clump dizzy card filter option defense"}'
+ASSET_PROVIDER=http
+ASSET_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000/asset"}'
+CHAIN_HISTORY_PROVIDER=http
+CHAIN_HISTORY_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000/chain-history"}'
+NETWORK_INFO_PROVIDER=http
+NETWORK_INFO_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000/network-info"}'
+REWARDS_PROVIDER=http
+REWARDS_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000/rewards"}'
 TX_SUBMIT_PROVIDER=http
-TX_SUBMIT_PROVIDER_PARAMS='{"baseUrl": "http://localhost:3456/tx-submit"}'
-UTXO_PROVIDER=blockfrost
-WALLET_PROVIDER=blockfrost
-STAKE_POOL_PROVIDER=stub
+TX_SUBMIT_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000/tx-submit"}'
+UTXO_PROVIDER=http
+UTXO_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000/utxo"}'
+STAKE_POOL_PROVIDER=http
+STAKE_POOL_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000/stake-pool"}'
 
 # Test Parameters
-OGMIOS_URL=ws://localhost:1338
-TX_SUBMIT_HTTP_URL=http://localhost:3456/tx-submit
-RABBITMQ_URL=amqp://localhost
+OGMIOS_URL=ws://localhost:1340
+TX_SUBMIT_HTTP_URL=http://localhost:5001/tx-submit
 TRANSACTIONS_NUMBER=10
 START_LOCAL_HTTP_SERVER=true
 WORKER_PARALLEL_TRANSACTION=3
+
 ```
-> :information_source: Remember to get your Blockfrost API key at [blockfrost.io](https://blockfrost.io/) and set it in the configuration file, the API key displayed here is invalid and for demonstration purposes only.
+> :information_source: If you are using blockfrost providers, remember to get your Blockfrost API key at [blockfrost.io](https://blockfrost.io/) and set it in the configuration file.
 
 > :information_source: Remember to use a wallet with enough funds to carry out transactions (see [here](#generate_wallet)).
 
 To execute the test:
 
 ```bash
-$ yarn workspace @cardano-sdk/e2e test:cardano-services
+$ yarn workspace @cardano-sdk/e2e test:load-testing
 ```
 
 ## Local Network
@@ -228,26 +230,26 @@ Since the wallet test interacts with most of the providers, you need to make sur
 # Logger
 LOGGER_MIN_SEVERITY=debug
 
-# Blockfrost secrets
-BLOCKFROST_API_KEY=testnetSOMEAPIKEY
-
 # Providers setup
 KEY_MANAGEMENT_PROVIDER=inMemory
-KEY_MANAGEMENT_PARAMS='{"accountIndex": 0, "networkId": 0, "password":"some_password","mnemonic":"run yarn workspace @cardano-sdk/e2e generate-mnemonics to generate your own"}'
-ASSET_PROVIDER=blockfrost
-CHAIN_HISTORY_PROVIDER=blockfrost
-NETWORK_INFO_PROVIDER=blockfrost
-REWARDS_PROVIDER=blockfrost
-TX_SUBMIT_PROVIDER=blockfrost
-UTXO_PROVIDER=blockfrost
-WALLET_PROVIDER=blockfrost
-STAKE_POOL_PROVIDER=stub
+KEY_MANAGEMENT_PARAMS='{"accountIndex": 0, "networkId": 0, "password":"some_password","mnemonic":"vacant violin soft weird deliver render brief always monitor general maid smart jelly core drastic erode echo there clump dizzy card filter option defense"}'
+ASSET_PROVIDER=http
+ASSET_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000/asset"}'
+CHAIN_HISTORY_PROVIDER=http
+CHAIN_HISTORY_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000/chain-history"}'
+NETWORK_INFO_PROVIDER=http
+NETWORK_INFO_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000/network-info"}'
+REWARDS_PROVIDER=http
+REWARDS_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000/rewards"}'
+TX_SUBMIT_PROVIDER=http
+TX_SUBMIT_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000/tx-submit"}'
+UTXO_PROVIDER=http
+UTXO_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000/utxo"}'
+STAKE_POOL_PROVIDER=http
+STAKE_POOL_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000/stake-pool"}'
 
-# Test Params
-POOL_ID_1=pool1euf2nh92ehqfw7rpd4s9qgq34z8dg4pvfqhjmhggmzk95gcd402
-POOL_ID_2=pool1fghrkl620rl3g54ezv56weeuwlyce2tdannm2hphs62syf3vyyh
 ```
-> :information_source: Remember to get your Blockfrost API key at [blockfrost.io](https://blockfrost.io/) and set it in the configuration file, the API key displayed here is invalid and for demonstration purposes only.
+> :information_source: If you are using blockfrost providers, remember to get your Blockfrost API key at [blockfrost.io](https://blockfrost.io/) and set it in the configuration file.
 
 > :information_source: Remember to use a wallet with enough funds to carry out transactions (see [here](#generate_wallet)).
 
@@ -286,7 +288,7 @@ BLOCKFROST_API_KEY=someAPIKEY
 NETWORK_ID=0
 MNEMONIC_WORDS="vacant violin soft weird deliver render brief always monitor general maid smart jelly core drastic erode echo there clump dizzy card filter option defense"
 ```
-> :information_source: Remember to get your Blockfrost API key at [blockfrost.io](https://blockfrost.io/) and set it in the configuration file, the API key displayed here is invalid and for demonstration purposes only.
+> :information_source: If you are using blockfrost providers, remember to get your Blockfrost API key at [blockfrost.io](https://blockfrost.io/) and set it in the configuration file.
 
 Then to run the web-extension tests run:
 

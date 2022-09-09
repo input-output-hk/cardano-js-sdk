@@ -17,6 +17,8 @@ A suite of TypeScript packages suitable for both Node.js and browser-based devel
 - [@cardano-sdk/core](./packages/core)
 - [@cardano-sdk/cip2](./packages/cip2)
 - [@cardano-sdk/cip30](./packages/cip30)
+- [@cardano-sdk/governance](./packages/governance)
+- [@cardano-sdk/key-management](./packages/key-management)
 - [@cardano-sdk/web-extension](./packages/web-extension)
 - [@cardano-sdk/wallet](./packages/wallet)
 - [@cardano-sdk/util-rxjs](./packages/util-rxjs)
@@ -109,22 +111,6 @@ yarn cleanup
 ```console
 yarn docs
 ```
-
-## Maintenance
-
-### Bump Version
-
-```console
-yarn bump-version
-```
-
-Then update the sibling dependencies manually.
-
-### New package checklist
-
-1. Extend packageMap in [.versionrc.js](./.versionrc.js)
-2. Extend [pack.sh](./scripts/pack.sh)
-3. Extend [publish.sh](./scripts/publish.sh)
 
 <p align="center">
   <a href="https://input-output-hk.github.io/cardano-js-sdk">:book: Documentation</a>

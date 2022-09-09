@@ -1,11 +1,11 @@
 /* eslint-disable sonarjs/no-identical-functions */
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable max-len */
-import { BAD_CONNECTION_URL } from '../../rabbitmq/test/utils';
+import { BAD_CONNECTION_URL } from './TxSubmit/rabbitmq/utils';
 import { ChildProcess, fork } from 'child_process';
 import { HealthCheckResponse } from '@cardano-sdk/core';
 import { Ogmios } from '@cardano-sdk/ogmios';
-import { RabbitMQContainer } from '../../rabbitmq/test/docker';
+import { RabbitMQContainer } from './TxSubmit/rabbitmq/docker';
 import { ServiceNames } from '../src';
 import { createHealthyMockOgmiosServer, createUnhealthyMockOgmiosServer, ogmiosServerReady, serverReady } from './util';
 import { fromSerializableObject } from '@cardano-sdk/util';

@@ -13,11 +13,11 @@ import {
   TxSignErrorCode,
   WalletApi
 } from '@cardano-sdk/cip30';
-import { AuthenticationError } from './KeyManagement/errors';
 import { CSL, Cardano, coreToCsl, cslToCore } from '@cardano-sdk/core';
 import { InputSelectionError } from '@cardano-sdk/cip2';
 import { Logger } from 'ts-log';
 import { ObservableWallet } from './types';
+import { errors } from '@cardano-sdk/key-management';
 import { firstValueFrom } from 'rxjs';
 
 export type Cip30WalletDependencies = {
@@ -260,7 +260,7 @@ export const createWalletApi = (
       } catch (error) {
         logger.error(error);
         // TODO: handle ProofGeneration errors?
-        const message = error instanceof AuthenticationError ? error.message : 'Nope';
+        const message = error instanceof errors.AuthenticationError ? error.message : 'Nope';
         throw new TxSignError(TxSignErrorCode.UserDeclined, message);
       }
     } else {

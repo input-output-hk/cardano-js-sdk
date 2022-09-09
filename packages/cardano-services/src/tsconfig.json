@@ -11,9 +11,6 @@
       "path": "../../ogmios/src"
     },
     {
-      "path": "../../rabbitmq/src"
-    },
-    {
       "path": "../../util/src"
     }
   ]

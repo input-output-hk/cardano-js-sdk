@@ -6,7 +6,7 @@ import { InitializeTxProps, InitializeTxResult, SingleAddressWallet, cip30 } fro
 import { createWallet } from './util';
 import { firstValueFrom } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
-import { utxo as mockedUtxo, networkId, utxosWithLowCoins } from '../mocks';
+import { utxo as mockedUtxo, utxosWithLowCoins } from '../mocks';
 import { waitForWalletStateSettle } from '../util';
 
 const createWalletAndApiWithStores = async (utxos: Cardano.Utxo[]) => {
@@ -49,7 +49,7 @@ describe('cip30', () => {
   describe('createWalletApi', () => {
     test('api.getNetworkId', async () => {
       const cip30NetworkId = await api.getNetworkId();
-      expect(cip30NetworkId).toEqual(networkId);
+      expect(cip30NetworkId).toEqual(Cardano.NetworkId.testnet);
     });
 
     test('api.getUtxos', async () => {

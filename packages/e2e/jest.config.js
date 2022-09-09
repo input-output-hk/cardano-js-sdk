@@ -29,10 +29,10 @@ module.exports = {
       }
     },
     {
-      displayName: 'cardano-services',
+      displayName: 'load-testing',
       preset: 'ts-jest',
       setupFiles: ['dotenv/config'],
-      testMatch: ['<rootDir>/test/cardano-services/**/*.test.ts'],
+      testMatch: ['<rootDir>/test/load-testing/**/*.test.ts'],
       transform: {
         '^.+\\.test.ts?$': 'ts-jest'
       }

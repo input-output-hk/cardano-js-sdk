@@ -1,15 +1,9 @@
+import { Address, Cardano, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
 import { BigIntMath } from '@cardano-sdk/util';
-import { Cardano, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
 import { Observable, firstValueFrom } from 'rxjs';
 import { OutputValidation } from '../types';
 import { computeMinimumCoinQuantity, tokenBundleSizeExceedsLimit } from '@cardano-sdk/cip2';
 import { txInEquals } from './util';
-
-/**
- * @param txIn transaction input to resolve address from
- * @returns input owner address
- */
-export type ResolveInputAddress = (txIn: Cardano.NewTxIn) => Promise<Cardano.Address | null>;
 
 export type ProtocolParametersRequiredByOutputValidator = Pick<
   ProtocolParametersRequiredByWallet,
@@ -56,10 +50,6 @@ export interface OutputValidator {
    * @returns For every output, validates that token bundle size is within limits and computes minimum coin quantity
    */
   validateOutputs(outputs: Iterable<Cardano.TxOut>): Promise<Map<Cardano.TxOut, OutputValidation>>;
-}
-
-export interface InputResolver {
-  resolveInputAddress: ResolveInputAddress;
 }
 
 export const createOutputValidator = ({ protocolParameters$ }: OutputValidatorContext): OutputValidator => {
@@ -115,7 +105,7 @@ export const createOutputValidator = ({ protocolParameters$ }: OutputValidatorCo
   };
 };
 
-export const createInputResolver = ({ utxo }: InputResolverContext): InputResolver => ({
+export const createInputResolver = ({ utxo }: InputResolverContext): Address.util.InputResolver => ({
   async resolveInputAddress(input: Cardano.NewTxIn) {
     const utxoAvailable = await firstValueFrom(utxo.available$);
     return utxoAvailable?.find(([txIn]) => txInEquals(txIn, input))?.[1].address || null;

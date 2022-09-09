@@ -1,4 +1,4 @@
-import { Address, TxAlonzo, TxIn } from '../Cardano';
+import { Address, NewTxIn, TxAlonzo, TxIn } from '../Cardano';
 import { parseCslAddress } from '../CSL';
 
 /**
@@ -22,3 +22,13 @@ export const isAddressWithin =
  */
 export const inputsWithAddresses = (tx: TxAlonzo, ownAddresses: Address[]): TxIn[] =>
   tx.body.inputs.filter(isAddressWithin(ownAddresses));
+
+/**
+ * @param txIn transaction input to resolve address from
+ * @returns input owner address
+ */
+export type ResolveInputAddress = (txIn: NewTxIn) => Promise<Address | null>;
+
+export interface InputResolver {
+  resolveInputAddress: ResolveInputAddress;
+}

@@ -2,8 +2,8 @@
 /* eslint-disable unicorn/consistent-function-scoping */
 import * as mocks from '../mocks';
 import { Cardano, coreToCsl } from '@cardano-sdk/core';
+import { GroupedAddress } from '@cardano-sdk/key-management';
 import {
-  KeyManagement,
   ObservableWallet,
   OutputValidator,
   ProtocolParametersRequiredByOutputValidator,
@@ -17,6 +17,7 @@ import { RetryBackoffConfig } from 'backoff-rxjs';
 import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { dummyLogger as logger } from 'ts-log';
 import { of, timer } from 'rxjs';
+import { testAsyncKeyAgent } from '../../../key-management/test/mocks';
 
 describe('CustomObservableWallet', () => {
   describe('can create an application-specific subset of ObservableWallet interface', () => {
@@ -49,7 +50,7 @@ describe('CustomObservableWallet', () => {
         {
           assetProvider: mocks.mockAssetProvider(),
           chainHistoryProvider: mocks.mockChainHistoryProvider(),
-          keyAgent: await mocks.testAsyncKeyAgent(),
+          keyAgent: await testAsyncKeyAgent(),
           logger,
           networkInfoProvider: mocks.mockNetworkInfoProvider(),
           rewardsProvider: mocks.mockRewardsProvider(),
@@ -65,7 +66,7 @@ describe('CustomObservableWallet', () => {
       // let's say we have an API endpoint to submit transaction as bytes and not as SDK's Cardano.NewTxAlonzo
       const submitTxBytesHexString: (tx: string) => Promise<void> = () => Promise.resolve();
       // and another endpoint to get wallet addresses
-      const getAddresses: () => Promise<KeyManagement.GroupedAddress[]> = async () => [];
+      const getAddresses: () => Promise<GroupedAddress[]> = async () => [];
       // and another endpoint to get wallet's utxo balance
       const getAvailableUtxoBalance: () => Promise<Cardano.Value> = async () => ({ coins: 10_000_000n });
       // and another endpoint to get wallet's total reward accounts deposit

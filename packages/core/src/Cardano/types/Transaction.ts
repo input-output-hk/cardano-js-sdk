@@ -100,3 +100,8 @@ export interface TxAlonzo extends NewTxAlonzo<TxBodyAlonzo> {
   body: TxBodyAlonzo;
   txSize: number;
 }
+
+export type TxBodyWithHash = {
+  hash: TransactionId;
+  body: NewTxBodyAlonzo;
+};

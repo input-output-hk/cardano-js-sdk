@@ -1,5 +1,8 @@
+/* eslint-disable func-style */
+/* eslint-disable jsdoc/require-jsdoc */
+
+import { MaybeValidTx, MaybeValidTxOut, ObservableWallet, ValidTx, ValidTxOut } from '../src';
 import { Observable, catchError, filter, firstValueFrom, throwError, timeout } from 'rxjs';
-import { ObservableWallet } from '../src';
 
 const SECOND = 1000;
 const MINUTE = 60 * SECOND;
@@ -25,3 +28,11 @@ export const waitForWalletStateSettle = (wallet: ObservableWallet) =>
     'Took too long to load',
     SYNC_TIMEOUT
   );
+
+export function assertTxIsValid(tx: MaybeValidTx): asserts tx is ValidTx {
+  expect(tx.isValid).toBe(true);
+}
+
+export function assertTxOutIsValid(txOut: MaybeValidTxOut): asserts txOut is ValidTxOut {
+  expect(txOut.isValid).toBe(true);
+}

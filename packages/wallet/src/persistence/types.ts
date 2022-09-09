@@ -7,7 +7,7 @@ import {
   StakeSummary,
   SupplySummary
 } from '@cardano-sdk/core';
-import { GroupedAddress } from '../KeyManagement';
+import { GroupedAddress } from '@cardano-sdk/key-management';
 import { NewTxAlonzoWithSlot } from '../services';
 import { Observable } from 'rxjs';
 

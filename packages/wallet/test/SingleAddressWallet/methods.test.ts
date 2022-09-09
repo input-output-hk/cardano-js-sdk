@@ -1,15 +1,14 @@
 /* eslint-disable max-len */
 import * as mocks from '../mocks';
+import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { Cardano } from '@cardano-sdk/core';
-import { InitializeTxProps, KeyManagement, SingleAddressWallet, setupWallet } from '../../src';
+import { InitializeTxProps, SingleAddressWallet, setupWallet } from '../../src';
 import { firstValueFrom, skip } from 'rxjs';
+import { getPassword, testAsyncKeyAgent } from '../../../key-management/test/mocks';
 import { dummyLogger as logger } from 'ts-log';
 import { mockChainHistoryProvider, mockRewardsProvider, utxo } from '../mocks';
 import { waitForWalletStateSettle } from '../util';
-
-jest.mock('../../src/KeyManagement/cip8/cip30signData');
-const { cip30signData } = jest.requireMock('../../src/KeyManagement/cip8/cip30signData');
 
 const outputs = [
   {
@@ -44,17 +43,17 @@ describe('SingleAddressWallet methods', () => {
     const stakePoolProvider = createStubStakePoolProvider();
     const rewardsProvider = mockRewardsProvider();
     const chainHistoryProvider = mockChainHistoryProvider();
-    const groupedAddress: KeyManagement.GroupedAddress = {
+    const groupedAddress: GroupedAddress = {
       accountIndex: 0,
       address,
       index: 0,
       networkId: Cardano.NetworkId.testnet,
       rewardAccount: mocks.rewardAccount,
-      type: KeyManagement.AddressType.External
+      type: AddressType.External
     };
     ({ wallet } = await setupWallet({
       createKeyAgent: async (dependencies) => {
-        const asyncKeyAgent = await mocks.testAsyncKeyAgent([groupedAddress], dependencies);
+        const asyncKeyAgent = await testAsyncKeyAgent([groupedAddress], dependencies);
         asyncKeyAgent.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
         return asyncKeyAgent;
       },
@@ -164,7 +163,7 @@ describe('SingleAddressWallet methods', () => {
     } as InitializeTxProps;
 
     it('initializeTx', async () => {
-      mocks.getPassword.mockClear();
+      getPassword.mockClear();
       const { body, hash, inputSelection } = await wallet.initializeTx(props);
       expect(body.outputs).toHaveLength(props.outputs!.size + 1 /* change output */);
       expect(body.collaterals).toEqual([utxo[2][0]]);
@@ -176,7 +175,7 @@ describe('SingleAddressWallet methods', () => {
       expect(inputSelection.inputs.size).toBeGreaterThan(0);
       expect(inputSelection.fee).toBeGreaterThan(0n);
       expect(inputSelection.change.size).toBeGreaterThan(0);
-      expect(mocks.getPassword).not.toBeCalled();
+      expect(getPassword).not.toBeCalled();
     });
 
     it('finalizeTx', async () => {
@@ -210,7 +209,7 @@ describe('SingleAddressWallet methods', () => {
   });
 
   it('signData calls cip30signData', async () => {
-    await wallet.signData({ payload: Cardano.util.HexBlob('abc123'), signWith: address });
-    expect(cip30signData).toBeCalledTimes(1);
+    const response = await wallet.signData({ payload: Cardano.util.HexBlob('abc123'), signWith: address });
+    expect(response).toHaveProperty('signature');
   });
 });

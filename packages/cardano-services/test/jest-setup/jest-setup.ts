@@ -1,4 +1,4 @@
-import { RabbitMQContainer } from '../../../rabbitmq/test/docker';
+import { RabbitMQContainer } from '../TxSubmit/rabbitmq/docker';
 import { parse } from 'pg-connection-string';
 import { setupPostgresContainer } from './docker';
 import dotenv from 'dotenv';

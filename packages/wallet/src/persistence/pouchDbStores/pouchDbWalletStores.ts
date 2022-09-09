@@ -2,7 +2,7 @@ import { Assets } from '../../types';
 import { Cardano, EpochRewards, EraSummary, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
 import { CreatePouchDbStoresDependencies } from './types';
 import { EMPTY, combineLatest, map } from 'rxjs';
-import { GroupedAddress } from '../../KeyManagement';
+import { GroupedAddress } from '@cardano-sdk/key-management';
 import { NewTxAlonzoWithSlot } from '../../services';
 import { PouchDbCollectionStore } from './PouchDbCollectionStore';
 import { PouchDbDocumentStore } from './PouchDbDocumentStore';
