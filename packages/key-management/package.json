@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/key-management",
-  "version": "0.1.0",
+  "version": "0.2.0-nightly.0",
   "description": "Key management types and utilities for Cardano",
   "engines": {
     "node": "^14"

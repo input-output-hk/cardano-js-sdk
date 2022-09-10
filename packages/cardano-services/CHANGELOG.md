@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.6.0-nightly.1...@cardano-sdk/cardano-services@0.6.0-nightly.2) (2022-09-10)
+
+
+### Bug Fixes
+
+* **cardano-services:** correct interval type and only clear if defined ([a23f384](https://github.com/input-output-hk/cardano-js-sdk/commit/a23f3846d85740675b57c14988ac08e35ee133b9))
+
+
+
 ## [0.6.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.6.0-nightly.0...@cardano-sdk/cardano-services@0.6.0-nightly.1) (2022-09-06)
 
 

@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.6.0-nightly.0...@cardano-sdk/core@0.6.0-nightly.1) (2022-09-10)
+
+
+### ⚠ BREAKING CHANGES
+
+* rename `TxInternals` to `TxBodyWithHash`
+* hoist InputResolver types to core package, in preparation for lifting key management
+* hoist TxInternals to core package, in preparation for lifting key management
+
+### Code Refactoring
+
+* hoist InputResolver types to core package, in preparation for lifting key management ([aaf430e](https://github.com/input-output-hk/cardano-js-sdk/commit/aaf430efefcc5c87f1acfaf227f4aec11fc8db8a))
+* hoist TxInternals to core package, in preparation for lifting key management ([f5510f3](https://github.com/input-output-hk/cardano-js-sdk/commit/f5510f340d592998b3194dd303bd14b184a0a3e3))
+* rename `TxInternals` to `TxBodyWithHash` ([77567aa](https://github.com/input-output-hk/cardano-js-sdk/commit/77567aab56395ded6d9b0ba7488aacc2d3f856a0))
+
+
+
 ## [0.6.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.5.1-nightly.2...@cardano-sdk/core@0.6.0-nightly.0) (2022-09-06)
 
 

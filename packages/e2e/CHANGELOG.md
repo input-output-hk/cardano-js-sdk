@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.0-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.5.0-nightly.3...@cardano-sdk/e2e@0.5.0-nightly.4) (2022-09-10)
+
+
+### ⚠ BREAKING CHANGES
+
+* lift key management and governance concepts to new packages
+
+### Features
+
+* **e2e:** update some tests to use txBuilder ([c38d52d](https://github.com/input-output-hk/cardano-js-sdk/commit/c38d52daef9d48fe2c59a383469fa7de57fa6e20))
+
+
+### Code Refactoring
+
+* lift key management and governance concepts to new packages ([15cde5f](https://github.com/input-output-hk/cardano-js-sdk/commit/15cde5f9becff94dac17278cb45e3adcaac763b5))
+
+
+
 ## [0.5.0-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.5.0-nightly.2...@cardano-sdk/e2e@0.5.0-nightly.3) (2022-09-06)
 
 
