@@ -1,16 +1,18 @@
 import { Cardano } from '@cardano-sdk/core';
 import { Observable, firstValueFrom } from 'rxjs';
 
-import { FinalizeTxProps, InitializeTxProps, ObservableWallet } from '../types';
+import { FinalizeTxProps, InitializeTxProps, InitializeTxResult, ObservableWallet } from '../types';
 import {
   IncompatibleWalletError,
   MaybeValidTx,
   OutputBuilder,
   PartialTxOut,
   SignedTx,
+  TxAlreadySubmittedError,
   TxBodyValidationError,
   TxBuilder,
-  TxOutValidationError
+  TxOutValidationError,
+  ValidTx
 } from './types';
 import { Logger } from 'ts-log';
 import { ObservableWalletTxOutputBuilder } from './OutputBuilder';
@@ -67,11 +69,15 @@ const createSignedTx = async ({
   tx,
   extraSigners,
   signingOptions,
-  auxiliaryData
-}: FinalizeTxProps & { wallet: ObservableWalletTxBuilderDependencies }): Promise<SignedTx> => {
+  auxiliaryData,
+  afterSubmitCb
+}: FinalizeTxProps & {
+  wallet: ObservableWalletTxBuilderDependencies;
+  afterSubmitCb: () => void;
+}): Promise<SignedTx> => {
   const finalizedTx = await wallet.finalizeTx({ auxiliaryData, extraSigners, signingOptions, tx });
   return {
-    submit: () => wallet.submitTx(finalizedTx),
+    submit: () => wallet.submitTx(finalizedTx).then(() => afterSubmitCb()),
     tx: finalizedTx
   };
 };
@@ -91,11 +97,16 @@ export class ObservableWalletTxBuilder implements TxBuilder {
   #outputValidator: OutputValidator;
   #delegateConfig: DelegateConfig;
   #logger: Logger;
+  #isSubmitted = false; // Do not allow building if a transaction built by this builder was already submitted
 
   constructor({ observableWallet, outputValidator = createWalletUtil(observableWallet), logger }: BuildTxProps) {
     this.#observableWallet = observableWallet;
     this.#outputValidator = outputValidator;
     this.#logger = logger;
+  }
+
+  isSubmitted(): boolean {
+    return this.#isSubmitted;
   }
 
   addOutput(txOut: Cardano.TxOut): TxBuilder {
@@ -137,6 +148,7 @@ export class ObservableWalletTxBuilder implements TxBuilder {
 
   async build(): Promise<MaybeValidTx> {
     try {
+      if (this.isSubmitted()) throw new TxAlreadySubmittedError();
       await this.#addDelegationCertificates();
       await this.#validateOutputs();
 
@@ -147,21 +159,7 @@ export class ObservableWalletTxBuilder implements TxBuilder {
         outputs: new Set(this.partialTxBody.outputs || []),
         signingOptions: this.signingOptions
       });
-      return {
-        auxiliaryData: this.auxiliaryData && { ...this.auxiliaryData },
-        body: tx.body,
-        extraSigners: this.extraSigners && [...this.extraSigners],
-        isValid: true,
-        sign: () =>
-          createSignedTx({
-            auxiliaryData: this.auxiliaryData && { ...this.auxiliaryData },
-            extraSigners: this.extraSigners && [...this.extraSigners],
-            signingOptions: this.signingOptions && { ...this.signingOptions },
-            tx,
-            wallet: this.#observableWallet
-          }),
-        signingOptions: this.signingOptions && { ...this.signingOptions }
-      };
+      return this.#createValidTx(tx);
     } catch (error) {
       const errors = Array.isArray(error) ? (error as TxBodyValidationError[]) : [error as TxBodyValidationError];
       this.#logger.debug('Build errors', errors);
@@ -170,6 +168,25 @@ export class ObservableWalletTxBuilder implements TxBuilder {
         isValid: false
       };
     }
+  }
+
+  #createValidTx(tx: InitializeTxResult): ValidTx {
+    return {
+      auxiliaryData: this.auxiliaryData && { ...this.auxiliaryData },
+      body: tx.body,
+      extraSigners: this.extraSigners && [...this.extraSigners],
+      isValid: true,
+      sign: () =>
+        createSignedTx({
+          afterSubmitCb: () => (this.#isSubmitted = true),
+          auxiliaryData: this.auxiliaryData && { ...this.auxiliaryData },
+          extraSigners: this.extraSigners && [...this.extraSigners],
+          signingOptions: this.signingOptions && { ...this.signingOptions },
+          tx,
+          wallet: this.#observableWallet
+        }),
+      signingOptions: this.signingOptions && { ...this.signingOptions }
+    };
   }
 
   async #validateOutputs(): Promise<TxOutValidationError[]> {
